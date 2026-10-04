@@ -81,6 +81,41 @@ export function floor(amount: Money): Money {
   return wrap(unwrap(amount).floor())
 }
 
+export function ceil(amount: Money): Money {
+  return wrap(unwrap(amount).ceil())
+}
+
+/**
+ * The money quantum (#20, Systems & Economy addition 2): every charge (recharge, repair, rescue
+ * fee, travel fee) is rounded up to it and every per-unit sale price down, so totals are exact
+ * sums and the money shown always adds up. `economy-constants.json` records the same rule.
+ */
+const MONEY_QUANTUM_DECIMALS = 3
+
+/** Rounds a charge up to the next multiple of 0.001. */
+export function ceilMilli(amount: Money): Money {
+  return wrap(unwrap(amount).toDecimalPlaces(MONEY_QUANTUM_DECIMALS, Decimal.ROUND_CEIL))
+}
+
+/** Rounds income (the per-unit ore sale price) down to a multiple of 0.001. */
+export function floorMilli(amount: Money): Money {
+  return wrap(unwrap(amount).toDecimalPlaces(MONEY_QUANTUM_DECIMALS, Decimal.ROUND_FLOOR))
+}
+
+/** A bounded count (level, units, tiles) as money, so it can scale a price. */
+export function fromSafeInteger(count: number): Money {
+  assertSafeInteger(count)
+  return wrap(new MoneyDecimal(count))
+}
+
+/** A whole amount that is a bounded count again (for example `ceil(0.4 * coreTileCount)`). */
+export function toSafeInteger(amount: Money): number {
+  const value = unwrap(amount)
+  const count = value.isInteger() ? value.toNumber() : Number.NaN
+  assertSafeInteger(count)
+  return count
+}
+
 /** Whether `text` parses as money >= 0: the check for a grant or a scenario's starting money. */
 export function isNonNegativeMoneyText(text: unknown): boolean {
   if (typeof text !== 'string' || !DECIMAL_TEXT.test(text)) return false
@@ -90,6 +125,10 @@ export function isNonNegativeMoneyText(text: unknown): boolean {
 
 export function isMoney(value: unknown): value is Money {
   return value instanceof MoneyDecimal
+}
+
+function assertSafeInteger(count: number): void {
+  if (!Number.isSafeInteger(count)) throw new RangeError(`expected a safe integer, got ${count}`)
 }
 
 /** Every value leaving this module is finite: Infinity and NaN never become money. */

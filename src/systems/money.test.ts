@@ -1,16 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import {
   add,
+  ceil,
+  ceilMilli,
   cmp,
   div,
   floor,
+  floorMilli,
   fromCanonical,
+  fromSafeInteger,
   isMoney,
   isNonNegativeMoneyText,
   mul,
   powInt,
   sub,
   toCanonical,
+  toSafeInteger,
   ZERO_MONEY,
   type Money,
 } from './money'
@@ -100,6 +105,11 @@ describe('money: arithmetic', () => {
     expect(toCanonical(floor(m('-2.25')))).toBe('-3e+0')
   })
 
+  it('ceils toward plus infinity, as an upgrade price ceil(base * ratio^level) needs', () => {
+    expect(toCanonical(ceil(m('29.76')))).toBe('3e+1')
+    expect(toCanonical(ceil(m('24')))).toBe('2.4e+1')
+  })
+
   it('compares by value, not by text', () => {
     expect(cmp(m('9'), m('10'))).toBe(-1)
     expect(cmp(m('1.50'), m('1.5'))).toBe(0)
@@ -114,6 +124,46 @@ describe('money: arithmetic', () => {
     const a = m('5')
     add(a, m('1'))
     expect(toCanonical(a)).toBe('5e+0')
+  })
+})
+
+describe('money: the one rounding rule for charges and income', () => {
+  it('rounds every charge up to the next 0.001', () => {
+    expect(toCanonical(ceilMilli(m('0.0451')))).toBe(toCanonical(m('0.046')))
+    expect(toCanonical(ceilMilli(m('0.045')))).toBe(toCanonical(m('0.045')))
+  })
+
+  it('rounds a per-unit ore price down to a multiple of 0.001', () => {
+    expect(toCanonical(floorMilli(m('75.9375')))).toBe(toCanonical(m('75.937')))
+  })
+
+  it('makes a sale of 7 tier-6 ore units exactly 531.559', () => {
+    const unitPrice = floorMilli(m('75.9375'))
+    expect(toCanonical(mul(unitPrice, fromSafeInteger(7)))).toBe(toCanonical(m('531.559')))
+  })
+
+  it('leaves amounts far above the 0.001 step unchanged', () => {
+    expect(ceilMilli(m('1.23e30'))).toEqual(m('1.23e30'))
+  })
+})
+
+describe('money: whole counts', () => {
+  it('turns a safe integer such as a level or a unit count into money', () => {
+    expect(toCanonical(fromSafeInteger(156))).toBe('1.56e+2')
+  })
+
+  it('refuses a count that is not a safe integer', () => {
+    expect(() => fromSafeInteger(1.5)).toThrow(/integer/)
+    expect(() => fromSafeInteger(Number.MAX_SAFE_INTEGER + 1)).toThrow(/integer/)
+  })
+
+  it('reads a whole amount such as a tile count back as a number', () => {
+    expect(toSafeInteger(ceil(m('62.4')))).toBe(63)
+  })
+
+  it('refuses to read a fraction or a huge amount as a count', () => {
+    expect(() => toSafeInteger(m('62.4'))).toThrow(/integer/)
+    expect(() => toSafeInteger(m('1e30'))).toThrow(/integer/)
   })
 })
 
