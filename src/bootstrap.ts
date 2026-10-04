@@ -60,6 +60,7 @@ function exposeDebugHandles(shell: Shell, runId: string): void {
   if (!shell.launch.debugEnabled) return
   shell.exposeGlobalHandle('steampunkDebug', createDebugApi())
   shell.exposeGlobalHandle('steampunkRunLog', () => shell.readBufferedRunEvents(runId))
+  shell.exposeGlobalHandle('steampunkRunCommands', () => shell.readBufferedRunCommands(runId))
 }
 
 function applyLaunchScenario(shell: Shell): void {

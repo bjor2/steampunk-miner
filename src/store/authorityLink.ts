@@ -6,7 +6,8 @@
  * `tick` is the authority's current tick until a fixed-step tick counter drives commands (it
  * arrives with the first tick-driven command, `reportPose`).
  */
-import type { CommandIntent } from '../systems/authority/authorityCommand'
+import { getRunLog } from '../logging/runLog'
+import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import type { Authority, DomainEventListener } from '../systems/authority/loopbackAuthority'
 
@@ -21,9 +22,15 @@ export function connectAuthority(next: Authority, onEvents: DomainEventListener)
   stopListening = next.subscribe(onEvents)
 }
 
+/** Every submitted command, accepted or not, goes to `commands.ndjson`: it replays the same way. */
 export function submitCommand(playerId: string, intent: CommandIntent): void {
-  const connected = connectedAuthority()
-  connected.submit({ playerId, tick: connected.snapshot().tick, seq: nextSeq++, ...intent })
+  const command = stampCommand(playerId, intent)
+  getRunLog().recordCommand(command)
+  connectedAuthority().submit(command)
+}
+
+function stampCommand(playerId: string, intent: CommandIntent): AuthorityCommand {
+  return { playerId, tick: connectedAuthority().snapshot().tick, seq: nextSeq++, ...intent }
 }
 
 export function readAuthorityState(): AuthorityState {

@@ -19,6 +19,8 @@ export interface ShellBridge {
   getAppInfo(): Promise<AppInfo>
   /** Appends already-formatted NDJSON lines (each ending in a newline) to the run's events file. */
   appendRunEvents(runId: string, ndjsonLines: string): Promise<void>
+  /** Appends authority commands as NDJSON lines to the run's commands file (the replay input). */
+  appendRunCommands(runId: string, ndjsonLines: string): Promise<void>
   /** Replaces the run's metadata.json or summary.json. */
   writeRunDocument(runId: string, document: RunDocumentName, json: string): Promise<void>
 }

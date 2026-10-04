@@ -1,6 +1,6 @@
 /**
  * The only module that writes run files to disk (design doc section 23):
- *   <logsRoot>/<runId>/events.ndjson | metadata.json | summary.json
+ *   <logsRoot>/<runId>/events.ndjson | commands.ndjson | metadata.json | summary.json
  * Everything arriving from the renderer is treated as untrusted: ids and sizes are checked here.
  */
 import { appendFile, mkdir, writeFile } from 'node:fs/promises'
@@ -19,6 +19,15 @@ export async function appendRunEvents(
 ): Promise<void> {
   const folder = await prepareRunFolder(logsRoot, runId)
   await appendFile(join(folder, 'events.ndjson'), acceptText(ndjsonLines), 'utf8')
+}
+
+export async function appendRunCommands(
+  logsRoot: string,
+  runId: unknown,
+  ndjsonLines: unknown,
+): Promise<void> {
+  const folder = await prepareRunFolder(logsRoot, runId)
+  await appendFile(join(folder, 'commands.ndjson'), acceptText(ndjsonLines), 'utf8')
 }
 
 export async function writeRunDocument(

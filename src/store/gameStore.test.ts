@@ -181,6 +181,27 @@ describe('game store: run log', () => {
     expect(sink.events[1]).toMatchObject({ planet: 9, depthTiles: 0, playerId: 'player_1' })
   })
 
+  it('writes every submitted command to the replay file in submission order', () => {
+    game().setPlanet(3)
+    game().giveMoney('100')
+    expect(sink.commands).toEqual([
+      {
+        playerId: 'player_1',
+        tick: 0,
+        seq: 1,
+        type: 'debug.setPlanet',
+        payload: { planetIndex: 3 },
+      },
+      {
+        playerId: 'player_1',
+        tick: 0,
+        seq: 2,
+        type: 'debug.grantMoney',
+        payload: { amount: '1e+2' },
+      },
+    ])
+  })
+
   it('records nothing for a refused command', () => {
     expect(() => game().giveMoney('-1')).toThrow()
     expect(sink.events).toEqual([])

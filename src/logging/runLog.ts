@@ -4,6 +4,7 @@
  * wall clock is injected (seconds since the run started), so tests control time; the game clock
  * is the `tick` the caller stamps.
  */
+import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import type { RunEventSink } from './eventSink'
 import type { RunEventData, RunEventName } from './eventNames'
 import { LOG_SCHEMA_VERSION, type RunEvent, type RunEventStamp } from './runEvent'
@@ -11,6 +12,8 @@ import { LOG_SCHEMA_VERSION, type RunEvent, type RunEventStamp } from './runEven
 export interface RunLog {
   readonly runId: string
   record<N extends RunEventName>(stamp: RunEventStamp, event: N, data: RunEventData<N>): void
+  /** Appends a submitted command to `commands.ndjson`, exactly as the authority receives it. */
+  recordCommand(command: AuthorityCommand): void
 }
 
 export interface RunLogOptions {
@@ -36,10 +39,15 @@ export function createRunLog({ runId, sink, secondsSinceStart }: RunLogOptions):
       }
       sink.append(stamped)
     },
+    recordCommand: (command) => sink.appendCommand(runId, command),
   }
 }
 
-const discardingRunLog: RunLog = { runId: 'run_none', record: () => undefined }
+const discardingRunLog: RunLog = {
+  runId: 'run_none',
+  record: () => undefined,
+  recordCommand: () => undefined,
+}
 
 let installed: RunLog = discardingRunLog
 

@@ -8,6 +8,7 @@ import type { Shell } from './shell'
 
 export function createBrowserShell(): Shell {
   const eventLinesByRun = new Map<string, string>()
+  const commandLinesByRun = new Map<string, string>()
   const documentsByRun = new Map<string, string>()
 
   return {
@@ -22,10 +23,14 @@ export function createBrowserShell(): Shell {
     appendRunEvents: async (runId, lines) => {
       eventLinesByRun.set(runId, (eventLinesByRun.get(runId) ?? '') + lines)
     },
+    appendRunCommands: async (runId, lines) => {
+      commandLinesByRun.set(runId, (commandLinesByRun.get(runId) ?? '') + lines)
+    },
     writeRunDocument: async (runId, document, json) => {
       documentsByRun.set(`${runId}/${document}`, json)
     },
     readBufferedRunEvents: (runId) => eventLinesByRun.get(runId) ?? '',
+    readBufferedRunCommands: (runId) => commandLinesByRun.get(runId) ?? '',
     exposeGlobalHandle: exposeOnWindow,
     onPageHide: runOnPageHide,
     onKeyChange: listenForKeys,

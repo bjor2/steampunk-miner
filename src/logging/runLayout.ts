@@ -1,6 +1,7 @@
 /**
  * Where a run's files live (design doc section 23):
- *   logs/<runId>/events.ndjson | summary.json | metadata.json
+ *   logs/<runId>/events.ndjson | commands.ndjson | summary.json | metadata.json
+ * (`commands.ndjson` is the replay input, decision #11 section 3)
  * and how a run gets its id. Time is an argument; nothing here reads a clock.
  */
 
@@ -18,6 +19,7 @@ export function isValidRunId(runId: string): boolean {
 export function runFilePaths(runId: string) {
   return {
     events: `logs/${runId}/events.ndjson`,
+    commands: `logs/${runId}/commands.ndjson`,
     summary: `logs/${runId}/summary.json`,
     metadata: `logs/${runId}/metadata.json`,
   }

@@ -5,8 +5,9 @@
  */
 import type { RunEvent } from './runEvent'
 
-export function formatNdjsonLine(event: RunEvent): string {
-  return `${JSON.stringify(event)}\n`
+/** One run event or one authority command as a line. */
+export function formatNdjsonLine(record: object): string {
+  return `${JSON.stringify(record)}\n`
 }
 
 export function parseNdjson(text: string): RunEvent[] {

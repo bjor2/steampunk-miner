@@ -6,9 +6,10 @@ describe('run layout', () => {
     expect(createRunId(new Date('2026-10-04T20:30:15Z'))).toBe('run_2026-10-04_20-30-15')
   })
 
-  it('puts the three run files in one folder per run', () => {
+  it('puts the four run files in one folder per run', () => {
     expect(runFilePaths('run_x')).toEqual({
       events: 'logs/run_x/events.ndjson',
+      commands: 'logs/run_x/commands.ndjson',
       summary: 'logs/run_x/summary.json',
       metadata: 'logs/run_x/metadata.json',
     })

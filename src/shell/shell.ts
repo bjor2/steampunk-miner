@@ -22,9 +22,12 @@ export interface Shell {
   readonly launch: LaunchParameters
   getAppInfo(): Promise<AppInfo>
   appendRunEvents(runId: string, ndjsonLines: string): Promise<void>
+  appendRunCommands(runId: string, ndjsonLines: string): Promise<void>
   writeRunDocument(runId: string, document: RunDocumentName, json: string): Promise<void>
-  /** Browser only: the NDJSON written so far (Electron writes files instead and returns ''). */
+  /** Browser only: the event NDJSON written so far (Electron writes files and returns ''). */
   readBufferedRunEvents(runId: string): string
+  /** Browser only: the command NDJSON written so far (Electron writes files and returns ''). */
+  readBufferedRunCommands(runId: string): string
   /** Puts a handle on `window` for bots and the dev console (Playwright, design doc section 20). */
   exposeGlobalHandle(name: string, handle: unknown): void
   /** Reports key presses (`KeyboardEvent.code`, e.g. "KeyA") and releases; returns an unsubscribe. */
