@@ -16,7 +16,24 @@ import type { CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { createLoopbackAuthority, type Authority } from '../systems/authority/loopbackAuthority'
+import {
+  readSnapshot,
+  takeSnapshot,
+  type SessionSnapshot,
+} from '../systems/authority/sessionSnapshot'
+import {
+  fastForwardProblems,
+  fastForwardSteps,
+  type FastForwardStep,
+  type ScriptedCommand,
+} from '../systems/fastForward'
 import { ZERO_MONEY, type Money } from '../systems/money'
+import {
+  startOfScenario,
+  validateScenario,
+  type Scenario,
+  type ScriptStep,
+} from '../systems/scenario'
 import { startScenarioProblems, type StartScenario } from '../systems/startScenario'
 import {
   grantMoneyCommand,
@@ -24,7 +41,12 @@ import {
   setPlanetSeedCommand,
   startScenarioCommands,
 } from '../systems/startScenarioCommands'
-import { connectAuthority, readAuthorityState, submitCommand } from './authorityLink'
+import {
+  advanceAuthorityTo,
+  connectAuthority,
+  readAuthorityState,
+  submitCommand,
+} from './authorityLink'
 
 export interface GameState {
   playerId: string
@@ -42,6 +64,12 @@ export interface GameState {
   /** `amount` is a decimal string >= 0, for example "1e100". */
   giveMoney(amount: string): void
   applyStartScenario(scenario: StartScenario): void
+  /** A scenario file (#11 section 4): its start as `debug.*` commands, then its script. */
+  applyScenario(scenario: Scenario): void
+  /** Advances the authority headlessly, submitting scripted commands at their ticks. */
+  fastForward(ticks: number, commands?: readonly ScriptedCommand[]): void
+  /** Replaces the session with a snapshot's state; refused whole on any problem. */
+  restoreSnapshot(snapshot: unknown): void
 }
 
 type GameValues = Pick<
@@ -88,7 +116,34 @@ export const useGameStore = create<GameState>()((set, get) => ({
     placeAtScenarioDepth(scenario)
     submitEach(get().playerId, startScenarioCommands(scenario))
   },
+
+  applyScenario: (scenario) => {
+    refuseProblems(validateScenario(scenario))
+    const scriptStartTick = readAuthorityState().tick
+    get().applyStartScenario(startOfScenario(scenario))
+    runScenarioScript(scriptStartTick, scenario.script ?? [])
+  },
+
+  fastForward: (ticks, commands = []) => {
+    const fromTick = readAuthorityState().tick
+    refuseProblems(fastForwardProblems(fromTick, ticks, commands))
+    recordDebugCommand(get(), 'fastForward', { ticks, commands: commands.length })
+    runFastForwardSteps(get().playerId, fastForwardSteps(fromTick, ticks, commands))
+  },
+
+  restoreSnapshot: (snapshot) => {
+    const restored = readSnapshot(snapshot)
+    if (!('state' in restored)) return refuseProblems(restored.problems)
+    connectAuthority(createLoopbackAuthority(restored.state), followAuthority)
+    followAuthority([])
+    recordDebugCommand(get(), 'restoreSnapshot', { tick: restored.state.tick })
+  },
 }))
+
+/** The session as a portable snapshot (#11 section 5): the debug API's `snapshot()`. */
+export function takeSessionSnapshot(): SessionSnapshot {
+  return takeSnapshot(readAuthorityState())
+}
 
 /** A new session for the starting values; tests pass a spy to watch what the store submits. */
 export function createStartingAuthority(): Authority {
@@ -135,6 +190,24 @@ function placeAtScenarioDepth(scenario: StartScenario): void {
 
 function submitEach(playerId: string, intents: readonly CommandIntent[]): void {
   for (const intent of intents) submitCommand(playerId, intent)
+}
+
+/**
+ * Script ticks count from the tick the scenario was applied at; a step whose tick an earlier
+ * fast-forward already passed runs at once, so time never goes backwards.
+ */
+function runScenarioScript(scriptStartTick: number, script: readonly ScriptStep[]): void {
+  for (const step of script) {
+    advanceAuthorityTo(Math.max(scriptStartTick + step.tick, readAuthorityState().tick))
+    useGameStore.getState().fastForward(step.args.ticks)
+  }
+}
+
+function runFastForwardSteps(playerId: string, steps: readonly FastForwardStep[]): void {
+  for (const step of steps) {
+    if (step.kind === 'advance') advanceAuthorityTo(step.tick)
+    else submitCommand(playerId, step.intent)
+  }
 }
 
 /** A scenario is refused, never trimmed: every problem is named, nothing is applied. */

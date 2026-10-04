@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseStartScenario, startScenarioProblems } from './startScenario'
+import { startScenarioProblems } from './startScenario'
 
 describe('start scenario', () => {
   it('accepts an empty scenario', () => {
@@ -31,40 +31,5 @@ describe('start scenario', () => {
     expect(startScenarioProblems({ money: 'Infinity' })).toHaveLength(1)
     expect(startScenarioProblems({ money: 'NaN' })).toHaveLength(1)
     expect(startScenarioProblems({ money: 'lots' })).toHaveLength(1)
-  })
-})
-
-describe('parse start scenario', () => {
-  it('reads the fields of a scenario', () => {
-    const { scenario, problems } = parseStartScenario('{"planetTier":317,"planetSeed":83921}')
-    expect(problems).toEqual([])
-    expect(scenario).toEqual({ planetTier: 317, planetSeed: 83921 })
-  })
-
-  it('refuses text that is not JSON', () => {
-    expect(parseStartScenario('{nope').problems).toEqual(['scenario is not valid JSON'])
-  })
-
-  it('refuses JSON that is not an object', () => {
-    expect(parseStartScenario('[1,2]').problems).toHaveLength(1)
-  })
-
-  it('refuses a field it does not know instead of ignoring it', () => {
-    expect(parseStartScenario('{"drillLevel":1500}').problems).toEqual([
-      'unknown scenario field "drillLevel"',
-    ])
-  })
-
-  it('refuses a field of the wrong type', () => {
-    expect(parseStartScenario('{"planetTier":"3"}').problems).toContain(
-      'planetTier must be a number',
-    )
-    expect(parseStartScenario('{"money":1e30}').problems).toContain(
-      'money must be a decimal string',
-    )
-  })
-
-  it('also reports the value rules', () => {
-    expect(parseStartScenario('{"depth":3}').problems).toHaveLength(1)
   })
 })

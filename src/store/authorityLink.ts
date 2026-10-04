@@ -15,11 +15,16 @@ let authority: Authority | null = null
 let nextSeq = 1
 let stopListening = () => {}
 
+/** A restored session continues its `seq`s, so the authority keeps accepting our commands. */
 export function connectAuthority(next: Authority, onEvents: DomainEventListener): void {
   stopListening()
   authority = next
-  nextSeq = 1
+  nextSeq = highestAcceptedSeq(next.snapshot().state) + 1
   stopListening = next.subscribe(onEvents)
+}
+
+function highestAcceptedSeq(state: AuthorityState): number {
+  return Math.max(0, ...Object.values(state.players).map((player) => player.lastSeq))
 }
 
 /** Every submitted command, accepted or not, goes to `commands.ndjson`: it replays the same way. */
@@ -31,6 +36,11 @@ export function submitCommand(playerId: string, intent: CommandIntent): void {
 
 function stampCommand(playerId: string, intent: CommandIntent): AuthorityCommand {
   return { playerId, tick: connectedAuthority().snapshot().tick, seq: nextSeq++, ...intent }
+}
+
+/** Moves the authority's clock with no command (fastForward); it answers with its events. */
+export function advanceAuthorityTo(tick: number): void {
+  connectedAuthority().advanceTo(tick)
 }
 
 export function readAuthorityState(): AuthorityState {

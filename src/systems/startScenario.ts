@@ -6,8 +6,8 @@
  * A scenario is refused, never trimmed: every problem is listed, and the caller applies nothing
  * when the list is not empty.
  *
- * Only the fields below exist so far; the design lists many more (upgrades, wagons, facilities,
- * NPC states, quests, enemies, core status, party size...). Add each with its rule and its test.
+ * This is the start state the store applies; scenario files (`scenario.ts`, #11 section 4) are
+ * validated there and mapped onto it. The per-field rules here also guard single debug commands.
  *
  * Money is a decimal string such as "1e30" (decision #5), never a JSON number, so 1e100 and past
  * 1e308 arrive exact.
@@ -54,48 +54,4 @@ function moneyProblems(money: string | undefined): string[] {
   if (money === undefined) return []
   if (isNonNegativeMoneyText(money)) return []
   return [`money must be a decimal string >= 0 such as "1e30", got ${JSON.stringify(money)}`]
-}
-
-const FIELD_TYPES: Readonly<Record<keyof StartScenario, 'number' | 'string'>> = {
-  planetTier: 'number',
-  planetSeed: 'number',
-  depthTiles: 'number',
-  money: 'string',
-}
-
-const FIELD_TYPE_NAMES = { number: 'a number', string: 'a decimal string' } as const
-
-/**
- * Reads a scenario from text (the `?scenario=` launch parameter). Unknown keys and values of the
- * wrong JSON type are problems, not silently dropped; `scenario` is only meaningful when `problems` is empty.
- */
-export function parseStartScenario(text: string): {
-  scenario: StartScenario
-  problems: string[]
-} {
-  const parsed = readJsonObject(text)
-  if (typeof parsed === 'string') return { scenario: {}, problems: [parsed] }
-  const scenario = parsed as StartScenario
-  return { scenario, problems: [...shapeProblems(parsed), ...startScenarioProblems(scenario)] }
-}
-
-function readJsonObject(text: string): Record<string, unknown> | string {
-  try {
-    const value: unknown = JSON.parse(text)
-    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      return value as Record<string, unknown>
-    }
-    return 'scenario must be a JSON object'
-  } catch {
-    return 'scenario is not valid JSON'
-  }
-}
-
-function shapeProblems(fields: Record<string, unknown>): string[] {
-  return Object.entries(fields).flatMap(([key, value]) => {
-    if (!Object.hasOwn(FIELD_TYPES, key)) return [`unknown scenario field "${key}"`]
-    const expected = FIELD_TYPES[key as keyof StartScenario]
-    if (typeof value !== expected) return [`${key} must be ${FIELD_TYPE_NAMES[expected]}`]
-    return []
-  })
 }

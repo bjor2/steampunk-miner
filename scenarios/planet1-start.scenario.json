@@ -1,0 +1,8 @@
+{
+  "scenarioVersion": 1,
+  "name": "planet1-start",
+  "worldSeed": 83921,
+  "start": { "planet": 1, "depthTiles": 0, "money": "0" },
+  "script": [{ "tick": 0, "command": "fastForward", "args": { "ticks": 7200 } }],
+  "expect": {}
+}

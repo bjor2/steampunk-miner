@@ -1,0 +1,13 @@
+{
+  "scenarioVersion": 1,
+  "name": "broken-on-purpose",
+  "worldSeed": 83921,
+  "start": {
+    "planet": 1,
+    "depthTiles": 12.5,
+    "money": "1,000",
+    "upgrades": { "drill_power": 3, "laser": 1, "hull": -2 },
+    "fuel": 100
+  },
+  "script": [{ "tick": 0, "command": "fastForward", "args": { "ticks": 600 } }]
+}

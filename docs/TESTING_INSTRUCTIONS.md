@@ -27,8 +27,8 @@ only be trusted by looking at it, look at it and say so in the commit.
 ## 2. Conventions
 
 - `describe('<area>')`, `it('<behaviour stated as a sentence>')`, one behaviour per test.
-- Set up state through a **start scenario** (`StartScenario`, `useGameStore.applyStartScenario`) or a
-  store action, never by assigning private fields.
+- Set up state through a **scenario** (`useGameStore.applyScenario`, `applyStartScenario`) or a store
+  action, never by assigning private fields.
 - Time is an argument: tests pass `dt` or an injected clock (`createRunLog({ secondsSinceStart })`).
   Where timing matters, assert the same outcome at two step rates.
 - Determinism: seed everything. A pinned-sequence test (see `seededRandom.test.ts`) makes a generator
@@ -38,15 +38,23 @@ only be trusted by looking at it, look at it and say so in the commit.
 
 ## 3. Scenarios and the debug API
 
-A **start scenario** is the state a player would have had to earn, written down instead of played
-for (design doc 19-20). Rules live in `src/systems/startScenario.ts`; they are **refused, never
-trimmed**: every problem is listed and nothing is applied.
+A **scenario** is the state a player would have had to earn, written down instead of played for
+(design doc 19-20, decision #11 section 4). Files are `scenarios/*.scenario.json`, `scenarioVersion` 1,
+validated by `validateScenario` in `src/systems/scenario.ts`. They are **refused, never trimmed**: every
+problem is listed (unknown fields included) and nothing is applied. Start fields whose system is not
+built yet (`depthBp`, inventory, upgrades, unlocks, core fragments) are validated, then refused with a
+problem naming what is missing.
 
-- Browser: `?scenario=<json>` at launch (parsed by `parseStartScenario`); `?debug` (or the dev build)
-  exposes `window.steampunkDebug` (the `DebugApi`) and `window.steampunkRunLog()` (the NDJSON so far,
-  browser shell only).
-- Fields today: `planetTier`, `planetSeed`, `depth`, `money` (a decimal string such as `"1e30"`). Add a
-  field with its validation rule, its store wiring and its test in one commit.
+- Applying a scenario submits `debug.*` authority commands (so it replays from `commands.ndjson` and logs
+  `debug_command_applied`), then runs its script (`fastForward` steps).
+- Browser: `?scenario=<json>` at launch (parsed by `parseScenario`); `?debug` (or the dev build) exposes
+  `window.steampunkDebug` (the `DebugApi`), `window.steampunkRunLog()` and `window.steampunkRunCommands()`
+  (the NDJSON so far, browser shell only).
+- Every wired debug method answers `{ ok: true, ... }` or `{ ok: false, problems }`: `setPlanet`,
+  `setPlanetSeed`, `teleportToDepthTiles`, `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
+  `fastForward(ticks, commands?)`, `snapshot()` and `restore(snapshot)`.
+- Run-log specs: every emitted line must pass `runEventProblems` (the schema registry in
+  `src/logging/eventNames.ts`); a summary is always `deriveSummary(events)`.
 - Money in tests: compare canonical strings (`toCanonical`) or `Money` values; `src/testSetup.ts` registers
   a value-equality tester, so `toEqual(fromCanonical('1.5'))` matches `1.50`.
 - Store actions that change world or economy go through the authority: to check that one submits instead

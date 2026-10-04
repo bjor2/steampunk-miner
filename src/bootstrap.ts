@@ -17,7 +17,7 @@ import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
 import { createRunMetadata } from './logging/runMetadata'
 import { getShell, type Shell } from './shell/shell'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
-import { parseStartScenario } from './systems/startScenario'
+import { parseScenario, type Scenario } from './systems/scenario'
 
 const LOG_FLUSH_INTERVAL_MS = 1000
 
@@ -85,9 +85,9 @@ function exposeDebugHandles(shell: Shell, runId: string): void {
 function applyLaunchScenario(shell: Shell): void {
   const text = shell.launch.scenarioText
   if (text === null) return
-  const { scenario, problems } = parseStartScenario(text)
+  const { scenario, problems } = parseScenario(text)
   if (problems.length > 0) throw new Error(`launch scenario refused: ${problems.join('; ')}`)
-  useGameStore.getState().applyStartScenario(scenario)
+  useGameStore.getState().applyScenario(scenario as Scenario)
 }
 
 function writeMetadata(shell: Shell, run: RunFiles): void {
