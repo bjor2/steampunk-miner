@@ -15,7 +15,11 @@ export interface DomainEventBodies {
   MoneyChanged: { from: string; to: string }
   DebugCommandApplied: { command: CommandType; args: Readonly<Record<string, unknown>> }
   CommandRejected: { commandType: string; reason: RejectionReason; problems: string[] }
+  StateDigested: { digest: string; scope: DigestScope }
 }
+
+/** When a digest is taken (#11 section 3): every 3600 ticks, at docks and travel, at the end. */
+export type DigestScope = 'periodic' | 'dock' | 'travel' | 'end'
 
 export type DomainEventType = keyof DomainEventBodies
 
@@ -23,5 +27,19 @@ export type DomainEventBody = {
   [K in DomainEventType]: { type: K } & DomainEventBodies[K]
 }[DomainEventType]
 
-/** Each event carries the `playerId`, `tick` and `seq` of the command that caused it. */
-export type DomainEvent = CommandStamp & DomainEventBody
+/** An event the clock caused, not a command (a periodic digest): it has no player or seq. */
+export interface TickStamp {
+  tick: number
+  playerId?: undefined
+  seq?: undefined
+}
+
+/**
+ * A command-caused event carries the `playerId`, `tick` and `seq` of its command; a tick-driven
+ * one only the tick (#11: its log line has no `cmd`).
+ */
+export type DomainEvent = (CommandStamp | TickStamp) & DomainEventBody
+
+export function isCommandCaused(event: DomainEvent): event is CommandStamp & DomainEventBody {
+  return event.seq !== undefined
+}

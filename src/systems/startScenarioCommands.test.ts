@@ -11,7 +11,7 @@ describe('start scenario commands', () => {
   })
 
   it('leaves the depth to the client, which owns the vehicle pose', () => {
-    expect(startScenarioCommands({ depth: 0.5 })).toEqual([])
+    expect(startScenarioCommands({ depthTiles: 50 })).toEqual([])
   })
 
   it('spells money canonically in the command', () => {

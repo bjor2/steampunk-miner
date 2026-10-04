@@ -1,17 +1,71 @@
 /**
- * Run-log lines projected from the authority's domain events (decision #11: log events are a
- * projection of domain events, never written ad hoc from game code). Events with no log line yet
- * are skipped; each later ticket adds the projection of the events it introduces.
+ * The projection from the authority's domain events to run-log lines (decision #11: log events are
+ * a projection of domain events, never written ad hoc from game code, so in co-op a client can
+ * never log what the host did not accept). Pure mapping first, recording second.
+ *
+ * Domain events with no log line project to null: planet, seed and wallet changes so far come only
+ * from `debug.*` commands, whose `debug_command_applied` line already says what happened. Each
+ * later ticket adds the projection of the domain events it introduces.
  */
-import type { DomainEvent } from '../systems/authority/domainEvent'
-import type { RunEventContext } from './runEvent'
+import {
+  isCommandCaused,
+  type DomainEvent,
+  type DomainEventBodies,
+  type DomainEventType,
+} from '../systems/authority/domainEvent'
+import type { RunEventData, RunEventName } from './eventNames'
+import type { CommandRef, RunEventPlace, RunEventStamp } from './runEvent'
 import { getRunLog } from './runLog'
 
-export function recordDomainEvents(context: RunEventContext, events: readonly DomainEvent[]) {
-  for (const event of events) recordDomainEvent(context, event)
+/** An event name with the payload registered for it. */
+export type RunLogLine = { [N in RunEventName]: { event: N; data: RunEventData<N> } }[RunEventName]
+
+export interface ProjectedLine {
+  tick: number
+  cmd?: CommandRef
+  line: RunLogLine
 }
 
-function recordDomainEvent(context: RunEventContext, event: DomainEvent): void {
-  if (event.type !== 'DebugCommandApplied') return
-  getRunLog().record(context, 'debug_command_applied', { command: event.command, args: event.args })
+type Projection<K extends DomainEventType> = (body: DomainEventBodies[K]) => RunLogLine | null
+
+const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
+  PlanetChanged: () => null,
+  PlanetSeedChanged: () => null,
+  MoneyChanged: () => null,
+  DebugCommandApplied: ({ command, args }) => ({
+    event: 'debug_command_applied',
+    data: { command, args },
+  }),
+  CommandRejected: ({ commandType, reason }) => ({
+    event: 'command_rejected',
+    data: { type: commandType, reason },
+  }),
+  StateDigested: ({ digest, scope }) => ({ event: 'state_digest', data: { digest, scope } }),
+}
+
+export function projectDomainEvent(event: DomainEvent): ProjectedLine | null {
+  const line = lineOf(event)
+  if (line === null) return null
+  return { tick: event.tick, ...causeOf(event), line }
+}
+
+function lineOf(event: DomainEvent): RunLogLine | null {
+  const project = PROJECTIONS[event.type] as Projection<typeof event.type>
+  return project(event as never)
+}
+
+function causeOf(event: DomainEvent): { cmd?: CommandRef } {
+  return isCommandCaused(event) ? { cmd: [event.tick, event.seq] } : {}
+}
+
+export function recordDomainEvents(place: RunEventPlace, events: readonly DomainEvent[]): void {
+  for (const projected of events.map(projectDomainEvent)) {
+    if (projected !== null) recordProjectedLine(place, projected)
+  }
+}
+
+function recordProjectedLine(place: RunEventPlace, { tick, cmd, line }: ProjectedLine): void {
+  const stamp: RunEventStamp = cmd === undefined ? { ...place, tick } : { ...place, tick, cmd }
+  // The union pairs each name with its payload; record() checks one name at a time.
+  getRunLog().record(stamp, line.event, line.data as never)
 }

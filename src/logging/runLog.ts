@@ -1,15 +1,16 @@
 /**
- * The run's event log: stamps each event with its run, order and time, and hands it to the sink.
- * One writer: only this module creates RunEvents. The clock is injected (seconds since the run
- * started), so tests control time.
+ * The run's event log: stamps each event with the envelope (#11 section 1: version, run, order
+ * and wall time) and hands it to the sink. One writer: only this module creates RunEvents. The
+ * wall clock is injected (seconds since the run started), so tests control time; the game clock
+ * is the `tick` the caller stamps.
  */
 import type { RunEventSink } from './eventSink'
-import type { RunEventName } from './eventNames'
-import type { RunEvent, RunEventContext, RunEventData } from './runEvent'
+import type { RunEventData, RunEventName } from './eventNames'
+import { LOG_SCHEMA_VERSION, type RunEvent, type RunEventStamp } from './runEvent'
 
 export interface RunLog {
   readonly runId: string
-  record<N extends RunEventName>(context: RunEventContext, event: N, data: RunEventData<N>): void
+  record<N extends RunEventName>(stamp: RunEventStamp, event: N, data: RunEventData<N>): void
 }
 
 export interface RunLogOptions {
@@ -23,12 +24,13 @@ export function createRunLog({ runId, sink, secondsSinceStart }: RunLogOptions):
   let nextSeq = 0
   return {
     runId,
-    record(context, event, data) {
+    record(stamp, event, data) {
       const stamped: RunEvent = {
+        v: LOG_SCHEMA_VERSION,
         seq: nextSeq++,
         timestamp: secondsSinceStart(),
         runId,
-        ...context,
+        ...stamp,
         event,
         data,
       }

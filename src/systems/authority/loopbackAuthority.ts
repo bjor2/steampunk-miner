@@ -4,11 +4,12 @@
  * in a remote proxy with the same three methods, and nothing above it changes.
  *
  * Commands are applied synchronously in submission order, and listeners hear each command's
- * events before `submit` returns.
+ * events before `submit` (or `advanceTo`) returns.
  */
 import type { AuthorityCommand } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
-import { applyCommand } from './applyCommand'
+import { advanceTicks } from './advanceTicks'
+import { applyCommand, type CommandOutcome } from './applyCommand'
 import type { DomainEvent } from './domainEvent'
 import { stateDigest } from './stateDigest'
 
@@ -23,6 +24,8 @@ export interface AuthoritySnapshot {
 
 export interface Authority {
   submit(command: AuthorityCommand): void
+  /** Moves the clock forward to `tick` with no command (fastForward, the fixed step). */
+  advanceTo(tick: number): void
   /** Returns the call that stops listening. */
   subscribe(onEvents: DomainEventListener): () => void
   snapshot(): AuthoritySnapshot
@@ -32,11 +35,17 @@ export function createLoopbackAuthority(initialState: AuthorityState): Authority
   let state = initialState
   const listeners = new Set<DomainEventListener>()
 
+  const settle = (outcome: CommandOutcome): void => {
+    state = outcome.state
+    notifyListeners(listeners, outcome.events)
+  }
+
   return {
     submit(command) {
-      const outcome = applyCommand(state, command)
-      state = outcome.state
-      notifyListeners(listeners, outcome.events)
+      settle(applyCommand(state, command))
+    },
+    advanceTo(tick) {
+      settle(advanceTicks(state, tick))
     },
     subscribe(onEvents) {
       listeners.add(onEvents)

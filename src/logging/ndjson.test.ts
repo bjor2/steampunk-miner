@@ -3,15 +3,17 @@ import { formatNdjsonLine, parseNdjson } from './ndjson'
 import type { RunEvent } from './runEvent'
 
 const event: RunEvent = {
+  v: 1,
   seq: 3,
+  tick: 8120,
   timestamp: 12.5,
   runId: 'run_test',
   playerId: 'player_1',
   planet: 1,
-  planetSeed: 7,
-  depth: 0.1,
-  event: 'money_earned',
-  data: { amount: 1e100 },
+  depthTiles: 73,
+  event: 'resource_sold',
+  cmd: [8118, 3],
+  data: { items: [{ tier: 2, amount: 6 }], value: '1e+100', mode: 'all' },
 }
 
 describe('ndjson', () => {
@@ -21,7 +23,7 @@ describe('ndjson', () => {
     expect(line.slice(0, -1)).not.toContain('\n')
   })
 
-  it('reads back what it wrote, including a 1e100 amount', () => {
+  it('reads back what it wrote, including a 1e100 value as its canonical string', () => {
     const text = formatNdjsonLine(event) + formatNdjsonLine({ ...event, seq: 4 })
     expect(parseNdjson(text)).toEqual([event, { ...event, seq: 4 }])
   })

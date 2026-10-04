@@ -17,8 +17,8 @@ import { isNonNegativeMoneyText } from './money'
 export interface StartScenario {
   planetTier?: number
   planetSeed?: number
-  /** Fraction of the way from the surface (0) to the core (1). */
-  depth?: number
+  /** Whole tiles below the surface (#11: depth is an integer, never a float fraction). */
+  depthTiles?: number
   /** A decimal string >= 0, for example "1e30". */
   money?: string
 }
@@ -27,7 +27,7 @@ export function startScenarioProblems(scenario: StartScenario): string[] {
   return [
     ...planetTierProblems(scenario.planetTier),
     ...planetSeedProblems(scenario.planetSeed),
-    ...depthProblems(scenario.depth),
+    ...depthTilesProblems(scenario.depthTiles),
     ...moneyProblems(scenario.money),
   ]
 }
@@ -44,10 +44,10 @@ function planetSeedProblems(planetSeed: number | undefined): string[] {
   return [`planetSeed must be a safe integer, got ${planetSeed}`]
 }
 
-function depthProblems(depth: number | undefined): string[] {
-  if (depth === undefined) return []
-  if (Number.isFinite(depth) && depth >= 0 && depth <= 1) return []
-  return [`depth must be a fraction in [0, 1], got ${depth}`]
+function depthTilesProblems(depthTiles: number | undefined): string[] {
+  if (depthTiles === undefined) return []
+  if (Number.isSafeInteger(depthTiles) && depthTiles >= 0) return []
+  return [`depthTiles must be a whole number >= 0, got ${depthTiles}`]
 }
 
 function moneyProblems(money: string | undefined): string[] {
@@ -59,7 +59,7 @@ function moneyProblems(money: string | undefined): string[] {
 const FIELD_TYPES: Readonly<Record<keyof StartScenario, 'number' | 'string'>> = {
   planetTier: 'number',
   planetSeed: 'number',
-  depth: 'number',
+  depthTiles: 'number',
   money: 'string',
 }
 

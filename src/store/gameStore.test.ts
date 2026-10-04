@@ -21,10 +21,10 @@ const game = () => useGameStore.getState()
 
 describe('game store: scenario commands', () => {
   it('puts the player on the requested planet at its surface', () => {
-    game().teleportToDepth(0.5)
+    game().teleportToDepthTiles(50)
     game().setPlanet(317)
     expect(game().planetTier).toBe(317)
-    expect(game().depth).toBe(0)
+    expect(game().depthTiles).toBe(0)
   })
 
   it('sets the planet seed', () => {
@@ -48,11 +48,11 @@ describe('game store: scenario commands', () => {
   })
 
   it('applies a whole scenario at once', () => {
-    game().applyStartScenario({ planetTier: 317, planetSeed: 83921, depth: 0.82, money: '1e30' })
+    game().applyStartScenario({ planetTier: 317, planetSeed: 83921, depthTiles: 82, money: '1e30' })
     expect(game()).toMatchObject({
       planetTier: 317,
       planetSeed: 83921,
-      depth: 0.82,
+      depthTiles: 82,
       money: fromCanonical('1e30'),
     })
   })
@@ -64,7 +64,7 @@ describe('game store: scenario commands', () => {
   })
 
   it('refuses an illegal scenario without applying any of it', () => {
-    expect(() => game().applyStartScenario({ planetTier: 5, depth: 3 })).toThrow(/depth/)
+    expect(() => game().applyStartScenario({ planetTier: 5, depthTiles: -3 })).toThrow(/depth/)
     expect(game().planetTier).toBe(0)
   })
 
@@ -81,6 +81,7 @@ describe('game store: authority', () => {
     const startSnapshot = createStartingAuthority().snapshot()
     const silent: Authority = {
       submit: (command) => void submitted.push(command),
+      advanceTo: () => {},
       subscribe: () => () => {},
       snapshot: () => startSnapshot,
     }
@@ -133,6 +134,7 @@ describe('game store: authority', () => {
     let tell: (events: []) => void = () => {}
     const authority: Authority = {
       submit: () => tell([]),
+      advanceTo: () => {},
       subscribe: (onEvents) => {
         tell = onEvents
         return () => {}
@@ -174,9 +176,9 @@ describe('game store: run log', () => {
   })
 
   it('stamps the event with the place the player is in after the command', () => {
-    game().teleportToDepth(0.5)
+    game().teleportToDepthTiles(50)
     game().setPlanet(9)
-    expect(sink.events[1]).toMatchObject({ planet: 9, depth: 0, playerId: 'player_1' })
+    expect(sink.events[1]).toMatchObject({ planet: 9, depthTiles: 0, playerId: 'player_1' })
   })
 
   it('records nothing for a refused command', () => {

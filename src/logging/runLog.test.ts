@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { createMemorySink } from './eventSink'
 import { createRunLog } from './runLog'
-import type { RunEventContext } from './runEvent'
+import type { RunEventStamp } from './runEvent'
 
-const context: RunEventContext = {
+const stamp: RunEventStamp = {
   playerId: 'player_1',
   planet: 17,
-  planetSeed: 83921,
-  depth: 0.73,
+  depthTiles: 73,
+  tick: 8120,
+  cmd: [8118, 3],
 }
 
 function startRun(clock: { now: number } = { now: 0 }) {
@@ -21,37 +22,39 @@ function startRun(clock: { now: number } = { now: 0 }) {
 }
 
 describe('run log', () => {
-  it('stamps the event with run, place and time as the design doc example does', () => {
+  it('stamps the event with the versioned envelope of the logging contract', () => {
     const { runLog, sink, clock } = startRun()
-    clock.now = 1023.52
-    runLog.record(context, 'resource_collected', { resourceTier: 42, amount: 6, value: 1250000 })
+    clock.now = 135.4
+    runLog.record(stamp, 'resource_collected', { resourceTier: 42, amount: 6, value: '1.25e+6' })
     expect(sink.events).toEqual([
       {
+        v: 1,
         seq: 0,
-        timestamp: 1023.52,
+        tick: 8120,
+        timestamp: 135.4,
         runId: 'run_test',
         playerId: 'player_1',
         planet: 17,
-        planetSeed: 83921,
-        depth: 0.73,
+        depthTiles: 73,
         event: 'resource_collected',
-        data: { resourceTier: 42, amount: 6, value: 1250000 },
+        cmd: [8118, 3],
+        data: { resourceTier: 42, amount: 6, value: '1.25e+6' },
       },
     ])
   })
 
-  it('numbers events in the order they were recorded, even at equal timestamps', () => {
+  it('numbers events in the order they were recorded, even at equal ticks', () => {
     const { runLog, sink } = startRun()
-    runLog.record(context, 'quest_started', { id: 'a' })
-    runLog.record(context, 'quest_completed', { id: 'a' })
+    runLog.record(stamp, 'storage_full', { lostUnits: 1 })
+    runLog.record(stamp, 'storage_full', { lostUnits: 2 })
     expect(sink.events.map((event) => event.seq)).toEqual([0, 1])
   })
 
   it('keeps events already recorded unchanged when the world moves on', () => {
     const { runLog, sink } = startRun()
-    const moving = { ...context }
-    runLog.record(moving, 'depth_milestone_reached', { depth: 0.73 })
-    moving.depth = 0.99
-    expect(sink.events[0].depth).toBe(0.73)
+    const moving = { ...stamp }
+    runLog.record(moving, 'depth_band_entered', { band: 2 })
+    moving.depthTiles = 99
+    expect(sink.events[0].depthTiles).toBe(73)
   })
 })

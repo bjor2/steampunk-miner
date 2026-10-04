@@ -5,15 +5,16 @@ import type { RunEvent } from './runEvent'
 
 function eventNumber(seq: number, runId = 'run_a'): RunEvent {
   return {
+    v: 1,
     seq,
+    tick: 0,
     timestamp: seq,
     runId,
     playerId: 'player_1',
     planet: 0,
-    planetSeed: 1,
-    depth: 0,
+    depthTiles: 0,
     event: 'game_started',
-    data: { gameVersion: 't', buildCommit: 't', platform: 'browser' },
+    data: { gameVersion: 't', buildCommit: 't', platform: 'browser', debug: false },
   }
 }
 

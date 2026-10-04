@@ -9,7 +9,7 @@ import { createRunId } from './logging/runLayout'
 import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
 import type { RunMetadata } from './logging/runMetadata'
 import { getShell, type Shell } from './shell/shell'
-import { runEventContextOf, useGameStore } from './store/gameStore'
+import { runEventPlaceOf, useGameStore } from './store/gameStore'
 import { parseStartScenario } from './systems/startScenario'
 
 const LOG_FLUSH_INTERVAL_MS = 1000
@@ -40,10 +40,12 @@ function startRunLogging(shell: Shell, runId: string): FlushableSink {
 }
 
 function recordGameStarted(shell: Shell): void {
-  getRunLog().record(runEventContextOf(useGameStore.getState()), 'game_started', {
+  // A run starts at authority tick 0, before any command.
+  getRunLog().record({ ...runEventPlaceOf(useGameStore.getState()), tick: 0 }, 'game_started', {
     gameVersion: GAME_VERSION,
     buildCommit: BUILD_COMMIT,
     platform: shell.kind,
+    debug: shell.launch.debugEnabled,
   })
 }
 

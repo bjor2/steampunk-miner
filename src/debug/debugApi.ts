@@ -3,7 +3,7 @@
  * spec or an AI-driven Playwright test needs to put the game in any state without playing there.
  * The command names follow the doc's examples; the exact API may differ, the capabilities may not.
  *
- * Wired today: setPlanet, setPlanetSeed, teleportToDepth, giveMoney, applyStartScenario.
+ * Wired today: setPlanet, setPlanetSeed, teleportToDepthTiles, giveMoney, applyStartScenario.
  * Stubs (typed, throw DebugCommandNotImplementedError) wait for the system they poke.
  */
 import { startScenarioProblems, type StartScenario } from '../systems/startScenario'
@@ -20,12 +20,14 @@ export interface DebugApi {
   // wired
   setPlanet(planetTier: number): void
   setPlanetSeed(planetSeed: number): void
-  teleportToDepth(depth: number): void
+  teleportToDepthTiles(depthTiles: number): void
   /** `amount` is a decimal string >= 0, for example "1e100" (decision #5). */
   giveMoney(amount: string): void
   applyStartScenario(scenario: StartScenario): void
   startScenarioProblems(scenario: StartScenario): string[]
   // stubs
+  /** `depthBp` is basis points of the radius (#11); the radius arrives with the generator (#19). */
+  teleportToDepth(depthBp: number): void
   teleportToCore(): void
   giveResource(resourceTier: number, amount: number): void
   setUpgrade(upgradeId: string, level: number): void
@@ -47,10 +49,11 @@ export function createDebugApi(): DebugApi {
   return {
     setPlanet: (planetTier) => game().setPlanet(planetTier),
     setPlanetSeed: (planetSeed) => game().setPlanetSeed(planetSeed),
-    teleportToDepth: (depth) => game().teleportToDepth(depth),
+    teleportToDepthTiles: (depthTiles) => game().teleportToDepthTiles(depthTiles),
     giveMoney: (amount) => game().giveMoney(amount),
     applyStartScenario: (scenario) => game().applyStartScenario(scenario),
     startScenarioProblems,
+    teleportToDepth: notImplemented('teleportToDepth'),
     teleportToCore: notImplemented('teleportToCore'),
     giveResource: notImplemented('giveResource'),
     setUpgrade: notImplemented('setUpgrade'),

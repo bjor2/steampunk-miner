@@ -19,7 +19,7 @@ describe('debug api', () => {
   })
 
   it('tells a bot why a scenario would be refused before it tries', () => {
-    expect(createDebugApi().startScenarioProblems({ depth: 2 })).toHaveLength(1)
+    expect(createDebugApi().startScenarioProblems({ depthTiles: -2 })).toHaveLength(1)
   })
 
   it('says plainly that a command is not built yet', () => {

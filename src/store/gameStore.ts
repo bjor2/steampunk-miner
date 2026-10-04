@@ -11,7 +11,7 @@
 import { create } from 'zustand'
 import { recordDomainEvents } from '../logging/domainEventLog'
 import { getRunLog } from '../logging/runLog'
-import type { RunEventContext } from '../logging/runEvent'
+import type { RunEventPlace } from '../logging/runEvent'
 import type { CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
@@ -30,25 +30,25 @@ export interface GameState {
   playerId: string
   planetTier: number
   planetSeed: number
-  /** Fraction of the way from the surface (0) to the core (1). Client-owned, like the pose. */
-  depth: number
+  /** Whole tiles below the surface. Client-owned, like the pose. */
+  depthTiles: number
   money: Money
 
   setPlanet(planetTier: number): void
   setPlanetSeed(planetSeed: number): void
-  teleportToDepth(depth: number): void
+  teleportToDepthTiles(depthTiles: number): void
   /** `amount` is a decimal string >= 0, for example "1e100". */
   giveMoney(amount: string): void
   applyStartScenario(scenario: StartScenario): void
 }
 
-type GameValues = Pick<GameState, 'playerId' | 'planetTier' | 'planetSeed' | 'depth' | 'money'>
+type GameValues = Pick<GameState, 'playerId' | 'planetTier' | 'planetSeed' | 'depthTiles' | 'money'>
 
 export const STARTING_VALUES: GameValues = {
   playerId: 'player_1',
   planetTier: 0,
   planetSeed: 1,
-  depth: 0,
+  depthTiles: 0,
   money: ZERO_MONEY,
 }
 
@@ -57,7 +57,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
-    set({ depth: 0 })
+    set({ depthTiles: 0 })
     submitCommand(get().playerId, setPlanetCommand(planetTier))
   },
 
@@ -66,10 +66,10 @@ export const useGameStore = create<GameState>()((set, get) => ({
     submitCommand(get().playerId, setPlanetSeedCommand(planetSeed))
   },
 
-  teleportToDepth: (depth) => {
-    refuseProblems(startScenarioProblems({ depth }))
-    set({ depth })
-    recordDebugCommand(get(), 'teleportToDepth', { depth })
+  teleportToDepthTiles: (depthTiles) => {
+    refuseProblems(startScenarioProblems({ depthTiles }))
+    set({ depthTiles })
+    recordDebugCommand(get(), 'teleportToDepthTiles', { depthTiles })
   },
 
   giveMoney: (amount) => {
@@ -104,19 +104,14 @@ export function resetGameStore(authority: Authority = createStartingAuthority())
 resetGameStore()
 
 /** Where in the world the player is, for stamping events. */
-export function runEventContextOf(state: GameValues): RunEventContext {
-  return {
-    playerId: state.playerId,
-    planet: state.planetTier,
-    planetSeed: state.planetSeed,
-    depth: state.depth,
-  }
+export function runEventPlaceOf(state: GameValues): RunEventPlace {
+  return { playerId: state.playerId, planet: state.planetTier, depthTiles: state.depthTiles }
 }
 
 /** The one writer of planet and wallet: copies them from the authority, then logs the events. */
 function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
-  recordDomainEvents(runEventContextOf(useGameStore.getState()), events)
+  recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)
 }
 
 function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues> {
@@ -128,7 +123,7 @@ function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues>
 }
 
 function placeAtScenarioDepth(scenario: StartScenario): void {
-  if (scenario.depth !== undefined) useGameStore.setState({ depth: scenario.depth })
+  if (scenario.depthTiles !== undefined) useGameStore.setState({ depthTiles: scenario.depthTiles })
 }
 
 function submitEach(playerId: string, intents: readonly CommandIntent[]): void {
@@ -140,11 +135,15 @@ function refuseProblems(problems: string[]): void {
   if (problems.length > 0) throw new Error(problems.join('; '))
 }
 
-/** Depth is client-owned (the vehicle pose, #3), so moving it is logged here, not by the authority. */
+/**
+ * Depth is client-owned (the vehicle pose, #3), so moving it is logged here, not projected from the
+ * authority. It is stamped with the authority's tick and no `cmd`: no authority command caused it.
+ */
 function recordDebugCommand(
   state: GameValues,
   command: string,
   args: Record<string, unknown>,
 ): void {
-  getRunLog().record(runEventContextOf(state), 'debug_command_applied', { command, args })
+  const stamp = { ...runEventPlaceOf(state), tick: readAuthorityState().tick }
+  getRunLog().record(stamp, 'debug_command_applied', { command, args })
 }
