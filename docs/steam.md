@@ -21,25 +21,32 @@ Electron window itself has **not** been launched in this setup (no GUI available
 
 ## What remains (not done)
 
-1. **Steamworks partner account, App ID and depots.** Needs the user's own Valve account and the
-   app fee. Until there is an App ID nothing below can be tested against real Steam.
-2. **`steamworks.js` integration.** Add the dependency; initialise it in the main process only;
-   expose just the calls the game needs (achievements, rich presence, cloud saves) as new methods
-   on `ShellBridge`, validated in `electron/ipcHandlers.cts`. It is a native module, so
-   `asarUnpack` it in `electron-builder.yml` and revisit `npmRebuild: false`. For local runs it
-   expects a `steam_appid.txt` next to the executable (do not ship that file). Its README also lists
-   Chromium switches needed for the Steam overlay on Windows; read it when integrating, we have
-   not checked them against the current Electron.
-3. **SteamPipe upload.** Install `steamcmd`, write `app_build_<id>.vdf` and `depot_build_<id>.vdf`
-   pointing at `release/<platform>-unpacked`, and upload with a build account. Keep the account
-   credentials out of the repo (CI secrets or a local login). The CI workflow deliberately does
-   not do this.
-4. **Per-platform builds.** `electron-builder` should be run on its own OS (or in CI per OS); only
-   Linux has been tried here. macOS needs signing and notarisation; Windows benefits from signing.
+Decided in [the Steam and Electron research ticket](https://github.com/bjor2/steampunk-miner/issues/12)
+(research done 4 Oct 2026; nothing here has been run).
+
+1. **Partner account, App ID, depots (human, longest lead).** Identity, bank and tax paperwork,
+   US$100 per app (non-refundable, recoupable at US$1,000 adjusted gross revenue), 21 days from fee
+   to release, a 1-5 day review, and a public "coming soon" page for two weeks before release.
+   Define one depot per OS (Windows, Linux).
+2. **Library: `steamworks.js` 0.4.0, main process only, narrow bridge.** Open item: a spike on
+   Electron 44.5.1 (init, overlay on each OS, crash check, frame cost of `in-process-gpu`).
+   Fallback: `steamworks-ffi-node`. Packaging: allow `steamworks.js` through the `node_modules`
+   exclusion, `asarUnpack` it, and copy the OS redistributable library next to the executable. Do
+   not ship `steam_appid.txt`. New capabilities become new `ShellBridge` methods, validated in
+   `electron/ipcHandlers.cts`.
+3. **SteamPipe.** Build per OS on its own CI runner; upload by hand with `steamcmd` to a beta branch
+   via `app_build_<id>.vdf` (`SetLive` = the beta branch name). Builder account credentials stay out
+   of the repo and CI.
+4. **Per-platform builds.** Windows and Linux in the slice; macOS later (signing and notarisation).
 5. **`appId` in `electron-builder.yml`** is a placeholder (`io.github.bjor2.steampunkminer`).
-6. **Saves.** There is no save system yet. When there is one it goes behind a checkpoint seam and,
-   for Steam Cloud, the shell.
-7. **Input and display.** Steam Input / Steam Deck support, fullscreen toggle, window state.
-8. **Debug API in release.** `?debug` / `?scenario=` are honoured by the shell in any build; decide
-   whether a Steam release should ignore them (they are cheats).
-9. **Auto-update** is not wanted on Steam (Steam updates the depot); do not add `electron-updater`.
+6. **Saves.** One file per slot at `<userData>/saves/slot-<n>.json` (`userData` is `%APPDATA%\<name>`,
+   `~/.config/<name>` or `~/Library/Application Support/<name>`), written atomically at each dock
+   and on travel, behind the checkpoint seam. Steam Auto-Cloud with one root and per-OS overrides;
+   set the quota and publish the Cloud settings.
+7. **Input and display.** Steam Input and Steam Deck verification are post-slice; the reference size
+   is 1280x800; Valve's Verified checklist is the later target.
+8. **Debug API in release.** Off by default in release builds; a debug-flagged run never unlocks
+   achievements or stats and never writes into the cloud save path (details in the logging ticket).
+9. **Still unverified.** The order of `electronEnableSteamOverlay` relative to app ready, overlay
+   behaviour on Linux, and macOS signing and notarisation.
+10. **Auto-update** is not wanted on Steam (Steam updates the depot); do not add `electron-updater`.
