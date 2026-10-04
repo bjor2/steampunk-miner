@@ -1,0 +1,137 @@
+{
+  "economyVersion": 1,
+  "ore": {
+    "tiersPerPlanet": 3,
+    "coreTierBand": 6,
+    "valueAtTier1": "10",
+    "valueRatio": "1.5",
+    "hardnessRatio": "1.2544",
+    "coreHardnessMultiplier": "4",
+    "coreHardnessBand": 5
+  },
+  "planets": {
+    "coreFraction": "0.4",
+    "paceScale": { "default": "1", "byPlanet": {} }
+  },
+  "prices": {
+    "referenceBand": 3,
+    "chargePerEnergyUnit": "0.002",
+    "fullRepair": "0.5",
+    "rescueFee": { "moneyFraction": "0.05", "floor": "3", "cap": "30" },
+    "travelFee": { "fraction": "0.12", "oreUnits": "10", "band": 5 }
+  },
+  "energy": {
+    "perSecond": { "drill": "1", "thrust": "1.5", "drive": "0.25" },
+    "rescueFloorFraction": "0.25"
+  },
+  "costCurves": [
+    { "id": "cost.vehicle.cargo_hold", "family": "geometric", "base": "24", "ratio": "1.24" },
+    { "id": "cost.vehicle.boiler", "family": "geometric", "base": "24", "ratio": "1.24" },
+    { "id": "cost.vehicle.engine", "family": "geometric", "base": "36", "ratio": "1.24" },
+    { "id": "cost.vehicle.hull", "family": "geometric", "base": "48", "ratio": "1.24" },
+    { "id": "cost.vehicle.drill_power", "family": "geometric", "base": "48", "ratio": "1.24" },
+    { "id": "cost.vehicle.drill_tip", "family": "geometric", "base": "72", "ratio": "1.5376" }
+  ],
+  "upgrades": [
+    {
+      "id": "drill_power",
+      "costCurveId": "cost.vehicle.drill_power",
+      "maxLevel": null,
+      "effect": { "family": "geometric", "stat": "drillPower", "start": "1.5", "ratio": "1.12" },
+      "onCurve": { "levelAtPlanet1": 13, "levelsPerPlanet": 6 }
+    },
+    {
+      "id": "drill_tip",
+      "costCurveId": "cost.vehicle.drill_tip",
+      "maxLevel": null,
+      "effect": { "family": "geometric", "stat": "drillTip", "start": "1", "ratio": "1.2544" },
+      "onCurve": { "levelAtPlanet1": 7, "levelsPerPlanet": 3 }
+    },
+    {
+      "id": "engine",
+      "costCurveId": "cost.vehicle.engine",
+      "maxLevel": null,
+      "effect": {
+        "family": "saturating",
+        "halfLevel": 25,
+        "stats": {
+          "speedMax": { "min": 6, "max": 14 },
+          "accel": { "min": 1, "max": 1.8 },
+          "thrustToWeight": { "min": 2, "max": 3.5 }
+        }
+      },
+      "onCurve": { "levelAtPlanet1": 6, "levelsPerPlanet": 6 }
+    },
+    {
+      "id": "boiler",
+      "costCurveId": "cost.vehicle.boiler",
+      "maxLevel": null,
+      "effect": { "family": "linear", "stat": "energyMax", "start": 150, "step": 6 },
+      "onCurve": { "levelAtPlanet1": 4, "levelsPerPlanet": 6 }
+    },
+    {
+      "id": "cargo_hold",
+      "costCurveId": "cost.vehicle.cargo_hold",
+      "maxLevel": null,
+      "effect": { "family": "linear", "stat": "cargoCapacity", "start": 10, "step": 4 },
+      "onCurve": { "levelAtPlanet1": 8, "levelsPerPlanet": 6 }
+    },
+    {
+      "id": "hull",
+      "costCurveId": "cost.vehicle.hull",
+      "maxLevel": null,
+      "effect": { "family": "geometric", "stat": "hullMax", "start": "100", "ratio": "1.12" },
+      "onCurve": { "levelAtPlanet1": 2, "levelsPerPlanet": 6 }
+    }
+  ],
+  "visualTiers": [
+    { "tier": 1, "minTotalLevel": 0 },
+    { "tier": 2, "minTotalLevel": 8 },
+    { "tier": 3, "minTotalLevel": 20 }
+  ],
+  "enemies": {
+    "tier": { "first": 1, "perPlanet": 6, "perBand": 1 },
+    "growth": "1.12",
+    "saturationTier": 60,
+    "kinds": [
+      {
+        "id": "crawler",
+        "health": "7",
+        "baseHit": "17.5",
+        "firstPlanet": 1,
+        "bands": [2, 3, 4, 5],
+        "moveTilesPerSecond": { "min": 2, "max": 4 },
+        "detectionTiles": { "min": 10, "max": 16 },
+        "attackCooldownTicks": { "min": 90, "max": 45 },
+        "windupTicks": 24,
+        "lungeTilesPerSecond": 8,
+        "lungeTicks": 30
+      },
+      {
+        "id": "burrower",
+        "health": "7",
+        "baseHit": "16.5",
+        "firstPlanet": 2,
+        "bands": [3, 4, 5],
+        "moveTilesPerSecond": { "min": 1.5, "max": 3 },
+        "detectionTiles": { "min": 8, "max": 12 },
+        "attackCooldownTicks": { "min": 90, "max": 45 },
+        "windupTicks": 24,
+        "lungeTilesPerSecond": 8,
+        "lungeTicks": 30
+      }
+    ],
+    "combat": {
+      "kFrontPlayer": "0.25",
+      "kSidePlayer": "1",
+      "kRearPlayer": "2",
+      "kDrillVsEnemy": "1",
+      "hitGraceTicks": 20,
+      "maxActivePerVehicle": 6,
+      "activationTiles": 24,
+      "despawnTiles": 48,
+      "spawnPointsPer10ChunksByBand": [0, 5, 10, 15, 10],
+      "burrowerShare": { "numerator": 1, "denominator": 3 }
+    }
+  }
+}
