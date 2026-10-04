@@ -6,6 +6,7 @@ import {
   floor,
   fromCanonical,
   isMoney,
+  isNonNegativeMoneyText,
   mul,
   powInt,
   sub,
@@ -120,6 +121,15 @@ describe('money: tests compare values', () => {
   it('treats equal amounts as equal whatever text they came from', () => {
     expect(m('1.50')).toEqual(m('1.5'))
     expect({ wallet: m('100') }).toEqual({ wallet: m('1e2') })
+  })
+
+  it('tells which text is money a player may be granted', () => {
+    expect(isNonNegativeMoneyText('1e5000')).toBe(true)
+    expect(isNonNegativeMoneyText('0')).toBe(true)
+    expect(isNonNegativeMoneyText('-0')).toBe(true)
+    expect(isNonNegativeMoneyText('-0.5')).toBe(false)
+    expect(isNonNegativeMoneyText('1e99999999999999999')).toBe(false)
+    expect(isNonNegativeMoneyText(5)).toBe(false)
   })
 
   it('tells money apart from other values', () => {

@@ -3,7 +3,7 @@
  * fields as data; a payload with a missing, unknown or wrongly kinded field is refused, never
  * trimmed, with every problem listed.
  */
-import { cmp, fromCanonical, ZERO_MONEY } from '../money'
+import { isNonNegativeMoneyText } from '../money'
 
 export type FieldKind = 'wholeNumber' | 'safeInteger' | 'nonNegativeMoney'
 
@@ -41,15 +41,6 @@ function fieldKindProblems(name: string, value: unknown, kind: FieldKind): strin
 
 export function isWholeNumber(value: unknown): boolean {
   return Number.isSafeInteger(value) && (value as number) >= 0
-}
-
-function isNonNegativeMoneyText(value: unknown): boolean {
-  if (typeof value !== 'string') return false
-  try {
-    return cmp(fromCanonical(value), ZERO_MONEY) >= 0
-  } catch {
-    return false
-  }
 }
 
 export function isJsonObject(value: unknown): value is Record<string, unknown> {

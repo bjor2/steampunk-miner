@@ -8,14 +8,19 @@
  *
  * Only the fields below exist so far; the design lists many more (upgrades, wagons, facilities,
  * NPC states, quests, enemies, core status, party size...). Add each with its rule and its test.
+ *
+ * Money is a decimal string such as "1e30" (decision #5), never a JSON number, so 1e100 and past
+ * 1e308 arrive exact.
  */
+import { isNonNegativeMoneyText } from './money'
 
 export interface StartScenario {
   planetTier?: number
   planetSeed?: number
   /** Fraction of the way from the surface (0) to the core (1). */
   depth?: number
-  money?: number
+  /** A decimal string >= 0, for example "1e30". */
+  money?: string
 }
 
 export function startScenarioProblems(scenario: StartScenario): string[] {
@@ -45,17 +50,24 @@ function depthProblems(depth: number | undefined): string[] {
   return [`depth must be a fraction in [0, 1], got ${depth}`]
 }
 
-function moneyProblems(money: number | undefined): string[] {
+function moneyProblems(money: string | undefined): string[] {
   if (money === undefined) return []
-  if (Number.isFinite(money) && money >= 0) return []
-  return [`money must be a finite number >= 0, got ${money}`]
+  if (isNonNegativeMoneyText(money)) return []
+  return [`money must be a decimal string >= 0 such as "1e30", got ${JSON.stringify(money)}`]
 }
 
-const KNOWN_KEYS: readonly string[] = ['planetTier', 'planetSeed', 'depth', 'money']
+const FIELD_TYPES: Readonly<Record<keyof StartScenario, 'number' | 'string'>> = {
+  planetTier: 'number',
+  planetSeed: 'number',
+  depth: 'number',
+  money: 'string',
+}
+
+const FIELD_TYPE_NAMES = { number: 'a number', string: 'a decimal string' } as const
 
 /**
- * Reads a scenario from text (the `?scenario=` launch parameter). Unknown keys and non-number
- * values are problems, not silently dropped; `scenario` is only meaningful when `problems` is empty.
+ * Reads a scenario from text (the `?scenario=` launch parameter). Unknown keys and values of the
+ * wrong JSON type are problems, not silently dropped; `scenario` is only meaningful when `problems` is empty.
  */
 export function parseStartScenario(text: string): {
   scenario: StartScenario
@@ -81,8 +93,9 @@ function readJsonObject(text: string): Record<string, unknown> | string {
 
 function shapeProblems(fields: Record<string, unknown>): string[] {
   return Object.entries(fields).flatMap(([key, value]) => {
-    if (!KNOWN_KEYS.includes(key)) return [`unknown scenario field "${key}"`]
-    if (typeof value !== 'number') return [`${key} must be a number`]
+    if (!Object.hasOwn(FIELD_TYPES, key)) return [`unknown scenario field "${key}"`]
+    const expected = FIELD_TYPES[key as keyof StartScenario]
+    if (typeof value !== expected) return [`${key} must be ${FIELD_TYPE_NAMES[expected]}`]
     return []
   })
 }

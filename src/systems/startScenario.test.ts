@@ -10,12 +10,13 @@ describe('start scenario', () => {
     expect(startScenarioProblems({ planetTier: 317, planetSeed: 83921, depth: 0.82 })).toEqual([])
   })
 
-  it('accepts a 1e100 money grant', () => {
-    expect(startScenarioProblems({ money: 1e100 })).toEqual([])
+  it('accepts money as a decimal string, past 1e308', () => {
+    expect(startScenarioProblems({ money: '1e100' })).toEqual([])
+    expect(startScenarioProblems({ money: '1e5000' })).toEqual([])
   })
 
   it('lists every problem, not just the first', () => {
-    const problems = startScenarioProblems({ planetTier: -1, depth: 2, money: -5 })
+    const problems = startScenarioProblems({ planetTier: -1, depth: 2, money: '-5' })
     expect(problems).toHaveLength(3)
   })
 
@@ -24,9 +25,10 @@ describe('start scenario', () => {
     expect(startScenarioProblems({ planetSeed: 2 ** 60 })).toHaveLength(1)
   })
 
-  it('refuses money that is not a finite amount', () => {
-    expect(startScenarioProblems({ money: Infinity })).toHaveLength(1)
-    expect(startScenarioProblems({ money: NaN })).toHaveLength(1)
+  it('refuses money that is not a finite decimal amount', () => {
+    expect(startScenarioProblems({ money: 'Infinity' })).toHaveLength(1)
+    expect(startScenarioProblems({ money: 'NaN' })).toHaveLength(1)
+    expect(startScenarioProblems({ money: 'lots' })).toHaveLength(1)
   })
 })
 
@@ -52,7 +54,12 @@ describe('parse start scenario', () => {
   })
 
   it('refuses a field of the wrong type', () => {
-    expect(parseStartScenario('{"money":"lots"}').problems).toContain('money must be a number')
+    expect(parseStartScenario('{"planetTier":"3"}').problems).toContain(
+      'planetTier must be a number',
+    )
+    expect(parseStartScenario('{"money":1e30}').problems).toContain(
+      'money must be a decimal string',
+    )
   })
 
   it('also reports the value rules', () => {

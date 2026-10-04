@@ -1,19 +1,20 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { resetGameStore, useGameStore } from '../store/gameStore'
+import { fromCanonical } from '../systems/money'
 import { createDebugApi, DebugCommandNotImplementedError } from './debugApi'
 
-beforeEach(resetGameStore)
+beforeEach(() => resetGameStore())
 
 describe('debug api', () => {
   it('drives the game store through the design doc command names', () => {
     const debug = createDebugApi()
     debug.setPlanet(300)
     debug.setPlanetSeed(83921)
-    debug.giveMoney(1e100)
+    debug.giveMoney('1e100')
     expect(useGameStore.getState()).toMatchObject({
       planetTier: 300,
       planetSeed: 83921,
-      money: 1e100,
+      money: fromCanonical('1e100'),
     })
   })
 

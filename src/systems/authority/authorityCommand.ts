@@ -29,9 +29,12 @@ export interface CommandStamp {
   seq: number
 }
 
-export type AuthorityCommand<T extends CommandType = CommandType> = {
-  [K in T]: CommandStamp & { type: K; payload: CommandPayloads[K] }
+/** What a caller wants done; the sender adds the stamp when it submits. */
+export type CommandIntent<T extends CommandType = CommandType> = {
+  [K in T]: { type: K; payload: CommandPayloads[K] }
 }[T]
+
+export type AuthorityCommand<T extends CommandType = CommandType> = CommandStamp & CommandIntent<T>
 
 export function isDebugCommandType(type: CommandType): boolean {
   return type.startsWith('debug.')

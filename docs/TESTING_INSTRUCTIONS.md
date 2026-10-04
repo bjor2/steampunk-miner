@@ -45,8 +45,12 @@ trimmed**: every problem is listed and nothing is applied.
 - Browser: `?scenario=<json>` at launch (parsed by `parseStartScenario`); `?debug` (or the dev build)
   exposes `window.steampunkDebug` (the `DebugApi`) and `window.steampunkRunLog()` (the NDJSON so far,
   browser shell only).
-- Fields today: `planetTier`, `planetSeed`, `depth`, `money`. Add a field with its validation rule, its
-  store wiring and its test in one commit.
+- Fields today: `planetTier`, `planetSeed`, `depth`, `money` (a decimal string such as `"1e30"`). Add a
+  field with its validation rule, its store wiring and its test in one commit.
+- Money in tests: compare canonical strings (`toCanonical`) or `Money` values; `src/testSetup.ts` registers
+  a value-equality tester, so `toEqual(fromCanonical('1.5'))` matches `1.50`.
+- Store actions that change world or economy go through the authority: to check that one submits instead
+  of writing state, pass a spy `Authority` to `resetGameStore(authority)`.
 - Stubs in `src/debug/debugApi.ts` throw `DebugCommandNotImplementedError`; implement them with the
   system they poke, never as a silent no-op.
 

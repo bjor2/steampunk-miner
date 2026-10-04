@@ -1,28 +1,44 @@
 /**
- * The game store: what the UI renders and the actions that change it. One writer for this
- * slice. Per-frame state (vehicle position, velocity) does NOT live here; it stays in the physics
- * body and refs.
+ * The game store: what the UI renders and the actions that change it. It is a replica of the
+ * authority (decision #3): actions that change the world or the economy submit a command, and the
+ * store copies planet and wallet from the authority when its events arrive. The store never
+ * writes those fields itself. Per-frame state (vehicle position, velocity) does NOT live here; it
+ * stays in the physics body and refs.
  *
- * Every action here is a scenario/debug command so far, so each records `debug_command_applied`
- * (design doc sections 19-22). Gameplay actions (drill, sell, buy) arrive with their own events.
+ * Every action here is a scenario/debug command so far, so each logs `debug_command_applied`
+ * (design doc sections 19-22). Gameplay actions (drill, sell, buy) arrive with their own commands.
  */
 import { create } from 'zustand'
+import { recordDomainEvents } from '../logging/domainEventLog'
 import { getRunLog } from '../logging/runLog'
 import type { RunEventContext } from '../logging/runEvent'
+import type { CommandIntent } from '../systems/authority/authorityCommand'
+import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
+import type { DomainEvent } from '../systems/authority/domainEvent'
+import { createLoopbackAuthority, type Authority } from '../systems/authority/loopbackAuthority'
+import { ZERO_MONEY, type Money } from '../systems/money'
 import { startScenarioProblems, type StartScenario } from '../systems/startScenario'
+import {
+  grantMoneyCommand,
+  setPlanetCommand,
+  setPlanetSeedCommand,
+  startScenarioCommands,
+} from '../systems/startScenarioCommands'
+import { connectAuthority, readAuthorityState, submitCommand } from './authorityLink'
 
 export interface GameState {
   playerId: string
   planetTier: number
   planetSeed: number
-  /** Fraction of the way from the surface (0) to the core (1). */
+  /** Fraction of the way from the surface (0) to the core (1). Client-owned, like the pose. */
   depth: number
-  money: number
+  money: Money
 
   setPlanet(planetTier: number): void
   setPlanetSeed(planetSeed: number): void
   teleportToDepth(depth: number): void
-  giveMoney(amount: number): void
+  /** `amount` is a decimal string >= 0, for example "1e100". */
+  giveMoney(amount: string): void
   applyStartScenario(scenario: StartScenario): void
 }
 
@@ -33,7 +49,7 @@ export const STARTING_VALUES: GameValues = {
   planetTier: 0,
   planetSeed: 1,
   depth: 0,
-  money: 0,
+  money: ZERO_MONEY,
 }
 
 export const useGameStore = create<GameState>()((set, get) => ({
@@ -41,14 +57,13 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
-    set({ planetTier, depth: 0 })
-    recordDebugCommand(get(), 'setPlanet', { planetTier })
+    set({ depth: 0 })
+    submitCommand(get().playerId, setPlanetCommand(planetTier))
   },
 
   setPlanetSeed: (planetSeed) => {
     refuseProblems(startScenarioProblems({ planetSeed }))
-    set({ planetSeed })
-    recordDebugCommand(get(), 'setPlanetSeed', { planetSeed })
+    submitCommand(get().playerId, setPlanetSeedCommand(planetSeed))
   },
 
   teleportToDepth: (depth) => {
@@ -59,21 +74,34 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
   giveMoney: (amount) => {
     refuseProblems(startScenarioProblems({ money: amount }))
-    set((state) => ({ money: state.money + amount }))
-    recordDebugCommand(get(), 'giveMoney', { amount })
+    submitCommand(get().playerId, grantMoneyCommand(amount))
   },
 
   applyStartScenario: (scenario) => {
     refuseProblems(startScenarioProblems(scenario))
-    set(scenario)
-    recordDebugCommand(get(), 'applyStartScenario', { ...scenario })
+    placeAtScenarioDepth(scenario)
+    submitEach(get().playerId, startScenarioCommands(scenario))
   },
 }))
 
-/** Back to a fresh run; tests call this in beforeEach. */
-export function resetGameStore(): void {
-  useGameStore.setState({ ...STARTING_VALUES })
+/** A new session for the starting values; tests pass a spy to watch what the store submits. */
+export function createStartingAuthority(): Authority {
+  return createLoopbackAuthority(
+    createAuthorityState({
+      planetIndex: STARTING_VALUES.planetTier,
+      planetSeed: STARTING_VALUES.planetSeed,
+      playerIds: [STARTING_VALUES.playerId],
+    }),
+  )
 }
+
+/** Back to a fresh run on a fresh authority; tests call this in beforeEach. */
+export function resetGameStore(authority: Authority = createStartingAuthority()): void {
+  useGameStore.setState({ ...STARTING_VALUES })
+  connectAuthority(authority, followAuthority)
+}
+
+resetGameStore()
 
 /** Where in the world the player is, for stamping events. */
 export function runEventContextOf(state: GameValues): RunEventContext {
@@ -85,11 +113,34 @@ export function runEventContextOf(state: GameValues): RunEventContext {
   }
 }
 
+/** The one writer of planet and wallet: copies them from the authority, then logs the events. */
+function followAuthority(events: readonly DomainEvent[]): void {
+  useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
+  recordDomainEvents(runEventContextOf(useGameStore.getState()), events)
+}
+
+function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues> {
+  return {
+    planetTier: state.planet.index,
+    planetSeed: state.planet.seed,
+    money: state.players[playerId].wallet,
+  }
+}
+
+function placeAtScenarioDepth(scenario: StartScenario): void {
+  if (scenario.depth !== undefined) useGameStore.setState({ depth: scenario.depth })
+}
+
+function submitEach(playerId: string, intents: readonly CommandIntent[]): void {
+  for (const intent of intents) submitCommand(playerId, intent)
+}
+
 /** A scenario is refused, never trimmed: every problem is named, nothing is applied. */
 function refuseProblems(problems: string[]): void {
   if (problems.length > 0) throw new Error(problems.join('; '))
 }
 
+/** Depth is client-owned (the vehicle pose, #3), so moving it is logged here, not by the authority. */
 function recordDebugCommand(
   state: GameValues,
   command: string,

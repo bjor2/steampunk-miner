@@ -85,9 +85,13 @@ Repo-specific rules:
 
 - **Keep ported or designed maths literal** and name the design section in the file. A balance constant
   changes because the design changed, never to make a test pass.
-- **Numbers**: values are plain `number` for now (see the note in `systems/blockHardness.ts`); money like
-  1e100 is representable but not exact. Do not let callers depend on the representation, so it can be
-  swapped for a log-space/decimal type later.
+- **Numbers** (decision #5): money and every stat that grows without bound is a `Money`/`BigStat` from
+  `systems/money.ts`, the only module that touches decimal.js; it crosses JSON as a canonical string.
+  Bounded values (ticks, levels, indices, coordinates) are safe-integer `number`s. `blockHardness` is still
+  a plain `number` until the economy formulas move it.
+- **Authority** (decision #3): world and economy state changes only through
+  `applyCommand(state, command)` in `systems/authority/`; store actions `submit` a command and render the
+  answering events. No `Math.pow`/`exp`/`log*`/trig, `**` or `Number()` there (ESLint enforces it).
 - **Determinism**: all randomness comes from a seed (`systems/seededRandom`, `cellRandom`). Per-cell world
   generation uses the order-independent hash so streaming or multiplayer never changes the world.
   `Math.random()` and wall-clock time are banned from `systems/`.

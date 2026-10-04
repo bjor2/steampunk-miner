@@ -21,7 +21,8 @@ export interface DebugApi {
   setPlanet(planetTier: number): void
   setPlanetSeed(planetSeed: number): void
   teleportToDepth(depth: number): void
-  giveMoney(amount: number): void
+  /** `amount` is a decimal string >= 0, for example "1e100" (decision #5). */
+  giveMoney(amount: string): void
   applyStartScenario(scenario: StartScenario): void
   startScenarioProblems(scenario: StartScenario): string[]
   // stubs

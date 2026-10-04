@@ -81,6 +81,13 @@ export function floor(amount: Money): Money {
   return wrap(unwrap(amount).floor())
 }
 
+/** Whether `text` parses as money >= 0: the check for a grant or a scenario's starting money. */
+export function isNonNegativeMoneyText(text: unknown): boolean {
+  if (typeof text !== 'string' || !DECIMAL_TEXT.test(text)) return false
+  const value = new MoneyDecimal(text)
+  return value.isFinite() && (value.isZero() || value.isPositive())
+}
+
 export function isMoney(value: unknown): value is Money {
   return value instanceof MoneyDecimal
 }
