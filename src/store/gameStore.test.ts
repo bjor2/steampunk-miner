@@ -146,6 +146,12 @@ describe('game store: authority', () => {
     expect(game()).toMatchObject({ planetTier: 7, planetSeed: 8 })
   })
 
+  it('shows that a debug command was applied, as the authority says', () => {
+    expect(game().debugApplied).toBe(false)
+    game().setPlanetSeed(5)
+    expect(game().debugApplied).toBe(true)
+  })
+
   it('starts each reset on the starting values', () => {
     game().giveMoney('5')
     resetGameStore()

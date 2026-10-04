@@ -4,39 +4,54 @@
  */
 import { BUILD_COMMIT, GAME_VERSION } from './constants/buildInfo'
 import { createDebugApi } from './debug/debugApi'
-import { createNdjsonSink, type FlushableSink } from './logging/eventSink'
+import {
+  createFanOutSink,
+  createMemorySink,
+  createNdjsonSink,
+  type FlushableSink,
+  type MemorySink,
+} from './logging/eventSink'
+import { writeRunMetadata, writeRunSummary } from './logging/runDocuments'
 import { createRunId } from './logging/runLayout'
 import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
-import type { RunMetadata } from './logging/runMetadata'
+import { createRunMetadata } from './logging/runMetadata'
 import { getShell, type Shell } from './shell/shell'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
 import { parseStartScenario } from './systems/startScenario'
 
 const LOG_FLUSH_INTERVAL_MS = 1000
 
-export function startGame(): void {
-  const shell = getShell()
-  const startedAt = new Date()
-  const runId = createRunId(startedAt)
-  const sink = startRunLogging(shell, runId)
-  recordGameStarted(shell)
-  keepLogFlushed(shell, sink)
-  exposeDebugHandles(shell, runId)
-  applyLaunchScenario(shell)
-  writeRunMetadata(shell, runId, startedAt)
+/** The files of the run in progress: the NDJSON sink and the memory copy the summary reads. */
+interface RunFiles {
+  runId: string
+  startedAt: Date
+  sink: FlushableSink
+  recorded: MemorySink
 }
 
-function startRunLogging(shell: Shell, runId: string): FlushableSink {
+export function startGame(): void {
+  const shell = getShell()
+  const run = startRunLogging(shell, new Date())
+  recordGameStarted(shell)
+  keepRunFilesWritten(shell, run)
+  exposeDebugHandles(shell, run.runId)
+  applyLaunchScenario(shell)
+  writeMetadata(shell, run)
+}
+
+function startRunLogging(shell: Shell, startedAt: Date): RunFiles {
+  const run = { runId: createRunId(startedAt), startedAt }
   const sink = createNdjsonSink(shell)
+  const recorded = createMemorySink()
   const startedAtMs = performance.now()
   installRunLog(
     createRunLog({
-      runId,
-      sink,
+      runId: run.runId,
+      sink: createFanOutSink(sink, recorded),
       secondsSinceStart: () => (performance.now() - startedAtMs) / 1000,
     }),
   )
-  return sink
+  return { ...run, sink, recorded }
 }
 
 function recordGameStarted(shell: Shell): void {
@@ -49,11 +64,15 @@ function recordGameStarted(shell: Shell): void {
   })
 }
 
-function keepLogFlushed(shell: Shell, sink: FlushableSink): void {
-  const flush = () =>
-    void sink.flush().catch((error) => console.error('run log flush failed', error))
+/** Lines flush every second; the summary and metadata are rewritten when the page hides. */
+function keepRunFilesWritten(shell: Shell, run: RunFiles): void {
+  const flush = () => reportFailure(run.sink.flush())
   setInterval(flush, LOG_FLUSH_INTERVAL_MS)
-  shell.onPageHide(flush)
+  shell.onPageHide(() => {
+    flush()
+    reportFailure(writeRunSummary(shell, run.runId, run.recorded.events))
+    writeMetadata(shell, run)
+  })
 }
 
 function exposeDebugHandles(shell: Shell, runId: string): void {
@@ -71,18 +90,23 @@ function applyLaunchScenario(shell: Shell): void {
   useGameStore.getState().applyStartScenario(scenario)
 }
 
-function writeRunMetadata(shell: Shell, runId: string, startedAt: Date): void {
-  const metadata: RunMetadata = {
-    runId,
+function writeMetadata(shell: Shell, run: RunFiles): void {
+  const game = useGameStore.getState()
+  const metadata = createRunMetadata({
+    runId: run.runId,
     gameVersion: GAME_VERSION,
     buildCommit: BUILD_COMMIT,
-    worldSeed: useGameStore.getState().planetSeed,
-    difficulty: 'normal',
-    multiplayer: false,
+    worldSeed: game.planetSeed,
+    platform: shell.kind,
+    debugEnabled: shell.launch.debugEnabled,
+    debugApplied: game.debugApplied,
     players: 1,
-    startTime: startedAt.toISOString(),
+    startTime: run.startedAt.toISOString(),
     endTime: null,
-    durationSeconds: null,
-  }
-  void shell.writeRunDocument(runId, 'metadata', JSON.stringify(metadata, null, 2))
+  })
+  reportFailure(writeRunMetadata(shell, metadata))
+}
+
+function reportFailure(write: Promise<void>): void {
+  void write.catch((error) => console.error('run file write failed', error))
 }

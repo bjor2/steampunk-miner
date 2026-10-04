@@ -33,6 +33,8 @@ export interface GameState {
   /** Whole tiles below the surface. Client-owned, like the pose. */
   depthTiles: number
   money: Money
+  /** Copied from the authority: a `debug.*` command was accepted in this run (#11 section 4). */
+  debugApplied: boolean
 
   setPlanet(planetTier: number): void
   setPlanetSeed(planetSeed: number): void
@@ -42,7 +44,10 @@ export interface GameState {
   applyStartScenario(scenario: StartScenario): void
 }
 
-type GameValues = Pick<GameState, 'playerId' | 'planetTier' | 'planetSeed' | 'depthTiles' | 'money'>
+type GameValues = Pick<
+  GameState,
+  'playerId' | 'planetTier' | 'planetSeed' | 'depthTiles' | 'money' | 'debugApplied'
+>
 
 export const STARTING_VALUES: GameValues = {
   playerId: 'player_1',
@@ -50,6 +55,7 @@ export const STARTING_VALUES: GameValues = {
   planetSeed: 1,
   depthTiles: 0,
   money: ZERO_MONEY,
+  debugApplied: false,
 }
 
 export const useGameStore = create<GameState>()((set, get) => ({
@@ -119,6 +125,7 @@ function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues>
     planetTier: state.planet.index,
     planetSeed: state.planet.seed,
     money: state.players[playerId].wallet,
+    debugApplied: state.debugApplied,
   }
 }
 
