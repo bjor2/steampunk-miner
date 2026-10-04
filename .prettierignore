@@ -1,0 +1,9 @@
+node_modules
+dist
+dist-electron
+release
+package-lock.json
+# The owner's design document is prose, not ours to reflow.
+docs/design.md
+# Copied verbatim from the osilion-dev-tsr3f skill.
+docs/standards

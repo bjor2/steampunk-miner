@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-electron
+release
+.vite
+*.local
+*.log
+coverage
+
+# run logs written by the dev/Electron shell (design doc section 23)
+logs/
+
+# local tooling and scratch
+.claude/worktrees/
+.DS_Store
