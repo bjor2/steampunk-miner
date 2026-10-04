@@ -20,6 +20,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run dev`                             | Vite dev server (browser)                                 |
 | `npm run typecheck`                       | `tsc` for `src/` and for `electron/`                      |
 | `npm test`                                | Vitest (node, no DOM, no canvas, no physics)              |
+| `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
 | `npm run lint` / `npm run format`         | ESLint (enforces the layer rules) / Prettier              |
 | `npm run build`                           | typecheck `src/` + Vite production build into `dist/`     |
 | `npm run electron:dev` / `electron:build` | Electron window on the dev server / package to `release/` |
