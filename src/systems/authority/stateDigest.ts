@@ -18,9 +18,14 @@ export function stateDigest(state: unknown): string {
 }
 
 export function fnv1a64Hex(text: string): string {
+  return fnv1a64HexOfBytes(utf8.encode(text))
+}
+
+/** The same hash over raw bytes; chunk digests (#4) hash packed cells without building text. */
+export function fnv1a64HexOfBytes(bytes: Uint8Array): string {
   let high = OFFSET_BASIS_HIGH
   let low = OFFSET_BASIS_LOW
-  for (const byte of utf8.encode(text)) {
+  for (const byte of bytes) {
     low = (low ^ byte) >>> 0
     ;[high, low] = multiplyByFnvPrime(high, low)
   }

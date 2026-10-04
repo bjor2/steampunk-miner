@@ -84,6 +84,8 @@ const INEXACT_SYNTAX = [
   },
 ]
 
+const EXPONENT_OPERATOR = INEXACT_SYNTAX.filter(({ selector }) => selector.includes('*'))
+
 const DECIMAL_ONLY_IN_MONEY = {
   group: ['decimal.js', 'decimal.js/*'],
   message: 'Only src/systems/money.ts constructs a Decimal (#5); use the Money functions.',
@@ -154,6 +156,16 @@ export default tseslint.config(
     rules: {
       'no-restricted-properties': ['error', ...CLOCK_AND_RANDOM, ...APPROXIMATED_MATH],
       'no-restricted-syntax': ['error', NO_IMPORT_META, ...INEXACT_SYNTAX],
+    },
+  },
+  {
+    // World generation (#4): a co-op guest regenerates the world from the seed, so every machine
+    // must produce the same tiles. Integer maths, + - * /, floor, sqrt, min/max/abs only.
+    files: ['src/systems/world/**/*.ts'],
+    ignores: ['src/systems/**/*.test.ts'],
+    rules: {
+      'no-restricted-properties': ['error', ...CLOCK_AND_RANDOM, ...APPROXIMATED_MATH],
+      'no-restricted-syntax': ['error', NO_IMPORT_META, ...EXPONENT_OPERATOR],
     },
   },
   {
