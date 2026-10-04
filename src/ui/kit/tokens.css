@@ -1,0 +1,14 @@
+/* Design tokens only. No classes here: those live in a CSS Module beside their component. */
+:root {
+  --color-bg: #1b1613;
+  --color-brass: #c9a24b;
+  --color-copper: #b87333;
+  --color-parchment: #e9dcc0;
+  --color-panel: rgb(27 22 19 / 0.85);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --radius-panel: 6px;
+  --font-body: 'Georgia', 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}

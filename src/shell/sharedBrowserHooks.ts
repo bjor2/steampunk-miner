@@ -10,3 +10,14 @@ export function runOnPageHide(callback: () => void): void {
     if (document.visibilityState === 'hidden') callback()
   })
 }
+
+export function listenForKeys(listener: (code: string, isDown: boolean) => void): () => void {
+  const onDown = (event: KeyboardEvent) => listener(event.code, true)
+  const onUp = (event: KeyboardEvent) => listener(event.code, false)
+  window.addEventListener('keydown', onDown)
+  window.addEventListener('keyup', onUp)
+  return () => {
+    window.removeEventListener('keydown', onDown)
+    window.removeEventListener('keyup', onUp)
+  }
+}

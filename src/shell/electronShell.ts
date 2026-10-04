@@ -1,7 +1,7 @@
 /** The shell under Electron: forwards to the contextBridge object the preload exposed. */
 import type { ShellBridge } from '../../electron/bridgeContract.cts'
 import { readLaunchParameters } from './launchParameters'
-import { exposeOnWindow, runOnPageHide } from './sharedBrowserHooks'
+import { exposeOnWindow, listenForKeys, runOnPageHide } from './sharedBrowserHooks'
 import type { Shell } from './shell'
 
 export function createElectronShell(bridge: ShellBridge): Shell {
@@ -14,5 +14,6 @@ export function createElectronShell(bridge: ShellBridge): Shell {
     readBufferedRunEvents: () => '',
     exposeGlobalHandle: exposeOnWindow,
     onPageHide: runOnPageHide,
+    onKeyChange: listenForKeys,
   }
 }

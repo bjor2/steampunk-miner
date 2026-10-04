@@ -3,7 +3,7 @@
  * them back through the debug handle). A real download/OPFS writer can replace this later.
  */
 import { readLaunchParameters } from './launchParameters'
-import { exposeOnWindow, runOnPageHide } from './sharedBrowserHooks'
+import { exposeOnWindow, listenForKeys, runOnPageHide } from './sharedBrowserHooks'
 import type { Shell } from './shell'
 
 export function createBrowserShell(): Shell {
@@ -28,5 +28,6 @@ export function createBrowserShell(): Shell {
     readBufferedRunEvents: (runId) => eventLinesByRun.get(runId) ?? '',
     exposeGlobalHandle: exposeOnWindow,
     onPageHide: runOnPageHide,
+    onKeyChange: listenForKeys,
   }
 }

@@ -27,6 +27,8 @@ export interface Shell {
   readBufferedRunEvents(runId: string): string
   /** Puts a handle on `window` for bots and the dev console (Playwright, design doc section 20). */
   exposeGlobalHandle(name: string, handle: unknown): void
+  /** Reports key presses (`KeyboardEvent.code`, e.g. "KeyA") and releases; returns an unsubscribe. */
+  onKeyChange(listener: (code: string, isDown: boolean) => void): () => void
   /** Runs when the page is hidden or closing: the last chance to flush the run log. */
   onPageHide(callback: () => void): void
 }

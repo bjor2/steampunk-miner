@@ -1,0 +1,16 @@
+/* Element rules only; the global-sheet guard test refuses a class selector here. */
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+  color: var(--color-parchment);
+  font-family: var(--font-body);
+}
+
+canvas {
+  display: block;
+}
