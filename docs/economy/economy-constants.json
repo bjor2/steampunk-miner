@@ -46,5 +46,15 @@
   "etPlanet": 6,
   "etBand": 1,
   "KxE": 60,
-  "tkill": "1.5"
+  "tkill": "1.5",
+  "visualTiers": {
+    "T2": 8,
+    "T3": 20,
+    "rule": "visualTier = 1 + [S>=T2] + [S>=T3], S = sum of the six levels"
+  },
+  "moneyQuantum": {
+    "unit": "0.001",
+    "charges": "ceilMilli",
+    "income": "floorMilli"
+  }
 }
