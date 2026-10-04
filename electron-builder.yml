@@ -1,0 +1,29 @@
+# Packaging for Steam. Steam wants an unpacked game folder per platform ("dir" targets), not an
+# installer: upload the folder as a depot. No signing, no Steam credentials here (docs/steam.md).
+appId: io.github.bjor2.steampunkminer # TODO confirm the real reverse-DNS id before the first release
+productName: Steampunk Miner
+directories:
+  output: release
+files:
+  - dist/**
+  - dist-electron/**
+  - package.json
+  # Vite bundles every runtime library into dist/, so node_modules would only bloat the app.
+  - '!node_modules'
+asar: true
+npmRebuild: false
+publish: null
+win:
+  target:
+    - target: dir
+      arch: x64
+linux:
+  target:
+    - target: dir
+      arch: x64
+  category: Game
+mac:
+  target:
+    - target: dir
+      arch: universal
+  category: public.app-category.games
