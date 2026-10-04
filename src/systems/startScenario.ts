@@ -50,3 +50,39 @@ function moneyProblems(money: number | undefined): string[] {
   if (Number.isFinite(money) && money >= 0) return []
   return [`money must be a finite number >= 0, got ${money}`]
 }
+
+const KNOWN_KEYS: readonly string[] = ['planetTier', 'planetSeed', 'depth', 'money']
+
+/**
+ * Reads a scenario from text (the `?scenario=` launch parameter). Unknown keys and non-number
+ * values are problems, not silently dropped; `scenario` is only meaningful when `problems` is empty.
+ */
+export function parseStartScenario(text: string): {
+  scenario: StartScenario
+  problems: string[]
+} {
+  const parsed = readJsonObject(text)
+  if (typeof parsed === 'string') return { scenario: {}, problems: [parsed] }
+  const scenario = parsed as StartScenario
+  return { scenario, problems: [...shapeProblems(parsed), ...startScenarioProblems(scenario)] }
+}
+
+function readJsonObject(text: string): Record<string, unknown> | string {
+  try {
+    const value: unknown = JSON.parse(text)
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      return value as Record<string, unknown>
+    }
+    return 'scenario must be a JSON object'
+  } catch {
+    return 'scenario is not valid JSON'
+  }
+}
+
+function shapeProblems(fields: Record<string, unknown>): string[] {
+  return Object.entries(fields).flatMap(([key, value]) => {
+    if (!KNOWN_KEYS.includes(key)) return [`unknown scenario field "${key}"`]
+    if (typeof value !== 'number') return [`${key} must be a number`]
+    return []
+  })
+}
