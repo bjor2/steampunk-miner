@@ -1,0 +1,96 @@
+/**
+ * Money and BigStat: every economy value that grows without bound (money, costs, prices, drill
+ * power, hardness, enemy stats). Decision #5: decimal.js digit-array arithmetic at precision 40
+ * with one fixed rounding mode, so add/sub/mul/div/powInt give identical results on every OS and
+ * Electron version. This is the only module in `src/` that constructs a Decimal (lint enforces it).
+ *
+ * The public surface is deliberately small so the backend can be swapped with a
+ * `numberFormatVersion` bump. Values are immutable; callers never see a Decimal.
+ *
+ * Wire and save format (#5 rule 4): `toExponential()` with minimal digits (`"1.5e+0"`), negative
+ * zero written as `"0e+0"`; parsing goes through a strict pattern first. NaN and Infinity are
+ * refused at both ends.
+ */
+import Decimal from 'decimal.js'
+
+/** Bump when the canonical string format or the backend changes; saves and logs record it. */
+export const NUMBER_FORMAT_VERSION = 1
+
+const MoneyDecimal = Decimal.clone({ precision: 40, rounding: Decimal.ROUND_HALF_EVEN })
+
+declare const moneyBrand: unique symbol
+
+/** An exact decimal amount. Opaque: only this module's functions read or make one. */
+export interface Money {
+  readonly [moneyBrand]: 'Money'
+}
+
+/** Unbounded vehicle and enemy stats share Money's representation and rules (#5). */
+export type BigStat = Money
+
+/** Plain decimal text: optional minus, no leading zeros, optional fraction, optional exponent. */
+const DECIMAL_TEXT = /^-?(0|[1-9][0-9]*)(\.[0-9]+)?(e[+-]?[0-9]+)?$/
+
+export const ZERO_MONEY: Money = wrap(new MoneyDecimal(0))
+
+export function fromCanonical(text: string): Money {
+  if (typeof text !== 'string' || !DECIMAL_TEXT.test(text)) {
+    throw new RangeError(`money must be a decimal string such as "1.5e+3", got ${String(text)}`)
+  }
+  return wrap(new MoneyDecimal(text))
+}
+
+export function toCanonical(amount: Money): string {
+  const value = unwrap(amount)
+  return value.isZero() ? '0e+0' : value.toExponential()
+}
+
+export function add(a: Money, b: Money): Money {
+  return wrap(unwrap(a).plus(unwrap(b)))
+}
+
+export function sub(a: Money, b: Money): Money {
+  return wrap(unwrap(a).minus(unwrap(b)))
+}
+
+export function mul(a: Money, b: Money): Money {
+  return wrap(unwrap(a).times(unwrap(b)))
+}
+
+export function div(a: Money, b: Money): Money {
+  return wrap(unwrap(a).dividedBy(unwrap(b)))
+}
+
+/** -1, 0 or 1, as `a` is below, equal to or above `b`. */
+export function cmp(a: Money, b: Money): -1 | 0 | 1 {
+  return unwrap(a).comparedTo(unwrap(b)) as -1 | 0 | 1
+}
+
+/**
+ * `base^exponent` for a whole exponent (cost curves are `base * ratio^level`, #5 rule 1).
+ * decimal.js uses exponentiation by squaring for these, never the OS `Math.pow`.
+ */
+export function powInt(base: Money, exponent: number): Money {
+  if (!Number.isSafeInteger(exponent)) {
+    throw new RangeError(`powInt needs a safe integer exponent, got ${exponent}`)
+  }
+  return wrap(unwrap(base).pow(exponent))
+}
+
+export function floor(amount: Money): Money {
+  return wrap(unwrap(amount).floor())
+}
+
+export function isMoney(value: unknown): value is Money {
+  return value instanceof MoneyDecimal
+}
+
+/** Every value leaving this module is finite: Infinity and NaN never become money. */
+function wrap(value: Decimal): Money {
+  if (!value.isFinite()) throw new RangeError('money left the representable range')
+  return value as unknown as Money
+}
+
+function unwrap(amount: Money): Decimal {
+  return amount as unknown as Decimal
+}

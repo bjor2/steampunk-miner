@@ -39,6 +39,7 @@ export default defineConfig({
   test: {
     // vitest owns the fast headless tests (node, no DOM, no canvas, no physics world).
     include: ['src/**/*.test.ts'],
+    setupFiles: ['src/testSetup.ts'],
     exclude: ['**/node_modules/**', 'dist/**', 'dist-electron/**', '.claude/**'],
   },
 })

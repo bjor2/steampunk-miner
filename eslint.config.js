@@ -26,6 +26,69 @@ const FRAMEWORK_IMPORTS = [
   },
 ]
 
+// The clock and Math.random are banned in every pure rule.
+const CLOCK_AND_RANDOM = [
+  { object: 'Date', property: 'now', message: 'Pass time in as dt/arguments.' },
+  { object: 'performance', property: 'now', message: 'Pass time in as dt/arguments.' },
+  { object: 'Math', property: 'random', message: 'Use the seeded RNG.' },
+]
+
+const NO_IMPORT_META = {
+  selector: 'MetaProperty[meta.name="import"]',
+  message: 'No import.meta (glob, env) in systems/.',
+}
+
+// Decision #5 rule 2 and #11: the spec leaves pow, exp, log and trig implementation-approximated,
+// so they can differ between OSes and Electron versions and break replay digests. Math.sqrt is exact.
+const APPROXIMATED_MATH = [
+  'pow',
+  'exp',
+  'expm1',
+  'log',
+  'log10',
+  'log2',
+  'log1p',
+  'cbrt',
+  'hypot',
+  'sin',
+  'cos',
+  'tan',
+  'asin',
+  'acos',
+  'atan',
+  'atan2',
+  'sinh',
+  'cosh',
+  'tanh',
+  'asinh',
+  'acosh',
+  'atanh',
+].map((property) => ({
+  object: 'Math',
+  property,
+  message: 'Authority maths must be exact on every OS (#5): multiply loops, tables or Money.',
+}))
+
+const INEXACT_SYNTAX = [
+  {
+    selector: 'BinaryExpression[operator="**"]',
+    message: 'Authority maths must be exact on every OS (#5): use a multiply loop or Money.powInt.',
+  },
+  {
+    selector: 'AssignmentExpression[operator="**="]',
+    message: 'Authority maths must be exact on every OS (#5): use a multiply loop or Money.powInt.',
+  },
+  {
+    selector: 'CallExpression[callee.name="Number"]',
+    message: 'Never convert through Number in the authority (#5): money stays Money.',
+  },
+]
+
+const DECIMAL_ONLY_IN_MONEY = {
+  group: ['decimal.js', 'decimal.js/*'],
+  message: 'Only src/systems/money.ts constructs a Decimal (#5); use the Money functions.',
+}
+
 export default tseslint.config(
   { ignores: ['dist', 'dist-electron', 'release', 'node_modules', 'logs', 'coverage'] },
   js.configs.recommended,
@@ -60,6 +123,7 @@ export default tseslint.config(
               group: ['@react-three/rapier', '@dimforge/*'],
               message: 'Rapier lives behind src/physics.',
             },
+            DECIMAL_ONLY_IN_MONEY,
           ],
         },
       ],
@@ -70,20 +134,26 @@ export default tseslint.config(
     files: ['src/systems/**/*.ts'],
     ignores: ['src/systems/**/*.test.ts'],
     rules: {
-      'no-restricted-imports': ['error', { patterns: FRAMEWORK_IMPORTS }],
-      'no-restricted-properties': [
+      'no-restricted-imports': [
         'error',
-        { object: 'Date', property: 'now', message: 'Pass time in as dt/arguments.' },
-        { object: 'performance', property: 'now', message: 'Pass time in as dt/arguments.' },
-        { object: 'Math', property: 'random', message: 'Use the seeded RNG.' },
+        { patterns: [...FRAMEWORK_IMPORTS, DECIMAL_ONLY_IN_MONEY] },
       ],
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: 'MetaProperty[meta.name="import"]',
-          message: 'No import.meta (glob, env) in systems/.',
-        },
-      ],
+      'no-restricted-properties': ['error', ...CLOCK_AND_RANDOM],
+      'no-restricted-syntax': ['error', NO_IMPORT_META],
+    },
+  },
+  {
+    // The one module allowed to construct a Decimal.
+    files: ['src/systems/money.ts'],
+    rules: { 'no-restricted-imports': ['error', { patterns: FRAMEWORK_IMPORTS }] },
+  },
+  {
+    // Authority and economy maths: exact on every OS, so replay digests match (#5, #11).
+    files: ['src/systems/authority/**/*.ts', 'src/systems/money.ts'],
+    ignores: ['src/systems/**/*.test.ts'],
+    rules: {
+      'no-restricted-properties': ['error', ...CLOCK_AND_RANDOM, ...APPROXIMATED_MATH],
+      'no-restricted-syntax': ['error', NO_IMPORT_META, ...INEXACT_SYNTAX],
     },
   },
   {
