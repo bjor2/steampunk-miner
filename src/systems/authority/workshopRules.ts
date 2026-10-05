@@ -80,7 +80,11 @@ function upgradeMoneyRejection(
   return rejectionOf('money_short', `costs ${toCanonical(price)}, has ${toCanonical(wallet)}`)
 }
 
-function buyUpgradeLevel(state: AuthorityState, playerId: string, upgradeId: UpgradeId) {
+function buyUpgradeLevel(
+  state: AuthorityState,
+  playerId: string,
+  upgradeId: UpgradeId,
+): RuleEffect {
   const { wallet, vehicle } = state.players[playerId]
   const cost = nextUpgradePrice(state, playerId, upgradeId)
   const upgraded = raisedOneLevel(vehicle, upgradeId)
@@ -91,7 +95,7 @@ function buyUpgradeLevel(state: AuthorityState, playerId: string, upgradeId: Upg
       purchaseEvent(vehicle, upgraded, upgradeId, cost),
       ...visualTierEvents(vehicle, upgraded),
     ],
-  } satisfies RuleEffect
+  }
 }
 
 function raisedOneLevel(vehicle: VehicleState, upgradeId: UpgradeId): VehicleState {
