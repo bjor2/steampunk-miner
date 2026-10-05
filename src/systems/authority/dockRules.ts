@@ -37,7 +37,7 @@ export const DOCK_COMMAND_RULES: {
       chainEffects(state, [
         (current) => changeMode(current, playerId, 'docked', 'dock', tick),
         (current) => logDockEntry(current, playerId),
-        (current) => bankCoreFragments(current, playerId, 'dock'),
+        (current) => bankCoreFragments(current, playerId, 'dock', tick),
         (current) => digestAtDock(current),
       ]),
   },

@@ -2,7 +2,8 @@
  * The platform's core bay (decision #10, #8 Game Director's rule): the fragments a vehicle carries
  * move into the bay when it docks and when the tow brings it home, so core is never lost. When the
  * bay first holds `coreNeeded` fragments the platform shows its `core_drive` (#23 acceptance 8,
- * not when the first core tile breaks), once for the run.
+ * not when the first core tile breaks), once for the run. Reaching `coreNeeded` also completes the
+ * core of the planet the session is on (`core_completed`), once per planet.
  */
 import { coreFragmentsNeeded } from '../economy/planetEconomy'
 import { coreTileCount } from '../world/planetGeometry'
@@ -15,10 +16,19 @@ export function bankCoreFragments(
   state: AuthorityState,
   playerId: string,
   source: CoreDepositSource,
+  tick: number,
 ): RuleEffect {
   return chainEffects(state, [
     (current) => depositHeldFragments(current, playerId, source),
+    (current) => followBayTotal(current, tick),
+  ])
+}
+
+/** What a new bay total may bring: the core drive look, then the planet's core completed. */
+export function followBayTotal(state: AuthorityState, tick: number): RuleEffect {
+  return chainEffects(state, [
     (current) => showCoreDriveOnceBayIsFull(current),
+    (current) => completeCoreOnceBayIsFull(current, tick),
   ])
 }
 
@@ -48,11 +58,25 @@ function depositHeldFragments(
 }
 
 function showCoreDriveOnceBayIsFull(state: AuthorityState): RuleEffect {
-  const needed = coreNeededOf(state.planet)
   const isOutpost = state.platform.visualState === 'outpost'
-  if (!isOutpost || needed === null || state.platform.coreBay < needed) return unchanged(state)
+  if (!isOutpost || !isBayFull(state)) return unchanged(state)
   return {
     state: { ...state, platform: { ...state.platform, visualState: 'core_drive' } },
     events: [{ type: 'PlatformConfigurationChanged', visualState: 'core_drive' }],
   }
+}
+
+/** `durationTicks` runs from `core_reached`; a bay filled by a debug command never reached it. */
+function completeCoreOnceBayIsFull(state: AuthorityState, tick: number): RuleEffect {
+  if (state.core.isCompleted || !isBayFull(state)) return unchanged(state)
+  const durationTicks = tick - (state.core.reachedTick ?? tick)
+  return {
+    state: { ...state, core: { ...state.core, isCompleted: true } },
+    events: [{ type: 'CoreCompleted', durationTicks }],
+  }
+}
+
+function isBayFull(state: AuthorityState): boolean {
+  const needed = coreNeededOf(state.planet)
+  return needed !== null && state.platform.coreBay >= needed
 }

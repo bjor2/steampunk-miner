@@ -149,8 +149,13 @@ describe('vehicle core fragments', () => {
     const core = { tx: 0, ty: 3 }
     session.submit(10, poseAbove(core, FACING.down))
     const events = session.submit(200, drill(core, 190))
-    expect(typesOf(events)).toEqual(['DrillDamageDealt', 'TileDestroyed', 'CargoAdded'])
-    expect(events[2]).toMatchObject({ resourceTier: 6, amount: 1 })
+    expect(typesOf(events)).toEqual([
+      'DrillDamageDealt',
+      'TileDestroyed',
+      'CoreReached',
+      'CoreTileHarvested',
+    ])
+    expect(events[3]).toMatchObject({ tilesRemaining: 155, fragments: 1 })
     expect(session.vehicle().cargo).toEqual({ ore: {}, coreFragments: 1 })
     expect(cargoUnitsOf(session.vehicle().cargo)).toBe(1)
   })

@@ -9,6 +9,7 @@
 import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import type { AuthorityState, PlayerState } from './authorityState'
+import { coreProgressProblems, type CoreProgress } from './coreProgress'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPlatformVisualState, type PlatformState } from './platformState'
 import { stateDigest } from './stateDigest'
@@ -23,8 +24,8 @@ import {
   type PortableWorld,
 } from './vehicleSnapshot'
 
-/** 3: the platform's core bay and visual state joined the state (#23). */
-export const SNAPSHOT_VERSION = 3
+/** 4: the core progress of the planet joined the state (#24); 3 added the platform (#23). */
+export const SNAPSHOT_VERSION = 4
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -42,6 +43,7 @@ export interface PortableState {
   players: Record<string, PortablePlayer>
   world: PortableWorld
   platform: PlatformState
+  core: CoreProgress
   debugApplied: boolean
 }
 
@@ -77,6 +79,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     ),
     world: portableWorldOf(state.world),
     platform: { ...state.platform },
+    core: { ...state.core },
     debugApplied: state.debugApplied,
   }
 }
@@ -106,6 +109,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     ),
     world: worldOfPortable(portable.world),
     platform: { ...portable.platform },
+    core: { ...portable.core },
     debugApplied: portable.debugApplied,
   }
 }
@@ -143,6 +147,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...playersProblems(state.players),
     ...portableWorldProblems(state.world),
     ...platformProblems(state.platform),
+    ...coreProgressProblems(state.core, 'snapshot.state.core'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),

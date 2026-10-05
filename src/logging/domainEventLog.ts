@@ -77,6 +77,12 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     data: { cargoUnits, energy, hull },
   }),
   DockLeft: ({ durationTicks }) => ({ event: 'dock_left', data: { durationTicks } }),
+  CoreReached: () => ({ event: 'core_reached', data: {} }),
+  CoreTileHarvested: ({ tilesRemaining, fragments }) => ({
+    event: 'core_tile_harvested',
+    data: { tilesRemaining, fragments },
+  }),
+  CoreCompleted: ({ durationTicks }) => ({ event: 'core_completed', data: { durationTicks } }),
   CoreBayDeposited: ({ fragments, total, source }) => ({
     event: 'core_bay_deposited',
     data: { fragments, total, source },

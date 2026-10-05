@@ -10,6 +10,7 @@
 import { ZERO_MONEY, type Money } from '../money'
 import { newVehicleState, type VehicleState } from '../vehicle/vehicleState'
 import { EMPTY_WORLD, type WorldState } from '../world/worldState'
+import { NEW_CORE_PROGRESS, type CoreProgress } from './coreProgress'
 import { NEW_PLATFORM, type PlatformState } from './platformState'
 import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
 
@@ -27,6 +28,8 @@ export interface AuthorityState {
   players: Readonly<Record<string, PlayerState>>
   world: WorldState
   platform: PlatformState
+  /** The core of the planet the session is on (#10); fresh on every planet. */
+  core: CoreProgress
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
 }
@@ -45,6 +48,7 @@ export function createAuthorityState(start: SessionStart): AuthorityState {
     players: Object.fromEntries(start.playerIds.map((id) => [id, newPlayerState(planet)])),
     world: EMPTY_WORLD,
     platform: NEW_PLATFORM,
+    core: NEW_CORE_PROGRESS,
     debugApplied: false,
   }
 }

@@ -79,10 +79,6 @@ export function withOreUnit(cargo: Cargo, tier: number): Cargo {
   return { ...cargo, ore: { ...cargo.ore, [key]: (cargo.ore[key] ?? 0) + 1 } }
 }
 
-export function withCoreFragment(cargo: Cargo): Cargo {
-  return { ...cargo, coreFragments: cargo.coreFragments + 1 }
-}
-
 export function isVehicleActive(vehicle: VehicleState): boolean {
   return vehicle.mode === 'active'
 }

@@ -72,7 +72,13 @@ export interface DomainEventBodies {
   /** Energy in quanta, hull as a canonical string (#11 amendment 2). */
   DockEntered: { cargoUnits: number; energy: number; hull: string }
   DockLeft: { durationTicks: number }
+  /** The first core tile of the planet broke (#10). */
+  CoreReached: Record<never, never>
+  /** One core tile broke; `fragments` is what the hold took (0 when it was full). */
+  CoreTileHarvested: { tilesRemaining: number; fragments: number }
   CoreBayDeposited: { fragments: number; total: number; source: CoreDepositSource }
+  /** The bay first held `coreNeeded` on this planet, `durationTicks` after `core_reached`. */
+  CoreCompleted: { durationTicks: number }
   PlatformConfigurationChanged: { visualState: PlatformVisualState }
   ResourceSold: { items: SoldItem[]; value: string; mode: SaleMode }
   RepairPurchased: { hullFrom: string; hullTo: string; cost: string }

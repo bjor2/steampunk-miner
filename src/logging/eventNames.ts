@@ -70,7 +70,8 @@ export const RUN_EVENT_REGISTRY = {
     payload: { planetSeed: 'integer', generatorVersion: 'integer', radius: 'integer' },
   },
   planet_unlocked: { group: 'progression', level: 'core', payload: 'unspecified' },
-  core_reached: { group: 'progression', level: 'core', payload: 'unspecified' },
+  // The envelope's `planet` says which core (#10); nothing else to carry.
+  core_reached: { group: 'progression', level: 'core', payload: {} },
   core_tile_harvested: {
     group: 'progression',
     level: 'core',

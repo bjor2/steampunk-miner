@@ -120,7 +120,12 @@ export interface Economy {
     coreHardnessMultiplier: BigStat
     coreHardnessBand: number
   }
-  planets: { coreFraction: Money; paceScale: { default: Money; byPlanet: Map<number, Money> } }
+  planets: {
+    coreFraction: Money
+    /** Core fragments one drilled core tile drops into the hold (#10: 1). */
+    fragmentsPerTile: number
+    paceScale: { default: Money; byPlanet: Map<number, Money> }
+  }
   prices: {
     referenceBand: number
     chargePerEnergyUnit: Money

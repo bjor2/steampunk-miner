@@ -12,6 +12,11 @@ export function coreFragmentsNeeded(coreTileCount: number): number {
   return toSafeInteger(ceil(mul(planets.coreFraction, fromSafeInteger(coreTileCount))))
 }
 
+/** Fragments one core tile drops (#10 `fragmentsPerTile`, a data field). */
+export function fragmentsPerCoreTile(): number {
+  return planets.fragmentsPerTile
+}
+
 /**
  * The balance regression's lever (#6 section 6): every charge on planet `p` is multiplied by it.
  * Default "1", so no formula changes when it is retuned.

@@ -67,6 +67,7 @@ function readPlanets(reader: FieldReader, planets: Record<string, unknown>): Eco
   const paceScale = reader.object('planets.paceScale', planets.paceScale)
   return {
     coreFraction: reader.money('planets.coreFraction', planets.coreFraction),
+    fragmentsPerTile: reader.safeInteger('planets.fragmentsPerTile', planets.fragmentsPerTile),
     paceScale: {
       default: reader.money('planets.paceScale.default', paceScale.default),
       byPlanet: readPaceScaleByPlanet(reader, paceScale.byPlanet),

@@ -90,7 +90,7 @@ export function towVehicle(
     (current) => payRescueFee(current, playerId, cause),
     (current) => bringVehicleToDock(current, playerId),
     (current) => changeMode(current, playerId, 'docked', 'rescue', tick),
-    (current) => bankCoreFragments(current, playerId, 'rescue'),
+    (current) => bankCoreFragments(current, playerId, 'rescue', tick),
   ])
 }
 

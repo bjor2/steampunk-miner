@@ -45,8 +45,8 @@ describe('run event schema', () => {
   })
 
   it('refuses an event whose payload is not specified yet outside dev builds', () => {
-    expect(runEventProblems({ ...resourceSold, event: 'core_reached', data: {} })).toEqual([
-      'event "core_reached" has no registered payload yet (dev builds only)',
+    expect(runEventProblems({ ...resourceSold, event: 'feature_unlocked', data: {} })).toEqual([
+      'event "feature_unlocked" has no registered payload yet (dev builds only)',
     ])
   })
 

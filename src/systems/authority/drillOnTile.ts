@@ -5,10 +5,9 @@
  *
  * Only the ticks that do something are charged: none on a tile the tip cannot scratch (#7), and
  * no more than the tank pays for or the tile needs to break. A broken tile becomes air and pays
- * out 1 cargo unit of ore or core (#7, #10); with a full hold the unit is lost, never refused.
+ * out 1 cargo unit of ore or core fragments (#7, #10); with a full hold the unit is lost, never refused.
  */
 import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
-import { ECONOMY } from '../economy/economy'
 import {
   add,
   ceil,
@@ -32,7 +31,6 @@ import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import {
   hasCargoRoom,
   statsOfVehicle,
-  withCoreFragment,
   withOreUnit,
   type VehicleState,
 } from '../vehicle/vehicleState'
@@ -43,6 +41,7 @@ import { CELL_KIND, isRemovableCell, kindOfCell, tierOffsetOfCell } from '../wor
 import { cellAt, tileWorkAt, withTileRemoved, withTileWork } from '../world/worldState'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import { unchanged, type RuleEffect } from './commandRule'
+import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
 
 /** Call with a planet that has params; `requestedTicks` is already validated against time. */
@@ -126,7 +125,7 @@ function breakTile(
   return { state: collected.state, events: [destroyed, ...collected.events] }
 }
 
-/** 1 unit per ore or core tile at any tier; ground gives nothing (#7). */
+/** 1 unit per ore tile at any tier (#7), core fragments per core tile (#10); ground nothing. */
 function collectTile(
   state: AuthorityState,
   playerId: string,
@@ -134,16 +133,16 @@ function collectTile(
   cell: number,
 ): RuleEffect {
   const kind = kindOfCell(cell)
-  if (kind !== CELL_KIND.ore && kind !== CELL_KIND.core) return unchanged(state)
+  if (kind === CELL_KIND.core) return harvestCoreTile(state, playerId, params)
+  if (kind !== CELL_KIND.ore) return unchanged(state)
   const vehicle = vehicleOf(state, playerId)
   if (!hasCargoRoom(vehicle)) return { state, events: [{ type: 'StorageFull', lostUnits: 1 }] }
   const resourceTier = resourceTierOf(params, cell)
-  const cargo =
-    kind === CELL_KIND.core
-      ? withCoreFragment(vehicle.cargo)
-      : withOreUnit(vehicle.cargo, resourceTier)
   return {
-    state: withVehicle(state, playerId, { ...vehicle, cargo }),
+    state: withVehicle(state, playerId, {
+      ...vehicle,
+      cargo: withOreUnit(vehicle.cargo, resourceTier),
+    }),
     events: [
       {
         type: 'CargoAdded',
@@ -155,12 +154,10 @@ function collectTile(
   }
 }
 
-/** A cell stores its tier above the planet's band-1 ore; core material is band 6 (#4, #6). */
+/** A cell stores its tier above the planet's band-1 ore (#4, #6). */
 function resourceTierOf(params: PlanetParams, cell: number): number {
-  const band = Math.min(1 + tierOffsetOfCell(cell), ECONOMY.ore.coreTierBand)
-  return oreTier(params.planetIndex, band)
+  return oreTier(params.planetIndex, 1 + tierOffsetOfCell(cell))
 }
-
 function kindNameOf(cell: number): 'ground' | 'ore' | 'core' {
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.ore) return 'ore'
