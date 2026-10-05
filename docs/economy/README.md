@@ -10,5 +10,6 @@ final balance. Nothing here is game code.
 - `planet-table.md`, `vehicle-table.md`, `price-table.md`, `enemy-table.md`: one row per planet.
 - `tools/gen.py` regenerates the tables from the constants. `tools/sim.py` is the pacing simulation.
 
-When building starts, the constants move into the data file the game reads (`economy.json`), and a
-test compares the game's formulas against these tables.
+The game reads its constants from `src/systems/economy/economy.json`; the pure formulas in
+`src/systems/economy/` render these four tables again, and `economyTables.test.ts` compares them cell
+by cell. Change a number in `economy.json` and regenerate these tables together.
