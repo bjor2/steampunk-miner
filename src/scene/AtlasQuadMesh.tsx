@@ -7,12 +7,13 @@
  */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
-import { PlaneGeometry, type Group, type MeshStandardMaterial } from 'three'
+import type { Group, MeshStandardMaterial } from 'three'
 import { DRILL_SPARK_LIGHT } from '../constants/scene'
 import { useGameStore } from '../store/gameStore'
 import { slotOfPartId } from '../systems/art/artIds'
 import type { AssetQuad, AtlasMaps, AtlasUv } from '../systems/art/assetLook'
 import { createPartPose, writePartPose, type PartPose } from '../systems/render/partMotion'
+import { createAtlasQuad } from './atlasQuadGeometry'
 import { useAtlasAlbedo, useAtlasEmissive, useAtlasNormal } from './atlasTextures'
 import { partMotion } from './partMotionPresence'
 
@@ -115,12 +116,4 @@ function placePart(group: Group | null, quad: AssetQuad, z: number, pose: PartPo
 
 function glowPart(material: MeshStandardMaterial | null, glow: number): void {
   if (material !== null) material.emissiveIntensity = glow
-}
-
-/** PlaneGeometry's corners run top-left, top-right, bottom-left, bottom-right. */
-function createAtlasQuad(quad: AssetQuad & { uv: AtlasUv }): PlaneGeometry {
-  const geometry = new PlaneGeometry(quad.size[0], quad.size[1])
-  const [left, bottom, right, top] = quad.uv
-  geometry.attributes.uv.array.set([left, top, right, top, left, bottom, right, bottom])
-  return geometry
 }

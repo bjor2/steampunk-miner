@@ -155,6 +155,12 @@ back to the flat placeholder quad while the map transcodes. Maps load with three
 its Basis transcoder (three r169) is copied into `public/basis/`, so update that copy when three
 is upgraded. The vehicle (S7a) is the first asset drawn this way.
 
+The enemies (S7c) draw from their atlases through the enemy pool (`src/scene/EnemyFigures.tsx`):
+each body is its kind's one part, tinted by the tier ramp and the telegraph (`enemyLookOf`; the
+chitin is authored pale so the tint reads over it) and rolled to local up. The artefact cache
+(S7c) is final art too, but nothing in the world draws it until the artefacts build places
+caches.
+
 ## The asset lint
 
 `src/systems/art/assetLint.test.ts` runs in `npm test` and fails when:

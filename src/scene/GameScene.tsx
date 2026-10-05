@@ -7,7 +7,7 @@ import { Canvas } from '@react-three/fiber'
 import { CAMERA_POSITION } from '../constants/scene'
 import { PhysicsWorld } from '../physics/PhysicsWorld'
 import { useGameStore } from '../store/gameStore'
-import { EnemyPlaceholders } from './EnemyPlaceholders'
+import { EnemyFigures } from './EnemyFigures'
 import { LightRig } from './LightRig'
 import { PerfSampler } from './PerfSampler'
 import { PlanetCamera } from './PlanetCamera'
@@ -38,7 +38,7 @@ export function GameScene() {
       <LightRig />
       <PlanetTerrain />
       <PlatformPlaceholder />
-      <EnemyPlaceholders />
+      <EnemyFigures />
       <PhysicsWorld isPaused={isPaused}>
         <Vehicle />
       </PhysicsWorld>

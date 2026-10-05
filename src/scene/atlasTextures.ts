@@ -38,3 +38,11 @@ export function useAtlasEmissive(maps: AtlasMaps & { emissive: string }): Textur
   const gl = useThree((state) => state.gl)
   return useLoader(KTX2Loader, maps.emissive, (loader) => configureLoader(loader, gl))
 }
+
+/** Several maps at once, in the order asked, so a pool can load every kind's maps in one hook. */
+export function useAtlasTextureSet(urls: readonly string[]): Texture[] {
+  const gl = useThree((state) => state.gl)
+  const textures = useLoader(KTX2Loader, [...urls], (loader) => configureLoader(loader, gl))
+  // R3F types an array load as possibly nested; one URL per entry loads one texture each.
+  return textures as Texture[]
+}

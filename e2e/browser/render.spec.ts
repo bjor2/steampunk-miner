@@ -83,6 +83,31 @@ test.describe('lit render budgets (#38)', () => {
     expect(errors).toEqual([])
   })
 
+  test('holds the same caps with six enemies drawn from their S7c atlases (#68 acceptance 3)', async ({
+    page,
+  }) => {
+    test.setTimeout(180_000)
+    const errors = await openGame(page)
+    await page.setViewportSize({ width: 1920, height: 1080 })
+    const spawned = await page.evaluate(() => {
+      const debug = window.steampunkDebug!
+      debug.ui.setZoom(20)
+      debug.ui.setRenderScale(0.5)
+      debug.freezeEnemies(true)
+      const offsets = [-6, -3, 3, 6, 9, -9]
+      return offsets.map((dx, at) =>
+        debug.spawnEnemy(at % 2 === 0 ? 'crawler' : 'burrower', 1 + at * 4, { dx, dy: -2 }),
+      )
+    })
+    expect(spawned.every((result) => result.ok)).toBe(true)
+    const stats = await settledStats(page)
+    expect(stats.groundBlocks).toBeLessThanOrEqual(MAX_GROUND_BLOCKS)
+    expect(stats.drawCalls).toBeLessThanOrEqual(MAX_DRAW_CALLS)
+    expect(stats.headlamps).toBe(1)
+    expect(stats.pointLights).toBeLessThanOrEqual(MAX_POINT_LIGHTS)
+    expect(errors).toEqual([])
+  })
+
   test('keeps the UI text the same size at every render scale, because it is DOM (#38 acceptance 4)', async ({
     page,
   }) => {
