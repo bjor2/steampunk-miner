@@ -22,9 +22,13 @@ encode_uastc_linear() {
   toktx --t2 --encode uastc --uastc_quality 2 --zcmp 19 --assign_oetf linear --genmipmap --threads 1 "$1" "$2"
 }
 
-# A parts asset has an albedo and a normal bake; a backdrop render (#51) is an albedo map alone.
-required=(albedo normal)
-[[ -f "$out/$asset_id.parts.json" ]] || required=(albedo)
+# A parts asset and a ground or casing tile (#52) have an albedo and a normal bake; a backdrop
+# render (#51) is an albedo map alone.
+category="${asset_id%%-*}"
+required=(albedo)
+if [[ -f "$out/$asset_id.parts.json" || "$category" == ground || "$category" == casing ]]; then
+  required=(albedo normal)
+fi
 for map in "${required[@]}"; do
   if [[ ! -f "$bake/$asset_id.$map.png" ]]; then
     echo "encode: missing bake $bake/$asset_id.$map.png; run scripts/art/export.sh first" >&2

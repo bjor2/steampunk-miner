@@ -6,8 +6,8 @@ Headless Blender export of one art asset (#52 "Folders"). Run through scripts/ar
 
 It refuses the scene (exit 1, every problem listed) if it has an armature, a shape key or an
 action, or a part object whose name is not a valid part id (#52 acceptance 4). A `backdrop` asset
-(a bay's screen backdrop, #51) is rendered by render_backdrop.py from its bay's .blend instead.
-Otherwise it bakes
+(a bay's screen backdrop, #51) is rendered by render_backdrop.py from its bay's .blend instead, and
+a `tile` asset (ground and casing, #52) is baked by bake_tile.py. A `parts` asset bakes
 every part with Cycles onto its own rectangle of the atlas, viewed along +Y (Blender's Front view):
 base colour with the part mask in alpha, a tangent-space normal map (OpenGL, +Y up) and emission.
 The PNG bakes go to art/build/<id>/ (gitignored) for scripts/art/encode.sh; the parts.json sidecar
@@ -26,6 +26,7 @@ import numpy
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import asset_layout  # noqa: E402
+import bake_tile  # noqa: E402
 import render_backdrop  # noqa: E402
 
 TIER_COLLECTION_PREFIX = 'tier-'
@@ -369,7 +370,11 @@ def write_outputs(asset_id, sidecar):
     print('exported %s: %d parts, atlas %dx%d' % (asset_id, len(sidecar['parts']), *sidecar['atlasPx']))
 
 
-EXPORTS_BY_FORM = {'parts': export_parts, 'backdrop': render_backdrop.export_backdrop}
+EXPORTS_BY_FORM = {
+    'parts': export_parts,
+    'backdrop': render_backdrop.export_backdrop,
+    'tile': bake_tile.export_tile,
+}
 
 if __name__ == '__main__':
     main()
