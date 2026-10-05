@@ -9,7 +9,26 @@
  * `debug_command_applied`. Stubs (typed, throw DebugCommandNotImplementedError) wait for the
  * system they poke.
  */
-import { takeSessionSnapshot, useGameStore, type GameState } from '../store/gameStore'
+import {
+  readLocalVehicle,
+  takeSessionSnapshot,
+  useGameStore,
+  vehicleDebugProblems,
+  type GameState,
+} from '../store/gameStore'
+import type { UpgradeLevels } from '../systems/economy/vehicleStats'
+import {
+  setEnergyCommand,
+  setHullCommand,
+  setUpgradeCommand,
+} from '../systems/vehicle/vehicleCommands'
+import {
+  onCurveVehicleViews,
+  vehicleStatsViewOf,
+  type OnCurveVehicleView,
+  type VehicleStatsView,
+} from '../systems/vehicle/vehicleStatsView'
+import { statsOfVehicle } from '../systems/vehicle/vehicleState'
 import { readSnapshot, type SessionSnapshot } from '../systems/authority/sessionSnapshot'
 import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForward'
 import { validateScenario, type Scenario } from '../systems/scenario'
@@ -31,6 +50,13 @@ export interface SessionPoint {
   digest: string
 }
 
+/** `vehicleStats()`: the levels the vehicle holds, its stats, and the on-curve table (#7, #14). */
+export interface VehicleStatsReport {
+  levels: UpgradeLevels
+  stats: VehicleStatsView
+  onCurveByPlanet: OnCurveVehicleView[]
+}
+
 export interface DebugApi {
   // set state (each one a `debug.*` command)
   setPlanet(planetIndex: number): DebugResult
@@ -47,13 +73,20 @@ export interface DebugApi {
   // snapshot and restore
   snapshot(): DebugResult<{ snapshot: SessionSnapshot }>
   restore(snapshot: unknown): DebugResult<SessionPoint>
+  // vehicle (#7, #11 amendment): the setters are `debug.*` commands, the read is not logged
+  /** One track to an integer level; level 1500 on `drill_tip` is fine (uncapped, #7). */
+  setUpgrade(upgradeId: string, level: number): DebugResult
+  /** Energy in units as a decimal string, a whole number of 1/240 quanta up to the tank. */
+  setEnergy(units: string): DebugResult
+  /** Hull as a canonical decimal string, at most `hullMax`; 0 destroys the vehicle. */
+  setHull(hull: string): DebugResult
+  vehicleStats(): DebugResult<VehicleStatsReport>
   // stubs
   /** `depthBp` is basis points of the radius (#11); the radius arrives with the generator. */
   teleportToDepth(depthBp: number): void
   teleportToCore(): void
   teleportToDock(): void
   giveResource(resourceTier: number, amount: number): void
-  setUpgrade(upgradeId: string, level: number): void
   unlock(featureId: string): void
   spawnEnemy(enemyKind: string, tier: number): void
   setVehicleLoadout(loadoutId: string): void
@@ -87,6 +120,15 @@ function sessionPoint(): SessionPoint {
 
 const game = (): GameState => useGameStore.getState()
 
+function vehicleStatsReport(): VehicleStatsReport {
+  const vehicle = readLocalVehicle()
+  return {
+    levels: vehicle.levels,
+    stats: vehicleStatsViewOf(statsOfVehicle(vehicle)),
+    onCurveByPlanet: onCurveVehicleViews(),
+  }
+}
+
 export function createDebugApi(): DebugApi {
   return {
     setPlanet: (planetIndex) =>
@@ -115,11 +157,21 @@ export function createDebugApi(): DebugApi {
     snapshot: () => ({ ok: true, snapshot: takeSessionSnapshot() }),
     restore: (snapshot) =>
       runAndReportPoint(readSnapshot(snapshot).problems, () => game().restoreSnapshot(snapshot)),
+    setUpgrade: (upgradeId, level) =>
+      runUnlessRefused(vehicleDebugProblems(setUpgradeCommand(upgradeId, level)), () =>
+        game().setUpgrade(upgradeId, level),
+      ),
+    setEnergy: (units) =>
+      runUnlessRefused(vehicleDebugProblems(setEnergyCommand(units)), () =>
+        game().setEnergy(units),
+      ),
+    setHull: (hull) =>
+      runUnlessRefused(vehicleDebugProblems(setHullCommand(hull)), () => game().setHull(hull)),
+    vehicleStats: () => ({ ok: true, ...vehicleStatsReport() }),
     teleportToDepth: notImplemented('teleportToDepth'),
     teleportToCore: notImplemented('teleportToCore'),
     teleportToDock: notImplemented('teleportToDock'),
     giveResource: notImplemented('giveResource'),
-    setUpgrade: notImplemented('setUpgrade'),
     unlock: notImplemented('unlock'),
     spawnEnemy: notImplemented('spawnEnemy'),
     setVehicleLoadout: notImplemented('setVehicleLoadout'),

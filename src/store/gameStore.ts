@@ -5,8 +5,9 @@
  * writes those fields itself. Per-frame state (vehicle position, velocity) does NOT live here; it
  * stays in the physics body and refs.
  *
- * Every action here is a scenario/debug command so far, so each logs `debug_command_applied`
- * (design doc sections 19-22). Gameplay actions (drill, sell, buy) arrive with their own commands.
+ * Scenario/debug actions log `debug_command_applied` (design doc sections 19-22). The vehicle's
+ * play actions (`reportPose`, `requestRescue`) and the live fixed step are ordinary commands and
+ * clock moves; selling and buying arrive with their own commands later.
  */
 import { create } from 'zustand'
 import { recordDomainEvents } from '../logging/domainEventLog'
@@ -35,6 +36,18 @@ import {
   type ScriptStep,
 } from '../systems/scenario'
 import { startScenarioProblems, type StartScenario } from '../systems/startScenario'
+import type { PosePayload } from '../systems/vehicle/poseReport'
+import {
+  reportPoseCommand,
+  requestRescueCommand,
+  setEnergyCommand,
+  setHullCommand,
+  setUpgradeCommand,
+} from '../systems/vehicle/vehicleCommands'
+import type { VehicleState } from '../systems/vehicle/vehicleState'
+import type { PlanetParams } from '../systems/world/planetParams'
+import type { WorldState } from '../systems/world/worldState'
+import { planetParamsOf } from '../systems/authority/planetOfState'
 import {
   grantMoneyCommand,
   setPlanetCommand,
@@ -45,8 +58,10 @@ import {
   advanceAuthorityTo,
   connectAuthority,
   readAuthorityState,
+  refusalOf,
   submitCommand,
 } from './authorityLink'
+import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
 export interface GameState {
   playerId: string
@@ -57,6 +72,8 @@ export interface GameState {
   money: Money
   /** Copied from the authority: a `debug.*` command was accepted in this run (#11 section 4). */
   debugApplied: boolean
+  /** Copied from the authority: the local vehicle as the HUD shows it. */
+  vehicle: VehicleReplica
 
   setPlanet(planetTier: number): void
   setPlanetSeed(planetSeed: number): void
@@ -70,20 +87,36 @@ export interface GameState {
   fastForward(ticks: number, commands?: readonly ScriptedCommand[]): void
   /** Replaces the session with a snapshot's state; refused whole on any problem. */
   restoreSnapshot(snapshot: unknown): void
+  /** Debug: one upgrade track to an integer level (#7); the stats follow from the levels. */
+  setUpgrade(upgradeId: string, level: number): void
+  /** Debug: energy in units as a decimal string, a whole number of 1/240 quanta. */
+  setEnergy(units: string): void
+  /** Debug: hull as a decimal string, at most `hullMax`. */
+  setHull(hull: string): void
+  /** The local vehicle's 5 Hz pose report (#11), built by the fixed-step loop. */
+  reportPose(pose: PosePayload): void
+  requestRescue(): void
+  /** One fixed physics step of the live game: the authority's clock moves one tick (#3). */
+  advanceOneTick(): void
 }
 
 type GameValues = Pick<
   GameState,
-  'playerId' | 'planetTier' | 'planetSeed' | 'depthTiles' | 'money' | 'debugApplied'
+  'playerId' | 'planetTier' | 'planetSeed' | 'depthTiles' | 'money' | 'debugApplied' | 'vehicle'
 >
 
+const STARTING_PLAYER_ID = 'player_1'
+const STARTING_PLANET = { index: 1, seed: 1 }
+
+/** A run starts on planet 1 (#2), the one planet with the starter vein (#16). */
 export const STARTING_VALUES: GameValues = {
-  playerId: 'player_1',
-  planetTier: 0,
-  planetSeed: 1,
+  playerId: STARTING_PLAYER_ID,
+  planetTier: STARTING_PLANET.index,
+  planetSeed: STARTING_PLANET.seed,
   depthTiles: 0,
   money: ZERO_MONEY,
   debugApplied: false,
+  vehicle: vehicleReplicaOf(startingAuthorityState().players[STARTING_PLAYER_ID].vehicle),
 }
 
 export const useGameStore = create<GameState>()((set, get) => ({
@@ -138,7 +171,36 @@ export const useGameStore = create<GameState>()((set, get) => ({
     followAuthority([])
     recordDebugCommand(get(), 'restoreSnapshot', { tick: restored.state.tick })
   },
+
+  setUpgrade: (upgradeId, level) =>
+    submitUnlessRefused(get().playerId, setUpgradeCommand(upgradeId, level)),
+
+  setEnergy: (units) => submitUnlessRefused(get().playerId, setEnergyCommand(units)),
+
+  setHull: (hull) => submitUnlessRefused(get().playerId, setHullCommand(hull)),
+
+  reportPose: (pose) => submitCommand(get().playerId, reportPoseCommand(pose)),
+
+  requestRescue: () => submitCommand(get().playerId, requestRescueCommand()),
+
+  advanceOneTick: () => advanceAuthorityTo(readAuthorityState().tick + 1),
 }))
+
+/** Why the authority would refuse a vehicle debug command now; empty when it would apply. */
+export function vehicleDebugProblems(intent: CommandIntent): string[] {
+  return refusalOf(useGameStore.getState().playerId, intent)
+}
+
+/** The local vehicle as the authority holds it, for the fixed-step loop (never rendered). */
+export function readLocalVehicle(): VehicleState {
+  return readAuthorityState().players[useGameStore.getState().playerId].vehicle
+}
+
+/** The planet's params and its world deltas now, for physics and the placeholder tile view. */
+export function readPlanetWorld(): { params: PlanetParams | null; world: WorldState } {
+  const state = readAuthorityState()
+  return { params: planetParamsOf(state.planet), world: state.world }
+}
 
 /** The session as a portable snapshot (#11 section 5): the debug API's `snapshot()`. */
 export function takeSessionSnapshot(): SessionSnapshot {
@@ -147,13 +209,15 @@ export function takeSessionSnapshot(): SessionSnapshot {
 
 /** A new session for the starting values; tests pass a spy to watch what the store submits. */
 export function createStartingAuthority(): Authority {
-  return createLoopbackAuthority(
-    createAuthorityState({
-      planetIndex: STARTING_VALUES.planetTier,
-      planetSeed: STARTING_VALUES.planetSeed,
-      playerIds: [STARTING_VALUES.playerId],
-    }),
-  )
+  return createLoopbackAuthority(startingAuthorityState())
+}
+
+function startingAuthorityState(): AuthorityState {
+  return createAuthorityState({
+    planetIndex: STARTING_PLANET.index,
+    planetSeed: STARTING_PLANET.seed,
+    playerIds: [STARTING_PLAYER_ID],
+  })
 }
 
 /** Back to a fresh run on a fresh authority; tests call this in beforeEach. */
@@ -181,6 +245,7 @@ function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues>
     planetSeed: state.planet.seed,
     money: state.players[playerId].wallet,
     debugApplied: state.debugApplied,
+    vehicle: vehicleReplicaOf(state.players[playerId].vehicle),
   }
 }
 
@@ -208,6 +273,12 @@ function runFastForwardSteps(playerId: string, steps: readonly FastForwardStep[]
     if (step.kind === 'advance') advanceAuthorityTo(step.tick)
     else submitCommand(playerId, step.intent)
   }
+}
+
+/** A debug command the authority would refuse is not sent: it throws with the problems. */
+function submitUnlessRefused(playerId: string, intent: CommandIntent): void {
+  refuseProblems(refusalOf(playerId, intent))
+  submitCommand(playerId, intent)
 }
 
 /** A scenario is refused, never trimmed: every problem is named, nothing is applied. */

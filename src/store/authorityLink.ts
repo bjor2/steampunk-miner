@@ -8,6 +8,7 @@
  */
 import { getRunLog } from '../logging/runLog'
 import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
+import { applyCommand } from '../systems/authority/applyCommand'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import type { Authority, DomainEventListener } from '../systems/authority/loopbackAuthority'
 
@@ -36,6 +37,19 @@ export function submitCommand(playerId: string, intent: CommandIntent): void {
 
 function stampCommand(playerId: string, intent: CommandIntent): AuthorityCommand {
   return { playerId, tick: connectedAuthority().snapshot().tick, seq: nextSeq++, ...intent }
+}
+
+/**
+ * What the authority would refuse this intent for, if it were submitted now: a dry run of the pure
+ * `applyCommand` on the current state, so a refused debug call changes nothing and logs nothing.
+ */
+export function refusalOf(playerId: string, intent: CommandIntent): string[] {
+  const state = connectedAuthority().snapshot().state
+  const command = { playerId, tick: state.tick, seq: nextSeq, ...intent } as AuthorityCommand
+  const refusal = applyCommand(state, command).events.find(
+    (event) => event.type === 'CommandRejected' && event.seq === command.seq,
+  )
+  return refusal?.type === 'CommandRejected' ? refusal.problems : []
 }
 
 /** Moves the authority's clock with no command (fastForward); it answers with its events. */

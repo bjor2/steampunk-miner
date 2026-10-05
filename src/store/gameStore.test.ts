@@ -5,7 +5,13 @@ import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import { createAuthorityState } from '../systems/authority/authorityState'
 import { snapshotOf, type Authority } from '../systems/authority/loopbackAuthority'
 import { fromCanonical, toCanonical, ZERO_MONEY } from '../systems/money'
-import { createStartingAuthority, resetGameStore, STARTING_VALUES, useGameStore } from './gameStore'
+import {
+  createStartingAuthority,
+  resetGameStore,
+  STARTING_VALUES,
+  takeSessionSnapshot,
+  useGameStore,
+} from './gameStore'
 
 let sink: ReturnType<typeof createMemorySink>
 
@@ -65,7 +71,7 @@ describe('game store: scenario commands', () => {
 
   it('refuses an illegal scenario without applying any of it', () => {
     expect(() => game().applyStartScenario({ planetTier: 5, depthTiles: -3 })).toThrow(/depth/)
-    expect(game().planetTier).toBe(0)
+    expect(game().planetTier).toBe(STARTING_VALUES.planetTier)
   })
 
   it('refuses a negative money grant', () => {
@@ -95,7 +101,11 @@ describe('game store: authority', () => {
     game().setPlanetSeed(99)
     game().giveMoney('100')
     game().applyStartScenario({ planetTier: 4, planetSeed: 5, money: '6' })
-    expect(game()).toMatchObject({ planetTier: 0, planetSeed: 1, money: ZERO_MONEY })
+    expect(game()).toMatchObject({
+      planetTier: STARTING_VALUES.planetTier,
+      planetSeed: STARTING_VALUES.planetSeed,
+      money: ZERO_MONEY,
+    })
     expect(submitted.map((command) => command.type)).toEqual([
       'debug.setPlanet',
       'debug.setPlanetSeed',
@@ -211,5 +221,46 @@ describe('game store: run log', () => {
   it('records nothing for a refused command', () => {
     expect(() => game().giveMoney('-1')).toThrow()
     expect(sink.events).toEqual([])
+  })
+})
+
+describe('game store: vehicle', () => {
+  it('copies the vehicle from the authority after a debug command', () => {
+    game().setEnergy('37.5')
+    game().setUpgrade('cargo_hold', 2)
+    expect(game().vehicle).toMatchObject({ energy: 9000, cargoCapacity: 18, mode: 'active' })
+  })
+
+  it('refuses a debug value the authority would refuse, without sending it', () => {
+    expect(() => game().setEnergy('500')).toThrow(/energy/)
+    expect(() => game().setUpgrade('laser', 1)).toThrow(/laser/)
+    expect(sink.commands).toEqual([])
+  })
+
+  it('sends pose reports and rescue calls as player commands, not debug ones', () => {
+    game().requestRescue()
+    game().reportPose({
+      x: 500,
+      y: 300500,
+      vx: 0,
+      vy: 0,
+      upx: 0,
+      upy: 1024,
+      facing: 1,
+      driving: false,
+      thrusting: false,
+      drilling: false,
+      thrustTicks: 0,
+      driveTicks: 0,
+      drillTicks: 0,
+    })
+    expect(sink.commands.map((command) => command.type)).toEqual(['requestRescue', 'reportPose'])
+    expect(game().debugApplied).toBe(false)
+  })
+
+  it('moves the authority one tick per fixed step', () => {
+    game().advanceOneTick()
+    game().advanceOneTick()
+    expect(takeSessionSnapshot().tick).toBe(2)
   })
 })

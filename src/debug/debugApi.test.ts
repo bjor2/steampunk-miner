@@ -196,3 +196,71 @@ describe('debug api: scenarios', () => {
     expect(sink.commands).toEqual([])
   })
 })
+
+describe('debug api: vehicle', () => {
+  const vehicleStatsOf = (debug: ReturnType<typeof createDebugApi>) => {
+    const report = debug.vehicleStats()
+    if (!report.ok) throw new Error(report.problems.join('; '))
+    return report
+  }
+
+  it('reads the vehicle stats and the on-curve table for planets 1 to 40 without logging', () => {
+    const debug = createDebugApi()
+    const report = vehicleStatsOf(debug)
+    expect(report.stats).toMatchObject({ drillPower: '1.5e+0', energyMax: 150, cargoCapacity: 10 })
+    expect(report.onCurveByPlanet.map((row) => row.planetIndex)).toEqual(
+      Array.from({ length: 40 }, (_, index) => index + 1),
+    )
+    expect(report.onCurveByPlanet[0].levels).toMatchObject({ drill_power: 13, drill_tip: 7 })
+    expect(sink.events).toEqual([])
+    expect(sink.commands).toEqual([])
+  })
+
+  it('sets an upgrade level as a logged debug command, with finite stats at drill_tip 1500', () => {
+    const debug = createDebugApi()
+    expect(debug.setUpgrade('drill_tip', 1500)).toEqual({ ok: true })
+    expect(vehicleStatsOf(debug).stats.drillTip).toMatch(/^[0-9.]+e\+\d+$/)
+    expect(sink.commands.map((command) => command.type)).toEqual(['debug.setUpgrade'])
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'vehicle_configuration_changed',
+      'debug_command_applied',
+    ])
+    expect(sink.events[0].data).toEqual({ visualTier: 3 })
+    expect(game().debugApplied).toBe(true)
+  })
+
+  it('sets energy and hull from canonical strings', () => {
+    const debug = createDebugApi()
+    expect(debug.setEnergy('37.5')).toEqual({ ok: true })
+    expect(debug.setHull('5e+1')).toEqual({ ok: true })
+    expect(game().vehicle).toMatchObject({ energy: 9000, hull: fromCanonical('50') })
+  })
+
+  it('refuses an unknown track, a level that is not an integer, or energy and hull out of range', () => {
+    const debug = createDebugApi()
+    const results = [
+      debug.setUpgrade('laser', 1),
+      debug.setUpgrade('engine', 1.5),
+      debug.setEnergy('151'),
+      debug.setEnergy('0.001'),
+      debug.setHull('101'),
+    ]
+    expect(results.every((result) => !result.ok)).toBe(true)
+    expect(sink.commands).toEqual([])
+    expect(game().vehicle.energy).toBe(150 * 240)
+  })
+
+  it('saves integer levels only, so a restore recomputes the same stats', () => {
+    const debug = createDebugApi()
+    debug.setUpgrade('hull', 6)
+    const taken = debug.snapshot()
+    if (!taken.ok) throw new Error('snapshot refused')
+    const savedVehicle = JSON.parse(JSON.stringify(taken.snapshot)).state.players.player_1.vehicle
+    expect(savedVehicle.levels).toMatchObject({ hull: 6 })
+    expect(Object.keys(savedVehicle)).not.toContain('hullMax')
+    const before = vehicleStatsOf(debug).stats
+    startRun()
+    expect(debug.restore(JSON.parse(JSON.stringify(taken.snapshot)))).toMatchObject({ ok: true })
+    expect(vehicleStatsOf(debug).stats).toEqual(before)
+  })
+})

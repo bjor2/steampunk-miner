@@ -61,7 +61,9 @@ problem naming what is missing.
   (the NDJSON so far, browser shell only).
 - Every wired debug method answers `{ ok: true, ... }` or `{ ok: false, problems }`: `setPlanet`,
   `setPlanetSeed`, `teleportToDepthTiles`, `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
-  `fastForward(ticks, commands?)`, `snapshot()` and `restore(snapshot)`.
+  `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
+  `setUpgrade(id, level)`, `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
+  `vehicleStats()`.
 - Run-log specs: every emitted line must pass `runEventProblems` (the schema registry in
   `src/logging/eventNames.ts`); a summary is always `deriveSummary(events)`.
 - Money in tests: compare canonical strings (`toCanonical`) or `Money` values; `src/testSetup.ts` registers
