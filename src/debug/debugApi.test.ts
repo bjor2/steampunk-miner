@@ -184,13 +184,20 @@ describe('debug api: scenarios', () => {
     expect(viaDebugApi).toMatchObject({ digest: viaLaunch.ok ? viaLaunch.snapshot.digest : '' })
   })
 
+  it('sets the upgrade levels a scenario starts with, as debug commands', () => {
+    const scenario = { ...minimalScenarioFor('upgrades'), start: { upgrades: { drill_tip: 7 } } }
+    expect(createDebugApi().applyScenario(scenario)).toMatchObject({ ok: true })
+    expect(createDebugApi().vehicleStats()).toMatchObject({ levels: { drill_tip: 7 } })
+    expect(sink.events.map((event) => event.event)).toContain('debug_command_applied')
+  })
+
   it('refuses the broken scenario with every problem and applies none of it', () => {
     const before = createDebugApi().snapshot()
     const result = createDebugApi().applyScenario(
       JSON.parse(readScenarioFile('broken.scenario.json')),
     )
     expect(result).toMatchObject({ ok: false })
-    expect(result.ok ? [] : result.problems).toHaveLength(6)
+    expect(result.ok ? [] : result.problems).toHaveLength(5)
     expect(createDebugApi().snapshot()).toEqual(before)
     expect(sink.events).toEqual([])
     expect(sink.commands).toEqual([])
@@ -291,5 +298,30 @@ describe('debug api: ui', () => {
     expect(sink.events).toEqual([])
     expect(sink.commands).toEqual([])
     expect(game().debugApplied).toBe(false)
+  })
+})
+
+function minimalScenarioFor(name: string) {
+  return { scenarioVersion: 1, name, worldSeed: 83921, start: {} }
+}
+
+describe('debug API: platform', () => {
+  it('accepts level 1 for each facility and changes nothing', () => {
+    const before = takeSessionSnapshot().digest
+    for (const facilityId of ['shop', 'workshop', 'charging']) {
+      expect(createDebugApi().setFacilityLevel(facilityId, 1)).toEqual({ ok: true })
+    }
+    expect(takeSessionSnapshot().digest).toBe(before)
+  })
+
+  it('lists a problem for any other level and for an unknown facility', () => {
+    expect(createDebugApi().setFacilityLevel('workshop', 2)).toEqual({
+      ok: false,
+      problems: ['facilities have no levels in the slice: level must be 1, got 2'],
+    })
+    expect(createDebugApi().setFacilityLevel('refinery', 0)).toMatchObject({
+      ok: false,
+      problems: [expect.stringContaining('"refinery" is not a facility'), expect.any(String)],
+    })
   })
 })

@@ -186,6 +186,22 @@ describe('platform: core bay', () => {
     expect(session.vehicle().cargo).toEqual({ ore: {}, coreFragments: 0 })
   })
 
+  it('tows a stranded vehicle after the grace and banks its core, with a full hull and 25% energy', () => {
+    const session = createScriptedSession()
+    equipForCore(session)
+    const tick = mineCore(session, 10, coreTiles(5))
+    session.submit(tick, { type: 'debug.setHull', payload: { hull: '40' } })
+    session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '0.05' } })
+    session.submit(tick + 12, poseAbove(GROUND, FACING.right, { driveTicks: 12 }))
+    expect(session.vehicle().mode).toBe('stranded')
+    const towed = session.advanceTo(tick + 12 + 180)
+    expect(towed[0]).toMatchObject({ type: 'RescueTriggered', cause: 'stranded', fee: '0e+0' })
+    expect(towed.at(-1)).toMatchObject({ type: 'CoreBayDeposited', fragments: 5, source: 'rescue' })
+    expect(session.state().platform.coreBay).toBe(5)
+    expect(session.vehicle()).toMatchObject({ mode: 'docked', energy: FULL_TANK / 4 })
+    expect(toCanonical(session.vehicle().hull)).toBe('1e+2')
+  })
+
   it('keeps the bay total through three rescues while carrying core', () => {
     const session = createScriptedSession()
     equipForCore(session)

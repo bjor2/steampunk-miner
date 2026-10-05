@@ -12,8 +12,8 @@
  * `depthTiles`), money a decimal string, ids are checked against their registries.
  *
  * Start fields whose system is not built yet (`depthBp` needs the planet radius; inventory,
- * upgrades, unlocks and core fragments need their tickets) are validated, then refused with a
- * problem naming what is missing, so no file is ever half applied.
+ * unlocks and core fragments need their tickets) are validated, then refused with a problem naming
+ * what is missing, so no file is ever half applied. Upgrade levels apply as `debug.setUpgrade`.
  */
 import { isNonNegativeMoneyText } from './money'
 import { UPGRADE_IDS } from './registeredIds'
@@ -134,10 +134,7 @@ const START_FIELDS: Readonly<Record<string, FieldRule>> = {
     ...listRule(value, path, (item, itemPath) => objectRule(item, itemPath, INVENTORY_FIELDS)),
     ...notBuiltYetUnlessEmpty(value, path, 'cargo (Build 4)'),
   ],
-  upgrades: (value, path) => [
-    ...upgradeLevelProblems(value, path),
-    ...notBuiltYetUnlessEmpty(value, path, 'the upgrade loop (Build 6)'),
-  ],
+  upgrades: upgradeLevelProblems,
   unlocks: (value, path) => [
     ...listRule(value, path, unlockIdProblems),
     ...notBuiltYetUnlessEmpty(value, path, 'unlocks (Build 7)'),
@@ -262,11 +259,12 @@ function quote(value: unknown): string {
  * generator (Build 2) derives each planet's seed from it.
  */
 export function startOfScenario(scenario: Scenario): StartScenario {
-  const { planet, depthTiles, money } = scenario.start
+  const { planet, depthTiles, money, upgrades } = scenario.start
   return {
     ...(planet === undefined ? {} : { planetTier: planet }),
     planetSeed: scenario.worldSeed,
     ...(depthTiles === undefined ? {} : { depthTiles }),
     ...(money === undefined ? {} : { money }),
+    ...(upgrades === undefined ? {} : { upgrades }),
   }
 }

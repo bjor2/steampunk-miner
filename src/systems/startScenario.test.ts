@@ -32,4 +32,11 @@ describe('start scenario', () => {
     expect(startScenarioProblems({ money: 'NaN' })).toHaveLength(1)
     expect(startScenarioProblems({ money: 'lots' })).toHaveLength(1)
   })
+
+  it('refuses an unknown upgrade id and a level that is not a whole number', () => {
+    expect(startScenarioProblems({ upgrades: { laser: 1, hull: 1.5, boiler: 3 } })).toEqual([
+      'laser is not a registered upgrade id',
+      'hull level must be a safe integer >= 0, got 1.5',
+    ])
+  })
 })

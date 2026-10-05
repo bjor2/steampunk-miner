@@ -13,6 +13,7 @@
  * 1e308 arrive exact.
  */
 import { isNonNegativeMoneyText } from './money'
+import { isUpgradeId, upgradeLevelProblems } from './vehicle/vehicleStats'
 
 export interface StartScenario {
   planetTier?: number
@@ -21,6 +22,8 @@ export interface StartScenario {
   depthTiles?: number
   /** A decimal string >= 0, for example "1e30". */
   money?: string
+  /** Integer levels by upgrade id (#7); tracks not named keep their level. */
+  upgrades?: Readonly<Record<string, number>>
 }
 
 export function startScenarioProblems(scenario: StartScenario): string[] {
@@ -29,7 +32,16 @@ export function startScenarioProblems(scenario: StartScenario): string[] {
     ...planetSeedProblems(scenario.planetSeed),
     ...depthTilesProblems(scenario.depthTiles),
     ...moneyProblems(scenario.money),
+    ...upgradesProblems(scenario.upgrades),
   ]
+}
+
+function upgradesProblems(upgrades: Readonly<Record<string, number>> | undefined): string[] {
+  if (upgrades === undefined) return []
+  return Object.entries(upgrades).flatMap(([upgradeId, level]) => [
+    ...(isUpgradeId(upgradeId) ? [] : [`${upgradeId} is not a registered upgrade id`]),
+    ...upgradeLevelProblems(upgradeId, level),
+  ])
 }
 
 function planetTierProblems(planetTier: number | undefined): string[] {

@@ -6,8 +6,9 @@
  * stays in the physics body and refs.
  *
  * Scenario/debug actions log `debug_command_applied` (design doc sections 19-22). The vehicle's
- * play actions (`reportPose`, `requestRescue`) and the live fixed step are ordinary commands and
- * clock moves; selling and buying arrive with their own commands later.
+ * play actions (`reportPose`, `requestRescue`), the platform's (dock, sell, repair, recharge, the
+ * quick action, upgrades) and the live fixed step are ordinary commands and clock moves; a refused
+ * one changes nothing and logs `command_rejected`.
  */
 import { create } from 'zustand'
 import { recordDomainEvents } from '../logging/domainEventLog'
@@ -46,6 +47,16 @@ import {
 } from '../systems/vehicle/vehicleCommands'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
 import { isCameraMode, type CameraMode } from '../systems/render/cameraTurn'
+import type { OreSelection } from '../systems/authority/platformServices'
+import {
+  buyUpgradeCommand,
+  dockCommand,
+  quickServiceCommand,
+  rechargeEnergyCommand,
+  repairHullCommand,
+  sellCargoCommand,
+  undockCommand,
+} from '../systems/platform/platformCommands'
 import type { PlanetParams } from '../systems/world/planetParams'
 import type { WorldState } from '../systems/world/worldState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
@@ -62,6 +73,7 @@ import {
   refusalOf,
   submitCommand,
 } from './authorityLink'
+import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
 export interface GameState {
@@ -75,6 +87,8 @@ export interface GameState {
   debugApplied: boolean
   /** Copied from the authority: the local vehicle as the HUD shows it. */
   vehicle: VehicleReplica
+  /** Copied from the authority: the core bay and the platform's look (#8, #10). */
+  platform: PlatformReplica
   /**
    * Local presentation only (#13 accessibility, #11 amendment 2 `ui.setCameraMode`): never a
    * command, never logged, never in the digest.
@@ -102,6 +116,16 @@ export interface GameState {
   /** The local vehicle's 5 Hz pose report (#11), built by the fixed-step loop. */
   reportPose(pose: PosePayload): void
   requestRescue(): void
+  /** The platform (#8): dock when stationary in the pad zone, then its facilities. */
+  dock(): void
+  undock(): void
+  /** One ore tier, or `'all'` of the hold's ore. */
+  sellCargo(resourceTier: OreSelection): void
+  repairHull(): void
+  rechargeEnergy(): void
+  /** "Sell, repair and recharge" at current prices. */
+  quickService(): void
+  buyUpgrade(upgradeId: string): void
   /** One fixed physics step of the live game: the authority's clock moves one tick (#3). */
   advanceOneTick(): void
   /** Rotating (local down at the bottom of the screen) or fixed (north up); the view only. */
@@ -117,6 +141,7 @@ type GameValues = Pick<
   | 'money'
   | 'debugApplied'
   | 'vehicle'
+  | 'platform'
   | 'cameraMode'
 >
 
@@ -132,6 +157,7 @@ export const STARTING_VALUES: GameValues = {
   money: ZERO_MONEY,
   debugApplied: false,
   vehicle: vehicleReplicaOf(startingAuthorityState().players[STARTING_PLAYER_ID].vehicle),
+  platform: platformReplicaOf(startingAuthorityState()),
   cameraMode: 'rotating',
 }
 
@@ -198,6 +224,20 @@ export const useGameStore = create<GameState>()((set, get) => ({
   reportPose: (pose) => submitCommand(get().playerId, reportPoseCommand(pose)),
 
   requestRescue: () => submitCommand(get().playerId, requestRescueCommand()),
+
+  dock: () => submitCommand(get().playerId, dockCommand()),
+
+  undock: () => submitCommand(get().playerId, undockCommand()),
+
+  sellCargo: (resourceTier) => submitCommand(get().playerId, sellCargoCommand(resourceTier)),
+
+  repairHull: () => submitCommand(get().playerId, repairHullCommand()),
+
+  rechargeEnergy: () => submitCommand(get().playerId, rechargeEnergyCommand()),
+
+  quickService: () => submitCommand(get().playerId, quickServiceCommand()),
+
+  buyUpgrade: (upgradeId) => submitCommand(get().playerId, buyUpgradeCommand(upgradeId)),
 
   advanceOneTick: () => advanceAuthorityTo(readAuthorityState().tick + 1),
 
@@ -272,6 +312,7 @@ function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues>
     money: state.players[playerId].wallet,
     debugApplied: state.debugApplied,
     vehicle: vehicleReplicaOf(state.players[playerId].vehicle),
+    platform: platformReplicaOf(state),
   }
 }
 

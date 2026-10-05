@@ -5,8 +5,10 @@
  * owns (#3), so the store places it.
  */
 import type { CommandIntent } from './authority/authorityCommand'
+import { UPGRADE_IDS } from './economy/economyDefinition'
 import { fromCanonical, toCanonical } from './money'
 import type { StartScenario } from './startScenario'
+import { setUpgradeCommand } from './vehicle/vehicleCommands'
 
 /** Call only with a scenario that has no problems; refusing is the caller's first step. */
 export function startScenarioCommands(scenario: StartScenario): CommandIntent[] {
@@ -14,7 +16,15 @@ export function startScenarioCommands(scenario: StartScenario): CommandIntent[] 
     ...(scenario.planetTier === undefined ? [] : [setPlanetCommand(scenario.planetTier)]),
     ...(scenario.planetSeed === undefined ? [] : [setPlanetSeedCommand(scenario.planetSeed)]),
     ...(scenario.money === undefined ? [] : [setMoneyCommand(scenario.money)]),
+    ...upgradeCommandsOf(scenario.upgrades ?? {}),
   ]
+}
+
+/** In the #7 track order, so a scenario replays the same commands however its file orders them. */
+function upgradeCommandsOf(upgrades: Readonly<Record<string, number>>): CommandIntent[] {
+  return UPGRADE_IDS.filter((upgradeId) => Object.hasOwn(upgrades, upgradeId)).map((upgradeId) =>
+    setUpgradeCommand(upgradeId, upgrades[upgradeId]),
+  )
 }
 
 export function setPlanetCommand(planetTier: number): CommandIntent<'debug.setPlanet'> {

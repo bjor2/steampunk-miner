@@ -24,7 +24,6 @@ describe('scenario validation', () => {
       'scenario.start.money must be a decimal string >= 0 such as "1e30", got "1,000"',
       'scenario.start.upgrades.laser is not a registered upgrade id',
       'scenario.start.upgrades.hull must be a whole number from 0 to 9007199254740991, got -2',
-      'scenario.start.upgrades cannot be applied until the upgrade loop (Build 6) exists',
     ])
   })
 

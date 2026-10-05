@@ -30,6 +30,7 @@ import {
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
 import { CAMERA_MODES, isCameraMode, type CameraMode } from '../systems/render/cameraTurn'
+import { facilityLevelProblems } from '../systems/authority/platformState'
 import { readSnapshot, type SessionSnapshot } from '../systems/authority/sessionSnapshot'
 import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForward'
 import { validateScenario, type Scenario } from '../systems/scenario'
@@ -97,6 +98,11 @@ export interface DebugApi {
   /** Hull as a canonical decimal string, at most `hullMax`; 0 destroys the vehicle. */
   setHull(hull: string): DebugResult
   vehicleStats(): DebugResult<VehicleStatsReport>
+  /**
+   * `shop`, `workshop` or `charging` (#8): facilities have one level in the slice, so level 1 is
+   * accepted and changes nothing, and any other level is a listed problem.
+   */
+  setFacilityLevel(facilityId: string, level: number): DebugResult
   ui: DebugUi
   // stubs
   /** `depthBp` is basis points of the radius (#11); the radius arrives with the generator. */
@@ -108,7 +114,6 @@ export interface DebugApi {
   spawnEnemy(enemyKind: string, tier: number): void
   setVehicleLoadout(loadoutId: string): void
   setCoreFragments(count: number): void
-  setFacilityLevel(facilityId: string, level: number): void
 }
 
 function notImplemented(command: string): () => never {
@@ -190,6 +195,8 @@ export function createDebugApi(): DebugApi {
     setHull: (hull) =>
       runUnlessRefused(vehicleDebugProblems(setHullCommand(hull)), () => game().setHull(hull)),
     vehicleStats: () => ({ ok: true, ...vehicleStatsReport() }),
+    setFacilityLevel: (facilityId, level) =>
+      runUnlessRefused(facilityLevelProblems(facilityId, level), () => {}),
     ui: {
       setCameraMode: (mode) =>
         runUnlessRefused(cameraModeProblems(mode), () => game().setCameraMode(mode as CameraMode)),
@@ -203,6 +210,5 @@ export function createDebugApi(): DebugApi {
     spawnEnemy: notImplemented('spawnEnemy'),
     setVehicleLoadout: notImplemented('setVehicleLoadout'),
     setCoreFragments: notImplemented('setCoreFragments'),
-    setFacilityLevel: notImplemented('setFacilityLevel'),
   }
 }
