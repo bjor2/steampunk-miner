@@ -164,11 +164,13 @@ export interface Economy {
    * at `casingGradeStart` and each grade is bought at the Upgrade bay along `costCurveId`. Grade
    * `G` holds bands `1..G`; the core needs `casingGradeCoreMin`. `collapseCrush` is the hull
    * fraction a collapse takes off a vehicle caught in it (#43), for bands 1 to 5 and then the core.
+   * `kCasing` is the fraction of `V(t(p, b))` one metre of first-placed lining costs (#76).
    */
   casing: {
     costCurveId: string
     casingGradeStart: number
     casingGradeCoreMin: number
+    kCasing: BigStat
     collapseCrush: readonly BigStat[]
   }
   upgrades: readonly UpgradeDef[]

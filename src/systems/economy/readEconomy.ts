@@ -148,6 +148,7 @@ function readCasing(
     costCurveId,
     casingGradeStart: reader.safeInteger('casing.casingGradeStart', casing.casingGradeStart),
     casingGradeCoreMin: reader.safeInteger('casing.casingGradeCoreMin', casing.casingGradeCoreMin),
+    kCasing: reader.money('casing.kCasing', casing.kCasing),
     collapseCrush: readCollapseCrush(reader, casing.collapseCrush, coreTierBand),
   }
 }

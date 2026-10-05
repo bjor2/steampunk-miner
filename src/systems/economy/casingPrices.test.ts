@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { add, toCanonical, ZERO_MONEY } from '../money'
-import { casingGradeStart, casingUpgradePrice } from './casingPrices'
+import { add, ceilMilli, fromCanonical, mul, toCanonical, ZERO_MONEY } from '../money'
+import { casingGradeStart, casingLiningPrice, casingUpgradePrice } from './casingPrices'
+import { ECONOMY } from './economy'
+import { oreTier, oreValue } from './oreEconomy'
 
 describe('casing prices', () => {
   it('starts every vehicle at grade 1', () => {
@@ -11,5 +13,34 @@ describe('casing prices', () => {
     const prices = [1, 2, 3, 4].map(casingUpgradePrice)
     expect(prices.map(toCanonical)).toEqual(['4.8e+1', '6e+1', '7.4e+1', '9.2e+1'])
     expect(toCanonical(prices.reduce(add, ZERO_MONEY))).toBe('2.74e+2')
+  })
+
+  it('reads k_casing as 0.30 of an ore unit per metre of lining', () => {
+    expect(toCanonical(ECONOMY.casing.kCasing)).toBe('3e-1')
+  })
+
+  it('charges ceilMilli(0.30 * V(t(1,3)) * 10) = 67.5 for 10 m against band 3 on planet 1', () => {
+    expect(toCanonical(casingLiningPrice(1, 3, fromCanonical('10')))).toBe('6.75e+1')
+  })
+
+  it('follows ceilMilli(k_casing * V(t(p,b)) * lengthM) on every planet and band', () => {
+    const lengthM = fromCanonical('0.5')
+    for (const planet of [1, 2, 3]) {
+      for (const band of [1, 2, 3, 4, 5, 6]) {
+        const expected = ceilMilli(
+          mul(mul(ECONOMY.casing.kCasing, oreValue(oreTier(planet, band))), lengthM),
+        )
+        expect(toCanonical(casingLiningPrice(planet, band, lengthM))).toBe(toCanonical(expected))
+      }
+    }
+  })
+
+  it('rounds a part-milli metre price up to the next milli', () => {
+    // V(t(1,4)) = 33.75, so half a metre is 5.0625 before rounding.
+    expect(toCanonical(casingLiningPrice(1, 4, fromCanonical('0.5')))).toBe('5.063e+0')
+  })
+
+  it('charges nothing for no new lining', () => {
+    expect(toCanonical(casingLiningPrice(1, 5, ZERO_MONEY))).toBe('0e+0')
   })
 })
