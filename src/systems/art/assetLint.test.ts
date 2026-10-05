@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { MAX_PLATFORM_DRAW_CALLS } from '../../constants/scene'
 import { MAP_KINDS, type MapKind } from './artIds'
 import {
   ASSET_MANIFEST,
@@ -130,6 +131,15 @@ describe('asset lint: final art replaces its placeholder', () => {
       const placeholder = placeholderSidecarOf(exported.assetId)
       expect(mapFilesOf(exported)).toEqual(placeholder === null ? [] : mapFilesOf(placeholder))
     }
+  })
+})
+
+describe('asset lint: render budget', () => {
+  it('keeps the platform hub and bays within their #38 share of draw calls, one per part', () => {
+    const platformParts = ASSET_MANIFEST.assets
+      .filter((entry) => entry.form === 'parts' && entry.id.startsWith('platform-'))
+      .flatMap((entry) => (shippedSidecarOf(entry) ?? placeholderSidecarOf(entry.id))?.parts ?? [])
+    expect(platformParts.length).toBeLessThanOrEqual(MAX_PLATFORM_DRAW_CALLS)
   })
 })
 

@@ -91,6 +91,12 @@ export const REFERENCE_VIEWPORT = { width: 1280, height: 800 } as const
 /** At most this many chunk draw calls at the reference screen (#4, #22 acceptance). */
 export const MAX_CHUNK_DRAW_CALLS = 16
 
+/**
+ * At most this many draw calls for the platform hub and its two bays together, one per part
+ * (#38 frame budget: "platform and bays at most 30" of the 150 per frame).
+ */
+export const MAX_PLATFORM_DRAW_CALLS = 30
+
 /** At most this many live ground colliders (#4, #22 acceptance, #36 acceptance 7). */
 export const MAX_GROUND_COLLIDERS = 600
 
