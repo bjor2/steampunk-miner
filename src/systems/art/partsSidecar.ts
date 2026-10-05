@@ -140,3 +140,30 @@ function isPositivePair(pair: Pair): boolean {
 function isPivotInside(pivot: Pair, size: Pair): boolean {
   return isFinitePair(pivot) && pivot.every((value, axis) => value >= 0 && value <= size[axis])
 }
+
+/**
+ * Why an exported sidecar does not replace its placeholder (S7a-d acceptance 2): the real asset
+ * keeps the placeholder's part ids and map files, so code that names a part or a map never changes
+ * when art lands. Sizes and rects may move; they come from the model. Empty when it replaces it.
+ */
+export function placeholderDriftProblems(
+  placeholder: PartsSidecar,
+  exported: PartsSidecar,
+): string[] {
+  const kept = placeholder.parts.map((part) => part.id)
+  const shipped = exported.parts.map((part) => part.id)
+  return [
+    ...kept.filter((id) => !shipped.includes(id)).map((id) => `part "${id}" is missing`),
+    ...shipped.filter((id) => !kept.includes(id)).map((id) => `part "${id}" has no placeholder`),
+    ...changedMapProblems(placeholder.maps, exported.maps),
+  ].map((problem) => `${exported.assetId}.parts.json: ${problem}`)
+}
+
+function changedMapProblems(placeholder: PartsSidecar['maps'], exported: PartsSidecar['maps']) {
+  return (['albedo', 'normal', 'emissive'] as const)
+    .filter((kind) => placeholder[kind] !== exported[kind])
+    .map(
+      (kind) =>
+        `maps.${kind} is ${String(exported[kind])}, its placeholder's is ${String(placeholder[kind])}`,
+    )
+}

@@ -17,7 +17,12 @@ import {
   type ManifestEntry,
 } from './assetManifest'
 import { ktx2MapProblems } from './ktx2Header'
-import { mapFilesOf, sidecarProblems, type PartsSidecar } from './partsSidecar'
+import {
+  mapFilesOf,
+  placeholderDriftProblems,
+  sidecarProblems,
+  type PartsSidecar,
+} from './partsSidecar'
 
 // The asset lint of #52 acceptance 1-3 and #51 acceptance 1-3, run over the files in the repo.
 // It fails `npm test`, so a stray, unlisted or malformed export never reaches a build.
@@ -90,6 +95,16 @@ describe('asset lint: sidecars', () => {
       return sidecar === null ? [] : sidecarProblems(entry.id, sidecar)
     })
     expect(exported).toEqual([])
+  })
+
+  it('keeps every exported asset on its placeholder part ids and map files (S7a-d acceptance 2)', () => {
+    const drift = ASSET_MANIFEST.assets.flatMap((entry) => {
+      const [placeholder, sidecar] = [placeholderSidecarOf(entry.id), shippedSidecarOf(entry)]
+      return placeholder === null || sidecar === null
+        ? []
+        : placeholderDriftProblems(placeholder, sidecar)
+    })
+    expect(drift).toEqual([])
   })
 })
 

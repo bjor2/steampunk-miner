@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { mapFilesOf, sidecarProblems, type PartsSidecar, type SidecarPart } from './partsSidecar'
+import {
+  mapFilesOf,
+  placeholderDriftProblems,
+  sidecarProblems,
+  type PartsSidecar,
+  type SidecarPart,
+} from './partsSidecar'
 
 const wheel: SidecarPart = {
   id: 't1-wheel',
@@ -128,6 +134,34 @@ describe('parts sidecar', () => {
     expect(mapFilesOf({ ...sidecar, maps: { ...sidecar.maps, emissive: false } })).toEqual([
       'vehicle.albedo.ktx2',
       'vehicle.normal.ktx2',
+    ])
+  })
+})
+
+describe('parts sidecar: replacing a placeholder', () => {
+  const placeholder = vehicleSidecar([wheel, { ...wheel, id: 't1-chassis' }])
+
+  it('accepts an export with the same part ids and maps, whatever its sizes and rects', () => {
+    const exported = vehicleSidecar([
+      { ...wheel, id: 't1-chassis', rect: [8, 8, 300, 200], sizeM: [0.6, 0.4] },
+      { ...wheel, rect: [324, 8, 130, 130] },
+    ])
+    expect(placeholderDriftProblems(placeholder, exported)).toEqual([])
+  })
+
+  it('names every part the export drops or adds', () => {
+    const exported = vehicleSidecar([wheel, { ...wheel, id: 't1-boiler' }])
+    expect(placeholderDriftProblems(placeholder, exported)).toEqual([
+      'vehicle.parts.json: part "t1-chassis" is missing',
+      'vehicle.parts.json: part "t1-boiler" has no placeholder',
+    ])
+  })
+
+  it('names a map the export ships differently from its placeholder', () => {
+    const exported = vehicleSidecar([wheel, { ...wheel, id: 't1-chassis' }])
+    const dark = { ...exported, maps: { ...exported.maps, emissive: false as const } }
+    expect(placeholderDriftProblems(placeholder, dark)).toEqual([
+      "vehicle.parts.json: maps.emissive is false, its placeholder's is vehicle.emissive.ktx2",
     ])
   })
 })
