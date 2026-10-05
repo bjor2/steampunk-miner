@@ -1,5 +1,6 @@
 /**
- * Composition root: wires shell, run log, store and debug API together once at page start.
+ * Composition root: wires shell, run log, checkpoint, store and debug API together once at page
+ * start.
  * Orchestrates only; each step lives in the module that owns it.
  */
 import { BUILD_COMMIT, GAME_VERSION } from './constants/buildInfo'
@@ -16,6 +17,12 @@ import { createRunId } from './logging/runLayout'
 import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
 import { createRunMetadata } from './logging/runMetadata'
 import { getShell, type Shell } from './shell/shell'
+import {
+  installSaveSlots,
+  loadCheckpoint,
+  type CheckpointLoad,
+  type SaveSlots,
+} from './store/checkpoint'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
 import { recordStartingPlanetEntered } from './store/planetArrivalLog'
 import { parseScenario, type Scenario } from './systems/scenario'
@@ -30,10 +37,13 @@ interface RunFiles {
   recorded: MemorySink
 }
 
-export function startGame(): void {
+/** Settles once the session is settled: fresh, resumed from the checkpoint, or a scenario's. */
+export async function startGame(): Promise<void> {
   const shell = getShell()
   const run = startRunLogging(shell, new Date())
   recordGameStarted(shell)
+  installSaveSlots(saveSlotsOf(shell))
+  await resumeLastCheckpoint(shell)
   recordStartingPlanetEntered()
   keepRunFilesWritten(shell, run)
   exposeDebugHandles(shell, run.runId)
@@ -75,6 +85,26 @@ function keepRunFilesWritten(shell: Shell, run: RunFiles): void {
     reportFailure(writeRunSummary(shell, run.runId, run.recorded.events))
     writeMetadata(shell, run)
   })
+}
+
+function saveSlotsOf(shell: Shell): SaveSlots {
+  return {
+    write: (slot, json) => shell.writeSaveSlot(slot, json),
+    read: (slot) => shell.readSaveSlot(slot),
+    setAside: (slot) => shell.setAsideSaveSlot(slot),
+  }
+}
+
+/** Quit and resume (#26); a launch scenario sets its own start instead. */
+async function resumeLastCheckpoint(shell: Shell): Promise<void> {
+  if (shell.launch.scenarioText !== null) return
+  resumeOrReport(await loadCheckpoint())
+}
+
+function resumeOrReport(checkpoint: CheckpointLoad): void {
+  if (checkpoint === null) return
+  if ('state' in checkpoint) useGameStore.getState().resumeCheckpoint(checkpoint)
+  else console.error(`checkpoint refused, starting fresh: ${checkpoint.problems.join('; ')}`)
 }
 
 function exposeDebugHandles(shell: Shell, runId: string): void {

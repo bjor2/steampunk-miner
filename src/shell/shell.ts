@@ -42,9 +42,13 @@ export interface Shell {
   onPageHide(callback: () => void): void
 }
 
-/** A debug-enabled run never writes into the cloud-synced folder (#11 section 6, #12). */
+/**
+ * A debug-enabled or scenario run never writes into the cloud-synced folder (#11 section 6, #12),
+ * so it can never replace a player's save.
+ */
 export function saveFolderOf(launch: LaunchParameters): SaveFolderName {
-  return launch.debugEnabled ? 'saves-debug' : 'saves'
+  const isDebugRun = launch.debugEnabled || launch.scenarioText !== null
+  return isDebugRun ? 'saves-debug' : 'saves'
 }
 
 let shell: Shell | null = null

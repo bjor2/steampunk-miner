@@ -36,6 +36,9 @@ export interface Checkpoint {
   saveEpoch: number
 }
 
+/** What a start finds in the slot: a session to resume, a refused save, or nothing. */
+export type CheckpointLoad = Checkpoint | { problems: string[] } | null
+
 let slots: SaveSlots | null = null
 let lastEpoch = 0
 let writes: Promise<void> = Promise.resolve()
@@ -63,7 +66,7 @@ export function checkpointWrites(): Promise<void> {
 }
 
 /** The saved session, null when there is none to resume, or the problems that refused it. */
-export async function loadCheckpoint(): Promise<Checkpoint | { problems: string[] } | null> {
+export async function loadCheckpoint(): Promise<CheckpointLoad> {
   if (slots === null) return null
   const text = await slots.read(CHECKPOINT_SLOT)
   return text === null ? null : adoptOrSetAside(slots, readSaveSlotText(text))
