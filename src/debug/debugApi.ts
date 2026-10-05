@@ -48,6 +48,8 @@ import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForwar
 import { validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems } from '../systems/startScenario'
 import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
+import { carveCircleCommand, fillCircleCommand } from '../systems/authority/groundCommands'
+import { SOLID_DENSITY } from '../systems/world/sampleGrid'
 import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'
 import {
   createDebugInput,
@@ -122,6 +124,11 @@ export interface DebugApi {
   freezeEnemies(frozen: boolean): DebugResult
   /** Table D of #6 for planets 1 to 40: tiers, health, hits, kill times and side-hit shares. */
   enemyStatsTable(kind: string): DebugResult<{ rows: EnemyStatsRowView[] }>
+  // ground (#36): `debug.*` commands; a disc in mm, `amount` 0 to 255 (default all of it)
+  /** Lowers density round `(x, y)` mm; credits no ore and never cuts the dock pad. */
+  carveCircle(x: number, y: number, radius: number, amount?: number): DebugResult
+  /** Raises density round `(x, y)` mm, up to solid ground. */
+  fillCircle(x: number, y: number, radius: number, amount?: number): DebugResult
   /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
   ui: DebugUi
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
@@ -259,6 +266,14 @@ export function createDebugApi(): DebugApi {
         game().freezeEnemies(frozen),
       ),
     enemyStatsTable: enemyStatsTableOf,
+    carveCircle: (x, y, radius, amount = SOLID_DENSITY) =>
+      runUnlessRefused(vehicleDebugProblems(carveCircleCommand({ x, y, radius, amount })), () =>
+        game().carveCircle({ x, y, radius, amount }),
+      ),
+    fillCircle: (x, y, radius, amount = SOLID_DENSITY) =>
+      runUnlessRefused(vehicleDebugProblems(fillCircleCommand({ x, y, radius, amount })), () =>
+        game().fillCircle({ x, y, radius, amount }),
+      ),
     ui: createDebugUi(),
     input: createDebugInput(),
     teleportToCore: notImplemented('teleportToCore'),

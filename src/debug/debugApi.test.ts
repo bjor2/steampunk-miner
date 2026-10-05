@@ -4,7 +4,16 @@ import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { deriveSummary } from '../logging/runSummary'
-import { readEnemies, resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
+import {
+  readEnemies,
+  readLocalVehicle,
+  readPlanetWorld,
+  resetGameStore,
+  takeSessionSnapshot,
+  useGameStore,
+} from '../store/gameStore'
+import { cellDensitySum } from '../systems/world/groundEdit'
+import type { PlanetParams } from '../systems/world/planetParams'
 import { fromCanonical } from '../systems/money'
 import { parseScenario, type Scenario } from '../systems/scenario'
 import { createDebugApi, DebugCommandNotImplementedError } from './debugApi'
@@ -96,6 +105,37 @@ describe('debug api: core', () => {
     expect(createDebugApi().setCoreFragments(1.5)).toMatchObject({ ok: false })
     expect(sink.commands).toEqual([])
     expect(game().platform.coreBay).toBe(0)
+  })
+})
+
+describe('debug api: ground (#36)', () => {
+  const DIG = { x: 20_500, y: 290_500, radius: 1500 }
+  const densitySum = () => {
+    const { world, params } = readPlanetWorld()
+    return cellDensitySum(world, params as PlanetParams, { tx: 20, ty: 290 })
+  }
+
+  it('carves a circle as a logged debug command, crediting no ore', () => {
+    expect(createDebugApi().carveCircle(DIG.x, DIG.y, DIG.radius)).toEqual({ ok: true })
+    expect(densitySum()).toBe(0)
+    expect(game().debugApplied).toBe(true)
+    expect(sink.events.map((event) => event.event)).toEqual(['debug_command_applied'])
+    expect(readLocalVehicle().cargo).toEqual({ ore: {}, coreFragments: 0 })
+  })
+
+  it('fills a carved circle back to solid ground', () => {
+    const debug = createDebugApi()
+    debug.carveCircle(DIG.x, DIG.y, DIG.radius)
+    expect(debug.fillCircle(DIG.x, DIG.y, DIG.radius)).toEqual({ ok: true })
+    expect(densitySum()).toBe(16 * 255)
+  })
+
+  it('refuses a circle of radius 0 or an amount past 255 and changes nothing', () => {
+    const debug = createDebugApi()
+    expect(debug.carveCircle(DIG.x, DIG.y, 0)).toMatchObject({ ok: false })
+    expect(debug.fillCircle(DIG.x, DIG.y, DIG.radius, 256)).toMatchObject({ ok: false })
+    expect(sink.commands).toEqual([])
+    expect(densitySum()).toBe(16 * 255)
   })
 })
 
