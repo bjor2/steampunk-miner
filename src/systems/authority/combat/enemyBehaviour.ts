@@ -16,7 +16,7 @@
  * the drill still pins and cuts them. An enemy whose vehicle cannot be hit waits, idle.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
-import { enemyBoundedStats } from '../../economy/enemyStats'
+import { enemyBoundedStats, type EnemyBoundedStats } from '../../economy/enemyStats'
 import { withCombat, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
 import { isOnTheNose, isTouching, isWithinMm, stepAwayFrom, stepToward } from './combatGeometry'
@@ -64,8 +64,7 @@ export function stepEnemy(
 }
 
 function hunt({ state, enemy, target, terrain, tick }: EnemyTurn): RuleEffect {
-  const stats = enemyBoundedStats(enemy.kind, enemy.tier)
-  if (!isWithinMm(target.position, enemy, stats.detectionTiles * MM_PER_METRE)) {
+  if (!isWithinMm(target.position, enemy, statsOf(enemy).detectionTiles * MM_PER_METRE)) {
     return updated(state, enemy.phase === 'idle' ? enemy : inPhase(enemy, 'idle', tick))
   }
   if (!isWithinMm(target.position, enemy, lungeReachMm(enemy))) {
@@ -76,9 +75,7 @@ function hunt({ state, enemy, target, terrain, tick }: EnemyTurn): RuleEffect {
 }
 
 function windUp({ state, enemy, target, tick }: EnemyTurn): RuleEffect {
-  if (tick - enemy.phaseSinceTick < enemyBoundedStats(enemy.kind, enemy.tier).windupTicks) {
-    return unchanged(state)
-  }
+  if (ticksInPhase(enemy, tick) < statsOf(enemy).windupTicks) return unchanged(state)
   const step = stepToward(enemy, target.position, lungeStepMmOf(enemy))
   return updated(state, { ...inPhase(enemy, 'lunge', tick), step })
 }
@@ -86,19 +83,14 @@ function windUp({ state, enemy, target, tick }: EnemyTurn): RuleEffect {
 function lunge(turn: EnemyTurn): RuleEffect {
   const { state, enemy, target, terrain, tick } = turn
   const moved = stepAlong(terrain, enemy)
-  if (moved !== null && isTouching(target.position, moved))
-    return hitOnContact({ ...turn, enemy: moved })
-  if (
-    moved === null ||
-    tick - enemy.phaseSinceTick >= enemyBoundedStats(enemy.kind, enemy.tier).lungeTicks
-  ) {
-    return updated(state, afterAttack(moved ?? enemy, tick))
-  }
-  return updated(state, moved)
+  if (moved === null) return updated(state, afterAttack(enemy, tick))
+  if (isTouching(target.position, moved)) return hitOnContact({ ...turn, enemy: moved })
+  const isLungeOver = ticksInPhase(enemy, tick) >= statsOf(enemy).lungeTicks
+  return updated(state, isLungeOver ? afterAttack(moved, tick) : moved)
 }
 
 function recoil({ state, enemy, terrain, tick }: EnemyTurn): RuleEffect {
-  if (tick - enemy.phaseSinceTick >= enemyBoundedStats(enemy.kind, enemy.tier).recoilTicks) {
+  if (ticksInPhase(enemy, tick) >= statsOf(enemy).recoilTicks) {
     return updated(state, inPhase(enemy, 'approach', tick))
   }
   return updated(state, stepAlong(terrain, enemy) ?? enemy)
@@ -119,7 +111,7 @@ function holdOnTheDrill(turn: EnemyTurn): RuleEffect {
   if (!isOnTheNose(target.pose, target.position, enemy)) {
     return chainEffects(state, [
       (current) => flushDrillDamage(current, enemy.id, 'front'),
-      (current) => updated(current, { ...recoilingFrom(latest(current, enemy), target, tick) }),
+      (current) => updated(current, recoilingFrom(latest(current, enemy), target, tick)),
     ])
   }
   return chainEffects(state, [
@@ -131,12 +123,15 @@ function holdOnTheDrill(turn: EnemyTurn): RuleEffect {
 /** Once per attack cooldown after the pin, a pinned enemy still alive strikes the front (#9). */
 function strikeWhilePinned(state: AuthorityState, enemyId: string, tick: number): RuleEffect {
   const enemy = enemyById(state.combat, enemyId)
-  if (enemy === undefined) return unchanged(state)
-  const pinnedFor = tick - enemy.phaseSinceTick
-  const cooldown = enemyBoundedStats(enemy.kind, enemy.tier).attackCooldownTicks
-  if (state.combat.isFrozen || pinnedFor === 0 || pinnedFor % cooldown !== 0)
+  if (enemy === undefined || state.combat.isFrozen || !isPinnedStrikeDue(enemy, tick)) {
     return unchanged(state)
+  }
   return strikeVehicle(state, enemy, 'front', tick)
+}
+
+function isPinnedStrikeDue(enemy: Enemy, tick: number): boolean {
+  const pinnedFor = ticksInPhase(enemy, tick)
+  return pinnedFor > 0 && pinnedFor % statsOf(enemy).attackCooldownTicks === 0
 }
 
 function waitIdle(state: AuthorityState, enemy: Enemy, tick: number): RuleEffect {
@@ -148,7 +143,7 @@ function waitIdle(state: AuthorityState, enemy: Enemy, tick: number): RuleEffect
 }
 
 function recoilingFrom(enemy: Enemy, target: VehicleTarget, tick: number): Enemy {
-  const { recoilTicks, attackCooldownTicks } = enemyBoundedStats(enemy.kind, enemy.tier)
+  const { recoilTicks, attackCooldownTicks } = statsOf(enemy)
   return {
     ...inPhase(enemy, 'recoil', tick),
     step: stepAwayFrom(enemy, target.position, walkStepMmOf(enemy)),
@@ -157,13 +152,21 @@ function recoilingFrom(enemy: Enemy, target: VehicleTarget, tick: number): Enemy
 }
 
 function afterAttack(enemy: Enemy, tick: number): Enemy {
-  const { attackCooldownTicks } = enemyBoundedStats(enemy.kind, enemy.tier)
+  const { attackCooldownTicks } = statsOf(enemy)
   return { ...inPhase(enemy, 'approach', tick), readyTick: tick + attackCooldownTicks }
 }
 
 /** How close an enemy comes before it winds up: as far as its lunge reaches. */
 function lungeReachMm(enemy: Enemy): number {
-  return lungeStepMmOf(enemy) * enemyBoundedStats(enemy.kind, enemy.tier).lungeTicks
+  return lungeStepMmOf(enemy) * statsOf(enemy).lungeTicks
+}
+
+function statsOf(enemy: Enemy): EnemyBoundedStats {
+  return enemyBoundedStats(enemy.kind, enemy.tier)
+}
+
+function ticksInPhase(enemy: Enemy, tick: number): number {
+  return tick - enemy.phaseSinceTick
 }
 
 function latest(state: AuthorityState, enemy: Enemy): Enemy {

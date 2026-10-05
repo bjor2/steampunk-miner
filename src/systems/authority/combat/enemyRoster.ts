@@ -41,34 +41,10 @@ export interface EnemyArrival {
 }
 
 export function spawnEnemy(state: AuthorityState, arrival: EnemyArrival, tick: number): RuleEffect {
-  const { combat } = state
-  const enemy: Enemy = {
-    id: enemyIdOf(combat.nextEnemyNumber),
-    kind: arrival.kind,
-    tier: arrival.tier,
-    spawnPointId: arrival.spawnPointId,
-    ownerId: arrival.ownerId,
-    x: arrival.position.x,
-    y: arrival.position.y,
-    health: enemyHealth(arrival.kind, arrival.tier),
-    phase: 'idle',
-    phaseSinceTick: tick,
-    readyTick: tick,
-    step: { x: 0, y: 0 },
-    pendingDrill: NO_PENDING_DRILL,
-  }
+  const enemy = newEnemy(state.combat, arrival, tick)
   return {
-    state: withCombat(state, withSpawned(combat, enemy)),
-    events: [
-      {
-        type: 'EnemySpawned',
-        enemyId: enemy.id,
-        kind: enemy.kind,
-        tier: enemy.tier,
-        spawnPointId: enemy.spawnPointId,
-      },
-      ...encounterEvents(combat, enemy.kind),
-    ],
+    state: withCombat(state, withSpawned(state.combat, enemy)),
+    events: [spawnedEvent(enemy), ...encounterEvents(state.combat, enemy.kind)],
   }
 }
 
@@ -83,23 +59,13 @@ export function activateSpawnPoints(
   tick: number,
 ): RuleEffect {
   const target = vehicleTargetOf(state, playerId, tick)
-  const params = planetParamsOf(state.planet)
-  if (target === null || params === null || !hasRoomForEnemy(state.combat, playerId)) {
-    return unchanged(state)
-  }
-  const room = maxActivePerVehicle - enemiesOwnedBy(state.combat, playerId).length
-  const points = freeSpawnPoints(
-    state.combat,
-    spawnPointsWithin(params, target.position.x, target.position.y, activationTiles),
+  if (target === null) return unchanged(state)
+  const arrivals = spawnPointsToWake(state, playerId, target.position).map((point) =>
+    arrivalAt(point, playerId),
   )
   return chainEffects(
     state,
-    nearestFirst(points, target.position)
-      .slice(0, room)
-      .map(
-        (point) => (current: AuthorityState) =>
-          spawnEnemy(current, arrivalAt(point, playerId), tick),
-      ),
+    arrivals.map((arrival) => (current: AuthorityState) => spawnEnemy(current, arrival, tick)),
   )
 }
 
@@ -131,6 +97,42 @@ export function combatOnNewPlanet(combat: CombatState): CombatState {
     nextEnemyNumber: combat.nextEnemyNumber,
     encounteredKinds: combat.encounteredKinds,
   }
+}
+
+function newEnemy(combat: CombatState, arrival: EnemyArrival, tick: number): Enemy {
+  return {
+    id: enemyIdOf(combat.nextEnemyNumber),
+    kind: arrival.kind,
+    tier: arrival.tier,
+    spawnPointId: arrival.spawnPointId,
+    ownerId: arrival.ownerId,
+    x: arrival.position.x,
+    y: arrival.position.y,
+    health: enemyHealth(arrival.kind, arrival.tier),
+    phase: 'idle',
+    phaseSinceTick: tick,
+    readyTick: tick,
+    step: { x: 0, y: 0 },
+    pendingDrill: NO_PENDING_DRILL,
+  }
+}
+
+function spawnedEvent(enemy: Enemy): DomainEventBody {
+  const { id: enemyId, kind, tier, spawnPointId } = enemy
+  return { type: 'EnemySpawned', enemyId, kind, tier, spawnPointId }
+}
+
+/** Free points within 24 tiles, nearest first, as many as the vehicle has room for. */
+function spawnPointsToWake(
+  state: AuthorityState,
+  playerId: string,
+  position: MillimetrePoint,
+): SpawnPoint[] {
+  const params = planetParamsOf(state.planet)
+  if (params === null) return []
+  const room = maxActivePerVehicle - enemiesOwnedBy(state.combat, playerId).length
+  const nearby = spawnPointsWithin(params, position.x, position.y, activationTiles)
+  return nearestFirst(freeSpawnPoints(state.combat, nearby), position).slice(0, Math.max(0, room))
 }
 
 function withSpawned(combat: CombatState, enemy: Enemy): CombatState {

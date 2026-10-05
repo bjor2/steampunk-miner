@@ -21,7 +21,7 @@ import {
   type BigStat,
 } from '../../money'
 import { ENERGY_QUANTA_PER_TICK } from '../../vehicle/energyQuanta'
-import { tileOfMillimetres } from '../../vehicle/vehiclePose'
+import { tileOfMillimetres, type VehiclePose } from '../../vehicle/vehiclePose'
 import type { TilePoint } from '../../world/tileGrid'
 import { vehicleOf, withCombat, withVehicle, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
@@ -32,6 +32,7 @@ import {
   NO_PENDING_DRILL,
   withEnemy,
   withoutEnemy,
+  type CombatState,
   type Enemy,
   type HitArc,
 } from './combatState'
@@ -40,13 +41,10 @@ import { hitArcOf } from './hitArc'
 export function drillPinnedEnemy(state: AuthorityState, enemy: Enemy, tick: number): RuleEffect {
   const vehicle = vehicleOf(state, enemy.ownerId)
   if (vehicle.energy < ENERGY_QUANTA_PER_TICK.drill) return unchanged(state)
-  const charged = withVehicle(state, enemy.ownerId, {
-    ...vehicle,
-    energy: vehicle.energy - ENERGY_QUANTA_PER_TICK.drill,
-  })
-  const perTick = pinnedDrillDamagePerTick(vehicle.levels.drill_power)
-  return chainEffects(charged, [
-    (current) => damageEnemy(current, enemy, perTick, 1, 'front'),
+  return chainEffects(state, [
+    (current) => chargeOneDrillTick(current, enemy.ownerId),
+    (current) =>
+      damageEnemy(current, enemy, drillDamagePerTickOf(current, enemy.ownerId), 1, 'front'),
     (current) => followEnergyChange(current, enemy.ownerId, tick),
   ])
 }
@@ -60,14 +58,14 @@ export function drillBurrowersOnTile(
 ): RuleEffect {
   const burrowers = state.combat.enemies.filter((enemy) => isSwimmingIn(enemy, tile))
   if (ticks === 0 || burrowers.length === 0) return unchanged(state)
-  const vehicle = vehicleOf(state, playerId)
-  const amount = mul(pinnedDrillDamagePerTick(vehicle.levels.drill_power), fromSafeInteger(ticks))
+  const amount = mul(drillDamagePerTickOf(state, playerId), fromSafeInteger(ticks))
+  const arcOf = (burrower: Enemy) => arcFromDriller(vehicleOf(state, playerId).pose, burrower)
   return chainEffects(
     state,
-    burrowers.map((burrower) => (current: AuthorityState) => {
-      const arc = vehicle.pose === null ? 'front' : arcFromVehicle(vehicle.pose, burrower)
-      return flushedAfter(damageEnemy(current, burrower, amount, ticks, arc), burrower.id, arc)
-    }),
+    burrowers.map(
+      (burrower) => (current: AuthorityState) =>
+        drillOneBurrower(current, burrower, amount, ticks, arcOf(burrower)),
+    ),
   )
 }
 
@@ -91,20 +89,22 @@ function damageEnemy(
   ticks: number,
   arc: HitArc,
 ): RuleEffect {
-  const current = enemyById(state.combat, enemy.id) ?? enemy
-  const damaged: Enemy = {
-    ...current,
-    health: sub(current.health, amount),
-    pendingDrill: {
-      amount: add(current.pendingDrill.amount, amount),
-      ticks: current.pendingDrill.ticks + ticks,
-    },
-  }
+  const damaged = withDrillDamage(enemyById(state.combat, enemy.id) ?? enemy, amount, ticks)
   const next = withCombat(state, withEnemy(state.combat, damaged))
   if (cmp(damaged.health, ZERO_MONEY) <= 0) return killEnemy(next, damaged, arc)
-  if (damaged.pendingDrill.ticks >= ENEMY_DAMAGE_LOG_TICKS)
-    return flushDrillDamage(next, enemy.id, arc)
-  return unchanged(next)
+  const isLogDue = damaged.pendingDrill.ticks >= ENEMY_DAMAGE_LOG_TICKS
+  return isLogDue ? flushDrillDamage(next, enemy.id, arc) : unchanged(next)
+}
+
+function withDrillDamage(enemy: Enemy, amount: BigStat, ticks: number): Enemy {
+  return {
+    ...enemy,
+    health: sub(enemy.health, amount),
+    pendingDrill: {
+      amount: add(enemy.pendingDrill.amount, amount),
+      ticks: enemy.pendingDrill.ticks + ticks,
+    },
+  }
 }
 
 function killEnemy(state: AuthorityState, enemy: Enemy, arc: HitArc): RuleEffect {
@@ -119,15 +119,34 @@ function killEnemy(state: AuthorityState, enemy: Enemy, arc: HitArc): RuleEffect
   ])
 }
 
-function removedAndUsed(state: AuthorityState, enemy: Enemy) {
+function removedAndUsed(state: AuthorityState, enemy: Enemy): CombatState {
   const combat = withoutEnemy(state.combat, enemy.id)
   if (enemy.spawnPointId === DEBUG_SPAWN_POINT_ID) return combat
   return { ...combat, usedSpawnPointIds: [...combat.usedSpawnPointIds, enemy.spawnPointId] }
 }
 
-function flushedAfter(effect: RuleEffect, enemyId: string, arc: HitArc): RuleEffect {
-  const flushed = flushDrillDamage(effect.state, enemyId, arc)
-  return { state: flushed.state, events: [...effect.events, ...flushed.events] }
+/** A drilled burrower's damage is logged at once, with the zone it was in. */
+function drillOneBurrower(
+  state: AuthorityState,
+  burrower: Enemy,
+  amount: BigStat,
+  ticks: number,
+  arc: HitArc,
+): RuleEffect {
+  return chainEffects(state, [
+    (current) => damageEnemy(current, burrower, amount, ticks, arc),
+    (current) => flushDrillDamage(current, burrower.id, arc),
+  ])
+}
+
+function chargeOneDrillTick(state: AuthorityState, playerId: string): RuleEffect {
+  const vehicle = vehicleOf(state, playerId)
+  const energy = vehicle.energy - ENERGY_QUANTA_PER_TICK.drill
+  return unchanged(withVehicle(state, playerId, { ...vehicle, energy }))
+}
+
+function drillDamagePerTickOf(state: AuthorityState, playerId: string): BigStat {
+  return pinnedDrillDamagePerTick(vehicleOf(state, playerId).levels.drill_power)
 }
 
 function isSwimmingIn(enemy: Enemy, tile: TilePoint): boolean {
@@ -137,6 +156,7 @@ function isSwimmingIn(enemy: Enemy, tile: TilePoint): boolean {
   )
 }
 
-function arcFromVehicle(pose: NonNullable<ReturnType<typeof vehicleOf>['pose']>, enemy: Enemy) {
-  return hitArcOf(pose, enemy.x - pose.x, enemy.y - pose.y)
+/** Drilling needs a pose, so the driller always has one; front is only a fallback. */
+function arcFromDriller(pose: VehiclePose | null, enemy: Enemy): HitArc {
+  return pose === null ? 'front' : hitArcOf(pose, enemy.x - pose.x, enemy.y - pose.y)
 }

@@ -14,7 +14,7 @@ import { enemyLookOf } from '../systems/render/enemyPlaceholder'
 
 const SLOTS = ECONOMY.enemies.combat.maxActivePerVehicle
 /** In front of the tiles, behind the vehicle's parts. */
-const ENEMY_Z = 0.05
+const ENEMY_Z = 0.08
 
 export function EnemyPlaceholders() {
   const meshes = useRef<(Mesh | null)[]>([])
