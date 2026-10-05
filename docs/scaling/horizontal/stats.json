@@ -1,0 +1,797 @@
+{
+  "updated": "2026-10-05T21:10:15.455513+00:00",
+  "sources": [
+    "docs/design.md",
+    "issues/14",
+    "issues/35",
+    "issues/54",
+    "issues/78",
+    "issues/79",
+    "schedule_C_auto_approved",
+    "issues/80",
+    "issues/81"
+  ],
+  "source_hash": "sha256:419ca56d8af626d1f0ff799075be9e72726381567c26168b7d0a6fbf8e1f3481",
+  "source_hash_method": "sha256 of feature ids + #79 schema + #80 lock fills",
+  "source_note": "Schedule C locked (#80). #78 survive 35 + 5 thin-act fills (P31 archive_cache, P32 grav_anchor, P34 buoyancy_tanks, P37 escape_thrusters, P39 finale_key). Intentional 1-gap at P16/P29. #81 \u22642 empty satisfied. Endless gate remains finale+endless_unlock @40 (manual bind on endless).",
+  "schedule_approved": "C",
+  "schema": {
+    "issue": 79,
+    "fields": ["id", "planetIndex", "lane", "progressionAxis", "status", "bind"],
+    "bind": ["planet_gate", "artefact", "facility", "manual"],
+    "endless": "reuse same table at planetIndex >= 41"
+  },
+  "features": [
+    {
+      "id": "sell_upgrade_loop",
+      "planetIndex": 1,
+      "lane": "Facility",
+      "progressionAxis": "horizontal",
+      "status": "shipped",
+      "bind": "facility",
+      "name": "Sell & upgrade loop",
+      "slice": 1
+    },
+    {
+      "id": "mobile_platform",
+      "planetIndex": 1,
+      "lane": "Facility",
+      "progressionAxis": "horizontal",
+      "status": "shipped",
+      "bind": "facility",
+      "name": "Mobile platform dock",
+      "slice": 1
+    },
+    {
+      "id": "crawler",
+      "planetIndex": 1,
+      "lane": "Enemy",
+      "progressionAxis": "horizontal",
+      "status": "shipped",
+      "bind": "planet_gate",
+      "name": "Crawler enemy",
+      "slice": 1
+    },
+    {
+      "id": "burrower",
+      "planetIndex": 1,
+      "lane": "Enemy",
+      "progressionAxis": "horizontal",
+      "status": "shipped",
+      "bind": "planet_gate",
+      "name": "Burrower enemy",
+      "slice": 1
+    },
+    {
+      "id": "core_harvest",
+      "planetIndex": 1,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "shipped",
+      "bind": "planet_gate",
+      "name": "Core harvest & travel",
+      "slice": 1
+    },
+    {
+      "id": "planet_2",
+      "planetIndex": 2,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "shipped",
+      "bind": "planet_gate",
+      "name": "Second planet travel",
+      "slice": 1
+    },
+    {
+      "id": "fluid_ground",
+      "planetIndex": 1,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "building",
+      "bind": "planet_gate",
+      "name": "Density-field fluid ground",
+      "slice": 2
+    },
+    {
+      "id": "casing_cement",
+      "planetIndex": 1,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "planet_gate",
+      "name": "Auto casing & cement tiers",
+      "slice": 2
+    },
+    {
+      "id": "collapse_vacuum",
+      "planetIndex": 1,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "planet_gate",
+      "name": "Collapse / vacuum hazard",
+      "slice": 2
+    },
+    {
+      "id": "two_bay_shops",
+      "planetIndex": 1,
+      "lane": "Facility",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "facility",
+      "name": "Separate Sell & Upgrade bays",
+      "slice": 2
+    },
+    {
+      "id": "artefacts",
+      "planetIndex": 1,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "artefact",
+      "name": "Ground artefacts (3 unique picks)",
+      "slice": 2
+    },
+    {
+      "id": "music_layers",
+      "planetIndex": 1,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "planet_gate",
+      "name": "Layered music & stingers",
+      "slice": 2
+    },
+    {
+      "id": "ore_whisper",
+      "planetIndex": 1,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "artefact",
+      "name": "Ore whisper (artefact pick)",
+      "slice": 2
+    },
+    {
+      "id": "breathing_room",
+      "planetIndex": 1,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "artefact",
+      "name": "Breathing room (artefact pick)",
+      "slice": 2
+    },
+    {
+      "id": "assay_beacon",
+      "planetIndex": 1,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "artefact",
+      "name": "Assay beacon (artefact pick)",
+      "slice": 2
+    },
+    {
+      "id": "refinery_bay",
+      "planetIndex": 3,
+      "lane": "Facility",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "facility",
+      "name": "Refinery bay",
+      "slice": "campaign",
+      "origin": "new",
+      "foldNote": "Folded processing_wagon: late optional mobile-refine is a mode on this bay, not a P29 row (#78)."
+    },
+    {
+      "id": "auto_guns",
+      "planetIndex": 4,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Automated guns (moved from planet 15)",
+      "slice": "campaign",
+      "origin": "vision",
+      "foldNote": "Folded deployables: placeable defence is a late slot/resource-capped mode under auto_guns (#78)."
+    },
+    {
+      "id": "artefact_set_1",
+      "planetIndex": 5,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "artefact",
+      "name": "Artefact set I: Seismic ping, Second wind",
+      "slice": "campaign",
+      "count": 2,
+      "origin": "new"
+    },
+    {
+      "id": "tunnel_wrecker",
+      "planetIndex": 6,
+      "lane": "Enemy",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Tunnel wrecker (the new enemy family)",
+      "slice": "campaign",
+      "origin": "vision"
+    },
+    {
+      "id": "blasting_charges",
+      "planetIndex": 7,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Blasting charges",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "heat_lava",
+      "planetIndex": 8,
+      "lane": "Environment",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Heat / lava planets",
+      "slice": "campaign",
+      "origin": "vision"
+    },
+    {
+      "id": "refractory_lining",
+      "planetIndex": 8,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Refractory lining",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "magma_tick",
+      "planetIndex": 9,
+      "lane": "Enemy",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Magma tick",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "merchants",
+      "planetIndex": 10,
+      "lane": "Merchant",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "facility",
+      "name": "Specialist merchants",
+      "slice": "campaign",
+      "origin": "vision"
+    },
+    {
+      "id": "artefact_set_2",
+      "planetIndex": 11,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "artefact",
+      "name": "Artefact set II: Ember valve, Overclock",
+      "slice": "campaign",
+      "count": 2,
+      "origin": "new"
+    },
+    {
+      "id": "wagons",
+      "planetIndex": 12,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Cargo wagon",
+      "slice": "campaign",
+      "origin": "vision",
+      "foldNote": "Merged special_wagons: second slot / wagon types live on this beat (#78)."
+    },
+    {
+      "id": "side_drills",
+      "planetIndex": 13,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Side drill arms",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "scanner_station",
+      "planetIndex": 14,
+      "lane": "Facility",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "facility",
+      "name": "Scanner station",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "core_guardian",
+      "planetIndex": 15,
+      "lane": "Enemy",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Core guardian chamber",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "frozen_planets",
+      "planetIndex": 17,
+      "lane": "Environment",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Frozen planets",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "insulated_lining",
+      "planetIndex": 17,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Insulated lining",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "frost_spitter",
+      "planetIndex": 18,
+      "lane": "Enemy",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Frost spitter",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "artefact_set_3",
+      "planetIndex": 19,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "artefact",
+      "name": "Artefact set III: Thermal lance, Glide treads",
+      "slice": "campaign",
+      "count": 2,
+      "origin": "new"
+    },
+    {
+      "id": "drone_bay",
+      "planetIndex": 20,
+      "lane": "Facility",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "facility",
+      "name": "Drone bay (hauler drones)",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "swarm_nests",
+      "planetIndex": 21,
+      "lane": "Enemy",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Swarm nests",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "shields",
+      "planetIndex": 22,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Steam shield",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "ore_thief",
+      "planetIndex": 23,
+      "lane": "Enemy",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Ore thief",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "research_lab",
+      "planetIndex": 24,
+      "lane": "Facility",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "facility",
+      "name": "Research lab",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "magnetic_planets",
+      "planetIndex": 25,
+      "lane": "Environment",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Magnetic / electrified planets",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "grounded_lining",
+      "planetIndex": 25,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Grounded lining",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "emp_mite",
+      "planetIndex": 26,
+      "lane": "Enemy",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "EMP mite",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "artefact_set_4",
+      "planetIndex": 27,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "artefact",
+      "name": "Artefact set IV: Relay coil, Salvage magnet",
+      "slice": "campaign",
+      "count": 2,
+      "origin": "new"
+    },
+    {
+      "id": "quest_office",
+      "planetIndex": 28,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "facility",
+      "name": "Quest office (NPC contracts)",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "relic_planet",
+      "planetIndex": 30,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Relic story planet",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "hollow_planets",
+      "planetIndex": 33,
+      "lane": "Environment",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Hollow planets",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "artefact_set_5",
+      "planetIndex": 35,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "artefact",
+      "name": "Artefact set V: Grapple anchor, Core sense",
+      "slice": "campaign",
+      "count": 2,
+      "origin": "new"
+    },
+    {
+      "id": "unstable_cores",
+      "planetIndex": 36,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Unstable cores (escape run)",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "core_forge",
+      "planetIndex": 38,
+      "lane": "Facility",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "facility",
+      "name": "Core forge",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "finale",
+      "planetIndex": 40,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Finale story planet",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "endless_unlock",
+      "planetIndex": 40,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "manual",
+      "name": "Endless mode unlock",
+      "slice": "campaign",
+      "origin": "new"
+    },
+    {
+      "id": "archive_cache",
+      "planetIndex": 31,
+      "lane": "Unique item",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "artefact",
+      "name": "Archive cache (story fragment)",
+      "slice": "campaign",
+      "origin": "schedule_lock_80",
+      "lockNote": "Thin-act fill: one exclusive story pick between relic (P30) and hollow (P33); keeps \u22642 empty rule without stacking systems."
+    },
+    {
+      "id": "grav_anchor",
+      "planetIndex": 32,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Grav anchor (hollow prep)",
+      "slice": "campaign",
+      "origin": "schedule_lock_80",
+      "lockNote": "Visible hull clamp for low-g interiors; unlocks the beat before hollow_planets."
+    },
+    {
+      "id": "buoyancy_tanks",
+      "planetIndex": 34,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Buoyancy tanks",
+      "slice": "campaign",
+      "origin": "schedule_lock_80",
+      "lockNote": "Post-hollow mobility: float/anchor in open interiors so P33 is not a one-planet novelty."
+    },
+    {
+      "id": "escape_thrusters",
+      "planetIndex": 37,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Escape thrusters",
+      "slice": "campaign",
+      "origin": "schedule_lock_80",
+      "lockNote": "Pairs with unstable_cores (P36): timed egress becomes a vehicle verb, not only a timer."
+    },
+    {
+      "id": "finale_key",
+      "planetIndex": 39,
+      "lane": "Feature",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "planet_gate",
+      "name": "Finale key (campaign cipher)",
+      "slice": "campaign",
+      "origin": "schedule_lock_80",
+      "lockNote": "Last gate beat before finale/endless at P40; no new economy loop."
+    }
+  ],
+  "cumulative_by_planet": [
+    {
+      "planet": 1,
+      "cumulative": 14
+    },
+    {
+      "planet": 2,
+      "cumulative": 15
+    },
+    {
+      "planet": 3,
+      "cumulative": 16
+    },
+    {
+      "planet": 4,
+      "cumulative": 17
+    },
+    {
+      "planet": 5,
+      "cumulative": 19
+    },
+    {
+      "planet": 6,
+      "cumulative": 20
+    },
+    {
+      "planet": 7,
+      "cumulative": 21
+    },
+    {
+      "planet": 8,
+      "cumulative": 23
+    },
+    {
+      "planet": 9,
+      "cumulative": 24
+    },
+    {
+      "planet": 10,
+      "cumulative": 25
+    },
+    {
+      "planet": 11,
+      "cumulative": 27
+    },
+    {
+      "planet": 12,
+      "cumulative": 28
+    },
+    {
+      "planet": 13,
+      "cumulative": 29
+    },
+    {
+      "planet": 14,
+      "cumulative": 30
+    },
+    {
+      "planet": 15,
+      "cumulative": 31
+    },
+    {
+      "planet": 16,
+      "cumulative": 31
+    },
+    {
+      "planet": 17,
+      "cumulative": 33
+    },
+    {
+      "planet": 18,
+      "cumulative": 34
+    },
+    {
+      "planet": 19,
+      "cumulative": 36
+    },
+    {
+      "planet": 20,
+      "cumulative": 37
+    },
+    {
+      "planet": 21,
+      "cumulative": 38
+    },
+    {
+      "planet": 22,
+      "cumulative": 39
+    },
+    {
+      "planet": 23,
+      "cumulative": 40
+    },
+    {
+      "planet": 24,
+      "cumulative": 41
+    },
+    {
+      "planet": 25,
+      "cumulative": 43
+    },
+    {
+      "planet": 26,
+      "cumulative": 44
+    },
+    {
+      "planet": 27,
+      "cumulative": 46
+    },
+    {
+      "planet": 28,
+      "cumulative": 47
+    },
+    {
+      "planet": 29,
+      "cumulative": 47
+    },
+    {
+      "planet": 30,
+      "cumulative": 48
+    },
+    {
+      "planet": 31,
+      "cumulative": 49
+    },
+    {
+      "planet": 32,
+      "cumulative": 50
+    },
+    {
+      "planet": 33,
+      "cumulative": 51
+    },
+    {
+      "planet": 34,
+      "cumulative": 52
+    },
+    {
+      "planet": 35,
+      "cumulative": 54
+    },
+    {
+      "planet": 36,
+      "cumulative": 55
+    },
+    {
+      "planet": 37,
+      "cumulative": 56
+    },
+    {
+      "planet": 38,
+      "cumulative": 57
+    },
+    {
+      "planet": 39,
+      "cumulative": 58
+    },
+    {
+      "planet": 40,
+      "cumulative": 60
+    }
+  ],
+  "gap_justifications": {
+    "16": "Act break after core_guardian before frozen triad; 1 empty \u2264 #81 cap.",
+    "29": "Breath before relic_planet act beat; 1 empty \u2264 #81 cap."
+  },
+  "schedule_locked": true,
+  "schedule_lock_issue": 80
+}
