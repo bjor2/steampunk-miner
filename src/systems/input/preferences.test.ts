@@ -10,7 +10,11 @@ import {
 
 describe('preferences file', () => {
   it('gives the defaults when there is no file yet', () => {
-    expect(readPreferences(null)).toEqual({ prefs: DEFAULT_PREFERENCES, problems: [] })
+    expect(readPreferences(null)).toEqual({
+      prefs: DEFAULT_PREFERENCES,
+      problems: [],
+      bindingsReset: [],
+    })
   })
 
   it('reads back what it wrote, rebinding included', () => {
@@ -20,7 +24,11 @@ describe('preferences file', () => {
       seenHints: ['hint_move', 'transmission_opening'],
       viewShortAxisMetres: 15,
     }
-    expect(readPreferences(preferencesText(prefs))).toEqual({ prefs, problems: [] })
+    expect(readPreferences(preferencesText(prefs))).toEqual({
+      prefs,
+      problems: [],
+      bindingsReset: [],
+    })
   })
 
   it('reads a file from before the seen-set as one with nothing seen', () => {
@@ -29,6 +37,7 @@ describe('preferences file', () => {
     expect(readPreferences(text)).toEqual({
       prefs: { ...DEFAULT_PREFERENCES, shake: false },
       problems: [],
+      bindingsReset: [],
     })
   })
 
@@ -66,6 +75,7 @@ describe('preferences file', () => {
     expect(readPreferences(text)).toEqual({
       prefs: DEFAULT_PREFERENCES,
       problems: ['viewShortAxisMetres must be a number from 8 to 20, got 40'],
+      bindingsReset: [],
     })
   })
 
@@ -79,6 +89,7 @@ describe('preferences file', () => {
   it('refuses a broken file whole, lists every problem and keeps the defaults', () => {
     const text = JSON.stringify({
       preferencesVersion: 1,
+      inputMapVersion: 2,
       cameraMode: 'sideways',
       shake: 'yes',
       flashes: true,
@@ -104,5 +115,57 @@ describe('preferences file', () => {
     expect(preferenceProblems('flashes', false)).toEqual([])
     expect(preferenceProblems('flashes', 0)).toEqual(['flashes must be true or false, got 0'])
     expect(preferenceProblems('bindings', {})).toHaveLength(1)
+  })
+})
+
+describe('preferences file: bindings from input map version 1 (#40, #54)', () => {
+  const v1File = (bindings: object) =>
+    JSON.stringify({
+      ...JSON.parse(preferencesText(DEFAULT_PREFERENCES)),
+      bindings,
+      shake: false,
+    }).replace('"inputMapVersion":2,', '')
+
+  it('writes the input map version beside the bindings', () => {
+    expect(JSON.parse(preferencesText(DEFAULT_PREFERENCES)).inputMapVersion).toBe(2)
+  })
+
+  it('discards a version 1 override that binds Space to lift and keeps the other settings', () => {
+    const reading = readPreferences(v1File({ lift: { keyboard: ['Space'] } }))
+    expect(reading.prefs).toEqual({ ...DEFAULT_PREFERENCES, shake: false })
+    expect(reading.problems).toEqual([])
+    expect(reading.bindingsReset).toEqual([
+      'key bindings made for input map version 1 were reset to the version 2 defaults',
+    ])
+  })
+
+  it('names aim_up when a version 1 override rebinds it, and migrates none of it', () => {
+    const reading = readPreferences(
+      v1File({ aim_up: { keyboard: ['KeyI'] }, aim_left: { keyboard: ['KeyJ'] } }),
+    )
+    expect(reading.prefs.bindings).toEqual({})
+    expect(reading.bindingsReset).toEqual([
+      'key bindings made for input map version 1 were reset to the version 2 defaults',
+      '"aim_up" is no longer an action',
+    ])
+  })
+
+  it('reads a version 1 file with no rebinding as it is, with no notice', () => {
+    const reading = readPreferences(v1File({}))
+    expect(reading).toEqual({
+      prefs: { ...DEFAULT_PREFERENCES, shake: false },
+      problems: [],
+      bindingsReset: [],
+    })
+  })
+
+  it('refuses a version 2 file whose override names aim_up, with the v2 defaults in force', () => {
+    const text = preferencesText({
+      ...DEFAULT_PREFERENCES,
+      bindings: { aim_up: { keyboard: ['KeyI'] } } as never,
+    })
+    const reading = readPreferences(text)
+    expect(reading.prefs).toEqual(DEFAULT_PREFERENCES)
+    expect(reading.problems).toEqual(['"aim_up" is not an action id'])
   })
 })

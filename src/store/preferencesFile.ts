@@ -2,7 +2,9 @@
  * The one writer of the local preferences file (#33, #16): the store hands every settings change
  * here and it goes to the shell, queued so writes land in order. At start `loadPreferences` reads
  * the file back; a file this build refuses leaves the defaults in force and its problems on the
- * console. Never part of a save, the digest or the replay.
+ * console. Bindings made for an older input map are reset to the defaults once: the reset is
+ * logged and written straight back, so the next start reads a current file and says nothing
+ * (#40, #54). Never part of a save, the digest or the replay.
  */
 import {
   preferencesText,
@@ -27,7 +29,9 @@ export function installPreferencesStorage(next: PreferencesStorage | null): void
 }
 
 export async function loadPreferences(): Promise<PreferencesReading> {
-  return readPreferences(storage === null ? null : await storage.read())
+  const reading = readPreferences(storage === null ? null : await storage.read())
+  if (reading.bindingsReset.length > 0) recordBindingsReset(reading)
+  return reading
 }
 
 export function writePreferences(prefs: Preferences): void {
@@ -36,6 +40,11 @@ export function writePreferences(prefs: Preferences): void {
   writes = writes
     .then(() => target.write(preferencesText(prefs)))
     .catch((error) => console.error('preferences write failed', error))
+}
+
+function recordBindingsReset(reading: PreferencesReading): void {
+  console.warn(`preferences: ${reading.bindingsReset.join('; ')}`)
+  writePreferences(reading.prefs)
 }
 
 /** Settles once every queued write has reached the shell; specs await it. */

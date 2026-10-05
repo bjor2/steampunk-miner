@@ -109,10 +109,10 @@ async function adoptLocalPreferences(shell: Shell): Promise<void> {
     read: () => shell.readPreferences(),
     write: (json) => shell.writePreferences(json),
   })
-  const { prefs, problems } = await loadPreferences()
-  if (problems.length > 0)
-    console.error(`preferences refused, using defaults: ${problems.join('; ')}`)
-  useGameStore.getState().adoptPreferences(prefs)
+  const reading = await loadPreferences()
+  if (reading.problems.length > 0)
+    console.error(`preferences refused, using defaults: ${reading.problems.join('; ')}`)
+  useGameStore.getState().adoptPreferences(reading)
 }
 
 /** Quit and resume (#26); a launch scenario sets its own start instead. */

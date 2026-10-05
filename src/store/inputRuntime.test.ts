@@ -1,11 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import type { KeyChange } from '../shell/shell'
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import type { Authority } from '../systems/authority/loopbackAuthority'
-import type { ActionId } from '../systems/input/actionMap'
-import { readPreferences } from '../systems/input/preferences'
+import { ACTION_MAP, defaultBindings, type ActionId } from '../systems/input/actionMap'
+import { DEFAULT_PREFERENCES, readPreferences } from '../systems/input/preferences'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import {
   createStartingAuthority,
@@ -22,7 +22,7 @@ import {
   routeScrollNotch,
 } from './inputRuntime'
 import { readUpgradeBayModel } from './screenReads'
-import { installPreferencesStorage, preferencesWrites } from './preferencesFile'
+import { installPreferencesStorage, loadPreferences, preferencesWrites } from './preferencesFile'
 
 let submitted: AuthorityCommand[]
 let clockMoves: number
@@ -416,5 +416,33 @@ describe('preferences: settings and rebinding stay local', () => {
     game().setBindings({ lift: { keyboard: ['KeyL'] } })
     expect(sink.events).toEqual([])
     expect(submitted).toEqual([])
+  })
+
+  it('resets version 1 bindings to the v2 defaults once, with the notice in settings (#40)', async () => {
+    let file: string | null = JSON.stringify({
+      preferencesVersion: 1,
+      ...DEFAULT_PREFERENCES,
+      bindings: { lift: { keyboard: ['Space'] }, aim_up: { keyboard: ['KeyW'] } },
+    })
+    installPreferencesStorage({
+      read: async () => file,
+      write: async (json) => {
+        file = json
+      },
+    })
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    game().adoptPreferences(await loadPreferences())
+    await preferencesWrites()
+    expect(game().bindings).toEqual(defaultBindings(ACTION_MAP))
+    expect(game().bindingProblems).toEqual([
+      'key bindings made for input map version 1 were reset to the version 2 defaults',
+      '"aim_up" is no longer an action',
+    ])
+    expect(warn).toHaveBeenCalledTimes(1)
+    resetGameStore()
+    game().adoptPreferences(await loadPreferences())
+    expect(game().bindingProblems).toEqual([])
+    expect(warn).toHaveBeenCalledTimes(1)
+    warn.mockRestore()
   })
 })

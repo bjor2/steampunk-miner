@@ -78,7 +78,7 @@ function playFirstTrip(): void {
 async function reload(): Promise<void> {
   await preferencesWrites()
   resetGameStore()
-  game().adoptPreferences((await loadPreferences()).prefs)
+  game().adoptPreferences(await loadPreferences())
 }
 
 describe('hint slice', () => {

@@ -24,6 +24,7 @@ import {
   withPreference,
   type PreferenceName,
   type Preferences,
+  type PreferencesReading,
 } from '../systems/input/preferences'
 import { otherCameraMode, type CameraMode } from '../systems/render/cameraTurn'
 import { VIEW_SHORT_AXIS_DEFAULT_M } from '../constants/scene'
@@ -45,7 +46,10 @@ export interface PresentationValues {
   prefs: Preferences
   /** The keys in force: the overrides in `prefs.bindings` on the shipped defaults. */
   bindings: Bindings
-  /** The problems of the last refused rebinding; empty once one is accepted. */
+  /**
+   * The problems of the last refused rebinding, or why the preferences file's bindings were reset
+   * at start (#40); empty once a rebinding is accepted.
+   */
   bindingProblems: readonly string[]
   isSettingsOpen: boolean
   focusedControlId: string | null
@@ -68,8 +72,8 @@ export interface PresentationActions {
   zoom(change: ZoomChange): void
   /** Holds the render scale (clamped to the 1080p floor), or `null` to adapt; refused (thrown). */
   pinRenderScale(scale: unknown): void
-  /** The preferences file read at start; already validated, so nothing is written back. */
-  adoptPreferences(prefs: Preferences): void
+  /** The preferences file read at start; the file owner already wrote back any reset. */
+  adoptPreferences(reading: PreferencesReading): void
   /** The hints and transmissions shown so far (#16), kept in the preferences file. */
   rememberSeenHints(seenHints: readonly string[]): void
   /** Refused whole: returns the problems and changes nothing, or [] and the overrides rule. */
@@ -131,8 +135,12 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       refuseProblems(renderScalePinProblems(scale))
       set({ renderScalePin: scale as number | null })
     },
-    adoptPreferences: (prefs) =>
-      set({ prefs, bindings: bindingsWithOverrides(ACTION_MAP, prefs.bindings).bindings }),
+    adoptPreferences: ({ prefs, bindingsReset }) =>
+      set({
+        prefs,
+        bindings: bindingsWithOverrides(ACTION_MAP, prefs.bindings).bindings,
+        bindingProblems: bindingsReset,
+      }),
     rememberSeenHints: (seenHints) => savePrefs({ ...get().prefs, seenHints }),
     setBindings: (overrides) => {
       const outcome = bindingsWithOverrides(ACTION_MAP, overrides)
