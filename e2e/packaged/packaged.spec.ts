@@ -6,6 +6,7 @@
 import { existsSync, mkdtempSync, readdirSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { _electron as electron, expect, test, type ElectronApplication } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
 
@@ -15,9 +16,10 @@ declare global {
   }
 }
 
-const RELEASE = new URL('../../release/', import.meta.url).pathname
-const SCENARIO_FILE = new URL('../../scenarios/planet1-start.scenario.json', import.meta.url)
-  .pathname
+const RELEASE = fileURLToPath(new URL('../../release/', import.meta.url))
+const SCENARIO_FILE = fileURLToPath(
+  new URL('../../scenarios/planet1-start.scenario.json', import.meta.url),
+)
 /** The committed start scenario fast-forwards this far (its script). */
 const SCENARIO_END_TICK = 7200
 

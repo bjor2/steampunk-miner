@@ -1,0 +1,37 @@
+name: Packaged smoke
+
+# The packaged Electron build runs on its own, with no Steam client (#2 done item 8, #29). Nightly
+# and by hand, never a merge gate: it is slow, and Playwright's Electron support is experimental.
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  packaged-smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run electron:build
+      # Ubuntu 24.04 runners block the unprivileged user namespaces Chromium's sandbox uses.
+      - if: runner.os == 'Linux'
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - if: runner.os == 'Linux'
+        run: xvfb-run -a npm run test:packaged
+      - if: runner.os != 'Linux'
+        run: npm run test:packaged
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: packaged-smoke-report-${{ matrix.os }}
+          path: playwright-report/

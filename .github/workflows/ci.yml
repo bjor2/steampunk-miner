@@ -6,10 +6,13 @@ on:
   pull_request:
 
 jobs:
+  # Every push and pull request: the whole Vitest suite, which holds the golden-replay, pacing-bot,
+  # event-registry and scenario gates of #29, then the balance report against the baseline.
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
-      # CI never launches Electron, so skip its ~100 MB binary download.
+      # CI never launches Electron here, so skip its ~100 MB binary download.
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
     steps:
       - uses: actions/checkout@v4
@@ -23,3 +26,28 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # Numbers only: compareRuns against tests/balance/bot-slice.summary.json goes to the job
+      # summary; the pacing targets themselves fail `npm test` above.
+      - run: npm run balance:report
+      - uses: actions/upload-artifact@v4
+        with:
+          name: balance-report
+          path: balance-report/
+
+  # Every pull request: the same golden digests on Windows as on Linux (#3, #5 and #11 acceptance).
+  determinism:
+    if: github.event_name == 'pull_request'
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: >-
+          npx vitest run src/logging/goldenRun.test.ts src/systems/replay
+          src/systems/money.test.ts src/systems/world/generatorGolden.test.ts
