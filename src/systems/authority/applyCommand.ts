@@ -7,8 +7,9 @@
  * A refused command changes nothing and answers with one `CommandRejected` event, which replays
  * identically.
  *
- * Before a command is looked at, the clock's own changes up to its tick happen first (a tow whose
- * grace ran out), so a command never acts on a vehicle the clock has already moved.
+ * Before a command is looked at, the clock's own changes up to its tick happen first (enemy ticks,
+ * a tow whose grace ran out), so a command never acts on a vehicle the clock has already moved.
+ * A refused command keeps the state from before them; the next clock move runs them again.
  */
 import {
   isDebugCommandType,
@@ -16,6 +17,7 @@ import {
   type CommandStamp,
   type CommandType,
 } from './authorityCommand'
+import { settleClockTo } from './authorityClock'
 import type { AuthorityState } from './authorityState'
 import { rejectionOf, type CommandRule, type Rejection, type RuleEffect } from './commandRule'
 import { DEBUG_COMMAND_RULES } from './debugCommandRules'
@@ -25,7 +27,6 @@ import { isJsonObject, isWholeNumber, payloadProblems } from './payloadFields'
 import { PLATFORM_SERVICE_RULES } from './platformServices'
 import { VEHICLE_COMMAND_RULES } from './vehicleCommandRules'
 import { TRAVEL_RULES } from './travelRules'
-import { towVehiclesDueBy } from './vehicleTransitions'
 import { WORKSHOP_RULES } from './workshopRules'
 
 export interface CommandOutcome {
@@ -36,10 +37,8 @@ export interface CommandOutcome {
 export function applyCommand(state: AuthorityState, command: AuthorityCommand): CommandOutcome {
   const clocked = runClockUpTo(state, command)
   const rejection = findRejection(clocked.state, command)
-  const answer =
-    rejection === null
-      ? acceptCommand(clocked.state, command)
-      : rejectCommand(clocked.state, command, rejection)
+  if (rejection !== null) return rejectCommand(state, command, rejection)
+  const answer = acceptCommand(clocked.state, command)
   return { state: answer.state, events: [...clocked.events, ...answer.events] }
 }
 
@@ -56,7 +55,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
 function runClockUpTo(state: AuthorityState, command: unknown): CommandOutcome {
   const tick = isJsonObject(command) ? command.tick : undefined
   if (!isWholeNumber(tick) || (tick as number) < state.tick) return { state, events: [] }
-  return towVehiclesDueBy(state, tick as number)
+  return settleClockTo(state, tick as number)
 }
 
 type RejectionCheck = (state: AuthorityState, command: unknown) => Rejection | null

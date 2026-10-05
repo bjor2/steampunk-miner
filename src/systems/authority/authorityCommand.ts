@@ -62,6 +62,14 @@ export interface CommandPayloads {
   'debug.setCoreFragments': { count: number }
   /** Replaces the player's wallet with `amount` (a start scenario's money). */
   'debug.setMoney': { amount: string }
+  /**
+   * Combat (#9, #11 amendment): an enemy of any registered kind and tier, `dx, dy` whole tiles
+   * from the vehicle's tile, hunting this player's vehicle.
+   */
+  'debug.spawnEnemy': { kind: string; tier: number; dx: number; dy: number }
+  'debug.clearEnemies': Record<string, never>
+  /** Frozen enemies neither move, wind up, attack nor spawn; the drill still cuts them. */
+  'debug.freezeEnemies': { frozen: boolean }
 }
 
 export type CommandType = keyof CommandPayloads

@@ -9,6 +9,12 @@
 import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import type { AuthorityState, PlayerState } from './authorityState'
+import {
+  combatOfPortable,
+  portableCombatOf,
+  portableCombatProblems,
+  type PortableCombat,
+} from './combat/combatSnapshot'
 import { coreProgressProblems, type CoreProgress } from './coreProgress'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPlatformVisualState, type PlatformState } from './platformState'
@@ -24,8 +30,8 @@ import {
   type PortableWorld,
 } from './vehicleSnapshot'
 
-/** 4: the core progress of the planet joined the state (#24); 3 added the platform (#23). */
-export const SNAPSHOT_VERSION = 4
+/** 5: combat joined the state (#25); 4 the planet's core progress (#24); 3 the platform (#23). */
+export const SNAPSHOT_VERSION = 5
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -44,6 +50,7 @@ export interface PortableState {
   world: PortableWorld
   platform: PlatformState
   core: CoreProgress
+  combat: PortableCombat
   debugApplied: boolean
 }
 
@@ -80,6 +87,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     world: portableWorldOf(state.world),
     platform: { ...state.platform },
     core: { ...state.core },
+    combat: portableCombatOf(state.combat),
     debugApplied: state.debugApplied,
   }
 }
@@ -110,6 +118,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     world: worldOfPortable(portable.world),
     platform: { ...portable.platform },
     core: { ...portable.core },
+    combat: combatOfPortable(portable.combat),
     debugApplied: portable.debugApplied,
   }
 }
@@ -148,6 +157,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...portableWorldProblems(state.world),
     ...platformProblems(state.platform),
     ...coreProgressProblems(state.core, 'snapshot.state.core'),
+    ...portableCombatProblems(state.combat, 'snapshot.state.combat'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),

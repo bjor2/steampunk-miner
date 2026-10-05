@@ -70,7 +70,7 @@ const vehicleEvents: DomainEvent[] = [
   { ...commandStamp, type: 'EnergyLow', threshold: 25 },
   { ...commandStamp, type: 'EnergyDepleted' },
   { ...commandStamp, type: 'VehicleModeChanged', from: 'active', to: 'stranded', reason: 'x' },
-  { ...commandStamp, type: 'VehicleDestroyed', cause: 'debug' },
+  { ...commandStamp, type: 'VehicleDestroyed', cause: 'debug', attacker: null },
   {
     tick: 300,
     playerId: 'p1',
@@ -111,6 +111,49 @@ const platformEvents: DomainEvent[] = [
   { ...commandStamp, type: 'DockLeft', durationTicks: 300 },
 ]
 
+const combatEvents: DomainEvent[] = [
+  {
+    tick: 400,
+    playerId: 'p1',
+    type: 'EnemySpawned',
+    enemyId: 'e1',
+    kind: 'crawler',
+    tier: 2,
+    spawnPointId: '3,8#0',
+  },
+  { tick: 400, playerId: 'p1', type: 'EnemyTypeEncountered', kind: 'crawler' },
+  {
+    tick: 460,
+    playerId: 'p1',
+    type: 'VehicleDamaged',
+    amount: '4.9e+0',
+    arc: 'front',
+    enemyId: 'e1',
+    kind: 'crawler',
+    tier: 1,
+    hullAfter: '1.2054e+2',
+  },
+  {
+    tick: 490,
+    playerId: 'p1',
+    type: 'EnemyDamaged',
+    enemyId: 'e1',
+    amount: '3.27e+0',
+    source: 'drill',
+    arc: 'front',
+    ticks: 30,
+  },
+  { tick: 532, playerId: 'p1', type: 'EnemyKilled', enemyId: 'e1', kind: 'crawler', tier: 1, by: 'drill' },
+  { tick: 600, playerId: 'p1', type: 'EnemyDespawned', enemyId: 'e2' },
+  {
+    tick: 700,
+    playerId: 'p1',
+    type: 'VehicleDestroyed',
+    cause: 'enemy',
+    attacker: { kind: 'burrower', tier: 9, arc: 'rear' },
+  },
+]
+
 describe('domain event log', () => {
   let sink: ReturnType<typeof createMemorySink>
 
@@ -149,6 +192,31 @@ describe('domain event log', () => {
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
     expect(sink.events.find((event) => event.event === 'energy_low')?.data).toEqual({
       threshold: 25,
+    })
+  })
+
+  it('records every combat event as a registered line; an enemy kill names no enemy id', () => {
+    recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, combatEvents)
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'enemy_spawned',
+      'enemy_type_encountered',
+      'vehicle_damaged',
+      'enemy_damaged',
+      'enemy_killed',
+      'enemy_despawned',
+      'vehicle_destroyed',
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+    expect(sink.events.find((event) => event.event === 'enemy_killed')?.data).toEqual({
+      kind: 'crawler',
+      tier: 1,
+      by: 'drill',
+    })
+    expect(sink.events.find((event) => event.event === 'vehicle_destroyed')?.data).toEqual({
+      cause: 'enemy',
+      kind: 'burrower',
+      tier: 9,
+      arc: 'rear',
     })
   })
 

@@ -1,11 +1,13 @@
 /**
  * The `debug.*` command rules (#11 section 4): scenario and debug-API state changes, applied
  * through the same `applyCommand` as play so they replay and are logged. The vehicle's own
- * (`setUpgrade`, `setEnergy`, `setHull`) live in `vehicleDebugRules.ts`.
+ * (`setUpgrade`, `setEnergy`, `setHull`) live in `vehicleDebugRules.ts`, combat's in
+ * `combat/combatDebugRules.ts`.
  */
 import { add, fromCanonical, toCanonical, type Money } from '../money'
 import type { CommandType } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
+import { COMBAT_DEBUG_RULES } from './combat/combatDebugRules'
 import type { CommandRule, RuleEffect } from './commandRule'
 import { followBayTotal } from './coreBay'
 import { withSessionOnPlanet } from './planetEntry'
@@ -44,6 +46,7 @@ export const DEBUG_COMMAND_RULES: {
       followBayTotal({ ...state, platform: { ...state.platform, coreBay: payload.count } }, tick),
   },
   ...VEHICLE_DEBUG_RULES,
+  ...COMBAT_DEBUG_RULES,
 }
 
 function walletOf(state: AuthorityState, playerId: string): Money {

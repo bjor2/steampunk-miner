@@ -1,0 +1,142 @@
+/**
+ * Drill damage on enemies (decision #9 "Front contact" and the burrower row):
+ *
+ * - A pinned enemy loses `drillPower * kDrillVsEnemy / 60` every tick with no input beyond facing
+ *   it, while the vehicle pays the drill's energy (`cDrill`, 4 quanta a tick). With an empty tank
+ *   the drill does not cut.
+ * - Drilling the tile a burrower swims in damages it by the same amount per drilled tick.
+ * - `enemy_damaged` sums continuous drill damage per 30 ticks and flushes before a kill.
+ * - A killed enemy is gone for the trip: its spawn point stays used until the next dock.
+ */
+import { ENEMY_DAMAGE_LOG_TICKS } from '../../../constants/balance'
+import { pinnedDrillDamagePerTick } from '../../economy/enemyStats'
+import {
+  add,
+  cmp,
+  fromSafeInteger,
+  mul,
+  sub,
+  toCanonical,
+  ZERO_MONEY,
+  type BigStat,
+} from '../../money'
+import { ENERGY_QUANTA_PER_TICK } from '../../vehicle/energyQuanta'
+import { tileOfMillimetres } from '../../vehicle/vehiclePose'
+import type { TilePoint } from '../../world/tileGrid'
+import { vehicleOf, withCombat, withVehicle, type AuthorityState } from '../authorityState'
+import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
+import { followEnergyChange } from '../vehicleTransitions'
+import {
+  DEBUG_SPAWN_POINT_ID,
+  enemyById,
+  NO_PENDING_DRILL,
+  withEnemy,
+  withoutEnemy,
+  type Enemy,
+  type HitArc,
+} from './combatState'
+import { hitArcOf } from './hitArc'
+
+export function drillPinnedEnemy(state: AuthorityState, enemy: Enemy, tick: number): RuleEffect {
+  const vehicle = vehicleOf(state, enemy.ownerId)
+  if (vehicle.energy < ENERGY_QUANTA_PER_TICK.drill) return unchanged(state)
+  const charged = withVehicle(state, enemy.ownerId, {
+    ...vehicle,
+    energy: vehicle.energy - ENERGY_QUANTA_PER_TICK.drill,
+  })
+  const perTick = pinnedDrillDamagePerTick(vehicle.levels.drill_power)
+  return chainEffects(charged, [
+    (current) => damageEnemy(current, enemy, perTick, 1, 'front'),
+    (current) => followEnergyChange(current, enemy.ownerId, tick),
+  ])
+}
+
+/** `ticks` of drilling on one tile also cut the burrowers swimming in it (not pinned ones). */
+export function drillBurrowersOnTile(
+  state: AuthorityState,
+  playerId: string,
+  tile: TilePoint,
+  ticks: number,
+): RuleEffect {
+  const burrowers = state.combat.enemies.filter((enemy) => isSwimmingIn(enemy, tile))
+  if (ticks === 0 || burrowers.length === 0) return unchanged(state)
+  const vehicle = vehicleOf(state, playerId)
+  const amount = mul(pinnedDrillDamagePerTick(vehicle.levels.drill_power), fromSafeInteger(ticks))
+  return chainEffects(
+    state,
+    burrowers.map((burrower) => (current: AuthorityState) => {
+      const arc = vehicle.pose === null ? 'front' : arcFromVehicle(vehicle.pose, burrower)
+      return flushedAfter(damageEnemy(current, burrower, amount, ticks, arc), burrower.id, arc)
+    }),
+  )
+}
+
+/** Logs a pinned enemy's drill damage not yet logged; for a released pin or a kill. */
+export function flushDrillDamage(state: AuthorityState, enemyId: string, arc: HitArc): RuleEffect {
+  const enemy = enemyById(state.combat, enemyId)
+  if (enemy === undefined || enemy.pendingDrill.ticks === 0) return unchanged(state)
+  const { amount, ticks } = enemy.pendingDrill
+  return {
+    state: withCombat(state, withEnemy(state.combat, { ...enemy, pendingDrill: NO_PENDING_DRILL })),
+    events: [
+      { type: 'EnemyDamaged', enemyId, amount: toCanonical(amount), source: 'drill', arc, ticks },
+    ],
+  }
+}
+
+function damageEnemy(
+  state: AuthorityState,
+  enemy: Enemy,
+  amount: BigStat,
+  ticks: number,
+  arc: HitArc,
+): RuleEffect {
+  const current = enemyById(state.combat, enemy.id) ?? enemy
+  const damaged: Enemy = {
+    ...current,
+    health: sub(current.health, amount),
+    pendingDrill: {
+      amount: add(current.pendingDrill.amount, amount),
+      ticks: current.pendingDrill.ticks + ticks,
+    },
+  }
+  const next = withCombat(state, withEnemy(state.combat, damaged))
+  if (cmp(damaged.health, ZERO_MONEY) <= 0) return killEnemy(next, damaged, arc)
+  if (damaged.pendingDrill.ticks >= ENEMY_DAMAGE_LOG_TICKS)
+    return flushDrillDamage(next, enemy.id, arc)
+  return unchanged(next)
+}
+
+function killEnemy(state: AuthorityState, enemy: Enemy, arc: HitArc): RuleEffect {
+  return chainEffects(state, [
+    (current) => flushDrillDamage(current, enemy.id, arc),
+    (current) => ({
+      state: withCombat(current, removedAndUsed(current, enemy)),
+      events: [
+        { type: 'EnemyKilled', enemyId: enemy.id, kind: enemy.kind, tier: enemy.tier, by: 'drill' },
+      ],
+    }),
+  ])
+}
+
+function removedAndUsed(state: AuthorityState, enemy: Enemy) {
+  const combat = withoutEnemy(state.combat, enemy.id)
+  if (enemy.spawnPointId === DEBUG_SPAWN_POINT_ID) return combat
+  return { ...combat, usedSpawnPointIds: [...combat.usedSpawnPointIds, enemy.spawnPointId] }
+}
+
+function flushedAfter(effect: RuleEffect, enemyId: string, arc: HitArc): RuleEffect {
+  const flushed = flushDrillDamage(effect.state, enemyId, arc)
+  return { state: flushed.state, events: [...effect.events, ...flushed.events] }
+}
+
+function isSwimmingIn(enemy: Enemy, tile: TilePoint): boolean {
+  const at = tileOfMillimetres(enemy.x, enemy.y)
+  return (
+    enemy.kind === 'burrower' && enemy.phase !== 'pinned' && at.tx === tile.tx && at.ty === tile.ty
+  )
+}
+
+function arcFromVehicle(pose: NonNullable<ReturnType<typeof vehicleOf>['pose']>, enemy: Enemy) {
+  return hitArcOf(pose, enemy.x - pose.x, enemy.y - pose.y)
+}

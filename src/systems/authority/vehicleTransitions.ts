@@ -42,8 +42,9 @@ import {
 } from '../vehicle/vehicleState'
 import { vehicleOf, withVehicle, withWallet, type AuthorityState } from './authorityState'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
+import { endTrip } from './combat/enemyRoster'
 import { bankCoreFragments } from './coreBay'
-import type { DomainEvent, DomainEventBody, RescueCause } from './domainEvent'
+import type { Attacker, DomainEvent, DomainEventBody, RescueCause } from './domainEvent'
 import { dockSiteOfPlanet } from './planetOfState'
 
 const QUANTA_PER_UNIT = fromSafeInteger(ENERGY_QUANTA_PER_UNIT)
@@ -60,25 +61,27 @@ export function followEnergyChange(
   ])
 }
 
-/** A hull at or below zero destroys an active or stranded vehicle. */
+/** A hull at or below zero destroys an active or stranded vehicle; `attacker` is who did it. */
 export function destroyIfHullGone(
   state: AuthorityState,
   playerId: string,
   tick: number,
   cause: string,
+  attacker: Attacker | null = null,
 ): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
   if (!isWreckable(vehicle) || cmp(vehicle.hull, ZERO_MONEY) > 0) return unchanged(state)
   const destroyed = changeMode(state, playerId, 'destroyed', cause, tick)
   return {
     state: destroyed.state,
-    events: [{ type: 'VehicleDestroyed', cause }, ...destroyed.events],
+    events: [{ type: 'VehicleDestroyed', cause, attacker }, ...destroyed.events],
   }
 }
 
 /**
  * The tow (#7, #8): fee paid, cargo ore lost, hull full, at least 25% energy, back on the dock,
- * and the carried core fragments delivered to the bay (#8 Game Director's rule, #10).
+ * the carried core fragments delivered to the bay (#8 Game Director's rule, #10), and the trip
+ * over for combat (#9).
  */
 export function towVehicle(
   state: AuthorityState,
@@ -91,6 +94,7 @@ export function towVehicle(
     (current) => bringVehicleToDock(current, playerId),
     (current) => changeMode(current, playerId, 'docked', 'rescue', tick),
     (current) => bankCoreFragments(current, playerId, 'rescue', tick),
+    (current) => endTrip(current, playerId),
   ])
 }
 

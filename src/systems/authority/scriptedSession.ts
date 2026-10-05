@@ -79,6 +79,12 @@ export function poseAbove(tile: TilePoint, facing: Facing, counts: Partial<Actio
   }
 }
 
+/**
+ * Specs about mining deep down, where crawlers live (#9), freeze enemies first so they see only
+ * the drill: frozen enemies never spawn.
+ */
+export const FREEZE_ENEMIES = { type: 'debug.freezeEnemies', payload: { frozen: true } } as const
+
 export const drill = (tile: TilePoint, ticks: number) =>
   ({ type: 'drillTile', payload: { ...tile, ticks } }) as const
 

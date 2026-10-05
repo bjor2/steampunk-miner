@@ -4,7 +4,8 @@
  *   active -- Dock, stationary in the pad zone -->  docked   vehicle_state_changed, dock_entered
  *   docked -- Undock -->                            active   dock_left, vehicle_state_changed
  *
- * Docking banks the carried core fragments (#10) and takes a `dock` state digest (#11 section 3).
+ * Docking banks the carried core fragments (#10), ends the trip for combat (the vehicle's enemies
+ * leave and used spawn points free up, #9) and takes a `dock` state digest (#11 section 3).
  * A vehicle with energy 0 in the pad zone is still `active` (it never strands there, #7), so it
  * docks like any other: no tow, no fee.
  */
@@ -21,6 +22,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
+import { endTrip } from './combat/enemyRoster'
 import { bankCoreFragments } from './coreBay'
 import { dockSiteOfPlanet, noPlanetRejection } from './planetOfState'
 import { stateDigest } from './stateDigest'
@@ -38,6 +40,7 @@ export const DOCK_COMMAND_RULES: {
         (current) => changeMode(current, playerId, 'docked', 'dock', tick),
         (current) => logDockEntry(current, playerId),
         (current) => bankCoreFragments(current, playerId, 'dock', tick),
+        (current) => endTrip(current, playerId),
         (current) => digestAtDock(current),
       ]),
   },

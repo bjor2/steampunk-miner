@@ -3,6 +3,7 @@
  * the replication unit and the source the run log is projected from (#11), so every field is
  * plain JSON and money is a canonical string.
  */
+import type { EnemyKind, HitArc } from '../economy/economyDefinition'
 import type { VehicleMode } from '../vehicle/vehicleState'
 import type { CommandStamp, CommandType } from './authorityCommand'
 import type { PlatformVisualState } from './platformState'
@@ -38,6 +39,10 @@ export type RejectionReason =
   // Registered by `Travel` (#10): too few fragments in the bay, or not the next planet.
   | 'core_short'
   | 'not_next_planet'
+  // Registered by combat's debug commands (#25): not an enemy id, or the vehicle already has the
+  // most enemies it may have.
+  | 'unknown_enemy'
+  | 'enemy_cap'
 
 export type RescueCause = 'stranded' | 'destroyed'
 
@@ -46,6 +51,13 @@ export type CoreDepositSource = 'dock' | 'rescue'
 
 /** `SellCargo {resourceTier}` sells one tier, `SellCargo {all}` and the quick action everything. */
 export type SaleMode = 'all' | 'single'
+
+/** Who wrecked the vehicle, for `vehicle_destroyed {kind, tier, arc}` (#9). */
+export interface Attacker {
+  kind: EnemyKind
+  tier: number
+  arc: HitArc
+}
 
 export interface SoldItem {
   tier: number
@@ -68,7 +80,24 @@ export interface DomainEventBodies {
   EnergyLow: { threshold: number }
   EnergyDepleted: Record<never, never>
   VehicleModeChanged: { from: VehicleMode; to: VehicleMode; reason: string }
-  VehicleDestroyed: { cause: string }
+  /** `attacker` is null when no enemy did it (a debug hull). */
+  VehicleDestroyed: { cause: string; attacker: Attacker | null }
+  /** Combat (#9, #25); the enemy's id is `e1`, `e2`, ... and its spawn point `cx,cy#slot`. */
+  EnemySpawned: { enemyId: string; kind: EnemyKind; tier: number; spawnPointId: string }
+  /** The first enemy of a kind this run (#9, #14 horizontal coverage). */
+  EnemyTypeEncountered: { kind: EnemyKind }
+  /** Drill damage on an enemy, summed over at most 30 ticks (#9). */
+  EnemyDamaged: { enemyId: string; amount: string; source: 'drill'; arc: HitArc; ticks: number }
+  EnemyKilled: { enemyId: string; kind: EnemyKind; tier: number; by: 'drill' }
+  EnemyDespawned: { enemyId: string }
+  VehicleDamaged: {
+    amount: string
+    arc: HitArc
+    enemyId: string
+    kind: EnemyKind
+    tier: number
+    hullAfter: string
+  }
   RescueTriggered: { cause: RescueCause; fee: string; cargoLostValue: string }
   UpgradeLevelChanged: { upgradeId: string; from: number; to: number }
   VehicleConfigurationChanged: { visualTier: number }

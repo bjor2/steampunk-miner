@@ -62,3 +62,19 @@ export const DOCK_STATIONARY_MM_PER_SECOND = 50
  * the same formulas).
  */
 export const SLICE_LAST_PLANET = 2
+
+/**
+ * Combat (#9 "Authority resolution from reported poses"): the vehicle's position is carried on from
+ * its last pose report by its velocity for at most this many ticks, one report interval.
+ */
+export const COMBAT_EXTRAPOLATION_TICKS = 12
+
+/**
+ * An enemy touches the vehicle when their centres are this close, in mm: a body in the next tile
+ * along an axis (1000 mm, the tile at the drill's nose) touches, a diagonal neighbour (1414 mm)
+ * does not. Enemies are points on the grid (#9), so this is the vehicle's contact reach.
+ */
+export const ENEMY_CONTACT_MM = 1100
+
+/** `enemy_damaged` sums continuous drill damage over this many ticks (#9 logging). */
+export const ENEMY_DAMAGE_LOG_TICKS = 30

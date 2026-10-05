@@ -50,7 +50,7 @@ describe('authority: determinism', () => {
   })
 
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('361e86492c189e32')
+    expect(stateDigest(replay(SESSION).state)).toBe('76d60b5e302eaa5c')
   })
 
   it('gives a different digest when one command differs', () => {

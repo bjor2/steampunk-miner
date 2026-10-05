@@ -22,6 +22,7 @@ import {
   type VehiclePose,
 } from '../vehicle/vehiclePose'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
+import type { TilePoint } from '../world/tileGrid'
 import { isRemovableCell } from '../world/worldCell'
 import { cellAt } from '../world/worldState'
 import type { AuthorityCommand, CommandPayloads } from './authorityCommand'
@@ -35,7 +36,10 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
+import { drillBurrowersOnTile } from './combat/enemyDamage'
+import { noteReportForCombat } from './combat/poseReportCombat'
 import { drillOnTile } from './drillOnTile'
+import type { DomainEventBody } from './domainEvent'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 import { followEnergyChange, rescueCauseOf, towVehicle } from './vehicleTransitions'
 
@@ -71,6 +75,7 @@ export const VEHICLE_COMMAND_RULES: {
     apply: (state, command) =>
       chainEffects(state, [
         (current) => recordPose(current, command),
+        (current) => noteReportForCombat(current, command.playerId, command.tick),
         (current) => chargeReportedActions(current, command),
         (current) => followEnergyChange(current, command.playerId, command.tick),
       ]),
@@ -174,7 +179,12 @@ function chargeReportedActions(
   if (!isVehicleActive(vehicle) || params === null || vehicle.pose === null) {
     return unchanged(markChargedState(state, playerId, tick))
   }
-  const drilled = drillOnTile(state, params, playerId, noseTileOf(vehicle.pose), payload.drillTicks)
+  const drilled = drillTileAndBurrowers(
+    state,
+    playerId,
+    noseTileOf(vehicle.pose),
+    payload.drillTicks,
+  )
   const moved = chargeMovement(drilled.state, playerId, payload)
   return { state: markChargedState(moved, playerId, tick), events: drilled.events }
 }
@@ -188,10 +198,29 @@ function chargeMovement(state: AuthorityState, playerId: string, payload: PosePa
 }
 
 function drillScriptedTile(state: AuthorityState, command: AuthorityCommand<'drillTile'>) {
+  const { tx, ty, ticks } = command.payload
+  return drillTileAndBurrowers(state, command.playerId, { tx, ty }, ticks)
+}
+
+/** The drill cuts the tile, and a burrower swimming in it for the ticks it cut (#9). */
+function drillTileAndBurrowers(
+  state: AuthorityState,
+  playerId: string,
+  tile: TilePoint,
+  requestedTicks: number,
+): RuleEffect {
   const params = planetParamsOf(state.planet)
   if (params === null) return unchanged(state)
-  const { tx, ty, ticks } = command.payload
-  return drillOnTile(state, params, command.playerId, { tx, ty }, ticks)
+  const drilled = drillOnTile(state, params, playerId, tile, requestedTicks)
+  const cut = drillBurrowersOnTile(drilled.state, playerId, tile, drilledTicksOf(drilled.events))
+  return { state: cut.state, events: [...drilled.events, ...cut.events] }
+}
+
+function drilledTicksOf(events: readonly DomainEventBody[]): number {
+  return events.reduce(
+    (ticks, event) => ticks + (event.type === 'DrillDamageDealt' ? event.ticks : 0),
+    0,
+  )
 }
 
 function markCharged(state: AuthorityState, playerId: string, tick: number): RuleEffect {

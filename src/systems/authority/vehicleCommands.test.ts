@@ -10,6 +10,7 @@ import { cellAt, EMPTY_WORLD } from '../world/worldState'
 import type { DomainEvent } from './domainEvent'
 import {
   createScriptedSession,
+  FREEZE_ENEMIES,
   drill,
   GROUND,
   mineTile,
@@ -88,6 +89,7 @@ describe('vehicle drilling', () => {
 
   it('deals no damage and drains no energy on a core tile, harder than four times the tip', () => {
     const session = createSession()
+    session.submit(0, FREEZE_ENEMIES)
     const deep = { tx: 0, ty: 3 }
     session.submit(10, poseAbove(deep, FACING.down))
     expect(session.submit(30, drill(deep, 20))).toEqual([])
@@ -141,6 +143,7 @@ describe('vehicle cargo', () => {
 describe('vehicle core fragments', () => {
   it('carries a core tile as one fragment, counted in the same cargo units as ore', () => {
     const session = createSession()
+    session.submit(0, FREEZE_ENEMIES)
     session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 7 } })
     session.submit(0, {
       type: 'debug.setUpgrade',

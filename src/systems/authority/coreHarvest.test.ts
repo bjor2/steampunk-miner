@@ -10,6 +10,7 @@ import { readSnapshot, takeSnapshot } from './sessionSnapshot'
 import {
   coreTiles,
   createScriptedSession,
+  FREEZE_ENEMIES,
   drill,
   mineTile,
   PARAMS,
@@ -41,8 +42,12 @@ const poseAtDock = {
 
 const CORE = { tx: 0, ty: 3 }
 
-/** Tip 7 scratches the planet-1 core (#24 acceptance 3); power 60 breaks a tile in 40 ticks. */
+/**
+ * Tip 7 scratches the planet-1 core (#24 acceptance 3); power 60 breaks a tile in 40 ticks.
+ * Crawlers live down there (#9): frozen, so the spec sees only the core's rules.
+ */
 function equipForCore(session: ScriptedSession, cargoHold = 20): void {
+  session.submit(0, FREEZE_ENEMIES)
   session.submit(0, setUpgrade('drill_tip', 7))
   session.submit(0, setUpgrade('drill_power', 60))
   session.submit(0, setUpgrade('cargo_hold', cargoHold))
@@ -65,6 +70,7 @@ function bringHomeAndDock(session: ScriptedSession, tick: number): DomainEvent[]
 /** The fixed steps it takes the drill to break one core tile with the given levels. */
 function ticksToBreakCore(tipLevel: number, powerLevel: number): number {
   const session = createScriptedSession()
+  session.submit(0, FREEZE_ENEMIES)
   session.submit(0, setUpgrade('drill_tip', tipLevel))
   session.submit(0, setUpgrade('drill_power', powerLevel))
   session.submit(10, poseAbove(CORE, FACING.down))

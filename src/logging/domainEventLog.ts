@@ -58,10 +58,25 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'vehicle_state_changed',
     data: { from, to, reason },
   }),
-  // Until enemies exist (#25) nothing but a debug hull can destroy the vehicle: no kind, no arc.
-  VehicleDestroyed: ({ cause }) => ({
+  // A debug hull destroys with no attacker: no kind, no arc.
+  VehicleDestroyed: ({ cause, attacker }) => ({
     event: 'vehicle_destroyed',
-    data: { cause, kind: 'none', tier: 0, arc: 'none' },
+    data: { cause, kind: attacker?.kind ?? 'none', tier: attacker?.tier ?? 0, arc: attacker?.arc ?? 'none' },
+  }),
+  EnemySpawned: ({ enemyId, kind, tier, spawnPointId }) => ({
+    event: 'enemy_spawned',
+    data: { enemyId, kind, tier, spawnPointId },
+  }),
+  EnemyTypeEncountered: ({ kind }) => ({ event: 'enemy_type_encountered', data: { kind } }),
+  EnemyDamaged: ({ enemyId, amount, source, arc, ticks }) => ({
+    event: 'enemy_damaged',
+    data: { enemyId, amount, source, arc, ticks },
+  }),
+  EnemyKilled: ({ kind, tier, by }) => ({ event: 'enemy_killed', data: { kind, tier, by } }),
+  EnemyDespawned: ({ enemyId }) => ({ event: 'enemy_despawned', data: { enemyId } }),
+  VehicleDamaged: ({ amount, arc, enemyId, kind, tier, hullAfter }) => ({
+    event: 'vehicle_damaged',
+    data: { amount, arc, enemyId, kind, tier, hullAfter },
   }),
   RescueTriggered: ({ cause, fee, cargoLostValue }) => ({
     event: 'rescue_triggered',

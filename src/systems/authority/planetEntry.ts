@@ -1,6 +1,6 @@
 /**
  * Moving the session onto another planet (decisions #10 and #4): another planet is another world.
- * Its deltas start empty, its core progress starts fresh, and every vehicle stands on its dock
+ * Its deltas start empty, its core progress and enemies start fresh, and every vehicle stands on its dock
  * site. The vehicles keep their levels, energy, hull and cargo; the platform keeps its bay and look.
  * `Travel` and `debug.setPlanet` both go through here.
  */
@@ -9,6 +9,7 @@ import { dockedPoseAt } from '../vehicle/vehiclePose'
 import type { PlanetParams } from '../world/planetParams'
 import { EMPTY_WORLD } from '../world/worldState'
 import type { AuthorityState } from './authorityState'
+import { combatOnNewPlanet } from './combat/enemyRoster'
 import { NEW_CORE_PROGRESS } from './coreProgress'
 import type { DomainEventBodies } from './domainEvent'
 import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
@@ -22,7 +23,14 @@ export function withSessionOnPlanet(state: AuthorityState, planet: SessionPlanet
       { ...player, vehicle: { ...player.vehicle, pose } },
     ]),
   )
-  return { ...state, planet, world: EMPTY_WORLD, core: NEW_CORE_PROGRESS, players }
+  return {
+    ...state,
+    planet,
+    world: EMPTY_WORLD,
+    core: NEW_CORE_PROGRESS,
+    combat: combatOnNewPlanet(state.combat),
+    players,
+  }
 }
 
 /** What `planet_entered` says about a planet (#11: its seed, generator and radius). */

@@ -10,6 +10,7 @@ import { quickServiceCharges, serviceQuote } from './platformServices'
 import {
   coreTiles,
   createScriptedSession,
+  FREEZE_ENEMIES,
   GROUND,
   mineTile,
   poseAbove,
@@ -67,7 +68,9 @@ function mineOreAndDock(session: ScriptedSession, count: number, startTick = 10)
 }
 
 /** A vehicle that digs core at once (#24 acceptance 3: tip 7 scratches it) with a large hold. */
+/** Mining at the core, where crawlers live: frozen so the spec sees only the platform's rules. */
 function equipForCore(session: ScriptedSession): void {
+  session.submit(0, FREEZE_ENEMIES)
   session.submit(0, setUpgrade('drill_tip', 7))
   session.submit(0, setUpgrade('drill_power', 60))
   session.submit(0, setUpgrade('cargo_hold', 20))

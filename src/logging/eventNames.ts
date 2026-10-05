@@ -237,9 +237,24 @@ export const RUN_EVENT_REGISTRY = {
       hullAfter: 'money',
     },
   },
-  enemy_spawned: { group: 'vehicle_and_combat', level: 'detail', payload: 'unspecified' },
-  enemy_damaged: { group: 'vehicle_and_combat', level: 'detail', payload: 'unspecified' },
-  enemy_despawned: { group: 'vehicle_and_combat', level: 'detail', payload: 'unspecified' },
+  enemy_spawned: {
+    group: 'vehicle_and_combat',
+    level: 'detail',
+    payload: { enemyId: 'text', kind: ENEMY_KIND, tier: 'integer', spawnPointId: 'text' },
+  },
+  // Continuous drill damage is summed per 30 ticks (#9); `ram` is reserved for enemy armour hits.
+  enemy_damaged: {
+    group: 'vehicle_and_combat',
+    level: 'detail',
+    payload: {
+      enemyId: 'text',
+      amount: 'money',
+      source: { oneOf: ['drill', 'ram'] },
+      arc: HIT_ARC,
+      ticks: 'integer',
+    },
+  },
+  enemy_despawned: { group: 'vehicle_and_combat', level: 'detail', payload: { enemyId: 'text' } },
   weapon_fired: { group: 'vehicle_and_combat', level: 'detail', payload: 'unspecified' },
   player_killed: { group: 'vehicle_and_combat', payload: 'reserved' },
 

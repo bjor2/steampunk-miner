@@ -10,6 +10,7 @@
 import { ZERO_MONEY, type Money } from '../money'
 import { newVehicleState, type VehicleState } from '../vehicle/vehicleState'
 import { EMPTY_WORLD, type WorldState } from '../world/worldState'
+import { NEW_COMBAT, type CombatState } from './combat/combatState'
 import { NEW_CORE_PROGRESS, type CoreProgress } from './coreProgress'
 import { NEW_PLATFORM, type PlatformState } from './platformState'
 import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
@@ -30,6 +31,8 @@ export interface AuthorityState {
   platform: PlatformState
   /** The core of the planet the session is on (#10); fresh on every planet. */
   core: CoreProgress
+  /** Enemies and what combat remembers per vehicle (#9); transient, empty after every dock. */
+  combat: CombatState
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
 }
@@ -49,6 +52,7 @@ export function createAuthorityState(start: SessionStart): AuthorityState {
     world: EMPTY_WORLD,
     platform: NEW_PLATFORM,
     core: NEW_CORE_PROGRESS,
+    combat: NEW_COMBAT,
     debugApplied: false,
   }
 }
@@ -73,4 +77,8 @@ export function withVehicle(
 export function withWallet(state: AuthorityState, playerId: string, wallet: Money): AuthorityState {
   const player = state.players[playerId]
   return { ...state, players: { ...state.players, [playerId]: { ...player, wallet } } }
+}
+
+export function withCombat(state: AuthorityState, combat: CombatState): AuthorityState {
+  return { ...state, combat }
 }
