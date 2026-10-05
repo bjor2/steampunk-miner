@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "@react-three/fiber", "vite/client"]
+  },
+  "include": ["e2e", "playwright.config.ts", "playwright.electron.config.ts"]
+}

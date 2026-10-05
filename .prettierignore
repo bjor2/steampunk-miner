@@ -13,3 +13,5 @@ tests/golden
 tests/balance
 # Written by `npm run balance:report`
 balance-report
+playwright-report
+test-results

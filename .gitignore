@@ -16,3 +16,7 @@ logs/
 
 # Written by `npm run balance:report` (CI uploads it as an artifact)
 balance-report/
+
+# Playwright output
+playwright-report/
+test-results/

@@ -92,7 +92,19 @@ const DECIMAL_ONLY_IN_MONEY = {
 }
 
 export default tseslint.config(
-  { ignores: ['dist', 'dist-electron', 'release', 'node_modules', 'logs', 'coverage'] },
+  {
+    ignores: [
+      'dist',
+      'dist-electron',
+      'release',
+      'node_modules',
+      'logs',
+      'coverage',
+      'balance-report',
+      'playwright-report',
+      'test-results',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
