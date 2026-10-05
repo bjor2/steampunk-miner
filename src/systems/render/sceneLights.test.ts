@@ -3,7 +3,6 @@ import { AMBIENT_DEEP, AMBIENT_SURFACE, MAX_POINT_LIGHTS } from '../../constants
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor } from '../world/planetParams'
 import { platformLookOf } from './platformPlaceholder'
-import { dockSiteOf } from '../world/dockSite'
 import {
   ambientAtDepth,
   choosePointLights,
