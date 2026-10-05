@@ -3,101 +3,29 @@ import { blockHardness } from '../economy/oreEconomy'
 import { drillPower, drillTip } from '../economy/vehicleStats'
 import { add, div, fromCanonical, fromSafeInteger, mul, toCanonical, ZERO_MONEY } from '../money'
 import { drillDamage } from '../vehicle/drillRule'
-import { FACING, type Facing } from '../vehicle/vehiclePose'
+import { FACING } from '../vehicle/vehiclePose'
 import { cargoUnitsOf } from '../vehicle/vehicleState'
-import { dockSiteOf } from '../world/dockSite'
-import { planetParamsFor } from '../world/planetParams'
-import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { cellAt, EMPTY_WORLD } from '../world/worldState'
-import { advanceTicks } from './advanceTicks'
-import { applyCommand, type CommandOutcome } from './applyCommand'
-import type { CommandIntent } from './authorityCommand'
-import { createAuthorityState, vehicleOf, type AuthorityState } from './authorityState'
 import type { DomainEvent } from './domainEvent'
+import {
+  createScriptedSession,
+  drill,
+  GROUND,
+  mineTile,
+  PARAMS,
+  poseAbove,
+  SITE,
+  surfaceOreTiles,
+  typesOf,
+  type ScriptedSession,
+} from './scriptedSession'
 
-const WORLD_SEED = 83921
-const PARAMS = planetParamsFor(WORLD_SEED, 1)
-const SITE = dockSiteOf(PARAMS)
 const FULL_TANK = 150 * 240
 
-/** A session that applies intents at chosen ticks and keeps every event, as a replay does. */
-function createSession() {
-  let outcome: CommandOutcome = {
-    state: createAuthorityState({ planetIndex: 1, planetSeed: WORLD_SEED, playerIds: ['p1'] }),
-    events: [],
-  }
-  let seq = 0
-  const keep = (step: CommandOutcome) => {
-    outcome = { state: step.state, events: [...outcome.events, ...step.events] }
-    return step.events
-  }
-  return {
-    submit: (tick: number, intent: CommandIntent) =>
-      keep(applyCommand(outcome.state, { playerId: 'p1', tick, seq: ++seq, ...intent })),
-    advanceTo: (tick: number) => keep(advanceTicks(outcome.state, tick)),
-    state: (): AuthorityState => outcome.state,
-    vehicle: () => vehicleOf(outcome.state, 'p1'),
-    events: (): DomainEvent[] => outcome.events,
-  }
-}
+const createSession = () => createScriptedSession()
 
-type Session = ReturnType<typeof createSession>
-
-const typesOf = (events: readonly DomainEvent[]) => events.map((event) => event.type)
-
-/** A band-1 ground tile on the surface, away from the pad and the starter vein. */
-const GROUND: TilePoint = { tx: 20, ty: surfaceRowOfColumn(20, PARAMS.radiusTiles) }
-
-/** The centre of a tile in mm, upright at the planet's top (the slice's surface), as a pose. */
-function poseAbove(tile: TilePoint, facing: Facing, counts: Partial<ActionTicks> = {}) {
-  return {
-    type: 'reportPose' as const,
-    payload: {
-      x: tile.tx * 1000 + 500,
-      y: (tile.ty + 1) * 1000 + 500,
-      vx: 0,
-      vy: 0,
-      upx: 0,
-      upy: 1024,
-      facing,
-      driving: false,
-      thrusting: false,
-      drilling: (counts.drillTicks ?? 0) > 0,
-      thrustTicks: 0,
-      driveTicks: 0,
-      drillTicks: 0,
-      ...counts,
-    },
-  }
-}
-
-interface ActionTicks {
-  thrustTicks: number
-  driveTicks: number
-  drillTicks: number
-}
-
-const drill = (tile: TilePoint, ticks: number) =>
-  ({ type: 'drillTile', payload: { ...tile, ticks } }) as const
-
-/** Ore tiles near the surface, found in the generated planet (band 1 is 10% ore, #6). */
-function surfaceOreTiles(count: number): TilePoint[] {
-  const tiles: TilePoint[] = []
-  for (let tx = 12; tiles.length < count; tx++) {
-    for (let depth = 0; depth < 6 && tiles.length < count; depth++) {
-      const tile = { tx, ty: surfaceRowOfColumn(tx, PARAMS.radiusTiles) - depth }
-      if (kindOfCell(cellAt(EMPTY_WORLD, PARAMS, tile)) === CELL_KIND.ore) tiles.push(tile)
-    }
-  }
-  return tiles
-}
-
-/** Places the vehicle on a tile and drills it until it breaks, one command per tile. */
-function mineTile(session: Session, tick: number, tile: TilePoint): DomainEvent[] {
-  session.submit(tick, poseAbove(tile, FACING.down))
-  return session.submit(tick + 40, drill(tile, 40))
-}
+type Session = ScriptedSession
 
 describe('vehicle drilling', () => {
   it('breaks a band-1 tile in exactly 40 ticks at level 0', () => {
