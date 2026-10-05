@@ -7,3 +7,5 @@ package-lock.json
 docs/design.md
 # Copied verbatim from the osilion-dev-tsr3f skill.
 docs/standards
+# Written by `npm run golden:update`; a regenerated file must diff exactly as written.
+tests/golden

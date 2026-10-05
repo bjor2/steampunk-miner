@@ -1,0 +1,205 @@
+{
+  "name": "money-past-1e40",
+  "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
+  "generatorVersion": 1,
+  "authorityProtocolVersion": 1,
+  "logSchemaVersion": 1,
+  "numberFormatVersion": 1,
+  "worldSeed": 83921,
+  "endTick": 2000,
+  "commands": [
+    {
+      "playerId": "p1",
+      "tick": 0,
+      "seq": 1,
+      "type": "debug.setPlanet",
+      "payload": {
+        "planetIndex": 80
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 0,
+      "seq": 2,
+      "type": "debug.setUpgrade",
+      "payload": {
+        "upgradeId": "drill_tip",
+        "level": 240
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 0,
+      "seq": 3,
+      "type": "debug.setUpgrade",
+      "payload": {
+        "upgradeId": "drill_power",
+        "level": 500
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 0,
+      "seq": 4,
+      "type": "debug.setUpgrade",
+      "payload": {
+        "upgradeId": "cargo_hold",
+        "level": 420
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 1,
+      "seq": 5,
+      "type": "reportPose",
+      "payload": {
+        "x": 13500,
+        "y": 950500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 41,
+      "seq": 6,
+      "type": "drillTile",
+      "payload": {
+        "tx": 13,
+        "ty": 949,
+        "ticks": 40
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 42,
+      "seq": 7,
+      "type": "reportPose",
+      "payload": {
+        "x": 13500,
+        "y": 947500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 82,
+      "seq": 8,
+      "type": "drillTile",
+      "payload": {
+        "tx": 13,
+        "ty": 946,
+        "ticks": 40
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 83,
+      "seq": 9,
+      "type": "reportPose",
+      "payload": {
+        "x": 17500,
+        "y": 950500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 123,
+      "seq": 10,
+      "type": "drillTile",
+      "payload": {
+        "tx": 17,
+        "ty": 949,
+        "ticks": 40
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 124,
+      "seq": 11,
+      "type": "reportPose",
+      "payload": {
+        "x": 500,
+        "y": 950500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 124,
+      "seq": 12,
+      "type": "dock",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 154,
+      "seq": 13,
+      "type": "sellCargo",
+      "payload": {
+        "resourceTier": "all"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 169,
+      "seq": 14,
+      "type": "buyUpgrade",
+      "payload": {
+        "upgradeId": "cargo_hold"
+      }
+    }
+  ],
+  "digests": [
+    {
+      "tick": 124,
+      "scope": "dock",
+      "digest": "3a464921aec4105d"
+    },
+    {
+      "tick": 2000,
+      "scope": "end",
+      "digest": "d58bb626a264bd78"
+    }
+  ]
+}

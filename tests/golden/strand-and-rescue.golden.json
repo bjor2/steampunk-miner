@@ -1,0 +1,49 @@
+{
+  "name": "strand-and-rescue",
+  "description": "Energy set to 0.05, drive off the pad until it runs out, stranded, towed after the grace (#7).",
+  "generatorVersion": 1,
+  "authorityProtocolVersion": 1,
+  "logSchemaVersion": 1,
+  "numberFormatVersion": 1,
+  "worldSeed": 83921,
+  "endTick": 252,
+  "commands": [
+    {
+      "playerId": "p1",
+      "tick": 0,
+      "seq": 1,
+      "type": "debug.setEnergy",
+      "payload": {
+        "energy": "0.05"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 12,
+      "seq": 2,
+      "type": "reportPose",
+      "payload": {
+        "x": 20500,
+        "y": 299500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 12,
+        "drillTicks": 0
+      }
+    }
+  ],
+  "digests": [
+    {
+      "tick": 252,
+      "scope": "end",
+      "digest": "b9fbf0c18bc55616"
+    }
+  ]
+}

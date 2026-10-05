@@ -1,0 +1,516 @@
+{
+  "name": "destroyed-and-towed",
+  "description": "Hull set to 1 in the band-1 corridor, a crawler hits the rear, destroyed, towed (#9).",
+  "generatorVersion": 1,
+  "authorityProtocolVersion": 1,
+  "logSchemaVersion": 1,
+  "numberFormatVersion": 1,
+  "worldSeed": 83921,
+  "endTick": 704,
+  "commands": [
+    {
+      "playerId": "p1",
+      "tick": 0,
+      "seq": 1,
+      "type": "debug.setUpgrade",
+      "payload": {
+        "upgradeId": "drill_power",
+        "level": 60
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 1,
+      "seq": 2,
+      "type": "reportPose",
+      "payload": {
+        "x": 14500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 31,
+      "seq": 3,
+      "type": "drillTile",
+      "payload": {
+        "tx": 14,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 32,
+      "seq": 4,
+      "type": "reportPose",
+      "payload": {
+        "x": 15500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 62,
+      "seq": 5,
+      "type": "drillTile",
+      "payload": {
+        "tx": 15,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 63,
+      "seq": 6,
+      "type": "reportPose",
+      "payload": {
+        "x": 16500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 93,
+      "seq": 7,
+      "type": "drillTile",
+      "payload": {
+        "tx": 16,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 94,
+      "seq": 8,
+      "type": "reportPose",
+      "payload": {
+        "x": 17500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 124,
+      "seq": 9,
+      "type": "drillTile",
+      "payload": {
+        "tx": 17,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 125,
+      "seq": 10,
+      "type": "reportPose",
+      "payload": {
+        "x": 18500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 155,
+      "seq": 11,
+      "type": "drillTile",
+      "payload": {
+        "tx": 18,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 156,
+      "seq": 12,
+      "type": "reportPose",
+      "payload": {
+        "x": 19500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 186,
+      "seq": 13,
+      "type": "drillTile",
+      "payload": {
+        "tx": 19,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 187,
+      "seq": 14,
+      "type": "reportPose",
+      "payload": {
+        "x": 20500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 217,
+      "seq": 15,
+      "type": "drillTile",
+      "payload": {
+        "tx": 20,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 218,
+      "seq": 16,
+      "type": "reportPose",
+      "payload": {
+        "x": 21500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 248,
+      "seq": 17,
+      "type": "drillTile",
+      "payload": {
+        "tx": 21,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 249,
+      "seq": 18,
+      "type": "reportPose",
+      "payload": {
+        "x": 22500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 279,
+      "seq": 19,
+      "type": "drillTile",
+      "payload": {
+        "tx": 22,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 280,
+      "seq": 20,
+      "type": "reportPose",
+      "payload": {
+        "x": 23500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 310,
+      "seq": 21,
+      "type": "drillTile",
+      "payload": {
+        "tx": 23,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 311,
+      "seq": 22,
+      "type": "reportPose",
+      "payload": {
+        "x": 24500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 341,
+      "seq": 23,
+      "type": "drillTile",
+      "payload": {
+        "tx": 24,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 342,
+      "seq": 24,
+      "type": "reportPose",
+      "payload": {
+        "x": 25500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 372,
+      "seq": 25,
+      "type": "drillTile",
+      "payload": {
+        "tx": 25,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 373,
+      "seq": 26,
+      "type": "reportPose",
+      "payload": {
+        "x": 26500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 403,
+      "seq": 27,
+      "type": "drillTile",
+      "payload": {
+        "tx": 26,
+        "ty": 297,
+        "ticks": 30
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 404,
+      "seq": 28,
+      "type": "debug.setUpgrade",
+      "payload": {
+        "upgradeId": "drill_power",
+        "level": 13
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 404,
+      "seq": 29,
+      "type": "debug.setUpgrade",
+      "payload": {
+        "upgradeId": "hull",
+        "level": 2
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 404,
+      "seq": 30,
+      "type": "debug.setHull",
+      "payload": {
+        "hull": "125.44"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 404,
+      "seq": 31,
+      "type": "reportPose",
+      "payload": {
+        "x": 20500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 0,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 404,
+      "seq": 32,
+      "type": "debug.setHull",
+      "payload": {
+        "hull": "1"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 404,
+      "seq": 33,
+      "type": "debug.spawnEnemy",
+      "payload": {
+        "kind": "crawler",
+        "tier": 1,
+        "dx": 3,
+        "dy": 0
+      }
+    }
+  ],
+  "digests": [
+    {
+      "tick": 704,
+      "scope": "end",
+      "digest": "4d103af8a2fc50d5"
+    }
+  ]
+}

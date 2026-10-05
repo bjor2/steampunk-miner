@@ -1,0 +1,265 @@
+{
+  "name": "dig-and-return",
+  "description": "Planet 1, level 0: drill six surface ore tiles, return to the pad, dock, sell all, undock (#7).",
+  "generatorVersion": 1,
+  "authorityProtocolVersion": 1,
+  "logSchemaVersion": 1,
+  "numberFormatVersion": 1,
+  "worldSeed": 83921,
+  "endTick": 4000,
+  "commands": [
+    {
+      "playerId": "p1",
+      "tick": 1,
+      "seq": 1,
+      "type": "reportPose",
+      "payload": {
+        "x": 13500,
+        "y": 299500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 41,
+      "seq": 2,
+      "type": "drillTile",
+      "payload": {
+        "tx": 13,
+        "ty": 298,
+        "ticks": 40
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 42,
+      "seq": 3,
+      "type": "reportPose",
+      "payload": {
+        "x": 16500,
+        "y": 295500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 82,
+      "seq": 4,
+      "type": "drillTile",
+      "payload": {
+        "tx": 16,
+        "ty": 294,
+        "ticks": 40
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 83,
+      "seq": 5,
+      "type": "reportPose",
+      "payload": {
+        "x": 18500,
+        "y": 297500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 123,
+      "seq": 6,
+      "type": "drillTile",
+      "payload": {
+        "tx": 18,
+        "ty": 296,
+        "ticks": 40
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 124,
+      "seq": 7,
+      "type": "reportPose",
+      "payload": {
+        "x": 18500,
+        "y": 295500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 164,
+      "seq": 8,
+      "type": "drillTile",
+      "payload": {
+        "tx": 18,
+        "ty": 294,
+        "ticks": 40
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 165,
+      "seq": 9,
+      "type": "reportPose",
+      "payload": {
+        "x": 18500,
+        "y": 294500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 205,
+      "seq": 10,
+      "type": "drillTile",
+      "payload": {
+        "tx": 18,
+        "ty": 293,
+        "ticks": 40
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 206,
+      "seq": 11,
+      "type": "reportPose",
+      "payload": {
+        "x": 19500,
+        "y": 295500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 246,
+      "seq": 12,
+      "type": "drillTile",
+      "payload": {
+        "tx": 19,
+        "ty": 294,
+        "ticks": 40
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 247,
+      "seq": 13,
+      "type": "reportPose",
+      "payload": {
+        "x": 500,
+        "y": 300500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 247,
+      "seq": 14,
+      "type": "dock",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 277,
+      "seq": 15,
+      "type": "sellCargo",
+      "payload": {
+        "resourceTier": "all"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 307,
+      "seq": 16,
+      "type": "undock",
+      "payload": {}
+    }
+  ],
+  "digests": [
+    {
+      "tick": 247,
+      "scope": "dock",
+      "digest": "5c4bf38cf1cae287"
+    },
+    {
+      "tick": 3600,
+      "scope": "periodic",
+      "digest": "e041bb3d064d9249"
+    },
+    {
+      "tick": 4000,
+      "scope": "end",
+      "digest": "d8d4f9d323a76f96"
+    }
+  ]
+}
