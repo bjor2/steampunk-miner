@@ -65,7 +65,8 @@ problem naming what is missing.
   `setPlanetSeed`, `teleportToDepthTiles`, `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
   `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
   `setUpgrade(id, level)`, `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
-  `vehicleStats()`.
+  `vehicleStats()`. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.getPrefs()`)
+  changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2).
 - Run-log specs: every emitted line must pass `runEventProblems` (the schema registry in
   `src/logging/eventNames.ts`); a summary is always `deriveSummary(events)`.
 - Money in tests: compare canonical strings (`toCanonical`) or `Money` values; `src/testSetup.ts` registers

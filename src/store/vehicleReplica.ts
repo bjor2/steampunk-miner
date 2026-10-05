@@ -3,6 +3,7 @@
  * a replica). Rebuilt only when the authority's vehicle object changes, so a tick that leaves the
  * vehicle alone gives the same replica and no subscriber re-renders.
  */
+import { visualTier } from '../systems/economy/vehicleStats'
 import { quantaOfUnits } from '../systems/vehicle/energyQuanta'
 import {
   cargoUnitsOf,
@@ -21,6 +22,8 @@ export interface VehicleReplica {
   hullMax: Money
   cargoUnits: number
   cargoCapacity: number
+  /** 1 to 3 from the upgrade levels (#7, #20): which placeholder parts the vehicle shows. */
+  visualTier: number
 }
 
 let lastSource: VehicleState | null = null
@@ -38,6 +41,7 @@ export function vehicleReplicaOf(vehicle: VehicleState): VehicleReplica {
     hullMax: stats.hullMax,
     cargoUnits: cargoUnitsOf(vehicle.cargo),
     cargoCapacity: stats.cargoCapacity,
+    visualTier: visualTier(vehicle.levels),
   }
   return lastReplica
 }

@@ -264,3 +264,30 @@ describe('game store: vehicle', () => {
     expect(takeSessionSnapshot().tick).toBe(2)
   })
 })
+
+describe('game store: camera mode', () => {
+  it('starts with the rotating camera', () => {
+    expect(game().cameraMode).toBe('rotating')
+  })
+
+  it('switches to the fixed camera without telling the authority', () => {
+    const before = takeSessionSnapshot().digest
+    game().setCameraMode('fixed')
+    expect(game().cameraMode).toBe('fixed')
+    expect(takeSessionSnapshot().digest).toBe(before)
+    expect(sink.events).toEqual([])
+  })
+
+  it('refuses an unknown mode', () => {
+    expect(() => game().setCameraMode('sideways' as 'fixed')).toThrow(/sideways/)
+    expect(game().cameraMode).toBe('rotating')
+  })
+})
+
+describe('game store: vehicle look', () => {
+  it('shows visual tier 1 at the start and tier 2 once the levels reach the threshold', () => {
+    expect(game().vehicle.visualTier).toBe(1)
+    game().setUpgrade('drill_tip', 8)
+    expect(game().vehicle.visualTier).toBe(2)
+  })
+})

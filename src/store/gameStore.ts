@@ -45,6 +45,7 @@ import {
   setUpgradeCommand,
 } from '../systems/vehicle/vehicleCommands'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
+import { isCameraMode, type CameraMode } from '../systems/render/cameraTurn'
 import type { PlanetParams } from '../systems/world/planetParams'
 import type { WorldState } from '../systems/world/worldState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
@@ -74,6 +75,11 @@ export interface GameState {
   debugApplied: boolean
   /** Copied from the authority: the local vehicle as the HUD shows it. */
   vehicle: VehicleReplica
+  /**
+   * Local presentation only (#13 accessibility, #11 amendment 2 `ui.setCameraMode`): never a
+   * command, never logged, never in the digest.
+   */
+  cameraMode: CameraMode
 
   setPlanet(planetTier: number): void
   setPlanetSeed(planetSeed: number): void
@@ -98,11 +104,20 @@ export interface GameState {
   requestRescue(): void
   /** One fixed physics step of the live game: the authority's clock moves one tick (#3). */
   advanceOneTick(): void
+  /** Rotating (local down at the bottom of the screen) or fixed (north up); the view only. */
+  setCameraMode(mode: CameraMode): void
 }
 
 type GameValues = Pick<
   GameState,
-  'playerId' | 'planetTier' | 'planetSeed' | 'depthTiles' | 'money' | 'debugApplied' | 'vehicle'
+  | 'playerId'
+  | 'planetTier'
+  | 'planetSeed'
+  | 'depthTiles'
+  | 'money'
+  | 'debugApplied'
+  | 'vehicle'
+  | 'cameraMode'
 >
 
 const STARTING_PLAYER_ID = 'player_1'
@@ -117,6 +132,7 @@ export const STARTING_VALUES: GameValues = {
   money: ZERO_MONEY,
   debugApplied: false,
   vehicle: vehicleReplicaOf(startingAuthorityState().players[STARTING_PLAYER_ID].vehicle),
+  cameraMode: 'rotating',
 }
 
 export const useGameStore = create<GameState>()((set, get) => ({
@@ -184,6 +200,11 @@ export const useGameStore = create<GameState>()((set, get) => ({
   requestRescue: () => submitCommand(get().playerId, requestRescueCommand()),
 
   advanceOneTick: () => advanceAuthorityTo(readAuthorityState().tick + 1),
+
+  setCameraMode: (cameraMode) => {
+    refuseProblems(isCameraMode(cameraMode) ? [] : [`unknown camera mode "${String(cameraMode)}"`])
+    set({ cameraMode })
+  },
 }))
 
 /** Why the authority would refuse a vehicle debug command now; empty when it would apply. */

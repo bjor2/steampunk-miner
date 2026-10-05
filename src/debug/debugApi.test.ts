@@ -4,7 +4,7 @@ import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { deriveSummary } from '../logging/runSummary'
-import { resetGameStore, useGameStore } from '../store/gameStore'
+import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
 import { fromCanonical } from '../systems/money'
 import { parseScenario, type Scenario } from '../systems/scenario'
 import { createDebugApi, DebugCommandNotImplementedError } from './debugApi'
@@ -262,5 +262,34 @@ describe('debug api: vehicle', () => {
     startRun()
     expect(debug.restore(JSON.parse(JSON.stringify(taken.snapshot)))).toMatchObject({ ok: true })
     expect(vehicleStatsOf(debug).stats).toEqual(before)
+  })
+})
+
+describe('debug api: ui', () => {
+  it('switches the camera to the fixed mode and back', () => {
+    const debug = createDebugApi()
+    expect(debug.ui.setCameraMode('fixed')).toEqual({ ok: true })
+    expect(debug.ui.getPrefs()).toEqual({ ok: true, prefs: { cameraMode: 'fixed' } })
+    debug.ui.setCameraMode('rotating')
+    expect(game().cameraMode).toBe('rotating')
+  })
+
+  it('refuses a camera mode it does not know and keeps the current one', () => {
+    const debug = createDebugApi()
+    expect(debug.ui.setCameraMode('upside-down')).toEqual({
+      ok: false,
+      problems: ['camera mode must be one of rotating, fixed, got "upside-down"'],
+    })
+    expect(game().cameraMode).toBe('rotating')
+  })
+
+  it('changes only the view: no command, no log line, no debug flag, the same digest', () => {
+    const debug = createDebugApi()
+    const before = takeSessionSnapshot()
+    debug.ui.setCameraMode('fixed')
+    expect(takeSessionSnapshot().digest).toBe(before.digest)
+    expect(sink.events).toEqual([])
+    expect(sink.commands).toEqual([])
+    expect(game().debugApplied).toBe(false)
   })
 })

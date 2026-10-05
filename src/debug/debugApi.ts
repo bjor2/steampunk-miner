@@ -29,6 +29,7 @@ import {
   type VehicleStatsView,
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
+import { CAMERA_MODES, isCameraMode, type CameraMode } from '../systems/render/cameraTurn'
 import { readSnapshot, type SessionSnapshot } from '../systems/authority/sessionSnapshot'
 import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForward'
 import { validateScenario, type Scenario } from '../systems/scenario'
@@ -57,6 +58,21 @@ export interface VehicleStatsReport {
   onCurveByPlanet: OnCurveVehicleView[]
 }
 
+/** What `ui.getPrefs()` reads: local presentation settings. */
+export interface UiPrefs {
+  cameraMode: CameraMode
+}
+
+/**
+ * The `ui.*` namespace (#11 amendment 2): local presentation state only. No command, not logged,
+ * not in the digest, and it never sets `debugApplied`.
+ */
+export interface DebugUi {
+  /** `rotating` (local down at the bottom of the screen) or `fixed` (#13 accessibility). */
+  setCameraMode(mode: string): DebugResult
+  getPrefs(): DebugResult<{ prefs: UiPrefs }>
+}
+
 export interface DebugApi {
   // set state (each one a `debug.*` command)
   setPlanet(planetIndex: number): DebugResult
@@ -81,6 +97,7 @@ export interface DebugApi {
   /** Hull as a canonical decimal string, at most `hullMax`; 0 destroys the vehicle. */
   setHull(hull: string): DebugResult
   vehicleStats(): DebugResult<VehicleStatsReport>
+  ui: DebugUi
   // stubs
   /** `depthBp` is basis points of the radius (#11); the radius arrives with the generator. */
   teleportToDepth(depthBp: number): void
@@ -119,6 +136,11 @@ function sessionPoint(): SessionPoint {
 }
 
 const game = (): GameState => useGameStore.getState()
+
+function cameraModeProblems(mode: unknown): string[] {
+  if (isCameraMode(mode)) return []
+  return [`camera mode must be one of ${CAMERA_MODES.join(', ')}, got ${JSON.stringify(mode)}`]
+}
 
 function vehicleStatsReport(): VehicleStatsReport {
   const vehicle = readLocalVehicle()
@@ -168,6 +190,11 @@ export function createDebugApi(): DebugApi {
     setHull: (hull) =>
       runUnlessRefused(vehicleDebugProblems(setHullCommand(hull)), () => game().setHull(hull)),
     vehicleStats: () => ({ ok: true, ...vehicleStatsReport() }),
+    ui: {
+      setCameraMode: (mode) =>
+        runUnlessRefused(cameraModeProblems(mode), () => game().setCameraMode(mode as CameraMode)),
+      getPrefs: () => ({ ok: true, prefs: { cameraMode: game().cameraMode } }),
+    },
     teleportToDepth: notImplemented('teleportToDepth'),
     teleportToCore: notImplemented('teleportToCore'),
     teleportToDock: notImplemented('teleportToDock'),
