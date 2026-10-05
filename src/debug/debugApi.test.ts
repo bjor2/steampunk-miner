@@ -510,3 +510,30 @@ describe('debug API: platform', () => {
     })
   })
 })
+
+describe('debug api: casing (#41)', () => {
+  const HOLE = { x: 20_500, y: 288_500 }
+  const casingGrade = () => takeSessionSnapshot().state.players[game().playerId].vehicle.casingGrade
+
+  it('sets the casing grade as a logged debug command', () => {
+    expect(createDebugApi().setCasingGrade(4)).toEqual({ ok: true })
+    expect(casingGrade()).toBe(4)
+    expect(game().debugApplied).toBe(true)
+    expect(sink.events.map((event) => event.event)).toEqual(['debug_command_applied'])
+  })
+
+  it('refuses a casing grade of 0 and changes nothing', () => {
+    expect(createDebugApi().setCasingGrade(0)).toMatchObject({ ok: false })
+    expect(sink.commands).toEqual([])
+    expect(casingGrade()).toBe(1)
+  })
+
+  it('lines a ring in a carved hole and logs it as casing_placed', () => {
+    const debug = createDebugApi()
+    debug.carveCircle(HOLE.x, HOLE.y, 950)
+    expect(debug.lineCasing(HOLE.x, HOLE.y, 3)).toEqual({ ok: true })
+    const placed = sink.events.find((event) => event.event === 'casing_placed')
+    expect(placed?.data).toMatchObject({ relined: 0, grade: 3 })
+    expect(sink.events.at(-1)?.event).toBe('debug_command_applied')
+  })
+})

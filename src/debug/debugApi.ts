@@ -55,6 +55,7 @@ import { validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems } from '../systems/startScenario'
 import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
 import { carveCircleCommand, fillCircleCommand } from '../systems/authority/groundCommands'
+import { lineCasingCommand, setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
 import type { BayId } from '../systems/world/dockBays'
 import { SOLID_DENSITY } from '../systems/world/sampleGrid'
 import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'
@@ -159,6 +160,11 @@ export interface DebugApi {
   carveCircle(x: number, y: number, radius: number, amount?: number): DebugResult
   /** Raises density round `(x, y)` mm, up to solid ground. */
   fillCircle(x: number, y: number, radius: number, amount?: number): DebugResult
+  // casing (#41): `debug.*` commands
+  /** The vehicle's casing grade, a whole number >= 1; grade G holds bands 1 to G. */
+  setCasingGrade(grade: number): DebugResult
+  /** One ring of lining of `grade` round `(x, y)` mm, the ring the vehicle lays. */
+  lineCasing(x: number, y: number, grade: number): DebugResult
   /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
   ui: DebugUi
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
@@ -318,6 +324,14 @@ export function createDebugApi(): DebugApi {
     fillCircle: (x, y, radius, amount = SOLID_DENSITY) =>
       runUnlessRefused(vehicleDebugProblems(fillCircleCommand({ x, y, radius, amount })), () =>
         game().fillCircle({ x, y, radius, amount }),
+      ),
+    setCasingGrade: (grade) =>
+      runUnlessRefused(vehicleDebugProblems(setCasingGradeCommand(grade)), () =>
+        game().setCasingGrade(grade),
+      ),
+    lineCasing: (x, y, grade) =>
+      runUnlessRefused(vehicleDebugProblems(lineCasingCommand({ x, y, grade })), () =>
+        game().lineCasing({ x, y, grade }),
       ),
     ui: createDebugUi(),
     input: createDebugInput(),
