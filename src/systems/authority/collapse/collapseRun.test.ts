@@ -40,7 +40,8 @@ import {
   TUNNEL_TO_X,
   weakTunnelIntents,
 } from './collapseFixtures'
-import { forceCollapseCommand } from './collapseDebugRules'
+import { forceCollapseCommand } from './collapseCommands'
+import { collapseReportOf } from './collapseReport'
 
 const ofType = <T extends DomainEvent['type']>(events: readonly DomainEvent[], type: T) =>
   events.filter((event): event is Extract<DomainEvent, { type: T }> => event.type === type)
@@ -357,6 +358,18 @@ describe('collapse: determinism (#43 acceptance 6)', () => {
 })
 
 describe('collapse: the debug command (#43 debug API)', () => {
+  it('reports the weak blocks near the vehicle and the blocks warning or refilling', () => {
+    const session = createScriptedSession()
+    buildWeakTunnel(session, 10)
+    const report = collapseReportOf(session.state())
+    expect(report.weakBlocks.length).toBeGreaterThan(4)
+    expect(report.weakBlocks[0]).toMatchObject({ band: 2, weakestGrade: 1, required: 2 })
+    expect(report.collapsing.map(({ block }) => block).sort()).toEqual(
+      report.weakBlocks.map(({ block }) => block).sort(),
+    )
+    expect(report.collapsing[0]).toMatchObject({ startTick: 10, refillTick: 70, phase: 'warning' })
+  })
+
   it('refuses a block name that is not one, listing the problem and changing nothing', () => {
     const session = createScriptedSession()
     const before = stateDigest(session.state())

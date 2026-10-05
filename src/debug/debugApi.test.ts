@@ -537,3 +537,30 @@ describe('debug api: casing (#41)', () => {
     expect(sink.events.at(-1)?.event).toBe('debug_command_applied')
   })
 })
+
+describe('debug api: collapse (#43)', () => {
+  const BLOCK = '0,8#17'
+
+  it('forces a block to collapse after its full warning, as logged debug commands', () => {
+    const debug = createDebugApi()
+    expect(debug.forceCollapse(BLOCK)).toEqual({ ok: true })
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'collapse_warning',
+      'debug_command_applied',
+    ])
+    const report = debug.collapseState()
+    expect(report).toMatchObject({
+      ok: true,
+      collapsing: [{ block: BLOCK, phase: 'warning', isForced: true }],
+    })
+    debug.fastForward(60)
+    expect(sink.events.map((event) => event.event)).toContain('collapse')
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
+  it('refuses a block name that is not one and changes nothing', () => {
+    expect(createDebugApi().forceCollapse('here')).toMatchObject({ ok: false })
+    expect(sink.commands).toEqual([])
+    expect(createDebugApi().collapseState()).toEqual({ ok: true, weakBlocks: [], collapsing: [] })
+  })
+})

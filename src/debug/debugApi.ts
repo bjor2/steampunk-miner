@@ -56,6 +56,9 @@ import { startScenarioProblems } from '../systems/startScenario'
 import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
 import { carveCircleCommand, fillCircleCommand } from '../systems/authority/groundCommands'
 import { lineCasingCommand, setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
+import { forceCollapseCommand } from '../systems/authority/collapse/collapseCommands'
+import type { CollapseReport } from '../systems/authority/collapse/collapseReport'
+import { readCollapseReport } from '../store/collapseDebugActions'
 import type { BayId } from '../systems/world/dockBays'
 import { SOLID_DENSITY } from '../systems/world/sampleGrid'
 import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'
@@ -165,6 +168,11 @@ export interface DebugApi {
   setCasingGrade(grade: number): DebugResult
   /** One ring of lining of `grade` round `(x, y)` mm, the ring the vehicle lays. */
   lineCasing(x: number, y: number, grade: number): DebugResult
+  // collapse (#43): the setter is a `debug.*` command, the read is not logged
+  /** Starts the collapse of block `cx,cy#index` now: the full 60-tick warning, then the refill. */
+  forceCollapse(block: string): DebugResult
+  /** The weak blocks within 16 m of a vehicle and the blocks warning or refilling. */
+  collapseState(): DebugResult<CollapseReport>
   /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
   ui: DebugUi
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
@@ -333,6 +341,11 @@ export function createDebugApi(): DebugApi {
       runUnlessRefused(vehicleDebugProblems(lineCasingCommand({ x, y, grade })), () =>
         game().lineCasing({ x, y, grade }),
       ),
+    forceCollapse: (block) =>
+      runUnlessRefused(vehicleDebugProblems(forceCollapseCommand(block)), () =>
+        game().forceCollapse(block),
+      ),
+    collapseState: () => ({ ok: true, ...readCollapseReport() }),
     ui: createDebugUi(),
     input: createDebugInput(),
     teleportToCore: notImplemented('teleportToCore'),

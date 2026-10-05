@@ -75,6 +75,7 @@ import { recordCheckpointLoaded, writeCheckpointAfter, type Checkpoint } from '.
 import { artefactActionsOf, type ArtefactActions } from './artefactActions'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { casingDebugActionsOf, type CasingDebugActions } from './casingDebugActions'
+import { collapseDebugActionsOf, type CollapseDebugActions } from './collapseDebugActions'
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
 import { announceFeedback } from './feedbackBroadcast'
 import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
@@ -89,7 +90,11 @@ import {
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
-type DebugActions = CombatDebugActions & GroundDebugActions & CasingDebugActions & ArtefactActions
+type DebugActions = CombatDebugActions &
+  GroundDebugActions &
+  CasingDebugActions &
+  CollapseDebugActions &
+  ArtefactActions
 
 export interface GameState
   extends DebugActions, PresentationValues, PresentationActions, HintValues, HintActions {
@@ -195,6 +200,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...combatDebugActionsOf(() => get().playerId),
   ...groundDebugActionsOf(() => get().playerId),
   ...casingDebugActionsOf(() => get().playerId),
+  ...collapseDebugActionsOf(() => get().playerId),
   ...artefactActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
   ...hintActionsOf(set, get),

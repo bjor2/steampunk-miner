@@ -33,10 +33,6 @@ export const COLLAPSE_DEBUG_RULES: {
   },
 }
 
-export function forceCollapseCommand(block: string) {
-  return { type: 'debug.forceCollapse' as const, payload: { block } }
-}
-
 function blockIdRejection(id: string): Rejection | null {
   if (blockOfId(id) !== null) return null
   return rejectionOf('invalid_payload', `block must be "cx,cy#index" (index 0 to 63), got "${id}"`)
