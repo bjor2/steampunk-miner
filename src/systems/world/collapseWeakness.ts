@@ -11,11 +11,10 @@
  * one of the chunk deltas it reads changes (a `GroundChanged` touched the block or its border).
  */
 import { requiredCasingGrade } from '../economy/casingGrades'
-import { ECONOMY } from '../economy/economy'
 import { blockIdOf, samplesOfBlock, type CollapseBlock } from './collapseBlock'
 import { COLLAPSE_BLOCK_SAMPLES } from '../../constants/balance'
 import type { ChunkDelta } from './chunkDelta'
-import { bandOfTile, isCoreTile } from './planetGeometry'
+import { casingBandOfTile } from './casingBand'
 import type { PlanetParams } from './planetParams'
 import { chunkOfSample, SAMPLES_PER_TILE } from './sampleGrid'
 import {
@@ -38,11 +37,6 @@ export interface BlockWeakness {
 export interface SamplePoint {
   sx: number
   sy: number
-}
-
-/** The band whose grade a tile needs: its own, or the core's band (6, #6) inside the core. */
-export function casingBandOfTile(params: PlanetParams, tx: number, ty: number): number {
-  return isCoreTile(params, tx, ty) ? ECONOMY.ore.coreTierBand : bandOfTile(params, tx, ty)
 }
 
 export function weaknessOfBlock(

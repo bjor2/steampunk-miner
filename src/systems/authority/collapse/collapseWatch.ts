@@ -22,7 +22,8 @@ import {
   sortBlocks,
   type CollapseBlock,
 } from '../../world/collapseBlock'
-import { casingBandOfTile, weaknessOfBlock, type BlockWeakness } from '../../world/collapseWeakness'
+import { casingBandOfTile } from '../../world/casingBand'
+import { weaknessOfBlock, type BlockWeakness } from '../../world/collapseWeakness'
 import type { BodyCentre } from '../../world/collapseRefill'
 import type { PlanetParams } from '../../world/planetParams'
 import { withCollapse, type AuthorityState } from '../authorityState'

@@ -6,9 +6,8 @@
  * core is reported as band 6, the core material's band in #6.
  */
 import { requiredCasingGrade } from '../economy/casingGrades'
-import { ECONOMY } from '../economy/economy'
 import { tileOfPose, type VehiclePose } from '../vehicle/vehiclePose'
-import { bandOfTile, isCoreTile } from '../world/planetGeometry'
+import { casingBandOfTile } from '../world/casingBand'
 import type { PlanetParams } from '../world/planetParams'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import { unchanged, type RuleEffect } from './commandRule'
@@ -31,7 +30,7 @@ export function followCasingSupport(state: AuthorityState, playerId: string): Ru
 /** The band whose casing the pose needs: its tile's band, or the core's band 6. */
 function supportBandOfPose(params: PlanetParams, pose: VehiclePose): number {
   const { tx, ty } = tileOfPose(pose)
-  return isCoreTile(params, tx, ty) ? ECONOMY.ore.coreTierBand : bandOfTile(params, tx, ty)
+  return casingBandOfTile(params, tx, ty)
 }
 
 function shortBandOf(grade: number, band: number): number | null {
