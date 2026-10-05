@@ -30,3 +30,15 @@ export const UP_VECTOR_SCALE = 1024
 
 /** Millimetres per metre: pose reports carry integer mm and mm/s (#11 amendment). */
 export const MM_PER_METRE = 1000
+
+/**
+ * Tangential drive acceleration at the engine's 1.0x `accel` (#7 gives only the 1.0x to 1.8x
+ * multiplier). A placeholder from the demo scene, tuned by hand in the vehicle feel test.
+ */
+export const BASE_DRIVE_ACCELERATION = 24
+
+/** The vehicle's collider: at most 0.9 m square, so it fits a 1-tile bore (#7); art may overhang. */
+export const VEHICLE_COLLIDER_SIZE = 0.9
+
+/** How far below the body's bottom a solid tile still counts as ground under the wheels, m. */
+export const GROUND_PROBE_DEPTH = 0.1

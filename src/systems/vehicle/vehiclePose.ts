@@ -4,7 +4,7 @@
  * 3 up (#33, frozen under `logSchemaVersion` 1). Everything here is integer arithmetic, so a
  * replayed `commands.ndjson` gives the same tiles and zones on every machine.
  */
-import { DRILL_REACH_MM, MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
+import { DRILL_REACH_MM, MAX_SPEED_MM_PER_SECOND, ZONE_TEST_MAX_MM } from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { DockSite } from '../world/dockSite'
 import type { TilePoint } from '../world/tileGrid'
@@ -121,4 +121,13 @@ function isUnitUpVector(upx: number, upy: number): boolean {
     Math.abs(upx) <= UP_VECTOR_SCALE + 1 && Math.abs(upy) <= UP_VECTOR_SCALE + 1
   const lengthSq = upx * upx + upy * upy
   return isEachAxisBounded && lengthSq >= UP_LENGTH_SQ_MIN && lengthSq <= UP_LENGTH_SQ_MAX
+}
+
+/**
+ * Whether an offset is close enough for the #9 front/side/rear zone test, which squares and
+ * multiplies it: beyond 65535 mm a pose is not used, so every product stays below 2^53.
+ */
+export function isWithinZoneTestRange(dx: number, dy: number): boolean {
+  const isEachAxisBounded = Math.abs(dx) <= ZONE_TEST_MAX_MM && Math.abs(dy) <= ZONE_TEST_MAX_MM
+  return isEachAxisBounded && dx * dx + dy * dy <= ZONE_TEST_MAX_MM * ZONE_TEST_MAX_MM
 }

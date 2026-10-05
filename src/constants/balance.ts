@@ -39,3 +39,12 @@ export const DRILL_REACH_MM = 1600
  * allows one interval of slack when it checks the action tick counts (#11 amendment 2).
  */
 export const POSE_REPORT_INTERVAL_TICKS = 12
+
+/** The drill head turns to a new facing over about 0.13 s (#7), while the body does not rotate. */
+export const SWIVEL_TICKS = 8
+
+/**
+ * #9 / #11 pose addition: the integer front/side/rear zone test runs only for offsets up to this
+ * many mm (contact range), so every intermediate stays below 2^53.
+ */
+export const ZONE_TEST_MAX_MM = 65535
