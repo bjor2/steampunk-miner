@@ -4,6 +4,7 @@
  * (#49) is read the same way by the sound stage.
  */
 import { selectAudioModel, type AudioModel } from '../systems/audio/audioModel'
+import { drillVoiceOf, type DrillVoice } from '../systems/audio/drillVoice'
 import { musicMomentOf } from '../systems/audio/musicMoment'
 import type { MusicMoment } from '../systems/audio/musicLayers'
 import type { HudModel } from '../systems/views/hudModel'
@@ -69,7 +70,13 @@ function readMusicMoment(): MusicMoment {
 
 /** The music's layer targets, settings and stingers now, as the sound stage plays them (#49). */
 export function readAudioModel(): AudioModel {
-  return selectAudioModel(readMusicMoment(), useGameStore.getState().prefs, readPlayedStingers())
+  const { prefs } = useGameStore.getState()
+  return selectAudioModel(readMusicMoment(), prefs, readPlayedStingers(), readDrillVoice())
+}
+
+/** Whether the drill's nose is in lining now (#41 feel), for the drill loop and the sparks. */
+export function readDrillVoice(): DrillVoice {
+  return drillVoiceOf(readAuthorityState(), useGameStore.getState().playerId)
 }
 
 /** The artefact cache's three cards (#46) as they are drawn while open. */

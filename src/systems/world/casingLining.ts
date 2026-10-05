@@ -16,6 +16,7 @@
  * is never carved. A player grade above 15 lines at 15, the most a sample holds.
  */
 import { CASING_LINING_HALF_WIDTH_MM, DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
+import { cellSampleIndices } from './cellYield'
 import { MAX_SAMPLE_CASING_GRADE } from './chunkDelta'
 import {
   casingGradeOf,
@@ -30,7 +31,8 @@ import {
 import type { PlanetParams } from './planetParams'
 import { ISO_DENSITY, MM_PER_SAMPLE } from './sampleGrid'
 import { FULL_WEIGHT, type WeightedSample } from './stampShape'
-import type { WorldState } from './worldState'
+import { chunkOfTile, type TilePoint } from './tileGrid'
+import { currentCasingOfChunk, currentDensityOfChunk, type WorldState } from './worldState'
 
 /** A ring of lining round `(xMm, yMm)`: inner radius `clearMm`, `widthMm` thick. */
 export interface CasingRing {
@@ -136,4 +138,13 @@ function applyRingStep(
   grade: number,
 ): void {
   if (step !== 'skip') markSampleCasing(session, sample, grade)
+}
+
+/** Whether the cell still holds lining with rock left in it: what the drill would cut as casing. */
+export function isCellLined(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
+  const cx = chunkOfTile(tile.tx)
+  const cy = chunkOfTile(tile.ty)
+  const casing = currentCasingOfChunk(world, cx, cy)
+  const density = currentDensityOfChunk(world, params, cx, cy)
+  return cellSampleIndices(tile).some((index) => casing[index] > 0 && density[index] > 0)
 }

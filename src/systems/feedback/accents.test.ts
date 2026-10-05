@@ -11,6 +11,8 @@ const CUES: FeedbackCue[] = [
   { kind: 'destroyed' },
   { kind: 'coreStinger' },
   { kind: 'travelStinger' },
+  { kind: 'casingHiss' },
+  { kind: 'casingPop' },
 ]
 
 describe('accents', () => {

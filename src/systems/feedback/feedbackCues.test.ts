@@ -46,6 +46,32 @@ describe('feedback cues', () => {
     ])
   })
 
+  it('hisses as a ring lines the wall and pops as the drill clears lining', () => {
+    const placed = (samples: number, relined: number): DomainEvent => ({
+      ...stamp('p1'),
+      type: 'CasingPlaced',
+      samples,
+      relined,
+      grade: 2,
+    })
+    const drilled: DomainEvent = { ...stamp('p1'), type: 'CasingDrilled', samples: 3, grade: 2 }
+    expect(feedbackCuesOf([placed(5, 0), placed(0, 2), drilled], 'p1')).toEqual([
+      { kind: 'casingHiss' },
+      { kind: 'casingPop' },
+    ])
+  })
+
+  it('stays quiet for a ring that lined nothing new', () => {
+    const idle: DomainEvent = {
+      ...stamp('p1'),
+      type: 'CasingPlaced',
+      samples: 0,
+      relined: 0,
+      grade: 2,
+    }
+    expect(feedbackCuesOf([idle], 'p1')).toEqual([])
+  })
+
   it("ignores another player's pickups", () => {
     expect(feedbackCuesOf([cargo(4, 'p2')], 'p1')).toEqual([])
   })

@@ -3,6 +3,7 @@
  * specs check the music without a sound card. The sound stage reads the same model, so what a spec
  * asserts is what plays.
  */
+import type { DrillVoice } from './drillVoice'
 import type { StingerId } from './musicBook'
 import {
   musicBusGainOf,
@@ -21,12 +22,15 @@ export interface AudioModel {
   musicMuted: boolean
   /** The music bus level: the volume, silent when muted, ducked while the artefact choice is open. */
   busGain: number
+  /** `casing` while the drill's nose is in lining (#41 feel: "sfx: casing_drill"), else `rock`. */
+  drillVoice: DrillVoice
 }
 
 export function selectAudioModel(
   moment: MusicMoment,
   settings: MusicSettings,
   stingers: readonly StingerId[],
+  drillVoice: DrillVoice,
 ): AudioModel {
   return {
     layers: musicTargetsOf(moment),
@@ -34,5 +38,6 @@ export function selectAudioModel(
     musicVolume: settings.musicVolume,
     musicMuted: settings.musicMuted,
     busGain: musicBusGainOf(settings, moment.isArtefactChoiceOpen),
+    drillVoice,
   }
 }

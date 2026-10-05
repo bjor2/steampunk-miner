@@ -1,7 +1,8 @@
 /**
  * What the player should see and hear for a batch of authority events (#13 VFX and audio
  * direction): a pickup chime per ore tier, a heavy clank for docking and upgrades, a hit that
- * shakes and flashes, and the stingers for core completion and travel. Presentation only: cues
+ * shakes and flashes, the stingers for core completion and travel, and casing's hydraulic hiss
+ * as a ring is laid and pop as the drill breaks through lining (#41 casing feel). Presentation only: cues
  * are read from the events, never written back, so they cannot touch state or the digest (#33).
  *
  * A batch gives at most one cue of each kind (the highest tier, the hardest hit), so a fast-forward
@@ -17,6 +18,8 @@ export type FeedbackCue =
   | { kind: 'destroyed' }
   | { kind: 'coreStinger' }
   | { kind: 'travelStinger' }
+  | { kind: 'casingHiss' }
+  | { kind: 'casingPop' }
 
 type CueKind = FeedbackCue['kind']
 
@@ -28,6 +31,8 @@ const CUE_ORDER: readonly CueKind[] = [
   'destroyed',
   'coreStinger',
   'travelStinger',
+  'casingHiss',
+  'casingPop',
 ]
 
 /** The local player's cues in a batch, one per kind, in a fixed order. */
@@ -59,6 +64,10 @@ function cueOfEvent(event: DomainEvent): FeedbackCue | null {
       return { kind: 'coreStinger' }
     case 'TravelStarted':
       return { kind: 'travelStinger' }
+    case 'CasingPlaced':
+      return event.samples + event.relined > 0 ? { kind: 'casingHiss' } : null
+    case 'CasingDrilled':
+      return { kind: 'casingPop' }
     default:
       return null
   }

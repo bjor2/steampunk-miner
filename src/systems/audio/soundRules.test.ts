@@ -4,6 +4,7 @@ import {
   chimeFrequencyOf,
   chimeSemitonesOf,
   drillFrequencyOf,
+  drillVoiceFrequencyOf,
   drillGainOf,
   drillLoadOf,
   engineGainOf,
@@ -48,6 +49,12 @@ describe('drill, engine and steam voices', () => {
     const hard = drillLoadOf(2)
     expect(drillFrequencyOf(hard)).toBeLessThan(drillFrequencyOf(soft))
     expect(drillGainOf(true, hard)).toBeGreaterThan(drillGainOf(true, soft))
+  })
+
+  it('sings higher in lining than in rock at the same load, so casing is heard', () => {
+    const load = drillLoadOf(1)
+    expect(drillVoiceFrequencyOf(load, 'rock')).toBe(drillFrequencyOf(load))
+    expect(drillVoiceFrequencyOf(load, 'casing')).toBeGreaterThan(drillFrequencyOf(load))
   })
 
   it('keeps the drill load within 0 to 1 and silent with no tile', () => {

@@ -1,7 +1,7 @@
 /**
  * The synthesised placeholder sounds (#13: "synthesised in the browser audio engine"): three
  * loops (drill, engine chug, steam hiss), the music's step sequencer (#49) and the one-shots
- * (chime, clank, thud, stingers), all from oscillators and one noise buffer. Built once per audio
+ * (chime, clank, thud, stingers, casing's hiss and pop), all from oscillators and one noise buffer. Built once per audio
  * context; the sound loops run from the start and are only ever re-levelled, so a frame never
  * builds a node for them, and a level that has not moved is not rescheduled.
  */
@@ -31,6 +31,8 @@ export function createWebAudioGraph(context: AudioContext): WebAudioGraph {
     playChime: (frequency) => playChime(context, master, frequency),
     playClank: (weight) => playClank(context, master, noise, weight),
     playThud: () => playThud(context, master),
+    playCasingHiss: () => playCasingHiss(context, master, noise),
+    playCasingPop: () => playCasingPop(context, master),
     playStinger: (kind, tuning) => playStinger(context, master, kind, tuning),
     setDrill: (frequency, gain) => levelLoop(context, drill, frequency, gain),
     setEngine: (puffs, gain) => levelLoop(context, engine, puffs, gain),
@@ -142,6 +144,26 @@ function playClank(
 function playThud(context: AudioContext, master: GainNode): void {
   const thud = strike(context, master, { type: 'sine', frequency: 70, gain: 0.5, seconds: 0.3 })
   thud.frequency.exponentialRampToValueAtTime(38, context.currentTime + 0.3)
+}
+
+/** A soft hydraulic hiss as a casing ring is laid (#41 feel): band-passed noise, swelling out. */
+function playCasingHiss(context: AudioContext, master: GainNode, noise: AudioBuffer): void {
+  const start = context.currentTime
+  const swell = gainOf(context, SILENCE, master)
+  swell.gain.setValueAtTime(SILENCE, start)
+  swell.gain.exponentialRampToValueAtTime(0.1, start + 0.1)
+  swell.gain.exponentialRampToValueAtTime(SILENCE, start + 0.4)
+  const filter = new BiquadFilterNode(context, { type: 'bandpass', frequency: 1800, Q: 1.5 })
+  filter.connect(swell)
+  const burst = new AudioBufferSourceNode(context, { buffer: noise })
+  burst.connect(filter)
+  burst.start(start, 0, 0.4)
+}
+
+/** The drill breaking through lining (#41 feel): a short pop that drops in pitch. */
+function playCasingPop(context: AudioContext, master: GainNode): void {
+  const pop = strike(context, master, { type: 'sine', frequency: 520, gain: 0.2, seconds: 0.1 })
+  pop.frequency.exponentialRampToValueAtTime(160, context.currentTime + 0.1)
 }
 
 /** Core: a rising brass arpeggio. Travel: a long falling glide, the platform lifting off. */

@@ -78,11 +78,13 @@ file turns it on, so scenario and bot runs never see hints.
 offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEnemies(frozen)` and the
   unlogged read `enemyStatsTable(kind)`; for the ground (#36), `carveCircle(x, y, radius, amount?)` and
   `fillCircle(x, y, radius, amount?)` (mm, amount 0 to 255; a carve credits no ore); for casing (#41),
-  `setCasingGrade(grade)` and `lineCasing(x, y, grade)` (one ring round a point of the tunnel axis, in mm). Specs that mine deep (where crawlers live) freeze enemies first
+  `setCasingGrade(grade)` and `lineCasing(x, y, grade)` (one ring round a point of the tunnel axis, in mm,
+  marking the rock beside air as lining; the vehicle lays the same rings by itself while it drills). Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
   `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getBayPresentation()`, `ui.getAudioModel()`) reads the
-  screens' view models, the bay screen's shutter, text size and preview framing (#45, #44), the music's layer targets, settings and stinger sequence (#49), and
+  screens' view models, the bay screen's shutter, text size and preview framing (#45, #44), the music's layer targets, settings and stinger sequence (#49) and
+  the drill voice (`drillVoice`: `casing` while the drill's nose is in lining, #41), and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
   #33). The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
   `input.setBindings(overrides)`) presses actions at the action layer, so a tap submits ordinary

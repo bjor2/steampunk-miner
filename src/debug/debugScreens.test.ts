@@ -3,6 +3,7 @@ import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { ALL_RUN_EVENT_NAMES } from '../logging/eventNames'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
+import { readAuthorityState } from '../store/authorityLink'
 import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
 import { resetInput } from '../store/inputRuntime'
 import { cameraPresence } from '../scene/cameraPresence'
@@ -269,6 +270,20 @@ function audioModel() {
   if (!result.ok) throw new Error(result.problems.join('; '))
   return result.model
 }
+
+describe('debug api: the audio model reads the drill voice (#41)', () => {
+  it('sings the casing drill voice with lining at the drill nose, the rock voice without (#41)', () => {
+    const debug = createDebugApi()
+    debug.teleportToDepthTiles(8)
+    expect(audioModel().drillVoice).toBe('rock')
+    const pose = readAuthorityState().players[useGameStore.getState().playerId].vehicle.pose
+    if (pose === null) throw new Error('the vehicle has no pose')
+    debug.fillCircle(pose.x + 2000, pose.y, 1500)
+    expect(audioModel().drillVoice).toBe('rock')
+    debug.lineCasing(pose.x, pose.y, 2)
+    expect(audioModel().drillVoice).toBe('casing')
+  })
+})
 
 describe('debug api: the audio model reads the music from the session (#49)', () => {
   it('plays only the platform layer docked at the hub', () => {

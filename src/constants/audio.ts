@@ -16,6 +16,8 @@ export const DRILL_LOADED_HZ = 90
 export const DRILL_HALF_LOAD_SECONDS = 1
 export const DRILL_GAIN_MIN = 0.1
 export const DRILL_GAIN_MAX = 0.22
+/** Cutting lining the motor sings this much higher, a fifth up, so casing is heard (#41 feel). */
+export const CASING_DRILL_PITCH_RATIO = 1.5
 
 /** The engine chug: puffs per second rise with speed up to `ENGINE_TOP_SPEED` m/s. */
 export const ENGINE_IDLE_PUFFS = 2

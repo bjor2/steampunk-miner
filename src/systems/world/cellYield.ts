@@ -75,7 +75,7 @@ export function cellDensitySum(world: WorldState, params: PlanetParams, tile: Ti
 }
 
 /** Chunk-local indices of a cell's 16 samples. */
-function cellSampleIndices(tile: TilePoint): number[] {
+export function cellSampleIndices(tile: TilePoint): number[] {
   const indices: number[] = []
   for (let qy = 0; qy < SAMPLES_PER_TILE; qy++) {
     for (let qx = 0; qx < SAMPLES_PER_TILE; qx++) {

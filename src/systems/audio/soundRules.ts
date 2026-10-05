@@ -1,11 +1,12 @@
 /**
  * The parametric sound effects (#13 "Audio direction"): pure functions from what the game is doing
  * to what each voice plays, so the sound stage only plays them. Plain numbers out, because the
- * stage asks every frame. The pickup chime climbs a musical
- * scale with the resource tier, so rising value is audible; the drill strains lower and louder as
- * the tile takes longer; the engine chugs faster with speed; the lift hisses.
+ * stage asks every frame. The pickup chime climbs a musical scale with the resource tier, so
+ * rising value is audible; the drill strains lower and louder as the tile takes longer, and sings
+ * higher in lining; the engine chugs faster with speed; the lift hisses.
  */
 import {
+  CASING_DRILL_PITCH_RATIO,
   CHIME_BASE_HZ,
   CHIME_MAX_OCTAVES,
   DRILL_FREE_HZ,
@@ -22,6 +23,7 @@ import {
 } from '../../constants/audio'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { TileTime } from '../views/tileTime'
+import type { DrillVoice } from './drillVoice'
 
 /** Semitones of the major scale's seven degrees above the tonic. */
 const MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11]
@@ -57,6 +59,12 @@ export function drillLoadOf(secondsPerTile: number | null): number {
 /** The motor sings high on soft rock and strains lower as the load rises. */
 export function drillFrequencyOf(load: number): number {
   return DRILL_FREE_HZ + (DRILL_LOADED_HZ - DRILL_FREE_HZ) * load
+}
+
+/** Lining sings higher than rock at the same load (#41 casing feel). */
+export function drillVoiceFrequencyOf(load: number, voice: DrillVoice): number {
+  const pitch = voice === 'casing' ? CASING_DRILL_PITCH_RATIO : 1
+  return drillFrequencyOf(load) * pitch
 }
 
 /** Silent unless the drill bites; louder under load. */

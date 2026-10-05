@@ -171,6 +171,22 @@ export const SPARK_SPEED = 4
 export const SPARK_SPREAD_RADIANS = 1.1
 export const SPARK_SIZE_PIXELS = 3
 export const SPARK_COLOUR = '#ffb347'
+/** Cutting lining the spray is denser and paler, so casing is seen as well as heard (#41 feel). */
+export const CASING_SPARK_COLOUR = '#dff6ff'
+export const CASING_SPARKS_PER_SECOND = 120
+/**
+ * The cement spray as a casing ring is laid (#41 feel): a grey puff all round the ring's place,
+ * `CEMENT_SPRAY_BEHIND_M` behind the body (the ring lags the stamp by 2.15 m, the stamp leads the
+ * body by 0.5 m). Placeholders, tuned by eye.
+ */
+export const CEMENT_CAPACITY = 96
+export const CEMENT_PUFF_COUNT = 24
+export const CEMENT_SPRAY_BEHIND_M = 1.65
+export const CEMENT_SPEED = 1.6
+export const CEMENT_LIFE_SECONDS = 0.45
+export const CEMENT_SIZE_PIXELS = 4
+export const CEMENT_COLOUR = '#b9b2a4'
+export const CEMENT_SEED = 0xce77
 /** Fixed seed for the spark spray: presentation only, never part of the world. */
 export const SPARK_SEED = 0x5a7c
 

@@ -17,6 +17,10 @@ export interface SoundOut {
   playChime(frequency: number): void
   playClank(weight: ClankWeight): void
   playThud(): void
+  /** A casing ring laid behind the drill (#41 feel). */
+  playCasingHiss(): void
+  /** The drill broke through lining (#41 feel). */
+  playCasingPop(): void
   playStinger(kind: StingerKind, tuningSemitones: number): void
   setDrill(frequency: number, gain: number): void
   setEngine(puffsPerSecond: number, gain: number): void
@@ -42,6 +46,8 @@ const SOUND_OUT: SoundOut = {
   playChime: (frequency) => graph?.playChime(frequency),
   playClank: (weight) => graph?.playClank(weight),
   playThud: () => graph?.playThud(),
+  playCasingHiss: () => graph?.playCasingHiss(),
+  playCasingPop: () => graph?.playCasingPop(),
   playStinger: (kind, tuning) => graph?.playStinger(kind, tuning),
   setDrill: (frequency, gain) => graph?.setDrill(frequency, gain),
   setEngine: (puffs, gain) => graph?.setEngine(puffs, gain),

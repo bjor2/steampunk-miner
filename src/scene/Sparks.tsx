@@ -1,5 +1,6 @@
 /**
- * Drill sparks (#13 VFX): while the drill bites, sparks spray back from the tile at its nose.
+ * Drill sparks (#13 VFX): while the drill bites, sparks spray back from the tile at its nose,
+ * denser and paler while it cuts lining (#41 casing feel).
  * One fixed pool drawn as points; stepping, emitting and uploading never allocate. Presentation
  * only, so the spray steps on the render delta with its own fixed seed.
  */
@@ -7,6 +8,9 @@ import { useFrame } from '@react-three/fiber'
 import { useMemo } from 'react'
 import { AdditiveBlending, BufferAttribute, BufferGeometry, PointsMaterial } from 'three'
 import {
+  CASING_SPARK_COLOUR,
+  CASING_SPARKS_PER_SECOND,
+  SCREEN_REFRESH_MS,
   SPARK_CAPACITY,
   SPARK_COLOUR,
   SPARK_LIFE_SECONDS,
@@ -16,6 +20,8 @@ import {
   SPARK_SPREAD_RADIANS,
   SPARKS_PER_SECOND,
 } from '../constants/scene'
+import { readDrillVoice } from '../store/screenReads'
+import type { DrillVoice } from '../systems/audio/drillVoice'
 import { writeHeadlampDirection } from '../systems/render/headlamp'
 import {
   createParticlePool,
@@ -43,14 +49,37 @@ export function Sparks() {
   const geometry = useMemo(createSparkGeometry, [])
   const material = useMemo(createSparkMaterial, [])
 
+  const voice = useMemo<VoiceRead>(() => ({ voice: 'rock', sinceRead: VOICE_REFRESH_SECONDS }), [])
+
   useFrame((_, delta) => {
     stepParticles(pool, delta)
+    refreshVoice(voice, material, delta)
     if (drillPresence.isDrilling)
-      sprayFromNose(pool, random, spray, particlesDue(carry, SPARKS_PER_SECOND, delta))
+      sprayFromNose(pool, random, spray, particlesDue(carry, sparkRateOf(voice.voice), delta))
     uploadPositions(pool, geometry)
   })
 
   return <points geometry={geometry} material={material} frustumCulled={false} />
+}
+
+/** The drill's voice is re-read as often as the HUD re-reads, not every frame. */
+const VOICE_REFRESH_SECONDS = SCREEN_REFRESH_MS / 1000
+
+interface VoiceRead {
+  voice: DrillVoice
+  sinceRead: number
+}
+
+function refreshVoice(read: VoiceRead, material: PointsMaterial, dt: number): void {
+  read.sinceRead += dt
+  if (read.sinceRead < VOICE_REFRESH_SECONDS) return
+  read.sinceRead = 0
+  read.voice = readDrillVoice()
+  material.color.set(read.voice === 'casing' ? CASING_SPARK_COLOUR : SPARK_COLOUR)
+}
+
+function sparkRateOf(voice: DrillVoice): number {
+  return voice === 'casing' ? CASING_SPARKS_PER_SECOND : SPARKS_PER_SECOND
 }
 
 function createSprayScratch(): Spray {

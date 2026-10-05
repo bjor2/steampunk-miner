@@ -7,6 +7,7 @@ import { Canvas } from '@react-three/fiber'
 import { CAMERA_POSITION } from '../constants/scene'
 import { PhysicsWorld } from '../physics/PhysicsWorld'
 import { useGameStore } from '../store/gameStore'
+import { CementSpray } from './CementSpray'
 import { EnemyFigures } from './EnemyFigures'
 import { LightRig } from './LightRig'
 import { PerfSampler } from './PerfSampler'
@@ -43,6 +44,7 @@ export function GameScene() {
         <Vehicle />
       </PhysicsWorld>
       <Sparks />
+      <CementSpray />
       <SoundStage />
       <PerfSampler />
       <RenderPipeline />

@@ -1,6 +1,7 @@
 /**
  * The game's sound (#13 audio direction): one-shots for each feedback cue (the pickup chime by
- * tier, the dock and upgrade clanks, a hit's thud, the core and travel stingers), the music
+ * tier, the dock and upgrade clanks, a hit's thud, the core and travel stingers, casing's hiss and
+ * pop), the music
  * stingers (#49) and, every frame, the drill, engine and steam loops and the crossfaded music
  * layers. What each voice plays comes from the pure rules in `systems/audio` and the audio view
  * model; this only hands it to the shell's sound output. Presentation only: it never writes the
@@ -13,7 +14,8 @@ import { getSoundOut, type SoundOut } from '../shell/soundOut'
 import { listenForFeedback } from '../store/feedbackBroadcast'
 import { useGameStore } from '../store/gameStore'
 import { listenForStingers } from '../store/musicStingerRecord'
-import { readAudioModel, readHudModel } from '../store/screenReads'
+import { readAudioModel, readDrillVoice, readHudModel } from '../store/screenReads'
+import type { DrillVoice } from '../systems/audio/drillVoice'
 import {
   easeLayers,
   planetTuningOf,
@@ -22,7 +24,7 @@ import {
 } from '../systems/audio/musicLayers'
 import {
   chimeFrequencyOf,
-  drillFrequencyOf,
+  drillVoiceFrequencyOf,
   drillGainOf,
   drillLoadOf,
   engineGainOf,
@@ -39,6 +41,7 @@ const LOAD_REFRESH_SECONDS = SCREEN_REFRESH_MS / 1000
 
 interface DrillLoad {
   load: number
+  voice: DrillVoice
   sinceRead: number
 }
 
@@ -62,7 +65,10 @@ function createMusicMix(): MusicMix {
 export function SoundStage() {
   const sound = useMemo(getSoundOut, [])
   const music = useMemo(createMusicMix, [])
-  const drill = useMemo<DrillLoad>(() => ({ load: 0, sinceRead: LOAD_REFRESH_SECONDS }), [])
+  const drill = useMemo<DrillLoad>(
+    () => ({ load: 0, voice: 'rock', sinceRead: LOAD_REFRESH_SECONDS }),
+    [],
+  )
   useEffect(() => listenForFeedback((cue) => playCue(sound, cue)), [sound])
   useEffect(
     () => listenForStingers((stingerId) => sound.playMusicStinger(stingerId, planetTuning())),
@@ -70,7 +76,7 @@ export function SoundStage() {
   )
   useFrame((_, delta) => {
     refreshDrillLoad(drill, delta)
-    playLoops(sound, drill.load)
+    playLoops(sound, drill)
     playMusic(sound, music, delta)
   })
   return null
@@ -87,6 +93,8 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   destroyed: (sound) => sound.playThud(),
   coreStinger: (sound, _cue, tuning) => sound.playStinger('core', tuning),
   travelStinger: (sound, _cue, tuning) => sound.playStinger('travel', tuning),
+  casingHiss: (sound) => sound.playCasingHiss(),
+  casingPop: (sound) => sound.playCasingPop(),
 }
 
 function playCue(sound: SoundOut, cue: FeedbackCue): void {
@@ -102,11 +110,15 @@ function refreshDrillLoad(drill: DrillLoad, dt: number): void {
   if (drill.sinceRead < LOAD_REFRESH_SECONDS) return
   drill.sinceRead = 0
   drill.load = drillLoadOf(secondsPerTileOf(readHudModel().tileTime))
+  drill.voice = readDrillVoice()
 }
 
-function playLoops(sound: SoundOut, drillLoad: number): void {
+function playLoops(sound: SoundOut, drill: DrillLoad): void {
   const speed = motionPresence.speedMetresPerSecond
-  sound.setDrill(drillFrequencyOf(drillLoad), drillGainOf(drillPresence.isDrilling, drillLoad))
+  sound.setDrill(
+    drillVoiceFrequencyOf(drill.load, drill.voice),
+    drillGainOf(drillPresence.isDrilling, drill.load),
+  )
   sound.setEngine(enginePuffsOf(speed), engineGainOf(speed))
   sound.setSteam(steamGainOf(motionPresence.isLifting))
 }
