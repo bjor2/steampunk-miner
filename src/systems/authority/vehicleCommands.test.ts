@@ -6,7 +6,7 @@ import { drillDamage } from '../vehicle/drillRule'
 import { FACING } from '../vehicle/vehiclePose'
 import { cargoUnitsOf } from '../vehicle/vehicleState'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
-import { cellDensitySum } from '../world/groundEdit'
+import { cellDensitySum } from '../world/cellYield'
 import { cellAt, EMPTY_WORLD } from '../world/worldState'
 import type { DomainEvent } from './domainEvent'
 import {

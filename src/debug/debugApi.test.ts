@@ -13,7 +13,7 @@ import {
   useGameStore,
 } from '../store/gameStore'
 import { placeholderSidecarOf } from '../systems/art/artCatalogue'
-import { cellDensitySum } from '../systems/world/groundEdit'
+import { cellDensitySum } from '../systems/world/cellYield'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { fromCanonical } from '../systems/money'
 import { parseScenario, type Scenario } from '../systems/scenario'

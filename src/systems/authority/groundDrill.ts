@@ -29,8 +29,8 @@ import {
   type CarveWindow,
   type CellDrillTicks,
   type GroundChange,
-  type YieldedCell,
 } from '../world/groundEdit'
+import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'

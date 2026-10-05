@@ -25,7 +25,7 @@ import {
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { isRemovableCell } from '../world/worldCell'
-import { cellDensitySum } from '../world/groundEdit'
+import { cellDensitySum } from '../world/cellYield'
 import type { PlanetParams } from '../world/planetParams'
 import { materialCellAt, type WorldState } from '../world/worldState'
 import type { AuthorityCommand, CommandPayloads } from './authorityCommand'

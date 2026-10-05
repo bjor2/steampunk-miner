@@ -1,14 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { cellDensitySum } from './cellYield'
 import { generateChunk } from './generateChunk'
 import { contourSegmentsOf } from './groundContour'
-import {
-  carveCell,
-  carveDisc,
-  cellDensitySum,
-  clearDisc,
-  fillDisc,
-  type CellDrillTicks,
-} from './groundEdit'
+import { carveCell, carveDisc, clearDisc, fillDisc, type CellDrillTicks } from './groundEdit'
 import { planetParamsFor } from './planetParams'
 import {
   CHUNK_SAMPLES,

@@ -7,13 +7,14 @@
  *   never below the sample's floor (0 except under a level cut). Over any `n` consecutive ticks at full weight that is exactly 255,
  *   so a cell clears in its #7 drill time whatever the stamp's path (hard rock carves slower inside
  *   the same stamp), and replaying the same ticks removes the same bytes on every machine.
- * - A material cell yields once, at the moment the sum of its 16 samples falls to half or below;
- *   its yield bit enforces "once".
+ * - A material cell yields once, at the moment the sum of its 16 samples falls to half or below
+ *   (`cellYield`).
  *
  * The dock pad never carves. Every change is reported per chunk with its dirty rectangle in
  * chunk-local samples, the shape of `GroundChanged`.
  */
-import { isCellYielded, withCellsYielded, withDensity } from './chunkDelta'
+import { cellsNowYielding, withYieldedCells, type YieldedCell } from './cellYield'
+import { withDensity } from './chunkDelta'
 import {
   FULL_WEIGHT,
   cellSamplesOf,
@@ -24,15 +25,14 @@ import {
 import type { PlanetParams } from './planetParams'
 import {
   CHUNK_SAMPLE_SIDE,
-  SAMPLES_PER_CELL,
   SAMPLES_PER_TILE,
   SOLID_DENSITY,
   chunkOfSample,
   localSampleOf,
   sampleIndexOf,
 } from './sampleGrid'
-import { cellIndexOfTile, chunkKey, chunkOfTile, type TilePoint } from './tileGrid'
-import { CELL_KIND, isRemovableCell, kindOfCell } from './worldCell'
+import { chunkKey, type TilePoint } from './tileGrid'
+import { CELL_KIND, kindOfCell } from './worldCell'
 import {
   currentDensityOfChunk,
   deltaOfChunk,
@@ -62,12 +62,6 @@ export interface GroundChange {
   y1: number
 }
 
-export interface YieldedCell {
-  tile: TilePoint
-  /** The material the cell was made of when it yielded. */
-  cell: number
-}
-
 export interface GroundEdit {
   world: WorldState
   changes: GroundChange[]
@@ -78,8 +72,6 @@ export interface Carve extends GroundEdit {
   /** The ticks in which the stamp still removed something: the drill's charged ticks. */
   ticksUsed: number
 }
-
-const YIELD_SUM = (SAMPLES_PER_CELL * SOLID_DENSITY) >> 1
 
 interface EditChunk {
   cx: number
@@ -306,62 +298,6 @@ function writeChunkDensity(params: PlanetParams) {
     rememberDensity(delta, density)
     return withChunkDelta(world, cx, cy, delta)
   }
-}
-
-/** Touched, removable, not yet yielded cells whose 16 samples now sum to half or less. */
-function cellsNowYielding(
-  world: WorldState,
-  params: PlanetParams,
-  tiles: readonly TilePoint[],
-): YieldedCell[] {
-  const yielded: YieldedCell[] = []
-  for (const tile of [...tiles].sort((a, b) => a.ty - b.ty || a.tx - b.tx)) {
-    const cell = materialCellAt(world, params, tile)
-    if (isRemovableCell(cell) && isAtYield(world, params, tile)) yielded.push({ tile, cell })
-  }
-  return yielded
-}
-
-function isAtYield(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
-  const delta = deltaOfChunk(world, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
-  if (isCellYielded(delta, cellIndexOfTile(tile.tx, tile.ty))) return false
-  return cellDensitySum(world, params, tile) <= YIELD_SUM
-}
-
-/** The sum of a cell's 16 density samples, the quantity the yield rule watches. */
-export function cellDensitySum(world: WorldState, params: PlanetParams, tile: TilePoint): number {
-  const cx = chunkOfTile(tile.tx)
-  const cy = chunkOfTile(tile.ty)
-  const density = currentDensityOfChunk(world, params, cx, cy)
-  let sum = 0
-  for (let qy = 0; qy < SAMPLES_PER_TILE; qy++) {
-    for (let qx = 0; qx < SAMPLES_PER_TILE; qx++) {
-      sum +=
-        density[
-          sampleIndexOf(
-            localSampleOf(tile.tx * SAMPLES_PER_TILE + qx),
-            localSampleOf(tile.ty * SAMPLES_PER_TILE + qy),
-          )
-        ]
-    }
-  }
-  return sum
-}
-
-/** Yield bits change no density, so each new delta keeps the density its chunk already has. */
-function withYieldedCells(
-  world: WorldState,
-  params: PlanetParams,
-  yielded: readonly YieldedCell[],
-): WorldState {
-  return yielded.reduce((current, { tile }) => {
-    const cx = chunkOfTile(tile.tx)
-    const cy = chunkOfTile(tile.ty)
-    const index = cellIndexOfTile(tile.tx, tile.ty)
-    const delta = withCellsYielded(deltaOfChunk(current, cx, cy), [index])
-    rememberDensity(delta, currentDensityOfChunk(current, params, cx, cy))
-    return withChunkDelta(current, cx, cy, delta)
-  }, world)
 }
 
 function tileOfSample(sample: WeightedSample): TilePoint {
