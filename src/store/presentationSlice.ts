@@ -1,6 +1,7 @@
 /**
  * The game store's presentation slice (#33): local settings and rebinding, which layer is open
- * (the artefact cache's cards too, #46), menu focus and the travel confirmation. None of it is authority state, a command, a log line or
+ * (the artefact cache's cards too, #46), menu focus, the travel confirmation and the Upgrade bay
+ * preview's install animation (#44). None of it is authority state, a command, a log line or
  * part of the digest; buttons that change the world submit ordinary authority commands.
  *
  * Kept beside the store so the store stays one reason to change; `gameStore` spreads it in, so
@@ -18,6 +19,7 @@ import {
 import type { CommandIntent } from '../systems/authority/authorityCommand'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { isChoiceOpenAfter } from '../systems/views/artefactChoiceModel'
+import type { UpgradeId } from '../systems/economy/economyDefinition'
 import { topLayerOf } from '../systems/input/inputRouting'
 import {
   DEFAULT_PREFERENCES,
@@ -37,6 +39,7 @@ import {
   type ZoomChange,
 } from '../systems/render/viewZoom'
 import { renderScalePinProblems } from '../systems/render/renderScale'
+import { partToInstallOf } from '../systems/views/bayPresentation'
 import { focusOnScreen, stepFocus } from '../systems/views/menuFocus'
 import type { ButtonAction, ScreenButton } from '../systems/views/viewParts'
 import { refuseProblems, submitCommand } from './authorityLink'
@@ -63,6 +66,8 @@ export interface PresentationValues {
   rebindingActionId: ActionId | null
   /** A render scale held by the debug API (#38 "a toggle can pin it"); null adapts to the GPU. */
   renderScalePin: number | null
+  /** The track whose part the Upgrade bay preview bolts on after a purchase (#44); null when none. */
+  installingUpgradeId: UpgradeId | null
 }
 
 export interface PresentationActions {
@@ -99,6 +104,10 @@ export interface PresentationActions {
   pressScreenButton(buttonId: string): boolean
   /** A player command from a key or a button; it ends any armed travel. */
   submitPlayerIntent(intent: CommandIntent): void
+  /** Starts the preview's install animation for a purchase in these events (none with reduce motion). */
+  startPartInstall(events: readonly DomainEvent[]): void
+  /** The preview calls this once the install animation has run its 0.4 s. */
+  endPartInstall(): void
 }
 
 type SliceHost = PresentationValues &
@@ -117,6 +126,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
   isTravelArmed: false,
   rebindingActionId: null,
   renderScalePin: null,
+  installingUpgradeId: null,
 }
 
 export function inputLayerOf(state: SliceHost): InputContext {
@@ -191,6 +201,11 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       set({ isTravelArmed: false })
       submitCommand(get().playerId, intent)
     },
+    startPartInstall: (events) => {
+      const upgradeId = partToInstallOf(events, get().playerId, !get().prefs.shake)
+      if (upgradeId !== null) set({ installingUpgradeId: upgradeId })
+    },
+    endPartInstall: () => set({ installingUpgradeId: null }),
   }
 }
 

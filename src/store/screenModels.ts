@@ -5,6 +5,7 @@
  * the same functions, so what a spec asserts is what the screen draws. Read on demand, never
  * stored per tick.
  */
+import type { UpgradeId } from '../systems/economy/economyDefinition'
 import type { ActionId, Bindings, InputContext } from '../systems/input/actionMap'
 import type { Preferences } from '../systems/input/preferences'
 import { selectHudModel, type HudModel } from '../systems/views/hudModel'
@@ -52,6 +53,7 @@ export interface ScreenSources {
   rebindingActionId: ActionId | null
   isTravelArmed: boolean
   focusedControlId: string | null
+  installingUpgradeId: UpgradeId | null
   hintBoard: HintBoard
   transmissionBoard: TransmissionBoard
   arePlaquesAllowed: boolean
@@ -96,6 +98,7 @@ function bayUiStateOf(sources: ScreenSources): BayUiState {
     isTravelArmed: sources.isTravelArmed,
     isQuickServiceHighlighted: isQuickServiceHighlighted(plaqueSourcesOf(sources)),
     focusedId: sources.focusedControlId,
+    installingUpgradeId: sources.installingUpgradeId,
   }
 }
 

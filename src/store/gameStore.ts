@@ -355,7 +355,7 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
- * transition when the events travelled, shows the hints, feedback and stingers they trigger, logs the
+ * transition when the events travelled, shows the hints, feedback, part installs and stingers they trigger, logs the
  * events, then writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
@@ -364,6 +364,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.getState().observePlaques(events)
   useGameStore.getState().followArtefactChoice(events)
   announceFeedback(events, useGameStore.getState().playerId)
+  useGameStore.getState().startPartInstall(events)
   recordMusicStingers(events, useGameStore.getState().playerId)
   recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)
   writeCheckpointAfter(events, runEventPlaceOf(useGameStore.getState()))

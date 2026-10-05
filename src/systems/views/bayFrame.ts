@@ -16,7 +16,8 @@ import { travelRefusal } from '../authority/travelRules'
 import { travelFee } from '../economy/planetCharges'
 import { travelCommand, undockCommand } from '../platform/platformCommands'
 import type { BayId } from '../world/dockBays'
-import { BAY_NAMES } from './bayNames'
+import type { UpgradeId } from '../economy/economyDefinition'
+import { BAY_ACCENTS, BAY_NAMES, type BayAccent } from './bayNames'
 import type { GaugeReading } from './hudModel'
 import type { FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
@@ -35,11 +36,15 @@ export interface BayUiState {
   isQuickServiceHighlighted: boolean
   /** The control with menu focus; the Upgrade bay's preview follows it. */
   focusedId: string | null
+  /** The track whose part the Upgrade bay preview is installing after a purchase (#44). */
+  installingUpgradeId: UpgradeId | null
 }
 
 export interface BayHeader {
   bay: BayId
   bayName: string
+  /** The bay's accent and motif over the shared chrome (#45): copper scale or teal gear. */
+  accent: BayAccent
   money: AmountReading
   planet: number
   /** The bay against `coreNeeded` (#8, #33): "17 / 63" and a brass dial. */
@@ -77,6 +82,7 @@ export function bayHeaderOf(state: AuthorityState, playerId: string, bay: BayId)
   return {
     bay,
     bayName: BAY_NAMES[bay],
+    accent: BAY_ACCENTS[bay],
     money: amountReading(state.players[playerId].wallet),
     planet: state.planet.index,
     coreBay: coreBayGaugeOf(state.platform.coreBay, needed),

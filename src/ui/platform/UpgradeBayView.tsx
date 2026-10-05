@@ -2,7 +2,8 @@
  * The Upgrade bay screen (#37): the tracks, the Casing row and repair, the live vehicle preview,
  * and the quick action's sign pointing back at the Sell bay. Markup only.
  */
-import type { UpgradeBayModel, UpgradePreview } from '../../systems/views/upgradeBayModel'
+import type { UpgradeBayModel } from '../../systems/views/upgradeBayModel'
+import type { UpgradePreview } from '../../systems/views/upgradePreview'
 import { UI_IDS } from '../ids'
 import { Panel } from '../kit/Panel'
 import { ScreenButtonView } from '../ScreenButtonView'

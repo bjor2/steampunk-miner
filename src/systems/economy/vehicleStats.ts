@@ -119,6 +119,24 @@ export function visualTier(levels: UpgradeLevels): number {
   return Math.max(...reached.map((threshold) => threshold.tier))
 }
 
+/**
+ * The brass gauge under the Upgrade bay preview (#44): the levels owned since the current visual
+ * tier and the levels that tier spans to the next; `span` is null at the last tier, which has no
+ * next shape.
+ */
+export interface VisualTierGauge {
+  owned: number
+  span: number | null
+}
+
+export function visualTierGaugeOf(levels: UpgradeLevels): VisualTierGauge {
+  const total = totalUpgradeLevel(levels)
+  const tier = visualTier(levels)
+  const from = ECONOMY.visualTiers.find((threshold) => threshold.tier === tier)?.minTotalLevel ?? 0
+  const next = ECONOMY.visualTiers.find((threshold) => threshold.tier === tier + 1)
+  return { owned: total - from, span: next === undefined ? null : next.minTotalLevel - from }
+}
+
 function levelsOf(levelFor: (upgradeId: UpgradeId) => number): UpgradeLevels {
   const entries = UPGRADE_IDS.map((upgradeId) => [upgradeId, levelFor(upgradeId)] as const)
   return Object.fromEntries(entries) as Record<UpgradeId, number>

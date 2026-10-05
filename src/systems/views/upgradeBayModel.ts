@@ -5,10 +5,8 @@
  * next cost and Buy; then Repair with its cost; and the live preview hook, under the shared header
  * and footer.
  *
- * The preview is presentation only (#37): with a track's row focused it highlights that track and
- * shows the visual tier the purchase would give; the Casing row, like any other control, leaves
- * the preview on the vehicle as it is, because casing is not a hull part. Focus is UI state, so
- * moving it never touches the authority or the digest.
+ * The preview is presentation only (#37, `upgradePreview`): focus and the install animation are UI
+ * state, so moving focus never touches the authority or the digest.
  *
  * The quick action belongs to the Sell bay; here it is a disabled sign carrying `wrong_bay`
  * (#40), never a focus stop.
@@ -17,8 +15,7 @@ import { CASING_ICON_ID } from '../art/artIds'
 import type { AuthorityState } from '../authority/authorityState'
 import { nextCasingPrice } from '../authority/casingRules'
 import { repairCostOf } from '../authority/platformServices'
-import type { UpgradeId } from '../economy/economyDefinition'
-import { visualTier, type UpgradeLevels } from '../economy/vehicleStats'
+import { visualTier } from '../economy/vehicleStats'
 import {
   buyCasingGradeCommand,
   quickServiceCommand,
@@ -37,6 +34,7 @@ import {
 } from './bayFrame'
 import { focusOnScreen, type FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
+import { upgradePreviewOf, type UpgradePreview } from './upgradePreview'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, workshopRowsOf, type BuyState, type WorkshopRow } from './workshopRows'
 
@@ -57,14 +55,6 @@ export interface RepairReading {
   hullText: string
   button: ScreenButton
   cost: AmountReading
-}
-
-/** What the live vehicle preview shows for the focused row (#37). */
-export interface UpgradePreview {
-  /** The track the focused row would raise; null for the Casing row and every other control. */
-  highlight: UpgradeId | null
-  /** The visual tier after the focused track's purchase; the current tier otherwise. */
-  visualTier: number
 }
 
 export interface UpgradeBayModel {
@@ -101,7 +91,13 @@ export function selectUpgradeBayModel(
     casing,
     repair,
     visualTier: visualTier(levels),
-    preview: previewOf(levels, tracks, focusOnScreen(focusStops, ui.focusedId, focusStops[0].id)),
+    preview: upgradePreviewOf(levels, {
+      focusedId: focusOnScreen(focusStops, ui.focusedId, focusStops[0].id),
+      tracks,
+      casingBuyId: casing.buy.id,
+      casingGradeAfter: casing.gradeAfter,
+      installing: ui.installingUpgradeId,
+    }),
     quickService,
     footer,
     focusStops,
@@ -152,17 +148,6 @@ function wrongBayQuickServiceOf(state: AuthorityState, playerId: string): Screen
     'Sell, repair and recharge: at the Sell bay',
     quickServiceCommand(),
   )
-}
-
-function previewOf(
-  levels: UpgradeLevels,
-  tracks: readonly WorkshopRow[],
-  focusedId: string,
-): UpgradePreview {
-  const focused = tracks.find((row) => row.buy.id === focusedId)
-  if (focused === undefined) return { highlight: null, visualTier: visualTier(levels) }
-  const after = { ...levels, [focused.upgradeId]: levels[focused.upgradeId] + 1 }
-  return { highlight: focused.upgradeId, visualTier: visualTier(after) }
 }
 
 function focusedButtonsOf(

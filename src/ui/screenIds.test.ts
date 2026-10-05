@@ -355,6 +355,7 @@ describe('screen ids (#33 acceptance 12)', () => {
       isTravelArmed: false,
       isQuickServiceHighlighted: false,
       focusedId: null,
+      installingUpgradeId: null,
     })
     const html = renderToString(createElement(SellBayView, { model, focusedId: '' }))
     const rows = [...html.matchAll(/data-testid="shop-row-\d+"[^>]*/g)]

@@ -23,6 +23,7 @@ function sellBayOf(session: Session, isTravelArmed = false) {
     isTravelArmed,
     isQuickServiceHighlighted: false,
     focusedId: null,
+    installingUpgradeId: null,
   })
 }
 

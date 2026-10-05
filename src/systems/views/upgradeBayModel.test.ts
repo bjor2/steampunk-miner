@@ -24,6 +24,7 @@ function upgradeBayOf(session: Session, focusedId: string | null = null) {
     isTravelArmed: false,
     isQuickServiceHighlighted: false,
     focusedId,
+    installingUpgradeId: null,
   })
 }
 
@@ -142,7 +143,7 @@ describe('upgrade bay model', () => {
   it('previews the focused track and the visual tier its purchase crosses into', () => {
     const session = atUpgradeBay()
     session.submit(3, setUpgradeCommand('boiler', 7))
-    expect(upgradeBayOf(session, buyIdOf('engine')).preview).toEqual({
+    expect(upgradeBayOf(session, buyIdOf('engine')).preview).toMatchObject({
       highlight: 'engine',
       visualTier: 2,
     })
@@ -152,7 +153,7 @@ describe('upgrade bay model', () => {
   it('keeps the visual tier unchanged with the Casing row focused: casing is not a hull part', () => {
     const session = atUpgradeBay('1e6')
     session.submit(3, setUpgradeCommand('boiler', 7))
-    expect(upgradeBayOf(session, UI_IDS.upgradebayCasingBuy).preview).toEqual({
+    expect(upgradeBayOf(session, UI_IDS.upgradebayCasingBuy).preview).toMatchObject({
       highlight: null,
       visualTier: 1,
     })
