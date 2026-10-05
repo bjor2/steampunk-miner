@@ -58,7 +58,7 @@ describe('the artefact cache from the keyboard (#46)', () => {
   it('shows the cache prompt only while interact would open the cache', () => {
     expect(readHudModel().cachePrompt.isShown).toBe(false)
     driveOntoCache()
-    expect(readHudModel().cachePrompt).toEqual({ isShown: true, text: 'E: Ancient cache' })
+    expect(readHudModel().cachePrompt).toEqual({ isShown: true, text: 'Space: Ancient cache' })
   })
 
   it('opens the three cards on interact, logging artefact_open', () => {

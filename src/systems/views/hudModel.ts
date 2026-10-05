@@ -90,7 +90,7 @@ export interface HudModel {
   tileTime: TileTime
   vehicleState: VehicleStateReading
   dockPrompt: DockPrompt
-  /** "E: Ancient cache" exactly while `interact` would open a live cache (#46). */
+  /** "Space: Ancient cache" (interact's first key) exactly while `interact` would open a live cache (#46). */
   cachePrompt: DockPrompt
   isDebugRun: boolean
   warning: EnergyWarning
