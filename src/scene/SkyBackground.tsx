@@ -8,12 +8,13 @@ import { useEffect, useMemo, useRef } from 'react'
 import { Color } from 'three'
 import { readPlanetWorld } from '../store/gameStore'
 import { paletteOf, skyColourAt } from '../systems/render/bandPalette'
+import type { PlanetParams } from '../systems/world/planetParams'
 import { vehiclePresence } from './vehiclePresence'
 
 export function SkyBackground() {
   const scene = useThree((state) => state.scene)
   const sky = useMemo(() => new Color(), [])
-  const shown = useRef({ depth: Number.NaN, paletteId: '' })
+  const shown = useRef<ShownSky>({ depth: Number.NaN, paletteId: '' })
 
   useEffect(() => {
     scene.background = sky
@@ -24,13 +25,22 @@ export function SkyBackground() {
 
   useFrame(() => {
     const { params } = readPlanetWorld()
-    if (params === null) return
-    const depth = Math.floor(params.radiusTiles - Math.hypot(vehiclePresence.x, vehiclePresence.y))
-    if (depth === shown.current.depth && params.paletteId === shown.current.paletteId) return
-    shown.current = { depth, paletteId: params.paletteId }
-    // Display values, as the terrain shader writes them; setRGB would treat them as linear.
-    sky.setRGB(...skyColourAt(paletteOf(params.paletteId), depth)).convertSRGBToLinear()
+    if (params !== null) recolourOnNewDepth(sky, shown.current, params)
   })
 
   return null
+}
+
+interface ShownSky {
+  depth: number
+  paletteId: string
+}
+
+function recolourOnNewDepth(sky: Color, shown: ShownSky, params: PlanetParams): void {
+  const depth = Math.floor(params.radiusTiles - Math.hypot(vehiclePresence.x, vehiclePresence.y))
+  if (depth === shown.depth && params.paletteId === shown.paletteId) return
+  shown.depth = depth
+  shown.paletteId = params.paletteId
+  // Display values, as the terrain shader writes them; setRGB alone would read them as linear.
+  sky.setRGB(...skyColourAt(paletteOf(params.paletteId), depth)).convertSRGBToLinear()
 }
