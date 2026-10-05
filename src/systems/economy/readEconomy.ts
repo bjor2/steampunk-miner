@@ -85,7 +85,7 @@ function readPaceScaleByPlanet(reader: FieldReader, value: unknown): Map<number,
 }
 
 function readPlanetKey(reader: FieldReader, key: string): number {
-  const planetIndex = /^[1-9][0-9]*$/.test(key) ? Number.parseInt(key, 10) : Number.NaN
+  const planetIndex = /^[1-9][0-9]*$/.test(key) ? Number.parseInt(key) : Number.NaN
   return reader.safeInteger(`planets.paceScale.byPlanet key ${key}`, planetIndex)
 }
 

@@ -6,7 +6,7 @@
  * Level 0 is the 1.0x start of every track. Unbounded stats are BigStat; the bounded ones are
  * plain numbers the physics step may read (#5 rule 5).
  */
-import type { BigStat } from '../money'
+import { fromSafeInteger, mul, type BigStat } from '../money'
 import { growGeometric, growLinear, saturate } from './curveFamilies'
 import { ECONOMY } from './economy'
 import {
@@ -77,6 +77,11 @@ export function computeVehicleStats(levels: UpgradeLevels): VehicleStats {
     cargoCapacity: cargoCapacity(levels.cargo_hold),
     engine: engineStats(levels.engine),
   }
+}
+
+/** Energy a rescue tow always leaves: 25% of `energyMax` (#9), so a broke player can still dig. */
+export function rescueEnergyFloor(boilerLevel: number): BigStat {
+  return mul(ECONOMY.energy.rescueFloorFraction, fromSafeInteger(energyMax(boilerLevel)))
 }
 
 /** The level an on-curve player holds at the end of planet `p` (#6 section 3). */
