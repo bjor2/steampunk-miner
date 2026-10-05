@@ -18,8 +18,11 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 |                                           |                                                           |
 | ----------------------------------------- | --------------------------------------------------------- |
 | `npm run dev`                             | Vite dev server (browser)                                 |
-| `npm run typecheck`                       | `tsc` for `src/` and for `electron/`                      |
+| `npm run typecheck`                       | `tsc` for `src/`, `electron/` and the Playwright `e2e/`   |
 | `npm test`                                | Vitest (node, no DOM, no canvas; Rapier in physics specs) |
+| `npm run test:e2e` / `test:packaged`      | Playwright: preview build / packaged Electron build       |
+| `npm run golden:update`                   | rewrite `tests/golden/` after a version bump              |
+| `npm run balance:report` / `:baseline`    | pacing bot report vs the committed baseline / rewrite it  |
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
 | `npm run bench:render`                    | chunk mesh batch p50/p95 per planet (logged, not gated)   |
 | `npm run lint` / `npm run format`         | ESLint (enforces the layer rules) / Prettier              |
@@ -79,6 +82,8 @@ src/ui         DOM UI; kit/ holds tokens.css, base.css (no classes) and shared c
 src/shell      the ONE bridge to Electron/browser APIs (window, URL, keys, page lifecycle, files)
 src/logging    append-only event log (design doc 21-24); NDJSON behind a transport seam
 src/debug      the scenario/debug API (design doc 19-20)
+e2e            Playwright: browser/ on the preview build, packaged/ on the Electron build
+tests          committed golden runs (golden/) and the balance-regression baseline (balance/)
 src/constants  named scene/balance numbers with their origin
 electron/      main + sandboxed preload + typed bridge (CommonJS, compiled to dist-electron/)
 ```
@@ -121,8 +126,10 @@ Repo-specific rules:
 - No test pins a known bug; a fixed bug brings its test in the same commit. A test that breaks during a
   behaviour-preserving refactor was written on the wrong seam: move the seam, not the code.
 - What only the eye can check (look, feel, camera) is verified by hand in `npm run dev` and said in the commit.
-- No browser end-to-end layer exists yet. When one is added (Playwright, driven through `window.steampunkDebug`
-  and `?scenario=`), record its rules in TESTING_INSTRUCTIONS.md first.
+- Playwright specs (`e2e/browser`, `e2e/packaged`) drive the game only through `window.steampunkDebug`
+  and the launch parameters, and assert state, never pixels (rulebook section 5).
+- A golden digest changes only with a version bump and `npm run golden:update`; a missed pacing target
+  is a balance finding, never a reason to retune the bot or a constant (rulebook section 4).
 
 ## Design principles (design doc section 37)
 

@@ -1,19 +1,19 @@
 # Testing instructions
 
 Read this before writing or running any test in this repository. It is the single place the testing
-rules live; `CLAUDE.md` summarises it. Modelled on the `infernal-bistro` rulebook, minus its
-Playwright layer, which this repo does not have yet.
+rules live; `CLAUDE.md` summarises it. Modelled on the `infernal-bistro` rulebook.
 
 ## 1. The layers
 
-|        | `npm test` (Vitest)                                                    | Browser end-to-end                     |
-| ------ | ---------------------------------------------------------------------- | -------------------------------------- |
-| Runs   | Node, no DOM, no canvas; a Rapier world only in `src/physics` specs    | **Does not exist yet**                 |
-| Covers | Formulas, store actions, logging, scenario rules, debug API, collision | What the camera shows, how input feels |
-| Status | The whole automated layer. Run it.                                     | Verify by hand in `npm run dev`        |
+|        | `npm test` (Vitest)                                                    | `npm run test:e2e` (Playwright)                         | `npm run test:packaged` (Playwright)               |
+| ------ | ---------------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------- |
+| Runs   | Node, no DOM, no canvas; a Rapier world only in `src/physics` specs    | Chromium on `vite preview` of the production build      | The `electron-builder --dir` output, no Steam      |
+| Covers | Formulas, store actions, logging, scenario rules, debug API, collision | Launch, `?debug&scenario=`, digests, snapshot, refusals | Window, run log folder, `--debug-api`, save folder |
+| Status | The whole rule layer, plus the golden and pacing gates. Run it.        | Pull requests touching the game (CI `e2e`)              | Nightly and by hand (CI `packaged-smoke`)          |
 
-`vite.config.ts` includes only `src/**/*.test.ts`. There are no component tests: if a change can
-only be trusted by looking at it, look at it and say so in the commit.
+`vite.config.ts` includes only `src/**/*.test.ts`. There are no component tests and no screenshot
+comparisons: what the camera shows and how input feels is checked by hand in `npm run dev` and said
+in the commit.
 
 ### Where a test belongs
 
@@ -32,9 +32,12 @@ only be trusted by looking at it, look at it and say so in the commit.
     metres (which tile the vehicle is in, how far from the centre), never exact floats or frames.
   - Anything a pure rule can answer (motion, gravity, swivel, pose quantising) is tested in
     `src/systems/` instead; feel (how driving or the camera looks) stays a hand check.
-- `electron/` – no tests yet (the main process is thin). Its one rule worth testing, run-id
-  validation in `runLogFiles.cts`, mirrors `isValidRunId`, which is tested. The save writer
-  (`saveFiles.cts`: atomic write, set-aside, folder and slot checks) is smoke-checked by hand in node.
+- `electron/` – no Vitest specs (the main process is thin). Its run-id validation in
+  `runLogFiles.cts` mirrors `isValidRunId`, which is tested. The save writer (`saveFiles.cts`) is
+  smoke-checked by hand in node; the launch flags (`launchOptions.cts`) and the save folder of a
+  debug run are checked by the packaged smoke test (section 5).
+- `src/systems/bot/` – the pacing bot; `src/systems/replay/` – `replayRun` and the golden scripts.
+  Both are pure and run in node (section 4).
 
 ## 2. Conventions
 
@@ -55,7 +58,10 @@ A **scenario** is the state a player would have had to earn, written down instea
 validated by `validateScenario` in `src/systems/scenario.ts`. They are **refused, never trimmed**: every
 problem is listed (unknown fields included) and nothing is applied. Start fields whose system is not
 built yet (`depthBp`, inventory, unlocks) are validated, then refused with a problem naming what is
-missing. `coreFragments` fills the platform's core bay (`debug.setCoreFragments`).
+missing. `coreFragments` fills the platform's core bay (`debug.setCoreFragments`); `enemies` (registered
+kind, tier, offset) spawn through `debug.spawnEnemy`; `facilities` (level 1 only) and `platformState`
+(it must agree with `coreFragments`) are checked, never applied. `hintsEnabled` (#16) is off unless a
+file turns it on, so scenario and bot runs never see hints.
 
 - Applying a scenario submits `debug.*` authority commands (so it replays from `commands.ndjson` and logs
   `debug_command_applied`), then runs its script (`fastForward` steps).
@@ -63,7 +69,9 @@ missing. `coreFragments` fills the platform's core bay (`debug.setCoreFragments`
   `window.steampunkDebug` (the `DebugApi`), `window.steampunkRunLog()` and `window.steampunkRunCommands()`
   (the NDJSON so far, browser shell only).
 - Every wired debug method answers `{ ok: true, ... }` or `{ ok: false, problems }`: `setPlanet`,
-  `setPlanetSeed`, `teleportToDepthTiles`, `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
+  `setPlanetSeed`, `teleportToDepthTiles`, `teleportToDepth(depthBp)` (basis points of the radius),
+  `teleportToDock()` (the `debug.teleportToDock` command: docked on the dock point, no tow, no fee),
+  `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
   `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
   `setUpgrade(id, level)`, `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
   `vehicleStats()`; for the core, `setCoreFragments(count)`; for combat (#25), `spawnEnemy(kind, tier,
@@ -86,7 +94,38 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
 - Stubs in `src/debug/debugApi.ts` throw `DebugCommandNotImplementedError`; implement them with the
   system they poke, never as a silent no-op.
 
-## 4. Before every commit
+## 4. Golden runs and the balance regression
+
+- **Golden runs** (`tests/golden/*.golden.json`, #11 section 3): a world seed, a stamped command list
+  and the digests the authority logged, under the versions that produced them. `src/logging/goldenRun.test.ts`
+  replays each at the fixed step and in 30 and 144 fps frame batches. A digest change with unchanged
+  versions fails (bump the version that owns the change); a bumped version fails with "regenerate the
+  golden file". Regenerate with `npm run golden:update` and commit the files with the bump. The
+  scripts live in `src/systems/replay/goldenScripts.ts`; the spec only reads the committed files.
+  CI replays them on Windows too (`determinism`), so digests must match across operating systems.
+- **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
+  authority commands with the #6 movement-time model. `src/logging/pacingGate.test.ts` fails on a
+  missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
+  #2 sequence or more than 4 MB of core events and commands in the first hour. Trips per planet
+  outside 3 to 12 are printed, never failed. Do not retune the bot or a constant to make it pass: a
+  miss is a balance finding for the Systems & Economy Designer (the lever is `paceScale`).
+- **Comparison** (`compareRuns`): `npm run balance:report` writes `balance-report/` and compares the
+  run with `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
+  deliberate economy change, `npm run balance:baseline` rewrites the baseline in the same commit.
+
+## 5. Browser and packaged end-to-end (Playwright)
+
+- Specs drive the game only through `window.steampunkDebug`, `window.steampunkRunLog()` and the
+  launch parameters (`?debug&scenario=<committed file>` in a browser, `--debug-api` and
+  `--scenario=<path>` for the packaged build). Assert state and digests, never pixels; no
+  screenshot comparisons in the slice. Every browser spec also asserts no console error.
+- `e2e/browser/` runs on the preview build (`npm run test:e2e`, which builds first; install the
+  browser once with `npx playwright install chromium`). `e2e/packaged/` runs on the packaged game
+  (`npm run electron:build`, then `npm run test:packaged`, under `xvfb-run -a` on Linux); each
+  launch gets a fresh user-data folder.
+- Not covered, by design: vehicle feel, camera, art and audio. Those stay hand checks.
+
+## 6. Before every commit
 
 `npm run typecheck`, the touched Vitest files green (and `npm run lint` for boundary rules). By hand for
 anything visual: `npm run dev`, then say what you checked in the commit message.
