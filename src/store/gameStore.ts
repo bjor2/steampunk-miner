@@ -16,6 +16,7 @@ import { getRunLog } from '../logging/runLog'
 import type { RunEventPlace } from '../logging/runEvent'
 import type { CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
+import type { Enemy } from '../systems/authority/combat/combatState'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { createLoopbackAuthority, type Authority } from '../systems/authority/loopbackAuthority'
 import {
@@ -287,6 +288,11 @@ export function readAuthorityTick(): number {
 /** The local vehicle as the authority holds it, for the fixed-step loop (never rendered). */
 export function readLocalVehicle(): VehicleState {
   return readAuthorityState().players[useGameStore.getState().playerId].vehicle
+}
+
+/** The active enemies now, for the scene's per-frame drawing (never rendered through React). */
+export function readEnemies(): readonly Enemy[] {
+  return readAuthorityState().combat.enemies
 }
 
 /** The planet's params and its world deltas now, for physics and the terrain meshes. */

@@ -5,6 +5,7 @@
 import { Canvas } from '@react-three/fiber'
 import { CAMERA_POSITION, CAMERA_ZOOM } from '../constants/scene'
 import { PhysicsWorld } from '../physics/PhysicsWorld'
+import { EnemyPlaceholders } from './EnemyPlaceholders'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetTerrain } from './PlanetTerrain'
 import { SkyBackground } from './SkyBackground'
@@ -17,6 +18,7 @@ export function GameScene() {
       <SkyBackground />
       <PlanetCamera />
       <PlanetTerrain />
+      <EnemyPlaceholders />
       <PhysicsWorld>
         <Vehicle />
       </PhysicsWorld>
