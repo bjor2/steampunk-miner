@@ -16,8 +16,9 @@ import type { BayId } from '../world/dockBays'
  * 4: the artefact commands and events (#46).
  * 5: the casing layer in chunk deltas, its events and debug commands (#41, #56).
  * 6: collapse (#43, #57): its events, `debug.forceCollapse` and `VehicleDamaged.source`.
+ * 7: the first-place lining charge (#76, #85): drilling now debits the wallet, `CasingLined`.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 6
+export const AUTHORITY_PROTOCOL_VERSION = 7
 
 export interface CommandPayloads {
   /**

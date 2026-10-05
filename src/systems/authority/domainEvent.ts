@@ -104,6 +104,11 @@ export interface DomainEventBodies {
   }
   /** One ring of lining (#41): air samples lined and lower-grade casing raised, at `grade`. */
   CasingPlaced: { samples: number; relined: number; grade: number }
+  /**
+   * A ring's first-placed lining charged (#76): `lengthMm` of new lining against the wall's
+   * `band`, `price` owed and `paid` (less when the wallet ran short), both canonical strings.
+   */
+  CasingLined: { lengthMm: number; band: number; grade: number; price: string; paid: string }
   /** The vehicle entered a band (6: the core) its casing grade does not hold (#41). */
   CasingGradeInsufficient: { band: number; grade: number; required: number }
   /** The vehicle is back where its casing grade holds (#41). */

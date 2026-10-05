@@ -231,6 +231,18 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: { samples: 'integer', relined: 'integer', grade: 'integer' },
   },
+  // #76: the first-place lining charge of one ring; relining is free and logs none.
+  casing_lined: {
+    group: 'mining',
+    level: 'core',
+    payload: {
+      lengthMm: 'integer',
+      band: 'integer',
+      grade: 'integer',
+      price: 'money',
+      paid: 'money',
+    },
+  },
   casing_drilled: {
     group: 'mining',
     level: 'detail',

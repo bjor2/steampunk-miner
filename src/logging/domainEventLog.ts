@@ -53,6 +53,10 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'casing_placed',
     data: { samples, relined, grade },
   }),
+  CasingLined: ({ lengthMm, band, grade, price, paid }) => ({
+    event: 'casing_lined',
+    data: { lengthMm, band, grade, price, paid },
+  }),
   CasingDrilled: ({ samples, grade }) => ({ event: 'casing_drilled', data: { samples, grade } }),
   CasingGradeInsufficient: ({ band, grade, required }) => ({
     event: 'casing_grade_insufficient',
