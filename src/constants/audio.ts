@@ -29,9 +29,15 @@ export const STEAM_GAIN = 0.1
 
 /** Loops crossfade over about this long: the same share closes in the same time at any fps. */
 export const LAYER_FADE_SECONDS = 1.5
-/** Underground, the tension layer rises over this many tiles below the surface. */
-export const TENSION_FULL_DEPTH_TILES = 120
-/** The combat layer comes in as an active enemy closes from this far (metres) to touching. */
-export const COMBAT_RANGE_METRES = 12
+/** The platform loop plays docked or within this many metres of the hub's dock point (#49). */
+export const PLATFORM_RANGE_METRES = 10
+/** The ambience layer's level in band 1; it rises evenly to full in band 5 (#49). */
+export const AMBIENCE_BAND_1_SHARE = 0.5
+/** The tension layer plays underground from this depth band on (#49), or on low energy. */
+export const TENSION_FROM_BAND = 4
+/** The combat layer comes in as an active enemy closes from this far (metres) to touching (#49). */
+export const COMBAT_RANGE_METRES = 8
+/** Stingers and the open artefact choice duck the layers by this many decibels (#49). */
+export const MUSIC_DUCK_DB = 6
 /** Each planet's layers are retuned by this many semitones per planet after the first (#13). */
 export const PLANET_TUNING_SEMITONES = -3

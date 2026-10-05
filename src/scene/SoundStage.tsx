@@ -10,16 +10,14 @@ import { useEffect, useMemo } from 'react'
 import { SCREEN_REFRESH_MS } from '../constants/scene'
 import { getSoundOut, type SoundOut } from '../shell/soundOut'
 import { listenForFeedback } from '../store/feedbackBroadcast'
-import { readEnemies, useGameStore } from '../store/gameStore'
-import { readHudModel } from '../store/screenReads'
+import { useGameStore } from '../store/gameStore'
+import { readHudModel, readMusicMoment } from '../store/screenReads'
 import {
   easeLayers,
-  nearestEnemyMetresOf,
   planetTuningOf,
   SILENT_LAYERS,
   writeMusicTargets,
   type MusicLayers,
-  type MusicMoment,
 } from '../systems/audio/musicLayers'
 import {
   chimeFrequencyOf,
@@ -34,9 +32,8 @@ import {
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
-import { vehiclePresence } from './vehiclePresence'
 
-/** The drill's load is re-read as often as the HUD re-reads its tile time. */
+/** The drill's load and the music's targets are re-read as often as the HUD re-reads. */
 const LOAD_REFRESH_SECONDS = SCREEN_REFRESH_MS / 1000
 
 interface DrillLoad {
@@ -44,18 +41,18 @@ interface DrillLoad {
   sinceRead: number
 }
 
-/** The music's crossfade and this frame's scratch, kept across frames so none allocates. */
+/** The music's crossfade and its targets, kept across frames so no frame allocates. */
 interface MusicMix {
   layers: MusicLayers
   targets: MusicLayers
-  moment: MusicMoment
+  sinceRead: number
 }
 
 function createMusicMix(): MusicMix {
   return {
     layers: { ...SILENT_LAYERS },
     targets: { ...SILENT_LAYERS },
-    moment: { isDocked: true, depthTiles: 0, nearestEnemyMetres: null },
+    sinceRead: LOAD_REFRESH_SECONDS,
   }
 }
 
@@ -104,19 +101,15 @@ function playLoops(sound: SoundOut, drillLoad: number): void {
 }
 
 function playMusic(sound: SoundOut, music: MusicMix, dt: number): void {
-  gatherMusicMoment(music.moment)
-  writeMusicTargets(music.moment, music.targets)
+  refreshMusicTargets(music, dt)
   easeLayers(music.layers, music.targets, dt)
   sound.setMusic(music.layers, planetTuningOf(useGameStore.getState().planetTier))
 }
 
-function gatherMusicMoment(moment: MusicMoment): void {
-  const game = useGameStore.getState()
-  moment.isDocked = game.vehicle.mode === 'docked'
-  moment.depthTiles = game.depthTiles
-  moment.nearestEnemyMetres = nearestEnemyMetresOf(
-    readEnemies(),
-    vehiclePresence.x,
-    vehiclePresence.y,
-  )
+/** The targets come from the authority replica (#49), which moves at most once per tick. */
+function refreshMusicTargets(music: MusicMix, dt: number): void {
+  music.sinceRead += dt
+  if (music.sinceRead < LOAD_REFRESH_SECONDS) return
+  music.sinceRead = 0
+  writeMusicTargets(readMusicMoment(), music.targets)
 }

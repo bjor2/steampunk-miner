@@ -2,10 +2,13 @@
  * The screens' view models now (#33), for the DOM components and the debug API's `ui.*` reads:
  * the same functions on the same store, so a spec reads what the screen draws.
  */
+import { musicMomentOf } from '../systems/audio/musicMoment'
+import type { MusicMoment } from '../systems/audio/musicLayers'
 import type { HudModel } from '../systems/views/hudModel'
 import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { PlatformModel } from '../systems/views/platformModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
+import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
 import { hudModelOf, plaqueModelOf, platformModelOf, settingsModelOf } from './screenModels'
 
@@ -24,4 +27,10 @@ export function readSettingsModel(): SettingsModel {
 /** The hint and transmission plaques (#16) as they are drawn. */
 export function readPlaqueModel(): PlaqueModel {
   return plaqueModelOf(useGameStore.getState())
+}
+
+/** Where the music stands now (#49), from the authority replica and the client-owned depth. */
+export function readMusicMoment(): MusicMoment {
+  const { playerId, depthTiles } = useGameStore.getState()
+  return musicMomentOf(readAuthorityState(), playerId, depthTiles)
 }
