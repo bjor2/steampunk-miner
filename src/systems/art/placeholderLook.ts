@@ -30,9 +30,12 @@ export function placeholderQuadsOf(assetId: string, tier: number): PlaceholderQu
   const entry = manifestEntryOf(assetId)
   const sidecar = placeholderSidecarOf(assetId)
   if (entry === null || sidecar === null) return [missingArtQuadOf(assetId)]
-  return partsShownAtTier(sidecar.parts, tier).map((part) =>
-    quadOfPart(part, colourOf(entry, part)),
-  )
+  return partsShownAtTier(sidecar.parts, tier).map((part) => colouredQuadOf(entry, part))
+}
+
+/** One part as a flat quad in its manifest colour. */
+export function colouredQuadOf(entry: ManifestEntry, part: SidecarPart): PlaceholderQuad {
+  return quadOfPart(part, colourOf(entry, part))
 }
 
 /**

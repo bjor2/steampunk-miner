@@ -1,5 +1,5 @@
 /**
- * The run vehicle's body parts (#52, #51), drawn from the `vehicle` placeholder sidecar at the
+ * The run vehicle's body parts (#52, #51), drawn from the `vehicle` asset's sidecar at the
  * authority replica's visual tier (#7: derived from the levels, never decided here), so an upgrade
  * threshold shows on the vehicle (37.7). Drawn inside the vehicle's body group, so it turns with
  * the body; the drill head's parts are `DrillHeadView`'s. Each part moves as the game state
@@ -9,12 +9,13 @@ import { useEffect, useMemo } from 'react'
 import { listenForFeedback } from '../store/feedbackBroadcast'
 import { useGameStore } from '../store/gameStore'
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
-import { vehicleBodyQuadsOf } from '../systems/render/vehicleLook'
+import { vehicleAtlasMaps, vehicleBodyQuadsOf } from '../systems/render/vehicleLook'
 import { recoilVehicleParts } from './partMotionPresence'
-import { PlaceholderQuadMesh } from './PlaceholderQuadMesh'
+import { PartQuadMesh } from './PartQuadMesh'
 
 /** Parts sit just in front of the tiles. */
 const BODY_Z = 0.1
+const maps = vehicleAtlasMaps()
 
 export function VehiclePlaceholder() {
   const visualTier = useGameStore((state) => state.vehicle.visualTier)
@@ -23,7 +24,7 @@ export function VehiclePlaceholder() {
   return (
     <>
       {quads.map((quad) => (
-        <PlaceholderQuadMesh key={quad.partId} quad={quad} baseZ={BODY_Z} />
+        <PartQuadMesh key={quad.partId} quad={quad} maps={maps} baseZ={BODY_Z} />
       ))}
     </>
   )

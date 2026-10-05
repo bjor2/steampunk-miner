@@ -13,6 +13,8 @@ tests/golden
 tests/balance
 # Written by `npm run art:export` (scripts/art); re-exporting must rewrite the same bytes.
 public/assets
+# three's Basis transcoder, copied verbatim (docs/art-pipeline.md "Drawing final art").
+public/basis
 # Written by `npm run balance:report`
 balance-report
 playwright-report

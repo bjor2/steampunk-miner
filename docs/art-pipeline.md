@@ -124,13 +124,22 @@ using the part ids, sizes, pivots and draw order of `art/placeholders/<id>.parts
 (`src/systems/art/placeholderLook.ts`). An asset id with no entry or no placeholder draws as one 1 m
 magenta quad.
 
-The vehicle (body and drill head) is drawn this way today, and `steampunkDebug.vehicleParts()`
-reports the part ids it shows. The real asset must keep the placeholder's part ids (S7a–S7d
-acceptance). To change a placeholder, edit its part list, then run
+`steampunkDebug.vehicleParts()` reports the part ids the run vehicle shows. The real asset must
+keep the placeholder's part ids and tiers (S7a–S7d acceptance; the lint checks it). To change a placeholder, edit its part list, then run
 `python3 scripts/art/repack_placeholder.py <id>` and `npm run format`.
 
-To ship real art: export it, set its manifest entry to `"status": "final"`, and commit the
-`.blend` (LFS) together with the files under `public/assets/`.
+To ship real art: export it, set its manifest entry to `"status": "final"`, add its exported
+sidecar to `EXPORTED_SIDECARS` in `src/systems/art/artCatalogue.ts`, and commit the `.blend` (LFS)
+together with the files under `public/assets/`.
+
+## Drawing final art
+
+A final asset's parts come from its exported sidecar (`src/systems/art/assetLook.ts`): each part
+is one quad, the same quads its placeholder drew, with texture coordinates cut from the atlas
+rect. `PartQuadMesh` draws it with the albedo map (alpha is the part mask, cut at 0.5) and falls
+back to the flat placeholder quad while the map transcodes. Maps load with three's `KTX2Loader`;
+its Basis transcoder (three r169) is copied into `public/basis/`, so update that copy when three
+is upgraded. The vehicle (S7a) is the first asset drawn this way.
 
 ## The asset lint
 
@@ -149,5 +158,6 @@ To ship real art: export it, set its manifest entry to `"status": "final"`, and 
 
 - Baking the `tile` (ground, casing) and `backdrop` (bay screens) forms. The script refuses them
   and names the form; S7d and S7b add them.
-- Drawing a final asset's KTX2 maps (KTX2Loader, lit materials). S6 and S7a, the first real export,
-  add this; until then a final asset still draws its placeholder quads, so keep its `color`.
+- Lighting final art. Parts draw unlit with the albedo map; the lit render (S6) adds the normal
+  and emissive maps to its lit material. Keep each final asset's `color`: it is the loading
+  fallback.

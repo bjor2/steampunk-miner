@@ -103,6 +103,8 @@ export default tseslint.config(
       'balance-report',
       'playwright-report',
       'test-results',
+      // three's Basis transcoder, copied verbatim for KTX2Loader (docs/art-pipeline.md).
+      'public/basis',
     ],
   },
   js.configs.recommended,

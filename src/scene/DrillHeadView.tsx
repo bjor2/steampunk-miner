@@ -12,11 +12,12 @@ import { VEHICLE_COLLIDER_SIZE } from '../constants/physics'
 import type { VehicleController } from '../physics/vehicleController'
 import { useGameStore } from '../store/gameStore'
 import { createDrillHeadPose, writeDrillHeadPose } from '../systems/render/drillHeadPose'
-import { drillHeadQuadsOf, drillHeadSizeOf } from '../systems/render/vehicleLook'
-import { PlaceholderQuadMesh } from './PlaceholderQuadMesh'
+import { drillHeadQuadsOf, drillHeadSizeOf, vehicleAtlasMaps } from '../systems/render/vehicleLook'
+import { PartQuadMesh } from './PartQuadMesh'
 
 /** In front of the body's parts. */
 const HEAD_Z = 0.2
+const maps = vehicleAtlasMaps()
 
 export function DrillHeadView({ controller }: { controller: VehicleController }) {
   const visualTier = useGameStore((state) => state.vehicle.visualTier)
@@ -32,7 +33,7 @@ export function DrillHeadView({ controller }: { controller: VehicleController })
   return (
     <group ref={head}>
       {quads.map((quad) => (
-        <PlaceholderQuadMesh key={quad.partId} quad={quad} baseZ={0} />
+        <PartQuadMesh key={quad.partId} quad={quad} maps={maps} baseZ={0} />
       ))}
     </group>
   )
