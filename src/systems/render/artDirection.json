@@ -1,0 +1,32 @@
+{
+  "palettes": {
+    "palette.planet_1": {
+      "surface": "#8a6a48",
+      "deep": "#3a2a2e",
+      "core": "#d2552e",
+      "pad": "#7d828a",
+      "sky": "#c98f5c",
+      "underground": "#120d0c"
+    },
+    "palette.planet_2": {
+      "surface": "#5f6e7a",
+      "deep": "#2b2438",
+      "core": "#c8406e",
+      "pad": "#7d828a",
+      "sky": "#8a7aa8",
+      "underground": "#0d0c14"
+    }
+  },
+  "oreFamilies": {
+    "metal": { "silhouette": "flecks", "hue": "#e0a84a" },
+    "crystal": { "silhouette": "shards", "hue": "#5cc8e8" }
+  },
+  "oreRamp": {
+    "halfRankTier": 4,
+    "lumaMin": 0.32,
+    "lumaMax": 0.94,
+    "glowMax": 1,
+    "sparklesMax": 6
+  },
+  "tileShadeSpread": 0.08
+}
