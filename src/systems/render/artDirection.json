@@ -18,8 +18,14 @@
     }
   },
   "oreFamilies": {
-    "metal": { "silhouette": "flecks", "hue": "#e0a84a" },
-    "crystal": { "silhouette": "shards", "hue": "#5cc8e8" }
+    "metal": {
+      "silhouette": "flecks",
+      "hue": "#e0a84a"
+    },
+    "crystal": {
+      "silhouette": "shards",
+      "hue": "#5cc8e8"
+    }
   },
   "oreRamp": {
     "halfRankTier": 4,
@@ -28,5 +34,12 @@
     "glowMax": 1,
     "sparklesMax": 6
   },
-  "tileShadeSpread": 0.08
+  "tileShadeSpread": 0.08,
+  "enemyTint": {
+    "ramp": ["#8b3a1e", "#f08a24", "#7a3fa8"],
+    "tiersPerTint": 6,
+    "sizeMax": 1.25,
+    "halfRankTier": 4,
+    "glowMax": 1
+  }
 }
