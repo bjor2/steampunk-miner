@@ -5,7 +5,12 @@
  */
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import type { DomainEvent, DomainEventBodies, DomainEventType } from '../authority/domainEvent'
+import { nextCasingPrice } from '../authority/casingRules'
+import { dockedBayOf } from '../authority/dockRules'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
+import { nextUpgradePrice } from '../authority/workshopRules'
+import { UPGRADE_IDS } from '../economy/economyDefinition'
+import { cmp, type Money } from '../money'
 import { dockedPoseAt, isInPadZone, isPoseStationary, tileOfPose } from '../vehicle/vehiclePose'
 import { isVehicleActive } from '../vehicle/vehicleState'
 
@@ -29,8 +34,13 @@ export const HINT_CONDITIONS = {
   tileDestroyed: (moment) => hasPlayerEvent(moment, 'TileDestroyed'),
   resourceCollected: (moment) => hasPlayerEvent(moment, 'CargoAdded'),
   docked: (moment) => hasPlayerEvent(moment, 'DockEntered'),
-  dockedWithCargo: (moment) =>
-    playerEventsOf(moment, 'DockEntered').some((event) => event.cargoUnits > 0),
+  dockedAtSellBayWithCargo: (moment) =>
+    playerEventsOf(moment, 'DockEntered').some(
+      (event) => event.bay === 'sell' && event.cargoUnits > 0,
+    ),
+  leftSellBay: (moment) => playerEventsOf(moment, 'DockLeft').some((event) => event.bay === 'sell'),
+  affordsUpgradeAtSellBay: isUpgradeAffordableAtSellBay,
+  atUpgradeBay: ({ state, playerId }) => dockedBayOf(state, playerId) === 'upgrade',
   upgradeBought: (moment) => hasPlayerEvent(moment, 'UpgradePurchased'),
   energyLowOrRescued: (moment) =>
     hasPlayerEvent(moment, 'EnergyLow') || hasPlayerEvent(moment, 'RescueTriggered'),
@@ -72,6 +82,22 @@ function hasLeftStartTile({ state, playerId }: HintMoment): boolean {
   const start = tileOfPose(dockedPoseAt(site))
   const isOnStartTile = tile.tx === start.tx && tile.ty === start.ty
   return !isOnStartTile || !isPoseStationary(pose)
+}
+
+/**
+ * #37, #58 Systems & Economy: docked at the Sell bay with money for the cheapest buy the Upgrade
+ * bay offers, the next level of any of the six tracks or the next casing grade.
+ */
+function isUpgradeAffordableAtSellBay({ state, playerId }: HintMoment): boolean {
+  if (dockedBayOf(state, playerId) !== 'sell') return false
+  return cmp(state.players[playerId].wallet, cheapestUpgradeBayPrice(state, playerId)) >= 0
+}
+
+function cheapestUpgradeBayPrice(state: AuthorityState, playerId: string): Money {
+  const trackPrices = UPGRADE_IDS.map((upgradeId) => nextUpgradePrice(state, playerId, upgradeId))
+  return [...trackPrices, nextCasingPrice(state, playerId)].reduce((cheapest, price) =>
+    cmp(price, cheapest) < 0 ? price : cheapest,
+  )
 }
 
 function hasPlayerEvent(moment: HintMoment, type: DomainEventType): boolean {

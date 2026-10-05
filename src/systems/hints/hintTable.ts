@@ -1,6 +1,6 @@
 /**
  * The hint and transmission table (#16, #2 narrative stubs) as data in `src/data/hints/hints.json`:
- * the five hints with the condition each is shown and dismissed on, the three transmissions with
+ * the five hints of #16 plus `hint_upgrade_bay` (#37, #58), with the condition each is shown and dismissed on, the three transmissions with
  * the condition each appears on, and the 20 s (1200 ticks) the hints keep apart. Text is at most
  * two lines and names actions; `{actionId}` prints the key bound to that action now (#33), and the
  * energy hint's `{fee}` and `{cargoLost}` print what a tow cost.

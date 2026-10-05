@@ -26,16 +26,25 @@
       "dismissedWhen": "docked",
       "lines": [
         "Ore fills your cargo hold. Take it back to the platform to sell it:",
-        "stop on the pad and Dock with {interact}."
+        "stop on the Sell bay pad and Dock with {interact}."
       ]
     },
     {
       "id": "hint_dock",
-      "shownWhen": "dockedWithCargo",
-      "dismissedWhen": "upgradeBought",
+      "shownWhen": "dockedAtSellBayWithCargo",
+      "dismissedWhen": "leftSellBay",
       "lines": [
-        "Sell, then repair or recharge: Sell, repair and recharge ({quick_service}) does all three.",
-        "When your money covers an upgrade, look at the workshop panel."
+        "This is the Sell bay: Sell, repair and recharge ({quick_service}) does all three.",
+        "Upgrades are bought at the Upgrade bay, along the pad."
+      ]
+    },
+    {
+      "id": "hint_upgrade_bay",
+      "shownWhen": "affordsUpgradeAtSellBay",
+      "dismissedWhen": "atUpgradeBay",
+      "lines": [
+        "Your money covers an upgrade. Drive along the pad to the Upgrade bay,",
+        "stop on its pad and Dock with {interact}."
       ]
     },
     {

@@ -193,8 +193,8 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     expect(replay.digests.at(-1)?.digest).toBe(takeSessionSnapshot().digest)
   })
 
-  it('registers the 56 event names from before the controls and HUD, plus casing_upgraded (#41)', () => {
-    expect(ALL_RUN_EVENT_NAMES).toHaveLength(57)
+  it('registers the 56 event names from before the controls and HUD, plus casing_upgraded and hint_shown', () => {
+    expect(ALL_RUN_EVENT_NAMES).toHaveLength(58)
   })
 })
 

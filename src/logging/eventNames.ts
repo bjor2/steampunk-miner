@@ -52,6 +52,8 @@ export const RUN_EVENT_REGISTRY = {
     payload: { command: 'text', args: 'jsonArgs' },
   },
   command_rejected: { group: 'run', level: 'detail', payload: { type: 'text', reason: 'text' } },
+  // #58: an onboarding hint went up, once per id; presentation, never part of the digest.
+  hint_shown: { group: 'run', level: 'core', payload: { hintId: 'text' } },
   perf_sample: {
     group: 'run',
     level: 'perf',

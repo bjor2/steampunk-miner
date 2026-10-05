@@ -10,7 +10,7 @@ import {
   surfaceOreTiles,
 } from '../authority/scriptedSession'
 import type { DomainEvent } from '../authority/domainEvent'
-import { buyUpgradeCommand, dockCommand, undockCommand } from '../platform/platformCommands'
+import { dockCommand, undockCommand } from '../platform/platformCommands'
 import { dockedPoseAt, FACING } from '../vehicle/vehiclePose'
 import { EMPTY_HINT_BOARD, observeHints, type HintStep } from './hintBoard'
 import { HINT_TABLE } from './hintTable'
@@ -110,18 +110,23 @@ describe('hint board', () => {
     expect(watched.shownIds()).toEqual(['hint_move', 'hint_drill', 'hint_cargo', 'hint_dock'])
   })
 
-  it('takes hint_dock down when the first upgrade is bought', () => {
+  it('takes hint_dock down when the player leaves the Sell bay', () => {
     const watched = watchedSession(['hint_move', 'hint_drill', 'hint_cargo'])
     watched.mine(12, surfaceOreTiles(1)[0])
     watched.submit(60, restOnDockPoint())
     watched.submit(70, dockCommand('sell'))
     expect(watched.step().board.shown?.id).toBe('hint_dock')
-    watched.submit(80, { type: 'debug.grantMoney', payload: { amount: '1e9' } })
     watched.submit(85, undockCommand())
-    watched.submit(85, poseInBay('upgrade'))
-    watched.submit(86, dockCommand('upgrade'))
-    watched.submit(90, buyUpgradeCommand('engine'))
     expect(watched.step().board.shown).toBeNull()
+  })
+
+  it('points hint_dock at the Sell bay: docking with cargo at the Upgrade bay does not show it', () => {
+    const watched = watchedSession(['hint_move', 'hint_drill', 'hint_cargo'])
+    watched.mine(12, surfaceOreTiles(1)[0])
+    watched.submit(60, poseInBay('upgrade'))
+    watched.submit(70, dockCommand('upgrade'))
+    expect(watched.step().board.shown).toBeNull()
+    expect(watched.step().board.queued).toEqual([])
   })
 
   it('shows hint_energy only after energy_low, and takes it down when the player docks', () => {
@@ -160,5 +165,68 @@ describe('hint board', () => {
     watched.mine(12, surfaceOreTiles(1)[0])
     watched.advanceTo(5 * GAP)
     expect(watched.shownIds()).toEqual([])
+  })
+})
+
+describe('hint board: the Upgrade bay hint (#58)', () => {
+  const EARLY_HINTS = ['hint_move', 'hint_drill', 'hint_cargo', 'hint_dock']
+  const grant = (amount: string) => ({ type: 'debug.grantMoney', payload: { amount } }) as const
+
+  /** Docked at the Sell bay with `money`, the earlier hints already seen. */
+  function atSellBayWith(money: string) {
+    const watched = watchedSession(EARLY_HINTS)
+    watched.submit(5, grant(money))
+    watched.submit(10, dockCommand('sell'))
+    return watched
+  }
+
+  it('fires once when money covers the cheapest upgrade while docked at the Sell bay', () => {
+    const watched = atSellBayWith('24')
+    expect(watched.step().board.shown?.id).toBe('hint_upgrade_bay')
+    watched.submit(20, undockCommand())
+    watched.submit(30, dockCommand('sell'))
+    expect(watched.shownIds()).toEqual(['hint_upgrade_bay'])
+    expect(watched.step().seen).toEqual([...EARLY_HINTS, 'hint_upgrade_bay'])
+  })
+
+  it('waits while the money is short of every upgrade and of the next casing grade', () => {
+    const watched = atSellBayWith('23.999')
+    expect(watched.step().board.shown).toBeNull()
+    expect(watched.step().board.queued).toEqual([])
+  })
+
+  it('never fires at the Upgrade bay, however much money there is', () => {
+    const watched = watchedSession(EARLY_HINTS)
+    watched.submit(5, grant('1e9'))
+    watched.submit(6, poseInBay('upgrade'))
+    watched.submit(10, dockCommand('upgrade'))
+    expect(watched.step().board.shown).toBeNull()
+    expect(watched.step().board.queued).toEqual([])
+  })
+
+  it('counts the next casing grade: casing alone can fire it when every track costs more', () => {
+    const watched = watchedSession(EARLY_HINTS)
+    for (const upgradeId of [
+      'drill_power',
+      'drill_tip',
+      'engine',
+      'boiler',
+      'cargo_hold',
+      'hull',
+    ]) {
+      watched.submit(1, { type: 'debug.setUpgrade', payload: { upgradeId, level: 6 } })
+    }
+    watched.submit(5, grant('48'))
+    watched.submit(10, dockCommand('sell'))
+    expect(watched.step().board.shown?.id).toBe('hint_upgrade_bay')
+  })
+
+  it('goes down once the vehicle is docked at the Upgrade bay', () => {
+    const watched = atSellBayWith('100')
+    watched.submit(20, undockCommand())
+    watched.submit(20, poseInBay('upgrade'))
+    expect(watched.step().board.shown?.id).toBe('hint_upgrade_bay')
+    watched.submit(21, dockCommand('upgrade'))
+    expect(watched.step().board.shown).toBeNull()
   })
 })

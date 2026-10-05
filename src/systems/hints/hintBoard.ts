@@ -1,5 +1,5 @@
 /**
- * The five onboarding hints as a pure board (#16): a hint is queued the first moment its
+ * The onboarding hints as a pure board (#16, plus #58's `hint_upgrade_bay`): a hint is queued the first moment its
  * `shownWhen` holds, shown when nothing else is and the last hint went up at least
  * `minTicksBetweenHints` ago, and taken down the first moment its `dismissedWhen` holds while it
  * is up. Each is shown once: a shown id joins the seen-set, which the store keeps in the local

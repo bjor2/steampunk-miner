@@ -103,10 +103,12 @@ describe('hint slice', () => {
   it('keeps the seen-set in the preferences file, so nothing repeats after a reload', async () => {
     game().startPlaques()
     playFirstTrip()
+    const seenBefore = game().prefs.seenHints
     await reload()
     game().startPlaques()
     playFirstTrip()
-    expect(readPlaqueModel()).toEqual({ hint: null, transmission: null })
+    expect(readPlaqueModel().transmission).toBeNull()
+    expect(seenBefore).not.toContain(readPlaqueModel().hint?.id)
     expect(game().prefs.seenHints).toEqual(
       expect.arrayContaining(['hint_move', 'hint_drill', 'transmission_opening']),
     )
@@ -119,6 +121,27 @@ describe('hint slice', () => {
     game().fastForward(GAP)
     expect(readPlaqueModel().hint?.id).toBe('hint_dock')
     expect(readSellBayModel().quickService.isHighlighted).toBe(true)
+  })
+
+  it('logs hint_shown once for hint_upgrade_bay, after the sale at the Sell bay pays for an upgrade', () => {
+    const sink = createMemorySink()
+    installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
+    game().startPlaques()
+    playFirstTrip()
+    game().fastForward(GAP)
+    game().undock()
+    game().fastForward(GAP)
+    expect(readPlaqueModel().hint?.id).toBe('hint_upgrade_bay')
+    game().dock('sell')
+    game().fastForward(GAP)
+    const shown = sink.events.filter((line) => line.event === 'hint_shown')
+    expect(shown.map((line) => (line.data as { hintId: string }).hintId)).toEqual([
+      'hint_move',
+      'hint_drill',
+      'hint_cargo',
+      'hint_dock',
+      'hint_upgrade_bay',
+    ])
   })
 
   it('shows no hint with Show hints off, but still the transmission', () => {

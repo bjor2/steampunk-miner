@@ -26,6 +26,7 @@ import {
 } from '../systems/hints/transmissionBoard'
 import type { Preferences } from '../systems/input/preferences'
 import { isHintsEnabled, type Scenario } from '../systems/scenario'
+import { getRunLog } from '../logging/runLog'
 import { readAuthorityState } from './authorityLink'
 
 export interface HintValues {
@@ -49,6 +50,8 @@ export interface HintActions {
 type SliceHost = HintValues &
   HintActions & {
     playerId: string
+    planetTier: number
+    depthTiles: number
     prefs: Preferences
     rememberSeenHints(seenHints: readonly string[]): void
   }
@@ -119,4 +122,13 @@ function keepBoards(
     set({ hintBoard: hints.board, transmissionBoard })
   }
   if (hints.seen !== host.prefs.seenHints) host.rememberSeenHints(hints.seen)
+  recordHintShown(host, hints.board)
+}
+
+/** `hint_shown` once per hint, when it goes up (#58: the Upgrade bay hint is logged). */
+function recordHintShown(host: SliceHost, board: HintBoard): void {
+  const shown = board.shown
+  if (shown === null || shown.id === host.hintBoard.shown?.id) return
+  const place = { playerId: host.playerId, planet: host.planetTier, depthTiles: host.depthTiles }
+  getRunLog().record({ ...place, tick: shown.shownTick }, 'hint_shown', { hintId: shown.id })
 }
