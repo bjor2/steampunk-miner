@@ -29,18 +29,18 @@ import {
   type Carve,
   type CarveWindow,
   type CellDrillTicks,
-  type GroundChange,
 } from '../world/groundEdit'
 import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell, tierOffsetOfCell } from '../world/worldCell'
-import { deltaOfChunk, materialCellAt, type WorldState } from '../world/worldState'
+import { materialCellAt, type WorldState } from '../world/worldState'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
 import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
+import { groundChangedEventsOf } from './groundChangedEvents'
 
 type CarveIn = (world: WorldState, window: CarveWindow, drillTicksOf: CellDrillTicks) => Carve
 
@@ -108,7 +108,7 @@ function drillGround(
     state: collected.state,
     events: [
       damageEvent(params, state.world, target.tile, drill, carved.ticksUsed),
-      ...carved.changes.map((change) => groundChangedEvent(carved.world, change)),
+      ...groundChangedEventsOf(carved),
       ...casingDrilledEvents(carved),
       ...collected.events,
     ],
@@ -214,7 +214,3 @@ function casingDrilledEvents({ casingCleared }: Carve): DomainEventBody[] {
   return [{ type: 'CasingDrilled', ...casingCleared }]
 }
 
-function groundChangedEvent(world: WorldState, change: GroundChange): DomainEventBody {
-  const { version } = deltaOfChunk(world, change.cx, change.cy)
-  return { type: 'GroundChanged', ...change, version }
-}

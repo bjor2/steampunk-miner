@@ -12,7 +12,6 @@ import { casingRingAround, lineRing } from '../world/casingLining'
 import { SOLID_DENSITY } from '../world/sampleGrid'
 import { clearDisc, fillDisc, type GroundEdit } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
-import { deltaOfChunk } from '../world/worldState'
 import type { AuthorityCommand } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
 import { casingGradeRangeRejection } from './casingRules'
@@ -25,7 +24,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
-import type { DomainEventBody } from './domainEvent'
+import { groundChangedEventsOf } from './groundChangedEvents'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 
 type CircleCommand = 'debug.carveCircle' | 'debug.fillCircle'
@@ -83,7 +82,7 @@ function lineCasingRing(
   return {
     state: { ...state, world: lined.world },
     events: [
-      ...groundChangedEvents(lined),
+      ...groundChangedEventsOf(lined),
       { type: 'CasingPlaced', samples: lined.placed, relined: lined.relined, grade },
     ],
   }
@@ -111,16 +110,9 @@ function applyCircle(
   const params = planetParamsOf(state.planet)
   if (params === null) return unchanged(state)
   const edited = edit(params, command)
-  return { state: { ...state, world: edited.world }, events: groundChangedEvents(edited) }
+  return { state: { ...state, world: edited.world }, events: groundChangedEventsOf(edited) }
 }
 
-function groundChangedEvents(edited: GroundEdit): DomainEventBody[] {
-  return edited.changes.map((change) => ({
-    type: 'GroundChanged',
-    ...change,
-    version: deltaOfChunk(edited.world, change.cx, change.cy).version,
-  }))
-}
 
 function discOf(circle: { x: number; y: number; radius: number }) {
   return { xMm: circle.x, yMm: circle.y, radiusMm: circle.radius, floorRadiusMm: null }
