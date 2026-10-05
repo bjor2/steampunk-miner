@@ -4,7 +4,7 @@
  * Electron it forwards to the preload bridge; in a plain browser it falls back to in-memory
  * buffers so the same game code runs in both.
  */
-import type { AppInfo, RunDocumentName } from '../../electron/bridgeContract.cts'
+import type { AppInfo, RunDocumentName, SaveFolderName } from '../../electron/bridgeContract.cts'
 import { createBrowserShell } from './browserShell'
 import { createElectronShell } from './electronShell'
 
@@ -28,12 +28,23 @@ export interface Shell {
   readBufferedRunEvents(runId: string): string
   /** Browser only: the command NDJSON written so far (Electron writes files and returns ''). */
   readBufferedRunCommands(runId: string): string
+  /** Replaces a save slot atomically, in the folder this run's saves belong to (`saveFolderOf`). */
+  writeSaveSlot(slot: number, json: string): Promise<void>
+  /** The slot's text, or null when it holds no save. */
+  readSaveSlot(slot: number): Promise<string | null>
+  /** Moves a save this build refused out of the way, so the next checkpoint cannot overwrite it. */
+  setAsideSaveSlot(slot: number): Promise<void>
   /** Puts a handle on `window` for bots and the dev console (Playwright, design doc section 20). */
   exposeGlobalHandle(name: string, handle: unknown): void
   /** Reports key presses (`KeyboardEvent.code`, e.g. "KeyA") and releases; returns an unsubscribe. */
   onKeyChange(listener: (code: string, isDown: boolean) => void): () => void
   /** Runs when the page is hidden or closing: the last chance to flush the run log. */
   onPageHide(callback: () => void): void
+}
+
+/** A debug-enabled run never writes into the cloud-synced folder (#11 section 6, #12). */
+export function saveFolderOf(launch: LaunchParameters): SaveFolderName {
+  return launch.debugEnabled ? 'saves-debug' : 'saves'
 }
 
 let shell: Shell | null = null

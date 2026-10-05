@@ -4,9 +4,11 @@ import { join } from 'node:path'
 import type { AppInfo } from './bridgeContract.cjs'
 import { SHELL_CHANNELS } from './channels.cjs'
 import { appendRunCommands, appendRunEvents, writeRunDocument } from './runLogFiles.cjs'
+import { readSaveSlot, setAsideSaveSlot, writeSaveSlot } from './saveFiles.cjs'
 
 export function registerShellHandlers(): void {
-  const logsRoot = join(app.getPath('userData'), 'logs')
+  const userData = app.getPath('userData')
+  const logsRoot = join(userData, 'logs')
 
   ipcMain.handle(SHELL_CHANNELS.getAppInfo, (): AppInfo => readAppInfo())
   ipcMain.handle(SHELL_CHANNELS.appendRunEvents, (_event, runId, ndjsonLines) =>
@@ -17,6 +19,15 @@ export function registerShellHandlers(): void {
   )
   ipcMain.handle(SHELL_CHANNELS.writeRunDocument, (_event, runId, document, json) =>
     writeRunDocument(logsRoot, runId, document, json),
+  )
+  ipcMain.handle(SHELL_CHANNELS.writeSaveSlot, (_event, folder, slot, json) =>
+    writeSaveSlot(userData, folder, slot, json),
+  )
+  ipcMain.handle(SHELL_CHANNELS.readSaveSlot, (_event, folder, slot) =>
+    readSaveSlot(userData, folder, slot),
+  )
+  ipcMain.handle(SHELL_CHANNELS.setAsideSaveSlot, (_event, folder, slot) =>
+    setAsideSaveSlot(userData, folder, slot),
   )
 }
 

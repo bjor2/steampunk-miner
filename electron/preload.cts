@@ -1,6 +1,6 @@
 /**
  * Preload: exposes the minimal typed bridge to the renderer as `window.steampunkShell`. Runs
- * sandboxed with context isolation, so the renderer gets these four functions and nothing of
+ * sandboxed with context isolation, so the renderer gets these few functions and nothing of
  * Node or Electron. Every addition here widens what a compromised page could do: validate in
  * the main process (electron/ipcHandlers.cts), not here.
  */
@@ -14,6 +14,9 @@ const channels = {
   appendRunEvents: 'shell:appendRunEvents',
   appendRunCommands: 'shell:appendRunCommands',
   writeRunDocument: 'shell:writeRunDocument',
+  writeSaveSlot: 'shell:writeSaveSlot',
+  readSaveSlot: 'shell:readSaveSlot',
+  setAsideSaveSlot: 'shell:setAsideSaveSlot',
 } as const satisfies typeof SHELL_CHANNELS
 
 const bridge: ShellBridge = {
@@ -24,6 +27,10 @@ const bridge: ShellBridge = {
     ipcRenderer.invoke(channels.appendRunCommands, runId, ndjsonLines),
   writeRunDocument: (runId, document, json) =>
     ipcRenderer.invoke(channels.writeRunDocument, runId, document, json),
+  writeSaveSlot: (folder, slot, json) =>
+    ipcRenderer.invoke(channels.writeSaveSlot, folder, slot, json),
+  readSaveSlot: (folder, slot) => ipcRenderer.invoke(channels.readSaveSlot, folder, slot),
+  setAsideSaveSlot: (folder, slot) => ipcRenderer.invoke(channels.setAsideSaveSlot, folder, slot),
 }
 
 contextBridge.exposeInMainWorld('steampunkShell', bridge)

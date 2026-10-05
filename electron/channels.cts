@@ -8,4 +8,7 @@ export const SHELL_CHANNELS = {
   appendRunEvents: 'shell:appendRunEvents',
   appendRunCommands: 'shell:appendRunCommands',
   writeRunDocument: 'shell:writeRunDocument',
+  writeSaveSlot: 'shell:writeSaveSlot',
+  readSaveSlot: 'shell:readSaveSlot',
+  setAsideSaveSlot: 'shell:setAsideSaveSlot',
 } as const
