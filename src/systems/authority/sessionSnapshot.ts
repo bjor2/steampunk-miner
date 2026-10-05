@@ -54,7 +54,7 @@ export interface PortableState {
   debugApplied: boolean
 }
 
-interface PortablePlayer {
+export interface PortablePlayer {
   wallet: string
   lastSeq: number
   vehicle: PortableVehicle
