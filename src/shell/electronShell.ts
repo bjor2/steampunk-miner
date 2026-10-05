@@ -2,11 +2,12 @@
 import type { ShellBridge } from '../../electron/bridgeContract.cts'
 import { readElectronLaunchParameters } from './launchParameters'
 import { exposeOnWindow, listenForKeys, runOnPageHide } from './sharedBrowserHooks'
-import { saveFolderOf, type Shell } from './shell'
+import { preferencesFileOf, saveFolderOf, type Shell } from './shell'
 
 export function createElectronShell(bridge: ShellBridge): Shell {
   const launch = readElectronLaunchParameters(bridge.getLaunch())
   const folder = saveFolderOf(launch)
+  const preferencesFile = preferencesFileOf(launch)
   return {
     kind: 'electron',
     launch,
@@ -17,6 +18,8 @@ export function createElectronShell(bridge: ShellBridge): Shell {
     writeSaveSlot: (slot, json) => bridge.writeSaveSlot(folder, slot, json),
     readSaveSlot: (slot) => bridge.readSaveSlot(folder, slot),
     setAsideSaveSlot: (slot) => bridge.setAsideSaveSlot(folder, slot),
+    readPreferences: () => bridge.readPreferences(preferencesFile),
+    writePreferences: (json) => bridge.writePreferences(preferencesFile, json),
     readBufferedRunEvents: () => '',
     readBufferedRunCommands: () => '',
     exposeGlobalHandle: exposeOnWindow,

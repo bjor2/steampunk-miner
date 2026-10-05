@@ -25,6 +25,12 @@ export type SaveFolderName = 'saves' | 'saves-debug'
  * What the main process was launched with (#11 section 6): the debug API only with
  * `--debug-api`, and a `--scenario=<path>` file's text only then.
  */
+/**
+ * The local preferences file (#33): presentation settings and rebinding, never in a save. A debug
+ * run keeps its own file, so a test never changes a player's settings.
+ */
+export type PreferencesFileName = 'preferences' | 'preferences-debug'
+
 export interface ShellLaunch {
   debugEnabled: boolean
   scenarioText: string | null
@@ -46,4 +52,8 @@ export interface ShellBridge {
   readSaveSlot(folder: SaveFolderName, slot: number): Promise<string | null>
   /** Keeps a save this build refused as `slot-<slot>.refused.json`, out of the next write's way. */
   setAsideSaveSlot(folder: SaveFolderName, slot: number): Promise<void>
+  /** `<userData>/<file>.json`, or null when it was never written. */
+  readPreferences(file: PreferencesFileName): Promise<string | null>
+  /** Replaces `<userData>/<file>.json` atomically (temp file, then rename). */
+  writePreferences(file: PreferencesFileName, json: string): Promise<void>
 }

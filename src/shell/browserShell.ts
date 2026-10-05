@@ -6,11 +6,12 @@
  */
 import { readBrowserLaunchParameters } from './launchParameters'
 import { exposeOnWindow, listenForKeys, runOnPageHide } from './sharedBrowserHooks'
-import { saveFolderOf, type Shell } from './shell'
+import { preferencesFileOf, saveFolderOf, type Shell } from './shell'
 
 export function createBrowserShell(): Shell {
   const launch = readBrowserLaunchParameters()
   const slotKey = (slot: number) => `steampunk-miner/${saveFolderOf(launch)}/slot-${slot}.json`
+  const preferencesKey = `steampunk-miner/${preferencesFileOf(launch)}.json`
   const eventLinesByRun = new Map<string, string>()
   const commandLinesByRun = new Map<string, string>()
   const documentsByRun = new Map<string, string>()
@@ -36,6 +37,8 @@ export function createBrowserShell(): Shell {
     writeSaveSlot: async (slot, json) => window.localStorage.setItem(slotKey(slot), json),
     readSaveSlot: async (slot) => window.localStorage.getItem(slotKey(slot)),
     setAsideSaveSlot: async (slot) => setAsideStoredSlot(slotKey(slot)),
+    readPreferences: async () => window.localStorage.getItem(preferencesKey),
+    writePreferences: async (json) => window.localStorage.setItem(preferencesKey, json),
     readBufferedRunEvents: (runId) => eventLinesByRun.get(runId) ?? '',
     readBufferedRunCommands: (runId) => commandLinesByRun.get(runId) ?? '',
     exposeGlobalHandle: exposeOnWindow,

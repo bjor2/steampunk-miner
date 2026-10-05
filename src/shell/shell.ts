@@ -4,7 +4,12 @@
  * Electron it forwards to the preload bridge; in a plain browser it falls back to in-memory
  * buffers so the same game code runs in both.
  */
-import type { AppInfo, RunDocumentName, SaveFolderName } from '../../electron/bridgeContract.cts'
+import type {
+  AppInfo,
+  PreferencesFileName,
+  RunDocumentName,
+  SaveFolderName,
+} from '../../electron/bridgeContract.cts'
 import { createBrowserShell } from './browserShell'
 import { createElectronShell } from './electronShell'
 
@@ -15,6 +20,15 @@ export interface LaunchParameters {
   debugEnabled: boolean
   /** A scenario's raw JSON text: `?scenario=` in a browser, a `--scenario=<path>` file in Electron. */
   scenarioText: string | null
+}
+
+/** One key going down or up (`KeyboardEvent.code`, e.g. "KeyA"), as the input layer reads it. */
+export interface KeyChange {
+  code: string
+  isDown: boolean
+  /** The browser's auto-repeat of a held key: edge actions ignore it (#33 section 1). */
+  isRepeat: boolean
+  isShiftHeld: boolean
 }
 
 export interface Shell {
@@ -36,8 +50,12 @@ export interface Shell {
   setAsideSaveSlot(slot: number): Promise<void>
   /** Puts a handle on `window` for bots and the dev console (Playwright, design doc section 20). */
   exposeGlobalHandle(name: string, handle: unknown): void
-  /** Reports key presses (`KeyboardEvent.code`, e.g. "KeyA") and releases; returns an unsubscribe. */
-  onKeyChange(listener: (code: string, isDown: boolean) => void): () => void
+  /** The local preferences file's text (#33), or null when none was written yet. */
+  readPreferences(): Promise<string | null>
+  /** Replaces the local preferences file; a debug run writes its own (`preferencesFileOf`). */
+  writePreferences(json: string): Promise<void>
+  /** Reports key presses and releases; returns an unsubscribe. */
+  onKeyChange(listener: (key: KeyChange) => void): () => void
   /** Runs when the page is hidden or closing: the last chance to flush the run log. */
   onPageHide(callback: () => void): void
 }
@@ -49,6 +67,12 @@ export interface Shell {
 export function saveFolderOf(launch: LaunchParameters): SaveFolderName {
   const isDebugRun = launch.debugEnabled || launch.scenarioText !== null
   return isDebugRun ? 'saves-debug' : 'saves'
+}
+
+/** Like saves, a debug or scenario run never touches the player's settings. */
+export function preferencesFileOf(launch: LaunchParameters): PreferencesFileName {
+  const isDebugRun = launch.debugEnabled || launch.scenarioText !== null
+  return isDebugRun ? 'preferences-debug' : 'preferences'
 }
 
 let shell: Shell | null = null

@@ -5,6 +5,7 @@ import type { AppInfo } from './bridgeContract.cjs'
 import { SHELL_CHANNELS } from './channels.cjs'
 import { readShellLaunch } from './launchOptions.cjs'
 import { appendRunCommands, appendRunEvents, writeRunDocument } from './runLogFiles.cjs'
+import { readPreferences, writePreferences } from './preferencesFiles.cjs'
 import { readSaveSlot, setAsideSaveSlot, writeSaveSlot } from './saveFiles.cjs'
 
 export function registerShellHandlers(): void {
@@ -34,6 +35,10 @@ export function registerShellHandlers(): void {
   )
   ipcMain.handle(SHELL_CHANNELS.setAsideSaveSlot, (_event, folder, slot) =>
     setAsideSaveSlot(userData, folder, slot),
+  )
+  ipcMain.handle(SHELL_CHANNELS.readPreferences, (_event, file) => readPreferences(userData, file))
+  ipcMain.handle(SHELL_CHANNELS.writePreferences, (_event, file, json) =>
+    writePreferences(userData, file, json),
   )
 }
 

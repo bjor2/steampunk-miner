@@ -18,6 +18,8 @@ const channels = {
   writeSaveSlot: 'shell:writeSaveSlot',
   readSaveSlot: 'shell:readSaveSlot',
   setAsideSaveSlot: 'shell:setAsideSaveSlot',
+  readPreferences: 'shell:readPreferences',
+  writePreferences: 'shell:writePreferences',
 } as const satisfies typeof SHELL_CHANNELS
 
 const bridge: ShellBridge = {
@@ -33,6 +35,8 @@ const bridge: ShellBridge = {
     ipcRenderer.invoke(channels.writeSaveSlot, folder, slot, json),
   readSaveSlot: (folder, slot) => ipcRenderer.invoke(channels.readSaveSlot, folder, slot),
   setAsideSaveSlot: (folder, slot) => ipcRenderer.invoke(channels.setAsideSaveSlot, folder, slot),
+  readPreferences: (file) => ipcRenderer.invoke(channels.readPreferences, file),
+  writePreferences: (file, json) => ipcRenderer.invoke(channels.writePreferences, file, json),
 }
 
 contextBridge.exposeInMainWorld('steampunkShell', bridge)

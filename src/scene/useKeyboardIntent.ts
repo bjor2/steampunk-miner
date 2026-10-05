@@ -19,7 +19,7 @@ export function useKeyboardIntent(): MutableRefObject<VehicleIntent> {
   const intent = useRef<VehicleIntent>(IDLE_INTENT)
   useEffect(() => {
     const held: ActionId[] = []
-    return getShell().onKeyChange((code, isDown) => {
+    return getShell().onKeyChange(({ code, isDown }) => {
       for (const action of actionsOfChord(ACTION_MAP, BINDINGS, 'vehicle', code)) {
         recordAction(held, action, isDown)
       }
