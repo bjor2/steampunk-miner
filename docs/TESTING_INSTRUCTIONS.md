@@ -6,11 +6,11 @@ Playwright layer, which this repo does not have yet.
 
 ## 1. The layers
 
-|        | `npm test` (Vitest)                                         | Browser end-to-end                     |
-| ------ | ----------------------------------------------------------- | -------------------------------------- |
-| Runs   | Node, no DOM, no physics, no canvas                         | **Does not exist yet**                 |
-| Covers | Formulas, store actions, logging, scenario rules, debug API | What the camera shows, how input feels |
-| Status | The whole automated layer. Run it.                          | Verify by hand in `npm run dev`        |
+|        | `npm test` (Vitest)                                                    | Browser end-to-end                     |
+| ------ | ---------------------------------------------------------------------- | -------------------------------------- |
+| Runs   | Node, no DOM, no canvas; a Rapier world only in `src/physics` specs    | **Does not exist yet**                 |
+| Covers | Formulas, store actions, logging, scenario rules, debug API, collision | What the camera shows, how input feels |
+| Status | The whole automated layer. Run it.                                     | Verify by hand in `npm run dev`        |
 
 `vite.config.ts` includes only `src/**/*.test.ts`. There are no component tests: if a change can
 only be trusted by looking at it, look at it and say so in the commit.
@@ -21,6 +21,15 @@ only be trusted by looking at it, look at it and say so in the commit.
   import graph (ESLint enforces it). The default home for any rule.
 - `src/store/` – what an action does to the world; reset with `resetGameStore()` in `beforeEach`.
 - `src/logging/`, `src/debug/` – event stamping, NDJSON, sinks, debug commands.
+- `src/physics/` – the physics layer: what only a real collision world can show (no tunnelling
+  through intact tiles, entering and leaving a 1-tile bore). Rules of this layer:
+  - Create a plain `@dimforge/rapier3d-compat` world (`await RAPIER.init()` in `beforeAll`) with zero
+    gravity, and drive it only through the game's own seams (`createVehicleBody`,
+    `createVehicleController`); never through `@react-three/rapier`, React or a canvas.
+  - Step it on `PHYSICS_TIMESTEP`, the same fixed step as the game. Assert outcomes in tiles and
+    metres (which tile the vehicle is in, how far from the centre), never exact floats or frames.
+  - Anything a pure rule can answer (motion, gravity, swivel, pose quantising) is tested in
+    `src/systems/` instead; feel (how driving or the camera looks) stays a hand check.
 - `electron/` – no tests yet (the main process is thin). Its one rule worth testing, run-id
   validation in `runLogFiles.cts`, mirrors `isValidRunId`, which is tested.
 

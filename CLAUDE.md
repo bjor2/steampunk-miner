@@ -19,7 +19,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | ----------------------------------------- | --------------------------------------------------------- |
 | `npm run dev`                             | Vite dev server (browser)                                 |
 | `npm run typecheck`                       | `tsc` for `src/` and for `electron/`                      |
-| `npm test`                                | Vitest (node, no DOM, no canvas, no physics)              |
+| `npm test`                                | Vitest (node, no DOM, no canvas; Rapier in physics specs) |
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
 | `npm run lint` / `npm run format`         | ESLint (enforces the layer rules) / Prettier              |
 | `npm run build`                           | typecheck `src/` + Vite production build into `dist/`     |
@@ -108,7 +108,8 @@ Repo-specific rules:
 
 ## Testing rulebook (short; the full text is [docs/TESTING_INSTRUCTIONS.md](docs/TESTING_INSTRUCTIONS.md))
 
-- Vitest runs in node: no DOM, no canvas, no physics world. Run the files for the modules you touched
+- Vitest runs in node: no DOM, no canvas; only `src/physics` specs build a Rapier world (rules in the
+  rulebook). Run the files for the modules you touched
   (`npx vitest run src/systems`); run all of `npm test` when a change crosses modules.
 - Tests live beside the code on seams that survive refactoring: pure `systems/` functions, store
   actions (what an action does to the world), the logging and debug API. Never private helpers, JSX
