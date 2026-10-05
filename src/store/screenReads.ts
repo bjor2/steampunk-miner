@@ -33,7 +33,7 @@ export function readPlaqueModel(): PlaqueModel {
 }
 
 /** Where the music stands now (#49), from the authority replica and the client-owned depth. */
-export function readMusicMoment(): MusicMoment {
+function readMusicMoment(): MusicMoment {
   const { playerId, depthTiles } = useGameStore.getState()
   return musicMomentOf(readAuthorityState(), playerId, depthTiles)
 }

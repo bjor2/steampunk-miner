@@ -1,44 +1,23 @@
 /**
  * The synthesised placeholder sounds (#13: "synthesised in the browser audio engine"): three
- * loops (drill, engine chug, steam hiss), four music layers and the one-shots (chime, clank,
- * thud, stingers), all from oscillators and one noise buffer. Built once per audio context; the
- * loops run from the start and are only ever re-levelled, so a frame never builds a node, and a
- * level that has not moved is not rescheduled.
+ * loops (drill, engine chug, steam hiss), the music's step sequencer (#49) and the one-shots
+ * (chime, clank, thud, stingers), all from oscillators and one noise buffer. Built once per audio
+ * context; the sound loops run from the start and are only ever re-levelled, so a frame never
+ * builds a node for them, and a level that has not moved is not rescheduled.
  */
-import type { MusicLayers } from '../systems/audio/musicLayers'
+import { MUSIC_BOOK } from '../systems/audio/musicBook'
+import { gainOf, glide, SILENCE } from './audioNodes'
+import { createMusicSequencer } from './musicSequencer'
 import type { ClankWeight, SoundOut, StingerKind } from './soundOut'
 
 export type WebAudioGraph = SoundOut & { context: AudioContext }
-
-type LayerName = keyof MusicLayers
 
 interface Loop {
   oscillator: OscillatorNode
   out: GainNode
 }
 
-interface MusicBus {
-  layers: Readonly<Record<LayerName, GainNode>>
-  oscillators: readonly OscillatorNode[]
-  tuning: number
-}
-
 const MASTER_GAIN = 0.5
-const MUSIC_GAIN = 0.1
-/** Continuous levels glide toward a new value with this time constant, so they never click. */
-const GLIDE_SECONDS = 0.04
-const SILENCE = 0.0001
-/** A level closer than this to where it is heading is left alone. */
-const UNHEARD_CHANGE = 0.0005
-const CENTS_PER_SEMITONE = 100
-
-/** Planet 1's notes per layer (Hz); every planet shifts them all by its tuning (#13). */
-const LAYER_NOTES: Readonly<Record<LayerName, { type: OscillatorType; hz: number[] }>> = {
-  platform: { type: 'triangle', hz: [220, 277.18, 329.63] },
-  ambience: { type: 'sine', hz: [55, 82.41] },
-  tension: { type: 'sawtooth', hz: [58.27, 61.74] },
-  combat: { type: 'square', hz: [73.42] },
-}
 
 export function createWebAudioGraph(context: AudioContext): WebAudioGraph {
   const master = gainOf(context, MASTER_GAIN, context.destination)
@@ -46,7 +25,7 @@ export function createWebAudioGraph(context: AudioContext): WebAudioGraph {
   const drill = createDrillLoop(context, master)
   const engine = createEngineLoop(context, master)
   const steam = createSteamLoop(context, master, noise)
-  const music = createMusicBus(context, master)
+  const music = createMusicSequencer(context, master, noise, MUSIC_BOOK)
   return {
     context,
     playChime: (frequency) => playChime(context, master, frequency),
@@ -56,23 +35,9 @@ export function createWebAudioGraph(context: AudioContext): WebAudioGraph {
     setDrill: (frequency, gain) => levelLoop(context, drill, frequency, gain),
     setEngine: (puffs, gain) => levelLoop(context, engine, puffs, gain),
     setSteam: (gain) => glide(context, steam.gain, gain),
-    setMusic: (layers, tuning) => levelMusic(context, music, layers, tuning),
+    setMusic: (layers, tuning, busGain) => music.setMusic(layers, tuning, busGain),
+    playMusicStinger: (stingerId, tuning) => music.playStinger(stingerId, tuning),
   }
-}
-
-function gainOf(context: AudioContext, gain: number, destination: AudioNode): GainNode {
-  const node = new GainNode(context, { gain })
-  node.connect(destination)
-  return node
-}
-
-const headingTo = new WeakMap<AudioParam, number>()
-
-function glide(context: AudioContext, param: AudioParam, value: number): void {
-  const heading = headingTo.get(param)
-  if (heading !== undefined && Math.abs(heading - value) < UNHEARD_CHANGE) return
-  headingTo.set(param, value)
-  param.setTargetAtTime(value, context.currentTime, GLIDE_SECONDS)
 }
 
 function levelLoop(context: AudioContext, loop: Loop, frequency: number, gain: number): void {
@@ -123,55 +88,6 @@ function createSteamLoop(context: AudioContext, master: GainNode, noise: AudioBu
   source.connect(filter)
   source.start()
   return out
-}
-
-function createMusicBus(context: AudioContext, master: GainNode): MusicBus {
-  const bus = gainOf(context, MUSIC_GAIN, master)
-  const oscillators: OscillatorNode[] = []
-  const layerOf = (name: LayerName) => {
-    const layer = gainOf(context, 0, bus)
-    const { type, hz } = LAYER_NOTES[name]
-    hz.forEach((frequency) => oscillators.push(startedOscillator(context, type, frequency, layer)))
-    return layer
-  }
-  const layers = {
-    platform: layerOf('platform'),
-    ambience: layerOf('ambience'),
-    tension: layerOf('tension'),
-    combat: layerOf('combat'),
-  }
-  return { layers, oscillators, tuning: 0 }
-}
-
-function startedOscillator(
-  context: AudioContext,
-  type: OscillatorType,
-  frequency: number,
-  destination: AudioNode,
-): OscillatorNode {
-  const oscillator = new OscillatorNode(context, { type, frequency })
-  oscillator.connect(destination)
-  oscillator.start()
-  return oscillator
-}
-
-function levelMusic(
-  context: AudioContext,
-  music: MusicBus,
-  layers: MusicLayers,
-  tuning: number,
-): void {
-  for (const name of Object.keys(music.layers) as LayerName[]) {
-    glide(context, music.layers[name].gain, layers[name])
-  }
-  if (tuning !== music.tuning) retuneMusic(music, tuning)
-}
-
-function retuneMusic(music: MusicBus, tuning: number): void {
-  music.tuning = tuning
-  music.oscillators.forEach((oscillator) => {
-    oscillator.detune.value = tuning * CENTS_PER_SEMITONE
-  })
 }
 
 /** A note that strikes and rings out, stopping itself when silent. */
