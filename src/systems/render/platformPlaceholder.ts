@@ -16,10 +16,23 @@ export interface PartShape {
   size: readonly [number, number]
   offset: readonly [number, number]
   colour: string
+  /** Glows by itself (emissive), so it reads in the dark and feeds the bloom (#38, #48). */
+  isGlowing?: boolean
+}
+
+/** A light on the platform (#48: the same material language as the vehicle, lit by its lamps). */
+export interface PlatformLamp {
+  id: string
+  offset: readonly [number, number]
+  colour: string
+  rangeM: number
+  strength: number
 }
 
 export interface PlatformLook {
   shapes: readonly PartShape[]
+  /** Its point-light sources; at most 4 lights shine in view (#38), so a few, never one per part. */
+  lamps: readonly PlatformLamp[]
   /** The bay gauge's empty frame; the fill grows up from its bottom edge. */
   bayGauge: { offset: readonly [number, number]; size: readonly [number, number] }
 }
@@ -59,15 +72,27 @@ const CORE_DRIVE: readonly PartShape[] = [
   box([0.3, 1.4], [-3.7, 3.5], IRON),
   box([2.6, 0.13], [-2.9, 3.0], COPPER),
   box([0.13, 0.9], [-1.65, 2.5], COPPER),
-  disc(1.3, [-2.6, 3.7], CORE_GLOW),
-  disc(0.6, [-2.6, 3.7], CORE_HEART),
+  { ...disc(1.3, [-2.6, 3.7], CORE_GLOW), isGlowing: true },
+  { ...disc(0.6, [-2.6, 3.7], CORE_HEART), isGlowing: true },
+]
+
+/** Placeholders, tuned by eye: a warm work lamp over the brass rail, the core drive's glow. */
+const OUTPOST_LAMPS: readonly PlatformLamp[] = [
+  { id: 'platform-lamp', offset: [-0.9, 2.8], colour: '#ffd9a0', rangeM: 6, strength: 0.4 },
+]
+const CORE_DRIVE_LAMPS: readonly PlatformLamp[] = [
+  { id: 'core-drive-glow', offset: [-2.6, 3.7], colour: CORE_GLOW, rangeM: 5, strength: 0.8 },
 ]
 
 const BAY_GAUGE = { offset: [-3.4, 1.4] as const, size: [0.5, 1.6] as const }
 
 export function platformLookOf(visualState: PlatformVisualState): PlatformLook {
-  const extras = visualState === 'core_drive' ? CORE_DRIVE : []
-  return { shapes: [...OUTPOST, ...extras], bayGauge: BAY_GAUGE }
+  const isCoreDrive = visualState === 'core_drive'
+  return {
+    shapes: [...OUTPOST, ...(isCoreDrive ? CORE_DRIVE : [])],
+    lamps: [...OUTPOST_LAMPS, ...(isCoreDrive ? CORE_DRIVE_LAMPS : [])],
+    bayGauge: BAY_GAUGE,
+  }
 }
 
 /** The bay gauge's fill, 0 to 1: `bay / coreNeeded`, full past the need, empty with no core. */

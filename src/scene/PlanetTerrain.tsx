@@ -11,6 +11,7 @@ import { planetParamsFor } from '../systems/world/planetParams'
 import { EMPTY_WORLD } from '../systems/world/worldState'
 import { createChunkMeshPool, type ChunkMeshPool, type TerrainView } from './chunkMeshPool'
 import { drillPresence } from './drillPresence'
+import { lightPresence } from './lightPresence'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
 import { vehiclePresence } from './vehiclePresence'
 
@@ -65,5 +66,6 @@ function createTerrainLightScratch(): TerrainLight {
     facing: drillPresence.facing,
     planetRadiusTiles: 0,
     dt: 0,
+    pointLights: lightPresence.pointLights,
   }
 }

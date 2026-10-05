@@ -104,6 +104,18 @@ export const HEADLAMP_HALF_ANGLE_RADIANS = 0.55
 export const HEADLAMP_SPILL_TILES = 2.5
 
 /**
+ * Dynamic lights (#38 "Lights", #48): the headlamp plus at most 4 point lights in view (bay
+ * lights, the core drive, drill sparks); everything else glows through emissive colour. A point
+ * light's `strength` is its share of full light at its centre, fading to nothing at its range.
+ * The drill-spark light and the headlamp's light on the vehicle's own parts are placeholders,
+ * tuned by eye.
+ */
+export const MAX_POINT_LIGHTS = 4
+export const DRILL_SPARK_LIGHT = { colour: '#ffb347', rangeM: 3.5, strength: 0.9 } as const
+/** The lamp seen from the camera side, so it lights the flat parts facing the camera. */
+export const HEADLAMP_BODY_LIGHT = { heightM: 1.2, rangeM: 4, strength: 0.5 } as const
+
+/**
  * Drill sparks (#13 VFX, from a small particle set). Placeholders, tuned by eye; the pool is
  * fixed, so a long drill never allocates.
  */

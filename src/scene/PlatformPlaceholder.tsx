@@ -1,6 +1,7 @@
 /**
  * The platform on its pad (#8, #13): the outpost, and the core drive once the authority's
- * `platform.visualState` says so, with the core bay's fill gauge on its body. Drawn behind the
+ * `platform.visualState` says so, with the core bay's fill gauge on its body. Lit by the scene's
+ * lights (#38, #48); its lamps are `LightRig`'s. Drawn behind the
  * vehicle; it changes only when the replica does, so it renders through React like the vehicle's
  * parts, never per frame.
  */
@@ -20,6 +21,9 @@ const FILL_Z = 0.035
 const DISC_SEGMENTS = 28
 const GAUGE_FRAME = '#1b1613'
 const GAUGE_FILL = '#ff8a4a'
+const NO_GLOW = '#000000'
+/** Matte, like the vehicle's parts (#48 one material language); tuned by eye. */
+const PART_ROUGHNESS = 0.55
 
 export function PlatformPlaceholder() {
   // The planet's seed re-renders this on travel or a new seed, where the pad moves.
@@ -48,6 +52,7 @@ function originOfPlanet(): { x: number; y: number } | null {
 function PlatformShapeMesh({ shape }: { shape: PartShape }) {
   const [width, height] = shape.size
   const [x, y] = shape.offset
+  const emissive = shape.isGlowing === true ? shape.colour : NO_GLOW
   return (
     <mesh position={[x, y, PLATFORM_Z]}>
       {shape.shape === 'disc' ? (
@@ -55,7 +60,7 @@ function PlatformShapeMesh({ shape }: { shape: PartShape }) {
       ) : (
         <planeGeometry args={[width, height]} />
       )}
-      <meshBasicMaterial color={shape.colour} />
+      <meshStandardMaterial color={shape.colour} roughness={PART_ROUGHNESS} emissive={emissive} />
     </mesh>
   )
 }
@@ -76,12 +81,12 @@ function BayGauge({
     <>
       <mesh position={[offset[0], offset[1], GAUGE_Z]}>
         <planeGeometry args={[width, height]} />
-        <meshBasicMaterial color={GAUGE_FRAME} />
+        <meshStandardMaterial color={GAUGE_FRAME} roughness={PART_ROUGHNESS} />
       </mesh>
       {fill > 0 && (
         <mesh position={[offset[0], fillY, FILL_Z]}>
           <planeGeometry args={[width * 0.7, fillHeight]} />
-          <meshBasicMaterial color={GAUGE_FILL} />
+          <meshStandardMaterial color={GAUGE_FILL} emissive={GAUGE_FILL} />
         </mesh>
       )}
     </>

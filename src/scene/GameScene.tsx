@@ -7,6 +7,7 @@ import { CAMERA_POSITION } from '../constants/scene'
 import { PhysicsWorld } from '../physics/PhysicsWorld'
 import { useGameStore } from '../store/gameStore'
 import { EnemyPlaceholders } from './EnemyPlaceholders'
+import { LightRig } from './LightRig'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetTerrain } from './PlanetTerrain'
 import { PlatformPlaceholder } from './PlatformPlaceholder'
@@ -25,6 +26,7 @@ export function GameScene() {
       <SkyBackground />
       <ScreenFeedback />
       <PlanetCamera />
+      <LightRig />
       <PlanetTerrain />
       <PlatformPlaceholder />
       <EnemyPlaceholders />

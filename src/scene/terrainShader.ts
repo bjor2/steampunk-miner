@@ -7,8 +7,8 @@
  * The edge highlight is the band just inside that contour. Colours are display (sRGB) values written as is,
  * the flat look of #13 with no tone mapping.
  *
- * Lighting is the vehicle lamp plus ambient light that fades with depth (#13: capped to the lamp
- * and a small fixed number of lights). Ore glow, sparkles and the core's pulse are emissive, so
+ * Lighting is the vehicle lamp, ambient light that fades with depth, and the scene's point lights
+ * (#13, #38: the lamp plus at most 4 point lights; `LightRig` chooses them, an unused one is black). Ore glow, sparkles and the core's pulse are emissive, so
  * ore stays readable in the dark and by shape and brightness, not colour alone.
  */
 
@@ -52,6 +52,9 @@ uniform float uAmbientSurface;
 uniform float uAmbientDeep;
 uniform float uAmbientFade;
 uniform sampler2D uDensity;
+// x, y and range in metres; colour premultiplied by strength.
+uniform vec3 uPointLights[MAX_POINT_LIGHTS];
+uniform vec3 uPointColours[MAX_POINT_LIGHTS];
 
 varying vec2 vLocal;
 varying vec2 vChunk;
@@ -138,7 +141,12 @@ vec3 lightAt(vec2 world) {
   float cone = smoothstep(uLampCosHalfAngle, mix(uLampCosHalfAngle, 1.0, 0.35), along);
   float reach = 1.0 - smoothstep(uLampRange * 0.35, uLampRange, distance);
   float spill = 1.0 - smoothstep(0.0, uLampSpill, distance);
-  return vec3(ambient) + uLampColour * (cone * reach + 0.6 * spill);
+  vec3 points = vec3(0.0);
+  for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
+    float falloff = 1.0 - smoothstep(0.0, uPointLights[i].z, length(world - uPointLights[i].xy));
+    points += uPointColours[i] * falloff * falloff;
+  }
+  return vec3(ambient) + uLampColour * (cone * reach + 0.6 * spill) + points;
 }
 
 void main() {
