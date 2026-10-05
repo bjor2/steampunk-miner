@@ -51,14 +51,20 @@ export const RUN_EVENT_REGISTRY = {
     payload: { command: 'text', args: 'jsonArgs' },
   },
   command_rejected: { group: 'run', level: 'detail', payload: { type: 'text', reason: 'text' } },
+  // One per second of frames (#38 Consequences: render scale, frame p50/p95, draw calls,
+  // triangles and visible ground blocks join the #4 terrain and collider counts).
   perf_sample: {
     group: 'run',
     level: 'perf',
     payload: {
+      frameMsP50: 'float',
       frameMsP95: 'float',
       terrainMsP95: 'float',
+      renderScale: 'float',
       colliders: 'integer',
       drawCalls: 'integer',
+      triangles: 'integer',
+      groundBlocks: 'integer',
       chunksLoaded: 'integer',
     },
   },

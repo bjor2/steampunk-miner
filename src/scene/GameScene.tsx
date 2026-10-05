@@ -9,6 +9,7 @@ import { PhysicsWorld } from '../physics/PhysicsWorld'
 import { useGameStore } from '../store/gameStore'
 import { EnemyPlaceholders } from './EnemyPlaceholders'
 import { LightRig } from './LightRig'
+import { PerfSampler } from './PerfSampler'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetTerrain } from './PlanetTerrain'
 import { PlatformPlaceholder } from './PlatformPlaceholder'
@@ -37,6 +38,7 @@ export function GameScene() {
       </PhysicsWorld>
       <Sparks />
       <SoundStage />
+      <PerfSampler />
       <RenderPipeline />
     </Canvas>
   )

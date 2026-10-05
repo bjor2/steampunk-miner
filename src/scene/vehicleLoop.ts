@@ -29,6 +29,7 @@ import { chunkKey } from '../systems/world/tileGrid'
 import type { WorldState } from '../systems/world/worldState'
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
+import { renderPresence } from './renderPresence'
 
 const HALF_TILE = 0.5
 
@@ -58,6 +59,7 @@ export function createVehicleLoop(): VehicleLoop {
       reportWhenDue(loop, result)
       showDrill(result)
       showMotion(result)
+      renderPresence.groundColliders = controller.colliderCount()
     },
   }
 }

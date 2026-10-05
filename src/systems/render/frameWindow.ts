@@ -24,7 +24,12 @@ export function createFrameWindow(): FrameWindow {
 
 /** Past the capacity the oldest frames are overwritten; the window still spans its seconds. */
 export function addFrame(window: FrameWindow, dtSeconds: number): void {
-  window.frameMs[window.count % FRAME_WINDOW_CAPACITY] = dtSeconds * 1000
+  addFrameSample(window, dtSeconds * 1000, dtSeconds)
+}
+
+/** A per-frame cost other than the frame itself (the terrain's work), over the frame's `dt`. */
+export function addFrameSample(window: FrameWindow, sampleMs: number, dtSeconds: number): void {
+  window.frameMs[window.count % FRAME_WINDOW_CAPACITY] = sampleMs
   window.count++
   window.seconds += dtSeconds
 }

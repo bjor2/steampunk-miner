@@ -40,7 +40,7 @@ export function PlanetTerrain() {
     view.params = params
     view.world = world
     view.viewRadius = viewRadiusOf(size.width, size.height, (camera as OrthographicCamera).zoom)
-    pool.current.sync(view)
+    syncTimed(pool.current, view)
     recordGroundDrawn(pool.current)
     light.facing = drillPresence.facing
     light.planetRadiusTiles = params.radiusTiles
@@ -49,6 +49,13 @@ export function PlanetTerrain() {
   })
 
   return <group ref={group} />
+}
+
+/** The #4 terrain budget is 2 ms a frame; the perf log keeps its p95. */
+function syncTimed(pool: ChunkMeshPool, view: TerrainView): void {
+  const started = performance.now()
+  pool.sync(view)
+  renderPresence.terrainMs = performance.now() - started
 }
 
 /** The #38 visible-block budget, read by the render stats and the perf log. */
