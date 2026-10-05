@@ -14,6 +14,8 @@ import {
   DOCK_CLEARANCE_TILES,
   DOCK_HALF_WIDTH_TILES,
   ORE_DENSITY_BP,
+  PATCH_MEAN_CELLS,
+  PATCH_SEED_CHANCE_BP,
   PLANET_ARCHETYPES,
   RADIUS_BASE_TILES,
   RADIUS_GROWTH_TILES,
@@ -34,8 +36,12 @@ export interface PlanetParams {
    * membership needs no floating point (#4).
    */
   bandStartsHalfTileSq: readonly number[]
-  /** Ore chance per band 1..5 in basis points (#6). */
+  /** Expected ore tiles per solid non-core tile of bands 1..5, in basis points (#6, #42). */
   oreDensityBp: readonly number[]
+  /** Mean tiles per ore patch in bands 1..5 (#42). */
+  patchMeanCells: readonly number[]
+  /** Chance a band's patch lattice node fires, in basis points (#42 `seedProb`). */
+  patchSeedChanceBp: readonly number[]
   caveThresholdBp: number
   dockHalfWidthTiles: number
   dockClearanceTiles: number
@@ -63,6 +69,8 @@ export function planetParamsFor(worldSeed: number, planetIndex: number): PlanetP
     coreRadiusTiles: coreRadiusFor(radiusTiles),
     bandStartsHalfTileSq: bandStartsFor(radiusTiles),
     oreDensityBp: ORE_DENSITY_BP,
+    patchMeanCells: PATCH_MEAN_CELLS,
+    patchSeedChanceBp: PATCH_SEED_CHANCE_BP,
     caveThresholdBp: CAVE_THRESHOLD_BP,
     dockHalfWidthTiles: DOCK_HALF_WIDTH_TILES,
     dockClearanceTiles: DOCK_CLEARANCE_TILES,

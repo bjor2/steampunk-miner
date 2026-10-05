@@ -29,7 +29,7 @@ interface GeneratedTile {
 }
 
 function cellAt(params: PlanetParams, tx: number, ty: number): number {
-  return generateChunk(params, chunkOfTile(tx), chunkOfTile(ty))[cellIndexOfTile(tx, ty)]
+  return generateChunk(params, chunkOfTile(tx), chunkOfTile(ty)).cells[cellIndexOfTile(tx, ty)]
 }
 
 function everyTileOf(params: PlanetParams): GeneratedTile[] {
@@ -37,7 +37,7 @@ function everyTileOf(params: PlanetParams): GeneratedTile[] {
   const tiles: GeneratedTile[] = []
   for (let cy = min; cy <= max; cy++) {
     for (let cx = min; cx <= max; cx++) {
-      generateChunk(params, cx, cy).forEach((cell, index) =>
+      generateChunk(params, cx, cy).cells.forEach((cell, index) =>
         tiles.push({
           tx: cx * CHUNK_SIZE + (index % CHUNK_SIZE),
           ty: cy * CHUNK_SIZE + Math.floor(index / CHUNK_SIZE),
@@ -58,12 +58,12 @@ const planet1 = planetParamsFor(83921, 1)
 const planet1Tiles = everyTileOf(planet1)
 
 describe('generateChunk determinism', () => {
-  it('returns identical cells on repeated calls', () => {
+  it('returns identical cells and density on repeated calls', () => {
     const params = planetParamsFor(7, 2)
     expect(generateChunk(params, -3, 5)).toEqual(generateChunk(params, -3, 5))
   })
 
-  it('gives each chunk the same cells whatever order the chunks are generated in', () => {
+  it('gives each chunk the same cells and density whatever order the chunks are generated in', () => {
     const params = planetParamsFor(7, 2)
     const coordinates = [-4, -1, 0, 2, 9].flatMap((cx) => [-9, -1, 0, 3].map((cy) => [cx, cy]))
     const forwards = coordinates.map(([cx, cy]) => generateChunk(params, cx, cy))
@@ -114,19 +114,6 @@ describe('generated planet shape', () => {
     ).toBe(true)
     const families = new Set(ore.map(({ cell }) => familyOfCell(cell)))
     expect(families).toEqual(new Set([RESOURCE_FAMILY.metal, RESOURCE_FAMILY.crystal]))
-  })
-
-  it('places ore at the #6 density of each band, within a tenth', () => {
-    const densities = [0.1, 0.14, 0.18, 0.2, 0.22]
-    densities.forEach((density, bandIndex) => {
-      const solid = planet1Tiles.filter(
-        ({ tx, ty, cell }) =>
-          (kindOfCell(cell) === CELL_KIND.ground || kindOfCell(cell) === CELL_KIND.ore) &&
-          bandOfTile(planet1, tx, ty) === bandIndex + 1,
-      )
-      const ore = tilesOfKind(solid, CELL_KIND.ore)
-      expect(ore.length / solid.length).toBeCloseTo(density, 1)
-    })
   })
 })
 

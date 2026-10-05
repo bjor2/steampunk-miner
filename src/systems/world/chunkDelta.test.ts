@@ -14,7 +14,8 @@ import { planetParamsFor } from './planetParams'
 import { CHUNK_CELLS } from './tileGrid'
 import { AIR_CELL, GROUND_CELL, INDESTRUCTIBLE_CELL } from './worldCell'
 
-const generated = generateChunk(planetParamsFor(83921, 1), 2, 5)
+const NO_DENSITY = new Uint8Array(0)
+const generated = generateChunk(planetParamsFor(83921, 1), 2, 5).cells
 
 describe('chunk delta', () => {
   it('leaves the generated cells unchanged when empty', () => {
@@ -71,7 +72,9 @@ describe('chunk delta', () => {
 
   it('changes the chunk digest when a tile is removed', () => {
     const dug = applyChunkDelta(generated, withCellRemoved(EMPTY_CHUNK_DELTA, 500))
-    expect(chunkDigest(dug)).not.toBe(chunkDigest(generated))
-    expect(chunkDigest(generated)).toMatch(/^[0-9a-f]{16}$/)
+    expect(chunkDigest({ cells: dug, density: NO_DENSITY })).not.toBe(
+      chunkDigest({ cells: generated, density: NO_DENSITY }),
+    )
+    expect(chunkDigest({ cells: generated, density: NO_DENSITY })).toMatch(/^[0-9a-f]{16}$/)
   })
 })

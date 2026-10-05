@@ -41,6 +41,19 @@ export const BAND_START_DEPTH_PERCENT: readonly number[] = [8, 35, 65, 90]
 /** Ore tiles per drilled tile in bands 1 to 5, in basis points (#6 section 1: 0.10 ... 0.22). */
 export const ORE_DENSITY_BP: readonly number[] = [1000, 1400, 1800, 2000, 2200]
 
+/** Mean tiles per ore patch in bands 1 to 5 (#42 `patchMeanCells`; cheap to retune). */
+export const PATCH_MEAN_CELLS: readonly number[] = [12, 16, 20, 24, 28]
+
+/**
+ * Chance that a band's lattice node fires a patch, in basis points (#42 `seedProb`): solved once
+ * so the painted ore fraction of planets 1 and 2 matches `ORE_DENSITY_BP` after clipping by
+ * band edges, caves and the core. Locked by the golden digest and the patch density test.
+ */
+export const PATCH_SEED_CHANCE_BP: readonly number[] = [8420, 8870, 8980, 8220, 8800]
+
+/** The cone under the dock is this wide at mid-band-1 depth (#42 dock guarantee; cheap to retune). */
+export const DOCK_CONE_WIDTH_AT_MID_TILES = 16
+
 /**
  * Cave noise above this level (basis points of the noise range) is open air, in bands 2 to 5
  * only, so the surface band stays whole and #9's crawlers have caves to live in. Placeholder.

@@ -1,7 +1,7 @@
 {
   "name": "dig-and-return",
   "description": "Planet 1, level 0: drill six surface ore tiles, return to the pad, dock, sell all, undock (#7).",
-  "generatorVersion": 1,
+  "generatorVersion": 2,
   "authorityProtocolVersion": 1,
   "logSchemaVersion": 1,
   "numberFormatVersion": 1,
@@ -14,7 +14,7 @@
       "seq": 1,
       "type": "reportPose",
       "payload": {
-        "x": 13500,
+        "x": 12500,
         "y": 299500,
         "vx": 0,
         "vy": 0,
@@ -35,7 +35,7 @@
       "seq": 2,
       "type": "drillTile",
       "payload": {
-        "tx": 13,
+        "tx": 12,
         "ty": 298,
         "ticks": 40
       }
@@ -46,8 +46,8 @@
       "seq": 3,
       "type": "reportPose",
       "payload": {
-        "x": 16500,
-        "y": 295500,
+        "x": 30500,
+        "y": 294500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -67,8 +67,8 @@
       "seq": 4,
       "type": "drillTile",
       "payload": {
-        "tx": 16,
-        "ty": 294,
+        "tx": 30,
+        "ty": 293,
         "ticks": 40
       }
     },
@@ -78,8 +78,8 @@
       "seq": 5,
       "type": "reportPose",
       "payload": {
-        "x": 18500,
-        "y": 297500,
+        "x": 30500,
+        "y": 293500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -99,8 +99,8 @@
       "seq": 6,
       "type": "drillTile",
       "payload": {
-        "tx": 18,
-        "ty": 296,
+        "tx": 30,
+        "ty": 292,
         "ticks": 40
       }
     },
@@ -110,8 +110,8 @@
       "seq": 7,
       "type": "reportPose",
       "payload": {
-        "x": 18500,
-        "y": 295500,
+        "x": 31500,
+        "y": 293500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -131,8 +131,8 @@
       "seq": 8,
       "type": "drillTile",
       "payload": {
-        "tx": 18,
-        "ty": 294,
+        "tx": 31,
+        "ty": 292,
         "ticks": 40
       }
     },
@@ -142,8 +142,8 @@
       "seq": 9,
       "type": "reportPose",
       "payload": {
-        "x": 18500,
-        "y": 294500,
+        "x": 55500,
+        "y": 292500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -163,8 +163,8 @@
       "seq": 10,
       "type": "drillTile",
       "payload": {
-        "tx": 18,
-        "ty": 293,
+        "tx": 55,
+        "ty": 291,
         "ticks": 40
       }
     },
@@ -174,8 +174,8 @@
       "seq": 11,
       "type": "reportPose",
       "payload": {
-        "x": 19500,
-        "y": 295500,
+        "x": 56500,
+        "y": 293500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -195,8 +195,8 @@
       "seq": 12,
       "type": "drillTile",
       "payload": {
-        "tx": 19,
-        "ty": 294,
+        "tx": 56,
+        "ty": 292,
         "ticks": 40
       }
     },
@@ -249,17 +249,17 @@
     {
       "tick": 247,
       "scope": "dock",
-      "digest": "5c4bf38cf1cae287"
+      "digest": "ad9ceffb8d1ce11e"
     },
     {
       "tick": 3600,
       "scope": "periodic",
-      "digest": "e041bb3d064d9249"
+      "digest": "cc9893251aefa45c"
     },
     {
       "tick": 4000,
       "scope": "end",
-      "digest": "d8d4f9d323a76f96"
+      "digest": "3380fddf57d504a9"
     }
   ]
 }

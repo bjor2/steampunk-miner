@@ -85,7 +85,7 @@ function generatedCellsOf(params: PlanetParams, cx: number, cy: number): Uint32A
   if (cacheOfPlanet === null || !isSamePlanet(cacheOfPlanet.params, params)) {
     cacheOfPlanet = { params, cache: createChunkCache(params, CACHED_CHUNKS) }
   }
-  return cacheOfPlanet.cache.generatedCellsOf(cx, cy)
+  return cacheOfPlanet.cache.generatedChunkOf(cx, cy).cells
 }
 
 function isSamePlanet(a: PlanetParams, b: PlanetParams): boolean {
