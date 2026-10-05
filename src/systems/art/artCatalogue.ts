@@ -13,6 +13,9 @@ import PLATFORM_BAY_UPGRADE from '../../../art/placeholders/platform-bay-upgrade
 import PLATFORM_HUB from '../../../art/placeholders/platform-hub.parts.json'
 import PROP_ARTEFACT_CACHE from '../../../art/placeholders/prop-artefact-cache.parts.json'
 import VEHICLE from '../../../art/placeholders/vehicle.parts.json'
+import PLATFORM_BAY_SELL_EXPORTED from '../../../public/assets/platform/platform-bay-sell/platform-bay-sell.parts.json'
+import PLATFORM_BAY_UPGRADE_EXPORTED from '../../../public/assets/platform/platform-bay-upgrade/platform-bay-upgrade.parts.json'
+import PLATFORM_HUB_EXPORTED from '../../../public/assets/platform/platform-hub/platform-hub.parts.json'
 import VEHICLE_EXPORTED from '../../../public/assets/vehicle/vehicle/vehicle.parts.json'
 import type { AssetManifest, ManifestEntry } from './assetManifest'
 import type { PartsSidecar } from './partsSidecar'
@@ -33,6 +36,9 @@ export const PLACEHOLDER_SIDECARS: readonly PartsSidecar[] = [
 /** Written by `npm run art:export`; the game draws one only while its manifest entry is final. */
 export const EXPORTED_SIDECARS: readonly PartsSidecar[] = [
   VEHICLE_EXPORTED,
+  PLATFORM_HUB_EXPORTED,
+  PLATFORM_BAY_SELL_EXPORTED,
+  PLATFORM_BAY_UPGRADE_EXPORTED,
 ] as unknown as readonly PartsSidecar[]
 
 export function manifestEntryOf(assetId: string): ManifestEntry | null {
