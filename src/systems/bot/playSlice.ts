@@ -10,7 +10,7 @@
  */
 import { SLICE_LAST_PLANET } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
-import type { AuthorityCommand } from '../authority/authorityCommand'
+import type { AuthorityCommand, CommandIntent } from '../authority/authorityCommand'
 import type { AuthorityState } from '../authority/authorityState'
 import { coreNeededOf } from '../authority/coreBay'
 import type { DomainEvent } from '../authority/domainEvent'
@@ -20,7 +20,7 @@ import { canScratch } from '../vehicle/drillRule'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
 import { buyUpgrades, serviceAtDock } from './botShopping'
-import { createBotSession, type BotSession } from './botSession'
+import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
 import { runTrip } from './botTrip'
 import type { TripGoal } from './tripGoal'
@@ -46,6 +46,9 @@ export interface SliceRunOptions {
   playerId?: string
   /** Ticks the bot may play before giving up; the slice target is at most 130 minutes. */
   maxTicks: number
+  /** Sent before the first trip, such as a scenario's `debug.*` start commands (#11 section 4). */
+  startCommands?: readonly CommandIntent[]
+  listener?: BotListener
 }
 
 /**
@@ -55,7 +58,8 @@ export interface SliceRunOptions {
 const CORE_TRIP_MAX_TICKS_PER_TILE = 20 * TICKS_PER_SECOND
 
 export function playSlice(start: AuthorityState, options: SliceRunOptions): SliceRun {
-  const session = createBotSession(start, options.playerId ?? 'p1')
+  const session = createBotSession(start, options.playerId ?? 'p1', options.listener)
+  for (const intent of options.startCommands ?? []) session.submit(intent)
   let planet = botPlanetOf(session)
   while (!isSliceDone(session) && session.tick() < options.maxTicks) {
     planet = travelWhenReady(session, planet)

@@ -16,7 +16,7 @@ import {
 } from '../systems/authority/domainEvent'
 import type { RunEventData, RunEventName } from './eventNames'
 import type { CommandRef, RunEventPlace, RunEventStamp } from './runEvent'
-import { getRunLog } from './runLog'
+import { getRunLog, type RunLog } from './runLog'
 
 /** An event name with the payload registered for it. */
 export type RunLogLine = { [N in RunEventName]: { event: N; data: RunEventData<N> } }[RunEventName]
@@ -164,13 +164,26 @@ function causeOf(event: DomainEvent): { cmd?: CommandRef } {
 }
 
 export function recordDomainEvents(place: RunEventPlace, events: readonly DomainEvent[]): void {
+  recordDomainEventsTo(getRunLog(), place, events)
+}
+
+/** The same projection into a run log the caller holds (a headless bot run has its own). */
+export function recordDomainEventsTo(
+  runLog: RunLog,
+  place: RunEventPlace,
+  events: readonly DomainEvent[],
+): void {
   for (const projected of events.map(projectDomainEvent)) {
-    if (projected !== null) recordProjectedLine(place, projected)
+    if (projected !== null) recordProjectedLine(runLog, place, projected)
   }
 }
 
-function recordProjectedLine(place: RunEventPlace, { tick, cmd, line }: ProjectedLine): void {
+function recordProjectedLine(
+  runLog: RunLog,
+  place: RunEventPlace,
+  { tick, cmd, line }: ProjectedLine,
+): void {
   const stamp: RunEventStamp = cmd === undefined ? { ...place, tick } : { ...place, tick, cmd }
   // The union pairs each name with its payload; record() checks one name at a time.
-  getRunLog().record(stamp, line.event, line.data as never)
+  runLog.record(stamp, line.event, line.data as never)
 }

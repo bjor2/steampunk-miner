@@ -3,7 +3,7 @@
  * which of the five depth bands, inside the core disc. Integer comparisons only.
  */
 import type { PlanetParams } from './planetParams'
-import { discTileCount, halfTileDistanceSq, isInsideDisc } from './tileGrid'
+import { discTileCount, halfTileDistanceSq, isInsideDisc, surfaceRowOfColumn } from './tileGrid'
 
 export const BAND_COUNT = 5
 
@@ -31,4 +31,9 @@ export function bandAtHalfTileDistanceSq(params: PlanetParams, distanceSq: numbe
 /** #4 `coreTileCount(params)`: 156 on planet 1 and 316 from planet 2 on (#6 section 2). */
 export function coreTileCount(params: PlanetParams): number {
   return discTileCount(params.coreRadiusTiles)
+}
+
+/** Whole tiles below the surface of a tile's column, 0 above it: the run log's `depthTiles`. */
+export function depthTilesAt(params: PlanetParams, tx: number, ty: number): number {
+  return Math.max(0, surfaceRowOfColumn(tx, params.radiusTiles) - ty)
 }

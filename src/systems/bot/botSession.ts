@@ -24,14 +24,27 @@ export interface BotSession {
   events(): readonly DomainEvent[]
 }
 
-export function createBotSession(start: AuthorityState, playerId: string): BotSession {
+/** Hears every command the bot sends and the state and events each step leaves (a run log). */
+export interface BotListener {
+  onCommand(command: AuthorityCommand): void
+  onEvents(state: AuthorityState, events: readonly DomainEvent[]): void
+}
+
+const NO_LISTENER: BotListener = { onCommand: () => undefined, onEvents: () => undefined }
+
+export function createBotSession(
+  start: AuthorityState,
+  playerId: string,
+  listener: BotListener = NO_LISTENER,
+): BotSession {
   let state = start
   let nextSeq = start.players[playerId].lastSeq + 1
   const commands: AuthorityCommand[] = []
   const events: DomainEvent[] = []
   const keep = (outcome: CommandOutcome): readonly DomainEvent[] => {
     state = outcome.state
-    events.push(...outcome.events)
+    for (const event of outcome.events) events.push(event)
+    listener.onEvents(state, outcome.events)
     return outcome.events
   }
   return {
@@ -42,6 +55,7 @@ export function createBotSession(start: AuthorityState, playerId: string): BotSe
     submit(intent) {
       const command = { playerId, tick: state.tick, seq: nextSeq++, ...intent } as AuthorityCommand
       commands.push(command)
+      listener.onCommand(command)
       return keep(applyCommand(state, command))
     },
     wait(ticks) {
