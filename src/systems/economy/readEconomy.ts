@@ -17,7 +17,7 @@ import {
   type UpgradeId,
   type VisualTierThreshold,
 } from './economyDefinition'
-import type { Money } from '../money'
+import type { BigStat, Money } from '../money'
 
 export type EconomyReading = { economy: Economy; problems: [] } | { problems: string[] }
 
@@ -35,15 +35,16 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     .list('upgrades', file.upgrades)
     .map((upgrade, index) => readUpgrade(reader, `upgrades[${index}]`, upgrade))
   checkUpgradeSet(reader, upgrades, costCurves)
+  const ore = readOre(reader, reader.object('ore', file.ore))
   return {
     economyVersion: reader.safeInteger('economyVersion', file.economyVersion),
-    ore: readOre(reader, reader.object('ore', file.ore)),
+    ore,
     planets: readPlanets(reader, reader.object('planets', file.planets)),
     prices: readPrices(reader, reader.object('prices', file.prices)),
     energy: readEnergy(reader, reader.object('energy', file.energy)),
     drill: readDrill(reader, reader.object('drill', file.drill)),
     costCurves,
-    casing: readCasing(reader, reader.object('casing', file.casing), costCurves),
+    casing: readCasing(reader, reader.object('casing', file.casing), costCurves, ore.coreTierBand),
     upgrades,
     visualTiers: reader
       .list('visualTiers', file.visualTiers)
@@ -137,6 +138,7 @@ function readCasing(
   reader: FieldReader,
   casing: Record<string, unknown>,
   costCurves: readonly CostCurve[],
+  coreTierBand: number,
 ): Economy['casing'] {
   const costCurveId = reader.text('casing.costCurveId', casing.costCurveId)
   if (!costCurves.some((curve) => curve.id === costCurveId)) {
@@ -146,7 +148,19 @@ function readCasing(
     costCurveId,
     casingGradeStart: reader.safeInteger('casing.casingGradeStart', casing.casingGradeStart),
     casingGradeCoreMin: reader.safeInteger('casing.casingGradeCoreMin', casing.casingGradeCoreMin),
+    collapseCrush: readCollapseCrush(reader, casing.collapseCrush, coreTierBand),
   }
+}
+
+/** One hull fraction per band, the core's last (#43 Data): as many as the core's band number. */
+function readCollapseCrush(reader: FieldReader, value: unknown, coreTierBand: number): BigStat[] {
+  const fractions = reader
+    .list('casing.collapseCrush', value)
+    .map((fraction, index) => reader.money(`casing.collapseCrush[${index}]`, fraction))
+  if (fractions.length !== coreTierBand) {
+    reader.record(`casing.collapseCrush must list ${coreTierBand} fractions, bands then the core`)
+  }
+  return fractions
 }
 
 function readCostCurve(reader: FieldReader, path: string, value: unknown): CostCurve {

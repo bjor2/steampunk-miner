@@ -162,9 +162,15 @@ export interface Economy {
   /**
    * The casing grade (#41 Systems & Economy): a separate counter, not a seventh track. It starts
    * at `casingGradeStart` and each grade is bought at the Upgrade bay along `costCurveId`. Grade
-   * `G` holds bands `1..G`; the core needs `casingGradeCoreMin`.
+   * `G` holds bands `1..G`; the core needs `casingGradeCoreMin`. `collapseCrush` is the hull
+   * fraction a collapse takes off a vehicle caught in it (#43), for bands 1 to 5 and then the core.
    */
-  casing: { costCurveId: string; casingGradeStart: number; casingGradeCoreMin: number }
+  casing: {
+    costCurveId: string
+    casingGradeStart: number
+    casingGradeCoreMin: number
+    collapseCrush: readonly BigStat[]
+  }
   upgrades: readonly UpgradeDef[]
   visualTiers: readonly VisualTierThreshold[]
   enemies: {

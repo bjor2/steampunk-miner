@@ -125,3 +125,21 @@ export const ENEMY_DAMAGE_LOG_TICKS = 30
  * the 1 m cell.
  */
 export const ARTEFACT_CACHE_OVERLAP_MM = 950
+
+/**
+ * Collapse (decision #43 Sequence and Data, S3 defaults accepted on #57): a weak block within
+ * `COLLAPSE_ACTIVE_RADIUS_MM` (16 m, the visible circle at the default zoom with margin) of a
+ * vehicle's body centre warns for `COLLAPSE_WARN_TICKS` (1.0 s, the Gameplay & Vehicle Designer's
+ * minimum), then refills from the walls inward over `COLLAPSE_FILL_TICKS`. The Gameplay & Vehicle
+ * and Systems & Economy Designers own the numbers.
+ */
+export const COLLAPSE_WARN_TICKS = 60
+export const COLLAPSE_FILL_TICKS = 30
+export const COLLAPSE_ACTIVE_RADIUS_MM = 16000
+/** A collapse block is the 4x4 m collision block (#36), 16 density samples a side. */
+export const COLLAPSE_BLOCK_SAMPLES = 16
+/**
+ * The refill never fills inside this circle round a vehicle's body centre (#43 Vehicle safety):
+ * the 0.9 m body's half-diagonal (637 mm, rounded up from 450 x sqrt 2) plus 0.25 m.
+ */
+export const COLLAPSE_VEHICLE_CLEARANCE_MM = 637 + 250
