@@ -5,10 +5,22 @@ import { describe, expect, it } from 'vitest'
 // guest regenerates the same planet. Lints source text as if it lived in the world folder.
 const eslint = new ESLint()
 
-async function lintRuleIdsFor(source: string): Promise<string[]> {
-  const [result] = await eslint.lintText(source, { filePath: 'src/systems/world/someRule.ts' })
+async function lintRuleIdsFor(
+  source: string,
+  filePath = 'src/systems/world/someRule.ts',
+): Promise<string[]> {
+  const [result] = await eslint.lintText(source, { filePath })
   return result.messages.map((message) => message.ruleId ?? 'parse-error')
 }
+
+// Decision #36 acceptance 6: the carve, fill and density generator code is held to the same rule.
+const DENSITY_MODULES = [
+  'src/systems/world/groundEdit.ts',
+  'src/systems/world/stampShape.ts',
+  'src/systems/world/generateDensity.ts',
+  'src/systems/world/orePatches.ts',
+  'src/systems/vehicle/drillStamp.ts',
+]
 
 describe('world generation exact-maths lint', () => {
   it.each([
@@ -23,6 +35,16 @@ describe('world generation exact-maths lint', () => {
     'export const digits = Math.log(1000)',
   ])('rejects %s', async (source) => {
     expect(await lintRuleIdsFor(source)).not.toEqual([])
+  })
+
+  it.each(DENSITY_MODULES)('rejects banned maths in the density module %s', async (filePath) => {
+    for (const source of [
+      'export const side = Math.sin(1)',
+      'export const roll = Math.random()',
+      'export const grown = Math.pow(1.15, 3)',
+    ]) {
+      expect(await lintRuleIdsFor(source, filePath)).not.toEqual([])
+    }
   })
 
   it('allows the exact operations the generator uses', async () => {
