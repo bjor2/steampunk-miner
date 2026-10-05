@@ -6,6 +6,7 @@
  * Browsers (and Electron's Chromium) start audio only after a user gesture, so the graph is built
  * on the first key or pointer press; until then every call is silently dropped, never queued.
  */
+import type { StingerId } from '../systems/audio/musicBook'
 import type { MusicLayers } from '../systems/audio/musicLayers'
 import { createWebAudioGraph, type WebAudioGraph } from './webAudioGraph'
 
@@ -20,7 +21,10 @@ export interface SoundOut {
   setDrill(frequency: number, gain: number): void
   setEngine(puffsPerSecond: number, gain: number): void
   setSteam(gain: number): void
-  setMusic(layers: MusicLayers, tuningSemitones: number): void
+  /** The layers' levels, the planet's tuning and the bus level (volume, mute, artefact duck). */
+  setMusic(layers: MusicLayers, tuningSemitones: number, busGain: number): void
+  /** One of the #49 music stingers; the layers duck for its length. */
+  playMusicStinger(stingerId: StingerId, tuningSemitones: number): void
 }
 
 const UNLOCK_EVENTS = ['keydown', 'pointerdown'] as const
@@ -42,7 +46,8 @@ const SOUND_OUT: SoundOut = {
   setDrill: (frequency, gain) => graph?.setDrill(frequency, gain),
   setEngine: (puffs, gain) => graph?.setEngine(puffs, gain),
   setSteam: (gain) => graph?.setSteam(gain),
-  setMusic: (layers, tuning) => graph?.setMusic(layers, tuning),
+  setMusic: (layers, tuning, busGain) => graph?.setMusic(layers, tuning, busGain),
+  playMusicStinger: (stingerId, tuning) => graph?.playMusicStinger(stingerId, tuning),
 }
 
 function waitForGesture(): void {

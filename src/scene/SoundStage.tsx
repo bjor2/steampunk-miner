@@ -1,25 +1,24 @@
 /**
  * The game's sound (#13 audio direction): one-shots for each feedback cue (the pickup chime by
- * tier, the dock and upgrade clanks, a hit's thud, the core and travel stingers) and, every frame,
- * the drill, engine and steam loops and the crossfaded music layers. What each voice plays comes
- * from the pure rules in `systems/audio`; this only gathers the moment and hands it to the shell's
- * sound output. Presentation only: it never writes the store or submits.
+ * tier, the dock and upgrade clanks, a hit's thud, the core and travel stingers), the music
+ * stingers (#49) and, every frame, the drill, engine and steam loops and the crossfaded music
+ * layers. What each voice plays comes from the pure rules in `systems/audio` and the audio view
+ * model; this only hands it to the shell's sound output. Presentation only: it never writes the
+ * store or submits.
  */
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
 import { SCREEN_REFRESH_MS } from '../constants/scene'
 import { getSoundOut, type SoundOut } from '../shell/soundOut'
 import { listenForFeedback } from '../store/feedbackBroadcast'
-import { readEnemies, useGameStore } from '../store/gameStore'
-import { readHudModel } from '../store/screenReads'
+import { useGameStore } from '../store/gameStore'
+import { listenForStingers } from '../store/musicStingerRecord'
+import { readAudioModel, readHudModel } from '../store/screenReads'
 import {
   easeLayers,
-  nearestEnemyMetresOf,
   planetTuningOf,
   SILENT_LAYERS,
-  writeMusicTargets,
   type MusicLayers,
-  type MusicMoment,
 } from '../systems/audio/musicLayers'
 import {
   chimeFrequencyOf,
@@ -34,9 +33,8 @@ import {
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
-import { vehiclePresence } from './vehiclePresence'
 
-/** The drill's load is re-read as often as the HUD re-reads its tile time. */
+/** The drill's load and the music's targets are re-read as often as the HUD re-reads. */
 const LOAD_REFRESH_SECONDS = SCREEN_REFRESH_MS / 1000
 
 interface DrillLoad {
@@ -44,18 +42,20 @@ interface DrillLoad {
   sinceRead: number
 }
 
-/** The music's crossfade and this frame's scratch, kept across frames so none allocates. */
+/** The music's crossfade and its targets, kept across frames so no frame allocates. */
 interface MusicMix {
   layers: MusicLayers
   targets: MusicLayers
-  moment: MusicMoment
+  busGain: number
+  sinceRead: number
 }
 
 function createMusicMix(): MusicMix {
   return {
     layers: { ...SILENT_LAYERS },
     targets: { ...SILENT_LAYERS },
-    moment: { isDocked: true, depthTiles: 0, nearestEnemyMetres: null },
+    busGain: 0,
+    sinceRead: LOAD_REFRESH_SECONDS,
   }
 }
 
@@ -64,6 +64,10 @@ export function SoundStage() {
   const music = useMemo(createMusicMix, [])
   const drill = useMemo<DrillLoad>(() => ({ load: 0, sinceRead: LOAD_REFRESH_SECONDS }), [])
   useEffect(() => listenForFeedback((cue) => playCue(sound, cue)), [sound])
+  useEffect(
+    () => listenForStingers((stingerId) => sound.playMusicStinger(stingerId, planetTuning())),
+    [sound],
+  )
   useFrame((_, delta) => {
     refreshDrillLoad(drill, delta)
     playLoops(sound, drill.load)
@@ -86,7 +90,11 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
 }
 
 function playCue(sound: SoundOut, cue: FeedbackCue): void {
-  CUE_SOUNDS[cue.kind](sound, cue, planetTuningOf(useGameStore.getState().planetTier))
+  CUE_SOUNDS[cue.kind](sound, cue, planetTuning())
+}
+
+function planetTuning(): number {
+  return planetTuningOf(useGameStore.getState().planetTier)
 }
 
 function refreshDrillLoad(drill: DrillLoad, dt: number): void {
@@ -104,19 +112,17 @@ function playLoops(sound: SoundOut, drillLoad: number): void {
 }
 
 function playMusic(sound: SoundOut, music: MusicMix, dt: number): void {
-  gatherMusicMoment(music.moment)
-  writeMusicTargets(music.moment, music.targets)
+  refreshMusicTargets(music, dt)
   easeLayers(music.layers, music.targets, dt)
-  sound.setMusic(music.layers, planetTuningOf(useGameStore.getState().planetTier))
+  sound.setMusic(music.layers, planetTuning(), music.busGain)
 }
 
-function gatherMusicMoment(moment: MusicMoment): void {
-  const game = useGameStore.getState()
-  moment.isDocked = game.vehicle.mode === 'docked'
-  moment.depthTiles = game.depthTiles
-  moment.nearestEnemyMetres = nearestEnemyMetresOf(
-    readEnemies(),
-    vehiclePresence.x,
-    vehiclePresence.y,
-  )
+/** The audio model, as the debug API reads it; its targets move at most once per tick (#49). */
+function refreshMusicTargets(music: MusicMix, dt: number): void {
+  music.sinceRead += dt
+  if (music.sinceRead < LOAD_REFRESH_SECONDS) return
+  music.sinceRead = 0
+  const model = readAudioModel()
+  Object.assign(music.targets, model.layers)
+  music.busGain = model.busGain
 }

@@ -1,6 +1,7 @@
 /**
  * `selectSettingsModel` (#33 sections 3 and 7): the settings overlay as data. The accessibility
- * baseline (fixed camera, screen shake, flashes), the hint switch, and every action with the key
+ * baseline (fixed camera, screen shake, flashes), the hint switch, the music switch and volume
+ * (#49), and every action with the key
  * now bound to it, "press a key to rebind" while one is waiting, the problem lines of the last
  * refused rebinding and "Reset to defaults". Local presentation only: nothing here is a command.
  */
@@ -49,9 +50,22 @@ const TOGGLE_LABELS: Readonly<Record<PreferenceName, string>> = {
   shake: 'Screen shake',
   flashes: 'Flashes',
   hintsEnabled: 'Show hints',
+  musicMuted: 'Music',
+  musicVolume: 'Music volume',
 }
 
 const CAMERA_MODE_TEXT = { rotating: 'Rotating with planet', fixed: 'Fixed, north up' } as const
+
+const PERCENT = 100
+
+const VALUE_TEXTS: Readonly<Record<PreferenceName, (prefs: Preferences) => string>> = {
+  cameraMode: (prefs) => CAMERA_MODE_TEXT[prefs.cameraMode],
+  shake: (prefs) => onOffText(prefs.shake),
+  flashes: (prefs) => onOffText(prefs.flashes),
+  hintsEnabled: (prefs) => onOffText(prefs.hintsEnabled),
+  musicMuted: (prefs) => onOffText(!prefs.musicMuted),
+  musicVolume: (prefs) => `${Math.round(prefs.musicVolume * PERCENT)}%`,
+}
 
 export function selectSettingsModel(sources: SettingsSources): SettingsModel {
   const toggles = togglesOf(sources.prefs)
@@ -81,7 +95,7 @@ function togglesOf(prefs: Preferences): SettingToggle[] {
   return (Object.keys(TOGGLE_LABELS) as PreferenceName[]).map((name) => ({
     name,
     label: TOGGLE_LABELS[name],
-    valueText: name === 'cameraMode' ? CAMERA_MODE_TEXT[prefs.cameraMode] : onOffText(prefs[name]),
+    valueText: VALUE_TEXTS[name](prefs),
     button: uiButton(UI_ID_TEMPLATES.settingsToggle(name), 'Change', {
       kind: 'togglePreference',
       name,

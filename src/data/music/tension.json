@@ -1,0 +1,25 @@
+{
+  "id": "tension",
+  "tempoBpm": 84,
+  "beatsPerBar": 4,
+  "stepsPerBeat": 4,
+  "barCount": 4,
+  "rootHz": 55,
+  "scale": [0, 1, 3, 5, 7, 8, 10],
+  "instruments": [
+    {
+      "name": "pulse",
+      "voice": "sawtooth",
+      "octave": 0,
+      "gain": 0.18,
+      "bars": ["1.1.1.1.1.1.2.1.", "1.1.1.1.1.1.2.1.", "1.1.1.1.1.1.2.1.", "1.1.1.1.2.2.1.1."]
+    },
+    {
+      "name": "ticking",
+      "voice": "noise",
+      "octave": 0,
+      "gain": 0.05,
+      "bars": ["x.x.x.x.x.x.x.x.", "x.x.x.x.x.x.x.x.", "x.x.x.x.x.x.x.x.", "x.x.x.x.x.x.x.x."]
+    }
+  ]
+}

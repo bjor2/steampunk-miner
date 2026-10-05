@@ -7,6 +7,7 @@ import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/game
 import { resetInput } from '../store/inputRuntime'
 import { cameraPresence } from '../scene/cameraPresence'
 import { fromCanonical, toCanonical } from '../systems/money'
+import { musicStingersOf } from '../systems/audio/musicStingers'
 import { firstDigestMismatch, replayRun } from '../systems/replay/replayRun'
 import { bayPoseAt } from '../systems/vehicle/vehiclePose'
 import { dockSiteOf } from '../systems/world/dockSite'
@@ -217,6 +218,24 @@ describe('debug api: presentation never reaches the session (#33 acceptance 10)'
     expect(digests.size).toBe(1)
   })
 
+  it('ends a scripted run on the same digest whatever the music volume and mute (#49)', () => {
+    const digests = new Set<string>()
+    for (const [musicVolume, musicMuted] of [
+      [1, false],
+      [0.25, false],
+      [1, true],
+    ] as const) {
+      resetGameStore()
+      resetInput()
+      const debug = createDebugApi()
+      debug.ui.setPref('musicVolume', musicVolume)
+      debug.ui.setPref('musicMuted', musicMuted)
+      playThroughTheScreens()
+      digests.add(takeSessionSnapshot().digest)
+    }
+    expect(digests.size).toBe(1)
+  })
+
   it('keeps settings out of the log and the commands', () => {
     const debug = createDebugApi()
     debug.ui.setPref('hintsEnabled', false)
@@ -229,8 +248,71 @@ describe('debug api: presentation never reaches the session (#33 acceptance 10)'
   it('refuses a setting it does not know', () => {
     expect(createDebugApi().ui.setPref('volume', 3)).toEqual({
       ok: false,
-      problems: ['"volume" is not a setting (cameraMode, shake, flashes, hintsEnabled)'],
+      problems: [
+        '"volume" is not a setting (cameraMode, shake, flashes, hintsEnabled, musicMuted, musicVolume)',
+      ],
     })
+  })
+})
+
+function audioModel() {
+  const result = createDebugApi().ui.getAudioModel()
+  if (!result.ok) throw new Error(result.problems.join('; '))
+  return result.model
+}
+
+describe('debug api: the audio model reads the music from the session (#49)', () => {
+  it('plays only the platform layer docked at the hub', () => {
+    createDebugApi().teleportToDock()
+    expect(audioModel().layers).toEqual({ platform: 1, ambience: 0, tension: 0, combat: 0 })
+  })
+
+  it('brings the tension layer in at band 4', () => {
+    const debug = createDebugApi()
+    debug.teleportToDepth(7000)
+    expect(hudModel().depth.band).toBe(4)
+    expect(audioModel().layers.tension).toBeGreaterThan(0)
+  })
+
+  it('plays the combat layer with an enemy 7 m away and not 9 m away', () => {
+    const debug = createDebugApi()
+    debug.freezeEnemies(true)
+    debug.spawnEnemy('burrower', 1, { dx: 0, dy: -7 })
+    expect(audioModel().layers.combat).toBeGreaterThan(0)
+    debug.clearEnemies()
+    debug.spawnEnemy('burrower', 1, { dx: 0, dy: -9 })
+    expect(audioModel().layers.combat).toBe(0)
+  })
+
+  it('records exactly one dock stinger when the vehicle docks', () => {
+    createDebugApi().input.tap('interact')
+    expect(game().vehicle.mode).toBe('docked')
+    expect(audioModel().stingers).toEqual(['dock'])
+  })
+
+  it('replays a run from its commands to the same stinger sequence', () => {
+    playThroughTheScreens()
+    const replay = replayRun(1, sink.commands, {
+      playerIds: ['player_1'],
+      endTick: takeSessionSnapshot().tick,
+    })
+    expect(audioModel().stingers.length).toBeGreaterThan(0)
+    expect(musicStingersOf(replay.events, 'player_1')).toEqual(audioModel().stingers)
+  })
+
+  it('reports the music settings and silences the bus when muted, logging nothing', () => {
+    const debug = createDebugApi()
+    debug.ui.setPref('musicVolume', 0.5)
+    expect(audioModel()).toMatchObject({ musicVolume: 0.5, musicMuted: false, busGain: 0.5 })
+    debug.ui.setPref('musicMuted', true)
+    expect(audioModel()).toMatchObject({ musicMuted: true, busGain: 0 })
+    expect(sink.events).toEqual([])
+  })
+
+  it('forgets the stingers with the run', () => {
+    createDebugApi().input.tap('interact')
+    resetGameStore()
+    expect(audioModel().stingers).toEqual([])
   })
 })
 

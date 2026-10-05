@@ -19,6 +19,7 @@ import type { CommandIntent } from '../systems/authority/authorityCommand'
 import { topLayerOf } from '../systems/input/inputRouting'
 import {
   DEFAULT_PREFERENCES,
+  nextMusicVolume,
   preferenceProblems,
   withPreference,
   type PreferenceName,
@@ -176,7 +177,9 @@ function zoomedViewOf(viewShortAxisMetres: number, change: ZoomChange): number {
 }
 
 function toggledValueOf(prefs: Preferences, name: PreferenceName): unknown {
-  return name === 'cameraMode' ? otherCameraMode(prefs.cameraMode) : !prefs[name]
+  if (name === 'cameraMode') return otherCameraMode(prefs.cameraMode)
+  if (name === 'musicVolume') return nextMusicVolume(prefs.musicVolume)
+  return !prefs[name]
 }
 
 function focusedControlOf(state: SliceHost): string {

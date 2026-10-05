@@ -76,6 +76,7 @@ import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActi
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
 import { announceFeedback } from './feedbackBroadcast'
 import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
+import { forgetMusicStingers, recordMusicStingers } from './musicStingerRecord'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import {
   presentationActionsOf,
@@ -339,6 +340,7 @@ function startingAuthorityState(): AuthorityState {
 /** Back to a fresh run on a fresh authority; tests call this in beforeEach. */
 export function resetGameStore(authority: Authority = createStartingAuthority()): void {
   useGameStore.setState({ ...STARTING_VALUES })
+  forgetMusicStingers()
   connectAuthority(authority, followAuthority)
 }
 
@@ -351,7 +353,7 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
- * transition when the events travelled, shows the hints and feedback they trigger, logs the
+ * transition when the events travelled, shows the hints, feedback and stingers they trigger, logs the
  * events, then writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
@@ -359,6 +361,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
   startTravelTransition(travelTransitionOf(events))
   useGameStore.getState().observePlaques(events)
   announceFeedback(events, useGameStore.getState().playerId)
+  recordMusicStingers(events, useGameStore.getState().playerId)
   recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)
   writeCheckpointAfter(events, runEventPlaceOf(useGameStore.getState()))
 }
