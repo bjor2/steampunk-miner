@@ -385,7 +385,7 @@ describe('debug api: ui', () => {
     expect(debug.ui.setCameraMode('fixed')).toEqual({ ok: true })
     expect(debug.ui.getPrefs()).toEqual({ ok: true, prefs: { cameraMode: 'fixed' } })
     debug.ui.setCameraMode('rotating')
-    expect(game().cameraMode).toBe('rotating')
+    expect(game().prefs.cameraMode).toBe('rotating')
   })
 
   it('refuses a camera mode it does not know and keeps the current one', () => {
@@ -394,7 +394,7 @@ describe('debug api: ui', () => {
       ok: false,
       problems: ['camera mode must be one of rotating, fixed, got "upside-down"'],
     })
-    expect(game().cameraMode).toBe('rotating')
+    expect(game().prefs.cameraMode).toBe('rotating')
   })
 
   it('changes only the view: no command, no log line, no debug flag, the same digest', () => {

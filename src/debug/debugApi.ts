@@ -274,7 +274,7 @@ export function createDebugApi(): DebugApi {
     ui: {
       setCameraMode: (mode) =>
         runUnlessRefused(cameraModeProblems(mode), () => game().setCameraMode(mode as CameraMode)),
-      getPrefs: () => ({ ok: true, prefs: { cameraMode: game().cameraMode } }),
+      getPrefs: () => ({ ok: true, prefs: { cameraMode: game().prefs.cameraMode } }),
     },
     teleportToCore: notImplemented('teleportToCore'),
     giveResource: notImplemented('giveResource'),

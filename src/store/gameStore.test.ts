@@ -267,20 +267,20 @@ describe('game store: vehicle', () => {
 
 describe('game store: camera mode', () => {
   it('starts with the rotating camera', () => {
-    expect(game().cameraMode).toBe('rotating')
+    expect(game().prefs.cameraMode).toBe('rotating')
   })
 
   it('switches to the fixed camera without telling the authority', () => {
     const before = takeSessionSnapshot().digest
     game().setCameraMode('fixed')
-    expect(game().cameraMode).toBe('fixed')
+    expect(game().prefs.cameraMode).toBe('fixed')
     expect(takeSessionSnapshot().digest).toBe(before)
     expect(sink.events).toEqual([])
   })
 
   it('refuses an unknown mode', () => {
     expect(() => game().setCameraMode('sideways' as 'fixed')).toThrow(/sideways/)
-    expect(game().cameraMode).toBe('rotating')
+    expect(game().prefs.cameraMode).toBe('rotating')
   })
 })
 

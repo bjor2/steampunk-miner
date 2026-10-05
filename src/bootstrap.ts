@@ -24,7 +24,9 @@ import {
   type SaveSlots,
 } from './store/checkpoint'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
+import { routeKeyChange } from './store/inputRuntime'
 import { recordStartingPlanetEntered } from './store/planetArrivalLog'
+import { installPreferencesStorage, loadPreferences } from './store/preferencesFile'
 import { parseScenario, type Scenario } from './systems/scenario'
 
 const LOG_FLUSH_INTERVAL_MS = 1000
@@ -43,6 +45,8 @@ export async function startGame(): Promise<void> {
   const run = startRunLogging(shell, new Date())
   recordGameStarted(shell)
   installSaveSlots(saveSlotsOf(shell))
+  await adoptLocalPreferences(shell)
+  shell.onKeyChange(routeKeyChange)
   await resumeLastCheckpoint(shell)
   recordStartingPlanetEntered()
   keepRunFilesWritten(shell, run)
@@ -93,6 +97,18 @@ function saveSlotsOf(shell: Shell): SaveSlots {
     read: (slot) => shell.readSaveSlot(slot),
     setAside: (slot) => shell.setAsideSaveSlot(slot),
   }
+}
+
+/** Settings and rebinding (#33) from the local file; a refused file keeps the defaults. */
+async function adoptLocalPreferences(shell: Shell): Promise<void> {
+  installPreferencesStorage({
+    read: () => shell.readPreferences(),
+    write: (json) => shell.writePreferences(json),
+  })
+  const { prefs, problems } = await loadPreferences()
+  if (problems.length > 0)
+    console.error(`preferences refused, using defaults: ${problems.join('; ')}`)
+  useGameStore.getState().adoptPreferences(prefs)
 }
 
 /** Quit and resume (#26); a launch scenario sets its own start instead. */

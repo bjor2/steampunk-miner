@@ -8,6 +8,8 @@ import type { CommandIntent } from '../authority/authorityCommand'
 import { refusalOfIntent } from '../authority/applyCommand'
 import type { RejectionReason } from '../authority/domainEvent'
 import { exactAmount, formatAmount } from '../displayAmount'
+import type { ActionId } from '../input/actionMap'
+import type { PreferenceName } from '../input/preferences'
 import { floorMilli, fromCanonical, type Money } from '../money'
 
 export interface AmountReading {
@@ -17,7 +19,13 @@ export interface AmountReading {
 
 /** What activating a button does: one authority command, or a UI step that changes no state. */
 export type ButtonAction =
-  { kind: 'submit'; intent: CommandIntent } | { kind: 'armTravel' } | { kind: 'openSettings' }
+  | { kind: 'submit'; intent: CommandIntent }
+  | { kind: 'armTravel' }
+  | { kind: 'openSettings' }
+  | { kind: 'closeSettings' }
+  | { kind: 'togglePreference'; name: PreferenceName }
+  | { kind: 'rebind'; actionId: ActionId }
+  | { kind: 'resetBindings' }
 
 export interface ScreenButton {
   id: string

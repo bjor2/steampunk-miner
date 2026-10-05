@@ -13,7 +13,7 @@ const LABEL_OF_MODE: Readonly<Record<CameraMode, string>> = {
 }
 
 export function CameraModeToggle() {
-  const cameraMode = useGameStore((state) => state.cameraMode)
+  const cameraMode = useGameStore((state) => state.prefs.cameraMode)
   const setCameraMode = useGameStore((state) => state.setCameraMode)
   const switchMode = () => setCameraMode(otherCameraMode(cameraMode))
 

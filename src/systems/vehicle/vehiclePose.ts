@@ -7,6 +7,8 @@
 import { DRILL_REACH_MM, MAX_SPEED_MM_PER_SECOND, ZONE_TEST_MAX_MM } from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { DockSite } from '../world/dockSite'
+import { depthTilesAt } from '../world/planetGeometry'
+import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
 
 export interface VehiclePose {
@@ -52,6 +54,16 @@ export function facingVectorOf(upx: number, upy: number, facing: Facing): Intege
 /** The tile a point in millimetres lies in (tile = 1 m, tile (tx, ty) covers [tx, tx+1)). */
 export function tileOfMillimetres(x: number, y: number): TilePoint {
   return { tx: Math.floor(x / MM_PER_METRE), ty: Math.floor(y / MM_PER_METRE) }
+}
+
+/**
+ * Whole tiles below the surface at a reported pose, the run log envelope's `depthTiles`
+ * (client-owned, like the pose); 0 on a planet with no world.
+ */
+export function depthTilesOfPose(params: PlanetParams | null, pose: IntegerVector): number {
+  if (params === null) return 0
+  const tile = tileOfMillimetres(pose.x, pose.y)
+  return depthTilesAt(params, tile.tx, tile.ty)
 }
 
 /** The tile the vehicle's centre is in. */

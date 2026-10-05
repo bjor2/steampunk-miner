@@ -29,6 +29,7 @@ import { ZERO_MONEY, type Money } from '../systems/money'
 import { startOfScenario, validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems, type StartScenario } from '../systems/startScenario'
 import type { PosePayload } from '../systems/vehicle/poseReport'
+import { depthTilesOfPose } from '../systems/vehicle/vehiclePose'
 import {
   reportPoseCommand,
   requestRescueCommand,
@@ -38,7 +39,6 @@ import {
   teleportToDockCommand,
 } from '../systems/vehicle/vehicleCommands'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
-import { isCameraMode, type CameraMode } from '../systems/render/cameraTurn'
 import type { OreSelection } from '../systems/authority/platformServices'
 import {
   buyUpgradeCommand,
@@ -73,10 +73,16 @@ import {
 import { recordCheckpointLoaded, writeCheckpointAfter, type Checkpoint } from './checkpoint'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
+import {
+  presentationActionsOf,
+  STARTING_PRESENTATION,
+  type PresentationActions,
+  type PresentationValues,
+} from './presentationSlice'
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
-export interface GameState extends CombatDebugActions {
+export interface GameState extends CombatDebugActions, PresentationValues, PresentationActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -91,11 +97,6 @@ export interface GameState extends CombatDebugActions {
   platform: PlatformReplica
   /** Copied from the authority: the bay has reached `coreNeeded` on this planet (#10). */
   isCoreCompleted: boolean
-  /**
-   * Local presentation only (#13 accessibility, #11 amendment 2 `ui.setCameraMode`): never a
-   * command, never logged, never in the digest.
-   */
-  cameraMode: CameraMode
   /** The travel transition on screen (#8: at most 10 s, skippable); the state already changed. */
   travelTransition: TravelTransition | null
 
@@ -142,8 +143,6 @@ export interface GameState extends CombatDebugActions {
   setCoreFragments(count: number): void
   /** One fixed physics step of the live game: the authority's clock moves one tick (#3). */
   advanceOneTick(): void
-  /** Rotating (local down at the bottom of the screen) or fixed (north up); the view only. */
-  setCameraMode(mode: CameraMode): void
 }
 
 type GameValues = Pick<
@@ -157,7 +156,7 @@ type GameValues = Pick<
   | 'vehicle'
   | 'platform'
   | 'isCoreCompleted'
-  | 'cameraMode'
+  | keyof PresentationValues
   | 'travelTransition'
 >
 
@@ -175,13 +174,14 @@ export const STARTING_VALUES: GameValues = {
   vehicle: vehicleReplicaOf(startingAuthorityState().players[STARTING_PLAYER_ID].vehicle),
   platform: platformReplicaOf(startingAuthorityState()),
   isCoreCompleted: false,
-  cameraMode: 'rotating',
+  ...STARTING_PRESENTATION,
   travelTransition: null,
 }
 
 export const useGameStore = create<GameState>()((set, get) => ({
   ...STARTING_VALUES,
   ...combatDebugActionsOf(() => get().playerId),
+  ...presentationActionsOf(set, get),
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
@@ -250,7 +250,10 @@ export const useGameStore = create<GameState>()((set, get) => ({
     set({ depthTiles: 0 })
   },
 
-  reportPose: (pose) => submitCommand(get().playerId, reportPoseCommand(pose)),
+  reportPose: (pose) => {
+    submitCommand(get().playerId, reportPoseCommand(pose))
+    set({ depthTiles: depthTilesOfPose(readPlanetWorld().params, pose) })
+  },
 
   requestRescue: () => submitCommand(get().playerId, requestRescueCommand()),
 
@@ -275,11 +278,6 @@ export const useGameStore = create<GameState>()((set, get) => ({
   setCoreFragments: (count) => submitUnlessRefused(get().playerId, setCoreFragmentsCommand(count)),
 
   advanceOneTick: () => advanceAuthorityTo(readAuthorityState().tick + 1),
-
-  setCameraMode: (cameraMode) => {
-    refuseProblems(isCameraMode(cameraMode) ? [] : [`unknown camera mode "${String(cameraMode)}"`])
-    set({ cameraMode })
-  },
 }))
 
 /** Why the authority would refuse a vehicle debug command now; empty when it would apply. */

@@ -12,7 +12,7 @@ import { vehiclePresence } from './vehiclePresence'
 export function PlanetCamera() {
   const turn = useMemo(createCameraTurn, [])
   useFrame(({ camera }, delta) => {
-    stepCameraTurn(turn, vehiclePresence, useGameStore.getState().cameraMode, delta)
+    stepCameraTurn(turn, vehiclePresence, useGameStore.getState().prefs.cameraMode, delta)
     camera.position.x = vehiclePresence.x
     camera.position.y = vehiclePresence.y
     camera.rotation.z = turn.angle
