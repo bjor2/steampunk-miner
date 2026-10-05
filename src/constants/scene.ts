@@ -1,6 +1,6 @@
 /**
- * Scene numbers. Every value is a placeholder chosen for the demo scene; none is ported from a
- * design number yet. When a design value replaces one, name its source here.
+ * Scene numbers. Every value is a placeholder for the demo view until rendering and the rotating
+ * camera arrive (Build 5, #22); when a design value replaces one, name its source here.
  */
 
 /** Orthographic camera zoom in pixels per world metre. */
@@ -9,14 +9,18 @@ export const CAMERA_ZOOM = 48
 /** Camera sits in front of the XY plane and looks down -Z. */
 export const CAMERA_POSITION: readonly [number, number, number] = [0, 0, 20]
 
-/** Placeholder vehicle: a 1×1 m square (design doc section 9 art comes later). */
-export const VEHICLE_SIZE = 1
-export const VEHICLE_START: readonly [number, number] = [0, 2]
+/** Tiles drawn around the vehicle by the placeholder tile view: a square of this half-size. */
+export const TILE_VIEW_RADIUS = 20
 
-/** Placeholder ground slab under the vehicle: centre y, half width, half height. */
-export const GROUND_CENTRE_Y = -3
-export const GROUND_HALF_WIDTH = 12
-export const GROUND_HALF_HEIGHT = 0.5
+/** Placeholder flat colours per cell kind (#13 art and #22 meshes replace them). */
+export const TILE_COLOURS = {
+  ground: '#4a3b2f',
+  ore: '#c9a227',
+  core: '#b33a3a',
+  indestructible: '#7a7f86',
+} as const
 
-/** Horizontal drive tuning for the placeholder vehicle (m/s and m/s²). */
-export const VEHICLE_DRIVE = { maxSpeed: 6, acceleration: 24 } as const
+/** Placeholder vehicle look: copper body, darker drill head (design doc section 9 art later). */
+export const VEHICLE_COLOUR = '#b87333'
+export const DRILL_HEAD_COLOUR = '#5b3a1e'
+export const DRILL_HEAD_SIZE = 0.35

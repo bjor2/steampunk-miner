@@ -2,7 +2,8 @@
 import { Canvas } from '@react-three/fiber'
 import { CAMERA_POSITION, CAMERA_ZOOM } from '../constants/scene'
 import { PhysicsWorld } from '../physics/PhysicsWorld'
-import { Ground } from './Ground'
+import { FollowCamera } from './FollowCamera'
+import { PlanetTiles } from './PlanetTiles'
 import { Vehicle } from './Vehicle'
 
 export function GameScene() {
@@ -11,8 +12,9 @@ export function GameScene() {
       <color attach="background" args={['#1b1613']} />
       <ambientLight intensity={0.8} />
       <directionalLight position={[3, 6, 10]} intensity={1.2} />
+      <FollowCamera />
+      <PlanetTiles />
       <PhysicsWorld>
-        <Ground />
         <Vehicle />
       </PhysicsWorld>
     </Canvas>

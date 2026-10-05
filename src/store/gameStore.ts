@@ -191,6 +191,11 @@ export function vehicleDebugProblems(intent: CommandIntent): string[] {
   return refusalOf(useGameStore.getState().playerId, intent)
 }
 
+/** The authority's tick now, without hashing the state as a snapshot would. */
+export function readAuthorityTick(): number {
+  return readAuthorityState().tick
+}
+
 /** The local vehicle as the authority holds it, for the fixed-step loop (never rendered). */
 export function readLocalVehicle(): VehicleState {
   return readAuthorityState().players[useGameStore.getState().playerId].vehicle

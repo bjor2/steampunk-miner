@@ -3,6 +3,7 @@ import { useGameStore } from '../store/gameStore'
 import { formatMoney } from '../systems/formatMoney'
 import styles from './Hud.module.css'
 import { Panel } from './kit/Panel'
+import { VehicleReadout } from './VehicleReadout'
 
 export function Hud() {
   const planetTier = useGameStore((state) => state.planetTier)
@@ -26,6 +27,7 @@ export function Hud() {
           <span>{moneyText}</span>
         </div>
       </Panel>
+      <VehicleReadout />
     </div>
   )
 }
