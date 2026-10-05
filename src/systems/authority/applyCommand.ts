@@ -19,10 +19,13 @@ import {
 import type { AuthorityState } from './authorityState'
 import { rejectionOf, type CommandRule, type Rejection, type RuleEffect } from './commandRule'
 import { DEBUG_COMMAND_RULES } from './debugCommandRules'
+import { DOCK_COMMAND_RULES } from './dockRules'
 import type { DomainEvent, DomainEventBody } from './domainEvent'
 import { isJsonObject, isWholeNumber, payloadProblems } from './payloadFields'
+import { PLATFORM_SERVICE_RULES } from './platformServices'
 import { VEHICLE_COMMAND_RULES } from './vehicleCommandRules'
 import { towVehiclesDueBy } from './vehicleTransitions'
+import { WORKSHOP_RULES } from './workshopRules'
 
 export interface CommandOutcome {
   state: AuthorityState
@@ -42,6 +45,9 @@ export function applyCommand(state: AuthorityState, command: AuthorityCommand): 
 const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...DEBUG_COMMAND_RULES,
   ...VEHICLE_COMMAND_RULES,
+  ...DOCK_COMMAND_RULES,
+  ...PLATFORM_SERVICE_RULES,
+  ...WORKSHOP_RULES,
 }
 
 /** The tick-driven changes due by a well-formed command's tick; none for a malformed one. */

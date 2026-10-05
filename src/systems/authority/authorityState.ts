@@ -1,6 +1,7 @@
 /**
- * What the authority owns (decision #3): the planet and its world deltas, and per player the
- * wallet, the vehicle and the last accepted `seq`. Immutable: `applyCommand` returns a new state.
+ * What the authority owns (decision #3): the planet and its world deltas, the platform shared by
+ * everyone in the session (#8, #10), and per player the wallet, the vehicle and the last accepted
+ * `seq`. Immutable: `applyCommand` returns a new state.
  * Only safe integers, booleans, strings, null and Money live here, so the canonical JSON and the
  * digest are exact.
  *
@@ -9,6 +10,7 @@
 import { ZERO_MONEY, type Money } from '../money'
 import { newVehicleState, type VehicleState } from '../vehicle/vehicleState'
 import { EMPTY_WORLD, type WorldState } from '../world/worldState'
+import { NEW_PLATFORM, type PlatformState } from './platformState'
 import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
 
 export interface PlayerState {
@@ -24,6 +26,7 @@ export interface AuthorityState {
   planet: SessionPlanet
   players: Readonly<Record<string, PlayerState>>
   world: WorldState
+  platform: PlatformState
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
 }
@@ -41,6 +44,7 @@ export function createAuthorityState(start: SessionStart): AuthorityState {
     planet,
     players: Object.fromEntries(start.playerIds.map((id) => [id, newPlayerState(planet)])),
     world: EMPTY_WORLD,
+    platform: NEW_PLATFORM,
     debugApplied: false,
   }
 }

@@ -5,6 +5,7 @@
  */
 import type { VehicleMode } from '../vehicle/vehicleState'
 import type { CommandStamp, CommandType } from './authorityCommand'
+import type { PlatformVisualState } from './platformState'
 
 /** Why a command changed nothing (#11 amendment 2: `command_rejected {type, reason}`). */
 export type RejectionReason =
@@ -25,8 +26,28 @@ export type RejectionReason =
   | 'no_rescue_needed'
   | 'unknown_upgrade'
   | 'out_of_range'
+  // Registered by the platform commands (#23, #33 uses the same codes on disabled buttons): the
+  // vehicle is not docked (or, for `dock`, not stationary in the pad zone), the wallet cannot pay,
+  // or the facility has nothing to do.
+  | 'not_docked'
+  | 'money_short'
+  | 'nothing_to_sell'
+  | 'hull_full'
+  | 'energy_full'
+  | 'nothing_to_service'
 
 export type RescueCause = 'stranded' | 'destroyed'
+
+/** Where core fragments came into the bay from (#10). */
+export type CoreDepositSource = 'dock' | 'rescue'
+
+/** `SellCargo {resourceTier}` sells one tier, `SellCargo {all}` and the quick action everything. */
+export type SaleMode = 'all' | 'single'
+
+export interface SoldItem {
+  tier: number
+  amount: number
+}
 
 export interface DomainEventBodies {
   PlanetChanged: { planetIndex: number }
@@ -48,6 +69,27 @@ export interface DomainEventBodies {
   RescueTriggered: { cause: RescueCause; fee: string; cargoLostValue: string }
   UpgradeLevelChanged: { upgradeId: string; from: number; to: number }
   VehicleConfigurationChanged: { visualTier: number }
+  /** Energy in quanta, hull as a canonical string (#11 amendment 2). */
+  DockEntered: { cargoUnits: number; energy: number; hull: string }
+  DockLeft: { durationTicks: number }
+  CoreBayDeposited: { fragments: number; total: number; source: CoreDepositSource }
+  PlatformConfigurationChanged: { visualState: PlatformVisualState }
+  ResourceSold: { items: SoldItem[]; value: string; mode: SaleMode }
+  RepairPurchased: { hullFrom: string; hullTo: string; cost: string }
+  /** Energy in quanta. */
+  EnergyRecharged: { from: number; to: number; cost: string }
+  UpgradePurchased: {
+    upgradeId: string
+    kind: 'vertical'
+    fromLevel: number
+    toLevel: number
+    cost: string
+    costCurveId: string
+    totalLevel: number
+    visualTier: number
+    /** `computeVehicleStats` at the new levels, each stat as a canonical string (#7, #11). */
+    statsAfter: Readonly<Record<string, string>>
+  }
 }
 
 /** When a digest is taken (#11 section 3): every 3600 ticks, at docks and travel, at the end. */

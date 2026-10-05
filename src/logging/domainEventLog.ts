@@ -72,6 +72,45 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'vehicle_configuration_changed',
     data: { visualTier },
   }),
+  DockEntered: ({ cargoUnits, energy, hull }) => ({
+    event: 'dock_entered',
+    data: { cargoUnits, energy, hull },
+  }),
+  DockLeft: ({ durationTicks }) => ({ event: 'dock_left', data: { durationTicks } }),
+  CoreBayDeposited: ({ fragments, total, source }) => ({
+    event: 'core_bay_deposited',
+    data: { fragments, total, source },
+  }),
+  PlatformConfigurationChanged: ({ visualState }) => ({
+    event: 'platform_configuration_changed',
+    data: { visualState },
+  }),
+  ResourceSold: ({ items, value, mode }) => ({
+    event: 'resource_sold',
+    data: { items, value, mode },
+  }),
+  RepairPurchased: ({ hullFrom, hullTo, cost }) => ({
+    event: 'repair_purchased',
+    data: { hullFrom, hullTo, cost },
+  }),
+  EnergyRecharged: ({ from, to, cost }) => ({
+    event: 'energy_recharged',
+    data: { from, to, cost },
+  }),
+  UpgradePurchased: (purchase) => ({
+    event: 'upgrade_purchased',
+    data: {
+      upgradeId: purchase.upgradeId,
+      kind: purchase.kind,
+      fromLevel: purchase.fromLevel,
+      toLevel: purchase.toLevel,
+      cost: purchase.cost,
+      costCurveId: purchase.costCurveId,
+      totalLevel: purchase.totalLevel,
+      visualTier: purchase.visualTier,
+      statsAfter: purchase.statsAfter,
+    },
+  }),
 }
 
 export function projectDomainEvent(event: DomainEvent): ProjectedLine | null {

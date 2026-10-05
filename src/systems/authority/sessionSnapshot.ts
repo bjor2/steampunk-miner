@@ -10,6 +10,7 @@ import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import type { AuthorityState, PlayerState } from './authorityState'
 import { isJsonObject, isWholeNumber } from './payloadFields'
+import { isPlatformVisualState, type PlatformState } from './platformState'
 import { stateDigest } from './stateDigest'
 import {
   portableVehicleOf,
@@ -22,8 +23,8 @@ import {
   type PortableWorld,
 } from './vehicleSnapshot'
 
-/** 2: the world deltas and each player's vehicle joined the state (#21). */
-export const SNAPSHOT_VERSION = 2
+/** 3: the platform's core bay and visual state joined the state (#23). */
+export const SNAPSHOT_VERSION = 3
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -40,6 +41,7 @@ export interface PortableState {
   planet: { index: number; seed: number }
   players: Record<string, PortablePlayer>
   world: PortableWorld
+  platform: PlatformState
   debugApplied: boolean
 }
 
@@ -74,6 +76,7 @@ function portableStateOf(state: AuthorityState): PortableState {
       ]),
     ),
     world: portableWorldOf(state.world),
+    platform: { ...state.platform },
     debugApplied: state.debugApplied,
   }
 }
@@ -102,6 +105,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
       Object.entries(portable.players).map(([id, player]) => [id, playerStateOf(player)]),
     ),
     world: worldOfPortable(portable.world),
+    platform: { ...portable.platform },
     debugApplied: portable.debugApplied,
   }
 }
@@ -138,6 +142,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...planetProblems(state.planet),
     ...playersProblems(state.players),
     ...portableWorldProblems(state.world),
+    ...platformProblems(state.platform),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),
@@ -148,6 +153,14 @@ function planetProblems(planet: unknown): string[] {
   const isValid =
     isJsonObject(planet) && isWholeNumber(planet.index) && Number.isSafeInteger(planet.seed)
   return isValid ? [] : ['snapshot.state.planet must hold a whole index and a safe-integer seed']
+}
+
+function platformProblems(platform: unknown): string[] {
+  const isValid =
+    isJsonObject(platform) &&
+    isWholeNumber(platform.coreBay) &&
+    isPlatformVisualState(platform.visualState)
+  return isValid ? [] : ['snapshot.state.platform must hold a whole coreBay and a visual state']
 }
 
 function playersProblems(players: unknown): string[] {

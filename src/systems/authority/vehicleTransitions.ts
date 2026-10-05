@@ -1,6 +1,6 @@
 /**
- * The vehicle state machine's transitions (decision #7 "Vehicle state machine"; docking and the
- * tow's platform side belong to #8/#23):
+ * The vehicle state machine's transitions (decision #7 "Vehicle state machine"; docking itself is
+ * in `dockRules.ts`):
  *
  *   active   -- energy 0 outside the pad zone -->  stranded            energy_depleted
  *   active, stranded -- hull <= 0 -->              destroyed           vehicle_destroyed
@@ -42,6 +42,7 @@ import {
 } from '../vehicle/vehicleState'
 import { vehicleOf, withVehicle, withWallet, type AuthorityState } from './authorityState'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
+import { bankCoreFragments } from './coreBay'
 import type { DomainEvent, DomainEventBody, RescueCause } from './domainEvent'
 import { dockSiteOfPlanet } from './planetOfState'
 
@@ -75,31 +76,22 @@ export function destroyIfHullGone(
   }
 }
 
-/** The tow (#7, #8): fee paid, cargo ore lost, hull full, at least 25% energy, back on the dock. */
+/**
+ * The tow (#7, #8): fee paid, cargo ore lost, hull full, at least 25% energy, back on the dock,
+ * and the carried core fragments delivered to the bay (#8 Game Director's rule, #10).
+ */
 export function towVehicle(
   state: AuthorityState,
   playerId: string,
   cause: RescueCause,
   tick: number,
 ): RuleEffect {
-  const { wallet, vehicle } = state.players[playerId]
-  const fee = rescueFee(state.planet.index, wallet)
-  const paid = withWallet(state, playerId, sub(wallet, fee))
-  const towed = withVehicle(paid, playerId, towedVehicle(vehicle, dockedPoseOf(state, vehicle)))
-  const docked = changeMode(towed, playerId, 'docked', 'rescue', tick)
-  return {
-    state: docked.state,
-    events: [
-      {
-        type: 'RescueTriggered',
-        cause,
-        fee: toCanonical(fee),
-        cargoLostValue: toCanonical(oreValueOf(vehicle.cargo)),
-      },
-      { type: 'MoneyChanged', from: toCanonical(wallet), to: toCanonical(sub(wallet, fee)) },
-      ...docked.events,
-    ],
-  }
+  return chainEffects(state, [
+    (current) => payRescueFee(current, playerId, cause),
+    (current) => bringVehicleToDock(current, playerId),
+    (current) => changeMode(current, playerId, 'docked', 'rescue', tick),
+    (current) => bankCoreFragments(current, playerId, 'rescue'),
+  ])
 }
 
 /** Which tow is due, if any: the cause a `RequestRescue` or an elapsed timer tows for. */
@@ -178,7 +170,7 @@ function isAtThePad(state: AuthorityState, vehicle: VehicleState): boolean {
   return site !== null && vehicle.pose !== null && isInPadZone(site, vehicle.pose)
 }
 
-function changeMode(
+export function changeMode(
   state: AuthorityState,
   playerId: string,
   to: VehicleMode,
@@ -194,6 +186,31 @@ function changeMode(
 
 function isWreckable(vehicle: VehicleState): boolean {
   return vehicle.mode === 'active' || vehicle.mode === 'stranded'
+}
+
+/** `rescue_triggered` counts the ore about to be lost; core fragments are never counted (#23). */
+function payRescueFee(state: AuthorityState, playerId: string, cause: RescueCause): RuleEffect {
+  const { wallet, vehicle } = state.players[playerId]
+  const fee = rescueFee(state.planet.index, wallet)
+  return {
+    state: withWallet(state, playerId, sub(wallet, fee)),
+    events: [
+      {
+        type: 'RescueTriggered',
+        cause,
+        fee: toCanonical(fee),
+        cargoLostValue: toCanonical(oreValueOf(vehicle.cargo)),
+      },
+      { type: 'MoneyChanged', from: toCanonical(wallet), to: toCanonical(sub(wallet, fee)) },
+    ],
+  }
+}
+
+function bringVehicleToDock(state: AuthorityState, playerId: string): RuleEffect {
+  const vehicle = vehicleOf(state, playerId)
+  return unchanged(
+    withVehicle(state, playerId, towedVehicle(vehicle, dockedPoseOf(state, vehicle))),
+  )
 }
 
 function towedVehicle(vehicle: VehicleState, pose: VehicleState['pose']): VehicleState {
@@ -218,7 +235,6 @@ function dockedPoseOf(state: AuthorityState, vehicle: VehicleState): VehicleStat
   return site === null ? vehicle.pose : dockedPoseAt(site)
 }
 
-/** What the lost ore would have sold for; core fragments are never counted (#23). */
 function oreValueOf(cargo: Cargo): Money {
   return Object.entries(cargo.ore).reduce(
     (total, [tier, units]) =>

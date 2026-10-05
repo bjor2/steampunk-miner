@@ -100,7 +100,7 @@ function setUpgradeLevel(
 }
 
 /** `vehicle_configuration_changed` only when the look changes (#7, #11 amendment). */
-function visualTierEvents(before: VehicleState, after: VehicleState): DomainEventBody[] {
+export function visualTierEvents(before: VehicleState, after: VehicleState): DomainEventBody[] {
   const tier = visualTier(after.levels)
   if (tier === visualTier(before.levels)) return []
   return [{ type: 'VehicleConfigurationChanged', visualTier: tier }]

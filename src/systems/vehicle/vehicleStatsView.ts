@@ -5,7 +5,7 @@
  */
 import { vehicleStatsTable } from '../economy/economyTables'
 import type { EngineStats, UpgradeLevels, VehicleStats } from '../economy/vehicleStats'
-import { toCanonical } from '../money'
+import { fromCanonical, fromSafeInteger, toCanonical } from '../money'
 
 export interface VehicleStatsView {
   drillPower: string
@@ -34,6 +34,28 @@ export function vehicleStatsViewOf(stats: VehicleStats): VehicleStatsView {
     cargoCapacity: stats.cargoCapacity,
     engine: { ...stats.engine },
   }
+}
+
+/**
+ * Every stat as a canonical decimal string, as `upgrade_purchased.statsAfter` logs them (#11
+ * amendment 1). The engine's bounded stats are doubles computed with + - * / only, so their
+ * shortest decimal spelling is the same on every machine.
+ */
+export function canonicalStatsOf(stats: VehicleStats): Record<string, string> {
+  return {
+    drillPower: toCanonical(stats.drillPower),
+    drillTip: toCanonical(stats.drillTip),
+    hullMax: toCanonical(stats.hullMax),
+    energyMax: toCanonical(fromSafeInteger(stats.energyMax)),
+    cargoCapacity: toCanonical(fromSafeInteger(stats.cargoCapacity)),
+    speedMax: canonicalOfDouble(stats.engine.speedMax),
+    accel: canonicalOfDouble(stats.engine.accel),
+    thrustToWeight: canonicalOfDouble(stats.engine.thrustToWeight),
+  }
+}
+
+function canonicalOfDouble(value: number): string {
+  return toCanonical(fromCanonical(String(value)))
 }
 
 export function onCurveVehicleViews(): OnCurveVehicleView[] {

@@ -5,7 +5,14 @@
  */
 import { isNonNegativeMoneyText } from '../money'
 
-export type FieldKind = 'wholeNumber' | 'safeInteger' | 'nonNegativeMoney' | 'flag' | 'text'
+export type FieldKind =
+  | 'wholeNumber'
+  | 'safeInteger'
+  | 'nonNegativeMoney'
+  | 'flag'
+  | 'text'
+  /** An ore tier (a safe integer >= 1) or the word `"all"`, as `SellCargo` takes (#8). */
+  | 'tierOrAll'
 
 export type PayloadFields = Readonly<Record<string, FieldKind>>
 
@@ -33,12 +40,17 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     nonNegativeMoney: { isValid: isNonNegativeMoneyText, expected: 'a decimal string >= 0' },
     flag: { isValid: (value) => typeof value === 'boolean', expected: 'true or false' },
     text: { isValid: (value) => typeof value === 'string', expected: 'a string' },
+    tierOrAll: { isValid: isTierOrAll, expected: 'an ore tier >= 1 or "all"' },
   }
 
 function fieldKindProblems(name: string, value: unknown, kind: FieldKind): string[] {
   const check = FIELD_CHECKS[kind]
   if (check.isValid(value)) return []
   return [`${name} must be ${check.expected}, got ${JSON.stringify(value) ?? 'nothing'}`]
+}
+
+function isTierOrAll(value: unknown): boolean {
+  return value === 'all' || (Number.isSafeInteger(value) && (value as number) >= 1)
 }
 
 export function isWholeNumber(value: unknown): boolean {

@@ -35,6 +35,18 @@ export interface CommandPayloads {
   drillTile: { tx: number; ty: number; ticks: number }
   /** Calls the tow for a stranded or destroyed vehicle (#7, #8). */
   requestRescue: Record<string, never>
+  /** The platform (#8, #23): dock when stationary in the pad zone, and leave again. */
+  dock: Record<string, never>
+  undock: Record<string, never>
+  /** The shop: one ore tier, or `"all"` of the hold's ore. */
+  sellCargo: { resourceTier: number | 'all' }
+  /** The workshop's repair and the charging station, each to full at current prices. */
+  repairHull: Record<string, never>
+  rechargeEnergy: Record<string, never>
+  /** "Sell, repair and recharge": sell all, repair, recharge, in that order (#8). */
+  quickService: Record<string, never>
+  /** The workshop: one level of one upgrade track (#7). */
+  buyUpgrade: { upgradeId: string }
   'debug.setUpgrade': { upgradeId: string; level: number }
   /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
   'debug.setEnergy': { energy: string }

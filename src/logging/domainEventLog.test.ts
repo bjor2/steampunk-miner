@@ -82,6 +82,35 @@ const vehicleEvents: DomainEvent[] = [
   { ...commandStamp, type: 'VehicleConfigurationChanged', visualTier: 2 },
 ]
 
+const platformEvents: DomainEvent[] = [
+  { ...commandStamp, type: 'DockEntered', cargoUnits: 4, energy: 9000, hull: '5e+1' },
+  { ...commandStamp, type: 'CoreBayDeposited', fragments: 3, total: 63, source: 'dock' },
+  { ...commandStamp, type: 'PlatformConfigurationChanged', visualState: 'core_drive' },
+  {
+    ...commandStamp,
+    type: 'ResourceSold',
+    items: [{ tier: 1, amount: 4 }],
+    value: '4e+1',
+    mode: 'all',
+  },
+  { ...commandStamp, type: 'RepairPurchased', hullFrom: '5e+1', hullTo: '1e+2', cost: '5.625e+0' },
+  { ...commandStamp, type: 'EnergyRecharged', from: 9000, to: 36000, cost: '5.063e+0' },
+  {
+    ...commandStamp,
+    type: 'UpgradePurchased',
+    upgradeId: 'hull',
+    kind: 'vertical',
+    fromLevel: 0,
+    toLevel: 1,
+    cost: '4.8e+1',
+    costCurveId: 'cost.vehicle.hull',
+    totalLevel: 1,
+    visualTier: 1,
+    statsAfter: { hullMax: '1.12e+2', energyMax: '1.5e+2' },
+  },
+  { ...commandStamp, type: 'DockLeft', durationTicks: 300 },
+]
+
 describe('domain event log', () => {
   let sink: ReturnType<typeof createMemorySink>
 
@@ -121,5 +150,20 @@ describe('domain event log', () => {
     expect(sink.events.find((event) => event.event === 'energy_low')?.data).toEqual({
       threshold: 25,
     })
+  })
+
+  it('records every platform event as a registered line with no envelope field in its payload', () => {
+    recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, platformEvents)
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'dock_entered',
+      'core_bay_deposited',
+      'platform_configuration_changed',
+      'resource_sold',
+      'repair_purchased',
+      'energy_recharged',
+      'upgrade_purchased',
+      'dock_left',
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
 })

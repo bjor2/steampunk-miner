@@ -48,3 +48,10 @@ export const SWIVEL_TICKS = 8
  * many mm (contact range), so every intermediate stays below 2^53.
  */
 export const ZONE_TEST_MAX_MM = 65535
+
+/**
+ * "Stationary" for docking (#8, #23 acceptance 1): a body resting on the pad still reports a few
+ * mm/s of solver jitter, so a speed on each axis at or under this counts as standing still. It is
+ * far below the slowest drive speed (6 m/s at engine level 0, #6).
+ */
+export const DOCK_STATIONARY_MM_PER_SECOND = 50
