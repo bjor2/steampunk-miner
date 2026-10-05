@@ -36,6 +36,32 @@ export const MAX_DRAWN_GROUND_BLOCKS = 48
  */
 export const MAX_DRAW_CALLS = 150
 
+/**
+ * Adaptive render scale (#38 "4K strategy"): the canvas renders at `scale x devicePixelRatio` and
+ * is upscaled; the HTML UI stays native. 1.0 is a native render; the floor is a 1920 x 1080
+ * internal render (0.5 at 4K). It starts at 0.75 and steps 0.1 once per second of frames.
+ */
+export const RENDER_SCALE_START = 0.75
+export const RENDER_SCALE_STEP = 0.1
+export const RENDER_SCALE_MAX = 1
+export const RENDER_SCALE_FLOOR_SHORT_AXIS_PX = 1080
+/** The frame budget behind every #38 acceptance: p95 at most 16.7 ms (60 frames/s). */
+export const FRAME_BUDGET_MS = 16.7
+/**
+ * A second whose p95 frame is over 10% past the budget missed frames, so the scale steps down;
+ * one within 5% of it (vsync jitter) met every frame, so it steps up. Between, it holds.
+ * Placeholders until the #38 acceptance run on the reference machine.
+ */
+export const RENDER_SCALE_DECLINE_FRAME_MS = FRAME_BUDGET_MS * 1.1
+export const RENDER_SCALE_INCLINE_FRAME_MS = FRAME_BUDGET_MS * 1.05
+/**
+ * Flip-flop protection (drei PerformanceMonitor's `flipflops`, #38): after this many reversals
+ * the scale settles at the lower of the two it swung between and stops adapting.
+ */
+export const RENDER_SCALE_MAX_FLIP_FLOPS = 3
+/** Frames kept per one-second window: room for a 240 Hz display. */
+export const FRAME_WINDOW_CAPACITY = 256
+
 /** Camera sits in front of the XY plane and looks down -Z. */
 export const CAMERA_POSITION: readonly [number, number, number] = [0, 0, 20]
 
