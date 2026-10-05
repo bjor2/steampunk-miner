@@ -17,7 +17,7 @@ export const CAMERA_POSITION: readonly [number, number, number] = [0, 0, 20]
  * The rotating camera closes about 63% of its remaining turn in this long (an exponential ease,
  * so it reads the same at any frame rate). Placeholder, tuned by eye.
  */
-export const CAMERA_TURN_SECONDS = 0.25
+export const CAMERA_TURN_SECONDS = 0.3
 
 /** The reference machine's screen (#4): budgets are stated at this size. */
 export const REFERENCE_VIEWPORT = { width: 1280, height: 800 } as const
@@ -43,7 +43,7 @@ export const SKY_FADE_DEPTH_TILES = 12
  * Placeholders, tuned by eye.
  */
 export const AMBIENT_SURFACE = 1
-export const AMBIENT_DEEP = 0.12
+export const AMBIENT_DEEP = 0.1
 export const AMBIENT_FADE_DEPTH_TILES = 20
 export const HEADLAMP_COLOUR = '#ffd9a0'
 export const HEADLAMP_RANGE_TILES = 11
