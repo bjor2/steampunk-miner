@@ -14,6 +14,7 @@ import { sellCargoCommand } from '../platform/platformCommands'
 import { cargoGaugeText } from '../vehicle/vehicleReadout'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
+import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 
 export interface ShopRow {
   tier: number
@@ -42,7 +43,13 @@ export function shopPanelOf(state: AuthorityState, playerId: string): ShopPanel 
       cargoUnitsOf(vehicle.cargo),
       statsOfVehicle(vehicle).cargoCapacity,
     ),
-    sellAll: commandButton(state, playerId, 'shop-sell-all', 'Sell all', sellCargoCommand('all')),
+    sellAll: commandButton(
+      state,
+      playerId,
+      UI_IDS.shopSellAll,
+      'Sell all',
+      sellCargoCommand('all'),
+    ),
     sellAllValue: amountReading(serviceQuote(state, playerId).saleValue),
   }
 }
@@ -62,6 +69,12 @@ function shopRowOf(state: AuthorityState, playerId: string, tier: number, amount
     amount,
     unitValue: amountReading(unit),
     lineValue: amountReading(mul(unit, fromSafeInteger(amount))),
-    sell: commandButton(state, playerId, `shop-sell-${tier}`, 'Sell', sellCargoCommand(tier)),
+    sell: commandButton(
+      state,
+      playerId,
+      UI_ID_TEMPLATES.shopSell(tier),
+      'Sell',
+      sellCargoCommand(tier),
+    ),
   }
 }

@@ -39,6 +39,7 @@ import {
   type ScreenButton,
 } from './viewParts'
 import { workshopRowsOf, type WorkshopRow } from './workshopRows'
+import { UI_IDS } from './screenIds'
 
 export interface PlatformUiState {
   isTravelArmed: boolean
@@ -100,7 +101,7 @@ export interface PlatformModel {
 }
 
 /** Opening the screen focuses the quick action (#33 section 6). */
-export const PLATFORM_START_FOCUS = 'platform-quick-service'
+export const PLATFORM_START_FOCUS: string = UI_IDS.platformQuickService
 
 const PLATFORM_STATE_TEXT: Readonly<Record<PlatformVisualState, string>> = {
   outpost: 'Outpost',
@@ -142,7 +143,7 @@ function workshopPanelOf(state: AuthorityState, playerId: string): WorkshopPanel
   return {
     upgrades: workshopRowsOf(state, playerId),
     hullText: hullGaugeText(vehicle.hull, statsOfVehicle(vehicle).hullMax),
-    repair: commandButton(state, playerId, 'workshop-repair', 'Repair', repairHullCommand()),
+    repair: commandButton(state, playerId, UI_IDS.workshopRepair, 'Repair', repairHullCommand()),
     repairCost: amountReading(repairCostOf(state, playerId)),
     visualTier: visualTier(vehicle.levels),
   }
@@ -157,7 +158,7 @@ function chargingPanelOf(state: AuthorityState, playerId: string): ChargingPanel
     recharge: commandButton(
       state,
       playerId,
-      'charging-recharge',
+      UI_IDS.chargingRecharge,
       'Recharge',
       rechargeEnergyCommand(),
     ),
@@ -171,15 +172,15 @@ function footerOf(state: AuthorityState, playerId: string, ui: PlatformUiState):
     quickService: commandButton(
       state,
       playerId,
-      'platform-quick-service',
+      UI_IDS.platformQuickService,
       'Sell, repair and recharge',
       quickServiceCommand(),
     ),
     quickTotal: amountReading(add(add(quote.saleValue, quote.repairCost), quote.rechargeCost)),
     travel: hasEndCard ? null : travelReadingOf(state, playerId, ui.isTravelArmed),
     hasEndCard,
-    undock: commandButton(state, playerId, 'platform-undock', 'Undock', undockCommand()),
-    settings: uiButton('platform-settings', 'Settings', { kind: 'openSettings' }),
+    undock: commandButton(state, playerId, UI_IDS.platformUndock, 'Undock', undockCommand()),
+    settings: uiButton(UI_IDS.platformSettings, 'Settings', { kind: 'openSettings' }),
   }
 }
 
@@ -189,7 +190,7 @@ function travelReadingOf(state: AuthorityState, playerId: string, isArmed: boole
   const reason = travelRefusal(state, playerId, toPlanet)?.reason ?? null
   return {
     button: {
-      id: 'platform-travel',
+      id: UI_IDS.platformTravel,
       label: isArmed ? `Confirm travel to planet ${toPlanet}` : `Travel to planet ${toPlanet}`,
       action: isArmed ? { kind: 'submit', intent: travelCommand(toPlanet) } : { kind: 'armTravel' },
       reason,

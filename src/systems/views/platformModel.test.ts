@@ -72,7 +72,7 @@ describe('platform model', () => {
       if (purchase?.type !== 'UpgradePurchased') throw new Error(`no purchase of ${upgradeId}`)
       expect(row.cost.exact).toBe(purchase.cost)
       for (const stat of statsOfTrack(upgradeId)) {
-        expect(row.effectAfter[stat].exact).toBe(purchase.statsAfter[stat])
+        expect(row.effectAfter.stats[stat].exact).toBe(purchase.statsAfter[stat])
       }
     }
   })

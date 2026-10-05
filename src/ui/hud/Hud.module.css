@@ -1,0 +1,157 @@
+/* Layout at the 1280x800 minimum (#33 section 5). */
+.hud {
+  position: absolute;
+  inset: 0;
+  font-family: var(--font-mono);
+  pointer-events: none;
+}
+
+.cluster,
+.position,
+.banner,
+.prompts {
+  position: absolute;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+}
+
+.cluster {
+  top: var(--space-3);
+  left: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.notes {
+  grid-column: 2;
+  display: flex;
+  gap: var(--space-2);
+  font-size: 0.8rem;
+}
+
+.position {
+  top: var(--space-3);
+  right: var(--space-3);
+  display: grid;
+  gap: var(--space-1);
+  min-width: 10rem;
+}
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.lineLabel {
+  color: var(--color-brass);
+}
+
+.arrow {
+  display: inline-block;
+  transform: rotate(var(--arrow-turn, 0deg));
+}
+
+.banner {
+  top: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* Text, an icon id and hatching carry the warning; the blink is only an extra. */
+.warning {
+  padding: 0 var(--space-1);
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(201 162 75 / 0.35) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.warning[data-level='critical']::before {
+  content: '!! ';
+}
+
+.warning[data-level='low']::before {
+  content: '! ';
+}
+
+.warning[data-flashing] {
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.prompts {
+  bottom: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--space-3);
+}
+
+.prompts:empty {
+  display: none;
+}
+
+.debugMark {
+  color: var(--color-copper);
+  letter-spacing: 0.1em;
+}
+
+.threats {
+  position: absolute;
+  inset: var(--space-3);
+}
+
+.threat {
+  position: absolute;
+  padding: 0 var(--space-1);
+  border: 2px solid var(--color-copper);
+  border-radius: 50%;
+}
+
+.threat[data-tremor]::after {
+  content: ' ~';
+}
+
+.threat[data-octant='0'] {
+  top: 0;
+  left: 50%;
+}
+.threat[data-octant='1'] {
+  top: 0;
+  right: 0;
+}
+.threat[data-octant='2'] {
+  top: 50%;
+  right: 0;
+}
+.threat[data-octant='3'] {
+  bottom: 0;
+  right: 0;
+}
+.threat[data-octant='4'] {
+  bottom: 0;
+  left: 50%;
+}
+.threat[data-octant='5'] {
+  bottom: 0;
+  left: 0;
+}
+.threat[data-octant='6'] {
+  top: 50%;
+  left: 0;
+}
+.threat[data-octant='7'] {
+  top: 0;
+  left: 0;
+}

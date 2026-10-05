@@ -21,9 +21,17 @@ import {
   type AmountReading,
   type ScreenButton,
 } from './viewParts'
+import { UI_ID_TEMPLATES } from './screenIds'
 
-/** The canonical stats a track changes, as `statsAfter` names them. */
-export type StatPreview = Readonly<Record<string, AmountReading>>
+/**
+ * The stats a track changes, keyed as `statsAfter` names them, with the screen text of all of
+ * them and their canonical values as one JSON string for `data-exact`.
+ */
+export interface StatPreview {
+  stats: Readonly<Record<string, AmountReading>>
+  text: string
+  exactText: string
+}
 
 export type BuyState = 'affordable' | 'money_short'
 
@@ -78,7 +86,7 @@ function workshopRowOf(
   const buy = commandButton(
     state,
     playerId,
-    `workshop-upgrade-${upgradeId}-buy`,
+    UI_ID_TEMPLATES.workshopUpgradeBuy(upgradeId),
     'Buy',
     buyUpgradeCommand(upgradeId),
   )
@@ -96,10 +104,13 @@ function workshopRowOf(
 }
 
 function previewOf(levels: UpgradeLevels, upgradeId: UpgradeId): StatPreview {
-  const stats = canonicalStatsOf(vehicleStatsAt(levels))
-  return Object.fromEntries(
-    STATS_OF_TRACK[upgradeId].map((stat) => [stat, statReading(stats[stat])]),
-  )
+  const canonical = canonicalStatsOf(vehicleStatsAt(levels))
+  const names = STATS_OF_TRACK[upgradeId]
+  return {
+    stats: Object.fromEntries(names.map((stat) => [stat, statReading(canonical[stat])])),
+    text: names.map((stat) => statReading(canonical[stat]).text).join(' / '),
+    exactText: JSON.stringify(Object.fromEntries(names.map((stat) => [stat, canonical[stat]]))),
+  }
 }
 
 function fullSpeedBandOf(planetIndex: number, levels: UpgradeLevels): number {

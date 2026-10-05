@@ -4,7 +4,7 @@
  * with the tow countdown. Each state has a text and an icon id, so none is read by colour alone.
  */
 import { DESTROY_DELAY_TICKS, STRAND_GRACE_TICKS } from '../../constants/balance'
-import { MM_PER_METRE } from '../../constants/physics'
+import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet, planetParamsOf } from '../authority/planetOfState'
 import { tileOfPose, type VehiclePose } from '../vehicle/vehiclePose'
@@ -32,6 +32,8 @@ export interface VehicleStateReading {
   icon: string
   /** Ticks until the tow arrives, while stranded or destroyed. */
   rescueCountdownTicks: number | null
+  /** Whole seconds until the tow, rounded up: "tow in 3 s". */
+  rescueCountdownText: string
 }
 
 const MODE_MARKERS: Readonly<Record<VehicleMode, { text: string; icon: string }>> = {
@@ -78,10 +80,13 @@ export function coreDistanceOf(state: AuthorityState, playerId: string): number 
 }
 
 export function vehicleStateReadingOf(vehicle: VehicleState, tick: number): VehicleStateReading {
+  const countdown = rescueCountdownOf(vehicle, tick)
   return {
     mode: vehicle.mode,
     ...MODE_MARKERS[vehicle.mode],
-    rescueCountdownTicks: rescueCountdownOf(vehicle, tick),
+    rescueCountdownTicks: countdown,
+    rescueCountdownText:
+      countdown === null ? '' : `tow in ${Math.ceil(countdown / TICKS_PER_SECOND)} s`,
   }
 }
 

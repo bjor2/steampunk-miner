@@ -1,0 +1,31 @@
+.button {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: transparent;
+  color: var(--color-parchment);
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.button:hover:not(:disabled) {
+  background: rgb(201 162 75 / 0.15);
+}
+
+/* Focus is marked by a double frame and a pointer glyph, never by colour alone (#33 section 7). */
+.button[data-focused] {
+  outline: 3px double var(--color-brass);
+  outline-offset: 2px;
+}
+
+.button[data-focused]::before {
+  content: '\25B8\00A0';
+}
+
+/* Disabled reads as struck through, not only dimmed. */
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  text-decoration: line-through;
+}

@@ -6,7 +6,8 @@
 import { useFrame } from '@react-three/fiber'
 import { useMemo } from 'react'
 import { useGameStore } from '../store/gameStore'
-import { createCameraTurn, stepCameraTurn } from '../systems/render/cameraTurn'
+import { angleOfUp, createCameraTurn, stepCameraTurn } from '../systems/render/cameraTurn'
+import { cameraPresence } from './cameraPresence'
 import { vehiclePresence } from './vehiclePresence'
 
 export function PlanetCamera() {
@@ -16,6 +17,7 @@ export function PlanetCamera() {
     camera.position.x = vehiclePresence.x
     camera.position.y = vehiclePresence.y
     camera.rotation.z = turn.angle
+    cameraPresence.localUpScreenAngle = angleOfUp(turn.up) - turn.angle
   })
   return null
 }

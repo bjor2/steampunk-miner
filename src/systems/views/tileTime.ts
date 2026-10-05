@@ -15,9 +15,12 @@ import { isRemovableCell } from '../world/worldCell'
 import { cellAt } from '../world/worldState'
 
 export type TileTime =
-  { state: 'none' } | { state: 'blocked' } | { state: 'time'; ticks: number; seconds: string }
+  | { state: 'none'; text: string }
+  | { state: 'blocked'; text: string }
+  | { state: 'time'; text: string; ticks: number }
 
-const NO_TILE: TileTime = { state: 'none' }
+const NO_TILE: TileTime = { state: 'none', text: '-' }
+const BLOCKED: TileTime = { state: 'blocked', text: 'needs a better tip' }
 
 export function tileTimeAhead(state: AuthorityState, playerId: string): TileTime {
   const vehicle = state.players[playerId].vehicle
@@ -27,8 +30,8 @@ export function tileTimeAhead(state: AuthorityState, playerId: string): TileTime
   const cell = cellAt(state.world, params, tile)
   if (!isRemovableCell(cell)) return NO_TILE
   const ticks = ticksPerTile(statsOfVehicle(vehicle), hardnessOfTile(params, tile, cell))
-  if (ticks === null) return { state: 'blocked' }
-  return { state: 'time', ticks, seconds: secondsText(ticks) }
+  if (ticks === null) return BLOCKED
+  return { state: 'time', text: `${secondsText(ticks)} s`, ticks }
 }
 
 /** Display only: hundredths of a second, rounded up so a tile never reads faster than it is. */

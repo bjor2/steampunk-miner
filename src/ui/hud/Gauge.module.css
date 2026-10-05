@@ -1,0 +1,50 @@
+.gauge {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: var(--space-2);
+  align-items: center;
+}
+
+.dial {
+  grid-row: span 2;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--color-brass);
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from -120deg,
+    var(--color-brass) 0deg 1.5deg,
+    transparent 1.5deg 30deg
+  );
+}
+
+.dial[data-hatched] {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(201 162 75 / 0.6) 0 3px,
+    transparent 3px 7px
+  );
+}
+
+.needle {
+  position: absolute;
+  left: calc(50% - 1px);
+  bottom: 50%;
+  width: 2px;
+  height: 45%;
+  background: var(--color-parchment);
+  transform-origin: bottom center;
+}
+
+.label {
+  color: var(--color-brass);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.text {
+  font-variant-numeric: tabular-nums;
+}

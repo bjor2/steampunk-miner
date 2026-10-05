@@ -8,6 +8,7 @@ import { ACTION_MAP, boundLabel, type ActionId, type Bindings } from '../input/a
 import type { PreferenceName, Preferences } from '../input/preferences'
 import type { FocusStop } from './menuFocus'
 import { uiButton, type ScreenButton } from './viewParts'
+import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 
 export interface SettingsSources {
   prefs: Preferences
@@ -41,7 +42,7 @@ export interface SettingsModel {
   focusStops: FocusStop[]
 }
 
-export const SETTINGS_START_FOCUS = 'settings-close'
+export const SETTINGS_START_FOCUS: string = UI_IDS.settingsClose
 
 const TOGGLE_LABELS: Readonly<Record<PreferenceName, string>> = {
   cameraMode: 'Camera',
@@ -55,8 +56,10 @@ const CAMERA_MODE_TEXT = { rotating: 'Rotating with planet', fixed: 'Fixed, nort
 export function selectSettingsModel(sources: SettingsSources): SettingsModel {
   const toggles = togglesOf(sources.prefs)
   const bindings = bindingRowsOf(sources)
-  const reset = uiButton('settings-reset-bindings', 'Reset to defaults', { kind: 'resetBindings' })
-  const close = uiButton('settings-close', 'Close', { kind: 'closeSettings' })
+  const reset = uiButton(UI_IDS.settingsResetBindings, 'Reset to defaults', {
+    kind: 'resetBindings',
+  })
+  const close = uiButton(UI_IDS.settingsClose, 'Close', { kind: 'closeSettings' })
   return {
     toggles,
     bindings,
@@ -79,7 +82,10 @@ function togglesOf(prefs: Preferences): SettingToggle[] {
     name,
     label: TOGGLE_LABELS[name],
     valueText: name === 'cameraMode' ? CAMERA_MODE_TEXT[prefs.cameraMode] : onOffText(prefs[name]),
-    button: uiButton(`settings-toggle-${name}`, 'Change', { kind: 'togglePreference', name }),
+    button: uiButton(UI_ID_TEMPLATES.settingsToggle(name), 'Change', {
+      kind: 'togglePreference',
+      name,
+    }),
   }))
 }
 
@@ -91,7 +97,7 @@ function bindingRowsOf(sources: SettingsSources): BindingRow[] {
       displayName: action.displayName,
       keyText: isWaitingForKey ? 'Press a key to rebind' : boundLabel(sources.bindings, action.id),
       isWaitingForKey,
-      button: uiButton(`settings-rebind-${action.id}`, 'Rebind', {
+      button: uiButton(UI_ID_TEMPLATES.settingsRebind(action.id), 'Rebind', {
         kind: 'rebind',
         actionId: action.id,
       }),

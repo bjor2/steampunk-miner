@@ -71,3 +71,10 @@ export const DRILL_HEAD_SIZE = 0.35
 
 /** The travel transition lasts at most 10 s and can be skipped (#8, #10); presentation only. */
 export const TRAVEL_TRANSITION_SECONDS = 10
+
+/**
+ * How often the HUD and the menus re-read their view models besides store changes (#33): enemy
+ * telegraphs and the compass move every tick, and a tenth of a second is quick enough to read
+ * while keeping per-tick state out of React. Placeholder, tuned by eye.
+ */
+export const SCREEN_REFRESH_MS = 100
