@@ -13,3 +13,6 @@ logs/
 # local tooling and scratch
 .claude/worktrees/
 .DS_Store
+
+# Written by `npm run balance:report` (CI uploads it as an artifact)
+balance-report/

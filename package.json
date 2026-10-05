@@ -16,6 +16,8 @@
     "bench:render": "vite-node scripts/benchChunkBatch.ts",
     "bench:combat": "vite-node scripts/benchCombatTick.ts",
     "golden:update": "vite-node scripts/updateGoldenRuns.ts",
+    "balance:report": "vite-node scripts/balanceReport.ts",
+    "balance:baseline": "vite-node scripts/balanceReport.ts --write-baseline",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

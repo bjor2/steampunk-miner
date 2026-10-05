@@ -5,7 +5,7 @@
  * derived from these events only (#11 section 3: derived data stays derived).
  */
 import { TICKS_PER_SECOND } from '../constants/physics'
-import type { AuthorityCommand } from '../systems/authority/authorityCommand'
+import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
 import { planetEntryOf } from '../systems/authority/planetEntry'
 import { planetParamsOf } from '../systems/authority/planetOfState'
@@ -44,7 +44,7 @@ export function playLoggedSlice(scenario: Scenario): LoggedSliceRun {
   const run = playSlice(start, {
     maxTicks: BOT_RUN_BUDGET_TICKS,
     playerId: PLAYER_ID,
-    startCommands: startScenarioCommands(startOfScenario(scenario)),
+    startCommands: startCommandsOf(scenario),
     listener: {
       onCommand: (command) => runLog.recordCommand(command),
       onEvents: (state, events) => {
@@ -64,6 +64,15 @@ function refuseBotScenario(scenario: Scenario): void {
     ...((scenario.script ?? []).length > 0 ? ['a pacing-bot scenario has no script'] : []),
   ]
   if (problems.length > 0) throw new Error(`bot scenario refused: ${problems.join('; ')}`)
+}
+
+/**
+ * The scenario's start as `debug.*` commands, without the world seed: the session is created on
+ * that seed, so a fresh-start scenario sends no debug command and its run counts as play.
+ */
+function startCommandsOf(scenario: Scenario): CommandIntent[] {
+  const { planetSeed: _sessionSeed, ...start } = startOfScenario(scenario)
+  return startScenarioCommands(start)
 }
 
 function startingState(scenario: Scenario): AuthorityState {

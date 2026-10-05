@@ -41,6 +41,10 @@ export interface RunSummary {
   vehicleDeaths: number
   damageTaken: string
   debugCommandsApplied: number
+  /** Track to its last level: bought in the workshop or set by `debug.setUpgrade`. */
+  upgradeLevels: Record<string, number>
+  /** Planet index (as a string key) to the tick its core was completed (#10). */
+  coreCompletedTicks: Record<string, number>
   milestones: RunMilestones
 }
 
@@ -82,6 +86,8 @@ interface Tally {
   vehicleDeaths: number
   damageTaken: Money
   debugCommandsApplied: number
+  upgradeLevels: Record<string, number>
+  coreCompletedTicks: Record<string, number>
   milestones: RunMilestones
 }
 
@@ -109,6 +115,8 @@ function emptyTally(runId: string): Tally {
     vehicleDeaths: 0,
     damageTaken: ZERO_MONEY,
     debugCommandsApplied: 0,
+    upgradeLevels: {},
+    coreCompletedTicks: {},
     milestones: {
       planetReached: {},
       firstSale: null,
@@ -149,6 +157,7 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
   upgrade_purchased: (tally, { data, tick }) => {
     tally.upgradeSpending = add(tally.upgradeSpending, fromCanonical(data.cost))
     tally.upgradesPurchased += 1
+    tally.upgradeLevels[data.upgradeId] = data.toLevel
     tally.milestones.firstUpgrade ??= tick
   },
   repair_purchased: (tally, { data }) => {
@@ -174,7 +183,8 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
   core_tile_harvested: (tally, { data }) => {
     tally.coreFragmentsHarvested += data.fragments
   },
-  core_completed: (tally, { tick }) => {
+  core_completed: (tally, { planet, tick }) => {
+    tally.coreCompletedTicks[String(planet)] ??= tick
     tally.milestones.firstCoreCompleted ??= tick
   },
   enemy_killed: (tally) => {
@@ -184,9 +194,19 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
     tally.vehicleDeaths += 1
     tally.milestones.firstDeath ??= tick
   },
-  debug_command_applied: (tally) => {
+  debug_command_applied: (tally, { data }) => {
     tally.debugCommandsApplied += 1
+    foldDebugUpgradeLevel(tally, data)
   },
+}
+
+/** `debug.setUpgrade` logs its args as given: `{ upgradeId, level }` (#11 section 4). */
+function foldDebugUpgradeLevel(tally: Tally, data: { command: string; args: unknown }): void {
+  if (data.command !== 'debug.setUpgrade') return
+  const { upgradeId, level } = data.args as { upgradeId: unknown; level: unknown }
+  if (typeof upgradeId === 'string' && Number.isSafeInteger(level)) {
+    tally.upgradeLevels[upgradeId] = level as number
+  }
 }
 
 function foldCollected(tally: Tally, collected: { amount: number; value: string }): void {
@@ -222,6 +242,8 @@ function summaryOf(tally: Tally): RunSummary {
     vehicleDeaths: tally.vehicleDeaths,
     damageTaken: toCanonical(tally.damageTaken),
     debugCommandsApplied: tally.debugCommandsApplied,
+    upgradeLevels: tally.upgradeLevels,
+    coreCompletedTicks: tally.coreCompletedTicks,
     milestones: tally.milestones,
   }
 }

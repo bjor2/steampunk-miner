@@ -125,6 +125,21 @@ describe('run summary', () => {
     })
   })
 
+  it('keeps the last level of each track and the tick each planet core was completed', () => {
+    const run = [
+      ...PLAYED_RUN.slice(0, -1),
+      line(9050, 'debug_command_applied', {
+        command: 'debug.setUpgrade',
+        args: { upgradeId: 'hull', level: 4 },
+      }),
+      line(9060, 'core_completed', { durationTicks: 60 }, { planet: 2 }),
+    ]
+    expect(deriveSummary(run)).toMatchObject({
+      upgradeLevels: { cargo_hold: 1, hull: 4 },
+      coreCompletedTicks: { '2': 9060 },
+    })
+  })
+
   it('calls a run with no game_ended interrupted', () => {
     expect(deriveSummary(PLAYED_RUN.slice(0, -1)).outcome).toBe('interrupted')
   })
