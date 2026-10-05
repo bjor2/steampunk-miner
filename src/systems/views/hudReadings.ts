@@ -4,14 +4,15 @@
  * with the tow countdown. Each state has a text and an icon id, so none is read by colour alone.
  */
 import { DESTROY_DELAY_TICKS, STRAND_GRACE_TICKS } from '../../constants/balance'
-import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
+import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet, planetParamsOf } from '../authority/planetOfState'
 import { tileOfPose, type VehiclePose } from '../vehicle/vehiclePose'
 import type { VehicleMode, VehicleState } from '../vehicle/vehicleState'
+import { bayRestPointOf } from '../world/dockBays'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
-import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
+import { surfaceRowOfColumn } from '../world/tileGrid'
 import { coreEdgeDistance, localOctantOf, tileDistance } from './compass'
 
 export interface DepthReading {
@@ -43,8 +44,6 @@ const MODE_MARKERS: Readonly<Record<VehicleMode, { text: string; icon: string }>
   destroyed: { text: 'WRECKED', icon: 'broken-gear' },
 }
 
-const HALF_TILE_MM = MM_PER_METRE / 2
-
 export function depthReadingOf(
   state: AuthorityState,
   playerId: string,
@@ -61,11 +60,12 @@ export function depthReadingOf(
   }
 }
 
+/** The compass points home to the Sell bay, the first stop of every return (#37). */
 export function dockArrowOf(state: AuthorityState, playerId: string): DockArrow | null {
   const site = dockSiteOfPlanet(state.planet)
   const pose = state.players[playerId].vehicle.pose
   if (site === null || pose === null) return null
-  const dock = centreOfTile(site.dockPoint)
+  const dock = bayRestPointOf(site, 'sell')
   return {
     octant: localOctantOf(pose, dock.x - pose.x, dock.y - pose.y),
     distance: tileDistance(pose, dock),
@@ -116,8 +116,4 @@ function altitudeOf(params: PlanetParams | null, pose: VehiclePose | null): numb
   if (params === null || pose === null) return 0
   const tile = tileOfPose(pose)
   return Math.max(0, tile.ty - surfaceRowOfColumn(tile.tx, params.radiusTiles) - 1)
-}
-
-function centreOfTile(tile: TilePoint): { x: number; y: number } {
-  return { x: tile.tx * MM_PER_METRE + HALF_TILE_MM, y: tile.ty * MM_PER_METRE + HALF_TILE_MM }
 }

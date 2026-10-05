@@ -1,5 +1,6 @@
 /**
- * The platform on its pad (#8, #13): the outpost, and the core drive once the authority's
+ * The platform on its pad (#8, #13, #37): the hub between the two bays and their signs, the
+ * outpost, and the core drive once the authority's
  * `platform.visualState` says so, with the core bay's fill gauge on its body. Drawn behind the
  * vehicle; it changes only when the replica does, so it renders through React like the vehicle's
  * parts, never per frame.
@@ -11,7 +12,7 @@ import {
   platformOriginOf,
 } from '../systems/render/platformPlaceholder'
 import type { PartShape } from '../systems/render/vehiclePlaceholder'
-import { dockSiteOf } from '../systems/world/dockSite'
+import { dockSiteOf, type DockSite } from '../systems/world/dockSite'
 
 /** Behind the vehicle and the enemies, in front of the tiles. */
 const PLATFORM_Z = 0.02
@@ -25,9 +26,10 @@ export function PlatformPlaceholder() {
   // The planet's seed re-renders this on travel or a new seed, where the pad moves.
   useGameStore((state) => `${state.planetTier}:${state.planetSeed}`)
   const platform = useGameStore((state) => state.platform)
-  const origin = originOfPlanet()
-  if (origin === null) return null
-  const look = platformLookOf(platform.visualState)
+  const site = siteOfPlanet()
+  if (site === null) return null
+  const origin = platformOriginOf(site)
+  const look = platformLookOf(platform.visualState, site)
   const fill = coreBayFillOf(platform.coreBay, platform.coreNeeded)
   return (
     <group position={[origin.x, origin.y, 0]}>
@@ -40,9 +42,9 @@ export function PlatformPlaceholder() {
 }
 
 /** The pad moves only with the planet; read on a render, never per frame. */
-function originOfPlanet(): { x: number; y: number } | null {
+function siteOfPlanet(): DockSite | null {
   const { params } = readPlanetWorld()
-  return params === null ? null : platformOriginOf(dockSiteOf(params))
+  return params === null ? null : dockSiteOf(params)
 }
 
 function PlatformShapeMesh({ shape }: { shape: PartShape }) {

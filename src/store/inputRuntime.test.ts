@@ -137,6 +137,16 @@ describe('input: no direct mutation (#33 acceptance 3)', () => {
     expect([...atSellBay, ...atUpgradeBay]).toEqual(['rechargeEnergy', 'buyUpgrade'])
   })
 
+  it('docks again on interact right after Undock while still in the pad zone: no grace (#58)', () => {
+    dockAtStart()
+    const presses = submittedDuring(() => {
+      tap('ui_cancel')
+      tap('interact')
+    })
+    expect(presses).toEqual(['undock', 'dock'])
+    expect(game().vehicle.mode).toBe('docked')
+  })
+
   it('buys a casing grade with ui_confirm on the Casing row at the Upgrade bay only', () => {
     game().giveMoney('200')
     game().teleportToDock('upgrade')

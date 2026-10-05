@@ -1,12 +1,15 @@
 /**
- * The platform's programmatic placeholder (#8 "How the platform shows progress", #13: 2 states).
- * The `outpost` is a plain brass-and-iron body standing on the pad beside the dock point; once
- * the platform's `visualState` is `core_drive` a glowing core drive assembly with extra stacks
- * and pipes appears on it and stays. The core bay shows a fill gauge on the body (#8). Both read
- * the authority's state through the replica; the art decides nothing. Metres from the pad's top
- * surface over the dock point, x along the pad.
+ * The platform's programmatic placeholder (#8 "How the platform shows progress", #13: 2 states;
+ * #37: a hub with two bays). The `outpost` is a plain brass-and-iron hub standing on the middle of
+ * the pad, between the Sell bay and the Upgrade bay; once the platform's `visualState` is
+ * `core_drive` a glowing core drive assembly with extra stacks and pipes appears on the hub and
+ * stays. The core bay shows a fill gauge on the hub (#8). Each bay has a sign on a post above its
+ * pad, told apart by shape as well as colour (#13): a coin on the Sell bay's, a cross on the
+ * Upgrade bay's. All of it reads the authority's state through the replica; the art decides
+ * nothing. Metres from the pad's top surface at its middle, x along the pad.
  */
 import type { PlatformVisualState } from '../authority/platformState'
+import { bayCentreColumnOf } from '../world/dockBays'
 import type { DockSite } from '../world/dockSite'
 import type { PartShape } from './vehiclePlaceholder'
 
@@ -22,6 +25,7 @@ const BRASS = '#c9a24b'
 const COPPER = '#b87333'
 const CORE_GLOW = '#ff8a4a'
 const CORE_HEART = '#ffe2b0'
+const BAY_TEAL = '#3f9a94'
 
 const box = (size: PartShape['size'], offset: PartShape['offset'], colour: string): PartShape => ({
   shape: 'box',
@@ -36,30 +40,50 @@ const disc = (diameter: number, offset: PartShape['offset'], colour: string): Pa
   colour,
 })
 
-/** Left of the dock point, so a docked vehicle stands clear of it. */
+/** On the hub between the bays, so a vehicle docked at either stands clear of it. */
 const OUTPOST: readonly PartShape[] = [
-  box([4.4, 0.4], [-3.4, 0.2], DARK_IRON),
-  box([3.8, 2.4], [-3.4, 1.6], IRON),
-  box([3.9, 0.13], [-3.4, 2.86], BRASS),
-  box([0.3, 1.2], [-4.8, 3.4], IRON),
-  box([2.2, 0.16], [-0.9, 2.5], BRASS),
-  box([0.1, 1.1], [-0.2, 1.95], BRASS),
+  box([4.4, 0.4], [0, 0.2], DARK_IRON),
+  box([3.8, 2.4], [0, 1.6], IRON),
+  box([3.9, 0.13], [0, 2.86], BRASS),
+  box([0.3, 1.2], [-1.4, 3.4], IRON),
 ]
 
 const CORE_DRIVE: readonly PartShape[] = [
-  box([0.3, 1.6], [-4.2, 3.6], IRON),
-  box([0.3, 1.4], [-3.7, 3.5], IRON),
-  box([2.6, 0.13], [-2.9, 3.0], COPPER),
-  box([0.13, 0.9], [-1.65, 2.5], COPPER),
-  disc(1.3, [-2.6, 3.7], CORE_GLOW),
-  disc(0.6, [-2.6, 3.7], CORE_HEART),
+  box([0.3, 1.6], [-0.8, 3.6], IRON),
+  box([0.3, 1.4], [-0.3, 3.5], IRON),
+  box([2.6, 0.13], [0.5, 3.0], COPPER),
+  box([0.13, 0.9], [1.75, 2.5], COPPER),
+  disc(1.3, [0.8, 3.7], CORE_GLOW),
+  disc(0.6, [0.8, 3.7], CORE_HEART),
 ]
 
-const BAY_GAUGE = { offset: [-3.4, 1.4] as const, size: [0.5, 1.6] as const }
+const BAY_GAUGE = { offset: [0, 1.4] as const, size: [0.5, 1.6] as const }
 
-export function platformLookOf(visualState: PlatformVisualState): PlatformLook {
+/** A bay's sign stands this high over its pad, on a post at the pad's outer edge. */
+const SIGN_HEIGHT = 3.4
+const POST_FROM_CENTRE = 1.8
+
+export function platformLookOf(visualState: PlatformVisualState, site: DockSite): PlatformLook {
   const extras = visualState === 'core_drive' ? CORE_DRIVE : []
-  return { shapes: [...OUTPOST, ...extras], bayGauge: BAY_GAUGE }
+  return { shapes: [...OUTPOST, ...extras, ...baySignsOf(site)], bayGauge: BAY_GAUGE }
+}
+
+function baySignsOf(site: DockSite): PartShape[] {
+  const sell = bayCentreColumnOf(site, 'sell') - padMiddleOf(site)
+  const upgrade = bayCentreColumnOf(site, 'upgrade') - padMiddleOf(site)
+  return [
+    box([0.13, SIGN_HEIGHT], [sell - POST_FROM_CENTRE, SIGN_HEIGHT / 2], IRON),
+    box([2.6, 0.6], [sell, SIGN_HEIGHT], COPPER),
+    disc(0.42, [sell, SIGN_HEIGHT], BRASS),
+    box([0.13, SIGN_HEIGHT], [upgrade + POST_FROM_CENTRE, SIGN_HEIGHT / 2], IRON),
+    box([2.6, 0.6], [upgrade, SIGN_HEIGHT], BAY_TEAL),
+    box([0.5, 0.13], [upgrade, SIGN_HEIGHT], BRASS),
+    box([0.13, 0.5], [upgrade, SIGN_HEIGHT], BRASS),
+  ]
+}
+
+function padMiddleOf(site: DockSite): number {
+  return (site.firstColumn + site.lastColumn + 1) / 2
 }
 
 /** The bay gauge's fill, 0 to 1: `bay / coreNeeded`, full past the need, empty with no core. */
@@ -68,7 +92,7 @@ export function coreBayFillOf(coreBay: number, coreNeeded: number | null): numbe
   return Math.min(coreBay / coreNeeded, 1)
 }
 
-/** The platform's origin in world metres: the pad's top surface over the dock point. */
+/** The platform's origin in world metres: the pad's top surface at its middle, on the hub. */
 export function platformOriginOf(site: DockSite): { x: number; y: number } {
-  return { x: site.dockPoint.tx + 0.5, y: site.padRow + 1 }
+  return { x: padMiddleOf(site), y: site.padRow + 1 }
 }

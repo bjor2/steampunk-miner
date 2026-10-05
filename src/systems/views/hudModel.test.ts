@@ -181,7 +181,8 @@ describe('HUD compass', () => {
     const session = createScriptedSession()
     session.submit(1, poseAt({ tx: 20, ty: SITE.padRow + 1 }, { facing: FACING.right }))
     const { dockArrow, coreDistance } = hudOf(session)
-    expect(dockArrow).toEqual({ octant: 6, distance: 20 })
+    // The arrow points at the Sell bay's rest point, 4 m left of the pad's middle (#37).
+    expect(dockArrow).toEqual({ octant: 6, distance: 24 })
     const radius = Math.floor(Math.hypot(20_500, (SITE.padRow + 1) * 1000 + 500) / 1000)
     expect(coreDistance).toBe(radius - PARAMS.coreRadiusTiles)
     expect(selectHudModel.length).toBe(1)
