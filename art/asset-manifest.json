@@ -5,7 +5,7 @@
       "id": "vehicle",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#b87333",
       "partColors": {
         "t1-boiler": "#c9a24b",

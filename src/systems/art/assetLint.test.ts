@@ -3,7 +3,12 @@ import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { MAP_KINDS, type MapKind } from './artIds'
-import { ASSET_MANIFEST, PLACEHOLDER_SIDECARS, placeholderSidecarOf } from './artCatalogue'
+import {
+  ASSET_MANIFEST,
+  EXPORTED_SIDECARS,
+  PLACEHOLDER_SIDECARS,
+  placeholderSidecarOf,
+} from './artCatalogue'
 import {
   expectedFilesOf,
   manifestProblems,
@@ -46,6 +51,9 @@ function expectedFilesOfManifest(): string[] {
   })
 }
 
+const partTiersOf = (sidecar: PartsSidecar): string[] =>
+  sidecar.parts.map((part) => `${part.id}@${part.tier}`).sort()
+
 const mapKindOf = (path: string): MapKind | undefined =>
   MAP_KINDS.find((kind) => path.endsWith(`.${kind}.ktx2`))
 
@@ -82,6 +90,31 @@ describe('asset lint: sidecars', () => {
       return sidecar === null ? [] : sidecarProblems(entry.id, sidecar)
     })
     expect(exported).toEqual([])
+  })
+})
+
+describe('asset lint: final art replaces its placeholder', () => {
+  it('lists every exported sidecar on disk in the catalogue the game draws from', () => {
+    const onDisk = shipped.filter((path) => path.endsWith('.parts.json'))
+    const listed = EXPORTED_SIDECARS.map((sidecar) => `${sidecar.assetId}.parts.json`)
+    expect(onDisk.map((path) => path.split('/').pop()).sort()).toEqual(listed.sort())
+  })
+
+  it('keeps the placeholder’s part ids and tiers in every exported sidecar (S7a-d acceptance)', () => {
+    for (const exported of EXPORTED_SIDECARS) {
+      const placeholder = placeholderSidecarOf(exported.assetId)
+      expect({ asset: exported.assetId, parts: partTiersOf(exported) }).toEqual({
+        asset: exported.assetId,
+        parts: placeholder === null ? [] : partTiersOf(placeholder),
+      })
+    }
+  })
+
+  it('names the same maps as the placeholder, so texture ids match it too', () => {
+    for (const exported of EXPORTED_SIDECARS) {
+      const placeholder = placeholderSidecarOf(exported.assetId)
+      expect(mapFilesOf(exported)).toEqual(placeholder === null ? [] : mapFilesOf(placeholder))
+    }
   })
 })
 

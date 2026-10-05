@@ -98,11 +98,11 @@ describe('asset lint', () => {
   it('fails a shipped file with no manifest entry, or one owned by a placeholder', () => {
     const shipped = [
       'public/assets/enemy/enemy-dragon/enemy-dragon.parts.json',
-      'public/assets/vehicle/vehicle/vehicle.parts.json',
+      'public/assets/enemy/enemy-burrower/enemy-burrower.parts.json',
     ]
     expect(shippedFileProblems(manifest, [], shipped)).toEqual([
       'public/assets/enemy/enemy-dragon/enemy-dragon.parts.json: has no asset-manifest.json entry',
-      'public/assets/vehicle/vehicle/vehicle.parts.json: "vehicle" is a placeholder, which ships no files',
+      'public/assets/enemy/enemy-burrower/enemy-burrower.parts.json: "enemy-burrower" is a placeholder, which ships no files',
     ])
   })
 
