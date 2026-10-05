@@ -4,8 +4,9 @@
  * - A spawn point activates when a vehicle out on a trip comes within 24 tiles of it, unless its
  *   enemy is already active or was killed this trip; nearest first, at most 6 per vehicle.
  * - An enemy despawns when its vehicle is more than 48 tiles away or back at the platform.
- * - Every dock and every tow ends the trip: the vehicle's enemies despawn and every used spawn
- *   point is free again, so nothing about enemies needs saving.
+ * - Every dock and every tow ends the trip: the vehicle's enemies despawn, every used spawn point
+ *   is free again and the last hit is forgotten (no hit grace carries over), so nothing about
+ *   enemies needs saving and a checkpoint resumes with none (#26).
  * - The first enemy of each kind in a run logs `enemy_type_encountered`.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
@@ -22,6 +23,7 @@ import {
   enemyIdOf,
   NEW_COMBAT,
   NO_PENDING_DRILL,
+  withCombatVehicle,
   withoutEnemy,
   type CombatState,
   type Enemy,
@@ -72,10 +74,14 @@ export function activateSpawnPoints(
 /** A dock or a tow: the vehicle's enemies leave, and every spawn point is free again (#9). */
 export function endTrip(state: AuthorityState, playerId: string): RuleEffect {
   const left = despawnEnemies(state, enemiesOwnedBy(state.combat, playerId))
-  return {
-    state: withCombat(left.state, { ...left.state.combat, usedSpawnPointIds: [] }),
-    events: left.events,
-  }
+  const combat = forgetLastHit({ ...left.state.combat, usedSpawnPointIds: [] }, playerId)
+  return { state: withCombat(left.state, combat), events: left.events }
+}
+
+/** A vehicle combat never met keeps no entry, so a quiet dock leaves the state as it was. */
+function forgetLastHit(combat: CombatState, playerId: string): CombatState {
+  if ((combat.vehicles[playerId]?.lastHitTick ?? null) === null) return combat
+  return withCombatVehicle(combat, playerId, { lastHitTick: null })
 }
 
 export function despawnEnemies(state: AuthorityState, enemies: readonly Enemy[]): RuleEffect {

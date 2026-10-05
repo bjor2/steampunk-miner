@@ -5,7 +5,7 @@ import type { CommandIntent } from '../authorityCommand'
 import type { DomainEvent } from '../domainEvent'
 import { takeSnapshot } from '../sessionSnapshot'
 import { createScriptedSession, PARAMS, SITE, type ScriptedSession } from '../scriptedSession'
-import { poseAt, setUpgrade, spawnEnemy } from './combatFixtures'
+import { poseAt, prepareCorridor, setUpgrade, spawnEnemy } from './combatFixtures'
 import { spawnPointsOfChunk, type SpawnPoint } from './spawnPoints'
 
 const dock: CommandIntent = { type: 'dock', payload: {} }
@@ -96,5 +96,17 @@ describe('combat: spawning and the cap (#9, #25 acceptance 7)', () => {
     session.submit(510, undock)
     visit(session, 520, besidePoint)
     expect(spawnedFrom(session.events(), point.id)).toHaveLength(2)
+  })
+
+  it('forgets the last hit at a dock, so no hit grace carries into the next trip', () => {
+    const session = createScriptedSession()
+    const start = prepareCorridor(session, FACING.left)
+    session.submit(start, spawnEnemy('crawler', 1, 3))
+    session.advanceTo(start + 80)
+    expect(session.state().combat.vehicles.p1.lastHitTick).not.toBeNull()
+
+    session.submit(start + 81, atDock)
+    session.submit(start + 81, dock)
+    expect(session.state().combat.vehicles.p1.lastHitTick).toBeNull()
   })
 })
