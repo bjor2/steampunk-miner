@@ -138,13 +138,15 @@ function advanceInFrames(
   return progress
 }
 
+/** The replay owns its event list and appends to it, so a long run stays linear. */
 function keepEvents<A>(
   outcome: CommandOutcome,
   step: (state: CommandOutcome['state'], argument: A) => CommandOutcome,
   argument: A,
 ): CommandOutcome {
   const next = step(outcome.state, argument)
-  return { state: next.state, events: [...outcome.events, ...next.events] }
+  for (const event of next.events) outcome.events.push(event)
+  return { state: next.state, events: outcome.events }
 }
 
 function endTickOf(
