@@ -140,13 +140,14 @@ export const DRILL_RADIANS_PER_TICK = 0.35
 export const LOAD_EASE_SECONDS = 0.1
 export const PISTON_HZ = 3
 export const PISTON_TRAVEL_M = 0.03
-export const BOILER_BREATH_HZ = 0.25
+/** One slow breath every 4 s. */
+export const BOILER_BREATH_HZ = 1 / 4
 export const BOILER_BREATH_M = 0.006
 export const BOILER_BOB_HZ = 2.5
 export const BOILER_BOB_M = 0.02
 export const HEADLAMP_FLICKER_SHARE = 0.08
 export const LANDING_SQUASH_SHARE = 0.03
-export const LANDING_SQUASH_SECONDS = 0.12
+export const LANDING_SQUASH_SECONDS = 120 / 1000
 /** Falling at least this fast, then not falling, is a landing. */
 export const LANDING_SPEED_MPS = 2
 export const HIT_RECOIL_M = 0.04

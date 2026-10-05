@@ -17,7 +17,14 @@ const part = (id: string, tier: number, z = 0): SidecarPart => ({
 describe('placeholder look', () => {
   it('draws a missing asset id as one magenta quad named after it', () => {
     expect(placeholderQuadsOf('enemy-dragon', 1)).toEqual([
-      { partId: 'enemy-dragon', centre: [0, 0], size: [1, 1], z: 0, colour: MISSING_ART_COLOUR },
+      {
+        partId: 'enemy-dragon',
+        centre: [0, 0],
+        pivot: [0, 0],
+        size: [1, 1],
+        z: 0,
+        colour: MISSING_ART_COLOUR,
+      },
     ])
   })
 
