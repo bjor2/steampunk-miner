@@ -1,4 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { MAP_KINDS, type MapKind } from './artIds'
 import { ASSET_MANIFEST, PLACEHOLDER_SIDECARS, placeholderSidecarOf } from './artCatalogue'
@@ -16,13 +18,14 @@ import { mapFilesOf, sidecarProblems, type PartsSidecar } from './partsSidecar'
 // It fails `npm test`, so a stray, unlisted or malformed export never reaches a build.
 
 const REPO = new URL('../../../', import.meta.url)
+const REPO_DIR = fileURLToPath(REPO)
 
 function filesUnder(folder: string): string[] {
   const directory = new URL(folder, REPO)
   if (!existsSync(directory)) return []
   return readdirSync(directory, { recursive: true, withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name !== '.gitkeep')
-    .map((entry) => `${entry.parentPath}/${entry.name}`.slice(new URL(REPO).pathname.length))
+    .filter((entry) => entry.isFile())
+    .map((entry) => relative(REPO_DIR, join(entry.parentPath, entry.name)).replaceAll('\\', '/'))
 }
 
 const readJson = <T>(path: string): T => JSON.parse(readFileSync(new URL(path, REPO), 'utf8')) as T
