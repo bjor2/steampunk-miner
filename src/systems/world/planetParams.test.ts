@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { oreTier } from '../economy/oreEconomy'
+import { ARCHETYPE_IDS } from '../registeredIds'
+import { dockSiteOf } from './dockSite'
 import { coreTileCount } from './planetGeometry'
 import { coreRadiusFor, planetParamsFor, radiusForPlanet } from './planetParams'
 
@@ -61,5 +64,33 @@ describe('planet params', () => {
 
   it.each([-1, 2 ** 32, 0.5])('refuses the world seed %s', (seed) => {
     expect(() => planetParamsFor(seed, 1)).toThrow(RangeError)
+  })
+})
+
+describe('planet 2', () => {
+  const second = planetParamsFor(83921, 2)
+
+  it('is the heavy archetype: radius 400, core radius 10, 316 core tiles, gravity 1.25', () => {
+    expect(second).toMatchObject({
+      archetypeId: 'archetype.heavy',
+      radiusTiles: 400,
+      coreRadiusTiles: 10,
+      gravityMultiplier: 1.25,
+    })
+    expect(coreTileCount(second)).toBe(316)
+  })
+
+  it('carries ore tiers 4 to 8 in its five bands', () => {
+    expect([1, 2, 3, 4, 5].map((band) => oreTier(2, band))).toEqual([4, 5, 6, 7, 8])
+  })
+
+  it('puts the dock site in the same place for the same seed on every run', () => {
+    expect(dockSiteOf(planetParamsFor(83921, 2))).toEqual(dockSiteOf(second))
+    expect(dockSiteOf(second).dockPoint.ty).toBeGreaterThan(390)
+  })
+
+  it('registers the base and heavy archetype ids for the scenario validator', () => {
+    expect(planetParamsFor(83921, 1).archetypeId).toBe('archetype.base')
+    expect(ARCHETYPE_IDS).toEqual(['archetype.base', 'archetype.heavy'])
   })
 })

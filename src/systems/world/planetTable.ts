@@ -9,6 +9,8 @@
  */
 
 export interface PlanetArchetype {
+  /** The archetype id the scenario validator knows (#10 registered ids). */
+  archetypeId: string
   /** Radial gravity multiplier (#4, #7); planet 2 is 1.25 (#6 section 2), never above 1.4. */
   gravityMultiplier: number
   /** Art palette for the five bands (#13); a placeholder id until the art lands. */
@@ -17,10 +19,16 @@ export interface PlanetArchetype {
   familyWeights: { metal: number; crystal: number }
 }
 
-/** Planet 1, then planet 2. Planets past the slice reuse the last entry until #2 adds more. */
+/** Planet 1 (`archetype.base`), then planet 2 (`archetype.heavy`, #10). Planets past the slice reuse the last entry until #2 adds more. */
 export const PLANET_ARCHETYPES: readonly PlanetArchetype[] = [
-  { gravityMultiplier: 1, paletteId: 'palette.planet_1', familyWeights: { metal: 3, crystal: 1 } },
   {
+    archetypeId: 'archetype.base',
+    gravityMultiplier: 1,
+    paletteId: 'palette.planet_1',
+    familyWeights: { metal: 3, crystal: 1 },
+  },
+  {
+    archetypeId: 'archetype.heavy',
     gravityMultiplier: 1.25,
     paletteId: 'palette.planet_2',
     familyWeights: { metal: 1, crystal: 2 },

@@ -39,6 +39,8 @@ export interface PlanetParams {
   caveThresholdBp: number
   dockHalfWidthTiles: number
   dockClearanceTiles: number
+  /** `archetype.base` on planet 1, `archetype.heavy` on planet 2 (#10). */
+  archetypeId: string
   gravityMultiplier: number
   paletteId: string
   familyWeights: { metal: number; crystal: number }
