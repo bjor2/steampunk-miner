@@ -24,6 +24,7 @@
     "perSecond": { "drill": "1", "thrust": "1.5", "drive": "0.25" },
     "rescueFloorFraction": "0.25"
   },
+  "drill": { "scratchFloor": "0.25", "minTicksPerTile": 24 },
   "costCurves": [
     { "id": "cost.vehicle.cargo_hold", "family": "geometric", "base": "24", "ratio": "1.24" },
     { "id": "cost.vehicle.boiler", "family": "geometric", "base": "24", "ratio": "1.24" },

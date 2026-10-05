@@ -41,6 +41,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     planets: readPlanets(reader, reader.object('planets', file.planets)),
     prices: readPrices(reader, reader.object('prices', file.prices)),
     energy: readEnergy(reader, reader.object('energy', file.energy)),
+    drill: readDrill(reader, reader.object('drill', file.drill)),
     costCurves,
     upgrades,
     visualTiers: reader
@@ -118,6 +119,13 @@ function readEnergy(reader: FieldReader, energy: Record<string, unknown>): Econo
       drive: reader.money('energy.perSecond.drive', perSecond.drive),
     },
     rescueFloorFraction: reader.money('energy.rescueFloorFraction', energy.rescueFloorFraction),
+  }
+}
+
+function readDrill(reader: FieldReader, drill: Record<string, unknown>): Economy['drill'] {
+  return {
+    scratchFloor: reader.money('drill.scratchFloor', drill.scratchFloor),
+    minTicksPerTile: reader.safeInteger('drill.minTicksPerTile', drill.minTicksPerTile),
   }
 }
 

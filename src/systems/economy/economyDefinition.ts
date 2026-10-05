@@ -132,6 +132,13 @@ export interface Economy {
     perSecond: { drill: BigStat; thrust: BigStat; drive: BigStat }
     rescueFloorFraction: BigStat
   }
+  /** The #7 drill rule's constants, filled in by #6 section 1. */
+  drill: {
+    /** Below `tip / hardness` of this the drill cannot scratch the tile (`P < H/4`). */
+    scratchFloor: BigStat
+    /** The tile speed cap: 2.5 tiles/s at 60 ticks/s is 24 ticks per tile. */
+    minTicksPerTile: number
+  }
   costCurves: readonly CostCurve[]
   upgrades: readonly UpgradeDef[]
   visualTiers: readonly VisualTierThreshold[]
