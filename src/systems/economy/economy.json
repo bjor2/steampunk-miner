@@ -24,7 +24,8 @@
   },
   "energy": {
     "perSecond": { "drill": "1", "thrust": "1.5", "drive": "0.25" },
-    "rescueFloorFraction": "0.25"
+    "rescueFloorFraction": "0.25",
+    "drillUpEnergyMult": "2.5"
   },
   "drill": { "scratchFloor": "0.25", "minTicksPerTile": 24 },
   "costCurves": [
@@ -36,7 +37,11 @@
     { "id": "cost.vehicle.drill_tip", "family": "geometric", "base": "72", "ratio": "1.5376" },
     { "id": "cost.casing.upgrade", "family": "geometric", "base": "48", "ratio": "1.24" }
   ],
-  "casing": { "costCurveId": "cost.casing.upgrade", "casingGradeStart": 1 },
+  "casing": {
+    "costCurveId": "cost.casing.upgrade",
+    "casingGradeStart": 1,
+    "casingGradeCoreMin": 5
+  },
   "upgrades": [
     {
       "id": "drill_power",

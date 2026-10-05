@@ -145,6 +145,11 @@ export interface Economy {
   energy: {
     perSecond: { drill: BigStat; thrust: BigStat; drive: BigStat }
     rescueFloorFraction: BigStat
+    /**
+     * #41: lift + drill drains `thrust + drill`, about this many times the drill alone.
+     * Informational only; the live drain is still the sum of the two rates.
+     */
+    drillUpEnergyMult: BigStat
   }
   /** The #7 drill rule's constants, filled in by #6 section 1. */
   drill: {
@@ -156,9 +161,10 @@ export interface Economy {
   costCurves: readonly CostCurve[]
   /**
    * The casing grade (#41 Systems & Economy): a separate counter, not a seventh track. It starts
-   * at `casingGradeStart` and each grade is bought at the Upgrade bay along `costCurveId`.
+   * at `casingGradeStart` and each grade is bought at the Upgrade bay along `costCurveId`. Grade
+   * `G` holds bands `1..G`; the core needs `casingGradeCoreMin`.
    */
-  casing: { costCurveId: string; casingGradeStart: number }
+  casing: { costCurveId: string; casingGradeStart: number; casingGradeCoreMin: number }
   upgrades: readonly UpgradeDef[]
   visualTiers: readonly VisualTierThreshold[]
   enemies: {

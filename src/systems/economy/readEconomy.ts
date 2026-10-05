@@ -122,6 +122,7 @@ function readEnergy(reader: FieldReader, energy: Record<string, unknown>): Econo
       drive: reader.money('energy.perSecond.drive', perSecond.drive),
     },
     rescueFloorFraction: reader.money('energy.rescueFloorFraction', energy.rescueFloorFraction),
+    drillUpEnergyMult: reader.money('energy.drillUpEnergyMult', energy.drillUpEnergyMult),
   }
 }
 
@@ -144,6 +145,7 @@ function readCasing(
   return {
     costCurveId,
     casingGradeStart: reader.safeInteger('casing.casingGradeStart', casing.casingGradeStart),
+    casingGradeCoreMin: reader.safeInteger('casing.casingGradeCoreMin', casing.casingGradeCoreMin),
   }
 }
 
