@@ -30,13 +30,17 @@ export function poseAt(
 
 /** Frozen enemies and a drill that cuts band-2 rock quickly. */
 export function prepareDigger(session: ScriptedSession, tick: number, casingGrade = 1): void {
-  session.submit(tick, FREEZE_ENEMIES)
-  session.submit(tick, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 8 } })
-  session.submit(tick, {
-    type: 'debug.setUpgrade',
-    payload: { upgradeId: 'drill_power', level: 8 },
-  })
-  session.submit(tick, { type: 'debug.setCasingGrade', payload: { grade: casingGrade } })
+  diggerIntents(casingGrade).forEach((intent) => session.submit(tick, intent))
+}
+
+/** What `prepareDigger` sends, for a script that is replayed rather than submitted. */
+export function diggerIntents(casingGrade = 1): CommandIntent[] {
+  return [
+    FREEZE_ENEMIES,
+    { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 8 } },
+    { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 8 } },
+    { type: 'debug.setCasingGrade', payload: { grade: casingGrade } },
+  ]
 }
 
 /**
@@ -51,16 +55,30 @@ export function digAlong(
   toX: number,
   drillTicks = REPORT_TICKS,
 ): number {
+  const poses = digPoses(firstTick, y, fromX, toX, drillTicks)
+  for (const { tick, ...pose } of poses) {
+    session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
+    session.submit(tick, { type: 'debug.setHull', payload: { hull: '100' } })
+    session.submit(tick, pose)
+  }
+  return firstTick + poses.length * REPORT_TICKS
+}
+
+/** The pose reports of a straight dig from `fromX` to `toX` at `y`: 100 mm every 12 ticks. */
+export function digPoses(
+  firstTick: number,
+  y: number,
+  fromX: number,
+  toX: number,
+  drillTicks = REPORT_TICKS,
+): ({ tick: number } & CommandIntent<'reportPose'>)[] {
   const direction = toX >= fromX ? 1 : -1
   const facing = direction > 0 ? FACING.right : FACING.left
   const count = Math.floor(Math.abs(toX - fromX) / STEP_MM) + 1
-  for (let at = 0; at < count; at++) {
-    const tick = firstTick + at * REPORT_TICKS
-    session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
-    session.submit(tick, { type: 'debug.setHull', payload: { hull: '100' } })
-    session.submit(tick, poseAt(fromX + direction * at * STEP_MM, y, drillTicks, facing))
-  }
-  return firstTick + count * REPORT_TICKS
+  return Array.from({ length: count }, (_, at) => ({
+    tick: firstTick + at * REPORT_TICKS,
+    ...poseAt(fromX + direction * at * STEP_MM, y, drillTicks, facing),
+  }))
 }
 
 /** Reports the same pose every `every` ticks from `fromTick` to `toTick`, never drilling. */

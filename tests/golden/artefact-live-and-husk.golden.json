@@ -1,0 +1,111 @@
+{
+  "name": "artefact-live-and-husk",
+  "description": "Take assay_beacon from the live planet 1 cache; on planet 2 the cache is a husk and opening it is refused (#46).",
+  "generatorVersion": 3,
+  "authorityProtocolVersion": 6,
+  "logSchemaVersion": 1,
+  "numberFormatVersion": 1,
+  "worldSeed": 83921,
+  "endTick": 60,
+  "commands": [
+    {
+      "playerId": "p1",
+      "tick": 1,
+      "seq": 1,
+      "type": "debug.freezeEnemies",
+      "payload": {
+        "frozen": true
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 2,
+      "seq": 2,
+      "type": "reportPose",
+      "payload": {
+        "x": 65500,
+        "y": -110500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 3,
+      "seq": 3,
+      "type": "openArtefactCache",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 4,
+      "seq": 4,
+      "type": "chooseArtefact",
+      "payload": {
+        "optionId": "artefact.assay_beacon"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 5,
+      "seq": 5,
+      "type": "debug.setPlanet",
+      "payload": {
+        "planetIndex": 2
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 6,
+      "seq": 6,
+      "type": "debug.freezeEnemies",
+      "payload": {
+        "frozen": true
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 7,
+      "seq": 7,
+      "type": "reportPose",
+      "payload": {
+        "x": 244500,
+        "y": 258500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 8,
+      "seq": 8,
+      "type": "openArtefactCache",
+      "payload": {}
+    }
+  ],
+  "digests": [
+    {
+      "tick": 60,
+      "scope": "end",
+      "digest": "0050b40e00dbe9b8"
+    }
+  ]
+}

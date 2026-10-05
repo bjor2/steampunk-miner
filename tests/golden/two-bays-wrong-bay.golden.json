@@ -1,0 +1,146 @@
+{
+  "name": "two-bays-wrong-bay",
+  "description": "Buying at the Sell bay and selling at the Upgrade bay are refused as wrong_bay; the same buys at the Upgrade bay apply (#37, #41).",
+  "generatorVersion": 3,
+  "authorityProtocolVersion": 6,
+  "logSchemaVersion": 1,
+  "numberFormatVersion": 1,
+  "worldSeed": 83921,
+  "endTick": 120,
+  "commands": [
+    {
+      "playerId": "p1",
+      "tick": 0,
+      "seq": 1,
+      "type": "debug.grantMoney",
+      "payload": {
+        "amount": "1000"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 1,
+      "seq": 2,
+      "type": "reportPose",
+      "payload": {
+        "x": -4000,
+        "y": 300500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 1,
+      "seq": 3,
+      "type": "dock",
+      "payload": {
+        "bay": "sell"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 2,
+      "seq": 4,
+      "type": "buyUpgrade",
+      "payload": {
+        "upgradeId": "drill_tip"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 3,
+      "seq": 5,
+      "type": "buyCasingGrade",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 10,
+      "seq": 6,
+      "type": "undock",
+      "payload": {}
+    },
+    {
+      "playerId": "p1",
+      "tick": 12,
+      "seq": 7,
+      "type": "reportPose",
+      "payload": {
+        "x": 4000,
+        "y": 300500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 1,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 12,
+      "seq": 8,
+      "type": "dock",
+      "payload": {
+        "bay": "upgrade"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 13,
+      "seq": 9,
+      "type": "sellCargo",
+      "payload": {
+        "resourceTier": "all"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 14,
+      "seq": 10,
+      "type": "buyUpgrade",
+      "payload": {
+        "upgradeId": "drill_tip"
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 15,
+      "seq": 11,
+      "type": "buyCasingGrade",
+      "payload": {}
+    }
+  ],
+  "digests": [
+    {
+      "tick": 1,
+      "scope": "dock",
+      "digest": "336c26082e28fd05"
+    },
+    {
+      "tick": 12,
+      "scope": "dock",
+      "digest": "dbb1826595e65644"
+    },
+    {
+      "tick": 120,
+      "scope": "end",
+      "digest": "7a144981bb2bf518"
+    }
+  ]
+}

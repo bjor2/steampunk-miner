@@ -34,7 +34,8 @@ jobs:
           name: balance-report
           path: balance-report/
 
-  # Every pull request: the same golden digests on Windows as on Linux (#3, #5 and #11 acceptance).
+  # Every pull request: the same golden digests on Windows as on Linux (#3, #5 and #11 acceptance),
+  # including the second slice's casing, collapse, bay and artefact runs (S11, #65).
   determinism:
     if: github.event_name == 'pull_request'
     runs-on: windows-latest
@@ -49,5 +50,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: >-
-          npx vitest run src/logging/goldenRun.test.ts src/systems/replay
+          npx vitest run src/logging/goldenRun.test.ts src/logging/secondSliceGolden.test.ts
+          src/systems/replay
           src/systems/money.test.ts src/systems/world/generatorGolden.test.ts

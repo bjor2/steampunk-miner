@@ -18,6 +18,7 @@ import { bayPoseAt, dockedPoseAt, FACING } from '../vehicle/vehiclePose'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor, type PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
+import { SECOND_SLICE_GOLDEN_SCRIPTS } from './secondSliceGoldenScripts'
 
 export interface GoldenScript {
   name: string
@@ -71,6 +72,7 @@ export const GOLDEN_SCRIPTS: readonly GoldenScript[] = [
     endTick: 2000,
     commands: moneyPast1e40Commands(planetParamsFor(WORLD_SEED, RICH_PLANET)),
   },
+  ...SECOND_SLICE_GOLDEN_SCRIPTS,
 ]
 
 /** Stamps a script as one player's client would: `seq` from 1, in order. */
