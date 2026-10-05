@@ -13,6 +13,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { compareRuns, formatComparisonTable } from '../src/logging/compareRuns'
 import { formatNdjsonLine } from '../src/logging/ndjson'
 import {
+  campaignPlanetAlerts,
   derivePacingReport,
   formatPacingReport,
   formatPacingVerdicts,
@@ -44,7 +45,7 @@ const report = [
   formatPacingReport(pacing),
   `### Gates\n\n${formatPacingVerdicts(pacingVerdicts(pacing))}`,
   listSection('Pacing targets missed (these fail the build)', pacingProblems(pacing)),
-  listSection('Alerts (reported only)', pacingAlerts(pacing)),
+  listSection('Alerts (reported only)', [...pacingAlerts(pacing), ...campaignPlanetAlerts(pacing)]),
   comparisonSection(summary),
   assaySection(),
 ].join('\n\n')

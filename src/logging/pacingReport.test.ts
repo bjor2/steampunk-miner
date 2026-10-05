@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { RunEventData, RunEventName } from './eventNames'
 import {
+  campaignPlanetAlerts,
   derivePacingReport,
   formatPacingVerdicts,
   laterPlanetAlerts,
@@ -124,6 +125,32 @@ describe('pacing report', () => {
     expect(laterPlanetAlerts(derivePacingReport(run, WORLD_SEED))).toEqual([
       'planet 3 core took 140.0 min, expected 25 to 120 min; retune paceScale(3)',
     ])
+  })
+
+  it('reports every campaign planet whose core leaves 45 to 60 minutes from arrival', () => {
+    const run = [
+      ...onTimeRun(),
+      line(100 * MINUTE, 'planet_entered', { planetSeed: 3, generatorVersion: 1, radius: 475 }, 3),
+      line(150 * MINUTE, 'core_completed', { durationTicks: 0 }, 3),
+      line(160 * MINUTE, 'planet_entered', { planetSeed: 4, generatorVersion: 1, radius: 500 }, 4),
+      line(240 * MINUTE, 'core_completed', { durationTicks: 0 }, 4),
+    ]
+    expect(campaignPlanetAlerts(derivePacingReport(run, WORLD_SEED))).toEqual([
+      'planet 4 core took 80.0 min, campaign target 45 to 60 min per planet',
+    ])
+  })
+
+  it('reports a slice planet off the campaign target without failing the slice gates', () => {
+    const fastCore = onTimeRun().map((event) =>
+      event.event === 'core_completed' && event.planet === 1
+        ? line(35 * MINUTE, 'core_completed', { durationTicks: 0 })
+        : event,
+    )
+    const report = derivePacingReport(fastCore, WORLD_SEED)
+    expect(campaignPlanetAlerts(report)).toEqual([
+      'planet 1 core took 35.0 min, campaign target 45 to 60 min per planet',
+    ])
+    expect(pacingProblems(report)).toEqual([])
   })
 
   it('alerts, without failing, on a planet done in fewer than 3 trips', () => {

@@ -2,11 +2,15 @@
  * Planets 3 to 40, reported and never gated (#29 Systems & Economy note 2, #6 acceptance 7): the
  * pacing bot plays the bot scenario on past the slice and the core time of every planet is
  * printed, with a warning where it leaves 25 to 120 minutes (the lever is `paceScale(p)` in
- * economy.json). Takes a few minutes; run it with `npm run balance:planets`.
+ * economy.json). The campaign's 45 to 60 minutes per planet (#91) is warned on beside it. Takes a few minutes; run it with `npm run balance:planets`.
  */
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
-import { derivePacingReport, laterPlanetAlerts } from '../src/logging/pacingReport'
+import {
+  campaignPlanetAlerts,
+  derivePacingReport,
+  laterPlanetAlerts,
+} from '../src/logging/pacingReport'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import type { Scenario } from '../src/systems/scenario'
 
@@ -28,7 +32,7 @@ const rows = Object.entries(report.coreTicksOnPlanet).map(
   ([planet, ticks]) =>
     `| ${planet} | ${(ticks / TICKS_PER_MINUTE).toFixed(1)} min | ${report.tripsByPlanet[planet] ?? 0} |`,
 )
-const alerts = laterPlanetAlerts(report)
+const alerts = [...laterPlanetAlerts(report), ...campaignPlanetAlerts(report)]
 const text = [
   `## Pacing bot, planets 1 to ${LAST_PLANET} (report only)`,
   run.isFinished

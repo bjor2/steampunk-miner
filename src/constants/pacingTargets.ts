@@ -21,4 +21,11 @@ export const PACING_TARGETS = {
    * should take 25 to 120 minutes from arrival; outside it, `paceScale(p)` is retuned.
    */
   laterPlanetCoreMinutes: { min: 25, max: 120 },
+  /**
+   * Report only (vertical audit #75 section 3.1, campaign build plan #90, C4 #91): the
+   * `pacing_targets_min` per-planet campaign entry, 45 to 60 minutes from arrival to core on every
+   * planet. The pacing bot and the 0.7x dig-time check of #81 are held to it after the curve
+   * changes land (C1, C2, C3); until then it never fails a build.
+   */
+  campaignPlanetMinutes: { min: 45, max: 60 },
 } as const

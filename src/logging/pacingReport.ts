@@ -215,11 +215,26 @@ export function laterPlanetAlerts(report: PacingReport): string[] {
   const { min, max } = PACING_TARGETS.laterPlanetCoreMinutes
   return Object.entries(report.coreTicksOnPlanet)
     .filter(([planet]) => Number.parseInt(planet) > SLICE_LAST_PLANET)
-    .filter(([, ticks]) => ticks < min * TICKS_PER_MINUTE || ticks > max * TICKS_PER_MINUTE)
+    .filter(([, ticks]) => isOutsideMinutes(ticks, { min, max }))
     .map(
       ([planet, ticks]) =>
         `planet ${planet} core took ${minutesText(ticks)}, expected ${min} to ${max} min; retune paceScale(${planet})`,
     )
+}
+
+/** Every planet against the campaign's 45 to 60 minutes each (#75, #91); reported, never gated. */
+export function campaignPlanetAlerts(report: PacingReport): string[] {
+  const { min, max } = PACING_TARGETS.campaignPlanetMinutes
+  return Object.entries(report.coreTicksOnPlanet)
+    .filter(([, ticks]) => isOutsideMinutes(ticks, { min, max }))
+    .map(
+      ([planet, ticks]) =>
+        `planet ${planet} core took ${minutesText(ticks)}, campaign target ${min} to ${max} min per planet`,
+    )
+}
+
+function isOutsideMinutes(ticks: number, range: { min: number; max: number }): boolean {
+  return ticks < range.min * TICKS_PER_MINUTE || ticks > range.max * TICKS_PER_MINUTE
 }
 
 function secondsText(tick: number | null): string {
