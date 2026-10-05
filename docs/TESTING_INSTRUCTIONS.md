@@ -65,7 +65,11 @@ missing. `coreFragments` fills the platform's core bay (`debug.setCoreFragments`
   `setPlanetSeed`, `teleportToDepthTiles`, `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
   `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
   `setUpgrade(id, level)`, `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
-  `vehicleStats()`; for the core, `setCoreFragments(count)`. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.getPrefs()`)
+  `vehicleStats()`; for the core, `setCoreFragments(count)`; for combat (#25), `spawnEnemy(kind, tier,
+offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEnemies(frozen)` and the
+  unlogged read `enemyStatsTable(kind)`. Specs that mine deep (where crawlers live) freeze enemies first
+  (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
+  `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.getPrefs()`)
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2).
 - Run-log specs: every emitted line must pass `runEventProblems` (the schema registry in
   `src/logging/eventNames.ts`); a summary is always `deriveSummary(events)`.

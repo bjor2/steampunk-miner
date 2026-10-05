@@ -30,6 +30,17 @@ import {
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
 import { CAMERA_MODES, isCameraMode, type CameraMode } from '../systems/render/cameraTurn'
+import { isEnemyKind } from '../systems/authority/combat/combatDebugRules'
+import {
+  clearEnemiesCommand,
+  freezeEnemiesCommand,
+  spawnEnemyCommand,
+  type TileOffset,
+} from '../systems/authority/combat/combatCommands'
+import {
+  enemyStatsTableView,
+  type EnemyStatsRowView,
+} from '../systems/authority/combat/enemyStatsView'
 import { facilityLevelProblems } from '../systems/authority/platformState'
 import { readSnapshot, type SessionSnapshot } from '../systems/authority/sessionSnapshot'
 import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForward'
@@ -106,6 +117,14 @@ export interface DebugApi {
   setFacilityLevel(facilityId: string, level: number): DebugResult
   /** The platform's core bay to `count` fragments (#10); 63 on planet 1 completes the core. */
   setCoreFragments(count: number): DebugResult
+  // combat (#9, #11 amendment): the setters are `debug.*` commands, the table read is not logged
+  /** `crawler` or `burrower` at any tier, `offset` whole tiles from the vehicle (default 4 right). */
+  spawnEnemy(kind: string, tier: number, offset?: TileOffset): DebugResult
+  clearEnemies(): DebugResult
+  /** Frozen enemies neither move, wind up, attack nor spawn; the drill still cuts them. */
+  freezeEnemies(frozen: boolean): DebugResult
+  /** Table D of #6 for planets 1 to 40: tiers, health, hits, kill times and side-hit shares. */
+  enemyStatsTable(kind: string): DebugResult<{ rows: EnemyStatsRowView[] }>
   ui: DebugUi
   // stubs
   /** `depthBp` is basis points of the radius (#11); the radius arrives with the generator. */
@@ -114,7 +133,6 @@ export interface DebugApi {
   teleportToDock(): void
   giveResource(resourceTier: number, amount: number): void
   unlock(featureId: string): void
-  spawnEnemy(enemyKind: string, tier: number): void
   setVehicleLoadout(loadoutId: string): void
 }
 
@@ -143,6 +161,17 @@ function sessionPoint(): SessionPoint {
 }
 
 const game = (): GameState => useGameStore.getState()
+
+function enemyKindProblems(kind: unknown): string[] {
+  if (isEnemyKind(kind)) return []
+  return [`enemy kind must be crawler or burrower, got ${JSON.stringify(kind)}`]
+}
+
+function enemyStatsTableOf(kind: string): DebugResult<{ rows: EnemyStatsRowView[] }> {
+  const problems = enemyKindProblems(kind)
+  if (problems.length > 0 || !isEnemyKind(kind)) return { ok: false, problems }
+  return { ok: true, rows: enemyStatsTableView(kind) }
+}
 
 function cameraModeProblems(mode: unknown): string[] {
   if (isCameraMode(mode)) return []
@@ -203,6 +232,17 @@ export function createDebugApi(): DebugApi {
       runUnlessRefused(vehicleDebugProblems(setCoreFragmentsCommand(count)), () =>
         game().setCoreFragments(count),
       ),
+    spawnEnemy: (kind, tier, offset) =>
+      runUnlessRefused(vehicleDebugProblems(spawnEnemyCommand(kind, tier, offset)), () =>
+        game().spawnEnemy(kind, tier, offset),
+      ),
+    clearEnemies: () =>
+      runUnlessRefused(vehicleDebugProblems(clearEnemiesCommand()), () => game().clearEnemies()),
+    freezeEnemies: (frozen) =>
+      runUnlessRefused(vehicleDebugProblems(freezeEnemiesCommand(frozen)), () =>
+        game().freezeEnemies(frozen),
+      ),
+    enemyStatsTable: enemyStatsTableOf,
     ui: {
       setCameraMode: (mode) =>
         runUnlessRefused(cameraModeProblems(mode), () => game().setCameraMode(mode as CameraMode)),
@@ -213,7 +253,6 @@ export function createDebugApi(): DebugApi {
     teleportToDock: notImplemented('teleportToDock'),
     giveResource: notImplemented('giveResource'),
     unlock: notImplemented('unlock'),
-    spawnEnemy: notImplemented('spawnEnemy'),
     setVehicleLoadout: notImplemented('setVehicleLoadout'),
   }
 }

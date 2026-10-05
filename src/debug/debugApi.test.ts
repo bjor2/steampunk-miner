@@ -291,6 +291,57 @@ describe('debug api: vehicle', () => {
   })
 })
 
+describe('debug api: combat', () => {
+  const belowTheDock = { dx: 4, dy: -3 }
+
+  it('spawns, freezes and clears enemies as logged debug commands', () => {
+    const debug = createDebugApi()
+    expect(debug.freezeEnemies(true)).toEqual({ ok: true })
+    expect(debug.spawnEnemy('burrower', 9, belowTheDock)).toEqual({ ok: true })
+    expect(debug.clearEnemies()).toEqual({ ok: true })
+    expect(sink.commands.map((command) => command.type)).toEqual([
+      'debug.freezeEnemies',
+      'debug.spawnEnemy',
+      'debug.clearEnemies',
+    ])
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'debug_command_applied',
+      'enemy_spawned',
+      'enemy_type_encountered',
+      'debug_command_applied',
+      'enemy_despawned',
+      'debug_command_applied',
+    ])
+    expect(sink.events[1].data).toEqual({
+      enemyId: 'e1',
+      kind: 'burrower',
+      tier: 9,
+      spawnPointId: 'debug',
+    })
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+    expect(game().debugApplied).toBe(true)
+  })
+
+  it('refuses an unknown enemy kind or a place off the planet, and changes nothing', () => {
+    const debug = createDebugApi()
+    expect(debug.spawnEnemy('dragon', 1, belowTheDock)).toMatchObject({ ok: false })
+    expect(debug.spawnEnemy('crawler', 1, { dx: 0, dy: 50 })).toMatchObject({ ok: false })
+    expect(debug.enemyStatsTable('dragon')).toMatchObject({ ok: false })
+    expect(sink.commands).toEqual([])
+  })
+
+  it('reads the crawler table for planets 1 to 40 without logging', () => {
+    const table = createDebugApi().enemyStatsTable('crawler')
+    if (!table.ok) throw new Error(table.problems.join('; '))
+    expect(table.rows).toHaveLength(40)
+    expect(table.rows[0]).toMatchObject({ planetIndex: 1, tierByBand: [1, 2, 3, 4, 5] })
+    expect(table.rows[0].healthByBand[0]).toBe('7.84e+0')
+    expect(table.rows[0].baseHitByBand[0]).toBe('1.96e+1')
+    expect(sink.events).toEqual([])
+    expect(sink.commands).toEqual([])
+  })
+})
+
 describe('debug api: ui', () => {
   it('switches the camera to the fixed mode and back', () => {
     const debug = createDebugApi()

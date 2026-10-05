@@ -74,12 +74,15 @@ import {
   connectAuthority,
   readAuthorityState,
   refusalOf,
+  refuseProblems,
   submitCommand,
+  submitUnlessRefused,
 } from './authorityLink'
+import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
-export interface GameState {
+export interface GameState extends CombatDebugActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -180,6 +183,7 @@ export const STARTING_VALUES: GameValues = {
 
 export const useGameStore = create<GameState>()((set, get) => ({
   ...STARTING_VALUES,
+  ...combatDebugActionsOf(() => get().playerId),
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
@@ -372,17 +376,6 @@ function runFastForwardSteps(playerId: string, steps: readonly FastForwardStep[]
     if (step.kind === 'advance') advanceAuthorityTo(step.tick)
     else submitCommand(playerId, step.intent)
   }
-}
-
-/** A debug command the authority would refuse is not sent: it throws with the problems. */
-function submitUnlessRefused(playerId: string, intent: CommandIntent): void {
-  refuseProblems(refusalOf(playerId, intent))
-  submitCommand(playerId, intent)
-}
-
-/** A scenario is refused, never trimmed: every problem is named, nothing is applied. */
-function refuseProblems(problems: string[]): void {
-  if (problems.length > 0) throw new Error(problems.join('; '))
 }
 
 /**

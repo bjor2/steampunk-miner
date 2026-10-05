@@ -9,6 +9,7 @@ import type { PlanetParams } from '../../world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../../world/tileGrid'
 import type { CommandIntent } from '../authorityCommand'
 import { drill, type ScriptedSession } from '../scriptedSession'
+import { freezeEnemiesCommand, spawnEnemyCommand } from './combatCommands'
 import { spawnPointsWithin } from './spawnPoints'
 
 export const CORRIDOR_ROW = 297
@@ -55,15 +56,10 @@ export const setHull = (hull: string): CommandIntent => ({
   payload: { hull },
 })
 
-export const spawnEnemy = (kind: string, tier: number, dx: number, dy = 0): CommandIntent => ({
-  type: 'debug.spawnEnemy',
-  payload: { kind, tier, dx, dy },
-})
+export const spawnEnemy = (kind: string, tier: number, dx: number, dy = 0): CommandIntent =>
+  spawnEnemyCommand(kind, tier, { dx, dy })
 
-export const freezeEnemies = (frozen: boolean): CommandIntent => ({
-  type: 'debug.freezeEnemies',
-  payload: { frozen },
-})
+export const freezeEnemies = freezeEnemiesCommand
 
 /** A command a spec sends at an absolute tick, kept so a replay can send it again. */
 export interface TimedCommand {

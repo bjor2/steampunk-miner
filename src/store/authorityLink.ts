@@ -65,3 +65,14 @@ function connectedAuthority(): Authority {
   if (authority === null) throw new Error('the game store is not connected to an authority')
   return authority
 }
+
+/** A debug command the authority would refuse is not sent: it throws with the problems. */
+export function submitUnlessRefused(playerId: string, intent: CommandIntent): void {
+  refuseProblems(refusalOf(playerId, intent))
+  submitCommand(playerId, intent)
+}
+
+/** A scenario is refused, never trimmed: every problem is named, nothing is applied. */
+export function refuseProblems(problems: string[]): void {
+  if (problems.length > 0) throw new Error(problems.join('; '))
+}
