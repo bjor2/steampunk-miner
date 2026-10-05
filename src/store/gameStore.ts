@@ -24,19 +24,9 @@ import {
   takeSnapshot,
   type SessionSnapshot,
 } from '../systems/authority/sessionSnapshot'
-import {
-  fastForwardProblems,
-  fastForwardSteps,
-  type FastForwardStep,
-  type ScriptedCommand,
-} from '../systems/fastForward'
+import { fastForwardProblems, fastForwardSteps, type ScriptedCommand } from '../systems/fastForward'
 import { ZERO_MONEY, type Money } from '../systems/money'
-import {
-  startOfScenario,
-  validateScenario,
-  type Scenario,
-  type ScriptStep,
-} from '../systems/scenario'
+import { startOfScenario, validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems, type StartScenario } from '../systems/startScenario'
 import type { PosePayload } from '../systems/vehicle/poseReport'
 import {
@@ -81,6 +71,7 @@ import {
 } from './authorityLink'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
+import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
 export interface GameState extends CombatDebugActions {
@@ -218,7 +209,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
     refuseProblems(validateScenario(scenario))
     const scriptStartTick = readAuthorityState().tick
     get().applyStartScenario(startOfScenario(scenario))
-    runScenarioScript(scriptStartTick, scenario.script ?? [])
+    runScenarioScript(scriptStartTick, scenario.script ?? [], get().fastForward)
   },
 
   fastForward: (ticks, commands = []) => {
@@ -360,28 +351,6 @@ function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues>
 
 function placeAtScenarioDepth(scenario: StartScenario): void {
   if (scenario.depthTiles !== undefined) useGameStore.setState({ depthTiles: scenario.depthTiles })
-}
-
-function submitEach(playerId: string, intents: readonly CommandIntent[]): void {
-  for (const intent of intents) submitCommand(playerId, intent)
-}
-
-/**
- * Script ticks count from the tick the scenario was applied at; a step whose tick an earlier
- * fast-forward already passed runs at once, so time never goes backwards.
- */
-function runScenarioScript(scriptStartTick: number, script: readonly ScriptStep[]): void {
-  for (const step of script) {
-    advanceAuthorityTo(Math.max(scriptStartTick + step.tick, readAuthorityState().tick))
-    useGameStore.getState().fastForward(step.args.ticks)
-  }
-}
-
-function runFastForwardSteps(playerId: string, steps: readonly FastForwardStep[]): void {
-  for (const step of steps) {
-    if (step.kind === 'advance') advanceAuthorityTo(step.tick)
-    else submitCommand(playerId, step.intent)
-  }
 }
 
 /**
