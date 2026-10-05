@@ -50,6 +50,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isCasingGrade(vehicle.casingGrade)
       ? []
       : [`${path}.casingGrade must be a whole number >= 1`]),
+    ...(vehicle.casingShortBand === null || isWholeNumber(vehicle.casingShortBand)
+      ? []
+      : [`${path}.casingShortBand must be null or a whole band`]),
     ...(isNonNegativeMoneyText(vehicle.hull) ? [] : [`${path}.hull must be a decimal string`]),
     ...(isPortableCargo(vehicle.cargo) ? [] : [`${path}.cargo must hold whole units`]),
     ...(vehicle.pose === null || isPortablePose(vehicle.pose) ? [] : [`${path}.pose is malformed`]),

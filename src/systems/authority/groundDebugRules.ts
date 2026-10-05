@@ -113,7 +113,6 @@ function applyCircle(
   return { state: { ...state, world: edited.world }, events: groundChangedEventsOf(edited) }
 }
 
-
 function discOf(circle: { x: number; y: number; radius: number }) {
   return { xMm: circle.x, yMm: circle.y, radiusMm: circle.radius, floorRadiusMm: null }
 }

@@ -234,6 +234,18 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: { samples: 'integer', grade: 'integer' },
   },
+  // #41: edge-triggered when the vehicle enters a band (6: the core) its grade does not hold, and
+  // the edge back; they drive the amber HUD badge.
+  casing_grade_insufficient: {
+    group: 'mining',
+    level: 'core',
+    payload: { band: 'integer', grade: 'integer', required: 'integer' },
+  },
+  casing_grade_sufficient: {
+    group: 'mining',
+    level: 'core',
+    payload: { band: 'integer', grade: 'integer' },
+  },
   // One line per drilling command (a pose report's interval or a `drillTile`), #7: `damage` is
   // `ticks * drillPower * eff / 60` in hardness units.
   drill_damage_dealt: {

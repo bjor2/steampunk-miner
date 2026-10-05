@@ -35,6 +35,11 @@ export interface VehicleState {
    * of them, so it is not in the visual-tier sum. Raised one at a time at the Upgrade bay.
    */
   casingGrade: number
+  /**
+   * The band (6 for the core) the vehicle last reported itself in while its casing grade did not
+   * hold it, or null when it does (#41): the edge of `casing_grade_insufficient` and the amber badge.
+   */
+  casingShortBand: number | null
   energy: number
   hull: BigStat
   cargo: Cargo
@@ -56,6 +61,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     modeSinceTick: tick,
     levels,
     casingGrade: casingGradeStart(),
+    casingShortBand: null,
     energy: quantaOfUnits(stats.energyMax),
     hull: stats.hullMax,
     cargo: EMPTY_CARGO,

@@ -32,9 +32,11 @@ import {
 import { energyWarningLevel, type EnergyWarningLevel } from './energyWarning'
 import {
   coreDistanceOf,
+  casingBadgeOf,
   depthReadingOf,
   dockArrowOf,
   vehicleStateReadingOf,
+  type CasingBadge,
   type DepthReading,
   type DockArrow,
   type VehicleStateReading,
@@ -84,6 +86,7 @@ export interface HudModel {
   cargo: CargoReading
   cargoValue: AmountReading
   depth: DepthReading
+  casing: CasingBadge | null
   dockArrow: DockArrow | null
   coreDistance: number | null
   threats: ThreatMarker[]
@@ -113,6 +116,7 @@ export function selectHudModel(sources: HudSources): HudModel {
     cargo: cargoGaugeOf(vehicle),
     cargoValue: amountReading(serviceQuote(state, playerId).saleValue),
     depth: depthReadingOf(state, playerId, sources.depthTiles),
+    casing: casingBadgeOf(state, playerId),
     dockArrow: dockArrowOf(state, playerId),
     coreDistance: coreDistanceOf(state, playerId),
     threats: threatMarkersOf(state, playerId),

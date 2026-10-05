@@ -213,4 +213,3 @@ function casingDrilledEvents({ casingCleared }: Carve): DomainEventBody[] {
   if (casingCleared.samples === 0) return []
   return [{ type: 'CasingDrilled', ...casingCleared }]
 }
-

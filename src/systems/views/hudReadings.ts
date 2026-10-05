@@ -22,6 +22,15 @@ export interface DepthReading {
   band: number | null
 }
 
+/**
+ * The casing grade badge beside the depth while undocked (#41 casing feel): calm when the grade
+ * holds the band, "WEAK" (and amber) when it does not, so it never reads by colour alone.
+ */
+export interface CasingBadge {
+  text: string
+  isShort: boolean
+}
+
 export interface DockArrow {
   octant: number
   distance: number
@@ -42,6 +51,14 @@ const MODE_MARKERS: Readonly<Record<VehicleMode, { text: string; icon: string }>
   active: { text: 'UNDER WAY', icon: 'wheel' },
   stranded: { text: 'STRANDED', icon: 'empty-tank' },
   destroyed: { text: 'WRECKED', icon: 'broken-gear' },
+}
+
+/** Null while docked: the grade is read at the platform then. */
+export function casingBadgeOf(state: AuthorityState, playerId: string): CasingBadge | null {
+  const vehicle = state.players[playerId].vehicle
+  if (vehicle.mode === 'docked') return null
+  const isShort = vehicle.casingShortBand !== null
+  return { text: `G${vehicle.casingGrade}${isShort ? ' WEAK' : ''}`, isShort }
 }
 
 export function depthReadingOf(

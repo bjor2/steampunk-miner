@@ -5,8 +5,10 @@ import { FACING, type VehiclePose } from '../vehicle/vehiclePose'
 import { setEnergyCommand, setHullCommand } from '../vehicle/vehicleCommands'
 import {
   createScriptedSession,
+  dockInBay,
   mineTile,
   PARAMS,
+  poseAbove,
   poseInBay,
   SITE,
   surfaceOreTiles,
@@ -19,6 +21,8 @@ import {
   spawnEnemy,
 } from '../authority/combat/combatFixtures'
 import { ACTION_MAP, defaultBindings } from '../input/actionMap'
+import { bandOfTile } from '../world/planetGeometry'
+import { surfaceRowOfColumn } from '../world/tileGrid'
 import { coreEdgeDistance, localOctantOf } from './compass'
 import { energyWarningLevel } from './energyWarning'
 import { energyWarningMarkers, selectHudModel } from './hudModel'
@@ -218,5 +222,33 @@ describe('HUD telegraphs', () => {
     session.submit(tick, freezeEnemies(true))
     session.submit(tick, spawnEnemy('crawler', 1, 5))
     expect(hudOf(session).threats).toEqual([])
+  })
+})
+
+describe('HUD model: casing badge (#41)', () => {
+  /** A pose report with the vehicle's centre in the first tile of `band` down column 20. */
+  function poseInBand(band: number) {
+    let ty = surfaceRowOfColumn(20, PARAMS.radiusTiles)
+    while (bandOfTile(PARAMS, 20, ty) < band) ty--
+    return poseAbove({ tx: 20, ty: ty - 1 }, FACING.down)
+  }
+
+  it('shows the grade calmly where it holds the band', () => {
+    const session = createScriptedSession()
+    session.submit(1, poseInBand(1))
+    expect(hudOf(session).casing).toEqual({ text: 'G1', isShort: false })
+  })
+
+  it('marks the grade WEAK in a band it does not hold, by text as well as colour', () => {
+    const session = createScriptedSession()
+    session.submit(0, freezeEnemies(true))
+    session.submit(1, poseInBand(2))
+    expect(hudOf(session).casing).toEqual({ text: 'G1 WEAK', isShort: true })
+  })
+
+  it('hides the badge while docked', () => {
+    const session = createScriptedSession()
+    dockInBay(session, 1, 'sell')
+    expect(hudOf(session).casing).toBeNull()
   })
 })

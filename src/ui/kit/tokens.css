@@ -7,6 +7,9 @@
   --color-teal: #3fa7a0;
   --color-parchment: #e9dcc0;
   --color-panel: rgb(27 22 19 / 0.85);
+  /* #41 casing feel: the bay teal for lining that holds its band, amber for lining that does not. */
+  --color-casing-safe: #4fa8a0;
+  --color-casing-weak: #e0a030;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 16px;

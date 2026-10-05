@@ -101,6 +101,10 @@ export interface DomainEventBodies {
   }
   /** One ring of lining (#41): air samples lined and lower-grade casing raised, at `grade`. */
   CasingPlaced: { samples: number; relined: number; grade: number }
+  /** The vehicle entered a band (6: the core) its casing grade does not hold (#41). */
+  CasingGradeInsufficient: { band: number; grade: number; required: number }
+  /** The vehicle is back where its casing grade holds (#41). */
+  CasingGradeSufficient: { band: number; grade: number }
   /** The drill cleared lining (#41): casing samples drilled to air, the highest grade among them. */
   CasingDrilled: { samples: number; grade: number }
   CargoAdded: { resourceTier: number; amount: number; value: string }

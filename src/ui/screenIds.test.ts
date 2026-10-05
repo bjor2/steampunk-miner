@@ -94,6 +94,7 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
     [UI_IDS.hudCargoValue]: model.cargoValue.text,
     [UI_IDS.hudDepth]: model.depth.text,
     [UI_IDS.hudBand]: String(model.depth.band),
+    ...(model.casing === null ? {} : { [UI_IDS.hudCasing]: model.casing.text }),
     [UI_IDS.hudTileTime]: model.tileTime.text,
     [UI_IDS.hudState]: model.vehicleState.text,
     ...(model.cargo.isFull ? { [UI_IDS.hudCargoFull]: 'FULL' } : {}),

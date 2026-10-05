@@ -49,6 +49,22 @@
   color: var(--color-brass);
 }
 
+/* #41 casing feel: the bay teal while the grade holds the band, flashing amber when it does not. */
+.casingBadge {
+  color: var(--color-casing-safe);
+}
+
+.casingBadge[data-state='short'] {
+  color: var(--color-casing-weak);
+  animation: casing-flash 0.8s steps(2, jump-none) infinite;
+}
+
+@keyframes casing-flash {
+  to {
+    opacity: 0.4;
+  }
+}
+
 .arrow {
   display: inline-block;
   transform: rotate(var(--arrow-turn, 0deg));

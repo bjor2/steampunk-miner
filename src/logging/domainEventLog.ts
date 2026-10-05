@@ -54,6 +54,14 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     data: { samples, relined, grade },
   }),
   CasingDrilled: ({ samples, grade }) => ({ event: 'casing_drilled', data: { samples, grade } }),
+  CasingGradeInsufficient: ({ band, grade, required }) => ({
+    event: 'casing_grade_insufficient',
+    data: { band, grade, required },
+  }),
+  CasingGradeSufficient: ({ band, grade }) => ({
+    event: 'casing_grade_sufficient',
+    data: { band, grade },
+  }),
   CargoAdded: ({ resourceTier, amount, value }) => ({
     event: 'resource_collected',
     data: { resourceTier, amount, value },

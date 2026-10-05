@@ -1,5 +1,5 @@
 /**
- * Top right (#33 section 5): depth (or ALT) and band, the dock arrow with its distance, tiles to
+ * Top right (#33 section 5): depth (or ALT) and band, the casing grade badge (#41), the dock arrow with its distance, tiles to
  * the core's edge, and the time per tile in front of the drill.
  */
 import type { ReactNode } from 'react'
@@ -9,7 +9,7 @@ import { CompassArrow } from './CompassArrow'
 import styles from './Hud.module.css'
 
 export function PositionPanel({ model }: { model: HudModel }) {
-  const { depth, dockArrow, coreDistance, tileTime } = model
+  const { depth, casing, dockArrow, coreDistance, tileTime } = model
   return (
     <div className={styles.position}>
       <Line label="Depth">
@@ -18,6 +18,17 @@ export function PositionPanel({ model }: { model: HudModel }) {
       <Line label="Band">
         <span data-testid={UI_IDS.hudBand}>{depth.band ?? '-'}</span>
       </Line>
+      {casing !== null && (
+        <Line label="Casing">
+          <span
+            className={styles.casingBadge}
+            data-testid={UI_IDS.hudCasing}
+            data-state={casing.isShort ? 'short' : 'holds'}
+          >
+            {casing.text}
+          </span>
+        </Line>
+      )}
       {dockArrow !== null && (
         <Line label="Dock">
           <CompassArrow octant={dockArrow.octant} />
