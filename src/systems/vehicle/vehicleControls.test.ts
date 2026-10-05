@@ -5,7 +5,8 @@ import { engineStats } from '../economy/vehicleStats'
 import { newDrillHead, settledFacingOf, stepDrillHead, type DrillHead } from './drillHead'
 import { dot, localUpOf, tangentOf, type Vector2 } from './localFrame'
 import { gravityAt, gravityStrengthAt, liftAcceleration } from './radialGravity'
-import { IDLE_INTENT, intentFromHeldKeys, type VehicleIntent } from './vehicleIntent'
+import { buildIntent } from '../input/buildIntent'
+import { IDLE_INTENT, type VehicleIntent } from './vehicleIntent'
 import { offsetToTileCentre, stepVehicleMotion, type MotionStep } from './vehicleMotion'
 import { FACING, facingVectorOf, type Facing } from './vehiclePose'
 
@@ -60,13 +61,13 @@ describe('vehicle local frame', () => {
     expect(localUpOf({ x: 0.5, y: -0.5 }, last)).toBe(last)
   })
 
-  it('reads "right" from held keys alone, so no camera angle or mode can change it', () => {
-    expect(intentFromHeldKeys.length).toBe(1)
-    expect(intentFromHeldKeys(['KeyD'])).toEqual({ moveX: 1, facing: FACING.right, lift: false })
+  it('reads "right" from held actions alone, so no camera angle or mode can change it', () => {
+    expect(buildIntent.length).toBe(1)
+    expect(buildIntent(['aim_right'])).toEqual({ moveX: 1, facing: FACING.right, lift: false })
   })
 
   it('gives "right" the same tangential velocity relative to localUp at every planet angle', () => {
-    const right = intentFromHeldKeys(['KeyD'])
+    const right = buildIntent(['aim_right'])
     const local = PLANET_ANGLES.map((position) => {
       const up = localUpOf(position, { x: 0, y: 1 })
       const { velocity } = runMotion(position, right, 30)
@@ -95,14 +96,14 @@ describe('vehicle bore alignment', () => {
     }).velocity
 
   it('steers an idle body toward the centre of the bore it drills along', () => {
-    const aimDown = intentFromHeldKeys(['KeyS'])
+    const aimDown = buildIntent(['aim_down'])
     expect(motionWith(0.3, aimDown).x).toBeGreaterThan(0)
     expect(motionWith(-0.3, aimDown).x).toBeLessThan(0)
     expect(motionWith(null, aimDown).x).toBe(0)
   })
 
   it('lets sideways input win over the centring', () => {
-    expect(motionWith(-0.3, intentFromHeldKeys(['KeyS', 'KeyD'])).x).toBeGreaterThan(0)
+    expect(motionWith(-0.3, buildIntent(['aim_down', 'aim_right'])).x).toBeGreaterThan(0)
   })
 
   it('measures the offset to the tile centre along the tangent', () => {
@@ -147,9 +148,9 @@ describe('drill head', () => {
   }
 
   it('takes the latest pushed direction as the facing', () => {
-    expect(intentFromHeldKeys(['KeyS', 'KeyD']).facing).toBe(FACING.right)
-    expect(intentFromHeldKeys(['KeyD', 'KeyS']).facing).toBe(FACING.down)
-    expect(intentFromHeldKeys([]).facing).toBeNull()
+    expect(buildIntent(['aim_down', 'aim_right']).facing).toBe(FACING.right)
+    expect(buildIntent(['aim_right', 'aim_down']).facing).toBe(FACING.down)
+    expect(buildIntent([]).facing).toBeNull()
   })
 
   it('reaches the pushed facing within SWIVEL_TICKS steps and keeps it on release', () => {

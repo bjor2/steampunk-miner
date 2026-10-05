@@ -5,11 +5,8 @@ import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { createVehicleBody, createVehicleController } from './vehicleController'
 import { readLocalVehicle, readPlanetWorld, resetGameStore } from '../store/gameStore'
-import {
-  IDLE_INTENT,
-  intentFromHeldKeys,
-  type VehicleIntent,
-} from '../systems/vehicle/vehicleIntent'
+import { buildIntent } from '../systems/input/buildIntent'
+import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { surfaceRowOfColumn } from '../systems/world/tileGrid'
 import { createVehicleLoop } from '../scene/vehicleLoop'
 
@@ -55,8 +52,8 @@ describe('vehicle loop', () => {
   it('drives off the pad and digs straight down, charging energy through pose reports', () => {
     const vehicle = createLiveVehicle()
     vehicle.hold(IDLE_INTENT, 0.5)
-    vehicle.hold(intentFromHeldKeys(['KeyD']), 2)
-    vehicle.hold(intentFromHeldKeys(['KeyS']), 5)
+    vehicle.hold(buildIntent(['aim_right']), 2)
+    vehicle.hold(buildIntent(['aim_down']), 5)
     const { x, y } = vehicle.body.translation()
     const { params } = readPlanetWorld()
     expect(destroyedTiles().length).toBeGreaterThanOrEqual(3)
@@ -67,8 +64,8 @@ describe('vehicle loop', () => {
 
   it('climbs back out of its shaft on the lift', () => {
     const vehicle = createLiveVehicle()
-    vehicle.hold(intentFromHeldKeys(['KeyD']), 2)
-    vehicle.hold(intentFromHeldKeys(['KeyS']), 4)
+    vehicle.hold(buildIntent(['aim_right']), 2)
+    vehicle.hold(buildIntent(['aim_down']), 4)
     const bottom = vehicle.body.translation().y
     vehicle.hold({ ...IDLE_INTENT, lift: true }, 1.5)
     expect(vehicle.body.translation().y).toBeGreaterThan(bottom + 3)
