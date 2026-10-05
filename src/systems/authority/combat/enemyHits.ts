@@ -91,6 +91,7 @@ function takeHit(
       {
         type: 'VehicleDamaged',
         amount: toCanonical(amount),
+        source: 'drill-contact enemy',
         arc,
         enemyId: enemy.id,
         kind: enemy.kind,

@@ -51,9 +51,10 @@ describe('authority: determinism', () => {
 
   // Re-pinned for #36 (drilling carves density, which the digest covers), protocol 2 (the run
   // starts in the Sell bay, #37), 3 (the casing grade, #41), 4 (each player's held artefact,
-  // null here, is authority state, #46) and 5 (the casing layer, its grade telegraph and the vehicle's casing trail, #56).
+  // null here, is authority state, #46), 5 (the casing layer, its grade telegraph and the vehicle's casing trail, #56)
+  // and 6 (the list of blocks warning or refilling, empty here, is authority state, #43, #57).
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('2b954b9a8ea24b89')
+    expect(stateDigest(replay(SESSION).state)).toBe('2b6addb0bde0a68e')
   })
 
   it('gives a different digest when one command differs', () => {

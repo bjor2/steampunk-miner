@@ -9,6 +9,8 @@
 import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import type { AuthorityState, PlayerState } from './authorityState'
+import { portableCollapseOf, portableCollapseProblems } from './collapse/collapseSnapshot'
+import type { CollapseState } from './collapse/collapseState'
 import {
   combatOfPortable,
   portableCombatOf,
@@ -32,11 +34,11 @@ import {
 } from './vehicleSnapshot'
 
 /**
- * 8: the casing layer in chunk deltas (#41, #56); 7: each player's held artefact (#46); 6: the
+ * 9: the blocks warning or refilling (#43, #57); 8: the casing layer in chunk deltas (#41, #56); 7: each player's held artefact (#46); 6: the
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 8
+export const SNAPSHOT_VERSION = 9
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -56,6 +58,7 @@ export interface PortableState {
   platform: PlatformState
   core: CoreProgress
   combat: PortableCombat
+  collapse: CollapseState
   debugApplied: boolean
 }
 
@@ -95,6 +98,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     platform: { ...state.platform },
     core: { ...state.core },
     combat: portableCombatOf(state.combat),
+    collapse: portableCollapseOf(state.collapse),
     debugApplied: state.debugApplied,
   }
 }
@@ -126,6 +130,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     platform: { ...portable.platform },
     core: { ...portable.core },
     combat: combatOfPortable(portable.combat),
+    collapse: portableCollapseOf(portable.collapse),
     debugApplied: portable.debugApplied,
   }
 }
@@ -166,6 +171,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...platformProblems(state.platform),
     ...coreProgressProblems(state.core, 'snapshot.state.core'),
     ...portableCombatProblems(state.combat, 'snapshot.state.combat'),
+    ...portableCollapseProblems(state.collapse, 'snapshot.state.collapse'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),

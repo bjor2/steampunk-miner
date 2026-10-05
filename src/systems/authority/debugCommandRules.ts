@@ -4,13 +4,15 @@
  * (`setUpgrade`, `setEnergy`, `setHull`) live in `vehicleDebugRules.ts`, combat's in
  * `combat/combatDebugRules.ts`, `teleportToDock` in `teleportDebugRules.ts`, the ground's
  * `carveCircle`, `fillCircle` and `lineCasing` in `groundDebugRules.ts`, `setCasingGrade` in
- * `casingRules.ts`, `setArtefact` in `artefactRules.ts`.
+ * `casingRules.ts`, `setArtefact` in `artefactRules.ts`, `forceCollapse` in
+ * `collapse/collapseDebugRules.ts`.
  */
 import { add, fromCanonical, toCanonical, type Money } from '../money'
 import type { CommandType } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
 import { ARTEFACT_DEBUG_RULES } from './artefactRules'
 import { CASING_DEBUG_RULES } from './casingRules'
+import { COLLAPSE_DEBUG_RULES } from './collapse/collapseDebugRules'
 import { COMBAT_DEBUG_RULES } from './combat/combatDebugRules'
 import type { CommandRule, RuleEffect } from './commandRule'
 import { followBayTotal } from './coreBay'
@@ -57,6 +59,7 @@ export const DEBUG_COMMAND_RULES: {
   ...GROUND_DEBUG_RULES,
   ...CASING_DEBUG_RULES,
   ...ARTEFACT_DEBUG_RULES,
+  ...COLLAPSE_DEBUG_RULES,
 }
 
 function walletOf(state: AuthorityState, playerId: string): Money {

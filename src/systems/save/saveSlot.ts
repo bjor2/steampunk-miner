@@ -2,7 +2,8 @@
  * The checkpoint save file (decisions #4 and #12, amended by #12 to one file per slot; #26):
  *
  *   header   formatVersion, snapshotVersion, generatorVersion, saveEpoch, tick, digest
- *   world    the planet as seed + params + chunk deltas, the platform, the core and combat
+ *   world    the planet as seed + params + chunk deltas, the platform, the core, combat and the
+ *            blocks warning or refilling (#43)
  *   profile  per player the wallet, the last seq and the vehicle (integer levels, never stats)
  *
  * Both sections carry the header's `saveEpoch`, so a world can never be paired with a profile
@@ -55,6 +56,7 @@ export interface SaveWorldSection {
   platform: PortableState['platform']
   core: PortableState['core']
   combat: PortableState['combat']
+  collapse: PortableState['collapse']
   debugApplied: boolean
 }
 
@@ -89,6 +91,7 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     platform: state.platform,
     core: state.core,
     combat: state.combat,
+    collapse: state.collapse,
     debugApplied: state.debugApplied,
   }
 }
@@ -125,6 +128,7 @@ function snapshotOfSaveSlot(file: SaveSlotFile): SessionSnapshot {
       platform: world.platform,
       core: world.core,
       combat: world.combat,
+      collapse: world.collapse,
       debugApplied: world.debugApplied,
     },
   }

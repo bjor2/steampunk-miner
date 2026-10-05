@@ -15,8 +15,9 @@ import type { BayId } from '../world/dockBays'
  * 3: the vehicle's casing grade and `BuyCasingGrade` (#41, #58).
  * 4: the artefact commands and events (#46).
  * 5: the casing layer in chunk deltas, its events and debug commands (#41, #56).
+ * 6: collapse (#43, #57): its events, `debug.forceCollapse` and `VehicleDamaged.source`.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 5
+export const AUTHORITY_PROTOCOL_VERSION = 6
 
 export interface CommandPayloads {
   /**
@@ -101,6 +102,11 @@ export interface CommandPayloads {
   'debug.setCasingGrade': { grade: number }
   /** One ring of casing lining of `grade` round `(x, y)` mm (#41 `debug.lineCasing`). */
   'debug.lineCasing': { x: number; y: number; grade: number }
+  /**
+   * Starts the collapse of one block (`cx,cy#index`) now, as if it were weak (#43
+   * `debug.forceCollapse`): it warns for the full 60 ticks and refills whatever its lining.
+   */
+  'debug.forceCollapse': { block: string }
 }
 
 export type CommandType = keyof CommandPayloads

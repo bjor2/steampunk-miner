@@ -128,6 +128,7 @@ const combatEvents: DomainEvent[] = [
     playerId: 'p1',
     type: 'VehicleDamaged',
     amount: '4.9e+0',
+    source: 'drill-contact enemy',
     arc: 'front',
     enemyId: 'e1',
     kind: 'crawler',
@@ -160,6 +161,24 @@ const combatEvents: DomainEvent[] = [
     type: 'VehicleDestroyed',
     cause: 'enemy',
     attacker: { kind: 'burrower', tier: 9, arc: 'rear' },
+  },
+]
+
+const collapseEvents: DomainEvent[] = [
+  { tick: 600, type: 'CollapseWarned', block: '0,8#17', band: 2, weakestGrade: 1, required: 2 },
+  { tick: 610, type: 'CollapseCancelled', block: '0,8#18' },
+  { tick: 660, type: 'CollapseStarted', block: '0,8#17', samplesFilled: 96, vehiclesHit: 1 },
+  {
+    tick: 660,
+    playerId: 'p1',
+    type: 'VehicleDamaged',
+    amount: '8e+0',
+    source: 'collapse',
+    arc: null,
+    enemyId: null,
+    kind: null,
+    tier: null,
+    hullAfter: '9.2e+1',
   },
 ]
 
@@ -226,6 +245,26 @@ describe('domain event log', () => {
       kind: 'burrower',
       tier: 9,
       arc: 'rear',
+    })
+  })
+
+  it('records every collapse event as a registered line; a crush names no enemy', () => {
+    recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 48 }, collapseEvents)
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'collapse_warning',
+      'collapse_cancelled',
+      'collapse',
+      'vehicle_damaged',
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+    expect(sink.events.find((event) => event.event === 'vehicle_damaged')?.data).toEqual({
+      amount: '8e+0',
+      source: 'collapse',
+      arc: 'none',
+      enemyId: '',
+      kind: 'none',
+      tier: 0,
+      hullAfter: '9.2e+1',
     })
   })
 

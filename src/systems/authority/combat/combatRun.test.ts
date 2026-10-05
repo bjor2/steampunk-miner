@@ -238,7 +238,17 @@ describe('combat: death and no interruption (#25 acceptance 10, #23 item 4)', ()
     expect(ofType(session.events(), 'CommandRejected')).toEqual([])
     expect(ofType(session.events(), 'TileDestroyed').length).toBeGreaterThan(13)
     expect(Object.keys(session.state()).sort()).toEqual(
-      ['combat', 'core', 'debugApplied', 'planet', 'platform', 'players', 'tick', 'world'].sort(),
+      [
+        'collapse',
+        'combat',
+        'core',
+        'debugApplied',
+        'planet',
+        'platform',
+        'players',
+        'tick',
+        'world',
+      ].sort(),
     )
     expect(Object.keys(session.state().combat).sort()).toEqual(
       [

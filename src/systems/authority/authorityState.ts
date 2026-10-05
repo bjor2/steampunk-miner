@@ -10,6 +10,7 @@
 import { ZERO_MONEY, type Money } from '../money'
 import { newVehicleState, type VehicleState } from '../vehicle/vehicleState'
 import { EMPTY_WORLD, type WorldState } from '../world/worldState'
+import { NO_COLLAPSE, type CollapseState } from './collapse/collapseState'
 import { NEW_COMBAT, type CombatState } from './combat/combatState'
 import { NEW_CORE_PROGRESS, type CoreProgress } from './coreProgress'
 import type { HeldArtefact } from './heldArtefact'
@@ -36,6 +37,8 @@ export interface AuthorityState {
   core: CoreProgress
   /** Enemies and what combat remembers per vehicle (#9); transient, empty after every dock. */
   combat: CombatState
+  /** Blocks warning or refilling (#43); authority-only, emptied on every planet. */
+  collapse: CollapseState
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
 }
@@ -56,6 +59,7 @@ export function createAuthorityState(start: SessionStart): AuthorityState {
     platform: NEW_PLATFORM,
     core: NEW_CORE_PROGRESS,
     combat: NEW_COMBAT,
+    collapse: NO_COLLAPSE,
     debugApplied: false,
   }
 }
@@ -98,4 +102,8 @@ export function withArtefact(
 
 export function withCombat(state: AuthorityState, combat: CombatState): AuthorityState {
   return { ...state, combat }
+}
+
+export function withCollapse(state: AuthorityState, collapse: CollapseState): AuthorityState {
+  return { ...state, collapse }
 }

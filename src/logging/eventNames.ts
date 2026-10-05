@@ -246,6 +246,18 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { band: 'integer', grade: 'integer' },
   },
+  // #43: a weak block near a vehicle telegraphs for 60 ticks, then refills; `block` is `cx,cy#index`.
+  collapse_warning: {
+    group: 'mining',
+    level: 'core',
+    payload: { block: 'text', band: 'integer', weakestGrade: 'integer', required: 'integer' },
+  },
+  collapse_cancelled: { group: 'mining', level: 'detail', payload: { block: 'text' } },
+  collapse: {
+    group: 'mining',
+    level: 'core',
+    payload: { block: 'text', samplesFilled: 'integer', vehiclesHit: 'integer' },
+  },
   // One line per drilling command (a pose report's interval or a `drillTile`), #7: `damage` is
   // `ticks * drillPower * eff / 60` in hardness units.
   drill_damage_dealt: {
@@ -285,14 +297,17 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { kind: ENEMY_KIND },
   },
+  // #43: `source` says an enemy hit or a collapse crushed; a crush has no enemy, so its arc and kind
+  // read `none`, its enemyId '' and its tier 0, as `vehicle_destroyed` does with no attacker.
   vehicle_damaged: {
     group: 'vehicle_and_combat',
     level: 'detail',
     payload: {
       amount: 'money',
-      arc: HIT_ARC,
+      source: { oneOf: ['drill-contact enemy', 'collapse'] },
+      arc: { oneOf: [...HIT_ARC.oneOf, 'none'] },
       enemyId: 'text',
-      kind: ENEMY_KIND,
+      kind: { oneOf: [...ENEMY_KIND.oneOf, 'none'] },
       tier: 'integer',
       hullAfter: 'money',
     },

@@ -25,6 +25,7 @@ const hitByCrawler: DomainEvent = {
   tick: 12,
   type: 'VehicleDamaged',
   amount: '5',
+  source: 'drill-contact enemy',
   arc: 'side',
   enemyId: 'e1',
   kind: 'crawler',

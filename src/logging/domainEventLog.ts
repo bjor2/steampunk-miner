@@ -62,6 +62,15 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'casing_grade_sufficient',
     data: { band, grade },
   }),
+  CollapseWarned: ({ block, band, weakestGrade, required }) => ({
+    event: 'collapse_warning',
+    data: { block, band, weakestGrade, required },
+  }),
+  CollapseCancelled: ({ block }) => ({ event: 'collapse_cancelled', data: { block } }),
+  CollapseStarted: ({ block, samplesFilled, vehiclesHit }) => ({
+    event: 'collapse',
+    data: { block, samplesFilled, vehiclesHit },
+  }),
   CargoAdded: ({ resourceTier, amount, value }) => ({
     event: 'resource_collected',
     data: { resourceTier, amount, value },
@@ -94,9 +103,18 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
   }),
   EnemyKilled: ({ kind, tier, by }) => ({ event: 'enemy_killed', data: { kind, tier, by } }),
   EnemyDespawned: ({ enemyId }) => ({ event: 'enemy_despawned', data: { enemyId } }),
-  VehicleDamaged: ({ amount, arc, enemyId, kind, tier, hullAfter }) => ({
+  // A collapse's crush has no enemy: its fields read as `vehicle_destroyed` does with none (#43).
+  VehicleDamaged: ({ amount, source, arc, enemyId, kind, tier, hullAfter }) => ({
     event: 'vehicle_damaged',
-    data: { amount, arc, enemyId, kind, tier, hullAfter },
+    data: {
+      amount,
+      source,
+      arc: arc ?? 'none',
+      enemyId: enemyId ?? '',
+      kind: kind ?? 'none',
+      tier: tier ?? 0,
+      hullAfter,
+    },
   }),
   RescueTriggered: ({ cause, fee, cargoLostValue }) => ({
     event: 'rescue_triggered',

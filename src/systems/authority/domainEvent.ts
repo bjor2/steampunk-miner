@@ -59,6 +59,9 @@ export type CoreDepositSource = 'dock' | 'rescue'
 /** `SellCargo {resourceTier}` sells one tier, `SellCargo {all}` and the quick action everything. */
 export type SaleMode = 'all' | 'single'
 
+/** What hurt the vehicle (#43 `VehicleDamaged.source`): an enemy's hit, or a collapse's crush. */
+export type DamageSource = 'drill-contact enemy' | 'collapse'
+
 /** Who wrecked the vehicle, for `vehicle_destroyed {kind, tier, arc}` (#9). */
 export interface Attacker {
   kind: EnemyKind
@@ -107,6 +110,16 @@ export interface DomainEventBodies {
   CasingGradeSufficient: { band: number; grade: number }
   /** The drill cleared lining (#41): casing samples drilled to air, the highest grade among them. */
   CasingDrilled: { samples: number; grade: number }
+  /**
+   * Collapse (#43): a weak block near a vehicle starts its 60-tick telegraph, naming the weakest
+   * lining's grade and the band it sits in; guests learn of a collapse from this, then from the
+   * refill's ordinary `GroundChanged`.
+   */
+  CollapseWarned: { block: string; band: number; weakestGrade: number; required: number }
+  /** The block stopped being weak, or no vehicle is within 16 m any more, before its refill. */
+  CollapseCancelled: { block: string }
+  /** The refill starts: the samples it will fill and the vehicles it crushes. */
+  CollapseStarted: { block: string; samplesFilled: number; vehiclesHit: number }
   CargoAdded: { resourceTier: number; amount: number; value: string }
   /** A full hold: the tile still broke, its unit was lost (#7). */
   StorageFull: { lostUnits: number }
@@ -123,12 +136,14 @@ export interface DomainEventBodies {
   EnemyDamaged: { enemyId: string; amount: string; source: 'drill'; arc: HitArc; ticks: number }
   EnemyKilled: { enemyId: string; kind: EnemyKind; tier: number; by: 'drill' }
   EnemyDespawned: { enemyId: string }
+  /** The enemy's id, kind, tier and arc are null when a collapse crushed the vehicle (#43). */
   VehicleDamaged: {
     amount: string
-    arc: HitArc
-    enemyId: string
-    kind: EnemyKind
-    tier: number
+    source: DamageSource
+    arc: HitArc | null
+    enemyId: string | null
+    kind: EnemyKind | null
+    tier: number | null
     hullAfter: string
   }
   RescueTriggered: { cause: RescueCause; fee: string; cargoLostValue: string }
