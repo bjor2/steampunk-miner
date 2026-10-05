@@ -117,7 +117,6 @@ function applyReaction(reaction: InputReaction): void {
   else if (reaction.kind === 'openSettings') game.openSettings()
   else if (reaction.kind === 'closeSettings') game.closeSettings()
   else if (reaction.kind === 'moveFocus') game.moveFocus(reaction.step)
-  else if (reaction.kind === 'jumpPanel') game.jumpFocusPanel(reaction.step)
   else if (reaction.kind === 'activateFocused') game.activateFocusedControl()
   else if (reaction.kind === 'zoom') game.zoom(reaction.change)
 }

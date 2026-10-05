@@ -1,5 +1,5 @@
 {
-  "inputMapVersion": 1,
+  "inputMapVersion": 2,
   "contexts": ["vehicle", "platform", "settings"],
   "reservedKeys": ["Escape"],
   "actions": [
@@ -25,25 +25,18 @@
       "keyboard": ["KeyS", "ArrowDown"]
     },
     {
-      "id": "aim_up",
-      "displayName": "Drill up",
-      "contexts": ["vehicle"],
-      "kind": "hold",
-      "keyboard": ["KeyW", "ArrowUp"]
-    },
-    {
       "id": "lift",
       "displayName": "Lift",
       "contexts": ["vehicle"],
       "kind": "hold",
-      "keyboard": ["Space"]
+      "keyboard": ["KeyW", "ArrowUp"]
     },
     {
       "id": "interact",
       "displayName": "Dock",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyE"]
+      "keyboard": ["Space", "KeyE"]
     },
     {
       "id": "quick_service",
@@ -100,20 +93,6 @@
       "contexts": ["platform", "settings"],
       "kind": "press",
       "keyboard": ["Escape", "Backspace"]
-    },
-    {
-      "id": "ui_prev_panel",
-      "displayName": "Previous panel",
-      "contexts": ["platform", "settings"],
-      "kind": "press",
-      "keyboard": ["Shift+Tab"]
-    },
-    {
-      "id": "ui_next_panel",
-      "displayName": "Next panel",
-      "contexts": ["platform", "settings"],
-      "kind": "press",
-      "keyboard": ["Tab"]
     },
     {
       "id": "zoom_in",

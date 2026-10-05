@@ -22,7 +22,6 @@ export type InputReaction =
   | { kind: 'openSettings' }
   | { kind: 'closeSettings' }
   | { kind: 'moveFocus'; step: -1 | 1 }
-  | { kind: 'jumpPanel'; step: -1 | 1 }
   | { kind: 'activateFocused' }
   | { kind: 'zoom'; change: ZoomChange }
   | { kind: 'none' }
@@ -46,8 +45,6 @@ const MENU_REACTIONS: Readonly<Partial<Record<ActionId, ReactionRule>>> = {
   ui_left: () => ({ kind: 'moveFocus', step: -1 }),
   ui_down: () => ({ kind: 'moveFocus', step: 1 }),
   ui_right: () => ({ kind: 'moveFocus', step: 1 }),
-  ui_prev_panel: () => ({ kind: 'jumpPanel', step: -1 }),
-  ui_next_panel: () => ({ kind: 'jumpPanel', step: 1 }),
   ui_confirm: () => ({ kind: 'activateFocused' }),
 }
 

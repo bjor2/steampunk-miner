@@ -61,7 +61,7 @@ describe('input routing', () => {
 
   it('moves menu focus only on a menu layer', () => {
     expect(reactionToPress('ui_down', DOCKED)).toEqual({ kind: 'moveFocus', step: 1 })
-    expect(reactionToPress('ui_next_panel', SETTINGS)).toEqual({ kind: 'jumpPanel', step: 1 })
+    expect(reactionToPress('ui_up', SETTINGS)).toEqual({ kind: 'moveFocus', step: -1 })
     expect(reactionToPress('ui_down', DRIVING)).toEqual({ kind: 'none' })
   })
 

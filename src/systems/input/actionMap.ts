@@ -1,6 +1,6 @@
 /**
- * The rebindable action map (decision #33 sections 2 and 3, gamepad ruled out of the slice on
- * #33): the defaults ship as data in `src/data/input/actions.json`, the player's overrides are a
+ * The rebindable action map (decision #33 sections 2 and 3, the version 2 table of #40, gamepad
+ * ruled out of the slice on #33): the defaults ship as data in `src/data/input/actions.json`, the player's overrides are a
  * sparse `{ actionId: { keyboard } }` map in the local preferences file. Device-agnostic: every
  * rule here speaks of action ids, and a key is only one device's way to press one, so a gamepad
  * table can be added beside `keyboard` later.
@@ -23,7 +23,6 @@ export const ACTION_IDS = [
   'aim_left',
   'aim_right',
   'aim_down',
-  'aim_up',
   'lift',
   'interact',
   'quick_service',
@@ -34,8 +33,6 @@ export const ACTION_IDS = [
   'ui_right',
   'ui_confirm',
   'ui_cancel',
-  'ui_prev_panel',
-  'ui_next_panel',
   'zoom_in',
   'zoom_out',
   'zoom_reset',
@@ -77,7 +74,8 @@ export interface BindingsOutcome {
   problems: string[]
 }
 
-export const INPUT_MAP_VERSION = 1
+/** 2 since #40: `W` lifts, `Space` docks, `aim_up` and the panel jumps are gone. */
+export const INPUT_MAP_VERSION = 2
 
 export const ACTION_MAP: ActionMap = loadShippedActionMap()
 

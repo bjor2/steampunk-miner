@@ -262,23 +262,64 @@ describe('input: keys, layers and the vehicle intent', () => {
     expect(submittedDuring(() => tap('ui_confirm'))).toEqual(['quickService'])
   })
 
-  it('jumps back a panel with Shift+Tab and still drives when Shift is held with D', () => {
+  it('still drives when Shift is held with D', () => {
     routeKeyChange(key('KeyD', true, { isShiftHeld: true }))
     expect(readVehicleIntent().moveX).toBe(1)
-    routeKeyChange(key('KeyD', false))
-    dockAtStart()
-    routeKeyChange(key('Tab', true, { isShiftHeld: true }))
-    expect(game().focusedControlId).toBe('platform-travel')
   })
 
-  it('moves focus with the menu keys and jumps panels with Tab, from the quick action', () => {
+  it('moves focus with the menu keys from the quick action, and Tab does nothing (#40)', () => {
     dockAtStart()
-    tap('ui_next_panel')
-    expect(game().focusedControlId).toBe('shop-sell-all')
     tap('ui_down')
-    expect(game().focusedControlId).toBe('charging-recharge')
-    tap('ui_prev_panel')
-    expect(game().focusedControlId).toBe('shop-sell-all')
+    expect(game().focusedControlId).not.toBe('platform-quick-service')
+    tap('ui_up')
+    expect(game().focusedControlId).toBe('platform-quick-service')
+    routeKeyChange(key('Tab', true))
+    expect(game().focusedControlId).toBe('platform-quick-service')
+  })
+})
+
+describe('input: W lifts, Space docks (#40)', () => {
+  it('lifts and faces up while W is held, and S pressed after it drops the lift', () => {
+    routeKeyChange(key('KeyW', true))
+    expect(readVehicleIntent()).toEqual({ moveX: 0, facing: FACING.up, lift: true })
+    routeKeyChange(key('KeyS', true))
+    expect(readVehicleIntent()).toEqual({ moveX: 0, facing: FACING.down, lift: false })
+    routeKeyChange(key('KeyS', false))
+    expect(readVehicleIntent()).toEqual({ moveX: 0, facing: FACING.up, lift: true })
+  })
+
+  it('never lifts on Space and submits nothing for it away from a pad', () => {
+    game().reportPose(poseAway)
+    const presses = submittedDuring(() => routeKeyChange(key('Space', true)))
+    expect(readVehicleIntent().lift).toBe(false)
+    expect(presses).toEqual([])
+  })
+
+  it('docks once at the Sell bay with Space, never again for the auto-repeat', () => {
+    const presses = submittedDuring(() => {
+      routeKeyChange(key('Space', true))
+      routeKeyChange(key('Space', true, { isRepeat: true }))
+      routeKeyChange(key('Space', false))
+    })
+    expect(presses).toEqual(['dock'])
+    expect(submitted.at(-1)).toMatchObject({ type: 'dock', payload: { bay: 'sell' } })
+    expect(sink.events.filter((event) => event.event === 'dock_entered')).toMatchObject([
+      { data: { bay: 'sell' } },
+    ])
+  })
+
+  it('docks at the Upgrade bay with Space when stopped on its pad', () => {
+    game().teleportToDock('upgrade')
+    game().undock()
+    routeKeyChange(key('Space', true))
+    expect(submitted.at(-1)).toMatchObject({ type: 'dock', payload: { bay: 'upgrade' } })
+  })
+
+  it('confirms the focused button with Space on a bay screen', () => {
+    dockAtStart()
+    game().setEnergy('100')
+    game().giveMoney('10')
+    expect(submittedDuring(() => routeKeyChange(key('Space', true)))).toEqual(['quickService'])
   })
 })
 

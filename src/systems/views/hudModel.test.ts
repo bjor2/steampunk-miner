@@ -77,7 +77,10 @@ describe('HUD model', () => {
 
   it('prompts to dock exactly when the authority would accept a dock, naming the bound key', () => {
     const session = createScriptedSession()
-    expect(hudOf(session).dockPrompt).toEqual({ isShown: true, text: 'E: Dock at the Sell bay' })
+    expect(hudOf(session).dockPrompt).toEqual({
+      isShown: true,
+      text: 'Space: Dock at the Sell bay',
+    })
     session.submit(1, poseAt({ tx: 20, ty: SITE.padRow + 3 }, { facing: FACING.right }))
     expect(hudOf(session).dockPrompt.isShown).toBe(false)
   })
@@ -85,7 +88,7 @@ describe('HUD model', () => {
   it('names the Upgrade bay in the prompt on its pad, and prompts nothing on the hub between', () => {
     const session = createScriptedSession()
     session.submit(1, poseInBay('upgrade'))
-    expect(hudOf(session).dockPrompt.text).toBe('E: Dock at the Upgrade bay')
+    expect(hudOf(session).dockPrompt.text).toBe('Space: Dock at the Upgrade bay')
     session.submit(2, poseAt({ tx: 0, ty: SITE.padRow + 1 }, { facing: FACING.right }))
     expect(hudOf(session).dockPrompt.isShown).toBe(false)
   })

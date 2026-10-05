@@ -8,7 +8,7 @@
       "dismissedWhen": "vehicleMoved",
       "lines": [
         "Drive left and right with {aim_left} and {aim_right}.",
-        "Hold {lift} to fire the thruster and climb."
+        "Hold {lift} to fire the thruster and climb; it also turns the drill up."
       ]
     },
     {
@@ -16,7 +16,7 @@
       "shownWhen": "leftPadZone",
       "dismissedWhen": "tileDestroyed",
       "lines": [
-        "Swivel the drill head with {aim_left} {aim_right} {aim_down} {aim_up}.",
+        "Swivel the drill head with {aim_left} {aim_right} {aim_down} {lift}.",
         "Hold a direction against the ground to bore through it."
       ]
     },

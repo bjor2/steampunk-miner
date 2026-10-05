@@ -23,14 +23,36 @@ describe('action map', () => {
     expect(ACTION_MAP.actions.map((action) => action.id).sort()).toEqual([...ACTION_IDS].sort())
   })
 
-  it('binds the #33 defaults: WASD and arrows aim, Space lifts, E docks', () => {
+  it('binds the version 2 defaults of #40: W lifts, S drills down, Space and E dock', () => {
     const bindings = defaultBindings(ACTION_MAP)
+    expect(ACTION_MAP.inputMapVersion).toBe(2)
+    expect(bindings.lift).toEqual(['KeyW', 'ArrowUp'])
+    expect(bindings.aim_down).toEqual(['KeyS', 'ArrowDown'])
     expect(bindings.aim_left).toEqual(['KeyA', 'ArrowLeft'])
     expect(bindings.aim_right).toEqual(['KeyD', 'ArrowRight'])
-    expect(bindings.aim_down).toEqual(['KeyS', 'ArrowDown'])
-    expect(bindings.aim_up).toEqual(['KeyW', 'ArrowUp'])
-    expect(bindings.lift).toEqual(['Space'])
-    expect(bindings.interact).toEqual(['KeyE'])
+    expect(bindings.interact).toEqual(['Space', 'KeyE'])
+    expect(bindings.ui_confirm).toEqual(['Enter', 'Space', 'KeyE'])
+  })
+
+  it('has no aim_up and no panel jumps, and zooms with =, - and 0 (#37, #39, #40)', () => {
+    const ids: readonly string[] = ACTION_MAP.actions.map((action) => action.id)
+    for (const gone of ['aim_up', 'ui_prev_panel', 'ui_next_panel']) {
+      expect(ids).not.toContain(gone)
+      expect(ACTION_IDS).not.toContain(gone)
+    }
+    const bindings = defaultBindings(ACTION_MAP)
+    expect([bindings.zoom_in, bindings.zoom_out, bindings.zoom_reset]).toEqual([
+      ['Equal'],
+      ['Minus'],
+      ['Digit0'],
+    ])
+  })
+
+  it('never lets Space lift: in the vehicle it docks, on a menu it confirms', () => {
+    const bindings = defaultBindings(ACTION_MAP)
+    expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'Space')).toEqual(['interact'])
+    expect(actionsOfChord(ACTION_MAP, bindings, 'platform', 'Space')).toEqual(['ui_confirm'])
+    expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'KeyW')).toEqual(['lift'])
   })
 
   it('lets a key press different actions in different contexts', () => {
@@ -41,8 +63,8 @@ describe('action map', () => {
   })
 
   it('refuses a broken file whole and lists its problems', () => {
-    const broken = { ...SHIPPED_ACTION_MAP, inputMapVersion: 2, actions: [] }
-    expect(actionMapProblems(broken)).toContain('inputMapVersion must be 1')
+    const broken = { ...SHIPPED_ACTION_MAP, inputMapVersion: 1, actions: [] }
+    expect(actionMapProblems(broken)).toContain('inputMapVersion must be 2')
     expect(actionMapProblems(broken)).toContain('aim_left must be listed exactly once')
   })
 })
@@ -60,13 +82,14 @@ describe('rebinding', () => {
     const { bindings } = bindingsWithOverrides(ACTION_MAP, { aim_left: { keyboard: ['KeyJ'] } })
     expect(boundLabel(bindings, 'aim_left')).toBe('J')
     expect(boundLabel(defaultBindings(ACTION_MAP), 'aim_left')).toBe('A')
-    expect(boundLabel(defaultBindings(ACTION_MAP), 'ui_prev_panel')).toBe('Shift+Tab')
+    expect(boundLabel(defaultBindings(ACTION_MAP), 'lift')).toBe('W')
+    expect(boundLabel(defaultBindings(ACTION_MAP), 'interact')).toBe('Space')
   })
 
   it('lists every problem of a broken override and leaves the defaults in force', () => {
     const outcome = bindingsWithOverrides(ACTION_MAP, {
       warp_drive: { keyboard: ['KeyX'] },
-      aim_up: { keyboard: ['KeyNope'] },
+      aim_left: { keyboard: ['KeyNope'] },
       aim_down: { keyboard: ['KeyE'] },
       lift: { keyboard: [] },
       aim_right: { keyboard: ['Escape'] },
@@ -82,13 +105,13 @@ describe('rebinding', () => {
 
   it('lists unknown keys, duplicates and empty bindings once the ids are sound', () => {
     const outcome = bindingsWithOverrides(ACTION_MAP, {
-      aim_up: { keyboard: ['KeyNope'] },
+      aim_left: { keyboard: ['KeyNope'] },
       aim_down: { keyboard: ['KeyE'] },
       lift: { keyboard: [] },
     })
     expect(outcome.bindings).toEqual(defaultBindings(ACTION_MAP))
     expect(outcome.problems).toEqual([
-      'aim_up: "KeyNope" is not a known key code',
+      'aim_left: "KeyNope" is not a known key code',
       'lift has no key bound',
       'KeyE is bound to both aim_down and interact in the vehicle context',
     ])

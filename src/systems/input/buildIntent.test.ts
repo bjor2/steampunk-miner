@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { dot, fromLocalFrame, localUpOf, tangentOf } from '../vehicle/localFrame'
 import { FACING } from '../vehicle/vehiclePose'
-import { ACTION_MAP, actionsOfChord, bindingsWithOverrides, defaultBindings } from './actionMap'
+import {
+  ACTION_MAP,
+  actionsOfChord,
+  bindingsWithOverrides,
+  defaultBindings,
+  type ActionId,
+} from './actionMap'
 import { buildIntent } from './buildIntent'
 
 const PLANET_POSITIONS = [
@@ -33,17 +39,56 @@ describe('vehicle intent', () => {
     expect(buildIntent([]).facing).toBeNull()
   })
 
-  it('drives with the side aim pressed last and never with up or down', () => {
+  it('drives with the side aim pressed last and never with lift or drill down', () => {
     expect(buildIntent(['aim_right', 'aim_left']).moveX).toBe(-1)
     expect(buildIntent(['aim_left', 'aim_down']).moveX).toBe(-1)
-    expect(buildIntent(['aim_up']).moveX).toBe(0)
+    expect(buildIntent(['lift']).moveX).toBe(0)
+  })
+})
+
+describe('vehicle intent: W lifts and faces up, S faces down (#40)', () => {
+  it('lifts and turns the drill up while lift alone is held', () => {
+    expect(buildIntent(['lift'])).toEqual({ moveX: 0, facing: FACING.up, lift: true })
   })
 
-  it('lifts while lift is held, whatever the aim', () => {
-    expect(buildIntent(['aim_up']).lift).toBe(false)
-    expect(buildIntent(['aim_left', 'lift']).lift).toBe(true)
+  it('faces down without any lift while drill down alone is held', () => {
+    expect(buildIntent(['aim_down'])).toEqual({ moveX: 0, facing: FACING.down, lift: false })
   })
 
+  it('lets the later of lift and drill down win when both are held', () => {
+    expect(buildIntent(['lift', 'aim_down'])).toEqual({
+      moveX: 0,
+      facing: FACING.down,
+      lift: false,
+    })
+    expect(buildIntent(['aim_down', 'lift'])).toEqual({ moveX: 0, facing: FACING.up, lift: true })
+  })
+
+  it('climbs with the head on the wall when a side aim follows lift', () => {
+    expect(buildIntent(['lift', 'aim_right'])).toEqual({
+      moveX: 1,
+      facing: FACING.right,
+      lift: true,
+    })
+    expect(buildIntent(['aim_left', 'lift'])).toEqual({ moveX: -1, facing: FACING.up, lift: true })
+  })
+
+  it('falls back to the key still held when the later one is released', () => {
+    const held: ActionId[] = ['lift', 'aim_down']
+    expect(buildIntent(held.filter((action) => action !== 'aim_down'))).toEqual(
+      buildIntent(['lift']),
+    )
+    expect(buildIntent(held.filter((action) => action !== 'lift'))).toEqual(
+      buildIntent(['aim_down']),
+    )
+  })
+
+  it('gives the idle intent when nothing is held', () => {
+    expect(buildIntent([])).toEqual({ moveX: 0, facing: null, lift: false })
+  })
+})
+
+describe('vehicle intent: rebinding', () => {
   it('gives a rebound key the intent the default key gave', () => {
     const rebound = bindingsWithOverrides(ACTION_MAP, { aim_left: { keyboard: ['KeyJ'] } })
     const before = buildIntent(

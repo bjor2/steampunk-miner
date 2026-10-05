@@ -23,14 +23,23 @@ describe('plaque model', () => {
     const { hint } = selectPlaqueModel(sources({ hintBoard: boardShowing('hint_move') }))
     expect(hint?.lines).toEqual([
       'Drive left and right with A and D.',
-      'Hold Space to fire the thruster and climb.',
+      'Hold W to fire the thruster and climb; it also turns the drill up.',
     ])
+  })
+
+  it('names W for lift and Space for docking with the version 2 keys (#40)', () => {
+    const drill = selectPlaqueModel(sources({ hintBoard: boardShowing('hint_drill') })).hint
+    const cargo = selectPlaqueModel(sources({ hintBoard: boardShowing('hint_cargo') })).hint
+    expect(drill?.lines[0]).toBe('Swivel the drill head with A D S W.')
+    expect(cargo?.lines[1]).toBe('stop on the Sell bay pad and Dock with Space.')
   })
 
   it('follows a rebinding at once', () => {
     const bindings = bindingsWithOverrides(ACTION_MAP, { lift: { keyboard: ['KeyJ'] } }).bindings
     const { hint } = selectPlaqueModel(sources({ hintBoard: boardShowing('hint_move'), bindings }))
-    expect(hint?.lines[1]).toBe('Hold J to fire the thruster and climb.')
+    expect(hint?.lines[1]).toBe(
+      'Hold J to fire the thruster and climb; it also turns the drill up.',
+    )
   })
 
   it('says what a tow cost on the energy hint after a rescue', () => {

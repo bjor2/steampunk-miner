@@ -34,7 +34,7 @@ import {
   type ZoomChange,
 } from '../systems/render/viewZoom'
 import { renderScalePinProblems } from '../systems/render/renderScale'
-import { focusOnScreen, jumpFocusToPanel, stepFocus } from '../systems/views/menuFocus'
+import { focusOnScreen, stepFocus } from '../systems/views/menuFocus'
 import type { ButtonAction, ScreenButton } from '../systems/views/viewParts'
 import { refuseProblems, submitCommand } from './authorityLink'
 import { writePreferences } from './preferencesFile'
@@ -82,7 +82,6 @@ export interface PresentationActions {
   openSettings(): void
   closeSettings(): void
   moveFocus(step: -1 | 1): void
-  jumpFocusPanel(step: -1 | 1): void
   activateFocusedControl(): void
   /** A screen button by id, as a click or `ui_confirm` presses it; a disabled one does nothing. */
   pressScreenButton(buttonId: string): boolean
@@ -155,8 +154,7 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
     openSettings: () => set({ isSettingsOpen: true, focusedControlId: null, isTravelArmed: false }),
     closeSettings: () =>
       set({ isSettingsOpen: false, focusedControlId: null, rebindingActionId: null }),
-    moveFocus: (step) => set({ focusedControlId: movedFocus(get(), step, stepFocus) }),
-    jumpFocusPanel: (step) => set({ focusedControlId: movedFocus(get(), step, jumpFocusToPanel) }),
+    moveFocus: (step) => set({ focusedControlId: movedFocus(get(), step) }),
     activateFocusedControl: () => void get().pressScreenButton(focusedControlOf(get())),
     pressScreenButton: (buttonId) => {
       const button = menuButtonOf(get(), buttonId)
@@ -197,9 +195,9 @@ function focusedControlOf(state: SliceHost): string {
   return focusOnScreen(menu.focusStops, state.focusedControlId, menu.startFocus)
 }
 
-function movedFocus(state: SliceHost, step: -1 | 1, move: typeof stepFocus): string {
+function movedFocus(state: SliceHost, step: -1 | 1): string {
   const menu = menuScreenOf(inputLayerOf(state), state)
-  return move(menu.focusStops, focusedControlOf(state), step)
+  return stepFocus(menu.focusStops, focusedControlOf(state), step)
 }
 
 function menuButtonOf(state: SliceHost, buttonId: string): ScreenButton | null {
