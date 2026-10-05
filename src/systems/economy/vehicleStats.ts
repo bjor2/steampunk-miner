@@ -38,28 +38,31 @@ export interface VehicleStats {
 
 const FIRST_PLANET = 1
 
-export function drillPower(level: number): BigStat {
-  return growGeometricStat(geometricEffectOf('drill_power'), level)
+/** The upgrade definitions a stat is read from; the game's own come from `economy.json`. */
+export type UpgradeDefs = readonly UpgradeDef[]
+
+export function drillPower(level: number, defs: UpgradeDefs = ECONOMY.upgrades): BigStat {
+  return growGeometricStat(geometricEffectOf(defs, 'drill_power'), level)
 }
 
-export function drillTip(level: number): BigStat {
-  return growGeometricStat(geometricEffectOf('drill_tip'), level)
+export function drillTip(level: number, defs: UpgradeDefs = ECONOMY.upgrades): BigStat {
+  return growGeometricStat(geometricEffectOf(defs, 'drill_tip'), level)
 }
 
-export function hullMax(level: number): BigStat {
-  return growGeometricStat(geometricEffectOf('hull'), level)
+export function hullMax(level: number, defs: UpgradeDefs = ECONOMY.upgrades): BigStat {
+  return growGeometricStat(geometricEffectOf(defs, 'hull'), level)
 }
 
-export function energyMax(level: number): number {
-  return growLinearStat(linearEffectOf('boiler'), level)
+export function energyMax(level: number, defs: UpgradeDefs = ECONOMY.upgrades): number {
+  return growLinearStat(linearEffectOf(defs, 'boiler'), level)
 }
 
-export function cargoCapacity(level: number): number {
-  return growLinearStat(linearEffectOf('cargo_hold'), level)
+export function cargoCapacity(level: number, defs: UpgradeDefs = ECONOMY.upgrades): number {
+  return growLinearStat(linearEffectOf(defs, 'cargo_hold'), level)
 }
 
-export function engineStats(level: number): EngineStats {
-  const { stats, halfLevel } = saturatingEffectOf('engine')
+export function engineStats(level: number, defs: UpgradeDefs = ECONOMY.upgrades): EngineStats {
+  const { stats, halfLevel } = saturatingEffectOf(defs, 'engine')
   return {
     speedMax: saturate(stats.speedMax, level, halfLevel),
     accel: saturate(stats.accel, level, halfLevel),
@@ -67,15 +70,21 @@ export function engineStats(level: number): EngineStats {
   }
 }
 
-/** `computeVehicleStats(levels)` of #7: pure, so a balance change retunes every old save. */
-export function computeVehicleStats(levels: UpgradeLevels): VehicleStats {
+/**
+ * The stats of valid integer levels (#7): pure, so a balance change in the definitions retunes
+ * every old save, which holds only the integer levels.
+ */
+export function vehicleStatsAt(
+  levels: UpgradeLevels,
+  defs: UpgradeDefs = ECONOMY.upgrades,
+): VehicleStats {
   return {
-    drillPower: drillPower(levels.drill_power),
-    drillTip: drillTip(levels.drill_tip),
-    hullMax: hullMax(levels.hull),
-    energyMax: energyMax(levels.boiler),
-    cargoCapacity: cargoCapacity(levels.cargo_hold),
-    engine: engineStats(levels.engine),
+    drillPower: drillPower(levels.drill_power, defs),
+    drillTip: drillTip(levels.drill_tip, defs),
+    hullMax: hullMax(levels.hull, defs),
+    energyMax: energyMax(levels.boiler, defs),
+    cargoCapacity: cargoCapacity(levels.cargo_hold, defs),
+    engine: engineStats(levels.engine, defs),
   }
 }
 
@@ -86,7 +95,7 @@ export function rescueEnergyFloor(boilerLevel: number): BigStat {
 
 /** The level an on-curve player holds at the end of planet `p` (#6 section 3). */
 export function onCurveLevel(upgradeId: UpgradeId, planetIndex: number): number {
-  const { levelAtPlanet1, levelsPerPlanet } = upgradeDefOf(upgradeId).onCurve
+  const { levelAtPlanet1, levelsPerPlanet } = upgradeDefOf(ECONOMY.upgrades, upgradeId).onCurve
   return levelAtPlanet1 + levelsPerPlanet * (planetIndex - FIRST_PLANET)
 }
 
@@ -123,26 +132,26 @@ function growLinearStat(effect: LinearEffect, level: number): number {
   return growLinear(effect.start, effect.step, level)
 }
 
-function upgradeDefOf(upgradeId: UpgradeId): UpgradeDef {
-  const upgrade = ECONOMY.upgrades.find((candidate) => candidate.id === upgradeId)
-  if (upgrade === undefined) throw new RangeError(`no upgrade ${upgradeId} in economy.json`)
+function upgradeDefOf(defs: UpgradeDefs, upgradeId: UpgradeId): UpgradeDef {
+  const upgrade = defs.find((candidate) => candidate.id === upgradeId)
+  if (upgrade === undefined) throw new RangeError(`no upgrade ${upgradeId} in the definitions`)
   return upgrade
 }
 
-function geometricEffectOf(upgradeId: UpgradeId): GeometricEffect {
-  const { effect } = upgradeDefOf(upgradeId)
+function geometricEffectOf(defs: UpgradeDefs, upgradeId: UpgradeId): GeometricEffect {
+  const { effect } = upgradeDefOf(defs, upgradeId)
   if (effect.family !== 'geometric') throw new RangeError(`${upgradeId} is not geometric`)
   return effect
 }
 
-function linearEffectOf(upgradeId: UpgradeId): LinearEffect {
-  const { effect } = upgradeDefOf(upgradeId)
+function linearEffectOf(defs: UpgradeDefs, upgradeId: UpgradeId): LinearEffect {
+  const { effect } = upgradeDefOf(defs, upgradeId)
   if (effect.family !== 'linear') throw new RangeError(`${upgradeId} is not linear`)
   return effect
 }
 
-function saturatingEffectOf(upgradeId: UpgradeId): SaturatingEffect {
-  const { effect } = upgradeDefOf(upgradeId)
+function saturatingEffectOf(defs: UpgradeDefs, upgradeId: UpgradeId): SaturatingEffect {
+  const { effect } = upgradeDefOf(defs, upgradeId)
   if (effect.family !== 'saturating') throw new RangeError(`${upgradeId} is not saturating`)
   return effect
 }

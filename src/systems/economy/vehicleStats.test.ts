@@ -4,7 +4,7 @@ import { UPGRADE_IDS, type UpgradeId } from './economyDefinition'
 import { ECONOMY } from './economy'
 import {
   cargoCapacity,
-  computeVehicleStats,
+  vehicleStatsAt,
   drillPower,
   drillTip,
   energyMax,
@@ -26,7 +26,7 @@ function levelsWith(changes: Partial<Record<UpgradeId, number>>): UpgradeLevels 
 
 describe('vehicle stats', () => {
   it('starts every track at its 1.0x value at level 0', () => {
-    expect(computeVehicleStats(startLevels())).toEqual({
+    expect(vehicleStatsAt(startLevels())).toEqual({
       drillPower: m('1.5'),
       drillTip: m('1'),
       hullMax: m('100'),

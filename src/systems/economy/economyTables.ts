@@ -20,7 +20,7 @@ import { energyUnitPrice, repairPrice, rescueFeeBounds, travelFee } from './plan
 import { coreFragmentsNeeded } from './planetEconomy'
 import { upgradePrice } from './upgradePrices'
 import {
-  computeVehicleStats,
+  vehicleStatsAt,
   hullMax,
   onCurveLevel,
   onCurveLevels,
@@ -112,7 +112,7 @@ export function planetEconomyRow(planetIndex: number): PlanetEconomyRow {
 
 export function onCurveVehicleRow(planetIndex: number): OnCurveVehicleRow {
   const levels = onCurveLevels(planetIndex)
-  return { planetIndex, levels, stats: computeVehicleStats(levels) }
+  return { planetIndex, levels, stats: vehicleStatsAt(levels) }
 }
 
 export function planetPriceRow(planetIndex: number): PlanetPriceRow {
