@@ -10,13 +10,9 @@ set -euo pipefail
 asset_id="${1:?usage: scripts/art/encode.sh <asset-id>}"
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 bake="$root/art/build/$asset_id"
-sidecar=("$root"/public/assets/*/"$asset_id"/"$asset_id".parts.json)
-
-if [[ ! -f "${sidecar[0]}" ]]; then
-  echo "encode: no exported parts.json for $asset_id; run scripts/art/export.sh first" >&2
-  exit 1
-fi
-out="$(dirname "${sidecar[0]}")"
+# The category is the id's prefix, as in asset_layout.category_of (`vehicle` has none).
+out="$root/public/assets/${asset_id%%-*}/$asset_id"
+mkdir -p "$out"
 
 encode_etc1s_srgb() {
   toktx --t2 --encode etc1s --clevel 2 --qlevel 192 --assign_oetf srgb --genmipmap --threads 1 "$1" "$2"
@@ -26,15 +22,20 @@ encode_uastc_linear() {
   toktx --t2 --encode uastc --uastc_quality 2 --zcmp 19 --assign_oetf linear --genmipmap --threads 1 "$1" "$2"
 }
 
-for map in albedo normal; do
+# A parts asset has an albedo and a normal bake; a backdrop render (#51) is an albedo map alone.
+required=(albedo normal)
+[[ -f "$out/$asset_id.parts.json" ]] || required=(albedo)
+for map in "${required[@]}"; do
   if [[ ! -f "$bake/$asset_id.$map.png" ]]; then
-    echo "encode: missing bake $bake/$asset_id.$map.png" >&2
+    echo "encode: missing bake $bake/$asset_id.$map.png; run scripts/art/export.sh first" >&2
     exit 1
   fi
 done
 
 encode_etc1s_srgb "$out/$asset_id.albedo.ktx2" "$bake/$asset_id.albedo.png"
-encode_uastc_linear "$out/$asset_id.normal.ktx2" "$bake/$asset_id.normal.png"
+if [[ " ${required[*]} " == *" normal "* ]]; then
+  encode_uastc_linear "$out/$asset_id.normal.ktx2" "$bake/$asset_id.normal.png"
+fi
 # The export writes no emissive bake when nothing glows, and the sidecar then says emissive: false.
 if [[ -f "$bake/$asset_id.emissive.png" ]]; then
   encode_etc1s_srgb "$out/$asset_id.emissive.ktx2" "$bake/$asset_id.emissive.png"

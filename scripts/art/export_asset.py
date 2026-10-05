@@ -5,7 +5,9 @@ Headless Blender export of one art asset (#52 "Folders"). Run through scripts/ar
         -P scripts/art/export_asset.py -- --asset <id>
 
 It refuses the scene (exit 1, every problem listed) if it has an armature, a shape key or an
-action, or a part object whose name is not a valid part id (#52 acceptance 4). Otherwise it bakes
+action, or a part object whose name is not a valid part id (#52 acceptance 4). A `backdrop` asset
+(a bay's screen backdrop, #51) is rendered by render_backdrop.py from its bay's .blend instead.
+Otherwise it bakes
 every part with Cycles onto its own rectangle of the atlas, viewed along +Y (Blender's Front view):
 base colour with the part mask in alpha, a tangent-space normal map (OpenGL, +Y up) and emission.
 The PNG bakes go to art/build/<id>/ (gitignored) for scripts/art/encode.sh; the parts.json sidecar
@@ -24,6 +26,7 @@ import numpy
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import asset_layout  # noqa: E402
+import render_backdrop  # noqa: E402
 
 TIER_COLLECTION_PREFIX = 'tier-'
 # A part's quad sits this far behind it, and bake rays start this far in front (metres).
@@ -37,6 +40,10 @@ def main():
     asset_id = asset_id_from_arguments()
     rules = asset_layout.load_rules()
     refuse_unless_exportable(asset_id, rules)
+    EXPORTS_BY_FORM[manifest_form_of(asset_id)](asset_id, rules)
+
+
+def export_parts(asset_id, rules):
     parts = part_layouts_of(asset_id, rules, part_objects())
     sidecar = asset_layout.build_sidecar(asset_id, parts, rules, source_of(), has_emissive=True)
     has_emissive = bake_atlas(asset_id, sidecar, rules)
@@ -63,7 +70,9 @@ def fail(problems):
 
 
 def refuse_unless_exportable(asset_id, rules):
-    problems = asset_problems(asset_id) + rig_problems() + part_name_problems(asset_id, rules)
+    problems = asset_problems(asset_id) + rig_problems()
+    if manifest_form_of(asset_id) == 'parts':
+        problems += part_name_problems(asset_id, rules)
     if problems:
         fail(problems)
 
@@ -72,8 +81,8 @@ def asset_problems(asset_id):
     if asset_layout.category_of(asset_id) is None:
         return ['"%s" names no asset category (%s)' % (asset_id, ', '.join(asset_layout.CATEGORIES))]
     form = manifest_form_of(asset_id)
-    if form != 'parts':
-        return ['"%s" is a %s asset; this script bakes parts assets only' % (asset_id, form)]
+    if form not in EXPORTS_BY_FORM:
+        return ['"%s" is a %s asset; this script exports %s assets only' % (asset_id, form, ' and '.join(EXPORTS_BY_FORM))]
     return []
 
 
@@ -112,8 +121,13 @@ def tier_collection_problems(asset_id, obj, rules):
 
 
 def part_objects():
-    """One mesh object per part (#52); lights, cameras and empties are not parts."""
-    return sorted((obj for obj in bpy.context.scene.objects if obj.type == 'MESH'), key=lambda o: o.name)
+    """One mesh object per part (#52); lights, cameras, empties and a backdrop's staging are not parts."""
+    return sorted((obj for obj in bpy.context.scene.objects if is_part_object(obj)), key=lambda o: o.name)
+
+
+def is_part_object(obj):
+    staged = any(collection.name == render_backdrop.STAGING_COLLECTION for collection in obj.users_collection)
+    return obj.type == 'MESH' and not staged
 
 
 # --- layout ---------------------------------------------------------------------------------------
@@ -354,6 +368,8 @@ def write_outputs(asset_id, sidecar):
     asset_layout.write_sidecar(path, sidecar)
     print('exported %s: %d parts, atlas %dx%d' % (asset_id, len(sidecar['parts']), *sidecar['atlasPx']))
 
+
+EXPORTS_BY_FORM = {'parts': export_parts, 'backdrop': render_backdrop.export_backdrop}
 
 if __name__ == '__main__':
     main()

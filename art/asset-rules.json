@@ -23,5 +23,7 @@
   },
   "maxAtlasPx": 4096,
   "atlasMarginPx": 8,
-  "tilePx": 1024
+  "tilePx": 1024,
+  "backdropPx": [2048, 1024],
+  "backdropSamples": 128
 }
