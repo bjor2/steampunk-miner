@@ -12,6 +12,8 @@ export const SEED_PURPOSE = {
   cave: 3,
   starterVein: 4,
   oreCluster: 5,
+  /** Enemy spawn points (#9): placed on generated cells, never changing them. */
+  enemySpawn: 6,
 } as const
 
 export type SeedPurpose = (typeof SEED_PURPOSE)[keyof typeof SEED_PURPOSE]
