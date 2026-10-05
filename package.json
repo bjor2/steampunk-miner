@@ -14,6 +14,7 @@
     "test": "vitest run",
     "bench:world": "vite-node scripts/benchGenerateChunk.ts",
     "bench:render": "vite-node scripts/benchChunkBatch.ts",
+    "bench:combat": "vite-node scripts/benchCombatTick.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
