@@ -123,10 +123,19 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   golden file". Regenerate with `npm run golden:update` and commit the files with the bump. The
   scripts live in `src/systems/replay/goldenScripts.ts`; the spec only reads the committed files.
   CI replays them on Windows too (`determinism`), so digests must match across operating systems.
+  The second slice's runs (S11, #65) live in `src/systems/replay/secondSliceGoldenScripts.ts`:
+  casing (a grade-2 bore in band 2, then `debug.forceCollapse`), collapse (a grade-1 dig into band
+  2), the two bays (`wrong_bay` both ways) and the artefact cache (live on planet 1, a husk on
+  planet 2). `src/logging/secondSliceGolden.test.ts` replays each committed file and checks it still
+  shows what it is named for, and that the husk's chunk digest equals a player's who holds nothing.
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
-  authority commands with the #6 movement-time model. `src/logging/pacingGate.test.ts` fails on a
+  authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
+  before it mines band `b`, grade 5 before the core, S11). `src/logging/pacingGate.test.ts` fails on a
   missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
-  #2 sequence or more than 4 MB of core events and commands in the first hour. Trips per planet
+  #2 sequence or more than 4 MB of core events and commands in the first hour.
+  `src/logging/assayPacingGate.test.ts` holds the bot holding `assay_beacon`
+  (`bot-slice-assay.scenario.json`) to the same three gates: the #16 first ten minutes, the planet 1
+  core in 30 to 60 minutes and the slice in 90 to 130 (`pacingVerdicts` prints pass or fail for each). Trips per planet
   outside 3 to 12 are printed, never failed. Do not retune the bot or a constant to make it pass: a
   miss is a balance finding for the Systems & Economy Designer (the lever is `paceScale`).
 - **Comparison** (`compareRuns`): `npm run balance:report` writes `balance-report/` and compares the

@@ -7,8 +7,10 @@ import { formatNdjsonLine } from './ndjson'
 import {
   derivePacingReport,
   formatPacingReport,
+  formatPacingVerdicts,
   pacingAlerts,
   pacingProblems,
+  pacingVerdicts,
 } from './pacingReport'
 import type { RunEvent } from './runEvent'
 import { runEventProblems } from './runEventSchema'
@@ -59,10 +61,13 @@ function bytesOf(lines: readonly object[]): number {
   return lines.reduce((total, line) => total + formatNdjsonLine(line).length, 0)
 }
 
-describe('balance regression: the pacing bot on the slice (#29)', () => {
+// S11 (#65): the whole second slice (casing grades bought on-curve, collapse, the two bays) under
+// the first slice's gates. A miss is a tuning ticket for Systems & Economy, never a scope change.
+describe('balance regression: the pacing bot on the slice (#29, S11)', () => {
   it('meets the first-sale, first-upgrade, ten-minute, core and slice targets', () => {
     const report = derivePacingReport(botRun().events, SCENARIO.worldSeed)
-    console.log(`${formatPacingReport(report)}\n${pacingAlerts(report).join('\n')}`)
+    const verdicts = formatPacingVerdicts(pacingVerdicts(report))
+    console.log(`${formatPacingReport(report)}\n\n${verdicts}\n${pacingAlerts(report).join('\n')}`)
     expect(pacingProblems(report)).toEqual([])
   })
 

@@ -123,16 +123,53 @@ function bandOfDestroyedTile(event: RunEvent<'tile_destroyed'>, worldSeed: numbe
   return bandOfTile(params, event.data.tx, event.data.ty)
 }
 
+/** One of the three gates the bot is held to (#29, S11 #65), and what it misses there. */
+export interface PacingVerdict {
+  gate: string
+  problems: string[]
+}
+
+/**
+ * The run against the three gates: the #16 first-ten-minutes beats, the planet 1 core window and
+ * the slice window. Each passes when it lists no problem.
+ */
+export function pacingVerdicts(report: PacingReport): PacingVerdict[] {
+  const { planet1CoreMinutes, sliceMinutes } = PACING_TARGETS
+  return [
+    { gate: 'first ten minutes (#16)', problems: firstTenMinutesProblems(report) },
+    {
+      gate: `planet 1 core, ${planet1CoreMinutes.min} to ${planet1CoreMinutes.max} min`,
+      problems: minutesInRange('planet 1 core', report.coreCompletedTick['1'], planet1CoreMinutes),
+    },
+    {
+      gate: `slice, ${sliceMinutes.min} to ${sliceMinutes.max} min`,
+      problems: minutesInRange('slice', report.sliceEndTick ?? undefined, sliceMinutes),
+    },
+  ]
+}
+
 /** Every pacing target the run misses; an empty list passes the gate. */
 export function pacingProblems(report: PacingReport): string[] {
+  return pacingVerdicts(report).flatMap((verdict) => verdict.problems)
+}
+
+function firstTenMinutesProblems(report: PacingReport): string[] {
   const targets = PACING_TARGETS
   return [
     ...withinSeconds('first sale', report.firstSaleTick, targets.firstSaleSeconds),
     ...withinSeconds('first upgrade', report.firstUpgradeTick, targets.firstUpgradeSeconds),
     ...earlyBeatProblems(report),
-    ...minutesInRange('planet 1 core', report.coreCompletedTick['1'], targets.planet1CoreMinutes),
-    ...minutesInRange('slice', report.sliceEndTick ?? undefined, targets.sliceMinutes),
   ]
+}
+
+/** The verdicts as a Markdown table: pass, or fail with what was missed. */
+export function formatPacingVerdicts(verdicts: readonly PacingVerdict[]): string {
+  const rows = verdicts.map(({ gate, problems }) => `| ${gate} | ${verdictText(problems)} |`)
+  return ['| gate | result |', '| --- | --- |', ...rows].join('\n')
+}
+
+function verdictText(problems: readonly string[]): string {
+  return problems.length === 0 ? 'pass' : `FAIL: ${problems.join('; ')}`
 }
 
 function withinSeconds(what: string, tick: number | null, seconds: number): string[] {
