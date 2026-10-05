@@ -8,6 +8,7 @@
 import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
 import {
   BASE_DRIVE_ACCELERATION,
+  BORE_ALIGN_SECONDS,
   GROUND_PROBE_DEPTH,
   MM_PER_METRE,
   VEHICLE_COLLIDER_SIZE,
@@ -26,6 +27,11 @@ export interface MotionStepInput {
   /** Active with energy left: a stranded or empty vehicle neither drives nor lifts (#7). */
   canAct: boolean
   isGrounded: boolean
+  /**
+   * Metres along the tangent to the centre of the bore the drill aims along (down or up), or
+   * null when it aims sideways: idle wheels then centre the body so it fits the 1-tile hole.
+   */
+  boreOffset: number | null
   dt: number
 }
 
@@ -55,14 +61,30 @@ export function stepVehicleMotion(input: MotionStepInput): MotionStep {
   }
 }
 
-/** Wheels steer the tangential speed toward `moveX * speedMax`, or brake it when idle. */
+/**
+ * Wheels steer the tangential speed toward `moveX * speedMax`; with no sideways input they centre
+ * the body on the bore it is drilling, or brake.
+ */
 function nextAlongSpeed(input: MotionStepInput): number {
   const current = dot(input.velocity, tangentOf(input.up))
-  const target = input.canAct ? input.intent.moveX * input.engine.speedMax : 0
+  const target = input.canAct ? targetAlongSpeed(input) : 0
   const maxChange = BASE_DRIVE_ACCELERATION * input.engine.accel * input.dt
   const gap = target - current
   if (Math.abs(gap) <= maxChange) return target
   return current + Math.sign(gap) * maxChange
+}
+
+function targetAlongSpeed(input: MotionStepInput): number {
+  const { intent, engine, boreOffset } = input
+  if (intent.moveX !== 0 || boreOffset === null) return intent.moveX * engine.speedMax
+  const centring = boreOffset / BORE_ALIGN_SECONDS
+  return Math.max(-engine.speedMax, Math.min(engine.speedMax, centring))
+}
+
+/** Metres along the tangent from `position` to the centre of the tile it is in. */
+export function offsetToTileCentre(position: Vector2, up: Vector2): number {
+  const centre = { x: Math.floor(position.x) + 0.5, y: Math.floor(position.y) + 0.5 }
+  return dot({ x: centre.x - position.x, y: centre.y - position.y }, tangentOf(up))
 }
 
 export function withinSpeedBound(velocity: Vector2): Vector2 {

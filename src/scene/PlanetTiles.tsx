@@ -43,7 +43,8 @@ export function PlanetTiles() {
   })
 
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, CAPACITY]}>
+    // Never culled: its bounds were measured at the origin, before the tiles moved under the camera.
+    <instancedMesh ref={mesh} args={[undefined, undefined, CAPACITY]} frustumCulled={false}>
       <planeGeometry args={[1, 1]} />
       <meshStandardMaterial />
     </instancedMesh>

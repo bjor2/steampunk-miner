@@ -1,0 +1,76 @@
+import RAPIER from '@dimforge/rapier3d-compat'
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { PHYSICS_TIMESTEP } from '../constants/physics'
+import { createMemorySink, type MemorySink } from '../logging/eventSink'
+import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
+import { createVehicleBody, createVehicleController } from './vehicleController'
+import { readLocalVehicle, readPlanetWorld, resetGameStore } from '../store/gameStore'
+import {
+  IDLE_INTENT,
+  intentFromHeldKeys,
+  type VehicleIntent,
+} from '../systems/vehicle/vehicleIntent'
+import { surfaceRowOfColumn } from '../systems/world/tileGrid'
+import { createVehicleLoop } from '../scene/vehicleLoop'
+
+// The fixed-step loop end to end, in the physics layer's terms (docs/TESTING_INSTRUCTIONS.md):
+// the real store and authority, a plain Rapier world in node, no React and no canvas.
+
+let sink: MemorySink
+
+beforeAll(async () => {
+  await RAPIER.init()
+})
+
+beforeEach(() => {
+  resetGameStore()
+  sink = createMemorySink()
+  installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
+})
+
+afterEach(() => uninstallRunLog())
+
+function createLiveVehicle() {
+  const world = new RAPIER.World({ x: 0, y: 0, z: 0 })
+  world.timestep = PHYSICS_TIMESTEP
+  const start = readLocalVehicle().pose
+  if (start === null) throw new Error('the starting planet has no dock')
+  const body = createVehicleBody(RAPIER, world, start)
+  const controller = createVehicleController(RAPIER, world, body)
+  const loop = createVehicleLoop()
+  return {
+    body,
+    hold(intent: VehicleIntent, seconds: number) {
+      for (let step = 0; step < seconds / PHYSICS_TIMESTEP; step++) {
+        loop.step(controller, intent)
+        world.step()
+      }
+    },
+  }
+}
+
+const destroyedTiles = () => sink.events.filter((event) => event.event === 'tile_destroyed')
+
+describe('vehicle loop', () => {
+  it('drives off the pad and digs straight down, charging energy through pose reports', () => {
+    const vehicle = createLiveVehicle()
+    vehicle.hold(IDLE_INTENT, 0.5)
+    vehicle.hold(intentFromHeldKeys(['KeyD']), 2)
+    vehicle.hold(intentFromHeldKeys(['KeyS']), 5)
+    const { x, y } = vehicle.body.translation()
+    const { params } = readPlanetWorld()
+    expect(destroyedTiles().length).toBeGreaterThanOrEqual(3)
+    expect(Math.floor(y)).toBeLessThan(surfaceRowOfColumn(Math.floor(x), params?.radiusTiles ?? 0))
+    expect(readLocalVehicle().energy).toBeLessThan(150 * 240)
+    expect(sink.commands.every((command) => command.type === 'reportPose')).toBe(true)
+  })
+
+  it('climbs back out of its shaft on the lift', () => {
+    const vehicle = createLiveVehicle()
+    vehicle.hold(intentFromHeldKeys(['KeyD']), 2)
+    vehicle.hold(intentFromHeldKeys(['KeyS']), 4)
+    const bottom = vehicle.body.translation().y
+    vehicle.hold({ ...IDLE_INTENT, lift: true }, 1.5)
+    expect(vehicle.body.translation().y).toBeGreaterThan(bottom + 3)
+  })
+})

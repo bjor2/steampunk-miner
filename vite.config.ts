@@ -37,7 +37,7 @@ export default defineConfig({
     watch: { ignored: ['**/.claude/**', '**/logs/**', '**/dist-electron/**'] },
   },
   test: {
-    // vitest owns the fast headless tests (node, no DOM, no canvas; only src/physics specs build a
+    // vitest owns the fast headless tests (node, no DOM, no canvas; only physics-layer specs build a
     // Rapier world, see docs/TESTING_INSTRUCTIONS.md).
     include: ['src/**/*.test.ts'],
     setupFiles: ['src/testSetup.ts'],

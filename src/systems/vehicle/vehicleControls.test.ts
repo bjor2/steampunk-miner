@@ -6,7 +6,7 @@ import { newDrillHead, settledFacingOf, stepDrillHead, type DrillHead } from './
 import { dot, localUpOf, tangentOf, type Vector2 } from './localFrame'
 import { gravityAt, gravityStrengthAt, liftAcceleration } from './radialGravity'
 import { IDLE_INTENT, intentFromHeldKeys, type VehicleIntent } from './vehicleIntent'
-import { stepVehicleMotion, type MotionStep } from './vehicleMotion'
+import { offsetToTileCentre, stepVehicleMotion, type MotionStep } from './vehicleMotion'
 import { FACING, facingVectorOf, type Facing } from './vehiclePose'
 
 const RADIUS = 300
@@ -36,6 +36,7 @@ function runMotion(
       engine: engineStats(0),
       canAct: true,
       isGrounded,
+      boreOffset: null,
       dt: PHYSICS_TIMESTEP,
     })
   }
@@ -76,6 +77,36 @@ describe('vehicle local frame', () => {
       expect(frame.upward).toBeCloseTo(local[0].upward, 9)
     })
     expect(local[0].along).toBeGreaterThan(0)
+  })
+})
+
+describe('vehicle bore alignment', () => {
+  const motionWith = (boreOffset: number | null, intent: VehicleIntent) =>
+    stepVehicleMotion({
+      velocity: { x: 0, y: 0 },
+      up: { x: 0, y: 1 },
+      gravity: { x: 0, y: 0 },
+      intent,
+      engine: engineStats(0),
+      canAct: true,
+      isGrounded: true,
+      boreOffset,
+      dt: PHYSICS_TIMESTEP,
+    }).velocity
+
+  it('steers an idle body toward the centre of the bore it drills along', () => {
+    const aimDown = intentFromHeldKeys(['KeyS'])
+    expect(motionWith(0.3, aimDown).x).toBeGreaterThan(0)
+    expect(motionWith(-0.3, aimDown).x).toBeLessThan(0)
+    expect(motionWith(null, aimDown).x).toBe(0)
+  })
+
+  it('lets sideways input win over the centring', () => {
+    expect(motionWith(-0.3, intentFromHeldKeys(['KeyS', 'KeyD'])).x).toBeGreaterThan(0)
+  })
+
+  it('measures the offset to the tile centre along the tangent', () => {
+    expect(offsetToTileCentre({ x: 20.2, y: 299.5 }, { x: 0, y: 1 })).toBeCloseTo(0.3, 9)
   })
 })
 

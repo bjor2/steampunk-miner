@@ -108,7 +108,7 @@ Repo-specific rules:
 
 ## Testing rulebook (short; the full text is [docs/TESTING_INSTRUCTIONS.md](docs/TESTING_INSTRUCTIONS.md))
 
-- Vitest runs in node: no DOM, no canvas; only `src/physics` specs build a Rapier world (rules in the
+- Vitest runs in node: no DOM, no canvas; only physics-layer specs build a Rapier world (rules in the
   rulebook). Run the files for the modules you touched
   (`npx vitest run src/systems`); run all of `npm test` when a change crosses modules.
 - Tests live beside the code on seams that survive refactoring: pure `systems/` functions, store

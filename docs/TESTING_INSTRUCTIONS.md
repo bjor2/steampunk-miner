@@ -22,10 +22,12 @@ only be trusted by looking at it, look at it and say so in the commit.
 - `src/store/` – what an action does to the world; reset with `resetGameStore()` in `beforeEach`.
 - `src/logging/`, `src/debug/` – event stamping, NDJSON, sinks, debug commands.
 - `src/physics/` – the physics layer: what only a real collision world can show (no tunnelling
-  through intact tiles, entering and leaving a 1-tile bore). Rules of this layer:
+  through intact tiles, entering and leaving a 1-tile bore, digging down through the scene's fixed-step
+  loop with the real store and authority). Rapier is imported only here (lint). Rules of this layer:
   - Create a plain `@dimforge/rapier3d-compat` world (`await RAPIER.init()` in `beforeAll`) with zero
     gravity, and drive it only through the game's own seams (`createVehicleBody`,
-    `createVehicleController`); never through `@react-three/rapier`, React or a canvas.
+    `createVehicleController`, `createVehicleLoop`); never through `@react-three/rapier`, React or a
+    canvas. Reset the store and install a memory run log in `beforeEach` when the loop is used.
   - Step it on `PHYSICS_TIMESTEP`, the same fixed step as the game. Assert outcomes in tiles and
     metres (which tile the vehicle is in, how far from the centre), never exact floats or frames.
   - Anything a pure rule can answer (motion, gravity, swivel, pose quantising) is tested in

@@ -23,7 +23,11 @@ import type { ActionFlags } from '../systems/vehicle/poseReport'
 import { quantisePose } from '../systems/vehicle/poseReport'
 import { gravityAt } from '../systems/vehicle/radialGravity'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
-import { groundProbeOf, stepVehicleMotion } from '../systems/vehicle/vehicleMotion'
+import {
+  groundProbeOf,
+  offsetToTileCentre,
+  stepVehicleMotion,
+} from '../systems/vehicle/vehicleMotion'
 import {
   FACING,
   noseTileOf,
@@ -109,23 +113,26 @@ export function createVehicleController(
   return {
     step(input, planet) {
       const position = vectorOf(body.translation())
+      const velocity = vectorOf(body.linvel())
       up = localUpOf(position, up)
       halo.syncAround(tileOfMetres(position), planet.worldVersion, (tile) =>
         isSolidCell(planet.cellAt(tile)),
       )
       const motion = stepVehicleMotion({
-        velocity: vectorOf(body.linvel()),
+        velocity,
         up,
         gravity: gravityAt(position, planet.radiusTiles, planet.gravityMultiplier),
         intent: input.intent,
         engine: input.engine,
         canAct: input.canAct,
         isGrounded: isSolidCell(planet.cellAt(tileOfMetres(groundProbeOf(position, up)))),
+        boreOffset: isAimingAlongUp(input.intent) ? offsetToTileCentre(position, up) : null,
         dt: PHYSICS_TIMESTEP,
       })
       driveBody(body, motion.velocity, up)
       head = stepDrillHead(head, input.intent.facing)
-      const pose = quantisePose(position, motion.velocity, up, settledFacingOf(head))
+      // The velocity the body actually had, after contacts, so a resting vehicle reports 0.
+      const pose = quantisePose(position, velocity, up, settledFacingOf(head))
       const isDrilling = input.canAct && isPushingIntoTile(input.intent, head, pose, planet)
       return {
         flags: { isDriving: motion.isDriving, isThrusting: motion.isThrusting, isDrilling },
@@ -155,6 +162,10 @@ function isPushingIntoTile(
 ): boolean {
   const isAimingAtFacing = intent.facing === pose.facing && isHeadSettled(head)
   return isAimingAtFacing && isRemovableCell(planet.cellAt(noseTileOf(pose)))
+}
+
+function isAimingAlongUp(intent: VehicleIntent): boolean {
+  return intent.facing === FACING.down || intent.facing === FACING.up
 }
 
 /** Motion by velocity; the spin turns the body toward `localUp` (the righting torque of #7). */

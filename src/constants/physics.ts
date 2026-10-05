@@ -39,3 +39,10 @@ export const VEHICLE_COLLIDER_SIZE = 0.9
 
 /** How far below the body's bottom a solid tile still counts as ground under the wheels, m. */
 export const GROUND_PROBE_DEPTH = 0.1
+
+/**
+ * While the drill aims down or up with no sideways input, the wheels steer the body onto the
+ * centre of its tile column within about this long, so a 0.9 m body drops into the 1 m hole it
+ * just bored (#7). A placeholder tuned by hand in the vehicle feel test.
+ */
+export const BORE_ALIGN_SECONDS = 0.15
