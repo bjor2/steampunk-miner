@@ -1,0 +1,169 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { createMemorySink, type MemorySink } from '../logging/eventSink'
+import { ALL_RUN_EVENT_NAMES } from '../logging/eventNames'
+import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
+import { runEventProblems } from '../logging/runEventSchema'
+import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
+import { resetInput } from '../store/inputRuntime'
+import { fromCanonical, toCanonical } from '../systems/money'
+import { firstDigestMismatch, replayRun } from '../systems/replay/replayRun'
+import { createDebugApi } from './debugApi'
+
+// #33 acceptance at the debug API seam: what a Playwright spec can do through
+// window.steampunkDebug without clicking pixels.
+
+let sink: MemorySink
+
+beforeEach(() => {
+  resetGameStore()
+  resetInput()
+  sink = createMemorySink()
+  installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
+})
+
+afterEach(() => uninstallRunLog())
+
+const game = () => useGameStore.getState()
+const canonical = (text: string) => toCanonical(fromCanonical(text))
+
+function hudModel() {
+  const result = createDebugApi().ui.getHudModel()
+  if (!result.ok) throw new Error(result.problems.join('; '))
+  return result.model
+}
+
+function platformModel() {
+  const result = createDebugApi().ui.getPlatformModel()
+  if (!result.ok) throw new Error(result.problems.join('; '))
+  return result.model
+}
+
+/** A UI-driven trip: dock with interact, buy with a button, travel with two presses. */
+function playThroughTheScreens(): void {
+  const debug = createDebugApi()
+  debug.giveMoney('1000')
+  debug.setCoreFragments(63)
+  debug.input.tap('interact')
+  game().pressScreenButton('workshop-upgrade-cargo_hold-buy')
+  debug.input.tap('quick_service')
+  game().pressScreenButton('platform-travel')
+  game().pressScreenButton('platform-travel')
+  debug.input.tap('ui_cancel')
+  debug.fastForward(120)
+}
+
+describe('debug api: ui reads the HUD and the platform screen (#33 acceptance 4)', () => {
+  it('shows what setEnergy, setHull and teleportToDepth set, with the exact values', () => {
+    const debug = createDebugApi()
+    debug.setEnergy('112')
+    debug.setHull('61.5')
+    debug.teleportToDepthTiles(100)
+    const hud = hudModel()
+    expect(hud.energy).toMatchObject({ text: '112 / 150', exact: canonical('112') })
+    expect(hud.hull).toMatchObject({ text: '62 / 100', exact: canonical('61.5') })
+    expect(hud.depth.text).toBe('100')
+    expect(hud.depth.band).toBeGreaterThanOrEqual(1)
+    expect(hud.cargo.text).toBe('0 / 10')
+  })
+
+  it('reads the platform screen with the core bay and money from the state', () => {
+    const debug = createDebugApi()
+    debug.giveMoney('1e400')
+    debug.setCoreFragments(17)
+    const { header } = platformModel()
+    expect(header).toMatchObject({ coreBayText: '17 / 63', money: { exact: canonical('1e400') } })
+    expect(header.money.text).not.toContain('NaN')
+  })
+})
+
+describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
+  it('logs a tapped dock as an ordinary player command, not a debug one', () => {
+    createDebugApi().input.tap('interact')
+    expect(sink.commands.map((command) => command.type)).toEqual(['dock'])
+    expect(sink.events.map((event) => event.event)).toContain('dock_entered')
+    expect(game().debugApplied).toBe(false)
+  })
+
+  it('refuses an unknown action id and does nothing', () => {
+    expect(createDebugApi().input.tap('warp')).toEqual({
+      ok: false,
+      problems: ['"warp" is not an action id'],
+    })
+    expect(sink.commands).toEqual([])
+  })
+
+  it('reads and sets bindings refused whole', () => {
+    const debug = createDebugApi()
+    expect(debug.input.setBindings({ aim_left: { keyboard: ['KeyJ'] } })).toEqual({ ok: true })
+    expect(debug.input.getBindings()).toMatchObject({
+      ok: true,
+      overrides: { aim_left: { keyboard: ['KeyJ'] } },
+    })
+    const refused = debug.input.setBindings({ aim_left: { keyboard: ['Escape'] } })
+    expect(refused).toEqual({
+      ok: false,
+      problems: ['aim_left: Escape is reserved and cannot be rebound'],
+    })
+    expect(game().bindings.aim_left).toEqual(['KeyJ'])
+  })
+
+  it('emits only registered events in a run driven through the screens', () => {
+    playThroughTheScreens()
+    expect(game().planetTier).toBe(2)
+    for (const event of sink.events) expect(runEventProblems(event)).toEqual([])
+  })
+
+  it('replays a screen-driven run from its commands to the same digests', () => {
+    playThroughTheScreens()
+    const logged = sink.events
+      .filter((event) => event.event === 'state_digest')
+      .map((event) => ({ tick: event.tick, ...(event.data as { digest: string; scope: never }) }))
+    const replay = replayRun(1, sink.commands, {
+      playerIds: ['player_1'],
+      endTick: takeSessionSnapshot().tick,
+    })
+    const replayedBeforeEnd = replay.digests.filter((record) => record.scope !== 'end')
+    expect(logged.length).toBeGreaterThan(0)
+    expect(firstDigestMismatch(logged, replayedBeforeEnd)).toBeNull()
+    expect(replay.digests.at(-1)?.digest).toBe(takeSessionSnapshot().digest)
+  })
+
+  it('registers the same 56 event names as before the controls and HUD were built', () => {
+    expect(ALL_RUN_EVENT_NAMES).toHaveLength(56)
+  })
+})
+
+describe('debug api: presentation never reaches the session (#33 acceptance 10)', () => {
+  it('ends a scripted run on the same digest under every camera, shake and flash setting', () => {
+    const digests = new Set<string>()
+    for (const cameraMode of ['rotating', 'fixed']) {
+      for (const isOn of [true, false]) {
+        resetGameStore()
+        resetInput()
+        const debug = createDebugApi()
+        debug.ui.setCameraMode(cameraMode)
+        debug.ui.setPref('shake', isOn)
+        debug.ui.setPref('flashes', !isOn)
+        playThroughTheScreens()
+        digests.add(takeSessionSnapshot().digest)
+      }
+    }
+    expect(digests.size).toBe(1)
+  })
+
+  it('keeps settings out of the log and the commands', () => {
+    const debug = createDebugApi()
+    debug.ui.setPref('hintsEnabled', false)
+    debug.input.setBindings({ lift: { keyboard: ['KeyL'] } })
+    expect(sink.events).toEqual([])
+    expect(sink.commands).toEqual([])
+    expect(debug.ui.getPrefs()).toMatchObject({ ok: true, prefs: { hintsEnabled: false } })
+  })
+
+  it('refuses a setting it does not know', () => {
+    expect(createDebugApi().ui.setPref('volume', 3)).toEqual({
+      ok: false,
+      problems: ['"volume" is not a setting (cameraMode, shake, flashes, hintsEnabled)'],
+    })
+  })
+})

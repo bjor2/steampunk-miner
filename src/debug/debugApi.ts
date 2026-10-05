@@ -31,7 +31,6 @@ import {
   type VehicleStatsView,
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
-import { CAMERA_MODES, isCameraMode, type CameraMode } from '../systems/render/cameraTurn'
 import { isEnemyKind } from '../systems/authority/combat/combatDebugRules'
 import {
   clearEnemiesCommand,
@@ -50,6 +49,13 @@ import { validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems } from '../systems/startScenario'
 import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
 import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'
+import {
+  createDebugInput,
+  createDebugUi,
+  type DebugInput,
+  type DebugResult,
+  type DebugUi,
+} from './debugScreens'
 
 export class DebugCommandNotImplementedError extends Error {
   constructor(command: string) {
@@ -58,8 +64,7 @@ export class DebugCommandNotImplementedError extends Error {
   }
 }
 
-export type DebugResult<T extends object = object> =
-  ({ ok: true } & T) | { ok: false; problems: string[] }
+export type { DebugResult }
 
 /** Where the authority stands after a time or snapshot command. */
 export interface SessionPoint {
@@ -72,21 +77,6 @@ export interface VehicleStatsReport {
   levels: UpgradeLevels
   stats: VehicleStatsView
   onCurveByPlanet: OnCurveVehicleView[]
-}
-
-/** What `ui.getPrefs()` reads: local presentation settings. */
-export interface UiPrefs {
-  cameraMode: CameraMode
-}
-
-/**
- * The `ui.*` namespace (#11 amendment 2): local presentation state only. No command, not logged,
- * not in the digest, and it never sets `debugApplied`.
- */
-export interface DebugUi {
-  /** `rotating` (local down at the bottom of the screen) or `fixed` (#13 accessibility). */
-  setCameraMode(mode: string): DebugResult
-  getPrefs(): DebugResult<{ prefs: UiPrefs }>
 }
 
 export interface DebugApi {
@@ -132,7 +122,10 @@ export interface DebugApi {
   freezeEnemies(frozen: boolean): DebugResult
   /** Table D of #6 for planets 1 to 40: tiers, health, hits, kill times and side-hit shares. */
   enemyStatsTable(kind: string): DebugResult<{ rows: EnemyStatsRowView[] }>
+  /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
   ui: DebugUi
+  /** Actions pressed at the action layer (#33): their commands are ordinary play. */
+  input: DebugInput
   // stubs
   teleportToCore(): void
   giveResource(resourceTier: number, amount: number): void
@@ -191,11 +184,6 @@ function depthBpProblems(depthBp: unknown): string[] {
 function depthTilesOfBp(depthBp: number): number {
   const { params } = readPlanetWorld()
   return params === null ? 0 : depthTilesOfBasisPoints(params, depthBp)
-}
-
-function cameraModeProblems(mode: unknown): string[] {
-  if (isCameraMode(mode)) return []
-  return [`camera mode must be one of ${CAMERA_MODES.join(', ')}, got ${JSON.stringify(mode)}`]
 }
 
 function vehicleStatsReport(): VehicleStatsReport {
@@ -271,11 +259,8 @@ export function createDebugApi(): DebugApi {
         game().freezeEnemies(frozen),
       ),
     enemyStatsTable: enemyStatsTableOf,
-    ui: {
-      setCameraMode: (mode) =>
-        runUnlessRefused(cameraModeProblems(mode), () => game().setCameraMode(mode as CameraMode)),
-      getPrefs: () => ({ ok: true, prefs: { cameraMode: game().prefs.cameraMode } }),
-    },
+    ui: createDebugUi(),
+    input: createDebugInput(),
     teleportToCore: notImplemented('teleportToCore'),
     giveResource: notImplemented('giveResource'),
     unlock: notImplemented('unlock'),

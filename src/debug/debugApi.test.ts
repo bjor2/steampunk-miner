@@ -383,7 +383,7 @@ describe('debug api: ui', () => {
   it('switches the camera to the fixed mode and back', () => {
     const debug = createDebugApi()
     expect(debug.ui.setCameraMode('fixed')).toEqual({ ok: true })
-    expect(debug.ui.getPrefs()).toEqual({ ok: true, prefs: { cameraMode: 'fixed' } })
+    expect(debug.ui.getPrefs()).toMatchObject({ ok: true, prefs: { cameraMode: 'fixed' } })
     debug.ui.setCameraMode('rotating')
     expect(game().prefs.cameraMode).toBe('rotating')
   })

@@ -78,8 +78,16 @@ file turns it on, so scenario and bot runs never see hints.
 offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEnemies(frozen)` and the
   unlogged read `enemyStatsTable(kind)`. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
-  `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.getPrefs()`)
-  changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2).
+  `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
+  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getPlatformModel()`) reads the screens' view models and
+  changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
+  #33). The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
+  `input.setBindings(overrides)`) presses actions at the action layer, so a tap submits ordinary
+  player commands that replay like real play; bindings are refused whole on any problem.
+- Screens (#33): the HUD, platform and settings view models are pure (`src/systems/views/`) and
+  tested there; the one DOM check is `src/ui/screenIds.test.ts`, a `renderToString` render (no
+  browser) that every `UI_IDS` id is drawn with its model's value. It asserts ids and texts, never
+  markup shape or class names. Input specs reset with `resetInput()` beside `resetGameStore()`.
 - Run-log specs: every emitted line must pass `runEventProblems` (the schema registry in
   `src/logging/eventNames.ts`); a summary is always `deriveSummary(events)`.
 - Money in tests: compare canonical strings (`toCanonical`) or `Money` values; `src/testSetup.ts` registers
