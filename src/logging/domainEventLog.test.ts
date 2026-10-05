@@ -143,7 +143,15 @@ const combatEvents: DomainEvent[] = [
     arc: 'front',
     ticks: 30,
   },
-  { tick: 532, playerId: 'p1', type: 'EnemyKilled', enemyId: 'e1', kind: 'crawler', tier: 1, by: 'drill' },
+  {
+    tick: 532,
+    playerId: 'p1',
+    type: 'EnemyKilled',
+    enemyId: 'e1',
+    kind: 'crawler',
+    tier: 1,
+    by: 'drill',
+  },
   { tick: 600, playerId: 'p1', type: 'EnemyDespawned', enemyId: 'e2' },
   {
     tick: 700,

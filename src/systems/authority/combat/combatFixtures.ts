@@ -5,9 +5,11 @@
  * The vehicle stands in the corridor's middle; enemies come along it.
  */
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
-import type { TilePoint } from '../../world/tileGrid'
+import type { PlanetParams } from '../../world/planetParams'
+import { surfaceRowOfColumn, type TilePoint } from '../../world/tileGrid'
 import type { CommandIntent } from '../authorityCommand'
 import { drill, type ScriptedSession } from '../scriptedSession'
+import { spawnPointsWithin } from './spawnPoints'
 
 export const CORRIDOR_ROW = 297
 export const CORRIDOR_MIDDLE: TilePoint = { tx: 20, ty: CORRIDOR_ROW }
@@ -63,22 +65,56 @@ export const freezeEnemies = (frozen: boolean): CommandIntent => ({
   payload: { frozen },
 })
 
+/** A command a spec sends at an absolute tick, kept so a replay can send it again. */
+export interface TimedCommand {
+  tick: number
+  intent: CommandIntent
+}
+
 /**
- * Bores the corridor, then stands the vehicle in its middle with the planet 1 on-curve hull
- * (`hullMax "125.44"`, #25 acceptance 2) and drill power. Returns the tick the fight can start at.
+ * The corridor set-up as commands: bore it, then stand the vehicle in its middle with the planet 1
+ * on-curve hull (`hullMax "125.44"`, #25 acceptance 2) and drill power (level 13).
  */
-export function prepareCorridor(session: ScriptedSession, facing: Facing = FACING.right): number {
-  session.submit(0, setUpgrade('drill_power', 60))
+export function corridorCommands(facing: Facing = FACING.right): TimedCommand[] {
+  const commands: TimedCommand[] = [{ tick: 0, intent: setUpgrade('drill_power', 60) }]
   let tick = 1
   for (let dx = -CORRIDOR_HALF_LENGTH; dx <= CORRIDOR_HALF_LENGTH; dx++) {
     const tile = { tx: CORRIDOR_MIDDLE.tx + dx, ty: CORRIDOR_ROW }
-    session.submit(tick, poseAt(tile, { facing: FACING.right }))
-    session.submit(tick + BORE_TICKS, drill(tile, BORE_TICKS))
+    commands.push({ tick, intent: poseAt(tile, { facing: FACING.right }) })
+    commands.push({ tick: tick + BORE_TICKS, intent: drill(tile, BORE_TICKS) })
     tick += BORE_TICKS + 1
   }
-  session.submit(tick, setUpgrade('drill_power', 13))
-  session.submit(tick, setUpgrade('hull', 2))
-  session.submit(tick, setHull('125.44'))
-  session.submit(tick, poseAt(CORRIDOR_MIDDLE, { facing }))
-  return tick
+  return [
+    ...commands,
+    { tick, intent: setUpgrade('drill_power', 13) },
+    { tick, intent: setUpgrade('hull', 2) },
+    { tick, intent: setHull('125.44') },
+    { tick, intent: poseAt(CORRIDOR_MIDDLE, { facing }) },
+  ]
 }
+
+/** Sends the corridor set-up; returns the tick the fight can start at. */
+export function prepareCorridor(session: ScriptedSession, facing: Facing = FACING.right): number {
+  const commands = corridorCommands(facing)
+  for (const { tick, intent } of commands) session.submit(tick, intent)
+  return commands[commands.length - 1].tick
+}
+
+/** Clear of every spawn point by more than the 24-tile activation reach plus a 10-tile margin. */
+const QUIET_RADIUS_TILES = 34
+
+/** The first tile one row under the surface, right of the pad, with no spawn point near it. */
+export function quietTileUnderSurface(params: PlanetParams): TilePoint {
+  for (let tx = 10; tx < params.radiusTiles; tx++) {
+    const tile = { tx, ty: surfaceRowOfColumn(tx, params.radiusTiles) - 1 }
+    const x = tile.tx * 1000 + 500
+    const y = tile.ty * 1000 + 500
+    if (spawnPointsWithin(params, x, y, QUIET_RADIUS_TILES).length === 0) return tile
+  }
+  throw new Error('no quiet tile under the surface')
+}
+
+export const setPlanet = (planetIndex: number): CommandIntent => ({
+  type: 'debug.setPlanet',
+  payload: { planetIndex },
+})

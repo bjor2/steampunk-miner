@@ -61,7 +61,12 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
   // A debug hull destroys with no attacker: no kind, no arc.
   VehicleDestroyed: ({ cause, attacker }) => ({
     event: 'vehicle_destroyed',
-    data: { cause, kind: attacker?.kind ?? 'none', tier: attacker?.tier ?? 0, arc: attacker?.arc ?? 'none' },
+    data: {
+      cause,
+      kind: attacker?.kind ?? 'none',
+      tier: attacker?.tier ?? 0,
+      arc: attacker?.arc ?? 'none',
+    },
   }),
   EnemySpawned: ({ enemyId, kind, tier, spawnPointId }) => ({
     event: 'enemy_spawned',
