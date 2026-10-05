@@ -1,19 +1,30 @@
-/** The platform screen, open exactly while docked (#8, #33): the store's model and menu focus. */
+/**
+ * The bay screen, open exactly while docked (#8, #33), for the bay the vehicle is docked at
+ * (#37): the store's model and menu focus.
+ */
 import { useGameStore } from '../../store/gameStore'
-import { readPlatformModel } from '../../store/screenReads'
+import { readBayScreen } from '../../store/screenReads'
 import { focusOnScreen } from '../../systems/views/menuFocus'
-import { PLATFORM_START_FOCUS } from '../../systems/views/platformModel'
+import { SELL_BAY_START_FOCUS } from '../../systems/views/sellBayModel'
+import { upgradeBayStartFocus } from '../../systems/views/upgradeBayModel'
 import { useScreenModel } from '../useScreenModel'
-import { PlatformView } from './PlatformView'
+import { SellBayView } from './SellBayView'
+import { UpgradeBayView } from './UpgradeBayView'
 
 export function PlatformScreen() {
   const isDocked = useGameStore((state) => state.vehicle.mode === 'docked')
-  return isDocked ? <OpenPlatformScreen /> : null
+  return isDocked ? <OpenBayScreen /> : null
 }
 
-function OpenPlatformScreen() {
-  const model = useScreenModel(readPlatformModel)
+function OpenBayScreen() {
+  const screen = useScreenModel(readBayScreen)
   const focusedControlId = useGameStore((state) => state.focusedControlId)
-  const focusedId = focusOnScreen(model.focusStops, focusedControlId, PLATFORM_START_FOCUS)
-  return <PlatformView model={model} focusedId={focusedId} />
+  if (screen === null) return null
+  if (screen.bay === 'sell') {
+    const focusedId = focusOnScreen(screen.model.focusStops, focusedControlId, SELL_BAY_START_FOCUS)
+    return <SellBayView model={screen.model} focusedId={focusedId} />
+  }
+  const start = upgradeBayStartFocus(screen.model)
+  const focusedId = focusOnScreen(screen.model.focusStops, focusedControlId, start)
+  return <UpgradeBayView model={screen.model} focusedId={focusedId} />
 }

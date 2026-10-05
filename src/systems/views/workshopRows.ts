@@ -1,5 +1,5 @@
 /**
- * The workshop panel's rows (#33 section 6): the six tracks in #7's order, each with its level,
+ * The Upgrade bay's track rows (#33 section 6, #37): the six tracks in #7's order, each with its level,
  * the next level's cost (`upgradePrice`, the same value `upgrade_purchased.cost` logs) and an
  * effect preview "before -> after" from `vehicleStatsAt` at this level and the next (the same
  * function as `upgrade_purchased.statsAfter`). `drill_tip` also says to which band of this planet
@@ -37,6 +37,8 @@ export type BuyState = 'affordable' | 'money_short'
 
 export interface WorkshopRow {
   upgradeId: UpgradeId
+  /** One icon per track (#44: `icon-track-<id>`), drawn by the shop screens ticket. */
+  iconId: string
   label: string
   level: number
   cost: AmountReading
@@ -71,6 +73,11 @@ export function workshopRowsOf(state: AuthorityState, playerId: string): Worksho
   return UPGRADE_IDS.map((upgradeId) => workshopRowOf(state, playerId, levels, upgradeId))
 }
 
+/** `money_short` when that is why the authority refuses the buy now; `affordable` otherwise. */
+export function buyStateOf(buy: ScreenButton): BuyState {
+  return buy.reason === 'money_short' ? 'money_short' : 'affordable'
+}
+
 /** The stats a track changes, as the preview shows them; specs compare it with `statsAfter`. */
 export function statsOfTrack(upgradeId: UpgradeId): readonly string[] {
   return STATS_OF_TRACK[upgradeId]
@@ -92,13 +99,14 @@ function workshopRowOf(
   )
   return {
     upgradeId,
+    iconId: `icon-track-${upgradeId}`,
     label: TRACK_LABELS[upgradeId],
     level: levels[upgradeId],
     cost: amountReading(nextUpgradePrice(state, playerId, upgradeId)),
     effectBefore: previewOf(levels, upgradeId),
     effectAfter: previewOf(next, upgradeId),
     buy,
-    buyState: buy.reason === 'money_short' ? 'money_short' : 'affordable',
+    buyState: buyStateOf(buy),
     fullSpeedBand: upgradeId === 'drill_tip' ? fullSpeedBandOf(state.planet.index, levels) : null,
   }
 }

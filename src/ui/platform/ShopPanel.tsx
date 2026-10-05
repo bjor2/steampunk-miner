@@ -3,7 +3,7 @@ import type { ShopPanel as Shop, ShopRow } from '../../systems/views/shopPanel'
 import { Panel } from '../kit/Panel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
-import { Field } from './PlatformHeader'
+import { Field } from './BayHeader'
 import styles from './Platform.module.css'
 
 export function ShopPanel({ shop, focusedId }: { shop: Shop; focusedId: string }) {

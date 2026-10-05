@@ -3,13 +3,14 @@ import { renderToString } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
-import { resetGameStore, useGameStore } from '../store/gameStore'
+import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
 import { pressAction, releaseAction, resetInput } from '../store/inputRuntime'
 import {
   readHudModel,
   readPlaqueModel,
-  readPlatformModel,
+  readSellBayModel,
   readSettingsModel,
+  readUpgradeBayModel,
 } from '../store/screenReads'
 import {
   createScriptedSession,
@@ -18,17 +19,20 @@ import {
 } from '../systems/authority/scriptedSession'
 import { teleportToDockCommand } from '../systems/vehicle/vehicleCommands'
 import { selectHudModel, type HudModel } from '../systems/views/hudModel'
-import { selectPlatformModel, type PlatformModel } from '../systems/views/platformModel'
+import type { BayFooter, BayHeader } from '../systems/views/bayFrame'
+import { selectSellBayModel, type SellBayModel } from '../systems/views/sellBayModel'
+import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { HudView } from './hud/HudView'
 import { UI_IDS, type UiId } from './ids'
-import { PlatformView } from './platform/PlatformView'
+import { SellBayView } from './platform/SellBayView'
+import { UpgradeBayView } from './platform/UpgradeBayView'
 import { PlaquesView } from './plaques/PlaquesView'
 import { SettingsView } from './settings/SettingsView'
 
-// #33 acceptance 12: both screens rendered on the server (no browser, no DOM) carry an element for
+// #33 acceptance 12: the screens rendered on the server (no browser, no DOM) carry an element for
 // every id in UI_IDS, and its text is the model's value. Ids, not markup shape, are the contract.
 
 beforeEach(() => {
@@ -100,8 +104,7 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
   }
 }
 
-function platformTexts(model: PlatformModel): Partial<Record<UiId, string | null>> {
-  const { header, shop, workshop, charging, footer } = model
+function bayFrameTexts(header: BayHeader, footer: BayFooter): Partial<Record<UiId, string | null>> {
   return {
     [UI_IDS.platformScreen]: null,
     [UI_IDS.platformMoney]: header.money.text,
@@ -109,19 +112,6 @@ function platformTexts(model: PlatformModel): Partial<Record<UiId, string | null
     [UI_IDS.platformCoreBayGauge]: null,
     [UI_IDS.platformCoreBay]: header.coreBay.text,
     [UI_IDS.platformState]: header.platformStateText,
-    [UI_IDS.shopCargoTotal]: shop.cargoTotalText,
-    [UI_IDS.shopSellAll]: shop.sellAll.label,
-    [UI_IDS.shopSellAllValue]: shop.sellAllValue.text,
-    [UI_IDS.workshopHull]: workshop.hullText,
-    [UI_IDS.workshopRepair]: workshop.repair.label,
-    [UI_IDS.workshopRepairCost]: workshop.repairCost.text,
-    [UI_IDS.workshopVisualTier]: String(workshop.visualTier),
-    [UI_IDS.chargingEnergy]: charging.energyText,
-    [UI_IDS.chargingPrice]: charging.price.text,
-    [UI_IDS.chargingCost]: charging.cost.text,
-    [UI_IDS.chargingRecharge]: charging.recharge.label,
-    [UI_IDS.platformQuickService]: footer.quickService.label,
-    [UI_IDS.platformQuickTotal]: footer.quickTotal.text,
     [UI_IDS.platformUndock]: footer.undock.label,
     [UI_IDS.platformSettings]: footer.settings.label,
     ...(footer.travel === null
@@ -132,6 +122,41 @@ function platformTexts(model: PlatformModel): Partial<Record<UiId, string | null
           [UI_IDS.platformTravelFragments]: footer.travel.fragmentsText,
           ...(footer.travel.isArmed ? { [UI_IDS.platformTravelConfirm]: null } : {}),
         }),
+  }
+}
+
+function sellBayTexts(model: SellBayModel): Partial<Record<UiId, string | null>> {
+  const { shop, charging, quickService } = model
+  return {
+    ...bayFrameTexts(model.header, model.footer),
+    [UI_IDS.sellbayScreen]: null,
+    [UI_IDS.shopCargoTotal]: shop.cargoTotalText,
+    [UI_IDS.shopSellAll]: shop.sellAll.label,
+    [UI_IDS.shopSellAllValue]: shop.sellAllValue.text,
+    [UI_IDS.chargingEnergy]: charging.energyText,
+    [UI_IDS.chargingPrice]: charging.price.text,
+    [UI_IDS.chargingCost]: charging.cost.text,
+    [UI_IDS.chargingRecharge]: charging.recharge.label,
+    [UI_IDS.platformQuickService]: quickService.button.label,
+    [UI_IDS.platformQuickTotal]: quickService.total.text,
+  }
+}
+
+function upgradeBayTexts(model: UpgradeBayModel): Partial<Record<UiId, string | null>> {
+  const { repair, casing } = model
+  return {
+    ...bayFrameTexts(model.header, model.footer),
+    [UI_IDS.upgradebayScreen]: null,
+    [UI_IDS.workshopHull]: repair.hullText,
+    [UI_IDS.workshopRepair]: repair.button.label,
+    [UI_IDS.workshopRepairCost]: repair.cost.text,
+    [UI_IDS.workshopVisualTier]: String(model.visualTier),
+    [UI_IDS.upgradebayCasing]: null,
+    [UI_IDS.upgradebayCasingGrade]: casing.gradeText,
+    [UI_IDS.upgradebayCasingCost]: casing.cost.text,
+    [UI_IDS.upgradebayCasingBuy]: casing.buy.label,
+    [UI_IDS.upgradebayPreview]: null,
+    [UI_IDS.upgradebayQuickService]: model.quickService.label,
   }
 }
 
@@ -176,10 +201,16 @@ function renderPlaques(): string[] {
   return checkScreen(createElement(PlaquesView, { model }), plaqueTexts(model))
 }
 
-function renderPlatform(): string[] {
-  const model = readPlatformModel()
-  const element = createElement(PlatformView, { model, focusedId: 'platform-quick-service' })
-  return checkScreen(element, platformTexts(model))
+function renderSellBay(): string[] {
+  const model = readSellBayModel()
+  const element = createElement(SellBayView, { model, focusedId: 'platform-quick-service' })
+  return checkScreen(element, sellBayTexts(model))
+}
+
+function renderUpgradeBay(): string[] {
+  const model = readUpgradeBayModel()
+  const element = createElement(UpgradeBayView, { model, focusedId: '' })
+  return checkScreen(element, upgradeBayTexts(model))
 }
 
 function renderSettings(): string[] {
@@ -241,12 +272,13 @@ describe('screen ids (#33 acceptance 12)', () => {
     game().setCoreFragments(63)
     game().giveMoney('60.8')
     game().pressScreenButton('platform-travel')
-    keep(renderPlatform())
+    keep(renderSellBay())
+    keep(renderUpgradeBay())
     game().setBindings({ lift: { keyboard: ['KeyE'] } })
     keep(renderSettings())
     game().pressScreenButton('platform-travel')
     tap('interact')
-    keep(renderPlatform())
+    keep(renderSellBay())
     tap('ui_cancel')
     game().setUpgrade('cargo_hold', 0)
     game().reportPose(strandedPose)
@@ -256,14 +288,30 @@ describe('screen ids (#33 acceptance 12)', () => {
     expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
   })
 
+  it('marks the preview with the focused track and the tier after its purchase, digest untouched', () => {
+    game().setUpgrade('boiler', 7)
+    game().teleportToDock('upgrade')
+    const digest = takeSessionSnapshot().digest
+    game().moveFocus(1)
+    game().moveFocus(1)
+    const html = renderToString(
+      createElement(UpgradeBayView, { model: readUpgradeBayModel(), focusedId: '' }),
+    )
+    expect(html).toMatch(
+      /data-testid="upgradebay-preview" data-highlight="engine" data-visual-tier="2"/,
+    )
+    expect(takeSessionSnapshot().digest).toBe(digest)
+  })
+
   it('carries the tier and family on every shop row', () => {
     const session = sessionWithOre(4)
     session.submit(400, teleportToDockCommand('sell'))
-    const model = selectPlatformModel(session.state(), 'p1', {
+    const model = selectSellBayModel(session.state(), 'p1', {
       isTravelArmed: false,
       isQuickServiceHighlighted: false,
+      focusedId: null,
     })
-    const html = renderToString(createElement(PlatformView, { model, focusedId: '' }))
+    const html = renderToString(createElement(SellBayView, { model, focusedId: '' }))
     const rows = [...html.matchAll(/data-testid="shop-row-\d+"[^>]*/g)]
     expect(rows.length).toBe(model.shop.rows.length)
     expect(rows.length).toBeGreaterThan(0)

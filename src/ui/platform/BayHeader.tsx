@@ -1,13 +1,14 @@
-/** Money, planet, the core bay against the need, and the platform's state (#33 section 6). */
+/** The bay's name, money, planet, the core bay against the need, and the platform's state (#33, #37). */
 import type { ReactNode } from 'react'
-import type { PlatformHeader as Header } from '../../systems/views/platformModel'
+import type { BayHeader as Header } from '../../systems/views/bayFrame'
 import { UI_IDS } from '../ids'
 import { Gauge } from '../kit/Gauge'
 import styles from './Platform.module.css'
 
-export function PlatformHeader({ header }: { header: Header }) {
+export function BayHeader({ header }: { header: Header }) {
   return (
     <header className={styles.header}>
+      <strong className={styles.bayName}>{header.bayName}</strong>
       <Field label="Money">
         <span data-testid={UI_IDS.platformMoney} data-exact={header.money.exact}>
           {header.money.text}

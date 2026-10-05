@@ -1,6 +1,6 @@
 /**
- * Every `data-testid` the HUD, platform screen and settings overlay carry (#33 sections 5, 6 and
- * 9), in one table: the view models name their buttons with it and the components take their ids
+ * Every `data-testid` the HUD, the two bay screens and settings overlay carry (#33 sections 5, 6
+ * and 9, #37 `sellbay-*` and `upgradebay-*`), in one table: the view models name their buttons with it and the components take their ids
  * from it (re-exported as `UI_IDS` from `src/ui/ids.ts`), so a spec, the debug API and the DOM
  * always agree. Rows that repeat take their id from a template.
  */
@@ -29,6 +29,14 @@ export const UI_IDS = {
   hudHintPlaque: 'hud-hint-plaque',
   hudTransmission: 'hud-transmission',
   platformScreen: 'platform-screen',
+  sellbayScreen: 'sellbay-screen',
+  upgradebayScreen: 'upgradebay-screen',
+  upgradebayPreview: 'upgradebay-preview',
+  upgradebayCasing: 'upgradebay-casing',
+  upgradebayCasingGrade: 'upgradebay-casing-grade',
+  upgradebayCasingCost: 'upgradebay-casing-cost',
+  upgradebayCasingBuy: 'upgradebay-casing-buy',
+  upgradebayQuickService: 'upgradebay-quick-service',
   platformMoney: 'platform-money',
   platformPlanet: 'platform-planet',
   platformCoreBay: 'platform-core-bay',

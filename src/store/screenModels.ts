@@ -1,8 +1,8 @@
 /**
- * The three screens as their view models, read from the authority replica and the store's
- * presentation state (#33): the HUD, the platform screen and the settings overlay. The debug
- * API's `ui.getHudModel()`/`ui.getPlatformModel()` and the DOM components read the same functions,
- * so what a spec asserts is what the screen draws. Read on demand, never stored per tick.
+ * The screens as their view models, read from the authority replica and the store's presentation
+ * state (#33, #37): the HUD, the Sell bay and Upgrade bay screens and the settings overlay. The
+ * debug API's `ui.get*Model()` reads and the DOM components read the same functions, so what a
+ * spec asserts is what the screen draws. Read on demand, never stored per tick.
  */
 import type { ActionId, Bindings, InputContext } from '../systems/input/actionMap'
 import type { Preferences } from '../systems/input/preferences'
@@ -16,11 +16,18 @@ import {
   type PlaqueModel,
   type PlaqueSources,
 } from '../systems/views/plaqueModel'
+import { dockedBayOf } from '../systems/authority/dockRules'
+import type { BayUiState } from '../systems/views/bayFrame'
 import {
-  PLATFORM_START_FOCUS,
-  selectPlatformModel,
-  type PlatformModel,
-} from '../systems/views/platformModel'
+  SELL_BAY_START_FOCUS,
+  selectSellBayModel,
+  type SellBayModel,
+} from '../systems/views/sellBayModel'
+import {
+  selectUpgradeBayModel,
+  upgradeBayStartFocus,
+  type UpgradeBayModel,
+} from '../systems/views/upgradeBayModel'
 import {
   SETTINGS_START_FOCUS,
   selectSettingsModel,
@@ -38,6 +45,7 @@ export interface ScreenSources {
   bindingProblems: readonly string[]
   rebindingActionId: ActionId | null
   isTravelArmed: boolean
+  focusedControlId: string | null
   hintBoard: HintBoard
   transmissionBoard: TransmissionBoard
   arePlaquesAllowed: boolean
@@ -58,11 +66,31 @@ export function hudModelOf(sources: ScreenSources): HudModel {
   })
 }
 
-export function platformModelOf(sources: ScreenSources): PlatformModel {
-  return selectPlatformModel(readAuthorityState(), sources.playerId, {
+/** The screen of the bay the vehicle is docked at; null while it is not docked (#37). */
+export type BayScreen =
+  { bay: 'sell'; model: SellBayModel } | { bay: 'upgrade'; model: UpgradeBayModel } | null
+
+export function bayScreenOf(sources: ScreenSources): BayScreen {
+  const bay = dockedBayOf(readAuthorityState(), sources.playerId)
+  if (bay === 'sell') return { bay, model: sellBayModelOf(sources) }
+  if (bay === 'upgrade') return { bay, model: upgradeBayModelOf(sources) }
+  return null
+}
+
+export function sellBayModelOf(sources: ScreenSources): SellBayModel {
+  return selectSellBayModel(readAuthorityState(), sources.playerId, bayUiStateOf(sources))
+}
+
+export function upgradeBayModelOf(sources: ScreenSources): UpgradeBayModel {
+  return selectUpgradeBayModel(readAuthorityState(), sources.playerId, bayUiStateOf(sources))
+}
+
+function bayUiStateOf(sources: ScreenSources): BayUiState {
+  return {
     isTravelArmed: sources.isTravelArmed,
     isQuickServiceHighlighted: isQuickServiceHighlighted(plaqueSourcesOf(sources)),
-  })
+    focusedId: sources.focusedControlId,
+  }
 }
 
 export function plaqueModelOf(sources: ScreenSources): PlaqueModel {
@@ -86,28 +114,19 @@ export function settingsModelOf(sources: ScreenSources): SettingsModel {
 
 /** The focusable buttons of a menu layer; the vehicle layer has none. */
 export function menuScreenOf(layer: InputContext, sources: ScreenSources): MenuScreen {
-  if (layer === 'platform') return platformMenu(platformModelOf(sources))
+  if (layer === 'platform') return bayMenu(bayScreenOf(sources))
   if (layer === 'settings') return settingsMenu(settingsModelOf(sources))
-  return { focusStops: [], startFocus: '', buttons: [] }
+  return NO_MENU
 }
 
-function platformMenu(model: PlatformModel): MenuScreen {
-  const { shop, workshop, charging, footer } = model
-  return {
-    focusStops: model.focusStops,
-    startFocus: PLATFORM_START_FOCUS,
-    buttons: [
-      ...shop.rows.map((row) => row.sell),
-      shop.sellAll,
-      ...workshop.upgrades.map((row) => row.buy),
-      workshop.repair,
-      charging.recharge,
-      footer.quickService,
-      ...(footer.travel === null ? [] : [footer.travel.button]),
-      footer.undock,
-      footer.settings,
-    ],
-  }
+const NO_MENU: MenuScreen = { focusStops: [], startFocus: '', buttons: [] }
+
+function bayMenu(screen: BayScreen): MenuScreen {
+  if (screen === null) return NO_MENU
+  const { focusStops, buttons } = screen.model
+  const startFocus =
+    screen.bay === 'sell' ? SELL_BAY_START_FOCUS : upgradeBayStartFocus(screen.model)
+  return { focusStops, startFocus, buttons }
 }
 
 function settingsMenu(model: SettingsModel): MenuScreen {

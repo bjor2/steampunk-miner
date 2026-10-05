@@ -7,6 +7,9 @@ import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/game
 import { resetInput } from '../store/inputRuntime'
 import { fromCanonical, toCanonical } from '../systems/money'
 import { firstDigestMismatch, replayRun } from '../systems/replay/replayRun'
+import { bayPoseAt } from '../systems/vehicle/vehiclePose'
+import { dockSiteOf } from '../systems/world/dockSite'
+import { planetParamsFor } from '../systems/world/planetParams'
 import { createDebugApi } from './debugApi'
 
 // #33 acceptance at the debug API seam: what a Playwright spec can do through
@@ -32,20 +35,53 @@ function hudModel() {
   return result.model
 }
 
-function platformModel() {
-  const result = createDebugApi().ui.getPlatformModel()
+function sellBayModel() {
+  const result = createDebugApi().ui.getSellBayModel()
   if (!result.ok) throw new Error(result.problems.join('; '))
   return result.model
 }
 
-/** A UI-driven trip: dock with interact, buy with a button, travel with two presses. */
+function upgradeBayModel() {
+  const result = createDebugApi().ui.getUpgradeBayModel()
+  if (!result.ok) throw new Error(result.problems.join('; '))
+  return result.model
+}
+
+/** Leaves the Sell bay and drives 8 m onto the Upgrade bay's pad, as the pose reports say (#37). */
+function driveToUpgradeBay(): void {
+  const debug = createDebugApi()
+  debug.input.tap('ui_cancel')
+  const site = dockSiteOf(planetParamsFor(1, 1))
+  const tick = takeSessionSnapshot().tick + 2
+  const payload = { ...bayPoseAt(site, 'upgrade'), ...IDLE, driveTicks: 2 }
+  debug.fastForward(2, [{ tick, type: 'reportPose', payload }])
+}
+
+const IDLE = {
+  driving: false,
+  thrusting: false,
+  drilling: false,
+  thrustTicks: 0,
+  driveTicks: 0,
+  drillTicks: 0,
+}
+
+/**
+ * A UI-driven trip over both bays: dock with interact and run the quick action at the Sell bay,
+ * drive to the Upgrade bay, dock, buy a track and a casing grade with buttons, travel with two
+ * presses.
+ */
 function playThroughTheScreens(): void {
   const debug = createDebugApi()
   debug.giveMoney('1000')
   debug.setCoreFragments(63)
+  debug.setEnergy('100')
+  debug.input.tap('interact')
+  debug.input.tap('quick_service')
+  driveToUpgradeBay()
   debug.input.tap('interact')
   game().pressScreenButton('workshop-upgrade-cargo_hold-buy')
-  debug.input.tap('quick_service')
+  game().pressScreenButton('upgradebay-casing-buy')
   game().pressScreenButton('platform-travel')
   game().pressScreenButton('platform-travel')
   debug.input.tap('ui_cancel')
@@ -66,11 +102,16 @@ describe('debug api: ui reads the HUD and the platform screen (#33 acceptance 4)
     expect(hud.cargo.text).toBe('0 / 10')
   })
 
-  it('reads the platform screen with the core bay and money from the state', () => {
+  it('reads the bay screens with the core bay and money from the state', () => {
     const debug = createDebugApi()
     debug.giveMoney('1e400')
     debug.setCoreFragments(17)
-    const { header } = platformModel()
+    expect(upgradeBayModel().header).toEqual({
+      ...sellBayModel().header,
+      bay: 'upgrade',
+      bayName: 'Upgrade bay',
+    })
+    const { header } = sellBayModel()
     expect(header).toMatchObject({
       coreBay: { text: '17 / 63' },
       money: { exact: canonical('1e400') },
@@ -108,6 +149,27 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
       problems: ['aim_left: Escape is reserved and cannot be rebound'],
     })
     expect(game().bindings.aim_left).toEqual(['KeyJ'])
+  })
+
+  it('docks at each bay with interact and buys at the Upgrade bay through its buttons', () => {
+    playThroughTheScreens()
+    const docks = sink.events.filter((event) => event.event === 'dock_entered')
+    expect(docks.map((event) => (event.data as { bay: string }).bay)).toEqual(['sell', 'upgrade'])
+    const names = sink.events.map((event) => event.event)
+    expect(names).toEqual(expect.arrayContaining(['upgrade_purchased', 'casing_upgraded']))
+    expect(names).not.toContain('command_rejected')
+  })
+
+  it('reads the Casing row and a focused track preview through ui.getUpgradeBayModel', () => {
+    const debug = createDebugApi()
+    debug.giveMoney('100')
+    debug.teleportToDock('upgrade')
+    const digest = takeSessionSnapshot().digest
+    game().moveFocus(1)
+    const model = upgradeBayModel()
+    expect(model.casing).toMatchObject({ grade: 1, gradeText: '1 → 2', cost: { text: '48' } })
+    expect(model.preview).toEqual({ highlight: 'drill_tip', visualTier: 1 })
+    expect(takeSessionSnapshot().digest).toBe(digest)
   })
 
   it('emits only registered events in a run driven through the screens', () => {

@@ -20,12 +20,38 @@
   align-items: center;
 }
 
-.panels {
+.sellPanels,
+.upgradePanels {
   display: grid;
-  grid-template-columns: 1fr 1.6fr 1fr;
   gap: var(--space-2);
+  align-content: start;
   min-height: 0;
   overflow: auto;
+}
+
+.sellPanels {
+  grid-template-columns: 1fr 1fr;
+}
+
+.sellPanels > :first-child {
+  grid-column: 1 / -1;
+}
+
+/* The preview takes about half the screen (#37); its framing is the shop screens ticket's. */
+.upgradePanels {
+  grid-template-columns: 1fr 1fr;
+}
+
+.bayName {
+  color: var(--color-brass);
+}
+
+.icon {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid var(--color-brass);
+  border-radius: 2px;
 }
 
 .field {

@@ -8,7 +8,7 @@
  */
 import { useGameStore } from '../store/gameStore'
 import { pressAction, releaseAction } from '../store/inputRuntime'
-import { readHudModel, readPlatformModel } from '../store/screenReads'
+import { readHudModel, readSellBayModel, readUpgradeBayModel } from '../store/screenReads'
 import {
   isActionId,
   type ActionId,
@@ -21,7 +21,8 @@ import {
   type Preferences,
 } from '../systems/input/preferences'
 import type { HudModel } from '../systems/views/hudModel'
-import type { PlatformModel } from '../systems/views/platformModel'
+import type { SellBayModel } from '../systems/views/sellBayModel'
+import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 
 export type DebugResult<T extends object = object> =
   ({ ok: true } & T) | { ok: false; problems: string[] }
@@ -33,7 +34,9 @@ export interface DebugUi {
   setPref(name: string, value: unknown): DebugResult
   getPrefs(): DebugResult<{ prefs: Preferences }>
   getHudModel(): DebugResult<{ model: HudModel }>
-  getPlatformModel(): DebugResult<{ model: PlatformModel }>
+  /** The two bay screens (#37), as each would draw now; their buttons carry `wrong_bay` away. */
+  getSellBayModel(): DebugResult<{ model: SellBayModel }>
+  getUpgradeBayModel(): DebugResult<{ model: UpgradeBayModel }>
 }
 
 export interface DebugInput {
@@ -55,7 +58,8 @@ export function createDebugUi(): DebugUi {
     setPref: (name, value) => setPreferenceUnlessRefused(name, value),
     getPrefs: () => ({ ok: true, prefs: game().prefs }),
     getHudModel: () => ({ ok: true, model: readHudModel() }),
-    getPlatformModel: () => ({ ok: true, model: readPlatformModel() }),
+    getSellBayModel: () => ({ ok: true, model: readSellBayModel() }),
+    getUpgradeBayModel: () => ({ ok: true, model: readUpgradeBayModel() }),
   }
 }
 

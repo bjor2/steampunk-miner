@@ -20,6 +20,7 @@ import {
   resetInput,
   routeKeyChange,
 } from './inputRuntime'
+import { readUpgradeBayModel } from './screenReads'
 import { installPreferencesStorage, preferencesWrites } from './preferencesFile'
 
 let submitted: AuthorityCommand[]
@@ -136,6 +137,28 @@ describe('input: no direct mutation (#33 acceptance 3)', () => {
     expect([...atSellBay, ...atUpgradeBay]).toEqual(['rechargeEnergy', 'buyUpgrade'])
   })
 
+  it('buys a casing grade with ui_confirm on the Casing row at the Upgrade bay only', () => {
+    game().giveMoney('200')
+    game().teleportToDock('upgrade')
+    game().pressScreenButton('upgradebay-casing-buy')
+    game().undock()
+    game().teleportToDock('upgrade')
+    const confirmed = submittedDuring(() => tap('ui_confirm'))
+    expect(confirmed).toEqual(['buyCasingGrade'])
+    expect(readUpgradeBayModel().casing.grade).toBe(3)
+  })
+
+  it('submits no quick action at the Upgrade bay, and no casing buy at the Sell bay', () => {
+    game().giveMoney('100')
+    game().setEnergy('100')
+    game().teleportToDock('upgrade')
+    expect(submittedDuring(() => tap('quick_service'))).toEqual([])
+    game().undock()
+    game().teleportToDock('sell')
+    expect(submittedDuring(() => game().pressScreenButton('upgradebay-casing-buy'))).toEqual([])
+    expect(readUpgradeBayModel().casing.grade).toBe(1)
+  })
+
   it('submits nothing for an action outside its context or a disabled button', () => {
     expect(submittedDuring(() => tap('quick_service'))).toEqual([])
     dockAtStart()
@@ -234,7 +257,7 @@ describe('input: keys, layers and the vehicle intent', () => {
     routeKeyChange(key('KeyD', false))
     dockAtStart()
     routeKeyChange(key('Tab', true, { isShiftHeld: true }))
-    expect(game().focusedControlId).toBe('charging-recharge')
+    expect(game().focusedControlId).toBe('platform-travel')
   })
 
   it('moves focus with the menu keys and jumps panels with Tab, from the quick action', () => {
@@ -242,7 +265,7 @@ describe('input: keys, layers and the vehicle intent', () => {
     tap('ui_next_panel')
     expect(game().focusedControlId).toBe('shop-sell-all')
     tap('ui_down')
-    expect(game().focusedControlId).toBe('workshop-upgrade-drill_power-buy')
+    expect(game().focusedControlId).toBe('charging-recharge')
     tap('ui_prev_panel')
     expect(game().focusedControlId).toBe('shop-sell-all')
   })

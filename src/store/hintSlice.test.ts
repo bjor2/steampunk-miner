@@ -12,7 +12,7 @@ import type { TilePoint } from '../systems/world/tileGrid'
 import { readAuthorityTick, resetGameStore, takeSessionSnapshot, useGameStore } from './gameStore'
 import { readVehicleIntent, resetInput, routeKeyChange } from './inputRuntime'
 import { installPreferencesStorage, loadPreferences, preferencesWrites } from './preferencesFile'
-import { readPlaqueModel, readPlatformModel } from './screenReads'
+import { readPlaqueModel, readSellBayModel } from './screenReads'
 
 const PLANET_1 = planetParamsFor(1, 1)
 const GAP = HINT_TABLE.minTicksBetweenHints
@@ -114,11 +114,11 @@ describe('hint slice', () => {
 
   it('highlights Sell, repair and recharge while the dock hint is up on the first visit', () => {
     game().startPlaques()
-    expect(readPlatformModel().footer.isQuickServiceHighlighted).toBe(false)
+    expect(readSellBayModel().quickService.isHighlighted).toBe(false)
     playFirstTrip()
     game().fastForward(GAP)
     expect(readPlaqueModel().hint?.id).toBe('hint_dock')
-    expect(readPlatformModel().footer.isQuickServiceHighlighted).toBe(true)
+    expect(readSellBayModel().quickService.isHighlighted).toBe(true)
   })
 
   it('shows no hint with Show hints off, but still the transmission', () => {
