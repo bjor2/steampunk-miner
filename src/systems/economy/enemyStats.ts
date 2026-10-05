@@ -7,15 +7,16 @@
  * on-curve player meets the same fight on every planet (the #9 parity rule).
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
-import { div, mul, type BigStat } from '../money'
+import { div, fromSafeInteger, mul, type BigStat } from '../money'
 import { growGeometric, saturate } from './curveFamilies'
 import { ECONOMY } from './economy'
-import type { EnemyDef, EnemyKind } from './economyDefinition'
+import type { EnemyDef, EnemyKind, HitArc } from './economyDefinition'
 import { drillPower, hullMax } from './vehicleStats'
 
 const { enemies } = ECONOMY
 const FIRST_PLANET = 1
 const FIRST_BAND = 1
+const TICKS_PER_SECOND_STAT = fromSafeInteger(TICKS_PER_SECOND)
 
 export interface EnemyBoundedStats {
   moveTilesPerSecond: number
@@ -25,6 +26,7 @@ export interface EnemyBoundedStats {
   windupTicks: number
   lungeTicks: number
   lungeTiles: number
+  recoilTicks: number
 }
 
 export function enemyTier(planetIndex: number, band: number): number {
@@ -51,7 +53,18 @@ export function enemyBoundedStats(kind: EnemyKind, tier: number): EnemyBoundedSt
     windupTicks: enemy.windupTicks,
     lungeTicks: enemy.lungeTicks,
     lungeTiles: lungeTilesOf(enemy),
+    recoilTicks: enemy.recoilTicks,
   }
+}
+
+/** What one hit from the `arc` zone takes off the hull: 0.25, 1 or 2 times the base hit (#9). */
+export function enemyHitOnVehicle(kind: EnemyKind, tier: number, arc: HitArc): BigStat {
+  return mul(enemyBaseHit(kind, tier), arcMultiplierOf(arc))
+}
+
+/** A pinned enemy loses `drillPower * kDrillVsEnemy` per second, a sixtieth of it per tick (#9). */
+export function pinnedDrillDamagePerTick(drillLevel: number): BigStat {
+  return div(mul(drillPower(drillLevel), enemies.combat.kDrillVsEnemy), TICKS_PER_SECOND_STAT)
 }
 
 /** Seconds a pinned enemy survives on the drill: `health / (drillPower * kDrillVsEnemy)`. */
@@ -70,6 +83,12 @@ export function enemyDefOf(kind: EnemyKind): EnemyDef {
   const enemy = enemies.kinds.find((candidate) => candidate.id === kind)
   if (enemy === undefined) throw new RangeError(`no enemy ${kind} in economy.json`)
   return enemy
+}
+
+function arcMultiplierOf(arc: HitArc): BigStat {
+  const { kFrontPlayer, kSidePlayer, kRearPlayer } = enemies.combat
+  if (arc === 'front') return kFrontPlayer
+  return arc === 'side' ? kSidePlayer : kRearPlayer
 }
 
 function lungeTilesOf(enemy: EnemyDef): number {

@@ -1,21 +1,26 @@
 import { describe, expect, it } from 'vitest'
-import { cmp, fromCanonical, type Money } from '../money'
+import { add, ceil, cmp, div, fromCanonical, mul, toCanonical, type Money } from '../money'
 import { ENEMY_KINDS } from './economyDefinition'
 import { ECONOMY } from './economy'
 import {
   enemyBaseHit,
   enemyBoundedStats,
   enemyHealth,
+  enemyHitOnVehicle,
   enemyTier,
+  pinnedDrillDamagePerTick,
   pinnedKillSeconds,
   sideHitShareOfHull,
 } from './enemyStats'
-import { engineStats, onCurveLevel } from './vehicleStats'
+import { drillPower, engineStats, hullMax, onCurveLevel } from './vehicleStats'
 
 const m = fromCanonical
 const PLANETS_1_TO_40 = Array.from({ length: 40 }, (_, index) => index + 1)
 const BANDS = [1, 2, 3, 4, 5]
 const TIERS = [1, 10, 100, 1000]
+const ON_CURVE_TIERS = PLANETS_1_TO_40.flatMap((planet) =>
+  BANDS.map((band) => enemyTier(planet, band)),
+)
 
 function isWithin(value: Money, low: string, high: string): boolean {
   return cmp(value, m(low)) >= 0 && cmp(value, m(high)) <= 0
@@ -49,10 +54,13 @@ describe('enemy stats', () => {
 })
 
 describe('enemy fairness invariants (#9)', () => {
-  it('winds every attack up for at least 24 ticks at every tier', () => {
+  it('winds every attack up for at least 24 ticks at every tier, on-curve tiers included', () => {
     for (const kind of ENEMY_KINDS) {
-      for (const tier of TIERS) {
-        expect(enemyBoundedStats(kind, tier).windupTicks).toBeGreaterThanOrEqual(24)
+      for (const tier of [...TIERS, ...ON_CURVE_TIERS]) {
+        const { windupTicks, attackCooldownTicks } = enemyBoundedStats(kind, tier)
+        expect(windupTicks).toBeGreaterThanOrEqual(24)
+        // A pinned enemy strikes once per cooldown, so the cooldown is its wind-up too.
+        expect(attackCooldownTicks).toBeGreaterThanOrEqual(windupTicks)
       }
     }
   })
@@ -106,6 +114,33 @@ describe('enemy fairness invariants (#9)', () => {
     expect([combat.activationTiles, combat.despawnTiles]).toEqual([24, 48])
     expect(combat.spawnPointsPer10ChunksByBand).toEqual([0, 5, 10, 15, 10])
     expect(combat.burrowerShare).toEqual({ numerator: 1, denominator: 3 })
+  })
+})
+
+describe('enemy hits and the pinned drill (#9, #25 acceptance 2 and 3)', () => {
+  it('takes a quarter, one and two base hits for front, side and rear', () => {
+    expect(
+      ['front', 'side', 'rear'].map((arc) => enemyHitOnVehicle('crawler', 1, arc as never)),
+    ).toEqual(['4.9', '19.6', '39.2'].map(m))
+  })
+
+  it('kills a tier 1 crawler pinned on a level 13 drill in 72 ticks', () => {
+    const perTick = pinnedDrillDamagePerTick(13)
+    expect(toCanonical(mul(perTick, m('60')))).toBe(toCanonical(drillPower(13)))
+    expect(ceil(div(enemyHealth('crawler', 1), perTick))).toEqual(m('72'))
+  })
+
+  it('never lets one rear hit destroy a full on-curve hull, and needs 4 side or 2 rear hits', () => {
+    for (const planet of PLANETS_1_TO_40) {
+      const hull = hullMax(onCurveLevel('hull', planet))
+      for (const band of BANDS) {
+        const tier = enemyTier(planet, band)
+        const side = enemyHitOnVehicle('crawler', tier, 'side')
+        const rear = enemyHitOnVehicle('crawler', tier, 'rear')
+        expect(cmp(rear, hull)).toBe(-1)
+        expect(cmp(add(add(side, side), side), hull)).toBe(-1)
+      }
+    }
   })
 })
 

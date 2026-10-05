@@ -107,7 +107,8 @@
         "attackCooldownTicks": { "min": 90, "max": 45 },
         "windupTicks": 24,
         "lungeTilesPerSecond": 8,
-        "lungeTicks": 30
+        "lungeTicks": 30,
+        "recoilTicks": 30
       },
       {
         "id": "burrower",
@@ -120,7 +121,8 @@
         "attackCooldownTicks": { "min": 90, "max": 45 },
         "windupTicks": 24,
         "lungeTilesPerSecond": 8,
-        "lungeTicks": 30
+        "lungeTicks": 30,
+        "recoilTicks": 30
       }
     ],
     "combat": {

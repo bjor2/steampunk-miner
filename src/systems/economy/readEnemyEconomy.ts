@@ -39,6 +39,7 @@ function readEnemyDef(reader: FieldReader, path: string, value: unknown): EnemyD
       kind.lungeTilesPerSecond,
     ),
     lungeTicks: reader.safeInteger(`${path}.lungeTicks`, kind.lungeTicks),
+    recoilTicks: reader.safeInteger(`${path}.recoilTicks`, kind.recoilTicks),
   }
 }
 

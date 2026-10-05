@@ -31,6 +31,11 @@ export const ENEMY_KINDS = ['crawler', 'burrower'] as const
 
 export type EnemyKind = (typeof ENEMY_KINDS)[number]
 
+/** The three contact zones of #9; each has its own multiplier on the enemy's base hit. */
+export const HIT_ARCS = ['front', 'side', 'rear'] as const
+
+export type HitArc = (typeof HIT_ARCS)[number]
+
 export interface BoundedRange {
   /** Value at tier or level 0; `max` is approached and never reached (#7, #9 saturating). */
   min: number
@@ -94,6 +99,8 @@ export interface EnemyDef {
   windupTicks: number
   lungeTilesPerSecond: number
   lungeTicks: number
+  /** How long a side or rear hitter backs off before it comes again (#9 `recoilTicks`). */
+  recoilTicks: number
 }
 
 export interface CombatRules {
