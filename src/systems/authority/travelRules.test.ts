@@ -47,26 +47,28 @@ describe('travel', () => {
     })
   })
 
-  it('logs travel_started, planet_unlocked, planet_entered, the cache and a travel digest, in order', () => {
+  it('logs travel_started, planet_unlocked, feature_unlocked, planet_entered, the cache and a travel digest, in order', () => {
     const session = dockedWith(63)
     const events = session.submit(10, travelTo(2))
     expect(typesOf(events)).toEqual([
       'TravelStarted',
       'MoneyChanged',
       'PlanetUnlocked',
+      'FeatureUnlocked',
       'PlanetEntered',
       'ArtefactCacheSpawned',
       'StateDigested',
     ])
     const planet2 = planetParamsFor(WORLD_SEED, 2)
     expect(events[2]).toMatchObject({ planetIndex: 2 })
-    expect(events[3]).toMatchObject({
+    expect(events[3]).toMatchObject({ featureId: 'planet_2' })
+    expect(events[4]).toMatchObject({
       planetSeed: planet2.planetSeed,
       generatorVersion: GENERATOR_VERSION,
       radius: 400,
     })
-    expect(events[4]).toMatchObject({ band: 2 })
-    expect(events[5]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
+    expect(events[5]).toMatchObject({ band: 2 })
+    expect(events[6]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
   })
 
   it('travels from the Upgrade bay as from the Sell bay (#37), landing in the Sell bay', () => {

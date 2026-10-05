@@ -7,8 +7,8 @@
  * bay and the travel fee in the wallet; otherwise it is refused with `not_docked`,
  * `not_next_planet`, `core_short` or `money_short` and nothing changes. It spends exactly the fee
  * and exactly `coreNeeded` fragments (surplus stays banked), moves the session to the new planet's
- * dock site, and logs `travel_started`, `planet_unlocked`, `planet_entered`,
- * `artefact_cache_spawned` (#46) and a `travel` digest.
+ * dock site, and logs `travel_started`, `planet_unlocked`, a `feature_unlocked` per schedule row
+ * opened on arrival (#88), `planet_entered`, `artefact_cache_spawned` (#46) and a `travel` digest.
  */
 import { travelFee } from '../economy/planetCharges'
 import { sub, toCanonical } from '../money'
@@ -23,6 +23,7 @@ import {
   type RuleEffect,
 } from './commandRule'
 import { coreNeededOf } from './coreBay'
+import { featureUnlocksOfTravel } from './featureUnlocks'
 import type { DomainEventBody } from './domainEvent'
 import { notDockedRejection } from './dockRules'
 import { artefactCacheSpawnOf, planetEntryOf, withSessionOnPlanet } from './planetEntry'
@@ -98,7 +99,10 @@ function payForTravel(state: AuthorityState, playerId: string, toPlanet: number)
   }
 }
 
-/** The slice has no separate unlock step: reaching a planet unlocks it (#2 log sequence). */
+/**
+ * The slice has no separate unlock step: reaching a planet unlocks it (#2 log sequence), and with
+ * it the schedule's `planet_gate` rows listed on that planet (#88).
+ */
 function arriveAtPlanet(state: AuthorityState, toPlanet: number): RuleEffect {
   const arrived = withSessionOnPlanet(state, { ...state.planet, index: toPlanet })
   const params = planetParamsOf(arrived.planet)
@@ -106,6 +110,7 @@ function arriveAtPlanet(state: AuthorityState, toPlanet: number): RuleEffect {
     state: arrived,
     events: [
       { type: 'PlanetUnlocked', planetIndex: toPlanet },
+      ...featureUnlocksOfTravel(state.planet.index, toPlanet),
       ...(params === null ? [] : arrivalEventsOf(params)),
     ],
   }

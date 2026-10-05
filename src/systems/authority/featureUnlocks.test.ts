@@ -1,0 +1,58 @@
+import { describe, expect, it } from 'vitest'
+import { startScenarioCommands } from '../startScenarioCommands'
+import type { DomainEvent } from './domainEvent'
+import { isFeatureUnlocked } from './featureUnlocks'
+import { createScriptedSession, WORLD_SEED } from './scriptedSession'
+
+const dock = { type: 'dock', payload: { bay: 'sell' } } as const
+const travelTo = (toPlanet: number) => ({ type: 'travel', payload: { toPlanet } }) as const
+
+/** A seeded run docked on `planetTier` with the money and fragments to travel on. */
+function dockedOnPlanet(planetTier: number) {
+  const session = createScriptedSession()
+  const scenario = { planetTier, planetSeed: WORLD_SEED, money: '1e30', coreFragments: 100000 }
+  for (const command of startScenarioCommands(scenario)) session.submit(0, command)
+  session.submit(5, dock)
+  return session
+}
+
+const unlockedIdsOf = (events: readonly DomainEvent[]) =>
+  events.flatMap((event) => (event.type === 'FeatureUnlocked' ? [event.featureId] : []))
+
+describe('feature unlocks on travel', () => {
+  it('unlocks planet_2 on arriving at planet 2, logged between planet_unlocked and planet_entered', () => {
+    const session = dockedOnPlanet(1)
+    expect(isFeatureUnlocked(session.state(), 'planet_2')).toBe(false)
+    const events = session.submit(10, travelTo(2))
+    expect(unlockedIdsOf(events)).toEqual(['planet_2'])
+    const types = events.map((event) => event.type)
+    expect(types.indexOf('FeatureUnlocked')).toBe(types.indexOf('PlanetUnlocked') + 1)
+    expect(isFeatureUnlocked(session.state(), 'planet_2')).toBe(true)
+  })
+
+  it('holds the planet 1 gates open from the start without logging them again', () => {
+    const session = dockedOnPlanet(1)
+    expect(isFeatureUnlocked(session.state(), 'core_harvest')).toBe(true)
+    expect(unlockedIdsOf(session.submit(10, travelTo(2)))).not.toContain('core_harvest')
+  })
+
+  it('unlocks no vision row on arriving at its planet (#90)', () => {
+    const session = dockedOnPlanet(7)
+    expect(unlockedIdsOf(session.submit(10, travelTo(8)))).toEqual([])
+    expect(isFeatureUnlocked(session.state(), 'heat_lava')).toBe(false)
+  })
+
+  it('does not unlock endless on arriving at planet 40 or travelling past it', () => {
+    const session = dockedOnPlanet(39)
+    const toFinale = session.submit(10, travelTo(40))
+    session.submit(15, dock)
+    const pastFinale = session.submit(20, travelTo(41))
+    expect(session.state().planet.index).toBe(41)
+    expect(unlockedIdsOf([...toFinale, ...pastFinale])).not.toContain('endless_unlock')
+    expect(isFeatureUnlocked(session.state(), 'endless_unlock')).toBe(false)
+  })
+
+  it('answers false for an id that is not on the schedule', () => {
+    expect(isFeatureUnlocked(dockedOnPlanet(2).state(), 'warp_drive')).toBe(false)
+  })
+})

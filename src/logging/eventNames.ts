@@ -93,7 +93,9 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { fromPlanet: 'integer', toPlanet: 'integer', cost: 'money', coreSpent: 'integer' },
   },
-  feature_unlocked: { group: 'progression', level: 'core', payload: 'unspecified' },
+  // A locked-schedule row (#79 id) that opened on this travel (#88); the envelope's `planet` is
+  // the planet arrived at.
+  feature_unlocked: { group: 'progression', level: 'core', payload: { featureId: 'text' } },
   // The artefact cache (#46); the envelope's `planet` is the cache's planet. The cache is
   // generated whatever the player holds, so `artefact_cache_spawned` is said on every planet.
   artefact_cache_spawned: {

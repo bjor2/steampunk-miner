@@ -149,6 +149,7 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     data: { fromPlanet, toPlanet, cost, coreSpent },
   }),
   PlanetUnlocked: ({ planetIndex }) => ({ event: 'planet_unlocked', data: { planetIndex } }),
+  FeatureUnlocked: ({ featureId }) => ({ event: 'feature_unlocked', data: { featureId } }),
   PlanetEntered: ({ planetSeed, generatorVersion, radius }) => ({
     event: 'planet_entered',
     data: { planetSeed, generatorVersion, radius },

@@ -167,6 +167,8 @@ export interface DomainEventBodies {
     coreSpent: number
   }
   PlanetUnlocked: { planetIndex: number }
+  /** A locked-schedule row opened by arriving at its planet (#88), keyed by its #79 row id. */
+  FeatureUnlocked: { featureId: string }
   PlanetEntered: { planetSeed: number; generatorVersion: number; radius: number }
   ResourceSold: { items: SoldItem[]; value: string; mode: SaleMode }
   /** The planet's artefact cache tile and band (#46), said once per planet entered. */
