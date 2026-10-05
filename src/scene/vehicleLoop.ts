@@ -1,11 +1,11 @@
 /**
  * The live game's fixed step for the local vehicle (#3, #11): the authority's clock moves one
  * tick, the controller drives the body for that tick with the current intent, the step's actions
- * are counted, a pose report goes to the authority when one is due, and the drill's facing and
- * activity go to the scene for the headlamp and sparks. After the tow or a planet change the body
+ * are counted, a pose report goes to the authority when one is due, the drill's facing and
+ * activity go to the scene for the headlamp and sparks, and the speed and lift to the sounds. After the tow or a planet change the body
  * is placed on the dock the authority put the vehicle on.
  */
-import { UP_VECTOR_SCALE } from '../constants/physics'
+import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
 import type { PlanetView, VehicleController, VehicleStepResult } from '../physics/vehicleController'
 import {
   readAuthorityTick,
@@ -26,6 +26,7 @@ import type { VehicleState } from '../systems/vehicle/vehicleState'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { cellAt, type WorldState } from '../systems/world/worldState'
 import { drillPresence } from './drillPresence'
+import { motionPresence } from './motionPresence'
 
 const HALF_TILE = 0.5
 
@@ -54,6 +55,7 @@ export function createVehicleLoop(): VehicleLoop {
       )
       reportWhenDue(loop, result)
       showDrill(result)
+      showMotion(result)
     },
   }
 }
@@ -105,6 +107,13 @@ function showDrill(result: VehicleStepResult): void {
   drillPresence.up.y = pose.upy / UP_VECTOR_SCALE
   drillPresence.nose.x = nose.tx + HALF_TILE
   drillPresence.nose.y = nose.ty + HALF_TILE
+}
+
+/** Hands the step's speed and lift to the sound stage. */
+function showMotion(result: VehicleStepResult): void {
+  const { vx, vy } = result.pose
+  motionPresence.speedMetresPerSecond = Math.sqrt(vx * vx + vy * vy) / MM_PER_METRE
+  motionPresence.isLifting = result.flags.isThrusting
 }
 
 function reportWhenDue(loop: LoopState, result: VehicleStepResult): void {

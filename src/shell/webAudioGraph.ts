@@ -1,0 +1,263 @@
+/**
+ * The synthesised placeholder sounds (#13: "synthesised in the browser audio engine"): three
+ * loops (drill, engine chug, steam hiss), four music layers and the one-shots (chime, clank,
+ * thud, stingers), all from oscillators and one noise buffer. Built once per audio context; the
+ * loops run from the start and are only ever re-levelled, so a frame never builds a node, and a
+ * level that has not moved is not rescheduled.
+ */
+import type { MusicLayers } from '../systems/audio/musicLayers'
+import type { ClankWeight, SoundOut, StingerKind } from './soundOut'
+
+export type WebAudioGraph = SoundOut & { context: AudioContext }
+
+type LayerName = keyof MusicLayers
+
+interface Loop {
+  oscillator: OscillatorNode
+  out: GainNode
+}
+
+interface MusicBus {
+  layers: Readonly<Record<LayerName, GainNode>>
+  oscillators: readonly OscillatorNode[]
+  tuning: number
+}
+
+const MASTER_GAIN = 0.5
+const MUSIC_GAIN = 0.12
+/** Continuous levels glide toward a new value with this time constant, so they never click. */
+const GLIDE_SECONDS = 0.05
+const SILENCE = 0.0001
+/** A level closer than this to where it is heading is left alone. */
+const UNHEARD_CHANGE = 0.0005
+const CENTS_PER_SEMITONE = 100
+
+/** Planet 1's notes per layer (Hz); every planet shifts them all by its tuning (#13). */
+const LAYER_NOTES: Readonly<Record<LayerName, { type: OscillatorType; hz: number[] }>> = {
+  platform: { type: 'triangle', hz: [220, 277.18, 329.63] },
+  ambience: { type: 'sine', hz: [55, 82.41] },
+  tension: { type: 'sawtooth', hz: [58.27, 61.74] },
+  combat: { type: 'square', hz: [73.42] },
+}
+
+export function createWebAudioGraph(context: AudioContext): WebAudioGraph {
+  const master = gainOf(context, MASTER_GAIN, context.destination)
+  const noise = createNoiseBuffer(context)
+  const drill = createDrillLoop(context, master)
+  const engine = createEngineLoop(context, master)
+  const steam = createSteamLoop(context, master, noise)
+  const music = createMusicBus(context, master)
+  return {
+    context,
+    playChime: (frequency) => playChime(context, master, frequency),
+    playClank: (weight) => playClank(context, master, noise, weight),
+    playThud: () => playThud(context, master),
+    playStinger: (kind, tuning) => playStinger(context, master, kind, tuning),
+    setDrill: (frequency, gain) => levelLoop(context, drill, frequency, gain),
+    setEngine: (puffs, gain) => levelLoop(context, engine, puffs, gain),
+    setSteam: (gain) => glide(context, steam.gain, gain),
+    setMusic: (layers, tuning) => levelMusic(context, music, layers, tuning),
+  }
+}
+
+function gainOf(context: AudioContext, gain: number, destination: AudioNode): GainNode {
+  const node = new GainNode(context, { gain })
+  node.connect(destination)
+  return node
+}
+
+const headingTo = new WeakMap<AudioParam, number>()
+
+function glide(context: AudioContext, param: AudioParam, value: number): void {
+  const heading = headingTo.get(param)
+  if (heading !== undefined && Math.abs(heading - value) < UNHEARD_CHANGE) return
+  headingTo.set(param, value)
+  param.setTargetAtTime(value, context.currentTime, GLIDE_SECONDS)
+}
+
+function levelLoop(context: AudioContext, loop: Loop, frequency: number, gain: number): void {
+  glide(context, loop.oscillator.frequency, frequency)
+  glide(context, loop.out.gain, gain)
+}
+
+/** One second of white noise, looped by the hiss and cut short by the clanks. */
+function createNoiseBuffer(context: AudioContext): AudioBuffer {
+  const buffer = context.createBuffer(1, context.sampleRate, context.sampleRate)
+  const samples = buffer.getChannelData(0)
+  for (let at = 0; at < samples.length; at++) samples[at] = Math.random() * 2 - 1
+  return buffer
+}
+
+/** A sawtooth motor through a low-pass, so it growls rather than buzzes. */
+function createDrillLoop(context: AudioContext, master: GainNode): Loop {
+  const out = gainOf(context, 0, master)
+  const filter = new BiquadFilterNode(context, { type: 'lowpass', frequency: 900 })
+  filter.connect(out)
+  const oscillator = new OscillatorNode(context, { type: 'sawtooth', frequency: 200 })
+  oscillator.connect(filter)
+  oscillator.start()
+  return { oscillator, out }
+}
+
+/** A low square chopped on and off by a square LFO: the LFO's frequency is the chug rate. */
+function createEngineLoop(context: AudioContext, master: GainNode): Loop {
+  const out = gainOf(context, 0, master)
+  const chop = new GainNode(context, { gain: 0.5 })
+  chop.connect(out)
+  const body = new OscillatorNode(context, { type: 'square', frequency: 48 })
+  body.connect(chop)
+  const oscillator = new OscillatorNode(context, { type: 'square', frequency: 2 })
+  const depth = new GainNode(context, { gain: 0.5 })
+  depth.connect(chop.gain)
+  oscillator.connect(depth)
+  body.start()
+  oscillator.start()
+  return { oscillator, out }
+}
+
+function createSteamLoop(context: AudioContext, master: GainNode, noise: AudioBuffer): GainNode {
+  const out = gainOf(context, 0, master)
+  const filter = new BiquadFilterNode(context, { type: 'highpass', frequency: 2500 })
+  filter.connect(out)
+  const source = new AudioBufferSourceNode(context, { buffer: noise, loop: true })
+  source.connect(filter)
+  source.start()
+  return out
+}
+
+function createMusicBus(context: AudioContext, master: GainNode): MusicBus {
+  const bus = gainOf(context, MUSIC_GAIN, master)
+  const oscillators: OscillatorNode[] = []
+  const layerOf = (name: LayerName) => {
+    const layer = gainOf(context, 0, bus)
+    const { type, hz } = LAYER_NOTES[name]
+    hz.forEach((frequency) => oscillators.push(startedOscillator(context, type, frequency, layer)))
+    return layer
+  }
+  const layers = {
+    platform: layerOf('platform'),
+    ambience: layerOf('ambience'),
+    tension: layerOf('tension'),
+    combat: layerOf('combat'),
+  }
+  return { layers, oscillators, tuning: 0 }
+}
+
+function startedOscillator(
+  context: AudioContext,
+  type: OscillatorType,
+  frequency: number,
+  destination: AudioNode,
+): OscillatorNode {
+  const oscillator = new OscillatorNode(context, { type, frequency })
+  oscillator.connect(destination)
+  oscillator.start()
+  return oscillator
+}
+
+function levelMusic(
+  context: AudioContext,
+  music: MusicBus,
+  layers: MusicLayers,
+  tuning: number,
+): void {
+  for (const name of Object.keys(music.layers) as LayerName[]) {
+    glide(context, music.layers[name].gain, layers[name])
+  }
+  if (tuning !== music.tuning) retuneMusic(music, tuning)
+}
+
+function retuneMusic(music: MusicBus, tuning: number): void {
+  music.tuning = tuning
+  music.oscillators.forEach((oscillator) => {
+    oscillator.detune.value = tuning * CENTS_PER_SEMITONE
+  })
+}
+
+/** A note that strikes and rings out, stopping itself when silent. */
+function strike(
+  context: AudioContext,
+  master: GainNode,
+  note: { type: OscillatorType; frequency: number; gain: number; seconds: number; at?: number },
+): OscillatorNode {
+  const start = context.currentTime + (note.at ?? 0)
+  const envelope = gainOf(context, SILENCE, master)
+  envelope.gain.setValueAtTime(SILENCE, start)
+  envelope.gain.exponentialRampToValueAtTime(note.gain, start + 0.005)
+  envelope.gain.exponentialRampToValueAtTime(SILENCE, start + note.seconds)
+  const oscillator = new OscillatorNode(context, { type: note.type, frequency: note.frequency })
+  oscillator.connect(envelope)
+  oscillator.start(start)
+  oscillator.stop(start + note.seconds)
+  return oscillator
+}
+
+function playChime(context: AudioContext, master: GainNode, frequency: number): void {
+  strike(context, master, { type: 'sine', frequency, gain: 0.3, seconds: 0.7 })
+  strike(context, master, { type: 'sine', frequency: frequency * 2, gain: 0.08, seconds: 0.4 })
+}
+
+function playClank(
+  context: AudioContext,
+  master: GainNode,
+  noise: AudioBuffer,
+  weight: ClankWeight,
+): void {
+  const isHeavy = weight === 'heavy'
+  strike(context, master, {
+    type: 'square',
+    frequency: isHeavy ? 70 : 140,
+    gain: 0.25,
+    seconds: 0.35,
+  })
+  const ring = gainOf(context, 0.4, master)
+  ring.gain.exponentialRampToValueAtTime(SILENCE, context.currentTime + 0.25)
+  const filter = new BiquadFilterNode(context, {
+    type: 'bandpass',
+    frequency: isHeavy ? 500 : 1200,
+    Q: 4,
+  })
+  filter.connect(ring)
+  const burst = new AudioBufferSourceNode(context, { buffer: noise })
+  burst.connect(filter)
+  burst.start(context.currentTime, 0, 0.25)
+}
+
+function playThud(context: AudioContext, master: GainNode): void {
+  const thud = strike(context, master, { type: 'sine', frequency: 70, gain: 0.5, seconds: 0.3 })
+  thud.frequency.exponentialRampToValueAtTime(38, context.currentTime + 0.3)
+}
+
+/** Core: a rising brass arpeggio. Travel: a long falling glide, the platform lifting off. */
+function playStinger(
+  context: AudioContext,
+  master: GainNode,
+  kind: StingerKind,
+  tuning: number,
+): void {
+  const root = 440 * 2 ** (tuning / 12)
+  if (kind === 'core') playCoreStinger(context, master, root)
+  else playTravelStinger(context, master, root)
+}
+
+function playCoreStinger(context: AudioContext, master: GainNode, root: number): void {
+  ;[0, 4, 7, 12].forEach((semitones, step) =>
+    strike(context, master, {
+      type: 'triangle',
+      frequency: root * 2 ** (semitones / 12),
+      gain: 0.25,
+      seconds: 0.6,
+      at: step * 0.14,
+    }),
+  )
+}
+
+function playTravelStinger(context: AudioContext, master: GainNode, root: number): void {
+  const fall = strike(context, master, {
+    type: 'sawtooth',
+    frequency: root / 2,
+    gain: 0.15,
+    seconds: 1.4,
+  })
+  fall.frequency.exponentialRampToValueAtTime(root / 4, context.currentTime + 1.4)
+}

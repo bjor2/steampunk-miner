@@ -3,9 +3,12 @@ import { CHIME_BASE_HZ } from '../../constants/audio'
 import {
   chimeFrequencyOf,
   chimeSemitonesOf,
+  drillFrequencyOf,
+  drillGainOf,
   drillLoadOf,
-  drillVoiceOf,
-  engineVoiceOf,
+  engineGainOf,
+  enginePuffsOf,
+  secondsPerTileOf,
   steamGainOf,
 } from './soundRules'
 
@@ -41,22 +44,25 @@ describe('pickup chime', () => {
 
 describe('drill, engine and steam voices', () => {
   it('drops the drill pitch and raises its volume as the tile takes longer', () => {
-    const soft = drillVoiceOf(true, drillLoadOf(0.3))
-    const hard = drillVoiceOf(true, drillLoadOf(2))
-    expect(hard.frequency).toBeLessThan(soft.frequency)
-    expect(hard.gain).toBeGreaterThan(soft.gain)
+    const soft = drillLoadOf(0.3)
+    const hard = drillLoadOf(2)
+    expect(drillFrequencyOf(hard)).toBeLessThan(drillFrequencyOf(soft))
+    expect(drillGainOf(true, hard)).toBeGreaterThan(drillGainOf(true, soft))
   })
 
   it('keeps the drill load within 0 to 1 and silent with no tile', () => {
-    expect(drillLoadOf(null)).toBe(0)
+    expect(drillLoadOf(secondsPerTileOf({ state: 'none', text: '-' }))).toBe(0)
     expect(drillLoadOf(1e9)).toBeLessThan(1)
-    expect(drillVoiceOf(false, 0.5).gain).toBe(0)
+    expect(drillLoadOf(secondsPerTileOf({ state: 'blocked', text: 'needs a better tip' }))).toBe(1)
+    expect(secondsPerTileOf({ state: 'time', text: '0.50 s', ticks: 30 })).toBe(0.5)
+    expect(drillGainOf(false, 0.5)).toBe(0)
   })
 
   it('chugs faster and louder with speed, up to its top speed', () => {
-    expect(engineVoiceOf(6).frequency).toBeGreaterThan(engineVoiceOf(0).frequency)
-    expect(engineVoiceOf(-6)).toEqual(engineVoiceOf(6))
-    expect(engineVoiceOf(100)).toEqual(engineVoiceOf(16))
+    expect(enginePuffsOf(6)).toBeGreaterThan(enginePuffsOf(0))
+    expect(engineGainOf(6)).toBeGreaterThan(engineGainOf(0))
+    expect(enginePuffsOf(-6)).toBe(enginePuffsOf(6))
+    expect(enginePuffsOf(100)).toBe(enginePuffsOf(16))
   })
 
   it('hisses only while lifting', () => {

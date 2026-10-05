@@ -12,6 +12,7 @@ import { PlanetTerrain } from './PlanetTerrain'
 import { PlatformPlaceholder } from './PlatformPlaceholder'
 import { ScreenFeedback } from './ScreenFeedback'
 import { SkyBackground } from './SkyBackground'
+import { SoundStage } from './SoundStage'
 import { Sparks } from './Sparks'
 import { Vehicle } from './Vehicle'
 
@@ -30,6 +31,7 @@ export function GameScene() {
         <Vehicle />
       </PhysicsWorld>
       <Sparks />
+      <SoundStage />
     </Canvas>
   )
 }

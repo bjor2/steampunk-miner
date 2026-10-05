@@ -10,6 +10,8 @@ import {
   PLANET_TUNING_SEMITONES,
   TENSION_FULL_DEPTH_TILES,
 } from '../../constants/audio'
+import { MM_PER_METRE } from '../../constants/physics'
+import type { Enemy } from '../authority/combat/combatState'
 
 export interface MusicLayers {
   platform: number
@@ -29,15 +31,19 @@ export const SILENT_LAYERS: MusicLayers = { platform: 0, ambience: 0, tension: 0
 
 const LAYER_NAMES = ['platform', 'ambience', 'tension', 'combat'] as const
 
+/** The layers' targets for this moment, written in place (the stage asks every frame). */
+export function writeMusicTargets(moment: MusicMoment, targets: MusicLayers): void {
+  const underground = !moment.isDocked && moment.depthTiles > 0 ? 1 : 0
+  targets.platform = 1 - underground
+  targets.ambience = underground
+  targets.tension = underground * Math.min(moment.depthTiles / TENSION_FULL_DEPTH_TILES, 1)
+  targets.combat = moment.isDocked ? 0 : combatShareOf(moment.nearestEnemyMetres)
+}
+
 export function musicTargetsOf(moment: MusicMoment): MusicLayers {
-  if (moment.isDocked) return { ...SILENT_LAYERS, platform: 1 }
-  const underground = moment.depthTiles > 0 ? 1 : 0
-  return {
-    platform: 1 - underground,
-    ambience: underground,
-    tension: underground * Math.min(moment.depthTiles / TENSION_FULL_DEPTH_TILES, 1),
-    combat: combatShareOf(moment.nearestEnemyMetres),
-  }
+  const targets = { ...SILENT_LAYERS }
+  writeMusicTargets(moment, targets)
+  return targets
 }
 
 /** Semitones every layer is shifted on this planet: planet 1 as written, each next one lower. */
@@ -54,4 +60,20 @@ export function easeLayers(layers: MusicLayers, targets: MusicLayers, dt: number
 function combatShareOf(nearestEnemyMetres: number | null): number {
   if (nearestEnemyMetres === null) return 0
   return Math.max(0, 1 - nearestEnemyMetres / COMBAT_RANGE_METRES)
+}
+
+/** Metres from a point (metres) to the nearest enemy, or null with none. */
+export function nearestEnemyMetresOf(
+  enemies: readonly Enemy[],
+  x: number,
+  y: number,
+): number | null {
+  let nearestSq: number | null = null
+  for (const enemy of enemies) {
+    const dx = enemy.x / MM_PER_METRE - x
+    const dy = enemy.y / MM_PER_METRE - y
+    const distanceSq = dx * dx + dy * dy
+    if (nearestSq === null || distanceSq < nearestSq) nearestSq = distanceSq
+  }
+  return nearestSq === null ? null : Math.sqrt(nearestSq)
 }

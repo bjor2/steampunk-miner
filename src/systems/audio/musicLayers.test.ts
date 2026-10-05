@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   easeLayers,
   musicTargetsOf,
+  nearestEnemyMetresOf,
   planetTuningOf,
   SILENT_LAYERS,
   type MusicLayers,
@@ -47,6 +48,13 @@ describe('music layers', () => {
     expect(at30.platform).toBeCloseTo(at144.platform, 6)
     expect(at30.platform).toBeGreaterThan(0)
     expect(at30.platform).toBeLessThan(1)
+  })
+
+  it('measures the nearest enemy in metres, or none with no enemy', () => {
+    const at = (x: number, y: number) =>
+      ({ x: x * 1000, y: y * 1000 }) as Parameters<typeof nearestEnemyMetresOf>[0][number]
+    expect(nearestEnemyMetresOf([], 0, 0)).toBeNull()
+    expect(nearestEnemyMetresOf([at(10, 0), at(3, 4)], 0, 0)).toBe(5)
   })
 
   it('tunes planet 2 differently from planet 1', () => {
