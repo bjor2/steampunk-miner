@@ -14,6 +14,7 @@ byte-identical sidecar (#52 acceptance 5).
 """
 
 import hashlib
+import json
 import os
 import sys
 
@@ -77,8 +78,6 @@ def asset_problems(asset_id):
 
 
 def manifest_form_of(asset_id):
-    import json
-
     with open(os.path.join(asset_layout.REPO_ROOT, 'art', 'asset-manifest.json'), encoding='utf-8') as file:
         manifest = json.load(file)
     forms = [entry['form'] for entry in manifest['assets'] if entry['id'] == asset_id]
