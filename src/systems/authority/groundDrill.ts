@@ -208,7 +208,7 @@ function damageEvent(
   return { type: 'DrillDamageDealt', tx: tile.tx, ty: tile.ty, ticks, damage }
 }
 
-/** Lining the drill cleared, never ore (#41); nothing when it cut no casing. */
+/** The lining the drill cleared (#41), logged once per drill command (#56 Q3); nothing when none. */
 function casingDrilledEvents({ casingCleared }: Carve): DomainEventBody[] {
   if (casingCleared.samples === 0) return []
   return [{ type: 'CasingDrilled', ...casingCleared }]
