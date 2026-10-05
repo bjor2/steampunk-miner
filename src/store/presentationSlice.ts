@@ -1,6 +1,6 @@
 /**
- * The game store's presentation slice (#33): local settings and rebinding, which layer is open,
- * menu focus and the travel confirmation. None of it is authority state, a command, a log line or
+ * The game store's presentation slice (#33): local settings and rebinding, which layer is open
+ * (the artefact cache's cards too, #46), menu focus and the travel confirmation. None of it is authority state, a command, a log line or
  * part of the digest; buttons that change the world submit ordinary authority commands.
  *
  * Kept beside the store so the store stays one reason to change; `gameStore` spreads it in, so
@@ -16,6 +16,8 @@ import {
   type InputContext,
 } from '../systems/input/actionMap'
 import type { CommandIntent } from '../systems/authority/authorityCommand'
+import type { DomainEvent } from '../systems/authority/domainEvent'
+import { isChoiceOpenAfter } from '../systems/views/artefactChoiceModel'
 import { topLayerOf } from '../systems/input/inputRouting'
 import {
   DEFAULT_PREFERENCES,
@@ -52,6 +54,8 @@ export interface PresentationValues {
    */
   bindingProblems: readonly string[]
   isSettingsOpen: boolean
+  /** The artefact cache's three cards (#46): open on this player's `artefact_open`. */
+  isArtefactChoiceOpen: boolean
   focusedControlId: string | null
   /** The first press of Travel arms it; only the second submits (#33 section 6). */
   isTravelArmed: boolean
@@ -85,6 +89,10 @@ export interface PresentationActions {
   cancelRebinding(): void
   openSettings(): void
   closeSettings(): void
+  /** "Leave it" or Escape on the cache's cards: no pick, the cache stays live. */
+  closeArtefactChoice(): void
+  /** Opens or closes the cards as the authority's answers say (`artefact_open`, `_chosen`). */
+  followArtefactChoice(events: readonly DomainEvent[]): void
   moveFocus(step: -1 | 1): void
   activateFocusedControl(): void
   /** A screen button by id, as a click or `ui_confirm` presses it; a disabled one does nothing. */
@@ -104,6 +112,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
   bindings: defaultBindings(ACTION_MAP),
   bindingProblems: [],
   isSettingsOpen: false,
+  isArtefactChoiceOpen: false,
   focusedControlId: null,
   isTravelArmed: false,
   rebindingActionId: null,
@@ -111,7 +120,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
 }
 
 export function inputLayerOf(state: SliceHost): InputContext {
-  return topLayerOf(state.vehicle.mode, state.isSettingsOpen)
+  return topLayerOf(state.vehicle.mode, state)
 }
 
 export function presentationActionsOf(set: SetSlice, get: () => SliceHost): PresentationActions {
@@ -162,6 +171,13 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
     openSettings: () => set({ isSettingsOpen: true, focusedControlId: null, isTravelArmed: false }),
     closeSettings: () =>
       set({ isSettingsOpen: false, focusedControlId: null, rebindingActionId: null }),
+    closeArtefactChoice: () => set({ isArtefactChoiceOpen: false, focusedControlId: null }),
+    followArtefactChoice: (events) => {
+      const isOpen = isChoiceOpenAfter(events, get().playerId, get().isArtefactChoiceOpen)
+      if (isOpen !== get().isArtefactChoiceOpen) {
+        set({ isArtefactChoiceOpen: isOpen, focusedControlId: null })
+      }
+    },
     moveFocus: (step) => set({ focusedControlId: movedFocus(get(), step) }),
     activateFocusedControl: () => void get().pressScreenButton(focusedControlOf(get())),
     pressScreenButton: (buttonId) => {
@@ -182,6 +198,7 @@ function runButtonAction(state: SliceHost, action: ButtonAction): void {
   if (action.kind === 'submit') state.submitPlayerIntent(action.intent)
   else if (action.kind === 'openSettings') state.openSettings()
   else if (action.kind === 'closeSettings') state.closeSettings()
+  else if (action.kind === 'closeArtefactChoice') state.closeArtefactChoice()
   else if (action.kind === 'togglePreference') state.togglePreference(action.name)
   else if (action.kind === 'rebind') state.startRebinding(action.actionId)
   else if (action.kind === 'resetBindings') state.resetBindings()

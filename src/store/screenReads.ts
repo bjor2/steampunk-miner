@@ -13,8 +13,10 @@ import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
+import type { ArtefactChoiceModel } from '../systems/views/artefactChoiceModel'
 import { readPlayedStingers } from './musicStingerRecord'
 import {
+  artefactChoiceModelOf,
   bayScreenOf,
   hudModelOf,
   plaqueModelOf,
@@ -61,4 +63,9 @@ function readMusicMoment(): MusicMoment {
 /** The music's layer targets, settings and stingers now, as the sound stage plays them (#49). */
 export function readAudioModel(): AudioModel {
   return selectAudioModel(readMusicMoment(), useGameStore.getState().prefs, readPlayedStingers())
+}
+
+/** The artefact cache's three cards (#46) as they are drawn while open. */
+export function readArtefactChoiceModel(): ArtefactChoiceModel {
+  return artefactChoiceModelOf(useGameStore.getState())
 }

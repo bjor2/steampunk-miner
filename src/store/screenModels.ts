@@ -1,8 +1,9 @@
 /**
  * The screens as their view models, read from the authority replica and the store's presentation
- * state (#33, #37): the HUD, the Sell bay and Upgrade bay screens and the settings overlay. The
- * debug API's `ui.get*Model()` reads and the DOM components read the same functions, so what a
- * spec asserts is what the screen draws. Read on demand, never stored per tick.
+ * state (#33, #37): the HUD, the Sell bay and Upgrade bay screens, the settings overlay and the
+ * artefact cache's cards (#46). The debug API's `ui.get*Model()` reads and the DOM components read
+ * the same functions, so what a spec asserts is what the screen draws. Read on demand, never
+ * stored per tick.
  */
 import type { ActionId, Bindings, InputContext } from '../systems/input/actionMap'
 import type { Preferences } from '../systems/input/preferences'
@@ -34,6 +35,11 @@ import {
   type SettingsModel,
 } from '../systems/views/settingsModel'
 import type { ScreenButton } from '../systems/views/viewParts'
+import {
+  ARTEFACT_CHOICE_START_FOCUS,
+  selectArtefactChoiceModel,
+  type ArtefactChoiceModel,
+} from '../systems/views/artefactChoiceModel'
 import { readAuthorityState } from './authorityLink'
 
 /** What the screens read from the store besides the authority. */
@@ -112,10 +118,15 @@ export function settingsModelOf(sources: ScreenSources): SettingsModel {
   return selectSettingsModel(sources)
 }
 
+export function artefactChoiceModelOf(sources: ScreenSources): ArtefactChoiceModel {
+  return selectArtefactChoiceModel(readAuthorityState(), sources.playerId)
+}
+
 /** The focusable buttons of a menu layer; the vehicle layer has none. */
 export function menuScreenOf(layer: InputContext, sources: ScreenSources): MenuScreen {
   if (layer === 'platform') return bayMenu(bayScreenOf(sources))
   if (layer === 'settings') return settingsMenu(settingsModelOf(sources))
+  if (layer === 'artefact') return artefactMenu(artefactChoiceModelOf(sources))
   return NO_MENU
 }
 
@@ -139,5 +150,13 @@ function settingsMenu(model: SettingsModel): MenuScreen {
       model.reset,
       model.close,
     ],
+  }
+}
+
+function artefactMenu(model: ArtefactChoiceModel): MenuScreen {
+  return {
+    focusStops: model.focusStops,
+    startFocus: ARTEFACT_CHOICE_START_FOCUS,
+    buttons: [...model.cards.map((card) => card.choose), model.leave],
   }
 }

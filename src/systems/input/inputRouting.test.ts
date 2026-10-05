@@ -6,6 +6,7 @@ const DRIVING: InputSituation = {
   vehicleMode: 'active',
   dockableBay: null,
   dockedBay: null,
+  canOpenArtefactCache: false,
 }
 const ON_PAD: InputSituation = { ...DRIVING, dockableBay: 'sell' }
 const DOCKED: InputSituation = {
@@ -13,9 +14,13 @@ const DOCKED: InputSituation = {
   vehicleMode: 'docked',
   dockableBay: null,
   dockedBay: 'sell',
+  canOpenArtefactCache: false,
 }
+const OVER_CACHE: InputSituation = { ...DRIVING, canOpenArtefactCache: true }
 const AT_UPGRADE_BAY: InputSituation = { ...DOCKED, dockedBay: 'upgrade' }
 const SETTINGS: InputSituation = { ...DRIVING, layer: 'settings' }
+const CARDS: InputSituation = { ...DRIVING, layer: 'artefact' }
+const NO_OVERLAY = { isSettingsOpen: false, isArtefactChoiceOpen: false }
 
 const submitted = (type: string, payload: object = {}) => ({
   kind: 'submit',
@@ -32,6 +37,17 @@ describe('input routing', () => {
     expect(reactionToPress('interact', { ...DRIVING, dockableBay: 'upgrade' })).toEqual(
       submitted('dock', { bay: 'upgrade' }),
     )
+  })
+
+  it('opens the artefact cache on interact exactly when the authority would accept it (#46)', () => {
+    expect(reactionToPress('interact', OVER_CACHE)).toEqual(submitted('openArtefactCache'))
+  })
+
+  it('closes the cache cards with ui_cancel, sending nothing, and moves focus on them', () => {
+    expect(reactionToPress('ui_cancel', CARDS)).toEqual({ kind: 'closeArtefactChoice' })
+    expect(reactionToPress('ui_right', CARDS)).toEqual({ kind: 'moveFocus', step: 1 })
+    expect(reactionToPress('ui_confirm', CARDS)).toEqual({ kind: 'activateFocused' })
+    expect(reactionToPress('interact', CARDS)).toEqual({ kind: 'none' })
   })
 
   it('undocks when the platform screen is closed with ui_cancel', () => {
@@ -73,8 +89,14 @@ describe('input routing', () => {
   })
 
   it('puts settings over everything and the platform screen over the vehicle while docked', () => {
-    expect(topLayerOf('docked', true)).toBe('settings')
-    expect(topLayerOf('docked', false)).toBe('platform')
-    expect(topLayerOf('stranded', false)).toBe('vehicle')
+    expect(topLayerOf('docked', { ...NO_OVERLAY, isSettingsOpen: true })).toBe('settings')
+    expect(topLayerOf('docked', NO_OVERLAY)).toBe('platform')
+    expect(topLayerOf('stranded', NO_OVERLAY)).toBe('vehicle')
+  })
+
+  it('puts the cache cards over the vehicle and under settings', () => {
+    const cardsOpen = { ...NO_OVERLAY, isArtefactChoiceOpen: true }
+    expect(topLayerOf('active', cardsOpen)).toBe('artefact')
+    expect(topLayerOf('active', { ...cardsOpen, isSettingsOpen: true })).toBe('settings')
   })
 })

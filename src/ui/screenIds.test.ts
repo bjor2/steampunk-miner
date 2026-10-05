@@ -14,9 +14,17 @@ import {
 } from '../store/screenReads'
 import {
   createScriptedSession,
+  FREEZE_ENEMIES,
   mineTile,
+  PARAMS,
   surfaceOreTiles,
 } from '../systems/authority/scriptedSession'
+import {
+  selectArtefactChoiceModel,
+  type ArtefactChoiceModel,
+} from '../systems/views/artefactChoiceModel'
+import { artefactCacheTile } from '../systems/world/artefactCache'
+import { ArtefactChoiceView } from './artefact/ArtefactChoiceView'
 import { teleportToDockCommand } from '../systems/vehicle/vehicleCommands'
 import { selectHudModel, type HudModel } from '../systems/views/hudModel'
 import type { BayFooter, BayHeader } from '../systems/views/bayFrame'
@@ -99,6 +107,7 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
       ? {}
       : { [UI_IDS.hudRescueCountdown]: model.vehicleState.rescueCountdownText }),
     ...(model.dockPrompt.isShown ? { [UI_IDS.hudDockPrompt]: model.dockPrompt.text } : {}),
+    ...(model.cachePrompt.isShown ? { [UI_IDS.hudCachePrompt]: model.cachePrompt.text } : {}),
     ...(model.isDebugRun ? { [UI_IDS.hudDebugMark]: 'DEBUG RUN' } : {}),
     ...(model.warning.level === 'ok' ? {} : { [UI_IDS.hudWarningEnergy]: model.warning.text }),
   }
@@ -171,6 +180,10 @@ function settingsTexts(model: SettingsModel): Partial<Record<UiId, string | null
   }
 }
 
+function artefactChoiceTexts(model: ArtefactChoiceModel): Partial<Record<UiId, string | null>> {
+  return { [UI_IDS.artefactChoice]: null, [UI_IDS.artefactLeave]: model.leave.label }
+}
+
 function plaqueTexts(model: PlaqueModel): Partial<Record<UiId, string | null>> {
   return {
     ...(model.hint === null ? {} : { [UI_IDS.hudHintPlaque]: model.hint.lines.join('') }),
@@ -240,6 +253,37 @@ function renderFullHoldHud(): string[] {
   return checkScreen(createElement(HudView, { model, isFlashing: false }), hudTexts(model))
 }
 
+/** The HUD over the planet's artefact cache, and the cache's cards (#46). */
+function renderAtArtefactCache(): string[] {
+  const session = createScriptedSession()
+  const cache = artefactCacheTile(PARAMS)
+  session.submit(1, FREEZE_ENEMIES)
+  session.submit(2, { ...strandedPoseIntent(), payload: poseOnTile(cache) })
+  const hud = selectHudModel({
+    state: session.state(),
+    playerId: 'p1',
+    depthTiles: 0,
+    bindings: game().bindings,
+  })
+  expect(hud.cachePrompt.isShown).toBe(true)
+  const cards = selectArtefactChoiceModel(session.state(), 'p1')
+  return [
+    ...checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud)),
+    ...checkScreen(
+      createElement(ArtefactChoiceView, { model: cards, focusedId: 'artefact-leave' }),
+      artefactChoiceTexts(cards),
+    ),
+  ]
+}
+
+function strandedPoseIntent() {
+  return { type: 'reportPose' as const, payload: strandedPose }
+}
+
+function poseOnTile(tile: { tx: number; ty: number }) {
+  return { ...strandedPose, x: tile.tx * 1000 + 500, y: tile.ty * 1000 + 500 }
+}
+
 function tap(action: Parameters<typeof pressAction>[0]): void {
   pressAction(action)
   releaseAction(action)
@@ -285,6 +329,7 @@ describe('screen ids (#33 acceptance 12)', () => {
     game().setEnergy('0')
     keep(renderHud())
     keep(renderFullHoldHud())
+    keep(renderAtArtefactCache())
     expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
   })
 

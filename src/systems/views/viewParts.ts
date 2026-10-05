@@ -23,6 +23,7 @@ export type ButtonAction =
   | { kind: 'armTravel' }
   | { kind: 'openSettings' }
   | { kind: 'closeSettings' }
+  | { kind: 'closeArtefactChoice' }
   | { kind: 'togglePreference'; name: PreferenceName }
   | { kind: 'rebind'; actionId: ActionId }
   | { kind: 'resetBindings' }

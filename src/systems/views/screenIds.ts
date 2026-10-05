@@ -24,6 +24,7 @@ export const UI_IDS = {
   hudState: 'hud-state',
   hudRescueCountdown: 'hud-rescue-countdown',
   hudDockPrompt: 'hud-dock-prompt',
+  hudCachePrompt: 'hud-cache-prompt',
   hudDebugMark: 'hud-debug-mark',
   hudWarningEnergy: 'hud-warning-energy',
   hudHintPlaque: 'hud-hint-plaque',
@@ -62,6 +63,8 @@ export const UI_IDS = {
   platformEndCard: 'platform-end-card',
   platformUndock: 'platform-undock',
   platformSettings: 'platform-settings',
+  artefactChoice: 'artefact-choice',
+  artefactLeave: 'artefact-leave',
   settingsPanel: 'settings-panel',
   settingsBindingProblems: 'settings-binding-problems',
   settingsResetBindings: 'settings-reset-bindings',
@@ -83,6 +86,8 @@ export const UI_ID_TEMPLATES = {
   workshopUpgradeEffectAfter: (upgradeId: UpgradeId) =>
     `workshop-upgrade-${upgradeId}-effect-after`,
   workshopUpgradeBuy: (upgradeId: UpgradeId) => `workshop-upgrade-${upgradeId}-buy`,
+  artefactCard: (optionId: string) => `artefact-card-${optionId}`,
+  artefactChoose: (optionId: string) => `artefact-choose-${optionId}`,
   settingsToggle: (name: string) => `settings-toggle-${name}`,
   settingsRebind: (actionId: string) => `settings-rebind-${actionId}`,
 } as const

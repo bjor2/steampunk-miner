@@ -3,13 +3,16 @@
  * actions, `buildIntent`) or, on a press, one reaction from this table. A reaction that changes
  * the world is an ordinary authority command; the rest move UI state. Nothing here mutates state.
  *
- * Contexts are layers: `settings` over everything, then `platform` while docked (the screen is
- * open exactly then), else `vehicle`. Escape closes the top layer: settings, then the platform
- * screen (that is `Undock`), and in `vehicle` it opens settings. An action outside its context, a
- * dock the authority would refuse, the quick action away from the Sell bay (#37, #40) and a tow
- * call while the vehicle can still move do nothing and are not buffered.
+ * Contexts are layers: `settings` over everything, then the artefact cache's cards while open
+ * (#46), then `platform` while docked (the screen is open exactly then), else `vehicle`. Escape
+ * closes the top layer: settings, the cards (no pick, the cache stays live), then the platform
+ * screen (that is `Undock`), and in `vehicle` it opens settings. `interact` opens a live cache the
+ * vehicle is over, else docks. An action outside its context, a dock or open the authority would
+ * refuse, the quick action away from the Sell bay (#37, #40) and a tow call while the vehicle can
+ * still move do nothing and are not buffered.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
+import { openArtefactCacheCommand } from '../artefacts/artefactCommands'
 import { dockCommand, quickServiceCommand, undockCommand } from '../platform/platformCommands'
 import { requestRescueCommand } from '../vehicle/vehicleCommands'
 import type { ZoomChange } from '../render/viewZoom'
@@ -21,6 +24,7 @@ export type InputReaction =
   | { kind: 'submit'; intent: CommandIntent }
   | { kind: 'openSettings' }
   | { kind: 'closeSettings' }
+  | { kind: 'closeArtefactChoice' }
   | { kind: 'moveFocus'; step: -1 | 1 }
   | { kind: 'activateFocused' }
   | { kind: 'zoom'; change: ZoomChange }
@@ -34,6 +38,14 @@ export interface InputSituation {
   dockableBay: BayId | null
   /** The bay the vehicle is docked at; null while it is not docked. */
   dockedBay: BayId | null
+  /** `canOpenArtefactCache` (#46): the cache prompt shows, and `interact` opens it, exactly then. */
+  canOpenArtefactCache: boolean
+}
+
+/** The overlays that sit above the vehicle or platform layer when open. */
+export interface OpenOverlays {
+  isSettingsOpen: boolean
+  isArtefactChoiceOpen: boolean
 }
 
 type ReactionRule = (situation: InputSituation) => InputReaction
@@ -52,7 +64,7 @@ const REACTIONS_BY_LAYER: Readonly<
   Record<InputContext, Readonly<Partial<Record<ActionId, ReactionRule>>>>
 > = {
   vehicle: {
-    interact: ({ dockableBay }) => (dockableBay === null ? NONE : submit(dockCommand(dockableBay))),
+    interact: interactReaction,
     request_rescue: ({ vehicleMode }) =>
       isWaitingForTow(vehicleMode) ? submit(requestRescueCommand()) : NONE,
     open_settings: () => ({ kind: 'openSettings' }),
@@ -65,6 +77,10 @@ const REACTIONS_BY_LAYER: Readonly<
     quick_service: ({ dockedBay }) => (dockedBay === 'sell' ? submit(quickServiceCommand()) : NONE),
     ui_cancel: () => submit(undockCommand()),
   },
+  artefact: {
+    ...MENU_REACTIONS,
+    ui_cancel: () => ({ kind: 'closeArtefactChoice' }),
+  },
   settings: {
     ...MENU_REACTIONS,
     ui_cancel: () => ({ kind: 'closeSettings' }),
@@ -75,10 +91,17 @@ export function reactionToPress(action: ActionId, situation: InputSituation): In
   return REACTIONS_BY_LAYER[situation.layer][action]?.(situation) ?? NONE
 }
 
-/** The layer input goes to: the settings overlay, else the dock screen while docked. */
-export function topLayerOf(vehicleMode: VehicleMode, isSettingsOpen: boolean): InputContext {
-  if (isSettingsOpen) return 'settings'
+/** The layer input goes to: settings, the cache's cards, else the dock screen while docked. */
+export function topLayerOf(vehicleMode: VehicleMode, overlays: OpenOverlays): InputContext {
+  if (overlays.isSettingsOpen) return 'settings'
+  if (overlays.isArtefactChoiceOpen) return 'artefact'
   return vehicleMode === 'docked' ? 'platform' : 'vehicle'
+}
+
+/** The cache and the pad are far apart, so at most one of the two applies. */
+function interactReaction(situation: InputSituation): InputReaction {
+  if (situation.canOpenArtefactCache) return submit(openArtefactCacheCommand())
+  return situation.dockableBay === null ? NONE : submit(dockCommand(situation.dockableBay))
 }
 
 /** `request_rescue` is live only for a vehicle that cannot move on its own (#7). */

@@ -6,6 +6,7 @@
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
 import type { AuthorityState } from '../authority/authorityState'
+import { canOpenArtefactCache } from '../authority/artefactRules'
 import { dockableBayOf } from '../authority/dockRules'
 import { BAY_NAMES } from './bayNames'
 import { serviceQuote } from '../authority/platformServices'
@@ -89,6 +90,8 @@ export interface HudModel {
   tileTime: TileTime
   vehicleState: VehicleStateReading
   dockPrompt: DockPrompt
+  /** "E: Ancient cache" exactly while `interact` would open a live cache (#46). */
+  cachePrompt: DockPrompt
   isDebugRun: boolean
   warning: EnergyWarning
 }
@@ -116,6 +119,7 @@ export function selectHudModel(sources: HudSources): HudModel {
     tileTime: tileTimeAhead(state, playerId),
     vehicleState: vehicleStateReadingOf(vehicle, state.tick),
     dockPrompt: dockPromptOf(state, playerId, sources.bindings),
+    cachePrompt: cachePromptOf(state, playerId, sources.bindings),
     isDebugRun: state.debugApplied,
     warning: energyWarningOf(vehicle, sources.depthTiles),
   }
@@ -184,6 +188,13 @@ function dockPromptOf(state: AuthorityState, playerId: string, bindings: Binding
   return {
     isShown: bay !== null,
     text: bay === null ? '' : `${label}: Dock at the ${BAY_NAMES[bay]}`,
+  }
+}
+
+function cachePromptOf(state: AuthorityState, playerId: string, bindings: Bindings): DockPrompt {
+  return {
+    isShown: canOpenArtefactCache(state, playerId),
+    text: `${boundLabel(bindings, 'interact')}: Ancient cache`,
   }
 }
 

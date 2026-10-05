@@ -1,4 +1,5 @@
 import { GameScene } from './scene/GameScene'
+import { ArtefactChoice } from './ui/artefact/ArtefactChoice'
 import { EndOfSliceCard } from './ui/EndOfSliceCard'
 import { Hud } from './ui/hud/Hud'
 import { PlatformScreen } from './ui/platform/PlatformScreen'
@@ -15,6 +16,7 @@ export default function App() {
       <Plaques />
       <TravelTransitionCard />
       <EndOfSliceCard />
+      <ArtefactChoice />
       <SettingsPanel />
     </>
   )

@@ -362,6 +362,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
   startTravelTransition(travelTransitionOf(events))
   useGameStore.getState().observePlaques(events)
+  useGameStore.getState().followArtefactChoice(events)
   announceFeedback(events, useGameStore.getState().playerId)
   recordMusicStingers(events, useGameStore.getState().playerId)
   recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)

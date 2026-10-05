@@ -13,6 +13,7 @@ import { ACTION_MAP, actionDefOf, actionsOfChord, type ActionId } from '../syste
 import { buildIntent } from '../systems/input/buildIntent'
 import { reactionToPress, type InputReaction } from '../systems/input/inputRouting'
 import { chordOf } from '../systems/input/keyCodes'
+import { canOpenArtefactCache } from '../systems/authority/artefactRules'
 import { dockableBayOf, dockedBayOf } from '../systems/authority/dockRules'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { readAuthorityState } from './authorityLink'
@@ -103,11 +104,13 @@ function captureRebinding(key: KeyChange): void {
 
 function situationNow() {
   const game = useGameStore.getState()
+  const state = readAuthorityState()
   return {
     layer: inputLayerOf(game),
     vehicleMode: game.vehicle.mode,
     dockableBay: dockableBayOf(readAuthorityState(), game.playerId),
     dockedBay: dockedBayOf(readAuthorityState(), game.playerId),
+    canOpenArtefactCache: canOpenArtefactCache(readAuthorityState(), game.playerId),
   }
 }
 
@@ -116,6 +119,7 @@ function applyReaction(reaction: InputReaction): void {
   if (reaction.kind === 'submit') game.submitPlayerIntent(reaction.intent)
   else if (reaction.kind === 'openSettings') game.openSettings()
   else if (reaction.kind === 'closeSettings') game.closeSettings()
+  else if (reaction.kind === 'closeArtefactChoice') game.closeArtefactChoice()
   else if (reaction.kind === 'moveFocus') game.moveFocus(reaction.step)
   else if (reaction.kind === 'activateFocused') game.activateFocusedControl()
   else if (reaction.kind === 'zoom') game.zoom(reaction.change)

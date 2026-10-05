@@ -1,6 +1,6 @@
 {
   "inputMapVersion": 2,
-  "contexts": ["vehicle", "platform", "settings"],
+  "contexts": ["vehicle", "platform", "artefact", "settings"],
   "reservedKeys": ["Escape"],
   "actions": [
     {
@@ -55,42 +55,42 @@
     {
       "id": "ui_up",
       "displayName": "Focus up",
-      "contexts": ["platform", "settings"],
+      "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
       "keyboard": ["ArrowUp", "KeyW"]
     },
     {
       "id": "ui_down",
       "displayName": "Focus down",
-      "contexts": ["platform", "settings"],
+      "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
       "keyboard": ["ArrowDown", "KeyS"]
     },
     {
       "id": "ui_left",
       "displayName": "Focus left",
-      "contexts": ["platform", "settings"],
+      "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
       "keyboard": ["ArrowLeft", "KeyA"]
     },
     {
       "id": "ui_right",
       "displayName": "Focus right",
-      "contexts": ["platform", "settings"],
+      "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
       "keyboard": ["ArrowRight", "KeyD"]
     },
     {
       "id": "ui_confirm",
       "displayName": "Confirm",
-      "contexts": ["platform", "settings"],
+      "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
       "keyboard": ["Enter", "Space", "KeyE"]
     },
     {
       "id": "ui_cancel",
       "displayName": "Back",
-      "contexts": ["platform", "settings"],
+      "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
       "keyboard": ["Escape", "Backspace"]
     },
