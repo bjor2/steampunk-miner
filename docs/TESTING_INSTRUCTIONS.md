@@ -33,7 +33,8 @@ only be trusted by looking at it, look at it and say so in the commit.
   - Anything a pure rule can answer (motion, gravity, swivel, pose quantising) is tested in
     `src/systems/` instead; feel (how driving or the camera looks) stays a hand check.
 - `electron/` – no tests yet (the main process is thin). Its one rule worth testing, run-id
-  validation in `runLogFiles.cts`, mirrors `isValidRunId`, which is tested.
+  validation in `runLogFiles.cts`, mirrors `isValidRunId`, which is tested. The save writer
+  (`saveFiles.cts`: atomic write, set-aside, folder and slot checks) is smoke-checked by hand in node.
 
 ## 2. Conventions
 
@@ -77,6 +78,11 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   a value-equality tester, so `toEqual(fromCanonical('1.5'))` matches `1.50`.
 - Store actions that change world or economy go through the authority: to check that one submits instead
   of writing state, pass a spy `Authority` to `resetGameStore(authority)`.
+- Checkpoint specs (#26): the save slot's rules (format, epochs, refusals, digest after a restore) are
+  tested on the pure `src/systems/save/`; store specs install an in-memory `SaveSlots` with
+  `installSaveSlots(...)`, `await checkpointWrites()` before reading what was written, and simulate quit
+  and resume as `resetGameStore()` plus the same slots, then `loadCheckpoint()` and `resumeCheckpoint`.
+  Uninstall with `installSaveSlots(null)` in `afterEach`.
 - Stubs in `src/debug/debugApi.ts` throw `DebugCommandNotImplementedError`; implement them with the
   system they poke, never as a silent no-op.
 
