@@ -53,8 +53,8 @@ A **scenario** is the state a player would have had to earn, written down instea
 (design doc 19-20, decision #11 section 4). Files are `scenarios/*.scenario.json`, `scenarioVersion` 1,
 validated by `validateScenario` in `src/systems/scenario.ts`. They are **refused, never trimmed**: every
 problem is listed (unknown fields included) and nothing is applied. Start fields whose system is not
-built yet (`depthBp`, inventory, upgrades, unlocks, core fragments) are validated, then refused with a
-problem naming what is missing.
+built yet (`depthBp`, inventory, unlocks) are validated, then refused with a problem naming what is
+missing. `coreFragments` fills the platform's core bay (`debug.setCoreFragments`).
 
 - Applying a scenario submits `debug.*` authority commands (so it replays from `commands.ndjson` and logs
   `debug_command_applied`), then runs its script (`fastForward` steps).
@@ -65,7 +65,7 @@ problem naming what is missing.
   `setPlanetSeed`, `teleportToDepthTiles`, `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
   `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
   `setUpgrade(id, level)`, `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
-  `vehicleStats()`. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.getPrefs()`)
+  `vehicleStats()`; for the core, `setCoreFragments(count)`. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.getPrefs()`)
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2).
 - Run-log specs: every emitted line must pass `runEventProblems` (the schema registry in
   `src/logging/eventNames.ts`); a summary is always `deriveSummary(events)`.

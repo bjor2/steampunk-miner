@@ -21,6 +21,13 @@ describe('start scenario commands', () => {
     ])
   })
 
+  it('fills the core bay with debug.setCoreFragments after the planet is set', () => {
+    expect(startScenarioCommands({ planetTier: 2, coreFragments: 127 })).toEqual([
+      { type: 'debug.setPlanet', payload: { planetIndex: 2 } },
+      { type: 'debug.setCoreFragments', payload: { count: 127 } },
+    ])
+  })
+
   it('spells money canonically in the command', () => {
     expect(grantMoneyCommand('1.50').payload.amount).toBe('1.5e+0')
   })

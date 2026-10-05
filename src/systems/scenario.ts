@@ -11,9 +11,10 @@
  * fields included), and nothing is applied if there is any. Depth is integer (`depthBp` or
  * `depthTiles`), money a decimal string, ids are checked against their registries.
  *
- * Start fields whose system is not built yet (`depthBp` needs the planet radius; inventory,
- * unlocks and core fragments need their tickets) are validated, then refused with a problem naming
- * what is missing, so no file is ever half applied. Upgrade levels apply as `debug.setUpgrade`.
+ * Start fields whose system is not built yet (`depthBp` needs the planet radius; inventory and
+ * unlocks need their tickets) are validated, then refused with a problem naming what is missing,
+ * so no file is ever half applied. Upgrade levels apply as `debug.setUpgrade`, core fragments as
+ * `debug.setCoreFragments` (the platform's bay, #10).
  */
 import { isNonNegativeMoneyText } from './money'
 import { UPGRADE_IDS } from './registeredIds'
@@ -139,10 +140,7 @@ const START_FIELDS: Readonly<Record<string, FieldRule>> = {
     ...listRule(value, path, unlockIdProblems),
     ...notBuiltYetUnlessEmpty(value, path, 'unlocks (Build 7)'),
   ],
-  coreFragments: (value, path) => [
-    ...wholeNumberRule(value, path),
-    ...(value === 0 ? [] : [notBuiltYet(path, 'the core bay (Build 7)')]),
-  ],
+  coreFragments: wholeNumberRule,
 }
 
 const INVENTORY_FIELDS: Readonly<Record<string, FieldRule>> = {
@@ -259,12 +257,13 @@ function quote(value: unknown): string {
  * generator (Build 2) derives each planet's seed from it.
  */
 export function startOfScenario(scenario: Scenario): StartScenario {
-  const { planet, depthTiles, money, upgrades } = scenario.start
+  const { planet, depthTiles, money, upgrades, coreFragments } = scenario.start
   return {
     ...(planet === undefined ? {} : { planetTier: planet }),
     planetSeed: scenario.worldSeed,
     ...(depthTiles === undefined ? {} : { depthTiles }),
     ...(money === undefined ? {} : { money }),
     ...(upgrades === undefined ? {} : { upgrades }),
+    ...(coreFragments === undefined ? {} : { coreFragments }),
   }
 }

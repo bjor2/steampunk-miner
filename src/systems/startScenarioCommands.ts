@@ -17,6 +17,9 @@ export function startScenarioCommands(scenario: StartScenario): CommandIntent[] 
     ...(scenario.planetSeed === undefined ? [] : [setPlanetSeedCommand(scenario.planetSeed)]),
     ...(scenario.money === undefined ? [] : [setMoneyCommand(scenario.money)]),
     ...upgradeCommandsOf(scenario.upgrades ?? {}),
+    ...(scenario.coreFragments === undefined
+      ? []
+      : [setCoreFragmentsCommand(scenario.coreFragments)]),
   ]
 }
 
@@ -33,6 +36,10 @@ export function setPlanetCommand(planetTier: number): CommandIntent<'debug.setPl
 
 export function setPlanetSeedCommand(planetSeed: number): CommandIntent<'debug.setPlanetSeed'> {
   return { type: 'debug.setPlanetSeed', payload: { planetSeed } }
+}
+
+export function setCoreFragmentsCommand(count: number): CommandIntent<'debug.setCoreFragments'> {
+  return { type: 'debug.setCoreFragments', payload: { count } }
 }
 
 export function grantMoneyCommand(amount: string): CommandIntent<'debug.grantMoney'> {

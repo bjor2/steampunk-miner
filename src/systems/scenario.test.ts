@@ -66,6 +66,13 @@ describe('scenario validation', () => {
     expect(validateScenario({ ...minimal, start })).toEqual([])
   })
 
+  it('accepts core fragments now that the core bay exists, and refuses a fraction', () => {
+    expect(validateScenario({ ...minimal, start: { coreFragments: 63 } })).toEqual([])
+    expect(validateScenario({ ...minimal, start: { coreFragments: 1.5 } })).toEqual([
+      'scenario.start.coreFragments must be a whole number from 0 to 9007199254740991, got 1.5',
+    ])
+  })
+
   it('refuses an unknown unlock id', () => {
     expect(validateScenario({ ...minimal, start: { unlocks: ['jetpack'] } })).toContain(
       'scenario.start.unlocks[0] "jetpack" is not a registered unlock id',

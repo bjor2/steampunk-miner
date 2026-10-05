@@ -55,13 +55,16 @@ import {
   rechargeEnergyCommand,
   repairHullCommand,
   sellCargoCommand,
+  travelCommand,
   undockCommand,
 } from '../systems/platform/platformCommands'
 import type { PlanetParams } from '../systems/world/planetParams'
 import type { WorldState } from '../systems/world/worldState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
+import { travelTransitionOf, type TravelTransition } from '../systems/sliceProgress'
 import {
   grantMoneyCommand,
+  setCoreFragmentsCommand,
   setPlanetCommand,
   setPlanetSeedCommand,
   startScenarioCommands,
@@ -89,11 +92,15 @@ export interface GameState {
   vehicle: VehicleReplica
   /** Copied from the authority: the core bay and the platform's look (#8, #10). */
   platform: PlatformReplica
+  /** Copied from the authority: the bay has reached `coreNeeded` on this planet (#10). */
+  isCoreCompleted: boolean
   /**
    * Local presentation only (#13 accessibility, #11 amendment 2 `ui.setCameraMode`): never a
    * command, never logged, never in the digest.
    */
   cameraMode: CameraMode
+  /** The travel transition on screen (#8: at most 10 s, skippable); the state already changed. */
+  travelTransition: TravelTransition | null
 
   setPlanet(planetTier: number): void
   setPlanetSeed(planetSeed: number): void
@@ -126,6 +133,12 @@ export interface GameState {
   /** "Sell, repair and recharge" at current prices. */
   quickService(): void
   buyUpgrade(upgradeId: string): void
+  /** `Travel` to the next planet (#10), paying the fee and the core fragments it needs. */
+  travel(): void
+  /** Ends the travel transition early; only the animation is skipped. */
+  finishTravelTransition(): void
+  /** Debug: the platform's core bay to a whole number of fragments (#10 `setCoreFragments`). */
+  setCoreFragments(count: number): void
   /** One fixed physics step of the live game: the authority's clock moves one tick (#3). */
   advanceOneTick(): void
   /** Rotating (local down at the bottom of the screen) or fixed (north up); the view only. */
@@ -142,7 +155,9 @@ type GameValues = Pick<
   | 'debugApplied'
   | 'vehicle'
   | 'platform'
+  | 'isCoreCompleted'
   | 'cameraMode'
+  | 'travelTransition'
 >
 
 const STARTING_PLAYER_ID = 'player_1'
@@ -158,7 +173,9 @@ export const STARTING_VALUES: GameValues = {
   debugApplied: false,
   vehicle: vehicleReplicaOf(startingAuthorityState().players[STARTING_PLAYER_ID].vehicle),
   platform: platformReplicaOf(startingAuthorityState()),
+  isCoreCompleted: false,
   cameraMode: 'rotating',
+  travelTransition: null,
 }
 
 export const useGameStore = create<GameState>()((set, get) => ({
@@ -239,6 +256,12 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
   buyUpgrade: (upgradeId) => submitCommand(get().playerId, buyUpgradeCommand(upgradeId)),
 
+  travel: () => submitCommand(get().playerId, travelCommand(get().planetTier + 1)),
+
+  finishTravelTransition: () => set({ travelTransition: null }),
+
+  setCoreFragments: (count) => submitUnlessRefused(get().playerId, setCoreFragmentsCommand(count)),
+
   advanceOneTick: () => advanceAuthorityTo(readAuthorityState().tick + 1),
 
   setCameraMode: (cameraMode) => {
@@ -299,10 +322,18 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
   return { playerId: state.playerId, planet: state.planetTier, depthTiles: state.depthTiles }
 }
 
-/** The one writer of planet and wallet: copies them from the authority, then logs the events. */
+/**
+ * The one writer of planet and wallet: copies them from the authority, starts the travel
+ * transition when the events travelled, then logs the events.
+ */
 function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
+  startTravelTransition(travelTransitionOf(events))
   recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)
+}
+
+function startTravelTransition(transition: TravelTransition | null): void {
+  if (transition !== null) useGameStore.setState({ travelTransition: transition })
 }
 
 function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues> {
@@ -313,6 +344,7 @@ function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues>
     debugApplied: state.debugApplied,
     vehicle: vehicleReplicaOf(state.players[playerId].vehicle),
     platform: platformReplicaOf(state),
+    isCoreCompleted: state.core.isCompleted,
   }
 }
 

@@ -17,6 +17,7 @@ import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
 import { createRunMetadata } from './logging/runMetadata'
 import { getShell, type Shell } from './shell/shell'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
+import { recordStartingPlanetEntered } from './store/planetArrivalLog'
 import { parseScenario, type Scenario } from './systems/scenario'
 
 const LOG_FLUSH_INTERVAL_MS = 1000
@@ -33,6 +34,7 @@ export function startGame(): void {
   const shell = getShell()
   const run = startRunLogging(shell, new Date())
   recordGameStarted(shell)
+  recordStartingPlanetEntered()
   keepRunFilesWritten(shell, run)
   exposeDebugHandles(shell, run.runId)
   applyLaunchScenario(shell)

@@ -24,6 +24,8 @@ export interface StartScenario {
   money?: string
   /** Integer levels by upgrade id (#7); tracks not named keep their level. */
   upgrades?: Readonly<Record<string, number>>
+  /** Fragments in the platform's core bay (#10). */
+  coreFragments?: number
 }
 
 export function startScenarioProblems(scenario: StartScenario): string[] {
@@ -33,6 +35,7 @@ export function startScenarioProblems(scenario: StartScenario): string[] {
     ...depthTilesProblems(scenario.depthTiles),
     ...moneyProblems(scenario.money),
     ...upgradesProblems(scenario.upgrades),
+    ...coreFragmentsProblems(scenario.coreFragments),
   ]
 }
 
@@ -66,4 +69,10 @@ function moneyProblems(money: string | undefined): string[] {
   if (money === undefined) return []
   if (isNonNegativeMoneyText(money)) return []
   return [`money must be a decimal string >= 0 such as "1e30", got ${JSON.stringify(money)}`]
+}
+
+function coreFragmentsProblems(coreFragments: number | undefined): string[] {
+  if (coreFragments === undefined) return []
+  if (Number.isSafeInteger(coreFragments) && coreFragments >= 0) return []
+  return [`coreFragments must be a whole number >= 0, got ${coreFragments}`]
 }

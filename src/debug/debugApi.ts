@@ -35,6 +35,7 @@ import { readSnapshot, type SessionSnapshot } from '../systems/authority/session
 import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForward'
 import { validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems } from '../systems/startScenario'
+import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
 
 export class DebugCommandNotImplementedError extends Error {
   constructor(command: string) {
@@ -103,6 +104,8 @@ export interface DebugApi {
    * accepted and changes nothing, and any other level is a listed problem.
    */
   setFacilityLevel(facilityId: string, level: number): DebugResult
+  /** The platform's core bay to `count` fragments (#10); 63 on planet 1 completes the core. */
+  setCoreFragments(count: number): DebugResult
   ui: DebugUi
   // stubs
   /** `depthBp` is basis points of the radius (#11); the radius arrives with the generator. */
@@ -113,7 +116,6 @@ export interface DebugApi {
   unlock(featureId: string): void
   spawnEnemy(enemyKind: string, tier: number): void
   setVehicleLoadout(loadoutId: string): void
-  setCoreFragments(count: number): void
 }
 
 function notImplemented(command: string): () => never {
@@ -197,6 +199,10 @@ export function createDebugApi(): DebugApi {
     vehicleStats: () => ({ ok: true, ...vehicleStatsReport() }),
     setFacilityLevel: (facilityId, level) =>
       runUnlessRefused(facilityLevelProblems(facilityId, level), () => {}),
+    setCoreFragments: (count) =>
+      runUnlessRefused(vehicleDebugProblems(setCoreFragmentsCommand(count)), () =>
+        game().setCoreFragments(count),
+      ),
     ui: {
       setCameraMode: (mode) =>
         runUnlessRefused(cameraModeProblems(mode), () => game().setCameraMode(mode as CameraMode)),
@@ -209,6 +215,5 @@ export function createDebugApi(): DebugApi {
     unlock: notImplemented('unlock'),
     spawnEnemy: notImplemented('spawnEnemy'),
     setVehicleLoadout: notImplemented('setVehicleLoadout'),
-    setCoreFragments: notImplemented('setCoreFragments'),
   }
 }

@@ -57,6 +57,25 @@ describe('debug api: set state', () => {
   })
 })
 
+describe('debug api: core', () => {
+  it('fills the core bay as a logged debug command, completing the planet-1 core at 63', () => {
+    expect(createDebugApi().setCoreFragments(63)).toEqual({ ok: true })
+    expect(game().platform).toMatchObject({ coreBay: 63, visualState: 'core_drive' })
+    expect(game().isCoreCompleted).toBe(true)
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'platform_configuration_changed',
+      'core_completed',
+      'debug_command_applied',
+    ])
+  })
+
+  it('refuses a fractional count and changes nothing', () => {
+    expect(createDebugApi().setCoreFragments(1.5)).toMatchObject({ ok: false })
+    expect(sink.commands).toEqual([])
+    expect(game().platform.coreBay).toBe(0)
+  })
+})
+
 describe('debug api: time', () => {
   it('fast-forwards the authority and reports where it stands', () => {
     const result = createDebugApi().fastForward(7200)

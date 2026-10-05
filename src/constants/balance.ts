@@ -55,3 +55,10 @@ export const ZONE_TEST_MAX_MM = 65535
  * far below the slowest drive speed (6 m/s at engine level 0, #6).
  */
 export const DOCK_STATIONARY_MM_PER_SECOND = 50
+
+/**
+ * The slice has two planets (#2 content budget); completing the core of the last one shows the
+ * end-of-slice card (#2 done item 5, #24). Travel itself is not capped (#10: later planets use
+ * the same formulas).
+ */
+export const SLICE_LAST_PLANET = 2
