@@ -1,13 +1,18 @@
 /**
  * Decision #4 / #22 acceptance: terrain updates stay under 2 ms per frame. The scene rebuilds at
- * most one chunk mesh per frame, so one `buildChunkTileBatch` (cells already generated) must fit
- * the budget. Measured and logged here, not gated in CI, because CI machines vary.
+ * most one chunk mesh per frame, so one density halo plus `buildChunkTileBatch` (chunks already
+ * generated) must fit the budget. Measured and logged here, not gated in CI, because CI machines vary.
  * Run with `npm run bench:render`; it prints one JSON line per planet.
  */
 import { buildChunkTileBatch } from '../src/systems/render/chunkTileBatch'
+import { chunkDensityHaloOf } from '../src/systems/render/densityHalo'
 import { planetParamsFor, type PlanetParams } from '../src/systems/world/planetParams'
 import { chunkRangeOfDisc } from '../src/systems/world/tileGrid'
-import { cellAt, currentCellsOfChunk, EMPTY_WORLD } from '../src/systems/world/worldState'
+import {
+  currentDensityOfChunk,
+  EMPTY_WORLD,
+  materialCellsOfChunk,
+} from '../src/systems/world/worldState'
 
 const BUDGET_P95_MS = 2
 const WORLD_SEED = 83921
@@ -23,10 +28,17 @@ function batchTimesMs(params: PlanetParams): number[] {
 }
 
 function timeOneBatchMs(params: PlanetParams, cx: number, cy: number): number {
-  const cells = currentCellsOfChunk(EMPTY_WORLD, params, cx, cy)
-  const cellOutside = (tx: number, ty: number) => cellAt(EMPTY_WORLD, params, { tx, ty })
+  const cells = materialCellsOfChunk(EMPTY_WORLD, params, cx, cy)
+  const densityOf = (x: number, y: number) => currentDensityOfChunk(EMPTY_WORLD, params, x, y)
+  for (const [x, y] of [
+    [cx, cy],
+    [cx + 1, cy],
+    [cx, cy + 1],
+    [cx + 1, cy + 1],
+  ])
+    densityOf(x, y)
   const start = performance.now()
-  buildChunkTileBatch(params, cx, cy, cells, cellOutside)
+  buildChunkTileBatch(params, cx, cy, cells, chunkDensityHaloOf(densityOf, cx, cy))
   return performance.now() - start
 }
 

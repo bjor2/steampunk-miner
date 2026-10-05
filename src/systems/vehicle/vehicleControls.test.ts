@@ -38,6 +38,8 @@ function runMotion(
       canAct: true,
       isGrounded,
       boreOffset: null,
+      isCuttingLevel: false,
+      isWaitingForCut: false,
       dt: PHYSICS_TIMESTEP,
     })
   }
@@ -92,6 +94,8 @@ describe('vehicle bore alignment', () => {
       canAct: true,
       isGrounded: true,
       boreOffset,
+      isCuttingLevel: false,
+      isWaitingForCut: false,
       dt: PHYSICS_TIMESTEP,
     }).velocity
 

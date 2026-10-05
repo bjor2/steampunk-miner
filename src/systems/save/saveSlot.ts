@@ -52,7 +52,6 @@ export interface SaveWorldSection {
   /** The params the planet was generated with; a build that would generate others refuses. */
   params: PlanetParams | null
   chunks: PortableState['world']['chunks']
-  tileWork: PortableState['world']['tileWork']
   platform: PortableState['platform']
   core: PortableState['core']
   combat: PortableState['combat']
@@ -87,7 +86,6 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     planetIndex: state.planet.index,
     params: planetParamsOf(state.planet),
     chunks: state.world.chunks,
-    tileWork: state.world.tileWork,
     platform: state.platform,
     core: state.core,
     combat: state.combat,
@@ -123,7 +121,7 @@ function snapshotOfSaveSlot(file: SaveSlotFile): SessionSnapshot {
       tick: file.tick,
       planet: { index: world.planetIndex, seed: world.worldSeed },
       players: profile.players,
-      world: { chunks: world.chunks, tileWork: world.tileWork },
+      world: { chunks: world.chunks },
       platform: world.platform,
       core: world.core,
       combat: world.combat,

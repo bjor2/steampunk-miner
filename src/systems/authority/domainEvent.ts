@@ -73,7 +73,25 @@ export interface DomainEventBodies {
   StateDigested: { digest: string; scope: DigestScope }
   /** Drill damage one command dealt to one tile, in hardness units (`ticks * D * eff / 60`). */
   DrillDamageDealt: { tx: number; ty: number; ticks: number; damage: string }
+  /**
+   * A material cell yielded (#36: its 16 density samples fell to half): the first-slice per-tile
+   * mining event, same payload, fired once per cell.
+   */
   TileDestroyed: { tx: number; ty: number; kind: 'ground' | 'ore' | 'core' }
+  /**
+   * The density of one chunk changed (#36, replacing the first slice's tile change): the dirty
+   * rectangle in chunk-local samples, inclusive, and the chunk's version after the change. The
+   * renderer, the collider halo and later the network consume it; the run log does not.
+   */
+  GroundChanged: {
+    cx: number
+    cy: number
+    x0: number
+    y0: number
+    x1: number
+    y1: number
+    version: number
+  }
   CargoAdded: { resourceTier: number; amount: number; value: string }
   /** A full hold: the tile still broke, its unit was lost (#7). */
   StorageFull: { lostUnits: number }

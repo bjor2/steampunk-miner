@@ -32,6 +32,14 @@ export interface MotionStepInput {
    * null when it aims sideways: idle wheels then centre the body so it fits the 1-tile hole.
    */
   boreOffset: number | null
+  /**
+   * The drill is cutting a level sideways tunnel on the ground (no lift, #36 level cut): contacts
+   * never add upward speed, so the body stays on the floor it is cutting instead of riding up the
+   * cut's round front.
+   */
+  isCuttingLevel: boolean
+  /** Uncut ground stands at the body's face while it cuts level: the wheels wait for the drill. */
+  isWaitingForCut: boolean
   dt: number
 }
 
@@ -47,7 +55,7 @@ export function stepVehicleMotion(input: MotionStepInput): MotionStep {
   const isThrusting = input.canAct && input.intent.lift
   const along = nextAlongSpeed(input)
   const upward =
-    dot(input.velocity, input.up) +
+    upwardSpeedOf(input) +
     (isThrusting ? liftAcceleration(input.engine.thrustToWeight) : 0) * input.dt
   const local = fromLocalFrame(input.up, along, upward)
   const pulled = {
@@ -59,6 +67,12 @@ export function stepVehicleMotion(input: MotionStepInput): MotionStep {
     isDriving: input.canAct && input.intent.moveX !== 0 && input.isGrounded,
     isThrusting,
   }
+}
+
+/** The body's speed along `localUp`; a level cut never lets a contact push it upward. */
+function upwardSpeedOf(input: MotionStepInput): number {
+  const upward = dot(input.velocity, input.up)
+  return input.isCuttingLevel ? Math.min(0, upward) : upward
 }
 
 /**
@@ -76,6 +90,7 @@ function nextAlongSpeed(input: MotionStepInput): number {
 
 function targetAlongSpeed(input: MotionStepInput): number {
   const { intent, engine, boreOffset } = input
+  if (input.isWaitingForCut) return 0
   if (intent.moveX !== 0 || boreOffset === null) return intent.moveX * engine.speedMax
   const centring = boreOffset / BORE_ALIGN_SECONDS
   return Math.max(-engine.speedMax, Math.min(engine.speedMax, centring))

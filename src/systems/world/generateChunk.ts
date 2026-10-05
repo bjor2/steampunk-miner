@@ -23,11 +23,17 @@ export interface GeneratedChunk {
 }
 
 export function generateChunk(params: PlanetParams, cx: number, cy: number): GeneratedChunk {
+  const cells = generateChunkCells(params, cx, cy)
+  return { cells, density: generateDensity(params, cx, cy, cells) }
+}
+
+/** The material cells alone: rules that only ask what a tile is skip the density. */
+export function generateChunkCells(params: PlanetParams, cx: number, cy: number): Uint32Array {
   const cells = generateBaseTerrain(params, cx, cy)
   paintOrePatches(params, cells, patchesForChunk(params, cx, cy), cx, cy)
   stampTilesInChunk(cells, dockSiteTiles(params), cx, cy)
   stampTilesInChunk(cells, starterVeinTiles(params), cx, cy)
-  return { cells, density: generateDensity(params, cx, cy, cells) }
+  return cells
 }
 
 /** The lattice patches in painting order, with the dock guarantee right after band 1's. */

@@ -10,15 +10,20 @@
  * updates under 2 ms per frame). A frame where nothing changed allocates nothing.
  */
 import {
+  DataTexture,
   InstancedBufferAttribute,
   InstancedBufferGeometry,
+  LinearFilter,
   Mesh,
   PlaneGeometry,
+  RedFormat,
+  UnsignedByteType,
   type Group,
   type ShaderMaterial,
 } from 'three'
 import { CHUNK_BUILDS_PER_FRAME } from '../constants/scene'
 import { buildChunkTileBatch, type ChunkTileBatch } from '../systems/render/chunkTileBatch'
+import { chunkDensityHaloOf, DENSITY_HALO_SIDE } from '../systems/render/densityHalo'
 import {
   chunkViewVersionOf,
   isSameChunkView,
@@ -28,7 +33,11 @@ import { visibleChunksAround, type ChunkPoint } from '../systems/render/visibleC
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { chunkKey, firstTileOfChunk } from '../systems/world/tileGrid'
-import { cellAt, currentCellsOfChunk, type WorldState } from '../systems/world/worldState'
+import {
+  currentDensityOfChunk,
+  materialCellsOfChunk,
+  type WorldState,
+} from '../systems/world/worldState'
 
 /** What the terrain should show this frame; the caller reuses one object across frames. */
 export interface TerrainView {
@@ -47,6 +56,7 @@ export interface ChunkMeshPool {
 
 interface ChunkMesh {
   mesh: Mesh
+  density: DataTexture
   version: ChunkViewVersion
 }
 
@@ -160,17 +170,44 @@ function buildChunkMesh(
   version: ChunkViewVersion,
 ): ChunkMesh {
   const { params, world } = view
-  const cells = currentCellsOfChunk(world, params, cx, cy)
-  const batch = buildChunkTileBatch(params, cx, cy, cells, (tx, ty) =>
-    cellAt(world, params, { tx, ty }),
+  const halo = chunkDensityHaloOf((x, y) => currentDensityOfChunk(world, params, x, y), cx, cy)
+  const batch = buildChunkTileBatch(
+    params,
+    cx,
+    cy,
+    materialCellsOfChunk(world, params, cx, cy),
+    halo,
   )
+  const density = densityTextureOf(halo)
   const mesh = new Mesh(geometryOf(batch), material)
   mesh.position.set(firstTileOfChunk(cx), firstTileOfChunk(cy), 0)
   // Culled by the view circle above; three's own test would use the unit quad's bounds.
   mesh.frustumCulled = false
-  // A chunk of air (a cave, the dock clearance) keeps its version but issues no draw call.
+  // A chunk with no ground (space, a cave) keeps its version but issues no draw call.
   mesh.visible = batch.count > 0
-  return { mesh, version }
+  // One material draws every chunk; each hands it its own density just before drawing.
+  mesh.onBeforeRender = () => {
+    material.uniforms.uDensity.value = density
+    material.uniformsNeedUpdate = true
+  }
+  return { mesh, density, version }
+}
+
+/** The halo as a one-channel texture, blended linearly between samples like the contour. */
+function densityTextureOf(halo: Uint8Array<ArrayBuffer>): DataTexture {
+  const texture = new DataTexture(
+    halo,
+    DENSITY_HALO_SIDE,
+    DENSITY_HALO_SIDE,
+    RedFormat,
+    UnsignedByteType,
+  )
+  texture.minFilter = LinearFilter
+  texture.magFilter = LinearFilter
+  // 129-byte rows: tell WebGL they are packed, not padded to 4 bytes.
+  texture.unpackAlignment = 1
+  texture.needsUpdate = true
+  return texture
 }
 
 /** A unit quad drawn once per tile; each chunk owns its copy, so disposing it is local. */
@@ -190,4 +227,5 @@ function geometryOf(batch: ChunkTileBatch): InstancedBufferGeometry {
 function disposeChunkMesh(parent: Group, chunk: ChunkMesh): void {
   parent.remove(chunk.mesh)
   chunk.mesh.geometry.dispose()
+  chunk.density.dispose()
 }

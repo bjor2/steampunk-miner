@@ -1,60 +1,125 @@
 /**
- * A chunk's changes from its generated state (decision #4, Storage): a 128-byte removed bitset
- * plus sparse `[index, cell]` overrides. The world is `seed + params + deltas`, so only touched
- * chunks are ever saved. Overrides exist so later features (placed supports, regrowing ground)
- * never need a format change.
+ * A chunk's changes from its generated state (decisions #4 Storage, #36 Storage):
  *
- * Plain JSON shapes so a delta can live in authority state and its canonical digest: the bitset
- * is 32 uint32 words, word `ly` holding bit `lx` of chunk row `ly`; overrides are sorted by index.
- * Immutable: every change returns a new delta.
+ * - `density`: the current density XOR the generated one, run-length encoded as
+ *   `[count, value, count, value, ...]`. A drilled chunk is mostly long runs of 0, so a tunnel
+ *   through a chunk costs a few hundred numbers.
+ * - `yieldedRows`: one bit per material cell that has credited its ore (#36 Yield), 32 uint32
+ *   words, word `ly` holding bit `lx` of chunk row `ly`. A yielded cell counts as open ground for
+ *   every cell rule (enemies, the bot, the drill), as a removed tile did under generator 1.
+ * - `overrides`: sparse `[index, cell]` material overrides sorted by index, so later features
+ *   (casing #41, placed supports) never need a format change.
+ * - `version`: counts the changes, so a renderer or collider can tell a chunk moved on (#36
+ *   `GroundChanged`).
+ *
+ * The world is `seed + params + deltas`, so only touched chunks are ever saved. Plain JSON shapes,
+ * so a delta lives in authority state and its canonical digest. Immutable.
  */
 import { CHUNK_SIZE } from './tileGrid'
 import { AIR_CELL } from './worldCell'
 
 export interface ChunkDelta {
-  removedRows: readonly number[]
+  density: readonly number[]
+  yieldedRows: readonly number[]
   overrides: readonly (readonly [index: number, cell: number])[]
+  version: number
 }
 
 export const EMPTY_CHUNK_DELTA: ChunkDelta = {
-  removedRows: new Array<number>(CHUNK_SIZE).fill(0),
+  density: [],
+  yieldedRows: new Array<number>(CHUNK_SIZE).fill(0),
   overrides: [],
+  version: 0,
 }
 
-export function isCellRemoved(delta: ChunkDelta, index: number): boolean {
-  return (delta.removedRows[rowOf(index)] & bitOf(index)) !== 0
+export function isCellYielded(delta: ChunkDelta, index: number): boolean {
+  return (delta.yieldedRows[rowOf(index)] & bitOf(index)) !== 0
 }
 
-/** A removed tile becomes air; it drops any override at the same cell. */
-export function withCellRemoved(delta: ChunkDelta, index: number): ChunkDelta {
-  return {
-    removedRows: withRowBit(delta.removedRows, index, true),
-    overrides: delta.overrides.filter(([at]) => at !== index),
-  }
+/** A yielded cell stays yielded: it credits its ore once, whatever is filled back later. */
+export function withCellsYielded(delta: ChunkDelta, indices: readonly number[]): ChunkDelta {
+  let rows = delta.yieldedRows
+  for (const index of indices) rows = withRowBit(rows, index)
+  return { ...delta, yieldedRows: rows, version: delta.version + 1 }
 }
 
-/** An override replaces the cell outright and clears its removed bit. */
+/** An override replaces the material of a cell outright. */
 export function withCellOverride(delta: ChunkDelta, index: number, cell: number): ChunkDelta {
   return {
-    removedRows: withRowBit(delta.removedRows, index, false),
+    ...delta,
     overrides: [...delta.overrides.filter(([at]) => at !== index), [index, cell] as const].sort(
       ([a], [b]) => a - b,
     ),
+    version: delta.version + 1,
   }
+}
+
+/** The density as it stands now becomes the delta's, encoded against the generated density. */
+export function withDensity(
+  delta: ChunkDelta,
+  current: Uint8Array,
+  generated: Uint8Array,
+): ChunkDelta {
+  return { ...delta, density: encodeDensityChange(current, generated), version: delta.version + 1 }
 }
 
 export function isChunkTouched(delta: ChunkDelta): boolean {
-  return delta.overrides.length > 0 || delta.removedRows.some((row) => row !== 0)
+  return (
+    delta.density.length > 0 ||
+    delta.overrides.length > 0 ||
+    delta.yieldedRows.some((row) => row !== 0)
+  )
 }
 
-/** The chunk as it stands now: a copy of the generated cells with the delta applied. */
+/** The material cells as they stand now: generated, overrides applied, yielded cells open. */
 export function applyChunkDelta(generated: Uint32Array, delta: ChunkDelta): Uint32Array {
-  const cells = generated.slice()
+  const cells = materialCellsOf(generated, delta)
   for (let index = 0; index < cells.length; index++) {
-    if (isCellRemoved(delta, index)) cells[index] = AIR_CELL
+    if (isCellYielded(delta, index)) cells[index] = AIR_CELL
   }
+  return cells
+}
+
+/** The material cells with overrides but without the yield mask: what the ground is made of. */
+export function materialCellsOf(generated: Uint32Array, delta: ChunkDelta): Uint32Array {
+  const cells = generated.slice()
   for (const [index, cell] of delta.overrides) cells[index] = cell
   return cells
+}
+
+/** The current density: the generated density XOR the decoded runs. A fresh array. */
+export function decodeDensity(generated: Uint8Array, delta: ChunkDelta): Uint8Array {
+  const density = generated.slice()
+  let at = 0
+  for (let run = 0; run < delta.density.length; run += 2) {
+    const [count, value] = [delta.density[run], delta.density[run + 1]]
+    if (value !== 0) xorRange(density, at, count, value)
+    at += count
+  }
+  return density
+}
+
+/** `current XOR generated` as runs; an unchanged density is no runs at all. */
+export function encodeDensityChange(current: Uint8Array, generated: Uint8Array): number[] {
+  const runs: number[] = []
+  let at = 0
+  while (at < current.length) {
+    const value = current[at] ^ generated[at]
+    const end = runEndOf(current, generated, at, value)
+    runs.push(end - at, value)
+    at = end
+  }
+  return runs.length === 2 && runs[1] === 0 ? [] : runs
+}
+
+function runEndOf(current: Uint8Array, generated: Uint8Array, start: number, value: number) {
+  let end = start + 1
+  while (end < current.length && (current[end] ^ generated[end]) === value) end++
+  return end
+}
+
+function xorRange(density: Uint8Array, start: number, count: number, value: number): void {
+  for (let at = start; at < start + count; at++) density[at] ^= value
 }
 
 function rowOf(index: number): number {
@@ -65,9 +130,8 @@ function bitOf(index: number): number {
   return (1 << (index % CHUNK_SIZE)) >>> 0
 }
 
-function withRowBit(rows: readonly number[], index: number, isSet: boolean): number[] {
+function withRowBit(rows: readonly number[], index: number): number[] {
   const next = rows.slice()
-  const row = rowOf(index)
-  next[row] = (isSet ? rows[row] | bitOf(index) : rows[row] & ~bitOf(index)) >>> 0
+  next[rowOf(index)] = (rows[rowOf(index)] | bitOf(index)) >>> 0
   return next
 }

@@ -1,6 +1,7 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { PHYSICS_TIMESTEP } from '../constants/physics'
+import { MAX_GROUND_COLLIDERS } from '../constants/scene'
 import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { createVehicleBody, createVehicleController } from './vehicleController'
@@ -37,6 +38,7 @@ function createLiveVehicle() {
   const loop = createVehicleLoop()
   return {
     body,
+    controller,
     hold(intent: VehicleIntent, seconds: number) {
       for (let step = 0; step < seconds / PHYSICS_TIMESTEP; step++) {
         loop.step(controller, intent)
@@ -60,6 +62,25 @@ describe('vehicle loop', () => {
     expect(Math.floor(y)).toBeLessThan(surfaceRowOfColumn(Math.floor(x), params?.radiusTiles ?? 0))
     expect(readLocalVehicle().energy).toBeLessThan(150 * 240)
     expect(sink.commands.every((command) => command.type === 'reportPose')).toBe(true)
+  })
+
+  it('drills a level tunnel sideways from the bottom of its shaft, along the planet curve', () => {
+    const vehicle = createLiveVehicle()
+    vehicle.hold(buildIntent(['aim_right']), 2)
+    vehicle.hold(buildIntent(['aim_down']), 6)
+    vehicle.hold(IDLE_INTENT, 0.5)
+    const start = vehicle.body.translation()
+    const startRadius = Math.hypot(start.x, start.y)
+    const radii: number[] = []
+    for (let second = 0; second < 12; second++) {
+      vehicle.hold(buildIntent(['aim_right']), 1)
+      const { x, y } = vehicle.body.translation()
+      radii.push(Math.hypot(x, y))
+    }
+    expect(vehicle.body.translation().x - start.x).toBeGreaterThan(8)
+    expect(vehicle.controller.colliderCount()).toBeGreaterThan(0)
+    expect(vehicle.controller.colliderCount()).toBeLessThanOrEqual(MAX_GROUND_COLLIDERS)
+    for (const radius of radii) expect(Math.abs(radius - startRadius)).toBeLessThan(0.4)
   })
 
   it('climbs back out of its shaft on the lift', () => {

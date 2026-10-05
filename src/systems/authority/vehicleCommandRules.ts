@@ -3,9 +3,10 @@
  *
  * - `reportPose`: the client-owned pose at 5 Hz plus the fixed steps each action was active since
  *   the last report; the authority charges energy as count times rate (drill 4, thrust 6, drive 1
- *   quanta) and drills the tile at the nose for the drill ticks. A stranded or destroyed vehicle
+ *   quanta) and carves the drill's stamp at the pose for the drill ticks (#36). A stranded or destroyed vehicle
  *   still reports its pose (gravity and hits apply) but its action ticks are ignored.
- * - `drillTile`: scripted mining of one tile within reach, the same drilling path.
+ * - `drillTile`: scripted mining of one tile within reach: the same drilling path, carving that
+ *   cell's own samples.
  * - `requestRescue`: calls the tow for a stranded or destroyed vehicle.
  *
  * Action tick counts may not exceed the ticks since the last charged command plus one report
@@ -24,7 +25,9 @@ import {
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { isRemovableCell } from '../world/worldCell'
-import { cellAt } from '../world/worldState'
+import { cellDensitySum } from '../world/groundEdit'
+import type { PlanetParams } from '../world/planetParams'
+import { materialCellAt, type WorldState } from '../world/worldState'
 import type { AuthorityCommand, CommandPayloads } from './authorityCommand'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import {
@@ -38,7 +41,7 @@ import {
 } from './commandRule'
 import { drillBurrowersOnTile } from './combat/enemyDamage'
 import { noteReportForCombat } from './combat/poseReportCombat'
-import { drillOnTile } from './drillOnTile'
+import { drillAtPose, drillCell } from './groundDrill'
 import type { DomainEventBody } from './domainEvent'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 import { followEnergyChange, rescueCauseOf, towVehicle } from './vehicleTransitions'
@@ -133,11 +136,17 @@ function reachRejection(state: AuthorityState, command: AuthorityCommand<'drillT
   return rejectionOf('out_of_reach', `tile ${tx},${ty} is out of the drill's reach`)
 }
 
+/** A cell with density left that is not the pad; a yielded cell is still drilled clear (#36). */
 function drillableRejection(state: AuthorityState, command: AuthorityCommand<'drillTile'>) {
   const params = planetParamsOf(state.planet)
-  const { tx, ty } = command.payload
-  if (params !== null && isRemovableCell(cellAt(state.world, params, { tx, ty }))) return null
-  return rejectionOf('not_drillable', `tile ${tx},${ty} is air or the dock pad`)
+  const tile = { tx: command.payload.tx, ty: command.payload.ty }
+  if (params !== null && isDrillableCell(state.world, params, tile)) return null
+  return rejectionOf('not_drillable', `tile ${tile.tx},${tile.ty} is open ground or the dock pad`)
+}
+
+function isDrillableCell(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
+  const material = materialCellAt(world, params, tile)
+  return isRemovableCell(material) && cellDensitySum(world, params, tile) > 0
 }
 
 /** Each action's ticks fit in the time since the last charged command, plus one interval. */
@@ -179,12 +188,7 @@ function chargeReportedActions(
   if (!isVehicleActive(vehicle) || params === null || vehicle.pose === null) {
     return unchanged(markChargedState(state, playerId, tick))
   }
-  const drilled = drillTileAndBurrowers(
-    state,
-    playerId,
-    noseTileOf(vehicle.pose),
-    payload.drillTicks,
-  )
+  const drilled = drillAtPoseAndBurrowers(state, playerId, vehicle.pose, payload)
   const moved = chargeMovement(drilled.state, playerId, payload)
   return { state: markChargedState(moved, playerId, tick), events: drilled.events }
 }
@@ -199,19 +203,29 @@ function chargeMovement(state: AuthorityState, playerId: string, payload: PosePa
 
 function drillScriptedTile(state: AuthorityState, command: AuthorityCommand<'drillTile'>) {
   const { tx, ty, ticks } = command.payload
-  return drillTileAndBurrowers(state, command.playerId, { tx, ty }, ticks)
+  const tile = { tx, ty }
+  const params = planetParamsOf(state.planet)
+  if (params === null) return unchanged(state)
+  const drilled = drillCell(state, params, command.playerId, tile, ticks)
+  return withBurrowersCut(drilled, command.playerId, tile)
 }
 
-/** The drill cuts the tile, and a burrower swimming in it for the ticks it cut (#9). */
-function drillTileAndBurrowers(
+function drillAtPoseAndBurrowers(
   state: AuthorityState,
   playerId: string,
-  tile: TilePoint,
-  requestedTicks: number,
+  pose: VehiclePose,
+  payload: PosePayload,
 ): RuleEffect {
   const params = planetParamsOf(state.planet)
   if (params === null) return unchanged(state)
-  const drilled = drillOnTile(state, params, playerId, tile, requestedTicks)
+  const nose = noseTileOf(pose)
+  const { thrusting, drillTicks } = payload
+  const drilled = drillAtPose(state, params, playerId, pose, thrusting, nose, drillTicks)
+  return withBurrowersCut(drilled, playerId, nose)
+}
+
+/** A burrower swimming in the drilled tile is cut for the ticks the drill worked (#9). */
+function withBurrowersCut(drilled: RuleEffect, playerId: string, tile: TilePoint): RuleEffect {
   const cut = drillBurrowersOnTile(drilled.state, playerId, tile, drilledTicksOf(drilled.events))
   return { state: cut.state, events: [...drilled.events, ...cut.events] }
 }

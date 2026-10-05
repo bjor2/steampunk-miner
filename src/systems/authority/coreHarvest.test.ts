@@ -73,8 +73,9 @@ function ticksToBreakCore(tipLevel: number, powerLevel: number): number {
   session.submit(0, FREEZE_ENEMIES)
   session.submit(0, setUpgrade('drill_tip', tipLevel))
   session.submit(0, setUpgrade('drill_power', powerLevel))
-  session.submit(10, poseAbove(CORE, FACING.down))
-  const events = session.submit(3010, drill(CORE, 3000))
+  // A window starting at tick 0 clears in exactly the #7 drill time (a later start may save one).
+  session.submit(0, poseAbove(CORE, FACING.down))
+  const events = session.submit(3000, drill(CORE, 3000))
   if (!typesOf(events).includes('TileDestroyed')) return Number.POSITIVE_INFINITY
   const damage = events.find((event) => event.type === 'DrillDamageDealt')
   return damage?.type === 'DrillDamageDealt' ? damage.ticks : Number.NaN
@@ -111,13 +112,14 @@ describe('core harvest', () => {
     const events = mineTile(session, 1000, coreTiles(1)[0])
     expect(typesOf(events)).toEqual([
       'DrillDamageDealt',
+      'GroundChanged',
       'TileDestroyed',
       'CoreReached',
       'CoreTileHarvested',
       'StorageFull',
     ])
-    expect(events[3]).toMatchObject({ tilesRemaining: 155, fragments: 0 })
-    expect(events[4]).toMatchObject({ lostUnits: 1 })
+    expect(events[4]).toMatchObject({ tilesRemaining: 155, fragments: 0 })
+    expect(events[5]).toMatchObject({ lostUnits: 1 })
     expect(session.vehicle().cargo.coreFragments).toBe(0)
   })
 

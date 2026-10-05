@@ -1,6 +1,6 @@
 /**
  * The vehicle's motor: the ONLY writer of the vehicle body's motion. Once per fixed physics step,
- * before the world steps, it reads the body, keeps the tile halo around it, applies one step of
+ * before the world steps, it reads the body, keeps the ground's collider halo around it, applies one step of
  * the pure motion rule by velocity (never by teleporting), keeps the body upright along
  * `localUp`, swivels the drill head, and says which actions were active and where it stands, for
  * the pose report. The same code runs under React (`VehicleBody`) and in the node physics specs.
@@ -10,6 +10,9 @@
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
+import { blockOfPoint } from '../systems/vehicle/colliderHalo'
+import { drillContactOf, type DrillContact } from '../systems/vehicle/drillContact'
+import { drillStampOf } from '../systems/vehicle/drillStamp'
 import type { EngineStats } from '../systems/economy/vehicleStats'
 import {
   isHeadSettled,
@@ -30,23 +33,25 @@ import {
 } from '../systems/vehicle/vehicleMotion'
 import {
   FACING,
-  noseTileOf,
-  tileOfMillimetres,
+  facingVectorOf,
+  type Facing,
   type VehiclePose,
 } from '../systems/vehicle/vehiclePose'
-import type { TilePoint } from '../systems/world/tileGrid'
-import { isRemovableCell, isSolidCell } from '../systems/world/worldCell'
-import { createTileHalo } from './tileHalo'
+import type { GroundReader } from '../systems/world/groundReader'
+import { ISO_DENSITY } from '../systems/world/sampleGrid'
+import { createGroundHalo } from './groundHalo'
 
 type Rapier = typeof RAPIER
 
-/** What the controller needs to know about the planet: its size, its gravity, its tiles now. */
+/** What the controller needs to know about the planet: its size, its gravity, its ground now. */
 export interface PlanetView {
   radiusTiles: number
   gravityMultiplier: number
-  /** The world state object; a new identity means tiles changed and the halo is rebuilt. */
+  /** The world state object; a new identity means the ground may have changed. */
   worldVersion: unknown
-  cellAt(tile: TilePoint): number
+  ground: GroundReader
+  /** A chunk's version (its delta's identity): the halo rebuilds the blocks over a changed one. */
+  chunkVersion(cx: number, cy: number): unknown
 }
 
 export interface VehicleStepInput {
@@ -71,8 +76,8 @@ export interface VehicleController {
   dispose(): void
 }
 
-/** Tiles of halo around the vehicle's tile; at 0.27 m per step it never outruns 4 tiles. */
-export const TILE_HALO_RADIUS = 4
+/** Collision blocks of halo round the vehicle's block; at 0.27 m per step it never outruns one. */
+export const HALO_RADIUS_BLOCKS = 1
 
 /** Share of the remaining tilt removed per step; under 1 so contact pushes settle smoothly. */
 const RIGHTING_GAIN = 0.5
@@ -106,7 +111,7 @@ export function createVehicleController(
   world: RAPIER.World,
   body: RAPIER.RigidBody,
 ): VehicleController {
-  const halo = createTileHalo(rapier, world, TILE_HALO_RADIUS)
+  const halo = createGroundHalo(rapier, world, HALO_RADIUS_BLOCKS)
   let head = newDrillHead(FACING.right)
   let up: Vector2 = { x: 0, y: 1 }
 
@@ -115,9 +120,19 @@ export function createVehicleController(
       const position = vectorOf(body.translation())
       const velocity = vectorOf(body.linvel())
       up = localUpOf(position, up)
-      halo.syncAround(tileOfMetres(position), planet.worldVersion, (tile) =>
-        isSolidCell(planet.cellAt(tile)),
-      )
+      halo.syncAround(blockOfPoint(position), planet.worldVersion, {
+        densityAt: planet.ground.densityAt,
+        chunkVersion: planet.chunkVersion,
+      })
+      head = stepDrillHead(head, input.intent.facing)
+      // The velocity the body actually had, after contacts, so a resting vehicle reports 0.
+      const pose = quantisePose(position, velocity, up, settledFacingOf(head))
+      const isLifting = input.canAct && input.intent.lift
+      const contact = input.canAct
+        ? drillContactFor(input.intent, head, pose, isLifting, planet)
+        : 'none'
+      const isDrilling = contact !== 'none'
+      const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)
       const motion = stepVehicleMotion({
         velocity,
         up,
@@ -125,15 +140,13 @@ export function createVehicleController(
         intent: input.intent,
         engine: input.engine,
         canAct: input.canAct,
-        isGrounded: isSolidCell(planet.cellAt(tileOfMetres(groundProbeOf(position, up)))),
+        isGrounded: isSolidAt(planet.ground, groundProbeOf(position, up)),
         boreOffset: isAimingAlongUp(input.intent) ? offsetToTileCentre(position, up) : null,
+        isCuttingLevel: isCuttingLevel,
+        isWaitingForCut: isCuttingLevel && contact === 'inTheWay',
         dt: PHYSICS_TIMESTEP,
       })
       driveBody(body, motion.velocity, up)
-      head = stepDrillHead(head, input.intent.facing)
-      // The velocity the body actually had, after contacts, so a resting vehicle reports 0.
-      const pose = quantisePose(position, velocity, up, settledFacingOf(head))
-      const isDrilling = input.canAct && isPushingIntoTile(input.intent, head, pose, planet)
       return {
         flags: { isDriving: motion.isDriving, isThrusting: motion.isThrusting, isDrilling },
         pose,
@@ -151,17 +164,31 @@ export function createVehicleController(
 }
 
 /**
- * Drilling auto-engages when the player pushes into a solid tile the settled head faces (#7):
- * the held aim matches the facing and the tile at the nose can be removed.
+ * Drilling auto-engages when the player pushes into ground the settled head faces (#7): the held
+ * aim matches the facing and the drill's stamp has ground to cut (#36, `drillContact`).
  */
-function isPushingIntoTile(
+function drillContactFor(
   intent: VehicleIntent,
   head: DrillHead,
   pose: VehiclePose,
+  isLifting: boolean,
   planet: PlanetView,
-): boolean {
-  const isAimingAtFacing = intent.facing === pose.facing && isHeadSettled(head)
-  return isAimingAtFacing && isRemovableCell(planet.cellAt(noseTileOf(pose)))
+): DrillContact {
+  if (intent.facing !== pose.facing || !isHeadSettled(head)) return 'none'
+  const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  return drillContactOf(planet.ground, {
+    centreMm: pose,
+    facing,
+    stamp: drillStampOf(pose, isLifting),
+  })
+}
+
+function isSolidAt(ground: GroundReader, point: Vector2): boolean {
+  return ground.densityAtPoint(point.x, point.y) >= ISO_DENSITY
+}
+
+function isSidewaysFacing(facing: Facing): boolean {
+  return facing === FACING.left || facing === FACING.right
 }
 
 function isAimingAlongUp(intent: VehicleIntent): boolean {
@@ -187,8 +214,4 @@ function tiltOf(rotation: RAPIER.Rotation, up: Vector2): number {
 
 function vectorOf(vector: { x: number; y: number }): Vector2 {
   return { x: vector.x, y: vector.y }
-}
-
-function tileOfMetres(position: Vector2): TilePoint {
-  return tileOfMillimetres(Math.round(position.x * MM), Math.round(position.y * MM))
 }

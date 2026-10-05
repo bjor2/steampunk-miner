@@ -37,8 +37,8 @@ export const REFERENCE_VIEWPORT = { width: 1280, height: 800 } as const
 /** At most this many chunk draw calls at the reference screen (#4, #22 acceptance). */
 export const MAX_CHUNK_DRAW_CALLS = 16
 
-/** At most this many live tile colliders (#4, #22 acceptance). */
-export const MAX_TILE_COLLIDERS = 600
+/** At most this many live ground colliders (#4, #22 acceptance, #36 acceptance 7). */
+export const MAX_GROUND_COLLIDERS = 600
 
 /**
  * Chunk meshes rebuilt per frame, nearest first: one chunk's batch is well under the 2 ms

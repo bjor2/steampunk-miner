@@ -1,6 +1,6 @@
 /**
  * The vehicle and world parts of the session snapshot (#11 section 5): the same plain JSON as the
- * state, with each BigStat (hull, drill work) as its canonical string. Reading checks the shape
+ * state, with the hull BigStat as its canonical string. Reading checks the shape
  * so a malformed snapshot is refused with listed problems before anything is built from it; the
  * digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
@@ -9,6 +9,8 @@ import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
 import type { Cargo, VehicleMode, VehicleState } from '../vehicle/vehicleState'
 import type { ChunkDelta } from '../world/chunkDelta'
+import { CHUNK_SAMPLES } from '../world/sampleGrid'
+import { CHUNK_SIZE } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 
@@ -16,11 +18,11 @@ export type PortableVehicle = Omit<VehicleState, 'hull'> & { hull: string }
 
 export interface PortableWorld {
   chunks: Record<string, ChunkDelta>
-  tileWork: Record<string, string>
 }
 
 const VEHICLE_MODES: readonly VehicleMode[] = ['docked', 'active', 'stranded', 'destroyed']
 const POSE_FIELDS = ['x', 'y', 'vx', 'vy', 'upx', 'upy'] as const
+const MAX_BYTE = 255
 
 export function portableVehicleOf(vehicle: VehicleState): PortableVehicle {
   return { ...vehicle, hull: toCanonical(vehicle.hull) }
@@ -30,22 +32,13 @@ export function vehicleOfPortable(vehicle: PortableVehicle): VehicleState {
   return { ...vehicle, hull: fromCanonical(vehicle.hull) }
 }
 
+/** The world is integers only since #36 (drill progress is density), so it travels as is. */
 export function portableWorldOf(world: WorldState): PortableWorld {
-  return {
-    chunks: { ...world.chunks },
-    tileWork: Object.fromEntries(
-      Object.entries(world.tileWork).map(([key, work]) => [key, toCanonical(work)]),
-    ),
-  }
+  return { chunks: { ...world.chunks } }
 }
 
 export function worldOfPortable(world: PortableWorld): WorldState {
-  return {
-    chunks: world.chunks,
-    tileWork: Object.fromEntries(
-      Object.entries(world.tileWork).map(([key, work]) => [key, fromCanonical(work)]),
-    ),
-  }
+  return { chunks: world.chunks }
 }
 
 export function portableVehicleProblems(vehicle: unknown, path: string): string[] {
@@ -63,12 +56,8 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
 
 export function portableWorldProblems(world: unknown): string[] {
   if (!isJsonObject(world)) return ['snapshot.state.world must be an object']
-  const isValid =
-    isJsonObject(world.chunks) &&
-    Object.values(world.chunks).every(isPortableDelta) &&
-    isJsonObject(world.tileWork) &&
-    Object.values(world.tileWork).every(isNonNegativeMoneyText)
-  return isValid ? [] : ['snapshot.state.world must hold chunk deltas and drill work strings']
+  const isValid = isJsonObject(world.chunks) && Object.values(world.chunks).every(isPortableDelta)
+  return isValid ? [] : ['snapshot.state.world must hold chunk deltas']
 }
 
 function wholeNumberProblems(
@@ -101,10 +90,22 @@ function isPortablePose(pose: unknown): pose is VehiclePose {
 function isPortableDelta(delta: unknown): delta is ChunkDelta {
   return (
     isJsonObject(delta) &&
-    isWholeNumberList(delta.removedRows) &&
+    isDensityRuns(delta.density) &&
+    isWholeNumberList(delta.yieldedRows) &&
+    delta.yieldedRows.length === CHUNK_SIZE &&
     Array.isArray(delta.overrides) &&
-    delta.overrides.every(isWholeNumberList)
+    delta.overrides.every(isWholeNumberList) &&
+    isWholeNumber(delta.version)
   )
+}
+
+/** No runs, or `[count, byte, ...]` pairs covering the chunk's samples exactly (#36). */
+function isDensityRuns(runs: unknown): boolean {
+  if (!isWholeNumberList(runs) || runs.length % 2 !== 0) return false
+  const counts = runs.filter((_, at) => at % 2 === 0)
+  const bytes = runs.filter((_, at) => at % 2 === 1)
+  const total = counts.reduce((sum, count) => sum + count, 0)
+  return (runs.length === 0 || total === CHUNK_SAMPLES) && bytes.every((byte) => byte <= MAX_BYTE)
 }
 
 function isWholeNumberList(value: unknown): value is number[] {

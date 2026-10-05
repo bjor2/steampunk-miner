@@ -50,7 +50,8 @@ describe('authority: determinism', () => {
   })
 
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('76d60b5e302eaa5c')
+    // Re-pinned for #36: drilling carves density, which the digest now covers.
+    expect(stateDigest(replay(SESSION).state)).toBe('0c689439d189f94f')
   })
 
   it('gives a different digest when one command differs', () => {

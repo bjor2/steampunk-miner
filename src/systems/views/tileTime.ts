@@ -6,7 +6,7 @@
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
-import { hardnessOfTile } from '../authority/drillOnTile'
+import { hardnessOfTile } from '../authority/groundDrill'
 import { planetParamsOf } from '../authority/planetOfState'
 import { ticksPerTile } from '../vehicle/drillRule'
 import { noseTileOf } from '../vehicle/vehiclePose'
