@@ -8,7 +8,7 @@ import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
 import type { AuthorityState } from '../authority/authorityState'
 import { canDock } from '../authority/dockRules'
 import { serviceQuote } from '../authority/platformServices'
-import { exactAmount, formatAmount } from '../displayAmount'
+import { formatAmount } from '../displayAmount'
 import { boundLabel, type Bindings } from '../input/actionMap'
 import {
   cmp,
@@ -39,6 +39,7 @@ import {
 } from './hudReadings'
 import { threatMarkersOf, type ThreatMarker } from './threatMarkers'
 import { tileTimeAhead, type TileTime } from './tileTime'
+import { amountReading, type AmountReading } from './viewParts'
 import { returnReserveUnits } from '../vehicle/returnReserve'
 
 export interface HudSources {
@@ -79,7 +80,7 @@ export interface HudModel {
   energy: GaugeReading
   hull: GaugeReading
   cargo: CargoReading
-  cargoValue: { text: string; exact: string }
+  cargoValue: AmountReading
   depth: DepthReading
   dockArrow: DockArrow | null
   coreDistance: number | null
@@ -177,10 +178,6 @@ function energyWarningOf(vehicle: VehicleState, depthTiles: number): EnergyWarni
 
 function dockPromptOf(state: AuthorityState, playerId: string, bindings: Bindings): DockPrompt {
   return { isShown: canDock(state, playerId), text: `${boundLabel(bindings, 'interact')}: Dock` }
-}
-
-function amountReading(amount: Money): { text: string; exact: string } {
-  return { text: formatAmount(amount), exact: exactAmount(amount) }
 }
 
 /** A BigStat ratio as a whole number of thousandths, at most 1000; display only. */

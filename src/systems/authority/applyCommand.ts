@@ -14,6 +14,7 @@
 import {
   isDebugCommandType,
   type AuthorityCommand,
+  type CommandIntent,
   type CommandStamp,
   type CommandType,
 } from './authorityCommand'
@@ -40,6 +41,20 @@ export function applyCommand(state: AuthorityState, command: AuthorityCommand): 
   if (rejection !== null) return rejectCommand(state, command, rejection)
   const answer = acceptCommand(clocked.state, command)
   return { state: answer.state, events: [...clocked.events, ...answer.events] }
+}
+
+/**
+ * Why the authority would refuse this intent from this player now, without applying it: the
+ * platform screen's disabled buttons carry exactly this reason (#33 section 6), and the clock is
+ * not moved, since a screen asks about the tick it shows.
+ */
+export function refusalOfIntent(
+  state: AuthorityState,
+  playerId: string,
+  intent: CommandIntent,
+): Rejection | null {
+  const seq = (state.players[playerId]?.lastSeq ?? 0) + 1
+  return findRejection(state, { playerId, tick: state.tick, seq, ...intent })
 }
 
 const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
