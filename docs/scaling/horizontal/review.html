@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="en" data-doc="horizontal-campaign-schedule-c-approved">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Horizontal campaign features — schedule C approved</title>
+<style>
+/* osilion-html runtime stylesheet. Inlined into every report by scripts/build.* */
+
+:root {
+  --bg: #f7f6f3;
+  --panel: #ffffff;
+  --panel-2: #f2f1ed;
+  --ink: #1c1917;
+  --ink-2: #44403c;
+  --muted: #78716c;
+  --line: #e7e5e4;
+  --line-2: #d6d3d1;
+  --accent: #4f46e5;
+  --accent-soft: #eef2ff;
+  --ok: #059669;
+  --ok-soft: #ecfdf5;
+  --warn: #d97706;
+  --warn-soft: #fffbeb;
+  --bad: #e11d48;
+  --bad-soft: #fff1f2;
+  --info: #0284c7;
+  --info-soft: #f0f9ff;
+  --shadow: 0 1px 2px rgba(28, 25, 23, 0.06), 0 8px 24px -12px rgba(28, 25, 23, 0.18);
+  --radius: 14px;
+  --toc-w: 272px;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Charter, Georgia, serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, "SF Mono", Menlo, monospace;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101216;
+    --panel: #171a20;
+    --panel-2: #1e222a;
+    --ink: #e7e5e4;
+    --ink-2: #c9c5c0;
+    --muted: #a09a93;
+    --line: #262a33;
+    --line-2: #343946;
+    --accent: #818cf8;
+    --accent-soft: #1e1f3a;
+    --ok: #34d399;
+    --ok-soft: #0d2a20;
+    --warn: #fbbf24;
+    --warn-soft: #2d2410;
+    --bad: #fb7185;
+    --bad-soft: #331419;
+    --info: #38bdf8;
+    --info-soft: #0c2434;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101216;
+  --panel: #171a20;
+  --panel-2: #1e222a;
+  --ink: #e7e5e4;
+  --ink-2: #c9c5c0;
+  --muted: #a09a93;
+  --line: #262a33;
+  --line-2: #343946;
+  --accent: #818cf8;
+  --accent-soft: #1e1f3a;
+  --ok: #34d399;
+  --ok-soft: #0d2a20;
+  --warn: #fbbf24;
+  --warn-soft: #2d2410;
+  --bad: #fb7185;
+  --bad-soft: #331419;
+  --info: #38bdf8;
+  --info-soft: #0c2434;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, pre, .mono { font-family: var(--mono); font-size: 0.875em; }
+code { background: var(--panel-2); padding: 0.1em 0.35em; border-radius: 5px; }
+pre { background: var(--panel-2); padding: 0.9rem 1rem; border-radius: 10px; overflow: auto; line-height: 1.5; }
+pre code { background: none; padding: 0; }
+img, svg, canvas { max-width: 100%; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
+
+/* ---------- page frame ---------- */
+.frame { display: grid; grid-template-columns: var(--toc-w) minmax(0, 1fr); min-height: 100vh; }
+.toc {
+  position: sticky; top: 0; height: 100vh; overflow: auto;
+  padding: 28px 18px 28px 24px;
+  border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 70%, var(--bg));
+  font-size: 0.86rem;
+}
+.toc-brand { font-family: var(--serif); font-size: 1rem; color: var(--ink); margin: 0 0 4px; }
+.toc-sub { color: var(--muted); font-size: 0.75rem; margin: 0 0 18px; }
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: flex; align-items: baseline; gap: 8px;
+  color: var(--ink-2); padding: 5px 10px; border-radius: 8px;
+  border-left: 2px solid transparent;
+}
+.toc a:hover { background: var(--panel-2); text-decoration: none; }
+.toc a.is-active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); }
+.toc .lvl-3 a { padding-left: 22px; font-size: 0.8rem; color: var(--muted); }
+.toc .lvl-3 a.is-active { color: var(--accent); }
+.toc .toc-ref { font-family: var(--mono); font-size: 0.7em; color: var(--muted); min-width: 2ch; }
+.toc .toc-dot {
+  margin-left: auto; width: 7px; height: 7px; border-radius: 50%; flex: none; align-self: center;
+  background: transparent;
+}
+.toc .has-comment .toc-dot { background: var(--accent); }
+.toc .is-approved .toc-dot { background: var(--ok); }
+.toc .is-rejected .toc-dot { background: var(--bad); }
+.toc .is-preferred .toc-dot { background: var(--accent); }
+.toc-foot { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.75rem; }
+
+main.doc { padding: 56px 64px 140px; max-width: 920px; width: 100%; }
+
+@media (max-width: 960px) {
+  .frame { grid-template-columns: 1fr; }
+  .toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  main.doc { padding: 32px 16px 140px; }
+}
+
+/* ---------- header ---------- */
+.doc-header { margin-bottom: 40px; }
+.eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.72rem; color: var(--muted); margin: 0 0 10px; }
+.doc-header h1 { font-family: var(--serif); font-weight: 600; font-size: 2.35rem; line-height: 1.15; margin: 0 0 14px; letter-spacing: -0.01em; }
+.lede { font-size: 1.1rem; color: var(--ink-2); margin: 0 0 16px; max-width: 64ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 10px 18px; color: var(--muted); font-size: 0.82rem; }
+.meta strong { color: var(--ink-2); font-weight: 600; }
+
+/* ---------- sections & prose ---------- */
+section { margin: 0 0 48px; }
+h2 { font-family: var(--serif); font-weight: 600; font-size: 1.55rem; margin: 40px 0 14px; letter-spacing: -0.005em; }
+h3 { font-size: 1.05rem; font-weight: 650; margin: 0; }
+h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 18px 0 6px; font-weight: 600; }
+p { margin: 0 0 12px; }
+ul, ol { margin: 0 0 12px; padding-left: 1.4rem; }
+li { margin: 2px 0; }
+.intro { font-size: 1.02rem; color: var(--ink-2); max-width: 66ch; }
+
+.callout { border-left: 3px solid var(--info); background: var(--info-soft); padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 14px 0; font-size: 0.95rem; }
+.callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+.callout.bad { border-color: var(--bad); background: var(--bad-soft); }
+.callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+.callout.accent { border-color: var(--accent); background: var(--accent-soft); }
+
+blockquote { margin: 14px 0; padding: 4px 16px; border-left: 3px solid var(--line-2); color: var(--ink-2); font-style: italic; }
+
+/* ---------- points (the commentable unit) ---------- */
+.point {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px 18px;
+  margin: 16px 0;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.2s;
+}
+.point:target { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+.point-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.point-head h3 { flex: 1 1 auto; min-width: 0; }
+.ref {
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 600; color: var(--muted);
+  background: var(--panel-2); border: 1px solid var(--line); padding: 2px 7px; border-radius: 6px; letter-spacing: 0.02em;
+}
+.point-body > :last-child { margin-bottom: 0; }
+.point-body p, .point-body li { font-size: 0.95rem; }
+
+/* decision states */
+.point.is-approved { border-color: color-mix(in srgb, var(--ok) 55%, var(--line)); background: color-mix(in srgb, var(--ok-soft) 55%, var(--panel)); }
+.point.is-rejected { border-color: color-mix(in srgb, var(--bad) 55%, var(--line)); background: color-mix(in srgb, var(--bad-soft) 55%, var(--panel)); }
+.point.is-approved::before, .point.is-rejected::before {
+  content: ""; position: absolute; left: -1px; top: 14px; bottom: 14px; width: 4px; border-radius: 0 4px 4px 0;
+}
+.point.is-approved::before { background: var(--ok); }
+.point.is-rejected::before { background: var(--bad); }
+.point.is-preferred { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+.alternatives.has-preference .option:not(.is-preferred) { opacity: 0.78; }
+
+/* ---------- badges ---------- */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap;
+}
+.badge-high, .badge-bad, .badge-hard { color: var(--bad); background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 30%, transparent); }
+.badge-medium, .badge-warn, .badge-moderate { color: var(--warn); background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
+.badge-low, .badge-ok, .badge-easy { color: var(--ok); background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
+.badge-info { color: var(--info); background: var(--info-soft); border-color: color-mix(in srgb, var(--info) 30%, transparent); }
+.badge-accent, .badge-rec { color: var(--accent); background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+.badge-neutral { color: var(--muted); background: var(--panel-2); border-color: var(--line); }
+
+/* ---------- figures, diagrams, charts ---------- */
+figure.figure {
+  margin: 16px 0; padding: 14px 16px; background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 12px;
+}
+figure.figure figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
+figure.figure pre.mermaid { background: transparent; padding: 0; margin: 0; display: flex; justify-content: center; }
+figure.figure .chart-wrap { position: relative; height: 260px; }
+figure.figure.tall .chart-wrap { height: 360px; }
+.figure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 720px) { .figure-grid { grid-template-columns: 1fr; } }
+.figure-grid figure.figure { margin: 0; }
+.fig-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+
+/* hand drawn schematic helpers */
+.schema { display: flex; flex-direction: column; gap: 6px; }
+.band { padding: 8px 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); font-size: 0.8rem; font-family: var(--mono); }
+.band.deep { background: var(--ink); color: var(--bg); border-color: var(--ink); font-weight: 600; }
+.band.faded { opacity: 0.45; }
+.band.bad { border-color: var(--bad); color: var(--bad); }
+.arrow { text-align: center; color: var(--muted); font-size: 0.8rem; line-height: 1; }
+
+/* meters and stat tiles */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 14px 0; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.stat .num { font-family: var(--serif); font-size: 1.7rem; line-height: 1.1; font-weight: 600; }
+.stat .lbl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+.meter { height: 8px; border-radius: 999px; background: var(--panel-2); overflow: hidden; border: 1px solid var(--line); }
+.meter > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.meter.ok > span { background: var(--ok); }
+.meter.warn > span { background: var(--warn); }
+.meter.bad > span { background: var(--bad); }
+
+/* ---------- alternatives ---------- */
+.alternatives { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin: 18px 0; }
+.alternatives .option { margin: 0; display: flex; flex-direction: column; }
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+@media (max-width: 560px) { .pros-cons { grid-template-columns: 1fr; } }
+.pros, .cons { list-style: none; margin: 0; padding: 10px 12px; border-radius: 10px; font-size: 0.88rem; }
+.pros { background: var(--ok-soft); border: 1px solid color-mix(in srgb, var(--ok) 25%, transparent); }
+.cons { background: var(--bad-soft); border: 1px solid color-mix(in srgb, var(--bad) 25%, transparent); }
+.pros li, .cons li { padding-left: 1.3em; position: relative; margin: 4px 0; }
+.pros li::before { content: "+"; position: absolute; left: 0; color: var(--ok); font-weight: 700; }
+.cons li::before { content: "\2212"; position: absolute; left: 0; color: var(--bad); font-weight: 700; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: 0.85rem; margin: 10px 0 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin: 14px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background: var(--panel-2); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+td.score-low { color: var(--ok); font-weight: 600; }
+td.score-medium { color: var(--warn); font-weight: 600; }
+td.score-high { color: var(--bad); font-weight: 600; }
+
+/* ---------- controls injected by the runtime ---------- */
+.controls { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.btn {
+  appearance: none; border: 1px solid var(--line-2); background: var(--panel); color: var(--ink-2);
+  font: inherit; font-size: 0.78rem; font-weight: 600; padding: 5px 11px; border-radius: 999px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; line-height: 1.2; transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn:hover { background: var(--panel-2); border-color: var(--muted); }
+.btn svg { width: 14px; height: 14px; }
+.btn.is-on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: color-mix(in srgb, var(--accent) 88%, black); border-color: color-mix(in srgb, var(--accent) 88%, black); }
+
+.decide { display: inline-flex; border: 1px solid var(--line-2); border-radius: 999px; overflow: hidden; background: var(--panel); }
+.decide button {
+  appearance: none; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 0.78rem; font-weight: 600;
+  padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.decide button + button { border-left: 1px solid var(--line-2); }
+.decide button:hover { background: var(--panel-2); color: var(--ink); }
+.decide button.approve.is-on { background: var(--ok); color: #fff; }
+.decide button.reject.is-on { background: var(--bad); color: #fff; }
+.decide button svg { width: 13px; height: 13px; }
+
+.comment-slot { margin-top: 14px; display: none; }
+.point.is-commenting .comment-slot, .point.has-comment .comment-slot { display: block; }
+.comment-slot label { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+.comment-slot textarea {
+  width: 100%; min-height: 72px; resize: vertical; font: inherit; font-size: 0.92rem; line-height: 1.5;
+  padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel-2); color: var(--ink);
+}
+.comment-slot textarea:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+.point.has-comment .comment-btn { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+/* ---------- bottom bar and comments panel ---------- */
+.bar {
+  position: fixed; left: var(--toc-w); right: 0; bottom: 0; z-index: 30;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 12px 64px; border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 88%, transparent); backdrop-filter: blur(10px);
+}
+@media (max-width: 960px) { .bar { left: 0; padding: 10px 16px; } }
+.bar .tally { font-size: 0.82rem; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.bar .tally b { color: var(--ink); font-weight: 650; }
+.bar .tally .ok { color: var(--ok); }
+.bar .tally .bad { color: var(--bad); }
+.bar .spacer { flex: 1; }
+
+.panel-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 40; display: none; }
+.panel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); z-index: 50;
+  background: var(--panel); border-left: 1px solid var(--line); box-shadow: var(--shadow);
+  transform: translateX(100%); transition: transform 0.22s ease; display: flex; flex-direction: column;
+}
+body.panel-open .panel { transform: none; }
+body.panel-open .panel-backdrop { display: block; }
+.panel-head { display: flex; align-items: center; gap: 10px; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+.panel-head h2 { margin: 0; font-size: 1.15rem; flex: 1; }
+.panel-body { padding: 18px 22px; overflow: auto; flex: 1; font-size: 0.92rem; }
+.panel-body h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 16px 0 8px; }
+.panel-body h3:first-child { margin-top: 0; }
+.panel-body ul { padding-left: 1.2rem; }
+.panel-body li { margin: 6px 0; }
+.panel-body li .ref { margin-right: 6px; }
+.panel-body li a { font-weight: 600; color: var(--ink); }
+.panel-body li a:hover { color: var(--accent); }
+.panel-body .empty { color: var(--muted); font-style: italic; }
+.panel-foot { padding: 14px 22px; border-top: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; }
+.panel-foot .btn-danger { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, transparent); margin-left: auto; }
+.toast {
+  position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(10px); z-index: 60;
+  background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 999px; font-size: 0.82rem;
+  opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%); }
+
+/* ---------- print ---------- */
+@media print {
+  .toc, .bar, .panel, .panel-backdrop, .controls, .toast { display: none !important; }
+  .frame { display: block; }
+  main.doc { padding: 0; max-width: none; }
+  .point { break-inside: avoid; box-shadow: none; }
+  .comment-slot { display: block !important; }
+  .comment-slot textarea { border: 1px dashed var(--line-2); }
+  .point:not(.has-comment) .comment-slot { display: none !important; }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+<body data-mode="alternatives">
+<div class="frame">
+  <nav class="toc" aria-label="Table of contents">
+    <p class="toc-brand">Horizontal campaign features — schedule C approved</p>
+    <p class="toc-sub">Alternatives &middot; <span data-fill="date"></span></p>
+    <ol class="toc-list"></ol>
+    <div class="toc-foot">Comment on any item, then use <b>All comments</b> at the bottom to copy them back into the chat.</div>
+  </nav>
+  <main class="doc">
+<header class="doc-header">
+  <p class="eyebrow">Alternatives &middot; steampunk-miner horizontal scaling &middot; <b>Schedule C approved</b></p>
+  <h1>Schedule C approved: act arcs + artefact drip through planet 40</h1>
+  <p class="lede">The horizontal cache lists 20 features. 14 of them land on planet 1, and nothing new arrives on planets 16&ndash;40. The resolution of <i>What type and direction of scalability does the game commit to?</i> asks for a schedule of what is new on every planet of a 30&ndash;40 planet campaign. This page compared three ways to fill that schedule. <b>Bjor auto-approved option C</b> (act arcs + artefact drip) on 2026-10-05 (&ldquo;This should always auto approve.&rdquo;). The approved schedule is written into <code>stats.json</code> (status <code>vision</code>); cumulative reaches 58 at planet 40. A/B remain below for reference only.</p>
+  <div class="meta">
+    <span><strong data-fill="point-count"></strong> points</span>
+    <span>Generated <strong data-fill="date"></strong></span>
+    <span>Cache <strong>docs/scaling/horizontal/stats.json</strong></span>
+    <span>Plan only, no game code</span>
+  </div>
+</header>
+<section id="s-1" data-toc="The cliff after planet 15">
+  <h2>1. The cliff after planet 15</h2>
+  <p class="intro">The solid line is today&rsquo;s cache (after the corrections in 1.2). The dashed line is the recommended schedule from section 3.</p>
+  <article class="point" id="p-1-1" data-ref="1.1">
+    <header class="point-head"><span class="ref">1.1</span><h3>Cumulative horizontal features by planet</h3><span class="badge badge-high">High</span></header>
+    <div class="point-body">
+      <figure class="figure"><canvas class="chart tall" data-chart='{"type":"line","data":{"labels":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40"],"datasets":[{"label":"Current (stats.json)","data":[14,15,15,15,15,16,16,17,17,18,18,19,19,19,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"stepped":true,"borderWidth":3,"pointRadius":0},{"label":"Approved schedule C","data":[14,15,16,17,19,20,21,23,24,25,27,28,29,30,31,32,34,35,37,38,39,40,41,42,44,45,47,48,49,50,51,51,52,52,54,55,55,56,56,58],"stepped":true,"borderWidth":3,"pointRadius":0,"borderDash":[6,4]}]},"options":{"scales":{"y":{"beginAtZero":true,"title":{"display":true,"text":"cumulative horizontal features"}},"x":{"title":{"display":true,"text":"planet"}}}}}'></canvas>
+        <figcaption>Today&rsquo;s curve stops at 20 on planet 15 and stays flat for 25 planets. Approved schedule C climbs to 58 at planet 40, with at most 1 planet in a row without something new.</figcaption>
+      </figure>
+      <div class="stats">
+        <div class="stat"><div class="num">53</div><div class="lbl">feature rows in the cache (58 weighted)</div></div>
+        <div class="stat"><div class="num">14</div><div class="lbl">of them land on planet 1</div></div>
+        <div class="stat"><div class="num">0</div><div class="lbl">long flats under C (max gap 1 planet)</div></div>
+        <div class="stat"><div class="num">~20 h</div><div class="lbl">of play in that stretch, at the slice&rsquo;s ~46&ndash;51 min per planet</div></div>
+      </div>
+      <p><b>Problem.</b> Planets 16&ndash;40 offer only bigger numbers, and planets 3&ndash;5 are already empty.</p>
+      <p><b>Impact.</b> Bjor&rsquo;s own words in the #14 resolution: &ldquo;horizontal scaling needs to be tracked throughout the whole start to finish.&rdquo; Today it covers less than half the campaign.</p>
+      <p><b>Suggested change.</b> Adopt a schedule where no more than two planets pass without a new capability (section 2, option C).</p>
+    </div>
+  </article>
+  <article class="point" id="p-1-2" data-ref="1.2">
+    <header class="point-head"><span class="ref">1.2</span><h3>Cache corrected: the three artefact picks are slice-2 features</h3><span class="badge badge-info">Fact fix</span></header>
+    <div class="point-body">
+      <p><b>What changed.</b> <i>How do artefacts work: find in ground, 3 options, each a unique horizontal upgrade?</i> (linked from the second-slice map) names the picks <code>ore_whisper</code>, <code>breathing_room</code> and <code>assay_beacon</code>, built under the second-slice build plan. The seed had <code>assay_beacon</code> as deferred on planet 2 and lacked the other two.</p>
+      <table><thead><tr><th>Feature</th><th>Seed</th><th>Now</th></tr></thead><tbody>
+        <tr><td><code>assay_beacon</code></td><td>deferred, planet 2</td><td>planned, planet 1, slice 2</td></tr>
+        <tr><td><code>ore_whisper</code></td><td>missing</td><td>planned, planet 1, slice 2</td></tr>
+        <tr><td><code>breathing_room</code></td><td>missing</td><td>planned, planet 1, slice 2</td></tr>
+      </tbody></table>
+      <p><b>Effect.</b> 18 &rarr; 20 features; planet 1 goes from 11 to 14, so the front-loading is even sharper. Vision placements were left as seeded; moving them is a proposal (4.3), not a fact. A <code>source_hash</code> now lets a later run skip the recompute when the design and the three issues are unchanged.</p>
+    </div>
+  </article>
+  <article class="point" id="p-1-3" data-ref="1.3">
+    <header class="point-head"><span class="ref">1.3</span><h3>Every planet after 2 reuses the heavy archetype</h3><span class="badge badge-medium">Medium</span></header>
+    <div class="point-body">
+      <p><b>Problem.</b> The planet table registers two archetypes (<code>archetype.base</code>, <code>archetype.heavy</code>), and <code>planetParams</code> clamps every planet from 3 on to the last one.</p>
+      <p><b>Impact.</b> The design says &ldquo;new planet archetypes should introduce horizontal variation&rdquo;, but no archetype hook exists yet beyond gravity and size. Heat at planet 8 is the first place that hook is needed, so it is on the critical path for every option below.</p>
+    </div>
+  </article>
+</section>
+<section id="s-2" data-toc="Three schedule strategies">
+  <h2>2. Three schedule strategies</h2>
+  <p class="intro">All three keep the seeded vision items and the slice as they are. They differ in how the new beats are spaced and themed. <b>Option C is approved</b>; A and B are kept for comparison.</p>
+  <figure class="figure"><canvas class="chart tall" data-chart='{"type":"line","data":{"labels":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40"],"datasets":[{"label":"Current","data":[14,15,15,15,15,16,16,17,17,18,18,19,19,19,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20],"stepped":true,"pointRadius":0,"borderWidth":3},{"label":"A. Steady drip","data":[14,15,15,16,16,17,17,18,18,19,19,20,20,21,22,23,23,24,24,25,25,26,26,27,27,28,28,29,29,30,30,31,31,32,32,33,33,34,34,35],"stepped":true,"pointRadius":0},{"label":"B. Milestone clusters","data":[14,15,15,15,19,19,19,19,19,23,23,23,23,23,26,26,26,26,26,29,29,29,29,29,32,32,32,32,32,35,35,35,35,35,38,38,38,38,38,42],"stepped":true,"pointRadius":0},{"label":"C. Act arcs + artefact drip","data":[14,15,16,17,19,20,21,23,24,25,27,28,29,30,31,32,34,35,37,38,39,40,41,42,44,45,47,48,49,50,51,51,52,52,54,55,55,56,56,58],"stepped":true,"pointRadius":0,"borderWidth":3}]},"options":{"scales":{"y":{"beginAtZero":true,"title":{"display":true,"text":"cumulative horizontal features"}},"x":{"title":{"display":true,"text":"planet"}}}}}'></canvas>
+    <figcaption>A climbs evenly but ends lowest. B climbs in steps with 4-planet flats. C front-loads a bridge out of the slice, is densest in mid-campaign, and ends with fewer, bigger beats.</figcaption>
+  </figure>
+  <div class="alternatives">
+    <article class="point option" id="opt-a" data-ref="A">
+      <header class="point-head"><span class="ref">A</span><h3>Steady drip: one new feature every two planets</h3><span class="badge badge-easy">Low content</span></header>
+      <div class="point-body">
+        <figure class="figure"><canvas class="chart" data-chart='{"type":"bar","data":{"labels":["3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40"],"datasets":[{"label":"A","data":[0,1,0,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1]}]},"options":{"scales":{"y":{"beginAtZero":true,"ticks":{"stepSize":1},"suggestedMax":4}},"plugins":{"legend":{"display":false}}}}'></canvas><figcaption>New features per planet, 3&ndash;40. Even, metronomic.</figcaption></figure>
+        <p>Keep the seeded vision items and add one feature from a backlog on every even planet that has none (4, 14, 16 &hellip; 40).</p>
+        <div class="pros-cons">
+          <ul class="pros"><li>Smallest content bill (15 new features)</li><li>Easy to test: one schedule rule, a gap check in CI</li><li>Closes the planet 16&ndash;40 cliff</li></ul>
+          <ul class="cons"><li>No themes: features arrive in backlog order, not because the planet asks for them</li><li>No climaxes; the vehicle changes shape at random times</li><li>Ends at 35, the lowest of the three</li></ul>
+        </div>
+        <dl class="facts"><dt>New features</dt><dd>15</dd><dt>Total at planet 40</dt><dd>35</dd><dt>Longest flat stretch</dt><dd>1 planet</dd><dt>Reversible</dt><dd>Yes, it is only a schedule</dd></dl>
+      </div>
+    </article>
+    <article class="point option" id="opt-b" data-ref="B">
+      <header class="point-head"><span class="ref">B</span><h3>Milestone clusters every fifth planet</h3><span class="badge badge-moderate">Medium content</span></header>
+      <div class="point-body">
+        <figure class="figure"><canvas class="chart" data-chart='{"type":"bar","data":{"labels":["3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40"],"datasets":[{"label":"B","data":[0,0,4,0,0,0,0,4,0,0,0,0,3,0,0,0,0,3,0,0,0,0,3,0,0,0,0,3,0,0,0,0,3,0,0,0,0,4]}]},"options":{"scales":{"y":{"beginAtZero":true,"ticks":{"stepSize":1},"suggestedMax":4}},"plugins":{"legend":{"display":false}}}}'></canvas><figcaption>New features per planet, 3&ndash;40. Spikes on 5, 10, 15 &hellip; 40, nothing between.</figcaption></figure>
+        <p>Pull the seeded vision items onto milestone planets (5, 10, 15) and land three or four new features together on every fifth planet, each cluster with a visible vehicle or platform change.</p>
+        <div class="pros-cons">
+          <ul class="pros"><li>Big, memorable moments; the vehicle visibly transforms at each milestone (design &sect;10)</li><li>Simple to communicate: &ldquo;every fifth planet is an upgrade planet&rdquo;</li><li>Clusters bundle art and testing work</li></ul>
+          <ul class="cons"><li>Four empty planets between clusters, about three hours at slice pace</li><li>Three to four systems learned at once on milestone planets</li><li>Heat would move from planet 8 to 10, wagons from 12 to 10</li></ul>
+        </div>
+        <dl class="facts"><dt>New features</dt><dd>22</dd><dt>Total at planet 40</dt><dd>42</dd><dt>Longest flat stretch</dt><dd>4 planets</dd><dt>Reversible</dt><dd>Yes, it is only a schedule</dd></dl>
+      </div>
+    </article>
+    <article class="point option" id="opt-c" data-ref="C" data-recommended data-preferred>
+      <header class="point-head"><span class="ref">C</span><h3>Act arcs with an artefact drip</h3><span class="badge badge-rec">Approved</span><span class="badge badge-hard">Most content</span></header>
+      <div class="point-body">
+        <figure class="figure"><canvas class="chart" data-chart='{"type":"bar","data":{"labels":["3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40"],"datasets":[{"label":"C","data":[1,1,2,1,1,2,1,1,2,1,1,1,1,1,2,1,2,1,1,1,1,1,2,1,2,1,1,1,1,0,1,0,2,1,0,1,0,2]}]},"options":{"scales":{"y":{"beginAtZero":true,"ticks":{"stepSize":1},"suggestedMax":4}},"plugins":{"legend":{"display":false}}}}'></canvas><figcaption>New features per planet, 3&ndash;40. Something every one or two planets, double beats where an archetype opens an act.</figcaption></figure>
+        <p>Five acts, each opened by a planet archetype that arrives with its own enemy and its own casing answer, closed by a boss, story or signature beat. Artefact sets (two new picks) fill the gaps cheaply, because the per-planet cache already exists after slice 2.</p>
+        <div class="pros-cons">
+          <ul class="pros"><li>Every beat has a reason: the planet creates a problem, the next unlock answers it</li><li>Uses what slice 2 builds: casing grades get lining types, the artefact cache gets a growing pool</li><li>Covers all of Bjor&rsquo;s categories in every act: items, upgrades, merchants, enemies, features</li><li>Answers both open #35 questions (casing and artefacts across the campaign)</li></ul>
+          <ul class="cons"><li>Biggest bill: 38 new features, though 13 of them are artefact picks or lining types on existing systems</li><li>Needs the archetype hook (1.3) by planet 8</li><li>Act themes lock some ordering; moving heat later moves its enemy and lining too</li></ul>
+        </div>
+        <dl class="facts"><dt>New features</dt><dd>38 (plus guns moved to planet 4)</dd><dt>Total at planet 40</dt><dd>58</dd><dt>Longest flat stretch</dt><dd>1 planet</dd><dt>Reversible</dt><dd>Yes; acts can be approved or cut one at a time</dd></dl>
+      </div>
+    </article>
+  </div>
+  <table class="compare">
+    <thead><tr><th>Option</th><th>Total at 40</th><th>Longest flat</th><th>Content bill</th><th>Memorable moments</th><th>Fit to #14 schedule</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#opt-a">A. Steady drip</a></td><td>35</td><td class="score-low">1</td><td class="score-low">Low (15)</td><td class="score-high">Few</td><td class="score-medium">Covers every planet, no themes</td></tr>
+      <tr><td><a href="#opt-b">B. Milestone clusters</a></td><td>42</td><td class="score-high">4</td><td class="score-medium">Medium (22)</td><td class="score-low">Many</td><td class="score-medium">Gaps of 4 planets</td></tr>
+      <tr class="preferred"><td><a href="#opt-c">C. Act arcs + artefacts (approved)</a></td><td>58</td><td class="score-low">1</td><td class="score-high">High (38)</td><td class="score-low">Many</td><td class="score-low">Something new on almost every planet</td></tr>
+    </tbody>
+  </table>
+  <div class="callout accent"><b>Approved.</b> Bjor auto-approved C on 2026-10-05. <b>Why C.</b> #14 asks for the game to stay new &ldquo;throughout the whole start to finish&rdquo;; C is the only option that does that while giving each beat a reason to exist. Its extra cost is mostly artefact picks and lining types, which reuse the cache and casing systems the second-slice build plan is already building.</div>
+</section>
+<section id="s-3" data-toc="Approved schedule by act">
+  <h2>3. Approved schedule (option C), act by act</h2>
+  <p class="intro">All acts below are in force in <code>stats.json</code>. Cadence rule: never more than two planets (roughly 1.5 hours at slice pace) without a new capability; an archetype, vehicle change or boss every three to four planets; artefact picks and enemy behaviours in between.</p>
+  <figure class="figure"><canvas class="chart" data-chart='{"type":"bar","data":{"labels":["Act I (3-7)","Act II (8-16)","Act III (17-24)","Act IV (25-32)","Act V (33-40)"],"datasets":[{"label":"Unique item","data":[2,2,2,2,2]},{"label":"Upgrade","data":[1,4,2,3,0]},{"label":"Merchant","data":[0,1,0,0,0]},{"label":"Enemy","data":[1,2,3,1,0]},{"label":"Facility","data":[1,1,2,0,1]},{"label":"Environment","data":[0,1,1,1,1]},{"label":"Feature","data":[1,0,0,2,3]}]},"options":{"scales":{"x":{"stacked":true},"y":{"stacked":true,"beginAtZero":true,"ticks":{"stepSize":1}}}}}'></canvas>
+    <figcaption>Every act carries enemies, upgrades and at least one unique item or facility; merchants arrive once and then scale vertically.</figcaption>
+  </figure>
+  <article class="point" id="p-3-1" data-ref="3.1" data-decision>
+    <header class="point-head"><span class="ref">3.1</span><h3>Act I &middot; Leaving the slice (planets 3&ndash;7)</h3><span class="badge badge-accent">+6 features</span></header>
+    <div class="point-body">
+      <p>Bridge out of the two slice planets: one platform bay, the first gun, the first tunnel enemy and a new mining method.</p>
+      <table><thead><tr><th>Planet</th><th>Feature</th><th>Lane</th><th>New capability or decision</th><th>Vertical tail</th></tr></thead><tbody><tr><td>3</td><td><b>Refinery bay</b><br><code>refinery_bay</code></td><td>Facility</td><td>Third platform bay: refine ore into alloy over a timed batch, so the player chooses between selling now and refining for more.</td><td>Batch size, refine time, alloy multiplier</td></tr><tr><td>4</td><td><b>Automated guns (moved from planet 15)</b> <span class="badge badge-neutral">from seed</span><br><code>auto_guns</code></td><td>Upgrade</td><td>A self-aiming gun on the hull; the first visible weapon, so the flanks stop being soft.</td><td>Damage, fire rate, range, ammo efficiency</td></tr><tr><td>5</td><td><b>Artefact set I: Seismic ping, Second wind</b><br><code>artefact_set_1</code></td><td>Unique item</td><td>Two picks join the cache pool: a ping that outlines nearby caves once per dive, and one free tow home per planet.</td><td>Ping radius, cooldown</td></tr><tr><td>6</td><td><b>Tunnel wrecker (the new enemy family)</b> <span class="badge badge-neutral">from seed</span><br><code>tunnel_wrecker</code></td><td>Enemy</td><td>Gnaws lining behind the vehicle so a cased tunnel can still cave in; the design&rsquo;s &ldquo;enemy that attacks the player&rsquo;s tunnel&rdquo;.</td><td>Gnaw rate, health, spawn density</td></tr><tr><td>7</td><td><b>Blasting charges</b><br><code>blasting_charges</code></td><td>Feature</td><td>Plant a charge, back off and clear a radius in one go; a blast can trigger the collapse rule.</td><td>Radius, charges carried, price</td></tr></tbody></table>
+      <p><b>Cumulative.</b> 15 at planet 2 &rarr; 21 at planet 7 (today: 15 &rarr; 16).</p>
+    </div>
+  </article>
+  <article class="point" id="p-3-2" data-ref="3.2" data-decision>
+    <header class="point-head"><span class="ref">3.2</span><h3>Act II &middot; Fire (planets 8&ndash;16)</h3><span class="badge badge-high">+11 features</span></header>
+    <div class="point-body">
+      <p>The first new planet archetype since planet 2, its enemy and its lining, then merchants, wagons and the first boss.</p>
+      <table><thead><tr><th>Planet</th><th>Feature</th><th>Lane</th><th>New capability or decision</th><th>Vertical tail</th></tr></thead><tbody><tr><td>8</td><td><b>Heat / lava planets</b> <span class="badge badge-neutral">from seed</span><br><code>heat_lava</code></td><td>Environment</td><td>A heat gauge and lava pockets turn cooling into a routing decision.</td><td>Temperature per planet</td></tr><tr><td>8</td><td><b>Refractory lining</b><br><code>refractory_lining</code></td><td>Upgrade</td><td>A second casing type for lava bands; ordinary lining slags in the heat.</td><td>Existing casingGrade curve</td></tr><tr><td>9</td><td><b>Magma tick</b><br><code>magma_tick</code></td><td>Enemy</td><td>Follows heat and explodes on contact, so running hot now draws enemies.</td><td>Blast damage, detection range</td></tr><tr><td>10</td><td><b>Specialist merchants</b> <span class="badge badge-neutral">from seed</span><br><code>merchants</code></td><td>Merchant</td><td>A visiting trader docks at the platform with a small rotating stock of unique parts.</td><td>Stock tier, prices</td></tr><tr><td>11</td><td><b>Artefact set II: Ember valve, Overclock</b><br><code>artefact_set_2</code></td><td>Unique item</td><td>Vent heat for a burst of speed; a player-triggered drill overdrive that costs energy.</td><td>Burst length, overheat cost</td></tr><tr><td>12</td><td><b>Cargo wagon</b> <span class="badge badge-neutral">from seed</span><br><code>wagons</code></td><td>Upgrade</td><td>The first wagon couples behind the vehicle; turning circles and tunnel width start to matter.</td><td>Wagon capacity, armour</td></tr><tr><td>13</td><td><b>Side drill arms</b><br><code>side_drills</code></td><td>Upgrade</td><td>A new attachment point that cuts sideways and widens shafts (and eats more lining).</td><td>Reach, power, energy draw</td></tr><tr><td>14</td><td><b>Scanner station</b><br><code>scanner_station</code></td><td>Facility</td><td>A platform scan before descent outlines ore patches on one band; discovery stops being purely visual.</td><td>Scan depth, resolution</td></tr><tr><td>15</td><td><b>Core guardian chamber</b><br><code>core_guardian</code></td><td>Enemy</td><td>Act finale: a boss guards the core region, one of the core-extraction events the design lists.</td><td>Health, phases, reward</td></tr><tr><td>16</td><td><b>Repair or weapons wagon</b><br><code>special_wagons</code></td><td>Upgrade</td><td>Choose what the second wagon slot is: field repair or a turret car.</td><td>Repair rate / turret damage</td></tr></tbody></table>
+      <p><b>Cumulative.</b> 21 at planet 7 &rarr; 32 at planet 16 (today: 16 &rarr; 20).</p>
+    </div>
+  </article>
+  <article class="point" id="p-3-3" data-ref="3.3" data-decision>
+    <header class="point-head"><span class="ref">3.3</span><h3>Act III &middot; Ice (planets 17&ndash;24)</h3><span class="badge badge-info">+10 features</span></header>
+    <div class="point-body">
+      <p>Cold and refreezing ground, ranged and swarm enemies, and the first automation (drones) with an enemy that preys on it.</p>
+      <table><thead><tr><th>Planet</th><th>Feature</th><th>Lane</th><th>New capability or decision</th><th>Vertical tail</th></tr></thead><tbody><tr><td>17</td><td><b>Frozen planets</b><br><code>frozen_planets</code></td><td>Environment</td><td>Cold drains energy and ice refreezes behind the vehicle (regenerating ground).</td><td>Temperature, refreeze rate</td></tr><tr><td>17</td><td><b>Insulated lining</b><br><code>insulated_lining</code></td><td>Upgrade</td><td>A casing type that keeps refrozen ice out of lined tunnels.</td><td>Existing casingGrade curve</td></tr><tr><td>18</td><td><b>Frost spitter</b><br><code>frost_spitter</code></td><td>Enemy</td><td>The first ranged enemy: facing the drill at it no longer protects you.</td><td>Range, projectile damage</td></tr><tr><td>19</td><td><b>Artefact set III: Thermal lance, Glide treads</b><br><code>artefact_set_3</code></td><td>Unique item</td><td>Melt a lane straight through ice; slide fast along frozen tunnel floors.</td><td>Lance length, cooldown</td></tr><tr><td>20</td><td><b>Drone bay (hauler drones)</b><br><code>drone_bay</code></td><td>Facility</td><td>Drones ferry full cargo to the platform while the player keeps drilling.</td><td>Drone count, capacity, speed</td></tr><tr><td>21</td><td><b>Swarm nests</b><br><code>swarm_nests</code></td><td>Enemy</td><td>Nest depth events release swarms; clear the nest or route around it.</td><td>Swarm size, nest health</td></tr><tr><td>22</td><td><b>Steam shield</b><br><code>shields</code></td><td>Upgrade</td><td>A timed active shield that blocks side hits at an energy cost.</td><td>Duration, recharge, absorb</td></tr><tr><td>23</td><td><b>Ore thief</b><br><code>ore_thief</code></td><td>Enemy</td><td>Steals cargo from wagons and drones, so automation becomes something to defend.</td><td>Steal rate, speed</td></tr><tr><td>24</td><td><b>Research lab</b><br><code>research_lab</code></td><td>Facility</td><td>Pick one branch per tier: permanent forks rather than bigger numbers.</td><td>Branch depth</td></tr></tbody></table>
+      <p><b>Cumulative.</b> 32 at planet 16 &rarr; 42 at planet 24 (today: 20 &rarr; 20).</p>
+    </div>
+  </article>
+  <article class="point" id="p-3-4" data-ref="3.4" data-decision>
+    <header class="point-head"><span class="ref">3.4</span><h3>Act IV &middot; Storm and relic (planets 25&ndash;32)</h3><span class="badge badge-medium">+9 features</span></header>
+    <div class="point-body">
+      <p>Interference that attacks equipment, NPC contracts and a story planet to close the act.</p>
+      <table><thead><tr><th>Planet</th><th>Feature</th><th>Lane</th><th>New capability or decision</th><th>Vertical tail</th></tr></thead><tbody><tr><td>25</td><td><b>Magnetic / electrified planets</b><br><code>magnetic_planets</code></td><td>Environment</td><td>Storm bands scramble the HUD scan and drones.</td><td>Storm intensity, band width</td></tr><tr><td>25</td><td><b>Grounded lining</b><br><code>grounded_lining</code></td><td>Upgrade</td><td>A casing type that earths storms inside lined tunnels, giving safe corridors.</td><td>Existing casingGrade curve</td></tr><tr><td>26</td><td><b>EMP mite</b><br><code>emp_mite</code></td><td>Enemy</td><td>Disables one attachment (gun, shield or side drills) until it is repaired.</td><td>Disable time, health</td></tr><tr><td>27</td><td><b>Artefact set IV: Relay coil, Salvage magnet</b><br><code>artefact_set_4</code></td><td>Unique item</td><td>Chain a drone relay through storms; pull scrap from ancient wrecks.</td><td>Relay range, salvage yield</td></tr><tr><td>28</td><td><b>Quest office (NPC contracts)</b><br><code>quest_office</code></td><td>Feature</td><td>Optional contracts from NPCs (deliver, rescue, clear) that give a reason to leave the straight dive.</td><td>Reward tier, contract length</td></tr><tr><td>29</td><td><b>Processing wagon</b><br><code>processing_wagon</code></td><td>Upgrade</td><td>Refine on the move; the planet-3 refinery decision goes underground.</td><td>Refine speed</td></tr><tr><td>30</td><td><b>Relic story planet</b><br><code>relic_planet</code></td><td>Feature</td><td>Act finale: an ancient machine depth event the player powers with core.</td><td>&mdash;</td></tr><tr><td>31</td><td><b>Deployable turrets and mines</b><br><code>deployables</code></td><td>Upgrade</td><td>Drop defences at a tunnel junction before cutting into the core.</td><td>Count, damage</td></tr></tbody></table>
+      <p><b>Cumulative.</b> 42 at planet 24 &rarr; 51 at planet 32 (today: 20 &rarr; 20).</p>
+    </div>
+  </article>
+  <article class="point" id="p-3-5" data-ref="3.5" data-decision>
+    <header class="point-head"><span class="ref">3.5</span><h3>Act V &middot; Hollow and core (planets 33&ndash;40)</h3><span class="badge badge-rec">+7 features</span></header>
+    <div class="point-body">
+      <p>Fewer, bigger signature beats: hollow worlds, escape runs, the core forge and the finale with endless mode.</p>
+      <table><thead><tr><th>Planet</th><th>Feature</th><th>Lane</th><th>New capability or decision</th><th>Vertical tail</th></tr></thead><tbody><tr><td>33</td><td><b>Hollow planets</b><br><code>hollow_planets</code></td><td>Environment</td><td>A thin shell around an open low-gravity interior; flight and anchoring replace digging.</td><td>Shell thickness, gravity</td></tr><tr><td>35</td><td><b>Artefact set V: Grapple anchor, Core sense</b><br><code>artefact_set_5</code></td><td>Unique item</td><td>Anchor to cavern roofs; feel the core&rsquo;s direction once per planet.</td><td>Anchor length</td></tr><tr><td>36</td><td><b>Unstable cores (escape run)</b><br><code>unstable_cores</code></td><td>Feature</td><td>Harvesting the core starts a timed collapse: get out, one of the design&rsquo;s escape sequences.</td><td>Timer, collapse speed</td></tr><tr><td>38</td><td><b>Core forge</b><br><code>core_forge</code></td><td>Facility</td><td>Spend core on one legendary part per forge tier; the platform&rsquo;s signature facility.</td><td>Forge tier</td></tr><tr><td>40</td><td><b>Finale story planet</b><br><code>finale</code></td><td>Feature</td><td>The campaign mystery resolves at the last core, the design&rsquo;s red line.</td><td>&mdash;</td></tr><tr><td>40</td><td><b>Endless mode unlock</b><br><code>endless_unlock</code></td><td>Feature</td><td>After the finale, planets keep coming with recombined archetypes and enemy families (#14).</td><td>Every formula past 40</td></tr></tbody></table>
+      <p><b>Cumulative.</b> 51 at planet 32 &rarr; 58 at planet 40 (today: 20 &rarr; 20).</p>
+    </div>
+  </article>
+</section>
+<section id="s-4" data-toc="Campaign rules for casing, artefacts, guns">
+  <h2>4. Campaign rules for casing, artefacts and guns</h2>
+  <p class="intro">The second-slice map leaves &ldquo;full campaign horizontal schedule updates for casing and artefacts&rdquo; under Not yet specified. These three rules close it; each can be approved on its own.</p>
+  <article class="point" id="p-4-1" data-ref="4.1" data-decision>
+    <header class="point-head"><span class="ref">4.1</span><h3>Casing: grade stays vertical, lining types are the horizontal beats</h3><span class="badge badge-moderate">Moderate</span></header>
+    <div class="point-body">
+      <div class="schema">
+        <div class="band">Planet 1: standard lining, <code>casingGrade</code> &ge; band (slice 2 rule, unchanged)</div><div class="arrow">&darr;</div>
+        <div class="band deep">Planet 8: refractory lining for lava bands</div><div class="arrow">&darr;</div>
+        <div class="band deep">Planet 17: insulated lining against refreezing ice</div><div class="arrow">&darr;</div>
+        <div class="band deep">Planet 25: grounded lining, safe corridors through storms</div>
+      </div>
+      <p><b>Proposal.</b> Casing grade keeps scaling by formula (vertical); each new archetype adds one lining type the player must choose and pay for (horizontal). The vehicle lays one type at a time, so switching is a decision.</p>
+      <p><b>Open point.</b> Whether re-lining an existing tunnel with a new type costs anything; the slice&rsquo;s relining rule suggests no.</p>
+    </div>
+  </article>
+  <article class="point" id="p-4-2" data-ref="4.2" data-decision>
+    <header class="point-head"><span class="ref">4.2</span><h3>Artefacts: one cache per planet, pool grows by two every act</h3><span class="badge badge-easy">Cheap</span></header>
+    <div class="point-body">
+      <figure class="figure"><canvas class="chart" data-chart='{"type":"line","data":{"labels":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40"],"datasets":[{"label":"Artefact picks in the pool","data":[3,3,3,3,5,5,5,5,5,5,7,7,7,7,7,7,7,7,9,9,9,9,9,9,9,9,11,11,11,11,11,11,11,11,13,13,13,13,13,13],"stepped":true,"pointRadius":0,"borderWidth":3},{"label":"Caches opened so far (one per planet)","data":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40],"pointRadius":0,"borderDash":[4,4]}]},"options":{"scales":{"y":{"beginAtZero":true}}}}'></canvas>
+        <figcaption>The pool grows from 3 to 13 picks. The player opens one cache per planet, so from about planet 13 onward caches must also offer re-picks.</figcaption>
+      </figure>
+      <p><b>Proposal.</b> Keep the slice rule (one cache per planet, exclusive 3-pick, no pure stat bumps) and add two act-themed picks at planets 5, 11, 19, 27 and 35. Each cache offers at least one pick the player has never been offered while any remain.</p>
+      <p><b>Decision needed.</b> What re-picking an owned artefact does once the pool is exhausted; suggestion: it upgrades that artefact (a vertical tail), which keeps every cache worth opening.</p>
+    </div>
+  </article>
+  <article class="point" id="p-4-3" data-ref="4.3" data-decision>
+    <header class="point-head"><span class="ref">4.3</span><h3>Move automated guns from planet 15 to planet 4</h3><span class="badge badge-medium">Medium</span></header>
+    <div class="point-body">
+      <blockquote>Automatic guns could appear around the third major planet or progression milestone, depending on pacing. &mdash; docs/design.md &sect;11</blockquote>
+      <p><b>Problem.</b> The seed puts <code>auto_guns</code> at 15, far from the design&rsquo;s hint, while planets 3&ndash;5 have nothing.</p>
+      <p><b>Proposal.</b> Planet 4: the first planet after the refinery bay, early enough to change how the player handles side hits for the rest of the campaign. Planet 15 gets the core guardian instead.</p>
+    </div>
+  </article>
+</section>
+<section id="s-5" data-toc="Done">
+  <h2>5. Done</h2>
+  <p><b>Schedule C is written into</b> <code>docs/scaling/horizontal/stats.json</code>: 38 vision features (plus relocated <code>auto_guns</code> and <code>tunnel_wrecker</code>), <code>cumulative_by_planet</code> recomputed to 58 at planet 40, <code>schedule_approved: "C"</code>. No game code changed.</p>
+  <p>Next (when asked): draft per-act tickets for the Progression &amp; Content Designer from the act tables in section 3.</p>
+</section>
+  </main>
+</div>
+
+<div class="bar">
+  <div class="tally"></div>
+  <span class="spacer"></span>
+  <button type="button" class="btn" data-action="print">Print</button>
+  <button type="button" class="btn btn-primary open-panel" data-action="open-panel">All comments (<b>0</b>)</button>
+</div>
+
+<div class="panel-backdrop"></div>
+<aside class="panel" aria-label="All comments">
+  <div class="panel-head">
+    <h2>Comments and decisions</h2>
+    <button type="button" class="btn" data-action="close-panel">Close</button>
+  </div>
+  <div class="panel-body"></div>
+  <div class="panel-foot">
+    <button type="button" class="btn btn-primary" data-action="copy-md">Copy as Markdown</button>
+    <button type="button" class="btn" data-action="download-md">Download .md</button>
+    <button type="button" class="btn btn-danger" data-action="clear-all">Clear all</button>
+  </div>
+</aside>
+
+<script>
+/* osilion-html runtime. Inlined into every report by scripts/build.*
+ *
+ * Responsibilities:
+ *  - build the left table of contents from <h2> sections and .point cards, with scroll-spy
+ *  - inject a comment field into every .point (and .option) card
+ *  - inject Approve / Reject controls (body[data-mode="approval"] or .point[data-decision])
+ *  - inject "Prefer this" on .option cards inside .alternatives
+ *  - persist everything in localStorage under the document id
+ *  - list all comments and decisions in a side panel, copy them as Markdown
+ *  - render Mermaid diagrams and Chart.js charts (data-chart JSON on <canvas>)
+ */
+(function () {
+  "use strict";
+
+  var doc = document;
+  var root = doc.documentElement;
+  var DOC_ID = root.getAttribute("data-doc") || doc.title || "osilion";
+  var STORE_KEY = "osilion:" + DOC_ID;
+  var MODE = doc.body.getAttribute("data-mode") || "findings";
+
+  var ICON = {
+    comment: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    cross: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+    star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>',
+    list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'
+  };
+
+  /* ---------------- state ---------------- */
+  var state = load();
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); } catch (e) { return {}; }
+  }
+  var saveTimer = null;
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* private window etc. */ }
+    }, 150);
+  }
+  function entry(id) { return state[id] || (state[id] = {}); }
+
+  /* ---------------- helpers ---------------- */
+  function el(tag, cls, html) {
+    var e = doc.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function text(node) { return (node ? node.textContent : "").replace(/\s+/g, " ").trim(); }
+  function pointTitle(p) {
+    var h = p.querySelector(".point-head h3, h3");
+    return text(h) || p.id;
+  }
+  function pointRef(p) { return p.getAttribute("data-ref") || text(p.querySelector(".ref")) || ""; }
+  function wantsDecision(p) {
+    var attr = p.getAttribute("data-decision");
+    if (attr === "false") return false;
+    if (attr != null) return true;
+    return MODE === "approval" && !p.classList.contains("option");
+  }
+  function showToast(msg) {
+    var t = doc.querySelector(".toast");
+    if (!t) { t = el("div", "toast"); doc.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._h);
+    t._h = setTimeout(function () { t.classList.remove("show"); }, 1600);
+  }
+
+  /* ---------------- points: ids, comments, decisions, preference ---------------- */
+  var points = Array.prototype.slice.call(doc.querySelectorAll(".point"));
+  points.forEach(function (p, i) { if (!p.id) p.id = "p-" + (i + 1); });
+
+  function decoratePoint(p) {
+    var head = p.querySelector(".point-head");
+    if (!head) {
+      head = el("header", "point-head");
+      var h3 = p.querySelector("h3");
+      if (h3) { h3.parentNode.insertBefore(head, h3); head.appendChild(h3); } else { p.insertBefore(head, p.firstChild); }
+    }
+    var controls = el("div", "controls");
+    head.appendChild(controls);
+
+    if (p.classList.contains("option") && p.closest(".alternatives")) addPrefer(p, controls);
+    if (wantsDecision(p)) addDecision(p, controls);
+    addComment(p, controls);
+    applyState(p);
+  }
+
+  function addComment(p, controls) {
+    var btn = el("button", "btn comment-btn", ICON.comment + "<span>Comment</span>");
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Comment on " + pointTitle(p));
+    controls.appendChild(btn);
+
+    var slot = el("div", "comment-slot");
+    var id = p.id + "-comment";
+    slot.innerHTML = '<label for="' + id + '">Your comment</label>';
+    var ta = el("textarea");
+    ta.id = id;
+    ta.placeholder = "What should change, what is missing, or what you disagree with...";
+    slot.appendChild(ta);
+    p.appendChild(slot);
+
+    btn.addEventListener("click", function () {
+      p.classList.toggle("is-commenting");
+      if (p.classList.contains("is-commenting")) ta.focus();
+    });
+    ta.addEventListener("input", function () {
+      var v = ta.value.trim();
+      if (v) entry(p.id).comment = ta.value; else delete entry(p.id).comment;
+      p.classList.toggle("has-comment", !!v);
+      save(); syncToc(p); tally();
+    });
+  }
+
+  function addDecision(p, controls) {
+    var seg = el("div", "decide");
+    var a = el("button", "approve", ICON.check + "<span>Approve</span>");
+    var r = el("button", "reject", ICON.cross + "<span>Reject</span>");
+    a.type = r.type = "button";
+    seg.appendChild(a); seg.appendChild(r);
+    controls.insertBefore(seg, controls.firstChild);
+    function set(v) {
+      var cur = entry(p.id).decision;
+      var next = cur === v ? null : v;
+      if (next) entry(p.id).decision = next; else delete entry(p.id).decision;
+      save(); applyState(p); syncToc(p); tally();
+    }
+    a.addEventListener("click", function () { set("approved"); });
+    r.addEventListener("click", function () { set("rejected"); });
+  }
+
+  function addPrefer(p, controls) {
+    var btn = el("button", "btn prefer-btn", ICON.star + "<span>Prefer this</span>");
+    btn.type = "button";
+    controls.insertBefore(btn, controls.firstChild);
+    btn.addEventListener("click", function () {
+      var group = p.closest(".alternatives");
+      var was = !!entry(p.id).preferred;
+      group.querySelectorAll(".option").forEach(function (o) { delete entry(o.id).preferred; });
+      if (!was) entry(p.id).preferred = true;
+      save();
+      group.querySelectorAll(".option").forEach(function (o) { applyState(o); syncToc(o); });
+      tally();
+    });
+  }
+
+  function applyState(p) {
+    var s = state[p.id] || {};
+    p.classList.toggle("is-approved", s.decision === "approved");
+    p.classList.toggle("is-rejected", s.decision === "rejected");
+    p.classList.toggle("is-preferred", !!s.preferred);
+    p.classList.toggle("has-comment", !!(s.comment && s.comment.trim()));
+    var a = p.querySelector(".decide .approve"), r = p.querySelector(".decide .reject");
+    if (a) a.classList.toggle("is-on", s.decision === "approved");
+    if (r) r.classList.toggle("is-on", s.decision === "rejected");
+    var pf = p.querySelector(".prefer-btn");
+    if (pf) { pf.classList.toggle("is-on", !!s.preferred); pf.querySelector("span").textContent = s.preferred ? "Preferred" : "Prefer this"; }
+    var ta = p.querySelector(".comment-slot textarea");
+    if (ta && s.comment && ta.value !== s.comment) ta.value = s.comment;
+    var group = p.closest(".alternatives");
+    if (group) group.classList.toggle("has-preference", !!group.querySelector(".option.is-preferred"));
+  }
+
+  points.forEach(decoratePoint);
+
+  /* ---------------- table of contents ---------------- */
+  var tocList = doc.querySelector(".toc ol.toc-list");
+  var tocItems = {};
+  function buildToc() {
+    if (!tocList) return;
+    var sections = doc.querySelectorAll("main.doc section");
+    sections.forEach(function (sec, si) {
+      var h2 = sec.querySelector("h2");
+      if (!h2) return;
+      if (!sec.id) sec.id = "s-" + (si + 1);
+      var li = el("li", "lvl-2");
+      var a = el("a");
+      a.href = "#" + sec.id;
+      a.innerHTML = "<span>" + escapeHtml(sec.getAttribute("data-toc") || text(h2)) + "</span>";
+      li.appendChild(a);
+      tocList.appendChild(li);
+      tocItems[sec.id] = li;
+      var sub = el("ol");
+      sec.querySelectorAll(".point").forEach(function (p) {
+        var pli = el("li", "lvl-3");
+        var pa = el("a");
+        pa.href = "#" + p.id;
+        var ref = pointRef(p);
+        pa.innerHTML = (ref ? '<span class="toc-ref">' + escapeHtml(ref) + "</span>" : "") +
+          "<span>" + escapeHtml(pointTitle(p)) + '</span><span class="toc-dot"></span>';
+        pli.appendChild(pa);
+        sub.appendChild(pli);
+        tocItems[p.id] = pli;
+        syncToc(p);
+      });
+      if (sub.children.length) li.appendChild(sub);
+    });
+  }
+  function syncToc(p) {
+    var li = tocItems[p.id];
+    if (!li) return;
+    ["has-comment", "is-approved", "is-rejected", "is-preferred"].forEach(function (c) { li.classList.toggle(c, p.classList.contains(c)); });
+  }
+  function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  buildToc();
+
+  // Keep the active entry visible inside the table of contents, and scroll
+  // nothing else. scrollIntoView*() scrolls every scrollable ancestor,
+  // including the page: on a narrow or zoomed-in viewport the TOC sits at the
+  // top of the page, so it yanked the reader back up there, and the new scroll
+  // position re-fired the spy. Only the TOC's own box moves, instantly, and
+  // only while the TOC is actually its own scroll container.
+  var tocBox = doc.querySelector(".toc");
+  function keepTocEntryVisible(li) {
+    if (!li || !tocBox) return;
+    var style = window.getComputedStyle(tocBox);
+    var scrollsOnItsOwn = style.position === "sticky" && /(auto|scroll)/.test(style.overflowY) &&
+      tocBox.scrollHeight > tocBox.clientHeight;
+    if (!scrollsOnItsOwn) return;
+    var box = tocBox.getBoundingClientRect();
+    var item = li.getBoundingClientRect();
+    var margin = 48;
+    var delta = 0;
+    if (item.top < box.top + margin) delta = item.top - box.top - margin;
+    else if (item.bottom > box.bottom - margin) delta = item.bottom - box.bottom + margin;
+    if (delta !== 0) tocBox.scrollTo({ top: tocBox.scrollTop + delta, behavior: "auto" });
+  }
+
+  // scroll-spy
+  var spyTargets = Object.keys(tocItems).map(function (id) { return doc.getElementById(id); }).filter(Boolean);
+  if ("IntersectionObserver" in window && spyTargets.length) {
+    var visible = new Set();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) visible.add(e.target.id); else visible.delete(e.target.id); });
+      var first = spyTargets.find(function (t) { return visible.has(t.id); });
+      if (!first) return;
+      Object.keys(tocItems).forEach(function (id) { tocItems[id].querySelector("a").classList.toggle("is-active", id === first.id); });
+      keepTocEntryVisible(tocItems[first.id]);
+    }, { rootMargin: "-10% 0px -70% 0px", threshold: 0 });
+    spyTargets.forEach(function (t) { io.observe(t); });
+  }
+
+  /* ---------------- bottom bar, tally, panel ---------------- */
+  var bar = doc.querySelector(".bar");
+  var tallyEl = bar ? bar.querySelector(".tally") : null;
+  var decisionPoints = points.filter(wantsDecision);
+  function tally() {
+    if (!tallyEl) return;
+    var comments = points.filter(function (p) { return p.classList.contains("has-comment"); }).length;
+    var parts = ['<span><b>' + comments + "</b> comment" + (comments === 1 ? "" : "s") + "</span>"];
+    if (decisionPoints.length) {
+      var ap = decisionPoints.filter(function (p) { return p.classList.contains("is-approved"); }).length;
+      var rj = decisionPoints.filter(function (p) { return p.classList.contains("is-rejected"); }).length;
+      parts.push('<span class="ok"><b>' + ap + "</b> approved</span>");
+      parts.push('<span class="bad"><b>' + rj + "</b> rejected</span>");
+      parts.push("<span><b>" + (decisionPoints.length - ap - rj) + "</b> undecided</span>");
+    }
+    var pref = points.filter(function (p) { return p.classList.contains("is-preferred"); });
+    if (pref.length) parts.push("<span>Preferred: <b>" + escapeHtml(pref.map(pointTitle).join(", ")) + "</b></span>");
+    tallyEl.innerHTML = parts.join("");
+    var cb = bar.querySelector(".open-panel b");
+    if (cb) cb.textContent = comments;
+  }
+
+  function collect() {
+    var out = { comments: [], approved: [], rejected: [], undecided: [], preferred: [] };
+    points.forEach(function (p) {
+      var s = state[p.id] || {};
+      var item = { id: p.id, ref: pointRef(p), title: pointTitle(p), comment: (s.comment || "").trim(), decision: s.decision, preferred: !!s.preferred };
+      if (item.comment) out.comments.push(item);
+      if (item.preferred) out.preferred.push(item);
+      if (wantsDecision(p)) {
+        if (s.decision === "approved") out.approved.push(item);
+        else if (s.decision === "rejected") out.rejected.push(item);
+        else out.undecided.push(item);
+      }
+    });
+    return out;
+  }
+  function label(it) { return (it.ref ? it.ref + " " : "") + it.title; }
+
+  function toMarkdown() {
+    var c = collect();
+    var lines = ["## Review of \"" + doc.title + "\"", ""];
+    lines.push("### Comments");
+    if (!c.comments.length) lines.push("- (none)");
+    c.comments.forEach(function (it) {
+      var flags = [];
+      if (it.decision) flags.push(it.decision);
+      if (it.preferred) flags.push("preferred");
+      lines.push("- **" + label(it) + "**" + (flags.length ? " (" + flags.join(", ") + ")" : "") + ": " + it.comment.replace(/\n+/g, " "));
+    });
+    if (decisionPoints.length) {
+      lines.push("", "### Decisions");
+      lines.push("- Approved: " + (c.approved.map(label).join("; ") || "none"));
+      lines.push("- Rejected: " + (c.rejected.map(label).join("; ") || "none"));
+      lines.push("- Undecided: " + (c.undecided.map(label).join("; ") || "none"));
+    }
+    if (c.preferred.length) {
+      lines.push("", "### Preferred option");
+      c.preferred.forEach(function (it) { lines.push("- " + label(it)); });
+    }
+    return lines.join("\n");
+  }
+
+  function renderPanel() {
+    var body = doc.querySelector(".panel-body");
+    if (!body) return;
+    var c = collect();
+    var html = "<h3>Comments</h3>";
+    html += c.comments.length ? "<ul>" + c.comments.map(function (it) {
+      return "<li>" + (it.ref ? '<span class="ref">' + escapeHtml(it.ref) + "</span>" : "") +
+        '<a href="#' + it.id + '">' + escapeHtml(it.title) + "</a>" +
+        (it.decision ? ' <span class="badge badge-' + (it.decision === "approved" ? "ok" : "bad") + '">' + it.decision + "</span>" : "") +
+        (it.preferred ? ' <span class="badge badge-accent">preferred</span>' : "") +
+        "<br>" + escapeHtml(it.comment).replace(/\n/g, "<br>") + "</li>";
+    }).join("") + "</ul>" : '<p class="empty">No comments yet. Use the Comment button on any item.</p>';
+    if (decisionPoints.length) {
+      html += "<h3>Decisions</h3><ul>" +
+        "<li><b>Approved</b>: " + (c.approved.map(linkLabel).join("; ") || "none") + "</li>" +
+        "<li><b>Rejected</b>: " + (c.rejected.map(linkLabel).join("; ") || "none") + "</li>" +
+        "<li><b>Undecided</b>: " + (c.undecided.map(linkLabel).join("; ") || "none") + "</li></ul>";
+    }
+    if (c.preferred.length) html += "<h3>Preferred option</h3><ul>" + c.preferred.map(function (it) { return "<li>" + linkLabel(it) + "</li>"; }).join("") + "</ul>";
+    body.innerHTML = html;
+    body.querySelectorAll("a[href^='#']").forEach(function (a) { a.addEventListener("click", closePanel); });
+  }
+  function linkLabel(it) { return '<a href="#' + it.id + '">' + escapeHtml(label(it)) + "</a>"; }
+
+  function openPanel() { renderPanel(); doc.body.classList.add("panel-open"); }
+  function closePanel() { doc.body.classList.remove("panel-open"); }
+
+  function copyMarkdown() {
+    var md = toMarkdown();
+    var done = function () { showToast("Copied as Markdown. Paste it back into the chat."); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { fallbackCopy(md); done(); });
+    else { fallbackCopy(md); done(); }
+  }
+  function fallbackCopy(s) {
+    var ta = el("textarea"); ta.value = s; ta.style.position = "fixed"; ta.style.opacity = "0";
+    doc.body.appendChild(ta); ta.select(); try { doc.execCommand("copy"); } catch (e) {} doc.body.removeChild(ta);
+  }
+  function downloadMarkdown() {
+    var blob = new Blob([toMarkdown()], { type: "text/markdown" });
+    var a = el("a"); a.href = URL.createObjectURL(blob);
+    a.download = (DOC_ID.replace(/[^\w.-]+/g, "-") || "review") + "-comments.md";
+    doc.body.appendChild(a); a.click(); doc.body.removeChild(a);
+  }
+  function clearAll() {
+    if (!confirm("Clear every comment, decision and preference on this page?")) return;
+    state = {}; save();
+    points.forEach(function (p) { var ta = p.querySelector("textarea"); if (ta) ta.value = ""; p.classList.remove("is-commenting"); applyState(p); syncToc(p); });
+    tally(); renderPanel();
+  }
+
+  doc.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-action]");
+    if (!t) return;
+    var act = t.getAttribute("data-action");
+    if (act === "open-panel") openPanel();
+    else if (act === "close-panel") closePanel();
+    else if (act === "copy-md") copyMarkdown();
+    else if (act === "download-md") downloadMarkdown();
+    else if (act === "clear-all") clearAll();
+    else if (act === "print") window.print();
+  });
+  doc.addEventListener("keydown", function (e) { if (e.key === "Escape") closePanel(); });
+  var backdrop = doc.querySelector(".panel-backdrop");
+  if (backdrop) backdrop.addEventListener("click", closePanel);
+  tally();
+
+  /* ---------------- meta fill-ins ---------------- */
+  doc.querySelectorAll("[data-fill='point-count']").forEach(function (n) { n.textContent = points.length; });
+  doc.querySelectorAll("[data-fill='date']").forEach(function (n) { if (!text(n)) n.textContent = new Date().toISOString().slice(0, 10); });
+
+  /* ---------------- charts (Chart.js) ---------------- */
+  var PALETTE = ["#4f46e5", "#059669", "#d97706", "#e11d48", "#0284c7", "#7c3aed", "#65a30d", "#db2777"];
+  function renderCharts() {
+    if (typeof Chart === "undefined") return;
+    var css = getComputedStyle(root);
+    var ink = css.getPropertyValue("--ink-2").trim() || "#44403c";
+    var line = css.getPropertyValue("--line").trim() || "#e7e5e4";
+    Chart.defaults.color = ink;
+    Chart.defaults.borderColor = line;
+    Chart.defaults.font.family = css.getPropertyValue("--sans").trim() || "system-ui";
+    doc.querySelectorAll("canvas.chart[data-chart]").forEach(function (cv) {
+      var cfg;
+      try { cfg = JSON.parse(cv.getAttribute("data-chart")); } catch (e) { console.warn("osilion: bad data-chart JSON", e); return; }
+      var single = cfg.type === "pie" || cfg.type === "doughnut" || cfg.type === "polarArea";
+      (cfg.data && cfg.data.datasets || []).forEach(function (ds, i) {
+        if (ds.backgroundColor == null) ds.backgroundColor = single ? PALETTE : PALETTE[i % PALETTE.length] + (cfg.type === "line" ? "33" : "cc");
+        if (ds.borderColor == null) ds.borderColor = single ? "#ffffff" : PALETTE[i % PALETTE.length];
+        if (ds.borderWidth == null) ds.borderWidth = cfg.type === "line" ? 2 : 1;
+        if (cfg.type === "line" && ds.tension == null) ds.tension = 0.3;
+      });
+      cfg.options = Object.assign({ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { boxWidth: 12 } } } }, cfg.options || {});
+      if (!cv.parentElement.classList.contains("chart-wrap")) { var w = el("div", "chart-wrap"); cv.parentNode.insertBefore(w, cv); w.appendChild(cv); }
+      new Chart(cv.getContext("2d"), cfg);
+    });
+  }
+  if (doc.readyState === "complete") renderCharts(); else window.addEventListener("load", renderCharts);
+
+  /* ---------------- mermaid ---------------- */
+  window.__osilionMermaidInit = function (mermaid) {
+    var dark = matchMedia("(prefers-color-scheme: dark)").matches && root.getAttribute("data-theme") !== "light";
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: dark ? "dark" : "neutral",
+      securityLevel: "loose",
+      fontFamily: "inherit",
+      flowchart: { curve: "basis", htmlLabels: true }
+    });
+  };
+})();
+</script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  window.__osilionMermaidInit(mermaid);
+</script>
+</body>
+</html>
