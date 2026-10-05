@@ -114,6 +114,7 @@ describe('debug api: ui reads the HUD and the platform screen (#33 acceptance 4)
       ...sellBayModel().header,
       bay: 'upgrade',
       bayName: 'Upgrade bay',
+      accent: 'teal',
     })
     const { header } = sellBayModel()
     expect(header).toMatchObject({
@@ -172,7 +173,11 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     game().moveFocus(1)
     const model = upgradeBayModel()
     expect(model.casing).toMatchObject({ grade: 1, gradeText: '1 → 2', cost: { text: '48' } })
-    expect(model.preview).toEqual({ highlight: 'drill_tip', visualTier: 1 })
+    expect(model.preview).toMatchObject({
+      highlight: 'drill_tip',
+      visualTier: 1,
+      liningGrade: null,
+    })
     expect(takeSessionSnapshot().digest).toBe(digest)
   })
 

@@ -6,9 +6,9 @@
  * "Reduce motion" is the shake switch, as it is for the vehicle's part motion (#33, #48).
  */
 import {
-  BAY_SHUTTER_SECONDS,
-  PART_INSTALL_SECONDS,
-  SHOP_TEXT_SHORT_AXIS_SHARE,
+  BAY_SHUTTER_MS,
+  PART_INSTALL_MS,
+  SHOP_TEXT_SHORT_AXIS_PERCENT,
 } from '../../constants/scene'
 import type { DomainEvent } from '../authority/domainEvent'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
@@ -27,12 +27,12 @@ export interface ShopType {
 }
 
 export function bayTransitionOf(isMotionReduced: boolean): BayTransition {
-  return { kind: isMotionReduced ? 'fade' : 'shutter', seconds: BAY_SHUTTER_SECONDS }
+  return { kind: isMotionReduced ? 'fade' : 'shutter', seconds: BAY_SHUTTER_MS / 1000 }
 }
 
 /** 0.4 s of bolting on and steam, or none with reduce motion: the change is instant (#44). */
 export function partInstallSecondsOf(isMotionReduced: boolean): number {
-  return isMotionReduced ? 0 : PART_INSTALL_SECONDS
+  return isMotionReduced ? 0 : PART_INSTALL_MS / 1000
 }
 
 /**
@@ -54,7 +54,10 @@ export function partToInstallOf(
 
 export function shopTypeOf(widthPixels: number, heightPixels: number): ShopType {
   const shortAxisPixels = Math.min(widthPixels, heightPixels)
-  return { shortAxisPixels, smallestTextPixels: shortAxisPixels * SHOP_TEXT_SHORT_AXIS_SHARE }
+  return {
+    shortAxisPixels,
+    smallestTextPixels: (shortAxisPixels * SHOP_TEXT_SHORT_AXIS_PERCENT) / 100,
+  }
 }
 
 function upgradeIdOf(id: string): UpgradeId | null {

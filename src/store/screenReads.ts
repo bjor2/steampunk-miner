@@ -11,6 +11,8 @@ import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
+import { dockedBayOf } from '../systems/authority/dockRules'
+import type { BayId } from '../systems/world/dockBays'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
 import type { ArtefactChoiceModel } from '../systems/views/artefactChoiceModel'
@@ -33,6 +35,11 @@ export function readHudModel(): HudModel {
 /** The screen of the bay the vehicle is docked at, or null (#37). */
 export function readBayScreen(): BayScreen {
   return bayScreenOf(useGameStore.getState())
+}
+
+/** The bay the vehicle is docked at, or null (#37): what opens the bay screen's shutter. */
+export function readDockedBay(): BayId | null {
+  return dockedBayOf(readAuthorityState(), useGameStore.getState().playerId)
 }
 
 /** The Sell bay's model, as it would draw now, docked there or not. */

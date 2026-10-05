@@ -8,6 +8,7 @@ import { grantMoneyCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import { selectUpgradeBayModel } from './upgradeBayModel'
+import { gaugeTicksOf } from './upgradePreview'
 
 type Session = ReturnType<typeof createScriptedSession>
 
@@ -132,5 +133,19 @@ describe('upgrade bay preview', () => {
     }).focusStops
     stops.forEach((stop) => previewOf(session, stop.id))
     expect(stateDigest(session.state())).toBe(before)
+  })
+
+  it('draws one gauge tick per level to the next tier: owned, then the pending buy, then open', () => {
+    expect(gaugeTicksOf({ owned: 2, span: 5, pending: 1 })).toEqual([
+      'owned',
+      'owned',
+      'pending',
+      'open',
+      'open',
+    ])
+  })
+
+  it('draws no ticks at the last tier, whose levels never end', () => {
+    expect(gaugeTicksOf({ owned: 40, span: null, pending: 1 })).toEqual([])
   })
 })

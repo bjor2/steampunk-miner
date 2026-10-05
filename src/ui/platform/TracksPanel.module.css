@@ -1,0 +1,24 @@
+/*
+ * One aligned grid for the six tracks and the Casing row (#45 "readable at projector distance"):
+ * icon, name, level, cost, effect, then Buy pinned at the end; a long effect wraps in its cell.
+ */
+.trackRow {
+  display: grid;
+  grid-template-columns: 2em 6.5em 2.5em 3.5em 1fr auto;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) 0;
+  border-bottom: 1px dotted rgb(201 162 75 / 0.4);
+}
+
+.trackRow > :last-child {
+  grid-column: -2;
+}
+
+.effect {
+  font-variant-numeric: tabular-nums;
+}
+
+.columnHead {
+  color: var(--color-brass);
+}

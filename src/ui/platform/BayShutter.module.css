@@ -1,0 +1,74 @@
+/*
+ * #45: a brass shutter slides the bay screen in from the top over 0.25 s and back out on undock;
+ * with reduce motion it fades. The length comes inline from BAY_SHUTTER_SECONDS.
+ */
+.shutter {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  animation-duration: var(--bay-transition-seconds);
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+/* A closing screen takes no clicks; the vehicle already has the keys. */
+.shutter[data-transition='closing'] * {
+  pointer-events: none !important;
+}
+
+.shutter[data-transition='opening'][data-transition-kind='shutter'] {
+  animation-name: shutter-in;
+}
+
+.shutter[data-transition='closing'][data-transition-kind='shutter'] {
+  animation-name: shutter-out;
+}
+
+.shutter[data-transition='opening'][data-transition-kind='fade'] {
+  animation-name: fade-in;
+}
+
+.shutter[data-transition='closing'][data-transition-kind='fade'] {
+  animation-name: fade-out;
+}
+
+@keyframes shutter-in {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes shutter-out {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}

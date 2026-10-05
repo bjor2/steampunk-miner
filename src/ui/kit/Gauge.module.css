@@ -40,7 +40,7 @@
 
 .label {
   color: var(--color-brass);
-  font-size: 0.75rem;
+  font-size: var(--kit-label-size, 0.75rem);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }

@@ -1,15 +1,15 @@
 /**
- * The Upgrade bay screen (#37): the tracks, the Casing row and repair, the live vehicle preview,
- * and the quick action's sign pointing back at the Sell bay. Markup only.
+ * The Upgrade bay screen (#37, #45 wire): the tracks, the Casing row and repair on the left 45%,
+ * the live vehicle preview on the right 55%, and the quick action's sign pointing back at the
+ * Sell bay. Markup only.
  */
 import type { UpgradeBayModel } from '../../systems/views/upgradeBayModel'
-import type { UpgradePreview } from '../../systems/views/upgradePreview'
 import { UI_IDS } from '../ids'
-import { Panel } from '../kit/Panel'
 import { ScreenButtonView } from '../ScreenButtonView'
 import { BayFrame } from './BayFrame'
 import styles from './Platform.module.css'
 import { TracksPanel } from './TracksPanel'
+import { VehiclePreviewPanel } from './VehiclePreviewPanel'
 
 export function UpgradeBayView({
   model,
@@ -22,28 +22,11 @@ export function UpgradeBayView({
     <BayFrame header={model.header} footer={model.footer} focusedId={focusedId}>
       <div className={styles.upgradePanels} data-testid={UI_IDS.upgradebayScreen}>
         <TracksPanel model={model} focusedId={focusedId} />
-        <VehiclePreview preview={model.preview} />
-        <ScreenButtonView button={model.quickService} focusedId={focusedId} />
+        <VehiclePreviewPanel preview={model.preview} />
+        <span className={styles.wideRow}>
+          <ScreenButtonView button={model.quickService} focusedId={focusedId} />
+        </span>
       </div>
     </BayFrame>
-  )
-}
-
-/**
- * The live preview's hook (#37): the part the focused row changes and the visual tier after the
- * buy, as data the shop screens ticket draws the vehicle from. Presentation only.
- */
-function VehiclePreview({ preview }: { preview: UpgradePreview }) {
-  return (
-    <Panel title="Preview">
-      <div
-        data-testid={UI_IDS.upgradebayPreview}
-        data-highlight={preview.highlight ?? ''}
-        data-visual-tier={preview.visualTier}
-      >
-        Tier {preview.visualTier}
-        {preview.highlight !== null && ` · ${preview.highlight}`}
-      </div>
-    </Panel>
   )
 }

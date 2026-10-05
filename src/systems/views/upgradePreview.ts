@@ -75,6 +75,22 @@ export function upgradePreviewOf(levels: UpgradeLevels, focus: PreviewFocus): Up
   }
 }
 
+/** One brass tick of the gauge: a level owned, the focused buy's level, or one still to buy. */
+export type GaugeTick = 'owned' | 'pending' | 'open'
+
+/**
+ * The gauge's ticks from the current tier to the next. The last tier has no next shape and its
+ * levels never end (#7), so it has no ticks; the screen says the levels owned in words.
+ */
+export function gaugeTicksOf(gauge: PreviewGauge): GaugeTick[] {
+  return Array.from({ length: gauge.span ?? 0 }, (_, at) => tickAt(gauge, at))
+}
+
+function tickAt(gauge: PreviewGauge, at: number): GaugeTick {
+  if (at < gauge.owned) return 'owned'
+  return at < gauge.owned + gauge.pending ? 'pending' : 'open'
+}
+
 function levelsAfterBuy(levels: UpgradeLevels, row: WorkshopRow): UpgradeLevels {
   return { ...levels, [row.upgradeId]: levels[row.upgradeId] + 1 }
 }

@@ -1,3 +1,7 @@
+/*
+ * #45: one shared chrome of dark enamel at 85% over the lit bay (the world stays visible), a thin
+ * brass frame, tabular figures; the font size is set inline from SHOP_TEXT_SHORT_AXIS_SHARE.
+ */
 .screen {
   position: absolute;
   inset: 10% 6%;
@@ -6,10 +10,29 @@
   gap: var(--space-2);
   padding: var(--space-3);
   border: 2px solid var(--color-brass);
+  border-top: 4px solid var(--bay-accent);
   border-radius: var(--radius-panel);
-  background: rgb(27 22 19 / 0.94);
+  background: var(--color-panel);
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   pointer-events: auto;
+}
+
+/* Sell is copper and amber with an assay scale, Upgrade steel and teal with a gear (#45). */
+.screen[data-accent='copper'] {
+  --bay-accent: var(--color-copper);
+}
+
+.screen[data-accent='teal'] {
+  --bay-accent: var(--color-teal);
+}
+
+.screen[data-accent='copper'] .bayName::before {
+  content: '\2696\00A0';
+}
+
+.screen[data-accent='teal'] .bayName::before {
+  content: '\2699\00A0';
 }
 
 .header,
@@ -37,13 +60,23 @@
   grid-column: 1 / -1;
 }
 
-/* The preview takes about half the screen (#37); its framing is the shop screens ticket's. */
+/* #45 wire: the track rows take 45% of the width, the live preview 55%. */
 .upgradePanels {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 45fr 55fr;
+  grid-template-rows: 1fr auto;
+  overflow: hidden;
+}
+
+.upgradePanels > :first-child {
+  overflow: auto;
+}
+
+.wideRow {
+  grid-column: 1 / -1;
 }
 
 .bayName {
-  color: var(--color-brass);
+  color: var(--bay-accent);
 }
 
 .field {

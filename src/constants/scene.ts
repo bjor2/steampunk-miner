@@ -204,11 +204,10 @@ export const ORE_WHISPER_ROCK_TILES = 1
 
 // The bay screens: #45 art direction, #44 icons and live preview, #39 the preview's framing.
 /** #45: the smallest text on a bay screen is at least 2.2% of the screen's short axis tall. */
-export const SHOP_TEXT_SHORT_AXIS_SHARE = 0.022
-/** #45: a brass shutter slides a bay screen in, and back out, over 0.25 s (a fade with reduce motion). */
-export const BAY_SHUTTER_SECONDS = 0.25
-/** #44: a bought part bolts on with a puff of steam over 0.4 s; instant with reduce motion. */
-export const PART_INSTALL_SECONDS = 0.4
+export const SHOP_TEXT_SHORT_AXIS_PERCENT = 2.2
+/** #45: a brass shutter slides a bay screen in, and back out, over 250 ms (a fade with reduce motion). */
+export const BAY_SHUTTER_MS = 250
+/** #44: a bought part bolts on with a puff of steam over 400 ms; instant with reduce motion. */
+export const PART_INSTALL_MS = 400
 /** #39 and #44: the preview camera frames the visual vehicle at 60% of the panel height, ±5%. */
-export const PREVIEW_VEHICLE_SHARE = 0.6
-export const PREVIEW_VEHICLE_SHARE_TOLERANCE = 0.05
+export const PREVIEW_VEHICLE_SHARE_PERCENT = 60
