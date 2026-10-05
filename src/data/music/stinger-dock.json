@@ -1,0 +1,19 @@
+{
+  "id": "dock",
+  "tempoBpm": 120,
+  "beatsPerBar": 4,
+  "stepsPerBeat": 4,
+  "barCount": 1,
+  "rootHz": 440,
+  "scale": [0, 2, 4, 5, 7, 9, 11],
+  "instruments": [
+    { "name": "chime", "voice": "sine", "octave": 0, "gain": 0.25, "bars": ["1...3...5...8---"] },
+    {
+      "name": "bell",
+      "voice": "triangle",
+      "octave": -1,
+      "gain": 0.12,
+      "bars": ["1---------------"]
+    }
+  ]
+}
