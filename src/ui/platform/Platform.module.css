@@ -77,6 +77,10 @@
   font-weight: bold;
 }
 
+.assay {
+  color: var(--color-brass);
+}
+
 .action {
   display: inline-flex;
   gap: var(--space-2);

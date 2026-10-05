@@ -16,6 +16,7 @@
   },
   "prices": {
     "referenceBand": 3,
+    "assayBeaconBand": 3,
     "chargePerEnergyUnit": "0.002",
     "fullRepair": "0.5",
     "rescueFee": { "moneyFraction": "0.05", "floor": "3", "cap": "30" },

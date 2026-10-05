@@ -135,6 +135,8 @@ export interface Economy {
   }
   prices: {
     referenceBand: number
+    /** `assay_beacon` (#46): ore of the bands below this one sells at this band's unit price. */
+    assayBeaconBand: number
     chargePerEnergyUnit: Money
     fullRepair: Money
     rescueFee: { moneyFraction: Money; floor: Money; cap: Money }

@@ -35,9 +35,21 @@ function ShopRowView({ row, focusedId }: { row: ShopRow; focusedId: string }) {
     >
       <span className={styles.tier}>T{row.tier}</span>
       <span>{row.amount} x</span>
-      <span data-exact={row.unitValue.exact}>{row.unitValue.text}</span>
+      <span data-exact={row.unitValue.exact} data-assayed={row.isAssayed}>
+        {row.isAssayed ? <AssayGlyph /> : null}
+        {row.unitValue.text}
+      </span>
       <span data-exact={row.lineValue.exact}>{row.lineValue.text}</span>
       <ScreenButtonView button={row.sell} focusedId={focusedId} />
     </div>
+  )
+}
+
+/** `assay_beacon` lifted this row's price (#46); a text mark until S8's icons land. */
+function AssayGlyph() {
+  return (
+    <span className={styles.assay} title="Assay Beacon: mid-band price">
+      ◈{' '}
+    </span>
   )
 }

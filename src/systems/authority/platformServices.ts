@@ -9,8 +9,12 @@
  * though the quick action at the Sell bay still repairs at the same price.
  *
  * A charge the wallet cannot pay is refused with `money_short`, never trimmed to what it can pay.
+ * A player holding `assay_beacon` (#46) sells the planet's shallow-band ore at the mid-band unit
+ * price, and each lifted tier says so in `artefact_assay_applied`.
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
+import { ARTEFACT_ID } from '../artefacts/artefactOptions'
+import { assayedSalePrice, bandOfTierOnPlanet, isAssayLifted } from '../economy/assayPricing'
 import { oreSalePrice } from '../economy/oreEconomy'
 import { rechargePrice, repairPrice } from '../economy/planetCharges'
 import {
@@ -41,7 +45,7 @@ import {
   type RuleEffect,
 } from './commandRule'
 import { atBayRejection } from './dockRules'
-import type { SaleMode, SoldItem } from './domainEvent'
+import type { DomainEventBody, SaleMode, SoldItem } from './domainEvent'
 
 /** One ore tier, or the whole hold's ore. */
 export type OreSelection = number | 'all'
@@ -109,7 +113,7 @@ export const PLATFORM_SERVICE_RULES: {
 
 export function serviceQuote(state: AuthorityState, playerId: string): ServiceQuote {
   return {
-    saleValue: saleValueOf(soldItemsOf(vehicleOf(state, playerId).cargo, 'all')),
+    saleValue: saleValueOf(state, playerId, soldItemsOf(vehicleOf(state, playerId).cargo, 'all')),
     repairCost: repairCostOf(state, playerId),
     rechargeCost: rechargeCostOf(state, playerId),
   }
@@ -118,6 +122,18 @@ export function serviceQuote(state: AuthorityState, playerId: string): ServiceQu
 /** What the quick action charges: repair plus recharge; the sale is paid in first. */
 export function quickServiceCharges(quote: ServiceQuote): Money {
   return add(quote.repairCost, quote.rechargeCost)
+}
+
+/** What one unit of a tier sells for to this player here: `floorMilli(V(t))`, or assayed (#46). */
+export function sellBayUnitPrice(state: AuthorityState, playerId: string, tier: number): Money {
+  if (!isAssayLiftedFor(state, playerId, tier)) return oreSalePrice(tier)
+  return assayedSalePrice(state.planet.index, tier)
+}
+
+/** Whether `assay_beacon` lifts this tier's price for this player on this planet. */
+export function isAssayLiftedFor(state: AuthorityState, playerId: string, tier: number): boolean {
+  const held = state.players[playerId].artefact
+  return held?.id === ARTEFACT_ID.assayBeacon && isAssayLifted(state.planet.index, tier)
 }
 
 /** `0.5 * V3 * hullLost / hullMax`, rounded up to 0.001 (#6, #20). */
@@ -182,18 +198,35 @@ function soldItemsOf(cargo: Cargo, selection: OreSelection): SoldItem[] {
     .sort((a, b) => a.tier - b.tier)
 }
 
-/** Each unit at `floorMilli(V(t))`, so the total is an exact sum (#20 rounding rule). */
-function saleValueOf(items: readonly SoldItem[]): Money {
+/** Each unit at its rounded unit price, so the total is an exact sum (#20 rounding rule). */
+function saleValueOf(state: AuthorityState, playerId: string, items: readonly SoldItem[]): Money {
   return items.reduce(
-    (total, item) => add(total, mul(oreSalePrice(item.tier), fromSafeInteger(item.amount))),
+    (total, item) =>
+      add(total, mul(sellBayUnitPrice(state, playerId, item.tier), fromSafeInteger(item.amount))),
     ZERO_MONEY,
   )
+}
+
+/** One `artefact_assay_applied` per lifted tier of the sale. */
+function assayEventsOf(
+  state: AuthorityState,
+  playerId: string,
+  items: readonly SoldItem[],
+): DomainEventBody[] {
+  return items
+    .filter((item) => isAssayLiftedFor(state, playerId, item.tier))
+    .map((item) => ({
+      type: 'ArtefactAssayApplied',
+      tier: item.tier,
+      band: bandOfTierOnPlanet(state.planet.index, item.tier),
+      unitPrice: toCanonical(sellBayUnitPrice(state, playerId, item.tier)),
+    }))
 }
 
 function sellOre(state: AuthorityState, playerId: string, selection: OreSelection): RuleEffect {
   const { wallet, vehicle } = state.players[playerId]
   const items = soldItemsOf(vehicle.cargo, selection)
-  const value = saleValueOf(items)
+  const value = saleValueOf(state, playerId, items)
   const sold = withVehicle(state, playerId, {
     ...vehicle,
     cargo: withoutOre(vehicle.cargo, items),
@@ -201,6 +234,7 @@ function sellOre(state: AuthorityState, playerId: string, selection: OreSelectio
   return {
     state: withWallet(sold, playerId, add(wallet, value)),
     events: [
+      ...assayEventsOf(state, playerId, items),
       { type: 'ResourceSold', items, value: toCanonical(value), mode: saleModeOf(selection) },
     ],
   }
