@@ -9,11 +9,11 @@ describe('asset look', () => {
   })
 
   it('draws a placeholder asset as its flat placeholder quads with no atlas', () => {
-    const quads = assetQuadsOf('enemy-crawler', 1)
+    const quads = assetQuadsOf('platform-hub', 1)
     expect(quads).toEqual(
-      placeholderQuadsOf('enemy-crawler', 1).map((quad) => ({ ...quad, uv: null })),
+      placeholderQuadsOf('platform-hub', 1).map((quad) => ({ ...quad, uv: null })),
     )
-    expect(atlasMapsOf('enemy-crawler')).toBeNull()
+    expect(atlasMapsOf('platform-hub')).toBeNull()
   })
 
   it('draws the final vehicle from its atlas at every tier, keeping each part’s colour', () => {
@@ -39,6 +39,30 @@ describe('asset look', () => {
       albedo: 'assets/vehicle/vehicle/vehicle.albedo.ktx2',
       normal: 'assets/vehicle/vehicle/vehicle.normal.ktx2',
       emissive: 'assets/vehicle/vehicle/vehicle.emissive.ktx2',
+    })
+  })
+
+  it('cuts both enemies and the artefact cache from their atlases as their one placeholder part', () => {
+    for (const assetId of ['enemy-crawler', 'enemy-burrower', 'prop-artefact-cache']) {
+      const [quad, ...rest] = assetQuadsOf(assetId, 1)
+      const [placeholder] = placeholderQuadsOf(assetId, 1)
+      expect(rest).toEqual([])
+      expect(quad.uv).not.toBeNull()
+      expect({ ...quad, uv: null }).toEqual({ ...placeholder, uv: null })
+    }
+  })
+
+  it('gives the enemies a glow map and the artefact cache none (S7c: nothing on the cache glows)', () => {
+    expect(atlasMapsOf('enemy-crawler')?.emissive).toBe(
+      'assets/enemy/enemy-crawler/enemy-crawler.emissive.ktx2',
+    )
+    expect(atlasMapsOf('enemy-burrower')?.emissive).toBe(
+      'assets/enemy/enemy-burrower/enemy-burrower.emissive.ktx2',
+    )
+    expect(atlasMapsOf('prop-artefact-cache')).toEqual({
+      albedo: 'assets/prop/prop-artefact-cache/prop-artefact-cache.albedo.ktx2',
+      normal: 'assets/prop/prop-artefact-cache/prop-artefact-cache.normal.ktx2',
+      emissive: null,
     })
   })
 })

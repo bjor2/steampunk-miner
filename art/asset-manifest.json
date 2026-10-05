@@ -83,21 +83,21 @@
       "id": "enemy-crawler",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#7a4a3a"
     },
     {
       "id": "enemy-burrower",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#5a3a4a"
     },
     {
       "id": "prop-artefact-cache",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#c9a24b"
     },
     {

@@ -24,6 +24,13 @@ const finalCrawler: ManifestEntry = {
   form: 'parts',
   status: 'final',
 }
+const placeholderBurrower: ManifestEntry = {
+  id: 'enemy-burrower',
+  source: 'blender',
+  form: 'parts',
+  status: 'placeholder',
+  color: '#5a3a4a',
+}
 const crawlerMaps = ['enemy-crawler.albedo.ktx2', 'enemy-crawler.normal.ktx2']
 const crawlerFiles = expectedFilesOf(finalCrawler, crawlerMaps)
 
@@ -100,7 +107,7 @@ describe('asset lint', () => {
       'public/assets/enemy/enemy-dragon/enemy-dragon.parts.json',
       'public/assets/enemy/enemy-burrower/enemy-burrower.parts.json',
     ]
-    expect(shippedFileProblems(manifest, [], shipped)).toEqual([
+    expect(shippedFileProblems(withEntries(placeholderBurrower), [], shipped)).toEqual([
       'public/assets/enemy/enemy-dragon/enemy-dragon.parts.json: has no asset-manifest.json entry',
       'public/assets/enemy/enemy-burrower/enemy-burrower.parts.json: "enemy-burrower" is a placeholder, which ships no files',
     ])
