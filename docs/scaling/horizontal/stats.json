@@ -17,20 +17,8 @@
   "schedule_approved": "C",
   "schema": {
     "issue": 79,
-    "fields": [
-      "id",
-      "planetIndex",
-      "lane",
-      "progressionAxis",
-      "status",
-      "bind"
-    ],
-    "bind": [
-      "planet_gate",
-      "artefact",
-      "facility",
-      "manual"
-    ],
+    "fields": ["id", "planetIndex", "lane", "progressionAxis", "status", "bind"],
+    "bind": ["planet_gate", "artefact", "facility", "manual"],
     "endless": "reuse same table at planetIndex >= 41"
   },
   "features": [
