@@ -73,6 +73,28 @@ describe('feedback cues', () => {
     expect(feedbackCuesOf([idle], 'p1')).toEqual([])
   })
 
+  it('rumbles once as blocks start their collapse warning and crashes as they refill', () => {
+    const warned = (block: string): DomainEvent => ({
+      tick: 600,
+      type: 'CollapseWarned',
+      block,
+      band: 2,
+      weakestGrade: 1,
+      required: 2,
+    })
+    const started: DomainEvent = {
+      tick: 660,
+      type: 'CollapseStarted',
+      block: '0,8#17',
+      samplesFilled: 90,
+      vehiclesHit: 0,
+    }
+    expect(feedbackCuesOf([warned('0,8#17'), warned('0,8#18'), started], 'p1')).toEqual([
+      { kind: 'collapseRumble' },
+      { kind: 'collapseCrash' },
+    ])
+  })
+
   it("ignores another player's pickups", () => {
     expect(feedbackCuesOf([cargo(4, 'p2')], 'p1')).toEqual([])
   })

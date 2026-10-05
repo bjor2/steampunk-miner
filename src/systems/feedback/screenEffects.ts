@@ -43,6 +43,8 @@ const KICKS: Readonly<Record<FeedbackCue['kind'], { shake: number; flash: number
   travelStinger: { shake: 0.5, flash: 0 },
   casingHiss: { shake: 0, flash: 0 },
   casingPop: { shake: 0, flash: 0 },
+  collapseRumble: { shake: 0.15, flash: 0 },
+  collapseCrash: { shake: 0.6, flash: 0 },
 }
 
 export function createScreenEffects(): ScreenEffects {

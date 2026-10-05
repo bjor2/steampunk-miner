@@ -95,6 +95,8 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   travelStinger: (sound, _cue, tuning) => sound.playStinger('travel', tuning),
   casingHiss: (sound) => sound.playCasingHiss(),
   casingPop: (sound) => sound.playCasingPop(),
+  collapseRumble: (sound) => sound.playCollapseRumble(),
+  collapseCrash: (sound) => sound.playCollapseCrash(),
 }
 
 function playCue(sound: SoundOut, cue: FeedbackCue): void {

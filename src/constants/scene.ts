@@ -187,6 +187,25 @@ export const CEMENT_LIFE_SECONDS = 0.45
 export const CEMENT_SIZE_PIXELS = 4
 export const CEMENT_COLOUR = '#b9b2a4'
 export const CEMENT_SEED = 0xce77
+/**
+ * The collapse telegraph (#43 Sequence 1, #41 feel: cracks, falling dust and a rising rumble for the
+ * 1.0 s before a refill): each collapsing block grows a crack of `CRACKS_PER_BLOCK` segments as its
+ * warning runs, and sheds dust from its top edge at a rate rising from `COLLAPSE_DUST_START` to
+ * `COLLAPSE_DUST_FULL` per second. At most `COLLAPSE_TELEGRAPH_BLOCKS` blocks are drawn at once.
+ * Placeholders, tuned by eye.
+ */
+export const COLLAPSE_TELEGRAPH_BLOCKS = 24
+export const CRACKS_PER_BLOCK = 7
+export const CRACK_SEGMENT_M = 0.6
+export const CRACK_COLOUR = '#1b130d'
+export const COLLAPSE_DUST_CAPACITY = 320
+export const COLLAPSE_DUST_START = 6
+export const COLLAPSE_DUST_FULL = 60
+export const COLLAPSE_DUST_FALL_SPEED = 1.8
+export const COLLAPSE_DUST_LIFE_SECONDS = 0.9
+export const COLLAPSE_DUST_SIZE_PIXELS = 3
+export const COLLAPSE_DUST_COLOUR = '#8d7f6a'
+export const COLLAPSE_DUST_SEED = 0xd057
 /** Fixed seed for the spark spray: presentation only, never part of the world. */
 export const SPARK_SEED = 0x5a7c
 

@@ -21,6 +21,10 @@ export interface SoundOut {
   playCasingHiss(): void
   /** The drill broke through lining (#41 feel). */
   playCasingPop(): void
+  /** A block's collapse warning: a low rumble rising over its 1 s (#43). */
+  playCollapseRumble(): void
+  /** The block refills: rock slumping in (#43). */
+  playCollapseCrash(): void
   playStinger(kind: StingerKind, tuningSemitones: number): void
   setDrill(frequency: number, gain: number): void
   setEngine(puffsPerSecond: number, gain: number): void
@@ -48,6 +52,8 @@ const SOUND_OUT: SoundOut = {
   playThud: () => graph?.playThud(),
   playCasingHiss: () => graph?.playCasingHiss(),
   playCasingPop: () => graph?.playCasingPop(),
+  playCollapseRumble: () => graph?.playCollapseRumble(),
+  playCollapseCrash: () => graph?.playCollapseCrash(),
   playStinger: (kind, tuning) => graph?.playStinger(kind, tuning),
   setDrill: (frequency, gain) => graph?.setDrill(frequency, gain),
   setEngine: (puffs, gain) => graph?.setEngine(puffs, gain),

@@ -1,7 +1,8 @@
 /**
  * The synthesised placeholder sounds (#13: "synthesised in the browser audio engine"): three
  * loops (drill, engine chug, steam hiss), the music's step sequencer (#49) and the one-shots
- * (chime, clank, thud, stingers, casing's hiss and pop), all from oscillators and one noise buffer. Built once per audio
+ * (chime, clank, thud, stingers, casing's hiss and pop, collapse's rumble and crash), all from
+ * oscillators and one noise buffer. Built once per audio
  * context; the sound loops run from the start and are only ever re-levelled, so a frame never
  * builds a node for them, and a level that has not moved is not rescheduled.
  */
@@ -33,6 +34,8 @@ export function createWebAudioGraph(context: AudioContext): WebAudioGraph {
     playThud: () => playThud(context, master),
     playCasingHiss: () => playCasingHiss(context, master, noise),
     playCasingPop: () => playCasingPop(context, master),
+    playCollapseRumble: () => playCollapseRumble(context, master, noise),
+    playCollapseCrash: () => playCollapseCrash(context, master, noise),
     playStinger: (kind, tuning) => playStinger(context, master, kind, tuning),
     setDrill: (frequency, gain) => levelLoop(context, drill, frequency, gain),
     setEngine: (puffs, gain) => levelLoop(context, engine, puffs, gain),
@@ -164,6 +167,41 @@ function playCasingHiss(context: AudioContext, master: GainNode, noise: AudioBuf
 function playCasingPop(context: AudioContext, master: GainNode): void {
   const pop = strike(context, master, { type: 'sine', frequency: 520, gain: 0.2, seconds: 0.1 })
   pop.frequency.exponentialRampToValueAtTime(160, context.currentTime + 0.1)
+}
+
+/**
+ * A collapse's warning (#43): low-passed noise and a deep sine swelling for the whole 1 s telegraph,
+ * then cut, so the rumble rises to the moment the rock comes in.
+ */
+function playCollapseRumble(context: AudioContext, master: GainNode, noise: AudioBuffer): void {
+  const start = context.currentTime
+  const swell = gainOf(context, SILENCE, master)
+  swell.gain.setValueAtTime(SILENCE, start)
+  swell.gain.exponentialRampToValueAtTime(0.35, start + 0.95)
+  swell.gain.exponentialRampToValueAtTime(SILENCE, start + 1.05)
+  const filter = new BiquadFilterNode(context, { type: 'lowpass', frequency: 160 })
+  filter.connect(swell)
+  const rumble = new AudioBufferSourceNode(context, { buffer: noise })
+  rumble.connect(filter)
+  rumble.start(start, 0, 1.05)
+  const growl = new OscillatorNode(context, { type: 'sine', frequency: 34 })
+  growl.frequency.linearRampToValueAtTime(52, start + 1)
+  growl.connect(swell)
+  growl.start(start)
+  growl.stop(start + 1.05)
+}
+
+/** The refill (#43): a heavy thud under a short burst of falling rock. */
+function playCollapseCrash(context: AudioContext, master: GainNode, noise: AudioBuffer): void {
+  const thud = strike(context, master, { type: 'sine', frequency: 55, gain: 0.55, seconds: 0.5 })
+  thud.frequency.exponentialRampToValueAtTime(28, context.currentTime + 0.5)
+  const scatter = gainOf(context, 0.3, master)
+  scatter.gain.exponentialRampToValueAtTime(SILENCE, context.currentTime + 0.5)
+  const filter = new BiquadFilterNode(context, { type: 'bandpass', frequency: 420, Q: 0.8 })
+  filter.connect(scatter)
+  const burst = new AudioBufferSourceNode(context, { buffer: noise })
+  burst.connect(filter)
+  burst.start(context.currentTime, 0, 0.5)
 }
 
 /** Core: a rising brass arpeggio. Travel: a long falling glide, the platform lifting off. */

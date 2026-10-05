@@ -18,6 +18,9 @@ export const ACCENT_OF_CUE: Readonly<Record<FeedbackCue['kind'], Accent | null>>
   travelStinger: null,
   casingHiss: null,
   casingPop: null,
+  // The crush that may follow is a hit, which already takes the flash.
+  collapseRumble: null,
+  collapseCrash: null,
 }
 
 export function accentOf(cue: FeedbackCue): Accent | null {

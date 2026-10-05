@@ -58,7 +58,7 @@ import { carveCircleCommand, fillCircleCommand } from '../systems/authority/grou
 import { lineCasingCommand, setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
 import { forceCollapseCommand } from '../systems/authority/collapse/collapseCommands'
 import type { CollapseReport } from '../systems/authority/collapse/collapseReport'
-import { readCollapseReport } from '../store/collapseDebugActions'
+import { readCollapseReport } from '../store/collapseReads'
 import type { BayId } from '../systems/world/dockBays'
 import { SOLID_DENSITY } from '../systems/world/sampleGrid'
 import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'

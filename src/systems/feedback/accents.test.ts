@@ -13,6 +13,8 @@ const CUES: FeedbackCue[] = [
   { kind: 'travelStinger' },
   { kind: 'casingHiss' },
   { kind: 'casingPop' },
+  { kind: 'collapseRumble' },
+  { kind: 'collapseCrash' },
 ]
 
 describe('accents', () => {
