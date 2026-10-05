@@ -68,13 +68,3 @@ export const SPARK_SEED = 0x5a7c
 /** Placeholder vehicle look: copper body, darker drill head (design doc section 9 art later). */
 export const DRILL_HEAD_COLOUR = '#5b3a1e'
 export const DRILL_HEAD_SIZE = 0.35
-
-/** Placeholder tile view (until the chunk meshes replace it in this build). */
-export const TILE_VIEW_RADIUS = 20
-export const TILE_COLOURS = {
-  ground: '#4a3b2f',
-  ore: '#c9a227',
-  core: '#b33a3a',
-  indestructible: '#7a7f86',
-} as const
-export const VEHICLE_COLOUR = '#b87333'

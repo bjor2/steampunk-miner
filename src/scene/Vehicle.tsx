@@ -1,12 +1,11 @@
-/** The local vehicle: keyboard intent in, the fixed-step loop, the placeholder body and drill head. */
+/** The local vehicle: keyboard intent in, the fixed-step loop, the placeholder art and drill head. */
 import { useMemo } from 'react'
-import { VEHICLE_COLOUR } from '../constants/scene'
-import { VEHICLE_COLLIDER_SIZE } from '../constants/physics'
 import { VehicleBody } from '../physics/VehicleBody'
 import type { VehicleController } from '../physics/vehicleController'
 import { readLocalVehicle } from '../store/gameStore'
 import { DrillHeadView } from './DrillHeadView'
 import { useKeyboardIntent } from './useKeyboardIntent'
+import { VehiclePlaceholder } from './VehiclePlaceholder'
 import { createVehicleLoop } from './vehicleLoop'
 import { vehiclePresence } from './vehiclePresence'
 
@@ -21,12 +20,7 @@ export function Vehicle() {
     <VehicleBody startPose={startPose} onFixedStep={stepVehicle} presence={vehiclePresence}>
       {(controller) => (
         <>
-          <mesh>
-            <boxGeometry
-              args={[VEHICLE_COLLIDER_SIZE, VEHICLE_COLLIDER_SIZE, VEHICLE_COLLIDER_SIZE]}
-            />
-            <meshStandardMaterial color={VEHICLE_COLOUR} />
-          </mesh>
+          <VehiclePlaceholder />
           <DrillHeadView controller={controller} />
         </>
       )}

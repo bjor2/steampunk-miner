@@ -13,6 +13,8 @@ import { settledFacingOf } from '../systems/vehicle/drillHead'
 import { FACING, type Facing } from '../systems/vehicle/vehiclePose'
 
 const OFFSET = (VEHICLE_COLLIDER_SIZE + DRILL_HEAD_SIZE) / 2
+/** In front of the placeholder's layers. */
+const HEAD_Z = 0.2
 
 const OFFSET_BY_FACING: Readonly<Record<Facing, readonly [number, number]>> = {
   [FACING.left]: [-OFFSET, 0],
@@ -25,12 +27,12 @@ export function DrillHeadView({ controller }: { controller: VehicleController })
   const head = useRef<Mesh>(null)
   useFrame(() => {
     const [x, y] = OFFSET_BY_FACING[settledFacingOf(controller.drillHead())]
-    head.current?.position.set(x, y, 0)
+    head.current?.position.set(x, y, HEAD_Z)
   })
   return (
     <mesh ref={head}>
-      <boxGeometry args={[DRILL_HEAD_SIZE, DRILL_HEAD_SIZE, DRILL_HEAD_SIZE]} />
-      <meshStandardMaterial color={DRILL_HEAD_COLOUR} />
+      <planeGeometry args={[DRILL_HEAD_SIZE, DRILL_HEAD_SIZE]} />
+      <meshBasicMaterial color={DRILL_HEAD_COLOUR} />
     </mesh>
   )
 }

@@ -1,9 +1,11 @@
 /**
  * The live game's fixed step for the local vehicle (#3, #11): the authority's clock moves one
  * tick, the controller drives the body for that tick with the current intent, the step's actions
- * are counted, and a pose report goes to the authority when one is due. After the tow or a planet
- * change the body is placed on the dock the authority put the vehicle on.
+ * are counted, a pose report goes to the authority when one is due, and the drill's facing and
+ * activity go to the scene for the headlamp and sparks. After the tow or a planet change the body
+ * is placed on the dock the authority put the vehicle on.
  */
+import { UP_VECTOR_SCALE } from '../constants/physics'
 import type { PlanetView, VehicleController, VehicleStepResult } from '../physics/vehicleController'
 import {
   readAuthorityTick,
@@ -19,9 +21,13 @@ import {
   type PoseReporter,
 } from '../systems/vehicle/poseReport'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { noseTileOf } from '../systems/vehicle/vehiclePose'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { cellAt, type WorldState } from '../systems/world/worldState'
+import { drillPresence } from './drillPresence'
+
+const HALF_TILE = 0.5
 
 export interface VehicleLoop {
   step(controller: VehicleController, intent: VehicleIntent): void
@@ -47,6 +53,7 @@ export function createVehicleLoop(): VehicleLoop {
         planetViewOf(loop, params, world),
       )
       reportWhenDue(loop, result)
+      showDrill(result)
     },
   }
 }
@@ -86,6 +93,18 @@ function planetViewOf(loop: LoopState, params: PlanetParams, world: WorldState):
   }
   loop.view = { world, params, planet }
   return planet
+}
+
+/** Hands the step's facing and drilling to the scene's headlamp and sparks. */
+function showDrill(result: VehicleStepResult): void {
+  const { pose, flags } = result
+  const nose = noseTileOf(pose)
+  drillPresence.facing = pose.facing
+  drillPresence.isDrilling = flags.isDrilling
+  drillPresence.up.x = pose.upx / UP_VECTOR_SCALE
+  drillPresence.up.y = pose.upy / UP_VECTOR_SCALE
+  drillPresence.nose.x = nose.tx + HALF_TILE
+  drillPresence.nose.y = nose.ty + HALF_TILE
 }
 
 function reportWhenDue(loop: LoopState, result: VehicleStepResult): void {

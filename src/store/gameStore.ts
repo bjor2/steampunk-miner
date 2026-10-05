@@ -222,7 +222,7 @@ export function readLocalVehicle(): VehicleState {
   return readAuthorityState().players[useGameStore.getState().playerId].vehicle
 }
 
-/** The planet's params and its world deltas now, for physics and the placeholder tile view. */
+/** The planet's params and its world deltas now, for physics and the terrain meshes. */
 export function readPlanetWorld(): { params: PlanetParams | null; world: WorldState } {
   const state = readAuthorityState()
   return { params: planetParamsOf(state.planet), world: state.world }

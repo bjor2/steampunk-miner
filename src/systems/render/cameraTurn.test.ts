@@ -4,6 +4,7 @@ import {
   createCameraTurn,
   easeAngleToward,
   isCameraMode,
+  otherCameraMode,
   stepCameraTurn,
   type CameraMode,
 } from './cameraTurn'
@@ -59,5 +60,10 @@ describe('camera turn', () => {
     expect(isCameraMode('rotating')).toBe(true)
     expect(isCameraMode('fixed')).toBe(true)
     expect(isCameraMode('spinning')).toBe(false)
+  })
+
+  it('toggles between the two modes', () => {
+    expect(otherCameraMode('rotating')).toBe('fixed')
+    expect(otherCameraMode('fixed')).toBe('rotating')
   })
 })

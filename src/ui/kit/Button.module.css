@@ -1,0 +1,14 @@
+.button {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: transparent;
+  color: var(--color-parchment);
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.button:hover {
+  background: rgb(201 162 75 / 0.15);
+}

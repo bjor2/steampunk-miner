@@ -1,6 +1,7 @@
 /** Corner readout of what the store holds. Reads narrowly; per-frame data never comes here. */
 import { useGameStore } from '../store/gameStore'
 import { formatMoney } from '../systems/formatMoney'
+import { CameraModeToggle } from './CameraModeToggle'
 import styles from './Hud.module.css'
 import { Panel } from './kit/Panel'
 import { VehicleReadout } from './VehicleReadout'
@@ -28,6 +29,7 @@ export function Hud() {
         </div>
       </Panel>
       <VehicleReadout />
+      <CameraModeToggle />
     </div>
   )
 }

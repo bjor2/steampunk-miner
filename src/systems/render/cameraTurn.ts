@@ -25,6 +25,11 @@ export function isCameraMode(value: unknown): value is CameraMode {
   return CAMERA_MODES.includes(value as CameraMode)
 }
 
+/** The mode a toggle switches to. */
+export function otherCameraMode(mode: CameraMode): CameraMode {
+  return mode === 'rotating' ? 'fixed' : 'rotating'
+}
+
 export function createCameraTurn(): CameraTurn {
   return { angle: 0, up: { x: 0, y: 1 } }
 }

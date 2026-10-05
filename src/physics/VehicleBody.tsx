@@ -19,7 +19,7 @@ interface VehicleBodyProps {
   startPose: VehiclePose
   /** Called once per fixed step, before the world steps, with the one writer of the motion. */
   onFixedStep: (controller: VehicleController) => void
-  /** Written every frame with the body's position, for the camera and the tile view. */
+  /** Written every frame with the body's position, for the camera, terrain and lighting. */
   presence: { x: number; y: number }
   children: (controller: VehicleController) => ReactNode
 }
