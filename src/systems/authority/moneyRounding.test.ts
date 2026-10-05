@@ -23,6 +23,7 @@ describe('money rounding', () => {
       './workshopRules.ts',
       './dockRules.ts',
       './coreBay.ts',
+      './travelRules.ts',
     ]
     expect(platformPaths.flatMap(roundingIn)).toEqual([])
   })

@@ -167,7 +167,8 @@ function quickServiceMoneyRejection(state: AuthorityState, playerId: string): Re
   )
 }
 
-function moneyShortRejection(available: Money, cost: Money): Rejection | null {
+/** A charge the wallet cannot pay; shared by every priced command. */
+export function moneyShortRejection(available: Money, cost: Money): Rejection | null {
   if (cmp(available, cost) >= 0) return null
   return rejectionOf('money_short', `costs ${toCanonical(cost)}, has ${toCanonical(available)}`)
 }

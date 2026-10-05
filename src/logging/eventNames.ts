@@ -69,7 +69,8 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { planetSeed: 'integer', generatorVersion: 'integer', radius: 'integer' },
   },
-  planet_unlocked: { group: 'progression', level: 'core', payload: 'unspecified' },
+  // The unlocked planet by index: the envelope's `planet` is whichever planet the line was on.
+  planet_unlocked: { group: 'progression', level: 'core', payload: { planetIndex: 'integer' } },
   // The envelope's `planet` says which core (#10); nothing else to carry.
   core_reached: { group: 'progression', level: 'core', payload: {} },
   core_tile_harvested: {
@@ -81,7 +82,7 @@ export const RUN_EVENT_REGISTRY = {
   travel_started: {
     group: 'progression',
     level: 'core',
-    payload: { fromPlanet: 'integer', toPlanet: 'integer', cost: 'money' },
+    payload: { fromPlanet: 'integer', toPlanet: 'integer', cost: 'money', coreSpent: 'integer' },
   },
   feature_unlocked: { group: 'progression', level: 'core', payload: 'unspecified' },
 

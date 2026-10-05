@@ -35,6 +35,9 @@ export type RejectionReason =
   | 'hull_full'
   | 'energy_full'
   | 'nothing_to_service'
+  // Registered by `Travel` (#10): too few fragments in the bay, or not the next planet.
+  | 'core_short'
+  | 'not_next_planet'
 
 export type RescueCause = 'stranded' | 'destroyed'
 
@@ -80,6 +83,14 @@ export interface DomainEventBodies {
   /** The bay first held `coreNeeded` on this planet, `durationTicks` after `core_reached`. */
   CoreCompleted: { durationTicks: number }
   PlatformConfigurationChanged: { visualState: PlatformVisualState }
+  TravelStarted: {
+    fromPlanet: number
+    toPlanet: number
+    cost: string
+    coreSpent: number
+  }
+  PlanetUnlocked: { planetIndex: number }
+  PlanetEntered: { planetSeed: number; generatorVersion: number; radius: number }
   ResourceSold: { items: SoldItem[]; value: string; mode: SaleMode }
   RepairPurchased: { hullFrom: string; hullTo: string; cost: string }
   /** Energy in quanta. */

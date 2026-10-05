@@ -47,6 +47,8 @@ export interface CommandPayloads {
   quickService: Record<string, never>
   /** The workshop: one level of one upgrade track (#7). */
   buyUpgrade: { upgradeId: string }
+  /** Moves the docked platform to the next planet, paying the fee and the core (#10). */
+  travel: { toPlanet: number }
   'debug.setUpgrade': { upgradeId: string; level: number }
   /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
   'debug.setEnergy': { energy: string }
@@ -56,6 +58,8 @@ export interface CommandPayloads {
   'debug.setPlanetSeed': { planetSeed: number }
   /** Adds `amount` (a decimal string) to the player's wallet. */
   'debug.grantMoney': { amount: string }
+  /** Sets the platform's core bay to `count` fragments (#10 `setCoreFragments`). */
+  'debug.setCoreFragments': { count: number }
   /** Replaces the player's wallet with `amount` (a start scenario's money). */
   'debug.setMoney': { amount: string }
 }

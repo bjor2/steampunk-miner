@@ -91,6 +91,15 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'platform_configuration_changed',
     data: { visualState },
   }),
+  TravelStarted: ({ fromPlanet, toPlanet, cost, coreSpent }) => ({
+    event: 'travel_started',
+    data: { fromPlanet, toPlanet, cost, coreSpent },
+  }),
+  PlanetUnlocked: ({ planetIndex }) => ({ event: 'planet_unlocked', data: { planetIndex } }),
+  PlanetEntered: ({ planetSeed, generatorVersion, radius }) => ({
+    event: 'planet_entered',
+    data: { planetSeed, generatorVersion, radius },
+  }),
   ResourceSold: ({ items, value, mode }) => ({
     event: 'resource_sold',
     data: { items, value, mode },

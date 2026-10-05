@@ -74,7 +74,7 @@ const PLAYED_RUN: readonly RunEvent[] = [
   }),
   line(5000, 'vehicle_destroyed', { cause: 'enemy', kind: 'crawler', tier: 1, arc: 'rear' }),
   line(5100, 'rescue_triggered', { cause: 'destroyed', fee: '6.75e+1', cargoLostValue: '0e+0' }),
-  line(9000, 'travel_started', { fromPlanet: 1, toPlanet: 2, cost: '6.08e+1' }),
+  line(9000, 'travel_started', { fromPlanet: 1, toPlanet: 2, cost: '6.08e+1', coreSpent: 63 }),
   line(9000, 'planet_entered', { planetSeed: 8, generatorVersion: 1, radius: 400 }, { planet: 2 }),
   line(9100, 'game_ended', { reason: 'quit' }, { planet: 2 }),
 ]

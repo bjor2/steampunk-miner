@@ -4,12 +4,11 @@
  * (`setUpgrade`, `setEnergy`, `setHull`) live in `vehicleDebugRules.ts`.
  */
 import { add, fromCanonical, toCanonical, type Money } from '../money'
-import { dockedPoseAt } from '../vehicle/vehiclePose'
-import { EMPTY_WORLD } from '../world/worldState'
 import type { CommandType } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
 import type { CommandRule, RuleEffect } from './commandRule'
-import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
+import { followBayTotal } from './coreBay'
+import { withSessionOnPlanet } from './planetEntry'
 import { VEHICLE_DEBUG_RULES } from './vehicleDebugRules'
 
 export const DEBUG_COMMAND_RULES: {
@@ -18,14 +17,14 @@ export const DEBUG_COMMAND_RULES: {
   'debug.setPlanet': {
     fields: { planetIndex: 'wholeNumber' },
     apply: (state, { payload }) => ({
-      state: onPlanet(state, { ...state.planet, index: payload.planetIndex }),
+      state: withSessionOnPlanet(state, { ...state.planet, index: payload.planetIndex }),
       events: [{ type: 'PlanetChanged', planetIndex: payload.planetIndex }],
     }),
   },
   'debug.setPlanetSeed': {
     fields: { planetSeed: 'safeInteger' },
     apply: (state, { payload }) => ({
-      state: onPlanet(state, { ...state.planet, seed: payload.planetSeed }),
+      state: withSessionOnPlanet(state, { ...state.planet, seed: payload.planetSeed }),
       events: [{ type: 'PlanetSeedChanged', planetSeed: payload.planetSeed }],
     }),
   },
@@ -39,23 +38,12 @@ export const DEBUG_COMMAND_RULES: {
     apply: (state, { playerId, payload }) =>
       replaceWallet(state, playerId, fromCanonical(payload.amount)),
   },
+  'debug.setCoreFragments': {
+    fields: { count: 'wholeNumber' },
+    apply: (state, { payload, tick }) =>
+      followBayTotal({ ...state, platform: { ...state.platform, coreBay: payload.count } }, tick),
+  },
   ...VEHICLE_DEBUG_RULES,
-}
-
-/**
- * Another planet is another world: its deltas start empty and every vehicle stands on its dock.
- * The vehicles keep their levels, energy, hull and cargo.
- */
-function onPlanet(state: AuthorityState, planet: SessionPlanet): AuthorityState {
-  const site = dockSiteOfPlanet(planet)
-  const pose = site === null ? null : dockedPoseAt(site)
-  const players = Object.fromEntries(
-    Object.entries(state.players).map(([id, player]) => [
-      id,
-      { ...player, vehicle: { ...player.vehicle, pose } },
-    ]),
-  )
-  return { ...state, planet, world: EMPTY_WORLD, players }
 }
 
 function walletOf(state: AuthorityState, playerId: string): Money {

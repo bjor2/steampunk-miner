@@ -1,7 +1,8 @@
 /**
  * The platform's command intents (decision #8 registered commands, #23), as the store submits
  * them: `Dock`, `Undock`, `SellCargo {resourceTier | all}`, `RepairHull`, `RechargeEnergy`,
- * `QuickService` and `BuyUpgrade {upgradeId}`. The authority checks and prices each one.
+ * `QuickService`, `BuyUpgrade {upgradeId}`, and `Travel {toPlanet}` (#10). The authority checks
+ * and prices each one.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import type { OreSelection } from '../authority/platformServices'
@@ -32,4 +33,8 @@ export function quickServiceCommand(): CommandIntent<'quickService'> {
 
 export function buyUpgradeCommand(upgradeId: string): CommandIntent<'buyUpgrade'> {
   return { type: 'buyUpgrade', payload: { upgradeId } }
+}
+
+export function travelCommand(toPlanet: number): CommandIntent<'travel'> {
+  return { type: 'travel', payload: { toPlanet } }
 }

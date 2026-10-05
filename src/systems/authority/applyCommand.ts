@@ -24,6 +24,7 @@ import type { DomainEvent, DomainEventBody } from './domainEvent'
 import { isJsonObject, isWholeNumber, payloadProblems } from './payloadFields'
 import { PLATFORM_SERVICE_RULES } from './platformServices'
 import { VEHICLE_COMMAND_RULES } from './vehicleCommandRules'
+import { TRAVEL_RULES } from './travelRules'
 import { towVehiclesDueBy } from './vehicleTransitions'
 import { WORKSHOP_RULES } from './workshopRules'
 
@@ -48,6 +49,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...DOCK_COMMAND_RULES,
   ...PLATFORM_SERVICE_RULES,
   ...WORKSHOP_RULES,
+  ...TRAVEL_RULES,
 }
 
 /** The tick-driven changes due by a well-formed command's tick; none for a malformed one. */
