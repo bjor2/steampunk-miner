@@ -130,6 +130,30 @@ export const DRILL_SPARK_LIGHT = { colour: '#ffb347', rangeM: 3.5, strength: 0.9
 export const HEADLAMP_BODY_LIGHT = { heightM: 1.2, rangeM: 4, strength: 0.5 } as const
 
 /**
+ * Part motion (#48 motion principles): every part moves because the game state drives it. The
+ * drill turns a fixed angle per drilling tick; the load (energy draw) eases over 0.1 s (#48:
+ * starts and stops ease over 80-120 ms); a landing squashes the chassis 3% and a hit snaps it
+ * back in 60 ms, then both settle. Only the boiler's breath and the headlamp's flicker move
+ * while idle. Amplitudes and rates are placeholders, tuned by eye.
+ */
+export const DRILL_RADIANS_PER_TICK = 0.35
+export const LOAD_EASE_SECONDS = 0.1
+export const PISTON_HZ = 3
+export const PISTON_TRAVEL_M = 0.03
+export const BOILER_BREATH_HZ = 0.25
+export const BOILER_BREATH_M = 0.006
+export const BOILER_BOB_HZ = 2.5
+export const BOILER_BOB_M = 0.02
+export const HEADLAMP_FLICKER_SHARE = 0.08
+export const LANDING_SQUASH_SHARE = 0.03
+export const LANDING_SQUASH_SECONDS = 0.12
+/** Falling at least this fast, then not falling, is a landing. */
+export const LANDING_SPEED_MPS = 2
+export const HIT_RECOIL_M = 0.04
+export const HIT_SNAP_SECONDS = 0.06
+export const HIT_SETTLE_SECONDS = 0.2
+
+/**
  * Drill sparks (#13 VFX, from a small particle set). Placeholders, tuned by eye; the pool is
  * fixed, so a long drill never allocates.
  */

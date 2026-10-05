@@ -5,7 +5,9 @@ import {
   drillHeadSizeOf,
   vehicleBodyQuadsOf,
   vehiclePartIdsOf,
+  vehiclePartPosesOf,
 } from './vehicleLook'
+import { createPartMotion, stepPartMotion } from './partMotion'
 
 const idsOf = (quads: { partId: string }[]) => quads.map((quad) => quad.partId)
 
@@ -54,5 +56,24 @@ describe('vehicle look', () => {
 
   it('leaves the collider at most 0.9 m square, whatever the art overhangs', () => {
     expect(VEHICLE_COLLIDER_SIZE).toBeLessThanOrEqual(0.9)
+  })
+
+  it('poses every part the vehicle shows, each wheel rolling by its own radius (#48)', () => {
+    const motion = createPartMotion()
+    const driving = {
+      alongMetresPerSecond: 2,
+      upMetresPerSecond: 0,
+      isDriving: true,
+      isThrusting: false,
+      isDrilling: false,
+    }
+    for (let tick = 0; tick < 60; tick++) stepPartMotion(motion, driving, 1 / 60)
+    const tier1 = vehiclePartPosesOf(motion, 1, false)
+    const tier3 = vehiclePartPosesOf(motion, 3, false)
+    expect(Object.keys(tier3).sort()).toEqual(vehiclePartIdsOf(3).sort())
+    // Tier 1 wheels are 0.24 m, tier 3 wheels 0.26 m across.
+    expect(tier1['t1-wheel-2'].angle).toBeCloseTo(-2 / 0.12, 6)
+    expect(tier3['t3-wheel-2'].angle).toBeCloseTo(-2 / 0.13, 6)
+    expect(tier1['t1-chassis'].angle).toBe(0)
   })
 })

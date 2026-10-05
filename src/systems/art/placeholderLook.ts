@@ -13,6 +13,8 @@ export interface PlaceholderQuad {
   partId: string
   /** The quad's centre in the asset's frame, metres. */
   centre: Pair
+  /** The part's pivot in the asset's frame (`atM`): wheels and the drill turn about it. */
+  pivot: Pair
   size: Pair
   z: number
   colour: string
@@ -58,7 +60,7 @@ function quadOfPart(part: SidecarPart, colour: string): PlaceholderQuad {
     part.atM[0] - part.pivotM[0] + width / 2,
     part.atM[1] - part.pivotM[1] + height / 2,
   ]
-  return { partId: part.id, centre, size: part.sizeM, z: part.z, colour }
+  return { partId: part.id, centre, pivot: part.atM, size: part.sizeM, z: part.z, colour }
 }
 
 function colourOf(entry: ManifestEntry, part: SidecarPart): string {
@@ -69,6 +71,7 @@ function missingArtQuadOf(assetId: string): PlaceholderQuad {
   return {
     partId: assetId,
     centre: [0, 0],
+    pivot: [0, 0],
     size: MISSING_ART_SIZE,
     z: 0,
     colour: MISSING_ART_COLOUR,

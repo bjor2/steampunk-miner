@@ -12,6 +12,7 @@ import {
   SHAKE_MAX_METRES,
   SHAKE_WOBBLE_HZ,
 } from '../../constants/scene'
+import { accentOf } from './accents'
 import type { FeedbackCue } from './feedbackCues'
 
 export interface ScreenEffects {
@@ -46,6 +47,11 @@ export function createScreenEffects(): ScreenEffects {
   return { shake: 0, wobbleSeconds: 0, flash: 0, offsetX: 0, offsetY: 0 }
 }
 
+/** The flash is the bloom-flash accent (#48): only a cue whose one accent it is may flash. */
+function isFlashAccent(cue: FeedbackCue): boolean {
+  return accentOf(cue) === 'bloomFlash'
+}
+
 /** A cue's kick, only through the switches the player left on. */
 export function kickScreen(
   effects: ScreenEffects,
@@ -54,7 +60,9 @@ export function kickScreen(
 ): void {
   const kick = KICKS[cue.kind]
   if (switches.shake) effects.shake = Math.min(1, effects.shake + kick.shake)
-  if (switches.flashes) effects.flash = Math.max(effects.flash, kick.flash * FLASH_MAX_OPACITY)
+  if (switches.flashes && isFlashAccent(cue)) {
+    effects.flash = Math.max(effects.flash, kick.flash * FLASH_MAX_OPACITY)
+  }
 }
 
 /** One frame: decay both, and write the camera's offset; a switch turned off clears its effect. */

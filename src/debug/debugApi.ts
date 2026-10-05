@@ -9,6 +9,7 @@
  * `debug_command_applied`. Stubs (typed, throw DebugCommandNotImplementedError) wait for the
  * system they poke.
  */
+import { partMotion } from '../scene/partMotionPresence'
 import {
   readLocalVehicle,
   readPlanetWorld,
@@ -31,7 +32,8 @@ import {
   type VehicleStatsView,
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
-import { vehiclePartIdsOf } from '../systems/render/vehicleLook'
+import type { PartPose } from '../systems/render/partMotion'
+import { vehiclePartIdsOf, vehiclePartPosesOf } from '../systems/render/vehicleLook'
 import { isEnemyKind } from '../systems/authority/combat/combatDebugRules'
 import {
   clearEnemiesCommand,
@@ -82,10 +84,14 @@ export interface VehicleStatsReport {
   onCurveByPlanet: OnCurveVehicleView[]
 }
 
-/** `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6). */
+/**
+ * `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6), and
+ * each part's pose now (#48 acceptance 1-2: wheel and drill angles, lifts, squash, glow).
+ */
 export interface VehiclePartsReport {
   visualTier: number
   partIds: string[]
+  poses: Record<string, PartPose>
 }
 
 export interface DebugApi {
@@ -203,8 +209,12 @@ function depthTilesOfBp(depthBp: number): number {
 }
 
 function vehiclePartsReport(): VehiclePartsReport {
-  const { visualTier } = game().vehicle
-  return { visualTier, partIds: vehiclePartIdsOf(visualTier) }
+  const { vehicle, prefs } = game()
+  return {
+    visualTier: vehicle.visualTier,
+    partIds: vehiclePartIdsOf(vehicle.visualTier),
+    poses: vehiclePartPosesOf(partMotion, vehicle.visualTier, !prefs.shake),
+  }
 }
 
 function vehicleStatsReport(): VehicleStatsReport {
