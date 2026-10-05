@@ -16,6 +16,7 @@
     "test:packaged": "playwright test -c playwright.electron.config.ts",
     "bench:world": "vite-node scripts/benchGenerateChunk.ts",
     "bench:render": "vite-node scripts/benchChunkBatch.ts",
+    "bench:ground": "vite-node scripts/benchGround.ts",
     "bench:combat": "vite-node scripts/benchCombatTick.ts",
     "golden:update": "vite-node scripts/updateGoldenRuns.ts",
     "balance:report": "vite-node scripts/balanceReport.ts",

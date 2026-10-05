@@ -27,13 +27,26 @@ const METRES_PER_SAMPLE = 1 / SAMPLES_PER_TILE
 
 /** Segments as `[ax, ay, bx, by, ...]` in world metres. */
 export function contourSegmentsOf(block: SampleBlock, densityAt: DensityAt): number[] {
+  const corners = cornerGridOf(block, densityAt)
   const segments: number[] = []
   for (let sy = block.sy0; sy < block.sy0 + block.height; sy++) {
     for (let sx = block.sx0; sx < block.sx0 + block.width; sx++) {
-      writeSquareSegments(segments, densityAt, sx, sy)
+      writeSquareSegments(segments, corners.densityAt, sx, sy)
     }
   }
   return segments
+}
+
+/** The block's corner samples read once each, where the squares would read most of them 4 times. */
+function cornerGridOf(block: SampleBlock, densityAt: DensityAt): { densityAt: DensityAt } {
+  const side = block.width + 1
+  const grid = new Uint8Array(side * (block.height + 1))
+  for (let y = 0; y <= block.height; y++) {
+    for (let x = 0; x <= block.width; x++) {
+      grid[y * side + x] = densityAt(block.sx0 + x, block.sy0 + y)
+    }
+  }
+  return { densityAt: (sx, sy) => grid[(sy - block.sy0) * side + (sx - block.sx0)] }
 }
 
 interface Square {

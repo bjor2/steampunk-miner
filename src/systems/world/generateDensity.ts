@@ -108,8 +108,13 @@ function writeTileDensity(
   lx: number,
   ly: number,
 ): void {
+  const surface = surfaceSpanOfTile(context, lx, ly)
+  if (surface === 'air') {
+    fillTileSamples(density, lx, ly, AIR_DENSITY)
+    return
+  }
   const cave = hasCaveWallsAt(context, lx, ly) ? caveSpanOfTile(context, lx, ly) : 'solid'
-  if (cave !== 'wall' && context.isWhollyInsideSurface) {
+  if (cave !== 'wall' && surface === 'solid') {
     fillTileSamples(density, lx, ly, CAVE_SPAN[cave])
     return
   }
@@ -121,6 +126,27 @@ function writeTileDensity(
       density[sampleIndexOf(lsx, lsy)] = Math.min(caveDensity, surfaceDensityAt(context, lsx, lsy))
     }
   }
+}
+
+/**
+ * Whether the surface ramp leaves all of a tile's samples solid, all air, or crosses them: the
+ * ramp is 255 from half a sample inside the radius and 0 from half a sample outside, so the
+ * tile's farthest and nearest samples from the centre decide.
+ */
+function surfaceSpanOfTile(context: DensityContext, lx: number, ly: number): CaveSpan {
+  if (context.isWhollyInsideSurface) return 'solid'
+  const last = SAMPLES_PER_TILE - 1
+  const x0 = firstSampleOfChunk(context.cx) + lx * SAMPLES_PER_TILE
+  const y0 = firstSampleOfChunk(context.cy) + ly * SAMPLES_PER_TILE
+  const farX = Math.max(Math.abs(x0), Math.abs(x0 + last))
+  const farY = Math.max(Math.abs(y0), Math.abs(y0 + last))
+  const nearX = Math.max(0, x0, -(x0 + last))
+  const nearY = Math.max(0, y0, -(y0 + last))
+  const inner = context.radiusSamples - 1
+  const outer = context.radiusSamples + 1
+  if (farX * farX + farY * farY <= inner * inner) return 'solid'
+  if (nearX * nearX + nearY * nearY >= outer * outer) return 'air'
+  return 'wall'
 }
 
 /**

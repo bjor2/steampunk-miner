@@ -88,11 +88,19 @@ interface EditChunk {
   change: GroundChange
 }
 
+interface TileFacts {
+  material: number
+  /** Undefined until a carve asks; null when the tip cannot scratch the tile. */
+  drillTicks?: number | null
+}
+
 interface EditSession {
   world: WorldState
   params: PlanetParams
   chunks: Map<string, EditChunk>
   touchedTiles: Map<string, TilePoint>
+  /** Material and drill time per tile, worked out once per edit: a tile holds 16 samples. */
+  tiles: Map<string, TileFacts>
 }
 
 export function carveDisc(
@@ -173,9 +181,8 @@ function carveOneSample(
   drillTicksOf: CellDrillTicks,
 ): number {
   if (!isCarvable(session, sample)) return 0
-  const tile = tileOfSample(sample)
-  const drillTicks = drillTicksOf(tile, materialCellAt(session.world, session.params, tile))
-  if (drillTicks === null) return 0
+  const { drillTicks } = tileFactsOf(session, sample, drillTicksOf)
+  if (drillTicks === null || drillTicks === undefined) return 0
   const rate = { perTick: SOLID_DENSITY * sample.weight, per: FULL_WEIGHT * drillTicks }
   const density = densityOf(session, sample)
   const removal = Math.min(Math.max(0, density - sample.floor), removalOver(rate, window))
@@ -202,12 +209,35 @@ function ticksToRemove(
 
 function isCarvable(session: EditSession, sample: WeightedSample): boolean {
   if (sample.weight === 0) return false
-  const material = materialCellAt(session.world, session.params, tileOfSample(sample))
+  const { material } = tileFactsOf(session, sample, NO_DRILL)
   return kindOfCell(material) !== CELL_KIND.indestructible
 }
 
+const NO_DRILL: CellDrillTicks = () => null
+
+/** The sample's tile material, and its drill time once a carve asks for it. */
+function tileFactsOf(
+  session: EditSession,
+  sample: WeightedSample,
+  drillTicksOf: CellDrillTicks,
+): TileFacts {
+  const tile = tileOfSample(sample)
+  const key = `${tile.tx},${tile.ty}`
+  const known = session.tiles.get(key)
+  if (known !== undefined && (known.drillTicks !== undefined || drillTicksOf === NO_DRILL)) {
+    return known
+  }
+  const material = known?.material ?? materialCellAt(session.world, session.params, tile)
+  const facts: TileFacts =
+    drillTicksOf === NO_DRILL
+      ? { material }
+      : { material, drillTicks: drillTicksOf(tile, material) }
+  session.tiles.set(key, facts)
+  return facts
+}
+
 function openSession(world: WorldState, params: PlanetParams): EditSession {
-  return { world, params, chunks: new Map(), touchedTiles: new Map() }
+  return { world, params, chunks: new Map(), touchedTiles: new Map(), tiles: new Map() }
 }
 
 function densityOf(session: EditSession, sample: WeightedSample): number {
