@@ -34,7 +34,7 @@ import {
   type BayHeader,
   type BayUiState,
 } from './bayFrame'
-import type { FocusStop } from './menuFocus'
+import { focusOnScreen, type FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, workshopRowsOf, type BuyState, type WorkshopRow } from './workshopRows'
@@ -100,7 +100,7 @@ export function selectUpgradeBayModel(
     casing,
     repair,
     visualTier: visualTier(levels),
-    preview: previewOf(levels, tracks, focusedIdOf(focusStops, ui.focusedId)),
+    preview: previewOf(levels, tracks, focusOnScreen(focusStops, ui.focusedId, focusStops[0].id)),
     quickService,
     footer,
     focusStops,
@@ -162,11 +162,6 @@ function previewOf(
   if (focused === undefined) return { highlight: null, visualTier: visualTier(levels) }
   const after = { ...levels, [focused.upgradeId]: levels[focused.upgradeId] + 1 }
   return { highlight: focused.upgradeId, visualTier: visualTier(after) }
-}
-
-/** The focused id if it is on this screen, else the first stop, as the screen draws it. */
-function focusedIdOf(stops: readonly FocusStop[], focusedId: string | null): string {
-  return stops.some((stop) => stop.id === focusedId) ? (focusedId as string) : stops[0].id
 }
 
 function focusedButtonsOf(

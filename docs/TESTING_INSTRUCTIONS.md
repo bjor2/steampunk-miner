@@ -70,7 +70,7 @@ file turns it on, so scenario and bot runs never see hints.
   (the NDJSON so far, browser shell only).
 - Every wired debug method answers `{ ok: true, ... }` or `{ ok: false, problems }`: `setPlanet`,
   `setPlanetSeed`, `teleportToDepthTiles`, `teleportToDepth(depthBp)` (basis points of the radius),
-  `teleportToDock()` (the `debug.teleportToDock` command: docked on the dock point, no tow, no fee),
+  `teleportToDock(bay?)` (the `debug.teleportToDock {bay}` command: docked at rest in the Sell bay, or the Upgrade bay when named, no tow, no fee),
   `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
   `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
   `setUpgrade(id, level)`, `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
@@ -79,7 +79,7 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   unlogged read `enemyStatsTable(kind)`. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
-  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getPlatformModel()`) reads the screens' view models and
+  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`) reads the screens' view models and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
   #33). The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
   `input.setBindings(overrides)`) presses actions at the action layer, so a tap submits ordinary
