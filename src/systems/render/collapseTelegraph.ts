@@ -7,7 +7,7 @@
  * Presentation only: read from the authority's collapse list, written into scratch, never back.
  */
 import { COLLAPSE_BLOCK_SAMPLES, COLLAPSE_WARN_TICKS } from '../../constants/balance'
-import { CRACK_SEGMENT_M, CRACKS_PER_BLOCK } from '../../constants/scene'
+import { CRACK_SEGMENT_M, CRACK_TURN_RADIANS, CRACKS_PER_BLOCK } from '../../constants/scene'
 import type { CollapseState } from '../authority/collapse/collapseState'
 import { blockOfId, firstSampleOfBlock } from '../world/collapseBlock'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
@@ -60,11 +60,12 @@ export function crackSegmentsAt(progress: number): number {
  * from the last, kept inside the block's bounds.
  */
 export function writeCrackSegment(block: TelegraphBlock, index: number, out: Float32Array): void {
-  let x = block.x0 + block.size * (0.25 + 0.5 * unitHash(block.seed, 0))
-  let y = block.y0 + block.size * (0.25 + 0.5 * unitHash(block.seed, 1))
+  // The crack starts in the block's middle half: a quarter to three quarters along each side.
+  let x = block.x0 + (block.size * (1 + 2 * unitHash(block.seed, 0))) / 4
+  let y = block.y0 + (block.size * (1 + 2 * unitHash(block.seed, 1))) / 4
   let heading = 2 * Math.PI * unitHash(block.seed, 2)
   for (let step = 0; step <= index; step++) {
-    heading += (unitHash(block.seed, 3 + step) - 0.5) * 1.6
+    heading += (2 * unitHash(block.seed, 3 + step) - 1) * CRACK_TURN_RADIANS
     out[0] = x
     out[1] = y
     x = clampInto(x + Math.cos(heading) * CRACK_SEGMENT_M, block.x0, block.size)

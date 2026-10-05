@@ -197,11 +197,14 @@ export const CEMENT_SEED = 0xce77
 export const COLLAPSE_TELEGRAPH_BLOCKS = 24
 export const CRACKS_PER_BLOCK = 7
 export const CRACK_SEGMENT_M = 0.6
+/** Each crack segment turns at most this far from the last. */
+export const CRACK_TURN_RADIANS = 0.8
 export const CRACK_COLOUR = '#1b130d'
 export const COLLAPSE_DUST_CAPACITY = 320
 export const COLLAPSE_DUST_START = 6
 export const COLLAPSE_DUST_FULL = 60
 export const COLLAPSE_DUST_FALL_SPEED = 1.8
+export const COLLAPSE_DUST_SPREAD_RADIANS = 0.3
 export const COLLAPSE_DUST_LIFE_SECONDS = 0.9
 export const COLLAPSE_DUST_SIZE_PIXELS = 3
 export const COLLAPSE_DUST_COLOUR = '#8d7f6a'
