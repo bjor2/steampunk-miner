@@ -110,4 +110,53 @@ test.describe('browser smoke (#29)', () => {
     expect(outcome.isUnchanged).toBe(true)
     expect(errors).toEqual([])
   })
+
+  for (const viewport of [
+    { width: 1920, height: 1080 },
+    { width: 3840, height: 2160 },
+  ]) {
+    test(`frames 12 m at ${viewport.width}x${viewport.height} and zooms within 8 m to 20 m (#39)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport)
+      const errors = await openGame(page, 'debug')
+      // The camera reports the canvas once it has drawn its first frame.
+      await expect
+        .poll(async () => (await readCameraView(page)).pixelsPerMetre)
+        .toBeCloseTo(viewport.height / 12, 6)
+      const view = await readCameraView(page)
+      expect(view.viewShortAxisMetres).toBe(12)
+      expect(view.vehicleColliderShare).toBeCloseTo(0.075, 2)
+      await tapRepeatedly(page, 'zoom_out', 6)
+      await expectCameraViewSettlesAt(page, 20)
+      await tapRepeatedly(page, 'zoom_in', 6)
+      await expectCameraViewSettlesAt(page, 8)
+      await tapRepeatedly(page, 'zoom_reset', 1)
+      await expectCameraViewSettlesAt(page, 12)
+      expect(errors).toEqual([])
+    })
+  }
 })
+
+async function readCameraView(page: Page) {
+  return page.evaluate(() => {
+    const result = window.steampunkDebug!.ui.getCameraView()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    return result.view
+  })
+}
+
+function expectCameraViewSettlesAt(page: Page, metres: number): Promise<void> {
+  return expect
+    .poll(async () => (await readCameraView(page)).viewShortAxisMetres)
+    .toBeCloseTo(metres, 6)
+}
+
+function tapRepeatedly(page: Page, actionId: string, times: number): Promise<void> {
+  return page.evaluate(
+    ({ actionId, times }) => {
+      for (let i = 0; i < times; i++) window.steampunkDebug!.input.tap(actionId)
+    },
+    { actionId, times },
+  )
+}

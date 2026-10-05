@@ -1,7 +1,7 @@
 {
   "name": "money-past-1e40",
   "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
-  "generatorVersion": 1,
+  "generatorVersion": 2,
   "authorityProtocolVersion": 3,
   "logSchemaVersion": 1,
   "numberFormatVersion": 1,
@@ -53,8 +53,8 @@
       "seq": 5,
       "type": "reportPose",
       "payload": {
-        "x": 13500,
-        "y": 950500,
+        "x": 19500,
+        "y": 948500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -74,8 +74,8 @@
       "seq": 6,
       "type": "drillTile",
       "payload": {
-        "tx": 13,
-        "ty": 949,
+        "tx": 19,
+        "ty": 947,
         "ticks": 40
       }
     },
@@ -85,8 +85,8 @@
       "seq": 7,
       "type": "reportPose",
       "payload": {
-        "x": 13500,
-        "y": 947500,
+        "x": 20500,
+        "y": 949500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -106,8 +106,8 @@
       "seq": 8,
       "type": "drillTile",
       "payload": {
-        "tx": 13,
-        "ty": 946,
+        "tx": 20,
+        "ty": 948,
         "ticks": 40
       }
     },
@@ -117,8 +117,8 @@
       "seq": 9,
       "type": "reportPose",
       "payload": {
-        "x": 17500,
-        "y": 950500,
+        "x": 20500,
+        "y": 948500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -138,8 +138,8 @@
       "seq": 10,
       "type": "drillTile",
       "payload": {
-        "tx": 17,
-        "ty": 949,
+        "tx": 20,
+        "ty": 947,
         "ticks": 40
       }
     },
@@ -233,17 +233,17 @@
     {
       "tick": 124,
       "scope": "dock",
-      "digest": "90afc05a06ef3e7c"
+      "digest": "ed71e4e3a8b282d8"
     },
     {
       "tick": 166,
       "scope": "dock",
-      "digest": "32af266aaa0ac83b"
+      "digest": "d2c77c1df0bfd91f"
     },
     {
       "tick": 2000,
       "scope": "end",
-      "digest": "3e920e437c175129"
+      "digest": "2c52fac90b852f81"
     }
   ]
 }

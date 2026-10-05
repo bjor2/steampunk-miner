@@ -45,6 +45,8 @@ export function createTerrainMaterial(): ShaderMaterial {
       uAmbientSurface: { value: AMBIENT_SURFACE },
       uAmbientDeep: { value: AMBIENT_DEEP },
       uAmbientFade: { value: AMBIENT_FADE_DEPTH_TILES },
+      // Each chunk mesh sets its own density halo just before it draws (chunkMeshPool).
+      uDensity: { value: null },
     },
   })
 }

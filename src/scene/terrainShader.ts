@@ -1,8 +1,10 @@
 /**
  * The terrain's one shader (#13 Visual direction, #22): every chunk mesh draws with it, so a
  * chunk is one draw call with its edge highlight, noise texture, ore decal, ore glow, sparkles and
- * lighting all in it. Instance attributes come from `buildChunkTileBatch`; style codes, edge bits
- * and silhouette codes are the ones it exports. Colours are display (sRGB) values written as is,
+ * lighting all in it. Instance attributes come from `buildChunkTileBatch`; style and silhouette
+ * codes are the ones it exports. Each quad is cut along the ground's surface (#36): the chunk's
+ * density halo is a texture, blended bilinearly between samples, and a fragment below 128 is air.
+ * The edge highlight is the band just inside that contour. Colours are display (sRGB) values written as is,
  * the flat look of #13 with no tone mapping.
  *
  * Lighting is the vehicle lamp plus ambient light that fades with depth (#13: capped to the lamp
@@ -17,6 +19,7 @@ attribute vec4 aOre;
 attribute vec4 aStyle;
 
 varying vec2 vLocal;
+varying vec2 vChunk;
 varying vec2 vWorld;
 varying vec2 vTile;
 varying vec3 vBase;
@@ -25,6 +28,7 @@ varying vec4 vStyle;
 
 void main() {
   vLocal = position.xy + 0.5;
+  vChunk = position.xy + aTile + 0.5;
   vec4 world = modelMatrix * vec4(position.xy + aTile + 0.5, 0.0, 1.0);
   vWorld = world.xy;
   vTile = floor((modelMatrix * vec4(aTile + 0.5, 0.0, 1.0)).xy);
@@ -47,15 +51,21 @@ uniform float uPlanetRadius;
 uniform float uAmbientSurface;
 uniform float uAmbientDeep;
 uniform float uAmbientFade;
+uniform sampler2D uDensity;
 
 varying vec2 vLocal;
+varying vec2 vChunk;
 varying vec2 vWorld;
 varying vec2 vTile;
 varying vec3 vBase;
 varying vec4 vOre;
 varying vec4 vStyle;
 
-const float EDGE_WIDTH = 0.09;
+// sampleGrid: 4 samples per tile, a 129-sample halo, the contour at 128 of 255.
+const float SAMPLES_PER_TILE = 4.0;
+const float HALO_SIDE = 129.0;
+const float ISO = 128.0 / 255.0;
+const float EDGE_PIXELS = 2.0;
 
 // Hash without sine (Dave Hoskins, "Hash without Sine", MIT): stable on every GPU.
 float hash12(vec2 p) {
@@ -70,17 +80,14 @@ mat2 rotation(float angle) {
   return mat2(c, -s, s, c);
 }
 
-float hasEdge(float mask, float bit) {
-  return mod(floor(mask / bit), 2.0);
+float densityAt(vec2 chunkLocal) {
+  return texture2D(uDensity, (chunkLocal * SAMPLES_PER_TILE + 0.5) / HALO_SIDE).r;
 }
 
-// Bits as in chunkTileBatch EDGE: 1 right, 2 left, 4 up, 8 down.
-float edgeHighlight(float mask, vec2 local) {
-  float right = hasEdge(mask, 1.0) * step(1.0 - EDGE_WIDTH, local.x);
-  float left = hasEdge(mask, 2.0) * step(local.x, EDGE_WIDTH);
-  float up = hasEdge(mask, 4.0) * step(1.0 - EDGE_WIDTH, local.y);
-  float down = hasEdge(mask, 8.0) * step(local.y, EDGE_WIDTH);
-  return max(max(right, left), max(up, down));
+// About EDGE_PIXELS wide on screen at any zoom: the density's change per pixel sets the band.
+float edgeHighlight(float density) {
+  float perPixel = max(fwidth(density), 0.0001);
+  return 1.0 - smoothstep(EDGE_PIXELS * perPixel * 0.5, EDGE_PIXELS * perPixel, density - ISO);
 }
 
 // Metals: angular flecks and nuggets, a few turned squares per tile.
@@ -135,9 +142,11 @@ vec3 lightAt(vec2 world) {
 }
 
 void main() {
+  float density = densityAt(vChunk);
+  if (density < ISO) discard;
   float style = vStyle.x;
   vec3 colour = vBase * (0.94 + 0.08 * hash12(floor(vLocal * 6.0) + vTile * 7.0));
-  colour = mix(colour, colour * 1.5 + vec3(0.06, 0.05, 0.03), 0.55 * edgeHighlight(vStyle.y, vLocal));
+  colour = mix(colour, colour * 1.5 + vec3(0.06, 0.05, 0.03), 0.55 * edgeHighlight(density));
   vec3 light = lightAt(vWorld);
   vec3 emissive = vec3(0.0);
 

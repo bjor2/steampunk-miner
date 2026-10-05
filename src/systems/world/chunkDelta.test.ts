@@ -1,76 +1,75 @@
 import { describe, expect, it } from 'vitest'
-import { toCanonicalJson } from '../authority/canonicalJson'
 import {
-  EMPTY_CHUNK_DELTA,
   applyChunkDelta,
-  isCellRemoved,
+  decodeDensity,
+  EMPTY_CHUNK_DELTA,
+  encodeDensityChange,
+  isCellYielded,
   isChunkTouched,
+  materialCellsOf,
   withCellOverride,
-  withCellRemoved,
+  withCellsYielded,
+  withDensity,
 } from './chunkDelta'
 import { chunkDigest } from './chunkDigest'
 import { generateChunk } from './generateChunk'
 import { planetParamsFor } from './planetParams'
-import { CHUNK_CELLS } from './tileGrid'
-import { AIR_CELL, GROUND_CELL, INDESTRUCTIBLE_CELL } from './worldCell'
+import { CHUNK_SAMPLES } from './sampleGrid'
+import { AIR_CELL, GROUND_CELL, oreCell, RESOURCE_FAMILY } from './worldCell'
 
 const generated = generateChunk(planetParamsFor(83921, 1), 2, 5)
 
-describe('chunk delta', () => {
-  it('leaves the generated cells unchanged when empty', () => {
-    expect(applyChunkDelta(generated, EMPTY_CHUNK_DELTA)).toEqual(generated)
+function tunnelThrough(density: Uint8Array): Uint8Array {
+  const dug = density.slice()
+  dug.fill(0, 128 * 40, 128 * 48)
+  dug[5000] = 77
+  return dug
+}
+
+describe('chunk delta (#36 Storage)', () => {
+  it('leaves the generated chunk unchanged when empty', () => {
+    expect(applyChunkDelta(generated.cells, EMPTY_CHUNK_DELTA)).toEqual(generated.cells)
+    expect(decodeDensity(generated.density, EMPTY_CHUNK_DELTA)).toEqual(generated.density)
     expect(isChunkTouched(EMPTY_CHUNK_DELTA)).toBe(false)
   })
 
-  it('turns a removed tile into air and marks the chunk touched', () => {
-    const delta = withCellRemoved(EMPTY_CHUNK_DELTA, 1023)
-    expect(applyChunkDelta(generated, delta)[1023]).toBe(AIR_CELL)
-    expect(isCellRemoved(delta, 1023)).toBe(true)
+  it('round-trips a carved density through its XOR runs', () => {
+    const dug = tunnelThrough(generated.density)
+    const delta = withDensity(EMPTY_CHUNK_DELTA, dug, generated.density)
+    expect(decodeDensity(generated.density, delta)).toEqual(dug)
     expect(isChunkTouched(delta)).toBe(true)
+    expect(delta.version).toBe(1)
   })
 
-  it('never changes the delta it was given', () => {
-    withCellRemoved(EMPTY_CHUNK_DELTA, 40)
-    withCellOverride(EMPTY_CHUNK_DELTA, 41, GROUND_CELL)
-    expect(isChunkTouched(EMPTY_CHUNK_DELTA)).toBe(false)
-  })
-
-  it('lets an override replace a removed tile and a removal drop an override', () => {
-    const overridden = withCellOverride(
-      withCellRemoved(EMPTY_CHUNK_DELTA, 7),
-      7,
-      INDESTRUCTIBLE_CELL,
+  it('stores a tunnel through a cave chunk in a few hundred numbers, an unchanged one in none', () => {
+    const runs = encodeDensityChange(tunnelThrough(generated.density), generated.density)
+    expect(runs.length).toBeLessThan(300)
+    expect(runs.filter((_, at) => at % 2 === 0).reduce((sum, count) => sum + count, 0)).toBe(
+      CHUNK_SAMPLES,
     )
-    expect(applyChunkDelta(generated, overridden)[7]).toBe(INDESTRUCTIBLE_CELL)
-    const removedAgain = withCellRemoved(overridden, 7)
-    expect(applyChunkDelta(generated, removedAgain)[7]).toBe(AIR_CELL)
-    expect(removedAgain.overrides).toEqual([])
+    expect(encodeDensityChange(generated.density, generated.density)).toEqual([])
   })
 
-  it('keeps overrides sorted by index, so equal deltas have one canonical form', () => {
-    const oneWay = withCellOverride(
-      withCellOverride(EMPTY_CHUNK_DELTA, 9, GROUND_CELL),
-      3,
-      AIR_CELL,
-    )
-    const otherWay = withCellOverride(
-      withCellOverride(EMPTY_CHUNK_DELTA, 3, AIR_CELL),
-      9,
-      GROUND_CELL,
-    )
-    expect(toCanonicalJson(oneWay)).toBe(toCanonicalJson(otherWay))
+  it('opens a yielded cell for the cell rules but keeps its material', () => {
+    const delta = withCellsYielded(EMPTY_CHUNK_DELTA, [33])
+    expect(isCellYielded(delta, 33)).toBe(true)
+    expect(isCellYielded(delta, 34)).toBe(false)
+    expect(applyChunkDelta(generated.cells, delta)[33]).toBe(AIR_CELL)
+    expect(materialCellsOf(generated.cells, delta)[33]).toBe(generated.cells[33])
   })
 
-  it('stays exact canonical JSON with every tile removed, its bitset 128 bytes of words', () => {
-    let delta = EMPTY_CHUNK_DELTA
-    for (let index = 0; index < CHUNK_CELLS; index++) delta = withCellRemoved(delta, index)
-    expect(delta.removedRows).toHaveLength(32)
-    expect(delta.removedRows.every((row) => row === 0xffffffff)).toBe(true)
-    expect(() => toCanonicalJson(delta)).not.toThrow()
+  it('replaces a cell material with an override, keeping overrides sorted', () => {
+    const ore = oreCell(RESOURCE_FAMILY.metal, 2)
+    const delta = withCellOverride(withCellOverride(EMPTY_CHUNK_DELTA, 9, ore), 3, GROUND_CELL)
+    expect(delta.overrides).toEqual([
+      [3, GROUND_CELL],
+      [9, ore],
+    ])
+    expect(materialCellsOf(generated.cells, delta)[9]).toBe(ore)
   })
 
-  it('changes the chunk digest when a tile is removed', () => {
-    const dug = applyChunkDelta(generated, withCellRemoved(EMPTY_CHUNK_DELTA, 500))
+  it('changes the chunk digest when the density changes', () => {
+    const dug = { cells: generated.cells, density: tunnelThrough(generated.density) }
     expect(chunkDigest(dug)).not.toBe(chunkDigest(generated))
     expect(chunkDigest(generated)).toMatch(/^[0-9a-f]{16}$/)
   })

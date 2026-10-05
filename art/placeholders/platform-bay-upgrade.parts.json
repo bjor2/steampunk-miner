@@ -1,0 +1,27 @@
+{
+  "assetId": "platform-bay-upgrade",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-bay-upgrade/platform-bay-upgrade.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [2048, 1024],
+  "maps": {
+    "albedo": "platform-bay-upgrade.albedo.ktx2",
+    "normal": "platform-bay-upgrade.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "platform-bay-upgrade",
+      "tier": 1,
+      "rect": [8, 8, 1024, 768],
+      "sizeM": [4.0, 3.0],
+      "pivotM": [2.0, 0.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}

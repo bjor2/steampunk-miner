@@ -73,6 +73,7 @@ import {
 } from './authorityLink'
 import { recordCheckpointLoaded, writeCheckpointAfter, type Checkpoint } from './checkpoint'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
+import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
 import { announceFeedback } from './feedbackBroadcast'
 import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
@@ -85,8 +86,10 @@ import {
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
+type DebugActions = CombatDebugActions & GroundDebugActions
+
 export interface GameState
-  extends CombatDebugActions, PresentationValues, PresentationActions, HintValues, HintActions {
+  extends DebugActions, PresentationValues, PresentationActions, HintValues, HintActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -187,6 +190,7 @@ export const STARTING_VALUES: GameValues = {
 export const useGameStore = create<GameState>()((set, get) => ({
   ...STARTING_VALUES,
   ...combatDebugActionsOf(() => get().playerId),
+  ...groundDebugActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
   ...hintActionsOf(set, get),
 

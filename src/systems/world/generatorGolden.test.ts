@@ -7,15 +7,16 @@ import { planetParamsFor, type PlanetParams } from './planetParams'
 import { chunkRangeOfDisc } from './tileGrid'
 
 /**
- * Decision #4 acceptance 1: a committed digest of the generator's output. If this fails, the
+ * Decision #4 acceptance 1 (#36 acceptance 1, #42 acceptance 4 under generator 2): a committed
+ * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 1,
-  wholePlanet1: 'c7b788b97138e940',
-  wholePlanet2: 'd6626ceec3864939',
-  farPlanetChunks: 'b44bf0f5db72d925',
+  generatorVersion: 2,
+  wholePlanet1: '868f653e59e877b8',
+  wholePlanet2: '2d9d3d1f9680274d',
+  farPlanetChunks: 'f5d1e59c4a6053f7',
 }
 
 /** One digest over every chunk's digest in a fixed order. */

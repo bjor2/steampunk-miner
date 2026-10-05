@@ -6,6 +6,7 @@ import { drillDamage } from '../vehicle/drillRule'
 import { FACING } from '../vehicle/vehiclePose'
 import { cargoUnitsOf } from '../vehicle/vehicleState'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
+import { cellDensitySum } from '../world/groundEdit'
 import { cellAt, EMPTY_WORLD } from '../world/worldState'
 import type { DomainEvent } from './domainEvent'
 import {
@@ -29,26 +30,39 @@ const createSession = () => createScriptedSession()
 type Session = ScriptedSession
 
 describe('vehicle drilling', () => {
-  it('breaks a band-1 tile in exactly 40 ticks at level 0', () => {
+  it('clears a band-1 cell in exactly 40 ticks at level 0, yielding it once half is drilled', () => {
     const session = createSession()
-    session.submit(10, poseAbove(GROUND, FACING.down))
-    expect(typesOf(session.submit(49, drill(GROUND, 39)))).toEqual(['DrillDamageDealt'])
-    expect(typesOf(session.submit(50, drill(GROUND, 1)))).toEqual([
+    session.submit(0, poseAbove(GROUND, FACING.down))
+    expect(typesOf(session.submit(20, drill(GROUND, 20)))).toEqual([
       'DrillDamageDealt',
+      'GroundChanged',
+    ])
+    expect(typesOf(session.submit(21, drill(GROUND, 1)))).toEqual([
+      'DrillDamageDealt',
+      'GroundChanged',
       'TileDestroyed',
     ])
     expect(kindOfCell(cellAt(session.state().world, PARAMS, GROUND))).toBe(CELL_KIND.air)
+    session.submit(39, drill(GROUND, 18))
+    expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBeGreaterThan(0)
+    session.submit(40, drill(GROUND, 1))
+    expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBe(0)
+    expect(FULL_TANK - session.vehicle().energy).toBe(40 * 4)
   })
 
-  it('breaks the same tile in exactly 24 ticks with drill_power at level 20', () => {
+  it('clears the same cell in exactly 24 ticks with drill_power at level 20', () => {
     const session = createSession()
     session.submit(0, {
       type: 'debug.setUpgrade',
       payload: { upgradeId: 'drill_power', level: 20 },
     })
-    session.submit(10, poseAbove(GROUND, FACING.down))
-    expect(typesOf(session.submit(33, drill(GROUND, 23)))).toEqual(['DrillDamageDealt'])
-    expect(typesOf(session.submit(34, drill(GROUND, 1)))).toContain('TileDestroyed')
+    session.submit(0, poseAbove(GROUND, FACING.down))
+    expect(typesOf(session.submit(12, drill(GROUND, 12)))).not.toContain('TileDestroyed')
+    expect(typesOf(session.submit(13, drill(GROUND, 1)))).toContain('TileDestroyed')
+    session.submit(23, drill(GROUND, 10))
+    expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBeGreaterThan(0)
+    session.submit(24, drill(GROUND, 1))
+    expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBe(0)
   })
 
   it('charges only the ticks a tile needs, so extra drill ticks cost nothing', () => {
@@ -58,16 +72,24 @@ describe('vehicle drilling', () => {
     expect(FULL_TANK - session.vehicle().energy).toBe(40 * 4)
   })
 
-  it('gives the same damage and energy through drillTile and a reported pose', () => {
-    const scripted = createSession()
-    scripted.submit(10, poseAbove(GROUND, FACING.down))
-    const byCommand = scripted.submit(30, drill(GROUND, 20))
-    const reported = createSession()
-    reported.submit(10, poseAbove(GROUND, FACING.down))
-    const byPose = reported.submit(30, poseAbove(GROUND, FACING.down, { drillTicks: 20 }))
-    expect(byPose).toEqual(byCommand.map((event) => ({ ...event, seq: 2 })))
-    expect(reported.vehicle().energy).toBe(scripted.vehicle().energy)
-    expect(reported.state().world).toEqual(scripted.state().world)
+  it('carves the 1.9 m drill stamp under a reported pose, charging only the ticks it cut', () => {
+    const session = createSession()
+    session.submit(10, poseAbove(GROUND, FACING.down))
+    const events = session.submit(30, poseAbove(GROUND, FACING.down, { drillTicks: 20 }))
+    expect(typesOf(events)).toContain('GroundChanged')
+    expect(FULL_TANK - session.vehicle().energy).toBe(20 * 4)
+    for (const tx of [GROUND.tx - 1, GROUND.tx, GROUND.tx + 1]) {
+      const tile = { tx, ty: GROUND.ty }
+      expect(cellDensitySum(session.state().world, PARAMS, tile)).toBeLessThan(16 * 255)
+    }
+  })
+
+  it('charges nothing for a reported drill into open ground', () => {
+    const session = createSession()
+    const inClearance = { tx: 0, ty: SITE.padRow + 4 }
+    session.submit(10, poseAbove(inClearance, FACING.left))
+    expect(session.submit(30, poseAbove(inClearance, FACING.left, { drillTicks: 20 }))).toEqual([])
+    expect(session.vehicle().energy).toBe(FULL_TANK)
   })
 
   it('sums drill_damage_dealt to the ticks times drillPower * eff / 60', () => {
@@ -134,8 +156,13 @@ describe('vehicle cargo', () => {
     const tiles = surfaceOreTiles(11)
     tiles.slice(0, 10).forEach((tile, index) => mineTile(session, 100 * (index + 1), tile))
     const events = mineTile(session, 2000, tiles[10])
-    expect(typesOf(events)).toEqual(['DrillDamageDealt', 'TileDestroyed', 'StorageFull'])
-    expect(events[2]).toMatchObject({ lostUnits: 1 })
+    expect(typesOf(events)).toEqual([
+      'DrillDamageDealt',
+      'GroundChanged',
+      'TileDestroyed',
+      'StorageFull',
+    ])
+    expect(events[3]).toMatchObject({ lostUnits: 1 })
     expect(session.vehicle().cargo.ore).toEqual({ 1: 10 })
   })
 })
@@ -154,11 +181,12 @@ describe('vehicle core fragments', () => {
     const events = session.submit(200, drill(core, 190))
     expect(typesOf(events)).toEqual([
       'DrillDamageDealt',
+      'GroundChanged',
       'TileDestroyed',
       'CoreReached',
       'CoreTileHarvested',
     ])
-    expect(events[3]).toMatchObject({ tilesRemaining: 155, fragments: 1 })
+    expect(events[4]).toMatchObject({ tilesRemaining: 155, fragments: 1 })
     expect(session.vehicle().cargo).toEqual({ ore: {}, coreFragments: 1 })
     expect(cargoUnitsOf(session.vehicle().cargo)).toBe(1)
   })

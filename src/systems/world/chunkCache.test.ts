@@ -6,14 +6,17 @@ import { planetParamsFor } from './planetParams'
 const params = planetParamsFor(83921, 1)
 
 describe('chunk cache', () => {
-  it('serves the same cells generateChunk makes', () => {
+  it('serves the same cells and density generateChunk makes', () => {
     const cache = createChunkCache(params, 4)
-    expect(cache.generatedCellsOf(-2, 3)).toEqual(generateChunk(params, -2, 3))
+    expect(cache.generatedChunkOf(-2, 3)).toEqual(generateChunk(params, -2, 3))
+    expect(cache.generatedCellsOf(-2, 3)).toEqual(generateChunk(params, -2, 3).cells)
   })
 
-  it('serves a held chunk without generating it again', () => {
+  it('serves a held chunk without generating it again, its density made once', () => {
     const cache = createChunkCache(params, 4)
     expect(cache.generatedCellsOf(1, 1)).toBe(cache.generatedCellsOf(1, 1))
+    expect(cache.generatedChunkOf(1, 1).density).toBe(cache.generatedChunkOf(1, 1).density)
+    expect(cache.generatedChunkOf(1, 1).cells).toBe(cache.generatedCellsOf(1, 1))
   })
 
   it('evicts the least recently used chunk past its capacity', () => {

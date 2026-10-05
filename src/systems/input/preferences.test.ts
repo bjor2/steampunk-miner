@@ -17,6 +17,7 @@ describe('preferences file', () => {
       ...withPreference(DEFAULT_PREFERENCES, 'cameraMode', 'fixed'),
       bindings: { aim_left: { keyboard: ['KeyJ'] } },
       seenHints: ['hint_move', 'transmission_opening'],
+      viewShortAxisMetres: 15,
     }
     expect(readPreferences(preferencesText(prefs))).toEqual({ prefs, problems: [] })
   })
@@ -27,6 +28,20 @@ describe('preferences file', () => {
     expect(readPreferences(text)).toEqual({
       prefs: { ...DEFAULT_PREFERENCES, shake: false },
       problems: [],
+    })
+  })
+
+  it('reads a file from before the zoom setting at the 12 m default', () => {
+    const { viewShortAxisMetres: _zoom, ...older } = DEFAULT_PREFERENCES
+    const text = JSON.stringify({ preferencesVersion: 1, ...older })
+    expect(readPreferences(text).prefs.viewShortAxisMetres).toBe(12)
+  })
+
+  it('refuses a zoom outside the 8 m to 20 m band', () => {
+    const text = preferencesText({ ...DEFAULT_PREFERENCES, viewShortAxisMetres: 40 })
+    expect(readPreferences(text)).toEqual({
+      prefs: DEFAULT_PREFERENCES,
+      problems: ['viewShortAxisMetres must be a number from 8 to 20, got 40'],
     })
   })
 

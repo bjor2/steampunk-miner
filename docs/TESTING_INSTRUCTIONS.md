@@ -22,8 +22,8 @@ in the commit.
 - `src/store/` – what an action does to the world; reset with `resetGameStore()` in `beforeEach`.
 - `src/logging/`, `src/debug/` – event stamping, NDJSON, sinks, debug commands.
 - `src/physics/` – the physics layer: what only a real collision world can show (no tunnelling
-  through intact tiles, entering and leaving a 1-tile bore, digging down through the scene's fixed-step
-  loop with the real store and authority). Rapier is imported only here (lint). Rules of this layer:
+  through intact ground, entering and leaving a stamp-wide bore, digging down and then a level tunnel
+  sideways through the scene's fixed-step loop with the real store and authority, #36). Rapier is imported only here (lint). Rules of this layer:
   - Create a plain `@dimforge/rapier3d-compat` world (`await RAPIER.init()` in `beforeAll`) with zero
     gravity, and drive it only through the game's own seams (`createVehicleBody`,
     `createVehicleController`, `createVehicleLoop`); never through `@react-three/rapier`, React or a
@@ -74,9 +74,10 @@ file turns it on, so scenario and bot runs never see hints.
   `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
   `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
   `setUpgrade(id, level)`, `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
-  `vehicleStats()`; for the core, `setCoreFragments(count)`; for combat (#25), `spawnEnemy(kind, tier,
+  `vehicleStats()` and `vehicleParts()` (the art part ids the run vehicle draws, #52); for the core, `setCoreFragments(count)`; for combat (#25), `spawnEnemy(kind, tier,
 offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEnemies(frozen)` and the
-  unlogged read `enemyStatsTable(kind)`. Specs that mine deep (where crawlers live) freeze enemies first
+  unlogged read `enemyStatsTable(kind)`; for the ground (#36), `carveCircle(x, y, radius, amount?)` and
+  `fillCircle(x, y, radius, amount?)` (mm, amount 0 to 255; a carve credits no ore). Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
   `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`) reads the screens' view models and

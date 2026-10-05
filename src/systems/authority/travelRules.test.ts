@@ -87,7 +87,7 @@ describe('travel', () => {
     session.submit(10, travelTo(2))
     const site = dockSiteOf(planetParamsFor(WORLD_SEED, 2))
     expect(session.vehicle()).toMatchObject({ mode: 'docked', pose: dockedPoseAt(site) })
-    expect(session.state().world).toEqual({ chunks: {}, tileWork: {} })
+    expect(session.state().world).toEqual({ chunks: {} })
     expect(session.state().core).toEqual({
       reachedTick: null,
       harvestedTiles: 0,

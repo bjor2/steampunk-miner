@@ -46,3 +46,15 @@ export const GROUND_PROBE_DEPTH = 0.1
  * just bored (#7). A placeholder tuned by hand in the vehicle feel test.
  */
 export const BORE_ALIGN_SECONDS = 0.15
+
+/**
+ * Collision blocks (decision #36 Collision): the halo is built from 4 x 4 m blocks, each one
+ * collider made of its contour segments, rebuilt only when the ground under it changes.
+ */
+export const COLLISION_BLOCK_METRES = 4
+
+/**
+ * Contour walls are extruded this far either side of the XY plane, past the vehicle's own depth,
+ * so a box meets them as vertical walls (the game is 2D, Z is locked).
+ */
+export const WALL_HALF_DEPTH = 1

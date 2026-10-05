@@ -31,6 +31,7 @@ import {
   type VehicleStatsView,
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
+import { vehiclePartIdsOf } from '../systems/render/vehicleLook'
 import { isEnemyKind } from '../systems/authority/combat/combatDebugRules'
 import {
   clearEnemiesCommand,
@@ -48,7 +49,9 @@ import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForwar
 import { validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems } from '../systems/startScenario'
 import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
+import { carveCircleCommand, fillCircleCommand } from '../systems/authority/groundCommands'
 import type { BayId } from '../systems/world/dockBays'
+import { SOLID_DENSITY } from '../systems/world/sampleGrid'
 import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'
 import {
   createDebugInput,
@@ -78,6 +81,12 @@ export interface VehicleStatsReport {
   levels: UpgradeLevels
   stats: VehicleStatsView
   onCurveByPlanet: OnCurveVehicleView[]
+}
+
+/** `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6). */
+export interface VehiclePartsReport {
+  visualTier: number
+  partIds: string[]
 }
 
 export interface DebugApi {
@@ -111,6 +120,8 @@ export interface DebugApi {
   /** Hull as a canonical decimal string, at most `hullMax`; 0 destroys the vehicle. */
   setHull(hull: string): DebugResult
   vehicleStats(): DebugResult<VehicleStatsReport>
+  /** The art part ids drawn on the run vehicle (placeholders until S7a's export); not logged. */
+  vehicleParts(): DebugResult<VehiclePartsReport>
   /**
    * `shop`, `workshop` or `charging` (#8): facilities have one level in the slice, so level 1 is
    * accepted and changes nothing, and any other level is a listed problem.
@@ -126,6 +137,11 @@ export interface DebugApi {
   freezeEnemies(frozen: boolean): DebugResult
   /** Table D of #6 for planets 1 to 40: tiers, health, hits, kill times and side-hit shares. */
   enemyStatsTable(kind: string): DebugResult<{ rows: EnemyStatsRowView[] }>
+  // ground (#36): `debug.*` commands; a disc in mm, `amount` 0 to 255 (default all of it)
+  /** Lowers density round `(x, y)` mm; credits no ore and never cuts the dock pad. */
+  carveCircle(x: number, y: number, radius: number, amount?: number): DebugResult
+  /** Raises density round `(x, y)` mm, up to solid ground. */
+  fillCircle(x: number, y: number, radius: number, amount?: number): DebugResult
   /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
   ui: DebugUi
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
@@ -190,6 +206,11 @@ function depthTilesOfBp(depthBp: number): number {
   return params === null ? 0 : depthTilesOfBasisPoints(params, depthBp)
 }
 
+function vehiclePartsReport(): VehiclePartsReport {
+  const { visualTier } = game().vehicle
+  return { visualTier, partIds: vehiclePartIdsOf(visualTier) }
+}
+
 function vehicleStatsReport(): VehicleStatsReport {
   const vehicle = readLocalVehicle()
   return {
@@ -246,6 +267,7 @@ export function createDebugApi(): DebugApi {
     setHull: (hull) =>
       runUnlessRefused(vehicleDebugProblems(setHullCommand(hull)), () => game().setHull(hull)),
     vehicleStats: () => ({ ok: true, ...vehicleStatsReport() }),
+    vehicleParts: () => ({ ok: true, ...vehiclePartsReport() }),
     setFacilityLevel: (facilityId, level) =>
       runUnlessRefused(facilityLevelProblems(facilityId, level), () => {}),
     setCoreFragments: (count) =>
@@ -263,6 +285,14 @@ export function createDebugApi(): DebugApi {
         game().freezeEnemies(frozen),
       ),
     enemyStatsTable: enemyStatsTableOf,
+    carveCircle: (x, y, radius, amount = SOLID_DENSITY) =>
+      runUnlessRefused(vehicleDebugProblems(carveCircleCommand({ x, y, radius, amount })), () =>
+        game().carveCircle({ x, y, radius, amount }),
+      ),
+    fillCircle: (x, y, radius, amount = SOLID_DENSITY) =>
+      runUnlessRefused(vehicleDebugProblems(fillCircleCommand({ x, y, radius, amount })), () =>
+        game().fillCircle({ x, y, radius, amount }),
+      ),
     ui: createDebugUi(),
     input: createDebugInput(),
     teleportToCore: notImplemented('teleportToCore'),

@@ -40,7 +40,37 @@ export function chunkNoise(seed: number, cx: number, cy: number, spacing: number
 
 /** Noise at a chunk-local tile, in basis points `[0, 10000]`. */
 export function noiseBpAt(noise: ChunkNoise, lx: number, ly: number): number {
-  return Math.floor((blendedValue(noise, lx, ly) * BASIS_POINTS) / noise.blendMax)
+  return Math.floor((blendedValue(noise, lx, ly, 1) * BASIS_POINTS) / noise.blendMax)
+}
+
+/**
+ * The same noise at a chunk-local density sample (#36: cave edges come from the same lattice
+ * noise), `steps` samples per tile. At a tile's own corner sample it equals `noiseBpAt` exactly.
+ */
+export function noiseBpAtSample(
+  noise: ChunkNoise,
+  lsx: number,
+  lsy: number,
+  steps: number,
+): number {
+  const blendMax = noise.blendMax * steps * steps
+  return Math.floor((blendedValue(noise, lsx, lsy, steps) * BASIS_POINTS) / blendMax)
+}
+
+/**
+ * The noise at one world tile without building a chunk's corners: the same corner hashes and
+ * blend as `noiseBpAt`, so it answers the same value for the same tile.
+ */
+export function noiseBpAtTile(seed: number, spacing: number, tx: number, ty: number): number {
+  const gx = Math.floor(tx / spacing)
+  const gy = Math.floor(ty / spacing)
+  const noise: ChunkNoise = {
+    spacing,
+    cornersPerSide: 2,
+    corners: cornerValues(seed, gx, gy, 2),
+    blendMax: CORNER_MAX * spacing * spacing,
+  }
+  return noiseBpAt(noise, tx - gx * spacing, ty - gy * spacing)
 }
 
 function cornerValues(seed: number, gx0: number, gy0: number, perSide: number): Uint32Array {
@@ -53,12 +83,14 @@ function cornerValues(seed: number, gx0: number, gy0: number, perSide: number): 
   return corners
 }
 
-function blendedValue(noise: ChunkNoise, lx: number, ly: number): number {
-  const { spacing, cornersPerSide, corners } = noise
-  const gx = Math.floor(lx / spacing)
-  const gy = Math.floor(ly / spacing)
-  const fx = lx - gx * spacing
-  const fy = ly - gy * spacing
+/** Bilinear blend at `(x, y)` in units of `1/steps` tile, scaled by `(spacing * steps)^2`. */
+function blendedValue(noise: ChunkNoise, x: number, y: number, steps: number): number {
+  const { cornersPerSide, corners } = noise
+  const spacing = noise.spacing * steps
+  const gx = Math.floor(x / spacing)
+  const gy = Math.floor(y / spacing)
+  const fx = x - gx * spacing
+  const fy = y - gy * spacing
   const at = gy * cornersPerSide + gx
   const bottom = corners[at] * (spacing - fx) + corners[at + 1] * fx
   const top = corners[at + cornersPerSide] * (spacing - fx) + corners[at + cornersPerSide + 1] * fx

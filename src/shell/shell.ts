@@ -31,6 +31,9 @@ export interface KeyChange {
   isShiftHeld: boolean
 }
 
+/** One notch of the mouse wheel (or a trackpad's worth of scrolling): `up` rolls away from the player. */
+export type ScrollNotch = 'up' | 'down'
+
 export interface Shell {
   readonly kind: 'electron' | 'browser'
   readonly launch: LaunchParameters
@@ -56,6 +59,8 @@ export interface Shell {
   writePreferences(json: string): Promise<void>
   /** Reports key presses and releases; returns an unsubscribe. */
   onKeyChange(listener: (key: KeyChange) => void): () => void
+  /** Reports mouse-wheel notches; returns an unsubscribe. */
+  onScrollNotch(listener: (notch: ScrollNotch) => void): () => void
   /** Runs when the page is hidden or closing: the last chance to flush the run log. */
   onPageHide(callback: () => void): void
 }

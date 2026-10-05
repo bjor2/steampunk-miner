@@ -11,6 +11,8 @@ docs/standards
 # exactly as written.
 tests/golden
 tests/balance
+# Written by `npm run art:export` (scripts/art); re-exporting must rewrite the same bytes.
+public/assets
 # Written by `npm run balance:report`
 balance-report
 playwright-report

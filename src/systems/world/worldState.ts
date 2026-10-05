@@ -1,18 +1,20 @@
 /**
- * The world part of authority state (decisions #3 and #4): the planet is its seed and params plus
- * the deltas of touched chunks, and tile damage is authority state, not Rapier state. Plain JSON
- * shapes (deltas as in `chunkDelta.ts`, drill work as BigStat), so the canonical JSON and the
- * state digest cover them. Immutable: every change returns a new world.
+ * The world part of authority state (decisions #3, #4, #36): the planet is its seed and params
+ * plus the deltas of touched chunks. Material cells, density, yield bits and overrides are all
+ * integers in plain JSON shapes (deltas as in `chunkDelta.ts`), so the canonical JSON and the
+ * state digest cover them. Drill progress is the density itself, saved like everything else.
+ * Immutable: every change returns a new world.
  */
-import { ZERO_MONEY, type BigStat } from '../money'
 import { createChunkCache, type ChunkCache } from './chunkCache'
 import {
   applyChunkDelta,
+  decodeDensity,
   EMPTY_CHUNK_DELTA,
-  isCellRemoved,
-  withCellRemoved,
+  isCellYielded,
+  materialCellsOf,
   type ChunkDelta,
 } from './chunkDelta'
+import type { GeneratedChunk } from './generateChunk'
 import type { PlanetParams } from './planetParams'
 import { cellIndexOfTile, chunkKey, chunkOfTile, type TilePoint } from './tileGrid'
 import { AIR_CELL } from './worldCell'
@@ -20,35 +22,58 @@ import { AIR_CELL } from './worldCell'
 export interface WorldState {
   /** Deltas of touched chunks only, keyed by `chunkKey(cx, cy)`. */
   chunks: Readonly<Record<string, ChunkDelta>>
-  /** Drill work on partly drilled tiles, keyed by `tileKey`; a broken tile drops its entry. */
-  tileWork: Readonly<Record<string, BigStat>>
 }
 
-export const EMPTY_WORLD: WorldState = { chunks: {}, tileWork: {} }
+export const EMPTY_WORLD: WorldState = { chunks: {} }
 
 /** Generated chunks held for the authority's lookups; touched chunks stay (see chunkCache). */
 const CACHED_CHUNKS = 64
 
 let cacheOfPlanet: { params: PlanetParams; cache: ChunkCache } | null = null
 
-export function tileKey(tile: TilePoint): string {
-  return `${tile.tx},${tile.ty}`
+/**
+ * Decoded densities, kept per delta object: a delta never changes, so its density never does, and
+ * a carve hands the array it built straight in (`rememberDensity`) instead of decoding it again.
+ */
+const densityOfDelta = new WeakMap<ChunkDelta, Uint8Array>()
+
+export function deltaOfChunk(world: WorldState, cx: number, cy: number): ChunkDelta {
+  return world.chunks[chunkKey(cx, cy)] ?? EMPTY_CHUNK_DELTA
 }
 
-/** The packed cell at a tile as the world stands now: generated, then the chunk's delta. */
+export function withChunkDelta(
+  world: WorldState,
+  cx: number,
+  cy: number,
+  delta: ChunkDelta,
+): WorldState {
+  return { chunks: { ...world.chunks, [chunkKey(cx, cy)]: delta } }
+}
+
+/** The packed cell at a tile as the world stands now: a yielded cell is open ground. */
 export function cellAt(world: WorldState, params: PlanetParams, tile: TilePoint): number {
+  const delta = deltaOfChunk(world, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
+  if (isCellYielded(delta, cellIndexOfTile(tile.tx, tile.ty))) return AIR_CELL
+  return materialCellAt(world, params, tile)
+}
+
+/** What a tile is made of, yielded or not: generated, then any override (#36). */
+export function materialCellAt(world: WorldState, params: PlanetParams, tile: TilePoint): number {
   const cx = chunkOfTile(tile.tx)
   const cy = chunkOfTile(tile.ty)
-  const delta = world.chunks[chunkKey(cx, cy)] ?? EMPTY_CHUNK_DELTA
   const index = cellIndexOfTile(tile.tx, tile.ty)
-  if (isCellRemoved(delta, index)) return AIR_CELL
-  const override = delta.overrides.find(([at]) => at === index)
-  return override === undefined ? generatedCellsOf(params, cx, cy)[index] : override[1]
+  const override = deltaOfChunk(world, cx, cy).overrides.find(([at]) => at === index)
+  return override === undefined ? cacheOf(params).generatedCellsOf(cx, cy)[index] : override[1]
+}
+
+export function isTileYielded(world: WorldState, tile: TilePoint): boolean {
+  const delta = deltaOfChunk(world, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
+  return isCellYielded(delta, cellIndexOfTile(tile.tx, tile.ty))
 }
 
 /**
- * All cells of a chunk as the world stands now, for the renderer. An untouched chunk answers the
- * cache's own array, which callers must only read.
+ * All cells of a chunk as the world stands now (yielded cells open). An untouched chunk answers
+ * the cache's own array, which callers must only read.
  */
 export function currentCellsOfChunk(
   world: WorldState,
@@ -57,35 +82,55 @@ export function currentCellsOfChunk(
   cy: number,
 ): Uint32Array {
   const delta = world.chunks[chunkKey(cx, cy)]
-  const generated = generatedCellsOf(params, cx, cy)
-  return delta === undefined ? generated : applyChunkDelta(generated, delta)
+  const cells = cacheOf(params).generatedCellsOf(cx, cy)
+  return delta === undefined ? cells : applyChunkDelta(cells, delta)
 }
 
-/** A broken tile becomes air for good (#10: removed tiles never regrow in the slice). */
-export function withTileRemoved(world: WorldState, tile: TilePoint): WorldState {
-  const key = chunkKey(chunkOfTile(tile.tx), chunkOfTile(tile.ty))
-  const delta = world.chunks[key] ?? EMPTY_CHUNK_DELTA
-  const { [tileKey(tile)]: _broken, ...tileWork } = world.tileWork
-  return {
-    chunks: { ...world.chunks, [key]: withCellRemoved(delta, cellIndexOfTile(tile.tx, tile.ty)) },
-    tileWork,
-  }
+/** All material cells of a chunk, yielded or not, for drawing what the ground is made of. */
+export function materialCellsOfChunk(
+  world: WorldState,
+  params: PlanetParams,
+  cx: number,
+  cy: number,
+): Uint32Array {
+  const delta = world.chunks[chunkKey(cx, cy)]
+  const cells = cacheOf(params).generatedCellsOf(cx, cy)
+  return delta === undefined ? cells : materialCellsOf(cells, delta)
 }
 
-export function tileWorkAt(world: WorldState, tile: TilePoint): BigStat {
-  return world.tileWork[tileKey(tile)] ?? ZERO_MONEY
+/** The chunk's density as it stands now; callers must only read it. */
+export function currentDensityOfChunk(
+  world: WorldState,
+  params: PlanetParams,
+  cx: number,
+  cy: number,
+): Uint8Array {
+  const delta = world.chunks[chunkKey(cx, cy)]
+  const { density } = generatedChunkOf(params, cx, cy)
+  if (delta === undefined) return density
+  const known = densityOfDelta.get(delta)
+  if (known !== undefined) return known
+  const decoded = decodeDensity(density, delta)
+  densityOfDelta.set(delta, decoded)
+  return decoded
 }
 
-export function withTileWork(world: WorldState, tile: TilePoint, work: BigStat): WorldState {
-  return { ...world, tileWork: { ...world.tileWork, [tileKey(tile)]: work } }
+/** Hands a delta the density array it was encoded from; the caller gives up writing to it. */
+export function rememberDensity(delta: ChunkDelta, density: Uint8Array): void {
+  densityOfDelta.set(delta, density)
+}
+
+/** The generated cells and density of a chunk, from the planet's cache. */
+export function generatedChunkOf(params: PlanetParams, cx: number, cy: number): GeneratedChunk {
+  return cacheOf(params).generatedChunkOf(cx, cy)
 }
 
 /** Generation is pure, so one cache per planet only saves time; it never changes an answer. */
-function generatedCellsOf(params: PlanetParams, cx: number, cy: number): Uint32Array {
+function cacheOf(params: PlanetParams): ChunkCache {
   if (cacheOfPlanet === null || !isSamePlanet(cacheOfPlanet.params, params)) {
     cacheOfPlanet = { params, cache: createChunkCache(params, CACHED_CHUNKS) }
   }
-  return cacheOfPlanet.cache.generatedCellsOf(cx, cy)
+  return cacheOfPlanet.cache
 }
 
 function isSamePlanet(a: PlanetParams, b: PlanetParams): boolean {

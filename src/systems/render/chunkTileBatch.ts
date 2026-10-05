@@ -1,13 +1,18 @@
 /**
- * One chunk's tiles as instance data for a single batched draw (#4 Rendering, #13): every solid
- * tile becomes one instance with its local position, its shaded band colour, its ore look and a
- * 4-neighbour edge mask for the edge highlight. Tiles stay aligned to the world, never to the
- * screen, so the look holds at any camera rotation. Air and space draw nothing.
+ * One chunk's tiles as instance data for a single batched draw (#4 Rendering, #13, #36): every
+ * tile the ground's surface can cross becomes one instance with its local position, its shaded
+ * band colour and its ore look. The shader cuts each quad along the density contour at 128 (the
+ * chunk's density halo, `densityHalo.ts`) and draws the edge highlight along it, so the ground
+ * reads as the smooth surface the vehicle collides with. Colours come from the material, drilled
+ * or not; a tile of space or cave air the surface ramps into takes its band's ground colour.
+ * Tiles stay aligned to the world, never to the screen, so the look holds at any camera rotation.
  */
 import type { PlanetParams } from '../world/planetParams'
 import { bandOfTile } from '../world/planetGeometry'
+import { ISO_DENSITY, SAMPLES_PER_TILE } from '../world/sampleGrid'
 import { CHUNK_CELLS, CHUNK_SIZE, firstTileOfChunk } from '../world/tileGrid'
-import { CELL_KIND, isSolidCell, kindOfCell } from '../world/worldCell'
+import { CELL_KIND, kindOfCell } from '../world/worldCell'
+import { DENSITY_HALO_SIDE } from './densityHalo'
 import type { BandPalette } from './artDirection'
 import { bandColourOf, paletteOf, tileShadeOf } from './bandPalette'
 import type { Rgb } from './colour'
@@ -15,9 +20,6 @@ import { oreLookOfCell, type OreLook } from './oreLook'
 
 /** How the shader draws a tile. */
 export const TILE_STYLE = { ground: 0, ore: 1, core: 2, pad: 3 } as const
-
-/** Bits of the edge mask: the side of the tile that touches air or space. */
-export const EDGE = { right: 1, left: 2, up: 4, down: 8 } as const
 
 /** The ore decal's shape code in the shader: 0 for a tile without ore. */
 export const SILHOUETTE_CODE = { none: 0, flecks: 1, shards: 2 } as const
@@ -31,12 +33,9 @@ export interface ChunkTileBatch {
   baseColours: Float32Array
   /** 4 per tile: ore colour and glow (zeros without ore). */
   oreColours: Float32Array
-  /** 4 per tile: style, edge mask, silhouette code, sparkle count. */
+  /** 4 per tile: style, unused, silhouette code, sparkle count. */
   styles: Float32Array
 }
-
-/** The cell at a tile outside the chunk, for the edge mask along the chunk's border. */
-export type CellOutside = (tx: number, ty: number) => number
 
 interface BatchContext {
   params: PlanetParams
@@ -46,28 +45,39 @@ interface BatchContext {
   cells: Uint32Array
   firstTx: number
   firstTy: number
-  cellOutside: CellOutside
   oreLooks: Map<number, OreLook>
 }
 
 const NO_ORE: Rgb = [0, 0, 0]
 const BANDS = [1, 2, 3, 4, 5]
 
+/** `cells` are the chunk's material cells; `halo` its density halo. */
 export function buildChunkTileBatch(
   params: PlanetParams,
   cx: number,
   cy: number,
   cells: Uint32Array,
-  cellOutside: CellOutside,
+  halo: Uint8Array,
 ): ChunkTileBatch {
-  const context = batchContextOf(params, cx, cy, cells, cellOutside)
+  const context = batchContextOf(params, cx, cy, cells)
   const batch = emptyBatch()
   for (let ly = 0; ly < CHUNK_SIZE; ly++) {
     for (let lx = 0; lx < CHUNK_SIZE; lx++) {
-      if (isSolidCell(cells[ly * CHUNK_SIZE + lx])) writeTile(batch, context, lx, ly)
+      if (hasGroundIn(halo, lx, ly)) writeTile(batch, context, lx, ly)
     }
   }
   return batch
+}
+
+/** Whether any of the 5 x 5 samples bounding the tile's square is solid, so the surface shows. */
+function hasGroundIn(halo: Uint8Array, lx: number, ly: number): boolean {
+  for (let qy = 0; qy <= SAMPLES_PER_TILE; qy++) {
+    const row = (ly * SAMPLES_PER_TILE + qy) * DENSITY_HALO_SIDE + lx * SAMPLES_PER_TILE
+    for (let qx = 0; qx <= SAMPLES_PER_TILE; qx++) {
+      if (halo[row + qx] >= ISO_DENSITY) return true
+    }
+  }
+  return false
 }
 
 function batchContextOf(
@@ -75,7 +85,6 @@ function batchContextOf(
   cx: number,
   cy: number,
   cells: Uint32Array,
-  cellOutside: CellOutside,
 ): BatchContext {
   const palette = paletteOf(params.paletteId)
   return {
@@ -85,7 +94,6 @@ function batchContextOf(
     cells,
     firstTx: firstTileOfChunk(cx),
     firstTy: firstTileOfChunk(cy),
-    cellOutside,
     oreLooks: new Map(),
   }
 }
@@ -113,7 +121,7 @@ function writeTile(batch: ChunkTileBatch, context: BatchContext, lx: number, ly:
   )
   writeRgb(batch.oreColours, at * 4, ore?.colour ?? NO_ORE)
   batch.oreColours[at * 4 + 3] = ore?.glow ?? 0
-  writeVector(batch.styles, at * 4, styleOf(cell), edgeMaskOf(context, lx, ly))
+  writeVector(batch.styles, at * 4, styleOf(cell), 0)
   writeVector(
     batch.styles,
     at * 4 + 2,
@@ -170,23 +178,4 @@ function styleOf(cell: number): number {
   if (kind === CELL_KIND.core) return TILE_STYLE.core
   if (kind === CELL_KIND.indestructible) return TILE_STYLE.pad
   return TILE_STYLE.ground
-}
-
-function edgeMaskOf(context: BatchContext, lx: number, ly: number): number {
-  return (
-    airSideBit(context, lx + 1, ly, EDGE.right) |
-    airSideBit(context, lx - 1, ly, EDGE.left) |
-    airSideBit(context, lx, ly + 1, EDGE.up) |
-    airSideBit(context, lx, ly - 1, EDGE.down)
-  )
-}
-
-function airSideBit(context: BatchContext, lx: number, ly: number, bit: number): number {
-  return isSolidCell(neighbourCell(context, lx, ly)) ? 0 : bit
-}
-
-function neighbourCell(context: BatchContext, lx: number, ly: number): number {
-  const isInside = lx >= 0 && lx < CHUNK_SIZE && ly >= 0 && ly < CHUNK_SIZE
-  if (isInside) return context.cells[ly * CHUNK_SIZE + lx]
-  return context.cellOutside(context.firstTx + lx, context.firstTy + ly)
 }

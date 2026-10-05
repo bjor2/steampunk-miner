@@ -24,7 +24,9 @@ import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { noseTileOf } from '../systems/vehicle/vehiclePose'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
 import type { PlanetParams } from '../systems/world/planetParams'
-import { cellAt, type WorldState } from '../systems/world/worldState'
+import { groundReaderOf } from '../systems/world/groundReader'
+import { chunkKey } from '../systems/world/tileGrid'
+import type { WorldState } from '../systems/world/worldState'
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
 
@@ -84,14 +86,15 @@ function placementOf(vehicle: VehicleState, params: PlanetParams): string {
   return `${params.worldSeed}:${params.planetIndex}:${dockedSince}`
 }
 
-/** One view per world state, so the halo rebuilds only when a tile actually changed. */
+/** One view per world state, so the halo looks for changed chunks only when the world moved on. */
 function planetViewOf(loop: LoopState, params: PlanetParams, world: WorldState): PlanetView {
   if (loop.view?.world === world && loop.view.params === params) return loop.view.planet
   const planet: PlanetView = {
     radiusTiles: params.radiusTiles,
     gravityMultiplier: params.gravityMultiplier,
     worldVersion: world,
-    cellAt: (tile) => cellAt(world, params, tile),
+    ground: groundReaderOf(world, params),
+    chunkVersion: (cx, cy) => world.chunks[chunkKey(cx, cy)],
   }
   loop.view = { world, params, planet }
   return planet

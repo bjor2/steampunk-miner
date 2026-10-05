@@ -35,6 +35,24 @@ export const MAX_SPEED_MM_PER_SECOND = 16000
 export const DRILL_REACH_MM = 1600
 
 /**
+ * The drill's circular stamp (decision #36 Carving, amended by #41): the carved diameter is the
+ * vehicle height (0.9 m, #7) plus 1.0 m, so a 0.25 m casing lining (#41) still leaves the vehicle
+ * height plus 0.5 m clear. The Gameplay & Vehicle Designer owns the number as data.
+ */
+export const DRILL_STAMP_RADIUS_MM = 950
+
+/**
+ * Where the stamp sits (#40: the drill axis is the 4-way facing in the local frame): this far
+ * ahead of the body's centre along the facing, so it bites just past the 0.9 m body's face.
+ * Driving sideways on the ground it is also raised along `localUp` by `DRILL_STAMP_LIFT_MM`, so
+ * the tunnel is taller above the body than below and its floor (cut level, see `drillStamp.ts`)
+ * lies inside the disc's strong middle. Placeholders, checked by the level-tunnel physics spec and
+ * tuned by hand in the vehicle feel test.
+ */
+export const DRILL_STAMP_AHEAD_MM = 500
+export const DRILL_STAMP_LIFT_MM = 250
+
+/**
  * Pose reports go out at most 5 times a second (#11 amendment), every 12 ticks; the authority
  * allows one interval of slack when it checks the action tick counts (#11 amendment 2).
  */

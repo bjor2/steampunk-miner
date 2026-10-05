@@ -5,6 +5,7 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
 import { resetInput } from '../store/inputRuntime'
+import { cameraPresence } from '../scene/cameraPresence'
 import { fromCanonical, toCanonical } from '../systems/money'
 import { firstDigestMismatch, replayRun } from '../systems/replay/replayRun'
 import { bayPoseAt } from '../systems/vehicle/vehiclePose'
@@ -230,5 +231,33 @@ describe('debug api: presentation never reaches the session (#33 acceptance 10)'
       ok: false,
       problems: ['"volume" is not a setting (cameraMode, shake, flashes, hintsEnabled)'],
     })
+  })
+})
+
+describe('debug api: zoom framing (#39)', () => {
+  it('sets the zoom inside the 8 m to 20 m band, refuses it outside, and logs nothing', () => {
+    const debug = createDebugApi()
+    expect(debug.ui.setZoom(20)).toEqual({ ok: true })
+    expect(debug.ui.setZoom(6)).toEqual({
+      ok: false,
+      problems: ['viewShortAxisMetres must be a number from 8 to 20, got 6'],
+    })
+    expect(debug.ui.getPrefs()).toMatchObject({ ok: true, prefs: { viewShortAxisMetres: 20 } })
+    expect(sink.events).toEqual([])
+    expect(sink.commands).toEqual([])
+  })
+
+  it.each([
+    [1920, 1080],
+    [3840, 2160],
+  ])('reports 12 m and the collider at 7.5% of the short axis on a %i x %i canvas', (w, h) => {
+    // As `PlanetCamera` writes it each frame once the default zoom has settled.
+    Object.assign(cameraPresence, { widthPixels: w, heightPixels: h, viewShortAxisMetres: 12 })
+    const result = createDebugApi().ui.getCameraView()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    expect(result.view.viewShortAxisMetres).toBe(12)
+    expect(result.view.vehicleColliderShare).toBeGreaterThanOrEqual(0.072)
+    expect(result.view.vehicleColliderShare).toBeLessThanOrEqual(0.078)
+    expect(result.view.pixelsPerMetre).toBe(h / 12)
   })
 })

@@ -36,6 +36,9 @@ export const ACTION_IDS = [
   'ui_cancel',
   'ui_prev_panel',
   'ui_next_panel',
+  'zoom_in',
+  'zoom_out',
+  'zoom_reset',
   'open_settings',
 ] as const
 

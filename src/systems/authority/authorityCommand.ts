@@ -83,6 +83,12 @@ export interface CommandPayloads {
   'debug.teleportToDock': { bay: BayId }
   /** Frozen enemies neither move, wind up, attack nor spawn; the drill still cuts them. */
   'debug.freezeEnemies': { frozen: boolean }
+  /**
+   * The ground (#36): lower or raise density by up to `amount` (0 to 255) in a disc of `radius`
+   * mm round `(x, y)` mm, softened at the rim like the drill's stamp. Never cuts the dock pad.
+   */
+  'debug.carveCircle': { x: number; y: number; radius: number; amount: number }
+  'debug.fillCircle': { x: number; y: number; radius: number; amount: number }
 }
 
 export type CommandType = keyof CommandPayloads

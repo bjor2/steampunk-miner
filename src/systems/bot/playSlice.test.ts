@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
 import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
+import { takeSnapshot } from '../authority/sessionSnapshot'
 import { digestsOf, replayRun } from '../replay/replayRun'
+import { saveSlotOf } from '../save/saveSlot'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor } from '../world/planetParams'
 import { boreTicks } from './botWorld'
@@ -39,6 +41,18 @@ describe('pacing bot', () => {
     const replayed = replayRun(WORLD_SEED, commands, { endTick: state.tick })
     expect(replayed.digests.slice(0, -1)).toEqual(digestsOf(events))
     expect(replayed.state).toEqual(state)
+  })
+})
+
+describe('pacing bot save size (#36 acceptance 4)', () => {
+  it('keeps the save of a 60-minute run under 1 MB', () => {
+    const hour = playSlice(
+      createAuthorityState({ planetIndex: 1, planetSeed: WORLD_SEED, playerIds: ['p1'] }),
+      { maxTicks: 60 * 60 * 60 },
+    )
+    const save = JSON.stringify(saveSlotOf(takeSnapshot(hour.state), 1))
+    expect(Object.keys(hour.state.world.chunks).length).toBeGreaterThan(10)
+    expect(save.length).toBeLessThan(1024 * 1024)
   })
 })
 

@@ -12,6 +12,7 @@
 import type { CommandIntent } from '../authority/authorityCommand'
 import { dockCommand, quickServiceCommand, undockCommand } from '../platform/platformCommands'
 import { requestRescueCommand } from '../vehicle/vehicleCommands'
+import type { ZoomChange } from '../render/viewZoom'
 import type { VehicleMode } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
 import type { ActionId, InputContext } from './actionMap'
@@ -23,6 +24,7 @@ export type InputReaction =
   | { kind: 'moveFocus'; step: -1 | 1 }
   | { kind: 'jumpPanel'; step: -1 | 1 }
   | { kind: 'activateFocused' }
+  | { kind: 'zoom'; change: ZoomChange }
   | { kind: 'none' }
 
 /** What the routing needs to know about the session; read from the authority replica. */
@@ -57,6 +59,9 @@ const REACTIONS_BY_LAYER: Readonly<
     request_rescue: ({ vehicleMode }) =>
       isWaitingForTow(vehicleMode) ? submit(requestRescueCommand()) : NONE,
     open_settings: () => ({ kind: 'openSettings' }),
+    zoom_in: () => ({ kind: 'zoom', change: 'in' }),
+    zoom_out: () => ({ kind: 'zoom', change: 'out' }),
+    zoom_reset: () => ({ kind: 'zoom', change: 'reset' }),
   },
   platform: {
     ...MENU_REACTIONS,

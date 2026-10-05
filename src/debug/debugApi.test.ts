@@ -4,7 +4,17 @@ import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { deriveSummary } from '../logging/runSummary'
-import { readEnemies, resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
+import {
+  readEnemies,
+  readLocalVehicle,
+  readPlanetWorld,
+  resetGameStore,
+  takeSessionSnapshot,
+  useGameStore,
+} from '../store/gameStore'
+import { placeholderSidecarOf } from '../systems/art/artCatalogue'
+import { cellDensitySum } from '../systems/world/groundEdit'
+import type { PlanetParams } from '../systems/world/planetParams'
 import { fromCanonical } from '../systems/money'
 import { parseScenario, type Scenario } from '../systems/scenario'
 import { createDebugApi, DebugCommandNotImplementedError } from './debugApi'
@@ -99,6 +109,37 @@ describe('debug api: core', () => {
   })
 })
 
+describe('debug api: ground (#36)', () => {
+  const DIG = { x: 20_500, y: 290_500, radius: 1500 }
+  const densitySum = () => {
+    const { world, params } = readPlanetWorld()
+    return cellDensitySum(world, params as PlanetParams, { tx: 20, ty: 290 })
+  }
+
+  it('carves a circle as a logged debug command, crediting no ore', () => {
+    expect(createDebugApi().carveCircle(DIG.x, DIG.y, DIG.radius)).toEqual({ ok: true })
+    expect(densitySum()).toBe(0)
+    expect(game().debugApplied).toBe(true)
+    expect(sink.events.map((event) => event.event)).toEqual(['debug_command_applied'])
+    expect(readLocalVehicle().cargo).toEqual({ ore: {}, coreFragments: 0 })
+  })
+
+  it('fills a carved circle back to solid ground', () => {
+    const debug = createDebugApi()
+    debug.carveCircle(DIG.x, DIG.y, DIG.radius)
+    expect(debug.fillCircle(DIG.x, DIG.y, DIG.radius)).toEqual({ ok: true })
+    expect(densitySum()).toBe(16 * 255)
+  })
+
+  it('refuses a circle of radius 0 or an amount past 255 and changes nothing', () => {
+    const debug = createDebugApi()
+    expect(debug.carveCircle(DIG.x, DIG.y, 0)).toMatchObject({ ok: false })
+    expect(debug.fillCircle(DIG.x, DIG.y, DIG.radius, 256)).toMatchObject({ ok: false })
+    expect(sink.commands).toEqual([])
+    expect(densitySum()).toBe(16 * 255)
+  })
+})
+
 describe('debug api: time', () => {
   it('fast-forwards the authority and reports where it stands', () => {
     const result = createDebugApi().fastForward(7200)
@@ -147,7 +188,7 @@ describe('debug api: snapshot and restore', () => {
     if (!taken.ok) throw new Error('snapshot refused')
     expect(debug.restore({ ...taken.snapshot, generatorVersion: 99 })).toEqual({
       ok: false,
-      problems: ['snapshot.generatorVersion is 99, this build reads 1'],
+      problems: ['snapshot.generatorVersion is 99, this build reads 2'],
     })
   })
 })
@@ -277,6 +318,28 @@ describe('debug api: vehicle', () => {
     expect(report.onCurveByPlanet[0].levels).toMatchObject({ drill_power: 13, drill_tip: 7 })
     expect(sink.events).toEqual([])
     expect(sink.commands).toEqual([])
+  })
+
+  it('reports every placeholder part id of each tier on the run vehicle, without logging', () => {
+    const partIdsOfTier = (tier: number) =>
+      (placeholderSidecarOf('vehicle')?.parts ?? [])
+        .filter((part) => part.tier === tier)
+        .map((part) => part.id)
+    const debug = createDebugApi()
+    expect(debug.vehicleParts()).toMatchObject({ ok: true, visualTier: 1 })
+    expect(debug.vehicleParts()).toMatchObject({
+      partIds: expect.arrayContaining(partIdsOfTier(1)),
+    })
+    expect(sink.events).toEqual([])
+    debug.setUpgrade('drill_tip', 1500)
+    expect(debug.vehicleParts()).toMatchObject({
+      visualTier: 3,
+      partIds: expect.arrayContaining(partIdsOfTier(3)),
+    })
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'vehicle_configuration_changed',
+      'debug_command_applied',
+    ])
   })
 
   it('sets an upgrade level as a logged debug command, with finite stats at drill_tip 1500', () => {

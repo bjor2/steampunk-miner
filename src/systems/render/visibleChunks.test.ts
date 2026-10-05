@@ -1,15 +1,34 @@
 import { describe, expect, it } from 'vitest'
-import { CAMERA_ZOOM, MAX_CHUNK_DRAW_CALLS, REFERENCE_VIEWPORT } from '../../constants/scene'
+import {
+  MAX_CHUNK_DRAW_CALLS,
+  MAX_DRAWN_CHUNKS_AT_MAX_ZOOM,
+  REFERENCE_VIEWPORT,
+  VIEW_SHORT_AXIS_DEFAULT_M,
+  VIEW_SHORT_AXIS_MAX_M,
+} from '../../constants/scene'
 import { planetParamsFor } from '../world/planetParams'
 import { chunkOfTile } from '../world/tileGrid'
 import { viewRadiusOf, visibleChunksAround } from './visibleChunks'
+import { pixelsPerMetreOf } from './viewZoom'
 
 const radiusTiles = planetParamsFor(1, 1).radiusTiles
-const referenceRadius = viewRadiusOf(
+
+function viewRadiusAt(width: number, height: number, viewShortAxisMetres: number): number {
+  return viewRadiusOf(width, height, pixelsPerMetreOf(width, height, viewShortAxisMetres))
+}
+
+const referenceRadius = viewRadiusAt(
   REFERENCE_VIEWPORT.width,
   REFERENCE_VIEWPORT.height,
-  CAMERA_ZOOM,
+  VIEW_SHORT_AXIS_MAX_M,
 )
+
+function mostChunksAcrossPlanet(viewRadius: number): number {
+  const counts = centresAcrossPlanet().map(
+    (centre) => visibleChunksAround(centre, viewRadius, radiusTiles).length,
+  )
+  return Math.max(...counts)
+}
 
 function centresAcrossPlanet(): { x: number; y: number }[] {
   const centres = []
@@ -20,15 +39,25 @@ function centresAcrossPlanet(): { x: number; y: number }[] {
 }
 
 describe('visible chunks', () => {
-  it('sees half the reference screen diagonal: about 64 by 40 tiles at the #4 zoom', () => {
-    expect(referenceRadius).toBeCloseTo(37.74, 2)
+  it('sees a circle of 12.2 m at the default zoom and 20.4 m at the widest, on a 16:9 screen (#38)', () => {
+    expect(viewRadiusAt(1920, 1080, VIEW_SHORT_AXIS_DEFAULT_M)).toBeCloseTo(12.24, 2)
+    expect(viewRadiusAt(3840, 2160, VIEW_SHORT_AXIS_MAX_M)).toBeCloseTo(20.4, 1)
+  })
+
+  it('draws the same chunks at 1080p and 4K for the same zoom', () => {
+    const centre = { x: -150.5, y: 120.25 }
+    expect(visibleChunksAround(centre, viewRadiusAt(3840, 2160, 20), radiusTiles)).toEqual(
+      visibleChunksAround(centre, viewRadiusAt(1920, 1080, 20), radiusTiles),
+    )
+  })
+
+  it('never asks for more than 9 chunks at the 20 m zoom-out on a 4K screen, anywhere on the planet', () => {
+    const radius = viewRadiusAt(3840, 2160, VIEW_SHORT_AXIS_MAX_M)
+    expect(mostChunksAcrossPlanet(radius)).toBeLessThanOrEqual(MAX_DRAWN_CHUNKS_AT_MAX_ZOOM)
   })
 
   it('never asks for more than 16 chunk draws at the reference screen, anywhere on the planet', () => {
-    const counts = centresAcrossPlanet().map(
-      (centre) => visibleChunksAround(centre, referenceRadius, radiusTiles).length,
-    )
-    expect(Math.max(...counts)).toBeLessThanOrEqual(MAX_CHUNK_DRAW_CALLS)
+    expect(mostChunksAcrossPlanet(referenceRadius)).toBeLessThanOrEqual(MAX_CHUNK_DRAW_CALLS)
   })
 
   it('covers every point the screen can show at any rotation', () => {

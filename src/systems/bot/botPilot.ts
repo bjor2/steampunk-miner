@@ -1,9 +1,11 @@
 /**
  * How the bot moves and bores (#29): as a client would, through `reportPose` at most every 12
  * ticks (5 per second, #11 amendments) with the action ticks since the last report, so energy is
- * charged by the authority exactly as in play. Boring is a report facing the tile with the drill
- * ticks it took; moving is a run of reports along a straight tunnel. Positions are tile centres,
- * upright (up = (0, 1024)), velocity 0 at each report.
+ * charged by the authority exactly as in play. Moving is a run of reports along a straight tunnel.
+ * Boring is a report facing the tile, then scripted mining of that one tile (`drillTile`, #3, #11
+ * section 5) for the drill ticks it took: the #6 movement-time model the pacing gate measures bores one
+ * 1 m tile at a time, where the player's 1.9 m drill stamp (#36, #41) opens more ground per metre.
+ * Positions are tile centres, upright (up = (0, 1024)), velocity 0 at each report.
  */
 import { POSE_REPORT_INTERVAL_TICKS } from '../../constants/balance'
 import { isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
@@ -39,8 +41,9 @@ export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, 
   for (let left = ticks; left > 0 && isVehicleActive(session.vehicle());) {
     faceThreats(session, pilot)
     const chunk = Math.min(left, BORE_REPORT_TICKS)
+    session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
     session.wait(chunk)
-    session.submit(reportPoseIntent(pilot.position, facing, { ...NO_TICKS, drillTicks: chunk }))
+    session.submit({ type: 'drillTile', payload: { ...tile, ticks: chunk } })
     pilot.facing = facing
     left -= chunk
   }

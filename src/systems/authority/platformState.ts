@@ -13,6 +13,9 @@ export const FACILITY_IDS = ['shop', 'workshop', 'charging'] as const
 
 export const FACILITY_LEVEL = 1
 
+/** The two docking bays of #37 (`Dock { bay }`): selling and upgrading are separate stops. */
+export const PLATFORM_BAY_IDS = ['sell', 'upgrade'] as const
+
 export interface PlatformState {
   coreBay: number
   visualState: PlatformVisualState

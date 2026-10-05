@@ -1,14 +1,10 @@
 /**
  * The seeded terrain under the placed features (decision #4 Generation): space outside the disc,
- * the core disc, caves in bands 2 to 5, ore clustered by value noise at the #6 density for its
- * band, and plain ground everywhere else. Every per-tile decision comes from `cellRandom` and
- * lattice noise on per-purpose sub-seeds, so a tile never depends on which chunk came first.
- *
- * Ore chance per tile is `density * 2 * clusterNoise`: the noise averages one half, so the band
- * keeps its #6 density on average while ore gathers into veins.
+ * the core disc, caves in bands 2 to 5, and plain ground everywhere else. Every per-tile decision
+ * comes from lattice noise on a per-purpose sub-seed, so a tile never depends on which chunk came
+ * first. Ore is stamped over this as patches (#42, `orePatches.ts`).
  */
-import { cellRandomFloat, hashCell } from '../cellRandom'
-import { chunkNoise, noiseBpAt, type ChunkNoise } from './latticeNoise'
+import { chunkNoise, noiseBpAt, noiseBpAtTile, type ChunkNoise } from './latticeNoise'
 import { SEED_PURPOSE, subSeedFor } from './generatorSeeds'
 import type { PlanetParams } from './planetParams'
 import { bandAtHalfTileDistanceSq } from './planetGeometry'
@@ -19,23 +15,11 @@ import {
   halfTileDistanceSq,
   halfTileRadiusSq,
 } from './tileGrid'
-import {
-  AIR_CELL,
-  CORE_CELL,
-  GROUND_CELL,
-  oreCell,
-  RESOURCE_FAMILY,
-  SPACE_CELL,
-  type ResourceFamily,
-} from './worldCell'
+import { AIR_CELL, CORE_CELL, GROUND_CELL, SPACE_CELL } from './worldCell'
 
-/** Lattice spacings in tiles; each divides the chunk size. Part of the generator output. */
-const CAVE_LATTICE_TILES = 8
-const ORE_CLUSTER_LATTICE_TILES = 4
-const ORE_FAMILY_REGION_TILES = 8
-/** `random < densityBp/10^4 * 2 * noiseBp/10^4`, scaled to compare in whole basis points. */
-const ORE_ROLL_SCALE = 50_000_000
-const FIRST_CAVE_BAND = 2
+/** Cave lattice spacing in tiles; it divides the chunk size. Part of the generator output. */
+export const CAVE_LATTICE_TILES = 8
+export const FIRST_CAVE_BAND = 2
 
 interface TerrainContext {
   params: PlanetParams
@@ -44,9 +28,6 @@ interface TerrainContext {
   surfaceSq: number
   coreSq: number
   caveNoise: ChunkNoise
-  oreClusterNoise: ChunkNoise
-  oreSeed: number
-  oreFamilySeed: number
 }
 
 export function generateBaseTerrain(params: PlanetParams, cx: number, cy: number): Uint32Array {
@@ -60,6 +41,25 @@ export function generateBaseTerrain(params: PlanetParams, cx: number, cy: number
   return cells
 }
 
+/**
+ * The seeded terrain at one tile, without generating its chunk: ore patches (#42) grow over the
+ * plain ground around them, wherever it lies.
+ */
+export function baseCellOfTile(params: PlanetParams, tx: number, ty: number): number {
+  const distanceSq = halfTileDistanceSq(tx, ty)
+  if (distanceSq > halfTileRadiusSq(params.radiusTiles)) return SPACE_CELL
+  if (distanceSq <= halfTileRadiusSq(params.coreRadiusTiles)) return CORE_CELL
+  const band = bandAtHalfTileDistanceSq(params, distanceSq)
+  if (band < FIRST_CAVE_BAND) return GROUND_CELL
+  const noise = noiseBpAtTile(subSeedFor(params, SEED_PURPOSE.cave), CAVE_LATTICE_TILES, tx, ty)
+  return noise >= params.caveThresholdBp ? AIR_CELL : GROUND_CELL
+}
+
+/** The cave noise of a chunk; the density layer reads it per sample for smooth cave walls. */
+export function caveNoiseOfChunk(params: PlanetParams, cx: number, cy: number): ChunkNoise {
+  return chunkNoise(subSeedFor(params, SEED_PURPOSE.cave), cx, cy, CAVE_LATTICE_TILES)
+}
+
 function terrainContextOf(params: PlanetParams, cx: number, cy: number): TerrainContext {
   return {
     params,
@@ -67,55 +67,20 @@ function terrainContextOf(params: PlanetParams, cx: number, cy: number): Terrain
     firstTy: firstTileOfChunk(cy),
     surfaceSq: halfTileRadiusSq(params.radiusTiles),
     coreSq: halfTileRadiusSq(params.coreRadiusTiles),
-    caveNoise: chunkNoise(subSeedFor(params, SEED_PURPOSE.cave), cx, cy, CAVE_LATTICE_TILES),
-    oreClusterNoise: chunkNoise(
-      subSeedFor(params, SEED_PURPOSE.oreCluster),
-      cx,
-      cy,
-      ORE_CLUSTER_LATTICE_TILES,
-    ),
-    oreSeed: subSeedFor(params, SEED_PURPOSE.ore),
-    oreFamilySeed: subSeedFor(params, SEED_PURPOSE.oreFamily),
+    caveNoise: caveNoiseOfChunk(params, cx, cy),
   }
 }
 
 function baseCellAt(context: TerrainContext, lx: number, ly: number): number {
-  const tx = context.firstTx + lx
-  const ty = context.firstTy + ly
-  const distanceSq = halfTileDistanceSq(tx, ty)
+  const distanceSq = halfTileDistanceSq(context.firstTx + lx, context.firstTy + ly)
   if (distanceSq > context.surfaceSq) return SPACE_CELL
   if (distanceSq <= context.coreSq) return CORE_CELL
   const band = bandAtHalfTileDistanceSq(context.params, distanceSq)
   if (isCaveAt(context, band, lx, ly)) return AIR_CELL
-  if (isOreAt(context, band, tx, ty, lx, ly)) return oreCell(oreFamilyAt(context, tx, ty), band - 1)
   return GROUND_CELL
 }
 
 function isCaveAt(context: TerrainContext, band: number, lx: number, ly: number): boolean {
   if (band < FIRST_CAVE_BAND) return false
   return noiseBpAt(context.caveNoise, lx, ly) >= context.params.caveThresholdBp
-}
-
-function isOreAt(
-  context: TerrainContext,
-  band: number,
-  tx: number,
-  ty: number,
-  lx: number,
-  ly: number,
-): boolean {
-  const chanceScaled =
-    context.params.oreDensityBp[band - 1] * noiseBpAt(context.oreClusterNoise, lx, ly)
-  return cellRandomFloat(context.oreSeed, tx, ty) * ORE_ROLL_SCALE < chanceScaled
-}
-
-/** One family per 8x8 region, picked by the planet's family weights, so a vein is one material. */
-function oreFamilyAt(context: TerrainContext, tx: number, ty: number): ResourceFamily {
-  const { metal, crystal } = context.params.familyWeights
-  const regionHash = hashCell(
-    context.oreFamilySeed,
-    Math.floor(tx / ORE_FAMILY_REGION_TILES),
-    Math.floor(ty / ORE_FAMILY_REGION_TILES),
-  )
-  return regionHash % (metal + crystal) < metal ? RESOURCE_FAMILY.metal : RESOURCE_FAMILY.crystal
 }
