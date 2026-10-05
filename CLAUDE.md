@@ -88,8 +88,9 @@ Repo-specific rules:
   changes because the design changed, never to make a test pass.
 - **Numbers** (decision #5): money and every stat that grows without bound is a `Money`/`BigStat` from
   `systems/money.ts`, the only module that touches decimal.js; it crosses JSON as a canonical string.
-  Bounded values (ticks, levels, indices, coordinates) are safe-integer `number`s. `blockHardness` is still
-  a plain `number` until the economy formulas move it.
+  Bounded values (ticks, levels, indices, coordinates) are safe-integer `number`s. Economy numbers (prices,
+  ratios, hardness, enemy and vehicle coefficients) live in `src/systems/economy/economy.json`, read by the
+  pure formulas in `src/systems/economy/`; no such literal appears in code.
 - **Authority** (decision #3): world and economy state changes only through
   `applyCommand(state, command)` in `systems/authority/`; store actions `submit` a command and render the
   answering events. No `Math.pow`/`exp`/`log*`/trig, `**` or `Number()` there (ESLint enforces it).

@@ -150,8 +150,9 @@ export default tseslint.config(
     rules: { 'no-restricted-imports': ['error', { patterns: FRAMEWORK_IMPORTS }] },
   },
   {
-    // Authority and economy maths: exact on every OS, so replay digests match (#5, #11).
-    files: ['src/systems/authority/**/*.ts', 'src/systems/money.ts'],
+    // Authority and economy maths: exact on every OS, so replay digests match (#5, #11); the
+    // economy formulas use integer exponents only (#20).
+    files: ['src/systems/authority/**/*.ts', 'src/systems/economy/**/*.ts', 'src/systems/money.ts'],
     ignores: ['src/systems/**/*.test.ts'],
     rules: {
       'no-restricted-properties': ['error', ...CLOCK_AND_RANDOM, ...APPROXIMATED_MATH],

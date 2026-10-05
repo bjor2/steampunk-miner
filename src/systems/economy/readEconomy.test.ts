@@ -61,6 +61,14 @@ describe('economy data validation', () => {
     expect(problemsOf(broken)).toContain('upgrades[0].costCurveId must be cost.vehicle.drill_power')
   })
 
+  it('lists a track whose effect has the wrong shape or stat', () => {
+    const broken = economyFileCopy()
+    broken.upgrades[0].effect.stat = 'hullMax'
+    expect(problemsOf(broken)).toContain(
+      'upgrades[0].effect must be geometric drillPower for drill_power',
+    )
+  })
+
   it('refuses a capped track', () => {
     const broken = economyFileCopy()
     Object.assign(broken.upgrades[2], { maxLevel: 50 })

@@ -5,6 +5,7 @@
 import { createFieldReader, readLiteral, readRange, type FieldReader } from './economyFieldReader'
 import { readEnemies } from './readEnemyEconomy'
 import {
+  TRACK_EFFECTS,
   UPGRADE_IDS,
   type CostCurve,
   type Economy,
@@ -222,6 +223,7 @@ function checkUpgradeSet(
 ): void {
   const curveIds = new Set(costCurves.map((curve) => curve.id))
   UPGRADE_IDS.forEach((id) => checkTrackListedOnce(reader, id, upgrades))
+  upgrades.forEach((upgrade, index) => checkTrackEffect(reader, index, upgrade))
   upgrades.forEach((upgrade, index) => checkCostCurveLink(reader, index, upgrade, curveIds))
 }
 
@@ -246,4 +248,16 @@ function checkTrackListedOnce(
 ): void {
   const count = upgrades.filter((upgrade) => upgrade.id === id).length
   if (count !== 1) reader.record(`upgrades must list the track ${id} once, found ${count}`)
+}
+
+function checkTrackEffect(reader: FieldReader, index: number, upgrade: UpgradeDef): void {
+  const declared = describeEffect(upgrade.effect)
+  const expected = TRACK_EFFECTS[upgrade.id]
+  if (declared !== expected) {
+    reader.record(`upgrades[${index}].effect must be ${expected} for ${upgrade.id}`)
+  }
+}
+
+function describeEffect(effect: UpgradeEffect): string {
+  return effect.family === 'saturating' ? 'saturating engine' : `${effect.family} ${effect.stat}`
 }

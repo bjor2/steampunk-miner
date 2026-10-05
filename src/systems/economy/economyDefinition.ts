@@ -17,6 +17,16 @@ export const UPGRADE_IDS = [
 
 export type UpgradeId = (typeof UPGRADE_IDS)[number]
 
+/** The stat each track raises and its curve family (#7 effect shapes). */
+export const TRACK_EFFECTS: Readonly<Record<UpgradeId, string>> = {
+  drill_power: 'geometric drillPower',
+  drill_tip: 'geometric drillTip',
+  engine: 'saturating engine',
+  boiler: 'linear energyMax',
+  cargo_hold: 'linear cargoCapacity',
+  hull: 'geometric hullMax',
+}
+
 export const ENEMY_KINDS = ['crawler', 'burrower'] as const
 
 export type EnemyKind = (typeof ENEMY_KINDS)[number]
