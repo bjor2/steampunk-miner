@@ -9,6 +9,7 @@ import { useGameStore } from '../store/gameStore'
 import { EnemyPlaceholders } from './EnemyPlaceholders'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetTerrain } from './PlanetTerrain'
+import { PlatformPlaceholder } from './PlatformPlaceholder'
 import { SkyBackground } from './SkyBackground'
 import { Sparks } from './Sparks'
 import { Vehicle } from './Vehicle'
@@ -21,6 +22,7 @@ export function GameScene() {
       <SkyBackground />
       <PlanetCamera />
       <PlanetTerrain />
+      <PlatformPlaceholder />
       <EnemyPlaceholders />
       <PhysicsWorld isPaused={isPaused}>
         <Vehicle />

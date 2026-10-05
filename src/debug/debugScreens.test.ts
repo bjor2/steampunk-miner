@@ -71,7 +71,10 @@ describe('debug api: ui reads the HUD and the platform screen (#33 acceptance 4)
     debug.giveMoney('1e400')
     debug.setCoreFragments(17)
     const { header } = platformModel()
-    expect(header).toMatchObject({ coreBayText: '17 / 63', money: { exact: canonical('1e400') } })
+    expect(header).toMatchObject({
+      coreBay: { text: '17 / 63' },
+      money: { exact: canonical('1e400') },
+    })
     expect(header.money.text).not.toContain('NaN')
   })
 })

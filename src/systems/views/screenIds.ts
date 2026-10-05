@@ -32,6 +32,7 @@ export const UI_IDS = {
   platformMoney: 'platform-money',
   platformPlanet: 'platform-planet',
   platformCoreBay: 'platform-core-bay',
+  platformCoreBayGauge: 'platform-core-bay-gauge',
   platformState: 'platform-state',
   shopCargoTotal: 'shop-cargo-total',
   shopSellAll: 'shop-sell-all',

@@ -139,7 +139,7 @@ describe('platform model', () => {
     session.submit(2, setCoreFragmentsCommand(17))
     expect(platformOf(session).header).toMatchObject({
       planet: 1,
-      coreBayText: '17 / 63',
+      coreBay: { text: '17 / 63', exact: '17', permille: 269 },
       platformState: 'outpost',
     })
   })

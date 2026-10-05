@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react'
 import type { PlatformHeader as Header } from '../../systems/views/platformModel'
 import { UI_IDS } from '../ids'
+import { Gauge } from '../kit/Gauge'
 import styles from './Platform.module.css'
 
 export function PlatformHeader({ header }: { header: Header }) {
@@ -15,9 +16,12 @@ export function PlatformHeader({ header }: { header: Header }) {
       <Field label="Planet">
         <span data-testid={UI_IDS.platformPlanet}>{header.planet}</span>
       </Field>
-      <Field label="Core bay">
-        <span data-testid={UI_IDS.platformCoreBay}>{header.coreBayText}</span>
-      </Field>
+      <Gauge
+        label="Core bay"
+        reading={header.coreBay}
+        gaugeId={UI_IDS.platformCoreBayGauge}
+        textId={UI_IDS.platformCoreBay}
+      />
       <Field label="Platform">
         <span data-testid={UI_IDS.platformState} data-state={header.platformState}>
           {header.platformStateText}

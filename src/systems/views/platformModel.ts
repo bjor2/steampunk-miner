@@ -28,6 +28,7 @@ import {
 import { visualTier } from '../economy/vehicleStats'
 import { energyGaugeText, hullGaugeText } from '../vehicle/vehicleReadout'
 import { energyMaxQuantaOf, statsOfVehicle } from '../vehicle/vehicleState'
+import type { GaugeReading } from './hudModel'
 import type { FocusStop } from './menuFocus'
 import { shopPanelOf, type ShopPanel } from './shopPanel'
 import {
@@ -50,7 +51,8 @@ export interface PlatformUiState {
 export interface PlatformHeader {
   money: AmountReading
   planet: number
-  coreBayText: string
+  /** The bay against `coreNeeded` (#8, #33): "17 / 63" and a brass dial. */
+  coreBay: GaugeReading
   platformState: PlatformVisualState
   platformStateText: string
 }
@@ -135,10 +137,15 @@ function headerOf(state: AuthorityState, playerId: string): PlatformHeader {
   return {
     money: amountReading(state.players[playerId].wallet),
     planet: state.planet.index,
-    coreBayText: `${state.platform.coreBay} / ${needed}`,
+    coreBay: coreBayGaugeOf(state.platform.coreBay, needed),
     platformState: state.platform.visualState,
     platformStateText: PLATFORM_STATE_TEXT[state.platform.visualState],
   }
+}
+
+function coreBayGaugeOf(coreBay: number, needed: number): GaugeReading {
+  const permille = needed > 0 ? Math.min(Math.floor((coreBay * 1000) / needed), 1000) : 0
+  return { text: `${coreBay} / ${needed}`, exact: String(coreBay), permille }
 }
 
 function workshopPanelOf(state: AuthorityState, playerId: string): WorkshopPanel {

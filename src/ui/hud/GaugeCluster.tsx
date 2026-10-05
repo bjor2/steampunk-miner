@@ -1,7 +1,7 @@
 /** Top left (#33 section 5): energy, hull and cargo as gauges with exact numbers, and the cargo value. */
 import type { HudModel } from '../../systems/views/hudModel'
 import { UI_IDS } from '../ids'
-import { Gauge } from './Gauge'
+import { Gauge } from '../kit/Gauge'
 import styles from './Hud.module.css'
 
 export function GaugeCluster({ model }: { model: HudModel }) {
