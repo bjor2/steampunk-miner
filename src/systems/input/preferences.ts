@@ -13,7 +13,7 @@
  */
 import { CAMERA_MODES, isCameraMode, type CameraMode } from '../render/cameraTurn'
 import { VIEW_SHORT_AXIS_DEFAULT_M } from '../../constants/scene'
-import { MUSIC_VOLUME_STEP } from '../../constants/audio'
+import { MUSIC_VOLUME_STEPS } from '../../constants/audio'
 import { viewShortAxisProblems } from '../render/viewZoom'
 import { HINT_TABLE, plaqueIdsOf } from '../hints/hintTable'
 import { ACTION_MAP, overrideProblems, type BindingOverrides } from './actionMap'
@@ -117,7 +117,7 @@ export function preferenceProblems(name: unknown, value: unknown): string[] {
 
 /** The settings overlay's "Change" on the music volume: a quarter down, from silence back to full. */
 export function nextMusicVolume(musicVolume: number): number {
-  return musicVolume <= 0 ? 1 : Math.max(0, musicVolume - MUSIC_VOLUME_STEP)
+  return musicVolume <= 0 ? 1 : Math.max(0, musicVolume - 1 / MUSIC_VOLUME_STEPS)
 }
 
 export function withPreference(
