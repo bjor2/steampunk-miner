@@ -5,6 +5,8 @@ import { FACING } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/groundEdit'
 import { CELL_KIND, kindOfCell, tierOffsetOfCell } from '../world/worldCell'
 import { EMPTY_WORLD, materialCellAt } from '../world/worldState'
+import { UI_IDS } from '../views/screenIds'
+import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
 import { createScriptedSession, drill, PARAMS, poseAbove } from './scriptedSession'
 import { readSnapshot, takeSnapshot } from './sessionSnapshot'
@@ -40,6 +42,18 @@ function sumOfValues(events: readonly DomainEvent[]) {
     ZERO_MONEY,
   )
 }
+
+describe('ore discovery (#42 acceptance 7)', () => {
+  it('has no ore scanner or ping: no such command and no such HUD id', () => {
+    const session = createScriptedSession()
+    for (const type of ['scanOre', 'pingOre', 'oreScan', 'orePing']) {
+      const [answer] = session.submit(1, { type, payload: {} } as unknown as CommandIntent)
+      expect(answer).toMatchObject({ type: 'CommandRejected', reason: 'unknown_command' })
+    }
+    const ids = Object.values(UI_IDS).filter((id) => typeof id === 'string')
+    expect(ids.filter((id) => /scan|ping/.test(id))).toEqual([])
+  })
+})
 
 describe('ground drilling (#36 Yield)', () => {
   it('credits each ore cell of a 1,000-cell scripted run once, at the first-slice value', () => {
