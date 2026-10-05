@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en" data-doc="vertical-scaler-v1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vertical curves: drill upgrades outrun income</title>
+<style>
+/* osilion-html runtime stylesheet. Inlined into every report by scripts/build.* */
+
+:root {
+  --bg: #f7f6f3;
+  --panel: #ffffff;
+  --panel-2: #f2f1ed;
+  --ink: #1c1917;
+  --ink-2: #44403c;
+  --muted: #78716c;
+  --line: #e7e5e4;
+  --line-2: #d6d3d1;
+  --accent: #4f46e5;
+  --accent-soft: #eef2ff;
+  --ok: #059669;
+  --ok-soft: #ecfdf5;
+  --warn: #d97706;
+  --warn-soft: #fffbeb;
+  --bad: #e11d48;
+  --bad-soft: #fff1f2;
+  --info: #0284c7;
+  --info-soft: #f0f9ff;
+  --shadow: 0 1px 2px rgba(28, 25, 23, 0.06), 0 8px 24px -12px rgba(28, 25, 23, 0.18);
+  --radius: 14px;
+  --toc-w: 272px;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Charter, Georgia, serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, "SF Mono", Menlo, monospace;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101216;
+    --panel: #171a20;
+    --panel-2: #1e222a;
+    --ink: #e7e5e4;
+    --ink-2: #c9c5c0;
+    --muted: #a09a93;
+    --line: #262a33;
+    --line-2: #343946;
+    --accent: #818cf8;
+    --accent-soft: #1e1f3a;
+    --ok: #34d399;
+    --ok-soft: #0d2a20;
+    --warn: #fbbf24;
+    --warn-soft: #2d2410;
+    --bad: #fb7185;
+    --bad-soft: #331419;
+    --info: #38bdf8;
+    --info-soft: #0c2434;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101216;
+  --panel: #171a20;
+  --panel-2: #1e222a;
+  --ink: #e7e5e4;
+  --ink-2: #c9c5c0;
+  --muted: #a09a93;
+  --line: #262a33;
+  --line-2: #343946;
+  --accent: #818cf8;
+  --accent-soft: #1e1f3a;
+  --ok: #34d399;
+  --ok-soft: #0d2a20;
+  --warn: #fbbf24;
+  --warn-soft: #2d2410;
+  --bad: #fb7185;
+  --bad-soft: #331419;
+  --info: #38bdf8;
+  --info-soft: #0c2434;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, pre, .mono { font-family: var(--mono); font-size: 0.875em; }
+code { background: var(--panel-2); padding: 0.1em 0.35em; border-radius: 5px; }
+pre { background: var(--panel-2); padding: 0.9rem 1rem; border-radius: 10px; overflow: auto; line-height: 1.5; }
+pre code { background: none; padding: 0; }
+img, svg, canvas { max-width: 100%; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
+
+/* ---------- page frame ---------- */
+.frame { display: grid; grid-template-columns: var(--toc-w) minmax(0, 1fr); min-height: 100vh; }
+.toc {
+  position: sticky; top: 0; height: 100vh; overflow: auto;
+  padding: 28px 18px 28px 24px;
+  border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 70%, var(--bg));
+  font-size: 0.86rem;
+}
+.toc-brand { font-family: var(--serif); font-size: 1rem; color: var(--ink); margin: 0 0 4px; }
+.toc-sub { color: var(--muted); font-size: 0.75rem; margin: 0 0 18px; }
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc li { margin: 0; }
+.toc a {
+  display: flex; align-items: baseline; gap: 8px;
+  color: var(--ink-2); padding: 5px 10px; border-radius: 8px;
+  border-left: 2px solid transparent;
+}
+.toc a:hover { background: var(--panel-2); text-decoration: none; }
+.toc a.is-active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); }
+.toc .lvl-3 a { padding-left: 22px; font-size: 0.8rem; color: var(--muted); }
+.toc .lvl-3 a.is-active { color: var(--accent); }
+.toc .toc-ref { font-family: var(--mono); font-size: 0.7em; color: var(--muted); min-width: 2ch; }
+.toc .toc-dot {
+  margin-left: auto; width: 7px; height: 7px; border-radius: 50%; flex: none; align-self: center;
+  background: transparent;
+}
+.toc .has-comment .toc-dot { background: var(--accent); }
+.toc .is-approved .toc-dot { background: var(--ok); }
+.toc .is-rejected .toc-dot { background: var(--bad); }
+.toc .is-preferred .toc-dot { background: var(--accent); }
+.toc-foot { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.75rem; }
+
+main.doc { padding: 56px 64px 140px; max-width: 920px; width: 100%; }
+
+@media (max-width: 960px) {
+  .frame { grid-template-columns: 1fr; }
+  .toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  main.doc { padding: 32px 16px 140px; }
+}
+
+/* ---------- header ---------- */
+.doc-header { margin-bottom: 40px; }
+.eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.72rem; color: var(--muted); margin: 0 0 10px; }
+.doc-header h1 { font-family: var(--serif); font-weight: 600; font-size: 2.35rem; line-height: 1.15; margin: 0 0 14px; letter-spacing: -0.01em; }
+.lede { font-size: 1.1rem; color: var(--ink-2); margin: 0 0 16px; max-width: 64ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 10px 18px; color: var(--muted); font-size: 0.82rem; }
+.meta strong { color: var(--ink-2); font-weight: 600; }
+
+/* ---------- sections & prose ---------- */
+section { margin: 0 0 48px; }
+h2 { font-family: var(--serif); font-weight: 600; font-size: 1.55rem; margin: 40px 0 14px; letter-spacing: -0.005em; }
+h3 { font-size: 1.05rem; font-weight: 650; margin: 0; }
+h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 18px 0 6px; font-weight: 600; }
+p { margin: 0 0 12px; }
+ul, ol { margin: 0 0 12px; padding-left: 1.4rem; }
+li { margin: 2px 0; }
+.intro { font-size: 1.02rem; color: var(--ink-2); max-width: 66ch; }
+
+.callout { border-left: 3px solid var(--info); background: var(--info-soft); padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 14px 0; font-size: 0.95rem; }
+.callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+.callout.bad { border-color: var(--bad); background: var(--bad-soft); }
+.callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+.callout.accent { border-color: var(--accent); background: var(--accent-soft); }
+
+blockquote { margin: 14px 0; padding: 4px 16px; border-left: 3px solid var(--line-2); color: var(--ink-2); font-style: italic; }
+
+/* ---------- points (the commentable unit) ---------- */
+.point {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px 18px;
+  margin: 16px 0;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.2s;
+}
+.point:target { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+.point-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.point-head h3 { flex: 1 1 auto; min-width: 0; }
+.ref {
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 600; color: var(--muted);
+  background: var(--panel-2); border: 1px solid var(--line); padding: 2px 7px; border-radius: 6px; letter-spacing: 0.02em;
+}
+.point-body > :last-child { margin-bottom: 0; }
+.point-body p, .point-body li { font-size: 0.95rem; }
+
+/* decision states */
+.point.is-approved { border-color: color-mix(in srgb, var(--ok) 55%, var(--line)); background: color-mix(in srgb, var(--ok-soft) 55%, var(--panel)); }
+.point.is-rejected { border-color: color-mix(in srgb, var(--bad) 55%, var(--line)); background: color-mix(in srgb, var(--bad-soft) 55%, var(--panel)); }
+.point.is-approved::before, .point.is-rejected::before {
+  content: ""; position: absolute; left: -1px; top: 14px; bottom: 14px; width: 4px; border-radius: 0 4px 4px 0;
+}
+.point.is-approved::before { background: var(--ok); }
+.point.is-rejected::before { background: var(--bad); }
+.point.is-preferred { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+.alternatives.has-preference .option:not(.is-preferred) { opacity: 0.78; }
+
+/* ---------- badges ---------- */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap;
+}
+.badge-high, .badge-bad, .badge-hard { color: var(--bad); background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 30%, transparent); }
+.badge-medium, .badge-warn, .badge-moderate { color: var(--warn); background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
+.badge-low, .badge-ok, .badge-easy { color: var(--ok); background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
+.badge-info { color: var(--info); background: var(--info-soft); border-color: color-mix(in srgb, var(--info) 30%, transparent); }
+.badge-accent, .badge-rec { color: var(--accent); background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+.badge-neutral { color: var(--muted); background: var(--panel-2); border-color: var(--line); }
+
+/* ---------- figures, diagrams, charts ---------- */
+figure.figure {
+  margin: 16px 0; padding: 14px 16px; background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 12px;
+}
+figure.figure figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
+figure.figure pre.mermaid { background: transparent; padding: 0; margin: 0; display: flex; justify-content: center; }
+figure.figure .chart-wrap { position: relative; height: 260px; }
+figure.figure.tall .chart-wrap { height: 360px; }
+.figure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 720px) { .figure-grid { grid-template-columns: 1fr; } }
+.figure-grid figure.figure { margin: 0; }
+.fig-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+
+/* hand drawn schematic helpers */
+.schema { display: flex; flex-direction: column; gap: 6px; }
+.band { padding: 8px 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--panel); font-size: 0.8rem; font-family: var(--mono); }
+.band.deep { background: var(--ink); color: var(--bg); border-color: var(--ink); font-weight: 600; }
+.band.faded { opacity: 0.45; }
+.band.bad { border-color: var(--bad); color: var(--bad); }
+.arrow { text-align: center; color: var(--muted); font-size: 0.8rem; line-height: 1; }
+
+/* meters and stat tiles */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 14px 0; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.stat .num { font-family: var(--serif); font-size: 1.7rem; line-height: 1.1; font-weight: 600; }
+.stat .lbl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+.meter { height: 8px; border-radius: 999px; background: var(--panel-2); overflow: hidden; border: 1px solid var(--line); }
+.meter > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.meter.ok > span { background: var(--ok); }
+.meter.warn > span { background: var(--warn); }
+.meter.bad > span { background: var(--bad); }
+
+/* ---------- alternatives ---------- */
+.alternatives { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin: 18px 0; }
+.alternatives .option { margin: 0; display: flex; flex-direction: column; }
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+@media (max-width: 560px) { .pros-cons { grid-template-columns: 1fr; } }
+.pros, .cons { list-style: none; margin: 0; padding: 10px 12px; border-radius: 10px; font-size: 0.88rem; }
+.pros { background: var(--ok-soft); border: 1px solid color-mix(in srgb, var(--ok) 25%, transparent); }
+.cons { background: var(--bad-soft); border: 1px solid color-mix(in srgb, var(--bad) 25%, transparent); }
+.pros li, .cons li { padding-left: 1.3em; position: relative; margin: 4px 0; }
+.pros li::before { content: "+"; position: absolute; left: 0; color: var(--ok); font-weight: 700; }
+.cons li::before { content: "\2212"; position: absolute; left: 0; color: var(--bad); font-weight: 700; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: 0.85rem; margin: 10px 0 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+
+/* ---------- tables ---------- */
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin: 14px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background: var(--panel-2); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+td.score-low { color: var(--ok); font-weight: 600; }
+td.score-medium { color: var(--warn); font-weight: 600; }
+td.score-high { color: var(--bad); font-weight: 600; }
+
+/* ---------- controls injected by the runtime ---------- */
+.controls { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.btn {
+  appearance: none; border: 1px solid var(--line-2); background: var(--panel); color: var(--ink-2);
+  font: inherit; font-size: 0.78rem; font-weight: 600; padding: 5px 11px; border-radius: 999px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; line-height: 1.2; transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn:hover { background: var(--panel-2); border-color: var(--muted); }
+.btn svg { width: 14px; height: 14px; }
+.btn.is-on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: color-mix(in srgb, var(--accent) 88%, black); border-color: color-mix(in srgb, var(--accent) 88%, black); }
+
+.decide { display: inline-flex; border: 1px solid var(--line-2); border-radius: 999px; overflow: hidden; background: var(--panel); }
+.decide button {
+  appearance: none; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 0.78rem; font-weight: 600;
+  padding: 5px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.decide button + button { border-left: 1px solid var(--line-2); }
+.decide button:hover { background: var(--panel-2); color: var(--ink); }
+.decide button.approve.is-on { background: var(--ok); color: #fff; }
+.decide button.reject.is-on { background: var(--bad); color: #fff; }
+.decide button svg { width: 13px; height: 13px; }
+
+.comment-slot { margin-top: 14px; display: none; }
+.point.is-commenting .comment-slot, .point.has-comment .comment-slot { display: block; }
+.comment-slot label { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+.comment-slot textarea {
+  width: 100%; min-height: 72px; resize: vertical; font: inherit; font-size: 0.92rem; line-height: 1.5;
+  padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--panel-2); color: var(--ink);
+}
+.comment-slot textarea:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+.point.has-comment .comment-btn { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+/* ---------- bottom bar and comments panel ---------- */
+.bar {
+  position: fixed; left: var(--toc-w); right: 0; bottom: 0; z-index: 30;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 12px 64px; border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 88%, transparent); backdrop-filter: blur(10px);
+}
+@media (max-width: 960px) { .bar { left: 0; padding: 10px 16px; } }
+.bar .tally { font-size: 0.82rem; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.bar .tally b { color: var(--ink); font-weight: 650; }
+.bar .tally .ok { color: var(--ok); }
+.bar .tally .bad { color: var(--bad); }
+.bar .spacer { flex: 1; }
+
+.panel-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 40; display: none; }
+.panel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); z-index: 50;
+  background: var(--panel); border-left: 1px solid var(--line); box-shadow: var(--shadow);
+  transform: translateX(100%); transition: transform 0.22s ease; display: flex; flex-direction: column;
+}
+body.panel-open .panel { transform: none; }
+body.panel-open .panel-backdrop { display: block; }
+.panel-head { display: flex; align-items: center; gap: 10px; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+.panel-head h2 { margin: 0; font-size: 1.15rem; flex: 1; }
+.panel-body { padding: 18px 22px; overflow: auto; flex: 1; font-size: 0.92rem; }
+.panel-body h3 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 16px 0 8px; }
+.panel-body h3:first-child { margin-top: 0; }
+.panel-body ul { padding-left: 1.2rem; }
+.panel-body li { margin: 6px 0; }
+.panel-body li .ref { margin-right: 6px; }
+.panel-body li a { font-weight: 600; color: var(--ink); }
+.panel-body li a:hover { color: var(--accent); }
+.panel-body .empty { color: var(--muted); font-style: italic; }
+.panel-foot { padding: 14px 22px; border-top: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; }
+.panel-foot .btn-danger { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, transparent); margin-left: auto; }
+.toast {
+  position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%) translateY(10px); z-index: 60;
+  background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 999px; font-size: 0.82rem;
+  opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%); }
+
+/* ---------- print ---------- */
+@media print {
+  .toc, .bar, .panel, .panel-backdrop, .controls, .toast { display: none !important; }
+  .frame { display: block; }
+  main.doc { padding: 0; max-width: none; }
+  .point { break-inside: avoid; box-shadow: none; }
+  .comment-slot { display: block !important; }
+  .comment-slot textarea { border: 1px dashed var(--line-2); }
+  .point:not(.has-comment) .comment-slot { display: none !important; }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+<body data-mode="findings">
+<div class="frame">
+  <nav class="toc" aria-label="Table of contents">
+    <p class="toc-brand">Vertical curves: drill upgrades outrun income</p>
+    <p class="toc-sub">Findings &middot; <span data-fill="date"></span></p>
+    <ol class="toc-list"></ol>
+    <div class="toc-foot">Comment on any item, then use <b>All comments</b> at the bottom to copy them back into the chat.</div>
+  </nav>
+  <main class="doc">
+<header class="doc-header">
+  <p class="eyebrow">Findings &middot; steampunk-miner scaling</p>
+  <h1>Vertical curves: drill upgrades outrun income by 18x at planet 40</h1>
+  <p class="lede">Drill power keeps pace with rock hardness, but its price climbs faster than ore value, so each upgrade costs more ore every planet.
+    Casing is listed as a vertical track yet has no curve, and it is the obvious sink for the 22-62 minutes slice 2 is short of its pacing target.
+    Comment on each finding where you disagree or know the intent, then copy all comments back into the chat.</p>
+  <div class="meta">
+    <span><strong data-fill="point-count"></strong> points</span>
+    <span>Generated <strong data-fill="date"></strong></span>
+    <span>Source <strong>docs/scaling/vertical/stats.json</strong> + <strong>docs/economy</strong> tables</span>
+  </div>
+</header>
+
+<section id="s-1" data-toc="Curve steepness">
+  <h2>1. Curve steepness</h2>
+  <p class="intro">Charts use the full planet 1-40 rows of <code>price-table.md</code>, <code>vehicle-table.md</code> and <code>planet-table.md</code>; the six samples in <code>stats.json</code> sit on these curves (except planet 40, see 1.5).</p>
+  <div class="stats">
+    <div class="stat"><div class="num">3.63x</div><div class="lbl">drill_power cost per planet (1.24^6)</div></div>
+    <div class="stat"><div class="num">3.38x</div><div class="lbl">ore value per planet (1.5^3)</div></div>
+    <div class="stat"><div class="num">1.97x</div><div class="lbl">drill power and hardness per planet</div></div>
+    <div class="stat"><div class="num">18x</div><div class="lbl">ore per upgrade, planet 40 vs 1</div></div>
+  </div>
+
+  <article class="point" id="p-1-1" data-ref="1.1">
+    <header class="point-head">
+      <span class="ref">1.1</span>
+      <h3>drill_power next cost climbs 3.63x per planet</h3>
+      <span class="badge badge-high">High</span>
+    </header>
+    <div class="point-body">
+      <figure class="figure">
+        <canvas class="chart tall" data-chart='{"type":"line","data":{"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40],"datasets":[{"label":"drill_power next upgrade cost","data":[787.0,2860.0,10400.0,37800.0,137000.0,499000.0,1820000.0,6600000.0,24000000.0,87200000.0,317000000.0,1150000000.0,4190000000.0,15200000000.0,55400000000.0,201000000000.0,731000000000.0,2660000000000.0,9670000000000.0,35100000000000.0,128000000000000.0,464000000000000.0,1690000000000000.0,6140000000000000.0,2.23e+16,8.11e+16,2.95e+17,1.07e+18,3.9e+18,1.42e+19,5.15e+19,1.87e+20,6.8e+20,2.47e+21,8.99e+21,3.27e+22,1.19e+23,4.32e+23,1.57e+24,5.71e+24],"pointRadius":2},{"label":"travel_fee","data":[60.8,205.0,692.0,2340.0,7880.0,26600.0,89800.0,303000.0,1020000.0,3450000.0,11600000.0,39300000.0,133000000.0,448000000.0,1510000000.0,5100000000.0,17200000000.0,58100000000.0,196000000000.0,662000000000.0,2230000000000.0,7540000000000.0,25400000000000.0,85900000000000.0,290000000000000.0,978000000000000.0,3300000000000000.0,1.11e+16,3.76e+16,1.27e+17,4.28e+17,1.45e+18,4.88e+18,1.65e+19,5.56e+19,1.88e+20,6.33e+20,2.14e+21,7.21e+21,2.43e+22],"pointRadius":2}]},"options":{"plugins":{"legend":{"position":"bottom","labels":{"boxWidth":12}}},"scales":{"x":{"title":{"display":true,"text":"Planet"}},"y":{"type":"logarithmic","title":{"display":true,"text":"Money (log scale)"}}}}}'></canvas>
+        <figcaption>Straight lines on a log axis mean fixed growth rates: the drill cost rises 22 orders of magnitude over 40 planets, and its slope is slightly steeper than the travel fee, which grows at the ore-value rate. Section 1.3 shows how that small gap adds up.</figcaption>
+      </figure>
+      <p><b>Problem.</b> Six drill levels per planet at r = 1.24 make the next upgrade 3.63x dearer each planet, from 787 at planet 1 to 5.71e24 at planet 40.</p>
+      <p><b>Impact.</b> Ore value only grows 3.38x per planet, so the curve is about 7.5% per planet steeper than income.</p>
+    </div>
+  </article>
+
+  <article class="point" id="p-1-2" data-ref="1.2">
+    <header class="point-head">
+      <span class="ref">1.2</span>
+      <h3>Drill power at end of planet tracks hardness exactly</h3>
+      <span class="badge badge-low">Low</span>
+    </header>
+    <div class="point-body">
+      <figure class="figure">
+        <canvas class="chart tall" data-chart='{"type":"line","data":{"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40],"datasets":[{"label":"drill_power at end of planet","data":[6.55,12.9,25.5,50.3,99.3,196.0,387.0,764.0,1510.0,2980.0,5870.0,11600.0,22900.0,45200.0,89200.0,176000.0,347000.0,686000.0,1350000.0,2670000.0,5270000.0,10400000.0,20500000.0,40600000.0,80000000.0,158000000.0,312000000.0,616000000.0,1210000000.0,2400000000.0,4730000000.0,9340000000.0,18400000000.0,36400000000.0,71800000000.0,142000000000.0,280000000000.0,552000000000.0,1090000000000.0,2150000000000.0],"pointRadius":2},{"label":"hardness, band 5","data":[2.48,4.89,9.65,19.0,37.6,74.2,146.0,289.0,570.0,1120.0,2220.0,4390.0,8660.0,17100.0,33700.0,66600.0,131000.0,259000.0,512000.0,1010000.0,1990000.0,3940000.0,7770000.0,15300000.0,30300000.0,59800000.0,118000000.0,233000000.0,460000000.0,907000000.0,1790000000.0,3530000000.0,6980000000.0,13800000000.0,27200000000.0,53600000000.0,106000000000.0,209000000000.0,413000000000.0,814000000000.0],"pointRadius":0,"borderDash":[5,4]}]},"options":{"plugins":{"legend":{"position":"bottom","labels":{"boxWidth":12}}},"scales":{"x":{"title":{"display":true,"text":"Planet"}},"y":{"type":"logarithmic","title":{"display":true,"text":"Value (log scale)"}}}}}'></canvas>
+        <figcaption>Both lines grow 1.97x per planet (gP^3 and gD^6), from 6.55 to 2.15e12 power; the distance between them never changes.</figcaption>
+      </figure>
+      <p><b>Finding.</b> The drill feels the same on every planet: power is pure maintenance against hardness, never felt growth.</p>
+      <p><b>Impact.</b> That is fine for the formula, but it means any sense of getting stronger must come from horizontal features, not this track.</p>
+    </div>
+  </article>
+
+  <article class="point" id="p-1-3" data-ref="1.3">
+    <header class="point-head">
+      <span class="ref">1.3</span>
+      <h3>Ore needed per drill upgrade drifts from 16 to 281</h3>
+      <span class="badge badge-high">High</span>
+    </header>
+    <div class="point-body">
+      <figure class="figure">
+        <canvas class="chart tall" data-chart='{"type":"bar","data":{"labels":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40],"datasets":[{"label":"drill_power next cost / band-5 ore value","data":[15.6,16.7,18.0,19.4,20.9,22.5,24.3,26.1,28.2,30.3,32.6,35.1,37.7,40.8,44.0,47.3,51.1,55.0,59.3,63.6,68.8,73.9,79.7,85.8,92.1,99.5,107.3,115.3,124.6,134.0,144.3,155.8,167.1,180.3,194.2,209.6,225.8,242.7,261.2,281.3]}]},"options":{"plugins":{"legend":{"position":"bottom","labels":{"boxWidth":12}}},"scales":{"x":{"title":{"display":true,"text":"Planet"}},"y":{"beginAtZero":true,"title":{"display":true,"text":"Band-5 ore units per upgrade"}}}}}'></canvas>
+        <figcaption>Upgrade price measured in band-5 ore units: 15.6 at planet 1, 30.3 at 10, 63.6 at 20, 281.3 at 40.</figcaption>
+      </figure>
+      <p><b>Impact.</b> The pacing bot already shows core time jumping from about 50 to 69 minutes at planets 7-8; at this drift planet 40 needs 18x the mining per upgrade of planet 1.</p>
+      <p><b>Suggested change.</b> Either set r so that r^6 matches 1.5^3 (r = 1.225) for a flat ratio, or keep the drift on purpose and state the per-planet time budget it implies.</p>
+    </div>
+  </article>
+
+  <article class="point" id="p-1-4" data-ref="1.4">
+    <header class="point-head">
+      <span class="ref">1.4</span>
+      <h3>Travel fee is a stable 1.2x band-5 ore value</h3>
+      <span class="badge badge-low">Low</span>
+    </header>
+    <div class="point-body">
+      <p><b>Finding.</b> <code>travel_fee</code> grows 3.38x per planet, the same as ore value, so it costs about 1.2 band-5 ore units on every planet (60.8 at planet 1, 2.43e22 at 40).</p>
+      <p><b>Impact.</b> It is a healthy, flat sink and a good template for casing pricing (2.1).</p>
+    </div>
+  </article>
+
+  <article class="point" id="p-1-5" data-ref="1.5">
+    <header class="point-head">
+      <span class="ref">1.5</span>
+      <h3><code>stats.json</code> planet-40 samples were planet-36 values (fixed)</h3>
+      <span class="badge badge-low">Fixed</span>
+    </header>
+    <div class="point-body">
+      <table>
+        <thead><tr><th>Field at planet 40</th><th>stats.json before</th><th>stats.json now (= price-table.md)</th></tr></thead>
+        <tbody>
+          <tr><td><code>drill_power_next_cost</code></td><td class="score-high">3.27e22 (planet 36)</td><td class="score-low">5.71e24</td></tr>
+          <tr><td><code>travel_fee</code></td><td class="score-high">1.88e20 (planet 36)</td><td class="score-low">2.43e22</td></tr>
+          <tr><td><code>drill_power_at_end_of_planet</code></td><td class="score-low">2.15e12</td><td class="score-low">2.15e12</td></tr>
+        </tbody>
+      </table>
+      <p><b>Finding.</b> Two price samples at planet 40 were copied from the planet-36 row, so they were 129-175x too low.</p>
+      <p><b>Resolution.</b> <code>stats.json</code> now holds the planet-40 values and a <code>sourceHash</code>; the charts always used the full tables and were never affected.</p>
+    </div>
+  </article>
+</section>
+
+<section id="s-2" data-toc="Casing as a vertical sink">
+  <h2>2. Casing as a new vertical sink</h2>
+  <p class="intro"><code>casing_grade</code> is the seventh track in <code>stats.json</code> and the horizontal intro <code>casing_cement</code> is planned for slice 2, but no curve exists yet.</p>
+
+  <article class="point" id="p-2-1" data-ref="2.1">
+    <header class="point-head">
+      <span class="ref">2.1</span>
+      <h3>casing_grade has no samples or price formula</h3>
+      <span class="badge badge-medium">Medium</span>
+    </header>
+    <div class="point-body">
+      <div class="figure-grid">
+        <figure class="figure">
+          <div class="fig-label">Sinks today</div>
+          <div class="schema">
+            <div class="band">Upgrades: one-off, 3.63x / planet</div>
+            <div class="band">Travel fee: per planet, 3.38x</div>
+            <div class="band faded">Repair, charge: small</div>
+          </div>
+        </figure>
+        <figure class="figure">
+          <div class="fig-label">With casing</div>
+          <div class="schema">
+            <div class="band">Upgrades: one-off</div>
+            <div class="band deep">Casing: per metre lined, recurring, 3.38x / planet</div>
+            <div class="band">Travel fee: per planet</div>
+          </div>
+        </figure>
+      </div>
+      <p><b>Problem.</b> Without a curve, casing cannot be balanced or sampled alongside the other six tracks.</p>
+      <p><b>Suggested change.</b> Price casing per metre as a fixed fraction of band ore value (like the travel fee), with grade levels gating which collapse pressure it holds.</p>
+    </div>
+  </article>
+
+  <article class="point" id="p-2-2" data-ref="2.2">
+    <header class="point-head">
+      <span class="ref">2.2</span>
+      <h3>Casing can close the slice-2 pacing gap</h3>
+      <span class="badge badge-high">High</span>
+    </header>
+    <div class="point-body">
+      <div class="stats">
+        <div class="stat"><div class="num">68.3</div><div class="lbl">slice minutes (bot)</div></div>
+        <div class="stat"><div class="num">90-130</div><div class="lbl">slice target, minutes</div></div>
+        <div class="stat"><div class="num">25-48%</div><div class="lbl">of income new sinks must absorb</div></div>
+      </div>
+      <div class="meter warn"><span style="width:53%"></span></div>
+      <p><b>Problem.</b> The build fails its pacing gate: slice 2 ends at 68.3 minutes, 22-62 minutes short.</p>
+      <p><b>Impact.</b> At the current 550 per minute income, landing at 90 / 110 / 130 minutes means casing and other new sinks take about 25% / 39% / 48% of money earned.</p>
+      <p><b>Suggested change.</b> Tune the casing fraction toward the 110-minute midpoint first, then re-run the bot; collapse risk will also slow mining, so expect to need less.</p>
+    </div>
+  </article>
+</section>
+
+<section id="s-3" data-toc="Pacing targets">
+  <h2>3. Pacing targets</h2>
+  <table>
+    <thead><tr><th>Target (stats.json)</th><th>Goal</th><th>Bot today</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><code>first_ten_minutes</code></td><td>see issue 16</td><td>first sale 28 s; 15 upgrades on 4 tracks by 600 s</td><td class="score-medium">Check vs 16</td></tr>
+      <tr><td><code>planet1_core</code></td><td>30-60 min</td><td>38.6 min</td><td class="score-low">Met</td></tr>
+      <tr><td><code>slice2</code></td><td>90-130 min</td><td>68.3 min</td><td class="score-high">Missed</td></tr>
+      <tr><td>Planet 1 trips (alert)</td><td>3-12</td><td>16</td><td class="score-medium">Over</td></tr>
+    </tbody>
+  </table>
+
+  <article class="point" id="p-3-1" data-ref="3.1">
+    <header class="point-head">
+      <span class="ref">3.1</span>
+      <h3>Per-planet time is already rising by planet 7</h3>
+      <span class="badge badge-medium">Medium</span>
+    </header>
+    <div class="point-body">
+      <figure class="figure">
+        <canvas class="chart" data-chart='{"type":"bar","data":{"labels":["P1","P2","P3","P4","P5","P6","P7","P8"],"datasets":[{"label":"Minutes from arrival to core (pacing bot, planets 1-40 run)","data":[53.7,44.7,51.1,50.5,46.1,50.8,68.6,69.2]}]},"options":{"plugins":{"legend":{"position":"bottom","labels":{"boxWidth":12}}},"scales":{"y":{"beginAtZero":true,"title":{"display":true,"text":"Minutes"}}}}}'></canvas>
+        <figcaption>Planets 1-6 take 45-54 minutes each; planets 7 and 8 jump to about 69. The bot did not reach planet 40 inside its budget.</figcaption>
+      </figure>
+      <p><b>Finding.</b> The drift in 1.3 shows up in play time early, not just at planet 40.</p>
+      <p><b>Suggested change.</b> Add a per-planet time target (for example 45-60 minutes) to <code>pacing_targets_min</code> so the regression gate catches the drift.</p>
+    </div>
+  </article>
+</section>
+
+<section id="s-4" data-toc="Next step">
+  <h2>4. Next step</h2>
+  <p>When your comments come back I will fix the planet-40 samples in <code>stats.json</code>, draft a casing price formula with a sampled curve, and, if you pick a flat ratio in 1.3, propose the new <code>r</code> with regenerated tables and a bot run. The data fix from 1.5 is already applied; with no comments, nothing else changes.</p>
+</section>
+  </main>
+</div>
+
+<div class="bar">
+  <div class="tally"></div>
+  <span class="spacer"></span>
+  <button type="button" class="btn" data-action="print">Print</button>
+  <button type="button" class="btn btn-primary open-panel" data-action="open-panel">All comments (<b>0</b>)</button>
+</div>
+
+<div class="panel-backdrop"></div>
+<aside class="panel" aria-label="All comments">
+  <div class="panel-head">
+    <h2>Comments and decisions</h2>
+    <button type="button" class="btn" data-action="close-panel">Close</button>
+  </div>
+  <div class="panel-body"></div>
+  <div class="panel-foot">
+    <button type="button" class="btn btn-primary" data-action="copy-md">Copy as Markdown</button>
+    <button type="button" class="btn" data-action="download-md">Download .md</button>
+    <button type="button" class="btn btn-danger" data-action="clear-all">Clear all</button>
+  </div>
+</aside>
+
+<script>
+/* osilion-html runtime. Inlined into every report by scripts/build.*
+ *
+ * Responsibilities:
+ *  - build the left table of contents from <h2> sections and .point cards, with scroll-spy
+ *  - inject a comment field into every .point (and .option) card
+ *  - inject Approve / Reject controls (body[data-mode="approval"] or .point[data-decision])
+ *  - inject "Prefer this" on .option cards inside .alternatives
+ *  - persist everything in localStorage under the document id
+ *  - list all comments and decisions in a side panel, copy them as Markdown
+ *  - render Mermaid diagrams and Chart.js charts (data-chart JSON on <canvas>)
+ */
+(function () {
+  "use strict";
+
+  var doc = document;
+  var root = doc.documentElement;
+  var DOC_ID = root.getAttribute("data-doc") || doc.title || "osilion";
+  var STORE_KEY = "osilion:" + DOC_ID;
+  var MODE = doc.body.getAttribute("data-mode") || "findings";
+
+  var ICON = {
+    comment: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    cross: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+    star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>',
+    list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'
+  };
+
+  /* ---------------- state ---------------- */
+  var state = load();
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); } catch (e) { return {}; }
+  }
+  var saveTimer = null;
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* private window etc. */ }
+    }, 150);
+  }
+  function entry(id) { return state[id] || (state[id] = {}); }
+
+  /* ---------------- helpers ---------------- */
+  function el(tag, cls, html) {
+    var e = doc.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function text(node) { return (node ? node.textContent : "").replace(/\s+/g, " ").trim(); }
+  function pointTitle(p) {
+    var h = p.querySelector(".point-head h3, h3");
+    return text(h) || p.id;
+  }
+  function pointRef(p) { return p.getAttribute("data-ref") || text(p.querySelector(".ref")) || ""; }
+  function wantsDecision(p) {
+    var attr = p.getAttribute("data-decision");
+    if (attr === "false") return false;
+    if (attr != null) return true;
+    return MODE === "approval" && !p.classList.contains("option");
+  }
+  function showToast(msg) {
+    var t = doc.querySelector(".toast");
+    if (!t) { t = el("div", "toast"); doc.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._h);
+    t._h = setTimeout(function () { t.classList.remove("show"); }, 1600);
+  }
+
+  /* ---------------- points: ids, comments, decisions, preference ---------------- */
+  var points = Array.prototype.slice.call(doc.querySelectorAll(".point"));
+  points.forEach(function (p, i) { if (!p.id) p.id = "p-" + (i + 1); });
+
+  function decoratePoint(p) {
+    var head = p.querySelector(".point-head");
+    if (!head) {
+      head = el("header", "point-head");
+      var h3 = p.querySelector("h3");
+      if (h3) { h3.parentNode.insertBefore(head, h3); head.appendChild(h3); } else { p.insertBefore(head, p.firstChild); }
+    }
+    var controls = el("div", "controls");
+    head.appendChild(controls);
+
+    if (p.classList.contains("option") && p.closest(".alternatives")) addPrefer(p, controls);
+    if (wantsDecision(p)) addDecision(p, controls);
+    addComment(p, controls);
+    applyState(p);
+  }
+
+  function addComment(p, controls) {
+    var btn = el("button", "btn comment-btn", ICON.comment + "<span>Comment</span>");
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Comment on " + pointTitle(p));
+    controls.appendChild(btn);
+
+    var slot = el("div", "comment-slot");
+    var id = p.id + "-comment";
+    slot.innerHTML = '<label for="' + id + '">Your comment</label>';
+    var ta = el("textarea");
+    ta.id = id;
+    ta.placeholder = "What should change, what is missing, or what you disagree with...";
+    slot.appendChild(ta);
+    p.appendChild(slot);
+
+    btn.addEventListener("click", function () {
+      p.classList.toggle("is-commenting");
+      if (p.classList.contains("is-commenting")) ta.focus();
+    });
+    ta.addEventListener("input", function () {
+      var v = ta.value.trim();
+      if (v) entry(p.id).comment = ta.value; else delete entry(p.id).comment;
+      p.classList.toggle("has-comment", !!v);
+      save(); syncToc(p); tally();
+    });
+  }
+
+  function addDecision(p, controls) {
+    var seg = el("div", "decide");
+    var a = el("button", "approve", ICON.check + "<span>Approve</span>");
+    var r = el("button", "reject", ICON.cross + "<span>Reject</span>");
+    a.type = r.type = "button";
+    seg.appendChild(a); seg.appendChild(r);
+    controls.insertBefore(seg, controls.firstChild);
+    function set(v) {
+      var cur = entry(p.id).decision;
+      var next = cur === v ? null : v;
+      if (next) entry(p.id).decision = next; else delete entry(p.id).decision;
+      save(); applyState(p); syncToc(p); tally();
+    }
+    a.addEventListener("click", function () { set("approved"); });
+    r.addEventListener("click", function () { set("rejected"); });
+  }
+
+  function addPrefer(p, controls) {
+    var btn = el("button", "btn prefer-btn", ICON.star + "<span>Prefer this</span>");
+    btn.type = "button";
+    controls.insertBefore(btn, controls.firstChild);
+    btn.addEventListener("click", function () {
+      var group = p.closest(".alternatives");
+      var was = !!entry(p.id).preferred;
+      group.querySelectorAll(".option").forEach(function (o) { delete entry(o.id).preferred; });
+      if (!was) entry(p.id).preferred = true;
+      save();
+      group.querySelectorAll(".option").forEach(function (o) { applyState(o); syncToc(o); });
+      tally();
+    });
+  }
+
+  function applyState(p) {
+    var s = state[p.id] || {};
+    p.classList.toggle("is-approved", s.decision === "approved");
+    p.classList.toggle("is-rejected", s.decision === "rejected");
+    p.classList.toggle("is-preferred", !!s.preferred);
+    p.classList.toggle("has-comment", !!(s.comment && s.comment.trim()));
+    var a = p.querySelector(".decide .approve"), r = p.querySelector(".decide .reject");
+    if (a) a.classList.toggle("is-on", s.decision === "approved");
+    if (r) r.classList.toggle("is-on", s.decision === "rejected");
+    var pf = p.querySelector(".prefer-btn");
+    if (pf) { pf.classList.toggle("is-on", !!s.preferred); pf.querySelector("span").textContent = s.preferred ? "Preferred" : "Prefer this"; }
+    var ta = p.querySelector(".comment-slot textarea");
+    if (ta && s.comment && ta.value !== s.comment) ta.value = s.comment;
+    var group = p.closest(".alternatives");
+    if (group) group.classList.toggle("has-preference", !!group.querySelector(".option.is-preferred"));
+  }
+
+  points.forEach(decoratePoint);
+
+  /* ---------------- table of contents ---------------- */
+  var tocList = doc.querySelector(".toc ol.toc-list");
+  var tocItems = {};
+  function buildToc() {
+    if (!tocList) return;
+    var sections = doc.querySelectorAll("main.doc section");
+    sections.forEach(function (sec, si) {
+      var h2 = sec.querySelector("h2");
+      if (!h2) return;
+      if (!sec.id) sec.id = "s-" + (si + 1);
+      var li = el("li", "lvl-2");
+      var a = el("a");
+      a.href = "#" + sec.id;
+      a.innerHTML = "<span>" + escapeHtml(sec.getAttribute("data-toc") || text(h2)) + "</span>";
+      li.appendChild(a);
+      tocList.appendChild(li);
+      tocItems[sec.id] = li;
+      var sub = el("ol");
+      sec.querySelectorAll(".point").forEach(function (p) {
+        var pli = el("li", "lvl-3");
+        var pa = el("a");
+        pa.href = "#" + p.id;
+        var ref = pointRef(p);
+        pa.innerHTML = (ref ? '<span class="toc-ref">' + escapeHtml(ref) + "</span>" : "") +
+          "<span>" + escapeHtml(pointTitle(p)) + '</span><span class="toc-dot"></span>';
+        pli.appendChild(pa);
+        sub.appendChild(pli);
+        tocItems[p.id] = pli;
+        syncToc(p);
+      });
+      if (sub.children.length) li.appendChild(sub);
+    });
+  }
+  function syncToc(p) {
+    var li = tocItems[p.id];
+    if (!li) return;
+    ["has-comment", "is-approved", "is-rejected", "is-preferred"].forEach(function (c) { li.classList.toggle(c, p.classList.contains(c)); });
+  }
+  function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  buildToc();
+
+  // Keep the active entry visible inside the table of contents, and scroll
+  // nothing else. scrollIntoView*() scrolls every scrollable ancestor,
+  // including the page: on a narrow or zoomed-in viewport the TOC sits at the
+  // top of the page, so it yanked the reader back up there, and the new scroll
+  // position re-fired the spy. Only the TOC's own box moves, instantly, and
+  // only while the TOC is actually its own scroll container.
+  var tocBox = doc.querySelector(".toc");
+  function keepTocEntryVisible(li) {
+    if (!li || !tocBox) return;
+    var style = window.getComputedStyle(tocBox);
+    var scrollsOnItsOwn = style.position === "sticky" && /(auto|scroll)/.test(style.overflowY) &&
+      tocBox.scrollHeight > tocBox.clientHeight;
+    if (!scrollsOnItsOwn) return;
+    var box = tocBox.getBoundingClientRect();
+    var item = li.getBoundingClientRect();
+    var margin = 48;
+    var delta = 0;
+    if (item.top < box.top + margin) delta = item.top - box.top - margin;
+    else if (item.bottom > box.bottom - margin) delta = item.bottom - box.bottom + margin;
+    if (delta !== 0) tocBox.scrollTo({ top: tocBox.scrollTop + delta, behavior: "auto" });
+  }
+
+  // scroll-spy
+  var spyTargets = Object.keys(tocItems).map(function (id) { return doc.getElementById(id); }).filter(Boolean);
+  if ("IntersectionObserver" in window && spyTargets.length) {
+    var visible = new Set();
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) visible.add(e.target.id); else visible.delete(e.target.id); });
+      var first = spyTargets.find(function (t) { return visible.has(t.id); });
+      if (!first) return;
+      Object.keys(tocItems).forEach(function (id) { tocItems[id].querySelector("a").classList.toggle("is-active", id === first.id); });
+      keepTocEntryVisible(tocItems[first.id]);
+    }, { rootMargin: "-10% 0px -70% 0px", threshold: 0 });
+    spyTargets.forEach(function (t) { io.observe(t); });
+  }
+
+  /* ---------------- bottom bar, tally, panel ---------------- */
+  var bar = doc.querySelector(".bar");
+  var tallyEl = bar ? bar.querySelector(".tally") : null;
+  var decisionPoints = points.filter(wantsDecision);
+  function tally() {
+    if (!tallyEl) return;
+    var comments = points.filter(function (p) { return p.classList.contains("has-comment"); }).length;
+    var parts = ['<span><b>' + comments + "</b> comment" + (comments === 1 ? "" : "s") + "</span>"];
+    if (decisionPoints.length) {
+      var ap = decisionPoints.filter(function (p) { return p.classList.contains("is-approved"); }).length;
+      var rj = decisionPoints.filter(function (p) { return p.classList.contains("is-rejected"); }).length;
+      parts.push('<span class="ok"><b>' + ap + "</b> approved</span>");
+      parts.push('<span class="bad"><b>' + rj + "</b> rejected</span>");
+      parts.push("<span><b>" + (decisionPoints.length - ap - rj) + "</b> undecided</span>");
+    }
+    var pref = points.filter(function (p) { return p.classList.contains("is-preferred"); });
+    if (pref.length) parts.push("<span>Preferred: <b>" + escapeHtml(pref.map(pointTitle).join(", ")) + "</b></span>");
+    tallyEl.innerHTML = parts.join("");
+    var cb = bar.querySelector(".open-panel b");
+    if (cb) cb.textContent = comments;
+  }
+
+  function collect() {
+    var out = { comments: [], approved: [], rejected: [], undecided: [], preferred: [] };
+    points.forEach(function (p) {
+      var s = state[p.id] || {};
+      var item = { id: p.id, ref: pointRef(p), title: pointTitle(p), comment: (s.comment || "").trim(), decision: s.decision, preferred: !!s.preferred };
+      if (item.comment) out.comments.push(item);
+      if (item.preferred) out.preferred.push(item);
+      if (wantsDecision(p)) {
+        if (s.decision === "approved") out.approved.push(item);
+        else if (s.decision === "rejected") out.rejected.push(item);
+        else out.undecided.push(item);
+      }
+    });
+    return out;
+  }
+  function label(it) { return (it.ref ? it.ref + " " : "") + it.title; }
+
+  function toMarkdown() {
+    var c = collect();
+    var lines = ["## Review of \"" + doc.title + "\"", ""];
+    lines.push("### Comments");
+    if (!c.comments.length) lines.push("- (none)");
+    c.comments.forEach(function (it) {
+      var flags = [];
+      if (it.decision) flags.push(it.decision);
+      if (it.preferred) flags.push("preferred");
+      lines.push("- **" + label(it) + "**" + (flags.length ? " (" + flags.join(", ") + ")" : "") + ": " + it.comment.replace(/\n+/g, " "));
+    });
+    if (decisionPoints.length) {
+      lines.push("", "### Decisions");
+      lines.push("- Approved: " + (c.approved.map(label).join("; ") || "none"));
+      lines.push("- Rejected: " + (c.rejected.map(label).join("; ") || "none"));
+      lines.push("- Undecided: " + (c.undecided.map(label).join("; ") || "none"));
+    }
+    if (c.preferred.length) {
+      lines.push("", "### Preferred option");
+      c.preferred.forEach(function (it) { lines.push("- " + label(it)); });
+    }
+    return lines.join("\n");
+  }
+
+  function renderPanel() {
+    var body = doc.querySelector(".panel-body");
+    if (!body) return;
+    var c = collect();
+    var html = "<h3>Comments</h3>";
+    html += c.comments.length ? "<ul>" + c.comments.map(function (it) {
+      return "<li>" + (it.ref ? '<span class="ref">' + escapeHtml(it.ref) + "</span>" : "") +
+        '<a href="#' + it.id + '">' + escapeHtml(it.title) + "</a>" +
+        (it.decision ? ' <span class="badge badge-' + (it.decision === "approved" ? "ok" : "bad") + '">' + it.decision + "</span>" : "") +
+        (it.preferred ? ' <span class="badge badge-accent">preferred</span>' : "") +
+        "<br>" + escapeHtml(it.comment).replace(/\n/g, "<br>") + "</li>";
+    }).join("") + "</ul>" : '<p class="empty">No comments yet. Use the Comment button on any item.</p>';
+    if (decisionPoints.length) {
+      html += "<h3>Decisions</h3><ul>" +
+        "<li><b>Approved</b>: " + (c.approved.map(linkLabel).join("; ") || "none") + "</li>" +
+        "<li><b>Rejected</b>: " + (c.rejected.map(linkLabel).join("; ") || "none") + "</li>" +
+        "<li><b>Undecided</b>: " + (c.undecided.map(linkLabel).join("; ") || "none") + "</li></ul>";
+    }
+    if (c.preferred.length) html += "<h3>Preferred option</h3><ul>" + c.preferred.map(function (it) { return "<li>" + linkLabel(it) + "</li>"; }).join("") + "</ul>";
+    body.innerHTML = html;
+    body.querySelectorAll("a[href^='#']").forEach(function (a) { a.addEventListener("click", closePanel); });
+  }
+  function linkLabel(it) { return '<a href="#' + it.id + '">' + escapeHtml(label(it)) + "</a>"; }
+
+  function openPanel() { renderPanel(); doc.body.classList.add("panel-open"); }
+  function closePanel() { doc.body.classList.remove("panel-open"); }
+
+  function copyMarkdown() {
+    var md = toMarkdown();
+    var done = function () { showToast("Copied as Markdown. Paste it back into the chat."); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { fallbackCopy(md); done(); });
+    else { fallbackCopy(md); done(); }
+  }
+  function fallbackCopy(s) {
+    var ta = el("textarea"); ta.value = s; ta.style.position = "fixed"; ta.style.opacity = "0";
+    doc.body.appendChild(ta); ta.select(); try { doc.execCommand("copy"); } catch (e) {} doc.body.removeChild(ta);
+  }
+  function downloadMarkdown() {
+    var blob = new Blob([toMarkdown()], { type: "text/markdown" });
+    var a = el("a"); a.href = URL.createObjectURL(blob);
+    a.download = (DOC_ID.replace(/[^\w.-]+/g, "-") || "review") + "-comments.md";
+    doc.body.appendChild(a); a.click(); doc.body.removeChild(a);
+  }
+  function clearAll() {
+    if (!confirm("Clear every comment, decision and preference on this page?")) return;
+    state = {}; save();
+    points.forEach(function (p) { var ta = p.querySelector("textarea"); if (ta) ta.value = ""; p.classList.remove("is-commenting"); applyState(p); syncToc(p); });
+    tally(); renderPanel();
+  }
+
+  doc.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-action]");
+    if (!t) return;
+    var act = t.getAttribute("data-action");
+    if (act === "open-panel") openPanel();
+    else if (act === "close-panel") closePanel();
+    else if (act === "copy-md") copyMarkdown();
+    else if (act === "download-md") downloadMarkdown();
+    else if (act === "clear-all") clearAll();
+    else if (act === "print") window.print();
+  });
+  doc.addEventListener("keydown", function (e) { if (e.key === "Escape") closePanel(); });
+  var backdrop = doc.querySelector(".panel-backdrop");
+  if (backdrop) backdrop.addEventListener("click", closePanel);
+  tally();
+
+  /* ---------------- meta fill-ins ---------------- */
+  doc.querySelectorAll("[data-fill='point-count']").forEach(function (n) { n.textContent = points.length; });
+  doc.querySelectorAll("[data-fill='date']").forEach(function (n) { if (!text(n)) n.textContent = new Date().toISOString().slice(0, 10); });
+
+  /* ---------------- charts (Chart.js) ---------------- */
+  var PALETTE = ["#4f46e5", "#059669", "#d97706", "#e11d48", "#0284c7", "#7c3aed", "#65a30d", "#db2777"];
+  function renderCharts() {
+    if (typeof Chart === "undefined") return;
+    var css = getComputedStyle(root);
+    var ink = css.getPropertyValue("--ink-2").trim() || "#44403c";
+    var line = css.getPropertyValue("--line").trim() || "#e7e5e4";
+    Chart.defaults.color = ink;
+    Chart.defaults.borderColor = line;
+    Chart.defaults.font.family = css.getPropertyValue("--sans").trim() || "system-ui";
+    doc.querySelectorAll("canvas.chart[data-chart]").forEach(function (cv) {
+      var cfg;
+      try { cfg = JSON.parse(cv.getAttribute("data-chart")); } catch (e) { console.warn("osilion: bad data-chart JSON", e); return; }
+      var single = cfg.type === "pie" || cfg.type === "doughnut" || cfg.type === "polarArea";
+      (cfg.data && cfg.data.datasets || []).forEach(function (ds, i) {
+        if (ds.backgroundColor == null) ds.backgroundColor = single ? PALETTE : PALETTE[i % PALETTE.length] + (cfg.type === "line" ? "33" : "cc");
+        if (ds.borderColor == null) ds.borderColor = single ? "#ffffff" : PALETTE[i % PALETTE.length];
+        if (ds.borderWidth == null) ds.borderWidth = cfg.type === "line" ? 2 : 1;
+        if (cfg.type === "line" && ds.tension == null) ds.tension = 0.3;
+      });
+      cfg.options = Object.assign({ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { boxWidth: 12 } } } }, cfg.options || {});
+      if (!cv.parentElement.classList.contains("chart-wrap")) { var w = el("div", "chart-wrap"); cv.parentNode.insertBefore(w, cv); w.appendChild(cv); }
+      new Chart(cv.getContext("2d"), cfg);
+    });
+  }
+  if (doc.readyState === "complete") renderCharts(); else window.addEventListener("load", renderCharts);
+
+  /* ---------------- mermaid ---------------- */
+  window.__osilionMermaidInit = function (mermaid) {
+    var dark = matchMedia("(prefers-color-scheme: dark)").matches && root.getAttribute("data-theme") !== "light";
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: dark ? "dark" : "neutral",
+      securityLevel: "loose",
+      fontFamily: "inherit",
+      flowchart: { curve: "basis", htmlLabels: true }
+    });
+  };
+})();
+</script>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  window.__osilionMermaidInit(mermaid);
+</script>
+</body>
+</html>

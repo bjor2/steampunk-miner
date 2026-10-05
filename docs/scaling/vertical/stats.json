@@ -1,0 +1,72 @@
+{
+  "updated": "2026-10-05T12:28:08.198187+00:00",
+  "sources": [
+    "docs/economy/economy-constants.json",
+    "docs/economy/vehicle-table.md",
+    "docs/economy/price-table.md",
+    "issues/14",
+    "issues/6"
+  ],
+  "tracks": [
+    "drill_power",
+    "drill_tip",
+    "hull",
+    "cargo_hold",
+    "boiler",
+    "engine",
+    "casing_grade"
+  ],
+  "samples": {
+    "planet": [
+      1,
+      5,
+      10,
+      20,
+      30,
+      40
+    ],
+    "drill_power_at_end_of_planet": [
+      6.55,
+      99.3,
+      2976,
+      2670000.0,
+      2400000000.0,
+      2150000000000.0
+    ],
+    "drill_power_next_cost": [
+      787,
+      137355,
+      87200000.0,
+      35100000000000.0,
+      1.42e+19,
+      5.71e+24
+    ],
+    "hull_max": [
+      125,
+      1904,
+      57043,
+      51200000.0,
+      46000000000.0,
+      41300000000000.0
+    ],
+    "travel_fee": [
+      60.8,
+      7882,
+      3450000.0,
+      662000000000.0,
+      1.27e+17,
+      2.43e+22
+    ]
+  },
+  "pacing_targets_min": {
+    "first_ten_minutes": "see #16",
+    "planet1_core": "30-60",
+    "slice2": "90-130"
+  },
+  "sourceHash": "03c55a635812b640",
+  "sourceHashAlgo": "sha256-16 of path+bytes for economy-constants, vehicle-table, price-table",
+  "notes": {
+    "planet40_fix": "drill_power_next_cost and travel_fee were planet-36 (3.27e22 / 1.88e20); corrected to price-table p40 (5.71e24 / 2.43e22)",
+    "recompute": "Skip full recompute when sourceHash matches; only refresh samples if economy tables/constants change"
+  }
+}
