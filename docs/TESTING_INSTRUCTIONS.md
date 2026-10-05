@@ -99,6 +99,10 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   `installSaveSlots(...)`, `await checkpointWrites()` before reading what was written, and simulate quit
   and resume as `resetGameStore()` plus the same slots, then `loadCheckpoint()` and `resumeCheckpoint`.
   Uninstall with `installSaveSlots(null)` in `afterEach`.
+- Hint specs (#16, #27): the hint and transmission boards are pure (`src/systems/hints/`) and are
+  fed authority moments (a scripted session, or the pacing bot's `listener`); the store specs
+  call `startPlaques()` as bootstrap does, install an in-memory `PreferencesStorage` for the
+  seen-set, and simulate a reload as `resetGameStore()` plus `adoptPreferences` of the same file.
 - Stubs in `src/debug/debugApi.ts` throw `DebugCommandNotImplementedError`; implement them with the
   system they poke, never as a silent no-op.
 

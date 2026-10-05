@@ -72,6 +72,7 @@ import {
 } from './authorityLink'
 import { recordCheckpointLoaded, writeCheckpointAfter, type Checkpoint } from './checkpoint'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
+import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import {
   presentationActionsOf,
@@ -82,7 +83,8 @@ import {
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
-export interface GameState extends CombatDebugActions, PresentationValues, PresentationActions {
+export interface GameState
+  extends CombatDebugActions, PresentationValues, PresentationActions, HintValues, HintActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -157,6 +159,7 @@ type GameValues = Pick<
   | 'platform'
   | 'isCoreCompleted'
   | keyof PresentationValues
+  | keyof HintValues
   | 'travelTransition'
 >
 
@@ -175,6 +178,7 @@ export const STARTING_VALUES: GameValues = {
   platform: platformReplicaOf(startingAuthorityState()),
   isCoreCompleted: false,
   ...STARTING_PRESENTATION,
+  ...STARTING_HINTS,
   travelTransition: null,
 }
 
@@ -182,6 +186,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...STARTING_VALUES,
   ...combatDebugActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
+  ...hintActionsOf(set, get),
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
@@ -213,6 +218,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
   applyScenario: (scenario) => {
     refuseProblems(validateScenario(scenario))
+    get().allowPlaquesFor(scenario)
     const scriptStartTick = readAuthorityState().tick
     get().applyStartScenario(startOfScenario(scenario))
     runScenarioScript(scriptStartTick, scenario.script ?? [], get().fastForward)
@@ -339,11 +345,13 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
- * transition when the events travelled, logs the events, then writes the checkpoint when due.
+ * transition when the events travelled, shows the hints they trigger, logs the events, then
+ * writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
   startTravelTransition(travelTransitionOf(events))
+  useGameStore.getState().observePlaques(events)
   recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)
   writeCheckpointAfter(events, runEventPlaceOf(useGameStore.getState()))
 }

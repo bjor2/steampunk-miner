@@ -16,8 +16,25 @@ describe('preferences file', () => {
     const prefs = {
       ...withPreference(DEFAULT_PREFERENCES, 'cameraMode', 'fixed'),
       bindings: { aim_left: { keyboard: ['KeyJ'] } },
+      seenHints: ['hint_move', 'transmission_opening'],
     }
     expect(readPreferences(preferencesText(prefs))).toEqual({ prefs, problems: [] })
+  })
+
+  it('reads a file from before the seen-set as one with nothing seen', () => {
+    const { seenHints: _seen, ...older } = DEFAULT_PREFERENCES
+    const text = JSON.stringify({ preferencesVersion: 1, ...older, shake: false })
+    expect(readPreferences(text)).toEqual({
+      prefs: { ...DEFAULT_PREFERENCES, shake: false },
+      problems: [],
+    })
+  })
+
+  it('refuses a seen-set naming a hint the table does not have', () => {
+    const text = preferencesText({ ...DEFAULT_PREFERENCES, seenHints: ['hint_swim'] })
+    expect(readPreferences(text).problems).toEqual([
+      'seenHints: "hint_swim" is not a hint id, or is listed twice',
+    ])
   })
 
   it('refuses a broken file whole, lists every problem and keeps the defaults', () => {

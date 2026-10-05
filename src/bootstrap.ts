@@ -52,6 +52,7 @@ export async function startGame(): Promise<void> {
   keepRunFilesWritten(shell, run)
   exposeDebugHandles(shell, run.runId)
   applyLaunchScenario(shell)
+  startHints()
   writeMetadata(shell, run)
 }
 
@@ -136,6 +137,11 @@ function applyLaunchScenario(shell: Shell): void {
   const { scenario, problems } = parseScenario(text)
   if (problems.length > 0) throw new Error(`launch scenario refused: ${problems.join('; ')}`)
   useGameStore.getState().applyScenario(scenario as Scenario)
+}
+
+/** The run has started (#16): the opening transmission and `hint_move` go up unless seen. */
+function startHints(): void {
+  useGameStore.getState().startPlaques()
 }
 
 function writeMetadata(shell: Shell, run: RunFiles): void {

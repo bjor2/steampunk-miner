@@ -53,6 +53,8 @@ export interface PresentationActions {
   togglePreference(name: PreferenceName): void
   /** The preferences file read at start; already validated, so nothing is written back. */
   adoptPreferences(prefs: Preferences): void
+  /** The hints and transmissions shown so far (#16), kept in the preferences file. */
+  rememberSeenHints(seenHints: readonly string[]): void
   /** Refused whole: returns the problems and changes nothing, or [] and the overrides rule. */
   setBindings(overrides: unknown): string[]
   resetBindings(): void
@@ -105,6 +107,7 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
     togglePreference: (name) => get().setPreference(name, toggledValueOf(get().prefs, name)),
     adoptPreferences: (prefs) =>
       set({ prefs, bindings: bindingsWithOverrides(ACTION_MAP, prefs.bindings).bindings }),
+    rememberSeenHints: (seenHints) => savePrefs({ ...get().prefs, seenHints }),
     setBindings: (overrides) => {
       const outcome = bindingsWithOverrides(ACTION_MAP, overrides)
       set({ bindingProblems: outcome.problems })

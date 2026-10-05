@@ -7,7 +7,15 @@
 import type { ActionId, Bindings, InputContext } from '../systems/input/actionMap'
 import type { Preferences } from '../systems/input/preferences'
 import { selectHudModel, type HudModel } from '../systems/views/hudModel'
+import type { HintBoard } from '../systems/hints/hintBoard'
+import type { TransmissionBoard } from '../systems/hints/transmissionBoard'
 import type { FocusStop } from '../systems/views/menuFocus'
+import {
+  isQuickServiceHighlighted,
+  selectPlaqueModel,
+  type PlaqueModel,
+  type PlaqueSources,
+} from '../systems/views/plaqueModel'
 import {
   PLATFORM_START_FOCUS,
   selectPlatformModel,
@@ -30,6 +38,9 @@ export interface ScreenSources {
   bindingProblems: readonly string[]
   rebindingActionId: ActionId | null
   isTravelArmed: boolean
+  hintBoard: HintBoard
+  transmissionBoard: TransmissionBoard
+  arePlaquesAllowed: boolean
 }
 
 export interface MenuScreen {
@@ -50,7 +61,23 @@ export function hudModelOf(sources: ScreenSources): HudModel {
 export function platformModelOf(sources: ScreenSources): PlatformModel {
   return selectPlatformModel(readAuthorityState(), sources.playerId, {
     isTravelArmed: sources.isTravelArmed,
+    isQuickServiceHighlighted: isQuickServiceHighlighted(plaqueSourcesOf(sources)),
   })
+}
+
+export function plaqueModelOf(sources: ScreenSources): PlaqueModel {
+  return selectPlaqueModel(plaqueSourcesOf(sources))
+}
+
+/** Hints need both the "Show hints" setting and the scenario's leave; transmissions the latter. */
+function plaqueSourcesOf(sources: ScreenSources): PlaqueSources {
+  return {
+    hintBoard: sources.hintBoard,
+    transmissionBoard: sources.transmissionBoard,
+    bindings: sources.bindings,
+    isShowingHints: sources.prefs.hintsEnabled && sources.arePlaquesAllowed,
+    isShowingTransmissions: sources.arePlaquesAllowed,
+  }
 }
 
 export function settingsModelOf(sources: ScreenSources): SettingsModel {

@@ -39,6 +39,9 @@ function isScreenSourceChanged(state: GameState, previous: GameState): boolean {
     state.prefs !== previous.prefs ||
     state.bindings !== previous.bindings ||
     state.bindingProblems !== previous.bindingProblems ||
-    state.rebindingActionId !== previous.rebindingActionId
+    state.rebindingActionId !== previous.rebindingActionId ||
+    state.hintBoard !== previous.hintBoard ||
+    state.transmissionBoard !== previous.transmissionBoard ||
+    state.arePlaquesAllowed !== previous.arePlaquesAllowed
   )
 }

@@ -29,3 +29,13 @@
   opacity: 0.55;
   text-decoration: line-through;
 }
+
+/* The first visit's "Sell, repair and recharge" (#16): a thicker frame and a star, not colour. */
+.button[data-state='highlighted'] {
+  border-width: 2px;
+  font-weight: bold;
+}
+
+.button[data-state='highlighted']::after {
+  content: '\00A0\2605';
+}

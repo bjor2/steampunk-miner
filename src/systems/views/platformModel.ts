@@ -43,6 +43,8 @@ import { UI_IDS } from './screenIds'
 
 export interface PlatformUiState {
   isTravelArmed: boolean
+  /** While the dock hint is up, its first visit (#16). */
+  isQuickServiceHighlighted: boolean
 }
 
 export interface PlatformHeader {
@@ -82,6 +84,7 @@ export interface TravelReading {
 
 export interface PlatformFooter {
   quickService: ScreenButton
+  isQuickServiceHighlighted: boolean
   quickTotal: AmountReading
   /** Null on the slice's last planet, where the end-of-slice card stands instead. */
   travel: TravelReading | null
@@ -176,6 +179,7 @@ function footerOf(state: AuthorityState, playerId: string, ui: PlatformUiState):
       'Sell, repair and recharge',
       quickServiceCommand(),
     ),
+    isQuickServiceHighlighted: ui.isQuickServiceHighlighted,
     quickTotal: amountReading(add(add(quote.saleValue, quote.repairCost), quote.rechargeCost)),
     travel: hasEndCard ? null : travelReadingOf(state, playerId, ui.isTravelArmed),
     hasEndCard,

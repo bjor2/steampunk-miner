@@ -1,0 +1,21 @@
+/* Over the HUD and the platform screen, never catching the pointer (#16: never takes input). */
+.plaques {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.transmission {
+  position: absolute;
+  top: 4.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Above the bottom-centre prompts (#33 section 5). */
+.hint {
+  position: absolute;
+  bottom: 4rem;
+  left: 50%;
+  transform: translateX(-50%);
+}

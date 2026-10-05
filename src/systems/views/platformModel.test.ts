@@ -23,7 +23,10 @@ function dockedSession() {
 }
 
 function platformOf(session: ReturnType<typeof createScriptedSession>, isTravelArmed = false) {
-  return selectPlatformModel(session.state(), 'p1', { isTravelArmed })
+  return selectPlatformModel(session.state(), 'p1', {
+    isTravelArmed,
+    isQuickServiceHighlighted: false,
+  })
 }
 
 function eventsAfter(session: ReturnType<typeof createScriptedSession>, run: () => void) {

@@ -24,9 +24,13 @@ const CANCEL_REBINDING_KEY = 'Escape'
 const heldActions: ActionId[] = []
 const actionsOfKey = new Map<string, ActionId[]>()
 
-/** One key from the shell: a rebinding capture, or the actions its chord has in the top layer. */
+/**
+ * One key from the shell: a rebinding capture, or the actions its chord has in the top layer.
+ * Any key also takes a shown transmission down (#16), and still does what it is bound to.
+ */
 export function routeKeyChange(key: KeyChange): void {
   if (!key.isDown) return releaseKey(key.code)
+  useGameStore.getState().dismissTransmission()
   if (useGameStore.getState().rebindingActionId !== null) return captureRebinding(key)
   if (key.isRepeat) return
   pressKey(key.code, actionsOfKeyNow(key))

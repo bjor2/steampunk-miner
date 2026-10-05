@@ -5,7 +5,12 @@ import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { resetGameStore, useGameStore } from '../store/gameStore'
 import { pressAction, releaseAction, resetInput } from '../store/inputRuntime'
-import { readHudModel, readPlatformModel, readSettingsModel } from '../store/screenReads'
+import {
+  readHudModel,
+  readPlaqueModel,
+  readPlatformModel,
+  readSettingsModel,
+} from '../store/screenReads'
 import {
   createScriptedSession,
   mineTile,
@@ -14,11 +19,13 @@ import {
 import { teleportToDockCommand } from '../systems/vehicle/vehicleCommands'
 import { selectHudModel, type HudModel } from '../systems/views/hudModel'
 import { selectPlatformModel, type PlatformModel } from '../systems/views/platformModel'
+import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { HudView } from './hud/HudView'
 import { UI_IDS, type UiId } from './ids'
 import { PlatformView } from './platform/PlatformView'
+import { PlaquesView } from './plaques/PlaquesView'
 import { SettingsView } from './settings/SettingsView'
 
 // #33 acceptance 12: both screens rendered on the server (no browser, no DOM) carry an element for
@@ -138,6 +145,15 @@ function settingsTexts(model: SettingsModel): Partial<Record<UiId, string | null
   }
 }
 
+function plaqueTexts(model: PlaqueModel): Partial<Record<UiId, string | null>> {
+  return {
+    ...(model.hint === null ? {} : { [UI_IDS.hudHintPlaque]: model.hint.lines.join('') }),
+    ...(model.transmission === null
+      ? {}
+      : { [UI_IDS.hudTransmission]: model.transmission.lines.join('') }),
+  }
+}
+
 /** Renders a screen and checks every expected id; returns the ids it found. */
 function checkScreen(element: ReactElement, texts: Partial<Record<UiId, string | null>>): string[] {
   const html = renderToString(element)
@@ -152,6 +168,11 @@ function checkScreen(element: ReactElement, texts: Partial<Record<UiId, string |
 function renderHud(): string[] {
   const model = readHudModel()
   return checkScreen(createElement(HudView, { model, isFlashing: true }), hudTexts(model))
+}
+
+function renderPlaques(): string[] {
+  const model = readPlaqueModel()
+  return checkScreen(createElement(PlaquesView, { model }), plaqueTexts(model))
 }
 
 function renderPlatform(): string[] {
@@ -213,6 +234,8 @@ describe('screen ids (#33 acceptance 12)', () => {
     const found = new Set<string>()
     const keep = (ids: string[]) => ids.forEach((id) => found.add(id))
     keep(renderHud())
+    game().startPlaques()
+    keep(renderPlaques())
     tap('interact')
     game().setCoreFragments(63)
     game().giveMoney('60.8')
@@ -235,7 +258,10 @@ describe('screen ids (#33 acceptance 12)', () => {
   it('carries the tier and family on every shop row', () => {
     const session = sessionWithOre(4)
     session.submit(400, teleportToDockCommand())
-    const model = selectPlatformModel(session.state(), 'p1', { isTravelArmed: false })
+    const model = selectPlatformModel(session.state(), 'p1', {
+      isTravelArmed: false,
+      isQuickServiceHighlighted: false,
+    })
     const html = renderToString(createElement(PlatformView, { model, focusedId: '' }))
     const rows = [...html.matchAll(/data-testid="shop-row-\d+"[^>]*/g)]
     expect(rows.length).toBe(model.shop.rows.length)

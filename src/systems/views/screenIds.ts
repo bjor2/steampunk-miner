@@ -26,6 +26,8 @@ export const UI_IDS = {
   hudDockPrompt: 'hud-dock-prompt',
   hudDebugMark: 'hud-debug-mark',
   hudWarningEnergy: 'hud-warning-energy',
+  hudHintPlaque: 'hud-hint-plaque',
+  hudTransmission: 'hud-transmission',
   platformScreen: 'platform-screen',
   platformMoney: 'platform-money',
   platformPlanet: 'platform-planet',
