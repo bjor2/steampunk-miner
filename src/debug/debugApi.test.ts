@@ -292,6 +292,21 @@ describe('debug api: vehicle', () => {
     expect(game().debugApplied).toBe(true)
   })
 
+  it.each([
+    ['drill tracks first', ['drill_power', 'drill_tip', 'engine', 'boiler', 'cargo_hold', 'hull']],
+    ['hull first', ['hull', 'cargo_hold', 'boiler', 'engine', 'drill_tip', 'drill_power']],
+  ])('crosses T2 then T3 with one tier change logged each, in any order (%s)', (_order, tracks) => {
+    // T2 = 8 and T3 = 20 (#20): levels of 4 per track sum 4, 8, ..., 24.
+    const debug = createDebugApi()
+    const tiers = tracks.map((track) => {
+      debug.setUpgrade(track, 4)
+      return game().vehicle.visualTier
+    })
+    expect(tiers).toEqual([1, 2, 2, 2, 3, 3])
+    const changes = sink.events.filter((event) => event.event === 'vehicle_configuration_changed')
+    expect(changes.map((event) => event.data)).toEqual([{ visualTier: 2 }, { visualTier: 3 }])
+  })
+
   it('sets energy and hull from canonical strings', () => {
     const debug = createDebugApi()
     expect(debug.setEnergy('37.5')).toEqual({ ok: true })

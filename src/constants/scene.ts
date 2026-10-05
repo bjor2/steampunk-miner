@@ -65,10 +65,6 @@ export const SPARK_COLOUR = '#ffb347'
 /** Fixed seed for the spark spray: presentation only, never part of the world. */
 export const SPARK_SEED = 0x5a7c
 
-/** Placeholder vehicle look: copper body, darker drill head (design doc section 9 art later). */
-export const DRILL_HEAD_COLOUR = '#5b3a1e'
-export const DRILL_HEAD_SIZE = 0.35
-
 /** The travel transition lasts at most 10 s and can be skipped (#8, #10); presentation only. */
 export const TRAVEL_TRANSITION_SECONDS = 10
 
