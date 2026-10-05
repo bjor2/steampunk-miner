@@ -3,6 +3,8 @@ import { FACING } from '../vehicle/vehiclePose'
 import { chunkOfSample, localSampleOf, MM_PER_SAMPLE, sampleIndexOf } from '../world/sampleGrid'
 import { currentCasingOfChunk, currentDensityOfChunk } from '../world/worldState'
 import type { DomainEvent } from './domainEvent'
+import { readSnapshot, takeSnapshot } from './sessionSnapshot'
+import { stateDigest } from './stateDigest'
 import {
   createScriptedSession,
   FREEZE_ENEMIES,
@@ -113,6 +115,33 @@ describe('automatic casing placement', () => {
     const placed = placedOf(session.events())
     expect(placed).toHaveLength(20)
     expect(placed.every((event) => event.grade === 3)).toBe(true)
+  })
+
+  it('relines the tunnel at the new grade when the vehicle drills back through it after an upgrade', () => {
+    const session = createScriptedSession()
+    session.submit(0, FREEZE_ENEMIES)
+    const dug = driveThrough(session, 0, stepsBetween(START.x, START.x + 9900), REPORT_TICKS)
+    const out = driveThrough(session, dug, stepsBetween(START.x + 9900, START.x - 2200), 0)
+    session.submit(out, { type: 'debug.setCasingGrade', payload: { grade: 3 } })
+    const before = session.events().length
+    const back = driveThrough(
+      session,
+      out,
+      stepsBetween(START.x - 2200, START.x + 9900),
+      REPORT_TICKS,
+    )
+    driveThrough(session, back, stepsBetween(START.x + 9900, START.x - 2200), 0)
+    const relaid = placedOf(session.events().slice(before))
+    expect(relaid.every((event) => event.grade === 3)).toBe(true)
+    expect(relaid.reduce((sum, event) => sum + event.relined, 0)).toBeGreaterThan(0)
+  })
+
+  it('replays the same dig to the same digest, and a snapshot keeps the trail', () => {
+    const first = digTwentyMetres().session.state()
+    const again = digTwentyMetres().session.state()
+    expect(stateDigest(again)).toBe(stateDigest(first))
+    const restored = readSnapshot(JSON.parse(JSON.stringify(takeSnapshot(first))))
+    expect('state' in restored && stateDigest(restored.state)).toBe(stateDigest(first))
   })
 
   it('lays no ring from travel without drilling', () => {
