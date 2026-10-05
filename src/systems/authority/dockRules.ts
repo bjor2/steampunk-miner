@@ -9,9 +9,8 @@
  * A vehicle with energy 0 in the pad zone is still `active` (it never strands there, #7), so it
  * docks like any other: no tow, no fee.
  */
-import { DOCK_STATIONARY_MM_PER_SECOND } from '../../constants/balance'
 import { toCanonical } from '../money'
-import { isInPadZone, type VehiclePose } from '../vehicle/vehiclePose'
+import { isInPadZone, isPoseStationary, type VehiclePose } from '../vehicle/vehiclePose'
 import { cargoUnitsOf, isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import {
@@ -86,15 +85,8 @@ function padZoneRejection(state: AuthorityState, pose: VehiclePose | null): Reje
   if (site === null || pose === null || !isInPadZone(site, pose)) {
     return rejectionOf('not_docked', 'the vehicle is not in the pad zone')
   }
-  if (!isStationary(pose)) return rejectionOf('not_docked', 'the vehicle is still moving')
+  if (!isPoseStationary(pose)) return rejectionOf('not_docked', 'the vehicle is still moving')
   return null
-}
-
-function isStationary(pose: VehiclePose): boolean {
-  return (
-    Math.abs(pose.vx) <= DOCK_STATIONARY_MM_PER_SECOND &&
-    Math.abs(pose.vy) <= DOCK_STATIONARY_MM_PER_SECOND
-  )
 }
 
 /** What the vehicle brought home, before the bay takes its core (#23 acceptance 1). */

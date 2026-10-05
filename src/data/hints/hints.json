@@ -1,0 +1,81 @@
+{
+  "hintsVersion": 1,
+  "minTicksBetweenHints": 1200,
+  "hints": [
+    {
+      "id": "hint_move",
+      "shownWhen": "runStarted",
+      "dismissedWhen": "vehicleMoved",
+      "lines": [
+        "Drive left and right with {aim_left} and {aim_right}.",
+        "Hold {lift} to fire the thruster and climb."
+      ]
+    },
+    {
+      "id": "hint_drill",
+      "shownWhen": "leftPadZone",
+      "dismissedWhen": "tileDestroyed",
+      "lines": [
+        "Swivel the drill head with {aim_left} {aim_right} {aim_down} {aim_up}.",
+        "Hold a direction against the ground to bore through it."
+      ]
+    },
+    {
+      "id": "hint_cargo",
+      "shownWhen": "resourceCollected",
+      "dismissedWhen": "docked",
+      "lines": [
+        "Ore fills your cargo hold. Take it back to the platform to sell it:",
+        "stop on the pad and Dock with {interact}."
+      ]
+    },
+    {
+      "id": "hint_dock",
+      "shownWhen": "dockedWithCargo",
+      "dismissedWhen": "upgradeBought",
+      "lines": [
+        "Sell, then repair or recharge: Sell, repair and recharge ({quick_service}) does all three.",
+        "When your money covers an upgrade, look at the workshop panel."
+      ]
+    },
+    {
+      "id": "hint_energy",
+      "shownWhen": "energyLowOrRescued",
+      "dismissedWhen": "docked",
+      "lines": [
+        "Energy is your clock: get back to the pad before it runs out.",
+        "Stranded on an empty tank? Call the tow with {request_rescue}, for a fee."
+      ],
+      "afterRescueLines": [
+        "The tow brought you home. You lost cargo worth {cargoLost} and paid a {fee} fee, nothing more.",
+        "Energy is your clock: get back to the pad before it runs out."
+      ]
+    }
+  ],
+  "transmissions": [
+    {
+      "id": "transmission_opening",
+      "shownWhen": "runStarted",
+      "lines": [
+        "Transmission from the Guild: your rig stands on the pad, prospector.",
+        "Bring up ore, buy better gear, and dig your way down to the core."
+      ]
+    },
+    {
+      "id": "transmission_core_reached",
+      "shownWhen": "coreReached",
+      "lines": [
+        "Transmission from the Guild: you have struck the core!",
+        "Haul its fragments to the platform; enough of them buys passage to the next world."
+      ]
+    },
+    {
+      "id": "transmission_planet_2",
+      "shownWhen": "enteredPlanetTwo",
+      "lines": [
+        "Transmission from the Guild: welcome to the second world.",
+        "Gravity pulls harder here. Mind your thruster and your energy."
+      ]
+    }
+  ]
+}

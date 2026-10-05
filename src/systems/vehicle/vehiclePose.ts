@@ -4,7 +4,12 @@
  * 3 up (#33, frozen under `logSchemaVersion` 1). Everything here is integer arithmetic, so a
  * replayed `commands.ndjson` gives the same tiles and zones on every machine.
  */
-import { DRILL_REACH_MM, MAX_SPEED_MM_PER_SECOND, ZONE_TEST_MAX_MM } from '../../constants/balance'
+import {
+  DOCK_STATIONARY_MM_PER_SECOND,
+  DRILL_REACH_MM,
+  MAX_SPEED_MM_PER_SECOND,
+  ZONE_TEST_MAX_MM,
+} from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { DockSite } from '../world/dockSite'
 import { depthTilesAt } from '../world/planetGeometry'
@@ -85,6 +90,14 @@ export function isWithinDrillReach(pose: VehiclePose, tile: TilePoint): boolean 
   const dx = tile.tx * MM_PER_METRE + MM_PER_METRE / 2 - pose.x
   const dy = tile.ty * MM_PER_METRE + MM_PER_METRE / 2 - pose.y
   return dx * dx + dy * dy <= DRILL_REACH_SQ
+}
+
+/** Slow enough to dock (#8); the hints (#16) read the same line as "has not moved yet". */
+export function isPoseStationary(pose: VehiclePose): boolean {
+  return (
+    Math.abs(pose.vx) <= DOCK_STATIONARY_MM_PER_SECOND &&
+    Math.abs(pose.vy) <= DOCK_STATIONARY_MM_PER_SECOND
+  )
 }
 
 /** The pad zone of #8: the cleared air above the dock pad, where energy 0 never strands. */
