@@ -13,6 +13,7 @@ import {
   isNonNegativeMoneyText,
   mul,
   powInt,
+  roundToWhole,
   sub,
   toCanonical,
   toSafeInteger,
@@ -108,6 +109,11 @@ describe('money: arithmetic', () => {
   it('ceils toward plus infinity, as an upgrade price ceil(base * ratio^level) needs', () => {
     expect(toCanonical(ceil(m('29.76')))).toBe('3e+1')
     expect(toCanonical(ceil(m('24')))).toBe('2.4e+1')
+  })
+
+  it('rounds to the nearest whole amount, ties to even', () => {
+    expect(toCanonical(roundToWhole(m('62.7')))).toBe('6.3e+1')
+    expect(toCanonical(roundToWhole(m('62.5')))).toBe('6.2e+1')
   })
 
   it('compares by value, not by text', () => {

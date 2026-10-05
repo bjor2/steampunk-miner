@@ -3,17 +3,22 @@
  * the 1/240 quanta (#33: "112 / 150"), hull and cargo as counts; nothing here feeds back.
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
-import { formatMoney } from '../formatMoney'
-import type { Money } from '../money'
+import { formatAmount } from '../displayAmount'
+import { roundToWhole, type BigStat } from '../money'
 
 export function energyGaugeText(quanta: number, maxQuanta: number): string {
-  return `${Math.floor(quanta / ENERGY_QUANTA_PER_UNIT)} / ${maxQuanta / ENERGY_QUANTA_PER_UNIT}`
+  return `${formatAmount(wholeEnergyUnits(quanta))} / ${formatAmount(wholeEnergyUnits(maxQuanta))}`
 }
 
-export function hullGaugeText(hull: Money, hullMax: Money): string {
-  return `${formatMoney(hull)} / ${formatMoney(hullMax)}`
+/** Hull is a BigStat with up to 40 digits (`100 * 1.12^L`), so it shows as a whole count. */
+export function hullGaugeText(hull: BigStat, hullMax: BigStat): string {
+  return `${formatAmount(roundToWhole(hull))} / ${formatAmount(roundToWhole(hullMax))}`
 }
 
 export function cargoGaugeText(units: number, capacity: number): string {
-  return `${units} / ${capacity}`
+  return `${formatAmount(units)} / ${formatAmount(capacity)}`
+}
+
+function wholeEnergyUnits(quanta: number): number {
+  return Math.floor(quanta / ENERGY_QUANTA_PER_UNIT)
 }

@@ -1,6 +1,6 @@
 /** Corner readout of what the store holds. Reads narrowly; per-frame data never comes here. */
 import { useGameStore } from '../store/gameStore'
-import { formatMoney } from '../systems/formatMoney'
+import { formatAmount } from '../systems/displayAmount'
 import { CameraModeToggle } from './CameraModeToggle'
 import styles from './Hud.module.css'
 import { Panel } from './kit/Panel'
@@ -10,7 +10,7 @@ export function Hud() {
   const planetTier = useGameStore((state) => state.planetTier)
   const planetSeed = useGameStore((state) => state.planetSeed)
   const money = useGameStore((state) => state.money)
-  const moneyText = formatMoney(money)
+  const moneyText = formatAmount(money)
 
   return (
     <div className={styles.hud}>

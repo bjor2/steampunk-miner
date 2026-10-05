@@ -85,6 +85,11 @@ export function ceil(amount: Money): Money {
   return wrap(unwrap(amount).ceil())
 }
 
+/** The nearest whole amount, ties to even (the module's one rounding mode). */
+export function roundToWhole(amount: Money): Money {
+  return wrap(unwrap(amount).round())
+}
+
 /**
  * The money quantum (#20, Systems & Economy addition 2): every charge (recharge, repair, rescue
  * fee, travel fee) is rounded up to it and every per-unit sale price down, so totals are exact
