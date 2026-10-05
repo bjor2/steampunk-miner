@@ -22,6 +22,20 @@ export const ZOOM_EASE_SECONDS = 0.2
  */
 export const MAX_DRAWN_CHUNKS_AT_MAX_ZOOM = 9
 
+/**
+ * Ground render blocks (#38 visible-block budget): the ground is culled by the view circle in
+ * 8 m blocks, so at the 20 m zoom-out at most 48 are drawn (37 touched in the worst case plus a
+ * one-ring margin), the same count at 1080p and 4K.
+ */
+export const GROUND_BLOCK_SIZE = 8
+export const MAX_DRAWN_GROUND_BLOCKS = 48
+
+/**
+ * The frame's draw-call ceiling (#38 frame budget, from the R3F "a few hundred or less" advice):
+ * ground 1-2 per chunk batch, vehicle at most 30, enemies, particles, platform and post-processing.
+ */
+export const MAX_DRAW_CALLS = 150
+
 /** Camera sits in front of the XY plane and looks down -Z. */
 export const CAMERA_POSITION: readonly [number, number, number] = [0, 0, 20]
 
