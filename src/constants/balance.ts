@@ -143,3 +143,15 @@ export const COLLAPSE_BLOCK_SAMPLES = 16
  * the 0.9 m body's half-diagonal (637 mm, rounded up from 450 x sqrt 2) plus 0.25 m.
  */
 export const COLLAPSE_VEHICLE_CLEARANCE_MM = 637 + 250
+
+/**
+ * The campaign ends at planet 40, where `finale` and `endless_unlock` sit; endless planets are 41+
+ * (#79 row shape, #80 schedule lock).
+ */
+export const CAMPAIGN_LAST_PLANET = 40
+
+/**
+ * The locked schedule never leaves more than this many consecutive campaign planets without a
+ * horizontal row, of any `bind` (#81 acceptance 2).
+ */
+export const MAX_PLANETS_WITHOUT_HORIZONTAL = 2
