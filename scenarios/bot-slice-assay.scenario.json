@@ -1,0 +1,7 @@
+{
+  "scenarioVersion": 1,
+  "name": "bot-slice-assay",
+  "worldSeed": 83921,
+  "start": { "artefactId": "artefact.assay_beacon" },
+  "hintsEnabled": false
+}
