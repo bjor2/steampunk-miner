@@ -9,11 +9,11 @@ describe('asset look', () => {
   })
 
   it('draws a placeholder asset as its flat placeholder quads with no atlas', () => {
-    const quads = assetQuadsOf('platform-hub', 1)
+    const quads = assetQuadsOf('ground-band-1', 1)
     expect(quads).toEqual(
-      placeholderQuadsOf('platform-hub', 1).map((quad) => ({ ...quad, uv: null })),
+      placeholderQuadsOf('ground-band-1', 1).map((quad) => ({ ...quad, uv: null })),
     )
-    expect(atlasMapsOf('platform-hub')).toBeNull()
+    expect(atlasMapsOf('ground-band-1')).toBeNull()
   })
 
   it('draws the final vehicle from its atlas at every tier, keeping each part’s colour', () => {
