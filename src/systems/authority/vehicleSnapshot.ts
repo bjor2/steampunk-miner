@@ -53,6 +53,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.casingShortBand === null || isWholeNumber(vehicle.casingShortBand)
       ? []
       : [`${path}.casingShortBand must be null or a whole band`]),
+    ...(isPortableCasingTrail(vehicle.casingTrail)
+      ? []
+      : [`${path}.casingTrail must hold safe-integer xMm and yMm points`]),
     ...(isNonNegativeMoneyText(vehicle.hull) ? [] : [`${path}.hull must be a decimal string`]),
     ...(isPortableCargo(vehicle.cargo) ? [] : [`${path}.cargo must hold whole units`]),
     ...(vehicle.pose === null || isPortablePose(vehicle.pose) ? [] : [`${path}.pose is malformed`]),
@@ -78,6 +81,19 @@ function wholeNumberProblems(
 
 function isCasingGrade(value: unknown): boolean {
   return isWholeNumber(value) && (value as number) >= 1
+}
+
+function isPortableCasingTrail(trail: unknown): boolean {
+  return (
+    isJsonObject(trail) &&
+    (trail.lastAxisPoint === null || isRingPoint(trail.lastAxisPoint)) &&
+    Array.isArray(trail.unlined) &&
+    trail.unlined.every(isRingPoint)
+  )
+}
+
+function isRingPoint(point: unknown): boolean {
+  return isJsonObject(point) && Number.isSafeInteger(point.xMm) && Number.isSafeInteger(point.yMm)
 }
 
 function isPortableCargo(cargo: unknown): cargo is Cargo {

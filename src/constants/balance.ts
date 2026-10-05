@@ -55,18 +55,24 @@ export const DRILL_STAMP_LIFT_MM = 250
 /**
  * Casing lining (#41 Placement rule as amended on 5 Oct, #56 Q1): a ring is centred on the tunnel
  * axis, where the drill stamp's centre passed, and lines the annulus `stampR - 0.25 m <= d <
- * stampR + 0.25 m`, one 0.25 m sample thick on the wall the drill cut. One ring every 0.5 m of
- * travel. The Gameplay & Vehicle Designer owns the numbers as data.
+ * stampR + 0.25 m`, one 0.25 m sample thick on the rock side of the wall the drill cut. One ring
+ * every 0.5 m the stamp cuts. The Gameplay & Vehicle Designer owns the numbers as data.
  */
 export const CASING_LINING_HALF_WIDTH_MM = 250
 export const CASING_RING_SPACING_MM = 500
 /**
- * "The ring sits behind the drill head, so the drill never cuts its own fresh lining" (#41): the
- * ring's axis point trails the stamp's centre by the stamp's radius plus the ring's outer radius,
- * so on a straight cut no later stamp reaches the ring it just laid.
+ * "The ring sits behind the drill head, so the drill never cuts its own fresh lining" (#41, #56
+ * Q2: `2 x stampR + 0.25 m`): a ring is laid at an axis point once the stamp's centre is this far
+ * past it, the stamp's radius plus the ring's outer radius, so on a straight cut no later stamp
+ * reaches the ring.
  */
 export const CASING_RING_LAG_MM =
   DRILL_STAMP_RADIUS_MM + DRILL_STAMP_RADIUS_MM + CASING_LINING_HALF_WIDTH_MM
+/**
+ * Axis points waiting for their ring: a straight cut holds `CASING_RING_LAG_MM / 500` of them.
+ * Dithering back and forth inside the lag lays the oldest past this many, so the save stays small.
+ */
+export const MAX_CASING_TRAIL_POINTS = 6
 
 /**
  * Pose reports go out at most 5 times a second (#11 amendment), every 12 ticks; the authority

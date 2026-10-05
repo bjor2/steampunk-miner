@@ -8,12 +8,12 @@
  * `debug.lineCasing` lines one ring of casing round a point at a grade (#41), the same ring the
  * vehicle lays, and logs it like one.
  */
-import { casingRingAround, lineRing } from '../world/casingLining'
 import { SOLID_DENSITY } from '../world/sampleGrid'
 import { clearDisc, fillDisc, type GroundEdit } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
 import type { AuthorityCommand } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
+import { layCasingRing } from './casingPlacement'
 import { casingGradeRangeRejection } from './casingRules'
 import type { GroundCircle } from './groundCommands'
 import {
@@ -78,14 +78,7 @@ function lineCasingRing(
 ): RuleEffect {
   const params = planetParamsOf(state.planet)
   if (params === null) return unchanged(state)
-  const lined = lineRing(state.world, params, casingRingAround(x, y), grade)
-  return {
-    state: { ...state, world: lined.world },
-    events: [
-      ...groundChangedEventsOf(lined),
-      { type: 'CasingPlaced', samples: lined.placed, relined: lined.relined, grade },
-    ],
-  }
+  return layCasingRing(state, params, { xMm: x, yMm: y }, grade)
 }
 
 function circleCommandRejection(state: AuthorityState, payload: GroundCircle): Rejection | null {

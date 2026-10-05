@@ -13,6 +13,7 @@ import {
 import { casingGradeStart } from '../economy/casingPrices'
 import type { BigStat } from '../money'
 import type { DockSite } from '../world/dockSite'
+import { EMPTY_CASING_TRAIL, type CasingTrail } from './casingTrail'
 import { quantaOfUnits } from './energyQuanta'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
 
@@ -40,6 +41,8 @@ export interface VehicleState {
    * hold it, or null when it does (#41): the edge of `casing_grade_insufficient` and the amber badge.
    */
   casingShortBand: number | null
+  /** The drill's recorded axis points still waiting for their casing ring (#41, #56). */
+  casingTrail: CasingTrail
   energy: number
   hull: BigStat
   cargo: Cargo
@@ -62,6 +65,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     levels,
     casingGrade: casingGradeStart(),
     casingShortBand: null,
+    casingTrail: EMPTY_CASING_TRAIL,
     energy: quantaOfUnits(stats.energyMax),
     hull: stats.hullMax,
     cargo: EMPTY_CARGO,

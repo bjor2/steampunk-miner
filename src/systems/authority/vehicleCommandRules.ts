@@ -3,8 +3,9 @@
  *
  * - `reportPose`: the client-owned pose at 5 Hz plus the fixed steps each action was active since
  *   the last report; the authority charges energy as count times rate (drill 4, thrust 6, drive 1
- *   quanta) and carves the drill's stamp at the pose for the drill ticks (#36); it also telegraphs
- *   a casing grade too low for the band (#41). A stranded or destroyed vehicle
+ *   quanta) and carves the drill's stamp at the pose for the drill ticks (#36), then lays casing
+ *   rings behind the drill every 0.5 m it cut (#41, #56); it also telegraphs a casing grade too low
+ *   for the band (#41). A stranded or destroyed vehicle
  *   still reports its pose (gravity and hits apply) but its action ticks are ignored.
  * - `drillTile`: scripted mining of one tile within reach: the same drilling path, carving that
  *   cell's own samples.
@@ -40,6 +41,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
+import { layCasingAtPose } from './casingPlacement'
 import { followCasingSupport } from './casingSupport'
 import { drillBurrowersOnTile } from './combat/enemyDamage'
 import { noteReportForCombat } from './combat/poseReportCombat'
@@ -83,6 +85,7 @@ export const VEHICLE_COMMAND_RULES: {
         (current) => followCasingSupport(current, command.playerId),
         (current) => noteReportForCombat(current, command.playerId, command.tick),
         (current) => chargeReportedActions(current, command),
+        (current) => layCasingAtPose(current, command.playerId, command.payload),
         (current) => followEnergyChange(current, command.playerId, command.tick),
       ]),
   },
