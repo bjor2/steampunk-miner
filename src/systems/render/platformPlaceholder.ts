@@ -40,7 +40,7 @@ const disc = (diameter: number, offset: PartShape['offset'], colour: string): Pa
 const OUTPOST: readonly PartShape[] = [
   box([4.4, 0.4], [-3.4, 0.2], DARK_IRON),
   box([3.8, 2.4], [-3.4, 1.6], IRON),
-  box([3.9, 0.12], [-3.4, 2.86], BRASS),
+  box([3.9, 0.13], [-3.4, 2.86], BRASS),
   box([0.3, 1.2], [-4.8, 3.4], IRON),
   box([2.2, 0.16], [-0.9, 2.5], BRASS),
   box([0.1, 1.1], [-0.2, 1.95], BRASS),
@@ -49,8 +49,8 @@ const OUTPOST: readonly PartShape[] = [
 const CORE_DRIVE: readonly PartShape[] = [
   box([0.3, 1.6], [-4.2, 3.6], IRON),
   box([0.3, 1.4], [-3.7, 3.5], IRON),
-  box([2.6, 0.12], [-2.9, 3.0], COPPER),
-  box([0.12, 0.9], [-1.65, 2.5], COPPER),
+  box([2.6, 0.13], [-2.9, 3.0], COPPER),
+  box([0.13, 0.9], [-1.65, 2.5], COPPER),
   disc(1.3, [-2.6, 3.7], CORE_GLOW),
   disc(0.6, [-2.6, 3.7], CORE_HEART),
 ]

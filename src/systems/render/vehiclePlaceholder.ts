@@ -72,7 +72,7 @@ const WHEELS_AT = [-0.32, 0, 0.32]
 export const VEHICLE_PARTS: readonly VehiclePartDef[] = [
   partOf('tracks', 0, [
     [box([1, 0.2], [0, -0.36], IRON)],
-    [box([1, 0.2], [0, -0.36], IRON), box([1.04, 0.05], [0, -0.25], DARK_IRON)],
+    [box([1, 0.2], [0, -0.36], IRON), box([1.04, 0.06], [0, -0.26], DARK_IRON)],
     [box([1.08, 0.24], [0, -0.36], IRON), box([1.1, 0.06], [0, -0.23], DARK_BRASS)],
   ]),
   partOf('wheels', 1, [
@@ -83,12 +83,12 @@ export const VEHICLE_PARTS: readonly VehiclePartDef[] = [
   partOf('chassis', 2, [
     [box([0.9, 0.42], [0, -0.08], COPPER)],
     [box([0.9, 0.42], [0, -0.08], COPPER), box([0.9, 0.04], [0, -0.2], DARK_BRASS)],
-    [box([0.94, 0.46], [0, -0.08], COPPER), box([0.94, 0.05], [0, -0.22], BRASS)],
+    [box([0.94, 0.46], [0, -0.08], COPPER), box([0.94, 0.06], [0, -0.22], BRASS)],
   ]),
   partOf('stacks', 2, [
     [box([0.1, 0.3], [-0.32, 0.38], IRON)],
     [box([0.1, 0.3], [-0.32, 0.38], IRON), box([0.1, 0.24], [-0.16, 0.44], IRON)],
-    [box([0.12, 0.36], [-0.32, 0.4], IRON), box([0.12, 0.3], [-0.16, 0.46], IRON)],
+    [box([0.13, 0.36], [-0.32, 0.4], IRON), box([0.13, 0.3], [-0.16, 0.46], IRON)],
   ]),
   partOf('boiler', 3, [
     [disc(0.42, [-0.13, 0.2], BRASS)],
@@ -101,9 +101,9 @@ export const VEHICLE_PARTS: readonly VehiclePartDef[] = [
     [box([0.22, 0.16], [0.26, 0.04], PARCHMENT), box([0.32, 0.06], [0.18, -0.22], STEEL)],
   ]),
   partOf('lamp', 4, [
-    [disc(0.1, [0.4, 0.12], LAMP)],
-    [disc(0.12, [0.4, 0.12], LAMP)],
-    [disc(0.12, [0.4, 0.12], LAMP), disc(0.1, [-0.4, 0.12], LAMP)],
+    [disc(0.1, [0.4, 0.13], LAMP)],
+    [disc(0.13, [0.4, 0.13], LAMP)],
+    [disc(0.13, [0.4, 0.13], LAMP), disc(0.1, [-0.4, 0.13], LAMP)],
   ]),
   partOf('armour', 5, [
     [],

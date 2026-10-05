@@ -84,4 +84,4 @@ export const SHAKE_MAX_METRES = 0.22
 export const SHAKE_DECAY_SECONDS = 0.18
 export const SHAKE_WOBBLE_HZ = 17
 export const FLASH_MAX_OPACITY = 0.3
-export const FLASH_SECONDS = 0.25
+export const FLASH_SECONDS = 0.28

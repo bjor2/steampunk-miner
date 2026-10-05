@@ -14,7 +14,7 @@ export const CHIME_MAX_OCTAVES = 3
 export const DRILL_FREE_HZ = 220
 export const DRILL_LOADED_HZ = 90
 export const DRILL_HALF_LOAD_SECONDS = 1
-export const DRILL_GAIN_MIN = 0.12
+export const DRILL_GAIN_MIN = 0.1
 export const DRILL_GAIN_MAX = 0.22
 
 /** The engine chug: puffs per second rise with speed up to `ENGINE_TOP_SPEED` m/s. */
@@ -22,7 +22,7 @@ export const ENGINE_IDLE_PUFFS = 2
 export const ENGINE_TOP_PUFFS = 9
 export const ENGINE_TOP_SPEED = 16
 export const ENGINE_GAIN_IDLE = 0.04
-export const ENGINE_GAIN_TOP = 0.12
+export const ENGINE_GAIN_TOP = 0.13
 
 /** Steam hiss of the lift thruster. */
 export const STEAM_GAIN = 0.1

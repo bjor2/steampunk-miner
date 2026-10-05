@@ -24,9 +24,9 @@ interface MusicBus {
 }
 
 const MASTER_GAIN = 0.5
-const MUSIC_GAIN = 0.12
+const MUSIC_GAIN = 0.1
 /** Continuous levels glide toward a new value with this time constant, so they never click. */
-const GLIDE_SECONDS = 0.05
+const GLIDE_SECONDS = 0.04
 const SILENCE = 0.0001
 /** A level closer than this to where it is heading is left alone. */
 const UNHEARD_CHANGE = 0.0005
@@ -207,11 +207,11 @@ function playClank(
   strike(context, master, {
     type: 'square',
     frequency: isHeavy ? 70 : 140,
-    gain: 0.25,
+    gain: 0.22,
     seconds: 0.35,
   })
   const ring = gainOf(context, 0.4, master)
-  ring.gain.exponentialRampToValueAtTime(SILENCE, context.currentTime + 0.25)
+  ring.gain.exponentialRampToValueAtTime(SILENCE, context.currentTime + 0.22)
   const filter = new BiquadFilterNode(context, {
     type: 'bandpass',
     frequency: isHeavy ? 500 : 1200,
@@ -220,7 +220,7 @@ function playClank(
   filter.connect(ring)
   const burst = new AudioBufferSourceNode(context, { buffer: noise })
   burst.connect(filter)
-  burst.start(context.currentTime, 0, 0.25)
+  burst.start(context.currentTime, 0, 0.22)
 }
 
 function playThud(context: AudioContext, master: GainNode): void {
@@ -245,7 +245,7 @@ function playCoreStinger(context: AudioContext, master: GainNode, root: number):
     strike(context, master, {
       type: 'triangle',
       frequency: root * 2 ** (semitones / 12),
-      gain: 0.25,
+      gain: 0.22,
       seconds: 0.6,
       at: step * 0.14,
     }),
