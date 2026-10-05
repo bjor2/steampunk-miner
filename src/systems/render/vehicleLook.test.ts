@@ -76,4 +76,11 @@ describe('vehicle look', () => {
     expect(tier3['t3-wheel-2'].angle).toBeCloseTo(-2 / 0.13, 6)
     expect(tier1['t1-chassis'].angle).toBe(0)
   })
+
+  it.each([1, 2, 3])(
+    'draws the vehicle in at most 30 calls at visual tier %i, one per part (#38, #48 acceptance 4)',
+    (tier) => {
+      expect(vehiclePartIdsOf(tier).length).toBeLessThanOrEqual(30)
+    },
+  )
 })

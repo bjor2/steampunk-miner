@@ -45,8 +45,12 @@ interface Passes {
   size: Vector2
 }
 
-/** Antialiasing the canvas would have done, now done by the scene target. */
-const SCENE_SAMPLES = 4
+/**
+ * No multisampling: a 4x half-float target multiplies the fill cost #38 budgets at 4K (on
+ * software GL a frame went from 0.35 s to 2.7 s), and the terrain's contour is cut in its shader,
+ * where multisampling never smoothed it. Only the parts' straight quad edges alias.
+ */
+const SCENE_SAMPLES = 0
 
 export function createPostPipeline(): PostPipeline {
   const passes = createPasses()
@@ -65,9 +69,9 @@ function renderFrame(passes: Passes, renderer: WebGLRenderer, scene: Scene, came
 }
 
 function createPasses(): Passes {
-  const bloomA = halfFloatTarget(0)
-  const bloomB = halfFloatTarget(0)
-  const sceneTarget = halfFloatTarget(SCENE_SAMPLES)
+  const bloomA = halfFloatTarget()
+  const bloomB = halfFloatTarget()
+  const sceneTarget = sceneDepthTarget()
   return {
     sceneTarget,
     bloomA,
@@ -93,13 +97,24 @@ function createPasses(): Passes {
   }
 }
 
-function halfFloatTarget(samples: number): WebGLRenderTarget {
+/** The bloom's: colour only, no depth. */
+function halfFloatTarget(): WebGLRenderTarget {
   return new WebGLRenderTarget(1, 1, {
     type: HalfFloatType,
     minFilter: LinearFilter,
     magFilter: LinearFilter,
-    depthBuffer: samples > 0,
-    samples,
+    depthBuffer: false,
+  })
+}
+
+/** The scene's: the parts' draw order is their depth, so it keeps a depth buffer. */
+function sceneDepthTarget(): WebGLRenderTarget {
+  return new WebGLRenderTarget(1, 1, {
+    type: HalfFloatType,
+    minFilter: LinearFilter,
+    magFilter: LinearFilter,
+    depthBuffer: true,
+    samples: SCENE_SAMPLES,
   })
 }
 

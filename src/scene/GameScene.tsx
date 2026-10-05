@@ -25,7 +25,13 @@ export function GameScene() {
   const isPaused = useGameStore((state) => state.isSettingsOpen)
   // `PlanetCamera` sets the zoom from the canvas size every frame (#39).
   return (
-    <Canvas flat orthographic camera={{ position: [...CAMERA_POSITION] }}>
+    <Canvas
+      flat
+      orthographic
+      // The canvas only takes the composite; multisampling it would only cost fill (#38).
+      gl={{ antialias: false }}
+      camera={{ position: [...CAMERA_POSITION] }}
+    >
       <SkyBackground />
       <ScreenFeedback />
       <PlanetCamera />
