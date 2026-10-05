@@ -7,7 +7,6 @@
 import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
-import { planetEntryOf } from '../systems/authority/planetEntry'
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import { playSlice, type SliceRun } from '../systems/bot/playSlice'
 import { startOfScenario, validateScenario, type Scenario } from '../systems/scenario'
@@ -18,6 +17,7 @@ import { recordDomainEventsTo } from './domainEventLog'
 import { createMemorySink } from './eventSink'
 import type { RunEvent, RunEventPlace } from './runEvent'
 import { createRunLog, type RunLog } from './runLog'
+import { recordStartingPlanet } from './startingPlanetLines'
 
 export interface LoggedSliceRun {
   run: SliceRun
@@ -93,7 +93,7 @@ function startingState(scenario: Scenario): AuthorityState {
   })
 }
 
-/** As a live run starts (#2 log sequence): `game_started`, then the first `planet_entered`. */
+/** As a live run starts (#2 log sequence): `game_started`, then the first planet's lines. */
 function recordRunStart(runLog: RunLog, start: AuthorityState): void {
   const stamp = { ...placeOf(start), tick: start.tick }
   runLog.record(stamp, 'game_started', {
@@ -103,7 +103,7 @@ function recordRunStart(runLog: RunLog, start: AuthorityState): void {
     debug: false,
   })
   const params = planetParamsOf(start.planet)
-  if (params !== null) runLog.record(stamp, 'planet_entered', planetEntryOf(params))
+  if (params !== null) recordStartingPlanet(runLog, stamp, params)
 }
 
 function recordRunEnd(runLog: RunLog, run: SliceRun): void {

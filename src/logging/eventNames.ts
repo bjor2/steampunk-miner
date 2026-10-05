@@ -94,6 +94,15 @@ export const RUN_EVENT_REGISTRY = {
     payload: { fromPlanet: 'integer', toPlanet: 'integer', cost: 'money', coreSpent: 'integer' },
   },
   feature_unlocked: { group: 'progression', level: 'core', payload: 'unspecified' },
+  // The artefact cache (#46); the envelope's `planet` is the cache's planet. The cache is
+  // generated whatever the player holds, so `artefact_cache_spawned` is said on every planet.
+  artefact_cache_spawned: {
+    group: 'progression',
+    level: 'core',
+    payload: { tx: 'integer', ty: 'integer', band: 'integer' },
+  },
+  artefact_open: { group: 'progression', level: 'core', payload: { tx: 'integer', ty: 'integer' } },
+  artefact_chosen: { group: 'progression', level: 'core', payload: { optionId: 'text' } },
 
   // Platform (#8); energy is an integer count of quanta (#11 amendment 2), hull a BigStat. The
   // dock events carry the bay (#37).
@@ -152,6 +161,12 @@ export const RUN_EVENT_REGISTRY = {
       fee: 'money',
       cargoLostValue: 'money',
     },
+  },
+  // `assay_beacon` priced a sold tier at the mid-band unit price (#46, economy detail).
+  artefact_assay_applied: {
+    group: 'platform',
+    level: 'detail',
+    payload: { tier: 'integer', band: 'integer', unitPrice: 'money' },
   },
   checkpoint_saved: {
     group: 'platform',

@@ -126,6 +126,16 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'resource_sold',
     data: { items, value, mode },
   }),
+  ArtefactCacheSpawned: ({ tx, ty, band }) => ({
+    event: 'artefact_cache_spawned',
+    data: { tx, ty, band },
+  }),
+  ArtefactCacheOpened: ({ tx, ty }) => ({ event: 'artefact_open', data: { tx, ty } }),
+  ArtefactChosen: ({ optionId }) => ({ event: 'artefact_chosen', data: { optionId } }),
+  ArtefactAssayApplied: ({ tier, band, unitPrice }) => ({
+    event: 'artefact_assay_applied',
+    data: { tier, band, unitPrice },
+  }),
   RepairPurchased: ({ hullFrom, hullTo, cost }) => ({
     event: 'repair_purchased',
     data: { hullFrom, hullTo, cost },

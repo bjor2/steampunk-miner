@@ -18,6 +18,7 @@ import {
   type CommandStamp,
   type CommandType,
 } from './authorityCommand'
+import { ARTEFACT_RULES } from './artefactRules'
 import { settleClockTo } from './authorityClock'
 import type { AuthorityState } from './authorityState'
 import { rejectionOf, type CommandRule, type Rejection, type RuleEffect } from './commandRule'
@@ -66,6 +67,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...WORKSHOP_RULES,
   ...CASING_RULES,
   ...TRAVEL_RULES,
+  ...ARTEFACT_RULES,
 }
 
 /** The tick-driven changes due by a well-formed command's tick; none for a malformed one. */

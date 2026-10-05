@@ -13,8 +13,9 @@ import type { BayId } from '../world/dockBays'
  * Bump when a command or domain event changes shape or meaning; run metadata records it.
  * 2: `Dock {bay}` and the two bays of #37, with the run starting in the Sell bay.
  * 3: the vehicle's casing grade and `BuyCasingGrade` (#41, #58).
+ * 4: the artefact commands and events (#46).
  */
-export const AUTHORITY_PROTOCOL_VERSION = 3
+export const AUTHORITY_PROTOCOL_VERSION = 4
 
 export interface CommandPayloads {
   /**
@@ -57,11 +58,17 @@ export interface CommandPayloads {
   buyCasingGrade: Record<string, never>
   /** Moves the docked platform to the next planet, paying the fee and the core (#10). */
   travel: { toPlanet: number }
+  /** `interact` while overlapping the planet's live artefact cache opens its choice (#46). */
+  openArtefactCache: Record<string, never>
+  /** Takes one of the three options for good; the other two are gone (#46). */
+  chooseArtefact: { optionId: string }
   'debug.setUpgrade': { upgradeId: string; level: number }
   /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
   'debug.setEnergy': { energy: string }
   /** Hull as a canonical decimal string (a BigStat, #7). */
   'debug.setHull': { hull: string }
+  /** The player holds this artefact, as if chosen from this planet's cache (a scenario start). */
+  'debug.setArtefact': { optionId: string }
   'debug.setPlanet': { planetIndex: number }
   'debug.setPlanetSeed': { planetSeed: number }
   /** Adds `amount` (a decimal string) to the player's wallet. */

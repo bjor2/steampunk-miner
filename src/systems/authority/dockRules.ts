@@ -11,7 +11,8 @@
  * again at once (#58, #40 follow-up).
  *
  * Docking banks the carried core fragments (#10), ends the trip for combat (the vehicle's enemies
- * leave and used spawn points free up, #9) and takes a `dock` state digest (#11 section 3).
+ * leave and used spawn points free up, #9), readies a spent `breathing_room` brace (#46) and
+ * takes a `dock` state digest (#11 section 3).
  * A vehicle with energy 0 in the pad zone is still `active` (it never strands there, #7), so it
  * docks like any other: no tow, no fee.
  */
@@ -28,6 +29,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
+import { restoreBreathingRoom } from './artefactRules'
 import { endTrip } from './combat/enemyRoster'
 import { bankCoreFragments } from './coreBay'
 import { dockSiteOfPlanet, noPlanetRejection } from './planetOfState'
@@ -47,6 +49,7 @@ export const DOCK_COMMAND_RULES: {
         (current) => logDockEntry(current, playerId, payload.bay),
         (current) => bankCoreFragments(current, playerId, 'dock', tick),
         (current) => endTrip(current, playerId),
+        (current) => restoreBreathingRoom(current, playerId),
         (current) => digestAtDock(current),
       ]),
   },

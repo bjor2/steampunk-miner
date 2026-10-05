@@ -96,3 +96,10 @@ export const ENEMY_CONTACT_MM = 1100
 
 /** `enemy_damaged` sums continuous drill damage over this many ticks (#9 logging). */
 export const ENEMY_DAMAGE_LOG_TICKS = 30
+
+/**
+ * The vehicle overlaps the artefact cache (#46 "interact while overlapping") when its centre is
+ * within this many mm of the cache cell's centre on both axes: half the 0.9 m body (#7) plus half
+ * the 1 m cell.
+ */
+export const ARTEFACT_CACHE_OVERLAP_MM = 950

@@ -46,6 +46,10 @@ export type RejectionReason =
   // most enemies it may have.
   | 'unknown_enemy'
   | 'enemy_cap'
+  // Registered by the artefact commands (#46): not one of the three option ids, or this cache is
+  // not live for this player (they already hold an artefact).
+  | 'unknown_artefact'
+  | 'artefact_unavailable'
 
 export type RescueCause = 'stranded' | 'destroyed'
 
@@ -142,6 +146,14 @@ export interface DomainEventBodies {
   PlanetUnlocked: { planetIndex: number }
   PlanetEntered: { planetSeed: number; generatorVersion: number; radius: number }
   ResourceSold: { items: SoldItem[]; value: string; mode: SaleMode }
+  /** The planet's artefact cache tile and band (#46), said once per planet entered. */
+  ArtefactCacheSpawned: { tx: number; ty: number; band: number }
+  /** `interact` opened the live cache's choice (#46); the choice itself is client UI. */
+  ArtefactCacheOpened: { tx: number; ty: number }
+  /** The pick committed: exactly once per player in the slice (#46). */
+  ArtefactChosen: { optionId: string }
+  /** `assay_beacon` priced one sold tier at the mid-band unit price (#46). */
+  ArtefactAssayApplied: { tier: number; band: number; unitPrice: string }
   RepairPurchased: { hullFrom: string; hullTo: string; cost: string }
   /** Energy in quanta. */
   EnergyRecharged: { from: number; to: number; cost: string }

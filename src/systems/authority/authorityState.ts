@@ -12,6 +12,7 @@ import { newVehicleState, type VehicleState } from '../vehicle/vehicleState'
 import { EMPTY_WORLD, type WorldState } from '../world/worldState'
 import { NEW_COMBAT, type CombatState } from './combat/combatState'
 import { NEW_CORE_PROGRESS, type CoreProgress } from './coreProgress'
+import type { HeldArtefact } from './heldArtefact'
 import { NEW_PLATFORM, type PlatformState } from './platformState'
 import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
 
@@ -20,6 +21,8 @@ export interface PlayerState {
   /** The `seq` of this player's last accepted command; the next one must be higher. */
   lastSeq: number
   vehicle: VehicleState
+  /** At most one artefact in the slice (#46); null until a cache is chosen from. */
+  artefact: HeldArtefact | null
 }
 
 export interface AuthorityState {
@@ -58,7 +61,12 @@ export function createAuthorityState(start: SessionStart): AuthorityState {
 }
 
 function newPlayerState(planet: SessionPlanet): PlayerState {
-  return { wallet: ZERO_MONEY, lastSeq: 0, vehicle: newVehicleState(dockSiteOfPlanet(planet), 0) }
+  return {
+    wallet: ZERO_MONEY,
+    lastSeq: 0,
+    vehicle: newVehicleState(dockSiteOfPlanet(planet), 0),
+    artefact: null,
+  }
 }
 
 export function vehicleOf(state: AuthorityState, playerId: string): VehicleState {
@@ -77,6 +85,15 @@ export function withVehicle(
 export function withWallet(state: AuthorityState, playerId: string, wallet: Money): AuthorityState {
   const player = state.players[playerId]
   return { ...state, players: { ...state.players, [playerId]: { ...player, wallet } } }
+}
+
+export function withArtefact(
+  state: AuthorityState,
+  playerId: string,
+  artefact: HeldArtefact | null,
+): AuthorityState {
+  const player = state.players[playerId]
+  return { ...state, players: { ...state.players, [playerId]: { ...player, artefact } } }
 }
 
 export function withCombat(state: AuthorityState, combat: CombatState): AuthorityState {

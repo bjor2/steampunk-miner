@@ -196,7 +196,7 @@ describe('save slot: refusals', () => {
     ])
     expect(readSaveSlot({ ...file(), formatVersion: 9, snapshotVersion: 4 }).problems).toEqual([
       'save.formatVersion is 9, this build reads 1',
-      'save.snapshotVersion is 4, this build reads 6',
+      'save.snapshotVersion is 4, this build reads 7',
     ])
   })
 

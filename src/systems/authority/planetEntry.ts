@@ -6,6 +6,7 @@
  */
 import { GENERATOR_VERSION } from '../generatorVersion'
 import { dockedPoseAt } from '../vehicle/vehiclePose'
+import { artefactCacheTile } from '../world/artefactCache'
 import type { PlanetParams } from '../world/planetParams'
 import { EMPTY_WORLD } from '../world/worldState'
 import type { AuthorityState } from './authorityState'
@@ -40,4 +41,11 @@ export function planetEntryOf(params: PlanetParams): DomainEventBodies['PlanetEn
     generatorVersion: GENERATOR_VERSION,
     radius: params.radiusTiles,
   }
+}
+
+/** What `artefact_cache_spawned` says about a planet's cache (#46): its tile and band. */
+export function artefactCacheSpawnOf(
+  params: PlanetParams,
+): DomainEventBodies['ArtefactCacheSpawned'] {
+  return { ...artefactCacheTile(params), band: params.artefactCacheBand }
 }

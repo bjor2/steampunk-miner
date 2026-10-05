@@ -7,10 +7,12 @@
  * bay and the travel fee in the wallet; otherwise it is refused with `not_docked`,
  * `not_next_planet`, `core_short` or `money_short` and nothing changes. It spends exactly the fee
  * and exactly `coreNeeded` fragments (surplus stays banked), moves the session to the new planet's
- * dock site, and logs `travel_started`, `planet_unlocked`, `planet_entered` and a `travel` digest.
+ * dock site, and logs `travel_started`, `planet_unlocked`, `planet_entered`,
+ * `artefact_cache_spawned` (#46) and a `travel` digest.
  */
 import { travelFee } from '../economy/planetCharges'
 import { sub, toCanonical } from '../money'
+import type { PlanetParams } from '../world/planetParams'
 import { vehicleOf, withWallet, type AuthorityState } from './authorityState'
 import {
   chainEffects,
@@ -21,8 +23,9 @@ import {
   type RuleEffect,
 } from './commandRule'
 import { coreNeededOf } from './coreBay'
+import type { DomainEventBody } from './domainEvent'
 import { notDockedRejection } from './dockRules'
-import { planetEntryOf, withSessionOnPlanet } from './planetEntry'
+import { artefactCacheSpawnOf, planetEntryOf, withSessionOnPlanet } from './planetEntry'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 import { moneyShortRejection } from './platformServices'
 import { stateDigest } from './stateDigest'
@@ -103,9 +106,16 @@ function arriveAtPlanet(state: AuthorityState, toPlanet: number): RuleEffect {
     state: arrived,
     events: [
       { type: 'PlanetUnlocked', planetIndex: toPlanet },
-      ...(params === null ? [] : [{ type: 'PlanetEntered' as const, ...planetEntryOf(params) }]),
+      ...(params === null ? [] : arrivalEventsOf(params)),
     ],
   }
+}
+
+function arrivalEventsOf(params: PlanetParams): DomainEventBody[] {
+  return [
+    { type: 'PlanetEntered', ...planetEntryOf(params) },
+    { type: 'ArtefactCacheSpawned', ...artefactCacheSpawnOf(params) },
+  ]
 }
 
 function digestAtTravel(state: AuthorityState): RuleEffect {

@@ -16,6 +16,7 @@ import {
   type PortableCombat,
 } from './combat/combatSnapshot'
 import { coreProgressProblems, type CoreProgress } from './coreProgress'
+import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPlatformVisualState, type PlatformState } from './platformState'
 import { stateDigest } from './stateDigest'
@@ -31,10 +32,10 @@ import {
 } from './vehicleSnapshot'
 
 /**
- * 6: the vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
- * progress (#24); 3 the platform (#23).
+ * 7: each player's held artefact (#46); 6: the vehicle's casing grade (#41, #58); 5: combat joined
+ * the state (#25); 4 the planet's core progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 6
+export const SNAPSHOT_VERSION = 7
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -61,6 +62,7 @@ export interface PortablePlayer {
   wallet: string
   lastSeq: number
   vehicle: PortableVehicle
+  artefact: HeldArtefact | null
 }
 
 export function takeSnapshot(state: AuthorityState): SessionSnapshot {
@@ -84,6 +86,7 @@ function portableStateOf(state: AuthorityState): PortableState {
           wallet: toCanonical(player.wallet),
           lastSeq: player.lastSeq,
           vehicle: portableVehicleOf(player.vehicle),
+          artefact: player.artefact === null ? null : { ...player.artefact },
         },
       ]),
     ),
@@ -131,6 +134,7 @@ function playerStateOf(player: PortablePlayer): PlayerState {
     wallet: fromCanonical(player.wallet),
     lastSeq: player.lastSeq,
     vehicle: vehicleOfPortable(player.vehicle),
+    artefact: player.artefact === null ? null : { ...player.artefact },
   }
 }
 
@@ -189,7 +193,10 @@ function playersProblems(players: unknown): string[] {
 function portablePlayerProblems(id: string, player: unknown): string[] {
   const path = `snapshot.state.players.${id}`
   if (!isPortablePlayer(player)) return [`${path} must hold a money wallet and a whole lastSeq`]
-  return portableVehicleProblems(player.vehicle, `${path}.vehicle`)
+  return [
+    ...portableVehicleProblems(player.vehicle, `${path}.vehicle`),
+    ...heldArtefactProblems(player.artefact, `${path}.artefact`),
+  ]
 }
 
 function isPortablePlayer(player: unknown): player is Record<string, unknown> {
