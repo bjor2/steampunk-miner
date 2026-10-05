@@ -30,8 +30,11 @@ import {
   type PortableWorld,
 } from './vehicleSnapshot'
 
-/** 5: combat joined the state (#25); 4 the planet's core progress (#24); 3 the platform (#23). */
-export const SNAPSHOT_VERSION = 5
+/**
+ * 6: the vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
+ * progress (#24); 3 the platform (#23).
+ */
+export const SNAPSHOT_VERSION = 6
 
 export interface SessionSnapshot {
   snapshotVersion: number

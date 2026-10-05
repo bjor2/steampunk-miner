@@ -49,9 +49,9 @@ describe('authority: determinism', () => {
     expect(second.events).toEqual(first.events)
   })
 
-  // Moved by protocol 2: the run starts in the Sell bay (#37), not on the pad's middle.
+  // Moved by protocol 2 (the run starts in the Sell bay, #37) and 3 (the casing grade, #41).
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('cd81074d7313197c')
+    expect(stateDigest(replay(SESSION).state)).toBe('9ae20b9c71183d38')
   })
 
   it('gives a different digest when one command differs', () => {

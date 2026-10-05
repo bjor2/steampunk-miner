@@ -108,6 +108,7 @@ const platformEvents: DomainEvent[] = [
     visualTier: 1,
     statsAfter: { hullMax: '1.12e+2', energyMax: '1.5e+2' },
   },
+  { ...commandStamp, type: 'CasingUpgraded', from: 1, to: 2, price: '4.8e+1' },
   { ...commandStamp, type: 'DockLeft', bay: 'sell', durationTicks: 300 },
 ]
 
@@ -238,6 +239,7 @@ describe('domain event log', () => {
       'repair_purchased',
       'energy_recharged',
       'upgrade_purchased',
+      'casing_upgraded',
       'dock_left',
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])

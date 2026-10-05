@@ -21,6 +21,7 @@ import {
 import { settleClockTo } from './authorityClock'
 import type { AuthorityState } from './authorityState'
 import { rejectionOf, type CommandRule, type Rejection, type RuleEffect } from './commandRule'
+import { CASING_RULES } from './casingRules'
 import { DEBUG_COMMAND_RULES } from './debugCommandRules'
 import { DOCK_COMMAND_RULES } from './dockRules'
 import type { DomainEvent, DomainEventBody } from './domainEvent'
@@ -63,6 +64,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...DOCK_COMMAND_RULES,
   ...PLATFORM_SERVICE_RULES,
   ...WORKSHOP_RULES,
+  ...CASING_RULES,
   ...TRAVEL_RULES,
 }
 

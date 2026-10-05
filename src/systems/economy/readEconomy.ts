@@ -43,6 +43,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     energy: readEnergy(reader, reader.object('energy', file.energy)),
     drill: readDrill(reader, reader.object('drill', file.drill)),
     costCurves,
+    casing: readCasing(reader, reader.object('casing', file.casing), costCurves),
     upgrades,
     visualTiers: reader
       .list('visualTiers', file.visualTiers)
@@ -127,6 +128,21 @@ function readDrill(reader: FieldReader, drill: Record<string, unknown>): Economy
   return {
     scratchFloor: reader.money('drill.scratchFloor', drill.scratchFloor),
     minTicksPerTile: reader.safeInteger('drill.minTicksPerTile', drill.minTicksPerTile),
+  }
+}
+
+function readCasing(
+  reader: FieldReader,
+  casing: Record<string, unknown>,
+  costCurves: readonly CostCurve[],
+): Economy['casing'] {
+  const costCurveId = reader.text('casing.costCurveId', casing.costCurveId)
+  if (!costCurves.some((curve) => curve.id === costCurveId)) {
+    reader.record(`casing.costCurveId ${costCurveId} has no curve in costCurves`)
+  }
+  return {
+    costCurveId,
+    casingGradeStart: reader.safeInteger('casing.casingGradeStart', casing.casingGradeStart),
   }
 }
 

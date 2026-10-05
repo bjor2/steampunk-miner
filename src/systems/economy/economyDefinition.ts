@@ -152,6 +152,11 @@ export interface Economy {
     minTicksPerTile: number
   }
   costCurves: readonly CostCurve[]
+  /**
+   * The casing grade (#41 Systems & Economy): a separate counter, not a seventh track. It starts
+   * at `casingGradeStart` and each grade is bought at the Upgrade bay along `costCurveId`.
+   */
+  casing: { costCurveId: string; casingGradeStart: number }
   upgrades: readonly UpgradeDef[]
   visualTiers: readonly VisualTierThreshold[]
   enemies: {

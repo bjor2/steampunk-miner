@@ -129,6 +129,12 @@ export const RUN_EVENT_REGISTRY = {
       statsAfter: { mapOf: 'money' },
     },
   },
+  // #41: one casing grade bought at the Upgrade bay.
+  casing_upgraded: {
+    group: 'platform',
+    level: 'core',
+    payload: { from: 'integer', to: 'integer', price: 'money' },
+  },
   purchase_made: { group: 'platform', level: 'core', payload: 'unspecified' },
   rescue_triggered: {
     group: 'platform',

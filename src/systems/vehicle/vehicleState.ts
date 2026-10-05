@@ -1,6 +1,6 @@
 /**
  * One player's vehicle as the authority holds it (decisions #7 and #3: `players[id].vehicle`).
- * The save holds integer levels, never stats; energy is an integer count of 1/240-unit quanta
+ * The save holds integer levels and the casing grade, never stats; energy is an integer count of 1/240-unit quanta
  * (#11 amendment 2), hull a BigStat, cargo whole units (1 ore tile = 1 unit at any tier, #7; core
  * fragments share the capacity, #10). The pose is the last accepted `reportPose`.
  */
@@ -10,6 +10,7 @@ import {
   type UpgradeLevels,
   type VehicleStats,
 } from '../economy/vehicleStats'
+import { casingGradeStart } from '../economy/casingPrices'
 import type { BigStat } from '../money'
 import type { DockSite } from '../world/dockSite'
 import { quantaOfUnits } from './energyQuanta'
@@ -29,6 +30,11 @@ export interface VehicleState {
   /** The tick the current mode began; the strand grace and the destroy delay count from it. */
   modeSinceTick: number
   levels: UpgradeLevels
+  /**
+   * The casing grade (#41): the player's own vertical counter next to the six tracks, never one
+   * of them, so it is not in the visual-tier sum. Raised one at a time at the Upgrade bay.
+   */
+  casingGrade: number
   energy: number
   hull: BigStat
   cargo: Cargo
@@ -49,6 +55,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     mode: 'active',
     modeSinceTick: tick,
     levels,
+    casingGrade: casingGradeStart(),
     energy: quantaOfUnits(stats.energyMax),
     hull: stats.hullMax,
     cargo: EMPTY_CARGO,

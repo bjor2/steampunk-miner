@@ -127,6 +127,8 @@ export interface DomainEventBodies {
   RepairPurchased: { hullFrom: string; hullTo: string; cost: string }
   /** Energy in quanta. */
   EnergyRecharged: { from: number; to: number; cost: string }
+  /** One casing grade bought (#41): `price` as a canonical string. */
+  CasingUpgraded: { from: number; to: number; price: string }
   UpgradePurchased: {
     upgradeId: string
     kind: 'vertical'

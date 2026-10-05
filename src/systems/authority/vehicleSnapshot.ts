@@ -54,6 +54,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(VEHICLE_MODES.includes(vehicle.mode as VehicleMode) ? [] : [`${path}.mode is not a mode`]),
     ...wholeNumberProblems(vehicle, ['modeSinceTick', 'energy', 'accountedTick'], path),
     ...upgradeLevelsProblems(vehicle.levels).map((problem) => `${path}.levels: ${problem}`),
+    ...(isCasingGrade(vehicle.casingGrade)
+      ? []
+      : [`${path}.casingGrade must be a whole number >= 1`]),
     ...(isNonNegativeMoneyText(vehicle.hull) ? [] : [`${path}.hull must be a decimal string`]),
     ...(isPortableCargo(vehicle.cargo) ? [] : [`${path}.cargo must hold whole units`]),
     ...(vehicle.pose === null || isPortablePose(vehicle.pose) ? [] : [`${path}.pose is malformed`]),
@@ -79,6 +82,10 @@ function wholeNumberProblems(
   return names
     .filter((name) => !isWholeNumber(value[name]))
     .map((name) => `${path}.${name} must be a whole number`)
+}
+
+function isCasingGrade(value: unknown): boolean {
+  return isWholeNumber(value) && (value as number) >= 1
 }
 
 function isPortableCargo(cargo: unknown): cargo is Cargo {

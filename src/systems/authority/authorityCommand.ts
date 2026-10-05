@@ -12,8 +12,9 @@ import type { BayId } from '../world/dockBays'
 /**
  * Bump when a command or domain event changes shape or meaning; run metadata records it.
  * 2: `Dock {bay}` and the two bays of #37, with the run starting in the Sell bay.
+ * 3: the vehicle's casing grade and `BuyCasingGrade` (#41, #58).
  */
-export const AUTHORITY_PROTOCOL_VERSION = 2
+export const AUTHORITY_PROTOCOL_VERSION = 3
 
 export interface CommandPayloads {
   /**
@@ -52,6 +53,8 @@ export interface CommandPayloads {
   quickService: Record<string, never>
   /** The workshop: one level of one upgrade track (#7). */
   buyUpgrade: { upgradeId: string }
+  /** The Upgrade bay's Casing row: one casing grade, not a vehicle track (#41, #58). */
+  buyCasingGrade: Record<string, never>
   /** Moves the docked platform to the next planet, paying the fee and the core (#10). */
   travel: { toPlanet: number }
   'debug.setUpgrade': { upgradeId: string; level: number }

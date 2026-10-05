@@ -2,7 +2,7 @@
   "name": "dig-and-return",
   "description": "Planet 1, level 0: drill six surface ore tiles, return to the pad, dock, sell all, undock (#7).",
   "generatorVersion": 1,
-  "authorityProtocolVersion": 2,
+  "authorityProtocolVersion": 3,
   "logSchemaVersion": 1,
   "numberFormatVersion": 1,
   "worldSeed": 83921,
@@ -251,17 +251,17 @@
     {
       "tick": 247,
       "scope": "dock",
-      "digest": "1517cb5b301b965b"
+      "digest": "310c3e338a200728"
     },
     {
       "tick": 3600,
       "scope": "periodic",
-      "digest": "9441947803b6b43d"
+      "digest": "f5361d761459ca5c"
     },
     {
       "tick": 4000,
       "scope": "end",
-      "digest": "e177c87c89e5b61a"
+      "digest": "f2bcad0a66edf41b"
     }
   ]
 }

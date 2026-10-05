@@ -527,7 +527,11 @@ describe('platform: workshop', () => {
 
 describe('platform: two bays', () => {
   const SELL_BAY_COMMANDS: readonly CommandIntent[] = [sell('all'), recharge, quickService]
-  const UPGRADE_BAY_COMMANDS: readonly CommandIntent[] = [repair, buy('engine')]
+  const UPGRADE_BAY_COMMANDS: readonly CommandIntent[] = [
+    repair,
+    buy('engine'),
+    { type: 'buyCasingGrade', payload: {} },
+  ]
 
   /** Worn, with ore in the hold and money, so every service has something to do. */
   function wornWithOre(): { session: ScriptedSession; tick: number } {

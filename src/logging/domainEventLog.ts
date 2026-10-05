@@ -132,6 +132,10 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'energy_recharged',
     data: { from, to, cost },
   }),
+  CasingUpgraded: ({ from, to, price }) => ({
+    event: 'casing_upgraded',
+    data: { from, to, price },
+  }),
   UpgradePurchased: (purchase) => ({
     event: 'upgrade_purchased',
     data: {
