@@ -1,14 +1,16 @@
 /**
- * One ring of casing lining (decision #41 Placement rule "Where", amended 5 Oct), integer
- * arithmetic only: the samples whose position in mm lies in the annulus `clearR <= d < clearR +
- * width` round a centre on the tunnel axis, chosen against the ground as it stood before the ring:
+ * One ring of casing lining (decision #41 Placement rule "Where", amended twice on #56, 5 Oct),
+ * integer arithmetic only: the samples whose position in mm lies in the annulus `clearR <= d <
+ * clearR + width` round a centre on the tunnel axis, chosen against the ground as it stood before
+ * the ring. Lining marks the **rock side** of the bore's wall, so the bore never narrows:
  *
- * 1. An **air** sample (density <= 128, the contour iso: the drill's soft rim never leaves wall
- *    samples at exactly 0) with a **native solid** 8-neighbour (density > 128 and not casing)
- *    becomes solid casing of `grade`: walls only, never a ring in mid-air, and never lining on
- *    lining, so it stays one sample thick however often rings pass.
- * 2. A **casing** sample of a lower grade is raised to `grade` (relining), density unchanged; a
- *    grade that already matches is left alone.
+ * 1. A **native solid** sample (density > 128, the contour iso, and casing 0) with an **air**
+ *    4-neighbour (density <= 128) takes the casing `grade`. Its material and density stay as they
+ *    were, so the contour, collision and the cell's ore are the same lined or not; only the drill
+ *    time and `casing_drilled` change. Rock with no air beside it is never lined, so lining never
+ *    spreads deeper than one sample.
+ * 2. A solid **casing** sample of a lower grade is raised to `grade` (relining); a grade that
+ *    already matches is left alone.
  *
  * Never refused: a grade too low for the band still lines (#41). The dock pad is never lined, as it
  * is never carved. A player grade above 15 lines at 15, the most a sample holds.
@@ -20,9 +22,8 @@ import {
   closeSession,
   densityOf,
   isCarvable,
-  lineSample,
+  markSampleCasing,
   openSession,
-  relineSample,
   type EditSession,
   type GroundEdit,
 } from './groundEditSession'
@@ -40,9 +41,9 @@ export interface CasingRing {
 }
 
 export interface Lining extends GroundEdit {
-  /** Air samples that became casing. */
+  /** Native rock samples that became lining. */
   placed: number
-  /** Casing samples raised to the ring's grade. */
+  /** Lining samples raised to the ring's grade. */
   relined: number
 }
 
@@ -107,33 +108,25 @@ function isInAnnulus(ring: CasingRing, sx: number, sy: number): boolean {
 }
 
 function ringStepOf(session: EditSession, sample: WeightedSample, grade: number): RingStep {
-  if (!isCarvable(session, sample)) return 'skip'
+  if (!isCarvable(session, sample) || densityOf(session, sample) <= ISO_DENSITY) return 'skip'
   const current = casingGradeOf(session, sample)
   if (current > 0) return current < grade ? 'reline' : 'skip'
-  return isAirTouchingNativeGround(session, sample) ? 'line' : 'skip'
+  return isBesideAir(session, sample) ? 'line' : 'skip'
 }
 
-function isAirTouchingNativeGround(session: EditSession, sample: WeightedSample): boolean {
-  if (densityOf(session, sample) > ISO_DENSITY) return false
-  return NEIGHBOUR_OFFSETS.some(([dx, dy]) =>
-    isNativeSolid(session, { ...sample, sx: sample.sx + dx, sy: sample.sy + dy }),
+/** A wall sample: one of its 4-neighbours is air (#56 Technical Director, rock-side lining). */
+function isBesideAir(session: EditSession, sample: WeightedSample): boolean {
+  return NEIGHBOUR_OFFSETS.some(
+    ([dx, dy]) =>
+      densityOf(session, { ...sample, sx: sample.sx + dx, sy: sample.sy + dy }) <= ISO_DENSITY,
   )
 }
 
-/** Solid ground that is not lining, so a ring never lines on lining (#41 amendment). */
-function isNativeSolid(session: EditSession, sample: WeightedSample): boolean {
-  return densityOf(session, sample) > ISO_DENSITY && casingGradeOf(session, sample) === 0
-}
-
 const NEIGHBOUR_OFFSETS: readonly (readonly [number, number])[] = [
-  [-1, -1],
   [0, -1],
-  [1, -1],
   [-1, 0],
   [1, 0],
-  [-1, 1],
   [0, 1],
-  [1, 1],
 ]
 
 function applyRingStep(
@@ -142,6 +135,5 @@ function applyRingStep(
   step: RingStep,
   grade: number,
 ): void {
-  if (step === 'line') lineSample(session, sample, grade)
-  if (step === 'reline') relineSample(session, sample, grade)
+  if (step !== 'skip') markSampleCasing(session, sample, grade)
 }

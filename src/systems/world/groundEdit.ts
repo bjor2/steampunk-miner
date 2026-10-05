@@ -10,8 +10,8 @@
  * - A material cell yields once, at the moment the sum of its 16 samples falls to half or below
  *   (`cellYield`).
  *
- * - A casing sample (#41) carves in the drill time of its own grade, not its cell's, and loses its
- *   casing when its density reaches 0. Casing never yields: the yield sum skips it (`cellYield`).
+ * - A lined sample (#41) carves in the drill time of its casing grade, not its cell's, and loses its
+ *   casing when its density reaches 0. Its density still counts toward its cell's yield (#56).
  *
  * The dock pad never carves. Every change is reported per chunk with its dirty rectangle in
  * chunk-local samples, the shape of `GroundChanged`.
@@ -153,7 +153,7 @@ function carveOneSample(
   return ticksToRemove(rate, window.firstTick, removal)
 }
 
-/** Lowers a sample's density; a casing sample that reaches air loses its casing (#41). */
+/** Lowers a sample's density; a lined sample cut to density 0 loses its casing (#41). */
 function lowerSample(session: EditSession, sample: WeightedSample, removal: number): void {
   editSample(session, sample, (current) => current - removal)
   if (densityOf(session, sample) === 0) clearCasingSample(session, sample)

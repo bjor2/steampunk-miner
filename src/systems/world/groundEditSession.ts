@@ -11,7 +11,6 @@ import type { PlanetParams } from './planetParams'
 import {
   CHUNK_SAMPLE_SIDE,
   SAMPLES_PER_TILE,
-  SOLID_DENSITY,
   chunkOfSample,
   localSampleOf,
   sampleIndexOf,
@@ -115,18 +114,15 @@ export function clearCasingSample(session: EditSession, sample: WeightedSample):
   session.casingCleared = { samples: cleared.samples + 1, grade: Math.max(cleared.grade, grade) }
 }
 
-/** Makes a sample solid lining of `grade` (#41): density 255 and the grade in the casing layer. */
-export function lineSample(session: EditSession, sample: WeightedSample, grade: number): void {
-  editSample(session, sample, () => SOLID_DENSITY)
-  writeCasingGrade(session, sample, grade)
-}
-
-/** Raises an existing lining sample to `grade` (#41 relining); its density stays solid. */
-export function relineSample(session: EditSession, sample: WeightedSample, grade: number): void {
-  writeCasingGrade(session, sample, grade)
-}
-
-function writeCasingGrade(session: EditSession, sample: WeightedSample, grade: number): void {
+/**
+ * Marks a sample as lining of `grade`, or raises its grade (#41 relining). Its density stays as it
+ * is: lining is an overlay on the rock (#56), so it never moves the contour or the cell's yield.
+ */
+export function markSampleCasing(
+  session: EditSession,
+  sample: WeightedSample,
+  grade: number,
+): void {
   const chunk = editChunkOf(session, sample)
   const lsx = localSampleOf(sample.sx)
   const lsy = localSampleOf(sample.sy)

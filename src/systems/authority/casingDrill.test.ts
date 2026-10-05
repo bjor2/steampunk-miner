@@ -34,67 +34,85 @@ function casingSamplesOf(session: ScriptedSession, tile: TilePoint): number {
   return lined
 }
 
-/** Mines an ore cell (crediting its ore), then lines the hole's walls from a ring above it. */
-function linedOreHole(): { session: ScriptedSession; hole: TilePoint } {
+const LEFT = { tx: -1, ty: 0 }
+
+/**
+ * An ore cell with its left neighbour mined out, so its left column of samples is a wall; at
+ * `grade` a ring round a point 0.95 m left of that column lines the wall (0 leaves it unlined).
+ */
+function oreWall(grade: number): {
+  session: ScriptedSession
+  ore: TilePoint
+  events: DomainEvent[]
+} {
   const session = createScriptedSession()
-  const [hole] = surfaceOreTiles(1)
-  mineTile(session, 10, hole)
-  session.submit(60, lineCasing(hole.tx * 1000 + 500, (hole.ty + 1) * 1000 + 500, 2))
-  return { session, hole }
+  const [ore] = surfaceOreTiles(1)
+  mineTile(session, 10, { tx: ore.tx + LEFT.tx, ty: ore.ty + LEFT.ty })
+  const events =
+    grade === 0
+      ? []
+      : session.submit(60, lineCasing(ore.tx * 1000 - 950, ore.ty * 1000 + 375, grade))
+  return { session, ore, events }
+}
+
+/** Drills the ore cell from above until it breaks; the events of that one command. */
+function drillOre(session: ScriptedSession, ore: TilePoint): DomainEvent[] {
+  session.submit(61, poseAbove(ore, FACING.down))
+  return session.submit(400, drill(ore, 300))
 }
 
 const ticksOf = (events: readonly DomainEvent[]) =>
   events.reduce((ticks, event) => ticks + (event.type === 'DrillDamageDealt' ? event.ticks : 0), 0)
 
+/** What each `CargoAdded` credited, without where it sits in the log. */
+const cargoOf = (events: readonly DomainEvent[]) =>
+  events.flatMap((event) =>
+    event.type === 'CargoAdded'
+      ? [{ resourceTier: event.resourceTier, amount: event.amount, value: event.value }]
+      : [],
+  )
+
 describe('re-drilling casing', () => {
-  it('lines the walls of a mined hole through debug.lineCasing and logs the ring', () => {
-    const session = createScriptedSession()
-    const [hole] = surfaceOreTiles(1)
-    mineTile(session, 10, hole)
-    const events = session.submit(
-      60,
-      lineCasing(hole.tx * 1000 + 500, (hole.ty + 1) * 1000 + 500, 2),
-    )
+  it('lines the wall beside a mined hole through debug.lineCasing and logs the ring', () => {
+    const { session, ore, events } = oreWall(2)
     expect(events).toContainEqual(
       expect.objectContaining({ type: 'CasingPlaced', grade: 2, relined: 0 }),
     )
     expect(typesOf(events)).toContain('GroundChanged')
     expect(typesOf(events).at(-1)).toBe('DebugCommandApplied')
-    expect(casingSamplesOf(session, hole)).toBeGreaterThan(0)
+    expect(casingSamplesOf(session, ore)).toBe(4)
   })
 
-  it('credits no ore and charges only the drill energy for the ticks it cut', () => {
-    const { session, hole } = linedOreHole()
-    const cargo = session.vehicle().cargo
+  it('pays the same ore for a lined wall as for an unlined one', () => {
+    const unlined = oreWall(0)
+    const lined = oreWall(2)
+    const unlinedCargo = cargoOf(drillOre(unlined.session, unlined.ore))
+    expect(unlinedCargo).toHaveLength(1)
+    expect(cargoOf(drillOre(lined.session, lined.ore))).toEqual(unlinedCargo)
+    expect(lined.session.vehicle().cargo).toEqual(unlined.session.vehicle().cargo)
+  })
+
+  it('charges only the drill energy for the ticks it cut', () => {
+    const { session, ore } = oreWall(2)
     const energy = session.vehicle().energy
-    session.submit(61, poseAbove(hole, FACING.down))
-    const events = session.submit(400, drill(hole, 300))
-    expect(typesOf(events)).not.toContain('CargoAdded')
-    expect(typesOf(events)).not.toContain('TileDestroyed')
-    expect(session.vehicle().cargo).toEqual(cargo)
+    const events = drillOre(session, ore)
     expect(ticksOf(events)).toBeGreaterThan(0)
     expect(energy - session.vehicle().energy).toBe(ticksOf(events) * 4)
   })
 
-  it('logs the lining it cleared and leaves the hole unlined', () => {
-    const { session, hole } = linedOreHole()
-    const lined = casingSamplesOf(session, hole)
-    session.submit(61, poseAbove(hole, FACING.down))
-    const events = session.submit(400, drill(hole, 300))
+  it('logs the lining it cleared and leaves the cell unlined', () => {
+    const { session, ore } = oreWall(2)
+    const events = drillOre(session, ore)
     expect(events).toContainEqual(
-      expect.objectContaining({ type: 'CasingDrilled', samples: lined, grade: 2 }),
+      expect.objectContaining({ type: 'CasingDrilled', samples: 4, grade: 2 }),
     )
-    expect(casingSamplesOf(session, hole)).toBe(0)
+    expect(casingSamplesOf(session, ore)).toBe(0)
   })
 
   it('takes longer to drill higher-grade lining, as band-G rock', () => {
     const drillTicksAtGrade = (grade: number) => {
-      const session = createScriptedSession()
-      const [hole] = surfaceOreTiles(1)
-      mineTile(session, 10, hole)
-      session.submit(60, lineCasing(hole.tx * 1000 + 500, (hole.ty + 1) * 1000 + 500, grade))
-      session.submit(61, poseAbove(hole, FACING.down))
-      return ticksOf(session.submit(400, drill(hole, 300)))
+      const { session, ore } = oreWall(grade)
+      return ticksOf(drillOre(session, ore))
     }
     expect(drillTicksAtGrade(1)).toBeLessThan(drillTicksAtGrade(3))
   })

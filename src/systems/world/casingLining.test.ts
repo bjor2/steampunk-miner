@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { unlinedDensitySum } from './cellYield'
+import { cellDensitySum } from './cellYield'
 import { casingRingAround, lineRing } from './casingLining'
 import { carveDisc, clearDisc, type CellDrillTicks } from './groundEdit'
 import { planetParamsFor } from './planetParams'
@@ -48,12 +48,20 @@ function isInRing(distanceSq: number): boolean {
   return distanceSq >= RING.clearMm * RING.clearMm && distanceSq < outer * outer
 }
 
-function touchesNativeGround(world: WorldState, sx: number, sy: number): boolean {
-  const offsets = [-1, 0, 1]
-  return offsets.some((dy) =>
-    offsets.some(
-      (dx) => densityAt(world, sx + dx, sy + dy) > 128 && casingAt(world, sx + dx, sy + dy) === 0,
-    ),
+function touchesAir(world: WorldState, sx: number, sy: number): boolean {
+  const neighbours: [number, number][] = [
+    [0, -1],
+    [-1, 0],
+    [1, 0],
+    [0, 1],
+  ]
+  return neighbours.some(([dx, dy]) => densityAt(world, sx + dx, sy + dy) <= 128)
+}
+
+/** Whether every sample of the box keeps the density it had in `before`. */
+function keepsDensity(before: WorldState, after: WorldState): boolean {
+  return samplesNearCentre().every(
+    ({ sx, sy }) => densityAt(after, sx, sy) === densityAt(before, sx, sy),
   )
 }
 
@@ -70,15 +78,15 @@ describe('casing lining', () => {
     )
   })
 
-  it('lines every air sample of the ring that touches ground, one sample thick, at the grade', () => {
+  it('lines every rock sample of the ring that touches air, at the grade, leaving its density', () => {
     const hole = boredHole()
     const lined = lineRing(hole, params, RING, 2)
     for (const { sx, sy, distanceSq } of samplesNearCentre()) {
       const shouldLine =
-        isInRing(distanceSq) && densityAt(hole, sx, sy) <= 128 && touchesNativeGround(hole, sx, sy)
+        isInRing(distanceSq) && densityAt(hole, sx, sy) > 128 && touchesAir(hole, sx, sy)
       expect(casingAt(lined.world, sx, sy)).toBe(shouldLine ? 2 : 0)
-      expect(densityAt(lined.world, sx, sy)).toBe(shouldLine ? 255 : densityAt(hole, sx, sy))
     }
+    expect(keepsDensity(hole, lined.world)).toBe(true)
     expect(lined.placed).toBeGreaterThan(0)
     expect(lined.relined).toBe(0)
   })
@@ -87,7 +95,7 @@ describe('casing lining', () => {
     expect(RING).toEqual({ ...CENTRE, clearMm: 700, widthMm: 500 })
   })
 
-  it('never lines on lining: rings half a metre apart keep the lining one sample thick', () => {
+  it('never spreads into the rock: rings half a metre apart keep the lining one sample thick', () => {
     const tunnel = clearDisc(
       boredHole(),
       params,
@@ -98,21 +106,23 @@ describe('casing lining', () => {
     const second = lineRing(first, params, casingRingAround(CENTRE.xMm + 500, CENTRE.yMm), 2)
     const lined = samplesNearCentre().filter(({ sx, sy }) => casingAt(second.world, sx, sy) > 0)
     expect(lined.length).toBeGreaterThan(0)
-    expect(lined.every(({ sx, sy }) => touchesNativeGround(second.world, sx, sy))).toBe(true)
+    expect(lined.every(({ sx, sy }) => touchesAir(second.world, sx, sy))).toBe(true)
   })
 
-  it('lines a wall sample left at exactly the iso density, which the rule counts as air', () => {
+  it('counts a wall sample left at exactly the iso density as air, and lines the rock beside it', () => {
     const edge = { xMm: 0, yMm: 1120 * MM_PER_SAMPLE, radiusMm: 100, floorRadiusMm: null }
     const halfCut = clearDisc(EMPTY_WORLD, params, edge, 127).world
     expect(densityAt(halfCut, 0, 1120)).toBe(128)
-    const ring = { xMm: 0, yMm: 1120 * MM_PER_SAMPLE, clearMm: 0, widthMm: 100 }
-    expect(lineRing(halfCut, params, ring, 1).placed).toBe(1)
+    const ring = { xMm: 0, yMm: 1120 * MM_PER_SAMPLE, clearMm: 0, widthMm: 300 }
+    const lined = lineRing(halfCut, params, ring, 1)
+    expect(lined.placed).toBe(4)
+    expect(casingAt(lined.world, 0, 1120)).toBe(0)
   })
 
-  it('never lines inside the clear radius, so the vehicle is never encased', () => {
-    const lined = lineRing(lineRing(boredHole(), params, RING, 2).world, params, RING, 2)
-    const inside = samplesNearCentre().filter(({ distanceSq }) => distanceSq < 700 * 700)
-    expect(inside.every(({ sx, sy }) => densityAt(lined.world, sx, sy) === 0)).toBe(true)
+  it('never narrows the bore: the contour is the same lined or not', () => {
+    const hole = boredHole()
+    const lined = lineRing(lineRing(hole, params, RING, 2).world, params, RING, 4)
+    expect(keepsDensity(hole, lined.world)).toBe(true)
   })
 
   it('raises lower-grade lining to the new grade when a ring passes again', () => {
@@ -166,22 +176,23 @@ describe('casing and the yield rule', () => {
     [1, 1121],
     [2, 1121],
   ]
+  const LINING = { xMm: 0, yMm: 1120 * MM_PER_SAMPLE, clearMm: 0, widthMm: 1000 }
 
-  it('never lets lining delay a cell yield: the eighth drilled sample still yields it', () => {
+  it('yields a lined cell at the same eighth sample as an unlined one', () => {
     const drilled = clearSamples(EMPTY_WORLD, SEVEN)
-    const lining = { xMm: 0, yMm: 1120 * MM_PER_SAMPLE, clearMm: 0, widthMm: 1000 }
-    const lined = lineRing(drilled, params, lining, 1)
-    expect(lined.placed).toBe(7)
-    expect(isTileYielded(lined.world, TILE)).toBe(false)
-    expect(unlinedDensitySum(lined.world, params, TILE)).toBe(9 * 255)
-    const eighth = clearDisc(lined.world, params, sampleDisc(3, 1121), 255)
-    expect(eighth.yielded.map(({ tile }) => tile)).toEqual([TILE])
+    const lined = lineRing(drilled, params, LINING, 1)
+    expect(lined.placed).toBeGreaterThan(0)
+    expect(cellDensitySum(lined.world, params, TILE)).toBe(cellDensitySum(drilled, params, TILE))
+    const unlinedEighth = clearDisc(drilled, params, sampleDisc(3, 1121), 255)
+    const linedEighth = clearDisc(lined.world, params, sampleDisc(3, 1121), 255)
+    expect(linedEighth.yielded).toEqual(unlinedEighth.yielded)
+    expect(linedEighth.yielded.map(({ tile }) => tile)).toEqual([TILE])
   })
 
   it('never yields a cell for lining it', () => {
     const drilled = clearSamples(EMPTY_WORLD, SEVEN)
-    const lining = { xMm: 0, yMm: 1120 * MM_PER_SAMPLE, clearMm: 0, widthMm: 1000 }
-    expect(lineRing(drilled, params, lining, 1).yielded).toEqual([])
+    expect(lineRing(drilled, params, LINING, 1).yielded).toEqual([])
+    expect(isTileYielded(lineRing(drilled, params, LINING, 1).world, TILE)).toBe(false)
   })
 })
 
@@ -191,7 +202,7 @@ describe('re-drilling casing', () => {
     casingGrade > 0 ? 48 : 24
   const WIDE = { ...CENTRE, radiusMm: 2000, floorRadiusMm: null }
 
-  it('drills lining in the drill time of its grade, then clears its casing at air', () => {
+  it('drills lining in the drill time of its grade, then clears its casing at density 0', () => {
     const lined = lineRing(boredHole(), params, RING, 3)
     const half = carveDisc(lined.world, params, WIDE, { firstTick: 0, ticks: 24 }, SLOWER_CASING)
     expect(half.casingCleared).toEqual({ samples: 0, grade: 0 })

@@ -1,8 +1,8 @@
 /**
  * The yield rule of decision #36: a material cell credits its ore once, at the moment the sum of
  * its 16 density samples falls to half of full or below; its yield bit enforces "once".
- * Casing samples (#41) count as nothing toward that sum, so lining a cell can never carry it back
- * over the threshold and re-drilling lining never credits ore.
+ * Lining (#41) is a mark on solid rock that leaves its density alone (#56 yield ruling), so a lined
+ * sample counts toward the sum like any other: lined and unlined walls pay the same ore.
  */
 import { isCellYielded, withCellsYielded } from './chunkDelta'
 import type { PlanetParams } from './planetParams'
@@ -16,7 +16,6 @@ import {
 import { cellIndexOfTile, chunkOfTile, type TilePoint } from './tileGrid'
 import { isRemovableCell } from './worldCell'
 import {
-  currentCasingOfChunk,
   currentDensityOfChunk,
   deltaOfChunk,
   materialCellAt,
@@ -50,7 +49,7 @@ export function cellsNowYielding(
 function isAtYield(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
   const delta = deltaOfChunk(world, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
   if (isCellYielded(delta, cellIndexOfTile(tile.tx, tile.ty))) return false
-  return unlinedDensitySum(world, params, tile) <= YIELD_SUM
+  return cellDensitySum(world, params, tile) <= YIELD_SUM
 }
 
 /** Yield bits change no density, so each new delta keeps the density its chunk already has. */
@@ -69,26 +68,10 @@ export function withYieldedCells(
   }, world)
 }
 
-/** The sum of a cell's 16 density samples, lining included: whether anything is left to drill. */
+/** The sum of a cell's 16 density samples, lining included. */
 export function cellDensitySum(world: WorldState, params: PlanetParams, tile: TilePoint): number {
   const density = currentDensityOfChunk(world, params, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
   return cellSampleIndices(tile).reduce((sum, index) => sum + density[index], 0)
-}
-
-/** The sum of a cell's samples that are not casing: the quantity the yield rule watches. */
-export function unlinedDensitySum(
-  world: WorldState,
-  params: PlanetParams,
-  tile: TilePoint,
-): number {
-  const cx = chunkOfTile(tile.tx)
-  const cy = chunkOfTile(tile.ty)
-  const density = currentDensityOfChunk(world, params, cx, cy)
-  const casing = currentCasingOfChunk(world, cx, cy)
-  return cellSampleIndices(tile).reduce(
-    (sum, index) => sum + (casing[index] === 0 ? density[index] : 0),
-    0,
-  )
 }
 
 /** Chunk-local indices of a cell's 16 samples. */
