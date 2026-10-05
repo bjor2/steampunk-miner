@@ -9,7 +9,21 @@ import { FACING, dockedPoseAt } from '../systems/vehicle/vehiclePose'
 import { dockSiteOf } from '../systems/world/dockSite'
 import { planetParamsFor, type PlanetParams } from '../systems/world/planetParams'
 import type { TilePoint } from '../systems/world/tileGrid'
-import { readAuthorityTick, resetGameStore, runEventPlaceOf, useGameStore } from './gameStore'
+import type { FeedbackCue } from '../systems/feedback/feedbackCues'
+import {
+  createScreenEffects,
+  kickScreen,
+  stepScreenEffects,
+} from '../systems/feedback/screenEffects'
+import type { CameraMode } from '../systems/render/cameraTurn'
+import { listenForFeedback } from './feedbackBroadcast'
+import {
+  readAuthorityTick,
+  resetGameStore,
+  runEventPlaceOf,
+  takeSessionSnapshot,
+  useGameStore,
+} from './gameStore'
 import { recordStartingPlanetEntered } from './planetArrivalLog'
 
 let sink: ReturnType<typeof createMemorySink>
@@ -199,5 +213,41 @@ describe('slice run on both planets', () => {
     game().setCoreFragments(63)
     expect(game().isCoreCompleted).toBe(true)
     expect(isSliceEndReached(game().planetTier, game().isCoreCompleted)).toBe(false)
+  })
+})
+
+describe('presentation settings and the run', () => {
+  const COMBINATIONS = (['rotating', 'fixed'] as CameraMode[]).flatMap((cameraMode) =>
+    [true, false].flatMap((shake) =>
+      [true, false].map((flashes) => ({ cameraMode, shake, flashes })),
+    ),
+  )
+
+  /** A trip, a sale and an upgrade with the screen effects listening, as the scene would. */
+  function playWithSettings(settings: (typeof COMBINATIONS)[number]) {
+    resetGameStore()
+    game().setCameraMode(settings.cameraMode)
+    game().setPreference('shake', settings.shake)
+    game().setPreference('flashes', settings.flashes)
+    const effects = createScreenEffects()
+    const heard: FeedbackCue['kind'][] = []
+    const stopListening = listenForFeedback((cue) => {
+      heard.push(cue.kind)
+      kickScreen(effects, cue, game().prefs)
+      stepScreenEffects(effects, 1 / 60, game().prefs)
+    })
+    mineTripAndDock(PLANET_1, surfaceOreTiles(10, PLANET_1))
+    game().sellCargo('all')
+    game().buyUpgrade('cargo_hold')
+    stopListening()
+    return { digest: takeSessionSnapshot().digest, heard }
+  }
+
+  it('reaches the same state digest with every camera, shake and flash setting', () => {
+    const runs = COMBINATIONS.map(playWithSettings)
+    expect(new Set(runs.map((run) => run.digest)).size).toBe(1)
+    runs.forEach((run) =>
+      expect(run.heard).toEqual(expect.arrayContaining(['pickup', 'dockClank', 'upgradeClank'])),
+    )
   })
 })

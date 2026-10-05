@@ -72,6 +72,7 @@ import {
 } from './authorityLink'
 import { recordCheckpointLoaded, writeCheckpointAfter, type Checkpoint } from './checkpoint'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
+import { announceFeedback } from './feedbackBroadcast'
 import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import {
@@ -345,13 +346,14 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
- * transition when the events travelled, shows the hints they trigger, logs the events, then
- * writes the checkpoint when due.
+ * transition when the events travelled, shows the hints and feedback they trigger, logs the
+ * events, then writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
   startTravelTransition(travelTransitionOf(events))
   useGameStore.getState().observePlaques(events)
+  announceFeedback(events, useGameStore.getState().playerId)
   recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)
   writeCheckpointAfter(events, runEventPlaceOf(useGameStore.getState()))
 }

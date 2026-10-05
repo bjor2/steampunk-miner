@@ -74,3 +74,14 @@ export const TRAVEL_TRANSITION_SECONDS = 10
  * while keeping per-tick state out of React. Placeholder, tuned by eye.
  */
 export const SCREEN_REFRESH_MS = 100
+
+/**
+ * Screen shake and flashes (#13 VFX: intensity-limited, and either can be turned off, #33). The
+ * camera moves at most `SHAKE_MAX_METRES` and a flash covers the screen at most
+ * `FLASH_MAX_OPACITY`, however many hits stack. Placeholders, tuned by eye.
+ */
+export const SHAKE_MAX_METRES = 0.22
+export const SHAKE_DECAY_SECONDS = 0.18
+export const SHAKE_WOBBLE_HZ = 17
+export const FLASH_MAX_OPACITY = 0.3
+export const FLASH_SECONDS = 0.25

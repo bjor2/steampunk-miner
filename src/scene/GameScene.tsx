@@ -10,6 +10,7 @@ import { EnemyPlaceholders } from './EnemyPlaceholders'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetTerrain } from './PlanetTerrain'
 import { PlatformPlaceholder } from './PlatformPlaceholder'
+import { ScreenFeedback } from './ScreenFeedback'
 import { SkyBackground } from './SkyBackground'
 import { Sparks } from './Sparks'
 import { Vehicle } from './Vehicle'
@@ -20,6 +21,7 @@ export function GameScene() {
   return (
     <Canvas flat orthographic camera={{ zoom: CAMERA_ZOOM, position: [...CAMERA_POSITION] }}>
       <SkyBackground />
+      <ScreenFeedback />
       <PlanetCamera />
       <PlanetTerrain />
       <PlatformPlaceholder />
