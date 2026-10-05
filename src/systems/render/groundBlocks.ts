@@ -22,7 +22,7 @@ export interface TileInstances {
   baseColours: Float32Array
   /** 4 per tile: ore colour and glow (zeros without ore). */
   oreColours: Float32Array
-  /** 4 per tile: style, unused, silhouette code, sparkle count. */
+  /** 4 per tile: style, the `ore_whisper` rim flag (1 or 0, #46), silhouette code, sparkle count. */
   styles: Float32Array
 }
 

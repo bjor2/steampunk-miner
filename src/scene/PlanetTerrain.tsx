@@ -5,7 +5,8 @@
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import type { Group, OrthographicCamera } from 'three'
-import { readPlanetWorld } from '../store/gameStore'
+import { writeArtefactLook } from '../store/artefactActions'
+import { readPlanetWorld, useGameStore } from '../store/gameStore'
 import { viewRadiusOf } from '../systems/render/visibleChunks'
 import { planetParamsFor } from '../systems/world/planetParams'
 import { EMPTY_WORLD } from '../systems/world/worldState'
@@ -45,6 +46,7 @@ export function PlanetTerrain() {
     light.facing = drillPresence.facing
     light.planetRadiusTiles = params.radiusTiles
     light.dt = delta
+    writeArtefactLook(light, useGameStore.getState().playerId)
     lightTerrain(material, light)
   })
 
@@ -82,5 +84,7 @@ function createTerrainLightScratch(): TerrainLight {
     planetRadiusTiles: 0,
     dt: 0,
     pointLights: lightPresence.pointLights,
+    isOreWhispering: false,
+    isCacheLive: true,
   }
 }

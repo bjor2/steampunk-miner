@@ -194,3 +194,10 @@ export const SHAKE_DECAY_SECONDS = 0.18
 export const SHAKE_WOBBLE_HZ = 17
 export const FLASH_MAX_OPACITY = 0.3
 export const FLASH_SECONDS = 0.28
+
+/**
+ * `ore_whisper` (#46): while undocked, ore within 16 m of the vehicle glows at its rim even
+ * behind up to 1 m of rock. Renderer only: no ore density, log or authority state changes.
+ */
+export const ORE_WHISPER_RANGE_TILES = 16
+export const ORE_WHISPER_ROCK_TILES = 1

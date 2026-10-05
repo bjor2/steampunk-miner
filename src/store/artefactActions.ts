@@ -9,6 +9,7 @@ import {
   setArtefactCommand,
 } from '../systems/artefacts/artefactCommands'
 import { artefactReportOf, type ArtefactReport } from '../systems/authority/heldArtefact'
+import { isCacheLive, isOreWhispering, type ArtefactLook } from '../systems/render/artefactLook'
 import { readAuthorityState, submitCommand, submitUnlessRefused } from './authorityLink'
 
 export interface ArtefactActions {
@@ -32,4 +33,12 @@ export function artefactActionsOf(playerIdOf: () => string): ArtefactActions {
 export function readArtefactReport(playerId: string): ArtefactReport {
   const state = readAuthorityState()
   return artefactReportOf(state.players[playerId].artefact, state.planet.index)
+}
+
+/** The local player's artefact look, written into the frame's scratch (no allocation). */
+export function writeArtefactLook(target: ArtefactLook, playerId: string): void {
+  const state = readAuthorityState()
+  const player = state.players[playerId]
+  target.isOreWhispering = isOreWhispering(player.artefact, player.vehicle.mode)
+  target.isCacheLive = isCacheLive(player.artefact, state.planet.index)
 }

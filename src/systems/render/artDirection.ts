@@ -57,6 +57,8 @@ export interface ArtDirection {
   /** How far a tile's lightness may drift from its band colour, for the subtle noise texture. */
   tileShadeSpread: number
   enemyTint: EnemyTint
+  /** The artefact cache's brass (#46); its husk is the same brass dimmed in the shader. */
+  artefactCache: Rgb
 }
 
 const PALETTE_COLOURS = ['surface', 'deep', 'core', 'pad', 'sky', 'underground'] as const
@@ -75,6 +77,7 @@ export function artDirectionProblems(raw: unknown): string[] {
       (knob) => `oreRamp.${knob} must be a number > 0`,
     ),
     ...enemyTintProblems(file.enemyTint),
+    ...(isHexColour(file.artefactCache) ? [] : ['artefactCache must be a #rrggbb colour']),
   ]
 }
 
@@ -92,6 +95,7 @@ function loadArtDirection(raw: typeof artFile): ArtDirection {
     oreRamp: raw.oreRamp,
     tileShadeSpread: raw.tileShadeSpread,
     enemyTint: { ...raw.enemyTint, ramp: raw.enemyTint.ramp.map(rgbOfHex) },
+    artefactCache: rgbOfHex(raw.artefactCache),
   }
 }
 

@@ -35,6 +35,7 @@
     "sparklesMax": 6
   },
   "tileShadeSpread": 0.08,
+  "artefactCache": "#c9a24b",
   "enemyTint": {
     "ramp": ["#8b3a1e", "#f08a24", "#7a3fa8"],
     "tiersPerTint": 6,

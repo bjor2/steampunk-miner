@@ -13,16 +13,18 @@ import {
   HEADLAMP_RANGE_TILES,
   HEADLAMP_SPILL_TILES,
   MAX_POINT_LIGHTS,
+  ORE_WHISPER_RANGE_TILES,
 } from '../constants/scene'
 import { rgbOfHex, type Rgb } from '../systems/render/colour'
 import { writeHeadlampDirection } from '../systems/render/headlamp'
+import type { ArtefactLook } from '../systems/render/artefactLook'
 import type { PointLightSource } from '../systems/render/sceneLights'
 import type { Facing } from '../systems/vehicle/vehiclePose'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import { TERRAIN_FRAGMENT_SHADER, TERRAIN_VERTEX_SHADER } from './terrainShader'
 
 /** What lights the terrain this frame. */
-export interface TerrainLight {
+export interface TerrainLight extends ArtefactLook {
   lampPosition: Vector2
   vehicleUp: Vector2
   facing: Facing
@@ -54,6 +56,9 @@ export function createTerrainMaterial(): ShaderMaterial {
       uDensity: { value: null },
       uPointLights: { value: Array.from({ length: MAX_POINT_LIGHTS }, () => new Vector3()) },
       uPointColours: { value: Array.from({ length: MAX_POINT_LIGHTS }, () => new Vector3()) },
+      uWhisper: { value: 0 },
+      uWhisperRange: { value: ORE_WHISPER_RANGE_TILES },
+      uCacheLive: { value: 1 },
     },
   })
 }
@@ -65,6 +70,8 @@ export function lightTerrain(material: ShaderMaterial, light: TerrainLight): voi
   writeHeadlampDirection(light.vehicleUp, light.facing, uniforms.uLampDirection.value)
   uniforms.uPlanetRadius.value = light.planetRadiusTiles
   writePointLights(uniforms.uPointLights.value, uniforms.uPointColours.value, light.pointLights)
+  uniforms.uWhisper.value = light.isOreWhispering ? 1 : 0
+  uniforms.uCacheLive.value = light.isCacheLive ? 1 : 0
 }
 
 /** Display colours like the lamp's; an unused slot is black, so it adds nothing. */

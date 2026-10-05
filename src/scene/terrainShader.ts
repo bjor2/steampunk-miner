@@ -8,6 +8,11 @@
  * values, the flat look of #13, and turned into linear light as the last step, because the frame
  * goes through the post pipeline (#38), whose composite writes display values back out.
  *
+ * The artefact cache (#46) is a brass casket whose rune ring glows while it is live to the local
+ * player and goes dull as a husk once they hold an artefact (`uCacheLive`). With `ore_whisper`
+ * held and the vehicle undocked (`uWhisper`), flagged ore within `uWhisperRange` of the vehicle
+ * pulses at its rim, through the rock in front of it.
+ *
  * Lighting is the vehicle lamp, ambient light that fades with depth, and the scene's point lights
  * (#13, #38: the lamp plus at most 4 point lights; `LightRig` chooses them, an unused one is black). Ore glow, sparkles and the core's pulse are emissive, so
  * ore stays readable in the dark and by shape and brightness, not colour alone.
@@ -56,6 +61,9 @@ uniform sampler2D uDensity;
 // x, y and range in metres; colour premultiplied by strength.
 uniform vec3 uPointLights[MAX_POINT_LIGHTS];
 uniform vec3 uPointColours[MAX_POINT_LIGHTS];
+uniform float uWhisper;
+uniform float uWhisperRange;
+uniform float uCacheLive;
 
 varying vec2 vLocal;
 varying vec2 vChunk;
@@ -166,7 +174,14 @@ void main() {
   vec3 light = lightAt(vWorld);
   vec3 emissive = vec3(0.0);
 
-  if (style > 2.5) {
+  if (style > 3.5) {
+    // The artefact cache: a banded casket with a rune ring, live or a dull husk.
+    vec2 fromCentre = vLocal - 0.5;
+    float ring = 1.0 - step(0.035, abs(length(fromCentre) - 0.28));
+    float band = 1.0 - step(0.05, abs(fromCentre.y));
+    colour *= mix(0.4, 1.0, uCacheLive) * (1.0 + 0.25 * band);
+    emissive += vec3(1.0, 0.78, 0.38) * ring * uCacheLive * (0.55 + 0.35 * sin(uTime * 2.2));
+  } else if (style > 2.5) {
     // The dock pad: riveted plate, lit like the platform.
     vec2 fromCentre = abs(vLocal - 0.5);
     colour *= 1.0 + 0.35 * step(length(fromCentre - 0.36), 0.05);
@@ -181,6 +196,10 @@ void main() {
     float halo = 1.0 - smoothstep(0.0, 0.7, length(vLocal - 0.5));
     emissive += vOre.rgb * vOre.a * (0.35 * shape + 0.2 * halo);
     emissive += vec3(1.0, 0.97, 0.9) * sparkles(vLocal, vTile, vStyle.w);
+    // ore_whisper: the tile's rim, within range of the vehicle and near the tunnel.
+    float inRange = 1.0 - smoothstep(uWhisperRange - 2.0, uWhisperRange, distance(vWorld, uLampPosition));
+    float rim = smoothstep(0.34, 0.5, max(abs(vLocal.x - 0.5), abs(vLocal.y - 0.5)));
+    emissive += vOre.rgb * uWhisper * vStyle.y * inRange * rim * (0.75 + 0.25 * sin(uTime * 3.0));
   }
 
   gl_FragColor = vec4(displayToLinear(colour * light + emissive), 1.0);

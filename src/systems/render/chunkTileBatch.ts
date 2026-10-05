@@ -6,8 +6,13 @@
  * reads as the smooth surface the vehicle collides with. Colours come from the material, drilled
  * or not; a tile of space or cave air the surface ramps into takes its band's ground colour.
  * Tiles stay aligned to the world, never to the screen, so the look holds at any camera rotation.
+ *
+ * An ore tile with air within `ORE_WHISPER_ROCK_TILES` of it is flagged for `ore_whisper`'s rim
+ * (#46); the shader lights the flag only while the player holds the artefact, so holding it never
+ * rebuilds a chunk. The halo reaches one sample into the right and upper neighbours, so a tile on
+ * those edges sees less of them than the whisper's 1 m: presentation only, never a rule.
  */
-import { GROUND_BLOCK_SIZE } from '../../constants/scene'
+import { GROUND_BLOCK_SIZE, ORE_WHISPER_ROCK_TILES } from '../../constants/scene'
 import type { PlanetParams } from '../world/planetParams'
 import { bandOfTile } from '../world/planetGeometry'
 import { ISO_DENSITY, SAMPLES_PER_TILE } from '../world/sampleGrid'
@@ -15,13 +20,13 @@ import { CHUNK_CELLS, CHUNK_SIZE, firstTileOfChunk } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { DENSITY_HALO_SIDE } from './densityHalo'
 import { BLOCKS_PER_CHUNK, BLOCKS_PER_CHUNK_SIDE, type BlockedTileInstances } from './groundBlocks'
-import type { BandPalette } from './artDirection'
+import { ART_DIRECTION, type BandPalette } from './artDirection'
 import { bandColourOf, paletteOf, tileShadeOf } from './bandPalette'
 import type { Rgb } from './colour'
 import { oreLookOfCell, type OreLook } from './oreLook'
 
 /** How the shader draws a tile. */
-export const TILE_STYLE = { ground: 0, ore: 1, core: 2, pad: 3 } as const
+export const TILE_STYLE = { ground: 0, ore: 1, core: 2, pad: 3, artefactCache: 4 } as const
 
 /** The ore decal's shape code in the shader: 0 for a tile without ore. */
 export const SILHOUETTE_CODE = { none: 0, flecks: 1, shards: 2 } as const
@@ -74,7 +79,7 @@ function writeBlock(
   const firstLy = Math.floor(block / BLOCKS_PER_CHUNK_SIDE) * GROUND_BLOCK_SIZE
   for (let ly = firstLy; ly < firstLy + GROUND_BLOCK_SIZE; ly++) {
     for (let lx = firstLx; lx < firstLx + GROUND_BLOCK_SIZE; lx++) {
-      if (hasGroundIn(halo, lx, ly)) writeTile(batch, context, lx, ly)
+      if (hasGroundIn(halo, lx, ly)) writeTile(batch, context, halo, lx, ly)
     }
   }
 }
@@ -85,6 +90,26 @@ function hasGroundIn(halo: Uint8Array, lx: number, ly: number): boolean {
     const row = (ly * SAMPLES_PER_TILE + qy) * DENSITY_HALO_SIDE + lx * SAMPLES_PER_TILE
     for (let qx = 0; qx <= SAMPLES_PER_TILE; qx++) {
       if (halo[row + qx] >= ISO_DENSITY) return true
+    }
+  }
+  return false
+}
+
+/** Whether any sample within the whisper's rock depth of the tile's square is air. */
+function isNearAir(halo: Uint8Array, lx: number, ly: number): boolean {
+  const reach = ORE_WHISPER_ROCK_TILES * SAMPLES_PER_TILE
+  const last = DENSITY_HALO_SIDE - 1
+  const [x0, x1] = [
+    Math.max(0, lx * SAMPLES_PER_TILE - reach),
+    Math.min(last, (lx + 1) * SAMPLES_PER_TILE + reach),
+  ]
+  const [y0, y1] = [
+    Math.max(0, ly * SAMPLES_PER_TILE - reach),
+    Math.min(last, (ly + 1) * SAMPLES_PER_TILE + reach),
+  ]
+  for (let qy = y0; qy <= y1; qy++) {
+    for (let qx = x0; qx <= x1; qx++) {
+      if (halo[qy * DENSITY_HALO_SIDE + qx] < ISO_DENSITY) return true
     }
   }
   return false
@@ -119,7 +144,13 @@ function emptyBatch(): ChunkTileBatch {
   }
 }
 
-function writeTile(batch: ChunkTileBatch, context: BatchContext, lx: number, ly: number): void {
+function writeTile(
+  batch: ChunkTileBatch,
+  context: BatchContext,
+  halo: Uint8Array,
+  lx: number,
+  ly: number,
+): void {
   const cell = context.cells[ly * CHUNK_SIZE + lx]
   const ore = kindOfCell(cell) === CELL_KIND.ore ? oreLookOf(context, cell) : null
   const at = batch.count
@@ -132,7 +163,7 @@ function writeTile(batch: ChunkTileBatch, context: BatchContext, lx: number, ly:
   )
   writeRgb(batch.oreColours, at * 4, ore?.colour ?? NO_ORE)
   batch.oreColours[at * 4 + 3] = ore?.glow ?? 0
-  writeVector(batch.styles, at * 4, styleOf(cell), 0)
+  writeVector(batch.styles, at * 4, styleOf(cell), ore !== null && isNearAir(halo, lx, ly) ? 1 : 0)
   writeVector(
     batch.styles,
     at * 4 + 2,
@@ -172,19 +203,26 @@ function baseColourOf(context: BatchContext, cell: number, lx: number, ly: numbe
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.indestructible) return context.palette.pad
   if (kind === CELL_KIND.core) return context.palette.core
+  if (kind === CELL_KIND.artefactCache) return ART_DIRECTION.artefactCache
   return context.bandColours[
     bandOfTile(context.params, context.firstTx + lx, context.firstTy + ly) - 1
   ]
 }
 
-/** The pad is plated metal: it keeps its flat colour, where rock and core get the noise shade. */
+/** The pad and the cache are metal: they keep their flat colour, rock and core get the shade. */
 function shadeOf(context: BatchContext, cell: number, lx: number, ly: number): number {
-  if (kindOfCell(cell) === CELL_KIND.indestructible) return 1
+  if (isMetalCell(cell)) return 1
   return tileShadeOf(context.params.planetSeed, context.firstTx + lx, context.firstTy + ly)
+}
+
+function isMetalCell(cell: number): boolean {
+  const kind = kindOfCell(cell)
+  return kind === CELL_KIND.indestructible || kind === CELL_KIND.artefactCache
 }
 
 function styleOf(cell: number): number {
   const kind = kindOfCell(cell)
+  if (kind === CELL_KIND.artefactCache) return TILE_STYLE.artefactCache
   if (kind === CELL_KIND.ore) return TILE_STYLE.ore
   if (kind === CELL_KIND.core) return TILE_STYLE.core
   if (kind === CELL_KIND.indestructible) return TILE_STYLE.pad

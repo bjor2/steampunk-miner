@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { artefactCacheTile } from '../world/artefactCache'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor } from '../world/planetParams'
 import { clearDisc } from '../world/groundEdit'
@@ -117,4 +118,35 @@ describe('chunk tile batch', () => {
     expect(styleAt(EMPTY_WORLD, 0, 0)[0]).toBe(TILE_STYLE.core)
     expect(styleAt(EMPTY_WORLD, 0, dockSiteOf(params).padRow)[0]).toBe(TILE_STYLE.pad)
   })
+
+  it('draws the artefact cache in its own style', () => {
+    const cache = artefactCacheTile(params)
+    expect(styleAt(EMPTY_WORLD, cache.tx, cache.ty)[0]).toBe(TILE_STYLE.artefactCache)
+  })
+
+  it('flags ore for the ore_whisper rim once a tunnel comes within 1 m of it (#46)', () => {
+    const deep = buriedOreTile()
+    expect(styleAt(EMPTY_WORLD, deep.tx, deep.ty)[1]).toBe(0)
+    expect(styleAt(holeAt({ tx: deep.tx + 2, ty: deep.ty }), deep.tx, deep.ty)[1]).toBe(1)
+  })
 })
+
+/** A band-1 ore tile with no air within 1 m, away from the chunk's right and top edges. */
+function buriedOreTile(): { tx: number; ty: number } {
+  for (const [cx, cy] of [
+    [-8, 0],
+    [-7, 0],
+    [-8, 1],
+    [-8, -1],
+  ]) {
+    const batch = batchOf(EMPTY_WORLD, cx, cy)
+    for (let at = 0; at < batch.count; at++) {
+      const [lx, ly] = [batch.tiles[at * 2], batch.tiles[at * 2 + 1]]
+      const isInner = lx > 1 && ly > 1 && lx < 28 && ly < 28
+      if (batch.styles[at * 4] === TILE_STYLE.ore && batch.styles[at * 4 + 1] === 0 && isInner) {
+        return { tx: firstTileOfChunk(cx) + lx, ty: firstTileOfChunk(cy) + ly }
+      }
+    }
+  }
+  throw new Error('no buried band-1 ore tile in the searched chunks')
+}
