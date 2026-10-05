@@ -108,6 +108,33 @@ test.describe('lit render budgets (#38)', () => {
     expect(errors).toEqual([])
   })
 
+  test('holds the same caps with the ground drawn from its five S7d strata maps (#69 acceptance 3)', async ({
+    page,
+  }) => {
+    test.setTimeout(180_000)
+    // A shader that fails to compile is logged by three, not thrown.
+    const consoleErrors: string[] = []
+    page.on('console', (message) => {
+      if (message.type() === 'error') consoleErrors.push(message.text())
+    })
+    const errors = await openGame(page)
+    await page.setViewportSize({ width: 1920, height: 1080 })
+    await page.evaluate(() => {
+      window.steampunkDebug!.ui.setZoom(20)
+      window.steampunkDebug!.ui.setRenderScale(0.5)
+    })
+    await expect
+      .poll(async () => (await renderStats(page)).strataBands, { timeout: 60_000 })
+      .toBe(5)
+    const stats = await settledStats(page)
+    expect(stats.groundBlocks).toBeLessThanOrEqual(MAX_GROUND_BLOCKS)
+    expect(stats.drawCalls).toBeLessThanOrEqual(MAX_DRAW_CALLS)
+    expect(stats.headlamps).toBe(1)
+    expect(stats.pointLights).toBeLessThanOrEqual(MAX_POINT_LIGHTS)
+    expect(errors).toEqual([])
+    expect(consoleErrors.filter((text) => text.includes('THREE.'))).toEqual([])
+  })
+
   test('keeps the UI text the same size at every render scale, because it is DOM (#38 acceptance 4)', async ({
     page,
   }) => {

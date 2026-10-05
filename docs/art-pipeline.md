@@ -30,6 +30,7 @@ art/
 scripts/art/
   export.sh                      the one export command: bake, then encode
   export_asset.py                headless Blender: refuse or bake, write parts.json
+  bake_tile.py                   headless Blender: bake a ground or casing tile (S7d)
   encode.sh                      toktx: PNG bakes to KTX2 maps
   asset_layout.py                part ids, atlas packing, the sidecar (no bpy)
   repack_placeholder.py          re-packs a hand-edited placeholder sidecar
@@ -52,7 +53,7 @@ and then `scripts/art/encode.sh <id>`. Set `BLENDER` to use another Blender bina
 trying out). The `.blend` is never saved.
 
 **It refuses the scene** (exit 1, with every problem listed) when the asset id names no category or
-isn't a `parts` asset in the manifest, when the file has an armature, a shape key or an action, or
+isn't a `parts`, `tile` or `backdrop` asset in the manifest, when the file has an armature, a shape key or an action, or
 when a mesh object's name isn't a valid part id. For the vehicle, `t<tier>-<part>` objects must also
 sit in the `tier-<tier>` collection.
 
@@ -95,6 +96,35 @@ render uses Cycles on the CPU with a fixed seed, sample count and thread count, 
 
 `scripts/art/author_platform.py` wrote the first version of the three platform files (S7b). From
 then on the `.blend` files are the sources: change the art in Blender and re-export.
+
+## Ground and casing tiles
+
+`npm run art:export -- ground-band-<n>` (or `casing-grade-<n>`) bakes a `tile` asset (#52 "Ground
+and casing"). The `.blend` holds one mesh object named for the asset id: a 4 x 4 m quad in the XZ
+plane facing -Y, its UVs 0..1 across it, with a material that repeats at its edges. Anything else
+is refused. `scripts/art/bake_tile.py` bakes the material's diffuse colour into a 1024 x 1024
+`albedo` (opaque) and its bump into a tangent-space `normal` (OpenGL, +Y up), with Cycles on the
+CPU at the `tileSamples` count in `art/asset-rules.json`, seed 0 and fixed threads. `encode.sh`
+writes them as `<id>.albedo.ktx2` (ETC1S, sRGB) and `<id>.normal.ktx2` (UASTC, linear) in
+`public/assets/<category>/<id>/`. The lint holds every tile map to 1024 x 1024.
+
+`scripts/art/author_tiles.py` wrote the first version of the ten files (S7d). Every texture in
+them reads 4D noise on a torus and every lattice has a whole number of periods across the tile,
+so the maps tile with no seam. From then on the `.blend` files are the sources.
+
+- **Ground** (`ground-band-1` to `-5`): five strata, each its own character (soil with pebbles,
+  wavy sediment beds, cracked shale, blocky bedrock, jointed basalt), with its mean colour at
+  planet 1's band colour. The terrain shader wraps a band's map around the planet in rings, a
+  whole number of 4 m tiles around the band's middle (`src/systems/render/groundStrata.ts`),
+  tints it by the planet's band colour over planet 1's, and tilts the lamp and point lights by
+  its normal map. It draws the strata only once all five bands are final and loaded
+  (`steampunkDebug.ui.getRenderStats().strataBands` is then 5); until then the flat band colours
+  show.
+- **Casing** (`casing-grade-1` to `-5`): one lining, five plate and rivet patterns, so grade reads
+  without colour (#48): rusting 1 m sheets with sparse rivets; lapped 0.25 m strips; tread plate
+  with corner rivets; blued panels with an X strap and bolts; staggered gunmetal armour with two
+  brass rivet rows. Every pattern repeats within 0.5 m, so a 0.25 m lining strip shows it. Nothing
+  draws the lining yet; the casing build (S2) does.
 
 ## The `parts.json` sidecar, schema 1
 
@@ -176,7 +206,6 @@ caches.
 
 ## Not built yet
 
-- Baking the `tile` form (ground, casing). The script refuses it and names the form; S7d adds it.
 - Showing a backdrop behind a bay screen. A DOM panel can't show KTX2, so S8 decides how the screen
   draws it (for example in the canvas behind the panel).
 - Lighting final art. Parts draw unlit with the albedo map; the lit render (S6) adds the normal

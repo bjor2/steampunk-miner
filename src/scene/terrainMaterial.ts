@@ -22,6 +22,7 @@ import type { PointLightSource } from '../systems/render/sceneLights'
 import type { Facing } from '../systems/vehicle/vehiclePose'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import { TERRAIN_FRAGMENT_SHADER, TERRAIN_VERTEX_SHADER } from './terrainShader'
+import { createStrataUniforms } from './terrainStrata'
 
 /** What lights the terrain this frame. */
 export interface TerrainLight extends ArtefactLook {
@@ -59,6 +60,7 @@ export function createTerrainMaterial(): ShaderMaterial {
       uWhisper: { value: 0 },
       uWhisperRange: { value: ORE_WHISPER_RANGE_TILES },
       uCacheLive: { value: 1 },
+      ...createStrataUniforms(),
     },
   })
 }

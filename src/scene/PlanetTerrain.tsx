@@ -14,7 +14,9 @@ import { createChunkMeshPool, type ChunkMeshPool, type TerrainView } from './chu
 import { drillPresence } from './drillPresence'
 import { lightPresence } from './lightPresence'
 import { renderPresence } from './renderPresence'
+import { GroundStrata } from './GroundStrata'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
+import { fitStrataToPlanet } from './terrainStrata'
 import { vehiclePresence } from './vehiclePresence'
 
 export function PlanetTerrain() {
@@ -48,9 +50,14 @@ export function PlanetTerrain() {
     light.dt = delta
     writeArtefactLook(light, useGameStore.getState().playerId)
     lightTerrain(material, light)
+    fitStrataToPlanet(material, params)
   })
 
-  return <group ref={group} />
+  return (
+    <group ref={group}>
+      <GroundStrata material={material} />
+    </group>
+  )
 }
 
 /** The #4 terrain budget is 2 ms a frame; the perf log keeps its p95. */

@@ -16,6 +16,11 @@
  * Lighting is the vehicle lamp, ambient light that fades with depth, and the scene's point lights
  * (#13, #38: the lamp plus at most 4 point lights; `LightRig` chooses them, an unused one is black). Ore glow, sparkles and the core's pulse are emissive, so
  * ore stays readable in the dark and by shape and brightness, not colour alone.
+ *
+ * Rock and ore tiles draw their depth band's strata map once the five have loaded (S7d,
+ * `uHasStrata`), wrapped around the planet in rings (`groundStrata.ts`): albedo for the colour,
+ * tinted per planet, and the baked normal tilting the lamp and point lights toward the slopes that
+ * face them. Until then, and on the pad, core and cache, the flat band colour shows.
  */
 
 export const TERRAIN_VERTEX_SHADER = /* glsl */ `
@@ -64,6 +69,15 @@ uniform vec3 uPointColours[MAX_POINT_LIGHTS];
 uniform float uWhisper;
 uniform float uWhisperRange;
 uniform float uCacheLive;
+// Ground strata (S7d), bands 1 to 5; band b starts where a tile's halfTileDistanceSq is at most
+// uBandStarts[b - 2], as in bandOfTile (planetGeometry).
+uniform float uHasStrata;
+uniform sampler2D uStrataAlbedo[5];
+uniform sampler2D uStrataNormal[5];
+uniform vec3 uStrataTint[5];
+uniform float uStrataTurns[5];
+uniform float uStrataTileM;
+uniform float uBandStarts[4];
 
 varying vec2 vLocal;
 varying vec2 vChunk;
@@ -78,6 +92,9 @@ const float SAMPLES_PER_TILE = 4.0;
 const float HALO_SIDE = 129.0;
 const float ISO = 128.0 / 255.0;
 const float EDGE_PIXELS = 2.0;
+const float TAU = 6.28318530718;
+// How far a baked slope brightens toward a light it faces, and darkens away from it.
+const float RELIEF = 1.0;
 
 // Hash without sine (Dave Hoskins, "Hash without Sine", MIT): stable on every GPU.
 float hash12(vec2 p) {
@@ -97,6 +114,13 @@ vec3 displayToLinear(vec3 colour) {
   vec3 low = colour / 12.92;
   vec3 high = pow((colour + 0.055) / 1.055, vec3(2.4));
   return mix(low, high, step(vec3(0.04045), colour));
+}
+
+// The sRGB transfer: a strata map samples as linear light, the shader works in display values.
+vec3 linearToDisplay(vec3 colour) {
+  vec3 low = colour * 12.92;
+  vec3 high = 1.055 * pow(colour, vec3(1.0 / 2.4)) - 0.055;
+  return mix(low, high, step(vec3(0.0031308), colour));
 }
 
 float densityAt(vec2 chunkLocal) {
@@ -148,7 +172,60 @@ float sparkles(vec2 local, vec2 tile, float count) {
   return light;
 }
 
-vec3 lightAt(vec2 world) {
+// The tile's depth band by the integer rule of bandOfTile: exact below 2^24, so for any planet.
+int bandOfTile(vec2 tile) {
+  vec2 halfTile = 2.0 * tile + 1.0;
+  float distanceSq = dot(halfTile, halfTile);
+  int band = 1;
+  for (int i = 0; i < 4; i++) band += int(step(distanceSq, uBandStarts[i]));
+  return band;
+}
+
+// Ring coordinates in strata tiles: u runs clockwise along the band and v outward, so the map's
+// right and up are the ground's wherever the camera rolls (the maps upload unflipped, v down).
+vec2 strataUv(vec2 world, float turns) {
+  return vec2(-atan(world.y, world.x) / TAU * turns, -length(world) / uStrataTileM);
+}
+
+// The change of strataUv for a change of world position: continuous across atan's wrap, so the
+// mip level never jumps there.
+vec2 strataUvChange(vec2 world, vec2 change, float turns) {
+  float radius = length(world);
+  float turn = (world.x * change.y - world.y * change.x) / (radius * radius);
+  return vec2(-turn / TAU * turns, -dot(world, change) / radius / uStrataTileM);
+}
+
+// Explicit gradients, because the band differs per tile and sampler arrays take constant indices.
+vec4 strataAlbedo(int band, vec2 uv, vec2 dx, vec2 dy) {
+  if (band == 1) return textureGrad(uStrataAlbedo[0], uv, dx, dy);
+  if (band == 2) return textureGrad(uStrataAlbedo[1], uv, dx, dy);
+  if (band == 3) return textureGrad(uStrataAlbedo[2], uv, dx, dy);
+  if (band == 4) return textureGrad(uStrataAlbedo[3], uv, dx, dy);
+  return textureGrad(uStrataAlbedo[4], uv, dx, dy);
+}
+
+vec4 strataNormal(int band, vec2 uv, vec2 dx, vec2 dy) {
+  if (band == 1) return textureGrad(uStrataNormal[0], uv, dx, dy);
+  if (band == 2) return textureGrad(uStrataNormal[1], uv, dx, dy);
+  if (band == 3) return textureGrad(uStrataNormal[2], uv, dx, dy);
+  if (band == 4) return textureGrad(uStrataNormal[3], uv, dx, dy);
+  return textureGrad(uStrataNormal[4], uv, dx, dy);
+}
+
+// A tangent-space normal (OpenGL, +Y up) in world terms: its x along the band, its y outward.
+vec3 groundNormalOf(vec3 tangentNormal, vec2 world) {
+  vec2 outward = normalize(world);
+  vec2 along = vec2(outward.y, -outward.x);
+  return normalize(vec3(tangentNormal.x * along + tangentNormal.y * outward, tangentNormal.z));
+}
+
+// 1 on flat ground; a slope facing the light at from is brighter, one turned away darker.
+float reliefToward(vec2 from, vec2 world, vec3 normal) {
+  vec2 toLight = from - world;
+  return max(0.0, 1.0 + RELIEF * dot(normal.xy, toLight / max(length(toLight), 0.0001)));
+}
+
+vec3 lightAt(vec2 world, vec3 normal) {
   float depth = uPlanetRadius - length(world);
   float ambient = mix(uAmbientSurface, uAmbientDeep, clamp(depth / uAmbientFade, 0.0, 1.0));
   vec2 toPoint = world - uLampPosition;
@@ -160,9 +237,10 @@ vec3 lightAt(vec2 world) {
   vec3 points = vec3(0.0);
   for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
     float falloff = 1.0 - smoothstep(0.0, uPointLights[i].z, length(world - uPointLights[i].xy));
-    points += uPointColours[i] * falloff * falloff;
+    points += uPointColours[i] * falloff * falloff * reliefToward(uPointLights[i].xy, world, normal);
   }
-  return vec3(ambient) + uLampColour * (cone * reach + 0.6 * spill) + points;
+  vec3 lamp = uLampColour * (cone * reach + 0.6 * spill) * reliefToward(uLampPosition, world, normal);
+  return vec3(ambient * normal.z) + lamp + points;
 }
 
 void main() {
@@ -170,8 +248,21 @@ void main() {
   if (density < ISO) discard;
   float style = vStyle.x;
   vec3 colour = vBase * (0.94 + 0.08 * hash12(floor(vLocal * 6.0) + vTile * 7.0));
+  vec3 normal = vec3(0.0, 0.0, 1.0);
+  // Derivatives outside the branch: a pixel's neighbours may be in a tile that skips it.
+  vec2 worldDx = dFdx(vWorld);
+  vec2 worldDy = dFdy(vWorld);
+  if (uHasStrata > 0.5 && style < 1.5) {
+    int band = bandOfTile(vTile);
+    float turns = uStrataTurns[band - 1];
+    vec2 uv = strataUv(vWorld, turns);
+    vec2 dx = strataUvChange(vWorld, worldDx, turns);
+    vec2 dy = strataUvChange(vWorld, worldDy, turns);
+    colour = linearToDisplay(strataAlbedo(band, uv, dx, dy).rgb) * uStrataTint[band - 1];
+    normal = groundNormalOf(strataNormal(band, uv, dx, dy).xyz * 2.0 - 1.0, vWorld);
+  }
   colour = mix(colour, colour * 1.5 + vec3(0.06, 0.05, 0.03), 0.55 * edgeHighlight(density));
-  vec3 light = lightAt(vWorld);
+  vec3 light = lightAt(vWorld, normal);
   vec3 emissive = vec3(0.0);
 
   if (style > 3.5) {
