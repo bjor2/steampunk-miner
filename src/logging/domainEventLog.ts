@@ -49,6 +49,11 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
   TileDestroyed: ({ tx, ty, kind }) => ({ event: 'tile_destroyed', data: { tx, ty, kind } }),
   // Per-carve chunk changes would swamp the log; the yields above are its record of mining (#4).
   GroundChanged: () => null,
+  CasingPlaced: ({ samples, relined, grade }) => ({
+    event: 'casing_placed',
+    data: { samples, relined, grade },
+  }),
+  CasingDrilled: ({ samples, grade }) => ({ event: 'casing_drilled', data: { samples, grade } }),
   CargoAdded: ({ resourceTier, amount, value }) => ({
     event: 'resource_collected',
     data: { resourceTier, amount, value },

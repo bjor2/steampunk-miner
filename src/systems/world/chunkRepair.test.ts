@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { stateDigest } from '../authority/stateDigest'
 import { chunkRepairOf, mismatchedChunks, touchedChunksOf, withChunkRepaired } from './chunkRepair'
+import { lineRing } from './casingLining'
 import { carveDisc } from './groundEdit'
 import { planetParamsFor } from './planetParams'
 import { chunkKey } from './tileGrid'
@@ -46,5 +47,20 @@ describe('chunk desync repair (#36 acceptance 5)', () => {
     const repair = chunkRepairOf(hostWorld(), { cx: 0, cy: 8 })
     expect(JSON.stringify(repair).length).toBeLessThan(16 * 1024)
     expect(repair.delta.density.length).toBeGreaterThan(0)
+  })
+})
+
+describe('chunk desync repair: casing (#41)', () => {
+  it('finds a guest chunk whose lining differs from the host and repairs it', () => {
+    const ring = { xMm: 31000, yMm: 284000, clearMm: 700, widthMm: 500 }
+    const host = lineRing(hostWorld(), params, ring, 3).world
+    const guest = lineRing(hostWorld(), params, ring, 2).world
+    const mismatched = mismatchedChunks(host, guest, params, touchedChunksOf(host, guest))
+    expect(mismatched.length).toBeGreaterThan(0)
+    const repaired = mismatched.reduce(
+      (world, chunk) => withChunkRepaired(world, chunkRepairOf(host, chunk)),
+      guest,
+    )
+    expect(mismatchedChunks(host, repaired, params, touchedChunksOf(host, repaired))).toEqual([])
   })
 })

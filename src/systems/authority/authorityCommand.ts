@@ -14,8 +14,9 @@ import type { BayId } from '../world/dockBays'
  * 2: `Dock {bay}` and the two bays of #37, with the run starting in the Sell bay.
  * 3: the vehicle's casing grade and `BuyCasingGrade` (#41, #58).
  * 4: the artefact commands and events (#46).
+ * 5: the casing layer in chunk deltas, its events and debug commands (#41, #56).
  */
-export const AUTHORITY_PROTOCOL_VERSION = 4
+export const AUTHORITY_PROTOCOL_VERSION = 5
 
 export interface CommandPayloads {
   /**
@@ -96,6 +97,10 @@ export interface CommandPayloads {
    */
   'debug.carveCircle': { x: number; y: number; radius: number; amount: number }
   'debug.fillCircle': { x: number; y: number; radius: number; amount: number }
+  /** Sets the vehicle's casing grade directly (#41 `debug.setCasingGrade`). */
+  'debug.setCasingGrade': { grade: number }
+  /** One ring of casing lining of `grade` round `(x, y)` mm (#41 `debug.lineCasing`). */
+  'debug.lineCasing': { x: number; y: number; grade: number }
 }
 
 export type CommandType = keyof CommandPayloads

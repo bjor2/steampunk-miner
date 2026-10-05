@@ -1,14 +1,15 @@
 /**
  * Desync repair, per chunk (decision #36 Determinism, after #4): each chunk has a digest over what
- * the world holds there now, its cells (yielded cells open, overrides applied) and its density.
- * When a guest's digest differs from the host's, the host resends that chunk's delta (the density
- * runs, the yield bits and the overrides) and the guest adopts it whole. Pure, so the same rules
+ * the world holds there now, its cells (yielded cells open, overrides applied), its density and
+ * its casing layer (#41). When a guest's digest differs from the host's, the host resends that
+ * chunk's delta (the density and casing runs, the yield bits and the overrides) and the guest adopts it whole. Pure, so the same rules
  * serve a future network seam and the specs.
  */
 import type { ChunkDelta } from './chunkDelta'
 import { chunkDigest } from './chunkDigest'
 import type { PlanetParams } from './planetParams'
 import {
+  currentCasingOfChunk,
   currentCellsOfChunk,
   currentDensityOfChunk,
   deltaOfChunk,
@@ -34,6 +35,7 @@ export function chunkStateDigest(
   return chunkDigest({
     cells: currentCellsOfChunk(world, params, cx, cy),
     density: currentDensityOfChunk(world, params, cx, cy),
+    casing: currentCasingOfChunk(world, cx, cy),
   })
 }
 

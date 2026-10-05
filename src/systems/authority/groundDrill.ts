@@ -10,6 +10,7 @@
  * yields once: 1 cargo unit of ore or core fragments (#7, #10); with a full hold the unit is lost,
  * never refused.
  */
+import { casingHardness } from '../economy/casingGrades'
 import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { toCanonical, type BigStat } from '../money'
 import { drillDamage, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
@@ -108,6 +109,7 @@ function drillGround(
     events: [
       damageEvent(params, state.world, target.tile, drill, carved.ticksUsed),
       ...carved.changes.map((change) => groundChangedEvent(carved.world, change)),
+      ...casingDrilledEvents(carved),
       ...collected.events,
     ],
   }
@@ -117,9 +119,23 @@ function affordableTicksOf(vehicle: VehicleState): number {
   return Math.floor(vehicle.energy / ENERGY_QUANTA_PER_TICK.drill)
 }
 
-/** A cell's drill time from its own hardness: hard rock carves slower inside the same stamp. */
+/**
+ * A sample's drill time from its own hardness: hard rock carves slower inside the same stamp, and
+ * lining carves as band-G rock of its grade on this planet (#41 `casingHardness`).
+ */
 function drillTicksOfCells(params: PlanetParams, drill: DrillStats): CellDrillTicks {
-  return (tile, material) => ticksPerTile(drill, hardnessOfTile(params, tile, material))
+  return (tile, material, casingGrade) =>
+    ticksPerTile(drill, hardnessOfSample(params, tile, material, casingGrade))
+}
+
+function hardnessOfSample(
+  params: PlanetParams,
+  tile: TilePoint,
+  material: number,
+  casingGrade: number,
+): BigStat {
+  if (casingGrade === 0) return hardnessOfTile(params, tile, material)
+  return casingHardness(params.planetIndex, casingGrade)
 }
 
 function collectYieldedCells(
@@ -190,6 +206,12 @@ function damageEvent(
   const hardness = hardnessOfTile(params, tile, materialCellAt(world, params, tile))
   const damage = toCanonical(drillDamage(drill, hardness, ticks))
   return { type: 'DrillDamageDealt', tx: tile.tx, ty: tile.ty, ticks, damage }
+}
+
+/** Lining the drill cleared, never ore (#41); nothing when it cut no casing. */
+function casingDrilledEvents({ casingCleared }: Carve): DomainEventBody[] {
+  if (casingCleared.samples === 0) return []
+  return [{ type: 'CasingDrilled', ...casingCleared }]
 }
 
 function groundChangedEvent(world: WorldState, change: GroundChange): DomainEventBody {

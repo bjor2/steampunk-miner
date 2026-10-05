@@ -10,11 +10,12 @@
  * - A material cell yields once, at the moment the sum of its 16 samples falls to half or below
  *   (`cellYield`).
  *
+ * - A casing sample (#41) carves in the drill time of its own grade, not its cell's, and loses its
+ *   casing when its density reaches 0. Casing never yields: the yield sum skips it (`cellYield`).
+ *
  * The dock pad never carves. Every change is reported per chunk with its dirty rectangle in
  * chunk-local samples, the shape of `GroundChanged`.
  */
-import { cellsNowYielding, withYieldedCells, type YieldedCell } from './cellYield'
-import { withDensity } from './chunkDelta'
 import {
   FULL_WEIGHT,
   cellSamplesOf,
@@ -22,26 +23,26 @@ import {
   type DiscStamp,
   type WeightedSample,
 } from './stampShape'
+import {
+  clearCasingSample,
+  closeSession,
+  densityOf,
+  editSample,
+  isCarvable,
+  materialOfSample,
+  openSession,
+  casingGradeOf,
+  tileOfSample,
+  type CasingCleared,
+  type EditSession,
+  type GroundEdit,
+} from './groundEditSession'
 import type { PlanetParams } from './planetParams'
-import {
-  CHUNK_SAMPLE_SIDE,
-  SAMPLES_PER_TILE,
-  SOLID_DENSITY,
-  chunkOfSample,
-  localSampleOf,
-  sampleIndexOf,
-} from './sampleGrid'
-import { chunkKey, type TilePoint } from './tileGrid'
-import { CELL_KIND, kindOfCell } from './worldCell'
-import {
-  currentDensityOfChunk,
-  deltaOfChunk,
-  generatedChunkOf,
-  materialCellAt,
-  rememberDensity,
-  withChunkDelta,
-  type WorldState,
-} from './worldState'
+import { SOLID_DENSITY } from './sampleGrid'
+import type { TilePoint } from './tileGrid'
+import type { WorldState } from './worldState'
+
+export type { CasingCleared, GroundChange, GroundEdit } from './groundEditSession'
 
 /** The fixed steps a carve covers: `ticks` steps starting at authority tick `firstTick`. */
 export interface CarveWindow {
@@ -49,50 +50,20 @@ export interface CarveWindow {
   ticks: number
 }
 
-/** Whole ticks a full-weight stamp needs to clear a cell of this material, or null if it cannot. */
-export type CellDrillTicks = (tile: TilePoint, material: number) => number | null
-
-export interface GroundChange {
-  cx: number
-  cy: number
-  /** Dirty rectangle in chunk-local samples, inclusive. */
-  x0: number
-  y0: number
-  x1: number
-  y1: number
-}
-
-export interface GroundEdit {
-  world: WorldState
-  changes: GroundChange[]
-  yielded: YieldedCell[]
-}
+/**
+ * Whole ticks a full-weight stamp needs to clear a sample of this cell's material, or of casing
+ * of `casingGrade` when it is above 0 (#41), or null if the drill cannot.
+ */
+export type CellDrillTicks = (
+  tile: TilePoint,
+  material: number,
+  casingGrade: number,
+) => number | null
 
 export interface Carve extends GroundEdit {
   /** The ticks in which the stamp still removed something: the drill's charged ticks. */
   ticksUsed: number
-}
-
-interface EditChunk {
-  cx: number
-  cy: number
-  density: Uint8Array
-  change: GroundChange
-}
-
-interface TileFacts {
-  material: number
-  /** Undefined until a carve asks; null when the tip cannot scratch the tile. */
-  drillTicks?: number | null
-}
-
-interface EditSession {
-  world: WorldState
-  params: PlanetParams
-  chunks: Map<string, EditChunk>
-  touchedTiles: Map<string, TilePoint>
-  /** Material and drill time per tile, worked out once per edit: a tile holds 16 samples. */
-  tiles: Map<string, TileFacts>
+  casingCleared: CasingCleared
 }
 
 export function carveDisc(
@@ -142,9 +113,8 @@ export function clearDisc(
   for (const sample of discSamplesOf(disc)) {
     if (!isCarvable(session, sample)) continue
     const cut = Math.floor((amount * sample.weight) / FULL_WEIGHT)
-    editSample(session, sample, (density) =>
-      Math.max(Math.min(density, sample.floor), density - cut),
-    )
+    const density = densityOf(session, sample)
+    lowerSample(session, sample, density - Math.max(Math.min(density, sample.floor), density - cut))
   }
   return closeSession(session)
 }
@@ -162,7 +132,7 @@ function carveSamples(
     const ticks = carveOneSample(session, sample, window, drillTicksOf)
     ticksUsed = Math.max(ticksUsed, ticks)
   }
-  return { ...closeSession(session), ticksUsed }
+  return { ...closeSession(session), ticksUsed, casingCleared: session.casingCleared }
 }
 
 /** Carves one sample; answers the ticks of the window it took to remove what it removed. */
@@ -173,14 +143,20 @@ function carveOneSample(
   drillTicksOf: CellDrillTicks,
 ): number {
   if (!isCarvable(session, sample)) return 0
-  const { drillTicks } = tileFactsOf(session, sample, drillTicksOf)
-  if (drillTicks === null || drillTicks === undefined) return 0
+  const drillTicks = drillTicksOfSample(session, sample, drillTicksOf)
+  if (drillTicks === null) return 0
   const rate = { perTick: SOLID_DENSITY * sample.weight, per: FULL_WEIGHT * drillTicks }
   const density = densityOf(session, sample)
   const removal = Math.min(Math.max(0, density - sample.floor), removalOver(rate, window))
   if (removal === 0) return 0
-  editSample(session, sample, (current) => current - removal)
+  lowerSample(session, sample, removal)
   return ticksToRemove(rate, window.firstTick, removal)
+}
+
+/** Lowers a sample's density; a casing sample that reaches air loses its casing (#41). */
+function lowerSample(session: EditSession, sample: WeightedSample, removal: number): void {
+  editSample(session, sample, (current) => current - removal)
+  if (densityOf(session, sample) === 0) clearCasingSample(session, sample)
 }
 
 /** `floor(a (T0 + k) / b) - floor(a T0 / b)`: the rate's removal over the window. */
@@ -199,110 +175,18 @@ function ticksToRemove(
   return Math.ceil((target * rate.per) / rate.perTick) - firstTick
 }
 
-function isCarvable(session: EditSession, sample: WeightedSample): boolean {
-  if (sample.weight === 0) return false
-  const { material } = tileFactsOf(session, sample, NO_DRILL)
-  return kindOfCell(material) !== CELL_KIND.indestructible
-}
-
-const NO_DRILL: CellDrillTicks = () => null
-
-/** The sample's tile material, and its drill time once a carve asks for it. */
-function tileFactsOf(
+/** The sample's drill time: its cell's material, or its casing grade when it is lined (#41). */
+function drillTicksOfSample(
   session: EditSession,
   sample: WeightedSample,
   drillTicksOf: CellDrillTicks,
-): TileFacts {
+): number | null {
   const tile = tileOfSample(sample)
-  const key = `${tile.tx},${tile.ty}`
-  const known = session.tiles.get(key)
-  if (known !== undefined && (known.drillTicks !== undefined || drillTicksOf === NO_DRILL)) {
-    return known
-  }
-  const material = known?.material ?? materialCellAt(session.world, session.params, tile)
-  const facts: TileFacts =
-    drillTicksOf === NO_DRILL
-      ? { material }
-      : { material, drillTicks: drillTicksOf(tile, material) }
-  session.tiles.set(key, facts)
-  return facts
-}
-
-function openSession(world: WorldState, params: PlanetParams): EditSession {
-  return { world, params, chunks: new Map(), touchedTiles: new Map(), tiles: new Map() }
-}
-
-function densityOf(session: EditSession, sample: WeightedSample): number {
-  const chunk = editChunkOf(session, sample)
-  return chunk.density[sampleIndexOf(localSampleOf(sample.sx), localSampleOf(sample.sy))]
-}
-
-function editSample(
-  session: EditSession,
-  sample: WeightedSample,
-  change: (density: number) => number,
-): void {
-  const chunk = editChunkOf(session, sample)
-  const lsx = localSampleOf(sample.sx)
-  const lsy = localSampleOf(sample.sy)
-  const index = sampleIndexOf(lsx, lsy)
-  const next = change(chunk.density[index])
-  if (next === chunk.density[index]) return
-  chunk.density[index] = next
-  growChange(chunk.change, lsx, lsy)
-  const tile = tileOfSample(sample)
-  session.touchedTiles.set(`${tile.tx},${tile.ty}`, tile)
-}
-
-/** A private copy of the chunk's density, made the first time the edit touches the chunk. */
-function editChunkOf(session: EditSession, sample: WeightedSample): EditChunk {
-  const cx = chunkOfSample(sample.sx)
-  const cy = chunkOfSample(sample.sy)
-  const key = chunkKey(cx, cy)
-  const known = session.chunks.get(key)
+  const grade = casingGradeOf(session, sample)
+  const key = `${tile.tx},${tile.ty}#${grade}`
+  const known = session.drillTicks.get(key)
   if (known !== undefined) return known
-  const density = currentDensityOfChunk(session.world, session.params, cx, cy).slice()
-  const chunk = { cx, cy, density, change: emptyChange(cx, cy) }
-  session.chunks.set(key, chunk)
-  return chunk
-}
-
-function emptyChange(cx: number, cy: number): GroundChange {
-  return { cx, cy, x0: CHUNK_SAMPLE_SIDE, y0: CHUNK_SAMPLE_SIDE, x1: -1, y1: -1 }
-}
-
-function growChange(change: GroundChange, lsx: number, lsy: number): void {
-  change.x0 = Math.min(change.x0, lsx)
-  change.y0 = Math.min(change.y0, lsy)
-  change.x1 = Math.max(change.x1, lsx)
-  change.y1 = Math.max(change.y1, lsy)
-}
-
-/** Writes the edited densities back as deltas, then credits the cells that fell to half. */
-function closeSession(session: EditSession): GroundEdit {
-  const changed = [...session.chunks.values()].filter(({ change }) => change.x1 >= 0)
-  const written = changed.reduce(writeChunkDensity(session.params), session.world)
-  const yielded = cellsNowYielding(written, session.params, [...session.touchedTiles.values()])
-  return {
-    world: withYieldedCells(written, session.params, yielded),
-    changes: changed.map(({ change }) => change),
-    yielded,
-  }
-}
-
-function writeChunkDensity(params: PlanetParams) {
-  return (world: WorldState, chunk: EditChunk): WorldState => {
-    const { cx, cy, density } = chunk
-    const generated = generatedChunkOf(params, cx, cy).density
-    const delta = withDensity(deltaOfChunk(world, cx, cy), density, generated)
-    rememberDensity(delta, density)
-    return withChunkDelta(world, cx, cy, delta)
-  }
-}
-
-function tileOfSample(sample: WeightedSample): TilePoint {
-  return {
-    tx: Math.floor(sample.sx / SAMPLES_PER_TILE),
-    ty: Math.floor(sample.sy / SAMPLES_PER_TILE),
-  }
+  const ticks = drillTicksOf(tile, materialOfSample(session, sample), grade)
+  session.drillTicks.set(key, ticks)
+  return ticks
 }

@@ -202,8 +202,10 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     expect(replay.digests.at(-1)?.digest).toBe(takeSessionSnapshot().digest)
   })
 
-  it('registers the 56 event names from before the controls and HUD, plus casing_upgraded, hint_shown and the four #46 artefact events', () => {
-    expect(ALL_RUN_EVENT_NAMES).toHaveLength(58 + 4)
+  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing and the four #46 artefact events', () => {
+    // #41 added `casing_upgraded`, `casing_placed` and `casing_drilled`; #46 four artefact events;
+    // the controls and the HUD still add none.
+    expect(ALL_RUN_EVENT_NAMES).toHaveLength(60 + 4)
   })
 })
 

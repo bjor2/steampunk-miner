@@ -7,19 +7,25 @@
  * - `yieldedRows`: one bit per material cell that has credited its ore (#36 Yield), 32 uint32
  *   words, word `ly` holding bit `lx` of chunk row `ly`. A yielded cell counts as open ground for
  *   every cell rule (enemies, the bot, the drill), as a removed tile did under generator 1.
- * - `overrides`: sparse `[index, cell]` material overrides sorted by index, so later features
- *   (casing #41, placed supports) never need a format change.
+ * - `casing`: the casing layer (#41), one grade per density sample (0 = no casing, 1 to 15),
+ *   run-length encoded like `density`. Generation lays no casing, so the runs are the layer itself.
+ * - `overrides`: sparse `[index, cell]` material overrides sorted by index (placed supports later).
  * - `version`: counts the changes, so a renderer or collider can tell a chunk moved on (#36
  *   `GroundChanged`).
  *
  * The world is `seed + params + deltas`, so only touched chunks are ever saved. Plain JSON shapes,
  * so a delta lives in authority state and its canonical digest. Immutable.
  */
+import { CHUNK_SAMPLES } from './sampleGrid'
 import { CHUNK_SIZE } from './tileGrid'
 import { AIR_CELL } from './worldCell'
 
+/** The highest grade a casing sample holds (#41: 1 to 15); a higher player grade lines at 15. */
+export const MAX_SAMPLE_CASING_GRADE = 15
+
 export interface ChunkDelta {
   density: readonly number[]
+  casing: readonly number[]
   yieldedRows: readonly number[]
   overrides: readonly (readonly [index: number, cell: number])[]
   version: number
@@ -27,6 +33,7 @@ export interface ChunkDelta {
 
 export const EMPTY_CHUNK_DELTA: ChunkDelta = {
   density: [],
+  casing: [],
   yieldedRows: new Array<number>(CHUNK_SIZE).fill(0),
   overrides: [],
   version: 0,
@@ -63,9 +70,15 @@ export function withDensity(
   return { ...delta, density: encodeDensityChange(current, generated), version: delta.version + 1 }
 }
 
+/** The casing layer as it stands now becomes the delta's. */
+export function withCasing(delta: ChunkDelta, casing: Uint8Array): ChunkDelta {
+  return { ...delta, casing: encodeDensityChange(casing, NO_CASING), version: delta.version + 1 }
+}
+
 export function isChunkTouched(delta: ChunkDelta): boolean {
   return (
     delta.density.length > 0 ||
+    delta.casing.length > 0 ||
     delta.overrides.length > 0 ||
     delta.yieldedRows.some((row) => row !== 0)
   )
@@ -89,14 +102,26 @@ export function materialCellsOf(generated: Uint32Array, delta: ChunkDelta): Uint
 
 /** The current density: the generated density XOR the decoded runs. A fresh array. */
 export function decodeDensity(generated: Uint8Array, delta: ChunkDelta): Uint8Array {
-  const density = generated.slice()
+  return xorRuns(generated, delta.density)
+}
+
+/** The casing layer, one grade per sample. A fresh array. */
+export function decodeCasing(delta: ChunkDelta): Uint8Array {
+  return xorRuns(NO_CASING, delta.casing)
+}
+
+/** A chunk with no casing anywhere, what generation lays (#41). Shared: only ever read. */
+export const NO_CASING: Uint8Array = new Uint8Array(CHUNK_SAMPLES)
+
+function xorRuns(base: Uint8Array, runs: readonly number[]): Uint8Array {
+  const layer = base.slice()
   let at = 0
-  for (let run = 0; run < delta.density.length; run += 2) {
-    const [count, value] = [delta.density[run], delta.density[run + 1]]
-    if (value !== 0) xorRange(density, at, count, value)
+  for (let run = 0; run < runs.length; run += 2) {
+    const [count, value] = [runs[run], runs[run + 1]]
+    if (value !== 0) xorRange(layer, at, count, value)
     at += count
   }
-  return density
+  return layer
 }
 
 /** `current XOR generated` as runs; an unchanged density is no runs at all. */

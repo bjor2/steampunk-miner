@@ -3,12 +3,14 @@
  * through the same `applyCommand` as play so they replay and are logged. The vehicle's own
  * (`setUpgrade`, `setEnergy`, `setHull`) live in `vehicleDebugRules.ts`, combat's in
  * `combat/combatDebugRules.ts`, `teleportToDock` in `teleportDebugRules.ts`, the ground's
- * `carveCircle` and `fillCircle` in `groundDebugRules.ts`, `setArtefact` in `artefactRules.ts`.
+ * `carveCircle`, `fillCircle` and `lineCasing` in `groundDebugRules.ts`, `setCasingGrade` in
+ * `casingRules.ts`, `setArtefact` in `artefactRules.ts`.
  */
 import { add, fromCanonical, toCanonical, type Money } from '../money'
 import type { CommandType } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
 import { ARTEFACT_DEBUG_RULES } from './artefactRules'
+import { CASING_DEBUG_RULES } from './casingRules'
 import { COMBAT_DEBUG_RULES } from './combat/combatDebugRules'
 import type { CommandRule, RuleEffect } from './commandRule'
 import { followBayTotal } from './coreBay'
@@ -53,6 +55,7 @@ export const DEBUG_COMMAND_RULES: {
   ...COMBAT_DEBUG_RULES,
   ...TELEPORT_DEBUG_RULES,
   ...GROUND_DEBUG_RULES,
+  ...CASING_DEBUG_RULES,
   ...ARTEFACT_DEBUG_RULES,
 }
 

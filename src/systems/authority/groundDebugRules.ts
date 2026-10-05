@@ -4,13 +4,19 @@
  * energy. They go through `applyCommand` like play, so they replay from `commands.ndjson` and log
  * `debug_command_applied`. A cell carved past half is marked yielded but credits nothing: debug
  * never counts as play (#11 section 4). The dock pad is never cut.
+ *
+ * `debug.lineCasing` lines one ring of casing round a point at a grade (#41), the same ring the
+ * vehicle lays, and logs it like one.
  */
+import { CASING_CLEAR_RADIUS_MM, CASING_RING_WIDTH_MM } from '../../constants/balance'
+import { lineRing } from '../world/casingLining'
 import { SOLID_DENSITY } from '../world/sampleGrid'
 import { clearDisc, fillDisc, type GroundEdit } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
 import { deltaOfChunk } from '../world/worldState'
 import type { AuthorityCommand } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
+import { casingGradeRangeRejection } from './casingRules'
 import type { GroundCircle } from './groundCommands'
 import {
   firstRejection,
@@ -20,6 +26,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
+import type { DomainEventBody } from './domainEvent'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 
 type CircleCommand = 'debug.carveCircle' | 'debug.fillCircle'
@@ -38,6 +45,7 @@ const CIRCLE_FIELDS = {
 export const GROUND_DEBUG_RULES: {
   readonly 'debug.carveCircle': CommandRule<'debug.carveCircle'>
   readonly 'debug.fillCircle': CommandRule<'debug.fillCircle'>
+  readonly 'debug.lineCasing': CommandRule<'debug.lineCasing'>
 } = {
   'debug.carveCircle': {
     fields: CIRCLE_FIELDS,
@@ -55,6 +63,32 @@ export const GROUND_DEBUG_RULES: {
         fillDisc(state.world, params, discOf(payload), payload.amount),
       ),
   },
+  'debug.lineCasing': {
+    fields: { x: 'safeInteger', y: 'safeInteger', grade: 'wholeNumber' },
+    reject: (state, { payload }) =>
+      firstRejection([
+        () => noPlanetRejection(state.planet),
+        () => casingGradeRangeRejection(payload.grade),
+      ]),
+    apply: (state, { payload }) => lineCasingRing(state, payload),
+  },
+}
+
+function lineCasingRing(
+  state: AuthorityState,
+  { x, y, grade }: { x: number; y: number; grade: number },
+): RuleEffect {
+  const params = planetParamsOf(state.planet)
+  if (params === null) return unchanged(state)
+  const ring = { xMm: x, yMm: y, clearMm: CASING_CLEAR_RADIUS_MM, widthMm: CASING_RING_WIDTH_MM }
+  const lined = lineRing(state.world, params, ring, grade)
+  return {
+    state: { ...state, world: lined.world },
+    events: [
+      ...groundChangedEvents(lined),
+      { type: 'CasingPlaced', samples: lined.placed, relined: lined.relined, grade },
+    ],
+  }
 }
 
 function circleCommandRejection(state: AuthorityState, payload: GroundCircle): Rejection | null {
@@ -79,14 +113,15 @@ function applyCircle(
   const params = planetParamsOf(state.planet)
   if (params === null) return unchanged(state)
   const edited = edit(params, command)
-  return {
-    state: { ...state, world: edited.world },
-    events: edited.changes.map((change) => ({
-      type: 'GroundChanged',
-      ...change,
-      version: deltaOfChunk(edited.world, change.cx, change.cy).version,
-    })),
-  }
+  return { state: { ...state, world: edited.world }, events: groundChangedEvents(edited) }
+}
+
+function groundChangedEvents(edited: GroundEdit): DomainEventBody[] {
+  return edited.changes.map((change) => ({
+    type: 'GroundChanged',
+    ...change,
+    version: deltaOfChunk(edited.world, change.cx, change.cy).version,
+  }))
 }
 
 function discOf(circle: { x: number; y: number; radius: number }) {

@@ -8,7 +8,7 @@ import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
 import type { Cargo, VehicleMode, VehicleState } from '../vehicle/vehicleState'
-import type { ChunkDelta } from '../world/chunkDelta'
+import { MAX_SAMPLE_CASING_GRADE, type ChunkDelta } from '../world/chunkDelta'
 import { CHUNK_SAMPLES } from '../world/sampleGrid'
 import { CHUNK_SIZE } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
@@ -97,7 +97,8 @@ function isPortablePose(pose: unknown): pose is VehiclePose {
 function isPortableDelta(delta: unknown): delta is ChunkDelta {
   return (
     isJsonObject(delta) &&
-    isDensityRuns(delta.density) &&
+    isSampleRuns(delta.density, MAX_BYTE) &&
+    isSampleRuns(delta.casing, MAX_SAMPLE_CASING_GRADE) &&
     isWholeNumberList(delta.yieldedRows) &&
     delta.yieldedRows.length === CHUNK_SIZE &&
     Array.isArray(delta.overrides) &&
@@ -106,13 +107,13 @@ function isPortableDelta(delta: unknown): delta is ChunkDelta {
   )
 }
 
-/** No runs, or `[count, byte, ...]` pairs covering the chunk's samples exactly (#36). */
-function isDensityRuns(runs: unknown): boolean {
+/** No runs, or `[count, value, ...]` pairs covering the chunk's samples exactly (#36, #41). */
+function isSampleRuns(runs: unknown, maxValue: number): boolean {
   if (!isWholeNumberList(runs) || runs.length % 2 !== 0) return false
   const counts = runs.filter((_, at) => at % 2 === 0)
   const bytes = runs.filter((_, at) => at % 2 === 1)
   const total = counts.reduce((sum, count) => sum + count, 0)
-  return (runs.length === 0 || total === CHUNK_SAMPLES) && bytes.every((byte) => byte <= MAX_BYTE)
+  return (runs.length === 0 || total === CHUNK_SAMPLES) && bytes.every((byte) => byte <= maxValue)
 }
 
 function isWholeNumberList(value: unknown): value is number[] {

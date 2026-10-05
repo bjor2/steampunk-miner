@@ -42,6 +42,14 @@ export const DRILL_REACH_MM = 1600
 export const DRILL_STAMP_RADIUS_MM = 950
 
 /**
+ * Casing lining (#41 Placement rule): a ring lines the annulus `clearR <= d < clearR + 0.5 m`
+ * round its centre, where `clearR` leaves the vehicle height (0.9 m, #7) plus 0.5 m clear,
+ * `(900 + 500) / 2` mm. The Gameplay & Vehicle Designer owns both as data.
+ */
+export const CASING_CLEAR_RADIUS_MM = 700
+export const CASING_RING_WIDTH_MM = 500
+
+/**
  * Where the stamp sits (#40: the drill axis is the 4-way facing in the local frame): this far
  * ahead of the body's centre along the facing, so it bites just past the 0.9 m body's face.
  * Driving sideways on the ground it is also raised along `localUp` by `DRILL_STAMP_LIFT_MM`, so

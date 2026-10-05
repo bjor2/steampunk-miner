@@ -8,10 +8,12 @@
 import { createChunkCache, type ChunkCache } from './chunkCache'
 import {
   applyChunkDelta,
+  decodeCasing,
   decodeDensity,
   EMPTY_CHUNK_DELTA,
   isCellYielded,
   materialCellsOf,
+  NO_CASING,
   type ChunkDelta,
 } from './chunkDelta'
 import type { GeneratedChunk } from './generateChunk'
@@ -36,6 +38,8 @@ let cacheOfPlanet: { params: PlanetParams; cache: ChunkCache } | null = null
  * a carve hands the array it built straight in (`rememberDensity`) instead of decoding it again.
  */
 const densityOfDelta = new WeakMap<ChunkDelta, Uint8Array>()
+/** Decoded casing layers, kept per delta object like the densities (#41). */
+const casingOfDelta = new WeakMap<ChunkDelta, Uint8Array>()
 
 export function deltaOfChunk(world: WorldState, cx: number, cy: number): ChunkDelta {
   return world.chunks[chunkKey(cx, cy)] ?? EMPTY_CHUNK_DELTA
@@ -113,6 +117,22 @@ export function currentDensityOfChunk(
   const decoded = decodeDensity(density, delta)
   densityOfDelta.set(delta, decoded)
   return decoded
+}
+
+/** The chunk's casing layer (#41), one grade per sample, 0 for none; callers must only read it. */
+export function currentCasingOfChunk(world: WorldState, cx: number, cy: number): Uint8Array {
+  const delta = deltaOfChunk(world, cx, cy)
+  if (delta.casing.length === 0) return NO_CASING
+  const known = casingOfDelta.get(delta)
+  if (known !== undefined) return known
+  const decoded = decodeCasing(delta)
+  casingOfDelta.set(delta, decoded)
+  return decoded
+}
+
+/** Hands a delta the casing array it was encoded from; the caller gives up writing to it. */
+export function rememberCasing(delta: ChunkDelta, casing: Uint8Array): void {
+  casingOfDelta.set(delta, casing)
 }
 
 /** Hands a delta the density array it was encoded from; the caller gives up writing to it. */

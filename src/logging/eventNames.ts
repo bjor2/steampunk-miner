@@ -223,6 +223,17 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: { tx: 'integer', ty: 'integer', kind: { oneOf: ['ground', 'ore', 'core'] } },
   },
+  // #41: one ring of lining, and lining the drill cleared (one line per drilling command).
+  casing_placed: {
+    group: 'mining',
+    level: 'detail',
+    payload: { samples: 'integer', relined: 'integer', grade: 'integer' },
+  },
+  casing_drilled: {
+    group: 'mining',
+    level: 'detail',
+    payload: { samples: 'integer', grade: 'integer' },
+  },
   // One line per drilling command (a pose report's interval or a `drillTile`), #7: `damage` is
   // `ticks * drillPower * eff / 60` in hardness units.
   drill_damage_dealt: {

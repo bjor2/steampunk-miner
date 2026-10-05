@@ -99,6 +99,10 @@ export interface DomainEventBodies {
     y1: number
     version: number
   }
+  /** One ring of lining (#41): air samples lined and lower-grade casing raised, at `grade`. */
+  CasingPlaced: { samples: number; relined: number; grade: number }
+  /** The drill cleared lining (#41): casing samples drilled to air, the highest grade among them. */
+  CasingDrilled: { samples: number; grade: number }
   CargoAdded: { resourceTier: number; amount: number; value: string }
   /** A full hold: the tile still broke, its unit was lost (#7). */
   StorageFull: { lostUnits: number }

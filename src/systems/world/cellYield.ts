@@ -1,6 +1,8 @@
 /**
  * The yield rule of decision #36: a material cell credits its ore once, at the moment the sum of
  * its 16 density samples falls to half of full or below; its yield bit enforces "once".
+ * Casing samples (#41) count as nothing toward that sum, so lining a cell can never carry it back
+ * over the threshold and re-drilling lining never credits ore.
  */
 import { isCellYielded, withCellsYielded } from './chunkDelta'
 import type { PlanetParams } from './planetParams'
@@ -14,6 +16,7 @@ import {
 import { cellIndexOfTile, chunkOfTile, type TilePoint } from './tileGrid'
 import { isRemovableCell } from './worldCell'
 import {
+  currentCasingOfChunk,
   currentDensityOfChunk,
   deltaOfChunk,
   materialCellAt,
@@ -47,7 +50,7 @@ export function cellsNowYielding(
 function isAtYield(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
   const delta = deltaOfChunk(world, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
   if (isCellYielded(delta, cellIndexOfTile(tile.tx, tile.ty))) return false
-  return cellDensitySum(world, params, tile) <= YIELD_SUM
+  return unlinedDensitySum(world, params, tile) <= YIELD_SUM
 }
 
 /** Yield bits change no density, so each new delta keeps the density its chunk already has. */
@@ -66,22 +69,40 @@ export function withYieldedCells(
   }, world)
 }
 
-/** The sum of a cell's 16 density samples, the quantity the yield rule watches. */
+/** The sum of a cell's 16 density samples, lining included: whether anything is left to drill. */
 export function cellDensitySum(world: WorldState, params: PlanetParams, tile: TilePoint): number {
+  const density = currentDensityOfChunk(world, params, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
+  return cellSampleIndices(tile).reduce((sum, index) => sum + density[index], 0)
+}
+
+/** The sum of a cell's samples that are not casing: the quantity the yield rule watches. */
+export function unlinedDensitySum(
+  world: WorldState,
+  params: PlanetParams,
+  tile: TilePoint,
+): number {
   const cx = chunkOfTile(tile.tx)
   const cy = chunkOfTile(tile.ty)
   const density = currentDensityOfChunk(world, params, cx, cy)
-  let sum = 0
+  const casing = currentCasingOfChunk(world, cx, cy)
+  return cellSampleIndices(tile).reduce(
+    (sum, index) => sum + (casing[index] === 0 ? density[index] : 0),
+    0,
+  )
+}
+
+/** Chunk-local indices of a cell's 16 samples. */
+function cellSampleIndices(tile: TilePoint): number[] {
+  const indices: number[] = []
   for (let qy = 0; qy < SAMPLES_PER_TILE; qy++) {
     for (let qx = 0; qx < SAMPLES_PER_TILE; qx++) {
-      sum +=
-        density[
-          sampleIndexOf(
-            localSampleOf(tile.tx * SAMPLES_PER_TILE + qx),
-            localSampleOf(tile.ty * SAMPLES_PER_TILE + qy),
-          )
-        ]
+      indices.push(
+        sampleIndexOf(
+          localSampleOf(tile.tx * SAMPLES_PER_TILE + qx),
+          localSampleOf(tile.ty * SAMPLES_PER_TILE + qy),
+        ),
+      )
     }
   }
-  return sum
+  return indices
 }
