@@ -1,7 +1,7 @@
 /**
  * The debug API's `ui` and `input` namespaces (#33 section 9, #11 amendment 2). `ui` reads the
- * screens' view models and sets local presentation settings: no command, no log line, not in the
- * digest, never `debugApplied`. `input` presses actions at the action layer, so a tap travels the
+ * screens' view models and the audio model (#49) and sets local presentation settings: no
+ * command, no log line, not in the digest, never `debugApplied`. `input` presses actions at the action layer, so a tap travels the
  * same path as a key and its commands land in `commands.ndjson` like real play; bindings are
  * read and set refused-whole. None of it is a `debug.*` command, and all of it exists only on
  * `window.steampunkDebug`, which the debug flag alone exposes.
@@ -9,7 +9,8 @@
 import { cameraPresence } from '../scene/cameraPresence'
 import { useGameStore } from '../store/gameStore'
 import { pressAction, releaseAction } from '../store/inputRuntime'
-import { readHudModel, readPlatformModel } from '../store/screenReads'
+import { readAudioModel, readHudModel, readPlatformModel } from '../store/screenReads'
+import type { AudioModel } from '../systems/audio/audioModel'
 import {
   isActionId,
   type ActionId,
@@ -40,6 +41,8 @@ export interface DebugUi {
   getCameraView(): DebugResult<{ view: CameraView }>
   getHudModel(): DebugResult<{ model: HudModel }>
   getPlatformModel(): DebugResult<{ model: PlatformModel }>
+  /** The music's layer targets, settings and the run's stingers in order (#49). */
+  getAudioModel(): DebugResult<{ model: AudioModel }>
 }
 
 export interface DebugInput {
@@ -64,6 +67,7 @@ export function createDebugUi(): DebugUi {
     getCameraView: () => ({ ok: true, view: cameraViewOnScreen() }),
     getHudModel: () => ({ ok: true, model: readHudModel() }),
     getPlatformModel: () => ({ ok: true, model: readPlatformModel() }),
+    getAudioModel: () => ({ ok: true, model: readAudioModel() }),
   }
 }
 
