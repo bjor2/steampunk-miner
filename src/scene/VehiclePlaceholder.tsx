@@ -1,42 +1,25 @@
 /**
- * The vehicle's programmatic placeholder art (#13): layered flat parts in brass, copper and iron,
- * each drawn at the variant of its visual tier, so an upgrade threshold shows on the vehicle
- * (37.7). The tier is the authority replica's (#7: derived from the levels, never decided here).
- * Drawn inside the vehicle's body group, so it turns with the body.
+ * The run vehicle's body parts (#52, #51), drawn from the `vehicle` placeholder sidecar at the
+ * authority replica's visual tier (#7: derived from the levels, never decided here), so an upgrade
+ * threshold shows on the vehicle (37.7). Drawn inside the vehicle's body group, so it turns with
+ * the body; the drill head's parts are `DrillHeadView`'s.
  */
 import { useMemo } from 'react'
 import { useGameStore } from '../store/gameStore'
-import { vehicleShapesForTier, type DrawnShape } from '../systems/render/vehiclePlaceholder'
+import { vehicleBodyQuadsOf } from '../systems/render/vehicleLook'
+import { PlaceholderQuadMesh } from './PlaceholderQuadMesh'
 
-/** Parts sit just in front of the tiles; each layer a hair nearer the camera than the last. */
-const BASE_Z = 0.1
-const Z_PER_LAYER = 0.01
-const DISC_SEGMENTS = 20
+/** Parts sit just in front of the tiles. */
+const BODY_Z = 0.1
 
 export function VehiclePlaceholder() {
   const visualTier = useGameStore((state) => state.vehicle.visualTier)
-  const shapes = useMemo(() => vehicleShapesForTier(visualTier), [visualTier])
+  const quads = useMemo(() => vehicleBodyQuadsOf(visualTier), [visualTier])
   return (
     <>
-      {shapes.map((shape) => (
-        <VehicleShapeMesh key={shape.key} shape={shape} />
+      {quads.map((quad) => (
+        <PlaceholderQuadMesh key={quad.partId} quad={quad} baseZ={BODY_Z} />
       ))}
     </>
-  )
-}
-
-function VehicleShapeMesh({ shape }: { shape: DrawnShape }) {
-  const [width, height] = shape.size
-  const [x, y] = shape.offset
-  const z = BASE_Z + shape.layer * Z_PER_LAYER
-  return (
-    <mesh position={[x, y, z]}>
-      {shape.shape === 'disc' ? (
-        <circleGeometry args={[width / 2, DISC_SEGMENTS]} />
-      ) : (
-        <planeGeometry args={[width, height]} />
-      )}
-      <meshBasicMaterial color={shape.colour} />
-    </mesh>
   )
 }

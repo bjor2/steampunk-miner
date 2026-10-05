@@ -74,7 +74,7 @@ file turns it on, so scenario and bot runs never see hints.
   `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
   `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
   `setUpgrade(id, level)`, `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
-  `vehicleStats()`; for the core, `setCoreFragments(count)`; for combat (#25), `spawnEnemy(kind, tier,
+  `vehicleStats()` and `vehicleParts()` (the art part ids the run vehicle draws, #52); for the core, `setCoreFragments(count)`; for combat (#25), `spawnEnemy(kind, tier,
 offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEnemies(frozen)` and the
   unlogged read `enemyStatsTable(kind)`; for the ground (#36), `carveCircle(x, y, radius, amount?)` and
   `fillCircle(x, y, radius, amount?)` (mm, amount 0 to 255; a carve credits no ore). Specs that mine deep (where crawlers live) freeze enemies first

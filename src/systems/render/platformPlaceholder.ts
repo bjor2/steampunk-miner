@@ -8,7 +8,15 @@
  */
 import type { PlatformVisualState } from '../authority/platformState'
 import type { DockSite } from '../world/dockSite'
-import type { PartShape } from './vehiclePlaceholder'
+
+/** A flat shape of the platform's placeholder; sizes and offsets in metres. */
+export interface PartShape {
+  shape: 'box' | 'disc'
+  /** Width and height; a disc uses the width as its diameter. */
+  size: readonly [number, number]
+  offset: readonly [number, number]
+  colour: string
+}
 
 export interface PlatformLook {
   shapes: readonly PartShape[]

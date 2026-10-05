@@ -31,6 +31,7 @@ import {
   type VehicleStatsView,
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
+import { vehiclePartIdsOf } from '../systems/render/vehicleLook'
 import { isEnemyKind } from '../systems/authority/combat/combatDebugRules'
 import {
   clearEnemiesCommand,
@@ -81,6 +82,12 @@ export interface VehicleStatsReport {
   onCurveByPlanet: OnCurveVehicleView[]
 }
 
+/** `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6). */
+export interface VehiclePartsReport {
+  visualTier: number
+  partIds: string[]
+}
+
 export interface DebugApi {
   // set state (each one a `debug.*` command)
   setPlanet(planetIndex: number): DebugResult
@@ -109,6 +116,8 @@ export interface DebugApi {
   /** Hull as a canonical decimal string, at most `hullMax`; 0 destroys the vehicle. */
   setHull(hull: string): DebugResult
   vehicleStats(): DebugResult<VehicleStatsReport>
+  /** The art part ids drawn on the run vehicle (placeholders until S7a's export); not logged. */
+  vehicleParts(): DebugResult<VehiclePartsReport>
   /**
    * `shop`, `workshop` or `charging` (#8): facilities have one level in the slice, so level 1 is
    * accepted and changes nothing, and any other level is a listed problem.
@@ -193,6 +202,11 @@ function depthTilesOfBp(depthBp: number): number {
   return params === null ? 0 : depthTilesOfBasisPoints(params, depthBp)
 }
 
+function vehiclePartsReport(): VehiclePartsReport {
+  const { visualTier } = game().vehicle
+  return { visualTier, partIds: vehiclePartIdsOf(visualTier) }
+}
+
 function vehicleStatsReport(): VehicleStatsReport {
   const vehicle = readLocalVehicle()
   return {
@@ -249,6 +263,7 @@ export function createDebugApi(): DebugApi {
     setHull: (hull) =>
       runUnlessRefused(vehicleDebugProblems(setHullCommand(hull)), () => game().setHull(hull)),
     vehicleStats: () => ({ ok: true, ...vehicleStatsReport() }),
+    vehicleParts: () => ({ ok: true, ...vehiclePartsReport() }),
     setFacilityLevel: (facilityId, level) =>
       runUnlessRefused(facilityLevelProblems(facilityId, level), () => {}),
     setCoreFragments: (count) =>

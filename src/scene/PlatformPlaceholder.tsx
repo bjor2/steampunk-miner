@@ -9,8 +9,8 @@ import {
   coreBayFillOf,
   platformLookOf,
   platformOriginOf,
+  type PartShape,
 } from '../systems/render/platformPlaceholder'
-import type { PartShape } from '../systems/render/vehiclePlaceholder'
 import { dockSiteOf } from '../systems/world/dockSite'
 
 /** Behind the vehicle and the enemies, in front of the tiles. */

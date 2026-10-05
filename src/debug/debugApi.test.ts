@@ -12,6 +12,7 @@ import {
   takeSessionSnapshot,
   useGameStore,
 } from '../store/gameStore'
+import { placeholderSidecarOf } from '../systems/art/artCatalogue'
 import { cellDensitySum } from '../systems/world/groundEdit'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { fromCanonical } from '../systems/money'
@@ -317,6 +318,28 @@ describe('debug api: vehicle', () => {
     expect(report.onCurveByPlanet[0].levels).toMatchObject({ drill_power: 13, drill_tip: 7 })
     expect(sink.events).toEqual([])
     expect(sink.commands).toEqual([])
+  })
+
+  it('reports every placeholder part id of each tier on the run vehicle, without logging', () => {
+    const partIdsOfTier = (tier: number) =>
+      (placeholderSidecarOf('vehicle')?.parts ?? [])
+        .filter((part) => part.tier === tier)
+        .map((part) => part.id)
+    const debug = createDebugApi()
+    expect(debug.vehicleParts()).toMatchObject({ ok: true, visualTier: 1 })
+    expect(debug.vehicleParts()).toMatchObject({
+      partIds: expect.arrayContaining(partIdsOfTier(1)),
+    })
+    expect(sink.events).toEqual([])
+    debug.setUpgrade('drill_tip', 1500)
+    expect(debug.vehicleParts()).toMatchObject({
+      visualTier: 3,
+      partIds: expect.arrayContaining(partIdsOfTier(3)),
+    })
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'vehicle_configuration_changed',
+      'debug_command_applied',
+    ])
   })
 
   it('sets an upgrade level as a logged debug command, with finite stats at drill_tip 1500', () => {
