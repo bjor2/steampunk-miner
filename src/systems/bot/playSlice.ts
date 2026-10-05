@@ -38,7 +38,7 @@ export interface SliceRun {
   commands: readonly AuthorityCommand[]
   events: readonly DomainEvent[]
   state: AuthorityState
-  /** The slice's last core was completed inside the tick budget. */
+  /** The last planet's core was completed inside the tick budget. */
   isFinished: boolean
 }
 
@@ -46,6 +46,11 @@ export interface SliceRunOptions {
   playerId?: string
   /** Ticks the bot may play before giving up; the slice target is at most 130 minutes. */
   maxTicks: number
+  /**
+   * The planet whose core ends the run: the slice's last (#2) unless a report plays on (#29
+   * Systems & Economy note 2: planets 3 to 40 are reported, never gated).
+   */
+  lastPlanet?: number
   /** Sent before the first trip, such as a scenario's `debug.*` start commands (#11 section 4). */
   startCommands?: readonly CommandIntent[]
   listener?: BotListener
@@ -61,7 +66,8 @@ export function playSlice(start: AuthorityState, options: SliceRunOptions): Slic
   const session = createBotSession(start, options.playerId ?? 'p1', options.listener)
   for (const intent of options.startCommands ?? []) session.submit(intent)
   let planet = botPlanetOf(session)
-  while (!isSliceDone(session) && session.tick() < options.maxTicks) {
+  const lastPlanet = options.lastPlanet ?? SLICE_LAST_PLANET
+  while (!isLastCoreDone(session, lastPlanet) && session.tick() < options.maxTicks) {
     planet = travelWhenReady(session, planet)
     if (!playDockCycle(session, planet)) break
   }
@@ -69,13 +75,13 @@ export function playSlice(start: AuthorityState, options: SliceRunOptions): Slic
     commands: session.commands(),
     events: session.events(),
     state: session.state(),
-    isFinished: isSliceDone(session),
+    isFinished: isLastCoreDone(session, lastPlanet),
   }
 }
 
-function isSliceDone(session: BotSession): boolean {
+function isLastCoreDone(session: BotSession, lastPlanet: number): boolean {
   const state = session.state()
-  return state.planet.index >= SLICE_LAST_PLANET && state.core.isCompleted
+  return state.planet.index >= lastPlanet && state.core.isCompleted
 }
 
 function botPlanetOf(session: BotSession): BotPlanet {

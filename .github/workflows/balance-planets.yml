@@ -1,0 +1,27 @@
+name: Balance planets
+
+# Planets 3 to 40, reported and never gated (#29 Systems & Economy note 2, #6 acceptance 7): the
+# pacing bot plays on past the slice and the core time of every planet goes to the job summary.
+on:
+  schedule:
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  planets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run balance:planets
+      - uses: actions/upload-artifact@v4
+        with:
+          name: balance-planets
+          path: balance-report/planets.md

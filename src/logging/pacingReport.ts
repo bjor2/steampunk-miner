@@ -5,6 +5,7 @@
  * the rescues per cause. `pacingProblems` lists the targets it misses (the CI gate);
  * `pacingAlerts` lists what is reported but never fails a build.
  */
+import { SLICE_LAST_PLANET } from '../constants/balance'
 import { PACING_TARGETS } from '../constants/pacingTargets'
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { UPGRADE_IDS } from '../systems/economy/economyDefinition'
@@ -170,6 +171,18 @@ export function pacingAlerts(report: PacingReport): string[] {
   return Object.entries(report.tripsByPlanet)
     .filter(([, trips]) => trips < min || trips > max)
     .map(([planet, trips]) => `planet ${planet} took ${trips} trips, expected ${min} to ${max}`)
+}
+
+/** Planets after the slice (3 on): their core times are reported, never gated (#29 note 2). */
+export function laterPlanetAlerts(report: PacingReport): string[] {
+  const { min, max } = PACING_TARGETS.laterPlanetCoreMinutes
+  return Object.entries(report.coreTicksOnPlanet)
+    .filter(([planet]) => Number.parseInt(planet) > SLICE_LAST_PLANET)
+    .filter(([, ticks]) => ticks < min * TICKS_PER_MINUTE || ticks > max * TICKS_PER_MINUTE)
+    .map(
+      ([planet, ticks]) =>
+        `planet ${planet} core took ${minutesText(ticks)}, expected ${min} to ${max} min; retune paceScale(${planet})`,
+    )
 }
 
 function secondsText(tick: number | null): string {

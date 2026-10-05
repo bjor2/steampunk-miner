@@ -30,7 +30,16 @@ const STARTING_PLANET_INDEX = 1
 /** Three hours of play: past the 130-minute slice target, so a slow build shows as a number. */
 export const BOT_RUN_BUDGET_TICKS = 3 * 60 * 60 * TICKS_PER_SECOND
 
-export function playLoggedSlice(scenario: Scenario): LoggedSliceRun {
+export interface LoggedRunOptions {
+  /** Plays on past the slice to this planet's core (a report, #29 note 2). */
+  lastPlanet?: number
+  maxTicks?: number
+}
+
+export function playLoggedSlice(
+  scenario: Scenario,
+  options: LoggedRunOptions = {},
+): LoggedSliceRun {
   refuseBotScenario(scenario)
   const start = startingState(scenario)
   let tick = 0
@@ -42,7 +51,8 @@ export function playLoggedSlice(scenario: Scenario): LoggedSliceRun {
   })
   recordRunStart(runLog, start)
   const run = playSlice(start, {
-    maxTicks: BOT_RUN_BUDGET_TICKS,
+    maxTicks: options.maxTicks ?? BOT_RUN_BUDGET_TICKS,
+    lastPlanet: options.lastPlanet,
     playerId: PLAYER_ID,
     startCommands: startCommandsOf(scenario),
     listener: {

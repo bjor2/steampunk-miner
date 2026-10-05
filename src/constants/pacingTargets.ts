@@ -16,4 +16,9 @@ export const PACING_TARGETS = {
   sliceMinutes: { min: 90, max: 130 },
   /** Report only (#29 Systems & Economy note 4): alert when a planet takes fewer or more trips. */
   tripsPerPlanet: { min: 3, max: 12 },
+  /**
+   * Report only (#6 acceptance 7, #29 Systems & Economy note 2): the core of each planet from 3 on
+   * should take 25 to 120 minutes from arrival; outside it, `paceScale(p)` is retuned.
+   */
+  laterPlanetCoreMinutes: { min: 25, max: 120 },
 } as const

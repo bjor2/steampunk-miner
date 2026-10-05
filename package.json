@@ -20,6 +20,7 @@
     "golden:update": "vite-node scripts/updateGoldenRuns.ts",
     "balance:report": "vite-node scripts/balanceReport.ts",
     "balance:baseline": "vite-node scripts/balanceReport.ts --write-baseline",
+    "balance:planets": "vite-node scripts/balancePlanets.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

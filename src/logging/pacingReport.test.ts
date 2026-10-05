@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { RunEventData, RunEventName } from './eventNames'
-import { derivePacingReport, pacingAlerts, pacingProblems } from './pacingReport'
+import { derivePacingReport, laterPlanetAlerts, pacingAlerts, pacingProblems } from './pacingReport'
 import type { RunEvent } from './runEvent'
 
 const WORLD_SEED = 83921
@@ -106,6 +106,17 @@ describe('pacing report', () => {
     const report = derivePacingReport(onTimeRun(), WORLD_SEED)
     expect(report.finalLevels).toMatchObject({ drill_tip: 2, hull: 1, engine: 0 })
     expect(report.rescuesByCause).toEqual({ destroyed: 1 })
+  })
+
+  it('reports a later planet whose core leaves 25 to 120 minutes, never the slice planets', () => {
+    const run = [
+      ...onTimeRun(),
+      line(100 * MINUTE, 'planet_entered', { planetSeed: 3, generatorVersion: 1, radius: 475 }, 3),
+      line(240 * MINUTE, 'core_completed', { durationTicks: 0 }, 3),
+    ]
+    expect(laterPlanetAlerts(derivePacingReport(run, WORLD_SEED))).toEqual([
+      'planet 3 core took 140.0 min, expected 25 to 120 min; retune paceScale(3)',
+    ])
   })
 
   it('alerts, without failing, on a planet done in fewer than 3 trips', () => {
