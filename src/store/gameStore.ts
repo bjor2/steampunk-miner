@@ -69,6 +69,7 @@ import {
   submitCommand,
   submitUnlessRefused,
 } from './authorityLink'
+import { recordCheckpointLoaded, writeCheckpointAfter, type Checkpoint } from './checkpoint'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
@@ -109,6 +110,8 @@ export interface GameState extends CombatDebugActions {
   fastForward(ticks: number, commands?: readonly ScriptedCommand[]): void
   /** Replaces the session with a snapshot's state; refused whole on any problem. */
   restoreSnapshot(snapshot: unknown): void
+  /** Quit and resume (#26): play goes on from the checkpoint, docked; not a debug command. */
+  resumeCheckpoint(checkpoint: Checkpoint): void
   /** Debug: one upgrade track to an integer level (#7); the stats follow from the levels. */
   setUpgrade(upgradeId: string, level: number): void
   /** Debug: energy in units as a decimal string, a whole number of 1/240 quanta. */
@@ -222,9 +225,14 @@ export const useGameStore = create<GameState>()((set, get) => ({
   restoreSnapshot: (snapshot) => {
     const restored = readSnapshot(snapshot)
     if (!('state' in restored)) return refuseProblems(restored.problems)
-    connectAuthority(createLoopbackAuthority(restored.state), followAuthority)
-    followAuthority([])
+    replaceSession(restored.state)
     recordDebugCommand(get(), 'restoreSnapshot', { tick: restored.state.tick })
+  },
+
+  resumeCheckpoint: (checkpoint) => {
+    set({ depthTiles: 0, travelTransition: null })
+    replaceSession(checkpoint.state)
+    recordCheckpointLoaded(runEventPlaceOf(get()), checkpoint.saveEpoch)
   },
 
   setUpgrade: (upgradeId, level) =>
@@ -325,12 +333,19 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
- * transition when the events travelled, then logs the events.
+ * transition when the events travelled, logs the events, then writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
   startTravelTransition(travelTransitionOf(events))
   recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)
+  writeCheckpointAfter(events, runEventPlaceOf(useGameStore.getState()))
+}
+
+/** A restored or resumed session on a fresh authority; its `seq`s continue (authorityLink). */
+function replaceSession(state: AuthorityState): void {
+  connectAuthority(createLoopbackAuthority(state), followAuthority)
+  followAuthority([])
 }
 
 function startTravelTransition(transition: TravelTransition | null): void {

@@ -142,6 +142,12 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { slot: 'text', epoch: 'integer', bytes: 'integer', digest: 'text' },
   },
+  // #26: the run resumed from a checkpoint; its commands replay from this state, not the seed.
+  checkpoint_loaded: {
+    group: 'platform',
+    level: 'core',
+    payload: { slot: 'text', epoch: 'integer', digest: 'text' },
+  },
   core_bay_deposited: {
     group: 'platform',
     level: 'core',
