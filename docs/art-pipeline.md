@@ -81,6 +81,20 @@ sorts its parts by id, rounds metres to 4 decimals, and records the Blender vers
 - The vehicle has collections `tier-1`, `tier-2` and `tier-3`. A higher tier holds only the parts it
   adds or replaces: `t3-wheel-2` replaces `t1-wheel-2`, and everything else carries over.
 - Draw order: an integer custom property `z` on the object if set, otherwise the depth rank.
+- The hub has collections `outpost` and `core-drive`, one part each.
+
+## Bay screen backdrops
+
+`npm run art:export -- platform-bay-<bay>-backdrop` renders the bay's screen backdrop (#45, #51)
+from the bay's own file, `art/blender/platform-bay-<bay>/platform-bay-<bay>.blend`. There is no
+second model. The scene camera frames the shot. The floor and wall that stage it are meshes in the
+`backdrop-staging` collection, which the parts bake skips, and its lights are ordinary lights. The
+render uses Cycles on the CPU with a fixed seed, sample count and thread count, at the
+`backdropPx` size in `art/asset-rules.json`. It ships as one `<id>.albedo.ktx2` (ETC1S, sRGB) in
+`public/assets/platform/<id>/`.
+
+`scripts/art/author_platform.py` wrote the first version of the three platform files (S7b). From
+then on the `.blend` files are the sources: change the art in Blender and re-export.
 
 ## The `parts.json` sidecar, schema 1
 
@@ -156,8 +170,9 @@ is upgraded. The vehicle (S7a) is the first asset drawn this way.
 
 ## Not built yet
 
-- Baking the `tile` (ground, casing) and `backdrop` (bay screens) forms. The script refuses them
-  and names the form; S7d and S7b add them.
+- Baking the `tile` form (ground, casing). The script refuses it and names the form; S7d adds it.
+- Showing a backdrop behind a bay screen. A DOM panel can't show KTX2, so S8 decides how the screen
+  draws it (for example in the canvas behind the panel).
 - Lighting final art. Parts draw unlit with the albedo map; the lit render (S6) adds the normal
   and emissive maps to its lit material. Keep each final asset's `color`: it is the loading
   fallback.

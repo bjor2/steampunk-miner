@@ -1,0 +1,44 @@
+{
+  "assetId": "platform-bay-sell",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-bay-sell/platform-bay-sell.blend",
+    "sha256": "7774b01ab7615846edc5131e04d0552cdaf877e29cfd95113b815b803a998a9f",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [
+    2048,
+    1024
+  ],
+  "maps": {
+    "albedo": "platform-bay-sell.albedo.ktx2",
+    "normal": "platform-bay-sell.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "platform-bay-sell",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        1024,
+        768
+      ],
+      "sizeM": [
+        4.0,
+        3.0
+      ],
+      "pivotM": [
+        2.0,
+        0.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0
+    }
+  ]
+}

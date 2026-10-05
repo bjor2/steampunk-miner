@@ -44,7 +44,7 @@
       "id": "platform-hub",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#3b3631",
       "partColors": {
         "core-drive": "#ff8a4a",
@@ -55,28 +55,28 @@
       "id": "platform-bay-sell",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#c9a24b"
     },
     {
       "id": "platform-bay-upgrade",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#b87333"
     },
     {
       "id": "platform-bay-sell-backdrop",
       "source": "blender",
       "form": "backdrop",
-      "status": "placeholder",
+      "status": "final",
       "color": "#2a2623"
     },
     {
       "id": "platform-bay-upgrade-backdrop",
       "source": "blender",
       "form": "backdrop",
-      "status": "placeholder",
+      "status": "final",
       "color": "#2a2623"
     },
     {
