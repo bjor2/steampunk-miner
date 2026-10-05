@@ -1,0 +1,126 @@
+{
+  "inputMapVersion": 1,
+  "contexts": ["vehicle", "platform", "settings"],
+  "reservedKeys": ["Escape"],
+  "actions": [
+    {
+      "id": "aim_left",
+      "displayName": "Drive left",
+      "contexts": ["vehicle"],
+      "kind": "hold",
+      "keyboard": ["KeyA", "ArrowLeft"]
+    },
+    {
+      "id": "aim_right",
+      "displayName": "Drive right",
+      "contexts": ["vehicle"],
+      "kind": "hold",
+      "keyboard": ["KeyD", "ArrowRight"]
+    },
+    {
+      "id": "aim_down",
+      "displayName": "Drill down",
+      "contexts": ["vehicle"],
+      "kind": "hold",
+      "keyboard": ["KeyS", "ArrowDown"]
+    },
+    {
+      "id": "aim_up",
+      "displayName": "Drill up",
+      "contexts": ["vehicle"],
+      "kind": "hold",
+      "keyboard": ["KeyW", "ArrowUp"]
+    },
+    {
+      "id": "lift",
+      "displayName": "Lift",
+      "contexts": ["vehicle"],
+      "kind": "hold",
+      "keyboard": ["Space"]
+    },
+    {
+      "id": "interact",
+      "displayName": "Dock",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["KeyE"]
+    },
+    {
+      "id": "quick_service",
+      "displayName": "Sell, repair and recharge",
+      "contexts": ["platform"],
+      "kind": "press",
+      "keyboard": ["KeyQ"]
+    },
+    {
+      "id": "request_rescue",
+      "displayName": "Call the tow",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["KeyR"]
+    },
+    {
+      "id": "ui_up",
+      "displayName": "Focus up",
+      "contexts": ["platform", "settings"],
+      "kind": "press",
+      "keyboard": ["ArrowUp", "KeyW"]
+    },
+    {
+      "id": "ui_down",
+      "displayName": "Focus down",
+      "contexts": ["platform", "settings"],
+      "kind": "press",
+      "keyboard": ["ArrowDown", "KeyS"]
+    },
+    {
+      "id": "ui_left",
+      "displayName": "Focus left",
+      "contexts": ["platform", "settings"],
+      "kind": "press",
+      "keyboard": ["ArrowLeft", "KeyA"]
+    },
+    {
+      "id": "ui_right",
+      "displayName": "Focus right",
+      "contexts": ["platform", "settings"],
+      "kind": "press",
+      "keyboard": ["ArrowRight", "KeyD"]
+    },
+    {
+      "id": "ui_confirm",
+      "displayName": "Confirm",
+      "contexts": ["platform", "settings"],
+      "kind": "press",
+      "keyboard": ["Enter", "Space", "KeyE"]
+    },
+    {
+      "id": "ui_cancel",
+      "displayName": "Back",
+      "contexts": ["platform", "settings"],
+      "kind": "press",
+      "keyboard": ["Escape", "Backspace"]
+    },
+    {
+      "id": "ui_prev_panel",
+      "displayName": "Previous panel",
+      "contexts": ["platform", "settings"],
+      "kind": "press",
+      "keyboard": ["Shift+Tab"]
+    },
+    {
+      "id": "ui_next_panel",
+      "displayName": "Next panel",
+      "contexts": ["platform", "settings"],
+      "kind": "press",
+      "keyboard": ["Tab"]
+    },
+    {
+      "id": "open_settings",
+      "displayName": "Settings",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["Escape"]
+    }
+  ]
+}
