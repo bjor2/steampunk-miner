@@ -1,16 +1,19 @@
 /**
- * One ring of casing lining (decision #41 Placement rule "Where"), integer arithmetic only: the
- * samples whose position in mm lies in the annulus `clearR <= d < clearR + width` round a centre,
- * chosen against the ground as it stood before the ring, so the lining is one sample thick:
+ * One ring of casing lining (decision #41 Placement rule "Where", amended 5 Oct), integer
+ * arithmetic only: the samples whose position in mm lies in the annulus `clearR <= d < clearR +
+ * width` round a centre on the tunnel axis, chosen against the ground as it stood before the ring:
  *
- * 1. An **air** sample with a **solid** 8-neighbour becomes solid casing of `grade`: walls only,
- *    never a ring in mid-air. Air and solid are as the contour sees them (below or at least iso
- *    128): the drill's soft rim leaves wall samples partly carved, never exactly 0.
- * 2. A **casing** sample of a lower grade is raised to `grade` (relining), density unchanged.
+ * 1. An **air** sample (density <= 128, the contour iso: the drill's soft rim never leaves wall
+ *    samples at exactly 0) with a **native solid** 8-neighbour (density > 128 and not casing)
+ *    becomes solid casing of `grade`: walls only, never a ring in mid-air, and never lining on
+ *    lining, so it stays one sample thick however often rings pass.
+ * 2. A **casing** sample of a lower grade is raised to `grade` (relining), density unchanged; a
+ *    grade that already matches is left alone.
  *
  * Never refused: a grade too low for the band still lines (#41). The dock pad is never lined, as it
  * is never carved. A player grade above 15 lines at 15, the most a sample holds.
  */
+import { CASING_LINING_HALF_WIDTH_MM, DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
 import { MAX_SAMPLE_CASING_GRADE } from './chunkDelta'
 import {
   casingGradeOf,
@@ -44,6 +47,16 @@ export interface Lining extends GroundEdit {
 }
 
 type RingStep = 'line' | 'reline' | 'skip'
+
+/** The drill's ring round a point of the tunnel axis: `stampR - 0.25 m <= d < stampR + 0.25 m`. */
+export function casingRingAround(xMm: number, yMm: number): CasingRing {
+  return {
+    xMm,
+    yMm,
+    clearMm: DRILL_STAMP_RADIUS_MM - CASING_LINING_HALF_WIDTH_MM,
+    widthMm: 2 * CASING_LINING_HALF_WIDTH_MM,
+  }
+}
 
 export function lineRing(
   world: WorldState,
@@ -97,15 +110,19 @@ function ringStepOf(session: EditSession, sample: WeightedSample, grade: number)
   if (!isCarvable(session, sample)) return 'skip'
   const current = casingGradeOf(session, sample)
   if (current > 0) return current < grade ? 'reline' : 'skip'
-  return isAirTouchingGround(session, sample) ? 'line' : 'skip'
+  return isAirTouchingNativeGround(session, sample) ? 'line' : 'skip'
 }
 
-function isAirTouchingGround(session: EditSession, sample: WeightedSample): boolean {
-  if (densityOf(session, sample) >= ISO_DENSITY) return false
-  return NEIGHBOUR_OFFSETS.some(
-    ([dx, dy]) =>
-      densityOf(session, { ...sample, sx: sample.sx + dx, sy: sample.sy + dy }) >= ISO_DENSITY,
+function isAirTouchingNativeGround(session: EditSession, sample: WeightedSample): boolean {
+  if (densityOf(session, sample) > ISO_DENSITY) return false
+  return NEIGHBOUR_OFFSETS.some(([dx, dy]) =>
+    isNativeSolid(session, { ...sample, sx: sample.sx + dx, sy: sample.sy + dy }),
   )
+}
+
+/** Solid ground that is not lining, so a ring never lines on lining (#41 amendment). */
+function isNativeSolid(session: EditSession, sample: WeightedSample): boolean {
+  return densityOf(session, sample) > ISO_DENSITY && casingGradeOf(session, sample) === 0
 }
 
 const NEIGHBOUR_OFFSETS: readonly (readonly [number, number])[] = [

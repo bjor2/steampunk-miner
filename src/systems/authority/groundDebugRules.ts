@@ -8,8 +8,7 @@
  * `debug.lineCasing` lines one ring of casing round a point at a grade (#41), the same ring the
  * vehicle lays, and logs it like one.
  */
-import { CASING_CLEAR_RADIUS_MM, CASING_RING_WIDTH_MM } from '../../constants/balance'
-import { lineRing } from '../world/casingLining'
+import { casingRingAround, lineRing } from '../world/casingLining'
 import { SOLID_DENSITY } from '../world/sampleGrid'
 import { clearDisc, fillDisc, type GroundEdit } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
@@ -80,8 +79,7 @@ function lineCasingRing(
 ): RuleEffect {
   const params = planetParamsOf(state.planet)
   if (params === null) return unchanged(state)
-  const ring = { xMm: x, yMm: y, clearMm: CASING_CLEAR_RADIUS_MM, widthMm: CASING_RING_WIDTH_MM }
-  const lined = lineRing(state.world, params, ring, grade)
+  const lined = lineRing(state.world, params, casingRingAround(x, y), grade)
   return {
     state: { ...state, world: lined.world },
     events: [

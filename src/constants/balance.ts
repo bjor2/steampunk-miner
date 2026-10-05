@@ -42,14 +42,6 @@ export const DRILL_REACH_MM = 1600
 export const DRILL_STAMP_RADIUS_MM = 950
 
 /**
- * Casing lining (#41 Placement rule): a ring lines the annulus `clearR <= d < clearR + 0.5 m`
- * round its centre, where `clearR` leaves the vehicle height (0.9 m, #7) plus 0.5 m clear,
- * `(900 + 500) / 2` mm. The Gameplay & Vehicle Designer owns both as data.
- */
-export const CASING_CLEAR_RADIUS_MM = 700
-export const CASING_RING_WIDTH_MM = 500
-
-/**
  * Where the stamp sits (#40: the drill axis is the 4-way facing in the local frame): this far
  * ahead of the body's centre along the facing, so it bites just past the 0.9 m body's face.
  * Driving sideways on the ground it is also raised along `localUp` by `DRILL_STAMP_LIFT_MM`, so
@@ -59,6 +51,22 @@ export const CASING_RING_WIDTH_MM = 500
  */
 export const DRILL_STAMP_AHEAD_MM = 500
 export const DRILL_STAMP_LIFT_MM = 250
+
+/**
+ * Casing lining (#41 Placement rule as amended on 5 Oct, #56 Q1): a ring is centred on the tunnel
+ * axis, where the drill stamp's centre passed, and lines the annulus `stampR - 0.25 m <= d <
+ * stampR + 0.25 m`, one 0.25 m sample thick on the wall the drill cut. One ring every 0.5 m of
+ * travel. The Gameplay & Vehicle Designer owns the numbers as data.
+ */
+export const CASING_LINING_HALF_WIDTH_MM = 250
+export const CASING_RING_SPACING_MM = 500
+/**
+ * "The ring sits behind the drill head, so the drill never cuts its own fresh lining" (#41): the
+ * ring's axis point trails the stamp's centre by the stamp's radius plus the ring's outer radius,
+ * so on a straight cut no later stamp reaches the ring it just laid.
+ */
+export const CASING_RING_LAG_MM =
+  DRILL_STAMP_RADIUS_MM + DRILL_STAMP_RADIUS_MM + CASING_LINING_HALF_WIDTH_MM
 
 /**
  * Pose reports go out at most 5 times a second (#11 amendment), every 12 ticks; the authority

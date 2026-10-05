@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { unlinedDensitySum } from './cellYield'
-import { lineRing, type CasingRing } from './casingLining'
+import { casingRingAround, lineRing } from './casingLining'
 import { carveDisc, clearDisc, type CellDrillTicks } from './groundEdit'
 import { planetParamsFor } from './planetParams'
 import { MM_PER_SAMPLE, chunkOfSample, localSampleOf, sampleIndexOf } from './sampleGrid'
@@ -15,7 +15,7 @@ import {
 const params = planetParamsFor(83921, 1)
 /** Deep band-1 rock, clear of caves (checked below). */
 const CENTRE = { xMm: 500, yMm: 284000 }
-const RING: CasingRing = { ...CENTRE, clearMm: 700, widthMm: 500 }
+const RING = casingRingAround(CENTRE.xMm, CENTRE.yMm)
 const BOX = 8
 
 function densityAt(world: WorldState, sx: number, sy: number): number {
@@ -48,9 +48,13 @@ function isInRing(distanceSq: number): boolean {
   return distanceSq >= RING.clearMm * RING.clearMm && distanceSq < outer * outer
 }
 
-function touchesGround(world: WorldState, sx: number, sy: number): boolean {
+function touchesNativeGround(world: WorldState, sx: number, sy: number): boolean {
   const offsets = [-1, 0, 1]
-  return offsets.some((dy) => offsets.some((dx) => densityAt(world, sx + dx, sy + dy) >= 128))
+  return offsets.some((dy) =>
+    offsets.some(
+      (dx) => densityAt(world, sx + dx, sy + dy) > 128 && casingAt(world, sx + dx, sy + dy) === 0,
+    ),
+  )
 }
 
 /** A round hole of 0.95 m radius, the drill's tunnel cross-section. */
@@ -71,12 +75,38 @@ describe('casing lining', () => {
     const lined = lineRing(hole, params, RING, 2)
     for (const { sx, sy, distanceSq } of samplesNearCentre()) {
       const shouldLine =
-        isInRing(distanceSq) && densityAt(hole, sx, sy) < 128 && touchesGround(hole, sx, sy)
+        isInRing(distanceSq) && densityAt(hole, sx, sy) <= 128 && touchesNativeGround(hole, sx, sy)
       expect(casingAt(lined.world, sx, sy)).toBe(shouldLine ? 2 : 0)
       expect(densityAt(lined.world, sx, sy)).toBe(shouldLine ? 255 : densityAt(hole, sx, sy))
     }
     expect(lined.placed).toBeGreaterThan(0)
     expect(lined.relined).toBe(0)
+  })
+
+  it('spans the stamp radius less and plus a quarter metre round the tunnel axis', () => {
+    expect(RING).toEqual({ ...CENTRE, clearMm: 700, widthMm: 500 })
+  })
+
+  it('never lines on lining: rings half a metre apart keep the lining one sample thick', () => {
+    const tunnel = clearDisc(
+      boredHole(),
+      params,
+      { xMm: CENTRE.xMm + 500, yMm: CENTRE.yMm, radiusMm: 950, floorRadiusMm: null },
+      255,
+    ).world
+    const first = lineRing(tunnel, params, RING, 2).world
+    const second = lineRing(first, params, casingRingAround(CENTRE.xMm + 500, CENTRE.yMm), 2)
+    const lined = samplesNearCentre().filter(({ sx, sy }) => casingAt(second.world, sx, sy) > 0)
+    expect(lined.length).toBeGreaterThan(0)
+    expect(lined.every(({ sx, sy }) => touchesNativeGround(second.world, sx, sy))).toBe(true)
+  })
+
+  it('lines a wall sample left at exactly the iso density, which the rule counts as air', () => {
+    const edge = { xMm: 0, yMm: 1120 * MM_PER_SAMPLE, radiusMm: 100, floorRadiusMm: null }
+    const halfCut = clearDisc(EMPTY_WORLD, params, edge, 127).world
+    expect(densityAt(halfCut, 0, 1120)).toBe(128)
+    const ring = { xMm: 0, yMm: 1120 * MM_PER_SAMPLE, clearMm: 0, widthMm: 100 }
+    expect(lineRing(halfCut, params, ring, 1).placed).toBe(1)
   })
 
   it('never lines inside the clear radius, so the vehicle is never encased', () => {
