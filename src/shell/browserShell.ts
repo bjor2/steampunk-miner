@@ -5,7 +5,12 @@
  * all-or-nothing, which is the browser's atomic write.
  */
 import { readBrowserLaunchParameters } from './launchParameters'
-import { exposeOnWindow, listenForKeys, runOnPageHide } from './sharedBrowserHooks'
+import {
+  exposeOnWindow,
+  listenForKeys,
+  listenForScrollNotches,
+  runOnPageHide,
+} from './sharedBrowserHooks'
 import { preferencesFileOf, saveFolderOf, type Shell } from './shell'
 
 export function createBrowserShell(): Shell {
@@ -44,6 +49,7 @@ export function createBrowserShell(): Shell {
     exposeGlobalHandle: exposeOnWindow,
     onPageHide: runOnPageHide,
     onKeyChange: listenForKeys,
+    onScrollNotch: listenForScrollNotches,
   }
 }
 

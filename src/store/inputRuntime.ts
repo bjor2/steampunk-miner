@@ -8,7 +8,7 @@
  * Which keys pressed which actions is remembered per key, so a key released after the layer
  * changed (docking with D held) still releases what it pressed and nothing sticks.
  */
-import type { KeyChange } from '../shell/shell'
+import type { KeyChange, ScrollNotch } from '../shell/shell'
 import { ACTION_MAP, actionDefOf, actionsOfChord, type ActionId } from '../systems/input/actionMap'
 import { buildIntent } from '../systems/input/buildIntent'
 import { reactionToPress, type InputReaction } from '../systems/input/inputRouting'
@@ -34,6 +34,11 @@ export function routeKeyChange(key: KeyChange): void {
   if (useGameStore.getState().rebindingActionId !== null) return captureRebinding(key)
   if (key.isRepeat) return
   pressKey(key.code, actionsOfKeyNow(key))
+}
+
+/** The wheel zooms like `zoom_in`/`zoom_out` (#39), so it does nothing on a menu layer. */
+export function routeScrollNotch(notch: ScrollNotch): void {
+  pressAction(notch === 'up' ? 'zoom_in' : 'zoom_out')
 }
 
 /** An action goes down: a held one joins the intent, a pressed one reacts once. */
@@ -113,4 +118,5 @@ function applyReaction(reaction: InputReaction): void {
   else if (reaction.kind === 'moveFocus') game.moveFocus(reaction.step)
   else if (reaction.kind === 'jumpPanel') game.jumpFocusPanel(reaction.step)
   else if (reaction.kind === 'activateFocused') game.activateFocusedControl()
+  else if (reaction.kind === 'zoom') game.zoom(reaction.change)
 }

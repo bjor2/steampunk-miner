@@ -44,6 +44,13 @@ describe('input routing', () => {
     expect(reactionToPress('ui_down', DRIVING)).toEqual({ kind: 'none' })
   })
 
+  it('zooms from the vehicle layer only, as a local setting rather than a command', () => {
+    expect(reactionToPress('zoom_in', DRIVING)).toEqual({ kind: 'zoom', change: 'in' })
+    expect(reactionToPress('zoom_out', DRIVING)).toEqual({ kind: 'zoom', change: 'out' })
+    expect(reactionToPress('zoom_reset', DRIVING)).toEqual({ kind: 'zoom', change: 'reset' })
+    expect(reactionToPress('zoom_in', DOCKED)).toEqual({ kind: 'none' })
+  })
+
   it('puts settings over everything and the platform screen over the vehicle while docked', () => {
     expect(topLayerOf('docked', true)).toBe('settings')
     expect(topLayerOf('docked', false)).toBe('platform')

@@ -19,6 +19,7 @@ import {
   releaseAction,
   resetInput,
   routeKeyChange,
+  routeScrollNotch,
 } from './inputRuntime'
 import { installPreferencesStorage, preferencesWrites } from './preferencesFile'
 
@@ -246,6 +247,64 @@ describe('input: keys, layers and the vehicle intent', () => {
   })
 })
 
+describe('input: zoom framing (#39)', () => {
+  const view = () => game().prefs.viewShortAxisMetres
+
+  it('starts at 12 m across the short axis', () => {
+    expect(view()).toBe(12)
+  })
+
+  it('clamps zoom_in at 8 m and zoom_out at 20 m, and zoom_reset returns to 12 m', () => {
+    for (let i = 0; i < 6; i++) tap('zoom_in')
+    expect(view()).toBe(8)
+    for (let i = 0; i < 10; i++) tap('zoom_out')
+    expect(view()).toBe(20)
+    tap('zoom_reset')
+    expect(view()).toBe(12)
+  })
+
+  it('zooms with the =, - and 0 keys', () => {
+    routeKeyChange(key('Minus', true))
+    expect(view()).toBeCloseTo(15, 9)
+    routeKeyChange(key('Equal', true))
+    routeKeyChange(key('Equal', true, { isRepeat: true }))
+    expect(view()).toBeCloseTo(12, 9)
+    routeKeyChange(key('Equal', true))
+    routeKeyChange(key('Digit0', true))
+    expect(view()).toBe(12)
+  })
+
+  it('zooms in when the wheel rolls up and out when it rolls down', () => {
+    routeScrollNotch('up')
+    expect(view()).toBeCloseTo(9.6, 9)
+    routeScrollNotch('down')
+    routeScrollNotch('down')
+    expect(view()).toBeCloseTo(15, 9)
+  })
+
+  it('leaves the zoom alone while a menu layer is on top', () => {
+    game().openSettings()
+    routeScrollNotch('down')
+    tap('zoom_out')
+    expect(view()).toBe(12)
+  })
+
+  it('refuses a zoom outside the 8 m to 20 m band and keeps the current one', () => {
+    expect(() => game().setViewShortAxis(25)).toThrow()
+    expect(view()).toBe(12)
+  })
+
+  it('never logs a zoom or sends it to the authority', () => {
+    const digestBefore = takeSessionSnapshot().digest
+    tap('zoom_out')
+    routeScrollNotch('up')
+    tap('zoom_reset')
+    expect(sink.events).toEqual([])
+    expect(submitted).toEqual([])
+    expect(takeSessionSnapshot().digest).toBe(digestBefore)
+  })
+})
+
 describe('preferences: settings and rebinding stay local', () => {
   it('writes a changed setting to the preferences file and reads it back', async () => {
     let file: string | null = null
@@ -257,9 +316,11 @@ describe('preferences: settings and rebinding stay local', () => {
     })
     game().setPreference('flashes', false)
     game().setBindings({ lift: { keyboard: ['KeyL'] } })
+    tap('zoom_out')
     await preferencesWrites()
     expect(readPreferences(file).prefs).toMatchObject({
       flashes: false,
+      viewShortAxisMetres: 15,
       bindings: { lift: { keyboard: ['KeyL'] } },
     })
   })

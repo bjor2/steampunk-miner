@@ -116,6 +116,27 @@
       "keyboard": ["Tab"]
     },
     {
+      "id": "zoom_in",
+      "displayName": "Zoom in",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["Equal"]
+    },
+    {
+      "id": "zoom_out",
+      "displayName": "Zoom out",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["Minus"]
+    },
+    {
+      "id": "zoom_reset",
+      "displayName": "Reset zoom",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["Digit0"]
+    },
+    {
       "id": "open_settings",
       "displayName": "Settings",
       "contexts": ["vehicle"],

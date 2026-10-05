@@ -24,7 +24,7 @@ import {
   type SaveSlots,
 } from './store/checkpoint'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
-import { routeKeyChange } from './store/inputRuntime'
+import { routeKeyChange, routeScrollNotch } from './store/inputRuntime'
 import { recordStartingPlanetEntered } from './store/planetArrivalLog'
 import { installPreferencesStorage, loadPreferences } from './store/preferencesFile'
 import { parseScenario, type Scenario } from './systems/scenario'
@@ -47,6 +47,7 @@ export async function startGame(): Promise<void> {
   installSaveSlots(saveSlotsOf(shell))
   await adoptLocalPreferences(shell)
   shell.onKeyChange(routeKeyChange)
+  shell.onScrollNotch(routeScrollNotch)
   await resumeLastCheckpoint(shell)
   recordStartingPlanetEntered()
   keepRunFilesWritten(shell, run)
