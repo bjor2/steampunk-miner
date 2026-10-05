@@ -226,6 +226,15 @@ describe('input: keys, layers and the vehicle intent', () => {
     expect(submittedDuring(() => tap('ui_confirm'))).toEqual(['quickService'])
   })
 
+  it('jumps back a panel with Shift+Tab and still drives when Shift is held with D', () => {
+    routeKeyChange(key('KeyD', true, { isShiftHeld: true }))
+    expect(readVehicleIntent().moveX).toBe(1)
+    routeKeyChange(key('KeyD', false))
+    dockAtStart()
+    routeKeyChange(key('Tab', true, { isShiftHeld: true }))
+    expect(game().focusedControlId).toBe('charging-recharge')
+  })
+
   it('moves focus with the menu keys and jumps panels with Tab, from the quick action', () => {
     dockAtStart()
     tap('ui_next_panel')
