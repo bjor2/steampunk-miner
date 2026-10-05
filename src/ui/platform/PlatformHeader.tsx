@@ -1,4 +1,5 @@
 /** Money, planet, the core bay against the need, and the platform's state (#33 section 6). */
+import type { ReactNode } from 'react'
 import type { PlatformHeader as Header } from '../../systems/views/platformModel'
 import { UI_IDS } from '../ids'
 import styles from './Platform.module.css'
@@ -26,7 +27,7 @@ export function PlatformHeader({ header }: { header: Header }) {
   )
 }
 
-export function Field({ label, children }: { label: string; children: React.ReactNode }) {
+export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <span className={styles.field}>
       <span className={styles.fieldLabel}>{label}</span>
