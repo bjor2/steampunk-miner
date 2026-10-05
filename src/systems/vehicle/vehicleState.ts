@@ -1,0 +1,88 @@
+/**
+ * One player's vehicle as the authority holds it (decisions #7 and #3: `players[id].vehicle`).
+ * The save holds integer levels, never stats; energy is an integer count of 1/240-unit quanta
+ * (#11 amendment 2), hull a BigStat, cargo whole units (1 ore tile = 1 unit at any tier, #7; core
+ * fragments share the capacity, #10). The pose is the last accepted `reportPose`.
+ */
+import {
+  startLevels,
+  vehicleStatsAt,
+  type UpgradeLevels,
+  type VehicleStats,
+} from '../economy/vehicleStats'
+import type { BigStat } from '../money'
+import type { DockSite } from '../world/dockSite'
+import { quantaOfUnits } from './energyQuanta'
+import { dockedPoseAt, type VehiclePose } from './vehiclePose'
+
+/** The #7 state machine; `docked` is entered by the rescue tow here and by docking in #23. */
+export type VehicleMode = 'docked' | 'active' | 'stranded' | 'destroyed'
+
+export interface Cargo {
+  /** Units held per ore tier, keyed by the tier written as a decimal integer. */
+  ore: Readonly<Record<string, number>>
+  coreFragments: number
+}
+
+export interface VehicleState {
+  mode: VehicleMode
+  /** The tick the current mode began; the strand grace and the destroy delay count from it. */
+  modeSinceTick: number
+  levels: UpgradeLevels
+  energy: number
+  hull: BigStat
+  cargo: Cargo
+  pose: VehiclePose | null
+  /** The tick up to which drive, thrust and drill ticks have been charged (#11 amendment 2). */
+  accountedTick: number
+  /** The `energy_low` percents already logged since the tank was last above them. */
+  energyLowLogged: readonly number[]
+}
+
+export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }
+
+/** A fresh vehicle: level 0 on every track, full tank and hull, empty hold, on the dock point. */
+export function newVehicleState(site: DockSite | null, tick: number): VehicleState {
+  const levels = startLevels()
+  const stats = vehicleStatsAt(levels)
+  return {
+    mode: 'active',
+    modeSinceTick: tick,
+    levels,
+    energy: quantaOfUnits(stats.energyMax),
+    hull: stats.hullMax,
+    cargo: EMPTY_CARGO,
+    pose: site === null ? null : dockedPoseAt(site),
+    accountedTick: tick,
+    energyLowLogged: [],
+  }
+}
+
+export function statsOfVehicle(vehicle: VehicleState): VehicleStats {
+  return vehicleStatsAt(vehicle.levels)
+}
+
+export function energyMaxQuantaOf(vehicle: VehicleState): number {
+  return quantaOfUnits(statsOfVehicle(vehicle).energyMax)
+}
+
+export function cargoUnitsOf(cargo: Cargo): number {
+  return Object.values(cargo.ore).reduce((total, units) => total + units, cargo.coreFragments)
+}
+
+export function hasCargoRoom(vehicle: VehicleState): boolean {
+  return cargoUnitsOf(vehicle.cargo) < statsOfVehicle(vehicle).cargoCapacity
+}
+
+export function withOreUnit(cargo: Cargo, tier: number): Cargo {
+  const key = String(tier)
+  return { ...cargo, ore: { ...cargo.ore, [key]: (cargo.ore[key] ?? 0) + 1 } }
+}
+
+export function withCoreFragment(cargo: Cargo): Cargo {
+  return { ...cargo, coreFragments: cargo.coreFragments + 1 }
+}
+
+export function isVehicleActive(vehicle: VehicleState): boolean {
+  return vehicle.mode === 'active'
+}

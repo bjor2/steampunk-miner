@@ -61,6 +61,27 @@ describe('domain event projection', () => {
   })
 })
 
+/** One of each vehicle event (#21), as the authority stamps them. */
+const vehicleEvents: DomainEvent[] = [
+  { ...commandStamp, type: 'DrillDamageDealt', tx: 20, ty: 298, ticks: 12, damage: '3e-1' },
+  { ...commandStamp, type: 'TileDestroyed', tx: 20, ty: 298, kind: 'ore' },
+  { ...commandStamp, type: 'CargoAdded', resourceTier: 1, amount: 1, value: '1e+1' },
+  { ...commandStamp, type: 'StorageFull', lostUnits: 1 },
+  { ...commandStamp, type: 'EnergyLow', threshold: 25 },
+  { ...commandStamp, type: 'EnergyDepleted' },
+  { ...commandStamp, type: 'VehicleModeChanged', from: 'active', to: 'stranded', reason: 'x' },
+  { ...commandStamp, type: 'VehicleDestroyed', cause: 'debug' },
+  {
+    tick: 300,
+    playerId: 'p1',
+    type: 'RescueTriggered',
+    cause: 'stranded',
+    fee: '0e+0',
+    cargoLostValue: '1e+1',
+  },
+  { ...commandStamp, type: 'VehicleConfigurationChanged', visualTier: 2 },
+]
+
 describe('domain event log', () => {
   let sink: ReturnType<typeof createMemorySink>
 
@@ -80,5 +101,25 @@ describe('domain event log', () => {
       'state_digest',
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
+  it('records every vehicle event as a registered line with no envelope field in its payload', () => {
+    recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, vehicleEvents)
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'drill_damage_dealt',
+      'tile_destroyed',
+      'resource_collected',
+      'storage_full',
+      'energy_low',
+      'energy_depleted',
+      'vehicle_state_changed',
+      'vehicle_destroyed',
+      'rescue_triggered',
+      'vehicle_configuration_changed',
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+    expect(sink.events.find((event) => event.event === 'energy_low')?.data).toEqual({
+      threshold: 25,
+    })
   })
 })

@@ -3,11 +3,30 @@
  * the replication unit and the source the run log is projected from (#11), so every field is
  * plain JSON and money is a canonical string.
  */
+import type { VehicleMode } from '../vehicle/vehicleState'
 import type { CommandStamp, CommandType } from './authorityCommand'
 
 /** Why a command changed nothing (#11 amendment 2: `command_rejected {type, reason}`). */
 export type RejectionReason =
-  'malformed_command' | 'unknown_command' | 'unknown_player' | 'out_of_order' | 'invalid_payload'
+  | 'malformed_command'
+  | 'unknown_command'
+  | 'unknown_player'
+  | 'out_of_order'
+  | 'invalid_payload'
+  // Registered by the vehicle commands (#21): the planet is not set up, the vehicle cannot act,
+  // the pose is impossible, more action ticks than time passed, the tile is out of reach or not
+  // drillable, no tow is due, or a debug value is outside its range.
+  | 'no_planet'
+  | 'vehicle_not_active'
+  | 'invalid_pose'
+  | 'too_many_ticks'
+  | 'out_of_reach'
+  | 'not_drillable'
+  | 'no_rescue_needed'
+  | 'unknown_upgrade'
+  | 'out_of_range'
+
+export type RescueCause = 'stranded' | 'destroyed'
 
 export interface DomainEventBodies {
   PlanetChanged: { planetIndex: number }
@@ -16,6 +35,19 @@ export interface DomainEventBodies {
   DebugCommandApplied: { command: CommandType; args: Readonly<Record<string, unknown>> }
   CommandRejected: { commandType: string; reason: RejectionReason; problems: string[] }
   StateDigested: { digest: string; scope: DigestScope }
+  /** Drill damage one command dealt to one tile, in hardness units (`ticks * D * eff / 60`). */
+  DrillDamageDealt: { tx: number; ty: number; ticks: number; damage: string }
+  TileDestroyed: { tx: number; ty: number; kind: 'ground' | 'ore' | 'core' }
+  CargoAdded: { resourceTier: number; amount: number; value: string }
+  /** A full hold: the tile still broke, its unit was lost (#7). */
+  StorageFull: { lostUnits: number }
+  EnergyLow: { threshold: number }
+  EnergyDepleted: Record<never, never>
+  VehicleModeChanged: { from: VehicleMode; to: VehicleMode; reason: string }
+  VehicleDestroyed: { cause: string }
+  RescueTriggered: { cause: RescueCause; fee: string; cargoLostValue: string }
+  UpgradeLevelChanged: { upgradeId: string; from: number; to: number }
+  VehicleConfigurationChanged: { visualTier: number }
 }
 
 /** When a digest is taken (#11 section 3): every 3600 ticks, at docks and travel, at the end. */
@@ -27,10 +59,13 @@ export type DomainEventBody = {
   [K in DomainEventType]: { type: K } & DomainEventBodies[K]
 }[DomainEventType]
 
-/** An event the clock caused, not a command (a periodic digest): it has no player or seq. */
+/**
+ * An event the clock caused, not a command (a periodic digest, a tow when the grace runs out): it
+ * has no seq, and a player only when it happened to one player's vehicle.
+ */
 export interface TickStamp {
   tick: number
-  playerId?: undefined
+  playerId?: string
   seq?: undefined
 }
 

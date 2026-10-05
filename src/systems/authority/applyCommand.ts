@@ -6,6 +6,9 @@
  * Commands may arrive from a replayed file, so the envelope and payload are checked at runtime.
  * A refused command changes nothing and answers with one `CommandRejected` event, which replays
  * identically.
+ *
+ * Before a command is looked at, the clock's own changes up to its tick happen first (a tow whose
+ * grace ran out), so a command never acts on a vehicle the clock has already moved.
  */
 import {
   isDebugCommandType,
@@ -14,9 +17,12 @@ import {
   type CommandType,
 } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
-import { DEBUG_COMMAND_RULES, type CommandRule, type RuleEffect } from './debugCommandRules'
-import type { DomainEvent, DomainEventBody, RejectionReason } from './domainEvent'
+import { rejectionOf, type CommandRule, type Rejection, type RuleEffect } from './commandRule'
+import { DEBUG_COMMAND_RULES } from './debugCommandRules'
+import type { DomainEvent, DomainEventBody } from './domainEvent'
 import { isJsonObject, isWholeNumber, payloadProblems } from './payloadFields'
+import { VEHICLE_COMMAND_RULES } from './vehicleCommandRules'
+import { towVehiclesDueBy } from './vehicleTransitions'
 
 export interface CommandOutcome {
   state: AuthorityState
@@ -24,16 +30,25 @@ export interface CommandOutcome {
 }
 
 export function applyCommand(state: AuthorityState, command: AuthorityCommand): CommandOutcome {
-  const rejection = findRejection(state, command)
-  if (rejection !== null) return rejectCommand(state, command, rejection)
-  return acceptCommand(state, command)
+  const clocked = runClockUpTo(state, command)
+  const rejection = findRejection(clocked.state, command)
+  const answer =
+    rejection === null
+      ? acceptCommand(clocked.state, command)
+      : rejectCommand(clocked.state, command, rejection)
+  return { state: answer.state, events: [...clocked.events, ...answer.events] }
 }
 
-const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = DEBUG_COMMAND_RULES
+const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
+  ...DEBUG_COMMAND_RULES,
+  ...VEHICLE_COMMAND_RULES,
+}
 
-interface Rejection {
-  reason: RejectionReason
-  problems: string[]
+/** The tick-driven changes due by a well-formed command's tick; none for a malformed one. */
+function runClockUpTo(state: AuthorityState, command: unknown): CommandOutcome {
+  const tick = isJsonObject(command) ? command.tick : undefined
+  if (!isWholeNumber(tick) || (tick as number) < state.tick) return { state, events: [] }
+  return towVehiclesDueBy(state, tick as number)
 }
 
 type RejectionCheck = (state: AuthorityState, command: unknown) => Rejection | null
@@ -45,6 +60,7 @@ const REJECTION_CHECKS: readonly RejectionCheck[] = [
   playerRejection,
   orderRejection,
   payloadRejection,
+  ruleRejection,
 ]
 
 function findRejection(state: AuthorityState, command: unknown): Rejection | null {
@@ -92,6 +108,11 @@ function payloadRejection(_state: AuthorityState, command: unknown): Rejection |
   const { type, payload } = command as AuthorityCommand
   const problems = payloadProblems(payload, COMMAND_RULES[type].fields)
   return problems.length > 0 ? { reason: 'invalid_payload', problems } : null
+}
+
+function ruleRejection(state: AuthorityState, command: unknown): Rejection | null {
+  const typed = command as AuthorityCommand
+  return COMMAND_RULES[typed.type].reject?.(state, typed) ?? null
 }
 
 function acceptCommand(state: AuthorityState, command: AuthorityCommand): CommandOutcome {
@@ -151,10 +172,6 @@ function stampOfAnyCommand(state: AuthorityState, fields: Record<string, unknown
     tick: isWholeNumber(fields.tick) ? (fields.tick as number) : state.tick,
     seq: isWholeNumber(fields.seq) ? (fields.seq as number) : 0,
   }
-}
-
-function rejectionOf(reason: RejectionReason, problem: string): Rejection {
-  return { reason, problems: [problem] }
 }
 
 function isNonEmptyString(value: unknown): value is string {

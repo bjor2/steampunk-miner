@@ -11,8 +11,19 @@ import { GENERATOR_VERSION } from '../generatorVersion'
 import type { AuthorityState, PlayerState } from './authorityState'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { stateDigest } from './stateDigest'
+import {
+  portableVehicleOf,
+  portableVehicleProblems,
+  portableWorldOf,
+  portableWorldProblems,
+  vehicleOfPortable,
+  worldOfPortable,
+  type PortableVehicle,
+  type PortableWorld,
+} from './vehicleSnapshot'
 
-export const SNAPSHOT_VERSION = 1
+/** 2: the world deltas and each player's vehicle joined the state (#21). */
+export const SNAPSHOT_VERSION = 2
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -27,8 +38,15 @@ export interface SessionSnapshot {
 export interface PortableState {
   tick: number
   planet: { index: number; seed: number }
-  players: Record<string, { wallet: string; lastSeq: number }>
+  players: Record<string, PortablePlayer>
+  world: PortableWorld
   debugApplied: boolean
+}
+
+interface PortablePlayer {
+  wallet: string
+  lastSeq: number
+  vehicle: PortableVehicle
 }
 
 export function takeSnapshot(state: AuthorityState): SessionSnapshot {
@@ -48,9 +66,14 @@ function portableStateOf(state: AuthorityState): PortableState {
     players: Object.fromEntries(
       Object.entries(state.players).map(([id, player]) => [
         id,
-        { wallet: toCanonical(player.wallet), lastSeq: player.lastSeq },
+        {
+          wallet: toCanonical(player.wallet),
+          lastSeq: player.lastSeq,
+          vehicle: portableVehicleOf(player.vehicle),
+        },
       ]),
     ),
+    world: portableWorldOf(state.world),
     debugApplied: state.debugApplied,
   }
 }
@@ -78,12 +101,17 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     players: Object.fromEntries(
       Object.entries(portable.players).map(([id, player]) => [id, playerStateOf(player)]),
     ),
+    world: worldOfPortable(portable.world),
     debugApplied: portable.debugApplied,
   }
 }
 
-function playerStateOf(player: { wallet: string; lastSeq: number }): PlayerState {
-  return { wallet: fromCanonical(player.wallet), lastSeq: player.lastSeq }
+function playerStateOf(player: PortablePlayer): PlayerState {
+  return {
+    wallet: fromCanonical(player.wallet),
+    lastSeq: player.lastSeq,
+    vehicle: vehicleOfPortable(player.vehicle),
+  }
 }
 
 function snapshotProblems(snapshot: unknown): string[] {
@@ -109,6 +137,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
       : ['snapshot.tick must match state.tick']),
     ...planetProblems(state.planet),
     ...playersProblems(state.players),
+    ...portableWorldProblems(state.world),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),
@@ -123,12 +152,16 @@ function planetProblems(planet: unknown): string[] {
 
 function playersProblems(players: unknown): string[] {
   if (!isJsonObject(players)) return ['snapshot.state.players must be an object']
-  return Object.entries(players)
-    .filter(([, player]) => !isPortablePlayer(player))
-    .map(([id]) => `snapshot.state.players.${id} must hold a money wallet and a whole lastSeq`)
+  return Object.entries(players).flatMap(([id, player]) => portablePlayerProblems(id, player))
 }
 
-function isPortablePlayer(player: unknown): boolean {
+function portablePlayerProblems(id: string, player: unknown): string[] {
+  const path = `snapshot.state.players.${id}`
+  if (!isPortablePlayer(player)) return [`${path} must hold a money wallet and a whole lastSeq`]
+  return portableVehicleProblems(player.vehicle, `${path}.vehicle`)
+}
+
+function isPortablePlayer(player: unknown): player is Record<string, unknown> {
   return (
     isJsonObject(player) && isNonNegativeMoneyText(player.wallet) && isWholeNumber(player.lastSeq)
   )

@@ -3,9 +3,10 @@
  * a projection of domain events, never written ad hoc from game code, so in co-op a client can
  * never log what the host did not accept). Pure mapping first, recording second.
  *
- * Domain events with no log line project to null: planet, seed and wallet changes so far come only
- * from `debug.*` commands, whose `debug_command_applied` line already says what happened. Each
- * later ticket adds the projection of the domain events it introduces.
+ * Domain events with no log line project to null: planet, seed, wallet and upgrade-level changes so
+ * far come from `debug.*` commands (whose `debug_command_applied` line already says what happened)
+ * or ride with an event that is logged (a tow's fee is in `rescue_triggered`). Each later ticket
+ * adds the projection of the domain events it introduces.
  */
 import {
   isCommandCaused,
@@ -41,6 +42,36 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     data: { type: commandType, reason },
   }),
   StateDigested: ({ digest, scope }) => ({ event: 'state_digest', data: { digest, scope } }),
+  DrillDamageDealt: ({ tx, ty, ticks, damage }) => ({
+    event: 'drill_damage_dealt',
+    data: { tx, ty, ticks, damage },
+  }),
+  TileDestroyed: ({ tx, ty, kind }) => ({ event: 'tile_destroyed', data: { tx, ty, kind } }),
+  CargoAdded: ({ resourceTier, amount, value }) => ({
+    event: 'resource_collected',
+    data: { resourceTier, amount, value },
+  }),
+  StorageFull: ({ lostUnits }) => ({ event: 'storage_full', data: { lostUnits } }),
+  EnergyLow: ({ threshold }) => ({ event: 'energy_low', data: { threshold } }),
+  EnergyDepleted: () => ({ event: 'energy_depleted', data: {} }),
+  VehicleModeChanged: ({ from, to, reason }) => ({
+    event: 'vehicle_state_changed',
+    data: { from, to, reason },
+  }),
+  // Until enemies exist (#25) nothing but a debug hull can destroy the vehicle: no kind, no arc.
+  VehicleDestroyed: ({ cause }) => ({
+    event: 'vehicle_destroyed',
+    data: { cause, kind: 'none', tier: 0, arc: 'none' },
+  }),
+  RescueTriggered: ({ cause, fee, cargoLostValue }) => ({
+    event: 'rescue_triggered',
+    data: { cause, fee, cargoLostValue },
+  }),
+  UpgradeLevelChanged: () => null,
+  VehicleConfigurationChanged: ({ visualTier }) => ({
+    event: 'vehicle_configuration_changed',
+    data: { visualTier },
+  }),
 }
 
 export function projectDomainEvent(event: DomainEvent): ProjectedLine | null {

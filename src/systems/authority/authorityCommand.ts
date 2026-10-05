@@ -11,6 +11,35 @@
 export const AUTHORITY_PROTOCOL_VERSION = 1
 
 export interface CommandPayloads {
+  /**
+   * The local vehicle's pose at 5 Hz (#11 amendments, #7): integer mm and mm/s, the body-up vector
+   * scaled to 1024, `facing` 0 to 3, the action flags at the moment of the report, and how many
+   * fixed steps since the previous report each action was active, which the authority charges.
+   */
+  reportPose: {
+    x: number
+    y: number
+    vx: number
+    vy: number
+    upx: number
+    upy: number
+    facing: number
+    driving: boolean
+    thrusting: boolean
+    drilling: boolean
+    thrustTicks: number
+    driveTicks: number
+    drillTicks: number
+  }
+  /** Scripted mining (#3, #11 section 5): `ticks` fixed steps of drilling on one tile. */
+  drillTile: { tx: number; ty: number; ticks: number }
+  /** Calls the tow for a stranded or destroyed vehicle (#7, #8). */
+  requestRescue: Record<string, never>
+  'debug.setUpgrade': { upgradeId: string; level: number }
+  /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
+  'debug.setEnergy': { energy: string }
+  /** Hull as a canonical decimal string (a BigStat, #7). */
+  'debug.setHull': { hull: string }
   'debug.setPlanet': { planetIndex: number }
   'debug.setPlanetSeed': { planetSeed: number }
   /** Adds `amount` (a decimal string) to the player's wallet. */

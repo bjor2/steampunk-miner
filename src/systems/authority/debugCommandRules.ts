@@ -1,24 +1,16 @@
 /**
  * The `debug.*` command rules (#11 section 4): scenario and debug-API state changes, applied
- * through the same `applyCommand` as play so they replay and are logged.
+ * through the same `applyCommand` as play so they replay and are logged. The vehicle's own
+ * (`setUpgrade`, `setEnergy`, `setHull`) live in `vehicleDebugRules.ts`.
  */
 import { add, fromCanonical, toCanonical, type Money } from '../money'
-import type { AuthorityCommand, CommandPayloads, CommandType } from './authorityCommand'
+import { dockedPoseAt } from '../vehicle/vehiclePose'
+import { EMPTY_WORLD } from '../world/worldState'
+import type { CommandType } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
-import type { DomainEventBody } from './domainEvent'
-import type { FieldKind } from './payloadFields'
-
-export interface RuleEffect {
-  state: AuthorityState
-  events: DomainEventBody[]
-}
-
-export interface CommandRule<T extends CommandType> {
-  fields: { readonly [F in keyof CommandPayloads[T]]: FieldKind }
-  // Method syntax on purpose: a rule for one type is usable where any rule is expected, and
-  // applyCommand only calls it with a command of that type.
-  apply(state: AuthorityState, command: AuthorityCommand<T>): RuleEffect
-}
+import type { CommandRule, RuleEffect } from './commandRule'
+import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
+import { VEHICLE_DEBUG_RULES } from './vehicleDebugRules'
 
 export const DEBUG_COMMAND_RULES: {
   readonly [K in Extract<CommandType, `debug.${string}`>]: CommandRule<K>
@@ -26,14 +18,14 @@ export const DEBUG_COMMAND_RULES: {
   'debug.setPlanet': {
     fields: { planetIndex: 'wholeNumber' },
     apply: (state, { payload }) => ({
-      state: { ...state, planet: { ...state.planet, index: payload.planetIndex } },
+      state: onPlanet(state, { ...state.planet, index: payload.planetIndex }),
       events: [{ type: 'PlanetChanged', planetIndex: payload.planetIndex }],
     }),
   },
   'debug.setPlanetSeed': {
     fields: { planetSeed: 'safeInteger' },
     apply: (state, { payload }) => ({
-      state: { ...state, planet: { ...state.planet, seed: payload.planetSeed } },
+      state: onPlanet(state, { ...state.planet, seed: payload.planetSeed }),
       events: [{ type: 'PlanetSeedChanged', planetSeed: payload.planetSeed }],
     }),
   },
@@ -47,6 +39,23 @@ export const DEBUG_COMMAND_RULES: {
     apply: (state, { playerId, payload }) =>
       replaceWallet(state, playerId, fromCanonical(payload.amount)),
   },
+  ...VEHICLE_DEBUG_RULES,
+}
+
+/**
+ * Another planet is another world: its deltas start empty and every vehicle stands on its dock.
+ * The vehicles keep their levels, energy, hull and cargo.
+ */
+function onPlanet(state: AuthorityState, planet: SessionPlanet): AuthorityState {
+  const site = dockSiteOfPlanet(planet)
+  const pose = site === null ? null : dockedPoseAt(site)
+  const players = Object.fromEntries(
+    Object.entries(state.players).map(([id, player]) => [
+      id,
+      { ...player, vehicle: { ...player.vehicle, pose } },
+    ]),
+  )
+  return { ...state, planet, world: EMPTY_WORLD, players }
 }
 
 function walletOf(state: AuthorityState, playerId: string): Money {

@@ -1,22 +1,38 @@
 /**
- * Moving the authority's clock without a command (#11 section 5, `fastForward`; later the live
- * fixed step). The only effect besides the tick is the periodic state digest every 3600 ticks
- * (#11 section 3), each taken over the state as it stands at that tick, so a replay that advances
- * to the same ticks logs the same digests.
+ * Moving the authority's clock without a command (#11 section 5, `fastForward`, and the live
+ * fixed step). Besides the tick, the clock tows vehicles whose strand grace or destroy delay runs
+ * out (#7) and takes the periodic state digest every 3600 ticks (#11 section 3), each over the
+ * state as it stands at that tick, so a replay that advances to the same ticks logs the same
+ * digests and tows.
  */
 import type { CommandOutcome } from './applyCommand'
 import type { AuthorityState } from './authorityState'
 import type { DomainEvent } from './domainEvent'
 import { stateDigest } from './stateDigest'
+import { towVehiclesDueBy } from './vehicleTransitions'
 
 /** One minute of fixed 1/60 s steps between periodic digests (#11 section 3). */
 export const DIGEST_INTERVAL_TICKS = 3600
 
 export function advanceTicks(state: AuthorityState, toTick: number): CommandOutcome {
   assertForwardTick(state.tick, toTick)
+  const digested = periodicDigestTicks(state.tick, toTick).reduce(runClockToDigest, {
+    state,
+    events: [],
+  })
+  const settled = towVehiclesDueBy(digested.state, toTick)
   return {
-    state: { ...state, tick: toTick },
-    events: periodicDigestTicks(state.tick, toTick).map((tick) => digestAt(state, tick)),
+    state: { ...settled.state, tick: toTick },
+    events: [...digested.events, ...settled.events],
+  }
+}
+
+/** Tows due at or before a digest tick happen first, so the digest sees them. */
+function runClockToDigest(outcome: CommandOutcome, digestTick: number): CommandOutcome {
+  const settled = towVehiclesDueBy(outcome.state, digestTick)
+  return {
+    state: settled.state,
+    events: [...outcome.events, ...settled.events, digestAt(settled.state, digestTick)],
   }
 }
 

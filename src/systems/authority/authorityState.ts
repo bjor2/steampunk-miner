@@ -1,23 +1,29 @@
 /**
- * What the authority owns (decision #3): the planet, and per player the wallet and the last
- * accepted `seq`. Immutable: `applyCommand` returns a new state. Only safe integers, booleans,
- * strings and Money live here, so the canonical JSON and the digest are exact.
+ * What the authority owns (decision #3): the planet and its world deltas, and per player the
+ * wallet, the vehicle and the last accepted `seq`. Immutable: `applyCommand` returns a new state.
+ * Only safe integers, booleans, strings, null and Money live here, so the canonical JSON and the
+ * digest are exact.
  *
- * The vehicle's pose is client-owned and stays out (it arrives later as `reportPose` commands).
+ * The vehicle's physics pose is client-owned (#3); the authority keeps the last reported one.
  */
 import { ZERO_MONEY, type Money } from '../money'
+import { newVehicleState, type VehicleState } from '../vehicle/vehicleState'
+import { EMPTY_WORLD, type WorldState } from '../world/worldState'
+import { dockSiteOfPlanet, type SessionPlanet } from './planetOfState'
 
 export interface PlayerState {
   wallet: Money
   /** The `seq` of this player's last accepted command; the next one must be higher. */
   lastSeq: number
+  vehicle: VehicleState
 }
 
 export interface AuthorityState {
   tick: number
-  /** Integer planet index (#4); the store still calls it `planetTier`. */
-  planet: { index: number; seed: number }
+  /** Integer planet index (#4) and the world seed; the store still calls the index `planetTier`. */
+  planet: SessionPlanet
   players: Readonly<Record<string, PlayerState>>
+  world: WorldState
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
 }
@@ -29,14 +35,34 @@ export interface SessionStart {
 }
 
 export function createAuthorityState(start: SessionStart): AuthorityState {
+  const planet = { index: start.planetIndex, seed: start.planetSeed }
   return {
     tick: 0,
-    planet: { index: start.planetIndex, seed: start.planetSeed },
-    players: Object.fromEntries(start.playerIds.map((id) => [id, newPlayerState()])),
+    planet,
+    players: Object.fromEntries(start.playerIds.map((id) => [id, newPlayerState(planet)])),
+    world: EMPTY_WORLD,
     debugApplied: false,
   }
 }
 
-function newPlayerState(): PlayerState {
-  return { wallet: ZERO_MONEY, lastSeq: 0 }
+function newPlayerState(planet: SessionPlanet): PlayerState {
+  return { wallet: ZERO_MONEY, lastSeq: 0, vehicle: newVehicleState(dockSiteOfPlanet(planet), 0) }
+}
+
+export function vehicleOf(state: AuthorityState, playerId: string): VehicleState {
+  return state.players[playerId].vehicle
+}
+
+export function withVehicle(
+  state: AuthorityState,
+  playerId: string,
+  vehicle: VehicleState,
+): AuthorityState {
+  const player = state.players[playerId]
+  return { ...state, players: { ...state.players, [playerId]: { ...player, vehicle } } }
+}
+
+export function withWallet(state: AuthorityState, playerId: string, wallet: Money): AuthorityState {
+  const player = state.players[playerId]
+  return { ...state, players: { ...state.players, [playerId]: { ...player, wallet } } }
 }

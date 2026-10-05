@@ -5,7 +5,7 @@
  */
 import { isNonNegativeMoneyText } from '../money'
 
-export type FieldKind = 'wholeNumber' | 'safeInteger' | 'nonNegativeMoney'
+export type FieldKind = 'wholeNumber' | 'safeInteger' | 'nonNegativeMoney' | 'flag' | 'text'
 
 export type PayloadFields = Readonly<Record<string, FieldKind>>
 
@@ -31,6 +31,8 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     wholeNumber: { isValid: isWholeNumber, expected: 'a safe integer >= 0' },
     safeInteger: { isValid: Number.isSafeInteger, expected: 'a safe integer' },
     nonNegativeMoney: { isValid: isNonNegativeMoneyText, expected: 'a decimal string >= 0' },
+    flag: { isValid: (value) => typeof value === 'boolean', expected: 'true or false' },
+    text: { isValid: (value) => typeof value === 'string', expected: 'a string' },
   }
 
 function fieldKindProblems(name: string, value: unknown, kind: FieldKind): string[] {

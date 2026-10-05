@@ -175,12 +175,22 @@ export const RUN_EVENT_REGISTRY = {
   },
   depth_band_entered: { group: 'mining', level: 'core', payload: { band: 'integer' } },
   storage_full: { group: 'mining', level: 'core', payload: { lostUnits: 'integer' } },
-  energy_depleted: { group: 'mining', level: 'core', payload: 'unspecified' },
+  energy_depleted: { group: 'mining', level: 'core', payload: {} },
   energy_low: { group: 'mining', level: 'core', payload: { threshold: 'integer' } },
   rare_resource_discovered: { group: 'mining', level: 'core', payload: 'unspecified' },
   tile_drilled: { group: 'mining', level: 'detail', payload: 'unspecified' },
-  tile_destroyed: { group: 'mining', level: 'detail', payload: 'unspecified' },
-  drill_damage_dealt: { group: 'mining', level: 'detail', payload: 'unspecified' },
+  tile_destroyed: {
+    group: 'mining',
+    level: 'detail',
+    payload: { tx: 'integer', ty: 'integer', kind: { oneOf: ['ground', 'ore', 'core'] } },
+  },
+  // One line per drilling command (a pose report's interval or a `drillTile`), #7: `damage` is
+  // `ticks * drillPower * eff / 60` in hardness units.
+  drill_damage_dealt: {
+    group: 'mining',
+    level: 'detail',
+    payload: { tx: 'integer', ty: 'integer', ticks: 'integer', damage: 'money' },
+  },
   resource_collected: {
     group: 'mining',
     level: 'detail',
