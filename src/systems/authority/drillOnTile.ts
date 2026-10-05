@@ -71,7 +71,7 @@ export function drillOnTile(
 }
 
 /** Hardness is looked up from the planet and depth, never stored in the cell (#4, #6). */
-function hardnessOfTile(params: PlanetParams, tile: TilePoint, cell: number): BigStat {
+export function hardnessOfTile(params: PlanetParams, tile: TilePoint, cell: number): BigStat {
   if (kindOfCell(cell) === CELL_KIND.core) return coreHardness(params.planetIndex)
   return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
 }
