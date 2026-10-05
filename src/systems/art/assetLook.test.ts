@@ -8,7 +8,7 @@ describe('asset look', () => {
     expect(atlasUvOf([256, 512, 128, 256], [1024, 2048])).toEqual([0.25, 0.375, 0.375, 0.25])
   })
 
-  it('draws a placeholder asset as its flat placeholder quads with no atlas', () => {
+  it('draws an asset with no exported parts sidecar as its flat placeholder quads with no atlas', () => {
     const quads = assetQuadsOf('ground-band-1', 1)
     expect(quads).toEqual(
       placeholderQuadsOf('ground-band-1', 1).map((quad) => ({ ...quad, uv: null })),

@@ -104,70 +104,70 @@
       "id": "ground-band-1",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#6b5a48"
     },
     {
       "id": "ground-band-2",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#6b5a48"
     },
     {
       "id": "ground-band-3",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#6b5a48"
     },
     {
       "id": "ground-band-4",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#6b5a48"
     },
     {
       "id": "ground-band-5",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#6b5a48"
     },
     {
       "id": "casing-grade-1",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#9aa0a6"
     },
     {
       "id": "casing-grade-2",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#9aa0a6"
     },
     {
       "id": "casing-grade-3",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#9aa0a6"
     },
     {
       "id": "casing-grade-4",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#9aa0a6"
     },
     {
       "id": "casing-grade-5",
       "source": "blender",
       "form": "tile",
-      "status": "placeholder",
+      "status": "final",
       "color": "#9aa0a6"
     },
     {
