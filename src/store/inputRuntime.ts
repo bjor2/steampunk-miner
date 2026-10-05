@@ -108,9 +108,9 @@ function situationNow() {
   return {
     layer: inputLayerOf(game),
     vehicleMode: game.vehicle.mode,
-    dockableBay: dockableBayOf(readAuthorityState(), game.playerId),
-    dockedBay: dockedBayOf(readAuthorityState(), game.playerId),
-    canOpenArtefactCache: canOpenArtefactCache(readAuthorityState(), game.playerId),
+    dockableBay: dockableBayOf(state, game.playerId),
+    dockedBay: dockedBayOf(state, game.playerId),
+    canOpenArtefactCache: canOpenArtefactCache(state, game.playerId),
   }
 }
 
