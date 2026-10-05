@@ -7,12 +7,14 @@
  * or not; a tile of space or cave air the surface ramps into takes its band's ground colour.
  * Tiles stay aligned to the world, never to the screen, so the look holds at any camera rotation.
  */
+import { GROUND_BLOCK_SIZE } from '../../constants/scene'
 import type { PlanetParams } from '../world/planetParams'
 import { bandOfTile } from '../world/planetGeometry'
 import { ISO_DENSITY, SAMPLES_PER_TILE } from '../world/sampleGrid'
 import { CHUNK_CELLS, CHUNK_SIZE, firstTileOfChunk } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { DENSITY_HALO_SIDE } from './densityHalo'
+import { BLOCKS_PER_CHUNK, BLOCKS_PER_CHUNK_SIDE, type BlockedTileInstances } from './groundBlocks'
 import type { BandPalette } from './artDirection'
 import { bandColourOf, paletteOf, tileShadeOf } from './bandPalette'
 import type { Rgb } from './colour'
@@ -24,18 +26,11 @@ export const TILE_STYLE = { ground: 0, ore: 1, core: 2, pad: 3 } as const
 /** The ore decal's shape code in the shader: 0 for a tile without ore. */
 export const SILHOUETTE_CODE = { none: 0, flecks: 1, shards: 2 } as const
 
-/** Instance attributes, `count` tiles long; arrays are sized for a full chunk. */
-export interface ChunkTileBatch {
-  count: number
-  /** 2 per tile: the tile's x and y inside the chunk. */
-  tiles: Float32Array
-  /** 3 per tile: the ground or core colour, already shaded. */
-  baseColours: Float32Array
-  /** 4 per tile: ore colour and glow (zeros without ore). */
-  oreColours: Float32Array
-  /** 4 per tile: style, unused, silhouette code, sparkle count. */
-  styles: Float32Array
-}
+/**
+ * A chunk's instance attributes, `count` tiles long; arrays are sized for a full chunk. Tiles come
+ * block by block (#38 ground blocks), so the renderer can draw only the blocks in view.
+ */
+export type ChunkTileBatch = BlockedTileInstances
 
 interface BatchContext {
   params: PlanetParams
@@ -61,12 +56,27 @@ export function buildChunkTileBatch(
 ): ChunkTileBatch {
   const context = batchContextOf(params, cx, cy, cells)
   const batch = emptyBatch()
-  for (let ly = 0; ly < CHUNK_SIZE; ly++) {
-    for (let lx = 0; lx < CHUNK_SIZE; lx++) {
+  for (let block = 0; block < BLOCKS_PER_CHUNK; block++) {
+    batch.blockStarts[block] = batch.count
+    writeBlock(batch, context, halo, block)
+  }
+  batch.blockStarts[BLOCKS_PER_CHUNK] = batch.count
+  return batch
+}
+
+function writeBlock(
+  batch: ChunkTileBatch,
+  context: BatchContext,
+  halo: Uint8Array,
+  block: number,
+): void {
+  const firstLx = (block % BLOCKS_PER_CHUNK_SIDE) * GROUND_BLOCK_SIZE
+  const firstLy = Math.floor(block / BLOCKS_PER_CHUNK_SIDE) * GROUND_BLOCK_SIZE
+  for (let ly = firstLy; ly < firstLy + GROUND_BLOCK_SIZE; ly++) {
+    for (let lx = firstLx; lx < firstLx + GROUND_BLOCK_SIZE; lx++) {
       if (hasGroundIn(halo, lx, ly)) writeTile(batch, context, lx, ly)
     }
   }
-  return batch
 }
 
 /** Whether any of the 5 x 5 samples bounding the tile's square is solid, so the surface shows. */
@@ -101,6 +111,7 @@ function batchContextOf(
 function emptyBatch(): ChunkTileBatch {
   return {
     count: 0,
+    blockStarts: new Int32Array(BLOCKS_PER_CHUNK + 1),
     tiles: new Float32Array(CHUNK_CELLS * 2),
     baseColours: new Float32Array(CHUNK_CELLS * 3),
     oreColours: new Float32Array(CHUNK_CELLS * 4),

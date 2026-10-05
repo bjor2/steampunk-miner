@@ -12,9 +12,11 @@ import {
   HEADLAMP_HALF_ANGLE_RADIANS,
   HEADLAMP_RANGE_TILES,
   HEADLAMP_SPILL_TILES,
+  MAX_POINT_LIGHTS,
 } from '../constants/scene'
-import { rgbOfHex } from '../systems/render/colour'
+import { rgbOfHex, type Rgb } from '../systems/render/colour'
 import { writeHeadlampDirection } from '../systems/render/headlamp'
+import type { PointLightSource } from '../systems/render/sceneLights'
 import type { Facing } from '../systems/vehicle/vehiclePose'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import { TERRAIN_FRAGMENT_SHADER, TERRAIN_VERTEX_SHADER } from './terrainShader'
@@ -26,10 +28,13 @@ export interface TerrainLight {
   facing: Facing
   planetRadiusTiles: number
   dt: number
+  /** At most `MAX_POINT_LIGHTS`, chosen by `LightRig`. */
+  pointLights: readonly PointLightSource[]
 }
 
 export function createTerrainMaterial(): ShaderMaterial {
   return new ShaderMaterial({
+    defines: { MAX_POINT_LIGHTS },
     vertexShader: TERRAIN_VERTEX_SHADER,
     fragmentShader: TERRAIN_FRAGMENT_SHADER,
     uniforms: {
@@ -47,6 +52,8 @@ export function createTerrainMaterial(): ShaderMaterial {
       uAmbientFade: { value: AMBIENT_FADE_DEPTH_TILES },
       // Each chunk mesh sets its own density halo just before it draws (chunkMeshPool).
       uDensity: { value: null },
+      uPointLights: { value: Array.from({ length: MAX_POINT_LIGHTS }, () => new Vector3()) },
+      uPointColours: { value: Array.from({ length: MAX_POINT_LIGHTS }, () => new Vector3()) },
     },
   })
 }
@@ -57,4 +64,34 @@ export function lightTerrain(material: ShaderMaterial, light: TerrainLight): voi
   uniforms.uLampPosition.value.set(light.lampPosition.x, light.lampPosition.y)
   writeHeadlampDirection(light.vehicleUp, light.facing, uniforms.uLampDirection.value)
   uniforms.uPlanetRadius.value = light.planetRadiusTiles
+  writePointLights(uniforms.uPointLights.value, uniforms.uPointColours.value, light.pointLights)
+}
+
+/** Display colours like the lamp's; an unused slot is black, so it adds nothing. */
+function writePointLights(
+  positions: Vector3[],
+  colours: Vector3[],
+  lights: readonly PointLightSource[],
+): void {
+  for (let at = 0; at < MAX_POINT_LIGHTS; at++) {
+    const light = lights[at]
+    if (light === undefined) {
+      colours[at].set(0, 0, 0)
+      continue
+    }
+    positions[at].set(light.x, light.y, light.rangeM)
+    const [red, green, blue] = cachedRgbOf(light.colour)
+    colours[at].set(red, green, blue).multiplyScalar(light.strength)
+  }
+}
+
+/** Light colours are a handful of constants: parsed once, so a frame allocates nothing. */
+const PARSED_COLOURS = new Map<string, Rgb>()
+
+function cachedRgbOf(hex: string): Rgb {
+  const known = PARSED_COLOURS.get(hex)
+  if (known !== undefined) return known
+  const parsed = rgbOfHex(hex)
+  PARSED_COLOURS.set(hex, parsed)
+  return parsed
 }

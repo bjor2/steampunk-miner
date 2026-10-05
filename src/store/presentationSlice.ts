@@ -33,6 +33,7 @@ import {
   zoomedOut,
   type ZoomChange,
 } from '../systems/render/viewZoom'
+import { renderScalePinProblems } from '../systems/render/renderScale'
 import { focusOnScreen, jumpFocusToPanel, stepFocus } from '../systems/views/menuFocus'
 import type { ButtonAction, ScreenButton } from '../systems/views/viewParts'
 import { refuseProblems, submitCommand } from './authorityLink'
@@ -52,6 +53,8 @@ export interface PresentationValues {
   isTravelArmed: boolean
   /** The action waiting for "press a key to rebind". */
   rebindingActionId: ActionId | null
+  /** A render scale held by the debug API (#38 "a toggle can pin it"); null adapts to the GPU. */
+  renderScalePin: number | null
 }
 
 export interface PresentationActions {
@@ -63,6 +66,8 @@ export interface PresentationActions {
   setViewShortAxis(metres: unknown): void
   /** One `zoom_in`/`zoom_out` step of 1.25, clamped, or `zoom_reset` to 12 m. */
   zoom(change: ZoomChange): void
+  /** Holds the render scale (clamped to the 1080p floor), or `null` to adapt; refused (thrown). */
+  pinRenderScale(scale: unknown): void
   /** The preferences file read at start; already validated, so nothing is written back. */
   adoptPreferences(prefs: Preferences): void
   /** The hints and transmissions shown so far (#16), kept in the preferences file. */
@@ -99,6 +104,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
   focusedControlId: null,
   isTravelArmed: false,
   rebindingActionId: null,
+  renderScalePin: null,
 }
 
 export function inputLayerOf(state: SliceHost): InputContext {
@@ -122,6 +128,10 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       savePrefs({ ...get().prefs, viewShortAxisMetres: metres as number })
     },
     zoom: (change) => get().setViewShortAxis(zoomedViewOf(get().prefs.viewShortAxisMetres, change)),
+    pinRenderScale: (scale) => {
+      refuseProblems(renderScalePinProblems(scale))
+      set({ renderScalePin: scale as number | null })
+    },
     adoptPreferences: (prefs) =>
       set({ prefs, bindings: bindingsWithOverrides(ACTION_MAP, prefs.bindings).bindings }),
     rememberSeenHints: (seenHints) => savePrefs({ ...get().prefs, seenHints }),

@@ -25,6 +25,7 @@ import {
 } from './store/checkpoint'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
 import { routeKeyChange, routeScrollNotch } from './store/inputRuntime'
+import { turnOnPerfLog } from './store/perfLog'
 import { recordStartingPlanetEntered } from './store/planetArrivalLog'
 import { installPreferencesStorage, loadPreferences } from './store/preferencesFile'
 import { parseScenario, type Scenario } from './systems/scenario'
@@ -52,6 +53,7 @@ export async function startGame(): Promise<void> {
   recordStartingPlanetEntered()
   keepRunFilesWritten(shell, run)
   exposeDebugHandles(shell, run.runId)
+  logPerfOnTestRuns(shell)
   applyLaunchScenario(shell)
   startHints()
   writeMetadata(shell, run)
@@ -130,6 +132,12 @@ function exposeDebugHandles(shell: Shell, runId: string): void {
   shell.exposeGlobalHandle('steampunkDebug', createDebugApi())
   shell.exposeGlobalHandle('steampunkRunLog', () => shell.readBufferedRunEvents(runId))
   shell.exposeGlobalHandle('steampunkRunCommands', () => shell.readBufferedRunCommands(runId))
+}
+
+/** `perf` lines are for dev, scenario and debug runs only (#11 section 1, #38). */
+function logPerfOnTestRuns(shell: Shell): void {
+  const isTestRun = shell.launch.debugEnabled || shell.launch.scenarioText !== null
+  if (isTestRun || import.meta.env.DEV) turnOnPerfLog()
 }
 
 function applyLaunchScenario(shell: Shell): void {

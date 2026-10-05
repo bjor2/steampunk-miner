@@ -11,6 +11,8 @@ import { planetParamsFor } from '../systems/world/planetParams'
 import { EMPTY_WORLD } from '../systems/world/worldState'
 import { createChunkMeshPool, type ChunkMeshPool, type TerrainView } from './chunkMeshPool'
 import { drillPresence } from './drillPresence'
+import { lightPresence } from './lightPresence'
+import { renderPresence } from './renderPresence'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
 import { vehiclePresence } from './vehiclePresence'
 
@@ -38,7 +40,8 @@ export function PlanetTerrain() {
     view.params = params
     view.world = world
     view.viewRadius = viewRadiusOf(size.width, size.height, (camera as OrthographicCamera).zoom)
-    pool.current.sync(view)
+    syncTimed(pool.current, view)
+    recordGroundDrawn(pool.current)
     light.facing = drillPresence.facing
     light.planetRadiusTiles = params.radiusTiles
     light.dt = delta
@@ -46,6 +49,19 @@ export function PlanetTerrain() {
   })
 
   return <group ref={group} />
+}
+
+/** The #4 terrain budget is 2 ms a frame; the perf log keeps its p95. */
+function syncTimed(pool: ChunkMeshPool, view: TerrainView): void {
+  const started = performance.now()
+  pool.sync(view)
+  renderPresence.terrainMs = performance.now() - started
+}
+
+/** The #38 visible-block budget, read by the render stats and the perf log. */
+function recordGroundDrawn(pool: ChunkMeshPool): void {
+  renderPresence.groundBlocks = pool.drawnBlockCount()
+  renderPresence.drawnChunks = pool.drawnChunkCount()
 }
 
 /** Its planet and world are placeholders, replaced before the pool first reads them. */
@@ -65,5 +81,6 @@ function createTerrainLightScratch(): TerrainLight {
     facing: drillPresence.facing,
     planetRadiusTiles: 0,
     dt: 0,
+    pointLights: lightPresence.pointLights,
   }
 }

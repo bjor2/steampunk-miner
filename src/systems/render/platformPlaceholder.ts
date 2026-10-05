@@ -5,8 +5,9 @@
  * `core_drive` a glowing core drive assembly with extra stacks and pipes appears on the hub and
  * stays. The core bay shows a fill gauge on the hub (#8). Each bay has a sign on a post above its
  * pad, told apart by shape as well as colour (#13): a coin on the Sell bay's, a cross on the
- * Upgrade bay's. All of it reads the authority's state through the replica; the art decides
- * nothing. Metres from the pad's top surface at its middle, x along the pad.
+ * Upgrade bay's. Lit by its own lamps (#38, #48). All of it reads the authority's state through
+ * the replica; the art decides nothing. Metres from the pad's top surface at its middle, x along
+ * the pad.
  */
 import type { PlatformVisualState } from '../authority/platformState'
 import { bayCentreColumnOf } from '../world/dockBays'
@@ -19,10 +20,23 @@ export interface PartShape {
   size: readonly [number, number]
   offset: readonly [number, number]
   colour: string
+  /** Glows by itself (emissive), so it reads in the dark and feeds the bloom (#38, #48). */
+  isGlowing?: boolean
+}
+
+/** A light on the platform (#48: the same material language as the vehicle, lit by its lamps). */
+export interface PlatformLamp {
+  id: string
+  offset: readonly [number, number]
+  colour: string
+  rangeM: number
+  strength: number
 }
 
 export interface PlatformLook {
   shapes: readonly PartShape[]
+  /** Its point-light sources; at most 4 lights shine in view (#38), so a few, never one per part. */
+  lamps: readonly PlatformLamp[]
   /** The bay gauge's empty frame; the fill grows up from its bottom edge. */
   bayGauge: { offset: readonly [number, number]; size: readonly [number, number] }
 }
@@ -61,8 +75,16 @@ const CORE_DRIVE: readonly PartShape[] = [
   box([0.3, 1.4], [-0.3, 3.5], IRON),
   box([2.6, 0.13], [0.5, 3.0], COPPER),
   box([0.13, 0.9], [1.75, 2.5], COPPER),
-  disc(1.3, [0.8, 3.7], CORE_GLOW),
-  disc(0.6, [0.8, 3.7], CORE_HEART),
+  { ...disc(1.3, [0.8, 3.7], CORE_GLOW), isGlowing: true },
+  { ...disc(0.6, [0.8, 3.7], CORE_HEART), isGlowing: true },
+]
+
+/** Placeholders, tuned by eye: a warm work lamp over the brass rail, the core drive's glow. */
+const OUTPOST_LAMPS: readonly PlatformLamp[] = [
+  { id: 'platform-lamp', offset: [0.5, 2.8], colour: '#ffd9a0', rangeM: 6, strength: 0.4 },
+]
+const CORE_DRIVE_LAMPS: readonly PlatformLamp[] = [
+  { id: 'core-drive-glow', offset: [0.8, 3.7], colour: CORE_GLOW, rangeM: 5, strength: 0.8 },
 ]
 
 const BAY_GAUGE = { offset: [0, 1.4] as const, size: [0.5, 1.6] as const }
@@ -72,8 +94,12 @@ const SIGN_HEIGHT = 3.4
 const POST_FROM_CENTRE = 1.8
 
 export function platformLookOf(visualState: PlatformVisualState, site: DockSite): PlatformLook {
-  const extras = visualState === 'core_drive' ? CORE_DRIVE : []
-  return { shapes: [...OUTPOST, ...extras, ...baySignsOf(site)], bayGauge: BAY_GAUGE }
+  const isCoreDrive = visualState === 'core_drive'
+  return {
+    shapes: [...OUTPOST, ...(isCoreDrive ? CORE_DRIVE : []), ...baySignsOf(site)],
+    lamps: [...OUTPOST_LAMPS, ...(isCoreDrive ? CORE_DRIVE_LAMPS : [])],
+    bayGauge: BAY_GAUGE,
+  }
 }
 
 function baySignsOf(site: DockSite): PartShape[] {

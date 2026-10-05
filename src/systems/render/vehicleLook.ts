@@ -8,6 +8,7 @@
  */
 import { slotOfPartId } from '../art/artIds'
 import { placeholderQuadsOf, type PlaceholderQuad } from '../art/placeholderLook'
+import { createPartPose, writePartPose, type PartMotion, type PartPose } from './partMotion'
 
 export const VEHICLE_ASSET_ID = 'vehicle'
 
@@ -21,6 +22,24 @@ function isOnDrillHead(quad: PlaceholderQuad): boolean {
 /** Every part id the run vehicle shows at a visual tier (the debug API's `vehicleParts`). */
 export function vehiclePartIdsOf(visualTier: number): string[] {
   return placeholderQuadsOf(VEHICLE_ASSET_ID, visualTier).map((quad) => quad.partId)
+}
+
+/**
+ * Every part's pose now, by part id (#48 acceptance 1-2: the render view model a scripted drive
+ * reads): the same rule the drawn parts follow, with each part's half-height as its radius.
+ */
+export function vehiclePartPosesOf(
+  motion: PartMotion,
+  visualTier: number,
+  isMotionReduced: boolean,
+): Record<string, PartPose> {
+  const poses: Record<string, PartPose> = {}
+  for (const quad of placeholderQuadsOf(VEHICLE_ASSET_ID, visualTier)) {
+    const pose = createPartPose()
+    writePartPose(motion, slotOfPartId(quad.partId), quad.size[1] / 2, isMotionReduced, pose)
+    poses[quad.partId] = pose
+  }
+  return poses
 }
 
 /** The quads drawn on the body, lowest draw order first. */
@@ -49,6 +68,7 @@ function relativeToHead(quad: PlaceholderQuad, head: PlaceholderQuad): Placehold
   return {
     ...quad,
     centre: [quad.centre[0] - head.centre[0], quad.centre[1] - head.centre[1]],
+    pivot: [quad.pivot[0] - head.centre[0], quad.pivot[1] - head.centre[1]],
     z: quad.z - head.z,
   }
 }

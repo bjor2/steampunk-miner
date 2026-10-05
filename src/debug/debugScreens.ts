@@ -7,6 +7,8 @@
  * `window.steampunkDebug`, which the debug flag alone exposes.
  */
 import { cameraPresence } from '../scene/cameraPresence'
+import { lightPresence } from '../scene/lightPresence'
+import { renderPresence } from '../scene/renderPresence'
 import { useGameStore } from '../store/gameStore'
 import { pressAction, releaseAction } from '../store/inputRuntime'
 import {
@@ -27,6 +29,7 @@ import {
   type PreferenceName,
   type Preferences,
 } from '../systems/input/preferences'
+import { renderScalePinProblems } from '../systems/render/renderScale'
 import { cameraViewOf, viewShortAxisProblems, type CameraView } from '../systems/render/viewZoom'
 import type { HudModel } from '../systems/views/hudModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
@@ -45,12 +48,22 @@ export interface DebugUi {
   setZoom(viewShortAxisMetres: unknown): DebugResult
   /** The framing on screen now: the eased zoom, pixels per metre and the collider's share (#39). */
   getCameraView(): DebugResult<{ view: CameraView }>
+  /** What the last frame drew and cost (#38 acceptance 1-3): draw calls, blocks, lights, scale. */
+  getRenderStats(): DebugResult<{ stats: RenderStats }>
+  /** Holds the render scale (0 to 1, clamped to the 1080p floor), or `null` to adapt again (#38). */
+  setRenderScale(scale: unknown): DebugResult
   getHudModel(): DebugResult<{ model: HudModel }>
   /** The two bay screens (#37), as each would draw now; their buttons carry `wrong_bay` away. */
   getSellBayModel(): DebugResult<{ model: SellBayModel }>
   getUpgradeBayModel(): DebugResult<{ model: UpgradeBayModel }>
   /** The music's layer targets, settings and the run's stingers in order (#49). */
   getAudioModel(): DebugResult<{ model: AudioModel }>
+}
+
+export type RenderStats = typeof renderPresence & {
+  headlamps: number
+  pointLights: number
+  pointLightIds: string[]
 }
 
 export interface DebugInput {
@@ -73,6 +86,8 @@ export function createDebugUi(): DebugUi {
     getPrefs: () => ({ ok: true, prefs: game().prefs }),
     setZoom: setZoomUnlessRefused,
     getCameraView: () => ({ ok: true, view: cameraViewOnScreen() }),
+    getRenderStats: () => ({ ok: true, stats: renderStatsNow() }),
+    setRenderScale: pinRenderScaleUnlessRefused,
     getHudModel: () => ({ ok: true, model: readHudModel() }),
     getSellBayModel: () => ({ ok: true, model: readSellBayModel() }),
     getUpgradeBayModel: () => ({ ok: true, model: readUpgradeBayModel() }),
@@ -104,6 +119,21 @@ function setZoomUnlessRefused(viewShortAxisMetres: unknown): DebugResult {
   const problems = viewShortAxisProblems(viewShortAxisMetres)
   if (problems.length === 0) game().setViewShortAxis(viewShortAxisMetres)
   return resultOf(problems)
+}
+
+function pinRenderScaleUnlessRefused(scale: unknown): DebugResult {
+  const problems = renderScalePinProblems(scale)
+  if (problems.length === 0) game().pinRenderScale(scale)
+  return resultOf(problems)
+}
+
+function renderStatsNow(): RenderStats {
+  return {
+    ...renderPresence,
+    headlamps: lightPresence.headlamps,
+    pointLights: lightPresence.pointLights.length,
+    pointLightIds: lightPresence.pointLights.map((light) => light.id),
+  }
 }
 
 function cameraViewOnScreen(): CameraView {

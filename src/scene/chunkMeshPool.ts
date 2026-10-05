@@ -1,11 +1,12 @@
 /**
  * The chunk meshes under the camera (#4 Rendering, #22): one instanced mesh per visible chunk,
- * all sharing the terrain material, so a chunk is one draw call. The ONLY writer of terrain
- * meshes. Which chunks are visible, and what each one's instances are, are the pure rules in
- * `systems/render`; this module turns them into three objects.
+ * all sharing the terrain material, so a chunk is one draw call. Each chunk draws only the tiles
+ * of its 8 m ground blocks inside the view circle (#38 visible-block budget). The ONLY writer of
+ * terrain meshes. Which blocks are visible, and what each chunk's instances are, are the pure
+ * rules in `systems/render`; this module turns them into three objects.
  *
  * Work happens only when something changed: the visible set is recomputed when the camera enters
- * another tile or the screen is resized, chunk versions are checked when the world changes, and
+ * another tile or the screen is resized (a changed block set only copies instance runs), chunk versions are checked when the world changes, and
  * at most `CHUNK_BUILDS_PER_FRAME` stale chunks are rebuilt per frame, nearest first (#4: terrain
  * updates under 2 ms per frame). A frame where nothing changed allocates nothing.
  */
@@ -29,10 +30,17 @@ import {
   isSameChunkView,
   type ChunkViewVersion,
 } from '../systems/render/chunkViewVersion'
-import { visibleChunksAround, type ChunkPoint } from '../systems/render/visibleChunks'
+import {
+  copyShownBlocks,
+  drawnBlockCountOf,
+  shownChunksOf,
+  visibleGroundBlocksAround,
+  type ShownChunk,
+  type TileInstances,
+} from '../systems/render/groundBlocks'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { PlanetParams } from '../systems/world/planetParams'
-import { chunkKey, firstTileOfChunk } from '../systems/world/tileGrid'
+import { CHUNK_CELLS, chunkKey, firstTileOfChunk } from '../systems/world/tileGrid'
 import {
   currentDensityOfChunk,
   materialCellsOfChunk,
@@ -51,6 +59,8 @@ export interface ChunkMeshPool {
   sync(view: Readonly<TerrainView>): void
   /** Chunk meshes drawn now: the #22 budget counts these draw calls. */
   drawnChunkCount(): number
+  /** 8 m ground blocks drawn now: the #38 budget allows 48 at the 20 m zoom-out. */
+  drawnBlockCount(): number
   dispose(): void
 }
 
@@ -58,11 +68,15 @@ interface ChunkMesh {
   mesh: Mesh
   density: DataTexture
   version: ChunkViewVersion
+  batch: ChunkTileBatch
+  /** The instances the mesh draws: the tiles of the shown blocks, bound to its geometry. */
+  drawn: TileInstances
+  blockMask: number
 }
 
 interface PoolState {
   meshes: Map<string, ChunkMesh>
-  visible: ChunkPoint[]
+  visible: ShownChunk[]
   tileX: number
   tileY: number
   viewRadius: number
@@ -91,6 +105,7 @@ export function createChunkMeshPool(parent: Group, material: ShaderMaterial): Ch
       pool.isUpToDate = rebuildStale(pool, parent, material, view)
     },
     drawnChunkCount: () => countDrawn(pool),
+    drawnBlockCount: () => countDrawnBlocks(pool),
     dispose: () => dropAll(pool, parent),
   }
 }
@@ -98,6 +113,12 @@ export function createChunkMeshPool(parent: Group, material: ShaderMaterial): Ch
 function countDrawn(pool: PoolState): number {
   let drawn = 0
   for (const chunk of pool.meshes.values()) if (chunk.mesh.visible) drawn++
+  return drawn
+}
+
+function countDrawnBlocks(pool: PoolState): number {
+  let drawn = 0
+  for (const chunk of pool.meshes.values()) drawn += drawnBlockCountOf(chunk.batch, chunk.blockMask)
   return drawn
 }
 
@@ -116,8 +137,28 @@ function chooseVisible(pool: PoolState, parent: Group, view: TerrainView): void 
   pool.tileY = Math.floor(view.centre.y)
   pool.viewRadius = view.viewRadius
   pool.params = view.params
-  pool.visible = visibleChunksAround(view.centre, view.viewRadius, view.params.radiusTiles)
+  const blocks = visibleGroundBlocksAround(view.centre, view.viewRadius, view.params.radiusTiles)
+  pool.visible = shownChunksOf(blocks)
   dropHidden(pool, parent)
+  showVisibleBlocks(pool)
+}
+
+/** Chunks already built draw their newly shown blocks at once; stale ones on their rebuild. */
+function showVisibleBlocks(pool: PoolState): void {
+  for (const { cx, cy, blockMask } of pool.visible) {
+    const chunk = pool.meshes.get(chunkKey(cx, cy))
+    if (chunk !== undefined && chunk.blockMask !== blockMask) showBlocks(chunk, blockMask)
+  }
+}
+
+function showBlocks(chunk: ChunkMesh, blockMask: number): void {
+  chunk.blockMask = blockMask
+  copyShownBlocks(chunk.batch, blockMask, chunk.drawn)
+  const geometry = chunk.mesh.geometry as InstancedBufferGeometry
+  for (const name of INSTANCE_ATTRIBUTES) geometry.getAttribute(name).needsUpdate = true
+  geometry.instanceCount = chunk.drawn.count
+  // A chunk with no ground in view (space, a cave) keeps its version but issues no draw call.
+  chunk.mesh.visible = chunk.drawn.count > 0
 }
 
 function dropHidden(pool: PoolState, parent: Group): void {
@@ -143,13 +184,14 @@ function rebuildStale(
   view: TerrainView,
 ): boolean {
   let builds = 0
-  for (const { cx, cy } of pool.visible) {
+  for (const { cx, cy, blockMask } of pool.visible) {
     const key = chunkKey(cx, cy)
     const version = chunkViewVersionOf(view.world, cx, cy)
     const current = pool.meshes.get(key)
     if (current !== undefined && isSameChunkView(current.version, version)) continue
     if (builds === CHUNK_BUILDS_PER_FRAME) return false
-    replaceChunkMesh(pool, parent, key, buildChunkMesh(material, view, cx, cy, version))
+    const built = buildChunkMesh(material, view, { cx, cy, blockMask }, version)
+    replaceChunkMesh(pool, parent, key, built)
     builds++
   }
   return true
@@ -165,8 +207,7 @@ function replaceChunkMesh(pool: PoolState, parent: Group, key: string, next: Chu
 function buildChunkMesh(
   material: ShaderMaterial,
   view: TerrainView,
-  cx: number,
-  cy: number,
+  { cx, cy, blockMask }: ShownChunk,
   version: ChunkViewVersion,
 ): ChunkMesh {
   const { params, world } = view
@@ -179,18 +220,32 @@ function buildChunkMesh(
     halo,
   )
   const density = densityTextureOf(halo)
-  const mesh = new Mesh(geometryOf(batch), material)
+  const drawn = emptyInstances()
+  const mesh = new Mesh(geometryOf(drawn), material)
   mesh.position.set(firstTileOfChunk(cx), firstTileOfChunk(cy), 0)
   // Culled by the view circle above; three's own test would use the unit quad's bounds.
   mesh.frustumCulled = false
-  // A chunk with no ground (space, a cave) keeps its version but issues no draw call.
-  mesh.visible = batch.count > 0
   // One material draws every chunk; each hands it its own density just before drawing.
   mesh.onBeforeRender = () => {
     material.uniforms.uDensity.value = density
     material.uniformsNeedUpdate = true
   }
-  return { mesh, density, version }
+  const chunk: ChunkMesh = { mesh, density, version, batch, drawn, blockMask: Number.NaN }
+  showBlocks(chunk, blockMask)
+  return chunk
+}
+
+const INSTANCE_ATTRIBUTES = ['aTile', 'aBase', 'aOre', 'aStyle'] as const
+
+/** Sized for a whole chunk, so showing more blocks never reallocates. */
+function emptyInstances(): TileInstances {
+  return {
+    count: 0,
+    tiles: new Float32Array(CHUNK_CELLS * 2),
+    baseColours: new Float32Array(CHUNK_CELLS * 3),
+    oreColours: new Float32Array(CHUNK_CELLS * 4),
+    styles: new Float32Array(CHUNK_CELLS * 4),
+  }
 }
 
 /** The halo as a one-channel texture, blended linearly between samples like the contour. */
@@ -211,7 +266,7 @@ function densityTextureOf(halo: Uint8Array<ArrayBuffer>): DataTexture {
 }
 
 /** A unit quad drawn once per tile; each chunk owns its copy, so disposing it is local. */
-function geometryOf(batch: ChunkTileBatch): InstancedBufferGeometry {
+function geometryOf(batch: TileInstances): InstancedBufferGeometry {
   const quad = new PlaneGeometry(1, 1)
   const geometry = new InstancedBufferGeometry()
   geometry.index = quad.index

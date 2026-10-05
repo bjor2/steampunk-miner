@@ -2,7 +2,8 @@
  * The live game's fixed step for the local vehicle (#3, #11): the authority's clock moves one
  * tick, the controller drives the body for that tick with the current intent, the step's actions
  * are counted, a pose report goes to the authority when one is due, the drill's facing and
- * activity go to the scene for the headlamp and sparks, and the speed and lift to the sounds. After the tow or a planet change the body
+ * activity go to the scene for the headlamp and sparks, the speed and lift to the sounds, and the
+ * tick's motion to the part animation (#48). After the tow or a planet change the body
  * is placed on the dock the authority put the vehicle on.
  */
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
@@ -29,6 +30,8 @@ import { chunkKey } from '../systems/world/tileGrid'
 import type { WorldState } from '../systems/world/worldState'
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
+import { stepVehicleParts } from './partMotionPresence'
+import { renderPresence } from './renderPresence'
 
 const HALF_TILE = 0.5
 
@@ -58,6 +61,8 @@ export function createVehicleLoop(): VehicleLoop {
       reportWhenDue(loop, result)
       showDrill(result)
       showMotion(result)
+      stepVehicleParts(result.pose, result.flags)
+      renderPresence.groundColliders = controller.colliderCount()
     },
   }
 }
