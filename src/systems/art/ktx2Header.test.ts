@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { ktx2MapProblems, readKtx2Header } from './ktx2Header'
+import { ktx2MapProblems, ktx2TileProblems, readKtx2Header } from './ktx2Header'
 
 // Tiny files written by KTX-Software's `toktx` 4.4.2 (see docs/art-pipeline.md), so the reader is
 // checked against the encoder the pipeline uses, not against bytes the test made up.
@@ -58,5 +58,20 @@ describe('ktx2 map lint', () => {
     expect(ktx2MapProblems('a.albedo.ktx2', 'albedo', fixture('etc1s-srgb-12x8.ktx2'))).toEqual([
       'a.albedo.ktx2: 12x8 must be power-of-two sides up to 4096',
     ])
+  })
+})
+
+describe('ktx2 tile lint', () => {
+  it('refuses a ground or casing map that is not the 1024 px square tile of #52', () => {
+    expect(ktx2TileProblems('g.albedo.ktx2', fixture('etc1s-srgb-8.ktx2'))).toEqual([
+      'g.albedo.ktx2: a tile map must be 1024x1024 (4 m at 256 px/m), not 8x8',
+    ])
+    expect(ktx2TileProblems('g.albedo.ktx2', fixture('etc1s-srgb-12x8.ktx2'))).toEqual([
+      'g.albedo.ktx2: a tile map must be 1024x1024 (4 m at 256 px/m), not 12x8',
+    ])
+  })
+
+  it('leaves bytes that are not KTX2 to the map lint', () => {
+    expect(ktx2TileProblems('g.albedo.ktx2', new TextEncoder().encode('no texture'))).toEqual([])
   })
 })

@@ -72,6 +72,22 @@ export function ktx2MapProblems(file: string, kind: MapKind, bytes: Uint8Array):
   return problems.map((problem) => `${file}: ${problem}`)
 }
 
+/**
+ * Why a ground or casing map is not the tile #52 asks for: 1024x1024, 4 x 4 m at 256 px/m, so it
+ * repeats across the world at the #38 texel density. Bytes that are not KTX2 are the map lint's.
+ */
+export function ktx2TileProblems(file: string, bytes: Uint8Array): string[] {
+  const header = readKtx2Header(bytes)
+  if (header === null || isTileSquare(header)) return []
+  const metres = ART_RULES.tilePx / ART_RULES.pxPerMetre.ground
+  const tile = `${ART_RULES.tilePx}x${ART_RULES.tilePx} (${metres} m at ${ART_RULES.pxPerMetre.ground} px/m)`
+  return [`${file}: a tile map must be ${tile}, not ${header.width}x${header.height}`]
+}
+
+function isTileSquare(header: Ktx2Header): boolean {
+  return header.width === ART_RULES.tilePx && header.height === ART_RULES.tilePx
+}
+
 function hasKtx2Identifier(bytes: Uint8Array): boolean {
   return bytes.byteLength > DFD_OFFSET_AT && IDENTIFIER.every((byte, at) => bytes[at] === byte)
 }

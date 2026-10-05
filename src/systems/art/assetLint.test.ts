@@ -13,11 +13,12 @@ import {
 import {
   expectedFilesOf,
   manifestProblems,
+  ownerIdOfFile,
   shippedFileProblems,
   SHIPPED_ART_FOLDERS,
   type ManifestEntry,
 } from './assetManifest'
-import { ktx2MapProblems } from './ktx2Header'
+import { ktx2MapProblems, ktx2TileProblems } from './ktx2Header'
 import {
   mapFilesOf,
   placeholderDriftProblems,
@@ -62,6 +63,9 @@ const partTiersOf = (sidecar: PartsSidecar): string[] =>
 
 const mapKindOf = (path: string): MapKind | undefined =>
   MAP_KINDS.find((kind) => path.endsWith(`.${kind}.ktx2`))
+
+const isTileMap = (path: string): boolean =>
+  ASSET_MANIFEST.assets.some((entry) => entry.form === 'tile' && entry.id === ownerIdOfFile(path))
 
 describe('asset lint: the manifest', () => {
   it('is the #51 inventory under the #52 naming', () => {
@@ -154,6 +158,13 @@ describe('asset lint: shipped files', () => {
       if (kind === undefined) return []
       return ktx2MapProblems(path, kind, new Uint8Array(readFileSync(new URL(path, REPO))))
     })
+    expect(problems).toEqual([])
+  })
+
+  it('ships every ground and casing map as the 1024 px square tile of #52', () => {
+    const problems = shipped
+      .filter((path) => path.endsWith('.ktx2') && isTileMap(path))
+      .flatMap((path) => ktx2TileProblems(path, new Uint8Array(readFileSync(new URL(path, REPO)))))
     expect(problems).toEqual([])
   })
 })
