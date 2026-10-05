@@ -25,6 +25,13 @@ import {
   type Preferences,
 } from '../systems/input/preferences'
 import { otherCameraMode, type CameraMode } from '../systems/render/cameraTurn'
+import { VIEW_SHORT_AXIS_DEFAULT_M } from '../constants/scene'
+import {
+  viewShortAxisProblems,
+  zoomedIn,
+  zoomedOut,
+  type ZoomChange,
+} from '../systems/render/viewZoom'
 import { focusOnScreen, jumpFocusToPanel, stepFocus } from '../systems/views/menuFocus'
 import type { ButtonAction, ScreenButton } from '../systems/views/viewParts'
 import { refuseProblems, submitCommand } from './authorityLink'
@@ -51,6 +58,10 @@ export interface PresentationActions {
   setPreference(name: PreferenceName, value: unknown): void
   setCameraMode(mode: CameraMode): void
   togglePreference(name: PreferenceName): void
+  /** Metres across the short axis, 8 to 20 (#39); refused (thrown) outside the band. */
+  setViewShortAxis(metres: unknown): void
+  /** One `zoom_in`/`zoom_out` step of 1.25, clamped, or `zoom_reset` to 12 m. */
+  zoom(change: ZoomChange): void
   /** The preferences file read at start; already validated, so nothing is written back. */
   adoptPreferences(prefs: Preferences): void
   /** The hints and transmissions shown so far (#16), kept in the preferences file. */
@@ -105,6 +116,11 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
     },
     setCameraMode: (mode) => get().setPreference('cameraMode', mode),
     togglePreference: (name) => get().setPreference(name, toggledValueOf(get().prefs, name)),
+    setViewShortAxis: (metres) => {
+      refuseProblems(viewShortAxisProblems(metres))
+      savePrefs({ ...get().prefs, viewShortAxisMetres: metres as number })
+    },
+    zoom: (change) => get().setViewShortAxis(zoomedViewOf(get().prefs.viewShortAxisMetres, change)),
     adoptPreferences: (prefs) =>
       set({ prefs, bindings: bindingsWithOverrides(ACTION_MAP, prefs.bindings).bindings }),
     rememberSeenHints: (seenHints) => savePrefs({ ...get().prefs, seenHints }),
@@ -152,6 +168,11 @@ function runButtonAction(state: SliceHost, action: ButtonAction): void {
   else if (action.kind === 'togglePreference') state.togglePreference(action.name)
   else if (action.kind === 'rebind') state.startRebinding(action.actionId)
   else if (action.kind === 'resetBindings') state.resetBindings()
+}
+
+function zoomedViewOf(viewShortAxisMetres: number, change: ZoomChange): number {
+  if (change === 'in') return zoomedIn(viewShortAxisMetres)
+  return change === 'out' ? zoomedOut(viewShortAxisMetres) : VIEW_SHORT_AXIS_DEFAULT_M
 }
 
 function toggledValueOf(prefs: Preferences, name: PreferenceName): unknown {

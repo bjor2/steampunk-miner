@@ -5,10 +5,22 @@
  */
 
 /**
- * Orthographic camera zoom in pixels per world metre: #4 sizes the view at about 64 tiles across
- * a 1280-pixel screen, which is what its 16-chunk budget assumes.
+ * Zoom framing (#39): the view is sized by the world metres across the screen's shorter axis, not
+ * by pixels per metre, so 1080p and 4K show the same world. 12 m puts the 0.9 m vehicle collider
+ * at 7.5% of the short axis (13.3 body heights); the player zooms between 8 m and 20 m, a factor
+ * of 1.25 per step, eased over 0.2 s. Presentation only: never in the authority or the digest.
  */
-export const CAMERA_ZOOM = 20
+export const VIEW_SHORT_AXIS_DEFAULT_M = 12
+export const VIEW_SHORT_AXIS_MIN_M = 8
+export const VIEW_SHORT_AXIS_MAX_M = 20
+export const ZOOM_STEP_FACTOR = 1.25
+export const ZOOM_EASE_SECONDS = 0.2
+
+/**
+ * At most this many 32 m chunks drawn at the 20 m zoom-out, at any resolution (#38 visible-block
+ * budget: 7 touched plus a one-ring margin).
+ */
+export const MAX_DRAWN_CHUNKS_AT_MAX_ZOOM = 9
 
 /** Camera sits in front of the XY plane and looks down -Z. */
 export const CAMERA_POSITION: readonly [number, number, number] = [0, 0, 20]

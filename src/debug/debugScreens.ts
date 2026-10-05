@@ -6,6 +6,7 @@
  * read and set refused-whole. None of it is a `debug.*` command, and all of it exists only on
  * `window.steampunkDebug`, which the debug flag alone exposes.
  */
+import { cameraPresence } from '../scene/cameraPresence'
 import { useGameStore } from '../store/gameStore'
 import { pressAction, releaseAction } from '../store/inputRuntime'
 import { readHudModel, readPlatformModel } from '../store/screenReads'
@@ -20,6 +21,7 @@ import {
   type PreferenceName,
   type Preferences,
 } from '../systems/input/preferences'
+import { cameraViewOf, viewShortAxisProblems, type CameraView } from '../systems/render/viewZoom'
 import type { HudModel } from '../systems/views/hudModel'
 import type { PlatformModel } from '../systems/views/platformModel'
 
@@ -32,6 +34,10 @@ export interface DebugUi {
   /** `cameraMode`, `shake`, `flashes` or `hintsEnabled`. */
   setPref(name: string, value: unknown): DebugResult
   getPrefs(): DebugResult<{ prefs: Preferences }>
+  /** The player's zoom, metres across the short axis from 8 to 20 (#39); refused outside it. */
+  setZoom(viewShortAxisMetres: unknown): DebugResult
+  /** The framing on screen now: the eased zoom, pixels per metre and the collider's share (#39). */
+  getCameraView(): DebugResult<{ view: CameraView }>
   getHudModel(): DebugResult<{ model: HudModel }>
   getPlatformModel(): DebugResult<{ model: PlatformModel }>
 }
@@ -54,6 +60,8 @@ export function createDebugUi(): DebugUi {
     setCameraMode: (mode) => setPreferenceUnlessRefused('cameraMode', mode),
     setPref: (name, value) => setPreferenceUnlessRefused(name, value),
     getPrefs: () => ({ ok: true, prefs: game().prefs }),
+    setZoom: setZoomUnlessRefused,
+    getCameraView: () => ({ ok: true, view: cameraViewOnScreen() }),
     getHudModel: () => ({ ok: true, model: readHudModel() }),
     getPlatformModel: () => ({ ok: true, model: readPlatformModel() }),
   }
@@ -77,6 +85,17 @@ function setPreferenceUnlessRefused(name: unknown, value: unknown): DebugResult 
   const problems = preferenceProblems(name, value)
   if (problems.length === 0) game().setPreference(name as PreferenceName, value)
   return resultOf(problems)
+}
+
+function setZoomUnlessRefused(viewShortAxisMetres: unknown): DebugResult {
+  const problems = viewShortAxisProblems(viewShortAxisMetres)
+  if (problems.length === 0) game().setViewShortAxis(viewShortAxisMetres)
+  return resultOf(problems)
+}
+
+function cameraViewOnScreen(): CameraView {
+  const { widthPixels, heightPixels, viewShortAxisMetres } = cameraPresence
+  return cameraViewOf(widthPixels, heightPixels, viewShortAxisMetres)
 }
 
 function runWithAction(actionId: unknown, run: (action: ActionId) => void): DebugResult {

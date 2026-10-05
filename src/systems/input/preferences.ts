@@ -7,10 +7,12 @@
  * `cameraMode` is the fixed-camera accessibility toggle (#13), `shake` and `flashes` the
  * screen-shake and flash switches, `hintsEnabled` the "Show hints" setting the hints (#27) read,
  * `bindings` the sparse override of the action map, `seenHints` the hints and transmissions already
- * shown (#16), so none repeats after a reload. A file written before the seen-set existed has none
- * yet and reads as an empty one.
+ * shown (#16), so none repeats after a reload, `viewShortAxisMetres` the player's zoom (#39). A
+ * file written before the seen-set or the zoom existed reads as nothing seen and the 12 m default.
  */
 import { CAMERA_MODES, isCameraMode, type CameraMode } from '../render/cameraTurn'
+import { VIEW_SHORT_AXIS_DEFAULT_M } from '../../constants/scene'
+import { viewShortAxisProblems } from '../render/viewZoom'
 import { HINT_TABLE, plaqueIdsOf } from '../hints/hintTable'
 import { ACTION_MAP, overrideProblems, type BindingOverrides } from './actionMap'
 
@@ -23,6 +25,8 @@ export interface Preferences {
   hintsEnabled: boolean
   bindings: BindingOverrides
   seenHints: readonly string[]
+  /** Metres across the screen's shorter axis, 8 to 20 (#39); stepped by the zoom actions. */
+  viewShortAxisMetres: number
 }
 
 /** The settings a player toggles one by one (`ui.setPref`); bindings change through rebinding. */
@@ -40,11 +44,24 @@ export const DEFAULT_PREFERENCES: Preferences = {
   hintsEnabled: true,
   bindings: {},
   seenHints: [],
+  viewShortAxisMetres: VIEW_SHORT_AXIS_DEFAULT_M,
 }
 
 const TOGGLE_NAMES = ['shake', 'flashes', 'hintsEnabled'] as const
 const PREFERENCE_NAMES: readonly PreferenceName[] = ['cameraMode', ...TOGGLE_NAMES]
-const FILE_FIELDS = ['preferencesVersion', ...PREFERENCE_NAMES, 'bindings', 'seenHints']
+const FILE_FIELDS = [
+  'preferencesVersion',
+  ...PREFERENCE_NAMES,
+  'bindings',
+  'seenHints',
+  'viewShortAxisMetres',
+]
+
+/** Fields a file from an earlier build may lack; they read as their defaults. */
+const LATER_FIELDS: Pick<Preferences, 'seenHints' | 'viewShortAxisMetres'> = {
+  seenHints: [],
+  viewShortAxisMetres: VIEW_SHORT_AXIS_DEFAULT_M,
+}
 
 /** No file yet gives the defaults with no problem; a broken file gives them with its problems. */
 export function readPreferences(text: string | null): PreferencesReading {
@@ -54,7 +71,7 @@ export function readPreferences(text: string | null): PreferencesReading {
   const { preferencesVersion: _version, ...prefs } = JSON.parse(text) as Partial<Preferences> & {
     preferencesVersion: number
   }
-  return { prefs: { seenHints: [], ...prefs } as Preferences, problems: [] }
+  return { prefs: { ...LATER_FIELDS, ...prefs } as Preferences, problems: [] }
 }
 
 export function preferencesText(prefs: Preferences): string {
@@ -99,6 +116,9 @@ function preferenceFileProblems(file: unknown): string[] {
     ...PREFERENCE_NAMES.flatMap((name) => preferenceProblems(name, fields[name])),
     ...overrideProblems(ACTION_MAP, fields.bindings),
     ...seenHintsProblems(fields.seenHints),
+    ...(fields.viewShortAxisMetres === undefined
+      ? []
+      : viewShortAxisProblems(fields.viewShortAxisMetres)),
   ]
 }
 

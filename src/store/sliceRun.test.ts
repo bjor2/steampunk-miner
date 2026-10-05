@@ -251,3 +251,37 @@ describe('presentation settings and the run', () => {
     )
   })
 })
+
+describe('zoom and the run (#39 acceptance 3)', () => {
+  /** Two trips, a sale and an upgrade; `zoomBetweenSteps` runs before and after every step. */
+  function playTwoTrips(zoomBetweenSteps: () => void): string {
+    resetGameStore()
+    const steps = [
+      () => mineTripAndDock(PLANET_1, surfaceOreTiles(6, PLANET_1)),
+      () => game().sellCargo('all'),
+      () => mineTripAndDock(PLANET_1, surfaceOreTiles(12, PLANET_1).slice(6)),
+      () => game().buyUpgrade('cargo_hold'),
+    ]
+    zoomBetweenSteps()
+    steps.forEach((step) => {
+      step()
+      zoomBetweenSteps()
+    })
+    return takeSessionSnapshot().digest
+  }
+
+  function zoomAround(): void {
+    game().zoom('out')
+    game().zoom('out')
+    game().zoom('in')
+    game().setViewShortAxis(20)
+    game().zoom('reset')
+    game().setViewShortAxis(8)
+  }
+
+  it('reaches the same state digest when the zoom changes repeatedly as when it never does', () => {
+    const zoomed = playTwoTrips(zoomAround)
+    expect(game().prefs.viewShortAxisMetres).toBe(8)
+    expect(zoomed).toBe(playTwoTrips(() => {}))
+  })
+})
