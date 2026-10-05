@@ -1,0 +1,31 @@
+{
+  "options": [
+    {
+      "id": "artefact.ore_whisper",
+      "name": "Ore Whisper",
+      "summary": "While undocked, ore within 16 m glows at its rim through up to 1 m of rock.",
+      "horizontal": true,
+      "gateClauses": ["new_information"],
+      "effects": [{ "kind": "information_channel", "channel": "ore_rim_through_rock" }]
+    },
+    {
+      "id": "artefact.breathing_room",
+      "name": "Breathing Room",
+      "summary": "Once per dock cycle, the first collapse warning on your tunnels is braced and filled.",
+      "horizontal": true,
+      "gateClauses": ["new_rule", "new_interaction"],
+      "effects": [
+        { "kind": "rule_flag", "rule": "breathing_room_charge" },
+        { "kind": "interaction", "with": "collapse" }
+      ]
+    },
+    {
+      "id": "artefact.assay_beacon",
+      "name": "Assay Beacon",
+      "summary": "At the Sell bay, ore from the shallow bands sells at the mid-band price.",
+      "horizontal": true,
+      "gateClauses": ["new_interaction"],
+      "effects": [{ "kind": "interaction", "with": "shops" }]
+    }
+  ]
+}
