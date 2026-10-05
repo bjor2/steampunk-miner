@@ -7,6 +7,7 @@
  */
 import type { AuthorityState } from '../authority/authorityState'
 import { nextUpgradePrice } from '../authority/workshopRules'
+import { trackIconIdOf } from '../art/artIds'
 import { blockHardness } from '../economy/oreEconomy'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
 import { vehicleStatsAt, type UpgradeLevels } from '../economy/vehicleStats'
@@ -37,7 +38,7 @@ export type BuyState = 'affordable' | 'money_short'
 
 export interface WorkshopRow {
   upgradeId: UpgradeId
-  /** One icon per track (#44: `icon-track-<id>`), drawn by the shop screens ticket. */
+  /** One vector icon per track (#44 `icon-track-<id>`, kebab-case per #52). */
   iconId: string
   label: string
   level: number
@@ -99,7 +100,7 @@ function workshopRowOf(
   )
   return {
     upgradeId,
-    iconId: `icon-track-${upgradeId}`,
+    iconId: trackIconIdOf(upgradeId),
     label: TRACK_LABELS[upgradeId],
     level: levels[upgradeId],
     cost: amountReading(nextUpgradePrice(state, playerId, upgradeId)),

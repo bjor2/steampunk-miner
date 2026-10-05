@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <title>Cargo hold</title>
+  <path fill="#c9a24b" d="M3 8h42l-12 24H15z"/>
+  <path fill="#1b1613" d="M9 12h30l-8 16H17z"/>
+  <path fill="#e9dcc0" d="M14 20l4-5 5 3 4-4 5 4 2 2-3 8H17z"/>
+  <rect fill="#c9a24b" x="19" y="32" width="10" height="8"/>
+  <rect fill="#c9a24b" x="14" y="40" width="20" height="5" rx="1.5"/>
+</svg>

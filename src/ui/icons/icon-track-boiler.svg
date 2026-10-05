@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <title>Boiler</title>
+  <rect fill="#c9a24b" x="10" y="2" width="8" height="10"/>
+  <rect fill="#c9a24b" x="6" y="10" width="36" height="34" rx="10"/>
+  <circle fill="#1b1613" cx="24" cy="27" r="10"/>
+  <circle fill="none" stroke="#e9dcc0" stroke-width="1.5" cx="24" cy="27" r="7.5"/>
+  <path fill="none" stroke="#e9dcc0" stroke-width="2.5" stroke-linecap="round" d="M24 27l5-5"/>
+  <rect fill="#1b1613" x="6" y="40" width="36" height="2"/>
+</svg>

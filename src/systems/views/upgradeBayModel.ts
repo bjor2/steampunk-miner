@@ -13,6 +13,7 @@
  * The quick action belongs to the Sell bay; here it is a disabled sign carrying `wrong_bay`
  * (#40), never a focus stop.
  */
+import { CASING_ICON_ID } from '../art/artIds'
 import type { AuthorityState } from '../authority/authorityState'
 import { nextCasingPrice } from '../authority/casingRules'
 import { repairCostOf } from '../authority/platformServices'
@@ -40,7 +41,7 @@ import { amountReading, commandButton, type AmountReading, type ScreenButton } f
 import { buyStateOf, workshopRowsOf, type BuyState, type WorkshopRow } from './workshopRows'
 
 export interface CasingRow {
-  /** The seventh icon (#54 scope review), drawn by the shop screens ticket. */
+  /** The seventh vector icon (#54 scope review). */
   iconId: string
   label: string
   grade: number
@@ -123,7 +124,7 @@ function casingRowOf(state: AuthorityState, playerId: string): CasingRow {
     buyCasingGradeCommand(),
   )
   return {
-    iconId: 'icon-casing',
+    iconId: CASING_ICON_ID,
     label: 'Casing',
     grade,
     gradeAfter: grade + 1,

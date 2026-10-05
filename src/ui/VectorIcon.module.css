@@ -1,0 +1,8 @@
+/* 2em: 48 px at the 1080p shop text size, the size #44 reads each silhouette at. */
+.icon {
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  flex: none;
+  vertical-align: middle;
+}

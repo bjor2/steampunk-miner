@@ -69,10 +69,18 @@ export function blenderAssetIds(): string[] {
  */
 export function vectorIconIds(): string[] {
   return [
-    ...UPGRADE_IDS.map((track) => `icon-track-${kebabOf(track)}`),
-    'icon-casing',
+    ...UPGRADE_IDS.map(trackIconIdOf),
+    CASING_ICON_ID,
     ...PLATFORM_BAY_IDS.map((bay) => `emblem-bay-${bay}`),
   ]
+}
+
+/** The Casing row's icon, the seventh vector icon (#54 scope review). */
+export const CASING_ICON_ID = 'icon-casing'
+
+/** An upgrade track's icon (#44 `icon-track-<id>`, in the #52 kebab form of the registry id). */
+export function trackIconIdOf(track: string): string {
+  return `icon-track-${kebabOf(track)}`
 }
 
 function numbered(prefix: string, count: number): string[] {

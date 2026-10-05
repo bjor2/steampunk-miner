@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { ASSET_MANIFEST } from '../art/artCatalogue'
 import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
 import { stateDigest } from '../authority/stateDigest'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
@@ -35,10 +36,27 @@ function eventsAfter(session: Session, run: () => void) {
 const buyIdOf = (upgradeId: UpgradeId) => UI_ID_TEMPLATES.workshopUpgradeBuy(upgradeId)
 
 describe('upgrade bay model', () => {
-  it('lists the six tracks in #7 order, each with its icon', () => {
+  it('lists the six tracks in #7 order, each with its kebab-case vector icon', () => {
     const tracks = upgradeBayOf(atUpgradeBay()).tracks
     expect(tracks.map((row) => row.upgradeId)).toEqual(UPGRADE_IDS)
-    expect(tracks.map((row) => row.iconId)).toEqual(UPGRADE_IDS.map((id) => `icon-track-${id}`))
+    expect(tracks.map((row) => row.iconId)).toEqual([
+      'icon-track-drill-power',
+      'icon-track-drill-tip',
+      'icon-track-engine',
+      'icon-track-boiler',
+      'icon-track-cargo-hold',
+      'icon-track-hull',
+    ])
+  })
+
+  it('gives every row an icon the art manifest ships as a final vector icon', () => {
+    const model = upgradeBayOf(atUpgradeBay())
+    const iconIds = [...model.tracks.map((row) => row.iconId), model.casing.iconId]
+    const finalIcons = ASSET_MANIFEST.assets.filter(
+      (entry) => entry.form === 'svg' && entry.status === 'final',
+    )
+    expect(finalIcons.map((entry) => entry.id)).toEqual(expect.arrayContaining(iconIds))
+    expect(new Set(iconIds).size).toBe(7)
   })
 
   it('previews each upgrade as the purchase then logs it: cost and statsAfter', () => {

@@ -8,6 +8,7 @@ import type { CasingRow, UpgradeBayModel } from '../../systems/views/upgradeBayM
 import { Panel } from '../kit/Panel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
+import { VectorIcon } from '../VectorIcon'
 import { Field } from './BayHeader'
 import styles from './Platform.module.css'
 
@@ -38,7 +39,7 @@ function UpgradeRow({ row, focusedId }: { row: WorkshopRow; focusedId: string })
   const id = row.upgradeId
   return (
     <div className={styles.row} data-testid={UI_ID_TEMPLATES.workshopUpgrade(id)}>
-      <TrackIcon iconId={row.iconId} />
+      <VectorIcon iconId={row.iconId} />
       <span>{row.label}</span>
       <span data-testid={UI_ID_TEMPLATES.workshopUpgradeLevel(id)}>{row.level}</span>
       <span data-testid={UI_ID_TEMPLATES.workshopUpgradeCost(id)} data-exact={row.cost.exact}>
@@ -56,7 +57,7 @@ function UpgradeRow({ row, focusedId }: { row: WorkshopRow; focusedId: string })
 function CasingRowView({ casing, focusedId }: { casing: CasingRow; focusedId: string }) {
   return (
     <div className={styles.row} data-testid={UI_IDS.upgradebayCasing}>
-      <TrackIcon iconId={casing.iconId} />
+      <VectorIcon iconId={casing.iconId} />
       <span>{casing.label}</span>
       <span data-testid={UI_IDS.upgradebayCasingGrade} data-grade={casing.grade}>
         {casing.gradeText}
@@ -67,11 +68,6 @@ function CasingRowView({ casing, focusedId }: { casing: CasingRow; focusedId: st
       <ScreenButtonView button={casing.buy} focusedId={focusedId} state={casing.buyState} />
     </div>
   )
-}
-
-/** The icon's slot until the shop screens ticket draws the vector icons; its id is fixed (#44). */
-function TrackIcon({ iconId }: { iconId: string }) {
-  return <span className={styles.icon} data-icon={iconId} aria-hidden />
 }
 
 function Preview({ id, preview }: { id: string; preview: StatPreview }) {
