@@ -14,10 +14,30 @@
  * Start fields whose system is not built yet (`depthBp` needs the planet radius; inventory and
  * unlocks need their tickets) are validated, then refused with a problem naming what is missing,
  * so no file is ever half applied. Upgrade levels apply as `debug.setUpgrade`, core fragments as
- * `debug.setCoreFragments` (the platform's bay, #10).
+ * `debug.setCoreFragments` (the platform's bay, #10), enemies as `debug.spawnEnemy` (#9).
+ * Facilities have their one level (#8) and the platform's look follows the core bay, so those two
+ * fields are checked, never applied: a file that contradicts them is refused.
+ *
+ * `hintsEnabled` (#16) is a presentation flag, off unless a file turns it on, so tests and bot
+ * runs never see hints; it is not authority state and sends no command.
  */
+import { DEFAULT_SPAWN_OFFSET } from './authority/combat/combatCommands'
 import { isNonNegativeMoneyText } from './money'
-import { UPGRADE_IDS } from './registeredIds'
+import { ENEMY_IDS, PLATFORM_VISUAL_STATES, UPGRADE_IDS } from './registeredIds'
+import {
+  fieldProblems,
+  flagRule,
+  isObject,
+  listRule,
+  objectRule,
+  quote,
+  rangeRule,
+  registeredIdRule,
+  safeIntegerRule,
+  wholeNumberRule,
+  type FieldRules,
+} from './scenarioFieldRules'
+import { facilityLevelProblems, platformStateProblems } from './scenarioPlatform'
 import type { StartScenario } from './startScenario'
 
 export const SCENARIO_VERSION = 1
@@ -32,6 +52,8 @@ export interface Scenario {
   start: ScenarioStart
   script?: ScriptStep[]
   expect?: ScenarioExpectations
+  /** #16: hints show only when a file says so; absent means off. */
+  hintsEnabled?: boolean
 }
 
 export interface ScenarioStart {
@@ -45,6 +67,19 @@ export interface ScenarioStart {
   upgrades?: Record<string, number>
   unlocks?: string[]
   coreFragments?: number
+  /** Enemies by registered kind (#9) and tier, `dx, dy` whole tiles from the vehicle. */
+  enemies?: ScenarioEnemy[]
+  /** Facility id to level; every facility has level 1 in the slice (#8). */
+  facilities?: Record<string, number>
+  /** `outpost` or `core_drive` (#8); it must agree with `coreFragments`. */
+  platformState?: string
+}
+
+export interface ScenarioEnemy {
+  kind: string
+  tier: number
+  dx?: number
+  dy?: number
 }
 
 /** One scripted step; its `tick` counts from the tick the scenario is applied at. */
@@ -59,10 +94,6 @@ export interface ScenarioExpectations {
   maxDepthTilesAtLeast?: number
 }
 
-type FieldRule = (value: unknown, path: string) => string[]
-
-const isPresent = (value: unknown) => value !== undefined
-
 export function validateScenario(value: unknown): string[] {
   if (!isObject(value)) return ['scenario must be a JSON object']
   return [
@@ -73,6 +104,7 @@ export function validateScenario(value: unknown): string[] {
       'start',
     ]),
     ...(isObject(value.start) ? startCombinationProblems(value.start) : []),
+    ...(isObject(value.start) ? platformStateProblems(value.start, value.worldSeed) : []),
     ...(Array.isArray(value.script) ? scriptOrderProblems(value.script) : []),
   ]
 }
@@ -91,26 +123,7 @@ export function parseScenario(text: string): { scenario: unknown; problems: stri
   }
 }
 
-function fieldProblems(
-  value: Record<string, unknown>,
-  rules: Readonly<Record<string, FieldRule>>,
-  path: string,
-  required: readonly string[] = [],
-): string[] {
-  return [
-    ...Object.keys(value)
-      .filter((name) => !Object.hasOwn(rules, name))
-      .map((name) => `${path}.${name} is not a scenario field`),
-    ...required
-      .filter((name) => !isPresent(value[name]))
-      .map((name) => `${path}.${name} is required`),
-    ...Object.entries(rules)
-      .filter(([name]) => isPresent(value[name]))
-      .flatMap(([name, rule]) => rule(value[name], `${path}.${name}`)),
-  ]
-}
-
-const SCENARIO_FIELDS: Readonly<Record<string, FieldRule>> = {
+const SCENARIO_FIELDS: FieldRules = {
   scenarioVersion: (value, path) =>
     value === SCENARIO_VERSION ? [] : [`${path} must be ${SCENARIO_VERSION}, got ${quote(value)}`],
   name: (value, path) => (isNonEmptyText(value) ? [] : [`${path} must be a non-empty string`]),
@@ -118,9 +131,12 @@ const SCENARIO_FIELDS: Readonly<Record<string, FieldRule>> = {
   start: (value, path) => objectRule(value, path, START_FIELDS),
   script: (value, path) => listRule(value, path, scriptStepProblems),
   expect: (value, path) => objectRule(value, path, EXPECT_FIELDS),
+  hintsEnabled: flagRule,
 }
 
-const START_FIELDS: Readonly<Record<string, FieldRule>> = {
+const isPresent = (value: unknown) => value !== undefined
+
+const START_FIELDS: FieldRules = {
   planet: wholeNumberRule,
   depthBp: (value, path) => [
     ...rangeRule(value, path, 0, DEPTH_BP_MAX),
@@ -141,25 +157,38 @@ const START_FIELDS: Readonly<Record<string, FieldRule>> = {
     ...notBuiltYetUnlessEmpty(value, path, 'unlocks (Build 7)'),
   ],
   coreFragments: wholeNumberRule,
+  enemies: (value, path) =>
+    listRule(value, path, (enemy, enemyPath) =>
+      objectRule(enemy, enemyPath, ENEMY_FIELDS, ['kind', 'tier']),
+    ),
+  facilities: facilityLevelProblems,
+  platformState: registeredIdRule(PLATFORM_VISUAL_STATES, 'platform state'),
 }
 
-const INVENTORY_FIELDS: Readonly<Record<string, FieldRule>> = {
+const ENEMY_FIELDS: FieldRules = {
+  kind: registeredIdRule(ENEMY_IDS, 'enemy id'),
+  tier: wholeNumberRule,
+  dx: safeIntegerRule,
+  dy: safeIntegerRule,
+}
+
+const INVENTORY_FIELDS: FieldRules = {
   tier: (value, path) => rangeRule(value, path, 1, Number.MAX_SAFE_INTEGER),
   amount: wholeNumberRule,
 }
 
-const EXPECT_FIELDS: Readonly<Record<string, FieldRule>> = {
+const EXPECT_FIELDS: FieldRules = {
   maxDepthTilesAtLeast: wholeNumberRule,
 }
 
-const SCRIPT_STEP_FIELDS: Readonly<Record<string, FieldRule>> = {
+const SCRIPT_STEP_FIELDS: FieldRules = {
   tick: wholeNumberRule,
   command: (value, path) =>
     value === 'fastForward' ? [] : [`${path} must be one of fastForward, got ${quote(value)}`],
   args: (value, path) => objectRule(value, path, FAST_FORWARD_ARGS, ['ticks']),
 }
 
-const FAST_FORWARD_ARGS: Readonly<Record<string, FieldRule>> = { ticks: wholeNumberRule }
+const FAST_FORWARD_ARGS: FieldRules = { ticks: wholeNumberRule }
 
 function scriptStepProblems(step: unknown, path: string): string[] {
   return objectRule(step, path, SCRIPT_STEP_FIELDS, ['tick', 'command', 'args'])
@@ -199,34 +228,6 @@ function unlockIdProblems(value: unknown, path: string): string[] {
   return [`${path} ${quote(value)} is not a registered unlock id`]
 }
 
-function objectRule(
-  value: unknown,
-  path: string,
-  rules: Readonly<Record<string, FieldRule>>,
-  required: readonly string[] = [],
-): string[] {
-  if (!isObject(value)) return [`${path} must be an object`]
-  return fieldProblems(value, rules, path, required)
-}
-
-function listRule(value: unknown, path: string, itemRule: FieldRule): string[] {
-  if (!Array.isArray(value)) return [`${path} must be a list`]
-  return value.flatMap((item, index) => itemRule(item, `${path}[${index}]`))
-}
-
-function wholeNumberRule(value: unknown, path: string): string[] {
-  return rangeRule(value, path, 0, Number.MAX_SAFE_INTEGER)
-}
-
-function safeIntegerRule(value: unknown, path: string): string[] {
-  return Number.isSafeInteger(value) ? [] : [`${path} must be a safe integer, got ${quote(value)}`]
-}
-
-function rangeRule(value: unknown, path: string, min: number, max: number): string[] {
-  if (Number.isSafeInteger(value) && (value as number) >= min && (value as number) <= max) return []
-  return [`${path} must be a whole number from ${min} to ${max}, got ${quote(value)}`]
-}
-
 function notBuiltYetUnlessEmpty(value: unknown, path: string, missing: string): string[] {
   return isEmptyCollection(value) ? [] : [notBuiltYet(path, missing)]
 }
@@ -244,20 +245,12 @@ function isNonEmptyText(value: unknown): boolean {
   return typeof value === 'string' && value.length > 0
 }
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-function quote(value: unknown): string {
-  return JSON.stringify(value) ?? 'nothing'
-}
-
 /**
  * The start state a valid scenario applies. The world seed is the planet seed until the planet
  * generator (Build 2) derives each planet's seed from it.
  */
 export function startOfScenario(scenario: Scenario): StartScenario {
-  const { planet, depthTiles, money, upgrades, coreFragments } = scenario.start
+  const { planet, depthTiles, money, upgrades, coreFragments, enemies } = scenario.start
   return {
     ...(planet === undefined ? {} : { planetTier: planet }),
     planetSeed: scenario.worldSeed,
@@ -265,5 +258,16 @@ export function startOfScenario(scenario: Scenario): StartScenario {
     ...(money === undefined ? {} : { money }),
     ...(upgrades === undefined ? {} : { upgrades }),
     ...(coreFragments === undefined ? {} : { coreFragments }),
+    ...(enemies === undefined ? {} : { enemies: enemies.map(placedEnemyOf) }),
   }
+}
+
+/** Absent offsets put the enemy where `spawnEnemy` does (`DEFAULT_SPAWN_OFFSET`). */
+function placedEnemyOf({ kind, tier, dx, dy }: ScenarioEnemy) {
+  return { kind, tier, dx: dx ?? DEFAULT_SPAWN_OFFSET.dx, dy: dy ?? DEFAULT_SPAWN_OFFSET.dy }
+}
+
+/** #16: hints are off unless the file turns them on. */
+export function isHintsEnabled(scenario: Scenario): boolean {
+  return scenario.hintsEnabled === true
 }

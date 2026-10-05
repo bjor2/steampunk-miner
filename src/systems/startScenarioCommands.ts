@@ -5,6 +5,7 @@
  * owns (#3), so the store places it.
  */
 import type { CommandIntent } from './authority/authorityCommand'
+import { spawnEnemyCommand } from './authority/combat/combatCommands'
 import { UPGRADE_IDS } from './economy/economyDefinition'
 import { fromCanonical, toCanonical } from './money'
 import type { StartScenario } from './startScenario'
@@ -20,6 +21,9 @@ export function startScenarioCommands(scenario: StartScenario): CommandIntent[] 
     ...(scenario.coreFragments === undefined
       ? []
       : [setCoreFragmentsCommand(scenario.coreFragments)]),
+    ...(scenario.enemies ?? []).map(({ kind, tier, dx, dy }) =>
+      spawnEnemyCommand(kind, tier, { dx, dy }),
+    ),
   ]
 }
 

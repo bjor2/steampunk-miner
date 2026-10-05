@@ -1,6 +1,12 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { parseScenario, startOfScenario, validateScenario, type Scenario } from './scenario'
+import {
+  isHintsEnabled,
+  parseScenario,
+  startOfScenario,
+  validateScenario,
+  type Scenario,
+} from './scenario'
 
 const readScenarioFile = (name: string) =>
   readFileSync(new URL(`../../scenarios/${name}`, import.meta.url), 'utf8')
@@ -90,12 +96,74 @@ describe('scenario validation', () => {
     ])
   })
 
+  it('checks enemy kinds, tiers and offsets against the #9 registry', () => {
+    const enemies = [
+      { kind: 'crawler', tier: 3, dx: -2 },
+      { kind: 'dragon', tier: 1.5 },
+      { tier: 2, fangs: 4 },
+    ]
+    expect(validateScenario({ ...minimal, start: { enemies } })).toEqual([
+      'scenario.start.enemies[1].kind "dragon" is not a registered enemy id (crawler, burrower)',
+      'scenario.start.enemies[1].tier must be a whole number from 0 to 9007199254740991, got 1.5',
+      'scenario.start.enemies[2].fangs is not a scenario field',
+      'scenario.start.enemies[2].kind is required',
+    ])
+  })
+
+  it('checks facility ids and their one level of the slice', () => {
+    const facilities = { shop: 1, garage: 1, workshop: 2 }
+    expect(validateScenario({ ...minimal, start: { facilities } })).toEqual([
+      'scenario.start.facilities key "garage" is not a registered facility id (shop, workshop, charging)',
+      'scenario.start.facilities.workshop must be a whole number from 1 to 1, got 2',
+    ])
+  })
+
+  it('checks the platform state against the registry and the core bay', () => {
+    const start = (platformState: string, coreFragments: number) => ({
+      ...minimal,
+      worldSeed: 83921,
+      start: { platformState, coreFragments },
+    })
+    expect(validateScenario(start('core_drive', 63))).toEqual([])
+    expect(validateScenario(start('outpost', 10))).toEqual([])
+    expect(validateScenario(start('core_drive', 62))).toEqual([
+      'scenario.start.platformState "core_drive" does not match coreFragments 62 (the core drive shows from 63)',
+    ])
+    expect(validateScenario(start('hangar', 0))).toEqual([
+      'scenario.start.platformState "hangar" is not a registered platform state (outpost, core_drive)',
+    ])
+  })
+
+  it('keeps hints off unless the file turns them on (#16)', () => {
+    expect(isHintsEnabled(minimal)).toBe(false)
+    expect(isHintsEnabled({ ...minimal, hintsEnabled: true })).toBe(true)
+    expect(validateScenario({ ...minimal, hintsEnabled: 'yes' })).toEqual([
+      'scenario.hintsEnabled must be true or false, got "yes"',
+    ])
+  })
+
   it('refuses text that is not JSON', () => {
     expect(parseScenario('{nope').problems).toEqual(['scenario is not valid JSON'])
   })
 })
 
 describe('scenario start state', () => {
+  it('places enemies where spawnEnemy would when the file gives no offset', () => {
+    const scenario: Scenario = {
+      ...minimal,
+      start: {
+        enemies: [
+          { kind: 'burrower', tier: 7 },
+          { kind: 'crawler', tier: 1, dx: -3, dy: 1 },
+        ],
+      },
+    }
+    expect(startOfScenario(scenario).enemies).toEqual([
+      { kind: 'burrower', tier: 7, dx: 4, dy: 0 },
+      { kind: 'crawler', tier: 1, dx: -3, dy: 1 },
+    ])
+  })
+
   it('puts the player on the planet with the money and depth the file names', () => {
     const scenario: Scenario = {
       ...minimal,

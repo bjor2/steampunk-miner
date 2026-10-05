@@ -4,7 +4,7 @@ import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { deriveSummary } from '../logging/runSummary'
-import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
+import { readEnemies, resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
 import { fromCanonical } from '../systems/money'
 import { parseScenario, type Scenario } from '../systems/scenario'
 import { createDebugApi, DebugCommandNotImplementedError } from './debugApi'
@@ -208,6 +208,20 @@ describe('debug api: scenarios', () => {
     expect(createDebugApi().applyScenario(scenario)).toMatchObject({ ok: true })
     expect(createDebugApi().vehicleStats()).toMatchObject({ levels: { drill_tip: 7 } })
     expect(sink.events.map((event) => event.event)).toContain('debug_command_applied')
+  })
+
+  it('spawns the enemies a scenario starts with, as debug commands', () => {
+    const scenario = {
+      ...minimalScenarioFor('enemies'),
+      worldSeed: 83921,
+      // A burrower in the rock under the pad: the dock point stands in open sky.
+      start: { enemies: [{ kind: 'burrower', tier: 2, dx: 2, dy: -3 }] },
+    }
+    expect(createDebugApi().applyScenario(scenario)).toMatchObject({ ok: true })
+    expect(readEnemies().map((enemy) => [enemy.kind, enemy.tier])).toEqual([['burrower', 2]])
+    expect(sink.events.map((event) => event.data)).toContainEqual(
+      expect.objectContaining({ command: 'debug.spawnEnemy' }),
+    )
   })
 
   it('refuses the broken scenario with every problem and applies none of it', () => {

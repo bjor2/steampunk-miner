@@ -12,6 +12,7 @@
  * Money is a decimal string such as "1e30" (decision #5), never a JSON number, so 1e100 and past
  * 1e308 arrive exact.
  */
+import { isEnemyKind } from './authority/combat/combatDebugRules'
 import { isNonNegativeMoneyText } from './money'
 import { isUpgradeId, upgradeLevelProblems } from './vehicle/vehicleStats'
 
@@ -26,6 +27,15 @@ export interface StartScenario {
   upgrades?: Readonly<Record<string, number>>
   /** Fragments in the platform's core bay (#10). */
   coreFragments?: number
+  /** Enemies to spawn (#9): registered kind, tier, whole tiles from the vehicle. */
+  enemies?: readonly StartEnemy[]
+}
+
+export interface StartEnemy {
+  kind: string
+  tier: number
+  dx: number
+  dy: number
 }
 
 export function startScenarioProblems(scenario: StartScenario): string[] {
@@ -36,6 +46,19 @@ export function startScenarioProblems(scenario: StartScenario): string[] {
     ...moneyProblems(scenario.money),
     ...upgradesProblems(scenario.upgrades),
     ...coreFragmentsProblems(scenario.coreFragments),
+    ...(scenario.enemies ?? []).flatMap(enemyProblems),
+  ]
+}
+
+function enemyProblems(enemy: StartEnemy, index: number): string[] {
+  return [
+    ...(isEnemyKind(enemy.kind) ? [] : [`enemies[${index}].kind ${enemy.kind} is not an enemy`]),
+    ...(Number.isSafeInteger(enemy.tier) && enemy.tier >= 0
+      ? []
+      : [`enemies[${index}].tier must be a whole number >= 0, got ${enemy.tier}`]),
+    ...(Number.isSafeInteger(enemy.dx) && Number.isSafeInteger(enemy.dy)
+      ? []
+      : [`enemies[${index}] offset must be whole tiles`]),
   ]
 }
 

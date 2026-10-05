@@ -28,6 +28,14 @@ describe('start scenario commands', () => {
     ])
   })
 
+  it('spawns each enemy with debug.spawnEnemy, after the core bay', () => {
+    const enemies = [{ kind: 'crawler', tier: 2, dx: -3, dy: 0 }]
+    expect(startScenarioCommands({ coreFragments: 4, enemies })).toEqual([
+      { type: 'debug.setCoreFragments', payload: { count: 4 } },
+      { type: 'debug.spawnEnemy', payload: { kind: 'crawler', tier: 2, dx: -3, dy: 0 } },
+    ])
+  })
+
   it('spells money canonically in the command', () => {
     expect(grantMoneyCommand('1.50').payload.amount).toBe('1.5e+0')
   })
