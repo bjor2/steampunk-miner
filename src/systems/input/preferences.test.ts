@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_PREFERENCES,
+  nextMusicVolume,
   preferenceProblems,
   preferencesText,
   readPreferences,
@@ -35,6 +36,29 @@ describe('preferences file', () => {
     const { viewShortAxisMetres: _zoom, ...older } = DEFAULT_PREFERENCES
     const text = JSON.stringify({ preferencesVersion: 1, ...older })
     expect(readPreferences(text).prefs.viewShortAxisMetres).toBe(12)
+  })
+
+  it('reads a file from before the music settings at full volume, not muted', () => {
+    const { musicVolume: _volume, musicMuted: _muted, ...older } = DEFAULT_PREFERENCES
+    const text = JSON.stringify({ preferencesVersion: 1, ...older })
+    expect(readPreferences(text)).toMatchObject({
+      prefs: { musicVolume: 1, musicMuted: false },
+      problems: [],
+    })
+  })
+
+  it('refuses a music volume outside 0 to 1', () => {
+    expect(preferenceProblems('musicVolume', 0.5)).toEqual([])
+    expect(preferenceProblems('musicVolume', 1.5)).toEqual([
+      'musicVolume must be a number from 0 to 1, got 1.5',
+    ])
+    expect(preferenceProblems('musicMuted', 'yes')).toEqual([
+      'musicMuted must be true or false, got "yes"',
+    ])
+  })
+
+  it('steps the music volume down a quarter at a time and from silence back to full', () => {
+    expect([1, 0.75, 0.5, 0.25, 0].map(nextMusicVolume)).toEqual([0.75, 0.5, 0.25, 0, 1])
   })
 
   it('refuses a zoom outside the 8 m to 20 m band', () => {

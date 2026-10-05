@@ -325,6 +325,15 @@ describe('preferences: settings and rebinding stay local', () => {
     })
   })
 
+  it('steps the music volume and mutes the music from the settings overlay, locally (#49)', () => {
+    game().openSettings()
+    game().pressScreenButton('settings-toggle-musicVolume')
+    game().pressScreenButton('settings-toggle-musicMuted')
+    expect(game().prefs).toMatchObject({ musicVolume: 0.75, musicMuted: true })
+    expect(sink.events).toEqual([])
+    expect(submitted).toEqual([])
+  })
+
   it('never logs a settings change or sends it to the authority', () => {
     game().setCameraMode('fixed')
     game().togglePreference('shake')

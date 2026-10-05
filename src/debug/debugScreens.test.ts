@@ -155,6 +155,24 @@ describe('debug api: presentation never reaches the session (#33 acceptance 10)'
     expect(digests.size).toBe(1)
   })
 
+  it('ends a scripted run on the same digest whatever the music volume and mute (#49)', () => {
+    const digests = new Set<string>()
+    for (const [musicVolume, musicMuted] of [
+      [1, false],
+      [0.25, false],
+      [1, true],
+    ] as const) {
+      resetGameStore()
+      resetInput()
+      const debug = createDebugApi()
+      debug.ui.setPref('musicVolume', musicVolume)
+      debug.ui.setPref('musicMuted', musicMuted)
+      playThroughTheScreens()
+      digests.add(takeSessionSnapshot().digest)
+    }
+    expect(digests.size).toBe(1)
+  })
+
   it('keeps settings out of the log and the commands', () => {
     const debug = createDebugApi()
     debug.ui.setPref('hintsEnabled', false)
@@ -167,7 +185,9 @@ describe('debug api: presentation never reaches the session (#33 acceptance 10)'
   it('refuses a setting it does not know', () => {
     expect(createDebugApi().ui.setPref('volume', 3)).toEqual({
       ok: false,
-      problems: ['"volume" is not a setting (cameraMode, shake, flashes, hintsEnabled)'],
+      problems: [
+        '"volume" is not a setting (cameraMode, shake, flashes, hintsEnabled, musicMuted, musicVolume)',
+      ],
     })
   })
 })

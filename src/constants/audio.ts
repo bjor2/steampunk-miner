@@ -41,3 +41,5 @@ export const COMBAT_RANGE_METRES = 8
 export const MUSIC_DUCK_DB = 6
 /** Each planet's layers are retuned by this many semitones per planet after the first (#13). */
 export const PLANET_TUNING_SEMITONES = -3
+/** The settings overlay steps the music volume by this share of full (#49 local settings). */
+export const MUSIC_VOLUME_STEP = 0.25
