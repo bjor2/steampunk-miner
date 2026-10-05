@@ -6,6 +6,7 @@ import type { PlanetParams } from './planetParams'
 import { discTileCount, halfTileDistanceSq, isInsideDisc, surfaceRowOfColumn } from './tileGrid'
 
 export const BAND_COUNT = 5
+const BASIS_POINTS = 10000
 
 export function isInsidePlanet(params: PlanetParams, tx: number, ty: number): boolean {
   return isInsideDisc(tx, ty, params.radiusTiles)
@@ -36,4 +37,9 @@ export function coreTileCount(params: PlanetParams): number {
 /** Whole tiles below the surface of a tile's column, 0 above it: the run log's `depthTiles`. */
 export function depthTilesAt(params: PlanetParams, tx: number, ty: number): number {
   return Math.max(0, surfaceRowOfColumn(tx, params.radiusTiles) - ty)
+}
+
+/** Basis points of the radius (#11 scenarios: 10000 is the centre) as whole tiles, rounded down. */
+export function depthTilesOfBasisPoints(params: PlanetParams, depthBp: number): number {
+  return Math.floor((params.radiusTiles * depthBp) / BASIS_POINTS)
 }

@@ -68,6 +68,8 @@ export interface CommandPayloads {
    */
   'debug.spawnEnemy': { kind: string; tier: number; dx: number; dy: number }
   'debug.clearEnemies': Record<string, never>
+  /** Puts the vehicle on the dock point and docks it there, no tow and no fee (#11 section 5). */
+  'debug.teleportToDock': Record<string, never>
   /** Frozen enemies neither move, wind up, attack nor spawn; the drill still cuts them. */
   'debug.freezeEnemies': { frozen: boolean }
 }

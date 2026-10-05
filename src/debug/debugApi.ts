@@ -11,6 +11,7 @@
  */
 import {
   readLocalVehicle,
+  readPlanetWorld,
   takeSessionSnapshot,
   useGameStore,
   vehicleDebugProblems,
@@ -21,6 +22,7 @@ import {
   setEnergyCommand,
   setHullCommand,
   setUpgradeCommand,
+  teleportToDockCommand,
 } from '../systems/vehicle/vehicleCommands'
 import {
   onCurveVehicleViews,
@@ -47,6 +49,7 @@ import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForwar
 import { validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems } from '../systems/startScenario'
 import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
+import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'
 
 export class DebugCommandNotImplementedError extends Error {
   constructor(command: string) {
@@ -91,6 +94,10 @@ export interface DebugApi {
   setPlanet(planetIndex: number): DebugResult
   setPlanetSeed(planetSeed: number): DebugResult
   teleportToDepthTiles(depthTiles: number): DebugResult
+  /** `depthBp` is basis points of the planet's radius (#11): 0 the surface, 10000 the centre. */
+  teleportToDepth(depthBp: number): DebugResult
+  /** The vehicle on the dock point, docked, with no tow and no fee (`debug.teleportToDock`). */
+  teleportToDock(): DebugResult
   /** `amount` is a decimal string >= 0, for example "1e100" (decision #5). */
   giveMoney(amount: string): DebugResult
   /** A `scenarioVersion` 1 file, already parsed from JSON. */
@@ -127,10 +134,7 @@ export interface DebugApi {
   enemyStatsTable(kind: string): DebugResult<{ rows: EnemyStatsRowView[] }>
   ui: DebugUi
   // stubs
-  /** `depthBp` is basis points of the radius (#11); the radius arrives with the generator. */
-  teleportToDepth(depthBp: number): void
   teleportToCore(): void
-  teleportToDock(): void
   giveResource(resourceTier: number, amount: number): void
   unlock(featureId: string): void
   setVehicleLoadout(loadoutId: string): void
@@ -173,6 +177,22 @@ function enemyStatsTableOf(kind: string): DebugResult<{ rows: EnemyStatsRowView[
   return { ok: true, rows: enemyStatsTableView(kind) }
 }
 
+const DEPTH_BP_MAX = 10000
+
+function depthBpProblems(depthBp: unknown): string[] {
+  const isInRange =
+    Number.isSafeInteger(depthBp) && (depthBp as number) >= 0 && (depthBp as number) <= DEPTH_BP_MAX
+  if (isInRange && readPlanetWorld().params !== null) return []
+  return [
+    `depthBp must be a whole number from 0 to ${DEPTH_BP_MAX}, got ${JSON.stringify(depthBp)}`,
+  ]
+}
+
+function depthTilesOfBp(depthBp: number): number {
+  const { params } = readPlanetWorld()
+  return params === null ? 0 : depthTilesOfBasisPoints(params, depthBp)
+}
+
 function cameraModeProblems(mode: unknown): string[] {
   if (isCameraMode(mode)) return []
   return [`camera mode must be one of ${CAMERA_MODES.join(', ')}, got ${JSON.stringify(mode)}`]
@@ -200,6 +220,14 @@ export function createDebugApi(): DebugApi {
     teleportToDepthTiles: (depthTiles) =>
       runUnlessRefused(startScenarioProblems({ depthTiles }), () =>
         game().teleportToDepthTiles(depthTiles),
+      ),
+    teleportToDepth: (depthBp) =>
+      runUnlessRefused(depthBpProblems(depthBp), () =>
+        game().teleportToDepthTiles(depthTilesOfBp(depthBp)),
+      ),
+    teleportToDock: () =>
+      runUnlessRefused(vehicleDebugProblems(teleportToDockCommand()), () =>
+        game().teleportToDock(),
       ),
     giveMoney: (amount) =>
       runUnlessRefused(startScenarioProblems({ money: amount }), () => game().giveMoney(amount)),
@@ -248,9 +276,7 @@ export function createDebugApi(): DebugApi {
         runUnlessRefused(cameraModeProblems(mode), () => game().setCameraMode(mode as CameraMode)),
       getPrefs: () => ({ ok: true, prefs: { cameraMode: game().cameraMode } }),
     },
-    teleportToDepth: notImplemented('teleportToDepth'),
     teleportToCore: notImplemented('teleportToCore'),
-    teleportToDock: notImplemented('teleportToDock'),
     giveResource: notImplemented('giveResource'),
     unlock: notImplemented('unlock'),
     setVehicleLoadout: notImplemented('setVehicleLoadout'),

@@ -35,6 +35,7 @@ import {
   setEnergyCommand,
   setHullCommand,
   setUpgradeCommand,
+  teleportToDockCommand,
 } from '../systems/vehicle/vehicleCommands'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
 import { isCameraMode, type CameraMode } from '../systems/render/cameraTurn'
@@ -118,6 +119,8 @@ export interface GameState extends CombatDebugActions {
   setEnergy(units: string): void
   /** Debug: hull as a decimal string, at most `hullMax`. */
   setHull(hull: string): void
+  /** Debug: the vehicle on the dock point, docked, with no tow and no fee. */
+  teleportToDock(): void
   /** The local vehicle's 5 Hz pose report (#11), built by the fixed-step loop. */
   reportPose(pose: PosePayload): void
   requestRescue(): void
@@ -241,6 +244,11 @@ export const useGameStore = create<GameState>()((set, get) => ({
   setEnergy: (units) => submitUnlessRefused(get().playerId, setEnergyCommand(units)),
 
   setHull: (hull) => submitUnlessRefused(get().playerId, setHullCommand(hull)),
+
+  teleportToDock: () => {
+    submitUnlessRefused(get().playerId, teleportToDockCommand())
+    set({ depthTiles: 0 })
+  },
 
   reportPose: (pose) => submitCommand(get().playerId, reportPoseCommand(pose)),
 

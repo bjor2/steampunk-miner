@@ -25,6 +25,10 @@ export function setEnergyCommand(units: string): CommandIntent<'debug.setEnergy'
   return { type: 'debug.setEnergy', payload: { energy: units } }
 }
 
+export function teleportToDockCommand(): CommandIntent<'debug.teleportToDock'> {
+  return { type: 'debug.teleportToDock', payload: {} }
+}
+
 /** A malformed hull is passed on as written, so the authority names the problem. */
 export function setHullCommand(hull: string): CommandIntent<'debug.setHull'> {
   return { type: 'debug.setHull', payload: { hull: canonicalOrAsWritten(hull) } }

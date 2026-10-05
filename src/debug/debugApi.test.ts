@@ -53,7 +53,30 @@ describe('debug api: set state', () => {
 
   it('says plainly that a command is not built yet', () => {
     expect(() => createDebugApi().teleportToCore()).toThrow(DebugCommandNotImplementedError)
-    expect(() => createDebugApi().teleportToDepth(5000)).toThrow(DebugCommandNotImplementedError)
+  })
+
+  it('teleports to a depth in basis points of the radius, and refuses one past the centre', () => {
+    const debug = createDebugApi()
+    expect(debug.teleportToDepth(5000)).toEqual({ ok: true })
+    expect(game().depthTiles).toBe(150)
+    expect(debug.teleportToDepth(10001)).toEqual({
+      ok: false,
+      problems: ['depthBp must be a whole number from 0 to 10000, got 10001'],
+    })
+    expect(debug.teleportToDepth(0.82 as number)).toMatchObject({ ok: false })
+  })
+
+  it('teleports the vehicle home and docks it as a logged debug command, once', () => {
+    const debug = createDebugApi()
+    expect(debug.teleportToDock()).toEqual({ ok: true })
+    expect(game().vehicle.mode).toBe('docked')
+    expect(sink.events.map((event) => event.data)).toContainEqual(
+      expect.objectContaining({ command: 'debug.teleportToDock' }),
+    )
+    expect(debug.teleportToDock()).toEqual({
+      ok: false,
+      problems: ['the vehicle is already docked'],
+    })
   })
 })
 
