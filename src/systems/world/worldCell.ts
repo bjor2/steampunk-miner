@@ -19,6 +19,8 @@ export const CELL_KIND = {
   core: 4,
   /** The dock pad (#8): can never be removed. */
   indestructible: 5,
+  /** The planet's artefact cache (#46): drills like rock and yields nothing. */
+  artefactCache: 6,
 } as const
 
 export type CellKind = (typeof CELL_KIND)[keyof typeof CELL_KIND]
@@ -57,6 +59,7 @@ export const AIR_CELL = packCell(CELL_KIND.air, RESOURCE_FAMILY.none, 0)
 export const GROUND_CELL = packCell(CELL_KIND.ground, RESOURCE_FAMILY.none, 0)
 export const CORE_CELL = packCell(CELL_KIND.core, RESOURCE_FAMILY.none, CORE_TIER_OFFSET)
 export const INDESTRUCTIBLE_CELL = packCell(CELL_KIND.indestructible, RESOURCE_FAMILY.none, 0)
+export const ARTEFACT_CACHE_CELL = packCell(CELL_KIND.artefactCache, RESOURCE_FAMILY.none, 0)
 
 export function oreCell(family: ResourceFamily, tierOffset: number): number {
   return packCell(CELL_KIND.ore, family, tierOffset)

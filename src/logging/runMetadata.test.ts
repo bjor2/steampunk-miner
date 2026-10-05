@@ -24,6 +24,6 @@ describe('run metadata', () => {
   })
 
   it('records generator version 2 (#36)', () => {
-    expect(createRunMetadata(FACTS).generatorVersion).toBe(2)
+    expect(createRunMetadata(FACTS).generatorVersion).toBe(3)
   })
 })

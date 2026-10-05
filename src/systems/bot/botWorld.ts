@@ -29,7 +29,8 @@ export function tileKindAt(state: AuthorityState, tile: TilePoint): BotTileKind 
   const kind = kindOfCell(cellAt(state.world, paramsOfSession(state), tile))
   if (kind === CELL_KIND.ore) return 'ore'
   if (kind === CELL_KIND.core) return 'core'
-  if (kind === CELL_KIND.ground) return 'ground'
+  // The cache drills like rock and yields nothing (#46); the bot never opens it.
+  if (kind === CELL_KIND.ground || kind === CELL_KIND.artefactCache) return 'ground'
   if (kind === CELL_KIND.indestructible) return 'pad'
   return 'open'
 }

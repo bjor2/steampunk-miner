@@ -3,9 +3,10 @@
  * chunk and its 128x128 density samples, a pure function of the planet params and the chunk
  * coordinates. The seeded terrain comes first, then ore patches stamp over it (#42, the dock
  * guarantee after the band-1 patches), then the placed features: the dock pad and its clearance
- * (#8), then the starter vein (#16). The density follows from the finished cells. Each step is a
+ * (#8), the starter vein (#16), then the artefact cache (#46). The density follows from the finished cells. Each step is a
  * function of the params alone, so stamping per chunk gives the same planet in any order.
  */
+import { artefactCacheTiles } from './artefactCache'
 import { generateBaseTerrain } from './baseTerrain'
 import { dockGuaranteePatch } from './dockGuarantee'
 import { dockSiteTiles } from './dockSite'
@@ -33,6 +34,7 @@ export function generateChunkCells(params: PlanetParams, cx: number, cy: number)
   paintOrePatches(params, cells, patchesForChunk(params, cx, cy), cx, cy)
   stampTilesInChunk(cells, dockSiteTiles(params), cx, cy)
   stampTilesInChunk(cells, starterVeinTiles(params), cx, cy)
+  stampTilesInChunk(cells, artefactCacheTiles(params), cx, cy)
   return cells
 }
 

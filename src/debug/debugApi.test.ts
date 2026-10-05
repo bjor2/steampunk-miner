@@ -188,7 +188,7 @@ describe('debug api: snapshot and restore', () => {
     if (!taken.ok) throw new Error('snapshot refused')
     expect(debug.restore({ ...taken.snapshot, generatorVersion: 99 })).toEqual({
       ok: false,
-      problems: ['snapshot.generatorVersion is 99, this build reads 2'],
+      problems: ['snapshot.generatorVersion is 99, this build reads 3'],
     })
   })
 })

@@ -2,6 +2,6 @@
  * Version of what a seed generates (decision #4): bump it with any change to world generation, so
  * saves, snapshots, golden replays and run metadata can refuse to mix worlds from different
  * generators. The planet generator (Build 2) owns every bump from here on. Version 2 is the
- * density field and ore patches (#36, #42).
+ * density field and ore patches (#36, #42); version 3 places the artefact cache (#46).
  */
-export const GENERATOR_VERSION = 2
+export const GENERATOR_VERSION = 3

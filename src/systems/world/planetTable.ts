@@ -83,5 +83,11 @@ export const CORE_RADIUS_MIN_TILES = 4
 export const CORE_RADIUS_MAX_TILES = 10
 export const CORE_RADIUS_DIVISOR = 40
 
+/**
+ * The depth band of each planet's artefact cache (#46: band 3 on planet 1, band 2 on planet 2);
+ * planets past the slice reuse the last entry, like the archetypes.
+ */
+export const ARTEFACT_CACHE_BANDS: readonly number[] = [3, 2]
+
 /** The starter vein is placed on planet 1 within this many tiles of the dock (#16). */
 export const STARTER_ZONE_RADIUS_TILES = 15

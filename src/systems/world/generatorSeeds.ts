@@ -14,6 +14,8 @@ export const SEED_PURPOSE = {
   enemySpawn: 6,
   /** Ore patch stamps (#42). */
   orePatch: 7,
+  /** The planet's one artefact cache (#46). */
+  artefactCache: 8,
 } as const
 
 export type SeedPurpose = (typeof SEED_PURPOSE)[keyof typeof SEED_PURPOSE]

@@ -6,6 +6,7 @@
  */
 import { hashCell } from '../cellRandom'
 import {
+  ARTEFACT_CACHE_BANDS,
   BAND_START_DEPTH_PERCENT,
   CAVE_THRESHOLD_BP,
   CORE_RADIUS_DIVISOR,
@@ -52,6 +53,8 @@ export interface PlanetParams {
   familyWeights: { metal: number; crystal: number }
   /** Planet 1 gets the guaranteed early ore of #16. */
   hasStarterVein: boolean
+  /** The band the planet's one artefact cache sits in (#46). */
+  artefactCacheBand: number
 }
 
 const TWO_TO_32 = 0x100000000
@@ -76,6 +79,7 @@ export function planetParamsFor(worldSeed: number, planetIndex: number): PlanetP
     dockClearanceTiles: DOCK_CLEARANCE_TILES,
     ...archetypeOf(planetIndex),
     hasStarterVein: planetIndex === FIRST_PLANET,
+    artefactCacheBand: artefactCacheBandOf(planetIndex),
   }
 }
 
@@ -118,6 +122,11 @@ function bandStartsFor(radiusTiles: number): number[] {
 function archetypeOf(planetIndex: number): PlanetArchetype {
   const last = PLANET_ARCHETYPES.length - 1
   return PLANET_ARCHETYPES[Math.min(planetIndex - FIRST_PLANET, last)]
+}
+
+function artefactCacheBandOf(planetIndex: number): number {
+  const last = ARTEFACT_CACHE_BANDS.length - 1
+  return ARTEFACT_CACHE_BANDS[Math.min(planetIndex - FIRST_PLANET, last)]
 }
 
 function assertValidWorldSeed(worldSeed: number): void {
