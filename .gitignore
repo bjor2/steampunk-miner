@@ -19,6 +19,7 @@ balance-report/
 
 # Intermediate PNG bakes of scripts/art/export_asset.py; only the KTX2 encodes ship (#52)
 art/build/
+scripts/art/__pycache__/
 
 # Playwright output
 playwright-report/
