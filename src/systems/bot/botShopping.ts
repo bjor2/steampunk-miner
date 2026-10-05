@@ -1,6 +1,8 @@
 /**
  * What the pacing bot does at the dock (#29 Systems & Economy note 3): sell, repair and recharge
- * at the Sell bay, then buy at the Upgrade bay (#37), always keeping the next service paid for. `drill_tip` and `hull` go to their on-curve level for the planet first (#6 section 3);
+ * at the Sell bay, then buy at the Upgrade bay (#37), always keeping the next service paid for. A
+ * casing grade the next trip needs comes first (`botCasing.ts`, S11); then `drill_tip` and `hull`
+ * go to their on-curve level for the planet (#6 section 3);
  * a `drill_power` level is forced while the core is the goal and the drill digs it slower than 0.4
  * tiles a second (`FORCED_DRILL_TICKS_PER_TILE`); otherwise the bot buys the upgrade with the best gain in planned money per tick
  * per price, while one pays. The #6 simulator's deadlock (never buying the unblocking drill level)
@@ -10,11 +12,13 @@ import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { CommandIntent } from '../authority/authorityCommand'
 import { applyCommand } from '../authority/applyCommand'
 import { nextUpgradePrice } from '../authority/workshopRules'
+import { nextCasingPrice } from '../authority/casingRules'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
 import { add, cmp, fromSafeInteger, type Money } from '../money'
 import { rechargePrice, repairPrice, travelFee } from '../economy/planetCharges'
 import { statsOfVehicle } from '../vehicle/vehicleState'
+import { isCasingGradeShort } from './botCasing'
 import type { BotSession } from './botSession'
 import type { MineLayout } from './mineLayout'
 import { approximately, bestOrePlan, fullTankMeans, isCoreDugWithin } from './tripEstimate'
@@ -27,6 +31,11 @@ const FORCED_DRILL_TICKS_PER_TILE = (5 * TICKS_PER_SECOND) / 2
 
 const ON_CURVE_FIRST: readonly UpgradeId[] = ['drill_tip', 'hull']
 const MARGINAL_TRACKS: readonly UpgradeId[] = ['drill_power', 'engine', 'boiler', 'cargo_hold']
+
+/** One buy at the Upgrade bay: a level of a vehicle track, or the next casing grade. */
+type Purchase = CommandIntent<'buyUpgrade'> | CommandIntent<'buyCasingGrade'>
+
+const BUY_CASING_GRADE: Purchase = { type: 'buyCasingGrade', payload: {} }
 
 export interface ShoppingSituation {
   layout: MineLayout
@@ -58,18 +67,39 @@ export function hasPurchase(session: BotSession, situation: ShoppingSituation): 
 
 export function buyUpgrades(session: BotSession, situation: ShoppingSituation): void {
   for (let pick = nextPurchase(session, situation); pick !== null;) {
-    session.submit({ type: 'buyUpgrade', payload: { upgradeId: pick } })
+    session.submit(pick)
     pick = nextPurchase(session, situation)
   }
 }
 
-function nextPurchase(session: BotSession, situation: ShoppingSituation): UpgradeId | null {
+function nextPurchase(session: BotSession, situation: ShoppingSituation): Purchase | null {
+  if (isCasingDue(session, situation)) return BUY_CASING_GRADE
+  const track = nextTrackPurchase(session, situation)
+  return track === null ? null : { type: 'buyUpgrade', payload: { upgradeId: track } }
+}
+
+function nextTrackPurchase(session: BotSession, situation: ShoppingSituation): UpgradeId | null {
   const onCurve = belowCurveAffordable(session)
   if (onCurve !== null) return onCurve
   if (isDrillForced(session, situation)) {
     return canAfford(session, 'drill_power') ? 'drill_power' : null
   }
   return bestMarginalPurchase(session, situation.layout)
+}
+
+/**
+ * The next trip wants a deeper band (or the core) than the casing grade holds, and the grade is
+ * affordable; when it is not yet, the bot buys tracks and mines the bands it holds meanwhile.
+ */
+function isCasingDue(session: BotSession, situation: ShoppingSituation): boolean {
+  const wantedBand = plannedBand(situation.layout, session.vehicle().levels)
+  const wanted = { isCoreTheGoal: situation.isCoreTheGoal, wantedBand }
+  return isCasingGradeShort(session, wanted) && canAffordCasing(session)
+}
+
+/** The band a full tank with these levels would mine best, whatever the casing grade holds. */
+function plannedBand(layout: MineLayout, levels: UpgradeLevels): number {
+  return bestOrePlan(layout, fullTankMeans(levels))?.band ?? 1
 }
 
 function belowCurveAffordable(session: BotSession): UpgradeId | null {
@@ -110,10 +140,18 @@ function priceOf(session: BotSession, track: UpgradeId) {
   return nextUpgradePrice(session.state(), session.playerId, track)
 }
 
-/** A purchase must leave the next service (and the travel fee, once the core is done) paid for. */
 function canAfford(session: BotSession, track: UpgradeId): boolean {
+  return canPay(session, priceOf(session, track))
+}
+
+function canAffordCasing(session: BotSession): boolean {
+  return canPay(session, nextCasingPrice(session.state(), session.playerId))
+}
+
+/** A purchase must leave the next service (and the travel fee, once the core is done) paid for. */
+function canPay(session: BotSession, price: Money): boolean {
   const wallet = session.state().players[session.playerId].wallet
-  return cmp(wallet, add(priceOf(session, track), moneyKeptBack(session))) >= 0
+  return cmp(wallet, add(price, moneyKeptBack(session))) >= 0
 }
 
 function moneyKeptBack(session: BotSession): Money {

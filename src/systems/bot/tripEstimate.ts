@@ -45,9 +45,13 @@ export function meansOfVehicle(vehicle: VehicleState): TripMeans {
   return { stats: statsOfVehicle(vehicle), tankQuanta: vehicle.energy }
 }
 
-/** The best ore band to mine with these means, or null when no band pays. */
-export function bestOrePlan(layout: MineLayout, means: TripMeans): OrePlan | null {
-  const plans = BANDS.flatMap((band) => {
+/** The best ore band down to `deepestBand` to mine with these means, or null when none pays. */
+export function bestOrePlan(
+  layout: MineLayout,
+  means: TripMeans,
+  deepestBand = BANDS.length,
+): OrePlan | null {
+  const plans = BANDS.filter((band) => band <= deepestBand).flatMap((band) => {
     const moneyPerTick = oreTripMoneyPerTick(layout, means, band)
     return moneyPerTick === null ? [] : [{ band, moneyPerTick }]
   })

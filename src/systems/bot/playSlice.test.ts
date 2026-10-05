@@ -6,6 +6,9 @@ import { digestsOf, replayRun } from '../replay/replayRun'
 import { saveSlotOf } from '../save/saveSlot'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor } from '../world/planetParams'
+import type { DomainEvent } from '../authority/domainEvent'
+import { requiredCasingGrade } from '../economy/casingGrades'
+import { bandOfTile } from '../world/planetGeometry'
 import { boreTicks } from './botWorld'
 import { playSlice, type SliceRun } from './playSlice'
 
@@ -44,6 +47,34 @@ describe('pacing bot', () => {
   })
 })
 
+/** Each planet-1 tile the bot broke, with the casing grade it held at the time. */
+function planet1DigsWithGrade(events: readonly DomainEvent[]) {
+  const params = planetParamsFor(WORLD_SEED, 1)
+  const travelled = events.findIndex((event) => event.type === 'TravelStarted')
+  let grade = 1
+  return events.slice(0, travelled).flatMap((event) => {
+    if (event.type === 'CasingUpgraded') grade = event.to
+    if (event.type !== 'TileDestroyed') return []
+    const band = event.kind === 'core' ? 6 : bandOfTile(params, event.tx, event.ty)
+    return [{ band, grade }]
+  })
+}
+
+describe('pacing bot casing (S11, #65 Systems & Economy note 2)', () => {
+  it('buys every casing grade from 2 to 5 on planet 1', () => {
+    const grades = sliceRun()
+      .events.filter((event) => event.type === 'CasingUpgraded')
+      .map((event) => (event.type === 'CasingUpgraded' ? event.to : 0))
+    expect(grades).toEqual([2, 3, 4, 5])
+  })
+
+  it('holds the grade a band needs before it breaks a tile there, and grade 5 before core', () => {
+    const digs = planet1DigsWithGrade(sliceRun().events)
+    expect(digs.some((dig) => dig.band === 6)).toBe(true)
+    expect(digs.filter((dig) => dig.grade < requiredCasingGrade(dig.band))).toEqual([])
+  })
+})
+
 describe('pacing bot save size (#36 acceptance 4)', () => {
   it('keeps the save of a 60-minute run under 1 MB', () => {
     const hour = playSlice(
@@ -51,7 +82,10 @@ describe('pacing bot save size (#36 acceptance 4)', () => {
       { maxTicks: 60 * 60 * 60 },
     )
     const save = JSON.stringify(saveSlotOf(takeSnapshot(hour.state), 1))
-    expect(Object.keys(hour.state.world.chunks).length).toBeGreaterThan(10)
+    // A guard that the hour dug enough for the size to mean something, not a pacing number: the
+    // bot touches about ten chunks in its first hour (10 since it keeps to the bands its casing
+    // holds, S11).
+    expect(Object.keys(hour.state.world.chunks).length).toBeGreaterThanOrEqual(10)
     expect(save.length).toBeLessThan(1024 * 1024)
   })
 })

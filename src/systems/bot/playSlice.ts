@@ -5,8 +5,8 @@
  * same digests (`replayRun`), and its log is what the pacing report is derived from.
  *
  * Each dock cycle: travel when the core is done and the fee is paid, choose a trip (the core while
- * it is the goal and the drill digs it fast enough, else the best ore band), run it, then service
- * and shop.
+ * it is the goal, the drill digs it fast enough and the casing holds it, else the best ore band
+ * the casing grade holds), run it, then service and shop.
  */
 import { SLICE_LAST_PLANET } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -20,6 +20,7 @@ import { canScratch } from '../vehicle/drillRule'
 import { bayRestTileOf } from '../world/dockBays'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
+import { deepestHeldBand, holdsCore } from './botCasing'
 import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
 import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
@@ -122,18 +123,21 @@ function shopAtUpgradeBay(session: BotSession, planet: BotPlanet): void {
 
 function chooseGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
   if (isCoreDiggable(session, planet)) return { kind: 'core' }
-  const plan = bestOrePlan(planet.layout, meansOfVehicle(session.vehicle()))
+  const means = meansOfVehicle(session.vehicle())
+  const plan = bestOrePlan(planet.layout, means, deepestHeldBand(session))
   return plan === null ? null : { kind: 'ore', band: plan.band }
 }
 
 /**
  * The core trip comes first whenever it is the goal and the drill makes any headway (the #6
- * simulator's rule); the tank must also reach it today, not just when full.
+ * simulator's rule); the tank must also reach it today, not just when full, and the casing must
+ * hold the core (S11).
  */
 function isCoreDiggable(session: BotSession, planet: BotPlanet): boolean {
   const vehicle = session.vehicle()
   return (
     isCoreTheGoal(session, planet) &&
+    holdsCore(session) &&
     canReachCore(planet.layout, meansOfVehicle(vehicle)) &&
     isCoreDugWithin(vehicle.levels, session.state().planet.index, CORE_TRIP_MAX_TICKS_PER_TILE)
   )
