@@ -45,6 +45,8 @@ export interface CasingRing {
 export interface Lining extends GroundEdit {
   /** Native rock samples that became lining. */
   placed: number
+  /** Those samples, in row order: the wall a first-placed lining charge is priced by (#76). */
+  linedSamples: readonly WeightedSample[]
   /** Lining samples raised to the ring's grade. */
   relined: number
 }
@@ -74,9 +76,11 @@ export function lineRing(
     step: ringStepOf(session, sample, grade),
   }))
   steps.forEach(({ sample, step }) => applyRingStep(session, sample, step, grade))
+  const linedSamples = steps.filter(({ step }) => step === 'line').map(({ sample }) => sample)
   return {
     ...closeSession(session),
-    placed: steps.filter(({ step }) => step === 'line').length,
+    placed: linedSamples.length,
+    linedSamples,
     relined: steps.filter(({ step }) => step === 'reline').length,
   }
 }

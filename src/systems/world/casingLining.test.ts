@@ -133,6 +133,14 @@ describe('casing lining', () => {
     expect(grades.filter((grade) => grade > 0).every((grade) => grade === 4)).toBe(true)
   })
 
+  it('reports the rock samples it newly lined, and none when a ring only relines', () => {
+    const first = lineRing(boredHole(), params, RING, 2)
+    expect(first.linedSamples).toHaveLength(first.placed)
+    expect(first.linedSamples.every(({ sx, sy }) => casingAt(first.world, sx, sy) === 2)).toBe(true)
+    const relined = lineRing(first.world, params, RING, 4)
+    expect(relined.linedSamples).toEqual([])
+  })
+
   it('keeps a higher grade when a lower ring passes', () => {
     const strong = lineRing(boredHole(), params, RING, 5)
     const weak = lineRing(strong.world, params, RING, 2)
