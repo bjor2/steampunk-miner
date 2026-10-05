@@ -4,6 +4,7 @@ import { drillPower, drillTip } from '../economy/vehicleStats'
 import { add, div, fromCanonical, fromSafeInteger, mul, toCanonical, ZERO_MONEY } from '../money'
 import { drillDamage } from '../vehicle/drillRule'
 import { FACING, type Facing } from '../vehicle/vehiclePose'
+import { cargoUnitsOf } from '../vehicle/vehicleState'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor } from '../world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
@@ -206,6 +207,24 @@ describe('vehicle cargo', () => {
     expect(typesOf(events)).toEqual(['DrillDamageDealt', 'TileDestroyed', 'StorageFull'])
     expect(events[2]).toMatchObject({ lostUnits: 1 })
     expect(session.vehicle().cargo.ore).toEqual({ 1: 10 })
+  })
+})
+
+describe('vehicle core fragments', () => {
+  it('carries a core tile as one fragment, counted in the same cargo units as ore', () => {
+    const session = createSession()
+    session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 7 } })
+    session.submit(0, {
+      type: 'debug.setUpgrade',
+      payload: { upgradeId: 'drill_power', level: 40 },
+    })
+    const core = { tx: 0, ty: 3 }
+    session.submit(10, poseAbove(core, FACING.down))
+    const events = session.submit(200, drill(core, 190))
+    expect(typesOf(events)).toEqual(['DrillDamageDealt', 'TileDestroyed', 'CargoAdded'])
+    expect(events[2]).toMatchObject({ resourceTier: 6, amount: 1 })
+    expect(session.vehicle().cargo).toEqual({ ore: {}, coreFragments: 1 })
+    expect(cargoUnitsOf(session.vehicle().cargo)).toBe(1)
   })
 })
 
