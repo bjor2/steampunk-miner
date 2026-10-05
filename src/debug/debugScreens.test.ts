@@ -6,6 +6,8 @@ import { runEventProblems } from '../logging/runEventSchema'
 import { resetGameStore, takeSessionSnapshot, useGameStore } from '../store/gameStore'
 import { resetInput } from '../store/inputRuntime'
 import { cameraPresence } from '../scene/cameraPresence'
+import { lightPresence } from '../scene/lightPresence'
+import { renderPresence } from '../scene/renderPresence'
 import { fromCanonical, toCanonical } from '../systems/money'
 import { musicStingersOf } from '../systems/audio/musicStingers'
 import { firstDigestMismatch, replayRun } from '../systems/replay/replayRun'
@@ -279,5 +281,60 @@ describe('debug api: zoom framing (#39)', () => {
     expect(result.view.vehicleColliderShare).toBeGreaterThanOrEqual(0.072)
     expect(result.view.vehicleColliderShare).toBeLessThanOrEqual(0.078)
     expect(result.view.pixelsPerMetre).toBe(h / 12)
+  })
+})
+
+describe('debug api: render scale and stats (#38)', () => {
+  it('pins the render scale inside (0, 1], adapts again on null, and logs nothing', () => {
+    const debug = createDebugApi()
+    expect(debug.ui.setRenderScale(0.6)).toEqual({ ok: true })
+    expect(game().renderScalePin).toBe(0.6)
+    expect(debug.ui.setRenderScale(null)).toEqual({ ok: true })
+    expect(game().renderScalePin).toBeNull()
+    expect(debug.ui.setRenderScale(1.5)).toEqual({
+      ok: false,
+      problems: ['renderScale must be null or a number above 0 and at most 1, got 1.5'],
+    })
+    expect(sink.events).toEqual([])
+    expect(sink.commands).toEqual([])
+  })
+
+  it('ends a scripted run on the same digest at every render scale and zoom (#38 acceptance 6)', () => {
+    const digests = new Set<string>()
+    for (const scale of [0.5, 1, null]) {
+      for (const zoom of [8, 20]) {
+        resetGameStore()
+        resetInput()
+        const debug = createDebugApi()
+        debug.ui.setRenderScale(scale)
+        debug.ui.setZoom(zoom)
+        playThroughTheScreens()
+        digests.add(takeSessionSnapshot().digest)
+      }
+    }
+    expect(digests.size).toBe(1)
+  })
+
+  it('reports the last frame as the scene wrote it, with the lights in view', () => {
+    // As `RenderPipeline`, `PlanetTerrain` and `LightRig` write them each frame.
+    Object.assign(renderPresence, { drawCalls: 41, groundBlocks: 37, renderScale: 0.75 })
+    lightPresence.pointLights.splice(0, Infinity, {
+      id: 'platform-lamp',
+      x: 0,
+      y: 0,
+      colour: '#ffffff',
+      rangeM: 6,
+      strength: 0.4,
+    })
+    const result = createDebugApi().ui.getRenderStats()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    expect(result.stats).toMatchObject({
+      drawCalls: 41,
+      groundBlocks: 37,
+      renderScale: 0.75,
+      headlamps: 1,
+      pointLights: 1,
+      pointLightIds: ['platform-lamp'],
+    })
   })
 })

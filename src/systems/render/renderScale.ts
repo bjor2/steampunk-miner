@@ -72,6 +72,15 @@ export function pinRenderScale(state: RenderScale, scale: number | null): void {
   if (scale !== null) state.scale = clampScale(state, roundToHundredth(scale))
 }
 
+/** Why `value` cannot pin the render scale; `null` (adapt again) or a number in (0, 1] can. */
+export function renderScalePinProblems(value: unknown): string[] {
+  const isScale = typeof value === 'number' && value > 0 && value <= RENDER_SCALE_MAX
+  if (value === null || isScale) return []
+  return [
+    `renderScale must be null or a number above 0 and at most 1, got ${JSON.stringify(value)}`,
+  ]
+}
+
 function stepFor(state: RenderScale, p95FrameMs: number): Step {
   if (state.isPinned || state.isSettled) return 0
   if (p95FrameMs > RENDER_SCALE_DECLINE_FRAME_MS) return -1

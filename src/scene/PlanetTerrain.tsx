@@ -12,6 +12,7 @@ import { EMPTY_WORLD } from '../systems/world/worldState'
 import { createChunkMeshPool, type ChunkMeshPool, type TerrainView } from './chunkMeshPool'
 import { drillPresence } from './drillPresence'
 import { lightPresence } from './lightPresence'
+import { renderPresence } from './renderPresence'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
 import { vehiclePresence } from './vehiclePresence'
 
@@ -40,6 +41,7 @@ export function PlanetTerrain() {
     view.world = world
     view.viewRadius = viewRadiusOf(size.width, size.height, (camera as OrthographicCamera).zoom)
     pool.current.sync(view)
+    recordGroundDrawn(pool.current)
     light.facing = drillPresence.facing
     light.planetRadiusTiles = params.radiusTiles
     light.dt = delta
@@ -47,6 +49,12 @@ export function PlanetTerrain() {
   })
 
   return <group ref={group} />
+}
+
+/** The #38 visible-block budget, read by the render stats and the perf log. */
+function recordGroundDrawn(pool: ChunkMeshPool): void {
+  renderPresence.groundBlocks = pool.drawnBlockCount()
+  renderPresence.drawnChunks = pool.drawnChunkCount()
 }
 
 /** Its planet and world are placeholders, replaced before the pool first reads them. */

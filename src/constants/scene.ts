@@ -62,6 +62,20 @@ export const RENDER_SCALE_MAX_FLIP_FLOPS = 3
 /** Frames kept per one-second window: room for a 240 Hz display. */
 export const FRAME_WINDOW_CAPACITY = 256
 
+/**
+ * Post-processing (#38: one bloom pass at half the internal resolution, filmic tone mapping and a
+ * vignette; no SSAO, depth of field or reflections). Light above the threshold (linear luminance)
+ * blooms; the tone curve leaves everything under the knee as authored and rolls off above it,
+ * so the flat palette keeps its colours and only lamps, sparks and glow saturate. Placeholders,
+ * tuned by eye.
+ */
+export const BLOOM_THRESHOLD = 0.85
+export const BLOOM_STRENGTH = 0.7
+export const TONE_KNEE = 0.8
+export const VIGNETTE_STRENGTH = 0.35
+/** Full-screen draws after the scene: bright pass, two blur passes and the composite (cap 6). */
+export const POST_PASSES = 4
+
 /** Camera sits in front of the XY plane and looks down -Z. */
 export const CAMERA_POSITION: readonly [number, number, number] = [0, 0, 20]
 

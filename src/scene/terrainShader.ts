@@ -4,8 +4,9 @@
  * lighting all in it. Instance attributes come from `buildChunkTileBatch`; style and silhouette
  * codes are the ones it exports. Each quad is cut along the ground's surface (#36): the chunk's
  * density halo is a texture, blended bilinearly between samples, and a fragment below 128 is air.
- * The edge highlight is the band just inside that contour. Colours are display (sRGB) values written as is,
- * the flat look of #13 with no tone mapping.
+ * The edge highlight is the band just inside that contour. Colours are worked in display (sRGB)
+ * values, the flat look of #13, and turned into linear light as the last step, because the frame
+ * goes through the post pipeline (#38), whose composite writes display values back out.
  *
  * Lighting is the vehicle lamp, ambient light that fades with depth, and the scene's point lights
  * (#13, #38: the lamp plus at most 4 point lights; `LightRig` chooses them, an unused one is black). Ore glow, sparkles and the core's pulse are emissive, so
@@ -81,6 +82,13 @@ mat2 rotation(float angle) {
   float c = cos(angle);
   float s = sin(angle);
   return mat2(c, -s, s, c);
+}
+
+// The sRGB transfer, inverted; above 1 it keeps rising, so bright glow still blooms.
+vec3 displayToLinear(vec3 colour) {
+  vec3 low = colour / 12.92;
+  vec3 high = pow((colour + 0.055) / 1.055, vec3(2.4));
+  return mix(low, high, step(vec3(0.04045), colour));
 }
 
 float densityAt(vec2 chunkLocal) {
@@ -175,6 +183,6 @@ void main() {
     emissive += vec3(1.0, 0.97, 0.9) * sparkles(vLocal, vTile, vStyle.w);
   }
 
-  gl_FragColor = vec4(colour * light + emissive, 1.0);
+  gl_FragColor = vec4(displayToLinear(colour * light + emissive), 1.0);
 }
 `

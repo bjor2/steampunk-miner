@@ -1,6 +1,7 @@
 /**
  * The 2D world: an orthographic camera looking down -Z at the XY plane, rolling with the planet
- * (#13). `flat` turns tone mapping off: the flat-vector look writes its colours as they are.
+ * (#13). Frames go through `RenderPipeline` (#38: bloom, tone curve, vignette, adaptive render
+ * scale); `flat` leaves three's own tone mapping off, because the composite pass does it.
  */
 import { Canvas } from '@react-three/fiber'
 import { CAMERA_POSITION } from '../constants/scene'
@@ -11,6 +12,7 @@ import { LightRig } from './LightRig'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetTerrain } from './PlanetTerrain'
 import { PlatformPlaceholder } from './PlatformPlaceholder'
+import { RenderPipeline } from './RenderPipeline'
 import { ScreenFeedback } from './ScreenFeedback'
 import { SkyBackground } from './SkyBackground'
 import { SoundStage } from './SoundStage'
@@ -35,6 +37,7 @@ export function GameScene() {
       </PhysicsWorld>
       <Sparks />
       <SoundStage />
+      <RenderPipeline />
     </Canvas>
   )
 }
