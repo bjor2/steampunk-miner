@@ -21,8 +21,19 @@ export type RunDocumentName = 'metadata' | 'summary'
  */
 export type SaveFolderName = 'saves' | 'saves-debug'
 
+/**
+ * What the main process was launched with (#11 section 6): the debug API only with
+ * `--debug-api`, and a `--scenario=<path>` file's text only then.
+ */
+export interface ShellLaunch {
+  debugEnabled: boolean
+  scenarioText: string | null
+}
+
 export interface ShellBridge {
   getAppInfo(): Promise<AppInfo>
+  /** Synchronous, read once at page start: the shell is created before anything awaits. */
+  getLaunch(): ShellLaunch
   /** Appends already-formatted NDJSON lines (each ending in a newline) to the run's events file. */
   appendRunEvents(runId: string, ndjsonLines: string): Promise<void>
   /** Appends authority commands as NDJSON lines to the run's commands file (the replay input). */

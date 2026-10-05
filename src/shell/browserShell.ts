@@ -4,12 +4,12 @@
  * Save slots go to localStorage, so quit and resume works in the browser too; one `setItem` is
  * all-or-nothing, which is the browser's atomic write.
  */
-import { readLaunchParameters } from './launchParameters'
+import { readBrowserLaunchParameters } from './launchParameters'
 import { exposeOnWindow, listenForKeys, runOnPageHide } from './sharedBrowserHooks'
 import { saveFolderOf, type Shell } from './shell'
 
 export function createBrowserShell(): Shell {
-  const launch = readLaunchParameters()
+  const launch = readBrowserLaunchParameters()
   const slotKey = (slot: number) => `steampunk-miner/${saveFolderOf(launch)}/slot-${slot}.json`
   const eventLinesByRun = new Map<string, string>()
   const commandLinesByRun = new Map<string, string>()

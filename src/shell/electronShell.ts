@@ -1,11 +1,11 @@
 /** The shell under Electron: forwards to the contextBridge object the preload exposed. */
 import type { ShellBridge } from '../../electron/bridgeContract.cts'
-import { readLaunchParameters } from './launchParameters'
+import { readElectronLaunchParameters } from './launchParameters'
 import { exposeOnWindow, listenForKeys, runOnPageHide } from './sharedBrowserHooks'
 import { saveFolderOf, type Shell } from './shell'
 
 export function createElectronShell(bridge: ShellBridge): Shell {
-  const launch = readLaunchParameters()
+  const launch = readElectronLaunchParameters(bridge.getLaunch())
   const folder = saveFolderOf(launch)
   return {
     kind: 'electron',

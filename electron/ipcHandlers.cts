@@ -3,6 +3,7 @@ import { app, ipcMain } from 'electron'
 import { join } from 'node:path'
 import type { AppInfo } from './bridgeContract.cjs'
 import { SHELL_CHANNELS } from './channels.cjs'
+import { readShellLaunch } from './launchOptions.cjs'
 import { appendRunCommands, appendRunEvents, writeRunDocument } from './runLogFiles.cjs'
 import { readSaveSlot, setAsideSaveSlot, writeSaveSlot } from './saveFiles.cjs'
 
@@ -10,7 +11,12 @@ export function registerShellHandlers(): void {
   const userData = app.getPath('userData')
   const logsRoot = join(userData, 'logs')
 
+  const launch = readShellLaunch(process.argv, process.env)
+
   ipcMain.handle(SHELL_CHANNELS.getAppInfo, (): AppInfo => readAppInfo())
+  ipcMain.on(SHELL_CHANNELS.getLaunch, (event) => {
+    event.returnValue = launch
+  })
   ipcMain.handle(SHELL_CHANNELS.appendRunEvents, (_event, runId, ndjsonLines) =>
     appendRunEvents(logsRoot, runId, ndjsonLines),
   )

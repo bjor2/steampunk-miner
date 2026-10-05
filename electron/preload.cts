@@ -11,6 +11,7 @@ import type { SHELL_CHANNELS } from './channels.cjs'
 // Repeated from channels.cts because a sandboxed preload cannot require local modules.
 const channels = {
   getAppInfo: 'shell:getAppInfo',
+  getLaunch: 'shell:getLaunch',
   appendRunEvents: 'shell:appendRunEvents',
   appendRunCommands: 'shell:appendRunCommands',
   writeRunDocument: 'shell:writeRunDocument',
@@ -21,6 +22,7 @@ const channels = {
 
 const bridge: ShellBridge = {
   getAppInfo: () => ipcRenderer.invoke(channels.getAppInfo),
+  getLaunch: () => ipcRenderer.sendSync(channels.getLaunch),
   appendRunEvents: (runId, ndjsonLines) =>
     ipcRenderer.invoke(channels.appendRunEvents, runId, ndjsonLines),
   appendRunCommands: (runId, ndjsonLines) =>

@@ -5,6 +5,7 @@
  */
 export const SHELL_CHANNELS = {
   getAppInfo: 'shell:getAppInfo',
+  getLaunch: 'shell:getLaunch',
   appendRunEvents: 'shell:appendRunEvents',
   appendRunCommands: 'shell:appendRunCommands',
   writeRunDocument: 'shell:writeRunDocument',

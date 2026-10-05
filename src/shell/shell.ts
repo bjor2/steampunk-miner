@@ -11,9 +11,9 @@ import { createElectronShell } from './electronShell'
 export type { AppInfo, RunDocumentName }
 
 export interface LaunchParameters {
-  /** True in the dev build, or with `?debug` on the URL: exposes the debug/scenario API. */
+  /** The debug/scenario API is exposed: the dev build, `?debug` in a browser, `--debug-api` in Electron. */
   debugEnabled: boolean
-  /** Raw `?scenario=<json>` text, if present. */
+  /** A scenario's raw JSON text: `?scenario=` in a browser, a `--scenario=<path>` file in Electron. */
   scenarioText: string | null
 }
 
