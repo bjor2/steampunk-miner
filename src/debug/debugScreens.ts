@@ -15,7 +15,7 @@ import {
   readSellBayModel,
   readUpgradeBayModel,
 } from '../store/screenReads'
-import type { AudioModel } from '../systems/audio/audioModel
+import type { AudioModel } from '../systems/audio/audioModel'
 import {
   isActionId,
   type ActionId,
