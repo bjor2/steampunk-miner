@@ -1,5 +1,6 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { SWIVEL_TICKS } from '../constants/balance'
 import { PHYSICS_TIMESTEP } from '../constants/physics'
 import { MAX_GROUND_COLLIDERS } from '../constants/scene'
 import { createMemorySink, type MemorySink } from '../logging/eventSink'
@@ -8,6 +9,8 @@ import { createVehicleBody, createVehicleController } from './vehicleController'
 import { readLocalVehicle, readPlanetWorld, resetGameStore } from '../store/gameStore'
 import { buildIntent } from '../systems/input/buildIntent'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { FACING } from '../systems/vehicle/vehiclePose'
+import { ENERGY_QUANTA_PER_TICK } from '../systems/vehicle/energyQuanta'
 import { surfaceRowOfColumn } from '../systems/world/tileGrid'
 import { createVehicleLoop } from '../scene/vehicleLoop'
 
@@ -46,6 +49,11 @@ function createLiveVehicle() {
       }
     },
   }
+}
+
+const lastPose = () => {
+  const poses = sink.commands.filter((command) => command.type === 'reportPose')
+  return poses.at(-1)?.payload as { thrusting: boolean; facing: number }
 }
 
 const destroyedTiles = () => sink.events.filter((event) => event.event === 'tile_destroyed')
@@ -90,5 +98,28 @@ describe('vehicle loop', () => {
     const bottom = vehicle.body.translation().y
     vehicle.hold({ ...IDLE_INTENT, lift: true }, 1.5)
     expect(vehicle.body.translation().y).toBeGreaterThan(bottom + 3)
+  })
+
+  it('climbs on W alone, and S pressed after W stops the thrust at the next pose report (#40)', () => {
+    const vehicle = createLiveVehicle()
+    vehicle.hold(buildIntent(['aim_right']), 2)
+    vehicle.hold(buildIntent(['aim_down']), 4)
+    const bottom = vehicle.body.translation().y
+    vehicle.hold(buildIntent(['lift']), 1.5)
+    expect(vehicle.body.translation().y).toBeGreaterThan(bottom + 3)
+    expect(lastPose()).toMatchObject({ thrusting: true, facing: FACING.up })
+    vehicle.hold(buildIntent(['lift', 'aim_down']), 0.25)
+    expect(lastPose().thrusting).toBe(false)
+  })
+
+  it('costs at most SWIVEL_TICKS ticks of thrust for a W tap that only turns the head up', () => {
+    const vehicle = createLiveVehicle()
+    vehicle.hold(IDLE_INTENT, 0.5)
+    const before = readLocalVehicle().energy
+    vehicle.hold(buildIntent(['lift']), SWIVEL_TICKS * PHYSICS_TIMESTEP)
+    vehicle.hold(IDLE_INTENT, 1)
+    const spent = before - readLocalVehicle().energy
+    expect(spent).toBeGreaterThan(0)
+    expect(spent).toBeLessThanOrEqual(SWIVEL_TICKS * ENERGY_QUANTA_PER_TICK.thrust)
   })
 })
