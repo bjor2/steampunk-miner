@@ -80,7 +80,8 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   `fillCircle(x, y, radius, amount?)` (mm, amount 0 to 255; a carve credits no ore). Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
-  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getPlatformModel()`) reads the screens' view models and
+  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getPlatformModel()`, `ui.getAudioModel()`) reads the
+  screens' view models and the music's layer targets, settings and stinger sequence (#49), and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
   #33). The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
   `input.setBindings(overrides)`) presses actions at the action layer, so a tap submits ordinary
