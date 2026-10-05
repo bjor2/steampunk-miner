@@ -72,6 +72,7 @@ import {
   submitUnlessRefused,
 } from './authorityLink'
 import { recordCheckpointLoaded, writeCheckpointAfter, type Checkpoint } from './checkpoint'
+import { artefactActionsOf, type ArtefactActions } from './artefactActions'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
 import { announceFeedback } from './feedbackBroadcast'
@@ -87,7 +88,7 @@ import {
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
-type DebugActions = CombatDebugActions & GroundDebugActions
+type DebugActions = CombatDebugActions & GroundDebugActions & ArtefactActions
 
 export interface GameState
   extends DebugActions, PresentationValues, PresentationActions, HintValues, HintActions {
@@ -192,6 +193,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...STARTING_VALUES,
   ...combatDebugActionsOf(() => get().playerId),
   ...groundDebugActionsOf(() => get().playerId),
+  ...artefactActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
   ...hintActionsOf(set, get),
 

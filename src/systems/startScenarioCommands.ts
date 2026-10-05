@@ -4,6 +4,7 @@
  * Only the authority-owned fields become commands; depth is the vehicle's pose, which the client
  * owns (#3), so the store places it.
  */
+import { setArtefactCommand } from './artefacts/artefactCommands'
 import type { CommandIntent } from './authority/authorityCommand'
 import { spawnEnemyCommand } from './authority/combat/combatCommands'
 import { UPGRADE_IDS } from './economy/economyDefinition'
@@ -16,6 +17,7 @@ export function startScenarioCommands(scenario: StartScenario): CommandIntent[] 
   return [
     ...(scenario.planetTier === undefined ? [] : [setPlanetCommand(scenario.planetTier)]),
     ...(scenario.planetSeed === undefined ? [] : [setPlanetSeedCommand(scenario.planetSeed)]),
+    ...(scenario.artefactId === undefined ? [] : [setArtefactCommand(scenario.artefactId)]),
     ...(scenario.money === undefined ? [] : [setMoneyCommand(scenario.money)]),
     ...upgradeCommandsOf(scenario.upgrades ?? {}),
     ...(scenario.coreFragments === undefined

@@ -2,6 +2,7 @@
  * Ids the scenario validator checks against (#11 section 4 and amendment 1). Each list belongs to
  * the decision that defines it and comes from that decision's data.
  */
+import { ARTEFACT_IDS as ARTEFACT_OPTION_IDS } from './artefacts/artefactOptions'
 import { ECONOMY } from './economy/economy'
 import { PLANET_ARCHETYPES } from './world/planetTable'
 
@@ -18,3 +19,6 @@ export const ENEMY_IDS: readonly string[] = ECONOMY.enemies.kinds.map((kind) => 
 export const ARCHETYPE_IDS: readonly string[] = PLANET_ARCHETYPES.map(
   (archetype) => archetype.archetypeId,
 )
+
+/** The three artefact options of #46 (`ore_whisper`, `breathing_room`, `assay_beacon`). */
+export const ARTEFACT_IDS: readonly string[] = ARTEFACT_OPTION_IDS

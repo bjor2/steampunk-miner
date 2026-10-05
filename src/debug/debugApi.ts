@@ -46,6 +46,9 @@ import {
   type EnemyStatsRowView,
 } from '../systems/authority/combat/enemyStatsView'
 import { facilityLevelProblems } from '../systems/authority/platformState'
+import type { ArtefactReport } from '../systems/authority/heldArtefact'
+import { setArtefactCommand } from '../systems/artefacts/artefactCommands'
+import { readArtefactReport } from '../store/artefactActions'
 import { readSnapshot, type SessionSnapshot } from '../systems/authority/sessionSnapshot'
 import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForward'
 import { validateScenario, type Scenario } from '../systems/scenario'
@@ -84,6 +87,9 @@ export interface VehicleStatsReport {
   stats: VehicleStatsView
   onCurveByPlanet: OnCurveVehicleView[]
 }
+
+/** `artefact()`: the held artefact and how this planet's cache reads (#46 `debug.artefact`). */
+export type { ArtefactReport }
 
 /**
  * `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6), and
@@ -143,6 +149,11 @@ export interface DebugApi {
   freezeEnemies(frozen: boolean): DebugResult
   /** Table D of #6 for planets 1 to 40: tiers, health, hits, kill times and side-hit shares. */
   enemyStatsTable(kind: string): DebugResult<{ rows: EnemyStatsRowView[] }>
+  // artefacts (#46): the setter is a `debug.*` command, the read is not logged
+  /** The player holds `optionId` (one of the three), as if chosen from this planet's cache. */
+  setArtefact(optionId: string): DebugResult
+  /** `{ artefactId, breathingRoomCharges, cacheState }` for the local player on this planet. */
+  artefact(): DebugResult<ArtefactReport>
   // ground (#36): `debug.*` commands; a disc in mm, `amount` 0 to 255 (default all of it)
   /** Lowers density round `(x, y)` mm; credits no ore and never cuts the dock pad. */
   carveCircle(x: number, y: number, radius: number, amount?: number): DebugResult
@@ -295,6 +306,11 @@ export function createDebugApi(): DebugApi {
         game().freezeEnemies(frozen),
       ),
     enemyStatsTable: enemyStatsTableOf,
+    setArtefact: (optionId) =>
+      runUnlessRefused(vehicleDebugProblems(setArtefactCommand(optionId)), () =>
+        game().setArtefact(optionId),
+      ),
+    artefact: () => ({ ok: true, ...readArtefactReport(game().playerId) }),
     carveCircle: (x, y, radius, amount = SOLID_DENSITY) =>
       runUnlessRefused(vehicleDebugProblems(carveCircleCommand({ x, y, radius, amount })), () =>
         game().carveCircle({ x, y, radius, amount }),

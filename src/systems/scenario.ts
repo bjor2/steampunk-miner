@@ -14,7 +14,8 @@
  * Start fields whose system is not built yet (`depthBp` needs the planet radius; inventory and
  * unlocks need their tickets) are validated, then refused with a problem naming what is missing,
  * so no file is ever half applied. Upgrade levels apply as `debug.setUpgrade`, core fragments as
- * `debug.setCoreFragments` (the platform's bay, #10), enemies as `debug.spawnEnemy` (#9).
+ * `debug.setCoreFragments` (the platform's bay, #10), enemies as `debug.spawnEnemy` (#9), a held
+ * artefact as `debug.setArtefact` (#46).
  * Facilities have their one level (#8) and the platform's look follows the core bay, so those two
  * fields are checked, never applied: a file that contradicts them is refused.
  *
@@ -23,7 +24,7 @@
  */
 import { DEFAULT_SPAWN_OFFSET } from './authority/combat/combatCommands'
 import { isNonNegativeMoneyText } from './money'
-import { ENEMY_IDS, PLATFORM_VISUAL_STATES, UPGRADE_IDS } from './registeredIds'
+import { ARTEFACT_IDS, ENEMY_IDS, PLATFORM_VISUAL_STATES, UPGRADE_IDS } from './registeredIds'
 import {
   fieldProblems,
   flagRule,
@@ -73,6 +74,8 @@ export interface ScenarioStart {
   facilities?: Record<string, number>
   /** `outpost` or `core_drive` (#8); it must agree with `coreFragments`. */
   platformState?: string
+  /** The artefact already held (#46), as `debug.setArtefact` after the planet is set. */
+  artefactId?: string
 }
 
 export interface ScenarioEnemy {
@@ -163,6 +166,7 @@ const START_FIELDS: FieldRules = {
     ),
   facilities: facilityLevelProblems,
   platformState: registeredIdRule(PLATFORM_VISUAL_STATES, 'platform state'),
+  artefactId: registeredIdRule(ARTEFACT_IDS, 'artefact id'),
 }
 
 const ENEMY_FIELDS: FieldRules = {
@@ -250,7 +254,7 @@ function isNonEmptyText(value: unknown): boolean {
  * generator (Build 2) derives each planet's seed from it.
  */
 export function startOfScenario(scenario: Scenario): StartScenario {
-  const { planet, depthTiles, money, upgrades, coreFragments, enemies } = scenario.start
+  const { planet, depthTiles, money, upgrades, coreFragments, enemies, artefactId } = scenario.start
   return {
     ...(planet === undefined ? {} : { planetTier: planet }),
     planetSeed: scenario.worldSeed,
@@ -259,6 +263,7 @@ export function startOfScenario(scenario: Scenario): StartScenario {
     ...(upgrades === undefined ? {} : { upgrades }),
     ...(coreFragments === undefined ? {} : { coreFragments }),
     ...(enemies === undefined ? {} : { enemies: enemies.map(placedEnemyOf) }),
+    ...(artefactId === undefined ? {} : { artefactId }),
   }
 }
 

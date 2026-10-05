@@ -12,6 +12,7 @@
  * Money is a decimal string such as "1e30" (decision #5), never a JSON number, so 1e100 and past
  * 1e308 arrive exact.
  */
+import { ARTEFACT_IDS, isArtefactId } from './artefacts/artefactOptions'
 import { isEnemyKind } from './authority/combat/combatDebugRules'
 import { isNonNegativeMoneyText } from './money'
 import { isUpgradeId, upgradeLevelProblems } from './vehicle/vehicleStats'
@@ -29,6 +30,8 @@ export interface StartScenario {
   coreFragments?: number
   /** Enemies to spawn (#9): registered kind, tier, whole tiles from the vehicle. */
   enemies?: readonly StartEnemy[]
+  /** The artefact the player already holds (#46), as if chosen from the start planet's cache. */
+  artefactId?: string
 }
 
 export interface StartEnemy {
@@ -47,6 +50,7 @@ export function startScenarioProblems(scenario: StartScenario): string[] {
     ...upgradesProblems(scenario.upgrades),
     ...coreFragmentsProblems(scenario.coreFragments),
     ...(scenario.enemies ?? []).flatMap(enemyProblems),
+    ...artefactIdProblems(scenario.artefactId),
   ]
 }
 
@@ -98,4 +102,9 @@ function coreFragmentsProblems(coreFragments: number | undefined): string[] {
   if (coreFragments === undefined) return []
   if (Number.isSafeInteger(coreFragments) && coreFragments >= 0) return []
   return [`coreFragments must be a whole number >= 0, got ${coreFragments}`]
+}
+
+function artefactIdProblems(artefactId: string | undefined): string[] {
+  if (artefactId === undefined || isArtefactId(artefactId)) return []
+  return [`artefactId must be one of ${ARTEFACT_IDS.join(', ')}, got ${JSON.stringify(artefactId)}`]
 }

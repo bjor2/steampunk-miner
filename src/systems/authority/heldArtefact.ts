@@ -34,3 +34,18 @@ export function heldArtefactProblems(value: unknown, path: string): string[] {
     (value.breathingRoomCharges === 0 || value.breathingRoomCharges === 1)
   return isValid ? [] : [`${path} must be null or an artefact id, fromPlanet and 0 or 1 charges`]
 }
+
+/** `debug.artefact()` (#46 Logs/debug API, amendment 4): what the player holds and the cache here. */
+export interface ArtefactReport {
+  artefactId: ArtefactId | null
+  breathingRoomCharges: number
+  cacheState: ArtefactCacheState
+}
+
+export function artefactReportOf(held: HeldArtefact | null, planetIndex: number): ArtefactReport {
+  return {
+    artefactId: held?.id ?? null,
+    breathingRoomCharges: held?.breathingRoomCharges ?? 0,
+    cacheState: cacheStateOf(held, planetIndex),
+  }
+}
