@@ -5,8 +5,8 @@
 import { ECONOMY } from './economy/economy'
 import { PLANET_ARCHETYPES } from './world/planetTable'
 
-/** The platform's facilities and visual states (#8 registered ids). */
-export { FACILITY_IDS, PLATFORM_VISUAL_STATES } from './authority/platformState'
+/** The platform's facilities and visual states (#8 registered ids) and its bays (#37). */
+export { FACILITY_IDS, PLATFORM_BAY_IDS, PLATFORM_VISUAL_STATES } from './authority/platformState'
 
 /** The six upgrade tracks of #7, as `economy.json` defines them (#20). */
 export const UPGRADE_IDS: readonly string[] = ECONOMY.upgrades.map((upgrade) => upgrade.id)

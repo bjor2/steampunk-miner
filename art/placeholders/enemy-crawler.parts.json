@@ -1,0 +1,27 @@
+{
+  "assetId": "enemy-crawler",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/enemy-crawler/enemy-crawler.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 512],
+  "maps": {
+    "albedo": "enemy-crawler.albedo.ktx2",
+    "normal": "enemy-crawler.normal.ktx2",
+    "emissive": "enemy-crawler.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "enemy-crawler",
+      "tier": 1,
+      "rect": [8, 8, 410, 410],
+      "sizeM": [0.8, 0.8],
+      "pivotM": [0.4, 0.4],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}

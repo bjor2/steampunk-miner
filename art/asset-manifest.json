@@ -1,0 +1,294 @@
+{
+  "schema": 1,
+  "assets": [
+    {
+      "id": "vehicle",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#b87333",
+      "partColors": {
+        "t1-boiler": "#c9a24b",
+        "t1-chassis": "#b87333",
+        "t1-drill-bit": "#9aa0a6",
+        "t1-drill-head": "#5b3a1e",
+        "t1-headlamp": "#ffd9a0",
+        "t1-hopper": "#8a6a2f",
+        "t1-motor-housing": "#e9dcc0",
+        "t1-piston": "#9aa0a6",
+        "t1-stack": "#3b3631",
+        "t1-wheel": "#2a2623",
+        "t1-wheel-2": "#2a2623",
+        "t1-wheel-3": "#2a2623",
+        "t2-armour-plate": "#8a6a2f",
+        "t2-armour-plate-2": "#8a6a2f",
+        "t2-drill-head": "#6b4424",
+        "t2-headlamp": "#ffd9a0",
+        "t2-stack-2": "#3b3631",
+        "t3-armour-plate": "#8a6a2f",
+        "t3-armour-plate-2": "#8a6a2f",
+        "t3-armour-plate-3": "#8a6a2f",
+        "t3-boiler-2": "#c9a24b",
+        "t3-chassis": "#b87333",
+        "t3-drill-bit": "#c9a24b",
+        "t3-drill-head": "#7a7f86",
+        "t3-headlamp-2": "#ffd9a0",
+        "t3-stack": "#3b3631",
+        "t3-stack-2": "#3b3631",
+        "t3-wheel": "#2a2623",
+        "t3-wheel-2": "#2a2623",
+        "t3-wheel-3": "#2a2623"
+      }
+    },
+    {
+      "id": "platform-hub",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#3b3631",
+      "partColors": {
+        "core-drive": "#ff8a4a",
+        "outpost": "#3b3631"
+      }
+    },
+    {
+      "id": "platform-bay-sell",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#c9a24b"
+    },
+    {
+      "id": "platform-bay-upgrade",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#b87333"
+    },
+    {
+      "id": "platform-bay-sell-backdrop",
+      "source": "blender",
+      "form": "backdrop",
+      "status": "placeholder",
+      "color": "#2a2623"
+    },
+    {
+      "id": "platform-bay-upgrade-backdrop",
+      "source": "blender",
+      "form": "backdrop",
+      "status": "placeholder",
+      "color": "#2a2623"
+    },
+    {
+      "id": "enemy-crawler",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#7a4a3a"
+    },
+    {
+      "id": "enemy-burrower",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#5a3a4a"
+    },
+    {
+      "id": "prop-artefact-cache",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#c9a24b"
+    },
+    {
+      "id": "ground-band-1",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#6b5a48"
+    },
+    {
+      "id": "ground-band-2",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#6b5a48"
+    },
+    {
+      "id": "ground-band-3",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#6b5a48"
+    },
+    {
+      "id": "ground-band-4",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#6b5a48"
+    },
+    {
+      "id": "ground-band-5",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#6b5a48"
+    },
+    {
+      "id": "casing-grade-1",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#9aa0a6"
+    },
+    {
+      "id": "casing-grade-2",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#9aa0a6"
+    },
+    {
+      "id": "casing-grade-3",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#9aa0a6"
+    },
+    {
+      "id": "casing-grade-4",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#9aa0a6"
+    },
+    {
+      "id": "casing-grade-5",
+      "source": "blender",
+      "form": "tile",
+      "status": "placeholder",
+      "color": "#9aa0a6"
+    },
+    {
+      "id": "icon-track-drill-power",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "icon-track-drill-tip",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "icon-track-engine",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "icon-track-boiler",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "icon-track-cargo-hold",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "icon-track-hull",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "icon-casing",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "emblem-bay-sell",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "emblem-bay-upgrade",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "ui-chrome-kit",
+      "source": "vector",
+      "form": "css",
+      "status": "final"
+    },
+    {
+      "id": "ore-glyphs",
+      "source": "vector",
+      "form": "css",
+      "status": "final"
+    },
+    {
+      "id": "fx-ore-glint",
+      "source": "shader",
+      "form": "code",
+      "status": "placeholder"
+    },
+    {
+      "id": "fx-core-glow",
+      "source": "shader",
+      "form": "code",
+      "status": "placeholder"
+    },
+    {
+      "id": "fx-heat-shimmer",
+      "source": "shader",
+      "form": "code",
+      "status": "placeholder"
+    },
+    {
+      "id": "fx-ground-edge-rim",
+      "source": "shader",
+      "form": "code",
+      "status": "placeholder"
+    },
+    {
+      "id": "fx-dust",
+      "source": "procedural",
+      "form": "code",
+      "status": "placeholder"
+    },
+    {
+      "id": "fx-sparks",
+      "source": "procedural",
+      "form": "code",
+      "status": "placeholder"
+    },
+    {
+      "id": "fx-steam",
+      "source": "procedural",
+      "form": "code",
+      "status": "placeholder"
+    },
+    {
+      "id": "fx-collapse-debris",
+      "source": "procedural",
+      "form": "code",
+      "status": "placeholder"
+    },
+    {
+      "id": "sky-gradient",
+      "source": "procedural",
+      "form": "code",
+      "status": "placeholder"
+    }
+  ]
+}

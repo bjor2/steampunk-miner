@@ -1,0 +1,27 @@
+{
+  "assetId": "enemy-burrower",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/enemy-burrower/enemy-burrower.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 512],
+  "maps": {
+    "albedo": "enemy-burrower.albedo.ktx2",
+    "normal": "enemy-burrower.normal.ktx2",
+    "emissive": "enemy-burrower.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "enemy-burrower",
+      "tier": 1,
+      "rect": [8, 8, 461, 461],
+      "sizeM": [0.9, 0.9],
+      "pivotM": [0.45, 0.45],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}

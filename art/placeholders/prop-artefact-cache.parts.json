@@ -1,0 +1,27 @@
+{
+  "assetId": "prop-artefact-cache",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/prop-artefact-cache/prop-artefact-cache.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 512],
+  "maps": {
+    "albedo": "prop-artefact-cache.albedo.ktx2",
+    "normal": "prop-artefact-cache.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "prop-artefact-cache",
+      "tier": 1,
+      "rect": [8, 8, 410, 308],
+      "sizeM": [0.8, 0.6],
+      "pivotM": [0.4, 0.3],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}
