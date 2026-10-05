@@ -6,7 +6,13 @@
  */
 import { ZERO_MONEY, type BigStat } from '../money'
 import { createChunkCache, type ChunkCache } from './chunkCache'
-import { EMPTY_CHUNK_DELTA, isCellRemoved, withCellRemoved, type ChunkDelta } from './chunkDelta'
+import {
+  applyChunkDelta,
+  EMPTY_CHUNK_DELTA,
+  isCellRemoved,
+  withCellRemoved,
+  type ChunkDelta,
+} from './chunkDelta'
 import type { PlanetParams } from './planetParams'
 import { cellIndexOfTile, chunkKey, chunkOfTile, type TilePoint } from './tileGrid'
 import { AIR_CELL } from './worldCell'
@@ -38,6 +44,21 @@ export function cellAt(world: WorldState, params: PlanetParams, tile: TilePoint)
   if (isCellRemoved(delta, index)) return AIR_CELL
   const override = delta.overrides.find(([at]) => at === index)
   return override === undefined ? generatedCellsOf(params, cx, cy)[index] : override[1]
+}
+
+/**
+ * All cells of a chunk as the world stands now, for the renderer. An untouched chunk answers the
+ * cache's own array, which callers must only read.
+ */
+export function currentCellsOfChunk(
+  world: WorldState,
+  params: PlanetParams,
+  cx: number,
+  cy: number,
+): Uint32Array {
+  const delta = world.chunks[chunkKey(cx, cy)]
+  const generated = generatedCellsOf(params, cx, cy)
+  return delta === undefined ? generated : applyChunkDelta(generated, delta)
 }
 
 /** A broken tile becomes air for good (#10: removed tiles never regrow in the slice). */
