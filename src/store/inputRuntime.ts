@@ -13,7 +13,7 @@ import { ACTION_MAP, actionDefOf, actionsOfChord, type ActionId } from '../syste
 import { buildIntent } from '../systems/input/buildIntent'
 import { reactionToPress, type InputReaction } from '../systems/input/inputRouting'
 import { chordOf } from '../systems/input/keyCodes'
-import { canDock } from '../systems/authority/dockRules'
+import { dockableBayOf, dockedBayOf } from '../systems/authority/dockRules'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
@@ -101,7 +101,8 @@ function situationNow() {
   return {
     layer: inputLayerOf(game),
     vehicleMode: game.vehicle.mode,
-    canDock: canDock(readAuthorityState(), game.playerId),
+    dockableBay: dockableBayOf(readAuthorityState(), game.playerId),
+    dockedBay: dockedBayOf(readAuthorityState(), game.playerId),
   }
 }
 

@@ -5,6 +5,7 @@
  */
 import type { EnemyKind, HitArc } from '../economy/economyDefinition'
 import type { VehicleMode } from '../vehicle/vehicleState'
+import type { BayId } from '../world/dockBays'
 import type { CommandStamp, CommandType } from './authorityCommand'
 import type { PlatformVisualState } from './platformState'
 
@@ -36,6 +37,8 @@ export type RejectionReason =
   | 'hull_full'
   | 'energy_full'
   | 'nothing_to_service'
+  // Registered by the two bays (#37): the command belongs to the other bay.
+  | 'wrong_bay'
   // Registered by `Travel` (#10): too few fragments in the bay, or not the next planet.
   | 'core_short'
   | 'not_next_planet'
@@ -102,8 +105,8 @@ export interface DomainEventBodies {
   UpgradeLevelChanged: { upgradeId: string; from: number; to: number }
   VehicleConfigurationChanged: { visualTier: number }
   /** Energy in quanta, hull as a canonical string (#11 amendment 2). */
-  DockEntered: { cargoUnits: number; energy: number; hull: string }
-  DockLeft: { durationTicks: number }
+  DockEntered: { bay: BayId; cargoUnits: number; energy: number; hull: string }
+  DockLeft: { bay: BayId; durationTicks: number }
   /** The first core tile of the planet broke (#10). */
   CoreReached: Record<never, never>
   /** One core tile broke; `fragments` is what the hold took (0 when it was full). */

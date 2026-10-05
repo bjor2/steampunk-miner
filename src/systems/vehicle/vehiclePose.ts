@@ -11,6 +11,7 @@ import {
   ZONE_TEST_MAX_MM,
 } from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
+import { bayOfTile, bayRestPointOf, isTileInBay, type BayId } from '../world/dockBays'
 import type { DockSite } from '../world/dockSite'
 import { depthTilesAt } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -111,17 +112,28 @@ export function isInPadZone(site: DockSite, pose: VehiclePose): boolean {
   )
 }
 
-/** The pose at rest on the dock point, upright at the top of the planet, facing right. */
+/** Whether the vehicle's centre is in one bay's pad zone (#37); the authority docks it there. */
+export function isInBayZone(site: DockSite, bay: BayId, pose: VehiclePose): boolean {
+  return isTileInBay(site, bay, tileOfPose(pose))
+}
+
+/** The bay whose pad zone the vehicle is in, or null on the hub and away from the pad (#37). */
+export function bayOfPose(site: DockSite, pose: VehiclePose): BayId | null {
+  return bayOfTile(site, tileOfPose(pose))
+}
+
+/**
+ * The pose a run starts in and the tow lands in: at rest in the Sell bay, so the first dock is
+ * always there (#37).
+ */
 export function dockedPoseAt(site: DockSite): VehiclePose {
-  return {
-    x: site.dockPoint.tx * MM_PER_METRE + MM_PER_METRE / 2,
-    y: site.dockPoint.ty * MM_PER_METRE + MM_PER_METRE / 2,
-    vx: 0,
-    vy: 0,
-    upx: 0,
-    upy: UP_VECTOR_SCALE,
-    facing: FACING.right,
-  }
+  return bayPoseAt(site, 'sell')
+}
+
+/** At rest on a bay's centre line, upright at the top of the planet, facing right. */
+export function bayPoseAt(site: DockSite, bay: BayId): VehiclePose {
+  const { x, y } = bayRestPointOf(site, bay)
+  return { x, y, vx: 0, vy: 0, upx: 0, upy: UP_VECTOR_SCALE, facing: FACING.right }
 }
 
 /** Why a reported pose cannot be true (#3 host sanity check): too fast, or a bent up vector. */

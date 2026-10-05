@@ -26,6 +26,7 @@ export type RegisteredEvent =
 
 const ENEMY_KIND = { oneOf: ['crawler', 'burrower'] } as const satisfies FieldKind
 const HIT_ARC = { oneOf: ['front', 'side', 'rear'] } as const satisfies FieldKind
+const BAY = { oneOf: ['sell', 'upgrade'] } as const satisfies FieldKind
 
 export const RUN_EVENT_REGISTRY = {
   // Run
@@ -86,13 +87,14 @@ export const RUN_EVENT_REGISTRY = {
   },
   feature_unlocked: { group: 'progression', level: 'core', payload: 'unspecified' },
 
-  // Platform (#8); energy is an integer count of quanta (#11 amendment 2), hull a BigStat.
+  // Platform (#8); energy is an integer count of quanta (#11 amendment 2), hull a BigStat. The
+  // dock events carry the bay (#37).
   dock_entered: {
     group: 'platform',
     level: 'core',
-    payload: { cargoUnits: 'integer', energy: 'integer', hull: 'money' },
+    payload: { bay: BAY, cargoUnits: 'integer', energy: 'integer', hull: 'money' },
   },
-  dock_left: { group: 'platform', level: 'core', payload: { durationTicks: 'integer' } },
+  dock_left: { group: 'platform', level: 'core', payload: { bay: BAY, durationTicks: 'integer' } },
   resource_sold: {
     group: 'platform',
     level: 'core',

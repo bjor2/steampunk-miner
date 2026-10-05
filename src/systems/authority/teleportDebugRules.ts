@@ -1,11 +1,12 @@
 /**
- * `teleportToDock()` (design doc section 19, decision #11 section 5) as the `debug.*` command
- * `debug.teleportToDock`: the vehicle is put on the dock point and docks there exactly as the
- * `Dock` command docks it (core banked, trip ended, dock digest), with no tow and no fee. It goes
+ * `teleportToDock(bay)` (design doc section 19, decision #11 section 5, #37) as the `debug.*`
+ * command `debug.teleportToDock {bay}`: the vehicle is put at rest in that bay and docks there
+ * exactly as the `Dock` command docks it (core banked, trip ended, dock digest), with no tow and no fee. It goes
  * through `applyCommand`, so it replays and logs `debug_command_applied`. A docked vehicle has
  * nowhere to go, and a destroyed one waits for its tow: both are refused with a listed problem.
  */
-import { dockedPoseAt } from '../vehicle/vehiclePose'
+import { bayPoseAt } from '../vehicle/vehiclePose'
+import type { BayId } from '../world/dockBays'
 import type { VehicleState } from '../vehicle/vehicleState'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import {
@@ -23,7 +24,7 @@ export const TELEPORT_DEBUG_RULES: {
   readonly 'debug.teleportToDock': CommandRule<'debug.teleportToDock'>
 } = {
   'debug.teleportToDock': {
-    fields: {},
+    fields: { bay: 'bay' },
     reject: (state, { playerId }) =>
       firstRejection([
         () => noPlanetRejection(state.planet),
@@ -31,7 +32,7 @@ export const TELEPORT_DEBUG_RULES: {
       ]),
     apply: (state, command) =>
       chainEffects(state, [
-        (current) => unchanged(placeOnDockPoint(current, command.playerId)),
+        (current) => unchanged(placeInBay(current, command.playerId, command.payload.bay)),
         (current) => DOCK_COMMAND_RULES.dock.apply(current, { ...command, type: 'dock' }),
       ]),
   },
@@ -47,9 +48,9 @@ function movableRejection(vehicle: VehicleState): Rejection | null {
 }
 
 /** A stranded vehicle comes home active, so it docks like any other. */
-function placeOnDockPoint(state: AuthorityState, playerId: string): AuthorityState {
+function placeInBay(state: AuthorityState, playerId: string, bay: BayId): AuthorityState {
   const site = dockSiteOfPlanet(state.planet)
   const vehicle = vehicleOf(state, playerId)
-  const pose = site === null ? vehicle.pose : dockedPoseAt(site)
+  const pose = site === null ? vehicle.pose : bayPoseAt(site, bay)
   return withVehicle(state, playerId, { ...vehicle, mode: 'active', pose })
 }

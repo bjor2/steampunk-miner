@@ -1,6 +1,6 @@
 /**
- * What the pacing bot does at the dock (#29 Systems & Economy note 3): sell, repair and recharge,
- * then buy, always keeping the next service paid for. `drill_tip` and `hull` go to their on-curve level for the planet first (#6 section 3);
+ * What the pacing bot does at the dock (#29 Systems & Economy note 3): sell, repair and recharge
+ * at the Sell bay, then buy at the Upgrade bay (#37), always keeping the next service paid for. `drill_tip` and `hull` go to their on-curve level for the planet first (#6 section 3);
  * a `drill_power` level is forced while the core is the goal and the drill digs it slower than 0.4
  * tiles a second (`FORCED_DRILL_TICKS_PER_TILE`); otherwise the bot buys the upgrade with the best gain in planned money per tick
  * per price, while one pays. The #6 simulator's deadlock (never buying the unblocking drill level)
@@ -49,6 +49,11 @@ function serviceIntents(session: BotSession): CommandIntent[] {
     { type: 'rechargeEnergy', payload: {} },
     { type: 'repairHull', payload: {} },
   ]
+}
+
+/** Whether the bot would buy anything now, wherever it is docked. */
+export function hasPurchase(session: BotSession, situation: ShoppingSituation): boolean {
+  return nextPurchase(session, situation) !== null
 }
 
 export function buyUpgrades(session: BotSession, situation: ShoppingSituation): void {

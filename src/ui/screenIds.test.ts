@@ -258,7 +258,7 @@ describe('screen ids (#33 acceptance 12)', () => {
 
   it('carries the tier and family on every shop row', () => {
     const session = sessionWithOre(4)
-    session.submit(400, teleportToDockCommand())
+    session.submit(400, teleportToDockCommand('sell'))
     const model = selectPlatformModel(session.state(), 'p1', {
       isTravelArmed: false,
       isQuickServiceHighlighted: false,

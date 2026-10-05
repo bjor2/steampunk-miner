@@ -5,6 +5,9 @@
  * `ceilMilli` by its price function. `QuickService` is the three in order (sell all, repair,
  * recharge) at current prices, with their own events and none of its own.
  *
+ * Selling, recharging and the quick action are the Sell bay's; repair is the Upgrade bay's (#37),
+ * though the quick action at the Sell bay still repairs at the same price.
+ *
  * A charge the wallet cannot pay is refused with `money_short`, never trimmed to what it can pay.
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
@@ -37,7 +40,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
-import { notDockedRejection } from './dockRules'
+import { atBayRejection } from './dockRules'
 import type { SaleMode, SoldItem } from './domainEvent'
 
 /** One ore tier, or the whole hold's ore. */
@@ -60,20 +63,18 @@ export const PLATFORM_SERVICE_RULES: {
 } = {
   sellCargo: {
     fields: { resourceTier: 'tierOrAll' },
-    reject: (state, { playerId, payload }) => {
-      const vehicle = vehicleOf(state, playerId)
-      return firstRejection([
-        () => notDockedRejection(vehicle),
-        () => nothingToSellRejection(vehicle.cargo, payload.resourceTier),
-      ])
-    },
+    reject: (state, { playerId, payload }) =>
+      firstRejection([
+        () => atBayRejection(state, playerId, 'sell'),
+        () => nothingToSellRejection(vehicleOf(state, playerId).cargo, payload.resourceTier),
+      ]),
     apply: (state, { playerId, payload }) => sellOre(state, playerId, payload.resourceTier),
   },
   repairHull: {
     fields: {},
     reject: (state, { playerId }) =>
       firstRejection([
-        () => notDockedRejection(vehicleOf(state, playerId)),
+        () => atBayRejection(state, playerId, 'upgrade'),
         () => hullFullRejection(vehicleOf(state, playerId)),
         () => moneyShortRejection(walletOf(state, playerId), repairCostOf(state, playerId)),
       ]),
@@ -83,7 +84,7 @@ export const PLATFORM_SERVICE_RULES: {
     fields: {},
     reject: (state, { playerId }) =>
       firstRejection([
-        () => notDockedRejection(vehicleOf(state, playerId)),
+        () => atBayRejection(state, playerId, 'sell'),
         () => energyFullRejection(vehicleOf(state, playerId)),
         () => moneyShortRejection(walletOf(state, playerId), rechargeCostOf(state, playerId)),
       ]),
@@ -93,7 +94,7 @@ export const PLATFORM_SERVICE_RULES: {
     fields: {},
     reject: (state, { playerId }) =>
       firstRejection([
-        () => notDockedRejection(vehicleOf(state, playerId)),
+        () => atBayRejection(state, playerId, 'sell'),
         () => nothingToServiceRejection(serviceQuote(state, playerId)),
         () => quickServiceMoneyRejection(state, playerId),
       ]),

@@ -24,7 +24,7 @@ import {
 const setUpgrade = (upgradeId: string, level: number) =>
   ({ type: 'debug.setUpgrade', payload: { upgradeId, level } }) as const
 
-const dock = { type: 'dock', payload: {} } as const
+const dock = { type: 'dock', payload: { bay: 'sell' } } as const
 const undock = { type: 'undock', payload: {} } as const
 
 const poseAtDock = {

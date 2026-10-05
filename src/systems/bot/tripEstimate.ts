@@ -122,7 +122,7 @@ function travelOf(
   const speed = stats.engine.speedMax
   const gallery = galleryOf(layout, row)
   const walk =
-    Math.abs(layout.shaftColumn - layout.dockPoint.tx) + Math.min(gallery.east, gallery.west)
+    Math.abs(layout.shaftColumn - layout.sellBay.tx) + Math.min(gallery.east, gallery.west)
   const openDepth = layout.travelRow - Math.max(row, layout.shaftBottomRow)
   const toBore = Math.max(0, layout.shaftBottomRow - row)
   const climb = moveTicks(layout.travelRow - row, speed)

@@ -83,7 +83,7 @@ const vehicleEvents: DomainEvent[] = [
 ]
 
 const platformEvents: DomainEvent[] = [
-  { ...commandStamp, type: 'DockEntered', cargoUnits: 4, energy: 9000, hull: '5e+1' },
+  { ...commandStamp, type: 'DockEntered', bay: 'sell', cargoUnits: 4, energy: 9000, hull: '5e+1' },
   { ...commandStamp, type: 'CoreBayDeposited', fragments: 3, total: 63, source: 'dock' },
   { ...commandStamp, type: 'PlatformConfigurationChanged', visualState: 'core_drive' },
   {
@@ -108,7 +108,7 @@ const platformEvents: DomainEvent[] = [
     visualTier: 1,
     statsAfter: { hullMax: '1.12e+2', energyMax: '1.5e+2' },
   },
-  { ...commandStamp, type: 'DockLeft', durationTicks: 300 },
+  { ...commandStamp, type: 'DockLeft', bay: 'sell', durationTicks: 300 },
 ]
 
 const combatEvents: DomainEvent[] = [

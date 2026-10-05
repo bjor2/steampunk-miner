@@ -2,7 +2,7 @@
   "name": "destroyed-and-towed",
   "description": "Hull set to 1 in the band-1 corridor, a crawler hits the rear, destroyed, towed (#9).",
   "generatorVersion": 1,
-  "authorityProtocolVersion": 1,
+  "authorityProtocolVersion": 2,
   "logSchemaVersion": 1,
   "numberFormatVersion": 1,
   "worldSeed": 83921,
@@ -510,7 +510,7 @@
     {
       "tick": 704,
       "scope": "end",
-      "digest": "4d103af8a2fc50d5"
+      "digest": "900a8e00ecf4e371"
     }
   ]
 }

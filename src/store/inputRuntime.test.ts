@@ -127,11 +127,13 @@ describe('input: no direct mutation (#33 acceptance 3)', () => {
     dockAtStart()
     game().giveMoney('1e6')
     game().setEnergy('100')
-    const pressed = submittedDuring(() => {
-      game().pressScreenButton('workshop-upgrade-engine-buy')
-      game().pressScreenButton('charging-recharge')
-    })
-    expect(pressed).toEqual(['buyUpgrade', 'rechargeEnergy'])
+    const atSellBay = submittedDuring(() => game().pressScreenButton('charging-recharge'))
+    game().undock()
+    game().teleportToDock('upgrade')
+    const atUpgradeBay = submittedDuring(() =>
+      game().pressScreenButton('workshop-upgrade-engine-buy'),
+    )
+    expect([...atSellBay, ...atUpgradeBay]).toEqual(['rechargeEnergy', 'buyUpgrade'])
   })
 
   it('submits nothing for an action outside its context or a disabled button', () => {

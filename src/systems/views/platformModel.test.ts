@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { createScriptedSession, mineTile, surfaceOreTiles } from '../authority/scriptedSession'
+import {
+  createScriptedSession,
+  dockInBay,
+  mineTile,
+  surfaceOreTiles,
+} from '../authority/scriptedSession'
 import { setHullCommand, setEnergyCommand, teleportToDockCommand } from '../vehicle/vehicleCommands'
 import {
   dockCommand,
@@ -18,7 +23,7 @@ const canonical = (text: string) => toCanonical(fromCanonical(text))
 
 function dockedSession() {
   const session = createScriptedSession()
-  session.submit(1, dockCommand())
+  session.submit(1, dockCommand('sell'))
   return session
 }
 
@@ -39,7 +44,7 @@ describe('platform model', () => {
   it('lists a row per held tier and values Sell all exactly as the sale pays (#33 acceptance 8)', () => {
     const session = createScriptedSession()
     surfaceOreTiles(4).forEach((tile, index) => mineTile(session, 1 + index * 50, tile))
-    session.submit(400, teleportToDockCommand())
+    session.submit(400, teleportToDockCommand('sell'))
     const model = platformOf(session)
     expect(model.shop.rows.length).toBeGreaterThan(0)
     expect(model.shop.rows.every((row) => row.family === 'mixed' && row.tier > 0)).toBe(true)
@@ -67,6 +72,7 @@ describe('platform model', () => {
   it('previews each upgrade as the purchase then logs it: cost and statsAfter', () => {
     const session = dockedSession()
     session.submit(2, grantMoneyCommand('1e6'))
+    dockInBay(session, 2, 'upgrade')
     for (const upgradeId of UPGRADE_IDS) {
       const row = platformOf(session).workshop.upgrades.find((r) => r.upgradeId === upgradeId)!
       const tick = session.state().tick
@@ -82,11 +88,12 @@ describe('platform model', () => {
 
   it('marks an unaffordable row money_short, the reason the authority refuses it with', () => {
     const session = dockedSession()
+    dockInBay(session, 2, 'upgrade')
     const row = platformOf(session).workshop.upgrades[0]
     expect(row.buyState).toBe('money_short')
     expect(row.buy.reason).toBe('money_short')
     const [refusal] = eventsAfter(session, () =>
-      session.submit(2, buyUpgradeCommand(row.upgradeId)),
+      session.submit(3, buyUpgradeCommand(row.upgradeId)),
     )
     expect(refusal).toMatchObject({ type: 'CommandRejected', reason: 'money_short' })
   })

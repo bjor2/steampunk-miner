@@ -5,7 +5,7 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { surfaceOreTiles } from '../systems/authority/scriptedSession'
 import { add, fromCanonical, sub, toCanonical, ZERO_MONEY } from '../systems/money'
-import { FACING, dockedPoseAt } from '../systems/vehicle/vehiclePose'
+import { FACING, bayPoseAt, dockedPoseAt } from '../systems/vehicle/vehiclePose'
 import type { ScriptedCommand } from '../systems/fastForward'
 import { dockSiteOf } from '../systems/world/dockSite'
 import { planetParamsFor } from '../systems/world/planetParams'
@@ -64,6 +64,15 @@ function mineTrip(tiles: readonly TilePoint[]): void {
   game().fastForward(home - readAuthorityTick(), commands)
 }
 
+/** Upgrades are bought at the Upgrade bay (#37): leave the Sell bay, drive 8 m, dock there. */
+function driveToUpgradeBay(): void {
+  game().undock()
+  const tick = readAuthorityTick() + 2
+  const pose = { ...bayPoseAt(SITE, 'upgrade'), ...idlePose, driveTicks: 2 }
+  game().fastForward(2, [{ tick, type: 'reportPose', payload: pose }])
+  game().dock('upgrade')
+}
+
 const loggedNames = () => sink.events.map((event) => event.event as RunEventName)
 
 const platformNames = () =>
@@ -84,9 +93,10 @@ describe('platform loop from a fresh profile', () => {
     for (const trip of [ore.slice(0, 10), ore.slice(10, 20), ore.slice(20, 30)]) {
       if (game().vehicle.mode === 'docked') game().undock()
       mineTrip(trip)
-      game().dock()
+      game().dock('sell')
       game().sellCargo('all')
     }
+    driveToUpgradeBay()
     for (const upgradeId of SIX_TRACKS) game().buyUpgrade(upgradeId)
 
     expect(platformNames()).toEqual([
@@ -98,6 +108,8 @@ describe('platform loop from a fresh profile', () => {
       'dock_left',
       'dock_entered',
       'resource_sold',
+      'dock_left',
+      'dock_entered',
       ...SIX_TRACKS.map(() => 'upgrade_purchased'),
     ])
     expect(
@@ -111,7 +123,8 @@ describe('platform loop from a fresh profile', () => {
   })
 
   it('logs a refused purchase as command_rejected and leaves the money alone', () => {
-    game().dock()
+    game().dock('sell')
+    driveToUpgradeBay()
     game().buyUpgrade('drill_tip')
     expect(sink.events.at(-1)).toMatchObject({
       event: 'command_rejected',
@@ -121,7 +134,7 @@ describe('platform loop from a fresh profile', () => {
   })
 
   it('shows the docked vehicle and the empty core bay of a fresh run', () => {
-    game().dock()
+    game().dock('sell')
     expect(game().vehicle.mode).toBe('docked')
     expect(game().platform).toEqual({ coreBay: 0, coreNeeded: 63, visualState: 'outpost' })
   })

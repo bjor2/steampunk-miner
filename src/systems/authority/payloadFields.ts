@@ -4,6 +4,7 @@
  * trimmed, with every problem listed.
  */
 import { isNonNegativeMoneyText } from '../money'
+import { isBayId } from '../world/dockBays'
 
 export type FieldKind =
   | 'wholeNumber'
@@ -13,6 +14,8 @@ export type FieldKind =
   | 'text'
   /** An ore tier (a safe integer >= 1) or the word `"all"`, as `SellCargo` takes (#8). */
   | 'tierOrAll'
+  /** One of the platform's bays, `"sell"` or `"upgrade"` (#37). */
+  | 'bay'
 
 export type PayloadFields = Readonly<Record<string, FieldKind>>
 
@@ -41,6 +44,7 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     flag: { isValid: (value) => typeof value === 'boolean', expected: 'true or false' },
     text: { isValid: (value) => typeof value === 'string', expected: 'a string' },
     tierOrAll: { isValid: isTierOrAll, expected: 'an ore tier >= 1 or "all"' },
+    bay: { isValid: isBayId, expected: '"sell" or "upgrade"' },
   }
 
 function fieldKindProblems(name: string, value: unknown, kind: FieldKind): string[] {

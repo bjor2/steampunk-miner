@@ -64,7 +64,7 @@ function reserveQuanta(session: BotSession, layout: MineLayout, from: TilePoint)
 export function returnQuanta(session: BotSession, layout: MineLayout, from: TilePoint): number {
   const speed = statsOfVehicle(session.vehicle()).engine.speedMax
   const along =
-    Math.abs(from.tx - layout.shaftColumn) + Math.abs(layout.shaftColumn - layout.dockPoint.tx)
+    Math.abs(from.tx - layout.shaftColumn) + Math.abs(layout.shaftColumn - layout.sellBay.tx)
   const climb = Math.max(0, layout.travelRow - from.ty)
   return moveQuanta(moveTicks(along, speed), moveTicks(climb, speed))
 }

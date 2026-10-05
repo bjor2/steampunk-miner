@@ -6,13 +6,14 @@
  * Contexts are layers: `settings` over everything, then `platform` while docked (the screen is
  * open exactly then), else `vehicle`. Escape closes the top layer: settings, then the platform
  * screen (that is `Undock`), and in `vehicle` it opens settings. An action outside its context, a
- * dock the authority would refuse and a tow call while the vehicle can still move do nothing and
- * are not buffered.
+ * dock the authority would refuse, the quick action away from the Sell bay (#37, #40) and a tow
+ * call while the vehicle can still move do nothing and are not buffered.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import { dockCommand, quickServiceCommand, undockCommand } from '../platform/platformCommands'
 import { requestRescueCommand } from '../vehicle/vehicleCommands'
 import type { VehicleMode } from '../vehicle/vehicleState'
+import type { BayId } from '../world/dockBays'
 import type { ActionId, InputContext } from './actionMap'
 
 export type InputReaction =
@@ -28,8 +29,10 @@ export type InputReaction =
 export interface InputSituation {
   layer: InputContext
   vehicleMode: VehicleMode
-  /** `canDock` (#23): the dock prompt shows, and `interact` docks, exactly then. */
-  canDock: boolean
+  /** The bay `canDock` holds for (#23, #37): the dock prompt shows, and `interact` docks, there. */
+  dockableBay: BayId | null
+  /** The bay the vehicle is docked at; null while it is not docked. */
+  dockedBay: BayId | null
 }
 
 type ReactionRule = (situation: InputSituation) => InputReaction
@@ -50,14 +53,14 @@ const REACTIONS_BY_LAYER: Readonly<
   Record<InputContext, Readonly<Partial<Record<ActionId, ReactionRule>>>>
 > = {
   vehicle: {
-    interact: ({ canDock }) => (canDock ? submit(dockCommand()) : NONE),
+    interact: ({ dockableBay }) => (dockableBay === null ? NONE : submit(dockCommand(dockableBay))),
     request_rescue: ({ vehicleMode }) =>
       isWaitingForTow(vehicleMode) ? submit(requestRescueCommand()) : NONE,
     open_settings: () => ({ kind: 'openSettings' }),
   },
   platform: {
     ...MENU_REACTIONS,
-    quick_service: () => submit(quickServiceCommand()),
+    quick_service: ({ dockedBay }) => (dockedBay === 'sell' ? submit(quickServiceCommand()) : NONE),
     ui_cancel: () => submit(undockCommand()),
   },
   settings: {

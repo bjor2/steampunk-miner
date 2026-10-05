@@ -1,14 +1,15 @@
 /**
  * The platform's command intents (decision #8 registered commands, #23), as the store submits
- * them: `Dock`, `Undock`, `SellCargo {resourceTier | all}`, `RepairHull`, `RechargeEnergy`,
+ * them: `Dock {bay}`, `Undock`, `SellCargo {resourceTier | all}`, `RepairHull`, `RechargeEnergy`,
  * `QuickService`, `BuyUpgrade {upgradeId}`, and `Travel {toPlanet}` (#10). The authority checks
  * and prices each one.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import type { OreSelection } from '../authority/platformServices'
+import type { BayId } from '../world/dockBays'
 
-export function dockCommand(): CommandIntent<'dock'> {
-  return { type: 'dock', payload: {} }
+export function dockCommand(bay: BayId): CommandIntent<'dock'> {
+  return { type: 'dock', payload: { bay } }
 }
 
 export function undockCommand(): CommandIntent<'undock'> {

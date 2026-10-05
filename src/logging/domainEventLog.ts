@@ -92,11 +92,11 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'vehicle_configuration_changed',
     data: { visualTier },
   }),
-  DockEntered: ({ cargoUnits, energy, hull }) => ({
+  DockEntered: ({ bay, cargoUnits, energy, hull }) => ({
     event: 'dock_entered',
-    data: { cargoUnits, energy, hull },
+    data: { bay, cargoUnits, energy, hull },
   }),
-  DockLeft: ({ durationTicks }) => ({ event: 'dock_left', data: { durationTicks } }),
+  DockLeft: ({ bay, durationTicks }) => ({ event: 'dock_left', data: { bay, durationTicks } }),
   CoreReached: () => ({ event: 'core_reached', data: {} }),
   CoreTileHarvested: ({ tilesRemaining, fragments }) => ({
     event: 'core_tile_harvested',

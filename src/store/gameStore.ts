@@ -50,6 +50,7 @@ import {
   travelCommand,
   undockCommand,
 } from '../systems/platform/platformCommands'
+import type { BayId } from '../systems/world/dockBays'
 import type { PlanetParams } from '../systems/world/planetParams'
 import type { WorldState } from '../systems/world/worldState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
@@ -123,13 +124,13 @@ export interface GameState
   setEnergy(units: string): void
   /** Debug: hull as a decimal string, at most `hullMax`. */
   setHull(hull: string): void
-  /** Debug: the vehicle on the dock point, docked, with no tow and no fee. */
-  teleportToDock(): void
+  /** Debug: the vehicle at rest in a bay, docked, with no tow and no fee (#37). */
+  teleportToDock(bay: BayId): void
   /** The local vehicle's 5 Hz pose report (#11), built by the fixed-step loop. */
   reportPose(pose: PosePayload): void
   requestRescue(): void
-  /** The platform (#8): dock when stationary in the pad zone, then its facilities. */
-  dock(): void
+  /** The platform (#8, #37): dock when stationary in that bay's pad zone, then its facilities. */
+  dock(bay: BayId): void
   undock(): void
   /** One ore tier, or `'all'` of the hold's ore. */
   sellCargo(resourceTier: OreSelection): void
@@ -252,8 +253,8 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
   setHull: (hull) => submitUnlessRefused(get().playerId, setHullCommand(hull)),
 
-  teleportToDock: () => {
-    submitUnlessRefused(get().playerId, teleportToDockCommand())
+  teleportToDock: (bay) => {
+    submitUnlessRefused(get().playerId, teleportToDockCommand(bay))
     set({ depthTiles: 0 })
   },
 
@@ -264,7 +265,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
   requestRescue: () => submitCommand(get().playerId, requestRescueCommand()),
 
-  dock: () => submitCommand(get().playerId, dockCommand()),
+  dock: (bay) => submitCommand(get().playerId, dockCommand(bay)),
 
   undock: () => submitCommand(get().playerId, undockCommand()),
 

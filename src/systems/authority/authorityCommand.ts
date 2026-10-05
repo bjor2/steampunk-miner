@@ -7,8 +7,13 @@
  * marks them instead of a separate flag that could disagree with the type.
  */
 
-/** Bump when a command or domain event changes shape or meaning; run metadata records it. */
-export const AUTHORITY_PROTOCOL_VERSION = 1
+import type { BayId } from '../world/dockBays'
+
+/**
+ * Bump when a command or domain event changes shape or meaning; run metadata records it.
+ * 2: `Dock {bay}` and the two bays of #37, with the run starting in the Sell bay.
+ */
+export const AUTHORITY_PROTOCOL_VERSION = 2
 
 export interface CommandPayloads {
   /**
@@ -35,8 +40,8 @@ export interface CommandPayloads {
   drillTile: { tx: number; ty: number; ticks: number }
   /** Calls the tow for a stranded or destroyed vehicle (#7, #8). */
   requestRescue: Record<string, never>
-  /** The platform (#8, #23): dock when stationary in the pad zone, and leave again. */
-  dock: Record<string, never>
+  /** The platform (#8, #23, #37): dock when stationary in that bay's pad zone, and leave again. */
+  dock: { bay: BayId }
   undock: Record<string, never>
   /** The shop: one ore tier, or `"all"` of the hold's ore. */
   sellCargo: { resourceTier: number | 'all' }
@@ -68,8 +73,11 @@ export interface CommandPayloads {
    */
   'debug.spawnEnemy': { kind: string; tier: number; dx: number; dy: number }
   'debug.clearEnemies': Record<string, never>
-  /** Puts the vehicle on the dock point and docks it there, no tow and no fee (#11 section 5). */
-  'debug.teleportToDock': Record<string, never>
+  /**
+   * Puts the vehicle at rest in one bay and docks it there, no tow and no fee (#11 section 5,
+   * #37: scripted runs move between the bays with it).
+   */
+  'debug.teleportToDock': { bay: BayId }
   /** Frozen enemies neither move, wind up, attack nor spawn; the drill still cuts them. */
   'debug.freezeEnemies': { frozen: boolean }
 }

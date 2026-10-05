@@ -5,6 +5,7 @@
 import type { CommandIntent } from '../authority/authorityCommand'
 import { fromCanonical, toCanonical } from '../money'
 import type { PosePayload } from './poseReport'
+import type { BayId } from '../world/dockBays'
 
 export function reportPoseCommand(payload: PosePayload): CommandIntent<'reportPose'> {
   return { type: 'reportPose', payload }
@@ -25,8 +26,9 @@ export function setEnergyCommand(units: string): CommandIntent<'debug.setEnergy'
   return { type: 'debug.setEnergy', payload: { energy: units } }
 }
 
-export function teleportToDockCommand(): CommandIntent<'debug.teleportToDock'> {
-  return { type: 'debug.teleportToDock', payload: {} }
+/** A bay that is not `sell` or `upgrade` is passed on as written, so the authority names it. */
+export function teleportToDockCommand(bay: BayId): CommandIntent<'debug.teleportToDock'> {
+  return { type: 'debug.teleportToDock', payload: { bay } }
 }
 
 /** A malformed hull is passed on as written, so the authority names the problem. */

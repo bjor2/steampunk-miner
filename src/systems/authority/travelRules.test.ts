@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { travelFee } from '../economy/planetCharges'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import { fromCanonical, sub, toCanonical } from '../money'
-import { dockedPoseAt } from '../vehicle/vehiclePose'
+import { bayPoseAt, dockedPoseAt } from '../vehicle/vehiclePose'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor } from '../world/planetParams'
 import type { DomainEvent } from './domainEvent'
@@ -10,7 +10,8 @@ import { createScriptedSession, GROUND, poseAbove, typesOf, WORLD_SEED } from '.
 import { stateDigest } from './stateDigest'
 import { canTravel } from './travelRules'
 
-const dock = { type: 'dock', payload: {} } as const
+const SITE_1 = dockSiteOf(planetParamsFor(WORLD_SEED, 1))
+const dock = { type: 'dock', payload: { bay: 'sell' } } as const
 const travelTo = (toPlanet: number) => ({ type: 'travel', payload: { toPlanet } }) as const
 const setCore = (count: number) => ({ type: 'debug.setCoreFragments', payload: { count } }) as const
 const setMoney = (amount: string) => ({ type: 'debug.setMoney', payload: { amount } }) as const
@@ -64,6 +65,21 @@ describe('travel', () => {
       radius: 400,
     })
     expect(events[4]).toMatchObject({ scope: 'travel', digest: stateDigest(session.state()) })
+  })
+
+  it('travels from the Upgrade bay as from the Sell bay (#37), landing in the Sell bay', () => {
+    const session = createScriptedSession()
+    session.submit(0, setMoney('1000'))
+    session.submit(0, setCore(63))
+    session.submit(5, {
+      ...poseAbove(GROUND, 1),
+      payload: { ...poseAbove(GROUND, 1).payload, ...bayPoseAt(SITE_1, 'upgrade') },
+    })
+    session.submit(5, { type: 'dock', payload: { bay: 'upgrade' } })
+    expect(canTravel(session.state(), 'p1')).toBe(true)
+    expect(typesOf(session.submit(10, travelTo(2)))).toContain('TravelStarted')
+    const site = dockSiteOf(planetParamsFor(WORLD_SEED, 2))
+    expect(session.vehicle()).toMatchObject({ mode: 'docked', pose: dockedPoseAt(site) })
   })
 
   it('places the docked vehicle on planet 2 dock site with a fresh world and core', () => {

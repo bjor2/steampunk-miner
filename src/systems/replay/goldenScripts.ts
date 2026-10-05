@@ -14,7 +14,7 @@ import {
 } from '../authority/combat/combatFixtures'
 import { drill, GROUND, poseAbove, surfaceOreTiles, WORLD_SEED } from '../authority/scriptedSession'
 import type { ScriptedCommand } from '../fastForward'
-import { dockedPoseAt, FACING } from '../vehicle/vehiclePose'
+import { bayPoseAt, dockedPoseAt, FACING } from '../vehicle/vehiclePose'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor, type PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
@@ -104,7 +104,7 @@ function homeAndSellAt(tick: number, params: PlanetParams): ScriptedCommand[] {
   const { payload } = poseAbove(GROUND, FACING.right)
   return [
     { tick, type: 'reportPose', payload: { ...payload, ...home } },
-    { tick, type: 'dock', payload: {} },
+    { tick, type: 'dock', payload: { bay: 'sell' } },
     { tick: tick + 30, type: 'sellCargo', payload: { resourceTier: 'all' } },
     { tick: tick + 60, type: 'undock', payload: {} },
   ]
@@ -140,6 +140,18 @@ function moneyPast1e40Commands(params: PlanetParams): ScriptedCommand[] {
     ...levels.map((intent) => ({ tick: 0, ...intent }) as ScriptedCommand),
     ...mineTilesFrom(1, surfaceOreTiles(3, params)),
     ...homeAndSellAt(tripEnd, params).slice(0, 3),
+    ...dockInUpgradeBayAt(tripEnd + 40, params),
     { tick: tripEnd + 45, type: 'buyUpgrade', payload: { upgradeId: 'cargo_hold' } },
+  ]
+}
+
+/** Upgrades are bought at the Upgrade bay (#37): leave the Sell bay, drive over, dock. */
+function dockInUpgradeBayAt(tick: number, params: PlanetParams): ScriptedCommand[] {
+  const bay = bayPoseAt(dockSiteOf(params), 'upgrade')
+  const { payload } = poseAbove(GROUND, FACING.right)
+  return [
+    { tick, type: 'undock', payload: {} },
+    { tick: tick + 2, type: 'reportPose', payload: { ...payload, ...bay, driveTicks: 2 } },
+    { tick: tick + 2, type: 'dock', payload: { bay: 'upgrade' } },
   ]
 }

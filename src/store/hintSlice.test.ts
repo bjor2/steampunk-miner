@@ -70,7 +70,7 @@ function playFirstTrip(): void {
   const atDock = { ...idle, ...dockedPoseAt(dockSiteOf(PLANET_1)) }
   commands.push({ tick: home, type: 'reportPose', payload: atDock })
   game().fastForward(home - readAuthorityTick(), commands)
-  game().dock()
+  game().dock('sell')
   game().sellCargo('all')
 }
 

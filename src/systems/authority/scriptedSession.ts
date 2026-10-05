@@ -3,7 +3,8 @@
  * `applyCommand`, the clock moved with `advanceTicks`, every event kept, as a replay does. Plus the
  * planet-1 places the vehicle specs mine at. Pure, so it runs in node with no store.
  */
-import { FACING, type Facing } from '../vehicle/vehiclePose'
+import { bayPoseAt, FACING, type Facing } from '../vehicle/vehiclePose'
+import type { BayId } from '../world/dockBays'
 import { vehicleOf, createAuthorityState, type AuthorityState } from './authorityState'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor, type PlanetParams } from '../world/planetParams'
@@ -77,6 +78,21 @@ export function poseAbove(tile: TilePoint, facing: Facing, counts: Partial<Actio
       ...counts,
     },
   }
+}
+
+/** At rest in one bay's pad zone on planet 1 (#37), as a pose report. */
+export function poseInBay(bay: BayId) {
+  const { payload } = poseAbove(GROUND, FACING.right)
+  return { type: 'reportPose' as const, payload: { ...payload, ...bayPoseAt(SITE, bay) } }
+}
+
+/** Undocks if docked, drives onto a bay's pad and docks there, all at one tick (#37). */
+export function dockInBay(session: ScriptedSession, tick: number, bay: BayId): DomainEvent[] {
+  if (vehicleOf(session.state(), 'p1').mode === 'docked') {
+    session.submit(tick, { type: 'undock', payload: {} })
+  }
+  session.submit(tick, poseInBay(bay))
+  return session.submit(tick, { type: 'dock', payload: { bay } })
 }
 
 /**

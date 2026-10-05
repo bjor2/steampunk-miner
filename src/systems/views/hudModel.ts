@@ -6,7 +6,8 @@
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
 import type { AuthorityState } from '../authority/authorityState'
-import { canDock } from '../authority/dockRules'
+import { dockableBayOf } from '../authority/dockRules'
+import { BAY_NAMES } from './bayNames'
 import { serviceQuote } from '../authority/platformServices'
 import { formatAmount } from '../displayAmount'
 import { boundLabel, type Bindings } from '../input/actionMap'
@@ -176,8 +177,14 @@ function energyWarningOf(vehicle: VehicleState, depthTiles: number): EnergyWarni
   }
 }
 
+/** The prompt names the bay the vehicle would dock at (#37). */
 function dockPromptOf(state: AuthorityState, playerId: string, bindings: Bindings): DockPrompt {
-  return { isShown: canDock(state, playerId), text: `${boundLabel(bindings, 'interact')}: Dock` }
+  const bay = dockableBayOf(state, playerId)
+  const label = boundLabel(bindings, 'interact')
+  return {
+    isShown: bay !== null,
+    text: bay === null ? '' : `${label}: Dock at the ${BAY_NAMES[bay]}`,
+  }
 }
 
 /** A BigStat ratio as a whole number of thousandths, at most 1000; display only. */

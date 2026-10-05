@@ -1,10 +1,12 @@
 /**
- * The bot's mine on one planet (#29): one vertical shaft just east of the pad and horizontal
+ * The bot's mine on one planet (#29): one vertical shaft just east of the pad (past the Upgrade
+ * bay, #37) and horizontal
  * galleries off it, three rows apart, so each gallery tile has an untouched row above and below
  * whose ore (or core) the drill can reach without moving. The bot remembers how far each gallery
  * reaches; the authority's world is the truth about what is open.
  */
 import { bandOfTile, isCoreTile, isInsidePlanet } from '../world/planetGeometry'
+import { bayRestTileOf } from '../world/dockBays'
 import type { DockSite } from '../world/dockSite'
 import type { PlanetParams } from '../world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
@@ -22,9 +24,11 @@ export interface Gallery {
 export interface MineLayout {
   params: PlanetParams
   shaftColumn: number
-  /** The row just above the pad: the bot drives along it between the dock point and the shaft. */
+  /** The row just above the pad: the bot drives along it between the bays and the shaft. */
   travelRow: number
-  dockPoint: TilePoint
+  /** Where the bot docks to sell (every return) and to buy (#37), one tile in each bay. */
+  sellBay: TilePoint
+  upgradeBay: TilePoint
   /** The lowest row the shaft is open down to; the vehicle can stand anywhere above it. */
   shaftBottomRow: number
   galleries: Map<number, Gallery>
@@ -42,7 +46,8 @@ export function newMineLayout(params: PlanetParams, site: DockSite): MineLayout 
     params,
     shaftColumn: site.lastColumn + 2,
     travelRow,
-    dockPoint: site.dockPoint,
+    sellBay: bayRestTileOf(site, 'sell'),
+    upgradeBay: bayRestTileOf(site, 'upgrade'),
     shaftBottomRow: travelRow,
     galleries: new Map(),
   }

@@ -48,6 +48,7 @@ import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForwar
 import { validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems } from '../systems/startScenario'
 import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
+import type { BayId } from '../systems/world/dockBays'
 import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'
 import {
   createDebugInput,
@@ -86,8 +87,11 @@ export interface DebugApi {
   teleportToDepthTiles(depthTiles: number): DebugResult
   /** `depthBp` is basis points of the planet's radius (#11): 0 the surface, 10000 the centre. */
   teleportToDepth(depthBp: number): DebugResult
-  /** The vehicle on the dock point, docked, with no tow and no fee (`debug.teleportToDock`). */
-  teleportToDock(): DebugResult
+  /**
+   * The vehicle at rest in a bay (`sell` unless named, #37), docked, with no tow and no fee
+   * (`debug.teleportToDock`).
+   */
+  teleportToDock(bay?: string): DebugResult
   /** `amount` is a decimal string >= 0, for example "1e100" (decision #5). */
   giveMoney(amount: string): DebugResult
   /** A `scenarioVersion` 1 file, already parsed from JSON. */
@@ -213,9 +217,9 @@ export function createDebugApi(): DebugApi {
       runUnlessRefused(depthBpProblems(depthBp), () =>
         game().teleportToDepthTiles(depthTilesOfBp(depthBp)),
       ),
-    teleportToDock: () =>
-      runUnlessRefused(vehicleDebugProblems(teleportToDockCommand()), () =>
-        game().teleportToDock(),
+    teleportToDock: (bay = 'sell') =>
+      runUnlessRefused(vehicleDebugProblems(teleportToDockCommand(bay as BayId)), () =>
+        game().teleportToDock(bay as BayId),
       ),
     giveMoney: (amount) =>
       runUnlessRefused(startScenarioProblems({ money: amount }), () => game().giveMoney(amount)),

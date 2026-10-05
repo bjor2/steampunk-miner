@@ -1,6 +1,6 @@
 /**
  * The workshop's `BuyUpgrade {upgradeId}` (decisions #7 and #6 section 3, #23 acceptance 6 and 7):
- * one command raises exactly one level of one track for `upgradePrice(id, fromLevel, planet)`.
+ * one command at the Upgrade bay (#37) raises exactly one level of one track for `upgradePrice(id, fromLevel, planet)`.
  * Hull and energy keep their values; the new maximum shows in `statsAfter` and the next repair or
  * recharge fills up to it. `vehicle_configuration_changed` follows when the sum of the six levels
  * crosses `T2` or `T3`. A refused purchase changes nothing and logs no purchase.
@@ -20,7 +20,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
-import { notDockedRejection } from './dockRules'
+import { atBayRejection } from './dockRules'
 import type { DomainEventBody } from './domainEvent'
 import { visualTierEvents } from './vehicleDebugRules'
 
@@ -41,9 +41,8 @@ export function upgradeRefusal(
   playerId: string,
   upgradeId: string,
 ): Rejection | null {
-  const vehicle = vehicleOf(state, playerId)
   return firstRejection([
-    () => notDockedRejection(vehicle),
+    () => atBayRejection(state, playerId, 'upgrade'),
     () => unknownUpgradeRejection(upgradeId),
     () => upgradeMoneyRejection(state, playerId, upgradeId as UpgradeId),
   ])

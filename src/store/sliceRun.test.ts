@@ -5,7 +5,7 @@ import { runEventProblems } from '../logging/runEventSchema'
 import { coreTiles, surfaceOreTiles } from '../systems/authority/scriptedSession'
 import type { ScriptedCommand } from '../systems/fastForward'
 import { isSliceEndReached } from '../systems/sliceProgress'
-import { FACING, dockedPoseAt } from '../systems/vehicle/vehiclePose'
+import { FACING, bayPoseAt, dockedPoseAt } from '../systems/vehicle/vehiclePose'
 import { dockSiteOf } from '../systems/world/dockSite'
 import { planetParamsFor, type PlanetParams } from '../systems/world/planetParams'
 import type { TilePoint } from '../systems/world/tileGrid'
@@ -91,7 +91,16 @@ function mineTripAndDock(params: PlanetParams, tiles: readonly TilePoint[]): voi
   const atDock = { ...dockedPoseAt(dockSiteOf(params)), ...idlePose }
   commands.push({ tick: home, type: 'reportPose', payload: atDock })
   game().fastForward(home - readAuthorityTick(), commands)
-  game().dock()
+  game().dock('sell')
+}
+
+/** Upgrades are bought at the Upgrade bay (#37): leave the Sell bay, drive 8 m, dock there. */
+function driveToUpgradeBay(params: PlanetParams): void {
+  game().undock()
+  const tick = readAuthorityTick() + 2
+  const pose = { ...bayPoseAt(dockSiteOf(params), 'upgrade'), ...idlePose, driveTicks: 2 }
+  game().fastForward(2, [{ tick, type: 'reportPose', payload: pose }])
+  game().dock('upgrade')
 }
 
 /** As bootstrap starts a run: `game_started`, then the starting planet's `planet_entered`. */
@@ -113,6 +122,7 @@ function earnAndBuyEveryTrack(): void {
     mineTripAndDock(PLANET_1, trip)
     game().sellCargo('all')
   }
+  driveToUpgradeBay(PLANET_1)
   for (const upgradeId of SIX_TRACKS) game().buyUpgrade(upgradeId)
 }
 
@@ -181,7 +191,7 @@ describe('slice run on both planets', () => {
   it('plays the travel transition after the state has already changed, and skips it', () => {
     game().setCoreFragments(63)
     game().giveMoney('100')
-    game().dock()
+    game().dock('sell')
     game().travel()
     expect(game().planetTier).toBe(2)
     expect(game().travelTransition).toEqual({ fromPlanet: 1, toPlanet: 2 })
@@ -193,7 +203,7 @@ describe('slice run on both planets', () => {
   it('refuses travel with too few fragments and loses no state', () => {
     game().setCoreFragments(62)
     game().giveMoney('100')
-    game().dock()
+    game().dock('sell')
     const before = { ...game() }
     game().travel()
     expect(sink.events.at(-1)).toMatchObject({
@@ -238,6 +248,7 @@ describe('presentation settings and the run', () => {
     })
     mineTripAndDock(PLANET_1, surfaceOreTiles(10, PLANET_1))
     game().sellCargo('all')
+    driveToUpgradeBay(PLANET_1)
     game().buyUpgrade('cargo_hold')
     stopListening()
     return { digest: takeSessionSnapshot().digest, heard }

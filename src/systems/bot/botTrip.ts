@@ -1,10 +1,12 @@
 /**
- * One trip of the pacing bot (#29): leave the pad, go down the shaft to a gallery, bore it out
+ * One trip of the pacing bot (#29): leave the pad (from either bay), go down the shaft to a gallery, bore it out
  * (on a core trip, taking the core tiles just above and below on the way), and turn home while
- * the tank still holds the climb back plus a margin (`botEnergy.ts`). A trip ends docked, or towed after a strand or a death,
+ * the tank still holds the climb back plus a margin (`botEnergy.ts`). A trip ends docked at the
+ * Sell bay, or towed after a strand or a death,
  * which the bot never causes on purpose but combat can.
  */
 import { coreNeededOf } from '../authority/coreBay'
+import { dockCommand, undockCommand } from '../platform/platformCommands'
 import { cargoUnitsOf, isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { assertReturnReserve, canAffordBore, canAffordMoveTo } from './botEnergy'
@@ -46,8 +48,15 @@ export function runTrip(session: BotSession, planet: BotPlanet, goal: TripGoal):
   else waitForTow(session, planet)
 }
 
+/** Drives from the Sell bay to the Upgrade bay (#37) and docks there, to buy. */
+export function driveToUpgradeBay(session: BotSession, planet: BotPlanet): void {
+  leavePad(session)
+  moveStraight(session, planet.pilot, planet.layout.upgradeBay)
+  session.submit(dockCommand('upgrade'))
+}
+
 function leavePad(session: BotSession): void {
-  if (session.vehicle().mode === 'docked') session.submit({ type: 'undock', payload: {} })
+  if (session.vehicle().mode === 'docked') session.submit(undockCommand())
 }
 
 function mineUntilTurnBack(session: BotSession, planet: BotPlanet, goal: TripGoal): void {
@@ -194,13 +203,13 @@ function returnAndDock(session: BotSession, planet: BotPlanet): void {
   const { layout, pilot } = planet
   moveStraight(session, pilot, shaftTileAt(layout, pilot.position.ty))
   moveStraight(session, pilot, shaftTileAt(layout, layout.travelRow))
-  moveStraight(session, pilot, layout.dockPoint)
-  if (isVehicleActive(session.vehicle())) session.submit({ type: 'dock', payload: {} })
+  moveStraight(session, pilot, layout.sellBay)
+  if (isVehicleActive(session.vehicle())) session.submit(dockCommand('sell'))
   else waitForTow(session, planet)
 }
 
 /** A stranded or destroyed vehicle is towed home after its grace or delay (#7). */
 function waitForTow(session: BotSession, planet: BotPlanet): void {
   while (session.vehicle().mode !== 'docked') session.wait(TOW_WAIT_TICKS)
-  planet.pilot.position = planet.layout.dockPoint
+  planet.pilot.position = planet.layout.sellBay
 }

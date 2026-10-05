@@ -6,7 +6,7 @@
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import type { DomainEvent, DomainEventBodies, DomainEventType } from '../authority/domainEvent'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
-import { isInPadZone, isPoseStationary, tileOfPose } from '../vehicle/vehiclePose'
+import { dockedPoseAt, isInPadZone, isPoseStationary, tileOfPose } from '../vehicle/vehiclePose'
 import { isVehicleActive } from '../vehicle/vehicleState'
 
 /** What the hint boards look at: the state after a batch of events, and that batch. */
@@ -25,7 +25,7 @@ export const HINT_CONDITIONS = {
   /** True at the first moment a board sees; the boards start watching when the run starts. */
   runStarted: () => true,
   leftPadZone: isOutsidePadZone,
-  vehicleMoved: hasLeftDockPoint,
+  vehicleMoved: hasLeftStartTile,
   tileDestroyed: (moment) => hasPlayerEvent(moment, 'TileDestroyed'),
   resourceCollected: (moment) => hasPlayerEvent(moment, 'CargoAdded'),
   docked: (moment) => hasPlayerEvent(moment, 'DockEntered'),
@@ -63,14 +63,15 @@ function isOutsidePadZone({ state, playerId }: HintMoment): boolean {
   return !isInPadZone(site, vehicle.pose)
 }
 
-/** A run starts at rest on the dock point; driving off it or speeding up is the first movement. */
-function hasLeftDockPoint({ state, playerId }: HintMoment): boolean {
+/** A run starts at rest in the Sell bay; driving off that tile or speeding up is the first movement. */
+function hasLeftStartTile({ state, playerId }: HintMoment): boolean {
   const pose = vehicleOf(state, playerId).pose
   const site = dockSiteOfPlanet(state.planet)
   if (site === null || pose === null) return false
   const tile = tileOfPose(pose)
-  const isOnDockPoint = tile.tx === site.dockPoint.tx && tile.ty === site.dockPoint.ty
-  return !isOnDockPoint || !isPoseStationary(pose)
+  const start = tileOfPose(dockedPoseAt(site))
+  const isOnStartTile = tile.tx === start.tx && tile.ty === start.ty
+  return !isOnStartTile || !isPoseStationary(pose)
 }
 
 function hasPlayerEvent(moment: HintMoment, type: DomainEventType): boolean {

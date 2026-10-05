@@ -8,7 +8,7 @@ import { createScriptedSession, PARAMS, SITE, type ScriptedSession } from '../sc
 import { poseAt, prepareCorridor, setUpgrade, spawnEnemy } from './combatFixtures'
 import { spawnPointsOfChunk, type SpawnPoint } from './spawnPoints'
 
-const dock: CommandIntent = { type: 'dock', payload: {} }
+const dock: CommandIntent = { type: 'dock', payload: { bay: 'sell' } }
 const undock: CommandIntent = { type: 'undock', payload: {} }
 const atDock: CommandIntent = {
   ...poseAt({ tx: 0, ty: 0 }, { facing: FACING.right }),

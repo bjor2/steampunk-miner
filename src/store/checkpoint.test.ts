@@ -63,7 +63,7 @@ async function quitAndResume(): Promise<void> {
 
 describe('checkpoint', () => {
   it('writes the save when the vehicle docks and logs checkpoint_saved', async () => {
-    game().dock()
+    game().dock('sell')
     await checkpointWrites()
     const file = savedFile()
     expect(readSaveSlot(file).problems).toEqual([])
@@ -79,7 +79,7 @@ describe('checkpoint', () => {
 
   it('writes again after each purchase at the dock, never out on a trip', async () => {
     game().giveMoney('1e6')
-    game().dock()
+    game().teleportToDock('upgrade')
     game().buyUpgrade('hull')
     game().undock()
     await checkpointWrites()
@@ -90,7 +90,7 @@ describe('checkpoint', () => {
   it('restores money, upgrades and core bay after a quit and resume at the dock', async () => {
     game().giveMoney('1e6')
     game().setCoreFragments(5)
-    game().dock()
+    game().teleportToDock('upgrade')
     game().buyUpgrade('drill_power')
     const before = game()
     await quitAndResume()
@@ -104,7 +104,7 @@ describe('checkpoint', () => {
   it('writes on travel and resumes on the planet it travelled to', async () => {
     game().giveMoney('1e9')
     game().setCoreFragments(400)
-    game().dock()
+    game().dock('sell')
     game().travel()
     await quitAndResume()
     expect(game().planetTier).toBe(2)
@@ -112,17 +112,17 @@ describe('checkpoint', () => {
   })
 
   it('continues the epoch and the command seqs after a resume', async () => {
-    game().dock()
+    game().dock('sell')
     await quitAndResume()
     game().undock()
-    game().dock()
+    game().dock('sell')
     await checkpointWrites()
     expect(linesNamed('command_rejected')).toEqual([])
     expect(savedFile().saveEpoch).toBe(2)
   })
 
   it('logs checkpoint_loaded with the slot, epoch and digest, and every line is registered', async () => {
-    game().dock()
+    game().dock('sell')
     await quitAndResume()
     expect(linesNamed('checkpoint_loaded').map((line) => line.data)).toEqual([
       { slot: 'slot-1', epoch: 1, digest: savedFile().digest },
@@ -131,14 +131,14 @@ describe('checkpoint', () => {
   })
 
   it('logs nothing as debug when resuming', async () => {
-    game().dock()
+    game().dock('sell')
     await quitAndResume()
     expect(linesNamed('debug_command_applied')).toEqual([])
     expect(game().debugApplied).toBe(false)
   })
 
   it('sets a refused save aside, never overwriting it, and starts fresh', async () => {
-    game().dock()
+    game().dock('sell')
     await checkpointWrites()
     const refused = JSON.stringify({ ...savedFile(), generatorVersion: 99 })
     disk.files.set('slot-1.json', refused)

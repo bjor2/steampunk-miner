@@ -5,6 +5,7 @@ import {
   GROUND,
   mineTile,
   poseAbove,
+  poseInBay,
   SITE,
   surfaceOreTiles,
 } from '../authority/scriptedSession'
@@ -101,11 +102,11 @@ describe('hint board', () => {
     watched.mine(GAP + 10, ores[1])
     watched.advanceTo(2 * GAP)
     watched.submit(2 * GAP + 10, restOnDockPoint())
-    watched.submit(2 * GAP + 20, dockCommand())
+    watched.submit(2 * GAP + 20, dockCommand('sell'))
     watched.submit(2 * GAP + 30, undockCommand())
     watched.mine(2 * GAP + 40, ores[2])
     watched.submit(3 * GAP + 10, restOnDockPoint())
-    watched.submit(3 * GAP + 20, dockCommand())
+    watched.submit(3 * GAP + 20, dockCommand('sell'))
     expect(watched.shownIds()).toEqual(['hint_move', 'hint_drill', 'hint_cargo', 'hint_dock'])
   })
 
@@ -113,9 +114,12 @@ describe('hint board', () => {
     const watched = watchedSession(['hint_move', 'hint_drill', 'hint_cargo'])
     watched.mine(12, surfaceOreTiles(1)[0])
     watched.submit(60, restOnDockPoint())
-    watched.submit(70, dockCommand())
+    watched.submit(70, dockCommand('sell'))
     expect(watched.step().board.shown?.id).toBe('hint_dock')
     watched.submit(80, { type: 'debug.grantMoney', payload: { amount: '1e9' } })
+    watched.submit(85, undockCommand())
+    watched.submit(85, poseInBay('upgrade'))
+    watched.submit(86, dockCommand('upgrade'))
     watched.submit(90, buyUpgradeCommand('engine'))
     expect(watched.step().board.shown).toBeNull()
   })
@@ -128,7 +132,7 @@ describe('hint board', () => {
     watched.submit(140, poseAbove(GROUND, FACING.right, { driveTicks: 120 }))
     expect(watched.step().board.shown).toMatchObject({ id: 'hint_energy', rescueCost: null })
     watched.submit(150, restOnDockPoint())
-    watched.submit(160, dockCommand())
+    watched.submit(160, dockCommand('sell'))
     expect(watched.step().board.shown).toBeNull()
   })
 

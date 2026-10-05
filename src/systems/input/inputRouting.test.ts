@@ -1,25 +1,46 @@
 import { describe, expect, it } from 'vitest'
 import { reactionToPress, topLayerOf, type InputSituation } from './inputRouting'
 
-const DRIVING: InputSituation = { layer: 'vehicle', vehicleMode: 'active', canDock: false }
-const ON_PAD: InputSituation = { ...DRIVING, canDock: true }
-const DOCKED: InputSituation = { layer: 'platform', vehicleMode: 'docked', canDock: false }
+const DRIVING: InputSituation = {
+  layer: 'vehicle',
+  vehicleMode: 'active',
+  dockableBay: null,
+  dockedBay: null,
+}
+const ON_PAD: InputSituation = { ...DRIVING, dockableBay: 'sell' }
+const DOCKED: InputSituation = {
+  layer: 'platform',
+  vehicleMode: 'docked',
+  dockableBay: null,
+  dockedBay: 'sell',
+}
+const AT_UPGRADE_BAY: InputSituation = { ...DOCKED, dockedBay: 'upgrade' }
 const SETTINGS: InputSituation = { ...DRIVING, layer: 'settings' }
 
-const submitted = (type: string) => ({ kind: 'submit', intent: { type, payload: {} } })
+const submitted = (type: string, payload: object = {}) => ({
+  kind: 'submit',
+  intent: { type, payload },
+})
 
 describe('input routing', () => {
   it('docks on interact exactly when the authority would accept the dock', () => {
-    expect(reactionToPress('interact', ON_PAD)).toEqual(submitted('dock'))
+    expect(reactionToPress('interact', ON_PAD)).toEqual(submitted('dock', { bay: 'sell' }))
     expect(reactionToPress('interact', DRIVING)).toEqual({ kind: 'none' })
+  })
+
+  it('docks at the bay the vehicle stands in', () => {
+    expect(reactionToPress('interact', { ...DRIVING, dockableBay: 'upgrade' })).toEqual(
+      submitted('dock', { bay: 'upgrade' }),
+    )
   })
 
   it('undocks when the platform screen is closed with ui_cancel', () => {
     expect(reactionToPress('ui_cancel', DOCKED)).toEqual(submitted('undock'))
   })
 
-  it('runs the quick service only on the platform screen', () => {
+  it('runs the quick service only at the Sell bay', () => {
     expect(reactionToPress('quick_service', DOCKED)).toEqual(submitted('quickService'))
+    expect(reactionToPress('quick_service', AT_UPGRADE_BAY)).toEqual({ kind: 'none' })
     expect(reactionToPress('quick_service', DRIVING)).toEqual({ kind: 'none' })
   })
 

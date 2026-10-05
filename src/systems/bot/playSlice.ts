@@ -17,12 +17,13 @@ import type { DomainEvent } from '../authority/domainEvent'
 import { canTravel } from '../authority/travelRules'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
 import { canScratch } from '../vehicle/drillRule'
+import { bayRestTileOf } from '../world/dockBays'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
-import { buyUpgrades, serviceAtDock } from './botShopping'
+import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
 import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
-import { runTrip } from './botTrip'
+import { driveToUpgradeBay, runTrip } from './botTrip'
 import type { TripGoal } from './tripGoal'
 import { paramsOfSession } from './botWorld'
 import { newMineLayout } from './mineLayout'
@@ -89,7 +90,7 @@ function botPlanetOf(session: BotSession): BotPlanet {
   if (site === null) throw new Error('the bot plays only on a generated planet')
   return {
     layout: newMineLayout(paramsOfSession(session.state()), site),
-    pilot: { position: site.dockPoint, facing: 1 },
+    pilot: { position: bayRestTileOf(site, 'sell'), facing: 1 },
   }
 }
 
@@ -107,8 +108,16 @@ function playDockCycle(session: BotSession, planet: BotPlanet): boolean {
   if (goal === null) return false
   runTrip(session, planet, goal)
   serviceAtDock(session)
-  buyUpgrades(session, { layout: planet.layout, isCoreTheGoal: isCoreTheGoal(session, planet) })
+  shopAtUpgradeBay(session, planet)
   return true
+}
+
+/** The bot drives over to the Upgrade bay (#37) only when it has something to buy there. */
+function shopAtUpgradeBay(session: BotSession, planet: BotPlanet): void {
+  const situation = { layout: planet.layout, isCoreTheGoal: isCoreTheGoal(session, planet) }
+  if (!hasPurchase(session, situation)) return
+  driveToUpgradeBay(session, planet)
+  buyUpgrades(session, situation)
 }
 
 function chooseGoal(session: BotSession, planet: BotPlanet): TripGoal | null {

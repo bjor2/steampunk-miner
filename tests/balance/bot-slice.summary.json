@@ -3,9 +3,9 @@
   "logSchemaVersion": 1,
   "outcome": "ended",
   "endReason": "slice_completed",
-  "durationTicks": 356432,
-  "durationSeconds": 5940.533333333334,
-  "eventCount": 11474,
+  "durationTicks": 358451,
+  "durationSeconds": 5974.183333333333,
+  "eventCount": 11584,
   "planetsVisited": [
     1,
     2
@@ -16,12 +16,12 @@
   "resourceUnitsCollected": 0,
   "resourceValueCollected": "0e+0",
   "moneyEarned": "3.9880586e+4",
-  "moneySpent": "3.9136059e+4",
+  "moneySpent": "3.913667e+4",
   "upgradeSpending": "3.8303e+4",
   "repairSpending": "1.14603e+2",
-  "chargingSpending": "4.30891e+2",
+  "chargingSpending": "4.31547e+2",
   "travelSpending": "6.075e+1",
-  "rescueFees": "2.26815e+2",
+  "rescueFees": "2.2677e+2",
   "upgradesPurchased": 89,
   "coreFragmentsHarvested": 190,
   "enemiesKilled": 17,
@@ -37,17 +37,17 @@
     "boiler": 18
   },
   "coreCompletedTicks": {
-    "1": 193247,
-    "2": 356432
+    "1": 194494,
+    "2": 358398
   },
   "milestones": {
     "planetReached": {
       "1": 0,
-      "2": 195335
+      "2": 196678
     },
-    "firstSale": 3040,
-    "firstUpgrade": 3040,
-    "firstDeath": 19759,
-    "firstCoreCompleted": 193247
+    "firstSale": 3120,
+    "firstUpgrade": 3200,
+    "firstDeath": 20039,
+    "firstCoreCompleted": 194494
   }
 }

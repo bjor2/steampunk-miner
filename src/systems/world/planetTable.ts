@@ -51,6 +51,15 @@ export const CAVE_THRESHOLD_BP = 7500
 export const DOCK_HALF_WIDTH_TILES = 6
 export const DOCK_CLEARANCE_TILES = 8
 
+/**
+ * The two bays on the pad (#37): the Sell bay and the Upgrade bay sit 8 m apart centre to centre,
+ * each centre this many tiles either side of the pad's middle, with the hub between them. Each
+ * bay's pad zone is 4 tiles wide, so the 12-tile pad holds both and the vehicle (0.9 m, #7) has to
+ * drive across the hub to go from one to the other.
+ */
+export const BAY_CENTRE_OFFSET_TILES = 4
+export const BAY_HALF_WIDTH_TILES = 2
+
 /** Radius formula (#6 section 2): `300 + floor(700*(p-1) / ((p-1) + 6))`. */
 export const RADIUS_BASE_TILES = 300
 export const RADIUS_GROWTH_TILES = 700

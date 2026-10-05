@@ -6,7 +6,9 @@ import { poseAt, prepareCorridor, spawnEnemy } from '../authority/combat/combatF
 import type { DomainEvent } from '../authority/domainEvent'
 import {
   createScriptedSession,
+  dockInBay,
   mineTile,
+  poseInBay,
   SITE,
   surfaceOreTiles,
   type ScriptedSession,
@@ -20,7 +22,7 @@ import { dockedPoseAt, FACING } from '../vehicle/vehiclePose'
 import { isCheckpointMoment } from './checkpointMoment'
 import { readSaveSlot, saveSlotOf, type SaveSlotFile } from './saveSlot'
 
-const dock: CommandIntent = { type: 'dock', payload: {} }
+const dock: CommandIntent = { type: 'dock', payload: { bay: 'sell' } }
 const undock: CommandIntent = { type: 'undock', payload: {} }
 const buy = (upgradeId: string): CommandIntent => ({ type: 'buyUpgrade', payload: { upgradeId } })
 const grant = (amount: string): CommandIntent => ({ type: 'debug.grantMoney', payload: { amount } })
@@ -52,6 +54,7 @@ function dockedAfterATrip(): ScriptedSession {
   session.submit(200, dock)
   session.submit(201, { type: 'sellCargo', payload: { resourceTier: 'all' } })
   session.submit(202, grant('1e6'))
+  dockInBay(session, 203, 'upgrade')
   session.submit(203, buy('drill_power'))
   session.submit(204, { type: 'debug.setCoreFragments', payload: { count: 12 } })
   return session
@@ -163,7 +166,7 @@ describe('save slot', () => {
     const session = createScriptedSession()
     session.submit(1, grant('1e9'))
     session.submit(2, setUpgrade('drill_power', 7))
-    session.submit(5, dock)
+    dockInBay(session, 5, 'upgrade')
     const saved = session.state()
     const [ore] = surfaceOreTiles(1)
     const commands = commandsAfter(saved, [
@@ -171,8 +174,8 @@ describe('save slot', () => {
       [11, undock],
       [20, poseAt({ tx: ore.tx, ty: ore.ty + 1 }, { facing: FACING.down })],
       [60, { type: 'drillTile', payload: { ...ore, ticks: 40 } }],
-      [100, atDock],
-      [100, dock],
+      [100, poseInBay('upgrade')],
+      [100, { type: 'dock', payload: { bay: 'upgrade' } }],
     ])
     const uninterrupted = runCommands(saved, commands)
     const resumed = runCommands(restoredFrom(savedText(saved)), commands)

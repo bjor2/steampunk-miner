@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { computeVehicleStats } from '../vehicle/vehicleStats'
 import { canonicalStatsOf } from '../vehicle/vehicleStatsView'
-import { FACING, dockedPoseAt } from '../vehicle/vehiclePose'
+import { FACING, bayPoseAt, dockedPoseAt } from '../vehicle/vehiclePose'
+import type { BayId } from '../world/dockBays'
 import { toCanonical } from '../money'
 import type { CommandIntent } from './authorityCommand'
-import { canDock } from './dockRules'
+import { canDock, dockedBayOf } from './dockRules'
 import type { DomainEvent } from './domainEvent'
 import { quickServiceCharges, serviceQuote } from './platformServices'
 import {
@@ -25,10 +26,15 @@ const FULL_TANK = 150 * 240
 const SIX_TRACKS = ['cargo_hold', 'boiler', 'engine', 'hull', 'drill_power', 'drill_tip']
 
 function poseAtDock(velocity: { vx: number; vy: number } = { vx: 0, vy: 0 }) {
+  return poseAtBay('sell', velocity)
+}
+
+/** At rest (or moving) in one bay's pad zone (#37); the Sell bay is where a run starts. */
+function poseAtBay(bay: BayId, velocity: { vx: number; vy: number } = { vx: 0, vy: 0 }) {
   return {
     type: 'reportPose' as const,
     payload: {
-      ...dockedPoseAt(SITE),
+      ...bayPoseAt(SITE, bay),
       ...velocity,
       driving: false,
       thrusting: false,
@@ -40,7 +46,8 @@ function poseAtDock(velocity: { vx: number; vy: number } = { vx: 0, vy: 0 }) {
   }
 }
 
-const dock = { type: 'dock', payload: {} } as const
+const dock = { type: 'dock', payload: { bay: 'sell' } } as const
+const dockAtUpgradeBay = { type: 'dock', payload: { bay: 'upgrade' } } as const
 const undock = { type: 'undock', payload: {} } as const
 const repair = { type: 'repairHull', payload: {} } as const
 const recharge = { type: 'rechargeEnergy', payload: {} } as const
@@ -85,6 +92,13 @@ function mineCore(
   return startTick + 50 * tiles.length
 }
 
+/** Undocks, drives over to the Upgrade bay and docks there (#37). */
+function moveToUpgradeBay(session: ScriptedSession, tick: number): void {
+  if (session.vehicle().mode === 'docked') session.submit(tick, undock)
+  session.submit(tick, poseAtBay('upgrade'))
+  session.submit(tick, dockAtUpgradeBay)
+}
+
 /** Applies the same intents to a fresh session and to a second one, for comparisons. */
 function sessionAfter(steps: readonly [number, CommandIntent][]): ScriptedSession {
   const session = createScriptedSession()
@@ -109,7 +123,7 @@ describe('platform: docking', () => {
     const before = session.state()
     expect(rejectionOf(session.submit(6, dock))).toBe('not_docked')
     expect(session.state().players).toEqual(before.players)
-    expect(canDock(session.state(), 'p1')).toBe(false)
+    expect(canDock(session.state(), 'p1', 'sell')).toBe(false)
   })
 
   it('refuses to dock a vehicle still moving in the pad zone', () => {
@@ -288,23 +302,33 @@ describe('platform: shop', () => {
 })
 
 describe('platform: repair and recharge', () => {
-  function dockedWith(steps: readonly CommandIntent[], money = '100'): ScriptedSession {
+  /** Repair is the Upgrade bay's and recharge the Sell bay's (#37). */
+  function dockedWith(
+    steps: readonly CommandIntent[],
+    money = '100',
+    bay: BayId = 'sell',
+  ): ScriptedSession {
     const session = createScriptedSession()
     session.submit(0, grant(money))
     for (const intent of steps) session.submit(1, intent)
-    session.submit(2, dock)
+    session.submit(2, poseAtBay(bay))
+    session.submit(2, { type: 'dock', payload: { bay } })
     return session
   }
 
   it('charges 11.25 for a full repair and 11.25 * x for a repair of x of the hull', () => {
-    const almostGone = dockedWith([{ type: 'debug.setHull', payload: { hull: '0.001' } }])
+    const almostGone = dockedWith(
+      [{ type: 'debug.setHull', payload: { hull: '0.001' } }],
+      '100',
+      'upgrade',
+    )
     expect(almostGone.submit(3, repair)[0]).toMatchObject({
       type: 'RepairPurchased',
       hullFrom: '1e-3',
       hullTo: '1e+2',
       cost: '1.125e+1',
     })
-    const half = dockedWith([{ type: 'debug.setHull', payload: { hull: '50' } }])
+    const half = dockedWith([{ type: 'debug.setHull', payload: { hull: '50' } }], '100', 'upgrade')
     expect(half.submit(3, repair)[0]).toMatchObject({ cost: '5.625e+0' })
     expect(walletOf(half)).toBe('9.4375e+1')
     expect(toCanonical(half.vehicle().hull)).toBe('1e+2')
@@ -327,24 +351,23 @@ describe('platform: repair and recharge', () => {
   })
 
   it('refuses a repair or recharge the wallet cannot pay, changing nothing', () => {
-    const session = dockedWith(
-      [
-        { type: 'debug.setHull', payload: { hull: '50' } },
-        { type: 'debug.setEnergy', payload: { energy: '0' } },
-      ],
-      '1',
-    )
-    const before = session.state().players
-    expect(rejectionOf(session.submit(3, repair))).toBe('money_short')
-    expect(rejectionOf(session.submit(4, recharge))).toBe('money_short')
-    expect(session.state().players.p1.vehicle).toEqual(before.p1.vehicle)
-    expect(walletOf(session)).toBe('1e+0')
+    const worn = [
+      { type: 'debug.setHull', payload: { hull: '50' } },
+      { type: 'debug.setEnergy', payload: { energy: '0' } },
+    ] as const
+    const atUpgradeBay = dockedWith(worn, '1', 'upgrade')
+    const atSellBay = dockedWith(worn, '1', 'sell')
+    const before = atUpgradeBay.state().players
+    expect(rejectionOf(atUpgradeBay.submit(3, repair))).toBe('money_short')
+    expect(rejectionOf(atSellBay.submit(4, recharge))).toBe('money_short')
+    expect(atUpgradeBay.state().players.p1.vehicle).toEqual(before.p1.vehicle)
+    expect(walletOf(atUpgradeBay)).toBe('1e+0')
+    expect(walletOf(atSellBay)).toBe('1e+0')
   })
 
   it('refuses to repair a full hull or recharge a full tank', () => {
-    const session = dockedWith([])
-    expect(rejectionOf(session.submit(3, repair))).toBe('hull_full')
-    expect(rejectionOf(session.submit(4, recharge))).toBe('energy_full')
+    expect(rejectionOf(dockedWith([], '100', 'upgrade').submit(3, repair))).toBe('hull_full')
+    expect(rejectionOf(dockedWith([]).submit(4, recharge))).toBe('energy_full')
   })
 })
 
@@ -374,10 +397,12 @@ describe('platform: quick service', () => {
     quick.session.submit(quick.tick, quickService)
     const three = wornSessionAtDock()
     three.session.submit(three.tick, sell('all'))
-    three.session.submit(three.tick, repair)
     three.session.submit(three.tick, recharge)
+    moveToUpgradeBay(three.session, three.tick)
+    three.session.submit(three.tick, repair)
     expect(walletOf(quick.session)).toBe(walletOf(three.session))
-    expect(quick.session.vehicle()).toEqual(three.session.vehicle())
+    const { hull, energy, cargo } = three.session.vehicle()
+    expect(quick.session.vehicle()).toMatchObject({ hull, energy, cargo })
     // 40 sold, 5.625 repair, 5.0625 -> 5.063 recharge.
     expect(toCanonical(quickServiceCharges(quote))).toBe('1.0688e+1')
     expect(walletOf(quick.session)).toBe('2.9312e+1')
@@ -402,7 +427,8 @@ describe('platform: workshop', () => {
   function dockedWithMoney(money: string, playerIds: readonly string[] = ['p1']) {
     const session = createScriptedSession(playerIds)
     for (const playerId of playerIds) session.submit(0, grant(money), playerId)
-    for (const playerId of playerIds) session.submit(1, dock, playerId)
+    for (const playerId of playerIds) session.submit(1, poseAtBay('upgrade'), playerId)
+    for (const playerId of playerIds) session.submit(1, dockAtUpgradeBay, playerId)
     return session
   }
 
@@ -496,5 +522,103 @@ describe('platform: workshop', () => {
         [20, expect.objectContaining({ visualTier: 3 })],
       ])
     }
+  })
+})
+
+describe('platform: two bays', () => {
+  const SELL_BAY_COMMANDS: readonly CommandIntent[] = [sell('all'), recharge, quickService]
+  const UPGRADE_BAY_COMMANDS: readonly CommandIntent[] = [repair, buy('engine')]
+
+  /** Worn, with ore in the hold and money, so every service has something to do. */
+  function wornWithOre(): { session: ScriptedSession; tick: number } {
+    const session = createScriptedSession()
+    session.submit(0, grant('1000'))
+    session.submit(1, { type: 'debug.setHull', payload: { hull: '50' } })
+    const tick = mineOreAndDock(session, 2)
+    session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '75' } })
+    return { session, tick: tick + 1 }
+  }
+
+  it('docks at the bay whose pad the vehicle stands in and says so in dock_entered', () => {
+    const session = createScriptedSession()
+    expect(session.submit(5, dock)[1]).toMatchObject({ type: 'DockEntered', bay: 'sell' })
+    session.submit(6, undock)
+    session.submit(7, poseAtBay('upgrade'))
+    expect(session.submit(8, dockAtUpgradeBay)[1]).toMatchObject({
+      type: 'DockEntered',
+      bay: 'upgrade',
+    })
+    expect(dockedBayOf(session.state(), 'p1')).toBe('upgrade')
+    expect(session.submit(9, undock)[0]).toMatchObject({ type: 'DockLeft', bay: 'upgrade' })
+  })
+
+  it('refuses to dock at the other bay until the vehicle has driven onto its pad', () => {
+    const session = createScriptedSession()
+    session.submit(5, dock)
+    session.submit(6, undock)
+    expect(rejectionOf(session.submit(7, dockAtUpgradeBay))).toBe('not_docked')
+    expect(canDock(session.state(), 'p1', 'upgrade')).toBe(false)
+    session.submit(8, poseAtBay('upgrade'))
+    expect(canDock(session.state(), 'p1', 'sell')).toBe(false)
+    expect(typesOf(session.submit(9, dockAtUpgradeBay))).toContain('DockEntered')
+  })
+
+  it('docks again at once after undocking while still in the pad zone: there is no grace', () => {
+    const session = createScriptedSession()
+    session.submit(5, dock)
+    session.submit(6, undock)
+    expect(typesOf(session.submit(6, dock))).toContain('DockEntered')
+  })
+
+  it('sells, recharges and runs the quick action at the Sell bay; buys and repairs are wrong_bay', () => {
+    for (const intent of SELL_BAY_COMMANDS) {
+      const { session, tick } = wornWithOre()
+      expect(rejectionOf(session.submit(tick, intent))).toBeNull()
+    }
+    for (const intent of UPGRADE_BAY_COMMANDS) {
+      const { session, tick } = wornWithOre()
+      const before = session.state().players
+      expect(rejectionOf(session.submit(tick, intent))).toBe('wrong_bay')
+      expect(session.state().players).toEqual(before)
+    }
+  })
+
+  it('buys and repairs at the Upgrade bay; selling, recharging and the quick action are wrong_bay', () => {
+    for (const intent of UPGRADE_BAY_COMMANDS) {
+      const { session, tick } = wornWithOre()
+      moveToUpgradeBay(session, tick)
+      expect(rejectionOf(session.submit(tick, intent))).toBeNull()
+    }
+    for (const intent of SELL_BAY_COMMANDS) {
+      const { session, tick } = wornWithOre()
+      moveToUpgradeBay(session, tick)
+      expect(rejectionOf(session.submit(tick, intent))).toBe('wrong_bay')
+    }
+  })
+
+  it('banks carried core fragments on docking at the Upgrade bay too', () => {
+    const session = createScriptedSession()
+    equipForCore(session)
+    const tick = mineCore(session, 10, coreTiles(4))
+    session.submit(tick, poseAtBay('upgrade'))
+    const events = session.submit(tick, dockAtUpgradeBay)
+    expect(events.find((event) => event.type === 'CoreBayDeposited')).toMatchObject({
+      fragments: 4,
+      source: 'dock',
+    })
+  })
+
+  it('tows a wrecked vehicle home docked at the Sell bay', () => {
+    const session = createScriptedSession()
+    session.submit(5, poseAbove(GROUND, FACING.down))
+    session.submit(6, { type: 'debug.setHull', payload: { hull: '0' } })
+    session.submit(7, { type: 'requestRescue', payload: {} })
+    expect(session.vehicle().mode).toBe('docked')
+    expect(dockedBayOf(session.state(), 'p1')).toBe('sell')
+  })
+
+  it('starts the run in the Sell bay', () => {
+    expect(createScriptedSession().vehicle().pose).toEqual(dockedPoseAt(SITE))
+    expect(canDock(createScriptedSession().state(), 'p1', 'sell')).toBe(true)
   })
 })

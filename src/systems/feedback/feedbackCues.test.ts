@@ -15,6 +15,7 @@ const cargo = (resourceTier: number, playerId = 'p1'): DomainEvent => ({
 const docked: DomainEvent = {
   ...stamp('p1'),
   type: 'DockEntered',
+  bay: 'sell',
   cargoUnits: 3,
   energy: 100,
   hull: '50',

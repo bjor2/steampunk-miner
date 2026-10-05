@@ -50,7 +50,7 @@ const band2Tile = (tick: number) => line(tick, 'tile_destroyed', { tx: 7, ty: 27
 
 const onTimeRun = (): RunEvent[] => [
   line(0, 'planet_entered', { planetSeed: 1, generatorVersion: 1, radius: 300 }),
-  line(10 * SECOND, 'dock_left', { durationTicks: 0 }),
+  line(10 * SECOND, 'dock_left', { bay: 'sell', durationTicks: 0 }),
   sale(60 * SECOND),
   upgrade(60 * SECOND, 'drill_tip', 1),
   upgrade(200 * SECOND, 'hull', 1),
