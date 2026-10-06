@@ -4,12 +4,8 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { MAX_PLATFORM_DRAW_CALLS } from '../../constants/scene'
 import { MAP_KINDS, type MapKind } from './artIds'
-import {
-  ASSET_MANIFEST,
-  EXPORTED_SIDECARS,
-  PLACEHOLDER_SIDECARS,
-  placeholderSidecarOf,
-} from './artCatalogue'
+import { SHIPPED_ART } from '../../scene/shippedArt'
+import { placeholderSidecarOf } from './artCatalogue'
 import {
   expectedFilesOf,
   manifestProblems,
@@ -52,7 +48,7 @@ function shippedSidecarOf(entry: ManifestEntry): PartsSidecar | null {
 }
 
 function expectedFilesOfManifest(): string[] {
-  return ASSET_MANIFEST.assets.flatMap((entry) => {
+  return SHIPPED_ART.manifest.assets.flatMap((entry) => {
     const sidecar = shippedSidecarOf(entry)
     return expectedFilesOf(entry, sidecar === null ? [] : mapFilesOf(sidecar))
   })
@@ -65,24 +61,38 @@ const mapKindOf = (path: string): MapKind | undefined =>
   MAP_KINDS.find((kind) => path.endsWith(`.${kind}.ktx2`))
 
 const isTileMap = (path: string): boolean =>
-  ASSET_MANIFEST.assets.some((entry) => entry.form === 'tile' && entry.id === ownerIdOfFile(path))
+  SHIPPED_ART.manifest.assets.some(
+    (entry) => entry.form === 'tile' && entry.id === ownerIdOfFile(path),
+  )
 
 describe('asset lint: the manifest', () => {
   it('is the #51 inventory under the #52 naming', () => {
-    expect(manifestProblems(ASSET_MANIFEST)).toEqual([])
+    expect(manifestProblems(SHIPPED_ART.manifest)).toEqual([])
+  })
+
+  it('keeps one entry file per asset under art/assets, named for the id it holds (#116)', () => {
+    const entryFiles = filesUnder('art/assets/')
+    const misnamed = entryFiles.filter(
+      (path) => path !== `art/assets/${readJson<ManifestEntry>(path).id}.json`,
+    )
+    expect(misnamed).toEqual([])
+    expect(entryFiles).toHaveLength(SHIPPED_ART.manifest.assets.length)
   })
 
   it('gives every Blender parts asset a checked-in placeholder sidecar, and lists every one', () => {
-    const partsAssets = ASSET_MANIFEST.assets.filter((entry) => entry.form === 'parts')
-    expect(partsAssets.filter((entry) => placeholderSidecarOf(entry.id) === null)).toEqual([])
+    const partsAssets = SHIPPED_ART.manifest.assets.filter((entry) => entry.form === 'parts')
+    expect(
+      partsAssets.filter((entry) => placeholderSidecarOf(SHIPPED_ART, entry.id) === null),
+    ).toEqual([])
     const onDisk = filesUnder('art/placeholders/').map((path) => path.split('/').pop())
-    const listed = PLACEHOLDER_SIDECARS.map((sidecar) => `${sidecar.assetId}.parts.json`)
+    const listed = SHIPPED_ART.placeholderSidecars.map((sidecar) => `${sidecar.assetId}.parts.json`)
     expect(onDisk.sort()).toEqual(listed.sort())
   })
 
   it('colours only parts the placeholder has', () => {
-    for (const entry of ASSET_MANIFEST.assets) {
-      const partIds = placeholderSidecarOf(entry.id)?.parts.map((part) => part.id) ?? []
+    for (const entry of SHIPPED_ART.manifest.assets) {
+      const partIds =
+        placeholderSidecarOf(SHIPPED_ART, entry.id)?.parts.map((part) => part.id) ?? []
       const strays = Object.keys(entry.partColors ?? {}).filter((id) => !partIds.includes(id))
       expect({ asset: entry.id, strays }).toEqual({ asset: entry.id, strays: [] })
     }
@@ -91,11 +101,13 @@ describe('asset lint: the manifest', () => {
 
 describe('asset lint: sidecars', () => {
   it('validates every placeholder sidecar against schema 1', () => {
-    expect(PLACEHOLDER_SIDECARS.flatMap((s) => sidecarProblems(s.assetId, s))).toEqual([])
+    expect(SHIPPED_ART.placeholderSidecars.flatMap((s) => sidecarProblems(s.assetId, s))).toEqual(
+      [],
+    )
   })
 
   it('validates every exported sidecar against schema 1', () => {
-    const exported = ASSET_MANIFEST.assets.flatMap((entry) => {
+    const exported = SHIPPED_ART.manifest.assets.flatMap((entry) => {
       const sidecar = shippedSidecarOf(entry)
       return sidecar === null ? [] : sidecarProblems(entry.id, sidecar)
     })
@@ -103,8 +115,11 @@ describe('asset lint: sidecars', () => {
   })
 
   it('keeps every exported asset on its placeholder part ids and map files (S7a-d acceptance 2)', () => {
-    const drift = ASSET_MANIFEST.assets.flatMap((entry) => {
-      const [placeholder, sidecar] = [placeholderSidecarOf(entry.id), shippedSidecarOf(entry)]
+    const drift = SHIPPED_ART.manifest.assets.flatMap((entry) => {
+      const [placeholder, sidecar] = [
+        placeholderSidecarOf(SHIPPED_ART, entry.id),
+        shippedSidecarOf(entry),
+      ]
       return placeholder === null || sidecar === null
         ? []
         : placeholderDriftProblems(placeholder, sidecar)
@@ -116,13 +131,13 @@ describe('asset lint: sidecars', () => {
 describe('asset lint: final art replaces its placeholder', () => {
   it('lists every exported sidecar on disk in the catalogue the game draws from', () => {
     const onDisk = shipped.filter((path) => path.endsWith('.parts.json'))
-    const listed = EXPORTED_SIDECARS.map((sidecar) => `${sidecar.assetId}.parts.json`)
+    const listed = SHIPPED_ART.exportedSidecars.map((sidecar) => `${sidecar.assetId}.parts.json`)
     expect(onDisk.map((path) => path.split('/').pop()).sort()).toEqual(listed.sort())
   })
 
   it('keeps the placeholder’s part ids and tiers in every exported sidecar (S7a-d acceptance)', () => {
-    for (const exported of EXPORTED_SIDECARS) {
-      const placeholder = placeholderSidecarOf(exported.assetId)
+    for (const exported of SHIPPED_ART.exportedSidecars) {
+      const placeholder = placeholderSidecarOf(SHIPPED_ART, exported.assetId)
       expect({ asset: exported.assetId, parts: partTiersOf(exported) }).toEqual({
         asset: exported.assetId,
         parts: placeholder === null ? [] : partTiersOf(placeholder),
@@ -131,8 +146,8 @@ describe('asset lint: final art replaces its placeholder', () => {
   })
 
   it('names the same maps as the placeholder, so texture ids match it too', () => {
-    for (const exported of EXPORTED_SIDECARS) {
-      const placeholder = placeholderSidecarOf(exported.assetId)
+    for (const exported of SHIPPED_ART.exportedSidecars) {
+      const placeholder = placeholderSidecarOf(SHIPPED_ART, exported.assetId)
       expect(mapFilesOf(exported)).toEqual(placeholder === null ? [] : mapFilesOf(placeholder))
     }
   })
@@ -140,16 +155,21 @@ describe('asset lint: final art replaces its placeholder', () => {
 
 describe('asset lint: render budget', () => {
   it('keeps the platform hub and bays within their #38 share of draw calls, one per part', () => {
-    const platformParts = ASSET_MANIFEST.assets
+    const platformParts = SHIPPED_ART.manifest.assets
       .filter((entry) => entry.form === 'parts' && entry.id.startsWith('platform-'))
-      .flatMap((entry) => (shippedSidecarOf(entry) ?? placeholderSidecarOf(entry.id))?.parts ?? [])
+      .flatMap(
+        (entry) =>
+          (shippedSidecarOf(entry) ?? placeholderSidecarOf(SHIPPED_ART, entry.id))?.parts ?? [],
+      )
     expect(platformParts.length).toBeLessThanOrEqual(MAX_PLATFORM_DRAW_CALLS)
   })
 })
 
 describe('asset lint: shipped files', () => {
   it('ships every file of a final asset and nothing a manifest entry does not own', () => {
-    expect(shippedFileProblems(ASSET_MANIFEST, expectedFilesOfManifest(), shipped)).toEqual([])
+    expect(shippedFileProblems(SHIPPED_ART.manifest, expectedFilesOfManifest(), shipped)).toEqual(
+      [],
+    )
   })
 
   it('encodes every map at most 4096 px with power-of-two sides, in its Basis format', () => {

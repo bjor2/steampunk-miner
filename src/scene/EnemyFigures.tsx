@@ -31,6 +31,7 @@ import { enemyLookOf } from '../systems/render/enemyPlaceholder'
 import { createAtlasQuad } from './atlasQuadGeometry'
 import { useAtlasTextureSet } from './atlasTextures'
 import { EnemyPlaceholders } from './EnemyPlaceholders'
+import { SHIPPED_ART } from './shippedArt'
 import {
   createEnemySlots,
   createHaloGeometry,
@@ -59,8 +60,8 @@ interface EnemySkin {
 
 type EnemySkins = Readonly<Record<EnemyKind, EnemySkin>>
 
-const ARTS = ENEMY_KINDS.map(enemyArtOf)
-const IS_ART_FINAL = isEveryEnemyArtFinal()
+const ARTS = ENEMY_KINDS.map((kind) => enemyArtOf(SHIPPED_ART, kind))
+const IS_ART_FINAL = isEveryEnemyArtFinal(SHIPPED_ART)
 
 export function EnemyFigures() {
   if (!IS_ART_FINAL) return <EnemyPlaceholders />

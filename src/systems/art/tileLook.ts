@@ -4,7 +4,7 @@
  * band colours. The ground draws its five strata only when every band's maps ship, so a half-done
  * export never mixes textured and flat bands.
  */
-import { manifestEntryOf } from './artCatalogue'
+import { manifestEntryOf, type ArtCatalogue } from './artCatalogue'
 import { folderOfEntry } from './assetManifest'
 import { BAND_COUNT } from '../world/planetGeometry'
 
@@ -17,16 +17,16 @@ export interface TileMaps {
 const PUBLIC_FOLDER = 'public/'
 
 /** The maps of a final tile asset, or null for a placeholder, another form or an unknown id. */
-export function tileMapsOf(assetId: string): TileMaps | null {
-  const entry = manifestEntryOf(assetId)
+export function tileMapsOf(art: ArtCatalogue, assetId: string): TileMaps | null {
+  const entry = manifestEntryOf(art, assetId)
   if (entry?.form !== 'tile' || entry.status !== 'final') return null
   const folder = folderOfEntry(entry)?.slice(PUBLIC_FOLDER.length) ?? ''
   return { albedo: `${folder}${assetId}.albedo.ktx2`, normal: `${folder}${assetId}.normal.ktx2` }
 }
 
 /** Bands 1 to 5 in order, or null unless all five are final. */
-export function groundStrataMapsOf(): TileMaps[] | null {
-  const maps = groundBandIds().map(tileMapsOf)
+export function groundStrataMapsOf(art: ArtCatalogue): TileMaps[] | null {
+  const maps = groundBandIds().map((bandId) => tileMapsOf(art, bandId))
   return maps.every(isShipped) ? maps : null
 }
 

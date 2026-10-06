@@ -1,0 +1,10 @@
+{
+  "id": "vehicle-blasting-charges",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#a63a2a",
+  "partColors": {
+    "charge-rack": "#8a6a2f"
+  }
+}

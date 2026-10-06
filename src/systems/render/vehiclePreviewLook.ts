@@ -7,6 +7,7 @@
  */
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { PREVIEW_VEHICLE_SHARE_PERCENT } from '../../constants/scene'
+import type { ArtCatalogue } from '../art/artCatalogue'
 import { slotOfPartId } from '../art/artIds'
 import type { AssetQuad } from '../art/assetLook'
 import type { UpgradeId } from '../economy/economyDefinition'
@@ -42,8 +43,8 @@ const MAX_WIDTH_SHARE = 0.9
 const REPEAT_SUFFIX = /-\d+$/
 
 /** How far right of the body's centre the drill head sits when it faces right (`DrillHeadView`). */
-export function drillHeadReachOf(visualTier: number): number {
-  return (VEHICLE_COLLIDER_SIZE + drillHeadSizeOf(visualTier)) / 2
+export function drillHeadReachOf(art: ArtCatalogue, visualTier: number): number {
+  return (VEHICLE_COLLIDER_SIZE + drillHeadSizeOf(art, visualTier)) / 2
 }
 
 export function isPartOfTrack(quad: AssetQuad, upgradeId: UpgradeId | null): boolean {
@@ -52,10 +53,10 @@ export function isPartOfTrack(quad: AssetQuad, upgradeId: UpgradeId | null): boo
 }
 
 /** The box round every part drawn at a tier: the body's and the drill head's out in front. */
-export function previewBoundsOf(visualTier: number): PreviewBounds {
-  const reach = drillHeadReachOf(visualTier)
-  const head = drillHeadQuadsOf(visualTier).map((quad) => shiftedRight(quad, reach))
-  return boundsOf([...vehicleBodyQuadsOf(visualTier), ...head])
+export function previewBoundsOf(art: ArtCatalogue, visualTier: number): PreviewBounds {
+  const reach = drillHeadReachOf(art, visualTier)
+  const head = drillHeadQuadsOf(art, visualTier).map((quad) => shiftedRight(quad, reach))
+  return boundsOf([...vehicleBodyQuadsOf(art, visualTier), ...head])
 }
 
 /**

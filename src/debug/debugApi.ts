@@ -10,6 +10,7 @@
  * system they poke.
  */
 import { partMotion } from '../scene/partMotionPresence'
+import { SHIPPED_ART } from '../scene/shippedArt'
 import {
   readLocalVehicle,
   readPlanetWorld,
@@ -241,8 +242,8 @@ function vehiclePartsReport(): VehiclePartsReport {
   const { vehicle, prefs } = game()
   return {
     visualTier: vehicle.visualTier,
-    partIds: vehiclePartIdsOf(vehicle.visualTier),
-    poses: vehiclePartPosesOf(partMotion, vehicle.visualTier, !prefs.shake),
+    partIds: vehiclePartIdsOf(SHIPPED_ART, vehicle.visualTier),
+    poses: vehiclePartPosesOf(SHIPPED_ART, partMotion, vehicle.visualTier, !prefs.shake),
   }
 }
 

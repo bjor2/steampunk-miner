@@ -1,0 +1,11 @@
+{
+  "id": "platform-hub",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#3b3631",
+  "partColors": {
+    "core-drive": "#ff8a4a",
+    "outpost": "#3b3631"
+  }
+}

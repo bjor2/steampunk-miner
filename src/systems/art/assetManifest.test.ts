@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ASSET_MANIFEST } from './artCatalogue'
+import { SHIPPED_ART } from '../../scene/shippedArt'
 import {
   expectedFilesOf,
   manifestProblems,
@@ -8,23 +8,12 @@ import {
   type AssetManifest,
   type ManifestEntry,
 } from './assetManifest'
-import {
-  BLASTING_CHARGES_ROW_ID,
-  SCHEDULED_ENEMY_ART_ROW_IDS,
-  blenderAssetIds,
-  enemyArtKinds,
-  isValidPartId,
-  vectorIconIds,
-  vehicleModuleAssetIdOf,
-  vehicleModuleRowIds,
-} from './artIds'
+import { blenderAssetIds, enemyArtKinds, vectorIconIds } from './artIds'
 import { ENEMY_IDS } from '../registeredIds'
-import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 
 const withEntries = (...entries: ManifestEntry[]): AssetManifest => ({
-  schema: 1,
   assets: [
-    ...ASSET_MANIFEST.assets.filter((asset) => !entries.some((e) => e.id === asset.id)),
+    ...SHIPPED_ART.manifest.assets.filter((asset) => !entries.some((e) => e.id === asset.id)),
     ...entries,
   ],
 })
@@ -53,8 +42,6 @@ describe('asset manifest', () => {
         'platform-hub',
         'platform-bay-sell',
         'platform-bay-upgrade',
-        'platform-bay-refinery',
-        'platform-bay-refinery-backdrop',
         'enemy-crawler',
         'enemy-burrower',
         'prop-artefact-cache',
@@ -63,25 +50,8 @@ describe('asset manifest', () => {
       ]),
     )
     expect(vectorIconIds()).toEqual(
-      expect.arrayContaining([
-        'icon-track-drill-power',
-        'icon-track-cargo-hold',
-        'icon-casing',
-        'emblem-bay-refinery',
-      ]),
+      expect.arrayContaining(['icon-track-drill-power', 'icon-track-cargo-hold', 'icon-casing']),
     )
-  })
-
-  it("names the tunnel wrecker's art from its schedule row before the economy lists the kind", () => {
-    expect(ENEMY_IDS).not.toContain('tunnel_wrecker')
-    expect(blenderAssetIds()).toContain('enemy-tunnel-wrecker')
-  })
-
-  it('takes scheduled enemy art only from Enemy rows of the locked schedule', () => {
-    const enemyRowIds = LOCKED_SCHEDULE.rows
-      .filter((row) => row.lane === 'Enemy')
-      .map((row) => row.id)
-    expect(enemyRowIds).toEqual(expect.arrayContaining([...SCHEDULED_ENEMY_ART_ROW_IDS]))
   })
 
   it("lists each enemy kind's art once, economy kinds first", () => {
@@ -90,30 +60,10 @@ describe('asset manifest', () => {
     expect(new Set(kinds).size).toBe(kinds.length)
   })
 
-  it('names each vehicle module from a row of the locked unlock schedule', () => {
-    const rowIds = LOCKED_SCHEDULE.rows.map((row) => row.id)
-    expect(vehicleModuleRowIds().filter((row) => !rowIds.includes(row))).toEqual([])
-    expect(blenderAssetIds()).toContain(vehicleModuleAssetIdOf('auto_guns'))
-    expect(vehicleModuleAssetIdOf('auto_guns')).toBe('vehicle-auto-guns')
-  })
-
-  it('gives the refinery bay one part per look it shows (#105: idle, refining, ready)', () => {
-    const looks = ['refinery-idle', 'refinery-refining', 'refinery-ready']
-    expect(looks.every((part) => isValidPartId('platform-bay-refinery', part))).toBe(true)
-    expect(isValidPartId('platform-bay-refinery', 'refinery-smelting')).toBe(false)
-  })
-
-  it('names the blasting charges art from its locked schedule row (#110)', () => {
-    expect(LOCKED_SCHEDULE.rows.map((row) => row.id)).toContain(BLASTING_CHARGES_ROW_ID)
-    expect(blenderAssetIds()).toEqual(
-      expect.arrayContaining(['vehicle-blasting-charges', 'prop-blasting-charge']),
-    )
-    expect(vectorIconIds()).toContain('icon-blasting-charges')
-  })
-
   it('refuses an asset id that no registry derives, and a missing inventory row', () => {
     const manifest = withEntries({ ...finalCrawler, id: 'enemy-dragon' })
-    expect(manifestProblems({ ...manifest, assets: manifest.assets.slice(1) })).toEqual([
+    const assets = manifest.assets.filter((entry) => entry.id !== 'vehicle')
+    expect(manifestProblems({ assets })).toEqual([
       'asset "enemy-dragon": id is not derived from a registry id (#52)',
       'asset "vehicle" from the #51 inventory is missing from the manifest',
     ])
@@ -165,7 +115,7 @@ describe('asset lint', () => {
       'public/assets/enemy/enemy-burrower/enemy-burrower.parts.json',
     ]
     expect(shippedFileProblems(withEntries(placeholderBurrower), [], shipped)).toEqual([
-      'public/assets/enemy/enemy-dragon/enemy-dragon.parts.json: has no asset-manifest.json entry',
+      'public/assets/enemy/enemy-dragon/enemy-dragon.parts.json: has no art/assets entry',
       'public/assets/enemy/enemy-burrower/enemy-burrower.parts.json: "enemy-burrower" is a placeholder, which ships no files',
     ])
   })

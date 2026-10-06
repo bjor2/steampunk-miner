@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { MISSING_ART_COLOUR, partsShownAtTier, placeholderQuadsOf } from './placeholderLook'
 import type { SidecarPart } from './partsSidecar'
+import { SHIPPED_ART } from '../../scene/shippedArt'
 
-const idsAt = (tier: number) => placeholderQuadsOf('vehicle', tier).map((quad) => quad.partId)
+const idsAt = (tier: number) =>
+  placeholderQuadsOf(SHIPPED_ART, 'vehicle', tier).map((quad) => quad.partId)
 
 const part = (id: string, tier: number, z = 0): SidecarPart => ({
   id,
@@ -16,7 +18,7 @@ const part = (id: string, tier: number, z = 0): SidecarPart => ({
 
 describe('placeholder look', () => {
   it('draws a missing asset id as one magenta quad named after it', () => {
-    expect(placeholderQuadsOf('enemy-dragon', 1)).toEqual([
+    expect(placeholderQuadsOf(SHIPPED_ART, 'enemy-dragon', 1)).toEqual([
       {
         partId: 'enemy-dragon',
         centre: [0, 0],
@@ -29,13 +31,15 @@ describe('placeholder look', () => {
   })
 
   it('draws a placeholder asset from its sidecar parts in the manifest colours', () => {
-    const [crawler] = placeholderQuadsOf('enemy-crawler', 1)
+    const [crawler] = placeholderQuadsOf(SHIPPED_ART, 'enemy-crawler', 1)
     expect(crawler).toMatchObject({ partId: 'enemy-crawler', size: [0.8, 0.8] })
     expect(crawler.colour).not.toBe(MISSING_ART_COLOUR)
   })
 
   it('centres a quad from its pivot: the pivot sits at atM, pivotM from the bottom-left', () => {
-    const [hub] = placeholderQuadsOf('platform-hub', 1).filter((quad) => quad.partId === 'outpost')
+    const [hub] = placeholderQuadsOf(SHIPPED_ART, 'platform-hub', 1).filter(
+      (quad) => quad.partId === 'outpost',
+    )
     expect(hub.centre[0]).toBeCloseTo(-3.4)
     expect(hub.centre[1]).toBeCloseTo(1.6)
   })

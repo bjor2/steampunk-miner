@@ -5,7 +5,7 @@
  * quad in the missing-art colour, which nobody can mistake for finished art.
  */
 import { slotOfPartId } from './artIds'
-import { manifestEntryOf, placeholderSidecarOf } from './artCatalogue'
+import { manifestEntryOf, placeholderSidecarOf, type ArtCatalogue } from './artCatalogue'
 import type { ManifestEntry } from './assetManifest'
 import type { Pair, SidecarPart } from './partsSidecar'
 
@@ -26,9 +26,13 @@ export const MISSING_ART_COLOUR = '#ff00ff'
 const MISSING_ART_SIZE: Pair = [1, 1]
 
 /** The quads an asset shows at a visual tier, lowest draw order first. */
-export function placeholderQuadsOf(assetId: string, tier: number): PlaceholderQuad[] {
-  const entry = manifestEntryOf(assetId)
-  const sidecar = placeholderSidecarOf(assetId)
+export function placeholderQuadsOf(
+  art: ArtCatalogue,
+  assetId: string,
+  tier: number,
+): PlaceholderQuad[] {
+  const entry = manifestEntryOf(art, assetId)
+  const sidecar = placeholderSidecarOf(art, assetId)
   if (entry === null || sidecar === null) return [missingArtQuadOf(assetId)]
   return partsShownAtTier(sidecar.parts, tier).map((part) => colouredQuadOf(entry, part))
 }

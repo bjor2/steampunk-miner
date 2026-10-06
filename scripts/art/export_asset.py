@@ -88,10 +88,12 @@ def asset_problems(asset_id):
 
 
 def manifest_form_of(asset_id):
-    with open(os.path.join(asset_layout.REPO_ROOT, 'art', 'asset-manifest.json'), encoding='utf-8') as file:
-        manifest = json.load(file)
-    forms = [entry['form'] for entry in manifest['assets'] if entry['id'] == asset_id]
-    return forms[0] if forms else 'unlisted'
+    """The form in the asset's own entry file, `art/assets/<id>.json` (#116)."""
+    path = os.path.join(asset_layout.REPO_ROOT, 'art', 'assets', asset_id + '.json')
+    if not os.path.isfile(path):
+        return 'unlisted'
+    with open(path, encoding='utf-8') as file:
+        return json.load(file)['form']
 
 
 def rig_problems():

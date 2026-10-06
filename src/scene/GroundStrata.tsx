@@ -6,6 +6,7 @@ import { Suspense, useEffect, useMemo } from 'react'
 import type { ShaderMaterial } from 'three'
 import { groundStrataMapsOf, type TileMaps } from '../systems/art/tileLook'
 import { useAtlasTextureSet } from './atlasTextures'
+import { SHIPPED_ART } from './shippedArt'
 import { bindStrataMaps, strataMapUrlsOf, unbindStrataMaps } from './terrainStrata'
 
 interface GroundStrataProps {
@@ -13,7 +14,7 @@ interface GroundStrataProps {
 }
 
 export function GroundStrata({ material }: GroundStrataProps) {
-  const strata = useMemo(groundStrataMapsOf, [])
+  const strata = useMemo(() => groundStrataMapsOf(SHIPPED_ART), [])
   if (strata === null) return null
   return (
     <Suspense fallback={null}>

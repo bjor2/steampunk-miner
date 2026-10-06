@@ -12,14 +12,15 @@ import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import { vehicleAtlasMaps, vehicleBodyQuadsOf } from '../systems/render/vehicleLook'
 import { recoilVehicleParts } from './partMotionPresence'
 import { PartQuadMesh } from './PartQuadMesh'
+import { SHIPPED_ART } from './shippedArt'
 
 /** Parts sit just in front of the tiles. */
 const BODY_Z = 0.1
-const maps = vehicleAtlasMaps()
+const maps = vehicleAtlasMaps(SHIPPED_ART)
 
 export function VehiclePlaceholder() {
   const visualTier = useGameStore((state) => state.vehicle.visualTier)
-  const quads = useMemo(() => vehicleBodyQuadsOf(visualTier), [visualTier])
+  const quads = useMemo(() => vehicleBodyQuadsOf(SHIPPED_ART, visualTier), [visualTier])
   useEffect(() => listenForFeedback(recoilOnHit), [])
   return (
     <>

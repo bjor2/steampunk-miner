@@ -8,12 +8,13 @@ import {
   vehiclePartPosesOf,
 } from './vehicleLook'
 import { createPartMotion, stepPartMotion } from './partMotion'
+import { SHIPPED_ART } from '../../scene/shippedArt'
 
 const idsOf = (quads: { partId: string }[]) => quads.map((quad) => quad.partId)
 
 describe('vehicle look', () => {
   it('shows the inventory parts of #51 on the run vehicle at tier 1', () => {
-    expect(vehiclePartIdsOf(1).sort()).toEqual(
+    expect(vehiclePartIdsOf(SHIPPED_ART, 1).sort()).toEqual(
       [
         't1-boiler',
         't1-chassis',
@@ -32,26 +33,31 @@ describe('vehicle look', () => {
   })
 
   it('draws the drill head and bit on the swivelling head and everything else on the body', () => {
-    expect(idsOf(drillHeadQuadsOf(1)).sort()).toEqual(['t1-drill-bit', 't1-drill-head'])
-    expect(idsOf(vehicleBodyQuadsOf(1)).filter((id) => id.includes('drill'))).toEqual([])
+    expect(idsOf(drillHeadQuadsOf(SHIPPED_ART, 1)).sort()).toEqual([
+      't1-drill-bit',
+      't1-drill-head',
+    ])
+    expect(idsOf(vehicleBodyQuadsOf(SHIPPED_ART, 1)).filter((id) => id.includes('drill'))).toEqual(
+      [],
+    )
   })
 
   it('centres the drill head’s parts on the head plate, the plate at draw order 0', () => {
-    const plate = drillHeadQuadsOf(1).find((quad) => quad.partId === 't1-drill-head')
+    const plate = drillHeadQuadsOf(SHIPPED_ART, 1).find((quad) => quad.partId === 't1-drill-head')
     expect(plate).toMatchObject({ centre: [0, 0], z: 0 })
   })
 
   it('fits the bore collar behind the drill head only at tier 3', () => {
     const isCollar = (quad: { size: readonly number[]; z: number }) =>
-      quad.z < 0 && quad.size[0] > drillHeadSizeOf(3)
-    expect(drillHeadQuadsOf(1).some(isCollar)).toBe(false)
-    expect(drillHeadQuadsOf(2).some(isCollar)).toBe(false)
-    expect(drillHeadQuadsOf(3).some(isCollar)).toBe(true)
+      quad.z < 0 && quad.size[0] > drillHeadSizeOf(SHIPPED_ART, 3)
+    expect(drillHeadQuadsOf(SHIPPED_ART, 1).some(isCollar)).toBe(false)
+    expect(drillHeadQuadsOf(SHIPPED_ART, 2).some(isCollar)).toBe(false)
+    expect(drillHeadQuadsOf(SHIPPED_ART, 3).some(isCollar)).toBe(true)
   })
 
   it('grows the drill head with the tier', () => {
-    expect(drillHeadSizeOf(2)).toBeGreaterThan(drillHeadSizeOf(1))
-    expect(drillHeadSizeOf(3)).toBeGreaterThan(drillHeadSizeOf(2))
+    expect(drillHeadSizeOf(SHIPPED_ART, 2)).toBeGreaterThan(drillHeadSizeOf(SHIPPED_ART, 1))
+    expect(drillHeadSizeOf(SHIPPED_ART, 3)).toBeGreaterThan(drillHeadSizeOf(SHIPPED_ART, 2))
   })
 
   it('leaves the collider at most 0.9 m square, whatever the art overhangs', () => {
@@ -68,9 +74,9 @@ describe('vehicle look', () => {
       isDrilling: false,
     }
     for (let tick = 0; tick < 60; tick++) stepPartMotion(motion, driving, 1 / 60)
-    const tier1 = vehiclePartPosesOf(motion, 1, false)
-    const tier3 = vehiclePartPosesOf(motion, 3, false)
-    expect(Object.keys(tier3).sort()).toEqual(vehiclePartIdsOf(3).sort())
+    const tier1 = vehiclePartPosesOf(SHIPPED_ART, motion, 1, false)
+    const tier3 = vehiclePartPosesOf(SHIPPED_ART, motion, 3, false)
+    expect(Object.keys(tier3).sort()).toEqual(vehiclePartIdsOf(SHIPPED_ART, 3).sort())
     // Tier 1 wheels are 0.24 m, tier 3 wheels 0.26 m across.
     expect(tier1['t1-wheel-2'].angle).toBeCloseTo(-2 / 0.12, 6)
     expect(tier3['t3-wheel-2'].angle).toBeCloseTo(-2 / 0.13, 6)
@@ -80,7 +86,7 @@ describe('vehicle look', () => {
   it.each([1, 2, 3])(
     'draws the vehicle in at most 30 calls at visual tier %i, one per part (#38, #48 acceptance 4)',
     (tier) => {
-      expect(vehiclePartIdsOf(tier).length).toBeLessThanOrEqual(30)
+      expect(vehiclePartIdsOf(SHIPPED_ART, tier).length).toBeLessThanOrEqual(30)
     },
   )
 })

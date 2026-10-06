@@ -14,15 +14,16 @@ import { useGameStore } from '../store/gameStore'
 import { createDrillHeadPose, writeDrillHeadPose } from '../systems/render/drillHeadPose'
 import { drillHeadQuadsOf, drillHeadSizeOf, vehicleAtlasMaps } from '../systems/render/vehicleLook'
 import { PartQuadMesh } from './PartQuadMesh'
+import { SHIPPED_ART } from './shippedArt'
 
 /** In front of the body's parts. */
 const HEAD_Z = 0.2
-const maps = vehicleAtlasMaps()
+const maps = vehicleAtlasMaps(SHIPPED_ART)
 
 export function DrillHeadView({ controller }: { controller: VehicleController }) {
   const visualTier = useGameStore((state) => state.vehicle.visualTier)
-  const quads = useMemo(() => drillHeadQuadsOf(visualTier), [visualTier])
-  const reach = (VEHICLE_COLLIDER_SIZE + drillHeadSizeOf(visualTier)) / 2
+  const quads = useMemo(() => drillHeadQuadsOf(SHIPPED_ART, visualTier), [visualTier])
+  const reach = (VEHICLE_COLLIDER_SIZE + drillHeadSizeOf(SHIPPED_ART, visualTier)) / 2
   const head = useRef<Group>(null)
   const pose = useMemo(createDrillHeadPose, [])
   useFrame(() => {

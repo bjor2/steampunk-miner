@@ -19,6 +19,7 @@ import {
   vehicleBodyQuadsOf,
 } from '../systems/render/vehicleLook'
 import { PartQuadMesh } from './PartQuadMesh'
+import { SHIPPED_ART } from './shippedArt'
 
 const BODY_Z = 0.1
 const HEAD_Z = 0.2
@@ -30,7 +31,7 @@ const GHOST_OPACITY = 0.35
 const DROP_M = 0.35
 const PUFF = { colour: '#f2efe6', startRadiusM: 0.1, endRadiusM: 0.45, opacity: 0.7 }
 
-const maps = vehicleAtlasMaps()
+const maps = vehicleAtlasMaps(SHIPPED_ART)
 
 interface PartFocus {
   highlight: UpgradeId | null
@@ -42,29 +43,31 @@ interface PreviewVehicleProps extends PartFocus {
 }
 
 export function PreviewVehicle({ visualTier, highlight, installing }: PreviewVehicleProps) {
-  const body = useMemo(() => vehicleBodyQuadsOf(visualTier), [visualTier])
-  const head = useMemo(() => drillHeadQuadsOf(visualTier), [visualTier])
+  const body = useMemo(() => vehicleBodyQuadsOf(SHIPPED_ART, visualTier), [visualTier])
+  const head = useMemo(() => drillHeadQuadsOf(SHIPPED_ART, visualTier), [visualTier])
   const partOf = (quad: AssetQuad) => (
     <PreviewPart key={quad.partId} quad={quad} highlight={highlight} installing={installing} />
   )
   return (
     <>
       <group position={[0, 0, BODY_Z]}>{body.map(partOf)}</group>
-      <group position={[drillHeadReachOf(visualTier), 0, HEAD_Z]}>{head.map(partOf)}</group>
+      <group position={[drillHeadReachOf(SHIPPED_ART, visualTier), 0, HEAD_Z]}>
+        {head.map(partOf)}
+      </group>
     </>
   )
 }
 
 /** The next tier's whole silhouette, see-through over the vehicle (#44 "ghost overlay"). */
 export function GhostVehicle({ visualTier }: { visualTier: number }) {
-  const body = useMemo(() => vehicleBodyQuadsOf(visualTier), [visualTier])
-  const head = useMemo(() => drillHeadQuadsOf(visualTier), [visualTier])
+  const body = useMemo(() => vehicleBodyQuadsOf(SHIPPED_ART, visualTier), [visualTier])
+  const head = useMemo(() => drillHeadQuadsOf(SHIPPED_ART, visualTier), [visualTier])
   return (
     <group position={[0, 0, GHOST_Z]}>
       {body.map((quad) => (
         <GhostQuad key={quad.partId} quad={quad} />
       ))}
-      <group position={[drillHeadReachOf(visualTier), 0, 0]}>
+      <group position={[drillHeadReachOf(SHIPPED_ART, visualTier), 0, 0]}>
         {head.map((quad) => (
           <GhostQuad key={quad.partId} quad={quad} />
         ))}

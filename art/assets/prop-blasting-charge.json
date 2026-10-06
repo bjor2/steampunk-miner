@@ -1,0 +1,10 @@
+{
+  "id": "prop-blasting-charge",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#a63a2a",
+  "partColors": {
+    "fuse-lamp": "#ff4a3a"
+  }
+}

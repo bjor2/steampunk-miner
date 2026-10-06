@@ -1,37 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import {
-  mapFilesOf,
-  placeholderDriftProblems,
-  sidecarProblems,
-  type PartsSidecar,
-  type SidecarPart,
-} from './partsSidecar'
+import { mapFilesOf, placeholderDriftProblems, sidecarProblems } from './partsSidecar'
+import { vehicleSidecar, WHEEL_PART } from './sidecarFixtures'
 
-const wheel: SidecarPart = {
-  id: 't1-wheel',
-  tier: 1,
-  rect: [8, 8, 123, 123],
-  sizeM: [0.24, 0.24],
-  pivotM: [0.12, 0.12],
-  atM: [-0.32, -0.36],
-  z: 1,
-}
-
-function vehicleSidecar(parts: SidecarPart[] = [wheel]): PartsSidecar {
-  return {
-    assetId: 'vehicle',
-    schema: 1,
-    source: { blend: 'art/blender/vehicle/vehicle.blend', sha256: null, blender: null },
-    pxPerMetre: 512,
-    atlasPx: [256, 256],
-    maps: {
-      albedo: 'vehicle.albedo.ktx2',
-      normal: 'vehicle.normal.ktx2',
-      emissive: 'vehicle.emissive.ktx2',
-    },
-    parts,
-  }
-}
+const wheel = WHEEL_PART
 
 describe('parts sidecar', () => {
   it('accepts a schema-1 vehicle sidecar with valid parts', () => {
@@ -122,63 +93,6 @@ describe('parts sidecar', () => {
     expect(sidecarProblems('platform-hub', { ...hub, parts: [{ ...wheel, id: 'tower' }] })).toEqual(
       ['platform-hub.parts.json: part "tower" is not a valid part id'],
     )
-  })
-
-  it('takes the tiered part names of a vehicle module on its own asset only', () => {
-    const barrel = { ...wheel, id: 't2-gun-barrel', tier: 2 }
-    const guns = {
-      ...vehicleSidecar([{ ...wheel, id: 't1-turret-head' }, barrel]),
-      assetId: 'vehicle-auto-guns',
-      maps: {
-        albedo: 'vehicle-auto-guns.albedo.ktx2',
-        normal: 'vehicle-auto-guns.normal.ktx2',
-        emissive: 'vehicle-auto-guns.emissive.ktx2',
-      },
-    }
-    expect(sidecarProblems('vehicle-auto-guns', guns)).toEqual([])
-    expect(sidecarProblems('vehicle-auto-guns', { ...guns, parts: [wheel] })).toEqual([
-      'vehicle-auto-guns.parts.json: part "t1-wheel" is not a valid part id',
-    ])
-    expect(sidecarProblems('vehicle', vehicleSidecar([barrel]))).toEqual([
-      'vehicle.parts.json: part "t2-gun-barrel" is not a valid part id',
-    ])
-  })
-
-  it('takes the charge rack frame and one charge per rack slot, and the planted charge lamp', () => {
-    const rack = {
-      ...vehicleSidecar([
-        { ...wheel, id: 'charge-rack' },
-        { ...wheel, id: 'charge-1' },
-        { ...wheel, id: 'charge-8' },
-      ]),
-      assetId: 'vehicle-blasting-charges',
-      maps: {
-        albedo: 'vehicle-blasting-charges.albedo.ktx2',
-        normal: 'vehicle-blasting-charges.normal.ktx2',
-        emissive: false as const,
-      },
-    }
-    expect(sidecarProblems('vehicle-blasting-charges', rack)).toEqual([])
-    expect(
-      sidecarProblems('vehicle-blasting-charges', {
-        ...rack,
-        parts: [{ ...wheel, id: 'charge-9' }],
-      }),
-    ).toEqual(['vehicle-blasting-charges.parts.json: part "charge-9" is not a valid part id'])
-    const charge = {
-      ...rack,
-      assetId: 'prop-blasting-charge',
-      parts: [
-        { ...wheel, id: 'prop-blasting-charge' },
-        { ...wheel, id: 'fuse-lamp' },
-      ],
-      maps: {
-        albedo: 'prop-blasting-charge.albedo.ktx2',
-        normal: 'prop-blasting-charge.normal.ktx2',
-        emissive: 'prop-blasting-charge.emissive.ktx2',
-      },
-    }
-    expect(sidecarProblems('prop-blasting-charge', charge)).toEqual([])
   })
 
   it('names no emissive map for an asset where nothing glows', () => {

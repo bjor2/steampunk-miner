@@ -5,7 +5,7 @@
  * while its maps load. The run vehicle and the Upgrade bay preview read the same quads (#44, #51
  * acceptance 4).
  */
-import { exportedSidecarOf, manifestEntryOf } from './artCatalogue'
+import { exportedSidecarOf, manifestEntryOf, type ArtCatalogue } from './artCatalogue'
 import { folderOfEntry, type ManifestEntry } from './assetManifest'
 import type { PartsSidecar, Pair, SidecarPart } from './partsSidecar'
 import {
@@ -37,17 +37,19 @@ export interface AtlasMaps {
 const PUBLIC_FOLDER = 'public/'
 
 /** The quads an asset shows at a visual tier, lowest draw order first. */
-export function assetQuadsOf(assetId: string, tier: number): AssetQuad[] {
-  const entry = manifestEntryOf(assetId)
-  const sidecar = finalSidecarOf(entry)
-  if (entry === null || sidecar === null) return placeholderQuadsOf(assetId, tier).map(withoutAtlas)
+export function assetQuadsOf(art: ArtCatalogue, assetId: string, tier: number): AssetQuad[] {
+  const entry = manifestEntryOf(art, assetId)
+  const sidecar = finalSidecarOf(art, entry)
+  if (entry === null || sidecar === null) {
+    return placeholderQuadsOf(art, assetId, tier).map(withoutAtlas)
+  }
   return partsShownAtTier(sidecar.parts, tier).map((part) => atlasQuadOf(entry, sidecar, part))
 }
 
 /** The maps a final asset draws with, or null while it is a placeholder. */
-export function atlasMapsOf(assetId: string): AtlasMaps | null {
-  const entry = manifestEntryOf(assetId)
-  const sidecar = finalSidecarOf(entry)
+export function atlasMapsOf(art: ArtCatalogue, assetId: string): AtlasMaps | null {
+  const entry = manifestEntryOf(art, assetId)
+  const sidecar = finalSidecarOf(art, entry)
   const folder = entry === null ? null : folderOfEntry(entry)
   if (sidecar === null || folder === null) return null
   return mapUrlsIn(folder.slice(PUBLIC_FOLDER.length), sidecar.maps)
@@ -59,8 +61,8 @@ export function atlasUvOf(rect: SidecarPart['rect'], [width, height]: Pair): Atl
   return [x / width, (y + h) / height, (x + w) / width, y / height]
 }
 
-function finalSidecarOf(entry: ManifestEntry | null): PartsSidecar | null {
-  return entry?.status === 'final' ? exportedSidecarOf(entry.id) : null
+function finalSidecarOf(art: ArtCatalogue, entry: ManifestEntry | null): PartsSidecar | null {
+  return entry?.status === 'final' ? exportedSidecarOf(art, entry.id) : null
 }
 
 function withoutAtlas(quad: PlaceholderQuad): AssetQuad {

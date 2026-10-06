@@ -17,6 +17,7 @@ import {
 } from '../systems/render/vehiclePreviewLook'
 import { previewPresence } from './previewPresence'
 import { GhostVehicle, PreviewVehicle } from './PreviewVehicle'
+import { SHIPPED_ART } from './shippedArt'
 
 /** Placeholders tuned by eye in `npm run dev`: a warm key light from above left on dark enamel. */
 const KEY_LIGHT = { position: [-3, 4, 6] as const, intensity: 2.2, colour: '#ffe2b0' }
@@ -26,7 +27,7 @@ const PLINTH = { colour: '#6b5a35', height: 0.15, overhang: 0.3 }
 const BACKDROP_COLOUR = '#17120f'
 
 export function VehiclePreviewScene({ preview }: { preview: UpgradePreview }) {
-  const bounds = useMemo(() => previewBoundsOf(preview.ownedTier), [preview.ownedTier])
+  const bounds = useMemo(() => previewBoundsOf(SHIPPED_ART, preview.ownedTier), [preview.ownedTier])
   return (
     <Canvas flat orthographic camera={{ position: [...CAMERA_POSITION] }}>
       <color attach="background" args={[BACKDROP_COLOUR]} />

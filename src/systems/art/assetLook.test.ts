@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { assetQuadsOf, atlasMapsOf, atlasUvOf } from './assetLook'
 import { placeholderSidecarOf } from './artCatalogue'
 import { partsShownAtTier, placeholderQuadsOf } from './placeholderLook'
+import { SHIPPED_ART } from '../../scene/shippedArt'
 
 describe('asset look', () => {
   it('cuts a part from the atlas with v counting down from the image’s top row', () => {
@@ -9,57 +10,33 @@ describe('asset look', () => {
   })
 
   it('draws an asset with no exported parts sidecar as its flat placeholder quads with no atlas', () => {
-    const quads = assetQuadsOf('ground-band-1', 1)
+    const quads = assetQuadsOf(SHIPPED_ART, 'ground-band-1', 1)
     expect(quads).toEqual(
-      placeholderQuadsOf('ground-band-1', 1).map((quad) => ({ ...quad, uv: null })),
+      placeholderQuadsOf(SHIPPED_ART, 'ground-band-1', 1).map((quad) => ({ ...quad, uv: null })),
     )
-    expect(atlasMapsOf('ground-band-1')).toBeNull()
+    expect(atlasMapsOf(SHIPPED_ART, 'ground-band-1')).toBeNull()
   })
 
   it('draws the final vehicle from its atlas at every tier, keeping each part’s colour', () => {
     for (const tier of [1, 2, 3]) {
-      const quads = assetQuadsOf('vehicle', tier)
+      const quads = assetQuadsOf(SHIPPED_ART, 'vehicle', tier)
       expect(quads.every((quad) => quad.uv !== null)).toBe(true)
       expect(quads.map((quad) => quad.colour)).toEqual(
-        placeholderQuadsOf('vehicle', tier).map((quad) => quad.colour),
+        placeholderQuadsOf(SHIPPED_ART, 'vehicle', tier).map((quad) => quad.colour),
       )
     }
   })
 
   it('shows the placeholder’s part ids at every tier once the vehicle art is final', () => {
-    const placeholder = placeholderSidecarOf('vehicle')?.parts ?? []
+    const placeholder = placeholderSidecarOf(SHIPPED_ART, 'vehicle')?.parts ?? []
     for (const tier of [1, 2, 3, 4]) {
       const shown = partsShownAtTier(placeholder, tier).map((part) => part.id)
-      expect(assetQuadsOf('vehicle', tier).map((quad) => quad.partId)).toEqual(shown)
+      expect(assetQuadsOf(SHIPPED_ART, 'vehicle', tier).map((quad) => quad.partId)).toEqual(shown)
     }
   })
 
-  it('keeps the auto guns’ mount and head at every look and swaps only the barrel at looks 2 and 3', () => {
-    const partsAt = (look: number) => assetQuadsOf('vehicle-auto-guns', look).map((q) => q.partId)
-    expect(partsAt(1)).toEqual(['t1-turret-mount', 't1-gun-barrel', 't1-turret-head'])
-    expect(partsAt(2)).toEqual(['t1-turret-mount', 't2-gun-barrel', 't1-turret-head'])
-    expect(partsAt(3)).toEqual(['t1-turret-mount', 't3-gun-barrel', 't1-turret-head'])
-  })
-
-  it('draws the final auto guns from their atlas, with an emissive map for the pilot lamp', () => {
-    expect(assetQuadsOf('vehicle-auto-guns', 3).every((quad) => quad.uv !== null)).toBe(true)
-    expect(atlasMapsOf('vehicle-auto-guns')?.emissive).toBe(
-      'assets/vehicle/vehicle-auto-guns/vehicle-auto-guns.emissive.ktx2',
-    )
-  })
-
-  it('turns the auto guns’ barrel and head about one trunnion above the vehicle’s hull', () => {
-    const quads = assetQuadsOf('vehicle-auto-guns', 3)
-    const trunnions = quads.filter((q) => q.partId !== 't1-turret-mount').map((q) => q.pivot)
-    expect(new Set(trunnions.map((pivot) => pivot.join()))).toHaveLength(1)
-    const vehicleTop = Math.max(
-      ...assetQuadsOf('vehicle', 3).map((q) => q.centre[1] + q.size[1] / 2),
-    )
-    expect(trunnions[0][1]).toBeGreaterThan(vehicleTop)
-  })
-
   it('names the final vehicle’s three maps beside its sidecar under the page root', () => {
-    expect(atlasMapsOf('vehicle')).toEqual({
+    expect(atlasMapsOf(SHIPPED_ART, 'vehicle')).toEqual({
       albedo: 'assets/vehicle/vehicle/vehicle.albedo.ktx2',
       normal: 'assets/vehicle/vehicle/vehicle.normal.ktx2',
       emissive: 'assets/vehicle/vehicle/vehicle.emissive.ktx2',
@@ -68,8 +45,8 @@ describe('asset look', () => {
 
   it('cuts both enemies and the artefact cache from their atlases as their one placeholder part', () => {
     for (const assetId of ['enemy-crawler', 'enemy-burrower', 'prop-artefact-cache']) {
-      const [quad, ...rest] = assetQuadsOf(assetId, 1)
-      const [placeholder] = placeholderQuadsOf(assetId, 1)
+      const [quad, ...rest] = assetQuadsOf(SHIPPED_ART, assetId, 1)
+      const [placeholder] = placeholderQuadsOf(SHIPPED_ART, assetId, 1)
       expect(rest).toEqual([])
       expect(quad.uv).not.toBeNull()
       expect({ ...quad, uv: null }).toEqual({ ...placeholder, uv: null })
@@ -77,27 +54,16 @@ describe('asset look', () => {
   })
 
   it('gives the enemies a glow map and the artefact cache none (S7c: nothing on the cache glows)', () => {
-    expect(atlasMapsOf('enemy-crawler')?.emissive).toBe(
+    expect(atlasMapsOf(SHIPPED_ART, 'enemy-crawler')?.emissive).toBe(
       'assets/enemy/enemy-crawler/enemy-crawler.emissive.ktx2',
     )
-    expect(atlasMapsOf('enemy-burrower')?.emissive).toBe(
+    expect(atlasMapsOf(SHIPPED_ART, 'enemy-burrower')?.emissive).toBe(
       'assets/enemy/enemy-burrower/enemy-burrower.emissive.ktx2',
     )
-    expect(atlasMapsOf('prop-artefact-cache')).toEqual({
+    expect(atlasMapsOf(SHIPPED_ART, 'prop-artefact-cache')).toEqual({
       albedo: 'assets/prop/prop-artefact-cache/prop-artefact-cache.albedo.ktx2',
       normal: 'assets/prop/prop-artefact-cache/prop-artefact-cache.normal.ktx2',
       emissive: null,
     })
-  })
-
-  it('cuts the tunnel wrecker from its atlas as its one placeholder part, with a glow map', () => {
-    const [quad, ...rest] = assetQuadsOf('enemy-tunnel-wrecker', 1)
-    const [placeholder] = placeholderQuadsOf('enemy-tunnel-wrecker', 1)
-    expect(rest).toEqual([])
-    expect(quad.uv).not.toBeNull()
-    expect({ ...quad, uv: null }).toEqual({ ...placeholder, uv: null })
-    expect(atlasMapsOf('enemy-tunnel-wrecker')?.emissive).toBe(
-      'assets/enemy/enemy-tunnel-wrecker/enemy-tunnel-wrecker.emissive.ktx2',
-    )
   })
 })

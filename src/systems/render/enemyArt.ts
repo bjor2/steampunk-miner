@@ -4,6 +4,7 @@
  * still come from `enemyLookOf` (tint, size, glow): the chitin is pale, so the tint multiplies
  * over it. An enemy stands on the round planet, so its art rolls to local up like the camera does.
  */
+import type { ArtCatalogue } from '../art/artCatalogue'
 import { kebabOf } from '../art/artIds'
 import { assetQuadsOf, atlasMapsOf, type AssetQuad, type AtlasMaps } from '../art/assetLook'
 import { ENEMY_KINDS, type EnemyKind } from '../economy/economyDefinition'
@@ -18,15 +19,15 @@ export function enemyAssetIdOf(kind: EnemyKind): string {
   return `enemy-${kebabOf(kind)}`
 }
 
-export function enemyArtOf(kind: EnemyKind): EnemyArt {
+export function enemyArtOf(art: ArtCatalogue, kind: EnemyKind): EnemyArt {
   const assetId = enemyAssetIdOf(kind)
-  const [quad] = assetQuadsOf(assetId, 1)
-  return { quad, maps: atlasMapsOf(assetId) }
+  const [quad] = assetQuadsOf(art, assetId, 1)
+  return { quad, maps: atlasMapsOf(art, assetId) }
 }
 
 /** The pool draws one material per kind's maps, so it draws atlas art only once every kind has it. */
-export function isEveryEnemyArtFinal(): boolean {
-  return ENEMY_KINDS.every((kind) => enemyArtOf(kind).maps !== null)
+export function isEveryEnemyArtFinal(art: ArtCatalogue): boolean {
+  return ENEMY_KINDS.every((kind) => enemyArtOf(art, kind).maps !== null)
 }
 
 /**

@@ -1,9 +1,9 @@
 /**
- * `art/asset-manifest.json`, the #51 inventory as data (#52 "Folders"): every asset with its
- * `source` (blender, vector, shader or procedural), its `form` (what files it ships as) and its
- * `status`. A `placeholder` has no files, and a Blender placeholder carries the flat colour the
- * renderer draws it in (`partColors` overrides it per part). A `final` asset ships exactly the
- * files its form names. The asset lint (#52 acceptance 1, #51 acceptance 1) is these rules run
+ * The asset manifest, the #51 inventory as data (#52 "Folders"), one `art/assets/<id>.json` entry
+ * per asset (#116): every asset with its `source` (blender, vector, shader or procedural), its
+ * `form` (what files it ships as) and its `status`. A `placeholder` has no files, and a Blender
+ * placeholder carries the flat colour the renderer draws it in (`partColors` overrides it per
+ * part). A `final` asset ships exactly the files its form names. The asset lint (#52 acceptance 1, #51 acceptance 1) is these rules run
  * over the shipped files.
  */
 import { blenderAssetIds, categoryOfAssetId, isKebabId, vectorIconIds } from './artIds'
@@ -30,8 +30,8 @@ export interface ManifestEntry {
   partColors?: Readonly<Record<string, string>>
 }
 
+/** Every entry file, sorted by id (`artCatalogueOf`). */
 export interface AssetManifest {
-  schema: number
   assets: readonly ManifestEntry[]
 }
 
@@ -50,7 +50,6 @@ const HEX_COLOUR = /^#[0-9a-f]{6}$/
 /** Why the manifest is not the #51 inventory under the #52 naming; empty when it is. */
 export function manifestProblems(manifest: AssetManifest): string[] {
   return [
-    ...(manifest.schema === 1 ? [] : ['asset-manifest.json: schema must be 1']),
     ...duplicateIdProblems(manifest.assets),
     ...manifest.assets.flatMap(entryProblems),
     ...missingIdProblems(manifest.assets, 'blender', blenderAssetIds()),
@@ -161,7 +160,7 @@ function strayFileProblems(
   path: string,
 ): string[] {
   const owner = manifest.assets.find((entry) => entry.id === ownerIdOfFile(path))
-  if (owner === undefined) return [`${path}: has no asset-manifest.json entry`]
+  if (owner === undefined) return [`${path}: has no art/assets entry`]
   if (owner.status !== 'final')
     return [`${path}: "${owner.id}" is a placeholder, which ships no files`]
   if (!expectedFiles.includes(path)) return [`${path}: is not a file a ${owner.form} asset ships`]

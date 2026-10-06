@@ -3,13 +3,14 @@ import { placeholderQuadsOf } from '../art/placeholderLook'
 import { ENEMY_KINDS } from '../economy/economyDefinition'
 import { enemyArtOf, enemyRollOf, isEveryEnemyArtFinal } from './enemyArt'
 import { enemyLookOf } from './enemyPlaceholder'
+import { SHIPPED_ART } from '../../scene/shippedArt'
 
 describe('enemy art', () => {
   it('draws every enemy kind as the one part of its final S7c asset, cut from the atlas', () => {
-    expect(isEveryEnemyArtFinal()).toBe(true)
+    expect(isEveryEnemyArtFinal(SHIPPED_ART)).toBe(true)
     for (const kind of ENEMY_KINDS) {
-      const art = enemyArtOf(kind)
-      const [placeholder] = placeholderQuadsOf(`enemy-${kind}`, 1)
+      const art = enemyArtOf(SHIPPED_ART, kind)
+      const [placeholder] = placeholderQuadsOf(SHIPPED_ART, `enemy-${kind}`, 1)
       expect(art.quad.partId).toBe(`enemy-${kind}`)
       expect(art.quad.uv).not.toBeNull()
       expect(art.quad.size).toEqual(placeholder.size)
@@ -19,7 +20,10 @@ describe('enemy art', () => {
 
   it('sizes the art as the placeholder look sizes the enemy at tier 1', () => {
     for (const kind of ENEMY_KINDS) {
-      expect(enemyArtOf(kind).quad.size[0]).toBeCloseTo(enemyLookOf(kind, 'idle', 1).size, 6)
+      expect(enemyArtOf(SHIPPED_ART, kind).quad.size[0]).toBeCloseTo(
+        enemyLookOf(kind, 'idle', 1).size,
+        6,
+      )
     }
   })
 

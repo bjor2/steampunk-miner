@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ASSET_MANIFEST } from '../art/artCatalogue'
+import { SHIPPED_ART } from '../../scene/shippedArt'
 import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
 import { stateDigest } from '../authority/stateDigest'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
@@ -53,7 +53,7 @@ describe('upgrade bay model', () => {
   it('gives every row an icon the art manifest ships as a final vector icon', () => {
     const model = upgradeBayOf(atUpgradeBay())
     const iconIds = [...model.tracks.map((row) => row.iconId), model.casing.iconId]
-    const finalIcons = ASSET_MANIFEST.assets.filter(
+    const finalIcons = SHIPPED_ART.manifest.assets.filter(
       (entry) => entry.form === 'svg' && entry.status === 'final',
     )
     expect(finalIcons.map((entry) => entry.id)).toEqual(expect.arrayContaining(iconIds))

@@ -7,18 +7,22 @@ import {
   previewVehicleShareOf,
   previewZoomOf,
 } from './vehiclePreviewLook'
+import { SHIPPED_ART } from '../../scene/shippedArt'
 
 const PANELS = [
   { widthPixels: 920, heightPixels: 560 },
   { widthPixels: 1840, heightPixels: 1120 },
 ]
 
-const partsAt = (tier: number) => [...vehicleBodyQuadsOf(tier), ...drillHeadQuadsOf(tier)]
+const partsAt = (tier: number) => [
+  ...vehicleBodyQuadsOf(SHIPPED_ART, tier),
+  ...drillHeadQuadsOf(SHIPPED_ART, tier),
+]
 
 describe('upgrade bay preview look', () => {
   it('frames the visual vehicle at 60% of the panel height at every tier, at 1080p and 4K panel sizes', () => {
     for (const tier of [1, 2, 3]) {
-      const bounds = previewBoundsOf(tier)
+      const bounds = previewBoundsOf(SHIPPED_ART, tier)
       for (const panel of PANELS) {
         const share = previewVehicleShareOf(
           bounds,
@@ -32,16 +36,16 @@ describe('upgrade bay preview look', () => {
   })
 
   it('narrows the framing rather than clip the drill in a slim panel', () => {
-    const bounds = previewBoundsOf(3)
+    const bounds = previewBoundsOf(SHIPPED_ART, 3)
     const slim = { widthPixels: 200, heightPixels: 800 }
     const zoom = previewZoomOf(bounds, slim)
     expect((bounds.right - bounds.left) * zoom).toBeLessThanOrEqual(slim.widthPixels)
   })
 
   it('reaches out to the drill head in front of the body', () => {
-    const bounds = previewBoundsOf(1)
+    const bounds = previewBoundsOf(SHIPPED_ART, 1)
     const bodyRight = Math.max(
-      ...vehicleBodyQuadsOf(1).map((quad) => quad.centre[0] + quad.size[0] / 2),
+      ...vehicleBodyQuadsOf(SHIPPED_ART, 1).map((quad) => quad.centre[0] + quad.size[0] / 2),
     )
     expect(bounds.right).toBeGreaterThan(bodyRight)
   })

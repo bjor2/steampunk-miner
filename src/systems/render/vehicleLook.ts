@@ -7,6 +7,7 @@
  * art may overhang the 0.9 m collider but never sizes it (#7): physics reads
  * `VEHICLE_COLLIDER_SIZE`, never this file.
  */
+import type { ArtCatalogue } from '../art/artCatalogue'
 import { slotOfPartId } from '../art/artIds'
 import { assetQuadsOf, atlasMapsOf, type AssetQuad, type AtlasMaps } from '../art/assetLook'
 import { createPartPose, writePartPose, type PartMotion, type PartPose } from './partMotion'
@@ -21,13 +22,13 @@ function isOnDrillHead(quad: AssetQuad): boolean {
 }
 
 /** Every part id the run vehicle shows at a visual tier (the debug API's `vehicleParts`). */
-export function vehiclePartIdsOf(visualTier: number): string[] {
-  return assetQuadsOf(VEHICLE_ASSET_ID, visualTier).map((quad) => quad.partId)
+export function vehiclePartIdsOf(art: ArtCatalogue, visualTier: number): string[] {
+  return assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier).map((quad) => quad.partId)
 }
 
 /** The maps the vehicle's parts are cut from, or null while it is a placeholder. */
-export function vehicleAtlasMaps(): AtlasMaps | null {
-  return atlasMapsOf(VEHICLE_ASSET_ID)
+export function vehicleAtlasMaps(art: ArtCatalogue): AtlasMaps | null {
+  return atlasMapsOf(art, VEHICLE_ASSET_ID)
 }
 
 /**
@@ -35,12 +36,13 @@ export function vehicleAtlasMaps(): AtlasMaps | null {
  * reads): the same rule the drawn parts follow, with each part's half-height as its radius.
  */
 export function vehiclePartPosesOf(
+  art: ArtCatalogue,
   motion: PartMotion,
   visualTier: number,
   isMotionReduced: boolean,
 ): Record<string, PartPose> {
   const poses: Record<string, PartPose> = {}
-  for (const quad of assetQuadsOf(VEHICLE_ASSET_ID, visualTier)) {
+  for (const quad of assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier)) {
     const pose = createPartPose()
     writePartPose(motion, slotOfPartId(quad.partId), quad.size[1] / 2, isMotionReduced, pose)
     poses[quad.partId] = pose
@@ -49,24 +51,24 @@ export function vehiclePartPosesOf(
 }
 
 /** The quads drawn on the body, lowest draw order first. */
-export function vehicleBodyQuadsOf(visualTier: number): AssetQuad[] {
-  return assetQuadsOf(VEHICLE_ASSET_ID, visualTier).filter((quad) => !isOnDrillHead(quad))
+export function vehicleBodyQuadsOf(art: ArtCatalogue, visualTier: number): AssetQuad[] {
+  return assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier).filter((quad) => !isOnDrillHead(quad))
 }
 
 /**
  * The quads the drill head carries, centred on the head plate's centre and with `z` counted from
  * the plate's, so the swivel can place and turn them as one.
  */
-export function drillHeadQuadsOf(visualTier: number): AssetQuad[] {
-  const quads = assetQuadsOf(VEHICLE_ASSET_ID, visualTier).filter(isOnDrillHead)
+export function drillHeadQuadsOf(art: ArtCatalogue, visualTier: number): AssetQuad[] {
+  const quads = assetQuadsOf(art, VEHICLE_ASSET_ID, visualTier).filter(isOnDrillHead)
   const head = quads.find((quad) => slotOfPartId(quad.partId) === DRILL_HEAD_SLOT)
   if (head === undefined) return []
   return quads.map((quad) => relativeToHead(quad, head))
 }
 
 /** The head plate's width, which sets how far ahead of the collider the head reaches. */
-export function drillHeadSizeOf(visualTier: number): number {
-  const head = drillHeadQuadsOf(visualTier).find((quad) => quad.z === 0)
+export function drillHeadSizeOf(art: ArtCatalogue, visualTier: number): number {
+  const head = drillHeadQuadsOf(art, visualTier).find((quad) => quad.z === 0)
   return head === undefined ? 0 : head.size[0]
 }
 

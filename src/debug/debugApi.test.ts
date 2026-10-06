@@ -18,6 +18,7 @@ import type { PlanetParams } from '../systems/world/planetParams'
 import { fromCanonical } from '../systems/money'
 import { parseScenario, type Scenario } from '../systems/scenario'
 import { createDebugApi, DebugCommandNotImplementedError } from './debugApi'
+import { SHIPPED_ART } from '../scene/shippedArt'
 
 const readScenarioFile = (name: string) =>
   readFileSync(new URL(`../../scenarios/${name}`, import.meta.url), 'utf8')
@@ -322,7 +323,7 @@ describe('debug api: vehicle', () => {
 
   it('reports every placeholder part id of each tier on the run vehicle, without logging', () => {
     const partIdsOfTier = (tier: number) =>
-      (placeholderSidecarOf('vehicle')?.parts ?? [])
+      (placeholderSidecarOf(SHIPPED_ART, 'vehicle')?.parts ?? [])
         .filter((part) => part.tier === tier)
         .map((part) => part.id)
     const debug = createDebugApi()

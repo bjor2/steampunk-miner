@@ -1,0 +1,14 @@
+{
+  "id": "vehicle-auto-guns",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "t1-turret-mount": "#3b3631",
+    "t1-turret-head": "#c9a24b",
+    "t1-gun-barrel": "#7a7f86",
+    "t2-gun-barrel": "#7a7f86",
+    "t3-gun-barrel": "#b87333"
+  }
+}
