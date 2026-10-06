@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CATEGORY_IDS } from '../metrics/phaseCategories.mjs'
-import { buildTicketTimeOverview } from './ticketTimeOverview.mjs'
+import { SHOWN_CATEGORIES, buildTicketTimeOverview } from './ticketTimeOverview.mjs'
 
 const REPO = 'bjor2/steampunk-miner'
 
@@ -75,10 +74,25 @@ describe('ticket time overview', () => {
 
   it('gives every ticket and every day a total for all ten categories, zeros included', () => {
     const model = build([ticketFile(5, '2026-10-05T10:00:00Z', { testing: 60 })])
-    expect(Object.keys(model.recent[0].totals)).toEqual(CATEGORY_IDS)
-    expect(Object.keys(model.days[0].totals)).toEqual(CATEGORY_IDS)
-    expect(model.categories.map((category) => category.id)).toEqual(CATEGORY_IDS)
-    expect(model.categoryTotals).toMatchObject({ testing: 60, blocked: 0 })
+    const shownIds = SHOWN_CATEGORIES.map((category) => category.id)
+    expect(Object.keys(model.recent[0].totals)).toEqual(shownIds)
+    expect(Object.keys(model.days[0].totals)).toEqual(shownIds)
+    expect(model.categories.map((category) => category.id)).toEqual(shownIds)
+    expect(model.categoryTotals).toMatchObject({ testing: 60, idle: 0 })
+  })
+
+  it('never shows how long a ticket was blocked: no category, total or day total for it', () => {
+    const model = build([
+      ticketFile(5, '2026-10-05T10:00:00Z', { blocked: 900, testing: 60 }, { preClaim: 3600 }),
+    ])
+    expect(SHOWN_CATEGORIES.map((category) => category.id)).not.toContain('blocked')
+    expect(model.categories.map((category) => category.id)).not.toContain('blocked')
+    expect(model.recent[0].totals).not.toHaveProperty('blocked')
+    expect(model.recent[0].claimedTotals).not.toHaveProperty('blocked')
+    expect(model.days[0].totals).not.toHaveProperty('blocked')
+    expect(model.categoryTotals).not.toHaveProperty('blocked')
+    expect(model.categoryTotals.testing).toBe(60)
+    expect(JSON.stringify(model)).not.toContain('blocked')
   })
 
   it('sums each close day and takes the median cycle and lead time of its tickets', () => {
@@ -131,8 +145,9 @@ describe('ticket time overview', () => {
     const [ticket] = build([{ name: '5.json', text: JSON.stringify(record) }]).tickets
     expect(ticket.claimed).toBe('2026-10-06T09:00:00Z')
     expect(ticket.claimedToDoneS).toBe(7200)
-    expect(ticket.claimedTotals).toMatchObject({ blocked: 0, developing: 3600, planner_wait: 3600 })
-    expect(ticket.totals.blocked).toBe(3600)
+    expect(ticket.claimedTotals).toMatchObject({ developing: 3600, planner_wait: 3600 })
+    expect(ticket.claimedTotals).not.toHaveProperty('blocked')
+    expect(ticket.totals).not.toHaveProperty('blocked')
   })
 
   it('gives a ticket that was never claimed no window', () => {
@@ -153,9 +168,9 @@ describe('ticket time overview', () => {
         { preClaim: threeDays },
       ),
     ])
-    expect(model.recent[0].claimedTotals).toMatchObject({ developing: 1800, blocked: 600 })
-    expect(model.categoryTotals).toMatchObject({ developing: 1800, blocked: 600 })
-    expect(model.days[0].totals).toMatchObject({ developing: 1800, blocked: 600 })
+    expect(model.recent[0].claimedTotals).toMatchObject({ developing: 1800 })
+    expect(model.categoryTotals).toMatchObject({ developing: 1800 })
+    expect(model.days[0].totals).toMatchObject({ developing: 1800 })
   })
 
   it('leaves a ticket with no claim out of the totals and counts it as unclaimed', () => {
@@ -163,7 +178,7 @@ describe('ticket time overview', () => {
       ticketFile(5, '2026-10-06T09:00:00Z', { testing: 60 }),
       ticketFile(6, '2026-10-06T10:00:00Z', { blocked: 9000 }, { claimed: false }),
     ])
-    expect(model.categoryTotals).toMatchObject({ testing: 60, blocked: 0 })
+    expect(model.categoryTotals).toMatchObject({ testing: 60, idle: 0 })
     expect(model.days[0]).toMatchObject({ ticketCount: 2, unclaimedCount: 1 })
     expect(model.unclaimedCount).toBe(1)
   })

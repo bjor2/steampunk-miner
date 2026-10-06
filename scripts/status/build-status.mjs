@@ -16,7 +16,6 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { PHASE_CATEGORIES } from '../metrics/phaseCategories.mjs'
 import { annotateFeatures, validateFeatures } from './features.mjs'
 import {
   renderFeatureTimeFailure,
@@ -25,7 +24,7 @@ import {
 } from './featureTimeHtml.mjs'
 import { buildPerfOverview } from './perfOverview.mjs'
 import { renderPerfOverview, renderPerfOverviewFailure } from './perfOverviewHtml.mjs'
-import { buildTicketTimeOverview } from './ticketTimeOverview.mjs'
+import { SHOWN_CATEGORIES, buildTicketTimeOverview } from './ticketTimeOverview.mjs'
 import { renderTicketTimeFailure, renderTicketTimeOverview } from './ticketTimeOverviewHtml.mjs'
 import { buildTicketsClosedOverTime } from './ticketsClosed.mjs'
 import { renderTicketsClosedFailure, renderTicketsClosedOverTime } from './ticketsClosedHtml.mjs'
@@ -322,8 +321,8 @@ function buildFeatureTimeSection(features, ticketTimeModel) {
   const problem = featureTimeProblemOf(features, ticketTimeModel)
   if (problem) return { features, html: renderFeatureTimeFailure(problem) }
   try {
-    const areas = withFeatureTimeBars(features.areas, PHASE_CATEGORIES)
-    const html = renderFeatureTimeOverview(features, PHASE_CATEGORIES, REPO)
+    const areas = withFeatureTimeBars(features.areas, SHOWN_CATEGORIES)
+    const html = renderFeatureTimeOverview(features, SHOWN_CATEGORIES, REPO)
     return { features: { ...features, areas }, html }
   } catch (err) {
     console.warn(`feature time failed: ${err.message}`)

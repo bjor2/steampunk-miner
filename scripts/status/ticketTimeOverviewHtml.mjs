@@ -108,7 +108,7 @@ function recentTicketsHtml(model) {
   )
   return (
     `<div class="sub" id="tt-tickets"><h3>Last ${model.recent.length} closed tickets</h3>` +
-    '<div class="muted tt-note">Each bar is the ticket from its claim to its close (claimed → done); right: that time.</div>' +
+    '<div class="muted tt-note">Each bar is the ticket from its claim to its close (claimed → done), time spent blocked left out; right: the whole claimed → done time.</div>' +
     `<div class="tt-rows">${rows.join('')}</div></div>`
   )
 }
@@ -253,7 +253,7 @@ function headerHtml(model) {
   return (
     '<h2>Where the time goes</h2>' +
     `<div class="muted tt-note">${model.ticketCount} closed tickets from <code>docs/metrics/tickets/</code>, ` +
-    'split into fixed phase categories, claimed → done only: time before the first claim is left out ' +
+    'split into fixed phase categories, claimed → done only: time before the first claim and time spent blocked are left out ' +
     `(<a href="${escapeHtml(readme)}">how it is measured</a>).${unclaimedNoteOf(model)}</div>`
   )
 }

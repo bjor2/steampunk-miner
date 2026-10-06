@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { CATEGORY_IDS } from '../metrics/phaseCategories.mjs'
 import { featureTimeOf, measuredByNumberOf, subIssuesOfIssues } from './featureTime.mjs'
-import { buildTicketTimeOverview } from './ticketTimeOverview.mjs'
+import { SHOWN_CATEGORIES, buildTicketTimeOverview } from './ticketTimeOverview.mjs'
 
 const HOUR = 3600
 
@@ -81,15 +80,23 @@ describe('feature time roll-up', () => {
     expect(time.totals.testing).toBe(30)
     expect(time.totals.idle).toBe(600)
     expect(time.measuredS).toBe(HOUR + 60 + 30 + 600)
-    expect(Object.keys(time.totals)).toEqual(CATEGORY_IDS)
+    expect(Object.keys(time.totals)).toEqual(SHOWN_CATEGORIES.map((category) => category.id))
   })
 
   it("leaves the time before each ticket's claim out of the feature", () => {
     const sources = sourcesOf([ticketFile(10, { developing: HOUR, planner_wait: 600 })])
     const time = featureTimeOf(feature('Drill', [10]), sources)
-    expect(time.totals.blocked).toBe(0)
+    expect(time.totals).not.toHaveProperty('blocked')
     expect(time.totals.planner_wait).toBe(600)
     expect(time.measuredS).toBe(HOUR + 600)
+  })
+
+  it('never counts the time a ticket was blocked, even after its claim', () => {
+    const sources = sourcesOf([ticketFile(10, { developing: HOUR, blocked: 600, testing: 60 })])
+    const time = featureTimeOf(feature('Drill', [10]), sources)
+    expect(time.totals).not.toHaveProperty('blocked')
+    expect(time.totals).toMatchObject({ developing: HOUR, testing: 60 })
+    expect(time.measuredS).toBe(HOUR + 60)
   })
 
   it('counts a ticket that was never claimed as not measured', () => {

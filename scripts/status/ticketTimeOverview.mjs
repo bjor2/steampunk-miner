@@ -4,12 +4,27 @@
 // clock, so the Pages job (no transcripts there) and the tests feed it the same file texts. The
 // breakdowns and totals count only each ticket's claimed-to-done window (#138 for the Features
 // tab, #167 here): days blocked before anyone picked a ticket up drowned out the work. The
-// Features tab rolls the same tickets up per feature (featureTime.mjs, #135).
+// Features tab rolls the same tickets up per feature (featureTime.mjs, #135). How long a ticket
+// was blocked is not shown anywhere on the page: the committed files still carry `blocked` time
+// (the metrics schema is unchanged), but the model drops it, so no bar, legend, tooltip or total
+// counts it.
 import { claimedWindowTotals } from '../metrics/claimedWindow.mjs'
-import { PHASE_CATEGORIES, TICKET_PHASES_SCHEMA, zeroTotals } from '../metrics/phaseCategories.mjs'
+import { PHASE_CATEGORIES, TICKET_PHASES_SCHEMA } from '../metrics/phaseCategories.mjs'
 
 export const RECENT_TICKET_COUNT = 30
 const DAY_LENGTH = 'YYYY-MM-DD'.length
+// Phase categories the status page leaves out of every chart and total.
+export const HIDDEN_CATEGORY_IDS = ['blocked']
+
+/** The phase categories the status page shows, in their fixed order and colours. */
+export const SHOWN_CATEGORIES = PHASE_CATEGORIES.filter(
+  (category) => !HIDDEN_CATEGORY_IDS.includes(category.id),
+)
+
+/** `{ <category>: 0 }` for every shown category, so a total or a legend never misses one. */
+export function shownZeroTotals() {
+  return Object.fromEntries(SHOWN_CATEGORIES.map((category) => [category.id, 0]))
+}
 
 function isRecord(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -46,10 +61,11 @@ function secondsOrNull(value) {
   return Number.isFinite(value) ? value : null
 }
 
-function fullTotalsOf(totals) {
-  const full = zeroTotals()
-  for (const id of Object.keys(full)) full[id] = Number.isFinite(totals[id]) ? totals[id] : 0
-  return full
+// Every shown category, a hidden one (blocked) dropped.
+function shownTotalsOf(totals) {
+  const shown = shownZeroTotals()
+  for (const id of Object.keys(shown)) shown[id] = Number.isFinite(totals[id]) ? totals[id] : 0
+  return shown
 }
 
 function claimedOf(record) {
@@ -64,7 +80,9 @@ function segmentsOf(record) {
 // unmeasured.
 function claimedTotalsOf(record) {
   const claimed = claimedOf(record)
-  return claimed ? claimedWindowTotals(segmentsOf(record), claimed, record.closed) : null
+  return claimed
+    ? shownTotalsOf(claimedWindowTotals(segmentsOf(record), claimed, record.closed))
+    : null
 }
 
 function ticketOf(record, repo) {
@@ -75,7 +93,7 @@ function ticketOf(record, repo) {
     closed: record.closed,
     closedMs: Date.parse(record.closed),
     tier: typeof record.tier === 'string' ? record.tier : null,
-    totals: fullTotalsOf(record.totals),
+    totals: shownTotalsOf(record.totals),
     leadS: secondsOrNull(record.lead_time_s),
     cycleS: secondsOrNull(record.cycle_time_s),
     claimed: claimedOf(record),
@@ -107,7 +125,7 @@ function isUnclaimed(ticket) {
 function claimedTotalsSumOf(tickets) {
   return tickets
     .filter((ticket) => !isUnclaimed(ticket))
-    .reduce((sum, ticket) => addTotals(sum, ticket.claimedTotals), zeroTotals())
+    .reduce((sum, ticket) => addTotals(sum, ticket.claimedTotals), shownZeroTotals())
 }
 
 function unclaimedCountOf(tickets) {
@@ -148,7 +166,7 @@ export function buildTicketTimeOverview({ files, repo }) {
     .map((record) => ticketOf(record, repo))
   return {
     repo,
-    categories: PHASE_CATEGORIES,
+    categories: SHOWN_CATEGORIES,
     ticketCount: tickets.length,
     unclaimedCount: unclaimedCountOf(tickets),
     categoryTotals: claimedTotalsSumOf(tickets),

@@ -16,6 +16,12 @@ in the **Where the time goes** section at the top of the **Issue trees** tab
 The bars, the day totals and the legend count only each ticket's
 [claimed-to-done window](#claimed-to-done-window) (#167); a ticket with no claim adds nothing to them.
 
+The page never shows how long a ticket was **blocked**: the files still record `blocked` time (the
+category is part of schema v1), but the status page drops it before drawing, on both tabs, so it is
+in no bar, legend, tooltip or category total there (`HIDDEN_CATEGORY_IDS` in
+`scripts/status/ticketTimeOverview.mjs`). A bar is its other categories; the claimed-to-done, lead
+and cycle times beside the bars and in the medians stay the full wall-clock spans.
+
 The page reads only the committed files (`scripts/status/ticketTimeOverview.mjs`), so the Pages job
 builds it without transcripts. Ticket #134 specifies all of this.
 
@@ -104,7 +110,7 @@ The Features tab and the Issue trees tab count only this window (`scripts/metric
   waiting on planners before anyone picked the ticket up says nothing about the work;
 - inside the window, every category is kept in its own colour: the session categories, `gates`,
   `landing`, `idle` between attempts or waiting on a gate slot, and `blocked` and `planner_wait`
-  after the work started;
+  after the work started (the status page then leaves `blocked` out, see above);
 - a segment that straddles the claim keeps only its part after it.
 
 The median lead time on the Issue trees tab still runs from creation to close.

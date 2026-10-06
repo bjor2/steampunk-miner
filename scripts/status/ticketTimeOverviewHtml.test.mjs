@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { PHASE_CATEGORIES } from '../metrics/phaseCategories.mjs'
-import { buildTicketTimeOverview } from './ticketTimeOverview.mjs'
+import { SHOWN_CATEGORIES, buildTicketTimeOverview } from './ticketTimeOverview.mjs'
 import {
   formatDuration,
   renderTicketTimeFailure,
@@ -87,12 +87,12 @@ describe('ticket time overview html', () => {
     const row = html.slice(html.indexOf('data-ticket="133"'), html.indexOf('data-ticket="118"'))
     const colours = [...row.matchAll(/<rect [^>]*fill="(#[0-9a-f]{6})"/g)].map((m) => m[1])
     const colourOf = (id) => PHASE_CATEGORIES.find((category) => category.id === id).colour
-    expect(colours).toEqual([colourOf('blocked'), colourOf('idle'), colourOf('testing')])
+    expect(colours).toEqual([colourOf('idle'), colourOf('testing')])
   })
 
-  it('lists every category in the legend, even one with no time', () => {
+  it('lists every shown category in the legend, even one with no time', () => {
     const html = render(FILES)
-    for (const category of PHASE_CATEGORIES) {
+    for (const category of SHOWN_CATEGORIES) {
       expect(html).toContain(`<li data-category="${category.id}">`)
     }
     expect(html).toContain('Waiting on planners <span class="muted">0 min · 0%</span>')
@@ -118,10 +118,29 @@ describe('ticket time overview html', () => {
       ),
     ])
     const row = rowOf(html, 150)
-    expect(row).toContain('<title>Blocked: 10 min (25%)</title>')
-    expect(row).toContain('<title>Developing: 30 min (75%)</title>')
+    expect(row).toContain('<title>Developing: 30 min (100%)</title>')
     expect(row).toContain('title="claimed → done">40 min')
-    expect(html).toContain('Blocked <span class="muted">10 min · 25%</span>')
+    expect(html).toContain('Developing <span class="muted">30 min · 100%</span>')
+  })
+
+  it('never shows how long a ticket was blocked: no bar segment, legend entry or tooltip', () => {
+    const blockedTicket = ticketFile(
+      150,
+      '2026-10-06T10:00:00Z',
+      { developing: 1800, blocked: 600, testing: 600 },
+      { preClaim: 3 * DAY_S },
+    )
+    const html = render([...FILES, blockedTicket])
+    const blocked = PHASE_CATEGORIES.find((category) => category.id === 'blocked')
+    expect(html).not.toContain(blocked.colour)
+    expect(html).not.toContain('data-category="blocked"')
+    expect(html).not.toContain('Blocked')
+    // Alone, its bar re-normalises over the shown categories: developing then testing, full width.
+    const row = rowOf(render([blockedTicket]), 150)
+    expect(row).toContain('<title>Developing: 30 min (75%)</title>')
+    expect(row).toContain('<title>Testing: 10 min (25%)</title>')
+    const widths = [...row.matchAll(/<rect [^>]*width="([\d.]+)"/g)].map((m) => Number(m[1]))
+    expect(widths.reduce((sum, width) => sum + width, 0)).toBeCloseTo(1000, 0)
   })
 
   it('says "claimed → done" in the caption of the bars and the legend', () => {
@@ -138,7 +157,7 @@ describe('ticket time overview html', () => {
     const row = rowOf(html, 60)
     expect(row).toContain('no claim data')
     expect(row).not.toContain('<rect')
-    expect(html).toContain('Blocked <span class="muted">0 min · 0%</span>')
+    expect(html).toContain('Testing <span class="muted">10 min · 100%</span>')
   })
 
   it('escapes ticket titles', () => {

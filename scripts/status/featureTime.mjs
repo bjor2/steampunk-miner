@@ -4,10 +4,10 @@
 // however many paths reach it, so a shared ticket never doubles a total. A ticket with no
 // docs/metrics/tickets file, or never claimed, is "not measured": counted, never added as zero time.
 // Only each ticket's claimed-to-done window counts (#138): time before its first claim is left out,
-// a block or planner wait after it is kept. Pure: the sub-issues come from the live issue list and
-// the times from ticketTimeOverview's tickets.
-import { zeroTotals } from '../metrics/phaseCategories.mjs'
-import { medianOf } from './ticketTimeOverview.mjs'
+// a planner wait or idle time after it is kept; blocked time is never counted (ticketTimeOverview
+// drops it). Pure: the sub-issues come from the live issue list and the times from
+// ticketTimeOverview's tickets.
+import { medianOf, shownZeroTotals } from './ticketTimeOverview.mjs'
 
 // The median of one ticket is just its time, so the median needs this many.
 export const MEDIAN_MIN_TICKETS = 2
@@ -60,7 +60,7 @@ export function rollUpTicketTime(numbers, measuredByNumber) {
     .map((n) => measuredByNumber.get(n))
   const totals = measured.reduce(
     (sum, ticket) => addTotals(sum, ticket.claimedTotals),
-    zeroTotals(),
+    shownZeroTotals(),
   )
   return {
     ticketCount: numbers.size,

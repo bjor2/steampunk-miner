@@ -146,7 +146,7 @@ function overviewNoteHtml(time, repo) {
   return (
     `<div class="tt-note">${time.measuredCount} of the ${plural(time.ticketCount, 'ticket')} linked from the tree have a ` +
     `<code>docs/metrics/tickets/</code> file and a claim. Each counts from its first claim to its close: time before the claim is ` +
-    `left out, a block or planner wait after it keeps its own colour. Umbrella issues bring in their sub-issues and a shared ticket counts once per ` +
+    `left out, a planner wait or idle time after it keeps its own colour, and time spent blocked is not counted. Umbrella issues bring in their sub-issues and a shared ticket counts once per ` +
     `feature and area (<a href="${escapeHtml(readme)}">how it is measured</a>).</div>`
   )
 }
