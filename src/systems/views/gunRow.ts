@@ -12,7 +12,7 @@ import { buyGunCommand } from '../platform/platformCommands'
 import { isGunMounted, type VehicleGun } from '../vehicle/vehicleGun'
 import { UI_IDS } from './screenIds'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
-import { buyStateOf, type BuyState } from './workshopRows'
+import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
 
 export interface GunRow {
   iconId: string
@@ -25,6 +25,9 @@ export interface GunRow {
   cost: AmountReading
   buy: ScreenButton
   buyState: BuyState
+  /** A padlock before the mount, a star at the track's top. */
+  badge: RowBadge
+  isBuyOpen: boolean
 }
 
 const RATE_DECIMALS = 2
@@ -49,7 +52,14 @@ export function gunRowOf(state: AuthorityState, playerId: string): GunRow | null
     cost: amountReading(nextGunPriceOf(state, playerId)),
     buy,
     buyState: buyStateOf(buy),
+    badge: badgeOf(gun),
+    isBuyOpen: isBuyOpen(buy),
   }
+}
+
+function badgeOf(gun: VehicleGun): RowBadge {
+  if (!isGunMounted(gun)) return 'locked'
+  return gun.level >= gunMaxLevel() ? 'maxed' : null
 }
 
 function buyLabelOf(gun: VehicleGun): string {

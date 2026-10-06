@@ -6,6 +6,7 @@
  * default, under the shared header and footer. A pure function of the authority replica and the
  * screen's UI state.
  */
+import { buttonIconIdOf } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import { rechargeCostOf, serviceQuote, type ServiceQuote } from '../authority/platformServices'
 import { energyUnitPrice } from '../economy/planetCharges'
@@ -31,6 +32,7 @@ import {
   amountReading,
   commandButton,
   statReading,
+  withIcon,
   type AmountReading,
   type ScreenButton,
 } from './viewParts'
@@ -103,12 +105,9 @@ function chargingPanelOf(state: AuthorityState, playerId: string): ChargingPanel
     energyText: energyGaugeText(vehicle.energy, energyMaxQuantaOf(vehicle)),
     price: statReading(toCanonical(energyUnitPrice(state.planet.index))),
     cost: amountReading(rechargeCostOf(state, playerId)),
-    recharge: commandButton(
-      state,
-      playerId,
-      UI_IDS.chargingRecharge,
-      'Recharge',
-      rechargeEnergyCommand(),
+    recharge: withIcon(
+      commandButton(state, playerId, UI_IDS.chargingRecharge, 'Recharge', rechargeEnergyCommand()),
+      buttonIconIdOf('recharge'),
     ),
   }
 }
@@ -120,12 +119,15 @@ function quickServiceOf(
 ): QuickServiceReading {
   const quote = serviceQuote(state, playerId)
   return {
-    button: commandButton(
-      state,
-      playerId,
-      UI_IDS.platformQuickService,
-      'Sell, repair and recharge',
-      quickServiceCommand(),
+    button: withIcon(
+      commandButton(
+        state,
+        playerId,
+        UI_IDS.platformQuickService,
+        'Sell, repair and recharge',
+        quickServiceCommand(),
+      ),
+      buttonIconIdOf('quick_service'),
     ),
     isHighlighted: ui.isQuickServiceHighlighted,
     total: amountReading(quickServiceTotalOf(quote)),

@@ -7,19 +7,29 @@
  * The hold counts ore by tier only (#7: value comes from the tier at sell time), so a row cannot
  * know which family its units came from; it says `mixed` and shows the tier number, never colour.
  */
+import { buttonIconIdOf } from '../art/icons/iconSet'
+import { oreIconIdOf } from '../art/icons/oreIcon'
 import type { AuthorityState } from '../authority/authorityState'
 import { isAssayLiftedFor, sellBayUnitPrice, serviceQuote } from '../authority/platformServices'
 import { fromSafeInteger, mul } from '../money'
 import { sellCargoCommand } from '../platform/platformCommands'
 import { cargoGaugeText } from '../vehicle/vehicleReadout'
 import { cargoUnitsOf, statsOfVehicle } from '../vehicle/vehicleState'
-import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
+import {
+  amountReading,
+  commandButton,
+  withIcon,
+  type AmountReading,
+  type ScreenButton,
+} from './viewParts'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 
 export interface ShopRow {
   tier: number
   /** `metal`, `crystal` or `mixed`; the hold keeps no family, so a tier row is `mixed`. */
   family: 'mixed'
+  /** The tier's generated ore icon (#158): a hex at the tier's luma with its grade. */
+  iconId: string
   amount: number
   unitValue: AmountReading
   /** `assay_beacon` priced this row at the mid-band unit value (#46: shown with an assay glyph). */
@@ -45,12 +55,9 @@ export function shopPanelOf(state: AuthorityState, playerId: string): ShopPanel 
       cargoUnitsOf(vehicle.cargo),
       statsOfVehicle(vehicle).cargoCapacity,
     ),
-    sellAll: commandButton(
-      state,
-      playerId,
-      UI_IDS.shopSellAll,
-      'Sell all',
-      sellCargoCommand('all'),
+    sellAll: withIcon(
+      commandButton(state, playerId, UI_IDS.shopSellAll, 'Sell all', sellCargoCommand('all')),
+      buttonIconIdOf('sell'),
     ),
     sellAllValue: amountReading(serviceQuote(state, playerId).saleValue),
   }
@@ -68,6 +75,7 @@ function shopRowOf(state: AuthorityState, playerId: string, tier: number, amount
   return {
     tier,
     family: 'mixed',
+    iconId: oreIconIdOf('mixed', tier),
     amount,
     unitValue: amountReading(unit),
     isAssayed: isAssayLiftedFor(state, playerId, tier),

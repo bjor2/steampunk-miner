@@ -5,6 +5,7 @@
  * the hit would land in, from the same pure `hitArcOf` the authority uses. Idle, approaching and
  * recoiling enemies are not telegraphed.
  */
+import { enemyIconIdOf } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import { enemiesOwnedBy, type Enemy, type EnemyPhase } from '../authority/combat/combatState'
 import { MOST_ENEMIES_PER_VEHICLE } from '../authority/combat/enemyRoster'
@@ -19,6 +20,8 @@ export type ArcLetter = 'F' | 'S' | 'R'
 
 export interface ThreatMarker {
   kind: EnemyKind
+  /** The enemy family's icon on the arrow (#158), so the kind reads without colour. */
+  iconId: string
   phase: EnemyPhase
   octant: number
   arc: ArcLetter
@@ -46,6 +49,7 @@ function threatMarkerOf(enemy: Enemy, pose: VehiclePose, tick: number): ThreatMa
   const dy = enemy.y - pose.y
   return {
     kind: enemy.kind,
+    iconId: enemyIconIdOf(enemy.kind),
     phase: enemy.phase,
     octant: localOctantOf(pose, dx, dy),
     arc: LETTER_OF_ARC[hitArcOf(pose, dx, dy)],

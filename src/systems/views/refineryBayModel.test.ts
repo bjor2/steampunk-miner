@@ -34,7 +34,7 @@ describe('refinery bay screen', () => {
     expect(model.ore.map((row) => [row.held, row.batchUnits])).toEqual([[6, 5]])
     expect(model.ore[0].queue).toMatchObject({ label: 'Refine 5', reason: null })
     expect(refineryBayStartFocus(model)).toBe(model.ore[0].queue.id)
-    expect(model.slots).toEqual([{ index: 0, look: 'empty', isYours: false, text: 'Empty' }])
+    expect(model.slots).toMatchObject([{ index: 0, look: 'empty', isYours: false, text: 'Empty' }])
   })
 
   it('shows a running batch with its seconds left and refuses another with slots_busy', () => {

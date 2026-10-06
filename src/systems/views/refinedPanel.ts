@@ -4,6 +4,8 @@
  * stays the one place that pays cash; a batch still refining, or another player's, is not listed.
  * Before the platform has the Refinery bay the panel is not there at all (#90: nothing shows).
  */
+import { buttonIconIdOf } from '../art/icons/iconSet'
+import { oreIconIdOf } from '../art/icons/oreIcon'
 import type { AuthorityState } from '../authority/authorityState'
 import { readySlotsOf, type RefineryBatch } from '../authority/refinery/refineryBatch'
 import { readyRefinedValueOf } from '../authority/refinery/refineryCollection'
@@ -11,11 +13,18 @@ import { hasRefineryOn } from '../authority/refinery/refineryFacility'
 import { refinedValue } from '../economy/refineryEconomy'
 import { collectRefinedCommand } from '../platform/platformCommands'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
-import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
+import {
+  amountReading,
+  commandButton,
+  withIcon,
+  type AmountReading,
+  type ScreenButton,
+} from './viewParts'
 
 export interface RefinedLine {
   slot: number
   tier: number
+  iconId: string
   units: number
   value: AmountReading
 }
@@ -34,12 +43,15 @@ export function refinedPanelOf(state: AuthorityState, playerId: string): Refined
       refinedLineOf(slot, slots[slot] as RefineryBatch),
     ),
     total: amountReading(readyRefinedValueOf(state, playerId)),
-    collect: commandButton(
-      state,
-      playerId,
-      UI_IDS.sellbayRefinedCollect,
-      'Collect refined',
-      collectRefinedCommand(),
+    collect: withIcon(
+      commandButton(
+        state,
+        playerId,
+        UI_IDS.sellbayRefinedCollect,
+        'Collect refined',
+        collectRefinedCommand(),
+      ),
+      buttonIconIdOf('collect'),
     ),
   }
 }
@@ -53,6 +65,7 @@ function refinedLineOf(slot: number, batch: RefineryBatch): RefinedLine {
   return {
     slot,
     tier: batch.tier,
+    iconId: oreIconIdOf('mixed', batch.tier),
     units: batch.units,
     value: amountReading(refinedValue(batch.tier, batch.units)),
   }

@@ -5,7 +5,7 @@
  * on); the Rack row adds one slot, "3 → 4", up to the top, where it says so and its Buy carries
  * `max_level`. Charges restock here only, never at the Sell bay.
  */
-import { BLASTING_CHARGES_ICON_ID } from '../art/artIds'
+import { BLASTING_CHARGES_ICON_ID, CHARGE_RACK_ICON_ID } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import {
   areChargesOffered,
@@ -18,7 +18,7 @@ import { buyChargeRackSlotCommand, restockChargesCommand } from '../platform/pla
 import { emptyRackSlotsOf, rackCapacityOf, type VehicleCharges } from '../vehicle/vehicleCharges'
 import { UI_IDS } from './screenIds'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
-import { buyStateOf, type BuyState } from './workshopRows'
+import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
 
 export interface ChargeRow {
   iconId: string
@@ -30,6 +30,9 @@ export interface ChargeRow {
   cost: AmountReading | null
   buy: ScreenButton
   buyState: BuyState
+  /** A padlock before the rack is bolted on; a star on the Rack row at its top size. */
+  badge: RowBadge
+  isBuyOpen: boolean
 }
 
 export interface ChargeRows {
@@ -65,6 +68,8 @@ function restockRowOf(state: AuthorityState, playerId: string): ChargeRow {
     cost: amountReading(restockPriceOf(state, playerId)),
     buy,
     buyState: buyStateOf(buy),
+    badge: charges.isRackMounted ? null : 'locked',
+    isBuyOpen: isBuyOpen(buy),
   }
 }
 
@@ -80,13 +85,15 @@ function rackRowOf(state: AuthorityState, playerId: string): ChargeRow {
   )
   const capacity = rackCapacityOf(charges)
   return {
-    iconId: BLASTING_CHARGES_ICON_ID,
+    iconId: CHARGE_RACK_ICON_ID,
     label: 'Rack',
     levelText: isTop ? `${capacity} (top)` : `${capacity} → ${capacity + 1}`,
     effectText: isTop ? `${capacity} charges` : `${capacity + 1} charges`,
     cost: isTop ? null : amountReading(rackSlotPriceOf(state, playerId)),
     buy,
     buyState: buyStateOf(buy),
+    badge: isTop ? 'maxed' : null,
+    isBuyOpen: isBuyOpen(buy),
   }
 }
 

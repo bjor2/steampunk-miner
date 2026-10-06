@@ -7,6 +7,8 @@
  * Core fragments never show here: they are banked on docking. A pure function of the replica.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
+import { buttonIconIdOf, REFINERY_SLOT_ICON_ID } from '../art/icons/iconSet'
+import { oreIconIdOf } from '../art/icons/oreIcon'
 import type { AuthorityState } from '../authority/authorityState'
 import { isBatchReady, type RefinerySlot } from '../authority/refinery/refineryBatch'
 import { batchCapOf, nextRefinerySlotPrice } from '../authority/refinery/refineryRules'
@@ -23,10 +25,17 @@ import {
 } from './bayFrame'
 import type { FocusStop } from './menuFocus'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
-import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
+import {
+  amountReading,
+  commandButton,
+  withIcon,
+  type AmountReading,
+  type ScreenButton,
+} from './viewParts'
 
 export interface RefineryOreRow {
   tier: number
+  iconId: string
   held: number
   /** What Queue moves into a slot: the held units, at most half the hold. */
   batchUnits: number
@@ -40,6 +49,7 @@ export type RefinerySlotLook = 'empty' | 'refining' | 'ready'
 
 export interface RefinerySlotReading {
   index: number
+  iconId: string
   look: RefinerySlotLook
   /** The batch is this player's: only they collect it, at the Sell bay. */
   isYours: boolean
@@ -65,12 +75,9 @@ export function selectRefineryBayModel(
   ui: BayUiState,
 ): RefineryBayModel {
   const ore = oreRowsOf(state, playerId)
-  const buySlot = commandButton(
-    state,
-    playerId,
-    UI_IDS.refinerybaySlotBuy,
-    'Buy slot',
-    buyRefinerySlotCommand(),
+  const buySlot = withIcon(
+    commandButton(state, playerId, UI_IDS.refinerybaySlotBuy, 'Buy slot', buyRefinerySlotCommand()),
+    REFINERY_SLOT_ICON_ID,
   )
   const footer = bayFooterOf(state, playerId, ui)
   const price = nextRefinerySlotPrice(state)
@@ -117,16 +124,20 @@ function oreRowOf(
 ): RefineryOreRow {
   return {
     tier,
+    iconId: oreIconIdOf('mixed', tier),
     held,
     batchUnits,
     raw: amountReading(rawRefineValue(tier, batchUnits)),
     refined: amountReading(refinedValue(tier, batchUnits)),
-    queue: commandButton(
-      state,
-      playerId,
-      UI_ID_TEMPLATES.refinerybayQueue(tier),
-      `Refine ${batchUnits}`,
-      queueRefineCommand(tier, batchUnits),
+    queue: withIcon(
+      commandButton(
+        state,
+        playerId,
+        UI_ID_TEMPLATES.refinerybayQueue(tier),
+        `Refine ${batchUnits}`,
+        queueRefineCommand(tier, batchUnits),
+      ),
+      buttonIconIdOf('refine'),
     ),
   }
 }
@@ -137,11 +148,13 @@ function slotReadingOf(
   playerId: string,
   tick: number,
 ): RefinerySlotReading {
-  if (slot === null) return { index, look: 'empty', isYours: false, text: 'Empty' }
+  const iconId = REFINERY_SLOT_ICON_ID
+  if (slot === null) return { index, iconId, look: 'empty', isYours: false, text: 'Empty' }
   const isYours = slot.owner === playerId
   if (isBatchReady(slot, tick)) {
     return {
       index,
+      iconId,
       look: 'ready',
       isYours,
       text: `T${slot.tier} x${slot.units} ready at the Sell bay`,
@@ -150,6 +163,7 @@ function slotReadingOf(
   const secondsLeft = Math.ceil((slot.readyAtTick - tick) / TICKS_PER_SECOND)
   return {
     index,
+    iconId,
     look: 'refining',
     isYours,
     text: `T${slot.tier} x${slot.units}, ${secondsLeft} s`,

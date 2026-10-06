@@ -1,3 +1,4 @@
 {
-  "returnReserveMargin": 2
+  "returnReserveMargin": 2,
+  "hullCriticalPercent": 25
 }

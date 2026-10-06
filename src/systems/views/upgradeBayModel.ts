@@ -13,7 +13,7 @@
  * The quick action belongs to the Sell bay; here it is a disabled sign carrying `wrong_bay`
  * (#40), never a focus stop.
  */
-import { CASING_ICON_ID } from '../art/artIds'
+import { buttonIconIdOf, CASING_ICON_ID, PREVIEW_TIER_ICON_ID } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import { nextCasingPrice } from '../authority/casingRules'
 import { repairCostOf } from '../authority/platformServices'
@@ -40,8 +40,21 @@ import { liningRowOf, type LiningRow } from './liningRow'
 import { focusOnScreen, type FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
 import { upgradePreviewOf, type UpgradePreview } from './upgradePreview'
-import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
-import { buyStateOf, workshopRowsOf, type BuyState, type WorkshopRow } from './workshopRows'
+import {
+  amountReading,
+  commandButton,
+  withIcon,
+  type AmountReading,
+  type ScreenButton,
+} from './viewParts'
+import {
+  buyStateOf,
+  isBuyOpen,
+  workshopRowsOf,
+  type BuyState,
+  type RowBadge,
+  type WorkshopRow,
+} from './workshopRows'
 
 export interface CasingRow {
   /** The seventh vector icon (#54 scope review). */
@@ -54,6 +67,8 @@ export interface CasingRow {
   cost: AmountReading
   buy: ScreenButton
   buyState: BuyState
+  badge: RowBadge
+  isBuyOpen: boolean
 }
 
 export interface RepairReading {
@@ -74,6 +89,8 @@ export interface UpgradeBayModel {
   charges: ChargeRows | null
   repair: RepairReading
   visualTier: number
+  /** The preview's tier gauge glyph (#158). */
+  tierIconId: string
   preview: UpgradePreview
   /** "Sell, repair and recharge" is the Sell bay's: disabled here with `wrong_bay`. */
   quickService: ScreenButton
@@ -109,6 +126,7 @@ export function selectUpgradeBayModel(
     charges,
     repair,
     visualTier: visualTier(levels),
+    tierIconId: PREVIEW_TIER_ICON_ID,
     preview: upgradePreviewOf(levels, {
       focusedId: focusOnScreen(focusStops, ui.focusedId, focusStops[0].id),
       tracks,
@@ -146,6 +164,8 @@ function casingRowOf(state: AuthorityState, playerId: string): CasingRow {
     cost: amountReading(nextCasingPrice(state, playerId)),
     buy,
     buyState: buyStateOf(buy),
+    badge: null,
+    isBuyOpen: isBuyOpen(buy),
   }
 }
 
@@ -153,18 +173,24 @@ function repairReadingOf(state: AuthorityState, playerId: string): RepairReading
   const vehicle = state.players[playerId].vehicle
   return {
     hullText: hullGaugeText(vehicle.hull, statsOfVehicle(vehicle).hullMax),
-    button: commandButton(state, playerId, UI_IDS.workshopRepair, 'Repair', repairHullCommand()),
+    button: withIcon(
+      commandButton(state, playerId, UI_IDS.workshopRepair, 'Repair', repairHullCommand()),
+      buttonIconIdOf('repair'),
+    ),
     cost: amountReading(repairCostOf(state, playerId)),
   }
 }
 
 function wrongBayQuickServiceOf(state: AuthorityState, playerId: string): ScreenButton {
-  return commandButton(
-    state,
-    playerId,
-    UI_IDS.upgradebayQuickService,
-    'Sell, repair and recharge: at the Sell bay',
-    quickServiceCommand(),
+  return withIcon(
+    commandButton(
+      state,
+      playerId,
+      UI_IDS.upgradebayQuickService,
+      'Sell, repair and recharge: at the Sell bay',
+      quickServiceCommand(),
+    ),
+    buttonIconIdOf('quick_service'),
   )
 }
 

@@ -34,6 +34,12 @@ export interface ScreenButton {
   action: ButtonAction
   /** The authority's refusal reason now; null when the command would be accepted. */
   reason: RejectionReason | null
+  /** A glyph of the icon set beside the label (#158); absent on a plain text button. */
+  iconId?: string
+}
+
+export function withIcon(button: ScreenButton, iconId: string): ScreenButton {
+  return { ...button, iconId }
 }
 
 export function amountReading(amount: Money | number): AmountReading {

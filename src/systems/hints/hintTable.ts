@@ -13,6 +13,8 @@ import { isHintConditionName, type HintConditionName } from './hintConditions'
 
 export interface HintDef {
   id: string
+  /** The icon of the set beside the plaque's text (#158: every hint has one). */
+  iconId: string
   shownWhen: HintConditionName
   dismissedWhen: HintConditionName
   lines: readonly string[]
@@ -83,6 +85,9 @@ function hintProblems(hint: unknown, where: string): string[] {
   if (!isRecord(hint)) return [`${where} must be an object`]
   return [
     ...transmissionProblems(hint, where),
+    ...(typeof hint.iconId === 'string' && hint.iconId !== ''
+      ? []
+      : [`${where}.iconId must name an icon`]),
     ...conditionProblems(hint.dismissedWhen, `${where}.dismissedWhen`),
     ...(hint.afterRescueLines === undefined
       ? []

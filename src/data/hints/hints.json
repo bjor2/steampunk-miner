@@ -4,6 +4,7 @@
   "hints": [
     {
       "id": "hint_move",
+      "iconId": "icon-state-active",
       "shownWhen": "runStarted",
       "dismissedWhen": "vehicleMoved",
       "lines": [
@@ -13,6 +14,7 @@
     },
     {
       "id": "hint_drill",
+      "iconId": "icon-track-drill-power",
       "shownWhen": "leftPadZone",
       "dismissedWhen": "tileDestroyed",
       "lines": [
@@ -22,6 +24,7 @@
     },
     {
       "id": "hint_cargo",
+      "iconId": "icon-gauge-cargo",
       "shownWhen": "resourceCollected",
       "dismissedWhen": "docked",
       "lines": [
@@ -31,6 +34,7 @@
     },
     {
       "id": "hint_dock",
+      "iconId": "icon-hud-compass",
       "shownWhen": "dockedAtSellBayWithCargo",
       "dismissedWhen": "leftSellBay",
       "lines": [
@@ -40,6 +44,7 @@
     },
     {
       "id": "hint_upgrade_bay",
+      "iconId": "emblem-bay-upgrade",
       "shownWhen": "affordsUpgradeAtSellBay",
       "dismissedWhen": "atUpgradeBay",
       "lines": [
@@ -49,6 +54,7 @@
     },
     {
       "id": "hint_energy",
+      "iconId": "icon-gauge-energy",
       "shownWhen": "energyLowOrRescued",
       "dismissedWhen": "docked",
       "lines": [

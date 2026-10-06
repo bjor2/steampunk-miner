@@ -18,7 +18,7 @@ import { buyLiningTypeCommand, selectLiningTypeCommand } from '../platform/platf
 import { isLiningTypeOwned, type VehicleLining } from '../vehicle/liningType'
 import { UI_IDS } from './screenIds'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
-import { buyStateOf, type BuyState } from './workshopRows'
+import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
 
 export interface LiningRow {
   iconId: string
@@ -31,6 +31,9 @@ export interface LiningRow {
   cost: AmountReading
   button: ScreenButton
   buyState: BuyState
+  /** A padlock until the type is unlocked. */
+  badge: RowBadge
+  isBuyOpen: boolean
 }
 
 const TYPE_NAMES: Readonly<Record<string, string>> = {
@@ -60,6 +63,8 @@ export function liningRowOf(state: AuthorityState, playerId: string): LiningRow 
     ),
     button,
     buyState: buyStateOf(button),
+    badge: isLiningTypeOwned(lining, offered) ? null : 'locked',
+    isBuyOpen: isBuyOpen(button),
   }
 }
 

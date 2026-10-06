@@ -11,6 +11,7 @@
  * this player's `artefact_open` and close on their `artefact_chosen`.
  */
 import { ARTEFACT_OPTIONS, type ArtefactOption } from '../artefacts/artefactOptions'
+import { artefactIconIdOf, panelIconIdOf } from '../art/icons/iconSet'
 import { chooseArtefactCommand } from '../artefacts/artefactCommands'
 import type { AuthorityState } from '../authority/authorityState'
 import type { DomainEvent } from '../authority/domainEvent'
@@ -20,6 +21,8 @@ import { commandButton, uiButton, type ScreenButton } from './viewParts'
 
 export interface ArtefactCard {
   optionId: string
+  /** The option's gear-rim icon (#158: a horizontal power-up). */
+  iconId: string
   name: string
   summary: string
   choose: ScreenButton
@@ -27,6 +30,7 @@ export interface ArtefactCard {
 
 export interface ArtefactChoiceModel {
   title: string
+  titleIconId: string
   cards: ArtefactCard[]
   leave: ScreenButton
   focusStops: FocusStop[]
@@ -44,6 +48,7 @@ export function selectArtefactChoiceModel(
   const leave = uiButton(UI_IDS.artefactLeave, 'Leave it', { kind: 'closeArtefactChoice' })
   return {
     title: 'Ancient cache: take one, the others are lost',
+    titleIconId: panelIconIdOf('cache'),
     cards,
     leave,
     focusStops: [...cards.map((card) => card.choose), leave].map(({ id }) => ({
@@ -73,6 +78,7 @@ function openStateAfterEvent(event: DomainEvent, isOpen: boolean): boolean {
 function cardOf(state: AuthorityState, playerId: string, option: ArtefactOption): ArtefactCard {
   return {
     optionId: option.id,
+    iconId: artefactIconIdOf(option.id),
     name: option.name,
     summary: option.summary,
     choose: commandButton(

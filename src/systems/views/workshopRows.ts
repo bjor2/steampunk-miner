@@ -36,6 +36,17 @@ export interface StatPreview {
 
 export type BuyState = 'affordable' | 'money_short'
 
+/**
+ * The state badge on a row's icon (#158 "State badges"): a padlock while the thing is still to be
+ * unlocked, a star once it is at its top; null for a plain row. Shapes, never colour alone.
+ */
+export type RowBadge = 'locked' | 'maxed' | null
+
+/** The rim glint on an icon: the buy would be accepted now (#158 "affordable"). */
+export function isBuyOpen(buy: ScreenButton): boolean {
+  return buy.reason === null
+}
+
 export interface WorkshopRow {
   upgradeId: UpgradeId
   /** One vector icon per track (#44 `icon-track-<id>`, kebab-case per #52). */
@@ -47,6 +58,8 @@ export interface WorkshopRow {
   effectAfter: StatPreview
   buy: ScreenButton
   buyState: BuyState
+  badge: RowBadge
+  isBuyOpen: boolean
   /** `drill_tip` only: the deepest band of this planet its tip cuts at full speed (0: none). */
   fullSpeedBand: number | null
 }
@@ -108,6 +121,8 @@ function workshopRowOf(
     effectAfter: previewOf(next, upgradeId),
     buy,
     buyState: buyStateOf(buy),
+    badge: null,
+    isBuyOpen: isBuyOpen(buy),
     fullSpeedBand: upgradeId === 'drill_tip' ? fullSpeedBandOf(state.planet.index, levels) : null,
   }
 }

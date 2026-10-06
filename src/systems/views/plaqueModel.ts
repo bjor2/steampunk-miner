@@ -5,6 +5,7 @@
  * the one display formatter (#32). Also whether the platform highlights "Sell, repair and
  * recharge", which it does while `hint_dock` is up (#16: the first visit).
  */
+import { TRANSMISSION_ICON_ID } from '../art/icons/iconSet'
 import { formatAmount } from '../displayAmount'
 import { isHintShown, hintDefOf, type HintBoard, type ShownHint } from '../hints/hintBoard'
 import { DOCK_HINT_ID, HINT_TABLE, type HintTable } from '../hints/hintTable'
@@ -24,6 +25,8 @@ export interface PlaqueSources {
 
 export interface PlaqueReading {
   id: string
+  /** The hint's icon from the table, or the transmission glyph (#158). */
+  iconId: string
   lines: string[]
 }
 
@@ -54,8 +57,13 @@ export function isQuickServiceHighlighted(
 function hintReadingOf(sources: PlaqueSources, table: HintTable): PlaqueReading | null {
   const shown = sources.hintBoard.shown
   if (shown === null || !sources.isShowingHints) return null
+  const hint = hintDefOf(table, shown.id)
   const lines = hintLinesOf(shown, table)
-  return { id: shown.id, lines: lines.map((line) => fillLine(line, sources.bindings, shown)) }
+  return {
+    id: shown.id,
+    iconId: hint.iconId,
+    lines: lines.map((line) => fillLine(line, sources.bindings, shown)),
+  }
 }
 
 /** After a tow the energy hint says what it cost, when the table has those lines. */
@@ -71,7 +79,11 @@ function transmissionReadingOf(sources: PlaqueSources, table: HintTable): Plaque
   if (shown === null || !sources.isShowingTransmissions) return null
   const transmission = table.transmissions.find((entry) => entry.id === shown)
   if (transmission === undefined) return null
-  return { id: shown, lines: transmission.lines.map((line) => fillLine(line, sources.bindings)) }
+  return {
+    id: shown,
+    iconId: TRANSMISSION_ICON_ID,
+    lines: transmission.lines.map((line) => fillLine(line, sources.bindings)),
+  }
 }
 
 function fillLine(line: string, bindings: Bindings, shown?: ShownHint): string {

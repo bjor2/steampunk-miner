@@ -5,6 +5,7 @@
  * now bound to it, "press a key to rebind" while one is waiting, the problem lines of the last
  * refused rebinding and "Reset to defaults". Local presentation only: nothing here is a command.
  */
+import { settingIconIdOf } from '../art/icons/iconSet'
 import { ACTION_MAP, boundLabel, type ActionId, type Bindings } from '../input/actionMap'
 import type { PreferenceName, Preferences } from '../input/preferences'
 import type { FocusStop } from './menuFocus'
@@ -21,6 +22,7 @@ export interface SettingsSources {
 
 export interface SettingToggle {
   name: PreferenceName
+  iconId: string
   label: string
   valueText: string
   button: ScreenButton
@@ -94,6 +96,7 @@ export function selectSettingsModel(sources: SettingsSources): SettingsModel {
 function togglesOf(prefs: Preferences): SettingToggle[] {
   return (Object.keys(TOGGLE_LABELS) as PreferenceName[]).map((name) => ({
     name,
+    iconId: settingIconIdOf(name),
     label: TOGGLE_LABELS[name],
     valueText: VALUE_TEXTS[name](prefs),
     button: uiButton(UI_ID_TEMPLATES.settingsToggle(name), 'Change', {

@@ -6,7 +6,7 @@
  * the lining bill the next sale settles, while there is one (#76 amendment, #115).
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
-import { combatStatusIconIdOf } from '../art/icons/iconSet'
+import { combatStatusIconIdOf, gaugeIconIdOf } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import { canOpenArtefactCache } from '../authority/artefactRules'
 import { dockableBayOf } from '../authority/dockRules'
@@ -52,6 +52,7 @@ import {
   type FuseWarning,
 } from './chargeReading'
 import { heatReadingOf, type HeatReading } from './heatReading'
+import { combatStatusStackOf, isCollapseWarnedFor, type CombatStatusStack } from './combatStatuses'
 import { threatMarkersOf, type ThreatMarker } from './threatMarkers'
 import { tileTimeAhead, type TileTime } from './tileTime'
 import { amountReading, type AmountReading } from './viewParts'
@@ -65,11 +66,16 @@ export interface HudSources {
   bindings: Bindings
 }
 
-/** A gauge: the text, the exact canonical value (`data-exact`) and the needle in 0..1000. */
+/**
+ * A gauge: the text, the exact canonical value (`data-exact`), the needle in 0..1000 and its glyph
+ * (#158: a pressure dial, a riveted plate, an ore crate), so the gauges are told apart by more than
+ * their position.
+ */
 export interface GaugeReading {
   text: string
   exact: string
   permille: number
+  iconId: string
 }
 
 export interface CargoReading extends GaugeReading {
@@ -111,6 +117,8 @@ export interface HudModel {
   dockArrow: DockArrow | null
   coreDistance: number | null
   threats: ThreatMarker[]
+  /** The combat statuses in priority order, at most three shown (#158). */
+  statuses: CombatStatusStack
   tileTime: TileTime
   vehicleState: VehicleStateReading
   dockPrompt: DockPrompt
@@ -133,27 +141,44 @@ const PERMILLE = 1000
 export function selectHudModel(sources: HudSources): HudModel {
   const { state, playerId } = sources
   const vehicle = state.players[playerId].vehicle
+  const hull = hullGaugeOf(vehicle)
+  const cargo = cargoGaugeOf(vehicle)
+  const chargeFuse = fuseWarningOf(state, playerId)
+  const heat = heatReadingOf(state, playerId)
+  const threats = threatMarkersOf(state, playerId)
+  const vehicleState = vehicleStateReadingOf(vehicle, state.tick)
+  const warning = energyWarningOf(vehicle, sources.depthTiles)
   return {
     energy: energyGaugeOf(vehicle),
-    hull: hullGaugeOf(vehicle),
-    cargo: cargoGaugeOf(vehicle),
+    hull,
+    cargo,
     cargoValue: amountReading(serviceQuote(state, playerId).saleValue),
     liningBill: liningBillOf(vehicle),
     depth: depthReadingOf(state, playerId, sources.depthTiles),
     casing: casingBadgeOf(state, playerId),
     guns: gunReadingOf(vehicle, sources.bindings),
     charges: chargeReadingOf(vehicle.charges, sources.bindings),
-    chargeFuse: fuseWarningOf(state, playerId),
-    heat: heatReadingOf(state, playerId),
+    chargeFuse,
+    heat,
     dockArrow: dockArrowOf(state, playerId),
     coreDistance: coreDistanceOf(state, playerId),
-    threats: threatMarkersOf(state, playerId),
+    threats,
+    statuses: combatStatusStackOf({
+      hullPermille: hull.permille,
+      isCollapseWarned: isCollapseWarnedFor(state, playerId),
+      chargeFuse,
+      heat,
+      warning,
+      threats,
+      cargo,
+      vehicleState,
+    }),
     tileTime: tileTimeAhead(state, playerId),
-    vehicleState: vehicleStateReadingOf(vehicle, state.tick),
+    vehicleState,
     dockPrompt: dockPromptOf(state, playerId, sources.bindings),
     cachePrompt: cachePromptOf(state, playerId, sources.bindings),
     isDebugRun: state.debugApplied,
-    warning: energyWarningOf(vehicle, sources.depthTiles),
+    warning,
   }
 }
 
@@ -172,6 +197,7 @@ function energyGaugeOf(vehicle: VehicleState): GaugeReading {
       div(fromSafeInteger(vehicle.energy), fromSafeInteger(ENERGY_QUANTA_PER_UNIT)),
     ),
     permille: Math.floor((vehicle.energy * PERMILLE) / maxQuanta),
+    iconId: gaugeIconIdOf('energy'),
   }
 }
 
@@ -181,6 +207,7 @@ function hullGaugeOf(vehicle: VehicleState): GaugeReading {
     text: hullGaugeText(vehicle.hull, hullMax),
     exact: toCanonical(vehicle.hull),
     permille: permilleOf(vehicle.hull, hullMax),
+    iconId: gaugeIconIdOf('hull'),
   }
 }
 
@@ -192,6 +219,7 @@ function cargoGaugeOf(vehicle: VehicleState): CargoReading {
     text: cargoGaugeText(units, capacity),
     exact: String(units),
     permille: Math.floor((Math.min(units, capacity) * PERMILLE) / capacity),
+    iconId: gaugeIconIdOf('cargo'),
     coreFragments,
     coreText: coreFragments > 0 ? `(${formatAmount(coreFragments)} core)` : '',
     isFull: units >= capacity,

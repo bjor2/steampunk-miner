@@ -116,6 +116,7 @@ describe('debug api: ui reads the HUD and the platform screen (#33 acceptance 4)
       bay: 'upgrade',
       bayName: 'Upgrade bay',
       accent: 'teal',
+      emblemId: 'emblem-bay-upgrade',
     })
     const { header } = sellBayModel()
     expect(header).toMatchObject({
