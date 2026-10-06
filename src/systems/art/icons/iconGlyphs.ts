@@ -50,12 +50,12 @@ const SETTINGS_GEAR =
   'M10 2h4l.6 3 2.1 1.2 2.8-1.2 2 3.5-2.3 1.9v2.6l2.3 1.9-2 3.5-2.8-1.2L14.6 19 14 22h-4l-.6-3-2.1-1.2-2.8 1.2-2-3.5 2.3-1.9v-2.6L2.5 8.1l2-3.5 2.8 1.2L9.4 5z' +
   'M12 8.5a3.5 3.5 0 1 0 0 7a3.5 3.5 0 0 0 0-7z'
 
-const RIVETS: IconGlyph['dots'] = [
-  [5.5, 6.5, 1],
-  [18.5, 6.5, 1],
-  [5.5, 17.5, 1],
-  [18.5, 17.5, 1],
-]
+/** The plate's four rivets, inset from its edges (`PLATE` spans 3..21 by 4..20). */
+const RIVET_INSET = 2.5
+
+const RIVETS: IconGlyph['dots'] = [3 + RIVET_INSET, 21 - RIVET_INSET].flatMap((x) =>
+  [4 + RIVET_INSET, 20 - RIVET_INSET].map((y): readonly [number, number, number] => [x, y, 1]),
+)
 
 const CORE_FRAGMENT: IconGlyph = {
   body: 'M12 3l7 5v8l-7 5-7-5V8z',
