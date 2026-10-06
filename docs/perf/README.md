@@ -45,6 +45,12 @@ committed code — the recorder warns on uncommitted changes), `--measured-at <i
 `--note "<text>"`, `--dry-run` (print the line, write nothing). The file shapes `--from` knows are
 listed in `scripts/perf/perfMetrics.mjs`; anything else should be written as `{"metrics": {...}}`.
 
+## Heap and stack flags
+
+The game sets none, by decision (#102): no `--max-old-space-size`, `--js-flags`, `--stack-size` or
+`NODE_OPTIONS`. The measured headroom in Chromium and the Electron renderer, and when to revisit
+it, are in [runtime-flags.md](runtime-flags.md).
+
 ## Reading the numbers
 
 - The box is shared and often loaded (the first runs were taken at a 1-min load of 7 to 20 on 8

@@ -228,6 +228,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   tested in `scripts/soak/`; `--evaluate <soak.json>` re-checks a saved run. On a box with no
   Playwright browser, pass `--browser /usr/bin/google-chrome` (run the script itself, after a
   build). Record a run with `npm run perf:record -- --source soak --from test-results/soak/summary.json --from test-results/soak/soak.json`.
+  The same soak runs the packaged game (#102): after `npm run electron:build`,
+  `xvfb-run -a node scripts/soak/soakMemory.mjs --electron release/linux-unpacked/steampunk-miner`
+  launches it with `--debug-api` and records under `soakElectron.*`. Its numbers back the decision
+  to set no heap or stack flags ([docs/perf/runtime-flags.md](perf/runtime-flags.md)).
 
 ## 6. Before every commit
 

@@ -6,6 +6,9 @@ import { app, BrowserWindow } from 'electron'
 import { join } from 'node:path'
 import { registerShellHandlers } from './ipcHandlers.cjs'
 
+// No heap or stack switches (app.commandLine.appendSwitch, js-flags): measured headroom ~88x,
+// see docs/perf/runtime-flags.md (#102).
+
 // electron:dev sets this to the Vite server; a packaged build loads dist/index.html instead.
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
 
