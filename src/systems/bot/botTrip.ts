@@ -12,7 +12,7 @@ import type { BayId } from '../world/dockBays'
 import type { TilePoint } from '../world/tileGrid'
 import { boreInPlace, openTile } from './botDig'
 import { assertReturnReserve, canAffordMoveTo } from './botEnergy'
-import { isTooHotToDig } from './botHeat'
+import { coolAtDock, isTooHotToDig } from './botHeat'
 import { moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import { boreShaftDownTo, moveAlongShaft } from './botShaft'
@@ -43,6 +43,7 @@ const ORE_GALLERY_REACH = 20
 
 export function runTrip(session: BotSession, planet: BotPlanet, goal: TripGoal): void {
   assertReturnReserve(session, planet, goal)
+  coolAtDock(session)
   leavePad(session)
   openPathTo(session, planet, shaftTileAt(planet.layout, planet.layout.travelRow))
   mineUntilTurnBack(session, planet, goal)
@@ -133,15 +134,15 @@ function mineGallerySide(
 function harvestBesides(session: BotSession, planet: BotPlanet, goal: TripGoal): boolean {
   const { position } = planet.pilot
   if (position.tx === shaftColumnAt(planet.layout, position.ty))
-    return !isTurningBack(session, goal)
+    return !isTurningBack(session, planet, goal)
   for (const tile of [
     { tx: position.tx, ty: position.ty + 1 },
     { tx: position.tx, ty: position.ty - 1 },
   ]) {
-    if (isTurningBack(session, goal)) return false
+    if (isTurningBack(session, planet, goal)) return false
     if (isWanted(tileKindAt(session.state(), tile), goal)) boreInPlace(session, planet, tile)
   }
-  return !isTurningBack(session, goal)
+  return !isTurningBack(session, planet, goal)
 }
 
 /**
@@ -174,9 +175,9 @@ function isPastTheCore(layout: MineLayout, face: TilePoint): boolean {
 }
 
 /** Full hold, the planet's core needs no more, a vehicle no longer under control, or too hot. */
-function isTurningBack(session: BotSession, goal: TripGoal): boolean {
+function isTurningBack(session: BotSession, planet: BotPlanet, goal: TripGoal): boolean {
   const vehicle = session.vehicle()
-  if (!isVehicleActive(vehicle) || isTooHotToDig(session)) return true
+  if (!isVehicleActive(vehicle) || isTooHotToDig(session, planet)) return true
   if (cargoUnitsOf(vehicle.cargo) >= statsOfVehicle(vehicle).cargoCapacity) return true
   return goal.kind === 'core' && isCoreCarriedEnough(session)
 }

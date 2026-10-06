@@ -41,14 +41,30 @@ describe('bot: heat planets (#113)', () => {
     expect(liningUnlockFor(session)).toBeNull()
   })
 
-  it('turns home at 90 on the gauge', () => {
+  it('turns home at the pad once the gauge reaches 95', () => {
     const session = botOn(8)
-    session.submit({ type: 'debug.setHeat', payload: { heat: 89 } })
-    expect(isTooHotToDig(session)).toBe(false)
-    session.submit({ type: 'debug.setHeat', payload: { heat: 90 } })
-    expect(isTooHotToDig(session)).toBe(true)
+    const planet = planetAt(session, 'pad')
+    session.submit({ type: 'debug.setHeat', payload: { heat: 94 } })
+    expect(isTooHotToDig(session, planet)).toBe(false)
+    session.submit({ type: 'debug.setHeat', payload: { heat: 95 } })
+    expect(isTooHotToDig(session, planet)).toBe(true)
+  })
+
+  it('turns home deep down earlier, keeping the heat of the climb home in hand', () => {
+    const session = botOn(8)
+    session.submit({ type: 'debug.setHeat', payload: { heat: 80 } })
+    expect(isTooHotToDig(session, planetAt(session, 'pad'))).toBe(false)
+    expect(isTooHotToDig(session, planetAt(session, 'deep'))).toBe(true)
   })
 })
+
+/** The bot's planet 8 mine with the pilot at the pad or 600 m down the shaft. */
+function planetAt(_session: BotSession, where: 'pad' | 'deep'): BotPlanet {
+  const params = planetParamsFor(83921, 8)
+  const layout = newMineLayout(params, dockSiteOf(params))
+  const row = where === 'pad' ? layout.travelRow : layout.travelRow - 600
+  return { layout, pilot: { position: shaftTileAt(layout, row), facing: 0 } }
+}
 
 describe('bot: shaft round lava (#113)', () => {
   /** On planet 8 the bot's shaft column meets lava at rows 351 to 348 (seed 83921). */

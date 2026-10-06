@@ -1,7 +1,8 @@
 /**
  * The bot's shaft (#29): travelling it, and boring it deeper. On a heat planet the next tile down
- * may free a lava pocket (#113); the shaft then steps sideways along its bottom row to the nearest
- * clear column (east first) and carries on down there, the jog remembered in the layout.
+ * may free a lava pocket (#113); the shaft then steps sideways to the nearest clear column (east
+ * first) along its bottom row, or failing that along one of the few open rows just above it, and
+ * carries on down there, the jog remembered in the layout.
  */
 import type { TilePoint } from '../world/tileGrid'
 import { openTile } from './botDig'
@@ -12,7 +13,15 @@ import { isLavaRisk } from './botWorld'
 import { shaftColumnAt, shaftTileAt, shaftWaypoints, type MineLayout } from './mineLayout'
 
 /** How far either side the shaft looks for a clear column. */
-const JOG_REACH_TILES = 6
+const JOG_REACH_TILES = 16
+/** How many of its own open rows the shaft may climb back to step aside from. */
+const JOG_RISE_ROWS = 6
+
+/** Where a jog leaves the shaft and the column it goes to. */
+interface JogPlan {
+  row: number
+  column: number
+}
 
 /** From the shaft tile at the pilot's row to the shaft tile at `toRow`, round every jog. */
 export function moveAlongShaft(
@@ -30,7 +39,7 @@ export function moveAlongShaft(
 export function boreShaftDownTo(session: BotSession, planet: BotPlanet, row: number): boolean {
   const { layout } = planet
   while (layout.shaftBottomRow > row) {
-    if (isTooHotToDig(session)) return false
+    if (isTooHotToDig(session, planet)) return false
     const below = shaftTileAt(layout, layout.shaftBottomRow - 1)
     if (isLavaRisk(session.state(), below) && !jogShaft(session, planet)) return false
     if (openTile(session, planet, shaftTileAt(layout, layout.shaftBottomRow - 1)) !== 'opened') {
@@ -41,17 +50,35 @@ export function boreShaftDownTo(session: BotSession, planet: BotPlanet, row: num
   return true
 }
 
-/** Steps the shaft's bottom sideways to the nearest clear column; false when there is none. */
+/** Steps the shaft sideways to the nearest clear column; false when there is none. */
 function jogShaft(session: BotSession, planet: BotPlanet): boolean {
-  const { layout } = planet
-  const row = layout.shaftBottomRow
-  const column = clearColumnNear(session, layout, row)
-  if (column === null) return false
-  for (const tile of tilesAlong(shaftColumnAt(layout, row), column, row)) {
+  const { layout, pilot } = planet
+  const plan = jogPlanOf(session, layout)
+  if (plan === null) return false
+  moveAlongShaft(session, pilot, layout, plan.row)
+  for (const tile of tilesAlong(shaftColumnAt(layout, plan.row), plan.column, plan.row)) {
     if (openTile(session, planet, tile) !== 'opened') return false
   }
-  layout.shaftJogs.push({ row, column })
+  layout.shaftJogs.push(plan)
+  layout.shaftBottomRow = plan.row
   return true
+}
+
+/** The lowest open row of the shaft's last straight run, then the nearest clear column from it. */
+function jogPlanOf(session: BotSession, layout: MineLayout): JogPlan | null {
+  for (const row of jogRowsOf(layout)) {
+    const column = clearColumnNear(session, layout, row)
+    if (column !== null) return { row, column }
+  }
+  return null
+}
+
+/** The bottom row and the open rows above it, up to the last jog (jogs stay in depth order). */
+function jogRowsOf(layout: MineLayout): number[] {
+  const bottom = layout.shaftBottomRow
+  const lastJog = layout.shaftJogs.at(-1)?.row ?? layout.travelRow
+  const highest = Math.min(bottom + JOG_RISE_ROWS, lastJog - 1)
+  return Array.from({ length: Math.max(0, highest - bottom + 1) }, (_, at) => bottom + at)
 }
 
 function clearColumnNear(session: BotSession, layout: MineLayout, row: number): number | null {
