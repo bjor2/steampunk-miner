@@ -1,7 +1,9 @@
 // The game feature tree of the status page's Features tab (docs/features/README.md). The data is
 // the hand-edited docs/features/features.json; this module validates it and, at build time, joins
 // each feature's linked issues with the live issue list so the page shows open/closed per issue and
-// a "check" marker on features whose status looks out of date. Pure functions, no I/O.
+// a "check" marker on features whose status looks out of date, and rolls the measured ticket
+// times up to every feature and group (featureTime.mjs, #135). Pure functions, no I/O.
+import { featureTimeOf, measuredByNumberOf, subIssuesOfIssues } from './featureTime.mjs'
 
 export const STATUSES = ['built', 'partial', 'planned']
 
@@ -102,15 +104,21 @@ export function syncCheckOf(node, issuesByNumber) {
 
 /**
  * The feature file joined with the live issues, for the page: each node gets `sync` (a check
- * reason or null), plus the issue states the page shows and the counts it puts in the header.
+ * reason or null) and `time` (its tickets' roll-up from `measuredTickets`, ticketTimeOverview's
+ * `tickets`), plus the issue states the page shows, the counts it puts in the header and `time`
+ * over the whole tree.
  */
-export function annotateFeatures(doc, issues) {
+export function annotateFeatures(doc, issues, measuredTickets = []) {
   const byNumber = new Map(issues.map((i) => [i.number, i]))
+  const timeSources = {
+    subIssuesOf: subIssuesOfIssues(issues),
+    measuredByNumber: measuredByNumberOf(measuredTickets),
+  }
   const linked = new Set()
   const counts = { features: 0, built: 0, partial: 0, planned: 0, flagged: 0 }
   const flagged = []
   const annotate = (node, path) => {
-    const out = { ...node }
+    const out = { ...node, time: featureTimeOf(node, timeSources) }
     for (const n of node.issues ?? []) linked.add(n)
     if (!node.group) {
       counts.features++
@@ -130,5 +138,6 @@ export function annotateFeatures(doc, issues) {
     const i = byNumber.get(n)
     if (i) issueStates[n] = { title: i.title, state: i.state, reason: i.stateReason ?? null }
   }
-  return { ...doc, areas, issues: issueStates, counts, flagged }
+  const time = featureTimeOf({ children: doc.areas }, timeSources)
+  return { ...doc, areas, issues: issueStates, counts, flagged, time }
 }

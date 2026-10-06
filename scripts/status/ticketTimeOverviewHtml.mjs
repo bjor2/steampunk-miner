@@ -36,14 +36,15 @@ function sumOf(totals) {
   return Object.values(totals).reduce((sum, seconds) => sum + seconds, 0)
 }
 
-function percentOf(part, whole) {
+export function percentOf(part, whole) {
   return whole > 0 ? `${Math.round((part / whole) * 100)}%` : '0%'
 }
 
-function legendHtml(model) {
-  const all = sumOf(model.categoryTotals)
-  const items = model.categories.map((category) => {
-    const seconds = model.categoryTotals[category.id]
+/** The legend of every category with its share of `totals`; the Features tab shows the same (#135). */
+export function phaseLegendHtml(categories, totals) {
+  const all = sumOf(totals)
+  const items = categories.map((category) => {
+    const seconds = totals[category.id]
     return (
       `<li data-category="${category.id}"><i class="tt-swatch" style="background:${category.colour}"></i>` +
       `${escapeHtml(category.name)} <span class="muted">${formatDuration(seconds)} · ${percentOf(seconds, all)}</span></li>`
@@ -56,7 +57,8 @@ function segmentTitle(category, seconds, whole) {
   return `${category.name}: ${formatDuration(seconds)} (${percentOf(seconds, whole)})`
 }
 
-function stackedBarRects(categories, totals, scale) {
+/** One rect per category with time, left to right, `scale` viewBox units per second. */
+export function stackedBarRects(categories, totals, scale, height = BAR.height) {
   const whole = sumOf(totals)
   let x = 0
   return categories
@@ -64,7 +66,7 @@ function stackedBarRects(categories, totals, scale) {
     .map((category) => {
       const width = totals[category.id] * scale
       const rect =
-        `<rect x="${round(x)}" y="0" width="${round(width)}" height="${BAR.height}" fill="${category.colour}">` +
+        `<rect x="${round(x)}" y="0" width="${round(width)}" height="${height}" fill="${category.colour}">` +
         `<title>${escapeHtml(segmentTitle(category, totals[category.id], whole))}</title></rect>`
       x += width
       return rect
@@ -247,7 +249,7 @@ export function renderTicketTimeOverview(model) {
   return (
     `<section class="panel" id="ticket-time-panel" data-tickets="${model.ticketCount}">` +
     headerHtml(model) +
-    legendHtml(model) +
+    phaseLegendHtml(model.categories, model.categoryTotals) +
     problemsHtml(model.problems) +
     body +
     '</section>'
