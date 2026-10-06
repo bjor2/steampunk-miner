@@ -106,12 +106,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   soak (#99); both refuse while nothing is mounted. Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
-  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getRefineryBayModel()` (#105), `ui.getBayPresentation()`, `ui.getAudioModel()`) reads the
+  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getRefineryBayModel()` (#105), `ui.getBayPresentation()`, `ui.getAudioModel()`, `ui.getScreenLayout()` (#173: the stage, `--ui-scale`, the TV safe inset, the smallest control and the bay-screen text size)) reads the
   screens' view models, the bay screen's shutter, text size and preview framing (#45, #44), the music's layer targets, settings and stinger sequence (#49) and
   the drill voice (`drillVoice`: `casing` while the drill's nose is in lining, #41), and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
   #33). The `input` namespace (`input.press/release/tap(actionId)`, `input.getBindings()`,
-  `input.setBindings(overrides)`) presses actions at the action layer, so a tap submits ordinary
+  `input.setBindings(overrides)`, and the unlogged read `input.getActionStream()`: every action
+  pressed and held one released, oldest first, from keys, touches and the API alike, #173) presses
+  actions at the action layer, so a tap submits ordinary
   player commands that replay like real play; bindings are refused whole on any problem.
 - Screens (#33): the HUD, platform and settings view models are pure (`src/systems/views/`) and
   tested there; the one DOM check is `src/ui/screenIds.test.ts`, a `renderToString` render (no
@@ -226,6 +228,22 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (`npm run electron:build`, then `npm run test:packaged`, under `xvfb-run -a` on Linux); each
   launch gets a fresh user-data folder.
 - Not covered, by design: vehicle feel, camera, art and audio. Those stay hand checks.
+- **Screen matrix** (#173, #179): `e2e/browser/screens/` runs once per reference screen, one
+  Playwright project per cell of `screenCells.ts` (desktop, ultra-wide, 32:9, TV and TV at 1080p
+  with TV mode on, iPhone 13 and Pixel 7 class phones in landscape, a phone in portrait, a tablet).
+  The cell's expectations are the decision's own tables (zoom cap, render-scale floor, stage), not
+  the game's formulas. It asserts the zoom cap and pillarbox (`ui.getCameraView()`'s
+  `maxViewShortAxisMetres`, the `game-stage` box), the render-scale floor and a pin at it
+  (`ui.getRenderStats()`'s `renderScaleFloor`), the #38 budgets at the widest zoom, every HUD and
+  bay-screen text at least its 1280 x 800 size times the UI scale, TV mode's 2.22%/2.78% text,
+  5.9% controls and 5% safe area, 44 px targets (56 on touch), a focus ring on each control Tab
+  reaches, no art upscaled at the 12 m default, the portrait card, and the touch controls: their
+  sizes and clearances, taps alone reaching every screen, the cluster following the dock, the
+  left-handed mirror, and a stick run pressing the same action stream as its key run
+  (`input.getActionStream()`, real touches through CDP). Each cell also writes the #173 look set;
+  `npm run screens:update` puts it in `docs/screens/` for review, never compared
+  ([docs/screens/README.md](screens/README.md)). Software WebGL at 4K is slow, so these projects
+  allow 5 minutes a test and 30 s a wait.
 - **Memory soak** (#99): `npm run soak:memory` builds, starts `vite preview` and drives the vehicle
   for 10 minutes through chunk cycles (dock, undock, right 8 s, down 8 s, left 4 s, right 4 s) with
   Playwright, reading the counts only through `ui.getRendererMemory()` and `getPhysicsStats()` and

@@ -9,6 +9,10 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { _electron as electron, expect, test, type ElectronApplication } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
+import { CANVAS_DPR_RANGE } from '../../src/constants/scene'
+import { renderScaleFloorOf } from '../../src/systems/render/renderScale'
+import { maxViewShortAxisOf } from '../../src/systems/render/viewZoom'
+import { screenLayoutOf } from '../../src/systems/views/screenLayout'
 
 declare global {
   interface Window {
@@ -108,6 +112,47 @@ test.describe('packaged build (#29 packaged-smoke)', () => {
       return snapshot.ok ? snapshot.snapshot.tick : -1
     })
     expect(tick).toBe(SCENARIO_END_TICK)
+    await app.close()
+  })
+
+  test('fits its window as the browser fits the same window: UI scale, zoom cap, render floor (#173)', async () => {
+    const { app } = await launchGame(['--debug-api'])
+    const page = await app.firstWindow()
+    await page.waitForFunction(() => window.steampunkDebug !== undefined)
+    const screen = await page.evaluate(() => ({
+      width: innerWidth,
+      height: innerHeight,
+      devicePixelRatio,
+    }))
+    const shortAxis = Math.min(screen.width, screen.height)
+    const devicePixelRatio = Math.min(screen.devicePixelRatio, CANVAS_DPR_RANGE[1])
+    const expected = {
+      layout: screenLayoutOf(
+        { widthPixels: screen.width, heightPixels: screen.height, isCoarsePointer: false },
+        false,
+      ),
+      maxViewShortAxisMetres: maxViewShortAxisOf(screen.width, screen.height),
+      renderScaleFloor: renderScaleFloorOf({
+        cssPixels: shortAxis,
+        devicePixels: shortAxis * devicePixelRatio,
+      }),
+    }
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const debug = window.steampunkDebug!
+          const layout = debug.ui.getScreenLayout()
+          const view = debug.ui.getCameraView()
+          const stats = debug.ui.getRenderStats()
+          if (!layout.ok || !view.ok || !stats.ok) return null
+          return {
+            layout: layout.layout,
+            maxViewShortAxisMetres: view.view.maxViewShortAxisMetres,
+            renderScaleFloor: stats.stats.renderScaleFloor,
+          }
+        }),
+      )
+      .toEqual(expected)
     await app.close()
   })
 })

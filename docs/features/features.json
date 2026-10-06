@@ -1593,15 +1593,21 @@
         },
         {
           "title": "Zoom",
-          "description": "Zoom between 8 and 20 m across the screen (default 12) with =, - and 0; the same framing at any resolution.",
+          "description": "Zoom between 8 and 20 m across the screen (default 12) with =, - and 0, or pinch and double tap on touch; the same framing at any resolution, capped on screens wider than 16:9.",
           "status": "built",
-          "issues": [39, 59]
+          "issues": [39, 59, 179]
         },
         {
           "title": "4K adaptive resolution",
           "description": "Rendering resolution adjusts to keep the frame rate while the UI stays sharp.",
           "status": "built",
           "issues": [38, 60]
+        },
+        {
+          "title": "Fits every screen",
+          "description": "One UI scale grows the HUD and screens with the screen and never shrinks them on a phone; screens wider than 64:27 are pillarboxed, and no art is upscaled on a 4K TV.",
+          "status": "built",
+          "issues": [173, 179]
         },
         {
           "group": true,
@@ -1733,6 +1739,12 @@
               "issues": [33]
             },
             {
+              "title": "Touch controls",
+              "description": "On a phone or tablet: a floating stick on the left, a cluster of the buttons you can use now on the right, pinch to zoom; they hide when you type and come back on the next touch.",
+              "status": "built",
+              "issues": [173, 179]
+            },
+            {
               "title": "Gamepad & Steam Input",
               "description": "Controller support, cut from the slice; the control map is ready for it.",
               "status": "planned",
@@ -1774,6 +1786,18 @@
               "description": "Mute or set the music volume.",
               "status": "built",
               "issues": [49, 63]
+            },
+            {
+              "title": "TV mode",
+              "description": "Bigger text and controls for a TV across the room, kept inside a 5% overscan-safe border.",
+              "status": "built",
+              "issues": [173, 179]
+            },
+            {
+              "title": "Left-handed touch & haptics",
+              "description": "Mirror the touch controls for the left hand; a short buzz on drill contact and hull damage.",
+              "status": "built",
+              "issues": [173, 179]
             }
           ]
         },
@@ -1820,6 +1844,13 @@
           "description": "Plays in a desktop browser and is published on GitHub Pages; saves go to browser storage.",
           "status": "built",
           "doc": "README.md"
+        },
+        {
+          "title": "Phones, tablets and TVs",
+          "description": "Plays in landscape on phones and tablets with every screen reachable by touch; portrait shows a turn-your-device card. A screenshot matrix keeps desktop, phone, tablet and TV sizes checked.",
+          "status": "built",
+          "issues": [173, 179],
+          "doc": "docs/screens/README.md"
         },
         {
           "title": "Electron desktop build",

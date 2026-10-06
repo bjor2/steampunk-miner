@@ -15,6 +15,7 @@
     "test:push": "cross-env SKIP_NIGHTLY_ONLY_TESTS=1 vitest run",
     "test:e2e": "playwright test",
     "test:packaged": "playwright test -c playwright.electron.config.ts",
+    "screens:update": "UPDATE_SCREENS=1 playwright test e2e/browser/screens/reviewShots.spec.ts",
     "bench:world": "vite-node scripts/benchGenerateChunk.ts",
     "bench:render": "vite-node scripts/benchChunkBatch.ts",
     "bench:ground": "vite-node scripts/benchGround.ts",

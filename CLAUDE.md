@@ -22,6 +22,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm test`                                | Vitest (node, no DOM, no canvas; Rapier in physics specs) |
 | `npm run test:e2e` / `test:packaged`      | Playwright: preview build / packaged Electron build       |
 | `npm run golden:update`                   | rewrite `tests/golden/` after a version bump              |
+| `npm run screens:update`                  | rewrite the screen matrix shots in `docs/screens/`        |
 | `npm run balance:report` / `:baseline`    | pacing bot report vs the committed baseline / rewrite it  |
 | `npm run balance:guns`                    | bot to planet 7 with and without `auto_guns` (reported)   |
 | `npm run balance:charges`                 | blast trade + P7-P10 bot with vs without charges (#109)   |
