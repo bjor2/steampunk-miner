@@ -1,0 +1,60 @@
+name: Record test metrics
+
+# Called by ci.yml and nightly.yml after their Vitest job, also when it failed or timed out.
+# Writes the run's per-file timings and results to the orphan `test-metrics` branch
+# (scripts/ci/recordTestRun.mjs; schema in docs/metrics/test-metrics.md). Every step may fail
+# without failing the caller, and a push from the workflow token starts no other workflow.
+on:
+  workflow_call:
+    inputs:
+      job:
+        description: Name of the caller's Vitest job (its steps and duration are recorded).
+        type: string
+        required: true
+      mode:
+        description: scoped, full, none or nightly.
+        type: string
+        required: true
+      reason:
+        type: string
+        default: ''
+      timeout-minutes:
+        description: The Vitest job's timeout, to tell a timeout from a manual cancel.
+        type: number
+        default: 10
+      keep-all-tests:
+        description: Record every test's duration, not only each file's slowest.
+        type: boolean
+        default: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the Vitest report
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: vitest-report
+          path: ${{ runner.temp }}/report
+      - name: Read the test job's steps and times
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs"
+          >"$RUNNER_TEMP/jobs.json"
+      - name: Append to the test-metrics branch
+        continue-on-error: true
+        env:
+          TEST_REPORT: ${{ runner.temp }}/report/vitest-report.json
+          TEST_JOBS: ${{ runner.temp }}/jobs.json
+          TEST_JOB: ${{ inputs.job }}
+          TEST_MODE: ${{ inputs.mode }}
+          TEST_REASON: ${{ inputs.reason }}
+          TEST_TIMEOUT_MINUTES: ${{ inputs.timeout-minutes }}
+          TEST_KEEP_ALL: ${{ inputs.keep-all-tests && '1' || '0' }}
+          TEST_ROOT: ${{ github.workspace }}
+        run: scripts/ci/pushTestMetrics.sh

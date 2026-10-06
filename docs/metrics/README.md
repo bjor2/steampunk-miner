@@ -1,5 +1,7 @@
 # Ticket phases: where each ticket's time goes
 
+CI test timings and results live elsewhere: see [test-metrics.md](test-metrics.md).
+
 Each closed ticket gets a breakdown of its time, from creation to close, in ten fixed phase
 categories. One file per ticket lives in `docs/metrics/tickets/<n>.json`. The status page draws them
 in the **Where the time goes** section at the top of the **Issue trees** tab

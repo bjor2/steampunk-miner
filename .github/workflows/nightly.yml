@@ -21,7 +21,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm test
+      # The JSON report feeds the test metrics (record-test-metrics.yml).
+      - run: npm test -- --reporter=default --reporter=json "--outputFile.json=$RUNNER_TEMP/vitest-report.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vitest-report
+          path: ${{ runner.temp }}/vitest-report.json
+          if-no-files-found: ignore
+          retention-days: 14
       # Runs even when a test failed, so the numbers are there to read next to the failure.
       - if: success() || failure()
         run: npm run balance:report
@@ -30,3 +38,18 @@ jobs:
         with:
           name: balance-report-nightly
           path: balance-report/
+
+  # Every nightly run, also failed or timed out: every test's timing to the test-metrics branch.
+  metrics:
+    needs: full-suite
+    if: always()
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/record-test-metrics.yml
+    with:
+      job: full-suite
+      mode: nightly
+      reason: true full suite (${{ github.event_name }})
+      timeout-minutes: 45
+      keep-all-tests: true

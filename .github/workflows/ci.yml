@@ -14,6 +14,9 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      mode: ${{ steps.pick.outputs.mode }}
+      reason: ${{ steps.pick.outputs.reason }}
     env:
       # CI never launches Electron here, so skip its ~100 MB binary download.
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
@@ -50,23 +53,47 @@ jobs:
           MODE: ${{ steps.pick.outputs.mode }}
           REASON: ${{ steps.pick.outputs.reason }}
           RELATED_LIST: ${{ runner.temp }}/vitest-related.txt
+          REPORT: ${{ runner.temp }}/vitest-report.json
         run: |
+          # The JSON report feeds the test metrics (record-test-metrics.yml).
+          reporters=(--reporter=default --reporter=json "--outputFile.json=$REPORT")
           case "$MODE" in
             full)
               echo "Full suite minus the nightly-only pacing tests: $REASON"
-              npm run test:push
+              npm run test:push -- "${reporters[@]}"
               ;;
             scoped)
               echo "Scoped to the tests related to: $(paste -sd ' ' - <"$RELATED_LIST")"
               mapfile -t related <"$RELATED_LIST"
-              npx vitest related --run --passWithNoTests "${related[@]}"
+              npx vitest related --run --passWithNoTests "${reporters[@]}" "${related[@]}"
               ;;
             *)
               echo "Skipping Vitest: $REASON"
               ;;
           esac
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vitest-report
+          path: ${{ runner.temp }}/vitest-report.json
+          if-no-files-found: ignore
+          retention-days: 14
       - run: npm run build
       # balance:report replays the pacing bot (over 4 minutes by itself), so it runs nightly only.
+
+  # Every verify run, also failed or timed out: its timings and results to the test-metrics branch.
+  metrics:
+    needs: verify
+    if: always()
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/record-test-metrics.yml
+    with:
+      job: verify
+      mode: ${{ needs.verify.outputs.mode || 'unknown' }}
+      reason: ${{ needs.verify.outputs.reason }}
+      timeout-minutes: 10
 
   # Every pull request: the same golden digests on Windows as on Linux (#3, #5 and #11 acceptance),
   # including the second slice's casing, collapse, bay and artefact runs (S11, #65).
