@@ -23,6 +23,7 @@ const ofType = <T extends DomainEvent['type']>(events: readonly DomainEvent[], t
 
 const { gnawTicksPerRing, ignoreVehicleTiles, minLinedRings, respawnTicks } =
   ECONOMY.enemies.tunnelWrecker
+const { despawnTiles } = ECONOMY.enemies.combat
 
 const FROM_X = TUNNEL_FROM_X
 const TO_X = TUNNEL_TO_X
@@ -69,6 +70,40 @@ describe('tunnel wrecker: when one comes (#111 Spawn)', () => {
     expect(ofType(session.events(), 'CasingPlaced').length).toBeGreaterThan(minLinedRings)
     expect(session.state().combat.routes).toEqual({})
     expect(ofType(session.events(), 'WreckerSpawned')).toEqual([])
+  })
+
+  it('never calls a wrecker to a ring beyond 48 tiles of its vehicle, where it would leave at once (#132)', () => {
+    const { session, tick } = digPlanet6Tunnel()
+    const farX = TO_X + (despawnTiles + 12) * MM_PER_METRE
+    const before = session.events().length
+    parkAt(session, tick, tick + 600, farX, PLANET_6.y, 10)
+    const events = session.events().slice(before)
+    expect(session.state().players.p1.vehicle.pose?.x).toBe(farX)
+    expect(routeOf(session.state().combat, 'p1').rings.length).toBeGreaterThan(minLinedRings)
+    expect(ofType(events, 'WreckerSpawned')).toEqual([])
+  })
+
+  it('keeps every wrecker longer than a tick unless it fled or died, and never recalls one to the ring it just left (#132)', () => {
+    const { session, tick } = digPlanet6Tunnel()
+    parkAt(session, tick, tick + 600, TO_X + (despawnTiles + 12) * MM_PER_METRE, PLANET_6.y, 10)
+    const events = session.events()
+    const spawned = ofType(events, 'WreckerSpawned')
+    const gone = new Set([
+      ...ofType(events, 'WreckerFled').map(({ enemyId }) => enemyId),
+      ...ofType(events, 'EnemyKilled').map(({ enemyId }) => enemyId),
+    ])
+    const lives = spawned
+      .filter(({ enemyId }) => !gone.has(enemyId))
+      .map(({ enemyId, tick: from }) => {
+        const left = ofType(events, 'EnemyDespawned').find((event) => event.enemyId === enemyId)
+        return (left?.tick ?? session.state().tick) - from
+      })
+    expect(spawned.length).toBeGreaterThan(0)
+    expect(lives.every((life) => life > 1)).toBe(true)
+    const recalled = spawned
+      .slice(1)
+      .filter((event, at) => event.ring === spawned[at].ring && event.tick - spawned[at].tick <= 1)
+    expect(recalled).toEqual([])
   })
 
   it('lets one wrecker hunt a route from planet 6 and two from planet 10', () => {

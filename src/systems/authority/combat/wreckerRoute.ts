@@ -4,7 +4,9 @@
  * player who never cases never meets one. A trip's end forgets the route with the rest of combat.
  *
  * A ring is gnawable while it still holds intact lining (grade 1 to 15), sits in a band the kind
- * lives in, no vehicle is within `ignoreVehicleTiles` of it and no other wrecker holds it.
+ * lives in, no vehicle is within `ignoreVehicleTiles` of it, no other wrecker holds it and it is
+ * within `despawnTiles` of the route's vehicle: a wrecker further away than that is a stray and
+ * leaves the next tick, so a ring out of that reach called one every tick (#132).
  * Distances are integer mm squared, like every combat distance.
  */
 import { CASING_RING_SPACING_MM } from '../../../constants/balance'
@@ -26,10 +28,10 @@ import { vehicleTargetOf } from './vehicleTarget'
 export const TUNNEL_WRECKER = 'tunnel_wrecker'
 
 const { ignoreVehicleTiles } = ECONOMY.enemies.tunnelWrecker
+const { despawnTiles } = ECONOMY.enemies.combat
 const MM_PER_TILE = MM_PER_METRE
 /** Rings further back than an enemy may stray from its vehicle (48 tiles) are out of its reach. */
-const MAX_REMEMBERED_RINGS =
-  (ECONOMY.enemies.combat.despawnTiles * MM_PER_TILE) / CASING_RING_SPACING_MM
+const MAX_REMEMBERED_RINGS = (despawnTiles * MM_PER_TILE) / CASING_RING_SPACING_MM
 
 const NO_ROUTE: WreckerRoute = { rings: [], nextWreckerTick: 0 }
 
@@ -77,7 +79,7 @@ export function newestGnawableRing(
   tick: number,
 ): GnawableRing | null {
   const rings = [...routeOf(state.combat, playerId).rings].reverse()
-  return firstGnawable(state, params, rings, null, tick)
+  return firstGnawable(state, params, rings, { playerId, wreckerId: null }, tick)
 }
 
 /** The gnawable ring nearest the wrecker on its vehicle's route; ties keep the route's order. */
@@ -92,7 +94,7 @@ export function nearestGnawableRing(
     .map((point, order) => ({ point, order, distance: distanceSq(wrecker, millimetresOf(point)) }))
     .sort((a, b) => a.distance - b.distance || a.order - b.order)
     .map(({ point }) => point)
-  return firstGnawable(state, params, byDistance, wrecker.id, tick)
+  return firstGnawable(state, params, byDistance, hunterOf(wrecker), tick)
 }
 
 /** Whether `wrecker` may go on gnawing its ring this tick. */
@@ -102,7 +104,10 @@ export function isStillGnawable(
   wrecker: Enemy,
   tick: number,
 ): boolean {
-  return wrecker.ring !== null && gnawableOf(state, params, wrecker.ring, wrecker.id, tick) !== null
+  return (
+    wrecker.ring !== null &&
+    gnawableOf(state, params, wrecker.ring, hunterOf(wrecker), tick) !== null
+  )
 }
 
 /** Every vehicle out on a trip, where it is at this tick, in player id order. */
@@ -130,15 +135,25 @@ export function millimetresOf(point: RingPoint): MillimetrePoint {
   return { x: point.xMm, y: point.yMm }
 }
 
+/** Whose route a ring is on, and the wrecker asking (null while the route calls a new one). */
+interface Hunter {
+  playerId: string
+  wreckerId: string | null
+}
+
+function hunterOf(wrecker: Enemy): Hunter {
+  return { playerId: wrecker.ownerId, wreckerId: wrecker.id }
+}
+
 function firstGnawable(
   state: AuthorityState,
   params: PlanetParams,
   points: readonly RingPoint[],
-  wreckerId: string | null,
+  hunter: Hunter,
   tick: number,
 ): GnawableRing | null {
   for (const point of points) {
-    const ring = gnawableOf(state, params, point, wreckerId, tick)
+    const ring = gnawableOf(state, params, point, hunter, tick)
     if (ring !== null) return ring
   }
   return null
@@ -148,16 +163,30 @@ function gnawableOf(
   state: AuthorityState,
   params: PlanetParams,
   point: RingPoint,
-  wreckerId: string | null,
+  hunter: Hunter,
   tick: number,
 ): GnawableRing | null {
   const band = bandOfRing(params, point)
   const isGnawable =
     enemyDefOf(TUNNEL_WRECKER).bands.includes(band) &&
-    !isHeldByAnotherWrecker(state.combat, point, wreckerId) &&
+    isWithinReachOfItsVehicle(state, point, hunter.playerId, tick) &&
+    !isHeldByAnotherWrecker(state.combat, point, hunter.wreckerId) &&
     !isAnyVehicleWithin(state, millimetresOf(point), ignoreVehicleTiles, tick) &&
     hasIntactLining(state.world, ringAt(point))
   return isGnawable ? { point, band } : null
+}
+
+/** Where a wrecker is no stray (`isStray`): within `despawnTiles` of its vehicle, or it is off a trip. */
+function isWithinReachOfItsVehicle(
+  state: AuthorityState,
+  point: RingPoint,
+  playerId: string,
+  tick: number,
+): boolean {
+  const target = vehicleTargetOf(state, playerId, tick)
+  return (
+    target === null || isWithinMm(target.position, millimetresOf(point), despawnTiles * MM_PER_TILE)
+  )
 }
 
 function bandOfRing(params: PlanetParams, point: RingPoint): number {
