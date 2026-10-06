@@ -3,9 +3,11 @@ import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { MAX_PLATFORM_DRAW_CALLS } from '../../constants/scene'
-import { MAP_KINDS, type MapKind } from './artIds'
+import { MAP_KINDS, slotItemAssetIdOf, type MapKind } from './artIds'
+import { attachCoverageProblems, attachedItemsOfRegistries } from '../registries/attachCoverage'
+import { ATTACH_ASSET_ID, attachIdsOf } from './sidecarAttach'
 import { SHIPPED_ART } from '../../scene/shippedArt'
-import { placeholderSidecarOf } from './artCatalogue'
+import { exportedSidecarOf, placeholderSidecarOf } from './artCatalogue'
 import {
   expectedFilesOf,
   manifestProblems,
@@ -125,6 +127,33 @@ describe('asset lint: sidecars', () => {
         : placeholderDriftProblems(placeholder, sidecar)
     })
     expect(drift).toEqual([])
+  })
+})
+
+// K5 #188: the #162 coverage rule over the items the loaded slices register, against the attach
+// points of the vehicle sidecars the game draws from.
+describe('asset lint: attach coverage', () => {
+  const vehicleSidecars = [
+    placeholderSidecarOf(SHIPPED_ART, ATTACH_ASSET_ID),
+    exportedSidecarOf(SHIPPED_ART, ATTACH_ASSET_ID),
+  ]
+
+  it('places every registered item at an attach point the vehicle sidecars carry', () => {
+    const problems = vehicleSidecars.flatMap((sidecar) =>
+      sidecar === null
+        ? [`no ${ATTACH_ASSET_ID} sidecar`]
+        : attachCoverageProblems(attachedItemsOfRegistries(), attachIdsOf(sidecar)),
+    )
+    expect(problems).toEqual([])
+  })
+
+  it('ships a model for every item drawn at its power-up slot (TD on #162)', () => {
+    const listed = SHIPPED_ART.manifest.assets.map((entry) => entry.id)
+    const missing = attachedItemsOfRegistries()
+      .filter((item) => item.attach === 'slot')
+      .map((item) => slotItemAssetIdOf(item.id))
+      .filter((assetId) => !listed.includes(assetId))
+    expect(missing).toEqual([])
   })
 })
 

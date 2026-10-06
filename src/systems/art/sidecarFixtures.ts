@@ -2,7 +2,8 @@
  * A schema-1 vehicle sidecar the sidecar specs vary one field of at a time: the shared
  * `partsSidecar.test.ts` and each module's own art spec (`<module>Art.test.ts`, #116).
  */
-import type { PartsSidecar, SidecarPart } from './partsSidecar'
+import { ATTACH_IDS } from '../registries/vehicleAttach'
+import type { AttachPoint, PartsSidecar, SidecarPart } from './partsSidecar'
 
 const WHEEL_SIZE_M = 0.24
 
@@ -18,6 +19,15 @@ export const WHEEL_PART: SidecarPart = {
   z: 1,
 }
 
+const MOUNTED_PART_Z = 6
+
+/** Every attach point at the vehicle's origin, which the base vehicle's sidecar must carry. */
+export const VEHICLE_ATTACH: readonly AttachPoint[] = ATTACH_IDS.map((id) => ({
+  id,
+  atM: [0, 0],
+  z: MOUNTED_PART_Z,
+}))
+
 export function vehicleSidecar(parts: SidecarPart[] = [WHEEL_PART]): PartsSidecar {
   return {
     assetId: 'vehicle',
@@ -31,5 +41,6 @@ export function vehicleSidecar(parts: SidecarPart[] = [WHEEL_PART]): PartsSideca
       emissive: 'vehicle.emissive.ktx2',
     },
     parts,
+    attach: VEHICLE_ATTACH,
   }
 }

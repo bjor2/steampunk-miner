@@ -8,6 +8,7 @@
  * and `atlasPx`, the atlas size the rects must fit. An optional `attach` array (#162 "vehicle
  * attach", K5; the shop buildings of #170) lists named points in the same frame, from the
  * `attach.<id>` empties of the `.blend`; it is checked only when present, and the schema stays 1.
+ * The base vehicle must place every vehicle attach id (`sidecarAttach.ts`).
  */
 import {
   ART_RULES,
@@ -17,6 +18,7 @@ import {
   tierOfPartId,
   type MapKind,
 } from './artIds'
+import { vehicleAttachProblems } from './sidecarAttach'
 
 export const SIDECAR_SCHEMA = 1
 
@@ -62,6 +64,7 @@ export function sidecarProblems(assetId: string, sidecar: PartsSidecar): string[
     ...duplicatePartProblems(sidecar.parts),
     ...sidecar.parts.flatMap((part) => partProblems(assetId, sidecar.atlasPx, part)),
     ...attachProblems(sidecar.attach ?? []),
+    ...vehicleAttachProblems(assetId, sidecar),
   ].map((problem) => `${assetId}.parts.json: ${problem}`)
 }
 

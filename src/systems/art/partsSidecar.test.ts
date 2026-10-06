@@ -5,9 +5,24 @@ import {
   placeholderDriftProblems,
   sidecarProblems,
 } from './partsSidecar'
-import { vehicleSidecar, WHEEL_PART } from './sidecarFixtures'
+import { VEHICLE_ATTACH, vehicleSidecar, WHEEL_PART } from './sidecarFixtures'
 
 const wheel = WHEEL_PART
+
+/** The platform hub's sidecar: an asset other than the base vehicle, with no attach array. */
+function hubSidecar(): ReturnType<typeof vehicleSidecar> {
+  return {
+    ...vehicleSidecar([{ ...WHEEL_PART, id: 'outpost' }]),
+    assetId: 'platform-hub',
+    pxPerMetre: 256,
+    maps: {
+      albedo: 'platform-hub.albedo.ktx2',
+      normal: 'platform-hub.normal.ktx2',
+      emissive: false as const,
+    },
+    attach: undefined,
+  }
+}
 
 describe('parts sidecar', () => {
   it('accepts a schema-1 vehicle sidecar with valid parts', () => {
@@ -114,6 +129,32 @@ describe('parts sidecar', () => {
   })
 })
 
+describe("parts sidecar: the base vehicle's attach points", () => {
+  const sidecar = vehicleSidecar()
+
+  it('requires the attach array, with every attach id, on the base vehicle', () => {
+    expect(sidecarProblems('vehicle', sidecar)).toEqual([])
+    expect(sidecarProblems('vehicle', { ...sidecar, attach: undefined })).toEqual([
+      'vehicle.parts.json: the base vehicle needs an attach array',
+    ])
+    const withoutFork = VEHICLE_ATTACH.filter((point) => point.id !== 'drill.fork')
+    expect(sidecarProblems('vehicle', { ...sidecar, attach: withoutFork })).toEqual([
+      'vehicle.parts.json: attach "drill.fork" is missing',
+    ])
+  })
+
+  it('refuses a point on the base vehicle that is not a vehicle attach id', () => {
+    const attach = [...VEHICLE_ATTACH, { id: 'hull.keel', atM: [0, 0] as const, z: 1 }]
+    expect(sidecarProblems('vehicle', { ...sidecar, attach })).toEqual([
+      'vehicle.parts.json: attach "hull.keel" is not a vehicle attach id',
+    ])
+  })
+
+  it('asks no attach array of any other asset', () => {
+    expect(sidecarProblems('platform-hub', hubSidecar())).toEqual([])
+  })
+})
+
 describe('parts sidecar: replacing a placeholder', () => {
   const placeholder = vehicleSidecar([wheel, { ...wheel, id: 't1-chassis' }])
 
@@ -146,11 +187,11 @@ describe('parts sidecar: attach points', () => {
   const chute = { id: 'sell.chute', atM: [1.5, 0.4] as const, z: 2 }
 
   it('takes an optional attach array of dotted ids in the asset frame (#162 K5 shape)', () => {
-    const sidecar = { ...vehicleSidecar(), attach: [chute, { ...chute, id: 'hull.roof.aft' }] }
-    expect(sidecarProblems('vehicle', sidecar)).toEqual([])
+    const sidecar = { ...hubSidecar(), attach: [chute, { ...chute, id: 'hull.roof.aft' }] }
+    expect(sidecarProblems(sidecar.assetId, sidecar)).toEqual([])
     expect(attachPointOf(sidecar, 'sell.chute')).toEqual(chute)
     expect(attachPointOf(sidecar, 'sell.stack')).toBeNull()
-    expect(attachPointOf(vehicleSidecar(), 'sell.chute')).toBeNull()
+    expect(attachPointOf(hubSidecar(), 'sell.chute')).toBeNull()
   })
 
   it('refuses an attach id without a dot, a repeated id, a non-finite point or a fractional z', () => {
@@ -159,11 +200,11 @@ describe('parts sidecar: attach points', () => {
       chute,
       { ...chute, atM: [Number.NaN, 0] as const, z: 0.5 },
     ]
-    expect(sidecarProblems('vehicle', { ...vehicleSidecar(), attach })).toEqual([
-      'vehicle.parts.json: attach "sell.chute" is listed twice',
-      'vehicle.parts.json: attach "chute" is not a dotted attach id',
-      'vehicle.parts.json: attach "sell.chute" atM must be two numbers',
-      'vehicle.parts.json: attach "sell.chute" z must be a whole number',
+    expect(sidecarProblems('platform-hub', { ...hubSidecar(), attach })).toEqual([
+      'platform-hub.parts.json: attach "sell.chute" is listed twice',
+      'platform-hub.parts.json: attach "chute" is not a dotted attach id',
+      'platform-hub.parts.json: attach "sell.chute" atM must be two numbers',
+      'platform-hub.parts.json: attach "sell.chute" z must be a whole number',
     ])
   })
 })

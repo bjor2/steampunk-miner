@@ -284,5 +284,142 @@
       "atM": [0.32, -0.36],
       "z": 1
     }
+  ],
+  "attach": [
+    {
+      "id": "cab.gauge",
+      "atM": [0.3, 0.08],
+      "z": 5
+    },
+    {
+      "id": "chassis.drive",
+      "atM": [0.0, -0.36],
+      "z": 2
+    },
+    {
+      "id": "drill.collar",
+      "atM": [0.5, 0.0],
+      "z": 7
+    },
+    {
+      "id": "drill.flank",
+      "atM": [0.58, 0.0],
+      "z": 7
+    },
+    {
+      "id": "drill.fork",
+      "atM": [0.42, 0.0],
+      "z": 7
+    },
+    {
+      "id": "drill.head",
+      "atM": [0.65, 0.0],
+      "z": 9
+    },
+    {
+      "id": "drill.hood",
+      "atM": [0.56, 0.16],
+      "z": 9
+    },
+    {
+      "id": "drill.housing",
+      "atM": [0.26, 0.04],
+      "z": 4
+    },
+    {
+      "id": "hull.arm.left",
+      "atM": [-0.36, -0.12],
+      "z": 6
+    },
+    {
+      "id": "hull.arm.right",
+      "atM": [0.36, -0.12],
+      "z": 6
+    },
+    {
+      "id": "hull.boiler",
+      "atM": [-0.13, 0.2],
+      "z": 3
+    },
+    {
+      "id": "hull.cargo",
+      "atM": [0.2, 0.2],
+      "z": 3
+    },
+    {
+      "id": "hull.front",
+      "atM": [0.48, -0.08],
+      "z": 6
+    },
+    {
+      "id": "hull.hitch",
+      "atM": [-0.52, -0.3],
+      "z": 1
+    },
+    {
+      "id": "hull.liner",
+      "atM": [-0.2, -0.08],
+      "z": 4
+    },
+    {
+      "id": "hull.plates",
+      "atM": [0.0, 0.14],
+      "z": 5
+    },
+    {
+      "id": "hull.powerup.1",
+      "atM": [-0.3, -0.02],
+      "z": 6
+    },
+    {
+      "id": "hull.powerup.2",
+      "atM": [-0.15, -0.02],
+      "z": 6
+    },
+    {
+      "id": "hull.powerup.3",
+      "atM": [0.0, -0.02],
+      "z": 6
+    },
+    {
+      "id": "hull.powerup.4",
+      "atM": [0.15, -0.02],
+      "z": 6
+    },
+    {
+      "id": "hull.powerup.5",
+      "atM": [0.3, -0.02],
+      "z": 6
+    },
+    {
+      "id": "hull.rear",
+      "atM": [-0.58, -0.04],
+      "z": 2
+    },
+    {
+      "id": "hull.roof.aft",
+      "atM": [-0.42, 0.24],
+      "z": 6
+    },
+    {
+      "id": "hull.roof.fore",
+      "atM": [0.3, 0.26],
+      "z": 6
+    },
+    {
+      "id": "hull.roof.mid",
+      "atM": [0.04, 0.42],
+      "z": 6
+    },
+    {
+      "id": "hull.stack",
+      "atM": [-0.16, 0.46],
+      "z": 2
+    },
+    {
+      "id": "hull.turret",
+      "atM": [0.04, 0.13],
+      "z": 10
+    }
   ]
 }

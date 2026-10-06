@@ -66,6 +66,15 @@ export function vehicleModuleAssetIdOf(rowId: string): string {
   return `vehicle-${kebabOf(rowId)}`
 }
 
+/**
+ * A slot-drawn item's own model (TD on #162: every `attach: "slot"` power-up ships one, drawn at
+ * `hull.powerup.n`): `mobility.steam_shield` is `vehicle-item-mobility-steam-shield`, named like the
+ * item's `item-` icon (#158) under the vehicle category.
+ */
+export function slotItemAssetIdOf(itemId: string): string {
+  return `vehicle-item-${kebabOf(itemId).replaceAll('.', '-')}`
+}
+
 /** Every Blender asset of the #51 inventory and the vehicle modules, named from the registries (#52). */
 export function blenderAssetIds(): string[] {
   return [

@@ -537,20 +537,24 @@ export function acceptedSlotsOf(itemId: string): readonly LoadoutSlotId[]
 ### 3.11 Vehicle attach (kernel `vehicle-attach`, render-only)
 
 ```ts
-// src/systems/registries/vehicleAttach.ts (new)
-export const ATTACH_IDS = ['drill.head', 'drill.flank', 'drill.collar', 'drill.hood', 'hull.front',
-  'hull.arm.left', 'hull.arm.right', 'hull.roof.fore', 'hull.roof.mid', 'hull.roof.aft',
-  'hull.turret', 'hull.rear', 'cab.gauge'] as const
+// src/systems/registries/vehicleAttach.ts (new; 27 ids since K5 #188)
+export const ATTACH_IDS = ['drill.head', 'drill.flank', 'drill.collar', 'drill.hood', 'drill.fork',
+  'drill.housing', 'hull.front', 'hull.arm.left', 'hull.arm.right', 'hull.roof.fore', 'hull.roof.mid',
+  'hull.roof.aft', 'hull.turret', 'hull.rear', 'hull.hitch', 'hull.boiler', 'hull.stack', 'hull.cargo',
+  'hull.plates', 'hull.liner', 'hull.powerup.1', …, 'hull.powerup.5', 'chassis.drive', 'cab.gauge'] as const
 export type AttachId = (typeof ATTACH_IDS)[number]
-export interface AttachUse { id: string; itemId: string; attach: AttachId }
-export function attachOf(itemId: string): AttachId | null
+export type ItemAttach = AttachId | 'slot'   // "slot": drawn at hull.powerup.n of its powerup.n slot
+export interface AttachUse { id: string; itemId: string; attach: ItemAttach }
+export function attachOf(itemId: string): ItemAttach | null
+export function attachPointOfEquipped(itemId: string, slot: LoadoutSlotId): AttachId | null
 ```
 
 Attach data never enters the authority state, snapshot or any digest. Only scene code reads it.
 
-K5, with #166, adds:
-- the optional `attach: [{id, atM, z}]` array in the vehicle `parts.json` sidecar, read by `src/systems/art/partsSidecar.ts`. Sidecar schema stays 1, and the validator checks the field only when it is present.
-- the coverage test: each physical item names exactly one attach that exists in `ATTACH_IDS` and in the sidecar, and no two co-equippable items share one
+K5 (#188), with #166, adds:
+- the `attach: [{id, atM, z}]` array of the `parts.json` sidecar (`src/systems/art/partsSidecar.ts`, landed with the #174 shop buildings), exported from `attach.<id>` empties. Sidecar schema stays 1; the field is checked when present, and the base `vehicle` sidecar must carry exactly the attach ids (`src/systems/art/sidecarAttach.ts`).
+- the coverage rule (`src/systems/registries/attachCoverage.ts`, run by the asset lint): each physical item names exactly one attach that exists in `ATTACH_IDS` and in the sidecar, and no two co-equippable items share one. An owned item with no loadout slot counts as always equipped. `"slot"` is valid only for `powerup.*` items. No item takes a point the vehicle's own upgrades hold (`drill.housing`, `hull.turret`, the six #180 showcase points) or a `hull.powerup.n` by name. `cab.gauge` (one gauge cluster) and `hull.rear` (the charge rack the crates and mortar ride) are shared.
+- the asset lint: every `"slot"` item ships a `vehicle-item-<id>` model.
 
 ### 3.12 Discovery (kernel query point, `codex` provides)
 
