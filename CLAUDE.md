@@ -29,6 +29,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run balance:heat`                    | bot to planet 10: heat planets 8-10 against C4 (#113)     |
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
 | `npm run bench:render`                    | chunk mesh batch p50/p95 per planet (logged, not gated)   |
+| `npm run bench:summary`                   | check + tabulate `bench:* -- --log` run folders (#124)    |
 | `npm run perf:record -- --source bench`   | record bench medians in `docs/perf/history.ndjson`        |
 | `npm run soak:memory`                     | 10-min memory soak on the preview build, leak gate (#99)  |
 | `npm run metrics:ticket -- <n>`           | where a closed ticket's time went, on the box (#134)      |

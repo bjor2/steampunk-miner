@@ -45,6 +45,16 @@ committed code — the recorder warns on uncommitted changes), `--measured-at <i
 `--note "<text>"`, `--dry-run` (print the line, write nothing). The file shapes `--from` knows are
 listed in `scripts/perf/perfMetrics.mjs`; anything else should be written as `{"metrics": {...}}`.
 
+## Bench run logs
+
+Any bench run with `-- --log` (`npm run bench:ground -- --log`) also writes its timed series as
+`benchmark_result` run events (`name`, `medianUs`, `p95Us`, `runs` = samples, `commit`; whole
+microseconds, as #11 keeps floats to `perf_sample`) to its own run folder,
+`logs/<runId>_bench-<bench>/events.ndjson`; stdout is unchanged. `npm run bench:summary` checks
+every such line against the run-event schema and prints them as a table. CI's `bench` job runs all
+four this way on every push and pull request, report only, uploads `logs/` as the artifact
+`session-ci-<sha>-<github run id>` and puts the table in the job summary (#124).
+
 ## Heap and stack flags
 
 The game sets none, by decision (#102): no `--max-old-space-size`, `--js-flags`, `--stack-size` or

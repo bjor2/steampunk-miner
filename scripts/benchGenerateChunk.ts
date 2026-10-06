@@ -2,11 +2,14 @@
  * Decision #4 acceptance 8: `generateChunk` must stay under 2 ms at the 95th percentile on the
  * reference machine. Measured and logged here, not gated in CI, because CI machines vary.
  * Run with `npm run bench:world`; it prints one JSON line per planet.
+ * With `-- --log` it also writes `benchmark_result` lines to `logs/<runId>/events.ndjson` (#124).
  */
 import { loadFeatures } from '../src/features'
+import type { BenchmarkSeries } from '../src/logging/benchmarkResult'
 import { generateChunk } from '../src/systems/world/generateChunk'
 import { planetParamsFor, type PlanetParams } from '../src/systems/world/planetParams'
 import { chunkRangeOfDisc } from '../src/systems/world/tileGrid'
+import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 
 loadFeatures()
 
@@ -34,7 +37,7 @@ function percentile(times: readonly number[], fraction: number): number {
   return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * fraction))]
 }
 
-function benchPlanet(planetIndex: number): void {
+function benchPlanet(planetIndex: number): BenchmarkSeries {
   const params = planetParamsFor(WORLD_SEED, planetIndex)
   chunkTimesMs(params)
   const times = chunkTimesMs(params)
@@ -50,6 +53,7 @@ function benchPlanet(planetIndex: number): void {
       isWithinBudget: p95Ms < BUDGET_P95_MS,
     }),
   )
+  return { name: 'generateChunk', planet: planetIndex, timesMs: times }
 }
 
-PLANETS.forEach(benchPlanet)
+logBenchmarkSeriesWhenAsked('world', PLANETS.map(benchPlanet))

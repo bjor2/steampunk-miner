@@ -5,6 +5,7 @@
  *
  * Six burrowers circle a vehicle whose drill points at open sky, so none is ever pinned and
  * killed: they hunt, wind up, lunge and recoil for the whole run, which is the busiest case.
+ * With `-- --log` it also writes `benchmark_result` lines to `logs/<runId>/events.ndjson` (#124).
  */
 import { loadFeatures } from '../src/features'
 import { createScriptedSession } from '../src/systems/authority/scriptedSession'
@@ -19,6 +20,7 @@ import {
 import { hullMax } from '../src/systems/economy/vehicleStats'
 import { toCanonical } from '../src/systems/money'
 import { FACING } from '../src/systems/vehicle/vehiclePose'
+import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 
 loadFeatures()
 
@@ -69,6 +71,9 @@ function benchSixEnemies(): void {
       isWithinBudget: p95Ms < BUDGET_P95_MS,
     }),
   )
+  logBenchmarkSeriesWhenAsked('combat', [
+    { name: 'combatTick', planet: session.state().planet.index, timesMs: times },
+  ])
 }
 
 benchSixEnemies()

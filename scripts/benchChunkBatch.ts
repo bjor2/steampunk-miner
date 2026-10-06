@@ -3,8 +3,10 @@
  * most one chunk mesh per frame, so one density halo plus `buildChunkTileBatch` (chunks already
  * generated) must fit the budget. Measured and logged here, not gated in CI, because CI machines vary.
  * Run with `npm run bench:render`; it prints one JSON line per planet.
+ * With `-- --log` it also writes `benchmark_result` lines to `logs/<runId>/events.ndjson` (#124).
  */
 import { loadFeatures } from '../src/features'
+import type { BenchmarkSeries } from '../src/logging/benchmarkResult'
 import { buildChunkTileBatch } from '../src/systems/render/chunkTileBatch'
 import { chunkDensityHaloOf } from '../src/systems/render/densityHalo'
 import { planetParamsFor, type PlanetParams } from '../src/systems/world/planetParams'
@@ -14,6 +16,7 @@ import {
   EMPTY_WORLD,
   materialCellsOfChunk,
 } from '../src/systems/world/worldState'
+import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 
 loadFeatures()
 
@@ -50,7 +53,7 @@ function percentile(times: readonly number[], fraction: number): number {
   return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * fraction))]
 }
 
-function benchPlanet(planetIndex: number): void {
+function benchPlanet(planetIndex: number): BenchmarkSeries {
   const params = planetParamsFor(WORLD_SEED, planetIndex)
   batchTimesMs(params)
   const times = batchTimesMs(params)
@@ -66,6 +69,7 @@ function benchPlanet(planetIndex: number): void {
       isWithinBudget: p95Ms < BUDGET_P95_MS,
     }),
   )
+  return { name: 'buildChunkTileBatch', planet: planetIndex, timesMs: times }
 }
 
-PLANETS.forEach(benchPlanet)
+logBenchmarkSeriesWhenAsked('render', PLANETS.map(benchPlanet))

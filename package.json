@@ -19,6 +19,7 @@
     "bench:render": "vite-node scripts/benchChunkBatch.ts",
     "bench:ground": "vite-node scripts/benchGround.ts",
     "bench:combat": "vite-node scripts/benchCombatTick.ts",
+    "bench:summary": "vite-node scripts/bench/summarizeBenchLogs.ts",
     "perf:record": "node scripts/perf/recordPerf.mjs",
     "metrics:ticket": "node scripts/metrics/ticketPhases.mjs",
     "metrics:backfill": "node scripts/metrics/ticketPhases.mjs --backfill",

@@ -7,6 +7,7 @@
  * every 12 ticks as the client does. Per report it times the authority's carve (the reportPose
  * command), the re-mesh of one changed chunk (its density halo and tile batch, the most the scene
  * rebuilds per frame), and the collision blocks of the 3 x 3 halo whose chunks changed.
+ * With `-- --log` it also writes `benchmark_result` lines to `logs/<runId>/events.ndjson` (#124).
  */
 import { loadFeatures } from '../src/features'
 import { applyCommand } from '../src/systems/authority/applyCommand'
@@ -25,6 +26,7 @@ import { FACING, type Facing } from '../src/systems/vehicle/vehiclePose'
 import { groundReaderOf } from '../src/systems/world/groundReader'
 import type { PlanetParams } from '../src/systems/world/planetParams'
 import { currentDensityOfChunk, materialCellsOfChunk } from '../src/systems/world/worldState'
+import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 
 loadFeatures()
 
@@ -174,3 +176,10 @@ const report = {
   budget: BUDGET,
 }
 console.log(JSON.stringify(report))
+logBenchmarkSeriesWhenAsked('ground', [
+  { name: 'groundDrilling.carve', planet: 1, timesMs: timings.carveMs },
+  { name: 'groundDrilling.remeshChunk', planet: 1, timesMs: timings.remeshMs },
+  { name: 'groundDrilling.colliderBlocks', planet: 1, timesMs: timings.blocksMs },
+  { name: 'groundDrilling.carveAndRemesh', planet: 1, timesMs: carveAndRemesh },
+  { name: 'groundDrilling.terrainFrame', planet: 1, timesMs: timings.frameMs },
+])
