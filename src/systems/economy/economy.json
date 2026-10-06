@@ -161,7 +161,7 @@
         "baseHit": "6",
         "firstPlanet": 6,
         "bands": [2, 3, 4, 5],
-        "moveTilesPerSecond": { "min": 1.5, "max": 2.5 },
+        "moveTilesPerSecond": { "min": 1.0, "max": 1.5 },
         "detectionTiles": { "min": 12, "max": 12 },
         "attackCooldownTicks": { "min": 90, "max": 45 },
         "windupTicks": 24,

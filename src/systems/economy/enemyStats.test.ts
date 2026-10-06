@@ -41,6 +41,24 @@ describe('enemy stats', () => {
     expect(enemyBoundedStats('tunnel_wrecker', 1).detectionTiles).toBe(12)
   })
 
+  it('walks a tunnel wrecker at 1.0 to 1.5 tiles/s, slow enough for the guns to finish it (#126)', () => {
+    const wrecker = ECONOMY.enemies.kinds.find((kind) => kind.id === 'tunnel_wrecker')
+    expect(wrecker).toEqual({
+      id: 'tunnel_wrecker',
+      health: m('10'),
+      baseHit: m('6'),
+      firstPlanet: 6,
+      bands: [2, 3, 4, 5],
+      moveTilesPerSecond: { min: 1.0, max: 1.5 },
+      detectionTiles: { min: 12, max: 12 },
+      attackCooldownTicks: { min: 90, max: 45 },
+      windupTicks: 24,
+      lungeTilesPerSecond: 8,
+      lungeTicks: 30,
+      recoilTicks: 30,
+    })
+  })
+
   it("holds the tunnel wrecker's route numbers as Systems set them (#111)", () => {
     expect(ECONOMY.enemies.tunnelWrecker).toEqual({
       gnawTicksPerRing: 300,
