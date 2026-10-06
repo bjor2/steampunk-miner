@@ -114,6 +114,16 @@ describe('bot: shaft round lava (#113)', () => {
     expect(planet.layout.shaftBottomRow).toBe(BELOW_LAVA)
   })
 
+  it('steps aside to a column clear past the pocket, so a gallery under the jog cannot trap it', () => {
+    // The #130 planet 8 loop: a jog one column over met the same pocket a row lower, and the only
+    // row left to step aside from again already had a gallery dug off it.
+    const { session, planet } = diggerAbovePocket()
+    const dugEast = { east: 20, west: 0, isEastDone: true, isWestDone: true }
+    planet.layout.galleries.set(ABOVE_LAVA - 1, dugEast)
+    expect(boreShaftDownTo(session, planet, BELOW_LAVA)).toBe(true)
+    expect(planet.layout.shaftBottomRow).toBe(BELOW_LAVA)
+  })
+
   it('travels the shaft round each jog, down and back up the same way', () => {
     const params = planetParamsFor(83921, 8)
     const layout = { ...newMineLayout(params, dockSiteOf(params)), shaftColumn: -8 }

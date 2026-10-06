@@ -4,6 +4,7 @@
  * first) along its bottom row, or failing that along one of the few open rows just above it, and
  * carries on down there, the jog remembered in the layout.
  */
+import { LAVA_POCKET_TILES } from '../../constants/balance'
 import type { TilePoint } from '../world/tileGrid'
 import { openTile } from './botDig'
 import { isTooHotToDig } from './botHeat'
@@ -16,6 +17,12 @@ import { shaftColumnAt, shaftTileAt, shaftWaypoints, type MineLayout } from './m
 const JOG_REACH_TILES = 16
 /** How many of its own open rows the shaft may climb back to step aside from. */
 const JOG_RISE_ROWS = 6
+/**
+ * A jog's new column is clear of lava this far down: a pocket block's height and the neighbour row
+ * on either side, so the shaft passes the pocket that stopped it instead of meeting it a row lower
+ * (#130: from there the only row left to step aside from may have a gallery dug off it).
+ */
+const JOG_CLEAR_ROWS = LAVA_POCKET_TILES + 2
 
 /** Where a jog leaves the shaft and the column it goes to. */
 interface JogPlan {
@@ -100,11 +107,17 @@ function clearColumnNear(session: BotSession, layout: MineLayout, row: number): 
   return null
 }
 
-/** The way along the row and the tile below its end are all clear of lava. */
+/** The way along the row and the new column's tiles below its end are all clear of lava. */
 function isClearJog(session: BotSession, from: number, to: number, row: number): boolean {
   const state = session.state()
-  const below = { tx: to, ty: row - 1 }
-  return [...tilesAlong(from, to, row), below].every((tile) => !isLavaRisk(state, tile))
+  return [...tilesAlong(from, to, row), ...columnBelow(to, row)].every(
+    (tile) => !isLavaRisk(state, tile),
+  )
+}
+
+/** The `JOG_CLEAR_ROWS` tiles of `column` under `row`. */
+function columnBelow(column: number, row: number): TilePoint[] {
+  return Array.from({ length: JOG_CLEAR_ROWS }, (_, at) => ({ tx: column, ty: row - 1 - at }))
 }
 
 /** The tiles after `from` up to and including `to` along `row`. */
