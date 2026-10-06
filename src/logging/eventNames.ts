@@ -302,6 +302,13 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { slot: 'text', epoch: 'integer', bytes: 'integer', digest: 'text' },
   },
+  // #170: an older save was brought up to this build by one step of the migration chain, logged
+  // per step just before checkpoint_loaded.
+  save_migrated: {
+    group: 'platform',
+    level: 'core',
+    payload: { version: { oneOf: ['generatorVersion'] }, from: 'integer', to: 'integer' },
+  },
   // #26: the run resumed from a checkpoint; its commands replay from this state, not the seed.
   checkpoint_loaded: {
     group: 'platform',

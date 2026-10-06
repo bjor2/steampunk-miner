@@ -269,7 +269,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   resumeCheckpoint: (checkpoint) => {
     set({ depthTiles: 0, travelTransition: null })
     replaceSession(checkpoint.state)
-    recordCheckpointLoaded(runEventPlaceOf(get()), checkpoint.saveEpoch)
+    recordCheckpointLoaded(runEventPlaceOf(get()), checkpoint)
   },
 
   setUpgrade: (upgradeId, level) =>

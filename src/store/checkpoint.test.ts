@@ -3,6 +3,7 @@ import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { toCanonical } from '../systems/money'
+import PRE_175_SAVE from '../systems/save/fixtures/pre-175-planet-1.save.json'
 import { readSaveSlot, type SaveSlotFile } from '../systems/save/saveSlot'
 import { checkpointWrites, installSaveSlots, loadCheckpoint, type SaveSlots } from './checkpoint'
 import { resetGameStore, useGameStore } from './gameStore'
@@ -128,6 +129,24 @@ describe('checkpoint', () => {
       { slot: 'slot-1', epoch: 1, digest: savedFile().digest },
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
+  it('resumes a pre-#175 save through the chain and logs save_migrated before checkpoint_loaded', async () => {
+    disk.files.set('slot-1.json', JSON.stringify(PRE_175_SAVE))
+    await resumeFromDisk()
+    expect(toCanonical(game().money)).toBe(PRE_175_SAVE.profile.players.player_1.wallet)
+    const names = sink.events.map((line) => line.event)
+    expect(names.indexOf('save_migrated')).toBeLessThan(names.indexOf('checkpoint_loaded'))
+    expect(linesNamed('save_migrated').map((line) => line.data)).toEqual([
+      { version: 'generatorVersion', from: 5, to: 6 },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
+  it('logs no save_migrated for a save of this build', async () => {
+    game().dock('sell')
+    await quitAndResume()
+    expect(linesNamed('save_migrated')).toEqual([])
   })
 
   it('logs nothing as debug when resuming', async () => {

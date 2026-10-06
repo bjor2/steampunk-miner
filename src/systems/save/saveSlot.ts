@@ -17,7 +17,8 @@
  *
  * Reading refuses, never migrates: another format, snapshot or generator version, a mismatched
  * epoch, planet params this build would not generate, or anything `readSnapshot` refuses is a
- * listed problem, and nothing is restored.
+ * listed problem, and nothing is restored. Older saves reach this reader through the migration
+ * chain first (`saveMigrations.ts`, #170).
  */
 import type { AuthorityState } from '../authority/authorityState'
 import { isJsonObject, isWholeNumber } from '../authority/payloadFields'
@@ -126,7 +127,8 @@ function restoreSections(file: SaveSlotFile): SaveSlotReading {
   return { state: restored.state, saveEpoch: file.saveEpoch, problems: [] }
 }
 
-function snapshotOfSaveSlot(file: SaveSlotFile): SessionSnapshot {
+/** The session snapshot the sections were cut from, joined back into one. */
+export function snapshotOfSaveSlot(file: SaveSlotFile): SessionSnapshot {
   const { world, profile } = file
   return {
     snapshotVersion: file.snapshotVersion,

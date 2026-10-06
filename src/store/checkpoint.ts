@@ -5,8 +5,10 @@
  * shell, which writes it atomically. Writes are queued, so slot files land in epoch order.
  * `checkpoint_saved` is logged once the shell has the file.
  *
- * At start `loadCheckpoint` reads the slot back: a save this build refuses is set aside, never
- * overwritten, and the run starts fresh with the problems on the console.
+ * At start `loadCheckpoint` reads the slot back through the migration chain (#170): a save of an
+ * older build loads through its steps, each logged as `save_migrated` before `checkpoint_loaded`;
+ * a save this build refuses is set aside, never overwritten, and the run starts fresh with the
+ * problems on the console.
  */
 import { getRunLog } from '../logging/runLog'
 import type { RunEventPlace } from '../logging/runEvent'
@@ -16,12 +18,11 @@ import { takeSnapshot } from '../systems/authority/sessionSnapshot'
 import { stateDigest } from '../systems/authority/stateDigest'
 import { isCheckpointMoment } from '../systems/save/checkpointMoment'
 import {
-  CHECKPOINT_SLOT,
-  readSaveSlot,
-  saveSlotOf,
-  type SaveSlotFile,
-  type SaveSlotReading,
-} from '../systems/save/saveSlot'
+  readMigratedSaveSlot,
+  type MigratedSaveSlotReading,
+  type SaveMigration,
+} from '../systems/save/saveMigrations'
+import { CHECKPOINT_SLOT, saveSlotOf, type SaveSlotFile } from '../systems/save/saveSlot'
 import { readAuthorityState } from './authorityLink'
 
 /** The shell's save files, as the checkpoint needs them; tests pass a memory copy. */
@@ -34,6 +35,8 @@ export interface SaveSlots {
 export interface Checkpoint {
   state: AuthorityState
   saveEpoch: number
+  /** The chain's steps that brought an older save up to this build, in order. */
+  migrations: readonly SaveMigration[]
 }
 
 /** What a start finds in the slot: a session to resume, a refused save, or nothing. */
@@ -75,22 +78,24 @@ export async function loadCheckpoint(): Promise<CheckpointLoad> {
 /** A resumed session's next checkpoint carries the next epoch; a refused save is kept aside. */
 async function adoptOrSetAside(
   target: SaveSlots,
-  reading: SaveSlotReading,
+  reading: MigratedSaveSlotReading,
 ): Promise<Checkpoint | { problems: string[] }> {
   if ('state' in reading) {
     lastEpoch = reading.saveEpoch
-    return reading
+    return { state: reading.state, saveEpoch: reading.saveEpoch, migrations: reading.migrations }
   }
   await target.setAside(CHECKPOINT_SLOT)
-  return reading
+  return { problems: reading.problems }
 }
 
-/** Logged by the store once the resumed session is connected. */
-export function recordCheckpointLoaded(place: RunEventPlace, epoch: number): void {
+/** Logged by the store once the resumed session is connected: each migration step, then the load. */
+export function recordCheckpointLoaded(place: RunEventPlace, checkpoint: Checkpoint): void {
   const state = readAuthorityState()
-  getRunLog().record({ ...place, tick: state.tick }, 'checkpoint_loaded', {
+  const at = { ...place, tick: state.tick }
+  checkpoint.migrations.forEach((step) => getRunLog().record(at, 'save_migrated', { ...step }))
+  getRunLog().record(at, 'checkpoint_loaded', {
     slot: slotName(),
-    epoch,
+    epoch: checkpoint.saveEpoch,
     digest: stateDigest(state),
   })
 }
@@ -100,11 +105,11 @@ function slotName(): string {
   return `slot-${CHECKPOINT_SLOT}`
 }
 
-function readSaveSlotText(text: string): SaveSlotReading {
+function readSaveSlotText(text: string): MigratedSaveSlotReading {
   try {
-    return readSaveSlot(JSON.parse(text))
+    return readMigratedSaveSlot(JSON.parse(text))
   } catch {
-    return { problems: ['save is not JSON'] }
+    return { problems: ['save is not JSON'], migrations: [] }
   }
 }
 
