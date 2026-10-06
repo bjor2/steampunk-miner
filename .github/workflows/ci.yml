@@ -6,8 +6,11 @@ on:
   pull_request:
 
 jobs:
-  # Every push and pull request: the whole Vitest suite, which holds the golden-replay, pacing-bot,
-  # event-registry and scenario gates of #29, then the balance report against the baseline.
+  # Every push and pull request: lint, types, the Vitest tests the change can reach, the build, and
+  # the balance report when balance inputs changed. scripts/ci/selectPushTests.sh picks the tests:
+  # scoped to the import graph of the changed files (plus fs-read rules), or the whole suite when a
+  # change cannot be mapped. The pacing bot regressions (NIGHTLY_ONLY_TESTS in vite.config.ts)
+  # never run here; nightly.yml runs the true full suite, `npm test`, every night.
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -16,6 +19,9 @@ jobs:
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Whole history, so the push's `before` commit and the pull request's merge base resolve.
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -24,12 +30,50 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: npm run typecheck
-      - run: npm test
+      - name: Pick the Vitest run (scoped or full)
+        id: pick
+        env:
+          PUSH_BEFORE: ${{ github.event.before }}
+          PR_BASE_REF: ${{ github.base_ref }}
+          RELATED_LIST: ${{ runner.temp }}/vitest-related.txt
+        run: |
+          set -o pipefail
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+            BASE=$(git merge-base "origin/$PR_BASE_REF" HEAD || true)
+          else
+            BASE="$PUSH_BEFORE"
+          fi
+          scripts/ci/selectPushTests.sh "$BASE" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Vitest (${{ steps.pick.outputs.mode }})
+        env:
+          SKIP_NIGHTLY_ONLY_TESTS: '1'
+          MODE: ${{ steps.pick.outputs.mode }}
+          REASON: ${{ steps.pick.outputs.reason }}
+          RELATED_LIST: ${{ runner.temp }}/vitest-related.txt
+        run: |
+          case "$MODE" in
+            full)
+              echo "Full suite minus the nightly-only pacing tests: $REASON"
+              npm run test:push
+              ;;
+            scoped)
+              echo "Scoped to the tests related to: $(paste -sd ' ' - <"$RELATED_LIST")"
+              mapfile -t related <"$RELATED_LIST"
+              npx vitest related --run --passWithNoTests "${related[@]}"
+              ;;
+            *)
+              echo "Skipping Vitest: $REASON"
+              ;;
+          esac
       - run: npm run build
       # Numbers only: compareRuns against tests/balance/bot-slice.summary.json goes to the job
-      # summary; the pacing targets themselves fail `npm test` above.
-      - run: npm run balance:report
-      - uses: actions/upload-artifact@v4
+      # summary; the pacing targets themselves fail the nightly `npm test`.
+      - if: steps.pick.outputs.balance == 'true'
+        run: npm run balance:report
+      - if: steps.pick.outputs.balance != 'true'
+        run: echo "Skipping balance:report, no balance inputs changed (nightly.yml always runs it)."
+      - if: steps.pick.outputs.balance == 'true'
+        uses: actions/upload-artifact@v4
         with:
           name: balance-report
           path: balance-report/

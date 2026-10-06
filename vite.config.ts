@@ -21,6 +21,16 @@ function readBuildCommit(): string {
   }
 }
 
+// The pacing bot regressions take about 72% of the suite's time, too long for the 10-minute
+// per-push CI job. `npm run test:push` (and that job) set SKIP_NIGHTLY_ONLY_TESTS=1 to leave them
+// out; the nightly workflow and `npm test` always run them.
+const NIGHTLY_ONLY_TESTS = [
+  'src/logging/pacingGate.test.ts',
+  'src/logging/assayPacingGate.test.ts',
+  'src/systems/bot/playSlice.test.ts',
+]
+const skipsNightlyOnlyTests = process.env.SKIP_NIGHTLY_ONLY_TESTS === '1'
+
 export default defineConfig({
   plugins: [react()],
   define: {
@@ -41,6 +51,12 @@ export default defineConfig({
     // Rapier world, see docs/TESTING_INSTRUCTIONS.md).
     include: ['src/**/*.test.ts', 'scripts/**/*.test.mjs'],
     setupFiles: ['src/testSetup.ts'],
-    exclude: ['**/node_modules/**', 'dist/**', 'dist-electron/**', '.claude/**'],
+    exclude: [
+      '**/node_modules/**',
+      'dist/**',
+      'dist-electron/**',
+      '.claude/**',
+      ...(skipsNightlyOnlyTests ? NIGHTLY_ONLY_TESTS : []),
+    ],
   },
 })

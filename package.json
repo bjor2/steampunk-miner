@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit && tsc -p tsconfig.e2e.json --noEmit",
     "test": "vitest run",
+    "test:push": "cross-env SKIP_NIGHTLY_ONLY_TESTS=1 vitest run",
     "test:e2e": "playwright test",
     "test:packaged": "playwright test -c playwright.electron.config.ts",
     "bench:world": "vite-node scripts/benchGenerateChunk.ts",
