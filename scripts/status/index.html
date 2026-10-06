@@ -439,9 +439,45 @@
         color: var(--muted);
         font-size: 12px;
       }
-      /* performance: rendered at build time by perfOverviewHtml.mjs, no script needed */
+      /* performance tab: panels rendered at build time by perfOverviewHtml.mjs, plus the
+         page-rendered #perf-work-panel (perf loop + perf issues, live) beside the summary */
+      #tab-performance #perf-summary-panel {
+        order: 0;
+      }
+      #tab-performance #perf-work-panel {
+        order: 1;
+      }
       #perf-panel {
         grid-column: 1 / -1;
+        order: 2;
+      }
+      .num-r {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .perf-cards .n.perf-last {
+        font-size: 14px;
+        line-height: 30px;
+      }
+      .perf-run-note {
+        font-size: 12px;
+      }
+      table.perf-budgets td,
+      table.perf-runs td {
+        vertical-align: baseline;
+      }
+      .tabn.ok {
+        color: var(--green);
+        border-color: #2f5a33;
+      }
+      .tabn.warn {
+        color: var(--amber);
+        border-color: #6b4c1a;
+      }
+      :target.perf-chart {
+        border-color: var(--brass);
+        box-shadow: 0 0 0 2px #d4ab3c55;
       }
       .perf-meta {
         margin-bottom: 4px;
@@ -1202,6 +1238,9 @@
         <a href="#features" data-tab="features" role="tab"
           >Features<span class="tabn" id="tabn-features"></span
         ></a>
+        <a href="#performance" data-tab="performance" role="tab"
+          >Performance<span class="tabn" id="tabn-performance"></span
+        ></a>
       </nav>
     </header>
     <main>
@@ -1250,7 +1289,6 @@
             <ul class="list mono" id="events"></ul>
           </div>
         </section>
-        <!-- perf-overview -->
       </section>
       <section class="tab hidden" id="tab-issues" data-tab="issues">
         <section class="panel" id="tree-panel">
@@ -1266,6 +1304,32 @@
             <label class="chk"><input type="checkbox" id="showclosed" /> expand closed</label>
           </div>
           <div class="tree" id="tree"></div>
+        </section>
+      </section>
+      <section class="tab tab-grid hidden" id="tab-performance" data-tab="performance">
+        <!-- perf-overview -->
+        <section class="panel" id="perf-work-panel">
+          <h2>Performance Tester bot</h2>
+          <table id="perf-loop-table">
+            <thead>
+              <tr>
+                <th>Loop</th>
+                <th>State</th>
+                <th>Issue</th>
+                <th>Note</th>
+                <th>Heartbeat</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="sub">
+            <h2>Open perf issues <span class="muted" id="perf-open-count"></span></h2>
+            <ul class="list" id="perf-open"></ul>
+          </div>
+          <div class="sub">
+            <h2>Perf issues closed in the last 7 days</h2>
+            <ul class="list" id="perf-closed"></ul>
+          </div>
         </section>
       </section>
       <section class="tab hidden" id="tab-features" data-tab="features">
@@ -1346,6 +1410,7 @@
       let DATA = null
       let LOOPS = null
       let LOOP_SRC = 'build snapshot'
+      let LAST_LOOP_REFRESH = 0
 
       function ago(iso) {
         if (!iso) return '—'
@@ -1688,23 +1753,41 @@
           · loops: <b>${esc(LOOP_SRC)}</b>${LOOPS && LOOPS.updated_at ? ' updated ' + ago(LOOPS.updated_at) : ''}
           · <a href="../">▶ play the game</a>`
         $('#footer').innerHTML =
-          `Issue data refreshes on every Pages build (schedule ~10 min, issue events, pushes). Loop state is re-read live from the <code>${esc(DATA.loopBranch)}</code> branch every 60 s. A loop is STALE when its heartbeat is older than ${STALE_MIN} min. Publish state with <code>scripts/status/loop-status.sh</code> — see <a href="https://github.com/${esc(DATA.repo)}/blob/main/docs/loop-status.md">docs/loop-status.md</a>.`
+          `Issue data refreshes on every Pages build (schedule ~10 min, issue events, pushes). Loop state is re-read live from the <code>${esc(DATA.loopBranch)}</code> branch every 60 s while the page is visible. A loop is STALE when its heartbeat is older than ${STALE_MIN} min. Publish state with <code>scripts/status/loop-status.sh</code> — see <a href="https://github.com/${esc(DATA.repo)}/blob/main/docs/loop-status.md">docs/loop-status.md</a>.`
       }
 
+      // The live loop state comes from the GitHub API (fresh) or raw.githubusercontent.com (CDN,
+      // up to ~5 min old, no rate limit). Unauthenticated API calls are limited to 60 an hour per
+      // IP, so the page polls only while visible, at most once a minute, slows down when the
+      // quota runs low and falls back to raw until the quota resets.
+      const API_GATE = { notBefore: 0 }
+      function noteRateLimit(r) {
+        const now = Date.now()
+        const left = Number(r.headers.get('x-ratelimit-remaining'))
+        const resetMs = Number(r.headers.get('x-ratelimit-reset')) * 1000 || now + 15 * 60000
+        if (r.status === 403 || r.status === 429 || left === 0) API_GATE.notBefore = resetMs
+        else if (left < 10) API_GATE.notBefore = resetMs
+        else if (left < 30) API_GATE.notBefore = now + 5 * 60000
+        else API_GATE.notBefore = now + 55000
+      }
       async function refreshLoops() {
-        const urls = [
-          [
+        const urls = []
+        if (Date.now() >= API_GATE.notBefore) {
+          urls.push([
+            'live',
             `https://api.github.com/repos/${DATA.repo}/contents/loops.json?ref=${DATA.loopBranch}`,
             { headers: { Accept: 'application/vnd.github.raw' }, cache: 'no-store' },
-          ],
-          [
-            `https://raw.githubusercontent.com/${DATA.repo}/${DATA.loopBranch}/loops.json`,
-            { cache: 'no-store' },
-          ],
-        ]
-        for (const [u, opt] of urls) {
+          ])
+        }
+        urls.push([
+          'live (raw, ≤5 min cache)',
+          `https://raw.githubusercontent.com/${DATA.repo}/${DATA.loopBranch}/loops.json`,
+          { cache: 'no-store' },
+        ])
+        for (const [src, u, opt] of urls) {
           try {
             const r = await fetch(u, opt)
+            if (src === 'live') noteRateLimit(r)
             if (!r.ok) continue
             const j = await r.json()
             if (j && j.entries) {
@@ -1715,8 +1798,9 @@
                 j.updated_at >= LOOPS.updated_at
               ) {
                 LOOPS = j
-                LOOP_SRC = 'live'
+                LOOP_SRC = src
               }
+              LAST_LOOP_REFRESH = Date.now()
               return true
             }
           } catch (_) {
@@ -1730,18 +1814,109 @@
         renderMeta()
         renderLoops()
         renderTree()
+        renderPerfWork()
       }
 
-      async function load() {
+      // The 5-minute reload re-reads only the Pages files; loops.json has its own 60 s poll.
+      async function load({ live = true } = {}) {
         const r = await fetch('status.json', { cache: 'no-store' })
         DATA = await r.json()
-        if (!LOOPS || LOOP_SRC !== 'live') LOOPS = DATA.loops
+        if (!LOOPS || !LOOP_SRC.startsWith('live')) LOOPS = DATA.loops
         renderAll()
         loadFeatures().catch((e) => {
           $('#ft-error').innerHTML =
             `<div class="ft-error">Feature tree failed to load: ${esc(e)}</div>`
         })
-        if (await refreshLoops()) renderAll()
+        if (live && (await refreshLoops())) renderAll()
+      }
+
+      // ---------- performance tab: badge, local times, perf loop and perf issues ----------
+      function renderPerfBadge() {
+        const panel = $('#perf-panel')
+        const tn = $('#tabn-performance')
+        if (!panel || !tn) return
+        tn.classList.remove('ok', 'bad', 'warn')
+        if (panel.dataset.error) {
+          tn.textContent = '!'
+          tn.classList.add('bad')
+          return
+        }
+        const over = Number(panel.dataset.over || 0)
+        const budgets = Number(panel.dataset.budgets || 0)
+        const last = panel.dataset.lastMeasured
+        const old = last && Date.now() - Date.parse(last) > 24 * 3600000
+        tn.textContent =
+          (over ? `${over} over budget` : `${budgets}/${budgets} in budget`) +
+          (old ? ` · ${ago(last)}` : '')
+        tn.classList.add(over ? 'bad' : old ? 'warn' : 'ok')
+        tn.title = last ? `last measured ${local(last)}` : 'no measurement yet'
+      }
+      function renderPerfTimes() {
+        document.querySelectorAll('#tab-performance time.perf-ago').forEach((t) => {
+          const iso = t.getAttribute('datetime')
+          t.textContent = `${local(iso)} (${ago(iso)})`
+          t.title = iso
+        })
+      }
+      function renderPerfWork() {
+        renderPerfBadge()
+        renderPerfTimes()
+        const byNum = new Map(DATA.issues.map((i) => [i.number, i]))
+        const issueLink = (n) =>
+          `<a href="${esc(byNum.get(n)?.url || `https://github.com/${DATA.repo}/issues/${n}`)}">#${n}</a>`
+        const loops = allEntries().filter((e) => /perf/i.test(e.loop))
+        $('#perf-loop-table tbody').innerHTML =
+          loops
+            .map((e) => {
+              const stale = isStale(e)
+              const pp = e.extra && e.extra.push_pending
+              return `<tr><td>${esc(e.loop)}${e.slot !== null && e.slot !== undefined ? ' / ' + esc(e.slot) : ''}</td>
+                <td><span class="badge st-${esc(e.state)}">${esc(e.state)}</span>${stale ? '<span class="badge stale">STALE</span>' : ''}</td>
+                <td>${e.issue ? `${issueLink(e.issue)} <span class="muted">${esc(byNum.get(e.issue)?.title || '')}</span>` : '<span class="muted">—</span>'}</td>
+                <td>${esc(e.note || '')}${pp ? ` <span class="bad">push_pending ${pp.ticket ? '#' + esc(pp.ticket) : ''}</span>` : ''}</td>
+                <td class="${stale ? 'warn' : 'muted'}" title="${esc(local(e.updated_at))}">${ago(e.updated_at)}</td></tr>`
+            })
+            .join('') ||
+          '<tr><td colspan="5" class="muted">No perf loop has reported (loop names containing “perf”).</td></tr>'
+
+        const isPerf = (i) => i.labels.some((l) => l.name === 'perf')
+        const claims = claimsByIssue()
+        const STATUS_LABELS = ['in-progress', 'blocked', 'needs-planner', 'needs-fix', 'hitl']
+        const rank = (i) =>
+          claims.has(i.number) || i.labels.some((l) => l.name === 'in-progress')
+            ? 0
+            : i.blockedBy.some((b) => b.state === 'OPEN') ||
+                i.labels.some((l) => STATUS_LABELS.slice(1).includes(l.name))
+              ? 2
+              : 1
+        const open = DATA.issues
+          .filter((i) => i.state === 'OPEN' && isPerf(i))
+          .sort((a, b) => rank(a) - rank(b) || a.number - b.number)
+        $('#perf-open-count').textContent = `(${open.length})`
+        $('#perf-open').innerHTML =
+          open
+            .map((i) => {
+              const c = claims.get(i.number)
+              const chips = i.labels
+                .filter((l) => STATUS_LABELS.includes(l.name) || l.name.startsWith('tier:'))
+                .map(labelChip)
+                .join(' ')
+              const blk = i.blockedBy.filter((b) => b.state === 'OPEN')
+              const s = i.summary || { total: 0 }
+              return `<li>${issueLink(i.number)} ${esc(i.title)} ${chips}${c ? ` <span class="claim">⚙ ${esc(c.loop)}</span>` : ''}${blk.length ? ` <span class="blk">⛔ by ${blk.map((b) => issueLink(b.number)).join(' ')}</span>` : ''}${s.total ? ` <span class="muted">${s.completed}/${s.total} sub-issues</span>` : ''}</li>`
+            })
+            .join('') || '<li class="muted">none</li>'
+        const weekAgo = Date.now() - 7 * 86400000
+        const closed = DATA.issues
+          .filter((i) => i.state !== 'OPEN' && isPerf(i) && Date.parse(i.closedAt || 0) > weekAgo)
+          .sort((a, b) => Date.parse(b.closedAt) - Date.parse(a.closedAt))
+        $('#perf-closed').innerHTML =
+          closed
+            .map(
+              (i) =>
+                `<li>${issueLink(i.number)} <span class="muted">${esc(i.title)}</span> <span class="muted" title="${esc(local(i.closedAt))}">· closed ${ago(i.closedAt)}</span></li>`,
+            )
+            .join('') || '<li class="muted">none</li>'
       }
 
       // ---------- features (data: docs/features/features.json, joined at build time) ----------
@@ -2031,15 +2206,25 @@
         }),
       )
 
-      // ---------- tabs: #issues, #loops (default), #features; `#features?q=lava` pre-fills search
-      const TABS = { issues: 'Issue trees', loops: 'Loops', features: 'Features' }
+      // ---------- tabs: #issues, #loops (default), #features, #performance; `#features?q=lava`
+      // pre-fills search; the old #perf-panel and a chart's own #metric-… id open Performance.
+      const TABS = {
+        issues: 'Issue trees',
+        loops: 'Loops',
+        features: 'Features',
+        performance: 'Performance',
+      }
       const DEFAULT_TAB = 'loops'
       function parseHash() {
         const [name, query] = location.hash.slice(1).split('?')
-        return { tab: name in TABS ? name : DEFAULT_TAB, params: new URLSearchParams(query || '') }
+        const params = new URLSearchParams(query || '')
+        if (name === 'perf' || name === 'perf-panel' || name.startsWith('metric-')) {
+          return { tab: 'performance', params, target: name.startsWith('metric-') ? name : null }
+        }
+        return { tab: name in TABS ? name : DEFAULT_TAB, params, target: null }
       }
       function showTab() {
-        const { tab, params } = parseHash()
+        const { tab, params, target } = parseHash()
         document
           .querySelectorAll('section.tab')
           .forEach((s) => s.classList.toggle('hidden', s.dataset.tab !== tab))
@@ -2057,6 +2242,7 @@
           $('#filter').value = params.get('q')
           applyFilter()
         }
+        if (target) document.getElementById(target)?.scrollIntoView({ block: 'center' })
       }
       window.addEventListener('hashchange', showTab)
       document.addEventListener('keydown', (e) => {
@@ -2083,19 +2269,28 @@
       load().catch((e) => {
         $('#meta').textContent = 'failed to load status.json: ' + e
       })
-      setInterval(async () => {
-        if (DATA && (await refreshLoops())) {
+      async function pollLoops() {
+        if (!DATA || document.hidden) return
+        if (await refreshLoops()) {
           renderMeta()
           renderLoops()
+          renderPerfWork()
         }
-      }, 60000)
+      }
+      setInterval(pollLoops, 60000)
+      // Back on a hidden tab: catch up at once if the last refresh is over a minute old.
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && Date.now() - LAST_LOOP_REFRESH > 60000) pollLoops()
+      })
       setInterval(() => {
         if (DATA) {
           renderMeta()
+          renderPerfBadge()
+          renderPerfTimes()
         }
       }, 30000)
       setInterval(() => {
-        load().catch(() => {})
+        if (!document.hidden) load({ live: false }).catch(() => {})
       }, 5 * 60000)
     </script>
   </body>

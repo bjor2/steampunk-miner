@@ -271,14 +271,18 @@ function buildFeatures(issues, lastCommit) {
   }
 }
 
-// /status/features/ is a short link to the Features tab.
-const FEATURES_REDIRECT = `<!doctype html>
+// /status/features/ and /status/performance/ are short links to their tabs.
+const SHORT_LINKS = { features: 'Feature tree', performance: 'Performance' }
+
+function shortLinkPage(tab, title) {
+  return `<!doctype html>
 <meta charset="utf-8" />
-<title>Steampunk Miner · Feature tree</title>
-<meta http-equiv="refresh" content="0; url=../#features" />
-<link rel="canonical" href="../#features" />
-<p>Moved to <a href="../#features">the status page's Features tab</a>.</p>
+<title>Steampunk Miner · ${title}</title>
+<meta http-equiv="refresh" content="0; url=../#${tab}" />
+<link rel="canonical" href="../#${tab}" />
+<p>Moved to <a href="../#${tab}">the status page's ${title} tab</a>.</p>
 `
+}
 
 function pageWithPerfSection(perfHtml) {
   const page = readFileSync(join(HERE, 'index.html'), 'utf8')
@@ -328,12 +332,14 @@ writeFileSync(join(OUT, 'loops.json'), JSON.stringify(loops, null, 2))
 writeFileSync(join(OUT, 'perf.json'), JSON.stringify(perf.model))
 writeFileSync(join(OUT, 'features.json'), JSON.stringify(features))
 writeFileSync(join(OUT, 'index.html'), page)
-mkdirSync(join(OUT, 'features'), { recursive: true })
-writeFileSync(join(OUT, 'features', 'index.html'), FEATURES_REDIRECT)
+for (const [tab, title] of Object.entries(SHORT_LINKS)) {
+  mkdirSync(join(OUT, tab), { recursive: true })
+  writeFileSync(join(OUT, tab, 'index.html'), shortLinkPage(tab, title))
+}
 for (const f of features.flagged ?? []) console.log(`features: check ${f.path}: ${f.reason}`)
 console.log(
   `status: ${issues.length} issues, ${Object.keys(loops.entries ?? {}).length} loop entries, ` +
     `${workflows.length} workflows, ${perf.model.runCount ?? 0} perf runs / ` +
-    `${perf.model.metricCount ?? 0} metrics, ` +
+    `${perf.model.metricCount ?? 0} metrics / ${perf.model.budgetCounts?.over ?? '?'} over budget, ` +
     `${features.counts ? `${features.counts.features} features / ${features.counts.flagged} to check` : `features: ${features.error}`} -> ${OUT}`,
 )
