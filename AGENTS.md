@@ -22,3 +22,8 @@ The game's design is [docs/design.md](docs/design.md); planning lives in this re
 [docs/features/features.json](docs/features/features.json) (shown at
 https://bjor2.github.io/steampunk-miner/status/#features) — see
 [docs/features/README.md](docs/features/README.md).
+
+**Performance:** if you measured anything, record it with `npm run perf:record -- --source bench`
+(or `--from <file>`) and commit `docs/perf/history.ndjson`; it shows at
+https://bjor2.github.io/steampunk-miner/status/#performance — see
+[docs/perf/README.md](docs/perf/README.md).

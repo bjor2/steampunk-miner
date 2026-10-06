@@ -1,8 +1,9 @@
 # Loop status: the one-liner
 
-The status dashboard — **https://bjor2.github.io/steampunk-miner/status/** — has three tabs, each
-linkable: **Issue trees** (`#issues`), **Loops** (`#loops`, the default) and **Features**
-(`#features`, the game feature tree). It shows the issue trees and what every automated loop is
+The status dashboard — **https://bjor2.github.io/steampunk-miner/status/** — has four tabs, each
+linkable: **Issue trees** (`#issues`), **Loops** (`#loops`, the default), **Features**
+(`#features`, the game feature tree) and **Performance** (`#performance`, short link
+`/status/performance/`). It shows the issue trees and what every automated loop is
 doing. A loop reports its state with one command:
 
 ```bash
@@ -11,10 +12,26 @@ scripts/status/loop-status.sh <loop> <working|idle|paused|blocked> [--issue N] [
 
 On the box the same script lives at `/workspace/claude-sessions/loop-status.sh`.
 
-The Loops tab also has a **Performance** section: one chart per measured metric over commits, read from
-`docs/perf/history.ndjson` and `docs/perf/metrics.json`. If you measured anything, record it with
-`npm run perf:record` and commit the `history.ndjson` line; a new metric is a new id, added to
-`metrics.json`. See [docs/perf/README.md](perf/README.md).
+## Performance tab
+
+**https://bjor2.github.io/steampunk-miner/status/#performance** shows the budget verdicts (latest value,
+headroom, change vs the previous run), the last measured time, the recent measurement runs, one
+chart per metric over commits, and, live, the perf loop's state plus the open and recently closed
+`perf` issues. The tab label shows `N over budget` (red) or `N/N in budget`, amber when the latest
+measurement is over a day old. A chart links as `#metric-<id>` (non-alphanumerics as `-`).
+
+The data is `docs/perf/history.ndjson` (one JSON line per measurement run) and
+`docs/perf/metrics.json` (labels, units, groups, budgets). **If you measured anything, publish it
+with one line, then commit:**
+
+```bash
+npm run perf:record -- --source bench --env "what else ran"     # or --from <summary.json> for a soak/e2e file
+git add docs/perf/history.ndjson && git commit -m "Record bench numbers after <change>"
+```
+
+A new metric is a new id; add it to `metrics.json` (with a `budget` if it has one). The perf loop
+reports itself like any loop (`loop-status.sh perf-loop working --issue N`); any loop whose name
+contains `perf` shows on the Performance tab. See [docs/perf/README.md](perf/README.md).
 
 | State     | Meaning                                                                  |
 | --------- | ------------------------------------------------------------------------ |

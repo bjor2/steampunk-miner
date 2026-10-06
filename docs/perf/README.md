@@ -1,9 +1,10 @@
 # Performance history
 
 Every performance number we measure is kept here, so progress shows over time. The
-**Performance** section of the status dashboard —
-**https://bjor2.github.io/steampunk-miner/status/#perf-panel** — draws one chart per metric from
-these two files on every Pages build:
+**Performance** tab of the status dashboard —
+**https://bjor2.github.io/steampunk-miner/status/#performance** (short link `/status/performance/`)
+— draws one chart per metric from these two files on every Pages build, with a budget table
+(pass/over, headroom, change vs the previous run), the recent runs and the last measured time:
 
 | File             | What                                                                                                                                                   |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
