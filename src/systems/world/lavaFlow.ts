@@ -117,6 +117,21 @@ function flowOneCell(
   }
 }
 
+/**
+ * Whether lining of the guarding type keeps this lava cell out of an open cell below it: the one
+ * thing a breach can undo (#133).
+ */
+export function isKeptOutByLining(
+  world: WorldState,
+  params: PlanetParams,
+  tile: TilePoint,
+  guardTypeIndex: number,
+): boolean {
+  return openCellsBelow(world, params, tile).some((next) =>
+    isGuardedByLining(world, next, guardTypeIndex),
+  )
+}
+
 /** Where one lava cell goes: the lowest open cell below it, or why it stays. */
 function moveOf(
   world: WorldState,
@@ -124,15 +139,20 @@ function moveOf(
   tile: TilePoint,
   barriers: LavaBarriers,
 ): Move {
-  const below = lowestFirst(neighboursOf(tile)).filter(
-    (next) => isLower(next, tile) && isOpenCell(world, params, next),
-  )
+  const below = openCellsBelow(world, params, tile)
   const guarded = below.filter((next) => isGuardedByLining(world, next, barriers.guardTypeIndex))
   const free = below.filter((next) => !guarded.includes(next))
   const clear = free.filter((next) => !isNearAnyBody(next, barriers.bodies))
   if (clear.length > 0) return { kind: 'moved', to: clear[0] }
   if (free.length > 0) return { kind: 'waiting' }
   return { kind: 'resting', guarded }
+}
+
+/** The open 4-neighbours strictly lower than the cell, lowest first. */
+function openCellsBelow(world: WorldState, params: PlanetParams, tile: TilePoint): TilePoint[] {
+  return lowestFirst(neighboursOf(tile)).filter(
+    (next) => isLower(next, tile) && isOpenCell(world, params, next),
+  )
 }
 
 /** The lava leaves `from` open and fills `to`, its lava bits turned over in both chunks. */

@@ -2,7 +2,8 @@
  * Lava in play (spec #113 design and numbers, built by #96):
  *
  * - When the ground opens beside a lava pocket (a cell the drill or a debug carve opened), or a
- *   wrecker breaches a ring near resting lava, the lava comes loose, and on the clock every `LAVA_FLOW_STEP_TICKS` the loose lava flows
+ *   wrecker breaches a ring near lava a refractory lining kept out (#133), the lava comes loose,
+ *   and on the clock every `LAVA_FLOW_STEP_TICKS` the loose lava flows
  *   one cell down into open tunnel (`lavaFlow.ts`). A refractory-lined cell keeps it out
  *   (`lava_blocked`, once where it stops); standard lining does not. The ground changes as ordinary
  *   `GroundChanged`, so guests and the renderer follow it.
@@ -23,9 +24,16 @@ import type { RingPoint } from '../../vehicle/casingTrail'
 import { tileOfMillimetres, tileOfPose, type VehiclePose } from '../../vehicle/vehiclePose'
 import { isVehicleActive, statsOfVehicle } from '../../vehicle/vehicleState'
 import type { YieldedCell } from '../../world/cellYield'
-import { flowLava, isLavaAt, lavaBesideOpenings, squareDistanceSqMm } from '../../world/lavaFlow'
+import {
+  flowLava,
+  isKeptOutByLining,
+  isLavaAt,
+  lavaBesideOpenings,
+  squareDistanceSqMm,
+} from '../../world/lavaFlow'
 import type { PlanetParams } from '../../world/planetParams'
 import type { TilePoint } from '../../world/tileGrid'
+import type { WorldState } from '../../world/worldState'
 import { vehicleOf, withVehicle, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
 import type { TickOutcome } from '../combat/combatTick'
@@ -67,23 +75,47 @@ export function nextLavaTick(state: AuthorityState): number | null {
 }
 
 /**
- * Lava resting within `LAVA_WAKE_TILES` of a ring a tunnel wrecker breached comes loose again: the
- * lining that kept it out may be gone (#113, #111).
+ * Lava within `LAVA_WAKE_TILES` of a ring a tunnel wrecker breached, which lining of the sealing
+ * type kept out of an open cell before the breach (`unbreached`), comes loose again: that lining
+ * may be gone (#113, #111). Lava resting for any other reason stays put (#133): a breach opens no
+ * ground, so a pocket that has lain against a cave since the planet was made, or one behind a
+ * standard ring, has nothing new to flow into.
  */
-export function wakeLavaNear(state: AuthorityState, params: PlanetParams, point: RingPoint) {
-  const tiles = lavaTilesNear(state, params, tileOfMillimetres(point.xMm, point.yMm))
+export function wakeLavaNear(
+  state: AuthorityState,
+  params: PlanetParams,
+  point: RingPoint,
+  unbreached: WorldState,
+) {
+  const tiles = lavaKeptOutNear(unbreached, params, tileOfMillimetres(point.xMm, point.yMm))
   return { ...state, lava: withLooseLava(state.lava, tiles, state.tick) }
 }
 
-function lavaTilesNear(state: AuthorityState, params: PlanetParams, centre: TilePoint) {
+function lavaKeptOutNear(world: WorldState, params: PlanetParams, centre: TilePoint) {
+  const guardTypeIndex = guardTypeIndexOn(params.planetIndex)
   const tiles: TilePoint[] = []
   for (let dy = -LAVA_WAKE_TILES; dy <= LAVA_WAKE_TILES; dy++) {
     for (let dx = -LAVA_WAKE_TILES; dx <= LAVA_WAKE_TILES; dx++) {
       const tile = { tx: centre.tx + dx, ty: centre.ty + dy }
-      if (isLavaAt(state.world, params, tile)) tiles.push(tile)
+      if (isLavaKeptOut(world, params, tile, guardTypeIndex)) tiles.push(tile)
     }
   }
   return tiles
+}
+
+function isLavaKeptOut(
+  world: WorldState,
+  params: PlanetParams,
+  tile: TilePoint,
+  guardTypeIndex: number,
+): boolean {
+  return isLavaAt(world, params, tile) && isKeptOutByLining(world, params, tile, guardTypeIndex)
+}
+
+/** The lining type that seals lava on this planet's archetype, or -1 where nothing does. */
+function guardTypeIndexOn(planetIndex: number): number {
+  const archetype = hazardArchetypeOn(planetIndex)
+  return archetype === null ? -1 : liningTypeIndexOf(archetype.liningType)
 }
 
 /** One flow step, if one is due at `tick`. */
@@ -91,8 +123,7 @@ export function runLavaTick(state: AuthorityState, tick: number): TickOutcome {
   const params = planetParamsOf(state.planet)
   const due = state.lava.nextStepTick
   if (params === null || due === null || due > tick) return { state, events: [] }
-  const archetype = hazardArchetypeOn(params.planetIndex)
-  const guardTypeIndex = archetype === null ? -1 : liningTypeIndexOf(archetype.liningType)
+  const guardTypeIndex = guardTypeIndexOn(params.planetIndex)
   const bodies = vehicleBodiesOf(state).map(({ centre }) => centre)
   const step = flowLava(state.world, params, state.lava.loose, { guardTypeIndex, bodies })
   const events: DomainEventBody[] = [

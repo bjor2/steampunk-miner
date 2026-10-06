@@ -31,7 +31,7 @@ export function gnawCasingRing(
   const breach = breachRing(state.world, params, casingRingAround(point.xMm, point.yMm))
   if (breach.breachedSamples.length === 0) return unchanged(state)
   return {
-    state: wakeLavaNear({ ...state, world: breach.world }, params, point),
+    state: wakeLavaNear({ ...state, world: breach.world }, params, point, state.world),
     events: [
       ...groundChangedEventsOf(breach),
       ...casingBreachedEventsOf(breach, enemyId),
