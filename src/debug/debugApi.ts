@@ -81,6 +81,7 @@ import {
   type DebugResult,
   type DebugUi,
 } from './debugScreens'
+import { debugActionsBySlice, type SliceDebugActions } from './debugActionRegistry'
 
 export class DebugCommandNotImplementedError extends Error {
   constructor(command: string) {
@@ -210,6 +211,8 @@ export interface DebugApi {
   ui: DebugUi
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
   input: DebugInput
+  /** Slice debug actions, `features['<slice>'].<action>()` (docs/standards/feature-slices.md 3.14). */
+  features: Readonly<Record<string, SliceDebugActions>>
   // stubs
   teleportToCore(): void
   giveResource(resourceTier: number, amount: number): void
@@ -406,6 +409,7 @@ export function createDebugApi(): DebugApi {
     getPhysicsStats: readPhysicsStats,
     ui: createDebugUi(),
     input: createDebugInput(),
+    features: debugActionsBySlice(),
     teleportToCore: notImplemented('teleportToCore'),
     giveResource: notImplemented('giveResource'),
     unlock: notImplemented('unlock'),

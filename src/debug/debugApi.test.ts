@@ -17,6 +17,8 @@ import { cellDensitySum } from '../systems/world/cellYield'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { fromCanonical } from '../systems/money'
 import { parseScenario, type Scenario } from '../systems/scenario'
+import { withRegistrations } from '../registries/registrar'
+import type { SliceDefinition } from '../registries/sliceDefinition'
 import { createDebugApi, DebugCommandNotImplementedError } from './debugApi'
 import { SHIPPED_ART } from '../scene/shippedArt'
 
@@ -623,5 +625,17 @@ describe('debug api: collapse (#43)', () => {
     expect(createDebugApi().forceCollapse('here')).toMatchObject({ ok: false })
     expect(sink.commands).toEqual([])
     expect(createDebugApi().collapseState()).toEqual({ ok: true, weakBlocks: [], collapsing: [] })
+  })
+})
+
+describe('debug api: features', () => {
+  it("answers a slice's registered action under features and its slice id", () => {
+    const probe: SliceDefinition = {
+      id: 'probe',
+      register: (r) => r.debugActions({ describe: () => ({ ok: true, sliceId: 'probe' }) }),
+    }
+    const answer = withRegistrations([probe], () => createDebugApi().features.probe.describe())
+    expect(answer).toEqual({ ok: true, sliceId: 'probe' })
+    expect(sink.commands).toEqual([])
   })
 })
