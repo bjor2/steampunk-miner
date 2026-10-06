@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T04:30:14Z",
+  "updated_at": "2026-10-06T04:31:44Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
-      "state": "working",
-      "issue": 115,
-      "note": "started 2026-10-06 05:44 CEST",
-      "updated_at": "2026-10-06T04:30:14Z",
+      "state": "idle",
+      "issue": null,
+      "note": "free; #115 landed on main and closed",
+      "updated_at": "2026-10-06T04:31:44Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -96,6 +96,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-06T04:31:44Z",
+      "key": "steampunk-loop/1",
+      "state": "idle",
+      "issue": null,
+      "note": "free; #115 landed on main and closed"
+    },
     {
       "at": "2026-10-06T04:18:27Z",
       "key": "steampunk-loop/4",
