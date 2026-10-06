@@ -6,12 +6,12 @@
  * offered (#107, `botGuns.ts`); then a full charge rack once charges are and the bot has met a
  * tile it would blast (#109, #129, `botCharges.ts`); then `drill_tip` and `hull`
  * go to their on-curve level for the planet (#6 section 3);
- * a `drill_power` level is forced while the core is the goal and the drill digs it slower than 0.4
- * tiles a second (`FORCED_DRILL_TICKS_PER_TILE`); otherwise the bot buys the upgrade with the best gain in planned money per tick
- * per price, while one pays. The #6 simulator's deadlock (never buying the unblocking drill level)
- * cannot happen: the forced rule saves for that level instead of spending elsewhere.
+ * a drill level is forced while the core is the goal and digs slow (`botCoreRule.ts`: `drill_power`,
+ * then `drill_tip` at the drill cap, #86); otherwise the bot buys the upgrade with the best gain in
+ * planned money per tick per price, while one pays, never `drill_power` past its lead cap. The #6
+ * simulator's deadlock (never buying the unblocking drill level) cannot happen: the forced rule
+ * saves for that level instead of spending elsewhere.
  */
-import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { CommandIntent } from '../authority/authorityCommand'
 import { applyCommand } from '../authority/applyCommand'
 import { nextUpgradePrice } from '../authority/workshopRules'
@@ -22,18 +22,13 @@ import { add, cmp, fromSafeInteger, type Money } from '../money'
 import { rechargePrice, repairPrice, travelFee } from '../economy/planetCharges'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { isCasingGradeShort } from './botCasing'
+import { forcedCoreTrack, isUnderLeadCap } from './botCoreRule'
 import { restockPriceFor } from './botCharges'
 import { gunMountPriceFor, type GunPolicy } from './botGuns'
 import { liningUnlockFor } from './botHeat'
 import type { BotSession } from './botSession'
 import type { MineLayout } from './mineLayout'
-import { approximately, bestOrePlan, fullTankMeans, isCoreDugWithin } from './tripEstimate'
-
-/**
- * #29 Systems & Economy note 3: while the core is the goal and the drill digs it slower than 0.4
- * tiles a second (2.5 seconds a tile), a `drill_power` level comes before anything else.
- */
-const FORCED_DRILL_TICKS_PER_TILE = (5 * TICKS_PER_SECOND) / 2
+import { approximately, bestOrePlan, fullTankMeans } from './tripEstimate'
 
 const ON_CURVE_FIRST: readonly UpgradeId[] = ['drill_tip', 'hull']
 const MARGINAL_TRACKS: readonly UpgradeId[] = ['drill_power', 'engine', 'boiler', 'cargo_hold']
@@ -102,9 +97,8 @@ function nextPurchase(session: BotSession, situation: ShoppingSituation): Purcha
 function nextTrackPurchase(session: BotSession, situation: ShoppingSituation): UpgradeId | null {
   const onCurve = belowCurveAffordable(session)
   if (onCurve !== null) return onCurve
-  if (isDrillForced(session, situation)) {
-    return canAfford(session, 'drill_power') ? 'drill_power' : null
-  }
+  const forced = forcedTrack(session, situation)
+  if (forced !== null) return canAfford(session, forced) ? forced : null
   return bestMarginalPurchase(session, situation.layout)
 }
 
@@ -150,17 +144,16 @@ function belowCurveAffordable(session: BotSession): UpgradeId | null {
   )
 }
 
-function isDrillForced(session: BotSession, situation: ShoppingSituation): boolean {
-  if (!situation.isCoreTheGoal) return false
-  const { levels } = session.vehicle()
-  return !isCoreDugWithin(levels, session.state().planet.index, FORCED_DRILL_TICKS_PER_TILE)
+function forcedTrack(session: BotSession, situation: ShoppingSituation): UpgradeId | null {
+  if (!situation.isCoreTheGoal) return null
+  return forcedCoreTrack(session.vehicle().levels, session.state().planet.index)
 }
 
 function bestMarginalPurchase(session: BotSession, layout: MineLayout): UpgradeId | null {
   const { levels } = session.vehicle()
   const now = plannedMoneyPerTick(layout, levels)
   let best: { track: UpgradeId; gainPerPrice: number } | null = null
-  for (const track of MARGINAL_TRACKS.filter((candidate) => canAfford(session, candidate))) {
+  for (const track of openMarginalTracks(session)) {
     const gain = plannedMoneyPerTick(layout, { ...levels, [track]: levels[track] + 1 }) - now
     const gainPerPrice = gain / approximately(priceOf(session, track))
     if (gain > 0 && (best === null || gainPerPrice > best.gainPerPrice)) {
@@ -168,6 +161,15 @@ function bestMarginalPurchase(session: BotSession, layout: MineLayout): UpgradeI
     }
   }
   return best?.track ?? null
+}
+
+/** The marginal tracks the bot can pay for and has not capped on this planet. */
+function openMarginalTracks(session: BotSession): UpgradeId[] {
+  const { levels } = session.vehicle()
+  const planetIndex = session.state().planet.index
+  return MARGINAL_TRACKS.filter(
+    (track) => isUnderLeadCap(levels, track, planetIndex) && canAfford(session, track),
+  )
 }
 
 function plannedMoneyPerTick(layout: MineLayout, levels: UpgradeLevels): number {
