@@ -12,3 +12,8 @@ Before writing or running any test, read and follow
 Code style: [docs/standards/REFERENCE.md](docs/standards/REFERENCE.md) and
 [docs/standards/CHECKLIST.md](docs/standards/CHECKLIST.md) (the `osilion-dev-tsr3f` skill).
 The game's design is [docs/design.md](docs/design.md); planning lives in this repo's GitHub issues.
+
+**Automated loops:** report what you are doing on the status dashboard
+(https://bjor2.github.io/steampunk-miner/status/) with one line:
+`scripts/status/loop-status.sh <loop> <working|idle|paused|blocked> [--issue N] [--slot S] [--note "text"]`
+— see [docs/loop-status.md](docs/loop-status.md).
