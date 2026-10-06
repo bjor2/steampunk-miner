@@ -57,6 +57,14 @@ export type RejectionReason =
   | 'max_level'
   | 'no_guns'
   | 'unknown_mode'
+  // Registered by the Refinery bay (#105): no refinery before its planet, every slot holds a batch,
+  // the hold has no ore of that tier (core fragments never refine), the slots are at their
+  // maximum, or nothing of this player's is ready to collect.
+  | 'refinery_locked'
+  | 'slots_busy'
+  | 'nothing_to_refine'
+  | 'slots_max'
+  | 'nothing_to_collect'
 
 export type RescueCause = 'stranded' | 'destroyed'
 

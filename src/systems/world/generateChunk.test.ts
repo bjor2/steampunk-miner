@@ -118,20 +118,17 @@ describe('generated planet shape', () => {
 })
 
 describe('dock site', () => {
-  it.each(SEEDS.flatMap((seed) => [1, 2, 40].map((planet) => [seed, planet])))(
+  it.each(SEEDS.flatMap((seed) => [1, 2].map((planet) => [seed, planet])))(
     'is a flat, indestructible 12-tile pad with 8 clear tiles above it (seed %i, planet %i)',
     (seed, planet) => {
-      const params = planetParamsFor(seed, planet)
-      const site = dockSiteOf(params)
-      for (let tx = -6; tx < 6; tx++) {
-        expect(kindOfCell(cellAt(params, tx, site.padRow))).toBe(CELL_KIND.indestructible)
-        for (let ty = site.padRow + 1; ty <= site.padRow + 8; ty++) {
-          expect(isRemovableCell(cellAt(params, tx, ty))).toBe(false)
-          expect(kindOfCell(cellAt(params, tx, ty))).not.toBe(CELL_KIND.indestructible)
-        }
-      }
-      expect(kindOfCell(cellAt(params, -7, site.padRow))).not.toBe(CELL_KIND.indestructible)
-      expect(kindOfCell(cellAt(params, 6, site.padRow))).not.toBe(CELL_KIND.indestructible)
+      expectFlatPad(planetParamsFor(seed, planet), -6, 5)
+    },
+  )
+
+  it.each(SEEDS.flatMap((seed) => [3, 40].map((planet) => [seed, planet])))(
+    'runs on under the Refinery bay to column 13 from planet 3 (seed %i, planet %i)',
+    (seed, planet) => {
+      expectFlatPad(planetParamsFor(seed, planet), -6, 13)
     },
   )
 
@@ -175,4 +172,18 @@ function everyTileNearDock(params: PlanetParams): GeneratedTile[] {
     for (let tx = -16; tx <= 16; tx++) tiles.push({ tx, ty, cell: cellAt(params, tx, ty) })
   }
   return tiles
+}
+
+/** The pad is indestructible from `first` to `last`, cleared 8 tiles above, and stops there. */
+function expectFlatPad(params: PlanetParams, first: number, last: number): void {
+  const site = dockSiteOf(params)
+  for (let tx = first; tx <= last; tx++) {
+    expect(kindOfCell(cellAt(params, tx, site.padRow))).toBe(CELL_KIND.indestructible)
+    for (let ty = site.padRow + 1; ty <= site.padRow + 8; ty++) {
+      expect(isRemovableCell(cellAt(params, tx, ty))).toBe(false)
+      expect(kindOfCell(cellAt(params, tx, ty))).not.toBe(CELL_KIND.indestructible)
+    }
+  }
+  expect(kindOfCell(cellAt(params, first - 1, site.padRow))).not.toBe(CELL_KIND.indestructible)
+  expect(kindOfCell(cellAt(params, last + 1, site.padRow))).not.toBe(CELL_KIND.indestructible)
 }

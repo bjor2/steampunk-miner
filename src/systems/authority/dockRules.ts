@@ -19,7 +19,7 @@
 import { toCanonical } from '../money'
 import { bayOfPose, isInBayZone, isPoseStationary, type VehiclePose } from '../vehicle/vehiclePose'
 import { cargoUnitsOf, isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
-import { BAY_IDS, type BayId } from '../world/dockBays'
+import { BAY_IDS, hasBay, type BayId } from '../world/dockBays'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import {
   chainEffects,
@@ -70,9 +70,20 @@ export function dockRefusal(state: AuthorityState, playerId: string, bay: BayId)
   const vehicle = vehicleOf(state, playerId)
   return firstRejection([
     () => noPlanetRejection(state.planet),
+    () => missingBayRejection(state, bay),
     () => activeRejection(vehicle),
     () => bayZoneRejection(state, bay, vehicle.pose),
   ])
+}
+
+/** The Refinery bay is on the pad only from its unlock planet (#105). */
+export function missingBayRejection(state: AuthorityState, bay: BayId): Rejection | null {
+  const site = dockSiteOfPlanet(state.planet)
+  if (site === null || hasBay(site, bay)) return null
+  return rejectionOf(
+    'refinery_locked',
+    `the platform has no ${bay} bay on planet ${state.planet.index}`,
+  )
 }
 
 export function canDock(state: AuthorityState, playerId: string, bay: BayId): boolean {

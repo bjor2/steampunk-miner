@@ -5,6 +5,8 @@
  * Plain integers, strings and one gravity number, so the params can go into a save header as JSON.
  */
 import { hashCell } from '../cellRandom'
+import { refineryUnlockPlanet } from '../economy/refineryEconomy'
+import { BAY_IDS, SLICE_BAY_IDS, type BayId } from './dockBays'
 import {
   ARTEFACT_CACHE_BANDS,
   BAND_START_DEPTH_PERCENT,
@@ -46,6 +48,8 @@ export interface PlanetParams {
   caveThresholdBp: number
   dockHalfWidthTiles: number
   dockClearanceTiles: number
+  /** The platform's bays here: the Sell and Upgrade bays, and the Refinery bay from P3 (#105). */
+  dockBays: readonly BayId[]
   /** `archetype.base` on planet 1, `archetype.heavy` on planet 2 (#10). */
   archetypeId: string
   gravityMultiplier: number
@@ -77,10 +81,16 @@ export function planetParamsFor(worldSeed: number, planetIndex: number): PlanetP
     caveThresholdBp: CAVE_THRESHOLD_BP,
     dockHalfWidthTiles: DOCK_HALF_WIDTH_TILES,
     dockClearanceTiles: DOCK_CLEARANCE_TILES,
+    dockBays: dockBaysOf(planetIndex),
     ...archetypeOf(planetIndex),
     hasStarterVein: planetIndex === FIRST_PLANET,
     artefactCacheBand: artefactCacheBandOf(planetIndex),
   }
+}
+
+/** The platform travels forward only, so it has the Refinery bay on every planet from its unlock. */
+function dockBaysOf(planetIndex: number): readonly BayId[] {
+  return planetIndex >= refineryUnlockPlanet() ? BAY_IDS : SLICE_BAY_IDS
 }
 
 /** #6 section 2: 300 on planet 1, 400 on planet 2, approaching 1000. */

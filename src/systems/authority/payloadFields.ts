@@ -44,7 +44,7 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     flag: { isValid: (value) => typeof value === 'boolean', expected: 'true or false' },
     text: { isValid: (value) => typeof value === 'string', expected: 'a string' },
     tierOrAll: { isValid: isTierOrAll, expected: 'an ore tier >= 1 or "all"' },
-    bay: { isValid: isBayId, expected: '"sell" or "upgrade"' },
+    bay: { isValid: isBayId, expected: '"sell", "upgrade" or "refinery"' },
   }
 
 function fieldKindProblems(name: string, value: unknown, kind: FieldKind): string[] {

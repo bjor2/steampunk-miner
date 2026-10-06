@@ -1,7 +1,7 @@
 {
   "name": "two-bays-wrong-bay",
   "description": "Buying at the Sell bay and selling at the Upgrade bay are refused as wrong_bay; the same buys at the Upgrade bay apply (#37, #41).",
-  "generatorVersion": 3,
+  "generatorVersion": 4,
   "authorityProtocolVersion": 9,
   "logSchemaVersion": 1,
   "numberFormatVersion": 1,

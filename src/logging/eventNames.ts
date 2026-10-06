@@ -28,7 +28,7 @@ const ENEMY_KIND = {
   oneOf: ['crawler', 'burrower', 'tunnel_wrecker'],
 } as const satisfies FieldKind
 const HIT_ARC = { oneOf: ['front', 'side', 'rear'] } as const satisfies FieldKind
-const BAY = { oneOf: ['sell', 'upgrade'] } as const satisfies FieldKind
+const BAY = { oneOf: ['sell', 'upgrade', 'refinery'] } as const satisfies FieldKind
 
 export const RUN_EVENT_REGISTRY = {
   // Run

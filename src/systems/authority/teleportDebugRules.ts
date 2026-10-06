@@ -17,7 +17,7 @@ import {
   type CommandRule,
   type Rejection,
 } from './commandRule'
-import { DOCK_COMMAND_RULES } from './dockRules'
+import { DOCK_COMMAND_RULES, missingBayRejection } from './dockRules'
 import { dockSiteOfPlanet, noPlanetRejection } from './planetOfState'
 
 export const TELEPORT_DEBUG_RULES: {
@@ -25,9 +25,10 @@ export const TELEPORT_DEBUG_RULES: {
 } = {
   'debug.teleportToDock': {
     fields: { bay: 'bay' },
-    reject: (state, { playerId }) =>
+    reject: (state, { playerId, payload }) =>
       firstRejection([
         () => noPlanetRejection(state.planet),
+        () => missingBayRejection(state, payload.bay),
         () => movableRejection(vehicleOf(state, playerId)),
       ]),
     apply: (state, command) =>

@@ -74,6 +74,13 @@ export const DOCK_CLEARANCE_TILES = 8
 export const BAY_CENTRE_OFFSET_TILES = 4
 export const BAY_HALF_WIDTH_TILES = 2
 
+/**
+ * The Refinery bay (#105) bolts on 8 m past the Upgrade bay, the #37 spacing, on the side away
+ * from the spawn point, so the Sell bay is still the first stop. From the refinery's unlock planet
+ * the pad runs on to the right edge of its zone (columns 10 to 13); before it the pad is unchanged.
+ */
+export const REFINERY_BAY_CENTRE_OFFSET_TILES = 12
+
 /** Radius formula (#6 section 2): `300 + floor(700*(p-1) / ((p-1) + 6))`. */
 export const RADIUS_BASE_TILES = 300
 export const RADIUS_GROWTH_TILES = 700

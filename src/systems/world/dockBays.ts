@@ -1,17 +1,22 @@
 /**
- * The platform's two bays on the dock pad (decision #37): the Sell bay on the spawn side (left of
- * the pad's middle) and the Upgrade bay 8 m to its right, each with its own pad zone. Runs start
- * and the tow lands on the Sell bay, so the first dock is always there. The hub between the bays
- * is part of the pad (energy 0 never strands there) but docks at neither bay.
+ * The platform's bays on the dock pad (decision #37): the Sell bay on the spawn side (left of the
+ * dock point) and the Upgrade bay 8 m to its right, each with its own pad zone; from its unlock
+ * planet the Refinery bay a further 8 m on (#105). Runs start and the tow lands on the Sell bay, so
+ * the first dock is always there. The hub between the first two bays is part of the pad (energy 0
+ * never strands there) but docks at no bay. A planet's site lists the bays its pad holds.
  *
  * Integer tiles and millimetres only, like every zone test the authority replays.
  */
 import { MM_PER_METRE } from '../../constants/physics'
 import type { DockSite } from './dockSite'
-import { BAY_CENTRE_OFFSET_TILES, BAY_HALF_WIDTH_TILES } from './planetTable'
+import {
+  BAY_CENTRE_OFFSET_TILES,
+  BAY_HALF_WIDTH_TILES,
+  REFINERY_BAY_CENTRE_OFFSET_TILES,
+} from './planetTable'
 import type { TilePoint } from './tileGrid'
 
-export const BAY_IDS = ['sell', 'upgrade'] as const
+export const BAY_IDS = ['sell', 'upgrade', 'refinery'] as const
 
 export type BayId = (typeof BAY_IDS)[number]
 
@@ -21,16 +26,28 @@ export interface BayColumns {
   lastColumn: number
 }
 
-const BAY_SIDE: Readonly<Record<BayId, -1 | 1>> = { sell: -1, upgrade: 1 }
+/** The two bays every platform has (#37); the refinery joins them from its unlock planet. */
+export const SLICE_BAY_IDS: readonly BayId[] = ['sell', 'upgrade']
+
+/** Each bay's centre column, in tiles from the dock point. */
+const BAY_CENTRE_OFFSETS: Readonly<Record<BayId, number>> = {
+  sell: -BAY_CENTRE_OFFSET_TILES,
+  upgrade: BAY_CENTRE_OFFSET_TILES,
+  refinery: REFINERY_BAY_CENTRE_OFFSET_TILES,
+}
 
 export function isBayId(value: unknown): value is BayId {
   return (BAY_IDS as readonly unknown[]).includes(value)
 }
 
-/** The pad's middle is the boundary between its two halves (columns -half .. half-1). */
+/** The dock point is the boundary between the slice pad's two halves (columns -half .. half-1). */
 export function bayCentreColumnOf(site: DockSite, bay: BayId): number {
-  const middle = (site.firstColumn + site.lastColumn + 1) / 2
-  return middle + BAY_SIDE[bay] * BAY_CENTRE_OFFSET_TILES
+  return site.dockPoint.tx + BAY_CENTRE_OFFSETS[bay]
+}
+
+/** The rightmost column any of these bays' zones covers, from a dock point at column 0. */
+export function lastBayColumnOf(bays: readonly BayId[]): number {
+  return Math.max(...bays.map((bay) => BAY_CENTRE_OFFSETS[bay] + BAY_HALF_WIDTH_TILES - 1))
 }
 
 export function bayColumnsOf(site: DockSite, bay: BayId): BayColumns {
@@ -41,16 +58,29 @@ export function bayColumnsOf(site: DockSite, bay: BayId): BayColumns {
   }
 }
 
+/** Whether this planet's pad holds the bay (the refinery's only from its unlock planet). */
+export function hasBay(site: DockSite, bay: BayId): boolean {
+  return site.bays.includes(bay)
+}
+
 /** Whether a tile lies in a bay's pad zone: its columns, above the pad, under the clearance. */
 export function isTileInBay(site: DockSite, bay: BayId, tile: TilePoint): boolean {
-  const columns = bayColumnsOf(site, bay)
-  const isInColumns = tile.tx >= columns.firstColumn && tile.tx <= columns.lastColumn
-  return isInColumns && tile.ty > site.padRow && tile.ty <= site.clearanceTopRow
+  return (
+    hasBay(site, bay) && isInBayColumns(bayColumnsOf(site, bay), tile) && isInClearance(site, tile)
+  )
 }
 
 /** The bay whose pad zone holds a tile, or null on the hub and away from the pad. */
 export function bayOfTile(site: DockSite, tile: TilePoint): BayId | null {
-  return BAY_IDS.find((bay) => isTileInBay(site, bay, tile)) ?? null
+  return site.bays.find((bay) => isTileInBay(site, bay, tile)) ?? null
+}
+
+function isInBayColumns(columns: BayColumns, tile: TilePoint): boolean {
+  return tile.tx >= columns.firstColumn && tile.tx <= columns.lastColumn
+}
+
+function isInClearance(site: DockSite, tile: TilePoint): boolean {
+  return tile.ty > site.padRow && tile.ty <= site.clearanceTopRow
 }
 
 /** The tile a vehicle rests in at a bay: the bay's centre column, just above the pad. */

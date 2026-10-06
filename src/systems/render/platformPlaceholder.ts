@@ -7,7 +7,7 @@
  * pad, told apart by shape as well as colour (#13): a coin on the Sell bay's, a cross on the
  * Upgrade bay's. Lit by its own lamps (#38, #48). All of it reads the authority's state through
  * the replica; the art decides nothing. Metres from the pad's top surface at its middle, x along
- * the pad.
+ * the pad, from the dock point.
  */
 import type { PlatformVisualState } from '../authority/platformState'
 import { bayCentreColumnOf } from '../world/dockBays'
@@ -103,8 +103,8 @@ export function platformLookOf(visualState: PlatformVisualState, site: DockSite)
 }
 
 function baySignsOf(site: DockSite): PartShape[] {
-  const sell = bayCentreColumnOf(site, 'sell') - padMiddleOf(site)
-  const upgrade = bayCentreColumnOf(site, 'upgrade') - padMiddleOf(site)
+  const sell = bayCentreColumnOf(site, 'sell') - site.dockPoint.tx
+  const upgrade = bayCentreColumnOf(site, 'upgrade') - site.dockPoint.tx
   return [
     box([0.13, SIGN_HEIGHT], [sell - POST_FROM_CENTRE, SIGN_HEIGHT / 2], IRON),
     box([2.6, 0.6], [sell, SIGN_HEIGHT], COPPER),
@@ -116,17 +116,16 @@ function baySignsOf(site: DockSite): PartShape[] {
   ]
 }
 
-function padMiddleOf(site: DockSite): number {
-  return (site.firstColumn + site.lastColumn + 1) / 2
-}
-
 /** The bay gauge's fill, 0 to 1: `bay / coreNeeded`, full past the need, empty with no core. */
 export function coreBayFillOf(coreBay: number, coreNeeded: number | null): number {
   if (coreNeeded === null || coreNeeded <= 0) return 0
   return Math.min(coreBay / coreNeeded, 1)
 }
 
-/** The platform's origin in world metres: the pad's top surface at its middle, on the hub. */
+/**
+ * The platform's origin in world metres: the pad's top surface at the dock point, on the hub (the
+ * middle of the slice pad; a pad widened for the Refinery bay keeps its hub there, #105).
+ */
 export function platformOriginOf(site: DockSite): { x: number; y: number } {
-  return { x: padMiddleOf(site), y: site.padRow + 1 }
+  return { x: site.dockPoint.tx, y: site.padRow + 1 }
 }

@@ -23,7 +23,7 @@ describe('run metadata', () => {
     expect(metadata.patchDockGuaranteed).toBe(dockGuaranteeCount(planetParamsFor(83921, 1)))
   })
 
-  it('records generator version 2 (#36)', () => {
-    expect(createRunMetadata(FACTS).generatorVersion).toBe(3)
+  it('records generator version 4 (#36, #105)', () => {
+    expect(createRunMetadata(FACTS).generatorVersion).toBe(4)
   })
 })
