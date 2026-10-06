@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { add, ceil, cmp, div, fromCanonical, mul, toCanonical, type Money } from '../money'
+import {
+  add,
+  ceil,
+  cmp,
+  div,
+  fromCanonical,
+  fromSafeInteger,
+  mul,
+  toCanonical,
+  type Money,
+} from '../money'
+import { radiusForPlanet } from '../world/planetParams'
 import { ENEMY_KINDS } from './economyDefinition'
 import { ECONOMY } from './economy'
 import {
@@ -11,6 +22,7 @@ import {
   pinnedDrillDamagePerTick,
   pinnedKillSeconds,
   sideHitShareOfHull,
+  spawnDensityScale,
 } from './enemyStats'
 import { drillPower, engineStats, hullMax, onCurveLevel } from './vehicleStats'
 
@@ -207,5 +219,32 @@ describe('enemy parity with an on-curve player (#9, #20 acceptance 4)', () => {
       expect(isWithin(pinnedKillSeconds('crawler', tier, drillLevel), '2.5', '5')).toBe(true)
       expect(isWithin(sideHitShareOfHull('crawler', tier, hullLevel), '0.30', '0.50')).toBe(true)
     }
+  })
+})
+
+/** `(R(6) / R(p))^2`, the landed density step of #131 written out. */
+function squaredRadiusRatioTo6(planetIndex: number): Money {
+  const ratio = div(
+    fromSafeInteger(radiusForPlanet(6)),
+    fromSafeInteger(radiusForPlanet(planetIndex)),
+  )
+  return mul(ratio, ratio)
+}
+
+describe('spawn density by planet size (#131)', () => {
+  it('keeps every band at full density on planets 1 to 6', () => {
+    for (const planet of [1, 2, 3, 4, 5, 6]) expect(spawnDensityScale(planet)).toEqual(m('1'))
+  })
+
+  it('thins every band from planet 7 by (R(6) / R(p))^2, so planet 9 keeps (618 / 700)^2', () => {
+    expect(radiusForPlanet(9)).toBe(700)
+    expect(spawnDensityScale(7)).toEqual(squaredRadiusRatioTo6(7))
+    expect(spawnDensityScale(9)).toEqual(squaredRadiusRatioTo6(9))
+  })
+
+  it('holds the 0.6 floor from planet 16, where (618 / 800)^2 falls under it', () => {
+    expect(cmp(spawnDensityScale(15), m('0.6'))).toBeGreaterThan(0)
+    expect(spawnDensityScale(16)).toEqual(m('0.6'))
+    expect(spawnDensityScale(40)).toEqual(m('0.6'))
   })
 })
