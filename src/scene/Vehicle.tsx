@@ -1,6 +1,7 @@
 /**
  * The local vehicle: the input intent in, the fixed-step loop, the placeholder art, the drill head
- * the guns' turret once mounted (#107) and the charge rack once bolted on (#109).
+ * the guns' turret once mounted (#107), the charge rack once bolted on (#109), and the heat
+ * shimmer above the throttle line (#113).
  */
 import { useMemo } from 'react'
 import { VehicleBody } from '../physics/VehicleBody'
@@ -9,6 +10,7 @@ import { readLocalVehicle } from '../store/gameStore'
 import { readVehicleIntent } from '../store/inputRuntime'
 import { DrillHeadView } from './DrillHeadView'
 import { VehicleChargeRack } from './VehicleChargeRack'
+import { HeatShimmer } from './HeatShimmer'
 import { VehicleGuns } from './VehicleGuns'
 import { VehiclePlaceholder } from './VehiclePlaceholder'
 import { createVehicleLoop } from './vehicleLoop'
@@ -28,6 +30,7 @@ export function Vehicle() {
           <DrillHeadView controller={controller} />
           <VehicleGuns />
           <VehicleChargeRack />
+          <HeatShimmer />
         </>
       )}
     </VehicleBody>

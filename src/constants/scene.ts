@@ -294,3 +294,10 @@ export const SCORCH_INNER_FADE_M = 1.2
 export const SCORCH_OUTER_FADE_M = 1.3
 export const SCORCH_DARKNESS = 0.9
 export const SCORCH_COLOUR = '#17110c'
+
+/**
+ * The heat shimmer (#113, `fx-heat-shimmer`): a square of haze this many metres across centred on
+ * the 0.9 m body, so it rises past the hull's edges, drawn over every part of the vehicle.
+ */
+export const HEAT_SHIMMER_SIZE_M = 1.6
+export const HEAT_SHIMMER_Z = 0.2

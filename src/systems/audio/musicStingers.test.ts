@@ -44,6 +44,19 @@ describe('music stingers', () => {
     expect(musicStingersOf([unlocked('planet_2')], 'p1')).toEqual([])
   })
 
+  it('plays the archetype stinger on arriving at the heat planets, not for their lining (#113)', () => {
+    const unlocked = (featureId: string): DomainEvent => ({
+      playerId: 'p1',
+      tick: 40,
+      seq: 3,
+      type: 'FeatureUnlocked',
+      featureId,
+    })
+    expect(musicStingersOf([unlocked('heat_lava'), unlocked('refractory_lining')], 'p1')).toEqual([
+      'archetype',
+    ])
+  })
+
   it('keeps the order the events happened in', () => {
     expect(musicStingersOf([coreReached, docked('p1')], 'p1')).toEqual(['core', 'dock'])
   })

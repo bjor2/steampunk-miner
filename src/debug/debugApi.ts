@@ -24,6 +24,8 @@ import {
   setEnergyCommand,
   setChargesCommand,
   setGunLevelCommand,
+  setHeatCommand,
+  setLiningTypeCommand,
   setHullCommand,
   setUpgradeCommand,
   teleportToDockCommand,
@@ -190,6 +192,11 @@ export interface DebugApi {
   // blasting charges (#109): a `debug.*` command
   /** A bolted-on rack with `slotLevel` (0 to 5) bought slots carrying `carried` charges. */
   setCharges(carried: number, slotLevel: number): DebugResult
+  // heat planets (#113): `debug.*` commands
+  /** The lining type the vehicle owns and lays from now on (`standard`, `refractory`), no price. */
+  setLiningType(liningType: string): DebugResult
+  /** The heat gauge at `heat` whole points, 0 to its max; only 0 off the heat planets. */
+  setHeat(heat: number): DebugResult
   // collapse (#43): the setter is a `debug.*` command, the read is not logged
   /** Starts the collapse of block `cx,cy#index` now: the full 60-tick warning, then the refill. */
   forceCollapse(block: string): DebugResult
@@ -381,6 +388,12 @@ export function createDebugApi(): DebugApi {
       runUnlessRefused(vehicleDebugProblems(setChargesCommand(carried, slotLevel)), () =>
         game().setCharges(carried, slotLevel),
       ),
+    setLiningType: (liningType) =>
+      runUnlessRefused(vehicleDebugProblems(setLiningTypeCommand(liningType)), () =>
+        game().setLiningType(liningType),
+      ),
+    setHeat: (heat) =>
+      runUnlessRefused(vehicleDebugProblems(setHeatCommand(heat)), () => game().setHeat(heat)),
     forceCollapse: (block) =>
       runUnlessRefused(vehicleDebugProblems(forceCollapseCommand(block)), () =>
         game().forceCollapse(block),

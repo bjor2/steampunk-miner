@@ -390,6 +390,19 @@ describe('debug api: vehicle', () => {
     expect(debug.vehicleParts()).toMatchObject({ gunLevel: 0 })
   })
 
+  it('sets the lining type and, on a heat planet, the heat gauge, logged as debug (#113)', () => {
+    const debug = createDebugApi()
+    expect(debug.setLiningType('refractory')).toEqual({ ok: true })
+    expect(debug.setHeat(40)).toMatchObject({ ok: false })
+    debug.setPlanet(8)
+    expect(debug.setHeat(80)).toEqual({ ok: true })
+    expect(debug.ui.getHudModel()).toMatchObject({
+      model: { heat: { text: '80 / 100', isThrottled: true } },
+    })
+    expect(debug.setLiningType('asbestos')).toMatchObject({ ok: false })
+    expect(sink.commands.map((command) => command.type)).toContain('debug.setLiningType')
+  })
+
   it('sets an upgrade level as a logged debug command, with finite stats at drill_tip 1500', () => {
     const debug = createDebugApi()
     expect(debug.setUpgrade('drill_tip', 1500)).toEqual({ ok: true })

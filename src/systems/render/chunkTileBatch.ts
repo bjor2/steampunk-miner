@@ -11,6 +11,10 @@
  * (#46); the shader lights the flag only while the player holds the artefact, so holding it never
  * rebuilds a chunk. The halo reaches one sample into the right and upper neighbours, so a tile on
  * those edges sees less of them than the whisper's 1 m: presentation only, never a rule.
+ *
+ * Heat planets (#113, #114): a lava cell draws as molten rock with its own style, and a ground
+ * tile holding refractory lining is flagged in the same slot as the whisper flag, so the shader
+ * draws it as firebrick with glowing joints.
  */
 import { GROUND_BLOCK_SIZE, ORE_WHISPER_ROCK_TILES } from '../../constants/scene'
 import type { PlanetParams } from '../world/planetParams'
@@ -26,7 +30,7 @@ import type { Rgb } from './colour'
 import { oreLookOfCell, type OreLook } from './oreLook'
 
 /** How the shader draws a tile. */
-export const TILE_STYLE = { ground: 0, ore: 1, core: 2, pad: 3, artefactCache: 4 } as const
+export const TILE_STYLE = { ground: 0, ore: 1, core: 2, pad: 3, artefactCache: 4, lava: 5 } as const
 
 /** The ore decal's shape code in the shader: 0 for a tile without ore. */
 export const SILHOUETTE_CODE = { none: 0, flecks: 1, shards: 2 } as const
@@ -46,20 +50,28 @@ interface BatchContext {
   firstTx: number
   firstTy: number
   oreLooks: Map<number, OreLook>
+  /** 1 per cell holding refractory lining (#113), in cell order. */
+  refractoryCells: Uint8Array
 }
 
 const NO_ORE: Rgb = [0, 0, 0]
+/** No cell lined with refractory: what a chunk without the lining passes. */
+export const NO_REFRACTORY_CELLS: Uint8Array = new Uint8Array(CHUNK_CELLS)
 const BANDS = [1, 2, 3, 4, 5]
 
-/** `cells` are the chunk's material cells; `halo` its density halo. */
+/**
+ * `cells` are the chunk's material cells; `halo` its density halo; `refractoryCells` marks the
+ * cells holding refractory lining.
+ */
 export function buildChunkTileBatch(
   params: PlanetParams,
   cx: number,
   cy: number,
   cells: Uint32Array,
   halo: Uint8Array,
+  refractoryCells: Uint8Array = NO_REFRACTORY_CELLS,
 ): ChunkTileBatch {
-  const context = batchContextOf(params, cx, cy, cells)
+  const context = { ...batchContextOf(params, cx, cy, cells), refractoryCells }
   const batch = emptyBatch()
   for (let block = 0; block < BLOCKS_PER_CHUNK; block++) {
     batch.blockStarts[block] = batch.count
@@ -120,7 +132,7 @@ function batchContextOf(
   cx: number,
   cy: number,
   cells: Uint32Array,
-): BatchContext {
+): Omit<BatchContext, 'refractoryCells'> {
   const palette = paletteOf(params.paletteId)
   return {
     params,
@@ -163,7 +175,7 @@ function writeTile(
   )
   writeRgb(batch.oreColours, at * 4, ore?.colour ?? NO_ORE)
   batch.oreColours[at * 4 + 3] = ore?.glow ?? 0
-  writeVector(batch.styles, at * 4, styleOf(cell), ore !== null && isNearAir(halo, lx, ly) ? 1 : 0)
+  writeVector(batch.styles, at * 4, styleOf(cell), tileFlagOf(context, halo, cell, ore, lx, ly))
   writeVector(
     batch.styles,
     at * 4 + 2,
@@ -191,6 +203,19 @@ function writeRgb(target: Float32Array, at: number, colour: Rgb): void {
   target[at + 2] = colour[2]
 }
 
+/** An ore tile's whisper rim (#46), or a ground tile's refractory lining (#113). */
+function tileFlagOf(
+  context: BatchContext,
+  halo: Uint8Array,
+  cell: number,
+  ore: OreLook | null,
+  lx: number,
+  ly: number,
+): number {
+  if (ore !== null) return isNearAir(halo, lx, ly) ? 1 : 0
+  return styleOf(cell) === TILE_STYLE.ground ? context.refractoryCells[ly * CHUNK_SIZE + lx] : 0
+}
+
 function oreLookOf(context: BatchContext, cell: number): OreLook {
   const known = context.oreLooks.get(cell)
   if (known !== undefined) return known
@@ -202,7 +227,7 @@ function oreLookOf(context: BatchContext, cell: number): OreLook {
 function baseColourOf(context: BatchContext, cell: number, lx: number, ly: number): Rgb {
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.indestructible) return context.palette.pad
-  if (kind === CELL_KIND.core) return context.palette.core
+  if (kind === CELL_KIND.core || kind === CELL_KIND.lava) return context.palette.core
   if (kind === CELL_KIND.artefactCache) return ART_DIRECTION.artefactCache
   return context.bandColours[
     bandOfTile(context.params, context.firstTx + lx, context.firstTy + ly) - 1
@@ -215,13 +240,17 @@ function shadeOf(context: BatchContext, cell: number, lx: number, ly: number): n
   return tileShadeOf(context.params.planetSeed, context.firstTx + lx, context.firstTy + ly)
 }
 
+/** Metal and molten lava keep their flat colour (#113: lava glows, it is not shaded rock). */
 function isMetalCell(cell: number): boolean {
   const kind = kindOfCell(cell)
-  return kind === CELL_KIND.indestructible || kind === CELL_KIND.artefactCache
+  return (
+    kind === CELL_KIND.indestructible || kind === CELL_KIND.artefactCache || kind === CELL_KIND.lava
+  )
 }
 
 function styleOf(cell: number): number {
   const kind = kindOfCell(cell)
+  if (kind === CELL_KIND.lava) return TILE_STYLE.lava
   if (kind === CELL_KIND.artefactCache) return TILE_STYLE.artefactCache
   if (kind === CELL_KIND.ore) return TILE_STYLE.ore
   if (kind === CELL_KIND.core) return TILE_STYLE.core

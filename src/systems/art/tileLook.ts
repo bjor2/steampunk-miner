@@ -5,6 +5,7 @@
  * export never mixes textured and flat bands.
  */
 import { manifestEntryOf, type ArtCatalogue } from './artCatalogue'
+import { LAVA_TILE_ASSET_ID, refractoryCasingTileIds } from './artIds'
 import { folderOfEntry, type ManifestEntry } from './assetManifest'
 import { BAND_COUNT } from '../world/planetGeometry'
 
@@ -48,6 +49,36 @@ export function groundStrataMapsOf(art: ArtCatalogue): TileMaps[] | null {
 
 function groundBandIds(): string[] {
   return Array.from({ length: BAND_COUNT }, (_, at) => `ground-band-${at + 1}`)
+}
+
+/** The heat planets' glowing tiles (#113, #114): lava, and refractory lining, albedo and glow. */
+export interface HeatTileMaps {
+  lava: TileMaps
+  lavaEmissive: string
+  refractory: TileMaps
+  refractoryEmissive: string
+}
+
+/**
+ * The lava tile and the first refractory grade's tile with their glow maps, or null unless all
+ * four are final. The terrain draws every refractory grade with the first grade's brick for now:
+ * the type reads by brick and glow, the grade's ironwork is not drawn yet.
+ */
+export function heatTileMapsOf(art: ArtCatalogue): HeatTileMaps | null {
+  const [refractoryId] = refractoryCasingTileIds()
+  const lava = tileMapsOf(art, LAVA_TILE_ASSET_ID)
+  const lavaEmissive = tileEmissiveMapOf(art, LAVA_TILE_ASSET_ID)
+  const refractory = tileMapsOf(art, refractoryId)
+  const refractoryEmissive = tileEmissiveMapOf(art, refractoryId)
+  if (
+    lava === null ||
+    refractory === null ||
+    lavaEmissive === null ||
+    refractoryEmissive === null
+  ) {
+    return null
+  }
+  return { lava, lavaEmissive, refractory, refractoryEmissive }
 }
 
 function isShipped(maps: TileMaps | null): maps is TileMaps {

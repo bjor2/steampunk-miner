@@ -28,6 +28,10 @@ describe('music patterns', () => {
     expect(stingerSecondsOf(MUSIC_BOOK, 'artefact')).toBe(3)
   })
 
+  it('plays the archetype stinger for 5 s on arriving at a new kind of planet (#113)', () => {
+    expect(stingerSecondsOf(MUSIC_BOOK, 'archetype')).toBe(5)
+  })
+
   it('plays the module reveal stinger for 4 s (#105)', () => {
     expect(stingerSecondsOf(MUSIC_BOOK, 'reveal')).toBe(4)
   })

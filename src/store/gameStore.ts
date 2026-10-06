@@ -78,6 +78,7 @@ import { casingDebugActionsOf, type CasingDebugActions } from './casingDebugActi
 import { gunDebugActionsOf, type GunDebugActions } from './gunDebugActions'
 import { chargeDebugActionsOf, type ChargeDebugActions } from './chargeDebugActions'
 import { forgetBlastScorches, recordBlastScorches } from './blastScorchRecord'
+import { heatDebugActionsOf, type HeatDebugActions } from './heatDebugActions'
 import { collapseDebugActionsOf, type CollapseDebugActions } from './collapseDebugActions'
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
 import { announceFeedback } from './feedbackBroadcast'
@@ -98,6 +99,7 @@ type DebugActions = CombatDebugActions &
   CasingDebugActions &
   GunDebugActions &
   ChargeDebugActions &
+  HeatDebugActions &
   CollapseDebugActions &
   ArtefactActions
 
@@ -207,6 +209,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...casingDebugActionsOf(() => get().playerId),
   ...gunDebugActionsOf(() => get().playerId),
   ...chargeDebugActionsOf(() => get().playerId),
+  ...heatDebugActionsOf(() => get().playerId),
   ...collapseDebugActionsOf(() => get().playerId),
   ...artefactActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),

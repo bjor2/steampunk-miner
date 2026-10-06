@@ -23,7 +23,13 @@ import {
   type ShaderMaterial,
 } from 'three'
 import { CHUNK_BUILDS_PER_FRAME } from '../constants/scene'
-import { buildChunkTileBatch, type ChunkTileBatch } from '../systems/render/chunkTileBatch'
+import {
+  buildChunkTileBatch,
+  NO_REFRACTORY_CELLS,
+  type ChunkTileBatch,
+} from '../systems/render/chunkTileBatch'
+import { refractoryCellsOf } from '../systems/render/refractoryCells'
+import { NO_CASING } from '../systems/world/chunkDelta'
 import { chunkDensityHaloOf, DENSITY_HALO_SIDE } from '../systems/render/densityHalo'
 import {
   chunkViewVersionOf,
@@ -42,6 +48,7 @@ import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { CHUNK_CELLS, chunkKey, firstTileOfChunk } from '../systems/world/tileGrid'
 import {
+  currentCasingOfChunk,
   currentDensityOfChunk,
   materialCellsOfChunk,
   type WorldState,
@@ -218,6 +225,7 @@ function buildChunkMesh(
     cy,
     materialCellsOfChunk(world, params, cx, cy),
     halo,
+    refractoryCellsOfChunk(world, cx, cy),
   )
   const density = densityTextureOf(halo)
   const drawn = emptyInstances()
@@ -233,6 +241,12 @@ function buildChunkMesh(
   const chunk: ChunkMesh = { mesh, density, version, batch, drawn, blockMask: Number.NaN }
   showBlocks(chunk, blockMask)
   return chunk
+}
+
+/** The cells to draw as refractory lining (#113); none, without a copy, for an unlined chunk. */
+function refractoryCellsOfChunk(world: WorldState, cx: number, cy: number): Uint8Array {
+  const casing = currentCasingOfChunk(world, cx, cy)
+  return casing === NO_CASING ? NO_REFRACTORY_CELLS : refractoryCellsOf(casing)
 }
 
 const INSTANCE_ATTRIBUTES = ['aTile', 'aBase', 'aOre', 'aStyle'] as const

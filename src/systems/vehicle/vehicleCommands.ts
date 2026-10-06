@@ -37,6 +37,14 @@ export function setGunLevelCommand(level: number): CommandIntent<'debug.setGunLe
   return { type: 'debug.setGunLevel', payload: { level } }
 }
 
+export function setLiningTypeCommand(liningType: string): CommandIntent<'debug.setLiningType'> {
+  return { type: 'debug.setLiningType', payload: { liningType } }
+}
+
+export function setHeatCommand(heat: number): CommandIntent<'debug.setHeat'> {
+  return { type: 'debug.setHeat', payload: { heat } }
+}
+
 export function setUpgradeCommand(
   upgradeId: string,
   level: number,

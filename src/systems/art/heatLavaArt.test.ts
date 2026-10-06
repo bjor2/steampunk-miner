@@ -7,7 +7,7 @@ import {
   vectorIconIds,
 } from './artIds'
 import { manifestEntryOf } from './artCatalogue'
-import { tileEmissiveMapOf, tileMapsOf } from './tileLook'
+import { heatTileMapsOf, tileEmissiveMapOf, tileMapsOf } from './tileLook'
 import { SHIPPED_ART } from '../../scene/shippedArt'
 import { bandColourOf, paletteOf } from '../render/bandPalette'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
@@ -56,5 +56,16 @@ describe('heat and lava art', () => {
     const bands = [1, 2, 3, 4, 5].map((band) => bandColourOf(heat, band))
     expect(bands.filter(([red, green]) => red <= green)).toEqual([])
     expect(heat.core).not.toEqual(paletteOf('palette.planet_1').core)
+  })
+})
+
+describe('heat tiles the terrain draws (#96)', () => {
+  it('draws the shipped lava tile and the first refractory grade, each with its glow', () => {
+    expect(heatTileMapsOf(SHIPPED_ART)).toEqual({
+      lava: tileMapsOf(SHIPPED_ART, 'ground-heat-lava'),
+      lavaEmissive: tileEmissiveMapOf(SHIPPED_ART, 'ground-heat-lava'),
+      refractory: tileMapsOf(SHIPPED_ART, 'casing-refractory-grade-1'),
+      refractoryEmissive: tileEmissiveMapOf(SHIPPED_ART, 'casing-refractory-grade-1'),
+    })
   })
 })

@@ -17,6 +17,11 @@
  * (#13, #38: the lamp plus at most 4 point lights; `LightRig` chooses them, an unused one is black). Ore glow, sparkles and the core's pulse are emissive, so
  * ore stays readable in the dark and by shape and brightness, not colour alone.
  *
+ * On a heat planet (#113, #114) a lava cell draws the lava tile, its glow scrolling slowly and
+ * pulsing, and a rock cell holding refractory lining draws the firebrick tile with its joints
+ * glowing (`uHasHeatTiles`); until those maps load, a flat molten colour and a procedural brick.
+ * Both glows are emissive, so they read in the dark of band 5.
+ *
  * Rock and ore tiles draw their depth band's strata map once the five have loaded (S7d,
  * `uHasStrata`), wrapped around the planet in rings (`groundStrata.ts`): albedo for the colour,
  * tinted per planet, and the baked normal tilting the lamp and point lights toward the slopes that
@@ -78,6 +83,12 @@ uniform vec3 uStrataTint[5];
 uniform float uStrataTurns[5];
 uniform float uStrataTileM;
 uniform float uBandStarts[4];
+// Heat planets (#113): the lava and refractory tiles, albedo and glow, each 4 m square.
+uniform float uHasHeatTiles;
+uniform sampler2D uLavaAlbedo;
+uniform sampler2D uLavaEmissive;
+uniform sampler2D uRefractoryAlbedo;
+uniform sampler2D uRefractoryEmissive;
 
 varying vec2 vLocal;
 varying vec2 vChunk;
@@ -172,6 +183,19 @@ float sparkles(vec2 local, vec2 tile, float count) {
   return light;
 }
 
+// The heat tiles cover 4 m; lava creeps along its tile slowly.
+const float HEAT_TILE_M = 4.0;
+const vec3 MOLTEN = vec3(1.0, 0.42, 0.08);
+const vec3 FIREBRICK = vec3(0.52, 0.16, 0.10);
+
+// Brick courses 0.25 m high and 0.5 m long, every other course offset: 1 in a joint, 0 on brick.
+float brickJoint(vec2 world) {
+  vec2 brick = world / vec2(0.5, 0.25);
+  brick.x += 0.5 * mod(floor(brick.y), 2.0);
+  vec2 inBrick = fract(brick);
+  return 1.0 - step(0.06, inBrick.x) * step(0.1, inBrick.y);
+}
+
 // The tile's depth band by the integer rule of bandOfTile: exact below 2^24, so for any planet.
 int bandOfTile(vec2 tile) {
   vec2 halfTile = 2.0 * tile + 1.0;
@@ -261,11 +285,34 @@ void main() {
     colour = linearToDisplay(strataAlbedo(band, uv, dx, dy).rgb) * uStrataTint[band - 1];
     normal = groundNormalOf(strataNormal(band, uv, dx, dy).xyz * 2.0 - 1.0, vWorld);
   }
+  if (style < 0.5 && vStyle.y > 0.5) {
+    // Refractory lining (#113): firebrick, its joints glowing.
+    vec2 uv = vWorld / HEAT_TILE_M;
+    colour = uHasHeatTiles > 0.5
+      ? linearToDisplay(texture2D(uRefractoryAlbedo, uv).rgb)
+      : FIREBRICK * (0.85 + 0.15 * hash12(floor(vWorld / vec2(0.5, 0.25))));
+  }
   colour = mix(colour, colour * 1.5 + vec3(0.06, 0.05, 0.03), 0.55 * edgeHighlight(density));
   vec3 light = lightAt(vWorld, normal);
   vec3 emissive = vec3(0.0);
+  float ember = 0.75 + 0.25 * sin(uTime * 1.3 + length(vWorld) * 0.6);
+  if (style < 0.5 && vStyle.y > 0.5) {
+    vec2 uv = vWorld / HEAT_TILE_M;
+    vec3 seams = uHasHeatTiles > 0.5
+      ? linearToDisplay(texture2D(uRefractoryEmissive, uv).rgb)
+      : MOLTEN * 0.6 * brickJoint(vWorld);
+    emissive += seams * ember;
+  }
 
-  if (style > 3.5) {
+  if (style > 4.5) {
+    // Lava (#113): crust plates on molten rock, the cracks glowing, creeping and pulsing.
+    vec2 uv = vWorld / HEAT_TILE_M + vec2(uTime * 0.015, 0.0);
+    vec3 glow = uHasHeatTiles > 0.5
+      ? linearToDisplay(texture2D(uLavaEmissive, uv).rgb)
+      : MOLTEN * (0.55 + 0.45 * hash12(floor(vWorld * 3.0) + floor(uTime * 0.5)));
+    colour = uHasHeatTiles > 0.5 ? linearToDisplay(texture2D(uLavaAlbedo, uv).rgb) : vBase * 0.35;
+    emissive += glow * (0.8 + 0.2 * sin(uTime * 2.1 + length(vWorld) * 0.9));
+  } else if (style > 3.5) {
     // The artefact cache: a banded casket with a rune ring, live or a dull husk.
     vec2 fromCentre = vLocal - 0.5;
     float ring = 1.0 - step(0.035, abs(length(fromCentre) - 0.28));

@@ -1,12 +1,14 @@
 /**
- * The shipped music (#49): the four layer loops and the four stingers (the reveal for a platform
- * module, #105), one pattern file each in
+ * The shipped music (#49): the four layer loops and the five stingers (the reveal for a platform
+ * module, #105; the archetype stinger on arriving at a new kind of planet, #113), one pattern file
+ * each in
  * `src/data/music/`. Every file is checked at load and the book refused whole on any problem, so a
  * malformed pattern stops the build's tests instead of playing wrong.
  */
 import AMBIENCE from '../../data/music/ambience.json'
 import COMBAT from '../../data/music/combat.json'
 import PLATFORM from '../../data/music/platform.json'
+import ARCHETYPE_STINGER from '../../data/music/stinger-archetype.json'
 import ARTEFACT_STINGER from '../../data/music/stinger-artefact.json'
 import CORE_STINGER from '../../data/music/stinger-core.json'
 import DOCK_STINGER from '../../data/music/stinger-dock.json'
@@ -18,7 +20,7 @@ import { scoreOfPattern, type MusicScore } from './musicScore'
 import type { MusicPattern } from './musicPattern'
 
 export type LayerName = keyof MusicLayers
-export const STINGER_IDS = ['dock', 'core', 'artefact', 'reveal'] as const
+export const STINGER_IDS = ['dock', 'core', 'artefact', 'reveal', 'archetype'] as const
 export type StingerId = (typeof STINGER_IDS)[number]
 
 export interface MusicBook {
@@ -38,6 +40,7 @@ export const SHIPPED_MUSIC_FILES: MusicFiles = {
     core: CORE_STINGER,
     artefact: ARTEFACT_STINGER,
     reveal: REVEAL_STINGER,
+    archetype: ARCHETYPE_STINGER,
   },
 }
 

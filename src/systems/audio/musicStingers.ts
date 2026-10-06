@@ -2,7 +2,9 @@
  * Which stingers a batch of authority events plays (#49): `dock` on `dock_entered`, `core` on the
  * first core fragment of a planet (`CoreReached`, the first core tile broken), `artefact` when the
  * artefact choice opens, and `reveal` when a platform module bolts on (#105: a schedule row with a
- * `facility` bind opens, the Refinery bay on arriving at planet 3). Read from the events only, so
+ * `facility` bind opens, the Refinery bay on arriving at planet 3), and `archetype` when the run
+ * arrives at a new kind of planet (#113: an `Environment` row opens, `heat_lava` at planet 8). Read
+ * from the events only, so
  * replaying the same commands plays the same stingers in the same order, and nothing here can
  * touch state or the digest.
  */
@@ -21,10 +23,15 @@ const STINGER_TRIGGERS: Readonly<Record<StingerId, StingerTrigger>> = {
   core: (event) => event.type === 'CoreReached',
   artefact: null,
   reveal: (event) => event.type === 'FeatureUnlocked' && isFacilityRow(event.featureId),
+  archetype: (event) => event.type === 'FeatureUnlocked' && isEnvironmentRow(event.featureId),
 }
 
 const FACILITY_ROW_IDS: ReadonlySet<string> = new Set(
   LOCKED_SCHEDULE.rows.filter((row) => row.bind === 'facility').map((row) => row.id),
+)
+
+const ENVIRONMENT_ROW_IDS: ReadonlySet<string> = new Set(
+  LOCKED_SCHEDULE.rows.filter((row) => row.lane === 'Environment').map((row) => row.id),
 )
 
 /** The local player's stingers in a batch, in the order their events happened. */
@@ -41,4 +48,8 @@ function stingerOfEvent(event: DomainEvent): StingerId | null {
 
 function isFacilityRow(featureId: string): boolean {
   return FACILITY_ROW_IDS.has(featureId)
+}
+
+function isEnvironmentRow(featureId: string): boolean {
+  return ENVIRONMENT_ROW_IDS.has(featureId)
 }

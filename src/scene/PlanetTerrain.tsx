@@ -15,6 +15,8 @@ import { drillPresence } from './drillPresence'
 import { lightPresence } from './lightPresence'
 import { renderPresence } from './renderPresence'
 import { GroundStrata } from './GroundStrata'
+import { HeatTiles } from './HeatTiles'
+import { isHeatPlanet } from '../systems/economy/heatEconomy'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
 import { fitStrataToPlanet } from './terrainStrata'
 import { vehiclePresence } from './vehiclePresence'
@@ -26,6 +28,7 @@ export function PlanetTerrain() {
   // Reused every frame, so the frame loop allocates nothing.
   const view = useMemo(createTerrainViewScratch, [])
   const light = useMemo(createTerrainLightScratch, [])
+  const isHeatPlanetNow = useGameStore((state) => isHeatPlanet(state.planetTier))
 
   useEffect(() => {
     if (group.current === null) return
@@ -56,6 +59,7 @@ export function PlanetTerrain() {
   return (
     <group ref={group}>
       <GroundStrata material={material} />
+      <HeatTiles material={material} isHeatPlanet={isHeatPlanetNow} />
     </group>
   )
 }
