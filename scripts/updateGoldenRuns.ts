@@ -5,10 +5,14 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { loadFeatures } from '../src/features'
-import { formatGoldenRun, recordGoldenRun } from '../src/logging/goldenRun'
-import { GOLDEN_SCRIPTS } from '../src/systems/replay/goldenScripts'
 
 loadFeatures()
+
+// Imported after the loader: building the golden scripts reads generated cells, and generation
+// asks the slice registries (#183), which throw when read before loadFeatures(). A static import
+// is evaluated before this module's body, so it would read them first.
+const { formatGoldenRun, recordGoldenRun } = await import('../src/logging/goldenRun')
+const { GOLDEN_SCRIPTS } = await import('../src/systems/replay/goldenScripts')
 
 const GOLDEN_FOLDER = new URL('../tests/golden/', import.meta.url)
 
