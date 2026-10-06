@@ -150,7 +150,7 @@ export interface CommandPayloads {
   'debug.setLiningType': { liningType: string }
   /** Sets the heat gauge to whole gauge points, 0 to its max, settled at the command's tick (#113). */
   'debug.setHeat': { heat: number }
-  /** One ring of casing lining of `grade` round `(x, y)` mm (#41 `debug.lineCasing`). */
+  /** One ring of casing lining of `grade` round `(x, y)` mm, in the active lining type (#41, #113). */
   'debug.lineCasing': { x: number; y: number; grade: number }
   /** Breaches the ring of lining round `(x, y)` mm as a tunnel wrecker's gnaw does (#111). */
   'debug.gnawCasing': { x: number; y: number }

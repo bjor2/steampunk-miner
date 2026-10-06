@@ -2,7 +2,8 @@
  * `generateChunk(params, cx, cy)` (decisions #4, #36): the 1024 packed material cells of one 32x32
  * chunk and its 128x128 density samples, a pure function of the planet params and the chunk
  * coordinates. The seeded terrain comes first, then ore patches stamp over it (#42, the dock
- * guarantee after the band-1 patches), then the placed features: the dock pad and its clearance
+ * guarantee after the band-1 patches), then a heat planet's lava pockets (#113), then the placed
+ * features: the dock pad and its clearance
  * (#8), the starter vein (#16), then the artefact cache (#46). The density follows from the finished cells. Each step is a
  * function of the params alone, so stamping per chunk gives the same planet in any order.
  */
@@ -11,6 +12,7 @@ import { generateBaseTerrain } from './baseTerrain'
 import { dockGuaranteePatch } from './dockGuarantee'
 import { dockSiteTiles } from './dockSite'
 import { generateDensity } from './generateDensity'
+import { paintLavaPockets } from './lavaPockets'
 import { orePatchesNearChunk, type OrePatch } from './orePatches'
 import type { PlanetParams } from './planetParams'
 import { bandOfTile } from './planetGeometry'
@@ -32,6 +34,7 @@ export function generateChunk(params: PlanetParams, cx: number, cy: number): Gen
 export function generateChunkCells(params: PlanetParams, cx: number, cy: number): Uint32Array {
   const cells = generateBaseTerrain(params, cx, cy)
   paintOrePatches(params, cells, patchesForChunk(params, cx, cy), cx, cy)
+  paintLavaPockets(params, cells, cx, cy)
   stampTilesInChunk(cells, dockSiteTiles(params), cx, cy)
   stampTilesInChunk(cells, starterVeinTiles(params), cx, cy)
   stampTilesInChunk(cells, artefactCacheTiles(params), cx, cy)

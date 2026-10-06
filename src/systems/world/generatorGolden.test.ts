@@ -8,16 +8,18 @@ import { chunkRangeOfDisc } from './tileGrid'
 
 /**
  * Decision #4 acceptance 1 (#36 acceptance 1, #42 acceptance 4 under generator 2, the #46 artefact cache under 3,
- * the Refinery bay's pad from planet 3 under 4, which leaves these digests as they were): a committed
+ * the Refinery bay's pad from planet 3 under 4, which leaves these digests as they were, and the
+ * lava pockets of the heat planets under 5, pinned by the planet 8 chunks): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 4,
+  generatorVersion: 5,
   wholePlanet1: 'd2cc46fd06b0ec6d',
   wholePlanet2: '815b05c18af1e3cf',
   farPlanetChunks: 'f5d1e59c4a6053f7',
+  heatPlanetChunks: 'dc182bc2716103c1',
 }
 
 /** One digest over every chunk's digest in a fixed order. */
@@ -45,6 +47,16 @@ const FAR_PLANET_CHUNKS = [
   [31, -32],
 ] as const
 
+/** Planet 8 chunks across bands 2 to 5 and the core, where its pockets lie. */
+const HEAT_PLANET_CHUNKS = [
+  [0, 0],
+  [0, 2],
+  [-3, 5],
+  [7, -9],
+  [12, 12],
+  [-18, 3],
+] as const
+
 describe('generator golden digest', () => {
   it('is pinned to the current generator version', () => {
     expect(GENERATOR_VERSION).toBe(GOLDEN.generatorVersion)
@@ -58,6 +70,12 @@ describe('generator golden digest', () => {
   it('makes the committed planet 2 for world seed 4000000000', () => {
     const params = planetParamsFor(4_000_000_000, 2)
     expect(digestOfChunks(params, everyChunkOf(params))).toBe(GOLDEN.wholePlanet2)
+  })
+
+  it('makes the committed lava pockets on the heat planet 8 for world seed 83921 (#113)', () => {
+    expect(digestOfChunks(planetParamsFor(83921, 8), HEAT_PLANET_CHUNKS)).toBe(
+      GOLDEN.heatPlanetChunks,
+    )
   })
 
   it('makes the committed chunks, negative coordinates included, on planet 2^40', () => {

@@ -173,6 +173,10 @@ export interface DomainEventBodies {
   EnergyLow: { threshold: number }
   /** The heat gauge rose past a line it watches, in gauge points (#113: the throttle line, the max). */
   HeatThreshold: { level: number }
+  /** The vehicle touched the lava of cell `tx, ty` and was burnt (#113 `lava_contact`). */
+  LavaTouched: { tx: number; ty: number }
+  /** Loose lava stopped at a cell its lining type guards; `ring` is that cell's centre in mm. */
+  LavaBlocked: { ring: string }
   /** The gauge rose past `throttleAt`: the drill is throttled until it falls back below (#113). */
   OverheatStarted: Record<never, never>
   OverheatEnded: Record<never, never>

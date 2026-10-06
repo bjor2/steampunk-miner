@@ -1,6 +1,6 @@
 /**
  * Moving the session onto another planet (decisions #10 and #4): another planet is another world.
- * Its deltas start empty, its core progress, enemies and collapses start fresh, and every vehicle stands on its dock
+ * Its deltas start empty, its core progress, enemies, collapses and lava start fresh, and every vehicle stands on its dock
  * site. The vehicles keep their levels, energy, hull and cargo; the platform keeps its bay and look.
  * A charge still on a wall stays on the old planet's wall: it is gone, and the rack keeps the rest.
  * `Travel` and `debug.setPlanet` both go through here.
@@ -14,6 +14,7 @@ import type { PlanetParams } from '../world/planetParams'
 import { EMPTY_WORLD } from '../world/worldState'
 import type { AuthorityState } from './authorityState'
 import { NO_COLLAPSE } from './collapse/collapseState'
+import { NO_LOOSE_LAVA } from './lava/lavaState'
 import { combatOnNewPlanet } from './combat/enemyRoster'
 import { NEW_CORE_PROGRESS } from './coreProgress'
 import type { DomainEventBodies } from './domainEvent'
@@ -35,6 +36,7 @@ export function withSessionOnPlanet(state: AuthorityState, planet: SessionPlanet
     core: NEW_CORE_PROGRESS,
     combat: combatOnNewPlanet(state.combat),
     collapse: NO_COLLAPSE,
+    lava: NO_LOOSE_LAVA,
     players,
   }
 }

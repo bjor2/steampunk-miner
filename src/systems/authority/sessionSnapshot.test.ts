@@ -33,7 +33,7 @@ describe('session snapshot', () => {
     const snapshot = takeSnapshot(richState())
     expect(snapshot).toMatchObject({
       snapshotVersion: 16,
-      generatorVersion: 4,
+      generatorVersion: 5,
       tick: 600,
       digest: stateDigest(richState()),
     })
@@ -43,7 +43,7 @@ describe('session snapshot', () => {
   it('refuses a snapshot from another generator version instead of migrating it', () => {
     const snapshot = { ...takeSnapshot(richState()), generatorVersion: 1 }
     expect(readSnapshot(snapshot).problems).toEqual([
-      'snapshot.generatorVersion is 1, this build reads 4',
+      'snapshot.generatorVersion is 1, this build reads 5',
     ])
   })
 
@@ -69,6 +69,7 @@ describe('session snapshot', () => {
       'snapshot.state.core must hold a reachedTick, whole harvestedTiles and isCompleted',
       'snapshot.state.combat must be an object',
       'snapshot.state.collapse must hold a list of blocks',
+      'snapshot.state.lava must hold loose lava tiles and a next step tick or null',
       'snapshot.state.debugApplied must be a boolean',
     ])
   })

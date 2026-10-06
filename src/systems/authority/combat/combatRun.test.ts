@@ -243,6 +243,7 @@ describe('combat: death and no interruption (#25 acceptance 10, #23 item 4)', ()
         'combat',
         'core',
         'debugApplied',
+        'lava',
         'planet',
         'platform',
         'players',

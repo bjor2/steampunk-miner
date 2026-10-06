@@ -71,9 +71,11 @@ export interface EditSession {
   casingCleared: CasingCleared
 }
 
+/** The drill and the ground rules never cut the dock pad or lava (#8, #113). */
 export function isCarvable(session: EditSession, sample: WeightedSample): boolean {
   if (sample.weight === 0) return false
-  return kindOfCell(materialOfSample(session, sample)) !== CELL_KIND.indestructible
+  const kind = kindOfCell(materialOfSample(session, sample))
+  return kind !== CELL_KIND.indestructible && kind !== CELL_KIND.lava
 }
 
 export function materialOfSample(session: EditSession, sample: WeightedSample): number {

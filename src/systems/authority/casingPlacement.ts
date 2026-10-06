@@ -132,8 +132,9 @@ export function layCasingRing(
   params: PlanetParams,
   point: RingPoint,
   grade: number,
+  typeIndex: number,
 ): RuleEffect {
-  const { state: lined, events } = lineCasingRing(state, params, point, grade)
+  const { state: lined, events } = lineCasingRing(state, params, point, grade, typeIndex)
   return { state: lined, events }
 }
 

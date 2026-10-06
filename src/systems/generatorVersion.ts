@@ -3,6 +3,7 @@
  * saves, snapshots, golden replays and run metadata can refuse to mix worlds from different
  * generators. The planet generator (Build 2) owns every bump from here on. Version 2 is the
  * density field and ore patches (#36, #42); version 3 places the artefact cache (#46); version 4
- * widens the pad under the Refinery bay from planet 3 (#105), planets 1 and 2 unchanged.
+ * widens the pad under the Refinery bay from planet 3 (#105), planets 1 and 2 unchanged; version 5
+ * paints lava pockets on the heat planets 8 to 16 (#113), planets 1 to 7 unchanged.
  */
-export const GENERATOR_VERSION = 4
+export const GENERATOR_VERSION = 5

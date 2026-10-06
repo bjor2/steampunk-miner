@@ -38,6 +38,7 @@ import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
+import { wakeLavaBeside } from './lava/lavaRules'
 
 type CarveIn = (world: WorldState, window: CarveWindow, drillTicksOf: CellDrillTicks) => Carve
 
@@ -102,7 +103,7 @@ function drillGround(
   })
   const collected = collectYieldedCells(charged, playerId, params, carved.yielded)
   return {
-    state: collected.state,
+    state: wakeLavaBeside(collected.state, params, carved.yielded, state.tick),
     events: [
       damageEvent(params, state.world, target.tile, drill, carved.ticksUsed),
       ...groundChangedEventsOf(carved),

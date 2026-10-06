@@ -11,6 +11,9 @@
  *   grade 1 to 15 and its type, or `CASING_BREACHED`), run-length encoded like `density`.
  *   Generation lays no casing, so the runs are the layer itself.
  * - `overrides`: sparse `[index, cell]` material overrides sorted by index (placed supports later).
+ * - `lavaFlips`: one bit per cell, laid out like `yieldedRows`, set where lava (#113) flowed in or
+ *   out: a cell holds lava when its generated cell is lava XOR its bit. Lava is a layer over the
+ *   material and the yield mask, so a tunnel it flows into reads as lava until it flows on.
  * - `version`: counts the changes, so a renderer or collider can tell a chunk moved on (#36
  *   `GroundChanged`).
  *
@@ -19,7 +22,7 @@
  */
 import { CHUNK_SAMPLES } from './sampleGrid'
 import { CHUNK_SIZE } from './tileGrid'
-import { AIR_CELL } from './worldCell'
+import { AIR_CELL, isLavaCell, LAVA_CELL } from './worldCell'
 
 /** The highest grade a casing sample holds (#41: 1 to 15); a higher player grade lines at 15. */
 export const MAX_SAMPLE_CASING_GRADE = 15
@@ -79,6 +82,7 @@ export interface ChunkDelta {
   casing: readonly number[]
   yieldedRows: readonly number[]
   overrides: readonly (readonly [index: number, cell: number])[]
+  lavaFlips: readonly number[]
   version: number
 }
 
@@ -87,11 +91,24 @@ export const EMPTY_CHUNK_DELTA: ChunkDelta = {
   casing: [],
   yieldedRows: new Array<number>(CHUNK_SIZE).fill(0),
   overrides: [],
+  lavaFlips: new Array<number>(CHUNK_SIZE).fill(0),
   version: 0,
 }
 
 export function isCellYielded(delta: ChunkDelta, index: number): boolean {
   return (delta.yieldedRows[rowOf(index)] & bitOf(index)) !== 0
+}
+
+/** Whether the cell holds lava now: generated lava that has not flowed out, or lava flowed in. */
+export function isLavaAt(generatedCell: number, delta: ChunkDelta, index: number): boolean {
+  return isLavaCell(generatedCell) !== isLavaFlipped(delta, index)
+}
+
+/** Lava flowed into or out of these cells (#113): each one's lava bit turns over. */
+export function withLavaFlipped(delta: ChunkDelta, indices: readonly number[]): ChunkDelta {
+  let rows = delta.lavaFlips
+  for (const index of indices) rows = withRowBitFlipped(rows, index)
+  return { ...delta, lavaFlips: rows, version: delta.version + 1 }
 }
 
 /** A yielded cell stays yielded: it credits its ore once, whatever is filled back later. */
@@ -131,24 +148,54 @@ export function isChunkTouched(delta: ChunkDelta): boolean {
     delta.density.length > 0 ||
     delta.casing.length > 0 ||
     delta.overrides.length > 0 ||
-    delta.yieldedRows.some((row) => row !== 0)
+    delta.yieldedRows.some((row) => row !== 0) ||
+    hasLavaFlips(delta)
   )
 }
 
-/** The material cells as they stand now: generated, overrides applied, yielded cells open. */
+/** The material cells as they stand now: generated, overrides applied, yielded cells open, lava over all. */
 export function applyChunkDelta(generated: Uint32Array, delta: ChunkDelta): Uint32Array {
   const cells = materialCellsOf(generated, delta)
   for (let index = 0; index < cells.length; index++) {
     if (isCellYielded(delta, index)) cells[index] = AIR_CELL
   }
+  overlayLava(cells, generated, delta)
   return cells
 }
 
-/** The material cells with overrides but without the yield mask: what the ground is made of. */
+/** The material cells with overrides and lava but without the yield mask: what the ground is made of. */
 export function materialCellsOf(generated: Uint32Array, delta: ChunkDelta): Uint32Array {
   const cells = generated.slice()
   for (const [index, cell] of delta.overrides) cells[index] = cell
+  overlayLava(cells, generated, delta)
   return cells
+}
+
+/** One cell's material: the generated cell or its override, then the lava layer (#113). */
+export function materialCellOf(generatedCell: number, delta: ChunkDelta, index: number): number {
+  if (isLavaFlipped(delta, index)) return lavaCellAfterFlip(generatedCell)
+  const override = delta.overrides.find(([at]) => at === index)
+  return override === undefined ? generatedCell : override[1]
+}
+
+/** Cells lava flowed into read as lava; generated lava that flowed out reads as open air. */
+function overlayLava(cells: Uint32Array, generated: Uint32Array, delta: ChunkDelta): void {
+  if (!hasLavaFlips(delta)) return
+  for (let index = 0; index < cells.length; index++) {
+    if (isLavaFlipped(delta, index)) cells[index] = lavaCellAfterFlip(generated[index])
+  }
+}
+
+function lavaCellAfterFlip(generatedCell: number): number {
+  return isLavaCell(generatedCell) ? AIR_CELL : LAVA_CELL
+}
+
+function isLavaFlipped(delta: ChunkDelta, index: number): boolean {
+  return (delta.lavaFlips[rowOf(index)] & bitOf(index)) !== 0
+}
+
+function hasLavaFlips(delta: ChunkDelta): boolean {
+  return delta.lavaFlips.some((row) => row !== 0)
 }
 
 /** The current density: the generated density XOR the decoded runs. A fresh array. */
@@ -204,6 +251,12 @@ function rowOf(index: number): number {
 
 function bitOf(index: number): number {
   return (1 << (index % CHUNK_SIZE)) >>> 0
+}
+
+function withRowBitFlipped(rows: readonly number[], index: number): number[] {
+  const next = rows.slice()
+  next[rowOf(index)] = (rows[rowOf(index)] ^ bitOf(index)) >>> 0
+  return next
 }
 
 function withRowBit(rows: readonly number[], index: number): number[] {

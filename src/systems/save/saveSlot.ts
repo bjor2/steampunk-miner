@@ -57,6 +57,7 @@ export interface SaveWorldSection {
   core: PortableState['core']
   combat: PortableState['combat']
   collapse: PortableState['collapse']
+  lava: PortableState['lava']
   debugApplied: boolean
 }
 
@@ -92,6 +93,7 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     core: state.core,
     combat: state.combat,
     collapse: state.collapse,
+    lava: state.lava,
     debugApplied: state.debugApplied,
   }
 }
@@ -129,6 +131,7 @@ function snapshotOfSaveSlot(file: SaveSlotFile): SessionSnapshot {
       core: world.core,
       combat: world.combat,
       collapse: world.collapse,
+      lava: world.lava,
       debugApplied: world.debugApplied,
     },
   }

@@ -210,9 +210,9 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     // `gun_hit` and `gun_mode`; #105 `refine_queued`, `refine_ready`, `refine_collected` and
     // `refinery_slot_bought`; #115 `lining_settled`; #109 `charge_planted`, `charge_detonated`,
     // `charges_restocked` and `charge_rack_upgraded`; #113 `lining_type_unlocked`,
-    // `lining_type_selected`, `heat_threshold`, `overheat_started` and `overheat_ended`; the controls
-    // and the HUD still add none.
-    expect(ALL_RUN_EVENT_NAMES).toHaveLength(62 + 4 + 3 + 1 + 3 + 4 + 4 + 1 + 4 + 5)
+    // `lining_type_selected`, `heat_threshold`, `overheat_started`, `overheat_ended`, `lava_contact`
+    // and `lava_blocked`; the controls and the HUD still add none.
+    expect(ALL_RUN_EVENT_NAMES).toHaveLength(62 + 4 + 3 + 1 + 3 + 4 + 4 + 1 + 4 + 7)
   })
 })
 

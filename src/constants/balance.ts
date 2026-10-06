@@ -162,3 +162,25 @@ export const MAX_PLANETS_WITHOUT_HORIZONTAL = 2
  * 1/60 s tick and a long dive never drifts. The rates themselves are economy data.
  */
 export const HEAT_UNITS_PER_POINT = 60000
+
+/**
+ * Lava pockets (#113) are drawn on a lattice of square blocks this many tiles a side: each block of
+ * plain ground is a pocket with its band's `hazardPocketVolume` chance, so the share of a band in
+ * pockets is that volume. 3 m blocks are wider than the 1.9 m bore, so a pocket reads as a pool.
+ * A build choice (#96), not a Systems number; changing it needs a GENERATOR_VERSION bump.
+ */
+export const LAVA_POCKET_TILES = 3
+
+/**
+ * Lava (#113) flows one cell a step, every this many ticks (4 cells a second): slow enough to
+ * outrun on the 6+ m/s engine once a pocket breaks open, quick enough to fill a tunnel's floor
+ * while the player watches. A build choice (#96), not a Systems number.
+ */
+export const LAVA_FLOW_STEP_TICKS = 15
+
+/**
+ * Lava touches a vehicle whose body centre is within this of a lava cell's square (#113): the
+ * 0.9 m body's half-size (450 mm) plus 150 mm, so resting against a pocket's face burns. Lava never
+ * flows into a cell whose square comes this close to a body, so it never buries a vehicle.
+ */
+export const LAVA_CONTACT_REACH_MM = 450 + 150

@@ -11,6 +11,7 @@ import { GENERATOR_VERSION } from '../generatorVersion'
 import type { AuthorityState, PlayerState } from './authorityState'
 import { portableCollapseOf, portableCollapseProblems } from './collapse/collapseSnapshot'
 import type { CollapseState } from './collapse/collapseState'
+import { portableLavaOf, portableLavaProblems, type LavaState } from './lava/lavaState'
 import {
   combatOfPortable,
   portableCombatOf,
@@ -36,7 +37,8 @@ import {
 
 /**
  * 16: heat, lava and the lining types (#113, #96): the vehicle's lining and heat gauge, typed
- * casing values; 15: each vehicle's charge rack, carried charges and planted charge (#109, #95);
+ * casing values, the lava layer of chunk deltas and the loose lava; 15: each vehicle's charge
+ * rack, carried charges and planted charge (#109, #95);
  * 14: what the vehicle's Sell bay visit has paid of its lining bill (#128); 13: the vehicle's
  * lining bill and each casing-trail point's axis length (#115, #76 amendment); 12: the Refinery
  * bay's slots on the platform (#105, #92); 11: the vehicle's guns and combat's gun timing and
@@ -67,6 +69,7 @@ export interface PortableState {
   core: CoreProgress
   combat: PortableCombat
   collapse: CollapseState
+  lava: LavaState
   debugApplied: boolean
 }
 
@@ -107,6 +110,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     core: { ...state.core },
     combat: portableCombatOf(state.combat),
     collapse: portableCollapseOf(state.collapse),
+    lava: portableLavaOf(state.lava),
     debugApplied: state.debugApplied,
   }
 }
@@ -139,6 +143,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     core: { ...portable.core },
     combat: combatOfPortable(portable.combat),
     collapse: portableCollapseOf(portable.collapse),
+    lava: portableLavaOf(portable.lava),
     debugApplied: portable.debugApplied,
   }
 }
@@ -180,6 +185,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...coreProgressProblems(state.core, 'snapshot.state.core'),
     ...portableCombatProblems(state.combat, 'snapshot.state.combat'),
     ...portableCollapseProblems(state.collapse, 'snapshot.state.collapse'),
+    ...portableLavaProblems(state.lava, 'snapshot.state.lava'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),

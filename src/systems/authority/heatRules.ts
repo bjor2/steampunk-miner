@@ -230,7 +230,8 @@ function netUnitsPerTick(heating: BigStat, cooling: BigStat): number {
   return heatUnitsPerTickOf(sub(heating, cooling))
 }
 
-function heatLineEvents(archetype: HazardArchetype, run: HeatRun): DomainEventBody[] {
+/** `heat_threshold` for each line risen past, and the throttle's start and end edges. */
+export function heatLineEvents(archetype: HazardArchetype, run: HeatRun): DomainEventBody[] {
   const throttleUnits = heatUnitsOfPoints(archetype.throttleAt)
   return [
     ...run.risenPast.flatMap((line): DomainEventBody[] => [

@@ -16,6 +16,8 @@ export const SEED_PURPOSE = {
   orePatch: 7,
   /** The planet's one artefact cache (#46). */
   artefactCache: 8,
+  /** Lava pockets of a heat planet (#113). */
+  lavaPocket: 9,
 } as const
 
 export type SeedPurpose = (typeof SEED_PURPOSE)[keyof typeof SEED_PURPOSE]

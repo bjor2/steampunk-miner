@@ -21,6 +21,11 @@ export const CELL_KIND = {
   indestructible: 5,
   /** The planet's artefact cache (#46): drills like rock and yields nothing. */
   artefactCache: 6,
+  /**
+   * A lava pocket of a heat planet (#113): molten rock, solid to the vehicle and the drill, which
+   * flows down into open tunnels and burns what touches it.
+   */
+  lava: 7,
 } as const
 
 export type CellKind = (typeof CELL_KIND)[keyof typeof CELL_KIND]
@@ -60,6 +65,7 @@ export const GROUND_CELL = packCell(CELL_KIND.ground, RESOURCE_FAMILY.none, 0)
 export const CORE_CELL = packCell(CELL_KIND.core, RESOURCE_FAMILY.none, CORE_TIER_OFFSET)
 export const INDESTRUCTIBLE_CELL = packCell(CELL_KIND.indestructible, RESOURCE_FAMILY.none, 0)
 export const ARTEFACT_CACHE_CELL = packCell(CELL_KIND.artefactCache, RESOURCE_FAMILY.none, 0)
+export const LAVA_CELL = packCell(CELL_KIND.lava, RESOURCE_FAMILY.none, 0)
 
 export function oreCell(family: ResourceFamily, tierOffset: number): number {
   return packCell(CELL_KIND.ore, family, tierOffset)
@@ -75,7 +81,12 @@ export function isSolidCell(cell: number): boolean {
   return !isAirCell(cell)
 }
 
-/** A drill may remove it: solid, and not the dock pad (#4 acceptance 4). */
+/** A drill may remove it: solid, and neither the dock pad (#4 acceptance 4) nor lava (#113). */
 export function isRemovableCell(cell: number): boolean {
-  return isSolidCell(cell) && kindOfCell(cell) !== CELL_KIND.indestructible
+  const kind = kindOfCell(cell)
+  return isSolidCell(cell) && kind !== CELL_KIND.indestructible && kind !== CELL_KIND.lava
+}
+
+export function isLavaCell(cell: number): boolean {
+  return kindOfCell(cell) === CELL_KIND.lava
 }

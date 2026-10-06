@@ -4,7 +4,7 @@
  * core. The drill bites on either; only ground in the way holds the body back. Only samples the
  * stamp can still lower count, so pushing along the vehicle's own tunnel never drills (and drains
  * nothing), and nothing seen here is ground the drill may not cut: a wall, a floor below or the
- * lip of a shaft's round bottom.
+ * lip of a shaft's round bottom. The dock pad and lava (#113) are never cut.
  */
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { ISO_DENSITY, MM_PER_SAMPLE, SAMPLES_PER_TILE } from '../world/sampleGrid'
@@ -55,7 +55,8 @@ function isCuttable(ground: DrillableGround, sample: WeightedSample): boolean {
     tx: Math.floor(sample.sx / SAMPLES_PER_TILE),
     ty: Math.floor(sample.sy / SAMPLES_PER_TILE),
   }
-  return kindOfCell(ground.materialAt(tile)) !== CELL_KIND.indestructible
+  const kind = kindOfCell(ground.materialAt(tile))
+  return kind !== CELL_KIND.indestructible && kind !== CELL_KIND.lava
 }
 
 /** Within reach of the face across the body, else in the stamp's core ahead of the centre. */

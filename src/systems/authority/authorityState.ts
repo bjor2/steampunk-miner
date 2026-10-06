@@ -11,6 +11,7 @@ import { ZERO_MONEY, type Money } from '../money'
 import { newVehicleState, type VehicleState } from '../vehicle/vehicleState'
 import { EMPTY_WORLD, type WorldState } from '../world/worldState'
 import { NO_COLLAPSE, type CollapseState } from './collapse/collapseState'
+import { NO_LOOSE_LAVA, type LavaState } from './lava/lavaState'
 import { NEW_COMBAT, type CombatState } from './combat/combatState'
 import { NEW_CORE_PROGRESS, type CoreProgress } from './coreProgress'
 import type { HeldArtefact } from './heldArtefact'
@@ -39,6 +40,8 @@ export interface AuthorityState {
   combat: CombatState
   /** Blocks warning or refilling (#43); authority-only, emptied on every planet. */
   collapse: CollapseState
+  /** Lava flowing on a heat planet (#113); emptied on every planet. */
+  lava: LavaState
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
 }
@@ -60,6 +63,7 @@ export function createAuthorityState(start: SessionStart): AuthorityState {
     core: NEW_CORE_PROGRESS,
     combat: NEW_COMBAT,
     collapse: NO_COLLAPSE,
+    lava: NO_LOOSE_LAVA,
     debugApplied: false,
   }
 }

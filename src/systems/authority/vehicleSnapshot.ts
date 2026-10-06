@@ -214,6 +214,8 @@ function isPortableDelta(delta: unknown): delta is ChunkDelta {
     delta.yieldedRows.length === CHUNK_SIZE &&
     Array.isArray(delta.overrides) &&
     delta.overrides.every(isWholeNumberList) &&
+    isWholeNumberList(delta.lavaFlips) &&
+    delta.lavaFlips.length === CHUNK_SIZE &&
     isWholeNumber(delta.version)
   )
 }

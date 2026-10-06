@@ -88,6 +88,8 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
   HeatThreshold: ({ level }) => ({ event: 'heat_threshold', data: { level } }),
   OverheatStarted: () => ({ event: 'overheat_started', data: {} }),
   OverheatEnded: () => ({ event: 'overheat_ended', data: {} }),
+  LavaTouched: ({ tx, ty }) => ({ event: 'lava_contact', data: { tx, ty } }),
+  LavaBlocked: ({ ring }) => ({ event: 'lava_blocked', data: { ring } }),
   VehicleModeChanged: ({ from, to, reason }) => ({
     event: 'vehicle_state_changed',
     data: { from, to, reason },

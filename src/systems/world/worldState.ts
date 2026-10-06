@@ -12,6 +12,7 @@ import {
   decodeDensity,
   EMPTY_CHUNK_DELTA,
   isCellYielded,
+  materialCellOf,
   materialCellsOf,
   NO_CASING,
   type ChunkDelta,
@@ -19,7 +20,7 @@ import {
 import type { GeneratedChunk } from './generateChunk'
 import type { PlanetParams } from './planetParams'
 import { cellIndexOfTile, chunkKey, chunkOfTile, type TilePoint } from './tileGrid'
-import { AIR_CELL } from './worldCell'
+import { AIR_CELL, isLavaCell } from './worldCell'
 
 export interface WorldState {
   /** Deltas of touched chunks only, keyed by `chunkKey(cx, cy)`. */
@@ -54,20 +55,21 @@ export function withChunkDelta(
   return { chunks: { ...world.chunks, [chunkKey(cx, cy)]: delta } }
 }
 
-/** The packed cell at a tile as the world stands now: a yielded cell is open ground. */
+/** The packed cell at a tile as the world stands now: a yielded cell is open ground, lava is lava. */
 export function cellAt(world: WorldState, params: PlanetParams, tile: TilePoint): number {
   const delta = deltaOfChunk(world, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
-  if (isCellYielded(delta, cellIndexOfTile(tile.tx, tile.ty))) return AIR_CELL
-  return materialCellAt(world, params, tile)
+  const material = materialCellAt(world, params, tile)
+  if (isLavaCell(material)) return material
+  return isCellYielded(delta, cellIndexOfTile(tile.tx, tile.ty)) ? AIR_CELL : material
 }
 
-/** What a tile is made of, yielded or not: generated, then any override (#36). */
+/** What a tile is made of, yielded or not: generated, then any override (#36), then lava (#113). */
 export function materialCellAt(world: WorldState, params: PlanetParams, tile: TilePoint): number {
   const cx = chunkOfTile(tile.tx)
   const cy = chunkOfTile(tile.ty)
   const index = cellIndexOfTile(tile.tx, tile.ty)
-  const override = deltaOfChunk(world, cx, cy).overrides.find(([at]) => at === index)
-  return override === undefined ? cacheOf(params).generatedCellsOf(cx, cy)[index] : override[1]
+  const generated = cacheOf(params).generatedCellsOf(cx, cy)[index]
+  return materialCellOf(generated, deltaOfChunk(world, cx, cy), index)
 }
 
 export function isTileYielded(world: WorldState, tile: TilePoint): boolean {

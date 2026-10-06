@@ -287,6 +287,14 @@ export const RUN_EVENT_REGISTRY = {
   heat_threshold: { group: 'vehicle_and_combat', level: 'core', payload: { level: 'integer' } },
   overheat_started: { group: 'vehicle_and_combat', level: 'core', payload: {} },
   overheat_ended: { group: 'vehicle_and_combat', level: 'core', payload: {} },
+  // #113: the vehicle touched lava (the cell's tile), and loose lava stopped at a refractory-lined
+  // cell (`ring` its centre in mm, as `ring_gnawed` names a ring).
+  lava_contact: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { tx: 'integer', ty: 'integer' },
+  },
+  lava_blocked: { group: 'mining', level: 'core', payload: { ring: 'text' } },
   energy_low: { group: 'mining', level: 'core', payload: { threshold: 'integer' } },
   rare_resource_discovered: { group: 'mining', level: 'core', payload: 'unspecified' },
   tile_drilled: { group: 'mining', level: 'detail', payload: 'unspecified' },
