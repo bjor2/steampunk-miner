@@ -38,6 +38,16 @@ describe('economy data validation', () => {
     ])
   })
 
+  it('refuses a heat archetype whose bands or throttle line do not fit the gauge (#113)', () => {
+    const broken = economyFileCopy()
+    broken.archetypes[0].bandHeatPerSecond = ['0', '0.100']
+    Object.assign(broken.archetypes[0], { throttleAt: 100 })
+    expect(problemsOf(broken)).toEqual([
+      'archetypes[0].bandHeatPerSecond must list 5 bands',
+      'archetypes[0].throttleAt must lie inside the gauge, above 0 and below gaugeMax',
+    ])
+  })
+
   it('lists an unknown upgrade id as a problem', () => {
     const broken = economyFileCopy()
     broken.upgrades[0].id = 'laser'

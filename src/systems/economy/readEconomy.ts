@@ -9,6 +9,7 @@ import {
   readRange,
   type FieldReader,
 } from './economyFieldReader'
+import { readArchetypes } from './readArchetypeEconomy'
 import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
@@ -61,6 +62,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     ),
     upgrades,
     gun: readGun(reader, reader.object('gun', file.gun)),
+    archetypes: readArchetypes(reader, file.archetypes, ore.coreTierBand),
     visualTiers: reader
       .list('visualTiers', file.visualTiers)
       .map((tier, index) => readVisualTier(reader, `visualTiers[${index}]`, tier)),

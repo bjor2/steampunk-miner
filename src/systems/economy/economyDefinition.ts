@@ -210,6 +210,37 @@ export interface BlastingChargeRules {
   botBlastThresholdTicks: number
 }
 
+/**
+ * A hazard archetype (spec #113 numbers, Systems & Economy): the planets of one act get a hazard
+ * gauge, its pockets in the ground and a lining type that answers it. Heat (the Fire act, P8-16) is
+ * the first; Ice and Storm add a block of the same shape (#113 "template seam"). Rates are per
+ * second of sim time on a 0 to `gaugeMax` gauge; `bandHeatPerSecond` and `hazardPocketVolume` list
+ * bands 1 to 5, and the band rates grow by `tail.ratio` a planet into the act, at most `tail.cap`
+ * times. Cooling rates are positive amounts taken off the gauge.
+ */
+export interface HazardArchetype {
+  id: string
+  planets: { first: number; last: number }
+  bandHeatPerSecond: readonly BigStat[]
+  drillHeatPerSecond: BigStat
+  coolingPerSecond: { idle: BigStat; liningCorridor: BigStat; surface: BigStat }
+  gaugeMax: number
+  /** Above this the drill is throttled, linearly down to `throttleFloor` of its power at the max. */
+  throttleAt: number
+  throttleFloor: BigStat
+  /** The share of `hullMax` a second the hull loses while the gauge sits at its max. */
+  damageAtMaxPerSecond: BigStat
+  /** Touching a pocket: gauge points added and the share of `hullMax` lost, once per hit grace. */
+  hazardContact: { heat: number; hullFraction: BigStat }
+  hazardPocketVolume: readonly BigStat[]
+  tail: { ratio: BigStat; cap: BigStat }
+  /** The lining type that seals the pockets and cools the tunnel, and its price on the #76 charge. */
+  liningType: string
+  liningMultiplier: BigStat
+  /** The type is unlocked once at the Upgrade bay for this many band ore units (#105 `bandOre`). */
+  liningUnlockCost: BandOreCost
+}
+
 export interface Economy {
   economyVersion: number
   ore: {
@@ -288,6 +319,7 @@ export interface Economy {
   blastingCharges: BlastingChargeRules
   upgrades: readonly UpgradeDef[]
   gun: GunRules
+  archetypes: readonly HazardArchetype[]
   visualTiers: readonly VisualTierThreshold[]
   enemies: {
     tier: { first: number; perPlanet: number; perBand: number }

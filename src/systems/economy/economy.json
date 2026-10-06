@@ -137,6 +137,25 @@
     "mountCost": { "band": 5, "oreUnits": "30" },
     "levelCost": { "id": "cost.vehicle.gun", "band": 5, "oreUnits": "8", "ratio": "1.250" }
   },
+  "archetypes": [
+    {
+      "id": "heat",
+      "planets": { "first": 8, "last": 16 },
+      "bandHeatPerSecond": ["0", "0.100", "0.200", "0.350", "0.500"],
+      "drillHeatPerSecond": "0.150",
+      "coolingPerSecond": { "idle": "0.4", "liningCorridor": "1.0", "surface": "10" },
+      "gaugeMax": 100,
+      "throttleAt": 70,
+      "throttleFloor": "0.500",
+      "damageAtMaxPerSecond": "0.020",
+      "hazardContact": { "heat": 25, "hullFraction": "0.050" },
+      "hazardPocketVolume": ["0", "0.010", "0.020", "0.030", "0.040"],
+      "tail": { "ratio": "1.040", "cap": "1.350" },
+      "liningType": "refractory",
+      "liningMultiplier": "1.5",
+      "liningUnlockCost": { "band": 5, "oreUnits": "40" }
+    }
+  ],
   "visualTiers": [
     { "tier": 1, "minTotalLevel": 0 },
     { "tier": 2, "minTotalLevel": 8 },
