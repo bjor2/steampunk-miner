@@ -8,13 +8,17 @@
  * from the bands each kind lives in, with the burrower share picked by the slot's hash where both
  * may live. The point then sits on the first cell from there (in the chunk, same band) that suits
  * the kind: cave air for a crawler, rock or ore for a burrower. Band 1 has none (`sp[1] = 0`).
+ * From planet 7 a second roll thins every band by `m(p)` (#131 Systems, `densityByRadius`), so a
+ * dive to the core passes about as many points as on planet 6 while the planets grow; it only ever
+ * removes points the band roll kept, and planets 1 to 6 keep exactly the list they had.
  * The tunnel wrecker never sits on a spawn point: it comes to a vehicle's lined route (#111).
  */
 import { MM_PER_METRE } from '../../../constants/physics'
 import { hashCell } from '../../cellRandom'
 import { ECONOMY } from '../../economy/economy'
 import { SPAWN_POINT_ENEMY_KINDS, type EnemyKind } from '../../economy/economyDefinition'
-import { enemyTier } from '../../economy/enemyStats'
+import { enemyTier, spawnDensityScale } from '../../economy/enemyStats'
+import { floor, fromSafeInteger, mul, toSafeInteger } from '../../money'
 import { SEED_PURPOSE, subSeedFor } from '../../world/generatorSeeds'
 import { bandOfTile, isInsidePlanet } from '../../world/planetGeometry'
 import type { PlanetParams } from '../../world/planetParams'
@@ -46,22 +50,30 @@ const SLOTS_PER_CHUNK = Math.ceil(
   Math.max(...combat.spawnPointsPer10ChunksByBand) / CHUNKS_PER_WEIGHT,
 )
 /** What each slot's hash decides; part of the generated world, like a seed purpose. */
-const SLOT_HASH = { cell: 0, keep: 1, kind: 2 } as const
+const SLOT_HASH = { cell: 0, keep: 1, kind: 2, density: 3 } as const
+/** Resolution of the density roll: a slot the band keeps stays with chance `m(p)` (#131). */
+const DENSITY_ROLL_RANGE = 1_000_000
 
-let cacheOfPlanet: { params: PlanetParams; byChunk: Map<string, readonly SpawnPoint[]> } | null =
-  null
+interface SpawnPlanet {
+  params: PlanetParams
+  /** A slot's density roll below this keeps it; the whole range at `m(p) = 1`. */
+  densityKeepBelow: number
+  byChunk: Map<string, readonly SpawnPoint[]>
+}
+
+let cacheOfPlanet: SpawnPlanet | null = null
 
 export function spawnPointsOfChunk(
   params: PlanetParams,
   cx: number,
   cy: number,
 ): readonly SpawnPoint[] {
-  const byChunk = chunkCacheOf(params)
+  const planet = spawnPlanetOf(params)
   const key = `${cx},${cy}`
-  const cached = byChunk.get(key)
+  const cached = planet.byChunk.get(key)
   if (cached !== undefined) return cached
-  const points = generateSpawnPoints(params, cx, cy)
-  byChunk.set(key, points)
+  const points = generateSpawnPoints(planet, cx, cy)
+  planet.byChunk.set(key, points)
   return points
 }
 
@@ -84,39 +96,46 @@ export function spawnPositionOf(tile: TilePoint): { x: number; y: number } {
   return { x: tile.tx * MM_PER_TILE + HALF_TILE_MM, y: tile.ty * MM_PER_TILE + HALF_TILE_MM }
 }
 
-function chunkCacheOf(params: PlanetParams): Map<string, readonly SpawnPoint[]> {
+function spawnPlanetOf(params: PlanetParams): SpawnPlanet {
   if (cacheOfPlanet === null || !isSamePlanet(cacheOfPlanet.params, params)) {
-    cacheOfPlanet = { params, byChunk: new Map() }
+    cacheOfPlanet = { params, densityKeepBelow: densityKeepBelowOf(params), byChunk: new Map() }
   }
-  return cacheOfPlanet.byChunk
+  return cacheOfPlanet
+}
+
+function densityKeepBelowOf(params: PlanetParams): number {
+  const range = fromSafeInteger(DENSITY_ROLL_RANGE)
+  return toSafeInteger(floor(mul(spawnDensityScale(params.planetIndex), range)))
 }
 
 function isSamePlanet(a: PlanetParams, b: PlanetParams): boolean {
   return a.worldSeed === b.worldSeed && a.planetIndex === b.planetIndex
 }
 
-function generateSpawnPoints(params: PlanetParams, cx: number, cy: number): SpawnPoint[] {
-  const chunkSeed = hashCell(subSeedFor(params, SEED_PURPOSE.enemySpawn), cx, cy)
+function generateSpawnPoints(planet: SpawnPlanet, cx: number, cy: number): SpawnPoint[] {
+  const chunkSeed = hashCell(subSeedFor(planet.params, SEED_PURPOSE.enemySpawn), cx, cy)
   const points: SpawnPoint[] = []
   for (let slot = 0; slot < SLOTS_PER_CHUNK; slot++) {
-    const point = spawnPointOfSlot(params, cx, cy, chunkSeed, slot)
+    const point = spawnPointOfSlot(planet, cx, cy, chunkSeed, slot)
     if (point !== null) points.push(point)
   }
   return points
 }
 
 function spawnPointOfSlot(
-  params: PlanetParams,
+  planet: SpawnPlanet,
   cx: number,
   cy: number,
   chunkSeed: number,
   slot: number,
 ): SpawnPoint | null {
+  const { params } = planet
   const startIndex = hashCell(chunkSeed, slot, SLOT_HASH.cell) % CHUNK_CELLS
   const start = tileOfCellIndex(cx, cy, startIndex)
   if (!isInsidePlanet(params, start.tx, start.ty)) return null
   const band = bandOfTile(params, start.tx, start.ty)
   if (!isSlotKept(band, hashCell(chunkSeed, slot, SLOT_HASH.keep))) return null
+  if (!isSlotDenseEnough(planet, hashCell(chunkSeed, slot, SLOT_HASH.density))) return null
   const kind = kindAt(params.planetIndex, band, hashCell(chunkSeed, slot, SLOT_HASH.kind))
   if (kind === null) return null
   const tile = firstSuitableTile(params, cx, cy, startIndex, kind, band)
@@ -127,6 +146,11 @@ function spawnPointOfSlot(
 function isSlotKept(band: number, roll: number): boolean {
   const weight = combat.spawnPointsPer10ChunksByBand[band - 1]
   return roll % (CHUNKS_PER_WEIGHT * SLOTS_PER_CHUNK) < weight
+}
+
+/** The planet-size thinning on top of the band roll, so `m(p) = 1` keeps every slot (#131). */
+function isSlotDenseEnough(planet: SpawnPlanet, roll: number): boolean {
+  return roll % DENSITY_ROLL_RANGE < planet.densityKeepBelow
 }
 
 /** The kinds that live in this band of this planet; where two do, the burrower share decides. */

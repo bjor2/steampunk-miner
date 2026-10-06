@@ -155,7 +155,21 @@ export interface CombatRules {
   activationTiles: number
   despawnTiles: number
   spawnPointsPer10ChunksByBand: readonly number[]
+  densityByRadius: DensityByRadius
   burrowerShare: { numerator: number; denominator: number }
+}
+
+/**
+ * Spawn density by planet size (#131 Systems): from `fromPlanet` on, every band's density is
+ * multiplied by `m(p) = max(floor, min(1, (R(refPlanet) / R(p))^exponent))`, so the spawn points
+ * one dive to the core passes stay near the reference planet's.
+ */
+export interface DensityByRadius {
+  fromPlanet: number
+  refPlanet: number
+  /** A whole step (Systems: 1, then 2, then 3, never higher). */
+  exponent: number
+  floor: BigStat
 }
 
 /** Every price on planet `from` and later is multiplied by `scale`, until the next row (#131). */

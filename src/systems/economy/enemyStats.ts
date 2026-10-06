@@ -7,8 +7,9 @@
  * on-curve player meets the same fight on every planet (the #9 parity rule).
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
-import { div, fromSafeInteger, mul, type BigStat } from '../money'
-import { growGeometric, saturate } from './curveFamilies'
+import { cmp, div, fromSafeInteger, mul, type BigStat } from '../money'
+import { radiusForPlanet } from '../world/planetParams'
+import { compoundRatio, growGeometric, saturate } from './curveFamilies'
 import { ECONOMY } from './economy'
 import type { EnemyDef, EnemyKind, HitArc } from './economyDefinition'
 import { drillPower, hullMax } from './vehicleStats'
@@ -17,6 +18,7 @@ const { enemies } = ECONOMY
 const FIRST_PLANET = 1
 const FIRST_BAND = 1
 const TICKS_PER_SECOND_STAT = fromSafeInteger(TICKS_PER_SECOND)
+const FULL_DENSITY = fromSafeInteger(1)
 
 export interface EnemyBoundedStats {
   moveTilesPerSecond: number
@@ -79,6 +81,15 @@ export function sideHitShareOfHull(kind: EnemyKind, tier: number, hullLevel: num
   return div(sideHit, hullMax(hullLevel))
 }
 
+/**
+ * The multiplier on every band's spawn density (#131 Systems):
+ * `m(p) = max(floor, min(1, (R(ref) / R(p))^exponent))` from `fromPlanet` on, 1 before it.
+ */
+export function spawnDensityScale(planetIndex: number): BigStat {
+  if (planetIndex < enemies.combat.densityByRadius.fromPlanet) return FULL_DENSITY
+  return clampSpawnDensityScale(radiusRatioPower(planetIndex))
+}
+
 export function enemyDefOf(kind: EnemyKind): EnemyDef {
   const enemy = enemies.kinds.find((candidate) => candidate.id === kind)
   if (enemy === undefined) throw new RangeError(`no enemy ${kind} in economy.json`)
@@ -93,4 +104,19 @@ function arcMultiplierOf(arc: HitArc): BigStat {
 
 function lungeTilesOf(enemy: EnemyDef): number {
   return (enemy.lungeTilesPerSecond * enemy.lungeTicks) / TICKS_PER_SECOND
+}
+
+function radiusRatioPower(planetIndex: number): BigStat {
+  const { refPlanet, exponent } = enemies.combat.densityByRadius
+  const ratio = div(
+    fromSafeInteger(radiusForPlanet(refPlanet)),
+    fromSafeInteger(radiusForPlanet(planetIndex)),
+  )
+  return compoundRatio(ratio, exponent)
+}
+
+function clampSpawnDensityScale(scale: BigStat): BigStat {
+  const { floor } = enemies.combat.densityByRadius
+  if (cmp(scale, FULL_DENSITY) > 0) return FULL_DENSITY
+  return cmp(scale, floor) < 0 ? floor : scale
 }

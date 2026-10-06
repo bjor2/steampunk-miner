@@ -3,6 +3,7 @@ import { readIntegerList, readLiteral, readRange, type FieldReader } from './eco
 import {
   ENEMY_KINDS,
   type CombatRules,
+  type DensityByRadius,
   type Economy,
   type EnemyDef,
   type TunnelWreckerRules,
@@ -99,9 +100,26 @@ function readCombat(reader: FieldReader, combat: Record<string, unknown>): Comba
       `${path}.spawnPointsPer10ChunksByBand`,
       combat.spawnPointsPer10ChunksByBand,
     ),
+    densityByRadius: readDensityByRadius(
+      reader,
+      reader.object(`${path}.densityByRadius`, combat.densityByRadius),
+    ),
     burrowerShare: {
       numerator: reader.safeInteger(`${path}.burrowerShare.numerator`, share.numerator),
       denominator: reader.safeInteger(`${path}.burrowerShare.denominator`, share.denominator),
     },
+  }
+}
+
+function readDensityByRadius(
+  reader: FieldReader,
+  density: Record<string, unknown>,
+): DensityByRadius {
+  const path = 'enemies.combat.densityByRadius'
+  return {
+    fromPlanet: reader.safeInteger(`${path}.fromPlanet`, density.fromPlanet),
+    refPlanet: reader.safeInteger(`${path}.refPlanet`, density.refPlanet),
+    exponent: reader.safeInteger(`${path}.exponent`, density.exponent),
+    floor: reader.money(`${path}.floor`, density.floor),
   }
 }

@@ -114,6 +114,14 @@ describe('economy data validation', () => {
     )
   })
 
+  it('refuses a spawn density exponent that is not a whole step (#131)', () => {
+    const broken = economyFileCopy()
+    Object.assign(broken.enemies.combat.densityByRadius, { exponent: 1.5 })
+    expect(problemsOf(broken)).toContain(
+      'enemies.combat.densityByRadius.exponent must be a safe integer',
+    )
+  })
+
   it('lists every problem at once and returns no economy', () => {
     const broken = economyFileCopy()
     broken.ore.valueRatio = 'lots'

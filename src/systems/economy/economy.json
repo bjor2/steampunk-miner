@@ -237,6 +237,7 @@
       "activationTiles": 24,
       "despawnTiles": 48,
       "spawnPointsPer10ChunksByBand": [0, 5, 10, 15, 10],
+      "densityByRadius": { "fromPlanet": 7, "refPlanet": 6, "exponent": 0, "floor": "0.60" },
       "burrowerShare": { "numerator": 1, "denominator": 3 }
     }
   }
