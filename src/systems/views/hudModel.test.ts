@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { fromCanonical, toCanonical } from '../money'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { FACING, type VehiclePose } from '../vehicle/vehiclePose'
-import { setEnergyCommand, setHullCommand } from '../vehicle/vehicleCommands'
+import {
+  setEnergyCommand,
+  setGunLevelCommand,
+  setGunModeCommand,
+  setHullCommand,
+} from '../vehicle/vehicleCommands'
 import {
   createScriptedSession,
   dockInBay,
@@ -40,6 +45,36 @@ function hudOf(session: ReturnType<typeof createScriptedSession>, depthTiles = 0
 }
 
 const UPRIGHT: VehiclePose = { x: 0, y: 0, vx: 0, vy: 0, upx: 0, upy: 1024, facing: FACING.right }
+
+describe('HUD model: guns (#107)', () => {
+  it('shows nothing of the guns before they are mounted', () => {
+    expect(hudOf(createScriptedSession()).guns).toBeNull()
+  })
+
+  it('reads the mode with the toggle key once mounted', () => {
+    const session = createScriptedSession()
+    session.submit(0, setGunLevelCommand(1))
+    expect(hudOf(session).guns).toEqual({
+      mode: 'auto',
+      text: 'Auto (G)',
+      isIdle: false,
+      idleText: '',
+    })
+    session.submit(1, setGunModeCommand('off'))
+    expect(hudOf(session).guns).toMatchObject({ mode: 'off', text: 'Off (G)' })
+  })
+
+  it('says guns idle: low steam on Auto where a shot would cross the rescue floor', () => {
+    const session = createScriptedSession()
+    session.submit(0, setGunLevelCommand(1))
+    session.submit(0, setEnergyCommand('38'))
+    expect(hudOf(session).guns?.isIdle).toBe(false)
+    session.submit(1, setEnergyCommand('37.75'))
+    expect(hudOf(session).guns).toMatchObject({ isIdle: true, idleText: 'guns idle: low steam' })
+    session.submit(2, setGunModeCommand('off'))
+    expect(hudOf(session).guns?.isIdle).toBe(false)
+  })
+})
 
 describe('HUD model', () => {
   it('shows energy and hull as the state holds them, with the exact value beside the text', () => {

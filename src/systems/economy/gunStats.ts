@@ -18,6 +18,9 @@ import { oreTier, oreValue } from './oreEconomy'
 import { paceScale } from './planetEconomy'
 import { drillPower } from './vehicleStats'
 
+/** The gun track's id, as its icon and the Upgrade bay name it (#107, #108). */
+export const GUN_TRACK_ID = 'gun'
+
 const { gun } = ECONOMY
 const MOUNTED_LEVEL = 1
 

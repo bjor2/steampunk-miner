@@ -3,9 +3,19 @@ import { SHIPPED_ART } from '../../scene/shippedArt'
 import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
 import { stateDigest } from '../authority/stateDigest'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
-import { buyCasingGradeCommand, buyUpgradeCommand } from '../platform/platformCommands'
+import { gunLevelPrice, gunMaxLevel, gunMountPrice } from '../economy/gunStats'
+import { toCanonical } from '../money'
+import {
+  buyCasingGradeCommand,
+  buyGunCommand,
+  buyUpgradeCommand,
+} from '../platform/platformCommands'
 import { grantMoneyCommand } from '../startScenarioCommands'
-import { setUpgradeCommand } from '../vehicle/vehicleCommands'
+import {
+  setGunLevelCommand,
+  setUpgradeCommand,
+  teleportToDockCommand,
+} from '../vehicle/vehicleCommands'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import { selectUpgradeBayModel, upgradeBayStartFocus } from './upgradeBayModel'
 import { statsOfTrack } from './workshopRows'
@@ -35,6 +45,73 @@ function eventsAfter(session: Session, run: () => void) {
 }
 
 const buyIdOf = (upgradeId: UpgradeId) => UI_ID_TEMPLATES.workshopUpgradeBuy(upgradeId)
+
+/** Docked at the Upgrade bay of planet `planetIndex` (debug), with `money`. */
+function atUpgradeBayOn(planetIndex: number, money = '1e30'): Session {
+  const session = createScriptedSession()
+  session.submit(1, { type: 'debug.setPlanet', payload: { planetIndex } })
+  session.submit(1, grantMoneyCommand(money))
+  session.submit(1, teleportToDockCommand('upgrade'))
+  return session
+}
+
+describe('upgrade bay model: the Guns row (#107)', () => {
+  it('shows no Guns row before auto_guns unlocks on planet 4 (#90: nothing before)', () => {
+    expect(upgradeBayOf(atUpgradeBayOn(3)).guns).toBeNull()
+    expect(upgradeBayOf(atUpgradeBay()).guns).toBeNull()
+  })
+
+  it('offers the mount on planet 4 at its price, with the rate it gives', () => {
+    const guns = upgradeBayOf(atUpgradeBayOn(4)).guns
+    expect(guns).toMatchObject({
+      iconId: 'icon-track-gun',
+      label: 'Guns',
+      level: 0,
+      levelText: 'Mount',
+      effectText: '2 shots/s',
+      cost: { exact: toCanonical(gunMountPrice(4)) },
+      buy: { id: UI_IDS.upgradebayGunsBuy, label: 'Mount', reason: null },
+    })
+  })
+
+  it('offers the next gun level after the mount, its Buy submitting BuyGun', () => {
+    const session = atUpgradeBayOn(4)
+    session.submit(2, buyGunCommand())
+    const guns = upgradeBayOf(session).guns
+    expect(guns).toMatchObject({
+      level: 1,
+      levelText: '1 → 2',
+      effectText: '2 → 2.14 shots/s',
+      cost: { exact: toCanonical(gunLevelPrice(1, 4)) },
+      buy: { label: 'Buy', action: { kind: 'submit', intent: buyGunCommand() } },
+    })
+  })
+
+  it('says top level at the cap and carries max_level on its Buy', () => {
+    const session = atUpgradeBayOn(4)
+    session.submit(2, setGunLevelCommand(gunMaxLevel()))
+    expect(upgradeBayOf(session).guns).toMatchObject({
+      levelText: '16 (top)',
+      buy: { reason: 'max_level' },
+    })
+  })
+
+  it('puts the Guns buy in focus after the Casing row', () => {
+    const model = upgradeBayOf(atUpgradeBayOn(4))
+    expect([...new Set(model.focusStops.map((stop) => stop.panel))]).toEqual([
+      'tracks',
+      'casing',
+      'guns',
+      'repair',
+      'footer',
+    ])
+  })
+
+  it('draws its icon from a final vector icon in the art manifest', () => {
+    const icon = SHIPPED_ART.manifest.assets.find((entry) => entry.id === 'icon-track-gun')
+    expect(icon).toMatchObject({ form: 'svg', status: 'final' })
+  })
+})
 
 describe('upgrade bay model', () => {
   it('lists the six tracks in #7 order, each with its kebab-case vector icon', () => {

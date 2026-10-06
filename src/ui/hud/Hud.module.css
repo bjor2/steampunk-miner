@@ -59,6 +59,12 @@
   animation: casing-flash 0.8s steps(2, jump-none) infinite;
 }
 
+/* #107: the guns are on Auto but the rescue floor holds them; the low-energy amber, said in text. */
+.gunsIdle {
+  color: var(--color-amber);
+  text-align: right;
+}
+
 @keyframes casing-flash {
   to {
     opacity: 0.4;

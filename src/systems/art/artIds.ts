@@ -6,6 +6,7 @@
  */
 import ASSET_RULES from '../../../art/asset-rules.json'
 import { REFINERY_BAY_LOOKS } from '../authority/platformState'
+import { GUN_TRACK_ID } from '../economy/gunStats'
 import { BAND_COUNT } from '../world/planetGeometry'
 import { ENEMY_IDS, PLATFORM_BAY_IDS, PLATFORM_VISUAL_STATES, UPGRADE_IDS } from '../registeredIds'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
@@ -88,12 +89,14 @@ export function blenderAssetIds(): string[] {
 
 /**
  * Every vector icon file stem, which is also its `data-testid` (#51 acceptance 3): one per upgrade
- * track, the casing row's icon (#54 scope review) and one emblem per bay (#51 "HUD and bay chrome").
+ * track, the casing row's icon (#54 scope review), the gun track's (#107, #108) and one emblem per
+ * bay (#51 "HUD and bay chrome").
  */
 export function vectorIconIds(): string[] {
   return [
     ...UPGRADE_IDS.map(trackIconIdOf),
     CASING_ICON_ID,
+    GUN_ICON_ID,
     ...PLATFORM_BAY_IDS.map((bay) => `emblem-bay-${bay}`),
     BLASTING_CHARGES_ICON_ID,
   ]
@@ -128,6 +131,9 @@ export function chargeRackPartIds(): string[] {
 
 /** The Casing row's icon, the seventh vector icon (#54 scope review). */
 export const CASING_ICON_ID = 'icon-casing'
+
+/** The Guns row's icon: the gun track in the `icon-track-<id>` family (#107, #108). */
+export const GUN_ICON_ID = `icon-track-${GUN_TRACK_ID}`
 
 /** An upgrade track's icon (#44 `icon-track-<id>`, in the #52 kebab form of the registry id). */
 export function trackIconIdOf(track: string): string {

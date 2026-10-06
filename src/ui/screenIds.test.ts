@@ -25,11 +25,15 @@ import {
 } from '../systems/views/artefactChoiceModel'
 import { artefactCacheTile } from '../systems/world/artefactCache'
 import { ArtefactChoiceView } from './artefact/ArtefactChoiceView'
-import { teleportToDockCommand } from '../systems/vehicle/vehicleCommands'
+import {
+  setEnergyCommand,
+  setGunLevelCommand,
+  teleportToDockCommand,
+} from '../systems/vehicle/vehicleCommands'
 import { selectHudModel, type HudModel } from '../systems/views/hudModel'
 import type { BayFooter, BayHeader } from '../systems/views/bayFrame'
 import { selectSellBayModel, type SellBayModel } from '../systems/views/sellBayModel'
-import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
+import { selectUpgradeBayModel, type UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { FACING } from '../systems/vehicle/vehiclePose'
@@ -95,6 +99,8 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
     [UI_IDS.hudDepth]: model.depth.text,
     [UI_IDS.hudBand]: String(model.depth.band),
     ...(model.casing === null ? {} : { [UI_IDS.hudCasing]: model.casing.text }),
+    ...(model.guns === null ? {} : { [UI_IDS.hudGuns]: model.guns.text }),
+    ...(model.guns?.isIdle === true ? { [UI_IDS.hudGunsIdle]: model.guns.idleText } : {}),
     [UI_IDS.hudTileTime]: model.tileTime.text,
     [UI_IDS.hudState]: model.vehicleState.text,
     ...(model.cargo.isFull ? { [UI_IDS.hudCargoFull]: 'FULL' } : {}),
@@ -165,6 +171,15 @@ function upgradeBayTexts(model: UpgradeBayModel): Partial<Record<UiId, string | 
     [UI_IDS.upgradebayCasingGrade]: casing.gradeText,
     [UI_IDS.upgradebayCasingCost]: casing.cost.text,
     [UI_IDS.upgradebayCasingBuy]: casing.buy.label,
+    ...(model.guns === null
+      ? {}
+      : {
+          [UI_IDS.upgradebayGuns]: null,
+          [UI_IDS.upgradebayGunsLevel]: model.guns.levelText,
+          [UI_IDS.upgradebayGunsCost]: model.guns.cost.text,
+          [UI_IDS.upgradebayGunsEffect]: model.guns.effectText,
+          [UI_IDS.upgradebayGunsBuy]: model.guns.buy.label,
+        }),
     [UI_IDS.upgradebayPreview]: null,
     [UI_IDS.upgradebayQuickService]: model.quickService.label,
   }
@@ -277,6 +292,36 @@ function renderAtArtefactCache(): string[] {
   ]
 }
 
+/** The HUD with the guns held back by low steam, then planet 4's Upgrade bay offering their next level (#107). */
+function renderWithGuns(): string[] {
+  const session = createScriptedSession()
+  session.submit(1, setGunLevelCommand(1))
+  session.submit(1, setEnergyCommand('37.75'))
+  const hud = selectHudModel({
+    state: session.state(),
+    playerId: 'p1',
+    depthTiles: 0,
+    bindings: game().bindings,
+  })
+  expect(hud.guns?.isIdle).toBe(true)
+  session.submit(2, { type: 'debug.setPlanet', payload: { planetIndex: 4 } })
+  session.submit(2, teleportToDockCommand('upgrade'))
+  const bay = selectUpgradeBayModel(session.state(), 'p1', {
+    isTravelArmed: false,
+    isQuickServiceHighlighted: false,
+    focusedId: null,
+    installingUpgradeId: null,
+  })
+  expect(bay.guns).not.toBeNull()
+  return [
+    ...checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud)),
+    ...checkScreen(
+      createElement(UpgradeBayView, { model: bay, focusedId: '' }),
+      upgradeBayTexts(bay),
+    ),
+  ]
+}
+
 function strandedPoseIntent() {
   return { type: 'reportPose' as const, payload: strandedPose }
 }
@@ -331,6 +376,7 @@ describe('screen ids (#33 acceptance 12)', () => {
     keep(renderHud())
     keep(renderFullHoldHud())
     keep(renderAtArtefactCache())
+    keep(renderWithGuns())
     expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
   })
 

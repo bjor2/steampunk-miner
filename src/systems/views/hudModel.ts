@@ -41,6 +41,7 @@ import {
   type DockArrow,
   type VehicleStateReading,
 } from './hudReadings'
+import { gunReadingOf, type GunReading } from './gunReading'
 import { threatMarkersOf, type ThreatMarker } from './threatMarkers'
 import { tileTimeAhead, type TileTime } from './tileTime'
 import { amountReading, type AmountReading } from './viewParts'
@@ -87,6 +88,8 @@ export interface HudModel {
   cargoValue: AmountReading
   depth: DepthReading
   casing: CasingBadge | null
+  /** Null with no guns mounted (#107). */
+  guns: GunReading | null
   dockArrow: DockArrow | null
   coreDistance: number | null
   threats: ThreatMarker[]
@@ -117,6 +120,7 @@ export function selectHudModel(sources: HudSources): HudModel {
     cargoValue: amountReading(serviceQuote(state, playerId).saleValue),
     depth: depthReadingOf(state, playerId, sources.depthTiles),
     casing: casingBadgeOf(state, playerId),
+    guns: gunReadingOf(vehicle, sources.bindings),
     dockArrow: dockArrowOf(state, playerId),
     coreDistance: coreDistanceOf(state, playerId),
     threats: threatMarkersOf(state, playerId),

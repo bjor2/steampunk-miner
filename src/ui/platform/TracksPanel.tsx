@@ -1,9 +1,11 @@
 /**
  * The Upgrade bay's six vehicle tracks (#7 order), each with its icon, level, next cost and
- * "before -> after", then the Casing row, which is not a track (#41, #58), then hull and repair,
- * and the vehicle's visual tier (#33 section 6, #37).
+ * "before -> after", then the Casing row, which is not a track (#41, #58), then the Guns row once
+ * `auto_guns` is offered (#107), then hull and repair, and the vehicle's visual tier (#33 section 6,
+ * #37).
  */
 import type { StatPreview, WorkshopRow } from '../../systems/views/workshopRows'
+import type { GunRow } from '../../systems/views/gunRow'
 import type { CasingRow, UpgradeBayModel } from '../../systems/views/upgradeBayModel'
 import { Panel } from '../kit/Panel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
@@ -21,6 +23,7 @@ export function TracksPanel({ model, focusedId }: { model: UpgradeBayModel; focu
         <UpgradeRow key={row.upgradeId} row={row} focusedId={focusedId} />
       ))}
       <CasingRowView casing={model.casing} focusedId={focusedId} />
+      {model.guns !== null && <GunRowView guns={model.guns} focusedId={focusedId} />}
       <Field label="Hull">
         <span data-testid={UI_IDS.workshopHull}>{model.repair.hullText}</span>
       </Field>
@@ -89,6 +92,25 @@ function CasingRowView({ casing, focusedId }: { casing: CasingRow; focusedId: st
         {casing.gradeText}
       </span>
       <ScreenButtonView button={casing.buy} focusedId={focusedId} state={casing.buyState} />
+    </div>
+  )
+}
+
+function GunRowView({ guns, focusedId }: { guns: GunRow; focusedId: string }) {
+  return (
+    <div className={rowStyles.trackRow} data-testid={UI_IDS.upgradebayGuns}>
+      <VectorIcon iconId={guns.iconId} />
+      <span>{guns.label}</span>
+      <span data-testid={UI_IDS.upgradebayGunsLevel} data-level={guns.level}>
+        {guns.levelText}
+      </span>
+      <span data-testid={UI_IDS.upgradebayGunsCost} data-exact={guns.cost.exact}>
+        {guns.cost.text}
+      </span>
+      <span className={rowStyles.effect} data-testid={UI_IDS.upgradebayGunsEffect}>
+        {guns.effectText}
+      </span>
+      <ScreenButtonView button={guns.buy} focusedId={focusedId} state={guns.buyState} />
     </div>
   )
 }
