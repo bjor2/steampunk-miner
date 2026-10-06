@@ -1532,6 +1532,10 @@
           padding: 8px 6px;
           text-align: center;
         }
+        /* five tabs since Slots (#193): an odd last tab fills its row instead of leaving a gap */
+        nav.tabs a:last-child:nth-child(odd) {
+          grid-column: 1 / -1;
+        }
         .tabn {
           margin-left: 0;
           white-space: nowrap;
@@ -1647,18 +1651,88 @@
           max-width: none;
         }
       }
+      /* Slots tab (#193): slotsHtml.mjs; a Grok slot and its Claude slot share --pair-hue (inline),
+         the lightness follows the theme so the chip text stays legible on white and on dark */
+      #slots-overview:empty {
+        display: none;
+      }
+      .sl-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+      @media (min-width: 1150px) {
+        .sl-grid {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        }
+      }
+      .sl-pool h3 {
+        font-size: 14px;
+        margin: 0 0 6px;
+      }
+      .sl-account h4 {
+        font-size: 13px;
+        margin: 10px 0 4px;
+      }
+      .sl-off {
+        opacity: 0.6;
+      }
+      .sl-fresh {
+        margin-bottom: 10px;
+        font-size: 12px;
+      }
+      .sl-table {
+        width: 100%;
+      }
+      .sl-table td:last-child {
+        white-space: nowrap;
+      }
+      .sl-pair {
+        --pair: hsl(var(--pair-hue) 60% 38%);
+        color: var(--pair);
+        border: 1px solid var(--pair);
+        border-radius: 4px;
+        padding: 0 5px;
+        white-space: nowrap;
+      }
+      @media (prefers-color-scheme: dark) {
+        .sl-pair {
+          --pair: hsl(var(--pair-hue) 55% 62%);
+        }
+      }
+      .sl-free {
+        background: var(--grey-bg);
+        color: var(--muted);
+      }
+      .sl-dev,
+      .sl-busy {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+      .sl-planner {
+        background: var(--accent-soft);
+        color: var(--violet);
+      }
+      .sl-disabled {
+        background: var(--red-bg);
+        color: var(--red);
+      }
     </style>
   </head>
   <body>
     <header>
       <h1>Steampunk Miner <small>build status</small></h1>
       <div class="meta" id="meta">loading…</div>
+      <div class="meta" id="slots-overview"></div>
       <nav class="tabs" role="tablist" aria-label="Status sections">
         <a href="#issues" data-tab="issues" role="tab"
           >Issue trees<span class="tabn" id="tabn-issues"></span
         ></a>
         <a href="#loops" data-tab="loops" role="tab"
           >Loops<span class="tabn" id="tabn-loops"></span
+        ></a>
+        <a href="#slots" data-tab="slots" role="tab"
+          >Slots<span class="tabn" id="tabn-slots"></span
         ></a>
         <a href="#features" data-tab="features" role="tab"
           >Features<span class="tabn" id="tabn-features"></span
@@ -1713,6 +1787,12 @@
             <h2>Recent loop events</h2>
             <ul class="list mono" id="events"></ul>
           </div>
+        </section>
+      </section>
+      <section class="tab hidden" id="tab-slots" data-tab="slots">
+        <section class="panel" id="slots-panel">
+          <h2>Loop slots</h2>
+          <div id="slots-body" class="muted">loading…</div>
         </section>
       </section>
       <section class="tab hidden" id="tab-issues" data-tab="issues">
@@ -1852,6 +1932,10 @@
       let LOOPS = null
       let LOOP_SRC = 'build snapshot'
       let LAST_LOOP_REFRESH = 0
+      let SLOTS = null
+      let SLOTS_SRC = 'build snapshot'
+      // slots.mjs + slotsHtml.mjs (#193), copied next to this page by build-status.mjs.
+      let SLOTS_VIEW = null
 
       function ago(iso) {
         if (!iso) return '—'
@@ -1951,7 +2035,7 @@
             const ex = entries.find((x) => x.loop === e.loop && x.extra) || {}
             const sum =
               ex.extra && ex.extra.active !== undefined
-                ? ` <span class="muted">· ${ex.extra.active}/${ex.extra.max} slots busy</span>`
+                ? ` <span class="muted">· ${ex.extra.active}/${ex.extra.max} slots busy${claudeAccountsSummary(e.loop)}</span>`
                 : ''
             rows.push(
               `<tr class="group"><td colspan="5">${esc(e.loop)}${sum}${e.source === 'actions' ? ' <span class="muted">(from Actions)</span>' : ''}</td></tr>`,
@@ -2241,6 +2325,41 @@
         for (const ch of tree.children) if (!ch.classList.contains('roothead')) visit(ch)
       }
 
+      // ---------- slots (#193): the loop's Grok and Claude pools from slots.json ----------
+      function slotsModel() {
+        if (!SLOTS_VIEW) return null
+        return SLOTS ? SLOTS_VIEW.model.readSlotsSnapshot(SLOTS) : { error: 'not published yet' }
+      }
+      function claudeAccountsSummary(loop) {
+        const model = loop === SLOTS_VIEW?.model.SLOTS_LOOP ? slotsModel() : null
+        if (!model || model.error) return ''
+        return ` · Claude ${esc(SLOTS_VIEW.model.claudeUsageByAccount(model))}`
+      }
+      function showSlotsFailure(error) {
+        $('#slots-body').innerHTML = SLOTS_VIEW.html.renderSlotsFailure(error)
+        $('#slots-overview').innerHTML = ''
+        $('#tabn-slots').textContent = '!'
+        $('#tabn-slots').classList.add('bad')
+      }
+      function showSlots(model) {
+        const { model: rules, html } = SLOTS_VIEW
+        const nowMs = Date.now()
+        const freshness = rules.slotsFreshness(model, rules.heartbeatsOfLoop(LOOPS), nowMs)
+        const titles = Object.fromEntries(DATA.issues.map((i) => [i.number, i.title]))
+        const view = { repo: DATA.repo, nowMs, freshness, titles }
+        $('#slots-body').innerHTML = html.renderSlotsPanel(model, view)
+        $('#slots-overview').innerHTML = html.renderSlotsOverview(model, freshness)
+        $('#tabn-slots').textContent = rules.slotsTabBadge(model)
+        $('#tabn-slots').classList.toggle('warn', freshness.isStale)
+      }
+      function renderSlots() {
+        if (!SLOTS_VIEW || !DATA) return
+        $('#tabn-slots').classList.remove('bad', 'warn')
+        const model = slotsModel()
+        if (model.error) showSlotsFailure(model.error)
+        else showSlots(model)
+      }
+
       function renderMeta() {
         const run = DATA.run
         $('#meta').innerHTML =
@@ -2248,9 +2367,10 @@
           · ${run ? `<a href="${esc(run.url)}">Actions run #${esc(run.id)}</a> (${esc(run.event)})` : 'local build'}
           · <a href="${esc(DATA.workflowUrl)}">workflow</a>
           · loops: <b>${esc(LOOP_SRC)}</b>${LOOPS && LOOPS.updated_at ? ' updated ' + ago(LOOPS.updated_at) : ''}
+          · slots: <b>${esc(SLOTS_SRC)}</b>
           · <a href="../">▶ play the game</a>`
         $('#footer').innerHTML =
-          `Issue data refreshes on every Pages build (schedule ~10 min, issue events, pushes). Loop state is re-read live from the <code>${esc(DATA.loopBranch)}</code> branch every 60 s while the page is visible. A loop is STALE when its heartbeat is older than ${STALE_MIN} min. Publish state with <code>scripts/status/loop-status.sh</code> — see <a href="https://github.com/${esc(DATA.repo)}/blob/main/docs/loop-status.md">docs/loop-status.md</a>.`
+          `Issue data refreshes on every Pages build (schedule ~10 min, issue events, pushes). Loop state is re-read live from the <code>${esc(DATA.loopBranch)}</code> branch every 60 s while the page is visible. A loop is STALE when its heartbeat is older than ${STALE_MIN} min. The Slots tab reads <code>slots.json</code> from the same branch; it is STALE when neither the snapshot nor the build loop's heartbeat is recent. Publish state with <code>scripts/status/loop-status.sh</code> — see <a href="https://github.com/${esc(DATA.repo)}/blob/main/docs/loop-status.md">docs/loop-status.md</a>.`
       }
 
       // The live loop state comes from the GitHub API (fresh) or raw.githubusercontent.com (CDN,
@@ -2280,49 +2400,71 @@
           /* storage blocked */
         }
       }
-      async function refreshLoops() {
-        const urls = []
-        if (Date.now() >= API_GATE.notBefore) {
-          urls.push([
-            'live',
-            `https://api.github.com/repos/${DATA.repo}/contents/loops.json?ref=${DATA.loopBranch}`,
-            { headers: { Accept: 'application/vnd.github.raw' }, cache: 'no-store' },
-          ])
+      // One API call resolves the branch head; loops.json and slots.json are then read from raw at
+      // that commit (immutable, so no stale CDN copy, and outside the API quota). Without the
+      // head (quota spent, API down) both come from raw at the branch, up to ~5 min old.
+      async function loopBranchHead() {
+        if (Date.now() < API_GATE.notBefore) return null
+        try {
+          const r = await fetch(
+            `https://api.github.com/repos/${DATA.repo}/commits/${DATA.loopBranch}`,
+            { headers: { Accept: 'application/vnd.github.sha' }, cache: 'no-store' },
+          )
+          noteRateLimit(r)
+          return r.ok ? (await r.text()).trim() : null
+        } catch (_) {
+          return null
         }
-        urls.push([
-          'live (raw, ≤5 min cache)',
-          `https://raw.githubusercontent.com/${DATA.repo}/${DATA.loopBranch}/loops.json`,
-          { cache: 'no-store' },
-        ])
-        for (const [src, u, opt] of urls) {
+      }
+      function loopBranchSources(head) {
+        const raw = `https://raw.githubusercontent.com/${DATA.repo}`
+        const sources = [['live (raw, ≤5 min cache)', `${raw}/${DATA.loopBranch}`]]
+        return head ? [['live', `${raw}/${head}`], ...sources] : sources
+      }
+      async function fetchLoopBranchFile(sources, file, isUsable) {
+        for (const [src, base] of sources) {
           try {
-            const r = await fetch(u, opt)
-            if (src === 'live') noteRateLimit(r)
+            const r = await fetch(`${base}/${file}`, { cache: 'no-store' })
             if (!r.ok) continue
-            const j = await r.json()
-            if (j && j.entries) {
-              if (
-                !LOOPS ||
-                !LOOPS.updated_at ||
-                !j.updated_at ||
-                j.updated_at >= LOOPS.updated_at
-              ) {
-                LOOPS = j
-                LOOP_SRC = src
-              }
-              LAST_LOOP_REFRESH = Date.now()
-              return true
-            }
+            const doc = await r.json()
+            if (isUsable(doc)) return { src, doc }
           } catch (_) {
             /* try next */
           }
         }
-        return false
+        return null
+      }
+      // A cached raw copy must not replace a newer snapshot already shown.
+      const isNotOlder = (doc, shown) =>
+        !shown || !shown.updated_at || !doc.updated_at || doc.updated_at >= shown.updated_at
+      function acceptLoops(found) {
+        if (!found) return
+        if (isNotOlder(found.doc, LOOPS)) {
+          LOOPS = found.doc
+          LOOP_SRC = found.src
+        }
+        LAST_LOOP_REFRESH = Date.now()
+      }
+      function acceptSlots(found) {
+        if (!found || !isNotOlder(found.doc, SLOTS)) return
+        SLOTS = found.doc
+        SLOTS_SRC = found.src
+      }
+      async function refreshLoops() {
+        const sources = loopBranchSources(await loopBranchHead())
+        const [loops, slots] = await Promise.all([
+          fetchLoopBranchFile(sources, 'loops.json', (j) => j && j.entries),
+          fetchLoopBranchFile(sources, 'slots.json', (j) => j !== null && typeof j === 'object'),
+        ])
+        acceptLoops(loops)
+        acceptSlots(slots)
+        return Boolean(loops || slots)
       }
 
       function renderAll() {
         renderMeta()
         renderLoops()
+        renderSlots()
         renderTree()
         renderIssueList()
         renderPerfWork()
@@ -2337,6 +2479,7 @@
           $('#iss-list').innerHTML = `<p class="bad">Issue filter failed to load: ${esc(e)}</p>`
           return null
         })
+        if (!SLOTS || !SLOTS_SRC.startsWith('live')) SLOTS = DATA.slots ?? null
         renderAll()
         loadFeatures().catch((e) => {
           $('#ft-error').innerHTML =
@@ -2722,11 +2865,12 @@
         }),
       )
 
-      // ---------- tabs: #issues, #loops (default), #features, #performance; `#features?q=lava`
+      // ---------- tabs: #issues, #loops (default), #slots, #features, #performance; `#features?q=lava`
       // pre-fills search; the old #perf-panel and a chart's own #metric-… id open Performance.
       const TABS = {
         issues: 'Issue trees',
         loops: 'Loops',
+        slots: 'Slots',
         features: 'Features',
         performance: 'Performance',
       }
@@ -2807,12 +2951,24 @@
       load().catch((e) => {
         $('#meta').textContent = 'failed to load status.json: ' + e
       })
+      Promise.all([import('./slots.mjs'), import('./slotsHtml.mjs')])
+        .then(([model, html]) => {
+          SLOTS_VIEW = { model, html }
+          if (!DATA) return
+          renderLoops()
+          renderSlots()
+        })
+        .catch((e) => {
+          $('#slots-body').innerHTML =
+            `<div class="warn">Slots view failed to load: ${esc(e)}</div>`
+        })
       async function pollLoops() {
         if (!DATA || document.hidden) return
         if (await refreshLoops()) {
           renderMeta()
           renderLoops()
           renderIssueList()
+          renderSlots()
           renderPerfWork()
         }
       }
@@ -2825,6 +2981,7 @@
         if (DATA) {
           renderMeta()
           renderIssueList()
+          renderSlots()
           renderPerfBadge()
           renderPerfTimes()
         }

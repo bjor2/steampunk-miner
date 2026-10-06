@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Builds the status dashboard (dist/status/) that the Pages workflow deploys next to the game:
 // the issue trees (sub-issue hierarchy) from GraphQL, the loop state from loops.json on the
-// orphan `loop-status` branch, the last run of each workflow, the Performance charts from
-// the committed docs/perf/ files (static HTML + SVG, no script), the "Where the time goes"
+// orphan `loop-status` branch (and the loop's slot pools from slots.json there, #193), the last
+// run of each workflow, the Performance charts from the committed docs/perf/ files (static
+// HTML + SVG, no script), the "Where the time goes"
 // section of the Issue trees tab from the committed docs/metrics/tickets/ files (#134), and the
 // game feature tree from docs/features/features.json joined with the live issue states, with
 // those ticket times rolled up per feature and area (#135) over each ticket's claimed-to-done
@@ -55,8 +56,16 @@ const TICKETS_CLOSED_PLACEHOLDER = '<!-- tickets-closed -->'
 const DAY_LENGTH = 'YYYY-MM-DD'.length
 const FEATURES_FILE = 'docs/features/features.json'
 const FEATURES_PATH = join(HERE, '..', '..', FEATURES_FILE)
-// The page imports these as they are: the Issue trees filter and cards (#194).
-const PAGE_MODULES = ['issueBuckets.mjs', 'issueClaims.mjs', 'issueListHtml.mjs']
+// The page imports these as they are: the Issue trees filter and cards (#194), and the Slots tab,
+// which renders live from them (#193).
+const PAGE_MODULES = [
+  'issueBuckets.mjs',
+  'issueClaims.mjs',
+  'issueListHtml.mjs',
+  'slots.mjs',
+  'slotsHtml.mjs',
+  'perfOverviewHtml.mjs',
+]
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
 const [OWNER, NAME] = REPO.split('/')
 const LOOP_BRANCH = process.env.LOOP_STATUS_BRANCH || 'loop-status'
@@ -194,12 +203,13 @@ async function fetchLoops() {
   }
 }
 
-// The loop's published slot snapshot, next to loops.json (loop README "slots.json v2"). Only the
-// documented fields are kept: the page is public.
+// The loop's published slot snapshot, next to loops.json (loop README "slots.json v2"): the issue
+// cards (#194) and the Slots tab's first paint (#193; the page re-reads it live). Only the
+// documented fields and the pool caps are kept: the page is public.
 function publishedSlotsOf(doc) {
   if (!doc) return null
-  const { updated_at, accounts, grok, claude } = doc
-  return { updated_at, accounts, grok, claude }
+  const { updated_at, caps, accounts, grok, claude } = doc
+  return { updated_at, caps, accounts, grok, claude }
 }
 
 async function fetchSlots() {

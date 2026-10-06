@@ -1,7 +1,7 @@
 // Renders the Slots tab of /status/ (#193) and its one-line overview in the page header from the
 // model of slots.mjs: the Grok agent pool, then the Claude Code pool per account, each slot with
 // its state, ticket link, linked slot in the other pool and since-time. A Grok slot and the Claude
-// slot it runs share a colour (`--pair`, from the Grok slot number). Static HTML strings; the
+// slot it runs share a hue (`--pair-hue`, from the Grok slot number). Static HTML strings; the
 // page re-renders them on every live fetch. The classes come from scripts/status/index.html.
 import { escapeHtml } from './perfOverviewHtml.mjs'
 import { SLOTS_STALE_AFTER_MIN, claudeUsageByAccount } from './slots.mjs'
@@ -25,7 +25,7 @@ export function ageOf(stamp, nowMs) {
 }
 
 function pairStyle(grokSlot) {
-  return `--pair:hsl(${(grokSlot * PAIR_HUE_STEP) % FULL_TURN} 55% 62%)`
+  return `--pair-hue:${(grokSlot * PAIR_HUE_STEP) % FULL_TURN}`
 }
 
 function pairChip(text, grokSlot) {
