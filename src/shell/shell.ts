@@ -12,8 +12,9 @@ import type {
 } from '../../electron/bridgeContract.cts'
 import { createBrowserShell } from './browserShell'
 import { createElectronShell } from './electronShell'
+import type { PageMemory } from './pageMemory'
 
-export type { AppInfo, RunDocumentName }
+export type { AppInfo, PageMemory, RunDocumentName }
 
 export interface LaunchParameters {
   /** The debug/scenario API is exposed: the dev build, `?debug` in a browser, `--debug-api` in Electron. */
@@ -63,6 +64,10 @@ export interface Shell {
   onScrollNotch(listener: (notch: ScrollNotch) => void): () => void
   /** Runs when the page is hidden or closing: the last chance to flush the run log. */
   onPageHide(callback: () => void): void
+  /** Starts counting the page's event listeners; test runs only, before the scene mounts (#121). */
+  watchPageListeners(): void
+  /** The page's JS heap, DOM elements and counted listeners now, for `memory_sample` (#121). */
+  readPageMemory(): PageMemory
 }
 
 /**

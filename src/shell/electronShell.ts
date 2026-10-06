@@ -1,6 +1,8 @@
 /** The shell under Electron: forwards to the contextBridge object the preload exposed. */
 import type { ShellBridge } from '../../electron/bridgeContract.cts'
 import { readElectronLaunchParameters } from './launchParameters'
+import { watchPageListeners } from './listenerCount'
+import { readPageMemory } from './pageMemory'
 import {
   exposeOnWindow,
   listenForKeys,
@@ -31,5 +33,7 @@ export function createElectronShell(bridge: ShellBridge): Shell {
     onPageHide: runOnPageHide,
     onKeyChange: listenForKeys,
     onScrollNotch: listenForScrollNotches,
+    watchPageListeners,
+    readPageMemory,
   }
 }

@@ -6,6 +6,8 @@
  */
 import { keepNewestLines } from '../logging/ndjson'
 import { readBrowserLaunchParameters } from './launchParameters'
+import { watchPageListeners } from './listenerCount'
+import { readPageMemory } from './pageMemory'
 import {
   exposeOnWindow,
   listenForKeys,
@@ -56,6 +58,8 @@ export function createBrowserShell(): Shell {
     onPageHide: runOnPageHide,
     onKeyChange: listenForKeys,
     onScrollNotch: listenForScrollNotches,
+    watchPageListeners,
+    readPageMemory,
   }
 }
 
