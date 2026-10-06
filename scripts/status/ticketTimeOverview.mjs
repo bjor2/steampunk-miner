@@ -2,7 +2,9 @@
 // ticket phase files (docs/metrics/tickets/*.json) as the last closed tickets' breakdowns, the
 // category totals per close day and the median cycle and lead time per close day. Pure: no fs, no
 // clock, so the Pages job (no transcripts there) and the tests feed it the same file texts. The
-// Features tab rolls the same tickets up per feature (featureTime.mjs, #135).
+// Features tab rolls the same tickets up per feature (featureTime.mjs, #135), counting only their
+// claimed-to-done window (#138).
+import { claimedWindowTotals } from '../metrics/claimedWindow.mjs'
 import { PHASE_CATEGORIES, TICKET_PHASES_SCHEMA, zeroTotals } from '../metrics/phaseCategories.mjs'
 
 export const RECENT_TICKET_COUNT = 30
@@ -49,6 +51,21 @@ function fullTotalsOf(totals) {
   return full
 }
 
+function claimedOf(record) {
+  return Number.isFinite(Date.parse(record.claimed)) ? record.claimed : null
+}
+
+function segmentsOf(record) {
+  return Array.isArray(record.segments) ? record.segments : []
+}
+
+// A ticket never claimed (closed with no session) has no window: the Features tab leaves it
+// unmeasured.
+function claimedTotalsOf(record) {
+  const claimed = claimedOf(record)
+  return claimed ? claimedWindowTotals(segmentsOf(record), claimed, record.closed) : null
+}
+
 function ticketOf(record, repo) {
   return {
     ticket: record.ticket,
@@ -60,6 +77,9 @@ function ticketOf(record, repo) {
     totals: fullTotalsOf(record.totals),
     leadS: secondsOrNull(record.lead_time_s),
     cycleS: secondsOrNull(record.cycle_time_s),
+    claimed: claimedOf(record),
+    claimedToDoneS: secondsOrNull(record.claimed_to_done_s),
+    claimedTotals: claimedTotalsOf(record),
     backfilled: record.backfilled === true,
   }
 }

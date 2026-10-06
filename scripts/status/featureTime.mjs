@@ -2,13 +2,15 @@
 // feature's tickets are its `issues` plus every sub-issue of an umbrella it lists, followed down;
 // a group's tickets are the union of its own and its children's. Each node counts a ticket once,
 // however many paths reach it, so a shared ticket never doubles a total. A ticket with no
-// docs/metrics/tickets file is "not measured": counted, never added as zero time. Pure: the
-// sub-issues come from the live issue list and the times from ticketTimeOverview's tickets.
+// docs/metrics/tickets file, or never claimed, is "not measured": counted, never added as zero time.
+// Only each ticket's claimed-to-done window counts (#138): time before its first claim is left out,
+// a block or planner wait after it is kept. Pure: the sub-issues come from the live issue list and
+// the times from ticketTimeOverview's tickets.
 import { zeroTotals } from '../metrics/phaseCategories.mjs'
 import { medianOf } from './ticketTimeOverview.mjs'
 
-// The median cycle time of one ticket says nothing about a feature, so it needs this many.
-export const MEDIAN_CYCLE_MIN_TICKETS = 2
+// The median of one ticket is just its time, so the median needs this many.
+export const MEDIAN_MIN_TICKETS = 2
 
 /** The issue numbers and every sub-issue under them, followed down; a loop is followed once. */
 export function ticketsUnderIssues(numbers, subIssuesOf) {
@@ -41,28 +43,32 @@ function sumOf(totals) {
   return Object.values(totals).reduce((sum, seconds) => sum + seconds, 0)
 }
 
-function medianCycleOf(measured) {
-  if (measured.length < MEDIAN_CYCLE_MIN_TICKETS) return null
-  return medianOf(measured.map((ticket) => ticket.cycleS))
+function medianClaimedToDoneOf(measured) {
+  if (measured.length < MEDIAN_MIN_TICKETS) return null
+  return medianOf(measured.map((ticket) => ticket.claimedToDoneS))
 }
 
 /**
- * The time of a set of ticket numbers: seconds per category and in all over the measured tickets,
- * the measured and not measured counts, and the median cycle time from two measured tickets on.
- * `measuredByNumber`: ticket number -> `{ totals, cycleS }` (ticketTimeOverview's tickets).
+ * The claimed-to-done time of a set of ticket numbers: seconds per category and in all over the
+ * measured tickets, the measured and not measured counts, and the median claimed-to-done time
+ * from two measured tickets on. `measuredByNumber`: ticket number ->
+ * `{ claimedTotals, claimedToDoneS }` (ticketTimeOverview's tickets).
  */
 export function rollUpTicketTime(numbers, measuredByNumber) {
   const measured = [...numbers]
     .filter((n) => measuredByNumber.has(n))
     .map((n) => measuredByNumber.get(n))
-  const totals = measured.reduce((sum, ticket) => addTotals(sum, ticket.totals), zeroTotals())
+  const totals = measured.reduce(
+    (sum, ticket) => addTotals(sum, ticket.claimedTotals),
+    zeroTotals(),
+  )
   return {
     ticketCount: numbers.size,
     measuredCount: measured.length,
     unmeasuredCount: numbers.size - measured.length,
     measuredS: sumOf(totals),
     totals,
-    medianCycleS: medianCycleOf(measured),
+    medianClaimedToDoneS: medianClaimedToDoneOf(measured),
   }
 }
 
@@ -78,7 +84,11 @@ export function subIssuesOfIssues(issues) {
   )
 }
 
-/** Ticket number -> its measured ticket, from ticketTimeOverview's `tickets`. */
+function isClaimed(ticket) {
+  return ticket.claimedTotals !== null && ticket.claimedTotals !== undefined
+}
+
+/** Ticket number -> its measured ticket (one with a claim), from ticketTimeOverview's `tickets`. */
 export function measuredByNumberOf(tickets) {
-  return new Map(tickets.map((ticket) => [ticket.ticket, ticket]))
+  return new Map(tickets.filter(isClaimed).map((ticket) => [ticket.ticket, ticket]))
 }

@@ -153,7 +153,7 @@ describe('annotateFeatures', () => {
       ],
     }
     const issues = [issue(90, 'CLOSED', { children: [91] }), issue(91, 'CLOSED'), issue(92, 'OPEN')]
-    const measured = [{ ticket: 91, totals: { developing: 600 }, cycleS: 900 }]
+    const measured = [{ ticket: 91, claimedTotals: { developing: 600 }, claimedToDoneS: 900 }]
     const out = annotateFeatures(doc, issues, measured)
     const [umbrella, shared] = out.areas[0].children
     expect(umbrella.time).toMatchObject({ ticketCount: 2, measuredCount: 1, measuredS: 600 })

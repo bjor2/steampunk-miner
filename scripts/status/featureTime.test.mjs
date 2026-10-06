@@ -5,17 +5,49 @@ import { buildTicketTimeOverview } from './ticketTimeOverview.mjs'
 
 const HOUR = 3600
 
-function ticketFile(ticket, totals, cycle = HOUR) {
+const HOUR_MS = HOUR * 1000
+const CLAIMED_MS = Date.parse('2026-10-05T10:00:00Z')
+
+function iso(ms) {
+  return new Date(ms).toISOString()
+}
+
+// A committed file whose ticket sat an hour blocked before its claim, then spent `totals` end to
+// end until its close. `claimedToDone` defaults to that window's length.
+function ticketFile(ticket, totals, claimedToDone) {
+  const segments = [{ category: 'blocked', start: iso(CLAIMED_MS - HOUR_MS), end: iso(CLAIMED_MS) }]
+  let at = CLAIMED_MS
+  for (const [category, seconds] of Object.entries(totals)) {
+    segments.push({ category, start: iso(at), end: iso(at + seconds * 1000) })
+    at += seconds * 1000
+  }
+  const windowS = (at - CLAIMED_MS) / 1000
   const record = {
     schema: 1,
     ticket,
     title: `Ticket ${ticket}`,
-    created: '2026-10-05T00:00:00Z',
-    closed: '2026-10-06T00:00:00Z',
-    segments: [],
-    totals,
-    lead_time_s: 2 * HOUR,
-    cycle_time_s: cycle,
+    created: iso(CLAIMED_MS - HOUR_MS),
+    closed: iso(at),
+    segments,
+    totals: { ...totals, blocked: HOUR },
+    lead_time_s: windowS + HOUR,
+    cycle_time_s: windowS,
+    claimed: iso(CLAIMED_MS),
+    claimed_to_done_s: claimedToDone ?? windowS,
+  }
+  return { name: `${ticket}.json`, text: JSON.stringify(record) }
+}
+
+function unclaimedTicketFile(ticket) {
+  const record = {
+    schema: 1,
+    ticket,
+    closed: iso(CLAIMED_MS),
+    segments: [{ category: 'idle', start: iso(CLAIMED_MS - HOUR_MS), end: iso(CLAIMED_MS) }],
+    totals: { idle: HOUR },
+    cycle_time_s: null,
+    claimed: null,
+    claimed_to_done_s: null,
   }
   return { name: `${ticket}.json`, text: JSON.stringify(record) }
 }
@@ -50,6 +82,20 @@ describe('feature time roll-up', () => {
     expect(time.totals.idle).toBe(600)
     expect(time.measuredS).toBe(HOUR + 60 + 30 + 600)
     expect(Object.keys(time.totals)).toEqual(CATEGORY_IDS)
+  })
+
+  it("leaves the time before each ticket's claim out of the feature", () => {
+    const sources = sourcesOf([ticketFile(10, { developing: HOUR, planner_wait: 600 })])
+    const time = featureTimeOf(feature('Drill', [10]), sources)
+    expect(time.totals.blocked).toBe(0)
+    expect(time.totals.planner_wait).toBe(600)
+    expect(time.measuredS).toBe(HOUR + 600)
+  })
+
+  it('counts a ticket that was never claimed as not measured', () => {
+    const sources = sourcesOf([ticketFile(10, { developing: HOUR }), unclaimedTicketFile(11)])
+    const time = featureTimeOf(feature('Drill', [10, 11]), sources)
+    expect(time).toMatchObject({ measuredCount: 1, unmeasuredCount: 1, measuredS: HOUR })
   })
 
   it('counts a ticket once when a feature reaches it directly and through an umbrella', () => {
@@ -97,7 +143,7 @@ describe('feature time roll-up', () => {
     const time = featureTimeOf(feature('Drill', [7, 8]), sourcesOf([]))
     expect(time).toMatchObject({ ticketCount: 2, measuredCount: 0, unmeasuredCount: 2 })
     expect(time.measuredS).toBe(0)
-    expect(time.medianCycleS).toBeNull()
+    expect(time.medianClaimedToDoneS).toBeNull()
   })
 
   it('gives a feature with no issues no tickets', () => {
@@ -106,14 +152,16 @@ describe('feature time roll-up', () => {
     expect(time.measuredS).toBe(0)
   })
 
-  it('shows the median cycle time only from two measured tickets on', () => {
+  it('shows the median claimed-to-done time only from two measured tickets on', () => {
     const sources = sourcesOf([
       ticketFile(10, { developing: 60 }, HOUR),
       ticketFile(11, { developing: 60 }, 3 * HOUR),
       ticketFile(12, { developing: 60 }, 8 * HOUR),
     ])
-    expect(featureTimeOf(feature('Drill', [10, 7]), sources).medianCycleS).toBeNull()
-    expect(featureTimeOf(feature('Drill', [10, 11]), sources).medianCycleS).toBe(2 * HOUR)
-    expect(featureTimeOf(feature('Drill', [10, 11, 12]), sources).medianCycleS).toBe(3 * HOUR)
+    expect(featureTimeOf(feature('Drill', [10, 7]), sources).medianClaimedToDoneS).toBeNull()
+    expect(featureTimeOf(feature('Drill', [10, 11]), sources).medianClaimedToDoneS).toBe(2 * HOUR)
+    expect(featureTimeOf(feature('Drill', [10, 11, 12]), sources).medianClaimedToDoneS).toBe(
+      3 * HOUR,
+    )
   })
 })

@@ -1,7 +1,8 @@
 // Draws the ticket time roll-up of featureTime.mjs on the Features tab (#135): a compact stacked
-// bar with its total on every feature row and group heading (`timeHtml`, which the page's script
-// inserts), and above the tree a chart comparing the feature areas by measured time, split by
-// phase, under the same legend as "Where the time goes" on #issues. Static HTML with inline SVG;
+// bar with its total and median on every feature row and group heading (`timeHtml`, which the
+// page's script inserts), and above the tree a chart comparing the feature areas by measured time,
+// split by phase, under the same legend as "Where the time goes" on #issues. Every time is the
+// tickets' claimed-to-done window (#138). Static HTML with inline SVG;
 // the colours come from phaseCategories.mjs, the classes from scripts/status/index.html.
 import { escapeHtml } from './perfOverviewHtml.mjs'
 import {
@@ -23,17 +24,19 @@ function plural(count, word) {
 
 function measuredLine(time) {
   if (time.measuredCount === 0) return `${plural(time.ticketCount, 'ticket')}, none measured`
-  return `Measured: ${formatDuration(time.measuredS)} over ${time.measuredCount} of ${plural(time.ticketCount, 'ticket')}`
+  return `Claimed to done: ${formatDuration(time.measuredS)} over ${time.measuredCount} of ${plural(time.ticketCount, 'ticket')}`
 }
 
 function unmeasuredLines(time) {
-  return time.unmeasuredCount ? [`${time.unmeasuredCount} not measured (no metrics file)`] : []
+  return time.unmeasuredCount
+    ? [`${time.unmeasuredCount} not measured (no metrics file or never claimed)`]
+    : []
 }
 
 function medianLines(time) {
-  return time.medianCycleS === null
+  return time.medianClaimedToDoneS === null
     ? []
-    : [`Median ticket cycle: ${formatDuration(time.medianCycleS)}`]
+    : [`Median claimed to done: ${formatDuration(time.medianClaimedToDoneS)}`]
 }
 
 function categoryLines(time, categories) {
@@ -45,7 +48,7 @@ function categoryLines(time, categories) {
     )
 }
 
-/** The tooltip of a node's bar: what was measured, the median cycle, then each category's time. */
+/** The tooltip of a node's bar: what was measured, the median, then each category's time. */
 export function featureTimeTooltip(time, categories) {
   return [
     measuredLine(time),
@@ -65,6 +68,12 @@ function unmeasuredSuffix(time) {
     : ''
 }
 
+function medianSuffix(time) {
+  return time.medianClaimedToDoneS === null
+    ? ''
+    : ` <span class="ft-time-median">· median ${formatDuration(time.medianClaimedToDoneS)}</span>`
+}
+
 function nodeBarSvg(time, categories) {
   return (
     `<svg class="ft-time-bar" viewBox="0 0 ${NODE_BAR.width} ${NODE_BAR.height}" preserveAspectRatio="none" role="img" aria-label="time per phase">` +
@@ -77,7 +86,7 @@ function measuredNodeHtml(time, categories) {
   return (
     `<span class="ft-time" data-measured="${time.measuredCount}" title="${tooltipAttribute(featureTimeTooltip(time, categories))}">` +
     nodeBarSvg(time, categories) +
-    `<span class="ft-time-total">${formatDuration(time.measuredS)}</span>${unmeasuredSuffix(time)}</span>`
+    `<span class="ft-time-total">${formatDuration(time.measuredS)}</span>${medianSuffix(time)}${unmeasuredSuffix(time)}</span>`
   )
 }
 
@@ -102,10 +111,16 @@ export function withFeatureTimeBars(nodes, categories) {
   }))
 }
 
+function areaMedianText(time) {
+  return time.medianClaimedToDoneS === null
+    ? ''
+    : ` · median ${formatDuration(time.medianClaimedToDoneS)}`
+}
+
 // Like a node bar: an area with no measured ticket shows its count, never a zero time.
 function areaCountsText(time) {
   if (time.measuredCount === 0) return `${plural(time.ticketCount, 'ticket')}, none measured`
-  return `${formatDuration(time.measuredS)} · ${time.measuredCount} of ${plural(time.ticketCount, 'ticket')} measured`
+  return `${formatDuration(time.measuredS)}${areaMedianText(time)} · ${time.measuredCount} of ${plural(time.ticketCount, 'ticket')} measured`
 }
 
 function areaRowHtml(area, categories, scale) {
@@ -130,7 +145,8 @@ function overviewNoteHtml(time, repo) {
   const readme = `https://github.com/${repo}/${README_URL_PATH}`
   return (
     `<div class="tt-note">${time.measuredCount} of the ${plural(time.ticketCount, 'ticket')} linked from the tree have a ` +
-    `<code>docs/metrics/tickets/</code> file; umbrella issues bring in their sub-issues and a shared ticket counts once per ` +
+    `<code>docs/metrics/tickets/</code> file and a claim. Each counts from its first claim to its close: time before the claim is ` +
+    `left out, a block or planner wait after it keeps its own colour. Umbrella issues bring in their sub-issues and a shared ticket counts once per ` +
     `feature and area (<a href="${escapeHtml(readme)}">how it is measured</a>).</div>`
   )
 }

@@ -25,8 +25,8 @@ function closedIssue(number, children = []) {
   return { number, title: `Issue ${number}`, state: 'CLOSED', labels: [], children }
 }
 
-function measured(ticket, totals, cycleS = HOUR) {
-  return { ticket, totals, cycleS }
+function measured(ticket, claimedTotals, claimedToDoneS = HOUR) {
+  return { ticket, claimedTotals, claimedToDoneS }
 }
 
 const DOC = {
@@ -48,22 +48,23 @@ function annotated() {
 }
 
 describe('feature time html', () => {
-  it('draws a feature bar in the fixed colours with its total and its unmeasured count', () => {
+  it('draws a feature bar in the fixed colours with its total, median and unmeasured count', () => {
     const drill = annotated().areas[0].children[0]
     const html = featureTimeBarHtml(drill.time, PHASE_CATEGORIES)
     const colours = [...html.matchAll(/<rect [^>]*fill="(#[0-9a-f]{6})"/g)].map((m) => m[1])
     const colourOf = (id) => PHASE_CATEGORIES.find((category) => category.id === id).colour
     expect(colours).toEqual([colourOf('developing'), colourOf('testing')])
     expect(html).toContain('<span class="ft-time-total">4.0 h</span>')
+    expect(html).toContain('· median 2.0 h')
     expect(html).toContain('1 not measured')
   })
 
-  it('lists the measured time, counts, median cycle and per-category hours in the tooltip', () => {
+  it('lists the claimed-to-done time, counts, median and per-category hours in the tooltip', () => {
     const drill = annotated().areas[0].children[0]
     expect(featureTimeTooltip(drill.time, PHASE_CATEGORIES)).toEqual([
-      'Measured: 4.0 h over 2 of 3 tickets',
-      '1 not measured (no metrics file)',
-      'Median ticket cycle: 2.0 h',
+      'Claimed to done: 4.0 h over 2 of 3 tickets',
+      '1 not measured (no metrics file or never claimed)',
+      'Median claimed to done: 2.0 h',
       'Developing: 3.0 h (75%)',
       'Testing: 1.0 h (25%)',
     ])
@@ -95,7 +96,7 @@ describe('feature time html', () => {
     expect(html).toContain(phaseLegendHtml(PHASE_CATEGORIES, features.time.totals))
     expect(html.match(/<div class="ft-time-row" /g)).toHaveLength(2)
     expect(html).toContain('data-area="Vehicle &amp; &lt;Movement&gt;"')
-    expect(html).toContain('4.0 h · 2 of 3 tickets measured')
+    expect(html).toContain('4.0 h · median 2.0 h · 2 of 3 tickets measured')
     const economy = html.slice(html.indexOf('data-area="Economy"'))
     expect(economy).toContain('1 ticket, none measured')
     expect(economy).not.toContain('0 min')

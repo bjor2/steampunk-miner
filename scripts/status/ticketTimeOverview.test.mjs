@@ -84,4 +84,33 @@ describe('ticket time overview', () => {
     const model = build([])
     expect(model).toMatchObject({ ticketCount: 0, recent: [], days: [], problems: [] })
   })
+
+  it('cuts each ticket to its claimed-to-done window for the Features tab', () => {
+    const record = {
+      schema: 1,
+      ticket: 5,
+      title: 'Ticket 5',
+      created: '2026-10-06T08:00:00Z',
+      closed: '2026-10-06T11:00:00Z',
+      segments: [
+        { category: 'blocked', start: '2026-10-06T08:00:00Z', end: '2026-10-06T09:00:00Z' },
+        { category: 'developing', start: '2026-10-06T09:00:00Z', end: '2026-10-06T10:00:00Z' },
+        { category: 'planner_wait', start: '2026-10-06T10:00:00Z', end: '2026-10-06T11:00:00Z' },
+      ],
+      totals: { blocked: 3600, developing: 3600, planner_wait: 3600 },
+      claimed: '2026-10-06T09:00:00Z',
+      claimed_to_done_s: 7200,
+    }
+    const [ticket] = build([{ name: '5.json', text: JSON.stringify(record) }]).tickets
+    expect(ticket.claimed).toBe('2026-10-06T09:00:00Z')
+    expect(ticket.claimedToDoneS).toBe(7200)
+    expect(ticket.claimedTotals).toMatchObject({ blocked: 0, developing: 3600, planner_wait: 3600 })
+    expect(ticket.totals.blocked).toBe(3600)
+  })
+
+  it('gives a ticket that was never claimed no window', () => {
+    const [ticket] = build([ticketFile(6, '2026-10-06T10:00:00Z', { idle: 60 })]).tickets
+    expect(ticket.claimed).toBeNull()
+    expect(ticket.claimedTotals).toBeNull()
+  })
 })
