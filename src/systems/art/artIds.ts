@@ -5,6 +5,7 @@
  * which `scripts/art/asset_layout.py` reads too.
  */
 import ASSET_RULES from '../../../art/asset-rules.json'
+import { REFINERY_BAY_LOOKS } from '../authority/platformState'
 import { BAND_COUNT } from '../world/planetGeometry'
 import { ENEMY_IDS, PLATFORM_BAY_IDS, PLATFORM_VISUAL_STATES, UPGRADE_IDS } from '../registeredIds'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
@@ -85,7 +86,7 @@ export function blenderAssetIds(): string[] {
 
 /**
  * Every vector icon file stem, which is also its `data-testid` (#51 acceptance 3): one per upgrade
- * track, the casing row's icon (#54 scope review) and the two bay emblems (#51 "HUD and bay chrome").
+ * track, the casing row's icon (#54 scope review) and one emblem per bay (#51 "HUD and bay chrome").
  */
 export function vectorIconIds(): string[] {
   return [
@@ -126,11 +127,21 @@ function numbered(prefix: string, count: number): string[] {
 }
 
 /**
- * Part ids outside the vehicle: each single-part asset's own id, and the hub's two visual states
- * (#8 `outpost`, `core_drive`), which are its collections in Blender (#52).
+ * Part ids outside the vehicle: each single-part asset's own id, the hub's two visual states
+ * (#8 `outpost`, `core_drive`), which are its collections in Blender (#52), and the refinery
+ * bay's three looks drawn over its frame (#105).
  */
 export function registryPartIds(): string[] {
-  return [...blenderAssetIds(), ...PLATFORM_VISUAL_STATES.map(kebabOf)]
+  return [
+    ...blenderAssetIds(),
+    ...PLATFORM_VISUAL_STATES.map(kebabOf),
+    ...REFINERY_BAY_LOOKS.map(refineryLookPartIdOf),
+  ]
+}
+
+/** The refinery bay part that shows one of its looks: `refinery-idle`, `-refining`, `-ready`. */
+export function refineryLookPartIdOf(look: string): string {
+  return `refinery-${kebabOf(look)}`
 }
 
 /** A tiered part is `t<tier>-<part>`, a repeat adds `-<n>` from 2 (`t1-wheel-2`). */

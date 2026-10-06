@@ -1,0 +1,54 @@
+{
+  "assetId": "platform-bay-refinery",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-bay-refinery/platform-bay-refinery.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [2048, 1024],
+  "maps": {
+    "albedo": "platform-bay-refinery.albedo.ktx2",
+    "normal": "platform-bay-refinery.normal.ktx2",
+    "emissive": "platform-bay-refinery.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "platform-bay-refinery",
+      "tier": 1,
+      "rect": [8, 8, 1024, 768],
+      "sizeM": [4.0, 3.0],
+      "pivotM": [2.0, 0.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "refinery-idle",
+      "tier": 1,
+      "rect": [574, 792, 139, 118],
+      "sizeM": [0.54, 0.46],
+      "pivotM": [0.27, 0.0],
+      "atM": [-0.75, 0.72],
+      "z": 1
+    },
+    {
+      "id": "refinery-ready",
+      "tier": 1,
+      "rect": [8, 792, 550, 118],
+      "sizeM": [2.1473, 0.46],
+      "pivotM": [0.27, 0.0],
+      "atM": [-0.75, 0.72],
+      "z": 1
+    },
+    {
+      "id": "refinery-refining",
+      "tier": 1,
+      "rect": [1048, 8, 561, 127],
+      "sizeM": [2.19, 0.495],
+      "pivotM": [0.3, 0.02],
+      "atM": [-0.75, 0.72],
+      "z": 1
+    }
+  ]
+}

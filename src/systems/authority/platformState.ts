@@ -13,8 +13,20 @@ export const FACILITY_IDS = ['shop', 'workshop', 'charging'] as const
 
 export const FACILITY_LEVEL = 1
 
-/** The two docking bays of #37 (`Dock { bay }`): selling and upgrading are separate stops. */
-export const PLATFORM_BAY_IDS = ['sell', 'upgrade'] as const
+/**
+ * The platform's bay modules: the two docking bays of #37 (`Dock { bay }`, `BAY_IDS`), where
+ * selling and upgrading are separate stops, and the refinery bay of #105, whose art exists before
+ * its build (#92) gives it a pad zone. Art, emblem and screen ids derive from these.
+ */
+export const PLATFORM_BAY_IDS = ['sell', 'upgrade', 'refinery'] as const
+
+export type PlatformBayId = (typeof PLATFORM_BAY_IDS)[number]
+
+/**
+ * What the refinery bay shows (#105 art): `idle` with the furnace shut, `refining` while a batch
+ * runs (lit furnace and molten moulds, smoke from the stack), `ready` with an ingot stack waiting.
+ */
+export const REFINERY_BAY_LOOKS = ['idle', 'refining', 'ready'] as const
 
 export interface PlatformState {
   coreBay: number

@@ -80,6 +80,18 @@
       "color": "#b87333"
     },
     {
+      "id": "platform-bay-refinery",
+      "source": "blender",
+      "form": "parts",
+      "status": "final",
+      "color": "#a4502a",
+      "partColors": {
+        "refinery-idle": "#3b3631",
+        "refinery-ready": "#c9a24b",
+        "refinery-refining": "#ff7a33"
+      }
+    },
+    {
       "id": "platform-bay-sell-backdrop",
       "source": "blender",
       "form": "backdrop",
@@ -88,6 +100,13 @@
     },
     {
       "id": "platform-bay-upgrade-backdrop",
+      "source": "blender",
+      "form": "backdrop",
+      "status": "final",
+      "color": "#2a2623"
+    },
+    {
+      "id": "platform-bay-refinery-backdrop",
       "source": "blender",
       "form": "backdrop",
       "status": "final",
@@ -241,6 +260,12 @@
     },
     {
       "id": "emblem-bay-upgrade",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
+    },
+    {
+      "id": "emblem-bay-refinery",
       "source": "vector",
       "form": "svg",
       "status": "placeholder"

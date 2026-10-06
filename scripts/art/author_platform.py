@@ -1,12 +1,13 @@
 """
 Authors the first version of the platform's Blender sources (S7b, #67): the hub with its two
 visual states (#8 `outpost`, `core-drive`) and the Sell and Upgrade bays, each bay with the
-staging (camera, lights, floor and wall) its screen backdrop renders with (#45, #51).
+staging (camera, lights, floor and wall) its screen backdrop renders with (#45, #51). The
+Refinery bay (#106, spec #105) joined later in the same way, with its three looks as parts.
 
     blender -b --factory-startup --python-exit-code 1 -P scripts/art/author_platform.py
 
-It writes art/blender/<id>/<id>.blend for platform-hub, platform-bay-sell and
-platform-bay-upgrade, or only the ids given after `--`. From then on those files are the sources (#52): change the art in Blender
+It writes art/blender/<id>/<id>.blend for platform-hub, platform-bay-sell, platform-bay-upgrade
+and platform-bay-refinery, or only the ids given after `--`. From then on those files are the sources (#52): change the art in Blender
 and re-export, rather than editing this script. Nothing here is rigged (#51 acceptance 2).
 
 Conventions (#52, docs/art-pipeline.md): 1 unit = 1 m, game right is +X, up is +Z, the camera
@@ -15,7 +16,8 @@ placeholder id, its origin the placeholder's pivot (bottom centre), at the place
 and its bounds the placeholder's `sizeM`, so the real art drops into the placeholder's place.
 Materials are dielectric: Cycles' diffuse colour pass, which the albedo bake reads, is black on a
 metallic surface. The look is #48's lit brass on dark iron; Sell is copper and amber with an
-assay scale, Upgrade steel and teal with a gear and wrench (#45).
+assay scale, Upgrade steel and teal with a gear and wrench (#45), Refinery ember and brass with
+a crucible furnace, a pour trough and an ingot table (#105).
 """
 
 import math
@@ -43,6 +45,14 @@ PALETTE = {
     'teal-glass': ((0.25, 0.85, 0.82), 0.15, 0.0),
     'core-glow': ((1.0, 0.54, 0.29), 0.3, 1.0),
     'core-heart': ((1.0, 0.89, 0.69), 0.3, 1.0),
+    'ember-iron': ((0.27, 0.075, 0.045), 0.5, 0.0),
+    'firebrick': ((0.52, 0.15, 0.08), 0.85, 0.0),
+    'soot': ((0.02, 0.018, 0.016), 0.9, 0.0),
+    'ember-glass': ((0.95, 0.36, 0.10), 0.15, 0.0),
+    'ingot': ((0.88, 0.68, 0.30), 0.3, 0.0),
+    'fire': ((1.0, 0.36, 0.08), 0.3, 1.0),
+    'fire-heart': ((1.0, 0.84, 0.46), 0.3, 1.0),
+    'molten': ((1.0, 0.56, 0.16), 0.3, 1.0),
     'floor': ((0.07, 0.06, 0.055), 0.8, 0.0),
     'wall': ((0.045, 0.042, 0.045), 0.6, 0.0),
 }
@@ -88,6 +98,28 @@ def author_upgrade_bay():
                + gear_and_wrench_pieces(), at=(0.0, 0.0, 0.0), z_order=0)
     stage_backdrop(key_colour=(0.8, 0.9, 1.0), accent_colour=(0.2, 0.85, 0.8))
     save_as('platform-bay-upgrade')
+
+
+def author_refinery_bay():
+    """
+    The frame with its furnace, trough and moulds, then one part per look (#105) over the furnace
+    door and the mould table, drawn above the frame. The backdrop shows the `refining` look, so the
+    other two carry `backdrop_hidden` (render_backdrop.py leaves them out of the render only).
+    """
+    reset_scene()
+    build_part('platform-bay-refinery', bay_frame_pieces('ember-iron', 'ember-glass', lintel='brass')
+               + furnace_pieces(),
+               at=(0.0, 0.0, 0.0), z_order=0)
+    looks = {
+        'refinery-idle': furnace_door_pieces(),
+        'refinery-refining': open_furnace_pieces() + molten_metal_pieces(),
+        'refinery-ready': furnace_door_pieces() + ingot_stack_pieces(),
+    }
+    for part_id, pieces in looks.items():
+        part = build_part(part_id, pieces, at=REFINERY_LOOK_PIVOT, z_order=1)
+        part['backdrop_hidden'] = part_id != 'refinery-refining'
+    stage_backdrop(key_colour=(1.0, 0.72, 0.5), accent_colour=(1.0, 0.42, 0.12))
+    save_as('platform-bay-refinery')
 
 
 def reset_scene():
@@ -226,6 +258,81 @@ def gear_and_wrench_pieces():
     return pieces
 
 
+# The furnace door's bottom centre: every look is authored around it, so each sits where the
+# frame's door opening is.
+REFINERY_LOOK_PIVOT = (-0.75, 0.0, 0.72)
+# The top of the furnace stack, where the refining look's smoke rises (procedural, #51).
+REFINERY_STACK_TOP = (-0.75, 2.98)
+# The stack stands proud of the lintel (whose face is at y -0.3), so it reads in front of it.
+STACK_Y = -0.42
+
+
+def furnace_pieces():
+    """The Refinery bay's motif: a firebrick crucible furnace with its stack, a trough and moulds."""
+    stack_x, stack_top = REFINERY_STACK_TOP
+    pieces = [
+        box('firebrick', (1.1, 0.5, 1.4), (-0.75, -0.05, 1.05)),
+        box('brass', (1.18, 0.56, 0.07), (-0.75, -0.05, 1.72)),
+        box('brass', (1.18, 0.56, 0.07), (-0.75, -0.05, 0.42)),
+        frustum('ember-iron', 0.5, 0.2, 0.32, (-0.75, -0.05, 1.91)),
+        cylinder('ember-iron', 0.12, stack_top - 2.07, (stack_x, STACK_Y, (2.07 + stack_top) / 2), 'Z'),
+        cylinder('brass', 0.16, 0.06, (stack_x, STACK_Y, stack_top - 0.03), 'Z'),
+        cylinder('brass', 0.14, 0.04, (stack_x, STACK_Y, 2.4), 'Z'),
+        box('soot', (0.5, 0.06, 0.42), (-0.75, -0.29, 0.95)),
+        box('brass', (0.66, 0.05, 0.06), (-0.75, -0.31, 1.2)),
+        box('dark-iron', (1.3, 0.5, 0.08), (0.65, -0.05, 0.84)),
+        box('dark-iron', (0.08, 0.4, 0.46), (0.08, -0.05, 0.58)),
+        box('dark-iron', (0.08, 0.4, 0.46), (1.22, -0.05, 0.58)),
+        box('ember-iron', (0.62, 0.12, 0.06), (-0.12, -0.22, 0.86), turn_y=math.radians(-6)),
+    ]
+    pieces += [box('dark-iron', (0.3, 0.2, 0.07), (x, -0.12, 0.915)) for x in (0.28, 0.65, 1.02)]
+    pieces += [rivet((x, -0.31, z)) for x in (-1.22, -0.28) for z in stepped(0.55, 1.55, 0.25)]
+    return pieces
+
+
+def furnace_door_pieces():
+    """The shut door over the furnace mouth (the idle and ready looks), around the door's pivot."""
+    pieces = [
+        box('dark-iron', (0.54, 0.05, 0.46), (0.0, -0.34, 0.23)),
+        box('brass', (0.04, 0.06, 0.38), (-0.2, -0.37, 0.23)),
+        box('brass', (0.04, 0.06, 0.38), (0.2, -0.37, 0.23)),
+        cylinder('brass', 0.025, 0.2, (0.0, -0.4, 0.3), 'X'),
+    ]
+    pieces += [box('soot', (0.3, 0.06, 0.025), (0.0, -0.36, z)) for z in (0.08, 0.13, 0.18)]
+    return pieces
+
+
+def open_furnace_pieces():
+    """The door swung down and the fire behind it, lit (the refining look)."""
+    return [
+        sphere('fire', 0.2, (0.0, -0.3, 0.2), flatten=0.4),
+        sphere('fire-heart', 0.1, (0.0, -0.36, 0.17), flatten=0.4),
+        box('dark-iron', (0.54, 0.46, 0.04), (0.0, -0.55, 0.0)),
+        box('brass', (0.6, 0.05, 0.05), (0.0, -0.36, 0.45)),
+    ]
+
+
+def molten_metal_pieces():
+    """Metal running down the trough into the three moulds (the refining look)."""
+    pieces = [box('molten', (0.6, 0.06, 0.03), (0.63, -0.28, 0.17), turn_y=math.radians(-6))]
+    pieces += [box('molten', (0.24, 0.14, 0.03), (x + 0.75, -0.14, 0.235)) for x in (0.28, 0.65, 1.02)]
+    return pieces
+
+
+def ingot_stack_pieces():
+    """A pyramid of six ingots on the mould table (the ready look)."""
+    pieces = []
+    for row, count in enumerate((3, 2, 1)):
+        left = 1.4 - (count - 1) * INGOT_PITCH / 2
+        pieces += [frustum('ingot', 0.06, 0.08, 0.09, (left + INGOT_PITCH * i, -0.2, 0.215 + 0.1 * row),
+                           long_x=0.12) for i in range(count)]
+    return pieces
+
+
+# Ingot centres sit this far apart, leaving a gap between ingots 0.28 m long at the base.
+INGOT_PITCH = 0.34
+
+
 # --- backdrop staging ----------------------------------------------------------------------------
 
 
@@ -326,12 +433,25 @@ def cylinder(material, radius, length, centre, axis):
     return finish_piece(material, smooth=True)
 
 
-def frustum(material, top_half_width, bottom_half_width, height, centre):
-    """A square funnel, wide side up (the Sell bay's hopper)."""
+def frustum(material, top_half_width, bottom_half_width, height, centre, long_x=0.0):
+    """
+    A square funnel, wide side up (the Sell bay's hopper), or narrow side up as an ingot;
+    `long_x` stretches it along X by that many metres.
+    """
     bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=bottom_half_width * math.sqrt(2),
                                     radius2=top_half_width * math.sqrt(2), depth=height,
                                     location=centre, rotation=(0.0, 0.0, math.pi / 4))
-    return finish_piece(material, smooth=False)
+    piece = finish_piece(material, smooth=False)
+    if long_x > 0.0:
+        stretch_along_x(piece, long_x)
+    return piece
+
+
+def stretch_along_x(piece, extra):
+    """Moves the vertices right of the piece's centre `extra` metres further right, then recentres."""
+    centre_x = sum(vertex.co.x for vertex in piece.data.vertices) / len(piece.data.vertices)
+    for vertex in piece.data.vertices:
+        vertex.co.x += (extra / 2) if vertex.co.x > centre_x else -(extra / 2)
 
 
 def sphere(material, radius, centre, flatten=1.0):
@@ -425,6 +545,7 @@ AUTHORS = {
     'platform-hub': author_hub,
     'platform-bay-sell': author_sell_bay,
     'platform-bay-upgrade': author_upgrade_bay,
+    'platform-bay-refinery': author_refinery_bay,
 }
 
 if __name__ == '__main__':

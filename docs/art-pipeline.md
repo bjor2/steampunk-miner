@@ -117,8 +117,32 @@ render uses Cycles on the CPU with a fixed seed, sample count and thread count, 
 `backdropPx` size in `art/asset-rules.json`. It ships as one `<id>.albedo.ktx2` (ETC1S, sRGB) in
 `public/assets/platform/<id>/`.
 
-`scripts/art/author_platform.py` wrote the first version of the three platform files (S7b). From
-then on the `.blend` files are the sources: change the art in Blender and re-export.
+`scripts/art/author_platform.py` wrote the first version of the three platform files (S7b), and
+of the Refinery bay later (#106). From then on the `.blend` files are the sources: change the art
+in Blender and re-export.
+
+A part whose `backdrop_hidden` custom property is set is left out of the backdrop render (and
+still baked as a part). `hide_render` would also drop it from the parts bake.
+
+## The Refinery bay
+
+`platform-bay-refinery` is the third bay module (#105 art, #106), the same 4 x 3 m frame as Sell
+and Upgrade in ember iron and brass, with a firebrick crucible furnace, its stack, a pour trough
+and a mould table. Its looks are three parts drawn over the frame (`z` 1), one at a time, all
+pivoted on the furnace door's bottom centre (`atM` [-0.75, 0.72]):
+
+| Part                | Look (#105) | What it shows                                                       |
+| ------------------- | ----------- | ------------------------------------------------------------------- |
+| `refinery-idle`     | `idle`      | the furnace door shut                                               |
+| `refinery-refining` | `refining`  | the door open on the fire, metal running into the moulds (emissive) |
+| `refinery-ready`    | `ready`     | the door shut and a pyramid of six ingots on the mould table        |
+
+The looks are `REFINERY_BAY_LOOKS` in `src/systems/authority/platformState.ts`, and
+`refineryLookPartIdOf` names their parts. The refining look's smoke is procedural (#51): it
+rises from the top of the stack, at [-0.75, 2.98] m in the bay's frame. The backdrop shows the
+refining look. Nothing draws platform bays in the world yet; the refinery build (#92) places the
+bay on the pad and picks the look from its batches. The bay's emblem (`emblem-bay-refinery`) is
+a placeholder like the other two bays' emblems.
 
 ## Ground and casing tiles
 

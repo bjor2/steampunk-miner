@@ -9,6 +9,7 @@ import MANIFEST_FILE from '../../../art/asset-manifest.json'
 import ENEMY_BURROWER from '../../../art/placeholders/enemy-burrower.parts.json'
 import ENEMY_CRAWLER from '../../../art/placeholders/enemy-crawler.parts.json'
 import ENEMY_TUNNEL_WRECKER from '../../../art/placeholders/enemy-tunnel-wrecker.parts.json'
+import PLATFORM_BAY_REFINERY from '../../../art/placeholders/platform-bay-refinery.parts.json'
 import PLATFORM_BAY_SELL from '../../../art/placeholders/platform-bay-sell.parts.json'
 import PLATFORM_BAY_UPGRADE from '../../../art/placeholders/platform-bay-upgrade.parts.json'
 import PLATFORM_HUB from '../../../art/placeholders/platform-hub.parts.json'
@@ -18,6 +19,7 @@ import VEHICLE_AUTO_GUNS from '../../../art/placeholders/vehicle-auto-guns.parts
 import ENEMY_BURROWER_EXPORTED from '../../../public/assets/enemy/enemy-burrower/enemy-burrower.parts.json'
 import ENEMY_CRAWLER_EXPORTED from '../../../public/assets/enemy/enemy-crawler/enemy-crawler.parts.json'
 import ENEMY_TUNNEL_WRECKER_EXPORTED from '../../../public/assets/enemy/enemy-tunnel-wrecker/enemy-tunnel-wrecker.parts.json'
+import PLATFORM_BAY_REFINERY_EXPORTED from '../../../public/assets/platform/platform-bay-refinery/platform-bay-refinery.parts.json'
 import PLATFORM_BAY_SELL_EXPORTED from '../../../public/assets/platform/platform-bay-sell/platform-bay-sell.parts.json'
 import PLATFORM_BAY_UPGRADE_EXPORTED from '../../../public/assets/platform/platform-bay-upgrade/platform-bay-upgrade.parts.json'
 import PLATFORM_HUB_EXPORTED from '../../../public/assets/platform/platform-hub/platform-hub.parts.json'
@@ -36,6 +38,7 @@ export const PLACEHOLDER_SIDECARS: readonly PartsSidecar[] = [
   PLATFORM_HUB,
   PLATFORM_BAY_SELL,
   PLATFORM_BAY_UPGRADE,
+  PLATFORM_BAY_REFINERY,
   ENEMY_CRAWLER,
   ENEMY_BURROWER,
   ENEMY_TUNNEL_WRECKER,
@@ -49,6 +52,7 @@ export const EXPORTED_SIDECARS: readonly PartsSidecar[] = [
   PLATFORM_HUB_EXPORTED,
   PLATFORM_BAY_SELL_EXPORTED,
   PLATFORM_BAY_UPGRADE_EXPORTED,
+  PLATFORM_BAY_REFINERY_EXPORTED,
   ENEMY_CRAWLER_EXPORTED,
   ENEMY_BURROWER_EXPORTED,
   ENEMY_TUNNEL_WRECKER_EXPORTED,

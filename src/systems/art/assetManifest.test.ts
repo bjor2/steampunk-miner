@@ -12,6 +12,7 @@ import {
   SCHEDULED_ENEMY_ART_ROW_IDS,
   blenderAssetIds,
   enemyArtKinds,
+  isValidPartId,
   vectorIconIds,
   vehicleModuleAssetIdOf,
   vehicleModuleRowIds,
@@ -51,6 +52,8 @@ describe('asset manifest', () => {
         'platform-hub',
         'platform-bay-sell',
         'platform-bay-upgrade',
+        'platform-bay-refinery',
+        'platform-bay-refinery-backdrop',
         'enemy-crawler',
         'enemy-burrower',
         'prop-artefact-cache',
@@ -59,7 +62,12 @@ describe('asset manifest', () => {
       ]),
     )
     expect(vectorIconIds()).toEqual(
-      expect.arrayContaining(['icon-track-drill-power', 'icon-track-cargo-hold', 'icon-casing']),
+      expect.arrayContaining([
+        'icon-track-drill-power',
+        'icon-track-cargo-hold',
+        'icon-casing',
+        'emblem-bay-refinery',
+      ]),
     )
   })
 
@@ -86,6 +94,12 @@ describe('asset manifest', () => {
     expect(vehicleModuleRowIds().filter((row) => !rowIds.includes(row))).toEqual([])
     expect(blenderAssetIds()).toContain(vehicleModuleAssetIdOf('auto_guns'))
     expect(vehicleModuleAssetIdOf('auto_guns')).toBe('vehicle-auto-guns')
+  })
+
+  it('gives the refinery bay one part per look it shows (#105: idle, refining, ready)', () => {
+    const looks = ['refinery-idle', 'refinery-refining', 'refinery-ready']
+    expect(looks.every((part) => isValidPartId('platform-bay-refinery', part))).toBe(true)
+    expect(isValidPartId('platform-bay-refinery', 'refinery-smelting')).toBe(false)
   })
 
   it('refuses an asset id that no registry derives, and a missing inventory row', () => {
