@@ -20,7 +20,7 @@ let stopListening = () => {}
 export function connectAuthority(next: Authority, onEvents: DomainEventListener): void {
   stopListening()
   authority = next
-  nextSeq = highestAcceptedSeq(next.snapshot().state) + 1
+  nextSeq = highestAcceptedSeq(next.readState()) + 1
   stopListening = next.subscribe(onEvents)
 }
 
@@ -36,7 +36,7 @@ export function submitCommand(playerId: string, intent: CommandIntent): void {
 }
 
 function stampCommand(playerId: string, intent: CommandIntent): AuthorityCommand {
-  return { playerId, tick: connectedAuthority().snapshot().tick, seq: nextSeq++, ...intent }
+  return { playerId, tick: connectedAuthority().readState().tick, seq: nextSeq++, ...intent }
 }
 
 /**
@@ -44,7 +44,7 @@ function stampCommand(playerId: string, intent: CommandIntent): AuthorityCommand
  * `applyCommand` on the current state, so a refused debug call changes nothing and logs nothing.
  */
 export function refusalOf(playerId: string, intent: CommandIntent): string[] {
-  const state = connectedAuthority().snapshot().state
+  const state = connectedAuthority().readState()
   const command = { playerId, tick: state.tick, seq: nextSeq, ...intent } as AuthorityCommand
   const refusal = applyCommand(state, command).events.find(
     (event) => event.type === 'CommandRejected' && event.seq === command.seq,
@@ -57,8 +57,9 @@ export function advanceAuthorityTo(tick: number): void {
   connectedAuthority().advanceTo(tick)
 }
 
+/** The authority's state now, without the digest a snapshot computes (#101). */
 export function readAuthorityState(): AuthorityState {
-  return connectedAuthority().snapshot().state
+  return connectedAuthority().readState()
 }
 
 function connectedAuthority(): Authority {

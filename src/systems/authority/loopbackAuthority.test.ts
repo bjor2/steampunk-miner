@@ -48,6 +48,17 @@ describe('loopback authority', () => {
     expect(first.tick).toBe(60)
   })
 
+  it('reads the state a command left, the one its snapshot hashes', () => {
+    const authority = createLoopbackAuthority(startState())
+    authority.submit(grant(1, '42', 90))
+    const read = authority.readState()
+    expect({ tick: read.tick, wallet: toCanonical(read.players.p1.wallet) }).toEqual({
+      tick: 90,
+      wallet: '4.2e+1',
+    })
+    expect(authority.snapshot().state).toBe(read)
+  })
+
   it('answers a refused command with an event and keeps its state', () => {
     const authority = createLoopbackAuthority(startState())
     const before = authority.snapshot()

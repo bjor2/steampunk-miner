@@ -89,6 +89,7 @@ describe('game store: authority', () => {
       submit: (command) => void submitted.push(command),
       advanceTo: () => {},
       subscribe: () => () => {},
+      readState: () => startSnapshot.state,
       snapshot: () => startSnapshot,
     }
     resetGameStore(silent)
@@ -149,6 +150,7 @@ describe('game store: authority', () => {
         tell = onEvents
         return () => {}
       },
+      readState: () => answered,
       snapshot: () => snapshotOf(answered),
     }
     resetGameStore(authority)
