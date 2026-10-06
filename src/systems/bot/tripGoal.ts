@@ -1,7 +1,7 @@
 /**
  * What a trip is for (#29): ore from one band, or the planet's core; and which gallery of the mine
  * serves it next. Ore galleries skip the rows that cross the core disc; core galleries are exactly
- * those rows, bored toward the planet's centre and then, if the core still needs it, away from it.
+ * those rows, bored toward the planet's centre and then, if the core still needs it, the other way.
  */
 import {
   bandOfRow,
@@ -25,13 +25,22 @@ export function nextRow(layout: MineLayout, goal: TripGoal): number | null {
 }
 
 /**
- * Every core gallery bores toward the centre first; the far sides open only once all of those
- * have ended, so a shaft through the core off its middle still reaches the fragments the core
- * needs (#136), and a shaft one side already covers mines as before.
+ * Every core gallery bores its near side first; the far sides open only once all of those have
+ * ended with the core still short, so a shaft that jogs through the core off its middle still
+ * reaches the fragments the core needs (#136), and a core the near sides fill mines as before.
  */
 function nextCoreRow(layout: MineLayout, rows: number[]): number | null {
-  const nearRow = rows.find((row) => !isSideDone(layout, row, coreSideOf(layout, row)))
-  return nearRow ?? rows.find((row) => openCoreSideOf(layout, row) !== null) ?? null
+  const near = coreSideOf(layout)
+  const nearRow = shallowestRowOpenOn(layout, rows, near)
+  return nearRow ?? shallowestRowOpenOn(layout, rows, oppositeSideOf(near)) ?? null
+}
+
+function shallowestRowOpenOn(
+  layout: MineLayout,
+  rows: number[],
+  side: GallerySide,
+): number | undefined {
+  return rows.find((row) => !isSideDone(layout, row, side))
 }
 
 function isGoalRow(layout: MineLayout, row: number, goal: TripGoal): boolean {
@@ -43,9 +52,9 @@ export function sideFor(layout: MineLayout, row: number, goal: TripGoal): Galler
   return goal.kind === 'ore' ? openSideOf(layout, row) : openCoreSideOf(layout, row)
 }
 
-/** The side toward the centre while it is open, then the far side. */
+/** The near side while it is open, then the far side. */
 function openCoreSideOf(layout: MineLayout, row: number): GallerySide | null {
-  const near = coreSideOf(layout, row)
+  const near = coreSideOf(layout)
   if (!isSideDone(layout, row, near)) return near
   const far = oppositeSideOf(near)
   return isSideDone(layout, row, far) ? null : far
