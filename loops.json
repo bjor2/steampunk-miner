@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T08:17:05Z",
+  "updated_at": "2026-10-06T08:17:20Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -16,8 +16,8 @@
       "slot": "2",
       "state": "working",
       "issue": 127,
-      "note": "started 2026-10-06 10:17 CEST",
-      "updated_at": "2026-10-06T08:17:05Z",
+      "note": "tier easy, attempt 1/2",
+      "updated_at": "2026-10-06T08:17:20Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
