@@ -75,6 +75,7 @@ import { recordCheckpointLoaded, writeCheckpointAfter, type Checkpoint } from '.
 import { artefactActionsOf, type ArtefactActions } from './artefactActions'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { casingDebugActionsOf, type CasingDebugActions } from './casingDebugActions'
+import { gunDebugActionsOf, type GunDebugActions } from './gunDebugActions'
 import { collapseDebugActionsOf, type CollapseDebugActions } from './collapseDebugActions'
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
 import { announceFeedback } from './feedbackBroadcast'
@@ -93,6 +94,7 @@ import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 type DebugActions = CombatDebugActions &
   GroundDebugActions &
   CasingDebugActions &
+  GunDebugActions &
   CollapseDebugActions &
   ArtefactActions
 
@@ -200,6 +202,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...combatDebugActionsOf(() => get().playerId),
   ...groundDebugActionsOf(() => get().playerId),
   ...casingDebugActionsOf(() => get().playerId),
+  ...gunDebugActionsOf(() => get().playerId),
   ...collapseDebugActionsOf(() => get().playerId),
   ...artefactActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),

@@ -343,6 +343,33 @@ describe('debug api: vehicle', () => {
     ])
   })
 
+  it('adds the guns turret to the vehicle parts once mounted, its barrel look by level (#107)', () => {
+    const debug = createDebugApi()
+    expect(debug.vehicleParts()).toMatchObject({ gunLevel: 0 })
+    expect(debug.vehicleParts()).not.toMatchObject({
+      partIds: expect.arrayContaining(['t1-turret-mount']),
+    })
+    expect(debug.setGunLevel(1)).toEqual({ ok: true })
+    expect(debug.vehicleParts()).toMatchObject({
+      gunLevel: 1,
+      partIds: expect.arrayContaining(['t1-turret-mount', 't1-turret-head', 't1-gun-barrel']),
+    })
+    debug.setGunLevel(12)
+    expect(debug.vehicleParts()).toMatchObject({
+      partIds: expect.arrayContaining(['t3-gun-barrel']),
+    })
+    expect(sink.events.map((event) => event.event)).toEqual([
+      'debug_command_applied',
+      'debug_command_applied',
+    ])
+  })
+
+  it('refuses a gun level above the top of the gun track, applying nothing', () => {
+    const debug = createDebugApi()
+    expect(debug.setGunLevel(17)).toMatchObject({ ok: false })
+    expect(debug.vehicleParts()).toMatchObject({ gunLevel: 0 })
+  })
+
   it('sets an upgrade level as a logged debug command, with finite stats at drill_tip 1500', () => {
     const debug = createDebugApi()
     expect(debug.setUpgrade('drill_tip', 1500)).toEqual({ ok: true })

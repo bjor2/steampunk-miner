@@ -249,3 +249,11 @@ export const BAY_SHUTTER_MS = 250
 export const PART_INSTALL_MS = 400
 /** #39 and #44: the preview camera frames the visual vehicle at 60% of the panel height, ±5%. */
 export const PREVIEW_VEHICLE_SHARE_PERCENT = 60
+
+/**
+ * #107/#108: the `auto_guns` barrel's three looks start at these gun levels (1-5 plain, 6-11
+ * jacketed, 12-16 twin), the split #108 proposed over the track's 16 levels. The barrel swings
+ * to its aim at most this fast; placeholders, tuned by eye.
+ */
+export const GUN_LOOK_FIRST_LEVELS: readonly number[] = [1, 6, 12]
+export const GUN_TURN_RADIANS_PER_SECOND = 9

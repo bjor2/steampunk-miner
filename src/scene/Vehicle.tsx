@@ -1,10 +1,14 @@
-/** The local vehicle: the input intent in, the fixed-step loop, the placeholder art and drill head. */
+/**
+ * The local vehicle: the input intent in, the fixed-step loop, the placeholder art, the drill head
+ * and the guns' turret once mounted (#107).
+ */
 import { useMemo } from 'react'
 import { VehicleBody } from '../physics/VehicleBody'
 import type { VehicleController } from '../physics/vehicleController'
 import { readLocalVehicle } from '../store/gameStore'
 import { readVehicleIntent } from '../store/inputRuntime'
 import { DrillHeadView } from './DrillHeadView'
+import { VehicleGuns } from './VehicleGuns'
 import { VehiclePlaceholder } from './VehiclePlaceholder'
 import { createVehicleLoop } from './vehicleLoop'
 import { vehiclePresence } from './vehiclePresence'
@@ -21,6 +25,7 @@ export function Vehicle() {
         <>
           <VehiclePlaceholder />
           <DrillHeadView controller={controller} />
+          <VehicleGuns />
         </>
       )}
     </VehicleBody>

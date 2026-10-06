@@ -22,6 +22,7 @@ import {
 import type { UpgradeLevels } from '../systems/economy/vehicleStats'
 import {
   setEnergyCommand,
+  setGunLevelCommand,
   setHullCommand,
   setUpgradeCommand,
   teleportToDockCommand,
@@ -34,6 +35,7 @@ import {
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
 import type { PartPose } from '../systems/render/partMotion'
+import { gunPartIdsOf } from '../systems/render/gunLook'
 import { vehiclePartIdsOf, vehiclePartPosesOf } from '../systems/render/vehicleLook'
 import { isEnemyKind } from '../systems/authority/combat/combatDebugRules'
 import {
@@ -102,10 +104,12 @@ export type { ArtefactReport }
 
 /**
  * `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6), and
- * each part's pose now (#48 acceptance 1-2: wheel and drill angles, lifts, squash, glow).
+ * each part's pose now (#48 acceptance 1-2: wheel and drill angles, lifts, squash, glow). Mounted
+ * guns add their turret's part ids at the look of their level (#107, #81 acceptance 3).
  */
 export interface VehiclePartsReport {
   visualTier: number
+  gunLevel: number
   partIds: string[]
   poses: Record<string, PartPose>
 }
@@ -175,6 +179,9 @@ export interface DebugApi {
   lineCasing(x: number, y: number, grade: number): DebugResult
   /** Breaches the ring of lining round `(x, y)` mm, as a tunnel wrecker's gnaw does (#111). */
   gnawCasing(x: number, y: number): DebugResult
+  // guns (#107): a `debug.*` command
+  /** The guns at `level`, 0 (none) to the gun track's cap, with no unlock or price. */
+  setGunLevel(level: number): DebugResult
   // collapse (#43): the setter is a `debug.*` command, the read is not logged
   /** Starts the collapse of block `cx,cy#index` now: the full 60-tick warning, then the refill. */
   forceCollapse(block: string): DebugResult
@@ -248,7 +255,11 @@ function vehiclePartsReport(): VehiclePartsReport {
   const { vehicle, prefs } = game()
   return {
     visualTier: vehicle.visualTier,
-    partIds: vehiclePartIdsOf(SHIPPED_ART, vehicle.visualTier),
+    gunLevel: vehicle.gunLevel,
+    partIds: [
+      ...vehiclePartIdsOf(SHIPPED_ART, vehicle.visualTier),
+      ...gunPartIdsOf(SHIPPED_ART, vehicle.gunLevel),
+    ],
     poses: vehiclePartPosesOf(SHIPPED_ART, partMotion, vehicle.visualTier, !prefs.shake),
   }
 }
@@ -351,6 +362,10 @@ export function createDebugApi(): DebugApi {
     gnawCasing: (x, y) =>
       runUnlessRefused(vehicleDebugProblems(gnawCasingCommand(x, y)), () =>
         game().gnawCasing(x, y),
+      ),
+    setGunLevel: (level) =>
+      runUnlessRefused(vehicleDebugProblems(setGunLevelCommand(level)), () =>
+        game().setGunLevel(level),
       ),
     forceCollapse: (block) =>
       runUnlessRefused(vehicleDebugProblems(forceCollapseCommand(block)), () =>
