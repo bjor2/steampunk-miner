@@ -60,6 +60,13 @@ test.describe('browser smoke (#29)', () => {
     expect(errors).toEqual([])
   })
 
+  test('answers the example slice under steampunkDebug.features (#156)', async ({ page }) => {
+    const errors = await openGame(page, 'debug')
+    const answer = await page.evaluate(() => window.steampunkDebug!.features.example.describe())
+    expect(answer).toEqual({ ok: true, sliceId: 'example', registers: ['debugActions'] })
+    expect(errors).toEqual([])
+  })
+
   test('reaches the same digest through ?scenario= and through applyScenario', async ({
     browser,
   }) => {

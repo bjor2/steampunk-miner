@@ -19,6 +19,10 @@ function scriptsMissingTheLoader(): string[] {
 }
 
 describe('feature loader', () => {
+  it('lists the committed example slice', () => {
+    expect(loadFeatures()).toContain('example')
+  })
+
   it('returns the same slice list on a second call', () => {
     expect(loadFeatures()).toBe(loadFeatures())
   })
