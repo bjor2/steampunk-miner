@@ -68,7 +68,7 @@ file turns it on, so scenario and bot runs never see hints.
   `debug_command_applied`), then runs its script (`fastForward` steps).
 - Browser: `?scenario=<json>` at launch (parsed by `parseScenario`); `?debug` (or the dev build) exposes
   `window.steampunkDebug` (the `DebugApi`), `window.steampunkRunLog()` and `window.steampunkRunCommands()`
-  (the NDJSON so far, browser shell only).
+  (the newest NDJSON lines, up to a million characters per file, browser shell only, #117).
 - Every wired debug method answers `{ ok: true, ... }` or `{ ok: false, problems }`: `setPlanet`,
   `setPlanetSeed`, `teleportToDepthTiles`, `teleportToDepth(depthBp)` (basis points of the radius),
   `teleportToDock(bay?)` (the `debug.teleportToDock {bay}` command: docked at rest in the Sell bay, or the Upgrade bay when named, no tow, no fee),

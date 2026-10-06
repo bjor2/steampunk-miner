@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatNdjsonLine, parseNdjson } from './ndjson'
+import { formatNdjsonLine, keepNewestLines, parseNdjson } from './ndjson'
 import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 const event: RunEvent = {
@@ -30,5 +30,24 @@ describe('ndjson', () => {
 
   it('skips a blank trailing line', () => {
     expect(parseNdjson('\n\n')).toEqual([])
+  })
+})
+
+describe('ndjson tail (#117)', () => {
+  const lineNumbered = (index: number) => `${String(index).padStart(9, '0')}\n`
+
+  it('keeps only the newest whole lines that fit after far more lines than the cap', () => {
+    let tail = ''
+    for (let index = 0; index < 10_000; index += 1)
+      tail = keepNewestLines(tail + lineNumbered(index), 35)
+    expect(tail).toBe('000009997\n000009998\n000009999\n')
+  })
+
+  it('keeps text within the cap whole', () => {
+    expect(keepNewestLines('{"seq":0}\n{"seq":1}\n', 20)).toBe('{"seq":0}\n{"seq":1}\n')
+  })
+
+  it('keeps no part of a line longer than the cap', () => {
+    expect(keepNewestLines('{"seq":0}\n{"seq":1,"data":"long"}\n', 12)).toBe('')
   })
 })

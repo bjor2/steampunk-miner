@@ -41,9 +41,9 @@ export interface Shell {
   appendRunEvents(runId: string, ndjsonLines: string): Promise<void>
   appendRunCommands(runId: string, ndjsonLines: string): Promise<void>
   writeRunDocument(runId: string, document: RunDocumentName, json: string): Promise<void>
-  /** Browser only: the event NDJSON written so far (Electron writes files and returns ''). */
+  /** Browser only: the newest event NDJSON lines, up to a cap (Electron writes files and returns ''). */
   readBufferedRunEvents(runId: string): string
-  /** Browser only: the command NDJSON written so far (Electron writes files and returns ''). */
+  /** Browser only: the newest command NDJSON lines, up to a cap (Electron writes files and returns ''). */
   readBufferedRunCommands(runId: string): string
   /** Replaces a save slot atomically, in the folder this run's saves belong to (`saveFolderOf`). */
   writeSaveSlot(slot: number, json: string): Promise<void>

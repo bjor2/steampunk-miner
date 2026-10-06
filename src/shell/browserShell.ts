@@ -1,9 +1,10 @@
 /**
- * The shell in a plain browser: no filesystem, so run files are kept in memory (a bot can read
- * them back through the debug handle). A real download/OPFS writer can replace this later.
- * Save slots go to localStorage, so quit and resume works in the browser too; one `setItem` is
- * all-or-nothing, which is the browser's atomic write.
+ * The shell in a plain browser: no filesystem, so the newest run-log lines are kept in memory (a
+ * bot can read them back through the debug handle). A real download/OPFS writer can replace this
+ * later. Save slots go to localStorage, so quit and resume works in the browser too; one `setItem`
+ * is all-or-nothing, which is the browser's atomic write.
  */
+import { keepNewestLines } from '../logging/ndjson'
 import { readBrowserLaunchParameters } from './launchParameters'
 import {
   exposeOnWindow,
@@ -12,6 +13,13 @@ import {
   runOnPageHide,
 } from './sharedBrowserHooks'
 import { preferencesFileOf, saveFolderOf, type Shell } from './shell'
+
+/**
+ * The newest run-log text kept per run and file (#117): about 13 minutes of a ?debug run at the
+ * 0.078 MB/min the memory soak measured, so a long session stays bounded while the debug readers
+ * (the e2e smoke's `game_started`, a bot's recent lines) still find what they look for.
+ */
+const KEPT_RUN_LOG_CHARS = 1_000_000
 
 export function createBrowserShell(): Shell {
   const launch = readBrowserLaunchParameters()
@@ -30,12 +38,10 @@ export function createBrowserShell(): Shell {
       platform: 'browser',
       isPackaged: false,
     }),
-    appendRunEvents: async (runId, lines) => {
-      eventLinesByRun.set(runId, (eventLinesByRun.get(runId) ?? '') + lines)
-    },
-    appendRunCommands: async (runId, lines) => {
-      commandLinesByRun.set(runId, (commandLinesByRun.get(runId) ?? '') + lines)
-    },
+    appendRunEvents: async (runId, lines) =>
+      appendKeepingNewestLines(eventLinesByRun, runId, lines),
+    appendRunCommands: async (runId, lines) =>
+      appendKeepingNewestLines(commandLinesByRun, runId, lines),
     writeRunDocument: async (runId, document, json) => {
       documentsByRun.set(`${runId}/${document}`, json)
     },
@@ -51,6 +57,14 @@ export function createBrowserShell(): Shell {
     onKeyChange: listenForKeys,
     onScrollNotch: listenForScrollNotches,
   }
+}
+
+function appendKeepingNewestLines(
+  linesByRun: Map<string, string>,
+  runId: string,
+  lines: string,
+): void {
+  linesByRun.set(runId, keepNewestLines((linesByRun.get(runId) ?? '') + lines, KEPT_RUN_LOG_CHARS))
 }
 
 function setAsideStoredSlot(key: string): void {
