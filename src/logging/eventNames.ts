@@ -12,8 +12,12 @@
  *
  * Adding a name or an optional field keeps `LOG_SCHEMA_VERSION`; renaming, removing or retyping a
  * field bumps it (#11 section 1, versioning).
+ *
+ * Slices register their own events in the `runEvents` registry (`registries/runEvents.ts`, K1),
+ * which `registeredEventOf` asks for any name this table does not hold.
  */
 import type { FieldKind, PayloadFields, PayloadOf } from './eventFields'
+import { sliceRunEventOf } from './registries/runEvents'
 
 export type RunEventLevel = 'core' | 'detail' | 'perf'
 
@@ -520,8 +524,9 @@ export type RunEventData<N extends RunEventName> =
       ? UnspecifiedEventData
       : PayloadOf<PayloadSpecOf<N>>
 
+/** The kernel's entry first, so a kernel name never reads the slice registry. */
 export function registeredEventOf(name: string): RegisteredEvent | undefined {
   return Object.hasOwn(RUN_EVENT_REGISTRY, name)
     ? RUN_EVENT_REGISTRY[name as RunEventName]
-    : undefined
+    : sliceRunEventOf(name)
 }

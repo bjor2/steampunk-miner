@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { debugActionsBySlice } from '../debug/debugActionRegistry'
+import type { SliceEventProjections } from '../logging/registries/eventProjections'
 import { unchanged } from '../systems/authority/commandRule'
 import { COMMAND_RULE_REGISTRY, type SliceCommandRules } from '../systems/registries/commandRules'
 import { GATE_CHECK_REGISTRY, type GateCheck } from '../systems/registries/gateChecks'
@@ -122,6 +123,17 @@ describe('slice registrar', () => {
         RegistrationRefusedError,
       )
     }
+  })
+
+  it('refuses a projection or run event outside the slice namespace', () => {
+    const projection = sliceOf('codex', (r) =>
+      r.eventProjections({ 'ores.PageRead': () => null } as SliceEventProjections),
+    )
+    const runEvent = sliceOf('codex', (r) =>
+      r.runEvents({ page_read: { group: 'progression', level: 'core', payload: {} } }),
+    )
+    expect(() => withRegistrations([projection], () => undefined)).toThrow(/"eventProjections"/)
+    expect(() => withRegistrations([runEvent], () => undefined)).toThrow(/"runEvents"/)
   })
 
   it('refuses a second ore-look provider from another slice', () => {

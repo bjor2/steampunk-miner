@@ -6,7 +6,8 @@
  * Domain events with no log line project to null: planet, seed, wallet and upgrade-level changes so
  * far come from `debug.*` commands (whose `debug_command_applied` line already says what happened)
  * or ride with an event that is logged (a tow's fee is in `rescue_triggered`). Each later ticket
- * adds the projection of the domain events it introduces.
+ * adds the projection of the domain events it introduces; a slice registers the projections of
+ * its own events (`registries/eventProjections.ts`, K1).
  */
 import {
   isCommandCaused,
@@ -15,6 +16,7 @@ import {
   type KernelDomainEventType,
 } from '../systems/authority/domainEvent'
 import type { RunEventData, RunEventName } from './eventNames'
+import { sliceEventProjectionOf, type SliceRunLogLine } from './registries/eventProjections'
 import type { CommandRef, RunEventPlace, RunEventStamp } from './runEvent'
 import { getRunLog, type RunLog } from './runLog'
 
@@ -24,7 +26,7 @@ export type RunLogLine = { [N in RunEventName]: { event: N; data: RunEventData<N
 export interface ProjectedLine {
   tick: number
   cmd?: CommandRef
-  line: RunLogLine
+  line: RunLogLine | SliceRunLogLine
 }
 
 type Projection<K extends KernelDomainEventType> = (body: DomainEventBodies[K]) => RunLogLine | null
@@ -284,9 +286,19 @@ export function projectDomainEvent(event: DomainEvent): ProjectedLine | null {
   return { tick: event.tick, ...causeOf(event), line }
 }
 
-function lineOf(event: DomainEvent): RunLogLine | null {
-  const project = PROJECTIONS[event.type] as Projection<typeof event.type>
+function lineOf(event: DomainEvent): RunLogLine | SliceRunLogLine | null {
+  return Object.hasOwn(PROJECTIONS, event.type) ? kernelLineOf(event) : sliceLineOf(event)
+}
+
+function kernelLineOf(event: DomainEvent): RunLogLine | null {
+  const project = PROJECTIONS[
+    event.type as KernelDomainEventType
+  ] as Projection<KernelDomainEventType>
   return project(event as never)
+}
+
+function sliceLineOf(event: DomainEvent): SliceRunLogLine | null {
+  return sliceEventProjectionOf(event.type)?.(event) ?? null
 }
 
 function causeOf(event: DomainEvent): { cmd?: CommandRef } {
@@ -314,6 +326,7 @@ function recordProjectedLine(
   { tick, cmd, line }: ProjectedLine,
 ): void {
   const stamp: RunEventStamp = cmd === undefined ? { ...place, tick } : { ...place, tick, cmd }
-  // The union pairs each name with its payload; record() checks one name at a time.
-  runLog.record(stamp, line.event, line.data as never)
+  // The union pairs each name with its payload; record() checks one name at a time. A slice's
+  // line names an event of the runEvents registry, which the run-log schema checks.
+  runLog.record(stamp, line.event as RunEventName, line.data as never)
 }

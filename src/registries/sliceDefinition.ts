@@ -4,6 +4,8 @@
  * slice's `register.ts` exports `slice` and does nothing at import.
  */
 import type { DebugAction } from '../debug/debugActionRegistry'
+import type { SliceEventProjections } from '../logging/registries/eventProjections'
+import type { SliceRunEvents } from '../logging/registries/runEvents'
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { SliceCommandRules } from '../systems/registries/commandRules'
 import type { ContentKind, ContentKinds } from '../systems/registries/content'
@@ -49,4 +51,8 @@ export interface SliceRegistrar {
    * or `debug.<slice>.<name>` for a debug command, which replays and logs `debug_command_applied`.
    */
   commandRules(rules: SliceCommandRules): void
+  /** Run-log projections of the domain events the slice adds, keyed by `<slice>.<Event>` type. */
+  eventProjections(projections: SliceEventProjections): void
+  /** The run events those projections log, keyed by `<slice>.<snake_case>` name. */
+  runEvents(events: SliceRunEvents): void
 }

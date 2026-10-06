@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { projectDomainEvent } from '../../../logging/domainEventLog'
-import { RUN_EVENT_REGISTRY } from '../../../logging/eventNames'
+import { registeredEventOf } from '../../../logging/eventNames'
 import { toCanonical } from '../../money'
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
 import { advanceTicks } from '../advanceTicks'
@@ -179,7 +179,7 @@ describe('combat: the events it logs (#25 acceptance 9)', () => {
       .flatMap((projected) => (projected === null ? [] : [projected.line.event]))
     const combatNames = names.filter(
       (name) =>
-        RUN_EVENT_REGISTRY[name].group === 'vehicle_and_combat' &&
+        registeredEventOf(name)?.group === 'vehicle_and_combat' &&
         !['vehicle_state_changed', 'vehicle_configuration_changed'].includes(name),
     )
     expect(new Set(combatNames)).toEqual(

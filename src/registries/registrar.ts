@@ -5,6 +5,11 @@
  * runs on a fresh sealed set holding only the given fakes, then puts the loaded set back.
  */
 import { DEBUG_ACTION_REGISTRY } from '../debug/debugActionRegistry'
+import {
+  EVENT_PROJECTION_REGISTRY,
+  eventProjectionRegistrationsOf,
+} from '../logging/registries/eventProjections'
+import { RUN_EVENT_REGISTRATIONS, runEventRegistrationsOf } from '../logging/registries/runEvents'
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import {
   COMMAND_RULE_REGISTRY,
@@ -51,6 +56,12 @@ export function registrarFor(sliceId: string): SliceRegistrar {
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),
     commandRules: (rules) =>
       commandRuleRegistrationsOf(rules).forEach((rule) => addCommandRule(sliceId, rule)),
+    eventProjections: (projections) =>
+      eventProjectionRegistrationsOf(projections).forEach((projection) =>
+        add(EVENT_PROJECTION_REGISTRY, projection),
+      ),
+    runEvents: (events) =>
+      runEventRegistrationsOf(events).forEach((event) => add(RUN_EVENT_REGISTRATIONS, event)),
   }
 }
 
