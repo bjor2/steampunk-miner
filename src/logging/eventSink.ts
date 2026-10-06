@@ -8,6 +8,7 @@
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import { formatNdjsonLine } from './ndjson'
 import type { RunEvent } from './runEvent'
+import { startRunSummaryFold, type RunSummary } from './runSummary'
 
 export interface RunEventSink {
   append(event: RunEvent): void
@@ -39,6 +40,23 @@ export function createMemorySink(): MemorySink {
     commands,
     append: (event) => void events.push(event),
     appendCommand: (_runId, command) => void commands.push(command),
+  }
+}
+
+export interface SummarySink extends RunEventSink {
+  summarize(): RunSummary
+}
+
+/**
+ * Keeps only the run's summary, folded as each event arrives: what a live run holds in memory, so a
+ * session of any length writes its `summary.json` without keeping its events (#117).
+ */
+export function createSummarySink(): SummarySink {
+  const fold = startRunSummaryFold()
+  return {
+    append: fold.add,
+    appendCommand: () => undefined,
+    summarize: fold.summarize,
   }
 }
 

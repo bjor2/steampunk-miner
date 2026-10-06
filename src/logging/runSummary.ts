@@ -65,8 +65,23 @@ export interface RunMilestones {
 }
 
 export function deriveSummary(events: readonly RunEvent[]): RunSummary {
-  const tally = events.reduce(foldEvent, emptyTally(events[0]?.runId ?? ''))
+  const tally = events.reduce(foldEvent, emptyTally())
   return summaryOf(tally)
+}
+
+/** The same fold one event at a time, so a live run keeps its totals and none of its events (#117). */
+export interface RunSummaryFold {
+  add(event: RunEvent): void
+  /** The summary so far; a copy that later events leave as it was. */
+  summarize(): RunSummary
+}
+
+export function startRunSummaryFold(): RunSummaryFold {
+  const tally = emptyTally()
+  return {
+    add: (event) => void foldEvent(tally, event),
+    summarize: () => summaryOf(tally),
+  }
 }
 
 interface Tally {
@@ -100,9 +115,9 @@ interface Tally {
   milestones: RunMilestones
 }
 
-function emptyTally(runId: string): Tally {
+function emptyTally(): Tally {
   return {
-    runId,
+    runId: '',
     endReason: null,
     lastTick: 0,
     eventCount: 0,
@@ -146,6 +161,7 @@ function foldEvent(tally: Tally, event: RunEvent): Tally {
 }
 
 function foldEnvelope(tally: Tally, event: RunEvent): void {
+  if (tally.eventCount === 0) tally.runId = event.runId
   tally.eventCount += 1
   tally.lastTick = Math.max(tally.lastTick, event.tick)
   tally.deepestPlanet = Math.max(tally.deepestPlanet, event.planet)
@@ -268,9 +284,9 @@ function summaryOf(tally: Tally): RunSummary {
     vehicleDeaths: tally.vehicleDeaths,
     damageTaken: toCanonical(tally.damageTaken),
     debugCommandsApplied: tally.debugCommandsApplied,
-    upgradeLevels: tally.upgradeLevels,
-    coreCompletedTicks: tally.coreCompletedTicks,
-    milestones: tally.milestones,
+    upgradeLevels: { ...tally.upgradeLevels },
+    coreCompletedTicks: { ...tally.coreCompletedTicks },
+    milestones: { ...tally.milestones, planetReached: { ...tally.milestones.planetReached } },
   }
 }
 

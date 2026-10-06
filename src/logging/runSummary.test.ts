@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { RunEventData, RunEventName } from './eventNames'
+import { createSummarySink } from './eventSink'
 import { writeRunSummary, type RunDocumentTransport } from './runDocuments'
 import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
-import { deriveSummary } from './runSummary'
+import { deriveSummary, formatRunSummary } from './runSummary'
 
 let nextSeq = 0
 
@@ -162,12 +163,44 @@ describe('run summary', () => {
     expect(deriveSummary(otherMachine)).toEqual(deriveSummary(PLAYED_RUN))
   })
 
-  it('writes exactly the summary derived from the events it was given', async () => {
+  it('writes exactly the summary derived from the events the run recorded', async () => {
     const written: string[] = []
     const transport: RunDocumentTransport = {
       writeRunDocument: async (_runId, _document, json) => void written.push(json),
     }
-    await writeRunSummary(transport, 'run_test', PLAYED_RUN)
+    await writeRunSummary(transport, 'run_test', summaryFoldedFrom(PLAYED_RUN))
+    expect(JSON.parse(written[0])).toMatchObject({ runId: 'run_test', moneySpent: '1.5905e+2' })
     expect(JSON.parse(written[0])).toEqual(deriveSummary(PLAYED_RUN))
+  })
+})
+
+function summaryFoldedFrom(events: readonly RunEvent[]) {
+  const sink = createSummarySink()
+  events.forEach(sink.append)
+  return sink.summarize()
+}
+
+describe('summary sink (#117)', () => {
+  it('folds the events as they arrive into the summary.json text the whole log derives', () => {
+    expect(formatRunSummary(summaryFoldedFrom(PLAYED_RUN))).toBe(
+      formatRunSummary(deriveSummary(PLAYED_RUN)),
+    )
+  })
+
+  it('keeps exact totals after far more events than a log could hold', () => {
+    const sale = line(960, 'resource_sold', { items: [], value: '1.5e+1', mode: 'all' })
+    const sink = createSummarySink()
+    for (let count = 0; count < 200_000; count += 1) sink.append(sale)
+    expect(sink.summarize()).toMatchObject({ eventCount: 200_000, moneyEarned: '3e+6' })
+  })
+
+  it('leaves a summary taken mid-run as it was while the run goes on', () => {
+    const sink = createSummarySink()
+    PLAYED_RUN.forEach(sink.append)
+    const atPageHide = sink.summarize()
+    sink.append(line(9200, 'core_completed', { durationTicks: 60 }, { planet: 2 }))
+    sink.append(line(9300, 'planet_entered', { planetSeed: 9, generatorVersion: 1, radius: 500 }))
+    expect(atPageHide.coreCompletedTicks).toEqual({})
+    expect(atPageHide.milestones.planetReached).toEqual({ '1': 0, '2': 9000 })
   })
 })

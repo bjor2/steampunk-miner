@@ -7,10 +7,10 @@ import { BUILD_COMMIT, GAME_VERSION } from './constants/buildInfo'
 import { createDebugApi } from './debug/debugApi'
 import {
   createFanOutSink,
-  createMemorySink,
   createNdjsonSink,
+  createSummarySink,
   type FlushableSink,
-  type MemorySink,
+  type SummarySink,
 } from './logging/eventSink'
 import { writeRunMetadata, writeRunSummary } from './logging/runDocuments'
 import { createRunId } from './logging/runLayout'
@@ -32,12 +32,12 @@ import { parseScenario, type Scenario } from './systems/scenario'
 
 const LOG_FLUSH_INTERVAL_MS = 1000
 
-/** The files of the run in progress: the NDJSON sink and the memory copy the summary reads. */
+/** The files of the run in progress: the NDJSON sink and the summary folded as the run goes. */
 interface RunFiles {
   runId: string
   startedAt: Date
   sink: FlushableSink
-  recorded: MemorySink
+  summary: SummarySink
 }
 
 /** Settles once the session is settled: fresh, resumed from the checkpoint, or a scenario's. */
@@ -62,16 +62,16 @@ export async function startGame(): Promise<void> {
 function startRunLogging(shell: Shell, startedAt: Date): RunFiles {
   const run = { runId: createRunId(startedAt), startedAt }
   const sink = createNdjsonSink(shell)
-  const recorded = createMemorySink()
+  const summary = createSummarySink()
   const startedAtMs = performance.now()
   installRunLog(
     createRunLog({
       runId: run.runId,
-      sink: createFanOutSink(sink, recorded),
+      sink: createFanOutSink(sink, summary),
       secondsSinceStart: () => (performance.now() - startedAtMs) / 1000,
     }),
   )
-  return { ...run, sink, recorded }
+  return { ...run, sink, summary }
 }
 
 function recordGameStarted(shell: Shell): void {
@@ -90,7 +90,7 @@ function keepRunFilesWritten(shell: Shell, run: RunFiles): void {
   setInterval(flush, LOG_FLUSH_INTERVAL_MS)
   shell.onPageHide(() => {
     flush()
-    reportFailure(writeRunSummary(shell, run.runId, run.recorded.events))
+    reportFailure(writeRunSummary(shell, run.runId, run.summary.summarize()))
     writeMetadata(shell, run)
   })
 }
