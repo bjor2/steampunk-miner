@@ -70,7 +70,7 @@ export const slice: SliceDefinition = {
 | --- | --- | --- |
 | `content(kind, entries)` | `src/systems/registries/content.ts` | Every entry has an `iconId`. The kind's owner declares it by module augmentation of `ContentKinds`. |
 | `oreTypes(provider)` | `oreTypes.ts` | One provider across all slices (`ores`). |
-| `gateCheck(check)` | `gateChecks.ts` | Verdict `cut`, `refused` or `lost`, or null for no opinion. |
+| `gateCheck(check)` | `gateChecks.ts` | Verdict `cut`, `refused` or `lost` with `required` and `have`, or null for a cell with no gate. `query.blast` is null on the drill; the drill reports stops as `DrillGated` (feature-slices.md 3.6). |
 | `blastEffect(effect)` | `blastEffects.ts` | Runs after the kernel's blast, in id order. |
 | `generationHook(hook)` | `generationHooks.ts` | Integer-only folds; the hook's seed is `subSeedForHook(params, hook.id)`. Adding one bumps `GENERATOR_VERSION`. |
 | `oreLook(provider)` | `oreLook.ts` | One provider (`ore-visuals`). |

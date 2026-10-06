@@ -431,21 +431,32 @@ The query is `{tier, cellFamily}`, the two things a cell knows (`kind | family |
 ### 3.6 Gate checks (`mining-gates` provides): #142's named extension point
 
 ```ts
-// src/systems/registries/gateChecks.ts (new)
+// src/systems/registries/gateChecks.ts
 export type GateOutcome = 'cut' | 'refused' | 'lost'
-export interface GateQuery { state: AuthorityState; playerId: string; tile: TilePoint; cell: number; ore: OreType }
-export interface GateVerdict { outcome: GateOutcome; gateKind: string; required: string }
-export interface GateCheck { id: string; check(query: GateQuery): GateVerdict | null }   // null: no opinion
+export interface GateQuery {
+  state: AuthorityState; playerId: string; tile: TilePoint; cell: number; ore: OreType
+  blast: BlastEvent | null                                     // K2: null when the drill asks
+}
+export interface GateVerdict { outcome: GateOutcome; gateKind: string; required: string; have: string }
+export interface GateCheck { id: string; check(query: GateQuery): GateVerdict | null }   // null: no gate on this cell
 /** refused > lost > cut; ties break on the lowest check id. null when no check has an opinion. */
 export function gateVerdictOf(query: GateQuery): GateVerdict | null
 ```
 
-**Wired in #156** in `src/systems/authority/groundDrill.ts`, for ore cells only:
-- `drillTicksOfCells(params, drill)` takes the state and player. A `refused` verdict makes the `CellDrillTicks` answer `null` (not drillable).
-- `collectYieldedCells` skips `collectTile` for a `lost` verdict. `TileDestroyed` still fires.
-- With no check registered, both functions take today's path unchanged.
+A verdict answers the means in the query: `cut` opens the cell to it, `refused` leaves the cell standing, `lost` breaks it without ore. `required` and `have` are the gate's own words for #142's `gate_hit` and HUD chip.
 
-Gate-specific domain events (`DrillGated`) and gates on the blast path need K1 and K2.
+**Drill** (#156/#183, `src/systems/authority/drillGates.ts`), for ore cells only:
+- A `refused` verdict makes the `CellDrillTicks` answer `null` (not drillable).
+- `collectYieldedCells` skips `collectTile` for a `lost` verdict. `TileDestroyed` still fires.
+- **K2 (#185):** each stop is reported as the kernel domain event `DrillGated {tx, ty, oreId, family, tier, gateKind, outcome: refused|lost, required, have}`: a refused cell once per drill command that met it, a lost one right after its `TileDestroyed`. A command the gates refused entirely charges no energy and answers only its `DrillGated` events. It is logged as the core run event `gate_hit` with the same fields.
+
+**Blast (K2, #185)** (`src/systems/authority/charges/blastGates.ts`): a charge asks about every ore cell in its radius, with its `BlastEvent`.
+- `refused`: the cell stands (#153 amendment: dense and rig-gated cells are anchors in the crater).
+- `cut`: the cell breaks past the charge's hardness cap and pays its full unit, after the kept share (#142: a qualifying charge frees a dynamite-gated cell whole).
+- `lost`: the cell breaks, and its sale value joins `charge_detonated.oreValueLost`.
+- A cell with no verdict takes today's blast.
+
+One verdict per tile is asked per drill command or blast (`cellGates.ts`), on the state the command started from. With no check registered, nothing is asked and both paths are unchanged.
 
 ### 3.7 Blast effects (`dynamite` and others provide)
 
@@ -696,7 +707,7 @@ Solid arrows are registrations and kernel reads. Dotted arrows are the only slic
 | --- | --- | --- | --- |
 | Ore identity, grade, `requires` | `ores` | drill, cargo, logs, `mining-gates`, `ore-visuals`, `codex` | `oreTypes` registry; `ores` index |
 | Lead weights and roles | `planet-mix` (reads `ores` index) | `orePatches` / `generateChunk` | `generationHooks` (`patchContent`, `oreCell`) |
-| Gate verdict `cut \| refused \| lost` (#142 `canMine`) | `mining-gates` (reads `ores` and the rig-owning slice's index) | drill | `gateChecks` |
+| Gate verdict `cut \| refused \| lost` (#142 `canMine`) | `mining-gates` (reads `ores` and the rig-owning slice's index) | drill, blast | `gateChecks` |
 | Blast | kernel charges today; `dynamite` after K1/K3 | world, ore, other slices' effects; VFX/audio via domain events | `blastEffects`, `listenForDomainEvents` |
 | Ore look | `ore-visuals` | `chunkTileBatch` | `oreLook` |
 | Discovery | `codex` | `tech-tree`, `sensing` | `discovery` |
@@ -839,7 +850,7 @@ Outside `src/`: 11 vite-node scripts import `../src`, and `e2e/` has 5 specs. Th
 | Ticket | Scope | Needed by |
 | --- | --- | --- |
 | K1 | `commandRules`, `eventProjections`, `runEvents` registries; augmentable rejection reason; `debug.<slice>.*` namespace | #148, #149, codex, tech-tree, any state-changing slice debug action |
-| K2 (after K1) | `DrillGated` gate-reporting event; gate verdicts on the blast path (#142 "dynamite frees the whole cell") | #148 |
+| K2 (after K1, built in #185) | `DrillGated` gate-reporting event; gate verdicts on the blast path (#142 "dynamite frees the whole cell") | #148 |
 | K3 | `BlastEvent` size fields per #153 | #149, #145 |
 | K4 | Loadout: state, `equip_item`, `equip_refused`, `loadout` section v1, snapshot and protocol bumps, `setVehicleLoadout` | #162 item builds |
 | K5 | Sidecar `attach` array + attach coverage test | #166 |
