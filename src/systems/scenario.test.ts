@@ -103,7 +103,7 @@ describe('scenario validation', () => {
       { tier: 2, fangs: 4 },
     ]
     expect(validateScenario({ ...minimal, start: { enemies } })).toEqual([
-      'scenario.start.enemies[1].kind "dragon" is not a registered enemy id (crawler, burrower)',
+      'scenario.start.enemies[1].kind "dragon" is not a registered enemy id (crawler, burrower, tunnel_wrecker)',
       'scenario.start.enemies[1].tier must be a whole number from 0 to 9007199254740991, got 1.5',
       'scenario.start.enemies[2].fangs is not a scenario field',
       'scenario.start.enemies[2].kind is required',

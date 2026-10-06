@@ -3,7 +3,8 @@
  *
  * - A crawler walks over open cells: cave air and bored tunnels inside the disc, never through
  *   rock and never out into space.
- * - A burrower swims through any cell inside the disc and removes no tiles.
+ * - A burrower swims through any cell inside the disc and removes no tiles; so does a tunnel
+ *   wrecker, which flees into the rock (#111).
  *
  * Walking is greedy: straight at the target, or along one axis when the straight step is blocked.
  * Lunges and recoils keep the step fixed when they start and stop at the first blocked cell.
@@ -52,8 +53,12 @@ export function stepAlong(terrain: Terrain, enemy: Enemy): Enemy | null {
 
 export function canEnter(terrain: Terrain, kind: EnemyKind, point: MillimetrePoint): boolean {
   const tile = tileOfMillimetres(point.x, point.y)
-  if (kind === 'burrower') return isInsidePlanet(terrain.params, tile.tx, tile.ty)
+  if (isRockSwimmer(kind)) return isInsidePlanet(terrain.params, tile.tx, tile.ty)
   return kindOfCell(cellAt(terrain.world, terrain.params, tile)) === CELL_KIND.air
+}
+
+function isRockSwimmer(kind: EnemyKind): boolean {
+  return kind === 'burrower' || kind === 'tunnel_wrecker'
 }
 
 function mmPerTick(tilesPerSecond: number): number {

@@ -8,11 +8,12 @@
  * from the bands each kind lives in, with the burrower share picked by the slot's hash where both
  * may live. The point then sits on the first cell from there (in the chunk, same band) that suits
  * the kind: cave air for a crawler, rock or ore for a burrower. Band 1 has none (`sp[1] = 0`).
+ * The tunnel wrecker never sits on a spawn point: it comes to a vehicle's lined route (#111).
  */
 import { MM_PER_METRE } from '../../../constants/physics'
 import { hashCell } from '../../cellRandom'
 import { ECONOMY } from '../../economy/economy'
-import { ENEMY_KINDS, type EnemyKind } from '../../economy/economyDefinition'
+import { SPAWN_POINT_ENEMY_KINDS, type EnemyKind } from '../../economy/economyDefinition'
 import { enemyTier } from '../../economy/enemyStats'
 import { SEED_PURPOSE, subSeedFor } from '../../world/generatorSeeds'
 import { bandOfTile, isInsidePlanet } from '../../world/planetGeometry'
@@ -130,7 +131,7 @@ function isSlotKept(band: number, roll: number): boolean {
 
 /** The kinds that live in this band of this planet; where two do, the burrower share decides. */
 function kindAt(planetIndex: number, band: number, roll: number): EnemyKind | null {
-  const living = ENEMY_KINDS.filter((kind) => livesIn(kind, planetIndex, band))
+  const living = SPAWN_POINT_ENEMY_KINDS.filter((kind) => livesIn(kind, planetIndex, band))
   if (living.length < 2) return living[0] ?? null
   const { numerator, denominator } = combat.burrowerShare
   return roll % denominator < numerator ? 'burrower' : 'crawler'

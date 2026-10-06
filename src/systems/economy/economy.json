@@ -133,8 +133,33 @@
         "lungeTilesPerSecond": 8,
         "lungeTicks": 30,
         "recoilTicks": 30
+      },
+      {
+        "id": "tunnel_wrecker",
+        "health": "10",
+        "baseHit": "6",
+        "firstPlanet": 6,
+        "bands": [2, 3, 4, 5],
+        "moveTilesPerSecond": { "min": 1.5, "max": 2.5 },
+        "detectionTiles": { "min": 12, "max": 12 },
+        "attackCooldownTicks": { "min": 90, "max": 45 },
+        "windupTicks": 24,
+        "lungeTilesPerSecond": 8,
+        "lungeTicks": 30,
+        "recoilTicks": 30
       }
     ],
+    "tunnelWrecker": {
+      "gnawTicksPerRing": 300,
+      "fleeTiles": 12,
+      "ignoreVehicleTiles": 20,
+      "minLinedRings": 20,
+      "maxAliveByPlanet": [
+        { "from": 6, "n": 1 },
+        { "from": 10, "n": 2 }
+      ],
+      "respawnTicks": 3600
+    },
     "combat": {
       "kFrontPlayer": "0.25",
       "kSidePlayer": "1",

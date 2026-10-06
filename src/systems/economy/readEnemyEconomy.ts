@@ -1,6 +1,13 @@
 /** Reads the enemy and combat part of `economy.json` (decision #9, coefficients from #6 section 5). */
 import { readIntegerList, readLiteral, readRange, type FieldReader } from './economyFieldReader'
-import { ENEMY_KINDS, type CombatRules, type Economy, type EnemyDef } from './economyDefinition'
+import {
+  ENEMY_KINDS,
+  type CombatRules,
+  type Economy,
+  type EnemyDef,
+  type TunnelWreckerRules,
+  type WreckerCap,
+} from './economyDefinition'
 
 export function readEnemies(
   reader: FieldReader,
@@ -18,7 +25,36 @@ export function readEnemies(
     kinds: reader
       .list('enemies.kinds', enemies.kinds)
       .map((kind, index) => readEnemyDef(reader, `enemies.kinds[${index}]`, kind)),
+    tunnelWrecker: readTunnelWrecker(
+      reader,
+      reader.object('enemies.tunnelWrecker', enemies.tunnelWrecker),
+    ),
     combat: readCombat(reader, reader.object('enemies.combat', enemies.combat)),
+  }
+}
+
+function readTunnelWrecker(
+  reader: FieldReader,
+  rules: Record<string, unknown>,
+): TunnelWreckerRules {
+  const path = 'enemies.tunnelWrecker'
+  return {
+    gnawTicksPerRing: reader.safeInteger(`${path}.gnawTicksPerRing`, rules.gnawTicksPerRing),
+    fleeTiles: reader.safeInteger(`${path}.fleeTiles`, rules.fleeTiles),
+    ignoreVehicleTiles: reader.safeInteger(`${path}.ignoreVehicleTiles`, rules.ignoreVehicleTiles),
+    minLinedRings: reader.safeInteger(`${path}.minLinedRings`, rules.minLinedRings),
+    maxAliveByPlanet: reader
+      .list(`${path}.maxAliveByPlanet`, rules.maxAliveByPlanet)
+      .map((cap, index) => readWreckerCap(reader, `${path}.maxAliveByPlanet[${index}]`, cap)),
+    respawnTicks: reader.safeInteger(`${path}.respawnTicks`, rules.respawnTicks),
+  }
+}
+
+function readWreckerCap(reader: FieldReader, path: string, value: unknown): WreckerCap {
+  const cap = reader.object(path, value)
+  return {
+    from: reader.safeInteger(`${path}.from`, cap.from),
+    n: reader.safeInteger(`${path}.n`, cap.n),
   }
 }
 

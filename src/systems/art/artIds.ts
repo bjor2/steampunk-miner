@@ -136,10 +136,10 @@ export function trackIconIdOf(track: string): string {
 
 /**
  * Enemy rows of the locked schedule (#80) whose art ticket ran before their module adds the kind to
- * `economy.json`: `tunnel_wrecker` (#112, spec #111, build #94). The schedule row id is the kind id
- * the module will register, so the art id stays derived from a registry (#52).
+ * `economy.json`. The schedule row id is the kind id the module will register, so the art id stays
+ * derived from a registry (#52). None now: `tunnel_wrecker` (#112) is an economy kind since #94.
  */
-export const SCHEDULED_ENEMY_ART_ROW_IDS: readonly string[] = ['tunnel_wrecker']
+export const SCHEDULED_ENEMY_ART_ROW_IDS: readonly string[] = []
 
 /** The economy's enemy kinds, then each scheduled Enemy row with art that is not one of them yet. */
 export function enemyArtKinds(): string[] {

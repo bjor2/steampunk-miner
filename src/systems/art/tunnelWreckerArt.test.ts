@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { SHIPPED_ART } from '../../scene/shippedArt'
-import { SCHEDULED_ENEMY_ART_ROW_IDS, blenderAssetIds } from './artIds'
+import { SCHEDULED_ENEMY_ART_ROW_IDS, blenderAssetIds, enemyArtKinds } from './artIds'
 import { assetQuadsOf, atlasMapsOf } from './assetLook'
 import { placeholderQuadsOf } from './placeholderLook'
 import { ENEMY_IDS } from '../registeredIds'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 
-// The tunnel wrecker (#111, #112): enemy art named from its schedule row ahead of its module (#94).
+// The tunnel wrecker (#111, #112): enemy art named from its schedule row, now the economy kind #94
+// registered.
 describe('tunnel wrecker art', () => {
-  it("names the tunnel wrecker's art from its schedule row before the economy lists the kind", () => {
-    expect(ENEMY_IDS).not.toContain('tunnel_wrecker')
+  it("names the tunnel wrecker's art from the economy kind its module registered (#94)", () => {
+    expect(ENEMY_IDS).toContain('tunnel_wrecker')
+    expect(enemyArtKinds().filter((kind) => kind === 'tunnel_wrecker')).toHaveLength(1)
     expect(blenderAssetIds()).toContain('enemy-tunnel-wrecker')
   })
 

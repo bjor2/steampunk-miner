@@ -27,9 +27,14 @@ export const TRACK_EFFECTS: Readonly<Record<UpgradeId, string>> = {
   hull: 'geometric hullMax',
 }
 
-export const ENEMY_KINDS = ['crawler', 'burrower'] as const
+/** The kinds spawn points hold (#9); the tunnel wrecker comes to a lined route instead (#111). */
+export const SPAWN_POINT_ENEMY_KINDS = ['crawler', 'burrower'] as const
+
+export const ENEMY_KINDS = [...SPAWN_POINT_ENEMY_KINDS, 'tunnel_wrecker'] as const
 
 export type EnemyKind = (typeof ENEMY_KINDS)[number]
+
+export type SpawnPointEnemyKind = (typeof SPAWN_POINT_ENEMY_KINDS)[number]
 
 /** The three contact zones of #9; each has its own multiplier on the enemy's base hit. */
 export const HIT_ARCS = ['front', 'side', 'rear'] as const
@@ -101,6 +106,28 @@ export interface EnemyDef {
   lungeTicks: number
   /** How long a side or rear hitter backs off before it comes again (#9 `recoilTicks`). */
   recoilTicks: number
+}
+
+/** How many wreckers may hunt one vehicle's route from planet `from` on (#111 `maxAliveByPlanet`). */
+export interface WreckerCap {
+  from: number
+  n: number
+}
+
+/** The tunnel wrecker's route rules (spec #111, Systems & Economy numbers), in ticks and tiles. */
+export interface TunnelWreckerRules {
+  /** Ticks of gnawing that breach one ring (the single tuning lever, 180 to 600). */
+  gnawTicksPerRing: number
+  /** A vehicle this close sends it fleeing into the rock. */
+  fleeTiles: number
+  /** It never gnaws a ring within this distance of any vehicle. */
+  ignoreVehicleTiles: number
+  /** Lined rings a vehicle must have laid behind it this trip before the first wrecker comes. */
+  minLinedRings: number
+  /** Ascending by `from`; the last row at or below the planet applies. */
+  maxAliveByPlanet: readonly WreckerCap[]
+  /** Ticks after one fled or died before the next may come. */
+  respawnTicks: number
 }
 
 export interface CombatRules {
@@ -180,6 +207,7 @@ export interface Economy {
     growth: BigStat
     saturationTier: number
     kinds: readonly EnemyDef[]
+    tunnelWrecker: TunnelWreckerRules
     combat: CombatRules
   }
 }

@@ -1,5 +1,5 @@
 /**
- * The programmatic placeholder for the two hand-authored enemies (#9 "Enemy art", #13), until the
+ * The programmatic placeholder for the hand-authored enemies (#9 "Enemy art", #13, #112), until the
  * commissioned parts land. The kind reads from its silhouette (a crawler is square, a burrower
  * round), the tier from the tint ramp, size and glow (`enemyTint`), so neither relies on colour
  * alone. The telegraph overrides the tint: the wind-up (the burrower's tremor) burns white-hot,
@@ -31,6 +31,8 @@ const WINDUP_GLOW = 1
 const BODY: Readonly<Record<EnemyKind, { silhouette: EnemySilhouette; size: number }>> = {
   crawler: { silhouette: 'square', size: 0.8 },
   burrower: { silhouette: 'round', size: 0.9 },
+  // A squat dome like its #112 bake, the same 0.9 m part.
+  tunnel_wrecker: { silhouette: 'round', size: 0.9 },
 }
 
 export function enemyLookOf(kind: EnemyKind, phase: EnemyPhase, tier: number): EnemyLook {

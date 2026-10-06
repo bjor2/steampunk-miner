@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { placeholderQuadsOf } from '../art/placeholderLook'
 import { ENEMY_KINDS } from '../economy/economyDefinition'
-import { enemyArtOf, enemyRollOf, isEveryEnemyArtFinal } from './enemyArt'
+import { enemyArtOf, enemyAssetIdOf, enemyRollOf, isEveryEnemyArtFinal } from './enemyArt'
 import { enemyLookOf } from './enemyPlaceholder'
 import { SHIPPED_ART } from '../../scene/shippedArt'
 
@@ -10,11 +10,12 @@ describe('enemy art', () => {
     expect(isEveryEnemyArtFinal(SHIPPED_ART)).toBe(true)
     for (const kind of ENEMY_KINDS) {
       const art = enemyArtOf(SHIPPED_ART, kind)
-      const [placeholder] = placeholderQuadsOf(SHIPPED_ART, `enemy-${kind}`, 1)
-      expect(art.quad.partId).toBe(`enemy-${kind}`)
+      const assetId = enemyAssetIdOf(kind)
+      const [placeholder] = placeholderQuadsOf(SHIPPED_ART, assetId, 1)
+      expect(art.quad.partId).toBe(assetId)
       expect(art.quad.uv).not.toBeNull()
       expect(art.quad.size).toEqual(placeholder.size)
-      expect(art.maps?.albedo).toBe(`assets/enemy/enemy-${kind}/enemy-${kind}.albedo.ktx2`)
+      expect(art.maps?.albedo).toBe(`assets/enemy/${assetId}/${assetId}.albedo.ktx2`)
     }
   })
 

@@ -33,6 +33,28 @@ describe('enemy stats', () => {
     expect(enemyTier(40, 5)).toBe(239)
   })
 
+  it('gives a tunnel wrecker 10 * 1.12^T health and 6 * 1.12^T hit from planet 6 in bands 2 to 5 (#111)', () => {
+    expect(enemyHealth('tunnel_wrecker', 1)).toEqual(m('11.2'))
+    expect(enemyBaseHit('tunnel_wrecker', 1)).toEqual(m('6.72'))
+    const wrecker = ECONOMY.enemies.kinds.find((kind) => kind.id === 'tunnel_wrecker')
+    expect(wrecker).toMatchObject({ firstPlanet: 6, bands: [2, 3, 4, 5] })
+    expect(enemyBoundedStats('tunnel_wrecker', 1).detectionTiles).toBe(12)
+  })
+
+  it("holds the tunnel wrecker's route numbers as Systems set them (#111)", () => {
+    expect(ECONOMY.enemies.tunnelWrecker).toEqual({
+      gnawTicksPerRing: 300,
+      fleeTiles: 12,
+      ignoreVehicleTiles: 20,
+      minLinedRings: 20,
+      maxAliveByPlanet: [
+        { from: 6, n: 1 },
+        { from: 10, n: 2 },
+      ],
+      respawnTicks: 3600,
+    })
+  })
+
   it('gives a crawler 7 * 1.12^T health and 17.5 * 1.12^T hit, a burrower 16.5 * 1.12^T hit', () => {
     expect(enemyHealth('crawler', 1)).toEqual(m('7.84'))
     expect(enemyBaseHit('crawler', 1)).toEqual(m('19.6'))

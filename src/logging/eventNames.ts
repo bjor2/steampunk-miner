@@ -24,7 +24,9 @@ export type RegisteredEvent =
   | { group: RunEventGroup; level: RunEventLevel; payload: PayloadFields | 'unspecified' }
   | { group: RunEventGroup; payload: 'reserved' }
 
-const ENEMY_KIND = { oneOf: ['crawler', 'burrower'] } as const satisfies FieldKind
+const ENEMY_KIND = {
+  oneOf: ['crawler', 'burrower', 'tunnel_wrecker'],
+} as const satisfies FieldKind
 const HIT_ARC = { oneOf: ['front', 'side', 'rear'] } as const satisfies FieldKind
 const BAY = { oneOf: ['sell', 'upgrade'] } as const satisfies FieldKind
 
