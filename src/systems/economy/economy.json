@@ -25,7 +25,8 @@
   "energy": {
     "perSecond": { "drill": "1", "thrust": "1.5", "drive": "0.25" },
     "rescueFloorFraction": "0.25",
-    "drillUpEnergyMult": "2.5"
+    "drillUpEnergyMult": "2.5",
+    "perShot": "0.5"
   },
   "drill": { "scratchFloor": "0.25", "minTicksPerTile": 24 },
   "costCurves": [
@@ -96,6 +97,16 @@
       "onCurve": { "levelAtPlanet1": 2, "levelsPerPlanet": 6 }
     }
   ],
+  "gun": {
+    "damageFractionOfDrill": "0.25",
+    "fireIntervalTicks": { "min": 30, "max": 12 },
+    "halfLevel": 8,
+    "maxLevel": 16,
+    "rangeTiles": 8,
+    "frontDeadConeDeg": 60,
+    "mountCost": { "band": 5, "oreUnits": "30" },
+    "levelCost": { "id": "cost.vehicle.gun", "band": 5, "oreUnits": "8", "ratio": "1.250" }
+  },
   "visualTiers": [
     { "tier": 1, "minTotalLevel": 0 },
     { "tier": 2, "minTotalLevel": 8 },

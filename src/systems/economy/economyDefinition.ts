@@ -143,6 +143,31 @@ export interface CombatRules {
   burrowerShare: { numerator: number; denominator: number }
 }
 
+/** A price of `oreUnits` of band `band`'s ore at the purchase planet (#105, #107 `bandOre`). */
+export interface BandOreCost {
+  band: number
+  oreUnits: Money
+}
+
+/**
+ * `auto_guns` (#107 numbers): a hull turret bought at the Upgrade bay from planet 4. A shot deals
+ * `damageFractionOfDrill * drillPower * kDrillVsEnemy`; its interval saturates from
+ * `fireIntervalTicks.min` at level 1 toward `.max` (`halfLevel` levels past level 1 gain half the
+ * range) up to `maxLevel`. Level 1 is the mount; each later level costs
+ * `levelCost.oreUnits * levelCost.ratio^(level - 1)` band ore units, priced like the mount.
+ */
+export interface GunRules {
+  damageFractionOfDrill: BigStat
+  fireIntervalTicks: BoundedRange
+  halfLevel: number
+  maxLevel: number
+  rangeTiles: number
+  /** The forward cone, centred on the drill axis, the guns never fire into. */
+  frontDeadConeDeg: number
+  mountCost: BandOreCost
+  levelCost: BandOreCost & { id: string; ratio: Money }
+}
+
 export interface Economy {
   economyVersion: number
   ore: {
@@ -177,6 +202,8 @@ export interface Economy {
      * Informational only; the live drain is still the sum of the two rates.
      */
     drillUpEnergyMult: BigStat
+    /** What one `auto_guns` shot takes from the boiler, in units (#107 numbers). */
+    perShot: BigStat
   }
   /** The #7 drill rule's constants, filled in by #6 section 1. */
   drill: {
@@ -201,6 +228,7 @@ export interface Economy {
     collapseCrush: readonly BigStat[]
   }
   upgrades: readonly UpgradeDef[]
+  gun: GunRules
   visualTiers: readonly VisualTierThreshold[]
   enemies: {
     tier: { first: number; perPlanet: number; perBand: number }

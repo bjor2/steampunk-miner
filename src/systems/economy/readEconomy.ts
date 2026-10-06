@@ -6,6 +6,7 @@ import { createFieldReader, readLiteral, readRange, type FieldReader } from './e
 import { readEnemies } from './readEnemyEconomy'
 import {
   TRACK_EFFECTS,
+  type BandOreCost,
   UPGRADE_IDS,
   type CostCurve,
   type Economy,
@@ -46,6 +47,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     costCurves,
     casing: readCasing(reader, reader.object('casing', file.casing), costCurves, ore.coreTierBand),
     upgrades,
+    gun: readGun(reader, reader.object('gun', file.gun)),
     visualTiers: reader
       .list('visualTiers', file.visualTiers)
       .map((tier, index) => readVisualTier(reader, `visualTiers[${index}]`, tier)),
@@ -124,6 +126,33 @@ function readEnergy(reader: FieldReader, energy: Record<string, unknown>): Econo
     },
     rescueFloorFraction: reader.money('energy.rescueFloorFraction', energy.rescueFloorFraction),
     drillUpEnergyMult: reader.money('energy.drillUpEnergyMult', energy.drillUpEnergyMult),
+    perShot: reader.money('energy.perShot', energy.perShot),
+  }
+}
+
+function readGun(reader: FieldReader, gun: Record<string, unknown>): Economy['gun'] {
+  const levelCost = reader.object('gun.levelCost', gun.levelCost)
+  return {
+    damageFractionOfDrill: reader.money('gun.damageFractionOfDrill', gun.damageFractionOfDrill),
+    fireIntervalTicks: readRange(reader, 'gun.fireIntervalTicks', gun.fireIntervalTicks),
+    halfLevel: reader.safeInteger('gun.halfLevel', gun.halfLevel),
+    maxLevel: reader.safeInteger('gun.maxLevel', gun.maxLevel),
+    rangeTiles: reader.safeInteger('gun.rangeTiles', gun.rangeTiles),
+    frontDeadConeDeg: reader.safeInteger('gun.frontDeadConeDeg', gun.frontDeadConeDeg),
+    mountCost: readBandOreCost(reader, 'gun.mountCost', gun.mountCost),
+    levelCost: {
+      ...readBandOreCost(reader, 'gun.levelCost', levelCost),
+      id: reader.text('gun.levelCost.id', levelCost.id),
+      ratio: reader.money('gun.levelCost.ratio', levelCost.ratio),
+    },
+  }
+}
+
+function readBandOreCost(reader: FieldReader, path: string, value: unknown): BandOreCost {
+  const cost = reader.object(path, value)
+  return {
+    band: reader.safeInteger(`${path}.band`, cost.band),
+    oreUnits: reader.money(`${path}.oreUnits`, cost.oreUnits),
   }
 }
 

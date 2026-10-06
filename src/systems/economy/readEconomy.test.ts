@@ -28,6 +28,16 @@ describe('economy data validation', () => {
     expect(upgrades.every((upgrade) => upgrade.maxLevel === null)).toBe(true)
   })
 
+  it('lists every broken field of the auto_guns block (#107)', () => {
+    const broken = economyFileCopy() as unknown as { gun: Record<string, unknown> }
+    broken.gun.damageFractionOfDrill = 0.25
+    broken.gun.mountCost = { band: 5 }
+    expect(problemsOf(broken)).toEqual([
+      'gun.damageFractionOfDrill must be a decimal string >= 0',
+      'gun.mountCost.oreUnits must be a decimal string >= 0',
+    ])
+  })
+
   it('lists an unknown upgrade id as a problem', () => {
     const broken = economyFileCopy()
     broken.upgrades[0].id = 'laser'
