@@ -73,6 +73,7 @@ import { readCollapseReport } from '../store/collapseReads'
 import type { BayId } from '../systems/world/dockBays'
 import { SOLID_DENSITY } from '../systems/world/sampleGrid'
 import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'
+import { readPhysicsStats, type PhysicsStats } from './debugMemory'
 import {
   createDebugInput,
   createDebugUi,
@@ -202,6 +203,9 @@ export interface DebugApi {
   forceCollapse(block: string): DebugResult
   /** The weak blocks within 16 m of a vehicle and the blocks warning or refilling. */
   collapseState(): DebugResult<CollapseReport>
+  // memory (#119): reads, not logged
+  /** Rigid bodies and colliders in the running Rapier world, and its WASM memory in bytes. */
+  getPhysicsStats(): DebugResult<PhysicsStats>
   /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
   ui: DebugUi
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
@@ -399,6 +403,7 @@ export function createDebugApi(): DebugApi {
         game().forceCollapse(block),
       ),
     collapseState: () => ({ ok: true, ...readCollapseReport() }),
+    getPhysicsStats: readPhysicsStats,
     ui: createDebugUi(),
     input: createDebugInput(),
     teleportToCore: notImplemented('teleportToCore'),

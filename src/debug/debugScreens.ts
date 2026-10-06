@@ -40,6 +40,7 @@ import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import { bayScreenPresence } from '../ui/platform/bayScreenPresence'
+import { readRendererMemory, type RendererMemory } from './debugMemory'
 
 export type DebugResult<T extends object = object> =
   ({ ok: true } & T) | { ok: false; problems: string[] }
@@ -56,6 +57,8 @@ export interface DebugUi {
   getCameraView(): DebugResult<{ view: CameraView }>
   /** What the last frame drew and cost (#38 acceptance 1-3): draw calls, blocks, lights, scale. */
   getRenderStats(): DebugResult<{ stats: RenderStats }>
+  /** Live geometries, textures and compiled programs in three's `renderer.info` (#119). */
+  getRendererMemory(): DebugResult<RendererMemory>
   /** Holds the render scale (0 to 1, clamped to the 1080p floor), or `null` to adapt again (#38). */
   setRenderScale(scale: unknown): DebugResult
   getHudModel(): DebugResult<{ model: HudModel }>
@@ -105,6 +108,7 @@ export function createDebugUi(): DebugUi {
     setZoom: setZoomUnlessRefused,
     getCameraView: () => ({ ok: true, view: cameraViewOnScreen() }),
     getRenderStats: () => ({ ok: true, stats: renderStatsNow() }),
+    getRendererMemory: readRendererMemory,
     setRenderScale: pinRenderScaleUnlessRefused,
     getHudModel: () => ({ ok: true, model: readHudModel() }),
     getSellBayModel: () => ({ ok: true, model: readSellBayModel() }),

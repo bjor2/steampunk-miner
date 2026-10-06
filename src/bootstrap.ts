@@ -16,6 +16,7 @@ import { writeRunMetadata, writeRunSummary } from './logging/runDocuments'
 import { createRunId } from './logging/runLayout'
 import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
 import { createRunMetadata } from './logging/runMetadata'
+import { watchRapierWasmMemory } from './physics/rapierWasmMemory'
 import { getShell, type Shell } from './shell/shell'
 import {
   installSaveSlots,
@@ -127,8 +128,10 @@ function resumeOrReport(checkpoint: CheckpointLoad): void {
   else console.error(`checkpoint refused, starting fresh: ${checkpoint.problems.join('; ')}`)
 }
 
+/** Before the scene mounts, so `getPhysicsStats()` sees Rapier's WASM memory as it loads (#119). */
 function exposeDebugHandles(shell: Shell, runId: string): void {
   if (!shell.launch.debugEnabled) return
+  watchRapierWasmMemory()
   shell.exposeGlobalHandle('steampunkDebug', createDebugApi())
   shell.exposeGlobalHandle('steampunkRunLog', () => shell.readBufferedRunEvents(runId))
   shell.exposeGlobalHandle('steampunkRunCommands', () => shell.readBufferedRunCommands(runId))

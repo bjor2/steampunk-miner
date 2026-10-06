@@ -3,7 +3,8 @@
  * takes over R3F's render (a positive `useFrame` priority), counts what the frame cost from
  * `renderer.info`, and once per second of frames lets the pure render-scale rule move the canvas's
  * pixel ratio between the 1080p floor and a native render. The HTML UI is outside the canvas, so
- * it stays native at every scale. Presentation only: it never writes the authority or submits.
+ * it stays native at every scale. Its `renderer.info` also answers `ui.getRendererMemory()` (#119).
+ * Presentation only: it never writes the authority or submits.
  */
 import { useFrame, useThree, type RootState } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
@@ -25,6 +26,7 @@ import {
 } from '../systems/render/renderScale'
 import { createPostPipeline } from './postPipeline'
 import { renderPresence } from './renderPresence'
+import { watchRendererInfo } from './rendererMemory'
 
 /** After the scene's own frame work, so the frame is drawn last. */
 const RENDER_PRIORITY = 1
@@ -38,7 +40,9 @@ export function RenderPipeline() {
   useEffect(() => {
     // Counted over the whole frame, scene and post passes, then reset by hand each frame.
     gl.info.autoReset = false
+    const unwatchInfo = watchRendererInfo(gl.info)
     return () => {
+      unwatchInfo()
       gl.info.autoReset = true
       pipeline.dispose()
     }

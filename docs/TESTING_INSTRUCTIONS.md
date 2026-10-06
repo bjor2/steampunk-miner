@@ -90,7 +90,11 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   off planets 8 to 16); for collapse (#43),
   `forceCollapse(block)` (a `cx,cy#index` block, warned for the full 60 ticks, then refilled whatever its
   lining) and the unlogged read `collapseState()` (the weak blocks within 16 m of a vehicle and the blocks
-  warning or refilling). Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first
+  warning or refilling); for memory (#119), the unlogged read `getPhysicsStats()`
+  (`{ rigidBodies, colliders, wasmBytes }` of the running Rapier world; `wasmBytes` is Rapier's WASM
+  memory, seen as Rapier loads in a debug run) and `ui.getRendererMemory()` (`{ geometries, textures,
+programs }` from three's `renderer.info` of the game canvas), read only when called, for the memory
+  soak (#99); both refuse while nothing is mounted. Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
   `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getRefineryBayModel()` (#105), `ui.getBayPresentation()`, `ui.getAudioModel()`) reads the
