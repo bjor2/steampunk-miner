@@ -96,8 +96,9 @@ describe('feature time html', () => {
     expect(html.match(/<div class="ft-time-row" /g)).toHaveLength(2)
     expect(html).toContain('data-area="Vehicle &amp; &lt;Movement&gt;"')
     expect(html).toContain('4.0 h · 2 of 3 tickets measured')
-    expect(html).toContain('1 ticket, none measured')
-    expect(html).not.toContain('0 min')
+    const economy = html.slice(html.indexOf('data-area="Economy"'))
+    expect(economy).toContain('1 ticket, none measured')
+    expect(economy).not.toContain('0 min')
   })
 
   it('shows the error in place of the chart when the roll-up fails', () => {

@@ -22,6 +22,7 @@ function plural(count, word) {
 }
 
 function measuredLine(time) {
+  if (time.measuredCount === 0) return `${plural(time.ticketCount, 'ticket')}, none measured`
   return `Measured: ${formatDuration(time.measuredS)} over ${time.measuredCount} of ${plural(time.ticketCount, 'ticket')}`
 }
 
