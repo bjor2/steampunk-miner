@@ -83,6 +83,21 @@ describe('compareRuns', () => {
     )
   })
 
+  it('shows each planet band 5 dig time beside band 1, the band the sawtooth is judged on', () => {
+    const a = summaryOf({ sawtoothBandDigTicks: { '3': { arrival: 45, departure: 24 } } })
+    const b = summaryOf({
+      runId: 'run_b',
+      sawtoothBandDigTicks: { '3': { arrival: 36, departure: 24 } },
+    })
+    const comparison = compareRuns(a, b)
+    expect(comparison.ok && rowNamed(comparison.rows, 'planet 3 band 5 dig on arrival')).toEqual({
+      metric: 'planet 3 band 5 dig on arrival',
+      a: '0.75 s/m',
+      b: '0.60 s/m',
+      change: '-0.15 s/m (-20%)',
+    })
+  })
+
   it('compares against a summary written before band 1 dig times were kept', () => {
     const { firstBandDigTicks: _absent, ...older } = summaryOf()
     const b = summaryOf({

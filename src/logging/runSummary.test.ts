@@ -182,6 +182,19 @@ describe('run summary', () => {
     })
   })
 
+  it('keeps the band-5 dig time of each planet too, the band the sawtooth is judged on', () => {
+    const run = [
+      ...PLAYED_RUN.slice(0, 7),
+      bought(985, 'drill_power', 13),
+      bought(986, 'drill_tip', 7),
+      ...PLAYED_RUN.slice(7),
+    ]
+    expect(deriveSummary(run).sawtoothBandDigTicks).toEqual({
+      '1': { arrival: 608, departure: 24 },
+      '2': { arrival: 45, departure: 45 },
+    })
+  })
+
   it('enters the planet with the start levels a scenario sets on the tick it is entered', () => {
     const setDrill = line(0, 'debug_command_applied', {
       command: 'debug.setUpgrade',

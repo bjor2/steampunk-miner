@@ -195,10 +195,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   writes the first seed's run to `balance-report/` and compares it with
   `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
   deliberate economy change, `npm run balance:baseline` rewrites the baseline in the same commit.
-- **Sawtooth** (#81, C3 #86): the summary's `firstBandDigTicks` holds each planet's band-1 drill
-  ticks per metre with the levels it was entered and left with (`firstBandDigTicks` in
-  `systems/vehicle/firstBandDig.ts`); `compareRuns` shows both per planet, and `balance:planets`
-  prints them with the ratio and alerts where departure is over 0.7x arrival. Reported, never gated.
+- **Sawtooth** (#81, C3 #86): the summary's `sawtoothBandDigTicks` holds each planet's band-5
+  drill ticks per metre with the levels it was entered and left with (`bandDigTicks` in
+  `systems/vehicle/bandDig.ts`), and `firstBandDigTicks` the same for band 1; `compareRuns` shows
+  both per planet. `balance:planets` plays the bot scenario on each pacing seed and warns where the
+  median band-5 departure is over 0.7x arrival on a planet the bot left (`sawtoothMedian.ts`).
+  Band 1 already digs at the 24-tick cap on arrival, so it is printed, never judged. Reported,
+  never gated.
 
 ## 5. Browser and packaged end-to-end (Playwright)
 

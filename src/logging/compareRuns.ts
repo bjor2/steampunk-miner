@@ -1,7 +1,7 @@
 /**
  * `compareRuns(a, b)` (decision #11 section 3, design doc sections 26 and 28): two run summaries
  * side by side, as the numbers a balance change moves: time to each planet and core, each planet's
- * band-1 dig time on arrival and at departure (the #81 sawtooth, #86), the firsts, income per
+ * band-1 and band-5 dig time on arrival and at departure (the #81 sawtooth, #86), the firsts, income per
  * minute, spending by kind, deaths and the final level of every track. Differences are
  * reported, never judged: only the pacing targets fail a build (#29).
  *
@@ -23,7 +23,8 @@ import {
   ZERO_MONEY,
   type Money,
 } from '../systems/money'
-import { digText, type FirstBandDig } from './firstBandDigReport'
+import { SAWTOOTH_BAND } from '../systems/vehicle/bandDig'
+import { digText, type BandDig } from './bandDigReport'
 import type { RunSummary } from './runSummary'
 
 export interface ComparisonRow {
@@ -81,7 +82,7 @@ function metricsFor(a: RunSummary, b: RunSummary): Metric[] {
   return [
     ...keysOfEither(a.milestones.planetReached, b.milestones.planetReached).map(planetMetric),
     ...keysOfEither(a.coreCompletedTicks, b.coreCompletedTicks).map(coreMetric),
-    ...keysOfEither(firstBandDigsOf(a), firstBandDigsOf(b)).flatMap(firstBandDigMetrics),
+    ...bandDigMetricsFor(a, b),
     ...FIXED_METRICS,
     ...keysOfEither(a.upgradeLevels, b.upgradeLevels).map(levelMetric),
   ]
@@ -107,23 +108,39 @@ function coreMetric(planet: string): Metric {
   }
 }
 
-/** A `summary.json` written before #86 has no band-1 dig times; it compares as none. */
-function firstBandDigsOf(summary: RunSummary): Partial<Record<string, FirstBandDig>> {
-  return (summary as Partial<RunSummary>).firstBandDigTicks ?? {}
+/** The summary fields that hold a band's dig time per planet, and the band each one measures. */
+const BAND_DIG_FIELDS = [
+  { field: 'firstBandDigTicks', band: 1 },
+  { field: 'sawtoothBandDigTicks', band: SAWTOOTH_BAND },
+] as const
+
+type BandDigField = (typeof BAND_DIG_FIELDS)[number]
+
+function bandDigMetricsFor(a: RunSummary, b: RunSummary): Metric[] {
+  return BAND_DIG_FIELDS.flatMap((source) =>
+    keysOfEither(bandDigsOf(a, source), bandDigsOf(b, source)).flatMap((planet) =>
+      bandDigMetrics(source, planet),
+    ),
+  )
 }
 
-function firstBandDigMetrics(planet: string): Metric[] {
-  const digOf = (summary: RunSummary, when: keyof FirstBandDig): Quantity => ({
+/** A `summary.json` written before #86 has no band dig times; it compares as none. */
+function bandDigsOf(summary: RunSummary, source: BandDigField): Partial<Record<string, BandDig>> {
+  return (summary as Partial<RunSummary>)[source.field] ?? {}
+}
+
+function bandDigMetrics(source: BandDigField, planet: string): Metric[] {
+  const digOf = (summary: RunSummary, when: keyof BandDig): Quantity => ({
     kind: 'digTicks',
-    value: firstBandDigsOf(summary)[planet]?.[when] ?? null,
+    value: bandDigsOf(summary, source)[planet]?.[when] ?? null,
   })
   return [
     {
-      name: `planet ${planet} band 1 dig on arrival`,
+      name: `planet ${planet} band ${source.band} dig on arrival`,
       read: (summary) => digOf(summary, 'arrival'),
     },
     {
-      name: `planet ${planet} band 1 dig at departure`,
+      name: `planet ${planet} band ${source.band} dig at departure`,
       read: (summary) => digOf(summary, 'departure'),
     },
   ]

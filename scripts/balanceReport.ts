@@ -14,7 +14,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { PACING_WORLD_SEEDS } from '../src/constants/pacingSeeds'
 import { compareRuns, formatComparisonTable } from '../src/logging/compareRuns'
-import { firstBandDigAlerts } from '../src/logging/firstBandDigReport'
+import { bandDigAlerts } from '../src/logging/bandDigReport'
 import { formatNdjsonLine } from '../src/logging/ndjson'
 import {
   formatSeedPacingTable,
@@ -35,6 +35,7 @@ import { deriveSummary, formatRunSummary, type RunSummary } from '../src/logging
 import { playLoggedSliceOnSeeds } from '../src/logging/sliceRunLog'
 import { deriveWreckerDives, wreckerDiveLines } from '../src/logging/wreckerDiveReport'
 import type { Scenario } from '../src/systems/scenario'
+import { SAWTOOTH_BAND } from '../src/systems/vehicle/bandDig'
 
 const SCENARIO_FILE = new URL('../scenarios/bot-slice.scenario.json', import.meta.url)
 const ASSAY_SCENARIO_FILE = new URL('../scenarios/bot-slice-assay.scenario.json', import.meta.url)
@@ -63,7 +64,7 @@ const report = [
   listSection('Alerts (reported only)', [
     ...pacingAlerts(pacing),
     ...campaignPlanetAlerts(pacing),
-    ...firstBandDigAlerts(summary.firstBandDigTicks),
+    ...bandDigAlerts(summary.sawtoothBandDigTicks, SAWTOOTH_BAND),
   ]),
   listSection('Tunnel wrecker (reported only, #111)', wreckerDiveLines(deriveWreckerDives(events))),
   comparisonSection(summary),

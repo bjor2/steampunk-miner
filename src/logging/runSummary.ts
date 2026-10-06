@@ -10,9 +10,13 @@
  */
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { add, fromCanonical, toCanonical, ZERO_MONEY, type Money } from '../systems/money'
+import { SAWTOOTH_BAND } from '../systems/vehicle/bandDig'
 import type { RunEventName } from './eventNames'
-import { firstBandDigOf, type FirstBandDig, type PlanetLevels } from './firstBandDigReport'
+import { bandDigOf, type BandDig, type PlanetLevels } from './bandDigReport'
 import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
+
+/** The band the first #86 probe measured; kept beside the sawtooth band, reported only. */
+const FIRST_BAND = 1
 
 export interface RunSummary {
   runId: string
@@ -56,7 +60,12 @@ export interface RunSummary {
    * Planet index (as a string key) to its band-1 drill ticks per metre with the levels it was
    * entered and left with (#81 sawtooth, #86); the planet the run ends on is left with its last.
    */
-  firstBandDigTicks: Record<string, FirstBandDig>
+  firstBandDigTicks: Record<string, BandDig>
+  /**
+   * The same for band 5, the band the #81 sawtooth is judged on (Game Director on #86): departure
+   * at most 0.7x arrival on the median of the pacing seeds.
+   */
+  sawtoothBandDigTicks: Record<string, BandDig>
   milestones: RunMilestones
 }
 
@@ -303,7 +312,8 @@ function summaryOf(tally: Tally): RunSummary {
     debugCommandsApplied: tally.debugCommandsApplied,
     upgradeLevels: { ...tally.upgradeLevels },
     coreCompletedTicks: { ...tally.coreCompletedTicks },
-    firstBandDigTicks: firstBandDigOf(tally.planetLevels, tally.upgradeLevels),
+    firstBandDigTicks: bandDigOf(tally.planetLevels, tally.upgradeLevels, FIRST_BAND),
+    sawtoothBandDigTicks: bandDigOf(tally.planetLevels, tally.upgradeLevels, SAWTOOTH_BAND),
     milestones: { ...tally.milestones, planetReached: { ...tally.milestones.planetReached } },
   }
 }

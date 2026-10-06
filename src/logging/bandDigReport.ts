@@ -1,18 +1,19 @@
 /**
- * The #81 sawtooth in a run's summary (C3 #86 acceptance 3): for each planet, the drill time per
- * metre of its first band with the track levels the vehicle arrived with and the levels it left
- * with (its `travel_started`, or the run's last levels on the planet it ended on). Derived from the
- * logged levels by the pure drill rule, never written into the log (#11 section 3). Reported, never
- * gated: #81 acceptance 1 wants departure at most 0.7x arrival on every campaign planet.
+ * The #81 sawtooth in a run's summary (C3 #86): for each planet, the drill time per metre of one
+ * band with the track levels the vehicle arrived with and the levels it left with (its
+ * `travel_started`, or the run's last levels on the planet it ended on). Derived from the logged
+ * levels by the pure drill rule, never written into the log (#11 section 3). The summary keeps
+ * band 1 (the first probe) and band 5, the band the sawtooth is judged on (Game Director on #86):
+ * departure at most 0.7x arrival, on the median of the pacing seeds (`sawtoothMedian.ts`).
  */
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { PACING_TARGETS } from '../constants/pacingTargets'
 import { UPGRADE_IDS } from '../systems/economy/economyDefinition'
 import type { UpgradeLevels } from '../systems/economy/vehicleStats'
-import { firstBandDigTicks } from '../systems/vehicle/firstBandDig'
+import { bandDigTicks } from '../systems/vehicle/bandDig'
 
-/** Band-1 drill ticks per metre; null where the tip only skids on band 1. */
-export interface FirstBandDig {
+/** A band's drill ticks per metre; null where the tip only skids on it. */
+export interface BandDig {
   arrival: number | null
   departure: number | null
 }
@@ -27,21 +28,27 @@ export interface PlanetLevels {
   departure: Record<string, LoggedLevels>
 }
 
-export function firstBandDigOf(
+export function bandDigOf(
   levels: PlanetLevels,
   lastLevels: LoggedLevels,
-): Record<string, FirstBandDig> {
+  band: number,
+): Record<string, BandDig> {
   const entries = Object.entries(levels.arrival).map(([planet, arrival]) => {
     const departure = levels.departure[planet] ?? lastLevels
-    return [planet, digOnPlanet(Number.parseInt(planet), arrival, departure)] as const
+    return [planet, digOnPlanet(Number.parseInt(planet), band, arrival, departure)] as const
   })
   return Object.fromEntries(entries)
 }
 
-function digOnPlanet(planetIndex: number, arrival: LoggedLevels, departure: LoggedLevels) {
+function digOnPlanet(
+  planetIndex: number,
+  band: number,
+  arrival: LoggedLevels,
+  departure: LoggedLevels,
+): BandDig {
   return {
-    arrival: firstBandDigTicks(planetIndex, upgradeLevelsOf(arrival)),
-    departure: firstBandDigTicks(planetIndex, upgradeLevelsOf(departure)),
+    arrival: bandDigTicks(planetIndex, upgradeLevelsOf(arrival), band),
+    departure: bandDigTicks(planetIndex, upgradeLevelsOf(departure), band),
   }
 }
 
@@ -50,25 +57,25 @@ function upgradeLevelsOf(logged: LoggedLevels): UpgradeLevels {
   return Object.fromEntries(entries) as UpgradeLevels
 }
 
-/** Departure over arrival; null when either side cannot dig band 1 at all. */
-export function firstBandDigRatio(dig: FirstBandDig): number | null {
+/** Departure over arrival; null when either side cannot dig the band at all. */
+export function bandDigRatio(dig: BandDig): number | null {
   if (dig.arrival === null || dig.departure === null) return null
   return dig.departure / dig.arrival
 }
 
-/** #81 acceptance 1: the planets whose band 1 did not get at least 30% faster during the stay. */
-export function firstBandDigAlerts(digs: Readonly<Record<string, FirstBandDig>>): string[] {
-  const most = PACING_TARGETS.firstBandDigDepartureRatioMax
+/** #81 acceptance 1: the planets whose band did not get at least 30% faster during the stay. */
+export function bandDigAlerts(digs: Readonly<Record<string, BandDig>>, band: number): string[] {
+  const most = PACING_TARGETS.sawtoothDepartureRatioMax
   return Object.entries(digs)
     .filter(([, dig]) => !isSawtoothMet(dig, most))
     .map(
       ([planet, dig]) =>
-        `planet ${planet} band 1 dug ${digText(dig.arrival)} on arrival and ${digText(dig.departure)} at departure, target at most ${most}x`,
+        `planet ${planet} band ${band} dug ${digText(dig.arrival)} on arrival and ${digText(dig.departure)} at departure, target at most ${most}x`,
     )
 }
 
 /** An arrival the tip only skidded on has nothing to beat; a departure that skids never passes. */
-function isSawtoothMet(dig: FirstBandDig, most: number): boolean {
+export function isSawtoothMet(dig: BandDig, most: number): boolean {
   if (dig.departure === null) return false
   return dig.arrival === null || dig.departure <= dig.arrival * most
 }
@@ -79,19 +86,20 @@ export function digText(ticks: number | null): string {
 }
 
 /** One Markdown row per planet: arrival, departure and their ratio. */
-export function formatFirstBandDigTable(digs: Readonly<Record<string, FirstBandDig>>): string {
+export function formatBandDigTable(digs: Readonly<Record<string, BandDig>>, band: number): string {
   const rows = Object.entries(digs).map(
     ([planet, dig]) =>
       `| ${planet} | ${digText(dig.arrival)} | ${digText(dig.departure)} | ${ratioText(dig)} |`,
   )
   return [
-    '| planet | band 1 on arrival | band 1 at departure | ratio |',
+    `| planet | band ${band} on arrival | band ${band} at departure | ratio |`,
     '| --- | --- | --- | --- |',
     ...rows,
   ].join('\n')
 }
 
-function ratioText(dig: FirstBandDig): string {
-  const ratio = firstBandDigRatio(dig)
+/** Display only: the ratio to two places, or `n/a` without a dig on both sides. */
+export function ratioText(dig: BandDig): string {
+  const ratio = bandDigRatio(dig)
   return ratio === null ? 'n/a' : `${ratio.toFixed(2)}x`
 }

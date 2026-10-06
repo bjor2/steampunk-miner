@@ -29,10 +29,11 @@ export const PACING_TARGETS = {
    */
   campaignPlanetMinutes: { min: 45, max: 60 },
   /**
-   * Report only (#81 acceptance 1, C3 #86): on every campaign planet the drill time per metre of
-   * the first band at departure is at most this multiple of its time on arrival.
+   * Report only (#81 acceptance 1, C3 #86 as the Game Director restated it): on every planet the
+   * pacing bot reaches, the drill time per metre of band 5 at departure is at most this multiple
+   * of its time on arrival, on the median of the pacing seeds (`npm run balance:planets`).
    */
-  firstBandDigDepartureRatioMax: 0.7,
+  sawtoothDepartureRatioMax: 0.7,
   /**
    * Report only (spec #111, Systems & Economy numbers): on planets 6 to 9 the median dive has 2 to 8
    * rings breached by tunnel wreckers, and at most 5 dives in 100 set off a collapse on the way home.
