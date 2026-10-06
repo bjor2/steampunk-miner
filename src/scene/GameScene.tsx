@@ -8,12 +8,14 @@ import { CAMERA_POSITION } from '../constants/scene'
 import { PhysicsWorld } from '../physics/PhysicsWorld'
 import { useGameStore } from '../store/gameStore'
 import { CementSpray } from './CementSpray'
+import { BlastScorches } from './BlastScorches'
 import { CollapseTelegraph } from './CollapseTelegraph'
 import { EnemyFigures } from './EnemyFigures'
 import { LightRig } from './LightRig'
 import { PerfSampler } from './PerfSampler'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetTerrain } from './PlanetTerrain'
+import { PlantedCharges } from './PlantedCharges'
 import { PlatformPlaceholder } from './PlatformPlaceholder'
 import { RenderPipeline } from './RenderPipeline'
 import { ScreenFeedback } from './ScreenFeedback'
@@ -47,6 +49,8 @@ export function GameScene() {
       <Sparks />
       <CementSpray />
       <CollapseTelegraph />
+      <BlastScorches />
+      <PlantedCharges />
       <SoundStage />
       <PerfSampler />
       <RenderPipeline />

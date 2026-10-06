@@ -16,6 +16,7 @@ const CUES: FeedbackCue[] = [
   { kind: 'collapseRumble' },
   { kind: 'collapseCrash' },
   { kind: 'wreckerScrape' },
+  { kind: 'chargeBlast' },
 ]
 
 describe('accents', () => {

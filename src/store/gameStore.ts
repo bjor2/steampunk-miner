@@ -76,6 +76,8 @@ import { artefactActionsOf, type ArtefactActions } from './artefactActions'
 import { combatDebugActionsOf, type CombatDebugActions } from './combatDebugActions'
 import { casingDebugActionsOf, type CasingDebugActions } from './casingDebugActions'
 import { gunDebugActionsOf, type GunDebugActions } from './gunDebugActions'
+import { chargeDebugActionsOf, type ChargeDebugActions } from './chargeDebugActions'
+import { forgetBlastScorches, recordBlastScorches } from './blastScorchRecord'
 import { collapseDebugActionsOf, type CollapseDebugActions } from './collapseDebugActions'
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
 import { announceFeedback } from './feedbackBroadcast'
@@ -95,6 +97,7 @@ type DebugActions = CombatDebugActions &
   GroundDebugActions &
   CasingDebugActions &
   GunDebugActions &
+  ChargeDebugActions &
   CollapseDebugActions &
   ArtefactActions
 
@@ -203,6 +206,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...groundDebugActionsOf(() => get().playerId),
   ...casingDebugActionsOf(() => get().playerId),
   ...gunDebugActionsOf(() => get().playerId),
+  ...chargeDebugActionsOf(() => get().playerId),
   ...collapseDebugActionsOf(() => get().playerId),
   ...artefactActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
@@ -354,6 +358,7 @@ function startingAuthorityState(): AuthorityState {
 export function resetGameStore(authority: Authority = createStartingAuthority()): void {
   useGameStore.setState({ ...STARTING_VALUES })
   forgetMusicStingers()
+  forgetBlastScorches()
   connectAuthority(authority, followAuthority)
 }
 
@@ -366,7 +371,8 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
- * transition when the events travelled, shows the hints, feedback, part installs and stingers they trigger, logs the
+ * transition when the events travelled, shows the hints, feedback, part installs, stingers and
+ * scorches they trigger, logs the
  * events, then writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
@@ -377,6 +383,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
   announceFeedback(events, useGameStore.getState().playerId)
   useGameStore.getState().startPartInstall(events)
   recordMusicStingers(events, useGameStore.getState().playerId)
+  recordBlastScorches(events)
   recordDomainEvents(runEventPlaceOf(useGameStore.getState()), events)
   writeCheckpointAfter(events, runEventPlaceOf(useGameStore.getState()))
 }

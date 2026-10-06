@@ -23,7 +23,12 @@ import {
   restockPrice,
 } from '../../economy/blastingCharges'
 import { sub, toCanonical, type Money } from '../../money'
-import { emptyRackSlotsOf, rackCapacityOf, type VehicleCharges } from '../../vehicle/vehicleCharges'
+import {
+  emptyRackSlotsOf,
+  rackCapacityOf,
+  type PlantedCharge,
+  type VehicleCharges,
+} from '../../vehicle/vehicleCharges'
 import { noseTileOf, type VehiclePose } from '../../vehicle/vehiclePose'
 import { isVehicleActive, type VehicleState } from '../../vehicle/vehicleState'
 import { isSolidCell } from '../../world/worldCell'
@@ -128,6 +133,13 @@ export function areChargesOffered(state: AuthorityState, playerId: string): bool
   return (
     isFeatureUnlocked(state, BLASTING_CHARGES_ROW_ID) || chargesOf(state, playerId).isRackMounted
   )
+}
+
+/** Every vehicle's live charge, its own or another player's, in player order. */
+export function liveChargesOf(state: AuthorityState): PlantedCharge[] {
+  return Object.values(state.players)
+    .map((player) => player.vehicle.charges.planted)
+    .filter((planted): planted is PlantedCharge => planted !== null)
 }
 
 export function chargesOf(state: AuthorityState, playerId: string): VehicleCharges {

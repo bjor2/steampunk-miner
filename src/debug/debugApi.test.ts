@@ -364,6 +364,26 @@ describe('debug api: vehicle', () => {
     ])
   })
 
+  it('bolts a charge rack on with its charges as a logged debug command (#109)', () => {
+    const debug = createDebugApi()
+    expect(debug.vehicleParts()).toMatchObject({ rackCharges: null })
+    expect(debug.setCharges(2, 1)).toEqual({ ok: true })
+    expect(debug.vehicleParts()).toMatchObject({
+      rackCharges: 2,
+      partIds: expect.arrayContaining(['charge-rack', 'charge-1', 'charge-2']),
+    })
+    expect(debug.vehicleParts()).not.toMatchObject({
+      partIds: expect.arrayContaining(['charge-3']),
+    })
+    expect(sink.events.map((event) => event.event)).toEqual(['debug_command_applied'])
+  })
+
+  it('refuses a rack holding more charges than its slots, applying nothing', () => {
+    const debug = createDebugApi()
+    expect(debug.setCharges(5, 1)).toMatchObject({ ok: false })
+    expect(debug.vehicleParts()).toMatchObject({ rackCharges: null })
+  })
+
   it('refuses a gun level above the top of the gun track, applying nothing', () => {
     const debug = createDebugApi()
     expect(debug.setGunLevel(17)).toMatchObject({ ok: false })

@@ -7,6 +7,7 @@
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
+import { liveChargesOf } from '../authority/charges/chargeRules'
 import { isInBlastRadius, isInFuseWarning } from '../economy/blastingCharges'
 import { boundLabel, type Bindings } from '../input/actionMap'
 import {
@@ -50,12 +51,6 @@ export function fuseWarningOf(state: AuthorityState, playerId: string): FuseWarn
     charge.detonateTick < first.detonateTick ? charge : first,
   )
   return warningOf(pose, soonest, state.tick)
-}
-
-function liveChargesOf(state: AuthorityState): PlantedCharge[] {
-  return Object.values(state.players)
-    .map((player) => player.vehicle.charges.planted)
-    .filter((planted): planted is PlantedCharge => planted !== null)
 }
 
 function isWarnedBy(pose: VehiclePose, charge: PlantedCharge): boolean {

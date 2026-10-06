@@ -26,6 +26,8 @@ export interface VehicleReplica {
   visualTier: number
   /** 0 with no guns; the turret and its barrel look follow it (#107). */
   gunLevel: number
+  /** The charges on the rack, or null with no rack bolted on; the rack's slots show them (#109). */
+  rackCharges: number | null
 }
 
 let lastSource: VehicleState | null = null
@@ -45,6 +47,7 @@ export function vehicleReplicaOf(vehicle: VehicleState): VehicleReplica {
     cargoCapacity: stats.cargoCapacity,
     visualTier: visualTier(vehicle.levels),
     gunLevel: vehicle.gun.level,
+    rackCharges: vehicle.charges.isRackMounted ? vehicle.charges.carried : null,
   }
   return lastReplica
 }

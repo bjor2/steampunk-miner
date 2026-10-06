@@ -22,6 +22,7 @@ import {
 import type { UpgradeLevels } from '../systems/economy/vehicleStats'
 import {
   setEnergyCommand,
+  setChargesCommand,
   setGunLevelCommand,
   setHullCommand,
   setUpgradeCommand,
@@ -35,6 +36,7 @@ import {
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
 import type { PartPose } from '../systems/render/partMotion'
+import { chargeRackQuadsOf } from '../systems/render/chargeLook'
 import { gunPartIdsOf } from '../systems/render/gunLook'
 import { vehiclePartIdsOf, vehiclePartPosesOf } from '../systems/render/vehicleLook'
 import { isEnemyKind } from '../systems/authority/combat/combatDebugRules'
@@ -105,11 +107,14 @@ export type { ArtefactReport }
 /**
  * `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6), and
  * each part's pose now (#48 acceptance 1-2: wheel and drill angles, lifts, squash, glow). Mounted
- * guns add their turret's part ids at the look of their level (#107, #81 acceptance 3).
+ * guns add their turret's part ids at the look of their level (#107, #81 acceptance 3), and a
+ * bolted-on charge rack its frame and one part per charge carried (#109).
  */
 export interface VehiclePartsReport {
   visualTier: number
   gunLevel: number
+  /** Null with no rack bolted on. */
+  rackCharges: number | null
   partIds: string[]
   poses: Record<string, PartPose>
 }
@@ -182,6 +187,9 @@ export interface DebugApi {
   // guns (#107): a `debug.*` command
   /** The guns at `level`, 0 (none) to the gun track's cap, with no unlock or price. */
   setGunLevel(level: number): DebugResult
+  // blasting charges (#109): a `debug.*` command
+  /** A bolted-on rack with `slotLevel` (0 to 5) bought slots carrying `carried` charges. */
+  setCharges(carried: number, slotLevel: number): DebugResult
   // collapse (#43): the setter is a `debug.*` command, the read is not logged
   /** Starts the collapse of block `cx,cy#index` now: the full 60-tick warning, then the refill. */
   forceCollapse(block: string): DebugResult
@@ -256,9 +264,11 @@ function vehiclePartsReport(): VehiclePartsReport {
   return {
     visualTier: vehicle.visualTier,
     gunLevel: vehicle.gunLevel,
+    rackCharges: vehicle.rackCharges,
     partIds: [
       ...vehiclePartIdsOf(SHIPPED_ART, vehicle.visualTier),
       ...gunPartIdsOf(SHIPPED_ART, vehicle.gunLevel),
+      ...chargeRackQuadsOf(SHIPPED_ART, vehicle.rackCharges).map((quad) => quad.partId),
     ],
     poses: vehiclePartPosesOf(SHIPPED_ART, partMotion, vehicle.visualTier, !prefs.shake),
   }
@@ -366,6 +376,10 @@ export function createDebugApi(): DebugApi {
     setGunLevel: (level) =>
       runUnlessRefused(vehicleDebugProblems(setGunLevelCommand(level)), () =>
         game().setGunLevel(level),
+      ),
+    setCharges: (carried, slotLevel) =>
+      runUnlessRefused(vehicleDebugProblems(setChargesCommand(carried, slotLevel)), () =>
+        game().setCharges(carried, slotLevel),
       ),
     forceCollapse: (block) =>
       runUnlessRefused(vehicleDebugProblems(forceCollapseCommand(block)), () =>

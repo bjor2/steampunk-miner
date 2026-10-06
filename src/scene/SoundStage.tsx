@@ -98,6 +98,8 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   collapseRumble: (sound) => sound.playCollapseRumble(),
   collapseCrash: (sound) => sound.playCollapseCrash(),
   wreckerScrape: (sound) => sound.playWreckerScrape(),
+  // Rock breaking all at once: the collapse's crash, until the blast has its own sound.
+  chargeBlast: (sound) => sound.playCollapseCrash(),
 }
 
 function playCue(sound: SoundOut, cue: FeedbackCue): void {

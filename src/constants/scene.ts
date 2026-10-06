@@ -273,3 +273,24 @@ export const REFINERY_SMOKE_LIFE_SECONDS = 2.4
 export const REFINERY_SMOKE_SIZE_PIXELS = 6
 export const REFINERY_SMOKE_COLOUR = '#8a817a'
 export const REFINERY_SMOKE_SEED = 0x5e0c
+
+/**
+ * #109/#110: a planted charge's fuse lamp blinks on and off this often (the art's `fuse-lamp`
+ * part, shown and hidden), faster in the last second so the blow reads. Up to this many charges
+ * are drawn at once (one live charge per vehicle). Placeholders, tuned by eye.
+ */
+export const FUSE_BLINK_SECONDS = 0.24
+export const FUSE_BLINK_LAST_SECOND_SECONDS = 0.1
+export const PLANTED_CHARGE_SLOTS = 4
+
+/**
+ * #109 "the blast leaves scorch marks on the tunnel edge" (`fx-blast-scorch`, a code shader):
+ * soot darkest in a ring at the blast's 2.5-tile edge, fading inward over `SCORCH_INNER_FADE_M`
+ * and outward over `SCORCH_OUTER_FADE_M`. The last `SCORCH_SLOTS` blasts on the planet keep
+ * theirs. Placeholders, tuned by eye; presentation only.
+ */
+export const SCORCH_SLOTS = 16
+export const SCORCH_INNER_FADE_M = 1.2
+export const SCORCH_OUTER_FADE_M = 1.3
+export const SCORCH_DARKNESS = 0.9
+export const SCORCH_COLOUR = '#17110c'

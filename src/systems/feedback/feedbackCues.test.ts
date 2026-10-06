@@ -109,6 +109,22 @@ describe('feedback cues', () => {
     expect(feedbackCuesOf([gnawed('1,2')], 'p2')).toEqual([])
   })
 
+  it("shakes for the player's own charge blowing, and not for another's (#109)", () => {
+    const blast: DomainEvent = {
+      tick: 720,
+      playerId: 'p1',
+      type: 'ChargeDetonated',
+      tx: 3,
+      ty: 280,
+      tilesCleared: 21,
+      oreValueLost: '0',
+      collapseChecks: 2,
+      collapsesTriggered: 0,
+    }
+    expect(feedbackCuesOf([blast], 'p1')).toEqual([{ kind: 'chargeBlast' }])
+    expect(feedbackCuesOf([blast], 'p2')).toEqual([])
+  })
+
   it("ignores another player's pickups", () => {
     expect(feedbackCuesOf([cargo(4, 'p2')], 'p1')).toEqual([])
   })
