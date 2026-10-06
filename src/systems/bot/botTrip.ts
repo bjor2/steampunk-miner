@@ -18,7 +18,6 @@ import type { BotSession } from './botSession'
 import { boreShaftDownTo, moveAlongShaft } from './botShaft'
 import { isInsideWorld, tileKindAt, type BotTileKind } from './botWorld'
 import {
-  coreSideOf,
   extendSide,
   galleryEndOf,
   galleryFaceOf,
@@ -116,7 +115,7 @@ function mineGallerySide(
   for (;;) {
     if (!harvestBesides(session, planet, goal)) return 'stop'
     const face = galleryFaceOf(planet.layout, row, side)
-    if (isGalleryEnd(session, planet.layout, face, goal)) {
+    if (isGalleryEnd(session, planet.layout, face, side, goal)) {
       markSideDone(planet.layout, row, side)
       return 'ended'
     }
@@ -158,6 +157,7 @@ function isGalleryEnd(
   session: BotSession,
   layout: MineLayout,
   face: TilePoint,
+  side: GallerySide,
   goal: TripGoal,
 ): boolean {
   const state = session.state()
@@ -166,12 +166,12 @@ function isGalleryEnd(
   if (!isInsideWorld(state, face) || isNearSurface(layout, face)) return true
   if (tileKindAt(state, face) === 'pad') return true
   if (goal.kind === 'ore') return isCoreTileAt(layout, face)
-  return isPastTheCore(layout, face)
+  return isPastTheCore(layout, face, side)
 }
 
-function isPastTheCore(layout: MineLayout, face: TilePoint): boolean {
+function isPastTheCore(layout: MineLayout, face: TilePoint, side: GallerySide): boolean {
   const reach = layout.params.coreRadiusTiles + 1
-  return coreSideOf(layout) === 'west' ? face.tx < -reach : face.tx > reach
+  return side === 'west' ? face.tx < -reach : face.tx > reach
 }
 
 /** Full hold, the planet's core needs no more, a vehicle no longer under control, or too hot. */

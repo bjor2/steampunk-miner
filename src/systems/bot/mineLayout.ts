@@ -196,7 +196,14 @@ export function isCoreTileAt(layout: MineLayout, tile: TilePoint): boolean {
   return isCoreTile(layout.params, tile.tx, tile.ty)
 }
 
-/** The core galleries run toward the planet's centre, across the core disc. */
-export function coreSideOf(layout: MineLayout): GallerySide {
-  return layout.shaftColumn > 0 ? 'west' : 'east'
+/**
+ * A core gallery runs first toward the planet's centre, across the core disc, from the shaft's
+ * column at its own row: a jog round lava can carry the shaft past the middle (#136).
+ */
+export function coreSideOf(layout: MineLayout, row: number): GallerySide {
+  return shaftColumnAt(layout, row) > 0 ? 'west' : 'east'
+}
+
+export function oppositeSideOf(side: GallerySide): GallerySide {
+  return side === 'east' ? 'west' : 'east'
 }
