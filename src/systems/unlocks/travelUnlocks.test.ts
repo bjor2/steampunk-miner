@@ -42,10 +42,10 @@ describe('travel unlocks', () => {
   })
 
   it('opens nothing for a vision row whose module is not built (#90)', () => {
-    expect(isUnlockedByTravel(rowOf(LOCKED_SCHEDULE, 'heat_lava'), CAMPAIGN_LAST_PLANET)).toBe(
+    expect(isUnlockedByTravel(rowOf(LOCKED_SCHEDULE, 'magma_tick'), CAMPAIGN_LAST_PLANET)).toBe(
       false,
     )
-    expect(rowsUnlockedByTravel(LOCKED_SCHEDULE, 7, 8)).toEqual([])
+    expect(rowsUnlockedByTravel(LOCKED_SCHEDULE, 8, 9)).toEqual([])
   })
 
   it('never opens an artefact, facility or manual row by travel alone', () => {

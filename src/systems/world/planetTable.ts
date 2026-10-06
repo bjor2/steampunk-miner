@@ -36,6 +36,17 @@ export const PLANET_ARCHETYPES: readonly PlanetArchetype[] = [
   },
 ]
 
+/**
+ * The heat planets of the Fire act (#113, the `heat` block of economy.json `archetypes`): the heavy
+ * planet's gravity and ore families under `palette.heat` (#114), with lava pockets in the ground.
+ * Nothing but the palette and the pockets is decided for them, so the rest stays as it was.
+ */
+export const HEAT_PLANET_ARCHETYPE: PlanetArchetype = {
+  ...PLANET_ARCHETYPES[PLANET_ARCHETYPES.length - 1],
+  archetypeId: 'archetype.heat',
+  paletteId: 'palette.heat',
+}
+
 /** Depth bands start at these percents of the way to the centre (#4 Geometry, #6 section 1). */
 export const BAND_START_DEPTH_PERCENT: readonly number[] = [8, 35, 65, 90]
 

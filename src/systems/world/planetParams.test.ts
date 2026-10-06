@@ -89,8 +89,25 @@ describe('planet 2', () => {
     expect(dockSiteOf(second).dockPoint.ty).toBeGreaterThan(390)
   })
 
-  it('registers the base and heavy archetype ids for the scenario validator', () => {
+  it('registers the base, heavy and heat archetype ids for the scenario validator', () => {
     expect(planetParamsFor(83921, 1).archetypeId).toBe('archetype.base')
-    expect(ARCHETYPE_IDS).toEqual(['archetype.base', 'archetype.heavy'])
+    expect(ARCHETYPE_IDS).toEqual(['archetype.base', 'archetype.heavy', 'archetype.heat'])
+  })
+
+  it('gives the Fire act, planets 8 to 16, the heat archetype and its palette (#113)', () => {
+    const archetypeIds = [7, 8, 16, 17].map((planet) => planetParamsFor(83921, planet).archetypeId)
+    expect(archetypeIds).toEqual([
+      'archetype.heavy',
+      'archetype.heat',
+      'archetype.heat',
+      'archetype.heavy',
+    ])
+    const heat = planetParamsFor(83921, 8)
+    const heavy = planetParamsFor(83921, 7)
+    expect(heat.paletteId).toBe('palette.heat')
+    expect([heat.gravityMultiplier, heat.familyWeights]).toEqual([
+      heavy.gravityMultiplier,
+      heavy.familyWeights,
+    ])
   })
 })

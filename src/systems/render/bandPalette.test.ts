@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { PLANET_ARCHETYPES } from '../world/planetTable'
+import { HEAT_PLANET_ARCHETYPE, PLANET_ARCHETYPES } from '../world/planetTable'
 import { bandColourOf, paletteOf, skyColourAt, tileShadeOf } from './bandPalette'
 import { lumaOf } from './colour'
 
 describe('band palette', () => {
   it('has a palette for every planet archetype', () => {
-    PLANET_ARCHETYPES.forEach(({ paletteId }) => expect(() => paletteOf(paletteId)).not.toThrow())
+    ;[...PLANET_ARCHETYPES, HEAT_PLANET_ARCHETYPE].forEach(({ paletteId }) =>
+      expect(() => paletteOf(paletteId)).not.toThrow(),
+    )
   })
 
   it('refuses a palette id the art direction does not define', () => {

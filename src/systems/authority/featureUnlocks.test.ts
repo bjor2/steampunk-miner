@@ -51,9 +51,19 @@ describe('feature unlocks on travel', () => {
   })
 
   it('unlocks no vision row on arriving at its planet (#90)', () => {
+    const session = dockedOnPlanet(8)
+    expect(unlockedIdsOf(session.submit(10, travelTo(9)))).toEqual([])
+    expect(isFeatureUnlocked(session.state(), 'magma_tick')).toBe(false)
+  })
+
+  it('unlocks heat_lava and refractory_lining on arriving at planet 8, the pair together (#96)', () => {
     const session = dockedOnPlanet(7)
-    expect(unlockedIdsOf(session.submit(10, travelTo(8)))).toEqual([])
     expect(isFeatureUnlocked(session.state(), 'heat_lava')).toBe(false)
+    expect(unlockedIdsOf(session.submit(10, travelTo(8)))).toEqual([
+      'heat_lava',
+      'refractory_lining',
+    ])
+    expect(isFeatureUnlocked(session.state(), 'refractory_lining')).toBe(true)
   })
 
   it('unlocks auto_guns on arriving at planet 4, its module being built (#93)', () => {

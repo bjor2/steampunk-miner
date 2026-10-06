@@ -5,6 +5,7 @@
  * Plain integers, strings and one gravity number, so the params can go into a save header as JSON.
  */
 import { hashCell } from '../cellRandom'
+import { isHeatPlanet } from '../economy/heatEconomy'
 import { refineryUnlockPlanet } from '../economy/refineryEconomy'
 import { BAY_IDS, SLICE_BAY_IDS, type BayId } from './dockBays'
 import {
@@ -16,6 +17,7 @@ import {
   CORE_RADIUS_MIN_TILES,
   DOCK_CLEARANCE_TILES,
   DOCK_HALF_WIDTH_TILES,
+  HEAT_PLANET_ARCHETYPE,
   ORE_DENSITY_BP,
   PATCH_MEAN_CELLS,
   PATCH_SEED_CHANCE_BP,
@@ -50,7 +52,7 @@ export interface PlanetParams {
   dockClearanceTiles: number
   /** The platform's bays here: the Sell and Upgrade bays, and the Refinery bay from P3 (#105). */
   dockBays: readonly BayId[]
-  /** `archetype.base` on planet 1, `archetype.heavy` on planet 2 (#10). */
+  /** `archetype.base` on planet 1, `archetype.heavy` on planet 2 (#10), `archetype.heat` on 8-16 (#113). */
   archetypeId: string
   gravityMultiplier: number
   paletteId: string
@@ -129,7 +131,9 @@ function bandStartsFor(radiusTiles: number): number[] {
   })
 }
 
+/** A heat planet of the Fire act takes the heat archetype; the others the slice's list (#10). */
 function archetypeOf(planetIndex: number): PlanetArchetype {
+  if (isHeatPlanet(planetIndex)) return HEAT_PLANET_ARCHETYPE
   const last = PLANET_ARCHETYPES.length - 1
   return PLANET_ARCHETYPES[Math.min(planetIndex - FIRST_PLANET, last)]
 }

@@ -110,6 +110,22 @@ describe('locked unlock schedule', () => {
     expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 6 })).toBe(true)
   })
 
+  it('opens heat_lava and refractory_lining together on arriving at planet 8 (#96)', () => {
+    const pair = LOCKED_SCHEDULE.rows.filter((row) => row.planetIndex === 8)
+    expect(pair.map((row) => [row.id, row.bind])).toEqual([
+      ['heat_lava', 'planet_gate'],
+      ['refractory_lining', 'planet_gate'],
+    ])
+    expect(pair.map((row) => isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 7 }))).toEqual([
+      false,
+      false,
+    ])
+    expect(pair.map((row) => isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 8 }))).toEqual([
+      true,
+      true,
+    ])
+  })
+
   it('names only vision rows of the locked schedule as built modules', () => {
     const built = LOCKED_SCHEDULE.rows.filter((row) => BUILT_VISION_ROW_IDS.has(row.id))
     expect(built.map((row) => [row.id, row.status])).toEqual(
