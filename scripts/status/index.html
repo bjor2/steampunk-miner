@@ -1326,7 +1326,7 @@
       }
       #tab-features .ft-time-row {
         display: grid;
-        grid-template-columns: minmax(0, 14em) minmax(0, 1fr) 15em;
+        grid-template-columns: minmax(0, 14em) minmax(0, 1fr) 22em;
         gap: 8px;
         align-items: center;
         font-size: 12px;
@@ -1362,6 +1362,47 @@
       #tab-features .ft-time-none,
       #tab-features .ft-time-unmeasured {
         color: var(--dim);
+      }
+      /* tickets closed over time (#138): ticketsClosedHtml.mjs */
+      #tab-features .tc-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+      @media (min-width: 1150px) {
+        #tab-features .tc-grid {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        }
+      }
+      #tab-features .tc-hit {
+        fill: transparent;
+      }
+      #tab-features .tc-day:hover .tc-hit {
+        fill: var(--panel3);
+      }
+      #tab-features rect.tc-bar {
+        fill: var(--brass);
+      }
+      #tab-features .tc-bar {
+        background: var(--brass);
+      }
+      #tab-features polyline.tc-cumulative,
+      #tab-features polyline.tc-median {
+        stroke-width: 2;
+      }
+      #tab-features .tc-cumulative {
+        stroke: var(--teal);
+        background: var(--teal);
+      }
+      #tab-features circle.tc-cumulative {
+        fill: var(--teal);
+      }
+      #tab-features .tc-median {
+        stroke: var(--copper);
+        background: var(--copper);
+      }
+      #tab-features circle.tc-median {
+        fill: var(--copper);
       }
       #tab-features .ft-foot a {
         color: var(--muted);
@@ -1501,6 +1542,7 @@
           </div>
         </div>
         <div class="wrap">
+          <!-- tickets-closed -->
           <!-- feature-time -->
           <div id="ft-error"></div>
           <div class="root" id="ft-root">

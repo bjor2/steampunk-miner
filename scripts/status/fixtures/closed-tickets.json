@@ -1,0 +1,922 @@
+{
+  "gh issue list --state closed --label build": [
+    {
+      "number": 15,
+      "title": "Update the src/logging and src/debug scaffold to the logging contract",
+      "state": "CLOSED",
+      "closedAt": "2026-10-04T23:38:04Z",
+      "labels": [
+        {
+          "name": "wayfinder:task"
+        },
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "title": "Build 1: Authority seam and Money module",
+      "state": "CLOSED",
+      "closedAt": "2026-10-04T23:15:48Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "title": "Build 2: Planet generator and chunk world",
+      "state": "CLOSED",
+      "closedAt": "2026-10-04T23:50:37Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "title": "Build 3: Economy data and formulas",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T00:08:54Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "title": "Build 4: Vehicle, drilling and controls",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T00:51:29Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "title": "Build 5: Rendering and rotating camera",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T01:16:13Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "title": "Build 6: Platform, sell and upgrade loop",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T01:38:22Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "title": "Build 7: Core harvest, travel and planet 2",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T01:54:06Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "title": "Build 8: Combat: crawler and burrower",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T02:30:34Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "title": "Build 9: Save, checkpoint and resume",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T02:45:50Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "title": "Build 10: Hints and first ten minutes",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T05:03:57Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "title": "Build 11: Visual tiers, audio and polish",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T05:25:45Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 29,
+      "title": "Build 12: Test harness and balance regression",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T04:05:59Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "title": "Build 11: Visual tiers, audio and polish",
+      "state": "CLOSED",
+      "closedAt": "2026-10-04T21:35:29Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "title": "Build 12: Test harness and balance regression",
+      "state": "CLOSED",
+      "closedAt": "2026-10-04T21:35:34Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 32,
+      "title": "Build 13: Large-number display formatter",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T01:21:12Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 34,
+      "title": "Build 14: Controls, HUD and platform screen",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T04:45:53Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 53,
+      "title": "Build: Action map v2 (W lift, Space dock, zoom, two-bay UI)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T15:25:34Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 54,
+      "title": "Build plan: second playable slice (fluid ground, casing, shops, look)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T21:07:04Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 55,
+      "title": "Build S1: Density-field world and ore stamps",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T12:17:55Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 56,
+      "title": "Build S2: Casing and cement",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T16:57:58Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 57,
+      "title": "Build S3: Collapse and vacuum",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T18:23:06Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 58,
+      "title": "Build S4: Two physical shop bays",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T15:03:24Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 59,
+      "title": "Build S5: Zoom framing (metres across short axis)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T12:15:52Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 60,
+      "title": "Build S6: Lit 2.5D render and 4K adaptive scale",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T14:49:31Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 61,
+      "title": "Build S7: Art export pipeline and placeholders",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T12:23:18Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 62,
+      "title": "Build S8: Shop screens, icons and vehicle preview",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T16:28:12Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 63,
+      "title": "Build S9: Music layers and stingers",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T14:48:55Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 64,
+      "title": "Build S10: Artefacts",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T15:51:38Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 65,
+      "title": "Build S11: Second-slice regression harness",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T18:58:19Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 66,
+      "title": "Build S7a: Vehicle part family (3 visual tiers)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T15:13:15Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 67,
+      "title": "Build S7b: Platform hub, bays and bay backdrops",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T15:41:42Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 68,
+      "title": "Build S7c: Crawler, burrower and artefact cache",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T16:05:44Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 69,
+      "title": "Build S7d: Ground strata and casing lining textures",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T16:38:20Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 70,
+      "title": "Gate: S7 (#61) on main before S7a–d",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T12:36:32Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 83,
+      "title": "Gate: schedule lock (#80) on main before campaign builds",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T21:37:30Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 84,
+      "title": "Build C1: Flatten drill_power and drill_tip cost r ≈ 1.225",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T07:01:19Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 85,
+      "title": "Build C2: First-place casing lining charge (k_casing = 0.30)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T23:15:29Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 86,
+      "title": "Build C3: drill_tip sawtooth breakpoints (≤0.7× dig time)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T14:51:04Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 87,
+      "title": "Build H1: Unlock schedule runtime (load locked stats.json)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T22:52:51Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 88,
+      "title": "Build H2: Wire planet_gate travel unlocks from schedule",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T23:13:33Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 91,
+      "title": "Build C4: Per-planet pacing_targets_min entry (45–60 min)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-05T22:53:37Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 92,
+      "title": "Build M1: Unlock module — refinery_bay",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T03:24:20Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 93,
+      "title": "Build M2: Unlock module — auto_guns",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T03:11:21Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 94,
+      "title": "Build M3: Unlock module — tunnel_wrecker",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T02:46:56Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 95,
+      "title": "Build M4: Unlock module — blasting_charges",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T06:02:33Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 96,
+      "title": "Build M5: Unlock module — heat_lava + refractory_lining",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T06:38:23Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 106,
+      "title": "Art: Refinery bay (refinery_bay)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T01:27:57Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 108,
+      "title": "Art: Automated guns (auto_guns)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T01:22:35Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 110,
+      "title": "Art: Blasting charges (blasting_charges)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T01:36:26Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 112,
+      "title": "Art: Tunnel wrecker (tunnel_wrecker)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T01:12:51Z",
+      "labels": [
+        {
+          "name": "build"
+        }
+      ]
+    },
+    {
+      "number": 114,
+      "title": "Art: Heat/lava planets + refractory lining (heat_lava + refractory_lining)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T03:14:51Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 115,
+      "title": "C1a: Pacing bot drills through the real casing path",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T04:31:39Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 116,
+      "title": "T1: Make the asset manifest merge-safe for parallel module builds",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T02:18:10Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:easy"
+        }
+      ]
+    },
+    {
+      "number": 126,
+      "title": "T2: Slow the tunnel wrecker so auto guns finish it when you stop beside it",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T04:18:23Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:easy"
+        }
+      ]
+    },
+    {
+      "number": 127,
+      "title": "T3: Flip the six shipped module rows in stats.json and retire BUILT_VISION_ROW_IDS",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T08:45:58Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:easy"
+        }
+      ]
+    },
+    {
+      "number": 128,
+      "title": "T4: Settle the lining bill per Sell bay visit, count refinery payouts, show it on the Sell bay screen",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T05:37:05Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:easy"
+        }
+      ]
+    },
+    {
+      "number": 129,
+      "title": "T5: pacing bot buys the charge rack only after meeting a tile it would blast",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T07:59:10Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:easy"
+        }
+      ]
+    },
+    {
+      "number": 130,
+      "title": "T6: campaign pace planets 3–10: diagnose the planet 9 stall, then tune",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T11:29:55Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 131,
+      "title": "T7: Campaign pace planets 3–10, economy (Systems)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T17:09:02Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 132,
+      "title": "Bug: tunnel_wrecker spawns and despawns every tick on planet 7",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T10:56:19Z",
+      "labels": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:easy"
+        }
+      ]
+    },
+    {
+      "number": 133,
+      "title": "Bug: lava touches on planets 8 and 10 with no lava-risk tile opened",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T13:10:52Z",
+      "labels": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 134,
+      "title": "Status: track where each ticket's time goes (fixed phase categories) on the Issue trees tab",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T16:20:19Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 135,
+      "title": "Status: roll ticket time stats up to features and feature categories on the Features tab",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T16:56:11Z",
+      "labels": [
+        {
+          "name": "build"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    }
+  ],
+  "gh issue list --state closed --label perf": [
+    {
+      "number": 97,
+      "title": "Perf 1: Run CPU smoke benchmarks and record baseline",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T01:57:56Z",
+      "labels": [
+        {
+          "name": "perf"
+        }
+      ]
+    },
+    {
+      "number": 98,
+      "title": "Perf 2: Static leak audit of chunk eviction and effect cleanup",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T01:57:57Z",
+      "labels": [
+        {
+          "name": "perf"
+        }
+      ]
+    },
+    {
+      "number": 99,
+      "title": "Perf 3: Land the memory soak in the repo as npm run soak:memory (debug-API seams, 20 MB gate)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T12:49:50Z",
+      "labels": [
+        {
+          "name": "perf"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 100,
+      "title": "Perf 4: Depth guard for the recursive JSON walkers (toCanonicalJson, payloadProblems)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T08:04:05Z",
+      "labels": [
+        {
+          "name": "perf"
+        },
+        {
+          "name": "tier:easy"
+        }
+      ]
+    },
+    {
+      "number": 101,
+      "title": "Perf 6: Stop hashing the whole authority state on every read",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T06:19:48Z",
+      "labels": [
+        {
+          "name": "perf"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 102,
+      "title": "Perf 5: Record the no-heap/stack-flags decision and measure the Electron renderer once",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T16:09:41Z",
+      "labels": [
+        {
+          "name": "perf"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 103,
+      "title": "Perf 7: Run the memory soak as a CI regression gate",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T17:49:29Z",
+      "labels": [
+        {
+          "name": "perf"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 117,
+      "title": "Perf 8: Cap the in-memory run log (memory sink + browser shell NDJSON)",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T04:53:03Z",
+      "labels": [
+        {
+          "name": "perf"
+        },
+        {
+          "name": "tier:hard"
+        }
+      ]
+    },
+    {
+      "number": 118,
+      "title": "Perf 9: Dispose prop-passed geometries and materials in scene components",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T07:29:48Z",
+      "labels": [
+        {
+          "name": "perf"
+        },
+        {
+          "name": "tier:easy"
+        }
+      ]
+    },
+    {
+      "number": 119,
+      "title": "Perf 10: Debug-API memory seams ui.getRendererMemory() and getPhysicsStats()",
+      "state": "CLOSED",
+      "closedAt": "2026-10-06T09:27:48Z",
+      "labels": [
+        {
+          "name": "perf"
+        },
+        {
+          "name": "tier:easy"
+        }
+      ]
+    }
+  ]
+}

@@ -5,7 +5,9 @@
 // the committed docs/perf/ files (static HTML + SVG, no script), the "Where the time goes"
 // section of the Issue trees tab from the committed docs/metrics/tickets/ files (#134), and the
 // game feature tree from docs/features/features.json joined with the live issue states, with
-// those ticket times rolled up per feature and area (#135). Static output, no server.
+// those ticket times rolled up per feature and area (#135) over each ticket's claimed-to-done
+// window, under a "Tickets closed over time" chart from the same issue list (#138). Static output,
+// no server.
 //
 //   node scripts/status/build-status.mjs [--out dist/status]
 //
@@ -25,6 +27,8 @@ import { buildPerfOverview } from './perfOverview.mjs'
 import { renderPerfOverview, renderPerfOverviewFailure } from './perfOverviewHtml.mjs'
 import { buildTicketTimeOverview } from './ticketTimeOverview.mjs'
 import { renderTicketTimeFailure, renderTicketTimeOverview } from './ticketTimeOverviewHtml.mjs'
+import { buildTicketsClosedOverTime } from './ticketsClosed.mjs'
+import { renderTicketsClosedFailure, renderTicketsClosedOverTime } from './ticketsClosedHtml.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 // The Pages job checks out with depth 1, so the perf files are read, never asked of git.
@@ -34,6 +38,8 @@ const PERF_PLACEHOLDER = '<!-- perf-overview -->'
 const TICKET_TIME_DIR = join(HERE, '..', '..', 'docs', 'metrics', 'tickets')
 const TICKET_TIME_PLACEHOLDER = '<!-- ticket-time -->'
 const FEATURE_TIME_PLACEHOLDER = '<!-- feature-time -->'
+const TICKETS_CLOSED_PLACEHOLDER = '<!-- tickets-closed -->'
+const DAY_LENGTH = 'YYYY-MM-DD'.length
 const FEATURES_FILE = 'docs/features/features.json'
 const FEATURES_PATH = join(HERE, '..', '..', FEATURES_FILE)
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
@@ -325,6 +331,21 @@ function buildFeatureTimeSection(features, ticketTimeModel) {
   }
 }
 
+// Like the other sections: a failed chart shows its error, the tree still renders.
+function buildTicketsClosedSection(issues, ticketTimeModel) {
+  try {
+    const model = buildTicketsClosedOverTime({
+      issues,
+      measuredTickets: ticketTimeModel.tickets ?? [],
+      today: new Date().toISOString().slice(0, DAY_LENGTH),
+    })
+    return { model, html: renderTicketsClosedOverTime(model) }
+  } catch (err) {
+    console.warn(`tickets closed failed: ${err.message}`)
+    return { model: { error: String(err.message) }, html: renderTicketsClosedFailure(err.message) }
+  }
+}
+
 // /status/features/ and /status/performance/ are short links to their tabs.
 const SHORT_LINKS = { features: 'Feature tree', performance: 'Performance' }
 
@@ -370,7 +391,12 @@ const featureTime = buildFeatureTimeSection(
   ticketTime.model,
 )
 const features = featureTime.features
-const page = withSection(pageBeforeFeatures, FEATURE_TIME_PLACEHOLDER, featureTime.html)
+const ticketsClosed = buildTicketsClosedSection(issues, ticketTime.model)
+const page = withSection(
+  withSection(pageBeforeFeatures, TICKETS_CLOSED_PLACEHOLDER, ticketsClosed.html),
+  FEATURE_TIME_PLACEHOLDER,
+  featureTime.html,
+)
 const server = process.env.GITHUB_SERVER_URL || 'https://github.com'
 const runId = process.env.GITHUB_RUN_ID
 const status = {
@@ -411,5 +437,6 @@ console.log(
     `${workflows.length} workflows, ${perf.model.runCount ?? 0} perf runs / ` +
     `${perf.model.metricCount ?? 0} metrics / ${perf.model.budgetCounts?.over ?? '?'} over budget, ` +
     `${ticketTime.model.ticketCount ?? 0} ticket time files, ` +
+    `${ticketsClosed.model.closedCount ?? '?'} tickets closed, ` +
     `${features.counts ? `${features.counts.features} features / ${features.counts.flagged} to check` : `features: ${features.error}`} -> ${OUT}`,
 )
