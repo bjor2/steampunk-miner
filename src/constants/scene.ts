@@ -13,6 +13,17 @@
 export const VIEW_SHORT_AXIS_DEFAULT_M = 12
 export const VIEW_SHORT_AXIS_MIN_M = 8
 export const VIEW_SHORT_AXIS_MAX_M = 20
+/**
+ * The zoom-out cap by screen shape (#173 "Zoom"): the drawn set follows half the screen diagonal
+ * (the camera rolls), and #38's 48-block and 150-draw budget was set for a 16:9 view at 20 m, whose
+ * half diagonal is 20.40 m. Wider screens zoom out less: 15.86 m at 21:9, 17.10 m at 19.5:9.
+ */
+export const VIEW_HALF_DIAGONAL_MAX_M = 20.4
+/**
+ * Past this aspect (2560 x 1080's 64:27) the canvas is pillarboxed (#173): at 32:9 the diagonal cap
+ * would fall to 11.04 m, under the 12 m default.
+ */
+export const STAGE_MAX_ASPECT = 64 / 27
 /** A whole-number ratio, so the economy scan never mistakes it for a price ratio. */
 export const ZOOM_STEP_FACTOR = 5 / 4
 export const ZOOM_EASE_SECONDS = 0.2

@@ -374,6 +374,16 @@ describe('debug api: zoom framing (#39)', () => {
     expect(result.view.vehicleColliderShare).toBeLessThanOrEqual(0.078)
     expect(result.view.pixelsPerMetre).toBe(h / 12)
   })
+
+  it('reports the zoom-out cap of the canvas shape: 20 m at 16:9, 15.86 m at 21:9 (#173)', () => {
+    const debug = createDebugApi()
+    Object.assign(cameraPresence, { widthPixels: 1920, heightPixels: 1080 })
+    expect(debug.ui.getCameraView()).toMatchObject({ view: { maxViewShortAxisMetres: 20 } })
+    Object.assign(cameraPresence, { widthPixels: 2560, heightPixels: 1080 })
+    const result = debug.ui.getCameraView()
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    expect(result.view.maxViewShortAxisMetres).toBeCloseTo(15.86, 2)
+  })
 })
 
 describe('debug api: render scale and stats (#38)', () => {

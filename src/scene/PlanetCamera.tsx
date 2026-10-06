@@ -2,7 +2,7 @@
  * The orthographic camera over the vehicle (#13): it follows the vehicle and rolls so local down
  * points down the screen, or stays upright in the fixed-camera mode, offset by the screen shake
  * (zero with shake off). It frames the player's zoom in metres across the short axis (#39), so
- * every resolution shows the same world. The turn and the zoom ease on the render delta, which is
+ * every resolution shows the same world, capped on wide screens (#173). The turn and the zoom ease on the render delta, which is
  * presentation only.
  */
 import { useFrame, type Size } from '@react-three/fiber'
@@ -15,7 +15,11 @@ import {
   stepCameraTurn,
   type CameraTurn,
 } from '../systems/render/cameraTurn'
-import { easeViewShortAxis, pixelsPerMetreOf } from '../systems/render/viewZoom'
+import {
+  easeViewShortAxis,
+  pixelsPerMetreOf,
+  shownViewShortAxisOf,
+} from '../systems/render/viewZoom'
 import { cameraPresence } from './cameraPresence'
 import { screenEffects } from './screenEffectsPresence'
 import { vehiclePresence } from './vehiclePresence'
@@ -38,11 +42,14 @@ function placeCamera(camera: Camera, turn: CameraTurn): void {
   cameraPresence.localUpScreenAngle = angleOfUp(turn.up) - turn.angle
 }
 
-/** Eases toward the chosen zoom and recomputes `camera.zoom` from the canvas, so a resize refits. */
-function frameCamera(camera: OrthographicCamera, size: Size, target: number, dt: number): void {
+/**
+ * Eases toward the chosen zoom, held under the screen shape's cap (#173), and recomputes
+ * `camera.zoom` from the canvas, so a resize refits.
+ */
+function frameCamera(camera: OrthographicCamera, size: Size, chosen: number, dt: number): void {
   cameraPresence.viewShortAxisMetres = easeViewShortAxis(
     cameraPresence.viewShortAxisMetres,
-    target,
+    shownViewShortAxisOf(size.width, size.height, chosen),
     dt,
   )
   cameraPresence.widthPixels = size.width
