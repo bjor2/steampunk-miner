@@ -95,6 +95,21 @@ const PLAYED_RUN: readonly RunEvent[] = [
   line(9100, 'game_ended', { reason: 'quit' }, { planet: 2 }),
 ]
 
+/** A `resource_collected` line of one unit of `oreId`, as the projection writes it (#122). */
+function collected(tick: number, oreId: string): RunEvent {
+  return line(tick, 'resource_collected', {
+    resourceTier: 1,
+    amount: 1,
+    value: '1.5e+0',
+    oreId,
+    oreDepthTiles: 4,
+    chunk: '0,9',
+  })
+}
+
+const METAL = 'kernel.metal.t1'
+const CRYSTAL = 'kernel.crystal.t2'
+
 describe('run summary', () => {
   it('sums earnings and every kind of spending as exact canonical money', () => {
     expect(deriveSummary(PLAYED_RUN)).toMatchObject({
@@ -229,6 +244,35 @@ function summaryFoldedFrom(events: readonly RunEvent[]) {
   events.forEach(sink.append)
   return sink.summarize()
 }
+
+describe('run summary: mined order (#122)', () => {
+  it('keeps the minerals in mined order, run-length encoded, with the units of each ore', () => {
+    const ores = [METAL, METAL, METAL, CRYSTAL, METAL, CRYSTAL, CRYSTAL]
+    const run = [...PLAYED_RUN, ...ores.map((oreId, index) => collected(9100 + index, oreId))]
+    expect(deriveSummary(run)).toMatchObject({
+      minedOrder: [
+        [METAL, 3],
+        [CRYSTAL, 1],
+        [METAL, 1],
+        [CRYSTAL, 2],
+      ],
+      minedUnitsByOre: { [METAL]: 4, [CRYSTAL]: 3 },
+    })
+  })
+
+  it('has an empty mined order for a run that collected nothing', () => {
+    expect(deriveSummary(PLAYED_RUN)).toMatchObject({ minedOrder: [], minedUnitsByOre: {} })
+  })
+
+  it('leaves a mined order taken mid-run as it was while the run goes on', () => {
+    const sink = createSummarySink()
+    sink.append(collected(10, METAL))
+    const atPageHide = sink.summarize()
+    sink.append(collected(11, METAL))
+    sink.append(collected(12, CRYSTAL))
+    expect(atPageHide).toMatchObject({ minedOrder: [[METAL, 1]], minedUnitsByOre: { [METAL]: 1 } })
+  })
+})
 
 describe('summary sink (#117)', () => {
   it('folds the events as they arrive into the summary.json text the whole log derives', () => {

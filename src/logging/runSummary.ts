@@ -13,6 +13,13 @@ import { add, fromCanonical, toCanonical, ZERO_MONEY, type Money } from '../syst
 import { SAWTOOTH_BAND } from '../systems/vehicle/bandDig'
 import type { RunEventName } from './eventNames'
 import { bandDigOf, type BandDig, type PlanetLevels } from './bandDigReport'
+import {
+  addMinedOre,
+  copyMinedOrder,
+  emptyMinedOrder,
+  type MinedOrder,
+  type MinedRun,
+} from './minedOrder'
 import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 /** The band the first #86 probe measured; kept beside the sawtooth band, reported only. */
@@ -72,6 +79,13 @@ export interface RunSummary {
    * departure.
    */
   planetLevels: PlanetLevels
+  /**
+   * The ore of every `resource_collected` line in mined order, run-length encoded as
+   * `[oreId, units]` (#122); `resource_collected` is a `detail` event, so a release run has none.
+   */
+  minedOrder: MinedRun[]
+  /** Ore id to the units of it collected (#122). */
+  minedUnitsByOre: Record<string, number>
   milestones: RunMilestones
 }
 
@@ -134,6 +148,7 @@ interface Tally {
   upgradeLevels: Record<string, number>
   coreCompletedTicks: Record<string, number>
   planetLevels: PlanetLevels
+  minedOrder: MinedOrder
   milestones: RunMilestones
 }
 
@@ -167,6 +182,7 @@ function emptyTally(): Tally {
     upgradeLevels: {},
     coreCompletedTicks: {},
     planetLevels: { arrival: {}, departure: {} },
+    minedOrder: emptyMinedOrder(),
     milestones: {
       planetReached: {},
       firstSale: null,
@@ -239,6 +255,9 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
   mining_interval: (tally, { data }) => {
     tally.tilesDestroyed += data.tilesDestroyed
     for (const collected of data.collected) foldCollected(tally, collected)
+  },
+  resource_collected: (tally, { data }) => {
+    addMinedOre(tally.minedOrder, data)
   },
   mining_session_ended: (tally, { data }) => {
     tally.maxDepthTiles = Math.max(tally.maxDepthTiles, data.maxDepthTiles)
@@ -324,8 +343,13 @@ function summaryOf(tally: Tally): RunSummary {
       arrival: { ...tally.planetLevels.arrival },
       departure: { ...tally.planetLevels.departure },
     },
+    ...minedOrderFieldsOf(copyMinedOrder(tally.minedOrder)),
     milestones: { ...tally.milestones, planetReached: { ...tally.milestones.planetReached } },
   }
+}
+
+function minedOrderFieldsOf({ runs, unitsByOre }: MinedOrder) {
+  return { minedOrder: runs, minedUnitsByOre: unitsByOre }
 }
 
 function totalSpent(tally: Tally): Money {
