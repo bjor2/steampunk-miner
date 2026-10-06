@@ -213,6 +213,27 @@
       "better": "lower",
       "source": "browser CPU profile summary (inclusive %)"
     },
+    "profile.stateDigestMainThreadPct": {
+      "label": "stateDigest share of main-thread samples",
+      "unit": "%",
+      "group": "Main-thread profile",
+      "better": "lower",
+      "source": "browser CPU profile summary (inclusive %), every caller of the state hash (#101)"
+    },
+    "authority.readStateUs": {
+      "label": "Authority state read (readAuthorityState) · 10.5 KB state",
+      "unit": "µs",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "readCost.ts on the perf box (#101): median per read over 15 batches of 20, after 720 drill reports"
+    },
+    "authority.snapshotOfUs": {
+      "label": "Authority snapshotOf (state + digest) · 10.5 KB state",
+      "unit": "µs",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "readCost.ts on the perf box (#101): median per call over 15 batches of 20, after 720 drill reports"
+    },
     "profile.garbageCollectorMainThreadPct": {
       "label": "Garbage collector share of main-thread samples",
       "unit": "%",
