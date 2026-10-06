@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T01:33:05Z",
+  "updated_at": "2026-10-06T01:33:18Z",
   "entries": {
     "test-loop/1": {
       "loop": "test-loop",
@@ -107,9 +107,25 @@
       },
       "updated_at": "2026-10-06T01:33:05Z",
       "host": "grok-bot-vm-452660841"
+    },
+    "dashboard-selftest": {
+      "loop": "dashboard-selftest",
+      "slot": null,
+      "state": "working",
+      "issue": 90,
+      "note": "e2e test 03:33",
+      "updated_at": "2026-10-06T01:33:18Z",
+      "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-06T01:33:18Z",
+      "key": "dashboard-selftest",
+      "state": "working",
+      "issue": 90,
+      "note": "e2e test 03:33"
+    },
     {
       "at": "2026-10-06T01:30:59Z",
       "key": "steampunk-loop",
