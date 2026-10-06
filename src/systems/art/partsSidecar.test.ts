@@ -144,6 +144,43 @@ describe('parts sidecar', () => {
     ])
   })
 
+  it('takes the charge rack frame and one charge per rack slot, and the planted charge lamp', () => {
+    const rack = {
+      ...vehicleSidecar([
+        { ...wheel, id: 'charge-rack' },
+        { ...wheel, id: 'charge-1' },
+        { ...wheel, id: 'charge-8' },
+      ]),
+      assetId: 'vehicle-blasting-charges',
+      maps: {
+        albedo: 'vehicle-blasting-charges.albedo.ktx2',
+        normal: 'vehicle-blasting-charges.normal.ktx2',
+        emissive: false as const,
+      },
+    }
+    expect(sidecarProblems('vehicle-blasting-charges', rack)).toEqual([])
+    expect(
+      sidecarProblems('vehicle-blasting-charges', {
+        ...rack,
+        parts: [{ ...wheel, id: 'charge-9' }],
+      }),
+    ).toEqual(['vehicle-blasting-charges.parts.json: part "charge-9" is not a valid part id'])
+    const charge = {
+      ...rack,
+      assetId: 'prop-blasting-charge',
+      parts: [
+        { ...wheel, id: 'prop-blasting-charge' },
+        { ...wheel, id: 'fuse-lamp' },
+      ],
+      maps: {
+        albedo: 'prop-blasting-charge.albedo.ktx2',
+        normal: 'prop-blasting-charge.normal.ktx2',
+        emissive: 'prop-blasting-charge.emissive.ktx2',
+      },
+    }
+    expect(sidecarProblems('prop-blasting-charge', charge)).toEqual([])
+  })
+
   it('names no emissive map for an asset where nothing glows', () => {
     const sidecar = vehicleSidecar()
     expect(mapFilesOf(sidecar)).toEqual([

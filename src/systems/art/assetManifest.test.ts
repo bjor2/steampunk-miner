@@ -9,6 +9,7 @@ import {
   type ManifestEntry,
 } from './assetManifest'
 import {
+  BLASTING_CHARGES_ROW_ID,
   SCHEDULED_ENEMY_ART_ROW_IDS,
   blenderAssetIds,
   enemyArtKinds,
@@ -100,6 +101,14 @@ describe('asset manifest', () => {
     const looks = ['refinery-idle', 'refinery-refining', 'refinery-ready']
     expect(looks.every((part) => isValidPartId('platform-bay-refinery', part))).toBe(true)
     expect(isValidPartId('platform-bay-refinery', 'refinery-smelting')).toBe(false)
+  })
+
+  it('names the blasting charges art from its locked schedule row (#110)', () => {
+    expect(LOCKED_SCHEDULE.rows.map((row) => row.id)).toContain(BLASTING_CHARGES_ROW_ID)
+    expect(blenderAssetIds()).toEqual(
+      expect.arrayContaining(['vehicle-blasting-charges', 'prop-blasting-charge']),
+    )
+    expect(vectorIconIds()).toContain('icon-blasting-charges')
   })
 
   it('refuses an asset id that no registry derives, and a missing inventory row', () => {

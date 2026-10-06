@@ -211,6 +211,26 @@
       "color": "#9aa0a6"
     },
     {
+      "id": "vehicle-blasting-charges",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#a63a2a",
+      "partColors": {
+        "charge-rack": "#8a6a2f"
+      }
+    },
+    {
+      "id": "prop-blasting-charge",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#a63a2a",
+      "partColors": {
+        "fuse-lamp": "#ff4a3a"
+      }
+    },
+    {
       "id": "icon-track-drill-power",
       "source": "vector",
       "form": "svg",
@@ -251,6 +271,12 @@
       "source": "vector",
       "form": "svg",
       "status": "final"
+    },
+    {
+      "id": "icon-blasting-charges",
+      "source": "vector",
+      "form": "svg",
+      "status": "placeholder"
     },
     {
       "id": "emblem-bay-sell",
@@ -327,6 +353,12 @@
     {
       "id": "fx-collapse-debris",
       "source": "procedural",
+      "form": "code",
+      "status": "placeholder"
+    },
+    {
+      "id": "fx-blast-scorch",
+      "source": "shader",
       "form": "code",
       "status": "placeholder"
     },

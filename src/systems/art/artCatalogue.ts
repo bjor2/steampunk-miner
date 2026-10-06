@@ -14,6 +14,8 @@ import PLATFORM_BAY_SELL from '../../../art/placeholders/platform-bay-sell.parts
 import PLATFORM_BAY_UPGRADE from '../../../art/placeholders/platform-bay-upgrade.parts.json'
 import PLATFORM_HUB from '../../../art/placeholders/platform-hub.parts.json'
 import PROP_ARTEFACT_CACHE from '../../../art/placeholders/prop-artefact-cache.parts.json'
+import PROP_BLASTING_CHARGE from '../../../art/placeholders/prop-blasting-charge.parts.json'
+import VEHICLE_BLASTING_CHARGES from '../../../art/placeholders/vehicle-blasting-charges.parts.json'
 import VEHICLE from '../../../art/placeholders/vehicle.parts.json'
 import VEHICLE_AUTO_GUNS from '../../../art/placeholders/vehicle-auto-guns.parts.json'
 import ENEMY_BURROWER_EXPORTED from '../../../public/assets/enemy/enemy-burrower/enemy-burrower.parts.json'
@@ -43,6 +45,8 @@ export const PLACEHOLDER_SIDECARS: readonly PartsSidecar[] = [
   ENEMY_BURROWER,
   ENEMY_TUNNEL_WRECKER,
   PROP_ARTEFACT_CACHE,
+  VEHICLE_BLASTING_CHARGES,
+  PROP_BLASTING_CHARGE,
 ] as unknown as readonly PartsSidecar[]
 
 /** Written by `npm run art:export`; the game draws one only while its manifest entry is final. */

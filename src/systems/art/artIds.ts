@@ -81,6 +81,8 @@ export function blenderAssetIds(): string[] {
     'prop-artefact-cache',
     ...numbered('ground-band', BAND_COUNT),
     ...numbered('casing-grade', CASING_GRADE_COUNT),
+    CHARGE_RACK_ASSET_ID,
+    PLANTED_CHARGE_ASSET_ID,
   ]
 }
 
@@ -93,7 +95,35 @@ export function vectorIconIds(): string[] {
     ...UPGRADE_IDS.map(trackIconIdOf),
     CASING_ICON_ID,
     ...PLATFORM_BAY_IDS.map((bay) => `emblem-bay-${bay}`),
+    BLASTING_CHARGES_ICON_ID,
   ]
+}
+
+/**
+ * The art of the `blasting_charges` schedule row (#109 "Visibility", #110): a charge rack mounted
+ * on the vehicle, a planted charge with its fuse lamp, and an icon for its Upgrade bay rows and HUD
+ * count. The ids take the #52 kebab form of the row id.
+ */
+export const BLASTING_CHARGES_ROW_ID = 'blasting_charges'
+
+const BLASTING_CHARGES = kebabOf(BLASTING_CHARGES_ROW_ID)
+
+/** Drawn at the vehicle's origin, in the vehicle's frame, once the rack is bought. */
+export const CHARGE_RACK_ASSET_ID = `vehicle-${BLASTING_CHARGES}`
+
+/** One charge planted on the wall; its `fuse-lamp` is its own part so it can blink. */
+export const PLANTED_CHARGE_ASSET_ID = 'prop-blasting-charge'
+
+export const FUSE_LAMP_PART_ID = 'fuse-lamp'
+
+export const BLASTING_CHARGES_ICON_ID = `icon-${BLASTING_CHARGES}`
+
+/**
+ * The rack's frame, then `charge-<n>` for each of its `chargeRackSlots` (#109 `rackMax`); the rack
+ * shows `charge-1` to `charge-<count>` for the count carried.
+ */
+export function chargeRackPartIds(): string[] {
+  return ['charge-rack', ...numbered('charge', ART_RULES.chargeRackSlots)]
 }
 
 /** The Casing row's icon, the seventh vector icon (#54 scope review). */
@@ -128,14 +158,17 @@ function numbered(prefix: string, count: number): string[] {
 
 /**
  * Part ids outside the vehicle: each single-part asset's own id, the hub's two visual states
- * (#8 `outpost`, `core_drive`), which are its collections in Blender (#52), and the refinery
- * bay's three looks drawn over its frame (#105).
+ * (#8 `outpost`, `core_drive`), which are its collections in Blender (#52), the refinery
+ * bay's three looks drawn over its frame (#105), the charge rack's slots and the planted
+ * charge's fuse lamp.
  */
 export function registryPartIds(): string[] {
   return [
     ...blenderAssetIds(),
     ...PLATFORM_VISUAL_STATES.map(kebabOf),
     ...REFINERY_BAY_LOOKS.map(refineryLookPartIdOf),
+    ...chargeRackPartIds(),
+    FUSE_LAMP_PART_ID,
   ]
 }
 
