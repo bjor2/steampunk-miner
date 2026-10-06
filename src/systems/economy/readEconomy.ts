@@ -12,6 +12,7 @@ import {
 import { readArchetypes } from './readArchetypeEconomy'
 import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
+import { readPaceScale } from './readPaceScale'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
 import {
   TRACK_EFFECTS,
@@ -26,7 +27,7 @@ import {
   type UpgradeId,
   type VisualTierThreshold,
 } from './economyDefinition'
-import type { BigStat, Money } from '../money'
+import type { BigStat } from '../money'
 
 export type EconomyReading = { economy: Economy; problems: [] } | { problems: string[] }
 
@@ -83,31 +84,11 @@ function readOre(reader: FieldReader, ore: Record<string, unknown>): Economy['or
 }
 
 function readPlanets(reader: FieldReader, planets: Record<string, unknown>): Economy['planets'] {
-  const paceScale = reader.object('planets.paceScale', planets.paceScale)
   return {
     coreFraction: reader.money('planets.coreFraction', planets.coreFraction),
     fragmentsPerTile: reader.safeInteger('planets.fragmentsPerTile', planets.fragmentsPerTile),
-    paceScale: {
-      default: reader.money('planets.paceScale.default', paceScale.default),
-      byPlanet: readPaceScaleByPlanet(reader, paceScale.byPlanet),
-    },
+    paceScale: readPaceScale(reader, planets.paceScale),
   }
-}
-
-/** Keys are planet indexes written as JSON object keys ("3": "1.1"). */
-function readPaceScaleByPlanet(reader: FieldReader, value: unknown): Map<number, Money> {
-  const entries = Object.entries(reader.object('planets.paceScale.byPlanet', value))
-  return new Map(
-    entries.map(([key, scale]) => [
-      readPlanetKey(reader, key),
-      reader.money(`planets.paceScale.byPlanet.${key}`, scale),
-    ]),
-  )
-}
-
-function readPlanetKey(reader: FieldReader, key: string): number {
-  const planetIndex = /^[1-9][0-9]*$/.test(key) ? Number.parseInt(key) : Number.NaN
-  return reader.safeInteger(`planets.paceScale.byPlanet key ${key}`, planetIndex)
 }
 
 function readPrices(reader: FieldReader, prices: Record<string, unknown>): Economy['prices'] {

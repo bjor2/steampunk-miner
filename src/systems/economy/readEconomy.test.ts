@@ -101,6 +101,19 @@ describe('economy data validation', () => {
     expect(problemsOf(broken)).toContain('costCurves[0].ratio must be a decimal string >= 0')
   })
 
+  it('refuses pace scale steps that do not climb by planet (#131)', () => {
+    const broken = economyFileCopy()
+    Object.assign(broken.planets.paceScale, {
+      fromPlanet: [
+        { from: 8, scale: '1' },
+        { from: 3, scale: '1.3' },
+      ],
+    })
+    expect(problemsOf(broken)).toContain(
+      'planets.paceScale.fromPlanet must climb by planet from 1 or later, one row a planet',
+    )
+  })
+
   it('lists every problem at once and returns no economy', () => {
     const broken = economyFileCopy()
     broken.ore.valueRatio = 'lots'

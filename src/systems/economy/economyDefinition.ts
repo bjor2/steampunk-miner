@@ -158,6 +158,20 @@ export interface CombatRules {
   burrowerShare: { numerator: number; denominator: number }
 }
 
+/** Every price on planet `from` and later is multiplied by `scale`, until the next row (#131). */
+export interface PaceScaleStep {
+  from: number
+  scale: Money
+}
+
+/** The balance lever `paceScale(p)` (#6 section 6): `byPlanet`, else the last step, else default. */
+export interface PaceScale {
+  default: Money
+  /** Ascending by `from`; the last row at or below the planet applies. */
+  fromPlanet: readonly PaceScaleStep[]
+  byPlanet: Map<number, Money>
+}
+
 /** A price of `oreUnits` of band `band`'s ore at the purchase planet (#105, #107 `bandOre`). */
 export interface BandOreCost {
   band: number
@@ -256,7 +270,7 @@ export interface Economy {
     coreFraction: Money
     /** Core fragments one drilled core tile drops into the hold (#10: 1). */
     fragmentsPerTile: number
-    paceScale: { default: Money; byPlanet: Map<number, Money> }
+    paceScale: PaceScale
   }
   prices: {
     referenceBand: number

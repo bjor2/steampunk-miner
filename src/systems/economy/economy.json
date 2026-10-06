@@ -12,7 +12,14 @@
   "planets": {
     "coreFraction": "0.4",
     "fragmentsPerTile": 1,
-    "paceScale": { "default": "1", "byPlanet": {} }
+    "paceScale": {
+      "default": "1",
+      "fromPlanet": [
+        { "from": 3, "scale": "1" },
+        { "from": 8, "scale": "1" }
+      ],
+      "byPlanet": {}
+    }
   },
   "prices": {
     "referenceBand": 3,

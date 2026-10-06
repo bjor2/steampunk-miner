@@ -19,8 +19,17 @@ export function fragmentsPerCoreTile(): number {
 
 /**
  * The balance regression's lever (#6 section 6): every charge on planet `p` is multiplied by it.
- * Default "1", so no formula changes when it is retuned.
+ * A single planet's scale wins, then the last `fromPlanet` step at or below `p` (#131), then the
+ * default "1", so no formula changes when it is retuned.
  */
 export function paceScale(planetIndex: number): Money {
-  return planets.paceScale.byPlanet.get(planetIndex) ?? planets.paceScale.default
+  return (
+    planets.paceScale.byPlanet.get(planetIndex) ??
+    stepScaleAt(planetIndex) ??
+    planets.paceScale.default
+  )
+}
+
+function stepScaleAt(planetIndex: number): Money | undefined {
+  return planets.paceScale.fromPlanet.filter((step) => step.from <= planetIndex).at(-1)?.scale
 }
