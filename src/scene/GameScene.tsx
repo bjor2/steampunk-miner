@@ -4,7 +4,7 @@
  * scale); `flat` leaves three's own tone mapping off, because the composite pass does it.
  */
 import { Canvas } from '@react-three/fiber'
-import { CAMERA_POSITION } from '../constants/scene'
+import { CAMERA_POSITION, CANVAS_DPR_RANGE } from '../constants/scene'
 import { PhysicsWorld } from '../physics/PhysicsWorld'
 import { useGameStore } from '../store/gameStore'
 import { CementSpray } from './CementSpray'
@@ -32,6 +32,7 @@ export function GameScene() {
     <Canvas
       flat
       orthographic
+      dpr={[...CANVAS_DPR_RANGE]}
       // The canvas only takes the composite; multisampling it would only cost fill (#38).
       gl={{ antialias: false }}
       camera={{ position: [...CAMERA_POSITION] }}

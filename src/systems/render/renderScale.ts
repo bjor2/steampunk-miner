@@ -2,9 +2,13 @@
  * The adaptive render scale (#38 "4K strategy"): the WebGL canvas renders at
  * `scale x devicePixelRatio` and is upscaled, so 4K costs only what the GPU can afford while the
  * HTML UI stays native. Once per second of frames the p95 frame time steps the scale down 0.1
- * (missed frames) or up 0.1 (every frame met), between a 1920 x 1080 internal floor and a native
- * render. After a few reversals it settles, like drei's PerformanceMonitor flip-flop fallback.
- * Driven by the render delta only: presentation, never the authority or the digest.
+ * (missed frames) or up 0.1 (every frame met), between a floor and a native render. After a few
+ * reversals it settles, like drei's PerformanceMonitor flip-flop fallback. Driven by the render
+ * delta only: presentation, never the authority or the digest.
+ *
+ * The floor (#173, amending #38) is 1080 internal pixels across the short axis or one internal
+ * pixel per CSS pixel, whichever is fewer: a 4K TV still floors at 1080p, and a DPR-2 phone can
+ * step down to DPR-1 sharpness instead of being pinned at a native render.
  */
 import {
   RENDER_SCALE_DECLINE_FRAME_MS,
@@ -34,14 +38,21 @@ export interface RenderScale {
   isPinned: boolean
 }
 
-/** The lowest scale that still renders 1080 pixels across the output's shorter side. */
-export function renderScaleFloorOf(outputShortAxisPx: number): number {
-  const floor = Math.min(RENDER_SCALE_MAX, RENDER_SCALE_FLOOR_SHORT_AXIS_PX / outputShortAxisPx)
+/** The canvas's shorter side in CSS pixels and in the device pixels it outputs (#173 tiers). */
+export interface OutputShortAxis {
+  cssPixels: number
+  devicePixels: number
+}
+
+/** The lowest scale that still renders `min(1080, cssPixels)` pixels across the shorter side. */
+export function renderScaleFloorOf(shortAxis: OutputShortAxis): number {
+  const floorPixels = Math.min(RENDER_SCALE_FLOOR_SHORT_AXIS_PX, shortAxis.cssPixels)
+  const floor = Math.min(RENDER_SCALE_MAX, floorPixels / shortAxis.devicePixels)
   return Math.ceil(floor * HUNDREDTHS - 1e-9) / HUNDREDTHS
 }
 
-export function createRenderScale(outputShortAxisPx: number): RenderScale {
-  const floor = renderScaleFloorOf(outputShortAxisPx)
+export function createRenderScale(shortAxis: OutputShortAxis): RenderScale {
+  const floor = renderScaleFloorOf(shortAxis)
   return {
     scale: Math.max(floor, RENDER_SCALE_START),
     floor,
@@ -53,8 +64,8 @@ export function createRenderScale(outputShortAxisPx: number): RenderScale {
 }
 
 /** A resized output moves the floor; the scale is lifted onto it when it now sits below. */
-export function refloorRenderScale(state: RenderScale, outputShortAxisPx: number): void {
-  state.floor = renderScaleFloorOf(outputShortAxisPx)
+export function refloorRenderScale(state: RenderScale, shortAxis: OutputShortAxis): void {
+  state.floor = renderScaleFloorOf(shortAxis)
   state.scale = Math.max(state.scale, state.floor)
 }
 

@@ -20,6 +20,8 @@ export const renderPresence = {
   terrainMs: 0,
   groundColliders: 0,
   renderScale: 1,
+  /** The lowest scale the adaptive rule may step to on this output (#173 tiers). */
+  renderScaleFloor: 1,
   isRenderScaleSettled: false,
   isRenderScalePinned: false,
   /** The drawing buffer the scene renders into, in device pixels. */

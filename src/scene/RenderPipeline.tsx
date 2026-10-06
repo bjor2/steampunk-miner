@@ -2,7 +2,7 @@
  * Draws each frame through the post pipeline and adapts the render scale (#38 "4K strategy"):
  * takes over R3F's render (a positive `useFrame` priority), counts what the frame cost from
  * `renderer.info`, and once per second of frames lets the pure render-scale rule move the canvas's
- * pixel ratio between the 1080p floor and a native render. The HTML UI is outside the canvas, so
+ * pixel ratio between its floor (#173) and a native render. The HTML UI is outside the canvas, so
  * it stays native at every scale. Its `renderer.info` also answers `ui.getRendererMemory()` (#119).
  * Presentation only: it never writes the authority or submits.
  */
@@ -23,6 +23,7 @@ import {
   createRenderScale,
   pinRenderScale,
   refloorRenderScale,
+  type OutputShortAxis,
   type RenderScale,
 } from '../systems/render/renderScale'
 import { createPostPipeline } from './postPipeline'
@@ -37,7 +38,11 @@ export function RenderPipeline() {
   const readRoot = useThree((state) => state.get)
   const pipeline = useMemo(createPostPipeline, [])
   const frames = useMemo(createFrameWindow, [])
-  const scale = useMemo(() => createRenderScale(outputShortAxisOf(readRoot())), [readRoot])
+  const shortAxis = useMemo(() => ({ cssPixels: 0, devicePixels: 0 }), [])
+  const scale = useMemo(
+    () => createRenderScale(readOutputShortAxis(readRoot(), shortAxis)),
+    [readRoot, shortAxis],
+  )
   useEffect(() => {
     // Counted over the whole frame, scene and post passes, then reset by hand each frame.
     gl.info.autoReset = false
@@ -52,14 +57,19 @@ export function RenderPipeline() {
     state.gl.info.reset()
     pipeline.render(state.gl, state.scene, state.camera)
     recordFrameCost(state)
-    adaptToFrame(state, scale, frames, delta)
+    adaptToFrame(state, scale, readOutputShortAxis(state, shortAxis), frames, delta)
   }, RENDER_PRIORITY)
   return null
 }
 
-/** The output's shorter side in device pixels: the canvas at the display's own pixel ratio. */
-function outputShortAxisOf(state: RootState): number {
-  return Math.min(state.size.width, state.size.height) * state.viewport.initialDpr
+/**
+ * The canvas's shorter side in CSS pixels and at the display's own pixel ratio (capped by the
+ * canvas's `dpr` range), written into `out` so the frame loop allocates nothing.
+ */
+function readOutputShortAxis(state: RootState, out: OutputShortAxis): OutputShortAxis {
+  out.cssPixels = Math.min(state.size.width, state.size.height)
+  out.devicePixels = out.cssPixels * state.viewport.initialDpr
+  return out
 }
 
 function recordFrameCost(state: RootState): void {
@@ -74,11 +84,12 @@ function recordFrameCost(state: RootState): void {
 function adaptToFrame(
   state: RootState,
   scale: RenderScale,
+  shortAxis: OutputShortAxis,
   frames: FrameWindow,
   delta: number,
 ): void {
   addFrame(frames, delta)
-  refloorRenderScale(scale, outputShortAxisOf(state))
+  refloorRenderScale(scale, shortAxis)
   pinRenderScale(scale, useGameStore.getState().renderScalePin)
   recordSecondOfFrames(frames)
   adaptRenderScale(scale, frames)
@@ -97,6 +108,7 @@ function recordSecondOfFrames(frames: FrameWindow): void {
 /** Changes the canvas's pixel ratio only when the scale moved, at most once a second. */
 function applyRenderScale(state: RootState, scale: RenderScale): void {
   renderPresence.renderScale = scale.scale
+  renderPresence.renderScaleFloor = scale.floor
   renderPresence.isRenderScaleSettled = scale.isSettled
   renderPresence.isRenderScalePinned = scale.isPinned
   const dpr = state.viewport.initialDpr * scale.scale

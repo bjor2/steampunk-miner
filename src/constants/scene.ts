@@ -46,6 +46,11 @@ export const RENDER_SCALE_START = 0.75
 export const RENDER_SCALE_STEP = 0.1
 export const RENDER_SCALE_MAX = 1
 export const RENDER_SCALE_FLOOR_SHORT_AXIS_PX = 1080
+/**
+ * The canvas's device-pixel-ratio range (#173 "Canvas"): R3F's default made explicit, so a DPR-3
+ * phone renders 2x, not 2.25x the pixels of DPR 2. The render scale multiplies the capped ratio.
+ */
+export const CANVAS_DPR_RANGE: readonly [number, number] = [1, 2]
 /** The frame budget behind every #38 acceptance: p95 at most 16.7 ms (60 frames/s). */
 export const FRAME_BUDGET_MS = 16.7
 /**

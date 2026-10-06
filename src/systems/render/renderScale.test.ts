@@ -9,8 +9,10 @@ import {
   type RenderScale,
 } from './renderScale'
 
-const AT_4K = 2160
-const AT_1080P = 1080
+const AT_4K = { cssPixels: 2160, devicePixels: 2160 }
+const AT_1080P = { cssPixels: 1080, devicePixels: 1080 }
+/** #173 reference phone: 844 x 390 CSS at DPR 3, capped to 2 by the canvas. */
+const PHONE_LANDSCAPE = { cssPixels: 390, devicePixels: 780 }
 
 /** One second of frames at a steady frame time, adapting after each frame as the scene does. */
 function runSecond(state: RenderScale, window: FrameWindow, frameMs: number): void {
@@ -34,8 +36,27 @@ describe('adaptive render scale', () => {
 
   it('never renders under 1080 pixels across the short axis, so a 1080p output stays native', () => {
     expect(createRenderScale(AT_1080P).scale).toBe(1)
-    expect(createRenderScale(800).scale).toBe(1)
-    expect(renderScaleFloorOf(1440) * 1440).toBeGreaterThanOrEqual(1080)
+    expect(createRenderScale({ cssPixels: 800, devicePixels: 800 }).scale).toBe(1)
+    expect(
+      renderScaleFloorOf({ cssPixels: 1440, devicePixels: 1440 }) * 1440,
+    ).toBeGreaterThanOrEqual(1080)
+  })
+
+  it('floors a high-DPR screen under 1080 CSS pixels at one internal pixel per CSS pixel (#173)', () => {
+    expect(renderScaleFloorOf(PHONE_LANDSCAPE)).toBe(0.5)
+    expect(renderScaleFloorOf({ cssPixels: 820, devicePixels: 1640 })).toBe(0.5)
+    expect(renderScaleFloorOf({ cssPixels: 900, devicePixels: 1800 })).toBe(0.5)
+  })
+
+  it('keeps the 4K TV and the 1440p desktop at the 1080p floor whatever their DPR (#173 tiers)', () => {
+    expect(renderScaleFloorOf({ cssPixels: 1080, devicePixels: 2160 })).toBe(0.5)
+    expect(renderScaleFloorOf({ cssPixels: 1440, devicePixels: 1440 })).toBe(0.75)
+  })
+
+  it('pins a phone at its floor of 0.5 instead of holding it at a native render', () => {
+    const state = createRenderScale(PHONE_LANDSCAPE)
+    pinRenderScale(state, 0.5)
+    expect(state.scale).toBe(0.5)
   })
 
   it('steps down 0.1 per second of missed frames and stops at the floor', () => {
