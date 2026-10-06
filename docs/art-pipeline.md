@@ -173,6 +173,31 @@ so the maps tile with no seam. From then on the `.blend` files are the sources.
   brass rivet rows. Every pattern repeats within 0.5 m, so a 0.25 m lining strip shows it. Nothing
   draws the lining yet; the casing build (S2) does.
 
+## Blasting charges
+
+The art of the `blasting_charges` schedule row ([#110](https://github.com/bjor2/steampunk-miner/issues/110),
+for the spec [#109](https://github.com/bjor2/steampunk-miner/issues/109) "Visibility"). The ids take
+the #52 kebab form of the row id (`src/systems/art/artIds.ts`).
+
+| Id                         | Source         | What the build draws                                                                   |
+| -------------------------- | -------------- | -------------------------------------------------------------------------------------- |
+| `vehicle-blasting-charges` | Blender, parts | the rack on the vehicle once it is bought: `charge-rack` plus `charge-1` to `charge-8` |
+| `prop-blasting-charge`     | Blender, parts | a planted charge: `prop-blasting-charge`, and `fuse-lamp`, the only part that glows    |
+| `icon-blasting-charges`    | vector, SVG    | the rack-slot and restock rows in the Upgrade bay and the HUD charge count             |
+| `fx-blast-scorch`          | shader, code   | scorch on the tunnel edge after a blast (placeholder: the build writes the shader)     |
+
+- The rack is authored in the **vehicle's frame**: draw its parts at the vehicle's origin, rolled
+  with it, under the vehicle's own parts. It sits behind the chassis at the rear, bolted on by one
+  arm.
+- `charge-<n>` is drawn while the count carried is at least `n`, so the rack shows exactly the
+  charges on board. The slots fill the bottom row first, left to right. Their number is
+  `chargeRackSlots` in `art/asset-rules.json`, #109's `rackMax` of 8; a rack that grows past it
+  needs new slots in the `.blend`.
+- The planted charge's pivot is its centre. `fuse-lamp` is a separate part so the fuse light can
+  blink by showing and hiding it (or by its emissive map once the lit render lands).
+- `scripts/art/author_blasting_charges.py` wrote the first version of both `.blend` files. From then
+  on the `.blend` files are the sources.
+
 ## The `parts.json` sidecar, schema 1
 
 ```json
