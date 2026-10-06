@@ -1,12 +1,13 @@
 /** Reads the `blasting_charges` part of `economy.json` (spec #109, Systems & Economy numbers). */
-import type { BandOreCost, BlastingChargeRules } from './economyDefinition'
-import type { FieldReader } from './economyFieldReader'
+import type { BlastingChargeRules, CostCurve } from './economyDefinition'
+import { readBandOreCost, type FieldReader } from './economyFieldReader'
 
 const PATH = 'blastingCharges'
 
 export function readBlastingCharges(
   reader: FieldReader,
   rules: Record<string, unknown>,
+  costCurves: readonly CostCurve[],
 ): BlastingChargeRules {
   const read: BlastingChargeRules = {
     fuseTicks: reader.safeInteger(`${PATH}.fuseTicks`, rules.fuseTicks),
@@ -21,42 +22,27 @@ export function readBlastingCharges(
     rackStart: reader.safeInteger(`${PATH}.rackStart`, rules.rackStart),
     rackMax: reader.safeInteger(`${PATH}.rackMax`, rules.rackMax),
     chargeCost: readBandOreCost(reader, `${PATH}.chargeCost`, rules.chargeCost),
-    rackSlotCost: readRackSlotCost(reader, rules.rackSlotCost),
+    rackSlotCostCurveId: reader.text(`${PATH}.rackSlotCostCurveId`, rules.rackSlotCostCurveId),
     hardnessCapBand: reader.safeInteger(`${PATH}.hardnessCapBand`, rules.hardnessCapBand),
     botBlastThresholdTicks: reader.safeInteger(
       `${PATH}.botBlastThresholdTicks`,
       rules.botBlastThresholdTicks,
     ),
   }
-  checkRackSize(reader, read)
+  checkRackSlotCurve(reader, read, costCurves)
   return read
 }
 
-function readBandOreCost(reader: FieldReader, path: string, value: unknown): BandOreCost {
-  const cost = reader.object(path, value)
-  return {
-    band: reader.safeInteger(`${path}.band`, cost.band),
-    oreUnits: reader.money(`${path}.oreUnits`, cost.oreUnits),
-  }
-}
-
-function readRackSlotCost(
+/** Every rack slot level adds one charge, so the `bandOre` curve prices `rackMax - rackStart`. */
+function checkRackSlotCurve(
   reader: FieldReader,
-  value: unknown,
-): BlastingChargeRules['rackSlotCost'] {
-  const path = `${PATH}.rackSlotCost`
-  const cost = reader.object(path, value)
-  return {
-    band: reader.safeInteger(`${path}.band`, cost.band),
-    oreUnitsByLevel: reader
-      .list(`${path}.oreUnitsByLevel`, cost.oreUnitsByLevel)
-      .map((units, index) => reader.money(`${path}.oreUnitsByLevel[${index}]`, units)),
+  rules: BlastingChargeRules,
+  costCurves: readonly CostCurve[],
+): void {
+  const curve = costCurves.find((candidate) => candidate.id === rules.rackSlotCostCurveId)
+  if (curve === undefined || curve.family !== 'bandOre') {
+    reader.record(`${PATH}.rackSlotCostCurveId ${rules.rackSlotCostCurveId} has no bandOre curve`)
+  } else if (rules.rackStart + curve.oreUnitsByLevel.length !== rules.rackMax) {
+    reader.record(`${PATH}.rackMax must be rackStart plus one per ${curve.id} level`)
   }
-}
-
-/** Every rack slot level adds one charge, from `rackStart` to `rackMax`. */
-function checkRackSize(reader: FieldReader, rules: BlastingChargeRules): void {
-  const slots = rules.rackSlotCost.oreUnitsByLevel.length
-  if (rules.rackStart + slots === rules.rackMax) return
-  reader.record(`${PATH}.rackMax must be rackStart plus one per rackSlotCost level`)
 }

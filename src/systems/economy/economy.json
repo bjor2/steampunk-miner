@@ -37,7 +37,13 @@
     { "id": "cost.vehicle.drill_power", "family": "geometric", "base": "48", "ratio": "1.24" },
     { "id": "cost.vehicle.drill_tip", "family": "geometric", "base": "72", "ratio": "1.5376" },
     { "id": "cost.casing.upgrade", "family": "geometric", "base": "48", "ratio": "1.24" },
-    { "id": "cost.refinery.slot", "family": "bandOre", "band": 5, "oreUnitsByLevel": ["20", "40"] }
+    { "id": "cost.refinery.slot", "family": "bandOre", "band": 5, "oreUnitsByLevel": ["20", "40"] },
+    {
+      "id": "cost.charges.rack_slot",
+      "family": "bandOre",
+      "band": 5,
+      "oreUnitsByLevel": ["6", "8", "10", "12", "14"]
+    }
   ],
   "casing": {
     "costCurveId": "cost.casing.upgrade",
@@ -65,7 +71,7 @@
     "rackStart": 3,
     "rackMax": 8,
     "chargeCost": { "band": 5, "oreUnits": "2" },
-    "rackSlotCost": { "band": 5, "oreUnitsByLevel": ["6", "8", "10", "12", "14"] },
+    "rackSlotCostCurveId": "cost.charges.rack_slot",
     "hardnessCapBand": 5,
     "botBlastThresholdTicks": 96
   },

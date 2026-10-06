@@ -2,13 +2,18 @@
  * Reads the raw `economy.json` into an `Economy`. A broken file is refused whole and every
  * problem is listed, like a scenario (CLAUDE.md "refused, never trimmed").
  */
-import { createFieldReader, readLiteral, readRange, type FieldReader } from './economyFieldReader'
+import {
+  createFieldReader,
+  readBandOreCost,
+  readLiteral,
+  readRange,
+  type FieldReader,
+} from './economyFieldReader'
 import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
 import {
   TRACK_EFFECTS,
-  type BandOreCost,
   UPGRADE_IDS,
   type CostCurve,
   type Economy,
@@ -52,6 +57,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     blastingCharges: readBlastingCharges(
       reader,
       reader.object('blastingCharges', file.blastingCharges),
+      costCurves,
     ),
     upgrades,
     gun: readGun(reader, reader.object('gun', file.gun)),
@@ -152,14 +158,6 @@ function readGun(reader: FieldReader, gun: Record<string, unknown>): Economy['gu
       id: reader.text('gun.levelCost.id', levelCost.id),
       ratio: reader.money('gun.levelCost.ratio', levelCost.ratio),
     },
-  }
-}
-
-function readBandOreCost(reader: FieldReader, path: string, value: unknown): BandOreCost {
-  const cost = reader.object(path, value)
-  return {
-    band: reader.safeInteger(`${path}.band`, cost.band),
-    oreUnits: reader.money(`${path}.oreUnits`, cost.oreUnits),
   }
 }
 

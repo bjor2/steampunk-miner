@@ -5,7 +5,7 @@
  * problem was recorded, so a stand-in never reaches a formula.
  */
 import { fromCanonical, isNonNegativeMoneyText, ZERO_MONEY, type Money } from '../money'
-import type { BoundedRange } from './economyDefinition'
+import type { BandOreCost, BoundedRange } from './economyDefinition'
 
 export interface FieldReader {
   readonly problems: string[]
@@ -63,6 +63,15 @@ export function readRange(reader: FieldReader, path: string, value: unknown): Bo
   return {
     min: reader.boundedNumber(`${path}.min`, range.min),
     max: reader.boundedNumber(`${path}.max`, range.max),
+  }
+}
+
+/** A `bandOre` price (#105, #107, #109): `oreUnits` of band `band`'s ore. */
+export function readBandOreCost(reader: FieldReader, path: string, value: unknown): BandOreCost {
+  const cost = reader.object(path, value)
+  return {
+    band: reader.safeInteger(`${path}.band`, cost.band),
+    oreUnits: reader.money(`${path}.oreUnits`, cost.oreUnits),
   }
 }
 

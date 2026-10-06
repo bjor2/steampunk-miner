@@ -9,7 +9,6 @@
  */
 import {
   add,
-  ceilMilli,
   cmp,
   floor,
   floorMilli,
@@ -18,11 +17,11 @@ import {
   toSafeInteger,
   type Money,
 } from '../money'
+import { bandOrePrice } from './bandOreCost'
 import { bandOreCurveOf } from './costCurveLookup'
 import { ECONOMY } from './economy'
-import { oreSalePrice, oreTier, oreValue } from './oreEconomy'
+import { oreSalePrice, oreValue } from './oreEconomy'
 import { compoundRatio } from './curveFamilies'
-import { paceScale } from './planetEconomy'
 
 const { refinery } = ECONOMY
 const ONE = fromSafeInteger(1)
@@ -66,8 +65,7 @@ export function refinerySlotPrice(planetIndex: number, slots: number): Money | n
   const curve = bandOreCurveOf(refinery.slotCostCurveId)
   const oreUnits = curve.oreUnitsByLevel[slots - refinery.slotsStart]
   if (oreUnits === undefined) return null
-  const oreWorth = mul(oreUnits, oreValue(oreTier(planetIndex, curve.band)))
-  return ceilMilli(mul(oreWorth, paceScale(planetIndex)))
+  return bandOrePrice({ band: curve.band, oreUnits }, planetIndex)
 }
 
 /**

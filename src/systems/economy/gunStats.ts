@@ -10,12 +10,10 @@
  * of band 5 at the planet the guns are bought on.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
-import { ceilMilli, mul, type BigStat, type Money } from '../money'
+import { mul, type BigStat, type Money } from '../money'
+import { bandOrePrice } from './bandOreCost'
 import { growGeometric, saturate } from './curveFamilies'
 import { ECONOMY } from './economy'
-import type { BandOreCost } from './economyDefinition'
-import { oreTier, oreValue } from './oreEconomy'
-import { paceScale } from './planetEconomy'
 import { drillPower } from './vehicleStats'
 
 /** The gun track's id, as its icon and the Upgrade bay name it (#107, #108). */
@@ -78,9 +76,4 @@ export function nextGunPrice(gunLevel: number, planetIndex: number): Money {
 
 export function gunLevelCostCurveId(): string {
   return gun.levelCost.id
-}
-
-function bandOrePrice({ band, oreUnits }: BandOreCost, planetIndex: number): Money {
-  const cargoValue = mul(oreUnits, oreValue(oreTier(planetIndex, band)))
-  return ceilMilli(mul(cargoValue, paceScale(planetIndex)))
 }

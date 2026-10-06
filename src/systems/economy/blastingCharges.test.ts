@@ -111,7 +111,7 @@ describe('blasting charges economy', () => {
     const broken = structuredClone(economyFile)
     broken.blastingCharges.rackMax = 9
     expect(readEconomy(broken).problems).toEqual([
-      'blastingCharges.rackMax must be rackStart plus one per rackSlotCost level',
+      'blastingCharges.rackMax must be rackStart plus one per cost.charges.rack_slot level',
     ])
   })
 })

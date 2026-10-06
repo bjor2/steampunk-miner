@@ -187,7 +187,7 @@ export interface GunRules {
  * `blasting_charges` (spec #109, Systems & Economy numbers): the fuse, the blast and its yield
  * trade, the hit on a vehicle and on enemies in the radius, the rack and its prices, and the
  * pacing bot's blast rule. The rack holds `rackStart` charges and each bought slot one more, up to
- * `rackMax` (`rackStart` plus one slot per `rackSlotCost` level).
+ * `rackMax` (`rackStart` plus one slot per level of the `bandOre` curve `rackSlotCostCurveId`).
  */
 export interface BlastingChargeRules {
   fuseTicks: number
@@ -203,7 +203,7 @@ export interface BlastingChargeRules {
   rackStart: number
   rackMax: number
   chargeCost: BandOreCost
-  rackSlotCost: { band: number; oreUnitsByLevel: readonly Money[] }
+  rackSlotCostCurveId: string
   /** No tile harder than this band's rock of the current planet breaks; core tiles never do. */
   hardnessCapBand: number
   /** The bot blasts a tile whose drill time would be over this many ticks (4x `minTicksPerTile`). */

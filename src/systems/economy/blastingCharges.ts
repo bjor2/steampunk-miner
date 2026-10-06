@@ -28,10 +28,11 @@ import {
 } from '../money'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
-import type { BandOreCost, EnemyKind } from './economyDefinition'
+import { bandOrePrice, bandOreWorth } from './bandOreCost'
+import { bandOreCurveOf } from './costCurveLookup'
+import type { BandOreCostCurve, EnemyKind } from './economyDefinition'
 import { enemyHealth, enemyTier } from './enemyStats'
-import { blockHardness, oreTier, oreValue } from './oreEconomy'
-import { paceScale } from './planetEconomy'
+import { blockHardness } from './oreEconomy'
 
 const { blastingCharges: charges } = ECONOMY
 const RADIUS_MM = mul(charges.blastRadiusTiles, fromSafeInteger(MM_PER_METRE))
@@ -66,19 +67,20 @@ export function rackCapacity(slotLevel: number): number {
 }
 
 export function rackMaxSlotLevel(): number {
-  return charges.rackSlotCost.oreUnitsByLevel.length
+  return rackSlotCurve().oreUnitsByLevel.length
 }
 
 /** Restocking `count` charges on planet `planetIndex`. */
 export function restockPrice(count: number, planetIndex: number): Money {
-  return ceilMilli(mul(fromSafeInteger(count), unroundedPrice(charges.chargeCost, planetIndex)))
+  return ceilMilli(mul(fromSafeInteger(count), bandOreWorth(charges.chargeCost, planetIndex)))
 }
 
 /** Raising the rack from `slotLevel` (0 to 4) bought slots to the next on planet `planetIndex`. */
 export function rackSlotPrice(slotLevel: number, planetIndex: number): Money {
-  const oreUnits = charges.rackSlotCost.oreUnitsByLevel[slotLevel]
+  const { band, oreUnitsByLevel } = rackSlotCurve()
+  const oreUnits = oreUnitsByLevel[slotLevel]
   if (oreUnits === undefined) throw new RangeError(`the rack has no slot after ${slotLevel}`)
-  return ceilMilli(unroundedPrice({ band: charges.rackSlotCost.band, oreUnits }, planetIndex))
+  return bandOrePrice({ band, oreUnits }, planetIndex)
 }
 
 /** What a blast takes off the planter's vehicle in its radius, at the blast tile's band. */
@@ -107,7 +109,6 @@ export function botBlastThresholdTicks(): number {
   return charges.botBlastThresholdTicks
 }
 
-function unroundedPrice({ band, oreUnits }: BandOreCost, planetIndex: number): Money {
-  const cargoValue = mul(oreUnits, oreValue(oreTier(planetIndex, band)))
-  return mul(cargoValue, paceScale(planetIndex))
+function rackSlotCurve(): BandOreCostCurve {
+  return bandOreCurveOf(charges.rackSlotCostCurveId)
 }
