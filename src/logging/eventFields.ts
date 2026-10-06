@@ -5,6 +5,7 @@
  * `perf_sample`. Each kind maps to the TypeScript type the recorder must pass, so the registry is
  * both the runtime schema and the compile-time one.
  */
+import { isNestedTooDeep, MAX_JSON_NESTING_DEPTH } from '../systems/jsonNesting'
 import { fromCanonical, toCanonical } from '../systems/money'
 
 export type FieldKind =
@@ -70,13 +71,14 @@ export function declaredFieldProblems(
 }
 
 function valueProblems(value: unknown, kind: FieldKind, path: string): string[] {
+  if (kind === 'jsonArgs') return jsonArgsProblems(value, path)
   if (typeof kind === 'string') return scalarProblems(value, kind, path)
   if ('oneOf' in kind) return oneOfProblems(value, kind.oneOf, path)
   if ('listOf' in kind) return listProblems(value, kind.listOf, path)
   return mapProblems(value, kind.mapOf, path)
 }
 
-type ScalarKind = Extract<FieldKind, string>
+type ScalarKind = Exclude<Extract<FieldKind, string>, 'jsonArgs'>
 
 const SCALAR_CHECKS: Record<
   ScalarKind,
@@ -87,13 +89,20 @@ const SCALAR_CHECKS: Record<
   text: { isValid: (value) => typeof value === 'string', expected: 'a string' },
   flag: { isValid: (value) => typeof value === 'boolean', expected: 'a boolean' },
   float: { isValid: Number.isFinite, expected: 'a finite number' },
-  jsonArgs: { isValid: isExactJsonObject, expected: 'an object without floats' },
 }
 
 function scalarProblems(value: unknown, kind: ScalarKind, path: string): string[] {
   const check = SCALAR_CHECKS[kind]
   if (check.isValid(value)) return []
   return [`${path} must be ${check.expected}, got ${quote(value)}`]
+}
+
+/** The depth check runs first: the exactness walk recurses, and so does quoting the value (#100). */
+function jsonArgsProblems(value: unknown, path: string): string[] {
+  if (isNestedTooDeep(value))
+    return [`${path} must nest at most ${MAX_JSON_NESTING_DEPTH} levels deep`]
+  if (isExactJsonObject(value)) return []
+  return [`${path} must be an object without floats, got ${quote(value)}`]
 }
 
 function oneOfProblems(value: unknown, allowed: readonly string[], path: string): string[] {

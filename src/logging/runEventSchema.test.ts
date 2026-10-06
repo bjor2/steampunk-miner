@@ -18,6 +18,19 @@ const resourceSold = {
 
 const withData = (data: unknown) => ({ ...resourceSold, data })
 
+const debugCommandLine = (args: unknown) => ({
+  ...resourceSold,
+  event: 'debug_command_applied',
+  data: { command: 'debug.setPlanet', args },
+})
+
+/** Debug arguments nested `depth` objects deep, counting `args` itself: `{ a: 1 }` is depth 1. */
+function argsNested(depth: number): unknown {
+  let value: unknown = 1
+  for (let level = 0; level < depth; level++) value = { a: value }
+  return value
+}
+
 describe('run event schema', () => {
   it('accepts the example line of the logging contract', () => {
     expect(runEventProblems(resourceSold)).toEqual([])
@@ -100,6 +113,22 @@ describe('run event schema', () => {
     }
     expect(runEventProblems(line)).toEqual([
       'debug_command_applied.args must be an object without floats, got {"planetIndex":1.5}',
+    ])
+  })
+
+  it('accepts debug command arguments nested 64 levels deep', () => {
+    expect(runEventProblems(debugCommandLine(argsNested(64)))).toEqual([])
+  })
+
+  it('refuses debug command arguments nested 65 levels deep, naming the limit', () => {
+    expect(runEventProblems(debugCommandLine(argsNested(65)))).toEqual([
+      'debug_command_applied.args must nest at most 64 levels deep',
+    ])
+  })
+
+  it('refuses debug command arguments nested 100,000 levels deep without overflowing the stack', () => {
+    expect(runEventProblems(debugCommandLine(argsNested(100_000)))).toEqual([
+      'debug_command_applied.args must nest at most 64 levels deep',
     ])
   })
 
