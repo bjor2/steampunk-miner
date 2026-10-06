@@ -214,6 +214,20 @@ describe('test metrics summary', () => {
     expect(summary.pipeline.modes).toEqual({ full: 1, scoped: 2 })
   })
 
+  it('lists a run without a report as a problem only when its job did not succeed', () => {
+    const run = (id, jobConclusion) => {
+      const record = runOf(id, 'scoped', `c${id}`, [])
+      return {
+        ...record,
+        run: { ...record.run, jobConclusion },
+        totals: { ...record.totals, reportFound: false },
+      }
+    }
+    expect(rollUpSummary([run(1, 'success'), run(2, 'cancelled')]).pipeline.withoutReport).toEqual([
+      2,
+    ])
+  })
+
   it('keeps only the last runs', () => {
     const runs = [1, 2, 3].map((id) =>
       runOf(id, 'scoped', `c${id}`, [['src/store/s.test.ts', 'passed', id]]),

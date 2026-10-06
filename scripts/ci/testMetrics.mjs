@@ -269,7 +269,10 @@ function pipelineOf(records) {
   return {
     modes,
     timedOut: records.filter((r) => r.run.timedOut).map((r) => r.run.id),
-    withoutReport: records.filter((r) => !r.totals.reportFound).map((r) => r.run.id),
+    // A green job without a report ran no tests on purpose (a docs-only scoped push); not a problem.
+    withoutReport: records
+      .filter((r) => !r.totals.reportFound && r.run.jobConclusion !== 'success')
+      .map((r) => r.run.id),
     scopingSuspects: scopingSuspectsOf(records),
   }
 }

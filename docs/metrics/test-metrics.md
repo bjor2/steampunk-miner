@@ -98,7 +98,7 @@ Rebuilt from the run files on every record, over the last 50 runs by run id:
               "timedOut", "jobDurationSec", "reportFound", "files", "tests", "failed", "failedFiles" } ],
   "pipeline": {
     "modes": { "scoped": 30, "full": 5, "nightly": 1 },
-    "timedOut": [runId], "withoutReport": [runId],
+    "timedOut": [runId], "withoutReport": [runId],   // no report and the job did not succeed
     // failing in the latest nightly, but passed or not run by the per-push runs since the one before
     "scopingSuspects": [ { "file", "nightlyRunId", "lastPerPushStatus": "passed" | null } ]
   },
