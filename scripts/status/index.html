@@ -81,17 +81,65 @@
         color: var(--text);
         font-weight: 600;
       }
+      /* tabs: #issues, #loops (default), #features */
+      nav.tabs {
+        flex-basis: 100%;
+        display: flex;
+        gap: 4px;
+        margin: 4px 0 -13px;
+      }
+      nav.tabs a {
+        padding: 7px 16px 8px;
+        border: 1px solid transparent;
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+        color: var(--muted);
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+      nav.tabs a:hover {
+        color: var(--text);
+        text-decoration: none;
+      }
+      nav.tabs a.active {
+        color: var(--brass);
+        background: var(--panel);
+        border-color: var(--line);
+        box-shadow: inset 0 2px 0 var(--brass);
+      }
+      .tabn {
+        margin-left: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0 7px;
+      }
+      .tabn.bad {
+        color: var(--red);
+        border-color: #6b2c25;
+      }
       main {
         padding: 16px 24px 40px;
+      }
+      .tab-grid {
         display: grid;
         gap: 16px;
         grid-template-columns: minmax(0, 1fr);
         max-width: 1500px;
       }
       @media (min-width: 1150px) {
-        main {
-          grid-template-columns: minmax(420px, 5fr) minmax(0, 7fr);
+        .tab-grid {
+          grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
         }
+      }
+      #tab-issues .panel {
+        max-width: 1500px;
+      }
+      main:has(#tab-features:not(.hidden)) {
+        padding: 0 0 40px;
       }
       section.panel {
         background: var(--panel);
@@ -492,67 +540,793 @@
         fill: var(--amber);
         font-size: 10px;
       }
+      /* features tab: the standalone feature-tree page's look, scoped to #tab-features */
+      #tab-features {
+        --bg: #0e0c09;
+        --bg2: #15110c;
+        --panel: #1b1610;
+        --panel2: #231c14;
+        --panel3: #2b2218;
+        --brass: #c9a24b;
+        --brass2: #e8c873;
+        --copper: #b8734a;
+        --teal: #4fb3a6;
+        --text: #ece2cc;
+        --muted: #a8997e;
+        --dim: #7d705a;
+        --line: #5b4930;
+        --line2: #3d3122;
+        --B: #6fca8d;
+        --A: #e6aa3c;
+        --P: #97a2e8;
+        --radius: 10px;
+      }
+      #tab-features {
+        color: var(--text);
+        font:
+          14px/1.45 system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          Ubuntu,
+          sans-serif;
+      }
+      #tab-features a {
+        color: var(--brass2);
+      }
+      #tab-features h1,
+      #tab-features h2,
+      #tab-features h3,
+      #tab-features .serif {
+        font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+      }
+      #tab-features .top {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: linear-gradient(180deg, rgba(21, 17, 12, 0.97), rgba(21, 17, 12, 0.92));
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(4px);
+      }
+      #tab-features .top-inner {
+        max-width: 1900px;
+        margin: 0 auto;
+        padding: 10px 22px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 18px;
+        align-items: center;
+      }
+      #tab-features .search {
+        position: relative;
+      }
+      #tab-features .search input {
+        width: 300px;
+        max-width: 70vw;
+        padding: 8px 12px 8px 32px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--bg2);
+        color: var(--text);
+        font-size: 14px;
+        outline: none;
+      }
+      #tab-features .search input:focus {
+        border-color: var(--brass);
+        box-shadow: 0 0 0 3px rgba(201, 162, 75, 0.18);
+      }
+      #tab-features .search svg {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.6;
+      }
+      #tab-features .btn,
+      #tab-features .chip {
+        border: 1px solid var(--line);
+        background: var(--panel2);
+        color: var(--text);
+        padding: 6px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #tab-features .btn:hover,
+      #tab-features .chip:hover {
+        border-color: var(--brass);
+      }
+      #tab-features .chip .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+      }
+      #tab-features .chip[aria-pressed='false'] {
+        opacity: 0.42;
+        text-decoration: line-through;
+      }
+      #tab-features .chip b {
+        font-weight: 600;
+      }
+      #tab-features .group-ctl {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      #tab-features .showing {
+        color: var(--muted);
+        font-size: 12px;
+        min-width: 150px;
+      }
+      #tab-features .wrap {
+        max-width: 1900px;
+        margin: 0 auto;
+        padding: 22px 22px 40px;
+      }
+      #tab-features .root {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+      }
+      #tab-features .root-plate {
+        position: relative;
+        text-align: center;
+        max-width: 780px;
+        padding: 18px 28px 16px;
+        background: linear-gradient(180deg, #3a2c19, #241b11);
+        border: 2px solid var(--brass);
+        border-radius: 14px;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 230, 160, 0.25),
+          0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+      #tab-features .root-plate:before,
+      #tab-features .root-plate:after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #f3dc9a, #8a6a2a);
+        box-shadow: 0 0 0 1px #5b4520;
+      }
+      #tab-features .root-plate:before {
+        left: 10px;
+      }
+      #tab-features .root-plate:after {
+        right: 10px;
+      }
+      #tab-features .root-plate h2 {
+        margin: 2px 0 4px;
+        font-size: 30px;
+        color: var(--brass2);
+        letter-spacing: 1px;
+      }
+      #tab-features .root-plate p {
+        margin: 0;
+        color: #d8cbb0;
+      }
+      #tab-features .summary {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+      #tab-features .sumline {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      #tab-features .sumline b {
+        color: var(--text);
+      }
+      #tab-features .bar {
+        display: flex;
+        height: 8px;
+        border-radius: 99px;
+        overflow: hidden;
+        background: var(--line2);
+        width: 100%;
+      }
+      #tab-features .bar span {
+        display: block;
+        height: 100%;
+      }
+      #tab-features .bar .B {
+        background: var(--B);
+      }
+      #tab-features .bar .A {
+        background: var(--A);
+      }
+      #tab-features .bar .P {
+        background: var(--P);
+      }
+      #tab-features .summary .bar {
+        width: 420px;
+        max-width: 80vw;
+      }
+      #tab-features .legend {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      #tab-features .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      #tab-features .stem {
+        width: 3px;
+        height: 26px;
+        background: linear-gradient(var(--brass), var(--line));
+      }
+      #tab-features .manifold {
+        width: min(1400px, 96%);
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--line) 8%,
+          var(--brass) 50%,
+          var(--line) 92%,
+          transparent
+        );
+        border-radius: 3px;
+        margin-bottom: 18px;
+        position: relative;
+      }
+      #tab-features .manifold:before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: -6px;
+        width: 15px;
+        height: 15px;
+        margin-left: -7px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #f3dc9a, #8a6a2a);
+        box-shadow: 0 0 0 2px #3a2c19;
+      }
+      #tab-features .branches {
+        columns: 3 520px;
+        column-gap: 20px;
+      }
+      #tab-features .branch {
+        break-inside: avoid;
+        display: inline-block;
+        width: 100%;
+        margin: 0 0 20px;
+        position: relative;
+        background: linear-gradient(180deg, var(--panel2), var(--panel));
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+      }
+      #tab-features .branch:before {
+        content: '';
+        position: absolute;
+        left: 28px;
+        top: -12px;
+        width: 3px;
+        height: 12px;
+        background: var(--line);
+      }
+      #tab-features .bhead {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 12px 14px 10px;
+        border-bottom: 1px solid var(--line2);
+        cursor: pointer;
+        user-select: none;
+      }
+      #tab-features .bnum {
+        flex: 0 0 auto;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 13px;
+        color: #2a1f10;
+        background: radial-gradient(circle at 35% 30%, #f6e3a6, #b88d38 70%);
+        box-shadow: 0 0 0 2px #5b4520;
+      }
+      #tab-features .btitle {
+        flex: 1;
+        min-width: 0;
+      }
+      #tab-features .btitle h3 {
+        margin: 0;
+        font-size: 18px;
+        color: var(--brass2);
+      }
+      #tab-features .btitle p {
+        margin: 2px 0 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      #tab-features .bmeta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      #tab-features .bmeta .bar {
+        width: 120px;
+        height: 6px;
+      }
+      #tab-features .bmeta .cnt b {
+        color: var(--text);
+      }
+      #tab-features .caret {
+        flex: 0 0 auto;
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--brass);
+        background: var(--bg2);
+        transition: transform 0.15s;
+        font-size: 11px;
+        cursor: pointer;
+        padding: 0;
+      }
+      #tab-features .collapsed > .bhead .caret,
+      #tab-features .collapsed > .node .caret {
+        transform: rotate(-90deg);
+      }
+      #tab-features .branch.collapsed > .bbody {
+        display: none;
+      }
+      #tab-features .bbody {
+        padding: 6px 12px 12px 6px;
+      }
+      #tab-features ul.tree {
+        list-style: none;
+        margin: 0;
+        padding: 0 0 0 14px;
+      }
+      #tab-features ul.tree ul.tree {
+        padding-left: 20px;
+      }
+      #tab-features ul.tree li {
+        position: relative;
+        padding-left: 20px;
+      }
+      #tab-features ul.tree li:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        border-left: 2px solid var(--line);
+      }
+      #tab-features ul.tree li:last-child:before {
+        bottom: auto;
+        height: 22px;
+      }
+      #tab-features ul.tree li:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 22px;
+        width: 16px;
+        border-top: 2px solid var(--line);
+      }
+      #tab-features li.collapsed > ul {
+        display: none;
+      }
+      #tab-features li.hide {
+        display: none;
+      }
+      #tab-features .node {
+        margin: 6px 0;
+        padding: 7px 10px 7px 10px;
+        border-radius: 8px;
+        background: var(--panel3);
+        border: 1px solid var(--line2);
+        border-left: 3px solid var(--line);
+      }
+      #tab-features .node.s-B {
+        border-left-color: var(--B);
+      }
+      #tab-features .node.s-A {
+        border-left-color: var(--A);
+        background: linear-gradient(90deg, rgba(230, 170, 60, 0.07), var(--panel3) 40%);
+      }
+      #tab-features .node.s-P {
+        border: 1px dashed #4d4f72;
+        border-left: 3px dashed var(--P);
+        background: rgba(151, 162, 232, 0.04);
+      }
+      #tab-features .node.group {
+        background: transparent;
+        border: 1px solid transparent;
+        border-left: 3px solid var(--brass);
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+      #tab-features .node.group .ntitle {
+        color: var(--brass2);
+        font-family: Georgia, serif;
+        font-size: 15px;
+      }
+      #tab-features .nrow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+      }
+      #tab-features .node .caret {
+        width: 18px;
+        height: 18px;
+        font-size: 9px;
+        margin-right: 2px;
+      }
+      #tab-features .ntitle {
+        font-weight: 600;
+      }
+      #tab-features .s-P .ntitle {
+        color: #d5d8f3;
+      }
+      #tab-features .ncount {
+        font-size: 11px;
+        color: var(--muted);
+        background: var(--bg2);
+        border: 1px solid var(--line2);
+        border-radius: 99px;
+        padding: 0 7px;
+      }
+      #tab-features .ndesc {
+        margin: 3px 0 0;
+        color: #cbbfa6;
+        font-size: 13px;
+      }
+      #tab-features .s-P .ndesc {
+        color: #b0b2c8;
+      }
+      #tab-features .badge {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        padding: 1px 7px;
+        border-radius: 99px;
+        border: 1px solid;
+      }
+      #tab-features .badge.B {
+        color: var(--B);
+        border-color: rgba(111, 202, 141, 0.5);
+        background: rgba(111, 202, 141, 0.08);
+      }
+      #tab-features .badge.A {
+        color: var(--A);
+        border-color: rgba(230, 170, 60, 0.55);
+        background: rgba(230, 170, 60, 0.1);
+      }
+      #tab-features .badge.P {
+        color: var(--P);
+        border-color: rgba(151, 162, 232, 0.55);
+        background: rgba(151, 162, 232, 0.08);
+      }
+      #tab-features .planet {
+        font-size: 10.5px;
+        color: #f0d9a0;
+        border: 1px solid #6d5426;
+        background: #2e2414;
+        border-radius: 4px;
+        padding: 0 5px;
+        font-weight: 600;
+      }
+      #tab-features .iss {
+        font-size: 11.5px;
+        text-decoration: none;
+        color: var(--brass2);
+        border-bottom: 1px dotted rgba(232, 200, 115, 0.5);
+      }
+      #tab-features .iss.closed {
+        color: #c9b27a;
+      }
+      #tab-features .iss:hover {
+        color: #fff;
+      }
+      #tab-features .doc {
+        font-size: 11px;
+        color: var(--teal);
+        text-decoration: none;
+        border-bottom: 1px dotted var(--teal);
+      }
+      #tab-features .mix {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      #tab-features .mix i {
+        font-style: normal;
+      }
+      #tab-features .mix .B {
+        color: var(--B);
+      }
+      #tab-features .mix .A {
+        color: var(--A);
+      }
+      #tab-features .mix .P {
+        color: var(--P);
+      }
+      #tab-features mark {
+        background: rgba(232, 200, 115, 0.35);
+        color: #fff;
+        border-radius: 2px;
+        padding: 0 1px;
+      }
+      #tab-features .empty {
+        display: none;
+        text-align: center;
+        color: var(--muted);
+        padding: 40px;
+      }
+      #tab-features .notes {
+        margin: 10px auto 0;
+        max-width: 1400px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 4px 18px 10px;
+      }
+      #tab-features .notes summary {
+        cursor: pointer;
+        padding: 10px 0;
+        color: var(--brass2);
+        font-family: Georgia, serif;
+        font-size: 16px;
+      }
+      #tab-features .notes li {
+        margin: 4px 0;
+        color: #cbbfa6;
+      }
+      #tab-features .ft-foot {
+        color: var(--dim);
+        font-size: 12px;
+        text-align: center;
+        margin-top: 20px;
+      }
+      @media (max-width: 700px) {
+        #tab-features .search input {
+          width: 100%;
+        }
+        #tab-features .branches {
+          columns: 1;
+        }
+      }
+      /* additions for the status page: live issue state, sync check, scoped resets */
+      #tab-features h2 {
+        text-transform: none;
+      }
+      #tab-features .top {
+        top: 0;
+      }
+      #tab-features .iss {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+      }
+      #tab-features .iss i {
+        font-style: normal;
+        font-size: 9.5px;
+      }
+      #tab-features .iss.open i {
+        color: var(--B);
+      }
+      #tab-features .iss.closed {
+        color: #c9b27a;
+      }
+      #tab-features .iss.closed i {
+        color: #a98bd6;
+      }
+      #tab-features .iss.notplanned {
+        color: var(--dim);
+        text-decoration: line-through;
+      }
+      #tab-features .ft-check {
+        font-size: 10.5px;
+        color: #e3a33b;
+        border: 1px dashed rgba(227, 163, 59, 0.6);
+        border-radius: 99px;
+        padding: 0 6px;
+        cursor: help;
+        white-space: nowrap;
+      }
+      #tab-features .chip.check[aria-pressed='false'] {
+        opacity: 0.75;
+        text-decoration: none;
+      }
+      #tab-features .chip.check[aria-pressed='true'] {
+        border-color: #e3a33b;
+        background: rgba(227, 163, 59, 0.12);
+      }
+      #tab-features .notes code {
+        color: var(--text);
+        font-size: 12px;
+      }
+      #tab-features .ft-flagged li {
+        color: #cbbfa6;
+      }
+      #tab-features .ft-flagged .path {
+        color: var(--text);
+        font-weight: 600;
+      }
+      #tab-features .ft-error {
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 14px 18px;
+        border: 1px solid #e0675a;
+        border-radius: 10px;
+        background: #2a1512;
+      }
+      #tab-features .ft-foot a {
+        color: var(--muted);
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
     <header>
       <h1>⚙ Steampunk Miner <small>build status</small></h1>
       <div class="meta" id="meta">loading…</div>
+      <nav class="tabs" role="tablist" aria-label="Status sections">
+        <a href="#issues" data-tab="issues" role="tab"
+          >Issue trees<span class="tabn" id="tabn-issues"></span
+        ></a>
+        <a href="#loops" data-tab="loops" role="tab"
+          >Loops<span class="tabn" id="tabn-loops"></span
+        ></a>
+        <a href="#features" data-tab="features" role="tab"
+          >Features<span class="tabn" id="tabn-features"></span
+        ></a>
+      </nav>
     </header>
     <main>
-      <section class="panel" id="loops-panel">
-        <h2>Loops</h2>
-        <div class="cards" id="loop-cards"></div>
-        <div id="loop-alerts"></div>
-        <table id="loop-table">
-          <thead>
-            <tr>
-              <th>Loop / slot</th>
-              <th>State</th>
-              <th>Issue</th>
-              <th>Note</th>
-              <th>Heartbeat</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div class="sub">
-          <h2>In progress</h2>
-          <ul class="list" id="inprogress"></ul>
-        </div>
-        <div class="sub">
-          <h2>Needs attention</h2>
-          <ul class="list" id="stuck"></ul>
-        </div>
-        <div class="sub">
-          <h2>Workflows</h2>
-          <table id="wf-table">
+      <section class="tab tab-grid" id="tab-loops" data-tab="loops">
+        <section class="panel" id="loops-panel">
+          <h2>Loops</h2>
+          <div class="cards" id="loop-cards"></div>
+          <div id="loop-alerts"></div>
+          <table id="loop-table">
             <thead>
               <tr>
-                <th>Workflow</th>
-                <th>Last run</th>
-                <th>When</th>
+                <th>Loop / slot</th>
+                <th>State</th>
+                <th>Issue</th>
+                <th>Note</th>
+                <th>Heartbeat</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
+        </section>
+        <section class="panel" id="activity-panel">
+          <div>
+            <h2>In progress</h2>
+            <ul class="list" id="inprogress"></ul>
+          </div>
+          <div class="sub">
+            <h2>Needs attention</h2>
+            <ul class="list" id="stuck"></ul>
+          </div>
+          <div class="sub">
+            <h2>Workflows</h2>
+            <table id="wf-table">
+              <thead>
+                <tr>
+                  <th>Workflow</th>
+                  <th>Last run</th>
+                  <th>When</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="sub">
+            <h2>Recent loop events</h2>
+            <ul class="list mono" id="events"></ul>
+          </div>
+        </section>
+        <!-- perf-overview -->
+      </section>
+      <section class="tab hidden" id="tab-issues" data-tab="issues">
+        <section class="panel" id="tree-panel">
+          <h2>Issue trees</h2>
+          <div class="toolbar">
+            <input
+              type="search"
+              id="filter"
+              placeholder="Filter: number, title, label, assignee…"
+            />
+            <button id="expand">Expand all</button>
+            <button id="collapse">Collapse all</button>
+            <label class="chk"><input type="checkbox" id="showclosed" /> expand closed</label>
+          </div>
+          <div class="tree" id="tree"></div>
+        </section>
+      </section>
+      <section class="tab hidden" id="tab-features" data-tab="features">
+        <div class="top">
+          <div class="top-inner">
+            <label class="search"
+              ><svg width="14" height="14" viewBox="0 0 24 24">
+                <circle cx="10" cy="10" r="7" stroke="#e8c873" stroke-width="2.5" fill="none" />
+                <path d="M15.5 15.5L22 22" stroke="#e8c873" stroke-width="2.5" />
+              </svg>
+              <input
+                id="ft-q"
+                type="search"
+                placeholder="Search features, descriptions, #issues, P12…"
+                autocomplete="off"
+            /></label>
+            <div class="group-ctl" id="ft-chips"></div>
+            <div class="group-ctl">
+              <button class="btn" id="ft-expand">Expand all</button>
+              <button class="btn" id="ft-collapse">Collapse all</button>
+            </div>
+            <span class="showing" id="ft-showing"></span>
+          </div>
         </div>
-        <div class="sub">
-          <h2>Recent loop events</h2>
-          <ul class="list mono" id="events"></ul>
+        <div class="wrap">
+          <div id="ft-error"></div>
+          <div class="root" id="ft-root">
+            <div class="root-plate">
+              <h2 id="ft-rootTitle"></h2>
+              <p id="ft-rootDesc"></p>
+              <div class="summary">
+                <div class="sumline" id="ft-sumline"></div>
+                <div class="bar" id="ft-sumbar"></div>
+                <div class="legend">
+                  <span><span class="badge B">Built</span> in the game today</span>
+                  <span><span class="badge A">Partial</span> partly built</span>
+                  <span><span class="badge P">Planned</span> decided or scheduled, not built</span>
+                  <span><span class="planet">P12</span> campaign planet it unlocks on</span>
+                  <span
+                    ><span class="iss open"><i>◉</i>#1</span> /
+                    <span class="iss closed"><i>✔</i>#1</span> live issue state</span
+                  >
+                  <span
+                    ><span class="ft-check">⚑ check</span> status may be out of date with its
+                    issues</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="stem"></div>
+            <div class="manifold"></div>
+          </div>
+          <div class="branches" id="ft-branches"></div>
+          <div class="empty" id="ft-empty">No features match the current search and filters.</div>
+          <details class="notes ft-flagged" id="ft-flagged">
+            <summary>Features to check</summary>
+            <ul id="ft-flagged-list"></ul>
+          </details>
+          <details class="notes" id="ft-notes">
+            <summary>Where the sources disagreed</summary>
+            <ul id="ft-notes-list"></ul>
+          </details>
+          <div class="ft-foot" id="ft-foot"></div>
         </div>
       </section>
-      <section class="panel" id="tree-panel">
-        <h2>Issue trees</h2>
-        <div class="toolbar">
-          <input type="search" id="filter" placeholder="Filter: number, title, label, assignee…" />
-          <button id="expand">Expand all</button>
-          <button id="collapse">Collapse all</button>
-          <label class="chk"><input type="checkbox" id="showclosed" /> expand closed</label>
-        </div>
-        <div class="tree" id="tree"></div>
-      </section>
-      <!-- perf-overview -->
     </main>
     <footer id="footer"></footer>
     <script>
@@ -639,6 +1413,12 @@
               `<div class="card"><div class="n ${cls}">${counts[k] || 0}</div><div class="l">${k}</div></div>`,
           )
           .join('')
+        const tn = $('#tabn-loops')
+        tn.textContent =
+          `${counts.working || 0} working` +
+          (counts.blocked ? ` · ${counts.blocked} blocked` : '') +
+          (counts.stale ? ` · ${counts.stale} stale` : '')
+        tn.classList.toggle('bad', !!(counts.blocked || counts.stale))
 
         // push_pending + coordinator alerts
         const alerts = []
@@ -859,6 +1639,8 @@
         if (archived.length)
           html += `<details class="closedgrp"${showClosed ? ' open' : ''}><summary>${archived.length} older closed roots</summary><div class="kids">${archived.map((i) => node(i.number, 9, new Set())).join('')}</div></details>`
         $('#tree').innerHTML = html
+        $('#tabn-issues').textContent =
+          `${DATA.issues.filter((i) => i.state === 'OPEN').length} open`
         applyFilter()
       }
 
@@ -951,8 +1733,336 @@
         DATA = await r.json()
         if (!LOOPS || LOOP_SRC !== 'live') LOOPS = DATA.loops
         renderAll()
+        loadFeatures().catch((e) => {
+          $('#ft-error').innerHTML =
+            `<div class="ft-error">Feature tree failed to load: ${esc(e)}</div>`
+        })
         if (await refreshLoops()) renderAll()
       }
+
+      // ---------- features (data: docs/features/features.json, joined at build time) ----------
+      const FT_LABEL = { built: 'Built', partial: 'Partial', planned: 'Planned' }
+      const FT_KEY = { built: 'B', partial: 'A', planned: 'P' }
+      const FT = {
+        raw: '',
+        tree: null,
+        active: new Set(['built', 'partial', 'planned']),
+        checkOnly: false,
+        byId: {},
+        els: {},
+      }
+
+      function ftPrep(n, depth, uid) {
+        n.id = 'ft-n' + uid.next++
+        n.depth = depth
+        n.hay = (
+          n.title +
+          ' ' +
+          n.description +
+          ' ' +
+          (n.issues || []).map((x) => '#' + x).join(' ') +
+          (n.planet ? ' p' + n.planet + ' planet ' + n.planet : '') +
+          (n.group ? '' : ' ' + FT_LABEL[n.status])
+        ).toLowerCase()
+        for (const c of n.children || []) ftPrep(c, depth + 1, uid)
+      }
+      function ftTally(n) {
+        const t = { nodes: 0, built: 0, partial: 0, planned: 0, check: 0 }
+        for (const c of n.children || []) {
+          t.nodes++
+          if (!c.group) {
+            t[c.status]++
+            if (c.sync) t.check++
+          }
+          const s = ftTally(c)
+          for (const k in t) t[k] += s[k]
+        }
+        n.tally = t
+        return t
+      }
+      function ftBar(t) {
+        const f = t.built + t.partial + t.planned || 1
+        return ['built', 'partial', 'planned']
+          .map((s) => `<span class="${FT_KEY[s]}" style="width:${(t[s] / f) * 100}%"></span>`)
+          .join('')
+      }
+      function ftMix(t) {
+        return ['built', 'partial', 'planned']
+          .filter((s) => t[s])
+          .map((s) => `<i class="${FT_KEY[s]}">${t[s]} ${s}</i>`)
+          .join(' · ')
+      }
+      function ftIssueLinks(n, F) {
+        const repoUrl = `https://github.com/${DATA.repo}`
+        let h = ''
+        for (const num of n.issues || []) {
+          const m = F.issues[num]
+          const cls = !m
+            ? ''
+            : m.state === 'OPEN'
+              ? 'open'
+              : m.reason === 'NOT_PLANNED'
+                ? 'notplanned'
+                : 'closed'
+          const glyph = !m ? '?' : m.state === 'OPEN' ? '◉' : m.reason === 'NOT_PLANNED' ? '⊘' : '✔'
+          const tip = m
+            ? `#${num} ${m.title} (${m.state === 'OPEN' ? 'open' : m.reason === 'NOT_PLANNED' ? 'closed: not planned' : 'closed'})`
+            : `#${num} (not found)`
+          h += `<a class="iss ${cls}" href="${repoUrl}/issues/${num}" target="_blank" rel="noopener" title="${esc(tip)}"><i>${glyph}</i>#${num}</a>`
+        }
+        if (n.doc) {
+          const path =
+            n.doc.startsWith('docs/') || n.doc === 'README.md'
+              ? n.doc
+              : 'docs/' + n.doc.split(' ')[0]
+          h += `<a class="doc" href="${repoUrl}/blob/main/${esc(path)}" target="_blank" rel="noopener">${esc(n.doc)}</a>`
+        }
+        return h
+      }
+      function ftNode(n, F) {
+        const kids = n.children || []
+        const cls = n.group ? 'group' : 's-' + FT_KEY[n.status]
+        let row = ''
+        if (kids.length)
+          row += `<button class="caret" data-tg="${n.id}" aria-label="Toggle">▼</button>`
+        row += `<span class="ntitle" data-txt="t">${esc(n.title)}</span>`
+        if (kids.length)
+          row += `<span class="ncount" title="features under this node">${n.tally.nodes}</span>`
+        if (!n.group) row += `<span class="badge ${FT_KEY[n.status]}">${FT_LABEL[n.status]}</span>`
+        if (n.planet)
+          row += `<span class="planet" title="Unlocks on campaign planet ${n.planet} (locked schedule, #80)">P${n.planet}</span>`
+        row += ftIssueLinks(n, F)
+        if (n.sync) row += `<span class="ft-check" title="${esc(n.sync)}">⚑ check</span>`
+        if (n.group && kids.length) row += `<span class="mix">${ftMix(n.tally)}</span>`
+        let h = `<li id="${n.id}"><div class="node ${cls}"><div class="nrow">${row}</div><p class="ndesc" data-txt="d">${esc(n.description)}</p></div>`
+        if (kids.length) h += `<ul class="tree">${kids.map((k) => ftNode(k, F)).join('')}</ul>`
+        return h + '</li>'
+      }
+      function ftBranch(b, idx, F) {
+        return `<section class="branch" id="${b.id}">
+          <div class="bhead" data-tg="${b.id}">
+            <div class="bnum">${idx + 1}</div>
+            <div class="btitle"><h3 data-txt="t">${esc(b.title)}</h3><p data-txt="d">${esc(b.description)}</p>
+              <div class="bmeta"><span class="cnt"><b>${b.tally.nodes}</b> nodes</span><span class="bar">${ftBar(b.tally)}</span><span class="mix">${ftMix(b.tally)}</span></div></div>
+            <button class="caret" aria-label="Toggle branch">▼</button>
+          </div>
+          <div class="bbody"><ul class="tree">${(b.children || []).map((k) => ftNode(k, F)).join('')}</ul></div>
+        </section>`
+      }
+      // **bold**, `code` and #123 issue links in the hand-written notes; everything else is text.
+      function ftInline(text) {
+        return esc(text)
+          .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+          .replace(/`(.+?)`/g, '<code>$1</code>')
+          .replace(
+            /(^|[^&\w])#(\d+)\b/g,
+            (m, pre, n) =>
+              `${pre}<a class="iss" href="https://github.com/${DATA.repo}/issues/${n}" target="_blank" rel="noopener">#${n}</a>`,
+          )
+      }
+
+      function renderFeatures(F) {
+        const fileUrl = `https://github.com/${DATA.repo}/blob/main/${F.file || 'docs/features/features.json'}`
+        if (F.error) {
+          $('#ft-error').innerHTML =
+            `<div class="ft-error"><b>The feature tree could not be built:</b> ${esc(F.error)}${(F.problems || []).length ? `<ul>${F.problems.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}<p>Fix <a href="${esc(fileUrl)}">${esc(F.file)}</a> (see docs/features/README.md).</p></div>`
+          $('#ft-root').classList.add('hidden')
+          $('#tabn-features').textContent = '!'
+          return
+        }
+        $('#ft-error').innerHTML = ''
+        $('#ft-root').classList.remove('hidden')
+        const tree = { title: F.title, description: F.description, children: F.areas }
+        ftPrep(tree, 0, { next: 0 })
+        ftTally(tree)
+        FT.tree = tree
+        const T = tree.tally
+        $('#ft-rootTitle').textContent = tree.title
+        $('#ft-rootDesc').textContent = tree.description
+        $('#ft-sumline').innerHTML =
+          `<b>${tree.children.length}</b> feature areas · <b>${T.nodes}</b> nodes · <b>${T.built + T.partial + T.planned}</b> features: <span style="color:var(--B)"><b>${T.built}</b> built</span> · <span style="color:var(--A)"><b>${T.partial}</b> partial</span> · <span style="color:var(--P)"><b>${T.planned}</b> planned</span>` +
+          (T.check
+            ? ` · <span class="ft-check" title="status may be out of date with its issues">⚑ <b>${T.check}</b> to check</span>`
+            : '')
+        $('#ft-sumbar').innerHTML = ftBar(T)
+        $('#ft-branches').innerHTML = tree.children.map((b, i) => ftBranch(b, i, F)).join('')
+
+        FT.byId = {}
+        FT.els = {}
+        const index = (n) => {
+          FT.byId[n.id] = n
+          for (const c of n.children || []) index(c)
+        }
+        index(tree)
+        for (const id of Object.keys(FT.byId)) {
+          const el = document.getElementById(id)
+          if (el) FT.els[id] = el
+        }
+
+        const chips = ['built', 'partial', 'planned']
+          .map(
+            (s) =>
+              `<button class="chip" data-s="${s}" aria-pressed="${FT.active.has(s)}"><span class="dot" style="background:var(--${FT_KEY[s]})"></span>${FT_LABEL[s]} <b>${T[s]}</b></button>`,
+          )
+          .join('')
+        $('#ft-chips').innerHTML =
+          chips +
+          `<button class="chip check" data-s="check" aria-pressed="${FT.checkOnly}" title="Only features whose status may be out of date with their issues">⚑ To check <b>${T.check}</b></button>`
+
+        const flagged = F.flagged || []
+        $('#ft-flagged').classList.toggle('hidden', !flagged.length)
+        $('#ft-flagged summary').textContent = `Features to check (${flagged.length})`
+        $('#ft-flagged-list').innerHTML = flagged
+          .map((f) => `<li><span class="path">${esc(f.path)}</span>: ${ftInline(f.reason)}</li>`)
+          .join('')
+        $('#ft-notes').classList.toggle('hidden', !(F.disagreements || []).length)
+        $('#ft-notes-list').innerHTML = (F.disagreements || [])
+          .map((d) => `<li>${ftInline(d)}</li>`)
+          .join('')
+        const lc = F.lastCommit
+        $('#ft-foot').innerHTML =
+          `Data: <a href="${esc(fileUrl)}">${esc(F.file)}</a>` +
+          (lc
+            ? `, last changed ${esc(local(lc.date))} in <a href="${esc(lc.url)}">${esc(lc.sha.slice(0, 7))}</a> “${esc(lc.message)}”`
+            : '') +
+          `. Issue states as of this build (${esc(local(DATA.generatedAt))}). ${esc(F.sources || '')}`
+        $('#tabn-features').textContent = T.check
+          ? `${T.built + T.partial + T.planned} · ⚑${T.check}`
+          : String(T.built + T.partial + T.planned)
+        window.__featureTree = { tree, tally: T, flagged }
+        ftApply()
+      }
+
+      function ftSetText(el, text, tokens) {
+        if (!tokens.length) {
+          el.textContent = text
+          return
+        }
+        let h = esc(text)
+        for (const tok of tokens) {
+          const re = new RegExp('(' + tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig')
+          h = h.replace(/(<[^>]+>)|([^<]+)/g, (m, tag, txt) =>
+            tag ? tag : txt.replace(re, '<mark>$1</mark>'),
+          )
+        }
+        el.innerHTML = h
+      }
+
+      function ftApply() {
+        if (!FT.tree) return
+        const q = $('#ft-q').value.trim().toLowerCase()
+        const tokens = q ? q.split(/\s+/).filter(Boolean) : []
+        let shown = 0
+        let total = 0
+        const vis = (n, ancMatch) => {
+          const selfMatch = tokens.length ? tokens.every((t) => n.hay.includes(t)) : false
+          const am = ancMatch || selfMatch
+          let childVis = false
+          for (const c of n.children || []) if (vis(c, am)) childVis = true
+          let v
+          if (n.group) v = childVis
+          else {
+            total++
+            const statusOk = FT.active.has(n.status) && (!FT.checkOnly || !!n.sync)
+            const searchOk = !tokens.length || selfMatch || ancMatch
+            v = childVis || (statusOk && searchOk)
+            if (v) shown++
+          }
+          const el = FT.els[n.id]
+          if (el && n.depth > 0) {
+            el.classList.toggle('hide', !v)
+            if (tokens.length && childVis && (n.children || []).length)
+              el.classList.remove('collapsed')
+            el.querySelectorAll(':scope > .node [data-txt], :scope > .bhead [data-txt]').forEach(
+              (x) => ftSetText(x, x.dataset.txt === 't' ? n.title : n.description, tokens),
+            )
+          }
+          return v
+        }
+        let any = false
+        for (const b of FT.tree.children) if (vis(b, false)) any = true
+        $('#ft-empty').style.display = any ? 'none' : 'block'
+        $('#ft-showing').textContent =
+          tokens.length || FT.active.size < 3 || FT.checkOnly
+            ? `Showing ${shown} of ${total} features`
+            : `${total} features`
+      }
+
+      async function loadFeatures() {
+        const r = await fetch('features.json', { cache: 'no-store' })
+        if (!r.ok) throw new Error('features.json: HTTP ' + r.status)
+        const raw = await r.text()
+        if (raw === FT.raw) return
+        FT.raw = raw
+        renderFeatures(JSON.parse(raw))
+      }
+
+      let ftTimer
+      $('#ft-q').addEventListener('input', () => {
+        clearTimeout(ftTimer)
+        ftTimer = setTimeout(ftApply, 120)
+      })
+      $('#ft-chips').addEventListener('click', (e) => {
+        const b = e.target.closest('.chip')
+        if (!b) return
+        const s = b.dataset.s
+        if (s === 'check') FT.checkOnly = !FT.checkOnly
+        else if (FT.active.has(s)) FT.active.delete(s)
+        else FT.active.add(s)
+        b.setAttribute('aria-pressed', s === 'check' ? FT.checkOnly : FT.active.has(s))
+        ftApply()
+      })
+      $('#tab-features').addEventListener('click', (e) => {
+        const t = e.target.closest('[data-tg]')
+        if (!t || e.target.closest('a')) return
+        const el = FT.els[t.dataset.tg]
+        if (el) el.classList.toggle('collapsed')
+      })
+      $('#ft-expand').addEventListener('click', () =>
+        Object.values(FT.els).forEach((el) => el.classList.remove('collapsed')),
+      )
+      $('#ft-collapse').addEventListener('click', () =>
+        Object.keys(FT.els).forEach((id) => {
+          if ((FT.byId[id].children || []).length) FT.els[id].classList.add('collapsed')
+        }),
+      )
+
+      // ---------- tabs: #issues, #loops (default), #features; `#features?q=lava` pre-fills search
+      const TABS = { issues: 'Issue trees', loops: 'Loops', features: 'Features' }
+      const DEFAULT_TAB = 'loops'
+      function parseHash() {
+        const [name, query] = location.hash.slice(1).split('?')
+        return { tab: name in TABS ? name : DEFAULT_TAB, params: new URLSearchParams(query || '') }
+      }
+      function showTab() {
+        const { tab, params } = parseHash()
+        document
+          .querySelectorAll('section.tab')
+          .forEach((s) => s.classList.toggle('hidden', s.dataset.tab !== tab))
+        document.querySelectorAll('nav.tabs a').forEach((a) => {
+          const on = a.dataset.tab === tab
+          a.classList.toggle('active', on)
+          a.setAttribute('aria-selected', String(on))
+        })
+        document.title = `Steampunk Miner · ${TABS[tab]}`
+        if (tab === 'features' && params.has('q')) {
+          $('#ft-q').value = params.get('q')
+          ftApply()
+        }
+        if (tab === 'issues' && params.has('q')) {
+          $('#filter').value = params.get('q')
+          applyFilter()
+        }
+      }
+      window.addEventListener('hashchange', showTab)
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== '/' || /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return
+        const input = { features: '#ft-q', issues: '#filter' }[parseHash().tab]
+        if (!input) return
+        e.preventDefault()
+        $(input).focus()
+      })
+      showTab()
 
       $('#filter').addEventListener('input', applyFilter)
       $('#showclosed').addEventListener('change', renderTree)
