@@ -185,6 +185,35 @@ refining look. Nothing draws platform bays in the world yet; the refinery build 
 bay on the pad and picks the look from its batches. The bay's emblem (`emblem-bay-refinery`) is
 a placeholder like the other two bays' emblems.
 
+## The shop buildings
+
+The two buildings of [#170](https://github.com/bjor2/steampunk-miner/issues/170) (art
+[#174](https://github.com/bjor2/steampunk-miner/issues/174)): `platform-building-sell`, the tall
+"Assay & Exchange" over the Sell zone, and `platform-building-upgrade`, the wide, low "Engineering
+Works" over the Workshop zone. The ids derive from the slice bays (`src/systems/art/shopBuildingArt.ts`);
+the Refinery keeps `platform-bay-refinery`. Each building's origin is its zone's centre column on
+the pad, where `bayRestPointOf` puts the vehicle, so the build (#175) places the asset at the rest
+point. The static detail of each is one part, the asset's own id; only the parts that move are
+parts of their own:
+
+| Asset                       | Moving parts                                                                                          | Attach points                                                                     |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `platform-building-sell`    | `sell-ticker` (pivot at its centre)                                                                   | `sell.chute`, `sell.ticker`, `sell.stack`                                         |
+| `platform-building-upgrade` | `workshop-gantry` (pivot at its root bearing), `workshop-turntable` (pivot at its centre, the origin) | `workshop.gantry`, `workshop.platform`, `workshop.stack`, `workshop.showcase_cam` |
+
+An **attach point** is an empty named `attach.<id>` in the `.blend`. The export writes its X and Z
+into the sidecar's optional `attach: [{id, atM, z}]` array (the #162 K5 shape; `z` is the empty's
+custom `z` property, the draw order of what hangs there), never baked. `attachPointOf` in
+`partsSidecar.ts` reads one; `shopBuildingArt.test.ts` checks every id of the Game Director's seven
+resolves in its building's sidecar. #175 registers the ids in the kernel `building-attach` registry.
+
+The signs are the bays' #158 emblems (`src/ui/icons/emblem-bay-<bay>.svg`) imported as curves and
+extruded in brass on a soot plaque, so the buildings speak the icon language. The palette is brass,
+iron and soot, and the only light is warm window, lamp and skylight glass on the emissive maps
+(orange stays reserved for heat). The review renders, the silhouette pair and the phone and TV
+sheets are in [docs/art/shops/](art/shops/README.md). `scripts/art/author_shop_buildings.py` wrote
+the first version of both files. From then on the `.blend` files are the sources.
+
 ## Ground and casing tiles
 
 `npm run art:export -- ground-band-<n>` (or `casing-grade-<n>`) bakes a `tile` asset (#52 "Ground
@@ -310,7 +339,10 @@ form of the row ids, and the refractory tiles take the lining type #113 names
 part's bottom-left. `atM` is where the pivot sits in the asset's frame (the object's X and Z), and
 `z` is the draw order. `atM` and `atlasPx` go beyond the example in #52: without `atM` the game
 couldn't place a part, and `atlasPx` is what the rects are checked against. A placeholder that no
-export has written yet has a null `sha256` and `blender`.
+export has written yet has a null `sha256` and `blender`. An optional `attach` array after the
+parts (`[{ "id": "sell.chute", "atM": [-1.6, 1.3], "z": 2 }]`, from the file's `attach.<id>`
+empties; see "The shop buildings") names points in the asset's frame; the lint checks it only when
+it is present, and the schema stays 1.
 
 ## Placeholders
 
