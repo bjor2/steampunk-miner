@@ -243,6 +243,9 @@ export const RUN_EVENT_REGISTRY = {
       paid: 'money',
     },
   },
+  // #111: a tunnel wrecker (or `debug.gnawCasing`) breached one ring; `ring` is its axis point `x,y`
+  // in mm and `band` the deepest band of the wall it breached.
+  ring_gnawed: { group: 'mining', level: 'core', payload: { ring: 'text', band: 'integer' } },
   casing_drilled: {
     group: 'mining',
     level: 'detail',

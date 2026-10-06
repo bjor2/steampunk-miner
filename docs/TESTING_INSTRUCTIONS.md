@@ -80,7 +80,8 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   unlogged read `enemyStatsTable(kind)`; for the ground (#36), `carveCircle(x, y, radius, amount?)` and
   `fillCircle(x, y, radius, amount?)` (mm, amount 0 to 255; a carve credits no ore); for casing (#41),
   `setCasingGrade(grade)` and `lineCasing(x, y, grade)` (one ring round a point of the tunnel axis, in mm,
-  marking the rock beside air as lining; the vehicle lays the same rings by itself while it drills); for collapse (#43),
+  marking the rock beside air as lining; the vehicle lays the same rings by itself while it drills) and
+  `gnawCasing(x, y)` (that ring breached, as a tunnel wrecker's gnaw leaves it, #111); for collapse (#43),
   `forceCollapse(block)` (a `cx,cy#index` block, warned for the full 60 ticks, then refilled whatever its
   lining) and the unlogged read `collapseState()` (the weak blocks within 16 m of a vehicle and the blocks
   warning or refilling). Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first

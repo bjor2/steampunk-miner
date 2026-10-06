@@ -57,6 +57,9 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'casing_lined',
     data: { lengthMm, band, grade, price, paid },
   }),
+  // A breach per chunk replicates the gnaw; `ring_gnawed` is its one log line per ring (#111).
+  CasingBreached: () => null,
+  RingGnawed: ({ ring, band }) => ({ event: 'ring_gnawed', data: { ring, band } }),
   CasingDrilled: ({ samples, grade }) => ({ event: 'casing_drilled', data: { samples, grade } }),
   CasingGradeInsufficient: ({ band, grade, required }) => ({
     event: 'casing_grade_insufficient',

@@ -113,6 +113,13 @@ export interface DomainEventBodies {
   CasingGradeInsufficient: { band: number; grade: number; required: number }
   /** The vehicle is back where its casing grade holds (#41). */
   CasingGradeSufficient: { band: number; grade: number }
+  /**
+   * A ring of lining gnawed (#111): `samples` of chunk `cx,cy` turned breached, by the tunnel
+   * wrecker `enemyId` (null for `debug.gnawCasing`). Guests learn of the breach from this.
+   */
+  CasingBreached: { chunk: string; samples: number; enemyId: string | null }
+  /** The same gnaw once per ring: its axis point `x,y` in mm and the deepest band of its wall. */
+  RingGnawed: { ring: string; band: number }
   /** The drill cleared lining (#41): casing samples drilled to air, the highest grade among them. */
   CasingDrilled: { samples: number; grade: number }
   /**

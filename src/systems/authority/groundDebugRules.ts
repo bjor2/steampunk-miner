@@ -6,7 +6,8 @@
  * never counts as play (#11 section 4). The dock pad is never cut.
  *
  * `debug.lineCasing` lines one ring of casing round a point at a grade (#41), the same ring the
- * vehicle lays, and logs it like one.
+ * vehicle lays, and logs it like one. `debug.gnawCasing` breaches that ring as a tunnel wrecker
+ * does (#111), logged as its gnaw with no enemy.
  */
 import { SOLID_DENSITY } from '../world/sampleGrid'
 import { clearDisc, fillDisc, type GroundEdit } from '../world/groundEdit'
@@ -14,6 +15,7 @@ import type { PlanetParams } from '../world/planetParams'
 import type { AuthorityCommand } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
 import { layCasingRing } from './casingPlacement'
+import { gnawCasingRing } from './casingGnaw'
 import { casingGradeRangeRejection } from './casingRules'
 import type { GroundCircle } from './groundCommands'
 import {
@@ -44,6 +46,7 @@ export const GROUND_DEBUG_RULES: {
   readonly 'debug.carveCircle': CommandRule<'debug.carveCircle'>
   readonly 'debug.fillCircle': CommandRule<'debug.fillCircle'>
   readonly 'debug.lineCasing': CommandRule<'debug.lineCasing'>
+  readonly 'debug.gnawCasing': CommandRule<'debug.gnawCasing'>
 } = {
   'debug.carveCircle': {
     fields: CIRCLE_FIELDS,
@@ -70,6 +73,20 @@ export const GROUND_DEBUG_RULES: {
       ]),
     apply: (state, { payload }) => lineCasingRing(state, payload),
   },
+  'debug.gnawCasing': {
+    fields: { x: 'safeInteger', y: 'safeInteger' },
+    reject: (state) => noPlanetRejection(state.planet),
+    apply: (state, { payload }) => gnawRingWithoutEnemy(state, payload),
+  },
+}
+
+function gnawRingWithoutEnemy(
+  state: AuthorityState,
+  { x, y }: { x: number; y: number },
+): RuleEffect {
+  const params = planetParamsOf(state.planet)
+  if (params === null) return unchanged(state)
+  return gnawCasingRing(state, params, { xMm: x, yMm: y }, null)
 }
 
 function lineCasingRing(

@@ -17,8 +17,10 @@ import type { BayId } from '../world/dockBays'
  * 5: the casing layer in chunk deltas, its events and debug commands (#41, #56).
  * 6: collapse (#43, #57): its events, `debug.forceCollapse` and `VehicleDamaged.source`.
  * 7: the first-place lining charge (#76, #85): drilling now debits the wallet, `CasingLined`.
+ * 8: breached casing and the tunnel wrecker (#111, #94): casing 255 in chunk deltas,
+ *    `CasingBreached`, `RingGnawed`, the wrecker's events and `debug.gnawCasing`.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 7
+export const AUTHORITY_PROTOCOL_VERSION = 8
 
 export interface CommandPayloads {
   /**
@@ -103,6 +105,8 @@ export interface CommandPayloads {
   'debug.setCasingGrade': { grade: number }
   /** One ring of casing lining of `grade` round `(x, y)` mm (#41 `debug.lineCasing`). */
   'debug.lineCasing': { x: number; y: number; grade: number }
+  /** Breaches the ring of lining round `(x, y)` mm as a tunnel wrecker's gnaw does (#111). */
+  'debug.gnawCasing': { x: number; y: number }
   /**
    * Starts the collapse of one block (`cx,cy#index`) now, as if it were weak (#43
    * `debug.forceCollapse`): it warns for the full 60 ticks and refills whatever its lining.

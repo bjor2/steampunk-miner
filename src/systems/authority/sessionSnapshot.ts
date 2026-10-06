@@ -34,11 +34,12 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 10: breached casing (#111, #94), 255 in the casing runs, and the tunnel wrecker's combat state;
  * 9: the blocks warning or refilling (#43, #57); 8: the casing layer in chunk deltas (#41, #56); 7: each player's held artefact (#46); 6: the
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 9
+export const SNAPSHOT_VERSION = 10
 
 export interface SessionSnapshot {
   snapshotVersion: number

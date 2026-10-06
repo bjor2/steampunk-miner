@@ -56,7 +56,11 @@ import { validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioProblems } from '../systems/startScenario'
 import { setCoreFragmentsCommand } from '../systems/startScenarioCommands'
 import { carveCircleCommand, fillCircleCommand } from '../systems/authority/groundCommands'
-import { lineCasingCommand, setCasingGradeCommand } from '../systems/authority/casingDebugCommands'
+import {
+  gnawCasingCommand,
+  lineCasingCommand,
+  setCasingGradeCommand,
+} from '../systems/authority/casingDebugCommands'
 import { forceCollapseCommand } from '../systems/authority/collapse/collapseCommands'
 import type { CollapseReport } from '../systems/authority/collapse/collapseReport'
 import { readCollapseReport } from '../store/collapseReads'
@@ -169,6 +173,8 @@ export interface DebugApi {
   setCasingGrade(grade: number): DebugResult
   /** One ring of lining of `grade` round `(x, y)` mm, the ring the vehicle lays. */
   lineCasing(x: number, y: number, grade: number): DebugResult
+  /** Breaches the ring of lining round `(x, y)` mm, as a tunnel wrecker's gnaw does (#111). */
+  gnawCasing(x: number, y: number): DebugResult
   // collapse (#43): the setter is a `debug.*` command, the read is not logged
   /** Starts the collapse of block `cx,cy#index` now: the full 60-tick warning, then the refill. */
   forceCollapse(block: string): DebugResult
@@ -341,6 +347,10 @@ export function createDebugApi(): DebugApi {
     lineCasing: (x, y, grade) =>
       runUnlessRefused(vehicleDebugProblems(lineCasingCommand({ x, y, grade })), () =>
         game().lineCasing({ x, y, grade }),
+      ),
+    gnawCasing: (x, y) =>
+      runUnlessRefused(vehicleDebugProblems(gnawCasingCommand(x, y)), () =>
+        game().gnawCasing(x, y),
       ),
     forceCollapse: (block) =>
       runUnlessRefused(vehicleDebugProblems(forceCollapseCommand(block)), () =>

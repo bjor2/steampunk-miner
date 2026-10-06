@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { stateDigest } from '../authority/stateDigest'
 import { chunkRepairOf, mismatchedChunks, touchedChunksOf, withChunkRepaired } from './chunkRepair'
+import { breachRing } from './casingBreach'
 import { lineRing } from './casingLining'
 import { carveDisc } from './groundEdit'
 import { planetParamsFor } from './planetParams'
@@ -62,5 +63,21 @@ describe('chunk desync repair: casing (#41)', () => {
       guest,
     )
     expect(mismatchedChunks(host, repaired, params, touchedChunksOf(host, repaired))).toEqual([])
+  })
+})
+
+describe('chunk desync repair: breached casing (#111)', () => {
+  it('finds a guest that missed a gnaw and repairs it by resending the host delta', () => {
+    const ring = { xMm: 31000, yMm: 284000, clearMm: 700, widthMm: 500 }
+    const lined = lineRing(hostWorld(), params, ring, 3).world
+    const host = breachRing(lined, params, ring).world
+    const mismatched = mismatchedChunks(host, lined, params, touchedChunksOf(host, lined))
+    expect(mismatched.length).toBeGreaterThan(0)
+    const repaired = mismatched.reduce(
+      (world, chunk) => withChunkRepaired(world, chunkRepairOf(host, chunk)),
+      lined,
+    )
+    expect(mismatchedChunks(host, repaired, params, touchedChunksOf(host, repaired))).toEqual([])
+    expect(stateDigest(repaired)).toBe(stateDigest(host))
   })
 })

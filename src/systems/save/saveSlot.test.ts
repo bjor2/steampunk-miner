@@ -109,6 +109,20 @@ describe('save slot', () => {
     expect(file.profile.saveEpoch).toBe(3)
   })
 
+  it('restores a chunk holding breached casing exactly (#111)', () => {
+    const session = dockedAfterATrip()
+    session.submit(210, {
+      type: 'debug.carveCircle',
+      payload: { x: 500, y: 284000, radius: 950, amount: 255 },
+    })
+    session.submit(210, { type: 'debug.lineCasing', payload: { x: 500, y: 284000, grade: 3 } })
+    const gnaw = session.submit(210, { type: 'debug.gnawCasing', payload: { x: 500, y: 284000 } })
+    expect(gnaw.some((event) => event.type === 'CasingBreached')).toBe(true)
+    const restored = restoredFrom(savedText(session.state()))
+    expect(stateDigest(restored)).toBe(stateDigest(session.state()))
+    expect(restored.world).toEqual(session.state().world)
+  })
+
   it('saves the vehicle as levels, integer energy and cargo and a hull string, with no stat', () => {
     const file = JSON.parse(savedText(dockedAfterATrip().state())) as SaveSlotFile
     const vehicle = file.profile.players.p1.vehicle
@@ -196,7 +210,7 @@ describe('save slot: refusals', () => {
     ])
     expect(readSaveSlot({ ...file(), formatVersion: 9, snapshotVersion: 4 }).problems).toEqual([
       'save.formatVersion is 9, this build reads 1',
-      'save.snapshotVersion is 4, this build reads 9',
+      'save.snapshotVersion is 4, this build reads 10',
     ])
   })
 

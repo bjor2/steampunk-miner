@@ -5,6 +5,7 @@
  * a grade is play and goes through the Upgrade bay's action.
  */
 import {
+  gnawCasingCommand,
   lineCasingCommand,
   setCasingGradeCommand,
   type CasingRingAt,
@@ -16,11 +17,14 @@ export interface CasingDebugActions {
   setCasingGrade(grade: number): void
   /** Debug: one ring of lining of `grade` round a point in mm, the ring the vehicle lays. */
   lineCasing(ring: CasingRingAt): void
+  /** Debug: the ring round a point in mm breached, as a tunnel wrecker gnaws it (#111). */
+  gnawCasing(x: number, y: number): void
 }
 
 export function casingDebugActionsOf(playerIdOf: () => string): CasingDebugActions {
   return {
     setCasingGrade: (grade) => submitUnlessRefused(playerIdOf(), setCasingGradeCommand(grade)),
     lineCasing: (ring) => submitUnlessRefused(playerIdOf(), lineCasingCommand(ring)),
+    gnawCasing: (x, y) => submitUnlessRefused(playerIdOf(), gnawCasingCommand(x, y)),
   }
 }

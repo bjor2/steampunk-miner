@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { applyCommand } from './applyCommand'
 import { createAuthorityState, type AuthorityState } from './authorityState'
+import { CASING_BREACHED, decodeCasing } from '../world/chunkDelta'
 import { readSnapshot, takeSnapshot } from './sessionSnapshot'
 import { stateDigest } from './stateDigest'
 
@@ -28,7 +29,7 @@ describe('session snapshot', () => {
   it('carries the state digest and the versions it was taken under', () => {
     const snapshot = takeSnapshot(richState())
     expect(snapshot).toMatchObject({
-      snapshotVersion: 9,
+      snapshotVersion: 10,
       generatorVersion: 3,
       tick: 600,
       digest: stateDigest(richState()),
@@ -57,7 +58,7 @@ describe('session snapshot', () => {
       state: { tick: 600, planet: { index: -1, seed: 1 }, players: { p1: { wallet: 5 } } },
     }
     expect(readSnapshot(broken).problems).toEqual([
-      'snapshot.snapshotVersion is 0, this build reads 9',
+      'snapshot.snapshotVersion is 0, this build reads 10',
       'snapshot.state.planet must hold a whole index and a safe-integer seed',
       'snapshot.state.players.p1 must hold a money wallet and a whole lastSeq',
       'snapshot.state.world must be an object',
@@ -89,6 +90,26 @@ describe('session snapshot: casing (#41)', () => {
     const state = linedState()
     expect(Object.values(state.world.chunks).some((delta) => delta.casing.length > 0)).toBe(true)
     expect(readSnapshot(throughJson(takeSnapshot(state)))).toEqual({ state, problems: [] })
+  })
+
+  it('keeps breached casing through save and load (#111)', () => {
+    const gnawed = applyCommand(linedState(), {
+      playerId: 'p1',
+      tick: 600,
+      seq: 4,
+      type: 'debug.gnawCasing',
+      payload: { x: 500, y: 284000 },
+    }).state
+    const deltas = Object.values(gnawed.world.chunks)
+    expect(deltas.some((delta) => decodeCasing(delta).includes(CASING_BREACHED))).toBe(true)
+    expect(readSnapshot(throughJson(takeSnapshot(gnawed)))).toEqual({ state: gnawed, problems: [] })
+  })
+
+  it('refuses a snapshot taken before breached casing, at version 9, with the version message', () => {
+    const snapshot = { ...throughJson(takeSnapshot(linedState())), snapshotVersion: 9 }
+    expect(readSnapshot(snapshot).problems).toEqual([
+      'snapshot.snapshotVersion is 9, this build reads 10',
+    ])
   })
 
   it('refuses casing runs that hold a grade above 15', () => {
