@@ -29,8 +29,11 @@ import type { BayId } from '../world/dockBays'
  *    logs what it paid as `LiningSettled`, and undocking logs what the visit forgave.
  * 13: blasting charges (#109, #95): the rack and charge commands, their events,
  *    `debug.setCharges`, and blast sources on `VehicleDamaged` and the enemy events.
+ * 14: heat, lava and the refractory lining (#113, #96): lining types in the casing layer and on the
+ *    vehicle, `BuyLiningType`, `SelectLiningType`, `debug.setLiningType`, `CasingLined.liningType`;
+ *    the heat gauge, its throttle and damage, `HeatThreshold`, `Overheat*`, `debug.setHeat`.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 13
+export const AUTHORITY_PROTOCOL_VERSION = 14
 
 export interface CommandPayloads {
   /**
@@ -78,6 +81,12 @@ export interface CommandPayloads {
   buyGun: Record<string, never>
   /** The HUD toggle: `"auto"` fires by itself, `"off"` saves the boiler (#107). */
   setGunMode: { mode: string }
+  /**
+   * The Upgrade bay's Lining row (#113): unlocks a lining type once its row is open (refractory
+   * from planet 8) and makes it the active type; `selectLiningType` switches between owned types.
+   */
+  buyLiningType: { liningType: string }
+  selectLiningType: { liningType: string }
   /**
    * The Refinery bay (#105): moves up to half the hold of one ore tier into a free slot, and buys
    * the next slot. Ready batches are collected, and paid, at the Sell bay only.
@@ -137,6 +146,10 @@ export interface CommandPayloads {
   'debug.setCharges': { carried: number; slotLevel: number }
   /** Sets the vehicle's casing grade directly (#41 `debug.setCasingGrade`). */
   'debug.setCasingGrade': { grade: number }
+  /** Owns and selects a lining type, with no unlock or price (#113 scenarios). */
+  'debug.setLiningType': { liningType: string }
+  /** Sets the heat gauge to whole gauge points, 0 to its max, settled at the command's tick (#113). */
+  'debug.setHeat': { heat: number }
   /** One ring of casing lining of `grade` round `(x, y)` mm (#41 `debug.lineCasing`). */
   'debug.lineCasing': { x: number; y: number; grade: number }
   /** Breaches the ring of lining round `(x, y)` mm as a tunnel wrecker's gnaw does (#111). */

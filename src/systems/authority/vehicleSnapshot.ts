@@ -4,9 +4,11 @@
  * strings. Reading checks the shape so a malformed snapshot is refused with listed problems before
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
+import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { isGunMode } from '../vehicle/vehicleGun'
+import { isLiningType } from '../vehicle/liningType'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
 import type { Cargo, VehicleMode, VehicleState } from '../vehicle/vehicleState'
 import { isCasingValue, type ChunkDelta } from '../world/chunkDelta'
@@ -86,6 +88,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableCharges(vehicle.charges)
       ? []
       : [`${path}.charges must hold a rack flag, whole counts and a planted charge or null`]),
+    ...(isPortableLining(vehicle.lining)
+      ? []
+      : [`${path}.lining must hold an owned active lining type and the owned types`]),
     ...(isNonNegativeMoneyText(vehicle.hull) ? [] : [`${path}.hull must be a decimal string`]),
     ...(isNonNegativeMoneyText(vehicle.liningBill)
       ? []
@@ -96,6 +101,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableCargo(vehicle.cargo) ? [] : [`${path}.cargo must hold whole units`]),
     ...(vehicle.pose === null || isPortablePose(vehicle.pose) ? [] : [`${path}.pose is malformed`]),
     ...(isWholeNumberList(vehicle.energyLowLogged) ? [] : [`${path}.energyLowLogged is malformed`]),
+    ...(isPortableHeat(vehicle.heat)
+      ? []
+      : [`${path}.heat must hold a whole level, its settled tick and a lava touch tick or null`]),
   ]
 }
 
@@ -156,6 +164,27 @@ function isPlantedCharge(planted: unknown): boolean {
     Number.isSafeInteger(planted.tx) &&
     Number.isSafeInteger(planted.ty) &&
     isWholeNumber(planted.detonateTick)
+  )
+}
+
+function isPortableHeat(heat: unknown): boolean {
+  return (
+    isJsonObject(heat) &&
+    isWholeNumber(heat.level) &&
+    isWholeNumber(heat.settledTick) &&
+    (heat.lavaTouchTick === null || isWholeNumber(heat.lavaTouchTick))
+  )
+}
+
+/** The active type is one the vehicle owns, and it owns the standard lining (#113). */
+function isPortableLining(lining: unknown): boolean {
+  if (!isJsonObject(lining) || !Array.isArray(lining.owned)) return false
+  const owned: unknown[] = lining.owned
+  return (
+    owned.every(isLiningType) &&
+    owned.includes(STANDARD_LINING_TYPE) &&
+    isLiningType(lining.active) &&
+    owned.includes(lining.active)
   )
 }
 

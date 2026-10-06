@@ -7,9 +7,9 @@
  * - `yieldedRows`: one bit per material cell that has credited its ore (#36 Yield), 32 uint32
  *   words, word `ly` holding bit `lx` of chunk row `ly`. A yielded cell counts as open ground for
  *   every cell rule (enemies, the bot, the drill), as a removed tile did under generator 1.
- * - `casing`: the casing layer (#41), one grade per density sample (0 = no casing, 1 to 15, or
- *   `CASING_BREACHED`), run-length encoded like `density`. Generation lays no casing, so the runs
- *   are the layer itself.
+ * - `casing`: the casing layer (#41), one value per density sample (0 = no casing, a lining of
+ *   grade 1 to 15 and its type, or `CASING_BREACHED`), run-length encoded like `density`.
+ *   Generation lays no casing, so the runs are the layer itself.
  * - `overrides`: sparse `[index, cell]` material overrides sorted by index (placed supports later).
  * - `version`: counts the changes, so a renderer or collider can tell a chunk moved on (#36
  *   `GroundChanged`).
@@ -26,13 +26,35 @@ export const MAX_SAMPLE_CASING_GRADE = 15
 
 /**
  * Lining a tunnel wrecker gnawed (#111 Technical Director, a reserved value of the same layer):
- * still lined, but holding at grade 0, so it is weak in every band. 16 to 254 stay invalid.
+ * still lined, but holding at grade 0, so it is weak in every band. A breach keeps no type.
  */
 export const CASING_BREACHED = 255
 
+/**
+ * A lining sample is `typeIndex * 16 + grade` (#113: the type sits on top of the grade): the
+ * standard lining is type 0, so its values stay the #41 grades 1 to 15 and older layers read the
+ * same. Types 1 to 14 fit below `CASING_BREACHED`; a type with grade 0 is not a value.
+ */
+const CASING_TYPE_STRIDE = MAX_SAMPLE_CASING_GRADE + 1
+const MAX_CASING_TYPE_INDEX = 14
+
+/** The standard lining's type index (#41): its values are the plain grades. */
+export const STANDARD_CASING_TYPE_INDEX = 0
+
+/** The value a sample holds when lined at `grade` (1 to 15) with the lining type `typeIndex`. */
+export function casingValueOf(grade: number, typeIndex: number): number {
+  return typeIndex * CASING_TYPE_STRIDE + grade
+}
+
 /** The grade a casing sample holds against collapse and the drill: 0 for breached lining. */
 export function effectiveCasingGrade(casing: number): number {
-  return casing === CASING_BREACHED ? 0 : casing
+  return casing === CASING_BREACHED ? 0 : casing % CASING_TYPE_STRIDE
+}
+
+/** The lining type of a sample (0 = standard), or null for no lining or a breach. */
+export function casingTypeIndexOf(casing: number): number | null {
+  if (!isIntactLining(casing)) return null
+  return Math.floor(casing / CASING_TYPE_STRIDE)
 }
 
 /** Lined, breached or not: never-lined rock is 0. */
@@ -45,9 +67,11 @@ export function isIntactLining(casing: number): boolean {
   return isLined(casing) && casing !== CASING_BREACHED
 }
 
-/** A value the casing layer may hold: none, a grade, or breached. */
+/** A value the casing layer may hold: none, a grade of some type, or breached. */
 export function isCasingValue(casing: number): boolean {
-  return casing <= MAX_SAMPLE_CASING_GRADE || casing === CASING_BREACHED
+  if (casing <= MAX_SAMPLE_CASING_GRADE || casing === CASING_BREACHED) return true
+  const typeIndex = Math.floor(casing / CASING_TYPE_STRIDE)
+  return typeIndex <= MAX_CASING_TYPE_INDEX && effectiveCasingGrade(casing) > 0
 }
 
 export interface ChunkDelta {

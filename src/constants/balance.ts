@@ -155,3 +155,10 @@ export const CAMPAIGN_LAST_PLANET = 40
  * horizontal row, of any `bind` (#81 acceptance 2).
  */
 export const MAX_PLANETS_WITHOUT_HORIZONTAL = 2
+
+/**
+ * The heat gauge (#113) is held as an integer count of units, this many per gauge point, so a
+ * per-second rate given in thousandths of a point (0.15, 0.65, ...) is a whole number of units per
+ * 1/60 s tick and a long dive never drifts. The rates themselves are economy data.
+ */
+export const HEAT_UNITS_PER_POINT = 60000

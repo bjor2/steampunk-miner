@@ -53,9 +53,9 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'casing_placed',
     data: { samples, relined, grade },
   }),
-  CasingLined: ({ lengthMm, band, grade, price }) => ({
+  CasingLined: ({ lengthMm, band, grade, liningType, price }) => ({
     event: 'casing_lined',
-    data: { lengthMm, band, grade, price },
+    data: { lengthMm, band, grade, type: liningType, price },
   }),
   // A breach per chunk replicates the gnaw; `ring_gnawed` is its one log line per ring (#111).
   CasingBreached: () => null,
@@ -85,6 +85,9 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
   StorageFull: ({ lostUnits }) => ({ event: 'storage_full', data: { lostUnits } }),
   EnergyLow: ({ threshold }) => ({ event: 'energy_low', data: { threshold } }),
   EnergyDepleted: () => ({ event: 'energy_depleted', data: {} }),
+  HeatThreshold: ({ level }) => ({ event: 'heat_threshold', data: { level } }),
+  OverheatStarted: () => ({ event: 'overheat_started', data: {} }),
+  OverheatEnded: () => ({ event: 'overheat_ended', data: {} }),
   VehicleModeChanged: ({ from, to, reason }) => ({
     event: 'vehicle_state_changed',
     data: { from, to, reason },
@@ -123,6 +126,14 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
   GunMounted: ({ level, price }) => ({ event: 'gun_mounted', data: { level, price } }),
   GunUpgraded: ({ from, to, price }) => ({ event: 'gun_upgraded', data: { from, to, price } }),
   GunModeChanged: ({ mode }) => ({ event: 'gun_mode', data: { mode } }),
+  LiningTypeUnlocked: ({ liningType, price }) => ({
+    event: 'lining_type_unlocked',
+    data: { type: liningType, price },
+  }),
+  LiningTypeSelected: ({ liningType }) => ({
+    event: 'lining_type_selected',
+    data: { type: liningType },
+  }),
   // A collapse's crush has no enemy: its fields read as `vehicle_destroyed` does with none (#43).
   VehicleDamaged: ({ amount, source, arc, enemyId, kind, tier, hullAfter }) => ({
     event: 'vehicle_damaged',

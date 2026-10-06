@@ -37,6 +37,16 @@ describe('casing prices', () => {
     }
   })
 
+  it('charges refractory lining 1.5 times the metre price, rounded once (#113)', () => {
+    const lengthM = fromCanonical('0.5')
+    for (const band of [1, 3, 5]) {
+      const metre = mul(ECONOMY.casing.kCasing, oreValue(oreTier(8, band)))
+      const expected = ceilMilli(mul(mul(metre, fromCanonical('1.5')), lengthM))
+      expect(casingLiningPrice(8, band, lengthM, 'refractory')).toEqual(expected)
+    }
+    expect(casingLiningPrice(8, 3, lengthM, 'standard')).toEqual(casingLiningPrice(8, 3, lengthM))
+  })
+
   it('rounds a part-milli metre price up to the next milli', () => {
     // V(t(1,4)) = 33.75, so half a metre is 0.03375 before rounding.
     expect(toCanonical(casingLiningPrice(1, 4, fromCanonical('0.5')))).toBe('3.4e-2')

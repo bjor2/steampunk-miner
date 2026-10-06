@@ -16,6 +16,8 @@ import type { DockSite } from '../world/dockSite'
 import { EMPTY_CASING_TRAIL, type CasingTrail } from './casingTrail'
 import { NO_CHARGES, type VehicleCharges } from './vehicleCharges'
 import { quantaOfUnits } from './energyQuanta'
+import { STANDARD_LINING, type VehicleLining } from './liningType'
+import { coldHeatAt, type VehicleHeat } from './vehicleHeat'
 import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
 
@@ -45,6 +47,8 @@ export interface VehicleState {
   casingShortBand: number | null
   /** The drill's recorded axis points still waiting for their casing ring (#41, #56). */
   casingTrail: CasingTrail
+  /** The lining type the rings are laid in and the types unlocked (#113). */
+  lining: VehicleLining
   /** The `auto_guns` turret (#107): not a vehicle track, so it is not in the visual-tier sum. */
   gun: VehicleGun
   /**
@@ -67,6 +71,8 @@ export interface VehicleState {
   accountedTick: number
   /** The `energy_low` percents already logged since the tank was last above them. */
   energyLowLogged: readonly number[]
+  /** The heat gauge (#113): 0 off the heat planets. */
+  heat: VehicleHeat
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }
@@ -82,6 +88,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     casingGrade: casingGradeStart(),
     casingShortBand: null,
     casingTrail: EMPTY_CASING_TRAIL,
+    lining: STANDARD_LINING,
     gun: NO_GUN,
     liningBill: ZERO_MONEY,
     liningPaidThisVisit: null,
@@ -92,6 +99,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     pose: site === null ? null : dockedPoseAt(site),
     accountedTick: tick,
     energyLowLogged: [],
+    heat: coldHeatAt(tick),
   }
 }
 

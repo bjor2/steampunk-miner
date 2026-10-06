@@ -5,7 +5,8 @@
  *
  * `reportPose` carves the drill's disc stamp at the reported pose; `drillTile` carves one cell's
  * own samples. Either way a sample of a cell clears in that cell's #7 drill time (`ticksPerTile`
- * from the tip, the power and the cell's hardness), and only the ticks in which the stamp still
+ * from the tip, the power (throttled when the heat gauge is over its line, #113) and the cell's
+ * hardness), and only the ticks in which the stamp still
  * removed something are charged, no more than the tank pays for. A cell whose samples fall to half
  * yields once: 1 cargo unit of ore or core fragments (#7, #10); with a full hold the unit is lost,
  * never refused.
@@ -17,12 +18,7 @@ import { drillDamage, ticksPerTile, type DrillStats } from '../vehicle/drillRule
 import { drillStampOf } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import type { VehiclePose } from '../vehicle/vehiclePose'
-import {
-  hasCargoRoom,
-  statsOfVehicle,
-  withOreUnit,
-  type VehicleState,
-} from '../vehicle/vehicleState'
+import { hasCargoRoom, withOreUnit, type VehicleState } from '../vehicle/vehicleState'
 import {
   carveCell,
   carveDisc,
@@ -41,6 +37,7 @@ import { chainEffects, unchanged, type RuleEffect } from './commandRule'
 import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
 import { groundChangedEventsOf } from './groundChangedEvents'
+import { heatThrottledDrill } from './heatRules'
 
 type CarveIn = (world: WorldState, window: CarveWindow, drillTicksOf: CellDrillTicks) => Carve
 
@@ -93,7 +90,7 @@ function drillGround(
   requestedTicks: number,
 ): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
-  const drill = statsOfVehicle(vehicle)
+  const drill = heatThrottledDrill(params.planetIndex, vehicle)
   const ticks = Math.min(requestedTicks, affordableTicksOf(vehicle))
   if (ticks === 0) return unchanged(state)
   const window = { firstTick: Math.max(0, state.tick - ticks), ticks }

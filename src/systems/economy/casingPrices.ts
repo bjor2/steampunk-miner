@@ -12,6 +12,7 @@ import { ceil, ceilMilli, mul, type BigStat, type Money } from '../money'
 import { geometricCurveOf } from './costCurveLookup'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
+import { liningTypePriceMultiplier, STANDARD_LINING_TYPE } from './heatEconomy'
 import { oreTier, oreValue } from './oreEconomy'
 
 /** What the Upgrade bay charges to raise the casing from `grade` to the next one. */
@@ -25,8 +26,18 @@ export function casingGradeStart(): number {
   return ECONOMY.casing.casingGradeStart
 }
 
-/** What `lengthM` metres of first-placed lining cost against band `band`'s wall on planet `planetIndex`. */
-export function casingLiningPrice(planetIndex: number, band: number, lengthM: BigStat): Money {
+/**
+ * What `lengthM` metres of first-placed lining cost against band `band`'s wall on planet
+ * `planetIndex`, in the lining type `liningType`: a type's multiplier scales the metre price
+ * (#113: refractory is 1.5 times it), the standard lining's is 1.
+ */
+export function casingLiningPrice(
+  planetIndex: number,
+  band: number,
+  lengthM: BigStat,
+  liningType: string = STANDARD_LINING_TYPE,
+): Money {
   const metrePrice = mul(ECONOMY.casing.kCasing, oreValue(oreTier(planetIndex, band)))
-  return ceilMilli(mul(metrePrice, lengthM))
+  const typedPrice = mul(metrePrice, liningTypePriceMultiplier(liningType))
+  return ceilMilli(mul(typedPrice, lengthM))
 }

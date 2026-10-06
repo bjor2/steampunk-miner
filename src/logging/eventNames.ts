@@ -163,6 +163,13 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { from: 'integer', to: 'integer', price: 'money' },
   },
+  // #113: a lining type unlocked at the Upgrade bay, and the type the rings are laid in from now on.
+  lining_type_unlocked: {
+    group: 'platform',
+    level: 'core',
+    payload: { type: 'text', price: 'money' },
+  },
+  lining_type_selected: { group: 'platform', level: 'core', payload: { type: 'text' } },
   // #107: the auto_guns turret bolted on at level 1, then each gun level bought.
   gun_mounted: { group: 'platform', level: 'core', payload: { level: 'integer', price: 'money' } },
   gun_upgraded: {
@@ -275,6 +282,11 @@ export const RUN_EVENT_REGISTRY = {
   depth_band_entered: { group: 'mining', level: 'core', payload: { band: 'integer' } },
   storage_full: { group: 'mining', level: 'core', payload: { lostUnits: 'integer' } },
   energy_depleted: { group: 'mining', level: 'core', payload: {} },
+  // #113: the heat gauge rose past the throttle line or its max (in gauge points), and the time the
+  // drill is throttled, from rising past the throttle line to falling back below it.
+  heat_threshold: { group: 'vehicle_and_combat', level: 'core', payload: { level: 'integer' } },
+  overheat_started: { group: 'vehicle_and_combat', level: 'core', payload: {} },
+  overheat_ended: { group: 'vehicle_and_combat', level: 'core', payload: {} },
   energy_low: { group: 'mining', level: 'core', payload: { threshold: 'integer' } },
   rare_resource_discovered: { group: 'mining', level: 'core', payload: 'unspecified' },
   tile_drilled: { group: 'mining', level: 'detail', payload: 'unspecified' },
@@ -289,7 +301,8 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: { samples: 'integer', relined: 'integer', grade: 'integer' },
   },
-  // #76: the first-place lining charge of one ring; relining is free and logs none.
+  // #76: the first-place lining charge of one ring; relining is free and logs none. `type` is the
+  // lining type laid (#113), so the bill splits by type; a type change is charged like new lining.
   casing_lined: {
     group: 'mining',
     level: 'core',
@@ -297,6 +310,7 @@ export const RUN_EVENT_REGISTRY = {
       lengthMm: 'integer',
       band: 'integer',
       grade: 'integer',
+      type: 'text',
       price: 'money',
     },
   },
@@ -398,7 +412,7 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: {
       amount: 'money',
-      source: { oneOf: ['drill-contact enemy', 'collapse', 'blast'] },
+      source: { oneOf: ['drill-contact enemy', 'collapse', 'blast', 'heat', 'lava'] },
       arc: { oneOf: [...HIT_ARC.oneOf, 'none'] },
       enemyId: 'text',
       kind: { oneOf: [...ENEMY_KIND.oneOf, 'none'] },

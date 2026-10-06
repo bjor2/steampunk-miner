@@ -10,6 +10,11 @@ import {
   withCellOverride,
   withCellsYielded,
   withDensity,
+  CASING_BREACHED,
+  casingTypeIndexOf,
+  casingValueOf,
+  effectiveCasingGrade,
+  isCasingValue,
 } from './chunkDelta'
 import { chunkDigest } from './chunkDigest'
 import { generateChunk } from './generateChunk'
@@ -72,5 +77,27 @@ describe('chunk delta (#36 Storage)', () => {
     const dug = { cells: generated.cells, density: tunnelThrough(generated.density) }
     expect(chunkDigest(dug)).not.toBe(chunkDigest(generated))
     expect(chunkDigest(generated)).toMatch(/^[0-9a-f]{16}$/)
+  })
+})
+
+describe('typed casing values (#113)', () => {
+  it('keeps the standard lining as the plain #41 grades', () => {
+    expect(casingValueOf(3, 0)).toBe(3)
+    expect([casingTypeIndexOf(3), effectiveCasingGrade(3)]).toEqual([0, 3])
+  })
+
+  it('stores a refractory ring as its grade on top of type 1', () => {
+    const value = casingValueOf(4, 1)
+    expect([casingTypeIndexOf(value), effectiveCasingGrade(value)]).toEqual([1, 4])
+    expect(isCasingValue(value)).toBe(true)
+  })
+
+  it('reads a breach as grade 0 with no type, and a typed grade 0 as no value at all', () => {
+    expect([casingTypeIndexOf(CASING_BREACHED), effectiveCasingGrade(CASING_BREACHED)]).toEqual([
+      null,
+      0,
+    ])
+    expect(isCasingValue(casingValueOf(0, 1))).toBe(false)
+    expect(casingTypeIndexOf(0)).toBeNull()
   })
 })

@@ -10,6 +10,7 @@
  * There is no undock grace: right after `Undock`, a vehicle still at rest in the pad zone may dock
  * again at once (#58, #40 follow-up).
  *
+ * Undocking settles the heat gauge for the time docked, cooled at the platform rate (#113).
  * Docking banks the carried core fragments (#10), ends the trip for combat (the vehicle's enemies
  * leave and used spawn points free up, #9), readies a spent `breathing_room` brace (#46) and
  * takes a `dock` state digest (#11 section 3).
@@ -32,6 +33,7 @@ import {
 } from './commandRule'
 import { restoreBreathingRoom } from './artefactRules'
 import { endTrip } from './combat/enemyRoster'
+import { settleDockedHeat } from './heatRules'
 import { forgiveLiningBillOnLeaving } from './liningBill'
 import { bankCoreFragments } from './coreBay'
 import { dockSiteOfPlanet, noPlanetRejection } from './planetOfState'
@@ -61,6 +63,7 @@ export const DOCK_COMMAND_RULES: {
     apply: (state, { playerId, tick }) =>
       chainEffects(state, [
         (current) => forgiveLiningBillOnLeaving(current, playerId),
+        (current) => settleDockedHeat(current, playerId, tick),
         (current) => logDockExit(current, playerId, tick),
         (current) => changeMode(current, playerId, 'active', 'undock', tick),
         (current) => restartActionAccounting(current, playerId, tick),

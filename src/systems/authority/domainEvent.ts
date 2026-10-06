@@ -71,6 +71,10 @@ export type RejectionReason =
   | 'no_charges'
   | 'charge_live'
   | 'no_wall'
+  // Registered by the lining types (#113): not a lining type, already unlocked, or not unlocked yet.
+  | 'unknown_lining_type'
+  | 'lining_type_owned'
+  | 'lining_type_not_owned'
 
 export type RescueCause = 'stranded' | 'destroyed'
 
@@ -81,10 +85,10 @@ export type CoreDepositSource = 'dock' | 'rescue'
 export type SaleMode = 'all' | 'single'
 
 /**
- * What hurt the vehicle (#43 `VehicleDamaged.source`): an enemy's hit, a collapse's crush, or its
- * own charge's blast (#109).
+ * What hurt the vehicle (#43 `VehicleDamaged.source`): an enemy's hit, a collapse's crush, its
+ * own charge's blast (#109), the heat gauge at its max, or a lava touch (#113).
  */
-export type DamageSource = 'drill-contact enemy' | 'collapse' | 'blast'
+export type DamageSource = 'drill-contact enemy' | 'collapse' | 'blast' | 'heat' | 'lava'
 
 /** What hurt or killed an enemy: the drill (#9) or a charge's blast (#109). */
 export type EnemyDamageSource = 'drill' | 'blast'
@@ -135,10 +139,11 @@ export interface DomainEventBodies {
   /** One ring of lining (#41): air samples lined and lower-grade casing raised, at `grade`. */
   CasingPlaced: { samples: number; relined: number; grade: number }
   /**
-   * A ring's first-placed lining charged (#76): `lengthMm` of new lining against the wall's
-   * `band`, its canonical `price` added to the vehicle's lining bill (paid at the next sale, #115).
+   * A ring's first-placed lining charged (#76): `lengthMm` of new lining in `liningType` (#113)
+   * against the wall's `band`, its canonical `price` added to the vehicle's lining bill (paid at the
+   * next sale, #115).
    */
-  CasingLined: { lengthMm: number; band: number; grade: number; price: string }
+  CasingLined: { lengthMm: number; band: number; grade: number; liningType: string; price: string }
   /** The vehicle entered a band (6: the core) its casing grade does not hold (#41). */
   CasingGradeInsufficient: { band: number; grade: number; required: number }
   /** The vehicle is back where its casing grade holds (#41). */
@@ -166,6 +171,11 @@ export interface DomainEventBodies {
   /** A full hold: the tile still broke, its unit was lost (#7). */
   StorageFull: { lostUnits: number }
   EnergyLow: { threshold: number }
+  /** The heat gauge rose past a line it watches, in gauge points (#113: the throttle line, the max). */
+  HeatThreshold: { level: number }
+  /** The gauge rose past `throttleAt`: the drill is throttled until it falls back below (#113). */
+  OverheatStarted: Record<never, never>
+  OverheatEnded: Record<never, never>
   EnergyDepleted: Record<never, never>
   VehicleModeChanged: { from: VehicleMode; to: VehicleMode; reason: string }
   /** `attacker` is null when no enemy did it (a debug hull). */
@@ -197,6 +207,10 @@ export interface DomainEventBodies {
   GunUpgraded: { from: number; to: number; price: string }
   /** The HUD toggle (#107). */
   GunModeChanged: { mode: GunMode }
+  /** A lining type unlocked at the Upgrade bay (#113); `price` as a canonical string. */
+  LiningTypeUnlocked: { liningType: string; price: string }
+  /** The rings laid from now on use this lining type (#113 `lining_type_selected`). */
+  LiningTypeSelected: { liningType: string }
   EnemyDespawned: { enemyId: string }
   /** A tunnel wrecker came out of the rock at ring `x,y` (mm) of a vehicle's route, in `band` (#111). */
   WreckerSpawned: { enemyId: string; ring: string; band: number }

@@ -35,7 +35,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
- * 15: each vehicle's charge rack, carried charges and planted charge (#109, #95);
+ * 16: heat, lava and the lining types (#113, #96): the vehicle's lining and heat gauge, typed
+ * casing values; 15: each vehicle's charge rack, carried charges and planted charge (#109, #95);
  * 14: what the vehicle's Sell bay visit has paid of its lining bill (#128); 13: the vehicle's
  * lining bill and each casing-trail point's axis length (#115, #76 amendment); 12: the Refinery
  * bay's slots on the platform (#105, #92); 11: the vehicle's guns and combat's gun timing and
@@ -45,7 +46,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 15
+export const SNAPSHOT_VERSION = 16
 
 export interface SessionSnapshot {
   snapshotVersion: number

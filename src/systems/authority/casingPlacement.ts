@@ -4,10 +4,11 @@
  * the drill stamp's centre (`followCasingTrail`, recording axis points only while the drill cut
  * since the last report), and so does scripted mining (`drillTile`) from the last reported pose, so
  * every drill command lays casing the same way (#115); it lays one ring at each axis point now due,
- * at the vehicle's casing grade, logging
- * `casing_placed` per ring. Never refused: a grade too low for the band still lines. A ring that
- * lines native rock for the first time is then charged (#76, `chargeFirstLining`); the debug
- * `lineCasing` lays the same ring free, as debug commands never count as play.
+ * at the vehicle's casing grade and in its active lining type (#113), logging `casing_placed` per
+ * ring. Never refused: a grade too low for the band still lines. A ring that lines native rock for
+ * the first time, or relays lining of another type, is then charged in its type (#76, #113,
+ * `chargeFirstLining`); the debug `lineCasing` lays a standard ring free, as debug commands never
+ * count as play.
  */
 import {
   followCasingTrail,
@@ -16,8 +17,10 @@ import {
   type TrailStep,
 } from '../vehicle/casingTrail'
 import { drillStampOf } from '../vehicle/drillStamp'
+import { liningTypeIndexOf } from '../vehicle/liningType'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import { casingRingAround, lineRing, type Lining } from '../world/casingLining'
+import { STANDARD_CASING_TYPE_INDEX } from '../world/chunkDelta'
 import type { PlanetParams } from '../world/planetParams'
 import type { CommandPayloads } from './authorityCommand'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
@@ -63,7 +66,14 @@ function layCasingAlongTrail(
   const step = trailStepOf(vehicle, motion)
   if (params === null || step === null) return unchanged(state)
   const moved = withVehicle(state, playerId, { ...vehicle, casingTrail: step.trail })
-  return layRings(moved, playerId, params, step.due, vehicle.casingGrade)
+  const lining = { grade: vehicle.casingGrade, liningType: vehicle.lining.active }
+  return layRings(moved, playerId, params, step.due, lining)
+}
+
+/** What a vehicle's rings are laid as: its casing grade, in its active lining type. */
+interface LaidLining {
+  grade: number
+  liningType: string
 }
 
 function trailStepOf(vehicle: VehicleState, motion: DrillMotion): TrailStep | null {
@@ -78,13 +88,13 @@ function layRings(
   playerId: string,
   params: PlanetParams,
   points: readonly AxisPoint[],
-  grade: number,
+  lining: LaidLining,
 ): RuleEffect {
   return chainEffects(
     state,
     points.map(
       (point) => (current: AuthorityState) =>
-        layPaidCasingRing(current, playerId, params, point, grade),
+        layPaidCasingRing(current, playerId, params, point, lining),
     ),
   )
 }
@@ -99,11 +109,17 @@ function layPaidCasingRing(
   playerId: string,
   params: PlanetParams,
   point: AxisPoint,
-  grade: number,
+  lining: LaidLining,
 ): RuleEffect {
-  const ring = lineCasingRing(state, params, point, grade)
-  const lining = { wall: ring.linedSamples, lengthMm: point.lengthMm, grade }
-  const charge = chargeFirstLining(ring.state, playerId, params, lining)
+  const ring = lineCasingRing(
+    state,
+    params,
+    point,
+    lining.grade,
+    liningTypeIndexOf(lining.liningType),
+  )
+  const first = { ...lining, wall: ring.linedSamples, lengthMm: point.lengthMm }
+  const charge = chargeFirstLining(ring.state, playerId, params, first)
   return {
     state: rememberLinedRing(charge.state, playerId, point),
     events: [...ring.events, ...charge.events],
@@ -131,8 +147,10 @@ function lineCasingRing(
   params: PlanetParams,
   point: RingPoint,
   grade: number,
+  typeIndex: number = STANDARD_CASING_TYPE_INDEX,
 ): LinedRing {
-  const lined = lineRing(state.world, params, casingRingAround(point.xMm, point.yMm), grade)
+  const ring = casingRingAround(point.xMm, point.yMm)
+  const lined = lineRing(state.world, params, ring, grade, typeIndex)
   return {
     state: { ...state, world: lined.world },
     events: [
