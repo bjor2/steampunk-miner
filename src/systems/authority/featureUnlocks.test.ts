@@ -36,6 +36,13 @@ describe('feature unlocks on travel', () => {
     expect(unlockedIdsOf(session.submit(10, travelTo(2)))).not.toContain('core_harvest')
   })
 
+  it('unlocks tunnel_wrecker on arriving at planet 6, its built module (#94)', () => {
+    const session = dockedOnPlanet(5)
+    expect(isFeatureUnlocked(session.state(), 'tunnel_wrecker')).toBe(false)
+    expect(unlockedIdsOf(session.submit(10, travelTo(6)))).toEqual(['tunnel_wrecker'])
+    expect(isFeatureUnlocked(session.state(), 'tunnel_wrecker')).toBe(true)
+  })
+
   it('unlocks no vision row on arriving at its planet (#90)', () => {
     const session = dockedOnPlanet(7)
     expect(unlockedIdsOf(session.submit(10, travelTo(8)))).toEqual([])

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import scheduleFile from '../../../docs/scaling/horizontal/stats.json'
 import type { UnlockBind, UnlockRow } from './readUnlockSchedule'
 import {
+  BUILT_VISION_ROW_IDS,
   isUnlocked,
   LOCKED_SCHEDULE,
   LOCKED_SCHEDULE_SOURCE_HASH,
@@ -93,11 +94,20 @@ describe('locked unlock schedule', () => {
     expect(rowsAt(LOCKED_SCHEDULE, 40).map((row) => row.id)).toEqual(['finale', 'endless_unlock'])
   })
 
-  it('unlocks no vision row even when every bind is met', () => {
+  it('unlocks no vision row whose module is not built, even when every bind is met', () => {
     const visionRows = LOCKED_SCHEDULE.rows.filter((row) => row.status === 'vision')
     const progress = progressWithEveryBindMet(visionRows)
     expect(visionRows).toHaveLength(40)
-    expect(visionRows.filter((row) => isUnlocked(row, progress))).toEqual([])
+    expect(visionRows.filter((row) => isUnlocked(row, progress)).map((row) => row.id)).toEqual([
+      ...BUILT_VISION_ROW_IDS,
+    ])
+  })
+
+  it('opens the built tunnel_wrecker row at planet 6, its locked planet (#94)', () => {
+    const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'tunnel_wrecker')!
+    expect(row).toMatchObject({ planetIndex: 6, bind: 'planet_gate', lane: 'Enemy' })
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 5 })).toBe(false)
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 6 })).toBe(true)
   })
 })
 
