@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T01:23:36Z",
+  "updated_at": "2026-10-06T01:23:38Z",
   "entries": {
     "test-loop/1": {
       "loop": "test-loop",
@@ -10,9 +10,41 @@
       "note": "heartbeat",
       "updated_at": "2026-10-06T01:23:36Z",
       "host": "grok-bot-vm-452660841"
+    },
+    "test-loop/2": {
+      "loop": "test-loop",
+      "slot": "2",
+      "state": "idle",
+      "updated_at": "2026-10-06T01:23:38Z",
+      "host": "grok-bot-vm-452660841"
+    },
+    "test-loop": {
+      "loop": "test-loop",
+      "state": "blocked",
+      "note": "batch",
+      "extra": {
+        "x": 1
+      },
+      "slot": null,
+      "updated_at": "2026-10-06T01:23:38Z",
+      "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-06T01:23:38Z",
+      "key": "test-loop",
+      "state": "blocked",
+      "issue": null,
+      "note": "batch"
+    },
+    {
+      "at": "2026-10-06T01:23:38Z",
+      "key": "test-loop/2",
+      "state": "idle",
+      "issue": null,
+      "note": null
+    },
     {
       "at": "2026-10-06T01:23:34Z",
       "key": "test-loop/1",
