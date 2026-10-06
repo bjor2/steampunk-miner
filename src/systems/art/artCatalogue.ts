@@ -16,6 +16,7 @@ import PROP_ARTEFACT_CACHE from '../../../art/placeholders/prop-artefact-cache.p
 import VEHICLE from '../../../art/placeholders/vehicle.parts.json'
 import ENEMY_BURROWER_EXPORTED from '../../../public/assets/enemy/enemy-burrower/enemy-burrower.parts.json'
 import ENEMY_CRAWLER_EXPORTED from '../../../public/assets/enemy/enemy-crawler/enemy-crawler.parts.json'
+import ENEMY_TUNNEL_WRECKER_EXPORTED from '../../../public/assets/enemy/enemy-tunnel-wrecker/enemy-tunnel-wrecker.parts.json'
 import PLATFORM_BAY_SELL_EXPORTED from '../../../public/assets/platform/platform-bay-sell/platform-bay-sell.parts.json'
 import PLATFORM_BAY_UPGRADE_EXPORTED from '../../../public/assets/platform/platform-bay-upgrade/platform-bay-upgrade.parts.json'
 import PLATFORM_HUB_EXPORTED from '../../../public/assets/platform/platform-hub/platform-hub.parts.json'
@@ -46,6 +47,7 @@ export const EXPORTED_SIDECARS: readonly PartsSidecar[] = [
   PLATFORM_BAY_UPGRADE_EXPORTED,
   ENEMY_CRAWLER_EXPORTED,
   ENEMY_BURROWER_EXPORTED,
+  ENEMY_TUNNEL_WRECKER_EXPORTED,
   PROP_ARTEFACT_CACHE_EXPORTED,
 ] as unknown as readonly PartsSidecar[]
 

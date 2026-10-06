@@ -191,6 +191,14 @@ chitin is authored pale so the tint reads over it) and rolled to local up. The a
 (S7c) is final art too, but nothing in the world draws it until the artefacts build places
 caches.
 
+An enemy's art can land before its kind is in `economy.json`. `SCHEDULED_ENEMY_ART_ROW_IDS` in
+`src/systems/art/artIds.ts` names the locked schedule's Enemy rows that already have art, and
+the row id is the kind id the enemy's module will register. The first is `enemy-tunnel-wrecker`
+(#112), written by `scripts/art/author_tunnel_wrecker.py`: a dome of pale scales with a spiked
+outline, two toothed rasp wheels for jaws, and a yellow-green glow. It is one 0.9 m part, like the
+burrower. Nothing draws it until the tunnel wrecker build (#94) adds the kind, and the pool then
+picks it up like the other two enemies.
+
 ## The asset lint
 
 `src/systems/art/assetLint.test.ts` runs in `npm test` and fails when:

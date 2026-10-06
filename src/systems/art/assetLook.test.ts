@@ -65,4 +65,15 @@ describe('asset look', () => {
       emissive: null,
     })
   })
+
+  it('cuts the tunnel wrecker from its atlas as its one placeholder part, with a glow map', () => {
+    const [quad, ...rest] = assetQuadsOf('enemy-tunnel-wrecker', 1)
+    const [placeholder] = placeholderQuadsOf('enemy-tunnel-wrecker', 1)
+    expect(rest).toEqual([])
+    expect(quad.uv).not.toBeNull()
+    expect({ ...quad, uv: null }).toEqual({ ...placeholder, uv: null })
+    expect(atlasMapsOf('enemy-tunnel-wrecker')?.emissive).toBe(
+      'assets/enemy/enemy-tunnel-wrecker/enemy-tunnel-wrecker.emissive.ktx2',
+    )
+  })
 })
