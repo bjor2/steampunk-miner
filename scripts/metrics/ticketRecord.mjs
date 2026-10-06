@@ -190,9 +190,18 @@ function secondsBetween(start, end) {
   return Math.round((end - start) / 1000)
 }
 
-function cycleTimeOf(attempts, created, closed) {
-  if (attempts.length === 0) return null
-  return secondsBetween(Math.max(attempts[0].start, created), closed)
+// The first claim is the first attempt's start (#138); the cycle time and the claimed-to-done
+// time both run from it to the close.
+function claimedAtOf(attempts, created) {
+  return attempts.length ? Math.max(attempts[0].start, created) : null
+}
+
+function claimedIsoOf(claimedAt) {
+  return claimedAt === null ? null : new Date(claimedAt).toISOString()
+}
+
+function secondsSinceClaim(claimedAt, closed) {
+  return claimedAt === null ? null : secondsBetween(claimedAt, closed)
 }
 
 function windowsOf({ attempts, driverEvents, githubWindows }) {
@@ -221,6 +230,7 @@ export function buildTicketRecord({
   const created = Date.parse(issue.createdAt)
   const closed = Date.parse(issue.closedAt)
   const numbered = attemptsOf(attempts, sessions, driverEvents)
+  const claimedAt = claimedAtOf(numbered, created)
   const pieces = layerWindows(
     windowsOf({ attempts: numbered, driverEvents, githubWindows }),
     created,
@@ -240,7 +250,9 @@ export function buildTicketRecord({
     ),
     totals: totalsOf(pieces),
     lead_time_s: secondsBetween(created, closed),
-    cycle_time_s: cycleTimeOf(numbered, created, closed),
+    cycle_time_s: secondsSinceClaim(claimedAt, closed),
+    claimed: claimedIsoOf(claimedAt),
+    claimed_to_done_s: secondsSinceClaim(claimedAt, closed),
     backfilled,
   }
 }

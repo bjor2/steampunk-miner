@@ -117,6 +117,12 @@ describe('ticket phases: ticket record', () => {
     expect(record.cycle_time_s).toBe(85 * 60)
   })
 
+  it('records the first claim and the time from it to the close', () => {
+    const record = buildTicketRecord(ticketSeven())
+    expect(record.claimed).toBe(iso(20))
+    expect(record.claimed_to_done_s).toBe(85 * 60)
+  })
+
   it('stamps each segment with its attempt, tier and model', () => {
     const record = buildTicketRecord(ticketSeven())
     const pick = (category) => record.segments.find((s) => s.category === category)
@@ -247,5 +253,7 @@ describe('ticket phases: ticket record', () => {
       ['landing', 60, 105],
     ])
     expect(record.cycle_time_s).toBeNull()
+    expect(record.claimed).toBeNull()
+    expect(record.claimed_to_done_s).toBeNull()
   })
 })
