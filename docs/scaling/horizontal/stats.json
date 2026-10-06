@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-06T18:34:16.873882+00:00",
+  "updated": "2026-10-06T20:04:18.487954+00:00",
   "sources": [
     "docs/design.md",
     "issues/14",
@@ -11,11 +11,12 @@
     "issues/80",
     "issues/81",
     "issues/160",
-    "issues/162"
+    "issues/162",
+    "issues/153"
   ],
-  "source_hash": "sha256:419ca56d8af626d1f0ff799075be9e72726381567c26168b7d0a6fbf8e1f3481",
-  "source_hash_method": "sha256 of feature ids + #79 schema + #80 lock fills",
-  "source_note": "Schedule C locked (#80). #78 survive 35 + 5 thin-act fills (P31 archive_cache, P32 grav_anchor, P34 buoyancy_tanks, P37 escape_thrusters, P39 finale_key). Intentional 1-gap at P16/P24/P29. #81 \u22642 empty satisfied. Endless gate remains finale+endless_unlock @40 (manual bind on endless). #162 (GD): research_lab P24->P15 as the combo-research building; side_drills, shields, grav_anchor, buoyancy_tanks, escape_thrusters are tech-tree nodes at their own planet (unlockVia tech_tree, treeLane per #160).",
+  "source_hash": "sha256:a420cb57bdc831be41eea490fe199873b567388c7159510acac920acd2814c8f",
+  "source_hash_method": "node docs/scaling/horizontal/source_hash.mjs: sha256 (UTF-8, hex) of JSON.stringify({ids, schema, fills}) with object keys sorted recursively and array order kept; ids = every features[].id sorted; schema = the #79 schema object; fills = the #80 lock fills, features with origin schedule_lock_80 as {id, planetIndex, lockNote} sorted by id. Status and other row fields are not hashed.",
+  "source_note": "Schedule C locked (#80). #78 survive 35 + 5 thin-act fills (P31 archive_cache, P32 grav_anchor, P34 buoyancy_tanks, P37 escape_thrusters, P39 finale_key). Intentional 1-gap at P16/P24/P29. #81 \u22642 empty satisfied. Endless gate remains finale+endless_unlock @40 (manual bind on endless). #162 (GD): research_lab P24->P15 as the combo-research building; side_drills, shields, grav_anchor, buoyancy_tanks, escape_thrusters are tech-tree nodes at their own planet (unlockVia tech_tree, treeLane per #160). #153 (GD amendment 2): remote_detonator added at P22 (Upgrade, planet_gate, planned) after shields; dynamite sizes 2\u201310 extend blasting_charges (labelled both, no rows); P22\u2013P40 cumulative +1 (P40 61). source_hash recomputed by source_hash.mjs (method now committed; the #80 value 419ca56d\u2026 was not reproducible).",
   "schedule_approved": "C",
   "schema": {
     "issue": 79,
@@ -428,6 +429,18 @@
       "treeLane": "mobility"
     },
     {
+      "id": "remote_detonator",
+      "planetIndex": 22,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "planet_gate",
+      "name": "Remote detonator",
+      "slice": "campaign",
+      "origin": "issues/153",
+      "scopeNote": "Plunger fires charges remotely (dynamite slice): optional for sizes 1\u20136 from P22, required from size 7 at P25; the wire reel lives on the hull.rear rack asset, no new attach point (#153 amendment 2)."
+    },
+    {
       "id": "ore_thief",
       "planetIndex": 23,
       "lane": "Enemy",
@@ -726,79 +739,79 @@
     },
     {
       "planet": 22,
-      "cumulative": 40
+      "cumulative": 41
     },
     {
       "planet": 23,
-      "cumulative": 41
+      "cumulative": 42
     },
     {
       "planet": 24,
-      "cumulative": 41
+      "cumulative": 42
     },
     {
       "planet": 25,
-      "cumulative": 43
-    },
-    {
-      "planet": 26,
       "cumulative": 44
     },
     {
+      "planet": 26,
+      "cumulative": 45
+    },
+    {
       "planet": 27,
-      "cumulative": 46
+      "cumulative": 47
     },
     {
       "planet": 28,
-      "cumulative": 47
-    },
-    {
-      "planet": 29,
-      "cumulative": 47
-    },
-    {
-      "planet": 30,
       "cumulative": 48
     },
     {
-      "planet": 31,
+      "planet": 29,
+      "cumulative": 48
+    },
+    {
+      "planet": 30,
       "cumulative": 49
     },
     {
-      "planet": 32,
+      "planet": 31,
       "cumulative": 50
     },
     {
-      "planet": 33,
+      "planet": 32,
       "cumulative": 51
     },
     {
-      "planet": 34,
+      "planet": 33,
       "cumulative": 52
     },
     {
-      "planet": 35,
-      "cumulative": 54
+      "planet": 34,
+      "cumulative": 53
     },
     {
-      "planet": 36,
+      "planet": 35,
       "cumulative": 55
     },
     {
-      "planet": 37,
+      "planet": 36,
       "cumulative": 56
     },
     {
-      "planet": 38,
+      "planet": 37,
       "cumulative": 57
     },
     {
-      "planet": 39,
+      "planet": 38,
       "cumulative": 58
     },
     {
+      "planet": 39,
+      "cumulative": 59
+    },
+    {
       "planet": 40,
-      "cumulative": 60
+      "cumulative": 61
     }
   ],
   "gap_justifications": {

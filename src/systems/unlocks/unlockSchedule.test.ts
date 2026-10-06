@@ -1,5 +1,7 @@
+import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import scheduleFile from '../../../docs/scaling/horizontal/stats.json'
 import type { UnlockBind, UnlockRow } from './readUnlockSchedule'
@@ -16,7 +18,31 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = '896254194c189398a85985ee98b64213b580cb92acf3ed54a2eb034f4cfe7f27'
+const LOCKED_FILE_SHA256 = '540f8d94df1068dc3afd64d0daed65ae76a6c7f6dfe621b2175f97eb9bd2e411'
+
+/**
+ * The canonical form of `source_hash_method` (docs/scaling/horizontal/source_hash.mjs, #153):
+ * sorted feature ids, the #79 schema and the #80 lock fills (rows with origin `schedule_lock_80`
+ * as `{id, planetIndex, lockNote}`, sorted by id), stringified with every object's keys sorted.
+ */
+function sourceHashOf(file: typeof scheduleFile): string {
+  const byCodeUnit = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
+  const sortKeys = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(sortKeys)
+    if (value === null || typeof value !== 'object') return value
+    const entries = Object.entries(value).sort(([a], [b]) => byCodeUnit(a, b))
+    return Object.fromEntries(entries.map(([key, inner]) => [key, sortKeys(inner)]))
+  }
+  const rows: { id: string; planetIndex: number; origin?: string; lockNote?: string }[] =
+    file.features
+  const ids = rows.map((row) => row.id).sort(byCodeUnit)
+  const fills = rows
+    .filter((row) => row.origin === 'schedule_lock_80')
+    .map(({ id, planetIndex, lockNote }) => ({ id, planetIndex, lockNote }))
+    .sort((a, b) => byCodeUnit(a.id, b.id))
+  const canonical = JSON.stringify(sortKeys({ ids, schema: file.schema, fills }))
+  return `sha256:${createHash('sha256').update(canonical, 'utf8').digest('hex')}`
+}
 
 const CAMPAIGN_PLANETS = Array.from({ length: 40 }, (_, index) => index + 1)
 
@@ -85,15 +111,25 @@ function progressWithEveryBindMet(rows: readonly UnlockRow[]): UnlockProgress {
 }
 
 describe('locked unlock schedule', () => {
-  it('loads the 55 locked Schedule C rows', () => {
-    expect(LOCKED_SCHEDULE.rows).toHaveLength(55)
+  it('loads the 56 locked Schedule C rows', () => {
+    expect(LOCKED_SCHEDULE.rows).toHaveLength(56)
   })
 
   it('carries the Horizontal Scaler source hash pin', () => {
     expect(LOCKED_SCHEDULE.sourceHash).toBe(
-      'sha256:419ca56d8af626d1f0ff799075be9e72726381567c26168b7d0a6fbf8e1f3481',
+      'sha256:a420cb57bdc831be41eea490fe199873b567388c7159510acac920acd2814c8f',
     )
     expect(LOCKED_SCHEDULE_SOURCE_HASH).toBe(LOCKED_SCHEDULE.sourceHash)
+  })
+
+  it('stores the source hash its committed method recomputes from the file (#153)', () => {
+    expect(sourceHashOf(scheduleFile)).toBe(scheduleFile.source_hash)
+    const script = fileURLToPath(
+      new URL('../../../docs/scaling/horizontal/source_hash.mjs', import.meta.url),
+    )
+    expect(execFileSync(process.execPath, [script], { encoding: 'utf8' }).trim()).toBe(
+      scheduleFile.source_hash,
+    )
   })
 
   it('fails when the file bytes drift without a pin update', () => {
@@ -103,8 +139,8 @@ describe('locked unlock schedule', () => {
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(LOCKED_FILE_SHA256)
   })
 
-  it('schedules 60 unlocks cumulatively by planet 40', () => {
-    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(60)
+  it('schedules 61 unlocks cumulatively by planet 40', () => {
+    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(61)
   })
 
   it('matches the cumulative count the scaler recorded for every campaign planet', () => {

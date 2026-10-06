@@ -15,9 +15,12 @@ import {
   type UnlockSchedule,
 } from './readUnlockSchedule'
 
-/** The Horizontal Scaler's lock (#80); a refreshed schedule changes this pin on purpose. */
+/**
+ * The Horizontal Scaler's lock (#80); a refreshed schedule changes this pin on purpose. Recompute
+ * it with `node docs/scaling/horizontal/source_hash.mjs` (#153).
+ */
 export const LOCKED_SCHEDULE_SOURCE_HASH =
-  'sha256:419ca56d8af626d1f0ff799075be9e72726381567c26168b7d0a6fbf8e1f3481'
+  'sha256:a420cb57bdc831be41eea490fe199873b567388c7159510acac920acd2814c8f'
 
 export const LOCKED_SCHEDULE: UnlockSchedule = loadLockedSchedule(LOCKED_SCHEDULE_FILE)
 
