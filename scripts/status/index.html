@@ -1760,15 +1760,28 @@
       // up to ~5 min old, no rate limit). Unauthenticated API calls are limited to 60 an hour per
       // IP, so the page polls only while visible, at most once a minute, slows down when the
       // quota runs low and falls back to raw until the quota resets.
+      // A spent quota is remembered across reloads (localStorage), so reloading does not retry.
+      const GATE_KEY = 'steampunk-status.apiQuotaResetAt'
       const API_GATE = { notBefore: 0 }
+      try {
+        API_GATE.notBefore = Number(localStorage.getItem(GATE_KEY)) || 0
+      } catch (_) {
+        /* storage blocked: per page only */
+      }
       function noteRateLimit(r) {
         const now = Date.now()
         const left = Number(r.headers.get('x-ratelimit-remaining'))
         const resetMs = Number(r.headers.get('x-ratelimit-reset')) * 1000 || now + 15 * 60000
-        if (r.status === 403 || r.status === 429 || left === 0) API_GATE.notBefore = resetMs
-        else if (left < 10) API_GATE.notBefore = resetMs
+        const spent = r.status === 403 || r.status === 429 || left < 10
+        if (spent) API_GATE.notBefore = resetMs
         else if (left < 30) API_GATE.notBefore = now + 5 * 60000
         else API_GATE.notBefore = now + 55000
+        try {
+          if (spent) localStorage.setItem(GATE_KEY, String(resetMs))
+          else localStorage.removeItem(GATE_KEY)
+        } catch (_) {
+          /* storage blocked */
+        }
       }
       async function refreshLoops() {
         const urls = []
