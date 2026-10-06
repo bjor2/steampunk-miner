@@ -23,6 +23,7 @@
     "balance:baseline": "vite-node scripts/balanceReport.ts --write-baseline",
     "balance:planets": "vite-node scripts/balancePlanets.ts",
     "art:export": "scripts/art/export.sh",
+    "art:merge-check": "scripts/art/merge_check.sh",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
