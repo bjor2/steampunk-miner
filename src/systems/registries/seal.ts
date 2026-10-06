@@ -68,6 +68,21 @@ export function swapRegistrySet(next: RegistrySet): RegistrySet {
   return previous
 }
 
+/**
+ * Runs `run` on a fresh set that `fill` registered into and the seal closed, then puts the set it
+ * replaced back, even when `run` throws. Synchronous only: a promise outlives the swap.
+ */
+export function withFreshRegistrySet<T>(fill: () => void, run: () => T): T {
+  const previous = swapRegistrySet(createRegistrySet())
+  try {
+    fill()
+    sealRegistrySet()
+    return run()
+  } finally {
+    swapRegistrySet(previous)
+  }
+}
+
 export function defineRegistry<T extends RegistryEntry>(name: string): Registry<T> {
   return { name, providerLimit: null }
 }

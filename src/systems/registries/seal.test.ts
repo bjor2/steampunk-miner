@@ -9,6 +9,7 @@ import {
   RegistrationRefusedError,
   sealRegistrySet,
   swapRegistrySet,
+  withFreshRegistrySet,
   type RegistrySet,
 } from './seal'
 
@@ -82,5 +83,31 @@ describe('registry seal', () => {
     expect(() => entriesOf(probes)).toThrow(FeaturesNotLoadedError)
     swapRegistrySet(kept)
     expect(entriesOf(probes).map((probe) => probe.id)).toEqual(['alpha.kept'])
+  })
+})
+
+describe('fresh registry set', () => {
+  it('runs on its own sealed registrations and restores the set it replaced', () => {
+    addToRegistry(probes, 'alpha', { id: 'alpha.kept', weight: 1 })
+    sealRegistrySet()
+    const inside = withFreshRegistrySet(
+      () => addToRegistry(probes, 'beta', { id: 'beta.fake', weight: 2 }),
+      () => entriesOf(probes).map((probe) => probe.id),
+    )
+    expect(inside).toEqual(['beta.fake'])
+    expect(entriesOf(probes).map((probe) => probe.id)).toEqual(['alpha.kept'])
+  })
+
+  it('restores the replaced set when the run throws', () => {
+    sealRegistrySet()
+    expect(() =>
+      withFreshRegistrySet(
+        () => undefined,
+        () => {
+          throw new Error('boom')
+        },
+      ),
+    ).toThrow('boom')
+    expect(entriesOf(probes)).toEqual([])
   })
 })
