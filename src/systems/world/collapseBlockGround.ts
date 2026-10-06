@@ -84,7 +84,8 @@ function isSameChunkGround(
 function isSameLayerIn(a: Uint8Array, b: Uint8Array, span: SampleSpan): boolean {
   if (a === b) return true
   for (let lsy = span.sy0; lsy <= span.sy1; lsy++) {
-    for (let at = sampleIndexOf(span.sx0, lsy); at <= sampleIndexOf(span.sx1, lsy); at++) {
+    const [first, last] = [sampleIndexOf(span.sx0, lsy), sampleIndexOf(span.sx1, lsy)]
+    for (let at = first; at <= last; at++) {
       if (a[at] !== b[at]) return false
     }
   }
