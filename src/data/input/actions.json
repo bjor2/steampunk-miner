@@ -53,6 +53,13 @@
       "keyboard": ["KeyR"]
     },
     {
+      "id": "toggle_guns",
+      "displayName": "Guns auto/off",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["KeyG"]
+    },
+    {
       "id": "ui_up",
       "displayName": "Focus up",
       "contexts": ["platform", "artefact", "settings"],

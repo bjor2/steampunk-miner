@@ -26,6 +26,16 @@ export function isGunMode(value: unknown): value is GunMode {
   return (GUN_MODES as readonly unknown[]).includes(value)
 }
 
+/** What the HUD toggle switches to. */
+export function toggledGunMode(mode: GunMode): GunMode {
+  return mode === 'auto' ? 'off' : 'auto'
+}
+
+/** The mode the HUD toggle switches from, or null with no guns mounted. */
+export function mountedGunModeOf(gun: VehicleGun): GunMode | null {
+  return isGunMounted(gun) ? gun.mode : null
+}
+
 export function isGunOnAuto(gun: VehicleGun): boolean {
   return isGunMounted(gun) && gun.mode === 'auto'
 }

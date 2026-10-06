@@ -7,6 +7,7 @@ const DRIVING: InputSituation = {
   dockableBay: null,
   dockedBay: null,
   canOpenArtefactCache: false,
+  gunMode: null,
 }
 const ON_PAD: InputSituation = { ...DRIVING, dockableBay: 'sell' }
 const DOCKED: InputSituation = {
@@ -15,6 +16,7 @@ const DOCKED: InputSituation = {
   dockableBay: null,
   dockedBay: 'sell',
   canOpenArtefactCache: false,
+  gunMode: null,
 }
 const OVER_CACHE: InputSituation = { ...DRIVING, canOpenArtefactCache: true }
 const AT_UPGRADE_BAY: InputSituation = { ...DOCKED, dockedBay: 'upgrade' }
@@ -48,6 +50,16 @@ describe('input routing', () => {
     expect(reactionToPress('ui_right', CARDS)).toEqual({ kind: 'moveFocus', step: 1 })
     expect(reactionToPress('ui_confirm', CARDS)).toEqual({ kind: 'activateFocused' })
     expect(reactionToPress('interact', CARDS)).toEqual({ kind: 'none' })
+  })
+
+  it('switches mounted guns between auto and off, and does nothing with no guns (#107)', () => {
+    expect(reactionToPress('toggle_guns', { ...DRIVING, gunMode: 'auto' })).toEqual(
+      submitted('setGunMode', { mode: 'off' }),
+    )
+    expect(reactionToPress('toggle_guns', { ...DRIVING, gunMode: 'off' })).toEqual(
+      submitted('setGunMode', { mode: 'auto' }),
+    )
+    expect(reactionToPress('toggle_guns', DRIVING)).toEqual({ kind: 'none' })
   })
 
   it('undocks when the platform screen is closed with ui_cancel', () => {

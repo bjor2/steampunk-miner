@@ -16,6 +16,7 @@ import { chordOf } from '../systems/input/keyCodes'
 import { canOpenArtefactCache } from '../systems/authority/artefactRules'
 import { dockableBayOf, dockedBayOf } from '../systems/authority/dockRules'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { mountedGunModeOf } from '../systems/vehicle/vehicleGun'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
 import { inputLayerOf } from './presentationSlice'
@@ -111,6 +112,7 @@ function situationNow() {
     dockableBay: dockableBayOf(state, game.playerId),
     dockedBay: dockedBayOf(state, game.playerId),
     canOpenArtefactCache: canOpenArtefactCache(state, game.playerId),
+    gunMode: mountedGunModeOf(state.players[game.playerId].vehicle.gun),
   }
 }
 

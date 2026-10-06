@@ -1,7 +1,7 @@
 /**
  * The platform's command intents (decision #8 registered commands, #23), as the store submits
  * them: `Dock {bay}`, `Undock`, `SellCargo {resourceTier | all}`, `RepairHull`, `RechargeEnergy`,
- * `QuickService`, `BuyUpgrade {upgradeId}`, `BuyCasingGrade`, and `Travel {toPlanet}` (#10). The authority checks
+ * `QuickService`, `BuyUpgrade {upgradeId}`, `BuyCasingGrade`, `BuyGun` (#107) and `Travel {toPlanet}` (#10). The authority checks
  * and prices each one.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
@@ -38,6 +38,10 @@ export function buyUpgradeCommand(upgradeId: string): CommandIntent<'buyUpgrade'
 
 export function buyCasingGradeCommand(): CommandIntent<'buyCasingGrade'> {
   return { type: 'buyCasingGrade', payload: {} }
+}
+
+export function buyGunCommand(): CommandIntent<'buyGun'> {
+  return { type: 'buyGun', payload: {} }
 }
 
 export function travelCommand(toPlanet: number): CommandIntent<'travel'> {

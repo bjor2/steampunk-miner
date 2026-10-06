@@ -8,13 +8,14 @@
  * closes the top layer: settings, the cards (no pick, the cache stays live), then the platform
  * screen (that is `Undock`), and in `vehicle` it opens settings. `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
- * refuse, the quick action away from the Sell bay (#37, #40) and a tow call while the vehicle can
- * still move do nothing and are not buffered.
+ * refuse, the quick action away from the Sell bay (#37, #40), a tow call while the vehicle can
+ * still move and the guns' toggle with no guns mounted (#107) do nothing and are not buffered.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import { openArtefactCacheCommand } from '../artefacts/artefactCommands'
 import { dockCommand, quickServiceCommand, undockCommand } from '../platform/platformCommands'
-import { requestRescueCommand } from '../vehicle/vehicleCommands'
+import { requestRescueCommand, setGunModeCommand } from '../vehicle/vehicleCommands'
+import { toggledGunMode, type GunMode } from '../vehicle/vehicleGun'
 import type { ZoomChange } from '../render/viewZoom'
 import type { VehicleMode } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
@@ -40,6 +41,8 @@ export interface InputSituation {
   dockedBay: BayId | null
   /** `canOpenArtefactCache` (#46): the cache prompt shows, and `interact` opens it, exactly then. */
   canOpenArtefactCache: boolean
+  /** The guns' mode, or null with no guns mounted: then `toggle_guns` does nothing (#107). */
+  gunMode: GunMode | null
 }
 
 /** The overlays that sit above the vehicle or platform layer when open. */
@@ -67,6 +70,8 @@ const REACTIONS_BY_LAYER: Readonly<
     interact: interactReaction,
     request_rescue: ({ vehicleMode }) =>
       isWaitingForTow(vehicleMode) ? submit(requestRescueCommand()) : NONE,
+    toggle_guns: ({ gunMode }) =>
+      gunMode === null ? NONE : submit(setGunModeCommand(toggledGunMode(gunMode))),
     open_settings: () => ({ kind: 'openSettings' }),
     zoom_in: () => ({ kind: 'zoom', change: 'in' }),
     zoom_out: () => ({ kind: 'zoom', change: 'out' }),

@@ -15,6 +15,15 @@ export function requestRescueCommand(): CommandIntent<'requestRescue'> {
   return { type: 'requestRescue', payload: {} }
 }
 
+/** The HUD toggle (#107); a mode that is not `auto` or `off` is refused by the authority. */
+export function setGunModeCommand(mode: string): CommandIntent<'setGunMode'> {
+  return { type: 'setGunMode', payload: { mode } }
+}
+
+export function setGunLevelCommand(level: number): CommandIntent<'debug.setGunLevel'> {
+  return { type: 'debug.setGunLevel', payload: { level } }
+}
+
 export function setUpgradeCommand(
   upgradeId: string,
   level: number,
