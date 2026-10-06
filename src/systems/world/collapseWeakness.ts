@@ -7,13 +7,16 @@
  *   the core). Unlined walls (casing 0) are ignored, so the unlined face and the last ~2.15 m behind
  *   the drill never make a block weak, and carving a lined sample clears it from the test.
  *
+ * Breached lining (#111) is lined at an effective grade of 0, so it is weak in every band, while
+ * never-lined rock stays ignored.
+ *
  * Weakness is a pure function of the ground, so it is cached per block and recomputed only when
  * one of the chunk deltas it reads changes (a `GroundChanged` touched the block or its border).
  */
 import { requiredCasingGrade } from '../economy/casingGrades'
 import { blockIdOf, samplesOfBlock, type CollapseBlock } from './collapseBlock'
 import { COLLAPSE_BLOCK_SAMPLES } from '../../constants/balance'
-import type { ChunkDelta } from './chunkDelta'
+import { effectiveCasingGrade, isLined, type ChunkDelta } from './chunkDelta'
 import { casingBandOfTile } from './casingBand'
 import type { PlanetParams } from './planetParams'
 import { chunkOfSample, SAMPLES_PER_TILE } from './sampleGrid'
@@ -83,7 +86,7 @@ function wallWeaknessOf(
 ): BlockWeakness | null {
   const band = casingBandOfTile(params, tileOf(wall.sx), tileOf(wall.sy))
   const required = requiredCasingGrade(band)
-  const grade = casingAt(layers, wall.sx, wall.sy)
+  const grade = effectiveCasingGrade(casingAt(layers, wall.sx, wall.sy))
   return grade < required ? { band, weakestGrade: grade, required } : null
 }
 
@@ -95,7 +98,7 @@ function weaker(kept: BlockWeakness | null, next: BlockWeakness | null): BlockWe
 }
 
 function isLinedWall(layers: SampleLayers, sample: SamplePoint): boolean {
-  return isSolidAt(layers, sample.sx, sample.sy) && casingAt(layers, sample.sx, sample.sy) > 0
+  return isSolidAt(layers, sample.sx, sample.sy) && isLined(casingAt(layers, sample.sx, sample.sy))
 }
 
 const NEIGHBOUR_OFFSETS: readonly (readonly [number, number])[] = [

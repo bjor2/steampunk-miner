@@ -5,7 +5,7 @@
  * a session, so a sample's density and casing change together and are written once.
  */
 import { cellsNowYielding, withYieldedCells, type YieldedCell } from './cellYield'
-import { withCasing, withDensity, type ChunkDelta } from './chunkDelta'
+import { effectiveCasingGrade, withCasing, withDensity, type ChunkDelta } from './chunkDelta'
 import type { WeightedSample } from './stampShape'
 import type { PlanetParams } from './planetParams'
 import {
@@ -111,7 +111,10 @@ export function clearCasingSample(session: EditSession, sample: WeightedSample):
   chunk.casing ??= currentCasingOfChunk(session.world, chunk.cx, chunk.cy).slice()
   chunk.casing[sampleIndexOf(localSampleOf(sample.sx), localSampleOf(sample.sy))] = 0
   const cleared = session.casingCleared
-  session.casingCleared = { samples: cleared.samples + 1, grade: Math.max(cleared.grade, grade) }
+  session.casingCleared = {
+    samples: cleared.samples + 1,
+    grade: Math.max(cleared.grade, effectiveCasingGrade(grade)),
+  }
 }
 
 /**

@@ -12,6 +12,7 @@
  *
  * - A lined sample (#41) carves in the drill time of its casing grade, not its cell's, and loses its
  *   casing when its density reaches 0. Its density still counts toward its cell's yield (#56).
+ *   Breached lining (#111) carves at grade 0, in its cell's own drill time.
  *
  * The dock pad never carves. Every change is reported per chunk with its dirty rectangle in
  * chunk-local samples, the shape of `GroundChanged`.
@@ -37,6 +38,7 @@ import {
   type EditSession,
   type GroundEdit,
 } from './groundEditSession'
+import { effectiveCasingGrade } from './chunkDelta'
 import type { PlanetParams } from './planetParams'
 import { SOLID_DENSITY } from './sampleGrid'
 import type { TilePoint } from './tileGrid'
@@ -182,7 +184,7 @@ function drillTicksOfSample(
   drillTicksOf: CellDrillTicks,
 ): number | null {
   const tile = tileOfSample(sample)
-  const grade = casingGradeOf(session, sample)
+  const grade = effectiveCasingGrade(casingGradeOf(session, sample))
   const key = `${tile.tx},${tile.ty}#${grade}`
   const known = session.drillTicks.get(key)
   if (known !== undefined) return known

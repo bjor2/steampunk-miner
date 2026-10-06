@@ -8,7 +8,7 @@ import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
 import type { Cargo, VehicleMode, VehicleState } from '../vehicle/vehicleState'
-import { MAX_SAMPLE_CASING_GRADE, type ChunkDelta } from '../world/chunkDelta'
+import { isCasingValue, type ChunkDelta } from '../world/chunkDelta'
 import { CHUNK_SAMPLES } from '../world/sampleGrid'
 import { CHUNK_SIZE } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
@@ -23,6 +23,10 @@ export interface PortableWorld {
 const VEHICLE_MODES: readonly VehicleMode[] = ['docked', 'active', 'stranded', 'destroyed']
 const POSE_FIELDS = ['x', 'y', 'vx', 'vy', 'upx', 'upy'] as const
 const MAX_BYTE = 255
+
+function isByte(value: number): boolean {
+  return value <= MAX_BYTE
+}
 
 export function portableVehicleOf(vehicle: VehicleState): PortableVehicle {
   return { ...vehicle, hull: toCanonical(vehicle.hull) }
@@ -116,8 +120,8 @@ function isPortablePose(pose: unknown): pose is VehiclePose {
 function isPortableDelta(delta: unknown): delta is ChunkDelta {
   return (
     isJsonObject(delta) &&
-    isSampleRuns(delta.density, MAX_BYTE) &&
-    isSampleRuns(delta.casing, MAX_SAMPLE_CASING_GRADE) &&
+    isSampleRuns(delta.density, isByte) &&
+    isSampleRuns(delta.casing, isCasingValue) &&
     isWholeNumberList(delta.yieldedRows) &&
     delta.yieldedRows.length === CHUNK_SIZE &&
     Array.isArray(delta.overrides) &&
@@ -126,13 +130,13 @@ function isPortableDelta(delta: unknown): delta is ChunkDelta {
   )
 }
 
-/** No runs, or `[count, value, ...]` pairs covering the chunk's samples exactly (#36, #41). */
-function isSampleRuns(runs: unknown, maxValue: number): boolean {
+/** No runs, or `[count, value, ...]` pairs covering the chunk's samples exactly (#36, #41, #111). */
+function isSampleRuns(runs: unknown, isValue: (value: number) => boolean): boolean {
   if (!isWholeNumberList(runs) || runs.length % 2 !== 0) return false
   const counts = runs.filter((_, at) => at % 2 === 0)
   const bytes = runs.filter((_, at) => at % 2 === 1)
   const total = counts.reduce((sum, count) => sum + count, 0)
-  return (runs.length === 0 || total === CHUNK_SAMPLES) && bytes.every((byte) => byte <= maxValue)
+  return (runs.length === 0 || total === CHUNK_SAMPLES) && bytes.every(isValue)
 }
 
 function isWholeNumberList(value: unknown): value is number[] {

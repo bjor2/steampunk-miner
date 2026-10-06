@@ -10,14 +10,15 @@
  *    time and `casing_drilled` change. Rock with no air beside it is never lined, so lining never
  *    spreads deeper than one sample.
  * 2. A solid **casing** sample of a lower grade is raised to `grade` (relining); a grade that
- *    already matches is left alone.
+ *    already matches is left alone. Breached lining (#111) holds at grade 0, so it is relined like
+ *    any lower grade: free, as it lines no new rock.
  *
  * Never refused: a grade too low for the band still lines (#41). The dock pad is never lined, as it
  * is never carved. A player grade above 15 lines at 15, the most a sample holds.
  */
 import { CASING_LINING_HALF_WIDTH_MM, DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
 import { cellSampleIndices } from './cellYield'
-import { MAX_SAMPLE_CASING_GRADE } from './chunkDelta'
+import { effectiveCasingGrade, isLined, MAX_SAMPLE_CASING_GRADE } from './chunkDelta'
 import {
   casingGradeOf,
   closeSession,
@@ -86,7 +87,7 @@ export function lineRing(
 }
 
 /** The samples of the annulus in row order, as full-weight stamp samples. */
-function ringSamplesOf(ring: CasingRing): WeightedSample[] {
+export function ringSamplesOf(ring: CasingRing): WeightedSample[] {
   const outer = ring.clearMm + ring.widthMm
   const samples: WeightedSample[] = []
   for (
@@ -116,7 +117,7 @@ function isInAnnulus(ring: CasingRing, sx: number, sy: number): boolean {
 function ringStepOf(session: EditSession, sample: WeightedSample, grade: number): RingStep {
   if (!isCarvable(session, sample) || densityOf(session, sample) <= ISO_DENSITY) return 'skip'
   const current = casingGradeOf(session, sample)
-  if (current > 0) return current < grade ? 'reline' : 'skip'
+  if (isLined(current)) return effectiveCasingGrade(current) < grade ? 'reline' : 'skip'
   return isBesideAir(session, sample) ? 'line' : 'skip'
 }
 
@@ -150,5 +151,5 @@ export function isCellLined(world: WorldState, params: PlanetParams, tile: TileP
   const cy = chunkOfTile(tile.ty)
   const casing = currentCasingOfChunk(world, cx, cy)
   const density = currentDensityOfChunk(world, params, cx, cy)
-  return cellSampleIndices(tile).some((index) => casing[index] > 0 && density[index] > 0)
+  return cellSampleIndices(tile).some((index) => isLined(casing[index]) && density[index] > 0)
 }

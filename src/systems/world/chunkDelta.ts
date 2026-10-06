@@ -7,8 +7,9 @@
  * - `yieldedRows`: one bit per material cell that has credited its ore (#36 Yield), 32 uint32
  *   words, word `ly` holding bit `lx` of chunk row `ly`. A yielded cell counts as open ground for
  *   every cell rule (enemies, the bot, the drill), as a removed tile did under generator 1.
- * - `casing`: the casing layer (#41), one grade per density sample (0 = no casing, 1 to 15),
- *   run-length encoded like `density`. Generation lays no casing, so the runs are the layer itself.
+ * - `casing`: the casing layer (#41), one grade per density sample (0 = no casing, 1 to 15, or
+ *   `CASING_BREACHED`), run-length encoded like `density`. Generation lays no casing, so the runs
+ *   are the layer itself.
  * - `overrides`: sparse `[index, cell]` material overrides sorted by index (placed supports later).
  * - `version`: counts the changes, so a renderer or collider can tell a chunk moved on (#36
  *   `GroundChanged`).
@@ -22,6 +23,32 @@ import { AIR_CELL } from './worldCell'
 
 /** The highest grade a casing sample holds (#41: 1 to 15); a higher player grade lines at 15. */
 export const MAX_SAMPLE_CASING_GRADE = 15
+
+/**
+ * Lining a tunnel wrecker gnawed (#111 Technical Director, a reserved value of the same layer):
+ * still lined, but holding at grade 0, so it is weak in every band. 16 to 254 stay invalid.
+ */
+export const CASING_BREACHED = 255
+
+/** The grade a casing sample holds against collapse and the drill: 0 for breached lining. */
+export function effectiveCasingGrade(casing: number): number {
+  return casing === CASING_BREACHED ? 0 : casing
+}
+
+/** Lined, breached or not: never-lined rock is 0. */
+export function isLined(casing: number): boolean {
+  return casing > 0
+}
+
+/** Lining at a grade of 1 to 15, the only casing a gnaw breaches. */
+export function isIntactLining(casing: number): boolean {
+  return isLined(casing) && casing !== CASING_BREACHED
+}
+
+/** A value the casing layer may hold: none, a grade, or breached. */
+export function isCasingValue(casing: number): boolean {
+  return casing <= MAX_SAMPLE_CASING_GRADE || casing === CASING_BREACHED
+}
 
 export interface ChunkDelta {
   density: readonly number[]
