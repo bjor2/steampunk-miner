@@ -460,13 +460,13 @@
         display: none;
       }
       #tab-issues .bucket b {
-        color: var(--brass);
+        color: var(--accent);
         margin-left: 3px;
       }
       #tab-issues .bucket[aria-pressed='true'],
       #tab-issues .view[aria-pressed='true'] {
-        border-color: var(--brass);
-        background: #3a2e1a;
+        border-color: var(--accent);
+        background: var(--accent-soft);
         color: var(--text);
         font-weight: 600;
       }
@@ -474,7 +474,7 @@
         color: var(--muted);
       }
       #tab-issues .iss {
-        border-bottom: 1px solid #2c231a;
+        border-bottom: 1px solid var(--line2);
       }
       #tab-issues .iss > summary {
         list-style: none;
@@ -491,7 +491,7 @@
       }
       #tab-issues .iss > summary::before {
         content: '▸';
-        color: var(--brass);
+        color: var(--accent);
         width: 10px;
         transition: transform 0.12s;
       }
@@ -499,7 +499,7 @@
         transform: rotate(90deg);
       }
       #tab-issues .iss > summary:hover {
-        background: #2a2119;
+        background: var(--hover);
       }
       #tab-issues .itype {
         font-size: 11px;
@@ -518,7 +518,7 @@
       }
       #tab-issues .itype.t-plan,
       #tab-issues .itype.t-map {
-        color: var(--brass);
+        color: var(--violet);
       }
       #tab-issues .started {
         font-size: 12px;
