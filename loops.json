@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T01:23:38Z",
+  "updated_at": "2026-10-06T01:23:49Z",
   "entries": {
     "test-loop/1": {
       "loop": "test-loop",
@@ -28,9 +28,25 @@
       "slot": null,
       "updated_at": "2026-10-06T01:23:38Z",
       "host": "grok-bot-vm-452660841"
+    },
+    "race/4": {
+      "loop": "race",
+      "slot": "4",
+      "state": "working",
+      "issue": null,
+      "note": "race 4",
+      "updated_at": "2026-10-06T01:23:49Z",
+      "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-06T01:23:49Z",
+      "key": "race/4",
+      "state": "working",
+      "issue": null,
+      "note": "race 4"
+    },
     {
       "at": "2026-10-06T01:23:38Z",
       "key": "test-loop",
