@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { CONTENT_REGISTRY, contentRegistrationOf } from './content'
 import { addToRegistry, withFreshRegistrySet } from './seal'
 import { ATTACH_IDS, ATTACH_USE_REGISTRY, attachOf } from './vehicleAttach'
-import { acceptedSlotsOf, LOADOUT_ACCEPTANCE_REGISTRY, LOADOUT_SLOT_IDS } from './vehicleLoadout'
+import {
+  acceptedSlotsOf,
+  LOADOUT_ACCEPTANCE_REGISTRY,
+  LOADOUT_SLOT_IDS,
+  slotOpenedBy,
+} from './vehicleLoadout'
 
 function registerBitAndAcceptance(): void {
   addToRegistry(
@@ -23,9 +28,13 @@ function registerBitAndAcceptance(): void {
 }
 
 describe('vehicle loadout registry', () => {
-  it('holds the ten slots and thirteen attach points of the #162 table', () => {
-    expect(LOADOUT_SLOT_IDS).toHaveLength(10)
+  it('holds the eight slots and thirteen attach points of the #162 table', () => {
+    expect(LOADOUT_SLOT_IDS).toHaveLength(8)
     expect(ATTACH_IDS).toHaveLength(13)
+  })
+
+  it('has no extractor slot, since extractors are mounted once owned', () => {
+    expect(LOADOUT_SLOT_IDS.filter((slot) => slot.startsWith('rig.'))).toEqual([])
   })
 
   it('accepts an item in its own slots and every slot an acceptance adds, in slot-table order', () => {
@@ -39,6 +48,27 @@ describe('vehicle loadout registry', () => {
     expect(withFreshRegistrySet(registerBitAndAcceptance, () => acceptedSlotsOf('nope'))).toEqual(
       [],
     )
+  })
+})
+
+describe('power-up cradles', () => {
+  const cradle = {
+    id: 'mobility.cradle-3',
+    iconId: 'icon-cradle',
+    slots: [],
+    attach: null,
+    opensSlot: 'powerup.3',
+  } as const
+
+  it('open the slot they name, and no other item opens one', () => {
+    const opened = withFreshRegistrySet(
+      () => {
+        registerBitAndAcceptance()
+        addToRegistry(CONTENT_REGISTRY, 'mobility', contentRegistrationOf('vehicle-item', cradle))
+      },
+      () => [slotOpenedBy('mobility.cradle-3'), slotOpenedBy('drill-gear.bit')],
+    )
+    expect(opened).toEqual(['powerup.3', null])
   })
 })
 
