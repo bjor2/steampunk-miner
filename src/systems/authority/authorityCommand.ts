@@ -22,8 +22,11 @@ import type { BayId } from '../world/dockBays'
  * 9: `auto_guns` (#93, #107): the vehicle's gun, `BuyGun`, `SetGunMode`, `debug.setGunLevel`, gun
  *    shots on the clock, `GunHit` and `EnemyKilled {by: gun}`.
  * 10: the Refinery bay (#105, #92): `Dock {bay: refinery}`, its commands, slots and events.
+ * 11: scripted mining (`drillTile`) lays and charges casing as a pose's drilling does, lining is
+ *    charged per metre of tunnel axis, not per ring, and onto the vehicle's lining bill, settled
+ *    out of the next sale as `LiningSettled` instead of debited mid-dive (#115, #76 amendment).
  */
-export const AUTHORITY_PROTOCOL_VERSION = 10
+export const AUTHORITY_PROTOCOL_VERSION = 11
 
 export interface CommandPayloads {
   /**

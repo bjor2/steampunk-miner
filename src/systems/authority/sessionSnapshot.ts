@@ -35,6 +35,7 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 13: the vehicle's lining bill and each casing-trail point's axis length (#115, #76 amendment);
  * 12: the Refinery bay's slots on the platform (#105, #92); 11: the vehicle's guns and combat's gun
  * timing and unlogged hits (#93); 10: breached casing (#111, #94), 255 in the casing runs, and the
  * tunnel wrecker's combat state; 9: the blocks warning or
@@ -42,7 +43,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 12
+export const SNAPSHOT_VERSION = 13
 
 export interface SessionSnapshot {
   snapshotVersion: number

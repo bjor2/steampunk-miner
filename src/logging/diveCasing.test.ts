@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { countDrillDives, diveTicksWithoutCasing } from './diveCasing'
 import type { RunEventData, RunEventName } from './eventNames'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 function line<N extends RunEventName>(tick: number, event: N, data: RunEventData<N>): RunEvent {
   return {
-    v: 1,
+    v: LOG_SCHEMA_VERSION,
     seq: tick,
     tick,
     timestamp: tick,

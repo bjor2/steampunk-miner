@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { deriveDiveSummaries } from './diveSummaries'
 import type { RunEventData, RunEventName } from './eventNames'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 let nextSeq = 0
 
@@ -12,7 +12,7 @@ function line<N extends RunEventName>(
   planet = 4,
 ): RunEvent {
   return {
-    v: 1,
+    v: LOG_SCHEMA_VERSION,
     seq: nextSeq++,
     tick,
     timestamp: tick * 7.3,

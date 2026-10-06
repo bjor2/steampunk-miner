@@ -3,7 +3,7 @@ import { computeVehicleStats } from '../vehicle/vehicleStats'
 import { canonicalStatsOf } from '../vehicle/vehicleStatsView'
 import { FACING, bayPoseAt, dockedPoseAt } from '../vehicle/vehiclePose'
 import type { BayId } from '../world/dockBays'
-import { toCanonical } from '../money'
+import { fromCanonical, sub, toCanonical } from '../money'
 import type { CommandIntent } from './authorityCommand'
 import { canDock, dockedBayOf } from './dockRules'
 import type { DomainEvent } from './domainEvent'
@@ -23,6 +23,11 @@ import {
 import { canBuyUpgrade } from './workshopRules'
 
 const FULL_TANK = 150 * 240
+
+/** A lined tunnel falling in (#43): the block's collapse and the ground it filled. */
+function isCollapseEvent(event: DomainEvent): boolean {
+  return event.type === 'CollapseStarted' || event.type === 'GroundChanged'
+}
 const SIX_TRACKS = ['cargo_hold', 'boiler', 'engine', 'hull', 'drill_power', 'drill_tip']
 
 function poseAtDock(velocity: { vx: number; vy: number } = { vx: 0, vy: 0 }) {
@@ -191,7 +196,8 @@ describe('platform: core bay', () => {
     mineTile(session, 10, ore)
     const tick = mineCore(session, 60, coreTiles(10))
     session.submit(tick, { type: 'debug.setHull', payload: { hull: '0' } })
-    const towed = session.advanceTo(tick + 120)
+    // The core dig's casing (#115) is grade 1 in a deep band, so it collapses meanwhile (#43).
+    const towed = session.advanceTo(tick + 120).filter((event) => !isCollapseEvent(event))
     expect(typesOf(towed)).toEqual([
       'RescueTriggered',
       'MoneyChanged',
@@ -266,16 +272,12 @@ describe('platform: shop', () => {
   it('sells the whole hold at 10 per planet-1 surface ore unit and empties it', () => {
     const session = createScriptedSession()
     const tick = mineOreAndDock(session, 4)
+    const lining = serviceQuote(session.state(), 'p1').liningPaid
     const events = session.submit(tick + 1, sell('all'))
-    expect(events).toEqual([
-      expect.objectContaining({
-        type: 'ResourceSold',
-        items: [{ tier: 1, amount: 4 }],
-        value: '4e+1',
-        mode: 'all',
-      }),
-    ])
-    expect(walletOf(session)).toBe('4e+1')
+    // Scripted mining lines its tiles as a player's drill does (#115), so the sale settles that bill.
+    expect(typesOf(events)).toEqual(['ResourceSold', 'LiningSettled'])
+    expect(events[0]).toMatchObject({ items: [{ tier: 1, amount: 4 }], value: '4e+1', mode: 'all' })
+    expect(walletOf(session)).toBe(toCanonical(sub(fromCanonical('40'), lining)))
     expect(session.vehicle().cargo.ore).toEqual({})
   })
 
@@ -391,7 +393,12 @@ describe('platform: quick service', () => {
   it('sells, repairs and recharges in that order with the three normal events', () => {
     const { session, tick } = wornSessionAtDock()
     const events = session.submit(tick, quickService)
-    expect(typesOf(events)).toEqual(['ResourceSold', 'RepairPurchased', 'EnergyRecharged'])
+    expect(typesOf(events)).toEqual([
+      'ResourceSold',
+      'LiningSettled',
+      'RepairPurchased',
+      'EnergyRecharged',
+    ])
     expect(events[0]).toMatchObject({ mode: 'all' })
   })
 
@@ -407,9 +414,10 @@ describe('platform: quick service', () => {
     expect(walletOf(quick.session)).toBe(walletOf(three.session))
     const { hull, energy, cargo } = three.session.vehicle()
     expect(quick.session.vehicle()).toMatchObject({ hull, energy, cargo })
-    // 40 sold, 5.625 repair, 5.0625 -> 5.063 recharge.
+    // 40 sold, less the mining's lining bill, 5.625 repair, 5.0625 -> 5.063 recharge.
     expect(toCanonical(quickServiceCharges(quote))).toBe('1.0688e+1')
-    expect(walletOf(quick.session)).toBe('2.9312e+1')
+    const left = sub(sub(fromCanonical('40'), quote.liningPaid), fromCanonical('10.688'))
+    expect(walletOf(quick.session)).toBe(toCanonical(left))
   })
 
   it('refuses when the sale and the wallet cannot pay the repair and recharge', () => {

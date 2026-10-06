@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import type { Scenario } from '../systems/scenario'
+import { countDrillDives, diveTicksWithoutCasing } from './diveCasing'
 import {
   derivePacingReport,
   formatPacingReport,
@@ -25,5 +26,8 @@ describe('balance regression: the pacing bot holding assay_beacon (#46, S11)', (
     console.log(`${formatPacingReport(report)}\n\n${formatPacingVerdicts(pacingVerdicts(report))}`)
     expect(pacingProblems(report)).toEqual([])
     expect(events.some((event) => event.event === 'artefact_assay_applied')).toBe(true)
+    // #115: the bot's drilling lays casing as a player's does, on every dive.
+    expect(countDrillDives(events)).toBeGreaterThan(0)
+    expect(diveTicksWithoutCasing(events)).toEqual([])
   })
 })

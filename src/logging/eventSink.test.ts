@@ -6,11 +6,11 @@ import {
   type RunLogTransport,
 } from './eventSink'
 import { parseNdjson } from './ndjson'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 function eventNumber(seq: number, runId = 'run_a'): RunEvent {
   return {
-    v: 1,
+    v: LOG_SCHEMA_VERSION,
     seq,
     tick: 0,
     timestamp: seq,

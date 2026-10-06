@@ -34,7 +34,8 @@ describe('selling with assay_beacon (#46)', () => {
   it('sells band-1 ore at the band-3 unit price and says so before the sale', () => {
     const session = dockedWithThreeOre(true)
     const events = session.submit(201, sellAll)
-    expect(typesOf(events)).toEqual(['ArtefactAssayApplied', 'ResourceSold'])
+    // The mining's lining bill (#115) settles after the sale.
+    expect(typesOf(events)).toEqual(['ArtefactAssayApplied', 'ResourceSold', 'LiningSettled'])
     expect(events[0]).toMatchObject({ tier: 1, band: 1, unitPrice: '2.25e+1' })
     expect(soldValueOf(events)).toMatchObject({ value: '6.75e+1' })
   })
@@ -42,7 +43,7 @@ describe('selling with assay_beacon (#46)', () => {
   it('sells the same ore at its own price without the beacon', () => {
     const session = dockedWithThreeOre(false)
     const events = session.submit(201, sellAll)
-    expect(typesOf(events)).toEqual(['ResourceSold'])
+    expect(typesOf(events)).toEqual(['ResourceSold', 'LiningSettled'])
     expect(soldValueOf(events)).toMatchObject({ value: '3e+1' })
   })
 

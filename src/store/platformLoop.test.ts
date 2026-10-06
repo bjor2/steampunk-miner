@@ -78,11 +78,11 @@ const loggedNames = () => sink.events.map((event) => event.event as RunEventName
 const platformNames = () =>
   loggedNames().filter((name) => RUN_EVENT_REGISTRY[name].group === 'platform')
 
-const soldValues = () =>
+const sumOfLogged = (name: RunEventName, field: string) =>
   sink.events
-    .filter((event) => event.event === 'resource_sold')
+    .filter((event) => event.event === name)
     .reduce(
-      (total, event) => add(total, fromCanonical((event.data as { value: string }).value)),
+      (total, event) => add(total, fromCanonical((event.data as Record<string, string>)[field])),
       ZERO_MONEY,
     )
 
@@ -99,15 +99,19 @@ describe('platform loop from a fresh profile', () => {
     driveToUpgradeBay()
     for (const upgradeId of SIX_TRACKS) game().buyUpgrade(upgradeId)
 
+    // Scripted mining lines its tiles (#115), so each sale settles the trip's lining bill.
     expect(platformNames()).toEqual([
       'dock_entered',
       'resource_sold',
+      'lining_settled',
       'dock_left',
       'dock_entered',
       'resource_sold',
+      'lining_settled',
       'dock_left',
       'dock_entered',
       'resource_sold',
+      'lining_settled',
       'dock_left',
       'dock_entered',
       ...SIX_TRACKS.map(() => 'upgrade_purchased'),
@@ -117,7 +121,11 @@ describe('platform loop from a fresh profile', () => {
         .filter((event) => event.event === 'upgrade_purchased')
         .map((event) => (event.data as { upgradeId: string }).upgradeId),
     ).toEqual(SIX_TRACKS)
-    expect(toCanonical(game().money)).toBe(toCanonical(sub(soldValues(), fromCanonical('252'))))
+    const sold = sumOfLogged('resource_sold', 'value')
+    const lining = sumOfLogged('lining_settled', 'paid')
+    expect(toCanonical(game().money)).toBe(
+      toCanonical(sub(sub(sold, lining), fromCanonical('252'))),
+    )
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
     expect(game().debugApplied).toBe(false)
   })

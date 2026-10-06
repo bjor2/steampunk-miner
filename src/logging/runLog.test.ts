@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createMemorySink } from './eventSink'
 import { createRunLog } from './runLog'
-import type { RunEventStamp } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEventStamp } from './runEvent'
 
 const stamp: RunEventStamp = {
   playerId: 'player_1',
@@ -28,7 +28,7 @@ describe('run log', () => {
     runLog.record(stamp, 'resource_collected', { resourceTier: 42, amount: 6, value: '1.25e+6' })
     expect(sink.events).toEqual([
       {
-        v: 1,
+        v: LOG_SCHEMA_VERSION,
         seq: 0,
         tick: 8120,
         timestamp: 135.4,

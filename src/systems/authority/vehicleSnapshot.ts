@@ -1,6 +1,6 @@
 /**
  * The vehicle and world parts of the session snapshot (#11 section 5): the same plain JSON as the
- * state, with the hull BigStat as its canonical string. Reading checks the shape
+ * state, with the hull BigStat and the lining bill as canonical strings. Reading checks the shape
  * so a malformed snapshot is refused with listed problems before anything is built from it; the
  * digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
@@ -15,7 +15,10 @@ import { CHUNK_SIZE } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 
-export type PortableVehicle = Omit<VehicleState, 'hull'> & { hull: string }
+export type PortableVehicle = Omit<VehicleState, 'hull' | 'liningBill'> & {
+  hull: string
+  liningBill: string
+}
 
 export interface PortableWorld {
   chunks: Record<string, ChunkDelta>
@@ -30,11 +33,19 @@ function isByte(value: number): boolean {
 }
 
 export function portableVehicleOf(vehicle: VehicleState): PortableVehicle {
-  return { ...vehicle, hull: toCanonical(vehicle.hull) }
+  return {
+    ...vehicle,
+    hull: toCanonical(vehicle.hull),
+    liningBill: toCanonical(vehicle.liningBill),
+  }
 }
 
 export function vehicleOfPortable(vehicle: PortableVehicle): VehicleState {
-  return { ...vehicle, hull: fromCanonical(vehicle.hull) }
+  return {
+    ...vehicle,
+    hull: fromCanonical(vehicle.hull),
+    liningBill: fromCanonical(vehicle.liningBill),
+  }
 }
 
 /** The world is integers only since #36 (drill progress is density), so it travels as is. */
@@ -60,9 +71,14 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
       : [`${path}.casingShortBand must be null or a whole band`]),
     ...(isPortableCasingTrail(vehicle.casingTrail)
       ? []
-      : [`${path}.casingTrail must hold safe-integer xMm and yMm points`]),
+      : [
+          `${path}.casingTrail must hold safe-integer xMm and yMm points (and lengthMm on unlined ones)`,
+        ]),
     ...(isPortableGun(vehicle.gun) ? [] : [`${path}.gun must hold a whole level and a gun mode`]),
     ...(isNonNegativeMoneyText(vehicle.hull) ? [] : [`${path}.hull must be a decimal string`]),
+    ...(isNonNegativeMoneyText(vehicle.liningBill)
+      ? []
+      : [`${path}.liningBill must be a decimal string`]),
     ...(isPortableCargo(vehicle.cargo) ? [] : [`${path}.cargo must hold whole units`]),
     ...(vehicle.pose === null || isPortablePose(vehicle.pose) ? [] : [`${path}.pose is malformed`]),
     ...(isWholeNumberList(vehicle.energyLowLogged) ? [] : [`${path}.energyLowLogged is malformed`]),
@@ -94,8 +110,12 @@ function isPortableCasingTrail(trail: unknown): boolean {
     isJsonObject(trail) &&
     (trail.lastAxisPoint === null || isRingPoint(trail.lastAxisPoint)) &&
     Array.isArray(trail.unlined) &&
-    trail.unlined.every(isRingPoint)
+    trail.unlined.every(isAxisPoint)
   )
+}
+
+function isAxisPoint(point: unknown): boolean {
+  return isRingPoint(point) && isWholeNumber((point as { lengthMm: unknown }).lengthMm)
 }
 
 function isRingPoint(point: unknown): boolean {

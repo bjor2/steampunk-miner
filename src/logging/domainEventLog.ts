@@ -53,9 +53,9 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'casing_placed',
     data: { samples, relined, grade },
   }),
-  CasingLined: ({ lengthMm, band, grade, price, paid }) => ({
+  CasingLined: ({ lengthMm, band, grade, price }) => ({
     event: 'casing_lined',
-    data: { lengthMm, band, grade, price, paid },
+    data: { lengthMm, band, grade, price },
   }),
   // A breach per chunk replicates the gnaw; `ring_gnawed` is its one log line per ring (#111).
   CasingBreached: () => null,
@@ -176,6 +176,10 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
   ResourceSold: ({ items, value, mode }) => ({
     event: 'resource_sold',
     data: { items, value, mode },
+  }),
+  LiningSettled: ({ billed, paid, forgiven }) => ({
+    event: 'lining_settled',
+    data: { billed, paid, forgiven },
   }),
   ArtefactCacheSpawned: ({ tx, ty, band }) => ({
     event: 'artefact_cache_spawned',

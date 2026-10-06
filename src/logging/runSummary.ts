@@ -35,10 +35,12 @@ export interface RunSummary {
   chargingSpending: string
   travelSpending: string
   rescueFees: string
-  /** First-place lining paid (#76): part of `moneySpent`. */
+  /** Lining bills paid at the Sell bay (`lining_settled.paid`, #76 amendment): part of `moneySpent`. */
   liningSpending: string
-  /** First-place lining priced; above `liningSpending` when an empty wallet left some unpaid. */
+  /** First-place lining charged as the rings were laid (`casing_lined.price`). */
   liningCharged: string
+  /** Lining bills a sale could not cover (`lining_settled.forgiven`); never spent. */
+  liningForgiven: string
   upgradesPurchased: number
   coreFragmentsHarvested: number
   enemiesKilled: number
@@ -86,6 +88,7 @@ interface Tally {
   rescueFees: Money
   liningSpending: Money
   liningCharged: Money
+  liningForgiven: Money
   upgradesPurchased: number
   coreFragmentsHarvested: number
   enemiesKilled: number
@@ -117,6 +120,7 @@ function emptyTally(runId: string): Tally {
     rescueFees: ZERO_MONEY,
     liningSpending: ZERO_MONEY,
     liningCharged: ZERO_MONEY,
+    liningForgiven: ZERO_MONEY,
     upgradesPurchased: 0,
     coreFragmentsHarvested: 0,
     enemiesKilled: 0,
@@ -185,8 +189,11 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
     tally.rescueFees = add(tally.rescueFees, fromCanonical(data.fee))
   },
   casing_lined: (tally, { data }) => {
-    tally.liningSpending = add(tally.liningSpending, fromCanonical(data.paid))
     tally.liningCharged = add(tally.liningCharged, fromCanonical(data.price))
+  },
+  lining_settled: (tally, { data }) => {
+    tally.liningSpending = add(tally.liningSpending, fromCanonical(data.paid))
+    tally.liningForgiven = add(tally.liningForgiven, fromCanonical(data.forgiven))
   },
   mining_interval: (tally, { data }) => {
     tally.tilesDestroyed += data.tilesDestroyed
@@ -254,6 +261,7 @@ function summaryOf(tally: Tally): RunSummary {
     rescueFees: toCanonical(tally.rescueFees),
     liningSpending: toCanonical(tally.liningSpending),
     liningCharged: toCanonical(tally.liningCharged),
+    liningForgiven: toCanonical(tally.liningForgiven),
     upgradesPurchased: tally.upgradesPurchased,
     coreFragmentsHarvested: tally.coreFragmentsHarvested,
     enemiesKilled: tally.enemiesKilled,

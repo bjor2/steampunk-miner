@@ -128,6 +128,7 @@ const FIXED_METRICS: readonly Metric[] = [
   { name: 'rescue fees', read: (summary) => money(summary.rescueFees) },
   { name: 'spent on lining', read: (summary) => money(summary.liningSpending) },
   { name: 'lining charged', read: (summary) => money(summary.liningCharged) },
+  { name: 'lining forgiven', read: (summary) => money(summary.liningForgiven) },
   { name: 'upgrades bought', read: (summary) => count(summary.upgradesPurchased) },
   { name: 'tiles destroyed', read: (summary) => count(summary.tilesDestroyed) },
   { name: 'enemies killed', read: (summary) => count(summary.enemiesKilled) },

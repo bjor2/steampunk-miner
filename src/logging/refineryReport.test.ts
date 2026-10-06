@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest'
 import type { RunEventData, RunEventName } from './eventNames'
 import type { PacingReport } from './pacingReport'
 import { formatRefineGain, refineGainByPlanet, refineryLeverFindings } from './refineryReport'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 import { deriveSummary } from './runSummary'
 
 const MINUTE = 60 * 60
 
 function line<N extends RunEventName>(event: N, data: RunEventData<N>, planet: number): RunEvent {
   return {
-    v: 1,
+    v: LOG_SCHEMA_VERSION,
     seq: 0,
     tick: 0,
     timestamp: 0,

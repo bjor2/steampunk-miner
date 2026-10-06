@@ -5,7 +5,9 @@
  * Boring is a report facing the tile, then scripted mining of that one tile (`drillTile`, #3, #11
  * section 5) for the drill ticks it took: the #6 movement-time model the pacing gate measures bores one
  * 1 m tile at a time, where the player's 1.9 m drill stamp (#36, #41) opens more ground per metre.
- * Positions are tile centres, upright (up = (0, 1024)), velocity 0 at each report.
+ * Scripted mining lays and charges casing through the player's placement code (#115), one ring per
+ * metre the bot bores, charged per metre as a player's two rings are, onto the lining bill its
+ * sales settle. Positions are tile centres, upright (up = (0, 1024)), velocity 0 at each report.
  */
 import { POSE_REPORT_INTERVAL_TICKS } from '../../constants/balance'
 import { isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'

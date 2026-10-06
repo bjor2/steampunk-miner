@@ -1,7 +1,9 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { TICKS_PER_SECOND } from '../constants/physics'
+import { cmp, fromCanonical, fromSafeInteger, mul } from '../systems/money'
 import type { Scenario } from '../systems/scenario'
+import { countDrillDives, diveTicksWithoutCasing } from './diveCasing'
 import { RUN_EVENT_REGISTRY, type RegisteredEvent } from './eventNames'
 import { formatNdjsonLine } from './ndjson'
 import {
@@ -73,6 +75,20 @@ describe('balance regression: the pacing bot on the slice (#29, S11)', () => {
       `${formatPacingReport(report)}\n\n${verdicts}\n${[...pacingAlerts(report), ...wrecker].join('\n')}`,
     )
     expect(pacingProblems(report)).toEqual([])
+  })
+
+  it('lays casing on every drill dive through the player placement code, and pays for it (#115)', () => {
+    const { events } = botRun()
+    expect(countDrillDives(events)).toBeGreaterThan(0)
+    expect(diveTicksWithoutCasing(events)).toEqual([])
+    const { liningCharged, liningSpending, liningForgiven } = deriveSummary(events)
+    console.log(
+      `lining: ${liningCharged} charged, ${liningSpending} paid, ${liningForgiven} forgiven`,
+    )
+    expect(liningSpending).not.toBe('0e+0')
+    // The bill settled at the Sell bay lands in full: at most a tenth of it forgiven (#115 ruling).
+    const forgivenTenfold = mul(fromCanonical(liningForgiven), fromSafeInteger(10))
+    expect(cmp(forgivenTenfold, fromCanonical(liningCharged))).toBeLessThanOrEqual(0)
   })
 
   it('emits only registered events, with registered fields and kinds', () => {

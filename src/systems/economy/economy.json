@@ -43,7 +43,7 @@
     "costCurveId": "cost.casing.upgrade",
     "casingGradeStart": 1,
     "casingGradeCoreMin": 5,
-    "kCasing": "0.30",
+    "kCasing": "0.002",
     "collapseCrush": ["0.080", "0.080", "0.080", "0.080", "0.080", "0.080"]
   },
   "refinery": {

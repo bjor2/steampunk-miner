@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { RunEventData, RunEventName } from './eventNames'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 import {
   deriveWreckerDives,
   medianRingsBreached,
@@ -16,7 +16,7 @@ function line<N extends RunEventName>(
   place: { planet: number; depthTiles: number },
 ): RunEvent {
   return {
-    v: 1,
+    v: LOG_SCHEMA_VERSION,
     seq: nextSeq++,
     tick: nextSeq,
     timestamp: 0,

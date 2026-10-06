@@ -5,6 +5,7 @@
  * `ceilMilli` by its price function. `QuickService` is the three in order (sell all, repair,
  * recharge) at current prices, with their own events and none of its own; selling all starts by
  * collecting the player's ready Refinery batches (#105), which are paid at the Sell bay only.
+ * Every ore sale settles the vehicle's lining bill out of its value (#76 amendment, `liningBill.ts`).
  *
  * Selling, recharging and the quick action are the Sell bay's; repair is the Upgrade bay's (#37),
  * though the quick action at the Sell bay still repairs at the same price.
@@ -47,6 +48,7 @@ import {
 } from './commandRule'
 import { atBayRejection } from './dockRules'
 import type { DomainEventBody, SaleMode, SoldItem } from './domainEvent'
+import { liningPaidOutOf, settleLiningBill } from './liningBill'
 import { collectWhenReady, readyRefinedValueOf } from './refinery/refineryCollection'
 
 /** One ore tier, or the whole hold's ore. */
@@ -57,6 +59,8 @@ export interface ServiceQuote {
   saleValue: Money
   /** This player's ready Refinery batches, paid in with the sale (#105). */
   refinedValue: Money
+  /** What selling the whole hold pays of the vehicle's lining bill, out of `saleValue` (#115). */
+  liningPaid: Money
   repairCost: Money
   rechargeCost: Money
 }
@@ -117,9 +121,15 @@ export const PLATFORM_SERVICE_RULES: {
 }
 
 export function serviceQuote(state: AuthorityState, playerId: string): ServiceQuote {
+  const saleValue = saleValueOf(
+    state,
+    playerId,
+    soldItemsOf(vehicleOf(state, playerId).cargo, 'all'),
+  )
   return {
-    saleValue: saleValueOf(state, playerId, soldItemsOf(vehicleOf(state, playerId).cargo, 'all')),
+    saleValue,
     refinedValue: readyRefinedValueOf(state, playerId),
+    liningPaid: liningPaidOutOf(state, playerId, saleValue),
     repairCost: repairCostOf(state, playerId),
     rechargeCost: rechargeCostOf(state, playerId),
   }
@@ -183,7 +193,7 @@ function nothingToServiceRejection(quote: ServiceQuote): Rejection | null {
 
 function quickServiceMoneyRejection(state: AuthorityState, playerId: string): Rejection | null {
   const quote = serviceQuote(state, playerId)
-  const paidIn = add(quote.saleValue, quote.refinedValue)
+  const paidIn = sub(add(quote.saleValue, quote.refinedValue), quote.liningPaid)
   return moneyShortRejection(add(walletOf(state, playerId), paidIn), quickServiceCharges(quote))
 }
 
@@ -227,8 +237,21 @@ function assayEventsOf(
 }
 
 function sellOre(state: AuthorityState, playerId: string, selection: OreSelection): RuleEffect {
+  const items = soldItemsOf(vehicleOf(state, playerId).cargo, selection)
+  const value = saleValueOf(state, playerId, items)
+  return chainEffects(state, [
+    (current) => payForOre(current, playerId, items, selection),
+    (current) => settleLiningBill(current, playerId, value),
+  ])
+}
+
+function payForOre(
+  state: AuthorityState,
+  playerId: string,
+  items: SoldItem[],
+  selection: OreSelection,
+): RuleEffect {
   const { wallet, vehicle } = state.players[playerId]
-  const items = soldItemsOf(vehicle.cargo, selection)
   const value = saleValueOf(state, playerId, items)
   const sold = withVehicle(state, playerId, {
     ...vehicle,

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { RunEventData, RunEventName } from './eventNames'
 import { writeRunSummary, type RunDocumentTransport } from './runDocuments'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 import { deriveSummary } from './runSummary'
 
 let nextSeq = 0
@@ -13,7 +13,7 @@ function line<N extends RunEventName>(
   place: { planet?: number; depthTiles?: number } = {},
 ): RunEvent {
   return {
-    v: 1,
+    v: LOG_SCHEMA_VERSION,
     seq: nextSeq++,
     tick,
     // Wall time differs on every machine; the summary must never read it.
@@ -94,13 +94,15 @@ describe('run summary', () => {
     })
   })
 
-  it('counts paid lining as spending and keeps the charged total beside it', () => {
-    const lined = (price: string, paid: string) =>
-      line(990, 'casing_lined', { lengthMm: 1000, band: 1, grade: 1, price, paid })
-    const run = [...PLAYED_RUN.slice(0, -1), lined('3e+0', '3e+0'), lined('3e+0', '1e+0')]
+  it('counts the lining bill paid at the Sell bay as spending, beside what was charged and forgiven', () => {
+    const lined = (price: string) =>
+      line(990, 'casing_lined', { lengthMm: 1000, band: 1, grade: 1, price })
+    const settled = line(995, 'lining_settled', { billed: '6e+0', paid: '4e+0', forgiven: '2e+0' })
+    const run = [...PLAYED_RUN.slice(0, -1), lined('3e+0'), lined('3e+0'), settled]
     expect(deriveSummary(run)).toMatchObject({
       liningSpending: '4e+0',
       liningCharged: '6e+0',
+      liningForgiven: '2e+0',
       moneySpent: '1.6305e+2',
     })
   })

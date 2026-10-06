@@ -11,7 +11,7 @@ import {
   type VehicleStats,
 } from '../economy/vehicleStats'
 import { casingGradeStart } from '../economy/casingPrices'
-import type { BigStat } from '../money'
+import { ZERO_MONEY, type BigStat, type Money } from '../money'
 import type { DockSite } from '../world/dockSite'
 import { EMPTY_CASING_TRAIL, type CasingTrail } from './casingTrail'
 import { quantaOfUnits } from './energyQuanta'
@@ -46,6 +46,11 @@ export interface VehicleState {
   casingTrail: CasingTrail
   /** The `auto_guns` turret (#107): not a vehicle track, so it is not in the visual-tier sum. */
   gun: VehicleGun
+  /**
+   * First-place lining charged since the last sale and not yet paid (#76 amendment, #115): it is
+   * settled at the Sell bay out of the next sale, so nothing leaves the wallet mid-dive.
+   */
+  liningBill: Money
   energy: number
   hull: BigStat
   cargo: Cargo
@@ -70,6 +75,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     casingShortBand: null,
     casingTrail: EMPTY_CASING_TRAIL,
     gun: NO_GUN,
+    liningBill: ZERO_MONEY,
     energy: quantaOfUnits(stats.energyMax),
     hull: stats.hullMax,
     cargo: EMPTY_CARGO,

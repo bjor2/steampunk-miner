@@ -51,12 +51,18 @@ describe('compareRuns', () => {
     expect(comparison.ok && rowNamed(comparison.rows, 'income per minute')?.a).toBe('2.00e40')
   })
 
-  it('shows lining paid next to lining charged, so an unpaid share is visible', () => {
+  it('shows lining paid next to lining charged and forgiven, so an unpaid share is visible', () => {
     const a = summaryOf({ liningSpending: '0e+0', liningCharged: '0e+0' })
-    const b = summaryOf({ runId: 'run_b', liningSpending: '4e+2', liningCharged: '5e+2' })
+    const b = summaryOf({
+      runId: 'run_b',
+      liningSpending: '4e+2',
+      liningCharged: '5e+2',
+      liningForgiven: '1e+2',
+    })
     const comparison = compareRuns(a, b)
     expect(comparison.ok && rowNamed(comparison.rows, 'spent on lining')?.b).toBe('400')
     expect(comparison.ok && rowNamed(comparison.rows, 'lining charged')?.b).toBe('500')
+    expect(comparison.ok && rowNamed(comparison.rows, 'lining forgiven')?.b).toBe('100')
   })
 
   it('lists the final level of every track either run has', () => {
@@ -68,10 +74,10 @@ describe('compareRuns', () => {
   })
 
   it('refuses runs logged under different schema versions', () => {
-    const comparison = compareRunsIncludingDebug(summaryOf(), summaryOf({ logSchemaVersion: 2 }))
+    const comparison = compareRunsIncludingDebug(summaryOf(), summaryOf({ logSchemaVersion: 1 }))
     expect(comparison).toEqual({
       ok: false,
-      problems: ['run_a has logSchemaVersion 1 and run_a has 2; no adapter exists between them'],
+      problems: ['run_a has logSchemaVersion 2 and run_a has 1; no adapter exists between them'],
     })
   })
 

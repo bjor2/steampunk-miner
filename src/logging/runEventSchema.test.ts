@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
+import { LOG_SCHEMA_VERSION } from './runEvent'
 import { runEventProblems } from './runEventSchema'
 
 const resourceSold = {
-  v: 1,
+  v: LOG_SCHEMA_VERSION,
   seq: 412,
   tick: 8120,
   timestamp: 135.4,
@@ -103,6 +104,6 @@ describe('run event schema', () => {
   })
 
   it('refuses a line from another log schema version', () => {
-    expect(runEventProblems({ ...resourceSold, v: 2 })).toEqual(['v must be 1'])
+    expect(runEventProblems({ ...resourceSold, v: 1 })).toEqual(['v must be 2'])
   })
 })

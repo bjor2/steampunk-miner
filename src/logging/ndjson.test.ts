@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { formatNdjsonLine, parseNdjson } from './ndjson'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 const event: RunEvent = {
-  v: 1,
+  v: LOG_SCHEMA_VERSION,
   seq: 3,
   tick: 8120,
   timestamp: 12.5,

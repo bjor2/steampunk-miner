@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { runEventProblems } from '../../../logging/runEventSchema'
 import { projectDomainEvent } from '../../../logging/domainEventLog'
+import { LOG_SCHEMA_VERSION } from '../../../logging/runEvent'
 import { enemyTier } from '../../economy/enemyStats'
 import { gunShotDamage } from '../../economy/gunStats'
 import { hullMax, onCurveLevel } from '../../economy/vehicleStats'
@@ -217,7 +218,7 @@ describe('guns: what they log (#107 logging)', () => {
     expect(gunLines.length).toBeGreaterThan(0)
     for (const { tick, cmd, line } of lines) {
       const envelope = {
-        v: 1,
+        v: LOG_SCHEMA_VERSION,
         seq: 1,
         tick,
         timestamp: 0,

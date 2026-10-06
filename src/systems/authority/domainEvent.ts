@@ -124,9 +124,9 @@ export interface DomainEventBodies {
   CasingPlaced: { samples: number; relined: number; grade: number }
   /**
    * A ring's first-placed lining charged (#76): `lengthMm` of new lining against the wall's
-   * `band`, `price` owed and `paid` (less when the wallet ran short), both canonical strings.
+   * `band`, its canonical `price` added to the vehicle's lining bill (paid at the next sale, #115).
    */
-  CasingLined: { lengthMm: number; band: number; grade: number; price: string; paid: string }
+  CasingLined: { lengthMm: number; band: number; grade: number; price: string }
   /** The vehicle entered a band (6: the core) its casing grade does not hold (#41). */
   CasingGradeInsufficient: { band: number; grade: number; required: number }
   /** The vehicle is back where its casing grade holds (#41). */
@@ -216,6 +216,11 @@ export interface DomainEventBodies {
   FeatureUnlocked: { featureId: string }
   PlanetEntered: { planetSeed: number; generatorVersion: number; radius: number }
   ResourceSold: { items: SoldItem[]; value: string; mode: SaleMode }
+  /**
+   * The lining bill settled out of a sale (#76 amendment, #115): `paid` is at most the sale's
+   * value, so there is never debt, and `forgiven` is the rest of `billed`. Canonical strings.
+   */
+  LiningSettled: { billed: string; paid: string; forgiven: string }
   /** The planet's artefact cache tile and band (#46), said once per planet entered. */
   ArtefactCacheSpawned: { tx: number; ty: number; band: number }
   /** `interact` opened the live cache's choice (#46); the choice itself is client UI. */

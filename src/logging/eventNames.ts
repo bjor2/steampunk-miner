@@ -125,6 +125,12 @@ export const RUN_EVENT_REGISTRY = {
       mode: { oneOf: ['all', 'single'] },
     },
   },
+  // #76 amendment (#115): the lining bill paid out of a sale, capped at its value; the rest forgiven.
+  lining_settled: {
+    group: 'platform',
+    level: 'core',
+    payload: { billed: 'money', paid: 'money', forgiven: 'money' },
+  },
   energy_recharged: {
     group: 'platform',
     level: 'core',
@@ -280,7 +286,6 @@ export const RUN_EVENT_REGISTRY = {
       band: 'integer',
       grade: 'integer',
       price: 'money',
-      paid: 'money',
     },
   },
   // #111: a tunnel wrecker (or `debug.gnawCasing`) breached one ring; `ring` is its axis point `x,y`

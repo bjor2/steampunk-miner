@@ -156,13 +156,16 @@ describe('vehicle cargo', () => {
     const tiles = surfaceOreTiles(11)
     tiles.slice(0, 10).forEach((tile, index) => mineTile(session, 100 * (index + 1), tile))
     const events = mineTile(session, 2000, tiles[10])
+    // Scripted mining lays casing as a player's drill does (#115), so the last tile's wall was
+    // lined by the rings behind the earlier digs and the drill cuts that lining.
     expect(typesOf(events)).toEqual([
       'DrillDamageDealt',
       'GroundChanged',
+      'CasingDrilled',
       'TileDestroyed',
       'StorageFull',
     ])
-    expect(events[3]).toMatchObject({ lostUnits: 1 })
+    expect(events[4]).toMatchObject({ lostUnits: 1 })
     expect(session.vehicle().cargo.ore).toEqual({ 1: 10 })
   })
 })

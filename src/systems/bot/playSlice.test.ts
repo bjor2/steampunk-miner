@@ -77,14 +77,16 @@ describe('pacing bot casing (S11, #65 Systems & Economy note 2)', () => {
 
 describe('pacing bot save size (#36 acceptance 4)', () => {
   it('keeps the save of a 60-minute run under 1 MB', () => {
+    // The hour's largest world is planet 1's at its core: travelling empties the world, so the
+    // save is taken there (or at 60 minutes, whichever comes first), not a few minutes into
+    // planet 2, where how many chunks it holds depends on when the core fell (#115).
     const hour = playSlice(
       createAuthorityState({ planetIndex: 1, planetSeed: WORLD_SEED, playerIds: ['p1'] }),
-      { maxTicks: 60 * 60 * 60 },
+      { maxTicks: 60 * 60 * 60, lastPlanet: 1 },
     )
     const save = JSON.stringify(saveSlotOf(takeSnapshot(hour.state), 1))
     // A guard that the hour dug enough for the size to mean something, not a pacing number: the
-    // bot touches about ten chunks in its first hour (10 since it keeps to the bands its casing
-    // holds, S11).
+    // bot touches about twenty chunks of planet 1 before its core.
     expect(Object.keys(hour.state.world.chunks).length).toBeGreaterThanOrEqual(10)
     expect(save.length).toBeLessThan(1024 * 1024)
   })

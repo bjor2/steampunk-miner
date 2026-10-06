@@ -15,12 +15,14 @@ describe('casing prices', () => {
     expect(toCanonical(prices.reduce(add, ZERO_MONEY))).toBe('2.74e+2')
   })
 
-  it('reads k_casing as 0.30 of an ore unit per metre of lining', () => {
-    expect(toCanonical(ECONOMY.casing.kCasing)).toBe('3e-1')
+  // Systems' value for C1a (#115) under the Sell-bay bill rule, down from 0.30: 0.004 and 0.003
+  // left the bot's planet 1 core over 58 min, 0.002 (the floor) met the gates.
+  it('reads k_casing as 0.002 of an ore unit per metre of lining', () => {
+    expect(toCanonical(ECONOMY.casing.kCasing)).toBe('2e-3')
   })
 
-  it('charges ceilMilli(0.30 * V(t(1,3)) * 10) = 67.5 for 10 m against band 3 on planet 1', () => {
-    expect(toCanonical(casingLiningPrice(1, 3, fromCanonical('10')))).toBe('6.75e+1')
+  it('charges ceilMilli(0.002 * V(t(1,3)) * 10) = 0.45 for 10 m against band 3 on planet 1', () => {
+    expect(toCanonical(casingLiningPrice(1, 3, fromCanonical('10')))).toBe('4.5e-1')
   })
 
   it('follows ceilMilli(k_casing * V(t(p,b)) * lengthM) on every planet and band', () => {
@@ -36,8 +38,8 @@ describe('casing prices', () => {
   })
 
   it('rounds a part-milli metre price up to the next milli', () => {
-    // V(t(1,4)) = 33.75, so half a metre is 5.0625 before rounding.
-    expect(toCanonical(casingLiningPrice(1, 4, fromCanonical('0.5')))).toBe('5.063e+0')
+    // V(t(1,4)) = 33.75, so half a metre is 0.03375 before rounding.
+    expect(toCanonical(casingLiningPrice(1, 4, fromCanonical('0.5')))).toBe('3.4e-2')
   })
 
   it('charges nothing for no new lining', () => {

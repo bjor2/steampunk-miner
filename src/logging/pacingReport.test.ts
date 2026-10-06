@@ -9,7 +9,7 @@ import {
   pacingProblems,
   pacingVerdicts,
 } from './pacingReport'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 const WORLD_SEED = 83921
 const SECOND = 60
@@ -24,7 +24,7 @@ function line<N extends RunEventName>(
   planet = 1,
 ): RunEvent {
   return {
-    v: 1,
+    v: LOG_SCHEMA_VERSION,
     seq: nextSeq++,
     tick,
     timestamp: 0,

@@ -53,4 +53,18 @@ describe('casing trail', () => {
     expect(trail.unlined).toHaveLength(6)
     expect(due).toEqual([0, 600])
   })
+
+  it('gives each ring the stretch of axis cut since the previous one', () => {
+    const lengthsAt = (stepMm: number) =>
+      followAlongX(stepsTo(2000, stepMm)).trail.unlined.map((point) => point.lengthMm)
+    expect(lengthsAt(100)).toEqual([500, 500, 500, 500, 500])
+    expect(lengthsAt(1000)).toEqual([500, 1000, 1000])
+  })
+
+  it('gives the first ring of a new cut one ring spacing, however far the vehicle travelled', () => {
+    const cut = followAlongX([0], true)
+    const travelled = followAlongX([10000, 10500], false, cut.trail)
+    const resumed = followAlongX([20000], true, travelled.trail)
+    expect(resumed.trail.unlined.map((point) => point.lengthMm)).toEqual([500])
+  })
 })

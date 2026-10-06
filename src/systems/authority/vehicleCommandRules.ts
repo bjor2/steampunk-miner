@@ -8,7 +8,8 @@
  *   for the band (#41), and logs the guns' hits since the last report (#107). A stranded or destroyed vehicle
  *   still reports its pose (gravity and hits apply) but its action ticks are ignored.
  * - `drillTile`: scripted mining of one tile within reach: the same drilling path, carving that
- *   cell's own samples.
+ *   cell's own samples, and the same casing rings behind the drill from the last reported pose
+ *   (#115), so a scripted dig pays the lining a player's dig pays.
  * - `requestRescue`: calls the tow for a stranded or destroyed vehicle.
  *
  * Action tick counts may not exceed the ticks since the last charged command plus one report
@@ -41,7 +42,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
-import { layCasingAtPose } from './casingPlacement'
+import { layCasingAfterScriptedDrill, layCasingAtPose } from './casingPlacement'
 import { followCasingSupport } from './casingSupport'
 import { drillBurrowersOnTile } from './combat/enemyDamage'
 import { flushGunHits } from './combat/gunHits'
@@ -105,6 +106,7 @@ export const VEHICLE_COMMAND_RULES: {
       chainEffects(state, [
         (current) => drillScriptedTile(current, command),
         (current) => markCharged(current, command.playerId, command.tick),
+        (current) => layCasingAfterScriptedDrill(current, command.playerId, command.payload.ticks),
         (current) => followEnergyChange(current, command.playerId, command.tick),
       ]),
   },
