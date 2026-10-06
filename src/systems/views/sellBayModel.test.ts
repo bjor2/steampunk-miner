@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { repairCostOf } from '../authority/platformServices'
-import { createScriptedSession, mineTile, surfaceOreTiles } from '../authority/scriptedSession'
+import { withVehicle, type AuthorityState } from '../authority/authorityState'
+import { digTenMetresUntil } from '../authority/casingDigFixtures'
+import {
+  continueScriptedSession,
+  createScriptedSession,
+  dockInBay,
+  mineTile,
+  surfaceOreTiles,
+} from '../authority/scriptedSession'
 import { formatAmount } from '../displayAmount'
 import { add, fromCanonical, toCanonical } from '../money'
 import { dockCommand, sellCargoCommand, travelCommand } from '../platform/platformCommands'
@@ -135,4 +143,50 @@ describe('sell bay model', () => {
       platformState: 'outpost',
     })
   })
+
+  it('shows no lining bill panel while the vehicle has no bill', () => {
+    expect(sellBayOf(dockedSession()).lining).toBeNull()
+  })
+
+  it('shows the visit lining bill, what its sales paid and what leaving would forgive (#128)', () => {
+    const { session, end } = digTenMetresUntil(1, '0')
+    surfaceOreTiles(1).forEach((tile) => mineTile(session, end + 100, tile))
+    dockInBay(session, end + 200, 'sell')
+    const billed = toCanonical(session.vehicle().liningBill)
+    expect(sellBayOf(session).lining).toMatchObject({
+      billed: { exact: billed },
+      paid: { exact: '0e+0' },
+      forgiven: { exact: '0e+0' },
+    })
+    session.submit(end + 200, sellCargoCommand('all'))
+    expect(sellBayOf(session).lining).toMatchObject({
+      billed: { exact: billed },
+      paid: { exact: billed },
+      forgiven: { exact: '0e+0' },
+    })
+  })
+
+  it('shows what a sale could not pay as forgiven on leaving, once the visit has had a payout', () => {
+    const session = continueScriptedSession(withBillOf(sessionWithOre(1).state(), '25'))
+    session.submit(500, teleportToDockCommand('sell'))
+    session.submit(501, sellCargoCommand('all'))
+    expect(sellBayOf(session).lining).toMatchObject({
+      billed: { exact: canonical('25') },
+      paid: { exact: canonical('10') },
+      forgiven: { exact: canonical('15') },
+    })
+  })
 })
+
+/** `units` surface ore (tier 1, worth 10 each) in the hold. */
+function sessionWithOre(units: number): Session {
+  const session = createScriptedSession()
+  surfaceOreTiles(units).forEach((tile, index) => mineTile(session, 1 + index * 50, tile))
+  return session
+}
+
+/** `bill` of lining on p1's vehicle, more than any short dig lays at today's `k_casing`. */
+function withBillOf(state: AuthorityState, bill: string): AuthorityState {
+  const vehicle = { ...state.players.p1.vehicle, liningBill: fromCanonical(bill) }
+  return withVehicle(state, 'p1', vehicle)
+}

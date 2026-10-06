@@ -12,8 +12,10 @@ import {
   readSettingsModel,
   readUpgradeBayModel,
 } from '../store/screenReads'
+import { digTenMetresUntil } from '../systems/authority/casingDigFixtures'
 import {
   createScriptedSession,
+  dockInBay,
   FREEZE_ENEMIES,
   mineTile,
   PARAMS,
@@ -213,6 +215,16 @@ function refinedTexts(model: SellBayModel): Partial<Record<UiId, string | null>>
   }
 }
 
+function liningTexts(model: SellBayModel): Partial<Record<UiId, string | null>> {
+  if (model.lining === null) return {}
+  return {
+    [UI_IDS.sellbayLining]: null,
+    [UI_IDS.sellbayLiningBilled]: model.lining.billed.text,
+    [UI_IDS.sellbayLiningPaid]: model.lining.paid.text,
+    [UI_IDS.sellbayLiningForgiven]: model.lining.forgiven.text,
+  }
+}
+
 function settingsTexts(model: SettingsModel): Partial<Record<UiId, string | null>> {
   return {
     [UI_IDS.settingsPanel]: null,
@@ -300,6 +312,22 @@ function renderRefineryScreens(): string[] {
     ),
     ...checkScreen(createElement(SellBayView, { model: sell, focusedId: '' }), refinedTexts(sell)),
   ]
+}
+
+/** After a 10 m dig (#128): the Sell bay mid-visit, its first sale having paid the lining bill. */
+function renderLiningVisit(): string[] {
+  const { session, end } = digTenMetresUntil(1, '0')
+  mineTile(session, end + 100, surfaceOreTiles(1)[0])
+  dockInBay(session, end + 200, 'sell')
+  session.submit(end + 200, { type: 'sellCargo', payload: { resourceTier: 'all' } })
+  const model = selectSellBayModel(session.state(), 'p1', {
+    isTravelArmed: false,
+    isQuickServiceHighlighted: false,
+    focusedId: null,
+    installingUpgradeId: null,
+  })
+  expect(model.lining).not.toBeNull()
+  return checkScreen(createElement(SellBayView, { model, focusedId: '' }), liningTexts(model))
 }
 
 function renderSettings(): string[] {
@@ -438,6 +466,7 @@ describe('screen ids (#33 acceptance 12)', () => {
     keep(renderAtArtefactCache())
     keep(renderWithGuns())
     keep(renderRefineryScreens())
+    keep(renderLiningVisit())
     expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
   })
 

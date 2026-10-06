@@ -1,9 +1,10 @@
 /**
  * `selectSellBayModel` (#37 Sell bay screen): the shop rows from #33 (tier, family, amount, unit
- * value, line value, Sell, Sell all), the player's ready Refinery batches with Collect (#105),
- * Recharge with its cost, and "Sell, repair and recharge" with its exact total (refined batches
- * included) as the focused default, under the shared header and footer. A pure function of the
- * authority replica and the screen's UI state.
+ * value, line value, Sell, Sell all), the player's ready Refinery batches with Collect (#105), the
+ * visit's lining bill with what it paid and what leaving forgives (#128), Recharge with its cost,
+ * and "Sell, repair and recharge" with its exact total (refined batches included) as the focused
+ * default, under the shared header and footer. A pure function of the authority replica and the
+ * screen's UI state.
  */
 import type { AuthorityState } from '../authority/authorityState'
 import { rechargeCostOf, serviceQuote, type ServiceQuote } from '../authority/platformServices'
@@ -23,6 +24,7 @@ import {
 } from './bayFrame'
 import type { FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
+import { liningPanelOf, type LiningPanel } from './liningPanel'
 import { refinedPanelOf, type RefinedPanel } from './refinedPanel'
 import { shopPanelOf, type ShopPanel } from './shopPanel'
 import {
@@ -52,6 +54,8 @@ export interface SellBayModel {
   shop: ShopPanel
   /** Null before the platform has the Refinery bay (#105). */
   refined: RefinedPanel | null
+  /** Null while the vehicle has no lining bill (#128). */
+  lining: LiningPanel | null
   charging: ChargingPanel
   quickService: QuickServiceReading
   footer: BayFooter
@@ -78,6 +82,7 @@ export function selectSellBayModel(
     header: bayHeaderOf(state, playerId, 'sell'),
     shop,
     refined,
+    lining: liningPanelOf(state, playerId),
     charging,
     quickService,
     footer,
