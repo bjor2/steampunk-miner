@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T19:44:41Z",
+  "updated_at": "2026-10-06T19:44:57Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "working",
       "issue": 137,
-      "note": "tier hard, attempt 2/2",
-      "updated_at": "2026-10-06T19:44:41Z",
+      "note": "started 2026-10-06 21:44 CEST",
+      "updated_at": "2026-10-06T19:44:57Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,7 +17,7 @@
       "state": "working",
       "issue": 156,
       "note": "started 2026-10-06 20:50 CEST",
-      "updated_at": "2026-10-06T19:43:18Z",
+      "updated_at": "2026-10-06T19:44:57Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "working",
       "issue": 150,
       "note": "started 2026-10-06 20:20 CEST",
-      "updated_at": "2026-10-06T19:43:18Z",
+      "updated_at": "2026-10-06T19:44:57Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "working",
       "issue": 163,
       "note": "started 2026-10-06 20:31 CEST",
-      "updated_at": "2026-10-06T19:43:18Z",
+      "updated_at": "2026-10-06T19:44:57Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "3/4 Claude slots busy, 0/4 planner slots; status check",
+      "note": "4/4 Claude slots busy, 3/4 planner slots; spawned 1 worker(s); delegated 3 spec(s); planner slots 3/4",
       "extra": {
-        "active": 3,
+        "active": 4,
         "max": 4,
         "max_attempts": 2,
         "attempts": {
@@ -95,7 +95,7 @@
           "150": 1,
           "163": 1,
           "156": 1,
-          "137": 1,
+          "137": 2,
           "101": 2,
           "117": 1,
           "118": 1,
@@ -106,10 +106,26 @@
           "103": 1,
           "120": 1
         },
-        "planner": [],
+        "planner": [
+          {
+            "grok_slot": "5",
+            "ticket": 171,
+            "map": 169
+          },
+          {
+            "grok_slot": "6",
+            "ticket": 143,
+            "map": 139
+          },
+          {
+            "grok_slot": "7",
+            "ticket": 161,
+            "map": 157
+          }
+        ],
         "push_pending": null
       },
-      "updated_at": "2026-10-06T19:43:18Z",
+      "updated_at": "2026-10-06T19:44:57Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
