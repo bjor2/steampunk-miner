@@ -50,6 +50,7 @@ import {
   type ChargeReading,
   type FuseWarning,
 } from './chargeReading'
+import { heatReadingOf, type HeatReading } from './heatReading'
 import { threatMarkersOf, type ThreatMarker } from './threatMarkers'
 import { tileTimeAhead, type TileTime } from './tileTime'
 import { amountReading, type AmountReading } from './viewParts'
@@ -104,6 +105,8 @@ export interface HudModel {
   charges: ChargeReading | null
   /** A live charge within warning reach, the vehicle's own or another's (#109); else null. */
   chargeFuse: FuseWarning | null
+  /** The heat gauge, on a heat planet only (#113). */
+  heat: HeatReading | null
   dockArrow: DockArrow | null
   coreDistance: number | null
   threats: ThreatMarker[]
@@ -138,6 +141,7 @@ export function selectHudModel(sources: HudSources): HudModel {
     guns: gunReadingOf(vehicle, sources.bindings),
     charges: chargeReadingOf(vehicle.charges, sources.bindings),
     chargeFuse: fuseWarningOf(state, playerId),
+    heat: heatReadingOf(state, playerId),
     dockArrow: dockArrowOf(state, playerId),
     coreDistance: coreDistanceOf(state, playerId),
     threats: threatMarkersOf(state, playerId),

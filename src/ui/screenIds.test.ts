@@ -115,6 +115,12 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
     ...(model.guns?.isIdle === true ? { [UI_IDS.hudGunsIdle]: model.guns.idleText } : {}),
     ...(model.charges === null ? {} : { [UI_IDS.hudCharges]: model.charges.text }),
     ...(model.chargeFuse === null ? {} : { [UI_IDS.hudChargeFuse]: model.chargeFuse.text }),
+    ...(model.heat === null
+      ? {}
+      : { [UI_IDS.hudHeatGauge]: null, [UI_IDS.hudHeatText]: model.heat.text }),
+    ...(model.heat?.isThrottled === true
+      ? { [UI_IDS.hudHeatThrottled]: model.heat.throttledText }
+      : {}),
     [UI_IDS.hudTileTime]: model.tileTime.text,
     [UI_IDS.hudState]: model.vehicleState.text,
     ...(model.cargo.isFull ? { [UI_IDS.hudCargoFull]: 'FULL' } : {}),
@@ -185,6 +191,15 @@ function upgradeBayTexts(model: UpgradeBayModel): Partial<Record<UiId, string | 
     [UI_IDS.upgradebayCasingGrade]: casing.gradeText,
     [UI_IDS.upgradebayCasingCost]: casing.cost.text,
     [UI_IDS.upgradebayCasingBuy]: casing.buy.label,
+    ...(model.lining === null
+      ? {}
+      : {
+          [UI_IDS.upgradebayLining]: null,
+          [UI_IDS.upgradebayLiningActive]: model.lining.activeText,
+          [UI_IDS.upgradebayLiningCost]: model.lining.cost.text,
+          [UI_IDS.upgradebayLiningEffect]: model.lining.effectText,
+          [UI_IDS.upgradebayLiningButton]: model.lining.button.label,
+        }),
     ...(model.guns === null
       ? {}
       : {
@@ -453,6 +468,35 @@ function renderWithCharges(): string[] {
   ]
 }
 
+/** Planet 8's HUD with the drill throttled by heat, then its Upgrade bay offering refractory (#113). */
+function renderWithHeat(): string[] {
+  const session = createScriptedSession()
+  session.submit(1, { type: 'debug.setPlanet', payload: { planetIndex: 8 } })
+  session.submit(1, { type: 'debug.setHeat', payload: { heat: 80 } })
+  const hud = selectHudModel({
+    state: session.state(),
+    playerId: 'p1',
+    depthTiles: 0,
+    bindings: game().bindings,
+  })
+  expect(hud.heat?.isThrottled).toBe(true)
+  session.submit(2, teleportToDockCommand('upgrade'))
+  const bay = selectUpgradeBayModel(session.state(), 'p1', {
+    isTravelArmed: false,
+    isQuickServiceHighlighted: false,
+    focusedId: null,
+    installingUpgradeId: null,
+  })
+  expect(bay.lining).not.toBeNull()
+  return [
+    ...checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud)),
+    ...checkScreen(
+      createElement(UpgradeBayView, { model: bay, focusedId: '' }),
+      upgradeBayTexts(bay),
+    ),
+  ]
+}
+
 function upgradeBayOn(planetIndex: number): UpgradeBayModel {
   const session = createScriptedSession()
   session.submit(1, { type: 'debug.setPlanet', payload: { planetIndex } })
@@ -521,6 +565,7 @@ describe('screen ids (#33 acceptance 12)', () => {
     keep(renderAtArtefactCache())
     keep(renderWithGuns())
     keep(renderWithCharges())
+    keep(renderWithHeat())
     keep(renderRefineryScreens())
     keep(renderLiningVisit())
     expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])

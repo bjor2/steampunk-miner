@@ -1,10 +1,13 @@
 /**
  * Top left (#33 section 5): energy, hull and cargo as gauges with exact numbers, the cargo value
- * and, while there is one, the lining bill the next sale settles (#115).
+ * and, while there is one, the lining bill the next sale settles (#115); on a heat planet the heat
+ * gauge with its icon, hatched and marked THROTTLED above its throttle line (#113).
  */
+import type { HeatReading } from '../../systems/views/heatReading'
 import type { HudModel } from '../../systems/views/hudModel'
 import { UI_IDS } from '../ids'
 import { Gauge } from '../kit/Gauge'
+import { VectorIcon } from '../VectorIcon'
 import styles from './Hud.module.css'
 
 export function GaugeCluster({ model }: { model: HudModel }) {
@@ -33,7 +36,29 @@ export function GaugeCluster({ model }: { model: HudModel }) {
       >
         <CargoNotes model={model} />
       </Gauge>
+      {model.heat !== null && <HeatGauge heat={model.heat} />}
     </div>
+  )
+}
+
+function HeatGauge({ heat }: { heat: HeatReading }) {
+  return (
+    <Gauge
+      label="Heat"
+      reading={heat}
+      gaugeId={UI_IDS.hudHeatGauge}
+      textId={UI_IDS.hudHeatText}
+      isHatched={heat.isThrottled}
+    >
+      <span className={styles.notes}>
+        <VectorIcon iconId={heat.iconId} />
+        {heat.isThrottled && (
+          <strong data-testid={UI_IDS.hudHeatThrottled} data-state="throttled">
+            {heat.throttledText}
+          </strong>
+        )}
+      </span>
+    </Gauge>
   )
 }
 

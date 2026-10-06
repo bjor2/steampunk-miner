@@ -1,11 +1,13 @@
 /**
  * The Upgrade bay's six vehicle tracks (#7 order), each with its icon, level, next cost and
- * "before -> after", then the Casing row, which is not a track (#41, #58), then the Guns row once
- * `auto_guns` is offered (#107), then the Charges and Rack rows once `blasting_charges` is (#109),
- * then hull and repair, and the vehicle's visual tier (#33 section 6, #37).
+ * "before -> after", then the Casing row, which is not a track (#41, #58), then the Lining row once a
+ * lining type is offered (#113), then the Guns row once `auto_guns` is offered (#107), then the
+ * Charges and Rack rows once `blasting_charges` is (#109), then hull and repair, and the vehicle's
+ * visual tier (#33 section 6, #37).
  */
 import type { StatPreview, WorkshopRow } from '../../systems/views/workshopRows'
 import type { GunRow } from '../../systems/views/gunRow'
+import type { LiningRow } from '../../systems/views/liningRow'
 import type { CasingRow, UpgradeBayModel } from '../../systems/views/upgradeBayModel'
 import { Panel } from '../kit/Panel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
@@ -24,6 +26,7 @@ export function TracksPanel({ model, focusedId }: { model: UpgradeBayModel; focu
         <UpgradeRow key={row.upgradeId} row={row} focusedId={focusedId} />
       ))}
       <CasingRowView casing={model.casing} focusedId={focusedId} />
+      {model.lining !== null && <LiningRowView lining={model.lining} focusedId={focusedId} />}
       {model.guns !== null && <GunRowView guns={model.guns} focusedId={focusedId} />}
       {model.charges !== null && <ChargeRowsView rows={model.charges} focusedId={focusedId} />}
       <Field label="Hull">
@@ -94,6 +97,23 @@ function CasingRowView({ casing, focusedId }: { casing: CasingRow; focusedId: st
         {casing.gradeText}
       </span>
       <ScreenButtonView button={casing.buy} focusedId={focusedId} state={casing.buyState} />
+    </div>
+  )
+}
+
+function LiningRowView({ lining, focusedId }: { lining: LiningRow; focusedId: string }) {
+  return (
+    <div className={rowStyles.trackRow} data-testid={UI_IDS.upgradebayLining}>
+      <VectorIcon iconId={lining.iconId} />
+      <span>{lining.label}</span>
+      <span data-testid={UI_IDS.upgradebayLiningActive}>{lining.activeText}</span>
+      <span data-testid={UI_IDS.upgradebayLiningCost} data-exact={lining.cost.exact}>
+        {lining.cost.text}
+      </span>
+      <span className={rowStyles.effect} data-testid={UI_IDS.upgradebayLiningEffect}>
+        {lining.effectText}
+      </span>
+      <ScreenButtonView button={lining.button} focusedId={focusedId} state={lining.buyState} />
     </div>
   )
 }

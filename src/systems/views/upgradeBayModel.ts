@@ -2,8 +2,9 @@
  * `selectUpgradeBayModel` (#37 Upgrade bay screen, #58): the six vehicle tracks in #7's order,
  * each with its icon, level, next cost, effect "before -> after" and Buy; then the Casing row
  * (#41, Game Director's scope review on #54), which is not a vehicle track: its grade "G -> G+1",
- * next cost and Buy; then the Guns row once `auto_guns` is offered (#107); then the Charges and
- * Rack rows once `blasting_charges` is (#109); then Repair with its
+ * next cost and Buy; then the Lining row once a lining type is offered (#113); then the Guns row
+ * once `auto_guns` is offered (#107); then the Charges and Rack rows once `blasting_charges` is
+ * (#109); then Repair with its
  * cost; and the live preview hook, under the shared header and footer.
  *
  * The preview is presentation only (#37, `upgradePreview`): focus and the install animation are UI
@@ -35,6 +36,7 @@ import {
 } from './bayFrame'
 import { chargeButtonsOf, chargeRowsOf, type ChargeRows } from './chargeRows'
 import { gunRowOf, type GunRow } from './gunRow'
+import { liningRowOf, type LiningRow } from './liningRow'
 import { focusOnScreen, type FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
 import { upgradePreviewOf, type UpgradePreview } from './upgradePreview'
@@ -64,6 +66,8 @@ export interface UpgradeBayModel {
   header: BayHeader
   tracks: WorkshopRow[]
   casing: CasingRow
+  /** Null until a lining type is offered here or owned (#113; #90: nothing shows before). */
+  lining: LiningRow | null
   /** Null until `auto_guns` is unlocked here or bolted on (#90: nothing shows before). */
   guns: GunRow | null
   /** Null until `blasting_charges` is open here or the rack is bolted on (#109). */
@@ -88,17 +92,19 @@ export function selectUpgradeBayModel(
   const levels = state.players[playerId].vehicle.levels
   const tracks = workshopRowsOf(state, playerId)
   const casing = casingRowOf(state, playerId)
+  const lining = liningRowOf(state, playerId)
   const guns = gunRowOf(state, playerId)
   const charges = chargeRowsOf(state, playerId)
   const repair = repairReadingOf(state, playerId)
   const footer = bayFooterOf(state, playerId, ui)
-  const rows: ShopRows = { tracks, casing, guns, charges, repair }
+  const rows: ShopRows = { tracks, casing, lining, guns, charges, repair }
   const focusStops = upgradeBayFocusStops(rows, footer)
   const quickService = wrongBayQuickServiceOf(state, playerId)
   return {
     header: bayHeaderOf(state, playerId, 'upgrade'),
     tracks,
     casing,
+    lining,
     guns,
     charges,
     repair,
@@ -166,6 +172,7 @@ function wrongBayQuickServiceOf(state: AuthorityState, playerId: string): Screen
 interface ShopRows {
   tracks: readonly WorkshopRow[]
   casing: CasingRow
+  lining: LiningRow | null
   guns: GunRow | null
   charges: ChargeRows | null
   repair: RepairReading
@@ -175,6 +182,7 @@ function focusedButtonsOf(rows: ShopRows, footer: BayFooter): ScreenButton[] {
   return [
     ...rows.tracks.map((row) => row.buy),
     rows.casing.buy,
+    ...liningButtonsOf(rows.lining),
     ...gunButtonsOf(rows.guns),
     ...chargeButtonsOf(rows.charges),
     rows.repair.button,
@@ -186,6 +194,7 @@ function upgradeBayFocusStops(rows: ShopRows, footer: BayFooter): FocusStop[] {
   return [
     ...rows.tracks.map((row) => row.buy).map(stopIn('tracks')),
     stopIn('casing')(rows.casing.buy),
+    ...liningButtonsOf(rows.lining).map(stopIn('lining')),
     ...gunButtonsOf(rows.guns).map(stopIn('guns')),
     ...chargeButtonsOf(rows.charges).map(stopIn('charges')),
     stopIn('repair')(rows.repair.button),
@@ -195,4 +204,8 @@ function upgradeBayFocusStops(rows: ShopRows, footer: BayFooter): FocusStop[] {
 
 function gunButtonsOf(guns: GunRow | null): ScreenButton[] {
   return guns === null ? [] : [guns.buy]
+}
+
+function liningButtonsOf(lining: LiningRow | null): ScreenButton[] {
+  return lining === null ? [] : [lining.button]
 }

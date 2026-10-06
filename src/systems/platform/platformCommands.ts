@@ -1,7 +1,8 @@
 /**
  * The platform's command intents (decision #8 registered commands, #23), as the store submits
  * them: `Dock {bay}`, `Undock`, `SellCargo {resourceTier | all}`, `RepairHull`, `RechargeEnergy`,
- * `QuickService`, `BuyUpgrade {upgradeId}`, `BuyCasingGrade`, `BuyGun` (#107), `Travel {toPlanet}`
+ * `QuickService`, `BuyUpgrade {upgradeId}`, `BuyCasingGrade`, `BuyGun` (#107), `BuyLiningType` and
+ * `SelectLiningType` (#113), `Travel {toPlanet}`
  * (#10), and the Refinery bay's `QueueRefine`, `BuyRefinerySlot` and the Sell bay's
  * `CollectRefined` (#105), and the Upgrade bay's `RestockCharges` and `BuyChargeRackSlot` (#109).
  * The authority checks and prices each one.
@@ -52,6 +53,14 @@ export function restockChargesCommand(): CommandIntent<'restockCharges'> {
 
 export function buyChargeRackSlotCommand(): CommandIntent<'buyChargeRackSlot'> {
   return { type: 'buyChargeRackSlot', payload: {} }
+}
+
+export function buyLiningTypeCommand(liningType: string): CommandIntent<'buyLiningType'> {
+  return { type: 'buyLiningType', payload: { liningType } }
+}
+
+export function selectLiningTypeCommand(liningType: string): CommandIntent<'selectLiningType'> {
+  return { type: 'selectLiningType', payload: { liningType } }
 }
 
 export function queueRefineCommand(
