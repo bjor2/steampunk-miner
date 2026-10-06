@@ -4,9 +4,14 @@
  * shop type, #44), `hud` 24 px at 1080p and never under 20 physical px, `banner` 32 px, `menu` the
  * surrounding type's 1em, allowed only in menus, shop lists and tooltips. A state is a badge with
  * its own shape (padlock, star) or a rim glint, never a colour.
+ *
+ * An id with no icon draws a placeholder that shows, never a blank (feature-slices.md 3.4): a
+ * magenta square in dev, which also warns once per id, a neutral outlined square in production.
  */
+import { useEffect } from 'react'
+import { IS_DEV_BUILD } from '../constants/buildInfo'
 import styles from './VectorIcon.module.css'
-import { iconUrlOf } from './vectorIcons'
+import { iconUrlOf, warnOfMissingIcon } from './vectorIcons'
 
 export type IconSize = 'row' | 'hud' | 'banner' | 'menu'
 
@@ -24,18 +29,31 @@ export function VectorIcon({
   hasGlint?: boolean
 }) {
   const url = iconUrlOf(iconId)
+  const isMissing = url === null
+  useEffect(() => warnInDevOfMissingIcon(iconId, isMissing), [iconId, isMissing])
   return (
     <span
       className={`${styles.icon} ${styles[size]}`}
       data-testid={iconId}
+      data-missing-icon={isMissing ? iconId : undefined}
       data-badge={badge ?? undefined}
       data-glint={hasGlint || undefined}
       aria-hidden
     >
-      {url !== null && <img className={styles.image} src={url} alt="" draggable={false} />}
+      {isMissing ? (
+        <span className={MISSING_FACE_CLASS} />
+      ) : (
+        <img className={styles.image} src={url} alt="" draggable={false} />
+      )}
       {badge !== null && <Badge badge={badge} />}
     </span>
   )
+}
+
+const MISSING_FACE_CLASS = IS_DEV_BUILD ? styles.missingInDev : styles.missing
+
+function warnInDevOfMissingIcon(iconId: string, isMissing: boolean): void {
+  if (IS_DEV_BUILD && isMissing) warnOfMissingIcon(iconId)
 }
 
 /** A padlock or a star over the icon's corner, in brass with an ink edge, on every panel. */

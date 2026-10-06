@@ -14,6 +14,25 @@
   height: 100%;
 }
 
+/* An id with no icon (feature-slices.md 3.4): a square that shows, never a blank. */
+.missing {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--color-parchment);
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+/* Dev: magenta (#158), so no one can mistake a missing icon for a quiet one. */
+.missingInDev {
+  composes: missing;
+  border-color: #ff00ff;
+  background: rgb(255 0 255 / 0.6);
+  opacity: 1;
+}
+
 /* 2em: 48 px at the 1080p shop text size, the size #44 reads each silhouette at. */
 .row {
   --icon-size: 2em;
