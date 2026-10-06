@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-06T21:54:55+02:00",
+  "updated_at": "2026-10-06T21:59:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -13,18 +13,17 @@
     {
       "id": "A1",
       "account": 1,
-      "label": "account 1 (default ~/.claude login)",
-      "email": "bjooar@gmail.com",
+      "label": "Claude Max 1",
       "enabled": true,
       "reason": "signed in",
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 137,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-06T21:44:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -52,15 +51,15 @@
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
-      "claims_last_hour": 3
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 3,
+      "name": "Claude Max 1"
     },
     {
       "id": "A2",
       "account": 2,
-      "label": "account 2 (~/.claude-acct2)",
-      "email": "bjor.byrkjedal@osilion.no",
+      "label": "Claude Max 2",
       "enabled": true,
       "reason": "signed in",
       "slots": [
@@ -100,7 +99,8 @@
       "size": 4,
       "used": 3,
       "free": 1,
-      "claims_last_hour": 3
+      "claims_last_hour": 3,
+      "name": "Claude Max 2"
     }
   ],
   "gate": {
@@ -110,10 +110,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 137,
-      "since": "2026-10-06T21:44:00+02:00",
-      "claude_slot": 1
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -203,10 +202,10 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 137,
-      "grok_slot": 1,
-      "since": "2026-10-06T21:44:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -276,8 +275,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 11,
-      "dev": 7,
+      "used": 10,
+      "dev": 6,
       "dev_cap": 8,
       "planner": 4,
       "planner_cap": 4
@@ -285,8 +284,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 7,
-      "free": 1,
+      "used": 6,
+      "free": 2,
       "external": 0
     }
   }
