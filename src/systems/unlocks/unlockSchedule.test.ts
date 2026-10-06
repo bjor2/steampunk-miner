@@ -109,6 +109,20 @@ describe('locked unlock schedule', () => {
     expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 5 })).toBe(false)
     expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 6 })).toBe(true)
   })
+
+  it('names only vision rows of the locked schedule as built modules', () => {
+    const built = LOCKED_SCHEDULE.rows.filter((row) => BUILT_VISION_ROW_IDS.has(row.id))
+    expect(built.map((row) => [row.id, row.status])).toEqual(
+      [...BUILT_VISION_ROW_IDS].map((id) => [id, 'vision']),
+    )
+  })
+
+  it('opens auto_guns on arriving at planet 4 now its module is built (#93)', () => {
+    const guns = LOCKED_SCHEDULE.rows.find((row) => row.id === 'auto_guns') as UnlockRow
+    expect(guns).toMatchObject({ planetIndex: 4, bind: 'planet_gate' })
+    expect(isUnlocked(guns, { ...NO_PROGRESS, highestPlanetIndex: 3 })).toBe(false)
+    expect(isUnlocked(guns, { ...NO_PROGRESS, highestPlanetIndex: 4 })).toBe(true)
+  })
 })
 
 describe('unlock gate checks', () => {

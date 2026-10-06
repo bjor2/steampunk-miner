@@ -19,9 +19,10 @@ import {
  * Vision rows whose module this build ships (#90 M tickets). The locked file's bytes are pinned and
  * marking a row's `status` is the Horizontal Scaler's refresh (#87), so a module built ahead of
  * that refresh is listed here and unlocks by its bind; every other vision row still shows nothing.
+ * `auto_guns`: M2 #93 (spec #107), the hull turret bought at the Upgrade bay from planet 4.
  * `tunnel_wrecker`: M3 #94.
  */
-export const BUILT_VISION_ROW_IDS: ReadonlySet<string> = new Set(['tunnel_wrecker'])
+export const BUILT_VISION_ROW_IDS: ReadonlySet<string> = new Set(['auto_guns', 'tunnel_wrecker'])
 
 /** The Horizontal Scaler's lock (#80); a refreshed schedule changes this pin on purpose. */
 export const LOCKED_SCHEDULE_SOURCE_HASH =

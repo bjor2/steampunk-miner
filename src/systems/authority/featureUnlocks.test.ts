@@ -49,6 +49,13 @@ describe('feature unlocks on travel', () => {
     expect(isFeatureUnlocked(session.state(), 'heat_lava')).toBe(false)
   })
 
+  it('unlocks auto_guns on arriving at planet 4, its module being built (#93)', () => {
+    const session = dockedOnPlanet(3)
+    expect(isFeatureUnlocked(session.state(), 'auto_guns')).toBe(false)
+    expect(unlockedIdsOf(session.submit(10, travelTo(4)))).toEqual(['auto_guns'])
+    expect(isFeatureUnlocked(session.state(), 'auto_guns')).toBe(true)
+  })
+
   it('does not unlock endless on arriving at planet 40 or travelling past it', () => {
     const session = dockedOnPlanet(39)
     const toFinale = session.submit(10, travelTo(40))
