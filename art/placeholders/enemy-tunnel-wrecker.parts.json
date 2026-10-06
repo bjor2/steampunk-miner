@@ -1,0 +1,27 @@
+{
+  "assetId": "enemy-tunnel-wrecker",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/enemy-tunnel-wrecker/enemy-tunnel-wrecker.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [512, 512],
+  "maps": {
+    "albedo": "enemy-tunnel-wrecker.albedo.ktx2",
+    "normal": "enemy-tunnel-wrecker.normal.ktx2",
+    "emissive": "enemy-tunnel-wrecker.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "enemy-tunnel-wrecker",
+      "tier": 1,
+      "rect": [8, 8, 461, 461],
+      "sizeM": [0.9, 0.9],
+      "pivotM": [0.45, 0.45],
+      "atM": [0.0, 0.0],
+      "z": 0
+    }
+  ]
+}

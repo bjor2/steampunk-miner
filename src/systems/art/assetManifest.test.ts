@@ -8,7 +8,14 @@ import {
   type AssetManifest,
   type ManifestEntry,
 } from './assetManifest'
-import { blenderAssetIds, vectorIconIds } from './artIds'
+import {
+  SCHEDULED_ENEMY_ART_ROW_IDS,
+  blenderAssetIds,
+  enemyArtKinds,
+  vectorIconIds,
+} from './artIds'
+import { ENEMY_IDS } from '../registeredIds'
+import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 
 const withEntries = (...entries: ManifestEntry[]): AssetManifest => ({
   schema: 1,
@@ -52,6 +59,24 @@ describe('asset manifest', () => {
     expect(vectorIconIds()).toEqual(
       expect.arrayContaining(['icon-track-drill-power', 'icon-track-cargo-hold', 'icon-casing']),
     )
+  })
+
+  it("names the tunnel wrecker's art from its schedule row before the economy lists the kind", () => {
+    expect(ENEMY_IDS).not.toContain('tunnel_wrecker')
+    expect(blenderAssetIds()).toContain('enemy-tunnel-wrecker')
+  })
+
+  it('takes scheduled enemy art only from Enemy rows of the locked schedule', () => {
+    const enemyRowIds = LOCKED_SCHEDULE.rows
+      .filter((row) => row.lane === 'Enemy')
+      .map((row) => row.id)
+    expect(enemyRowIds).toEqual(expect.arrayContaining([...SCHEDULED_ENEMY_ART_ROW_IDS]))
+  })
+
+  it("lists each enemy kind's art once, economy kinds first", () => {
+    const kinds = enemyArtKinds()
+    expect(kinds.slice(0, ENEMY_IDS.length)).toEqual(ENEMY_IDS)
+    expect(new Set(kinds).size).toBe(kinds.length)
   })
 
   it('refuses an asset id that no registry derives, and a missing inventory row', () => {

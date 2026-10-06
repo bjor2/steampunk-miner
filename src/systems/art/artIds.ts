@@ -7,6 +7,7 @@
 import ASSET_RULES from '../../../art/asset-rules.json'
 import { BAND_COUNT } from '../world/planetGeometry'
 import { ENEMY_IDS, PLATFORM_BAY_IDS, PLATFORM_VISUAL_STATES, UPGRADE_IDS } from '../registeredIds'
+import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 
 export const ASSET_CATEGORIES = [
   'vehicle',
@@ -56,7 +57,7 @@ export function blenderAssetIds(): string[] {
     'platform-hub',
     ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}`),
     ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}-backdrop`),
-    ...ENEMY_IDS.map((kind) => `enemy-${kebabOf(kind)}`),
+    ...enemyArtKinds().map((kind) => `enemy-${kebabOf(kind)}`),
     'prop-artefact-cache',
     ...numbered('ground-band', BAND_COUNT),
     ...numbered('casing-grade', CASING_GRADE_COUNT),
@@ -81,6 +82,24 @@ export const CASING_ICON_ID = 'icon-casing'
 /** An upgrade track's icon (#44 `icon-track-<id>`, in the #52 kebab form of the registry id). */
 export function trackIconIdOf(track: string): string {
   return `icon-track-${kebabOf(track)}`
+}
+
+/**
+ * Enemy rows of the locked schedule (#80) whose art ticket ran before their module adds the kind to
+ * `economy.json`: `tunnel_wrecker` (#112, spec #111, build #94). The schedule row id is the kind id
+ * the module will register, so the art id stays derived from a registry (#52).
+ */
+export const SCHEDULED_ENEMY_ART_ROW_IDS: readonly string[] = ['tunnel_wrecker']
+
+/** The economy's enemy kinds, then each scheduled Enemy row with art that is not one of them yet. */
+export function enemyArtKinds(): string[] {
+  return [...ENEMY_IDS, ...scheduledEnemyArtKinds().filter((kind) => !ENEMY_IDS.includes(kind))]
+}
+
+function scheduledEnemyArtKinds(): string[] {
+  return LOCKED_SCHEDULE.rows
+    .filter((row) => row.lane === 'Enemy' && SCHEDULED_ENEMY_ART_ROW_IDS.includes(row.id))
+    .map((row) => row.id)
 }
 
 function numbered(prefix: string, count: number): string[] {

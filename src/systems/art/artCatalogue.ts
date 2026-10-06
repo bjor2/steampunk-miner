@@ -8,6 +8,7 @@
 import MANIFEST_FILE from '../../../art/asset-manifest.json'
 import ENEMY_BURROWER from '../../../art/placeholders/enemy-burrower.parts.json'
 import ENEMY_CRAWLER from '../../../art/placeholders/enemy-crawler.parts.json'
+import ENEMY_TUNNEL_WRECKER from '../../../art/placeholders/enemy-tunnel-wrecker.parts.json'
 import PLATFORM_BAY_SELL from '../../../art/placeholders/platform-bay-sell.parts.json'
 import PLATFORM_BAY_UPGRADE from '../../../art/placeholders/platform-bay-upgrade.parts.json'
 import PLATFORM_HUB from '../../../art/placeholders/platform-hub.parts.json'
@@ -33,6 +34,7 @@ export const PLACEHOLDER_SIDECARS: readonly PartsSidecar[] = [
   PLATFORM_BAY_UPGRADE,
   ENEMY_CRAWLER,
   ENEMY_BURROWER,
+  ENEMY_TUNNEL_WRECKER,
   PROP_ARTEFACT_CACHE,
 ] as unknown as readonly PartsSidecar[]
 

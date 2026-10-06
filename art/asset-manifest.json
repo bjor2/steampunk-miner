@@ -94,6 +94,13 @@
       "color": "#5a3a4a"
     },
     {
+      "id": "enemy-tunnel-wrecker",
+      "source": "blender",
+      "form": "parts",
+      "status": "placeholder",
+      "color": "#6a5a3a"
+    },
+    {
       "id": "prop-artefact-cache",
       "source": "blender",
       "form": "parts",
