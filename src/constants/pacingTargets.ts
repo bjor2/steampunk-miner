@@ -28,4 +28,12 @@ export const PACING_TARGETS = {
    * changes land (C1, C2, C3); until then it never fails a build.
    */
   campaignPlanetMinutes: { min: 45, max: 60 },
+  /**
+   * Report only (spec #111, Systems & Economy numbers): on planets 6 to 9 the median dive has 2 to 8
+   * rings breached by tunnel wreckers, and at most 5 dives in 100 set off a collapse on the way home.
+   * A miss is a balance finding; the single lever is `gnawTicksPerRing` (180 to 600).
+   */
+  wreckerPlanets: { first: 6, last: 9 },
+  wreckerRingsBreachedPerDive: { min: 2, max: 8 },
+  wreckerCollapseDivesPerHundred: 5,
 } as const

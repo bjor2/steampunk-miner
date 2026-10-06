@@ -23,6 +23,7 @@ import {
 } from '../src/logging/pacingReport'
 import { deriveSummary, formatRunSummary, type RunSummary } from '../src/logging/runSummary'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
+import { deriveWreckerDives, wreckerDiveLines } from '../src/logging/wreckerDiveReport'
 import type { Scenario } from '../src/systems/scenario'
 
 const SCENARIO_FILE = new URL('../scenarios/bot-slice.scenario.json', import.meta.url)
@@ -46,6 +47,7 @@ const report = [
   `### Gates\n\n${formatPacingVerdicts(pacingVerdicts(pacing))}`,
   listSection('Pacing targets missed (these fail the build)', pacingProblems(pacing)),
   listSection('Alerts (reported only)', [...pacingAlerts(pacing), ...campaignPlanetAlerts(pacing)]),
+  listSection('Tunnel wrecker (reported only, #111)', wreckerDiveLines(deriveWreckerDives(events))),
   comparisonSection(summary),
   assaySection(),
 ].join('\n\n')

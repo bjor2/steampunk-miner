@@ -16,6 +16,7 @@ import type { RunEvent } from './runEvent'
 import { runEventProblems } from './runEventSchema'
 import { deriveSummary } from './runSummary'
 import { playLoggedSlice, type LoggedSliceRun } from './sliceRunLog'
+import { deriveWreckerDives, wreckerDiveLines } from './wreckerDiveReport'
 
 const SCENARIO = JSON.parse(
   readFileSync(new URL('../../scenarios/bot-slice.scenario.json', import.meta.url), 'utf8'),
@@ -67,7 +68,10 @@ describe('balance regression: the pacing bot on the slice (#29, S11)', () => {
   it('meets the first-sale, first-upgrade, ten-minute, core and slice targets', () => {
     const report = derivePacingReport(botRun().events, SCENARIO.worldSeed)
     const verdicts = formatPacingVerdicts(pacingVerdicts(report))
-    console.log(`${formatPacingReport(report)}\n\n${verdicts}\n${pacingAlerts(report).join('\n')}`)
+    const wrecker = wreckerDiveLines(deriveWreckerDives(botRun().events))
+    console.log(
+      `${formatPacingReport(report)}\n\n${verdicts}\n${[...pacingAlerts(report), ...wrecker].join('\n')}`,
+    )
     expect(pacingProblems(report)).toEqual([])
   })
 
