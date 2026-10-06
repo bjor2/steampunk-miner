@@ -54,6 +54,14 @@ issues (`wayfinder:*` labels) and umbrella issues (with sub-issues) never count 
 "To check" chip and the "Features to check" list show them; fix the status (or add `ignoreSync`
 with a reason when the mismatch is real and known).
 
+## Ticket time per feature
+
+Every feature row and group heading also shows how long its tickets took: a compact stacked bar in
+the phase colours of the **Where the time goes** section, its measured total, and a tooltip with
+the hours per phase and the ticket counts. A chart above the tree compares the areas. The rule
+(umbrella issues bring in their sub-issues, a shared ticket counts once, tickets without a metrics
+file are "not measured") is in [docs/metrics/README.md](../metrics/README.md#roll-up-per-feature-features-tab).
+
 `npm test` validates the file (`scripts/status/features.test.mjs`), so a typo fails CI, not the
 page. If the file is invalid at build time anyway, the tab lists the problems and the rest of the
 page still deploys.

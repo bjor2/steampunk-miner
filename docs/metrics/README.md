@@ -13,6 +13,9 @@ in the **Where the time goes** section at the top of the **Issue trees** tab
 The page reads only the committed files (`scripts/status/ticketTimeOverview.mjs`), so the Pages job
 builds it without transcripts. Ticket #134 specifies all of this.
 
+The **Features** tab rolls the same files up per feature and feature area; see
+[Roll-up per feature](#roll-up-per-feature-features-tab) below.
+
 ## Categories (schema v1)
 
 The list is fixed. Adding or renaming a category bumps `schema`
@@ -114,6 +117,37 @@ when no session ever ran).
 `source` is `transcript`, `loop-log`, `github` or `derived` (idle). The totals add up to the lead
 time to within rounding. The writer puts one segment per line and rewrites the same bytes for the
 same inputs, so the folder is excluded from Prettier.
+
+## Roll-up per feature (Features tab)
+
+The **Features** tab (**https://bjor2.github.io/steampunk-miner/status/#features**) shows the
+ticket times per feature and per feature area of `docs/features/features.json` (#135). The rule
+lives in `scripts/status/featureTime.mjs`:
+
+- **A feature's tickets** are its `issues`, plus every sub-issue of an umbrella issue it lists,
+  followed down through umbrellas of umbrellas. The umbrella itself is one of the tickets.
+- **A group's tickets** (an area or a sub-heading) are the union of its own issues and all its
+  children's tickets.
+- **Each ticket counts once per node**, however many paths reach it. A ticket shared by two
+  features counts in both, but only once in the group above them, so an area's total is never a
+  plain sum of its features.
+- **Measured** tickets have a file in `docs/metrics/tickets/`; their category totals are added.
+  The others count as **not measured**: shown as a count, never as zero time.
+- Per node: seconds per category, the measured total, the measured and not-measured counts, and
+  from **2 measured tickets** on the median ticket cycle time.
+
+What the tab shows (`scripts/status/featureTimeHtml.mjs`):
+
+- on every feature row and group heading, a compact stacked bar in the fixed category colours with
+  its total (or "N not measured" when no ticket has a file; nothing when it links no ticket). Its
+  tooltip lists the measured time and counts, the median cycle and each category's time;
+- above the tree, one bar per feature area on a shared scale, split by category, under the same
+  legend as the Issue trees section (`phaseLegendHtml`, colours from `phaseCategories.mjs`), with
+  the categories' totals over every ticket the tree links.
+
+`build-status.mjs` reads the sub-issues from the issue list it already fetches and the times from
+the committed files only, so the Pages job builds it with no transcripts. A broken ticket file or
+feature file replaces the chart with its error; the tree still renders.
 
 ## Commands (on the build box)
 
