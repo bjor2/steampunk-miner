@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest'
 import scheduleFile from '../../../docs/scaling/horizontal/stats.json'
 import type { UnlockBind, UnlockRow } from './readUnlockSchedule'
 import {
-  BUILT_VISION_ROW_IDS,
   isUnlocked,
   LOCKED_SCHEDULE,
   LOCKED_SCHEDULE_SOURCE_HASH,
@@ -17,7 +16,7 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = '74227339530b34d4318f0a35091ab9e8bc9304a6ce83266397f7ca2c3ed83777'
+const LOCKED_FILE_SHA256 = 'd4500e2f926b59246df20ee8502c33f282647a375745555c9768dc8bdb12b250'
 
 const CAMPAIGN_PLANETS = Array.from({ length: 40 }, (_, index) => index + 1)
 
@@ -139,10 +138,8 @@ describe('locked unlock schedule', () => {
   it('unlocks no vision row whose module is not built, even when every bind is met', () => {
     const visionRows = LOCKED_SCHEDULE.rows.filter((row) => row.status === 'vision')
     const progress = progressWithEveryBindMet(visionRows)
-    expect(visionRows).toHaveLength(40)
-    expect(visionRows.filter((row) => isUnlocked(row, progress)).map((row) => row.id)).toEqual([
-      ...BUILT_VISION_ROW_IDS,
-    ])
+    expect(visionRows).toHaveLength(34)
+    expect(visionRows.filter((row) => isUnlocked(row, progress))).toEqual([])
   })
 
   it('opens the built tunnel_wrecker row at planet 6, its locked planet (#94)', () => {
@@ -168,10 +165,10 @@ describe('locked unlock schedule', () => {
     ])
   })
 
-  it('names only vision rows of the locked schedule as built modules', () => {
-    const built = LOCKED_SCHEDULE.rows.filter((row) => BUILT_VISION_ROW_IDS.has(row.id))
+  it('marks the six built campaign module rows shipped in the locked file (#127)', () => {
+    const built = LOCKED_SCHEDULE.rows.filter((row) => BUILT_BEFORE_SHIPPED_IN_FILE.has(row.id))
     expect(built.map((row) => [row.id, row.status])).toEqual(
-      [...BUILT_VISION_ROW_IDS].map((id) => [id, 'vision']),
+      [...BUILT_BEFORE_SHIPPED_IN_FILE].map((id) => [id, 'shipped']),
     )
   })
 

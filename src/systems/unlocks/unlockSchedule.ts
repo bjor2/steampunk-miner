@@ -15,25 +15,6 @@ import {
   type UnlockSchedule,
 } from './readUnlockSchedule'
 
-/**
- * Vision rows whose module this build ships (#90 M tickets). The locked file's bytes are pinned and
- * marking a row's `status` is the Horizontal Scaler's refresh (#87), so a module built ahead of
- * that refresh is listed here and unlocks by its bind; every other vision row still shows nothing.
- * `refinery_bay`: M1 #92 (spec #105), the platform's third bay, a `facility` row it has from planet 3.
- * `auto_guns`: M2 #93 (spec #107), the hull turret bought at the Upgrade bay from planet 4.
- * `tunnel_wrecker`: M3 #94. `blasting_charges`: M4 #95, charges bought at the Upgrade bay from planet 7.
- * `heat_lava` and `refractory_lining`: M5 #96 (spec #113), the heat planets from planet 8 and the
- * lining type bought at the Upgrade bay there; the pair ships together.
- */
-export const BUILT_VISION_ROW_IDS: ReadonlySet<string> = new Set([
-  'refinery_bay',
-  'auto_guns',
-  'tunnel_wrecker',
-  'blasting_charges',
-  'heat_lava',
-  'refractory_lining',
-])
-
 /** The Horizontal Scaler's lock (#80); a refreshed schedule changes this pin on purpose. */
 export const LOCKED_SCHEDULE_SOURCE_HASH =
   'sha256:419ca56d8af626d1f0ff799075be9e72726381567c26168b7d0a6fbf8e1f3481'
@@ -68,8 +49,7 @@ export function isUnlocked(row: UnlockRow, progress: UnlockProgress): boolean {
 }
 
 function hasModule(row: UnlockRow): boolean {
-  if (row.status === 'vision') return BUILT_VISION_ROW_IDS.has(row.id)
-  return row.status !== 'cut'
+  return row.status !== 'vision' && row.status !== 'cut'
 }
 
 const isBindMet: Record<UnlockBind, (row: UnlockRow, progress: UnlockProgress) => boolean> = {
