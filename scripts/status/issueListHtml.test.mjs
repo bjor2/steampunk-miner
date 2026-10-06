@@ -7,6 +7,7 @@ import {
   elapsedText,
   issueCardHtml,
   issueListHtml,
+  issueSearchText,
   osloTimeOf,
   whenText,
 } from './issueListHtml.mjs'
@@ -140,6 +141,14 @@ describe('issue list cards', () => {
     expect(cardOf(194, page)).toContain('data-n="194" data-search=')
     expect(cardOf(194, page)).toMatch(/^<details class="iss" [^>]*open>/)
     expect(cardOf(193, page)).not.toMatch(/^<details[^>]*open>/)
+  })
+
+  it('lets the search box match the type, labels, assignees and loop slot', () => {
+    const issue = { ...FIXTURE.issues.find((i) => i.number === 194), assignees: ['bjor2'] }
+    const search = issueSearchText(issue, pageOf().claims.get(194))
+    for (const word of ['#194', 'build', 'tier:hard', 'bjor2', 'g1 · c1']) {
+      expect(search).toContain(word)
+    }
   })
 
   it('says so when a filter has no issues', () => {

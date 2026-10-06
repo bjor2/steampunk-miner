@@ -442,6 +442,124 @@
         gap: 4px;
         align-items: center;
       }
+      /* issue status filter and cards (#194, issueListHtml.mjs) */
+      #tab-issues .buckets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+      #tab-issues .tree-ctl {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      /* after .tree-ctl: the List/Tree toggle hides its controls with the hidden attribute */
+      #tab-issues [hidden] {
+        display: none;
+      }
+      #tab-issues .bucket b {
+        color: var(--brass);
+        margin-left: 3px;
+      }
+      #tab-issues .bucket[aria-pressed='true'],
+      #tab-issues .view[aria-pressed='true'] {
+        border-color: var(--brass);
+        background: #3a2e1a;
+        color: var(--text);
+        font-weight: 600;
+      }
+      #tab-issues .view[aria-pressed='false'] {
+        color: var(--muted);
+      }
+      #tab-issues .iss {
+        border-bottom: 1px solid #2c231a;
+      }
+      #tab-issues .iss > summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        align-items: baseline;
+        padding: 4px;
+        border-radius: 5px;
+      }
+      #tab-issues .iss > summary::-webkit-details-marker {
+        display: none;
+      }
+      #tab-issues .iss > summary::before {
+        content: '▸';
+        color: var(--brass);
+        width: 10px;
+        transition: transform 0.12s;
+      }
+      #tab-issues .iss[open] > summary::before {
+        transform: rotate(90deg);
+      }
+      #tab-issues .iss > summary:hover {
+        background: #2a2119;
+      }
+      #tab-issues .itype {
+        font-size: 11px;
+        padding: 0 6px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      #tab-issues .itype.t-build {
+        color: var(--green);
+      }
+      #tab-issues .itype.t-spec {
+        color: var(--blue);
+      }
+      #tab-issues .itype.t-plan,
+      #tab-issues .itype.t-map {
+        color: var(--brass);
+      }
+      #tab-issues .started {
+        font-size: 12px;
+        color: var(--amber);
+      }
+      #tab-issues .iss .muted {
+        font-size: 12px;
+      }
+      #tab-issues .iss-meta {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 2px 12px;
+        margin: 2px 0 8px 32px;
+        font-size: 12.5px;
+      }
+      #tab-issues .iss-meta dt {
+        color: var(--muted);
+      }
+      #tab-issues .iss-meta dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+      }
+      #tab-issues .iss-phase {
+        display: inline-block;
+        width: 180px;
+        max-width: 50%;
+        vertical-align: middle;
+      }
+      @media (max-width: 700px) {
+        #tab-issues .iss-meta {
+          grid-template-columns: 1fr;
+          margin-left: 14px;
+        }
+        #tab-issues .iss-meta dd {
+          margin-bottom: 4px;
+        }
+        #tab-issues .toolbar input[type='search'] {
+          min-width: 0;
+          flex: 1 1 100%;
+        }
+      }
       /* tree */
       .tree details {
         margin-left: 14px;
@@ -1598,21 +1716,27 @@
         </section>
       </section>
       <section class="tab hidden" id="tab-issues" data-tab="issues">
-        <!-- ticket-time -->
         <section class="panel" id="tree-panel">
           <h2>Issue trees</h2>
+          <div class="buckets" id="buckets" role="group" aria-label="Status filter"></div>
           <div class="toolbar">
             <input
               type="search"
               id="filter"
               placeholder="Filter: number, title, label, assignee…"
             />
-            <button id="expand">Expand all</button>
-            <button id="collapse">Collapse all</button>
-            <label class="chk"><input type="checkbox" id="showclosed" /> expand closed</label>
+            <button class="view" data-view="list" aria-pressed="true">List</button>
+            <button class="view" data-view="tree" aria-pressed="false">Tree</button>
+            <span class="tree-ctl" id="tree-ctl" hidden>
+              <button id="expand">Expand all</button>
+              <button id="collapse">Collapse all</button>
+              <label class="chk"><input type="checkbox" id="showclosed" /> expand closed</label>
+            </span>
           </div>
-          <div class="tree" id="tree"></div>
+          <div id="iss-list"></div>
+          <div class="tree" id="tree" hidden></div>
         </section>
+        <!-- ticket-time -->
       </section>
       <section class="tab tab-grid hidden" id="tab-performance" data-tab="performance">
         <!-- perf-overview -->
@@ -2023,13 +2147,71 @@
         if (archived.length)
           html += `<details class="closedgrp"${showClosed ? ' open' : ''}><summary>${archived.length} older closed roots</summary><div class="kids">${archived.map((i) => node(i.number, 9, new Set())).join('')}</div></details>`
         $('#tree').innerHTML = html
-        $('#tabn-issues').textContent =
-          `${DATA.issues.filter((i) => i.state === 'OPEN').length} open`
         applyFilter()
+      }
+
+      // ---------- issue status filter and cards (#194): issueBuckets/Claims/ListHtml.mjs ----------
+      // `#issues?f=<bucket>` picks the filter (default Ongoing), `&view=tree` shows the tree instead.
+      const ISSUE_MODULES = Promise.all([
+        import('./issueBuckets.mjs'),
+        import('./issueClaims.mjs'),
+        import('./issueListHtml.mjs'),
+      ]).then((modules) => Object.assign({}, ...modules))
+      let LIB = null
+      const ISS = { f: null, view: 'list', expanded: new Set() }
+
+      function issuePage() {
+        return {
+          repo: DATA.repo,
+          byNum: new Map(DATA.issues.map((i) => [i.number, i])),
+          claims: LIB.loopClaimsOf(LOOPS, DATA.slots),
+          loopFacts: LIB.loopFactsOf(LOOPS),
+          phases: DATA.phases,
+          nowMs: Date.now(),
+          expanded: ISS.expanded,
+        }
+      }
+      function renderIssueList() {
+        if (!DATA || !LIB) return
+        const page = issuePage()
+        const bucket = LIB.bucketIdOf(ISS.f)
+        const counts = LIB.bucketCountsOf(DATA.issues, page)
+        const shown = LIB.issuesInBucket(DATA.issues, bucket, page)
+        $('#buckets').innerHTML = LIB.bucketButtonsHtml(counts, ISS.view === 'list' ? bucket : null)
+        $('#iss-list').innerHTML = LIB.issueListHtml(shown, page)
+        $('#tabn-issues').textContent = `${counts.open} open · ${counts.ongoing} ongoing`
+        applyFilter()
+      }
+      function readIssueView(params) {
+        ISS.f = params.get('f')
+        ISS.view = params.get('view') === 'tree' ? 'tree' : 'list'
+      }
+      function showIssueView() {
+        const isTree = ISS.view === 'tree'
+        $('#iss-list').hidden = isTree
+        $('#tree').hidden = !isTree
+        $('#tree-ctl').hidden = !isTree
+        document
+          .querySelectorAll('#tree-panel .view')
+          .forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === ISS.view)))
+        renderIssueList()
+      }
+      function goToIssueView(f, view) {
+        const params = new URLSearchParams()
+        if (f) params.set('f', f)
+        if (view === 'tree') params.set('view', 'tree')
+        const query = params.toString()
+        location.hash = 'issues' + (query ? '?' + query : '')
+      }
+      function applyListSearch(q) {
+        for (const card of $('#iss-list').querySelectorAll('.iss')) {
+          card.classList.toggle('hidden', !!q && !card.dataset.search.includes(q))
+        }
       }
 
       function applyFilter() {
         const q = $('#filter').value.trim().toLowerCase()
+        applyListSearch(q)
         const tree = $('#tree')
         tree.querySelectorAll('.hidden').forEach((el) => el.classList.remove('hidden'))
         if (!q) return
@@ -2142,6 +2324,7 @@
         renderMeta()
         renderLoops()
         renderTree()
+        renderIssueList()
         renderPerfWork()
       }
 
@@ -2150,6 +2333,10 @@
         const r = await fetch('status.json', { cache: 'no-store' })
         DATA = await r.json()
         if (!LOOPS || !LOOP_SRC.startsWith('live')) LOOPS = DATA.loops
+        LIB = await ISSUE_MODULES.catch((e) => {
+          $('#iss-list').innerHTML = `<p class="bad">Issue filter failed to load: ${esc(e)}</p>`
+          return null
+        })
         renderAll()
         loadFeatures().catch((e) => {
           $('#ft-error').innerHTML =
@@ -2571,6 +2758,10 @@
           $('#filter').value = params.get('q')
           applyFilter()
         }
+        if (tab === 'issues') {
+          readIssueView(params)
+          showIssueView()
+        }
         if (target) document.getElementById(target)?.scrollIntoView({ block: 'center' })
       }
       window.addEventListener('hashchange', showTab)
@@ -2584,6 +2775,24 @@
       showTab()
 
       $('#filter').addEventListener('input', applyFilter)
+      $('#buckets').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-bucket]')
+        if (b) goToIssueView(b.dataset.bucket, 'list')
+      })
+      document
+        .querySelectorAll('#tree-panel .view')
+        .forEach((b) => b.addEventListener('click', () => goToIssueView(ISS.f, b.dataset.view)))
+      // Kept across the re-renders of the live loop poll and the 30 s clock.
+      $('#iss-list').addEventListener(
+        'toggle',
+        (e) => {
+          const n = Number(e.target.dataset.n)
+          if (!n) return
+          if (e.target.open) ISS.expanded.add(n)
+          else ISS.expanded.delete(n)
+        },
+        true,
+      )
       $('#showclosed').addEventListener('change', renderTree)
       $('#expand').addEventListener('click', () =>
         $('#tree')
@@ -2603,6 +2812,7 @@
         if (await refreshLoops()) {
           renderMeta()
           renderLoops()
+          renderIssueList()
           renderPerfWork()
         }
       }
@@ -2614,6 +2824,7 @@
       setInterval(() => {
         if (DATA) {
           renderMeta()
+          renderIssueList()
           renderPerfBadge()
           renderPerfTimes()
         }

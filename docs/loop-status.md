@@ -12,6 +12,26 @@ scripts/status/loop-status.sh <loop> <working|idle|paused|blocked> [--issue N] [
 
 On the box the same script lives at `/workspace/claude-sessions/loop-status.sh`.
 
+## Issue trees tab
+
+**https://bjor2.github.io/steampunk-miner/status/#issues** opens on the **Ongoing** filter. Five
+buttons pick the list, each with its count, and the choice stays in the hash (`#issues?f=open`,
+`ready`, `ongoing`, `closed`, `planned`; `&view=tree` shows the sub-issue tree instead):
+
+| Filter         | Issues                                                                                                                             |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Open           | every open issue (Ongoing + Ready to begin + Planned)                                                                              |
+| Ongoing        | labelled `in-progress`, or held by a live loop worker or planner slot                                                              |
+| Ready to begin | the build loop's pick rule: none of `blocked`/`on-hold`/`hitl`/`needs-planner`, blockers closed, attempts left, no open sub-issues |
+| Planned        | the other open issues: waiting on an open blocker, a label, its open sub-issues or a person                                        |
+| Closed         | newest closed first                                                                                                                |
+
+Each card expands to the issue's parent, blockers, created/updated/closed times, its loop slot
+(`G#` · `C#`, account, model and effort, attempts, push_pending) and its phase bar from
+`docs/metrics/tickets/`. An ongoing issue shows when work began (Oslo time and elapsed): the loop's
+claim time from the published `slots.json` or the loop event log, else when `in-progress` was
+applied. The rule lives in `scripts/status/issueBuckets.mjs`, which the page imports as is.
+
 ## Performance tab
 
 **https://bjor2.github.io/steampunk-miner/status/#performance** shows the budget verdicts (latest value,

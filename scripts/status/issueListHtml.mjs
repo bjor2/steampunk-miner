@@ -224,12 +224,12 @@ function cardBodyHtml(issue, page) {
   )
 }
 
-/** What the search box matches on: number, title, labels, type and the loop slot. */
+/** What the search box matches on: number, title, type, labels, assignees and the loop slot. */
 export function issueSearchText(issue, claim) {
   const parts = [issue.number, `#${issue.number}`, issue.title, issueTypeOf(issue) ?? '']
   const labels = issue.labels.map((label) => label.name)
   const seats = claim ? [claim.loop, slotText(claim)] : []
-  return [...parts, ...labels, ...seats].join(' ').toLowerCase()
+  return [...parts, ...labels, ...(issue.assignees ?? []), ...seats].join(' ').toLowerCase()
 }
 
 /**
