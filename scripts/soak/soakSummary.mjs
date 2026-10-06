@@ -3,7 +3,7 @@
 // reader checks first: cycles, heap at the first and last boundary, the counts there, the gate.
 // Pure: it reads a soak.json object and returns the summary.
 
-import { listSoakGateFailures, SOAK_GATE } from './soakGate.mjs'
+import { listSoakGateFailures, measureRetainedHeapGrowth, SOAK_GATE } from './soakGate.mjs'
 
 const MIB = 1048576
 const DECIMALS = 1000
@@ -39,6 +39,7 @@ function summariseHeap(run) {
     peakUsedJSHeapMB: roundTo(peakOf(allSamplesOf(run), 'usedJSHeapSize') / MIB),
     heapSlopeMBperCycle: roundTo(slopeOf(run.boundaries, (b) => b.cycle, heapMB)),
     heapSlopeAfterCycle4MBperMin: roundTo(slopeOf(settled, minutesOf, heapMB)),
+    heapGateGrowthMB: roundTo(megabytesOf(measureRetainedHeapGrowth(settled))),
   }
 }
 
@@ -52,6 +53,10 @@ function summariseCounts(boundaries) {
     bodiesFirstLast: [first.rapierBodies, last.rapierBodies],
     wasmBytesFirstLast: [first.wasmBytes, last.wasmBytes],
   }
+}
+
+function megabytesOf(bytes) {
+  return bytes === null ? null : bytes / MIB
 }
 
 function allSamplesOf(run) {

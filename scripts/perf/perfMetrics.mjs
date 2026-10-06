@@ -52,13 +52,14 @@ export function medianMetricsOf(runs) {
   )
 }
 
-// The memory soak's summary.json (scripts/soak/soakMemory.mjs in the perf pass) -> soak.* ids.
+// The memory soak's summary.json (scripts/soak/soakSummary.mjs, #99) -> soak.* ids.
 const SOAK_SUMMARY_FIELDS = {
   heapFirstBoundaryMB: 'soak.heapStartMB',
   heapLastBoundaryMB: 'soak.heapEndMB',
   peakUsedJSHeapMB: 'soak.heapPeakMB',
   heapSlopeMBperCycle: 'soak.heapGrowthMBPerCycle',
   heapSlopeAfterCycle4MBperMin: 'soak.heapSlopeAfterWarmupMBPerMin',
+  heapGateGrowthMB: 'soak.heapGateGrowthMB',
   peakWasmMB: 'soak.wasmPeakMB',
   runLogTextMBperMin: 'soak.runLogMBPerMin',
   frameP50median: 'soak.frameP50Ms',

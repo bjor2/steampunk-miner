@@ -157,6 +157,14 @@
       "better": "lower",
       "source": "memory soak summary.json"
     },
+    "soak.heapGateGrowthMB": {
+      "label": "Retained heap growth the leak gate judges",
+      "unit": "MB",
+      "group": "Memory soak",
+      "better": "lower",
+      "budget": 20,
+      "source": "memory soak summary.json (median heap of the last 3 cycle boundaries minus the first 3 after 4 warm-up cycles, after GC, MiB; soakGate.mjs fails above 20, #99)"
+    },
     "soak.geometriesAtLastBoundary": {
       "label": "three geometries at last boundary",
       "unit": "geometries",

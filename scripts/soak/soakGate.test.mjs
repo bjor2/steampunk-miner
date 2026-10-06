@@ -1,5 +1,11 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { listSoakGateFailures } from './soakGate.mjs'
+
+/** The cycle boundaries of a real 10-minute `npm run soak:memory` (18 cycles, no page error). */
+const REAL_SOAK = JSON.parse(
+  readFileSync(new URL('./fixtures/soak-boundaries.json', import.meta.url), 'utf8'),
+)
 
 const MIB = 1048576
 
@@ -26,6 +32,10 @@ describe('memory soak gate', () => {
     const run = cycles(18, (cycle) => ({ heapMB: 43 + noise[cycle - 1] }))
 
     expect(listSoakGateFailures(run, [])).toEqual([])
+  })
+
+  it('passes a real 10-minute soak with its one warm-up step in geometries and textures', () => {
+    expect(listSoakGateFailures(REAL_SOAK.boundaries, REAL_SOAK.pageErrors)).toEqual([])
   })
 
   it('fails a leak of 2 MB and one geometry per cycle on both the heap and the geometry rule', () => {

@@ -43,13 +43,21 @@ function listTooFewCycles(settled) {
 }
 
 function listHeapGrowth(settled) {
-  if (settled.length < SOAK_GATE.heapMinSettledCycles) return []
-  const first = medianHeapOf(settled.slice(0, SOAK_GATE.heapMedianOf))
-  const last = medianHeapOf(settled.slice(-SOAK_GATE.heapMedianOf))
-  const growth = last - first
-  if (growth <= SOAK_GATE.retainedHeapGrowthBytes) return []
+  const growth = measureRetainedHeapGrowth(settled)
+  if (growth === null || growth <= SOAK_GATE.retainedHeapGrowthBytes) return []
   const limitMB = SOAK_GATE.retainedHeapGrowthBytes / MIB
   return [`retained heap grew ${(growth / MIB).toFixed(1)} MB (> ${limitMB} MB)`]
+}
+
+/**
+ * Bytes between the median heap of the last 3 settled boundaries and the first 3: the number the
+ * 20 MB rule judges. Null while too few cycles have settled to compare.
+ */
+export function measureRetainedHeapGrowth(settled) {
+  if (settled.length < SOAK_GATE.heapMinSettledCycles) return null
+  const first = medianHeapOf(settled.slice(0, SOAK_GATE.heapMedianOf))
+  const last = medianHeapOf(settled.slice(-SOAK_GATE.heapMedianOf))
+  return last - first
 }
 
 function listRisingCount(settled, field) {

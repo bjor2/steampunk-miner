@@ -1,0 +1,187 @@
+{
+  "source": "npm run soak:memory at 3d66004 (#99), 2026-10-06T09:51:12.624Z, headless Chrome 154 SwiftShader, box load 6-14; boundaries only",
+  "minutes": 10,
+  "pageErrors": [],
+  "boundaries": [
+    {
+      "cycle": 1,
+      "t": 33.7,
+      "usedJSHeapSize": 46108076,
+      "geometries": 32,
+      "textures": 18,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1310720
+    },
+    {
+      "cycle": 2,
+      "t": 66.9,
+      "usedJSHeapSize": 46178039,
+      "geometries": 32,
+      "textures": 18,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1310720
+    },
+    {
+      "cycle": 3,
+      "t": 99.7,
+      "usedJSHeapSize": 47480257,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 4,
+      "t": 132.3,
+      "usedJSHeapSize": 47723691,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 5,
+      "t": 164.8,
+      "usedJSHeapSize": 47838670,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 6,
+      "t": 197.3,
+      "usedJSHeapSize": 48406491,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 7,
+      "t": 229.6,
+      "usedJSHeapSize": 48394366,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 8,
+      "t": 266.4,
+      "usedJSHeapSize": 48518213,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 9,
+      "t": 301.6,
+      "usedJSHeapSize": 49130903,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 10,
+      "t": 341.7,
+      "usedJSHeapSize": 48875649,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 11,
+      "t": 377.2,
+      "usedJSHeapSize": 49400409,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 12,
+      "t": 412.7,
+      "usedJSHeapSize": 49126281,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1376256
+    },
+    {
+      "cycle": 13,
+      "t": 448.3,
+      "usedJSHeapSize": 49998990,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1441792
+    },
+    {
+      "cycle": 14,
+      "t": 484.1,
+      "usedJSHeapSize": 49932755,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1441792
+    },
+    {
+      "cycle": 15,
+      "t": 519.7,
+      "usedJSHeapSize": 49856308,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1441792
+    },
+    {
+      "cycle": 16,
+      "t": 554.9,
+      "usedJSHeapSize": 50342817,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1441792
+    },
+    {
+      "cycle": 17,
+      "t": 591.6,
+      "usedJSHeapSize": 50152998,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1441792
+    },
+    {
+      "cycle": 18,
+      "t": 626.9,
+      "usedJSHeapSize": 50518860,
+      "geometries": 35,
+      "textures": 21,
+      "rapierColliders": 4,
+      "rapierBodies": 1,
+      "wasmBytes": 1441792
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { metricsOfMeasurementFile } from '../perf/perfMetrics.mjs'
 import { summariseSoak } from './soakSummary.mjs'
@@ -59,6 +60,7 @@ describe('memory soak summary', () => {
       peakUsedJSHeapMB: 46,
       heapSlopeMBperCycle: 2,
       heapSlopeAfterCycle4MBperMin: null,
+      heapGateGrowthMB: null,
       geometriesFirstLast: [31, 34],
       texturesFirstLast: [18, 18],
       collidersFirstLast: [4, 4],
@@ -69,6 +71,20 @@ describe('memory soak summary', () => {
       frameP50median: 150,
       frameP95median: 300,
     })
+  })
+
+  it('reports the heap growth the gate judged on a real 10-minute soak', () => {
+    const fixture = new URL('./fixtures/soak-boundaries.json', import.meta.url)
+    const realSoak = JSON.parse(readFileSync(fixture, 'utf8'))
+    const run = { ...realSoak, samples: [], refusals: [], consoleErrorCount: 0 }
+
+    const summary = summariseSoak(run)
+
+    expect(summary.gate).toBe('PASS')
+    expect(summary.cycles).toBe(18)
+    expect(summary.heapGateGrowthMB).toBe(1.858)
+    expect(summary.geometriesFirstLast).toEqual([32, 35])
+    expect(metricsOfMeasurementFile(summary).metrics['soak.heapGateGrowthMB']).toBe(1.858)
   })
 
   it('is read by the perf recorder as the soak metrics of the history', () => {
