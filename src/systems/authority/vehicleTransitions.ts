@@ -13,25 +13,12 @@
 import {
   DESTROY_DELAY_TICKS,
   ENERGY_LOW_PERCENTS,
-  ENERGY_QUANTA_PER_UNIT,
   STRAND_GRACE_TICKS,
 } from '../../constants/balance'
 import { rescueFee } from '../economy/planetCharges'
 import { oreSalePrice } from '../economy/oreEconomy'
-import { rescueEnergyFloor } from '../economy/vehicleStats'
-import {
-  add,
-  ceil,
-  cmp,
-  fromSafeInteger,
-  mul,
-  sub,
-  toCanonical,
-  toSafeInteger,
-  ZERO_MONEY,
-  type Money,
-} from '../money'
-import { isAtOrBelowPercent } from '../vehicle/energyQuanta'
+import { add, cmp, fromSafeInteger, mul, sub, toCanonical, ZERO_MONEY, type Money } from '../money'
+import { isAtOrBelowPercent, rescueFloorQuanta } from '../vehicle/energyQuanta'
 import { dockedPoseAt, isInPadZone } from '../vehicle/vehiclePose'
 import {
   energyMaxQuantaOf,
@@ -46,8 +33,6 @@ import { endTrip } from './combat/enemyRoster'
 import { bankCoreFragments } from './coreBay'
 import type { Attacker, DomainEvent, DomainEventBody, RescueCause } from './domainEvent'
 import { dockSiteOfPlanet } from './planetOfState'
-
-const QUANTA_PER_UNIT = fromSafeInteger(ENERGY_QUANTA_PER_UNIT)
 
 /** What follows any change to a vehicle's energy: the low-energy lines, then a possible strand. */
 export function followEnergyChange(
@@ -222,16 +207,11 @@ function towedVehicle(vehicle: VehicleState, pose: VehicleState['pose']): Vehicl
   return {
     ...vehicle,
     hull: stats.hullMax,
-    energy: Math.max(vehicle.energy, rescueFloorQuanta(vehicle)),
+    energy: Math.max(vehicle.energy, rescueFloorQuanta(vehicle.levels.boiler)),
     cargo: { ...vehicle.cargo, ore: {} },
     pose,
     energyLowLogged: [],
   }
-}
-
-/** 25% of `energyMax` (#6, #9), rounded up to a whole quantum so the floor is never missed. */
-function rescueFloorQuanta(vehicle: VehicleState): number {
-  return toSafeInteger(ceil(mul(rescueEnergyFloor(vehicle.levels.boiler), QUANTA_PER_UNIT)))
 }
 
 function dockedPoseOf(state: AuthorityState, vehicle: VehicleState): VehicleState['pose'] {

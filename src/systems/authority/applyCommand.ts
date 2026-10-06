@@ -35,6 +35,7 @@ import { CASING_RULES } from './casingRules'
 import { followCollapse } from './collapse/collapseWatch'
 import { DEBUG_COMMAND_RULES } from './debugCommandRules'
 import { DOCK_COMMAND_RULES } from './dockRules'
+import { GUN_RULES } from './gunRules'
 import type { DomainEvent, DomainEventBody } from './domainEvent'
 import { isJsonObject, isWholeNumber, payloadProblems } from './payloadFields'
 import { PLATFORM_SERVICE_RULES } from './platformServices'
@@ -76,6 +77,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...PLATFORM_SERVICE_RULES,
   ...WORKSHOP_RULES,
   ...CASING_RULES,
+  ...GUN_RULES,
   ...TRAVEL_RULES,
   ...ARTEFACT_RULES,
 }

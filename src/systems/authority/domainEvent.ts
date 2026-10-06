@@ -4,6 +4,7 @@
  * plain JSON and money is a canonical string.
  */
 import type { EnemyKind, HitArc } from '../economy/economyDefinition'
+import type { GunMode } from '../vehicle/vehicleGun'
 import type { VehicleMode } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
 import type { CommandStamp, CommandType } from './authorityCommand'
@@ -50,6 +51,12 @@ export type RejectionReason =
   // not live for this player (they already hold an artefact).
   | 'unknown_artefact'
   | 'artefact_unavailable'
+  // Registered by the guns (#107): `auto_guns` is not unlocked on this planet, the gun track is at
+  // its cap, the vehicle has no guns to switch, or the mode is not `auto` or `off`.
+  | 'feature_locked'
+  | 'max_level'
+  | 'no_guns'
+  | 'unknown_mode'
 
 export type RescueCause = 'stranded' | 'destroyed'
 
@@ -61,6 +68,9 @@ export type SaleMode = 'all' | 'single'
 
 /** What hurt the vehicle (#43 `VehicleDamaged.source`): an enemy's hit, or a collapse's crush. */
 export type DamageSource = 'drill-contact enemy' | 'collapse'
+
+/** What dealt an enemy's killing damage (#107: `enemy_killed {by: drill | gun}`). */
+export type EnemyKiller = 'drill' | 'gun'
 
 /** Who wrecked the vehicle, for `vehicle_destroyed {kind, tier, arc}` (#9). */
 export interface Attacker {
@@ -146,7 +156,18 @@ export interface DomainEventBodies {
   EnemyTypeEncountered: { kind: EnemyKind }
   /** Drill damage on an enemy, summed over at most 30 ticks (#9). */
   EnemyDamaged: { enemyId: string; amount: string; source: 'drill'; arc: HitArc; ticks: number }
-  EnemyKilled: { enemyId: string; kind: EnemyKind; tier: number; by: 'drill' }
+  EnemyKilled: { enemyId: string; kind: EnemyKind; tier: number; by: EnemyKiller }
+  /**
+   * The guns' hits on one enemy since the shooter's last pose report (#107: counted per report,
+   * not one event a shot): their damage, how many shots and the energy they took, in quanta.
+   */
+  GunHit: { enemyId: string; damage: string; shots: number; energy: number }
+  /** The guns were bought and bolted on at level 1 (#107); `price` as a canonical string. */
+  GunMounted: { level: number; price: string }
+  /** One gun level bought (#107). */
+  GunUpgraded: { from: number; to: number; price: string }
+  /** The HUD toggle (#107). */
+  GunModeChanged: { mode: GunMode }
   EnemyDespawned: { enemyId: string }
   /** A tunnel wrecker came out of the rock at ring `x,y` (mm) of a vehicle's route, in `band` (#111). */
   WreckerSpawned: { enemyId: string; ring: string; band: number }

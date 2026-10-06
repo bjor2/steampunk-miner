@@ -7,7 +7,9 @@
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { ECONOMY } from '../economy/economy'
+import { rescueEnergyFloor } from '../economy/vehicleStats'
 import {
+  ceil,
   div,
   fromCanonical,
   fromSafeInteger,
@@ -36,6 +38,14 @@ export const GUN_SHOT_QUANTA: number = toSafeInteger(mul(ECONOMY.energy.perShot,
 
 function quantaPerTickOf(unitsPerSecond: BigStat): number {
   return toSafeInteger(div(mul(unitsPerSecond, QUANTA_PER_UNIT), fromSafeInteger(TICKS_PER_SECOND)))
+}
+
+/**
+ * What a rescue tow always leaves, 25% of `energyMax` (#6, #9), rounded up to a whole quantum so
+ * the floor is never missed. The guns stop short of it too (#107).
+ */
+export function rescueFloorQuanta(boilerLevel: number): number {
+  return toSafeInteger(ceil(mul(rescueEnergyFloor(boilerLevel), QUANTA_PER_UNIT)))
 }
 
 /** A whole number of energy units (an `energyMax`) as quanta. */

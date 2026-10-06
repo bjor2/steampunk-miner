@@ -4,7 +4,7 @@
  * (`setUpgrade`, `setEnergy`, `setHull`) live in `vehicleDebugRules.ts`, combat's in
  * `combat/combatDebugRules.ts`, `teleportToDock` in `teleportDebugRules.ts`, the ground's
  * `carveCircle`, `fillCircle` and `lineCasing` in `groundDebugRules.ts`, `setCasingGrade` in
- * `casingRules.ts`, `setArtefact` in `artefactRules.ts`, `forceCollapse` in
+ * `casingRules.ts`, `setGunLevel` in `gunRules.ts`, `setArtefact` in `artefactRules.ts`, `forceCollapse` in
  * `collapse/collapseDebugRules.ts`.
  */
 import { add, fromCanonical, toCanonical, type Money } from '../money'
@@ -17,6 +17,7 @@ import { COMBAT_DEBUG_RULES } from './combat/combatDebugRules'
 import type { CommandRule, RuleEffect } from './commandRule'
 import { followBayTotal } from './coreBay'
 import { GROUND_DEBUG_RULES } from './groundDebugRules'
+import { GUN_DEBUG_RULES } from './gunRules'
 import { withSessionOnPlanet } from './planetEntry'
 import { TELEPORT_DEBUG_RULES } from './teleportDebugRules'
 import { VEHICLE_DEBUG_RULES } from './vehicleDebugRules'
@@ -58,6 +59,7 @@ export const DEBUG_COMMAND_RULES: {
   ...TELEPORT_DEBUG_RULES,
   ...GROUND_DEBUG_RULES,
   ...CASING_DEBUG_RULES,
+  ...GUN_DEBUG_RULES,
   ...ARTEFACT_DEBUG_RULES,
   ...COLLAPSE_DEBUG_RULES,
 }

@@ -26,6 +26,7 @@ import { tileOfMillimetres, type VehiclePose } from '../../vehicle/vehiclePose'
 import type { TilePoint } from '../../world/tileGrid'
 import { vehicleOf, withCombat, withVehicle, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
+import type { EnemyKiller } from '../domainEvent'
 import { followEnergyChange } from '../vehicleTransitions'
 import {
   DEBUG_SPAWN_POINT_ID,
@@ -104,7 +105,8 @@ function damageEnemy(
 ): RuleEffect {
   const damaged = withDrillDamage(enemyById(state.combat, enemy.id) ?? enemy, amount, cut.ticks)
   const next = withCombat(state, withEnemy(state.combat, damaged))
-  if (cmp(damaged.health, ZERO_MONEY) <= 0) return killEnemy(next, damaged, cut)
+  if (cmp(damaged.health, ZERO_MONEY) <= 0)
+    return killEnemy(next, damaged, cut.arc, cut.tick, 'drill')
   const isLogDue = damaged.pendingDrill.ticks >= ENEMY_DAMAGE_LOG_TICKS
   return isLogDue ? flushDrillDamage(next, enemy.id, cut.arc) : unchanged(next)
 }
@@ -120,14 +122,23 @@ function withDrillDamage(enemy: Enemy, amount: BigStat, ticks: number): Enemy {
   }
 }
 
-function killEnemy(state: AuthorityState, enemy: Enemy, cut: DrillCut): RuleEffect {
+/**
+ * The enemy is gone for the trip; drill damage not yet logged is logged first, in `arc`, and
+ * `by` says whether the drill or the guns dealt the killing damage (#107). A killed tunnel
+ * wrecker starts its respawn wait at `tick` (#111).
+ */
+export function killEnemy(
+  state: AuthorityState,
+  enemy: Enemy,
+  arc: HitArc,
+  tick: number,
+  by: EnemyKiller,
+): RuleEffect {
   return chainEffects(state, [
-    (current) => flushDrillDamage(current, enemy.id, cut.arc),
+    (current) => flushDrillDamage(current, enemy.id, arc),
     (current) => ({
-      state: withCombat(current, removedAndUsed(current, enemy, cut.tick)),
-      events: [
-        { type: 'EnemyKilled', enemyId: enemy.id, kind: enemy.kind, tier: enemy.tier, by: 'drill' },
-      ],
+      state: withCombat(current, removedAndUsed(current, enemy, tick)),
+      events: [{ type: 'EnemyKilled', enemyId: enemy.id, kind: enemy.kind, tier: enemy.tier, by }],
     }),
   ])
 }

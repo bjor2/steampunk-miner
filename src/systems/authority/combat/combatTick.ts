@@ -1,7 +1,8 @@
 /**
  * One tick of the enemy simulation (decision #9), run by the authority's clock for every tick
  * while combat is live: strays leave, spawn points near each vehicle out on a trip come alive, a
- * lined route may call a tunnel wrecker (#111), then every enemy acts in spawn order. Events are stamped with the tick and the player whose
+ * lined route may call a tunnel wrecker (#111), every enemy acts in spawn order, then each
+ * vehicle's guns fire if due (#107). Events are stamped with the tick and the player whose
  * enemy or vehicle they concern, with no `seq`: the clock caused them, not a command.
  *
  * Combat is live while an enemy is active or a vehicle's position is still being carried on from
@@ -17,6 +18,7 @@ import { combatVehicleOf } from './combatState'
 import { stepEnemy } from './enemyBehaviour'
 import type { Terrain } from './enemyMovement'
 import { activateSpawnPoints, despawnEnemies } from './enemyRoster'
+import { fireGun } from './gunFire'
 import { isStray } from './enemyRoster'
 import { isOnTrip } from './vehicleTarget'
 import { callWrecker } from './wreckerSpawn'
@@ -50,7 +52,11 @@ function tickSteps(terrain: Terrain, tick: number, isFrozen: boolean): TickStep[
     (state) => activateNearVehicles(state, tick),
     (state) => callWreckersToRoutes(state, tick),
   ]
-  return [...(isFrozen ? [] : roster), (state) => stepEveryEnemy(state, terrain, tick)]
+  return [
+    ...(isFrozen ? [] : roster),
+    (state) => stepEveryEnemy(state, terrain, tick),
+    (state) => fireEveryGun(state, terrain, tick),
+  ]
 }
 
 function despawnStrays(state: AuthorityState, tick: number): TickOutcome {
@@ -94,6 +100,19 @@ function stepEveryEnemy(state: AuthorityState, terrain: Terrain, tick: number): 
       (enemy) => (current) =>
         stampedFor(stepEnemy(current, enemy.id, terrain, tick), enemy.ownerId, tick),
     ),
+  )
+}
+
+/** Frozen enemies still take fire, as they still take the drill. */
+function fireEveryGun(state: AuthorityState, terrain: Terrain, tick: number): TickOutcome {
+  return runSteps(
+    state,
+    Object.keys(state.players)
+      .sort()
+      .map(
+        (playerId) => (current) =>
+          stampedFor(fireGun(current, playerId, terrain, tick), playerId, tick),
+      ),
   )
 }
 

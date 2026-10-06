@@ -19,8 +19,10 @@ import type { BayId } from '../world/dockBays'
  * 7: the first-place lining charge (#76, #85): drilling now debits the wallet, `CasingLined`.
  * 8: breached casing and the tunnel wrecker (#111, #94): casing 255 in chunk deltas,
  *    `CasingBreached`, `RingGnawed`, the wrecker's events and `debug.gnawCasing`.
+ * 9: `auto_guns` (#93, #107): the vehicle's gun, `BuyGun`, `SetGunMode`, `debug.setGunLevel`, gun
+ *    shots on the clock, `GunHit` and `EnemyKilled {by: gun}`.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 8
+export const AUTHORITY_PROTOCOL_VERSION = 9
 
 export interface CommandPayloads {
   /**
@@ -61,6 +63,13 @@ export interface CommandPayloads {
   buyUpgrade: { upgradeId: string }
   /** The Upgrade bay's Casing row: one casing grade, not a vehicle track (#41, #58). */
   buyCasingGrade: Record<string, never>
+  /**
+   * The Upgrade bay's Guns row (#107): mounts the guns once `auto_guns` is unlocked, then raises
+   * the gun track one level a buy.
+   */
+  buyGun: Record<string, never>
+  /** The HUD toggle: `"auto"` fires by itself, `"off"` saves the boiler (#107). */
+  setGunMode: { mode: string }
   /** Moves the docked platform to the next planet, paying the fee and the core (#10). */
   travel: { toPlanet: number }
   /** `interact` while overlapping the planet's live artefact cache opens its choice (#46). */
@@ -101,6 +110,8 @@ export interface CommandPayloads {
    */
   'debug.carveCircle': { x: number; y: number; radius: number; amount: number }
   'debug.fillCircle': { x: number; y: number; radius: number; amount: number }
+  /** Sets the gun level directly, 0 (no guns) to the track's cap (#107 combat scenarios). */
+  'debug.setGunLevel': { level: number }
   /** Sets the vehicle's casing grade directly (#41 `debug.setCasingGrade`). */
   'debug.setCasingGrade': { grade: number }
   /** One ring of casing lining of `grade` round `(x, y)` mm (#41 `debug.lineCasing`). */

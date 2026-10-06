@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import { FACING } from '../vehicle/vehiclePose'
 import { applyCommand } from './applyCommand'
 import { createAuthorityState, type AuthorityState } from './authorityState'
 import { CASING_BREACHED, decodeCasing } from '../world/chunkDelta'
 import { readSnapshot, takeSnapshot } from './sessionSnapshot'
 import { stateDigest } from './stateDigest'
+import { freezeEnemies, prepareCorridor, spawnEnemy } from './combat/combatFixtures'
+import { createScriptedSession } from './scriptedSession'
 
 function richState(): AuthorityState {
   const start = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
@@ -29,7 +32,7 @@ describe('session snapshot', () => {
   it('carries the state digest and the versions it was taken under', () => {
     const snapshot = takeSnapshot(richState())
     expect(snapshot).toMatchObject({
-      snapshotVersion: 10,
+      snapshotVersion: 11,
       generatorVersion: 3,
       tick: 600,
       digest: stateDigest(richState()),
@@ -58,7 +61,7 @@ describe('session snapshot', () => {
       state: { tick: 600, planet: { index: -1, seed: 1 }, players: { p1: { wallet: 5 } } },
     }
     expect(readSnapshot(broken).problems).toEqual([
-      'snapshot.snapshotVersion is 0, this build reads 10',
+      'snapshot.snapshotVersion is 0, this build reads 11',
       'snapshot.state.planet must hold a whole index and a safe-integer seed',
       'snapshot.state.players.p1 must hold a money wallet and a whole lastSeq',
       'snapshot.state.world must be an object',
@@ -108,7 +111,7 @@ describe('session snapshot: casing (#41)', () => {
   it('refuses a snapshot taken before breached casing, at version 9, with the version message', () => {
     const snapshot = { ...throughJson(takeSnapshot(linedState())), snapshotVersion: 9 }
     expect(readSnapshot(snapshot).problems).toEqual([
-      'snapshot.snapshotVersion is 9, this build reads 10',
+      'snapshot.snapshotVersion is 9, this build reads 11',
     ])
   })
 
@@ -118,5 +121,28 @@ describe('session snapshot: casing (#41)', () => {
     const delta = snapshot.state.world.chunks[key]
     snapshot.state.world.chunks[key] = { ...delta, casing: [128 * 128, 16] }
     expect(readSnapshot(snapshot).problems).toEqual(['snapshot.state.world must hold chunk deltas'])
+  })
+})
+
+describe('session snapshot: guns (#93)', () => {
+  it('keeps the guns and their hits not yet logged mid-fight through save and load', () => {
+    const session = createScriptedSession()
+    const start = prepareCorridor(session, FACING.right)
+    session.submit(start, { type: 'debug.setGunLevel', payload: { level: 2 } })
+    session.submit(start, freezeEnemies(true))
+    session.submit(start, spawnEnemy('crawler', 1, -3))
+    session.advanceTo(start + 5)
+    const state = session.state()
+    expect(state.combat.vehicles.p1.pendingGunHits).toHaveLength(1)
+    expect(readSnapshot(throughJson(takeSnapshot(state)))).toEqual({ state, problems: [] })
+  })
+
+  it('refuses a vehicle whose guns are in an unknown mode', () => {
+    const snapshot = throughJson(takeSnapshot(richState()))
+    const vehicle = snapshot.state.players.p1.vehicle
+    snapshot.state.players.p1.vehicle = { ...vehicle, gun: { level: 1, mode: 'burst' as 'off' } }
+    expect(readSnapshot(snapshot).problems).toEqual([
+      'snapshot.state.players.p1.vehicle.gun must hold a whole level and a gun mode',
+    ])
   })
 })

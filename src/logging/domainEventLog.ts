@@ -115,6 +115,13 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     data: { enemyId, ring, band },
   }),
   WreckerFled: ({ enemyId }) => ({ event: 'wrecker_fled', data: { enemyId } }),
+  GunHit: ({ enemyId, damage, shots, energy }) => ({
+    event: 'gun_hit',
+    data: { enemyId, damage, shots, energy },
+  }),
+  GunMounted: ({ level, price }) => ({ event: 'gun_mounted', data: { level, price } }),
+  GunUpgraded: ({ from, to, price }) => ({ event: 'gun_upgraded', data: { from, to, price } }),
+  GunModeChanged: ({ mode }) => ({ event: 'gun_mode', data: { mode } }),
   // A collapse's crush has no enemy: its fields read as `vehicle_destroyed` does with none (#43).
   VehicleDamaged: ({ amount, source, arc, enemyId, kind, tier, hullAfter }) => ({
     event: 'vehicle_damaged',

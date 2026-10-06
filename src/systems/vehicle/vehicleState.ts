@@ -15,6 +15,7 @@ import type { BigStat } from '../money'
 import type { DockSite } from '../world/dockSite'
 import { EMPTY_CASING_TRAIL, type CasingTrail } from './casingTrail'
 import { quantaOfUnits } from './energyQuanta'
+import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
 
 /** The #7 state machine; `docked` is entered by the rescue tow here and by docking in #23. */
@@ -43,6 +44,8 @@ export interface VehicleState {
   casingShortBand: number | null
   /** The drill's recorded axis points still waiting for their casing ring (#41, #56). */
   casingTrail: CasingTrail
+  /** The `auto_guns` turret (#107): not a vehicle track, so it is not in the visual-tier sum. */
+  gun: VehicleGun
   energy: number
   hull: BigStat
   cargo: Cargo
@@ -66,6 +69,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     casingGrade: casingGradeStart(),
     casingShortBand: null,
     casingTrail: EMPTY_CASING_TRAIL,
+    gun: NO_GUN,
     energy: quantaOfUnits(stats.energyMax),
     hull: stats.hullMax,
     cargo: EMPTY_CARGO,

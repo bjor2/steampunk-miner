@@ -2,7 +2,7 @@
   "name": "artefact-live-and-husk",
   "description": "Take assay_beacon from the live planet 1 cache; on planet 2 the cache is a husk and opening it is refused (#46).",
   "generatorVersion": 3,
-  "authorityProtocolVersion": 8,
+  "authorityProtocolVersion": 9,
   "logSchemaVersion": 1,
   "numberFormatVersion": 1,
   "worldSeed": 83921,
@@ -105,7 +105,7 @@
     {
       "tick": 60,
       "scope": "end",
-      "digest": "1fa14f3eff0c95c8"
+      "digest": "668fea4a6fbc0de5"
     }
   ]
 }

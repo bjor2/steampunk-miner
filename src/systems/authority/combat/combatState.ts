@@ -53,6 +53,13 @@ export interface Enemy {
   ring: RingPoint | null
 }
 
+/** Gun hits on one enemy not yet logged: `gun_hit` sums them per pose report (#107). */
+export interface PendingGunHit {
+  enemyId: string
+  damage: BigStat
+  shots: number
+}
+
 /** What combat remembers about each vehicle besides its pose. */
 export interface CombatVehicle {
   /** The tick of the last accepted pose report: extrapolation counts from it (#9, #11). */
@@ -64,6 +71,10 @@ export interface CombatVehicle {
   frontAtPreviousReport: readonly string[]
   /** The tick of the last damaging hit; none lands within `hitGraceTicks` of it (#7, #9). */
   lastHitTick: number | null
+  /** The earliest tick this vehicle's guns may fire again (#107 fire interval). */
+  gunReadyTick: number
+  /** This vehicle's gun hits since its last pose report, by enemy in the order first hit. */
+  pendingGunHits: readonly PendingGunHit[]
 }
 
 /**
@@ -110,6 +121,8 @@ const NO_REPORT: CombatVehicle = {
   previousReportTick: 0,
   frontAtPreviousReport: [],
   lastHitTick: null,
+  gunReadyTick: 0,
+  pendingGunHits: [],
 }
 
 export function combatVehicleOf(combat: CombatState, playerId: string): CombatVehicle {

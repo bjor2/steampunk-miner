@@ -6,6 +6,7 @@
  */
 import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
+import { isGunMode } from '../vehicle/vehicleGun'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
 import type { Cargo, VehicleMode, VehicleState } from '../vehicle/vehicleState'
 import { isCasingValue, type ChunkDelta } from '../world/chunkDelta'
@@ -60,6 +61,7 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableCasingTrail(vehicle.casingTrail)
       ? []
       : [`${path}.casingTrail must hold safe-integer xMm and yMm points`]),
+    ...(isPortableGun(vehicle.gun) ? [] : [`${path}.gun must hold a whole level and a gun mode`]),
     ...(isNonNegativeMoneyText(vehicle.hull) ? [] : [`${path}.hull must be a decimal string`]),
     ...(isPortableCargo(vehicle.cargo) ? [] : [`${path}.cargo must hold whole units`]),
     ...(vehicle.pose === null || isPortablePose(vehicle.pose) ? [] : [`${path}.pose is malformed`]),
@@ -98,6 +100,10 @@ function isPortableCasingTrail(trail: unknown): boolean {
 
 function isRingPoint(point: unknown): boolean {
   return isJsonObject(point) && Number.isSafeInteger(point.xMm) && Number.isSafeInteger(point.yMm)
+}
+
+function isPortableGun(gun: unknown): boolean {
+  return isJsonObject(gun) && isWholeNumber(gun.level) && isGunMode(gun.mode)
 }
 
 function isPortableCargo(cargo: unknown): cargo is Cargo {

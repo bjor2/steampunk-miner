@@ -156,6 +156,13 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { from: 'integer', to: 'integer', price: 'money' },
   },
+  // #107: the auto_guns turret bolted on at level 1, then each gun level bought.
+  gun_mounted: { group: 'platform', level: 'core', payload: { level: 'integer', price: 'money' } },
+  gun_upgraded: {
+    group: 'platform',
+    level: 'core',
+    payload: { from: 'integer', to: 'integer', price: 'money' },
+  },
   purchase_made: { group: 'platform', level: 'core', payload: 'unspecified' },
   rescue_triggered: {
     group: 'platform',
@@ -357,6 +364,18 @@ export const RUN_EVENT_REGISTRY = {
     payload: { enemyId: 'text', ring: 'text', band: 'integer' },
   },
   wrecker_fled: { group: 'vehicle_and_combat', level: 'core', payload: { enemyId: 'text' } },
+  // #107: the guns' hits on one enemy since the shooter's last pose report (never one line a
+  // shot), with the energy they took in quanta: a dive's gun energy is the sum of its lines.
+  gun_hit: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { enemyId: 'text', damage: 'money', shots: 'integer', energy: 'integer' },
+  },
+  gun_mode: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { mode: { oneOf: ['auto', 'off'] } },
+  },
   weapon_fired: { group: 'vehicle_and_combat', level: 'detail', payload: 'unspecified' },
   player_killed: { group: 'vehicle_and_combat', payload: 'reserved' },
 

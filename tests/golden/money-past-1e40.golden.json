@@ -2,7 +2,7 @@
   "name": "money-past-1e40",
   "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
   "generatorVersion": 3,
-  "authorityProtocolVersion": 8,
+  "authorityProtocolVersion": 9,
   "logSchemaVersion": 1,
   "numberFormatVersion": 1,
   "worldSeed": 83921,
@@ -233,17 +233,17 @@
     {
       "tick": 124,
       "scope": "dock",
-      "digest": "0ad34bd457f83d14"
+      "digest": "b1f6ee618edaec63"
     },
     {
       "tick": 166,
       "scope": "dock",
-      "digest": "e916618ca701cac9"
+      "digest": "53997b458067cb8a"
     },
     {
       "tick": 2000,
       "scope": "end",
-      "digest": "79860de7d65d311f"
+      "digest": "f8a09f115121e2de"
     }
   ]
 }

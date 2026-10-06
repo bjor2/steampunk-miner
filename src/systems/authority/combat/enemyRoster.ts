@@ -28,6 +28,7 @@ import {
   type CombatState,
   type Enemy,
 } from './combatState'
+import { flushGunHits } from './gunHits'
 import { spawnPointsWithin, spawnPositionOf, type SpawnPoint } from './spawnPoints'
 import { vehicleTargetOf } from './vehicleTarget'
 import { withoutRoute } from './wreckerRoute'
@@ -73,10 +74,18 @@ export function activateSpawnPoints(
 }
 
 /**
- * A dock or a tow: the vehicle's enemies leave, every spawn point is free again (#9) and its route
- * is no longer the way home a wrecker hunts (#111).
+ * A dock or a tow: the guns' unlogged hits are logged within the trip (#107), the vehicle's
+ * enemies leave, every spawn point is free again (#9) and its route is no longer the way home a
+ * wrecker hunts (#111).
  */
 export function endTrip(state: AuthorityState, playerId: string): RuleEffect {
+  return chainEffects(state, [
+    (current) => flushGunHits(current, playerId),
+    (current) => despawnEnemiesOf(current, playerId),
+  ])
+}
+
+function despawnEnemiesOf(state: AuthorityState, playerId: string): RuleEffect {
   const left = despawnEnemies(state, enemiesOwnedBy(state.combat, playerId))
   const freed = { ...left.state.combat, usedSpawnPointIds: [] }
   const combat = withoutRoute(forgetLastHit(freed, playerId), playerId)
