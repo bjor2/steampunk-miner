@@ -1,14 +1,14 @@
 /**
  * Enemy telegraphs on the HUD (#33 section 5, #9 "Telegraph"): one marker per enemy of this
- * vehicle that is winding up, lunging or pinned on the drill, at most `maxActivePerVehicle` (6).
+ * vehicle that is winding up, lunging or pinned on the drill, at most one per enemy it may have.
  * Each marker says where it is (the local octant), how long the wind-up still runs, and the arc
  * the hit would land in, from the same pure `hitArcOf` the authority uses. Idle, approaching and
  * recoiling enemies are not telegraphed.
  */
 import type { AuthorityState } from '../authority/authorityState'
 import { enemiesOwnedBy, type Enemy, type EnemyPhase } from '../authority/combat/combatState'
+import { MOST_ENEMIES_PER_VEHICLE } from '../authority/combat/enemyRoster'
 import { hitArcOf, type HitArc } from '../authority/combat/hitArc'
-import { ECONOMY } from '../economy/economy'
 import type { EnemyKind } from '../economy/economyDefinition'
 import { enemyBoundedStats } from '../economy/enemyStats'
 import type { VehiclePose } from '../vehicle/vehiclePose'
@@ -37,7 +37,7 @@ export function threatMarkersOf(state: AuthorityState, playerId: string): Threat
   if (pose === null) return []
   return enemiesOwnedBy(state.combat, playerId)
     .filter((enemy) => TELEGRAPHED_PHASES.includes(enemy.phase))
-    .slice(0, ECONOMY.enemies.combat.maxActivePerVehicle)
+    .slice(0, MOST_ENEMIES_PER_VEHICLE)
     .map((enemy) => threatMarkerOf(enemy, pose, state.tick))
 }
 

@@ -6,7 +6,9 @@ import { advanceTicks } from '../advanceTicks'
 import { digAlong, parkAt, poseAt } from '../collapse/collapseFixtures'
 import type { DomainEvent } from '../domainEvent'
 import { readSnapshot, takeSnapshot } from '../sessionSnapshot'
+import type { ScriptedSession } from '../scriptedSession'
 import { stateDigest } from '../stateDigest'
+import { spawnEnemy } from './combatFixtures'
 import {
   digPlanet6Tunnel,
   onPlanet,
@@ -16,19 +18,28 @@ import {
   TUNNEL_TO_X,
 } from './wreckerFixtures'
 import { routeOf } from './wreckerRoute'
-import { wreckerCapOf } from './wreckerSpawn'
+import { wreckerCapOf, wreckersOwnedBy } from './wreckerSpawn'
 
 const ofType = <T extends DomainEvent['type']>(events: readonly DomainEvent[], type: T) =>
   events.filter((event): event is Extract<DomainEvent, { type: T }> => event.type === type)
 
 const { gnawTicksPerRing, ignoreVehicleTiles, minLinedRings, respawnTicks } =
   ECONOMY.enemies.tunnelWrecker
-const { despawnTiles } = ECONOMY.enemies.combat
+const { despawnTiles, maxActivePerVehicle } = ECONOMY.enemies.combat
 
 const FROM_X = TUNNEL_FROM_X
 const TO_X = TUNNEL_TO_X
 
 const ringX = (ring: string) => Number.parseInt(ring.split(',')[0], 10)
+
+/** A full regular cap of crawlers 20 tiles down in the rock: out of sight, idle, never strays. */
+const fillCapWithCrawlers = (session: ScriptedSession, tick: number) =>
+  Array.from({ length: maxActivePerVehicle }, (_, at) =>
+    session.submit(tick, spawnEnemy('crawler', 1, 20 + at, -20)),
+  ).flat()
+
+const crawlersOf = (session: ScriptedSession) =>
+  session.state().combat.enemies.filter(({ kind }) => kind === 'crawler')
 
 /** Where `digAlong` from tick 1 had the vehicle at `tick`: 100 mm every 12 ticks. */
 const digXAt = (tick: number) => FROM_X + Math.floor((tick - 1) / 12) * 100
@@ -104,6 +115,23 @@ describe('tunnel wrecker: when one comes (#111 Spawn)', () => {
       .slice(1)
       .filter((event, at) => event.ring === spawned[at].ring && event.tick - spawned[at].tick <= 1)
     expect(recalled).toEqual([])
+  })
+
+  it('still comes to a vehicle whose regular enemy cap is full of crawlers (#131)', () => {
+    const session = onPlanet(PLANET_6.planetIndex)
+    session.submit(1, poseAt(FROM_X, PLANET_6.y))
+    fillCapWithCrawlers(session, 1)
+    digAlong(session, 2, PLANET_6.y, FROM_X, TO_X)
+    expect(crawlersOf(session)).toHaveLength(maxActivePerVehicle)
+    expect(ofType(session.events(), 'WreckerSpawned').length).toBeGreaterThan(0)
+  })
+
+  it('leaves the whole regular enemy cap to crawlers while a wrecker hunts (#131)', () => {
+    const { session, tick } = digPlanet6Tunnel()
+    expect(wreckersOwnedBy(session.state().combat, 'p1')).toBe(1)
+    const answers = fillCapWithCrawlers(session, tick)
+    expect(ofType(answers, 'CommandRejected')).toEqual([])
+    expect(crawlersOf(session)).toHaveLength(maxActivePerVehicle)
   })
 
   it('lets one wrecker hunt a route from planet 6 and two from planet 10', () => {

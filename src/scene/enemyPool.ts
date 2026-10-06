@@ -1,15 +1,15 @@
 /**
  * The fixed pool both enemy views draw into: one body and one halo per enemy a vehicle may have
- * (#9: at most 6), refilled from the authority every frame, so nothing per-frame goes through
+ * (#9: at most 6, plus the tunnel wrecker's own slots, #131), refilled from the authority every frame, so nothing per-frame goes through
  * React or allocates and the draw count never grows (#38). The halo is the tier's glow and the
  * telegraph's flare whatever the body looks like.
  */
 import { CircleGeometry, type Mesh, type MeshBasicMaterial } from 'three'
 import type { Enemy } from '../systems/authority/combat/combatState'
-import { ECONOMY } from '../systems/economy/economy'
+import { MOST_ENEMIES_PER_VEHICLE } from '../systems/authority/combat/enemyRoster'
 import type { EnemyLook } from '../systems/render/enemyPlaceholder'
 
-export const ENEMY_SLOTS = ECONOMY.enemies.combat.maxActivePerVehicle
+export const ENEMY_SLOTS = MOST_ENEMIES_PER_VEHICLE
 /** In front of the tiles, behind the vehicle's parts; the halo just behind its body. */
 export const ENEMY_Z = 0.08
 const HALO_Z = 0.07

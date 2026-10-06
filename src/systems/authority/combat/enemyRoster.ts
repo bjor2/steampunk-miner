@@ -7,6 +7,8 @@
  * - Every dock and every tow ends the trip: the vehicle's enemies despawn, every used spawn point
  *   is free again and the last hit is forgotten (no hit grace carries over), so nothing about
  *   enemies needs saving and a checkpoint resumes with none (#26).
+ * - The tunnel wrecker has its own slots (#131, `maxAliveByPlanet`): it never fills the cap of 6,
+ *   so crawlers cannot crowd it out and it never holds a combat slot while it flees.
  * - The first enemy of each kind in a run logs `enemy_type_encountered`.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
@@ -31,10 +33,15 @@ import {
 import { flushGunHits } from './gunHits'
 import { spawnPointsWithin, spawnPositionOf, type SpawnPoint } from './spawnPoints'
 import { vehicleTargetOf } from './vehicleTarget'
-import { withoutRoute } from './wreckerRoute'
+import { TUNNEL_WRECKER, withoutRoute } from './wreckerRoute'
 
 const { maxActivePerVehicle, activationTiles, despawnTiles } = ECONOMY.enemies.combat
+const { maxAliveByPlanet } = ECONOMY.enemies.tunnelWrecker
 const MM_PER_TILE = MM_PER_METRE
+
+/** The regular cap plus the wrecker's own slots: the most enemies one vehicle ever has. */
+export const MOST_ENEMIES_PER_VEHICLE =
+  maxActivePerVehicle + Math.max(0, ...maxAliveByPlanet.map((cap) => cap.n))
 
 export interface EnemyArrival {
   kind: EnemyKind
@@ -53,7 +60,12 @@ export function spawnEnemy(state: AuthorityState, arrival: EnemyArrival, tick: n
 }
 
 export function hasRoomForEnemy(combat: CombatState, playerId: string): boolean {
-  return enemiesOwnedBy(combat, playerId).length < maxActivePerVehicle
+  return regularEnemiesOwnedBy(combat, playerId) < maxActivePerVehicle
+}
+
+/** Every enemy of the vehicle but its wreckers, which come on their own slots (#131). */
+function regularEnemiesOwnedBy(combat: CombatState, playerId: string): number {
+  return enemiesOwnedBy(combat, playerId).filter((enemy) => enemy.kind !== TUNNEL_WRECKER).length
 }
 
 /** Spawn points near the vehicle come alive, nearest first, up to the per-vehicle cap. */
@@ -151,7 +163,7 @@ function spawnPointsToWake(
 ): SpawnPoint[] {
   const params = planetParamsOf(state.planet)
   if (params === null) return []
-  const room = maxActivePerVehicle - enemiesOwnedBy(state.combat, playerId).length
+  const room = maxActivePerVehicle - regularEnemiesOwnedBy(state.combat, playerId)
   const nearby = spawnPointsWithin(params, position.x, position.y, activationTiles)
   return nearestFirst(freeSpawnPoints(state.combat, nearby), position).slice(0, Math.max(0, room))
 }

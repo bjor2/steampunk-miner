@@ -4,7 +4,8 @@
  * route, fewer wreckers than its planet's cap and the `respawnTicks` since the last one fled or died
  * calls one to the newest ring of its route that no vehicle is within `ignoreVehicleTiles` of. It
  * comes out of the rock at that ring, logged as `wrecker_spawned` with the ring and its band, and
- * its tier is the band's on the standard curve.
+ * its tier is the band's on the standard curve. Its slots are its own (#131): a vehicle with the
+ * regular enemy cap full still draws it.
  */
 import { ECONOMY } from '../../economy/economy'
 import type { WreckerCap } from '../../economy/economyDefinition'
@@ -15,7 +16,7 @@ import { isFeatureUnlocked } from '../featureUnlocks'
 import { planetParamsOf } from '../planetOfState'
 import { ringIdOf } from '../casingGnaw'
 import { enemiesOwnedBy, enemyIdOf, inPhase, withEnemy, type CombatState } from './combatState'
-import { hasRoomForEnemy, spawnEnemy } from './enemyRoster'
+import { spawnEnemy } from './enemyRoster'
 import { vehicleTargetOf } from './vehicleTarget'
 import {
   millimetresOf,
@@ -67,8 +68,7 @@ function isWreckerDue(state: AuthorityState, playerId: string, tick: number): bo
     vehicleTargetOf(state, playerId, tick) !== null &&
     route.rings.length >= minLinedRings &&
     tick >= route.nextWreckerTick &&
-    wreckersOwnedBy(state.combat, playerId) < wreckerCapOf(state.planet.index) &&
-    hasRoomForEnemy(state.combat, playerId)
+    wreckersOwnedBy(state.combat, playerId) < wreckerCapOf(state.planet.index)
   )
 }
 
