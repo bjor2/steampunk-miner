@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T05:45:42Z",
+  "updated_at": "2026-10-06T05:45:49Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
-      "state": "idle",
-      "issue": null,
-      "note": "free",
-      "updated_at": "2026-10-06T05:44:50Z",
+      "state": "working",
+      "issue": 84,
+      "note": "started 2026-10-06 07:45 CEST",
+      "updated_at": "2026-10-06T05:45:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,7 +17,7 @@
       "state": "working",
       "issue": 95,
       "note": "started 2026-10-06 05:59 CEST",
-      "updated_at": "2026-10-06T05:44:50Z",
+      "updated_at": "2026-10-06T05:45:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "working",
       "issue": 96,
       "note": "started 2026-10-06 05:59 CEST",
-      "updated_at": "2026-10-06T05:44:50Z",
+      "updated_at": "2026-10-06T05:45:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-06T05:44:50Z",
+      "updated_at": "2026-10-06T05:45:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "2/4 slots busy; status check",
+      "note": "3/4 slots busy; spawned 1 worker(s)",
       "extra": {
-        "active": 2,
+        "active": 3,
         "max": 4,
         "max_attempts": 2,
         "attempts": {
@@ -83,7 +83,7 @@
         },
         "push_pending": null
       },
-      "updated_at": "2026-10-06T05:44:50Z",
+      "updated_at": "2026-10-06T05:45:49Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -97,6 +97,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-06T05:45:49Z",
+      "key": "steampunk-loop/1",
+      "state": "working",
+      "issue": 84,
+      "note": "started 2026-10-06 07:45 CEST"
+    },
     {
       "at": "2026-10-06T05:35:39Z",
       "key": "perf-loop",
