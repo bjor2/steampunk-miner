@@ -214,6 +214,43 @@ iron and soot, and the only light is warm window, lamp and skylight glass on the
 sheets are in [docs/art/shops/](art/shops/README.md). `scripts/art/author_shop_buildings.py` wrote
 the first version of both files. From then on the `.blend` files are the sources.
 
+## The Workshop showcase
+
+The rig and reaction pieces of [#180](https://github.com/bjor2/steampunk-miner/issues/180) section
+7 (art [#182](https://github.com/bjor2/steampunk-miner/issues/182)), the pit stop the workshop build
+(#177) animates on every purchase. The ids derive from the Workshop building's attach zone
+(`workshop.*`, `src/systems/art/workshopShowcaseArt.ts`); nothing draws them until #177.
+
+| Asset                        | Category, density  | Parts                                                                                                                                                                      |
+| ---------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `platform-workshop-showcase` | platform, 256 px/m | `showcase-rail`, `showcase-trolley`, `showcase-chain`, `showcase-hook`, `showcase-arm-upper-<side>` and `showcase-arm-fore-<side>` for `left` and `right`, `showcase-lift` |
+| `prop-workshop-reactions`    | prop, 512 px/m     | `<row>-step` and `<row>-major` for the six tracks, `gun`, `blasting-charges` and `casing`                                                                                  |
+
+- **The rig** sits in the building's frame: its origin is `workshop.platform`, the turntable's
+  centre, so the build places it where it places `platform-building-upgrade`. The I-beam rail hangs
+  under the roof (3.3 m up) with the hoist that runs it: the trolley (pivot at the rail's axis, slid
+  along X), a 0.8 m chain (pivot at its top; scale it to the drop) and the hook block (pivot at the
+  bottom of its ring, where a load's top hangs). Two gantry arms hang from shoulder bearings on the
+  rail's face at ±1.3 m: the upper arm's pivot is the shoulder, the forearm's the elbow, both
+  authored hanging straight down so a segment's `sizeM` height less its bearing radius is its
+  length; the code turns them about Y (`docs/art/workshop/render_showcase.py` poses them with
+  two-bone IK the same way). The cradle lift's pivot is the foot of its ram posts, which rest inside
+  the turntable's band; raise it 0.24 m and the posts show. The car's wheels stand on the cradle
+  0.26 m over the pad.
+- **The reaction pieces** are one pair per row of the Gameplay & Vehicle table: the tool an arm
+  darts in with on a small step (a head wrench, a grinder, a hub wrench, a valve key, a crate, a
+  rivet gun, a barrel brush, a charge stick, a lining spool) and the component the hoist lowers on
+  a big level-up (a motor housing with its gearbox, a gem-set tip, a drive unit, a boiler drum with
+  a second stack, a pannier, a plating set, a turret, a rack row, a liner cassette). Every piece is
+  gripped or hoisted at its top and its pivot is its bottom on the mount axis, the point that meets
+  the car's attach point; `UPGRADE_REACTION_ATTACH_IDS` names that point per row (`drill_power` on
+  `drill.housing`, the Game Director's ruling). They are vehicle-scale, so they bake at the
+  vehicle's density under the `prop` category; where they stand in the file is only for the sheet.
+- With the hub, the bays and the two buildings they make 22 platform parts of the 30 the lint
+  gates. `scripts/art/author_workshop_showcase.py` wrote the first version of both files; from
+  then on the `.blend` files are the sources. The review renders and clips are in
+  [docs/art/workshop/](art/workshop/README.md).
+
 ## Ground and casing tiles
 
 `npm run art:export -- ground-band-<n>` (or `casing-grade-<n>`) bakes a `tile` asset (#52 "Ground
