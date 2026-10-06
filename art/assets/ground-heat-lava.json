@@ -2,7 +2,7 @@
   "id": "ground-heat-lava",
   "source": "blender",
   "form": "tile",
-  "status": "placeholder",
+  "status": "final",
   "color": "#d9581e",
   "emissive": true
 }

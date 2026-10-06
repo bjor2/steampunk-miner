@@ -7,6 +7,7 @@ import {
   vectorIconIds,
 } from './artIds'
 import { manifestEntryOf } from './artCatalogue'
+import { tileEmissiveMapOf, tileMapsOf } from './tileLook'
 import { SHIPPED_ART } from '../../scene/shippedArt'
 import { bandColourOf, paletteOf } from '../render/bandPalette'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
@@ -40,6 +41,14 @@ describe('heat and lava art', () => {
     const glowing = ['ground-heat-lava', ...refractoryCasingTileIds()]
     expect(glowing.filter((id) => manifestEntryOf(SHIPPED_ART, id)?.emissive !== true)).toEqual([])
     expect(manifestEntryOf(SHIPPED_ART, 'casing-grade-3')?.emissive).toBeUndefined()
+  })
+
+  it('ships the lava and refractory tiles as final art with their glow maps', () => {
+    const tiles = ['ground-heat-lava', ...refractoryCasingTileIds()]
+    expect(tiles.filter((id) => tileMapsOf(SHIPPED_ART, id) === null)).toEqual([])
+    expect(tileEmissiveMapOf(SHIPPED_ART, 'ground-heat-lava')).toBe(
+      'assets/ground/ground-heat-lava/ground-heat-lava.emissive.ktx2',
+    )
   })
 
   it('draws heat planets in a palette of their own that runs hot in every band', () => {

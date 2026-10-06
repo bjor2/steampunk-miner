@@ -2,7 +2,7 @@
   "id": "casing-refractory-grade-3",
   "source": "blender",
   "form": "tile",
-  "status": "placeholder",
+  "status": "final",
   "color": "#8e3b26",
   "emissive": true
 }
