@@ -1,0 +1,1693 @@
+{
+  "atlas": {
+    "sidePx": 4096,
+    "cellPx": 256,
+    "contentPx": 248,
+    "gutterPx": 4,
+    "variantsMax": 4
+  },
+  "maps": ["albedo", "normal", "emissive"],
+  "emissiveFromGrade": 3,
+  "cells": [
+    {
+      "familyId": "alien",
+      "variant": 0,
+      "grade": 1,
+      "index": 0,
+      "rectPx": [4, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 0,
+      "grade": 2,
+      "index": 1,
+      "rectPx": [260, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 0,
+      "grade": 3,
+      "index": 2,
+      "rectPx": [516, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 0,
+      "grade": 4,
+      "index": 3,
+      "rectPx": [772, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 0,
+      "grade": 5,
+      "index": 4,
+      "rectPx": [1028, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 1,
+      "grade": 1,
+      "index": 5,
+      "rectPx": [1284, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 1,
+      "grade": 2,
+      "index": 6,
+      "rectPx": [1540, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 1,
+      "grade": 3,
+      "index": 7,
+      "rectPx": [1796, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 1,
+      "grade": 4,
+      "index": 8,
+      "rectPx": [2052, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 1,
+      "grade": 5,
+      "index": 9,
+      "rectPx": [2308, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 2,
+      "grade": 1,
+      "index": 10,
+      "rectPx": [2564, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 2,
+      "grade": 2,
+      "index": 11,
+      "rectPx": [2820, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 2,
+      "grade": 3,
+      "index": 12,
+      "rectPx": [3076, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 2,
+      "grade": 4,
+      "index": 13,
+      "rectPx": [3332, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 2,
+      "grade": 5,
+      "index": 14,
+      "rectPx": [3588, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 3,
+      "grade": 1,
+      "index": 15,
+      "rectPx": [3844, 4, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 3,
+      "grade": 2,
+      "index": 16,
+      "rectPx": [4, 260, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 3,
+      "grade": 3,
+      "index": 17,
+      "rectPx": [260, 260, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 3,
+      "grade": 4,
+      "index": 18,
+      "rectPx": [516, 260, 248, 248]
+    },
+    {
+      "familyId": "alien",
+      "variant": 3,
+      "grade": 5,
+      "index": 19,
+      "rectPx": [772, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 0,
+      "grade": 1,
+      "index": 20,
+      "rectPx": [1028, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 0,
+      "grade": 2,
+      "index": 21,
+      "rectPx": [1284, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 0,
+      "grade": 3,
+      "index": 22,
+      "rectPx": [1540, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 0,
+      "grade": 4,
+      "index": 23,
+      "rectPx": [1796, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 0,
+      "grade": 5,
+      "index": 24,
+      "rectPx": [2052, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 1,
+      "grade": 1,
+      "index": 25,
+      "rectPx": [2308, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 1,
+      "grade": 2,
+      "index": 26,
+      "rectPx": [2564, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 1,
+      "grade": 3,
+      "index": 27,
+      "rectPx": [2820, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 1,
+      "grade": 4,
+      "index": 28,
+      "rectPx": [3076, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 1,
+      "grade": 5,
+      "index": 29,
+      "rectPx": [3332, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 2,
+      "grade": 1,
+      "index": 30,
+      "rectPx": [3588, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 2,
+      "grade": 2,
+      "index": 31,
+      "rectPx": [3844, 260, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 2,
+      "grade": 3,
+      "index": 32,
+      "rectPx": [4, 516, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 2,
+      "grade": 4,
+      "index": 33,
+      "rectPx": [260, 516, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 2,
+      "grade": 5,
+      "index": 34,
+      "rectPx": [516, 516, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 3,
+      "grade": 1,
+      "index": 35,
+      "rectPx": [772, 516, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 3,
+      "grade": 2,
+      "index": 36,
+      "rectPx": [1028, 516, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 3,
+      "grade": 3,
+      "index": 37,
+      "rectPx": [1284, 516, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 3,
+      "grade": 4,
+      "index": 38,
+      "rectPx": [1540, 516, 248, 248]
+    },
+    {
+      "familyId": "ancient",
+      "variant": 3,
+      "grade": 5,
+      "index": 39,
+      "rectPx": [1796, 516, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 0,
+      "grade": 1,
+      "index": 40,
+      "rectPx": [2052, 516, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 0,
+      "grade": 2,
+      "index": 41,
+      "rectPx": [2308, 516, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 0,
+      "grade": 3,
+      "index": 42,
+      "rectPx": [2564, 516, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 0,
+      "grade": 4,
+      "index": 43,
+      "rectPx": [2820, 516, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 0,
+      "grade": 5,
+      "index": 44,
+      "rectPx": [3076, 516, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 1,
+      "grade": 1,
+      "index": 45,
+      "rectPx": [3332, 516, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 1,
+      "grade": 2,
+      "index": 46,
+      "rectPx": [3588, 516, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 1,
+      "grade": 3,
+      "index": 47,
+      "rectPx": [3844, 516, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 1,
+      "grade": 4,
+      "index": 48,
+      "rectPx": [4, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 1,
+      "grade": 5,
+      "index": 49,
+      "rectPx": [260, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 2,
+      "grade": 1,
+      "index": 50,
+      "rectPx": [516, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 2,
+      "grade": 2,
+      "index": 51,
+      "rectPx": [772, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 2,
+      "grade": 3,
+      "index": 52,
+      "rectPx": [1028, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 2,
+      "grade": 4,
+      "index": 53,
+      "rectPx": [1284, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 2,
+      "grade": 5,
+      "index": 54,
+      "rectPx": [1540, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 3,
+      "grade": 1,
+      "index": 55,
+      "rectPx": [1796, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 3,
+      "grade": 2,
+      "index": 56,
+      "rectPx": [2052, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 3,
+      "grade": 3,
+      "index": 57,
+      "rectPx": [2308, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 3,
+      "grade": 4,
+      "index": 58,
+      "rectPx": [2564, 772, 248, 248]
+    },
+    {
+      "familyId": "cryo",
+      "variant": 3,
+      "grade": 5,
+      "index": 59,
+      "rectPx": [2820, 772, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 0,
+      "grade": 1,
+      "index": 60,
+      "rectPx": [3076, 772, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 0,
+      "grade": 2,
+      "index": 61,
+      "rectPx": [3332, 772, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 0,
+      "grade": 3,
+      "index": 62,
+      "rectPx": [3588, 772, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 0,
+      "grade": 4,
+      "index": 63,
+      "rectPx": [3844, 772, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 0,
+      "grade": 5,
+      "index": 64,
+      "rectPx": [4, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 1,
+      "grade": 1,
+      "index": 65,
+      "rectPx": [260, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 1,
+      "grade": 2,
+      "index": 66,
+      "rectPx": [516, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 1,
+      "grade": 3,
+      "index": 67,
+      "rectPx": [772, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 1,
+      "grade": 4,
+      "index": 68,
+      "rectPx": [1028, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 1,
+      "grade": 5,
+      "index": 69,
+      "rectPx": [1284, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 2,
+      "grade": 1,
+      "index": 70,
+      "rectPx": [1540, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 2,
+      "grade": 2,
+      "index": 71,
+      "rectPx": [1796, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 2,
+      "grade": 3,
+      "index": 72,
+      "rectPx": [2052, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 2,
+      "grade": 4,
+      "index": 73,
+      "rectPx": [2308, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 2,
+      "grade": 5,
+      "index": 74,
+      "rectPx": [2564, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 3,
+      "grade": 1,
+      "index": 75,
+      "rectPx": [2820, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 3,
+      "grade": 2,
+      "index": 76,
+      "rectPx": [3076, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 3,
+      "grade": 3,
+      "index": 77,
+      "rectPx": [3332, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 3,
+      "grade": 4,
+      "index": 78,
+      "rectPx": [3588, 1028, 248, 248]
+    },
+    {
+      "familyId": "crystal",
+      "variant": 3,
+      "grade": 5,
+      "index": 79,
+      "rectPx": [3844, 1028, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 0,
+      "grade": 1,
+      "index": 80,
+      "rectPx": [4, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 0,
+      "grade": 2,
+      "index": 81,
+      "rectPx": [260, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 0,
+      "grade": 3,
+      "index": 82,
+      "rectPx": [516, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 0,
+      "grade": 4,
+      "index": 83,
+      "rectPx": [772, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 0,
+      "grade": 5,
+      "index": 84,
+      "rectPx": [1028, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 1,
+      "grade": 1,
+      "index": 85,
+      "rectPx": [1284, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 1,
+      "grade": 2,
+      "index": 86,
+      "rectPx": [1540, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 1,
+      "grade": 3,
+      "index": 87,
+      "rectPx": [1796, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 1,
+      "grade": 4,
+      "index": 88,
+      "rectPx": [2052, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 1,
+      "grade": 5,
+      "index": 89,
+      "rectPx": [2308, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 2,
+      "grade": 1,
+      "index": 90,
+      "rectPx": [2564, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 2,
+      "grade": 2,
+      "index": 91,
+      "rectPx": [2820, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 2,
+      "grade": 3,
+      "index": 92,
+      "rectPx": [3076, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 2,
+      "grade": 4,
+      "index": 93,
+      "rectPx": [3332, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 2,
+      "grade": 5,
+      "index": 94,
+      "rectPx": [3588, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 3,
+      "grade": 1,
+      "index": 95,
+      "rectPx": [3844, 1284, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 3,
+      "grade": 2,
+      "index": 96,
+      "rectPx": [4, 1540, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 3,
+      "grade": 3,
+      "index": 97,
+      "rectPx": [260, 1540, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 3,
+      "grade": 4,
+      "index": 98,
+      "rectPx": [516, 1540, 248, 248]
+    },
+    {
+      "familyId": "energy",
+      "variant": 3,
+      "grade": 5,
+      "index": 99,
+      "rectPx": [772, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 0,
+      "grade": 1,
+      "index": 100,
+      "rectPx": [1028, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 0,
+      "grade": 2,
+      "index": 101,
+      "rectPx": [1284, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 0,
+      "grade": 3,
+      "index": 102,
+      "rectPx": [1540, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 0,
+      "grade": 4,
+      "index": 103,
+      "rectPx": [1796, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 0,
+      "grade": 5,
+      "index": 104,
+      "rectPx": [2052, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 1,
+      "grade": 1,
+      "index": 105,
+      "rectPx": [2308, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 1,
+      "grade": 2,
+      "index": 106,
+      "rectPx": [2564, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 1,
+      "grade": 3,
+      "index": 107,
+      "rectPx": [2820, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 1,
+      "grade": 4,
+      "index": 108,
+      "rectPx": [3076, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 1,
+      "grade": 5,
+      "index": 109,
+      "rectPx": [3332, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 2,
+      "grade": 1,
+      "index": 110,
+      "rectPx": [3588, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 2,
+      "grade": 2,
+      "index": 111,
+      "rectPx": [3844, 1540, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 2,
+      "grade": 3,
+      "index": 112,
+      "rectPx": [4, 1796, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 2,
+      "grade": 4,
+      "index": 113,
+      "rectPx": [260, 1796, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 2,
+      "grade": 5,
+      "index": 114,
+      "rectPx": [516, 1796, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 3,
+      "grade": 1,
+      "index": 115,
+      "rectPx": [772, 1796, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 3,
+      "grade": 2,
+      "index": 116,
+      "rectPx": [1028, 1796, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 3,
+      "grade": 3,
+      "index": 117,
+      "rectPx": [1284, 1796, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 3,
+      "grade": 4,
+      "index": 118,
+      "rectPx": [1540, 1796, 248, 248]
+    },
+    {
+      "familyId": "exotic",
+      "variant": 3,
+      "grade": 5,
+      "index": 119,
+      "rectPx": [1796, 1796, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 0,
+      "grade": 1,
+      "index": 120,
+      "rectPx": [2052, 1796, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 0,
+      "grade": 2,
+      "index": 121,
+      "rectPx": [2308, 1796, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 0,
+      "grade": 3,
+      "index": 122,
+      "rectPx": [2564, 1796, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 0,
+      "grade": 4,
+      "index": 123,
+      "rectPx": [2820, 1796, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 0,
+      "grade": 5,
+      "index": 124,
+      "rectPx": [3076, 1796, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 1,
+      "grade": 1,
+      "index": 125,
+      "rectPx": [3332, 1796, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 1,
+      "grade": 2,
+      "index": 126,
+      "rectPx": [3588, 1796, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 1,
+      "grade": 3,
+      "index": 127,
+      "rectPx": [3844, 1796, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 1,
+      "grade": 4,
+      "index": 128,
+      "rectPx": [4, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 1,
+      "grade": 5,
+      "index": 129,
+      "rectPx": [260, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 2,
+      "grade": 1,
+      "index": 130,
+      "rectPx": [516, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 2,
+      "grade": 2,
+      "index": 131,
+      "rectPx": [772, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 2,
+      "grade": 3,
+      "index": 132,
+      "rectPx": [1028, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 2,
+      "grade": 4,
+      "index": 133,
+      "rectPx": [1284, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 2,
+      "grade": 5,
+      "index": 134,
+      "rectPx": [1540, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 3,
+      "grade": 1,
+      "index": 135,
+      "rectPx": [1796, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 3,
+      "grade": 2,
+      "index": 136,
+      "rectPx": [2052, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 3,
+      "grade": 3,
+      "index": 137,
+      "rectPx": [2308, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 3,
+      "grade": 4,
+      "index": 138,
+      "rectPx": [2564, 2052, 248, 248]
+    },
+    {
+      "familyId": "fossil",
+      "variant": 3,
+      "grade": 5,
+      "index": 139,
+      "rectPx": [2820, 2052, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 0,
+      "grade": 1,
+      "index": 140,
+      "rectPx": [3076, 2052, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 0,
+      "grade": 2,
+      "index": 141,
+      "rectPx": [3332, 2052, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 0,
+      "grade": 3,
+      "index": 142,
+      "rectPx": [3588, 2052, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 0,
+      "grade": 4,
+      "index": 143,
+      "rectPx": [3844, 2052, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 0,
+      "grade": 5,
+      "index": 144,
+      "rectPx": [4, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 1,
+      "grade": 1,
+      "index": 145,
+      "rectPx": [260, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 1,
+      "grade": 2,
+      "index": 146,
+      "rectPx": [516, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 1,
+      "grade": 3,
+      "index": 147,
+      "rectPx": [772, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 1,
+      "grade": 4,
+      "index": 148,
+      "rectPx": [1028, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 1,
+      "grade": 5,
+      "index": 149,
+      "rectPx": [1284, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 2,
+      "grade": 1,
+      "index": 150,
+      "rectPx": [1540, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 2,
+      "grade": 2,
+      "index": 151,
+      "rectPx": [1796, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 2,
+      "grade": 3,
+      "index": 152,
+      "rectPx": [2052, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 2,
+      "grade": 4,
+      "index": 153,
+      "rectPx": [2308, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 2,
+      "grade": 5,
+      "index": 154,
+      "rectPx": [2564, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 3,
+      "grade": 1,
+      "index": 155,
+      "rectPx": [2820, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 3,
+      "grade": 2,
+      "index": 156,
+      "rectPx": [3076, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 3,
+      "grade": 3,
+      "index": 157,
+      "rectPx": [3332, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 3,
+      "grade": 4,
+      "index": 158,
+      "rectPx": [3588, 2308, 248, 248]
+    },
+    {
+      "familyId": "metal",
+      "variant": 3,
+      "grade": 5,
+      "index": 159,
+      "rectPx": [3844, 2308, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 0,
+      "grade": 1,
+      "index": 160,
+      "rectPx": [4, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 0,
+      "grade": 2,
+      "index": 161,
+      "rectPx": [260, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 0,
+      "grade": 3,
+      "index": 162,
+      "rectPx": [516, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 0,
+      "grade": 4,
+      "index": 163,
+      "rectPx": [772, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 0,
+      "grade": 5,
+      "index": 164,
+      "rectPx": [1028, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 1,
+      "grade": 1,
+      "index": 165,
+      "rectPx": [1284, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 1,
+      "grade": 2,
+      "index": 166,
+      "rectPx": [1540, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 1,
+      "grade": 3,
+      "index": 167,
+      "rectPx": [1796, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 1,
+      "grade": 4,
+      "index": 168,
+      "rectPx": [2052, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 1,
+      "grade": 5,
+      "index": 169,
+      "rectPx": [2308, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 2,
+      "grade": 1,
+      "index": 170,
+      "rectPx": [2564, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 2,
+      "grade": 2,
+      "index": 171,
+      "rectPx": [2820, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 2,
+      "grade": 3,
+      "index": 172,
+      "rectPx": [3076, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 2,
+      "grade": 4,
+      "index": 173,
+      "rectPx": [3332, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 2,
+      "grade": 5,
+      "index": 174,
+      "rectPx": [3588, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 3,
+      "grade": 1,
+      "index": 175,
+      "rectPx": [3844, 2564, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 3,
+      "grade": 2,
+      "index": 176,
+      "rectPx": [4, 2820, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 3,
+      "grade": 3,
+      "index": 177,
+      "rectPx": [260, 2820, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 3,
+      "grade": 4,
+      "index": 178,
+      "rectPx": [516, 2820, 248, 248]
+    },
+    {
+      "familyId": "organic",
+      "variant": 3,
+      "grade": 5,
+      "index": 179,
+      "rectPx": [772, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 0,
+      "grade": 1,
+      "index": 180,
+      "rectPx": [1028, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 0,
+      "grade": 2,
+      "index": 181,
+      "rectPx": [1284, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 0,
+      "grade": 3,
+      "index": 182,
+      "rectPx": [1540, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 0,
+      "grade": 4,
+      "index": 183,
+      "rectPx": [1796, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 0,
+      "grade": 5,
+      "index": 184,
+      "rectPx": [2052, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 1,
+      "grade": 1,
+      "index": 185,
+      "rectPx": [2308, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 1,
+      "grade": 2,
+      "index": 186,
+      "rectPx": [2564, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 1,
+      "grade": 3,
+      "index": 187,
+      "rectPx": [2820, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 1,
+      "grade": 4,
+      "index": 188,
+      "rectPx": [3076, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 1,
+      "grade": 5,
+      "index": 189,
+      "rectPx": [3332, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 2,
+      "grade": 1,
+      "index": 190,
+      "rectPx": [3588, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 2,
+      "grade": 2,
+      "index": 191,
+      "rectPx": [3844, 2820, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 2,
+      "grade": 3,
+      "index": 192,
+      "rectPx": [4, 3076, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 2,
+      "grade": 4,
+      "index": 193,
+      "rectPx": [260, 3076, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 2,
+      "grade": 5,
+      "index": 194,
+      "rectPx": [516, 3076, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 3,
+      "grade": 1,
+      "index": 195,
+      "rectPx": [772, 3076, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 3,
+      "grade": 2,
+      "index": 196,
+      "rectPx": [1028, 3076, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 3,
+      "grade": 3,
+      "index": 197,
+      "rectPx": [1284, 3076, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 3,
+      "grade": 4,
+      "index": 198,
+      "rectPx": [1540, 3076, 248, 248]
+    },
+    {
+      "familyId": "radioactive",
+      "variant": 3,
+      "grade": 5,
+      "index": 199,
+      "rectPx": [1796, 3076, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 0,
+      "grade": 1,
+      "index": 200,
+      "rectPx": [2052, 3076, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 0,
+      "grade": 2,
+      "index": 201,
+      "rectPx": [2308, 3076, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 0,
+      "grade": 3,
+      "index": 202,
+      "rectPx": [2564, 3076, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 0,
+      "grade": 4,
+      "index": 203,
+      "rectPx": [2820, 3076, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 0,
+      "grade": 5,
+      "index": 204,
+      "rectPx": [3076, 3076, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 1,
+      "grade": 1,
+      "index": 205,
+      "rectPx": [3332, 3076, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 1,
+      "grade": 2,
+      "index": 206,
+      "rectPx": [3588, 3076, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 1,
+      "grade": 3,
+      "index": 207,
+      "rectPx": [3844, 3076, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 1,
+      "grade": 4,
+      "index": 208,
+      "rectPx": [4, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 1,
+      "grade": 5,
+      "index": 209,
+      "rectPx": [260, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 2,
+      "grade": 1,
+      "index": 210,
+      "rectPx": [516, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 2,
+      "grade": 2,
+      "index": 211,
+      "rectPx": [772, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 2,
+      "grade": 3,
+      "index": 212,
+      "rectPx": [1028, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 2,
+      "grade": 4,
+      "index": 213,
+      "rectPx": [1284, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 2,
+      "grade": 5,
+      "index": 214,
+      "rectPx": [1540, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 3,
+      "grade": 1,
+      "index": 215,
+      "rectPx": [1796, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 3,
+      "grade": 2,
+      "index": 216,
+      "rectPx": [2052, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 3,
+      "grade": 3,
+      "index": 217,
+      "rectPx": [2308, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 3,
+      "grade": 4,
+      "index": 218,
+      "rectPx": [2564, 3332, 248, 248]
+    },
+    {
+      "familyId": "relic",
+      "variant": 3,
+      "grade": 5,
+      "index": 219,
+      "rectPx": [2820, 3332, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 0,
+      "grade": 1,
+      "index": 220,
+      "rectPx": [3076, 3332, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 0,
+      "grade": 2,
+      "index": 221,
+      "rectPx": [3332, 3332, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 0,
+      "grade": 3,
+      "index": 222,
+      "rectPx": [3588, 3332, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 0,
+      "grade": 4,
+      "index": 223,
+      "rectPx": [3844, 3332, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 0,
+      "grade": 5,
+      "index": 224,
+      "rectPx": [4, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 1,
+      "grade": 1,
+      "index": 225,
+      "rectPx": [260, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 1,
+      "grade": 2,
+      "index": 226,
+      "rectPx": [516, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 1,
+      "grade": 3,
+      "index": 227,
+      "rectPx": [772, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 1,
+      "grade": 4,
+      "index": 228,
+      "rectPx": [1028, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 1,
+      "grade": 5,
+      "index": 229,
+      "rectPx": [1284, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 2,
+      "grade": 1,
+      "index": 230,
+      "rectPx": [1540, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 2,
+      "grade": 2,
+      "index": 231,
+      "rectPx": [1796, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 2,
+      "grade": 3,
+      "index": 232,
+      "rectPx": [2052, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 2,
+      "grade": 4,
+      "index": 233,
+      "rectPx": [2308, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 2,
+      "grade": 5,
+      "index": 234,
+      "rectPx": [2564, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 3,
+      "grade": 1,
+      "index": 235,
+      "rectPx": [2820, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 3,
+      "grade": 2,
+      "index": 236,
+      "rectPx": [3076, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 3,
+      "grade": 3,
+      "index": 237,
+      "rectPx": [3332, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 3,
+      "grade": 4,
+      "index": 238,
+      "rectPx": [3588, 3588, 248, 248]
+    },
+    {
+      "familyId": "volcanic",
+      "variant": 3,
+      "grade": 5,
+      "index": 239,
+      "rectPx": [3844, 3588, 248, 248]
+    }
+  ]
+}
