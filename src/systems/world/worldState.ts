@@ -114,16 +114,39 @@ export function currentDensityOfChunk(
   const delta = world.chunks[chunkKey(cx, cy)]
   const { density } = generatedChunkOf(params, cx, cy)
   if (delta === undefined) return density
+  return decodedDensityOf(density, delta)
+}
+
+/**
+ * The density a delta of chunk `(cx, cy)` stands for, the world's now or an earlier one, read from
+ * the same per-delta store; a delta that changed no density answers the generated array. Callers
+ * must only read it.
+ */
+export function densityOfChunkDelta(
+  params: PlanetParams,
+  cx: number,
+  cy: number,
+  delta: ChunkDelta,
+): Uint8Array {
+  const { density } = generatedChunkOf(params, cx, cy)
+  return delta.density.length === 0 ? density : decodedDensityOf(density, delta)
+}
+
+function decodedDensityOf(generated: Uint8Array, delta: ChunkDelta): Uint8Array {
   const known = densityOfDelta.get(delta)
   if (known !== undefined) return known
-  const decoded = decodeDensity(density, delta)
+  const decoded = decodeDensity(generated, delta)
   densityOfDelta.set(delta, decoded)
   return decoded
 }
 
 /** The chunk's casing layer (#41), one grade per sample, 0 for none; callers must only read it. */
 export function currentCasingOfChunk(world: WorldState, cx: number, cy: number): Uint8Array {
-  const delta = deltaOfChunk(world, cx, cy)
+  return casingOfChunkDelta(deltaOfChunk(world, cx, cy))
+}
+
+/** The casing layer a chunk delta stands for, the world's now or an earlier one; read only. */
+export function casingOfChunkDelta(delta: ChunkDelta): Uint8Array {
   if (delta.casing.length === 0) return NO_CASING
   const known = casingOfDelta.get(delta)
   if (known !== undefined) return known

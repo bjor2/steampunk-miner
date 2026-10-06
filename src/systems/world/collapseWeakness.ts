@@ -11,15 +11,21 @@
  * never-lined rock stays ignored.
  *
  * Weakness is a pure function of the ground, so it is cached per block and recomputed only when
- * one of the chunk deltas it reads changes (a `GroundChanged` touched the block or its border).
+ * the ground it reads changed: a new delta of a chunk under the block or its border that holds other
+ * density or casing over those samples (`collapseBlockGround`, #120).
  */
 import { requiredCasingGrade } from '../economy/casingGrades'
-import { blockIdOf, samplesOfBlock, type CollapseBlock } from './collapseBlock'
+import { blockIdOf, firstSampleOfBlock, type CollapseBlock } from './collapseBlock'
+import {
+  chunksReadByBlock,
+  deltasReadByBlock,
+  isSameGroundReadByBlock,
+} from './collapseBlockGround'
 import { COLLAPSE_BLOCK_SAMPLES } from '../../constants/balance'
 import { effectiveCasingGrade, isLined, type ChunkDelta } from './chunkDelta'
 import { casingBandOfTile } from './casingBand'
 import type { PlanetParams } from './planetParams'
-import { chunkOfSample, SAMPLES_PER_TILE } from './sampleGrid'
+import { SAMPLES_PER_TILE } from './sampleGrid'
 import {
   casingAt,
   isCarvedAirAt,
@@ -27,7 +33,7 @@ import {
   openSampleLayers,
   type SampleLayers,
 } from './sampleLayers'
-import { deltaOfChunk, type WorldState } from './worldState'
+import type { WorldState } from './worldState'
 
 /** What `collapse_warning` reports: the weakest lining's grade and the band it sits in. */
 export interface BlockWeakness {
@@ -47,10 +53,13 @@ export function weaknessOfBlock(
   params: PlanetParams,
   block: CollapseBlock,
 ): BlockWeakness | null {
-  const deps = deltasReadBy(world, block)
+  const chunks = chunksReadByBlock(block)
+  const deps = deltasReadByBlock(world, chunks)
   const key = cacheKeyOf(params, block)
   const cached = weaknessCache.get(key)
-  if (cached !== undefined && isSameDeltas(cached.deps, deps)) return cached.weakness
+  if (cached !== undefined && isSameGroundReadByBlock(params, block, chunks, cached.deps, deps)) {
+    return keepWeakness(key, cached, deps)
+  }
   const weakness = deps.some(hasCasing) ? findWeakness(world, params, block) : null
   rememberWeakness(key, { deps, weakness })
   return weakness
@@ -59,46 +68,76 @@ export function weaknessOfBlock(
 /** Every lined solid sample bordering the block's carved air, once each, in row order. */
 export function linedWallsOfBlock(layers: SampleLayers, block: CollapseBlock): SamplePoint[] {
   const walls = new Map<string, SamplePoint>()
-  for (const air of samplesOfBlock(block)) {
-    if (!isCarvedAirAt(layers, air.sx, air.sy)) continue
-    for (const wall of eightNeighboursOf(air)) {
-      if (isLinedWall(layers, wall)) walls.set(`${wall.sx},${wall.sy}`, wall)
-    }
-  }
+  visitLinedWallsOfBlock(layers, block, (sx, sy) => walls.set(`${sx},${sy}`, { sx, sy }))
   return [...walls.values()]
 }
 
+/**
+ * The weakest wall in the order `linedWallsOfBlock` lists them. Walks the samples in place: this
+ * runs for every block near a vehicle whose ground changed, on every carve (#120).
+ */
 function findWeakness(
   world: WorldState,
   params: PlanetParams,
   block: CollapseBlock,
 ): BlockWeakness | null {
   const layers = openSampleLayers(world, params)
-  return linedWallsOfBlock(layers, block)
-    .map((wall) => wallWeaknessOf(layers, params, wall))
-    .reduce<BlockWeakness | null>(weaker, null)
+  let weakest: BlockWeakness | null = null
+  visitLinedWallsOfBlock(layers, block, (sx, sy) => {
+    weakest = weakerWall(weakest, layers, params, sx, sy)
+  })
+  return weakest
 }
 
-function wallWeaknessOf(
+/**
+ * Each lined solid sample bordering the block's carved air, met air sample by air sample in row
+ * order, neighbours in `NEIGHBOUR_OFFSETS` order; a wall bordering several air samples comes again.
+ */
+function visitLinedWallsOfBlock(
+  layers: SampleLayers,
+  block: CollapseBlock,
+  visit: (sx: number, sy: number) => void,
+): void {
+  const first = firstSampleOfBlock(block)
+  for (let sy = first.sy; sy < first.sy + COLLAPSE_BLOCK_SAMPLES; sy++) {
+    for (let sx = first.sx; sx < first.sx + COLLAPSE_BLOCK_SAMPLES; sx++) {
+      if (isCarvedAirAt(layers, sx, sy)) visitLinedNeighbours(layers, sx, sy, visit)
+    }
+  }
+}
+
+function visitLinedNeighbours(
+  layers: SampleLayers,
+  sx: number,
+  sy: number,
+  visit: (sx: number, sy: number) => void,
+): void {
+  for (const [dx, dy] of NEIGHBOUR_OFFSETS) {
+    if (isLinedWall(layers, sx + dx, sy + dy)) visit(sx + dx, sy + dy)
+  }
+}
+
+/**
+ * `kept`, or the wall when it is weak and lower in grade: the lower grade wins, on a tie the first
+ * met stays, so a wall met again never changes the answer. The band is read only when the wall's
+ * grade could win.
+ */
+function weakerWall(
+  kept: BlockWeakness | null,
   layers: SampleLayers,
   params: PlanetParams,
-  wall: SamplePoint,
+  sx: number,
+  sy: number,
 ): BlockWeakness | null {
-  const band = casingBandOfTile(params, tileOf(wall.sx), tileOf(wall.sy))
+  const grade = effectiveCasingGrade(casingAt(layers, sx, sy))
+  if (kept !== null && grade >= kept.weakestGrade) return kept
+  const band = casingBandOfTile(params, tileOf(sx), tileOf(sy))
   const required = requiredCasingGrade(band)
-  const grade = effectiveCasingGrade(casingAt(layers, wall.sx, wall.sy))
-  return grade < required ? { band, weakestGrade: grade, required } : null
+  return grade < required ? { band, weakestGrade: grade, required } : kept
 }
 
-/** The lower grade wins; on a tie the first in row order stays. */
-function weaker(kept: BlockWeakness | null, next: BlockWeakness | null): BlockWeakness | null {
-  if (next === null) return kept
-  if (kept === null || next.weakestGrade < kept.weakestGrade) return next
-  return kept
-}
-
-function isLinedWall(layers: SampleLayers, sample: SamplePoint): boolean {
-  return isSolidAt(layers, sample.sx, sample.sy) && isLined(casingAt(layers, sample.sx, sample.sy))
+function isLinedWall(layers: SampleLayers, sx: number, sy: number): boolean {
+  return isSolidAt(layers, sx, sy) && isLined(casingAt(layers, sx, sy))
 }
 
 const NEIGHBOUR_OFFSETS: readonly (readonly [number, number])[] = [
@@ -129,6 +168,16 @@ interface CachedWeakness {
 const MAX_CACHED_BLOCKS = 4096
 const weaknessCache = new Map<string, CachedWeakness>()
 
+/** The ground the block reads is unchanged: its weakness stands, now against the new deltas. */
+function keepWeakness(
+  key: string,
+  cached: CachedWeakness,
+  deps: readonly ChunkDelta[],
+): BlockWeakness | null {
+  weaknessCache.set(key, { deps, weakness: cached.weakness })
+  return cached.weakness
+}
+
 function rememberWeakness(key: string, entry: CachedWeakness): void {
   if (weaknessCache.size >= MAX_CACHED_BLOCKS) weaknessCache.clear()
   weaknessCache.set(key, entry)
@@ -136,25 +185,6 @@ function rememberWeakness(key: string, entry: CachedWeakness): void {
 
 function cacheKeyOf(params: PlanetParams, block: CollapseBlock): string {
   return `${params.worldSeed}:${params.planetIndex}:${blockIdOf(block)}`
-}
-
-/** The deltas of the chunks under the block and its one-sample border, in a fixed order. */
-function deltasReadBy(world: WorldState, block: CollapseBlock): ChunkDelta[] {
-  const [first] = samplesOfBlock(block)
-  const columns = chunkSpanOf(first.sx)
-  const rows = chunkSpanOf(first.sy)
-  return rows.flatMap((cy) => columns.map((cx) => deltaOfChunk(world, cx, cy)))
-}
-
-/** A block is an eighth of a chunk, so its border reaches at most one neighbouring chunk. */
-function chunkSpanOf(firstSample: number): number[] {
-  const low = chunkOfSample(firstSample - 1)
-  const high = chunkOfSample(firstSample + COLLAPSE_BLOCK_SAMPLES)
-  return low === high ? [low] : [low, high]
-}
-
-function isSameDeltas(a: readonly ChunkDelta[], b: readonly ChunkDelta[]): boolean {
-  return a.length === b.length && a.every((delta, at) => delta === b[at])
 }
 
 function hasCasing(delta: ChunkDelta): boolean {

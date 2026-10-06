@@ -5,7 +5,8 @@ import { weaknessOfBlock } from './collapseWeakness'
 import { clearDisc } from './groundEdit'
 import { planetParamsFor } from './planetParams'
 import { MM_PER_SAMPLE } from './sampleGrid'
-import { generatedChunkOf, EMPTY_WORLD, type WorldState } from './worldState'
+import { EMPTY_CHUNK_DELTA, NO_CASING, withCasing, withDensity } from './chunkDelta'
+import { generatedChunkOf, EMPTY_WORLD, withChunkDelta, type WorldState } from './worldState'
 import { chunkOfSample, localSampleOf, sampleIndexOf } from './sampleGrid'
 
 const params = planetParamsFor(83921, 1)
@@ -129,5 +130,61 @@ describe('collapse weakness', () => {
       widened = clearDisc(widened, params, disc, 255).world
     }
     expect(weaknessOfBlock(widened, params, block)).toBeNull()
+  })
+})
+
+/**
+ * A block at the left edge of chunk (-1, 7) in band-2 rock, whose left border column lies in chunk
+ * (-2, 7): air cut into its first column, the rock across the chunk border lined or carved.
+ */
+const EDGE_BLOCK = { cx: -1, cy: 7, index: 56 }
+const EDGE_ROWS = [1010, 1011, 1012, 1013]
+
+function sampleIndexInChunk(sx: number, sy: number): number {
+  return sampleIndexOf(localSampleOf(sx), localSampleOf(sy))
+}
+
+/** `generated` with `samples` set to `value`, as a chunk delta. */
+function deltaWithDensity(cx: number, cy: number, samples: number[][], value: number) {
+  const generated = generatedChunkOf(params, cx, cy).density
+  const density = generated.slice()
+  for (const [sx, sy] of samples) density[sampleIndexInChunk(sx, sy)] = value
+  return withDensity(EMPTY_CHUNK_DELTA, density, generated)
+}
+
+/** Air in the edge block's first column; across the border, lining at `grade` or carved rock. */
+function edgeWorld(border: { grade: number } | 'carved'): WorldState {
+  const air = EDGE_ROWS.map((sy) => [-128, sy])
+  const wall = EDGE_ROWS.map((sy) => [-129, sy])
+  const inBlock = withChunkDelta(EMPTY_WORLD, -1, 7, deltaWithDensity(-1, 7, air, 0))
+  if (border === 'carved') return withChunkDelta(inBlock, -2, 7, deltaWithDensity(-2, 7, wall, 0))
+  const casing = NO_CASING.slice()
+  for (const [sx, sy] of wall) casing[sampleIndexInChunk(sx, sy)] = border.grade
+  return withChunkDelta(inBlock, -2, 7, withCasing(EMPTY_CHUNK_DELTA, casing))
+}
+
+describe('collapse weakness across a chunk border', () => {
+  it('starts from solid band-2 rock on both sides of the border', () => {
+    const rows = EDGE_ROWS.flatMap((sy) => [-129, -128].map((sx) => [sx, sy]))
+    const densities = rows.map(([sx, sy]) => {
+      const { density } = generatedChunkOf(params, chunkOfSample(sx), chunkOfSample(sy))
+      return density[sampleIndexInChunk(sx, sy)]
+    })
+    expect(densities).toEqual(rows.map(() => 255))
+  })
+
+  it('follows the lining in the neighbouring chunk each time only that chunk changes', () => {
+    expect(weaknessOfBlock(edgeWorld({ grade: 2 }), params, EDGE_BLOCK)).toBeNull()
+    expect(weaknessOfBlock(edgeWorld({ grade: 1 }), params, EDGE_BLOCK)).toEqual({
+      band: 2,
+      weakestGrade: 1,
+      required: 2,
+    })
+    expect(weaknessOfBlock(edgeWorld({ grade: 2 }), params, EDGE_BLOCK)).toBeNull()
+  })
+
+  it('stops being weak once the lined rock across the border is carved away', () => {
+    expect(weaknessOfBlock(edgeWorld({ grade: 1 }), params, EDGE_BLOCK)).not.toBeNull()
+    expect(weaknessOfBlock(edgeWorld('carved'), params, EDGE_BLOCK)).toBeNull()
   })
 })

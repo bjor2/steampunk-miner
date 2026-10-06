@@ -24,10 +24,12 @@ export interface SampleLayers {
   world: WorldState
   params: PlanetParams
   chunks: Map<string, ChunkLayers>
+  /** The chunk read last: a walk over a block stays in one chunk for most samples (#120). */
+  last: { cx: number; cy: number; chunk: ChunkLayers } | null
 }
 
 export function openSampleLayers(world: WorldState, params: PlanetParams): SampleLayers {
-  return { world, params, chunks: new Map() }
+  return { world, params, chunks: new Map(), last: null }
 }
 
 export function casingAt(layers: SampleLayers, sx: number, sy: number): number {
@@ -52,6 +54,14 @@ export function isCarvedAirAt(layers: SampleLayers, sx: number, sy: number): boo
 function layersAt(layers: SampleLayers, sx: number, sy: number): ChunkLayers {
   const cx = chunkOfSample(sx)
   const cy = chunkOfSample(sy)
+  const { last } = layers
+  if (last !== null && last.cx === cx && last.cy === cy) return last.chunk
+  const chunk = chunkLayersAt(layers, cx, cy)
+  layers.last = { cx, cy, chunk }
+  return chunk
+}
+
+function chunkLayersAt(layers: SampleLayers, cx: number, cy: number): ChunkLayers {
   const key = chunkKey(cx, cy)
   const known = layers.chunks.get(key)
   if (known !== undefined) return known
