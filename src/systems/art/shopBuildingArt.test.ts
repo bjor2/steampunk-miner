@@ -67,6 +67,14 @@ describe('shop building art', () => {
     expect(workshop.size[0]).toBeGreaterThan(workshop.size[1])
     expect(workshop.size[0]).toBeGreaterThan(sell.size[0])
   })
+
+  it('draws both buildings from their atlases with warm window light on an emissive map', () => {
+    for (const bay of SHOP_BUILDING_BAY_IDS) {
+      const quads = assetQuadsOf(SHIPPED_ART, shopBuildingAssetIdOf(bay), 1)
+      expect(quads.every((quad) => quad.uv !== null)).toBe(true)
+      expect(shippedSidecarOf(shopBuildingAssetIdOf(bay)).maps.emissive).not.toBe(false)
+    }
+  })
 })
 
 /** The chute mouth sits within a vehicle height of the pad, where the rig's hopper is. */

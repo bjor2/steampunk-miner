@@ -2,7 +2,7 @@
   "id": "platform-building-upgrade",
   "source": "blender",
   "form": "parts",
-  "status": "placeholder",
+  "status": "final",
   "color": "#4a4a4e",
   "partColors": {
     "workshop-gantry": "#b08a3c",

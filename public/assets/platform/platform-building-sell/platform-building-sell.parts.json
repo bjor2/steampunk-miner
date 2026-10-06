@@ -1,0 +1,93 @@
+{
+  "assetId": "platform-building-sell",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-building-sell/platform-building-sell.blend",
+    "sha256": "929a1664d02a512399ab5431c63d3764d4f0746b5c75251f3c742936e5bdcaf4",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [
+    2048,
+    4096
+  ],
+  "maps": {
+    "albedo": "platform-building-sell.albedo.ktx2",
+    "normal": "platform-building-sell.normal.ktx2",
+    "emissive": "platform-building-sell.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "platform-building-sell",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        1539,
+        2560
+      ],
+      "sizeM": [
+        6.01,
+        10.0
+      ],
+      "pivotM": [
+        3.0,
+        0.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "sell-ticker",
+      "tier": 1,
+      "rect": [
+        8,
+        2584,
+        564,
+        154
+      ],
+      "sizeM": [
+        2.2,
+        0.6
+      ],
+      "pivotM": [
+        1.1,
+        0.3
+      ],
+      "atM": [
+        0.0,
+        5.65
+      ],
+      "z": 1
+    }
+  ],
+  "attach": [
+    {
+      "id": "sell.chute",
+      "atM": [
+        -1.6,
+        1.3
+      ],
+      "z": 2
+    },
+    {
+      "id": "sell.stack",
+      "atM": [
+        -2.5,
+        10.0
+      ],
+      "z": -1
+    },
+    {
+      "id": "sell.ticker",
+      "atM": [
+        0.0,
+        5.65
+      ],
+      "z": 2
+    }
+  ]
+}

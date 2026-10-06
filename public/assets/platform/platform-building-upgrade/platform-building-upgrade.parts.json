@@ -1,0 +1,124 @@
+{
+  "assetId": "platform-building-upgrade",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-building-upgrade/platform-building-upgrade.blend",
+    "sha256": "07294607795defcbd3266baf5e1357bb27ee5663063f03412a7591e78fd44679",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [
+    4096,
+    2048
+  ],
+  "maps": {
+    "albedo": "platform-building-upgrade.albedo.ktx2",
+    "normal": "platform-building-upgrade.normal.ktx2",
+    "emissive": "platform-building-upgrade.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "platform-building-upgrade",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        2612,
+        1741
+      ],
+      "sizeM": [
+        10.2,
+        6.8
+      ],
+      "pivotM": [
+        5.1,
+        0.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "workshop-gantry",
+      "tier": 1,
+      "rect": [
+        2636,
+        8,
+        1037,
+        537
+      ],
+      "sizeM": [
+        4.0476,
+        2.0938
+      ],
+      "pivotM": [
+        0.3,
+        0.3
+      ],
+      "atM": [
+        -3.4,
+        4.9
+      ],
+      "z": 1
+    },
+    {
+      "id": "workshop-turntable",
+      "tier": 1,
+      "rect": [
+        8,
+        1765,
+        844,
+        61
+      ],
+      "sizeM": [
+        3.2946,
+        0.2376
+      ],
+      "pivotM": [
+        1.6473,
+        0.12
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 1
+    }
+  ],
+  "attach": [
+    {
+      "id": "workshop.gantry",
+      "atM": [
+        -3.4,
+        4.9
+      ],
+      "z": 2
+    },
+    {
+      "id": "workshop.platform",
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 1
+    },
+    {
+      "id": "workshop.showcase_cam",
+      "atM": [
+        0.0,
+        1.8
+      ],
+      "z": 0
+    },
+    {
+      "id": "workshop.stack",
+      "atM": [
+        3.6,
+        6.8
+      ],
+      "z": -1
+    }
+  ]
+}
