@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T01:17:27+02:00",
+  "updated_at": "2026-10-07T01:22:03+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 3,
+      "claims_last_hour": 1,
       "name": "Claude Max 1"
     },
     {
@@ -73,11 +73,11 @@
         },
         {
           "slot": "C6",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 188,
+          "grok_slot": 5,
+          "kind": "dev",
+          "since": "2026-10-07T01:21:00+02:00"
         },
         {
           "slot": "C7",
@@ -97,9 +97,9 @@
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
-      "claims_last_hour": 4,
+      "used": 4,
+      "free": 0,
+      "claims_last_hour": 5,
       "name": "Claude Max 2"
     }
   ],
@@ -138,9 +138,10 @@
     },
     {
       "slot": 5,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 188,
+      "since": "2026-10-07T01:21:00+02:00",
+      "claude_slot": 6
     },
     {
       "slot": 6,
@@ -234,10 +235,10 @@
     },
     {
       "slot": 6,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 188,
+      "grok_slot": 5,
+      "since": "2026-10-07T01:21:00+02:00",
       "account": 2
     },
     {
@@ -258,17 +259,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 00:59 CEST",
-    "mode": "refill-dev",
-    "triggers": "#123 #188",
-    "started": "#185->C5/A2 #186->C7/A2",
-    "note": "spawned 2 worker(s)"
+    "at": "2026-10-07 01:21 CEST",
+    "mode": "pass",
+    "triggers": "#187",
+    "started": "#188->C6/A2",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 8,
-      "dev": 7,
+      "used": 9,
+      "dev": 8,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -276,8 +277,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 7,
-      "free": 1,
+      "used": 8,
+      "free": 0,
       "external": 0
     }
   }
