@@ -7,14 +7,14 @@ export const TICKET_PHASES_SCHEMA = 1
 export const PHASE_CATEGORIES = [
   { id: 'blocked', name: 'Blocked', colour: '#e0675a' },
   { id: 'planner_wait', name: 'Waiting on planners', colour: '#a98bd6' },
-  { id: 'idle', name: 'Idle', colour: '#6e6252' },
+  { id: 'idle', name: 'Idle', colour: '#8c959f' },
   { id: 'context', name: 'Context gathering', colour: '#6aa9d8' },
   { id: 'planning', name: 'Planning', colour: '#4fb3a6' },
   { id: 'developing', name: 'Developing', colour: '#d4ab3c' },
   { id: 'testing', name: 'Testing', colour: '#6fbf73' },
-  { id: 'gates', name: 'Gates', colour: '#c27a45' },
+  { id: 'gates', name: 'Gates', colour: '#e8833a' },
   { id: 'landing', name: 'Landing', colour: '#d978a8' },
-  { id: 'other', name: 'Other', colour: '#9a9a9a' },
+  { id: 'other', name: 'Other', colour: '#c4c9d0' },
 ]
 
 export const CATEGORY_IDS = PHASE_CATEGORIES.map((category) => category.id)
