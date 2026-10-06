@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-06T22:18:28+02:00",
+  "updated_at": "2026-10-06T22:28:57+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -19,11 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 178,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-06T22:18:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -51,8 +51,8 @@
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
@@ -110,10 +110,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 178,
-      "since": "2026-10-06T22:18:00+02:00",
-      "claude_slot": 1
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -152,12 +151,9 @@
     },
     {
       "slot": 7,
-      "state": "planner",
-      "ticket": 162,
-      "since": "2026-10-06T22:18:20+02:00",
-      "map": 157,
-      "room": "6309acb5-cb8c-4ce1-87ed-f9f09a592517",
-      "adopted": true
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 8,
@@ -198,10 +194,10 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 178,
-      "grok_slot": 1,
-      "since": "2026-10-06T22:18:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -271,17 +267,17 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 10,
-      "dev": 8,
+      "used": 8,
+      "dev": 7,
       "dev_cap": 8,
-      "planner": 2,
+      "planner": 1,
       "planner_cap": 4
     },
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 8,
-      "free": 0,
+      "used": 7,
+      "free": 1,
       "external": 0
     }
   }
