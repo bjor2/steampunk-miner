@@ -3,7 +3,7 @@
 #
 #   scripts/ci/selectPushTests.sh <base-sha-or-empty>
 #
-# Writes mode=scoped|full|none, balance=true|false and reason=... to $GITHUB_OUTPUT (stdout when
+# Writes mode=scoped|full|none and reason=... to $GITHUB_OUTPUT (stdout when
 # unset), and the files for `vitest related` to $RELATED_LIST (default: vitest-related.txt).
 # scoped: Vitest follows the import graph from these files to the tests that import them.
 # full:   a change Vitest cannot map (config, setup, golden and balance data, CI itself) or no
@@ -19,9 +19,6 @@ RELATED_LIST="${RELATED_LIST:-vitest-related.txt}"
 
 # Changes Vitest's import graph cannot see, or that change every test: run the whole suite.
 FULL_SUITE_PATHS='^(package\.json|package-lock\.json|(vite|vitest)\.config\.[^/]+|tsconfig[^/]*\.json|eslint\.config\.[^/]+|src/testSetup\.ts|\.github/workflows/ci\.yml|scripts/ci/.*|tests/.*)$'
-
-# The balance report's inputs; anything else skips `npm run balance:report` on a scoped push.
-BALANCE_PATHS='^(src/systems/economy/|src/data/|src/logging/|scripts/balanceReport\.ts$|tests/balance/|scenarios/)'
 
 # Tests that read their inputs with node:fs (not import), so the import graph misses them.
 # Each line: <path regex> <test files...>
@@ -39,11 +36,9 @@ RULES
 write_choice() {
   {
     echo "mode=$1"
-    echo "balance=$2"
-    echo "reason=$3"
+    echo "reason=$2"
   } >>"$OUT"
-  echo "Vitest mode: $1 ($3)"
-  echo "Balance report: $([ "$2" = true ] && echo run || echo skip)"
+  echo "Vitest mode: $1 ($2)"
 }
 
 has_usable_base() {
@@ -52,7 +47,7 @@ has_usable_base() {
 }
 
 if ! has_usable_base; then
-  write_choice full true "no usable base commit ('${BASE:-none}'), e.g. a new branch or a force push"
+  write_choice full "no usable base commit ('${BASE:-none}'), e.g. a new branch or a force push"
   exit 0
 fi
 
@@ -61,13 +56,13 @@ echo "Changed files since ${BASE:0:12}:"
 sed 's/^/  /' <<<"${CHANGED:-(none)}"
 
 if [ -z "$CHANGED" ]; then
-  write_choice none false "no files changed since ${BASE:0:12}"
+  write_choice none "no files changed since ${BASE:0:12}"
   exit 0
 fi
 
 FULL_HITS=$(grep -E "$FULL_SUITE_PATHS" <<<"$CHANGED" || true)
 if [ -n "$FULL_HITS" ]; then
-  write_choice full true "unmappable change: $(paste -sd ' ' - <<<"$FULL_HITS")"
+  write_choice full "unmappable change: $(paste -sd ' ' - <<<"$FULL_HITS")"
   exit 0
 fi
 
@@ -80,6 +75,4 @@ while read -r pattern tests; do
 done <<<"$FS_READ_RULES"
 sort -u -o "$RELATED_LIST" "$RELATED_LIST"
 
-BALANCE=false
-if grep -qE "$BALANCE_PATHS" <<<"$CHANGED"; then BALANCE=true; fi
-write_choice scoped "$BALANCE" "$(wc -l <<<"$CHANGED" | tr -d ' ') changed files, tests picked by import graph and fs-read rules"
+write_choice scoped "$(wc -l <<<"$CHANGED" | tr -d ' ') changed files, tests picked by import graph and fs-read rules"
