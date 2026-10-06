@@ -93,7 +93,10 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   unlock or price; `vehicleParts()` then reports `rackCharges` and the rack's parts); for the heat planets
   (#113), `setLiningType(type)` (`standard` or `refractory`, owned and laid from then on, no unlock or
   price; `lineCasing` lays the active type) and `setHeat(points)` (the heat gauge, 0 to its max, only 0
-  off planets 8 to 16); for collapse (#43),
+  off planets 8 to 16); for the loadout (#162, K4), `setVehicleLoadout(slots, owned?)` (replaces the
+  vehicle's loadout: each named slot holds its item, every other slot is empty, and the vehicle owns
+  exactly those items and `owned`, with no dock, price or slot lock; it reads registered vehicle
+  items, so kernel specs register fakes with `withRegistrations`); for collapse (#43),
   `forceCollapse(block)` (a `cx,cy#index` block, warned for the full 60 ticks, then refilled whatever its
   lining) and the unlogged read `collapseState()` (the weak blocks within 16 m of a vehicle and the blocks
   warning or refilling); for memory (#119), the unlogged read `getPhysicsStats()`

@@ -509,7 +509,7 @@ export function oreLookProvider(): OreLookProvider   // default: today's oreLook
 ```ts
 // src/systems/registries/vehicleLoadout.ts (new)
 export const LOADOUT_SLOT_IDS = ['powerup.1', 'powerup.2', 'powerup.3', 'powerup.4', 'powerup.5',
-  'rig.1', 'rig.2', 'drill.head', 'drill.flank', 'drill.collar'] as const
+  'drill.head', 'drill.flank', 'drill.collar'] as const   // no rig.* slots: GD ruling on #162 (K4)
 export type LoadoutSlotId = (typeof LOADOUT_SLOT_IDS)[number]
 export type EquipRefusal = 'not_owned' | 'slot_locked' | 'exclusive_taken' | 'not_docked' | 'wrong_slot'
 export interface VehicleItem extends ContentEntry { slots: readonly LoadoutSlotId[]; attach: AttachId | null }
@@ -529,6 +529,8 @@ export function acceptedSlotsOf(itemId: string): readonly LoadoutSlotId[]
 - the `loadout` section v1
 - the `SNAPSHOT_VERSION` and `AUTHORITY_PROTOCOL_VERSION` bumps and golden regeneration
 - `debugApi.setVehicleLoadout` (today `notImplemented`, `src/debug/debugApi.ts` lines 217 and 412)
+
+**Landed in K4 (#187).** The state is `vehicle.loadout {slots, owned}` (`src/systems/vehicle/loadoutState.ts`): owned items are the kernel's `ownsItem(state, playerId, itemId)`, and extractors take effect whenever owned, with no slot. The rules are `src/systems/authority/loadoutRules.ts`. A refusal is answered as the `EquipRefused` domain event (`equip_refused` in the log), checked in the order `not_docked`, `wrong_slot`, `slot_locked`, `not_owned`, `exclusive_taken`. A cradle item opens its slot through `VehicleItem.opensSlot`. The section is `{version: 1, body}` on the portable vehicle (`loadoutSection.ts`).
 
 `power-up-core` registers activation, not slots. Item slices register acceptance and never import each other.
 
