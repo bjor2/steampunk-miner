@@ -93,6 +93,13 @@ export const FRAME_WINDOW_CAPACITY = 256
 export const LONG_FRAME_MS = 50
 /** Seconds of frames between two `memory_sample` lines (#121, logging strategy section 2). */
 export const MEMORY_SAMPLE_SECONDS = 10
+/**
+ * Debug-run snapshots (#123, logging strategy section 1): a save snapshot every 5 min of frames
+ * besides every save and the session end, and a heap snapshot each time the heap climbs another
+ * 50 MB (in KiB, as `memory_sample` reads it) above its first sample.
+ */
+export const SAVE_SNAPSHOT_SECONDS = 300
+export const HEAP_SNAPSHOT_STEP_KB = 50 * 1024
 
 /**
  * Post-processing (#38: one bloom pass at half the internal resolution, filmic tone mapping and a
