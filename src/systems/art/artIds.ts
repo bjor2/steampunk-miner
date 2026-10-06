@@ -84,6 +84,8 @@ export function blenderAssetIds(): string[] {
     ...numbered('casing-grade', CASING_GRADE_COUNT),
     CHARGE_RACK_ASSET_ID,
     PLANTED_CHARGE_ASSET_ID,
+    LAVA_TILE_ASSET_ID,
+    ...refractoryCasingTileIds(),
   ]
 }
 
@@ -99,6 +101,8 @@ export function vectorIconIds(): string[] {
     GUN_ICON_ID,
     ...PLATFORM_BAY_IDS.map((bay) => `emblem-bay-${bay}`),
     BLASTING_CHARGES_ICON_ID,
+    HEAT_GAUGE_ICON_ID,
+    REFRACTORY_LINING_ICON_ID,
   ]
 }
 
@@ -127,6 +131,35 @@ export const BLASTING_CHARGES_ICON_ID = `icon-${BLASTING_CHARGES}`
  */
 export function chargeRackPartIds(): string[] {
   return ['charge-rack', ...numbered('charge', ART_RULES.chargeRackSlots)]
+}
+
+/**
+ * The art of the `heat_lava` and `refractory_lining` schedule rows (#113 "Visibility", #114): the
+ * lava pockets' tile, the refractory lining's tiles, the heat gauge's icon and the lining type's
+ * icon. The ids take the #52 kebab form of the row ids; the refractory tiles take the lining type
+ * #113 names (`standard` keeps the `casing-grade-<n>` tiles).
+ */
+export const HEAT_LAVA_ROW_ID = 'heat_lava'
+
+export const REFRACTORY_LINING_ROW_ID = 'refractory_lining'
+
+export const REFRACTORY_LINING_TYPE = 'refractory'
+
+/** Lava pockets, the fluid ground of heat planets; molten veins under a crust, which glow. */
+export const LAVA_TILE_ASSET_ID = `ground-${kebabOf(HEAT_LAVA_ROW_ID)}`
+
+/** The HUD heat gauge's icon. */
+export const HEAT_GAUGE_ICON_ID = `icon-${kebabOf(HEAT_LAVA_ROW_ID)}`
+
+/** The refractory lining type's row in the Upgrade bay. */
+export const REFRACTORY_LINING_ICON_ID = `icon-${kebabOf(REFRACTORY_LINING_ROW_ID)}`
+
+/**
+ * `casing-refractory-grade-1` to `-5`: a refractory ring keeps its grade's plate and rivet pattern
+ * (#48 acceptance 5: grade reads without colour) in firebrick with glowing seams (#113).
+ */
+export function refractoryCasingTileIds(): string[] {
+  return numbered(`casing-${REFRACTORY_LINING_TYPE}-grade`, CASING_GRADE_COUNT)
 }
 
 /** The Casing row's icon, the seventh vector icon (#54 scope review). */

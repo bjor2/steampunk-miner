@@ -15,6 +15,14 @@
       "pad": "#7d828a",
       "sky": "#8a7aa8",
       "underground": "#0d0c14"
+    },
+    "palette.heat": {
+      "surface": "#7a4630",
+      "deep": "#2e1210",
+      "core": "#ff8a2a",
+      "pad": "#7d828a",
+      "sky": "#c4532e",
+      "underground": "#1a0907"
     }
   },
   "oreFamilies": {

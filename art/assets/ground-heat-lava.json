@@ -1,0 +1,8 @@
+{
+  "id": "ground-heat-lava",
+  "source": "blender",
+  "form": "tile",
+  "status": "placeholder",
+  "color": "#d9581e",
+  "emissive": true
+}
