@@ -8,9 +8,11 @@ import type {
   RefineryOreRow,
   RefinerySlotReading,
 } from '../../systems/views/refineryBayModel'
+import { panelIconIdOf } from '../../systems/art/icons/iconSet'
 import { Panel } from '../kit/Panel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
+import { VectorIcon } from '../VectorIcon'
 import { BayFrame } from './BayFrame'
 import { Field } from './BayHeader'
 import styles from './Platform.module.css'
@@ -25,7 +27,7 @@ export function RefineryBayView({
   return (
     <BayFrame header={model.header} footer={model.footer} focusedId={focusedId}>
       <div className={styles.refineryPanels} data-testid={UI_IDS.refinerybayScreen}>
-        <Panel title="Hold">
+        <Panel title="Hold" iconId={panelIconIdOf('hold')}>
           {model.ore.map((row) => (
             <OreRowView key={row.tier} row={row} focusedId={focusedId} />
           ))}
@@ -33,7 +35,7 @@ export function RefineryBayView({
             <span data-testid={UI_IDS.refinerybayBatchCap}>{model.batchCapText}</span>
           </Field>
         </Panel>
-        <Panel title="Slots">
+        <Panel title="Slots" iconId={panelIconIdOf('slots')}>
           {model.slots.map((slot) => (
             <SlotView key={slot.index} slot={slot} />
           ))}
@@ -59,6 +61,7 @@ function OreRowView({ row, focusedId }: { row: RefineryOreRow; focusedId: string
       data-testid={UI_ID_TEMPLATES.refinerybayOre(row.tier)}
       data-tier={row.tier}
     >
+      <VectorIcon iconId={row.iconId} size="menu" />
       <span className={styles.tier}>T{row.tier}</span>
       <span>{row.held} held</span>
       <span data-exact={row.raw.exact}>raw {row.raw.text}</span>
@@ -76,6 +79,7 @@ function SlotView({ slot }: { slot: RefinerySlotReading }) {
       data-look={slot.look}
       data-yours={slot.isYours}
     >
+      <VectorIcon iconId={slot.iconId} size="menu" />
       <span className={styles.tier}>#{slot.index + 1}</span>
       <span>{slot.text}</span>
     </div>

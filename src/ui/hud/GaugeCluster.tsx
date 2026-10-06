@@ -7,7 +7,6 @@ import type { HeatReading } from '../../systems/views/heatReading'
 import type { HudModel } from '../../systems/views/hudModel'
 import { UI_IDS } from '../ids'
 import { Gauge } from '../kit/Gauge'
-import { VectorIcon } from '../VectorIcon'
 import styles from './Hud.module.css'
 
 export function GaugeCluster({ model }: { model: HudModel }) {
@@ -51,7 +50,6 @@ function HeatGauge({ heat }: { heat: HeatReading }) {
       isHatched={heat.isThrottled}
     >
       <span className={styles.notes}>
-        <VectorIcon iconId={heat.iconId} />
         {heat.isThrottled && (
           <strong data-testid={UI_IDS.hudHeatThrottled} data-state="throttled">
             {heat.throttledText}

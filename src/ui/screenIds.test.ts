@@ -122,6 +122,7 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
       ? { [UI_IDS.hudHeatThrottled]: model.heat.throttledText }
       : {}),
     [UI_IDS.hudTileTime]: model.tileTime.text,
+    [UI_IDS.hudStatuses]: null,
     [UI_IDS.hudState]: model.vehicleState.text,
     ...(model.cargo.isFull ? { [UI_IDS.hudCargoFull]: 'FULL' } : {}),
     ...(model.dockArrow === null

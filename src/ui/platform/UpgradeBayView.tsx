@@ -22,7 +22,7 @@ export function UpgradeBayView({
     <BayFrame header={model.header} footer={model.footer} focusedId={focusedId}>
       <div className={styles.upgradePanels} data-testid={UI_IDS.upgradebayScreen}>
         <TracksPanel model={model} focusedId={focusedId} />
-        <VehiclePreviewPanel preview={model.preview} />
+        <VehiclePreviewPanel preview={model.preview} tierIconId={model.tierIconId} />
         <span className={styles.wideRow}>
           <ScreenButtonView button={model.quickService} focusedId={focusedId} />
         </span>

@@ -47,10 +47,14 @@
 .line {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: var(--space-2);
 }
 
 .lineLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   color: var(--color-brass);
 }
 
@@ -99,7 +103,64 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  align-items: center;
   gap: var(--space-3);
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* #158 "Combat statuses": the stack of triangle icons, hidden while it is empty. */
+.statuses {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.statuses:empty {
+  display: none;
+}
+
+/* Urgency is a pulse rate; with flashes off, a thicker rim says the same. */
+.status {
+  display: inline-flex;
+  border: 2px solid transparent;
+  border-radius: 4px;
+}
+
+.status[data-urgency='slow'][data-pulsing] {
+  animation: status-pulse 1.6s ease-in-out infinite;
+}
+
+.status[data-urgency='fast'][data-pulsing] {
+  animation: status-pulse 0.6s ease-in-out infinite;
+}
+
+.status[data-urgency='slow']:not([data-pulsing]) {
+  border-color: var(--color-ember);
+}
+
+.status[data-urgency='fast']:not([data-pulsing]) {
+  border-width: 3px;
+  border-color: var(--color-ember);
+}
+
+@keyframes status-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* The "+N" pip: the statuses that did not fit the three. */
+.statusMore {
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-ember);
+  border-radius: 50%;
+  color: var(--color-ember);
+  font-weight: bold;
 }
 
 /* Text, an icon id and hatching carry the warning; the blink is only an extra. */
@@ -154,9 +215,12 @@
 
 .threat {
   position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   padding: 0 var(--space-1);
   border: 2px solid var(--color-copper);
-  border-radius: 50%;
+  border-radius: 1em;
 }
 
 .threat[data-tremor]::after {

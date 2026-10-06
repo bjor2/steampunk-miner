@@ -22,3 +22,8 @@
 .columnHead {
   color: var(--color-brass);
 }
+
+/* #158 "State badges": only the price turns red when the wallet is short; the icon stays itself. */
+.trackRow[data-buy-state='money_short'] .cost {
+  color: var(--color-ember);
+}

@@ -26,6 +26,12 @@
   padding: 2px 0;
 }
 
+.setting {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
 .row[data-waiting] .key {
   text-decoration: underline wavy;
 }

@@ -11,9 +11,16 @@ import { useGameStore } from '../../store/gameStore'
 import type { UpgradeId } from '../../systems/economy/economyDefinition'
 import { gaugeTicksOf, type UpgradePreview } from '../../systems/views/upgradePreview'
 import { UI_IDS } from '../ids'
+import { VectorIcon } from '../VectorIcon'
 import styles from './VehiclePreviewPanel.module.css'
 
-export function VehiclePreviewPanel({ preview }: { preview: UpgradePreview }) {
+export function VehiclePreviewPanel({
+  preview,
+  tierIconId,
+}: {
+  preview: UpgradePreview
+  tierIconId: string
+}) {
   useEndOfPartInstall(preview.installing)
   return (
     <section
@@ -31,17 +38,18 @@ export function VehiclePreviewPanel({ preview }: { preview: UpgradePreview }) {
       <div className={styles.stage}>
         <VehiclePreviewScene preview={preview} />
       </div>
-      <TierGauge preview={preview} />
+      <TierGauge preview={preview} tierIconId={tierIconId} />
       <PreviewCaption preview={preview} />
     </section>
   )
 }
 
 /** One brass tick per level to the next tier; the pending buy's tick is hollow and marked. */
-function TierGauge({ preview }: { preview: UpgradePreview }) {
+function TierGauge({ preview, tierIconId }: { preview: UpgradePreview; tierIconId: string }) {
   const ticks = gaugeTicksOf(preview.gauge)
   return (
     <div className={styles.gauge}>
+      <VectorIcon iconId={tierIconId} size="menu" />
       <span>Tier {preview.ownedTier}</span>
       <span className={styles.ticks} aria-hidden>
         {ticks.map((tick, at) => (

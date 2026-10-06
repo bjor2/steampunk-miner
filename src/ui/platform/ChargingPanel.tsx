@@ -1,5 +1,6 @@
 /** Energy, the price per unit and the cost of filling the tank (#8, #33 section 6). */
 import type { ChargingPanel as Charging } from '../../systems/views/sellBayModel'
+import { panelIconIdOf } from '../../systems/art/icons/iconSet'
 import { Panel } from '../kit/Panel'
 import { UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
@@ -8,7 +9,7 @@ import styles from './Platform.module.css'
 
 export function ChargingPanel({ charging, focusedId }: { charging: Charging; focusedId: string }) {
   return (
-    <Panel title="Charging">
+    <Panel title="Charging" iconId={panelIconIdOf('charging')}>
       <Field label="Energy">
         <span data-testid={UI_IDS.chargingEnergy}>{charging.energyText}</span>
       </Field>

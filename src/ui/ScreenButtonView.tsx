@@ -7,6 +7,7 @@
 import type { MouseEvent } from 'react'
 import { useGameStore } from '../store/gameStore'
 import type { ScreenButton } from '../systems/views/viewParts'
+import { VectorIcon } from './VectorIcon'
 import styles from './ScreenButtonView.module.css'
 
 export function ScreenButtonView({
@@ -36,6 +37,7 @@ export function ScreenButtonView({
       onMouseDown={keepFocusOnGame}
       onClick={() => useGameStore.getState().pressScreenButton(button.id)}
     >
+      {button.iconId !== undefined && <VectorIcon iconId={button.iconId} size="menu" />}
       {label}
     </button>
   )

@@ -20,7 +20,7 @@
 
 /*
  * Sell is copper and amber with an assay scale, Upgrade steel and teal with a gear (#45),
- * Refinery ember and brass with an alembic (#105).
+ * Refinery ember and brass with an alembic (#105); the motif is the bay's emblem icon (#158).
  */
 .screen[data-accent='copper'] {
   --bay-accent: var(--color-copper);
@@ -32,18 +32,6 @@
 
 .screen[data-accent='ember'] {
   --bay-accent: var(--color-ember);
-}
-
-.screen[data-accent='copper'] .bayName::before {
-  content: '\2696\00A0';
-}
-
-.screen[data-accent='teal'] .bayName::before {
-  content: '\2699\00A0';
-}
-
-.screen[data-accent='ember'] .bayName::before {
-  content: '\2697\00A0';
 }
 
 .header,
@@ -93,15 +81,22 @@
 }
 
 .bayName {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   color: var(--bay-accent);
 }
 
 .field {
   display: inline-flex;
+  align-items: center;
   gap: var(--space-2);
 }
 
 .fieldLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   color: var(--color-brass);
 }
 

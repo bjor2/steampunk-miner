@@ -4,14 +4,16 @@ import {
   type RefinedLine,
   type RefinedPanel as Refined,
 } from '../../systems/views/refinedPanel'
+import { panelIconIdOf } from '../../systems/art/icons/iconSet'
 import { Panel } from '../kit/Panel'
 import { UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
+import { VectorIcon } from '../VectorIcon'
 import styles from './Platform.module.css'
 
 export function RefinedPanel({ refined, focusedId }: { refined: Refined; focusedId: string }) {
   return (
-    <Panel title="Refined">
+    <Panel title="Refined" iconId={panelIconIdOf('refined')}>
       <div data-testid={UI_IDS.sellbayRefined}>
         {refined.lines.map((line) => (
           <RefinedLineView key={line.slot} line={line} />
@@ -30,6 +32,7 @@ export function RefinedPanel({ refined, focusedId }: { refined: Refined; focused
 function RefinedLineView({ line }: { line: RefinedLine }) {
   return (
     <div className={styles.row} data-testid={refinedLineId(line)} data-tier={line.tier}>
+      <VectorIcon iconId={line.iconId} size="menu" />
       <span className={styles.tier}>T{line.tier}</span>
       <span>{line.units} x</span>
       <span data-exact={line.value.exact}>{line.value.text}</span>

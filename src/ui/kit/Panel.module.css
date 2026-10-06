@@ -6,6 +6,9 @@
 }
 
 .title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   margin: 0 0 var(--space-1);
   color: var(--color-brass);
   font-size: var(--kit-label-size, 0.8rem);

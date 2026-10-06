@@ -1,13 +1,14 @@
 /** The visit's lining bill, what the Sell bay has paid of it and what leaving forgives (#128). */
 import type { LiningPanel as Lining } from '../../systems/views/liningPanel'
 import type { AmountReading } from '../../systems/views/viewParts'
+import { panelIconIdOf } from '../../systems/art/icons/iconSet'
 import { Panel } from '../kit/Panel'
 import { UI_IDS } from '../ids'
 import { Field } from './BayHeader'
 
 export function LiningPanel({ lining }: { lining: Lining }) {
   return (
-    <Panel title="Lining bill">
+    <Panel title="Lining bill" iconId={panelIconIdOf('lining')}>
       <div data-testid={UI_IDS.sellbayLining}>
         <Amount label="Billed" testId={UI_IDS.sellbayLiningBilled} reading={lining.billed} />
         <Amount label="Paid from sales" testId={UI_IDS.sellbayLiningPaid} reading={lining.paid} />

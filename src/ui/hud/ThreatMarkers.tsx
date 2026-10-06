@@ -1,9 +1,11 @@
 /**
- * Enemy telegraphs at the screen edge (#33 section 5): one marker per threat, placed by its
- * octant, with the arc letter it would hit and a tremor glyph for the burrower.
+ * Enemy telegraphs at the screen edge (#33 section 5, #158): one marker per threat, placed by its
+ * octant, carrying the enemy family's icon, the arc letter it would hit and a tremor glyph for
+ * the burrower.
  */
 import type { ThreatMarker } from '../../systems/views/threatMarkers'
 import { UI_ID_TEMPLATES } from '../ids'
+import { VectorIcon } from '../VectorIcon'
 import styles from './Hud.module.css'
 
 export function ThreatMarkers({ threats }: { threats: readonly ThreatMarker[] }) {
@@ -20,6 +22,7 @@ export function ThreatMarkers({ threats }: { threats: readonly ThreatMarker[] })
           data-ticks-left={threat.ticksLeft}
           data-tremor={threat.isTremor || undefined}
         >
+          <VectorIcon iconId={threat.iconId} size="hud" />
           {threat.arc}
         </span>
       ))}

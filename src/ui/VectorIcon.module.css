@@ -1,8 +1,51 @@
-/* 2em: 48 px at the 1080p shop text size, the size #44 reads each silhouette at. */
+/* The box the image fills; the size class sets --icon-size (#158 "Sizes"). */
 .icon {
+  position: relative;
   display: inline-block;
-  width: 2em;
-  height: 2em;
+  width: var(--icon-size);
+  height: var(--icon-size);
   flex: none;
   vertical-align: middle;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 2em: 48 px at the 1080p shop text size, the size #44 reads each silhouette at. */
+.row {
+  --icon-size: 2em;
+}
+
+/* 24 px at the 1080p reference, scaled with the viewport, never under 20 physical px. */
+.hud {
+  --icon-size: max(20px, calc(24 / 1080 * 100vh));
+}
+
+/* Banners and statuses read from the corner of the eye while steering: 32 px. */
+.banner {
+  --icon-size: max(20px, calc(32 / 1080 * 100vh));
+}
+
+/* The surrounding type's size; the bay screens set it at 2.2% of the short axis, over 16 px. */
+.menu {
+  --icon-size: 1.25em;
+}
+
+/* Affordable: a brass glint on the rim, a shape of light, not a colour of the glyph. */
+.icon[data-glint] {
+  border-radius: 20%;
+  box-shadow:
+    0 0 0 1px rgb(201 162 75 / 0.9),
+    0 0 6px 1px rgb(233 220 192 / 0.55);
+}
+
+.badge {
+  position: absolute;
+  right: -12%;
+  bottom: -12%;
+  width: 50%;
+  height: 50%;
 }

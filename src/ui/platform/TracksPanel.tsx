@@ -9,6 +9,7 @@ import type { StatPreview, WorkshopRow } from '../../systems/views/workshopRows'
 import type { GunRow } from '../../systems/views/gunRow'
 import type { LiningRow } from '../../systems/views/liningRow'
 import type { CasingRow, UpgradeBayModel } from '../../systems/views/upgradeBayModel'
+import { panelIconIdOf } from '../../systems/art/icons/iconSet'
 import { Panel } from '../kit/Panel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
@@ -20,7 +21,7 @@ import rowStyles from './TracksPanel.module.css'
 
 export function TracksPanel({ model, focusedId }: { model: UpgradeBayModel; focusedId: string }) {
   return (
-    <Panel title="Upgrades">
+    <Panel title="Upgrades" iconId={panelIconIdOf('upgrades')}>
       <TrackColumns />
       {model.tracks.map((row) => (
         <UpgradeRow key={row.upgradeId} row={row} focusedId={focusedId} />
@@ -62,11 +63,19 @@ function TrackColumns() {
 function UpgradeRow({ row, focusedId }: { row: WorkshopRow; focusedId: string }) {
   const id = row.upgradeId
   return (
-    <div className={rowStyles.trackRow} data-testid={UI_ID_TEMPLATES.workshopUpgrade(id)}>
-      <VectorIcon iconId={row.iconId} />
+    <div
+      className={rowStyles.trackRow}
+      data-testid={UI_ID_TEMPLATES.workshopUpgrade(id)}
+      data-buy-state={row.buyState}
+    >
+      <VectorIcon iconId={row.iconId} badge={row.badge} hasGlint={row.isBuyOpen} />
       <span>{row.label}</span>
       <span data-testid={UI_ID_TEMPLATES.workshopUpgradeLevel(id)}>{row.level}</span>
-      <span data-testid={UI_ID_TEMPLATES.workshopUpgradeCost(id)} data-exact={row.cost.exact}>
+      <span
+        className={rowStyles.cost}
+        data-testid={UI_ID_TEMPLATES.workshopUpgradeCost(id)}
+        data-exact={row.cost.exact}
+      >
         {row.cost.text}
       </span>
       <span className={rowStyles.effect}>
@@ -82,11 +91,19 @@ function UpgradeRow({ row, focusedId }: { row: WorkshopRow; focusedId: string })
 
 function CasingRowView({ casing, focusedId }: { casing: CasingRow; focusedId: string }) {
   return (
-    <div className={rowStyles.trackRow} data-testid={UI_IDS.upgradebayCasing}>
-      <VectorIcon iconId={casing.iconId} />
+    <div
+      className={rowStyles.trackRow}
+      data-testid={UI_IDS.upgradebayCasing}
+      data-buy-state={casing.buyState}
+    >
+      <VectorIcon iconId={casing.iconId} badge={casing.badge} hasGlint={casing.isBuyOpen} />
       <span>{casing.label}</span>
       <span />
-      <span data-testid={UI_IDS.upgradebayCasingCost} data-exact={casing.cost.exact}>
+      <span
+        className={rowStyles.cost}
+        data-testid={UI_IDS.upgradebayCasingCost}
+        data-exact={casing.cost.exact}
+      >
         {casing.cost.text}
       </span>
       <span
@@ -103,11 +120,19 @@ function CasingRowView({ casing, focusedId }: { casing: CasingRow; focusedId: st
 
 function LiningRowView({ lining, focusedId }: { lining: LiningRow; focusedId: string }) {
   return (
-    <div className={rowStyles.trackRow} data-testid={UI_IDS.upgradebayLining}>
-      <VectorIcon iconId={lining.iconId} />
+    <div
+      className={rowStyles.trackRow}
+      data-testid={UI_IDS.upgradebayLining}
+      data-buy-state={lining.buyState}
+    >
+      <VectorIcon iconId={lining.iconId} badge={lining.badge} hasGlint={lining.isBuyOpen} />
       <span>{lining.label}</span>
       <span data-testid={UI_IDS.upgradebayLiningActive}>{lining.activeText}</span>
-      <span data-testid={UI_IDS.upgradebayLiningCost} data-exact={lining.cost.exact}>
+      <span
+        className={rowStyles.cost}
+        data-testid={UI_IDS.upgradebayLiningCost}
+        data-exact={lining.cost.exact}
+      >
         {lining.cost.text}
       </span>
       <span className={rowStyles.effect} data-testid={UI_IDS.upgradebayLiningEffect}>
@@ -120,13 +145,21 @@ function LiningRowView({ lining, focusedId }: { lining: LiningRow; focusedId: st
 
 function GunRowView({ guns, focusedId }: { guns: GunRow; focusedId: string }) {
   return (
-    <div className={rowStyles.trackRow} data-testid={UI_IDS.upgradebayGuns}>
-      <VectorIcon iconId={guns.iconId} />
+    <div
+      className={rowStyles.trackRow}
+      data-testid={UI_IDS.upgradebayGuns}
+      data-buy-state={guns.buyState}
+    >
+      <VectorIcon iconId={guns.iconId} badge={guns.badge} hasGlint={guns.isBuyOpen} />
       <span>{guns.label}</span>
       <span data-testid={UI_IDS.upgradebayGunsLevel} data-level={guns.level}>
         {guns.levelText}
       </span>
-      <span data-testid={UI_IDS.upgradebayGunsCost} data-exact={guns.cost.exact}>
+      <span
+        className={rowStyles.cost}
+        data-testid={UI_IDS.upgradebayGunsCost}
+        data-exact={guns.cost.exact}
+      >
         {guns.cost.text}
       </span>
       <span className={rowStyles.effect} data-testid={UI_IDS.upgradebayGunsEffect}>

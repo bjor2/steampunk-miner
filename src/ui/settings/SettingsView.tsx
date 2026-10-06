@@ -3,15 +3,17 @@
  * rebind button, the problem lines of a refused rebinding, reset, and close. Markup only.
  */
 import type { BindingRow, SettingToggle, SettingsModel } from '../../systems/views/settingsModel'
+import { panelIconIdOf } from '../../systems/art/icons/iconSet'
 import { Panel } from '../kit/Panel'
 import { UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
+import { VectorIcon } from '../VectorIcon'
 import styles from './Settings.module.css'
 
 export function SettingsView({ model, focusedId }: { model: SettingsModel; focusedId: string }) {
   return (
     <div className={styles.overlay} data-testid={UI_IDS.settingsPanel}>
-      <Panel title="Settings">
+      <Panel title="Settings" iconId={panelIconIdOf('settings')}>
         <div className={styles.columns}>
           <section>
             {model.toggles.map((toggle) => (
@@ -41,7 +43,10 @@ export function SettingsView({ model, focusedId }: { model: SettingsModel; focus
 function ToggleRow({ toggle, focusedId }: { toggle: SettingToggle; focusedId: string }) {
   return (
     <div className={styles.row}>
-      <span>{toggle.label}</span>
+      <span className={styles.setting}>
+        <VectorIcon iconId={toggle.iconId} size="menu" />
+        {toggle.label}
+      </span>
       <span data-state={toggle.valueText}>{toggle.valueText}</span>
       <ScreenButtonView button={toggle.button} focusedId={focusedId} />
     </div>

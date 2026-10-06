@@ -12,12 +12,20 @@ export function PlaquesView({ model }: { model: PlaqueModel }) {
     <div className={styles.plaques}>
       {model.transmission !== null && (
         <div className={styles.transmission}>
-          <Plaque lines={model.transmission.lines} testId={UI_IDS.hudTransmission} />
+          <Plaque
+            lines={model.transmission.lines}
+            iconId={model.transmission.iconId}
+            testId={UI_IDS.hudTransmission}
+          />
         </div>
       )}
       {model.hint !== null && (
         <div className={styles.hint} data-hint={model.hint.id}>
-          <Plaque lines={model.hint.lines} testId={UI_IDS.hudHintPlaque} />
+          <Plaque
+            lines={model.hint.lines}
+            iconId={model.hint.iconId}
+            testId={UI_IDS.hudHintPlaque}
+          />
         </div>
       )}
     </div>

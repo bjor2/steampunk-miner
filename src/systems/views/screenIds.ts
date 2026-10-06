@@ -36,6 +36,7 @@ export const UI_IDS = {
   hudCachePrompt: 'hud-cache-prompt',
   hudDebugMark: 'hud-debug-mark',
   hudWarningEnergy: 'hud-warning-energy',
+  hudStatuses: 'hud-statuses',
   hudHintPlaque: 'hud-hint-plaque',
   hudTransmission: 'hud-transmission',
   platformScreen: 'platform-screen',
@@ -116,6 +117,7 @@ export type UiId = (typeof UI_IDS)[keyof typeof UI_IDS]
 /** Ids of repeated rows: one per threat, ore tier, upgrade track, setting and action. */
 export const UI_ID_TEMPLATES = {
   hudThreat: (index: number) => `hud-threat-${index}`,
+  hudStatus: (status: string) => `hud-status-${status}`,
   shopRow: (tier: number) => `shop-row-${tier}`,
   shopSell: (tier: number) => `shop-sell-${tier}`,
   refinerybayOre: (tier: number) => `refinerybay-ore-${tier}`,

@@ -49,11 +49,11 @@ function ChargeRowView({
   focusedId: string
 }) {
   return (
-    <div className={rowStyles.trackRow} data-testid={ids.row}>
-      <VectorIcon iconId={row.iconId} />
+    <div className={rowStyles.trackRow} data-testid={ids.row} data-buy-state={row.buyState}>
+      <VectorIcon iconId={row.iconId} badge={row.badge} hasGlint={row.isBuyOpen} />
       <span>{row.label}</span>
       <span data-testid={ids.level}>{row.levelText}</span>
-      <span data-testid={ids.cost} data-exact={row.cost?.exact}>
+      <span className={rowStyles.cost} data-testid={ids.cost} data-exact={row.cost?.exact}>
         {row.cost?.text ?? '-'}
       </span>
       <span className={rowStyles.effect} data-testid={ids.effect}>

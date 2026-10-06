@@ -1,10 +1,12 @@
 /**
  * One brass analogue gauge (#13 UI, #33 section 5): a needle and tick marks for the eye, the exact
- * number beside it for reading, `data-exact` for the canonical value. Hatched when the warning
- * is up, so the state never relies on colour.
+ * number beside it for reading, `data-exact` for the canonical value, and the gauge's glyph on
+ * the label so the gauges are told apart by more than their place (#158). Hatched when the
+ * warning is up, so the state never relies on colour.
  */
 import type { CSSProperties, ReactNode } from 'react'
 import type { GaugeReading } from '../../systems/views/hudModel'
+import { VectorIcon } from '../VectorIcon'
 import styles from './Gauge.module.css'
 
 /** The needle sweeps 240 degrees, from -120 (empty) to +120 (full). */
@@ -36,7 +38,10 @@ export function Gauge({
       >
         <span className={styles.needle} style={needleStyle} />
       </div>
-      <span className={styles.label}>{label}</span>
+      <span className={styles.label}>
+        <VectorIcon iconId={reading.iconId} size="hud" />
+        {label}
+      </span>
       <span className={styles.text} data-testid={textId} data-exact={reading.exact}>
         {reading.text}
       </span>
