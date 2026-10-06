@@ -1,6 +1,13 @@
 {
   "$comment": "Registry of the metric ids in history.ndjson: how /status/ labels, groups and judges each one. A new id in history.ndjson gets its own chart even before it is listed here (with a build warning); add it here to give it a label, unit, group, direction and budget. See docs/perf/README.md.",
-  "groups": ["CPU benches", "Memory soak", "Frame time", "Main-thread profile", "Stack"],
+  "groups": [
+    "CPU benches",
+    "Memory soak",
+    "Memory soak (Electron)",
+    "Frame time",
+    "Main-thread profile",
+    "Stack"
+  ],
   "metrics": {
     "generateChunk.p1.p50Ms": {
       "label": "World generateChunk p50 · planet 1",
@@ -213,6 +220,98 @@
       "group": "Frame time",
       "better": "lower",
       "source": "memory soak summary.json (median of the 10-s samples of the frame p95: rAF until #99, the game's render stats since; software GL, not a GPU)"
+    },
+    "soakElectron.heapStartMB": {
+      "label": "Heap at first cycle boundary · Electron",
+      "unit": "MB",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak summary.json (usedJSHeapSize after GC, MiB)"
+    },
+    "soakElectron.heapEndMB": {
+      "label": "Heap at last cycle boundary · Electron",
+      "unit": "MB",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak summary.json (usedJSHeapSize after GC, MiB)"
+    },
+    "soakElectron.heapPeakMB": {
+      "label": "Heap peak (all samples) · Electron",
+      "unit": "MB",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak summary.json"
+    },
+    "soakElectron.heapGrowthMBPerCycle": {
+      "label": "Heap growth per cycle · Electron",
+      "unit": "MB/cycle",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak summary.json (slope over cycle boundaries)"
+    },
+    "soakElectron.heapSlopeAfterWarmupMBPerMin": {
+      "label": "Heap slope after warm-up (cycle 4+) · Electron",
+      "unit": "MB/min",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak summary.json"
+    },
+    "soakElectron.heapGateGrowthMB": {
+      "label": "Retained heap growth the leak gate judges · Electron",
+      "unit": "MB",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "budget": 20,
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak summary.json (median heap of the last 3 cycle boundaries minus the first 3 after 4 warm-up cycles, after GC, MiB; soakGate.mjs fails above 20, #99)"
+    },
+    "soakElectron.geometriesAtLastBoundary": {
+      "label": "three geometries at last boundary · Electron",
+      "unit": "geometries",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak soak.json"
+    },
+    "soakElectron.texturesAtLastBoundary": {
+      "label": "three textures at last boundary · Electron",
+      "unit": "textures",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak soak.json"
+    },
+    "soakElectron.collidersAtLastBoundary": {
+      "label": "Rapier colliders at last boundary · Electron",
+      "unit": "colliders",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak soak.json"
+    },
+    "soakElectron.wasmPeakMB": {
+      "label": "Rapier WASM memory peak · Electron",
+      "unit": "MB",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak summary.json"
+    },
+    "soakElectron.runLogMBPerMin": {
+      "label": "Run-log text growth (?debug) · Electron",
+      "unit": "MB/min",
+      "group": "Memory soak (Electron)",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102): run-log text the renderer holds; the Electron shell writes the log over IPC and buffers none, so 0"
+    },
+    "soakElectron.frameP50Ms": {
+      "label": "Frame time p50 (Electron soak, SwiftShader)",
+      "unit": "ms",
+      "group": "Frame time",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak summary.json (median of the 10-s samples of the frame p50: rAF until #99, the game's render stats since; software GL, not a GPU)"
+    },
+    "soakElectron.frameP95Ms": {
+      "label": "Frame time p95 (Electron soak, SwiftShader)",
+      "unit": "ms",
+      "group": "Frame time",
+      "better": "lower",
+      "source": "Electron memory soak, packaged build with --debug-api (soakMemory.mjs --electron, #102); memory soak summary.json (median of the 10-s samples of the frame p95: rAF until #99, the game's render stats since; software GL, not a GPU)"
     },
     "profile.snapshotOfMainThreadPct": {
       "label": "snapshotOf share of main-thread samples",
