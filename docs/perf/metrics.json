@@ -296,6 +296,28 @@
       "group": "Memory soak",
       "better": "lower",
       "source": "preview build, 12 visual-tier/rack toggles via steampunkDebug, renderer.info.memory (#118)"
+    },
+    "debugMemory.seamProbeMismatches": {
+      "label": "Debug memory reads that disagree with probe.js (getPhysicsStats + ui.getRendererMemory)",
+      "unit": "samples",
+      "group": "Memory soak",
+      "better": "lower",
+      "budget": 0,
+      "source": "preview build, 5 drive-and-drill cycles x 5 samples, probe.js injected beside steampunkDebug (#119)"
+    },
+    "debugMemory.getRendererMemoryCallUs": {
+      "label": "ui.getRendererMemory() per call (median; at Chrome's timer resolution)",
+      "unit": "µs",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "preview build, 1000 calls per sample in page, SwiftShader (#119)"
+    },
+    "debugMemory.getPhysicsStatsCallUs": {
+      "label": "getPhysicsStats() per call (median; at Chrome's timer resolution)",
+      "unit": "µs",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "preview build, 1000 calls per sample in page, SwiftShader (#119)"
     }
   }
 }
