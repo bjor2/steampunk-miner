@@ -1,32 +1,31 @@
 #!/usr/bin/env node
-// Memory soak on the preview build (#99; perf report /workspace/perf/memory/out/report.md sections
-// 3 and 6): drives the vehicle through repeated chunk cycles (dock, undock, drive off the pad, drill
-// down, drill sideways both ways, back to the dock) and, every 10 s after a forced GC, samples the
-// JS heap, the renderer's geometries and textures, the Rapier world's bodies, colliders and WASM
-// memory, the DOM counters and the game's frame times; plus one sample per cycle boundary on the
-// dock. Heap snapshots at start, middle and end. Then soakGate.mjs judges the boundaries.
+// Memory soak on the preview build in Chromium (#99; perf report /workspace/perf/memory/out/report.md
+// sections 3 and 6) or on the packaged Electron build (#102; soakTarget.mjs): drives the vehicle
+// through repeated chunk cycles (dock, undock, drive off the pad, drill down, drill sideways both
+// ways, back to the dock) and, every 10 s after a forced GC, samples the JS heap, the renderer's
+// geometries and textures, the Rapier world's bodies, colliders and WASM memory, the DOM counters
+// and the game's frame times; plus one sample per cycle boundary on the dock. Heap snapshots at
+// start, middle and end. Then soakGate.mjs judges the boundaries.
 //
-// The game is read only through its debug API (`?debug`): `ui.getRendererMemory()` and
-// `getPhysicsStats()` (#119) for the counts, `ui.getRenderStats()` for frame times. Heap, GC and
-// DOM counters come from the browser (CDP), never from a hook in the page.
+// The game is read only through its debug API (`?debug`, `--debug-api` in Electron):
+// `ui.getRendererMemory()` and `getPhysicsStats()` (#119) for the counts, `ui.getRenderStats()` for
+// frame times. Heap, GC and DOM counters come from the renderer (CDP), never from a hook in the page.
 //
 //   npm run soak:memory     (builds, then a 10-minute soak into test-results/soak)
 //   node scripts/soak/soakMemory.mjs [--minutes 10] [--out DIR] [--port 4391] [--dist dist]
 //        [--browser /path/to/chrome] [--no-snapshots]
+//   xvfb-run -a node scripts/soak/soakMemory.mjs --electron release/linux-unpacked/steampunk-miner
+//        [--minutes 10] [--out DIR] [--no-snapshots]   (after `npm run electron:build`)
 //   node scripts/soak/soakMemory.mjs --evaluate DIR/soak.json   (re-run the gate offline, print)
 //
 // Writes DIR/soak.json (every sample), DIR/summary.json (soakSummary.mjs) and the heap snapshots;
 // exits 1 when the gate fails and 2 when the soak could not run.
-import { chromium } from '@playwright/test'
-import { spawn } from 'node:child_process'
 import { createWriteStream, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join, resolve } from 'node:path'
 import { isGameMemoryReadable, readGameMemory, refillOnDock } from './soakPage.mjs'
 import { summariseSoak } from './soakSummary.mjs'
+import { openBrowserTarget, openElectronTarget } from './soakTarget.mjs'
 
-const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
-const VITE_BIN = join(REPO_ROOT, 'node_modules/vite/bin/vite.js')
 const SAMPLE_EVERY_MS = 10_000
 const SETTLE_MS = 3_000
 const MIB = 1048576
@@ -37,15 +36,6 @@ const CYCLE_LEGS = [
   ['aim_left', 4_000],
   ['aim_right', 4_000],
 ]
-/** Precise heap numbers, `gc()` for the sampler, and software GL so headless boxes draw WebGL. */
-const BROWSER_ARGS = [
-  '--enable-precise-memory-info',
-  '--js-flags=--expose-gc',
-  '--use-gl=swiftshader',
-  '--enable-unsafe-swiftshader',
-  '--ignore-gpu-blocklist',
-]
-
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms))
 const log = (...parts) => console.log(new Date().toISOString(), ...parts)
 
@@ -60,33 +50,14 @@ function readSoakOptions(argv) {
     out: resolve(valueOf('out', 'test-results/soak')),
     dist: valueOf('dist', 'dist'),
     browserPath: valueOf('browser', undefined),
+    electronPath: valueOf('electron', undefined),
     isTakingSnapshots: !argv.includes('--no-snapshots'),
     evaluate: valueOf('evaluate', null),
   }
 }
 
-async function isAnswering(port) {
-  try {
-    return (await fetch(`http://localhost:${port}/`)).ok
-  } catch {
-    return false
-  }
-}
-
-/** Starts `vite preview` of the built game; the caller stops it in its `finally`. */
-async function startPreview(options) {
-  const args = ['preview', '--outDir', options.dist, '--port', String(options.port), '--strictPort']
-  const server = spawn(process.execPath, [VITE_BIN, ...args], { cwd: REPO_ROOT, stdio: 'ignore' })
-  for (let tries = 0; tries < 60; tries++) {
-    await sleep(500)
-    if (await isAnswering(options.port)) return server
-  }
-  server.kill()
-  throw new Error(`vite preview did not answer on port ${options.port}`)
-}
-
-async function openGame(browser, options) {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+async function openGame(target) {
+  const { page } = target
   const errors = { pageErrors: [], consoleErrors: [] }
   page.on('pageerror', (error) => errors.pageErrors.push(String(error.stack ?? error)))
   page.on('console', (message) => {
@@ -94,7 +65,7 @@ async function openGame(browser, options) {
   })
   const cdp = await page.context().newCDPSession(page)
   await cdp.send('HeapProfiler.enable')
-  await page.goto(`http://localhost:${options.port}/?debug`)
+  await target.startGame()
   await waitForMemoryReads(page)
   return { page, cdp, errors }
 }
@@ -227,6 +198,7 @@ async function driveCycles(session, options) {
 
 async function writeSoakRun(session, options, driven) {
   const run = {
+    target: session.target,
     startedAt: driven.startedAt,
     minutes: options.minutes,
     cycleLegs: CYCLE_LEGS,
@@ -255,24 +227,19 @@ function reportVerdict(summary) {
   return summary.gate === 'PASS' ? 0 : 1
 }
 
-async function soakInBrowser(options) {
-  const browser = await chromium.launch({ executablePath: options.browserPath, args: BROWSER_ARGS })
-  try {
-    const session = await openGame(browser, options)
-    const driven = await driveCycles(session, options)
-    return reportVerdict(await writeSoakRun(session, options, driven))
-  } finally {
-    await browser.close()
-  }
+function openTarget(options) {
+  return options.electronPath ? openElectronTarget(options) : openBrowserTarget(options)
 }
 
 async function runSoak(options) {
   mkdirSync(options.out, { recursive: true })
-  const server = await startPreview(options)
+  const target = await openTarget(options)
   try {
-    return await soakInBrowser(options)
+    const session = { target: target.kind, ...(await openGame(target)) }
+    const driven = await driveCycles(session, options)
+    return reportVerdict(await writeSoakRun(session, options, driven))
   } finally {
-    server.kill()
+    await target.close()
   }
 }
 

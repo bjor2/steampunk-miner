@@ -19,6 +19,8 @@ export function readGameMemory() {
   return {
     usedJSHeapSize: performance.memory?.usedJSHeapSize ?? null,
     totalJSHeapSize: performance.memory?.totalJSHeapSize ?? null,
+    // The runtime's default heap ceiling, the headroom no-heap-flag rests on (#102).
+    jsHeapSizeLimit: performance.memory?.jsHeapSizeLimit ?? null,
     geometries: renderer.ok ? renderer.geometries : null,
     textures: renderer.ok ? renderer.textures : null,
     programs: renderer.ok ? renderer.programs : null,

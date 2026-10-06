@@ -91,6 +91,20 @@ describe('perf metrics from a measurement file', () => {
     })
   })
 
+  it('files an Electron soak under its own ids, apart from the Chromium soak', () => {
+    const summary = { target: 'electron', heapSlopeMBperCycle: 0.2, peakUsedJSHeapMB: 51.25 }
+    const run = { target: 'electron', boundaries: [{ geometries: 33, textures: 6 }] }
+
+    expect(metricsOfMeasurementFile(summary).metrics).toEqual({
+      'soakElectron.heapGrowthMBPerCycle': 0.2,
+      'soakElectron.heapPeakMB': 51.25,
+    })
+    expect(metricsOfMeasurementFile(run).metrics).toEqual({
+      'soakElectron.geometriesAtLastBoundary': 33,
+      'soakElectron.texturesAtLastBoundary': 6,
+    })
+  })
+
   it('records the deepest nesting a walker survived before its first stack overflow', () => {
     const file = {
       stackSizeFlag: 'default',

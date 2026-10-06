@@ -54,24 +54,27 @@ export function medianMetricsOf(runs) {
 
 // The memory soak's summary.json (scripts/soak/soakSummary.mjs, #99) -> soak.* ids.
 const SOAK_SUMMARY_FIELDS = {
-  heapFirstBoundaryMB: 'soak.heapStartMB',
-  heapLastBoundaryMB: 'soak.heapEndMB',
-  peakUsedJSHeapMB: 'soak.heapPeakMB',
-  heapSlopeMBperCycle: 'soak.heapGrowthMBPerCycle',
-  heapSlopeAfterCycle4MBperMin: 'soak.heapSlopeAfterWarmupMBPerMin',
-  heapGateGrowthMB: 'soak.heapGateGrowthMB',
-  peakWasmMB: 'soak.wasmPeakMB',
-  runLogTextMBperMin: 'soak.runLogMBPerMin',
-  frameP50median: 'soak.frameP50Ms',
-  frameP95median: 'soak.frameP95Ms',
+  heapFirstBoundaryMB: 'heapStartMB',
+  heapLastBoundaryMB: 'heapEndMB',
+  peakUsedJSHeapMB: 'heapPeakMB',
+  heapSlopeMBperCycle: 'heapGrowthMBPerCycle',
+  heapSlopeAfterCycle4MBperMin: 'heapSlopeAfterWarmupMBPerMin',
+  heapGateGrowthMB: 'heapGateGrowthMB',
+  peakWasmMB: 'wasmPeakMB',
+  runLogTextMBperMin: 'runLogMBPerMin',
+  frameP50median: 'frameP50Ms',
+  frameP95median: 'frameP95Ms',
 }
 
 // The soak's raw soak.json: what is still allocated at the last cycle boundary (after GC).
 const SOAK_BOUNDARY_FIELDS = {
-  geometries: 'soak.geometriesAtLastBoundary',
-  textures: 'soak.texturesAtLastBoundary',
-  rapierColliders: 'soak.collidersAtLastBoundary',
+  geometries: 'geometriesAtLastBoundary',
+  textures: 'texturesAtLastBoundary',
+  rapierColliders: 'collidersAtLastBoundary',
 }
+
+// The packaged Electron build's soak (#102) charts beside the Chromium one, never in its series.
+const SOAK_ID_PREFIX_BY_TARGET = { browser: 'soak', electron: 'soakElectron' }
 
 // A browser CPU profile summary: inclusive share of all main-thread samples.
 const PROFILE_FIELDS = {
@@ -102,8 +105,17 @@ function metricsOfBenchSummary(file) {
   return metrics
 }
 
+/** A soak file's fields -> its ids; files from before the target existed soaked the browser. */
+function renameSoakFields(file, source, fields) {
+  const prefix = SOAK_ID_PREFIX_BY_TARGET[file.target ?? 'browser']
+  const ids = Object.fromEntries(
+    Object.entries(fields).map(([field, name]) => [field, `${prefix}.${name}`]),
+  )
+  return renameFields(source, ids)
+}
+
 function metricsOfSoakRun(file) {
-  return renameFields(file.boundaries.at(-1), SOAK_BOUNDARY_FIELDS)
+  return renameSoakFields(file, file.boundaries.at(-1), SOAK_BOUNDARY_FIELDS)
 }
 
 function walkerNameOf(stressName) {
@@ -145,7 +157,7 @@ const FILE_KINDS = [
   {
     kind: 'soak-summary',
     matches: (f) => Number.isFinite(f.heapSlopeMBperCycle),
-    read: (f) => renameFields(f, SOAK_SUMMARY_FIELDS),
+    read: (f) => renameSoakFields(f, f, SOAK_SUMMARY_FIELDS),
   },
   {
     kind: 'soak-run',

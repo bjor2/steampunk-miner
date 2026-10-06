@@ -47,6 +47,7 @@ const SHORT_RUN = {
 describe('memory soak summary', () => {
   it('reports cycles, heap, counts, frame medians and the gate of a run', () => {
     expect(summariseSoak(SHORT_RUN)).toEqual({
+      target: 'browser',
       gate: 'FAIL',
       failures: ['only 0 cycles after warm-up; the gate needs 11'],
       minutes: 3,
@@ -85,6 +86,11 @@ describe('memory soak summary', () => {
     expect(summary.heapGateGrowthMB).toBe(1.858)
     expect(summary.geometriesFirstLast).toEqual([32, 35])
     expect(metricsOfMeasurementFile(summary).metrics['soak.heapGateGrowthMB']).toBe(1.858)
+  })
+
+  it('says which build it soaked, the browser one for a run from before the Electron target', () => {
+    expect(summariseSoak({ ...SHORT_RUN, target: 'electron' }).target).toBe('electron')
+    expect(summariseSoak(SHORT_RUN).target).toBe('browser')
   })
 
   it('is read by the perf recorder as the soak metrics of the history', () => {

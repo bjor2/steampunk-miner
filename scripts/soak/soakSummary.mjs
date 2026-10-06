@@ -1,6 +1,6 @@
 // The memory soak's summary.json (#99): one flat object per run with the numbers the perf history
-// charts (scripts/perf/perfMetrics.mjs reads these field names as the soak.* metric ids) and what a
-// reader checks first: cycles, heap at the first and last boundary, the counts there, the gate.
+// charts (scripts/perf/perfMetrics.mjs reads these field names as the soak.* metric ids, or
+// soakElectron.* for the packaged build, #102) and what a reader checks first: the target, cycles, heap at the first and last boundary, the counts there, the gate.
 // Pure: it reads a soak.json object and returns the summary.
 
 import { listSoakGateFailures, measureRetainedHeapGrowth, SOAK_GATE } from './soakGate.mjs'
@@ -12,6 +12,8 @@ const DECIMALS = 1000
 export function summariseSoak(run) {
   const failures = listSoakGateFailures(run.boundaries, run.pageErrors)
   return {
+    // Runs from before the Electron target (#102) soaked the preview build in Chromium.
+    target: run.target ?? 'browser',
     gate: failures.length === 0 ? 'PASS' : 'FAIL',
     failures,
     minutes: run.minutes,
