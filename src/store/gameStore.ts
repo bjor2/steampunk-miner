@@ -81,6 +81,7 @@ import { forgetBlastScorches, recordBlastScorches } from './blastScorchRecord'
 import { heatDebugActionsOf, type HeatDebugActions } from './heatDebugActions'
 import { collapseDebugActionsOf, type CollapseDebugActions } from './collapseDebugActions'
 import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActions'
+import { announceDomainEvents } from './domainEventBroadcast'
 import { announceFeedback } from './feedbackBroadcast'
 import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
 import { forgetMusicStingers, recordMusicStingers } from './musicStingerRecord'
@@ -375,7 +376,8 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
  * transition when the events travelled, shows the hints, feedback, part installs, stingers and
- * scorches they trigger, logs the events, then writes the checkpoint when due.
+ * scorches they trigger, hands them to the slices' stores, logs the events, then writes the
+ * checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
@@ -383,6 +385,7 @@ function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.getState().observePlaques(events)
   useGameStore.getState().followArtefactChoice(events)
   announceFeedback(events, useGameStore.getState().playerId)
+  announceDomainEvents(events, useGameStore.getState().playerId)
   useGameStore.getState().startPartInstall(events)
   recordMusicStingers(events, useGameStore.getState().playerId)
   recordBlastScorches(events)
