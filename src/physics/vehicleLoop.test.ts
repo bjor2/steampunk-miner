@@ -62,7 +62,8 @@ describe('vehicle loop', () => {
   it('drives off the pad and digs straight down, charging energy through pose reports', () => {
     const vehicle = createLiveVehicle()
     vehicle.hold(IDLE_INTENT, 0.5)
-    vehicle.hold(buildIntent(['aim_right']), 2)
+    // The Sell bay is the pad's west end (#170), so off the pad is to the left.
+    vehicle.hold(buildIntent(['aim_left']), 2)
     vehicle.hold(buildIntent(['aim_down']), 5)
     const { x, y } = vehicle.body.translation()
     const { params } = readPlanetWorld()

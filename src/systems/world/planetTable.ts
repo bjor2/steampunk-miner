@@ -72,25 +72,36 @@ export const DOCK_CONE_WIDTH_AT_MID_TILES = 16
  */
 export const CAVE_THRESHOLD_BP = 7500
 
-/** The dock pad is 12 tiles wide with 8 tiles of cleared air above it (#4, #8). */
-export const DOCK_HALF_WIDTH_TILES = 6
+/** 8 tiles of cleared air above the dock pad (#4, #8). */
 export const DOCK_CLEARANCE_TILES = 8
 
 /**
- * The two bays on the pad (#37): the Sell bay and the Upgrade bay sit 8 m apart centre to centre,
- * each centre this many tiles either side of the pad's middle, with the hub between them. Each
- * bay's pad zone is 4 tiles wide, so the 12-tile pad holds both and the vehicle (0.9 m, #7) has to
- * drive across the hub to go from one to the other.
+ * The dock pad's span in tiles from the dock point (#170): it follows the shop buildings' art, not
+ * the bay zones, so it is data. It starts at -8 on every planet and ends at +12 on planets 1 to 9;
+ * each counter building the planet holds (#170 amendment, TD 6 Oct) adds 6 columns east, at the
+ * planet of its locked schedule row (`docs/scaling/horizontal/stats.json`): merchants P10, quest
+ * office P28, core forge P38. The pad belongs to the planet, never to the player's unlocks.
  */
-export const BAY_CENTRE_OFFSET_TILES = 4
+export const PAD_FIRST_COLUMN = -8
+export const PAD_LAST_COLUMN_BASE = 12
+export const PAD_COLUMNS_PER_COUNTER_BUILDING = 6
+export const DOCK_COUNTER_BUILDING_PLANETS: readonly number[] = [10, 28, 38]
+
+/**
+ * The bay zones on the pad (#37, moved under the buildings by #170): each zone is 4 tiles wide
+ * around its centre column. The Sell zone (Assay & Exchange) is centred 5 tiles left of the dock
+ * point, on the spawn side, so the first dock and the tow still land there; the Upgrade zone
+ * (Engineering Works) 7 tiles right of it, on the turntable. The yard between them docks nowhere.
+ */
+export const SELL_BAY_CENTRE_OFFSET_TILES = 5
+export const UPGRADE_BAY_CENTRE_OFFSET_TILES = 7
 export const BAY_HALF_WIDTH_TILES = 2
 
 /**
- * The Refinery bay (#105) bolts on 8 m past the Upgrade bay, the #37 spacing, on the side away
- * from the spawn point, so the Sell bay is still the first stop. From the refinery's unlock planet
- * the pad runs on to the right edge of its zone (columns 10 to 13); before it the pad is unchanged.
+ * The Refinery (#105) stands behind the yard (#170): from its unlock planet the yard's columns
+ * -2 to +1, centred on the dock point, are its zone, under its intake pipe. The pad is the same.
  */
-export const REFINERY_BAY_CENTRE_OFFSET_TILES = 12
+export const REFINERY_BAY_CENTRE_OFFSET_TILES = 0
 
 /** Radius formula (#6 section 2): `300 + floor(700*(p-1) / ((p-1) + 6))`. */
 export const RADIUS_BASE_TILES = 300

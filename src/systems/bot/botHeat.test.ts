@@ -78,7 +78,11 @@ function planetAt(_session: BotSession, where: 'pad' | 'deep'): BotPlanet {
 }
 
 describe('bot: shaft round lava (#113)', () => {
-  /** On planet 8 the bot's shaft column meets lava at rows 351 to 348 (seed 83921). */
+  /**
+   * On planet 8 column -8 meets lava at rows 351 to 348 (seed 83921): the bot's shaft column until
+   * the #175 pad moved it to -10, kept here so the pocket stays the one these cases were made on.
+   */
+  const POCKET_COLUMN = -8
   const ABOVE_LAVA = 353
   const BELOW_LAVA = 340
 
@@ -94,7 +98,11 @@ describe('bot: shaft round lava (#113)', () => {
     session.submit({ type: 'debug.freezeEnemies', payload: { frozen: true } })
     session.submit({ type: 'undock', payload: {} })
     const params = planetParamsFor(83921, 8)
-    const layout = { ...newMineLayout(params, dockSiteOf(params)), shaftBottomRow: ABOVE_LAVA }
+    const layout = {
+      ...newMineLayout(params, dockSiteOf(params)),
+      shaftColumn: POCKET_COLUMN,
+      shaftBottomRow: ABOVE_LAVA,
+    }
     const position = shaftTileAt(layout, ABOVE_LAVA)
     return {
       session,

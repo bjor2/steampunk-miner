@@ -118,17 +118,17 @@ describe('generated planet shape', () => {
 })
 
 describe('dock site', () => {
-  it.each(SEEDS.flatMap((seed) => [1, 2].map((planet) => [seed, planet])))(
-    'is a flat, indestructible 12-tile pad with 8 clear tiles above it (seed %i, planet %i)',
+  it.each(SEEDS.flatMap((seed) => [1, 2, 3].map((planet) => [seed, planet])))(
+    'is a flat, indestructible pad from -8 to +12 with 8 clear tiles above it (seed %i, planet %i)',
     (seed, planet) => {
-      expectFlatPad(planetParamsFor(seed, planet), -6, 5)
+      expectFlatPad(planetParamsFor(seed, planet), -8, 12)
     },
   )
 
-  it.each(SEEDS.flatMap((seed) => [3, 40].map((planet) => [seed, planet])))(
-    'runs on under the Refinery bay to column 13 from planet 3 (seed %i, planet %i)',
-    (seed, planet) => {
-      expectFlatPad(planetParamsFor(seed, planet), -6, 13)
+  it.each(SEEDS)(
+    'runs on to column 30 under the counter buildings on planet 40 (seed %i)',
+    (seed) => {
+      expectFlatPad(planetParamsFor(seed, 40), -8, 30)
     },
   )
 

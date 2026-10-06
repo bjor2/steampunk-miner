@@ -45,8 +45,8 @@ describe('platform look', () => {
     const shapes = platformLookOf('outpost', SITE).shapes
     const signsOver = (x: number) =>
       shapes.filter((shape) => shape.offset[0] === x && shape.offset[1] > 3)
-    const sell = signsOver(-4)
-    const upgrade = signsOver(4)
+    const sell = signsOver(-5)
+    const upgrade = signsOver(7)
     expect(sell.map((shape) => shape.shape)).toEqual(['box', 'disc'])
     expect(upgrade.map((shape) => shape.shape)).toEqual(['box', 'box', 'box'])
   })

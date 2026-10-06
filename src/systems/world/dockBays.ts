@@ -1,18 +1,21 @@
 /**
- * The platform's bays on the dock pad (decision #37): the Sell bay on the spawn side (left of the
- * dock point) and the Upgrade bay 8 m to its right, each with its own pad zone; from its unlock
- * planet the Refinery bay a further 8 m on (#105). Runs start and the tow lands on the Sell bay, so
- * the first dock is always there. The hub between the first two bays is part of the pad (energy 0
- * never strands there) but docks at no bay. A planet's site lists the bays its pad holds.
+ * The platform's bays on the dock pad (decision #37, laid out under two buildings by #170): the
+ * Sell bay under the Assay & Exchange on the spawn side (left of the dock point) and the Upgrade
+ * bay on the Engineering Works' turntable 12 m to its right, each with its own pad zone; from its
+ * unlock planet the Refinery bay in the yard between them (#105, #170). Runs start and the tow
+ * lands on the Sell bay, so the first dock is always there. The yard is part of the pad (energy 0
+ * never strands there) but docks at no bay until the Refinery's. A planet's site lists the bays
+ * its pad holds.
  *
  * Integer tiles and millimetres only, like every zone test the authority replays.
  */
 import { MM_PER_METRE } from '../../constants/physics'
 import type { DockSite } from './dockSite'
 import {
-  BAY_CENTRE_OFFSET_TILES,
   BAY_HALF_WIDTH_TILES,
   REFINERY_BAY_CENTRE_OFFSET_TILES,
+  SELL_BAY_CENTRE_OFFSET_TILES,
+  UPGRADE_BAY_CENTRE_OFFSET_TILES,
 } from './planetTable'
 import type { TilePoint } from './tileGrid'
 
@@ -31,8 +34,8 @@ export const SLICE_BAY_IDS: readonly BayId[] = ['sell', 'upgrade']
 
 /** Each bay's centre column, in tiles from the dock point. */
 const BAY_CENTRE_OFFSETS: Readonly<Record<BayId, number>> = {
-  sell: -BAY_CENTRE_OFFSET_TILES,
-  upgrade: BAY_CENTRE_OFFSET_TILES,
+  sell: -SELL_BAY_CENTRE_OFFSET_TILES,
+  upgrade: UPGRADE_BAY_CENTRE_OFFSET_TILES,
   refinery: REFINERY_BAY_CENTRE_OFFSET_TILES,
 }
 
@@ -40,14 +43,9 @@ export function isBayId(value: unknown): value is BayId {
   return (BAY_IDS as readonly unknown[]).includes(value)
 }
 
-/** The dock point is the boundary between the slice pad's two halves (columns -half .. half-1). */
+/** A bay's centre column; the dock point is the middle of the yard. */
 export function bayCentreColumnOf(site: DockSite, bay: BayId): number {
   return site.dockPoint.tx + BAY_CENTRE_OFFSETS[bay]
-}
-
-/** The rightmost column any of these bays' zones covers, from a dock point at column 0. */
-export function lastBayColumnOf(bays: readonly BayId[]): number {
-  return Math.max(...bays.map((bay) => BAY_CENTRE_OFFSETS[bay] + BAY_HALF_WIDTH_TILES - 1))
 }
 
 export function bayColumnsOf(site: DockSite, bay: BayId): BayColumns {
@@ -70,7 +68,7 @@ export function isTileInBay(site: DockSite, bay: BayId, tile: TilePoint): boolea
   )
 }
 
-/** The bay whose pad zone holds a tile, or null on the hub and away from the pad. */
+/** The bay whose pad zone holds a tile, or null in a yard with no bay and away from the pad. */
 export function bayOfTile(site: DockSite, tile: TilePoint): BayId | null {
   return site.bays.find((bay) => isTileInBay(site, bay, tile)) ?? null
 }

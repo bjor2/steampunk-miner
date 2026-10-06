@@ -1,6 +1,6 @@
 /**
  * How the Refinery bay shows on the platform (#105 design, #106 art, #81 acceptance 3): from the
- * planet the platform gets it, the baked bay stands on its pad 8 m past the Upgrade bay with one of
+ * planet the platform gets it, the baked bay stands in the yard on the dock point (#170) with one of
  * its three looks over the frame: `ready` while any batch waits (an ingot stack), `refining` while
  * one runs (the lit furnace; smoke rises from the stack), else `idle`. Read from the authority's
  * slots and tick, so every player sees the same bay; the art decides nothing.
@@ -37,7 +37,7 @@ export function refineryBayMaps(art: ArtCatalogue): AtlasMaps | null {
   return atlasMapsOf(art, REFINERY_BAY_ASSET_ID)
 }
 
-/** The bay's centre in metres from the platform's origin on the hub (one tile is one metre). */
+/** The bay's centre in metres from the platform's origin in the yard (one tile is one metre). */
 export function refineryBayOffsetOf(site: DockSite): number {
   return bayCentreColumnOf(site, 'refinery') - site.dockPoint.tx
 }

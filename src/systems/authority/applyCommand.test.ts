@@ -60,9 +60,10 @@ describe('authority: determinism', () => {
   // authority state, #109, #95) and 14 (each vehicle's lining types and heat gauge, standard and
   // cold here, are authority state, #113, #96), 17 (each vehicle's loadout, empty here, is
   // authority state, K4) and 18 (the live blasts and the queued terrain edits, none here, are
-  // authority state, K6 #189).
+  // authority state, K6 #189), and generator 6 (the run starts on the Sell bay under the
+  // Exchange, 5 m left of the dock point, #175).
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('78b6cbd44d23e61c')
+    expect(stateDigest(replay(SESSION).state)).toBe('5482db9b454d9908')
   })
 
   it('gives a different digest when one command differs', () => {

@@ -9,16 +9,17 @@ import { chunkRangeOfDisc } from './tileGrid'
 /**
  * Decision #4 acceptance 1 (#36 acceptance 1, #42 acceptance 4 under generator 2, the #46 artefact cache under 3,
  * the Refinery bay's pad from planet 3 under 4, which leaves these digests as they were, and the
- * lava pockets of the heat planets under 5, pinned by the planet 8 chunks): a committed
+ * lava pockets of the heat planets under 5, pinned by the planet 8 chunks, and the -8..+12 pad
+ * under the shop buildings under 6, #170): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 5,
-  wholePlanet1: 'd2cc46fd06b0ec6d',
-  wholePlanet2: '815b05c18af1e3cf',
-  farPlanetChunks: 'f5d1e59c4a6053f7',
+  generatorVersion: 6,
+  wholePlanet1: 'a0d7fac844715b23',
+  wholePlanet2: 'cf4b2baabe6f47a0',
+  farPlanetChunks: 'd95ca7c7e5c09b34',
   heatPlanetChunks: 'dc182bc2716103c1',
 }
 

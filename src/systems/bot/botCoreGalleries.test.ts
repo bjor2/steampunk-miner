@@ -28,10 +28,11 @@ import { nextRow, sideFor } from './tripGoal'
 const CORE: { kind: 'core' } = { kind: 'core' }
 
 /**
- * Seed 27182's planet 9 (#136): the shaft starts at column -8, west of the core's middle, but its
- * jogs round lava bring it down through the core at column 3, east of the middle.
+ * Seed 10's planet 9: the shaft starts at column -10, west of the core's middle, but its jogs
+ * round lava bring it down through the core at column 7, east of the middle. This was seed 27182
+ * (#136) until the #175 pad moved the shaft from -8 to -10 and its jogs stayed west.
  */
-const OFF_CENTRE_SEED = 27182
+const OFF_CENTRE_SEED = 10
 const OFF_CENTRE_PLANET = 9
 /** More core trips than the core needs; on main the core goal ran out after about a dozen. */
 const MAX_CORE_TRIPS = 60
@@ -79,7 +80,7 @@ function mineCoreUntilGoalEnds(session: BotSession, planet: BotPlanet): void {
 }
 
 describe('pacing bot core galleries from an off-centre shaft (#136)', () => {
-  it('completes the core of seed 27182 planet 9, whose shaft jogs across the core middle', () => {
+  it('completes the core of seed 10 planet 9, whose shaft jogs across the core middle', () => {
     const { session, planet } = botOnPlanet9()
     mineCoreUntilGoalEnds(session, planet)
     const state = session.state()

@@ -29,7 +29,7 @@ describe('refinery bay look', () => {
     expect(ids('ready')).toEqual(['platform-bay-refinery', 'refinery-ready'])
   })
 
-  it('stands 12 m right of the hub, over its pad zone', () => {
-    expect(refineryBayOffsetOf(dockSiteOf(planetParamsFor(83921, 3)))).toBe(12)
+  it('stands in the yard on the dock point, over its pad zone (#170)', () => {
+    expect(refineryBayOffsetOf(dockSiteOf(planetParamsFor(83921, 3)))).toBe(0)
   })
 })

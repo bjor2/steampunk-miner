@@ -69,9 +69,10 @@ describe('state digest', () => {
     expect(stateDigest(one)).toBe(stateDigest(other))
   })
 
+  // Re-pinned for generator 6: the run starts on the Sell bay under the Exchange, 5 m left (#175).
   it('keeps the digest of a fresh authority state, as the golden runs do', () => {
     const state = createAuthorityState({ planetIndex: 1, planetSeed: 7, playerIds: ['p1'] })
-    expect(stateDigest(state)).toBe('abb1930fbeb74036')
+    expect(stateDigest(state)).toBe('2b369423948ec371')
   })
 
   it('changes when any value changes', () => {

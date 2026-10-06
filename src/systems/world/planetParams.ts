@@ -16,10 +16,13 @@ import {
   CORE_RADIUS_MAX_TILES,
   CORE_RADIUS_MIN_TILES,
   DOCK_CLEARANCE_TILES,
-  DOCK_HALF_WIDTH_TILES,
+  DOCK_COUNTER_BUILDING_PLANETS,
   HEAT_PLANET_ARCHETYPE,
   ORE_DENSITY_BP,
   PATCH_MEAN_CELLS,
+  PAD_COLUMNS_PER_COUNTER_BUILDING,
+  PAD_FIRST_COLUMN,
+  PAD_LAST_COLUMN_BASE,
   PATCH_SEED_CHANCE_BP,
   PLANET_ARCHETYPES,
   RADIUS_BASE_TILES,
@@ -48,7 +51,9 @@ export interface PlanetParams {
   /** Chance a band's patch lattice node fires, in basis points (#42 `seedProb`). */
   patchSeedChanceBp: readonly number[]
   caveThresholdBp: number
-  dockHalfWidthTiles: number
+  /** The dock pad's columns from the dock point (#170): -8 to +12, growing east from P10. */
+  padFirstColumn: number
+  padLastColumn: number
   dockClearanceTiles: number
   /** The platform's bays here: the Sell and Upgrade bays, and the Refinery bay from P3 (#105). */
   dockBays: readonly BayId[]
@@ -81,7 +86,8 @@ export function planetParamsFor(worldSeed: number, planetIndex: number): PlanetP
     patchMeanCells: PATCH_MEAN_CELLS,
     patchSeedChanceBp: PATCH_SEED_CHANCE_BP,
     caveThresholdBp: CAVE_THRESHOLD_BP,
-    dockHalfWidthTiles: DOCK_HALF_WIDTH_TILES,
+    padFirstColumn: PAD_FIRST_COLUMN,
+    padLastColumn: padLastColumnOf(planetIndex),
     dockClearanceTiles: DOCK_CLEARANCE_TILES,
     dockBays: dockBaysOf(planetIndex),
     ...archetypeOf(planetIndex),
@@ -93,6 +99,12 @@ export function planetParamsFor(worldSeed: number, planetIndex: number): PlanetP
 /** The platform travels forward only, so it has the Refinery bay on every planet from its unlock. */
 function dockBaysOf(planetIndex: number): readonly BayId[] {
   return planetIndex >= refineryUnlockPlanet() ? BAY_IDS : SLICE_BAY_IDS
+}
+
+/** `12 + 6 * n`, n the counter buildings whose planet this is or is past (#170 amendment). */
+export function padLastColumnOf(planetIndex: number): number {
+  const counters = DOCK_COUNTER_BUILDING_PLANETS.filter((planet) => planet <= planetIndex).length
+  return PAD_LAST_COLUMN_BASE + PAD_COLUMNS_PER_COUNTER_BUILDING * counters
 }
 
 /** #6 section 2: 300 on planet 1, 400 on planet 2, approaching 1000. */

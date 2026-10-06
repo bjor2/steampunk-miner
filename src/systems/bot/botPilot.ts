@@ -57,6 +57,8 @@ export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, 
     const chunk = Math.min(left, BORE_REPORT_TICKS)
     session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
     session.wait(chunk)
+    // An enemy can destroy the vehicle while it waits; the drill then has nothing to drive.
+    if (!isVehicleActive(session.vehicle())) return
     session.submit({ type: 'drillTile', payload: { ...tile, ticks: chunk } })
     pilot.facing = facing
     left -= chunk
