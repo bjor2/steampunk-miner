@@ -148,6 +148,10 @@ export interface DomainEventBodies {
   EnemyDamaged: { enemyId: string; amount: string; source: 'drill'; arc: HitArc; ticks: number }
   EnemyKilled: { enemyId: string; kind: EnemyKind; tier: number; by: 'drill' }
   EnemyDespawned: { enemyId: string }
+  /** A tunnel wrecker came out of the rock at ring `x,y` (mm) of a vehicle's route, in `band` (#111). */
+  WreckerSpawned: { enemyId: string; ring: string; band: number }
+  /** A tunnel wrecker got out of every vehicle's sight and went into the rock (#111). */
+  WreckerFled: { enemyId: string }
   /** The enemy's id, kind, tier and arc are null when a collapse crushed the vehicle (#43). */
   VehicleDamaged: {
     amount: string

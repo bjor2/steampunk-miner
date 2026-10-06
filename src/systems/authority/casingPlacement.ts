@@ -15,6 +15,7 @@ import type { PlanetParams } from '../world/planetParams'
 import type { CommandPayloads } from './authorityCommand'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import { chargeFirstLining } from './casingLiningCharge'
+import { rememberLinedRing } from './combat/wreckerRoute'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { planetParamsOf } from './planetOfState'
@@ -57,7 +58,10 @@ function layRings(
   )
 }
 
-/** A ring laid by drilling: lined as `debug.lineCasing` lines it, then its new lining charged. */
+/**
+ * A ring laid by drilling: lined as `debug.lineCasing` lines it, then its new lining charged, and
+ * it joins the vehicle's route where tunnel wreckers live (#111).
+ */
 function layPaidCasingRing(
   state: AuthorityState,
   playerId: string,
@@ -67,7 +71,10 @@ function layPaidCasingRing(
 ): RuleEffect {
   const ring = lineCasingRing(state, params, point, grade)
   const charge = chargeFirstLining(ring.state, playerId, params, ring.linedSamples, grade)
-  return { state: charge.state, events: [...ring.events, ...charge.events] }
+  return {
+    state: rememberLinedRing(charge.state, playerId, point),
+    events: [...ring.events, ...charge.events],
+  }
 }
 
 /** One ring round an axis point, logged as `casing_placed`; `debug.lineCasing` lays the same. */

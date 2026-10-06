@@ -14,34 +14,54 @@
  * A pinned enemy is drilled every tick and strikes the front once per attack cooldown, which is
  * never shorter than the wind-up. Frozen enemies (`freezeEnemies`) neither move nor strike, but
  * the drill still pins and cuts them. An enemy whose vehicle cannot be hit waits, idle.
+ *
+ * A tunnel wrecker (#111) never hunts: its free phases seek, gnaw and flee (`wreckerBehaviour.ts`),
+ * and only a wrecker cornered on the drill strikes, through the same pin.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
+import type { EnemyKind } from '../../economy/economyDefinition'
 import { enemyBoundedStats, type EnemyBoundedStats } from '../../economy/enemyStats'
-import { withCombat, type AuthorityState } from '../authorityState'
+import type { AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
 import { isOnTheNose, isTouching, isWithinMm, stepAwayFrom, stepToward } from './combatGeometry'
-import { enemyById, inPhase, withEnemy, type Enemy, type EnemyPhase } from './combatState'
+import { enemyById, inPhase, type Enemy, type EnemyPhase } from './combatState'
 import { drillPinnedEnemy, flushDrillDamage } from './enemyDamage'
 import { contactArcOf, strikeVehicle } from './enemyHits'
 import { lungeStepMmOf, stepAlong, walkStepMmOf, walkToward, type Terrain } from './enemyMovement'
+import { ticksInPhase, updated, type EnemyTurn, type PhaseStep } from './enemyTurn'
 import { vehicleTargetOf, type VehicleTarget } from './vehicleTarget'
+import { fleeIntoRock, gnawRing, seekRing } from './wreckerBehaviour'
 
-interface EnemyTurn {
-  state: AuthorityState
-  enemy: Enemy
-  target: VehicleTarget
-  terrain: Terrain
-  tick: number
-}
+type FreePhaseSteps = Readonly<Record<Exclude<EnemyPhase, 'pinned'>, PhaseStep>>
 
-type PhaseStep = (turn: EnemyTurn) => RuleEffect
-
-const FREE_PHASE_STEPS: Readonly<Record<Exclude<EnemyPhase, 'pinned'>, PhaseStep>> = {
+/** Crawlers and burrowers hunt the vehicle; they never take a wrecker's phases. */
+const HUNTER_PHASE_STEPS: FreePhaseSteps = {
   idle: hunt,
   approach: hunt,
   windup: windUp,
   lunge: lunge,
   recoil: recoil,
+  seek: hunt,
+  gnaw: hunt,
+  flee: hunt,
+}
+
+/** A wrecker goes for the route, never the vehicle; after a released pin it backs off, then seeks. */
+const WRECKER_PHASE_STEPS: FreePhaseSteps = {
+  idle: seekRing,
+  approach: seekRing,
+  windup: seekRing,
+  lunge: seekRing,
+  recoil: recoil,
+  seek: seekRing,
+  gnaw: gnawRing,
+  flee: fleeIntoRock,
+}
+
+const FREE_PHASE_STEPS_OF_KIND: Readonly<Record<EnemyKind, FreePhaseSteps>> = {
+  crawler: HUNTER_PHASE_STEPS,
+  burrower: HUNTER_PHASE_STEPS,
+  tunnel_wrecker: WRECKER_PHASE_STEPS,
 }
 
 export function stepEnemy(
@@ -60,7 +80,7 @@ export function stepEnemy(
     return updated(state, inPhase(enemy, 'pinned', tick))
   }
   if (state.combat.isFrozen) return unchanged(state)
-  return FREE_PHASE_STEPS[enemy.phase](turn)
+  return FREE_PHASE_STEPS_OF_KIND[enemy.kind][enemy.phase](turn)
 }
 
 function hunt({ state, enemy, target, terrain, tick }: EnemyTurn): RuleEffect {
@@ -165,14 +185,6 @@ function statsOf(enemy: Enemy): EnemyBoundedStats {
   return enemyBoundedStats(enemy.kind, enemy.tier)
 }
 
-function ticksInPhase(enemy: Enemy, tick: number): number {
-  return tick - enemy.phaseSinceTick
-}
-
 function latest(state: AuthorityState, enemy: Enemy): Enemy {
   return enemyById(state.combat, enemy.id) ?? enemy
-}
-
-function updated(state: AuthorityState, enemy: Enemy): RuleEffect {
-  return unchanged(withCombat(state, withEnemy(state.combat, enemy)))
 }

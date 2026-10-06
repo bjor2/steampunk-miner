@@ -1,7 +1,7 @@
 /**
  * One tick of the enemy simulation (decision #9), run by the authority's clock for every tick
- * while combat is live: strays leave, spawn points near each vehicle out on a trip come alive,
- * then every enemy acts in spawn order. Events are stamped with the tick and the player whose
+ * while combat is live: strays leave, spawn points near each vehicle out on a trip come alive, a
+ * lined route may call a tunnel wrecker (#111), then every enemy acts in spawn order. Events are stamped with the tick and the player whose
  * enemy or vehicle they concern, with no `seq`: the clock caused them, not a command.
  *
  * Combat is live while an enemy is active or a vehicle's position is still being carried on from
@@ -19,6 +19,7 @@ import type { Terrain } from './enemyMovement'
 import { activateSpawnPoints, despawnEnemies } from './enemyRoster'
 import { isStray } from './enemyRoster'
 import { isOnTrip } from './vehicleTarget'
+import { callWrecker } from './wreckerSpawn'
 
 export interface TickOutcome {
   state: AuthorityState
@@ -47,6 +48,7 @@ function tickSteps(terrain: Terrain, tick: number, isFrozen: boolean): TickStep[
   const roster: TickStep[] = [
     (state) => despawnStrays(state, tick),
     (state) => activateNearVehicles(state, tick),
+    (state) => callWreckersToRoutes(state, tick),
   ]
   return [...(isFrozen ? [] : roster), (state) => stepEveryEnemy(state, terrain, tick)]
 }
@@ -69,6 +71,18 @@ function activateNearVehicles(state: AuthorityState, tick: number): TickOutcome 
       .map(
         (playerId) => (current) =>
           stampedFor(activateSpawnPoints(current, playerId, tick), playerId, tick),
+      ),
+  )
+}
+
+/** Each vehicle's lined route may call a tunnel wrecker (#111); its events concern that vehicle. */
+function callWreckersToRoutes(state: AuthorityState, tick: number): TickOutcome {
+  return runSteps(
+    state,
+    Object.keys(state.players)
+      .sort()
+      .map(
+        (playerId) => (current) => stampedFor(callWrecker(current, playerId, tick), playerId, tick),
       ),
   )
 }

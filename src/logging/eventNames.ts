@@ -349,6 +349,14 @@ export const RUN_EVENT_REGISTRY = {
     },
   },
   enemy_despawned: { group: 'vehicle_and_combat', level: 'detail', payload: { enemyId: 'text' } },
+  // #111: a tunnel wrecker came to ring `x,y` (mm) of a vehicle's route in `band`, and later went
+  // into the rock out of every vehicle's sight (a killed one logs `enemy_killed` instead).
+  wrecker_spawned: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { enemyId: 'text', ring: 'text', band: 'integer' },
+  },
+  wrecker_fled: { group: 'vehicle_and_combat', level: 'core', payload: { enemyId: 'text' } },
   weapon_fired: { group: 'vehicle_and_combat', level: 'detail', payload: 'unspecified' },
   player_killed: { group: 'vehicle_and_combat', payload: 'reserved' },
 

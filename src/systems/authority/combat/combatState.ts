@@ -9,13 +9,16 @@
  */
 import type { EnemyKind, HitArc } from '../../economy/economyDefinition'
 import { ZERO_MONEY, type BigStat } from '../../money'
+import type { RingPoint } from '../../vehicle/casingTrail'
 
 /**
  * `idle` waits out of detection range, `approach` closes in, `windup` is the telegraph (the
  * burrower's tremor), `lunge` the attack, `recoil` the back-off after a side or rear hit or a
- * released pin, `pinned` stuck on the drill head.
+ * released pin, `pinned` stuck on the drill head. A tunnel wrecker (#111) has three of its own:
+ * `seek` heads for a lined ring, `gnaw` breaches it, `flee` makes for the rock away from a vehicle.
  */
-export type EnemyPhase = 'idle' | 'approach' | 'windup' | 'lunge' | 'recoil' | 'pinned'
+export type EnemyPhase =
+  'idle' | 'approach' | 'windup' | 'lunge' | 'recoil' | 'pinned' | 'seek' | 'gnaw' | 'flee'
 
 export interface MillimetreStep {
   x: number
@@ -46,6 +49,8 @@ export interface Enemy {
   /** The lunge or recoil step per tick, fixed when that phase starts. */
   step: MillimetreStep
   pendingDrill: PendingDrillDamage
+  /** The casing ring a tunnel wrecker heads for or gnaws; null for every other kind. */
+  ring: RingPoint | null
 }
 
 /** What combat remembers about each vehicle besides its pose. */
@@ -61,6 +66,15 @@ export interface CombatVehicle {
   lastHitTick: number | null
 }
 
+/**
+ * A vehicle's lined route this trip, as tunnel wreckers see it (#111): the axis points of the rings
+ * its drill laid, oldest first, and the earliest tick the next wrecker may come.
+ */
+export interface WreckerRoute {
+  rings: readonly RingPoint[]
+  nextWreckerTick: number
+}
+
 export interface CombatState {
   /** `freezeEnemies(true)`: enemies neither move, wind up, attack nor spawn. */
   isFrozen: boolean
@@ -72,6 +86,8 @@ export interface CombatState {
   /** Kinds met this run: `enemy_type_encountered` fires once per kind (#9, #14). */
   encounteredKinds: readonly EnemyKind[]
   vehicles: Readonly<Record<string, CombatVehicle>>
+  /** Per vehicle, only from the planet where `tunnel_wrecker` opens; forgotten with the trip. */
+  routes: Readonly<Record<string, WreckerRoute>>
 }
 
 export const NEW_COMBAT: CombatState = {
@@ -81,6 +97,7 @@ export const NEW_COMBAT: CombatState = {
   usedSpawnPointIds: [],
   encounteredKinds: [],
   vehicles: {},
+  routes: {},
 }
 
 export const NO_PENDING_DRILL: PendingDrillDamage = { amount: ZERO_MONEY, ticks: 0 }

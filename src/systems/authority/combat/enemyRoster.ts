@@ -30,6 +30,7 @@ import {
 } from './combatState'
 import { spawnPointsWithin, spawnPositionOf, type SpawnPoint } from './spawnPoints'
 import { vehicleTargetOf } from './vehicleTarget'
+import { withoutRoute } from './wreckerRoute'
 
 const { maxActivePerVehicle, activationTiles, despawnTiles } = ECONOMY.enemies.combat
 const MM_PER_TILE = MM_PER_METRE
@@ -71,10 +72,14 @@ export function activateSpawnPoints(
   )
 }
 
-/** A dock or a tow: the vehicle's enemies leave, and every spawn point is free again (#9). */
+/**
+ * A dock or a tow: the vehicle's enemies leave, every spawn point is free again (#9) and its route
+ * is no longer the way home a wrecker hunts (#111).
+ */
 export function endTrip(state: AuthorityState, playerId: string): RuleEffect {
   const left = despawnEnemies(state, enemiesOwnedBy(state.combat, playerId))
-  const combat = forgetLastHit({ ...left.state.combat, usedSpawnPointIds: [] }, playerId)
+  const freed = { ...left.state.combat, usedSpawnPointIds: [] }
+  const combat = withoutRoute(forgetLastHit(freed, playerId), playerId)
   return { state: withCombat(left.state, combat), events: left.events }
 }
 
@@ -120,6 +125,7 @@ function newEnemy(combat: CombatState, arrival: EnemyArrival, tick: number): Ene
     readyTick: tick,
     step: { x: 0, y: 0 },
     pendingDrill: NO_PENDING_DRILL,
+    ring: null,
   }
 }
 

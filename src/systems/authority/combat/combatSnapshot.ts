@@ -1,13 +1,14 @@
 /**
  * The combat part of the session snapshot (#11 section 5): the same plain JSON as the state, with
  * each enemy's health and pending drill damage as canonical strings. A dock leaves no enemies, so a
- * checkpoint taken there carries none (#9); a debug or co-op join snapshot mid-fight carries them.
+ * checkpoint taken there carries none (#9) and no wrecker route (#111); a debug or co-op join
+ * snapshot mid-fight carries them.
  * Reading checks the shape; the digest check in `sessionSnapshot.ts` catches wrong values.
  */
 import { ENEMY_KINDS, type EnemyKind } from '../../economy/economyDefinition'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../../money'
 import { isJsonObject, isWholeNumber } from '../payloadFields'
-import type { CombatState, CombatVehicle, Enemy, EnemyPhase } from './combatState'
+import type { CombatState, CombatVehicle, Enemy, EnemyPhase, WreckerRoute } from './combatState'
 
 type PortableEnemy = Omit<Enemy, 'health' | 'pendingDrill'> & {
   health: string
@@ -23,6 +24,9 @@ const ENEMY_PHASES: readonly EnemyPhase[] = [
   'lunge',
   'recoil',
   'pinned',
+  'seek',
+  'gnaw',
+  'flee',
 ]
 const WHOLE_FIELDS = ['nextEnemyNumber'] as const
 const ENEMY_WHOLE_FIELDS = ['tier', 'phaseSinceTick', 'readyTick'] as const
@@ -47,6 +51,7 @@ export function portableCombatProblems(combat: unknown, path: string): string[] 
     ...(isKindList(combat.encounteredKinds) ? [] : [`${path}.encounteredKinds is malformed`]),
     ...vehiclesProblems(combat.vehicles, `${path}.vehicles`),
     ...enemiesProblems(combat.enemies, `${path}.enemies`),
+    ...routesProblems(combat.routes, `${path}.routes`),
   ]
 }
 
@@ -99,8 +104,30 @@ function enemyProblems(enemy: unknown, path: string): string[] {
     ENEMY_INTEGER_FIELDS.every((name) => Number.isSafeInteger(enemy[name])) &&
     isNonNegativeMoneyText(enemy.health) &&
     isIntegerStep(enemy.step) &&
-    isPortablePendingDrill(enemy.pendingDrill)
+    isPortablePendingDrill(enemy.pendingDrill) &&
+    (enemy.ring === null || isRingPoint(enemy.ring))
   return isValid ? [] : [`${path} is malformed`]
+}
+
+/** Each vehicle's lined route (#111): its ring axis points and the next wrecker's tick. */
+function routesProblems(routes: unknown, path: string): string[] {
+  if (!isJsonObject(routes)) return [`${path} must be an object`]
+  return Object.entries(routes)
+    .filter(([, route]) => !isPortableRoute(route))
+    .map(([id]) => `${path}.${id} is malformed`)
+}
+
+function isPortableRoute(route: unknown): route is WreckerRoute {
+  return (
+    isJsonObject(route) &&
+    Array.isArray(route.rings) &&
+    route.rings.every(isRingPoint) &&
+    isWholeNumber(route.nextWreckerTick)
+  )
+}
+
+function isRingPoint(point: unknown): boolean {
+  return isJsonObject(point) && Number.isSafeInteger(point.xMm) && Number.isSafeInteger(point.yMm)
 }
 
 function isIntegerStep(step: unknown): boolean {

@@ -256,6 +256,7 @@ describe('combat: death and no interruption (#25 acceptance 10, #23 item 4)', ()
         'enemies',
         'isFrozen',
         'nextEnemyNumber',
+        'routes',
         'usedSpawnPointIds',
         'vehicles',
       ].sort(),

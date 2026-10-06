@@ -232,7 +232,8 @@ function drillAtPoseAndBurrowers(
 
 /** A burrower swimming in the drilled tile is cut for the ticks the drill worked (#9). */
 function withBurrowersCut(drilled: RuleEffect, playerId: string, tile: TilePoint): RuleEffect {
-  const cut = drillBurrowersOnTile(drilled.state, playerId, tile, drilledTicksOf(drilled.events))
+  const ticks = drilledTicksOf(drilled.events)
+  const cut = drillBurrowersOnTile(drilled.state, playerId, tile, ticks, drilled.state.tick)
   return { state: cut.state, events: [...drilled.events, ...cut.events] }
 }
 
