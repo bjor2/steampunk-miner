@@ -32,10 +32,10 @@ describe('refinery slots', () => {
     const session = sessionOnPlanet(3, '1e30')
     dockAtBayOf(session, 1, REFINERY_SITE, 'refinery')
     expect(eventOf(session.submit(2, buySlot), 'RefinerySlotBought')).toEqual(
-      expect.objectContaining({ slots: 2, price: '1.1533008e+4' }),
+      expect.objectContaining({ slots: 2, price: '1.6146211e+4' }),
     )
     expect(eventOf(session.submit(3, buySlot), 'RefinerySlotBought')).toEqual(
-      expect.objectContaining({ slots: 3, price: '2.3066016e+4' }),
+      expect.objectContaining({ slots: 3, price: '3.2292422e+4' }),
     )
     expect(rejectionOf(session.submit(4, buySlot))).toMatchObject({ reason: 'slots_max' })
     expect(session.state().platform.refinerySlots).toEqual([null, null, null])

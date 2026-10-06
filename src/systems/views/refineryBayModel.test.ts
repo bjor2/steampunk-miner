@@ -51,7 +51,7 @@ describe('refinery bay screen', () => {
 
   it('prices the next slot, and says so when every slot is built', () => {
     const { session, tick } = atRefineryWithOre()
-    expect(selectRefineryBayModel(session.state(), 'p1', UI).slotPrice?.exact).toBe('1.1533008e+4')
+    expect(selectRefineryBayModel(session.state(), 'p1', UI).slotPrice?.exact).toBe('1.6146211e+4')
     session.submit(tick + 1, { type: 'buyRefinerySlot', payload: {} })
     session.submit(tick + 2, { type: 'buyRefinerySlot', payload: {} })
     const model = selectRefineryBayModel(session.state(), 'p1', UI)

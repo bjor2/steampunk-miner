@@ -51,8 +51,14 @@ describe('planet charges', () => {
     expect(coreFragmentsNeeded(316)).toBe(127)
   })
 
-  it('scales every planet by the default pace of 1', () => {
+  it('keeps planets 1 and 2 at the default pace of 1', () => {
     expect(paceScale(1)).toEqual(m('1'))
+    expect(paceScale(2)).toEqual(m('1'))
+  })
+
+  it('scales planets 3 to 7 by the refinery row of 1.4, and planet 8 on by its own row (#131)', () => {
+    expect([3, 5, 7].map(paceScale)).toEqual([m('1.4'), m('1.4'), m('1.4')])
+    expect(paceScale(8)).toEqual(m('1'))
     expect(paceScale(1_000_000)).toEqual(m('1'))
   })
 

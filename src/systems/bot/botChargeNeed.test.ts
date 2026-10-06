@@ -17,8 +17,11 @@ const BEHIND_BUDGET_TICKS = 15 * 60 * 60
 /** A drill this far behind the curve meets tiles over the 96-tick threshold (#109 bot policy). */
 const DRILL_LEVELS_BEHIND = 12
 const DRILL_TRACKS: readonly UpgradeId[] = ['drill_power', 'drill_tip']
-/** Enough for a rack of three (about 450k on planet 7) from the first visit, with no charges. */
-const MONEY = '700000'
+/**
+ * Enough for a rack of three (about 630k on planet 7) from the first visit, with no charges: the
+ * 700k this spec had at paceScale 1, times planet 7's 1.4 (#131), so it buys what it bought then.
+ */
+const MONEY = '980000'
 
 /** Arrived on planet 7 with no charges, money for the rack and the drill `drillBehind` levels back. */
 function arrivedOnPlanet7(drillBehind: number): CommandIntent[] {

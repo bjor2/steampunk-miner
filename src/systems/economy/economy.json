@@ -15,7 +15,7 @@
     "paceScale": {
       "default": "1",
       "fromPlanet": [
-        { "from": 3, "scale": "1" },
+        { "from": 3, "scale": "1.4" },
         { "from": 8, "scale": "1" }
       ],
       "byPlanet": {}
