@@ -10,7 +10,7 @@ import type { TilePoint } from '../world/tileGrid'
 import type { BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import { boreQuanta, moveQuanta, moveTicks } from './botWorld'
-import type { MineLayout } from './mineLayout'
+import { shaftColumnAt, shaftJogLengthAbove, type MineLayout } from './mineLayout'
 import { nextRow, type TripGoal } from './tripGoal'
 
 /** The return trip must fit in the tank this many times over, plus one unit. */
@@ -47,7 +47,8 @@ export function canAffordMoveTo(
   const { position } = planet.pilot
   const speed = statsOfVehicle(session.vehicle()).engine.speedMax
   const along =
-    Math.abs(target.tx - position.tx) + Math.abs(position.tx - planet.layout.shaftColumn)
+    Math.abs(target.tx - position.tx) +
+    Math.abs(position.tx - shaftColumnAt(planet.layout, position.ty))
   const down = Math.max(0, position.ty - target.ty)
   const cost = moveQuanta(moveTicks(along + down, speed), 0)
   return session.vehicle().energy - cost >= reserveQuanta(session, planet.layout, target)
@@ -60,11 +61,16 @@ function reserveQuanta(session: BotSession, layout: MineLayout, from: TilePoint)
   )
 }
 
-/** The energy the straight way home costs: along the gallery, up the shaft, over to the pad. */
+/**
+ * The energy the way home costs: along the gallery, up the shaft and along its jogs round lava
+ * (#113), over to the pad.
+ */
 export function returnQuanta(session: BotSession, layout: MineLayout, from: TilePoint): number {
   const speed = statsOfVehicle(session.vehicle()).engine.speedMax
   const along =
-    Math.abs(from.tx - layout.shaftColumn) + Math.abs(layout.shaftColumn - layout.sellBay.tx)
+    Math.abs(from.tx - shaftColumnAt(layout, from.ty)) +
+    shaftJogLengthAbove(layout, from.ty) +
+    Math.abs(layout.shaftColumn - layout.sellBay.tx)
   const climb = Math.max(0, layout.travelRow - from.ty)
   return moveQuanta(moveTicks(along, speed), moveTicks(climb, speed))
 }

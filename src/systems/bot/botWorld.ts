@@ -17,7 +17,15 @@ import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { cellAt } from '../world/worldState'
 
-export type BotTileKind = 'open' | 'ground' | 'ore' | 'core' | 'pad'
+export type BotTileKind = 'open' | 'ground' | 'ore' | 'core' | 'pad' | 'lava'
+
+const LAVA_NEIGHBOURS: readonly (readonly [number, number])[] = [
+  [0, 0],
+  [0, -1],
+  [-1, 0],
+  [1, 0],
+  [0, 1],
+]
 
 export function paramsOfSession(state: AuthorityState): PlanetParams {
   const params = planetParamsOf(state.planet)
@@ -32,7 +40,18 @@ export function tileKindAt(state: AuthorityState, tile: TilePoint): BotTileKind 
   // The cache drills like rock and yields nothing (#46); the bot never opens it.
   if (kind === CELL_KIND.ground || kind === CELL_KIND.artefactCache) return 'ground'
   if (kind === CELL_KIND.indestructible) return 'pad'
+  if (kind === CELL_KIND.lava) return 'lava'
   return 'open'
+}
+
+/**
+ * #113: opening this tile would free a lava pocket (it is lava, or lava is a 4-neighbour), and a
+ * vehicle standing in it would touch the lava. The bot never bores or enters such a tile.
+ */
+export function isLavaRisk(state: AuthorityState, tile: TilePoint): boolean {
+  return LAVA_NEIGHBOURS.some(
+    ([dx, dy]) => tileKindAt(state, { tx: tile.tx + dx, ty: tile.ty + dy }) === 'lava',
+  )
 }
 
 export function isInsideWorld(state: AuthorityState, tile: TilePoint): boolean {
@@ -51,7 +70,9 @@ export function canBore(
   tile: TilePoint,
   kind: BotTileKind,
 ) {
-  return kind !== 'pad' && canScratch(drill.drillTip, hardnessAt(params, tile, kind))
+  return (
+    kind !== 'pad' && kind !== 'lava' && canScratch(drill.drillTip, hardnessAt(params, tile, kind))
+  )
 }
 
 /** Ticks to break an intact tile, or null when the tip cannot scratch it. */

@@ -5,6 +5,11 @@
  * galleries off it, three rows apart, so each gallery tile has an untouched row above and below
  * whose ore (or core) the drill can reach without moving. The bot remembers how far each gallery
  * reaches; the authority's world is the truth about what is open.
+ *
+ * On a heat planet the shaft steps sideways round lava (#113): where the next tile down would open
+ * a pocket, the bot bores along the shaft's bottom row to a clear column and carries on down
+ * there. Each such jog is remembered; a row's shaft tile is in the column of the last jog at or
+ * above it. On a planet without lava the shaft is one straight column, as before.
  */
 import { bandOfTile, isCoreTile, isInsidePlanet } from '../world/planetGeometry'
 import { bayRestTileOf, hasBay } from '../world/dockBays'
@@ -13,6 +18,12 @@ import type { PlanetParams } from '../world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
 
 export type GallerySide = 'east' | 'west'
+
+/** The shaft runs on in `column` from `row` down, after a sideways step along `row`. */
+export interface ShaftJog {
+  row: number
+  column: number
+}
 
 /** How far a gallery reaches from the shaft on each side, and whether a side has hit its end. */
 export interface Gallery {
@@ -24,7 +35,10 @@ export interface Gallery {
 
 export interface MineLayout {
   params: PlanetParams
+  /** The shaft's column at the top; `shaftJogs` move it lower down. */
   shaftColumn: number
+  /** The shaft's sideways steps round lava, deepest last (#113). */
+  shaftJogs: ShaftJog[]
   /** The row just above the pad: the bot drives along it between the bays and the shaft. */
   travelRow: number
   /** Where the bot docks to sell (every return) and to buy (#37), one tile in each bay. */
@@ -50,6 +64,7 @@ export function newMineLayout(params: PlanetParams, site: DockSite): MineLayout 
   return {
     params,
     shaftColumn: shaftColumnOf(site),
+    shaftJogs: [],
     travelRow,
     sellBay: bayRestTileOf(site, 'sell'),
     upgradeBay: bayRestTileOf(site, 'upgrade'),
@@ -86,25 +101,58 @@ export function galleryRows(layout: MineLayout): number[] {
 }
 
 export function shaftTileAt(layout: MineLayout, row: number): TilePoint {
-  return { tx: layout.shaftColumn, ty: row }
+  return { tx: shaftColumnAt(layout, row), ty: row }
+}
+
+/** The shaft's column at `row`: the last jog's at or above it, else the top column. */
+export function shaftColumnAt(layout: MineLayout, row: number): number {
+  return layout.shaftJogs.reduce(
+    (column, jog) => (row <= jog.row ? jog.column : column),
+    layout.shaftColumn,
+  )
+}
+
+/** The tiles of the shaft's way from `fromRow` to `toRow`: corners at each jog between, in order. */
+export function shaftWaypoints(layout: MineLayout, fromRow: number, toRow: number): TilePoint[] {
+  const isDown = toRow < fromRow
+  const jogs = layout.shaftJogs.filter(
+    (jog) => jog.row <= Math.max(fromRow, toRow) && jog.row >= Math.min(fromRow, toRow),
+  )
+  const ordered = isDown ? jogs : [...jogs].reverse()
+  const corners = ordered.flatMap((jog) => {
+    const above = shaftColumnAt(layout, jog.row + 1)
+    const pair = [
+      { tx: above, ty: jog.row },
+      { tx: jog.column, ty: jog.row },
+    ]
+    return isDown ? pair : pair.reverse()
+  })
+  return [...corners, shaftTileAt(layout, toRow)]
+}
+
+/** Tiles walked sideways along the jogs at or above `row`, for the way home's energy. */
+export function shaftJogLengthAbove(layout: MineLayout, row: number): number {
+  return layout.shaftJogs
+    .filter((jog) => jog.row >= row)
+    .reduce((length, jog) => length + Math.abs(jog.column - shaftColumnAt(layout, jog.row + 1)), 0)
 }
 
 export function bandOfRow(layout: MineLayout, row: number): number {
-  return bandOfTile(layout.params, layout.shaftColumn, row)
+  return bandOfTile(layout.params, shaftColumnAt(layout, row), row)
 }
 
 /** The tile a gallery side bores next. */
 export function galleryFaceOf(layout: MineLayout, row: number, side: GallerySide): TilePoint {
   const gallery = galleryOf(layout, row)
   const reach = side === 'east' ? gallery.east + 1 : -(gallery.west + 1)
-  return { tx: layout.shaftColumn + reach, ty: row }
+  return { tx: shaftColumnAt(layout, row) + reach, ty: row }
 }
 
 /** The open end of a gallery side, where the vehicle stands to bore its face. */
 export function galleryEndOf(layout: MineLayout, row: number, side: GallerySide): TilePoint {
   const gallery = galleryOf(layout, row)
   const reach = side === 'east' ? gallery.east : -gallery.west
-  return { tx: layout.shaftColumn + reach, ty: row }
+  return { tx: shaftColumnAt(layout, row) + reach, ty: row }
 }
 
 export function isSideDone(layout: MineLayout, row: number, side: GallerySide): boolean {
