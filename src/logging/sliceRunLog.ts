@@ -8,6 +8,7 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
+import type { GunPolicy } from '../systems/bot/botGuns'
 import { playSlice, type SliceRun } from '../systems/bot/playSlice'
 import { startOfScenario, validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioCommands } from '../systems/startScenarioCommands'
@@ -34,6 +35,8 @@ export interface LoggedRunOptions {
   /** Plays on past the slice to this planet's core (a report, #29 note 2). */
   lastPlanet?: number
   maxTicks?: number
+  /** `never` plays without `auto_guns`, the comparison run of #107 acceptance 5. */
+  gunPolicy?: GunPolicy
 }
 
 export function playLoggedSlice(
@@ -53,6 +56,7 @@ export function playLoggedSlice(
   const run = playSlice(start, {
     maxTicks: options.maxTicks ?? BOT_RUN_BUDGET_TICKS,
     lastPlanet: options.lastPlanet,
+    gunPolicy: options.gunPolicy,
     playerId: PLAYER_ID,
     startCommands: startCommandsOf(scenario),
     listener: {

@@ -12,6 +12,7 @@ import { isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
 import type { Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
 import { faceThreats } from './botCombat'
+import { setGunsForEnergy } from './botGuns'
 import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
 import { moveTicks } from './botWorld'
@@ -34,12 +35,14 @@ export interface BotPlanet {
 
 /**
  * Bores the neighbouring tile for `ticks`, reporting facing it every few ticks; between reports the
- * bot turns to meet any enemy closing in (`faceThreats`), so a long core bore is not a free hit.
+ * bot turns to meet any enemy closing in (`faceThreats`), so a long core bore is not a free hit,
+ * and sets its guns for the tank it has (`setGunsForEnergy`).
  */
 export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, ticks: number) {
   const facing = facingTowards(pilot.position, tile)
   for (let left = ticks; left > 0 && isVehicleActive(session.vehicle());) {
     faceThreats(session, pilot)
+    setGunsForEnergy(session)
     const chunk = Math.min(left, BORE_REPORT_TICKS)
     session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
     session.wait(chunk)
@@ -85,6 +88,7 @@ function reportMove(
   isClimb: boolean,
 ): void {
   session.wait(ticks)
+  setGunsForEnergy(session)
   const counts = isClimb ? { ...NO_TICKS, thrustTicks: ticks } : { ...NO_TICKS, driveTicks: ticks }
   session.submit(reportPoseIntent(tile, facing, counts))
 }

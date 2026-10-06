@@ -21,6 +21,7 @@ import { bayRestTileOf } from '../world/dockBays'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
 import { deepestHeldBand, holdsCore } from './botCasing'
+import type { GunPolicy } from './botGuns'
 import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
 import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
@@ -55,6 +56,8 @@ export interface SliceRunOptions {
   lastPlanet?: number
   /** Sent before the first trip, such as a scenario's `debug.*` start commands (#11 section 4). */
   startCommands?: readonly CommandIntent[]
+  /** Mount `auto_guns` when offered (the default, #107 bot policy), or never, to compare. */
+  gunPolicy?: GunPolicy
   listener?: BotListener
 }
 
@@ -69,9 +72,10 @@ export function playSlice(start: AuthorityState, options: SliceRunOptions): Slic
   for (const intent of options.startCommands ?? []) session.submit(intent)
   let planet = botPlanetOf(session)
   const lastPlanet = options.lastPlanet ?? SLICE_LAST_PLANET
+  const gunPolicy = options.gunPolicy ?? 'mount'
   while (!isLastCoreDone(session, lastPlanet) && session.tick() < options.maxTicks) {
     planet = travelWhenReady(session, planet)
-    if (!playDockCycle(session, planet)) break
+    if (!playDockCycle(session, planet, gunPolicy)) break
   }
   return {
     commands: session.commands(),
@@ -104,18 +108,19 @@ function travelWhenReady(session: BotSession, planet: BotPlanet): BotPlanet {
 }
 
 /** One trip and the dock after it; false when no trip can earn anything. */
-function playDockCycle(session: BotSession, planet: BotPlanet): boolean {
+function playDockCycle(session: BotSession, planet: BotPlanet, gunPolicy: GunPolicy): boolean {
   const goal = chooseGoal(session, planet)
   if (goal === null) return false
   runTrip(session, planet, goal)
   serviceAtDock(session)
-  shopAtUpgradeBay(session, planet)
+  shopAtUpgradeBay(session, planet, gunPolicy)
   return true
 }
 
 /** The bot drives over to the Upgrade bay (#37) only when it has something to buy there. */
-function shopAtUpgradeBay(session: BotSession, planet: BotPlanet): void {
-  const situation = { layout: planet.layout, isCoreTheGoal: isCoreTheGoal(session, planet) }
+function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, gunPolicy: GunPolicy): void {
+  const isCoreGoal = isCoreTheGoal(session, planet)
+  const situation = { layout: planet.layout, isCoreTheGoal: isCoreGoal, gunPolicy }
   if (!hasPurchase(session, situation)) return
   driveToUpgradeBay(session, planet)
   buyUpgrades(session, situation)

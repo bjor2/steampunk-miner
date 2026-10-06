@@ -81,7 +81,9 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   `fillCircle(x, y, radius, amount?)` (mm, amount 0 to 255; a carve credits no ore); for casing (#41),
   `setCasingGrade(grade)` and `lineCasing(x, y, grade)` (one ring round a point of the tunnel axis, in mm,
   marking the rock beside air as lining; the vehicle lays the same rings by itself while it drills) and
-  `gnawCasing(x, y)` (that ring breached, as a tunnel wrecker's gnaw leaves it, #111); for collapse (#43),
+  `gnawCasing(x, y)` (that ring breached, as a tunnel wrecker's gnaw leaves it, #111); for the guns (#107),
+  `setGunLevel(level)` (0 to the gun track's cap, no unlock or price; `vehicleParts()` then lists the
+  turret's parts); for collapse (#43),
   `forceCollapse(block)` (a `cx,cy#index` block, warned for the full 60 ticks, then refilled whatever its
   lining) and the unlogged read `collapseState()` (the weak blocks within 16 m of a vehicle and the blocks
   warning or refilling). Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first
@@ -140,6 +142,12 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   core in 30 to 60 minutes and the slice in 90 to 130 (`pacingVerdicts` prints pass or fail for each). Trips per planet
   outside 3 to 12 are printed, never failed. Do not retune the bot or a constant to make it pass: a
   miss is a balance finding for the Systems & Economy Designer (the lever is `paceScale`).
+- **Guns** (#107 acceptance 5): `npm run balance:guns` plays the bot to planet 7's core with
+  `auto_guns` (mounted on planet 4) and without, and prints planets 4 to 7 side by side with each
+  planet's gun energy and kills from the dive summaries (`deriveDiveSummaries`). Reported, never gated;
+  a planet that moves by more than 10% is a balance finding whose one lever is
+  `gun.damageFractionOfDrill`. Gun combat specs fight in the band-1 corridor with `debug.setGunLevel`
+  and the planet 4 on-curve levels (`combat/gunFire.test.ts`).
 - **Comparison** (`compareRuns`): `npm run balance:report` writes `balance-report/` and compares the
   run with `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
   deliberate economy change, `npm run balance:baseline` rewrites the baseline in the same commit.

@@ -1,7 +1,8 @@
 /**
  * What the pacing bot does at the dock (#29 Systems & Economy note 3): sell, repair and recharge
  * at the Sell bay, then buy at the Upgrade bay (#37), always keeping the next service paid for. A
- * casing grade the next trip needs comes first (`botCasing.ts`, S11); then `drill_tip` and `hull`
+ * casing grade the next trip needs comes first (`botCasing.ts`, S11); then the guns' mount once
+ * they are offered (#107, `botGuns.ts`); then `drill_tip` and `hull`
  * go to their on-curve level for the planet (#6 section 3);
  * a `drill_power` level is forced while the core is the goal and the drill digs it slower than 0.4
  * tiles a second (`FORCED_DRILL_TICKS_PER_TILE`); otherwise the bot buys the upgrade with the best gain in planned money per tick
@@ -19,6 +20,7 @@ import { add, cmp, fromSafeInteger, type Money } from '../money'
 import { rechargePrice, repairPrice, travelFee } from '../economy/planetCharges'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { isCasingGradeShort } from './botCasing'
+import { gunMountPriceFor, type GunPolicy } from './botGuns'
 import type { BotSession } from './botSession'
 import type { MineLayout } from './mineLayout'
 import { approximately, bestOrePlan, fullTankMeans, isCoreDugWithin } from './tripEstimate'
@@ -32,15 +34,18 @@ const FORCED_DRILL_TICKS_PER_TILE = (5 * TICKS_PER_SECOND) / 2
 const ON_CURVE_FIRST: readonly UpgradeId[] = ['drill_tip', 'hull']
 const MARGINAL_TRACKS: readonly UpgradeId[] = ['drill_power', 'engine', 'boiler', 'cargo_hold']
 
-/** One buy at the Upgrade bay: a level of a vehicle track, or the next casing grade. */
-type Purchase = CommandIntent<'buyUpgrade'> | CommandIntent<'buyCasingGrade'>
+/** One buy at the Upgrade bay: a level of a vehicle track, the next casing grade or the guns. */
+type Purchase =
+  CommandIntent<'buyUpgrade'> | CommandIntent<'buyCasingGrade'> | CommandIntent<'buyGun'>
 
 const BUY_CASING_GRADE: Purchase = { type: 'buyCasingGrade', payload: {} }
+const BUY_GUN: Purchase = { type: 'buyGun', payload: {} }
 
 export interface ShoppingSituation {
   layout: MineLayout
   /** The core is what the bot is after: still short of fragments and the shaft is at band 5. */
   isCoreTheGoal: boolean
+  gunPolicy: GunPolicy
 }
 
 export function serviceAtDock(session: BotSession): void {
@@ -74,6 +79,7 @@ export function buyUpgrades(session: BotSession, situation: ShoppingSituation): 
 
 function nextPurchase(session: BotSession, situation: ShoppingSituation): Purchase | null {
   if (isCasingDue(session, situation)) return BUY_CASING_GRADE
+  if (isGunMountDue(session, situation.gunPolicy)) return BUY_GUN
   const track = nextTrackPurchase(session, situation)
   return track === null ? null : { type: 'buyUpgrade', payload: { upgradeId: track } }
 }
@@ -100,6 +106,11 @@ function isCasingDue(session: BotSession, situation: ShoppingSituation): boolean
 /** The band a full tank with these levels would mine best, whatever the casing grade holds. */
 function plannedBand(layout: MineLayout, levels: UpgradeLevels): number {
   return bestOrePlan(layout, fullTankMeans(levels))?.band ?? 1
+}
+
+function isGunMountDue(session: BotSession, policy: GunPolicy): boolean {
+  const price = gunMountPriceFor(session, policy)
+  return price !== null && canPay(session, price)
 }
 
 function belowCurveAffordable(session: BotSession): UpgradeId | null {
