@@ -28,6 +28,7 @@ import {
 } from '../systems/render/particles'
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import { createSeededRandom, type SeededRandom } from '../systems/seededRandom'
+import { useDisposeOnRelease } from './disposeOnRelease'
 import { drillPresence } from './drillPresence'
 import { vehiclePresence } from './vehiclePresence'
 
@@ -49,6 +50,8 @@ export function CementSpray() {
   const queue = useMemo<PuffQueue>(() => ({ owed: 0 }), [])
   const geometry = useMemo(createCementGeometry, [])
   const material = useMemo(createCementMaterial, [])
+  useDisposeOnRelease(geometry)
+  useDisposeOnRelease(material)
   useEffect(() => listenForFeedback((cue) => owePuffOn(queue, cue)), [queue])
 
   useFrame((_, delta) => {

@@ -33,6 +33,7 @@ import {
   type Spray,
 } from '../systems/render/particles'
 import { createSeededRandom, type SeededRandom } from '../systems/seededRandom'
+import { useDisposeOnRelease } from './disposeOnRelease'
 import { drillPresence } from './drillPresence'
 
 /** Sparks draw just in front of the tiles and the vehicle. */
@@ -48,6 +49,8 @@ export function Sparks() {
   const spray = useMemo(createSprayScratch, [])
   const geometry = useMemo(createSparkGeometry, [])
   const material = useMemo(createSparkMaterial, [])
+  useDisposeOnRelease(geometry)
+  useDisposeOnRelease(material)
 
   const voice = useMemo<VoiceRead>(() => ({ voice: 'rock', sinceRead: VOICE_REFRESH_SECONDS }), [])
 

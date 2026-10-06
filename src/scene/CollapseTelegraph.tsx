@@ -46,6 +46,7 @@ import {
   type Spray,
 } from '../systems/render/particles'
 import { createSeededRandom, type SeededRandom } from '../systems/seededRandom'
+import { useDisposeOnRelease } from './disposeOnRelease'
 
 /** Cracks lie on the ground's face; dust falls in front of it, behind the sparks. */
 const CRACK_Z = 0.27
@@ -65,6 +66,10 @@ export function CollapseTelegraph() {
   const telegraph = useMemo(createTelegraph, [])
   const cracks = useMemo(createCrackLines, [])
   const dust = useMemo(createDustPoints, [])
+  useDisposeOnRelease(cracks.geometry)
+  useDisposeOnRelease(cracks.material)
+  useDisposeOnRelease(dust.geometry)
+  useDisposeOnRelease(dust.material)
 
   useFrame((_, delta) => {
     const { collapse, tick } = readCollapse()
@@ -102,7 +107,7 @@ function createTelegraph(): Telegraph {
   }
 }
 
-function createCrackLines(): LineSegments {
+function createCrackLines(): LineSegments<BufferGeometry, LineBasicMaterial> {
   const geometry = new BufferGeometry()
   const vertices = COLLAPSE_TELEGRAPH_BLOCKS * CRACKS_PER_BLOCK * 2
   geometry.setAttribute('position', new BufferAttribute(new Float32Array(vertices * 3), 3))

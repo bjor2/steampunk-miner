@@ -30,6 +30,7 @@ import type { Rgb } from '../systems/render/colour'
 import { enemyLookOf } from '../systems/render/enemyPlaceholder'
 import { createAtlasQuad } from './atlasQuadGeometry'
 import { useAtlasTextureSet } from './atlasTextures'
+import { useDisposeEachOnRelease, useDisposeOnRelease } from './disposeOnRelease'
 import { EnemyPlaceholders } from './EnemyPlaceholders'
 import { SHIPPED_ART } from './shippedArt'
 import {
@@ -77,6 +78,8 @@ function EnemyAtlasBodies() {
   const skins = useMemo(() => skinsOf(textures), [textures])
   const slots = useRef(createEnemySlots())
   const haloGeometry = useMemo(createHaloGeometry, [])
+  useDisposeEachOnRelease(useMemo(() => skinGeometriesOf(skins), [skins]))
+  useDisposeOnRelease(haloGeometry)
   const draw = useMemo(() => drawEnemyWith(skins), [skins])
   const first = skins[ENEMY_KINDS[0]]
   useFrame(() => fillEnemySlots(slots.current, readEnemies(), draw))
@@ -128,6 +131,11 @@ function skinOf(art: EnemyArt, textures: readonly Texture[], at: number): EnemyS
     emissive,
     glow: art.maps?.emissive === null ? 0 : 1,
   }
+}
+
+/** Each kind's quad is cut for this pool; the maps belong to the loader's cache. */
+function skinGeometriesOf(skins: EnemySkins): PlaneGeometry[] {
+  return Object.values(skins).map((skin) => skin.geometry)
 }
 
 function drawEnemyWith(skins: EnemySkins): DrawEnemy {

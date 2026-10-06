@@ -36,6 +36,7 @@ import {
 } from '../systems/render/refineryBayLook'
 import { createSeededRandom, type SeededRandom } from '../systems/seededRandom'
 import type { DockSite } from '../systems/world/dockSite'
+import { useDisposeOnRelease } from './disposeOnRelease'
 import { PartQuadMesh } from './PartQuadMesh'
 import { SHIPPED_ART } from './shippedArt'
 
@@ -63,6 +64,8 @@ function StackSmoke({ isRising }: { isRising: boolean }) {
   const carry = useMemo<EmissionCarry>(() => ({ owed: 0 }), [])
   const geometry = useMemo(createSmokeGeometry, [])
   const material = useMemo(createSmokeMaterial, [])
+  useDisposeOnRelease(geometry)
+  useDisposeOnRelease(material)
 
   useFrame((_, delta) => {
     stepParticles(pool, delta)

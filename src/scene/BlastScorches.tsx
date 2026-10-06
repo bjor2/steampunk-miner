@@ -19,6 +19,7 @@ import { blastRadiusMm } from '../systems/economy/blastingCharges'
 import { rgbOfHex } from '../systems/render/colour'
 import type { ChargePlacement } from '../systems/render/chargeLook'
 import { SCORCH_FRAGMENT_SHADER, SCORCH_VERTEX_SHADER } from './blastScorchShader'
+import { useDisposeEachOnRelease } from './disposeOnRelease'
 
 /** On the ground's face, under the planted charges (0.26). */
 const SCORCH_Z = 0.2
@@ -27,6 +28,8 @@ const HALF_SIZE_M = RADIUS_M + SCORCH_OUTER_FADE_M
 
 export function BlastScorches() {
   const meshes = useMemo(createScorchMeshes, [])
+  // R3F never disposes a <primitive>.
+  useDisposeEachOnRelease(useMemo(() => gpuResourcesOf(meshes), [meshes]))
   useFrame(() => placeScorches(meshes, readBlastScorches()))
   return (
     <>
@@ -37,13 +40,18 @@ export function BlastScorches() {
   )
 }
 
-function createScorchMeshes(): Mesh[] {
+function createScorchMeshes(): Mesh<PlaneGeometry, ShaderMaterial>[] {
   const geometry = new PlaneGeometry(HALF_SIZE_M * 2, HALF_SIZE_M * 2)
   return Array.from({ length: SCORCH_SLOTS }, (_, at) => {
     const mesh = new Mesh(geometry, createScorchMaterial(at))
     mesh.visible = false
     return mesh
   })
+}
+
+/** The slots share one quad; each has its own material. */
+function gpuResourcesOf(meshes: readonly Mesh<PlaneGeometry, ShaderMaterial>[]) {
+  return [meshes[0].geometry, ...meshes.map((mesh) => mesh.material)]
 }
 
 function createScorchMaterial(seed: number): ShaderMaterial {

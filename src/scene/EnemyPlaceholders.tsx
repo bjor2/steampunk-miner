@@ -17,6 +17,7 @@ import { MM_PER_METRE } from '../constants/physics'
 import { readEnemies } from '../store/gameStore'
 import type { Enemy } from '../systems/authority/combat/combatState'
 import { enemyLookOf, type EnemySilhouette } from '../systems/render/enemyPlaceholder'
+import { useDisposeEachOnRelease, useDisposeOnRelease } from './disposeOnRelease'
 import {
   createEnemySlots,
   createHaloGeometry,
@@ -32,8 +33,11 @@ export function EnemyPlaceholders() {
   const slots = useRef(createEnemySlots())
   const silhouettes = useMemo(createSilhouettes, [])
   const haloGeometry = useMemo(createHaloGeometry, [])
+  useDisposeEachOnRelease(useMemo(() => Object.values(silhouettes), [silhouettes]))
+  useDisposeOnRelease(haloGeometry)
   const draw = useMemo(() => drawEnemyWith(silhouettes), [silhouettes])
   useFrame(() => fillEnemySlots(slots.current, readEnemies(), draw))
+  // Bodies start on a pool silhouette, so every geometry they hold is one this pool frees.
   return (
     <>
       {slots.current.map((slot, at) => (
@@ -41,7 +45,7 @@ export function EnemyPlaceholders() {
           <mesh ref={(mesh) => (slot.halo = mesh)} geometry={haloGeometry} visible={false}>
             <meshBasicMaterial transparent blending={AdditiveBlending} depthWrite={false} />
           </mesh>
-          <mesh ref={(mesh) => (slot.body = mesh)} visible={false}>
+          <mesh ref={(mesh) => (slot.body = mesh)} geometry={silhouettes.square} visible={false}>
             <meshBasicMaterial />
           </mesh>
         </group>

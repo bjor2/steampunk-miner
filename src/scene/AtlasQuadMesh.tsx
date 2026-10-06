@@ -15,6 +15,7 @@ import type { AssetQuad, AtlasMaps, AtlasUv } from '../systems/art/assetLook'
 import { createPartPose, writePartPose, type PartPose } from '../systems/render/partMotion'
 import { createAtlasQuad } from './atlasQuadGeometry'
 import { useAtlasAlbedo, useAtlasEmissive, useAtlasNormal } from './atlasTextures'
+import { useDisposeOnRelease } from './disposeOnRelease'
 import { partMotion } from './partMotionPresence'
 
 /** Small enough that ten draw-order steps stay inside the gap to the next layer of the scene. */
@@ -72,6 +73,7 @@ function AtlasQuadMeshLit({
   const albedo = useAtlasAlbedo(maps)
   const normal = useAtlasNormal(maps)
   const geometry = useMemo(() => createAtlasQuad(quad), [quad])
+  useDisposeOnRelease(geometry)
   const group = useRef<Group>(null)
   const material = useRef<MeshStandardMaterial>(null)
   const pose = useMemo(createPartPose, [])
