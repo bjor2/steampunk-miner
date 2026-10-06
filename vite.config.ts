@@ -39,7 +39,7 @@ export default defineConfig({
   test: {
     // vitest owns the fast headless tests (node, no DOM, no canvas; only physics-layer specs build a
     // Rapier world, see docs/TESTING_INSTRUCTIONS.md).
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'scripts/**/*.test.mjs'],
     setupFiles: ['src/testSetup.ts'],
     exclude: ['**/node_modules/**', 'dist/**', 'dist-electron/**', '.claude/**'],
   },

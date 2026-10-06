@@ -123,7 +123,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['electron/**/*.cts', '*.config.{js,ts}'],
+    files: ['electron/**/*.cts', '*.config.{js,ts}', 'scripts/**/*.mjs'],
     languageOptions: { globals: globals.node },
   },
   {
