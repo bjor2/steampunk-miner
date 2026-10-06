@@ -1,5 +1,5 @@
 /**
- * The session report's charts (#125): heap against progress and frame p95 against time, for the
+ * The session report's charts (#125): heap and frame p95 against time, for the
  * newest sessions that logged them; the tables keep every session.
  */
 import { FRAME_BUDGET_MS } from '../../constants/scene'
@@ -21,18 +21,17 @@ export function chartedSessions(
     .slice(-MAX_CHARTED_SESSIONS)
 }
 
-/** Heap against minerals collected, or against time while none were. */
+/**
+ * Heap over seconds of frames: minerals come in steps (none for minutes, then several), so a chart
+ * against them folds back on itself; the table holds the slopes against every progress marker.
+ */
 export function heapChartOf(session: SessionLog): string {
   const samples = eventsNamed(session, 'memory_sample').map((line) => line.data)
-  const hasMinerals = samples.some((sample) => sample.mineralsCollected > 0)
   return drawLineChart({
     title: `Heap, ${session.runId} (${session.commit})`,
-    xLabel: hasMinerals ? 'minerals collected' : 's of frames',
+    xLabel: 's of frames',
     yLabel: 'MB',
-    points: samples.map((sample) => ({
-      x: hasMinerals ? sample.mineralsCollected : sample.elapsedS,
-      y: sample.jsHeapUsedKB / KIB_PER_MIB,
-    })),
+    points: samples.map((sample) => ({ x: sample.elapsedS, y: sample.jsHeapUsedKB / KIB_PER_MIB })),
   })
 }
 

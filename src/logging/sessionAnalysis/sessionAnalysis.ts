@@ -75,14 +75,14 @@ function countsOf(values: readonly string[]): Map<string, number> {
 }
 
 function heapLine(trends: readonly HeapTrend[]): string {
-  const steepest = [...trends]
+  const highest = [...trends]
     .filter((trend) => trend.mbPer10Minutes !== null)
     .sort((a, b) => (b.mbPer10Minutes ?? 0) - (a.mbPer10Minutes ?? 0))[0]
-  if (steepest === undefined) return 'Heap: no session with memory samples after warm-up'
+  if (highest === undefined) return 'Heap: no session with memory samples after warm-up'
   return (
-    `Heap: steepest ${signedText(steepest.mbPer10Minutes, 1)} MB per 10 min, ` +
-    `${signedText(steepest.mbPer100Minerals, 1)} MB per 100 minerals ` +
-    `(${steepest.runId} at ${steepest.commit}, ${steepest.samples} samples)`
+    `Heap: highest slope ${signedText(highest.mbPer10Minutes, 1)} MB per 10 min, ` +
+    `${signedText(highest.mbPer100Minerals, 1)} MB per 100 minerals ` +
+    `(${highest.runId} at ${highest.commit}, ${highest.samples} samples)`
   )
 }
 

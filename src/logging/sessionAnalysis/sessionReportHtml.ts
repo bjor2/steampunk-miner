@@ -82,7 +82,7 @@ function heapSection({ heapTrends, sessions }: SessionAnalysis): string {
   return sectionHtml(
     'heap',
     'Heap against progress',
-    `Live JS heap from memory_sample (every 10 s; no GC forced), after the first ${WARM_UP_SAMPLES} samples of warm-up. Slopes are least-squares fits.`,
+    `Live JS heap from memory_sample (every 10 s; no GC is forced, so it is a sawtooth and one collection moves a short session's slope a lot), after the first ${WARM_UP_SAMPLES} samples of warm-up. Slopes are least-squares fits; the soak's after-GC heap gates leaks.`,
     tableHtml({
       headers: [...headers, 'MB / 100 minerals', 'MB / 10 min', 'MB / 100 chunks'],
       rows,
