@@ -1,4 +1,6 @@
+import { readdirSync } from 'node:fs'
 import js from '@eslint/js'
+import { createNodeResolver, importX } from 'eslint-plugin-import-x'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import tseslint from 'typescript-eslint'
@@ -91,6 +93,50 @@ const DECIMAL_ONLY_IN_MONEY = {
   message: 'Only src/systems/money.ts constructs a Decimal (#5); use the Money functions.',
 }
 
+// Feature slices (docs/standards/feature-slices.md): every folder under src/features is a slice,
+// read at lint time, so adding a slice never edits this file.
+const SLICES = readdirSync('src/features', { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .sort()
+const KERNEL_DIRS = readdirSync('src', { withFileTypes: true })
+  .filter((entry) => entry.isDirectory() && entry.name !== 'features')
+  .map((entry) => `./src/${entry.name}`)
+const COMPOSITION_ROOTS = ['./src/bootstrap.ts', './src/testSetup.ts', './scripts']
+const SLICE_ZONES = SLICES.map((slice) => ({
+  target: `./src/features/!(${slice})/**/*`,
+  from: `./src/features/${slice}`,
+  except: ['./index.ts'],
+  message: `Another slice imports slice "${slice}" only through src/features/${slice}/index.ts.`,
+}))
+const KERNEL_ZONES = [
+  {
+    target: './src/features/*/**/*',
+    from: './src/features/index.ts',
+    message: 'A slice never imports the loader; it is called by the composition roots only.',
+  },
+  {
+    target: [...KERNEL_DIRS, './src/App.tsx', './src/main.tsx'],
+    from: './src/features',
+    message: 'The kernel never imports a slice: slices register through the kernel registries.',
+  },
+  {
+    target: COMPOSITION_ROOTS,
+    from: './src/features',
+    except: ['./index.ts'],
+    message: 'Composition roots load slices only through src/features/index.ts.',
+  },
+]
+const ART_DIRECTION_JSON = {
+  group: ['**/artDirection.json'],
+  message: 'Only src/systems/render/artDirection.ts reads artDirection.json.',
+}
+const ART_DIRECTION_LOADER = {
+  group: ['**/systems/render/artDirection'],
+  message:
+    'Ore family, tier and grade come from the ores index; only ore-visuals reads the art direction.',
+}
+
 export default tseslint.config(
   {
     ignores: [
@@ -147,8 +193,8 @@ export default tseslint.config(
   },
   {
     // Pure rules: no framework, no clock, no Vite-only code.
-    files: ['src/systems/**/*.ts'],
-    ignores: ['src/systems/**/*.test.ts'],
+    files: ['src/systems/**/*.ts', 'src/features/*/systems/**/*.ts'],
+    ignores: ['src/systems/**/*.test.ts', 'src/features/**/*.test.ts'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -171,8 +217,14 @@ export default tseslint.config(
       'src/systems/economy/**/*.ts',
       'src/systems/vehicle/**/*.ts',
       'src/systems/money.ts',
+      // A slice's pure rules take the authority set; its look maths in systems/render does not.
+      'src/features/*/systems/**/*.ts',
     ],
-    ignores: ['src/systems/**/*.test.ts'],
+    ignores: [
+      'src/systems/**/*.test.ts',
+      'src/features/**/*.test.ts',
+      'src/features/*/systems/render/**',
+    ],
     rules: {
       'no-restricted-properties': ['error', ...CLOCK_AND_RANDOM, ...APPROXIMATED_MATH],
       'no-restricted-syntax': ['error', NO_IMPORT_META, ...INEXACT_SYNTAX],
@@ -195,12 +247,42 @@ export default tseslint.config(
       'src/ui/**/*.{ts,tsx}',
       'src/store/**/*.ts',
       'src/logging/**/*.ts',
+      'src/features/*/{scene,ui,store}/**/*.{ts,tsx}',
     ],
     rules: {
       'no-restricted-globals': [
         'error',
         { name: 'localStorage', message: 'Persistence goes through src/shell.' },
         { name: 'indexedDB', message: 'Persistence goes through src/shell.' },
+      ],
+    },
+  },
+  {
+    // Slice boundaries: one public index per slice, and the kernel never imports a slice.
+    files: ['src/**/*.{ts,tsx}', 'scripts/**/*.ts'],
+    plugins: { 'import-x': importX },
+    settings: {
+      'import-x/resolver-next': [createNodeResolver({ extensions: ['.ts', '.tsx', '.json'] })],
+    },
+    rules: {
+      'import-x/no-restricted-paths': ['error', { zones: [...SLICE_ZONES, ...KERNEL_ZONES] }],
+    },
+  },
+  {
+    // A second rule name, so these bans never replace the layer bans of no-restricted-imports.
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/systems/render/artDirection.ts', 'src/systems/render/*.test.ts'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': ['error', { patterns: [ART_DIRECTION_JSON] }],
+    },
+  },
+  {
+    files: ['src/features/**/*.{ts,tsx}'],
+    ignores: ['src/features/ore-visuals/**'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        { patterns: [ART_DIRECTION_JSON, ART_DIRECTION_LOADER] },
       ],
     },
   },
