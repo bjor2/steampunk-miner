@@ -433,7 +433,7 @@
       "planetIndex": 22,
       "lane": "Upgrade",
       "progressionAxis": "horizontal",
-      "status": "planned",
+      "status": "vision",
       "bind": "planet_gate",
       "name": "Remote detonator",
       "slice": "campaign",

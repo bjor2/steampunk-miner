@@ -18,7 +18,7 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = '540f8d94df1068dc3afd64d0daed65ae76a6c7f6dfe621b2175f97eb9bd2e411'
+const LOCKED_FILE_SHA256 = 'a2e145aba9a40b374604b98e0e7eac97ab2edbd9ad8fda5e6aa8f806ca6dcfff'
 
 /**
  * The canonical form of `source_hash_method` (docs/scaling/horizontal/source_hash.mjs, #153):
@@ -174,7 +174,7 @@ describe('locked unlock schedule', () => {
   it('unlocks no vision row whose module is not built, even when every bind is met', () => {
     const visionRows = LOCKED_SCHEDULE.rows.filter((row) => row.status === 'vision')
     const progress = progressWithEveryBindMet(visionRows)
-    expect(visionRows).toHaveLength(34)
+    expect(visionRows).toHaveLength(35)
     expect(visionRows.filter((row) => isUnlocked(row, progress))).toEqual([])
   })
 
