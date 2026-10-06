@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "ticket": 109,
+  "title": "Spec: Blasting charges (blasting_charges) — design, numbers, art",
+  "tier": null,
+  "model": "claude-opus-5-5",
+  "created": "2026-10-05T23:05:12Z",
+  "closed": "2026-10-06T00:58:27Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-05T23:05:12.000Z","end":"2026-10-05T23:15:39.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-05T23:15:39.000Z","end":"2026-10-05T23:15:49.712Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-05T23:15:49.712Z","end":"2026-10-05T23:16:15.681Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-05T23:16:15.681Z","end":"2026-10-05T23:16:46.469Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-05T23:16:46.469Z","end":"2026-10-05T23:16:49.364Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-05T23:16:49.364Z","end":"2026-10-05T23:16:54.578Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-05T23:16:54.578Z","end":"2026-10-05T23:17:31.214Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"idle","start":"2026-10-05T23:17:31.214Z","end":"2026-10-06T00:58:27.000Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"derived"}
+  ],
+  "totals": {"blocked":0,"planner_wait":0,"idle":6683,"context":66,"planning":0,"developing":31,"testing":0,"gates":0,"landing":5,"other":11},
+  "lead_time_s": 6795,
+  "cycle_time_s": 6168,
+  "backfilled": true
+}

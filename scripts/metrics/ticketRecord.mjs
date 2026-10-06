@@ -11,7 +11,8 @@ import { TICKET_PHASES_SCHEMA, zeroTotals } from './phaseCategories.mjs'
 const RANKS = { transcript: 0, session: 1, gates: 2, landing: 3, planner_wait: 4, blocked: 5 }
 // The driver logs the tier a few seconds after the session log is created, in whole minutes.
 const TIER_LINE_SLACK_MS = 5 * 60_000
-const MATCH_SLACK_MS = 60_000
+const MINUTE_MS = 60_000
+const MATCH_SLACK_MS = MINUTE_MS
 const TIER_LABEL_PREFIX = 'tier:'
 
 function windowOf(category, start, end, source, rank) {
@@ -66,24 +67,55 @@ function attemptOfLonelySession(session) {
   return { start: session.start, end: session.end, gatesEnd: null, session }
 }
 
-function numberAttempt(attempt, number, driverEvents) {
+/** One attempt per session log, plus one per transcript no log claims, by start time. */
+function orderedAttempts(logs, sessions) {
+  const fromLogs = logs.map((log) => attemptOfLog(log, sessions))
+  const claimed = new Set(fromLogs.map((attempt) => attempt.session).filter(Boolean))
+  const lonely = sessions.filter((s) => !claimed.has(s)).map(attemptOfLonelySession)
+  return [...fromLogs, ...lonely].sort((a, b) => a.start - b.start)
+}
+
+function firstEventBetween(driverEvents, kind, from, to) {
+  return driverEvents.find((e) => e.kind === kind && e.at >= from && e.at < to) ?? null
+}
+
+// The transcript's last line, else the driver's exit line. The log file's mtime is the last
+// resort: moving the box on 2026-10-06 touched every log file at once.
+function sessionEndOf(attempt, driverEvents, nextStart) {
+  if (attempt.session) return attempt.session.end
+  const exit = firstEventBetween(driverEvents, 'session-exit', attempt.start - MINUTE_MS, nextStart)
+  return exit?.at ?? attempt.end
+}
+
+// The gate files' mtime, never past the minute of the driver's verdict; the verdict alone when
+// the files are gone.
+function gatesEndOf(attempt, sessionEnd, driverEvents, nextStart) {
+  const verdict = firstEventBetween(driverEvents, 'gates-end', sessionEnd - MINUTE_MS, nextStart)
+  if (attempt.gatesEnd === null || attempt.gatesEnd === undefined) return verdict?.at ?? null
+  return verdict ? Math.min(attempt.gatesEnd, verdict.at + MINUTE_MS) : attempt.gatesEnd
+}
+
+function settleAttempt(attempt, number, driverEvents, nextStart) {
   const tier = tierAt(driverEvents, attempt.start)
+  const end = sessionEndOf(attempt, driverEvents, nextStart)
   return {
-    ...attempt,
+    start: attempt.start,
+    end,
+    gatesEnd: gatesEndOf(attempt, end, driverEvents, nextStart),
+    session: attempt.session,
     number,
     tier: tier?.tier ?? null,
     model: attempt.session?.model ?? tier?.model ?? null,
   }
 }
 
-/** One attempt per session log, plus one per transcript no log claims; numbered from 1. */
+/** The attempts numbered from 1, each with its session end, gates end, tier and model. */
 function attemptsOf(logs, sessions, driverEvents) {
-  const fromLogs = logs.map((log) => attemptOfLog(log, sessions))
-  const claimed = new Set(fromLogs.map((attempt) => attempt.session).filter(Boolean))
-  const lonely = sessions.filter((s) => !claimed.has(s)).map(attemptOfLonelySession)
-  return [...fromLogs, ...lonely]
-    .sort((a, b) => a.start - b.start)
-    .map((attempt, index) => numberAttempt(attempt, index + 1, driverEvents))
+  const ordered = orderedAttempts(logs, sessions)
+  return ordered.map((attempt, index) => {
+    const nextStart = ordered[index + 1]?.start ?? Infinity
+    return settleAttempt(attempt, index + 1, driverEvents, nextStart)
+  })
 }
 
 function sessionWindowsOf(attempt) {
@@ -94,32 +126,33 @@ function sessionWindowsOf(attempt) {
   return [...transcript, span]
 }
 
-function gatesEndOf(attempt, driverEvents, nextStart) {
-  if (attempt.gatesEnd !== null && attempt.gatesEnd !== undefined) return attempt.gatesEnd
-  const verdict = driverEvents.find(
-    (e) => e.kind === 'gates-end' && e.at > attempt.end && e.at < nextStart,
-  )
-  return verdict?.at ?? null
+function gatesWindowsOf(attempts) {
+  return attempts
+    .filter((attempt) => attempt.gatesEnd !== null && attempt.gatesEnd > attempt.end)
+    .map((attempt) => windowOf('gates', attempt.end, attempt.gatesEnd, 'loop-log', RANKS.gates))
 }
 
-function gatesWindowsOf(attempts, driverEvents) {
-  return attempts.flatMap((attempt, index) => {
-    const nextStart = attempts[index + 1]?.start ?? Infinity
-    const end = gatesEndOf(attempt, driverEvents, nextStart)
-    return end !== null && end > attempt.end
-      ? [windowOf('gates', attempt.end, end, 'loop-log', RANKS.gates)]
-      : []
-  })
+// A landing runs until the close. A failed rebase or push ends it only when another attempt
+// follows (the ticket went back to work; the wait for that slot is idle); with no attempt after
+// it, the time until the close is conflict resolution and a hand-land, so still landing.
+function landingEndOf(start, driverEvents, attempts) {
+  const stop = driverEvents.find((e) => e.kind === 'landing-stop' && e.at >= start.at)
+  const isSentBack = stop && attempts.some((attempt) => attempt.start >= stop.at)
+  return isSentBack ? stop.at : Infinity
 }
 
-// A landing runs from its start to the next failed rebase or push, else until the close.
-function landingWindowsOf(driverEvents) {
+function landingWindowsOf(driverEvents, attempts) {
   return driverEvents
     .filter((e) => e.kind === 'landing-start')
-    .map((start) => {
-      const stop = driverEvents.find((e) => e.kind === 'landing-stop' && e.at >= start.at)
-      return windowOf('landing', start.at, stop?.at ?? Infinity, 'loop-log', RANKS.landing)
-    })
+    .map((start) =>
+      windowOf(
+        'landing',
+        start.at,
+        landingEndOf(start, driverEvents, attempts),
+        'loop-log',
+        RANKS.landing,
+      ),
+    )
 }
 
 function rankedGithubWindows(githubWindows) {
@@ -165,8 +198,8 @@ function cycleTimeOf(attempts, created, closed) {
 function windowsOf({ attempts, driverEvents, githubWindows }) {
   return [
     ...attempts.flatMap(sessionWindowsOf),
-    ...gatesWindowsOf(attempts, driverEvents),
-    ...landingWindowsOf(driverEvents),
+    ...gatesWindowsOf(attempts),
+    ...landingWindowsOf(driverEvents, attempts),
     ...rankedGithubWindows(githubWindows),
   ]
 }

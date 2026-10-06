@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "ticket": 91,
+  "title": "Build C4: Per-planet pacing_targets_min entry (45–60 min)",
+  "tier": null,
+  "model": "claude-opus-5-5",
+  "created": "2026-10-05T21:37:26Z",
+  "closed": "2026-10-05T22:53:37Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-05T21:37:26.000Z","end":"2026-10-05T22:40:41.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-05T22:40:41.000Z","end":"2026-10-05T22:40:54.104Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-05T22:40:54.104Z","end":"2026-10-05T22:41:38.385Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-05T22:41:38.385Z","end":"2026-10-05T22:41:43.388Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-05T22:41:43.388Z","end":"2026-10-05T22:41:44.033Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-05T22:41:44.033Z","end":"2026-10-05T22:48:49.552Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-05T22:48:49.552Z","end":"2026-10-05T22:48:54.724Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-05T22:48:54.724Z","end":"2026-10-05T22:49:07.754Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-05T22:49:07.754Z","end":"2026-10-05T22:49:15.353Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-05T22:49:15.353Z","end":"2026-10-05T22:53:37.000Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":0,"planner_wait":0,"idle":3795,"context":45,"planning":8,"developing":10,"testing":426,"gates":262,"landing":13,"other":13},
+  "lead_time_s": 4571,
+  "cycle_time_s": 776,
+  "backfilled": true
+}

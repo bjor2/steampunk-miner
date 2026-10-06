@@ -34,7 +34,7 @@ describe('ticket phases: loop driver log', () => {
     expect(parseLoopStamp('2026-10-06 13:47 XYZ')).toBeNull()
   })
 
-  it('reads the tier, the end of the gates and the landing of a build loop ticket', () => {
+  it('reads the tier, the session exit, the end of the gates and the landing of a build loop ticket', () => {
     const events = parseDriverLog(BUILD_LOOP)
     expect(events.filter((event) => event.ticket === 133)).toEqual([
       {
@@ -44,6 +44,7 @@ describe('ticket phases: loop driver log', () => {
         tier: 'hard',
         model: 'opus',
       },
+      { ticket: 133, at: Date.parse('2026-10-06T12:56:00Z'), kind: 'session-exit' },
       { ticket: 133, at: Date.parse('2026-10-06T13:10:00Z'), kind: 'gates-end' },
       { ticket: 133, at: Date.parse('2026-10-06T13:10:00Z'), kind: 'landing-start' },
       { ticket: 133, at: Date.parse('2026-10-06T13:10:00Z'), kind: 'landing-start' },
@@ -70,6 +71,7 @@ describe('ticket phases: loop driver log', () => {
         tier: 'easy',
         model: 'opus',
       },
+      { ticket: 118, at: Date.parse('2026-10-06T07:21:00Z'), kind: 'session-exit' },
       { ticket: 118, at: Date.parse('2026-10-06T07:29:00Z'), kind: 'gates-end' },
       { ticket: 118, at: Date.parse('2026-10-06T07:29:00Z'), kind: 'landing-start' },
       { ticket: 118, at: Date.parse('2026-10-06T07:29:00Z'), kind: 'landing-start' },

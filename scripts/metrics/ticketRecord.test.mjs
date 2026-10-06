@@ -173,11 +173,45 @@ describe('ticket phases: ticket record', () => {
     expect(spans(record).filter(([category]) => category === 'gates')).toEqual([['gates', 90, 95]])
   })
 
-  it('stops a landing at a failed push and starts again at the recovery', () => {
+  it('ends a session at its transcript, not at a log file touched later', () => {
+    const touched = at(400)
+    const record = buildTicketRecord(
+      ticketSeven({
+        issue: { ...ticketSeven().issue, closedAt: iso(500) },
+        attempts: [{ start: at(60), end: touched, gatesEnd: touched, sessionId: 'b' }],
+        driverEvents: [{ ticket: 7, at: at(95), kind: 'gates-end' }],
+        githubWindows: [],
+      }),
+    )
+    expect(spans(record).slice(-4)).toEqual([
+      ['developing', 60.5, 80],
+      ['testing', 80, 90],
+      ['gates', 90, 96],
+      ['idle', 96, 500],
+    ])
+  })
+
+  it('ends a session with no transcript at the driver exit line', () => {
+    const record = buildTicketRecord(
+      ticketSeven({
+        attempts: [{ start: at(20), end: at(400), gatesEnd: null, sessionId: 'gone' }],
+        sessions: [],
+        driverEvents: [{ ticket: 7, at: at(30), kind: 'session-exit' }],
+        githubWindows: [],
+      }),
+    )
+    expect(spans(record)).toEqual([
+      ['idle', 0, 20],
+      ['other', 20, 30],
+      ['idle', 30, 105],
+    ])
+  })
+
+  it('waits between attempts as idle when a failed push sends the ticket back', () => {
     const record = buildTicketRecord(
       ticketSeven({
         attempts: [],
-        sessions: [],
+        sessions: [session('fix', 70, 80, [['developing', 70, 80]])],
         githubWindows: [],
         driverEvents: [
           { ticket: 7, at: at(60), kind: 'landing-start' },
@@ -189,8 +223,28 @@ describe('ticket phases: ticket record', () => {
     expect(spans(record)).toEqual([
       ['idle', 0, 60],
       ['landing', 60, 62],
-      ['idle', 62, 100],
+      ['idle', 62, 70],
+      ['developing', 70, 80],
+      ['idle', 80, 100],
       ['landing', 100, 105],
+    ])
+  })
+
+  it('keeps landing after a failed rebase until a hand-land closes the ticket', () => {
+    const record = buildTicketRecord(
+      ticketSeven({
+        attempts: [],
+        sessions: [],
+        githubWindows: [],
+        driverEvents: [
+          { ticket: 7, at: at(60), kind: 'landing-start' },
+          { ticket: 7, at: at(62), kind: 'landing-stop' },
+        ],
+      }),
+    )
+    expect(spans(record)).toEqual([
+      ['idle', 0, 60],
+      ['landing', 60, 105],
     ])
     expect(record.cycle_time_s).toBeNull()
   })

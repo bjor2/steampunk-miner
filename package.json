@@ -19,6 +19,8 @@
     "bench:ground": "vite-node scripts/benchGround.ts",
     "bench:combat": "vite-node scripts/benchCombatTick.ts",
     "perf:record": "node scripts/perf/recordPerf.mjs",
+    "metrics:ticket": "node scripts/metrics/ticketPhases.mjs",
+    "metrics:backfill": "node scripts/metrics/ticketPhases.mjs --backfill",
     "soak:memory": "npm run build && node scripts/soak/soakMemory.mjs --minutes 10 --out test-results/soak",
     "golden:update": "vite-node scripts/updateGoldenRuns.ts",
     "balance:report": "vite-node scripts/balanceReport.ts",

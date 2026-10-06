@@ -9,6 +9,7 @@ const ZONE_OFFSETS = { UTC: 'Z', GMT: 'Z', CET: '+01:00', CEST: '+02:00' }
 // One line can be two events: "#N verified ...; pushing" ends the gates and starts the landing.
 const LINE_RULES = [
   { kind: 'tier', pattern: /#(\d+)\b.*?\btier=(\S+) model=(\S+)/ },
+  { kind: 'session-exit', pattern: /session for #(\d+) exited|#(\d+) session exited/ },
   { kind: 'gates-end', pattern: /#(\d+):? (?:verified|NOT accepted)\b/ },
   { kind: 'landing-start', pattern: /#(\d+) verified\b.*\b(?:pushing|landing)\b/ },
   { kind: 'landing-start', pattern: /push lock acquired for #(\d+)|#(\d+): push lock acquired/ },
@@ -46,7 +47,7 @@ function eventsOfLine(line) {
 
 /**
  * A driver.log's text -> `[{ ticket, at, kind }]` in file order. Kinds: `tier` (with `tier` and
- * `model`), `gates-end` (verified or not accepted), `landing-start` (verified for landing, push
+ * `model`), `session-exit`, `gates-end` (verified or not accepted), `landing-start` (verified for landing, push
  * lock taken, push_pending recovery, manual land) and `landing-stop` (rebase or push failed).
  */
 export function parseDriverLog(text) {

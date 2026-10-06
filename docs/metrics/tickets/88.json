@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "ticket": 88,
+  "title": "Build H2: Wire planet_gate travel unlocks from schedule",
+  "tier": null,
+  "model": "claude-opus-5-5",
+  "created": "2026-10-05T21:32:23Z",
+  "closed": "2026-10-05T23:13:33Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-05T21:32:23.000Z","end":"2026-10-05T21:33:03.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"blocked","start":"2026-10-05T21:33:03.000Z","end":"2026-10-05T22:52:51.000Z","attempt":0,"tier":null,"model":null,"source":"github"},
+    {"category":"idle","start":"2026-10-05T22:52:51.000Z","end":"2026-10-05T23:01:59.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-05T23:01:59.000Z","end":"2026-10-05T23:02:09.264Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-05T23:02:09.264Z","end":"2026-10-05T23:03:56.879Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-05T23:03:56.879Z","end":"2026-10-05T23:04:10.108Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-05T23:04:10.108Z","end":"2026-10-05T23:05:01.244Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-05T23:05:01.244Z","end":"2026-10-05T23:05:06.669Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-05T23:05:06.669Z","end":"2026-10-05T23:05:36.129Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-05T23:05:36.129Z","end":"2026-10-05T23:05:39.776Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-05T23:05:39.776Z","end":"2026-10-05T23:09:59.416Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-05T23:09:59.416Z","end":"2026-10-05T23:10:03.899Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-05T23:10:03.899Z","end":"2026-10-05T23:10:22.052Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-05T23:10:22.052Z","end":"2026-10-05T23:10:32.129Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-05T23:10:32.129Z","end":"2026-10-05T23:13:33.000Z","attempt":1,"tier":null,"model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":4788,"planner_wait":0,"idle":588,"context":117,"planning":10,"developing":18,"testing":340,"gates":181,"landing":18,"other":10},
+  "lead_time_s": 6070,
+  "cycle_time_s": 694,
+  "backfilled": true
+}

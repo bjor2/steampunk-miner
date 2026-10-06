@@ -19,3 +19,5 @@ public/basis
 balance-report
 playwright-report
 test-results
+# Written by `npm run metrics:ticket` / `metrics:backfill`; a rerun must rewrite the same bytes.
+docs/metrics/tickets

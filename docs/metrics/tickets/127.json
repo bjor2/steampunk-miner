@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "ticket": 127,
+  "title": "T3: Flip the six shipped module rows in stats.json and retire BUILT_VISION_ROW_IDS",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-06T03:10:42Z",
+  "closed": "2026-10-06T08:45:58Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-06T03:10:42.000Z","end":"2026-10-06T03:10:43.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"blocked","start":"2026-10-06T03:10:43.000Z","end":"2026-10-06T08:06:04.000Z","attempt":0,"tier":null,"model":null,"source":"github"},
+    {"category":"idle","start":"2026-10-06T08:06:04.000Z","end":"2026-10-06T08:17:06.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-06T08:17:06.000Z","end":"2026-10-06T08:17:24.447Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-06T08:17:24.447Z","end":"2026-10-06T08:17:49.041Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-06T08:17:49.041Z","end":"2026-10-06T08:18:26.199Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-06T08:18:26.199Z","end":"2026-10-06T08:18:36.167Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-06T08:18:36.167Z","end":"2026-10-06T08:32:36.105Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-06T08:32:36.105Z","end":"2026-10-06T08:32:40.898Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-06T08:32:40.898Z","end":"2026-10-06T08:32:54.072Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-06T08:32:54.072Z","end":"2026-10-06T08:33:00.017Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-06T08:33:00.017Z","end":"2026-10-06T08:45:51.824Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-06T08:45:51.824Z","end":"2026-10-06T08:45:58.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":17721,"planner_wait":0,"idle":663,"context":25,"planning":6,"developing":15,"testing":877,"gates":772,"landing":19,"other":18},
+  "lead_time_s": 20116,
+  "cycle_time_s": 1732,
+  "backfilled": true
+}
