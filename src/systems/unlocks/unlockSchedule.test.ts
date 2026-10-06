@@ -135,6 +135,17 @@ describe('locked unlock schedule', () => {
     }
     expect(isUnlocked(row, withBay)).toBe(true)
   })
+
+  it('opens the built blasting_charges row at planet 7, its locked planet (#95)', () => {
+    const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'blasting_charges')!
+    expect(row).toMatchObject({
+      planetIndex: 7,
+      bind: 'planet_gate',
+      progressionAxis: 'horizontal',
+    })
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 6 })).toBe(false)
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 7 })).toBe(true)
+  })
 })
 
 describe('unlock gate checks', () => {

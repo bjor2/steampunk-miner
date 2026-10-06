@@ -56,9 +56,10 @@ describe('authority: determinism', () => {
   // protocol 9 (each vehicle's guns, none here, are authority state, #93), 10 (the platform's
   // Refinery slots, one empty slot here, are authority state, #105), 11 (each vehicle's lining
   // bill, empty here, is authority state, #115) and 12 (what the Sell bay visit has paid of the
-  // bill, no visit here, is authority state, #128).
+  // bill, no visit here, is authority state, #128) and 13 (each vehicle's charge rack, empty here, is
+  // authority state, #109, #95).
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('85ac7356bbe36d74')
+    expect(stateDigest(replay(SESSION).state)).toBe('38682ebc4b336df4')
   })
 
   it('gives a different digest when one command differs', () => {

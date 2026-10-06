@@ -170,6 +170,17 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { from: 'integer', to: 'integer', price: 'money' },
   },
+  // #109: the Upgrade bay filled the charge rack, or added one slot to it.
+  charges_restocked: {
+    group: 'platform',
+    level: 'core',
+    payload: { count: 'integer', price: 'money' },
+  },
+  charge_rack_upgraded: {
+    group: 'platform',
+    level: 'core',
+    payload: { from: 'integer', to: 'integer', price: 'money' },
+  },
   purchase_made: { group: 'platform', level: 'core', payload: 'unspecified' },
   // The Refinery bay (#105). The envelope's `planet` is where the line happened: the queue's and
   // the slot's planet, the platform's when a batch is ready, and the Sell bay's on collection, so
@@ -292,6 +303,25 @@ export const RUN_EVENT_REGISTRY = {
   // #111: a tunnel wrecker (or `debug.gnawCasing`) breached one ring; `ring` is its axis point `x,y`
   // in mm and `band` the deepest band of the wall it breached.
   ring_gnawed: { group: 'mining', level: 'core', payload: { ring: 'text', band: 'integer' } },
+  // #109: a charge planted on the wall at tile `tx, ty`, and its blast: tiles cleared, the sale
+  // value of the blasted ore that never reached the hold, and the collapse checks it ran.
+  charge_planted: {
+    group: 'mining',
+    level: 'core',
+    payload: { tx: 'integer', ty: 'integer', detonateTick: 'integer', carried: 'integer' },
+  },
+  charge_detonated: {
+    group: 'mining',
+    level: 'core',
+    payload: {
+      tx: 'integer',
+      ty: 'integer',
+      tilesCleared: 'integer',
+      oreValueLost: 'money',
+      collapseChecks: 'integer',
+      collapsesTriggered: 'integer',
+    },
+  },
   casing_drilled: {
     group: 'mining',
     level: 'detail',
@@ -361,13 +391,14 @@ export const RUN_EVENT_REGISTRY = {
     payload: { kind: ENEMY_KIND },
   },
   // #43: `source` says an enemy hit or a collapse crushed; a crush has no enemy, so its arc and kind
-  // read `none`, its enemyId '' and its tier 0, as `vehicle_destroyed` does with no attacker.
+  // read `none`, its enemyId '' and its tier 0, as `vehicle_destroyed` does with no attacker. A
+  // charge's blast on its own vehicle (#109) reads the same way.
   vehicle_damaged: {
     group: 'vehicle_and_combat',
     level: 'detail',
     payload: {
       amount: 'money',
-      source: { oneOf: ['drill-contact enemy', 'collapse'] },
+      source: { oneOf: ['drill-contact enemy', 'collapse', 'blast'] },
       arc: { oneOf: [...HIT_ARC.oneOf, 'none'] },
       enemyId: 'text',
       kind: { oneOf: [...ENEMY_KIND.oneOf, 'none'] },
@@ -387,8 +418,8 @@ export const RUN_EVENT_REGISTRY = {
     payload: {
       enemyId: 'text',
       amount: 'money',
-      source: { oneOf: ['drill', 'ram'] },
-      arc: HIT_ARC,
+      source: { oneOf: ['drill', 'ram', 'blast'] },
+      arc: { oneOf: [...HIT_ARC.oneOf, 'none'] },
       ticks: 'integer',
     },
   },

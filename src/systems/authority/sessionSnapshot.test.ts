@@ -32,7 +32,7 @@ describe('session snapshot', () => {
   it('carries the state digest and the versions it was taken under', () => {
     const snapshot = takeSnapshot(richState())
     expect(snapshot).toMatchObject({
-      snapshotVersion: 14,
+      snapshotVersion: 15,
       generatorVersion: 4,
       tick: 600,
       digest: stateDigest(richState()),
@@ -61,7 +61,7 @@ describe('session snapshot', () => {
       state: { tick: 600, planet: { index: -1, seed: 1 }, players: { p1: { wallet: 5 } } },
     }
     expect(readSnapshot(broken).problems).toEqual([
-      'snapshot.snapshotVersion is 0, this build reads 14',
+      'snapshot.snapshotVersion is 0, this build reads 15',
       'snapshot.state.planet must hold a whole index and a safe-integer seed',
       'snapshot.state.players.p1 must hold a money wallet and a whole lastSeq',
       'snapshot.state.world must be an object',
@@ -111,7 +111,7 @@ describe('session snapshot: casing (#41)', () => {
   it('refuses a snapshot taken before breached casing, at version 9, with the version message', () => {
     const snapshot = { ...throughJson(takeSnapshot(linedState())), snapshotVersion: 9 }
     expect(readSnapshot(snapshot).problems).toEqual([
-      'snapshot.snapshotVersion is 9, this build reads 14',
+      'snapshot.snapshotVersion is 9, this build reads 15',
     ])
   })
 
@@ -144,5 +144,47 @@ describe('session snapshot: guns (#93)', () => {
     expect(readSnapshot(snapshot).problems).toEqual([
       'snapshot.state.players.p1.vehicle.gun must hold a whole level and a gun mode',
     ])
+  })
+})
+
+describe('session snapshot: blasting charges (#109)', () => {
+  it('keeps the rack and a planted charge through save and load', () => {
+    const start = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
+    const racked = applyCommand(start, {
+      playerId: 'p1',
+      tick: 600,
+      seq: 1,
+      type: 'debug.setCharges',
+      payload: { carried: 2, slotLevel: 1 },
+    }).state
+    const vehicle = racked.players.p1.vehicle
+    const planted = {
+      ...racked,
+      players: {
+        p1: {
+          ...racked.players.p1,
+          vehicle: {
+            ...vehicle,
+            charges: { ...vehicle.charges, planted: { tx: 3, ty: 280, detonateTick: 720 } },
+          },
+        },
+      },
+    }
+    expect(readSnapshot(throughJson(takeSnapshot(planted)))).toEqual({
+      state: planted,
+      problems: [],
+    })
+  })
+
+  it('refuses a snapshot whose vehicle has no charge rack', () => {
+    const snapshot = throughJson(takeSnapshot(richState()))
+    const { charges: _dropped, ...vehicle } = snapshot.state.players.p1.vehicle
+    const broken = {
+      ...snapshot,
+      state: { ...snapshot.state, players: { p1: { ...snapshot.state.players.p1, vehicle } } },
+    }
+    expect(readSnapshot(broken).problems).toContain(
+      'snapshot.state.players.p1.vehicle.charges must hold a rack flag, whole counts and a planted charge or null',
+    )
   })
 })

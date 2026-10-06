@@ -16,6 +16,7 @@
 import { MM_PER_METRE } from '../../constants/physics'
 import {
   add,
+  ceil,
   ceilMilli,
   cmp,
   floor,
@@ -43,6 +44,11 @@ export function chargeFuseTicks(): number {
 /** Whether a point `dxMm, dyMm` from the charge tile's centre is inside the blast. */
 export function isInBlastRadius(dxMm: number, dyMm: number): boolean {
   return cmp(fromSafeInteger(dxMm * dxMm + dyMm * dyMm), RADIUS_MM_SQ) <= 0
+}
+
+/** The blast's radius in whole millimetres, rounded out. */
+export function blastRadiusMm(): number {
+  return toSafeInteger(ceil(RADIUS_MM))
 }
 
 /** The blast's reach in whole tiles round the charge tile, for the tiles worth testing. */

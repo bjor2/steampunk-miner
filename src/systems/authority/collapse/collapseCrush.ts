@@ -6,10 +6,10 @@
  * (`rescue_triggered.cause` stays `destroyed`). Only an active or stranded vehicle can be crushed.
  */
 import { collapseCrushDamage } from '../../economy/collapseCrush'
-import { cmp, sub, toCanonical, ZERO_MONEY, type BigStat } from '../../money'
 import { statsOfVehicle, type VehicleState } from '../../vehicle/vehicleState'
-import { vehicleOf, withVehicle, type AuthorityState } from '../authorityState'
+import { vehicleOf, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
+import { damageHullBy } from '../hullDamage'
 import { destroyIfHullGone } from '../vehicleTransitions'
 
 export function isCrushable(vehicle: VehicleState): boolean {
@@ -31,26 +31,6 @@ export function crushVehicle(
 }
 
 function takeCrush(state: AuthorityState, playerId: string, band: number): RuleEffect {
-  const vehicle = vehicleOf(state, playerId)
-  const amount = collapseCrushDamage(band, statsOfVehicle(vehicle).hullMax)
-  const hullAfter = atLeastZero(sub(vehicle.hull, amount))
-  return {
-    state: withVehicle(state, playerId, { ...vehicle, hull: hullAfter }),
-    events: [
-      {
-        type: 'VehicleDamaged',
-        amount: toCanonical(amount),
-        source: 'collapse',
-        arc: null,
-        enemyId: null,
-        kind: null,
-        tier: null,
-        hullAfter: toCanonical(hullAfter),
-      },
-    ],
-  }
-}
-
-function atLeastZero(amount: BigStat): BigStat {
-  return cmp(amount, ZERO_MONEY) < 0 ? ZERO_MONEY : amount
+  const hullMax = statsOfVehicle(vehicleOf(state, playerId)).hullMax
+  return damageHullBy(state, playerId, collapseCrushDamage(band, hullMax), 'collapse')
 }

@@ -164,9 +164,17 @@ function collectTile(
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.core) return harvestCoreTile(state, playerId, params)
   if (kind !== CELL_KIND.ore) return unchanged(state)
+  return collectOreUnit(state, playerId, resourceTierOf(params, cell))
+}
+
+/** One ore unit of `resourceTier` into the hold; with a full hold it is lost, never refused (#7). */
+export function collectOreUnit(
+  state: AuthorityState,
+  playerId: string,
+  resourceTier: number,
+): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
   if (!hasCargoRoom(vehicle)) return { state, events: [{ type: 'StorageFull', lostUnits: 1 }] }
-  const resourceTier = resourceTierOf(params, cell)
   return {
     state: withVehicle(state, playerId, {
       ...vehicle,
@@ -184,11 +192,12 @@ function collectTile(
 }
 
 /** A cell stores its tier above the planet's band-1 ore (#4, #6). */
-function resourceTierOf(params: PlanetParams, cell: number): number {
+export function resourceTierOf(params: PlanetParams, cell: number): number {
   return oreTier(params.planetIndex, 1 + tierOffsetOfCell(cell))
 }
 
-function kindNameOf(cell: number): 'ground' | 'ore' | 'core' {
+/** What `TileDestroyed` calls a yielded cell's material. */
+export function kindNameOf(cell: number): 'ground' | 'ore' | 'core' {
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.ore) return 'ore'
   if (kind === CELL_KIND.core) return 'core'

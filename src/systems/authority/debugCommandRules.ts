@@ -5,13 +5,14 @@
  * `combat/combatDebugRules.ts`, `teleportToDock` in `teleportDebugRules.ts`, the ground's
  * `carveCircle`, `fillCircle` and `lineCasing` in `groundDebugRules.ts`, `setCasingGrade` in
  * `casingRules.ts`, `setGunLevel` in `gunRules.ts`, `setArtefact` in `artefactRules.ts`, `forceCollapse` in
- * `collapse/collapseDebugRules.ts`.
+ * `collapse/collapseDebugRules.ts`, `setCharges` in `charges/chargeRules.ts`.
  */
 import { add, fromCanonical, toCanonical, type Money } from '../money'
 import type { CommandType } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
 import { ARTEFACT_DEBUG_RULES } from './artefactRules'
 import { CASING_DEBUG_RULES } from './casingRules'
+import { CHARGE_DEBUG_RULES } from './charges/chargeRules'
 import { COLLAPSE_DEBUG_RULES } from './collapse/collapseDebugRules'
 import { COMBAT_DEBUG_RULES } from './combat/combatDebugRules'
 import type { CommandRule, RuleEffect } from './commandRule'
@@ -62,6 +63,7 @@ export const DEBUG_COMMAND_RULES: {
   ...GUN_DEBUG_RULES,
   ...ARTEFACT_DEBUG_RULES,
   ...COLLAPSE_DEBUG_RULES,
+  ...CHARGE_DEBUG_RULES,
 }
 
 function walletOf(state: AuthorityState, playerId: string): Money {

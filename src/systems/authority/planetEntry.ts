@@ -2,10 +2,13 @@
  * Moving the session onto another planet (decisions #10 and #4): another planet is another world.
  * Its deltas start empty, its core progress, enemies and collapses start fresh, and every vehicle stands on its dock
  * site. The vehicles keep their levels, energy, hull and cargo; the platform keeps its bay and look.
+ * A charge still on a wall stays on the old planet's wall: it is gone, and the rack keeps the rest.
  * `Travel` and `debug.setPlanet` both go through here.
  */
 import { GENERATOR_VERSION } from '../generatorVersion'
+import type { VehicleCharges } from '../vehicle/vehicleCharges'
 import { dockedPoseAt } from '../vehicle/vehiclePose'
+import type { VehicleState } from '../vehicle/vehicleState'
 import { artefactCacheTile } from '../world/artefactCache'
 import type { PlanetParams } from '../world/planetParams'
 import { EMPTY_WORLD } from '../world/worldState'
@@ -22,7 +25,7 @@ export function withSessionOnPlanet(state: AuthorityState, planet: SessionPlanet
   const players = Object.fromEntries(
     Object.entries(state.players).map(([id, player]) => [
       id,
-      { ...player, vehicle: { ...player.vehicle, pose } },
+      { ...player, vehicle: { ...player.vehicle, pose, charges: withoutPlanted(player.vehicle) } },
     ]),
   )
   return {
@@ -34,6 +37,10 @@ export function withSessionOnPlanet(state: AuthorityState, planet: SessionPlanet
     collapse: NO_COLLAPSE,
     players,
   }
+}
+
+function withoutPlanted(vehicle: VehicleState): VehicleCharges {
+  return { ...vehicle.charges, planted: null }
 }
 
 /** What `planet_entered` says about a planet (#11: its seed, generator and radius). */

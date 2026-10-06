@@ -134,7 +134,8 @@ function runSteps(state: AuthorityState, steps: readonly TickStep[]): TickOutcom
   )
 }
 
-function stampedFor(effect: RuleEffect, playerId: string, tick: number): TickOutcome {
+/** A clock-caused effect's events, stamped with the tick and the player they concern. */
+export function stampedFor(effect: RuleEffect, playerId: string, tick: number): TickOutcome {
   return {
     state: effect.state,
     events: effect.events.map((body): DomainEvent => ({ tick, playerId, ...body })),

@@ -65,6 +65,12 @@ export type RejectionReason =
   | 'nothing_to_refine'
   | 'slots_max'
   | 'nothing_to_collect'
+  // Registered by the charge commands (#109): the rack is full, no charge is carried, one is
+  // already live, or the vehicle faces no wall to plant on (`feature_locked` and `max_level` above).
+  | 'rack_full'
+  | 'no_charges'
+  | 'charge_live'
+  | 'no_wall'
 
 export type RescueCause = 'stranded' | 'destroyed'
 
@@ -74,11 +80,17 @@ export type CoreDepositSource = 'dock' | 'rescue'
 /** `SellCargo {resourceTier}` sells one tier, `SellCargo {all}` and the quick action everything. */
 export type SaleMode = 'all' | 'single'
 
-/** What hurt the vehicle (#43 `VehicleDamaged.source`): an enemy's hit, or a collapse's crush. */
-export type DamageSource = 'drill-contact enemy' | 'collapse'
+/**
+ * What hurt the vehicle (#43 `VehicleDamaged.source`): an enemy's hit, a collapse's crush, or its
+ * own charge's blast (#109).
+ */
+export type DamageSource = 'drill-contact enemy' | 'collapse' | 'blast'
 
-/** What dealt an enemy's killing damage (#107: `enemy_killed {by: drill | gun}`). */
-export type EnemyKiller = 'drill' | 'gun'
+/** What hurt or killed an enemy: the drill (#9) or a charge's blast (#109). */
+export type EnemyDamageSource = 'drill' | 'blast'
+
+/** What dealt an enemy's killing damage (#107 `enemy_killed {by: drill | gun}`, #109 `blast`). */
+export type EnemyKiller = 'drill' | 'gun' | 'blast'
 
 /** Who wrecked the vehicle, for `vehicle_destroyed {kind, tier, arc}` (#9). */
 export interface Attacker {
@@ -162,8 +174,17 @@ export interface DomainEventBodies {
   EnemySpawned: { enemyId: string; kind: EnemyKind; tier: number; spawnPointId: string }
   /** The first enemy of a kind this run (#9, #14 horizontal coverage). */
   EnemyTypeEncountered: { kind: EnemyKind }
-  /** Drill damage on an enemy, summed over at most 30 ticks (#9). */
-  EnemyDamaged: { enemyId: string; amount: string; source: 'drill'; arc: HitArc; ticks: number }
+  /**
+   * Drill damage on an enemy, summed over at most 30 ticks (#9), or a blast's hit at once, which
+   * comes from no arc and over no ticks (#109).
+   */
+  EnemyDamaged: {
+    enemyId: string
+    amount: string
+    source: EnemyDamageSource
+    arc: HitArc | null
+    ticks: number
+  }
   EnemyKilled: { enemyId: string; kind: EnemyKind; tier: number; by: EnemyKiller }
   /**
    * The guns' hits on one enemy since the shooter's last pose report (#107: counted per report,
@@ -250,6 +271,24 @@ export interface DomainEventBodies {
   RepairPurchased: { hullFrom: string; hullTo: string; cost: string }
   /** Energy in quanta. */
   EnergyRecharged: { from: number; to: number; cost: string }
+  /** A charge on the wall at tile `tx, ty`, blowing at `detonateTick`; `carried` is what is left (#109). */
+  ChargePlanted: { tx: number; ty: number; detonateTick: number; carried: number }
+  /**
+   * The charge at `tx, ty` blew (#109): the tiles it cleared, the sale value of the ore it broke
+   * that never reached the hold, the collapse blocks it checked and the warnings it started.
+   */
+  ChargeDetonated: {
+    tx: number
+    ty: number
+    tilesCleared: number
+    oreValueLost: string
+    collapseChecks: number
+    collapsesTriggered: number
+  }
+  /** The rack filled with `count` charges for `price` (#109). */
+  ChargesRestocked: { count: number; price: string }
+  /** One rack slot bought: slot level `from` to `to`, for `price` (#109). */
+  ChargeRackUpgraded: { from: number; to: number; price: string }
   /** One casing grade bought (#41): `price` as a canonical string. */
   CasingUpgraded: { from: number; to: number; price: string }
   UpgradePurchased: {

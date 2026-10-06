@@ -104,9 +104,10 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     data: { enemyId, kind, tier, spawnPointId },
   }),
   EnemyTypeEncountered: ({ kind }) => ({ event: 'enemy_type_encountered', data: { kind } }),
+  // A blast's hit comes from no arc (#109).
   EnemyDamaged: ({ enemyId, amount, source, arc, ticks }) => ({
     event: 'enemy_damaged',
-    data: { enemyId, amount, source, arc, ticks },
+    data: { enemyId, amount, source, arc: arc ?? 'none', ticks },
   }),
   EnemyKilled: ({ kind, tier, by }) => ({ event: 'enemy_killed', data: { kind, tier, by } }),
   EnemyDespawned: ({ enemyId }) => ({ event: 'enemy_despawned', data: { enemyId } }),
@@ -219,6 +220,29 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
   EnergyRecharged: ({ from, to, cost }) => ({
     event: 'energy_recharged',
     data: { from, to, cost },
+  }),
+  ChargePlanted: ({ tx, ty, detonateTick, carried }) => ({
+    event: 'charge_planted',
+    data: { tx, ty, detonateTick, carried },
+  }),
+  ChargeDetonated: (blast) => ({
+    event: 'charge_detonated',
+    data: {
+      tx: blast.tx,
+      ty: blast.ty,
+      tilesCleared: blast.tilesCleared,
+      oreValueLost: blast.oreValueLost,
+      collapseChecks: blast.collapseChecks,
+      collapsesTriggered: blast.collapsesTriggered,
+    },
+  }),
+  ChargesRestocked: ({ count, price }) => ({
+    event: 'charges_restocked',
+    data: { count, price },
+  }),
+  ChargeRackUpgraded: ({ from, to, price }) => ({
+    event: 'charge_rack_upgraded',
+    data: { from, to, price },
   }),
   CasingUpgraded: ({ from, to, price }) => ({
     event: 'casing_upgraded',

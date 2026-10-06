@@ -14,6 +14,7 @@ import { casingGradeStart } from '../economy/casingPrices'
 import { ZERO_MONEY, type BigStat, type Money } from '../money'
 import type { DockSite } from '../world/dockSite'
 import { EMPTY_CASING_TRAIL, type CasingTrail } from './casingTrail'
+import { NO_CHARGES, type VehicleCharges } from './vehicleCharges'
 import { quantaOfUnits } from './energyQuanta'
 import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
@@ -56,6 +57,8 @@ export interface VehicleState {
    * (#128): leaving the bay after a payout forgives the rest; leaving before one carries it.
    */
   liningPaidThisVisit: Money | null
+  /** The charge rack and the charges it carries (#109), not a vehicle track. */
+  charges: VehicleCharges
   energy: number
   hull: BigStat
   cargo: Cargo
@@ -82,6 +85,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     gun: NO_GUN,
     liningBill: ZERO_MONEY,
     liningPaidThisVisit: null,
+    charges: NO_CHARGES,
     energy: quantaOfUnits(stats.energyMax),
     hull: stats.hullMax,
     cargo: EMPTY_CARGO,

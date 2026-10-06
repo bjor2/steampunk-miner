@@ -32,6 +32,7 @@ import {
   type RuleEffect,
 } from './commandRule'
 import { CASING_RULES } from './casingRules'
+import { CHARGE_RULES } from './charges/chargeRules'
 import { followCollapse } from './collapse/collapseWatch'
 import { DEBUG_COMMAND_RULES } from './debugCommandRules'
 import { DOCK_COMMAND_RULES } from './dockRules'
@@ -84,6 +85,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...ARTEFACT_RULES,
   ...REFINERY_RULES,
   ...REFINERY_COLLECTION_RULES,
+  ...CHARGE_RULES,
 }
 
 /** The tick-driven changes due by a well-formed command's tick; none for a malformed one. */

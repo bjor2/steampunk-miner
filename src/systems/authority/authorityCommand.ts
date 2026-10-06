@@ -27,8 +27,10 @@ import type { BayId } from '../world/dockBays'
  *    out of the next sale as `LiningSettled` instead of debited mid-dive (#115, #76 amendment).
  * 12: the bill is settled per Sell bay visit (#128): each payout, collected Refinery batches too,
  *    logs what it paid as `LiningSettled`, and undocking logs what the visit forgave.
+ * 13: blasting charges (#109, #95): the rack and charge commands, their events,
+ *    `debug.setCharges`, and blast sources on `VehicleDamaged` and the enemy events.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 12
+export const AUTHORITY_PROTOCOL_VERSION = 13
 
 export interface CommandPayloads {
   /**
@@ -89,6 +91,12 @@ export interface CommandPayloads {
   openArtefactCache: Record<string, never>
   /** Takes one of the three options for good; the other two are gone (#46). */
   chooseArtefact: { optionId: string }
+  /** Plants a charge on the wall the last reported pose faces; it blows after its fuse (#109). */
+  plantCharge: Record<string, never>
+  /** The Upgrade bay fills the rack's empty slots at the price per charge (#109). */
+  restockCharges: Record<string, never>
+  /** The Upgrade bay adds one slot to the rack (#109). */
+  buyChargeRackSlot: Record<string, never>
   'debug.setUpgrade': { upgradeId: string; level: number }
   /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
   'debug.setEnergy': { energy: string }
@@ -125,6 +133,8 @@ export interface CommandPayloads {
   'debug.fillCircle': { x: number; y: number; radius: number; amount: number }
   /** Sets the gun level directly, 0 (no guns) to the track's cap (#107 combat scenarios). */
   'debug.setGunLevel': { level: number }
+  /** A mounted rack with `slotLevel` bought slots carrying `carried` charges (#109). */
+  'debug.setCharges': { carried: number; slotLevel: number }
   /** Sets the vehicle's casing grade directly (#41 `debug.setCasingGrade`). */
   'debug.setCasingGrade': { grade: number }
   /** One ring of casing lining of `grade` round `(x, y)` mm (#41 `debug.lineCasing`). */

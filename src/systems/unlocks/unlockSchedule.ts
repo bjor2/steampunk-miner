@@ -21,12 +21,13 @@ import {
  * that refresh is listed here and unlocks by its bind; every other vision row still shows nothing.
  * `refinery_bay`: M1 #92 (spec #105), the platform's third bay, a `facility` row it has from planet 3.
  * `auto_guns`: M2 #93 (spec #107), the hull turret bought at the Upgrade bay from planet 4.
- * `tunnel_wrecker`: M3 #94.
+ * `tunnel_wrecker`: M3 #94. `blasting_charges`: M4 #95, charges bought at the Upgrade bay from planet 7.
  */
 export const BUILT_VISION_ROW_IDS: ReadonlySet<string> = new Set([
   'refinery_bay',
   'auto_guns',
   'tunnel_wrecker',
+  'blasting_charges',
 ])
 
 /** The Horizontal Scaler's lock (#80); a refreshed schedule changes this pin on purpose. */

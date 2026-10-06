@@ -83,6 +83,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
           `${path}.casingTrail must hold safe-integer xMm and yMm points (and lengthMm on unlined ones)`,
         ]),
     ...(isPortableGun(vehicle.gun) ? [] : [`${path}.gun must hold a whole level and a gun mode`]),
+    ...(isPortableCharges(vehicle.charges)
+      ? []
+      : [`${path}.charges must hold a rack flag, whole counts and a planted charge or null`]),
     ...(isNonNegativeMoneyText(vehicle.hull) ? [] : [`${path}.hull must be a decimal string`]),
     ...(isNonNegativeMoneyText(vehicle.liningBill)
       ? []
@@ -135,6 +138,25 @@ function isRingPoint(point: unknown): boolean {
 
 function isPortableGun(gun: unknown): boolean {
   return isJsonObject(gun) && isWholeNumber(gun.level) && isGunMode(gun.mode)
+}
+
+function isPortableCharges(charges: unknown): boolean {
+  return (
+    isJsonObject(charges) &&
+    typeof charges.isRackMounted === 'boolean' &&
+    isWholeNumber(charges.slotLevel) &&
+    isWholeNumber(charges.carried) &&
+    (charges.planted === null || isPlantedCharge(charges.planted))
+  )
+}
+
+function isPlantedCharge(planted: unknown): boolean {
+  return (
+    isJsonObject(planted) &&
+    Number.isSafeInteger(planted.tx) &&
+    Number.isSafeInteger(planted.ty) &&
+    isWholeNumber(planted.detonateTick)
+  )
 }
 
 function isPortableCargo(cargo: unknown): cargo is Cargo {

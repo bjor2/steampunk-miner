@@ -8,6 +8,8 @@
  * - `enemy_damaged` sums continuous drill damage per 30 ticks and flushes before a kill.
  * - A killed enemy is gone for the trip: its spawn point stays used until the next dock. A killed
  *   tunnel wrecker came from no spawn point; the next may come `respawnTicks` later (#111).
+ * - A charge's blast (#109) hits every enemy in its radius once, logged at once with no arc; drill
+ *   damage still pending on a pinned one is logged first.
  */
 import { ENEMY_DAMAGE_LOG_TICKS } from '../../../constants/balance'
 import { pinnedDrillDamagePerTick } from '../../economy/enemyStats'
@@ -26,7 +28,7 @@ import { tileOfMillimetres, type VehiclePose } from '../../vehicle/vehiclePose'
 import type { TilePoint } from '../../world/tileGrid'
 import { vehicleOf, withCombat, withVehicle, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
-import type { EnemyKiller } from '../domainEvent'
+import type { DomainEventBody, EnemyKiller } from '../domainEvent'
 import { followEnergyChange } from '../vehicleTransitions'
 import {
   DEBUG_SPAWN_POINT_ID,
@@ -90,6 +92,31 @@ export function flushDrillDamage(state: AuthorityState, enemyId: string, arc: Hi
   }
 }
 
+/** A blast's `amount` on one enemy at `tick`; at 0 health it dies, killed by the blast. */
+export function blastEnemy(
+  state: AuthorityState,
+  enemy: Enemy,
+  amount: BigStat,
+  tick: number,
+): RuleEffect {
+  const flushed = flushDrillDamage(state, enemy.id, 'front')
+  const current = enemyById(flushed.state.combat, enemy.id) ?? enemy
+  const hit = { ...current, health: sub(current.health, amount) }
+  const damaged: DomainEventBody = {
+    type: 'EnemyDamaged',
+    enemyId: enemy.id,
+    amount: toCanonical(amount),
+    source: 'blast',
+    arc: null,
+    ticks: 0,
+  }
+  const outcome =
+    cmp(hit.health, ZERO_MONEY) <= 0
+      ? removeKilled(flushed.state, hit, 'blast', tick)
+      : unchanged(withCombat(flushed.state, withEnemy(flushed.state.combat, hit)))
+  return { state: outcome.state, events: [...flushed.events, damaged, ...outcome.events] }
+}
+
 /** One drilling: `ticks` of drill, from the `arc` it came from, ending at `tick`. */
 interface DrillCut {
   ticks: number
@@ -136,11 +163,20 @@ export function killEnemy(
 ): RuleEffect {
   return chainEffects(state, [
     (current) => flushDrillDamage(current, enemy.id, arc),
-    (current) => ({
-      state: withCombat(current, removedAndUsed(current, enemy, tick)),
-      events: [{ type: 'EnemyKilled', enemyId: enemy.id, kind: enemy.kind, tier: enemy.tier, by }],
-    }),
+    (current) => removeKilled(current, enemy, by, tick),
   ])
+}
+
+function removeKilled(
+  state: AuthorityState,
+  enemy: Enemy,
+  by: EnemyKiller,
+  tick: number,
+): RuleEffect {
+  return {
+    state: withCombat(state, removedAndUsed(state, enemy, tick)),
+    events: [{ type: 'EnemyKilled', enemyId: enemy.id, kind: enemy.kind, tier: enemy.tier, by }],
+  }
 }
 
 function removedAndUsed(state: AuthorityState, enemy: Enemy, tick: number): CombatState {
