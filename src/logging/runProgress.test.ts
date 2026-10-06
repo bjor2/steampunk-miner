@@ -34,8 +34,8 @@ describe('run progress', () => {
     const sink = createRunProgressSink()
     sink.append(line('tile_destroyed', { tx: 3, ty: 290, kind: 'ground' }, 9))
     sink.append(line('tile_destroyed', { tx: 3, ty: 289, kind: 'ore' }, 10))
-    sink.append(line('resource_collected', { resourceTier: 1, amount: 2, value: '6e+0' }, 10))
-    sink.append(line('resource_collected', { resourceTier: 2, amount: 1, value: '9e+0' }, 10))
+    sink.append(line('resource_collected', collected(1, 2, '6e+0'), 10))
+    sink.append(line('resource_collected', collected(2, 1, '9e+0'), 10))
     sink.append(line('resource_sold', { items: [], value: '1.5e+1', mode: 'all' }))
     sink.append(line('refine_collected', refinedBatch('4.5e+1')))
     expect(sink.progress()).toEqual({
@@ -56,4 +56,19 @@ describe('run progress', () => {
 
 function refinedBatch(value: string): RunEventData<'refine_collected'> {
   return { slot: 0, tier: 3, units: 4, rawValue: '3e+1', value, waitSeconds: 60, queuedPlanet: 1 }
+}
+
+function collected(
+  tier: number,
+  amount: number,
+  value: string,
+): RunEventData<'resource_collected'> {
+  return {
+    resourceTier: tier,
+    amount,
+    value,
+    oreId: 'kernel.metal.t1',
+    oreDepthTiles: 10,
+    chunk: '0,9',
+  }
 }
