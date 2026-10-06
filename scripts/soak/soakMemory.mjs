@@ -22,6 +22,7 @@ import { spawn } from 'node:child_process'
 import { createWriteStream, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { isGameMemoryReadable, readGameMemory, refillOnDock } from './soakPage.mjs'
 import { summariseSoak } from './soakSummary.mjs'
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
@@ -98,13 +99,9 @@ async function openGame(browser, options) {
   return { page, cdp, errors }
 }
 
-/** Both memory reads refuse until the scene has mounted its renderer and physics world. */
+/** Waits for the scene to mount, then lets the first chunks settle before the start snapshot. */
 async function waitForMemoryReads(page) {
-  const isReadable = () => {
-    const debug = globalThis.steampunkDebug
-    return debug !== undefined && debug.getPhysicsStats().ok && debug.ui.getRendererMemory().ok
-  }
-  await page.waitForFunction(isReadable, null, { timeout: 120_000 })
+  await page.waitForFunction(isGameMemoryReadable, null, { timeout: 120_000 })
   await sleep(5_000)
 }
 
@@ -112,39 +109,6 @@ async function collectGarbage({ cdp, page }) {
   await cdp.send('HeapProfiler.collectGarbage')
   await page.evaluate(() => globalThis.gc?.())
   await cdp.send('HeapProfiler.collectGarbage')
-}
-
-/** One reading of the game through its debug API; a refused read is listed, its counts null. */
-function readGameMemory() {
-  const debug = globalThis.steampunkDebug
-  const renderer = debug.ui.getRendererMemory()
-  const physics = debug.getPhysicsStats()
-  const stats = debug.ui.getRenderStats().stats
-  const state = debug.snapshot().snapshot.state
-  const pose = Object.values(state.players)[0].vehicle.pose
-  return {
-    usedJSHeapSize: performance.memory?.usedJSHeapSize ?? null,
-    totalJSHeapSize: performance.memory?.totalJSHeapSize ?? null,
-    geometries: renderer.ok ? renderer.geometries : null,
-    textures: renderer.ok ? renderer.textures : null,
-    programs: renderer.ok ? renderer.programs : null,
-    rapierBodies: physics.ok ? physics.rigidBodies : null,
-    rapierColliders: physics.ok ? physics.colliders : null,
-    wasmBytes: physics.ok ? physics.wasmBytes : null,
-    refusals: [renderer, physics].flatMap((read) => (read.ok ? [] : read.problems)),
-    drawCalls: stats.drawCalls,
-    groundBlocks: stats.groundBlocks,
-    drawnChunks: stats.drawnChunks,
-    groundColliders: stats.groundColliders,
-    gameFrameP50Ms: stats.frameMsP50,
-    gameFrameP95Ms: stats.frameMsP95,
-    tick: state.tick,
-    poseX: pose.x,
-    poseY: pose.y,
-    // Legitimate game-state growth (drilled chunks), to tell it apart from a leak.
-    worldStateJsonBytes: JSON.stringify(state.world).length,
-    runLogBytes: (globalThis.steampunkRunLog?.() ?? '').length,
-  }
 }
 
 async function sampleNow(session, label) {
@@ -177,16 +141,6 @@ async function hold(page, actionId, ms) {
   await page.evaluate((id) => globalThis.steampunkDebug.input.press(id), actionId)
   await sleep(ms)
   await page.evaluate((id) => globalThis.steampunkDebug.input.release(id), actionId)
-}
-
-/** Refills energy and hull on the dock; a vehicle already on the pad refuses the teleport. */
-function refillOnDock() {
-  const debug = globalThis.steampunkDebug
-  const docked = debug.teleportToDock()
-  const isOnPad = docked.ok || docked.problems.join().includes('already docked')
-  return [debug.setEnergy('150'), debug.setHull('100')]
-    .concat(isOnPad ? [] : [docked])
-    .flatMap((result) => (result.ok ? [] : result.problems))
 }
 
 async function driveOneCycle(session, results) {
