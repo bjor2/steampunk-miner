@@ -221,11 +221,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   for 10 minutes through chunk cycles (dock, undock, right 8 s, down 8 s, left 4 s, right 4 s) with
   Playwright, reading the counts only through `ui.getRendererMemory()` and `getPhysicsStats()` and
   the heap through the browser after a forced GC. It writes `test-results/soak/soak.json`,
-  `summary.json` and three heap snapshots, and exits 1 when the gate in `scripts/soak/soakGate.mjs`
+  `summary.json`, `soak-chart.svg` (heap and counts per cycle boundary against the gate) and three
+  heap snapshots, and exits 1 when the gate in `scripts/soak/soakGate.mjs`
   fails: after 4 warm-up cycles, the median heap of the last 3 cycle boundaries more than 20 MB
   above the first 3, geometries, textures or colliders rising in 3 or more of the last 10 steps
   without falling, any page error, or fewer than 15 cycles. The gate and summary are pure and
-  tested in `scripts/soak/`; `--evaluate <soak.json>` re-checks a saved run. On a box with no
+  tested in `scripts/soak/`; `--evaluate <soak.json>` re-checks a saved run and `--job-summary <dir>`
+  prints its summary as one Markdown row. CI runs it as a regression gate (#103,
+  `.github/workflows/memory-soak.yml`): nightly, by hand (`workflow_dispatch`) and on pull requests
+  labelled `perf`, never on every push, because 15 cycles of ~36 s cannot fit a shorter profile. The
+  job fails with the gate, appends the row to the job summary and uploads `soak.json`,
+  `summary.json` and the chart as the `memory-soak` artifact (the heap snapshots only on a failure).
+  To check a change for leaks before merging, add the `perf` label to its pull request. On a box with no
   Playwright browser, pass `--browser /usr/bin/google-chrome` (run the script itself, after a
   build). Record a run with `npm run perf:record -- --source soak --from test-results/soak/summary.json --from test-results/soak/soak.json`.
   The same soak runs the packaged game (#102): after `npm run electron:build`,
