@@ -4,6 +4,7 @@ import {
   buildPerfOverview,
   deltaOf,
   figureIdOf,
+  headroomPercentOf,
   niceCeilingOf,
   parsePerfHistory,
 } from './perfOverview.mjs'
@@ -102,6 +103,16 @@ describe('perf overview history order', () => {
   })
 })
 
+describe('perf overview headroom', () => {
+  it('is the share of the budget left, negative when over, and none for a zero budget', () => {
+    expect(headroomPercentOf(1.5, 2, 'lower')).toBe(25)
+    expect(headroomPercentOf(3, 2, 'lower')).toBe(-50)
+    expect(headroomPercentOf(150, 100, 'higher')).toBe(50)
+    expect(headroomPercentOf(0, 0, 'lower')).toBeNull()
+    expect(headroomPercentOf(1, null, 'lower')).toBeNull()
+  })
+})
+
 describe('perf overview deltas', () => {
   it('calls a drop good when lower is better', () => {
     expect(deltaOf(1.5, 2, 'lower')).toEqual({ absolute: -0.5, percent: -25, direction: 'good' })
@@ -156,6 +167,39 @@ describe('perf overview charts', () => {
       metrics: { 'gen.p95Ms': 2.5, 'stack.maxOkDepth': 800 },
     }),
   ].join('\n')
+
+  it('judges every budgeted metric on its latest value and counts the runs over budget', () => {
+    const registry = {
+      ...REGISTRY,
+      metrics: {
+        ...REGISTRY.metrics,
+        'stack.maxOkDepth': { ...REGISTRY.metrics['stack.maxOkDepth'], budget: 500 },
+      },
+    }
+    const model = buildPerfOverview({ historyText: history, registry, repo: REPO })
+    expect(model.budgetCounts).toEqual({ total: 2, over: 1, within: 1 })
+    expect(
+      model.budgets.map((b) => [b.id, b.latest, b.overBudget, b.runsOverBudget, b.runCount]),
+    ).toEqual([
+      ['gen.p95Ms', 2.5, true, 1, 3],
+      ['stack.maxOkDepth', 800, false, 0, 2],
+    ])
+    expect(model.budgets[0].headroomPercent).toBe(-25)
+    expect(model.budgets[1].headroomPercent).toBe(60)
+    expect(model.budgets[0].latestRun.shortSha).toBe('3333333')
+  })
+
+  it('lists the recent runs newest measurement first, with the metrics they had over budget', () => {
+    const model = buildPerfOverview({ historyText: history, registry: REGISTRY, repo: REPO })
+    expect(
+      model.recentRuns.map((r) => [r.shortSha, r.source, r.metricCount, r.overBudget]),
+    ).toEqual([
+      ['3333333', 'bench', 2, ['gen.p95Ms']],
+      ['2222222', 'soak', 2, []],
+      ['2222222', 'bench', 2, []],
+      ['1111111', 'bench', 1, []],
+    ])
+  })
 
   it('gives each metric the runs that contain it, with deltas vs previous and first', () => {
     const model = buildPerfOverview({ historyText: history, registry: REGISTRY, repo: REPO })

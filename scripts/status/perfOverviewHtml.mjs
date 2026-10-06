@@ -1,4 +1,4 @@
-// Renders the Performance section of /status/ from the model of perfOverview.mjs as static HTML
+// Renders the Performance tab of /status/ from the model of perfOverview.mjs as static HTML
 // with inline SVG, so `curl` of the live page shows the charts and nothing needs JavaScript.
 // Classes and colours come from the page's own style sheet (scripts/status/index.html).
 
@@ -235,10 +235,101 @@ function latestRunHtml(model) {
 function headerHtml(model) {
   const readme = `https://github.com/${model.repo}/blob/main/docs/perf/README.md`
   return (
-    '<h2>Performance</h2>' +
     `<div class="meta perf-meta"><b>${model.runCount}</b> runs · <b>${model.metricCount}</b> metrics · ${latestRunHtml(model)}</div>` +
-    `<div class="meta perf-meta">Charts come from <code>docs/perf/history.ndjson</code> and <code>docs/perf/metrics.json</code> (<a href="${escapeHtml(readme)}">docs/perf/README.md</a>). ` +
+    `<div class="meta perf-meta">Data: <code>docs/perf/history.ndjson</code> and <code>docs/perf/metrics.json</code> (<a href="${escapeHtml(readme)}">docs/perf/README.md</a>). ` +
     'Update: <code>npm run perf:record -- --source bench</code>, then commit <code>docs/perf/history.ndjson</code>.</div>'
+  )
+}
+
+function cardHtml(value, label, cls = '') {
+  return `<div class="card"><div class="n ${cls}">${value}</div><div class="l">${escapeHtml(label)}</div></div>`
+}
+
+// The page's script turns the stamp into the reader's local time and age (no clock here).
+function timeHtml(iso) {
+  return iso
+    ? `<time class="perf-ago" datetime="${escapeHtml(iso)}">${escapeHtml(formatStamp(iso))}</time>`
+    : '—'
+}
+
+function cardsHtml(model) {
+  const { total, over, within } = model.budgetCounts
+  return (
+    '<div class="cards perf-cards">' +
+    cardHtml(over, 'over budget', over ? 'bad' : 'ok') +
+    cardHtml(within, `within budget (of ${total})`, 'ok') +
+    cardHtml(model.metricCount, 'metrics') +
+    cardHtml(model.runCount, 'runs') +
+    `<div class="card"><div class="n perf-last">${timeHtml(model.latestRun?.measuredAt)}</div><div class="l">last measured</div></div>` +
+    '</div>'
+  )
+}
+
+function headroomHtml(row) {
+  if (row.headroomPercent === null) {
+    return `<span class="${row.overBudget ? 'bad' : 'muted'}">${row.overBudget ? 'over' : '—'}</span>`
+  }
+  const text = row.overBudget
+    ? `${formatMetricValue(Math.abs(row.headroomPercent / 100) + 1)}× budget`
+    : `${row.headroomPercent.toFixed(0)}% left`
+  return `<span class="${row.overBudget ? 'bad' : row.headroomPercent < 15 ? 'warn' : 'ok'}">${escapeHtml(text)}</span>`
+}
+
+function budgetRowHtml(row, repo) {
+  const prev = row.deltaFromPrevious
+  const trend = !prev
+    ? '<span class="muted">—</span>'
+    : `<span class="${prev.direction === 'good' ? 'ok' : prev.direction === 'bad' ? 'bad' : 'muted'}">${escapeHtml(signed(withUnit(prev.absolute, row.unit)))}${prev.percent === null ? '' : ` (${escapeHtml(signed(prev.percent.toFixed(PERCENT_DECIMALS)))}%)`}</span>`
+  const verdict = row.overBudget
+    ? '<span class="badge st-blocked">over</span>'
+    : '<span class="badge st-working">pass</span>'
+  return (
+    `<tr data-metric="${escapeHtml(row.id)}">` +
+    `<td><a href="#${escapeHtml(row.figureId)}">${escapeHtml(row.label)}</a></td>` +
+    `<td class="num-r">${escapeHtml(withUnit(row.latest, row.unit))}</td>` +
+    `<td class="num-r muted">${row.better === 'lower' ? '≤' : '≥'} ${escapeHtml(withUnit(row.budget, row.unit))}</td>` +
+    `<td>${headroomHtml(row)}</td>` +
+    `<td>${trend}</td>` +
+    `<td class="muted" title="runs of this metric over its budget">${row.runsOverBudget}/${row.runCount}</td>` +
+    `<td>${verdict} <a class="mono muted" href="${escapeHtml(commitUrlOf(repo, row.latestRun.commit))}">${escapeHtml(row.latestRun.shortSha)}</a></td>` +
+    '</tr>'
+  )
+}
+
+function budgetsHtml(model) {
+  if (model.budgets.length === 0) {
+    return '<div class="sub"><h2>Budgets</h2><div class="muted">No metric has a budget in metrics.json.</div></div>'
+  }
+  return (
+    '<div class="sub"><h2>Budgets</h2><table class="perf-budgets"><thead><tr>' +
+    '<th>Metric</th><th>Latest</th><th>Budget</th><th>Headroom</th><th>vs prev run</th><th>Runs over</th><th>Verdict</th>' +
+    `</tr></thead><tbody>${model.budgets.map((row) => budgetRowHtml(row, model.repo)).join('')}</tbody></table></div>`
+  )
+}
+
+function recentRunHtml(run, repo) {
+  const over = run.overBudget.length
+    ? `<span class="bad" title="${escapeHtml(run.overBudget.join(', '))}">${run.overBudget.length} over budget</span>`
+    : ''
+  const note = [run.note, run.env].filter(Boolean).join(' · ')
+  return (
+    '<tr>' +
+    `<td class="muted">${timeHtml(run.measuredAt)}</td>` +
+    `<td><a class="mono" href="${escapeHtml(commitUrlOf(repo, run.commit))}">${escapeHtml(run.shortSha)}</a></td>` +
+    `<td>${escapeHtml(run.source)}</td>` +
+    `<td class="num-r muted">${run.load === null ? '—' : escapeHtml(formatMetricValue(run.load))}</td>` +
+    `<td class="num-r">${run.metricCount}</td>` +
+    `<td>${over}${over && note ? ' · ' : ''}<span class="muted perf-run-note">${escapeHtml(note)}</span></td>` +
+    '</tr>'
+  )
+}
+
+function recentRunsHtml(model) {
+  if (model.recentRuns.length === 0) return ''
+  return (
+    '<div class="sub"><h2>Recent runs</h2><table class="perf-runs"><thead><tr>' +
+    '<th>Measured</th><th>Commit</th><th>Source</th><th>Load</th><th>Metrics</th><th>Notes</th>' +
+    `</tr></thead><tbody>${model.recentRuns.map((run) => recentRunHtml(run, model.repo)).join('')}</tbody></table></div>`
   )
 }
 
@@ -247,21 +338,32 @@ function problemsHtml(problems) {
   return `<ul class="list perf-problems warn">${problems.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul>`
 }
 
-function sectionHtml(body) {
-  return `<section class="panel" id="perf-panel">${body}</section>`
+// The chart panel carries the numbers the page's tab badge shows, so the badge needs no fetch.
+function chartsSectionHtml(model, body) {
+  const { total, over } = model.budgetCounts
+  const data =
+    `data-budgets="${total}" data-over="${over}" data-runs="${model.runCount}"` +
+    ` data-last-measured="${escapeHtml(model.latestRun?.measuredAt ?? '')}"`
+  return `<section class="panel" id="perf-panel" ${data}>${body}</section>`
 }
 
-/** The whole section for a model from `buildPerfOverview`. */
+/** The Performance tab for a model from `buildPerfOverview`: a summary panel, then the charts. */
 export function renderPerfOverview(model) {
   const groups = model.groups.map((group) => groupHtml(group, model.repo)).join('')
   const empty =
     model.groups.length === 0 ? '<div class="muted">No measurement recorded yet.</div>' : ''
-  return sectionHtml(headerHtml(model) + problemsHtml(model.problems) + groups + empty)
+  const summary =
+    '<section class="panel" id="perf-summary-panel"><h2>Performance</h2>' +
+    cardsHtml(model) +
+    headerHtml(model) +
+    problemsHtml(model.problems) +
+    budgetsHtml(model) +
+    recentRunsHtml(model) +
+    '</section>'
+  return summary + chartsSectionHtml(model, '<h2>Charts</h2>' + groups + empty)
 }
 
 /** The section when the model could not be built: the rest of the dashboard still renders. */
 export function renderPerfOverviewFailure(message) {
-  return sectionHtml(
-    `<h2>Performance</h2><div class="bad">Performance overview failed to build: ${escapeHtml(message)}</div>`,
-  )
+  return `<section class="panel" id="perf-panel" data-error="1"><h2>Performance</h2><div class="bad">Performance overview failed to build: ${escapeHtml(message)}</div></section>`
 }

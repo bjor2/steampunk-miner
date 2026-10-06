@@ -52,7 +52,8 @@ function render(historyText = HISTORY, registry = REGISTRY) {
 describe('perf overview html', () => {
   it('renders one figure per metric id with the exact id and a commit link per point', () => {
     const html = render()
-    expect(html).toContain('<section class="panel" id="perf-panel">')
+    expect(html).toContain('<section class="panel" id="perf-summary-panel"><h2>Performance</h2>')
+    expect(html).toContain('<section class="panel" id="perf-panel" data-budgets="1" data-over="1"')
     expect(html).toContain(
       '<figure class="perf-chart" id="metric-gen-p95Ms" data-metric="gen.p95Ms">',
     )
@@ -123,6 +124,36 @@ describe('perf overview html', () => {
     expect(html).toContain('<h2>Not in metrics.json</h2>')
   })
 
+  it('sums up the budgets in cards and gives the tab badge its numbers on the chart panel', () => {
+    const html = render()
+    expect(html).toContain('<div class="n bad">1</div><div class="l">over budget</div>')
+    expect(html).toContain('<div class="n ok">0</div><div class="l">within budget (of 1)</div>')
+    expect(html).toContain(
+      'data-runs="2" data-last-measured="2026-10-06T11:00:00+02:00"><h2>Charts</h2>',
+    )
+    expect(html).toContain(
+      '<time class="perf-ago" datetime="2026-10-06T11:00:00+02:00">2026-10-06 11:00 +02:00</time>',
+    )
+  })
+
+  it('lists every budgeted metric with its latest value, headroom and verdict, linked to its chart', () => {
+    const html = render()
+    const table = html.slice(html.indexOf('<table class="perf-budgets">'), html.indexOf('</table>'))
+    expect(table).toContain('<a href="#metric-gen-p95Ms">generateChunk p95</a>')
+    expect(table).toContain('<td class="num-r">2.5 ms</td><td class="num-r muted">≤ 2 ms</td>')
+    expect(table).toContain('<span class="bad">1.25× budget</span>')
+    expect(table).toContain('<span class="badge st-blocked">over</span>')
+    expect(table).toContain('>1/2</td>')
+    expect(table).not.toContain('gen.p50Ms')
+  })
+
+  it('lists the recent runs newest first, naming the metrics a run had over budget', () => {
+    const html = render()
+    const runs = html.slice(html.indexOf('<table class="perf-runs">'))
+    expect(runs.indexOf('b48cc89')).toBeLessThan(runs.indexOf('a1b2c3d'))
+    expect(runs).toContain('<span class="bad" title="gen.p95Ms">1 over budget</span>')
+  })
+
   it('lists skipped history lines in the section and escapes text from the files', () => {
     const html = render(
       [
@@ -163,7 +194,7 @@ describe('perf overview html', () => {
 
   it('renders the failure note when the model could not be built', () => {
     expect(renderPerfOverviewFailure('ENOENT <history>')).toBe(
-      '<section class="panel" id="perf-panel"><h2>Performance</h2><div class="bad">Performance overview failed to build: ENOENT &lt;history&gt;</div></section>',
+      '<section class="panel" id="perf-panel" data-error="1"><h2>Performance</h2><div class="bad">Performance overview failed to build: ENOENT &lt;history&gt;</div></section>',
     )
   })
 

@@ -9,6 +9,8 @@ const SHORT_SHA_LENGTH = 7
 // little headroom), so a budget never sits on the top edge and the gridline labels stay round.
 const NICE_FRACTIONS = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]
 const HEADROOM = 1.08
+// The "Recent runs" table of the Performance tab shows this many of the latest measurements.
+const RECENT_RUN_COUNT = 8
 
 function isRecord(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -254,6 +256,67 @@ function chartsOf(runs, registry) {
   }
 }
 
+/** How far the latest value is from its budget, as a share of the budget; negative means over. */
+export function headroomPercentOf(value, budget, better) {
+  if (budget === null || budget === 0) return null
+  const room = better === 'lower' ? budget - value : value - budget
+  return (room / Math.abs(budget)) * 100
+}
+
+function budgetRowOf(chart) {
+  const latest = chart.points.at(-1)
+  return {
+    id: chart.id,
+    label: chart.label,
+    unit: chart.unit,
+    figureId: chart.figureId,
+    better: chart.better,
+    budget: chart.budget,
+    latest: chart.latest,
+    overBudget: chart.latestOverBudget,
+    headroomPercent: headroomPercentOf(chart.latest, chart.budget, chart.better),
+    deltaFromPrevious: chart.deltaFromPrevious,
+    runsOverBudget: chart.points.filter((p) => p.overBudget).length,
+    runCount: chart.points.length,
+    latestRun: {
+      commit: latest.commit,
+      shortSha: latest.shortSha,
+      measuredAt: latest.measuredAt,
+      source: latest.source,
+      load: latest.load,
+    },
+  }
+}
+
+/** Every metric with a budget, judged on its latest value: over budget first, then least room. */
+export function budgetsOf(charts) {
+  const rows = charts.filter((chart) => chart.budget !== null).map(budgetRowOf)
+  const room = (row) => row.headroomPercent ?? (row.overBudget ? -Infinity : Infinity)
+  return rows.sort((a, b) => Number(b.overBudget) - Number(a.overBudget) || room(a) - room(b))
+}
+
+function recentRunsOf(runs, budgetsById) {
+  return [...runs]
+    .sort((a, b) => b.measuredAtMs - a.measuredAtMs || b.line - a.line)
+    .slice(0, RECENT_RUN_COUNT)
+    .map((run) => ({
+      commit: run.commit,
+      shortSha: run.shortSha,
+      measuredAt: run.measuredAt,
+      source: run.source,
+      load: run.load,
+      env: run.env,
+      note: run.note,
+      metricCount: Object.keys(run.metrics).length,
+      overBudget: Object.entries(run.metrics)
+        .filter(([id, value]) => {
+          const def = budgetsById.get(id)
+          return def && isOverBudget(value, def.budget, def.better)
+        })
+        .map(([id]) => id),
+    }))
+}
+
 /**
  * The whole section's model from the two committed files.
  * @param {{ historyText: string, registry: unknown, repo: string }} inputs
@@ -262,12 +325,18 @@ export function buildPerfOverview({ historyText, registry, repo }) {
   const history = parsePerfHistory(historyText)
   const known = readPerfRegistry(registry)
   const { charts, unregistered } = chartsOf(history.runs, known)
+  const budgets = budgetsOf(charts)
+  const over = budgets.filter((row) => row.overBudget).length
+  const budgetsById = new Map(budgets.map((row) => [row.id, row]))
   return {
     repo,
     runCount: history.runs.length,
     metricCount: charts.length,
     runs: history.runs,
     latestRun: latestMeasuredOf(history.runs),
+    budgets,
+    budgetCounts: { total: budgets.length, over, within: budgets.length - over },
+    recentRuns: recentRunsOf(history.runs, budgetsById),
     groups: groupCharts(charts, known),
     unregistered,
     problems: history.problems,
