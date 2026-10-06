@@ -78,6 +78,9 @@ export const slice: SliceDefinition = {
 | `discovery(provider)` | `discovery.ts` | One provider (`codex`). |
 | `loadoutAcceptance(rule)`, `attachUse(use)` | `vehicleLoadout.ts`, `vehicleAttach.ts` | Item slices only. |
 | `hudPanel(panel)` | `src/ui/registries/hudPanels.ts` | The panel reads the slice's own store and takes no props. |
+| `worldPiece(piece)` | `src/scene/registries/worldPieces.ts` | An R3F piece drawn in its world layer (`platform`), no props (#175). |
+| `vehicleStaging(provider)` | `src/systems/registries/vehicleStaging.ts` | One provider (`dock-buildings`): where the local car is drawn, the camera looks and input waits; presentation only (#170). |
+| `buildingAttachUse(use)` | `src/systems/registries/buildingAttach.ts` | A use of a shop building's attach point (#170). |
 | `debugActions(actions)` | `src/debug/debugActionRegistry.ts` | Exposed as `steampunkDebug.features['<slice>']`. |
 | `commandRules(rules)` | `src/systems/registries/commandRules.ts` | Keyed by command type: `<slice>.<name>`, or `debug.<slice>.<name>` for a debug command. `applyCommand` asks the kernel table first. |
 | `eventProjections(projections)` | `src/logging/registries/eventProjections.ts` | Keyed by `<slice>.<Event>` domain event type; `() => null` for an event with no log line. |

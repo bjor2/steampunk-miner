@@ -40,6 +40,8 @@ import {
   type RegistryEntry,
 } from '../systems/registries/seal'
 import { ATTACH_USE_REGISTRY } from '../systems/registries/vehicleAttach'
+import { VEHICLE_STAGING_REGISTRY } from '../systems/registries/vehicleStaging'
+import { WORLD_PIECE_REGISTRY } from '../scene/registries/worldPieces'
 import { LOADOUT_ACCEPTANCE_REGISTRY } from '../systems/registries/vehicleLoadout'
 import { HUD_PANEL_REGISTRY } from '../ui/registries/hudPanels'
 import type { SliceDefinition, SliceRegistrar } from './sliceDefinition'
@@ -64,6 +66,8 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     attachUse: (use) => add(ATTACH_USE_REGISTRY, use),
     buildingAttachUse: (use) => add(BUILDING_ATTACH_USE_REGISTRY, use),
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),
+    worldPiece: (piece) => add(WORLD_PIECE_REGISTRY, piece),
+    vehicleStaging: (provider) => add(VEHICLE_STAGING_REGISTRY, provider),
     debugActions: (actions) =>
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),
     commandRules: (rules) =>

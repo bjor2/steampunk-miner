@@ -4,7 +4,8 @@
  * are counted, a pose report goes to the authority when one is due, the drill's facing and
  * activity go to the scene for the headlamp and sparks, the speed and lift to the sounds, and the
  * tick's motion to the part animation (#48). After the tow or a planet change the body
- * is placed on the dock the authority put the vehicle on.
+ * is placed on the dock the authority put the vehicle on. A dock building may stage the vehicle
+ * first (#170 auto-roll, `vehicleStage.ts`): the drawn car and the camera move, the body does not.
  */
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
 import type { PlanetView, VehicleController, VehicleStepResult } from '../physics/vehicleController'
@@ -32,6 +33,7 @@ import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
 import { stepVehicleParts } from './partMotionPresence'
 import { renderPresence } from './renderPresence'
+import { createVehicleStage, type VehicleStage } from './vehicleStage'
 
 const HALF_TILE = 0.5
 
@@ -40,13 +42,19 @@ export interface VehicleLoop {
 }
 
 interface LoopState {
+  stage: VehicleStage
   reporter: PoseReporter
   placement: string
   view: { world: WorldState; params: PlanetParams; planet: PlanetView } | null
 }
 
 export function createVehicleLoop(): VehicleLoop {
-  const loop: LoopState = { reporter: NEW_POSE_REPORTER, placement: '', view: null }
+  const loop: LoopState = {
+    stage: createVehicleStage(),
+    reporter: NEW_POSE_REPORTER,
+    placement: '',
+    view: null,
+  }
   return {
     step(controller, intent) {
       useGameStore.getState().advanceOneTick()
@@ -54,8 +62,13 @@ export function createVehicleLoop(): VehicleLoop {
       if (params === null) return
       const vehicle = readLocalVehicle()
       placeAfterTowOrTravel(loop, controller, vehicle, params)
+      const stagedIntent = loop.stage.step(intent)
       const result = controller.step(
-        { intent, engine: engineStats(vehicle.levels.engine), canAct: canVehicleAct(vehicle) },
+        {
+          intent: stagedIntent,
+          engine: engineStats(vehicle.levels.engine),
+          canAct: canVehicleAct(vehicle),
+        },
         planetViewOf(loop, params, world),
       )
       reportWhenDue(loop, result)

@@ -1,5 +1,6 @@
 /**
- * The orthographic camera over the vehicle (#13): it follows the vehicle and rolls so local down
+ * The orthographic camera over the vehicle (#13): it follows the vehicle (or eases to where a dock
+ * building stages it, #170) and rolls so local down
  * points down the screen, or stays upright in the fixed-camera mode, offset by the screen shake
  * (zero with shake off). It frames the player's zoom in metres across the short axis (#39), so
  * every resolution shows the same world, capped on wide screens (#173). The turn and the zoom ease on the render delta, which is
@@ -23,6 +24,7 @@ import {
 import { cameraPresence } from './cameraPresence'
 import { screenEffects } from './screenEffectsPresence'
 import { vehiclePresence } from './vehiclePresence'
+import { vehicleStagePresence } from './vehicleStage'
 
 export function PlanetCamera() {
   const turn = useMemo(createCameraTurn, [])
@@ -36,10 +38,17 @@ export function PlanetCamera() {
 }
 
 function placeCamera(camera: Camera, turn: CameraTurn): void {
-  camera.position.x = vehiclePresence.x + screenEffects.offsetX
-  camera.position.y = vehiclePresence.y + screenEffects.offsetY
+  camera.position.x =
+    lookAtOf(vehiclePresence.x, vehicleStagePresence.cameraX) + screenEffects.offsetX
+  camera.position.y =
+    lookAtOf(vehiclePresence.y, vehicleStagePresence.cameraY) + screenEffects.offsetY
   camera.rotation.z = turn.angle
   cameraPresence.localUpScreenAngle = angleOfUp(turn.up) - turn.angle
+}
+
+/** The vehicle, or on the way to where a dock building stages the camera (#170 showcase). */
+function lookAtOf(vehicle: number, staged: number): number {
+  return vehicle + (staged - vehicle) * vehicleStagePresence.cameraWeight
 }
 
 /**

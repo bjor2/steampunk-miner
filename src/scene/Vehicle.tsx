@@ -15,6 +15,7 @@ import { VehicleGuns } from './VehicleGuns'
 import { VehiclePlaceholder } from './VehiclePlaceholder'
 import { createVehicleLoop } from './vehicleLoop'
 import { vehiclePresence } from './vehiclePresence'
+import { vehicleStagePresence } from './vehicleStage'
 
 export function Vehicle() {
   const loop = useMemo(createVehicleLoop, [])
@@ -23,7 +24,12 @@ export function Vehicle() {
 
   if (startPose === null) return null
   return (
-    <VehicleBody startPose={startPose} onFixedStep={stepVehicle} presence={vehiclePresence}>
+    <VehicleBody
+      startPose={startPose}
+      onFixedStep={stepVehicle}
+      presence={vehiclePresence}
+      stage={vehicleStagePresence}
+    >
       {(controller) => (
         <>
           <VehiclePlaceholder />

@@ -313,6 +313,8 @@ export interface SliceRegistrar {
   attachUse(use: AttachUse): void
   buildingAttachUse(use: BuildingAttachUse): void      // #175, section 3.11
   hudPanel(panel: HudPanel): void
+  worldPiece(piece: WorldPiece): void                  // #175, section 3.14
+  vehicleStaging(provider: VehicleStagingProvider): void  // one provider, #175, section 3.14
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   commandRules(rules: SliceCommandRules): void              // K1, section 3.15
   eventProjections(projections: SliceEventProjections): void
@@ -652,6 +654,8 @@ export function debugActionsBySlice(): Readonly<Record<string, Readonly<Record<s
 ```
 
 **HUD.** `HudView.tsx` renders each slot's panels right after its kernel component (`GaugeCluster`, `HudBanner`, `PositionPanel`, `HudPrompts`, `ThreatMarkers`). An empty slot renders no markup.
+
+**World pieces and vehicle staging (#175).** `src/scene/registries/worldPieces.ts` is the scene's counterpart of the HUD slots: `GameScene` draws each layer's pieces (`platform`, on the pad behind the vehicle) in id order, and an empty layer draws nothing. `src/systems/registries/vehicleStaging.ts` takes one provider that says, from the authority state alone, where the local car is drawn relative to its body, where the camera looks and whether input waits (the Workshop auto-roll of #170). `scene/vehicleStage.ts` reads it once per fixed step; it never moves the body or the authority pose, and with no provider nothing is staged.
 
 **Debug.** `createDebugApi()` adds one key, `features`, so tests call `window.steampunkDebug.features['<slice>'].<action>()`. In #156, actions are read-only. Since K1 (#184), a state-changing action submits a `debug.<slice>.<action>` command through `submitSliceDebugCommand` (`src/debug/sliceDebugCommands.ts`), so it replays and logs `debug_command_applied`.
 

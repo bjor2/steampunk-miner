@@ -26,6 +26,10 @@ const CANCEL_REBINDING_KEY = 'Escape'
 
 const heldActions: ActionId[] = []
 const actionsOfKey = new Map<string, ActionId[]>()
+/** Every key down now, whatever layer it pressed in: a drive key held on a dock screen counts. */
+const keysDown = new Set<string>()
+/** The vehicle's held drive actions (#170: holding one leaves the Workshop showcase). */
+const DRIVE_ACTIONS: readonly ActionId[] = ['aim_left', 'aim_right', 'aim_down', 'lift']
 
 /** One action going down (accepted in its layer) or a held one coming up, in order (#173). */
 export interface ActionEdge {
@@ -43,6 +47,7 @@ const actionStream: ActionEdge[] = []
  * touch (#173), and still does what it is bound to.
  */
 export function routeKeyChange(key: KeyChange): void {
+  rememberKey(key)
   if (!key.isDown) return releaseKey(key.code)
   useGameStore.getState().dismissTransmission()
   useGameStore.getState().hideTouchControls()
@@ -86,11 +91,23 @@ export function readVehicleIntent(): VehicleIntent {
   return buildIntent(heldActions)
 }
 
+/** Whether a key bound to a drive action is down, on any layer (the Workshop's leave, #170). */
+export function isDriveKeyHeld(): boolean {
+  const { bindings } = useGameStore.getState()
+  return DRIVE_ACTIONS.some((action) => bindings[action].some((chord) => keysDown.has(chord)))
+}
+
 /** Nothing held; tests and a fresh store start here. */
 export function resetInput(): void {
   heldActions.length = 0
   actionsOfKey.clear()
   actionStream.length = 0
+  keysDown.clear()
+}
+
+function rememberKey(key: KeyChange): void {
+  if (key.isDown) keysDown.add(key.code)
+  else keysDown.delete(key.code)
 }
 
 function holdAction(action: ActionId): void {

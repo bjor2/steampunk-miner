@@ -1,7 +1,8 @@
 /**
  * The vehicle's Rapier body under React: created once in the R3F physics world, driven once per
  * fixed step by the vehicle controller, and drawn by copying the body's transform onto a group
- * each frame (presentation only; nothing per-frame reaches React state).
+ * each frame (presentation only; nothing per-frame reaches React state), shifted by the dock
+ * building's staging (#170 auto-roll), which never moves the body.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { useFrame } from '@react-three/fiber'
@@ -19,9 +20,16 @@ interface VehicleBodyProps {
   startPose: VehiclePose
   /** Called once per fixed step, before the world steps, with the one writer of the motion. */
   onFixedStep: (controller: VehicleController) => void
-  /** Written every frame with the body's position, for the camera, terrain and lighting. */
+  /** Written every frame with where the car is drawn, for the camera, terrain and lighting. */
   presence: { x: number; y: number }
+  /** Metres from the body to where the car is drawn; zero unless a dock building stages it. */
+  stage: DrawOffset
   children: (controller: VehicleController) => ReactNode
+}
+
+interface DrawOffset {
+  drawOffsetX: number
+  drawOffsetY: number
 }
 
 interface MountedVehicle {
@@ -29,7 +37,13 @@ interface MountedVehicle {
   controller: VehicleController
 }
 
-export function VehicleBody({ startPose, onFixedStep, presence, children }: VehicleBodyProps) {
+export function VehicleBody({
+  startPose,
+  onFixedStep,
+  presence,
+  stage,
+  children,
+}: VehicleBodyProps) {
   const { world, rapier } = useRapier()
   const group = useRef<Group>(null)
   const [mounted, setMounted] = useState<MountedVehicle | null>(null)
@@ -52,7 +66,7 @@ export function VehicleBody({ startPose, onFixedStep, presence, children }: Vehi
 
   useFrame(() => {
     if (mounted !== null && group.current !== null)
-      copyBodyTransform(mounted.body, group.current, presence)
+      copyBodyTransform(mounted.body, group.current, presence, stage)
   })
 
   return <group ref={group}>{mounted === null ? null : children(mounted.controller)}</group>
@@ -62,11 +76,12 @@ function copyBodyTransform(
   body: RAPIER.RigidBody,
   group: Group,
   presence: { x: number; y: number },
+  stage: DrawOffset,
 ) {
   const position = body.translation()
   const rotation = body.rotation()
-  group.position.set(position.x, position.y, 0)
+  presence.x = position.x + stage.drawOffsetX
+  presence.y = position.y + stage.drawOffsetY
+  group.position.set(presence.x, presence.y, 0)
   group.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w)
-  presence.x = position.x
-  presence.y = position.y
 }

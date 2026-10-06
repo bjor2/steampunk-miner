@@ -22,6 +22,8 @@ import type { OreLookProvider } from '../systems/registries/oreLook'
 import type { OreTypeProvider } from '../systems/registries/oreTypes'
 import type { SaveSection } from '../systems/registries/saveSections'
 import type { AttachUse } from '../systems/registries/vehicleAttach'
+import type { VehicleStagingProvider } from '../systems/registries/vehicleStaging'
+import type { WorldPiece } from '../scene/registries/worldPieces'
 import type { LoadoutAcceptance } from '../systems/registries/vehicleLoadout'
 import type { HudPanel } from '../ui/registries/hudPanels'
 
@@ -56,6 +58,10 @@ export interface SliceRegistrar {
   /** A use of a shop building's attach point (#170 `building-attach`): render-only. */
   buildingAttachUse(use: BuildingAttachUse): void
   hudPanel(panel: HudPanel): void
+  /** A piece of the world scene, drawn in its layer (#175). */
+  worldPiece(piece: WorldPiece): void
+  /** One provider across all slices: how a dock building stages the local vehicle (#170). */
+  vehicleStaging(provider: VehicleStagingProvider): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   /**
