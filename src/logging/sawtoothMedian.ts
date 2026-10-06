@@ -7,6 +7,7 @@
  */
 import { PACING_TARGETS } from '../constants/pacingTargets'
 import { bandDigRatio, type BandDig } from './bandDigReport'
+import { drillLeadsText } from './planetLeads'
 import type { RunSummary } from './runSummary'
 
 /** One seed's run summary, as the sawtooth table prints it. */
@@ -37,7 +38,10 @@ export function sawtoothMisses(runs: readonly SeededSawtooth[]): string[] {
     )
 }
 
-/** One row per planet left: each seed's ratio (`-` where it never left) and the median. */
+/**
+ * One row per planet left: each seed's ratio with its drill and tip leads on arrival and at
+ * departure (`-` where it never left), and the median.
+ */
 export function formatSawtoothSeedTable(runs: readonly SeededSawtooth[]): string {
   const medians = medianSawtoothScores(runs)
   const rows = Object.entries(medians).map(([planet, median]) => {
@@ -84,7 +88,11 @@ function sawtoothScore(dig: BandDig): SawtoothScore {
 
 function seedCellOn(summary: RunSummary, planet: string): string {
   const dig = leftPlanetDigs(summary)[planet]
-  return dig === undefined ? '-' : scoreText(sawtoothScore(dig))
+  if (dig === undefined) return '-'
+  const leads = drillLeadsText(summary.planetLevels, planet)
+  return leads === ''
+    ? scoreText(sawtoothScore(dig))
+    : `${scoreText(sawtoothScore(dig))} (${leads})`
 }
 
 function scoreText(score: SawtoothScore): string {

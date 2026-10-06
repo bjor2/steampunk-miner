@@ -66,6 +66,12 @@ export interface RunSummary {
    * at most 0.7x arrival on the median of the pacing seeds.
    */
   sawtoothBandDigTicks: Record<string, BandDig>
+  /**
+   * Planet index (as a string key) to the track levels it was entered and left with, for the
+   * drill and tip leads printed beside the sawtooth (#86); the planet the run ends on has no
+   * departure.
+   */
+  planetLevels: PlanetLevels
   milestones: RunMilestones
 }
 
@@ -314,6 +320,10 @@ function summaryOf(tally: Tally): RunSummary {
     coreCompletedTicks: { ...tally.coreCompletedTicks },
     firstBandDigTicks: bandDigOf(tally.planetLevels, tally.upgradeLevels, FIRST_BAND),
     sawtoothBandDigTicks: bandDigOf(tally.planetLevels, tally.upgradeLevels, SAWTOOTH_BAND),
+    planetLevels: {
+      arrival: { ...tally.planetLevels.arrival },
+      departure: { ...tally.planetLevels.departure },
+    },
     milestones: { ...tally.milestones, planetReached: { ...tally.milestones.planetReached } },
   }
 }
