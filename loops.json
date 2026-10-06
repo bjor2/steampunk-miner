@@ -37,9 +37,25 @@
       "note": "race 4",
       "updated_at": "2026-10-06T01:23:49Z",
       "host": "grok-bot-vm-452660841"
+    },
+    "race/2": {
+      "loop": "race",
+      "slot": "2",
+      "state": "working",
+      "issue": null,
+      "note": "race 2",
+      "updated_at": "2026-10-06T01:23:49Z",
+      "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-06T01:23:49Z",
+      "key": "race/2",
+      "state": "working",
+      "issue": null,
+      "note": "race 2"
+    },
     {
       "at": "2026-10-06T01:23:49Z",
       "key": "race/4",
