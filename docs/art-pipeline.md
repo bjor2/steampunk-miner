@@ -237,6 +237,39 @@ the #52 kebab form of the row id (`src/systems/art/artIds.ts`).
 - `scripts/art/author_blasting_charges.py` wrote the first version of both `.blend` files. From then
   on the `.blend` files are the sources.
 
+## Heat planets and the refractory lining
+
+The art of the `heat_lava` and `refractory_lining` schedule rows
+([#114](https://github.com/bjor2/steampunk-miner/issues/114), for the spec
+[#113](https://github.com/bjor2/steampunk-miner/issues/113) "Visibility"). The ids take the #52 kebab
+form of the row ids, and the refractory tiles take the lining type #113 names
+(`src/systems/art/artIds.ts`).
+
+| Id                                                         | Source               | What the build draws                                                   |
+| ---------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------- |
+| `ground-heat-lava`                                         | Blender, tile + glow | lava pockets: black crust plates on molten rock, the cracks glowing    |
+| `casing-refractory-grade-1` to `-5`                        | Blender, tile + glow | a refractory ring of that grade: firebrick with ember joints, ironwork |
+| `icon-heat-lava`                                           | vector, SVG          | the HUD heat gauge                                                     |
+| `icon-refractory-lining`                                   | vector, SVG          | the lining type row in the Upgrade bay                                 |
+| `fx-heat-shimmer`                                          | shader, code         | the shimmer on the vehicle above `throttleAt` (#51 row; placeholder)   |
+| `palette.heat` (in `src/systems/render/artDirection.json`) | procedural colours   | heat planets' bands, ember sky and molten core                         |
+
+- All six tiles say `"emissive": true`, so each ships `<id>.emissive.ktx2`; `tileEmissiveMapOf`
+  names it. Add it on top of the lit colour, so the joints and the lava still glow where the
+  ambient light has faded with depth. The renderer may scroll the lava tile and pulse either glow;
+  the maps hold still.
+- A standard ring keeps drawing `casing-grade-<n>`, a refractory ring `casing-refractory-grade-<n>`.
+  Every refractory grade is the same firebrick, so the type reads by brick and glow. The grade reads
+  by the ironwork over it, which steps up like the standard lining's plates: anchor bolts on a 0.5 m
+  grid; a riveted band every 0.5 m; a riveted 0.5 m frame; the frame braced by an X with big bolts;
+  a 0.25 m gunmetal cage with brass bolts. Iron covers the joints under it, so they never glow.
+  Each pattern repeats within 0.5 m, like the standard grades.
+- `palette.heat` is a palette like the planets' (#13); the heat archetype (#96) points its
+  `paletteId` at it. Its band colours tint the ground strata as any planet's do.
+- `scripts/art/author_heat_tiles.py` wrote the first version of the six `.blend` files, reusing
+  `author_tiles.py`'s seamless graph. From then on the `.blend` files are the sources.
+- The archetype stinger on arrival at P8 (#113) is audio, not art.
+
 ## The `parts.json` sidecar, schema 1
 
 ```json
