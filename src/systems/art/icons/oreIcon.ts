@@ -49,21 +49,24 @@ const GRADE_PIP_Y = 20.2
 
 const GRADE_PIP_GAP = 2.6
 
-/** The SVG text of an ore icon, marked with its family, tier and grade. */
-export function oreIconSvgOf(request: OreIconRequest): string {
-  const grade = oreGradeOf(request.tier)
-  const drawing: IconDrawing = {
+/** The drawing of an ore icon: the hex in the tier's colour, the family's glyph, the grade pips. */
+export function oreIconDrawingOf(request: OreIconRequest): IconDrawing {
+  return {
     title: `Tier ${request.tier} ${titleOfFamily(request.family)}`,
     frame: 'hex',
     axis: 'neutral',
     bodyColour: hexOfRgb(oreColourOf(request)),
     glyph: glyphOfFamily(request.family),
-    extraElements: gradePips(grade),
+    extraElements: gradePips(oreGradeOf(request.tier)),
   }
-  return svgTextOf(drawing, {
+}
+
+/** The SVG text of an ore icon, marked with its family, tier and grade. */
+export function oreIconSvgOf(request: OreIconRequest): string {
+  return svgTextOf(oreIconDrawingOf(request), {
     family: request.family,
     tier: String(request.tier),
-    grade: String(grade),
+    grade: String(oreGradeOf(request.tier)),
   })
 }
 

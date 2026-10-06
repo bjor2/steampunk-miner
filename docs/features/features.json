@@ -632,9 +632,9 @@
             },
             {
               "title": "Upgrade icons",
-              "description": "Hand-drawn vector icons for each track and module.",
+              "description": "One icon language across the bay: a riveted plate for each track and module, a padlock or star badge for locked and maxed rows, a rim glint when a buy is open, and only the price turns red when money is short.",
               "status": "built",
-              "issues": [44, 62, 114]
+              "issues": [44, 62, 114, 163]
             },
             {
               "title": "Install animation",
@@ -1404,6 +1404,19 @@
           "description": "Icons, letters and hatching back up every colour cue.",
           "status": "built",
           "issues": [33]
+        },
+        {
+          "title": "Icon set",
+          "description": "Every gauge, status, readout, row, resource, button, card, plaque and setting has an icon; the frame shape says the kind (plate, gear, hex, triangle) and ore icons are generated from the ore look with their grade.",
+          "status": "built",
+          "issues": [158, 163]
+        },
+        {
+          "title": "Combat status stack",
+          "description": "Hull critical, collapse, live fuse, overheat, low energy and threat as triangle icons in that priority, at most three with a +N pip, pulsing by urgency (a thicker rim with flashes off); cargo full and the tow countdown shown beside them.",
+          "status": "partial",
+          "issues": [158, 163],
+          "doc": "docs/art/icons/README.md"
         },
         {
           "title": "Keyboard menus",

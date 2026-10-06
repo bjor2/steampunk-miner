@@ -37,11 +37,19 @@ scripts/art/
   repack_placeholder.py          re-packs a hand-edited placeholder sidecar
   merge_check.sh                 shows two art branches merge with no hand edits (#116)
 public/assets/<category>/<id>/   generated exports only: <id>.parts.json and <id>.<map>.ktx2
-src/ui/icons/<id>.svg            vector icons; the data-testid is the file stem
+src/ui/icons/<id>.svg            vector icons, written by `npm run art:icons` from the icon set (docs/art/icons/)
 ```
 
 The category is the id's prefix: `vehicle` (and the vehicle modules, `vehicle-*`), `platform-*`,
 `enemy-*`, `prop-*`, `ground-*` and `casing-*`.
+
+## The icon set
+
+Every UI icon is one entry of `src/systems/art/icons/iconSet.ts` (#158, #163): its id derived from a
+registry id, its frame (plate, gear, hex, triangle, none) and colour axis, and its glyph in
+`iconGlyphs.ts`. `npm run art:icons` writes `src/ui/icons/<id>.svg`, the `art/assets/<id>.json`
+entry and the contact sheet under `docs/art/icons/`; a stale file fails `npm test`. Ore icons are
+generated from the ore look at run time and are not files. See [docs/art/icons/README.md](art/icons/README.md).
 
 ## Adding an asset
 
