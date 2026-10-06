@@ -41,6 +41,13 @@ describe('asset look', () => {
     expect(partsAt(3)).toEqual(['t1-turret-mount', 't3-gun-barrel', 't1-turret-head'])
   })
 
+  it('draws the final auto guns from their atlas, with an emissive map for the pilot lamp', () => {
+    expect(assetQuadsOf('vehicle-auto-guns', 3).every((quad) => quad.uv !== null)).toBe(true)
+    expect(atlasMapsOf('vehicle-auto-guns')?.emissive).toBe(
+      'assets/vehicle/vehicle-auto-guns/vehicle-auto-guns.emissive.ktx2',
+    )
+  })
+
   it('turns the auto guns’ barrel and head about one trunnion above the vehicle’s hull', () => {
     const quads = assetQuadsOf('vehicle-auto-guns', 3)
     const trunnions = quads.filter((q) => q.partId !== 't1-turret-mount').map((q) => q.pivot)

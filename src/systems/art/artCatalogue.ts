@@ -23,6 +23,7 @@ import PLATFORM_BAY_UPGRADE_EXPORTED from '../../../public/assets/platform/platf
 import PLATFORM_HUB_EXPORTED from '../../../public/assets/platform/platform-hub/platform-hub.parts.json'
 import PROP_ARTEFACT_CACHE_EXPORTED from '../../../public/assets/prop/prop-artefact-cache/prop-artefact-cache.parts.json'
 import VEHICLE_EXPORTED from '../../../public/assets/vehicle/vehicle/vehicle.parts.json'
+import VEHICLE_AUTO_GUNS_EXPORTED from '../../../public/assets/vehicle/vehicle-auto-guns/vehicle-auto-guns.parts.json'
 import type { AssetManifest, ManifestEntry } from './assetManifest'
 import type { PartsSidecar } from './partsSidecar'
 
@@ -44,6 +45,7 @@ export const PLACEHOLDER_SIDECARS: readonly PartsSidecar[] = [
 /** Written by `npm run art:export`; the game draws one only while its manifest entry is final. */
 export const EXPORTED_SIDECARS: readonly PartsSidecar[] = [
   VEHICLE_EXPORTED,
+  VEHICLE_AUTO_GUNS_EXPORTED,
   PLATFORM_HUB_EXPORTED,
   PLATFORM_BAY_SELL_EXPORTED,
   PLATFORM_BAY_UPGRADE_EXPORTED,

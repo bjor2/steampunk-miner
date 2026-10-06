@@ -44,7 +44,7 @@
       "id": "vehicle-auto-guns",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#c9a24b",
       "partColors": {
         "t1-turret-mount": "#3b3631",

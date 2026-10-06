@@ -38,8 +38,8 @@ public/assets/<category>/<id>/   generated exports only: <id>.parts.json and <id
 src/ui/icons/<id>.svg            vector icons; the data-testid is the file stem
 ```
 
-The category is the id's prefix: `vehicle`, `platform-*`, `enemy-*`, `prop-*`, `ground-*` and
-`casing-*`.
+The category is the id's prefix: `vehicle` (and the vehicle modules, `vehicle-*`), `platform-*`,
+`enemy-*`, `prop-*`, `ground-*` and `casing-*`.
 
 ## Exporting an asset
 
@@ -54,8 +54,8 @@ trying out). The `.blend` is never saved.
 
 **It refuses the scene** (exit 1, with every problem listed) when the asset id names no category or
 isn't a `parts`, `tile` or `backdrop` asset in the manifest, when the file has an armature, a shape key or an action, or
-when a mesh object's name isn't a valid part id. For the vehicle, `t<tier>-<part>` objects must also
-sit in the `tier-<tier>` collection.
+when a mesh object's name isn't a valid part id. Tiered `t<tier>-<part>` objects (the vehicle's and
+a vehicle module's) must also sit in the `tier-<tier>` collection.
 
 **Otherwise it bakes** each part with Cycles (CPU, 1 sample, seed 0) from a quad just behind it, so
 the view is along +Y (Blender's Front view). Each part gets its own rectangle of a power-of-two
@@ -83,6 +83,29 @@ sorts its parts by id, rounds metres to 4 decimals, and records the Blender vers
   adds or replaces: `t3-wheel-2` replaces `t1-wheel-2`, and everything else carries over.
 - Draw order: an integer custom property `z` on the object if set, otherwise the depth rank.
 - The hub has collections `outpost` and `core-drive`, one part each.
+
+## Vehicle modules
+
+A schedule row whose unlock shows on the vehicle (#81 acceptance 3) gets its own tiered part
+family, `vehicle-<row>`, listed with its part names under `vehicleModuleParts` in
+`art/asset-rules.json` (the lint checks every key is a row of `docs/scaling/horizontal/stats.json`).
+Its parts are authored in the vehicle's own frame (chassis centre at the origin, drill towards +X),
+so drawing the family with the vehicle's transform puts it on the hull. Its tiers are the module's
+own looks, not the vehicle's visual tier.
+
+- **`vehicle-auto-guns`** (`auto_guns`, #107, #108): a hull turret, visible at every visual tier.
+  - `t1-turret-mount`: a pedestal on the chassis top at (0.04, 0.13); it never moves.
+  - `t1-turret-head`: a brass cupola with a sight slit and an amber pilot lamp, the one glowing
+    part; its pivot is the trunnion at (0.04, 0.64), above the stacks.
+  - `t1-gun-barrel`, `t2-gun-barrel`, `t3-gun-barrel`: the three barrel looks for the gun-level
+    breakpoints (one plain barrel; a longer barrel with a cooling jacket and muzzle brake; twin
+    finned barrels with a heat band and flared muzzles). Each pivots on the same trunnion and rests
+    pointing at the rear (-X), the arc the guns cover; the code turns it to the aim angle. Which
+    gun level picks which look is the build's (#93).
+  - Draw order 10 (mount), 11 (barrel), 12 (head), over every vehicle part.
+
+  `scripts/art/author_auto_guns.py` wrote the first version of the file. From then on the
+  `.blend` is the source.
 
 ## Bay screen backdrops
 
