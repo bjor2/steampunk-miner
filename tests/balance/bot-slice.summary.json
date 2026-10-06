@@ -43,6 +43,16 @@
     "1": 209688,
     "2": 386922
   },
+  "firstBandDigTicks": {
+    "1": {
+      "arrival": 40,
+      "departure": 24
+    },
+    "2": {
+      "arrival": 24,
+      "departure": 24
+    }
+  },
   "milestones": {
     "planetReached": {
       "1": 0,

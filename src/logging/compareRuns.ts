@@ -1,7 +1,8 @@
 /**
  * `compareRuns(a, b)` (decision #11 section 3, design doc sections 26 and 28): two run summaries
- * side by side, as the numbers a balance change moves: time to each planet and core, the firsts,
- * income per minute, spending by kind, deaths and the final level of every track. Differences are
+ * side by side, as the numbers a balance change moves: time to each planet and core, each planet's
+ * band-1 dig time on arrival and at departure (the #81 sawtooth, #86), the firsts, income per
+ * minute, spending by kind, deaths and the final level of every track. Differences are
  * reported, never judged: only the pacing targets fail a build (#29).
  *
  * Runs with different `logSchemaVersion`s are refused (no adapter exists yet), and so, unless the
@@ -22,6 +23,7 @@ import {
   ZERO_MONEY,
   type Money,
 } from '../systems/money'
+import { digText, type FirstBandDig } from './firstBandDigReport'
 import type { RunSummary } from './runSummary'
 
 export interface ComparisonRow {
@@ -37,6 +39,7 @@ type Quantity =
   | { kind: 'ticks'; value: number | null }
   | { kind: 'count'; value: number }
   | { kind: 'money'; value: Money }
+  | { kind: 'digTicks'; value: number | null }
 
 interface Metric {
   name: string
@@ -78,12 +81,13 @@ function metricsFor(a: RunSummary, b: RunSummary): Metric[] {
   return [
     ...keysOfEither(a.milestones.planetReached, b.milestones.planetReached).map(planetMetric),
     ...keysOfEither(a.coreCompletedTicks, b.coreCompletedTicks).map(coreMetric),
+    ...keysOfEither(firstBandDigsOf(a), firstBandDigsOf(b)).flatMap(firstBandDigMetrics),
     ...FIXED_METRICS,
     ...keysOfEither(a.upgradeLevels, b.upgradeLevels).map(levelMetric),
   ]
 }
 
-function keysOfEither(a: Record<string, number>, b: Record<string, number>): string[] {
+function keysOfEither(a: Record<string, unknown>, b: Record<string, unknown>): string[] {
   return [...new Set([...Object.keys(a), ...Object.keys(b)])].sort((x, y) =>
     x.localeCompare(y, 'en', { numeric: true }),
   )
@@ -101,6 +105,28 @@ function coreMetric(planet: string): Metric {
     name: `planet ${planet} core completed`,
     read: (summary) => ticks(summary.coreCompletedTicks[planet] ?? null),
   }
+}
+
+/** A `summary.json` written before #86 has no band-1 dig times; it compares as none. */
+function firstBandDigsOf(summary: RunSummary): Partial<Record<string, FirstBandDig>> {
+  return (summary as Partial<RunSummary>).firstBandDigTicks ?? {}
+}
+
+function firstBandDigMetrics(planet: string): Metric[] {
+  const digOf = (summary: RunSummary, when: keyof FirstBandDig): Quantity => ({
+    kind: 'digTicks',
+    value: firstBandDigsOf(summary)[planet]?.[when] ?? null,
+  })
+  return [
+    {
+      name: `planet ${planet} band 1 dig on arrival`,
+      read: (summary) => digOf(summary, 'arrival'),
+    },
+    {
+      name: `planet ${planet} band 1 dig at departure`,
+      read: (summary) => digOf(summary, 'departure'),
+    },
+  ]
 }
 
 function levelMetric(upgradeId: string): Metric {
@@ -156,6 +182,7 @@ function rowOf(metric: Metric, a: RunSummary, b: RunSummary): ComparisonRow {
 function quantityText(quantity: Quantity): string {
   if (quantity.kind === 'money') return formatAmount(quantity.value)
   if (quantity.kind === 'count') return String(quantity.value)
+  if (quantity.kind === 'digTicks') return digText(quantity.value)
   return quantity.value === null ? 'never' : minutesText(quantity.value)
 }
 
@@ -165,6 +192,8 @@ function changeText(before: Quantity, after: Quantity): string {
   if (before.kind === 'count' && after.kind === 'count') return signed(after.value - before.value)
   if (before.kind === 'ticks' && after.kind === 'ticks')
     return tickChange(before.value, after.value)
+  if (before.kind === 'digTicks' && after.kind === 'digTicks')
+    return digChange(before.value, after.value)
   return 'n/a'
 }
 
@@ -172,6 +201,12 @@ function tickChange(before: number | null, after: number | null): string {
   if (before === null || after === null) return before === after ? '0' : 'n/a'
   const difference = after - before
   return `${difference < 0 ? '-' : '+'}${minutesText(Math.abs(difference))}${percentText(difference, before)}`
+}
+
+function digChange(before: number | null, after: number | null): string {
+  if (before === null || after === null) return before === after ? '0' : 'n/a'
+  const difference = after - before
+  return `${difference < 0 ? '-' : '+'}${digText(Math.abs(difference))}${percentText(difference, before)}`
 }
 
 function moneyChange(before: Money, after: Money): string {

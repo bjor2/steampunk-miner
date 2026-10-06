@@ -14,6 +14,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { PACING_WORLD_SEEDS } from '../src/constants/pacingSeeds'
 import { compareRuns, formatComparisonTable } from '../src/logging/compareRuns'
+import { firstBandDigAlerts } from '../src/logging/firstBandDigReport'
 import { formatNdjsonLine } from '../src/logging/ndjson'
 import {
   formatSeedPacingTable,
@@ -59,7 +60,11 @@ const report = [
   seedsSection(seeds),
   `### Gates on the median\n\n${formatPacingVerdicts(pacingVerdicts(median))}`,
   listSection('Pacing targets missed (these fail the build)', pacingProblems(median)),
-  listSection('Alerts (reported only)', [...pacingAlerts(pacing), ...campaignPlanetAlerts(pacing)]),
+  listSection('Alerts (reported only)', [
+    ...pacingAlerts(pacing),
+    ...campaignPlanetAlerts(pacing),
+    ...firstBandDigAlerts(summary.firstBandDigTicks),
+  ]),
   listSection('Tunnel wrecker (reported only, #111)', wreckerDiveLines(deriveWreckerDives(events))),
   comparisonSection(summary),
   assaySection(),

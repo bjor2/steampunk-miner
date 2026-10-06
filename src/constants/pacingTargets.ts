@@ -29,6 +29,11 @@ export const PACING_TARGETS = {
    */
   campaignPlanetMinutes: { min: 45, max: 60 },
   /**
+   * Report only (#81 acceptance 1, C3 #86): on every campaign planet the drill time per metre of
+   * the first band at departure is at most this multiple of its time on arrival.
+   */
+  firstBandDigDepartureRatioMax: 0.7,
+  /**
    * Report only (spec #111, Systems & Economy numbers): on planets 6 to 9 the median dive has 2 to 8
    * rings breached by tunnel wreckers, and at most 5 dives in 100 set off a collapse on the way home.
    * A miss is a balance finding; the single lever is `gnawTicksPerRing` (180 to 600).

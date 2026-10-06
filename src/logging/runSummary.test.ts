@@ -28,6 +28,21 @@ function line<N extends RunEventName>(
   } as RunEvent
 }
 
+/** A workshop buy of one level, as the store logs it. */
+function bought(tick: number, upgradeId: string, toLevel: number): RunEvent {
+  return line(tick, 'upgrade_purchased', {
+    upgradeId,
+    fromLevel: toLevel - 1,
+    toLevel,
+    cost: '1e+2',
+    kind: 'geometric',
+    costCurveId: `cost.vehicle.${upgradeId}`,
+    totalLevel: toLevel,
+    visualTier: 1,
+    statsAfter: {},
+  })
+}
+
 const PLAYED_RUN: readonly RunEvent[] = [
   line(0, 'game_started', {
     gameVersion: '0.1.0',
@@ -152,6 +167,28 @@ describe('run summary', () => {
       upgradeLevels: { cargo_hold: 1, hull: 4 },
       coreCompletedTicks: { '2': 9060 },
     })
+  })
+
+  it('keeps the band-1 dig time per metre of each planet with the levels it was entered and left with', () => {
+    const run = [
+      ...PLAYED_RUN.slice(0, 7),
+      bought(985, 'drill_power', 13),
+      bought(986, 'drill_tip', 7),
+      ...PLAYED_RUN.slice(7),
+    ]
+    expect(deriveSummary(run).firstBandDigTicks).toEqual({
+      '1': { arrival: 40, departure: 24 },
+      '2': { arrival: 24, departure: 24 },
+    })
+  })
+
+  it('enters the planet with the start levels a scenario sets on the tick it is entered', () => {
+    const setDrill = line(0, 'debug_command_applied', {
+      command: 'debug.setUpgrade',
+      args: { upgradeId: 'drill_power', level: 13 },
+    })
+    const run = [...PLAYED_RUN.slice(0, 2), setDrill, ...PLAYED_RUN.slice(2)]
+    expect(deriveSummary(run).firstBandDigTicks['1']).toEqual({ arrival: 24, departure: 24 })
   })
 
   it('calls a run with no game_ended interrupted', () => {

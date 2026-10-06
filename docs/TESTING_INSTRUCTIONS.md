@@ -195,6 +195,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   writes the first seed's run to `balance-report/` and compares it with
   `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
   deliberate economy change, `npm run balance:baseline` rewrites the baseline in the same commit.
+- **Sawtooth** (#81, C3 #86): the summary's `firstBandDigTicks` holds each planet's band-1 drill
+  ticks per metre with the levels it was entered and left with (`firstBandDigTicks` in
+  `systems/vehicle/firstBandDig.ts`); `compareRuns` shows both per planet, and `balance:planets`
+  prints them with the ratio and alerts where departure is over 0.7x arrival. Reported, never gated.
 
 ## 5. Browser and packaged end-to-end (Playwright)
 

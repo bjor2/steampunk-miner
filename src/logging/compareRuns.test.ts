@@ -65,6 +65,39 @@ describe('compareRuns', () => {
     expect(comparison.ok && rowNamed(comparison.rows, 'lining forgiven')?.b).toBe('100')
   })
 
+  it('shows each planet band 1 dig time on arrival and at departure, the sawtooth of #81', () => {
+    const a = summaryOf({ firstBandDigTicks: { '2': { arrival: 30, departure: 24 } } })
+    const b = summaryOf({
+      runId: 'run_b',
+      firstBandDigTicks: { '2': { arrival: 48, departure: 24 } },
+    })
+    const comparison = compareRuns(a, b)
+    expect(comparison.ok && rowNamed(comparison.rows, 'planet 2 band 1 dig on arrival')).toEqual({
+      metric: 'planet 2 band 1 dig on arrival',
+      a: '0.50 s/m',
+      b: '0.80 s/m',
+      change: '+0.30 s/m (+60%)',
+    })
+    expect(comparison.ok && rowNamed(comparison.rows, 'planet 2 band 1 dig at departure')?.b).toBe(
+      '0.40 s/m',
+    )
+  })
+
+  it('compares against a summary written before band 1 dig times were kept', () => {
+    const { firstBandDigTicks: _absent, ...older } = summaryOf()
+    const b = summaryOf({
+      runId: 'run_b',
+      firstBandDigTicks: { '1': { arrival: 40, departure: 24 } },
+    })
+    const comparison = compareRuns(older as RunSummary, b)
+    expect(comparison.ok && rowNamed(comparison.rows, 'planet 1 band 1 dig on arrival')).toEqual({
+      metric: 'planet 1 band 1 dig on arrival',
+      a: 'no dig',
+      b: '0.67 s/m',
+      change: 'n/a',
+    })
+  })
+
   it('lists the final level of every track either run has', () => {
     const a = summaryOf({ upgradeLevels: { drill_power: 28 } })
     const b = summaryOf({ runId: 'run_b', upgradeLevels: { drill_power: 19, hull: 3 } })

@@ -11,6 +11,7 @@
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { add, fromCanonical, toCanonical, ZERO_MONEY, type Money } from '../systems/money'
 import type { RunEventName } from './eventNames'
+import { firstBandDigOf, type FirstBandDig, type PlanetLevels } from './firstBandDigReport'
 import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 export interface RunSummary {
@@ -51,6 +52,11 @@ export interface RunSummary {
   upgradeLevels: Record<string, number>
   /** Planet index (as a string key) to the tick its core was completed (#10). */
   coreCompletedTicks: Record<string, number>
+  /**
+   * Planet index (as a string key) to its band-1 drill ticks per metre with the levels it was
+   * entered and left with (#81 sawtooth, #86); the planet the run ends on is left with its last.
+   */
+  firstBandDigTicks: Record<string, FirstBandDig>
   milestones: RunMilestones
 }
 
@@ -112,6 +118,7 @@ interface Tally {
   debugCommandsApplied: number
   upgradeLevels: Record<string, number>
   coreCompletedTicks: Record<string, number>
+  planetLevels: PlanetLevels
   milestones: RunMilestones
 }
 
@@ -144,6 +151,7 @@ function emptyTally(): Tally {
     debugCommandsApplied: 0,
     upgradeLevels: {},
     coreCompletedTicks: {},
+    planetLevels: { arrival: {}, departure: {} },
     milestones: {
       planetReached: {},
       firstSale: null,
@@ -177,6 +185,7 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
   planet_entered: (tally, { planet, tick }) => {
     tally.planetsVisited.add(planet)
     tally.milestones.planetReached[String(planet)] ??= tick
+    tally.planetLevels.arrival[String(planet)] ??= { ...tally.upgradeLevels }
   },
   resource_sold: (tally, { data, tick }) => {
     tally.moneyEarned = add(tally.moneyEarned, fromCanonical(data.value))
@@ -200,6 +209,7 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
   },
   travel_started: (tally, { data }) => {
     tally.travelSpending = add(tally.travelSpending, fromCanonical(data.cost))
+    tally.planetLevels.departure[String(data.fromPlanet)] = { ...tally.upgradeLevels }
   },
   rescue_triggered: (tally, { data }) => {
     tally.rescueFees = add(tally.rescueFees, fromCanonical(data.fee))
@@ -233,9 +243,10 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
     tally.vehicleDeaths += 1
     tally.milestones.firstDeath ??= tick
   },
-  debug_command_applied: (tally, { data }) => {
+  debug_command_applied: (tally, event) => {
     tally.debugCommandsApplied += 1
-    foldDebugUpgradeLevel(tally, data)
+    foldDebugUpgradeLevel(tally, event.data)
+    foldStartLevelsOnArrival(tally, event)
   },
 }
 
@@ -246,6 +257,12 @@ function foldDebugUpgradeLevel(tally: Tally, data: { command: string; args: unkn
   if (typeof upgradeId === 'string' && Number.isSafeInteger(level)) {
     tally.upgradeLevels[upgradeId] = level as number
   }
+}
+
+/** A scenario's start levels, set on the tick its planet is entered, are what the planet is entered with. */
+function foldStartLevelsOnArrival(tally: Tally, { planet, tick }: RunEvent): void {
+  if (tally.milestones.planetReached[String(planet)] !== tick) return
+  tally.planetLevels.arrival[String(planet)] = { ...tally.upgradeLevels }
 }
 
 function foldCollected(tally: Tally, collected: { amount: number; value: string }): void {
@@ -286,6 +303,7 @@ function summaryOf(tally: Tally): RunSummary {
     debugCommandsApplied: tally.debugCommandsApplied,
     upgradeLevels: { ...tally.upgradeLevels },
     coreCompletedTicks: { ...tally.coreCompletedTicks },
+    firstBandDigTicks: firstBandDigOf(tally.planetLevels, tally.upgradeLevels),
     milestones: { ...tally.milestones, planetReached: { ...tally.milestones.planetReached } },
   }
 }
