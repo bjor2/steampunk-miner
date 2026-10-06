@@ -56,6 +56,19 @@ describe('feature unlocks on travel', () => {
     expect(isFeatureUnlocked(session.state(), 'auto_guns')).toBe(true)
   })
 
+  it('unlocks refinery_bay on arriving at planet 3, where the platform gets its Refinery bay', () => {
+    const session = dockedOnPlanet(2)
+    expect(isFeatureUnlocked(session.state(), 'refinery_bay')).toBe(false)
+    expect(unlockedIdsOf(session.submit(10, travelTo(3)))).toEqual(['refinery_bay'])
+    expect(isFeatureUnlocked(session.state(), 'refinery_bay')).toBe(true)
+  })
+
+  it('keeps refinery_bay open on every later planet without logging it again', () => {
+    const session = dockedOnPlanet(3)
+    expect(isFeatureUnlocked(session.state(), 'refinery_bay')).toBe(true)
+    expect(unlockedIdsOf(session.submit(10, travelTo(4)))).not.toContain('refinery_bay')
+  })
+
   it('does not unlock endless on arriving at planet 40 or travelling past it', () => {
     const session = dockedOnPlanet(39)
     const toFinale = session.submit(10, travelTo(40))

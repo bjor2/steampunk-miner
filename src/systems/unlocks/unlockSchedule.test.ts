@@ -123,6 +123,18 @@ describe('locked unlock schedule', () => {
     expect(isUnlocked(guns, { ...NO_PROGRESS, highestPlanetIndex: 3 })).toBe(false)
     expect(isUnlocked(guns, { ...NO_PROGRESS, highestPlanetIndex: 4 })).toBe(true)
   })
+
+  it('opens the built refinery_bay row once the platform has its Refinery bay (#92)', () => {
+    const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'refinery_bay')!
+    expect(row).toMatchObject({ planetIndex: 3, bind: 'facility', lane: 'Facility' })
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 3 })).toBe(false)
+    const withBay = {
+      ...NO_PROGRESS,
+      highestPlanetIndex: 3,
+      builtFacilityRowIds: new Set([row.id]),
+    }
+    expect(isUnlocked(row, withBay)).toBe(true)
+  })
 })
 
 describe('unlock gate checks', () => {
