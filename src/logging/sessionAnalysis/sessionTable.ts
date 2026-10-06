@@ -30,7 +30,7 @@ export interface SessionLog {
   startedAtMs: number | null
   worldSeed: number | null
   folder: string
-  /** In `tick` then `seq` order. */
+  /** In the log's own order: `seq`, strictly increasing per run (#11 section 1). */
   events: RunEvent[]
 }
 
@@ -128,7 +128,7 @@ function sessionLogOf(files: SessionFiles, events: RunEvent[]): SessionLog {
     startedAtMs: startOfRunId(runId),
     worldSeed: typeof metadata.worldSeed === 'number' ? metadata.worldSeed : null,
     folder: files.folder,
-    events: [...events].sort(byTickThenSeq),
+    events: [...events].sort(bySeq),
   }
 }
 
@@ -189,8 +189,8 @@ function byStart(a: SessionLog, b: SessionLog): number {
   return startOrder || a.runId.localeCompare(b.runId)
 }
 
-function byTickThenSeq(a: RunEvent, b: RunEvent): number {
-  return a.tick - b.tick || a.seq - b.seq
+function bySeq(a: RunEvent, b: RunEvent): number {
+  return a.seq - b.seq
 }
 
 /** The table as flat rows, one per event: what `sessions.ndjson` holds for ad hoc queries. */

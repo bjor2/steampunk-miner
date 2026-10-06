@@ -86,7 +86,7 @@ describe('session table', () => {
     ])
   })
 
-  it('orders sessions by start and each session by tick, then seq', () => {
+  it("orders sessions by start and each session by seq, the log's own order", () => {
     const later = sessionFilesOf('logs/later', [memoryLine('run_2026-10-06_00-00-00', 0, 60)])
     const earlier = sessionFilesOf('logs/earlier', [
       memoryLine(GAME_RUN, 2, 1200),
