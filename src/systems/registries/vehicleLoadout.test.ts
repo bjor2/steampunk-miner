@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CONTENT_REGISTRY, contentRegistrationOf } from './content'
 import { addToRegistry, withFreshRegistrySet } from './seal'
-import { ATTACH_IDS, ATTACH_USE_REGISTRY, attachOf } from './vehicleAttach'
+import { ATTACH_IDS, ATTACH_USE_REGISTRY, attachOf, attachPointOfEquipped } from './vehicleAttach'
 import {
   acceptedSlotsOf,
   LOADOUT_ACCEPTANCE_REGISTRY,
@@ -28,9 +28,10 @@ function registerBitAndAcceptance(): void {
 }
 
 describe('vehicle loadout registry', () => {
-  it('holds the eight slots and thirteen attach points of the #162 table', () => {
+  it('holds the eight slots of the #162 table and the 27 attach points of K5', () => {
     expect(LOADOUT_SLOT_IDS).toHaveLength(8)
-    expect(ATTACH_IDS).toHaveLength(13)
+    expect(ATTACH_IDS).toHaveLength(27)
+    expect(new Set(ATTACH_IDS).size).toBe(27)
   })
 
   it('has no extractor slot, since extractors are mounted once owned', () => {
@@ -97,4 +98,31 @@ describe('vehicle attach registry', () => {
   it('attaches an unknown item nowhere', () => {
     expect(withFreshRegistrySet(registerBitAndAcceptance, () => attachOf('nope'))).toBeNull()
   })
+
+  it('draws a "slot" power-up equipped in powerup.3 at hull.powerup.3', () => {
+    const point = withFreshRegistrySet(registerSlotDrawnShield, () =>
+      attachPointOfEquipped('mobility.shield', 'powerup.3'),
+    )
+    expect(point).toBe('hull.powerup.3')
+  })
+
+  it('draws a named-point item at its own point whatever slot holds it', () => {
+    const point = withFreshRegistrySet(registerBitAndAcceptance, () =>
+      attachPointOfEquipped('drill-gear.bit', 'powerup.2'),
+    )
+    expect(point).toBe('drill.hood')
+  })
 })
+
+function registerSlotDrawnShield(): void {
+  addToRegistry(
+    CONTENT_REGISTRY,
+    'mobility',
+    contentRegistrationOf('vehicle-item', {
+      id: 'mobility.shield',
+      iconId: 'icon-shield',
+      slots: ['powerup.1', 'powerup.2', 'powerup.3', 'powerup.4', 'powerup.5'],
+      attach: 'slot',
+    }),
+  )
+}

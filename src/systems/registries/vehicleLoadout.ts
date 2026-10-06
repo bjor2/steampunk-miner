@@ -9,7 +9,7 @@
  */
 import { contentOf, type ContentEntry } from './content'
 import { defineRegistry, entriesOf } from './seal'
-import type { AttachId } from './vehicleAttach'
+import type { ItemAttach } from './vehicleAttach'
 
 export const LOADOUT_SLOT_IDS = [
   'powerup.1',
@@ -41,7 +41,7 @@ export type EquipRefusal =
 
 export interface VehicleItem extends ContentEntry {
   slots: readonly LoadoutSlotId[]
-  attach: AttachId | null
+  attach: ItemAttach | null
   /** A power-up cradle (#162 `slot.powerup_3`-`5`): owning it opens this slot. */
   opensSlot?: LoadoutSlotId
 }
