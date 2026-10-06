@@ -13,6 +13,7 @@ import { kebabOf } from './artNaming'
 import { iconFileIds } from './icons/iconSet'
 import { BLASTING_CHARGES_ROW_ID, HEAT_LAVA_ROW_ID, REFRACTORY_LINING_TYPE } from './moduleRowIds'
 import { shopBuildingAssetIds, shopBuildingMovingPartIds } from './shopBuildingArt'
+import { workshopShowcaseAssetIds, workshopShowcasePartIds } from './workshopShowcaseArt'
 
 export const ASSET_CATEGORIES = [
   'vehicle',
@@ -84,6 +85,7 @@ export function blenderAssetIds(): string[] {
     ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}`),
     ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}-backdrop`),
     ...shopBuildingAssetIds(),
+    ...workshopShowcaseAssetIds(),
     ...enemyArtKinds().map((kind) => `enemy-${kebabOf(kind)}`),
     'prop-artefact-cache',
     ...numbered('ground-band', BAND_COUNT),
@@ -112,6 +114,18 @@ export {
   shopBuildingMovingPartIdsOf,
   shopBuildingShellPartIdOf,
 } from './shopBuildingArt'
+
+export {
+  reactionMajorPartIdOf,
+  reactionStepPartIdOf,
+  showcaseArmPartIdsOf,
+  showcaseRigPartIds,
+  UPGRADE_REACTION_ATTACH_IDS,
+  UPGRADE_REACTIONS_ASSET_ID,
+  upgradeReactionPartIds,
+  upgradeReactionRowIds,
+  WORKSHOP_SHOWCASE_ASSET_ID,
+} from './workshopShowcaseArt'
 
 export {
   BLASTING_CHARGES_ICON_ID,
@@ -195,7 +209,8 @@ function numbered(prefix: string, count: number): string[] {
  * Part ids outside the vehicle: each single-part asset's own id, the hub's two visual states
  * (#8 `outpost`, `core_drive`), which are its collections in Blender (#52), the refinery
  * bay's three looks drawn over its frame (#105), the charge rack's slots, the planted
- * charge's fuse lamp and the shop buildings' moving parts (#170).
+ * charge's fuse lamp, the shop buildings' moving parts (#170) and the Workshop showcase's rig
+ * and reaction pieces (#180).
  */
 export function registryPartIds(): string[] {
   return [
@@ -205,6 +220,7 @@ export function registryPartIds(): string[] {
     ...chargeRackPartIds(),
     FUSE_LAMP_PART_ID,
     ...shopBuildingMovingPartIds(),
+    ...workshopShowcasePartIds(),
   ]
 }
 

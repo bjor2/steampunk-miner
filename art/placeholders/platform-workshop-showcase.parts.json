@@ -1,0 +1,99 @@
+{
+  "assetId": "platform-workshop-showcase",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-workshop-showcase/platform-workshop-showcase.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [2048, 1024],
+  "maps": {
+    "albedo": "platform-workshop-showcase.albedo.ktx2",
+    "normal": "platform-workshop-showcase.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "showcase-arm-fore-left",
+      "tier": 1,
+      "rect": [296, 8, 103, 308],
+      "sizeM": [0.4, 1.2],
+      "pivotM": [0.2, 1.2],
+      "atM": [-1.8, 2.2],
+      "z": 4
+    },
+    {
+      "id": "showcase-arm-fore-right",
+      "tier": 1,
+      "rect": [415, 8, 103, 308],
+      "sizeM": [0.4, 1.2],
+      "pivotM": [0.2, 1.2],
+      "atM": [1.8, 2.2],
+      "z": 4
+    },
+    {
+      "id": "showcase-arm-upper-left",
+      "tier": 1,
+      "rect": [8, 8, 128, 359],
+      "sizeM": [0.5, 1.4],
+      "pivotM": [0.25, 1.4],
+      "atM": [-1.8, 3.6],
+      "z": 3
+    },
+    {
+      "id": "showcase-arm-upper-right",
+      "tier": 1,
+      "rect": [152, 8, 128, 359],
+      "sizeM": [0.5, 1.4],
+      "pivotM": [0.25, 1.4],
+      "atM": [1.8, 3.6],
+      "z": 3
+    },
+    {
+      "id": "showcase-chain",
+      "tier": 1,
+      "rect": [534, 8, 16, 256],
+      "sizeM": [0.06, 1.0],
+      "pivotM": [0.03, 1.0],
+      "atM": [0.0, 2.95],
+      "z": 2
+    },
+    {
+      "id": "showcase-hook",
+      "tier": 1,
+      "rect": [762, 8, 77, 116],
+      "sizeM": [0.3, 0.45],
+      "pivotM": [0.15, 0.0],
+      "atM": [0.0, 1.95],
+      "z": 3
+    },
+    {
+      "id": "showcase-lift",
+      "tier": 1,
+      "rect": [8, 476, 512, 77],
+      "sizeM": [2.0, 0.3],
+      "pivotM": [1.0, 0.0],
+      "atM": [0.0, 0.12],
+      "z": 2
+    },
+    {
+      "id": "showcase-rail",
+      "tier": 1,
+      "rect": [8, 383, 1639, 77],
+      "sizeM": [6.4, 0.3],
+      "pivotM": [3.2, 0.15],
+      "atM": [0.0, 3.3],
+      "z": 1
+    },
+    {
+      "id": "showcase-trolley",
+      "tier": 1,
+      "rect": [566, 8, 180, 128],
+      "sizeM": [0.7, 0.5],
+      "pivotM": [0.35, 0.5],
+      "atM": [0.0, 3.3],
+      "z": 2
+    }
+  ]
+}

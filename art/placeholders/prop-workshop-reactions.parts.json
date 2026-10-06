@@ -1,0 +1,180 @@
+{
+  "assetId": "prop-workshop-reactions",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/prop-workshop-reactions/prop-workshop-reactions.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [256, 4096],
+  "maps": {
+    "albedo": "prop-workshop-reactions.albedo.ktx2",
+    "normal": "prop-workshop-reactions.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "blasting-charges-major",
+      "tier": 1,
+      "rect": [8, 8, 205, 154],
+      "sizeM": [0.4, 0.3],
+      "pivotM": [0.2, 0.0],
+      "atM": [5.6, 0.6],
+      "z": 0
+    },
+    {
+      "id": "blasting-charges-step",
+      "tier": 1,
+      "rect": [8, 1538, 82, 154],
+      "sizeM": [0.16, 0.3],
+      "pivotM": [0.08, 0.0],
+      "atM": [5.6, 0.0],
+      "z": 0
+    },
+    {
+      "id": "boiler-major",
+      "tier": 1,
+      "rect": [8, 178, 205, 154],
+      "sizeM": [0.4, 0.3],
+      "pivotM": [0.2, 0.0],
+      "atM": [2.4, 0.6],
+      "z": 0
+    },
+    {
+      "id": "boiler-step",
+      "tier": 1,
+      "rect": [106, 1538, 82, 154],
+      "sizeM": [0.16, 0.3],
+      "pivotM": [0.08, 0.0],
+      "atM": [2.4, 0.0],
+      "z": 0
+    },
+    {
+      "id": "cargo-hold-major",
+      "tier": 1,
+      "rect": [8, 348, 205, 154],
+      "sizeM": [0.4, 0.3],
+      "pivotM": [0.2, 0.0],
+      "atM": [3.2, 0.6],
+      "z": 0
+    },
+    {
+      "id": "cargo-hold-step",
+      "tier": 1,
+      "rect": [8, 1708, 82, 154],
+      "sizeM": [0.16, 0.3],
+      "pivotM": [0.08, 0.0],
+      "atM": [3.2, 0.0],
+      "z": 0
+    },
+    {
+      "id": "casing-major",
+      "tier": 1,
+      "rect": [8, 518, 205, 154],
+      "sizeM": [0.4, 0.3],
+      "pivotM": [0.2, 0.0],
+      "atM": [6.4, 0.6],
+      "z": 0
+    },
+    {
+      "id": "casing-step",
+      "tier": 1,
+      "rect": [106, 1708, 82, 154],
+      "sizeM": [0.16, 0.3],
+      "pivotM": [0.08, 0.0],
+      "atM": [6.4, 0.0],
+      "z": 0
+    },
+    {
+      "id": "drill-power-major",
+      "tier": 1,
+      "rect": [8, 688, 205, 154],
+      "sizeM": [0.4, 0.3],
+      "pivotM": [0.2, 0.0],
+      "atM": [0.0, 0.6],
+      "z": 0
+    },
+    {
+      "id": "drill-power-step",
+      "tier": 1,
+      "rect": [8, 1878, 82, 154],
+      "sizeM": [0.16, 0.3],
+      "pivotM": [0.08, 0.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "drill-tip-major",
+      "tier": 1,
+      "rect": [8, 858, 205, 154],
+      "sizeM": [0.4, 0.3],
+      "pivotM": [0.2, 0.0],
+      "atM": [0.8, 0.6],
+      "z": 0
+    },
+    {
+      "id": "drill-tip-step",
+      "tier": 1,
+      "rect": [106, 1878, 82, 154],
+      "sizeM": [0.16, 0.3],
+      "pivotM": [0.08, 0.0],
+      "atM": [0.8, 0.0],
+      "z": 0
+    },
+    {
+      "id": "engine-major",
+      "tier": 1,
+      "rect": [8, 1028, 205, 154],
+      "sizeM": [0.4, 0.3],
+      "pivotM": [0.2, 0.0],
+      "atM": [1.6, 0.6],
+      "z": 0
+    },
+    {
+      "id": "engine-step",
+      "tier": 1,
+      "rect": [8, 2048, 82, 154],
+      "sizeM": [0.16, 0.3],
+      "pivotM": [0.08, 0.0],
+      "atM": [1.6, 0.0],
+      "z": 0
+    },
+    {
+      "id": "gun-major",
+      "tier": 1,
+      "rect": [8, 1198, 205, 154],
+      "sizeM": [0.4, 0.3],
+      "pivotM": [0.2, 0.0],
+      "atM": [4.8, 0.6],
+      "z": 0
+    },
+    {
+      "id": "gun-step",
+      "tier": 1,
+      "rect": [106, 2048, 82, 154],
+      "sizeM": [0.16, 0.3],
+      "pivotM": [0.08, 0.0],
+      "atM": [4.8, 0.0],
+      "z": 0
+    },
+    {
+      "id": "hull-major",
+      "tier": 1,
+      "rect": [8, 1368, 205, 154],
+      "sizeM": [0.4, 0.3],
+      "pivotM": [0.2, 0.0],
+      "atM": [4.0, 0.6],
+      "z": 0
+    },
+    {
+      "id": "hull-step",
+      "tier": 1,
+      "rect": [8, 2218, 82, 154],
+      "sizeM": [0.16, 0.3],
+      "pivotM": [0.08, 0.0],
+      "atM": [4.0, 0.0],
+      "z": 0
+    }
+  ]
+}

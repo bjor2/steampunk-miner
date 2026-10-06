@@ -1,0 +1,435 @@
+{
+  "assetId": "prop-workshop-reactions",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/prop-workshop-reactions/prop-workshop-reactions.blend",
+    "sha256": "3346b7fc392fa48b9011db2546c1f0b41d7b396b1356573ac9dbfbef6f6126b0",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    512,
+    1024
+  ],
+  "maps": {
+    "albedo": "prop-workshop-reactions.albedo.ktx2",
+    "normal": "prop-workshop-reactions.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "blasting-charges-major",
+      "tier": 1,
+      "rect": [
+        363,
+        792,
+        109,
+        88
+      ],
+      "sizeM": [
+        0.212,
+        0.1716
+      ],
+      "pivotM": [
+        0.106,
+        0.0
+      ],
+      "atM": [
+        5.6,
+        0.6
+      ],
+      "z": 0
+    },
+    {
+      "id": "blasting-charges-step",
+      "tier": 1,
+      "rect": [
+        137,
+        792,
+        26,
+        98
+      ],
+      "sizeM": [
+        0.049,
+        0.19
+      ],
+      "pivotM": [
+        0.022,
+        0.0
+      ],
+      "atM": [
+        5.6,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "boiler-major",
+      "tier": 1,
+      "rect": [
+        178,
+        8,
+        256,
+        208
+      ],
+      "sizeM": [
+        0.5,
+        0.405
+      ],
+      "pivotM": [
+        0.25,
+        0.005
+      ],
+      "atM": [
+        2.4,
+        0.6
+      ],
+      "z": 0
+    },
+    {
+      "id": "boiler-step",
+      "tier": 1,
+      "rect": [
+        109,
+        467,
+        59,
+        149
+      ],
+      "sizeM": [
+        0.1151,
+        0.29
+      ],
+      "pivotM": [
+        0.0576,
+        0.0
+      ],
+      "atM": [
+        2.4,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "cargo-hold-major",
+      "tier": 1,
+      "rect": [
+        285,
+        640,
+        164,
+        129
+      ],
+      "sizeM": [
+        0.32,
+        0.2516
+      ],
+      "pivotM": [
+        0.16,
+        0.0
+      ],
+      "atM": [
+        3.2,
+        0.6
+      ],
+      "z": 0
+    },
+    {
+      "id": "cargo-hold-step",
+      "tier": 1,
+      "rect": [
+        267,
+        792,
+        80,
+        89
+      ],
+      "sizeM": [
+        0.155,
+        0.1737
+      ],
+      "pivotM": [
+        0.0775,
+        0.0
+      ],
+      "atM": [
+        3.2,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "casing-major",
+      "tier": 1,
+      "rect": [
+        8,
+        792,
+        113,
+        109
+      ],
+      "sizeM": [
+        0.22,
+        0.2116
+      ],
+      "pivotM": [
+        0.11,
+        0.0
+      ],
+      "atM": [
+        6.4,
+        0.6
+      ],
+      "z": 0
+    },
+    {
+      "id": "casing-step",
+      "tier": 1,
+      "rect": [
+        179,
+        792,
+        72,
+        93
+      ],
+      "sizeM": [
+        0.14,
+        0.1797
+      ],
+      "pivotM": [
+        0.07,
+        0.0
+      ],
+      "atM": [
+        6.4,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "drill-power-major",
+      "tier": 1,
+      "rect": [
+        105,
+        640,
+        164,
+        134
+      ],
+      "sizeM": [
+        0.32,
+        0.2616
+      ],
+      "pivotM": [
+        0.11,
+        0.01
+      ],
+      "atM": [
+        0.0,
+        0.6
+      ],
+      "z": 0
+    },
+    {
+      "id": "drill-power-step",
+      "tier": 1,
+      "rect": [
+        8,
+        281,
+        60,
+        170
+      ],
+      "sizeM": [
+        0.1169,
+        0.3315
+      ],
+      "pivotM": [
+        0.0585,
+        0.0065
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "drill-tip-major",
+      "tier": 1,
+      "rect": [
+        298,
+        467,
+        82,
+        140
+      ],
+      "sizeM": [
+        0.16,
+        0.2716
+      ],
+      "pivotM": [
+        0.08,
+        0.0
+      ],
+      "atM": [
+        0.8,
+        0.6
+      ],
+      "z": 0
+    },
+    {
+      "id": "drill-tip-step",
+      "tier": 1,
+      "rect": [
+        8,
+        467,
+        85,
+        157
+      ],
+      "sizeM": [
+        0.165,
+        0.305
+      ],
+      "pivotM": [
+        0.105,
+        0.0
+      ],
+      "atM": [
+        0.8,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "engine-major",
+      "tier": 1,
+      "rect": [
+        310,
+        281,
+        177,
+        157
+      ],
+      "sizeM": [
+        0.345,
+        0.3066
+      ],
+      "pivotM": [
+        0.13,
+        0.0
+      ],
+      "atM": [
+        1.6,
+        0.6
+      ],
+      "z": 0
+    },
+    {
+      "id": "engine-step",
+      "tier": 1,
+      "rect": [
+        184,
+        467,
+        98,
+        141
+      ],
+      "sizeM": [
+        0.19,
+        0.275
+      ],
+      "pivotM": [
+        0.095,
+        0.0
+      ],
+      "atM": [
+        1.6,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "gun-major",
+      "tier": 1,
+      "rect": [
+        84,
+        281,
+        210,
+        157
+      ],
+      "sizeM": [
+        0.41,
+        0.3066
+      ],
+      "pivotM": [
+        0.32,
+        0.0
+      ],
+      "atM": [
+        4.8,
+        0.6
+      ],
+      "z": 0
+    },
+    {
+      "id": "gun-step",
+      "tier": 1,
+      "rect": [
+        396,
+        467,
+        41,
+        139
+      ],
+      "sizeM": [
+        0.08,
+        0.271
+      ],
+      "pivotM": [
+        0.04,
+        0.0
+      ],
+      "atM": [
+        4.8,
+        0.0
+      ],
+      "z": 0
+    },
+    {
+      "id": "hull-major",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        154,
+        257
+      ],
+      "sizeM": [
+        0.3,
+        0.5016
+      ],
+      "pivotM": [
+        0.15,
+        0.0
+      ],
+      "atM": [
+        4.0,
+        0.6
+      ],
+      "z": 0
+    },
+    {
+      "id": "hull-step",
+      "tier": 1,
+      "rect": [
+        8,
+        640,
+        81,
+        136
+      ],
+      "sizeM": [
+        0.1568,
+        0.265
+      ],
+      "pivotM": [
+        0.0716,
+        0.0
+      ],
+      "atM": [
+        4.0,
+        0.0
+      ],
+      "z": 0
+    }
+  ]
+}

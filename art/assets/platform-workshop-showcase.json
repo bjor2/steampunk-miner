@@ -1,0 +1,14 @@
+{
+  "id": "platform-workshop-showcase",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#b08a3c",
+  "partColors": {
+    "showcase-rail": "#3b3631",
+    "showcase-trolley": "#5a5650",
+    "showcase-chain": "#2a2724",
+    "showcase-hook": "#8a6a2f",
+    "showcase-lift": "#4a4a4e"
+  }
+}
