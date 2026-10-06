@@ -147,7 +147,10 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   `src/logging/assayPacingGate.test.ts` holds the bot holding `assay_beacon`
   (`bot-slice-assay.scenario.json`) to the same three gates: the #16 first ten minutes, the planet 1
   core in 30 to 60 minutes and the slice in 90 to 130 (`pacingVerdicts` prints pass or fail for each). Trips per planet
-  outside 3 to 12 are printed, never failed. Do not retune the bot or a constant to make it pass: a
+  outside 3 to 12 are printed, never failed. Both play their scenario on three world seeds
+  (`src/constants/pacingSeeds.ts`, the scenario's own `worldSeed` first) and gate on the median of
+  each metric (`medianPacingReport`, #84), so one run's combat deaths cannot flip a gate; the log
+  checks, the baseline and `compareRuns` stay on the first seed. Do not retune the bot or a constant to make it pass: a
   miss is a balance finding for the Systems & Economy Designer (the lever is `paceScale`).
 - **Guns** (#107 acceptance 5): `npm run balance:guns` plays the bot to planet 7's core with
   `auto_guns` (mounted on planet 4) and without, and prints planets 4 to 7 side by side with each
@@ -176,8 +179,9 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   the `bandHeat` scale (0.8 to 1.2), never `k_casing`. Heat specs drill band 5 of planet 8 straight
   above the core (`heatRun.test.ts`); lava specs find a pocket's floor in band 3 of planet 8
   (`lavaFlow.test.ts`, `lava/lavaRun.test.ts`) and build refractory rings with `debug.lineCasing`.
-- **Comparison** (`compareRuns`): `npm run balance:report` writes `balance-report/` and compares the
-  run with `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
+- **Comparison** (`compareRuns`): `npm run balance:report` prints each seed's row and the median,
+  writes the first seed's run to `balance-report/` and compares it with
+  `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
   deliberate economy change, `npm run balance:baseline` rewrites the baseline in the same commit.
 
 ## 5. Browser and packaged end-to-end (Playwright)

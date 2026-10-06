@@ -262,7 +262,8 @@ export function formatPacingReport(report: PacingReport): string {
   )
 }
 
-function minutesText(ticks: number): string {
+/** Ticks as minutes to one decimal, as every pacing table prints them. */
+export function minutesText(ticks: number): string {
   return `${(ticks / TICKS_PER_MINUTE).toFixed(1)} min`
 }
 

@@ -45,6 +45,26 @@ export interface LoggedRunOptions {
   refinery?: RefineryUse
 }
 
+/** One run of a scenario on one of its pacing world seeds (#84). */
+export interface SeededSliceRun extends LoggedSliceRun {
+  worldSeed: number
+}
+
+/**
+ * The scenario played once per world seed, its own seed swapped for each (#84): the bot, the
+ * scenario's start and the options are the same in every run, so only the world differs.
+ */
+export function playLoggedSliceOnSeeds(
+  scenario: Scenario,
+  worldSeeds: readonly number[],
+  options: LoggedRunOptions = {},
+): SeededSliceRun[] {
+  return worldSeeds.map((worldSeed) => ({
+    worldSeed,
+    ...playLoggedSlice({ ...scenario, worldSeed }, options),
+  }))
+}
+
 export function playLoggedSlice(
   scenario: Scenario,
   options: LoggedRunOptions = {},

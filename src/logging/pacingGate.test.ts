@@ -1,11 +1,13 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import { PACING_WORLD_SEEDS } from '../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { cmp, fromCanonical, fromSafeInteger, mul } from '../systems/money'
 import type { Scenario } from '../systems/scenario'
 import { countDrillDives, diveTicksWithoutCasing } from './diveCasing'
 import { RUN_EVENT_REGISTRY, type RegisteredEvent } from './eventNames'
 import { formatNdjsonLine } from './ndjson'
+import { formatSeedPacingTable, medianPacingReport, seededPacingReportsOf } from './pacingMedian'
 import {
   derivePacingReport,
   formatPacingReport,
@@ -17,7 +19,12 @@ import {
 import type { RunEvent } from './runEvent'
 import { runEventProblems } from './runEventSchema'
 import { deriveSummary } from './runSummary'
-import { playLoggedSlice, type LoggedSliceRun } from './sliceRunLog'
+import {
+  playLoggedSlice,
+  playLoggedSliceOnSeeds,
+  type LoggedSliceRun,
+  type SeededSliceRun,
+} from './sliceRunLog'
 import { deriveWreckerDives, wreckerDiveLines } from './wreckerDiveReport'
 
 const SCENARIO = JSON.parse(
@@ -41,12 +48,19 @@ const SLICE_SEQUENCE = [
   'core_completed',
 ]
 
-let logged: LoggedSliceRun | null = null
+const WORLD_SEEDS = PACING_WORLD_SEEDS['bot-slice']
 
-/** One logged bot run, shared by the specs: about 100 minutes of the slice in a few seconds. */
+let seeded: SeededSliceRun[] | null = null
+
+/** One logged bot run per pacing seed (#84), shared by the specs: about 100 minutes of slice each. */
+function seededRuns(): SeededSliceRun[] {
+  seeded ??= playLoggedSliceOnSeeds(SCENARIO, WORLD_SEEDS)
+  return seeded
+}
+
+/** The run on the scenario's own world seed, the one the baseline and the log checks use. */
 function botRun(): LoggedSliceRun {
-  logged ??= playLoggedSlice(SCENARIO)
-  return logged
+  return seededRuns()[0]
 }
 
 function isSubsequence(names: readonly string[], log: readonly string[]): boolean {
@@ -67,14 +81,22 @@ function bytesOf(lines: readonly object[]): number {
 // S11 (#65): the whole second slice (casing grades bought on-curve, collapse, the two bays) under
 // the first slice's gates. A miss is a tuning ticket for Systems & Economy, never a scope change.
 describe('balance regression: the pacing bot on the slice (#29, S11)', () => {
-  it('meets the first-sale, first-upgrade, ten-minute, core and slice targets', () => {
-    const report = derivePacingReport(botRun().events, SCENARIO.worldSeed)
-    const verdicts = formatPacingVerdicts(pacingVerdicts(report))
+  it("plays the scenario's own world seed first, then two fixed others", () => {
+    expect(WORLD_SEEDS).toHaveLength(3)
+    expect(WORLD_SEEDS[0]).toBe(SCENARIO.worldSeed)
+  })
+
+  // #84: judged on the median of the seeded runs, so one run's combat deaths cannot flip a gate.
+  it('meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median', () => {
+    const seeds = seededPacingReportsOf(seededRuns())
+    const median = medianPacingReport(seeds.map((seed) => seed.report))
+    const verdicts = formatPacingVerdicts(pacingVerdicts(median))
     const wrecker = wreckerDiveLines(deriveWreckerDives(botRun().events))
     console.log(
-      `${formatPacingReport(report)}\n\n${verdicts}\n${[...pacingAlerts(report), ...wrecker].join('\n')}`,
+      `${formatSeedPacingTable(seeds)}\n\n${formatPacingReport(median)}\n\n${verdicts}\n` +
+        [...pacingAlerts(median), ...wrecker].join('\n'),
     )
-    expect(pacingProblems(report)).toEqual([])
+    expect(pacingProblems(median)).toEqual([])
   })
 
   it('lays casing on every drill dive through the player placement code, and pays for it (#115)', () => {
