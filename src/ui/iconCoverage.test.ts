@@ -70,7 +70,9 @@ function everyNamedIconId(): string[] {
 const contentSliceOf = (iconId: string): SliceDefinition => ({
   id: 'icon-probe',
   register: (r) =>
-    r.content('vehicle-item', [{ id: 'icon-probe.drill', iconId, slots: ['rig.1'], attach: null }]),
+    r.content('vehicle-item', [
+      { id: 'icon-probe.drill', iconId, slots: ['drill.head'], attach: null },
+    ]),
 })
 
 describe('icon registry coverage', () => {
