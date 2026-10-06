@@ -73,6 +73,19 @@ export const RUN_EVENT_REGISTRY = {
       chunksLoaded: 'integer',
     },
   },
+  // #124: one timed series of a bench script run with `--log`, in the bench's own run folder.
+  // Times are whole microseconds, as floats belong to perf_sample alone (#11 value rules).
+  benchmark_result: {
+    group: 'run',
+    level: 'perf',
+    payload: {
+      name: 'text',
+      medianUs: 'integer',
+      p95Us: 'integer',
+      runs: 'integer',
+      commit: 'text',
+    },
+  },
 
   // Progression
   planet_entered: {
