@@ -60,7 +60,7 @@ describe('authority: determinism', () => {
   // authority state, #109, #95) and 14 (each vehicle's lining types and heat gauge, standard and
   // cold here, are authority state, #113, #96).
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('38682ebc4b336df4')
+    expect(stateDigest(replay(SESSION).state)).toBe('fe88312b019e2f87')
   })
 
   it('gives a different digest when one command differs', () => {

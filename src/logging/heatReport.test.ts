@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { RunEventData, RunEventName } from './eventNames'
 import { formatHeatPlanetLines, heatPlanetLines } from './heatReport'
 import type { PacingReport } from './pacingReport'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 const MINUTE = 60 * 60
 
@@ -13,7 +13,7 @@ function line<N extends RunEventName>(
   tick: number,
 ): RunEvent {
   return {
-    v: 1,
+    v: LOG_SCHEMA_VERSION,
     seq: 0,
     tick,
     timestamp: 0,
@@ -36,7 +36,7 @@ const paced = (coreMinutesOnPlanet: Record<string, number>) =>
 const arrivedAt = (planet: number, tick: number) =>
   line('planet_entered', { planetSeed: 1, generatorVersion: 5, radius: 676 }, planet, tick)
 const lined = (planet: number, type: string) =>
-  line('casing_lined', { lengthMm: 500, band: 4, grade: 4, type, price: '1', paid: '1' }, planet, 0)
+  line('casing_lined', { lengthMm: 500, band: 4, grade: 4, type, price: '1' }, planet, 0)
 
 describe('heat report (#113 acceptance 4)', () => {
   const events = [

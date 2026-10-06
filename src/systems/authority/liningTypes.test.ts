@@ -207,20 +207,21 @@ describe('refractory lining laid by the drill (#113 numbers acceptance 3)', () =
     const relaid = linedOf(drillBackThrough(session, out))
     expect(relaid.length).toBeGreaterThan(10)
     expect(relaid.every((event) => event.liningType === 'refractory')).toBe(true)
-    expect(relaid.every((event) => event.paid !== toCanonical(ZERO_MONEY))).toBe(true)
+    expect(relaid.every((event) => event.price !== toCanonical(ZERO_MONEY))).toBe(true)
     expect(wallTypeIndexes(session)).toEqual(new Set([1]))
   })
 
   it('relines a refractory tunnel in refractory for nothing', () => {
     const session = createScriptedSession()
     const out = boreTenMetres(session, 'refractory')
-    const wallet = session.state().players.p1.wallet
+    // Lining is billed, not debited mid-dive (#115): the bill grows by exactly what was charged.
+    const bill = session.state().players.p1.vehicle.liningBill
     const again = drillBackThrough(session, out)
     const charged = linedOf(again)
       .map((event) => fromCanonical(event.price))
       .reduce(add, ZERO_MONEY)
     const onNewRock = again.filter((event) => event.type === 'CasingPlaced' && event.samples > 0)
     expect(linedOf(again)).toHaveLength(onNewRock.length)
-    expect(session.state().players.p1.wallet).toEqual(sub(wallet, charged))
+    expect(session.state().players.p1.vehicle.liningBill).toEqual(add(bill, charged))
   })
 })

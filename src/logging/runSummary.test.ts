@@ -97,7 +97,7 @@ describe('run summary', () => {
 
   it('counts the lining bill paid at the Sell bay as spending, beside what was charged and forgiven', () => {
     const lined = (price: string) =>
-      line(990, 'casing_lined', { lengthMm: 1000, band: 1, grade: 1, price })
+      line(990, 'casing_lined', { lengthMm: 1000, band: 1, grade: 1, type: 'standard', price })
     const settled = line(995, 'lining_settled', { billed: '6e+0', paid: '4e+0', forgiven: '2e+0' })
     const run = [...PLAYED_RUN.slice(0, -1), lined('3e+0'), lined('3e+0'), settled]
     expect(deriveSummary(run)).toMatchObject({

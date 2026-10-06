@@ -36,7 +36,12 @@ describe('bot: heat planets (#113)', () => {
     const session = botOn(8)
     const params = planetParamsFor(83921, 8)
     const layout = newMineLayout(params, dockSiteOf(params))
-    buyUpgrades(session, { layout, isCoreTheGoal: false, gunPolicy: 'never' })
+    buyUpgrades(session, {
+      layout,
+      isCoreTheGoal: false,
+      gunPolicy: 'never',
+      chargePolicy: 'never',
+    })
     expect(session.vehicle().lining.active).toBe('refractory')
     expect(liningUnlockFor(session)).toBeNull()
   })
@@ -63,7 +68,7 @@ function planetAt(_session: BotSession, where: 'pad' | 'deep'): BotPlanet {
   const params = planetParamsFor(83921, 8)
   const layout = newMineLayout(params, dockSiteOf(params))
   const row = where === 'pad' ? layout.travelRow : layout.travelRow - 600
-  return { layout, pilot: { position: shaftTileAt(layout, row), facing: 0 } }
+  return { layout, pilot: { position: shaftTileAt(layout, row), facing: 0 }, chargePolicy: 'never' }
 }
 
 describe('bot: shaft round lava (#113)', () => {
@@ -77,12 +82,15 @@ describe('bot: shaft round lava (#113)', () => {
       const level = onCurveLevel(upgradeId, 8)
       session.submit({ type: 'debug.setUpgrade', payload: { upgradeId, level } })
     }
+    // The casing grade the bot buys before planet 8 too: scripted mining lays casing (#115), and a
+    // grade short of the band lets the dig's weak blocks collapse on it.
+    session.submit({ type: 'debug.setCasingGrade', payload: { grade: 5 } })
     session.submit({ type: 'debug.freezeEnemies', payload: { frozen: true } })
     session.submit({ type: 'undock', payload: {} })
     const params = planetParamsFor(83921, 8)
     const layout = { ...newMineLayout(params, dockSiteOf(params)), shaftBottomRow: ABOVE_LAVA }
     const position = shaftTileAt(layout, ABOVE_LAVA)
-    return { session, planet: { layout, pilot: { position, facing: 0 } } }
+    return { session, planet: { layout, pilot: { position, facing: 0 }, chargePolicy: 'never' } }
   }
 
   it('steps the shaft sideways to a clear column and bores on below the pocket', () => {
