@@ -61,10 +61,34 @@ describe('slice save sections in the snapshot', () => {
     expect('slices' in snapshot.state.players.p1).toBe(false)
   })
 
-  it('starts a new state with every registered section at its initial value', () => {
-    const state = withRegistrations([BOTH_SECTIONS], () => createAuthorityState(START))
-    expect(state.slices).toEqual({ 'section-probe': 0 })
-    expect(state.players.p1.slices).toEqual({ 'section-probe.notes': [] })
+  it('leaves a registered section out of the state until it leaves its initial value', () => {
+    const { fresh, reset } = withRegistrations([BOTH_SECTIONS], () => ({
+      fresh: createAuthorityState(START),
+      reset: withSection(writtenState(), null, countSection(1), 0),
+    }))
+    expect('slices' in fresh).toBe(false)
+    expect('slices' in fresh.players.p1).toBe(false)
+    expect('slices' in reset).toBe(false)
+    expect(reset.players.p1.slices).toEqual({ 'section-probe.notes': ['first ore'] })
+  })
+
+  it('snapshots every registered section, at its initial value when the state leaves it out', () => {
+    const snapshot = withRegistrations([BOTH_SECTIONS], () =>
+      takeSnapshot(createAuthorityState(START)),
+    )
+    expect(snapshot.state.slices).toEqual({ 'section-probe': { version: 1, body: 0 } })
+    expect(snapshot.state.players.p1.slices).toEqual({
+      'section-probe.notes': { version: 1, body: [] },
+    })
+  })
+
+  it('restores a snapshot of sections at their initial values to the same digest', () => {
+    const { reading, digest } = withRegistrations([BOTH_SECTIONS], () => {
+      const state = createAuthorityState(START)
+      return { reading: readText(snapshotText(state)), digest: stateDigest(state) }
+    })
+    expect(reading.problems).toEqual([])
+    expect(stateDigest((reading as { state: AuthorityState }).state)).toBe(digest)
   })
 
   it('reads back what a section was set to, per scope', () => {

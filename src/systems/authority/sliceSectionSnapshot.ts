@@ -1,11 +1,13 @@
 /**
  * The slices' sections in the session snapshot (docs/standards/feature-slices.md 3.13, 5.3):
- * `{ [id]: { version, body } }` under an optional `slices` key of the portable state and of each
- * portable player, omitted while the state holds none. Restoring matches each section's version
+ * `{ [id]: { version, body } }` of every registered section under an optional `slices` key of the
+ * portable state and of each portable player, omitted while the scope has no section. Restoring matches each section's version
  * exactly and refuses an unknown or a missing section: refused, never migrated.
  */
 import {
+  isAtInitial,
   saveSectionsOf,
+  slicesKeyOf,
   type SaveSection,
   type SaveSectionScope,
   type SliceSections,
@@ -19,36 +21,35 @@ export interface PortableSection {
 
 export type PortableSections = Record<string, PortableSection>
 
-/** `{ slices }` to spread into a portable state or player; nothing when the state holds none. */
+/**
+ * `{ slices }` to spread into a portable state or player: every registered section of the scope,
+ * at its initial value when the state leaves it out; nothing while the scope has no section.
+ */
 export function portableSectionsOf(
   sections: SliceSections | undefined,
   scope: SaveSectionScope,
 ): { slices?: PortableSections } {
-  if (sections === undefined) return {}
+  const registered = saveSectionsOf(scope)
+  if (registered.length === 0) return {}
   return {
     slices: Object.fromEntries(
-      Object.entries(sections).map(([id, value]) => {
-        const section = registeredSectionOf(scope, id)
-        return [id, { version: section.version, body: section.toPortable(value) }]
-      }),
+      registered.map((section) => [section.id, portableSectionOf(section, sections)]),
     ),
   }
 }
 
-/** `{ slices }` to spread into a restored state or player; call only on a portable without problems. */
+/**
+ * `{ slices }` to spread into a restored state or player, leaving out each section at its initial
+ * value as the state does. Call only on a portable without problems.
+ */
 export function sectionsOfPortable(
   portable: PortableSections | undefined,
   scope: SaveSectionScope,
 ): { slices?: SliceSections } {
-  if (portable === undefined) return {}
-  return {
-    slices: Object.fromEntries(
-      Object.entries(portable).map(([id, entry]) => [
-        id,
-        registeredSectionOf(scope, id).ofPortable(entry.body),
-      ]),
-    ),
-  }
+  const values = saveSectionsOf(scope)
+    .map((section) => [section, section.ofPortable(portable?.[section.id].body)] as const)
+    .filter(([section, value]) => !isAtInitial(section, value))
+  return slicesKeyOf(Object.fromEntries(values.map(([section, value]) => [section.id, value])))
 }
 
 /** Every unknown, missing, mismatched or malformed section under `<path>.slices`. */
@@ -93,9 +94,11 @@ function missingSectionProblems(
     .map((section) => `${path}.slices.${section.id} is missing: this build registers it`)
 }
 
-/** A state only ever holds registered sections, so an unknown id here is a bug, not a save. */
-function registeredSectionOf(scope: SaveSectionScope, id: string): SaveSection<unknown> {
-  const section = saveSectionsOf(scope).find((known) => known.id === id)
-  if (section === undefined) throw new Error(`no ${scope} save section "${id}" is registered`)
-  return section
+function portableSectionOf(
+  section: SaveSection<unknown>,
+  sections: SliceSections | undefined,
+): PortableSection {
+  const value =
+    sections !== undefined && section.id in sections ? sections[section.id] : section.initial
+  return { version: section.version, body: section.toPortable(value) }
 }

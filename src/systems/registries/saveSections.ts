@@ -4,11 +4,13 @@
  * sections never touch a shared constant, and `SNAPSHOT_VERSION` is not bumped for one.
  *
  * The values live under `slices` on the authority state (session scope) or on each player (player
- * scope). A new state holds every registered section at its `initial`, so a snapshot always
- * carries them all; the key is omitted, never `undefined`, while the scope has no section, which
- * keeps every state digest of a build without sections unchanged.
+ * scope), and only while they differ from the section's `initial`: absent means initial. So a new
+ * state never reads this registry (the store builds one at import, before `loadFeatures()`), a
+ * registered section changes no state digest until a slice writes it, and the key is omitted,
+ * never `undefined`, while it would be empty.
  */
-import type { AuthorityState, PlayerState } from '../authority/authorityState'
+import type { AuthorityState } from '../authority/authorityState'
+import { toCanonicalJson } from '../authority/canonicalJson'
 import { defineRegistry, entriesOf } from './seal'
 
 export type SaveSectionScope = 'session' | 'player'
@@ -39,13 +41,6 @@ export function saveSectionsOf(scope: SaveSectionScope): readonly SaveSection<un
   return entriesOf(SAVE_SECTION_REGISTRY).filter((section) => section.scope === scope)
 }
 
-/** `{ slices }` holding each of the scope's sections at its `initial`; nothing when it has none. */
-export function initialSectionsOf(scope: SaveSectionScope): { slices?: SliceSections } {
-  const sections = saveSectionsOf(scope)
-  if (sections.length === 0) return {}
-  return { slices: Object.fromEntries(sections.map((section) => [section.id, section.initial])) }
-}
-
 /** The section's value: the state's, else its `initial`. `playerId` names a player section's owner. */
 export function readSection<T>(
   state: AuthorityState,
@@ -57,26 +52,50 @@ export function readSection<T>(
   return sections[section.id] as T
 }
 
-/** The state with the section set to `value`. */
+/** The state with the section set to `value`; at its initial value the section is left out. */
 export function withSection<T>(
   state: AuthorityState,
   playerId: string | null,
   section: SaveSection<T>,
   value: T,
 ): AuthorityState {
-  if (section.scope === 'session')
-    return { ...state, slices: { ...state.slices, [section.id]: value } }
+  if (section.scope === 'session') return withSlicesSet(state, section, value)
   const owner = ownerOf(playerId, section)
-  const player = state.players[owner]
-  const slices = { ...player.slices, [section.id]: value }
-  return { ...state, players: { ...state.players, [owner]: { ...player, slices } } }
+  const player = withSlicesSet(state.players[owner], section, value)
+  return { ...state, players: { ...state.players, [owner]: player } }
+}
+
+/** Whether `value` is the section's initial value, compared in canonical portable form. */
+export function isAtInitial<T>(section: SaveSection<T>, value: T): boolean {
+  const portable = toCanonicalJson(section.toPortable(value))
+  return portable === toCanonicalJson(section.toPortable(section.initial))
+}
+
+/** `{ slices }` to spread into a state or player; nothing when `sections` is empty. */
+export function slicesKeyOf(sections: SliceSections): { slices?: SliceSections } {
+  return Object.keys(sections).length === 0 ? {} : { slices: sections }
+}
+
+function withSlicesSet<H extends SectionsHolder, T>(
+  holder: H,
+  section: SaveSection<T>,
+  value: T,
+): H {
+  const { slices: _replaced, ...rest } = holder
+  const { [section.id]: _previous, ...others } = holder.slices ?? {}
+  const sections = isAtInitial(section, value) ? others : { ...others, [section.id]: value }
+  return { ...rest, ...slicesKeyOf(sections) } as H
+}
+
+interface SectionsHolder {
+  slices?: SliceSections
 }
 
 function sectionsHolderOf(
   state: AuthorityState,
   playerId: string | null,
   section: SaveSection<unknown>,
-): AuthorityState | PlayerState {
+): SectionsHolder {
   return section.scope === 'session' ? state : state.players[ownerOf(playerId, section)]
 }
 
