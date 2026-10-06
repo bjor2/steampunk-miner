@@ -1,7 +1,7 @@
 /**
  * Top right (#33 section 5): depth (or ALT) and band, the casing grade badge (#41), the guns' mode
- * and their low-steam badge (#107), the dock arrow with its distance, tiles to the core's edge, and
- * the time per tile in front of the drill.
+ * and their low-steam badge (#107), the charges carried with the plant key (#109), the dock arrow
+ * with its distance, tiles to the core's edge, and the time per tile in front of the drill.
  */
 import type { ReactNode } from 'react'
 import type { HudModel } from '../../systems/views/hudModel'
@@ -10,7 +10,7 @@ import { CompassArrow } from './CompassArrow'
 import styles from './Hud.module.css'
 
 export function PositionPanel({ model }: { model: HudModel }) {
-  const { depth, casing, guns, dockArrow, coreDistance, tileTime } = model
+  const { depth, casing, guns, charges, dockArrow, coreDistance, tileTime } = model
   return (
     <div className={styles.position}>
       <Line label="Depth">
@@ -41,6 +41,13 @@ export function PositionPanel({ model }: { model: HudModel }) {
         <span className={styles.gunsIdle} data-testid={UI_IDS.hudGunsIdle}>
           {guns.idleText}
         </span>
+      )}
+      {charges !== null && (
+        <Line label="Charges">
+          <span data-testid={UI_IDS.hudCharges} data-carried={charges.carried}>
+            {charges.text}
+          </span>
+        </Line>
       )}
       {dockArrow !== null && (
         <Line label="Dock">

@@ -61,6 +61,12 @@ export function chargeWarnTiles(): number {
   return charges.warnTiles
 }
 
+/** Whether a vehicle `dxMm, dyMm` from a planted charge's centre sees its fuse warning. */
+export function isInFuseWarning(dxMm: number, dyMm: number): boolean {
+  const reachMm = charges.warnTiles * MM_PER_METRE
+  return dxMm * dxMm + dyMm * dyMm <= reachMm * reachMm
+}
+
 /** Charges a rack with `slotLevel` bought slots holds. */
 export function rackCapacity(slotLevel: number): number {
   return charges.rackStart + slotLevel

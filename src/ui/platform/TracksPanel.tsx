@@ -1,8 +1,8 @@
 /**
  * The Upgrade bay's six vehicle tracks (#7 order), each with its icon, level, next cost and
  * "before -> after", then the Casing row, which is not a track (#41, #58), then the Guns row once
- * `auto_guns` is offered (#107), then hull and repair, and the vehicle's visual tier (#33 section 6,
- * #37).
+ * `auto_guns` is offered (#107), then the Charges and Rack rows once `blasting_charges` is (#109),
+ * then hull and repair, and the vehicle's visual tier (#33 section 6, #37).
  */
 import type { StatPreview, WorkshopRow } from '../../systems/views/workshopRows'
 import type { GunRow } from '../../systems/views/gunRow'
@@ -10,6 +10,7 @@ import type { CasingRow, UpgradeBayModel } from '../../systems/views/upgradeBayM
 import { Panel } from '../kit/Panel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
+import { ChargeRowsView } from './ChargeRowsView'
 import { VectorIcon } from '../VectorIcon'
 import { Field } from './BayHeader'
 import styles from './Platform.module.css'
@@ -24,6 +25,7 @@ export function TracksPanel({ model, focusedId }: { model: UpgradeBayModel; focu
       ))}
       <CasingRowView casing={model.casing} focusedId={focusedId} />
       {model.guns !== null && <GunRowView guns={model.guns} focusedId={focusedId} />}
+      {model.charges !== null && <ChargeRowsView rows={model.charges} focusedId={focusedId} />}
       <Field label="Hull">
         <span data-testid={UI_IDS.workshopHull}>{model.repair.hullText}</span>
       </Field>

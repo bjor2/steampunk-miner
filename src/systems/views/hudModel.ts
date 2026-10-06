@@ -44,6 +44,12 @@ import {
   type VehicleStateReading,
 } from './hudReadings'
 import { gunReadingOf, type GunReading } from './gunReading'
+import {
+  chargeReadingOf,
+  fuseWarningOf,
+  type ChargeReading,
+  type FuseWarning,
+} from './chargeReading'
 import { threatMarkersOf, type ThreatMarker } from './threatMarkers'
 import { tileTimeAhead, type TileTime } from './tileTime'
 import { amountReading, type AmountReading } from './viewParts'
@@ -94,6 +100,10 @@ export interface HudModel {
   casing: CasingBadge | null
   /** Null with no guns mounted (#107). */
   guns: GunReading | null
+  /** Null until the charge rack is bolted on (#109). */
+  charges: ChargeReading | null
+  /** A live charge within warning reach, the vehicle's own or another's (#109); else null. */
+  chargeFuse: FuseWarning | null
   dockArrow: DockArrow | null
   coreDistance: number | null
   threats: ThreatMarker[]
@@ -126,6 +136,8 @@ export function selectHudModel(sources: HudSources): HudModel {
     depth: depthReadingOf(state, playerId, sources.depthTiles),
     casing: casingBadgeOf(state, playerId),
     guns: gunReadingOf(vehicle, sources.bindings),
+    charges: chargeReadingOf(vehicle.charges, sources.bindings),
+    chargeFuse: fuseWarningOf(state, playerId),
     dockArrow: dockArrowOf(state, playerId),
     coreDistance: coreDistanceOf(state, playerId),
     threats: threatMarkersOf(state, playerId),

@@ -26,6 +26,7 @@ import {
   type ArtefactChoiceModel,
 } from '../systems/views/artefactChoiceModel'
 import { artefactCacheTile } from '../systems/world/artefactCache'
+import { plantOnWall, prepareBlaster } from '../systems/authority/charges/chargeFixtures'
 import { ArtefactChoiceView } from './artefact/ArtefactChoiceView'
 import {
   setEnergyCommand,
@@ -112,6 +113,8 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
     ...(model.casing === null ? {} : { [UI_IDS.hudCasing]: model.casing.text }),
     ...(model.guns === null ? {} : { [UI_IDS.hudGuns]: model.guns.text }),
     ...(model.guns?.isIdle === true ? { [UI_IDS.hudGunsIdle]: model.guns.idleText } : {}),
+    ...(model.charges === null ? {} : { [UI_IDS.hudCharges]: model.charges.text }),
+    ...(model.chargeFuse === null ? {} : { [UI_IDS.hudChargeFuse]: model.chargeFuse.text }),
     [UI_IDS.hudTileTime]: model.tileTime.text,
     [UI_IDS.hudState]: model.vehicleState.text,
     ...(model.cargo.isFull ? { [UI_IDS.hudCargoFull]: 'FULL' } : {}),
@@ -190,6 +193,20 @@ function upgradeBayTexts(model: UpgradeBayModel): Partial<Record<UiId, string | 
           [UI_IDS.upgradebayGunsCost]: model.guns.cost.text,
           [UI_IDS.upgradebayGunsEffect]: model.guns.effectText,
           [UI_IDS.upgradebayGunsBuy]: model.guns.buy.label,
+        }),
+    ...(model.charges === null
+      ? {}
+      : {
+          [UI_IDS.upgradebayCharges]: null,
+          [UI_IDS.upgradebayChargesCarried]: model.charges.restock.levelText,
+          [UI_IDS.upgradebayChargesCost]: model.charges.restock.cost?.text ?? '-',
+          [UI_IDS.upgradebayChargesEffect]: model.charges.restock.effectText,
+          [UI_IDS.upgradebayChargesRestock]: model.charges.restock.buy.label,
+          [UI_IDS.upgradebayRack]: null,
+          [UI_IDS.upgradebayRackSize]: model.charges.rack.levelText,
+          [UI_IDS.upgradebayRackCost]: model.charges.rack.cost?.text ?? '-',
+          [UI_IDS.upgradebayRackEffect]: model.charges.rack.effectText,
+          [UI_IDS.upgradebayRackBuy]: model.charges.rack.buy.label,
         }),
     [UI_IDS.upgradebayPreview]: null,
     [UI_IDS.upgradebayQuickService]: model.quickService.label,
@@ -410,6 +427,44 @@ function renderWithGuns(): string[] {
   ]
 }
 
+/**
+ * The HUD with a charge lit on the wall ahead and the rack's count, then planet 7's Upgrade bay
+ * offering a restock and a rack slot (#109).
+ */
+function renderWithCharges(): string[] {
+  const session = createScriptedSession()
+  prepareBlaster(session, 1)
+  plantOnWall(session, 2)
+  const hud = selectHudModel({
+    state: session.state(),
+    playerId: 'p1',
+    depthTiles: 0,
+    bindings: game().bindings,
+  })
+  expect(hud.chargeFuse).not.toBeNull()
+  const bay = upgradeBayOn(7)
+  expect(bay.charges).not.toBeNull()
+  return [
+    ...checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud)),
+    ...checkScreen(
+      createElement(UpgradeBayView, { model: bay, focusedId: '' }),
+      upgradeBayTexts(bay),
+    ),
+  ]
+}
+
+function upgradeBayOn(planetIndex: number): UpgradeBayModel {
+  const session = createScriptedSession()
+  session.submit(1, { type: 'debug.setPlanet', payload: { planetIndex } })
+  session.submit(1, teleportToDockCommand('upgrade'))
+  return selectUpgradeBayModel(session.state(), 'p1', {
+    isTravelArmed: false,
+    isQuickServiceHighlighted: false,
+    focusedId: null,
+    installingUpgradeId: null,
+  })
+}
+
 function strandedPoseIntent() {
   return { type: 'reportPose' as const, payload: strandedPose }
 }
@@ -465,6 +520,7 @@ describe('screen ids (#33 acceptance 12)', () => {
     keep(renderFullHoldHud())
     keep(renderAtArtefactCache())
     keep(renderWithGuns())
+    keep(renderWithCharges())
     keep(renderRefineryScreens())
     keep(renderLiningVisit())
     expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
