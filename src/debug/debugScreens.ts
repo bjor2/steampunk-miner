@@ -16,6 +16,7 @@ import { pressAction, releaseAction } from '../store/inputRuntime'
 import {
   readAudioModel,
   readHudModel,
+  readRefineryBayModel,
   readSellBayModel,
   readUpgradeBayModel,
 } from '../store/screenReads'
@@ -35,6 +36,7 @@ import { renderScalePinProblems } from '../systems/render/renderScale'
 import { cameraViewOf, viewShortAxisProblems, type CameraView } from '../systems/render/viewZoom'
 import { shopTypeOf, type ShopType } from '../systems/views/bayPresentation'
 import type { HudModel } from '../systems/views/hudModel'
+import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import { bayScreenPresence } from '../ui/platform/bayScreenPresence'
@@ -57,9 +59,10 @@ export interface DebugUi {
   /** Holds the render scale (0 to 1, clamped to the 1080p floor), or `null` to adapt again (#38). */
   setRenderScale(scale: unknown): DebugResult
   getHudModel(): DebugResult<{ model: HudModel }>
-  /** The two bay screens (#37), as each would draw now; their buttons carry `wrong_bay` away. */
+  /** The bay screens (#37, #105), as each would draw now; their buttons carry `wrong_bay` away. */
   getSellBayModel(): DebugResult<{ model: SellBayModel }>
   getUpgradeBayModel(): DebugResult<{ model: UpgradeBayModel }>
+  getRefineryBayModel(): DebugResult<{ model: RefineryBayModel }>
   /**
    * How the bay screen presents now (#45, #44, #39): its shutter, the smallest text against the
    * short axis, and the share of the preview panel's height the vehicle fills (0 when closed).
@@ -106,6 +109,7 @@ export function createDebugUi(): DebugUi {
     getHudModel: () => ({ ok: true, model: readHudModel() }),
     getSellBayModel: () => ({ ok: true, model: readSellBayModel() }),
     getUpgradeBayModel: () => ({ ok: true, model: readUpgradeBayModel() }),
+    getRefineryBayModel: () => ({ ok: true, model: readRefineryBayModel() }),
     getBayPresentation: () => ({ ok: true, presentation: bayPresentationNow() }),
     getAudioModel: () => ({ ok: true, model: readAudioModel() }),
   }

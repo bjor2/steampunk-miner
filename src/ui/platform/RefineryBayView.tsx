@@ -1,0 +1,83 @@
+/**
+ * The Refinery bay screen (#105): the hold's ore by tier, each with Refine and what its batch
+ * pays refined against raw, then the platform's slots and the next slot's price. Collecting is
+ * the Sell bay's. Markup only.
+ */
+import type {
+  RefineryBayModel,
+  RefineryOreRow,
+  RefinerySlotReading,
+} from '../../systems/views/refineryBayModel'
+import { Panel } from '../kit/Panel'
+import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
+import { ScreenButtonView } from '../ScreenButtonView'
+import { BayFrame } from './BayFrame'
+import { Field } from './BayHeader'
+import styles from './Platform.module.css'
+
+export function RefineryBayView({
+  model,
+  focusedId,
+}: {
+  model: RefineryBayModel
+  focusedId: string
+}) {
+  return (
+    <BayFrame header={model.header} footer={model.footer} focusedId={focusedId}>
+      <div className={styles.refineryPanels} data-testid={UI_IDS.refinerybayScreen}>
+        <Panel title="Hold">
+          {model.ore.map((row) => (
+            <OreRowView key={row.tier} row={row} focusedId={focusedId} />
+          ))}
+          <Field label="Batch">
+            <span data-testid={UI_IDS.refinerybayBatchCap}>{model.batchCapText}</span>
+          </Field>
+        </Panel>
+        <Panel title="Slots">
+          {model.slots.map((slot) => (
+            <SlotView key={slot.index} slot={slot} />
+          ))}
+          <div className={styles.action}>
+            <ScreenButtonView button={model.buySlot} focusedId={focusedId} />
+            <span
+              data-testid={UI_IDS.refinerybaySlotPrice}
+              data-exact={model.slotPrice?.exact ?? ''}
+            >
+              {model.slotPrice?.text ?? 'All slots built'}
+            </span>
+          </div>
+        </Panel>
+      </div>
+    </BayFrame>
+  )
+}
+
+function OreRowView({ row, focusedId }: { row: RefineryOreRow; focusedId: string }) {
+  return (
+    <div
+      className={styles.row}
+      data-testid={UI_ID_TEMPLATES.refinerybayOre(row.tier)}
+      data-tier={row.tier}
+    >
+      <span className={styles.tier}>T{row.tier}</span>
+      <span>{row.held} held</span>
+      <span data-exact={row.raw.exact}>raw {row.raw.text}</span>
+      <span data-exact={row.refined.exact}>refined {row.refined.text}</span>
+      <ScreenButtonView button={row.queue} focusedId={focusedId} />
+    </div>
+  )
+}
+
+function SlotView({ slot }: { slot: RefinerySlotReading }) {
+  return (
+    <div
+      className={styles.row}
+      data-testid={UI_ID_TEMPLATES.refinerybaySlot(slot.index)}
+      data-look={slot.look}
+      data-yours={slot.isYours}
+    >
+      <span className={styles.tier}>#{slot.index + 1}</span>
+      <span>{slot.text}</span>
+    </div>
+  )
+}

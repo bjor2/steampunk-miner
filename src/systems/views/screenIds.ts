@@ -1,6 +1,6 @@
 /**
- * Every `data-testid` the HUD, the two bay screens and settings overlay carry (#33 sections 5, 6
- * and 9, #37 `sellbay-*` and `upgradebay-*`), in one table: the view models name their buttons with it and the components take their ids
+ * Every `data-testid` the HUD, the bay screens and settings overlay carry (#33 sections 5, 6
+ * and 9, #37 `sellbay-*` and `upgradebay-*`, #105 `refinerybay-*`), in one table: the view models name their buttons with it and the components take their ids
  * from it (re-exported as `UI_IDS` from `src/ui/ids.ts`), so a spec, the debug API and the DOM
  * always agree. Rows that repeat take their id from a template.
  */
@@ -46,6 +46,13 @@ export const UI_IDS = {
   upgradebayGunsEffect: 'upgradebay-guns-effect',
   upgradebayGunsBuy: 'upgradebay-guns-buy',
   upgradebayQuickService: 'upgradebay-quick-service',
+  refinerybayScreen: 'refinerybay-screen',
+  refinerybayBatchCap: 'refinerybay-batch-cap',
+  refinerybaySlotBuy: 'refinerybay-slot-buy',
+  refinerybaySlotPrice: 'refinerybay-slot-price',
+  sellbayRefined: 'sellbay-refined',
+  sellbayRefinedTotal: 'sellbay-refined-total',
+  sellbayRefinedCollect: 'sellbay-refined-collect',
   platformMoney: 'platform-money',
   platformPlanet: 'platform-planet',
   platformCoreBay: 'platform-core-bay',
@@ -86,6 +93,10 @@ export const UI_ID_TEMPLATES = {
   hudThreat: (index: number) => `hud-threat-${index}`,
   shopRow: (tier: number) => `shop-row-${tier}`,
   shopSell: (tier: number) => `shop-sell-${tier}`,
+  refinerybayOre: (tier: number) => `refinerybay-ore-${tier}`,
+  refinerybayQueue: (tier: number) => `refinerybay-queue-${tier}`,
+  refinerybaySlot: (index: number) => `refinerybay-slot-${index}`,
+  sellbayRefinedLine: (slot: number) => `sellbay-refined-line-${slot}`,
   workshopUpgrade: (upgradeId: UpgradeId) => `workshop-upgrade-${upgradeId}`,
   workshopUpgradeLevel: (upgradeId: UpgradeId) => `workshop-upgrade-${upgradeId}-level`,
   workshopUpgradeCost: (upgradeId: UpgradeId) => `workshop-upgrade-${upgradeId}-cost`,

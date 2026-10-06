@@ -55,7 +55,8 @@
 }
 
 .sellPanels,
-.upgradePanels {
+.upgradePanels,
+.refineryPanels {
   display: grid;
   gap: var(--space-2);
   align-content: start;
@@ -69,6 +70,11 @@
 
 .sellPanels > :first-child {
   grid-column: 1 / -1;
+}
+
+/* #105: the hold's ore beside the slots. */
+.refineryPanels {
+  grid-template-columns: 1fr 1fr;
 }
 
 /* #45 wire: the track rows take 45% of the width, the live preview 55%. */

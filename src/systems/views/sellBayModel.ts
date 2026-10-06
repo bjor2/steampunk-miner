@@ -1,11 +1,12 @@
 /**
  * `selectSellBayModel` (#37 Sell bay screen): the shop rows from #33 (tier, family, amount, unit
- * value, line value, Sell, Sell all), Recharge with its cost, and "Sell, repair and recharge" with
- * its exact total as the focused default, under the shared header and footer. A pure function of
- * the authority replica and the screen's UI state.
+ * value, line value, Sell, Sell all), the player's ready Refinery batches with Collect (#105),
+ * Recharge with its cost, and "Sell, repair and recharge" with its exact total (refined batches
+ * included) as the focused default, under the shared header and footer. A pure function of the
+ * authority replica and the screen's UI state.
  */
 import type { AuthorityState } from '../authority/authorityState'
-import { rechargeCostOf, serviceQuote } from '../authority/platformServices'
+import { rechargeCostOf, serviceQuote, type ServiceQuote } from '../authority/platformServices'
 import { energyUnitPrice } from '../economy/planetCharges'
 import { add, toCanonical } from '../money'
 import { quickServiceCommand, rechargeEnergyCommand } from '../platform/platformCommands'
@@ -22,6 +23,7 @@ import {
 } from './bayFrame'
 import type { FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
+import { refinedPanelOf, type RefinedPanel } from './refinedPanel'
 import { shopPanelOf, type ShopPanel } from './shopPanel'
 import {
   amountReading,
@@ -48,6 +50,8 @@ export interface QuickServiceReading {
 export interface SellBayModel {
   header: BayHeader
   shop: ShopPanel
+  /** Null before the platform has the Refinery bay (#105). */
+  refined: RefinedPanel | null
   charging: ChargingPanel
   quickService: QuickServiceReading
   footer: BayFooter
@@ -66,18 +70,21 @@ export function selectSellBayModel(
   ui: BayUiState,
 ): SellBayModel {
   const shop = shopPanelOf(state, playerId)
+  const refined = refinedPanelOf(state, playerId)
   const charging = chargingPanelOf(state, playerId)
   const quickService = quickServiceOf(state, playerId, ui)
   const footer = bayFooterOf(state, playerId, ui)
   return {
     header: bayHeaderOf(state, playerId, 'sell'),
     shop,
+    refined,
     charging,
     quickService,
     footer,
-    focusStops: sellBayFocusStops(shop, charging, quickService, footer),
+    focusStops: sellBayFocusStops(shop, refined, charging, quickService, footer),
     buttons: [
       ...shopButtonsOf(shop),
+      ...refinedButtonsOf(refined),
       charging.recharge,
       quickService.button,
       ...footerButtonsOf(footer),
@@ -116,8 +123,17 @@ function quickServiceOf(
       quickServiceCommand(),
     ),
     isHighlighted: ui.isQuickServiceHighlighted,
-    total: amountReading(add(add(quote.saleValue, quote.repairCost), quote.rechargeCost)),
+    total: amountReading(quickServiceTotalOf(quote)),
   }
+}
+
+/** What the quick action pays in and charges, as one net figure: sale and refined, plus charges. */
+function quickServiceTotalOf(quote: ServiceQuote) {
+  return add(add(add(quote.saleValue, quote.refinedValue), quote.repairCost), quote.rechargeCost)
+}
+
+function refinedButtonsOf(refined: RefinedPanel | null): ScreenButton[] {
+  return refined === null ? [] : [refined.collect]
 }
 
 function shopButtonsOf(shop: ShopPanel): ScreenButton[] {
@@ -126,6 +142,7 @@ function shopButtonsOf(shop: ShopPanel): ScreenButton[] {
 
 function sellBayFocusStops(
   shop: ShopPanel,
+  refined: RefinedPanel | null,
   charging: ChargingPanel,
   quickService: QuickServiceReading,
   footer: BayFooter,
@@ -133,6 +150,7 @@ function sellBayFocusStops(
   return [
     stopIn('quick')(quickService.button),
     ...shopButtonsOf(shop).map(stopIn('shop')),
+    ...refinedButtonsOf(refined).map(stopIn('refined')),
     stopIn('charging')(charging.recharge),
     ...footerButtonsOf(footer).map(stopIn('footer')),
   ]

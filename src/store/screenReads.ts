@@ -11,6 +11,7 @@ import type { HudModel } from '../systems/views/hudModel'
 import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
+import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { dockedBayOf } from '../systems/authority/dockRules'
 import type { BayId } from '../systems/world/dockBays'
@@ -23,6 +24,7 @@ import {
   bayScreenOf,
   hudModelOf,
   plaqueModelOf,
+  refineryBayModelOf,
   sellBayModelOf,
   settingsModelOf,
   upgradeBayModelOf,
@@ -51,6 +53,11 @@ export function readSellBayModel(): SellBayModel {
 /** The Upgrade bay's model, as it would draw now, docked there or not. */
 export function readUpgradeBayModel(): UpgradeBayModel {
   return upgradeBayModelOf(useGameStore.getState())
+}
+
+/** The Refinery bay's model (#105), as it would draw now, docked there or not. */
+export function readRefineryBayModel(): RefineryBayModel {
+  return refineryBayModelOf(useGameStore.getState())
 }
 
 export function readSettingsModel(): SettingsModel {

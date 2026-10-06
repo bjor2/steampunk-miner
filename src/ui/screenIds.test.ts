@@ -34,11 +34,19 @@ import { selectHudModel, type HudModel } from '../systems/views/hudModel'
 import type { BayFooter, BayHeader } from '../systems/views/bayFrame'
 import { selectSellBayModel, type SellBayModel } from '../systems/views/sellBayModel'
 import { selectUpgradeBayModel, type UpgradeBayModel } from '../systems/views/upgradeBayModel'
+import { selectRefineryBayModel, type RefineryBayModel } from '../systems/views/refineryBayModel'
+import {
+  dockAtBayOf,
+  mineSurfaceOre,
+  REFINERY_SITE,
+  sessionOnPlanet,
+} from '../systems/authority/refinery/refineryFixtures'
 import type { PlaqueModel } from '../systems/views/plaqueModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { FACING } from '../systems/vehicle/vehiclePose'
 import { HudView } from './hud/HudView'
 import { UI_IDS, type UiId } from './ids'
+import { RefineryBayView } from './platform/RefineryBayView'
 import { SellBayView } from './platform/SellBayView'
 import { UpgradeBayView } from './platform/UpgradeBayView'
 import { PlaquesView } from './plaques/PlaquesView'
@@ -185,6 +193,25 @@ function upgradeBayTexts(model: UpgradeBayModel): Partial<Record<UiId, string | 
   }
 }
 
+function refineryBayTexts(model: RefineryBayModel): Partial<Record<UiId, string | null>> {
+  return {
+    ...bayFrameTexts(model.header, model.footer),
+    [UI_IDS.refinerybayScreen]: null,
+    [UI_IDS.refinerybayBatchCap]: model.batchCapText,
+    [UI_IDS.refinerybaySlotBuy]: model.buySlot.label,
+    [UI_IDS.refinerybaySlotPrice]: model.slotPrice?.text ?? null,
+  }
+}
+
+function refinedTexts(model: SellBayModel): Partial<Record<UiId, string | null>> {
+  if (model.refined === null) return {}
+  return {
+    [UI_IDS.sellbayRefined]: null,
+    [UI_IDS.sellbayRefinedTotal]: model.refined.total.text,
+    [UI_IDS.sellbayRefinedCollect]: model.refined.collect.label,
+  }
+}
+
 function settingsTexts(model: SettingsModel): Partial<Record<UiId, string | null>> {
   return {
     [UI_IDS.settingsPanel]: null,
@@ -240,6 +267,38 @@ function renderUpgradeBay(): string[] {
   const model = readUpgradeBayModel()
   const element = createElement(UpgradeBayView, { model, focusedId: '' })
   return checkScreen(element, upgradeBayTexts(model))
+}
+
+/**
+ * On planet 3 (#105): the Refinery bay with ore in the hold and a batch refining, then the Sell
+ * bay once the batch is ready, with its refined line and Collect.
+ */
+function renderRefineryScreens(): string[] {
+  const session = sessionOnPlanet(3, '1e30')
+  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 25 } })
+  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 13 } })
+  const tick = mineSurfaceOre(session, 10, 6)
+  dockAtBayOf(session, tick, REFINERY_SITE, 'refinery')
+  const tier = Number.parseInt(Object.keys(session.vehicle().cargo.ore)[0], 10)
+  session.submit(tick + 1, { type: 'queueRefine', payload: { resourceTier: tier, units: 2 } })
+  const ui = {
+    isTravelArmed: false,
+    isQuickServiceHighlighted: false,
+    focusedId: null,
+    installingUpgradeId: null,
+  }
+  const refinery = selectRefineryBayModel(session.state(), 'p1', ui)
+  expect(refinery.ore.length).toBeGreaterThan(0)
+  dockAtBayOf(session, tick + 2 + 180 * 60, REFINERY_SITE, 'sell')
+  const sell = selectSellBayModel(session.state(), 'p1', ui)
+  expect(sell.refined?.lines).toHaveLength(1)
+  return [
+    ...checkScreen(
+      createElement(RefineryBayView, { model: refinery, focusedId: '' }),
+      refineryBayTexts(refinery),
+    ),
+    ...checkScreen(createElement(SellBayView, { model: sell, focusedId: '' }), refinedTexts(sell)),
+  ]
 }
 
 function renderSettings(): string[] {
@@ -377,6 +436,7 @@ describe('screen ids (#33 acceptance 12)', () => {
     keep(renderFullHoldHud())
     keep(renderAtArtefactCache())
     keep(renderWithGuns())
+    keep(renderRefineryScreens())
     expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
   })
 
