@@ -5,6 +5,8 @@
   --color-copper: #b87333;
   --color-amber: #e0a040;
   --color-teal: #3fa7a0;
+  /* #105: the Refinery bay's furnace glow. */
+  --color-ember: #e0602a;
   --color-parchment: #e9dcc0;
   --color-panel: rgb(27 22 19 / 0.85);
   /* #41 casing feel: the bay teal for lining that holds its band, amber for lining that does not. */
