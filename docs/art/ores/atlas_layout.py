@@ -11,6 +11,7 @@ slice's spec compares against. Run it to rewrite that file:
 
 import json
 import os
+import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
@@ -79,9 +80,17 @@ def write_layout(path=LAYOUT_PATH):
         'cells': atlas_cells(looks),
     }
     with open(path, 'w', encoding='utf-8', newline='\n') as file:
-        json.dump(layout, file, indent=2)
-        file.write('\n')
+        file.write(json_text_of(layout))
     return layout
+
+
+SCALAR_LIST = re.compile(r'\[\s*((?:(?:-?\d+(?:\.\d+)?|"[^"]*"),?\s*)+)\]')
+
+
+def json_text_of(value):
+    """Two-space JSON with scalar lists on one line, the way the repo's Prettier writes JSON."""
+    text = json.dumps(value, indent=2, ensure_ascii=False)
+    return SCALAR_LIST.sub(lambda match: '[' + ', '.join(match.group(1).split()).replace(',,', ',') + ']', text) + '\n'
 
 
 if __name__ == '__main__':

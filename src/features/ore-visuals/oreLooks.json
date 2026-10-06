@@ -141,8 +141,8 @@
       "escalation": "glassy obsidian lumps with curved, shell-like fracture lines",
       "shaderSilhouette": "flecks",
       "hueBand": [345, 358],
-      "saturation": 0.8,
-      "lumaBand": [0.2, 0.42],
+      "saturation": 0.6,
+      "lumaBand": [0.14, 0.32],
       "emission": { "hue": 50, "saturation": 0.3 },
       "variants": 4
     }
