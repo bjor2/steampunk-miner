@@ -31,6 +31,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run bench:render`                    | chunk mesh batch p50/p95 per planet (logged, not gated)   |
 | `npm run bench:summary`                   | check + tabulate `bench:* -- --log` run folders (#124)    |
 | `npm run perf:record -- --source bench`   | record bench medians in `docs/perf/history.ndjson`        |
+| `npm run perf:sessions`                   | session analysis: run logs + CI artifacts → report (#125) |
 | `npm run soak:memory`                     | 10-min memory soak on the preview build, leak gate (#99)  |
 | `npm run metrics:ticket -- <n>`           | where a closed ticket's time went, on the box (#134)      |
 | `npm run metrics:backfill`                | the same for closed #90 / perf tickets since 2026-10-05   |

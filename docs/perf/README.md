@@ -55,6 +55,36 @@ every such line against the run-event schema and prints them as a table. CI's `b
 four this way on every push and pull request, report only, uploads `logs/` as the artifact
 `session-ci-<sha>-<github run id>` and puts the table in the job summary (#124).
 
+## Session analysis
+
+`npm run perf:sessions` (#125, logging strategy section 6) reads every `events.ndjson` under
+`--sessions <dir>` (default `logs/`; repeat the flag for more folders) into one table keyed by
+commit, run id and tick, and writes `report.html`, a short `summary.txt` and the flat table
+`sessions.ndjson` to `--out` (default `test-results/session-analysis/`). `--download <n>` first
+pulls the newest `n` CI `session-*` artifacts into `<first --sessions>/ci/` with `gh run download`,
+skipping ones already there. The page and summary show:
+
+- **heap against progress**: least-squares MB per 100 minerals, per 10 minutes and per 100 chunks
+  from `memory_sample`, after 3 warm-up samples. It is the live heap (no GC is forced), so one
+  collection moves a short session's slope a lot; leaks are gated by the soak's after-GC heap;
+- **geometries, textures and colliders against chunks**: flagged as climbing by the soak's rule
+  (rose in 3 of the last 10 steps, never fell);
+- **frame p95/p99 by planet and depth band**, slowdowns (back-to-back seconds over the 16.7 ms
+  budget) and long-task bursts, each with the ore, depth and chunk last collected before it;
+- **the bench trend per commit**: `benchmark_result` medians, flagged above 10% over the median of
+  the commits measured in the 7 days before, per source (CI runner and box never mix). GitHub's
+  runners are not one CPU model either: on 2026-10-06 `combatTick` sat at 15-16 µs on some jobs and
+  21-25 µs on others, docs-only commits included, so read a flag against the commits around it;
+- **run summaries across commits**: the newest game session of a seed against the newest before it
+  on another commit, as `compareRuns` tables them.
+
+A session is refused whole, and listed, when it was written under another `logSchemaVersion` or has
+a broken line; one crash-truncated last line is ignored (#11). Report only: it never fails on a
+finding and never opens or edits an issue. On the box, the daily pass is run by hand:
+`npm run perf:sessions -- --sessions /workspace/perf/sessions --download 20 --out <dir>`. The
+analysis is pure and tested in `src/logging/sessionAnalysis/` against the committed fixture
+sessions there.
+
 ## Heap and stack flags
 
 The game sets none, by decision (#102): no `--max-old-space-size`, `--js-flags`, `--stack-size` or
