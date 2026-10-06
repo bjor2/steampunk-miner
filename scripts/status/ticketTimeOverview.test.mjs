@@ -4,7 +4,32 @@ import { buildTicketTimeOverview } from './ticketTimeOverview.mjs'
 
 const REPO = 'bjor2/steampunk-miner'
 
-function ticketFile(ticket, closed, totals, { lead = 3600, cycle = 1800 } = {}) {
+// The totals laid back to back so they end at the close, claimed at the first one; `preClaim`
+// seconds of blocked time come before the claim, `claimed: false` leaves the claim out.
+function segmentsOf(closed, totals, preClaim) {
+  let end = Date.parse(closed)
+  const segments = Object.entries(totals).map(([category, seconds]) => {
+    const segment = { category, start: new Date(end - seconds * 1000), end: new Date(end) }
+    end -= seconds * 1000
+    return segment
+  })
+  if (preClaim) {
+    segments.push({
+      category: 'blocked',
+      start: new Date(end - preClaim * 1000),
+      end: new Date(end),
+    })
+  }
+  return { segments: segments.reverse(), claimedMs: end }
+}
+
+function ticketFile(
+  ticket,
+  closed,
+  totals,
+  { lead = 3600, cycle = 1800, preClaim = 0, claimed = true } = {},
+) {
+  const { segments, claimedMs } = segmentsOf(closed, totals, preClaim)
   const record = {
     schema: 1,
     ticket,
@@ -13,10 +38,12 @@ function ticketFile(ticket, closed, totals, { lead = 3600, cycle = 1800 } = {}) 
     model: 'claude-opus-5-5',
     created: '2026-10-05T00:00:00Z',
     closed,
-    segments: [],
-    totals,
+    segments,
+    totals: preClaim ? { ...totals, blocked: (totals.blocked ?? 0) + preClaim } : totals,
     lead_time_s: lead,
     cycle_time_s: cycle,
+    claimed: claimed ? new Date(claimedMs).toISOString() : null,
+    claimed_to_done_s: claimed ? (Date.parse(closed) - claimedMs) / 1000 : null,
     backfilled: true,
   }
   return { name: `${ticket}.json`, text: JSON.stringify(record) }
@@ -109,8 +136,35 @@ describe('ticket time overview', () => {
   })
 
   it('gives a ticket that was never claimed no window', () => {
-    const [ticket] = build([ticketFile(6, '2026-10-06T10:00:00Z', { idle: 60 })]).tickets
+    const [ticket] = build([
+      ticketFile(6, '2026-10-06T10:00:00Z', { idle: 60 }, { claimed: false }),
+    ]).tickets
     expect(ticket.claimed).toBeNull()
     expect(ticket.claimedTotals).toBeNull()
+  })
+
+  it('drops days of blocked time before the claim from the totals of the Issue trees tab', () => {
+    const threeDays = 3 * 24 * 3600
+    const model = build([
+      ticketFile(
+        7,
+        '2026-10-06T10:00:00Z',
+        { developing: 1800, blocked: 600 },
+        { preClaim: threeDays },
+      ),
+    ])
+    expect(model.recent[0].claimedTotals).toMatchObject({ developing: 1800, blocked: 600 })
+    expect(model.categoryTotals).toMatchObject({ developing: 1800, blocked: 600 })
+    expect(model.days[0].totals).toMatchObject({ developing: 1800, blocked: 600 })
+  })
+
+  it('leaves a ticket with no claim out of the totals and counts it as unclaimed', () => {
+    const model = build([
+      ticketFile(5, '2026-10-06T09:00:00Z', { testing: 60 }),
+      ticketFile(6, '2026-10-06T10:00:00Z', { blocked: 9000 }, { claimed: false }),
+    ])
+    expect(model.categoryTotals).toMatchObject({ testing: 60, blocked: 0 })
+    expect(model.days[0]).toMatchObject({ ticketCount: 2, unclaimedCount: 1 })
+    expect(model.unclaimedCount).toBe(1)
   })
 })

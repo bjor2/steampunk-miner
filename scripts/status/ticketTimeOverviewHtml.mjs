@@ -1,6 +1,7 @@
 // Renders the "Where the time goes" section at the top of /status/#issues from the model of
 // ticketTimeOverview.mjs (#134): static HTML with inline SVG, no script. Each category keeps one
-// fixed colour (phaseCategories.mjs); the classes come from scripts/status/index.html.
+// fixed colour (phaseCategories.mjs); the classes come from scripts/status/index.html. Bars and
+// totals run from each ticket's claim to its close (#167).
 import { niceCeilingOf } from './perfOverview.mjs'
 import { escapeHtml } from './perfOverviewHtml.mjs'
 
@@ -74,28 +75,40 @@ export function stackedBarRects(categories, totals, scale, height = BAR.height) 
     .join('')
 }
 
+// An old backfill with no claim has no window: drawing all its time would be mostly blocked.
+function ticketBarHtml(ticket, categories, scale) {
+  if (ticket.claimedTotals === null) return '<span class="muted">no claim data</span>'
+  return (
+    `<svg class="tt-bar" viewBox="0 0 ${BAR.width} ${BAR.height}" preserveAspectRatio="none" role="img" aria-label="time per category">` +
+    stackedBarRects(categories, ticket.claimedTotals, scale) +
+    '</svg>'
+  )
+}
+
 function ticketRowHtml(ticket, categories, scale) {
   const tag = ticket.backfilled ? ' <span class="muted">backfilled</span>' : ''
   return (
     `<div class="tt-row" data-ticket="${ticket.ticket}">` +
     `<a class="tt-name" href="${escapeHtml(ticket.url)}" title="${escapeHtml(ticket.title)}">` +
     `<span class="num">#${ticket.ticket}</span> ${escapeHtml(ticket.title)}</a>` +
-    `<svg class="tt-bar" viewBox="0 0 ${BAR.width} ${BAR.height}" preserveAspectRatio="none" role="img" aria-label="time per category">` +
-    stackedBarRects(categories, ticket.totals, scale) +
-    '</svg>' +
-    `<span class="tt-lead" title="lead time · cycle time">${formatDuration(ticket.leadS)} · ${formatDuration(ticket.cycleS)}${tag}</span>` +
+    ticketBarHtml(ticket, categories, scale) +
+    `<span class="tt-lead" title="claimed → done">${formatDuration(ticket.claimedToDoneS)}${tag}</span>` +
     '</div>'
   )
 }
 
+function claimedSumOf(ticket) {
+  return ticket.claimedTotals === null ? 0 : sumOf(ticket.claimedTotals)
+}
+
 function recentTicketsHtml(model) {
-  const longest = Math.max(...model.recent.map((ticket) => sumOf(ticket.totals)), 1)
+  const longest = Math.max(...model.recent.map(claimedSumOf), 1)
   const rows = model.recent.map((ticket) =>
     ticketRowHtml(ticket, model.categories, BAR.width / longest),
   )
   return (
     `<div class="sub" id="tt-tickets"><h3>Last ${model.recent.length} closed tickets</h3>` +
-    '<div class="muted tt-note">Each bar is the ticket from creation to close; right: lead time · cycle time.</div>' +
+    '<div class="muted tt-note">Each bar is the ticket from its claim to its close (claimed → done); right: that time.</div>' +
     `<div class="tt-rows">${rows.join('')}</div></div>`
   )
 }
@@ -176,7 +189,7 @@ function dayTotalsHtml(model) {
   )
   return (
     '<div class="sub" id="tt-days"><h3>Category totals per close day</h3>' +
-    '<div class="muted tt-note">The tickets closed that day (UTC), all their time stacked.</div>' +
+    '<div class="muted tt-note">The tickets closed that day (UTC), their claimed → done time stacked.</div>' +
     chartSvg(
       'category totals per close day',
       gridHtml(maxSeconds) + columns.join('') + dayLabelsHtml(model.days),
@@ -231,12 +244,17 @@ function problemsHtml(problems) {
   return `<ul class="list warn">${problems.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul>`
 }
 
+function unclaimedNoteOf(model) {
+  return model.unclaimedCount > 0 ? ` ${model.unclaimedCount} with no claim data are left out.` : ''
+}
+
 function headerHtml(model) {
   const readme = `https://github.com/${model.repo}/${README_URL_PATH}`
   return (
     '<h2>Where the time goes</h2>' +
     `<div class="muted tt-note">${model.ticketCount} closed tickets from <code>docs/metrics/tickets/</code>, ` +
-    `split into fixed phase categories (<a href="${escapeHtml(readme)}">how it is measured</a>).</div>`
+    'split into fixed phase categories, claimed → done only: time before the first claim is left out ' +
+    `(<a href="${escapeHtml(readme)}">how it is measured</a>).${unclaimedNoteOf(model)}</div>`
   )
 }
 

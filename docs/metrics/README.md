@@ -7,10 +7,14 @@ categories. One file per ticket lives in `docs/metrics/tickets/<n>.json`. The st
 in the **Where the time goes** section at the top of the **Issue trees** tab
 (**https://bjor2.github.io/steampunk-miner/status/#issues**):
 
-- one stacked bar per recently closed ticket (the last 30), linked to the issue;
+- one stacked bar per recently closed ticket (the last 30), linked to the issue, with its
+  claimed-to-done time beside it; a ticket with no `claimed` shows "no claim data";
 - the category totals of the tickets closed each day (UTC);
 - the median cycle time and median lead time per close day, to follow completion time over time;
 - a legend with every category, even one at zero.
+
+The bars, the day totals and the legend count only each ticket's
+[claimed-to-done window](#claimed-to-done-window) (#167); a ticket with no claim adds nothing to them.
 
 The page reads only the committed files (`scripts/status/ticketTimeOverview.mjs`), so the Pages job
 builds it without transcripts. Ticket #134 specifies all of this.
@@ -94,7 +98,7 @@ slot claim), or the first transcript on its branch when no log names one, never 
 creation. `claimed` is that moment and `claimed_to_done_s` the seconds from it to the close (#138).
 They equal the cycle time's span and are `null` for a ticket no session ever ran.
 
-The Features tab counts only this window (`scripts/metrics/claimedWindow.mjs`):
+The Features tab and the Issue trees tab count only this window (`scripts/metrics/claimedWindow.mjs`):
 
 - every segment before the claim is dropped, whatever its category: waiting for a slot, blocked or
   waiting on planners before anyone picked the ticket up says nothing about the work;
@@ -103,7 +107,7 @@ The Features tab counts only this window (`scripts/metrics/claimedWindow.mjs`):
   after the work started;
 - a segment that straddles the claim keeps only its part after it.
 
-The Issue trees tab still draws each ticket from creation to close.
+The median lead time on the Issue trees tab still runs from creation to close.
 
 ## File schema (v1)
 

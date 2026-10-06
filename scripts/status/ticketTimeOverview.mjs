@@ -2,8 +2,9 @@
 // ticket phase files (docs/metrics/tickets/*.json) as the last closed tickets' breakdowns, the
 // category totals per close day and the median cycle and lead time per close day. Pure: no fs, no
 // clock, so the Pages job (no transcripts there) and the tests feed it the same file texts. The
-// Features tab rolls the same tickets up per feature (featureTime.mjs, #135), counting only their
-// claimed-to-done window (#138).
+// breakdowns and totals count only each ticket's claimed-to-done window (#138 for the Features
+// tab, #167 here): days blocked before anyone picked a ticket up drowned out the work. The
+// Features tab rolls the same tickets up per feature (featureTime.mjs, #135).
 import { claimedWindowTotals } from '../metrics/claimedWindow.mjs'
 import { PHASE_CATEGORIES, TICKET_PHASES_SCHEMA, zeroTotals } from '../metrics/phaseCategories.mjs'
 
@@ -97,11 +98,28 @@ export function medianOf(values) {
   return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2
 }
 
+function isUnclaimed(ticket) {
+  return ticket.claimedTotals === null
+}
+
+// A ticket with no claim (an old backfill) has no window, so it adds nothing rather than all of
+// its time.
+function claimedTotalsSumOf(tickets) {
+  return tickets
+    .filter((ticket) => !isUnclaimed(ticket))
+    .reduce((sum, ticket) => addTotals(sum, ticket.claimedTotals), zeroTotals())
+}
+
+function unclaimedCountOf(tickets) {
+  return tickets.filter(isUnclaimed).length
+}
+
 function dayOf(day, tickets) {
   return {
     day,
     ticketCount: tickets.length,
-    totals: tickets.reduce((sum, ticket) => addTotals(sum, ticket.totals), zeroTotals()),
+    unclaimedCount: unclaimedCountOf(tickets),
+    totals: claimedTotalsSumOf(tickets),
     medianCycleS: medianOf(tickets.map((ticket) => ticket.cycleS)),
     medianLeadS: medianOf(tickets.map((ticket) => ticket.leadS)),
   }
@@ -132,7 +150,8 @@ export function buildTicketTimeOverview({ files, repo }) {
     repo,
     categories: PHASE_CATEGORIES,
     ticketCount: tickets.length,
-    categoryTotals: tickets.reduce((sum, ticket) => addTotals(sum, ticket.totals), zeroTotals()),
+    unclaimedCount: unclaimedCountOf(tickets),
+    categoryTotals: claimedTotalsSumOf(tickets),
     recent: newestFirst(tickets).slice(0, RECENT_TICKET_COUNT),
     days: daysOf(tickets),
     // Every measured ticket, for the feature roll-up of the Features tab (featureTime.mjs, #135).
