@@ -12,7 +12,7 @@ rules live; `CLAUDE.md` summarises it. Modelled on the `infernal-bistro` ruleboo
 | Status | The whole rule layer, plus the golden and pacing gates. Run it.        | Pull requests touching the game (CI `e2e`)              | Nightly and by hand (CI `packaged-smoke`)          |
 
 `vite.config.ts` includes `src/**/*.test.ts` and, for the node build scripts (perf recorder,
-status dashboard), `scripts/**/*.test.mjs`. There are no component tests and no screenshot
+status dashboard, ticket phase metrics), `scripts/**/*.test.mjs`. There are no component tests and no screenshot
 comparisons: what the camera shows and how input feels is checked by hand in `npm run dev` and said
 in the commit.
 

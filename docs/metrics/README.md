@@ -1,0 +1,158 @@
+# Ticket phases: where each ticket's time goes
+
+Each closed ticket gets a breakdown of its time, from creation to close, in ten fixed phase
+categories. One file per ticket lives in `docs/metrics/tickets/<n>.json`. The status page draws them
+in the **Where the time goes** section at the top of the **Issue trees** tab
+(**https://bjor2.github.io/steampunk-miner/status/#issues**):
+
+- one stacked bar per recently closed ticket (the last 30), linked to the issue;
+- the category totals of the tickets closed each day (UTC);
+- the median cycle time and median lead time per close day, to follow completion time over time;
+- a legend with every category, even one at zero.
+
+The page reads only the committed files (`scripts/status/ticketTimeOverview.mjs`), so the Pages job
+builds it without transcripts. Ticket #134 specifies all of this.
+
+## Categories (schema v1)
+
+The list is fixed. Adding or renaming a category bumps `schema`
+(`scripts/metrics/phaseCategories.mjs`, which also holds each category's colour).
+
+| id             | Name                | Counted when                                                                                                                                                                       | Source                |
+| -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `blocked`      | Blocked             | open with an open `blocked_by` dependency, or a `blocked` label                                                                                                                    | GitHub timeline       |
+| `planner_wait` | Waiting on planners | the `needs-planner` label is on                                                                                                                                                    | GitHub timeline       |
+| `idle`         | Idle                | open, unblocked and in no session: waiting for a slot, a loop tick, or between attempts                                                                                            | what is left over     |
+| `context`      | Context gathering   | Read/Grep/Glob, `gh issue view`, `gh api`, `git log/show/diff/status`, cat/sed -n/grep/ls, read-only python, Skill, Agent subagents                                                | transcript            |
+| `planning`     | Planning            | a reply with no tool call (thinking, a written plan, the closing summary), TodoWrite, plan mode, Plan subagents                                                                    | transcript            |
+| `developing`   | Developing          | Edit/Write/MultiEdit/NotebookEdit, `git add/commit/stash/checkout`, `sed -i`, file-writing scripts, `art:export`                                                                   | transcript            |
+| `testing`      | Testing             | vitest, typecheck, lint, prettier, build, bench, soak, balance and pacing sims, playwright, waiting on those runs                                                                  | transcript            |
+| `gates`        | Gates               | the loop's own typecheck/lint/format/test/build after a session                                                                                                                    | loop logs             |
+| `landing`      | Landing             | rebase, push under `.push.lock`, push_pending recovery, conflict resolution and hand-lands until the close; in a session `git fetch/rebase/push` and `gh issue comment/edit/close` | loop logs, transcript |
+| `other`        | Other               | session time no rule matches                                                                                                                                                       | transcript            |
+
+`other` should stay small. On the backfill below it is 0.7% of session time. If it grows, read
+what the unmatched calls were and add a rule to `scripts/metrics/classifyToolCall.mjs`, with a
+fixture in its test.
+
+## How time is counted
+
+**Inside a session** (`scripts/metrics/sessionSegments.mjs`, transcript in
+`~/.claude/projects/*<worktree>*/<session>.jsonl`):
+
+- A tool call's time runs from its `tool_use` to its `tool_result` and goes to that call's
+  category.
+- The model's time between a `tool_result` and the next `tool_use` goes to that next call's
+  category. Model time in a reply that ends with no call counts as `planning`.
+- Parallel calls share one timeline: the earliest open call owns the overlap, so no second counts
+  twice.
+- A background run (`run_in_background`) ends with a task notification that names its `tool_use`.
+  The wait until that notification goes to the run's category, usually `testing`. Monitor,
+  ScheduleWakeup and TaskOutput are `testing` for the same reason.
+- Subagent lines are skipped: their Agent call in the main transcript already covers that time.
+
+**Over the ticket's life** (`scripts/metrics/ticketRecord.mjs`): each source becomes windows with a
+rank. Where windows overlap, the higher rank owns the time. Time no window covers is `idle`.
+Ranks, highest first:
+
+1. what the transcript says a session did;
+2. the rest of a session's span (`other`): the seconds between the loop starting the session and
+   the first transcript line;
+3. `gates`: from the end of the session to the last `.gates.*` file's mtime, never later than the
+   minute of the driver's verdict line (just the verdict line when the gate files are gone);
+4. `landing`: from the driver's "verified ... pushing", "push lock acquired", push_pending recovery
+   or manual-land line until the close. A failed rebase or push ends it only when another attempt
+   follows (the ticket went back to work). Without one, the time until the close is conflict
+   resolution and a hand-land;
+5. `planner_wait`;
+6. `blocked`.
+
+A session ends at its transcript's last line. With no transcript, it ends at the driver's "exited"
+line, and the log file's mtime is the last resort, because moving the box on 2026-10-06 at 05:35
+touched every log file.
+
+**Attempts:** each session log `logs/<n>-<YYYYMMDD-HHMMSS>.log` (build loop and perf loop) is one
+attempt. Its first line names the session's transcript. A transcript started on `ticket/<n>` or
+`perf/<n>` that no log names counts as an attempt of its own. Every segment carries the attempt
+it falls in (0 before the first), the attempt's tier (from the driver's `tier=` line) and its
+model (from the transcript, else the driver's model alias). Retries and rework can be counted
+from these, with no extra category.
+
+**Lead time:** created to closed. **Cycle time:** start of the first attempt to closed (`null`
+when no session ever ran).
+
+## File schema (v1)
+
+```jsonc
+{
+  "schema": 1,
+  "ticket": 133,
+  "title": "Bug: lava touches on planets 8 and 10 with no lava-risk tile opened",
+  "tier": "hard", // the tier:* label at close, else the last attempt's tier
+  "model": "claude-opus-5-5", // the last attempt's model
+  "created": "2026-10-06T10:06:58Z",
+  "closed": "2026-10-06T13:10:52Z",
+  "segments": [
+    // one per line, covering created..closed with no gap or overlap
+    {
+      "category": "blocked",
+      "start": "…",
+      "end": "…",
+      "attempt": 0,
+      "tier": null,
+      "model": null,
+      "source": "github",
+    },
+  ],
+  "totals": { "blocked": 4975, "planner_wait": 0, "idle": 1067 /* …all ten, seconds */ },
+  "lead_time_s": 11034,
+  "cycle_time_s": 4992,
+  "backfilled": false,
+}
+```
+
+`source` is `transcript`, `loop-log`, `github` or `derived` (idle). The totals add up to the lead
+time to within rounding. The writer puts one segment per line and rewrites the same bytes for the
+same inputs, so the folder is excluded from Prettier.
+
+## Commands (on the build box)
+
+```bash
+npm run metrics:ticket -- 133   # one closed ticket; refuses an open one
+npm run metrics:backfill        # every closed #90 child and perf ticket closed since 2026-10-05
+                                # that has transcripts; marks them backfilled, prints each ticket
+                                # and the share of session time in other
+```
+
+The inputs live only on the box: `gh` (logged in), the loop logs
+(`/workspace/claude-sessions/steampunk-loop/logs` and `/workspace/claude-sessions/perf-loop/logs`,
+override with `METRICS_LOOP_LOGS=dir1:dir2`) and the transcripts (`~/.claude/projects`, override with
+`METRICS_CLAUDE_PROJECTS`). Session log names are read in the box's local time (Europe/Oslo), the
+same clock the loops name them with.
+
+The first backfill (2026-10-06) wrote 28 tickets. Six closed tickets had no transcripts and were
+skipped: #83, #97, #98, #105, #111 and #113. `other` was 0.7% of session time.
+
+## How the loop calls it after a close
+
+The loop wiring lives outside this repo; Grok Bot hooks it up. After the driver has pushed a ticket
+and closed its issue (the "closed after successful push" / "landed on origin/main and closed"
+step), it should:
+
+1. run `npm run metrics:ticket -- <n>` in a checkout of `origin/main`, once the session's
+   transcript and the gate files are final;
+2. commit only `docs/metrics/tickets/<n>.json`, with a message like
+   `Record where #<n>'s time went`, and push it under `.push.lock` like any landing (plain rebase,
+   never force);
+3. treat any failure as a warning: the metrics must never block or fail the loop. The command
+   is idempotent, so a later run (or `metrics:backfill`) fills the gap.
+
+A push to `main` rebuilds the status page, so the new bar shows on the next Pages run.
+
+## Limits
+
+- The driver's stamps are whole minutes. Gate and landing edges that come only from the driver
+  log are accurate to about a minute; the gate files and transcripts are accurate to the second.
+- A blocker counts from its creation to its last close. A reopened blocker is not followed.
+- Tickets worked by hand outside the loop show only the transcripts started on their branch.
+  Sessions on `main` cannot be matched to a ticket.
