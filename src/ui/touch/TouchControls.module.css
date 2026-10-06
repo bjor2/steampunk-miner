@@ -1,0 +1,126 @@
+/*
+ * The on-screen driving controls (#173, Gameplay & Vehicle's layout): a floating stick in the
+ * thumb's 40% of the screen below the HUD strip, and a contextual cluster in the other bottom
+ * corner. All inside the safe area; mirrored for the left hand.
+ */
+.controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Pinch and double tap anywhere the stick and the buttons are not; the browser never zooms. */
+.surface {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.stickZone {
+  position: absolute;
+  top: 20%;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.controls[data-hand='left'] .stickZone {
+  left: auto;
+  right: 0;
+}
+
+/* The stick's 56 px travel around where the thumb landed; the knob follows it. */
+.stickBase {
+  position: absolute;
+  width: 112px;
+  height: 112px;
+  margin: -56px 0 0 -56px;
+  border: 2px solid var(--color-brass);
+  border-radius: 50%;
+  background: rgb(27 22 19 / 0.35);
+  opacity: 0.8;
+}
+
+.knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  border-radius: 50%;
+  background: var(--color-brass);
+  transform: translate(var(--knob-x, 0px), var(--knob-y, 0px));
+}
+
+.cluster {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  display: grid;
+  grid-template-columns: 56px 56px 72px;
+  grid-template-rows: 56px 72px;
+  grid-template-areas:
+    '. toggle_guns plant_charge'
+    'request_rescue quick_service interact';
+  gap: 8px;
+  place-items: end;
+  pointer-events: none;
+}
+
+.controls[data-hand='left'] .cluster {
+  right: auto;
+  left: var(--space-3);
+  grid-template-columns: 72px 56px 56px;
+  grid-template-areas:
+    'plant_charge toggle_guns .'
+    'interact quick_service request_rescue';
+  place-items: end start;
+}
+
+/* 35% at rest and 80% pressed, a 2 px brass rim, glyphs only (#173). */
+.button {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 2px solid var(--color-brass);
+  border-radius: 50%;
+  background: var(--color-panel);
+  opacity: 0.35;
+  pointer-events: auto;
+  touch-action: none;
+  /* The glyph is the menu size, 1.25em: 32 px here and 40 px on Interact. */
+  font-size: 1.6rem;
+}
+
+.button[data-pressed] {
+  opacity: 0.8;
+}
+
+.button[data-action='interact'] {
+  grid-area: interact;
+  width: 72px;
+  height: 72px;
+  font-size: 2rem;
+}
+
+.button[data-action='plant_charge'] {
+  grid-area: plant_charge;
+}
+
+.button[data-action='toggle_guns'] {
+  grid-area: toggle_guns;
+}
+
+.button[data-action='request_rescue'] {
+  grid-area: request_rescue;
+}
+
+.button[data-action='quick_service'] {
+  grid-area: quick_service;
+}

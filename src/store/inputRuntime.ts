@@ -27,13 +27,25 @@ const CANCEL_REBINDING_KEY = 'Escape'
 const heldActions: ActionId[] = []
 const actionsOfKey = new Map<string, ActionId[]>()
 
+/** One action going down (accepted in its layer) or a held one coming up, in order (#173). */
+export interface ActionEdge {
+  actionId: ActionId
+  isDown: boolean
+}
+
+/** The newest edges kept for the debug read; enough for a scripted touch or key run. */
+const KEPT_ACTION_EDGES = 256
+const actionStream: ActionEdge[] = []
+
 /**
  * One key from the shell: a rebinding capture, or the actions its chord has in the top layer.
- * Any key also takes a shown transmission down (#16), and still does what it is bound to.
+ * Any key also takes a shown transmission down (#16) and hides the touch controls until the next
+ * touch (#173), and still does what it is bound to.
  */
 export function routeKeyChange(key: KeyChange): void {
   if (!key.isDown) return releaseKey(key.code)
   useGameStore.getState().dismissTransmission()
+  useGameStore.getState().hideTouchControls()
   if (useGameStore.getState().rebindingActionId !== null) return captureRebinding(key)
   if (key.isRepeat) return
   pressKey(key.code, actionsOfKeyNow(key))
@@ -48,13 +60,24 @@ export function routeScrollNotch(notch: ScrollNotch): void {
 export function pressAction(action: ActionId): void {
   const game = useGameStore.getState()
   if (!actionDefOf(ACTION_MAP, action).contexts.includes(inputLayerOf(game))) return
+  recordEdge(action, true)
   if (actionDefOf(ACTION_MAP, action).kind === 'hold') return holdAction(action)
   applyReaction(reactionToPress(action, situationNow()))
 }
 
 export function releaseAction(action: ActionId): void {
   const index = heldActions.indexOf(action)
-  if (index >= 0) heldActions.splice(index, 1)
+  if (index < 0) return
+  heldActions.splice(index, 1)
+  recordEdge(action, false)
+}
+
+/**
+ * The actions keys, touches and the debug API pressed, oldest first: the same play gives the same
+ * stream whatever device it came from (#173 acceptance: touch and keyboard action streams match).
+ */
+export function readActionStream(): readonly ActionEdge[] {
+  return actionStream
 }
 
 /** What the fixed step drives with: idle whenever a menu layer is on top. */
@@ -67,11 +90,18 @@ export function readVehicleIntent(): VehicleIntent {
 export function resetInput(): void {
   heldActions.length = 0
   actionsOfKey.clear()
+  actionStream.length = 0
 }
 
 function holdAction(action: ActionId): void {
-  releaseAction(action)
+  const index = heldActions.indexOf(action)
+  if (index >= 0) heldActions.splice(index, 1)
   heldActions.push(action)
+}
+
+function recordEdge(actionId: ActionId, isDown: boolean): void {
+  actionStream.push({ actionId, isDown })
+  if (actionStream.length > KEPT_ACTION_EDGES) actionStream.shift()
 }
 
 function pressKey(code: string, actions: readonly ActionId[]): void {

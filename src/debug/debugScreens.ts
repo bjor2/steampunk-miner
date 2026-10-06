@@ -12,7 +12,12 @@ import { lightPresence } from '../scene/lightPresence'
 import { previewPresence } from '../scene/previewPresence'
 import { renderPresence } from '../scene/renderPresence'
 import { useGameStore } from '../store/gameStore'
-import { pressAction, releaseAction } from '../store/inputRuntime'
+import {
+  pressAction,
+  readActionStream,
+  releaseAction,
+  type ActionEdge,
+} from '../store/inputRuntime'
 import {
   readAudioModel,
   readHudModel,
@@ -100,6 +105,11 @@ export interface DebugInput {
   getBindings(): DebugResult<{ bindings: Bindings; overrides: BindingOverrides }>
   /** The player's sparse override; refused whole with every problem, the current one stays. */
   setBindings(overrides: unknown): DebugResult
+  /**
+   * The actions pressed and held ones released, oldest first, from keys, touches and this API
+   * alike (#173: a touch run and its key run press the same stream). An unlogged read.
+   */
+  getActionStream(): DebugResult<{ stream: ActionEdge[] }>
 }
 
 const game = () => useGameStore.getState()
@@ -135,6 +145,7 @@ export function createDebugInput(): DebugInput {
       }),
     getBindings: () => ({ ok: true, bindings: game().bindings, overrides: game().prefs.bindings }),
     setBindings: (overrides) => resultOf(game().setBindings(overrides)),
+    getActionStream: () => ({ ok: true, stream: [...readActionStream()] }),
   }
 }
 

@@ -68,6 +68,8 @@ export interface PresentationValues {
   renderScalePin: number | null
   /** The track whose part the Upgrade bay preview bolts on after a purchase (#44); null when none. */
   installingUpgradeId: UpgradeId | null
+  /** The on-screen driving controls (#173): shown on a finger's touch, hidden by a key. */
+  isTouchControlsShown: boolean
 }
 
 export interface PresentationActions {
@@ -113,6 +115,10 @@ export interface PresentationActions {
   startPartInstall(events: readonly DomainEvent[]): void
   /** The preview calls this once the install animation has run its 0.4 s. */
   endPartInstall(): void
+  /** A finger touched the screen, or it starts with a coarse pointer (#173). */
+  showTouchControls(): void
+  /** A key went down: the keyboard has the game until the next touch (#173). */
+  hideTouchControls(): void
 }
 
 type SliceHost = PresentationValues &
@@ -132,6 +138,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
   rebindingActionId: null,
   renderScalePin: null,
   installingUpgradeId: null,
+  isTouchControlsShown: false,
 }
 
 export function inputLayerOf(state: SliceHost): InputContext {
@@ -214,6 +221,12 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       if (upgradeId !== null) set({ installingUpgradeId: upgradeId })
     },
     endPartInstall: () => set({ installingUpgradeId: null }),
+    showTouchControls: () => {
+      if (!get().isTouchControlsShown) set({ isTouchControlsShown: true })
+    },
+    hideTouchControls: () => {
+      if (get().isTouchControlsShown) set({ isTouchControlsShown: false })
+    },
   }
 }
 

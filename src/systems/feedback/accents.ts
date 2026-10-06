@@ -24,6 +24,8 @@ export const ACCENT_OF_CUE: Readonly<Record<FeedbackCue['kind'], Accent | null>>
   wreckerScrape: null,
   // A planter caught in its own blast takes a hit, which already takes the flash.
   chargeBlast: null,
+  // Felt in the hand only (#173 haptics).
+  drillContact: null,
 }
 
 export function accentOf(cue: FeedbackCue): Accent | null {

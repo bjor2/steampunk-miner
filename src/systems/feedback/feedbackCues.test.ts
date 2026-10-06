@@ -128,6 +128,19 @@ describe('feedback cues', () => {
     expect(feedbackCuesOf([blast], 'p2')).toEqual([])
   })
 
+  it("marks the player's own drill biting, once a batch, for the haptics (#173)", () => {
+    const bite = (playerId: string): DomainEvent => ({
+      ...stamp(playerId),
+      type: 'DrillDamageDealt',
+      tx: 3,
+      ty: 280,
+      ticks: 12,
+      damage: '4',
+    })
+    expect(feedbackCuesOf([bite('p1'), bite('p1')], 'p1')).toEqual([{ kind: 'drillContact' }])
+    expect(feedbackCuesOf([bite('p2')], 'p1')).toEqual([])
+  })
+
   it("ignores another player's pickups", () => {
     expect(feedbackCuesOf([cargo(4, 'p2')], 'p1')).toEqual([])
   })

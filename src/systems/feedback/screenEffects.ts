@@ -48,6 +48,8 @@ const KICKS: Readonly<Record<FeedbackCue['kind'], { shake: number; flash: number
   // The wrecker gnaws more than 20 tiles away: heard, not felt.
   wreckerScrape: { shake: 0, flash: 0 },
   chargeBlast: { shake: 0.8, flash: 0 },
+  // Felt in the hand only (#173 haptics): the screen stays still while the drill cuts.
+  drillContact: { shake: 0, flash: 0 },
 }
 
 export function createScreenEffects(): ScreenEffects {

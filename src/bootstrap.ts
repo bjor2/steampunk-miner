@@ -33,6 +33,7 @@ import { recordStartingPlanetEntered } from './store/planetArrivalLog'
 import { installPreferencesStorage, loadPreferences } from './store/preferencesFile'
 import { parseScenario, type Scenario } from './systems/scenario'
 import { keepScreenFitted } from './ui/stage/screenFit'
+import { keepHapticsPlaying, showTouchControlsOnTouch } from './ui/touch/touchFollowers'
 
 const LOG_FLUSH_INTERVAL_MS = 1000
 
@@ -58,6 +59,8 @@ export async function startGame(): Promise<void> {
   installSaveSlots(saveSlotsOf(shell))
   await adoptLocalPreferences(shell)
   keepScreenFitted(shell)
+  showTouchControlsOnTouch(shell)
+  keepHapticsPlaying(shell)
   shell.onKeyChange(routeKeyChange)
   shell.onScrollNotch(routeScrollNotch)
   await resumeLastCheckpoint(shell)

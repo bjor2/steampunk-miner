@@ -1,7 +1,7 @@
 /**
  * The screens' view models now (#33, #37), for the DOM components and the debug API's `ui.*` reads:
  * the same functions on the same store, so a spec reads what the screen draws. The audio model
- * (#49) is read the same way by the sound stage.
+ * (#49) is read the same way by the sound stage, and the touch cluster's situation (#173) too.
  */
 import { selectAudioModel, type AudioModel } from '../systems/audio/audioModel'
 import { drillVoiceOf, type DrillVoice } from '../systems/audio/drillVoice'
@@ -14,11 +14,15 @@ import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
 import { dockedBayOf } from '../systems/authority/dockRules'
+import { chargesOf } from '../systems/authority/charges/chargeRules'
+import type { TouchSituation } from '../systems/input/touchControls'
+import { mountedGunModeOf } from '../systems/vehicle/vehicleGun'
 import type { BayId } from '../systems/world/dockBays'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
 import type { ArtefactChoiceModel } from '../systems/views/artefactChoiceModel'
 import { readPlayedStingers } from './musicStingerRecord'
+import { inputLayerOf } from './presentationSlice'
 import {
   artefactChoiceModelOf,
   bayScreenOf,
@@ -89,4 +93,17 @@ export function readDrillVoice(): DrillVoice {
 /** The artefact cache's three cards (#46) as they are drawn while open. */
 export function readArtefactChoiceModel(): ArtefactChoiceModel {
   return artefactChoiceModelOf(useGameStore.getState())
+}
+
+/** What decides the touch cluster's buttons now (#173): the layer, the vehicle and its parts. */
+export function readTouchSituation(): TouchSituation {
+  const game = useGameStore.getState()
+  const state = readAuthorityState()
+  return {
+    layer: inputLayerOf(game),
+    vehicleMode: game.vehicle.mode,
+    dockedBay: dockedBayOf(state, game.playerId),
+    hasGuns: mountedGunModeOf(state.players[game.playerId].vehicle.gun) !== null,
+    hasChargeRack: chargesOf(state, game.playerId).isRackMounted,
+  }
 }

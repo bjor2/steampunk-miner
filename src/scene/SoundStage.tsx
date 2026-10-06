@@ -100,6 +100,8 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   wreckerScrape: (sound) => sound.playWreckerScrape(),
   // Rock breaking all at once: the collapse's crash, until the blast has its own sound.
   chargeBlast: (sound) => sound.playCollapseCrash(),
+  // Felt, not heard (#173 haptics): the drill's own voice already sounds while it cuts.
+  drillContact: () => {},
 }
 
 function playCue(sound: SoundOut, cue: FeedbackCue): void {

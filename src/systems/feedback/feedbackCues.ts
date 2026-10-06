@@ -5,7 +5,8 @@
  * as a ring is laid and pop as the drill breaks through lining (#41 casing feel), a collapse's
  * rising rumble as a block starts its warning and crash as it refills (#43), and a tunnel wrecker's
  * scrape as it breaches a ring of the vehicle's route (#111 telegraph), and the crack and shake of
- * the player's own charge blowing (#109). Presentation only: cues
+ * the player's own charge blowing (#109), and the drill biting, which is felt as a haptic tick
+ * rather than heard (#173). Presentation only: cues
  * are read from the events, never written back, so they cannot touch state or the digest (#33).
  *
  * A batch gives at most one cue of each kind (the highest tier, the hardest hit), so a fast-forward
@@ -27,6 +28,7 @@ export type FeedbackCue =
   | { kind: 'collapseCrash' }
   | { kind: 'wreckerScrape' }
   | { kind: 'chargeBlast' }
+  | { kind: 'drillContact' }
 
 type CueKind = FeedbackCue['kind']
 
@@ -44,6 +46,7 @@ const CUE_ORDER: readonly CueKind[] = [
   'collapseCrash',
   'wreckerScrape',
   'chargeBlast',
+  'drillContact',
 ]
 
 /** The local player's cues in a batch, one per kind, in a fixed order. */
@@ -87,6 +90,8 @@ function cueOfEvent(event: DomainEvent): FeedbackCue | null {
       return { kind: 'wreckerScrape' }
     case 'ChargeDetonated':
       return { kind: 'chargeBlast' }
+    case 'DrillDamageDealt':
+      return { kind: 'drillContact' }
     default:
       return null
   }

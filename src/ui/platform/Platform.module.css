@@ -135,6 +135,8 @@
     display: block;
     overflow: auto;
     overscroll-behavior: contain;
+    /* Room to scroll the last row clear of the touch cluster's 72 px Interact corner. */
+    padding-bottom: calc(72px + 2 * var(--space-3));
   }
 
   .screen > * + * {
