@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-05T21:10:15.455513+00:00",
+  "updated": "2026-10-06T18:34:16.873882+00:00",
   "sources": [
     "docs/design.md",
     "issues/14",
@@ -9,11 +9,13 @@
     "issues/79",
     "schedule_C_auto_approved",
     "issues/80",
-    "issues/81"
+    "issues/81",
+    "issues/160",
+    "issues/162"
   ],
   "source_hash": "sha256:419ca56d8af626d1f0ff799075be9e72726381567c26168b7d0a6fbf8e1f3481",
   "source_hash_method": "sha256 of feature ids + #79 schema + #80 lock fills",
-  "source_note": "Schedule C locked (#80). #78 survive 35 + 5 thin-act fills (P31 archive_cache, P32 grav_anchor, P34 buoyancy_tanks, P37 escape_thrusters, P39 finale_key). Intentional 1-gap at P16/P29. #81 \u22642 empty satisfied. Endless gate remains finale+endless_unlock @40 (manual bind on endless).",
+  "source_note": "Schedule C locked (#80). #78 survive 35 + 5 thin-act fills (P31 archive_cache, P32 grav_anchor, P34 buoyancy_tanks, P37 escape_thrusters, P39 finale_key). Intentional 1-gap at P16/P24/P29. #81 \u22642 empty satisfied. Endless gate remains finale+endless_unlock @40 (manual bind on endless). #162 (GD): research_lab P24->P15 as the combo-research building; side_drills, shields, grav_anchor, buoyancy_tanks, escape_thrusters are tech-tree nodes at their own planet (unlockVia tech_tree, treeLane per #160).",
   "schedule_approved": "C",
   "schema": {
     "issue": 79,
@@ -307,7 +309,9 @@
       "bind": "planet_gate",
       "name": "Side drill arms",
       "slice": "campaign",
-      "origin": "new"
+      "origin": "new",
+      "unlockVia": "tech_tree",
+      "treeLane": "drill-gear"
     },
     {
       "id": "scanner_station",
@@ -330,6 +334,18 @@
       "name": "Core guardian chamber",
       "slice": "campaign",
       "origin": "new"
+    },
+    {
+      "id": "research_lab",
+      "planetIndex": 15,
+      "lane": "Facility",
+      "progressionAxis": "horizontal",
+      "status": "vision",
+      "bind": "facility",
+      "name": "Research lab (combo research)",
+      "slice": "campaign",
+      "origin": "new",
+      "scopeNote": "Platform building where milestone combos are researched, endless combos included; moved from P24, P24 left open (#162)."
     },
     {
       "id": "frozen_planets",
@@ -407,7 +423,9 @@
       "bind": "planet_gate",
       "name": "Steam shield",
       "slice": "campaign",
-      "origin": "new"
+      "origin": "new",
+      "unlockVia": "tech_tree",
+      "treeLane": "mobility"
     },
     {
       "id": "ore_thief",
@@ -417,17 +435,6 @@
       "status": "vision",
       "bind": "planet_gate",
       "name": "Ore thief",
-      "slice": "campaign",
-      "origin": "new"
-    },
-    {
-      "id": "research_lab",
-      "planetIndex": 24,
-      "lane": "Facility",
-      "progressionAxis": "horizontal",
-      "status": "vision",
-      "bind": "facility",
-      "name": "Research lab",
       "slice": "campaign",
       "origin": "new"
     },
@@ -587,7 +594,9 @@
       "name": "Grav anchor (hollow prep)",
       "slice": "campaign",
       "origin": "schedule_lock_80",
-      "lockNote": "Visible hull clamp for low-g interiors; unlocks the beat before hollow_planets."
+      "lockNote": "Visible hull clamp for low-g interiors; unlocks the beat before hollow_planets.",
+      "unlockVia": "tech_tree",
+      "treeLane": "mobility"
     },
     {
       "id": "buoyancy_tanks",
@@ -599,7 +608,9 @@
       "name": "Buoyancy tanks",
       "slice": "campaign",
       "origin": "schedule_lock_80",
-      "lockNote": "Post-hollow mobility: float/anchor in open interiors so P33 is not a one-planet novelty."
+      "lockNote": "Post-hollow mobility: float/anchor in open interiors so P33 is not a one-planet novelty.",
+      "unlockVia": "tech_tree",
+      "treeLane": "mobility"
     },
     {
       "id": "escape_thrusters",
@@ -611,7 +622,9 @@
       "name": "Escape thrusters",
       "slice": "campaign",
       "origin": "schedule_lock_80",
-      "lockNote": "Pairs with unstable_cores (P36): timed egress becomes a vehicle verb, not only a timer."
+      "lockNote": "Pairs with unstable_cores (P36): timed egress becomes a vehicle verb, not only a timer.",
+      "unlockVia": "tech_tree",
+      "treeLane": "mobility"
     },
     {
       "id": "finale_key",
@@ -685,39 +698,39 @@
     },
     {
       "planet": 15,
-      "cumulative": 31
+      "cumulative": 32
     },
     {
       "planet": 16,
-      "cumulative": 31
+      "cumulative": 32
     },
     {
       "planet": 17,
-      "cumulative": 33
-    },
-    {
-      "planet": 18,
       "cumulative": 34
     },
     {
-      "planet": 19,
-      "cumulative": 36
+      "planet": 18,
+      "cumulative": 35
     },
     {
-      "planet": 20,
+      "planet": 19,
       "cumulative": 37
     },
     {
-      "planet": 21,
+      "planet": 20,
       "cumulative": 38
     },
     {
-      "planet": 22,
+      "planet": 21,
       "cumulative": 39
     },
     {
-      "planet": 23,
+      "planet": 22,
       "cumulative": 40
+    },
+    {
+      "planet": 23,
+      "cumulative": 41
     },
     {
       "planet": 24,
@@ -790,6 +803,7 @@
   ],
   "gap_justifications": {
     "16": "Act break after core_guardian before frozen triad; 1 empty \u2264 #81 cap.",
+    "24": "Freed when research_lab moved to P15 (#162 GD: leave open); 1 empty \u2264 #81 cap.",
     "29": "Breath before relic_planet act beat; 1 empty \u2264 #81 cap."
   },
   "schedule_locked": true,

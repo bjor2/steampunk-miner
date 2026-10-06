@@ -16,7 +16,7 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = 'd4500e2f926b59246df20ee8502c33f282647a375745555c9768dc8bdb12b250'
+const LOCKED_FILE_SHA256 = '896254194c189398a85985ee98b64213b580cb92acf3ed54a2eb034f4cfe7f27'
 
 const CAMPAIGN_PLANETS = Array.from({ length: 40 }, (_, index) => index + 1)
 
@@ -115,11 +115,11 @@ describe('locked unlock schedule', () => {
     expect(counted).toEqual(scheduleFile.cumulative_by_planet)
   })
 
-  it('leaves only the intentional gaps at planets 16 and 29 without a new row', () => {
+  it('leaves only the intentional gaps at planets 16, 24 and 29 without a new row', () => {
     const emptyPlanets = CAMPAIGN_PLANETS.filter(
       (planet) => rowsAt(LOCKED_SCHEDULE, planet).length === 0,
     )
-    expect(emptyPlanets).toEqual([16, 29])
+    expect(emptyPlanets).toEqual([16, 24, 29])
   })
 
   it('unlocks the same rows on every campaign planet as before the six rows were marked shipped', () => {
