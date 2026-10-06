@@ -2,7 +2,8 @@
  * `selectHudModel` (#33 section 5): the in-run HUD as a pure function of the authority replica,
  * the client-owned depth and the local bindings. Every element the HUD draws is a field here, so
  * the debug API and specs read the HUD without pixels. Money is not on the HUD; the cargo value
- * is, at the shop's prices, with core fragments excluded (they are never sold, #10).
+ * is, at the shop's prices, with core fragments excluded (they are never sold, #10), and beside it
+ * the lining bill the next sale settles, while there is one (#76 amendment, #115).
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
 import type { AuthorityState } from '../authority/authorityState'
@@ -20,6 +21,7 @@ import {
   mul,
   toCanonical,
   toSafeInteger,
+  ZERO_MONEY,
   type Money,
 } from '../money'
 import { cargoGaugeText, energyGaugeText, hullGaugeText } from '../vehicle/vehicleReadout'
@@ -86,6 +88,8 @@ export interface HudModel {
   hull: GaugeReading
   cargo: CargoReading
   cargoValue: AmountReading
+  /** The vehicle's unpaid lining, in the fee readout's style; null while the bill is empty. */
+  liningBill: AmountReading | null
   depth: DepthReading
   casing: CasingBadge | null
   /** Null with no guns mounted (#107). */
@@ -118,6 +122,7 @@ export function selectHudModel(sources: HudSources): HudModel {
     hull: hullGaugeOf(vehicle),
     cargo: cargoGaugeOf(vehicle),
     cargoValue: amountReading(serviceQuote(state, playerId).saleValue),
+    liningBill: liningBillOf(vehicle),
     depth: depthReadingOf(state, playerId, sources.depthTiles),
     casing: casingBadgeOf(state, playerId),
     guns: gunReadingOf(vehicle, sources.bindings),
@@ -172,6 +177,11 @@ function cargoGaugeOf(vehicle: VehicleState): CargoReading {
     coreText: coreFragments > 0 ? `(${formatAmount(coreFragments)} core)` : '',
     isFull: units >= capacity,
   }
+}
+
+function liningBillOf(vehicle: VehicleState): AmountReading | null {
+  if (cmp(vehicle.liningBill, ZERO_MONEY) === 0) return null
+  return amountReading(vehicle.liningBill)
 }
 
 function energyWarningOf(vehicle: VehicleState, depthTiles: number): EnergyWarning {

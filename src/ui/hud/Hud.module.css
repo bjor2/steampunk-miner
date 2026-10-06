@@ -31,6 +31,11 @@
   font-size: 0.8rem;
 }
 
+/* #115: the lining bill owed at the next sale, a cost like a fee, so in the brass of the labels. */
+.liningBill {
+  color: var(--color-brass);
+}
+
 .position {
   top: var(--space-3);
   right: var(--space-3);

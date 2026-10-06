@@ -102,6 +102,14 @@ describe('HUD model', () => {
     expect(hud.cargoValue.exact).not.toBe(canonical('0'))
   })
 
+  it('shows the lining bill beside the cargo value while the vehicle owes one (#115)', () => {
+    const session = createScriptedSession()
+    expect(hudOf(session).liningBill).toBeNull()
+    surfaceOreTiles(3).forEach((tile, index) => mineTile(session, 1 + index * 50, tile))
+    expect(hudOf(session).liningBill?.exact).toBe(toCanonical(session.vehicle().liningBill))
+    expect(hudOf(session).liningBill?.exact).not.toBe(canonical('0'))
+  })
+
   it('reads the depth the client reports and the band at that depth', () => {
     const session = createScriptedSession()
     expect(hudOf(session, 0).depth).toMatchObject({ text: '0', band: 1 })

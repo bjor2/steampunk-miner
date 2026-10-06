@@ -16,6 +16,7 @@ export const UI_IDS = {
   hudCargoCore: 'hud-cargo-core',
   hudCargoFull: 'hud-cargo-full',
   hudCargoValue: 'hud-cargo-value',
+  hudLiningBill: 'hud-lining-bill',
   hudDepth: 'hud-depth',
   hudBand: 'hud-band',
   hudCasing: 'hud-casing',

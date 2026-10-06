@@ -104,6 +104,7 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
     [UI_IDS.hudCargoText]: model.cargo.text,
     [UI_IDS.hudCargoCore]: model.cargo.coreText,
     [UI_IDS.hudCargoValue]: model.cargoValue.text,
+    ...(model.liningBill === null ? {} : { [UI_IDS.hudLiningBill]: model.liningBill.text }),
     [UI_IDS.hudDepth]: model.depth.text,
     [UI_IDS.hudBand]: String(model.depth.band),
     ...(model.casing === null ? {} : { [UI_IDS.hudCasing]: model.casing.text }),
