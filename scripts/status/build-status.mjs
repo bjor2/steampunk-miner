@@ -2,24 +2,31 @@
 // Builds the status dashboard (dist/status/) that the Pages workflow deploys next to the game:
 // the issue trees (sub-issue hierarchy) from GraphQL, the loop state from loops.json on the
 // orphan `loop-status` branch, the last run of each workflow, the Performance charts from
-// the committed docs/perf/ files (static HTML + SVG, no script), and the game feature tree from
-// docs/features/features.json joined with the live issue states. Static output, no server.
+// the committed docs/perf/ files (static HTML + SVG, no script), the "Where the time goes"
+// section of the Issue trees tab from the committed docs/metrics/tickets/ files (#134), and the
+// game feature tree from docs/features/features.json joined with the live issue states. Static
+// output, no server.
 //
 //   node scripts/status/build-status.mjs [--out dist/status]
 //
 // Auth: GITHUB_TOKEN / GH_TOKEN when set (Actions), else the logged-in `gh` CLI (local runs).
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { annotateFeatures, validateFeatures } from './features.mjs'
 import { buildPerfOverview } from './perfOverview.mjs'
 import { renderPerfOverview, renderPerfOverviewFailure } from './perfOverviewHtml.mjs'
+import { buildTicketTimeOverview } from './ticketTimeOverview.mjs'
+import { renderTicketTimeFailure, renderTicketTimeOverview } from './ticketTimeOverviewHtml.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 // The Pages job checks out with depth 1, so the perf files are read, never asked of git.
 const PERF_DIR = join(HERE, '..', '..', 'docs', 'perf')
 const PERF_PLACEHOLDER = '<!-- perf-overview -->'
+// Written on the build box by `npm run metrics:ticket`; the Pages job only reads them.
+const TICKET_TIME_DIR = join(HERE, '..', '..', 'docs', 'metrics', 'tickets')
+const TICKET_TIME_PLACEHOLDER = '<!-- ticket-time -->'
 const FEATURES_FILE = 'docs/features/features.json'
 const FEATURES_PATH = join(HERE, '..', '..', FEATURES_FILE)
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
@@ -235,6 +242,26 @@ function buildPerfSection() {
   }
 }
 
+function readTicketTimeFiles() {
+  if (!existsSync(TICKET_TIME_DIR)) return []
+  return readdirSync(TICKET_TIME_DIR)
+    .filter((name) => name.endsWith('.json'))
+    .sort()
+    .map((name) => ({ name, text: readFileSync(join(TICKET_TIME_DIR, name), 'utf8') }))
+}
+
+// Like the perf section: a broken ticket file or renderer shows its error in the section only.
+function buildTicketTimeSection() {
+  try {
+    const model = buildTicketTimeOverview({ files: readTicketTimeFiles(), repo: REPO })
+    for (const problem of model.problems) console.warn(`ticket time: ${problem}`)
+    return { model, html: renderTicketTimeOverview(model) }
+  } catch (err) {
+    console.warn(`ticket time overview failed: ${err.message}`)
+    return { model: { error: String(err.message) }, html: renderTicketTimeFailure(err.message) }
+  }
+}
+
 async function fetchLastCommitOf(path) {
   try {
     const commits = await rest(`repos/${REPO}/commits?path=${encodeURIComponent(path)}&per_page=1`)
@@ -284,17 +311,26 @@ function shortLinkPage(tab, title) {
 `
 }
 
-function pageWithPerfSection(perfHtml) {
-  const page = readFileSync(join(HERE, 'index.html'), 'utf8')
-  if (!page.includes(PERF_PLACEHOLDER)) {
-    throw new Error(`index.html lacks the ${PERF_PLACEHOLDER} placeholder`)
+function withSection(page, placeholder, html) {
+  if (!page.includes(placeholder)) {
+    throw new Error(`index.html lacks the ${placeholder} placeholder`)
   }
-  return page.replace(PERF_PLACEHOLDER, () => perfHtml)
+  return page.replace(placeholder, () => html)
 }
 
-// Perf first, before any GitHub call, so a perf bug shows at the top of the log.
+function pageWithSections(perfHtml, ticketTimeHtml) {
+  const page = readFileSync(join(HERE, 'index.html'), 'utf8')
+  return withSection(
+    withSection(page, PERF_PLACEHOLDER, perfHtml),
+    TICKET_TIME_PLACEHOLDER,
+    ticketTimeHtml,
+  )
+}
+
+// The committed-file sections first, before any GitHub call, so their bugs top the log.
 const perf = buildPerfSection()
-const page = pageWithPerfSection(perf.html)
+const ticketTime = buildTicketTimeSection()
+const page = pageWithSections(perf.html, ticketTime.html)
 
 const [issues, loops, workflows, featuresCommit] = await Promise.all([
   fetchIssues(),
@@ -330,6 +366,7 @@ mkdirSync(OUT, { recursive: true })
 writeFileSync(join(OUT, 'status.json'), JSON.stringify(status))
 writeFileSync(join(OUT, 'loops.json'), JSON.stringify(loops, null, 2))
 writeFileSync(join(OUT, 'perf.json'), JSON.stringify(perf.model))
+writeFileSync(join(OUT, 'ticket-time.json'), JSON.stringify(ticketTime.model))
 writeFileSync(join(OUT, 'features.json'), JSON.stringify(features))
 writeFileSync(join(OUT, 'index.html'), page)
 for (const [tab, title] of Object.entries(SHORT_LINKS)) {
@@ -341,5 +378,6 @@ console.log(
   `status: ${issues.length} issues, ${Object.keys(loops.entries ?? {}).length} loop entries, ` +
     `${workflows.length} workflows, ${perf.model.runCount ?? 0} perf runs / ` +
     `${perf.model.metricCount ?? 0} metrics / ${perf.model.budgetCounts?.over ?? '?'} over budget, ` +
+    `${ticketTime.model.ticketCount ?? 0} ticket time files, ` +
     `${features.counts ? `${features.counts.features} features / ${features.counts.flagged} to check` : `features: ${features.error}`} -> ${OUT}`,
 )

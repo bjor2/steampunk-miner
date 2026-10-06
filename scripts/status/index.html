@@ -142,6 +142,95 @@
       #tab-issues .panel {
         max-width: 1500px;
       }
+      /* "Where the time goes" (#134): ticketTimeOverviewHtml.mjs; category colours are inline */
+      #ticket-time-panel {
+        margin-bottom: 16px;
+      }
+      #ticket-time-panel h3 {
+        font-size: 13px;
+        margin: 0 0 4px;
+      }
+      .tt-note {
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+      .tt-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 16px;
+        list-style: none;
+        margin: 8px 0 4px;
+        padding: 0;
+        font-size: 12px;
+      }
+      .tt-swatch {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 5px;
+        vertical-align: -1px;
+      }
+      .tt-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+      @media (min-width: 1150px) {
+        .tt-grid {
+          grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        }
+      }
+      .tt-row {
+        display: grid;
+        grid-template-columns: minmax(0, 16em) minmax(0, 1fr) 11em;
+        gap: 8px;
+        align-items: center;
+        font-size: 12px;
+        padding: 1px 0;
+      }
+      .tt-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .tt-bar {
+        width: 100%;
+        height: 12px;
+        display: block;
+      }
+      .tt-lead {
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .tt-chart {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .tt-line-legend {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
+      }
+      polyline.tt-line-lead,
+      polyline.tt-line-cycle {
+        stroke-width: 2;
+      }
+      .tt-line-lead {
+        stroke: var(--brass);
+        background: var(--brass);
+      }
+      circle.tt-line-lead {
+        fill: var(--brass);
+      }
+      .tt-line-cycle {
+        stroke: var(--blue);
+        background: var(--blue);
+      }
+      circle.tt-line-cycle {
+        fill: var(--blue);
+      }
       main:has(#tab-features:not(.hidden)) {
         padding: 0 0 40px;
       }
@@ -1291,6 +1380,7 @@
         </section>
       </section>
       <section class="tab hidden" id="tab-issues" data-tab="issues">
+        <!-- ticket-time -->
         <section class="panel" id="tree-panel">
           <h2>Issue trees</h2>
           <div class="toolbar">
