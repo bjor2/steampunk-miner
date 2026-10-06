@@ -10,6 +10,9 @@ const cargo = (resourceTier: number, playerId = 'p1'): DomainEvent => ({
   resourceTier,
   amount: 1,
   value: '1',
+  oreId: `kernel.metal.t${resourceTier}`,
+  depthTiles: 3,
+  chunk: '0,4',
 })
 
 const docked: DomainEvent = {

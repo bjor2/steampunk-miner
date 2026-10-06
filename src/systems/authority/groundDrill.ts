@@ -12,7 +12,7 @@
  * never refused.
  */
 import { casingHardness } from '../economy/casingGrades'
-import { coreHardness, blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
+import { coreHardness, blockHardness, oreSalePrice } from '../economy/oreEconomy'
 import { toCanonical, type BigStat } from '../money'
 import { drillDamage, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf } from '../vehicle/drillStamp'
@@ -30,7 +30,7 @@ import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
-import { CELL_KIND, kindOfCell, tierOffsetOfCell } from '../world/worldCell'
+import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { materialCellAt, type WorldState } from '../world/worldState'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
@@ -38,6 +38,7 @@ import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
+import { minedOreOf, type MinedOre } from './minedOre'
 import { wakeLavaBeside } from './lava/lavaRules'
 
 type CarveIn = (world: WorldState, window: CarveWindow, drillTicksOf: CellDrillTicks) => Carve
@@ -145,7 +146,7 @@ function collectYieldedCells(
   return chainEffects(
     state,
     yielded.map(({ tile, cell }) => (current: AuthorityState) => {
-      const collected = collectTile(current, playerId, params, cell)
+      const collected = collectTile(current, playerId, params, { tile, cell })
       const destroyed: DomainEventBody = { type: 'TileDestroyed', ...tile, kind: kindNameOf(cell) }
       return { state: collected.state, events: [destroyed, ...collected.events] }
     }),
@@ -157,41 +158,35 @@ function collectTile(
   state: AuthorityState,
   playerId: string,
   params: PlanetParams,
-  cell: number,
+  { tile, cell }: YieldedCell,
 ): RuleEffect {
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.core) return harvestCoreTile(state, playerId, params)
   if (kind !== CELL_KIND.ore) return unchanged(state)
-  return collectOreUnit(state, playerId, resourceTierOf(params, cell))
+  return collectOreUnit(state, playerId, minedOreOf(params, tile, cell))
 }
 
-/** One ore unit of `resourceTier` into the hold; with a full hold it is lost, never refused (#7). */
-export function collectOreUnit(
-  state: AuthorityState,
-  playerId: string,
-  resourceTier: number,
-): RuleEffect {
+/**
+ * One ore unit into the hold, named with its tier, ore id, depth and chunk (#122); with a full
+ * hold it is lost, never refused (#7).
+ */
+export function collectOreUnit(state: AuthorityState, playerId: string, ore: MinedOre): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
   if (!hasCargoRoom(vehicle)) return { state, events: [{ type: 'StorageFull', lostUnits: 1 }] }
   return {
     state: withVehicle(state, playerId, {
       ...vehicle,
-      cargo: withOreUnit(vehicle.cargo, resourceTier),
+      cargo: withOreUnit(vehicle.cargo, ore.resourceTier),
     }),
     events: [
       {
         type: 'CargoAdded',
-        resourceTier,
+        ...ore,
         amount: 1,
-        value: toCanonical(oreSalePrice(resourceTier)),
+        value: toCanonical(oreSalePrice(ore.resourceTier)),
       },
     ],
   }
-}
-
-/** A cell stores its tier above the planet's band-1 ore (#4, #6). */
-export function resourceTierOf(params: PlanetParams, cell: number): number {
-  return oreTier(params.planetIndex, 1 + tierOffsetOfCell(cell))
 }
 
 /** What `TileDestroyed` calls a yielded cell's material. */

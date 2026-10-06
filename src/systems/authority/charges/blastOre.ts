@@ -25,7 +25,8 @@ import type { AuthorityState } from '../authorityState'
 import { chainEffects, type RuleEffect } from '../commandRule'
 import type { DomainEventBody } from '../domainEvent'
 import { groundChangedEventsOf } from '../groundChangedEvents'
-import { collectOreUnit, hardnessOfTile, kindNameOf, resourceTierOf } from '../groundDrill'
+import { collectOreUnit, hardnessOfTile, kindNameOf } from '../groundDrill'
+import { minedOreOf, type MinedOre } from '../minedOre'
 
 /** A 32-bit cell hash over this is a dither in [0, 1). */
 const HASH_RANGE = fromSafeInteger(0x100000000)
@@ -36,10 +37,13 @@ export interface BrokenGround {
   oreValueLost: Money
 }
 
-/** One tier's blasted ore units and how many of them reach the hold. */
+/**
+ * One tier's blasted ore, in the order the blast broke it, and how many units reach the hold: the
+ * first `kept` of them, so each kept unit names a cell the blast broke (#122).
+ */
 interface BlastedTier {
   tier: number
-  units: number
+  ores: MinedOre[]
   kept: number
 }
 
@@ -98,15 +102,17 @@ function blastedTiersOf(
   yielded: readonly YieldedCell[],
   dither: Money,
 ): BlastedTier[] {
-  const unitsByTier = new Map<number, number>()
-  for (const { cell } of yielded) {
+  const oresByTier = new Map<number, MinedOre[]>()
+  for (const { tile, cell } of yielded) {
     if (kindOfCell(cell) !== CELL_KIND.ore) continue
-    const tier = resourceTierOf(params, cell)
-    unitsByTier.set(tier, (unitsByTier.get(tier) ?? 0) + 1)
+    const ore = minedOreOf(params, tile, cell)
+    const ores = oresByTier.get(ore.resourceTier) ?? []
+    ores.push(ore)
+    oresByTier.set(ore.resourceTier, ores)
   }
-  return [...unitsByTier.entries()]
+  return [...oresByTier.entries()]
     .sort(([a], [b]) => a - b)
-    .map(([tier, units]) => ({ tier, units, kept: keptBlastOreUnits(units, dither) }))
+    .map(([tier, ores]) => ({ tier, ores, kept: keptBlastOreUnits(ores.length, dither) }))
 }
 
 function collectKeptOre(
@@ -114,17 +120,17 @@ function collectKeptOre(
   playerId: string,
   tiers: readonly BlastedTier[],
 ): RuleEffect {
-  const units = tiers.flatMap(({ tier, kept }) => Array.from({ length: kept }, () => tier))
+  const keptOres = tiers.flatMap(({ ores, kept }) => ores.slice(0, kept))
   return chainEffects(
     state,
-    units.map((tier) => (current: AuthorityState) => collectOreUnit(current, playerId, tier)),
+    keptOres.map((ore) => (current: AuthorityState) => collectOreUnit(current, playerId, ore)),
   )
 }
 
 function valueLostOf(tiers: readonly BlastedTier[]): Money {
   return tiers.reduce(
-    (total, { tier, units, kept }) =>
-      add(total, mul(fromSafeInteger(units - kept), oreSalePrice(tier))),
+    (total, { tier, ores, kept }) =>
+      add(total, mul(fromSafeInteger(ores.length - kept), oreSalePrice(tier))),
     ZERO_MONEY,
   )
 }

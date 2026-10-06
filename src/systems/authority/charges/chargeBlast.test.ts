@@ -11,7 +11,7 @@ import { chunkOfTile, type TilePoint } from '../../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../../world/worldCell'
 import { cellAt, currentDensityOfChunk, deltaOfChunk, EMPTY_WORLD } from '../../world/worldState'
 import { BAND_2_Y, buildWeakTunnel, lineTunnel, TUNNEL_TO_X } from '../collapse/collapseFixtures'
-import { resourceTierOf } from '../groundDrill'
+import { minedOreOf, resourceTierOf } from '../minedOre'
 import { coreTiles, createScriptedSession, FREEZE_ENEMIES, PARAMS } from '../scriptedSession'
 import { blastTilesAround } from './blastOre'
 import {
@@ -237,6 +237,24 @@ describe('blasting charges: ore yield (#109 numbers acceptance 1)', () => {
     expect(detonated.oreValueLost).toBe(toCanonical(mul(fromCanonical('0.6'), inRadiusValue)))
     expect(session.vehicle().cargo.ore).toEqual({ [String(tier)]: 2 })
     expect(ofType(session.events(), 'CargoAdded')).toHaveLength(2)
+  })
+
+  it('names each kept unit after the first ore cells the blast broke, in its order (#122)', () => {
+    const { wall } = fiveOreBlastSite()
+    const session = createScriptedSession()
+    session.submit(0, FREEZE_ENEMIES)
+    session.submit(0, setChargesIntent(3))
+    session.submit(0, poseOnTile({ tx: wall.tx - 1, ty: wall.ty }))
+    session.submit(1, PLANT)
+    session.submit(2, poseOnTile({ tx: wall.tx - 5, ty: wall.ty }))
+    session.advanceTo(1 + FUSE_TICKS)
+    const brokenOre = blastTilesAround(wall)
+      .filter((tile) => kindOfCell(cellAt(EMPTY_WORLD, PARAMS, tile)) === CELL_KIND.ore)
+      .map((tile) => minedOreOf(PARAMS, tile, cellAt(EMPTY_WORLD, PARAMS, tile)))
+    const added = ofType(session.events(), 'CargoAdded')
+    expect(added.map(({ oreId, depthTiles, chunk }) => ({ oreId, depthTiles, chunk }))).toEqual(
+      brokenOre.slice(0, 2).map(({ oreId, depthTiles, chunk }) => ({ oreId, depthTiles, chunk })),
+    )
   })
 })
 

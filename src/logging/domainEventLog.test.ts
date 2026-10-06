@@ -65,7 +65,16 @@ describe('domain event projection', () => {
 const vehicleEvents: DomainEvent[] = [
   { ...commandStamp, type: 'DrillDamageDealt', tx: 20, ty: 298, ticks: 12, damage: '3e-1' },
   { ...commandStamp, type: 'TileDestroyed', tx: 20, ty: 298, kind: 'ore' },
-  { ...commandStamp, type: 'CargoAdded', resourceTier: 1, amount: 1, value: '1e+1' },
+  {
+    ...commandStamp,
+    type: 'CargoAdded',
+    resourceTier: 1,
+    amount: 1,
+    value: '1e+1',
+    oreId: 'kernel.metal.t1',
+    depthTiles: 2,
+    chunk: '0,9',
+  },
   { ...commandStamp, type: 'StorageFull', lostUnits: 1 },
   { ...commandStamp, type: 'EnergyLow', threshold: 25 },
   { ...commandStamp, type: 'EnergyDepleted' },

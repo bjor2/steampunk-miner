@@ -167,7 +167,19 @@ export interface DomainEventBodies {
   CollapseCancelled: { block: string }
   /** The refill starts: the samples it will fill and the vehicles it crushes. */
   CollapseStarted: { block: string; samplesFilled: number; vehiclesHit: number }
-  CargoAdded: { resourceTier: number; amount: number; value: string }
+  /**
+   * One ore unit reached the hold: its tier and sale value, and which ore it was (#122): the
+   * `oreId` #155 names, whole tiles below the surface of the cell's column, and the cell's chunk
+   * as `cx,cy`, so the log can replay the mined order.
+   */
+  CargoAdded: {
+    resourceTier: number
+    amount: number
+    value: string
+    oreId: string
+    depthTiles: number
+    chunk: string
+  }
   /** A full hold: the tile still broke, its unit was lost (#7). */
   StorageFull: { lostUnits: number }
   EnergyLow: { threshold: number }
