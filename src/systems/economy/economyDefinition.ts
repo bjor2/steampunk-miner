@@ -183,6 +183,33 @@ export interface GunRules {
   levelCost: BandOreCost & { id: string; ratio: Money }
 }
 
+/**
+ * `blasting_charges` (spec #109, Systems & Economy numbers): the fuse, the blast and its yield
+ * trade, the hit on a vehicle and on enemies in the radius, the rack and its prices, and the
+ * pacing bot's blast rule. The rack holds `rackStart` charges and each bought slot one more, up to
+ * `rackMax` (`rackStart` plus one slot per `rackSlotCost` level).
+ */
+export interface BlastingChargeRules {
+  fuseTicks: number
+  blastRadiusTiles: BigStat
+  /** The share of the value of the ore a blast breaks that reaches the hold. */
+  oreYieldFraction: BigStat
+  /** The hit on the planter's vehicle in the radius before enemy tier growth (1.5 crawler hits). */
+  selfHit: BigStat
+  /** An enemy in the radius loses this many times its kind's health at the blast tile's tier. */
+  enemyDamageHealthMultiple: BigStat
+  /** Every vehicle this close to a planted charge sees its fuse warning (S3 `collapse_warning`). */
+  warnTiles: number
+  rackStart: number
+  rackMax: number
+  chargeCost: BandOreCost
+  rackSlotCost: { band: number; oreUnitsByLevel: readonly Money[] }
+  /** No tile harder than this band's rock of the current planet breaks; core tiles never do. */
+  hardnessCapBand: number
+  /** The bot blasts a tile whose drill time would be over this many ticks (4x `minTicksPerTile`). */
+  botBlastThresholdTicks: number
+}
+
 export interface Economy {
   economyVersion: number
   ore: {
@@ -258,6 +285,7 @@ export interface Economy {
     valueMultiplier: Money
     slotCostCurveId: string
   }
+  blastingCharges: BlastingChargeRules
   upgrades: readonly UpgradeDef[]
   gun: GunRules
   visualTiers: readonly VisualTierThreshold[]

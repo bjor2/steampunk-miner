@@ -55,6 +55,20 @@
     "valueMultiplier": "1.25",
     "slotCostCurveId": "cost.refinery.slot"
   },
+  "blastingCharges": {
+    "fuseTicks": 120,
+    "blastRadiusTiles": "2.5",
+    "oreYieldFraction": "0.4",
+    "selfHit": "26",
+    "enemyDamageHealthMultiple": "2",
+    "warnTiles": 16,
+    "rackStart": 3,
+    "rackMax": 8,
+    "chargeCost": { "band": 5, "oreUnits": "2" },
+    "rackSlotCost": { "band": 5, "oreUnitsByLevel": ["6", "8", "10", "12", "14"] },
+    "hardnessCapBand": 5,
+    "botBlastThresholdTicks": 96
+  },
   "upgrades": [
     {
       "id": "drill_power",

@@ -3,6 +3,7 @@
  * problem is listed, like a scenario (CLAUDE.md "refused, never trimmed").
  */
 import { createFieldReader, readLiteral, readRange, type FieldReader } from './economyFieldReader'
+import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
 import {
@@ -48,6 +49,10 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     costCurves,
     casing: readCasing(reader, reader.object('casing', file.casing), costCurves, ore.coreTierBand),
     refinery: readRefinery(reader, reader.object('refinery', file.refinery), costCurves),
+    blastingCharges: readBlastingCharges(
+      reader,
+      reader.object('blastingCharges', file.blastingCharges),
+    ),
     upgrades,
     gun: readGun(reader, reader.object('gun', file.gun)),
     visualTiers: reader
