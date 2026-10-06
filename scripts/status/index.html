@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Steampunk Miner · Status</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23c9a227'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --bg: #14100c;
+        --panel: #1e1813;
+        --panel2: #261e17;
+        --line: #3a2e22;
+        --text: #eadfc8;
+        --muted: #a39479;
+        --brass: #d4ab3c;
+        --copper: #c27a45;
+        --green: #6fbf73;
+        --blue: #6aa9d8;
+        --red: #e0675a;
+        --amber: #e3a33b;
+        --violet: #a98bd6;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: radial-gradient(ellipse at top, #221a12 0%, var(--bg) 60%) fixed;
+        color: var(--text);
+        font:
+          14px/1.45 system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+      }
+      a {
+        color: var(--brass);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      header {
+        padding: 18px 24px 12px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 24px;
+        align-items: baseline;
+      }
+      h1 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: 0.04em;
+        color: var(--brass);
+        font-family: Georgia, 'Times New Roman', serif;
+      }
+      h1 small {
+        color: var(--muted);
+        font-size: 13px;
+        font-family: system-ui, sans-serif;
+        letter-spacing: 0;
+      }
+      h2 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        color: var(--copper);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .meta b {
+        color: var(--text);
+        font-weight: 600;
+      }
+      main {
+        padding: 16px 24px 40px;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 1500px;
+      }
+      @media (min-width: 1150px) {
+        main {
+          grid-template-columns: minmax(420px, 5fr) minmax(0, 7fr);
+        }
+      }
+      section.panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 14px 16px;
+        box-shadow:
+          0 1px 0 #00000055,
+          inset 0 1px 0 #ffffff08;
+        min-width: 0;
+      }
+      .cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .card {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 6px 12px;
+        min-width: 78px;
+      }
+      .card .n {
+        font-size: 20px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+      .card .l {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th {
+        text-align: left;
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 11.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 4px 6px;
+        border-bottom: 1px solid var(--line);
+      }
+      td {
+        padding: 5px 6px;
+        border-bottom: 1px solid #2c231a;
+        vertical-align: top;
+      }
+      tr.group td {
+        color: var(--copper);
+        font-weight: 600;
+        padding-top: 10px;
+        border-bottom: 1px solid var(--line);
+      }
+      .badge {
+        display: inline-block;
+        padding: 1px 7px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        font-weight: 600;
+        line-height: 17px;
+        white-space: nowrap;
+      }
+      .st-working {
+        background: #1f3a22;
+        color: var(--green);
+      }
+      .st-idle {
+        background: #2a2a2a;
+        color: #c7c0b2;
+      }
+      .st-paused {
+        background: #1e2f3d;
+        color: var(--blue);
+      }
+      .st-blocked {
+        background: #3e1d19;
+        color: var(--red);
+      }
+      .stale {
+        background: #4a3510;
+        color: var(--amber);
+        margin-left: 4px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .mono {
+        font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+        font-size: 12.5px;
+      }
+      .warn {
+        color: var(--amber);
+      }
+      .bad {
+        color: var(--red);
+      }
+      .ok {
+        color: var(--green);
+      }
+      .list {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .list li {
+        margin: 2px 0;
+      }
+      .sub {
+        margin-top: 16px;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .toolbar input[type='search'] {
+        background: var(--panel2);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 5px 9px;
+        min-width: 220px;
+      }
+      button {
+        background: var(--panel2);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 4px 10px;
+        cursor: pointer;
+        font-size: 12.5px;
+      }
+      button:hover {
+        border-color: var(--brass);
+      }
+      label.chk {
+        color: var(--muted);
+        font-size: 12.5px;
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+      }
+      /* tree */
+      .tree details {
+        margin-left: 14px;
+      }
+      .tree > details,
+      .tree > .row {
+        margin-left: 0;
+      }
+      .tree details > summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        align-items: baseline;
+      }
+      .tree details > summary > .row {
+        flex: 1;
+        min-width: 0;
+      }
+      .tree details > summary::-webkit-details-marker {
+        display: none;
+      }
+      .tree details > summary::before {
+        content: '▸';
+        color: var(--brass);
+        display: inline-block;
+        width: 14px;
+        flex: none;
+        transition: transform 0.12s;
+      }
+      .tree details[open] > summary::before {
+        transform: rotate(90deg);
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        align-items: baseline;
+        padding: 3px 4px;
+        border-radius: 5px;
+      }
+      .row:hover {
+        background: #2a2119;
+      }
+      .leaf {
+        margin-left: 28px;
+      }
+      .tree details > .kids {
+        border-left: 1px dashed #4a3a2a;
+        margin-left: 6px;
+        padding-left: 2px;
+      }
+      .num {
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .title.closed {
+        color: var(--muted);
+        text-decoration: line-through;
+        text-decoration-color: #6b5d48;
+      }
+      .ico {
+        width: 14px;
+        display: inline-block;
+        text-align: center;
+      }
+      .ico.open {
+        color: var(--green);
+      }
+      .ico.closed {
+        color: var(--violet);
+      }
+      .ico.notplanned {
+        color: var(--muted);
+      }
+      .lbl {
+        font-size: 11px;
+        padding: 0 6px;
+        border-radius: 999px;
+        line-height: 16px;
+        font-weight: 600;
+      }
+      .who {
+        font-size: 12px;
+        color: var(--blue);
+      }
+      .blk {
+        font-size: 12px;
+        color: var(--red);
+      }
+      .claim {
+        font-size: 11.5px;
+        background: #1f3a22;
+        color: var(--green);
+        border-radius: 4px;
+        padding: 0 5px;
+      }
+      .prog {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .bar {
+        width: 70px;
+        height: 6px;
+        background: #3a2e22;
+        border-radius: 3px;
+        overflow: hidden;
+        display: inline-block;
+      }
+      .bar > i {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, var(--copper), var(--brass));
+      }
+      .closedgrp > summary {
+        color: var(--muted);
+        font-size: 12.5px;
+        padding: 2px 4px;
+      }
+      .roothead {
+        margin: 14px 0 4px;
+        color: var(--copper);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+      .pinned {
+        background: #241c14;
+        border: 1px solid #4a3a26;
+        border-radius: 8px;
+        padding: 6px 8px;
+        margin-bottom: 8px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      footer {
+        padding: 0 24px 30px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>⚙ Steampunk Miner <small>build status</small></h1>
+      <div class="meta" id="meta">loading…</div>
+    </header>
+    <main>
+      <section class="panel" id="loops-panel">
+        <h2>Loops</h2>
+        <div class="cards" id="loop-cards"></div>
+        <div id="loop-alerts"></div>
+        <table id="loop-table">
+          <thead>
+            <tr>
+              <th>Loop / slot</th>
+              <th>State</th>
+              <th>Issue</th>
+              <th>Note</th>
+              <th>Heartbeat</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="sub">
+          <h2>In progress</h2>
+          <ul class="list" id="inprogress"></ul>
+        </div>
+        <div class="sub">
+          <h2>Needs attention</h2>
+          <ul class="list" id="stuck"></ul>
+        </div>
+        <div class="sub">
+          <h2>Workflows</h2>
+          <table id="wf-table">
+            <thead>
+              <tr>
+                <th>Workflow</th>
+                <th>Last run</th>
+                <th>When</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="sub">
+          <h2>Recent loop events</h2>
+          <ul class="list mono" id="events"></ul>
+        </div>
+      </section>
+      <section class="panel" id="tree-panel">
+        <h2>Issue trees</h2>
+        <div class="toolbar">
+          <input type="search" id="filter" placeholder="Filter: number, title, label, assignee…" />
+          <button id="expand">Expand all</button>
+          <button id="collapse">Collapse all</button>
+          <label class="chk"><input type="checkbox" id="showclosed" /> expand closed</label>
+        </div>
+        <div class="tree" id="tree"></div>
+      </section>
+    </main>
+    <footer id="footer"></footer>
+    <script>
+      'use strict'
+      const STALE_MIN = 30
+      const RECENT_DAYS = 14
+      const $ = (s) => document.querySelector(s)
+      const esc = (s) =>
+        String(s ?? '').replace(
+          /[&<>"']/g,
+          (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+        )
+      let DATA = null
+      let LOOPS = null
+      let LOOP_SRC = 'build snapshot'
+
+      function ago(iso) {
+        if (!iso) return '—'
+        const s = Math.round((Date.now() - Date.parse(iso)) / 1000)
+        if (s < 60) return s + 's ago'
+        if (s < 3600) return Math.round(s / 60) + 'm ago'
+        if (s < 86400) return (s / 3600).toFixed(1) + 'h ago'
+        return Math.round(s / 86400) + 'd ago'
+      }
+      function local(iso) {
+        if (!iso) return ''
+        return new Date(iso).toLocaleString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZoneName: 'short',
+        })
+      }
+      function labelChip(l) {
+        const c = '#' + (l.color || '777777')
+        const r = parseInt(c.slice(1, 3), 16),
+          g = parseInt(c.slice(3, 5), 16),
+          b = parseInt(c.slice(5, 7), 16)
+        const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+        return `<span class="lbl" style="background:${c}33;color:${lum < 0.35 ? '#ddd' : c};border:1px solid ${c}88">${esc(l.name)}</span>`
+      }
+      const isStale = (e) => {
+        if (!e.updated_at) return false
+        const lim = e.stale_after_min === undefined ? STALE_MIN : e.stale_after_min
+        if (lim === null) return false
+        return Date.now() - Date.parse(e.updated_at) > lim * 60000
+      }
+
+      // ---------- loops ----------
+      function allEntries() {
+        const base = Object.values((LOOPS && LOOPS.entries) || {})
+        const wf = Object.values(DATA.workflowLoops || {})
+        return base.concat(wf).sort((a, b) =>
+          a.loop === b.loop
+            ? String(a.slot ?? '').localeCompare(String(b.slot ?? ''), undefined, {
+                numeric: true,
+              })
+            : a.loop.localeCompare(b.loop),
+        )
+      }
+      function claimsByIssue() {
+        const m = new Map()
+        for (const e of allEntries()) if (e.issue && e.state === 'working') m.set(e.issue, e)
+        return m
+      }
+      function renderLoops() {
+        const byNum = new Map(DATA.issues.map((i) => [i.number, i]))
+        const entries = allEntries()
+        const counts = { working: 0, idle: 0, paused: 0, blocked: 0, stale: 0 }
+        for (const e of entries) {
+          counts[e.state] = (counts[e.state] || 0) + 1
+          if (isStale(e)) counts.stale++
+        }
+        $('#loop-cards').innerHTML = [
+          ['working', 'ok'],
+          ['idle', ''],
+          ['paused', ''],
+          ['blocked', 'bad'],
+          ['stale', 'warn'],
+        ]
+          .map(
+            ([k, cls]) =>
+              `<div class="card"><div class="n ${cls}">${counts[k] || 0}</div><div class="l">${k}</div></div>`,
+          )
+          .join('')
+
+        // push_pending + coordinator alerts
+        const alerts = []
+        for (const e of entries) {
+          const pp = e.extra && e.extra.push_pending
+          if (pp)
+            alerts.push(
+              `<div class="bad">⚠ <b>push_pending</b> on <b>${esc(e.loop)}</b>: ${pp.ticket ? `<a href="${esc(byNum.get(pp.ticket)?.url || '#')}">#${pp.ticket}</a>` : ''} ${esc(pp.branch || '')} — a green ticket is waiting to land on main</div>`,
+            )
+        }
+        if (LOOPS && LOOPS.error)
+          alerts.push(
+            `<div class="warn">loops.json unavailable at build: ${esc(LOOPS.error)}</div>`,
+          )
+        $('#loop-alerts').innerHTML = alerts.join('') || ''
+
+        let last = null
+        const rows = []
+        for (const e of entries) {
+          if (e.loop !== last) {
+            last = e.loop
+            const ex = entries.find((x) => x.loop === e.loop && x.extra) || {}
+            const sum =
+              ex.extra && ex.extra.active !== undefined
+                ? ` <span class="muted">· ${ex.extra.active}/${ex.extra.max} slots busy</span>`
+                : ''
+            rows.push(
+              `<tr class="group"><td colspan="5">${esc(e.loop)}${sum}${e.source === 'actions' ? ' <span class="muted">(from Actions)</span>' : ''}</td></tr>`,
+            )
+          }
+          const iss = e.issue ? byNum.get(e.issue) : null
+          const stale = isStale(e)
+          rows.push(`<tr>
+            <td>${e.slot !== null && e.slot !== undefined ? 'slot ' + esc(e.slot) : '<span class="muted">—</span>'}</td>
+            <td><span class="badge st-${esc(e.state)}">${esc(e.state)}</span>${stale ? '<span class="badge stale">STALE</span>' : ''}</td>
+            <td>${e.issue ? `<a href="${esc(iss?.url || `https://github.com/${DATA.repo}/issues/${e.issue}`)}">#${e.issue}</a> <span class="muted">${esc(iss?.title || '')}</span>` : '<span class="muted">—</span>'}</td>
+            <td>${e.link ? `<a href="${esc(e.link)}">${esc(e.note || 'run')}</a>` : esc(e.note || '')}</td>
+            <td class="${stale ? 'warn' : 'muted'}" title="${esc(local(e.updated_at))}">${ago(e.updated_at)}</td></tr>`)
+        }
+        $('#loop-table tbody').innerHTML =
+          rows.join('') || '<tr><td colspan="5" class="muted">No loop has reported yet.</td></tr>'
+
+        // in-progress issues
+        const claims = claimsByIssue()
+        const ip = DATA.issues.filter(
+          (i) => i.state === 'OPEN' && i.labels.some((l) => l.name === 'in-progress'),
+        )
+        const working = entries.filter(
+          (e) => e.state === 'working' && e.issue && !ip.some((i) => i.number === e.issue),
+        )
+        $('#inprogress').innerHTML =
+          ip
+            .map((i) => {
+              const c = claims.get(i.number)
+              return `<li><a href="${esc(i.url)}">#${i.number}</a> ${esc(i.title)} ${c ? `<span class="claim">${esc(c.loop)}${c.slot ? ' / slot ' + esc(c.slot) : ''}</span>` : '<span class="warn">(no loop reports it)</span>'}</li>`
+            })
+            .concat(
+              working.map((e) => {
+                const i = byNum.get(e.issue)
+                return `<li><a href="${esc(i?.url || '#')}">#${e.issue}</a> ${esc(i?.title || '')} <span class="claim">${esc(e.loop)}${e.slot ? ' / slot ' + esc(e.slot) : ''}</span> <span class="muted">(no in-progress label)</span></li>`
+              }),
+            )
+            .join('') || '<li class="muted">nothing</li>'
+
+        // needs attention: open issues with needs-planner / needs-fix / blocked / attempts exhausted
+        const attempts = {}
+        let maxAtt = 2
+        for (const e of entries)
+          if (e.extra && e.extra.attempts) {
+            Object.assign(attempts, e.extra.attempts)
+            maxAtt = e.extra.max_attempts || maxAtt
+          }
+        const stuck = DATA.issues
+          .filter((i) => i.state === 'OPEN')
+          .map((i) => {
+            const why = i.labels
+              .map((l) => l.name)
+              .filter((n) => ['needs-planner', 'needs-fix', 'blocked', 'hitl'].includes(n))
+            if ((attempts[i.number] || 0) >= maxAtt)
+              why.push(`attempts ${attempts[i.number]}/${maxAtt}`)
+            const openBlk = i.blockedBy.filter((b) => b.state === 'OPEN')
+            return { i, why, openBlk }
+          })
+          .filter((x) => x.why.length)
+        $('#stuck').innerHTML =
+          stuck
+            .map(
+              ({ i, why, openBlk }) =>
+                `<li><a href="${esc(i.url)}">#${i.number}</a> ${esc(i.title)} <span class="warn">${esc(why.join(', '))}</span>${openBlk.length ? ` <span class="blk">⛔ by ${openBlk.map((b) => '#' + b.number).join(' ')}</span>` : ''}</li>`,
+            )
+            .join('') || '<li class="muted">nothing</li>'
+
+        // workflows
+        $('#wf-table tbody').innerHTML = (DATA.workflows || [])
+          .map((w) => {
+            const r = w.run
+            const res = !r
+              ? '<span class="muted">no runs</span>'
+              : r.status !== 'completed'
+                ? `<span class="warn">${esc(r.status)}</span>`
+                : `<span class="${r.conclusion === 'success' ? 'ok' : 'bad'}">${esc(r.conclusion)}</span>`
+            return `<tr><td><a href="${esc(w.url)}">${esc(w.name)}</a></td><td>${r ? `<a href="${esc(r.url)}">${res}</a> <span class="muted">${esc(r.event)}</span>` : res}</td><td class="muted" title="${esc(local(r?.updatedAt))}">${r ? ago(r.updatedAt) : ''}</td></tr>`
+          })
+          .join('')
+
+        // events
+        const evs = ((LOOPS && LOOPS.events) || []).slice(0, 25)
+        $('#events').innerHTML =
+          evs
+            .map(
+              (e) =>
+                `<li><span class="muted">${esc(local(e.at))}</span> ${esc(e.key)} → <span class="badge st-${esc(e.state)}">${esc(e.state)}</span>${e.issue ? ' #' + e.issue : ''} <span class="muted">${esc(e.note || '')}</span></li>`,
+            )
+            .join('') || '<li class="muted">none</li>'
+      }
+
+      // ---------- issue tree ----------
+      function renderTree() {
+        const byNum = new Map(DATA.issues.map((i) => [i.number, i]))
+        const claims = claimsByIssue()
+        const recentCut = Date.now() - RECENT_DAYS * 86400000
+        const openDesc = new Map()
+        const hasOpen = (n, seen = new Set()) => {
+          if (openDesc.has(n)) return openDesc.get(n)
+          if (seen.has(n)) return false
+          seen.add(n)
+          const i = byNum.get(n)
+          const r = !!i && (i.state === 'OPEN' || i.children.some((c) => hasOpen(c, seen)))
+          openDesc.set(n, r)
+          return r
+        }
+        const showClosed = $('#showclosed').checked
+
+        function row(i) {
+          const closed = i.state !== 'OPEN'
+          const ico = !closed
+            ? '<span class="ico open" title="open">◉</span>'
+            : i.stateReason === 'NOT_PLANNED'
+              ? '<span class="ico notplanned" title="closed: not planned">⊘</span>'
+              : '<span class="ico closed" title="closed">✔</span>'
+          const s = i.summary || { total: 0, completed: 0 }
+          const prog = s.total
+            ? `<span class="prog"><span class="bar"><i style="width:${Math.round((100 * s.completed) / s.total)}%"></i></span>${s.completed}/${s.total}</span>`
+            : ''
+          const blk = i.blockedBy.filter((b) => b.state === 'OPEN')
+          const c = claims.get(i.number)
+          const search = [
+            i.number,
+            '#' + i.number,
+            i.title,
+            ...i.labels.map((l) => l.name),
+            ...i.assignees,
+            c ? c.loop : '',
+          ]
+            .join(' ')
+            .toLowerCase()
+          return `<span class="row" data-search="${esc(search)}">${ico}<span class="num">#${i.number}</span>
+            <a class="title ${closed ? 'closed' : ''}" href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title)}</a>
+            ${i.labels.map(labelChip).join(' ')}
+            ${c ? `<span class="claim">⚙ ${esc(c.loop)}${c.slot ? '/' + esc(c.slot) : ''}</span>` : ''}
+            ${i.assignees.length ? `<span class="who">@${i.assignees.map(esc).join(' @')}</span>` : ''}
+            ${blk.length ? `<span class="blk" title="${esc(blk.map((b) => '#' + b.number + ' ' + b.title).join('\n'))}">⛔ blocked by ${blk.map((b) => `<a href="https://github.com/${DATA.repo}/issues/${b.number}">#${b.number}</a>`).join(' ')}</span>` : ''}
+            ${closed && i.closedAt ? `<span class="muted" style="font-size:11.5px">closed ${ago(i.closedAt)}</span>` : ''}
+            ${prog}</span>`
+        }
+
+        function node(n, depth, path) {
+          const i = byNum.get(n)
+          if (!i) return `<div class="row leaf muted">#${n} (not visible)</div>`
+          if (path.has(n)) return `<div class="row leaf muted">#${n} (cycle)</div>`
+          const p = new Set(path).add(n)
+          const kids = i.children.map((c) => byNum.get(c)).filter(Boolean)
+          if (!kids.length) return `<div class="leaf">${row(i)}</div>`
+          const openKids = kids.filter((k) => hasOpen(k.number))
+          const closedKids = kids.filter((k) => !hasOpen(k.number))
+          closedKids.sort((a, b) => Date.parse(b.closedAt || 0) - Date.parse(a.closedAt || 0))
+          const recent = closedKids.filter((k) => Date.parse(k.closedAt || 0) > recentCut).length
+          const isOpen = hasOpen(n) && depth < 3 && !(depth > 0 && (DATA.pinned || []).includes(n))
+          let inner = openKids.map((k) => node(k.number, depth + 1, p)).join('')
+          if (closedKids.length) {
+            inner += `<details class="closedgrp"${showClosed ? ' open' : ''}><summary>${closedKids.length} closed${recent ? ` (${recent} in the last ${RECENT_DAYS} days)` : ''}</summary><div class="kids">${closedKids.map((k) => node(k.number, depth + 1, p)).join('')}</div></details>`
+          }
+          return `<details data-n="${n}"${isOpen ? ' open' : ''}><summary>${row(i)}</summary><div class="kids">${inner}</div></details>`
+        }
+
+        const roots = DATA.issues.filter((i) => i.parent === null || !byNum.has(i.parent))
+        const isMap = (i) => i.labels.some((l) => l.name === 'wayfinder:map')
+        const recentClosed = (i) => i.closedAt && Date.parse(i.closedAt) > recentCut
+        const trees = roots.filter(
+          (i) => i.children.length && (hasOpen(i.number) || recentClosed(i)),
+        )
+        trees.sort(
+          (a, b) =>
+            isMap(b) - isMap(a) || hasOpen(b.number) - hasOpen(a.number) || a.number - b.number,
+        )
+        const loose = roots.filter((i) => !i.children.length && i.state === 'OPEN')
+        const looseClosed = roots.filter(
+          (i) => !i.children.length && i.state !== 'OPEN' && recentClosed(i),
+        )
+        const archived = roots.filter(
+          (i) => !trees.includes(i) && !loose.includes(i) && !looseClosed.includes(i),
+        )
+
+        let html = ''
+        for (const n of DATA.pinned || []) {
+          if (byNum.has(n))
+            html += `<div class="roothead">Build plan #${n}</div><div class="pinned">${node(n, 0, new Set())}</div>`
+        }
+        html +=
+          `<div class="roothead">Root & map trees (${trees.length})</div>` +
+          trees.map((i) => node(i.number, 0, new Set())).join('')
+        if (loose.length)
+          html +=
+            `<div class="roothead">Open issues without a parent (${loose.length})</div>` +
+            loose.map((i) => `<div class="leaf" style="margin-left:14px">${row(i)}</div>`).join('')
+        if (looseClosed.length)
+          html += `<details class="closedgrp"${showClosed ? ' open' : ''}><summary>${looseClosed.length} parentless issues closed in the last ${RECENT_DAYS} days</summary><div class="kids">${looseClosed.map((i) => `<div class="leaf">${row(i)}</div>`).join('')}</div></details>`
+        if (archived.length)
+          html += `<details class="closedgrp"${showClosed ? ' open' : ''}><summary>${archived.length} older closed roots</summary><div class="kids">${archived.map((i) => node(i.number, 9, new Set())).join('')}</div></details>`
+        $('#tree').innerHTML = html
+        applyFilter()
+      }
+
+      function applyFilter() {
+        const q = $('#filter').value.trim().toLowerCase()
+        const tree = $('#tree')
+        tree.querySelectorAll('.hidden').forEach((el) => el.classList.remove('hidden'))
+        if (!q) return
+        // hide leaves/details whose subtree has no match; open the ones that do
+        const visit = (el) => {
+          let match = false
+          for (const ch of el.children) {
+            if (ch.tagName === 'SUMMARY') continue
+            if (ch.classList.contains('row')) {
+              if (ch.dataset.search.includes(q)) match = true
+              continue
+            }
+            if (visit(ch)) match = true
+          }
+          const own = el.tagName === 'DETAILS' ? el.querySelector(':scope > summary > .row') : null
+          const selfMatch = own && own.dataset.search.includes(q)
+          if (
+            el.tagName === 'DETAILS' ||
+            el.classList.contains('leaf') ||
+            el.classList.contains('pinned')
+          ) {
+            if (!match && !selfMatch) el.classList.add('hidden')
+            else if (match && el.tagName === 'DETAILS') el.open = true
+          }
+          return match || selfMatch
+        }
+        for (const ch of tree.children) if (!ch.classList.contains('roothead')) visit(ch)
+      }
+
+      function renderMeta() {
+        const run = DATA.run
+        $('#meta').innerHTML =
+          `generated <b title="${esc(DATA.generatedAt)}">${esc(local(DATA.generatedAt))}</b> (${ago(DATA.generatedAt)})
+          · ${run ? `<a href="${esc(run.url)}">Actions run #${esc(run.id)}</a> (${esc(run.event)})` : 'local build'}
+          · <a href="${esc(DATA.workflowUrl)}">workflow</a>
+          · loops: <b>${esc(LOOP_SRC)}</b>${LOOPS && LOOPS.updated_at ? ' updated ' + ago(LOOPS.updated_at) : ''}
+          · <a href="../">▶ play the game</a>`
+        $('#footer').innerHTML =
+          `Issue data refreshes on every Pages build (schedule ~10 min, issue events, pushes). Loop state is re-read live from the <code>${esc(DATA.loopBranch)}</code> branch every 60 s. A loop is STALE when its heartbeat is older than ${STALE_MIN} min. Publish state with <code>scripts/status/loop-status.sh</code> — see <a href="https://github.com/${esc(DATA.repo)}/blob/main/docs/loop-status.md">docs/loop-status.md</a>.`
+      }
+
+      async function refreshLoops() {
+        const urls = [
+          [
+            `https://api.github.com/repos/${DATA.repo}/contents/loops.json?ref=${DATA.loopBranch}`,
+            { headers: { Accept: 'application/vnd.github.raw' }, cache: 'no-store' },
+          ],
+          [
+            `https://raw.githubusercontent.com/${DATA.repo}/${DATA.loopBranch}/loops.json`,
+            { cache: 'no-store' },
+          ],
+        ]
+        for (const [u, opt] of urls) {
+          try {
+            const r = await fetch(u, opt)
+            if (!r.ok) continue
+            const j = await r.json()
+            if (j && j.entries) {
+              if (
+                !LOOPS ||
+                !LOOPS.updated_at ||
+                !j.updated_at ||
+                j.updated_at >= LOOPS.updated_at
+              ) {
+                LOOPS = j
+                LOOP_SRC = 'live'
+              }
+              return true
+            }
+          } catch (_) {
+            /* try next */
+          }
+        }
+        return false
+      }
+
+      function renderAll() {
+        renderMeta()
+        renderLoops()
+        renderTree()
+      }
+
+      async function load() {
+        const r = await fetch('status.json', { cache: 'no-store' })
+        DATA = await r.json()
+        if (!LOOPS || LOOP_SRC !== 'live') LOOPS = DATA.loops
+        renderAll()
+        if (await refreshLoops()) renderAll()
+      }
+
+      $('#filter').addEventListener('input', applyFilter)
+      $('#showclosed').addEventListener('change', renderTree)
+      $('#expand').addEventListener('click', () =>
+        $('#tree')
+          .querySelectorAll('details')
+          .forEach((d) => (d.open = true)),
+      )
+      $('#collapse').addEventListener('click', () =>
+        $('#tree')
+          .querySelectorAll('details')
+          .forEach((d) => (d.open = false)),
+      )
+      load().catch((e) => {
+        $('#meta').textContent = 'failed to load status.json: ' + e
+      })
+      setInterval(async () => {
+        if (DATA && (await refreshLoops())) {
+          renderMeta()
+          renderLoops()
+        }
+      }, 60000)
+      setInterval(() => {
+        if (DATA) {
+          renderMeta()
+        }
+      }, 30000)
+      setInterval(() => {
+        load().catch(() => {})
+      }, 5 * 60000)
+    </script>
+  </body>
+</html>

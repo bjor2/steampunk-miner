@@ -1,18 +1,30 @@
 name: Deploy play URL
 
+# One Pages deployment holds the game (dist/) and the status dashboard (dist/status/). The game
+# build is the same `npm run build` as before; the dashboard is added after it, from GitHub data
+# only (scripts/status/build-status.mjs, docs/loop-status.md), so it never changes the game.
 on:
   push:
     branches: [main]
+  # Also fired by scripts/status/loop-status.sh on a loop state change: a push to the orphan
+  # `loop-status` branch cannot trigger this workflow (that branch carries no workflow files).
   workflow_dispatch:
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, assigned, unassigned, deleted]
+  schedule:
+    - cron: '*/10 * * * *'
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  issues: read
+  actions: read
 
+# Never cancel a running deploy: one runs, the newest trigger waits, older waiting ones are dropped.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -28,6 +40,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Build status dashboard (dist/status)
+        # A dashboard failure must never take the play URL down: the game still deploys.
+        continue-on-error: true
+        run: node scripts/status/build-status.mjs --out dist/status
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
