@@ -11,6 +11,7 @@ import {
 } from '../logging/registries/eventProjections'
 import { RUN_EVENT_REGISTRATIONS, runEventRegistrationsOf } from '../logging/registries/runEvents'
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
+import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
 import {
   COMMAND_RULE_REGISTRY,
   commandRuleRegistrationsOf,
@@ -61,6 +62,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     discoveryAliases: (table) => add(DISCOVERY_ALIAS_REGISTRY, table),
     loadoutAcceptance: (rule) => add(LOADOUT_ACCEPTANCE_REGISTRY, rule),
     attachUse: (use) => add(ATTACH_USE_REGISTRY, use),
+    buildingAttachUse: (use) => add(BUILDING_ATTACH_USE_REGISTRY, use),
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),
     debugActions: (actions) =>
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),

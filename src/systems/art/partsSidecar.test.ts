@@ -96,23 +96,26 @@ describe('parts sidecar', () => {
   })
 
   it('takes registry-derived part ids on other assets', () => {
-    const hub = {
+    const works = {
       ...vehicleSidecar([
-        { ...wheel, id: 'outpost' },
-        { ...wheel, id: 'core-drive' },
+        { ...wheel, id: 'workshop-gantry' },
+        { ...wheel, id: 'workshop-turntable' },
       ]),
-      assetId: 'platform-hub',
+      assetId: 'platform-building-upgrade',
       pxPerMetre: 256,
       maps: {
-        albedo: 'platform-hub.albedo.ktx2',
-        normal: 'platform-hub.normal.ktx2',
+        albedo: 'platform-building-upgrade.albedo.ktx2',
+        normal: 'platform-building-upgrade.normal.ktx2',
         emissive: false as const,
       },
     }
-    expect(sidecarProblems('platform-hub', hub)).toEqual([])
-    expect(sidecarProblems('platform-hub', { ...hub, parts: [{ ...wheel, id: 'tower' }] })).toEqual(
-      ['platform-hub.parts.json: part "tower" is not a valid part id'],
-    )
+    expect(sidecarProblems('platform-building-upgrade', works)).toEqual([])
+    expect(
+      sidecarProblems('platform-building-upgrade', {
+        ...works,
+        parts: [{ ...wheel, id: 'tower' }],
+      }),
+    ).toEqual(['platform-building-upgrade.parts.json: part "tower" is not a valid part id'])
   })
 
   it('names no emissive map for an asset where nothing glows', () => {

@@ -37,9 +37,9 @@ the vehicle, so the build places the asset at the rest point and nothing else.
   centre at `workshop.platform` (the origin). `workshop.showcase_cam` is 1.8 m above it.
 
 The palette is brass, iron and soot; the only light is warm window, lamp, skylight and ticker glass,
-on the emissive maps, so orange stays reserved for heat (#170). Together with the hub and the three
-bays they make 13 platform parts, inside the 30-part render budget the asset lint gates
-(`MAX_PLATFORM_DRAW_CALLS`).
+on the emissive maps, so orange stays reserved for heat (#170). With the hub and the Sell and Upgrade
+bay art retired (#175), they and the Refinery bay are the platform's parts, inside the 48-part budget
+the asset lint gates (`MAX_PLATFORM_PARTS`, base set at most 30).
 
 ## Files
 

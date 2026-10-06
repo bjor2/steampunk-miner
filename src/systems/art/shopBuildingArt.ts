@@ -7,10 +7,18 @@
  * Each building is one static shell baked into one part plus the parts that move (#170 budget:
  * "only the ticker, gantry and turntable move"), and carries the attach points the sell burst
  * (#171), the workshop showcase (#180) and the dock camera read, as `attach.<id>` empties in the
- * `.blend` exported into the sidecar's `attach` array (#162 K5 shape). #175 registers the ids in
- * the kernel `building-attach` registry; this module is the art's own list of them.
+ * `.blend` exported into the sidecar's `attach` array (#162 K5 shape). The ids are the kernel
+ * `building-attach` registry's (#175); this module finds them in the art.
  */
+import { attachIdsOfBuilding, type BuildingAttachId } from '../registries/buildingAttach'
 import { SLICE_BAY_IDS, type BayId } from '../world/dockBays'
+import {
+  exportedSidecarOf,
+  manifestEntryOf,
+  placeholderSidecarOf,
+  type ArtCatalogue,
+} from './artCatalogue'
+import { attachPointOf, type AttachPoint } from './partsSidecar'
 
 export type ShopBuildingBayId = Extract<BayId, 'sell' | 'upgrade'>
 
@@ -24,8 +32,8 @@ function isShopBuildingBay(bay: BayId): bay is ShopBuildingBayId {
 
 /** The Game Director's seven attach points (#170 "Look"), each on the building it names. */
 export const SHOP_BUILDING_ATTACH_IDS: Readonly<Record<ShopBuildingBayId, readonly string[]>> = {
-  sell: ['sell.chute', 'sell.ticker', 'sell.stack'],
-  upgrade: ['workshop.gantry', 'workshop.platform', 'workshop.stack', 'workshop.showcase_cam'],
+  sell: attachIdsOfBuilding('sell'),
+  upgrade: attachIdsOfBuilding('upgrade'),
 }
 
 /** The parts drawn over each shell that the code animates: the ticker; the gantry and turntable. */
@@ -54,4 +62,20 @@ export function shopBuildingMovingPartIdsOf(bay: ShopBuildingBayId): readonly st
 /** Every moving part of both buildings, for the registry of part ids outside the vehicle. */
 export function shopBuildingMovingPartIds(): string[] {
   return SHOP_BUILDING_BAY_IDS.flatMap(shopBuildingMovingPartIdsOf)
+}
+
+/**
+ * Where an attach point sits, in metres from its building's origin (the zone's centre on the pad
+ * top): from the exported sidecar once the asset is final, else from its placeholder.
+ */
+export function shopBuildingAttachPointOf(
+  art: ArtCatalogue,
+  bay: ShopBuildingBayId,
+  attach: BuildingAttachId,
+): AttachPoint | null {
+  const assetId = shopBuildingAssetIdOf(bay)
+  const isFinal = manifestEntryOf(art, assetId)?.status === 'final'
+  const exported = isFinal ? exportedSidecarOf(art, assetId) : null
+  const sidecar = exported ?? placeholderSidecarOf(art, assetId)
+  return sidecar === null ? null : attachPointOf(sidecar, attach)
 }

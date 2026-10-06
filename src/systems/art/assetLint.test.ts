@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { MAX_PLATFORM_DRAW_CALLS } from '../../constants/scene'
+import { MAX_PLATFORM_PARTS } from '../../constants/scene'
 import { MAP_KINDS, slotItemAssetIdOf, type MapKind } from './artIds'
 import { attachCoverageProblems, attachedItemsOfRegistries } from '../registries/attachCoverage'
 import { ATTACH_ASSET_ID, attachIdsOf } from './sidecarAttach'
@@ -183,14 +183,14 @@ describe('asset lint: final art replaces its placeholder', () => {
 })
 
 describe('asset lint: render budget', () => {
-  it('keeps the platform hub and bays within their #38 share of draw calls, one per part', () => {
+  it('keeps the shop buildings, the Refinery and the add-ons to come within 48 parts (#170)', () => {
     const platformParts = SHIPPED_ART.manifest.assets
       .filter((entry) => entry.form === 'parts' && entry.id.startsWith('platform-'))
       .flatMap(
         (entry) =>
           (shippedSidecarOf(entry) ?? placeholderSidecarOf(SHIPPED_ART, entry.id))?.parts ?? [],
       )
-    expect(platformParts.length).toBeLessThanOrEqual(MAX_PLATFORM_DRAW_CALLS)
+    expect(platformParts.length).toBeLessThanOrEqual(MAX_PLATFORM_PARTS)
   })
 })
 

@@ -39,15 +39,19 @@ describe('asset manifest', () => {
     expect(blenderAssetIds()).toEqual(
       expect.arrayContaining([
         'vehicle',
-        'platform-hub',
-        'platform-bay-sell',
-        'platform-bay-upgrade',
+        'platform-bay-refinery',
+        'platform-building-sell',
+        'platform-building-upgrade',
         'enemy-crawler',
         'enemy-burrower',
         'prop-artefact-cache',
         'ground-band-5',
         'casing-grade-5',
       ]),
+    )
+    // The hub and the Sell and Upgrade bays retired into the two buildings (#170, #175).
+    expect(blenderAssetIds()).not.toEqual(
+      expect.arrayContaining(['platform-hub', 'platform-bay-sell', 'platform-bay-upgrade']),
     )
     expect(vectorIconIds()).toEqual(
       expect.arrayContaining(['icon-track-drill-power', 'icon-track-cargo-hold', 'icon-casing']),

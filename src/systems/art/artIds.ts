@@ -12,7 +12,11 @@ import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 import { kebabOf } from './artNaming'
 import { iconFileIds } from './icons/iconSet'
 import { BLASTING_CHARGES_ROW_ID, HEAT_LAVA_ROW_ID, REFRACTORY_LINING_TYPE } from './moduleRowIds'
-import { shopBuildingAssetIds, shopBuildingMovingPartIds } from './shopBuildingArt'
+import {
+  SHOP_BUILDING_BAY_IDS,
+  shopBuildingAssetIds,
+  shopBuildingMovingPartIds,
+} from './shopBuildingArt'
 import { workshopShowcaseAssetIds, workshopShowcasePartIds } from './workshopShowcaseArt'
 
 export const ASSET_CATEGORIES = [
@@ -81,9 +85,10 @@ export function blenderAssetIds(): string[] {
   return [
     'vehicle',
     ...vehicleModuleRowIds().map(vehicleModuleAssetIdOf),
-    'platform-hub',
-    ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}`),
-    ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}-backdrop`),
+    // The hub and the Sell and Upgrade bays retired into the two buildings (#170, #175); the
+    // Refinery keeps its bay art until it moves behind the yard.
+    ...unbuiltBayIds().map((bay) => `platform-bay-${bay}`),
+    ...unbuiltBayIds().map((bay) => `platform-bay-${bay}-backdrop`),
     ...shopBuildingAssetIds(),
     ...workshopShowcaseAssetIds(),
     ...enemyArtKinds().map((kind) => `enemy-${kebabOf(kind)}`),
@@ -95,6 +100,11 @@ export function blenderAssetIds(): string[] {
     LAVA_TILE_ASSET_ID,
     ...refractoryCasingTileIds(),
   ]
+}
+
+/** The bays with no building of their own: the Refinery. */
+function unbuiltBayIds(): string[] {
+  return PLATFORM_BAY_IDS.filter((bay) => !SHOP_BUILDING_BAY_IDS.some((built) => built === bay))
 }
 
 /**

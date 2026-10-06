@@ -7,6 +7,7 @@ import type { DebugAction } from '../debug/debugActionRegistry'
 import type { SliceEventProjections } from '../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../logging/registries/runEvents'
 import type { BlastEffect } from '../systems/registries/blastEffects'
+import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
 import type { SliceCommandRules } from '../systems/registries/commandRules'
 import type { ContentKind, ContentKinds } from '../systems/registries/content'
 import type {
@@ -52,6 +53,8 @@ export interface SliceRegistrar {
   discoveryAliases(table: DiscoveryAliasTable): void
   loadoutAcceptance(rule: LoadoutAcceptance): void
   attachUse(use: AttachUse): void
+  /** A use of a shop building's attach point (#170 `building-attach`): render-only. */
+  buildingAttachUse(use: BuildingAttachUse): void
   hudPanel(panel: HudPanel): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */
   debugActions(actions: Readonly<Record<string, DebugAction>>): void

@@ -123,10 +123,12 @@ export const REFERENCE_VIEWPORT = { width: 1280, height: 800 } as const
 export const MAX_CHUNK_DRAW_CALLS = 16
 
 /**
- * At most this many draw calls for the platform hub and its two bays together, one per part
- * (#38 frame budget: "platform and bays at most 30" of the 150 per frame).
+ * At most this many parts across every `platform-*` asset, one draw call each (#38 frame budget,
+ * raised by the TD on #170 for the pad growth: the base set of the buildings and the Refinery at
+ * most 30, each in-place add-on 2 and each counter building 4). The real cap is per view: the
+ * dock camera frames one building, and a frame stays within the 150 draw calls of #38.
  */
-export const MAX_PLATFORM_DRAW_CALLS = 30
+export const MAX_PLATFORM_PARTS = 48
 
 /** At most this many live ground colliders (#4, #22 acceptance, #36 acceptance 7). */
 export const MAX_GROUND_COLLIDERS = 600

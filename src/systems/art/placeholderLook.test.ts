@@ -37,11 +37,11 @@ describe('placeholder look', () => {
   })
 
   it('centres a quad from its pivot: the pivot sits at atM, pivotM from the bottom-left', () => {
-    const [hub] = placeholderQuadsOf(SHIPPED_ART, 'platform-hub', 1).filter(
-      (quad) => quad.partId === 'outpost',
+    const [gantry] = placeholderQuadsOf(SHIPPED_ART, 'platform-building-upgrade', 1).filter(
+      (quad) => quad.partId === 'workshop-gantry',
     )
-    expect(hub.centre[0]).toBeCloseTo(-3.4)
-    expect(hub.centre[1]).toBeCloseTo(1.6)
+    expect(gantry.centre[0]).toBeCloseTo(-0.15)
+    expect(gantry.centre[1]).toBeCloseTo(4.9)
   })
 
   it('keeps the tier-1 parts a higher tier does not replace, and swaps the ones it does', () => {

@@ -9,6 +9,8 @@ Refinery bay (#106, spec #105) joined later in the same way, with its three look
 It writes art/blender/<id>/<id>.blend for platform-hub, platform-bay-sell, platform-bay-upgrade
 and platform-bay-refinery, or only the ids given after `--`. From then on those files are the sources (#52): change the art in Blender
 and re-export, rather than editing this script. Nothing here is rigged (#51 acceptance 2).
+The hub and the Sell and Upgrade bays retired into the two shop buildings (#170, #175); only the
+Refinery bay's .blend is still a source.
 
 Conventions (#52, docs/art-pipeline.md): 1 unit = 1 m, game right is +X, up is +Z, the camera
 looks along +Y so details stand out towards -Y. Each part is one mesh object named for its
