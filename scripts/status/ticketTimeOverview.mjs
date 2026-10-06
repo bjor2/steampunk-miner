@@ -1,7 +1,8 @@
 // The model behind the "Where the time goes" section of /status/#issues (#134): the committed
 // ticket phase files (docs/metrics/tickets/*.json) as the last closed tickets' breakdowns, the
 // category totals per close day and the median cycle and lead time per close day. Pure: no fs, no
-// clock, so the Pages job (no transcripts there) and the tests feed it the same file texts.
+// clock, so the Pages job (no transcripts there) and the tests feed it the same file texts. The
+// Features tab rolls the same tickets up per feature (featureTime.mjs, #135).
 import { PHASE_CATEGORIES, TICKET_PHASES_SCHEMA, zeroTotals } from '../metrics/phaseCategories.mjs'
 
 export const RECENT_TICKET_COUNT = 30
@@ -114,6 +115,8 @@ export function buildTicketTimeOverview({ files, repo }) {
     categoryTotals: tickets.reduce((sum, ticket) => addTotals(sum, ticket.totals), zeroTotals()),
     recent: newestFirst(tickets).slice(0, RECENT_TICKET_COUNT),
     days: daysOf(tickets),
+    // Every measured ticket, for the feature roll-up of the Features tab (featureTime.mjs, #135).
+    tickets,
     problems,
   }
 }
