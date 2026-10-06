@@ -4,8 +4,8 @@
 // orphan `loop-status` branch, the last run of each workflow, the Performance charts from
 // the committed docs/perf/ files (static HTML + SVG, no script), the "Where the time goes"
 // section of the Issue trees tab from the committed docs/metrics/tickets/ files (#134), and the
-// game feature tree from docs/features/features.json joined with the live issue states. Static
-// output, no server.
+// game feature tree from docs/features/features.json joined with the live issue states, with
+// those ticket times rolled up per feature and area (#135). Static output, no server.
 //
 //   node scripts/status/build-status.mjs [--out dist/status]
 //
@@ -14,7 +14,13 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { PHASE_CATEGORIES } from '../metrics/phaseCategories.mjs'
 import { annotateFeatures, validateFeatures } from './features.mjs'
+import {
+  renderFeatureTimeFailure,
+  renderFeatureTimeOverview,
+  withFeatureTimeBars,
+} from './featureTimeHtml.mjs'
 import { buildPerfOverview } from './perfOverview.mjs'
 import { renderPerfOverview, renderPerfOverviewFailure } from './perfOverviewHtml.mjs'
 import { buildTicketTimeOverview } from './ticketTimeOverview.mjs'
@@ -27,6 +33,7 @@ const PERF_PLACEHOLDER = '<!-- perf-overview -->'
 // Written on the build box by `npm run metrics:ticket`; the Pages job only reads them.
 const TICKET_TIME_DIR = join(HERE, '..', '..', 'docs', 'metrics', 'tickets')
 const TICKET_TIME_PLACEHOLDER = '<!-- ticket-time -->'
+const FEATURE_TIME_PLACEHOLDER = '<!-- feature-time -->'
 const FEATURES_FILE = 'docs/features/features.json'
 const FEATURES_PATH = join(HERE, '..', '..', FEATURES_FILE)
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
@@ -282,7 +289,7 @@ async function fetchLastCommitOf(path) {
 
 // A broken feature file must not take the rest of the page down: the Features tab then lists
 // the problems instead of the tree.
-function buildFeatures(issues, lastCommit) {
+function buildFeatures(issues, lastCommit, measuredTickets) {
   const base = { file: FEATURES_FILE, lastCommit }
   try {
     const doc = JSON.parse(readFileSync(FEATURES_PATH, 'utf8'))
@@ -291,10 +298,30 @@ function buildFeatures(issues, lastCommit) {
       for (const p of problems) console.warn(`features: ${p}`)
       return { ...base, error: `${FEATURES_FILE} is invalid`, problems }
     }
-    return { ...base, ...annotateFeatures(doc, issues) }
+    return { ...base, ...annotateFeatures(doc, issues, measuredTickets) }
   } catch (err) {
     console.warn(`features failed: ${err.message}`)
     return { ...base, error: String(err.message), problems: [] }
+  }
+}
+
+function featureTimeProblemOf(features, ticketTimeModel) {
+  if (features.error) return `the feature tree failed: ${features.error}`
+  if (ticketTimeModel.error) return `the ticket time files failed: ${ticketTimeModel.error}`
+  return null
+}
+
+// Like the other sections: a failed roll-up shows its error above the tree, the tree still renders.
+function buildFeatureTimeSection(features, ticketTimeModel) {
+  const problem = featureTimeProblemOf(features, ticketTimeModel)
+  if (problem) return { features, html: renderFeatureTimeFailure(problem) }
+  try {
+    const areas = withFeatureTimeBars(features.areas, PHASE_CATEGORIES)
+    const html = renderFeatureTimeOverview(features, PHASE_CATEGORIES, REPO)
+    return { features: { ...features, areas }, html }
+  } catch (err) {
+    console.warn(`feature time failed: ${err.message}`)
+    return { features, html: renderFeatureTimeFailure(err.message) }
   }
 }
 
@@ -330,7 +357,7 @@ function pageWithSections(perfHtml, ticketTimeHtml) {
 // The committed-file sections first, before any GitHub call, so their bugs top the log.
 const perf = buildPerfSection()
 const ticketTime = buildTicketTimeSection()
-const page = pageWithSections(perf.html, ticketTime.html)
+const pageBeforeFeatures = pageWithSections(perf.html, ticketTime.html)
 
 const [issues, loops, workflows, featuresCommit] = await Promise.all([
   fetchIssues(),
@@ -338,7 +365,12 @@ const [issues, loops, workflows, featuresCommit] = await Promise.all([
   fetchWorkflows(),
   fetchLastCommitOf(FEATURES_FILE),
 ])
-const features = buildFeatures(issues, featuresCommit)
+const featureTime = buildFeatureTimeSection(
+  buildFeatures(issues, featuresCommit, ticketTime.model.tickets ?? []),
+  ticketTime.model,
+)
+const features = featureTime.features
+const page = withSection(pageBeforeFeatures, FEATURE_TIME_PLACEHOLDER, featureTime.html)
 const server = process.env.GITHUB_SERVER_URL || 'https://github.com'
 const runId = process.env.GITHUB_RUN_ID
 const status = {

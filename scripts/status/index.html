@@ -1307,6 +1307,62 @@
         border-radius: 10px;
         background: #2a1512;
       }
+      /* ticket time per feature (#135): featureTimeHtml.mjs; phase colours are inline */
+      #tab-features .ft-time-panel {
+        margin: 0 0 18px;
+        padding: 12px 14px;
+        background: linear-gradient(180deg, var(--panel2), var(--panel));
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+      }
+      #tab-features .ft-time-panel h3 {
+        margin: 0 0 4px;
+        font-size: 15px;
+        color: var(--brass2);
+      }
+      #tab-features .ft-time-panel .tt-note,
+      #tab-features .ft-time-panel .tt-legend .muted {
+        color: var(--muted);
+      }
+      #tab-features .ft-time-row {
+        display: grid;
+        grid-template-columns: minmax(0, 14em) minmax(0, 1fr) 15em;
+        gap: 8px;
+        align-items: center;
+        font-size: 12px;
+        padding: 1px 0;
+      }
+      #tab-features .ft-time-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #tab-features .ft-time-counts {
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      #tab-features .ft-time {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        color: var(--muted);
+        white-space: nowrap;
+        cursor: help;
+      }
+      #tab-features .ft-time-bar {
+        width: 72px;
+        height: 7px;
+        border-radius: 2px;
+        background: var(--bg2);
+      }
+      #tab-features .ft-time-total {
+        color: var(--text);
+      }
+      #tab-features .ft-time-none,
+      #tab-features .ft-time-unmeasured {
+        color: var(--dim);
+      }
       #tab-features .ft-foot a {
         color: var(--muted);
         text-decoration: underline;
@@ -1445,6 +1501,7 @@
           </div>
         </div>
         <div class="wrap">
+          <!-- feature-time -->
           <div id="ft-error"></div>
           <div class="root" id="ft-root">
             <div class="root-plate">
@@ -2116,6 +2173,7 @@
         row += ftIssueLinks(n, F)
         if (n.sync) row += `<span class="ft-check" title="${esc(n.sync)}">⚑ check</span>`
         if (n.group && kids.length) row += `<span class="mix">${ftMix(n.tally)}</span>`
+        row += n.timeHtml || ''
         let h = `<li id="${n.id}"><div class="node ${cls}"><div class="nrow">${row}</div><p class="ndesc" data-txt="d">${esc(n.description)}</p></div>`
         if (kids.length) h += `<ul class="tree">${kids.map((k) => ftNode(k, F)).join('')}</ul>`
         return h + '</li>'
@@ -2125,7 +2183,7 @@
           <div class="bhead" data-tg="${b.id}">
             <div class="bnum">${idx + 1}</div>
             <div class="btitle"><h3 data-txt="t">${esc(b.title)}</h3><p data-txt="d">${esc(b.description)}</p>
-              <div class="bmeta"><span class="cnt"><b>${b.tally.nodes}</b> nodes</span><span class="bar">${ftBar(b.tally)}</span><span class="mix">${ftMix(b.tally)}</span></div></div>
+              <div class="bmeta"><span class="cnt"><b>${b.tally.nodes}</b> nodes</span><span class="bar">${ftBar(b.tally)}</span><span class="mix">${ftMix(b.tally)}</span>${b.timeHtml || ''}</div></div>
             <button class="caret" aria-label="Toggle branch">▼</button>
           </div>
           <div class="bbody"><ul class="tree">${(b.children || []).map((k) => ftNode(k, F)).join('')}</ul></div>
