@@ -12,6 +12,7 @@ import {
   nextGunPrice,
 } from './gunStats'
 import { oreTier, oreValue } from './oreEconomy'
+import { paceScale } from './planetEconomy'
 import { drillPower, onCurveLevel } from './vehicleStats'
 
 const m = fromCanonical
@@ -24,7 +25,7 @@ function onCurveShotsToKill(kind: (typeof ENEMY_KINDS)[number], planetIndex: num
 }
 
 function bandFiveOre(units: string, planetIndex: number) {
-  return ceilMilli(mul(m(units), oreValue(oreTier(planetIndex, 5))))
+  return ceilMilli(mul(mul(m(units), oreValue(oreTier(planetIndex, 5))), paceScale(planetIndex)))
 }
 
 describe('gun stats (#107 numbers)', () => {

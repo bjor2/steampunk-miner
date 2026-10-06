@@ -27,10 +27,12 @@ import { readEconomy } from './readEconomy'
 import economyFile from './economy.json'
 import { enemyHealth, enemyTier } from './enemyStats'
 import { blockHardness, coreHardness, oreTier, oreValue } from './oreEconomy'
+import { paceScale } from './planetEconomy'
 import { hullMax, onCurveLevel } from './vehicleStats'
 
 const MM = 1000
-const BAND_5_UNIT_ON_PLANET_7 = oreValue(oreTier(7, 5))
+/** One band-5 ore unit priced on planet 7, `V(t(7, 5)) * paceScale(7)`. */
+const BAND_5_UNIT_ON_PLANET_7 = mul(oreValue(oreTier(7, 5)), paceScale(7))
 
 function textOf(amount: Money): string {
   return toCanonical(amount)
