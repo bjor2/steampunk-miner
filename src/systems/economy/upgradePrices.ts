@@ -3,14 +3,15 @@
  * `ceil(base * ratio^L)` as a whole-number Money, times `paceScale(p)` (default 1).
  */
 import { ceil, mul, type Money } from '../money'
+import { geometricCurveOf } from './costCurveLookup'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
-import type { CostCurve, UpgradeId } from './economyDefinition'
+import type { UpgradeId } from './economyDefinition'
 import { paceScale } from './planetEconomy'
 
 /** What the workshop charges on planet `planetIndex` to raise `upgradeId` from `level`. */
 export function upgradePrice(upgradeId: UpgradeId, level: number, planetIndex: number): Money {
-  const curve = costCurveOf(upgradeId)
+  const curve = geometricCurveOf(costCurveIdOf(upgradeId))
   return ceil(mul(growGeometric(curve.base, curve.ratio, level), paceScale(planetIndex)))
 }
 
@@ -19,11 +20,4 @@ export function costCurveIdOf(upgradeId: UpgradeId): string {
   const upgrade = ECONOMY.upgrades.find((candidate) => candidate.id === upgradeId)
   if (upgrade === undefined) throw new RangeError(`no upgrade ${upgradeId}`)
   return upgrade.costCurveId
-}
-
-function costCurveOf(upgradeId: UpgradeId): CostCurve {
-  const curveId = costCurveIdOf(upgradeId)
-  const curve = ECONOMY.costCurves.find((candidate) => candidate.id === curveId)
-  if (curve === undefined) throw new RangeError(`no cost curve ${curveId}`)
-  return curve
 }

@@ -105,6 +105,22 @@ describe('economy data validation', () => {
     expect('economy' in reading).toBe(false)
   })
 
+  it('refuses a refinery whose slot curve does not price each slot past the first', () => {
+    const broken = economyFileCopy()
+    Object.assign(broken.refinery, { slotsMax: 4 })
+    expect(problemsOf(broken)).toContain(
+      'cost.refinery.slot must price 3 slots, slotsStart to slotsMax',
+    )
+  })
+
+  it('refuses a refinery slot curve that is not priced in band ore', () => {
+    const broken = economyFileCopy()
+    Object.assign(broken.refinery, { slotCostCurveId: 'cost.casing.upgrade' })
+    expect(problemsOf(broken)).toContain(
+      'refinery.slotCostCurveId cost.casing.upgrade has no bandOre curve',
+    )
+  })
+
   it('refuses a file that is not an object', () => {
     expect(problemsOf(null)).toContain('economy must be an object')
   })

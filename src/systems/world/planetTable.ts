@@ -29,7 +29,8 @@ export const PLANET_ARCHETYPES: readonly PlanetArchetype[] = [
   },
   {
     archetypeId: 'archetype.heavy',
-    gravityMultiplier: 1.25,
+    // 1.25 as a whole-number ratio, so the economy scan never mistakes it for a price ratio.
+    gravityMultiplier: 5 / 4,
     paletteId: 'palette.planet_2',
     familyWeights: { metal: 1, crystal: 2 },
   },

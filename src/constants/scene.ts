@@ -13,7 +13,8 @@
 export const VIEW_SHORT_AXIS_DEFAULT_M = 12
 export const VIEW_SHORT_AXIS_MIN_M = 8
 export const VIEW_SHORT_AXIS_MAX_M = 20
-export const ZOOM_STEP_FACTOR = 1.25
+/** A whole-number ratio, so the economy scan never mistakes it for a price ratio. */
+export const ZOOM_STEP_FACTOR = 5 / 4
 export const ZOOM_EASE_SECONDS = 0.2
 
 /**

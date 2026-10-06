@@ -36,7 +36,8 @@
     { "id": "cost.vehicle.hull", "family": "geometric", "base": "48", "ratio": "1.24" },
     { "id": "cost.vehicle.drill_power", "family": "geometric", "base": "48", "ratio": "1.24" },
     { "id": "cost.vehicle.drill_tip", "family": "geometric", "base": "72", "ratio": "1.5376" },
-    { "id": "cost.casing.upgrade", "family": "geometric", "base": "48", "ratio": "1.24" }
+    { "id": "cost.casing.upgrade", "family": "geometric", "base": "48", "ratio": "1.24" },
+    { "id": "cost.refinery.slot", "family": "bandOre", "band": 5, "oreUnitsByLevel": ["20", "40"] }
   ],
   "casing": {
     "costCurveId": "cost.casing.upgrade",
@@ -44,6 +45,15 @@
     "casingGradeCoreMin": 5,
     "kCasing": "0.30",
     "collapseCrush": ["0.080", "0.080", "0.080", "0.080", "0.080", "0.080"]
+  },
+  "refinery": {
+    "unlockPlanet": 3,
+    "slotsStart": 1,
+    "slotsMax": 3,
+    "batchCargoFraction": "0.5",
+    "refineSeconds": 180,
+    "valueMultiplier": "1.25",
+    "slotCostCurveId": "cost.refinery.slot"
   },
   "upgrades": [
     {

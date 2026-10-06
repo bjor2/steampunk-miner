@@ -80,12 +80,27 @@ export interface UpgradeDef {
   onCurve: { levelAtPlanet1: number; levelsPerPlanet: number }
 }
 
-export interface CostCurve {
+export interface GeometricCostCurve {
   id: string
   family: 'geometric'
   base: Money
   ratio: Money
 }
+
+/**
+ * A price in ore units of one band at the buyer's planet (#105 `cost.refinery.slot`): the
+ * travel-fee shape, so it keeps its weight on any planet with no geometric ratio to drift. Level
+ * `L` (counted from the first priced level) costs `oreUnitsByLevel[L]` units; past the list there is
+ * nothing more to buy.
+ */
+export interface BandOreCostCurve {
+  id: string
+  family: 'bandOre'
+  band: number
+  oreUnitsByLevel: readonly Money[]
+}
+
+export type CostCurve = GeometricCostCurve | BandOreCostCurve
 
 export interface VisualTierThreshold {
   tier: number
@@ -226,6 +241,22 @@ export interface Economy {
     casingGradeCoreMin: number
     kCasing: BigStat
     collapseCrush: readonly BigStat[]
+  }
+  /**
+   * The Refinery bay (#105 numbers): from `unlockPlanet` the platform has it with `slotsStart`
+   * slots, bought up to `slotsMax` along `slotCostCurveId`. A batch holds at most
+   * `floor(batchCargoFraction * cargoCapacity)` units of one tier, runs `refineSeconds` of sim time
+   * and pays `valueMultiplier` times its raw value at the Sell bay. `refinery.mobile` is reserved
+   * for the folded `processing_wagon` (#78) and is not read.
+   */
+  refinery: {
+    unlockPlanet: number
+    slotsStart: number
+    slotsMax: number
+    batchCargoFraction: BigStat
+    refineSeconds: number
+    valueMultiplier: Money
+    slotCostCurveId: string
   }
   upgrades: readonly UpgradeDef[]
   gun: GunRules

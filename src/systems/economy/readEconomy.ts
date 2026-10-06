@@ -4,6 +4,7 @@
  */
 import { createFieldReader, readLiteral, readRange, type FieldReader } from './economyFieldReader'
 import { readEnemies } from './readEnemyEconomy'
+import { readCostCurve, readRefinery } from './readRefineryEconomy'
 import {
   TRACK_EFFECTS,
   type BandOreCost,
@@ -46,6 +47,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     drill: readDrill(reader, reader.object('drill', file.drill)),
     costCurves,
     casing: readCasing(reader, reader.object('casing', file.casing), costCurves, ore.coreTierBand),
+    refinery: readRefinery(reader, reader.object('refinery', file.refinery), costCurves),
     upgrades,
     gun: readGun(reader, reader.object('gun', file.gun)),
     visualTiers: reader
@@ -191,16 +193,6 @@ function readCollapseCrush(reader: FieldReader, value: unknown, coreTierBand: nu
     reader.record(`casing.collapseCrush must list ${coreTierBand} fractions, bands then the core`)
   }
   return fractions
-}
-
-function readCostCurve(reader: FieldReader, path: string, value: unknown): CostCurve {
-  const curve = reader.object(path, value)
-  return {
-    id: reader.text(`${path}.id`, curve.id),
-    family: readLiteral(reader, `${path}.family`, curve.family, ['geometric'] as const),
-    base: reader.money(`${path}.base`, curve.base),
-    ratio: reader.money(`${path}.ratio`, curve.ratio),
-  }
 }
 
 function readUpgrade(reader: FieldReader, path: string, value: unknown): UpgradeDef {

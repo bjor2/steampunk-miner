@@ -9,14 +9,14 @@
  * multiply it (grade only gates collapse) and relining is free, so no grade enters the formula.
  */
 import { ceil, ceilMilli, mul, type BigStat, type Money } from '../money'
+import { geometricCurveOf } from './costCurveLookup'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
 import { oreTier, oreValue } from './oreEconomy'
 
 /** What the Upgrade bay charges to raise the casing from `grade` to the next one. */
 export function casingUpgradePrice(grade: number): Money {
-  const curve = ECONOMY.costCurves.find((candidate) => candidate.id === ECONOMY.casing.costCurveId)
-  if (curve === undefined) throw new RangeError(`no cost curve ${ECONOMY.casing.costCurveId}`)
+  const curve = geometricCurveOf(ECONOMY.casing.costCurveId)
   return ceil(growGeometric(curve.base, curve.ratio, grade - 1))
 }
 
