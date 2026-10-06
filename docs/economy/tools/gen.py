@@ -5,7 +5,8 @@ C=dict(v0="10",rho="1.5",eta="1.2544",d0="1.5",gD="1.12",P0="1",gP="1.2544",H0="
  E0=150,eStep=6,C0=10,cStep=4,sMin="6",sMax="14",aMin="1.0",aMax="1.8",tMin="2.0",tMax="3.5",Ke=25,
  coreMult="4",coreFrac="0.4",travelK="0.12",chargeK="0.002",repairK="0.5",feeFrac="0.05",feeFloorK="3",feeCapK="30",
  c0=24,base=dict(drill_power="55",drill_tip="83"),r="1.24",rDrill="1.225",rTip="1.500625",w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
- Hk="7",Dkc="17.5",Dkb="16.5",gE="1.12",ET0=1,etPlanet=6,etBand=1,KxE=60,tkill="1.5")
+ Hk="7",Dkc="17.5",Dkb="16.5",gE="1.12",ET0=1,etPlanet=6,etBand=1,KxE=60,tkill="1.5",
+ paceFrom=[[3,"1"],[8,"1"]])
 d=lambda s:D(str(s))
 def tier(p,b): return 3*(p-1)+b
 def V(t): return d(C['v0'])*d(C['rho'])**(t-1)
@@ -20,9 +21,11 @@ def coreTiles(Rr):
 def need(Rr): return -(-4*coreTiles(Rr)//10)
 def Lon(tr,p):
     return dict(drill_power=6*(p-1)+13,drill_tip=3*(p-1)+7,hull=6*(p-1)+2,cargo_hold=6*(p-1)+8,boiler=6*(p-1)+4,engine=6*(p-1)+6)[tr]
-def cost(tr,L):
+# paceScale(p) (#131 fromPlanet): the last row at or below p, else 1; it multiplies every price.
+def pace(p): return d(([s for f_,s in C['paceFrom'] if f_<=p] or ["1"])[-1])
+def cost(tr,L,p=1):
     base=d(C['base'][tr]) if tr in C['base'] else d(C['c0'])*d(C['w'][tr]); r=d(C[dict(drill_tip='rTip',drill_power='rDrill').get(tr,'r')])
-    return (base*r**L).to_integral_value(rounding=ROUND_CEILING)
+    return (base*r**L*pace(p)).to_integral_value(rounding=ROUND_CEILING)
 def cargo(L): return C['C0']+C['cStep']*L
 def energy(L): return C['E0']+C['eStep']*L
 def speed(L): return d(C['sMin'])+(d(C['sMax'])-d(C['sMin']))*L/(L+C['Ke'])
@@ -47,9 +50,9 @@ for p in P:
     A.append(f"| {p} | {Rr} | {coreR(Rr)} | {ct} | {need(Rr)} | {f(V(tier(p,1)))} | {f(V(t5))} | {f(V(tier(p,6)))} | {f(Hh(t5))} | {f(d(C['coreMult'])*Hh(t5))} |")
     Ld,Lt,Lh,Lc,Lb,Le=[Lon(k,p) for k in ('drill_power','drill_tip','hull','cargo_hold','boiler','engine')]
     B.append(f"| {p} | {Ld} | {f(Dr(Ld))} | {Lt} | {Lh} | {f(Hu(Lh))} | {Lc} | {cargo(Lc)} | {Lb} | {energy(Lb)} | {Le} | {float(speed(Le)):.1f} |")
-    V3=V(tier(p,3))
+    V3=V(tier(p,3))*pace(p)
     fl=d(C['feeFloorK'])*V3; cp=d(C['feeCapK'])*V3
-    Cc.append(f"| {p} | {f(cost('drill_power',Ld))} | {f(cost('drill_tip',Lt))} | {f(cost('hull',Lh))} | {f(d(C['chargeK'])*V3,2)} | {f(d(C['repairK'])*V3)} | {f(fl)} | {f(cp)} | {f(d('0.12')*10*V(t5))} |")
+    Cc.append(f"| {p} | {f(cost('drill_power',Ld,p))} | {f(cost('drill_tip',Lt,p))} | {f(cost('hull',Lh,p))} | {f(d(C['chargeK'])*V3,2)} | {f(d(C['repairK'])*V3)} | {f(fl)} | {f(cp)} | {f(d('0.12')*10*V(t5)*pace(p))} |")
     ks=[];ss=[]
     for b in (1,3,5):
         T=ET(p,b); ks.append(eh(T)/Dr(Ld)); ss.append(ed(T)/Hu(Lh)*100)

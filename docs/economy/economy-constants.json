@@ -52,6 +52,10 @@
   "etBand": 1,
   "KxE": 60,
   "tkill": "1.5",
+  "paceFrom": [
+    [3, "1"],
+    [8, "1"]
+  ],
   "visualTiers": {
     "T2": 8,
     "T3": 20,
