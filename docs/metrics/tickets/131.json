@@ -137,5 +137,7 @@
   "totals": {"blocked":4725,"planner_wait":4095,"idle":2160,"context":834,"planning":23,"developing":256,"testing":12508,"gates":622,"landing":51,"other":60},
   "lead_time_s": 25334,
   "cycle_time_s": 19282,
+  "claimed": "2026-10-06T11:47:40.000Z",
+  "claimed_to_done_s": 19282,
   "backfilled": false
 }
