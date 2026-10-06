@@ -80,9 +80,9 @@ export function blastOpen(session: BotSession, planet: BotPlanet, tile: TilePoin
   const from = planet.pilot.position
   const refuge = backOffTileOf(session, planet, tile) as TilePoint
   if (!plantFacing(session, from, tile)) return false
-  moveStraight(session, planet.pilot, refuge)
+  moveStraight(session, planet, refuge)
   waitForBlast(session)
-  if (isVehicleActive(session.vehicle())) moveStraight(session, planet.pilot, from)
+  if (isVehicleActive(session.vehicle())) moveStraight(session, planet, from)
   return tileKindAt(session.state(), tile) === 'open'
 }
 

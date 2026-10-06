@@ -25,7 +25,7 @@ const MAX_REBORES = 8
 export function openTile(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
   if (isLavaRisk(session.state(), tile)) return 'blocked'
   if (tileKindAt(session.state(), tile) === 'open') {
-    moveStraight(session, planet.pilot, tile)
+    moveStraight(session, planet, tile)
     return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
   }
   const bored = boreInPlace(session, planet, tile)

@@ -68,7 +68,7 @@ export function driveToSellBay(session: BotSession, planet: BotPlanet): void {
 
 function driveToBay(session: BotSession, planet: BotPlanet, bay: BayId, tile: TilePoint): void {
   leavePad(session)
-  moveStraight(session, planet.pilot, tile)
+  moveStraight(session, planet, tile)
   session.submit(dockCommand(bay))
 }
 
@@ -89,8 +89,8 @@ function reachRow(session: BotSession, planet: BotPlanet, row: number): boolean 
   const { layout, pilot } = planet
   const openBottom = shaftTileAt(layout, Math.max(row, layout.shaftBottomRow))
   if (!canAffordMoveTo(session, planet, openBottom)) return false
-  moveStraight(session, pilot, shaftTileAt(layout, pilot.position.ty))
-  moveAlongShaft(session, pilot, layout, openBottom.ty)
+  moveStraight(session, planet, shaftTileAt(layout, pilot.position.ty))
+  moveAlongShaft(session, planet, openBottom.ty)
   return boreShaftDownTo(session, planet, row)
 }
 
@@ -112,7 +112,7 @@ function mineGallerySide(
 ): GalleryEnd {
   const end = galleryEndOf(planet.layout, row, side)
   if (!canAffordMoveTo(session, planet, end)) return 'stop'
-  moveStraight(session, planet.pilot, end)
+  moveStraight(session, planet, end)
   for (;;) {
     if (!harvestBesides(session, planet, goal)) return 'stop'
     const face = galleryFaceOf(planet.layout, row, side)
@@ -190,15 +190,19 @@ function isCoreCarriedEnough(session: BotSession): boolean {
 
 function returnAndDock(session: BotSession, planet: BotPlanet): void {
   const { layout, pilot } = planet
-  moveStraight(session, pilot, shaftTileAt(layout, pilot.position.ty))
-  moveAlongShaft(session, pilot, layout, layout.travelRow)
-  moveStraight(session, pilot, layout.sellBay)
+  moveStraight(session, planet, shaftTileAt(layout, pilot.position.ty))
+  moveAlongShaft(session, planet, layout.travelRow)
+  moveStraight(session, planet, layout.sellBay)
   if (isVehicleActive(session.vehicle())) session.submit(dockCommand('sell'))
   else waitForTow(session, planet)
 }
 
-/** A stranded or destroyed vehicle is towed home after its grace or delay (#7). */
-function waitForTow(session: BotSession, planet: BotPlanet): void {
+/**
+ * A stranded or destroyed vehicle is towed home after its grace or delay (#7); a destroyed one
+ * leaves the bot watching its flanks on this planet from then on (#130).
+ */
+export function waitForTow(session: BotSession, planet: BotPlanet): void {
+  if (session.vehicle().mode === 'destroyed') planet.hasBeenDestroyedHere = true
   while (session.vehicle().mode !== 'docked') session.wait(TOW_WAIT_TICKS)
   planet.pilot.position = planet.layout.sellBay
 }

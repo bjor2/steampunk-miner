@@ -54,6 +54,7 @@ function botAtWall(openTilesBehind: number, chargePolicy: ChargePolicy = 'blast'
     pilot: { position: STAND_TILE, facing: 1 },
     chargePolicy,
     hasMetBlastTile: false,
+    hasBeenDestroyedHere: false,
   }
   return { session, planet }
 }

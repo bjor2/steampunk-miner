@@ -37,6 +37,11 @@ export interface BotPlanet {
   chargePolicy: ChargePolicy
   /** It met a tile here it would blast with no charge in stock, so it wants charges (#129). */
   hasMetBlastTile: boolean
+  /**
+   * Its vehicle was destroyed here, so it meets enemies while it drives too (#130): with the
+   * reflex only between bores, a fatal dive replayed after every tow. Travel starts afresh.
+   */
+  hasBeenDestroyedHere: boolean
 }
 
 /**
@@ -70,20 +75,30 @@ export function enterBoredTile(pilot: BotPilot, tile: TilePoint): void {
  * Moves in a straight line through open tiles to `to`, reporting along the way. Climbing is
  * thrust; driving and falling are drive (#6 energy rates).
  */
-export function moveStraight(session: BotSession, pilot: BotPilot, to: TilePoint): void {
+export function moveStraight(session: BotSession, planet: BotPlanet, to: TilePoint): void {
+  const { pilot } = planet
   const tiles = straightPath(pilot.position, to)
   const speed = statsOfVehicle(session.vehicle()).engine.speedMax
+  const facing = facingTowards(pilot.position, to)
   const isClimb = to.ty > pilot.position.ty
   let reportedTicks = 0
   tiles.forEach((tile, index) => {
     const ticks = moveTicks(index + 1, speed)
     const isLast = index === tiles.length - 1
     if (!isLast && ticks - reportedTicks < POSE_REPORT_INTERVAL_TICKS) return
-    reportMove(session, tile, facingTowards(pilot.position, to), ticks - reportedTicks, isClimb)
+    reportMove(session, tile, facing, ticks - reportedTicks, isClimb)
     reportedTicks = ticks
+    faceThreatsOnTheMove(session, planet, tile)
   })
-  if (tiles.length > 0) pilot.facing = facingTowards(pilot.position, to)
+  if (tiles.length > 0) pilot.facing = facing
   pilot.position = to
+}
+
+/** After a death on this planet, each report on the move also meets a closing enemy (#130). */
+function faceThreatsOnTheMove(session: BotSession, planet: BotPlanet, tile: TilePoint): void {
+  if (!planet.hasBeenDestroyedHere) return
+  planet.pilot.position = tile
+  faceThreats(session, planet.pilot)
 }
 
 function reportMove(

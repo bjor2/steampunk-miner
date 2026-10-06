@@ -73,6 +73,7 @@ function planetAt(_session: BotSession, where: 'pad' | 'deep'): BotPlanet {
     pilot: { position: shaftTileAt(layout, row), facing: 0 },
     chargePolicy: 'never',
     hasMetBlastTile: false,
+    hasBeenDestroyedHere: false,
   }
 }
 
@@ -102,6 +103,7 @@ describe('bot: shaft round lava (#113)', () => {
         pilot: { position, facing: 0 },
         chargePolicy: 'never',
         hasMetBlastTile: false,
+        hasBeenDestroyedHere: false,
       },
     }
   }

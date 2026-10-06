@@ -8,7 +8,7 @@ import { LAVA_POCKET_TILES } from '../../constants/balance'
 import type { TilePoint } from '../world/tileGrid'
 import { openTile } from './botDig'
 import { isTooHotToDig } from './botHeat'
-import { moveStraight, type BotPilot, type BotPlanet } from './botPilot'
+import { moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import { isLavaRisk } from './botWorld'
 import { shaftColumnAt, shaftTileAt, shaftWaypoints, type MineLayout } from './mineLayout'
@@ -31,14 +31,9 @@ interface JogPlan {
 }
 
 /** From the shaft tile at the pilot's row to the shaft tile at `toRow`, round every jog. */
-export function moveAlongShaft(
-  session: BotSession,
-  pilot: BotPilot,
-  layout: MineLayout,
-  toRow: number,
-): void {
-  for (const waypoint of shaftWaypoints(layout, pilot.position.ty, toRow)) {
-    moveStraight(session, pilot, waypoint)
+export function moveAlongShaft(session: BotSession, planet: BotPlanet, toRow: number): void {
+  for (const waypoint of shaftWaypoints(planet.layout, planet.pilot.position.ty, toRow)) {
+    moveStraight(session, planet, waypoint)
   }
 }
 
@@ -59,10 +54,10 @@ export function boreShaftDownTo(session: BotSession, planet: BotPlanet, row: num
 
 /** Steps the shaft sideways to the nearest clear column; false when there is none. */
 function jogShaft(session: BotSession, planet: BotPlanet): boolean {
-  const { layout, pilot } = planet
+  const { layout } = planet
   const plan = jogPlanOf(session, layout)
   if (plan === null) return false
-  moveAlongShaft(session, pilot, layout, plan.row)
+  moveAlongShaft(session, planet, plan.row)
   for (const tile of tilesAlong(shaftColumnAt(layout, plan.row), plan.column, plan.row)) {
     if (openTile(session, planet, tile) !== 'opened') return false
   }

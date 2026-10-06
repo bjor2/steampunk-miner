@@ -185,6 +185,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the `bandHeat` scale (0.8 to 1.2), never `k_casing`. Heat specs drill band 5 of planet 8 straight
   above the core (`heatRun.test.ts`); lava specs find a pocket's floor in band 3 of planet 8
   (`lavaFlow.test.ts`, `lava/lavaRun.test.ts`) and build refractory rings with `debug.lineCasing`.
+- **Bot combat** (#130): the bot meets a hunting enemy with the drill head between bores (#29), and
+  on the move too once its vehicle was destroyed on that planet; travel resets that. A run with no
+  death plays as before, and a fatal dive no longer replays after every tow (`bot/botCombat.test.ts`,
+  in the band-1 corridor).
 - **Comparison** (`compareRuns`): `npm run balance:report` prints each seed's row and the median,
   writes the first seed's run to `balance-report/` and compares it with
   `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a

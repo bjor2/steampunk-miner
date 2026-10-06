@@ -16,10 +16,7 @@ import type { AuthorityCommand, CommandIntent } from '../authority/authorityComm
 import type { AuthorityState } from '../authority/authorityState'
 import { coreNeededOf } from '../authority/coreBay'
 import type { DomainEvent } from '../authority/domainEvent'
-import { canTravel } from '../authority/travelRules'
-import { dockSiteOfPlanet } from '../authority/planetOfState'
 import { canScratch } from '../vehicle/drillRule'
-import { bayRestTileOf } from '../world/dockBays'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
 import { deepestHeldBand, holdsCore } from './botCasing'
@@ -30,9 +27,8 @@ import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
 import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
 import { driveToUpgradeBay, runTrip } from './botTrip'
+import { botPlanetOf, travelWhenReady } from './botTravel'
 import type { TripGoal } from './tripGoal'
-import { paramsOfSession } from './botWorld'
-import { newMineLayout } from './mineLayout'
 import {
   bestOrePlan,
   canReachCore,
@@ -113,25 +109,6 @@ function isRefining(session: BotSession, run: BotRun): boolean {
 function isLastCoreDone(session: BotSession, lastPlanet: number): boolean {
   const state = session.state()
   return state.planet.index >= lastPlanet && state.core.isCompleted
-}
-
-function botPlanetOf(session: BotSession, chargePolicy: ChargePolicy): BotPlanet {
-  const site = dockSiteOfPlanet(session.state().planet)
-  if (site === null) throw new Error('the bot plays only on a generated planet')
-  return {
-    layout: newMineLayout(paramsOfSession(session.state()), site),
-    pilot: { position: bayRestTileOf(site, 'sell'), facing: 1 },
-    chargePolicy,
-    hasMetBlastTile: false,
-  }
-}
-
-/** Travel (#10) as soon as the platform allows it; the new planet gets a fresh mine. */
-function travelWhenReady(session: BotSession, planet: BotPlanet): BotPlanet {
-  const state = session.state()
-  if (!state.core.isCompleted || !canTravel(state, session.playerId)) return planet
-  session.submit({ type: 'travel', payload: { toPlanet: state.planet.index + 1 } })
-  return botPlanetOf(session, planet.chargePolicy)
 }
 
 /** One trip and the dock after it; false when no trip can earn anything. */
