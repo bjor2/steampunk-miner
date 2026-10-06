@@ -22,6 +22,7 @@ import { bayRestTileOf } from '../world/dockBays'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
 import { deepestHeldBand, holdsCore } from './botCasing'
+import type { ChargePolicy } from './botCharges'
 import type { GunPolicy } from './botGuns'
 import { collectWhenReady, refineWhenWorthIt, type RefineryUse } from './botRefining'
 import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
@@ -60,6 +61,8 @@ export interface SliceRunOptions {
   startCommands?: readonly CommandIntent[]
   /** Mount `auto_guns` when offered (the default, #107 bot policy), or never, to compare. */
   gunPolicy?: GunPolicy
+  /** Blast hard tiles from planet 7 (the default, #109 bot policy), or never, to compare. */
+  chargePolicy?: ChargePolicy
   listener?: BotListener
   /** `used` (the default) from the Refinery bay's planet; `ignored` plays as if it had none. */
   refinery?: RefineryUse
@@ -70,6 +73,7 @@ interface BotRun {
   lastPlanet: number
   refinery: RefineryUse
   gunPolicy: GunPolicy
+  chargePolicy: ChargePolicy
 }
 
 /**
@@ -81,12 +85,13 @@ const CORE_TRIP_MAX_TICKS_PER_TILE = 20 * TICKS_PER_SECOND
 export function playSlice(start: AuthorityState, options: SliceRunOptions): SliceRun {
   const session = createBotSession(start, options.playerId ?? 'p1', options.listener)
   for (const intent of options.startCommands ?? []) session.submit(intent)
-  let planet = botPlanetOf(session)
   const run: BotRun = {
     lastPlanet: options.lastPlanet ?? SLICE_LAST_PLANET,
     refinery: options.refinery ?? 'used',
     gunPolicy: options.gunPolicy ?? 'mount',
+    chargePolicy: options.chargePolicy ?? 'blast',
   }
+  let planet = botPlanetOf(session, run.chargePolicy)
   while (!isLastCoreDone(session, run.lastPlanet) && session.tick() < options.maxTicks) {
     planet = travelWhenReady(session, planet)
     if (!playDockCycle(session, planet, run)) break
@@ -109,12 +114,13 @@ function isLastCoreDone(session: BotSession, lastPlanet: number): boolean {
   return state.planet.index >= lastPlanet && state.core.isCompleted
 }
 
-function botPlanetOf(session: BotSession): BotPlanet {
+function botPlanetOf(session: BotSession, chargePolicy: ChargePolicy): BotPlanet {
   const site = dockSiteOfPlanet(session.state().planet)
   if (site === null) throw new Error('the bot plays only on a generated planet')
   return {
     layout: newMineLayout(paramsOfSession(session.state()), site),
     pilot: { position: bayRestTileOf(site, 'sell'), facing: 1 },
+    chargePolicy,
   }
 }
 
@@ -123,7 +129,7 @@ function travelWhenReady(session: BotSession, planet: BotPlanet): BotPlanet {
   const state = session.state()
   if (!state.core.isCompleted || !canTravel(state, session.playerId)) return planet
   session.submit({ type: 'travel', payload: { toPlanet: state.planet.index + 1 } })
-  return botPlanetOf(session)
+  return botPlanetOf(session, planet.chargePolicy)
 }
 
 /** One trip and the dock after it; false when no trip can earn anything. */
@@ -134,14 +140,15 @@ function playDockCycle(session: BotSession, planet: BotPlanet, run: BotRun): boo
   collectWhenReady(session)
   if (isRefining(session, run)) refineWhenWorthIt(session, planet)
   serviceAtDock(session)
-  shopAtUpgradeBay(session, planet, run.gunPolicy)
+  shopAtUpgradeBay(session, planet, run)
   return true
 }
 
 /** The bot drives over to the Upgrade bay (#37) only when it has something to buy there. */
-function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, gunPolicy: GunPolicy): void {
+function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): void {
   const isCoreGoal = isCoreTheGoal(session, planet)
-  const situation = { layout: planet.layout, isCoreTheGoal: isCoreGoal, gunPolicy }
+  const { gunPolicy, chargePolicy } = run
+  const situation = { layout: planet.layout, isCoreTheGoal: isCoreGoal, gunPolicy, chargePolicy }
   if (!hasPurchase(session, situation)) return
   driveToUpgradeBay(session, planet)
   buyUpgrades(session, situation)

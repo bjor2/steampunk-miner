@@ -10,6 +10,7 @@ import { dockCommand, undockCommand } from '../platform/platformCommands'
 import { cargoUnitsOf, isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
 import type { TilePoint } from '../world/tileGrid'
+import { blastOpen, isBlastWorthIt } from './botCharges'
 import { assertReturnReserve, canAffordBore, canAffordMoveTo } from './botEnergy'
 import { boreTile, enterBoredTile, moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
@@ -186,7 +187,10 @@ function openTile(session: BotSession, planet: BotPlanet, tile: TilePoint): Open
   return bored
 }
 
-/** Bores a neighbouring tile without moving; nothing happens unless it is `opened`. */
+/**
+ * Bores a neighbouring tile without moving, or blasts it open when that pays (#109: the bot backs
+ * off and comes back to the same tile); nothing happens unless it is `opened`.
+ */
 function boreInPlace(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
   const ticks = boreTicks(
     statsOfVehicle(session.vehicle()),
@@ -196,6 +200,9 @@ function boreInPlace(session: BotSession, planet: BotPlanet, tile: TilePoint): O
   )
   if (ticks === null) return 'blocked'
   if (!canAffordBore(session, planet, ticks)) return 'short'
+  if (isBlastWorthIt(session, planet, tile, ticks) && blastOpen(session, planet, tile)) {
+    return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
+  }
   boreTile(session, planet.pilot, tile, ticks)
   return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
 }

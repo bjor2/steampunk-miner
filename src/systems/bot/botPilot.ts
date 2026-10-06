@@ -14,6 +14,7 @@ import { isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
 import type { Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
 import { faceThreats } from './botCombat'
+import type { ChargePolicy } from './botCharges'
 import { setGunsForEnergy } from './botGuns'
 import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
@@ -29,10 +30,11 @@ export interface BotPilot {
   facing: Facing
 }
 
-/** The bot on one planet: its mine and where its vehicle is. */
+/** The bot on one planet: its mine, where its vehicle is, and whether it blasts (#109). */
 export interface BotPlanet {
   layout: MineLayout
   pilot: BotPilot
+  chargePolicy: ChargePolicy
 }
 
 /**

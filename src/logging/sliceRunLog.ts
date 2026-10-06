@@ -8,6 +8,7 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
+import type { ChargePolicy } from '../systems/bot/botCharges'
 import type { GunPolicy } from '../systems/bot/botGuns'
 import type { RefineryUse } from '../systems/bot/botRefining'
 import { playSlice, type SliceRun } from '../systems/bot/playSlice'
@@ -38,6 +39,8 @@ export interface LoggedRunOptions {
   maxTicks?: number
   /** `never` plays without `auto_guns`, the comparison run of #107 acceptance 5. */
   gunPolicy?: GunPolicy
+  /** Whether the bot blasts hard tiles from planet 7 (#109 bot policy); default `blast`. */
+  chargePolicy?: ChargePolicy
   /** Whether the bot refines from the Refinery bay's planet (#105 acceptance 7); default `used`. */
   refinery?: RefineryUse
 }
@@ -60,6 +63,7 @@ export function playLoggedSlice(
     maxTicks: options.maxTicks ?? BOT_RUN_BUDGET_TICKS,
     lastPlanet: options.lastPlanet,
     gunPolicy: options.gunPolicy,
+    chargePolicy: options.chargePolicy,
     refinery: options.refinery,
     playerId: PLAYER_ID,
     startCommands: startCommandsOf(scenario),
