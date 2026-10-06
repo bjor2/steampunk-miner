@@ -7,6 +7,20 @@ export const TICKS_PER_SECOND = 60
  */
 export const PHYSICS_TIMESTEP = 1 / TICKS_PER_SECOND
 
+/**
+ * The most fixed steps one render frame may run, the 0.5 s catch-up `@react-three/rapier` allowed
+ * when it stepped the world itself; a longer hitch drops the rest instead of spiralling.
+ */
+export const MAX_STEPS_PER_FRAME = 30
+
+/**
+ * `useFrame` order. Negative runs before the scene's default 0 and never takes over rendering
+ * (only a positive priority does). The fixed steps run first, then each body draws itself between
+ * its last two steps, so the camera, terrain and lights read the position drawn this frame.
+ */
+export const FIXED_STEP_FRAME_PRIORITY = -2
+export const BODY_DRAW_FRAME_PRIORITY = -1
+
 /** The 2D game lives in the XY plane; Z is depth for draw order only. */
 export const PLANE_Z = 0
 
