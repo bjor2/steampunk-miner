@@ -245,6 +245,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `xvfb-run -a node scripts/soak/soakMemory.mjs --electron release/linux-unpacked/steampunk-miner`
   launches it with `--debug-api` and records under `soakElectron.*`. Its numbers back the decision
   to set no heap or stack flags ([docs/perf/runtime-flags.md](perf/runtime-flags.md)).
+- **Memory and frame samples in the run log** (#121): dev, scenario and debug runs log `perf_sample`
+  every second of frames (now with `frameMsP99` and `longTasks`, the frames over 50 ms) and
+  `memory_sample` every 10 s of frames: the JS heap, Rapier's WASM memory, the renderer and physics
+  counts (the same seams as the two debug reads), cached and meshed chunks, DOM elements and live
+  listeners, beside the progress so far (`maxDepthTiles`, `tilesDestroyed`, `mineralsCollected`,
+  `moneyTotal` earned). Read them from `events.ndjson`, or `window.steampunkRunLog()` in a browser.
+  Chromium rounds and caches `performance.memory` unless it is launched with
+  `--enable-precise-memory-info` (the soak passes it): without the flag the heap fields stay flat for
+  minutes. A browser without `performance.memory` writes no `memory_sample`. `e2e/browser/memorySample.spec.ts`
+  checks the lines of a real `?debug` session against the schema.
 
 ## 6. Before every commit
 
