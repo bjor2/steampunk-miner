@@ -84,7 +84,10 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   `gnawCasing(x, y)` (that ring breached, as a tunnel wrecker's gnaw leaves it, #111); for the guns (#107),
   `setGunLevel(level)` (0 to the gun track's cap, no unlock or price; `vehicleParts()` then lists the
   turret's parts); for blasting charges (#109), `setCharges(carried, slotLevel)` (a bolted-on rack, no
-  unlock or price; `vehicleParts()` then reports `rackCharges` and the rack's parts); for collapse (#43),
+  unlock or price; `vehicleParts()` then reports `rackCharges` and the rack's parts); for the heat planets
+  (#113), `setLiningType(type)` (`standard` or `refractory`, owned and laid from then on, no unlock or
+  price; `lineCasing` lays the active type) and `setHeat(points)` (the heat gauge, 0 to its max, only 0
+  off planets 8 to 16); for collapse (#43),
   `forceCollapse(block)` (a `cx,cy#index` block, warned for the full 60 ticks, then refilled whatever its
   lining) and the unlogged read `collapseState()` (the weak blocks within 16 m of a vehicle and the blocks
   warning or refilling). Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first
@@ -166,6 +169,13 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   never gated; the one lever is the price per charge (1 to 4 band-5 units). Charge specs stand in
   band-2 rock with `charges/chargeFixtures.ts`; the bot's blasting run starts on planet 7 with a
   stocked rack and a lagging drill (`bot/botBlasting.test.ts`).
+- **Heat** (#113 acceptance 4): `npm run balance:heat` plays the bot scenario to planet 10's core
+  and prints planets 8 to 10 (`heatPlanetLines`): each core time against the campaign's 45 to 60
+  minutes (C4), when refractory was unlocked, the refractory laid, the throttle and heat-damage
+  episodes, lava touches and lava a refractory ring stopped. Reported, never gated; the one lever is
+  the `bandHeat` scale (0.8 to 1.2), never `k_casing`. Heat specs drill band 5 of planet 8 straight
+  above the core (`heatRun.test.ts`); lava specs find a pocket's floor in band 3 of planet 8
+  (`lavaFlow.test.ts`, `lava/lavaRun.test.ts`) and build refractory rings with `debug.lineCasing`.
 - **Comparison** (`compareRuns`): `npm run balance:report` writes `balance-report/` and compares the
   run with `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
   deliberate economy change, `npm run balance:baseline` rewrites the baseline in the same commit.

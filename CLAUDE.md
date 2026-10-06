@@ -26,6 +26,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run balance:guns`                    | bot to planet 7 with and without `auto_guns` (reported)   |
 | `npm run balance:charges`                 | blast trade + P7-P10 bot with vs without charges (#109)   |
 | `npm run balance:refinery`                | P1-P8 bot with vs without the Refinery bay (#105, logged) |
+| `npm run balance:heat`                    | bot to planet 10: heat planets 8-10 against C4 (#113)     |
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
 | `npm run bench:render`                    | chunk mesh batch p50/p95 per planet (logged, not gated)   |
 | `npm run perf:record -- --source bench`   | record bench medians in `docs/perf/history.ndjson`        |
