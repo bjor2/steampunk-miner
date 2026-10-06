@@ -1,7 +1,7 @@
 /**
  * Validates a logged event against the envelope and the schema registry (#11 section 1 and
  * acceptance 2): an unregistered, reserved or unspecified event, an unknown field, a wrong kind,
- * or a float outside a `perf` sample or `timestamp` is a listed problem. Used by the specs on what the
+ * or a float outside `perf_sample`/`timestamp` is a listed problem. Used by the specs on what the
  * game emits, and by the comparison tool on files it reads.
  */
 import {
@@ -84,27 +84,19 @@ function duplicatesIn(name: string, fields: PayloadFields): string[] {
     .map((field) => `${name}.${field} repeats an envelope field`)
 }
 
-/**
- * Events allowed a float field: only the `perf` level samples (#11 section 1, value rules, written
- * when `perf_sample` was the one; #121 adds `memory_sample` "like perf_sample"). They are
- * presentation-side measurements, off in played release runs and outside every digest and replay.
- */
+/** Events allowed a float field: only `perf_sample` (#11 section 1, value rules). */
 export function floatFieldProblems(registry: Readonly<Record<string, RegisteredEvent>>): string[] {
   return Object.entries(registry).flatMap(([name, registered]) =>
-    isPerfSample(registered) || typeof registered.payload === 'string'
+    name === 'perf_sample' || typeof registered.payload === 'string'
       ? []
       : floatsIn(name, registered.payload),
   )
 }
 
-function isPerfSample(registered: RegisteredEvent): boolean {
-  return 'level' in registered && registered.level === 'perf'
-}
-
 function floatsIn(name: string, fields: PayloadFields): string[] {
   return Object.entries(fields)
     .filter(([, kind]) => holdsFloat(kind))
-    .map(([field]) => `${name}.${field} is a float outside a perf sample`)
+    .map(([field]) => `${name}.${field} is a float outside perf_sample`)
 }
 
 function holdsFloat(kind: FieldKind): boolean {

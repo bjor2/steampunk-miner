@@ -110,8 +110,8 @@ describe('memory log', () => {
       tick: 0,
       data: {
         elapsedS: 10,
-        jsHeapUsedMB: 61.5,
-        wasmMB: 1.31,
+        jsHeapUsedKB: 62976,
+        wasmKB: 1344,
         colliders: 7,
         chunksMeshed: 12,
         listeners: 31,

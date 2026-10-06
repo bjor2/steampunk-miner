@@ -1,9 +1,9 @@
 /**
  * The value kinds a run-event payload field may have, and the checks for them (#11 section 1,
  * value rules): integers are safe-integer JSON numbers, every Money/BigStat is its canonical
- * string (#5), ids and enums are strings, booleans are booleans, and floats exist only in the
- * `perf` samples (`perf_sample`, `memory_sample`). Each kind maps to the TypeScript type the
- * recorder must pass, so the registry is both the runtime schema and the compile-time one.
+ * string (#5), ids and enums are strings, booleans are booleans, and floats exist only in
+ * `perf_sample`. Each kind maps to the TypeScript type the recorder must pass, so the registry is
+ * both the runtime schema and the compile-time one.
  */
 import { isNestedTooDeep, MAX_JSON_NESTING_DEPTH } from '../systems/jsonNesting'
 import { fromCanonical, toCanonical } from '../systems/money'

@@ -1,8 +1,9 @@
 /**
  * The `memory_sample` line (#121, logging strategy section 2): what the page, the renderer and the
  * physics hold every 10 s, with how far the run got, so heap can be plotted against progress.
- * Sizes are MiB kept to hundredths, like the times in `perf_sample`. A browser with no heap
- * reading (only Chromium has `performance.memory`) writes no line rather than a made-up one.
+ * Sizes are whole KiB (1024 bytes): floats belong to `perf_sample` alone (#11 value rules), and a
+ * KiB is finer than Chromium's heap reading and exact for Rapier's 64 KiB pages. A browser with no
+ * heap reading (only Chromium has `performance.memory`) writes no line rather than a made-up one.
  */
 import type { PageMemory } from '../shell/pageMemory'
 import type { RunEventData } from './eventNames'
@@ -32,7 +33,7 @@ export interface MemoryReadings {
   progress: RunProgress
 }
 
-const BYTES_PER_MIB = 1024 * 1024
+const BYTES_PER_KIB = 1024
 
 /** Null when the browser gives no heap reading. */
 export function memorySampleOf(readings: MemoryReadings): MemorySample | null {
@@ -40,10 +41,10 @@ export function memorySampleOf(readings: MemoryReadings): MemorySample | null {
   if (page.jsHeap === null) return null
   return {
     elapsedS: readings.elapsedSeconds,
-    jsHeapUsedMB: mebibytesOf(page.jsHeap.usedBytes),
-    jsHeapTotalMB: mebibytesOf(page.jsHeap.totalBytes),
-    jsHeapLimitMB: mebibytesOf(page.jsHeap.limitBytes),
-    wasmMB: mebibytesOf(scene.wasmBytes),
+    jsHeapUsedKB: kibibytesOf(page.jsHeap.usedBytes),
+    jsHeapTotalKB: kibibytesOf(page.jsHeap.totalBytes),
+    jsHeapLimitKB: kibibytesOf(page.jsHeap.limitBytes),
+    wasmKB: kibibytesOf(scene.wasmBytes),
     geometries: scene.geometries,
     textures: scene.textures,
     programs: scene.programs,
@@ -57,6 +58,6 @@ export function memorySampleOf(readings: MemoryReadings): MemorySample | null {
   }
 }
 
-function mebibytesOf(bytes: number): number {
-  return Math.round((bytes / BYTES_PER_MIB) * 100) / 100
+function kibibytesOf(bytes: number): number {
+  return Math.round(bytes / BYTES_PER_KIB)
 }

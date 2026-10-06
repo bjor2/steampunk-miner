@@ -86,7 +86,7 @@ test.describe('memory and frame samples (#121)', () => {
     const fields = Object.keys(RUN_EVENT_REGISTRY.memory_sample.payload).sort()
     for (const { data } of memory) {
       expect(Object.keys(data).sort()).toEqual(fields)
-      for (const count of ['jsHeapUsedMB', 'wasmMB', 'geometries', 'programs', 'colliders'])
+      for (const count of ['jsHeapUsedKB', 'wasmKB', 'geometries', 'programs', 'colliders'])
         expect(data[count]).toBeGreaterThan(0)
       for (const count of ['rigidBodies', 'chunksCached', 'chunksMeshed', 'domNodes', 'listeners'])
         expect(data[count]).toBeGreaterThan(0)

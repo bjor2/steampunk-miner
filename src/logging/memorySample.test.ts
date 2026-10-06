@@ -29,13 +29,13 @@ const READINGS: MemoryReadings = {
 }
 
 describe('memory sample', () => {
-  it('turns heap and WASM bytes into MiB to hundredths and keeps every count', () => {
+  it('turns heap and WASM bytes into whole KiB and keeps every count', () => {
     expect(memorySampleOf(READINGS)).toEqual({
       elapsedS: 20,
-      jsHeapUsedMB: 142.3,
-      jsHeapTotalMB: 180,
-      jsHeapLimitMB: 4096,
-      wasmMB: 1.31,
+      jsHeapUsedKB: 145715,
+      jsHeapTotalKB: 184321,
+      jsHeapLimitKB: 4194304,
+      wasmKB: 1344,
       geometries: 388,
       textures: 21,
       programs: 14,
