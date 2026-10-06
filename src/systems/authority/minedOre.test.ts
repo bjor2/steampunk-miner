@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
+import { ORE_TYPE_REGISTRY, type OreType } from '../registries/oreTypes'
+import { addToRegistry, withFreshRegistrySet } from '../registries/seal'
 import { FACING } from '../vehicle/vehiclePose'
 import { depthTilesAt } from '../world/planetGeometry'
 import { chunkKey, chunkOfTile, type TilePoint } from '../world/tileGrid'
 import { familyOfCell, RESOURCE_FAMILY } from '../world/worldCell'
 import { EMPTY_WORLD, materialCellAt } from '../world/worldState'
 import type { DomainEvent } from './domainEvent'
-import { kernelOreIdOf, minedOreOf } from './minedOre'
+import { minedOreOf } from './minedOre'
 import { createScriptedSession, drill, PARAMS, poseAbove, surfaceOreTiles } from './scriptedSession'
 
 /** Mines each tile clear from above, in order, refilling the tank as a dock would. */
@@ -22,16 +24,37 @@ function mineInOrder(tiles: readonly TilePoint[]): DomainEvent[] {
   return session.events()
 }
 
+const copper: OreType = {
+  id: 'ores.copper',
+  name: 'Copper',
+  family: 'copper',
+  cellFamily: RESOURCE_FAMILY.metal,
+  tier: 1,
+  grade: 0,
+  iconId: 'none',
+  requires: [],
+}
+
+/** A fake `ores` catalogue that calls every ore copper. */
+function registerCopperProvider(): void {
+  addToRegistry(ORE_TYPE_REGISTRY, 'ores', {
+    id: 'ores.catalogue',
+    oreTypeOf: () => copper,
+    catalogue: () => [copper],
+  })
+}
+
 function oreOfTile(tile: TilePoint) {
   return minedOreOf(PARAMS, tile, materialCellAt(EMPTY_WORLD, PARAMS, tile))
 }
 
 describe('mined ore identity (#122)', () => {
-  it('names an ore by the kernel default id of its family and tier until a catalogue does', () => {
-    expect(kernelOreIdOf({ tier: 1, cellFamily: RESOURCE_FAMILY.metal })).toBe('kernel.metal.t1')
-    expect(kernelOreIdOf({ tier: 7, cellFamily: RESOURCE_FAMILY.crystal })).toBe(
-      'kernel.crystal.t7',
+  it("names the ore by the ore catalogue's id when a slice provides one (#155 3.5)", () => {
+    const [ore] = surfaceOreTiles(1)
+    const added = withFreshRegistrySet(registerCopperProvider, () => mineInOrder([ore])).find(
+      (event) => event.type === 'CargoAdded',
     )
+    expect(added).toMatchObject({ resourceTier: 1, oreId: 'ores.copper' })
   })
 
   it('puts the ore id, the depth of its cell and its chunk on CargoAdded', () => {
