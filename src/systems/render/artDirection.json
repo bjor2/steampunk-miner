@@ -42,6 +42,7 @@
     "glowMax": 1,
     "sparklesMax": 6
   },
+  "oreGrades": [4, 12, 30, 70],
   "tileShadeSpread": 0.08,
   "artefactCache": "#c9a24b",
   "enemyTint": {

@@ -1,14 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="plate" data-axis="verdigris">
   <title>Guns</title>
-  <path fill="#c9a24b" d="M26 28.2 10.1 10.2l-3.8 3.4 15.9 18z"/>
-  <path fill="#1b1613" d="M19.3 20.9l1.1 1.2-3.7 3.4-1.1-1.2zM14.6 15.6l1.1 1.2-3.7 3.4-1.1-1.2z"/>
-  <circle fill="#c9a24b" cx="8" cy="12" r="4.6"/>
-  <circle fill="#1b1613" cx="8" cy="12" r="2.2"/>
-  <path fill="#c9a24b" d="M12 37a12 12 0 0 1 24 0z"/>
-  <circle fill="#1b1613" cx="24" cy="30" r="3.5"/>
-  <circle fill="#e9dcc0" cx="31" cy="32" r="1.8"/>
-  <rect fill="#c9a24b" x="7" y="37" width="34" height="8" rx="2"/>
-  <g fill="#1b1613">
-    <circle cx="12" cy="41" r="1.5"/><circle cx="24" cy="41" r="1.5"/><circle cx="36" cy="41" r="1.5"/>
-  </g>
+  <rect x="1.5" y="1.5" width="21" height="21" rx="2.5" fill="#3fa7a0" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/><circle cx="4.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="4.5" cy="19.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="19.5" r="1" fill="#1b1613"/>
+  <g transform="translate(5 5) scale(0.58)"><path d="M3 10h11l2-3h5v4l-3 2v4H6l-3-2z" fill="#1b1613" fill-rule="evenodd"/><path d="M14 7l2-3M6 14h8" fill="none" stroke="#3fa7a0" stroke-width="2.57" stroke-linecap="round" stroke-linejoin="round"/></g>
 </svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="hex" data-axis="warning">
+  <title>Core fragment</title>
+  <path d="M12 1.5L21.09 6.75L21.09 17.25L12 22.5L2.91 17.25L2.91 6.75z" fill="#e0602a" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/>
+  <g transform="translate(5.5 5.5) scale(0.54)"><path d="M12 3l7 5v8l-7 5-7-5V8z" fill="#1b1613" fill-rule="evenodd"/><path d="M12 8v8M8.5 10l7 4M15.5 10l-7 4" fill="none" stroke="#e0602a" stroke-width="2.77" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

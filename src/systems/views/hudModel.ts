@@ -6,6 +6,7 @@
  * the lining bill the next sale settles, while there is one (#76 amendment, #115).
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
+import { combatStatusIconIdOf } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
 import { canOpenArtefactCache } from '../authority/artefactRules'
 import { dockableBayOf } from '../authority/dockRules'
@@ -80,7 +81,7 @@ export interface CargoReading extends GaugeReading {
 export interface EnergyWarning {
   level: EnergyWarningLevel
   text: string
-  /** Icon id: the warning never relies on colour (#33 section 7). */
+  /** The low-energy status icon (#158), for both levels: urgency shows by pulse, never by glyph; '' while ok. */
   icon: string
   returnReserveUnits: number
 }
@@ -119,10 +120,12 @@ export interface HudModel {
   warning: EnergyWarning
 }
 
+const LOW_ENERGY_ICON = combatStatusIconIdOf('low_energy')
+
 const WARNING_MARKERS: Readonly<Record<EnergyWarningLevel, { text: string; icon: string }>> = {
-  ok: { text: '', icon: 'none' },
-  low: { text: 'LOW ENERGY: head for the platform', icon: 'gauge-hatched' },
-  critical: { text: 'CRITICAL ENERGY: climb home now', icon: 'gauge-hatched-double' },
+  ok: { text: '', icon: '' },
+  low: { text: 'LOW ENERGY: head for the platform', icon: LOW_ENERGY_ICON },
+  critical: { text: 'CRITICAL ENERGY: climb home now', icon: LOW_ENERGY_ICON },
 }
 
 const PERMILLE = 1000

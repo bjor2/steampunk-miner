@@ -1,21 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
-  <title>Blasting charges</title>
-  <g fill="#c9a24b">
-    <rect x="7" y="16" width="10" height="28" rx="2"/>
-    <rect x="19" y="16" width="10" height="28" rx="2"/>
-    <rect x="31" y="16" width="10" height="28" rx="2"/>
-  </g>
-  <g fill="#a63a2a">
-    <rect x="9" y="19" width="6" height="23"/>
-    <rect x="21" y="19" width="6" height="23"/>
-    <rect x="33" y="19" width="6" height="23"/>
-  </g>
-  <g fill="#e9dcc0">
-    <rect x="9" y="19" width="6" height="3"/>
-    <rect x="21" y="19" width="6" height="3"/>
-    <rect x="33" y="19" width="6" height="3"/>
-  </g>
-  <rect fill="#c9a24b" x="5" y="33" width="38" height="4"/>
-  <path fill="none" stroke="#c9a24b" stroke-width="2.5" stroke-linecap="round" d="M24 16c0-5 6-5 8-9"/>
-  <path fill="#e9dcc0" d="M34 2l1.6 3.6 3.9.4-2.9 2.6.8 3.9-3.4-2-3.4 2 .8-3.9-2.9-2.6 3.9-.4z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="plate" data-axis="verdigris">
+  <title>Charges</title>
+  <rect x="1.5" y="1.5" width="21" height="21" rx="2.5" fill="#3fa7a0" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/><circle cx="4.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="4.5" cy="19.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="19.5" r="1" fill="#1b1613"/>
+  <g transform="translate(5 5) scale(0.58)"><path d="M6 9h12v12H6z" fill="#1b1613" fill-rule="evenodd"/><path d="M12 9V5c0-2 3-2 3-4M8 13h8" fill="none" stroke="#3fa7a0" stroke-width="2.57" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15.5" cy="1.5" r="1.2" fill="#3fa7a0"/></g>
 </svg>

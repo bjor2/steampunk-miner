@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="triangle" data-axis="warning">
+  <title>Crawler</title>
+  <path d="M12 1.5L22.5 21.5H1.5z" fill="#e0602a" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/>
+  <g transform="translate(7 7) scale(0.42)"><path d="M12 6a6 8 0 1 1 0 16a6 8 0 1 1 0-16z" fill="#1b1613" fill-rule="evenodd"/><path d="M6 10l-4-2M6 14H2M6 18l-4 2M18 10l4-2M18 14h4M18 18l4 2" fill="none" stroke="#e0602a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="5" r="1.2" fill="#e0602a"/><circle cx="15" cy="5" r="1.2" fill="#e0602a"/></g>
+</svg>

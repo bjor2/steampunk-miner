@@ -22,7 +22,9 @@ import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
 
 /** The #7 state machine; `docked` is entered by the rescue tow here and by docking in #23. */
-export type VehicleMode = 'docked' | 'active' | 'stranded' | 'destroyed'
+export const VEHICLE_MODES = ['docked', 'active', 'stranded', 'destroyed'] as const
+
+export type VehicleMode = (typeof VEHICLE_MODES)[number]
 
 export interface Cargo {
   /** Units held per ore tier, keyed by the tier written as a decimal integer. */

@@ -68,7 +68,12 @@ export const DEFAULT_PREFERENCES: Preferences = {
 }
 
 const TOGGLE_NAMES = ['shake', 'flashes', 'hintsEnabled', 'musicMuted'] as const
-const PREFERENCE_NAMES: readonly PreferenceName[] = ['cameraMode', ...TOGGLE_NAMES, 'musicVolume']
+/** Every setting the overlay lists, in its order; each has an icon (#158). */
+export const PREFERENCE_NAMES: readonly PreferenceName[] = [
+  'cameraMode',
+  ...TOGGLE_NAMES,
+  'musicVolume',
+]
 /** The settings every preferences file has held; the music ones came later (#49). */
 const FIRST_PREFERENCE_NAMES: readonly PreferenceName[] = [
   'cameraMode',

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="plate" data-axis="verdigris">
+  <title>Rack</title>
+  <rect x="1.5" y="1.5" width="21" height="21" rx="2.5" fill="#3fa7a0" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/><circle cx="4.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="4.5" cy="19.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="19.5" r="1" fill="#1b1613"/>
+  <g transform="translate(5 5) scale(0.58)"><path d="M3 10h18v11H3z" fill="#1b1613" fill-rule="evenodd"/><path d="M9 10v11M15 10v11M3 15h18" fill="none" stroke="#3fa7a0" stroke-width="2.57" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

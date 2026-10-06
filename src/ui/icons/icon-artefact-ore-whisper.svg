@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="gear" data-axis="verdigris">
+  <title>Ore Whisper</title>
+  <path d="M21.04 10.28L22.95 10.96L22.95 13.04L21.04 13.72L20.32 15.92L21.47 17.6L20.25 19.27L18.3 18.71L16.43 20.06L16.37 22.1L14.4 22.74L13.15 21.13L10.85 21.13L9.6 22.74L7.63 22.1L7.57 20.06L5.7 18.71L3.75 19.27L2.53 17.6L3.68 15.92L2.96 13.72L1.05 13.04L1.05 10.96L2.96 10.28L3.68 8.08L2.53 6.4L3.75 4.73L5.7 5.29L7.57 3.94L7.63 1.9L9.6 1.26L10.85 2.87L13.15 2.87L14.4 1.26L16.37 1.9L16.43 3.94L18.3 5.29L20.25 4.73L21.47 6.4L20.32 8.08z" fill="#3fa7a0" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/>
+  <g transform="translate(6.5 6.5) scale(0.46)"><path d="M2 12c4-6 16-6 20 0c-4 6-16 6-20 0z" fill="#1b1613" fill-rule="evenodd"/><path d="M12 5V2M7 6L5 3M17 6l2-3" fill="none" stroke="#3fa7a0" stroke-width="3.27" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.5" fill="#3fa7a0"/></g>
+</svg>

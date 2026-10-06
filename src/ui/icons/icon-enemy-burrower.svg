@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="triangle" data-axis="warning">
+  <title>Burrower</title>
+  <path d="M12 1.5L22.5 21.5H1.5z" fill="#e0602a" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/>
+  <g transform="translate(7 7) scale(0.42)"><path d="M4 16c0-6 4-10 8-10s8 4 8 10z" fill="#1b1613" fill-rule="evenodd"/><path d="M3 20h4M9 20h6M17 20h4" fill="none" stroke="#e0602a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="12" r="1.1" fill="#e0602a"/><circle cx="15" cy="12" r="1.1" fill="#e0602a"/></g>
+</svg>

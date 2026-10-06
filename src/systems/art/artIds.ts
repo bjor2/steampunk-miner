@@ -6,10 +6,12 @@
  */
 import ASSET_RULES from '../../../art/asset-rules.json'
 import { REFINERY_BAY_LOOKS } from '../authority/platformState'
-import { GUN_TRACK_ID } from '../economy/gunStats'
 import { BAND_COUNT } from '../world/planetGeometry'
-import { ENEMY_IDS, PLATFORM_BAY_IDS, PLATFORM_VISUAL_STATES, UPGRADE_IDS } from '../registeredIds'
+import { ENEMY_IDS, PLATFORM_BAY_IDS, PLATFORM_VISUAL_STATES } from '../registeredIds'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
+import { kebabOf } from './artNaming'
+import { iconFileIds } from './icons/iconSet'
+import { BLASTING_CHARGES_ROW_ID, HEAT_LAVA_ROW_ID, REFRACTORY_LINING_TYPE } from './moduleRowIds'
 
 export const ASSET_CATEGORIES = [
   'vehicle',
@@ -32,16 +34,9 @@ export const ART_RULES = ASSET_RULES
 /** #51: one casing lining with five grade patterns, ground in the five depth bands. */
 const CASING_GRADE_COUNT = 5
 
-const KEBAB_ID = /^[a-z0-9]+(-[a-z0-9]+)*$/
 const TIER_PREFIX = /^t([1-9][0-9]*)-/
 
-export function kebabOf(registryId: string): string {
-  return registryId.replaceAll('_', '-')
-}
-
-export function isKebabId(id: string): boolean {
-  return KEBAB_ID.test(id)
-}
+export { isKebabId, kebabOf } from './artNaming'
 
 /** `vehicle`, or the prefix before the first dash (`enemy-crawler` is an enemy). */
 export function categoryOfAssetId(assetId: string): AssetCategory | null {
@@ -90,28 +85,35 @@ export function blenderAssetIds(): string[] {
 }
 
 /**
- * Every vector icon file stem, which is also its `data-testid` (#51 acceptance 3): one per upgrade
- * track, the casing row's icon (#54 scope review), the gun track's (#107, #108) and one emblem per
- * bay (#51 "HUD and bay chrome").
+ * Every vector icon file stem, which is also its `data-testid` (#51 acceptance 3): the icon set of
+ * #158, one entry per upgrade track, module row, HUD gauge, status, enemy, artefact, panel and
+ * button, plus one emblem per bay (#51 "HUD and bay chrome"). The set derives each id from its
+ * registry (`icons/iconSet.ts`); ore icons are generated, not files, so they are not listed here.
  */
 export function vectorIconIds(): string[] {
-  return [
-    ...UPGRADE_IDS.map(trackIconIdOf),
-    CASING_ICON_ID,
-    GUN_ICON_ID,
-    ...PLATFORM_BAY_IDS.map((bay) => `emblem-bay-${bay}`),
-    BLASTING_CHARGES_ICON_ID,
-    HEAT_GAUGE_ICON_ID,
-    REFRACTORY_LINING_ICON_ID,
-  ]
+  return iconFileIds()
 }
+
+export {
+  BLASTING_CHARGES_ICON_ID,
+  CASING_ICON_ID,
+  GUN_ICON_ID,
+  HEAT_GAUGE_ICON_ID,
+  REFRACTORY_LINING_ICON_ID,
+  trackIconIdOf,
+} from './icons/iconSet'
 
 /**
  * The art of the `blasting_charges` schedule row (#109 "Visibility", #110): a charge rack mounted
  * on the vehicle, a planted charge with its fuse lamp, and an icon for its Upgrade bay rows and HUD
  * count. The ids take the #52 kebab form of the row id.
  */
-export const BLASTING_CHARGES_ROW_ID = 'blasting_charges'
+export {
+  BLASTING_CHARGES_ROW_ID,
+  HEAT_LAVA_ROW_ID,
+  REFRACTORY_LINING_ROW_ID,
+  REFRACTORY_LINING_TYPE,
+} from './moduleRowIds'
 
 const BLASTING_CHARGES = kebabOf(BLASTING_CHARGES_ROW_ID)
 
@@ -122,8 +124,6 @@ export const CHARGE_RACK_ASSET_ID = `vehicle-${BLASTING_CHARGES}`
 export const PLANTED_CHARGE_ASSET_ID = 'prop-blasting-charge'
 
 export const FUSE_LAMP_PART_ID = 'fuse-lamp'
-
-export const BLASTING_CHARGES_ICON_ID = `icon-${BLASTING_CHARGES}`
 
 /**
  * The rack's frame, then `charge-<n>` for each of its `chargeRackSlots` (#109 `rackMax`); the rack
@@ -139,20 +139,8 @@ export function chargeRackPartIds(): string[] {
  * icon. The ids take the #52 kebab form of the row ids; the refractory tiles take the lining type
  * #113 names (`standard` keeps the `casing-grade-<n>` tiles).
  */
-export const HEAT_LAVA_ROW_ID = 'heat_lava'
-
-export const REFRACTORY_LINING_ROW_ID = 'refractory_lining'
-
-export const REFRACTORY_LINING_TYPE = 'refractory'
-
 /** Lava pockets, the fluid ground of heat planets; molten veins under a crust, which glow. */
 export const LAVA_TILE_ASSET_ID = `ground-${kebabOf(HEAT_LAVA_ROW_ID)}`
-
-/** The HUD heat gauge's icon. */
-export const HEAT_GAUGE_ICON_ID = `icon-${kebabOf(HEAT_LAVA_ROW_ID)}`
-
-/** The refractory lining type's row in the Upgrade bay. */
-export const REFRACTORY_LINING_ICON_ID = `icon-${kebabOf(REFRACTORY_LINING_ROW_ID)}`
 
 /**
  * `casing-refractory-grade-1` to `-5`: a refractory ring keeps its grade's plate and rivet pattern
@@ -160,17 +148,6 @@ export const REFRACTORY_LINING_ICON_ID = `icon-${kebabOf(REFRACTORY_LINING_ROW_I
  */
 export function refractoryCasingTileIds(): string[] {
   return numbered(`casing-${REFRACTORY_LINING_TYPE}-grade`, CASING_GRADE_COUNT)
-}
-
-/** The Casing row's icon, the seventh vector icon (#54 scope review). */
-export const CASING_ICON_ID = 'icon-casing'
-
-/** The Guns row's icon: the gun track in the `icon-track-<id>` family (#107, #108). */
-export const GUN_ICON_ID = `icon-track-${GUN_TRACK_ID}`
-
-/** An upgrade track's icon (#44 `icon-track-<id>`, in the #52 kebab form of the registry id). */
-export function trackIconIdOf(track: string): string {
-  return `icon-track-${kebabOf(track)}`
 }
 
 /**

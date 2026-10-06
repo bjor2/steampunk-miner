@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="triangle" data-axis="warning">
+  <title>Stranded</title>
+  <path d="M12 1.5L22.5 21.5H1.5z" fill="#e0602a" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/>
+  <g transform="translate(7 7) scale(0.42)"><path d="M4 8h16v10H4zM8 8V5h8v3h-2V7h-4v1z" fill="#1b1613" fill-rule="evenodd"/><path d="M7 15h3M12 15h2M16 15h1" fill="none" stroke="#e0602a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

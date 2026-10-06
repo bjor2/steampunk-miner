@@ -54,6 +54,8 @@ export interface ArtDirection {
   palettes: Readonly<Record<string, BandPalette>>
   oreFamilies: { metal: OreFamilyLook; crystal: OreFamilyLook }
   oreRamp: OreRamp
+  /** The first tier of grades 2 to 5 (#140, #151): a tier below the first is grade 1. */
+  oreGrades: readonly number[]
   /** How far a tile's lightness may drift from its band colour, for the subtle noise texture. */
   tileShadeSpread: number
   enemyTint: EnemyTint
@@ -76,6 +78,7 @@ export function artDirectionProblems(raw: unknown): string[] {
     ...RAMP_KNOBS.filter((knob) => !isPositive(file.oreRamp?.[knob])).map(
       (knob) => `oreRamp.${knob} must be a number > 0`,
     ),
+    ...oreGradeProblems(file.oreGrades),
     ...enemyTintProblems(file.enemyTint),
     ...(isHexColour(file.artefactCache) ? [] : ['artefactCache must be a #rrggbb colour']),
   ]
@@ -93,10 +96,22 @@ function loadArtDirection(raw: typeof artFile): ArtDirection {
       crystal: familyOf(raw.oreFamilies.crystal),
     },
     oreRamp: raw.oreRamp,
+    oreGrades: raw.oreGrades,
     tileShadeSpread: raw.tileShadeSpread,
     enemyTint: { ...raw.enemyTint, ramp: raw.enemyTint.ramp.map(rgbOfHex) },
     artefactCache: rgbOfHex(raw.artefactCache),
   }
+}
+
+/** Four thresholds, each a whole tier above the one before, so `oreGradeOf` is monotone. */
+function oreGradeProblems(grades: unknown): string[] {
+  const isRisingTiers =
+    Array.isArray(grades) &&
+    grades.length === 4 &&
+    grades.every(
+      (tier, at) => Number.isInteger(tier) && tier > 1 && (at === 0 || tier > grades[at - 1]),
+    )
+  return isRisingTiers ? [] : ['oreGrades must be four rising whole tiers above 1']
 }
 
 function enemyTintProblems(tint: Record<string, unknown> | undefined): string[] {

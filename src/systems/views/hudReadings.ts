@@ -8,8 +8,9 @@ import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
 import { enemiesOwnedBy } from '../authority/combat/combatState'
 import { dockSiteOfPlanet, planetParamsOf } from '../authority/planetOfState'
+import { vehicleStateIconIdOf } from '../art/icons/iconSet'
 import { tileOfPose, type VehiclePose } from '../vehicle/vehiclePose'
-import type { VehicleMode, VehicleState } from '../vehicle/vehicleState'
+import { VEHICLE_MODES, type VehicleMode, type VehicleState } from '../vehicle/vehicleState'
 import { bayRestPointOf } from '../world/dockBays'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -50,12 +51,21 @@ export interface VehicleStateReading {
   rescueCountdownText: string
 }
 
-const MODE_MARKERS: Readonly<Record<VehicleMode, { text: string; icon: string }>> = {
-  docked: { text: 'DOCKED', icon: 'anchor' },
-  active: { text: 'UNDER WAY', icon: 'wheel' },
-  stranded: { text: 'STRANDED', icon: 'empty-tank' },
-  destroyed: { text: 'WRECKED', icon: 'broken-gear' },
+const MODE_TEXTS: Readonly<Record<VehicleMode, string>> = {
+  docked: 'DOCKED',
+  active: 'UNDER WAY',
+  stranded: 'STRANDED',
+  destroyed: 'WRECKED',
 }
+
+/** Each state's text and its icon of the set (#158): the id is derived, so it always ships. */
+const MODE_MARKERS: Readonly<Record<VehicleMode, { text: string; icon: string }>> =
+  Object.fromEntries(
+    VEHICLE_MODES.map((mode) => [
+      mode,
+      { text: MODE_TEXTS[mode], icon: vehicleStateIconIdOf(mode) },
+    ]),
+  ) as Record<VehicleMode, { text: string; icon: string }>
 
 /** Null while docked: the grade is read at the platform then. */
 export function casingBadgeOf(state: AuthorityState, playerId: string): CasingBadge | null {

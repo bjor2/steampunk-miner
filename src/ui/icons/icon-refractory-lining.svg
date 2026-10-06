@@ -1,9 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
-  <title>Refractory lining</title>
-  <circle fill="#1b1613" cx="24" cy="24" r="22.5"/>
-  <circle fill="none" stroke="#c9a24b" stroke-width="2" cx="24" cy="24" r="21"/>
-  <circle fill="none" stroke="#f08a24" stroke-width="11.5" cx="24" cy="24" r="14.75"/>
-  <circle fill="none" stroke="#a63a2a" stroke-width="5" stroke-dasharray="9.4 1.6" cx="24" cy="24" r="17.5"/>
-  <circle fill="none" stroke="#8e3b26" stroke-width="5" stroke-dasharray="7.8 1.62" stroke-dashoffset="4.7" cx="24" cy="24" r="12"/>
-  <circle fill="#1b1613" cx="24" cy="24" r="8.75"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="plate" data-axis="verdigris">
+  <title>Lining</title>
+  <rect x="1.5" y="1.5" width="21" height="21" rx="2.5" fill="#3fa7a0" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/><circle cx="4.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="4.5" cy="19.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="19.5" r="1" fill="#1b1613"/>
+  <g transform="translate(5 5) scale(0.58)"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zm0 4a5 5 0 1 1 0 10a5 5 0 1 1 0-10z" fill="#1b1613" fill-rule="evenodd"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4" fill="none" stroke="#3fa7a0" stroke-width="2.57" stroke-linecap="round" stroke-linejoin="round"/></g>
 </svg>

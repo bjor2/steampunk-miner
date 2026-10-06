@@ -1,9 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="plate" data-axis="brass">
   <title>Boiler</title>
-  <rect fill="#c9a24b" x="10" y="2" width="8" height="10"/>
-  <rect fill="#c9a24b" x="6" y="10" width="36" height="34" rx="10"/>
-  <circle fill="#1b1613" cx="24" cy="27" r="10"/>
-  <circle fill="none" stroke="#e9dcc0" stroke-width="1.5" cx="24" cy="27" r="7.5"/>
-  <path fill="none" stroke="#e9dcc0" stroke-width="2.5" stroke-linecap="round" d="M24 27l5-5"/>
-  <rect fill="#1b1613" x="6" y="40" width="36" height="2"/>
+  <rect x="1.5" y="1.5" width="21" height="21" rx="2.5" fill="#c9a24b" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/><circle cx="4.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="4.5" cy="19.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="4.5" r="1" fill="#1b1613"/><circle cx="19.5" cy="19.5" r="1" fill="#1b1613"/>
+  <g transform="translate(5 5) scale(0.58)"><path d="M5 8a7 7 0 0 1 14 0v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" fill="#1b1613" fill-rule="evenodd"/><path d="M8 13h8M9 5c0-2 2-2 2-4M14 5c0-2 2-2 2-4" fill="none" stroke="#c9a24b" stroke-width="2.57" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="17" r="0.9" fill="#c9a24b"/><circle cx="16" cy="17" r="0.9" fill="#c9a24b"/></g>
 </svg>

@@ -155,7 +155,7 @@ describe('HUD model', () => {
       expect(marker.icon).not.toBe('')
     }
     expect(energyWarningMarkers().low.text).not.toBe('')
-    expect(energyWarningMarkers().critical.icon).not.toBe('none')
+    expect(energyWarningMarkers().critical.icon).not.toBe('')
   })
 })
 

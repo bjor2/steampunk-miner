@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="triangle" data-axis="warning">
+  <title>Wrecked</title>
+  <path d="M12 1.5L22.5 21.5H1.5z" fill="#e0602a" stroke="#1b1613" stroke-width="1.5" stroke-linejoin="round"/>
+  <g transform="translate(7 7) scale(0.42)"><path d="M10 2h4l.6 3 2.1 1.2 2.8-1.2 2 3.5-2.3 1.9v2.6l2.3 1.9-2 3.5-2.8-1.2L14.6 19 14 22h-4l-.6-3-2.1-1.2-2.8 1.2-2-3.5 2.3-1.9v-2.6L2.5 8.1l2-3.5 2.8 1.2L9.4 5zM12 8.5a3.5 3.5 0 1 0 0 7a3.5 3.5 0 0 0 0-7z" fill="#1b1613" fill-rule="evenodd"/><path d="M12 12l5-6M9 20l2-5" fill="none" stroke="#e0602a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>
