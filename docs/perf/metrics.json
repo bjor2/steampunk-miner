@@ -1,0 +1,252 @@
+{
+  "$comment": "Registry of the metric ids in history.ndjson: how /status/ labels, groups and judges each one. A new id in history.ndjson gets its own chart even before it is listed here (with a build warning); add it here to give it a label, unit, group, direction and budget. See docs/perf/README.md.",
+  "groups": ["CPU benches", "Memory soak", "Frame time", "Main-thread profile", "Stack"],
+  "metrics": {
+    "generateChunk.p1.p50Ms": {
+      "label": "World generateChunk p50 · planet 1",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:world"
+    },
+    "generateChunk.p1.p95Ms": {
+      "label": "World generateChunk p95 · planet 1",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:world"
+    },
+    "generateChunk.p2.p50Ms": {
+      "label": "World generateChunk p50 · planet 2",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:world"
+    },
+    "generateChunk.p2.p95Ms": {
+      "label": "World generateChunk p95 · planet 2",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:world"
+    },
+    "buildChunkTileBatch.p1.p50Ms": {
+      "label": "Render buildChunkTileBatch p50 · planet 1",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "buildChunkTileBatch.p1.p95Ms": {
+      "label": "Render buildChunkTileBatch p95 · planet 1",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:render"
+    },
+    "buildChunkTileBatch.p2.p50Ms": {
+      "label": "Render buildChunkTileBatch p50 · planet 2",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "buildChunkTileBatch.p2.p95Ms": {
+      "label": "Render buildChunkTileBatch p95 · planet 2",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:render"
+    },
+    "groundDrilling.carveP95Ms": {
+      "label": "Ground carve p95",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:ground"
+    },
+    "groundDrilling.remeshChunkP95Ms": {
+      "label": "Ground remesh chunk p95",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:ground"
+    },
+    "groundDrilling.colliderBlocksP95Ms": {
+      "label": "Ground collider blocks p95",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:ground"
+    },
+    "groundDrilling.carveAndRemeshP95Ms": {
+      "label": "Ground carve + remesh p95",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 1,
+      "source": "npm run bench:ground"
+    },
+    "groundDrilling.terrainFrameP95Ms": {
+      "label": "Ground terrain frame p95",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:ground"
+    },
+    "groundDrilling.liveCollidersMax": {
+      "label": "Ground live colliders (max)",
+      "unit": "colliders",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 600,
+      "source": "npm run bench:ground"
+    },
+    "combatTick.p50Ms": {
+      "label": "Combat tick p50 · 6 enemies",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:combat"
+    },
+    "combatTick.p95Ms": {
+      "label": "Combat tick p95 · 6 enemies",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 0.5,
+      "source": "npm run bench:combat"
+    },
+    "soak.heapStartMB": {
+      "label": "Heap at first cycle boundary",
+      "unit": "MB",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak summary.json (usedJSHeapSize after GC, MiB)"
+    },
+    "soak.heapEndMB": {
+      "label": "Heap at last cycle boundary",
+      "unit": "MB",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak summary.json (usedJSHeapSize after GC, MiB)"
+    },
+    "soak.heapPeakMB": {
+      "label": "Heap peak (all samples)",
+      "unit": "MB",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak summary.json"
+    },
+    "soak.heapGrowthMBPerCycle": {
+      "label": "Heap growth per cycle",
+      "unit": "MB/cycle",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak summary.json (slope over cycle boundaries)"
+    },
+    "soak.heapSlopeAfterWarmupMBPerMin": {
+      "label": "Heap slope after warm-up (cycle 4+)",
+      "unit": "MB/min",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak summary.json"
+    },
+    "soak.geometriesAtLastBoundary": {
+      "label": "three geometries at last boundary",
+      "unit": "geometries",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak soak.json"
+    },
+    "soak.texturesAtLastBoundary": {
+      "label": "three textures at last boundary",
+      "unit": "textures",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak soak.json"
+    },
+    "soak.collidersAtLastBoundary": {
+      "label": "Rapier colliders at last boundary",
+      "unit": "colliders",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak soak.json"
+    },
+    "soak.wasmPeakMB": {
+      "label": "Rapier WASM memory peak",
+      "unit": "MB",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak summary.json"
+    },
+    "soak.runLogMBPerMin": {
+      "label": "Run-log text growth (?debug)",
+      "unit": "MB/min",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "memory soak summary.json"
+    },
+    "soak.frameP50Ms": {
+      "label": "Frame time p50 (soak, SwiftShader)",
+      "unit": "ms",
+      "group": "Frame time",
+      "better": "lower",
+      "source": "memory soak summary.json (median of rAF p50 samples; software GL, not a GPU)"
+    },
+    "soak.frameP95Ms": {
+      "label": "Frame time p95 (soak, SwiftShader)",
+      "unit": "ms",
+      "group": "Frame time",
+      "better": "lower",
+      "source": "memory soak summary.json (median of rAF p95 samples; software GL, not a GPU)"
+    },
+    "profile.snapshotOfMainThreadPct": {
+      "label": "snapshotOf share of main-thread samples",
+      "unit": "%",
+      "group": "Main-thread profile",
+      "better": "lower",
+      "source": "browser CPU profile summary (inclusive %)"
+    },
+    "profile.garbageCollectorMainThreadPct": {
+      "label": "Garbage collector share of main-thread samples",
+      "unit": "%",
+      "group": "Main-thread profile",
+      "better": "lower",
+      "source": "browser CPU profile summary (inclusive %)"
+    },
+    "stack.authorityStateDepth": {
+      "label": "Authority state nesting depth",
+      "unit": "levels",
+      "group": "Stack",
+      "better": "lower",
+      "source": "stack/state-depth.json"
+    },
+    "stack.snapshotDepth": {
+      "label": "Snapshot nesting depth",
+      "unit": "levels",
+      "group": "Stack",
+      "better": "lower",
+      "source": "stack/state-depth.json"
+    },
+    "stack.toCanonicalJson.maxOkDepth": {
+      "label": "toCanonicalJson deepest nesting survived (default stack)",
+      "unit": "levels",
+      "group": "Stack",
+      "better": "higher",
+      "source": "stack stress (deepest tested depth before the first RangeError)"
+    },
+    "stack.payloadProblems.maxOkDepth": {
+      "label": "payloadProblems deepest nesting survived (default stack)",
+      "unit": "levels",
+      "group": "Stack",
+      "better": "higher",
+      "source": "stack stress (deepest tested depth before the first RangeError)"
+    }
+  }
+}

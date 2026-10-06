@@ -9,6 +9,11 @@ scripts/status/loop-status.sh <loop> <working|idle|paused|blocked> [--issue N] [
 
 On the box the same script lives at `/workspace/claude-sessions/loop-status.sh`.
 
+The page also has a **Performance** section: one chart per measured metric over commits, read from
+`docs/perf/history.ndjson` and `docs/perf/metrics.json`. If you measured anything, record it with
+`npm run perf:record` and commit the `history.ndjson` line; a new metric is a new id, added to
+`metrics.json`. See [docs/perf/README.md](perf/README.md).
+
 | State     | Meaning                                                                  |
 | --------- | ------------------------------------------------------------------------ |
 | `working` | Busy on something now; pass `--issue N` when it is a ticket.             |
@@ -46,7 +51,7 @@ loop-status.sh --show                              # print the published loops.j
   once per 90 s); a push to `loop-status` cannot trigger it because that branch has no workflows.
 - The Pages workflow builds the game exactly as before, then runs
   `scripts/status/build-status.mjs`, which writes `dist/status/` (issue tree from GraphQL
-  sub-issues, loops.json, last workflow runs). Triggers: every ~10 min, issue events, pushes to
+  sub-issues, loops.json, last workflow runs, and the Performance charts from `docs/perf/`). Triggers: every ~10 min, issue events, pushes to
   main, and dispatch. The page itself re-reads `loops.json` live from the branch every 60 s, so
   loop state shows within about a minute even between builds.
 - Workflows listed in `WORKFLOWS` in `build-status.mjs` with a `loop` name (today
