@@ -1,10 +1,10 @@
 /**
  * The vehicle and world parts of the session snapshot (#11 section 5): the same plain JSON as the
- * state, with the hull BigStat and the lining bill as canonical strings. Reading checks the shape
- * so a malformed snapshot is refused with listed problems before anything is built from it; the
- * digest check in `sessionSnapshot.ts` then catches any value that does not match.
+ * state, with the hull BigStat, the lining bill and the visit's lining payment as canonical
+ * strings. Reading checks the shape so a malformed snapshot is refused with listed problems before
+ * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
-import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
+import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { isGunMode } from '../vehicle/vehicleGun'
 import { upgradeLevelsProblems } from '../vehicle/vehicleStats'
@@ -15,9 +15,10 @@ import { CHUNK_SIZE } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 
-export type PortableVehicle = Omit<VehicleState, 'hull' | 'liningBill'> & {
+export type PortableVehicle = Omit<VehicleState, 'hull' | 'liningBill' | 'liningPaidThisVisit'> & {
   hull: string
   liningBill: string
+  liningPaidThisVisit: string | null
 }
 
 export interface PortableWorld {
@@ -37,6 +38,7 @@ export function portableVehicleOf(vehicle: VehicleState): PortableVehicle {
     ...vehicle,
     hull: toCanonical(vehicle.hull),
     liningBill: toCanonical(vehicle.liningBill),
+    liningPaidThisVisit: canonicalOrNull(vehicle.liningPaidThisVisit),
   }
 }
 
@@ -45,7 +47,13 @@ export function vehicleOfPortable(vehicle: PortableVehicle): VehicleState {
     ...vehicle,
     hull: fromCanonical(vehicle.hull),
     liningBill: fromCanonical(vehicle.liningBill),
+    liningPaidThisVisit:
+      vehicle.liningPaidThisVisit === null ? null : fromCanonical(vehicle.liningPaidThisVisit),
   }
+}
+
+function canonicalOrNull(amount: Money | null): string | null {
+  return amount === null ? null : toCanonical(amount)
 }
 
 /** The world is integers only since #36 (drill progress is density), so it travels as is. */
@@ -79,6 +87,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isNonNegativeMoneyText(vehicle.liningBill)
       ? []
       : [`${path}.liningBill must be a decimal string`]),
+    ...(vehicle.liningPaidThisVisit === null || isNonNegativeMoneyText(vehicle.liningPaidThisVisit)
+      ? []
+      : [`${path}.liningPaidThisVisit must be null or a decimal string`]),
     ...(isPortableCargo(vehicle.cargo) ? [] : [`${path}.cargo must hold whole units`]),
     ...(vehicle.pose === null || isPortablePose(vehicle.pose) ? [] : [`${path}.pose is malformed`]),
     ...(isWholeNumberList(vehicle.energyLowLogged) ? [] : [`${path}.energyLowLogged is malformed`]),

@@ -47,10 +47,15 @@ export interface VehicleState {
   /** The `auto_guns` turret (#107): not a vehicle track, so it is not in the visual-tier sum. */
   gun: VehicleGun
   /**
-   * First-place lining charged since the last sale and not yet paid (#76 amendment, #115): it is
-   * settled at the Sell bay out of the next sale, so nothing leaves the wallet mid-dive.
+   * First-place lining charged and not yet paid or forgiven (#76 amendment, #115): it is settled
+   * at the Sell bay out of the visit's payouts (#128), so nothing leaves the wallet mid-dive.
    */
   liningBill: Money
+  /**
+   * What this Sell bay visit's payouts have paid of the bill so far, or null before the first one
+   * (#128): leaving the bay after a payout forgives the rest; leaving before one carries it.
+   */
+  liningPaidThisVisit: Money | null
   energy: number
   hull: BigStat
   cargo: Cargo
@@ -76,6 +81,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     casingTrail: EMPTY_CASING_TRAIL,
     gun: NO_GUN,
     liningBill: ZERO_MONEY,
+    liningPaidThisVisit: null,
     energy: quantaOfUnits(stats.energyMax),
     hull: stats.hullMax,
     cargo: EMPTY_CARGO,

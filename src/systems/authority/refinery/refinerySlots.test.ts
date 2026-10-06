@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { oreTier } from '../../economy/oreEconomy'
 import { refinedValue } from '../../economy/refineryEconomy'
-import { add, toCanonical } from '../../money'
+import { add, sub, toCanonical } from '../../money'
 import type { DomainEvent } from '../domainEvent'
 import { createScriptedSession, mineTile, surfaceOreTiles, WORLD_SEED } from '../scriptedSession'
 import { setPlanetCommand, setPlanetSeedCommand } from '../../startScenarioCommands'
@@ -87,9 +87,11 @@ describe('refinery in co-op', () => {
       reason: 'nothing_to_collect',
     })
     const p1Before = session.state().players.p1.wallet
+    // Scripted mining lines its tiles (#115), and the payout settles that lining bill (#128).
+    const p1Bill = session.vehicle('p1').liningBill
     session.submit(ready + 2, collect, 'p1')
     expect(toCanonical(session.state().players.p1.wallet)).toBe(
-      toCanonical(add(p1Before, refinedValue(TIER, 2))),
+      toCanonical(sub(add(p1Before, refinedValue(TIER, 2)), p1Bill)),
     )
   })
 })

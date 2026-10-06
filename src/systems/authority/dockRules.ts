@@ -13,6 +13,7 @@
  * Docking banks the carried core fragments (#10), ends the trip for combat (the vehicle's enemies
  * leave and used spawn points free up, #9), readies a spent `breathing_room` brace (#46) and
  * takes a `dock` state digest (#11 section 3).
+ * Undocking closes a Sell bay visit's lining bill: what its payouts could not pay is forgiven (#128).
  * A vehicle with energy 0 in the pad zone is still `active` (it never strands there, #7), so it
  * docks like any other: no tow, no fee.
  */
@@ -31,6 +32,7 @@ import {
 } from './commandRule'
 import { restoreBreathingRoom } from './artefactRules'
 import { endTrip } from './combat/enemyRoster'
+import { forgiveLiningBillOnLeaving } from './liningBill'
 import { bankCoreFragments } from './coreBay'
 import { dockSiteOfPlanet, noPlanetRejection } from './planetOfState'
 import { stateDigest } from './stateDigest'
@@ -58,6 +60,7 @@ export const DOCK_COMMAND_RULES: {
     reject: (state, { playerId }) => notDockedRejection(vehicleOf(state, playerId)),
     apply: (state, { playerId, tick }) =>
       chainEffects(state, [
+        (current) => forgiveLiningBillOnLeaving(current, playerId),
         (current) => logDockExit(current, playerId, tick),
         (current) => changeMode(current, playerId, 'active', 'undock', tick),
         (current) => restartActionAccounting(current, playerId, tick),

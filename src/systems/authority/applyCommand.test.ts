@@ -54,10 +54,11 @@ describe('authority: determinism', () => {
   // null here, is authority state, #46), 5 (the casing layer, its grade telegraph and the vehicle's casing trail, #56)
   // and 6 (the list of blocks warning or refilling, empty here, is authority state, #43, #57),
   // protocol 9 (each vehicle's guns, none here, are authority state, #93), 10 (the platform's
-  // Refinery slots, one empty slot here, are authority state, #105) and 11 (each vehicle's lining
-  // bill, empty here, is authority state, #115).
+  // Refinery slots, one empty slot here, are authority state, #105), 11 (each vehicle's lining
+  // bill, empty here, is authority state, #115) and 12 (what the Sell bay visit has paid of the
+  // bill, no visit here, is authority state, #128).
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('19ff63a81f2ba09e')
+    expect(stateDigest(replay(SESSION).state)).toBe('85ac7356bbe36d74')
   })
 
   it('gives a different digest when one command differs', () => {

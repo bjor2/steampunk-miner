@@ -5,7 +5,8 @@
  * `ceilMilli` by its price function. `QuickService` is the three in order (sell all, repair,
  * recharge) at current prices, with their own events and none of its own; selling all starts by
  * collecting the player's ready Refinery batches (#105), which are paid at the Sell bay only.
- * Every ore sale settles the vehicle's lining bill out of its value (#76 amendment, `liningBill.ts`).
+ * Every ore sale pays what it can of the vehicle's lining bill out of its value, the rest carrying
+ * to the visit's next payout (#76 amendment, #128, `liningBill.ts`).
  *
  * Selling, recharging and the quick action are the Sell bay's; repair is the Upgrade bay's (#37),
  * though the quick action at the Sell bay still repairs at the same price.
@@ -48,7 +49,7 @@ import {
 } from './commandRule'
 import { atBayRejection } from './dockRules'
 import type { DomainEventBody, SaleMode, SoldItem } from './domainEvent'
-import { liningPaidOutOf, settleLiningBill } from './liningBill'
+import { liningPaidOutOf, payLiningBillOutOf } from './liningBill'
 import { collectWhenReady, readyRefinedValueOf } from './refinery/refineryCollection'
 
 /** One ore tier, or the whole hold's ore. */
@@ -59,7 +60,7 @@ export interface ServiceQuote {
   saleValue: Money
   /** This player's ready Refinery batches, paid in with the sale (#105). */
   refinedValue: Money
-  /** What selling the whole hold pays of the vehicle's lining bill, out of `saleValue` (#115). */
+  /** What selling the whole hold and collecting pays of the vehicle's lining bill (#115, #128). */
   liningPaid: Money
   repairCost: Money
   rechargeCost: Money
@@ -126,10 +127,11 @@ export function serviceQuote(state: AuthorityState, playerId: string): ServiceQu
     playerId,
     soldItemsOf(vehicleOf(state, playerId).cargo, 'all'),
   )
+  const refinedValue = readyRefinedValueOf(state, playerId)
   return {
     saleValue,
-    refinedValue: readyRefinedValueOf(state, playerId),
-    liningPaid: liningPaidOutOf(state, playerId, saleValue),
+    refinedValue,
+    liningPaid: liningPaidOutOf(state, playerId, add(saleValue, refinedValue)),
     repairCost: repairCostOf(state, playerId),
     rechargeCost: rechargeCostOf(state, playerId),
   }
@@ -241,7 +243,7 @@ function sellOre(state: AuthorityState, playerId: string, selection: OreSelectio
   const value = saleValueOf(state, playerId, items)
   return chainEffects(state, [
     (current) => payForOre(current, playerId, items, selection),
-    (current) => settleLiningBill(current, playerId, value),
+    (current) => payLiningBillOutOf(current, playerId, value),
   ])
 }
 

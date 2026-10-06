@@ -135,8 +135,8 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
 - **Pacing bot** (`src/systems/bot/`, #29): plays `scenarios/bot-slice.scenario.json` through
   authority commands with the #6 movement-time model, buying casing grades on-curve (grade `b`
   before it mines band `b`, grade 5 before the core, S11). Its scripted mining (`drillTile`) lays
-  casing through the player's placement code, one ring per metre, and the lining bill is settled out
-  of each sale (#115); the pacing specs fail a drill dive with no `casing_placed` and a slice that
+  casing through the player's placement code, one ring per metre, and the lining bill is settled per
+  Sell bay visit (#115, #128); the pacing specs fail a drill dive with no `casing_placed` and a slice that
   forgives more than a tenth of the lining it charged. `src/logging/pacingGate.test.ts` fails on a
   missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
   #2 sequence or more than 4 MB of core events and commands in the first hour.

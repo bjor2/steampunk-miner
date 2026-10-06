@@ -4,13 +4,15 @@
  * player's ready batches `floorMilli(units * V(t) * valueMultiplier)` and frees its slot; another
  * player's batch, ready or not, stays where it is. The quick "Sell, repair and recharge" collects
  * first, as part of selling everything. Each batch logs `refine_collected` with what it would have
- * sold for raw and how long its money waited, the balance report's realised refine gain.
+ * sold for raw and how long its money waited, the balance report's realised refine gain. The
+ * payout pays the vehicle's lining bill like an ore sale (#128, `liningBill.ts`).
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { rawRefineValue, refinedValue } from '../../economy/refineryEconomy'
 import { add, toCanonical, ZERO_MONEY, type Money } from '../../money'
 import { withWallet, type AuthorityState } from '../authorityState'
 import {
+  chainEffects,
   firstRejection,
   rejectionOf,
   unchanged,
@@ -20,6 +22,7 @@ import {
 } from '../commandRule'
 import type { DomainEventBody } from '../domainEvent'
 import { atBayRejection } from '../dockRules'
+import { payLiningBillOutOf } from '../liningBill'
 import { readySlotsOf, type RefineryBatch } from './refineryBatch'
 
 export const REFINERY_COLLECTION_RULES: {
@@ -69,6 +72,14 @@ function readyBatchesOf(state: AuthorityState, playerId: string): ReadyBatch[] {
 }
 
 function collectReadyBatches(state: AuthorityState, playerId: string): RuleEffect {
+  const proceeds = readyRefinedValueOf(state, playerId)
+  return chainEffects(state, [
+    (current) => payOutReadyBatches(current, playerId),
+    (current) => payLiningBillOutOf(current, playerId, proceeds),
+  ])
+}
+
+function payOutReadyBatches(state: AuthorityState, playerId: string): RuleEffect {
   const ready = readyBatchesOf(state, playerId)
   const paid = withWallet(
     state,

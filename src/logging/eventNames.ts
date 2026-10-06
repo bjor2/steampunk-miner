@@ -125,7 +125,8 @@ export const RUN_EVENT_REGISTRY = {
       mode: { oneOf: ['all', 'single'] },
     },
   },
-  // #76 amendment (#115): the lining bill paid out of a sale, capped at its value; the rest forgiven.
+  // #76 amendment (#115, #128): what a Sell bay payout paid of the bill it found (forgiven 0), or,
+  // on leaving the bay, the bill the visit's payouts could not cover (paid 0, all forgiven).
   lining_settled: {
     group: 'platform',
     level: 'core',

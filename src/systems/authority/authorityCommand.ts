@@ -25,8 +25,10 @@ import type { BayId } from '../world/dockBays'
  * 11: scripted mining (`drillTile`) lays and charges casing as a pose's drilling does, lining is
  *    charged per metre of tunnel axis, not per ring, and onto the vehicle's lining bill, settled
  *    out of the next sale as `LiningSettled` instead of debited mid-dive (#115, #76 amendment).
+ * 12: the bill is settled per Sell bay visit (#128): each payout, collected Refinery batches too,
+ *    logs what it paid as `LiningSettled`, and undocking logs what the visit forgave.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 11
+export const AUTHORITY_PROTOCOL_VERSION = 12
 
 export interface CommandPayloads {
   /**

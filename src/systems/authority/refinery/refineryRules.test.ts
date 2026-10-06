@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { oreTier } from '../../economy/oreEconomy'
 import { refinedValue } from '../../economy/refineryEconomy'
-import { add, toCanonical } from '../../money'
+import { add, sub, toCanonical } from '../../money'
 import { readSnapshot, takeSnapshot } from '../sessionSnapshot'
 import type { DomainEvent } from '../domainEvent'
 import type { ScriptedSession } from '../scriptedSession'
@@ -133,6 +133,8 @@ describe('refinery timer and collection', () => {
     session.submit(tick + 1, queue(4))
     dockAtBayOf(session, tick + 1 + REFINE_TICKS, REFINERY_SITE, 'sell')
     const before = session.state().players.p1.wallet
+    // Scripted mining lines its tiles (#115), and the payout settles that lining bill (#128).
+    const bill = session.vehicle().liningBill
     const events = session.submit(tick + 2 + REFINE_TICKS, collect)
     expect(eventOf(events, 'RefineCollected')).toMatchObject({
       slot: 0,
@@ -142,7 +144,7 @@ describe('refinery timer and collection', () => {
       queuedPlanet: 3,
     })
     expect(toCanonical(session.state().players.p1.wallet)).toBe(
-      toCanonical(add(before, refinedValue(TIER, 4))),
+      toCanonical(sub(add(before, refinedValue(TIER, 4)), bill)),
     )
     expect(session.state().platform.refinerySlots).toEqual([null])
   })

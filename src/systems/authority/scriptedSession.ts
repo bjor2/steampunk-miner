@@ -20,20 +20,24 @@ export const WORLD_SEED = 83921
 export const PARAMS = planetParamsFor(WORLD_SEED, 1)
 export const SITE = dockSiteOf(PARAMS)
 
-export type ScriptedSession = ReturnType<typeof createScriptedSession>
+export type ScriptedSession = ReturnType<typeof continueScriptedSession>
 
 export function createScriptedSession(playerIds: readonly string[] = ['p1']) {
-  let outcome: CommandOutcome = {
-    state: createAuthorityState({ planetIndex: 1, planetSeed: WORLD_SEED, playerIds }),
-    events: [],
-  }
+  return continueScriptedSession(
+    createAuthorityState({ planetIndex: 1, planetSeed: WORLD_SEED, playerIds }),
+  )
+}
+
+/** A session that picks up from `start`, for a state no short script reaches (a large bill). */
+export function continueScriptedSession(start: AuthorityState) {
+  let outcome: CommandOutcome = { state: start, events: [] }
   const seqs = new Map<string, number>()
   const keep = (step: CommandOutcome) => {
     outcome = { state: step.state, events: [...outcome.events, ...step.events] }
     return step.events
   }
   const nextSeq = (playerId: string) => {
-    seqs.set(playerId, (seqs.get(playerId) ?? 0) + 1)
+    seqs.set(playerId, (seqs.get(playerId) ?? start.players[playerId]?.lastSeq ?? 0) + 1)
     return seqs.get(playerId) as number
   }
   return {
