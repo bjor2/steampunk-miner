@@ -17,3 +17,8 @@ The game's design is [docs/design.md](docs/design.md); planning lives in this re
 (https://bjor2.github.io/steampunk-miner/status/) with one line:
 `scripts/status/loop-status.sh <loop> <working|idle|paused|blocked> [--issue N] [--slot S] [--note "text"]`
 — see [docs/loop-status.md](docs/loop-status.md).
+
+**Features:** when you ship or plan a player-facing feature, update
+[docs/features/features.json](docs/features/features.json) (shown at
+https://bjor2.github.io/steampunk-miner/status/#features) — see
+[docs/features/README.md](docs/features/README.md).

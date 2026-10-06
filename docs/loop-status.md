@@ -1,7 +1,9 @@
 # Loop status: the one-liner
 
-The status dashboard — **https://bjor2.github.io/steampunk-miner/status/** — shows the issue
-trees and what every automated loop is doing. A loop reports its state with one command:
+The status dashboard — **https://bjor2.github.io/steampunk-miner/status/** — has three tabs, each
+linkable: **Issue trees** (`#issues`), **Loops** (`#loops`, the default) and **Features**
+(`#features`, the game feature tree). It shows the issue trees and what every automated loop is
+doing. A loop reports its state with one command:
 
 ```bash
 scripts/status/loop-status.sh <loop> <working|idle|paused|blocked> [--issue N] [--slot S] [--note "text"]
@@ -9,7 +11,7 @@ scripts/status/loop-status.sh <loop> <working|idle|paused|blocked> [--issue N] [
 
 On the box the same script lives at `/workspace/claude-sessions/loop-status.sh`.
 
-The page also has a **Performance** section: one chart per measured metric over commits, read from
+The Loops tab also has a **Performance** section: one chart per measured metric over commits, read from
 `docs/perf/history.ndjson` and `docs/perf/metrics.json`. If you measured anything, record it with
 `npm run perf:record` and commit the `history.ndjson` line; a new metric is a new id, added to
 `metrics.json`. See [docs/perf/README.md](perf/README.md).
@@ -41,6 +43,14 @@ loop-status.sh --show                              # print the published loops.j
   `state`, `issue`, `note` and any extra fields (the build-loop driver sends `extra.push_pending`,
   `extra.active`, `extra.max`, `extra.attempts`, which the page shows).
 
+## Feature tree
+
+The **Features** tab (https://bjor2.github.io/steampunk-miner/status/#features) renders
+[`docs/features/features.json`](features/features.json). **When you ship or plan a player-facing
+feature, update that file in the same change** (status `built` / `partial` / `planned`, plus the
+issue numbers). Each feature shows the live open/closed state of its issues, and a **⚑ check**
+marker when its status looks out of date. Format and rules: [docs/features/README.md](features/README.md).
+
 ## How it works
 
 - `loops.json` lives on the orphan branch **`loop-status`** (no code, no history on main). The
@@ -51,7 +61,8 @@ loop-status.sh --show                              # print the published loops.j
   once per 90 s); a push to `loop-status` cannot trigger it because that branch has no workflows.
 - The Pages workflow builds the game exactly as before, then runs
   `scripts/status/build-status.mjs`, which writes `dist/status/` (issue tree from GraphQL
-  sub-issues, loops.json, last workflow runs, and the Performance charts from `docs/perf/`). Triggers: every ~10 min, issue events, pushes to
+  sub-issues, loops.json, last workflow runs, the Performance charts from `docs/perf/`, and
+  `features.json` from `docs/features/` joined with the issue states). Triggers: every ~10 min, issue events, pushes to
   main, and dispatch. The page itself re-reads `loops.json` live from the branch every 60 s, so
   loop state shows within about a minute even between builds.
 - Workflows listed in `WORKFLOWS` in `build-status.mjs` with a `loop` name (today
