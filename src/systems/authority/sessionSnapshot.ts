@@ -4,7 +4,9 @@
  * the checkpoint save contents and the co-op join snapshot (#3, #4).
  *
  * Restoring refuses, never migrates: a version mismatch, a malformed state or a digest that does
- * not match the state is a listed problem, and nothing is restored.
+ * not match the state is a listed problem, and nothing is restored. The slices' save sections
+ * ride along under an optional `slices` key, each checked by its own version
+ * (`sliceSectionSnapshot.ts`), so adding one never bumps `SNAPSHOT_VERSION`.
  */
 import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
 import { GENERATOR_VERSION } from '../generatorVersion'
@@ -23,6 +25,12 @@ import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPlatformVisualState, type PlatformState } from './platformState'
 import { copyRefinerySlots, refinerySlotsProblems } from './refinery/refineryBatch'
+import {
+  portableSectionsOf,
+  portableSectionsProblems,
+  sectionsOfPortable,
+  type PortableSections,
+} from './sliceSectionSnapshot'
 import { stateDigest } from './stateDigest'
 import {
   portableVehicleOf,
@@ -71,6 +79,8 @@ export interface PortableState {
   collapse: CollapseState
   lava: LavaState
   debugApplied: boolean
+  /** The session sections; omitted while none is registered. */
+  slices?: PortableSections
 }
 
 export interface PortablePlayer {
@@ -78,6 +88,8 @@ export interface PortablePlayer {
   lastSeq: number
   vehicle: PortableVehicle
   artefact: HeldArtefact | null
+  /** The player sections; omitted while none is registered. */
+  slices?: PortableSections
 }
 
 export function takeSnapshot(state: AuthorityState): SessionSnapshot {
@@ -102,6 +114,7 @@ function portableStateOf(state: AuthorityState): PortableState {
           lastSeq: player.lastSeq,
           vehicle: portableVehicleOf(player.vehicle),
           artefact: player.artefact === null ? null : { ...player.artefact },
+          ...portableSectionsOf(player.slices, 'player'),
         },
       ]),
     ),
@@ -112,6 +125,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     collapse: portableCollapseOf(state.collapse),
     lava: portableLavaOf(state.lava),
     debugApplied: state.debugApplied,
+    ...portableSectionsOf(state.slices, 'session'),
   }
 }
 
@@ -145,6 +159,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     collapse: portableCollapseOf(portable.collapse),
     lava: portableLavaOf(portable.lava),
     debugApplied: portable.debugApplied,
+    ...sectionsOfPortable(portable.slices, 'session'),
   }
 }
 
@@ -154,6 +169,7 @@ function playerStateOf(player: PortablePlayer): PlayerState {
     lastSeq: player.lastSeq,
     vehicle: vehicleOfPortable(player.vehicle),
     artefact: player.artefact === null ? null : { ...player.artefact },
+    ...sectionsOfPortable(player.slices, 'player'),
   }
 }
 
@@ -189,6 +205,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),
+    ...portableSectionsProblems(state.slices, 'session', 'snapshot.state'),
   ]
 }
 
@@ -222,6 +239,7 @@ function portablePlayerProblems(id: string, player: unknown): string[] {
   return [
     ...portableVehicleProblems(player.vehicle, `${path}.vehicle`),
     ...heldArtefactProblems(player.artefact, `${path}.artefact`),
+    ...portableSectionsProblems(player.slices, 'player', path),
   ]
 }
 

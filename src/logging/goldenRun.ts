@@ -8,12 +8,18 @@
  *   without saying so. Fail; bump the version that owns the change.
  * - A version differs: the file is stale. Fail with "regenerate the golden file", so a digest
  *   change always arrives as a version bump plus a visible diff of the file in the same commit.
+ *
+ * `sliceSections` records each registered save section's version (feature-slices.md 5.4), written
+ * only while one is registered, so a build without sections writes the files byte for byte as
+ * before. It is compared exactly both ways: a slice section change needs that section's version
+ * bump and a regenerated golden, never `SNAPSHOT_VERSION`.
  */
 import { AUTHORITY_PROTOCOL_VERSION } from '../systems/authority/authorityCommand'
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { GENERATOR_VERSION } from '../systems/generatorVersion'
 import { NUMBER_FORMAT_VERSION } from '../systems/money'
+import { saveSectionsOf } from '../systems/registries/saveSections'
 import { stampScript, type GoldenScript } from '../systems/replay/goldenScripts'
 import { firstDigestMismatch, replayRun, type DigestRecord } from '../systems/replay/replayRun'
 import { minedOrderOf, type MinedOre, type MinedRun } from './minedOrder'
@@ -24,7 +30,18 @@ export interface GoldenVersions {
   authorityProtocolVersion: number
   logSchemaVersion: number
   numberFormatVersion: number
+  /** Each registered save section's version by id; omitted while none is registered. */
+  sliceSections?: Record<string, number>
 }
+
+type NumberVersionName = Exclude<keyof GoldenVersions, 'sliceSections'>
+
+const NUMBER_VERSION_NAMES: readonly NumberVersionName[] = [
+  'generatorVersion',
+  'authorityProtocolVersion',
+  'logSchemaVersion',
+  'numberFormatVersion',
+]
 
 export interface GoldenRun extends GoldenVersions {
   name: string
@@ -48,6 +65,17 @@ export function currentGoldenVersions(): GoldenVersions {
     authorityProtocolVersion: AUTHORITY_PROTOCOL_VERSION,
     logSchemaVersion: LOG_SCHEMA_VERSION,
     numberFormatVersion: NUMBER_FORMAT_VERSION,
+    ...sliceSectionVersions(),
+  }
+}
+
+/** `{ sliceSections }` of every registered section, session then player, sorted by id. */
+function sliceSectionVersions(): Pick<GoldenVersions, 'sliceSections'> {
+  const sections = [...saveSectionsOf('session'), ...saveSectionsOf('player')]
+  if (sections.length === 0) return {}
+  const sorted = sections.sort((a, b) => (a.id === b.id ? 0 : a.id < b.id ? -1 : 1))
+  return {
+    sliceSections: Object.fromEntries(sorted.map((section) => [section.id, section.version])),
   }
 }
 
@@ -80,13 +108,29 @@ export function goldenRunProblems(golden: GoldenRun): string[] {
 
 function staleVersionProblems(golden: GoldenRun): string[] {
   const current = currentGoldenVersions()
-  return (Object.keys(current) as (keyof GoldenVersions)[])
-    .filter((version) => golden[version] !== current[version])
-    .map(
-      (version) =>
-        `${golden.name}: ${version} is ${golden[version]} in the file and ${current[version]} ` +
-        `in the code; ${REGENERATE_HINT}`,
-    )
+  return [
+    ...staleNumberVersionProblems(golden, current),
+    ...staleSliceSectionProblems(golden, current),
+  ]
+}
+
+function staleNumberVersionProblems(golden: GoldenRun, current: GoldenVersions): string[] {
+  return NUMBER_VERSION_NAMES.filter((version) => golden[version] !== current[version]).map(
+    (version) =>
+      `${golden.name}: ${version} is ${golden[version]} in the file and ${current[version]} ` +
+      `in the code; ${REGENERATE_HINT}`,
+  )
+}
+
+/** Exact both ways: a section added, dropped or re-versioned since the file was written. */
+function staleSliceSectionProblems(golden: GoldenRun, current: GoldenVersions): string[] {
+  const inFile = JSON.stringify(golden.sliceSections ?? {})
+  const inCode = JSON.stringify(current.sliceSections ?? {})
+  if (inFile === inCode) return []
+  return [
+    `${golden.name}: sliceSections are ${inFile} in the file and ${inCode} in the code; ` +
+      REGENERATE_HINT,
+  ]
 }
 
 function replayProblems(golden: GoldenRun, framesPerSecond: number | undefined): string[] {

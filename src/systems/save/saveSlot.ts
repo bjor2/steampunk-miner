@@ -6,6 +6,10 @@
  *            blocks warning or refilling (#43)
  *   profile  per player the wallet, the last seq and the vehicle (integer levels, never stats)
  *
+ * The slices' save sections ride inside these two parts (feature-slices.md 3.13): the session
+ * sections as `world.slices`, the player sections in each profile player, both omitted while none
+ * is registered, so neither the header nor `SAVE_FORMAT_VERSION` changes for them.
+ *
  * Both sections carry the header's `saveEpoch`, so a world can never be paired with a profile
  * from another write; they stay separately addressable so co-op can split them into two files.
  * The sections are cut from the session snapshot (#11 section 5) and joined back into one before
@@ -59,6 +63,8 @@ export interface SaveWorldSection {
   collapse: PortableState['collapse']
   lava: PortableState['lava']
   debugApplied: boolean
+  /** The session sections; omitted while none is registered. */
+  slices?: PortableState['slices']
 }
 
 export interface SaveProfileSection {
@@ -95,6 +101,7 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     collapse: state.collapse,
     lava: state.lava,
     debugApplied: state.debugApplied,
+    ...(state.slices === undefined ? {} : { slices: state.slices }),
   }
 }
 
@@ -133,6 +140,7 @@ function snapshotOfSaveSlot(file: SaveSlotFile): SessionSnapshot {
       collapse: world.collapse,
       lava: world.lava,
       debugApplied: world.debugApplied,
+      ...(world.slices === undefined ? {} : { slices: world.slices }),
     },
   }
 }

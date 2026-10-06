@@ -8,6 +8,7 @@
  * The vehicle's physics pose is client-owned (#3); the authority keeps the last reported one.
  */
 import { ZERO_MONEY, type Money } from '../money'
+import { initialSectionsOf, type SliceSections } from '../registries/saveSections'
 import { newVehicleState, type VehicleState } from '../vehicle/vehicleState'
 import { EMPTY_WORLD, type WorldState } from '../world/worldState'
 import { NO_COLLAPSE, type CollapseState } from './collapse/collapseState'
@@ -25,6 +26,8 @@ export interface PlayerState {
   vehicle: VehicleState
   /** At most one artefact in the slice (#46); null until a cache is chosen from. */
   artefact: HeldArtefact | null
+  /** The slices' player sections (feature-slices.md 3.13); omitted while none is registered. */
+  slices?: SliceSections
 }
 
 export interface AuthorityState {
@@ -44,6 +47,8 @@ export interface AuthorityState {
   lava: LavaState
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
+  /** The slices' session sections (feature-slices.md 3.13); omitted while none is registered. */
+  slices?: SliceSections
 }
 
 export interface SessionStart {
@@ -65,6 +70,7 @@ export function createAuthorityState(start: SessionStart): AuthorityState {
     collapse: NO_COLLAPSE,
     lava: NO_LOOSE_LAVA,
     debugApplied: false,
+    ...initialSectionsOf('session'),
   }
 }
 
@@ -74,6 +80,7 @@ function newPlayerState(planet: SessionPlanet): PlayerState {
     lastSeq: 0,
     vehicle: newVehicleState(dockSiteOfPlanet(planet), 0),
     artefact: null,
+    ...initialSectionsOf('player'),
   }
 }
 
