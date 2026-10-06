@@ -22,7 +22,8 @@ clone before committing the first `.blend`; without it git stores the file whole
 
 ```
 art/
-  asset-manifest.json            the #51 inventory: id, source, form, status, placeholder colours
+  assets/<id>.json               the #51 inventory, one manifest entry per asset: id, source, form,
+                                 status, placeholder colours
   asset-rules.json               vehicle part names, px per metre, atlas limits (read by TS and Python)
   placeholders/<id>.parts.json   checked-in placeholder sidecars, one per Blender parts asset
   blender/<id>/<id>.blend        sources, Git LFS
@@ -34,12 +35,44 @@ scripts/art/
   encode.sh                      toktx: PNG bakes to KTX2 maps
   asset_layout.py                part ids, atlas packing, the sidecar (no bpy)
   repack_placeholder.py          re-packs a hand-edited placeholder sidecar
+  merge_check.sh                 shows two art branches merge with no hand edits (#116)
 public/assets/<category>/<id>/   generated exports only: <id>.parts.json and <id>.<map>.ktx2
 src/ui/icons/<id>.svg            vector icons; the data-testid is the file stem
 ```
 
 The category is the id's prefix: `vehicle` (and the vehicle modules, `vehicle-*`), `platform-*`,
 `enemy-*`, `prop-*`, `ground-*` and `casing-*`.
+
+## Adding an asset
+
+Every file an asset needs is a file of its own, so two branches that each add an asset merge with
+no hand edits (#116). Create:
+
+1. `art/assets/<id>.json`, the asset's manifest entry. The file name is its id (the lint checks it).
+2. For a Blender `parts` asset, `art/placeholders/<id>.parts.json`, its placeholder sidecar.
+3. Its spec, `src/systems/art/<module>Art.test.ts`, one per module (see `autoGunsArt.test.ts` or
+   `blastingChargesArt.test.ts`). Don't add module cases to the shared `assetManifest`,
+   `assetLook` or `partsSidecar` specs.
+
+Don't edit a shared list: no manifest file and no catalogue imports. The loader
+`src/scene/shippedArt.ts` finds every entry file, placeholder sidecar and exported sidecar with
+`import.meta.glob` and sorts them by id into the `ArtCatalogue` that the pure rules in
+`src/systems/art` take as an argument. `systems/` imports no `import.meta`, so it stays testable in
+node. The export script reads the asset's own entry file.
+
+The one code change left is the id itself. #52 derives every id from a registry. An asset of a
+registered kind (an economy enemy, a platform bay, an upgrade track) is derived already. An asset
+whose name comes from a new place (the first art of a schedule row, like the charge rack) adds that
+derivation to `src/systems/art/artIds.ts`, or the lint rejects the id.
+
+`npm run art:merge-check` proves this from the committed HEAD in a throwaway clone. Two branches add
+assets whose ids sort next to each other, and they merge cleanly. A control pair that appends to one
+shared file must conflict.
+
+**Why one file per asset, not a sorted generated manifest:** a committed generated file still
+conflicts when two branches add neighbouring ids, and a generated file that isn't committed would
+have to be rebuilt before every typecheck, test and Python export. One file per asset never
+conflicts, and the folder is the list.
 
 ## Exporting an asset
 
@@ -244,9 +277,9 @@ magenta quad.
 keep the placeholder's part ids and tiers (S7a–S7d acceptance; the lint checks it). To change a placeholder, edit its part list, then run
 `python3 scripts/art/repack_placeholder.py <id>` and `npm run format`.
 
-To ship real art: export it, set its manifest entry to `"status": "final"`, add its exported
-sidecar to `EXPORTED_SIDECARS` in `src/systems/art/artCatalogue.ts`, and commit the `.blend` (LFS)
-together with the files under `public/assets/`.
+To ship real art: export it, set `"status": "final"` in `art/assets/<id>.json`, and commit the
+`.blend` (LFS) together with the files under `public/assets/`. The loader finds the exported
+sidecar on its own.
 
 ## Drawing final art
 
@@ -278,6 +311,7 @@ picks it up like the other two enemies.
 - the manifest isn't the #51 inventory under the #52 ids: every Blender asset and vector icon
   derived from the registries is listed, nothing unknown is listed, and every Blender placeholder
   has a colour
+- an entry file under `art/assets/` isn't named `<id>.json` for the id it holds
 - a file under `public/assets/` or `src/ui/icons/` has no final manifest entry, or isn't a file its
   form ships (so a raster icon fails), or a final entry is missing one of its files
 - a sidecar (placeholder or exported) fails schema 1: wrong ids or tiers, a zero-size or
