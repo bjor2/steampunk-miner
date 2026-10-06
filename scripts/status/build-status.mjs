@@ -6,14 +6,23 @@
 // section of the Issue trees tab from the committed docs/metrics/tickets/ files (#134), and the
 // game feature tree from docs/features/features.json joined with the live issue states, with
 // those ticket times rolled up per feature and area (#135) over each ticket's claimed-to-done
-// window, under a "Tickets closed over time" chart from the same issue list (#138). Static output,
-// no server.
+// window, under a "Tickets closed over time" chart from the same issue list (#138). The Issue trees
+// status filter and issue cards (#194) run in the page from the three issue*.mjs modules copied
+// next to index.html, fed by status.json (issues with their in-progress label time, the published
+// slots.json and each measured ticket's phase bar). Static output, no server.
 //
 //   node scripts/status/build-status.mjs [--out dist/status]
 //
 // Auth: GITHUB_TOKEN / GH_TOKEN when set (Actions), else the logged-in `gh` CLI (local runs).
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { annotateFeatures, validateFeatures } from './features.mjs'
@@ -22,10 +31,15 @@ import {
   renderFeatureTimeOverview,
   withFeatureTimeBars,
 } from './featureTimeHtml.mjs'
+import { labelAppliedAt } from './issueClaims.mjs'
 import { buildPerfOverview } from './perfOverview.mjs'
 import { renderPerfOverview, renderPerfOverviewFailure } from './perfOverviewHtml.mjs'
 import { SHOWN_CATEGORIES, buildTicketTimeOverview } from './ticketTimeOverview.mjs'
-import { renderTicketTimeFailure, renderTicketTimeOverview } from './ticketTimeOverviewHtml.mjs'
+import {
+  renderTicketTimeFailure,
+  renderTicketTimeOverview,
+  ticketPhaseSummaryOf,
+} from './ticketTimeOverviewHtml.mjs'
 import { buildTicketsClosedOverTime } from './ticketsClosed.mjs'
 import { renderTicketsClosedFailure, renderTicketsClosedOverTime } from './ticketsClosedHtml.mjs'
 
@@ -41,6 +55,8 @@ const TICKETS_CLOSED_PLACEHOLDER = '<!-- tickets-closed -->'
 const DAY_LENGTH = 'YYYY-MM-DD'.length
 const FEATURES_FILE = 'docs/features/features.json'
 const FEATURES_PATH = join(HERE, '..', '..', FEATURES_FILE)
+// The page imports these as they are: the Issue trees filter and cards (#194).
+const PAGE_MODULES = ['issueBuckets.mjs', 'issueClaims.mjs', 'issueListHtml.mjs']
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
 const [OWNER, NAME] = REPO.split('/')
 const LOOP_BRANCH = process.env.LOOP_STATUS_BRANCH || 'loop-status'
@@ -118,10 +134,20 @@ query($owner: String!, $name: String!, $cursor: String) {
         subIssues(first: 100) { nodes { number } }
         blockedBy(first: 30) { nodes { number state title } }
         blocking(first: 30) { nodes { number state } }
+        timelineItems(last: 20, itemTypes: [LABELED_EVENT]) {
+          nodes { ... on LabeledEvent { createdAt label { name } } }
+        }
       }
     }
   }
 }`
+
+// When the in-progress label still on the issue was applied: the started time when no loop
+// reports a claim time (#194).
+function inProgressSince(node) {
+  if (!node.labels.nodes.some((l) => l.name === 'in-progress')) return null
+  return labelAppliedAt(node.timelineItems.nodes, 'in-progress')
+}
 
 async function fetchIssues() {
   const issues = []
@@ -146,6 +172,7 @@ async function fetchIssues() {
         summary: n.subIssuesSummary,
         blockedBy: n.blockedBy.nodes,
         blocking: n.blocking.nodes.map((b) => b.number),
+        inProgressAt: inProgressSince(n),
       })
     }
     if (!page.pageInfo.hasNextPage) break
@@ -164,6 +191,27 @@ async function fetchLoops() {
   } catch (err) {
     console.warn(`loops.json unavailable: ${err.message}`)
     return { schema: 1, entries: {}, events: [], error: String(err.message) }
+  }
+}
+
+// The loop's published slot snapshot, next to loops.json (loop README "slots.json v2"). Only the
+// documented fields are kept: the page is public.
+function publishedSlotsOf(doc) {
+  if (!doc) return null
+  const { updated_at, accounts, grok, claude } = doc
+  return { updated_at, accounts, grok, claude }
+}
+
+async function fetchSlots() {
+  try {
+    const doc = await rest(`repos/${REPO}/contents/slots.json?ref=${LOOP_BRANCH}`, {
+      raw: true,
+      allow404: true,
+    })
+    return publishedSlotsOf(doc)
+  } catch (err) {
+    console.warn(`slots.json unavailable: ${err.message}`)
+    return null
   }
 }
 
@@ -274,6 +322,14 @@ function buildTicketTimeSection() {
   }
 }
 
+// Each measured ticket's own bar for its issue card; a broken ticket file already left the model.
+function ticketPhasesOf(ticketTimeModel) {
+  const tickets = ticketTimeModel.tickets ?? []
+  return Object.fromEntries(
+    tickets.map((ticket) => [ticket.ticket, ticketPhaseSummaryOf(ticket, SHOWN_CATEGORIES)]),
+  )
+}
+
 async function fetchLastCommitOf(path) {
   try {
     const commits = await rest(`repos/${REPO}/commits?path=${encodeURIComponent(path)}&per_page=1`)
@@ -379,9 +435,10 @@ const perf = buildPerfSection()
 const ticketTime = buildTicketTimeSection()
 const pageBeforeFeatures = pageWithSections(perf.html, ticketTime.html)
 
-const [issues, loops, workflows, featuresCommit] = await Promise.all([
+const [issues, loops, slots, workflows, featuresCommit] = await Promise.all([
   fetchIssues(),
   fetchLoops(),
+  fetchSlots(),
   fetchWorkflows(),
   fetchLastCommitOf(FEATURES_FILE),
 ])
@@ -415,6 +472,8 @@ const status = {
   loopBranch: LOOP_BRANCH,
   issues,
   loops,
+  slots,
+  phases: ticketPhasesOf(ticketTime.model),
   workflowLoops: workflowLoopEntries(workflows),
   workflows,
 }
@@ -426,6 +485,7 @@ writeFileSync(join(OUT, 'perf.json'), JSON.stringify(perf.model))
 writeFileSync(join(OUT, 'ticket-time.json'), JSON.stringify(ticketTime.model))
 writeFileSync(join(OUT, 'features.json'), JSON.stringify(features))
 writeFileSync(join(OUT, 'index.html'), page)
+for (const name of PAGE_MODULES) copyFileSync(join(HERE, name), join(OUT, name))
 for (const [tab, title] of Object.entries(SHORT_LINKS)) {
   mkdirSync(join(OUT, tab), { recursive: true })
   writeFileSync(join(OUT, tab, 'index.html'), shortLinkPage(tab, title))

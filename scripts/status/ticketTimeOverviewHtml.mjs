@@ -85,6 +85,14 @@ function ticketBarHtml(ticket, categories, scale) {
   )
 }
 
+/** One ticket's own bar (full width) and its claimed-to-done time, for its Issue trees card (#194). */
+export function ticketPhaseSummaryOf(ticket, categories) {
+  return {
+    barHtml: ticketBarHtml(ticket, categories, BAR.width / Math.max(claimedSumOf(ticket), 1)),
+    totalText: formatDuration(ticket.claimedToDoneS),
+  }
+}
+
 function ticketRowHtml(ticket, categories, scale) {
   const tag = ticket.backfilled ? ' <span class="muted">backfilled</span>' : ''
   return (

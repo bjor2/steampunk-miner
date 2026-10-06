@@ -5,6 +5,7 @@ import {
   formatDuration,
   renderTicketTimeFailure,
   renderTicketTimeOverview,
+  ticketPhaseSummaryOf,
 } from './ticketTimeOverviewHtml.mjs'
 
 const REPO = 'bjor2/steampunk-miner'
@@ -175,5 +176,13 @@ describe('ticket time overview html', () => {
     expect(formatDuration(1500)).toBe('25 min')
     expect(formatDuration(11034)).toBe('3.1 h')
     expect(formatDuration(null)).toBe('—')
+  })
+
+  it('draws one ticket full width with its claimed-to-done time for its issue card', () => {
+    const [ticket] = buildTicketTimeOverview({ files: [FILES[1]], repo: REPO }).tickets
+    const { barHtml, totalText } = ticketPhaseSummaryOf(ticket, SHOWN_CATEGORIES)
+    expect(barHtml).toContain('<rect x="0" y="0" width="666.7"')
+    expect(barHtml).toContain('<rect x="666.7" y="0" width="333.3"')
+    expect(totalText).toBe('15 min')
   })
 })
