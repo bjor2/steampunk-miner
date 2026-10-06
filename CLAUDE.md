@@ -95,6 +95,8 @@ src/debug      the scenario/debug API (design doc 19-20)
 e2e            Playwright: browser/ on the preview build, packaged/ on the Electron build
 tests          committed golden runs (golden/) and the balance-regression baseline (balance/)
 src/constants  named scene/balance numbers with their origin
+src/features   feature slices, one folder each (docs/standards/feature-slices.md); index.ts is the loader
+src/registries the slice registrar, SliceDefinition and the spec seam withRegistrations
 electron/      main + sandboxed preload + typed bridge (CommonJS, compiled to dist-electron/)
 ```
 
@@ -119,6 +121,15 @@ Repo-specific rules:
 - **Scenarios are refused, never trimmed** (`systems/startScenario`): every problem listed, nothing applied.
 - **Data-driven content** (design 18): definitions are data under `src/` consumed by pure rules, not
   `if` ladders in components. Asset discovery via `import.meta.glob` stays in loader modules.
+- **Feature slices** ([feature-slices.md](docs/standards/feature-slices.md), template
+  [slice-template.md](docs/standards/slice-template.md)): feature code lives in `src/features/<slice>/`;
+  the rest of `src/` is the kernel. Another slice imports a slice only through its `index.ts`; nothing
+  but the composition roots imports the loader, and the kernel never imports a slice (lint). Slices
+  reach the kernel only through `register.ts` and the registries (`systems/registries/`,
+  `ui/registries/`, `debug/debugActionRegistry.ts`), every id prefixed `<slice>.`. **One session, one
+  slice:** a slice ticket edits only its folder, plus version bumps under rule 5.5 and an optional
+  domain-event field it names; any other kernel change is a kernel ticket. Every composition root
+  calls `loadFeatures()` first, and no module reads a registry at import time.
 - **The renderer never gets Node.** New capability = new method on `ShellBridge`
   (`electron/bridgeContract.cts`), validated in `electron/ipcHandlers.cts`.
 

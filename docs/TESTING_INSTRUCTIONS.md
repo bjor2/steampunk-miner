@@ -37,6 +37,12 @@ in the commit.
   `runLogFiles.cts` mirrors `isValidRunId`, which is tested. The save writer (`saveFiles.cts`) is
   smoke-checked by hand in node; the launch flags (`launchOptions.cts`) and the save folder of a
   debug run are checked by the packaged smoke test (section 5).
+- `src/features/<slice>/` – a slice's tests sit beside its code, on the seams of the kernel layer of
+  the same name (`systems/` pure, `store/` actions). `src/testSetup.ts` calls `loadFeatures()`, so
+  every spec runs with the committed slices registered and the registries sealed. A kernel spec that
+  needs a fake registration wraps its assertions in `withRegistrations(slices, run)`
+  (`src/registries/registrar.ts`: synchronous, it restores the loaded set) and never imports a
+  slice. `src/features/sliceBoundaries.test.ts` proves the boundary lint against `eslint.config.js`.
 - `src/systems/bot/` – the pacing bot; `src/systems/replay/` – `replayRun` and the golden scripts.
   Both are pure and run in node (section 4).
 

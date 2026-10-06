@@ -8,3 +8,8 @@ says otherwise, those win.
 
 - [REFERENCE.md](REFERENCE.md) – the rules with before/after code
 - [CHECKLIST.md](CHECKLIST.md) – review checklist, run over every touched file
+
+This repo's own standards sit beside them:
+
+- [feature-slices.md](feature-slices.md) – where feature code lives and how slices reach the kernel (#155)
+- [slice-template.md](slice-template.md) – how to start a slice; `src/features/example/` is its copy
