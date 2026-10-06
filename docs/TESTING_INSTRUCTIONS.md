@@ -171,7 +171,9 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   never, and prints both core times per planet, the blasts and whether each is inside C4. Reported,
   never gated; the one lever is the price per charge (1 to 4 band-5 units). Charge specs stand in
   band-2 rock with `charges/chargeFixtures.ts`; the bot's blasting run starts on planet 7 with a
-  stocked rack and a lagging drill (`bot/botBlasting.test.ts`).
+  stocked rack and a lagging drill (`bot/botBlasting.test.ts`). The bot buys charges only on a
+  planet where it met a tile it would blast with none in stock (#129, `bot/botChargeNeed.test.ts`:
+  an on-curve run plays exactly like `chargePolicy: 'never'`).
 - **Heat** (#113 acceptance 4): `npm run balance:heat` plays the bot scenario to planet 10's core
   and prints planets 8 to 10 (`heatPlanetLines`): each core time against the campaign's 45 to 60
   minutes (C4), when refractory was unlocked, the refractory laid, the throttle and heat-damage
