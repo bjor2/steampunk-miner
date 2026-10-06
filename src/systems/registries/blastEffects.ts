@@ -12,6 +12,11 @@ export interface BlastEvent {
   tx: number
   ty: number
   radiusMm: number
+  /**
+   * The rung on the dynamite ladder (#153, numbers on #143), 1 to 10; `radiusMm` is that rung's
+   * radius. The shipped charge is size 1.
+   */
+  size: number
   playerId: string
   /** What blew: `charge` for the shipped blasting charges. */
   source: string

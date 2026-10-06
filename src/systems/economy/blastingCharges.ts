@@ -47,6 +47,11 @@ export function isInBlastRadius(dxMm: number, dyMm: number): boolean {
   return cmp(fromSafeInteger(dxMm * dxMm + dyMm * dyMm), RADIUS_MM_SQ) <= 0
 }
 
+/** The shipped charge is size 1 of the dynamite ladder (#153: sizes extend `blasting_charges`). */
+export function chargeSize(): number {
+  return 1
+}
+
 /** The blast's radius in whole millimetres, rounded out. */
 export function blastRadiusMm(): number {
   return toSafeInteger(ceil(RADIUS_MM))

@@ -451,7 +451,7 @@ Gate-specific domain events (`DrillGated`) and gates on the blast path need K1 a
 
 ```ts
 // src/systems/registries/blastEffects.ts (new)
-export interface BlastEvent { tx: number; ty: number; radiusMm: number; playerId: string; source: string; tick: number }
+export interface BlastEvent { tx: number; ty: number; radiusMm: number; size: number; playerId: string; source: string; tick: number }
 export interface BlastEffect { id: string; apply(state: AuthorityState, blast: BlastEvent, params: PlanetParams): RuleEffect }
 export function applyBlastEffects(state: AuthorityState, blast: BlastEvent, params: PlanetParams): RuleEffect
 ```
@@ -463,7 +463,7 @@ export function applyBlastEffects(state: AuthorityState, blast: BlastEvent, para
 - Its events append after today's.
 - With no effect registered, the state and events are identical.
 
-Presentation (VFX, audio) listens to domain events (3.12) and never registers here. K3 adds size fields once #153 rules.
+Presentation (VFX, audio) listens to domain events (3.12) and never registers here. K3 (#186) added `size`, the #153 ladder rung (1 to 10) whose radius `radiusMm` carries; the shipped charge blasts as size 1.
 
 ### 3.8 Generation hooks (`ores`, `planet-mix` provide)
 

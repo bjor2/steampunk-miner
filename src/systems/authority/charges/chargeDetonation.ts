@@ -6,7 +6,7 @@
  * and says all of it in one `charge_detonated` ahead of the consequences. The slices' blast effects
  * run last, and their events follow (feature-slices.md 3.7); with none registered nothing changes.
  */
-import { blastRadiusMm } from '../../economy/blastingCharges'
+import { blastRadiusMm, chargeSize } from '../../economy/blastingCharges'
 import { toCanonical } from '../../money'
 import { applyBlastEffects, type BlastEvent } from '../../registries/blastEffects'
 import type { PlantedCharge } from '../../vehicle/vehicleCharges'
@@ -94,6 +94,7 @@ function chargeBlastOf(playerId: string, charge: PlantedCharge, tick: number): B
     tx: charge.tx,
     ty: charge.ty,
     radiusMm: blastRadiusMm(),
+    size: chargeSize(),
     playerId,
     source: 'charge',
     tick,

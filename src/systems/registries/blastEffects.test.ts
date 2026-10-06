@@ -11,6 +11,7 @@ const BLAST: BlastEvent = {
   tx: 3,
   ty: 40,
   radiusMm: 2500,
+  size: 1,
   playerId: 'p1',
   source: 'charge',
   tick: 9,

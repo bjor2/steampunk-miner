@@ -47,13 +47,14 @@ function recordingSliceOf(seen: BlastEvent[]): SliceDefinition {
 }
 
 describe('charge blast effects', () => {
-  it("tells a registered effect the charge's blast, every field an integer", () => {
+  it("tells a registered effect the charge's blast as size 1, every field an integer", () => {
     const seen: BlastEvent[] = []
     blastWith([recordingSliceOf(seen)])
     expect(seen).toEqual([
       {
         ...WALL_TILE,
         radiusMm: blastRadiusMm(),
+        size: 1,
         playerId: 'p1',
         source: 'charge',
         tick: BLAST_TICK,
