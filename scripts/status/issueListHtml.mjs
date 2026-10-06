@@ -22,7 +22,6 @@ const OSLO_DAY = new Intl.DateTimeFormat('en-GB', {
   month: 'short',
 })
 const CLOSE_REASONS = { COMPLETED: 'completed', NOT_PLANNED: 'not planned', DUPLICATE: 'duplicate' }
-const DARK_LABEL_LUMINANCE = 0.35
 
 export function escapeHtml(text) {
   return String(text ?? '').replace(
@@ -67,16 +66,13 @@ function timeHtml(iso, text) {
   return `<time datetime="${escapeHtml(iso)}" title="${escapeHtml(iso)}">${escapeHtml(text)}</time>`
 }
 
-function luminanceOf(hex) {
-  const [r, g, b] = [0, 2, 4].map((at) => parseInt(hex.slice(at, at + 2), 16))
-  return (0.299 * r + 0.587 * g + 0.114 * b) / 255
-}
-
-/** A label chip in the label's GitHub colour; dark colours get light text. */
+/**
+ * A label chip tinted and bordered in the label's GitHub colour. The text stays the page colour,
+ * as in the tree's chips, so pale and dark labels read alike in light and dark mode.
+ */
 export function labelChipHtml(label) {
   const hex = label.color || '777777'
-  const text = luminanceOf(hex) < DARK_LABEL_LUMINANCE ? '#ddd' : `#${hex}`
-  return `<span class="lbl" style="background:#${hex}33;color:${text};border:1px solid #${hex}88">${escapeHtml(label.name)}</span>`
+  return `<span class="lbl" style="background:#${hex}2e;color:var(--text);border:1px solid #${hex}99">${escapeHtml(label.name)}</span>`
 }
 
 /** One button per bucket with its count; the active one is pressed. */
