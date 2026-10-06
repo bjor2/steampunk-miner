@@ -453,6 +453,34 @@
       "group": "Memory soak",
       "better": "lower",
       "source": "preview build, 1000 calls per sample in page, SwiftShader (#119)"
+    },
+    "perfLog.frameStatsPerSecondUs": {
+      "label": "Frame-window stats per second of frames (p50, p95, p99, long frames)",
+      "unit": "µs",
+      "group": "Main-thread profile",
+      "better": "lower",
+      "source": "throwaway A/B on src, 144-frame window, 20,000 repeats, vite-node (#121)"
+    },
+    "runLog.fanOutPerLineUs": {
+      "label": "Run-log fan-out per line, NDJSON text excluded (summary + progress folds)",
+      "unit": "µs",
+      "group": "Main-thread profile",
+      "better": "lower",
+      "source": "throwaway A/B on src, a captured ?debug session's 490 lines x 40, vite-node (#121)"
+    },
+    "listenerCount.addRemovePairNs": {
+      "label": "addEventListener + removeEventListener pair, test runs (listener counter, #121)",
+      "unit": "ns",
+      "group": "Main-thread profile",
+      "better": "lower",
+      "source": "throwaway A/B on Node's EventTarget, 200,000 pairs, vite-node (#121)"
+    },
+    "perfLog.memorySampleBuildUs": {
+      "label": "Building one memory_sample line from its readings",
+      "unit": "µs",
+      "group": "Main-thread profile",
+      "better": "lower",
+      "source": "throwaway bench on src, 20,000 builds, vite-node (#121)"
     }
   }
 }
