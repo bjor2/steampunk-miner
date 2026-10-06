@@ -1,18 +1,23 @@
 #!/usr/bin/env node
 // Builds the status dashboard (dist/status/) that the Pages workflow deploys next to the game:
 // the issue trees (sub-issue hierarchy) from GraphQL, the loop state from loops.json on the
-// orphan `loop-status` branch, and the last run of each workflow. Static output, no server.
+// orphan `loop-status` branch, the last run of each workflow, and the Performance charts from
+// the committed docs/perf/ files (static HTML + SVG, no script). Static output, no server.
 //
 //   node scripts/status/build-status.mjs [--out dist/status]
 //
 // Auth: GITHUB_TOKEN / GH_TOKEN when set (Actions), else the logged-in `gh` CLI (local runs).
-/* global process, fetch, console -- Node 22 script, run by the Pages workflow */
 import { execFileSync } from 'node:child_process'
-import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { buildPerfOverview } from './perfOverview.mjs'
+import { renderPerfOverview, renderPerfOverviewFailure } from './perfOverviewHtml.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
+// The Pages job checks out with depth 1, so the perf files are read, never asked of git.
+const PERF_DIR = join(HERE, '..', '..', 'docs', 'perf')
+const PERF_PLACEHOLDER = '<!-- perf-overview -->'
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
 const [OWNER, NAME] = REPO.split('/')
 const LOOP_BRANCH = process.env.LOOP_STATUS_BRANCH || 'loop-status'
@@ -198,6 +203,46 @@ function workflowLoopEntries(workflows) {
   return entries
 }
 
+function readPerfInputs() {
+  return {
+    historyText: readFileSync(join(PERF_DIR, 'history.ndjson'), 'utf8'),
+    registry: JSON.parse(readFileSync(join(PERF_DIR, 'metrics.json'), 'utf8')),
+    repo: REPO,
+  }
+}
+
+function warnPerfProblems(model) {
+  for (const id of model.unregistered) {
+    console.warn(`perf: metric "${id}" is not in docs/perf/metrics.json (charted as is)`)
+  }
+  for (const problem of model.problems) console.warn(`perf: ${problem}`)
+}
+
+// A broken perf file or renderer must not take the loops and issue trees down with it: the
+// section then shows the error and the build goes on.
+function buildPerfSection() {
+  try {
+    const model = buildPerfOverview(readPerfInputs())
+    warnPerfProblems(model)
+    return { model, html: renderPerfOverview(model) }
+  } catch (err) {
+    console.warn(`perf overview failed: ${err.message}`)
+    return { model: { error: String(err.message) }, html: renderPerfOverviewFailure(err.message) }
+  }
+}
+
+function pageWithPerfSection(perfHtml) {
+  const page = readFileSync(join(HERE, 'index.html'), 'utf8')
+  if (!page.includes(PERF_PLACEHOLDER)) {
+    throw new Error(`index.html lacks the ${PERF_PLACEHOLDER} placeholder`)
+  }
+  return page.replace(PERF_PLACEHOLDER, () => perfHtml)
+}
+
+// Perf first, before any GitHub call, so a perf bug shows at the top of the log.
+const perf = buildPerfSection()
+const page = pageWithPerfSection(perf.html)
+
 const [issues, loops, workflows] = await Promise.all([
   fetchIssues(),
   fetchLoops(),
@@ -229,8 +274,10 @@ const status = {
 mkdirSync(OUT, { recursive: true })
 writeFileSync(join(OUT, 'status.json'), JSON.stringify(status))
 writeFileSync(join(OUT, 'loops.json'), JSON.stringify(loops, null, 2))
-copyFileSync(join(HERE, 'index.html'), join(OUT, 'index.html'))
+writeFileSync(join(OUT, 'perf.json'), JSON.stringify(perf.model))
+writeFileSync(join(OUT, 'index.html'), page)
 console.log(
   `status: ${issues.length} issues, ${Object.keys(loops.entries ?? {}).length} loop entries, ` +
-    `${workflows.length} workflows -> ${OUT}`,
+    `${workflows.length} workflows, ${perf.model.runCount ?? 0} perf runs / ` +
+    `${perf.model.metricCount ?? 0} metrics -> ${OUT}`,
 )
