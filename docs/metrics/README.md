@@ -13,8 +13,9 @@ in the **Where the time goes** section at the top of the **Issue trees** tab
 The page reads only the committed files (`scripts/status/ticketTimeOverview.mjs`), so the Pages job
 builds it without transcripts. Ticket #134 specifies all of this.
 
-The **Features** tab rolls the same files up per feature and feature area; see
-[Roll-up per feature](#roll-up-per-feature-features-tab) below.
+The **Features** tab rolls the same files up per feature and feature area, counting only each
+ticket's [claimed-to-done window](#claimed-to-done-window), under a chart of tickets closed per day;
+see [Roll-up per feature](#roll-up-per-feature-features-tab) below.
 
 ## Categories (schema v1)
 
@@ -84,6 +85,24 @@ from these, with no extra category.
 **Lead time:** created to closed. **Cycle time:** start of the first attempt to closed (`null`
 when no session ever ran).
 
+### Claimed-to-done window
+
+A ticket is **claimed** when its first attempt starts: the first loop session (the `in-progress`
+slot claim), or the first transcript on its branch when no log names one, never before its
+creation. `claimed` is that moment and `claimed_to_done_s` the seconds from it to the close (#138).
+They equal the cycle time's span and are `null` for a ticket no session ever ran.
+
+The Features tab counts only this window (`scripts/metrics/claimedWindow.mjs`):
+
+- every segment before the claim is dropped, whatever its category: waiting for a slot, blocked or
+  waiting on planners before anyone picked the ticket up says nothing about the work;
+- inside the window, every category is kept in its own colour: the session categories, `gates`,
+  `landing`, `idle` between attempts or waiting on a gate slot, and `blocked` and `planner_wait`
+  after the work started;
+- a segment that straddles the claim keeps only its part after it.
+
+The Issue trees tab still draws each ticket from creation to close.
+
 ## File schema (v1)
 
 ```jsonc
@@ -110,19 +129,23 @@ when no session ever ran).
   "totals": { "blocked": 4975, "planner_wait": 0, "idle": 1067 /* …all ten, seconds */ },
   "lead_time_s": 11034,
   "cycle_time_s": 4992,
+  "claimed": "2026-10-06T11:47:40.000Z", // first attempt's start (#138), null with no session
+  "claimed_to_done_s": 4992, // claimed to closed, null with no session
   "backfilled": false,
 }
 ```
 
 `source` is `transcript`, `loop-log`, `github` or `derived` (idle). The totals add up to the lead
-time to within rounding. The writer puts one segment per line and rewrites the same bytes for the
+time to within rounding. `claimed` and `claimed_to_done_s` were added to v1 without a schema
+bump: a reader treats a file without them as never claimed. The writer puts one segment per line and rewrites the same bytes for the
 same inputs, so the folder is excluded from Prettier.
 
 ## Roll-up per feature (Features tab)
 
 The **Features** tab (**https://bjor2.github.io/steampunk-miner/status/#features**) shows the
-ticket times per feature and per feature area of `docs/features/features.json` (#135). The rule
-lives in `scripts/status/featureTime.mjs`:
+ticket times per feature and per feature area of `docs/features/features.json` (#135), each
+ticket cut to its [claimed-to-done window](#claimed-to-done-window) (#138). The rule lives in
+`scripts/status/featureTime.mjs`:
 
 - **A feature's tickets** are its `issues`, plus every sub-issue of an umbrella issue it lists,
   followed down through umbrellas of umbrellas. The umbrella itself is one of the tickets.
@@ -131,23 +154,33 @@ lives in `scripts/status/featureTime.mjs`:
 - **Each ticket counts once per node**, however many paths reach it. A ticket shared by two
   features counts in both, but only once in the group above them, so an area's total is never a
   plain sum of its features.
-- **Measured** tickets have a file in `docs/metrics/tickets/`; their category totals are added.
-  The others count as **not measured**: shown as a count, never as zero time.
-- Per node: seconds per category, the measured total, the measured and not-measured counts, and
-  from **2 measured tickets** on the median ticket cycle time.
+- **Measured** tickets have a file in `docs/metrics/tickets/` with a claim; their in-window
+  category times are added. The others (no file, or closed with no session) count as **not
+  measured**: shown as a count, never as zero time.
+- Per node: seconds per category inside the window, the total claimed-to-done time, the measured
+  and not-measured counts, and from **2 measured tickets** on the median claimed-to-done time per
+  ticket. These replace lead time as the tab's headline.
 
 What the tab shows (`scripts/status/featureTimeHtml.mjs`):
 
+- at the top, **Tickets closed over time** (`scripts/status/ticketsClosed.mjs`): the `build` and
+  `perf` issues closed each UTC day as bars, from the first close to the day the page is built
+  (days with none at zero), with the running total as a line. It counts what
+  `gh issue list --state closed --label build` (and `--label perf`) lists, not-planned closes
+  included, from the issue list `build-status.mjs` already fetches, so every closed ticket counts
+  with or without a metrics file. A day's hover gives the date, the count and the titles. Beside it,
+  the median `claimed_to_done_s` of the measured tickets closed each day;
 - on every feature row and group heading, a compact stacked bar in the fixed category colours with
-  its total (or "N not measured" when no ticket has a file; nothing when it links no ticket). Its
-  tooltip lists the measured time and counts, the median cycle and each category's time;
+  its total and median (or "N not measured" when no ticket is measured; nothing when it links no
+  ticket). Its tooltip lists the claimed-to-done time and counts, the median and each category's
+  time;
 - above the tree, one bar per feature area on a shared scale, split by category, under the same
   legend as the Issue trees section (`phaseLegendHtml`, colours from `phaseCategories.mjs`), with
   the categories' totals over every ticket the tree links.
 
-`build-status.mjs` reads the sub-issues from the issue list it already fetches and the times from
-the committed files only, so the Pages job builds it with no transcripts. A broken ticket file or
-feature file replaces the chart with its error; the tree still renders.
+`build-status.mjs` reads the sub-issues and the close dates from the issue list it already fetches
+and the times from the committed files only, so the Pages job builds it with no transcripts. A
+broken ticket file or feature file replaces its chart with the error; the tree still renders.
 
 ## Commands (on the build box)
 
@@ -164,7 +197,8 @@ override with `METRICS_LOOP_LOGS=dir1:dir2`) and the transcripts (`~/.claude/pro
 `METRICS_CLAUDE_PROJECTS`). Session log names are read in the box's local time (Europe/Oslo), the
 same clock the loops name them with.
 
-The first backfill (2026-10-06) wrote 28 tickets. Six closed tickets had no transcripts and were
+The first backfill (2026-10-06) wrote 28 tickets; a rerun the same day for #138 added `claimed`
+and `claimed_to_done_s` to all 32 committed files and changed nothing else in them. Six closed tickets had no transcripts and were
 skipped: #83, #97, #98, #105, #111 and #113. `other` was 0.7% of session time.
 
 ## How the loop calls it after a close
