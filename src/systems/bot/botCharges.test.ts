@@ -6,7 +6,13 @@ import { FREEZE_ENEMIES } from '../authority/scriptedSession'
 import { restockPrice } from '../economy/blastingCharges'
 import { restockChargesCommand } from '../platform/platformCommands'
 import type { TilePoint } from '../world/tileGrid'
-import { blastOpen, isBlastWorthIt, restockPriceFor, type ChargePolicy } from './botCharges'
+import {
+  blastOpen,
+  isBlastWorthIt,
+  noteTileWorthACharge,
+  restockPriceFor,
+  type ChargePolicy,
+} from './botCharges'
 import type { BotPlanet } from './botPilot'
 import { NO_TICKS, reportPoseIntent } from './botPose'
 import { createBotSession, type BotSession } from './botSession'
@@ -33,13 +39,13 @@ function botAtUpgradeBayOn(planetIndex: number): BotSession {
 }
 
 /**
- * The bot in band-2 rock with three charges, on the stand tile facing the wall east of it, with
- * `openTilesBehind` tiles carved open to the west.
+ * The bot in band-2 rock with `carried` charges (three by default), on the stand tile facing the
+ * wall east of it, with `openTilesBehind` tiles carved open to the west.
  */
-function botAtWall(openTilesBehind: number, chargePolicy: ChargePolicy = 'blast') {
+function botAtWall(openTilesBehind: number, chargePolicy: ChargePolicy = 'blast', carried = 3) {
   const session = freshSession()
   session.submit(FREEZE_ENEMIES)
-  session.submit(setChargesIntent(3))
+  session.submit(setChargesIntent(carried))
   for (let back = 0; back <= openTilesBehind; back++) carveTile(session, westOf(STAND_TILE, back))
   session.submit(reportPoseIntent(STAND_TILE, 1, NO_TICKS))
   const site = dockSiteOfPlanet(session.state().planet)!
@@ -47,6 +53,7 @@ function botAtWall(openTilesBehind: number, chargePolicy: ChargePolicy = 'blast'
     layout: newMineLayout(paramsOfSession(session.state()), site),
     pilot: { position: STAND_TILE, facing: 1 },
     chargePolicy,
+    hasMetBlastTile: false,
   }
   return { session, planet }
 }
@@ -64,15 +71,31 @@ function carveTile(session: BotSession, tile: TilePoint): void {
 
 describe('bot: blasting charges policy (#109)', () => {
   it('fills the rack at the Upgrade bay from planet 7, and not before', () => {
-    expect(restockPriceFor(botAtUpgradeBayOn(6), 'blast')).toBeNull()
-    expect(restockPriceFor(botAtUpgradeBayOn(7), 'blast')).toEqual(restockPrice(3, 7))
+    expect(restockPriceFor(botAtUpgradeBayOn(6))).toBeNull()
+    expect(restockPriceFor(botAtUpgradeBayOn(7))).toEqual(restockPrice(3, 7))
   })
 
-  it('wants no restock with a full rack, and none in a comparison run without charges', () => {
+  it('wants no restock with a full rack', () => {
     const full = botAtUpgradeBayOn(7)
     full.submit(restockChargesCommand())
-    expect(restockPriceFor(full, 'blast')).toBeNull()
-    expect(restockPriceFor(botAtUpgradeBayOn(7), 'never')).toBeNull()
+    expect(restockPriceFor(full)).toBeNull()
+  })
+
+  it('wants charges once it meets a tile it would blast with none in stock (#129)', () => {
+    const { session, planet } = botAtWall(2, 'blast', 0)
+    noteTileWorthACharge(session, planet, WALL_TILE, HARD_TICKS)
+    expect(planet.hasMetBlastTile).toBe(true)
+  })
+
+  it('wants no charges for a tile at the threshold, with one in stock, or without charges', () => {
+    const atThreshold = botAtWall(2, 'blast', 0)
+    noteTileWorthACharge(atThreshold.session, atThreshold.planet, WALL_TILE, THRESHOLD_TICKS)
+    const stocked = botAtWall(2, 'blast', 1)
+    noteTileWorthACharge(stocked.session, stocked.planet, WALL_TILE, HARD_TICKS)
+    const never = botAtWall(2, 'never', 0)
+    noteTileWorthACharge(never.session, never.planet, WALL_TILE, HARD_TICKS)
+    const flags = [atThreshold, stocked, never].map(({ planet }) => planet.hasMetBlastTile)
+    expect(flags).toEqual([false, false, false])
   })
 
   it('blasts only a tile slower than 96 ticks, with a charge and an open way back', () => {

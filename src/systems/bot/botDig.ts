@@ -2,13 +2,14 @@
  * Opening one neighbouring tile (#29): drive in when it is open, else bore it from where the bot
  * stands for the ticks the #7 drill rule gives, at the drill power the heat gauge leaves (#113),
  * and bore on while the gauge's throttle left the tile standing; a tile worth a blasting charge
- * (#109, `botCharges.ts`) is blasted open instead. A tile that would free lava, or
+ * (#109, `botCharges.ts`) is blasted open instead, and one met with an empty rack makes the next
+ * Upgrade bay visit buy charges (#129). A tile that would free lava, or
  * the bot's tip cannot scratch, is `blocked`; one the tank cannot afford with the way home, `short`.
  */
 import { heatThrottledDrill } from '../authority/heatRules'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
-import { blastOpen, isBlastWorthIt } from './botCharges'
+import { blastOpen, isBlastWorthIt, noteTileWorthACharge } from './botCharges'
 import { canAffordBore } from './botEnergy'
 import { boreTile, enterBoredTile, moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
@@ -48,6 +49,8 @@ function boreOnce(session: BotSession, planet: BotPlanet, tile: TilePoint): Open
   const ticks = boreTicks(drill, planet.layout.params, tile, tileKindAt(session.state(), tile))
   if (ticks === null) return 'blocked'
   if (!canAffordBore(session, planet, ticks)) return 'short'
+  // #129: a tile it would blast with an empty rack is what makes its next visit buy charges.
+  noteTileWorthACharge(session, planet, tile, ticks)
   // #109: blast it open when that pays; the bot backs off and comes back to the same tile.
   if (isBlastWorthIt(session, planet, tile, ticks) && blastOpen(session, planet, tile)) {
     return isVehicleActive(session.vehicle()) ? 'opened' : 'short'

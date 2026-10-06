@@ -7,7 +7,8 @@
  * Each dock cycle: travel when the core is done and the fee is paid, choose a trip (the core while
  * it is the goal, the drill digs it fast enough and the casing holds it, else the best ore band
  * the casing grade holds), run it, refine the best of the haul when the platform has the Refinery
- * bay and the bot will dive again (#105), then service and shop.
+ * bay and the bot will dive again (#105), then service and shop. Charges are bought only on a
+ * planet where the bot met a tile it would blast with none in stock (#129); travel starts afresh.
  */
 import { SLICE_LAST_PLANET } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -121,6 +122,7 @@ function botPlanetOf(session: BotSession, chargePolicy: ChargePolicy): BotPlanet
     layout: newMineLayout(paramsOfSession(session.state()), site),
     pilot: { position: bayRestTileOf(site, 'sell'), facing: 1 },
     chargePolicy,
+    hasMetBlastTile: false,
   }
 }
 
@@ -147,8 +149,12 @@ function playDockCycle(session: BotSession, planet: BotPlanet, run: BotRun): boo
 /** The bot drives over to the Upgrade bay (#37) only when it has something to buy there. */
 function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): void {
   const isCoreGoal = isCoreTheGoal(session, planet)
-  const { gunPolicy, chargePolicy } = run
-  const situation = { layout: planet.layout, isCoreTheGoal: isCoreGoal, gunPolicy, chargePolicy }
+  const situation = {
+    layout: planet.layout,
+    isCoreTheGoal: isCoreGoal,
+    gunPolicy: run.gunPolicy,
+    hasMetBlastTile: planet.hasMetBlastTile,
+  }
   if (!hasPurchase(session, situation)) return
   driveToUpgradeBay(session, planet)
   buyUpgrades(session, situation)

@@ -40,7 +40,7 @@ describe('bot: heat planets (#113)', () => {
       layout,
       isCoreTheGoal: false,
       gunPolicy: 'never',
-      chargePolicy: 'never',
+      hasMetBlastTile: false,
     })
     expect(session.vehicle().lining.active).toBe('refractory')
     expect(liningUnlockFor(session)).toBeNull()
@@ -68,7 +68,12 @@ function planetAt(_session: BotSession, where: 'pad' | 'deep'): BotPlanet {
   const params = planetParamsFor(83921, 8)
   const layout = newMineLayout(params, dockSiteOf(params))
   const row = where === 'pad' ? layout.travelRow : layout.travelRow - 600
-  return { layout, pilot: { position: shaftTileAt(layout, row), facing: 0 }, chargePolicy: 'never' }
+  return {
+    layout,
+    pilot: { position: shaftTileAt(layout, row), facing: 0 },
+    chargePolicy: 'never',
+    hasMetBlastTile: false,
+  }
 }
 
 describe('bot: shaft round lava (#113)', () => {
@@ -90,7 +95,15 @@ describe('bot: shaft round lava (#113)', () => {
     const params = planetParamsFor(83921, 8)
     const layout = { ...newMineLayout(params, dockSiteOf(params)), shaftBottomRow: ABOVE_LAVA }
     const position = shaftTileAt(layout, ABOVE_LAVA)
-    return { session, planet: { layout, pilot: { position, facing: 0 }, chargePolicy: 'never' } }
+    return {
+      session,
+      planet: {
+        layout,
+        pilot: { position, facing: 0 },
+        chargePolicy: 'never',
+        hasMetBlastTile: false,
+      },
+    }
   }
 
   it('steps the shaft sideways to a clear column and bores on below the pocket', () => {

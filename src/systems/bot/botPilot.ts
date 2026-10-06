@@ -35,6 +35,8 @@ export interface BotPlanet {
   layout: MineLayout
   pilot: BotPilot
   chargePolicy: ChargePolicy
+  /** It met a tile here it would blast with no charge in stock, so it wants charges (#129). */
+  hasMetBlastTile: boolean
 }
 
 /**

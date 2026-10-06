@@ -3,8 +3,8 @@
  * at the Sell bay, then buy at the Upgrade bay (#37), always keeping the next service paid for. A
  * casing grade the next trip needs comes first (`botCasing.ts`, S11); then a heat planet's lining
  * type, refractory, once it is offered (#113, `botHeat.ts`); then the guns' mount once they are
- * offered (#107, `botGuns.ts`); then a full charge rack once charges are (#109, `botCharges.ts`);
- * then `drill_tip` and `hull`
+ * offered (#107, `botGuns.ts`); then a full charge rack once charges are and the bot has met a
+ * tile it would blast (#109, #129, `botCharges.ts`); then `drill_tip` and `hull`
  * go to their on-curve level for the planet (#6 section 3);
  * a `drill_power` level is forced while the core is the goal and the drill digs it slower than 0.4
  * tiles a second (`FORCED_DRILL_TICKS_PER_TILE`); otherwise the bot buys the upgrade with the best gain in planned money per tick
@@ -22,7 +22,7 @@ import { add, cmp, fromSafeInteger, type Money } from '../money'
 import { rechargePrice, repairPrice, travelFee } from '../economy/planetCharges'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { isCasingGradeShort } from './botCasing'
-import { restockPriceFor, type ChargePolicy } from './botCharges'
+import { restockPriceFor } from './botCharges'
 import { gunMountPriceFor, type GunPolicy } from './botGuns'
 import { liningUnlockFor } from './botHeat'
 import type { BotSession } from './botSession'
@@ -55,7 +55,8 @@ export interface ShoppingSituation {
   /** The core is what the bot is after: still short of fragments and the shaft is at band 5. */
   isCoreTheGoal: boolean
   gunPolicy: GunPolicy
-  chargePolicy: ChargePolicy
+  /** The bot met a tile on this planet it would blast with no charge in stock (#129). */
+  hasMetBlastTile: boolean
 }
 
 export function serviceAtDock(session: BotSession): void {
@@ -93,7 +94,7 @@ function nextPurchase(session: BotSession, situation: ShoppingSituation): Purcha
   const lining = liningUnlockDue(session)
   if (lining !== null) return { type: 'buyLiningType', payload: { liningType: lining } }
   if (isGunMountDue(session, situation.gunPolicy)) return BUY_GUN
-  if (isRestockDue(session, situation.chargePolicy)) return RESTOCK_CHARGES
+  if (isRestockDue(session, situation)) return RESTOCK_CHARGES
   const track = nextTrackPurchase(session, situation)
   return track === null ? null : { type: 'buyUpgrade', payload: { upgradeId: track } }
 }
@@ -133,8 +134,9 @@ function isGunMountDue(session: BotSession, policy: GunPolicy): boolean {
   return price !== null && canPay(session, price)
 }
 
-function isRestockDue(session: BotSession, policy: ChargePolicy): boolean {
-  const price = restockPriceFor(session, policy)
+function isRestockDue(session: BotSession, situation: ShoppingSituation): boolean {
+  if (!situation.hasMetBlastTile) return false
+  const price = restockPriceFor(session)
   return price !== null && canPay(session, price)
 }
 
