@@ -28,7 +28,7 @@ describe('golden runs (committed in tests/golden)', () => {
   })
 
   it.each(committedGoldenRuns().map((golden) => [golden.name, golden] as const))(
-    'replays %s to every committed digest at the fixed step, 30 and 144 fps',
+    'replays %s to every committed digest and its mined order at the fixed step, 30 and 144 fps',
     (_name, golden) => {
       expect(goldenRunProblems(golden)).toEqual([])
     },
@@ -50,10 +50,26 @@ describe('golden run gate', () => {
     expect(problems[0]).toContain('bump the version')
   })
 
+  it('fails at every clock when the replay mines a different order under unchanged versions', () => {
+    const golden = committedGoldenRuns().find((candidate) => candidate.minedOrder.length > 1)
+    if (golden === undefined) throw new Error('no committed golden run mines two ores')
+    const [first, ...rest] = golden.minedOrder
+    const tampered = { ...golden, minedOrder: [...rest, first] }
+    const problems = goldenRunProblems(tampered)
+    expect(problems).toHaveLength(3)
+    expect(problems[0]).toContain('mined order')
+    expect(problems[0]).toContain('bump the version')
+  })
+
   it('asks to regenerate the file when a version constant was bumped without it', () => {
     const golden = firstGolden()
     const stale = { ...golden, generatorVersion: currentGoldenVersions().generatorVersion - 1 }
     expect(goldenRunProblems(stale)).toEqual([expect.stringContaining(REGENERATE_HINT)])
+  })
+
+  it('mines ore in the committed runs, so the mined-order check replays a real sequence (#122)', () => {
+    const mined = committedGoldenRuns().filter((golden) => golden.minedOrder.length > 0)
+    expect(mined.length).toBeGreaterThan(0)
   })
 
   it('keeps the committed command lists in step with the scripts that made them', () => {

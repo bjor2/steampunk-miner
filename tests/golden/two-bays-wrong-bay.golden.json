@@ -2,7 +2,7 @@
   "name": "two-bays-wrong-bay",
   "description": "Buying at the Sell bay and selling at the Upgrade bay are refused as wrong_bay; the same buys at the Upgrade bay apply (#37, #41).",
   "generatorVersion": 5,
-  "authorityProtocolVersion": 15,
+  "authorityProtocolVersion": 16,
   "logSchemaVersion": 2,
   "numberFormatVersion": 1,
   "worldSeed": 83921,
@@ -142,5 +142,6 @@
       "scope": "end",
       "digest": "c666c14b6f0ce324"
     }
-  ]
+  ],
+  "minedOrder": []
 }

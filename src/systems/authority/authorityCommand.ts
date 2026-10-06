@@ -34,8 +34,10 @@ import type { BayId } from '../world/dockBays'
  *    the heat gauge, its throttle and damage, `HeatThreshold`, `Overheat*`, `debug.setHeat`.
  * 15: drill_power and drill_tip prices flattened to ratio 1.225 and 1.500625 on bases 55 and 83
  *    (#84, #77), so the same `BuyUpgrade` costs a different amount.
+ * 16: `CargoAdded` names its ore (#122): `oreId` (#155), the cell's `depthTiles` and `chunk`; a
+ *    blast's kept units are the first ore cells of their tier it broke.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 15
+export const AUTHORITY_PROTOCOL_VERSION = 16
 
 export interface CommandPayloads {
   /**

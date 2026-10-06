@@ -12,12 +12,21 @@ import {
   setUpgrade,
   spawnEnemy,
 } from '../authority/combat/combatFixtures'
-import { drill, GROUND, poseAbove, surfaceOreTiles, WORLD_SEED } from '../authority/scriptedSession'
+import {
+  drill,
+  GROUND,
+  PARAMS,
+  poseAbove,
+  surfaceOreTiles,
+  WORLD_SEED,
+} from '../authority/scriptedSession'
 import type { ScriptedCommand } from '../fastForward'
 import { bayPoseAt, dockedPoseAt, FACING } from '../vehicle/vehiclePose'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor, type PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
+import { familyOfCell, RESOURCE_FAMILY } from '../world/worldCell'
+import { cellAt, EMPTY_WORLD } from '../world/worldState'
 import { SECOND_SLICE_GOLDEN_SCRIPTS } from './secondSliceGoldenScripts'
 
 export interface GoldenScript {
@@ -42,6 +51,9 @@ const RICH_PLANET = 80
 const RICH_CARGO_LEVEL = 420
 const RICH_TIP_LEVEL = 240
 const RICH_DRILL_LEVEL = 500
+const MIXED_ORE_COUNT = 6
+/** Enough surface ore of planet 1 to hold three of each family. */
+const SURFACE_ORE_SCANNED = 60
 
 export const GOLDEN_SCRIPTS: readonly GoldenScript[] = [
   {
@@ -72,6 +84,15 @@ export const GOLDEN_SCRIPTS: readonly GoldenScript[] = [
     endTick: 2000,
     commands: moneyPast1e40Commands(planetParamsFor(WORLD_SEED, RICH_PLANET)),
   },
+  {
+    name: 'mined-order-mixed',
+    description:
+      'Planet 1, level 0: drill metal, crystal, crystal, metal, crystal, metal surface ore; the ' +
+      'replay must mine the same ores in the same order (#122).',
+    worldSeed: WORLD_SEED,
+    endTick: 1 + MIXED_ORE_COUNT * (BAND_1_TICKS + 1) + 60,
+    commands: mineTilesFrom(1, mixedOreTiles()),
+  },
   ...SECOND_SLICE_GOLDEN_SCRIPTS,
 ]
 
@@ -88,6 +109,15 @@ function digAndReturnCommands(): ScriptedCommand[] {
     ...mineTilesFrom(1, surfaceOreTiles(6)),
     ...homeAndSellAt(1 + 6 * (BAND_1_TICKS + 1), planetParamsFor(WORLD_SEED, 1)),
   ]
+}
+
+/** Surface ore of planet 1 whose families alternate unevenly, so a reordering shows (#122). */
+function mixedOreTiles(): TilePoint[] {
+  const ore = surfaceOreTiles(SURFACE_ORE_SCANNED)
+  const [metal, crystal] = [RESOURCE_FAMILY.metal, RESOURCE_FAMILY.crystal].map((family) =>
+    ore.filter((tile) => familyOfCell(cellAt(EMPTY_WORLD, PARAMS, tile)) === family),
+  )
+  return [metal[0], crystal[0], crystal[1], metal[1], crystal[2], metal[2]]
 }
 
 /** One tile at a time: stand over it, then drill it for long enough to break it. */

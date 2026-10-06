@@ -1,60 +1,21 @@
 {
-  "name": "money-past-1e40",
-  "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
+  "name": "mined-order-mixed",
+  "description": "Planet 1, level 0: drill metal, crystal, crystal, metal, crystal, metal surface ore; the replay must mine the same ores in the same order (#122).",
   "generatorVersion": 5,
   "authorityProtocolVersion": 16,
   "logSchemaVersion": 2,
   "numberFormatVersion": 1,
   "worldSeed": 83921,
-  "endTick": 2000,
+  "endTick": 307,
   "commands": [
     {
       "playerId": "p1",
-      "tick": 0,
-      "seq": 1,
-      "type": "debug.setPlanet",
-      "payload": {
-        "planetIndex": 80
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 0,
-      "seq": 2,
-      "type": "debug.setUpgrade",
-      "payload": {
-        "upgradeId": "drill_tip",
-        "level": 240
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 0,
-      "seq": 3,
-      "type": "debug.setUpgrade",
-      "payload": {
-        "upgradeId": "drill_power",
-        "level": 500
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 0,
-      "seq": 4,
-      "type": "debug.setUpgrade",
-      "payload": {
-        "upgradeId": "cargo_hold",
-        "level": 420
-      }
-    },
-    {
-      "playerId": "p1",
       "tick": 1,
-      "seq": 5,
+      "seq": 1,
       "type": "reportPose",
       "payload": {
-        "x": 19500,
-        "y": 948500,
+        "x": 12500,
+        "y": 299500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -71,22 +32,22 @@
     {
       "playerId": "p1",
       "tick": 41,
-      "seq": 6,
+      "seq": 2,
       "type": "drillTile",
       "payload": {
-        "tx": 19,
-        "ty": 947,
+        "tx": 12,
+        "ty": 298,
         "ticks": 40
       }
     },
     {
       "playerId": "p1",
       "tick": 42,
-      "seq": 7,
+      "seq": 3,
       "type": "reportPose",
       "payload": {
-        "x": 20500,
-        "y": 949500,
+        "x": 68500,
+        "y": 288500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -103,22 +64,22 @@
     {
       "playerId": "p1",
       "tick": 82,
-      "seq": 8,
+      "seq": 4,
       "type": "drillTile",
       "payload": {
-        "tx": 20,
-        "ty": 948,
+        "tx": 68,
+        "ty": 287,
         "ticks": 40
       }
     },
     {
       "playerId": "p1",
       "tick": 83,
-      "seq": 9,
+      "seq": 5,
       "type": "reportPose",
       "payload": {
-        "x": 20500,
-        "y": 948500,
+        "x": 69500,
+        "y": 289500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
@@ -135,27 +96,27 @@
     {
       "playerId": "p1",
       "tick": 123,
-      "seq": 10,
+      "seq": 6,
       "type": "drillTile",
       "payload": {
-        "tx": 20,
-        "ty": 947,
+        "tx": 69,
+        "ty": 288,
         "ticks": 40
       }
     },
     {
       "playerId": "p1",
       "tick": 124,
-      "seq": 11,
+      "seq": 7,
       "type": "reportPose",
       "payload": {
-        "x": -4000,
-        "y": 950500,
+        "x": 30500,
+        "y": 294500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
         "upy": 1024,
-        "facing": 1,
+        "facing": 2,
         "driving": false,
         "thrusting": false,
         "drilling": false,
@@ -166,90 +127,107 @@
     },
     {
       "playerId": "p1",
-      "tick": 124,
-      "seq": 12,
-      "type": "dock",
-      "payload": {
-        "bay": "sell"
-      }
-    },
-    {
-      "playerId": "p1",
-      "tick": 154,
-      "seq": 13,
-      "type": "sellCargo",
-      "payload": {
-        "resourceTier": "all"
-      }
-    },
-    {
-      "playerId": "p1",
       "tick": 164,
-      "seq": 14,
-      "type": "undock",
-      "payload": {}
+      "seq": 8,
+      "type": "drillTile",
+      "payload": {
+        "tx": 30,
+        "ty": 293,
+        "ticks": 40
+      }
     },
     {
       "playerId": "p1",
-      "tick": 166,
-      "seq": 15,
+      "tick": 165,
+      "seq": 9,
       "type": "reportPose",
       "payload": {
-        "x": 4000,
-        "y": 950500,
+        "x": 69500,
+        "y": 288500,
         "vx": 0,
         "vy": 0,
         "upx": 0,
         "upy": 1024,
-        "facing": 1,
+        "facing": 2,
         "driving": false,
         "thrusting": false,
         "drilling": false,
         "thrustTicks": 0,
-        "driveTicks": 2,
+        "driveTicks": 0,
         "drillTicks": 0
       }
     },
     {
       "playerId": "p1",
-      "tick": 166,
-      "seq": 16,
-      "type": "dock",
+      "tick": 205,
+      "seq": 10,
+      "type": "drillTile",
       "payload": {
-        "bay": "upgrade"
+        "tx": 69,
+        "ty": 287,
+        "ticks": 40
       }
     },
     {
       "playerId": "p1",
-      "tick": 169,
-      "seq": 17,
-      "type": "buyUpgrade",
+      "tick": 206,
+      "seq": 11,
+      "type": "reportPose",
       "payload": {
-        "upgradeId": "cargo_hold"
+        "x": 30500,
+        "y": 293500,
+        "vx": 0,
+        "vy": 0,
+        "upx": 0,
+        "upy": 1024,
+        "facing": 2,
+        "driving": false,
+        "thrusting": false,
+        "drilling": false,
+        "thrustTicks": 0,
+        "driveTicks": 0,
+        "drillTicks": 0
+      }
+    },
+    {
+      "playerId": "p1",
+      "tick": 246,
+      "seq": 12,
+      "type": "drillTile",
+      "payload": {
+        "tx": 30,
+        "ty": 292,
+        "ticks": 40
       }
     }
   ],
   "digests": [
     {
-      "tick": 124,
-      "scope": "dock",
-      "digest": "67f1ba68df57b9c9"
-    },
-    {
-      "tick": 166,
-      "scope": "dock",
-      "digest": "91d9136dbab77f89"
-    },
-    {
-      "tick": 2000,
+      "tick": 307,
       "scope": "end",
-      "digest": "6f856e7dee25eeb8"
+      "digest": "cfe266a0bcc1f06a"
     }
   ],
   "minedOrder": [
     [
-      "kernel.crystal.t238",
-      3
+      "kernel.metal.t1",
+      1
+    ],
+    [
+      "kernel.crystal.t1",
+      2
+    ],
+    [
+      "kernel.metal.t1",
+      1
+    ],
+    [
+      "kernel.crystal.t1",
+      1
+    ],
+    [
+      "kernel.metal.t1",
+      1
     ]
   ]
 }
