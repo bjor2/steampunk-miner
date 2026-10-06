@@ -6,7 +6,7 @@
  */
 import type { PageMemory } from '../shell/pageMemory'
 import type { RunEventData } from './eventNames'
-import type { RunSummary } from './runSummary'
+import type { RunProgress } from './runProgress'
 
 export type MemorySample = RunEventData<'memory_sample'>
 
@@ -22,15 +22,6 @@ export interface SceneMemory {
   chunksCached: number
   /** Chunk meshes the terrain has built, drawn or not. */
   chunksMeshed: number
-}
-
-/** How far the run got, from the run summary folded so far. */
-export interface RunProgress {
-  maxDepthTiles: number
-  tilesDestroyed: number
-  mineralsCollected: number
-  /** Money earned over the run (sales and refined batches), a canonical string. */
-  moneyTotal: string
 }
 
 export interface MemoryReadings {
@@ -63,16 +54,6 @@ export function memorySampleOf(readings: MemoryReadings): MemorySample | null {
     domNodes: page.domNodes,
     listeners: page.listeners,
     ...readings.progress,
-  }
-}
-
-/** Collected units are the minerals; money earned is the progress, not the wallet that is spent. */
-export function runProgressOf(summary: RunSummary): RunProgress {
-  return {
-    maxDepthTiles: summary.maxDepthTiles,
-    tilesDestroyed: summary.tilesDestroyed,
-    mineralsCollected: summary.resourceUnitsCollected,
-    moneyTotal: summary.moneyEarned,
   }
 }
 

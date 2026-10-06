@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { RunEventData, RunEventName } from './eventNames'
-import { createSummarySink } from './eventSink'
-import { memorySampleOf, runProgressOf, type MemoryReadings } from './memorySample'
-import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
+import { memorySampleOf, type MemoryReadings } from './memorySample'
 
 const MIB = 1024 * 1024
 
@@ -29,28 +26,6 @@ const READINGS: MemoryReadings = {
     mineralsCollected: 57,
     moneyTotal: '1.25e+3',
   },
-}
-
-let nextSeq = 0
-
-function line<N extends RunEventName>(
-  tick: number,
-  event: N,
-  data: RunEventData<N>,
-  depthTiles = 0,
-): RunEvent {
-  return {
-    v: LOG_SCHEMA_VERSION,
-    seq: nextSeq++,
-    tick,
-    timestamp: 0,
-    runId: 'run_test',
-    playerId: 'p1',
-    planet: 1,
-    depthTiles,
-    event,
-    data,
-  } as RunEvent
 }
 
 describe('memory sample', () => {
@@ -80,21 +55,4 @@ describe('memory sample', () => {
   it('writes no line where the browser gives no heap reading', () => {
     expect(memorySampleOf({ ...READINGS, page: { ...READINGS.page, jsHeap: null } })).toBeNull()
   })
-
-  it('reads progress from the run so far: deepest tile, tiles destroyed, units and money earned', () => {
-    const summary = createSummarySink()
-    summary.append(line(600, 'mining_interval', miningInterval(40, 10, '1.5e+1'), 18))
-    summary.append(line(1200, 'mining_interval', miningInterval(25, 3, '9e+0'), 31))
-    summary.append(line(1300, 'resource_sold', { items: [], value: '2.4e+1', mode: 'all' }))
-    expect(runProgressOf(summary.summarize())).toEqual({
-      maxDepthTiles: 31,
-      tilesDestroyed: 65,
-      mineralsCollected: 13,
-      moneyTotal: '2.4e+1',
-    })
-  })
 })
-
-function miningInterval(tilesDestroyed: number, amount: number, value: string) {
-  return { tilesDestroyed, collected: [{ tier: 1, amount, value }], drillDamageDealt: '1e+2' }
-}

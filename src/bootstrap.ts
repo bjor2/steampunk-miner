@@ -13,11 +13,11 @@ import {
   type FlushableSink,
   type SummarySink,
 } from './logging/eventSink'
-import { runProgressOf } from './logging/memorySample'
 import { writeRunMetadata, writeRunSummary } from './logging/runDocuments'
 import { createRunId } from './logging/runLayout'
 import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
 import { createRunMetadata } from './logging/runMetadata'
+import { createRunProgressSink, type RunProgressSink } from './logging/runProgress'
 import { watchRapierWasmMemory } from './physics/rapierWasmMemory'
 import { getShell, type Shell } from './shell/shell'
 import {
@@ -35,12 +35,16 @@ import { parseScenario, type Scenario } from './systems/scenario'
 
 const LOG_FLUSH_INTERVAL_MS = 1000
 
-/** The files of the run in progress: the NDJSON sink and the summary folded as the run goes. */
+/**
+ * The files of the run in progress: the NDJSON sink and the summary folded as the run goes, and
+ * the progress the memory samples carry (#121).
+ */
 interface RunFiles {
   runId: string
   startedAt: Date
   sink: FlushableSink
   summary: SummarySink
+  progress: RunProgressSink
 }
 
 /** Settles once the session is settled: fresh, resumed from the checkpoint, or a scenario's. */
@@ -67,15 +71,16 @@ function startRunLogging(shell: Shell, startedAt: Date): RunFiles {
   const run = { runId: createRunId(startedAt), startedAt }
   const sink = createNdjsonSink(shell)
   const summary = createSummarySink()
+  const progress = createRunProgressSink()
   const startedAtMs = performance.now()
   installRunLog(
     createRunLog({
       runId: run.runId,
-      sink: createFanOutSink(sink, summary),
+      sink: createFanOutSink(sink, summary, progress),
       secondsSinceStart: () => (performance.now() - startedAtMs) / 1000,
     }),
   )
-  return { ...run, sink, summary }
+  return { ...run, sink, summary, progress }
 }
 
 function recordGameStarted(shell: Shell): void {
@@ -143,7 +148,7 @@ function exposeDebugHandles(shell: Shell, runId: string): void {
 /**
  * `perf` lines are for dev, scenario and debug runs only (#11 section 1, #38). Their memory sample
  * (#121) needs Rapier's WASM memory and the page's listeners watched before anything registers
- * one, so this runs first; its progress markers come from the summary folded so far.
+ * one, so this runs first.
  */
 function logPerfOnTestRuns(shell: Shell, run: RunFiles): void {
   const isTestRun = shell.launch.debugEnabled || shell.launch.scenarioText !== null
@@ -152,7 +157,7 @@ function logPerfOnTestRuns(shell: Shell, run: RunFiles): void {
   shell.watchPageListeners()
   turnOnPerfLog({
     readPageMemory: () => shell.readPageMemory(),
-    readRunProgress: () => runProgressOf(run.summary.summarize()),
+    readRunProgress: () => run.progress.progress(),
   })
 }
 

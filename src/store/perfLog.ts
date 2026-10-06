@@ -4,10 +4,11 @@
  * hands it the page and progress readers; a played release run records none and reads nothing.
  * Samples are stamped like every other line, at the authority's tick.
  */
-import { memorySampleOf, type RunProgress, type SceneMemory } from '../logging/memorySample'
+import { memorySampleOf, type SceneMemory } from '../logging/memorySample'
 import type { PerfSample } from '../logging/perfSample'
 import type { RunEventData } from '../logging/eventNames'
 import { getRunLog } from '../logging/runLog'
+import type { RunProgress } from '../logging/runProgress'
 import type { PageMemory } from '../shell/pageMemory'
 import { readAuthorityState } from './authorityLink'
 import { runEventPlaceOf, useGameStore } from './gameStore'
