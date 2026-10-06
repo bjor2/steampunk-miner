@@ -1,0 +1,22 @@
+/* #173: the canvas's rectangle, the whole window up to 64:27 and a centred band past it. */
+.stage {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--stage-left);
+  width: var(--stage-width);
+  overflow: hidden;
+}
+
+/*
+ * The HUD and the screens lay out inside the safe area: a phone's notch and home bar
+ * (`viewport-fit=cover` with `env(safe-area-inset-*)`) and TV mode's 5% overscan inset.
+ */
+.safeArea {
+  position: absolute;
+  inset: max(env(safe-area-inset-top), var(--tv-safe-y))
+    max(env(safe-area-inset-right), var(--tv-safe-x))
+    max(env(safe-area-inset-bottom), var(--tv-safe-y))
+    max(env(safe-area-inset-left), var(--tv-safe-x));
+  pointer-events: none;
+}

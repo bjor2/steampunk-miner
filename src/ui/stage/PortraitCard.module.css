@@ -1,0 +1,33 @@
+/*
+ * #173 "Portrait": not supported on any phone, tablet or foldable. The card covers the stage in
+ * portrait and goes on rotation, with no reload; the simulation keeps ticking under it.
+ */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  pointer-events: auto;
+}
+
+@media (orientation: portrait) {
+  .overlay {
+    display: flex;
+  }
+}
+
+.glyph {
+  display: block;
+  margin: 0 auto var(--space-2);
+  font-size: 3rem;
+  text-align: center;
+}
+
+.text {
+  margin: 0;
+  max-width: 20rem;
+}

@@ -5,11 +5,7 @@
  *
  * "Reduce motion" is the shake switch, as it is for the vehicle's part motion (#33, #48).
  */
-import {
-  BAY_SHUTTER_MS,
-  PART_INSTALL_MS,
-  SHOP_TEXT_SHORT_AXIS_PERCENT,
-} from '../../constants/scene'
+import { BAY_SHUTTER_MS, PART_INSTALL_MS } from '../../constants/scene'
 import type { DomainEvent } from '../authority/domainEvent'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
 
@@ -52,11 +48,15 @@ export function partToInstallOf(
   return last?.type === 'UpgradePurchased' ? upgradeIdOf(last.upgradeId) : null
 }
 
-export function shopTypeOf(widthPixels: number, heightPixels: number): ShopType {
-  const shortAxisPixels = Math.min(widthPixels, heightPixels)
+/** The screen's short axis beside the shop text the layout set (`shopTextPixelsOf`, #173). */
+export function shopTypeOf(
+  widthPixels: number,
+  heightPixels: number,
+  shopTextPixels: number,
+): ShopType {
   return {
-    shortAxisPixels,
-    smallestTextPixels: (shortAxisPixels * SHOP_TEXT_SHORT_AXIS_PERCENT) / 100,
+    shortAxisPixels: Math.min(widthPixels, heightPixels),
+    smallestTextPixels: shopTextPixels,
   }
 }
 

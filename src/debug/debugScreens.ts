@@ -40,6 +40,8 @@ import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import { bayScreenPresence } from '../ui/platform/bayScreenPresence'
+import { readFittedScreen } from '../ui/stage/screenFit'
+import type { ScreenLayout } from '../systems/views/screenLayout'
 import { readRendererMemory, type RendererMemory } from './debugMemory'
 
 export type DebugResult<T extends object = object> =
@@ -73,6 +75,8 @@ export interface DebugUi {
   getBayPresentation(): DebugResult<{ presentation: BayPresentation }>
   /** The music's layer targets, settings and the run's stingers in order (#49). */
   getAudioModel(): DebugResult<{ model: AudioModel }>
+  /** How the UI fits the screen (#173): stage, UI scale, TV safe inset, smallest control. */
+  getScreenLayout(): DebugResult<{ layout: ScreenLayout }>
 }
 
 export interface BayPresentation {
@@ -116,6 +120,7 @@ export function createDebugUi(): DebugUi {
     getRefineryBayModel: () => ({ ok: true, model: readRefineryBayModel() }),
     getBayPresentation: () => ({ ok: true, presentation: bayPresentationNow() }),
     getAudioModel: () => ({ ok: true, model: readAudioModel() }),
+    getScreenLayout: screenLayoutNow,
   }
 }
 
@@ -163,9 +168,19 @@ function renderStatsNow(): RenderStats {
 function bayPresentationNow(): BayPresentation {
   return {
     shutter: { ...bayScreenPresence },
-    type: shopTypeOf(cameraPresence.widthPixels, cameraPresence.heightPixels),
+    type: shopTypeOf(
+      cameraPresence.widthPixels,
+      cameraPresence.heightPixels,
+      readFittedScreen()?.shopTextPixels ?? 0,
+    ),
     preview: { ...previewPresence },
   }
+}
+
+function screenLayoutNow(): DebugResult<{ layout: ScreenLayout }> {
+  const layout = readFittedScreen()
+  if (layout === null) return { ok: false, problems: ['the screen has not been laid out yet'] }
+  return { ok: true, layout }
 }
 
 function cameraViewOnScreen(): CameraView {

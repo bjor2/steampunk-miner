@@ -124,3 +124,32 @@
   align-items: center;
   margin-top: var(--space-1);
 }
+
+/*
+ * #173 phones and small tablets: a short screen gives the bay its whole safe area and scrolls it
+ * as one page, so every row and button stays reachable by touch at the 17.6 px text size.
+ */
+@media (max-height: 600px) {
+  .screen {
+    inset: 0;
+    display: block;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .screen > * + * {
+    margin-top: var(--space-2);
+  }
+
+  .sellPanels,
+  .refineryPanels,
+  .upgradePanels {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    overflow: visible;
+  }
+
+  .upgradePanels > :first-child {
+    overflow: visible;
+  }
+}

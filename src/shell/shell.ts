@@ -10,6 +10,7 @@ import type {
   RunDocumentName,
   SaveFolderName,
 } from '../../electron/bridgeContract.cts'
+import type { ScreenReading } from '../systems/views/screenLayout'
 import { createBrowserShell } from './browserShell'
 import { createElectronShell } from './electronShell'
 import type { PageMemory } from './pageMemory'
@@ -68,6 +69,16 @@ export interface Shell {
   watchPageListeners(): void
   /** The page's JS heap, DOM elements and counted listeners now, for `memory_sample` (#121). */
   readPageMemory(): PageMemory
+  /** The window in CSS pixels and whether its primary pointer is a finger (#173). */
+  readScreen(): ScreenReading
+  /** Reports a resize, a rotation or a change of primary pointer; returns an unsubscribe. */
+  onScreenChange(listener: () => void): () => void
+  /** Sets custom properties on the page root, the one place the UI's scale is written (#173). */
+  setScreenStyle(properties: Readonly<Record<string, string>>): void
+  /** Reports each finger touching the page, so the touch controls can show (#173). */
+  onTouchInput(listener: () => void): () => void
+  /** A short buzz on a device with a vibration motor; nothing elsewhere (#173 haptics). */
+  vibrate(milliseconds: number): void
 }
 
 /**

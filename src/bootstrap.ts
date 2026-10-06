@@ -32,6 +32,7 @@ import { turnOnPerfLog } from './store/perfLog'
 import { recordStartingPlanetEntered } from './store/planetArrivalLog'
 import { installPreferencesStorage, loadPreferences } from './store/preferencesFile'
 import { parseScenario, type Scenario } from './systems/scenario'
+import { keepScreenFitted } from './ui/stage/screenFit'
 
 const LOG_FLUSH_INTERVAL_MS = 1000
 
@@ -56,6 +57,7 @@ export async function startGame(): Promise<void> {
   recordGameStarted(shell)
   installSaveSlots(saveSlotsOf(shell))
   await adoptLocalPreferences(shell)
+  keepScreenFitted(shell)
   shell.onKeyChange(routeKeyChange)
   shell.onScrollNotch(routeScrollNotch)
   await resumeLastCheckpoint(shell)

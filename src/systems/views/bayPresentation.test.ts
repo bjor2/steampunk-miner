@@ -8,6 +8,7 @@ import {
   partToInstallOf,
   shopTypeOf,
 } from './bayPresentation'
+import { shopTextPixelsOf } from './screenLayout'
 
 function purchaseEvents(run: (session: ReturnType<typeof createScriptedSession>) => void) {
   const session = createScriptedSession(['p1', 'p2'])
@@ -45,9 +46,11 @@ describe('bay screen presentation', () => {
     expect(partToInstallOf(bought, 'p1', true)).toBeNull()
   })
 
-  it('sets the smallest shop text at 2.2% of the short axis at 1080p and 4K', () => {
-    expect(shopTypeOf(1920, 1080).smallestTextPixels).toBeCloseTo(23.76)
-    expect(shopTypeOf(3840, 2160).smallestTextPixels).toBeCloseTo(47.52)
-    expect(shopTypeOf(1080, 1920).shortAxisPixels).toBe(1080)
+  it("reports the screen's short axis beside the shop text the layout set", () => {
+    expect(shopTypeOf(1920, 1080, shopTextPixelsOf(1080, false))).toEqual({
+      shortAxisPixels: 1080,
+      smallestTextPixels: shopTextPixelsOf(1080, false),
+    })
+    expect(shopTypeOf(1080, 1920, 17.6).shortAxisPixels).toBe(1080)
   })
 })

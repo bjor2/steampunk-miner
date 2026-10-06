@@ -99,6 +99,11 @@ export interface PresentationActions {
   /** Opens or closes the cards as the authority's answers say (`artefact_open`, `_chosen`). */
   followArtefactChoice(events: readonly DomainEvent[]): void
   moveFocus(step: -1 | 1): void
+  /**
+   * Menu focus onto a control the browser focused (Tab, #173 focus rings), so Enter confirms the
+   * control that shows the ring; an id that is not a stop on the screen on top changes nothing.
+   */
+  focusControl(buttonId: string): void
   activateFocusedControl(): void
   /** A screen button by id, as a click or `ui_confirm` presses it; a disabled one does nothing. */
   pressScreenButton(buttonId: string): boolean
@@ -189,6 +194,9 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       }
     },
     moveFocus: (step) => set({ focusedControlId: movedFocus(get(), step) }),
+    focusControl: (buttonId) => {
+      if (isFocusStopOnScreen(get(), buttonId)) set({ focusedControlId: buttonId })
+    },
     activateFocusedControl: () => void get().pressScreenButton(focusedControlOf(get())),
     pressScreenButton: (buttonId) => {
       const button = menuButtonOf(get(), buttonId)
@@ -238,6 +246,11 @@ function focusedControlOf(state: SliceHost): string {
 function movedFocus(state: SliceHost, step: -1 | 1): string {
   const menu = menuScreenOf(inputLayerOf(state), state)
   return stepFocus(menu.focusStops, focusedControlOf(state), step)
+}
+
+function isFocusStopOnScreen(state: SliceHost, buttonId: string): boolean {
+  const menu = menuScreenOf(inputLayerOf(state), state)
+  return menu.focusStops.some((stop) => stop.id === buttonId)
 }
 
 function menuButtonOf(state: SliceHost, buttonId: string): ScreenButton | null {

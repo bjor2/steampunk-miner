@@ -72,3 +72,10 @@
     var(--color-bg) calc(100% / var(--grade) - 3px) calc(100% / var(--grade))
   );
 }
+
+/* #173: on a short screen the bay scrolls as one page, so the preview keeps a height of its own. */
+@media (max-height: 600px) {
+  .stage {
+    min-height: 60vh;
+  }
+}

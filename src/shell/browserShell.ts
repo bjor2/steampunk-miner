@@ -14,6 +14,13 @@ import {
   listenForScrollNotches,
   runOnPageHide,
 } from './sharedBrowserHooks'
+import {
+  listenForScreenChanges,
+  listenForTouches,
+  readScreen,
+  setRootStyle,
+  vibrateDevice,
+} from './screenHooks'
 import { preferencesFileOf, saveFolderOf, type Shell } from './shell'
 
 /**
@@ -60,6 +67,11 @@ export function createBrowserShell(): Shell {
     onScrollNotch: listenForScrollNotches,
     watchPageListeners,
     readPageMemory,
+    readScreen,
+    onScreenChange: listenForScreenChanges,
+    setScreenStyle: setRootStyle,
+    onTouchInput: listenForTouches,
+    vibrate: vibrateDevice,
   }
 }
 

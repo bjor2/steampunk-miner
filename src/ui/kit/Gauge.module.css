@@ -9,8 +9,8 @@
 .dial {
   grid-row: span 2;
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: calc(44px * var(--ui-scale));
+  height: calc(44px * var(--ui-scale));
   border: 2px solid var(--color-brass);
   border-radius: 50%;
   background: repeating-conic-gradient(

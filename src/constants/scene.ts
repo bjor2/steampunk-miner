@@ -267,6 +267,12 @@ export const ORE_WHISPER_ROCK_TILES = 1
 // The bay screens: #45 art direction, #44 icons and live preview, #39 the preview's framing.
 /** #45: the smallest text on a bay screen is at least 2.2% of the screen's short axis tall. */
 export const SHOP_TEXT_SHORT_AXIS_PERCENT = 2.2
+/**
+ * #173: that 2.2% of the 800 px reference short axis (17.6 px), set times `--ui-scale`, so it is
+ * 2.2% on every screen from 800 px up and keeps 17.6 px on a phone.
+ */
+export const SHOP_TEXT_REFERENCE_PX =
+  (SHOP_TEXT_SHORT_AXIS_PERCENT / 100) * REFERENCE_VIEWPORT.height
 /** #45: a brass shutter slides a bay screen in, and back out, over 250 ms (a fade with reduce motion). */
 export const BAY_SHUTTER_MS = 250
 /** #44: a bought part bolts on with a puff of steam over 400 ms; instant with reduce motion. */

@@ -276,6 +276,19 @@ describe('input: keys, layers and the vehicle intent', () => {
     routeKeyChange(key('Tab', true))
     expect(game().focusedControlId).toBe('platform-quick-service')
   })
+
+  it('moves menu focus to a control the browser focused, so confirm presses that one (#173)', () => {
+    dockAtStart()
+    game().focusControl('platform-undock')
+    expect(game().focusedControlId).toBe('platform-undock')
+    expect(submittedDuring(() => tap('ui_confirm'))).toEqual(['undock'])
+  })
+
+  it('ignores browser focus on a control the screen on top does not show', () => {
+    dockAtStart()
+    game().focusControl('settings-close')
+    expect(game().focusedControlId).toBeNull()
+  })
 })
 
 describe('input: W lifts, Space docks (#40)', () => {

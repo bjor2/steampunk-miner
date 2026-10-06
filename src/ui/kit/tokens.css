@@ -12,10 +12,24 @@
   /* #41 casing feel: the bay teal for lining that holds its band, amber for lining that does not. */
   --color-casing-safe: #4fa8a0;
   --color-casing-weak: #e0a030;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 16px;
+  /*
+   * #173: the screen layout the shell writes on the root (systems/views/screenLayout.ts); these
+   * are the values before the first write. Every rem and spacing token follows --ui-scale.
+   */
+  --ui-scale: 1;
+  --stage-left: 0px;
+  --stage-width: 100%;
+  --tv-safe-x: 0px;
+  --tv-safe-y: 0px;
+  --control-min: 44px;
+  --shop-text: 17.6px;
+  --space-1: calc(4px * var(--ui-scale));
+  --space-2: calc(8px * var(--ui-scale));
+  --space-3: calc(16px * var(--ui-scale));
   --radius-panel: 6px;
+  /* #173: every control's keyboard focus ring, the hook a focus-driven UI (#168) can use later. */
+  --focus-ring: 3px solid var(--color-amber);
+  --focus-ring-offset: 2px;
   --font-body: 'Georgia', 'Times New Roman', serif;
   --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 }

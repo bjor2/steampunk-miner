@@ -5,12 +5,13 @@ import { Hud } from './ui/hud/Hud'
 import { PlatformScreen } from './ui/platform/PlatformScreen'
 import { Plaques } from './ui/plaques/Plaques'
 import { SettingsPanel } from './ui/settings/SettingsPanel'
+import { GameStage } from './ui/stage/GameStage'
+import { PortraitCard } from './ui/stage/PortraitCard'
 import { TravelTransitionCard } from './ui/TravelTransitionCard'
 
 export default function App() {
   return (
-    <>
-      <GameScene />
+    <GameStage scene={<GameScene />}>
       <Hud />
       <PlatformScreen />
       <Plaques />
@@ -18,6 +19,7 @@ export default function App() {
       <EndOfSliceCard />
       <ArtefactChoice />
       <SettingsPanel />
-    </>
+      <PortraitCard />
+    </GameStage>
   )
 }

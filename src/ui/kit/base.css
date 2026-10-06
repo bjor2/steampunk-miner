@@ -11,6 +11,24 @@ body,
   font-family: var(--font-body);
 }
 
+/* #173: one root UI scale, so every rem grows with the screen and never shrinks below 16 px. */
+html {
+  font-size: calc(100% * var(--ui-scale));
+}
+
 canvas {
   display: block;
+}
+
+/* #173 targets: no control under 44 x 44 CSS px, 56 under a finger, 5.9% tall in TV mode. */
+button {
+  min-width: var(--control-min);
+  min-height: var(--control-min);
+  touch-action: manipulation;
+}
+
+/* #173: a visible ring on keyboard focus for every control, never on a click. */
+button:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
