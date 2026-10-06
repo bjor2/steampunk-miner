@@ -20,6 +20,7 @@ balance-report/
 # Intermediate PNG bakes of scripts/art/export_asset.py; only the KTX2 encodes ship (#52)
 art/build/
 scripts/art/__pycache__/
+docs/art/ore-ladder/__pycache__/
 # Blender keeps the previous save as <file>.blend1; the source is the .blend in LFS
 *.blend1
 
