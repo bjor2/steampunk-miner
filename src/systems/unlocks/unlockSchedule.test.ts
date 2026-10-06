@@ -42,6 +42,39 @@ function stubRow(bind: UnlockBind, overrides: Partial<UnlockRow> = {}): UnlockRo
   }
 }
 
+/**
+ * The six vision rows the M tickets switched on in code before T3 (#127) marked them shipped in the
+ * file; the pre-T3 rule below replays how they unlocked so the flip can be shown to change nothing.
+ */
+const BUILT_BEFORE_SHIPPED_IN_FILE = new Set([
+  'refinery_bay',
+  'auto_guns',
+  'tunnel_wrecker',
+  'blasting_charges',
+  'heat_lava',
+  'refractory_lining',
+])
+
+function isUnlockedBeforeShippedInFile(row: UnlockRow, progress: UnlockProgress): boolean {
+  const hasModule =
+    row.status === 'vision' ? BUILT_BEFORE_SHIPPED_IN_FILE.has(row.id) : row.status !== 'cut'
+  return hasModule && isUnlocked({ ...row, status: 'planned' }, progress)
+}
+
+/** A run that has reached `planetIndex` and met the bind of every row scheduled up to it. */
+function progressThroughPlanet(planetIndex: number): UnlockProgress {
+  const reached = LOCKED_SCHEDULE.rows.filter((row) => row.planetIndex <= planetIndex)
+  return { ...progressWithEveryBindMet(reached), highestPlanetIndex: planetIndex }
+}
+
+function unlockedIdsOnPlanet(
+  planetIndex: number,
+  unlocks: (row: UnlockRow, progress: UnlockProgress) => boolean,
+): string[] {
+  const progress = progressThroughPlanet(planetIndex)
+  return LOCKED_SCHEDULE.rows.filter((row) => unlocks(row, progress)).map((row) => row.id)
+}
+
 function progressWithEveryBindMet(rows: readonly UnlockRow[]): UnlockProgress {
   const ids = new Set(rows.map((row) => row.id))
   return {
@@ -88,6 +121,15 @@ describe('locked unlock schedule', () => {
       (planet) => rowsAt(LOCKED_SCHEDULE, planet).length === 0,
     )
     expect(emptyPlanets).toEqual([16, 29])
+  })
+
+  it('unlocks the same rows on every campaign planet as before the six rows were marked shipped', () => {
+    const before = CAMPAIGN_PLANETS.map((planet) =>
+      unlockedIdsOnPlanet(planet, isUnlockedBeforeShippedInFile),
+    )
+    const after = CAMPAIGN_PLANETS.map((planet) => unlockedIdsOnPlanet(planet, isUnlocked))
+    expect(after).toEqual(before)
+    expect(after[39]).toEqual(expect.arrayContaining([...BUILT_BEFORE_SHIPPED_IN_FILE]))
   })
 
   it('lists the finale and the endless gate at planet 40', () => {
