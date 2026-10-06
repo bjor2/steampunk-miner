@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T23:44:31Z",
+  "updated_at": "2026-10-06T23:44:51Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -8,7 +8,7 @@
       "state": "working",
       "issue": 175,
       "note": "started 2026-10-07 00:18 CEST",
-      "updated_at": "2026-10-06T23:44:31Z",
+      "updated_at": "2026-10-06T23:44:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,7 +17,7 @@
       "state": "working",
       "issue": 179,
       "note": "started 2026-10-06 22:18 CEST",
-      "updated_at": "2026-10-06T23:44:31Z",
+      "updated_at": "2026-10-06T23:44:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "working",
       "issue": 144,
       "note": "started 2026-10-07 00:45 CEST",
-      "updated_at": "2026-10-06T23:44:31Z",
+      "updated_at": "2026-10-06T23:44:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "working",
       "issue": 182,
       "note": "started 2026-10-07 00:20 CEST",
-      "updated_at": "2026-10-06T23:44:31Z",
+      "updated_at": "2026-10-06T23:44:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,7 +43,7 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "8/8 Claude slots busy, 1/4 planner slots; status check",
+      "note": "8/8 Claude slots busy, 1/4 planner slots; dev slots full; delegated 0 spec(s); planner slots 1/4",
       "extra": {
         "active": 8,
         "max": 8,
@@ -137,7 +137,7 @@
         ],
         "push_pending": null
       },
-      "updated_at": "2026-10-06T23:44:31Z",
+      "updated_at": "2026-10-06T23:44:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -155,7 +155,7 @@
       "state": "working",
       "issue": 185,
       "note": "started 2026-10-07 00:59 CEST",
-      "updated_at": "2026-10-06T23:44:31Z",
+      "updated_at": "2026-10-06T23:44:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -164,7 +164,7 @@
       "state": "working",
       "issue": 188,
       "note": "started 2026-10-07 01:21 CEST",
-      "updated_at": "2026-10-06T23:44:31Z",
+      "updated_at": "2026-10-06T23:44:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -173,7 +173,7 @@
       "state": "working",
       "issue": 186,
       "note": "started 2026-10-07 00:59 CEST",
-      "updated_at": "2026-10-06T23:44:31Z",
+      "updated_at": "2026-10-06T23:44:51Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -182,7 +182,7 @@
       "state": "working",
       "issue": 125,
       "note": "started 2026-10-07 00:41 CEST",
-      "updated_at": "2026-10-06T23:44:31Z",
+      "updated_at": "2026-10-06T23:44:51Z",
       "host": "grok-bot-vm-452660841"
     }
   },
