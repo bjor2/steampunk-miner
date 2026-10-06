@@ -11,11 +11,12 @@ import { chunkOfTile, type TilePoint } from '../../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../../world/worldCell'
 import { cellAt, currentDensityOfChunk, deltaOfChunk, EMPTY_WORLD } from '../../world/worldState'
 import { BAND_2_Y, buildWeakTunnel, lineTunnel, TUNNEL_TO_X } from '../collapse/collapseFixtures'
-import { minedOreOf, resourceTierOf } from '../minedOre'
+import { minedOreOf } from '../minedOre'
 import { coreTiles, createScriptedSession, FREEZE_ENEMIES, PARAMS } from '../scriptedSession'
 import { blastTilesAround } from './blastOre'
 import {
   BACKED_OFF_TILE,
+  fiveOreBlastSite,
   ofType,
   PLANT,
   plantOnWall,
@@ -42,22 +43,6 @@ function blastFromStand(options: { isBackingOff: boolean } = { isBackingOff: tru
 
 function densityOfTile(session: ReturnType<typeof createScriptedSession>, tile: TilePoint) {
   return cellDensitySum(session.state().world, PARAMS, tile)
-}
-
-/** A solid tile whose blast holds exactly five ore cells, all of one tier, in generated rock. */
-function fiveOreBlastSite(): { wall: TilePoint; tier: number } {
-  for (let ty = STAND_TILE.ty - 30; ty <= STAND_TILE.ty + 30; ty++) {
-    for (let tx = -60; tx <= 60; tx++) {
-      const wall = { tx, ty }
-      if (kindOfCell(cellAt(EMPTY_WORLD, PARAMS, wall)) !== CELL_KIND.ground) continue
-      const ore = blastTilesAround(wall)
-        .map((tile) => cellAt(EMPTY_WORLD, PARAMS, tile))
-        .filter((cell) => kindOfCell(cell) === CELL_KIND.ore)
-      const tiers = new Set(ore.map((cell) => resourceTierOf(PARAMS, cell)))
-      if (ore.length === 5 && tiers.size === 1) return { wall, tier: [...tiers][0] }
-    }
-  }
-  throw new Error('no five-ore blast site in the scanned rock')
 }
 
 describe('blasting charges: plant and fuse (#109)', () => {

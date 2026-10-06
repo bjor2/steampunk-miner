@@ -5,10 +5,14 @@
  */
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
 import type { TilePoint } from '../../world/tileGrid'
+import { CELL_KIND, kindOfCell } from '../../world/worldCell'
+import { cellAt, EMPTY_WORLD } from '../../world/worldState'
 import type { CommandIntent } from '../authorityCommand'
 import { BAND_2_Y, poseAt } from '../collapse/collapseFixtures'
 import type { DomainEvent } from '../domainEvent'
-import { FREEZE_ENEMIES, type ScriptedSession } from '../scriptedSession'
+import { resourceTierOf } from '../minedOre'
+import { FREEZE_ENEMIES, PARAMS, type ScriptedSession } from '../scriptedSession'
+import { blastTilesAround } from './blastOre'
 
 const MM_PER_TILE = 1000
 const HALF_TILE_MM = MM_PER_TILE / 2
@@ -53,3 +57,19 @@ export function plantOnWall(session: ScriptedSession, tick: number): DomainEvent
 
 export const ofType = <T extends DomainEvent['type']>(events: readonly DomainEvent[], type: T) =>
   events.filter((event): event is Extract<DomainEvent, { type: T }> => event.type === type)
+
+/** A solid tile whose blast holds exactly five ore cells, all of one tier, in generated rock. */
+export function fiveOreBlastSite(): { wall: TilePoint; tier: number } {
+  for (let ty = STAND_TILE.ty - 30; ty <= STAND_TILE.ty + 30; ty++) {
+    for (let tx = -60; tx <= 60; tx++) {
+      const wall = { tx, ty }
+      if (kindOfCell(cellAt(EMPTY_WORLD, PARAMS, wall)) !== CELL_KIND.ground) continue
+      const ore = blastTilesAround(wall)
+        .map((tile) => cellAt(EMPTY_WORLD, PARAMS, tile))
+        .filter((cell) => kindOfCell(cell) === CELL_KIND.ore)
+      const tiers = new Set(ore.map((cell) => resourceTierOf(PARAMS, cell)))
+      if (ore.length === 5 && tiers.size === 1) return { wall, tier: [...tiers][0] }
+    }
+  }
+  throw new Error('no five-ore blast site in the scanned rock')
+}
