@@ -1,7 +1,8 @@
 /**
  * The heat gauge in play (spec #113 design and numbers, built by #96), on a heat planet only:
  *
- * - Each accepted `reportPose` and `drillTile` settles the gauge from the last settled tick: first
+ * - Each accepted `reportPose` and `drillTile` settles the gauge from the last settled tick (a
+ *   docked vehicle's report at the platform rate, as undocking does): first
  *   the ticks the drill ran (band heat plus drill heat), then the rest (band heat), each less the
  *   strongest cooling that applies: at the surface (no rock above, or docked), inside a corridor of
  *   the archetype's lining type, or idle (no drive, thrust or drill ticks in the report). Undocking
@@ -97,6 +98,7 @@ export function followHeat(
   activity: HeatActivity,
 ): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
+  if (vehicle.mode === 'docked') return settleDockedHeat(state, playerId, tick)
   const params = planetParamsOf(state.planet)
   const archetype = hazardArchetypeOn(state.planet.index)
   const pose = vehicle.pose

@@ -163,6 +163,16 @@ describe('heat gauge cooling (#113)', () => {
     expect(gaugePoints(session)).toBe(30)
   })
 
+  it('cools a docked vehicle at the platform rate whether or not it reports its pose', () => {
+    const session = onHeatPlanet()
+    session.submit(0, { type: 'debug.teleportToDock', payload: { bay: 'sell' } })
+    session.submit(0, setHeat(80))
+    const { pose } = session.vehicle()
+    reportFor(session, 0, 3, 12, () => ({}), { x: pose?.x ?? 0, y: pose?.y ?? 0 })
+    session.submit(5 * TICKS_PER_SECOND, { type: 'undock', payload: {} })
+    expect(gaugePoints(session)).toBe(30)
+  })
+
   it('keeps the gauge at 0 off the heat planets', () => {
     const session = createScriptedSession()
     session.submit(0, FREEZE_ENEMIES)
