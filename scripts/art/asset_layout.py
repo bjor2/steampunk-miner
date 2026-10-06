@@ -24,6 +24,15 @@ def load_rules():
         return json.load(file)
 
 
+def load_manifest_entry(asset_id):
+    """The asset's own entry file, `art/assets/<id>.json` (#116), or None if it has none."""
+    path = os.path.join(REPO_ROOT, 'art', 'assets', asset_id + '.json')
+    if not os.path.isfile(path):
+        return None
+    with open(path, encoding='utf-8') as file:
+        return json.load(file)
+
+
 def load_placeholder_sidecar(asset_id):
     path = placeholder_path_of(asset_id)
     if not os.path.exists(path):

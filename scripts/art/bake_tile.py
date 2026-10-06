@@ -1,12 +1,13 @@
 """
 Bakes a ground or casing tile (#52 "Ground and casing": tileable 1024x1024 maps, 4 x 4 m at
-256 px/m, albedo and normal). The .blend holds one mesh object named for the asset id: a 4 x 4 m
+256 px/m, albedo and normal, plus emission for a tile whose entry says `"emissive": true`, #113). The .blend holds one mesh object named for the asset id: a 4 x 4 m
 quad in the XZ plane facing -Y (the Front view, so +X is right and +Z up), its UVs 0..1 across it.
 Its material must repeat at the UV edges; the S7d sources map their noise onto a torus
 (scripts/art/author_tiles.py), so the left edge continues the right one.
 
 The bake reads the object's own material: Cycles' diffuse colour pass is the albedo (opaque) and a
-tangent-space normal bake (OpenGL, +Y up) picks up its bump. Cycles on the CPU with a fixed seed,
+tangent-space normal bake (OpenGL, +Y up) picks up its bump. A glowing tile (refractory seams, lava)
+also bakes its emit pass, which encode.sh writes as the emissive map. Cycles on the CPU with a fixed seed,
 sample count and thread count, so an unchanged .blend bakes the same pixels. The PNGs go to
 art/build/<id>/ for scripts/art/encode.sh; toktx mipmaps them.
 """
@@ -22,18 +23,24 @@ import asset_layout
 BAKE_THREADS = 8
 # Blender stores vertices as 32-bit floats, so a 4 m side can be off in the last digits.
 SIZE_TOLERANCE_M = 1e-4
-MAP_COLOUR_SPACES = {'albedo': 'sRGB', 'normal': 'Non-Color'}
-BAKE_TYPES = {'albedo': ('DIFFUSE', {'COLOR'}), 'normal': ('NORMAL', set())}
+MAP_COLOUR_SPACES = {'albedo': 'sRGB', 'normal': 'Non-Color', 'emissive': 'sRGB'}
+BAKE_TYPES = {'albedo': ('DIFFUSE', {'COLOR'}), 'normal': ('NORMAL', set()), 'emissive': ('EMIT', set())}
 
 
 def export_tile(asset_id, rules):
     tile = tile_object_of(asset_id, rules)
     configure_cycles_bake(rules)
-    images = {kind: blank_image(asset_id, kind, rules['tilePx']) for kind in MAP_COLOUR_SPACES}
+    images = {kind: blank_image(asset_id, kind, rules['tilePx']) for kind in map_kinds_of(asset_id)}
     for kind, image in images.items():
         bake_into(tile, image, *BAKE_TYPES[kind])
     save_maps(asset_id, images)
     print('baked tile %s at %dx%d' % (asset_id, rules['tilePx'], rules['tilePx']))
+
+
+def map_kinds_of(asset_id):
+    """Albedo and normal, and emissive when the asset's entry says the tile glows."""
+    entry = asset_layout.load_manifest_entry(asset_id) or {}
+    return ['albedo', 'normal', 'emissive'] if entry.get('emissive') is True else ['albedo', 'normal']
 
 
 def tile_object_of(asset_id, rules):
@@ -135,3 +142,7 @@ def save_maps(asset_id, images):
         image.filepath_raw = os.path.join(folder, '%s.%s.png' % (asset_id, kind))
         image.file_format = 'PNG'
         image.save()
+    # A stale emission bake would be encoded as a map this tile no longer ships.
+    stale = os.path.join(folder, '%s.emissive.png' % asset_id)
+    if 'emissive' not in images and os.path.exists(stale):
+        os.remove(stale)

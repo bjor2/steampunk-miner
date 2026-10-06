@@ -16,7 +16,6 @@ byte-identical sidecar (#52 acceptance 5).
 """
 
 import hashlib
-import json
 import os
 import sys
 
@@ -89,11 +88,8 @@ def asset_problems(asset_id):
 
 def manifest_form_of(asset_id):
     """The form in the asset's own entry file, `art/assets/<id>.json` (#116)."""
-    path = os.path.join(asset_layout.REPO_ROOT, 'art', 'assets', asset_id + '.json')
-    if not os.path.isfile(path):
-        return 'unlisted'
-    with open(path, encoding='utf-8') as file:
-        return json.load(file)['form']
+    entry = asset_layout.load_manifest_entry(asset_id)
+    return 'unlisted' if entry is None else entry['form']
 
 
 def rig_problems():

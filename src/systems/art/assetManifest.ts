@@ -28,6 +28,11 @@ export interface ManifestEntry {
   status: AssetStatus
   color?: string
   partColors?: Readonly<Record<string, string>>
+  /**
+   * A tile whose material glows (#113: refractory seams, lava) ships an emissive map too. A tile has
+   * no sidecar to say so, as a parts asset's does.
+   */
+  emissive?: boolean
 }
 
 /** Every entry file, sorted by id (`artCatalogueOf`). */
@@ -46,6 +51,9 @@ const FORMS_OF_SOURCE: Readonly<Record<AssetSource, readonly AssetForm[]>> = {
 }
 
 const HEX_COLOUR = /^#[0-9a-f]{6}$/
+
+/** A tile's maps; the last ships only when the entry says the tile glows. */
+const TILE_MAP_KINDS = ['albedo', 'normal', 'emissive'] as const
 
 /** Why the manifest is not the #51 inventory under the #52 naming; empty when it is. */
 export function manifestProblems(manifest: AssetManifest): string[] {
@@ -69,6 +77,9 @@ function entryProblems(entry: ManifestEntry): string[] {
   }
   if (!Object.values(entry.partColors ?? {}).every(isHexColour)) {
     problems.push('partColors must be #rrggbb colours')
+  }
+  if (entry.emissive !== undefined && entry.form !== 'tile') {
+    problems.push('only a tile says emissive; a parts sidecar names its own maps')
   }
   return problems.map((problem) => `asset "${entry.id}": ${problem}`)
 }
@@ -125,9 +136,14 @@ export function expectedFilesOf(entry: ManifestEntry, sidecarMaps: readonly stri
 function namesOfForm(entry: ManifestEntry, sidecarMaps: readonly string[]): string[] {
   const { id } = entry
   if (entry.form === 'parts') return [`${id}.parts.json`, ...sidecarMaps]
-  if (entry.form === 'tile') return [`${id}.albedo.ktx2`, `${id}.normal.ktx2`]
+  if (entry.form === 'tile') return tileMapNamesOf(entry)
   if (entry.form === 'backdrop') return [`${id}.albedo.ktx2`]
   return entry.form === 'svg' ? [`${id}.svg`] : []
+}
+
+function tileMapNamesOf(entry: ManifestEntry): string[] {
+  const kinds = entry.emissive === true ? TILE_MAP_KINDS : TILE_MAP_KINDS.slice(0, 2)
+  return kinds.map((kind) => `${entry.id}.${kind}.ktx2`)
 }
 
 /** The asset id a shipped file belongs to: its folder under public/assets, or its icon's stem. */

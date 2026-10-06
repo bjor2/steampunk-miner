@@ -88,6 +88,29 @@ describe('asset manifest', () => {
     expect(expectedFilesOf({ ...finalCrawler, status: 'placeholder' }, crawlerMaps)).toEqual([])
   })
 
+  it('ships a glowing tile’s emissive map beside its albedo and normal maps', () => {
+    const tile: ManifestEntry = {
+      id: 'casing-grade-2',
+      source: 'blender',
+      form: 'tile',
+      status: 'final',
+      color: '#5c6066',
+    }
+    const folder = 'public/assets/casing/casing-grade-2/casing-grade-2'
+    expect(expectedFilesOf(tile, [])).toEqual([`${folder}.albedo.ktx2`, `${folder}.normal.ktx2`])
+    expect(expectedFilesOf({ ...tile, emissive: true }, [])).toEqual([
+      `${folder}.albedo.ktx2`,
+      `${folder}.normal.ktx2`,
+      `${folder}.emissive.ktx2`,
+    ])
+  })
+
+  it('refuses an emissive flag on anything but a tile, whose sidecar would say it instead', () => {
+    expect(manifestProblems(withEntries({ ...finalCrawler, emissive: true }))).toEqual([
+      'asset "enemy-crawler": only a tile says emissive; a parts sidecar names its own maps',
+    ])
+  })
+
   it('reads the owner of an export from its folder and of an icon from its file stem', () => {
     expect(ownerIdOfFile('public/assets/enemy/enemy-crawler/enemy-crawler.normal.ktx2')).toBe(
       'enemy-crawler',

@@ -188,6 +188,12 @@ CPU at the `tileSamples` count in `art/asset-rules.json`, seed 0 and fixed threa
 writes them as `<id>.albedo.ktx2` (ETC1S, sRGB) and `<id>.normal.ktx2` (UASTC, linear) in
 `public/assets/<category>/<id>/`. The lint holds every tile map to 1024 x 1024.
 
+A tile whose material glows (the refractory lining's seams and the lava, #113) says
+`"emissive": true` in its entry. `bake_tile.py` then bakes its emit pass too, and `encode.sh` writes
+`<id>.emissive.ktx2` (ETC1S, sRGB) beside the other two maps. The lint expects that third map for
+exactly those tiles, and `tileEmissiveMapOf` (`src/systems/art/tileLook.ts`) names it for the
+renderer. Only a tile carries the flag; a parts asset's sidecar names its own maps.
+
 `scripts/art/author_tiles.py` wrote the first version of the ten files (S7d). Every texture in
 them reads 4D noise on a torus and every lattice has a whole number of periods across the tile,
 so the maps tile with no seam. From then on the `.blend` files are the sources.
