@@ -73,12 +73,21 @@ function jogPlanOf(session: BotSession, layout: MineLayout): JogPlan | null {
   return null
 }
 
-/** The bottom row and the open rows above it, up to the last jog (jogs stay in depth order). */
+/**
+ * The bottom row and the open rows above it, up to the last jog (jogs stay in depth order), but
+ * never a row with a gallery dug off it: its reach is counted from the shaft's column there.
+ */
 function jogRowsOf(layout: MineLayout): number[] {
   const bottom = layout.shaftBottomRow
   const lastJog = layout.shaftJogs.at(-1)?.row ?? layout.travelRow
   const highest = Math.min(bottom + JOG_RISE_ROWS, lastJog - 1)
-  return Array.from({ length: Math.max(0, highest - bottom + 1) }, (_, at) => bottom + at)
+  const rows = Array.from({ length: Math.max(0, highest - bottom + 1) }, (_, at) => bottom + at)
+  return rows.filter((row) => !hasDugGallery(layout, row))
+}
+
+function hasDugGallery(layout: MineLayout, row: number): boolean {
+  const gallery = layout.galleries.get(row)
+  return gallery !== undefined && (gallery.east > 0 || gallery.west > 0)
 }
 
 function clearColumnNear(session: BotSession, layout: MineLayout, row: number): number | null {

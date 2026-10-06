@@ -117,6 +117,16 @@ describe('bot: shaft round lava (#113)', () => {
     ])
   })
 
+  it('never steps aside along a row it has dug a gallery off', () => {
+    const { session, planet } = diggerAbovePocket()
+    const dug = { east: 4, west: 0, isEastDone: false, isWestDone: false }
+    ;[352, 353, 354].forEach((row) => planet.layout.galleries.set(row, { ...dug }))
+    boreShaftDownTo(session, planet, BELOW_LAVA)
+    expect(planet.layout.shaftJogs.map((jog) => jog.row)).not.toEqual(
+      expect.arrayContaining([352, 353, 354]),
+    )
+  })
+
   it('never frees the pocket or touches it on the way', () => {
     const { session, planet } = diggerAbovePocket()
     boreShaftDownTo(session, planet, BELOW_LAVA)
