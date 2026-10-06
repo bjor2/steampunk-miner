@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "ticket": 186,
+  "title": "Kernel K3: BlastEvent size fields",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-06T18:47:20Z",
+  "closed": "2026-10-06T23:51:13Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-06T18:47:20.000Z","end":"2026-10-06T18:47:39.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"blocked","start":"2026-10-06T18:47:39.000Z","end":"2026-10-06T22:38:24.000Z","attempt":0,"tier":null,"model":null,"source":"github"},
+    {"category":"idle","start":"2026-10-06T22:38:24.000Z","end":"2026-10-06T22:59:24.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-06T22:59:24.000Z","end":"2026-10-06T22:59:55.741Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-06T22:59:55.741Z","end":"2026-10-06T23:00:48.570Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-06T23:00:48.570Z","end":"2026-10-06T23:18:29.536Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-06T23:18:29.536Z","end":"2026-10-06T23:18:34.007Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-06T23:18:34.007Z","end":"2026-10-06T23:29:04.430Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-06T23:29:04.430Z","end":"2026-10-06T23:29:08.863Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-06T23:29:08.863Z","end":"2026-10-06T23:29:23.256Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-06T23:29:23.256Z","end":"2026-10-06T23:29:26.916Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-06T23:29:26.916Z","end":"2026-10-06T23:29:35.345Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-06T23:29:35.345Z","end":"2026-10-06T23:51:05.159Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-06T23:51:05.159Z","end":"2026-10-06T23:51:13.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":13845,"planner_wait":0,"idle":1279,"context":57,"planning":8,"developing":8,"testing":1691,"gates":1290,"landing":22,"other":32},
+  "lead_time_s": 18233,
+  "cycle_time_s": 3109,
+  "claimed": "2026-10-06T22:59:24.000Z",
+  "claimed_to_done_s": 3109,
+  "backfilled": false
+}
