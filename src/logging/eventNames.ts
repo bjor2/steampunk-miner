@@ -393,10 +393,20 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: { tx: 'integer', ty: 'integer', ticks: 'integer', damage: 'money' },
   },
+  // #122: which ore (the `oreId` #155 names), whole tiles below the surface of its cell's column
+  // (`oreDepthTiles`: the envelope's `depthTiles` is the vehicle's) and its chunk as `cx,cy`; the
+  // envelope's `seq` orders the lines into the mined order `summary.json` keeps.
   resource_collected: {
     group: 'mining',
     level: 'detail',
-    payload: { resourceTier: 'integer', amount: 'integer', value: 'money' },
+    payload: {
+      resourceTier: 'integer',
+      amount: 'integer',
+      value: 'money',
+      oreId: 'text',
+      oreDepthTiles: 'integer',
+      chunk: 'text',
+    },
   },
 
   // Vehicle and combat (#7, #9)

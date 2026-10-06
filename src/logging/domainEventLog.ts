@@ -78,9 +78,10 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'collapse',
     data: { block, samplesFilled, vehiclesHit },
   }),
-  CargoAdded: ({ resourceTier, amount, value }) => ({
+  // The cell's depth is `oreDepthTiles`: the envelope's `depthTiles` is where the vehicle is (#122).
+  CargoAdded: ({ resourceTier, amount, value, oreId, depthTiles, chunk }) => ({
     event: 'resource_collected',
-    data: { resourceTier, amount, value },
+    data: { resourceTier, amount, value, oreId, oreDepthTiles: depthTiles, chunk },
   }),
   StorageFull: ({ lostUnits }) => ({ event: 'storage_full', data: { lostUnits } }),
   EnergyLow: ({ threshold }) => ({ event: 'energy_low', data: { threshold } }),

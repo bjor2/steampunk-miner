@@ -25,7 +25,14 @@ describe('run log', () => {
   it('stamps the event with the versioned envelope of the logging contract', () => {
     const { runLog, sink, clock } = startRun()
     clock.now = 135.4
-    runLog.record(stamp, 'resource_collected', { resourceTier: 42, amount: 6, value: '1.25e+6' })
+    runLog.record(stamp, 'resource_collected', {
+      resourceTier: 42,
+      amount: 6,
+      value: '1.25e+6',
+      oreId: 'kernel.crystal.t42',
+      oreDepthTiles: 73,
+      chunk: '2,-5',
+    })
     expect(sink.events).toEqual([
       {
         v: LOG_SCHEMA_VERSION,
@@ -38,7 +45,14 @@ describe('run log', () => {
         depthTiles: 73,
         event: 'resource_collected',
         cmd: [8118, 3],
-        data: { resourceTier: 42, amount: 6, value: '1.25e+6' },
+        data: {
+          resourceTier: 42,
+          amount: 6,
+          value: '1.25e+6',
+          oreId: 'kernel.crystal.t42',
+          oreDepthTiles: 73,
+          chunk: '2,-5',
+        },
       },
     ])
   })

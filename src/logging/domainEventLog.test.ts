@@ -246,6 +246,18 @@ describe('domain event log', () => {
     })
   })
 
+  it('records which ore was collected, how deep its cell lay and its chunk (#122)', () => {
+    recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, vehicleEvents)
+    expect(sink.events.find((event) => event.event === 'resource_collected')?.data).toEqual({
+      resourceTier: 1,
+      amount: 1,
+      value: '1e+1',
+      oreId: 'kernel.metal.t1',
+      oreDepthTiles: 2,
+      chunk: '0,9',
+    })
+  })
+
   it('records every combat event as a registered line; an enemy kill names no enemy id', () => {
     recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, combatEvents)
     expect(sink.events.map((event) => event.event)).toEqual([
