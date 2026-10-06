@@ -114,6 +114,34 @@
       "budget": 600,
       "source": "npm run bench:ground"
     },
+    "groundDrillingBundledCpu.carveP50Ms": {
+      "label": "Ground carve p50 · bundled, CPU time",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "bench:ground bundled with esbuild (as Vite ships the game) and timed in process CPU time, 5+ interleaved runs, median (#120)"
+    },
+    "groundDrillingBundledCpu.carveP95Ms": {
+      "label": "Ground carve p95 · bundled, CPU time",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "bench:ground bundled with esbuild (as Vite ships the game) and timed in process CPU time, 5+ interleaved runs, median (#120)"
+    },
+    "groundDrillingBundledCpu.remeshP50Ms": {
+      "label": "Ground remesh chunk p50 · bundled, CPU time",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "bench:ground bundled with esbuild (as Vite ships the game) and timed in process CPU time, 5+ interleaved runs, median (#120)"
+    },
+    "groundDrillingBundledCpu.carveAndRemeshP95Ms": {
+      "label": "Ground carve + remesh p95 · bundled, CPU time",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "bench:ground bundled with esbuild (as Vite ships the game) and timed in process CPU time, 5+ interleaved runs, median (#120)"
+    },
     "combatTick.p50Ms": {
       "label": "Combat tick p50 · 6 enemies",
       "unit": "ms",
