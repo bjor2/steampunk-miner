@@ -15,6 +15,11 @@ import type { VehicleItem } from './vehicleLoadout'
 export interface ContentEntry {
   id: string
   iconId: string
+  /**
+   * The row of the locked horizontal schedule (docs/scaling/horizontal/stats.json) this entry
+   * ships, when it ships one; the schedule coverage spec gives every row exactly one home.
+   */
+  scheduleRowId?: string
 }
 
 /** Kinds are added by module augmentation from the kind's owner; values must extend ContentEntry. */
@@ -29,6 +34,11 @@ export interface ContentRegistration {
   id: string
   kind: string
   entry: ContentEntry
+}
+
+export interface ScheduleRowClaim {
+  rowId: string
+  entryId: string
 }
 
 export interface ContentIconUse {
@@ -51,6 +61,13 @@ export function contentOf<K extends ContentKind>(kind: K): readonly ContentKinds
   return entriesOf(CONTENT_REGISTRY)
     .filter((registration) => registration.kind === kind)
     .map((registration) => registration.entry as ContentKinds[K])
+}
+
+/** Every schedule row a content entry claims, with the entry that claims it. */
+export function contentScheduleRowClaims(): readonly ScheduleRowClaim[] {
+  return entriesOf(CONTENT_REGISTRY).flatMap(({ id, entry }) =>
+    entry.scheduleRowId === undefined ? [] : [{ rowId: entry.scheduleRowId, entryId: id }],
+  )
 }
 
 /** Every content entry's icon, for the kernel icon coverage test. */
