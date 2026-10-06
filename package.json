@@ -24,6 +24,7 @@
     "balance:baseline": "vite-node scripts/balanceReport.ts --write-baseline",
     "balance:planets": "vite-node scripts/balancePlanets.ts",
     "balance:guns": "vite-node scripts/balanceGuns.ts",
+    "balance:refinery": "vite-node scripts/balanceRefinery.ts",
     "art:export": "scripts/art/export.sh",
     "art:merge-check": "scripts/art/merge_check.sh",
     "lint": "eslint .",

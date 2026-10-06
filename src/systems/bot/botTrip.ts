@@ -8,6 +8,7 @@
 import { coreNeededOf } from '../authority/coreBay'
 import { dockCommand, undockCommand } from '../platform/platformCommands'
 import { cargoUnitsOf, isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
+import type { BayId } from '../world/dockBays'
 import type { TilePoint } from '../world/tileGrid'
 import { assertReturnReserve, canAffordBore, canAffordMoveTo } from './botEnergy'
 import { boreTile, enterBoredTile, moveStraight, type BotPlanet } from './botPilot'
@@ -50,9 +51,23 @@ export function runTrip(session: BotSession, planet: BotPlanet, goal: TripGoal):
 
 /** Drives from the Sell bay to the Upgrade bay (#37) and docks there, to buy. */
 export function driveToUpgradeBay(session: BotSession, planet: BotPlanet): void {
+  driveToBay(session, planet, 'upgrade', planet.layout.upgradeBay)
+}
+
+/** Drives along the pad to the Refinery bay (#105) and docks there, to queue a batch. */
+export function driveToRefineryBay(session: BotSession, planet: BotPlanet, bay: TilePoint): void {
+  driveToBay(session, planet, 'refinery', bay)
+}
+
+/** Drives back to the Sell bay and docks there, to collect and sell. */
+export function driveToSellBay(session: BotSession, planet: BotPlanet): void {
+  driveToBay(session, planet, 'sell', planet.layout.sellBay)
+}
+
+function driveToBay(session: BotSession, planet: BotPlanet, bay: BayId, tile: TilePoint): void {
   leavePad(session)
-  moveStraight(session, planet.pilot, planet.layout.upgradeBay)
-  session.submit(dockCommand('upgrade'))
+  moveStraight(session, planet.pilot, tile)
+  session.submit(dockCommand(bay))
 }
 
 function leavePad(session: BotSession): void {

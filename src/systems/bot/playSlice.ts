@@ -6,7 +6,8 @@
  *
  * Each dock cycle: travel when the core is done and the fee is paid, choose a trip (the core while
  * it is the goal, the drill digs it fast enough and the casing holds it, else the best ore band
- * the casing grade holds), run it, then service and shop.
+ * the casing grade holds), run it, refine the best of the haul when the platform has the Refinery
+ * bay and the bot will dive again (#105), then service and shop.
  */
 import { SLICE_LAST_PLANET } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -22,6 +23,7 @@ import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
 import { deepestHeldBand, holdsCore } from './botCasing'
 import type { GunPolicy } from './botGuns'
+import { collectWhenReady, refineWhenWorthIt, type RefineryUse } from './botRefining'
 import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
 import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
@@ -59,6 +61,15 @@ export interface SliceRunOptions {
   /** Mount `auto_guns` when offered (the default, #107 bot policy), or never, to compare. */
   gunPolicy?: GunPolicy
   listener?: BotListener
+  /** `used` (the default) from the Refinery bay's planet; `ignored` plays as if it had none. */
+  refinery?: RefineryUse
+}
+
+/** What every dock cycle of one run needs to know. */
+interface BotRun {
+  lastPlanet: number
+  refinery: RefineryUse
+  gunPolicy: GunPolicy
 }
 
 /**
@@ -71,18 +82,26 @@ export function playSlice(start: AuthorityState, options: SliceRunOptions): Slic
   const session = createBotSession(start, options.playerId ?? 'p1', options.listener)
   for (const intent of options.startCommands ?? []) session.submit(intent)
   let planet = botPlanetOf(session)
-  const lastPlanet = options.lastPlanet ?? SLICE_LAST_PLANET
-  const gunPolicy = options.gunPolicy ?? 'mount'
-  while (!isLastCoreDone(session, lastPlanet) && session.tick() < options.maxTicks) {
+  const run: BotRun = {
+    lastPlanet: options.lastPlanet ?? SLICE_LAST_PLANET,
+    refinery: options.refinery ?? 'used',
+    gunPolicy: options.gunPolicy ?? 'mount',
+  }
+  while (!isLastCoreDone(session, run.lastPlanet) && session.tick() < options.maxTicks) {
     planet = travelWhenReady(session, planet)
-    if (!playDockCycle(session, planet, gunPolicy)) break
+    if (!playDockCycle(session, planet, run)) break
   }
   return {
     commands: session.commands(),
     events: session.events(),
     state: session.state(),
-    isFinished: isLastCoreDone(session, lastPlanet),
+    isFinished: isLastCoreDone(session, run.lastPlanet),
   }
+}
+
+/** Refining pays only when the bot comes back for the batch: not after the run's last core. */
+function isRefining(session: BotSession, run: BotRun): boolean {
+  return run.refinery === 'used' && !isLastCoreDone(session, run.lastPlanet)
 }
 
 function isLastCoreDone(session: BotSession, lastPlanet: number): boolean {
@@ -108,12 +127,14 @@ function travelWhenReady(session: BotSession, planet: BotPlanet): BotPlanet {
 }
 
 /** One trip and the dock after it; false when no trip can earn anything. */
-function playDockCycle(session: BotSession, planet: BotPlanet, gunPolicy: GunPolicy): boolean {
+function playDockCycle(session: BotSession, planet: BotPlanet, run: BotRun): boolean {
   const goal = chooseGoal(session, planet)
   if (goal === null) return false
   runTrip(session, planet, goal)
+  collectWhenReady(session)
+  if (isRefining(session, run)) refineWhenWorthIt(session, planet)
   serviceAtDock(session)
-  shopAtUpgradeBay(session, planet, gunPolicy)
+  shopAtUpgradeBay(session, planet, run.gunPolicy)
   return true
 }
 

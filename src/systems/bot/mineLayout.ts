@@ -6,7 +6,7 @@
  * reaches; the authority's world is the truth about what is open.
  */
 import { bandOfTile, isCoreTile, isInsidePlanet } from '../world/planetGeometry'
-import { bayRestTileOf } from '../world/dockBays'
+import { bayRestTileOf, hasBay } from '../world/dockBays'
 import type { DockSite } from '../world/dockSite'
 import type { PlanetParams } from '../world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
@@ -29,6 +29,8 @@ export interface MineLayout {
   /** Where the bot docks to sell (every return) and to buy (#37), one tile in each bay. */
   sellBay: TilePoint
   upgradeBay: TilePoint
+  /** Where the bot docks to refine (#105), on the planets whose pad has the Refinery bay. */
+  refineryBay: TilePoint | null
   /** The lowest row the shaft is open down to; the vehicle can stand anywhere above it. */
   shaftBottomRow: number
   galleries: Map<number, Gallery>
@@ -48,6 +50,7 @@ export function newMineLayout(params: PlanetParams, site: DockSite): MineLayout 
     travelRow,
     sellBay: bayRestTileOf(site, 'sell'),
     upgradeBay: bayRestTileOf(site, 'upgrade'),
+    refineryBay: hasBay(site, 'refinery') ? bayRestTileOf(site, 'refinery') : null,
     shaftBottomRow: travelRow,
     galleries: new Map(),
   }

@@ -36,4 +36,11 @@ export const PACING_TARGETS = {
   wreckerPlanets: { first: 6, last: 9 },
   wreckerRingsBreachedPerDive: { min: 2, max: 8 },
   wreckerCollapseDivesPerHundred: 5,
+  /**
+   * Report only (#105 numbers, single-lever rule): the bot refining may shorten a planet by at most
+   * this many percent against the run without the refinery, and may not push a planet that took
+   * at least `campaignPlanetMinutes.min` below it. Past either, `valueMultiplier` is lowered
+   * (floor 1.15), never `k_casing`.
+   */
+  refineryMaxPlanetSpeedupPercent: 10,
 } as const

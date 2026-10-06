@@ -154,6 +154,10 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
     tally.moneyEarned = add(tally.moneyEarned, fromCanonical(data.value))
     tally.milestones.firstSale ??= tick
   },
+  // A refined batch is paid at the Sell bay (#105), so it is money earned like a sale.
+  refine_collected: (tally, { data }) => {
+    tally.moneyEarned = add(tally.moneyEarned, fromCanonical(data.value))
+  },
   upgrade_purchased: (tally, { data, tick }) => {
     tally.upgradeSpending = add(tally.upgradeSpending, fromCanonical(data.cost))
     tally.upgradesPurchased += 1

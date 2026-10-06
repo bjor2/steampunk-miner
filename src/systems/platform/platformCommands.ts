@@ -1,8 +1,9 @@
 /**
  * The platform's command intents (decision #8 registered commands, #23), as the store submits
  * them: `Dock {bay}`, `Undock`, `SellCargo {resourceTier | all}`, `RepairHull`, `RechargeEnergy`,
- * `QuickService`, `BuyUpgrade {upgradeId}`, `BuyCasingGrade`, `BuyGun` (#107) and `Travel {toPlanet}` (#10). The authority checks
- * and prices each one.
+ * `QuickService`, `BuyUpgrade {upgradeId}`, `BuyCasingGrade`, `BuyGun` (#107), `Travel {toPlanet}`
+ * (#10), and the Refinery bay's `QueueRefine`, `BuyRefinerySlot` and the Sell bay's
+ * `CollectRefined` (#105). The authority checks and prices each one.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import type { OreSelection } from '../authority/platformServices'
@@ -42,6 +43,21 @@ export function buyCasingGradeCommand(): CommandIntent<'buyCasingGrade'> {
 
 export function buyGunCommand(): CommandIntent<'buyGun'> {
   return { type: 'buyGun', payload: {} }
+}
+
+export function queueRefineCommand(
+  resourceTier: number,
+  units: number,
+): CommandIntent<'queueRefine'> {
+  return { type: 'queueRefine', payload: { resourceTier, units } }
+}
+
+export function buyRefinerySlotCommand(): CommandIntent<'buyRefinerySlot'> {
+  return { type: 'buyRefinerySlot', payload: {} }
+}
+
+export function collectRefinedCommand(): CommandIntent<'collectRefined'> {
+  return { type: 'collectRefined', payload: {} }
 }
 
 export function travelCommand(toPlanet: number): CommandIntent<'travel'> {

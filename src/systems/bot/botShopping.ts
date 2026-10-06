@@ -59,6 +59,7 @@ function serviceIntents(session: BotSession): CommandIntent[] {
   const quick: CommandIntent = { type: 'quickService', payload: {} }
   if (wouldAccept(session, quick)) return [quick]
   return [
+    { type: 'collectRefined', payload: {} },
     { type: 'sellCargo', payload: { resourceTier: 'all' } },
     { type: 'rechargeEnergy', payload: {} },
     { type: 'repairHull', payload: {} },

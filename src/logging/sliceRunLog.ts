@@ -9,6 +9,7 @@ import type { AuthorityCommand, CommandIntent } from '../systems/authority/autho
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
 import type { GunPolicy } from '../systems/bot/botGuns'
+import type { RefineryUse } from '../systems/bot/botRefining'
 import { playSlice, type SliceRun } from '../systems/bot/playSlice'
 import { startOfScenario, validateScenario, type Scenario } from '../systems/scenario'
 import { startScenarioCommands } from '../systems/startScenarioCommands'
@@ -37,6 +38,8 @@ export interface LoggedRunOptions {
   maxTicks?: number
   /** `never` plays without `auto_guns`, the comparison run of #107 acceptance 5. */
   gunPolicy?: GunPolicy
+  /** Whether the bot refines from the Refinery bay's planet (#105 acceptance 7); default `used`. */
+  refinery?: RefineryUse
 }
 
 export function playLoggedSlice(
@@ -57,6 +60,7 @@ export function playLoggedSlice(
     maxTicks: options.maxTicks ?? BOT_RUN_BUDGET_TICKS,
     lastPlanet: options.lastPlanet,
     gunPolicy: options.gunPolicy,
+    refinery: options.refinery,
     playerId: PLAYER_ID,
     startCommands: startCommandsOf(scenario),
     listener: {
