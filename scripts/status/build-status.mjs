@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Builds the status dashboard (dist/status/) that the Pages workflow deploys next to the game:
 // the issue trees (sub-issue hierarchy) from GraphQL, the loop state from loops.json on the
-// orphan `loop-status` branch, the last run of each workflow, and the Performance charts from
-// the committed docs/perf/ files (static HTML + SVG, no script). Static output, no server.
+// orphan `loop-status` branch, the last run of each workflow, the Performance charts from
+// the committed docs/perf/ files (static HTML + SVG, no script), and the game feature tree from
+// docs/features/features.json joined with the live issue states. Static output, no server.
 //
 //   node scripts/status/build-status.mjs [--out dist/status]
 //
@@ -11,6 +12,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { annotateFeatures, validateFeatures } from './features.mjs'
 import { buildPerfOverview } from './perfOverview.mjs'
 import { renderPerfOverview, renderPerfOverviewFailure } from './perfOverviewHtml.mjs'
 
@@ -18,6 +20,8 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 // The Pages job checks out with depth 1, so the perf files are read, never asked of git.
 const PERF_DIR = join(HERE, '..', '..', 'docs', 'perf')
 const PERF_PLACEHOLDER = '<!-- perf-overview -->'
+const FEATURES_FILE = 'docs/features/features.json'
+const FEATURES_PATH = join(HERE, '..', '..', FEATURES_FILE)
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
 const [OWNER, NAME] = REPO.split('/')
 const LOOP_BRANCH = process.env.LOOP_STATUS_BRANCH || 'loop-status'
@@ -231,6 +235,51 @@ function buildPerfSection() {
   }
 }
 
+async function fetchLastCommitOf(path) {
+  try {
+    const commits = await rest(`repos/${REPO}/commits?path=${encodeURIComponent(path)}&per_page=1`)
+    const c = commits?.[0]
+    return c
+      ? {
+          sha: c.sha,
+          url: c.html_url,
+          date: c.commit.committer?.date ?? c.commit.author?.date ?? null,
+          message: c.commit.message.split('\n')[0],
+        }
+      : null
+  } catch (err) {
+    console.warn(`last commit of ${path} unavailable: ${err.message}`)
+    return null
+  }
+}
+
+// A broken feature file must not take the rest of the page down: the Features tab then lists
+// the problems instead of the tree.
+function buildFeatures(issues, lastCommit) {
+  const base = { file: FEATURES_FILE, lastCommit }
+  try {
+    const doc = JSON.parse(readFileSync(FEATURES_PATH, 'utf8'))
+    const problems = validateFeatures(doc)
+    if (problems.length) {
+      for (const p of problems) console.warn(`features: ${p}`)
+      return { ...base, error: `${FEATURES_FILE} is invalid`, problems }
+    }
+    return { ...base, ...annotateFeatures(doc, issues) }
+  } catch (err) {
+    console.warn(`features failed: ${err.message}`)
+    return { ...base, error: String(err.message), problems: [] }
+  }
+}
+
+// /status/features/ is a short link to the Features tab.
+const FEATURES_REDIRECT = `<!doctype html>
+<meta charset="utf-8" />
+<title>Steampunk Miner · Feature tree</title>
+<meta http-equiv="refresh" content="0; url=../#features" />
+<link rel="canonical" href="../#features" />
+<p>Moved to <a href="../#features">the status page's Features tab</a>.</p>
+`
+
 function pageWithPerfSection(perfHtml) {
   const page = readFileSync(join(HERE, 'index.html'), 'utf8')
   if (!page.includes(PERF_PLACEHOLDER)) {
@@ -243,11 +292,13 @@ function pageWithPerfSection(perfHtml) {
 const perf = buildPerfSection()
 const page = pageWithPerfSection(perf.html)
 
-const [issues, loops, workflows] = await Promise.all([
+const [issues, loops, workflows, featuresCommit] = await Promise.all([
   fetchIssues(),
   fetchLoops(),
   fetchWorkflows(),
+  fetchLastCommitOf(FEATURES_FILE),
 ])
+const features = buildFeatures(issues, featuresCommit)
 const server = process.env.GITHUB_SERVER_URL || 'https://github.com'
 const runId = process.env.GITHUB_RUN_ID
 const status = {
@@ -275,9 +326,14 @@ mkdirSync(OUT, { recursive: true })
 writeFileSync(join(OUT, 'status.json'), JSON.stringify(status))
 writeFileSync(join(OUT, 'loops.json'), JSON.stringify(loops, null, 2))
 writeFileSync(join(OUT, 'perf.json'), JSON.stringify(perf.model))
+writeFileSync(join(OUT, 'features.json'), JSON.stringify(features))
 writeFileSync(join(OUT, 'index.html'), page)
+mkdirSync(join(OUT, 'features'), { recursive: true })
+writeFileSync(join(OUT, 'features', 'index.html'), FEATURES_REDIRECT)
+for (const f of features.flagged ?? []) console.log(`features: check ${f.path}: ${f.reason}`)
 console.log(
   `status: ${issues.length} issues, ${Object.keys(loops.entries ?? {}).length} loop entries, ` +
     `${workflows.length} workflows, ${perf.model.runCount ?? 0} perf runs / ` +
-    `${perf.model.metricCount ?? 0} metrics -> ${OUT}`,
+    `${perf.model.metricCount ?? 0} metrics, ` +
+    `${features.counts ? `${features.counts.features} features / ${features.counts.flagged} to check` : `features: ${features.error}`} -> ${OUT}`,
 )

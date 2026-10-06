@@ -1,0 +1,1908 @@
+{
+  "$comment": "Canonical game feature tree shown on the status page's Features tab (https://bjor2.github.io/steampunk-miner/status/#features). Edit by hand; how-to in docs/features/README.md. status: built | partial | planned. issues: GitHub issue numbers. planet: campaign planet it unlocks on. group: a heading node without its own status.",
+  "schema": 1,
+  "title": "Steampunk Miner",
+  "description": "Infinite 2D steampunk mining game in the spirit of Motherload: drill into round planets, haul ore home, sell, upgrade, harvest the core and travel on through a 40-planet campaign toward endless play.",
+  "areas": [
+    {
+      "group": true,
+      "title": "Vehicle & Movement",
+      "description": "The mining rig itself: how it drives, climbs, drills and survives on a round world.",
+      "children": [
+        {
+          "title": "Driving on a round world",
+          "description": "Drive left and right along the curved surface and tunnels; controls follow the rig, so 'down' always points toward the core.",
+          "status": "built",
+          "issues": [7, 21]
+        },
+        {
+          "title": "Thruster climb (lift)",
+          "description": "Hold W to fire the steam thruster and climb against gravity; it also swings the drill to face up. Thrust drains energy fastest.",
+          "status": "built",
+          "issues": [40, 53]
+        },
+        {
+          "title": "Radial gravity",
+          "description": "Gravity always pulls toward the planet centre and weakens near it, so climbing out of a deep shaft is the real cost of a dive.",
+          "status": "built",
+          "issues": [7, 4]
+        },
+        {
+          "title": "Swivelling drill head",
+          "description": "The drill turns between four directions (left, right, down, up) without turning the body, so you can tunnel any way you like.",
+          "status": "built",
+          "issues": [7]
+        },
+        {
+          "group": true,
+          "title": "Energy",
+          "description": "One shared energy tank powers everything; it is your clock on every trip.",
+          "children": [
+            {
+              "title": "Energy tank",
+              "description": "Driving, drilling, thrusting and gun shots all draw from a single boiler tank that you recharge at the platform.",
+              "status": "built",
+              "issues": [7]
+            },
+            {
+              "title": "Action energy costs",
+              "description": "Each action drains at its own rate: thrust most, then drilling, then driving; boring upward costs about 2.5x more than boring down.",
+              "status": "built",
+              "issues": [6, 41]
+            },
+            {
+              "title": "Low-energy warnings",
+              "description": "Warnings at 25% and 10% that also account for the energy needed to climb home from your current depth, so they never lie about the way back.",
+              "status": "built",
+              "issues": [33, 7]
+            },
+            {
+              "title": "Stranding & rescue tow",
+              "description": "Run dry away from the pad and the rig strands; press R (or wait a few seconds) and the tow drags you home for a small fee, losing the ore in the hold. No game over.",
+              "status": "built",
+              "issues": [7, 8]
+            },
+            {
+              "title": "Safe pad",
+              "description": "Running out of energy on the dock pad never strands you; you can always dock.",
+              "status": "built",
+              "issues": [7]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Hull & Cargo",
+          "description": "How much punishment the rig takes and how much it can carry.",
+          "children": [
+            {
+              "title": "Hull health",
+              "description": "Hull soaks hits from enemies, cave-ins, heat, lava and your own blasts; repair it at the platform.",
+              "status": "built",
+              "issues": [7, 9]
+            },
+            {
+              "title": "Wreck & tow",
+              "description": "At zero hull the rig is wrecked and towed back to the dock: hull refilled, cargo ore lost, core fragments still banked.",
+              "status": "built",
+              "issues": [9, 7]
+            },
+            {
+              "title": "Cargo capacity",
+              "description": "Ore fills a limited hold; once it is full, newly mined ore is lost, so you have to head home and sell.",
+              "status": "built",
+              "issues": [7]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Look & Feel",
+          "description": "How the rig shows what it is doing and how far it has grown.",
+          "children": [
+            {
+              "title": "Animated machinery",
+              "description": "Wheels roll with speed, the drill spins as it bites, pistons pump with thrust, the boiler breathes and landings squash the chassis.",
+              "status": "built",
+              "issues": [48, 66]
+            },
+            {
+              "title": "Headlamp",
+              "description": "A lamp follows the drill's facing and lights the rock you are about to cut.",
+              "status": "built",
+              "issues": [13]
+            },
+            {
+              "title": "Three visual tiers",
+              "description": "The rig visibly grows: tier 2 adds side armour and a second stack, tier 3 a bore-collar drill, a second boiler and a second lamp, as your total upgrade levels rise.",
+              "status": "built",
+              "issues": [7, 66]
+            },
+            {
+              "title": "Mounted modules on the rig",
+              "description": "Bought modules show on the vehicle: the gun turret swings its barrel toward targets and the charge rack sits on the hull.",
+              "status": "built",
+              "issues": [108, 110]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Planned vehicle modules",
+          "description": "Campaign additions scheduled in the locked unlock schedule but not built yet.",
+          "children": [
+            {
+              "title": "Cargo wagon",
+              "description": "Hitch a wagon behind the rig for more storage; later wagon types and a second slot live on this beat.",
+              "status": "planned",
+              "issues": [80, 78],
+              "planet": 12
+            },
+            {
+              "title": "Side drill arms",
+              "description": "Extra drill arms that cut wider tunnels to the sides.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 13
+            },
+            {
+              "title": "Steam shield",
+              "description": "A shield that absorbs hits before the hull does.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 22
+            },
+            {
+              "title": "Grav anchor",
+              "description": "A visible hull clamp for low-gravity interiors, prepared one planet before hollow worlds.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 32
+            },
+            {
+              "title": "Buoyancy tanks",
+              "description": "Float and anchor inside the open interiors of hollow planets.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 34
+            },
+            {
+              "title": "Escape thrusters",
+              "description": "Burst thrusters for timed escapes from unstable cores.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 37
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Drilling & Terrain",
+      "description": "Cutting through the ground, keeping tunnels standing, and blasting when the drill is not enough.",
+      "children": [
+        {
+          "title": "Smooth carved ground",
+          "description": "The ground is a fluid density field: the drill carves round tunnels at any angle instead of chopping square blocks, so sideways digging feels natural.",
+          "status": "built",
+          "issues": [36, 55]
+        },
+        {
+          "title": "Hardness vs drill",
+          "description": "Each rock's hardness against your drill sets the dig time, up to 2.5 tiles a second; deeper bands and later planets are harder.",
+          "status": "built",
+          "issues": [7, 6]
+        },
+        {
+          "title": "'Needs a better tip'",
+          "description": "If your drill tip is under a quarter of the rock's hardness the drill only skids: no progress, no energy spent, a clear sign to upgrade.",
+          "status": "built",
+          "issues": [7]
+        },
+        {
+          "title": "Upward and sideways boring",
+          "description": "Dig up, down or sideways; boring upward combines thrust and drill and costs the most energy.",
+          "status": "built",
+          "issues": [40, 41]
+        },
+        {
+          "title": "Drill-tip breakpoints",
+          "description": "Retune so each planet's tip upgrades visibly cut dig time (to 0.7x or less by departure). In progress.",
+          "status": "planned",
+          "issues": [86, 81]
+        },
+        {
+          "group": true,
+          "title": "Casing & Lining",
+          "description": "The rig lines its own tunnels with cement as it drills.",
+          "children": [
+            {
+              "title": "Automatic casing",
+              "description": "While drilling, the rig lays a cement lining ring about every half metre behind it, with no button to press.",
+              "status": "built",
+              "issues": [41, 56]
+            },
+            {
+              "title": "Casing grade",
+              "description": "Lining strength; each depth band needs a grade at least its number (the core needs 5). Buy higher grades at the Upgrade bay.",
+              "status": "built",
+              "issues": [41, 56]
+            },
+            {
+              "title": "Lining bill",
+              "description": "Lining fresh rock costs a little per metre; the bill is paid out of your next payout at the Sell bay, and whatever that visit can't cover is forgiven. Never debt.",
+              "status": "built",
+              "issues": [76, 85, 115, 128]
+            },
+            {
+              "title": "Re-drilling your casing",
+              "description": "You can drill back through your own lining; lined walls still pay their ore, and the drill sings a higher note in casing.",
+              "status": "built",
+              "issues": [41, 56]
+            },
+            {
+              "title": "Refractory lining",
+              "description": "A firebrick lining type for heat planets, bought once at the Upgrade bay: it keeps lava out and cools the rig faster, at 1.5x the lining cost.",
+              "status": "built",
+              "issues": [96, 113, 114]
+            },
+            {
+              "title": "Insulated lining",
+              "description": "Lining type for frozen planets.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 17
+            },
+            {
+              "title": "Grounded lining",
+              "description": "Lining type for magnetic and electrified planets.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 25
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Cave-ins",
+          "description": "Tunnels lined too weakly for their depth can collapse around you.",
+          "children": [
+            {
+              "title": "Weak-tunnel collapse",
+              "description": "A tunnel stretch whose lining grade is too low for its band caves in when your rig is within 16 m; unlined rock never does.",
+              "status": "built",
+              "issues": [43, 57]
+            },
+            {
+              "title": "Collapse warning",
+              "description": "About a second of growing cracks, falling dust and a rising rumble before the walls refill.",
+              "status": "built",
+              "issues": [43, 57]
+            },
+            {
+              "title": "Crush damage",
+              "description": "A rig caught in the refill loses hull and is left in a pocket of air; a wreck goes to the tow.",
+              "status": "built",
+              "issues": [43, 57]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Blasting charges",
+          "description": "A tool for hard rock, shafts and enemies in the way, unlocked on planet 7.",
+          "children": [
+            {
+              "title": "Plant a charge",
+              "description": "Press B to stick a charge on the wall the drill faces; it blows after a two-second fuse.",
+              "status": "built",
+              "issues": [95, 109]
+            },
+            {
+              "title": "Blast trade-off",
+              "description": "Clears a 2.5-tile radius instantly but only about 40% of the ore survives; core and rock harder than the deep band resist, and lined rings hold.",
+              "status": "built",
+              "issues": [95, 109]
+            },
+            {
+              "title": "Blast damage",
+              "description": "The blast hurts you if you stand too close and heavily damages enemies in range; it can also set off weak tunnels.",
+              "status": "built",
+              "issues": [95, 109]
+            },
+            {
+              "title": "Charge rack",
+              "description": "Buy charges and extra rack slots (3 up to 8) at the Upgrade bay.",
+              "status": "built",
+              "issues": [95, 109]
+            },
+            {
+              "title": "Fuse warning & scorch",
+              "description": "The HUD warns of a live fuse nearby; the charge blinks on the wall and leaves a scorch mark.",
+              "status": "built",
+              "issues": [95, 110]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Planets & World",
+      "description": "Round, fully drillable planets, their layers, their cores and the journey between them.",
+      "children": [
+        {
+          "title": "Round, fully drillable planets",
+          "description": "Every planet is a disc you can dig into from anywhere on its surface, down to the core and beyond.",
+          "status": "built",
+          "issues": [4, 19]
+        },
+        {
+          "title": "Depth bands",
+          "description": "Five bands from crust to deep rock, each harder, richer and more dangerous, then the core.",
+          "status": "built",
+          "issues": [4, 6]
+        },
+        {
+          "title": "Caves",
+          "description": "Natural caverns open from band 2 downward and give crawlers somewhere to live.",
+          "status": "built",
+          "issues": [4, 19]
+        },
+        {
+          "title": "Growing planets",
+          "description": "Each planet is larger than the last, from 300 m radius toward 1000 m.",
+          "status": "built",
+          "issues": [6]
+        },
+        {
+          "title": "Seeded worlds",
+          "description": "Each planet comes from a world seed, so the same seed always builds the same world.",
+          "status": "built",
+          "issues": [4]
+        },
+        {
+          "group": true,
+          "title": "Guaranteed early ore",
+          "description": "The first dives always pay something.",
+          "children": [
+            {
+              "title": "Starter vein",
+              "description": "Planet 1 places an easy vein within 15 m of the dock, in a zone no enemy spawns in.",
+              "status": "built",
+              "issues": [16, 27]
+            },
+            {
+              "title": "Dock ore guarantee",
+              "description": "If no ore lies under the dock, one shallow patch is placed straight below it.",
+              "status": "built",
+              "issues": [42, 55]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Planet types",
+          "description": "Planet archetypes change gravity, palette, resources and hazards.",
+          "children": [
+            {
+              "title": "Base planet",
+              "description": "Planet 1: standard gravity, metal-rich ground and its own palette.",
+              "status": "built",
+              "issues": [2, 19]
+            },
+            {
+              "title": "Heavy planet",
+              "description": "Planet 2 on: gravity 1.25x, crystal-rich ground and a new palette.",
+              "status": "built",
+              "issues": [10, 24]
+            },
+            {
+              "title": "Heat / lava planets",
+              "description": "Planets 8 to 16 (the Fire act): a heat gauge, lava pockets and a firebrick palette, announced by a stinger.",
+              "status": "built",
+              "issues": [96, 113, 114]
+            },
+            {
+              "title": "Frozen planets",
+              "description": "A cold planet family.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 17
+            },
+            {
+              "title": "Magnetic / electrified planets",
+              "description": "Planets that interfere with the rig's systems.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 25
+            },
+            {
+              "title": "Hollow planets",
+              "description": "Planets with open interiors to cross.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 33
+            },
+            {
+              "title": "Unstable cores",
+              "description": "Harvesting the core starts an escape run.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 36
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Planet core",
+          "description": "The core is the major objective of every planet.",
+          "children": [
+            {
+              "title": "Core region",
+              "description": "A disc of very hard core tiles at the planet centre.",
+              "status": "built",
+              "issues": [10, 24]
+            },
+            {
+              "title": "Core fragments",
+              "description": "Each core tile drops a fragment; fragments are never sold, they pay for travel.",
+              "status": "built",
+              "issues": [10, 24]
+            },
+            {
+              "title": "Core bay",
+              "description": "Fragments bank at the platform whenever you dock or get towed, so core is never lost.",
+              "status": "built",
+              "issues": [10]
+            },
+            {
+              "title": "Core reached & completed",
+              "description": "The first core tile brings a Guild transmission and a stinger; filling the quota completes the planet and fits the platform's core drive.",
+              "status": "built",
+              "issues": [10, 23]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Planet travel",
+          "description": "Moving the operation to the next world.",
+          "children": [
+            {
+              "title": "Travel to the next planet",
+              "description": "From the dock, pay the fee plus the fragment quota (40% of the core's tiles) to move to the next planet; extra fragments stay banked.",
+              "status": "built",
+              "issues": [10, 24]
+            },
+            {
+              "title": "Travel transition",
+              "description": "A short travel card of up to 10 seconds that you can skip.",
+              "status": "built",
+              "issues": [10, 24]
+            },
+            {
+              "title": "Fresh world on arrival",
+              "description": "The new planet starts untouched; your rig, levels, cargo and artefact come with you.",
+              "status": "built",
+              "issues": [10]
+            },
+            {
+              "title": "No travel cap",
+              "description": "Planets keep coming by formula past the authored campaign; nothing stops travel.",
+              "status": "built",
+              "issues": [10, 14]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Resources & Ore",
+      "description": "What you dig up and what it is worth.",
+      "children": [
+        {
+          "title": "Endless ore tiers",
+          "description": "Every band and planet steps up the ore tier; each tier is worth 1.5x the last, with no top.",
+          "status": "built",
+          "issues": [6, 20]
+        },
+        {
+          "title": "Ore families",
+          "description": "Metal and crystal families with their own shapes; each planet weights them differently.",
+          "status": "built",
+          "issues": [2, 4]
+        },
+        {
+          "title": "Ore patches",
+          "description": "Ore sits in larger, rarer patches (bigger deeper down) that you find by exposing them.",
+          "status": "built",
+          "issues": [42, 55]
+        },
+        {
+          "title": "Tier glow",
+          "description": "Higher tiers glow brighter and sparkle more; tiers stay readable even in greyscale.",
+          "status": "built",
+          "issues": [13, 28]
+        },
+        {
+          "title": "Ore pickup",
+          "description": "A cell's ore drops into the hold once you've carved through most of it, lined or not.",
+          "status": "built",
+          "issues": [36, 56]
+        },
+        {
+          "title": "Refined ore",
+          "description": "Ore refined at the Refinery bay sells for 25% more than raw.",
+          "status": "built",
+          "issues": [92, 105]
+        },
+        {
+          "title": "More resource families",
+          "description": "Crystals, volcanic, relic and other families with names, colours and special properties.",
+          "status": "planned",
+          "doc": "design.md §6"
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Economy, Platform & Docks",
+      "description": "The mobile platform on the surface: bays, services and prices.",
+      "children": [
+        {
+          "title": "Mobile platform",
+          "description": "Your base stands on a pad at the surface of every planet and moves with you.",
+          "status": "built",
+          "issues": [8, 23]
+        },
+        {
+          "title": "Docking",
+          "description": "Stop on a bay's pad and press Space or E to dock; the bay's screen slides in.",
+          "status": "built",
+          "issues": [37, 40, 53]
+        },
+        {
+          "group": true,
+          "title": "Sell bay",
+          "description": "Copper-and-amber bay for turning ore into money.",
+          "children": [
+            {
+              "title": "Sell ore",
+              "description": "Sell one tier or the whole hold at the current unit prices.",
+              "status": "built",
+              "issues": [37, 58]
+            },
+            {
+              "title": "Recharge",
+              "description": "Refill the energy tank for a small charge.",
+              "status": "built",
+              "issues": [8, 37]
+            },
+            {
+              "title": "Sell, repair & recharge",
+              "description": "One key (Q) sells everything, repairs and recharges at the exact total shown.",
+              "status": "built",
+              "issues": [8, 37]
+            },
+            {
+              "title": "Collect refined batches",
+              "description": "Ready refinery batches are paid in here, 25% richer than raw ore.",
+              "status": "built",
+              "issues": [92, 105]
+            },
+            {
+              "title": "Lining bill on screen",
+              "description": "Shows the visit's lining bill, what it paid and what leaving will forgive.",
+              "status": "built",
+              "issues": [128]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Upgrade bay",
+          "description": "Steel-and-teal bay where the rig gets stronger.",
+          "children": [
+            {
+              "title": "Buy upgrades",
+              "description": "The six vehicle tracks, each with icon, level, next cost and 'before to after' stats.",
+              "status": "built",
+              "issues": [37, 58, 62]
+            },
+            {
+              "title": "Extra rows",
+              "description": "Casing grade, lining type, guns and charges rows appear as each is unlocked.",
+              "status": "built",
+              "issues": [58, 93, 95, 96]
+            },
+            {
+              "title": "Repair",
+              "description": "Repair the hull for a price that scales with the damage.",
+              "status": "built",
+              "issues": [8, 37]
+            },
+            {
+              "title": "Live vehicle preview",
+              "description": "A live preview of the rig: focusing a row highlights the part, shows stats before and after, and ghosts the next visual tier.",
+              "status": "built",
+              "issues": [44, 62]
+            },
+            {
+              "title": "Upgrade icons",
+              "description": "Hand-drawn vector icons for each track and module.",
+              "status": "built",
+              "issues": [44, 62, 114]
+            },
+            {
+              "title": "Install animation",
+              "description": "A bought part bolts on with a puff of steam (instant with reduced motion).",
+              "status": "built",
+              "issues": [44, 62]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Refinery bay",
+          "description": "Ember-and-brass third bay that bolts onto the pad from planet 3.",
+          "children": [
+            {
+              "title": "Refinery unlock",
+              "description": "The bay appears on arrival at planet 3, with its own look, stack smoke and a reveal stinger.",
+              "status": "built",
+              "issues": [92, 105, 106]
+            },
+            {
+              "title": "Refine batches",
+              "description": "Load up to half your hold of one ore tier into a slot; it refines over 3 minutes, even while you dive or travel.",
+              "status": "built",
+              "issues": [92, 105]
+            },
+            {
+              "title": "Refinery slots",
+              "description": "Start with one slot and buy up to three.",
+              "status": "built",
+              "issues": [92, 105]
+            },
+            {
+              "title": "Mobile refining",
+              "description": "A later mode that refines on the move, folded into this bay.",
+              "status": "planned",
+              "issues": [78, 105]
+            }
+          ]
+        },
+        {
+          "title": "Bay screens",
+          "description": "Shared steampunk frame with a brass shutter, one accent colour per bay, large readable text and full keyboard control.",
+          "status": "built",
+          "issues": [45, 62]
+        },
+        {
+          "title": "Right bay for each job",
+          "description": "Each service belongs to one bay; at the other bay it shows as a disabled sign that points you along the pad.",
+          "status": "built",
+          "issues": [37, 40]
+        },
+        {
+          "title": "Platform grows",
+          "description": "The outpost hub gains a glowing core drive with a fill gauge when the core quota is met, then the Refinery bay from planet 3.",
+          "status": "built",
+          "issues": [8, 67, 106]
+        },
+        {
+          "group": true,
+          "title": "Prices",
+          "description": "Prices climb on formulas so the economy can run forever.",
+          "children": [
+            {
+              "title": "Ore prices",
+              "description": "Every ore tier has a unit price that grows by a fixed ratio per tier.",
+              "status": "built",
+              "issues": [6, 20]
+            },
+            {
+              "title": "Exponential upgrade prices",
+              "description": "Each upgrade level costs more by a fixed ratio; drill prices were flattened to match ore growth.",
+              "status": "built",
+              "issues": [6, 84]
+            },
+            {
+              "title": "Rescue fee",
+              "description": "The tow costs a small share of your money, with a floor and a cap.",
+              "status": "built",
+              "issues": [8]
+            },
+            {
+              "title": "Travel fee",
+              "description": "Travel costs money as well as core fragments, scaled to the planet.",
+              "status": "built",
+              "issues": [10]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Planned facilities",
+          "description": "Further platform facilities in the campaign schedule.",
+          "children": [
+            {
+              "title": "Specialist merchants",
+              "description": "Merchants with their own specialised trades.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 10
+            },
+            {
+              "title": "Scanner station",
+              "description": "Reveals what lies underground.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 14
+            },
+            {
+              "title": "Drone bay",
+              "description": "Hauler drones that ferry cargo.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 20
+            },
+            {
+              "title": "Research lab",
+              "description": "Research to unlock new technology.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 24
+            },
+            {
+              "title": "Quest office",
+              "description": "NPC contracts with their own rewards.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 28
+            },
+            {
+              "title": "Core forge",
+              "description": "A late facility that turns core material into special upgrades.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 38
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Upgrades & Progression",
+      "description": "Vertical upgrades that scale forever and the campaign schedule of new things to do.",
+      "children": [
+        {
+          "group": true,
+          "title": "Vehicle upgrade tracks",
+          "description": "Six uncapped tracks bought at the Upgrade bay.",
+          "issues": [7, 23],
+          "children": [
+            {
+              "title": "Drill power",
+              "description": "Digs faster through any rock.",
+              "status": "built",
+              "issues": [7, 84]
+            },
+            {
+              "title": "Drill tip",
+              "description": "Lets the drill bite harder rock; the gate to deeper bands and planets.",
+              "status": "built",
+              "issues": [7, 84]
+            },
+            {
+              "title": "Engine",
+              "description": "Raises top speed, acceleration and climbing power, with gradually smaller gains.",
+              "status": "built",
+              "issues": [7]
+            },
+            {
+              "title": "Boiler",
+              "description": "Adds energy capacity for longer dives.",
+              "status": "built",
+              "issues": [7]
+            },
+            {
+              "title": "Cargo hold",
+              "description": "Adds room for four more ore per level.",
+              "status": "built",
+              "issues": [7]
+            },
+            {
+              "title": "Hull",
+              "description": "Adds 12% hull per level.",
+              "status": "built",
+              "issues": [7]
+            }
+          ]
+        },
+        {
+          "title": "Uncapped levels",
+          "description": "Every track goes on forever while its price climbs exponentially, so progress never hits a wall.",
+          "status": "built",
+          "issues": [6, 14]
+        },
+        {
+          "title": "Module upgrades",
+          "description": "Casing grades, gun levels, charge-rack slots and refinery slots are bought alongside the tracks.",
+          "status": "built",
+          "issues": [41, 93, 95, 92]
+        },
+        {
+          "group": true,
+          "title": "Campaign unlock schedule",
+          "description": "A locked 40-planet plan: every planet brings something new.",
+          "children": [
+            {
+              "title": "40-planet schedule",
+              "description": "A data-driven schedule of new enemies, facilities, upgrades and planet types for each campaign planet.",
+              "status": "partial",
+              "issues": [80, 87]
+            },
+            {
+              "title": "Unlock on arrival",
+              "description": "Features unlock when you reach their planet, announced by stingers.",
+              "status": "built",
+              "issues": [88]
+            },
+            {
+              "title": "Slice beats (planets 1-2)",
+              "description": "Sell and upgrade loop, platform, crawler, burrower, core harvest and the second planet.",
+              "status": "built",
+              "issues": [2, 17]
+            },
+            {
+              "title": "Planet 3: Refinery bay",
+              "description": "The first new facility.",
+              "status": "built",
+              "issues": [92],
+              "planet": 3
+            },
+            {
+              "title": "Planet 4: Automated guns",
+              "description": "The first weapon.",
+              "status": "built",
+              "issues": [93],
+              "planet": 4
+            },
+            {
+              "title": "Planet 6: Tunnel wrecker",
+              "description": "A new enemy family that goes after your tunnels.",
+              "status": "built",
+              "issues": [94],
+              "planet": 6
+            },
+            {
+              "title": "Planet 7: Blasting charges",
+              "description": "A new mining tool.",
+              "status": "built",
+              "issues": [95],
+              "planet": 7
+            },
+            {
+              "title": "Planet 8: Heat & refractory lining",
+              "description": "The first new planet type and its counter-upgrade.",
+              "status": "built",
+              "issues": [96],
+              "planet": 8
+            },
+            {
+              "title": "Pacing target",
+              "description": "Aim of 45-60 minutes per planet; the target is set, but a stall on planet 9 is being diagnosed.",
+              "status": "partial",
+              "issues": [91, 130]
+            },
+            {
+              "title": "Felt-progression gate",
+              "description": "A regression check that keeps upgrades feeling meaningful across the campaign.",
+              "status": "planned",
+              "issues": [89]
+            }
+          ]
+        },
+        {
+          "title": "End-of-slice card",
+          "description": "Completing planet 2's core shows an end-of-slice card; play continues behind it.",
+          "status": "built",
+          "issues": [2, 24]
+        },
+        {
+          "title": "Endless mode",
+          "description": "Unlocks after the finale at planet 40, so progression goes on past the campaign.",
+          "status": "planned",
+          "issues": [14, 80],
+          "planet": 40
+        },
+        {
+          "title": "Powerups",
+          "description": "Timed buffs or consumables, deferred for now; artefacts carry the horizontal beat instead.",
+          "status": "planned",
+          "issues": [47]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Hazards, Enemies & Combat",
+      "description": "Combat grows out of mining: the drill is your first weapon.",
+      "children": [
+        {
+          "group": true,
+          "title": "Drill-contact combat",
+          "description": "Facing matters: point the drill at trouble.",
+          "children": [
+            {
+              "title": "The drill always hurts",
+              "description": "Enemies that touch the drill's nose are pinned and drilled every moment they stay there.",
+              "status": "built",
+              "issues": [9, 25]
+            },
+            {
+              "title": "Three hit zones",
+              "description": "Hits from the front cost a quarter, from the side full damage, from behind double, so you turn to face attackers.",
+              "status": "built",
+              "issues": [9, 25]
+            },
+            {
+              "title": "Telegraphed attacks",
+              "description": "Enemies wind up visibly before they lunge, giving you time to turn the drill.",
+              "status": "built",
+              "issues": [9, 25]
+            },
+            {
+              "title": "Safe at the dock",
+              "description": "Docking ends the trip: hunting enemies leave you alone.",
+              "status": "built",
+              "issues": [9]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Enemies",
+          "description": "The roster grows over the campaign.",
+          "children": [
+            {
+              "title": "Crawler",
+              "description": "A cave-dwelling hunter from planet 1 that stalks and lunges at the rig.",
+              "status": "built",
+              "issues": [9, 25, 68]
+            },
+            {
+              "title": "Burrower",
+              "description": "Swims through solid rock from planet 2 and gives itself away with a tremor before it strikes.",
+              "status": "built",
+              "issues": [9, 25, 68]
+            },
+            {
+              "title": "Tunnel wrecker",
+              "description": "From planet 6, gnaws your lined route home so it caves in; it flees from the rig and can only be caught when cornered. A scrape warns you.",
+              "status": "built",
+              "issues": [94, 111, 112, 126]
+            },
+            {
+              "title": "Magma tick",
+              "description": "A heat-planet pest.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 9
+            },
+            {
+              "title": "Core guardian",
+              "description": "A guardian in the core chamber.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 15
+            },
+            {
+              "title": "Frost spitter",
+              "description": "A ranged frozen-planet enemy.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 18
+            },
+            {
+              "title": "Swarm nests",
+              "description": "Nests that release swarms.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 21
+            },
+            {
+              "title": "Ore thief",
+              "description": "Steals ore from your hold.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 23
+            },
+            {
+              "title": "EMP mite",
+              "description": "Disables the rig's equipment.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 26
+            }
+          ]
+        },
+        {
+          "title": "Enemy scaling",
+          "description": "Enemies get tougher every planet and band; the crust stays free of them and the middle bands are busiest.",
+          "status": "built",
+          "issues": [6, 9]
+        },
+        {
+          "group": true,
+          "title": "Automated guns",
+          "description": "A hull turret from planet 4 that covers your flanks.",
+          "children": [
+            {
+              "title": "Mount the turret",
+              "description": "Bolt guns onto the rig at the Upgrade bay, then level them up.",
+              "status": "built",
+              "issues": [93, 107, 108]
+            },
+            {
+              "title": "Auto targeting",
+              "description": "The turret shoots enemies at your sides and rear within range; the front is left to the drill.",
+              "status": "built",
+              "issues": [93, 107]
+            },
+            {
+              "title": "Steam-powered shots",
+              "description": "Each shot costs energy, and the guns go quiet before they could strand you (low-steam badge).",
+              "status": "built",
+              "issues": [93, 107]
+            },
+            {
+              "title": "Auto / Off toggle",
+              "description": "Press G to switch the guns between Auto and Off.",
+              "status": "built",
+              "issues": [93]
+            },
+            {
+              "title": "Deployable defences",
+              "description": "A later mode for placeable defences, folded into the guns.",
+              "status": "planned",
+              "issues": [78, 107]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Heat & lava",
+          "description": "The hazards of the Fire act (planets 8-16).",
+          "children": [
+            {
+              "title": "Heat gauge",
+              "description": "Heat builds with depth and drilling; cool off by idling, in refractory-lined tunnels, or at the surface.",
+              "status": "built",
+              "issues": [96, 113]
+            },
+            {
+              "title": "Overheat throttle",
+              "description": "Above 70 heat the drill slows to half speed, a warning before any damage.",
+              "status": "built",
+              "issues": [96, 113]
+            },
+            {
+              "title": "Heat damage",
+              "description": "At maximum heat the hull burns away steadily.",
+              "status": "built",
+              "issues": [96, 113]
+            },
+            {
+              "title": "Lava pockets",
+              "description": "Hidden pockets of lava in deeper bands of heat planets.",
+              "status": "built",
+              "issues": [96, 113]
+            },
+            {
+              "title": "Flowing lava",
+              "description": "Breach a pocket and lava pours down into open tunnels; refractory lining stops it.",
+              "status": "built",
+              "issues": [96, 113]
+            },
+            {
+              "title": "Lava contact",
+              "description": "Touching lava spikes heat and costs hull.",
+              "status": "built",
+              "issues": [96, 113]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Artefacts & Unique Items",
+      "description": "One-of-a-kind finds that change how you play, not just numbers.",
+      "children": [
+        {
+          "title": "Artefact cache",
+          "description": "One sealed cache hides in every planet (band 3 on planet 1, band 2 after); a prompt shows when you're on it.",
+          "status": "built",
+          "issues": [46, 64, 68]
+        },
+        {
+          "title": "Pick one of three",
+          "description": "Opening the cache offers three exclusive cards; 'Leave it' keeps the cache for later.",
+          "status": "built",
+          "issues": [46, 64]
+        },
+        {
+          "title": "One artefact held",
+          "description": "You keep one artefact for good; every other cache becomes an empty husk.",
+          "status": "built",
+          "issues": [46, 64]
+        },
+        {
+          "group": true,
+          "title": "Artefacts",
+          "description": "The three picks available now.",
+          "children": [
+            {
+              "title": "Ore Whisper",
+              "description": "While undocked, ore within 16 m glows at its rim through up to 1 m of rock.",
+              "status": "built",
+              "issues": [46, 64]
+            },
+            {
+              "title": "Breathing Room",
+              "description": "Once per dock cycle, the first collapse warning on your tunnels is braced and refilled safely.",
+              "status": "built",
+              "issues": [46, 64]
+            },
+            {
+              "title": "Assay Beacon",
+              "description": "At the Sell bay, shallow-band ore sells at the mid-band price.",
+              "status": "built",
+              "issues": [46, 64]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Planned artefact sets",
+          "description": "More artefact picks in the campaign schedule.",
+          "children": [
+            {
+              "title": "Set I: Seismic ping, Second wind",
+              "description": "Two new picks.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 5
+            },
+            {
+              "title": "Set II: Ember valve, Overclock",
+              "description": "Two new picks.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 11
+            },
+            {
+              "title": "Set III: Thermal lance, Glide treads",
+              "description": "Two new picks.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 19
+            },
+            {
+              "title": "Set IV: Relay coil, Salvage magnet",
+              "description": "Two new picks.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 27
+            },
+            {
+              "title": "Set V: Grapple anchor, Core sense",
+              "description": "Two new picks.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 35
+            },
+            {
+              "title": "Archive cache",
+              "description": "An exclusive story-fragment pick between the relic and hollow planets.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 31
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Narrative & Onboarding",
+      "description": "Guild transmissions give the journey purpose; hints teach without a tutorial level.",
+      "children": [
+        {
+          "group": true,
+          "title": "Guild transmissions",
+          "description": "Short text messages from the Guild that never pause play.",
+          "children": [
+            {
+              "title": "Opening transmission",
+              "description": "'Your rig stands on the pad, prospector': bring up ore, buy gear, dig to the core.",
+              "status": "built",
+              "issues": [27, 16]
+            },
+            {
+              "title": "Core struck",
+              "description": "Congratulates you on reaching the core and explains fragments buy passage onward.",
+              "status": "built",
+              "issues": [27]
+            },
+            {
+              "title": "Welcome to the second world",
+              "description": "Warns that gravity pulls harder on planet 2.",
+              "status": "built",
+              "issues": [27]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Onboarding hints",
+          "description": "Six one-time hints triggered by what you do.",
+          "children": [
+            {
+              "title": "Move hint",
+              "description": "How to drive and use the thruster.",
+              "status": "built",
+              "issues": [16, 27]
+            },
+            {
+              "title": "Drill hint",
+              "description": "How to swivel the drill and bore.",
+              "status": "built",
+              "issues": [16, 27]
+            },
+            {
+              "title": "Cargo hint",
+              "description": "Ore fills the hold; go back and dock to sell.",
+              "status": "built",
+              "issues": [16, 27]
+            },
+            {
+              "title": "Sell bay hint",
+              "description": "The quick 'sell, repair and recharge' action.",
+              "status": "built",
+              "issues": [16, 27]
+            },
+            {
+              "title": "Upgrade bay hint",
+              "description": "Tells you when you can afford an upgrade and where to buy it.",
+              "status": "built",
+              "issues": [58]
+            },
+            {
+              "title": "Energy & tow hint",
+              "description": "Energy is your clock; how to call the tow, and what a tow cost you.",
+              "status": "built",
+              "issues": [16, 27]
+            }
+          ]
+        },
+        {
+          "title": "Hint pacing",
+          "description": "Hints are spaced at least 20 s apart, each shown once, remembered across reloads, and can be switched off.",
+          "status": "built",
+          "issues": [16, 27]
+        },
+        {
+          "title": "No tutorial level",
+          "description": "You learn in the real game, helped by a starter vein near the dock.",
+          "status": "built",
+          "issues": [16]
+        },
+        {
+          "group": true,
+          "title": "Planned story beats",
+          "description": "Campaign story content scheduled for later planets.",
+          "children": [
+            {
+              "title": "Relic story planet",
+              "description": "A story planet built around an ancient relic.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 30
+            },
+            {
+              "title": "Finale key",
+              "description": "A campaign cipher that opens the way to the finale.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 39
+            },
+            {
+              "title": "Finale story planet",
+              "description": "The campaign finale.",
+              "status": "planned",
+              "issues": [80],
+              "planet": 40
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "HUD & UI",
+      "description": "Readable, colour-independent information while you dig.",
+      "children": [
+        {
+          "title": "Gauge cluster",
+          "description": "Energy, hull and cargo as gauges with exact numbers, plus the cargo's sale value and any lining bill.",
+          "status": "built",
+          "issues": [33, 34, 115]
+        },
+        {
+          "title": "Heat gauge",
+          "description": "On heat planets, a heat gauge that hatches and reads THROTTLED above its limit.",
+          "status": "built",
+          "issues": [96, 113]
+        },
+        {
+          "title": "Depth & band readout",
+          "description": "Depth below the surface (or altitude above it) and the current band.",
+          "status": "built",
+          "issues": [33, 34]
+        },
+        {
+          "title": "Dock compass",
+          "description": "An arrow and distance pointing home to the dock, plus tiles to the core's edge.",
+          "status": "built",
+          "issues": [33, 34]
+        },
+        {
+          "title": "Time per tile",
+          "description": "How long the rock in front of the drill will take, or 'needs a better tip'.",
+          "status": "built",
+          "issues": [33, 7]
+        },
+        {
+          "title": "Status badges",
+          "description": "Casing grade warning, guns mode with a low-steam badge, and charges carried with the plant key.",
+          "status": "built",
+          "issues": [41, 107, 109]
+        },
+        {
+          "title": "Warning banner",
+          "description": "Low energy, a live charge fuse nearby, and the rig's state with the tow countdown.",
+          "status": "built",
+          "issues": [33, 109]
+        },
+        {
+          "title": "Context prompts",
+          "description": "Dock and artefact-cache prompts appear exactly when the action would work.",
+          "status": "built",
+          "issues": [33, 46]
+        },
+        {
+          "title": "Threat markers",
+          "description": "Edge-of-screen markers for enemies winding up, with the zone letter (F, S, R) they'd hit and a tremor sign for burrowers.",
+          "status": "built",
+          "issues": [33, 9]
+        },
+        {
+          "title": "Big-number display",
+          "description": "Very large money and prices shown in a compact, readable format.",
+          "status": "built",
+          "issues": [5, 32]
+        },
+        {
+          "title": "Colour-independent design",
+          "description": "Icons, letters and hatching back up every colour cue.",
+          "status": "built",
+          "issues": [33]
+        },
+        {
+          "title": "Keyboard menus",
+          "description": "Every screen works with the keyboard: arrows move focus, Enter or Space confirms, Esc backs out.",
+          "status": "built",
+          "issues": [33]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Audio",
+      "description": "Mechanical sound effects and layered music driven by what is happening in the game.",
+      "children": [
+        {
+          "group": true,
+          "title": "Sound effects",
+          "description": "Sounds that change with what the rig is doing.",
+          "children": [
+            {
+              "title": "Drill voice",
+              "description": "The drill strains lower on hard rock and sings higher in your own lining.",
+              "status": "built",
+              "issues": [13, 41]
+            },
+            {
+              "title": "Engine & lift",
+              "description": "The engine chugs faster with speed; the thruster hisses.",
+              "status": "built",
+              "issues": [13, 28]
+            },
+            {
+              "title": "Ore pickup chime",
+              "description": "A chime that climbs the scale with the ore's tier, so better ore sounds better.",
+              "status": "built",
+              "issues": [13, 28]
+            },
+            {
+              "title": "Dock & upgrade clank",
+              "description": "A heavy clank on docking and on buying upgrades.",
+              "status": "built",
+              "issues": [13, 28]
+            },
+            {
+              "title": "Hit impact",
+              "description": "Getting hit sounds sharp, with a shake and flash.",
+              "status": "built",
+              "issues": [13, 28]
+            },
+            {
+              "title": "Casing hiss & pop",
+              "description": "A hydraulic hiss as a ring is laid and a pop as the drill breaks through lining.",
+              "status": "built",
+              "issues": [41, 56]
+            },
+            {
+              "title": "Collapse rumble & crash",
+              "description": "A rising rumble during the warning, then a crash as the walls refill.",
+              "status": "built",
+              "issues": [43, 57]
+            },
+            {
+              "title": "Wrecker scrape",
+              "description": "A scrape when a tunnel wrecker breaches your route.",
+              "status": "built",
+              "issues": [111]
+            },
+            {
+              "title": "Charge blast",
+              "description": "A crack and shake when your charge goes off.",
+              "status": "built",
+              "issues": [109]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Layered music",
+          "description": "Four looping layers crossfade with where you are.",
+          "children": [
+            {
+              "title": "Platform layer",
+              "description": "Plays while docked or near the hub.",
+              "status": "built",
+              "issues": [49, 63]
+            },
+            {
+              "title": "Ambience layer",
+              "description": "Underground; louder the deeper you go.",
+              "status": "built",
+              "issues": [49, 63]
+            },
+            {
+              "title": "Tension layer",
+              "description": "Deep bands or low energy.",
+              "status": "built",
+              "issues": [49, 63]
+            },
+            {
+              "title": "Combat layer",
+              "description": "Rises as enemies close in.",
+              "status": "built",
+              "issues": [49, 63]
+            },
+            {
+              "title": "Per-planet tuning",
+              "description": "Planets share the layers with their own tuning.",
+              "status": "built",
+              "issues": [49, 63]
+            },
+            {
+              "title": "Music duck during artefact choice",
+              "description": "Music dips while the artefact cards are open; the choice is never reported to the music, so this doesn't happen yet.",
+              "status": "partial",
+              "issues": [49, 64]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Stingers",
+          "description": "Short musical cues for big moments.",
+          "children": [
+            {
+              "title": "Dock stinger",
+              "description": "Plays on docking.",
+              "status": "built",
+              "issues": [49, 63]
+            },
+            {
+              "title": "Core stinger",
+              "description": "Plays when you break the first core tile.",
+              "status": "built",
+              "issues": [49, 63]
+            },
+            {
+              "title": "Reveal stinger",
+              "description": "Plays when a new platform facility bolts on.",
+              "status": "built",
+              "issues": [105]
+            },
+            {
+              "title": "New planet type stinger",
+              "description": "Plays when you reach a new kind of planet.",
+              "status": "built",
+              "issues": [113]
+            },
+            {
+              "title": "Artefact stinger",
+              "description": "Should play when the artefact choice opens; the music exists but has no trigger yet.",
+              "status": "partial",
+              "issues": [49, 64]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Visuals & Art",
+      "description": "A lit 2.5D look of brass machinery in a dark, carved world, built to hold up at 4K.",
+      "children": [
+        {
+          "title": "Lit 2.5D rendering",
+          "description": "Flat parts lit by the headlamp and a few lights, with bloom on glowing things.",
+          "status": "built",
+          "issues": [38, 60]
+        },
+        {
+          "title": "Rotating camera",
+          "description": "The camera rolls with the planet so 'toward the core' is always down the screen (or stays north-up if you prefer).",
+          "status": "built",
+          "issues": [13, 22]
+        },
+        {
+          "title": "Zoom",
+          "description": "Zoom between 8 and 20 m across the screen (default 12) with =, - and 0; the same framing at any resolution.",
+          "status": "built",
+          "issues": [39, 59]
+        },
+        {
+          "title": "4K adaptive resolution",
+          "description": "Rendering resolution adjusts to keep the frame rate while the UI stays sharp.",
+          "status": "built",
+          "issues": [38, 60]
+        },
+        {
+          "group": true,
+          "title": "World look",
+          "description": "How the ground and sky read.",
+          "children": [
+            {
+              "title": "Ground strata",
+              "description": "Hand-made layered rock textures per band, wrapped around the planet and tinted per planet.",
+              "status": "built",
+              "issues": [69, 51]
+            },
+            {
+              "title": "Carved edges",
+              "description": "Tunnels carve smoothly with a lit edge.",
+              "status": "built",
+              "issues": [48, 55]
+            },
+            {
+              "title": "Sky fade",
+              "description": "The planet's sky at the surface fades to underground dark as you descend.",
+              "status": "built",
+              "issues": [13]
+            },
+            {
+              "title": "Lava & firebrick",
+              "description": "Glowing lava tiles and firebrick refractory lining with glowing joints.",
+              "status": "built",
+              "issues": [114]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Effects",
+          "description": "Short-lived visual feedback.",
+          "children": [
+            {
+              "title": "Drill sparks",
+              "description": "Sparks fly where the drill bites, denser in lining.",
+              "status": "built",
+              "issues": [13, 28]
+            },
+            {
+              "title": "Cement spray",
+              "description": "A grey puff as each casing ring is laid.",
+              "status": "built",
+              "issues": [41, 56]
+            },
+            {
+              "title": "Collapse cracks & dust",
+              "description": "Branching cracks and falling dust before a cave-in.",
+              "status": "built",
+              "issues": [43, 57]
+            },
+            {
+              "title": "Blast scorch",
+              "description": "Scorch marks where charges blew.",
+              "status": "built",
+              "issues": [110]
+            },
+            {
+              "title": "Heat shimmer",
+              "description": "The rig shimmers when it runs hot.",
+              "status": "built",
+              "issues": [113, 114]
+            },
+            {
+              "title": "Screen shake & flash",
+              "description": "Hits shake and flash the screen, capped and one big effect at a time.",
+              "status": "built",
+              "issues": [13, 48]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Authored art",
+          "description": "Blender-made parts and textures, plus vector icons.",
+          "children": [
+            {
+              "title": "Vehicle parts",
+              "description": "The rig's parts in three visual tiers.",
+              "status": "built",
+              "issues": [66]
+            },
+            {
+              "title": "Platform hub & bays",
+              "description": "The hub, both bays and their backdrops.",
+              "status": "built",
+              "issues": [67]
+            },
+            {
+              "title": "Creatures & cache",
+              "description": "Crawler, burrower and the artefact cache.",
+              "status": "built",
+              "issues": [68]
+            },
+            {
+              "title": "Module art",
+              "description": "Refinery bay, gun turret, charge rack and tunnel wrecker.",
+              "status": "built",
+              "issues": [106, 108, 110, 112]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Controls, Save & Settings",
+      "description": "Keyboard controls, the settings overlay and automatic saves.",
+      "children": [
+        {
+          "group": true,
+          "title": "Controls",
+          "description": "A data-driven keyboard map.",
+          "children": [
+            {
+              "title": "Keyboard layout",
+              "description": "WASD or arrows to drive, drill and lift; Space/E dock; Q quick service; R tow; G guns; B charge; = - 0 zoom; Esc settings.",
+              "status": "built",
+              "issues": [33, 53]
+            },
+            {
+              "title": "Key rebinding",
+              "description": "Rebind any action in settings, with conflicts refused and a reset to defaults.",
+              "status": "built",
+              "issues": [33]
+            },
+            {
+              "title": "Gamepad & Steam Input",
+              "description": "Controller support, cut from the slice; the control map is ready for it.",
+              "status": "planned",
+              "issues": [33, 12]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Settings",
+          "description": "Presentation and accessibility options, kept apart from the save.",
+          "children": [
+            {
+              "title": "Camera mode",
+              "description": "Camera rotating with the planet, or fixed north-up.",
+              "status": "built",
+              "issues": [13, 33]
+            },
+            {
+              "title": "Screen shake / reduce motion",
+              "description": "Turns off shake and part motion; bay shutters fade and installs are instant.",
+              "status": "built",
+              "issues": [33, 48]
+            },
+            {
+              "title": "Flashes",
+              "description": "Turns off screen flashes; warnings stay steady.",
+              "status": "built",
+              "issues": [33]
+            },
+            {
+              "title": "Show hints",
+              "description": "Switch the onboarding hints on or off.",
+              "status": "built",
+              "issues": [27, 33]
+            },
+            {
+              "title": "Music on/off & volume",
+              "description": "Mute or set the music volume.",
+              "status": "built",
+              "issues": [49, 63]
+            }
+          ]
+        },
+        {
+          "group": true,
+          "title": "Saving",
+          "description": "Checkpoint saves that you never have to think about.",
+          "children": [
+            {
+              "title": "Checkpoint autosave",
+              "description": "The game saves at every dock, purchase, tow and travel.",
+              "status": "built",
+              "issues": [26]
+            },
+            {
+              "title": "Resume",
+              "description": "Reload and you're back at the dock where you last saved.",
+              "status": "built",
+              "issues": [26]
+            },
+            {
+              "title": "Safe save handling",
+              "description": "A save from an incompatible build is set aside, never overwritten, and a fresh run starts.",
+              "status": "built",
+              "issues": [26]
+            },
+            {
+              "title": "Multiple save slots",
+              "description": "More than one slot; the slice has a single slot.",
+              "status": "planned",
+              "issues": [12]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Platforms & Multiplayer",
+      "description": "Where the game runs and who plays it.",
+      "children": [
+        {
+          "title": "Browser",
+          "description": "Plays in a desktop browser and is published on GitHub Pages; saves go to browser storage.",
+          "status": "built",
+          "doc": "README.md"
+        },
+        {
+          "title": "Electron desktop build",
+          "description": "A packaged desktop game folder per OS, ready for Steam depots, with saves, settings and logs in the user folder.",
+          "status": "built",
+          "issues": [12]
+        },
+        {
+          "title": "Steam integration",
+          "description": "Overlay, cloud saves, achievements and SteamPipe uploads via steamworks.js; researched, not built.",
+          "status": "planned",
+          "issues": [12]
+        },
+        {
+          "title": "Steam Deck verification",
+          "description": "Steam Deck support after the slice.",
+          "status": "planned",
+          "issues": [12]
+        },
+        {
+          "title": "Co-op multiplayer",
+          "description": "2-4 player co-op with shared world and platform but separate wallets and rigs. The game already runs through a co-op-ready authority; networking isn't built.",
+          "status": "partial",
+          "issues": [3]
+        },
+        {
+          "title": "Performance & memory",
+          "description": "Stays within frame and memory budgets over long sessions; budget work on ground carving and memory soaks is ongoing.",
+          "status": "partial",
+          "issues": [97, 101, 117, 118, 120, 99]
+        }
+      ]
+    },
+    {
+      "group": true,
+      "title": "Debug & Testing Tools",
+      "description": "Notable tools for testers and automated players (debug runs only).",
+      "children": [
+        {
+          "title": "Debug mode",
+          "description": "Add ?debug to the URL (or --debug-api on desktop) to expose the debug API for tests and bots.",
+          "status": "built",
+          "issues": [11, 15]
+        },
+        {
+          "title": "Scenarios",
+          "description": "Start from a prepared situation with ?scenario= or a scenario file.",
+          "status": "built",
+          "issues": [11]
+        },
+        {
+          "title": "DEBUG RUN mark",
+          "description": "A HUD mark once a debug command was used, so debug runs are never mistaken for real play.",
+          "status": "built",
+          "issues": [11]
+        },
+        {
+          "title": "Run logging",
+          "description": "Every run writes an event log and summary to compare playthroughs.",
+          "status": "built",
+          "issues": [11, 15, 117]
+        },
+        {
+          "title": "Replays & golden runs",
+          "description": "Seeded runs replay exactly and are checked against recorded golden runs.",
+          "status": "built",
+          "issues": [29, 65]
+        },
+        {
+          "title": "Pacing bot & balance reports",
+          "description": "An automated player plays the campaign and reports pace, guns, charges, refinery and heat balance.",
+          "status": "built",
+          "issues": [29, 115]
+        },
+        {
+          "title": "Status dashboard",
+          "description": "A public page with the issue tree, automated loop status and performance charts.",
+          "status": "built",
+          "issues": [104],
+          "doc": "docs/loop-status.md"
+        },
+        {
+          "title": "Session analysis & memory soak",
+          "description": "Richer session logs, memory snapshots and a CI memory gate.",
+          "status": "planned",
+          "issues": [104, 99, 103, 121, 122, 123, 124, 125]
+        }
+      ]
+    }
+  ],
+  "disagreements": [
+    "**Schedule file is behind the code.** `docs/scaling/horizontal/stats.json` still marks slice-2 features as \"building\" or \"planned\" (fluid ground, casing, collapse, two bays, artefacts, music) and the six campaign modules (refinery, guns, wrecker, charges, heat/lava, refractory lining) as \"vision\". All of them are in the code. The six modules are switched on in code instead; cleaning this up is #127.",
+    "**Plan text is out of date.** #90 still lists M1–M5 (#92–#96) as held or blocked, but all five are closed and merged.",
+    "**Music hooks for artefacts aren't connected.** The artefact stinger has music data but no trigger, and the music dip during the artefact choice is always off. Comments say both were waiting for S10 (#64), which has since shipped.",
+    "**Vision and code differ in scope.** design.md describes many ore families, repair and storage facilities, and powerups. The code has metal and crystal ores only. Repair is at the Upgrade bay (or the Sell bay's quick action). Powerups were deferred (#47).",
+    "**Heat came back.** The slice ruled out heat (#7, #2). It now exists only on the heat planets (8–16), added by the campaign plan (#96)."
+  ],
+  "sources": "Seeded from code and docs at main 202b6e2 (6 Oct 2026, 09:20 CEST), docs/design.md, docs/scaling/horizontal/stats.json (locked campaign schedule), all 129 GitHub issues and the sub-issue tree, and the git log. Built = in the code today; Partial = partly built; Planned = decided or scheduled in an issue but not built."
+}
