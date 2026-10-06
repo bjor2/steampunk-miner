@@ -1,9 +1,9 @@
 # Loop status: the one-liner
 
-The status dashboard — **https://bjor2.github.io/steampunk-miner/status/** — has four tabs, each
-linkable: **Issue trees** (`#issues`), **Loops** (`#loops`, the default), **Features**
-(`#features`, the game feature tree) and **Performance** (`#performance`, short link
-`/status/performance/`). It shows the issue trees and what every automated loop is
+The status dashboard — **https://bjor2.github.io/steampunk-miner/status/** — has five tabs, each
+linkable: **Issue trees** (`#issues`), **Loops** (`#loops`, the default), **Slots** (`#slots`, the
+build loop's slot pools), **Features** (`#features`, the game feature tree) and **Performance**
+(`#performance`, short link `/status/performance/`). It shows the issue trees and what every automated loop is
 doing. A loop reports its state with one command:
 
 ```bash
@@ -79,6 +79,47 @@ loop-status.sh --show                              # print the published loops.j
   `loop-status.sh --batch < entries.jsonl`, one JSON object per line with `loop`, `slot`,
   `state`, `issue`, `note` and any extra fields (the build-loop driver sends `extra.push_pending`,
   `extra.active`, `extra.max`, `extra.attempts`, which the page shows).
+
+## Slots tab
+
+**https://bjor2.github.io/steampunk-miner/status/#slots** shows the build loop's two pools: the
+**Grok agent slots** (free, `dev` or `planner`) and the **Claude Code slots** (free, `busy` or
+`disabled`), split per Claude account (`A1 · Claude Max 1`, `A2 · Claude Max 2`) with disabled or
+signed-out accounts marked. Each slot shows its ticket (linked), the slot it pairs with in the other
+pool (`G3 ↔ C5 (A2)`, the same colour on both sides) and how long it has been held. A busy Claude
+slot whose Grok slot is free is flagged `G free`. The tab label reads `Grok used/size · Claude
+used/size` (`Slots 9/12 · 8/8`); the page header carries the same summary on every tab with Claude
+per account, and the Loops tab adds it to the `steampunk-loop` row.
+
+The data is `slots.json` on the `loop-status` branch, next to `loops.json`. The build-loop driver
+(`next-ticket.sh`, outside the repo, schema in its README) writes the full snapshot on the box at
+`/workspace/claude-sessions/steampunk-loop/slots.json` on every pass, refill and `--status`, and
+publishes a **sanitised copy** itself (`publish_slots_json`): no pids, paths, host names or login
+emails, accounts named only `A1`/`A2` and `Claude Max N`, committed through the contents API only
+when the content apart from `updated_at` changed, never forced, so it makes no commit on main and
+starts no workflow. There is no separate publish command to call. The fields the page reads:
+
+```
+{ updated_at, caps: { dev, planner },
+  grok:     [{ slot, state: 'free'|'dev'|'planner', ticket, since, claude_slot }],
+  claude:   [{ slot, state: 'free'|'busy'|'disabled', ticket, grok_slot, since }],
+  accounts: [{ id, account, name, enabled, reason,
+               slots: [{ slot: 'C1', state, kind: 'dev'|'aux'|'external'|null, ticket, grok_slot, since }] }] }
+```
+
+Without `accounts` (a v1 snapshot) the Claude pool shows as one pool. The page copies only these
+fields (`scripts/status/slots.mjs`), so anything else in the file never reaches it, and drops a name
+or reason that looks like a path, email or host name. A malformed file shows its reason instead of
+the tables.
+
+- **Live:** the page re-reads `slots.json` with `loops.json` every 60 s (one API call for the
+  branch head, then both files from raw at that commit), so a change shows within about a minute.
+  `build-status.mjs` puts the last snapshot in `status.json` for the first paint.
+- **STALE:** the driver publishes only on change, so `updated_at` is the last change, not the last
+  check. The snapshot counts as confirmed by the newer of `updated_at` and the newest heartbeat of
+  the `steampunk-loop` entries in `loops.json` (sent every 10 min while a session runs, and on every
+  pass); older than 20 min (`SLOTS_STALE_AFTER_MIN`) and the tab, its badge and the header line say
+  STALE.
 
 ## Feature tree
 
