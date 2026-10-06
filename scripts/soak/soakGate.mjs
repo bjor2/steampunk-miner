@@ -60,6 +60,15 @@ export function measureRetainedHeapGrowth(settled) {
   return last - first
 }
 
+/**
+ * The heap the median of the last 3 settled boundaries may reach before the 20 MB rule fails: the
+ * first 3's median plus the allowance. Null while too few cycles have settled to compare.
+ */
+export function findRetainedHeapLimit(settled) {
+  if (settled.length < SOAK_GATE.heapMinSettledCycles) return null
+  return medianHeapOf(settled.slice(0, SOAK_GATE.heapMedianOf)) + SOAK_GATE.retainedHeapGrowthBytes
+}
+
 function listRisingCount(settled, field) {
   const tail = settled.slice(-(SOAK_GATE.trendSteps + 1)).map((boundary) => boundary[field])
   const steps = tail.slice(1).map((value, at) => value - tail[at])

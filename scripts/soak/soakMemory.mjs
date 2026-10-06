@@ -17,11 +17,14 @@
 //   xvfb-run -a node scripts/soak/soakMemory.mjs --electron release/linux-unpacked/steampunk-miner
 //        [--minutes 10] [--out DIR] [--no-snapshots]   (after `npm run electron:build`)
 //   node scripts/soak/soakMemory.mjs --evaluate DIR/soak.json   (re-run the gate offline, print)
+//   node scripts/soak/soakMemory.mjs --job-summary DIR   (print DIR/summary.json as a CI job-summary row)
 //
-// Writes DIR/soak.json (every sample), DIR/summary.json (soakSummary.mjs) and the heap snapshots;
-// exits 1 when the gate fails and 2 when the soak could not run.
-import { createWriteStream, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+// Writes DIR/soak.json (every sample), DIR/summary.json (soakSummary.mjs), DIR/soak-chart.svg
+// (soakChart.mjs) and the heap snapshots; exits 1 when the gate fails and 2 when the soak could not run.
+import { createWriteStream, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { drawSoakChart } from './soakChart.mjs'
+import { formatSoakJobSummary } from './soakJobSummary.mjs'
 import { isGameMemoryReadable, readGameMemory, refillOnDock } from './soakPage.mjs'
 import { summariseSoak } from './soakSummary.mjs'
 import { openBrowserTarget, openElectronTarget } from './soakTarget.mjs'
@@ -53,6 +56,7 @@ function readSoakOptions(argv) {
     electronPath: valueOf('electron', undefined),
     isTakingSnapshots: !argv.includes('--no-snapshots'),
     evaluate: valueOf('evaluate', null),
+    jobSummary: valueOf('job-summary', null),
   }
 }
 
@@ -210,6 +214,7 @@ async function writeSoakRun(session, options, driven) {
     refusals: [...driven.refusals, ...driven.samples.flatMap((sample) => sample.refusals)],
   }
   writeFileSync(join(options.out, 'soak.json'), JSON.stringify(run, null, 1))
+  writeFileSync(join(options.out, 'soak-chart.svg'), drawSoakChart(run))
   return writeSummary(options.out, run)
 }
 
@@ -250,9 +255,18 @@ function evaluateSavedRun(file) {
   return reportVerdict(summary)
 }
 
+/** Prints the job-summary Markdown of DIR/summary.json, a FAIL line when the soak never wrote one. */
+function printJobSummary(dir) {
+  const file = join(dir, 'summary.json')
+  const summary = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null
+  process.stdout.write(formatSoakJobSummary(summary))
+  return 0
+}
+
 async function main(argv) {
   const options = readSoakOptions(argv)
   if (options.evaluate) return evaluateSavedRun(options.evaluate)
+  if (options.jobSummary) return printJobSummary(options.jobSummary)
   return runSoak(options)
 }
 
