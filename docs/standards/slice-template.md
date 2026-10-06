@@ -16,16 +16,18 @@ Nothing outside the folder changes. The loader finds `register.ts` by glob, the 
 
 ```
 src/features/<slice>/
-  index.ts                public API: types, read selectors, constants (intents after K1)
+  index.ts                public API: types, read selectors, constants, intents
   register.ts             export const slice: SliceDefinition; no side effects at import
   <slice>.economy.json    the slice's numbers (optional)
   systems/                pure rules: the authority lint set (exact maths, no clock or random)
   systems/render/         pure look maths: exempt from the exact-maths set only
+  systems/<slice>Commands.ts  command, event and rejection augmentations and their rules (K1)
+  logging.ts              projections of the slice's domain events and its run events (K1)
   store/                  optional zustand store fed by listenForDomainEvents
   ui/                     React + CSS Modules
   scene/                  R3F components
   icons/<icon-id>.svg     found by the kernel icon registry
-  debug.ts                debug actions (optional, read-only until K1)
+  debug.ts                debug actions (optional); a state-changing one submits a debug.<slice>.* command
   *.test.ts               beside the code
 ```
 
@@ -77,6 +79,9 @@ export const slice: SliceDefinition = {
 | `loadoutAcceptance(rule)`, `attachUse(use)` | `vehicleLoadout.ts`, `vehicleAttach.ts` | Item slices only. |
 | `hudPanel(panel)` | `src/ui/registries/hudPanels.ts` | The panel reads the slice's own store and takes no props. |
 | `debugActions(actions)` | `src/debug/debugActionRegistry.ts` | Exposed as `steampunkDebug.features['<slice>']`. |
+| `commandRules(rules)` | `src/systems/registries/commandRules.ts` | Keyed by command type: `<slice>.<name>`, or `debug.<slice>.<name>` for a debug command. `applyCommand` asks the kernel table first. |
+| `eventProjections(projections)` | `src/logging/registries/eventProjections.ts` | Keyed by `<slice>.<Event>` domain event type; `() => null` for an event with no log line. |
+| `runEvents(events)` | `src/logging/registries/runEvents.ts` | Keyed by `<slice>.<snake_case>` name, payload fully specified. |
 
 Registries are read only after `loadFeatures()` has sealed them, so no slice module reads one at import time.
 
@@ -86,7 +91,64 @@ Registries are read only after `loadFeatures()` has sealed them, so no slice mod
 - `store/`, fed by `listenForDomainEvents`, with a `reset<Slice>Store()` for `beforeEach`
 - `ui/` with CSS Modules
 - `icons/`
-- after K1, a `declare module` augmentation of `CommandPayloads` and `DomainEventBodies` in `systems/`
+- commands, domain events and rejection reasons, as below
+- a `scheduleRowId` on the content entry that ships a row of `docs/scaling/horizontal/stats.json`, with the row deleted from the deferred list in `src/systems/registries/scheduleRows.ts` in the same commit
+
+## Commands, events and debug commands (K1)
+
+A slice never edits a kernel list. It augments the open interfaces and registers the rules, projections and run events. Kernel specs that need one write a fake the same way: `src/registries/sliceCommands.test.ts` is the worked example.
+
+```ts
+// src/features/<slice>/systems/<slice>Commands.ts: pure, authority lint set
+import type { SliceCommandRules } from '../../../systems/registries/commandRules'
+import { rejectionOf } from '../../../systems/authority/commandRule'
+
+declare module '../../../systems/authority/authorityCommand' {
+  interface CommandPayloads {
+    'bell.ring': { strokes: number }
+    'debug.bell.setStrokes': { strokes: number }
+  }
+}
+declare module '../../../systems/authority/domainEvent' {
+  interface DomainEventBodies { 'bell.Rung': { strokes: number } }
+  interface RejectionReasons { 'bell.cracked': true }
+}
+
+export const BELL_RULES: SliceCommandRules = {
+  'bell.ring': {
+    fields: { strokes: 'wholeNumber' },
+    reject: (_state, { payload }) => (payload.strokes > 3 ? rejectionOf('bell.cracked', 'too many strokes') : null),
+    apply: (state, { payload }) => ({ state, events: [{ type: 'bell.Rung', strokes: payload.strokes }] }),
+  },
+  // 'debug.bell.setStrokes': { ... }
+}
+
+// src/features/<slice>/logging.ts: outside systems/, which may not import logging types
+import type { SliceEventProjections } from '../../logging/registries/eventProjections'
+import type { SliceRunEvents } from '../../logging/registries/runEvents'
+export const BELL_PROJECTIONS: SliceEventProjections = {
+  'bell.Rung': ({ strokes }) => ({ event: 'bell.rung', data: { strokes } }),
+}
+export const BELL_RUN_EVENTS: SliceRunEvents = {
+  'bell.rung': { group: 'progression', level: 'core', payload: { strokes: 'integer' } },
+}
+
+// src/features/<slice>/debug.ts: a state-changing action replays and logs debug_command_applied
+import { submitSliceDebugCommand } from '../../debug/sliceDebugCommands'
+export const bellDebugActions = {
+  setStrokes: (strokes: unknown) =>
+    submitSliceDebugCommand({ type: 'debug.bell.setStrokes', payload: { strokes: strokes as number } }),
+}
+
+// register.ts
+r.commandRules(BELL_RULES)
+r.eventProjections(BELL_PROJECTIONS)
+r.runEvents(BELL_RUN_EVENTS)
+r.debugActions(bellDebugActions)
+```
+
+- Prefix every command, event type, run event name and rejection reason with the slice id; the registrar refuses an unprefixed command, projection or run event.
+- Adding or changing a command or domain event bumps `AUTHORITY_PROTOCOL_VERSION`, in the ticket's last commit under rule 5.5 (feature-slices.md 5.4). A new run event name keeps `LOG_SCHEMA_VERSION`.
 
 ## Commits
 

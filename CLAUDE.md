@@ -127,7 +127,12 @@ Repo-specific rules:
   the rest of `src/` is the kernel. Another slice imports a slice only through its `index.ts`; nothing
   but the composition roots imports the loader, and the kernel never imports a slice (lint). Slices
   reach the kernel only through `register.ts` and the registries (`systems/registries/`,
-  `ui/registries/`, `debug/debugActionRegistry.ts`), every id prefixed `<slice>.`. **One session, one
+  `logging/registries/`, `ui/registries/`, `debug/debugActionRegistry.ts`), every id prefixed
+  `<slice>.` (a slice debug command `debug.<slice>.`). A slice adds commands, domain events and
+  rejection reasons by augmenting `CommandPayloads`, `DomainEventBodies` and `RejectionReasons`,
+  never by editing them. Every row of `docs/scaling/horizontal/stats.json` has one home
+  (`systems/registries/scheduleRows.ts`): a new row joins the deferred list, and leaves it in the
+  commit whose registered entry claims it. **One session, one
   slice:** a slice ticket edits only its folder, plus version bumps under rule 5.5 and an optional
   domain-event field it names; any other kernel change is a kernel ticket. Every composition root
   calls `loadFeatures()` first, and no module reads a registry at import time.

@@ -311,7 +311,9 @@ export interface SliceRegistrar {
   attachUse(use: AttachUse): void
   hudPanel(panel: HudPanel): void
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
-  // K1 adds commandRules, eventProjections, runEvents
+  commandRules(rules: SliceCommandRules): void              // K1, section 3.15
+  eventProjections(projections: SliceEventProjections): void
+  runEvents(events: SliceRunEvents): void
 }
 ```
 
@@ -609,15 +611,19 @@ export function debugActionsBySlice(): Readonly<Record<string, Readonly<Record<s
 
 **HUD.** `HudView.tsx` renders each slot's panels right after its kernel component (`GaugeCluster`, `HudBanner`, `PositionPanel`, `HudPrompts`, `ThreatMarkers`). An empty slot renders no markup.
 
-**Debug.** `createDebugApi()` adds one key, `features`, so tests call `window.steampunkDebug.features['<slice>'].<action>()`. In #156, actions are read-only. A state-changing action submits a `debug.<slice>.<action>` command, which needs K1 so it replays and logs `debug_command_applied`.
+**Debug.** `createDebugApi()` adds one key, `features`, so tests call `window.steampunkDebug.features['<slice>'].<action>()`. In #156, actions are read-only. Since K1 (#184), a state-changing action submits a `debug.<slice>.<action>` command through `submitSliceDebugCommand` (`src/debug/sliceDebugCommands.ts`), so it replays and logs `debug_command_applied`.
 
-### 3.15 Not yet registries (K1)
+### 3.15 Commands, events and run events (K1, built in #184)
 
-`CommandPayloads` and `DomainEventBodies` are interfaces, so slices can augment them. `RejectionReason` is a union and can't be augmented, and `COMMAND_RULES`, `PROJECTIONS` and `RUN_EVENT_REGISTRY` are closed objects. K1 adds:
-- `commandRules`, `eventProjections` and `runEvents` registries, which `applyCommand.ts`, `domainEventLog.ts` and `eventNames.ts` consult
-- an augmentable rejection-reason interface
+Before K1, `RejectionReason` was a union, and `COMMAND_RULES`, `PROJECTIONS` and `RUN_EVENT_REGISTRY` were closed objects. K1 added:
+- **Open types.** `CommandPayloads` extends the closed `KernelCommandPayloads`, `DomainEventBodies` extends `KernelDomainEventBodies`, and `RejectionReason` is `keyof RejectionReasons`. Slices augment the open interfaces. The kernel's own tables are typed over the closed ones, so an augmentation never breaks the kernel's typecheck.
+- **`commandRules`** (`src/systems/registries/commandRules.ts`). `applyCommand.ts` asks the kernel table first, so a kernel command never reads the registry. Types are `<slice>.<name>`, or `debug.<slice>.<name>` for a debug command, which marks the session debugged and logs `debug_command_applied` like the kernel's `debug.*`.
+- **`eventProjections`** (`src/logging/registries/eventProjections.ts`), keyed by `<slice>.<Event>` domain event type, which `domainEventLog.ts` asks for a non-kernel event.
+- **`runEvents`** (`src/logging/registries/runEvents.ts`), keyed by `<slice>.<snake_case>` name with a fully specified payload, which `registeredEventOf` in `eventNames.ts` asks for a non-kernel name. The run-log schema therefore checks slice lines too.
+- **`submitSliceDebugCommand`** (`src/debug/sliceDebugCommands.ts`) for state-changing slice debug actions.
+- **Schedule coverage** (`src/systems/registries/scheduleRows.ts`): every row of `docs/scaling/horizontal/stats.json` has exactly one home, a content entry's `scheduleRowId` or the shrink-only generated or deferred list.
 
-Until K1 lands, slices have selectors, hooks, effects, UI and read-only debug actions, but no commands of their own.
+With nothing registered, every command, event and log line is the same as before K1. The worked example is `src/registries/sliceCommands.test.ts`; the copyable shape is in `slice-template.md`.
 
 ## 4. Cross-slice contracts
 
