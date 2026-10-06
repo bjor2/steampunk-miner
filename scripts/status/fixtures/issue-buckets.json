@@ -1,0 +1,481 @@
+{
+  "_note": "Issue trees filter fixture (#194): status.json issues, loops.json and the published slots.json in the shapes of 2026-10-06, one issue per bucket rule; `expect` is each issue's bucket.",
+  "expect": {
+    "1": "planned",
+    "90": "planned",
+    "137": "ready",
+    "148": "planned",
+    "164": "ready",
+    "174": "ongoing",
+    "178": "planned",
+    "181": "planned",
+    "182": "planned",
+    "190": "planned",
+    "191": "ongoing",
+    "193": "ready",
+    "194": "ongoing",
+    "196": "planned",
+    "167": "closed",
+    "120": "closed"
+  },
+  "issues": [
+    {
+      "number": 1,
+      "title": "Infinite 2D steampunk mining game",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/1",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-01T08:00:00Z",
+      "updatedAt": "2026-10-06T10:00:00Z",
+      "closedAt": null,
+      "labels": [{ "name": "wayfinder:map", "color": "5319e7" }],
+      "assignees": [],
+      "parent": null,
+      "children": [90],
+      "summary": { "total": 1, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 90,
+      "title": "Build plan: campaign schedule unlock + vertical curve fixes",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/90",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-04T08:00:00Z",
+      "updatedAt": "2026-10-06T20:00:00Z",
+      "closedAt": null,
+      "labels": [{ "name": "build", "color": "0e8a16" }],
+      "assignees": [],
+      "parent": 1,
+      "children": [137, 148, 164, 167, 174, 178, 181, 182, 190, 193, 194, 196],
+      "summary": { "total": 12, "completed": 1, "percentCompleted": 8 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 137,
+      "title": "T9: Campaign pace planets 8-10",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/137",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-05T08:00:00Z",
+      "updatedAt": "2026-10-06T09:00:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "tier:hard", "color": "b60205" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [{ "number": 131, "state": "CLOSED", "title": "T7: density" }],
+      "blocking": []
+    },
+    {
+      "number": 148,
+      "title": "Build: Mining gates (drill tier, skill, dynamite-only ores)",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/148",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T09:00:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "tier:hard", "color": "b60205" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [{ "number": 146, "state": "OPEN", "title": "Build: Ore catalogue" }],
+      "blocking": []
+    },
+    {
+      "number": 164,
+      "title": "Build: Item descriptions in shops, platform and tooltips",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/164",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T09:00:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "needs-fix", "color": "d93f0b" },
+        { "name": "tier:hard", "color": "b60205" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 174,
+      "title": "Art: Sell shop and Workshop buildings in Blender (MCP)",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/174",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T19:54:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "in-progress", "color": "fbca04" },
+        { "name": "tier:hard", "color": "b60205" },
+        { "name": "design", "color": "c5def5" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": [175],
+      "inProgressAt": "2026-10-06T19:54:10Z"
+    },
+    {
+      "number": 178,
+      "title": "Build: Mining resource popup and new-material highlight",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/178",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T20:20:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "needs-planner", "color": "d93f0b" },
+        { "name": "tier:easy", "color": "0e8a16" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 181,
+      "title": "Build: Two-tier upgrade levels and chain-purchase pricing",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/181",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T09:00:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "tier:hard", "color": "b60205" },
+        { "name": "on-hold", "color": "cccccc" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 182,
+      "title": "Art: Workshop showcase platform and per-track upgrade reactions",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/182",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T09:00:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "blocked", "color": "b60205" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 190,
+      "title": "Build: Faster browser (Playwright e2e) tests",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/190",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T09:00:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "hitl", "color": "d876e3" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 191,
+      "title": "Spec: Vertical-slice test layout with a single test overview",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/191",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T19:51:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "wayfinder:task", "color": "1d76db" },
+        { "name": "design", "color": "c5def5" },
+        { "name": "planning:delegated", "color": "bfdadc" }
+      ],
+      "assignees": [],
+      "parent": 139,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 193,
+      "title": "Build: Slots tab on the status page (loop slot pools live view)",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/193",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T09:00:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "tier:easy", "color": "0e8a16" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 194,
+      "title": "Status: Issue trees tab: status filter buttons, started time and per-issue metadata",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/194",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T19:00:00Z",
+      "updatedAt": "2026-10-06T20:29:55Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "tier:hard", "color": "b60205" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 196,
+      "title": "Bug: Bot money maths overflows to Infinity past P582",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/196",
+      "state": "OPEN",
+      "stateReason": null,
+      "createdAt": "2026-10-06T08:00:00Z",
+      "updatedAt": "2026-10-06T09:00:00Z",
+      "closedAt": null,
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "needs-fix", "color": "d93f0b" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 167,
+      "title": "Status: Issue trees tab measures claimed-to-done only",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/167",
+      "state": "CLOSED",
+      "stateReason": "COMPLETED",
+      "createdAt": "2026-10-06T18:17:51Z",
+      "updatedAt": "2026-10-06T20:11:24Z",
+      "closedAt": "2026-10-06T20:11:24Z",
+      "labels": [
+        { "name": "build", "color": "0e8a16" },
+        { "name": "tier:easy", "color": "0e8a16" }
+      ],
+      "assignees": [],
+      "parent": 90,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    },
+    {
+      "number": 120,
+      "title": "Perf: ground mesh p95",
+      "url": "https://github.com/bjor2/steampunk-miner/issues/120",
+      "state": "CLOSED",
+      "stateReason": "NOT_PLANNED",
+      "createdAt": "2026-10-05T08:00:00Z",
+      "updatedAt": "2026-10-06T19:42:00Z",
+      "closedAt": "2026-10-06T19:42:00Z",
+      "labels": [{ "name": "perf", "color": "fbca04" }],
+      "assignees": [],
+      "parent": null,
+      "children": [],
+      "summary": { "total": 0, "completed": 0, "percentCompleted": 0 },
+      "blockedBy": [],
+      "blocking": []
+    }
+  ],
+  "loops": {
+    "schema": 1,
+    "updated_at": "2026-10-06T20:30:09Z",
+    "entries": {
+      "steampunk-loop/1": {
+        "loop": "steampunk-loop",
+        "slot": "1",
+        "state": "working",
+        "issue": 194,
+        "note": "started 2026-10-06 22:29 CEST",
+        "updated_at": "2026-10-06T20:30:09Z"
+      },
+      "steampunk-loop/4": {
+        "loop": "steampunk-loop",
+        "slot": "4",
+        "state": "working",
+        "issue": 174,
+        "note": "started 2026-10-06 21:54 CEST",
+        "updated_at": "2026-10-06T20:30:09Z"
+      },
+      "steampunk-loop/5": {
+        "loop": "steampunk-loop",
+        "slot": "5",
+        "state": "idle",
+        "issue": null,
+        "note": "free",
+        "updated_at": "2026-10-06T20:30:09Z"
+      },
+      "steampunk-loop": {
+        "loop": "steampunk-loop",
+        "slot": null,
+        "state": "working",
+        "issue": null,
+        "note": "8/8 Claude slots busy, 1/4 planner slots",
+        "extra": {
+          "active": 8,
+          "max": 8,
+          "max_attempts": 2,
+          "attempts": { "164": 1, "174": 1, "194": 1, "196": 2 },
+          "planner": [{ "grok_slot": "10", "ticket": 191, "map": 139 }],
+          "push_pending": { "ticket": 174, "branch": "ticket/174" }
+        },
+        "updated_at": "2026-10-06T20:30:09Z"
+      }
+    },
+    "events": [
+      {
+        "at": "2026-10-06T20:29:55Z",
+        "key": "steampunk-loop/1",
+        "state": "working",
+        "issue": 194,
+        "note": "tier hard, attempt 1/2"
+      },
+      {
+        "at": "2026-10-06T20:29:00Z",
+        "key": "steampunk-loop/1",
+        "state": "idle",
+        "issue": null,
+        "note": "free"
+      },
+      {
+        "at": "2026-10-06T20:18:20Z",
+        "key": "steampunk-loop/1",
+        "state": "working",
+        "issue": 178,
+        "note": "started 2026-10-06 22:18 CEST"
+      }
+    ]
+  },
+  "slots": {
+    "updated_at": "2026-10-06T22:30:09+02:00",
+    "accounts": [
+      {
+        "id": "A1",
+        "account": 1,
+        "name": "Claude Max 1",
+        "label": "Claude Max 1",
+        "enabled": true,
+        "slots": [
+          {
+            "slot": "C1",
+            "state": "busy",
+            "ticket": 194,
+            "grok_slot": 1,
+            "kind": "dev",
+            "since": "2026-10-06T22:29:00+02:00"
+          },
+          {
+            "slot": "C4",
+            "state": "busy",
+            "ticket": 174,
+            "grok_slot": 9,
+            "kind": "dev",
+            "since": "2026-10-06T21:54:00+02:00"
+          }
+        ]
+      },
+      {
+        "id": "A2",
+        "account": 2,
+        "name": "Claude Max 2",
+        "label": "Claude Max 2",
+        "enabled": true,
+        "slots": [
+          {
+            "slot": "C5",
+            "state": "free",
+            "ticket": null,
+            "grok_slot": null,
+            "kind": null,
+            "since": null
+          }
+        ]
+      }
+    ],
+    "grok": [
+      {
+        "slot": 1,
+        "state": "dev",
+        "ticket": 194,
+        "since": "2026-10-06T22:29:00+02:00",
+        "claude_slot": 1
+      },
+      {
+        "slot": 9,
+        "state": "dev",
+        "ticket": 174,
+        "since": "2026-10-06T21:54:00+02:00",
+        "claude_slot": 4
+      },
+      {
+        "slot": 10,
+        "state": "planner",
+        "ticket": 191,
+        "since": "2026-10-06T21:51:39+02:00",
+        "map": 139,
+        "adopted": true
+      }
+    ]
+  }
+}
