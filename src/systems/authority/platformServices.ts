@@ -3,7 +3,8 @@
  * from #20): the shop sells ore at `floorMilli(V(t))` per unit, the workshop repairs the missing
  * hull and the charging station refills the missing energy, each charge rounded up with
  * `ceilMilli` by its price function. `QuickService` is the three in order (sell all, repair,
- * recharge) at current prices, with their own events and none of its own.
+ * recharge) at current prices, with their own events and none of its own; selling all starts by
+ * collecting the player's ready Refinery batches (#105), which are paid at the Sell bay only.
  *
  * Selling, recharging and the quick action are the Sell bay's; repair is the Upgrade bay's (#37),
  * though the quick action at the Sell bay still repairs at the same price.
@@ -46,6 +47,7 @@ import {
 } from './commandRule'
 import { atBayRejection } from './dockRules'
 import type { DomainEventBody, SaleMode, SoldItem } from './domainEvent'
+import { collectWhenReady, readyRefinedValueOf } from './refinery/refineryCollection'
 
 /** One ore tier, or the whole hold's ore. */
 export type OreSelection = number | 'all'
@@ -53,6 +55,8 @@ export type OreSelection = number | 'all'
 /** What each service costs or pays right now, as the platform screen shows it (#33). */
 export interface ServiceQuote {
   saleValue: Money
+  /** This player's ready Refinery batches, paid in with the sale (#105). */
+  refinedValue: Money
   repairCost: Money
   rechargeCost: Money
 }
@@ -104,6 +108,7 @@ export const PLATFORM_SERVICE_RULES: {
       ]),
     apply: (state, { playerId }) =>
       chainEffects(state, [
+        (current) => collectWhenReady(current, playerId),
         (current) => sellAllHeldOre(current, playerId),
         (current) => repairWhenDamaged(current, playerId),
         (current) => rechargeWhenLow(current, playerId),
@@ -114,6 +119,7 @@ export const PLATFORM_SERVICE_RULES: {
 export function serviceQuote(state: AuthorityState, playerId: string): ServiceQuote {
   return {
     saleValue: saleValueOf(state, playerId, soldItemsOf(vehicleOf(state, playerId).cargo, 'all')),
+    refinedValue: readyRefinedValueOf(state, playerId),
     repairCost: repairCostOf(state, playerId),
     rechargeCost: rechargeCostOf(state, playerId),
   }
@@ -170,18 +176,15 @@ function energyFullRejection(vehicle: VehicleState): Rejection | null {
 }
 
 function nothingToServiceRejection(quote: ServiceQuote): Rejection | null {
-  const isAllZero = [quote.saleValue, quote.repairCost, quote.rechargeCost].every(
-    (amount) => cmp(amount, ZERO_MONEY) === 0,
-  )
+  const amounts = [quote.saleValue, quote.refinedValue, quote.repairCost, quote.rechargeCost]
+  const isAllZero = amounts.every((amount) => cmp(amount, ZERO_MONEY) === 0)
   return isAllZero ? rejectionOf('nothing_to_service', 'nothing to sell, repair or recharge') : null
 }
 
 function quickServiceMoneyRejection(state: AuthorityState, playerId: string): Rejection | null {
   const quote = serviceQuote(state, playerId)
-  return moneyShortRejection(
-    add(walletOf(state, playerId), quote.saleValue),
-    quickServiceCharges(quote),
-  )
+  const paidIn = add(quote.saleValue, quote.refinedValue)
+  return moneyShortRejection(add(walletOf(state, playerId), paidIn), quickServiceCharges(quote))
 }
 
 /** A charge the wallet cannot pay; shared by every priced command. */

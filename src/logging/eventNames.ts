@@ -164,6 +164,37 @@ export const RUN_EVENT_REGISTRY = {
     payload: { from: 'integer', to: 'integer', price: 'money' },
   },
   purchase_made: { group: 'platform', level: 'core', payload: 'unspecified' },
+  // The Refinery bay (#105). The envelope's `planet` is where the line happened: the queue's and
+  // the slot's planet, the platform's when a batch is ready, and the Sell bay's on collection, so
+  // `refine_collected` names the planet the batch was queued on as `queuedPlanet`.
+  refine_queued: {
+    group: 'platform',
+    level: 'core',
+    payload: { slot: 'integer', tier: 'integer', units: 'integer', requestedUnits: 'integer' },
+  },
+  refine_ready: {
+    group: 'platform',
+    level: 'core',
+    payload: { slot: 'integer', tier: 'integer', units: 'integer' },
+  },
+  refine_collected: {
+    group: 'platform',
+    level: 'core',
+    payload: {
+      slot: 'integer',
+      tier: 'integer',
+      units: 'integer',
+      rawValue: 'money',
+      value: 'money',
+      waitSeconds: 'integer',
+      queuedPlanet: 'integer',
+    },
+  },
+  refinery_slot_bought: {
+    group: 'platform',
+    level: 'core',
+    payload: { slots: 'integer', price: 'money' },
+  },
   rescue_triggered: {
     group: 'platform',
     level: 'core',

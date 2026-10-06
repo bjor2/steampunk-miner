@@ -109,7 +109,21 @@ const platformEvents: DomainEvent[] = [
     statsAfter: { hullMax: '1.12e+2', energyMax: '1.5e+2' },
   },
   { ...commandStamp, type: 'CasingUpgraded', from: 1, to: 2, price: '4.8e+1' },
-  { ...commandStamp, type: 'DockLeft', bay: 'sell', durationTicks: 300 },
+  { ...commandStamp, type: 'RefineQueued', slot: 0, tier: 7, units: 5, requestedUnits: 9 },
+  { tick: 11000, playerId: 'p1', type: 'RefineReady', slot: 0, tier: 7, units: 5 },
+  {
+    ...commandStamp,
+    type: 'RefineCollected',
+    slot: 0,
+    tier: 7,
+    units: 5,
+    rawValue: '5.6953e+2',
+    value: '7.11914e+2',
+    waitSeconds: 180,
+    queuedPlanet: 3,
+  },
+  { ...commandStamp, type: 'RefinerySlotBought', slots: 2, price: '1.1533008e+4' },
+  { ...commandStamp, type: 'DockLeft', bay: 'refinery', durationTicks: 300 },
 ]
 
 const combatEvents: DomainEvent[] = [
@@ -279,6 +293,10 @@ describe('domain event log', () => {
       'energy_recharged',
       'upgrade_purchased',
       'casing_upgraded',
+      'refine_queued',
+      'refine_ready',
+      'refine_collected',
+      'refinery_slot_bought',
       'dock_left',
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])

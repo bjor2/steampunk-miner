@@ -224,6 +224,24 @@ export interface DomainEventBodies {
   ArtefactChosen: { optionId: string }
   /** `assay_beacon` priced one sold tier at the mid-band unit price (#46). */
   ArtefactAssayApplied: { tier: number; band: number; unitPrice: string }
+  /**
+   * The Refinery bay (#105): a batch queued into `slot` (`units` after the clamp to the hold and
+   * half its capacity, `requestedUnits` as asked), ready on the clock for its owner, and collected
+   * at the Sell bay: what it pays, what the ore would have sold for raw, how long its money
+   * waited, and the planet it was queued on. A slot bought raises the refinery to `slots`.
+   */
+  RefineQueued: { slot: number; tier: number; units: number; requestedUnits: number }
+  RefineReady: { slot: number; tier: number; units: number }
+  RefineCollected: {
+    slot: number
+    tier: number
+    units: number
+    rawValue: string
+    value: string
+    waitSeconds: number
+    queuedPlanet: number
+  }
+  RefinerySlotBought: { slots: number; price: string }
   RepairPurchased: { hullFrom: string; hullTo: string; cost: string }
   /** Energy in quanta. */
   EnergyRecharged: { from: number; to: number; cost: string }

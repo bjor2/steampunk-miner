@@ -254,7 +254,11 @@ describe('platform: core bay', () => {
     const third = mineCore(session, second + 10, tiles.slice(66, 70))
     session.submit(third, poseAtDock())
     expect(typesOf(session.submit(third, dock))).not.toContain('PlatformConfigurationChanged')
-    expect(session.state().platform).toEqual({ coreBay: 70, visualState: 'core_drive' })
+    expect(session.state().platform).toEqual({
+      coreBay: 70,
+      visualState: 'core_drive',
+      refinerySlots: [null],
+    })
   })
 })
 

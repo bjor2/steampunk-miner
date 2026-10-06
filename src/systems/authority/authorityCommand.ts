@@ -21,8 +21,9 @@ import type { BayId } from '../world/dockBays'
  *    `CasingBreached`, `RingGnawed`, the wrecker's events and `debug.gnawCasing`.
  * 9: `auto_guns` (#93, #107): the vehicle's gun, `BuyGun`, `SetGunMode`, `debug.setGunLevel`, gun
  *    shots on the clock, `GunHit` and `EnemyKilled {by: gun}`.
+ * 10: the Refinery bay (#105, #92): `Dock {bay: refinery}`, its commands, slots and events.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 9
+export const AUTHORITY_PROTOCOL_VERSION = 10
 
 export interface CommandPayloads {
   /**
@@ -70,6 +71,13 @@ export interface CommandPayloads {
   buyGun: Record<string, never>
   /** The HUD toggle: `"auto"` fires by itself, `"off"` saves the boiler (#107). */
   setGunMode: { mode: string }
+  /**
+   * The Refinery bay (#105): moves up to half the hold of one ore tier into a free slot, and buys
+   * the next slot. Ready batches are collected, and paid, at the Sell bay only.
+   */
+  queueRefine: { resourceTier: number; units: number }
+  buyRefinerySlot: Record<string, never>
+  collectRefined: Record<string, never>
   /** Moves the docked platform to the next planet, paying the fee and the core (#10). */
   travel: { toPlanet: number }
   /** `interact` while overlapping the planet's live artefact cache opens its choice (#46). */

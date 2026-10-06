@@ -187,6 +187,27 @@ const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
     event: 'artefact_assay_applied',
     data: { tier, band, unitPrice },
   }),
+  RefineQueued: ({ slot, tier, units, requestedUnits }) => ({
+    event: 'refine_queued',
+    data: { slot, tier, units, requestedUnits },
+  }),
+  RefineReady: ({ slot, tier, units }) => ({ event: 'refine_ready', data: { slot, tier, units } }),
+  RefineCollected: (collected) => ({
+    event: 'refine_collected',
+    data: {
+      slot: collected.slot,
+      tier: collected.tier,
+      units: collected.units,
+      rawValue: collected.rawValue,
+      value: collected.value,
+      waitSeconds: collected.waitSeconds,
+      queuedPlanet: collected.queuedPlanet,
+    },
+  }),
+  RefinerySlotBought: ({ slots, price }) => ({
+    event: 'refinery_slot_bought',
+    data: { slots, price },
+  }),
   RepairPurchased: ({ hullFrom, hullTo, cost }) => ({
     event: 'repair_purchased',
     data: { hullFrom, hullTo, cost },

@@ -21,6 +21,7 @@ import { coreProgressProblems, type CoreProgress } from './coreProgress'
 import { heldArtefactProblems, type HeldArtefact } from './heldArtefact'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPlatformVisualState, type PlatformState } from './platformState'
+import { copyRefinerySlots, refinerySlotsProblems } from './refinery/refineryBatch'
 import { stateDigest } from './stateDigest'
 import {
   portableVehicleOf,
@@ -34,13 +35,14 @@ import {
 } from './vehicleSnapshot'
 
 /**
- * 11: the vehicle's guns and combat's gun timing and unlogged hits (#93); 10: breached casing
- * (#111, #94), 255 in the casing runs, and the tunnel wrecker's combat state; 9: the blocks warning or
+ * 12: the Refinery bay's slots on the platform (#105, #92); 11: the vehicle's guns and combat's gun
+ * timing and unlogged hits (#93); 10: breached casing (#111, #94), 255 in the casing runs, and the
+ * tunnel wrecker's combat state; 9: the blocks warning or
  * refilling (#43, #57); 8: the casing layer in chunk deltas (#41, #56); 7: each player's held artefact (#46); 6: the
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 11
+export const SNAPSHOT_VERSION = 12
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -97,7 +99,7 @@ function portableStateOf(state: AuthorityState): PortableState {
       ]),
     ),
     world: portableWorldOf(state.world),
-    platform: { ...state.platform },
+    platform: copyPlatform(state.platform),
     core: { ...state.core },
     combat: portableCombatOf(state.combat),
     collapse: portableCollapseOf(state.collapse),
@@ -129,7 +131,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
       Object.entries(portable.players).map(([id, player]) => [id, playerStateOf(player)]),
     ),
     world: worldOfPortable(portable.world),
-    platform: { ...portable.platform },
+    platform: copyPlatform(portable.platform),
     core: { ...portable.core },
     combat: combatOfPortable(portable.combat),
     collapse: portableCollapseOf(portable.collapse),
@@ -191,7 +193,12 @@ function platformProblems(platform: unknown): string[] {
     isJsonObject(platform) &&
     isWholeNumber(platform.coreBay) &&
     isPlatformVisualState(platform.visualState)
-  return isValid ? [] : ['snapshot.state.platform must hold a whole coreBay and a visual state']
+  if (!isValid) return ['snapshot.state.platform must hold a whole coreBay and a visual state']
+  return refinerySlotsProblems(platform.refinerySlots, 'snapshot.state.platform.refinerySlots')
+}
+
+function copyPlatform(platform: PlatformState): PlatformState {
+  return { ...platform, refinerySlots: copyRefinerySlots(platform.refinerySlots) }
 }
 
 function playersProblems(players: unknown): string[] {

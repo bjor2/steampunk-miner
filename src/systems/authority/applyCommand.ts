@@ -39,6 +39,8 @@ import { GUN_RULES } from './gunRules'
 import type { DomainEvent, DomainEventBody } from './domainEvent'
 import { isJsonObject, isWholeNumber, payloadProblems } from './payloadFields'
 import { PLATFORM_SERVICE_RULES } from './platformServices'
+import { REFINERY_COLLECTION_RULES } from './refinery/refineryCollection'
+import { REFINERY_RULES } from './refinery/refineryRules'
 import { VEHICLE_COMMAND_RULES } from './vehicleCommandRules'
 import { TRAVEL_RULES } from './travelRules'
 import { WORKSHOP_RULES } from './workshopRules'
@@ -80,6 +82,8 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...GUN_RULES,
   ...TRAVEL_RULES,
   ...ARTEFACT_RULES,
+  ...REFINERY_RULES,
+  ...REFINERY_COLLECTION_RULES,
 }
 
 /** The tick-driven changes due by a well-formed command's tick; none for a malformed one. */

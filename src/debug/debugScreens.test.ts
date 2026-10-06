@@ -203,12 +203,13 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     expect(replay.digests.at(-1)?.digest).toBe(takeSessionSnapshot().digest)
   })
 
-  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker and the guns', () => {
+  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker, the guns and the refinery', () => {
     // #41 added `casing_upgraded`, `casing_placed`, `casing_drilled` and the two grade edges; #46 four
     // artefact events; #43 `collapse_warning`, `collapse_cancelled` and `collapse`; #76 `casing_lined`;
     // #111 `ring_gnawed`, `wrecker_spawned` and `wrecker_fled`; #93 `gun_mounted`, `gun_upgraded`,
-    // `gun_hit` and `gun_mode`; the controls and the HUD still add none.
-    expect(ALL_RUN_EVENT_NAMES).toHaveLength(62 + 4 + 3 + 1 + 3 + 4)
+    // `gun_hit` and `gun_mode`; #105 `refine_queued`, `refine_ready`, `refine_collected` and
+    // `refinery_slot_bought`; the controls and the HUD still add none.
+    expect(ALL_RUN_EVENT_NAMES).toHaveLength(62 + 4 + 3 + 1 + 3 + 4 + 4)
   })
 })
 

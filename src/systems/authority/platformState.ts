@@ -3,7 +3,10 @@
  * shared by everyone in the session, and the visual state the platform shows. The slice has two
  * states: the plain `outpost`, and the `core_drive` that appears once the bay first holds the
  * fragments travel needs and stays for the rest of the run. Facilities have no levels (#8).
+ * The Refinery bay's slots (#105) travel with the platform; they are used from its unlock planet.
  */
+import { newRefinerySlots, type RefinerySlot } from './refinery/refineryBatch'
+
 export const PLATFORM_VISUAL_STATES = ['outpost', 'core_drive'] as const
 
 export type PlatformVisualState = (typeof PLATFORM_VISUAL_STATES)[number]
@@ -31,9 +34,14 @@ export const REFINERY_BAY_LOOKS = ['idle', 'refining', 'ready'] as const
 export interface PlatformState {
   coreBay: number
   visualState: PlatformVisualState
+  refinerySlots: readonly RefinerySlot[]
 }
 
-export const NEW_PLATFORM: PlatformState = { coreBay: 0, visualState: 'outpost' }
+export const NEW_PLATFORM: PlatformState = {
+  coreBay: 0,
+  visualState: 'outpost',
+  refinerySlots: newRefinerySlots(),
+}
 
 /**
  * Why `debug.setFacilityLevel(id, level)` cannot apply (#8 registered ids): an unknown facility,
