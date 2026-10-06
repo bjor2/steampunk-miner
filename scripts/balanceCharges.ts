@@ -151,13 +151,17 @@ function paceRowOf(planet: number) {
 
 function paceWarnings(): string[] {
   return rows.flatMap((row) => [
-    ...(row.isInsideC4
-      ? []
-      : [`planet ${row.planet} took ${minutes(row.blastingTicks)} blasting, outside C4`]),
+    ...(row.isInsideC4 ? [] : [c4MissOf(row.planet, row.blastingTicks)]),
     ...(row.shiftPercent !== null && row.shiftPercent < -MAX_SPEED_UP_PERCENT
       ? [`planet ${row.planet} sped up ${percent(row.shiftPercent)} with charges`]
       : []),
   ])
+}
+
+function c4MissOf(planet: number, ticks: number | null): string {
+  if (ticks === null)
+    return `planet ${planet}'s core was not reached with charges in the run budget`
+  return `planet ${planet} took ${minutes(ticks)} with charges, outside C4`
 }
 
 function linesOn(events: readonly RunEvent[], name: RunEventName, planet: number): number {
