@@ -1,6 +1,7 @@
 /**
- * The bot's mine on one planet (#29): one vertical shaft just east of the pad (past the Upgrade
- * bay, #37) and horizontal
+ * The bot's mine on one planet (#29): one vertical shaft just off the pad's edge nearer the hub
+ * (east of the slice pad, past the Upgrade bay, #37; west of the Sell bay once the pad runs on
+ * under the Refinery bay, #105, so the walk from the hub stays as short as on the slice) and horizontal
  * galleries off it, three rows apart, so each gallery tile has an untouched row above and below
  * whose ore (or core) the drill can reach without moving. The bot remembers how far each gallery
  * reaches; the authority's world is the truth about what is open.
@@ -36,6 +37,8 @@ export interface MineLayout {
   galleries: Map<number, Gallery>
 }
 
+/** The shaft is this many columns off the pad, so the pad's edge tile stays whole. */
+const SHAFT_OFFSET_TILES = 2
 /** Galleries are three rows apart, starting two rows under the shaft's surface tile. */
 const GALLERY_SPACING_ROWS = 3
 const FIRST_GALLERY_DEPTH = 2
@@ -46,7 +49,7 @@ export function newMineLayout(params: PlanetParams, site: DockSite): MineLayout 
   const travelRow = site.padRow + 1
   return {
     params,
-    shaftColumn: site.lastColumn + 2,
+    shaftColumn: shaftColumnOf(site),
     travelRow,
     sellBay: bayRestTileOf(site, 'sell'),
     upgradeBay: bayRestTileOf(site, 'upgrade'),
@@ -54,6 +57,15 @@ export function newMineLayout(params: PlanetParams, site: DockSite): MineLayout 
     shaftBottomRow: travelRow,
     galleries: new Map(),
   }
+}
+
+/** Two tiles past the pad edge nearer the dock point; east when both are as near. */
+function shaftColumnOf(site: DockSite): number {
+  const westReach = site.dockPoint.tx - site.firstColumn
+  const eastReach = site.lastColumn + 1 - site.dockPoint.tx
+  return westReach < eastReach
+    ? site.firstColumn - SHAFT_OFFSET_TILES
+    : site.lastColumn + SHAFT_OFFSET_TILES
 }
 
 export function galleryOf(layout: MineLayout, row: number): Gallery {
