@@ -22,6 +22,8 @@
   "chargingSpending": "4.77548e+2",
   "travelSpending": "6.075e+1",
   "rescueFees": "0e+0",
+  "liningSpending": "0e+0",
+  "liningCharged": "0e+0",
   "upgradesPurchased": 86,
   "coreFragmentsHarvested": 190,
   "enemiesKilled": 16,
