@@ -169,3 +169,32 @@ export function labelAppliedAt(timelineNodes, name) {
     .sort()
   return times.at(-1) ?? null
 }
+
+// The build loop's session tiers (loop README "Model/effort tiers", the tier:* label
+// descriptions): design always runs fable, a tier:easy retry escalates to hard.
+const SESSION_TIERS = {
+  fable: { model: 'fable', effort: 'high' },
+  hard: { model: 'opus', effort: 'high' },
+  easy: { model: 'opus', effort: 'medium' },
+}
+
+function labelNamesOf(issue) {
+  return issue.labels.map((label) => label.name)
+}
+
+function sessionTierNameOf(issue, attempt) {
+  const names = labelNamesOf(issue)
+  if (names.includes('design') || names.includes('tier:fable')) return 'fable'
+  if (names.includes('tier:easy') && attempt < 2) return 'easy'
+  return 'hard'
+}
+
+/**
+ * The model and effort of a loop worker's session: what the loop published, else what its tier
+ * rule gives for the issue's labels and attempt. Null for a planner slot (no Claude session).
+ */
+export function sessionOf(issue, claim, loopFacts) {
+  if (claim?.kind !== 'dev') return null
+  const tier = SESSION_TIERS[sessionTierNameOf(issue, loopFacts.attempts[issue.number] ?? 1)]
+  return { model: claim.model ?? tier.model, effort: claim.effort ?? tier.effort }
+}

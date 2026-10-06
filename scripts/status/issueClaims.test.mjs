@@ -5,6 +5,7 @@ import {
   labelAppliedAt,
   loopClaimsOf,
   loopFactsOf,
+  sessionOf,
   startedAtOf,
 } from './issueClaims.mjs'
 
@@ -134,5 +135,44 @@ describe('issue started time', () => {
     expect(labelAppliedAt(nodes, 'in-progress')).toBe('2026-10-06T20:00:00Z')
     expect(labelAppliedAt([], 'in-progress')).toBeNull()
     expect(labelAppliedAt(undefined, 'in-progress')).toBeNull()
+  })
+})
+
+describe('issue session tier', () => {
+  const facts = { attempts: { 5: 2 }, maxAttempts: 2 }
+  function issue(number, ...names) {
+    return { number, labels: names.map((name) => ({ name })) }
+  }
+  const worker = { kind: 'dev', model: null, effort: null }
+
+  it('gives a worker the model and effort of its tier label', () => {
+    expect(sessionOf(issue(1, 'tier:hard'), worker, facts)).toEqual({
+      model: 'opus',
+      effort: 'high',
+    })
+    expect(sessionOf(issue(1, 'tier:easy'), worker, facts)).toEqual({
+      model: 'opus',
+      effort: 'medium',
+    })
+    expect(sessionOf(issue(1, 'tier:fable'), worker, facts)).toEqual({
+      model: 'fable',
+      effort: 'high',
+    })
+    expect(sessionOf(issue(1), worker, facts)).toEqual({ model: 'opus', effort: 'high' })
+  })
+
+  it('runs design issues on fable and escalates an easy retry to hard', () => {
+    expect(sessionOf(issue(1, 'tier:hard', 'design'), worker, facts).model).toBe('fable')
+    expect(sessionOf(issue(5, 'tier:easy'), worker, facts).effort).toBe('high')
+  })
+
+  it('keeps what the loop published and gives a planner slot no session', () => {
+    const published = { kind: 'dev', model: 'sonnet', effort: 'low' }
+    expect(sessionOf(issue(1, 'tier:hard'), published, facts)).toEqual({
+      model: 'sonnet',
+      effort: 'low',
+    })
+    expect(sessionOf(issue(1), { kind: 'planner' }, facts)).toBeNull()
+    expect(sessionOf(issue(1), undefined, facts)).toBeNull()
   })
 })
