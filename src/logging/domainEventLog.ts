@@ -12,7 +12,7 @@ import {
   isCommandCaused,
   type DomainEvent,
   type DomainEventBodies,
-  type DomainEventType,
+  type KernelDomainEventType,
 } from '../systems/authority/domainEvent'
 import type { RunEventData, RunEventName } from './eventNames'
 import type { CommandRef, RunEventPlace, RunEventStamp } from './runEvent'
@@ -27,9 +27,9 @@ export interface ProjectedLine {
   line: RunLogLine
 }
 
-type Projection<K extends DomainEventType> = (body: DomainEventBodies[K]) => RunLogLine | null
+type Projection<K extends KernelDomainEventType> = (body: DomainEventBodies[K]) => RunLogLine | null
 
-const PROJECTIONS: { readonly [K in DomainEventType]: Projection<K> } = {
+const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   PlanetChanged: () => null,
   PlanetSeedChanged: () => null,
   MoneyChanged: () => null,

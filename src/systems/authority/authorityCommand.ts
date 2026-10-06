@@ -39,7 +39,8 @@ import type { BayId } from '../world/dockBays'
  */
 export const AUTHORITY_PROTOCOL_VERSION = 16
 
-export interface CommandPayloads {
+/** The kernel's own commands: the closed set its rule tables are written against. */
+export interface KernelCommandPayloads {
   /**
    * The local vehicle's pose at 5 Hz (#11 amendments, #7): integer mm and mm/s, the body-up vector
    * scaled to 1024, `facing` 0 to 3, the action flags at the moment of the report, and how many
@@ -164,6 +165,20 @@ export interface CommandPayloads {
    */
   'debug.forceCollapse': { block: string }
 }
+
+/**
+ * Every command, the kernel's and the slices'. A slice adds its commands by module augmentation,
+ * each type prefixed `<slice>.` (or `debug.<slice>.` for a debug command), and registers their
+ * rules (docs/standards/feature-slices.md 3.15):
+ *
+ *   declare module '<path to>/systems/authority/authorityCommand' {
+ *     interface CommandPayloads { 'example.ringBell': { strokes: number } }
+ *   }
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- the slices' augmentation point
+export interface CommandPayloads extends KernelCommandPayloads {}
+
+export type KernelCommandType = keyof KernelCommandPayloads
 
 export type CommandType = keyof CommandPayloads
 

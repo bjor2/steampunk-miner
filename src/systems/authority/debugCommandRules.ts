@@ -9,7 +9,7 @@
  * `collapse/collapseDebugRules.ts`, `setCharges` in `charges/chargeRules.ts`.
  */
 import { add, fromCanonical, toCanonical, type Money } from '../money'
-import type { CommandType } from './authorityCommand'
+import type { KernelCommandType } from './authorityCommand'
 import type { AuthorityState } from './authorityState'
 import { ARTEFACT_DEBUG_RULES } from './artefactRules'
 import { CASING_DEBUG_RULES } from './casingRules'
@@ -27,7 +27,7 @@ import { TELEPORT_DEBUG_RULES } from './teleportDebugRules'
 import { VEHICLE_DEBUG_RULES } from './vehicleDebugRules'
 
 export const DEBUG_COMMAND_RULES: {
-  readonly [K in Extract<CommandType, `debug.${string}`>]: CommandRule<K>
+  readonly [K in Extract<KernelCommandType, `debug.${string}`>]: CommandRule<K>
 } = {
   'debug.setPlanet': {
     fields: { planetIndex: 'wholeNumber' },

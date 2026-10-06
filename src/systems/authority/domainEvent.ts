@@ -10,71 +10,82 @@ import type { BayId } from '../world/dockBays'
 import type { CommandStamp, CommandType } from './authorityCommand'
 import type { PlatformVisualState } from './platformState'
 
-/** Why a command changed nothing (#11 amendment 2: `command_rejected {type, reason}`). */
-export type RejectionReason =
-  | 'malformed_command'
-  | 'unknown_command'
-  | 'unknown_player'
-  | 'out_of_order'
-  | 'invalid_payload'
+/**
+ * Why a command changed nothing (#11 amendment 2: `command_rejected {type, reason}`), one key per
+ * reason. An interface, so a slice adds its own reasons by module augmentation, prefixed
+ * `<slice>.`, without editing this list (docs/standards/feature-slices.md 3.15):
+ *
+ *   declare module '<path to>/systems/authority/domainEvent' {
+ *     interface RejectionReasons { 'example.bell_cracked': true }
+ *   }
+ */
+export interface RejectionReasons {
+  malformed_command: true
+  unknown_command: true
+  unknown_player: true
+  out_of_order: true
+  invalid_payload: true
   // Registered by the vehicle commands (#21): the planet is not set up, the vehicle cannot act,
   // the pose is impossible, more action ticks than time passed, the tile is out of reach or not
   // drillable, no tow is due, or a debug value is outside its range.
-  | 'no_planet'
-  | 'vehicle_not_active'
-  | 'invalid_pose'
-  | 'too_many_ticks'
-  | 'out_of_reach'
-  | 'not_drillable'
-  | 'no_rescue_needed'
-  | 'unknown_upgrade'
-  | 'out_of_range'
+  no_planet: true
+  vehicle_not_active: true
+  invalid_pose: true
+  too_many_ticks: true
+  out_of_reach: true
+  not_drillable: true
+  no_rescue_needed: true
+  unknown_upgrade: true
+  out_of_range: true
   // Registered by the platform commands (#23, #33 uses the same codes on disabled buttons): the
   // vehicle is not docked (or, for `dock`, not stationary in the pad zone), the wallet cannot pay,
   // or the facility has nothing to do.
-  | 'not_docked'
-  | 'money_short'
-  | 'nothing_to_sell'
-  | 'hull_full'
-  | 'energy_full'
-  | 'nothing_to_service'
+  not_docked: true
+  money_short: true
+  nothing_to_sell: true
+  hull_full: true
+  energy_full: true
+  nothing_to_service: true
   // Registered by the two bays (#37): the command belongs to the other bay.
-  | 'wrong_bay'
+  wrong_bay: true
   // Registered by `Travel` (#10): too few fragments in the bay, or not the next planet.
-  | 'core_short'
-  | 'not_next_planet'
+  core_short: true
+  not_next_planet: true
   // Registered by combat's debug commands (#25): not an enemy id, or the vehicle already has the
   // most enemies it may have.
-  | 'unknown_enemy'
-  | 'enemy_cap'
+  unknown_enemy: true
+  enemy_cap: true
   // Registered by the artefact commands (#46): not one of the three option ids, or this cache is
   // not live for this player (they already hold an artefact).
-  | 'unknown_artefact'
-  | 'artefact_unavailable'
+  unknown_artefact: true
+  artefact_unavailable: true
   // Registered by the guns (#107): `auto_guns` is not unlocked on this planet, the gun track is at
   // its cap, the vehicle has no guns to switch, or the mode is not `auto` or `off`.
-  | 'feature_locked'
-  | 'max_level'
-  | 'no_guns'
-  | 'unknown_mode'
+  feature_locked: true
+  max_level: true
+  no_guns: true
+  unknown_mode: true
   // Registered by the Refinery bay (#105): no refinery before its planet, every slot holds a batch,
   // the hold has no ore of that tier (core fragments never refine), the slots are at their
   // maximum, or nothing of this player's is ready to collect.
-  | 'refinery_locked'
-  | 'slots_busy'
-  | 'nothing_to_refine'
-  | 'slots_max'
-  | 'nothing_to_collect'
+  refinery_locked: true
+  slots_busy: true
+  nothing_to_refine: true
+  slots_max: true
+  nothing_to_collect: true
   // Registered by the charge commands (#109): the rack is full, no charge is carried, one is
   // already live, or the vehicle faces no wall to plant on (`feature_locked` and `max_level` above).
-  | 'rack_full'
-  | 'no_charges'
-  | 'charge_live'
-  | 'no_wall'
+  rack_full: true
+  no_charges: true
+  charge_live: true
+  no_wall: true
   // Registered by the lining types (#113): not a lining type, already unlocked, or not unlocked yet.
-  | 'unknown_lining_type'
-  | 'lining_type_owned'
-  | 'lining_type_not_owned'
+  unknown_lining_type: true
+  lining_type_owned: true
+  lining_type_not_owned: true
+}
+
+export type RejectionReason = keyof RejectionReasons
 
 export type RescueCause = 'stranded' | 'destroyed'
 
@@ -108,7 +119,8 @@ export interface SoldItem {
   amount: number
 }
 
-export interface DomainEventBodies {
+/** The kernel's own domain events: the closed set its projections and rules are written against. */
+export interface KernelDomainEventBodies {
   PlanetChanged: { planetIndex: number }
   PlanetSeedChanged: { planetSeed: number }
   MoneyChanged: { from: string; to: string }
@@ -337,6 +349,20 @@ export interface DomainEventBodies {
 
 /** When a digest is taken (#11 section 3): every 3600 ticks, at docks and travel, at the end. */
 export type DigestScope = 'periodic' | 'dock' | 'travel' | 'end'
+
+/**
+ * Every domain event, the kernel's and the slices'. A slice adds its events by module augmentation,
+ * each type prefixed `<slice>.`, and registers their run-log projections
+ * (docs/standards/feature-slices.md 3.15):
+ *
+ *   declare module '<path to>/systems/authority/domainEvent' {
+ *     interface DomainEventBodies { 'example.BellRung': { strokes: number } }
+ *   }
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- the slices' augmentation point
+export interface DomainEventBodies extends KernelDomainEventBodies {}
+
+export type KernelDomainEventType = keyof KernelDomainEventBodies
 
 export type DomainEventType = keyof DomainEventBodies
 
