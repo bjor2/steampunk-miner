@@ -8,6 +8,7 @@ const DRIVING: InputSituation = {
   dockedBay: null,
   canOpenArtefactCache: false,
   gunMode: null,
+  canPlantCharge: false,
 }
 const ON_PAD: InputSituation = { ...DRIVING, dockableBay: 'sell' }
 const DOCKED: InputSituation = {
@@ -17,6 +18,7 @@ const DOCKED: InputSituation = {
   dockedBay: 'sell',
   canOpenArtefactCache: false,
   gunMode: null,
+  canPlantCharge: false,
 }
 const OVER_CACHE: InputSituation = { ...DRIVING, canOpenArtefactCache: true }
 const AT_UPGRADE_BAY: InputSituation = { ...DOCKED, dockedBay: 'upgrade' }
@@ -60,6 +62,16 @@ describe('input routing', () => {
       submitted('setGunMode', { mode: 'auto' }),
     )
     expect(reactionToPress('toggle_guns', DRIVING)).toEqual({ kind: 'none' })
+  })
+
+  it('plants a charge only when the authority would take it, and never from the pad screen (#109)', () => {
+    expect(reactionToPress('plant_charge', { ...DRIVING, canPlantCharge: true })).toEqual(
+      submitted('plantCharge'),
+    )
+    expect(reactionToPress('plant_charge', DRIVING)).toEqual({ kind: 'none' })
+    expect(reactionToPress('plant_charge', { ...DOCKED, canPlantCharge: true })).toEqual({
+      kind: 'none',
+    })
   })
 
   it('undocks when the platform screen is closed with ui_cancel', () => {

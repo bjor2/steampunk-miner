@@ -3,7 +3,8 @@
  * them: `Dock {bay}`, `Undock`, `SellCargo {resourceTier | all}`, `RepairHull`, `RechargeEnergy`,
  * `QuickService`, `BuyUpgrade {upgradeId}`, `BuyCasingGrade`, `BuyGun` (#107), `Travel {toPlanet}`
  * (#10), and the Refinery bay's `QueueRefine`, `BuyRefinerySlot` and the Sell bay's
- * `CollectRefined` (#105). The authority checks and prices each one.
+ * `CollectRefined` (#105), and the Upgrade bay's `RestockCharges` and `BuyChargeRackSlot` (#109).
+ * The authority checks and prices each one.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import type { OreSelection } from '../authority/platformServices'
@@ -43,6 +44,14 @@ export function buyCasingGradeCommand(): CommandIntent<'buyCasingGrade'> {
 
 export function buyGunCommand(): CommandIntent<'buyGun'> {
   return { type: 'buyGun', payload: {} }
+}
+
+export function restockChargesCommand(): CommandIntent<'restockCharges'> {
+  return { type: 'restockCharges', payload: {} }
+}
+
+export function buyChargeRackSlotCommand(): CommandIntent<'buyChargeRackSlot'> {
+  return { type: 'buyChargeRackSlot', payload: {} }
 }
 
 export function queueRefineCommand(

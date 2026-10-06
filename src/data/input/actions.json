@@ -60,6 +60,13 @@
       "keyboard": ["KeyG"]
     },
     {
+      "id": "plant_charge",
+      "displayName": "Plant charge",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["KeyB"]
+    },
+    {
       "id": "ui_up",
       "displayName": "Focus up",
       "contexts": ["platform", "artefact", "settings"],

@@ -16,6 +16,7 @@ import { chordOf } from '../systems/input/keyCodes'
 import { canOpenArtefactCache } from '../systems/authority/artefactRules'
 import { dockableBayOf, dockedBayOf } from '../systems/authority/dockRules'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { plantRefusal } from '../systems/authority/charges/chargeRules'
 import { mountedGunModeOf } from '../systems/vehicle/vehicleGun'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
@@ -113,6 +114,7 @@ function situationNow() {
     dockedBay: dockedBayOf(state, game.playerId),
     canOpenArtefactCache: canOpenArtefactCache(state, game.playerId),
     gunMode: mountedGunModeOf(state.players[game.playerId].vehicle.gun),
+    canPlantCharge: plantRefusal(state, game.playerId) === null,
   }
 }
 
