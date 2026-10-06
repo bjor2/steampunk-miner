@@ -113,6 +113,9 @@ describe('test run record', () => {
       ['area rounds up', 300],
       ['area rounds down', 100],
     ])
+    expect(record.files.find((file) => file.feature === 'bot').slowest).toEqual([
+      ['area refines ore', 2900],
+    ])
     expect(prices.testDurations).toBeUndefined()
     const bot = record.files.find((file) => file.feature === 'bot')
     expect(bot.failures).toEqual([

@@ -75,7 +75,7 @@ reads them.
       "passed": 6,
       "failed": 0,
       "skipped": 0, // skipped also counts todo
-      "slowest": [["bot refining sells refined ore …", 40211]], // up to 5, full test names
+      "slowest": [["bot refining sells refined ore …", 40211]], // up to 3 tests of 100 ms or more
       "failures": [{ "test": "full test name or null", "message": "first 300 chars" }],
       "testDurations": [["full test name", 12, "passed"]], // nightly only: every test
     },
@@ -83,7 +83,8 @@ reads them.
 }
 ```
 
-A run with no report (Vitest skipped, killed by the timeout, or crashed) still gets a record:
+A run with no report (Vitest skipped, a scoped run with no related tests, killed by the timeout,
+or crashed) still gets a record:
 `totals.reportFound: false`, `files: []`, plus the job's conclusion, duration and steps.
 
 ## Summary (`summary.json`, schema 1)
@@ -113,3 +114,8 @@ Rebuilt from the run files on every record, over the last 50 runs by run id:
 
 Percentiles are nearest-rank over the runs that ran the file, so a scoped run only adds to the
 files it ran. Per-test history across runs lives in the nightly records (`testDurations`).
+
+The runs of 2026-10-06 before this landed were backfilled once from their job logs
+(`run.source: "log-backfill"`): per-file duration and counts from the default reporter, slowest
+tests only where the log printed them (300 ms or more), and mode `full-legacy` for the runs from
+before the per-push split, which ran the whole suite including the pacing bot files.

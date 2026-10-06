@@ -5,7 +5,9 @@
 import { featureOfTestFile } from './testFeatures.mjs'
 
 export const RUN_SCHEMA = 1
-export const SLOWEST_TESTS_PER_FILE = 5
+export const SLOWEST_TESTS_PER_FILE = 3
+/** Tests quicker than this are left out of `slowest`, which keeps per-push records small. */
+export const SLOWEST_TEST_MIN_MS = 100
 export const SUMMARY_RUNS = 50
 const FAILURE_MESSAGE_CHARS = 300
 const STATUS_OF_ASSERTION = { passed: 'passed', failed: 'failed' }
@@ -29,7 +31,7 @@ function countTestsByStatus(assertions) {
 
 function slowestTestsOf(assertions) {
   return assertions
-    .filter((assertion) => assertion.status === 'passed' || assertion.status === 'failed')
+    .filter((assertion) => (assertion.duration ?? 0) >= SLOWEST_TEST_MIN_MS)
     .sort((a, b) => (b.duration ?? 0) - (a.duration ?? 0))
     .slice(0, SLOWEST_TESTS_PER_FILE)
     .map((assertion) => [assertion.fullName, roundMs(assertion.duration)])
