@@ -35,6 +35,10 @@ export interface RunSummary {
   chargingSpending: string
   travelSpending: string
   rescueFees: string
+  /** First-place lining paid (#76): part of `moneySpent`. */
+  liningSpending: string
+  /** First-place lining priced; above `liningSpending` when an empty wallet left some unpaid. */
+  liningCharged: string
   upgradesPurchased: number
   coreFragmentsHarvested: number
   enemiesKilled: number
@@ -80,6 +84,8 @@ interface Tally {
   chargingSpending: Money
   travelSpending: Money
   rescueFees: Money
+  liningSpending: Money
+  liningCharged: Money
   upgradesPurchased: number
   coreFragmentsHarvested: number
   enemiesKilled: number
@@ -109,6 +115,8 @@ function emptyTally(runId: string): Tally {
     chargingSpending: ZERO_MONEY,
     travelSpending: ZERO_MONEY,
     rescueFees: ZERO_MONEY,
+    liningSpending: ZERO_MONEY,
+    liningCharged: ZERO_MONEY,
     upgradesPurchased: 0,
     coreFragmentsHarvested: 0,
     enemiesKilled: 0,
@@ -176,6 +184,10 @@ const EVENT_FOLDS: { readonly [N in RunEventName]?: EventFold<N> } = {
   rescue_triggered: (tally, { data }) => {
     tally.rescueFees = add(tally.rescueFees, fromCanonical(data.fee))
   },
+  casing_lined: (tally, { data }) => {
+    tally.liningSpending = add(tally.liningSpending, fromCanonical(data.paid))
+    tally.liningCharged = add(tally.liningCharged, fromCanonical(data.price))
+  },
   mining_interval: (tally, { data }) => {
     tally.tilesDestroyed += data.tilesDestroyed
     for (const collected of data.collected) foldCollected(tally, collected)
@@ -240,6 +252,8 @@ function summaryOf(tally: Tally): RunSummary {
     chargingSpending: toCanonical(tally.chargingSpending),
     travelSpending: toCanonical(tally.travelSpending),
     rescueFees: toCanonical(tally.rescueFees),
+    liningSpending: toCanonical(tally.liningSpending),
+    liningCharged: toCanonical(tally.liningCharged),
     upgradesPurchased: tally.upgradesPurchased,
     coreFragmentsHarvested: tally.coreFragmentsHarvested,
     enemiesKilled: tally.enemiesKilled,
@@ -259,6 +273,7 @@ function totalSpent(tally: Tally): Money {
     tally.chargingSpending,
     tally.travelSpending,
     tally.rescueFees,
+    tally.liningSpending,
   ].reduce(add, ZERO_MONEY)
 }
 

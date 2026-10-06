@@ -51,6 +51,14 @@ describe('compareRuns', () => {
     expect(comparison.ok && rowNamed(comparison.rows, 'income per minute')?.a).toBe('2.00e40')
   })
 
+  it('shows lining paid next to lining charged, so an unpaid share is visible', () => {
+    const a = summaryOf({ liningSpending: '0e+0', liningCharged: '0e+0' })
+    const b = summaryOf({ runId: 'run_b', liningSpending: '4e+2', liningCharged: '5e+2' })
+    const comparison = compareRuns(a, b)
+    expect(comparison.ok && rowNamed(comparison.rows, 'spent on lining')?.b).toBe('400')
+    expect(comparison.ok && rowNamed(comparison.rows, 'lining charged')?.b).toBe('500')
+  })
+
   it('lists the final level of every track either run has', () => {
     const a = summaryOf({ upgradeLevels: { drill_power: 28 } })
     const b = summaryOf({ runId: 'run_b', upgradeLevels: { drill_power: 19, hull: 3 } })

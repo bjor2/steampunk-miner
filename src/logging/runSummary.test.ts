@@ -94,6 +94,17 @@ describe('run summary', () => {
     })
   })
 
+  it('counts paid lining as spending and keeps the charged total beside it', () => {
+    const lined = (price: string, paid: string) =>
+      line(990, 'casing_lined', { lengthMm: 1000, band: 1, grade: 1, price, paid })
+    const run = [...PLAYED_RUN.slice(0, -1), lined('3e+0', '3e+0'), lined('3e+0', '1e+0')]
+    expect(deriveSummary(run)).toMatchObject({
+      liningSpending: '4e+0',
+      liningCharged: '6e+0',
+      moneySpent: '1.6305e+2',
+    })
+  })
+
   it('counts time in ticks with a seconds view', () => {
     expect(deriveSummary(PLAYED_RUN)).toMatchObject({
       durationTicks: 9100,
