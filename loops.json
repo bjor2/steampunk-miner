@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T06:13:50Z",
+  "updated_at": "2026-10-06T06:14:03Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -8,7 +8,7 @@
       "state": "working",
       "issue": 84,
       "note": "started 2026-10-06 07:45 CEST",
-      "updated_at": "2026-10-06T06:11:06Z",
+      "updated_at": "2026-10-06T06:14:03Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,16 +17,16 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-06T06:11:06Z",
+      "updated_at": "2026-10-06T06:14:03Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
       "loop": "steampunk-loop",
       "slot": "3",
-      "state": "blocked",
-      "issue": 96,
-      "note": "push_pending: ticket/96 green but not on main (slot free)",
-      "updated_at": "2026-10-06T06:13:50Z",
+      "state": "idle",
+      "issue": null,
+      "note": "free",
+      "updated_at": "2026-10-06T06:14:03Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,17 +35,17 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-06T06:11:06Z",
+      "updated_at": "2026-10-06T06:14:03Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
       "loop": "steampunk-loop",
       "slot": null,
-      "state": "working",
+      "state": "blocked",
       "issue": null,
-      "note": "2/4 slots busy; nothing pickable (all done, blocked, claimed, needs-planner, or out of attempts)",
+      "note": "push_pending #96 (ticket/96) waits to land on main; 1/4 slots busy; status check",
       "extra": {
-        "active": 2,
+        "active": 1,
         "max": 4,
         "max_attempts": 2,
         "attempts": {
@@ -82,9 +82,12 @@
           "128": 1,
           "84": 1
         },
-        "push_pending": null
+        "push_pending": {
+          "ticket": 96,
+          "branch": "ticket/96"
+        }
       },
-      "updated_at": "2026-10-06T06:11:06Z",
+      "updated_at": "2026-10-06T06:14:03Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -98,6 +101,20 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-06T06:14:03Z",
+      "key": "steampunk-loop",
+      "state": "blocked",
+      "issue": null,
+      "note": "push_pending #96 (ticket/96) waits to land on main; 1/4 slots busy; status check"
+    },
+    {
+      "at": "2026-10-06T06:14:03Z",
+      "key": "steampunk-loop/3",
+      "state": "idle",
+      "issue": null,
+      "note": "free"
+    },
     {
       "at": "2026-10-06T06:13:50Z",
       "key": "steampunk-loop/3",
@@ -503,20 +520,6 @@
       "state": "working",
       "issue": null,
       "note": "race 2"
-    },
-    {
-      "at": "2026-10-06T01:23:49Z",
-      "key": "race/4",
-      "state": "working",
-      "issue": null,
-      "note": "race 4"
-    },
-    {
-      "at": "2026-10-06T01:23:38Z",
-      "key": "test-loop",
-      "state": "blocked",
-      "issue": null,
-      "note": "batch"
     }
   ]
 }
