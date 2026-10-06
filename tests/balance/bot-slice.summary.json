@@ -53,6 +53,39 @@
       "departure": 24
     }
   },
+  "sawtoothBandDigTicks": {
+    "1": {
+      "arrival": 608,
+      "departure": 26
+    },
+    "2": {
+      "arrival": 51,
+      "departure": 24
+    }
+  },
+  "planetLevels": {
+    "arrival": {
+      "1": {},
+      "2": {
+        "hull": 2,
+        "cargo_hold": 8,
+        "drill_tip": 7,
+        "drill_power": 12,
+        "boiler": 8,
+        "engine": 6
+      }
+    },
+    "departure": {
+      "1": {
+        "hull": 2,
+        "cargo_hold": 8,
+        "drill_tip": 7,
+        "drill_power": 12,
+        "boiler": 8,
+        "engine": 6
+      }
+    }
+  },
   "milestones": {
     "planetReached": {
       "1": 0,

@@ -199,9 +199,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   drill ticks per metre with the levels it was entered and left with (`bandDigTicks` in
   `systems/vehicle/bandDig.ts`), and `firstBandDigTicks` the same for band 1; `compareRuns` shows
   both per planet. `balance:planets` plays the bot scenario on each pacing seed and warns where the
-  median band-5 departure is over 0.7x arrival on a planet the bot left (`sawtoothMedian.ts`).
-  Band 1 already digs at the 24-tick cap on arrival, so it is printed, never judged. Reported,
-  never gated.
+  median band-5 departure is over 0.7x arrival on a planet the bot left (`sawtoothMedian.ts`);
+  each seed's cell shows its drill_power and drill_tip leads past the curve on arrival and at
+  departure (`planetLeads.ts`). The bot holds drill_power to one level past the planet's on-curve
+  level and its forced core rule then buys drill_tip to two past (`bot/botCoreRule.ts`, #86), so a
+  lead above those bounds is a bot bug, not a balance finding. Band 1 already digs at the
+  24-tick cap on arrival, so it is printed, never judged. Reported, never gated.
 
 ## 5. Browser and packaged end-to-end (Playwright)
 
