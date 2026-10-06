@@ -271,6 +271,9 @@ const SETTING_TITLES: Readonly<Record<PreferenceName, string>> = {
   hintsEnabled: 'Show hints',
   musicMuted: 'Music',
   musicVolume: 'Music volume',
+  tvMode: 'TV mode',
+  leftHanded: 'Left-handed touch controls',
+  haptics: 'Haptics',
 }
 
 const ARTEFACT_TITLES: Readonly<Record<string, string>> = {

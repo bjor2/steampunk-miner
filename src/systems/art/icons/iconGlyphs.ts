@@ -258,6 +258,10 @@ const GLYPHS: Readonly<Record<string, IconGlyph>> = {
     body: 'M3 9h4l6-5v16l-6-5H3z',
     lines: 'M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11',
   },
+  // The device settings (#173): a TV set, a mirror axis, a buzzing handset.
+  'setting-tv-mode': { body: 'M2 6h20v13H2zM7 20h10v2H7z', lines: 'M8 2l4 4 4-4M5 9h14' },
+  'setting-left-handed': { body: 'M11 2h2v20h-2zM9 12L3 7v10zM15 12l6-5v10z' },
+  'setting-haptics': { body: 'M8 3h8v18H8z', lines: 'M4 8v8M20 8v8M11 18h2' },
   // The bay emblems (#45): assay scale, gear, alembic.
   'emblem-sell': { body: SCALE, lines: 'M3 5h18' },
   'emblem-upgrade': { body: SETTINGS_GEAR },

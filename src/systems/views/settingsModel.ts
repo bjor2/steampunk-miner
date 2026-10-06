@@ -1,7 +1,7 @@
 /**
  * `selectSettingsModel` (#33 sections 3 and 7): the settings overlay as data. The accessibility
  * baseline (fixed camera, screen shake, flashes), the hint switch, the music switch and volume
- * (#49), and every action with the key
+ * (#49), TV mode and the touch controls' hand and haptics (#173), and every action with the key
  * now bound to it, "press a key to rebind" while one is waiting, the problem lines of the last
  * refused rebinding and "Reset to defaults". Local presentation only: nothing here is a command.
  */
@@ -52,8 +52,11 @@ const TOGGLE_LABELS: Readonly<Record<PreferenceName, string>> = {
   shake: 'Screen shake',
   flashes: 'Flashes',
   hintsEnabled: 'Show hints',
+  tvMode: 'TV mode',
+  leftHanded: 'Touch controls',
   musicMuted: 'Music',
   musicVolume: 'Music volume',
+  haptics: 'Haptics',
 }
 
 const CAMERA_MODE_TEXT = { rotating: 'Rotating with planet', fixed: 'Fixed, north up' } as const
@@ -67,6 +70,9 @@ const VALUE_TEXTS: Readonly<Record<PreferenceName, (prefs: Preferences) => strin
   hintsEnabled: (prefs) => onOffText(prefs.hintsEnabled),
   musicMuted: (prefs) => onOffText(!prefs.musicMuted),
   musicVolume: (prefs) => `${Math.round(prefs.musicVolume * PERCENT)}%`,
+  tvMode: (prefs) => onOffText(prefs.tvMode),
+  leftHanded: (prefs) => (prefs.leftHanded ? 'Left-handed' : 'Right-handed'),
+  haptics: (prefs) => onOffText(prefs.haptics),
 }
 
 export function selectSettingsModel(sources: SettingsSources): SettingsModel {

@@ -48,7 +48,7 @@ export type DebugResult<T extends object = object> =
 export interface DebugUi {
   /** `rotating` (local down at the bottom of the screen) or `fixed` (#13 accessibility). */
   setCameraMode(mode: string): DebugResult
-  /** `cameraMode`, `shake`, `flashes` or `hintsEnabled`. */
+  /** Any setting the overlay lists (`PREFERENCE_NAMES`), such as `tvMode` (#173). */
   setPref(name: string, value: unknown): DebugResult
   getPrefs(): DebugResult<{ prefs: Preferences }>
   /** The player's zoom, metres across the short axis from 8 to 20 (#39); refused outside it. */

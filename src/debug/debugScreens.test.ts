@@ -267,7 +267,7 @@ describe('debug api: presentation never reaches the session (#33 acceptance 10)'
     expect(createDebugApi().ui.setPref('volume', 3)).toEqual({
       ok: false,
       problems: [
-        '"volume" is not a setting (cameraMode, shake, flashes, hintsEnabled, musicMuted, musicVolume)',
+        '"volume" is not a setting (cameraMode, shake, flashes, hintsEnabled, musicMuted, musicVolume, tvMode, leftHanded, haptics)',
       ],
     })
   })

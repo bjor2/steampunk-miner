@@ -8,8 +8,10 @@
  * screen-shake and flash switches, `hintsEnabled` the "Show hints" setting the hints (#27) read,
  * `bindings` the sparse override of the action map, `seenHints` the hints and transmissions already
  * shown (#16), so none repeats after a reload, `viewShortAxisMetres` the player's zoom (#39),
- * `musicVolume` and `musicMuted` the music settings (#49). A file written before the seen-set, the
- * zoom or the music settings existed reads as nothing seen, the 12 m default and full music.
+ * `musicVolume` and `musicMuted` the music settings (#49), `tvMode` the 10-foot UI with its safe
+ * area (#173), `leftHanded` the mirrored touch controls and `haptics` their vibration (#173). A file
+ * written before the seen-set, the zoom, the music or the #173 settings existed reads as nothing
+ * seen, the 12 m default, full music, TV mode and left-handed off and haptics on.
  *
  * The file notes the `inputMapVersion` its bindings were made for. Bindings from an older map
  * (none noted is version 1) are discarded for the current defaults, never migrated (#40, the Game
@@ -42,11 +44,25 @@ export interface Preferences {
   /** The music's level, 0 to 1 (#49); the sound effects keep theirs. */
   musicVolume: number
   musicMuted: boolean
+  /** The 10-foot UI (#173): larger minimum text and controls inside a 5% overscan-safe area. */
+  tvMode: boolean
+  /** The touch stick on the right and the button cluster bottom-left (#173). */
+  leftHanded: boolean
+  /** A short vibration on drill contact and hull damage, where the device has one (#173). */
+  haptics: boolean
 }
 
 /** The settings a player toggles one by one (`ui.setPref`); bindings change through rebinding. */
 export type PreferenceName =
-  'cameraMode' | 'shake' | 'flashes' | 'hintsEnabled' | 'musicMuted' | 'musicVolume'
+  | 'cameraMode'
+  | 'shake'
+  | 'flashes'
+  | 'hintsEnabled'
+  | 'musicMuted'
+  | 'musicVolume'
+  | 'tvMode'
+  | 'leftHanded'
+  | 'haptics'
 
 export interface PreferencesReading {
   prefs: Preferences
@@ -65,14 +81,20 @@ export const DEFAULT_PREFERENCES: Preferences = {
   viewShortAxisMetres: VIEW_SHORT_AXIS_DEFAULT_M,
   musicVolume: 1,
   musicMuted: false,
+  tvMode: false,
+  leftHanded: false,
+  haptics: true,
 }
 
 const TOGGLE_NAMES = ['shake', 'flashes', 'hintsEnabled', 'musicMuted'] as const
-/** Every setting the overlay lists, in its order; each has an icon (#158). */
+/** The #173 device settings: TV mode, the touch controls' hand and their vibration. */
+const DEVICE_NAMES = ['tvMode', 'leftHanded', 'haptics'] as const
+/** Every setting the overlay lists; each has an icon (#158). */
 export const PREFERENCE_NAMES: readonly PreferenceName[] = [
   'cameraMode',
   ...TOGGLE_NAMES,
   'musicVolume',
+  ...DEVICE_NAMES,
 ]
 /** The settings every preferences file has held; the music ones came later (#49). */
 const FIRST_PREFERENCE_NAMES: readonly PreferenceName[] = [
@@ -81,7 +103,11 @@ const FIRST_PREFERENCE_NAMES: readonly PreferenceName[] = [
   'flashes',
   'hintsEnabled',
 ]
-const LATER_PREFERENCE_NAMES: readonly PreferenceName[] = ['musicMuted', 'musicVolume']
+const LATER_PREFERENCE_NAMES: readonly PreferenceName[] = [
+  'musicMuted',
+  'musicVolume',
+  ...DEVICE_NAMES,
+]
 const FILE_FIELDS = [
   'preferencesVersion',
   'inputMapVersion',
@@ -94,12 +120,21 @@ const FILE_FIELDS = [
 /** Fields a file from an earlier build may lack; they read as their defaults. */
 const LATER_FIELDS: Pick<
   Preferences,
-  'seenHints' | 'viewShortAxisMetres' | 'musicVolume' | 'musicMuted'
+  | 'seenHints'
+  | 'viewShortAxisMetres'
+  | 'musicVolume'
+  | 'musicMuted'
+  | 'tvMode'
+  | 'leftHanded'
+  | 'haptics'
 > = {
   seenHints: [],
   viewShortAxisMetres: VIEW_SHORT_AXIS_DEFAULT_M,
   musicVolume: DEFAULT_PREFERENCES.musicVolume,
   musicMuted: DEFAULT_PREFERENCES.musicMuted,
+  tvMode: DEFAULT_PREFERENCES.tvMode,
+  leftHanded: DEFAULT_PREFERENCES.leftHanded,
+  haptics: DEFAULT_PREFERENCES.haptics,
 }
 
 /** Only the input map before #40 existed when files did not note their version. */

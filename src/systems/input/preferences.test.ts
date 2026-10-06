@@ -56,6 +56,21 @@ describe('preferences file', () => {
     })
   })
 
+  it('reads a file from before the #173 settings with TV mode and left-handed off, haptics on', () => {
+    const { tvMode: _tv, leftHanded: _hand, haptics: _haptics, ...older } = DEFAULT_PREFERENCES
+    const text = JSON.stringify({ preferencesVersion: 1, ...older })
+    expect(readPreferences(text)).toMatchObject({
+      prefs: { tvMode: false, leftHanded: false, haptics: true },
+      problems: [],
+    })
+  })
+
+  it('reads back the TV mode, left-handed and haptics settings it wrote', () => {
+    const prefs = { ...DEFAULT_PREFERENCES, tvMode: true, leftHanded: true, haptics: false }
+    expect(readPreferences(preferencesText(prefs)).prefs).toEqual(prefs)
+    expect(preferenceProblems('tvMode', 'on')).toEqual(['tvMode must be true or false, got "on"'])
+  })
+
   it('refuses a music volume outside 0 to 1', () => {
     expect(preferenceProblems('musicVolume', 0.5)).toEqual([])
     expect(preferenceProblems('musicVolume', 1.5)).toEqual([
