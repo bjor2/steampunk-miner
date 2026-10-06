@@ -26,6 +26,8 @@ import PLATFORM_BAY_SELL_EXPORTED from '../../../public/assets/platform/platform
 import PLATFORM_BAY_UPGRADE_EXPORTED from '../../../public/assets/platform/platform-bay-upgrade/platform-bay-upgrade.parts.json'
 import PLATFORM_HUB_EXPORTED from '../../../public/assets/platform/platform-hub/platform-hub.parts.json'
 import PROP_ARTEFACT_CACHE_EXPORTED from '../../../public/assets/prop/prop-artefact-cache/prop-artefact-cache.parts.json'
+import PROP_BLASTING_CHARGE_EXPORTED from '../../../public/assets/prop/prop-blasting-charge/prop-blasting-charge.parts.json'
+import VEHICLE_BLASTING_CHARGES_EXPORTED from '../../../public/assets/vehicle/vehicle-blasting-charges/vehicle-blasting-charges.parts.json'
 import VEHICLE_EXPORTED from '../../../public/assets/vehicle/vehicle/vehicle.parts.json'
 import VEHICLE_AUTO_GUNS_EXPORTED from '../../../public/assets/vehicle/vehicle-auto-guns/vehicle-auto-guns.parts.json'
 import type { AssetManifest, ManifestEntry } from './assetManifest'
@@ -61,6 +63,8 @@ export const EXPORTED_SIDECARS: readonly PartsSidecar[] = [
   ENEMY_BURROWER_EXPORTED,
   ENEMY_TUNNEL_WRECKER_EXPORTED,
   PROP_ARTEFACT_CACHE_EXPORTED,
+  VEHICLE_BLASTING_CHARGES_EXPORTED,
+  PROP_BLASTING_CHARGE_EXPORTED,
 ] as unknown as readonly PartsSidecar[]
 
 export function manifestEntryOf(assetId: string): ManifestEntry | null {

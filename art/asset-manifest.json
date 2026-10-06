@@ -214,7 +214,7 @@
       "id": "vehicle-blasting-charges",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#a63a2a",
       "partColors": {
         "charge-rack": "#8a6a2f"
@@ -224,7 +224,7 @@
       "id": "prop-blasting-charge",
       "source": "blender",
       "form": "parts",
-      "status": "placeholder",
+      "status": "final",
       "color": "#a63a2a",
       "partColors": {
         "fuse-lamp": "#ff4a3a"
