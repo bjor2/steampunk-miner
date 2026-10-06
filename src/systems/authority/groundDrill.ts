@@ -9,8 +9,9 @@
  * hardness), and only the ticks in which the stamp still
  * removed something are charged, no more than the tank pays for. A cell whose samples fall to half
  * yields once: 1 cargo unit of ore or core fragments (#7, #10); with a full hold the unit is lost,
- * never refused. The slices' gate checks may refuse an ore cell or destroy it without cargo
- * (`drillGates.ts`); with none registered the drill is unchanged.
+ * never refused. The slices' gate checks may refuse an ore cell or destroy it without cargo, and
+ * the drill reports each as a `DrillGated` (`drillGates.ts`); with none registered the drill is
+ * unchanged.
  */
 import { casingHardness } from '../economy/casingGrades'
 import { coreHardness, blockHardness, oreSalePrice } from '../economy/oreEconomy'
@@ -37,7 +38,7 @@ import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
 import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
-import { gatedDrillTicks, isYieldLostToGate } from './drillGates'
+import { openDrillGates, type DrillGates } from './drillGates'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
 import { minedOreOf, type MinedOre } from './minedOre'
@@ -98,14 +99,14 @@ function drillGround(
   const ticks = Math.min(requestedTicks, affordableTicksOf(vehicle))
   if (ticks === 0) return unchanged(state)
   const window = { firstTick: Math.max(0, state.tick - ticks), ticks }
-  const drillTicksOf = gatedDrillTicks(state, playerId, params, drillTicksOfCells(params, drill))
-  const carved = target.carve(state.world, window, drillTicksOf)
-  if (carved.ticksUsed === 0) return unchanged(state)
+  const gates = openDrillGates(state, playerId, params, drillTicksOfCells(params, drill))
+  const carved = target.carve(state.world, window, gates.drillTicksOf)
+  if (carved.ticksUsed === 0) return { state, events: gates.refusedEvents() }
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
     ...vehicle,
     energy: vehicle.energy - carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill,
   })
-  const collected = collectYieldedCells(charged, playerId, params, carved.yielded)
+  const collected = collectYieldedCells(charged, playerId, params, carved.yielded, gates)
   return {
     state: wakeLavaBeside(collected.state, params, carved.yielded, state.tick),
     events: [
@@ -113,6 +114,7 @@ function drillGround(
       ...groundChangedEventsOf(carved),
       ...casingDrilledEvents(carved),
       ...collected.events,
+      ...gates.refusedEvents(),
     ],
   }
 }
@@ -145,26 +147,28 @@ function collectYieldedCells(
   playerId: string,
   params: PlanetParams,
   yielded: readonly YieldedCell[],
+  gates: DrillGates,
 ): RuleEffect {
   return chainEffects(
     state,
     yielded.map(({ tile, cell }) => (current: AuthorityState) => {
-      const collected = collectUngatedTile(current, playerId, params, { tile, cell })
+      const collected = collectUngatedTile(current, playerId, params, { tile, cell }, gates)
       const destroyed: DomainEventBody = { type: 'TileDestroyed', ...tile, kind: kindNameOf(cell) }
       return { state: collected.state, events: [destroyed, ...collected.events] }
     }),
   )
 }
 
-/** A cell a gate says is lost is destroyed and pays nothing; every other cell is collected. */
+/** A cell a gate says is lost is destroyed, pays nothing and says why; every other is collected. */
 function collectUngatedTile(
   state: AuthorityState,
   playerId: string,
   params: PlanetParams,
   yielded: YieldedCell,
+  gates: DrillGates,
 ): RuleEffect {
-  if (isYieldLostToGate(state, playerId, params, yielded.tile, yielded.cell))
-    return unchanged(state)
+  const lost = gates.lostEventOf(yielded)
+  if (lost !== null) return { state, events: [lost] }
   return collectTile(state, playerId, params, yielded)
 }
 

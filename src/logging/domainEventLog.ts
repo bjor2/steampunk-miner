@@ -49,6 +49,20 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     data: { tx, ty, ticks, damage },
   }),
   TileDestroyed: ({ tx, ty, kind }) => ({ event: 'tile_destroyed', data: { tx, ty, kind } }),
+  DrillGated: (gated) => ({
+    event: 'gate_hit',
+    data: {
+      oreId: gated.oreId,
+      family: gated.family,
+      tier: gated.tier,
+      gateKind: gated.gateKind,
+      outcome: gated.outcome,
+      required: gated.required,
+      have: gated.have,
+      tx: gated.tx,
+      ty: gated.ty,
+    },
+  }),
   // Per-carve chunk changes would swamp the log; the yields above are its record of mining (#4).
   GroundChanged: () => null,
   CasingPlaced: ({ samples, relined, grade }) => ({

@@ -258,6 +258,40 @@ describe('domain event log', () => {
     })
   })
 
+  it("records a gate stopping the drill as a schema-valid gate_hit with the gate's words (K2)", () => {
+    const gated: DomainEvent = {
+      ...commandStamp,
+      type: 'DrillGated',
+      tx: 14,
+      ty: 207,
+      oreId: 'kernel.metal.t1',
+      family: 'metal',
+      tier: 1,
+      gateKind: 'rig',
+      outcome: 'refused',
+      required: 'rig.resonance_rig',
+      have: 'none',
+    }
+    recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 3 }, [gated])
+    expect(sink.events.map(({ event, data }) => ({ event, data }))).toEqual([
+      {
+        event: 'gate_hit',
+        data: {
+          oreId: 'kernel.metal.t1',
+          family: 'metal',
+          tier: 1,
+          gateKind: 'rig',
+          outcome: 'refused',
+          required: 'rig.resonance_rig',
+          have: 'none',
+          tx: 14,
+          ty: 207,
+        },
+      },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
   it('records every combat event as a registered line; an enemy kill names no enemy id', () => {
     recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, combatEvents)
     expect(sink.events.map((event) => event.event)).toEqual([

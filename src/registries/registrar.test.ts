@@ -24,7 +24,7 @@ function sliceOf(id: string, register: (r: SliceRegistrar) => void): SliceDefini
 
 const refuseAll = (id: string): GateCheck => ({
   id,
-  check: () => ({ outcome: 'refused', gateKind: id, required: 'rig' }),
+  check: () => ({ outcome: 'refused', gateKind: id, required: 'rig', have: 'none' }),
 })
 
 function lookProvider(id: string): OreLookProvider {

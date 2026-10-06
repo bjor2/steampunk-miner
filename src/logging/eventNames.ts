@@ -365,6 +365,23 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: { tx: 'integer', ty: 'integer', kind: { oneOf: ['ground', 'ore', 'core'] } },
   },
+  // K2 (#185, #142 acceptance 13): a slice's gate check stopped the drill at an ore cell, once per
+  // drilling command that met it; `required` and `have` are the gate's own words.
+  gate_hit: {
+    group: 'mining',
+    level: 'core',
+    payload: {
+      oreId: 'text',
+      family: 'text',
+      tier: 'integer',
+      gateKind: 'text',
+      outcome: { oneOf: ['refused', 'lost'] },
+      required: 'text',
+      have: 'text',
+      tx: 'integer',
+      ty: 'integer',
+    },
+  },
   // #41: one ring of lining, and lining the drill cleared (one line per drilling command).
   casing_placed: {
     group: 'mining',

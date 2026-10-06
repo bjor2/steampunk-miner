@@ -139,6 +139,22 @@ export interface KernelDomainEventBodies {
    */
   TileDestroyed: { tx: number; ty: number; kind: 'ground' | 'ore' | 'core' }
   /**
+   * A slice's gate check stopped the drill at an ore cell (feature-slices.md 3.6, K2): `refused`
+   * once per drill command that met the cell, `lost` beside the cell's `TileDestroyed`. The fields
+   * are the ore and the verdict, as #142's `gate_hit` logs them.
+   */
+  DrillGated: {
+    tx: number
+    ty: number
+    oreId: string
+    family: string
+    tier: number
+    gateKind: string
+    outcome: 'refused' | 'lost'
+    required: string
+    have: string
+  }
+  /**
    * The density of one chunk changed (#36, replacing the first slice's tile change): the dirty
    * rectangle in chunk-local samples, inclusive, and the chunk's version after the change. The
    * renderer, the collider halo and later the network consume it; the run log does not.

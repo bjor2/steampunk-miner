@@ -19,12 +19,14 @@ const QUERY: GateQuery = {
     iconId: 'none',
     requires: [],
   },
+  blast: null,
 }
 
 function registerCheck(id: string, outcome: GateOutcome | null): void {
   addToRegistry(GATE_CHECK_REGISTRY, 'mining-gates', {
     id,
-    check: () => (outcome === null ? null : { outcome, gateKind: id, required: 'rig' }),
+    check: () =>
+      outcome === null ? null : { outcome, gateKind: id, required: 'rig', have: 'none' },
   })
 }
 

@@ -1,10 +1,14 @@
 /**
- * Whether the drill may take an ore cell (docs/standards/feature-slices.md 3.6, #142's `canMine`):
- * `mining-gates` registers checks, the drill asks for one verdict. A check with no opinion answers
- * null. With no check registered the drill takes today's path.
+ * Whether the drill or a blast may take an ore cell (docs/standards/feature-slices.md 3.6, #142's
+ * `canMine`): `mining-gates` registers checks, the drill and the blast each ask for one verdict. A
+ * check answers null for a cell with no gate. With no check registered both take today's path.
+ *
+ * A verdict is the gate's answer to the means in the query: `cut` opens the cell (a blast frees it
+ * whole, #142 "Dynamite-only share"), `refused` leaves it standing, `lost` breaks it without ore.
  */
 import type { AuthorityState } from '../authority/authorityState'
 import type { TilePoint } from '../world/tileGrid'
+import type { BlastEvent } from './blastEffects'
 import type { OreType } from './oreTypes'
 import { defineRegistry, entriesOf } from './seal'
 
@@ -16,17 +20,21 @@ export interface GateQuery {
   tile: TilePoint
   cell: number
   ore: OreType
+  /** The blast asking; null when the drill asks. */
+  blast: BlastEvent | null
 }
 
+/** What the gate needs and what the player has, as #142's `gate_hit` logs them. */
 export interface GateVerdict {
   outcome: GateOutcome
   gateKind: string
   required: string
+  have: string
 }
 
 export interface GateCheck {
   id: string
-  /** null: no opinion on this cell. */
+  /** null: no gate on this cell. */
   check(query: GateQuery): GateVerdict | null
 }
 
