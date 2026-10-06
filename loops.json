@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T01:24:44Z",
+  "updated_at": "2026-10-06T01:24:47Z",
   "entries": {
     "test-loop/1": {
       "loop": "test-loop",
@@ -36,15 +36,6 @@
       "issue": null,
       "note": "race3 4",
       "updated_at": "2026-10-06T01:24:30Z",
-      "host": "grok-bot-vm-452660841"
-    },
-    "race/3": {
-      "loop": "race",
-      "slot": "3",
-      "state": "paused",
-      "issue": null,
-      "note": "race3 3",
-      "updated_at": "2026-10-06T01:24:34Z",
       "host": "grok-bot-vm-452660841"
     }
   },
