@@ -1,8 +1,9 @@
 /**
  * Slice debug actions (docs/standards/feature-slices.md 3.14), exposed as
  * `window.steampunkDebug.features['<slice>'].<action>()`, so a slice never adds a `DebugApi` key.
- * Read-only until K1: a state-changing action must submit a `debug.<slice>.<action>` command, so
- * it replays and logs `debug_command_applied`.
+ * A state-changing action submits a `debug.<slice>.<action>` command through
+ * `submitSliceDebugCommand` (`sliceDebugCommands.ts`), so it replays and logs
+ * `debug_command_applied`; it never writes state itself.
  */
 import { defineRegistry, entriesOf } from '../systems/registries/seal'
 import type { DebugResult } from './debugScreens'
