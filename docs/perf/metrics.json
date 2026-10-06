@@ -268,6 +268,20 @@
       "group": "Stack",
       "better": "higher",
       "source": "stack stress (deepest tested depth before the first RangeError)"
+    },
+    "lookChange.geometriesPerToggle": {
+      "label": "three geometries kept per vehicle look change (visual tier + rack, after GC)",
+      "unit": "geometries",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "preview build, 12 visual-tier/rack toggles via steampunkDebug, renderer.info.memory (#118)"
+    },
+    "lookChange.texturesPerToggle": {
+      "label": "three textures kept per vehicle look change (visual tier + rack, after GC)",
+      "unit": "textures",
+      "group": "Memory soak",
+      "better": "lower",
+      "source": "preview build, 12 visual-tier/rack toggles via steampunkDebug, renderer.info.memory (#118)"
     }
   }
 }
