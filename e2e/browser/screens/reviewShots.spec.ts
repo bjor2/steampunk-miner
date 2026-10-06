@@ -9,9 +9,11 @@
  * and the settings screen in their places; each ticket swaps its shot in when it lands.
  */
 import { expect, test, type Page } from '@playwright/test'
-import { currentCell, dockAt, openGame, settledStats } from './screenHelpers'
+import { currentCell, dockAt, openGame, renderStats } from './screenHelpers'
 
 const JPEG_QUALITY = 80
+/** A native 4K frame on software WebGL takes seconds; the shot waits for drawn ground, then this. */
+const GROUND_SETTLE_MS = 3000
 
 test.describe('screen matrix: review shots (#173)', () => {
   test('writes the look set for this screen', async ({ page }) => {
@@ -24,10 +26,10 @@ test.describe('screen matrix: review shots (#173)', () => {
     }
     await page.evaluate(() => window.steampunkDebug!.ui.setRenderScale(1))
     await dismissTransmission(page)
-    await settledStats(page)
+    await waitForGround(page)
     await shoot(page, 'dock')
     await digDown(page)
-    await settledStats(page)
+    await waitForGround(page)
     await shoot(page, 'dig')
     await dockAt(page, 'upgrade')
     await shoot(page, 'workshop')
@@ -60,6 +62,14 @@ async function digDown(page: Page): Promise<void> {
   })
   await page.waitForTimeout(4000)
   await page.evaluate(() => window.steampunkDebug!.input.release('aim_down'))
+}
+
+/** The ground drawn around the rig; the review shot needs a picture, not settled counts. */
+async function waitForGround(page: Page): Promise<void> {
+  await expect
+    .poll(async () => (await renderStats(page)).groundBlocks, { timeout: 240_000 })
+    .toBeGreaterThan(0)
+  await page.waitForTimeout(GROUND_SETTLE_MS)
 }
 
 async function shoot(page: Page, shot: string): Promise<void> {

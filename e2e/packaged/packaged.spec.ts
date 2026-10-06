@@ -26,6 +26,12 @@ const SCENARIO_FILE = fileURLToPath(
 )
 /** The committed start scenario fast-forwards this far (its script). */
 const SCENARIO_END_TICK = 7200
+/** Chromium switches that give a headless or virtual display a software WebGL context. */
+const SOFTWARE_GL_SWITCHES = [
+  '--use-gl=swiftshader',
+  '--enable-unsafe-swiftshader',
+  '--ignore-gpu-blocklist',
+]
 
 /** Where `electron-builder --dir` puts the game on this platform (electron-builder.yml). */
 function packagedExecutable(): string {
@@ -116,7 +122,9 @@ test.describe('packaged build (#29 packaged-smoke)', () => {
   })
 
   test('fits its window as the browser fits the same window: UI scale, zoom cap, render floor (#173)', async () => {
-    const { app } = await launchGame(['--debug-api'])
+    // The zoom cap and the render floor are read from drawn frames, so WebGL must start: under
+    // Xvfb only SwiftShader gives it one (#102), and the switches are harmless elsewhere.
+    const { app } = await launchGame(['--debug-api', ...SOFTWARE_GL_SWITCHES])
     const page = await app.firstWindow()
     await page.waitForFunction(() => window.steampunkDebug !== undefined)
     const screen = await page.evaluate(() => ({
