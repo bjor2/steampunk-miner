@@ -258,3 +258,18 @@ export const PREVIEW_VEHICLE_SHARE_PERCENT = 60
  */
 export const GUN_LOOK_FIRST_LEVELS: readonly number[] = [1, 6, 12]
 export const GUN_TURN_RADIANS_PER_SECOND = 9
+
+/**
+ * The Refinery bay's smoke while a batch runs (#105, #106 art: procedural, #51), rising from its
+ * stack top at `REFINERY_STACK_TOP_M` in the bay's frame (the art's documented point). Placeholders,
+ * tuned by eye; presentation only.
+ */
+export const REFINERY_STACK_TOP_M = [-0.75, 2.98] as const
+export const REFINERY_SMOKE_CAPACITY = 64
+export const REFINERY_SMOKE_PER_SECOND = 14
+export const REFINERY_SMOKE_SPEED = 0.7
+export const REFINERY_SMOKE_SPREAD_RADIANS = 0.35
+export const REFINERY_SMOKE_LIFE_SECONDS = 2.4
+export const REFINERY_SMOKE_SIZE_PIXELS = 6
+export const REFINERY_SMOKE_COLOUR = '#8a817a'
+export const REFINERY_SMOKE_SEED = 0x5e0c

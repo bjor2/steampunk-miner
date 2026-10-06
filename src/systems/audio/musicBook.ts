@@ -1,5 +1,6 @@
 /**
- * The shipped music (#49): the four layer loops and the three stingers, one pattern file each in
+ * The shipped music (#49): the four layer loops and the four stingers (the reveal for a platform
+ * module, #105), one pattern file each in
  * `src/data/music/`. Every file is checked at load and the book refused whole on any problem, so a
  * malformed pattern stops the build's tests instead of playing wrong.
  */
@@ -9,6 +10,7 @@ import PLATFORM from '../../data/music/platform.json'
 import ARTEFACT_STINGER from '../../data/music/stinger-artefact.json'
 import CORE_STINGER from '../../data/music/stinger-core.json'
 import DOCK_STINGER from '../../data/music/stinger-dock.json'
+import REVEAL_STINGER from '../../data/music/stinger-reveal.json'
 import TENSION from '../../data/music/tension.json'
 import { musicPatternProblems } from './musicPattern'
 import type { MusicLayers } from './musicLayers'
@@ -16,7 +18,7 @@ import { scoreOfPattern, type MusicScore } from './musicScore'
 import type { MusicPattern } from './musicPattern'
 
 export type LayerName = keyof MusicLayers
-export const STINGER_IDS = ['dock', 'core', 'artefact'] as const
+export const STINGER_IDS = ['dock', 'core', 'artefact', 'reveal'] as const
 export type StingerId = (typeof STINGER_IDS)[number]
 
 export interface MusicBook {
@@ -31,7 +33,12 @@ export interface MusicFiles {
 
 export const SHIPPED_MUSIC_FILES: MusicFiles = {
   layers: { platform: PLATFORM, ambience: AMBIENCE, tension: TENSION, combat: COMBAT },
-  stingers: { dock: DOCK_STINGER, core: CORE_STINGER, artefact: ARTEFACT_STINGER },
+  stingers: {
+    dock: DOCK_STINGER,
+    core: CORE_STINGER,
+    artefact: ARTEFACT_STINGER,
+    reveal: REVEAL_STINGER,
+  },
 }
 
 export const MUSIC_BOOK: MusicBook = loadMusicBook(SHIPPED_MUSIC_FILES)

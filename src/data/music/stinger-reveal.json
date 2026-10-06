@@ -1,0 +1,32 @@
+{
+  "id": "reveal",
+  "tempoBpm": 120,
+  "beatsPerBar": 4,
+  "stepsPerBeat": 4,
+  "barCount": 2,
+  "rootHz": 294,
+  "scale": [0, 2, 4, 5, 7, 9, 11],
+  "instruments": [
+    {
+      "name": "brass",
+      "voice": "sawtooth",
+      "octave": 0,
+      "gain": 0.14,
+      "bars": ["1---5---8-------", "6---5---8-------"]
+    },
+    {
+      "name": "anvil",
+      "voice": "triangle",
+      "octave": 1,
+      "gain": 0.1,
+      "bars": ["1.......1.......", "1...1...1-------"]
+    },
+    {
+      "name": "floor",
+      "voice": "sine",
+      "octave": -1,
+      "gain": 0.22,
+      "bars": ["1---------------", "4---------------"]
+    }
+  ]
+}

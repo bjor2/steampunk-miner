@@ -89,7 +89,7 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   warning or refilling). Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
-  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getBayPresentation()`, `ui.getAudioModel()`) reads the
+  `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getRefineryBayModel()` (#105), `ui.getBayPresentation()`, `ui.getAudioModel()`) reads the
   screens' view models, the bay screen's shutter, text size and preview framing (#45, #44), the music's layer targets, settings and stinger sequence (#49) and
   the drill voice (`drillVoice`: `casing` while the drill's nose is in lining, #41), and
   changes local presentation only: no command, no log line, no `debugApplied` (#11 amendment 2,
@@ -148,6 +148,12 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   a planet that moves by more than 10% is a balance finding whose one lever is
   `gun.damageFractionOfDrill`. Gun combat specs fight in the band-1 corridor with `debug.setGunLevel`
   and the planet 4 on-curve levels (`combat/gunFire.test.ts`).
+- **Refinery** (#105 acceptance 7): `npm run balance:refinery` plays the bot scenario from planet 1
+  to planet 8's core twice, refining from planet 3 (`refinery: 'used'`, the bot's default) and
+  ignoring the refinery, and prints both core times per planet, the single-lever findings
+  (`refineryLeverFindings`: a planet pushed under 45 minutes or shortened more than 10%) and the
+  realised refine gain per planet from `refine_collected`. Reported, never gated; the lever is
+  `valueMultiplier` (floor 1.15), never `k_casing`.
 - **Comparison** (`compareRuns`): `npm run balance:report` writes `balance-report/` and compares the
   run with `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
   deliberate economy change, `npm run balance:baseline` rewrites the baseline in the same commit.

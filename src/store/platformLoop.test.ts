@@ -136,6 +136,16 @@ describe('platform loop from a fresh profile', () => {
   it('shows the docked vehicle and the empty core bay of a fresh run', () => {
     game().dock('sell')
     expect(game().vehicle.mode).toBe('docked')
-    expect(game().platform).toEqual({ coreBay: 0, coreNeeded: 63, visualState: 'outpost' })
+    expect(game().platform).toEqual({
+      coreBay: 0,
+      coreNeeded: 63,
+      visualState: 'outpost',
+      refineryLook: null,
+    })
+  })
+
+  it('shows the Refinery bay, idle, once the platform stands on planet 3', () => {
+    game().setPlanet(3)
+    expect(game().platform.refineryLook).toBe('idle')
   })
 })

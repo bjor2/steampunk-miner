@@ -28,6 +28,10 @@ describe('music patterns', () => {
     expect(stingerSecondsOf(MUSIC_BOOK, 'artefact')).toBe(3)
   })
 
+  it('plays the module reveal stinger for 4 s (#105)', () => {
+    expect(stingerSecondsOf(MUSIC_BOOK, 'reveal')).toBe(4)
+  })
+
   it('loops the platform for 8 bars and the ambience for 16', () => {
     const barSeconds = (tempoBpm: number) => (4 * 60) / tempoBpm
     expect(MUSIC_BOOK.layers.platform.loopSeconds).toBeCloseTo(8 * barSeconds(96), 9)

@@ -32,6 +32,18 @@ describe('music stingers', () => {
     expect(musicStingersOf([coreReached, coreTileBroken, coreTileBroken], 'p1')).toEqual(['core'])
   })
 
+  it('plays the reveal stinger when the Refinery bay bolts on, not for a planet gate', () => {
+    const unlocked = (featureId: string): DomainEvent => ({
+      playerId: 'p1',
+      tick: 30,
+      seq: 2,
+      type: 'FeatureUnlocked',
+      featureId,
+    })
+    expect(musicStingersOf([unlocked('refinery_bay')], 'p1')).toEqual(['reveal'])
+    expect(musicStingersOf([unlocked('planet_2')], 'p1')).toEqual([])
+  })
+
   it('keeps the order the events happened in', () => {
     expect(musicStingersOf([coreReached, docked('p1')], 'p1')).toEqual(['core', 'dock'])
   })

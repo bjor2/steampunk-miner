@@ -1,7 +1,8 @@
 /**
  * The platform on its pad (#8, #13, #37): the hub between the two bays and their signs, the
  * outpost, and the core drive once the authority's
- * `platform.visualState` says so, with the core bay's fill gauge on its body. Lit by the scene's
+ * `platform.visualState` says so, with the core bay's fill gauge on its body; from planet 3 the
+ * Refinery bay at its look (#105). Lit by the scene's
  * lights (#38, #48); its lamps are `LightRig`'s. Drawn behind the
  * vehicle; it changes only when the replica does, so it renders through React like the vehicle's
  * parts, never per frame.
@@ -14,6 +15,7 @@ import {
   type PartShape,
 } from '../systems/render/platformPlaceholder'
 import { dockSiteOf, type DockSite } from '../systems/world/dockSite'
+import { RefineryBay } from './RefineryBay'
 
 /** Behind the vehicle and the enemies, in front of the tiles. */
 const PLATFORM_Z = 0.02
@@ -41,6 +43,9 @@ export function PlatformPlaceholder() {
         <PlatformShapeMesh key={`${platform.visualState}.${at}`} shape={shape} />
       ))}
       <BayGauge offset={look.bayGauge.offset} size={look.bayGauge.size} fill={fill} />
+      {platform.refineryLook === null ? null : (
+        <RefineryBay site={site} look={platform.refineryLook} />
+      )}
     </group>
   )
 }
