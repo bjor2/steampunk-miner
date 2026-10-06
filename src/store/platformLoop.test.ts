@@ -124,7 +124,7 @@ describe('platform loop from a fresh profile', () => {
     const sold = sumOfLogged('resource_sold', 'value')
     const lining = sumOfLogged('lining_settled', 'paid')
     expect(toCanonical(game().money)).toBe(
-      toCanonical(sub(sub(sold, lining), fromCanonical('252'))),
+      toCanonical(sub(sub(sold, lining), fromCanonical('270'))),
     )
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
     expect(game().debugApplied).toBe(false)

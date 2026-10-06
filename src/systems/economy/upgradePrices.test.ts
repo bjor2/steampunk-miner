@@ -1,27 +1,57 @@
 import { describe, expect, it } from 'vitest'
-import { ceil, fromCanonical, mul, powInt } from '../money'
+import { ceil, cmp, floorMilli, fromCanonical, mul, powInt, type Money } from '../money'
+import { ECONOMY } from './economy'
 import { UPGRADE_IDS } from './economyDefinition'
 import { upgradePrice } from './upgradePrices'
 
 const m = fromCanonical
 
+/** Ore value grows by 1.5 per tier and three tiers per planet (#6). */
+const ORE_GROWTH_PER_PLANET = m('3.375')
+
+function ratioOfCurve(curveId: string): Money {
+  const curve = ECONOMY.costCurves.find((candidate) => candidate.id === curveId)
+  if (curve?.family !== 'geometric') throw new Error(`no geometric cost curve ${curveId}`)
+  return curve.ratio
+}
+
 describe('upgrade prices', () => {
-  it('prices level 0 at 24, 24, 36, 48, 48 and 72 for cargo, boiler, engine, hull, drill, tip', () => {
+  // #84: the drill and tip bases sit above the c0 * weight start (48, 72), so the flattened ratio
+  // costs the slice what the old curve did.
+  it('prices level 0 at 24, 24, 36, 48, 55 and 83 for cargo, boiler, engine, hull, drill, tip', () => {
     const order = ['cargo_hold', 'boiler', 'engine', 'hull', 'drill_power', 'drill_tip'] as const
     expect(order.map((upgradeId) => upgradePrice(upgradeId, 0, 1))).toEqual(
-      ['24', '24', '36', '48', '48', '72'].map(m),
+      ['24', '24', '36', '48', '55', '83'].map(m),
     )
   })
 
-  it('prices level 1 at ceil(base * ratio): 30 for the cargo hold and 111 for the tip', () => {
+  it('prices level 1 at ceil(base * ratio): 30 for the cargo hold and 125 for the tip', () => {
     expect(upgradePrice('cargo_hold', 1, 1)).toEqual(m('30'))
-    expect(upgradePrice('drill_tip', 1, 1)).toEqual(m('111'))
+    expect(upgradePrice('drill_tip', 1, 1)).toEqual(m('125'))
   })
 
-  it('grows the tip price by "1.5376" per level and every other track by "1.24"', () => {
-    expect(upgradePrice('drill_tip', 20, 1)).toEqual(ceil(mul(m('72'), powInt(m('1.5376'), 20))))
+  it('grows drill power by "1.225", the tip by "1.500625" and every other track by "1.24" per level', () => {
+    expect(upgradePrice('drill_power', 20, 1)).toEqual(ceil(mul(m('55'), powInt(m('1.225'), 20))))
+    expect(upgradePrice('drill_tip', 20, 1)).toEqual(ceil(mul(m('83'), powInt(m('1.500625'), 20))))
     expect(upgradePrice('hull', 20, 1)).toEqual(ceil(mul(m('48'), powInt(m('1.24'), 20))))
     expect(upgradePrice('engine', 20, 1)).toEqual(ceil(mul(m('36'), powInt(m('1.24'), 20))))
+  })
+
+  // #77: the drill ratio r is 3.375^(1/6) to the milli, so r^6 = 1.5^3 and six drill levels a
+  // planet cost what three ore tiers pay. The tip buys three levels a planet, so its ratio is r^2.
+  it('stores the drill ratio as the sixth root of 1.5^3 rounded to the milli', () => {
+    const drillRatio = ratioOfCurve('cost.vehicle.drill_power')
+    expect(floorMilli(drillRatio)).toEqual(drillRatio)
+    expect(cmp(powInt(m('1.2245'), 6), ORE_GROWTH_PER_PLANET)).toBe(-1)
+    expect(cmp(powInt(m('1.2255'), 6), ORE_GROWTH_PER_PLANET)).toBe(1)
+    expect(drillRatio).toEqual(m('1.225'))
+  })
+
+  it('prices the tip at the drill ratio squared, so both grow by r^6 a planet', () => {
+    const drillRatio = ratioOfCurve('cost.vehicle.drill_power')
+    const tipRatio = ratioOfCurve('cost.vehicle.drill_tip')
+    expect(tipRatio).toEqual(powInt(drillRatio, 2))
+    expect(powInt(tipRatio, 3)).toEqual(powInt(drillRatio, 6))
   })
 
   it('is a whole number at every level', () => {

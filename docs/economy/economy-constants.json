@@ -28,8 +28,13 @@
   "feeFloorK": "3",
   "feeCapK": "30",
   "c0": 24,
+  "base": {
+    "drill_power": "55",
+    "drill_tip": "83"
+  },
   "r": "1.24",
-  "rTip": "1.5376",
+  "rDrill": "1.225",
+  "rTip": "1.500625",
   "w": {
     "drill_power": 2,
     "drill_tip": 3,

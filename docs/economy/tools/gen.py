@@ -4,7 +4,7 @@ getcontext().prec=40
 C=dict(v0="10",rho="1.5",eta="1.2544",d0="1.5",gD="1.12",P0="1",gP="1.2544",H0="100",gH="1.12",
  E0=150,eStep=6,C0=10,cStep=4,sMin="6",sMax="14",aMin="1.0",aMax="1.8",tMin="2.0",tMax="3.5",Ke=25,
  coreMult="4",coreFrac="0.4",travelK="0.12",chargeK="0.002",repairK="0.5",feeFrac="0.05",feeFloorK="3",feeCapK="30",
- c0=24,r="1.24",rTip="1.5376",w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
+ c0=24,base=dict(drill_power="55",drill_tip="83"),r="1.24",rDrill="1.225",rTip="1.500625",w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
  Hk="7",Dkc="17.5",Dkb="16.5",gE="1.12",ET0=1,etPlanet=6,etBand=1,KxE=60,tkill="1.5")
 d=lambda s:D(str(s))
 def tier(p,b): return 3*(p-1)+b
@@ -21,7 +21,7 @@ def need(Rr): return -(-4*coreTiles(Rr)//10)
 def Lon(tr,p):
     return dict(drill_power=6*(p-1)+13,drill_tip=3*(p-1)+7,hull=6*(p-1)+2,cargo_hold=6*(p-1)+8,boiler=6*(p-1)+4,engine=6*(p-1)+6)[tr]
 def cost(tr,L):
-    base=d(C['c0'])*d(C['w'][tr]); r=d(C['rTip']) if tr=='drill_tip' else d(C['r'])
+    base=d(C['base'][tr]) if tr in C['base'] else d(C['c0'])*d(C['w'][tr]); r=d(C[dict(drill_tip='rTip',drill_power='rDrill').get(tr,'r')])
     return (base*r**L).to_integral_value(rounding=ROUND_CEILING)
 def cargo(L): return C['C0']+C['cStep']*L
 def energy(L): return C['E0']+C['eStep']*L
@@ -73,7 +73,7 @@ assert e_need<0.25*energy(0)
 open('out/planet-table.md','w').write("\n".join(A)); open('out/vehicle-table.md','w').write("\n".join(B))
 open('out/price-table.md','w').write("\n".join(Cc)); open('out/enemy-table.md','w').write("\n".join(En))
 # ratio checks
-print("cost ratio/planet", float(d(C['r'])**6), "value ratio/planet", float(d(C['rho'])**3), "hardness", float(d(C['eta'])**3), "drill", float(d(C['gD'])**6))
+print("cost ratio/planet", float(d(C['r'])**6), "drill cost ratio/planet", float(d(C['rDrill'])**6), "value ratio/planet", float(d(C['rho'])**3), "hardness", float(d(C['eta'])**3), "drill", float(d(C['gD'])**6))
 print("level-0 prices", {k:int(cost(k,0)) for k in C['w']})
 print("p40 R",R(40),"coreTiles",coreTiles(R(40)), "p1",R(1),coreR(R(1)),coreTiles(R(1)),"p2",R(2),coreR(R(2)),coreTiles(R(2)))
 json.dump(C,open('out/economy-constants.json','w'),indent=1)

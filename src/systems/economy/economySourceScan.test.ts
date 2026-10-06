@@ -86,7 +86,16 @@ describe('economy source scan', () => {
 
   it('searches for the ratios and coefficients that define the curves', () => {
     expect(distinctiveEconomyNumbers()).toEqual(
-      expect.arrayContaining(['1.2544', '1.12', '1.24', '1.5376', '0.002', '17.5', '16.5']),
+      expect.arrayContaining([
+        '1.2544',
+        '1.12',
+        '1.24',
+        '1.225',
+        '1.500625',
+        '0.002',
+        '17.5',
+        '16.5',
+      ]),
     )
   })
 })

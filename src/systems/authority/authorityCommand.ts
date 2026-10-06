@@ -32,8 +32,10 @@ import type { BayId } from '../world/dockBays'
  * 14: heat, lava and the refractory lining (#113, #96): lining types in the casing layer and on the
  *    vehicle, `BuyLiningType`, `SelectLiningType`, `debug.setLiningType`, `CasingLined.liningType`;
  *    the heat gauge, its throttle and damage, `HeatThreshold`, `Overheat*`, `debug.setHeat`.
+ * 15: drill_power and drill_tip prices flattened to ratio 1.225 and 1.500625 on bases 55 and 83
+ *    (#84, #77), so the same `BuyUpgrade` costs a different amount.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 14
+export const AUTHORITY_PROTOCOL_VERSION = 15
 
 export interface CommandPayloads {
   /**

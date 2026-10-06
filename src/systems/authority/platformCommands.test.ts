@@ -444,7 +444,7 @@ describe('platform: workshop', () => {
     return session
   }
 
-  it('prices level 0 of the six tracks at 24, 24, 36, 48, 48 and 72', () => {
+  it('prices level 0 of the six tracks at 24, 24, 36, 48, 55 and 83', () => {
     const session = dockedWithMoney('1000')
     const costs = SIX_TRACKS.map((id) => session.submit(2, buy(id))[0])
     expect(costs.map((event) => (event.type === 'UpgradePurchased' ? event.cost : ''))).toEqual([
@@ -452,10 +452,10 @@ describe('platform: workshop', () => {
       '2.4e+1',
       '3.6e+1',
       '4.8e+1',
-      '4.8e+1',
-      '7.2e+1',
+      '5.5e+1',
+      '8.3e+1',
     ])
-    expect(walletOf(session)).toBe('7.48e+2')
+    expect(walletOf(session)).toBe('7.3e+2')
   })
 
   it('prices level 1 at ceil(base * ratio)', () => {
@@ -463,7 +463,7 @@ describe('platform: workshop', () => {
     session.submit(2, buy('cargo_hold'))
     session.submit(2, buy('drill_tip'))
     expect(session.submit(3, buy('cargo_hold'))[0]).toMatchObject({ cost: '3e+1' })
-    expect(session.submit(3, buy('drill_tip'))[0]).toMatchObject({ cost: '1.11e+2' })
+    expect(session.submit(3, buy('drill_tip'))[0]).toMatchObject({ cost: '1.25e+2' })
   })
 
   it('logs the purchase with the levels, curve, tier and the stats at the new level', () => {

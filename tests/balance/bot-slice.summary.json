@@ -3,9 +3,9 @@
   "logSchemaVersion": 2,
   "outcome": "ended",
   "endReason": "slice_completed",
-  "durationTicks": 378490,
-  "durationSeconds": 6308.166666666667,
-  "eventCount": 21532,
+  "durationTicks": 386976,
+  "durationSeconds": 6449.6,
+  "eventCount": 21300,
   "planetsVisited": [
     1,
     2
@@ -15,42 +15,42 @@
   "tilesDestroyed": 0,
   "resourceUnitsCollected": 0,
   "resourceValueCollected": "0e+0",
-  "moneyEarned": "3.9102851e+4",
-  "moneySpent": "3.8291467e+4",
-  "upgradeSpending": "3.6998e+4",
-  "repairSpending": "1.59126e+2",
-  "chargingSpending": "4.65651e+2",
+  "moneyEarned": "3.6174269e+4",
+  "moneySpent": "3.5618379e+4",
+  "upgradeSpending": "3.4281e+4",
+  "repairSpending": "1.09196e+2",
+  "chargingSpending": "4.81984e+2",
   "travelSpending": "6.075e+1",
-  "rescueFees": "1.66026e+2",
-  "liningSpending": "4.41914e+2",
-  "liningCharged": "4.53899e+2",
+  "rescueFees": "2.7e+2",
+  "liningSpending": "4.15449e+2",
+  "liningCharged": "4.27947e+2",
   "liningForgiven": "0e+0",
-  "upgradesPurchased": 87,
+  "upgradesPurchased": 85,
   "coreFragmentsHarvested": 190,
-  "enemiesKilled": 21,
-  "vehicleDeaths": 3,
+  "enemiesKilled": 15,
+  "vehicleDeaths": 4,
   "damageTaken": "0e+0",
   "debugCommandsApplied": 0,
   "upgradeLevels": {
-    "drill_tip": 10,
     "hull": 8,
-    "cargo_hold": 16,
+    "cargo_hold": 15,
+    "drill_tip": 10,
     "drill_power": 20,
-    "engine": 17,
-    "boiler": 16
+    "boiler": 16,
+    "engine": 16
   },
   "coreCompletedTicks": {
-    "1": 201456,
-    "2": 378438
+    "1": 209688,
+    "2": 386922
   },
   "milestones": {
     "planetReached": {
       "1": 0,
-      "2": 212653
+      "2": 211808
     },
     "firstSale": 4120,
     "firstUpgrade": 4200,
-    "firstDeath": 182146,
-    "firstCoreCompleted": 201456
+    "firstDeath": 178841,
+    "firstCoreCompleted": 209688
   }
 }

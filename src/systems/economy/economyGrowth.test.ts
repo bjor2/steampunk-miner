@@ -70,6 +70,20 @@ describe('economy growth past the slice', () => {
   })
 })
 
+/** Band-5 ore units one next on-curve drill_power level costs on a planet (#75, #77). */
+function band5OreUnitsPerDrillBuy(planetIndex: number): Money {
+  const band5Value = planetEconomyRow(planetIndex).oreValueByBand[4]
+  return div(planetPriceRow(planetIndex).drillPowerNext, band5Value)
+}
+
+describe('drill cost against ore income (#77)', () => {
+  it('keeps the band-5 ore units per next drill buy within 1.2x from planet 1 to planet 40', () => {
+    const drift = div(band5OreUnitsPerDrillBuy(40), band5OreUnitsPerDrillBuy(1))
+    expect(cmp(drift, m('1.2'))).toBe(-1)
+    expect(cmp(drift, div(m('1'), m('1.2')))).toBe(1)
+  })
+})
+
 describe('rescue energy (#9, #20 acceptance 6)', () => {
   it('leaves 37.5 units at level 0, more than a planet 1 round trip to the first ore', () => {
     const depthTiles = m(String((300 * BAND_START_DEPTH_PERCENT[0]) / 100))
