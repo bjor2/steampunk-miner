@@ -30,6 +30,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
 | `npm run bench:render`                    | chunk mesh batch p50/p95 per planet (logged, not gated)   |
 | `npm run perf:record -- --source bench`   | record bench medians in `docs/perf/history.ndjson`        |
+| `npm run soak:memory`                     | 10-min memory soak on the preview build, leak gate (#99)  |
 | `npm run art:export -- <asset-id>`        | headless Blender bake + KTX2 encode (art-pipeline.md)     |
 | `npm run lint` / `npm run format`         | ESLint (enforces the layer rules) / Prettier              |
 | `npm run build`                           | typecheck `src/` + Vite production build into `dist/`     |

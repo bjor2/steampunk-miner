@@ -1,0 +1,344 @@
+#!/usr/bin/env node
+// Memory soak on the preview build (#99; perf report /workspace/perf/memory/out/report.md sections
+// 3 and 6): drives the vehicle through repeated chunk cycles (dock, undock, drive off the pad, drill
+// down, drill sideways both ways, back to the dock) and, every 10 s after a forced GC, samples the
+// JS heap, the renderer's geometries and textures, the Rapier world's bodies, colliders and WASM
+// memory, the DOM counters and the game's frame times; plus one sample per cycle boundary on the
+// dock. Heap snapshots at start, middle and end. Then soakGate.mjs judges the boundaries.
+//
+// The game is read only through its debug API (`?debug`): `ui.getRendererMemory()` and
+// `getPhysicsStats()` (#119) for the counts, `ui.getRenderStats()` for frame times. Heap, GC and
+// DOM counters come from the browser (CDP), never from a hook in the page.
+//
+//   npm run soak:memory     (builds, then a 10-minute soak into test-results/soak)
+//   node scripts/soak/soakMemory.mjs [--minutes 10] [--out DIR] [--port 4391] [--dist dist]
+//        [--browser /path/to/chrome] [--no-snapshots]
+//   node scripts/soak/soakMemory.mjs --evaluate DIR/soak.json   (re-run the gate offline, print)
+//
+// Writes DIR/soak.json (every sample), DIR/summary.json (soakSummary.mjs) and the heap snapshots;
+// exits 1 when the gate fails and 2 when the soak could not run.
+import { chromium } from '@playwright/test'
+import { spawn } from 'node:child_process'
+import { createWriteStream, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { summariseSoak } from './soakSummary.mjs'
+
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+const VITE_BIN = join(REPO_ROOT, 'node_modules/vite/bin/vite.js')
+const SAMPLE_EVERY_MS = 10_000
+const SETTLE_MS = 3_000
+const MIB = 1048576
+/** The cycle that streams chunks (perf report section 3): from the dock, out, down, both ways. */
+const CYCLE_LEGS = [
+  ['aim_right', 8_000],
+  ['aim_down', 8_000],
+  ['aim_left', 4_000],
+  ['aim_right', 4_000],
+]
+/** Precise heap numbers, `gc()` for the sampler, and software GL so headless boxes draw WebGL. */
+const BROWSER_ARGS = [
+  '--enable-precise-memory-info',
+  '--js-flags=--expose-gc',
+  '--use-gl=swiftshader',
+  '--enable-unsafe-swiftshader',
+  '--ignore-gpu-blocklist',
+]
+
+const sleep = (ms) => new Promise((done) => setTimeout(done, ms))
+const log = (...parts) => console.log(new Date().toISOString(), ...parts)
+
+function readSoakOptions(argv) {
+  const valueOf = (name, fallback) => {
+    const at = argv.indexOf(`--${name}`)
+    return at === -1 ? fallback : argv[at + 1]
+  }
+  return {
+    minutes: Number(valueOf('minutes', '10')),
+    port: Number(valueOf('port', '4391')),
+    out: resolve(valueOf('out', 'test-results/soak')),
+    dist: valueOf('dist', 'dist'),
+    browserPath: valueOf('browser', undefined),
+    isTakingSnapshots: !argv.includes('--no-snapshots'),
+    evaluate: valueOf('evaluate', null),
+  }
+}
+
+async function isAnswering(port) {
+  try {
+    return (await fetch(`http://localhost:${port}/`)).ok
+  } catch {
+    return false
+  }
+}
+
+/** Starts `vite preview` of the built game; the caller stops it in its `finally`. */
+async function startPreview(options) {
+  const args = ['preview', '--outDir', options.dist, '--port', String(options.port), '--strictPort']
+  const server = spawn(process.execPath, [VITE_BIN, ...args], { cwd: REPO_ROOT, stdio: 'ignore' })
+  for (let tries = 0; tries < 60; tries++) {
+    await sleep(500)
+    if (await isAnswering(options.port)) return server
+  }
+  server.kill()
+  throw new Error(`vite preview did not answer on port ${options.port}`)
+}
+
+async function openGame(browser, options) {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } })
+  const errors = { pageErrors: [], consoleErrors: [] }
+  page.on('pageerror', (error) => errors.pageErrors.push(String(error.stack ?? error)))
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.consoleErrors.push(message.text())
+  })
+  const cdp = await page.context().newCDPSession(page)
+  await cdp.send('HeapProfiler.enable')
+  await page.goto(`http://localhost:${options.port}/?debug`)
+  await waitForMemoryReads(page)
+  return { page, cdp, errors }
+}
+
+/** Both memory reads refuse until the scene has mounted its renderer and physics world. */
+async function waitForMemoryReads(page) {
+  const isReadable = () => {
+    const debug = globalThis.steampunkDebug
+    return debug !== undefined && debug.getPhysicsStats().ok && debug.ui.getRendererMemory().ok
+  }
+  await page.waitForFunction(isReadable, null, { timeout: 120_000 })
+  await sleep(5_000)
+}
+
+async function collectGarbage({ cdp, page }) {
+  await cdp.send('HeapProfiler.collectGarbage')
+  await page.evaluate(() => globalThis.gc?.())
+  await cdp.send('HeapProfiler.collectGarbage')
+}
+
+/** One reading of the game through its debug API; a refused read is listed, its counts null. */
+function readGameMemory() {
+  const debug = globalThis.steampunkDebug
+  const renderer = debug.ui.getRendererMemory()
+  const physics = debug.getPhysicsStats()
+  const stats = debug.ui.getRenderStats().stats
+  const state = debug.snapshot().snapshot.state
+  const pose = Object.values(state.players)[0].vehicle.pose
+  return {
+    usedJSHeapSize: performance.memory?.usedJSHeapSize ?? null,
+    totalJSHeapSize: performance.memory?.totalJSHeapSize ?? null,
+    geometries: renderer.ok ? renderer.geometries : null,
+    textures: renderer.ok ? renderer.textures : null,
+    programs: renderer.ok ? renderer.programs : null,
+    rapierBodies: physics.ok ? physics.rigidBodies : null,
+    rapierColliders: physics.ok ? physics.colliders : null,
+    wasmBytes: physics.ok ? physics.wasmBytes : null,
+    refusals: [renderer, physics].flatMap((read) => (read.ok ? [] : read.problems)),
+    drawCalls: stats.drawCalls,
+    groundBlocks: stats.groundBlocks,
+    drawnChunks: stats.drawnChunks,
+    groundColliders: stats.groundColliders,
+    gameFrameP50Ms: stats.frameMsP50,
+    gameFrameP95Ms: stats.frameMsP95,
+    tick: state.tick,
+    poseX: pose.x,
+    poseY: pose.y,
+    // Legitimate game-state growth (drilled chunks), to tell it apart from a leak.
+    worldStateJsonBytes: JSON.stringify(state.world).length,
+    runLogBytes: (globalThis.steampunkRunLog?.() ?? '').length,
+  }
+}
+
+async function sampleNow(session, label) {
+  await collectGarbage(session)
+  const game = await session.page.evaluate(readGameMemory)
+  const dom = await session.cdp.send('Memory.getDOMCounters')
+  return {
+    ...label,
+    ...game,
+    domNodes: dom.nodes,
+    jsEventListeners: dom.jsEventListeners,
+  }
+}
+
+async function takeHeapSnapshot(session, file) {
+  const stream = createWriteStream(file)
+  const writeChunk = ({ chunk }) => stream.write(chunk)
+  session.cdp.on('HeapProfiler.addHeapSnapshotChunk', writeChunk)
+  await session.cdp.send('HeapProfiler.takeHeapSnapshot', { reportProgress: false })
+  session.cdp.off('HeapProfiler.addHeapSnapshotChunk', writeChunk)
+  await new Promise((done) => stream.end(done))
+}
+
+function describeSample(sample) {
+  const heap = (sample.usedJSHeapSize / MIB).toFixed(1)
+  return `cycle=${sample.cycle} heap=${heap}MB geo=${sample.geometries} tex=${sample.textures} bodies=${sample.rapierBodies} colliders=${sample.rapierColliders} p95=${sample.gameFrameP95Ms?.toFixed(1)}ms`
+}
+
+async function hold(page, actionId, ms) {
+  await page.evaluate((id) => globalThis.steampunkDebug.input.press(id), actionId)
+  await sleep(ms)
+  await page.evaluate((id) => globalThis.steampunkDebug.input.release(id), actionId)
+}
+
+/** Refills energy and hull on the dock; a vehicle already on the pad refuses the teleport. */
+function refillOnDock() {
+  const debug = globalThis.steampunkDebug
+  const docked = debug.teleportToDock()
+  const isOnPad = docked.ok || docked.problems.join().includes('already docked')
+  return [debug.setEnergy('150'), debug.setHull('100')]
+    .concat(isOnPad ? [] : [docked])
+    .flatMap((result) => (result.ok ? [] : result.problems))
+}
+
+async function driveOneCycle(session, results) {
+  results.refusals.push(...(await session.page.evaluate(refillOnDock)))
+  await sleep(SETTLE_MS)
+  // The dock screen's cancel undocks (dockRules.ts); a docked vehicle ignores the aim actions.
+  await session.page.evaluate(() => globalThis.steampunkDebug.input.tap('ui_cancel'))
+  await sleep(500)
+  for (const [actionId, ms] of CYCLE_LEGS) await hold(session.page, actionId, ms)
+}
+
+/** Serialises CDP work: a periodic sample never interleaves with a boundary or a snapshot. */
+function createSoakClock(session, results, options) {
+  const startedAt = Date.now()
+  let queue = Promise.resolve()
+  const clock = {
+    startedAt,
+    cycle: 0,
+    elapsedS: () => (Date.now() - startedAt) / 1000,
+    exclusive: (work) => (queue = queue.then(work, work)),
+    drained: () => queue,
+  }
+  clock.snapshot = (label) =>
+    clock.exclusive(() => takeLabelledSnapshot(session, results, options, clock, label))
+  return clock
+}
+
+async function takeLabelledSnapshot(session, results, options, clock, label) {
+  if (!options.isTakingSnapshots) return
+  await collectGarbage(session)
+  const file = join(options.out, `heap-${label}.heapsnapshot`)
+  await takeHeapSnapshot(session, file)
+  results.snapshots.push({ label, file, t: clock.elapsedS(), cycle: clock.cycle })
+  log('snapshot', label)
+}
+
+function startPeriodicSampling(session, results, clock) {
+  return setInterval(() => {
+    clock
+      .exclusive(async () => {
+        const label = { t: clock.elapsedS(), cycle: clock.cycle, kind: 'periodic' }
+        const sample = await sampleNow(session, label)
+        results.samples.push(sample)
+        log(`t=${sample.t.toFixed(0)}s`, describeSample(sample))
+      })
+      .catch((error) => log('sample failed', error))
+  }, SAMPLE_EVERY_MS)
+}
+
+/** Back on the dock and settled, so every boundary sees the same chunks. */
+async function sampleBoundary(session, results, clock) {
+  await session.page.evaluate(() => globalThis.steampunkDebug.teleportToDock())
+  await sleep(SETTLE_MS)
+  await clock.exclusive(async () => {
+    const label = { t: clock.elapsedS(), cycle: clock.cycle, kind: 'boundary' }
+    const boundary = await sampleNow(session, label)
+    results.boundaries.push(boundary)
+    log('boundary', describeSample(boundary))
+  })
+}
+
+async function driveCycles(session, options) {
+  const results = { refusals: [], samples: [], boundaries: [], snapshots: [] }
+  const clock = createSoakClock(session, results, options)
+  const halfway = clock.startedAt + (options.minutes * 60_000) / 2
+  const deadline = clock.startedAt + options.minutes * 60_000
+  const sampler = startPeriodicSampling(session, results, clock)
+  await clock.snapshot('start')
+  let isMidTaken = false
+  while (Date.now() < deadline) {
+    await driveOneCycle(session, results)
+    clock.cycle++
+    await sampleBoundary(session, results, clock)
+    if (!isMidTaken && Date.now() > halfway) {
+      isMidTaken = true
+      await clock.snapshot('mid')
+    }
+  }
+  clearInterval(sampler)
+  await clock.drained()
+  await clock.snapshot('end')
+  return { startedAt: new Date(clock.startedAt).toISOString(), ...results }
+}
+
+async function writeSoakRun(session, options, driven) {
+  const run = {
+    startedAt: driven.startedAt,
+    minutes: options.minutes,
+    cycleLegs: CYCLE_LEGS,
+    userAgent: await session.page.evaluate(() => navigator.userAgent),
+    pageErrors: session.errors.pageErrors,
+    consoleErrors: session.errors.consoleErrors.slice(0, 50),
+    consoleErrorCount: session.errors.consoleErrors.length,
+    ...driven,
+    refusals: [...driven.refusals, ...driven.samples.flatMap((sample) => sample.refusals)],
+  }
+  writeFileSync(join(options.out, 'soak.json'), JSON.stringify(run, null, 1))
+  return writeSummary(options.out, run)
+}
+
+function writeSummary(dir, run) {
+  const summary = summariseSoak(run)
+  writeFileSync(join(dir, 'summary.json'), `${JSON.stringify(summary, null, 2)}\n`)
+  return summary
+}
+
+function reportVerdict(summary) {
+  log(
+    `${summary.cycles} cycles, heap ${summary.heapFirstBoundaryMB} -> ${summary.heapLastBoundaryMB} MB`,
+  )
+  log(summary.gate === 'PASS' ? 'PASS' : `FAIL\n  ${summary.failures.join('\n  ')}`)
+  return summary.gate === 'PASS' ? 0 : 1
+}
+
+async function soakInBrowser(options) {
+  const browser = await chromium.launch({ executablePath: options.browserPath, args: BROWSER_ARGS })
+  try {
+    const session = await openGame(browser, options)
+    const driven = await driveCycles(session, options)
+    return reportVerdict(await writeSoakRun(session, options, driven))
+  } finally {
+    await browser.close()
+  }
+}
+
+async function runSoak(options) {
+  mkdirSync(options.out, { recursive: true })
+  const server = await startPreview(options)
+  try {
+    return await soakInBrowser(options)
+  } finally {
+    server.kill()
+  }
+}
+
+/** Prints the summary of a saved soak.json and its gate verdict; writes nothing. */
+function evaluateSavedRun(file) {
+  const summary = summariseSoak(JSON.parse(readFileSync(file, 'utf8')))
+  console.log(JSON.stringify(summary, null, 2))
+  return reportVerdict(summary)
+}
+
+async function main(argv) {
+  const options = readSoakOptions(argv)
+  if (options.evaluate) return evaluateSavedRun(options.evaluate)
+  return runSoak(options)
+}
+
+main(process.argv.slice(2)).then(
+  (exitCode) => process.exit(exitCode),
+  (error) => {
+    console.error(error)
+    process.exit(2)
+  },
+)

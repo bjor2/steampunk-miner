@@ -205,6 +205,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (`npm run electron:build`, then `npm run test:packaged`, under `xvfb-run -a` on Linux); each
   launch gets a fresh user-data folder.
 - Not covered, by design: vehicle feel, camera, art and audio. Those stay hand checks.
+- **Memory soak** (#99): `npm run soak:memory` builds, starts `vite preview` and drives the vehicle
+  for 10 minutes through chunk cycles (dock, undock, right 8 s, down 8 s, left 4 s, right 4 s) with
+  Playwright, reading the counts only through `ui.getRendererMemory()` and `getPhysicsStats()` and
+  the heap through the browser after a forced GC. It writes `test-results/soak/soak.json`,
+  `summary.json` and three heap snapshots, and exits 1 when the gate in `scripts/soak/soakGate.mjs`
+  fails: after 4 warm-up cycles, the median heap of the last 3 cycle boundaries more than 20 MB
+  above the first 3, geometries, textures or colliders rising in 3 or more of the last 10 steps
+  without falling, any page error, or fewer than 15 cycles. The gate and summary are pure and
+  tested in `scripts/soak/`; `--evaluate <soak.json>` re-checks a saved run. On a box with no
+  Playwright browser, pass `--browser /usr/bin/google-chrome` (run the script itself, after a
+  build). Record a run with `npm run perf:record -- --source soak --from test-results/soak/summary.json --from test-results/soak/soak.json`.
 
 ## 6. Before every commit
 

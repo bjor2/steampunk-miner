@@ -197,14 +197,14 @@
       "unit": "ms",
       "group": "Frame time",
       "better": "lower",
-      "source": "memory soak summary.json (median of rAF p50 samples; software GL, not a GPU)"
+      "source": "memory soak summary.json (median of the 10-s samples of the frame p50: rAF until #99, the game's render stats since; software GL, not a GPU)"
     },
     "soak.frameP95Ms": {
       "label": "Frame time p95 (soak, SwiftShader)",
       "unit": "ms",
       "group": "Frame time",
       "better": "lower",
-      "source": "memory soak summary.json (median of rAF p95 samples; software GL, not a GPU)"
+      "source": "memory soak summary.json (median of the 10-s samples of the frame p95: rAF until #99, the game's render stats since; software GL, not a GPU)"
     },
     "profile.snapshotOfMainThreadPct": {
       "label": "snapshotOf share of main-thread samples",
