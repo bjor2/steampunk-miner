@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T07:29:50Z",
+  "updated_at": "2026-10-06T07:33:35Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -95,14 +95,21 @@
     "perf-loop": {
       "loop": "perf-loop",
       "slot": null,
-      "state": "idle",
-      "issue": null,
-      "note": "#118 landed; idle",
-      "updated_at": "2026-10-06T07:29:50Z",
+      "state": "working",
+      "issue": 100,
+      "note": "tier easy, attempt 1/2",
+      "updated_at": "2026-10-06T07:33:35Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-06T07:33:35Z",
+      "key": "perf-loop",
+      "state": "working",
+      "issue": 100,
+      "note": "tier easy, attempt 1/2"
+    },
     {
       "at": "2026-10-06T07:29:50Z",
       "key": "perf-loop",
@@ -515,13 +522,6 @@
       "state": "blocked",
       "issue": null,
       "note": "push_pending #110 (ticket/110) waits to land on main; 2/4 slots busy; status check"
-    },
-    {
-      "at": "2026-10-06T01:30:59Z",
-      "key": "steampunk-loop/4",
-      "state": "idle",
-      "issue": null,
-      "note": "free"
     }
   ]
 }
