@@ -1,5 +1,6 @@
 /**
- * One second of frame times (#38 logging: frame time p50/p95 sampled each second): the render
+ * One second of frame times (#38 logging: frame time p50/p95 sampled each second; #121: p99 and
+ * the frames over a long task): the render
  * delta of each frame in milliseconds, fed in by the scene, read by the render-scale rule and the
  * perf log. Fixed capacity and in-place sorting, so feeding it every frame allocates nothing.
  */
@@ -46,6 +47,14 @@ export function frameMsAt(window: FrameWindow, share: number): number {
   sorted.set(window.frameMs.subarray(0, kept))
   sorted.sort()
   return sorted[Math.min(kept - 1, Math.ceil(share * kept) - 1)]
+}
+
+/** How many of the window's frames took longer than `ms`. */
+export function countFramesOver(window: FrameWindow, ms: number): number {
+  const kept = Math.min(window.count, FRAME_WINDOW_CAPACITY)
+  let over = 0
+  for (let frame = 0; frame < kept; frame++) if (window.frameMs[frame] > ms) over++
+  return over
 }
 
 export function clearFrameWindow(window: FrameWindow): void {

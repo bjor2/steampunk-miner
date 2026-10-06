@@ -1,5 +1,6 @@
 /**
- * The `perf_sample` line (#38 Consequences, #4 budgets): what one second of frames cost, as the
+ * The `perf_sample` line (#38 Consequences, #4 budgets, #121 p99 and long tasks): what one second
+ * of frames cost, as the
  * perf log records it. Times and the scale are kept to hundredths, so the line stays short and a
  * sample reads the same however the float printed.
  */
@@ -11,6 +12,8 @@ export type PerfSample = RunEventData<'perf_sample'>
 export interface FrameCost {
   frameMsP50: number
   frameMsP95: number
+  frameMsP99: number
+  longFrames: number
   renderScale: number
   drawCalls: number
   triangles: number
@@ -23,6 +26,9 @@ export function perfSampleOf(cost: FrameCost, terrainMsP95: number): PerfSample 
   return {
     frameMsP50: toHundredths(cost.frameMsP50),
     frameMsP95: toHundredths(cost.frameMsP95),
+    frameMsP99: toHundredths(cost.frameMsP99),
+    // A frame over 50 ms is one long task of the frame loop, as the Long Tasks API counts them.
+    longTasks: cost.longFrames,
     terrainMsP95: toHundredths(terrainMsP95),
     renderScale: toHundredths(cost.renderScale),
     colliders: cost.groundColliders,

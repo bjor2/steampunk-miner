@@ -62,6 +62,11 @@ export const RENDER_SCALE_INCLINE_FRAME_MS = FRAME_BUDGET_MS * 1.05
 export const RENDER_SCALE_MAX_FLIP_FLOPS = 3
 /** Frames kept per one-second window: room for a 240 Hz display. */
 export const FRAME_WINDOW_CAPACITY = 256
+/**
+ * A frame longer than this is a hitch the perf log counts as `longTasks` (#121): the W3C Long
+ * Tasks API's threshold, 50 ms of main thread work without a break.
+ */
+export const LONG_FRAME_MS = 50
 
 /**
  * Post-processing (#38: one bloom pass at half the internal resolution, filmic tone mapping and a

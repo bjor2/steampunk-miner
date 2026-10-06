@@ -1,6 +1,6 @@
 /**
  * What the last frame cost and how it was drawn (#38 acceptance 1-3: draw calls, triangles,
- * visible ground blocks, the render scale and frame times; #4: the terrain's work and the live
+ * visible ground blocks, the render scale and frame times, #121 their p99 and hitches; #4: the terrain's work and the live
  * ground colliders; S7d: the strata bands drawn): written by `RenderPipeline`, `PlanetTerrain`,
  * `terrainStrata` and the vehicle loop, read by the debug API's render stats and the perf log. A
  * mutable registry, because it changes every frame and never goes through React or the store.
@@ -26,4 +26,7 @@ export const renderPresence = {
   /** Over the last full second of frames. */
   frameMsP50: 0,
   frameMsP95: 0,
+  frameMsP99: 0,
+  /** Frames over `LONG_FRAME_MS` in the last full second (#121). */
+  longFrames: 0,
 }

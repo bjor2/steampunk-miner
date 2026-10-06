@@ -8,10 +8,11 @@
  */
 import { useFrame, useThree, type RootState } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
-import { POST_PASSES } from '../constants/scene'
+import { LONG_FRAME_MS, POST_PASSES } from '../constants/scene'
 import { useGameStore } from '../store/gameStore'
 import {
   addFrame,
+  countFramesOver,
   createFrameWindow,
   frameMsAt,
   hasFullSecond,
@@ -89,6 +90,8 @@ function recordSecondOfFrames(frames: FrameWindow): void {
   if (!hasFullSecond(frames)) return
   renderPresence.frameMsP50 = frameMsAt(frames, 0.5)
   renderPresence.frameMsP95 = frameMsAt(frames, 0.95)
+  renderPresence.frameMsP99 = frameMsAt(frames, 0.99)
+  renderPresence.longFrames = countFramesOver(frames, LONG_FRAME_MS)
 }
 
 /** Changes the canvas's pixel ratio only when the scale moved, at most once a second. */

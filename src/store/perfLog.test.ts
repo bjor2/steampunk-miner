@@ -9,6 +9,8 @@ import { recordPerfSample, turnOffPerfLog, turnOnPerfLog } from './perfLog'
 const SECOND_AT_4K: FrameCost = {
   frameMsP50: 15.234,
   frameMsP95: 16.6789,
+  frameMsP99: 61.004,
+  longFrames: 1,
   renderScale: 0.6500001,
   drawCalls: 41,
   triangles: 2608,
@@ -31,7 +33,7 @@ afterEach(() => {
 })
 
 describe('perf log', () => {
-  it('records one valid perf_sample with the render scale, frame times, draws and blocks (#38)', () => {
+  it('records one valid perf_sample with the render scale, frame times, long tasks, draws and blocks (#38, #121)', () => {
     turnOnPerfLog()
     recordPerfSample(perfSampleOf(SECOND_AT_4K, 1.774))
     expect(sink.events).toHaveLength(1)
@@ -42,6 +44,8 @@ describe('perf log', () => {
       data: {
         frameMsP50: 15.23,
         frameMsP95: 16.68,
+        frameMsP99: 61,
+        longTasks: 1,
         terrainMsP95: 1.77,
         renderScale: 0.65,
         drawCalls: 41,

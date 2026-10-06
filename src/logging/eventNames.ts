@@ -61,13 +61,16 @@ export const RUN_EVENT_REGISTRY = {
   // #58: an onboarding hint went up, once per id; presentation, never part of the digest.
   hint_shown: { group: 'run', level: 'core', payload: { hintId: 'text' } },
   // One per second of frames (#38 Consequences: render scale, frame p50/p95, draw calls,
-  // triangles and visible ground blocks join the #4 terrain and collider counts).
+  // triangles and visible ground blocks join the #4 terrain and collider counts; #121: the p99
+  // frame and the frames over 50 ms).
   perf_sample: {
     group: 'run',
     level: 'perf',
     payload: {
       frameMsP50: 'float',
       frameMsP95: 'float',
+      frameMsP99: 'float',
+      longTasks: 'integer',
       terrainMsP95: 'float',
       renderScale: 'float',
       colliders: 'integer',
