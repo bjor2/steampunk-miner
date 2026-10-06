@@ -1,0 +1,63 @@
+{
+  "assetId": "vehicle-auto-guns",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-auto-guns/vehicle-auto-guns.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [256, 1024],
+  "maps": {
+    "albedo": "vehicle-auto-guns.albedo.ktx2",
+    "normal": "vehicle-auto-guns.normal.ktx2",
+    "emissive": "vehicle-auto-guns.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "t1-gun-barrel",
+      "tier": 1,
+      "rect": [8, 505, 175, 36],
+      "sizeM": [0.34, 0.07],
+      "pivotM": [0.3, 0.035],
+      "atM": [0.04, 0.64],
+      "z": 11
+    },
+    {
+      "id": "t1-turret-head",
+      "tier": 1,
+      "rect": [8, 240, 154, 93],
+      "sizeM": [0.3, 0.18],
+      "pivotM": [0.15, 0.09],
+      "atM": [0.04, 0.64],
+      "z": 12
+    },
+    {
+      "id": "t1-turret-mount",
+      "tier": 1,
+      "rect": [8, 8, 134, 216],
+      "sizeM": [0.26, 0.42],
+      "pivotM": [0.13, 0.0],
+      "atM": [0.04, 0.13],
+      "z": 10
+    },
+    {
+      "id": "t2-gun-barrel",
+      "tier": 2,
+      "rect": [8, 437, 205, 52],
+      "sizeM": [0.4, 0.1],
+      "pivotM": [0.36, 0.05],
+      "atM": [0.04, 0.64],
+      "z": 11
+    },
+    {
+      "id": "t3-gun-barrel",
+      "tier": 3,
+      "rect": [8, 349, 226, 72],
+      "sizeM": [0.44, 0.14],
+      "pivotM": [0.4, 0.07],
+      "atM": [0.04, 0.64],
+      "z": 11
+    }
+  ]
+}

@@ -13,6 +13,9 @@
     "piston",
     "headlamp"
   ],
+  "vehicleModuleParts": {
+    "auto_guns": ["turret-mount", "turret-head", "gun-barrel"]
+  },
   "pxPerMetre": {
     "vehicle": 512,
     "enemy": 512,

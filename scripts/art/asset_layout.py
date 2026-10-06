@@ -58,7 +58,8 @@ def vehicle_part_pattern(rules):
 
 
 def part_id_problems(asset_id, part_id, rules):
-    """A vehicle part is `t<tier>-<part>[-n]`; any other asset's parts are its placeholder's ids."""
+    """A vehicle part is `t<tier>-<part>[-n]`; any other asset's parts (a vehicle module's
+    `t<tier>-<part>` too) are its placeholder's ids."""
     if asset_id == 'vehicle':
         if vehicle_part_pattern(rules).match(part_id):
             return []
@@ -70,8 +71,17 @@ def part_id_problems(asset_id, part_id, rules):
     return ['part "%s" is not one of the placeholder ids %s' % (part_id, ', '.join(known))]
 
 
-def tier_of_vehicle_part(part_id, rules):
-    return int(vehicle_part_pattern(rules).match(part_id).group(1))
+TIER_PREFIX = re.compile(r'^t([1-9][0-9]*)-')
+
+
+def tier_of_part(part_id):
+    """The tier a `t<tier>-` id names (the vehicle and its module families), else 1."""
+    match = TIER_PREFIX.match(part_id)
+    return int(match.group(1)) if match else 1
+
+
+def is_tiered_part(part_id):
+    return TIER_PREFIX.match(part_id) is not None
 
 
 def px_size_of(size_m, px_per_metre):

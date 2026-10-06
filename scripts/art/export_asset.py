@@ -114,9 +114,10 @@ def part_name_problems(asset_id, rules):
 
 
 def tier_collection_problems(asset_id, obj, rules):
-    if asset_id != 'vehicle' or asset_layout.part_id_problems(asset_id, obj.name, rules):
+    """A tiered part (the vehicle's, a vehicle module's) sits in its `tier-<n>` collection."""
+    if not asset_layout.is_tiered_part(obj.name) or asset_layout.part_id_problems(asset_id, obj.name, rules):
         return []
-    wanted = TIER_COLLECTION_PREFIX + str(asset_layout.tier_of_vehicle_part(obj.name, rules))
+    wanted = TIER_COLLECTION_PREFIX + str(asset_layout.tier_of_part(obj.name))
     names = [collection.name for collection in obj.users_collection]
     return [] if wanted in names else ['part "%s" belongs in the collection %s' % (obj.name, wanted)]
 
@@ -152,7 +153,7 @@ def part_layout_of(asset_id, rules, obj, depth_rank):
     inside = all(-1e-6 <= pivot[axis] <= size[axis] + 1e-6 for axis in (0, 1))
     return {
         'id': obj.name,
-        'tier': asset_layout.tier_of_vehicle_part(obj.name, rules) if asset_id == 'vehicle' else 1,
+        'tier': asset_layout.tier_of_part(obj.name),
         'sizeM': list(size),
         'pivotM': [min(max(value, 0.0), size[axis]) for axis, value in enumerate(pivot)],
         'atM': [origin.x, origin.z],

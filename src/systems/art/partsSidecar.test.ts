@@ -124,6 +124,26 @@ describe('parts sidecar', () => {
     )
   })
 
+  it('takes the tiered part names of a vehicle module on its own asset only', () => {
+    const barrel = { ...wheel, id: 't2-gun-barrel', tier: 2 }
+    const guns = {
+      ...vehicleSidecar([{ ...wheel, id: 't1-turret-head' }, barrel]),
+      assetId: 'vehicle-auto-guns',
+      maps: {
+        albedo: 'vehicle-auto-guns.albedo.ktx2',
+        normal: 'vehicle-auto-guns.normal.ktx2',
+        emissive: 'vehicle-auto-guns.emissive.ktx2',
+      },
+    }
+    expect(sidecarProblems('vehicle-auto-guns', guns)).toEqual([])
+    expect(sidecarProblems('vehicle-auto-guns', { ...guns, parts: [wheel] })).toEqual([
+      'vehicle-auto-guns.parts.json: part "t1-wheel" is not a valid part id',
+    ])
+    expect(sidecarProblems('vehicle', vehicleSidecar([barrel]))).toEqual([
+      'vehicle.parts.json: part "t2-gun-barrel" is not a valid part id',
+    ])
+  })
+
   it('names no emissive map for an asset where nothing glows', () => {
     const sidecar = vehicleSidecar()
     expect(mapFilesOf(sidecar)).toEqual([

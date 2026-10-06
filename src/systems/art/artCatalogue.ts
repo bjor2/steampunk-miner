@@ -14,6 +14,7 @@ import PLATFORM_BAY_UPGRADE from '../../../art/placeholders/platform-bay-upgrade
 import PLATFORM_HUB from '../../../art/placeholders/platform-hub.parts.json'
 import PROP_ARTEFACT_CACHE from '../../../art/placeholders/prop-artefact-cache.parts.json'
 import VEHICLE from '../../../art/placeholders/vehicle.parts.json'
+import VEHICLE_AUTO_GUNS from '../../../art/placeholders/vehicle-auto-guns.parts.json'
 import ENEMY_BURROWER_EXPORTED from '../../../public/assets/enemy/enemy-burrower/enemy-burrower.parts.json'
 import ENEMY_CRAWLER_EXPORTED from '../../../public/assets/enemy/enemy-crawler/enemy-crawler.parts.json'
 import ENEMY_TUNNEL_WRECKER_EXPORTED from '../../../public/assets/enemy/enemy-tunnel-wrecker/enemy-tunnel-wrecker.parts.json'
@@ -30,6 +31,7 @@ export const ASSET_MANIFEST = MANIFEST_FILE as AssetManifest
 
 export const PLACEHOLDER_SIDECARS: readonly PartsSidecar[] = [
   VEHICLE,
+  VEHICLE_AUTO_GUNS,
   PLATFORM_HUB,
   PLATFORM_BAY_SELL,
   PLATFORM_BAY_UPGRADE,

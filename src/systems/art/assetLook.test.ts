@@ -34,6 +34,23 @@ describe('asset look', () => {
     }
   })
 
+  it('keeps the auto guns’ mount and head at every look and swaps only the barrel at looks 2 and 3', () => {
+    const partsAt = (look: number) => assetQuadsOf('vehicle-auto-guns', look).map((q) => q.partId)
+    expect(partsAt(1)).toEqual(['t1-turret-mount', 't1-gun-barrel', 't1-turret-head'])
+    expect(partsAt(2)).toEqual(['t1-turret-mount', 't2-gun-barrel', 't1-turret-head'])
+    expect(partsAt(3)).toEqual(['t1-turret-mount', 't3-gun-barrel', 't1-turret-head'])
+  })
+
+  it('turns the auto guns’ barrel and head about one trunnion above the vehicle’s hull', () => {
+    const quads = assetQuadsOf('vehicle-auto-guns', 3)
+    const trunnions = quads.filter((q) => q.partId !== 't1-turret-mount').map((q) => q.pivot)
+    expect(new Set(trunnions.map((pivot) => pivot.join()))).toHaveLength(1)
+    const vehicleTop = Math.max(
+      ...assetQuadsOf('vehicle', 3).map((q) => q.centre[1] + q.size[1] / 2),
+    )
+    expect(trunnions[0][1]).toBeGreaterThan(vehicleTop)
+  })
+
   it('names the final vehicle’s three maps beside its sidecar under the page root', () => {
     expect(atlasMapsOf('vehicle')).toEqual({
       albedo: 'assets/vehicle/vehicle/vehicle.albedo.ktx2',

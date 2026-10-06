@@ -50,10 +50,29 @@ function isOfCategory(assetId: string, category: AssetCategory): boolean {
   return assetId === category || assetId.startsWith(`${category}-`)
 }
 
-/** Every Blender asset of the #51 inventory, named from the registries (#52). */
+/**
+ * Schedule rows (`docs/scaling/horizontal/stats.json`) whose unlock shows on the vehicle as a part
+ * family of its own (#81 acceptance 3), with the part names each family may use. A family is drawn
+ * in the vehicle's frame, so it sits on the hull, and its tiers are the module's looks (#107: the
+ * gun barrel at its level breakpoints), not the vehicle's visual tier.
+ */
+const VEHICLE_MODULE_PARTS: Readonly<Record<string, readonly string[]>> =
+  ASSET_RULES.vehicleModuleParts
+
+export function vehicleModuleRowIds(): string[] {
+  return Object.keys(VEHICLE_MODULE_PARTS)
+}
+
+/** `auto_guns` draws as `vehicle-auto-guns` (#52 kebab form under the vehicle category). */
+export function vehicleModuleAssetIdOf(rowId: string): string {
+  return `vehicle-${kebabOf(rowId)}`
+}
+
+/** Every Blender asset of the #51 inventory and the vehicle modules, named from the registries (#52). */
 export function blenderAssetIds(): string[] {
   return [
     'vehicle',
+    ...vehicleModuleRowIds().map(vehicleModuleAssetIdOf),
     'platform-hub',
     ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}`),
     ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}-backdrop`),
@@ -114,14 +133,26 @@ export function registryPartIds(): string[] {
   return [...blenderAssetIds(), ...PLATFORM_VISUAL_STATES.map(kebabOf)]
 }
 
-/** A vehicle part is `t<tier>-<part>`, a repeat adds `-<n>` from 2 (`t1-wheel-2`). */
-export function isVehiclePartId(partId: string): boolean {
+/** A tiered part is `t<tier>-<part>`, a repeat adds `-<n>` from 2 (`t1-wheel-2`). */
+function isTieredPartId(partId: string, partNames: readonly string[]): boolean {
   const match = /^t[1-9][0-9]*-(.+?)(-[2-9]|-[1-9][0-9]+)?$/.exec(partId)
-  return match !== null && ART_RULES.vehiclePartNames.includes(match[1])
+  return match !== null && partNames.includes(match[1])
+}
+
+export function isVehiclePartId(partId: string): boolean {
+  return isTieredPartId(partId, ART_RULES.vehiclePartNames)
+}
+
+/** The part names of a tiered asset (the vehicle or a vehicle module), or null for any other. */
+function tieredPartNamesOf(assetId: string): readonly string[] | null {
+  if (assetId === 'vehicle') return ART_RULES.vehiclePartNames
+  const rowId = vehicleModuleRowIds().find((row) => vehicleModuleAssetIdOf(row) === assetId)
+  return rowId === undefined ? null : VEHICLE_MODULE_PARTS[rowId]
 }
 
 export function isValidPartId(assetId: string, partId: string): boolean {
-  return assetId === 'vehicle' ? isVehiclePartId(partId) : registryPartIds().includes(partId)
+  const partNames = tieredPartNamesOf(assetId)
+  return partNames === null ? registryPartIds().includes(partId) : isTieredPartId(partId, partNames)
 }
 
 /** The tier a `t<tier>-` id names, or null for an id without one. */

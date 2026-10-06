@@ -13,6 +13,8 @@ import {
   blenderAssetIds,
   enemyArtKinds,
   vectorIconIds,
+  vehicleModuleAssetIdOf,
+  vehicleModuleRowIds,
 } from './artIds'
 import { ENEMY_IDS } from '../registeredIds'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
@@ -77,6 +79,13 @@ describe('asset manifest', () => {
     const kinds = enemyArtKinds()
     expect(kinds.slice(0, ENEMY_IDS.length)).toEqual(ENEMY_IDS)
     expect(new Set(kinds).size).toBe(kinds.length)
+  })
+
+  it('names each vehicle module from a row of the locked unlock schedule', () => {
+    const rowIds = LOCKED_SCHEDULE.rows.map((row) => row.id)
+    expect(vehicleModuleRowIds().filter((row) => !rowIds.includes(row))).toEqual([])
+    expect(blenderAssetIds()).toContain(vehicleModuleAssetIdOf('auto_guns'))
+    expect(vehicleModuleAssetIdOf('auto_guns')).toBe('vehicle-auto-guns')
   })
 
   it('refuses an asset id that no registry derives, and a missing inventory row', () => {
