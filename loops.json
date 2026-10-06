@@ -1,23 +1,23 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-06T16:05:22Z",
+  "updated_at": "2026-10-06T16:07:13Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "working",
       "issue": 134,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-06T16:05:22Z",
+      "note": "started 2026-10-06 17:34 CEST",
+      "updated_at": "2026-10-06T16:07:13Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
       "loop": "steampunk-loop",
       "slot": "2",
-      "state": "blocked",
-      "issue": 131,
-      "note": "#131 needs-planner (slot free)",
-      "updated_at": "2026-10-06T15:52:58Z",
+      "state": "idle",
+      "issue": null,
+      "note": "free",
+      "updated_at": "2026-10-06T16:07:13Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-06T15:40:59Z",
+      "updated_at": "2026-10-06T16:07:13Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,7 +35,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-06T15:40:59Z",
+      "updated_at": "2026-10-06T16:07:13Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "2/4 slots busy; nothing pickable (all done, blocked, claimed, needs-planner, or out of attempts)",
+      "note": "1/4 slots busy; status check",
       "extra": {
-        "active": 2,
+        "active": 1,
         "max": 4,
         "max_attempts": 2,
         "attempts": {
@@ -92,7 +92,7 @@
         },
         "push_pending": null
       },
-      "updated_at": "2026-10-06T15:40:59Z",
+      "updated_at": "2026-10-06T16:07:13Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -106,6 +106,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-06T16:07:13Z",
+      "key": "steampunk-loop/2",
+      "state": "idle",
+      "issue": null,
+      "note": "free"
+    },
     {
       "at": "2026-10-06T15:52:58Z",
       "key": "steampunk-loop/2",
@@ -518,13 +525,6 @@
       "state": "blocked",
       "issue": 128,
       "note": "#128 needs-planner (slot free)"
-    },
-    {
-      "at": "2026-10-06T05:25:55Z",
-      "key": "steampunk-loop/1",
-      "state": "idle",
-      "issue": null,
-      "note": "free"
     }
   ]
 }
