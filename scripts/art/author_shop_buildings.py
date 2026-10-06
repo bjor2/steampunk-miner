@@ -387,12 +387,13 @@ def workshop_lamp_pieces():
 
 
 def workshop_stack_pieces():
-    """A short boiler-house stack on the right end of the roof."""
+    """A short boiler-house stack through the right end of the roof, booted on the tooth's slope."""
+    boot = WORKS_EAVE + 0.3
     return [
-        platform.cylinder('soot', 0.35, WORKS_STACK_TOP - WORKS_RIDGE, (WORKS_STACK_X, 0.9, (WORKS_RIDGE + WORKS_STACK_TOP) / 2), 'Z'),
+        platform.cylinder('soot', 0.35, WORKS_STACK_TOP - boot, (WORKS_STACK_X, 0.9, (boot + WORKS_STACK_TOP) / 2), 'Z'),
         platform.cylinder('brass', 0.42, 0.1, (WORKS_STACK_X, 0.9, WORKS_STACK_TOP - 0.05), 'Z'),
-        platform.cylinder('brass', 0.4, 0.08, (WORKS_STACK_X, 0.9, WORKS_RIDGE + 0.4), 'Z'),
-        platform.cylinder('dark-iron', 0.5, 0.3, (WORKS_STACK_X, 0.9, WORKS_RIDGE + 0.1), 'Z'),
+        platform.cylinder('brass', 0.4, 0.08, (WORKS_STACK_X, 0.9, WORKS_STACK_TOP - 0.9), 'Z'),
+        platform.cylinder('dark-iron', 0.5, 0.5, (WORKS_STACK_X, 0.9, boot + 0.45), 'Z'),
     ]
 
 

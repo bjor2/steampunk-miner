@@ -3,7 +3,7 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/platform-building-upgrade/platform-building-upgrade.blend",
-    "sha256": "07294607795defcbd3266baf5e1357bb27ee5663063f03412a7591e78fd44679",
+    "sha256": "90ca527d3c3092c6dada471fc451157426eb6c672653d830f918e3e105e1c2a6",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 256,
