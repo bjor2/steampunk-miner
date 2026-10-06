@@ -3,7 +3,8 @@
  * point the drill laid is breached (`breachRing`), and the authority says so per chunk with
  * `CasingBreached {chunk, samples, enemyId}` for replication, then once per ring with `RingGnawed
  * {ring, band}` for the log, `band` being the deepest band of the breached wall (#76's wall band).
- * A ring with no intact lining left changes nothing and says nothing.
+ * A ring with no intact lining left changes nothing and says nothing. Lava resting near the ring
+ * comes loose again, as the lining that kept it out is breached (#113).
  *
  * The tunnel wrecker gnaws as itself; `debug.gnawCasing` gnaws with no enemy (`enemyId` null), so
  * scenarios and specs can breach a stretch without waiting on a wrecker.
@@ -19,6 +20,7 @@ import type { AuthorityState } from './authorityState'
 import { unchanged, type RuleEffect } from './commandRule'
 import type { DomainEventBody } from './domainEvent'
 import { groundChangedEventsOf } from './groundChangedEvents'
+import { wakeLavaNear } from './lava/lavaRules'
 
 export function gnawCasingRing(
   state: AuthorityState,
@@ -29,7 +31,7 @@ export function gnawCasingRing(
   const breach = breachRing(state.world, params, casingRingAround(point.xMm, point.yMm))
   if (breach.breachedSamples.length === 0) return unchanged(state)
   return {
-    state: { ...state, world: breach.world },
+    state: wakeLavaNear({ ...state, world: breach.world }, params, point),
     events: [
       ...groundChangedEventsOf(breach),
       ...casingBreachedEventsOf(breach, enemyId),

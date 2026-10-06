@@ -1,11 +1,12 @@
 /**
  * A tunnel wrecker's gnaw (spec #111, Technical Director's storage): every sample of one casing
- * ring holding lining at grade 1 to 15 becomes `CASING_BREACHED`. Never-lined rock (0) and lining
+ * ring holding lining at grade 1 to 15 becomes breached, keeping its lining type (`CASING_BREACHED`
+ * for standard lining, the type at grade 0 for another, #113). Never-lined rock (0) and lining
  * already breached are left as they are, so a gnaw is idempotent and never makes a tunnel safer.
  * Density and material stay as they were: breaching changes only the casing layer, which the chunk
  * digest already hashes.
  */
-import { CASING_BREACHED, isIntactLining } from './chunkDelta'
+import { breachedValueOf, isIntactLining } from './chunkDelta'
 import { ringSamplesOf, type CasingRing } from './casingLining'
 import {
   casingGradeOf,
@@ -29,7 +30,9 @@ export function breachRing(world: WorldState, params: PlanetParams, ring: Casing
   const intact = ringSamplesOf(ring).filter((sample) =>
     isIntactLining(casingGradeOf(session, sample)),
   )
-  intact.forEach((sample) => markSampleCasing(session, sample, CASING_BREACHED))
+  intact.forEach((sample) =>
+    markSampleCasing(session, sample, breachedValueOf(casingGradeOf(session, sample))),
+  )
   return { ...closeSession(session), breachedSamples: intact }
 }
 

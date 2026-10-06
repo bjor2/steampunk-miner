@@ -116,11 +116,11 @@ describe('session snapshot: casing (#41)', () => {
     ])
   })
 
-  it('refuses casing runs that hold a grade above 15', () => {
+  it('refuses casing runs that hold a value past the lining types', () => {
     const snapshot = throughJson(takeSnapshot(linedState()))
     const [key] = Object.keys(snapshot.state.world.chunks)
     const delta = snapshot.state.world.chunks[key]
-    snapshot.state.world.chunks[key] = { ...delta, casing: [128 * 128, 16] }
+    snapshot.state.world.chunks[key] = { ...delta, casing: [128 * 128, 240] }
     expect(readSnapshot(snapshot).problems).toEqual(['snapshot.state.world must hold chunk deltas'])
   })
 })

@@ -11,7 +11,8 @@
  *    spreads deeper than one sample.
  * 2. A solid **casing** sample of the ring's own lining type and a lower grade is raised to
  *    `grade` (relining); a grade that already matches is left alone. Breached lining (#111) holds
- *    at grade 0 and no type, so it is relined like any lower grade: free, as it lines no new rock.
+ *    at grade 0 and keeps its type, so in its own type it is relined like any lower grade: free,
+ *    as it lines no new rock (M3).
  * 3. A solid casing sample of **another lining type** (#113) is relaid in the ring's type at the
  *    higher of the two grades, so a type change never weakens the wall. It counts as first
  *    placement of the new type: it joins the wall the charge is priced by.
@@ -22,10 +23,10 @@
 import { CASING_LINING_HALF_WIDTH_MM, DRILL_STAMP_RADIUS_MM } from '../../constants/balance'
 import { cellSampleIndices } from './cellYield'
 import {
-  casingTypeIndexOf,
   casingValueOf,
   effectiveCasingGrade,
   isLined,
+  liningTypeIndexOfValue,
   MAX_SAMPLE_CASING_GRADE,
   STANDARD_CASING_TYPE_INDEX,
 } from './chunkDelta'
@@ -139,10 +140,9 @@ function ringStepOf(session: EditSession, sample: WeightedSample, lining: RingLi
   return isBesideAir(session, sample) ? 'line' : 'skip'
 }
 
-/** Lining already there: another type is relaid, the same type (or a breach) only relined up. */
+/** Lining already there, breached or not: another type is relaid, the same type relined up. */
 function liningStepOf(current: number, lining: RingLining): RingStep {
-  const typeIndex = casingTypeIndexOf(current)
-  if (typeIndex !== null && typeIndex !== lining.typeIndex) return 'retype'
+  if (liningTypeIndexOfValue(current) !== lining.typeIndex) return 'retype'
   return effectiveCasingGrade(current) < lining.grade ? 'reline' : 'skip'
 }
 

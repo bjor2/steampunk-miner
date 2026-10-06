@@ -1,20 +1,22 @@
 import { describe, expect, it } from 'vitest'
 import {
   applyChunkDelta,
+  breachedValueOf,
+  CASING_BREACHED,
+  casingTypeIndexOf,
+  casingValueOf,
   decodeDensity,
+  effectiveCasingGrade,
   EMPTY_CHUNK_DELTA,
   encodeDensityChange,
+  isCasingValue,
   isCellYielded,
   isChunkTouched,
+  liningTypeIndexOfValue,
   materialCellsOf,
   withCellOverride,
   withCellsYielded,
   withDensity,
-  CASING_BREACHED,
-  casingTypeIndexOf,
-  casingValueOf,
-  effectiveCasingGrade,
-  isCasingValue,
 } from './chunkDelta'
 import { chunkDigest } from './chunkDigest'
 import { generateChunk } from './generateChunk'
@@ -92,12 +94,19 @@ describe('typed casing values (#113)', () => {
     expect(isCasingValue(value)).toBe(true)
   })
 
-  it('reads a breach as grade 0 with no type, and a typed grade 0 as no value at all', () => {
+  it('breaches lining to grade 0 of its own type, which guards nothing', () => {
     expect([casingTypeIndexOf(CASING_BREACHED), effectiveCasingGrade(CASING_BREACHED)]).toEqual([
       null,
       0,
     ])
-    expect(isCasingValue(casingValueOf(0, 1))).toBe(false)
+    expect(breachedValueOf(3)).toBe(CASING_BREACHED)
+    const refractoryBreach = breachedValueOf(casingValueOf(4, 1))
+    expect(isCasingValue(refractoryBreach)).toBe(true)
+    expect([
+      liningTypeIndexOfValue(refractoryBreach),
+      casingTypeIndexOf(refractoryBreach),
+      effectiveCasingGrade(refractoryBreach),
+    ]).toEqual([1, null, 0])
     expect(casingTypeIndexOf(0)).toBeNull()
   })
 })

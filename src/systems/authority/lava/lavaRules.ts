@@ -1,8 +1,8 @@
 /**
  * Lava in play (spec #113 design and numbers, built by #96):
  *
- * - When the ground opens beside a lava pocket (a cell the drill or a debug carve opened), the
- *   pocket's cells come loose, and on the clock every `LAVA_FLOW_STEP_TICKS` the loose lava flows
+ * - When the ground opens beside a lava pocket (a cell the drill or a debug carve opened), or a
+ *   wrecker breaches a ring near resting lava, the lava comes loose, and on the clock every `LAVA_FLOW_STEP_TICKS` the loose lava flows
  *   one cell down into open tunnel (`lavaFlow.ts`). A refractory-lined cell keeps it out
  *   (`lava_blocked`, once where it stops); standard lining does not. The ground changes as ordinary
  *   `GroundChanged`, so guests and the renderer follow it.
@@ -19,7 +19,8 @@ import { cmp, sub, toCanonical, ZERO_MONEY } from '../../money'
 import { drillStampOf } from '../../vehicle/drillStamp'
 import { liningTypeIndexOf } from '../../vehicle/liningType'
 import { heatUnitsOfPoints, runHeatSegments } from '../../vehicle/vehicleHeat'
-import { tileOfPose, type VehiclePose } from '../../vehicle/vehiclePose'
+import type { RingPoint } from '../../vehicle/casingTrail'
+import { tileOfMillimetres, tileOfPose, type VehiclePose } from '../../vehicle/vehiclePose'
 import { isVehicleActive, statsOfVehicle } from '../../vehicle/vehicleState'
 import type { YieldedCell } from '../../world/cellYield'
 import { flowLava, isLavaAt, lavaBesideOpenings, squareDistanceSqMm } from '../../world/lavaFlow'
@@ -31,7 +32,7 @@ import type { TickOutcome } from '../combat/combatTick'
 import { vehicleBodiesOf } from '../collapse/collapseWatch'
 import type { DomainEvent, DomainEventBody } from '../domainEvent'
 import { groundChangedEventsOf } from '../groundChangedEvents'
-import { heatLineEvents, withHeat } from '../heatRules'
+import { heatLineEvents, heatLinesOf, withHeat } from '../heatRules'
 import { planetParamsOf } from '../planetOfState'
 import { destroyIfHullGone } from '../vehicleTransitions'
 import { lavaAfterStep, withLooseLava } from './lavaState'
@@ -40,6 +41,8 @@ import { LAVA_CONTACT_REACH_MM } from '../../../constants/balance'
 const { hitGraceTicks } = ECONOMY.enemies.combat
 const REACH_SQ_MM = LAVA_CONTACT_REACH_MM * LAVA_CONTACT_REACH_MM
 const TOUCH_TILES = [-1, 0, 1]
+/** A ring's outer edge (1.2 m) plus the tile a guarded cell sits beside its lava, rounded up. */
+const LAVA_WAKE_TILES = 3
 
 /** The pockets beside cells that just opened come loose. */
 export function wakeLavaBeside(
@@ -57,14 +60,37 @@ export function wakeLavaBeside(
 }
 
 /** The next tick the lava steps, or null. */
+/** The next tick the lava steps, never one the clock has passed; or null. */
 export function nextLavaTick(state: AuthorityState): number | null {
-  return state.lava.nextStepTick
+  const due = state.lava.nextStepTick
+  return due === null ? null : Math.max(due, state.tick + 1)
+}
+
+/**
+ * Lava resting within `LAVA_WAKE_TILES` of a ring a tunnel wrecker breached comes loose again: the
+ * lining that kept it out may be gone (#113, #111).
+ */
+export function wakeLavaNear(state: AuthorityState, params: PlanetParams, point: RingPoint) {
+  const tiles = lavaTilesNear(state, params, tileOfMillimetres(point.xMm, point.yMm))
+  return { ...state, lava: withLooseLava(state.lava, tiles, state.tick) }
+}
+
+function lavaTilesNear(state: AuthorityState, params: PlanetParams, centre: TilePoint) {
+  const tiles: TilePoint[] = []
+  for (let dy = -LAVA_WAKE_TILES; dy <= LAVA_WAKE_TILES; dy++) {
+    for (let dx = -LAVA_WAKE_TILES; dx <= LAVA_WAKE_TILES; dx++) {
+      const tile = { tx: centre.tx + dx, ty: centre.ty + dy }
+      if (isLavaAt(state.world, params, tile)) tiles.push(tile)
+    }
+  }
+  return tiles
 }
 
 /** One flow step, if one is due at `tick`. */
 export function runLavaTick(state: AuthorityState, tick: number): TickOutcome {
   const params = planetParamsOf(state.planet)
-  if (params === null || state.lava.nextStepTick !== tick) return { state, events: [] }
+  const due = state.lava.nextStepTick
+  if (params === null || due === null || due > tick) return { state, events: [] }
   const archetype = hazardArchetypeOn(params.planetIndex)
   const guardTypeIndex = archetype === null ? -1 : liningTypeIndexOf(archetype.liningType)
   const bodies = vehicleBodiesOf(state).map(({ centre }) => centre)
@@ -158,7 +184,7 @@ function burnWithLava(
   const vehicle = vehicleOf(state, playerId)
   const spike = heatUnitsOfPoints(archetype.hazardContact.heat)
   const gaugeMax = heatUnitsOfPoints(archetype.gaugeMax)
-  const lines = [archetype.throttleAt, archetype.gaugeMax].map(heatUnitsOfPoints)
+  const lines = heatLinesOf(archetype)
   const run = runHeatSegments(
     vehicle.heat.level,
     [{ ticks: 1, unitsPerTick: spike }],

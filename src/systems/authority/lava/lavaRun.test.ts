@@ -109,6 +109,20 @@ describe('lava on the authority clock (#113)', () => {
     expect(session.state().lava.nextStepTick).toBeNull()
   })
 
+  it('lets the lava through once a wrecker breaches the refractory ring that stopped it', () => {
+    const session = onHeatPlanet()
+    session.submit(0, reportAt(AWAY))
+    session.submit(1, { type: 'debug.setLiningType', payload: { liningType: 'refractory' } })
+    session.submit(1, carveHole)
+    session.submit(1, lineHole)
+    session.advanceTo(5 * LAVA_FLOW_STEP_TICKS)
+    expect(isLavaAt(session.state().world, PARAMS, BELOW_FLOOR)).toBe(false)
+    const tick = 5 * LAVA_FLOW_STEP_TICKS + 1
+    session.submit(tick, { type: 'debug.gnawCasing', payload: { x: HOLE.x, y: HOLE.y } })
+    session.advanceTo(tick + 5 * LAVA_FLOW_STEP_TICKS)
+    expect(isLavaAt(session.state().world, PARAMS, BELOW_FLOOR)).toBe(true)
+  })
+
   it('passes the same hole lined with standard lining', () => {
     const session = onHeatPlanet()
     session.submit(0, reportAt(AWAY))

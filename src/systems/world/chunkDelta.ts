@@ -28,15 +28,17 @@ import { AIR_CELL, isLavaCell, LAVA_CELL } from './worldCell'
 export const MAX_SAMPLE_CASING_GRADE = 15
 
 /**
- * Lining a tunnel wrecker gnawed (#111 Technical Director, a reserved value of the same layer):
- * still lined, but holding at grade 0, so it is weak in every band. A breach keeps no type.
+ * Standard lining a tunnel wrecker gnawed (#111 Technical Director, a reserved value of the same
+ * layer): still lined, but holding at grade 0, so it is weak in every band.
  */
 export const CASING_BREACHED = 255
 
 /**
  * A lining sample is `typeIndex * 16 + grade` (#113: the type sits on top of the grade): the
  * standard lining is type 0, so its values stay the #41 grades 1 to 15 and older layers read the
- * same. Types 1 to 14 fit below `CASING_BREACHED`; a type with grade 0 is not a value.
+ * same. Types 1 to 14 fit below `CASING_BREACHED`; a type's grade 0 (16, 32, ...) is that type
+ * breached, so relining it in its own type stays free and another type is charged, while it guards
+ * nothing (`casingTypeIndexOf` answers only for intact lining).
  */
 const CASING_TYPE_STRIDE = MAX_SAMPLE_CASING_GRADE + 1
 const MAX_CASING_TYPE_INDEX = 14
@@ -54,10 +56,23 @@ export function effectiveCasingGrade(casing: number): number {
   return casing === CASING_BREACHED ? 0 : casing % CASING_TYPE_STRIDE
 }
 
-/** The lining type of a sample (0 = standard), or null for no lining or a breach. */
+/** The lining type of intact lining (0 = standard), or null for no lining or a breach. */
 export function casingTypeIndexOf(casing: number): number | null {
   if (!isIntactLining(casing)) return null
+  return liningTypeIndexOfValue(casing)
+}
+
+/** The lining type of any lining, breached or not (0 = standard), or null for no lining. */
+export function liningTypeIndexOfValue(casing: number): number | null {
+  if (!isLined(casing)) return null
+  if (casing === CASING_BREACHED) return STANDARD_CASING_TYPE_INDEX
   return Math.floor(casing / CASING_TYPE_STRIDE)
+}
+
+/** What a gnaw leaves of intact lining: its type at grade 0. */
+export function breachedValueOf(casing: number): number {
+  const typeIndex = liningTypeIndexOfValue(casing) ?? STANDARD_CASING_TYPE_INDEX
+  return typeIndex === STANDARD_CASING_TYPE_INDEX ? CASING_BREACHED : typeIndex * CASING_TYPE_STRIDE
 }
 
 /** Lined, breached or not: never-lined rock is 0. */
@@ -67,14 +82,13 @@ export function isLined(casing: number): boolean {
 
 /** Lining at a grade of 1 to 15, the only casing a gnaw breaches. */
 export function isIntactLining(casing: number): boolean {
-  return isLined(casing) && casing !== CASING_BREACHED
+  return isLined(casing) && effectiveCasingGrade(casing) > 0
 }
 
 /** A value the casing layer may hold: none, a grade of some type, or breached. */
 export function isCasingValue(casing: number): boolean {
   if (casing <= MAX_SAMPLE_CASING_GRADE || casing === CASING_BREACHED) return true
-  const typeIndex = Math.floor(casing / CASING_TYPE_STRIDE)
-  return typeIndex <= MAX_CASING_TYPE_INDEX && effectiveCasingGrade(casing) > 0
+  return Math.floor(casing / CASING_TYPE_STRIDE) <= MAX_CASING_TYPE_INDEX
 }
 
 export interface ChunkDelta {

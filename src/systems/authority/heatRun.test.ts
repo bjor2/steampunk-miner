@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { TICKS_PER_SECOND } from '../../constants/physics'
-import { heatPointsOf } from '../vehicle/vehicleHeat'
+import { heatPointsOf, heatUnitsOfPoints, runHeatSegments } from '../vehicle/vehicleHeat'
+import { heatArchetype } from '../economy/heatEconomy'
 import { FACING } from '../vehicle/vehiclePose'
 import { fromCanonical, fromSafeInteger, mul, sub, toCanonical } from '../money'
 import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
-import { heatThrottledDrill } from './heatRules'
+import { heatLineEvents, heatLinesOf, heatThrottledDrill } from './heatRules'
 import { createScriptedSession, FREEZE_ENEMIES, type ScriptedSession } from './scriptedSession'
 
 /** Planet 8, the first heat planet: radius 676 tiles, band 5 from 67.6 tiles in, core 10. */
@@ -129,6 +130,20 @@ describe('heat gauge (#113 numbers acceptance 1)', () => {
     reportFor(session, 1, 5, 12, drilling)
     const lost = sub(before, session.vehicle().hull)
     expect(lost).toEqual(mul(before, fromCanonical('0.1')))
+  })
+
+  it('starts the overheat in the log only above 70, where the throttle starts', () => {
+    const heat = heatArchetype()
+    const linesAfter = (fromPoints: number, toPoints: number) => {
+      const step = heatUnitsOfPoints(toPoints - fromPoints)
+      const segments = [{ ticks: 1, unitsPerTick: step }]
+      const max = heatUnitsOfPoints(heat.gaugeMax)
+      const run = runHeatSegments(heatUnitsOfPoints(fromPoints), segments, max, heatLinesOf(heat))
+      return heatLineEvents(heat, run).map((event) => event.type)
+    }
+    expect(linesAfter(60, 70)).toEqual([])
+    expect(linesAfter(60, 71)).toEqual(['HeatThreshold', 'OverheatStarted'])
+    expect(linesAfter(71, 70)).toEqual(['OverheatEnded'])
   })
 
   it('ends the throttle when the gauge falls back below 70', () => {

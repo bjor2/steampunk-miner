@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { casingRingAround, lineRing } from './casingLining'
-import { clearDisc } from './groundEdit'
+import { clearDisc, fillDisc } from './groundEdit'
 import { flowLava, isLavaAt, lavaBesideOpenings } from './lavaFlow'
 import { planetParamsFor } from './planetParams'
 import { bandOfTile } from './planetGeometry'
@@ -88,6 +88,13 @@ describe('lava flow (#113 numbers acceptance 2)', () => {
     const { world, loose } = linedHole(STANDARD)
     const count = (state: WorldState) => lavaCellsAround(state).length
     expect(count(flowUntilRest(world, loose, REFRACTORY).world)).toBe(count(world))
+  })
+
+  it('never flows into ground a collapse refilled, though the cell still reads as yielded', () => {
+    const { world, loose } = linedHole(STANDARD)
+    const refilled = fillDisc(world, PARAMS, { ...HOLE, radiusMm: 950, floorRadiusMm: null }, 255)
+    const after = flowUntilRest(refilled.world, loose, REFRACTORY)
+    expect(isLavaAt(after.world, PARAMS, BELOW_FLOOR)).toBe(false)
   })
 
   it('never flows into a cell a vehicle body is in', () => {

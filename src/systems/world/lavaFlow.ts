@@ -2,14 +2,16 @@
  * Lava flow (spec #113 "lava pockets flow into open tunnels"), integer only. Lava is a cell layer
  * over the ground (`lavaFlips` in the chunk delta): a lava cell is solid at density 255, and the
  * drill never cuts it. Each step, every loose lava cell, lowest first, moves one cell down: into the
- * 4-neighbour nearest the planet's centre that is open (an air cell), strictly lower than it, not
+ * 4-neighbour nearest the planet's centre that is open (an air cell whose samples hold at most
+ * half of a solid cell, so ground a collapse refilled stays shut), strictly lower than it, not
  * guarded by the lining type that seals lava (refractory), and not where a vehicle's body is. The
- * cell it leaves opens to density 0; the cell it enters fills to 255 and loses any lining laid on it
- * (standard lining lets lava through, #113). Lava that cannot move rests; the cells a lining kept
+ * cell it leaves opens to density 0, melting what little rock the open cell still held; the cell it
+ * enters fills to 255 and loses any lining laid on it (standard lining lets lava through, #113). Lava that cannot move rests; the cells a lining kept
  * it out of are reported, so `lava_blocked` is logged once where it stopped.
  */
 import { LAVA_CONTACT_REACH_MM } from '../../constants/balance'
 import { MM_PER_METRE } from '../../constants/physics'
+import { cellDensitySum } from './cellYield'
 import { withLavaFlipped } from './chunkDelta'
 import type { BodyCentre } from './collapseRefill'
 import {
@@ -21,7 +23,7 @@ import {
 } from './groundEditSession'
 import { isGuardedByLining } from './liningGuard'
 import type { PlanetParams } from './planetParams'
-import { AIR_DENSITY, SAMPLES_PER_TILE, SOLID_DENSITY } from './sampleGrid'
+import { AIR_DENSITY, SAMPLES_PER_CELL, SAMPLES_PER_TILE, SOLID_DENSITY } from './sampleGrid'
 import { FULL_WEIGHT } from './stampShape'
 import { cellIndexOfTile, chunkOfTile, halfTileDistanceSq, type TilePoint } from './tileGrid'
 import { isAirCell, isLavaCell } from './worldCell'
@@ -86,6 +88,12 @@ export function lavaBesideOpenings(
   )
 }
 
+/** An air cell (yielded or never solid) whose density is at most half of a solid cell's. */
+function isOpenCell(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
+  if (!isAirCell(cellAt(world, params, tile))) return false
+  return cellDensitySum(world, params, tile) * 2 <= SAMPLES_PER_CELL * SOLID_DENSITY
+}
+
 export function isLavaAt(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
   return isLavaCell(cellAt(world, params, tile))
 }
@@ -117,7 +125,7 @@ function moveOf(
   barriers: LavaBarriers,
 ): Move {
   const below = lowestFirst(neighboursOf(tile)).filter(
-    (next) => isLower(next, tile) && isAirCell(cellAt(world, params, next)),
+    (next) => isLower(next, tile) && isOpenCell(world, params, next),
   )
   const guarded = below.filter((next) => isGuardedByLining(world, next, barriers.guardTypeIndex))
   const free = below.filter((next) => !guarded.includes(next))

@@ -16,7 +16,6 @@
  *
  * Off the act the gauge reads 0 and nothing heats; a vehicle that arrives hot cools at once.
  */
-import { HEAT_UNITS_PER_POINT } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { HazardArchetype } from '../economy/economyDefinition'
 import {
@@ -167,7 +166,12 @@ function settleHeat(
   tick: number,
 ): RuleEffect {
   const heat = vehicleOf(state, playerId).heat
-  const run = runHeatSegments(heat.level, segments, gaugeMaxUnitsOf(archetype), linesOf(archetype))
+  const run = runHeatSegments(
+    heat.level,
+    segments,
+    gaugeMaxUnitsOf(archetype),
+    heatLinesOf(archetype),
+  )
   const settled = withHeat(state, playerId, { ...heat, level: run.level, settledTick: tick })
   return chainEffects(settled, [
     () => ({ state: settled, events: heatLineEvents(archetype, run) }),
@@ -234,16 +238,29 @@ function netUnitsPerTick(heating: BigStat, cooling: BigStat): number {
 
 /** `heat_threshold` for each line risen past, and the throttle's start and end edges. */
 export function heatLineEvents(archetype: HazardArchetype, run: HeatRun): DomainEventBody[] {
-  const throttleUnits = heatUnitsOfPoints(archetype.throttleAt)
+  const overheat = overheatLineOf(archetype)
   return [
-    ...run.risenPast.flatMap((line): DomainEventBody[] => [
-      { type: 'HeatThreshold', level: line / HEAT_UNITS_PER_POINT },
-      ...(line === throttleUnits ? [{ type: 'OverheatStarted' } as const] : []),
-    ]),
+    ...run.risenPast.flatMap((line): DomainEventBody[] =>
+      line === overheat
+        ? [{ type: 'HeatThreshold', level: archetype.throttleAt }, { type: 'OverheatStarted' }]
+        : [{ type: 'HeatThreshold', level: archetype.gaugeMax }],
+    ),
     ...run.fellBelow
-      .filter((line) => line === throttleUnits)
+      .filter((line) => line === overheat)
       .map((): DomainEventBody => ({ type: 'OverheatEnded' })),
   ]
+}
+
+/**
+ * The gauge lines the log watches: just above the throttle line, where the throttle (and
+ * `isOverheated`) begins, so the log and the drill agree at exactly `throttleAt`; and the max.
+ */
+export function heatLinesOf(archetype: HazardArchetype): number[] {
+  return [overheatLineOf(archetype), heatUnitsOfPoints(archetype.gaugeMax)]
+}
+
+function overheatLineOf(archetype: HazardArchetype): number {
+  return heatUnitsOfPoints(archetype.throttleAt) + 1
 }
 
 /** `damageAtMaxPerSecond * hullMax` for each second at the max, never below 0 hull. */
@@ -284,9 +301,4 @@ function heatRangeRejection(state: AuthorityState, heat: number): Rejection | nu
 
 function gaugeMaxUnitsOf(archetype: HazardArchetype): number {
   return heatUnitsOfPoints(archetype.gaugeMax)
-}
-
-/** The gauge lines the log watches: the throttle line and the max. */
-function linesOf(archetype: HazardArchetype): number[] {
-  return [archetype.throttleAt, archetype.gaugeMax].map(heatUnitsOfPoints)
 }

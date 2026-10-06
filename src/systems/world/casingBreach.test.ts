@@ -158,6 +158,16 @@ describe('breached casing', () => {
     expect(ringCasing(reline.world, MIDDLE_X, BAND_1_Y)).not.toContain(CASING_BREACHED)
   })
 
+  it('keeps the lining type of a breached ring: free to reline in it, charged in another (#113)', () => {
+    const ring = casingRingAround(MIDDLE_X, BAND_1_Y)
+    const tunnel = carveTunnel(EMPTY_WORLD, BAND_1_Y)
+    const refractory = breachRing(lineRing(tunnel, params, ring, 2, 1).world, params, ring).world
+    const sameType = lineRing(refractory, params, ring, 2, 1)
+    expect([sameType.placed, sameType.relined > 0]).toEqual([0, true])
+    const standard = breachRing(lineRing(tunnel, params, ring, 2).world, params, ring).world
+    expect(lineRing(standard, params, ring, 2, 1).placed).toBeGreaterThan(0)
+  })
+
   it('stops a breached block being weak once the stretch is relined', () => {
     const gnawed = gnawMiddle(lineTunnel(carveTunnel(EMPTY_WORLD, BAND_1_Y), BAND_1_Y, 1), BAND_1_Y)
     const relined = lineTunnel(gnawed, BAND_1_Y, 1)
@@ -187,8 +197,8 @@ describe('breached casing', () => {
     expect(samplesOfBlock(block).every(({ sx, sy }) => casingAt(world, sx, sy) === 0)).toBe(true)
   })
 
-  it('holds only none, a grade of 1 to 15 or breached in the casing layer', () => {
-    expect([0, 1, 15, CASING_BREACHED].every(isCasingValue)).toBe(true)
-    expect([16, 128, 254].some(isCasingValue)).toBe(false)
+  it('holds only none, a grade of 1 to 15 of a lining type, or breached in the casing layer', () => {
+    expect([0, 1, 15, CASING_BREACHED, 16, 17, 31].every(isCasingValue)).toBe(true)
+    expect([240, 247, 254].some(isCasingValue)).toBe(false)
   })
 })
