@@ -269,6 +269,20 @@
       "better": "higher",
       "source": "stack stress (deepest tested depth before the first RangeError)"
     },
+    "authority.canonicalJsonFourPlayerUs": {
+      "label": "toCanonicalJson of a fresh 4-player authority state (3.3 KB)",
+      "unit": "µs",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "perf-100 walker tool: median of 5 runs, each the median of 7 rounds x 3000 calls (#100)"
+    },
+    "authority.stateDigestFourPlayerUs": {
+      "label": "stateDigest of a fresh 4-player authority state (3.3 KB)",
+      "unit": "µs",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "perf-100 walker tool: median of 5 runs, each the median of 7 rounds x 1000 calls (#100)"
+    },
     "lookChange.geometriesPerToggle": {
       "label": "three geometries kept per vehicle look change (visual tier + rack, after GC)",
       "unit": "geometries",
