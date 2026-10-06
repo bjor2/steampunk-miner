@@ -172,6 +172,7 @@ export function labelAppliedAt(timelineNodes, name) {
 
 // The build loop's session tiers (loop README "Model/effort tiers", the tier:* label
 // descriptions): design always runs fable, a tier:easy retry escalates to hard.
+const BUILD_LOOP = 'steampunk-loop'
 const SESSION_TIERS = {
   fable: { model: 'fable', effort: 'high' },
   hard: { model: 'opus', effort: 'high' },
@@ -189,12 +190,22 @@ function sessionTierNameOf(issue, attempt) {
   return 'hard'
 }
 
+function hasPublishedSession(claim) {
+  return Boolean(claim.model || claim.effort)
+}
+
+function tierSessionOf(issue, loopFacts) {
+  return SESSION_TIERS[sessionTierNameOf(issue, loopFacts.attempts[issue.number] ?? 1)]
+}
+
 /**
- * The model and effort of a loop worker's session: what the loop published, else what its tier
- * rule gives for the issue's labels and attempt. Null for a planner slot (no Claude session).
+ * The model and effort of a loop worker's session: what the loop published, else, for the build
+ * loop, what its tier rule gives for the issue's labels and attempt. Null for a planner slot (no
+ * Claude session) and for another loop that published none.
  */
 export function sessionOf(issue, claim, loopFacts) {
   if (claim?.kind !== 'dev') return null
-  const tier = SESSION_TIERS[sessionTierNameOf(issue, loopFacts.attempts[issue.number] ?? 1)]
+  if (claim.loop !== BUILD_LOOP && !hasPublishedSession(claim)) return null
+  const tier = tierSessionOf(issue, loopFacts)
   return { model: claim.model ?? tier.model, effort: claim.effort ?? tier.effort }
 }

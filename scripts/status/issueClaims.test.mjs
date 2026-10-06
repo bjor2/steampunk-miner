@@ -143,7 +143,7 @@ describe('issue session tier', () => {
   function issue(number, ...names) {
     return { number, labels: names.map((name) => ({ name })) }
   }
-  const worker = { kind: 'dev', model: null, effort: null }
+  const worker = { loop: 'steampunk-loop', kind: 'dev', model: null, effort: null }
 
   it('gives a worker the model and effort of its tier label', () => {
     expect(sessionOf(issue(1, 'tier:hard'), worker, facts)).toEqual({
@@ -173,6 +173,7 @@ describe('issue session tier', () => {
       effort: 'low',
     })
     expect(sessionOf(issue(1), { kind: 'planner' }, facts)).toBeNull()
+    expect(sessionOf(issue(1), { ...worker, loop: 'perf-loop' }, facts)).toBeNull()
     expect(sessionOf(issue(1), undefined, facts)).toBeNull()
   })
 })
