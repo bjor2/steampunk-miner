@@ -58,9 +58,10 @@ describe('authority: determinism', () => {
   // bill, empty here, is authority state, #115) and 12 (what the Sell bay visit has paid of the
   // bill, no visit here, is authority state, #128), 13 (each vehicle's charge rack, empty here, is
   // authority state, #109, #95) and 14 (each vehicle's lining types and heat gauge, standard and
-  // cold here, are authority state, #113, #96).
+  // cold here, are authority state, #113, #96) and 17 (each vehicle's loadout, empty here, is
+  // authority state, K4).
   it('pins the digest of a known session, so a rule change shows up as a decision', () => {
-    expect(stateDigest(replay(SESSION).state)).toBe('fe88312b019e2f87')
+    expect(stateDigest(replay(SESSION).state)).toBe('3adbb8ef480454a1')
   })
 
   it('gives a different digest when one command differs', () => {

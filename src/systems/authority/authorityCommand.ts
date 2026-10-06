@@ -36,8 +36,10 @@ import type { BayId } from '../world/dockBays'
  *    (#84, #77), so the same `BuyUpgrade` costs a different amount.
  * 16: `CargoAdded` names its ore (#122): `oreId` (#155), the cell's `depthTiles` and `chunk`; a
  *    blast's kept units are the first ore cells of their tier it broke.
+ * 17: the vehicle's loadout (K4, #162): `equipItem`, `debug.setVehicleLoadout`, `ItemEquipped`
+ *    and `EquipRefused`.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 16
+export const AUTHORITY_PROTOCOL_VERSION = 17
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
