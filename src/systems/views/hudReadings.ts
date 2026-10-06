@@ -6,6 +6,7 @@
 import { DESTROY_DELAY_TICKS, STRAND_GRACE_TICKS } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
+import { enemiesOwnedBy } from '../authority/combat/combatState'
 import { dockSiteOfPlanet, planetParamsOf } from '../authority/planetOfState'
 import { tileOfPose, type VehiclePose } from '../vehicle/vehiclePose'
 import type { VehicleMode, VehicleState } from '../vehicle/vehicleState'
@@ -24,12 +25,15 @@ export interface DepthReading {
 
 /**
  * The casing grade badge beside the depth while undocked (#41 casing feel): calm when the grade
- * holds the band, "WEAK" (and amber) when it does not, so it never reads by colour alone.
+ * holds the band, "WEAK" (and amber) when it does not, so it never reads by colour alone. While a
+ * tunnel wrecker gnaws this vehicle's route it pulses "GNAW" in the same amber (#111 telegraph).
  */
 export interface CasingBadge {
   text: string
-  isShort: boolean
+  state: CasingBadgeState
 }
+
+export type CasingBadgeState = 'holds' | 'short' | 'gnawed'
 
 export interface DockArrow {
   octant: number
@@ -58,7 +62,26 @@ export function casingBadgeOf(state: AuthorityState, playerId: string): CasingBa
   const vehicle = state.players[playerId].vehicle
   if (vehicle.mode === 'docked') return null
   const isShort = vehicle.casingShortBand !== null
-  return { text: `G${vehicle.casingGrade}${isShort ? ' WEAK' : ''}`, isShort }
+  const isGnawed = isRouteBeingGnawed(state, playerId)
+  return {
+    text: casingBadgeTextOf(vehicle.casingGrade, isShort, isGnawed),
+    state: casingBadgeStateOf(isShort, isGnawed),
+  }
+}
+
+function casingBadgeTextOf(grade: number, isShort: boolean, isGnawed: boolean): string {
+  const marks = [...(isShort ? ['WEAK'] : []), ...(isGnawed ? ['GNAW'] : [])]
+  return [`G${grade}`, ...marks].join(' ')
+}
+
+/** A tunnel wrecker hunting this vehicle's route is gnawing a ring of it now. */
+function isRouteBeingGnawed(state: AuthorityState, playerId: string): boolean {
+  return enemiesOwnedBy(state.combat, playerId).some((enemy) => enemy.phase === 'gnaw')
+}
+
+function casingBadgeStateOf(isShort: boolean, isGnawed: boolean): CasingBadgeState {
+  if (isGnawed) return 'gnawed'
+  return isShort ? 'short' : 'holds'
 }
 
 export function depthReadingOf(

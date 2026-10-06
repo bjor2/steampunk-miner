@@ -23,6 +23,8 @@ import {
 import { ACTION_MAP, defaultBindings } from '../input/actionMap'
 import { bandOfTile } from '../world/planetGeometry'
 import { surfaceRowOfColumn } from '../world/tileGrid'
+import { parkAt } from '../authority/collapse/collapseFixtures'
+import { digPlanet6Tunnel, PLANET_6, TUNNEL_TO_X } from '../authority/combat/wreckerFixtures'
 import { coreEdgeDistance, localOctantOf } from './compass'
 import { energyWarningLevel } from './energyWarning'
 import { energyWarningMarkers, selectHudModel } from './hudModel'
@@ -236,14 +238,21 @@ describe('HUD model: casing badge (#41)', () => {
   it('shows the grade calmly where it holds the band', () => {
     const session = createScriptedSession()
     session.submit(1, poseInBand(1))
-    expect(hudOf(session).casing).toEqual({ text: 'G1', isShort: false })
+    expect(hudOf(session).casing).toEqual({ text: 'G1', state: 'holds' })
   })
 
   it('marks the grade WEAK in a band it does not hold, by text as well as colour', () => {
     const session = createScriptedSession()
     session.submit(0, freezeEnemies(true))
     session.submit(1, poseInBand(2))
-    expect(hudOf(session).casing).toEqual({ text: 'G1 WEAK', isShort: true })
+    expect(hudOf(session).casing).toEqual({ text: 'G1 WEAK', state: 'short' })
+  })
+
+  it('pulses GNAW in amber while a tunnel wrecker gnaws the route (#111 telegraph)', () => {
+    const { session, tick } = digPlanet6Tunnel()
+    parkAt(session, tick, tick + 600, TUNNEL_TO_X, PLANET_6.y, 10)
+    expect(session.state().combat.enemies.some(({ phase }) => phase === 'gnaw')).toBe(true)
+    expect(hudOf(session).casing).toEqual({ text: 'G2 GNAW', state: 'gnawed' })
   })
 
   it('hides the badge while docked', () => {

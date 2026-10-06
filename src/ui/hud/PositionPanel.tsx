@@ -23,7 +23,7 @@ export function PositionPanel({ model }: { model: HudModel }) {
           <span
             className={styles.casingBadge}
             data-testid={UI_IDS.hudCasing}
-            data-state={casing.isShort ? 'short' : 'holds'}
+            data-state={casing.state}
           >
             {casing.text}
           </span>

@@ -1,15 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import { MM_PER_METRE } from '../../../constants/physics'
 import { ECONOMY } from '../../economy/economy'
-import { onCurveLevel } from '../../economy/vehicleStats'
 import { FACING } from '../../vehicle/vehiclePose'
 import { advanceTicks } from '../advanceTicks'
-import type { CommandIntent } from '../authorityCommand'
 import { digAlong, parkAt, poseAt } from '../collapse/collapseFixtures'
 import type { DomainEvent } from '../domainEvent'
 import { readSnapshot, takeSnapshot } from '../sessionSnapshot'
 import { stateDigest } from '../stateDigest'
-import { createScriptedSession, type ScriptedSession } from '../scriptedSession'
+import {
+  digPlanet6Tunnel,
+  onPlanet,
+  PLANET_5,
+  PLANET_6,
+  TUNNEL_FROM_X,
+  TUNNEL_TO_X,
+} from './wreckerFixtures'
 import { routeOf } from './wreckerRoute'
 import { wreckerCapOf } from './wreckerSpawn'
 
@@ -19,34 +24,8 @@ const ofType = <T extends DomainEvent['type']>(events: readonly DomainEvent[], t
 const { gnawTicksPerRing, ignoreVehicleTiles, minLinedRings, respawnTicks } =
   ECONOMY.enemies.tunnelWrecker
 
-/** Cave-free band-2 rock with no spawn point within 30 tiles, on planets 6 and 5 of the seed. */
-const PLANET_6 = { planetIndex: 6, y: 552500 }
-const PLANET_5 = { planetIndex: 5, y: 522500 }
-const FROM_X = 8000
-const TO_X = 48000
-
-/** On `planetIndex`, the drill on its curve there, lining band 2 at grade 2. */
-function onPlanet(planetIndex: number): ScriptedSession {
-  const session = createScriptedSession()
-  const onCurve = (upgradeId: 'drill_tip' | 'drill_power') => ({
-    type: 'debug.setUpgrade' as const,
-    payload: { upgradeId, level: onCurveLevel(upgradeId, planetIndex) },
-  })
-  const intents: CommandIntent[] = [
-    { type: 'debug.setPlanet', payload: { planetIndex } },
-    onCurve('drill_tip'),
-    onCurve('drill_power'),
-    { type: 'debug.setCasingGrade', payload: { grade: 2 } },
-  ]
-  intents.forEach((intent) => session.submit(0, intent))
-  return session
-}
-
-/** A 40 m band-2 tunnel dug and lined on planet 6; answers the session and the next free tick. */
-function digPlanet6Tunnel(): { session: ScriptedSession; tick: number } {
-  const session = onPlanet(PLANET_6.planetIndex)
-  return { session, tick: digAlong(session, 1, PLANET_6.y, FROM_X, TO_X) }
-}
+const FROM_X = TUNNEL_FROM_X
+const TO_X = TUNNEL_TO_X
 
 const ringX = (ring: string) => Number.parseInt(ring.split(',')[0], 10)
 

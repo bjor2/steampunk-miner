@@ -65,6 +65,19 @@
   }
 }
 
+/* #111 telegraph: a tunnel wrecker gnaws the route, a slow amber pulse in the same badge. */
+.casingBadge[data-state='gnawed'] {
+  color: var(--color-casing-weak);
+  animation: casing-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes casing-pulse {
+  to {
+    opacity: 0.35;
+    text-shadow: 0 0 6px var(--color-casing-weak);
+  }
+}
+
 .arrow {
   display: inline-block;
   transform: rotate(var(--arrow-turn, 0deg));

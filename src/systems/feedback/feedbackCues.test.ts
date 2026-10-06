@@ -95,6 +95,20 @@ describe('feedback cues', () => {
     ])
   })
 
+  it("scrapes once per batch as a tunnel wrecker gnaws rings of the player's route (#111)", () => {
+    const gnawed = (ring: string): DomainEvent => ({
+      tick: 900,
+      playerId: 'p1',
+      type: 'RingGnawed',
+      ring,
+      band: 2,
+    })
+    expect(feedbackCuesOf([gnawed('1,2'), gnawed('1,3')], 'p1')).toEqual([
+      { kind: 'wreckerScrape' },
+    ])
+    expect(feedbackCuesOf([gnawed('1,2')], 'p2')).toEqual([])
+  })
+
   it("ignores another player's pickups", () => {
     expect(feedbackCuesOf([cargo(4, 'p2')], 'p1')).toEqual([])
   })

@@ -97,6 +97,7 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   casingPop: (sound) => sound.playCasingPop(),
   collapseRumble: (sound) => sound.playCollapseRumble(),
   collapseCrash: (sound) => sound.playCollapseCrash(),
+  wreckerScrape: (sound) => sound.playWreckerScrape(),
 }
 
 function playCue(sound: SoundOut, cue: FeedbackCue): void {

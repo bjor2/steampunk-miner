@@ -25,6 +25,8 @@ export interface SoundOut {
   playCollapseRumble(): void
   /** The block refills: rock slumping in (#43). */
   playCollapseCrash(): void
+  /** A tunnel wrecker breached a ring of the route: a rasping scrape (#111 telegraph). */
+  playWreckerScrape(): void
   playStinger(kind: StingerKind, tuningSemitones: number): void
   setDrill(frequency: number, gain: number): void
   setEngine(puffsPerSecond: number, gain: number): void
@@ -54,6 +56,7 @@ const SOUND_OUT: SoundOut = {
   playCasingPop: () => graph?.playCasingPop(),
   playCollapseRumble: () => graph?.playCollapseRumble(),
   playCollapseCrash: () => graph?.playCollapseCrash(),
+  playWreckerScrape: () => graph?.playWreckerScrape(),
   playStinger: (kind, tuning) => graph?.playStinger(kind, tuning),
   setDrill: (frequency, gain) => graph?.setDrill(frequency, gain),
   setEngine: (puffs, gain) => graph?.setEngine(puffs, gain),

@@ -45,6 +45,8 @@ const KICKS: Readonly<Record<FeedbackCue['kind'], { shake: number; flash: number
   casingPop: { shake: 0, flash: 0 },
   collapseRumble: { shake: 0.15, flash: 0 },
   collapseCrash: { shake: 0.6, flash: 0 },
+  // The wrecker gnaws more than 20 tiles away: heard, not felt.
+  wreckerScrape: { shake: 0, flash: 0 },
 }
 
 export function createScreenEffects(): ScreenEffects {

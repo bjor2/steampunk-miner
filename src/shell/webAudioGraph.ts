@@ -1,7 +1,8 @@
 /**
  * The synthesised placeholder sounds (#13: "synthesised in the browser audio engine"): three
  * loops (drill, engine chug, steam hiss), the music's step sequencer (#49) and the one-shots
- * (chime, clank, thud, stingers, casing's hiss and pop, collapse's rumble and crash), all from
+ * (chime, clank, thud, stingers, casing's hiss and pop, collapse's rumble and crash, the wrecker's
+ * scrape), all from
  * oscillators and one noise buffer. Built once per audio
  * context; the sound loops run from the start and are only ever re-levelled, so a frame never
  * builds a node for them, and a level that has not moved is not rescheduled.
@@ -36,6 +37,7 @@ export function createWebAudioGraph(context: AudioContext): WebAudioGraph {
     playCasingPop: () => playCasingPop(context, master),
     playCollapseRumble: () => playCollapseRumble(context, master, noise),
     playCollapseCrash: () => playCollapseCrash(context, master, noise),
+    playWreckerScrape: () => playWreckerScrape(context, master, noise),
     playStinger: (kind, tuning) => playStinger(context, master, kind, tuning),
     setDrill: (frequency, gain) => levelLoop(context, drill, frequency, gain),
     setEngine: (puffs, gain) => levelLoop(context, engine, puffs, gain),
@@ -161,6 +163,30 @@ function playCasingHiss(context: AudioContext, master: GainNode, noise: AudioBuf
   const burst = new AudioBufferSourceNode(context, { buffer: noise })
   burst.connect(filter)
   burst.start(start, 0, 0.4)
+}
+
+/**
+ * A tunnel wrecker's gnaw (#111 telegraph): narrow-band noise rasped by a sawtooth gate, its teeth
+ * on the lining, quiet because the wrecker is always more than 20 tiles away.
+ */
+function playWreckerScrape(context: AudioContext, master: GainNode, noise: AudioBuffer): void {
+  const start = context.currentTime
+  const swell = gainOf(context, SILENCE, master)
+  swell.gain.setValueAtTime(SILENCE, start)
+  swell.gain.exponentialRampToValueAtTime(0.08, start + 0.04)
+  swell.gain.exponentialRampToValueAtTime(SILENCE, start + 0.6)
+  const rasp = gainOf(context, 0.5, swell)
+  const teeth = new OscillatorNode(context, { type: 'sawtooth', frequency: 22 })
+  const depth = new GainNode(context, { gain: 0.5 })
+  depth.connect(rasp.gain)
+  teeth.connect(depth)
+  teeth.start(start)
+  teeth.stop(start + 0.6)
+  const filter = new BiquadFilterNode(context, { type: 'bandpass', frequency: 2600, Q: 6 })
+  filter.connect(rasp)
+  const scrape = new AudioBufferSourceNode(context, { buffer: noise })
+  scrape.connect(filter)
+  scrape.start(start, 0, 0.6)
 }
 
 /** The drill breaking through lining (#41 feel): a short pop that drops in pitch. */
