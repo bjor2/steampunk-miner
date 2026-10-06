@@ -6,6 +6,11 @@
  */
 import { DEBUG_ACTION_REGISTRY } from '../debug/debugActionRegistry'
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
+import {
+  COMMAND_RULE_REGISTRY,
+  commandRuleRegistrationsOf,
+  type CommandRuleRegistration,
+} from '../systems/registries/commandRules'
 import { CONTENT_REGISTRY, contentRegistrationOf } from '../systems/registries/content'
 import { DISCOVERY_REGISTRY } from '../systems/registries/discovery'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
@@ -44,6 +49,8 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),
     debugActions: (actions) =>
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),
+    commandRules: (rules) =>
+      commandRuleRegistrationsOf(rules).forEach((rule) => addCommandRule(sliceId, rule)),
   }
 }
 
@@ -80,6 +87,13 @@ function addPrefixed<T extends RegistryEntry>(registry: Registry<T>, sliceId: st
 function addSaveSection(sliceId: string, section: SaveSection<unknown>) {
   if (section.id === sliceId) addToRegistry(SAVE_SECTION_REGISTRY, sliceId, section)
   else addPrefixed(SAVE_SECTION_REGISTRY, sliceId, section)
+}
+
+/** A slice's debug commands live under `debug.<slice>.`, so they are `debug.*` commands too. */
+function addCommandRule(sliceId: string, registration: CommandRuleRegistration) {
+  const isSliceDebugCommand = registration.id.startsWith(`debug.${sliceId}.`)
+  if (isSliceDebugCommand) addToRegistry(COMMAND_RULE_REGISTRY, sliceId, registration)
+  else addPrefixed(COMMAND_RULE_REGISTRY, sliceId, registration)
 }
 
 function refuseUnprefixed(registry: Registry<RegistryEntry>, sliceId: string, id: string): never {

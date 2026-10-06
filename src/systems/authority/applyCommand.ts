@@ -33,6 +33,7 @@ import {
 } from './commandRule'
 import { CASING_RULES } from './casingRules'
 import { CHARGE_RULES } from './charges/chargeRules'
+import { sliceCommandRuleOf } from '../registries/commandRules'
 import { followCollapse } from './collapse/collapseWatch'
 import { DEBUG_COMMAND_RULES } from './debugCommandRules'
 import { DOCK_COMMAND_RULES } from './dockRules'
@@ -74,6 +75,7 @@ export function refusalOfIntent(
   return findRejection(state, { playerId, tick: state.tick, seq, ...intent })
 }
 
+/** The kernel's own rules; a slice's come from the `commandRules` registry (K1). */
 const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...DEBUG_COMMAND_RULES,
   ...VEHICLE_COMMAND_RULES,
@@ -88,6 +90,16 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...REFINERY_RULES,
   ...REFINERY_COLLECTION_RULES,
   ...CHARGE_RULES,
+}
+
+/** The kernel's rule first, so a kernel command never reads the slice registry. */
+function ruleOf(type: string): CommandRule<CommandType> | undefined {
+  return Object.hasOwn(COMMAND_RULES, type) ? COMMAND_RULES[type] : sliceCommandRuleOf(type)
+}
+
+/** Every check after `commandTypeRejection`, and the apply step, may assume the type has a rule. */
+function ruleOfKnownType(type: CommandType): CommandRule<CommandType> {
+  return ruleOf(type) as CommandRule<CommandType>
 }
 
 /** The tick-driven changes due by a well-formed command's tick; none for a malformed one. */
@@ -130,7 +142,7 @@ function envelopeRejection(_state: AuthorityState, command: unknown): Rejection 
 
 function commandTypeRejection(_state: AuthorityState, command: unknown): Rejection | null {
   const { type } = command as AuthorityCommand
-  if (Object.hasOwn(COMMAND_RULES, type)) return null
+  if (ruleOf(type) !== undefined) return null
   return rejectionOf('unknown_command', `unknown command type "${type}"`)
 }
 
@@ -152,13 +164,13 @@ function orderRejection(state: AuthorityState, command: unknown): Rejection | nu
 
 function payloadRejection(_state: AuthorityState, command: unknown): Rejection | null {
   const { type, payload } = command as AuthorityCommand
-  const problems = payloadProblems(payload, COMMAND_RULES[type].fields)
+  const problems = payloadProblems(payload, ruleOfKnownType(type).fields)
   return problems.length > 0 ? { reason: 'invalid_payload', problems } : null
 }
 
 function ruleRejection(state: AuthorityState, command: unknown): Rejection | null {
   const typed = command as AuthorityCommand
-  return COMMAND_RULES[typed.type].reject?.(state, typed) ?? null
+  return ruleOfKnownType(typed.type).reject?.(state, typed) ?? null
 }
 
 function acceptCommand(state: AuthorityState, command: AuthorityCommand): CommandOutcome {
@@ -182,7 +194,7 @@ function recordReceipt(state: AuthorityState, command: AuthorityCommand): Author
 }
 
 function applyRule(state: AuthorityState, command: AuthorityCommand): RuleEffect {
-  return COMMAND_RULES[command.type].apply(state, command)
+  return ruleOfKnownType(command.type).apply(state, command)
 }
 
 /** Scenario and debug commands say so in the log, so analytics never count them as play. */

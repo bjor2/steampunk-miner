@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { debugActionsBySlice } from '../debug/debugActionRegistry'
+import { unchanged } from '../systems/authority/commandRule'
+import { COMMAND_RULE_REGISTRY, type SliceCommandRules } from '../systems/registries/commandRules'
 import { GATE_CHECK_REGISTRY, type GateCheck } from '../systems/registries/gateChecks'
 import type { OreLookProvider } from '../systems/registries/oreLook'
 import { saveSectionsOf, type SaveSection } from '../systems/registries/saveSections'
@@ -38,6 +40,12 @@ function section(id: string): SaveSection<number> {
     toPortable: (value) => value,
     ofPortable: (body) => body as number,
   }
+}
+
+/** Rules that change nothing, for the given command types: only their ids matter here. */
+function rulesFor(...types: string[]): SliceCommandRules {
+  const rule = { fields: {}, apply: unchanged }
+  return Object.fromEntries(types.map((type) => [type, rule])) as SliceCommandRules
 }
 
 /** Runs `run` on a fresh, unsealed set, as a composition root sees it before loading. */
@@ -89,6 +97,31 @@ describe('slice registrar', () => {
     })
     const ids = withRegistrations([codex], () => saveSectionsOf('player').map(({ id }) => id))
     expect(ids).toEqual(['codex', 'codex.pages'])
+  })
+
+  it('accepts slice commands under the slice prefix and debug commands under debug.<slice>.', () => {
+    const codex = sliceOf('codex', (r) =>
+      r.commandRules(rulesFor('codex.read', 'debug.codex.fill')),
+    )
+    const types = withRegistrations([codex], () =>
+      entriesOf(COMMAND_RULE_REGISTRY).map(({ id }) => id),
+    )
+    expect(types).toEqual(['codex.read', 'debug.codex.fill'])
+  })
+
+  it("refuses a command type in the kernel's or another slice's namespace", () => {
+    for (const type of [
+      'read',
+      'debug.fill',
+      'ores.read',
+      'debug.ores.fill',
+      'debug.codexx.fill',
+    ]) {
+      const stray = sliceOf('codex', (r) => r.commandRules(rulesFor(type)))
+      expect(() => withRegistrations([stray], () => undefined), type).toThrow(
+        RegistrationRefusedError,
+      )
+    }
   })
 
   it('refuses a second ore-look provider from another slice', () => {

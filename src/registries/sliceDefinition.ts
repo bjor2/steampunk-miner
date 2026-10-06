@@ -5,6 +5,7 @@
  */
 import type { DebugAction } from '../debug/debugActionRegistry'
 import type { BlastEffect } from '../systems/registries/blastEffects'
+import type { SliceCommandRules } from '../systems/registries/commandRules'
 import type { ContentKind, ContentKinds } from '../systems/registries/content'
 import type { DiscoveryProvider } from '../systems/registries/discovery'
 import type { GateCheck } from '../systems/registries/gateChecks'
@@ -43,5 +44,9 @@ export interface SliceRegistrar {
   hudPanel(panel: HudPanel): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
-  // K1 adds commandRules, eventProjections, runEvents
+  /**
+   * Rules for the commands the slice adds to `CommandPayloads`, keyed by type: `<slice>.<name>`,
+   * or `debug.<slice>.<name>` for a debug command, which replays and logs `debug_command_applied`.
+   */
+  commandRules(rules: SliceCommandRules): void
 }
