@@ -223,7 +223,7 @@ the #52 kebab form of the row id (`src/systems/art/artIds.ts`).
 | `vehicle-blasting-charges` | Blender, parts | the rack on the vehicle once it is bought: `charge-rack` plus `charge-1` to `charge-8` |
 | `prop-blasting-charge`     | Blender, parts | a planted charge: `prop-blasting-charge`, and `fuse-lamp`, the only part that glows    |
 | `icon-blasting-charges`    | vector, SVG    | the rack-slot and restock rows in the Upgrade bay and the HUD charge count             |
-| `fx-blast-scorch`          | shader, code   | scorch on the tunnel edge after a blast (placeholder: the build writes the shader)     |
+| `fx-blast-scorch`          | shader, code   | scorch on the tunnel edge after a blast (`src/scene/blastScorchShader.ts`, #95)        |
 
 - The rack is authored in the **vehicle's frame**: draw its parts at the vehicle's origin, rolled
   with it, under the vehicle's own parts. It sits behind the chassis at the rear, bolted on by one

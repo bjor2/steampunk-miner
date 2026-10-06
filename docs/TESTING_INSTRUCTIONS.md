@@ -83,7 +83,8 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   marking the rock beside air as lining; the vehicle lays the same rings by itself while it drills) and
   `gnawCasing(x, y)` (that ring breached, as a tunnel wrecker's gnaw leaves it, #111); for the guns (#107),
   `setGunLevel(level)` (0 to the gun track's cap, no unlock or price; `vehicleParts()` then lists the
-  turret's parts); for collapse (#43),
+  turret's parts); for blasting charges (#109), `setCharges(carried, slotLevel)` (a bolted-on rack, no
+  unlock or price; `vehicleParts()` then reports `rackCharges` and the rack's parts); for collapse (#43),
   `forceCollapse(block)` (a `cx,cy#index` block, warned for the full 60 ticks, then refilled whatever its
   lining) and the unlogged read `collapseState()` (the weak blocks within 16 m of a vehicle and the blocks
   warning or refilling). Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first
@@ -157,6 +158,14 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   (`refineryLeverFindings`: a planet pushed under 45 minutes or shortened more than 10%) and the
   realised refine gain per planet from `refine_collected`. Reported, never gated; the lever is
   `valueMultiplier` (floor 1.15), never `k_casing`.
+- **Blasting charges** (#109 numbers acceptance 3 and 4): `npm run balance:charges` prints the
+  blast trade (`blastTrade.ts`: per band of planets 7 to 10, drill time over the floor, ore money a
+  minute drilling against blasting, and 3 tiles of shaft either way, for the on-curve drill and one 12
+  levels behind), then plays the bot scenario to planet 10's core blasting (the bot's default) and
+  never, and prints both core times per planet, the blasts and whether each is inside C4. Reported,
+  never gated; the one lever is the price per charge (1 to 4 band-5 units). Charge specs stand in
+  band-2 rock with `charges/chargeFixtures.ts`; the bot's blasting run starts on planet 7 with a
+  stocked rack and a lagging drill (`bot/botBlasting.test.ts`).
 - **Comparison** (`compareRuns`): `npm run balance:report` writes `balance-report/` and compares the
   run with `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
   deliberate economy change, `npm run balance:baseline` rewrites the baseline in the same commit.

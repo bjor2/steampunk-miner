@@ -372,8 +372,7 @@ export function runEventPlaceOf(state: GameValues): RunEventPlace {
 /**
  * The one writer of planet and wallet: copies them from the authority, starts the travel
  * transition when the events travelled, shows the hints, feedback, part installs, stingers and
- * scorches they trigger, logs the
- * events, then writes the checkpoint when due.
+ * scorches they trigger, logs the events, then writes the checkpoint when due.
  */
 function followAuthority(events: readonly DomainEvent[]): void {
   useGameStore.setState(replicaOf(readAuthorityState(), useGameStore.getState().playerId))
