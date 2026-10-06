@@ -35,6 +35,11 @@ export const GATE_CHECK_REGISTRY = defineRegistry<GateCheck>('gateChecks')
 /** Higher wins: refused over lost over cut. */
 const OUTCOME_PRECEDENCE: Readonly<Record<GateOutcome, number>> = { cut: 0, lost: 1, refused: 2 }
 
+/** Whether any slice registered a check: with none, the drill keeps today's path. */
+export function hasGateChecks(): boolean {
+  return entriesOf(GATE_CHECK_REGISTRY).length > 0
+}
+
 /** refused > lost > cut; ties break on the lowest check id. null when no check has an opinion. */
 export function gateVerdictOf(query: GateQuery): GateVerdict | null {
   let verdict: GateVerdict | null = null

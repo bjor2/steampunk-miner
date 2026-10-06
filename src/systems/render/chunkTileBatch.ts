@@ -27,7 +27,8 @@ import { BLOCKS_PER_CHUNK, BLOCKS_PER_CHUNK_SIDE, type BlockedTileInstances } fr
 import { ART_DIRECTION, type BandPalette } from './artDirection'
 import { bandColourOf, paletteOf, tileShadeOf } from './bandPalette'
 import type { Rgb } from './colour'
-import { oreLookOfCell, type OreLook } from './oreLook'
+import { oreLookProvider, type OreLookProvider } from '../registries/oreLook'
+import type { OreLook } from './oreLook'
 
 /** How the shader draws a tile. */
 export const TILE_STYLE = { ground: 0, ore: 1, core: 2, pad: 3, artefactCache: 4, lava: 5 } as const
@@ -50,6 +51,8 @@ interface BatchContext {
   firstTx: number
   firstTy: number
   oreLooks: Map<number, OreLook>
+  /** The `ore-visuals` slice's look, else the kernel's (feature-slices.md 3.9), read per chunk. */
+  oreLook: OreLookProvider
   /** 1 per cell holding refractory lining (#113), in cell order. */
   refractoryCells: Uint8Array
 }
@@ -142,6 +145,7 @@ function batchContextOf(
     firstTx: firstTileOfChunk(cx),
     firstTy: firstTileOfChunk(cy),
     oreLooks: new Map(),
+    oreLook: oreLookProvider(),
   }
 }
 
@@ -219,7 +223,7 @@ function tileFlagOf(
 function oreLookOf(context: BatchContext, cell: number): OreLook {
   const known = context.oreLooks.get(cell)
   if (known !== undefined) return known
-  const look = oreLookOfCell(context.params, cell)
+  const look = context.oreLook.oreLookOfCell(context.params, cell)
   context.oreLooks.set(cell, look)
   return look
 }

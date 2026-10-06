@@ -9,7 +9,8 @@
  * hardness), and only the ticks in which the stamp still
  * removed something are charged, no more than the tank pays for. A cell whose samples fall to half
  * yields once: 1 cargo unit of ore or core fragments (#7, #10); with a full hold the unit is lost,
- * never refused.
+ * never refused. The slices' gate checks may refuse an ore cell or destroy it without cargo
+ * (`drillGates.ts`); with none registered the drill is unchanged.
  */
 import { casingHardness } from '../economy/casingGrades'
 import { coreHardness, blockHardness, oreSalePrice } from '../economy/oreEconomy'
@@ -36,6 +37,7 @@ import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
 import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
+import { gatedDrillTicks, isYieldLostToGate } from './drillGates'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
 import { minedOreOf, type MinedOre } from './minedOre'
@@ -96,7 +98,8 @@ function drillGround(
   const ticks = Math.min(requestedTicks, affordableTicksOf(vehicle))
   if (ticks === 0) return unchanged(state)
   const window = { firstTick: Math.max(0, state.tick - ticks), ticks }
-  const carved = target.carve(state.world, window, drillTicksOfCells(params, drill))
+  const drillTicksOf = gatedDrillTicks(state, playerId, params, drillTicksOfCells(params, drill))
+  const carved = target.carve(state.world, window, drillTicksOf)
   if (carved.ticksUsed === 0) return unchanged(state)
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
     ...vehicle,
@@ -146,11 +149,23 @@ function collectYieldedCells(
   return chainEffects(
     state,
     yielded.map(({ tile, cell }) => (current: AuthorityState) => {
-      const collected = collectTile(current, playerId, params, { tile, cell })
+      const collected = collectUngatedTile(current, playerId, params, { tile, cell })
       const destroyed: DomainEventBody = { type: 'TileDestroyed', ...tile, kind: kindNameOf(cell) }
       return { state: collected.state, events: [destroyed, ...collected.events] }
     }),
   )
+}
+
+/** A cell a gate says is lost is destroyed and pays nothing; every other cell is collected. */
+function collectUngatedTile(
+  state: AuthorityState,
+  playerId: string,
+  params: PlanetParams,
+  yielded: YieldedCell,
+): RuleEffect {
+  if (isYieldLostToGate(state, playerId, params, yielded.tile, yielded.cell))
+    return unchanged(state)
+  return collectTile(state, playerId, params, yielded)
 }
 
 /** 1 unit per ore tile at any tier (#7), core fragments per core tile (#10); ground nothing. */

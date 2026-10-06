@@ -3,9 +3,12 @@
  * whether or not a command arrives then, so a run gives the same blast however its ticks are
  * batched. Charges due at one tick blow in player id order. A blast breaks the ground and pays its
  * ore, hits its planter and the enemies in its radius, then checks the collapse blocks round it,
- * and says all of it in one `charge_detonated` ahead of the consequences.
+ * and says all of it in one `charge_detonated` ahead of the consequences. The slices' blast effects
+ * run last, and their events follow (feature-slices.md 3.7); with none registered nothing changes.
  */
+import { blastRadiusMm } from '../../economy/blastingCharges'
 import { toCanonical } from '../../money'
+import { applyBlastEffects, type BlastEvent } from '../../registries/blastEffects'
 import type { PlantedCharge } from '../../vehicle/vehicleCharges'
 import type { PlanetParams } from '../../world/planetParams'
 import type { AuthorityState } from '../authorityState'
@@ -59,6 +62,11 @@ function blastCharge(
   const planterHit = hitPlanterInBlast(ground.effect.state, params, playerId, charge, tick)
   const enemiesHit = hitEnemiesInBlast(planterHit.state, params, charge, tick)
   const collapse = checkCollapseNearBlast(enemiesHit.state, params, charge)
+  const sliceEffects = applyBlastEffects(
+    collapse.effect.state,
+    chargeBlastOf(playerId, charge, tick),
+    params,
+  )
   const summary: DomainEventBody = {
     type: 'ChargeDetonated',
     tx: charge.tx,
@@ -70,12 +78,25 @@ function blastCharge(
   }
   const planterEvents = [summary, ...ground.effect.events, ...planterHit.events]
   return {
-    state: collapse.effect.state,
+    state: sliceEffects.state,
     events: [
       ...stampedFor({ state, events: planterEvents }, playerId, tick).events,
       ...enemiesHit.events,
       ...stampedFor(collapse.effect, playerId, tick).events,
+      ...stampedFor(sliceEffects, playerId, tick).events,
     ],
+  }
+}
+
+/** What the slices' blast effects are told: a charge's blast, every field an integer. */
+function chargeBlastOf(playerId: string, charge: PlantedCharge, tick: number): BlastEvent {
+  return {
+    tx: charge.tx,
+    ty: charge.ty,
+    radiusMm: blastRadiusMm(),
+    playerId,
+    source: 'charge',
+    tick,
   }
 }
 
