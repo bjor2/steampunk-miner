@@ -17,6 +17,7 @@
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { PACING_TARGETS } from '../src/constants/pacingTargets'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
+import { loadFeatures } from '../src/features'
 import { derivePacingReport } from '../src/logging/pacingReport'
 import type { RunEvent } from '../src/logging/runEvent'
 import type { RunEventName } from '../src/logging/eventNames'
@@ -26,6 +27,8 @@ import type { ChargePolicy } from '../src/systems/bot/botCharges'
 import { onCurveLevels, vehicleStatsAt } from '../src/systems/economy/vehicleStats'
 import type { Scenario } from '../src/systems/scenario'
 import { planetParamsFor } from '../src/systems/world/planetParams'
+
+loadFeatures()
 
 const FIRST_CHARGE_PLANET = 7
 const LAST_PLANET = 10

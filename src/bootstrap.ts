@@ -1,10 +1,11 @@
 /**
- * Composition root: wires shell, run log, checkpoint, store and debug API together once at page
- * start.
+ * Composition root: loads the feature slices, then wires shell, run log, checkpoint, store and
+ * debug API together once at page start.
  * Orchestrates only; each step lives in the module that owns it.
  */
 import { BUILD_COMMIT, GAME_VERSION } from './constants/buildInfo'
 import { createDebugApi } from './debug/debugApi'
+import { loadFeatures } from './features'
 import {
   createFanOutSink,
   createNdjsonSink,
@@ -43,6 +44,7 @@ interface RunFiles {
 
 /** Settles once the session is settled: fresh, resumed from the checkpoint, or a scenario's. */
 export async function startGame(): Promise<void> {
+  loadFeatures()
   const shell = getShell()
   const run = startRunLogging(shell, new Date())
   recordGameStarted(shell)

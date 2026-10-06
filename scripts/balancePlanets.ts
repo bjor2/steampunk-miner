@@ -10,6 +10,7 @@
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { PACING_WORLD_SEEDS } from '../src/constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
+import { loadFeatures } from '../src/features'
 import { formatBandDigTable } from '../src/logging/bandDigReport'
 import {
   campaignPlanetAlerts,
@@ -21,6 +22,8 @@ import { formatSawtoothSeedTable, sawtoothMisses } from '../src/logging/sawtooth
 import { playLoggedSliceOnSeeds } from '../src/logging/sliceRunLog'
 import type { Scenario } from '../src/systems/scenario'
 import { SAWTOOTH_BAND } from '../src/systems/vehicle/bandDig'
+
+loadFeatures()
 
 const LAST_PLANET = 40
 /** Forty planets at about an hour each, with room to see a slow one. */

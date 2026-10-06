@@ -9,11 +9,14 @@
  */
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
+import { loadFeatures } from '../src/features'
 import { deriveDiveSummaries, type DiveSummary } from '../src/logging/diveSummaries'
 import { derivePacingReport } from '../src/logging/pacingReport'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import type { GunPolicy } from '../src/systems/bot/botGuns'
 import type { Scenario } from '../src/systems/scenario'
+
+loadFeatures()
 
 const FIRST_GUN_PLANET = 4
 const LAST_PLANET = 7

@@ -3,9 +3,12 @@
  * reference machine. Measured and logged here, not gated in CI, because CI machines vary.
  * Run with `npm run bench:world`; it prints one JSON line per planet.
  */
+import { loadFeatures } from '../src/features'
 import { generateChunk } from '../src/systems/world/generateChunk'
 import { planetParamsFor, type PlanetParams } from '../src/systems/world/planetParams'
 import { chunkRangeOfDisc } from '../src/systems/world/tileGrid'
+
+loadFeatures()
 
 const BUDGET_P95_MS = 2
 const WORLD_SEED = 83921

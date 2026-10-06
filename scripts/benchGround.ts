@@ -8,6 +8,7 @@
  * command), the re-mesh of one changed chunk (its density halo and tile batch, the most the scene
  * rebuilds per frame), and the collision blocks of the 3 x 3 halo whose chunks changed.
  */
+import { loadFeatures } from '../src/features'
 import { applyCommand } from '../src/systems/authority/applyCommand'
 import { createAuthorityState, type AuthorityState } from '../src/systems/authority/authorityState'
 import type { DomainEvent } from '../src/systems/authority/domainEvent'
@@ -24,6 +25,8 @@ import { FACING, type Facing } from '../src/systems/vehicle/vehiclePose'
 import { groundReaderOf } from '../src/systems/world/groundReader'
 import type { PlanetParams } from '../src/systems/world/planetParams'
 import { currentDensityOfChunk, materialCellsOfChunk } from '../src/systems/world/worldState'
+
+loadFeatures()
 
 const WORLD_SEED = 83921
 const REPORT_TICKS = 12

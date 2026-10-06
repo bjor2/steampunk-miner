@@ -4,8 +4,11 @@
  * commit the files with the bump so the digest change is a visible diff.
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
+import { loadFeatures } from '../src/features'
 import { formatGoldenRun, recordGoldenRun } from '../src/logging/goldenRun'
 import { GOLDEN_SCRIPTS } from '../src/systems/replay/goldenScripts'
+
+loadFeatures()
 
 const GOLDEN_FOLDER = new URL('../tests/golden/', import.meta.url)
 

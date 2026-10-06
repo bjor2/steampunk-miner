@@ -4,6 +4,7 @@
  * generated) must fit the budget. Measured and logged here, not gated in CI, because CI machines vary.
  * Run with `npm run bench:render`; it prints one JSON line per planet.
  */
+import { loadFeatures } from '../src/features'
 import { buildChunkTileBatch } from '../src/systems/render/chunkTileBatch'
 import { chunkDensityHaloOf } from '../src/systems/render/densityHalo'
 import { planetParamsFor, type PlanetParams } from '../src/systems/world/planetParams'
@@ -13,6 +14,8 @@ import {
   EMPTY_WORLD,
   materialCellsOfChunk,
 } from '../src/systems/world/worldState'
+
+loadFeatures()
 
 const BUDGET_P95_MS = 2
 const WORLD_SEED = 83921

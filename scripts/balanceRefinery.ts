@@ -8,6 +8,7 @@
  */
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
+import { loadFeatures } from '../src/features'
 import { derivePacingReport, type PacingReport } from '../src/logging/pacingReport'
 import {
   formatRefineGain,
@@ -17,6 +18,8 @@ import {
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import type { RefineryUse } from '../src/systems/bot/botRefining'
 import type { Scenario } from '../src/systems/scenario'
+
+loadFeatures()
 
 const LAST_PLANET = 8
 /** Eight planets at about an hour each, with room to see a slow one. */

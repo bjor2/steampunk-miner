@@ -8,10 +8,13 @@
  */
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
+import { loadFeatures } from '../src/features'
 import { formatHeatPlanetLines, heatPlanetLines } from '../src/logging/heatReport'
 import { derivePacingReport } from '../src/logging/pacingReport'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import type { Scenario } from '../src/systems/scenario'
+
+loadFeatures()
 
 const FIRST_HEAT_PLANET = 8
 const LAST_PLANET = 10

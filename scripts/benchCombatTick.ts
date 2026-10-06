@@ -6,6 +6,7 @@
  * Six burrowers circle a vehicle whose drill points at open sky, so none is ever pinned and
  * killed: they hunt, wind up, lunge and recoil for the whole run, which is the busiest case.
  */
+import { loadFeatures } from '../src/features'
 import { createScriptedSession } from '../src/systems/authority/scriptedSession'
 import {
   CORRIDOR_MIDDLE,
@@ -18,6 +19,8 @@ import {
 import { hullMax } from '../src/systems/economy/vehicleStats'
 import { toCanonical } from '../src/systems/money'
 import { FACING } from '../src/systems/vehicle/vehiclePose'
+
+loadFeatures()
 
 const BUDGET_P95_MS = 0.5
 /** A hull no burrower can wear down in the run, so the vehicle is never towed away. */
