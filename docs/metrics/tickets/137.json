@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "ticket": 137,
+  "title": "T9: Campaign pace planets 8–10, from: 8 pace row (Systems)",
+  "tier": "hard",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-06T16:29:07Z",
+  "closed": "2026-10-06T19:21:02Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-06T16:29:07.000Z","end":"2026-10-06T16:29:15.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"blocked","start":"2026-10-06T16:29:15.000Z","end":"2026-10-06T18:49:08.000Z","attempt":0,"tier":null,"model":null,"source":"github"},
+    {"category":"idle","start":"2026-10-06T18:49:08.000Z","end":"2026-10-06T18:50:08.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-06T18:50:08.000Z","end":"2026-10-06T18:50:43.030Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-06T18:50:43.030Z","end":"2026-10-06T18:51:33.958Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-06T18:51:33.958Z","end":"2026-10-06T18:53:01.229Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-06T18:53:01.229Z","end":"2026-10-06T18:53:06.652Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-06T18:53:06.652Z","end":"2026-10-06T18:53:16.287Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-06T18:53:16.287Z","end":"2026-10-06T18:53:19.090Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-06T18:53:19.090Z","end":"2026-10-06T18:53:22.102Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-06T18:53:22.102Z","end":"2026-10-06T18:53:24.303Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-06T18:53:24.303Z","end":"2026-10-06T18:53:29.861Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-06T18:53:29.861Z","end":"2026-10-06T18:53:31.665Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-06T18:53:31.665Z","end":"2026-10-06T19:20:56.742Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-06T19:20:56.742Z","end":"2026-10-06T19:21:02.000Z","attempt":1,"tier":"hard","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":8393,"planner_wait":0,"idle":68,"context":61,"planning":2,"developing":0,"testing":105,"gates":1645,"landing":5,"other":35},
+  "lead_time_s": 10315,
+  "cycle_time_s": 1854,
+  "claimed": "2026-10-06T18:50:08.000Z",
+  "claimed_to_done_s": 1854,
+  "backfilled": false
+}
