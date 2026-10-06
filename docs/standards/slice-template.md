@@ -74,7 +74,7 @@ export const slice: SliceDefinition = {
 | `blastEffect(effect)` | `blastEffects.ts` | Runs after the kernel's blast, in id order. |
 | `generationHook(hook)` | `generationHooks.ts` | Integer-only folds; the hook's seed is `subSeedForHook(params, hook.id)`. Adding one bumps `GENERATOR_VERSION`. |
 | `oreLook(provider)` | `oreLook.ts` | One provider (`ore-visuals`). |
-| `saveSection(section)` | `saveSections.ts` | Its own `version`, matched exactly on restore. |
+| `saveSection(section)` | `saveSections.ts` | Its own `version`, matched exactly on restore. Read it with `readSection`, write it with `withSection`. A value at `initial` stays out of the state, so a section changes no digest until it is written. |
 | `discovery(provider)` | `discovery.ts` | One provider (`codex`). |
 | `loadoutAcceptance(rule)`, `attachUse(use)` | `vehicleLoadout.ts`, `vehicleAttach.ts` | Item slices only. |
 | `hudPanel(panel)` | `src/ui/registries/hudPanels.ts` | The panel reads the slice's own store and takes no props. |
@@ -88,7 +88,7 @@ Registries are read only after `loadFeatures()` has sealed them, so no slice mod
 ## A real slice also adds
 
 - `<slice>.economy.json`
-- `store/`, fed by `listenForDomainEvents`, with a `reset<Slice>Store()` for `beforeEach`
+- `store/`, fed by `listenForDomainEvents` (`src/store/domainEventBroadcast.ts`), with a `reset<Slice>Store()` for `beforeEach`
 - `ui/` with CSS Modules
 - `icons/`
 - commands, domain events and rejection reasons, as below
