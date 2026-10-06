@@ -95,6 +95,35 @@ jobs:
       reason: ${{ needs.verify.outputs.reason }}
       timeout-minutes: 10
 
+  # Every push and pull request: the four CPU benches with --log (#124, logging strategy section 5).
+  # Report only: CI machines vary, so no budget gates here. A malformed benchmark_result line fails
+  # bench:summary. The bench run folders upload as one artifact named for the workflow, the commit
+  # and the GitHub run, and their table goes to the job summary.
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run bench:world -- --log
+      - run: npm run bench:render -- --log
+      - run: npm run bench:ground -- --log
+      - run: npm run bench:combat -- --log
+      - run: npm run bench:summary
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: session-ci-${{ github.sha }}-${{ github.run_id }}
+          path: logs/
+          if-no-files-found: warn
+          overwrite: true
+
   # Every pull request: the same golden digests on Windows as on Linux (#3, #5 and #11 acceptance),
   # including the second slice's casing, collapse, bay and artefact runs (S11, #65).
   determinism:
