@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { mapFilesOf, placeholderDriftProblems, sidecarProblems } from './partsSidecar'
+import {
+  attachPointOf,
+  mapFilesOf,
+  placeholderDriftProblems,
+  sidecarProblems,
+} from './partsSidecar'
 import { vehicleSidecar, WHEEL_PART } from './sidecarFixtures'
 
 const wheel = WHEEL_PART
@@ -133,6 +138,32 @@ describe('parts sidecar: replacing a placeholder', () => {
     const dark = { ...exported, maps: { ...exported.maps, emissive: false as const } }
     expect(placeholderDriftProblems(placeholder, dark)).toEqual([
       "vehicle.parts.json: maps.emissive is false, its placeholder's is vehicle.emissive.ktx2",
+    ])
+  })
+})
+
+describe('parts sidecar: attach points', () => {
+  const chute = { id: 'sell.chute', atM: [1.5, 0.4] as const, z: 2 }
+
+  it('takes an optional attach array of dotted ids in the asset frame (#162 K5 shape)', () => {
+    const sidecar = { ...vehicleSidecar(), attach: [chute, { ...chute, id: 'hull.roof.aft' }] }
+    expect(sidecarProblems('vehicle', sidecar)).toEqual([])
+    expect(attachPointOf(sidecar, 'sell.chute')).toEqual(chute)
+    expect(attachPointOf(sidecar, 'sell.stack')).toBeNull()
+    expect(attachPointOf(vehicleSidecar(), 'sell.chute')).toBeNull()
+  })
+
+  it('refuses an attach id without a dot, a repeated id, a non-finite point or a fractional z', () => {
+    const attach = [
+      { ...chute, id: 'chute' },
+      chute,
+      { ...chute, atM: [Number.NaN, 0] as const, z: 0.5 },
+    ]
+    expect(sidecarProblems('vehicle', { ...vehicleSidecar(), attach })).toEqual([
+      'vehicle.parts.json: attach "sell.chute" is listed twice',
+      'vehicle.parts.json: attach "chute" is not a dotted attach id',
+      'vehicle.parts.json: attach "sell.chute" atM must be two numbers',
+      'vehicle.parts.json: attach "sell.chute" z must be a whole number',
     ])
   })
 })

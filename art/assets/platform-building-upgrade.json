@@ -1,0 +1,11 @@
+{
+  "id": "platform-building-upgrade",
+  "source": "blender",
+  "form": "parts",
+  "status": "placeholder",
+  "color": "#4a4a4e",
+  "partColors": {
+    "workshop-gantry": "#b08a3c",
+    "workshop-turntable": "#2a2724"
+  }
+}

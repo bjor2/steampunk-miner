@@ -12,7 +12,8 @@ every part with Cycles onto its own rectangle of the atlas, viewed along +Y (Ble
 base colour with the part mask in alpha, a tangent-space normal map (OpenGL, +Y up) and emission.
 The PNG bakes go to art/build/<id>/ (gitignored) for scripts/art/encode.sh; the parts.json sidecar
 goes to public/assets/<category>/<id>/. The .blend is never saved, and an unchanged .blend writes a
-byte-identical sidecar (#52 acceptance 5).
+byte-identical sidecar (#52 acceptance 5). An empty named `attach.<id>` is an attach point (#162
+K5, the shop buildings of #170): its X and Z go into the sidecar's `attach` array, never baked.
 """
 
 import hashlib
@@ -29,6 +30,7 @@ import bake_tile  # noqa: E402
 import render_backdrop  # noqa: E402
 
 TIER_COLLECTION_PREFIX = 'tier-'
+ATTACH_PREFIX = 'attach.'
 # A part's quad sits this far behind it, and bake rays start this far in front (metres).
 BAKE_CLEARANCE = 0.01
 FLAT_NORMAL = (0.5, 0.5, 1.0, 1.0)
@@ -45,7 +47,8 @@ def main():
 
 def export_parts(asset_id, rules):
     parts = part_layouts_of(asset_id, rules, part_objects())
-    sidecar = asset_layout.build_sidecar(asset_id, parts, rules, source_of(), has_emissive=True)
+    sidecar = asset_layout.build_sidecar(asset_id, parts, rules, source_of(), has_emissive=True,
+                                         attach=attach_points_of(attach_empties()))
     has_emissive = bake_atlas(asset_id, sidecar, rules)
     if not has_emissive:
         sidecar['maps']['emissive'] = False
@@ -128,6 +131,23 @@ def part_objects():
 def is_part_object(obj):
     staged = any(collection.name == render_backdrop.STAGING_COLLECTION for collection in obj.users_collection)
     return obj.type == 'MESH' and not staged
+
+
+def attach_empties():
+    """An empty named `attach.<id>` marks a named point of the asset's frame (#162 K5)."""
+    return [obj for obj in bpy.context.scene.objects if obj.type == 'EMPTY' and obj.name.startswith(ATTACH_PREFIX)]
+
+
+def attach_points_of(empties):
+    """The sidecar's `attach` array, or None when the file marks no point, so older assets are unchanged."""
+    if not empties:
+        return None
+    return [attach_point_of(obj) for obj in empties]
+
+
+def attach_point_of(obj):
+    origin = obj.matrix_world.translation
+    return {'id': obj.name[len(ATTACH_PREFIX):], 'atM': [origin.x, origin.z], 'z': int(obj['z']) if 'z' in obj else 0}
 
 
 # --- layout ---------------------------------------------------------------------------------------

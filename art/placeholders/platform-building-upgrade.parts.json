@@ -1,0 +1,67 @@
+{
+  "assetId": "platform-building-upgrade",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-building-upgrade/platform-building-upgrade.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [4096, 2048],
+  "maps": {
+    "albedo": "platform-building-upgrade.albedo.ktx2",
+    "normal": "platform-building-upgrade.normal.ktx2",
+    "emissive": "platform-building-upgrade.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "platform-building-upgrade",
+      "tier": 1,
+      "rect": [8, 8, 2560, 1332],
+      "sizeM": [10.0, 5.2],
+      "pivotM": [5.0, 0.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "workshop-gantry",
+      "tier": 1,
+      "rect": [2584, 8, 1152, 359],
+      "sizeM": [4.5, 1.4],
+      "pivotM": [0.4, 0.4],
+      "atM": [-2.0, 4.6],
+      "z": 1
+    },
+    {
+      "id": "workshop-turntable",
+      "tier": 1,
+      "rect": [8, 1356, 820, 77],
+      "sizeM": [3.2, 0.3],
+      "pivotM": [1.6, 0.2],
+      "atM": [0.0, 0.0],
+      "z": 1
+    }
+  ],
+  "attach": [
+    {
+      "id": "workshop.gantry",
+      "atM": [-2.0, 4.6],
+      "z": 2
+    },
+    {
+      "id": "workshop.platform",
+      "atM": [0.0, 0.0],
+      "z": 1
+    },
+    {
+      "id": "workshop.showcase_cam",
+      "atM": [0.0, 1.8],
+      "z": 0
+    },
+    {
+      "id": "workshop.stack",
+      "atM": [3.6, 5.2],
+      "z": -1
+    }
+  ]
+}

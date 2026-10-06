@@ -1,0 +1,53 @@
+{
+  "assetId": "platform-building-sell",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-building-sell/platform-building-sell.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [2048, 4096],
+  "maps": {
+    "albedo": "platform-building-sell.albedo.ktx2",
+    "normal": "platform-building-sell.normal.ktx2",
+    "emissive": "platform-building-sell.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "platform-building-sell",
+      "tier": 1,
+      "rect": [8, 8, 1536, 2432],
+      "sizeM": [6.0, 9.5],
+      "pivotM": [3.0, 0.0],
+      "atM": [0.0, 0.0],
+      "z": 0
+    },
+    {
+      "id": "sell-ticker",
+      "tier": 1,
+      "rect": [8, 2456, 564, 154],
+      "sizeM": [2.2, 0.6],
+      "pivotM": [1.1, 0.3],
+      "atM": [0.0, 5.6],
+      "z": 1
+    }
+  ],
+  "attach": [
+    {
+      "id": "sell.chute",
+      "atM": [1.6, 0.6],
+      "z": 2
+    },
+    {
+      "id": "sell.stack",
+      "atM": [-2.1, 9.5],
+      "z": -1
+    },
+    {
+      "id": "sell.ticker",
+      "atM": [0.0, 5.6],
+      "z": 2
+    }
+  ]
+}

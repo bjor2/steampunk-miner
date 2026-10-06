@@ -21,7 +21,8 @@ def repack(asset_id, rules):
         raise SystemExit('no placeholder at ' + asset_layout.placeholder_path_of(asset_id))
     has_emissive = placeholder.get('maps', {}).get('emissive', False) is not False
     source = placeholder.get('source') or placeholder_source_of(asset_id)
-    sidecar = asset_layout.build_sidecar(asset_id, placeholder['parts'], rules, source, has_emissive)
+    sidecar = asset_layout.build_sidecar(asset_id, placeholder['parts'], rules, source, has_emissive,
+                                         attach=placeholder.get('attach'))
     asset_layout.write_sidecar(asset_layout.placeholder_path_of(asset_id), sidecar)
 
 

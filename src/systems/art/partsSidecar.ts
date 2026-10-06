@@ -5,7 +5,9 @@
  *
  * Two fields beyond the decision's example: `atM`, where the part's pivot sits in the asset's own
  * frame (the Blender object's location, X right and Z up), without which no part could be placed;
- * and `atlasPx`, the atlas size the rects must fit.
+ * and `atlasPx`, the atlas size the rects must fit. An optional `attach` array (#162 "vehicle
+ * attach", K5; the shop buildings of #170) lists named points in the same frame, from the
+ * `attach.<id>` empties of the `.blend`; it is checked only when present, and the schema stays 1.
  */
 import {
   ART_RULES,
@@ -31,6 +33,15 @@ export interface SidecarPart {
   z: number
 }
 
+/** A named point of the asset's frame that code draws something at; never a part of its own. */
+export interface AttachPoint {
+  /** Dotted, like `sell.chute` or `hull.roof.aft`. */
+  id: string
+  atM: Pair
+  /** The draw order of what hangs there, relative to the parts. */
+  z: number
+}
+
 export interface PartsSidecar {
   assetId: string
   schema: number
@@ -41,6 +52,7 @@ export interface PartsSidecar {
   /** `emissive` is false when nothing on the asset glows (#52 "Formats"). */
   maps: Record<Exclude<MapKind, 'emissive'>, string> & { emissive: string | false }
   parts: readonly SidecarPart[]
+  attach?: readonly AttachPoint[]
 }
 
 /** Why a sidecar is not a valid schema-1 file for `assetId` (#52 acceptance 3); empty when it is. */
@@ -49,7 +61,13 @@ export function sidecarProblems(assetId: string, sidecar: PartsSidecar): string[
     ...headerProblems(assetId, sidecar),
     ...duplicatePartProblems(sidecar.parts),
     ...sidecar.parts.flatMap((part) => partProblems(assetId, sidecar.atlasPx, part)),
+    ...attachProblems(sidecar.attach ?? []),
   ].map((problem) => `${assetId}.parts.json: ${problem}`)
+}
+
+/** The attach point of that id, or null when the sidecar names none. */
+export function attachPointOf(sidecar: PartsSidecar, attachId: string): AttachPoint | null {
+  return sidecar.attach?.find((point) => point.id === attachId) ?? null
 }
 
 /** The map files the sidecar names, which a final asset must ship beside it. */
@@ -99,6 +117,24 @@ function partProblems(assetId: string, atlas: Pair, part: SidecarPart): string[]
   if (!isFinitePair(part.atM)) problems.push('atM must be two numbers')
   if (!Number.isSafeInteger(part.z)) problems.push('z must be a whole number')
   return problems.map((problem) => `part "${part.id}" ${problem}`)
+}
+
+const ATTACH_ID = /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$/
+
+function attachProblems(points: readonly AttachPoint[]): string[] {
+  const ids = points.map((point) => point.id)
+  return [
+    ...ids.filter((id, at) => ids.indexOf(id) !== at).map((id) => `attach "${id}" is listed twice`),
+    ...points.flatMap(attachPointProblems),
+  ]
+}
+
+function attachPointProblems(point: AttachPoint): string[] {
+  const problems: string[] = []
+  if (!ATTACH_ID.test(point.id)) problems.push('is not a dotted attach id')
+  if (!isFinitePair(point.atM)) problems.push('atM must be two numbers')
+  if (!Number.isSafeInteger(point.z)) problems.push('z must be a whole number')
+  return problems.map((problem) => `attach "${point.id}" ${problem}`)
 }
 
 function isTierOfPart(part: SidecarPart): boolean {

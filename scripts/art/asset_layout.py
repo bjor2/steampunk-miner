@@ -142,10 +142,12 @@ def next_power_of_two(value):
     return side
 
 
-def build_sidecar(asset_id, parts, rules, source, has_emissive):
+def build_sidecar(asset_id, parts, rules, source, has_emissive, attach=None):
     """
     `parts` are dicts with id, tier, sizeM, pivotM, atM and z, in metres. Parts come out sorted by
     id and every number rounded, so an unchanged scene writes a byte-identical file (#52 acc. 5).
+    `attach`, when given, are dicts with id, atM and z: the asset's named points (#162 K5, the
+    shop buildings of #170), written sorted by id after the parts.
     """
     px_per_metre = rules['pxPerMetre'][category_of(asset_id)]
     sizes = {part['id']: tuple(px_size_of(m, px_per_metre) for m in part['sizeM']) for part in parts}
@@ -153,7 +155,7 @@ def build_sidecar(asset_id, parts, rules, source, has_emissive):
     if packed is None:
         raise ValueError('the parts of "%s" do not fit a %d px atlas' % (asset_id, rules['maxAtlasPx']))
     rects, atlas = packed
-    return {
+    sidecar = {
         'assetId': asset_id,
         'schema': SIDECAR_SCHEMA,
         'source': source,
@@ -166,6 +168,13 @@ def build_sidecar(asset_id, parts, rules, source, has_emissive):
         },
         'parts': [sidecar_part_of(part, rects[part['id']]) for part in sorted(parts, key=lambda p: p['id'])],
     }
+    if attach is not None:
+        sidecar['attach'] = [attach_point_of(point) for point in sorted(attach, key=lambda p: p['id'])]
+    return sidecar
+
+
+def attach_point_of(point):
+    return {'id': point['id'], 'atM': [round_metres(v) for v in point['atM']], 'z': point['z']}
 
 
 def sidecar_part_of(part, rect):

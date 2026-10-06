@@ -1,0 +1,10 @@
+{
+  "id": "platform-building-sell",
+  "source": "blender",
+  "form": "parts",
+  "status": "placeholder",
+  "color": "#8a6a3a",
+  "partColors": {
+    "sell-ticker": "#1b1613"
+  }
+}

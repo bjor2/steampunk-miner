@@ -12,6 +12,7 @@ import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 import { kebabOf } from './artNaming'
 import { iconFileIds } from './icons/iconSet'
 import { BLASTING_CHARGES_ROW_ID, HEAT_LAVA_ROW_ID, REFRACTORY_LINING_TYPE } from './moduleRowIds'
+import { shopBuildingAssetIds, shopBuildingMovingPartIds } from './shopBuildingArt'
 
 export const ASSET_CATEGORIES = [
   'vehicle',
@@ -73,6 +74,7 @@ export function blenderAssetIds(): string[] {
     'platform-hub',
     ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}`),
     ...PLATFORM_BAY_IDS.map((bay) => `platform-bay-${bay}-backdrop`),
+    ...shopBuildingAssetIds(),
     ...enemyArtKinds().map((kind) => `enemy-${kebabOf(kind)}`),
     'prop-artefact-cache',
     ...numbered('ground-band', BAND_COUNT),
@@ -93,6 +95,14 @@ export function blenderAssetIds(): string[] {
 export function vectorIconIds(): string[] {
   return iconFileIds()
 }
+
+export {
+  SHOP_BUILDING_ATTACH_IDS,
+  SHOP_BUILDING_BAY_IDS,
+  shopBuildingAssetIdOf,
+  shopBuildingMovingPartIdsOf,
+  shopBuildingShellPartIdOf,
+} from './shopBuildingArt'
 
 export {
   BLASTING_CHARGES_ICON_ID,
@@ -175,8 +185,8 @@ function numbered(prefix: string, count: number): string[] {
 /**
  * Part ids outside the vehicle: each single-part asset's own id, the hub's two visual states
  * (#8 `outpost`, `core_drive`), which are its collections in Blender (#52), the refinery
- * bay's three looks drawn over its frame (#105), the charge rack's slots and the planted
- * charge's fuse lamp.
+ * bay's three looks drawn over its frame (#105), the charge rack's slots, the planted
+ * charge's fuse lamp and the shop buildings' moving parts (#170).
  */
 export function registryPartIds(): string[] {
   return [
@@ -185,6 +195,7 @@ export function registryPartIds(): string[] {
     ...REFINERY_BAY_LOOKS.map(refineryLookPartIdOf),
     ...chargeRackPartIds(),
     FUSE_LAMP_PART_ID,
+    ...shopBuildingMovingPartIds(),
   ]
 }
 
