@@ -1,0 +1,41 @@
+{
+  "pxPerMetre": 256,
+  "tiles": [
+    {
+      "grade": 1,
+      "oreLuma": 0.1299,
+      "rockLuma": 0.1488,
+      "orePeakLuma": 0.1729,
+      "contrast": 1.1
+    },
+    {
+      "grade": 2,
+      "oreLuma": 0.1344,
+      "rockLuma": 0.1162,
+      "orePeakLuma": 0.4013,
+      "contrast": 1.11
+    },
+    {
+      "grade": 3,
+      "oreLuma": 0.1975,
+      "rockLuma": 0.1318,
+      "orePeakLuma": 1.0,
+      "contrast": 1.36
+    },
+    {
+      "grade": 4,
+      "oreLuma": 0.2191,
+      "rockLuma": 0.1113,
+      "orePeakLuma": 1.0,
+      "contrast": 1.67
+    },
+    {
+      "grade": 5,
+      "oreLuma": 0.3053,
+      "rockLuma": 0.0458,
+      "orePeakLuma": 1.0,
+      "contrast": 3.71
+    }
+  ],
+  "oreLumaRisesWithGrade": true
+}

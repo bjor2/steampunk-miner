@@ -148,14 +148,14 @@ def pulsing(material):
 
 def build_tesla_coil(x, rng):
     brass = brass_material()
-    coil = materials.surface_material('voltaic-coil', BRASS, metallic=1.0, roughness=0.55)
+    coil = materials.surface_material('voltaic-coil', BRASS, metallic=0.7, roughness=0.7)
     shapes.assign(shapes.add_torus('coil', 0.34, 0.045, (x, -0.03, 0.0), rotation=(math.pi / 2, 0, 0)), coil)
     shapes.assign(shapes.add_torus('coil-winding', 0.34, 0.02, (x, -0.085, 0.0), rotation=(math.pi / 2, 0, 0)), coil)
     tips = [add_electrode('electrode-%d' % i, x, px, pz, brass) for i, (px, pz) in enumerate(shapes.ring_positions(4, 0.2, math.pi / 4))]
     core = shapes.add_icosphere('plasma-core', 0.09, (x, -0.1, 0.0), subdivisions=3)
     shapes.assign(core, pulsing(materials.glow_material('voltaic-plasma', PLASMA, 10.0)))
     add_coil_arcs(x, tips, rng)
-    stage.add_point_light('coil-light', (x, -0.25, 0.0), ARC, 25.0)
+    stage.add_point_light('coil-light', (x, -0.25, 0.0), ARC, 12.0)
 
 
 def add_electrode(name, x, px, pz, material):
