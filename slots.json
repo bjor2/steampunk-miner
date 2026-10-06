@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-06T23:47:44+02:00",
+  "updated_at": "2026-10-07T00:02:31+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -82,10 +82,10 @@
         {
           "slot": "C7",
           "state": "busy",
-          "ticket": 193,
+          "ticket": 188,
           "grok_slot": 7,
           "kind": "dev",
-          "since": "2026-10-06T22:50:00+02:00"
+          "since": "2026-10-07T00:02:00+02:00"
         },
         {
           "slot": "C8",
@@ -104,7 +104,7 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "grok": [
@@ -153,8 +153,8 @@
     {
       "slot": 7,
       "state": "dev",
-      "ticket": 193,
-      "since": "2026-10-06T22:50:00+02:00",
+      "ticket": 188,
+      "since": "2026-10-07T00:02:00+02:00",
       "claude_slot": 7
     },
     {
@@ -244,9 +244,9 @@
     {
       "slot": 7,
       "state": "busy",
-      "ticket": 193,
+      "ticket": 188,
       "grok_slot": 7,
-      "since": "2026-10-06T22:50:00+02:00",
+      "since": "2026-10-07T00:02:00+02:00",
       "account": 2
     },
     {
@@ -259,10 +259,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-06 23:47 CEST",
-    "mode": "pass",
-    "triggers": "#194",
-    "started": "#194->C1/A1",
+    "at": "2026-10-07 00:02 CEST",
+    "mode": "refill-dev",
+    "triggers": "#193",
+    "started": "#188->C7/A2",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
