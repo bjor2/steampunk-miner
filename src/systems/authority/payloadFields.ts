@@ -16,6 +16,12 @@ export type FieldKind =
   | 'tierOrAll'
   /** One of the platform's bays, `"sell"` or `"upgrade"` (#37). */
   | 'bay'
+  /** A string, or null for "none": `equipItem` empties a slot with a null item (#162). */
+  | 'textOrNull'
+  /** An object of strings, as `debug.setVehicleLoadout` names each slot's item (K4). */
+  | 'textMap'
+  /** A list of strings, as `debug.setVehicleLoadout` names the items owned with no slot (K4). */
+  | 'textList'
 
 export type PayloadFields = Readonly<Record<string, FieldKind>>
 
@@ -45,12 +51,26 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     text: { isValid: (value) => typeof value === 'string', expected: 'a string' },
     tierOrAll: { isValid: isTierOrAll, expected: 'an ore tier >= 1 or "all"' },
     bay: { isValid: isBayId, expected: '"sell", "upgrade" or "refinery"' },
+    textOrNull: {
+      isValid: (value) => value === null || typeof value === 'string',
+      expected: 'a string or null',
+    },
+    textMap: { isValid: isTextMap, expected: 'an object of strings' },
+    textList: { isValid: isTextList, expected: 'a list of strings' },
   }
 
 function fieldKindProblems(name: string, value: unknown, kind: FieldKind): string[] {
   const check = FIELD_CHECKS[kind]
   if (check.isValid(value)) return []
   return [`${name} must be ${check.expected}, got ${JSON.stringify(value) ?? 'nothing'}`]
+}
+
+function isTextMap(value: unknown): boolean {
+  return isJsonObject(value) && Object.values(value).every((entry) => typeof entry === 'string')
+}
+
+function isTextList(value: unknown): boolean {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
 }
 
 function isTierOrAll(value: unknown): boolean {

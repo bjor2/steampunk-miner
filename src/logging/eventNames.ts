@@ -218,6 +218,20 @@ export const RUN_EVENT_REGISTRY = {
     payload: { type: 'text', price: 'money' },
   },
   lining_type_selected: { group: 'platform', level: 'core', payload: { type: 'text' } },
+  // #162 (K4): one loadout slot changed at the platform, and an `equipItem` that changed nothing.
+  // The names are the spec's; `none` stands for an empty slot, as in `vehicle_destroyed`.
+  equip_item: { group: 'platform', level: 'core', payload: { slot: 'text', itemId: 'text' } },
+  equip_refused: {
+    group: 'platform',
+    level: 'core',
+    payload: {
+      slot: 'text',
+      itemId: 'text',
+      reason: {
+        oneOf: ['not_owned', 'slot_locked', 'exclusive_taken', 'not_docked', 'wrong_slot'],
+      },
+    },
+  },
   // #107: the auto_guns turret bolted on at level 1, then each gun level bought.
   gun_mounted: { group: 'platform', level: 'core', payload: { level: 'integer', price: 'money' } },
   gun_upgraded: {

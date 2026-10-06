@@ -322,4 +322,27 @@ describe('domain event log', () => {
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
+
+  it('records equipping and its refusals as registered lines, an empty slot as none (K4)', () => {
+    recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, [
+      { ...commandStamp, type: 'ItemEquipped', slot: 'powerup.1', itemId: null },
+      { ...commandStamp, type: 'ItemEquipped', slot: 'powerup.2', itemId: 'sensing.echo_sounder' },
+      {
+        ...commandStamp,
+        type: 'EquipRefused',
+        slot: 'rig.1',
+        itemId: 'rig.resonance',
+        reason: 'wrong_slot',
+      },
+    ])
+    expect(sink.events.map(({ event, data }) => ({ event, data }))).toEqual([
+      { event: 'equip_item', data: { slot: 'powerup.1', itemId: 'none' } },
+      { event: 'equip_item', data: { slot: 'powerup.2', itemId: 'sensing.echo_sounder' } },
+      {
+        event: 'equip_refused',
+        data: { slot: 'rig.1', itemId: 'rig.resonance', reason: 'wrong_slot' },
+      },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
 })

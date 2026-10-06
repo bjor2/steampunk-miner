@@ -1,7 +1,7 @@
 /**
  * The vehicle and world parts of the session snapshot (#11 section 5): the same plain JSON as the
  * state, with the hull BigStat, the lining bill and the visit's lining payment as canonical
- * strings. Reading checks the shape so a malformed snapshot is refused with listed problems before
+ * strings, and the loadout as its versioned `loadout` section (K4). Reading checks the shape so a malformed snapshot is refused with listed problems before
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
@@ -15,12 +15,22 @@ import { isCasingValue, type ChunkDelta } from '../world/chunkDelta'
 import { CHUNK_SAMPLES } from '../world/sampleGrid'
 import { CHUNK_SIZE } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
+import {
+  loadoutOfPortable,
+  portableLoadoutOf,
+  portableLoadoutProblems,
+  type PortableSection,
+} from './loadoutSection'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 
-export type PortableVehicle = Omit<VehicleState, 'hull' | 'liningBill' | 'liningPaidThisVisit'> & {
+export type PortableVehicle = Omit<
+  VehicleState,
+  'hull' | 'liningBill' | 'liningPaidThisVisit' | 'loadout'
+> & {
   hull: string
   liningBill: string
   liningPaidThisVisit: string | null
+  loadout: PortableSection
 }
 
 export interface PortableWorld {
@@ -41,6 +51,7 @@ export function portableVehicleOf(vehicle: VehicleState): PortableVehicle {
     hull: toCanonical(vehicle.hull),
     liningBill: toCanonical(vehicle.liningBill),
     liningPaidThisVisit: canonicalOrNull(vehicle.liningPaidThisVisit),
+    loadout: portableLoadoutOf(vehicle.loadout),
   }
 }
 
@@ -51,6 +62,7 @@ export function vehicleOfPortable(vehicle: PortableVehicle): VehicleState {
     liningBill: fromCanonical(vehicle.liningBill),
     liningPaidThisVisit:
       vehicle.liningPaidThisVisit === null ? null : fromCanonical(vehicle.liningPaidThisVisit),
+    loadout: loadoutOfPortable(vehicle.loadout),
   }
 }
 
@@ -91,6 +103,7 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableLining(vehicle.lining)
       ? []
       : [`${path}.lining must hold an owned active lining type and the owned types`]),
+    ...portableLoadoutProblems(vehicle.loadout, `${path}.loadout`),
     ...(isNonNegativeMoneyText(vehicle.hull) ? [] : [`${path}.hull must be a decimal string`]),
     ...(isNonNegativeMoneyText(vehicle.liningBill)
       ? []

@@ -39,6 +39,7 @@ import { DEBUG_COMMAND_RULES } from './debugCommandRules'
 import { DOCK_COMMAND_RULES } from './dockRules'
 import { GUN_RULES } from './gunRules'
 import { LINING_RULES } from './liningRules'
+import { LOADOUT_RULES } from './loadoutRules'
 import type { DomainEvent, DomainEventBody } from './domainEvent'
 import { isJsonObject, isWholeNumber, payloadProblems } from './payloadFields'
 import { PLATFORM_SERVICE_RULES } from './platformServices'
@@ -90,6 +91,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...REFINERY_RULES,
   ...REFINERY_COLLECTION_RULES,
   ...CHARGE_RULES,
+  ...LOADOUT_RULES,
 }
 
 /** The kernel's rule first, so a kernel command never reads the slice registry. */

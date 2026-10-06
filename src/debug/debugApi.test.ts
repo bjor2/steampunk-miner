@@ -639,3 +639,43 @@ describe('debug api: features', () => {
     expect(sink.commands).toEqual([])
   })
 })
+
+describe('debug api: loadout (K4)', () => {
+  const drillGear: SliceDefinition = {
+    id: 'drill-gear',
+    register: (r) =>
+      r.content('vehicle-item', [
+        {
+          id: 'drill-gear.twin_bit',
+          iconId: 'item-gear-twin-bit',
+          slots: ['drill.head'],
+          attach: 'drill.head',
+        },
+      ]),
+  }
+
+  it('replaces the vehicle loadout as a logged debug command', () => {
+    const answer = withRegistrations([drillGear], () =>
+      createDebugApi().setVehicleLoadout({ 'drill.head': 'drill-gear.twin_bit' }),
+    )
+    expect(answer).toEqual({ ok: true })
+    expect(readLocalVehicle().loadout).toMatchObject({
+      slots: { 'drill.head': 'drill-gear.twin_bit', 'powerup.1': null },
+      owned: ['drill-gear.twin_bit'],
+    })
+    expect(sink.commands.map((command) => command.type)).toEqual(['debug.setVehicleLoadout'])
+    expect(sink.events.map((event) => event.event)).toEqual(['debug_command_applied'])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
+  it('refuses an item in a slot it does not go in, applying nothing', () => {
+    const answer = withRegistrations([drillGear], () =>
+      createDebugApi().setVehicleLoadout({ 'powerup.1': 'drill-gear.twin_bit' }),
+    )
+    expect(answer).toEqual({
+      ok: false,
+      problems: ['"drill-gear.twin_bit" does not go in powerup.1'],
+    })
+    expect(sink.commands).toEqual([])
+  })
+})

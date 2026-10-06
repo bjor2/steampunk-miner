@@ -56,6 +56,8 @@ import { facilityLevelProblems } from '../systems/authority/platformState'
 import type { ArtefactReport } from '../systems/authority/heldArtefact'
 import { setArtefactCommand } from '../systems/artefacts/artefactCommands'
 import { readArtefactReport } from '../store/artefactActions'
+import { setVehicleLoadout } from '../store/loadoutActions'
+import { setVehicleLoadoutCommand } from '../systems/authority/loadoutCommands'
 import { readSnapshot, type SessionSnapshot } from '../systems/authority/sessionSnapshot'
 import { fastForwardProblems, type ScriptedCommand } from '../systems/fastForward'
 import { validateScenario, type Scenario } from '../systems/scenario'
@@ -199,6 +201,13 @@ export interface DebugApi {
   setLiningType(liningType: string): DebugResult
   /** The heat gauge at `heat` whole points, 0 to its max; only 0 off the heat planets. */
   setHeat(heat: number): DebugResult
+  // loadout (#162, K4): a `debug.*` command
+  /**
+   * Replaces the vehicle's loadout: `slots` maps a slot (`powerup.1`-`5`, `drill.head`, `.flank`,
+   * `.collar`) to the item it holds, every other slot empty; the vehicle owns exactly those items
+   * and `owned` (extractors, cradles). No dock, price or slot lock.
+   */
+  setVehicleLoadout(slots: Readonly<Record<string, string>>, owned?: readonly string[]): DebugResult
   // collapse (#43): the setter is a `debug.*` command, the read is not logged
   /** Starts the collapse of block `cx,cy#index` now: the full 60-tick warning, then the refill. */
   forceCollapse(block: string): DebugResult
@@ -217,7 +226,6 @@ export interface DebugApi {
   teleportToCore(): void
   giveResource(resourceTier: number, amount: number): void
   unlock(featureId: string): void
-  setVehicleLoadout(loadoutId: string): void
 }
 
 function notImplemented(command: string): () => never {
@@ -401,6 +409,10 @@ export function createDebugApi(): DebugApi {
       ),
     setHeat: (heat) =>
       runUnlessRefused(vehicleDebugProblems(setHeatCommand(heat)), () => game().setHeat(heat)),
+    setVehicleLoadout: (slots, owned = []) =>
+      runUnlessRefused(vehicleDebugProblems(setVehicleLoadoutCommand(slots, owned)), () =>
+        setVehicleLoadout(game().playerId, slots, owned),
+      ),
     forceCollapse: (block) =>
       runUnlessRefused(vehicleDebugProblems(forceCollapseCommand(block)), () =>
         game().forceCollapse(block),
@@ -413,6 +425,5 @@ export function createDebugApi(): DebugApi {
     teleportToCore: notImplemented('teleportToCore'),
     giveResource: notImplemented('giveResource'),
     unlock: notImplemented('unlock'),
-    setVehicleLoadout: notImplemented('setVehicleLoadout'),
   }
 }

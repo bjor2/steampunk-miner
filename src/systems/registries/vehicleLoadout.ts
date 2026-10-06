@@ -72,6 +72,10 @@ export function acceptedSlotsOf(itemId: string): readonly LoadoutSlotId[] {
   return LOADOUT_SLOT_IDS.filter((slot) => accepted.has(slot))
 }
 
+export function isVehicleItemId(itemId: string): boolean {
+  return vehicleItemOf(itemId) !== undefined
+}
+
 /** The slot a cradle item opens once owned, or null for every other item. */
 export function slotOpenedBy(itemId: string): LoadoutSlotId | null {
   return vehicleItemOf(itemId)?.opensSlot ?? null

@@ -111,6 +111,11 @@ export interface KernelCommandPayloads {
   restockCharges: Record<string, never>
   /** The Upgrade bay adds one slot to the rack (#109). */
   buyChargeRackSlot: Record<string, never>
+  /**
+   * The loadout (#162 TD lock, K4): puts an owned item in a slot that accepts it, or empties the
+   * slot with a null item; docked at the platform only. A refusal is answered as `EquipRefused`.
+   */
+  equipItem: { slot: string; itemId: string | null }
   'debug.setUpgrade': { upgradeId: string; level: number }
   /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
   'debug.setEnergy': { energy: string }
@@ -153,6 +158,12 @@ export interface KernelCommandPayloads {
   'debug.setCasingGrade': { grade: number }
   /** Owns and selects a lining type, with no unlock or price (#113 scenarios). */
   'debug.setLiningType': { liningType: string }
+  /**
+   * A scenario's loadout (K4), replacing the vehicle's: each named slot holds its item, every slot
+   * not named is empty, and the vehicle owns exactly those items and `owned` (extractors, cradles,
+   * spares), with no dock, price or slot lock.
+   */
+  'debug.setVehicleLoadout': { slots: Readonly<Record<string, string>>; owned: readonly string[] }
   /** Sets the heat gauge to whole gauge points, 0 to its max, settled at the command's tick (#113). */
   'debug.setHeat': { heat: number }
   /** One ring of casing lining of `grade` round `(x, y)` mm, in the active lining type (#41, #113). */

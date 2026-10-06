@@ -17,6 +17,7 @@ import { EMPTY_CASING_TRAIL, type CasingTrail } from './casingTrail'
 import { NO_CHARGES, type VehicleCharges } from './vehicleCharges'
 import { quantaOfUnits } from './energyQuanta'
 import { STANDARD_LINING, type VehicleLining } from './liningType'
+import { EMPTY_LOADOUT, type VehicleLoadout } from './loadoutState'
 import { coldHeatAt, type VehicleHeat } from './vehicleHeat'
 import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
@@ -65,6 +66,8 @@ export interface VehicleState {
   liningPaidThisVisit: Money | null
   /** The charge rack and the charges it carries (#109), not a vehicle track. */
   charges: VehicleCharges
+  /** The vehicle items owned and the one in each loadout slot (#162, K4). */
+  loadout: VehicleLoadout
   energy: number
   hull: BigStat
   cargo: Cargo
@@ -95,6 +98,7 @@ export function newVehicleState(site: DockSite | null, tick: number): VehicleSta
     liningBill: ZERO_MONEY,
     liningPaidThisVisit: null,
     charges: NO_CHARGES,
+    loadout: EMPTY_LOADOUT,
     energy: quantaOfUnits(stats.energyMax),
     hull: stats.hullMax,
     cargo: EMPTY_CARGO,

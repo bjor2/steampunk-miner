@@ -6,6 +6,7 @@
 import type { EnemyKind, HitArc } from '../economy/economyDefinition'
 import type { GunMode } from '../vehicle/vehicleGun'
 import type { VehicleMode } from '../vehicle/vehicleState'
+import type { EquipRefusal, LoadoutSlotId } from '../registries/vehicleLoadout'
 import type { BayId } from '../world/dockBays'
 import type { CommandStamp, CommandType } from './authorityCommand'
 import type { PlatformVisualState } from './platformState'
@@ -83,6 +84,9 @@ export interface RejectionReasons {
   unknown_lining_type: true
   lining_type_owned: true
   lining_type_not_owned: true
+  // Registered by `debug.setVehicleLoadout` (K4): an unknown slot, an item the slot does not take,
+  // or one item in two slots. Play's `equipItem` answers refusals as `EquipRefused` instead.
+  invalid_loadout: true
 }
 
 export type RejectionReason = keyof RejectionReasons
@@ -239,6 +243,13 @@ export interface KernelDomainEventBodies {
   LiningTypeUnlocked: { liningType: string; price: string }
   /** The rings laid from now on use this lining type (#113 `lining_type_selected`). */
   LiningTypeSelected: { liningType: string }
+  /**
+   * One loadout slot now holds `itemId`, or nothing when null (#162 `equip_item`). An item moved
+   * from another slot first empties that slot, as its own event.
+   */
+  ItemEquipped: { slot: LoadoutSlotId; itemId: string | null }
+  /** `equipItem` changed nothing (#162 `equip_refused`); `slot` as sent, so `rig.1` shows as is. */
+  EquipRefused: { slot: string; itemId: string | null; reason: EquipRefusal }
   EnemyDespawned: { enemyId: string }
   /** A tunnel wrecker came out of the rock at ring `x,y` (mm) of a vehicle's route, in `band` (#111). */
   WreckerSpawned: { enemyId: string; ring: string; band: number }
