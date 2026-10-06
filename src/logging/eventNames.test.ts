@@ -41,7 +41,7 @@ describe('run event registry', () => {
     ])
   })
 
-  it('allows floats only in perf_sample', () => {
+  it('allows floats only in perf samples (#11 value rules, #121)', () => {
     expect(floatFieldProblems(RUN_EVENT_REGISTRY)).toEqual([])
     const registry = {
       mining_interval: {
@@ -49,9 +49,12 @@ describe('run event registry', () => {
         level: 'core',
         payload: { collected: { listOf: { value: 'float' } } },
       },
+      tile_drilled: { group: 'mining', level: 'detail', payload: { progress: 'float' } },
+      memory_sample: { group: 'run', level: 'perf', payload: { jsHeapUsedMB: 'float' } },
     } as const
     expect(floatFieldProblems(registry)).toEqual([
-      'mining_interval.collected is a float outside perf_sample',
+      'mining_interval.collected is a float outside a perf sample',
+      'tile_drilled.progress is a float outside a perf sample',
     ])
   })
 

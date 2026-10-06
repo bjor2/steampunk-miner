@@ -171,6 +171,11 @@ export function generatedChunkOf(params: PlanetParams, cx: number, cy: number): 
 }
 
 /** Generation is pure, so one cache per planet only saves time; it never changes an answer. */
+/** Generated chunks held now, touched ones included, for the memory sample (#121). */
+export function cachedChunkCount(): number {
+  return cacheOfPlanet?.cache.size() ?? 0
+}
+
 function cacheOf(params: PlanetParams): ChunkCache {
   if (cacheOfPlanet === null || !isSamePlanet(cacheOfPlanet.params, params)) {
     cacheOfPlanet = { params, cache: createChunkCache(params, CACHED_CHUNKS) }

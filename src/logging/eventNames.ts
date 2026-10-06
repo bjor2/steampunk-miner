@@ -93,6 +93,33 @@ export const RUN_EVENT_REGISTRY = {
       commit: 'text',
     },
   },
+  // Every 10 s of frames (#121, logging strategy section 2): what the page, the renderer and the
+  // physics hold, beside how far the run got, so memory reads against progress and not only time.
+  // Sizes in MiB to hundredths; the planet and the depth now are on the envelope. Never forces a GC.
+  memory_sample: {
+    group: 'run',
+    level: 'perf',
+    payload: {
+      elapsedS: 'integer',
+      jsHeapUsedMB: 'float',
+      jsHeapTotalMB: 'float',
+      jsHeapLimitMB: 'float',
+      wasmMB: 'float',
+      geometries: 'integer',
+      textures: 'integer',
+      programs: 'integer',
+      rigidBodies: 'integer',
+      colliders: 'integer',
+      chunksCached: 'integer',
+      chunksMeshed: 'integer',
+      domNodes: 'integer',
+      listeners: 'integer',
+      maxDepthTiles: 'integer',
+      tilesDestroyed: 'integer',
+      mineralsCollected: 'integer',
+      moneyTotal: 'money',
+    },
+  },
 
   // Progression
   planet_entered: {

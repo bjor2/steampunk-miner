@@ -204,7 +204,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     expect(replay.digests.at(-1)?.digest).toBe(takeSessionSnapshot().digest)
   })
 
-  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker, the guns, the refinery, the lining bill, blasting charges, heat and benchmark results', () => {
+  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker, the guns, the refinery, the lining bill, blasting charges, heat, benchmark results and the memory sample', () => {
     // #41 added `casing_upgraded`, `casing_placed`, `casing_drilled` and the two grade edges; #46 four
     // artefact events; #43 `collapse_warning`, `collapse_cancelled` and `collapse`; #76 `casing_lined`;
     // #111 `ring_gnawed`, `wrecker_spawned` and `wrecker_fled`; #93 `gun_mounted`, `gun_upgraded`,
@@ -212,9 +212,9 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     // `refinery_slot_bought`; #115 `lining_settled`; #109 `charge_planted`, `charge_detonated`,
     // `charges_restocked` and `charge_rack_upgraded`; #113 `lining_type_unlocked`,
     // `lining_type_selected`, `heat_threshold`, `overheat_started`, `overheat_ended`, `lava_contact`
-    // and `lava_blocked`; #124 `benchmark_result` (bench scripts only); the controls and the HUD
-    // still add none.
-    expect(ALL_RUN_EVENT_NAMES).toHaveLength(62 + 4 + 3 + 1 + 3 + 4 + 4 + 1 + 4 + 7 + 1)
+    // and `lava_blocked`; #124 `benchmark_result` (bench scripts only); #121 `memory_sample`; the
+    // controls and the HUD still add none.
+    expect(ALL_RUN_EVENT_NAMES).toHaveLength(62 + 4 + 3 + 1 + 3 + 4 + 4 + 1 + 4 + 7 + 1 + 1)
   })
 })
 

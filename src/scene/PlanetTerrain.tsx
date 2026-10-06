@@ -71,10 +71,11 @@ function syncTimed(pool: ChunkMeshPool, view: TerrainView): void {
   renderPresence.terrainMs = performance.now() - started
 }
 
-/** The #38 visible-block budget, read by the render stats and the perf log. */
+/** The #38 visible-block budget, read by the render stats and the perf log; built meshes (#121). */
 function recordGroundDrawn(pool: ChunkMeshPool): void {
   renderPresence.groundBlocks = pool.drawnBlockCount()
   renderPresence.drawnChunks = pool.drawnChunkCount()
+  renderPresence.builtChunks = pool.builtChunkCount()
 }
 
 /** Its planet and world are placeholders, replaced before the pool first reads them. */

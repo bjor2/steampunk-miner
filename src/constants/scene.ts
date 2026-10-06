@@ -67,6 +67,8 @@ export const FRAME_WINDOW_CAPACITY = 256
  * Tasks API's threshold, 50 ms of main thread work without a break.
  */
 export const LONG_FRAME_MS = 50
+/** Seconds of frames between two `memory_sample` lines (#121, logging strategy section 2). */
+export const MEMORY_SAMPLE_SECONDS = 10
 
 /**
  * Post-processing (#38: one bloom pass at half the internal resolution, filmic tone mapping and a

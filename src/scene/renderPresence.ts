@@ -12,6 +12,8 @@ export const renderPresence = {
   postPasses: 0,
   groundBlocks: 0,
   drawnChunks: 0,
+  /** Chunk meshes the terrain holds, drawn or hidden (#121 memory sample). */
+  builtChunks: 0,
   /** Depth bands the terrain draws from their strata maps (S7d): 0 until all five load. */
   strataBands: 0,
   /** Milliseconds the terrain's sync took this frame. */

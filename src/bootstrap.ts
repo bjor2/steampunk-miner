@@ -13,6 +13,7 @@ import {
   type FlushableSink,
   type SummarySink,
 } from './logging/eventSink'
+import { runProgressOf } from './logging/memorySample'
 import { writeRunMetadata, writeRunSummary } from './logging/runDocuments'
 import { createRunId } from './logging/runLayout'
 import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
@@ -47,6 +48,7 @@ export async function startGame(): Promise<void> {
   loadFeatures()
   const shell = getShell()
   const run = startRunLogging(shell, new Date())
+  logPerfOnTestRuns(shell, run)
   recordGameStarted(shell)
   installSaveSlots(saveSlotsOf(shell))
   await adoptLocalPreferences(shell)
@@ -56,7 +58,6 @@ export async function startGame(): Promise<void> {
   recordStartingPlanetEntered()
   keepRunFilesWritten(shell, run)
   exposeDebugHandles(shell, run.runId)
-  logPerfOnTestRuns(shell)
   applyLaunchScenario(shell)
   startHints()
   writeMetadata(shell, run)
@@ -139,10 +140,20 @@ function exposeDebugHandles(shell: Shell, runId: string): void {
   shell.exposeGlobalHandle('steampunkRunCommands', () => shell.readBufferedRunCommands(runId))
 }
 
-/** `perf` lines are for dev, scenario and debug runs only (#11 section 1, #38). */
-function logPerfOnTestRuns(shell: Shell): void {
+/**
+ * `perf` lines are for dev, scenario and debug runs only (#11 section 1, #38). Their memory sample
+ * (#121) needs Rapier's WASM memory and the page's listeners watched before anything registers
+ * one, so this runs first; its progress markers come from the summary folded so far.
+ */
+function logPerfOnTestRuns(shell: Shell, run: RunFiles): void {
   const isTestRun = shell.launch.debugEnabled || shell.launch.scenarioText !== null
-  if (isTestRun || import.meta.env.DEV) turnOnPerfLog()
+  if (!isTestRun && !import.meta.env.DEV) return
+  watchRapierWasmMemory()
+  shell.watchPageListeners()
+  turnOnPerfLog({
+    readPageMemory: () => shell.readPageMemory(),
+    readRunProgress: () => runProgressOf(run.summary.summarize()),
+  })
 }
 
 function applyLaunchScenario(shell: Shell): void {

@@ -68,6 +68,8 @@ export interface ChunkMeshPool {
   drawnChunkCount(): number
   /** 8 m ground blocks drawn now: the #38 budget allows 48 at the 20 m zoom-out. */
   drawnBlockCount(): number
+  /** Chunk meshes built now, drawn or hidden: what the pool holds on the GPU (#121). */
+  builtChunkCount(): number
   dispose(): void
 }
 
@@ -113,6 +115,7 @@ export function createChunkMeshPool(parent: Group, material: ShaderMaterial): Ch
     },
     drawnChunkCount: () => countDrawn(pool),
     drawnBlockCount: () => countDrawnBlocks(pool),
+    builtChunkCount: () => pool.meshes.size,
     dispose: () => dropAll(pool, parent),
   }
 }
