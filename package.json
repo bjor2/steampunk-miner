@@ -21,6 +21,7 @@
     "bench:combat": "vite-node scripts/benchCombatTick.ts",
     "bench:summary": "vite-node scripts/bench/summarizeBenchLogs.ts",
     "perf:record": "node scripts/perf/recordPerf.mjs",
+    "perf:sessions": "vite-node scripts/perf/analyzeSessions.ts",
     "metrics:ticket": "node scripts/metrics/ticketPhases.mjs",
     "metrics:backfill": "node scripts/metrics/ticketPhases.mjs --backfill",
     "metrics:tests": "node scripts/ci/queryTestMetrics.mjs",
