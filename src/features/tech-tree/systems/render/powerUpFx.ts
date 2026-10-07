@@ -36,14 +36,17 @@ const LINGERING_KINDS: readonly FxKind[] = ['ring', 'cone', 'burn', 'plume']
 const FLARE_APEX_TILES = 6
 
 export function fxFrameOf(fx: PowerUpFx, tick: number): FxFrame {
+  return writeFxFrame(fx, tick, { reachM: 0, alpha: 0, strands: 0, isOver: false })
+}
+
+/** `fxFrameOf` written into `frame`, so a frame loop draws an effect without allocating. */
+export function writeFxFrame(fx: PowerUpFx, tick: number, frame: FxFrame): FxFrame {
   const sweep = smoothstep(clampUnit(tick / fx.sweepTicks))
-  const alpha = isStanding(fx) ? 1 : alphaOf(fx, tick)
-  return {
-    reachM: fx.reachTiles * METRES_PER_TILE * sweep,
-    alpha,
-    strands: Math.min(fx.strands, SPARK_CAPACITY),
-    isOver: !isStanding(fx) && tick >= fx.ticks,
-  }
+  frame.reachM = fx.reachTiles * METRES_PER_TILE * sweep
+  frame.alpha = isStanding(fx) ? 1 : alphaOf(fx, tick)
+  frame.strands = Math.min(fx.strands, SPARK_CAPACITY)
+  frame.isOver = !isStanding(fx) && tick >= fx.ticks
+  return frame
 }
 
 /** The frame of the effect named `fxId`; null for an unknown id. */
@@ -57,10 +60,19 @@ export function fxFrameOfId(fxId: string, tick: number): FxFrame | null {
  * side (+X) over the sweep, so the player sees where it came from (G&V mortar pick).
  */
 export function flareShellPointOf(fx: PowerUpFx, tick: number): readonly [number, number] {
+  return writeFlareShellPoint(fx, tick, [0, 0])
+}
+
+/** `flareShellPointOf` written into `point`, for a frame loop. */
+export function writeFlareShellPoint(
+  fx: PowerUpFx,
+  tick: number,
+  point: [number, number],
+): [number, number] {
   const p = clampUnit(tick / fx.sweepTicks)
-  const across = fx.reachTiles * (p * p * (1 + 1 / 2) - p / 2)
-  const up = 4 * FLARE_APEX_TILES * p * (1 - p)
-  return [across, up]
+  point[0] = fx.reachTiles * (p * p * (1 + 1 / 2) - p / 2)
+  point[1] = 4 * FLARE_APEX_TILES * p * (1 - p)
+  return point
 }
 
 export function isStanding(fx: PowerUpFx): boolean {
