@@ -51,6 +51,7 @@ import { reactToStep } from './reactionRun'
 import { REFINERY_COLLECTION_RULES } from './refinery/refineryCollection'
 import { REFINERY_RULES } from './refinery/refineryRules'
 import { VEHICLE_COMMAND_RULES } from './vehicleCommandRules'
+import { VEHICLE_ITEM_RULES } from './vehicleItemRules'
 import { TRAVEL_RULES } from './travelRules'
 import { WORKSHOP_RULES } from './workshopRules'
 
@@ -98,6 +99,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...CHARGE_RULES,
   ...CHARGE_SHOP_RULES,
   ...LOADOUT_RULES,
+  ...VEHICLE_ITEM_RULES,
 }
 
 /** Every kernel command type: the keys of the kernel's own rule table. */

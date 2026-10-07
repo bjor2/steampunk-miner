@@ -34,6 +34,11 @@ export function artefactItemOf(optionId: string): ItemRef {
   return itemRefOf('artefact', optionId)
 }
 
+/** A tech-unlocked vehicle item as the Upgrade bay sells it (ticket 248). */
+export function vehicleItemRefOf(itemId: string): ItemRef {
+  return itemRefOf('vehicle-item', itemId)
+}
+
 export function bayItemOf(bay: BayId): ItemRef {
   return itemRefOf('bay', bay)
 }

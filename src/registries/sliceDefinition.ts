@@ -41,6 +41,7 @@ import type { PartMotionRequestSource } from '../systems/registries/partMotionRe
 import type { SaveSection } from '../systems/registries/saveSections'
 import type { SoundCue } from '../systems/registries/soundCues'
 import type { AttachUse } from '../systems/registries/vehicleAttach'
+import type { VehicleItemResearch, VehicleItemSeller } from '../systems/registries/vehicleItemSales'
 import type { VehicleMotionEffectSource } from '../systems/registries/vehicleMotionEffects'
 import type { VehicleStagingProvider } from '../systems/registries/vehicleStaging'
 import type { SceneLayer } from '../scene/registries/sceneLayers'
@@ -115,6 +116,10 @@ export interface SliceRegistrar {
   /** Card lines for the slice's own items; two entries matching one ref are refused at the seal. */
   itemDescriptionEntries(entries: readonly ItemDescriptionEntry[]): void
   loadoutAcceptance(rule: LoadoutAcceptance): void
+  /** Names and prices the slice's own vehicle items for `buyVehicleItem` (ticket 248). */
+  vehicleItemSeller(seller: VehicleItemSeller): void
+  /** One provider across all slices (`tech-tree`): whether an item's node is researched. */
+  vehicleItemResearch(provider: VehicleItemResearch): void
   attachUse(use: AttachUse): void
   /** A use of a shop building's attach point (#170 `building-attach`): render-only. */
   buildingAttachUse(use: BuildingAttachUse): void

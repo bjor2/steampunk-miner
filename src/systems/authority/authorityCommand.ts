@@ -173,6 +173,11 @@ export interface KernelCommandPayloads {
    * slot with a null item; docked at the platform only. A refusal is answered as `EquipRefused`.
    */
   equipItem: { slot: string; itemId: string | null }
+  /**
+   * The Upgrade bay buys a vehicle item the tech tree unlocked, at the price its card shows
+   * (ticket 248); owned, it can be slotted by `equipItem`.
+   */
+  buyVehicleItem: { itemId: string }
   'debug.setUpgrade': { upgradeId: string; level: number }
   /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
   'debug.setEnergy': { energy: string }

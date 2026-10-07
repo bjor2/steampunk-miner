@@ -66,6 +66,10 @@ import {
   type RegistryEntry,
 } from '../systems/registries/seal'
 import { ATTACH_USE_REGISTRY } from '../systems/registries/vehicleAttach'
+import {
+  VEHICLE_ITEM_RESEARCH_REGISTRY,
+  VEHICLE_ITEM_SELLER_REGISTRY,
+} from '../systems/registries/vehicleItemSales'
 import { VEHICLE_MOTION_EFFECT_REGISTRY } from '../systems/registries/vehicleMotionEffects'
 import { VEHICLE_STAGING_REGISTRY } from '../systems/registries/vehicleStaging'
 import { SCENE_LAYER_REGISTRY } from '../scene/registries/sceneLayers'
@@ -110,6 +114,8 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     itemDescriptionEntries: (entries) =>
       entries.forEach((entry) => add(ITEM_DESCRIPTION_ENTRY_REGISTRY, entry)),
     loadoutAcceptance: (rule) => add(LOADOUT_ACCEPTANCE_REGISTRY, rule),
+    vehicleItemSeller: (seller) => add(VEHICLE_ITEM_SELLER_REGISTRY, seller),
+    vehicleItemResearch: (provider) => add(VEHICLE_ITEM_RESEARCH_REGISTRY, provider),
     attachUse: (use) => add(ATTACH_USE_REGISTRY, use),
     buildingAttachUse: (use) => add(BUILDING_ATTACH_USE_REGISTRY, use),
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),

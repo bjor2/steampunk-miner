@@ -264,6 +264,12 @@ export const RUN_EVENT_REGISTRY = {
       },
     },
   },
+  // Ticket 248: a vehicle item the tech tree unlocked, bought at the Upgrade bay at its card price.
+  vehicle_item_purchased: {
+    group: 'platform',
+    level: 'core',
+    payload: { itemId: 'text', price: 'money' },
+  },
   // #107: the auto_guns turret bolted on at level 1, then each gun level bought.
   gun_mounted: {
     group: 'platform',

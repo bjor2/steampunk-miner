@@ -92,6 +92,12 @@ export interface RejectionReasons {
   // Registered by hold-to-buy (#180, ticket 226): a held step the wallet can pay that would leave
   // it under the service reserve.
   service_reserve: true
+  // Registered by `buyVehicleItem` (ticket 248): no registered item has the id (a vision row is
+  // invisible), the vehicle owns it already, its node is not researched, or nobody sells it here.
+  unknown_vehicle_item: true
+  vehicle_item_owned: true
+  not_researched: true
+  not_for_sale: true
 }
 
 export type RejectionReason = keyof RejectionReasons
@@ -298,6 +304,8 @@ export interface KernelDomainEventBodies {
   ItemEquipped: { slot: LoadoutSlotId; itemId: string | null }
   /** `equipItem` changed nothing (#162 `equip_refused`); `slot` as sent, so `rig.1` shows as is. */
   EquipRefused: { slot: string; itemId: string | null; reason: EquipRefusal }
+  /** A tech-unlocked vehicle item bought at the Upgrade bay (ticket 248); `price` canonical. */
+  VehicleItemPurchased: { itemId: string; price: string }
   EnemyDespawned: { enemyId: string }
   /** A tunnel wrecker came out of the rock at ring `x,y` (mm) of a vehicle's route, in `band` (#111). */
   WreckerSpawned: { enemyId: string; ring: string; band: number }

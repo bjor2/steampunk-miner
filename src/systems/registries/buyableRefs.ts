@@ -6,16 +6,26 @@
  * description fails there instead of being missed in one of five files.
  *
  * Each kernel player command says what it buys, so a new kernel command fails the typecheck (and
- * `buyableRefs.test.ts`) until it is placed here.
+ * `buyableRefs.test.ts`) until it is placed here. `buyVehicleItem` buys every registered vehicle
+ * item a slice sells on one of the planets walked (ticket 248).
  */
 import { ARTEFACT_OPTIONS } from '../artefacts/artefactOptions'
 import type { KernelCommandType } from '../authority/authorityCommand'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { liningTypes, STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { BAY_IDS } from '../world/dockBays'
+import { contentOf } from './content'
 import type { ItemRef } from './itemDescriber'
 import { generatedItemRefsOn } from './itemDescriptionEntries'
-import { artefactItemOf, bayItemOf, KERNEL_ITEMS, liningItemOf, trackItemOf } from './kernelItems'
+import {
+  artefactItemOf,
+  bayItemOf,
+  KERNEL_ITEMS,
+  liningItemOf,
+  trackItemOf,
+  vehicleItemRefOf,
+} from './kernelItems'
+import { vehicleItemOfferOf } from './vehicleItemSales'
 
 export type KernelPlayerCommandType = Exclude<KernelCommandType, `debug.${string}`>
 
@@ -24,8 +34,11 @@ export const NOT_A_BUY = 'not-a-buy'
 
 const FIRST_PLANET = 1
 
-/** What each kernel player command buys; picked artefacts use the same card (#159). */
-export function kernelCommandBuys(): {
+/**
+ * What each kernel player command buys on planets 1 to `maxPlanet`; picked artefacts use the same
+ * card (#159).
+ */
+export function kernelCommandBuys(maxPlanet: number = FIRST_PLANET): {
   readonly [K in KernelPlayerCommandType]: readonly ItemRef[] | typeof NOT_A_BUY
 } {
   return {
@@ -54,6 +67,7 @@ export function kernelCommandBuys(): {
     restockCharges: [KERNEL_ITEMS.charges],
     buyChargeRackSlot: [KERNEL_ITEMS.chargeRack],
     equipItem: NOT_A_BUY,
+    buyVehicleItem: soldVehicleItemRefsUpTo(maxPlanet),
   }
 }
 
@@ -62,20 +76,35 @@ export function kernelCommandBuys(): {
  * sorted by kind, id and grade in code-unit order.
  */
 export function listBuyableRefs(maxPlanet: number = FIRST_PLANET): readonly ItemRef[] {
-  const refs = [...kernelBuyableRefs(), ...generatedRefsUpTo(maxPlanet)]
+  const refs = [...kernelBuyableRefs(maxPlanet), ...generatedRefsUpTo(maxPlanet)]
   return uniqueRefsOf(refs).sort(compareRefs)
 }
 
-function kernelBuyableRefs(): readonly ItemRef[] {
-  const bought = Object.values(kernelCommandBuys()).flatMap((buys) =>
+function kernelBuyableRefs(maxPlanet: number): readonly ItemRef[] {
+  const bought = Object.values(kernelCommandBuys(maxPlanet)).flatMap((buys) =>
     buys === NOT_A_BUY ? [] : buys,
   )
   return [...bought, ...BAY_IDS.map(bayItemOf)]
 }
 
 function generatedRefsUpTo(maxPlanet: number): readonly ItemRef[] {
-  const planets = Array.from({ length: maxPlanet }, (_, offset) => FIRST_PLANET + offset)
-  return planets.flatMap(generatedItemRefsOn)
+  return planetsUpTo(maxPlanet).flatMap(generatedItemRefsOn)
+}
+
+/** Each registered vehicle item some slice sells on a planet up to `maxPlanet`. */
+function soldVehicleItemRefsUpTo(maxPlanet: number): readonly ItemRef[] {
+  const planets = planetsUpTo(maxPlanet)
+  return contentOf('vehicle-item')
+    .filter((item) => isSoldOnAnyOf(item.id, planets))
+    .map((item) => vehicleItemRefOf(item.id))
+}
+
+function isSoldOnAnyOf(itemId: string, planets: readonly number[]): boolean {
+  return planets.some((planet) => vehicleItemOfferOf(itemId, planet) !== null)
+}
+
+function planetsUpTo(maxPlanet: number): number[] {
+  return Array.from({ length: maxPlanet }, (_, offset) => FIRST_PLANET + offset)
 }
 
 /** The standard lining comes with the casing; every other type is unlocked for a price (#113). */

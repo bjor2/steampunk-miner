@@ -169,6 +169,10 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'equip_refused',
     data: { slot, itemId: itemId ?? 'none', reason },
   }),
+  VehicleItemPurchased: ({ itemId, price }) => ({
+    event: 'vehicle_item_purchased',
+    data: { itemId, price },
+  }),
   // A collapse's crush has no enemy: its fields read as `vehicle_destroyed` does with none (#43).
   VehicleDamaged: ({ amount, source, arc, enemyId, kind, tier, hullAfter }) => ({
     event: 'vehicle_damaged',
