@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T21:21:14Z",
+  "updated_at": "2026-10-07T21:22:38Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "working",
       "issue": 274,
-      "note": "tier hard, attempt 2/2",
-      "updated_at": "2026-10-07T21:21:14Z",
+      "note": "started 2026-10-07 23:21 CEST",
+      "updated_at": "2026-10-07T21:22:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -16,8 +16,8 @@
       "slot": "2",
       "state": "working",
       "issue": 273,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T21:20:03Z",
+      "note": "started 2026-10-07 22:39 CEST",
+      "updated_at": "2026-10-07T21:22:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,16 +26,16 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T21:17:19Z",
+      "updated_at": "2026-10-07T21:22:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
       "loop": "steampunk-loop",
       "slot": "4",
-      "state": "blocked",
-      "issue": 279,
-      "note": "#279 needs-planner (slot free)",
-      "updated_at": "2026-10-07T21:17:39Z",
+      "state": "idle",
+      "issue": null,
+      "note": "free",
+      "updated_at": "2026-10-07T21:22:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "5/8 Claude slots busy, 0/4 planner slots; status check",
+      "note": "3/8 Claude slots busy, 0/4 planner slots; no pickable build ticket; delegated 0 spec(s); planner slots 0/4",
       "extra": {
-        "active": 5,
+        "active": 3,
         "max": 8,
         "max_attempts": 2,
         "attempts": {
@@ -195,11 +195,11 @@
           "295": 2,
           "273": 1,
           "238": 0,
-          "274": 1,
+          "274": 2,
           "297": 1,
           "243": 1,
           "244": 1,
-          "279": 1
+          "279": 0
         },
         "tester_grants": {
           "248": {
@@ -211,7 +211,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-07T21:17:19Z",
+      "updated_at": "2026-10-07T21:22:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -229,7 +229,7 @@
       "state": "working",
       "issue": 248,
       "note": "started 2026-10-07 23:04 CEST",
-      "updated_at": "2026-10-07T21:17:19Z",
+      "updated_at": "2026-10-07T21:22:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -237,8 +237,8 @@
       "slot": "6",
       "state": "idle",
       "issue": null,
-      "note": "free; #274 not accepted (needs-fix), will retry",
-      "updated_at": "2026-10-07T21:18:48Z",
+      "note": "free",
+      "updated_at": "2026-10-07T21:22:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -247,7 +247,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T21:17:19Z",
+      "updated_at": "2026-10-07T21:22:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -256,7 +256,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T21:17:19Z",
+      "updated_at": "2026-10-07T21:22:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -271,6 +271,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-07T21:22:38Z",
+      "key": "steampunk-loop/4",
+      "state": "idle",
+      "issue": null,
+      "note": "free"
+    },
     {
       "at": "2026-10-07T21:21:14Z",
       "key": "steampunk-loop/1",
@@ -683,13 +690,6 @@
       "state": "working",
       "issue": 247,
       "note": "tier easy, attempt 1/2"
-    },
-    {
-      "at": "2026-10-07T19:20:50Z",
-      "key": "steampunk-loop/7",
-      "state": "idle",
-      "issue": null,
-      "note": "free; #250 not accepted (needs-fix), will retry"
     }
   ]
 }
