@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T21:16:44+02:00",
+  "updated_at": "2026-10-07T21:18:24+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -31,7 +31,7 @@
           "ticket": null,
           "grok_slot": null,
           "kind": "aux",
-          "since": "2026-10-07T21:16:00+02:00",
+          "since": "2026-10-07T21:18:00+02:00",
           "label": "fable GD lock #258"
         },
         {
@@ -54,7 +54,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 10,
+      "claims_last_hour": 11,
       "name": "Claude Max 1"
     },
     {
@@ -105,7 +105,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 3,
     "max": 3
   },
   "tester": {
@@ -328,7 +328,7 @@
       "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-07T21:16:00+02:00",
+      "since": "2026-10-07T21:18:00+02:00",
       "kind": "aux",
       "label": "fable GD lock #258",
       "account": 1
@@ -383,9 +383,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 21:16 CEST",
+    "at": "2026-10-07 21:18 CEST",
     "mode": "refill-dev",
-    "triggers": "#249",
+    "triggers": "claude-run:fable",
     "started": "",
     "note": "dev slots full"
   },
