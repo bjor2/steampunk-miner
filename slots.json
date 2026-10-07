@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T20:22:49+02:00",
+  "updated_at": "2026-10-07T20:24:39+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -66,10 +66,11 @@
         {
           "slot": "C5",
           "state": "busy",
-          "ticket": 236,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-07T19:16:00+02:00"
+          "ticket": null,
+          "grok_slot": null,
+          "kind": "aux",
+          "since": "2026-10-07T20:24:00+02:00",
+          "label": "fable GD lock #256"
         },
         {
           "slot": "C6",
@@ -99,12 +100,12 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 3,
+      "claims_last_hour": 4,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 3,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -263,10 +264,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 236,
-      "since": "2026-10-07T19:16:00+02:00",
-      "claude_slot": 5
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -371,9 +371,11 @@
     {
       "slot": 5,
       "state": "busy",
-      "ticket": 236,
-      "grok_slot": 2,
-      "since": "2026-10-07T19:16:00+02:00",
+      "ticket": null,
+      "grok_slot": null,
+      "since": "2026-10-07T20:24:00+02:00",
+      "kind": "aux",
+      "label": "fable GD lock #256",
       "account": 2
     },
     {
@@ -402,17 +404,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 19:45 CEST",
+    "at": "2026-10-07 20:24 CEST",
     "mode": "refill-dev",
-    "triggers": "#205",
+    "triggers": "#236",
     "started": "",
-    "note": "no pickable build ticket"
+    "note": "dev slots full"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 8,
-      "dev": 8,
+      "used": 7,
+      "dev": 7,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
