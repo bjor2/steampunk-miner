@@ -3,10 +3,12 @@
  * while owned (2.1) and reads at the reach of the Mark the player researched, with Mark 0 acting
  * as bought. A passive the player does not own reads null, so its panel draws nothing. The lens's
  * cards are its readings nearest the miner first, up to the cap its overlay cards hold seats with.
- * Pure reads of the authority state: reveal only (Vertical Scaler on #157).
+ * Inside a magnetic field the reach is cut to the kernel's field share at the vehicle's tile (spec
+ * #258, ticket 290). Pure reads of the authority state: reveal only (Vertical Scaler on #157).
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { ownsItem } from '../../../systems/authority/loadoutRules'
+import { sensingReachAt } from '../../../systems/authority/magnetic/sensingReach'
 import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { researchedMarkOf } from '../../tech-tree'
@@ -59,7 +61,14 @@ function barometerOf(state: AuthorityState, playerId: string): BarometerWarning[
 function reachOwnedOf(state: AuthorityState, playerId: string, itemId: string): number | null {
   const item = sensingItemOf(itemId)
   if (item === null || !ownsItem(state, playerId, itemId)) return null
-  return passiveReachOf(item, researchedMarkOf(state, playerId, itemId))
+  const baseTiles = passiveReachOf(item, researchedMarkOf(state, playerId, itemId))
+  return reachFromVehicleOf(state, playerId, baseTiles)
+}
+
+/** The reach as the field the vehicle stands in leaves it; the base before any pose. */
+function reachFromVehicleOf(state: AuthorityState, playerId: string, baseTiles: number): number {
+  const pose = state.players[playerId].vehicle.pose
+  return pose === null ? baseTiles : sensingReachAt(state, tileOfPose(pose), baseTiles)
 }
 
 function nearestReadingsOf(

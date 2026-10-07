@@ -420,9 +420,9 @@
             },
             {
               "title": "Magnetic / electrified planets",
-              "description": "The Lodestone act's planet class (P25 to P32, P30 stays the relic planet; in endless every Lodestone planet, P43, P48 and every fifth): each ferrous vein throws a field and some of its cells are electrified, both from the planet seed so every player sees the same. The field tug, shocks, look and planet card come with the hazard and art builds.",
+              "description": "The Lodestone act's planet class (P25 to P32, P30 stays the relic planet; in endless every Lodestone planet, P43, P48 and every fifth): each ferrous vein throws a field and some of its cells are electrified, both from the planet seed so every player sees the same. Inside a field the rig is tugged toward the vein at a tenth of its planet's on-curve speed, never into lava, a gated cell or an open drop, and sensing reaches half as far; driving into a field the first time records hazard:magnetic in the codex. Drilling an electrified cell takes half a second longer and costs 2% of the on-curve hull, at most 25% a dive. The look, the planet card and the dielectric bit come with their builds.",
               "status": "partial",
-              "issues": [80, 258, 289],
+              "issues": [80, 258, 289, 290],
               "planet": 25
             },
             {

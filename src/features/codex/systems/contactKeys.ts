@@ -2,13 +2,14 @@
  * The enemy and hazard keys one step's events meet (ticket 252, S2 of the #157 gap review): an
  * enemy is contacted when it and the vehicle hurt each other (its hit on the vehicle, or the
  * drill, the guns or a charge on it), a hazard when it acts on the vehicle (a lava touch, or the
- * heat gauge rising past a line it watches).
+ * heat gauge rising past a line it watches) or the vehicle drives into it (a magnetic field, the
+ * GD ruling on spec #258 Q2, ticket 290).
  *
  * Only the tunnel wrecker is recorded for now, the one enemy a #161 node keys on. Crawler and
  * burrower contact runs through the committed goldens, so recording them moves their digests and
  * takes a protocol bump of its own. Hazard ids are the #161 key names: the economy's `heat`
- * archetype is the `heat_lava` Schedule C row; frozen, magnetic and hollow join here when their
- * planets have archetypes.
+ * archetype is the `heat_lava` Schedule C row, and `MagneticFieldEntered` is `magnetic`; frozen
+ * and hollow join here when their planets have hazards.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { enemyById } from '../../../systems/authority/combat/combatState'
@@ -20,6 +21,8 @@ import type { DiscoveryKey } from '../../../systems/registries/discovery'
 const RECORDED_ENEMY_KINDS: readonly EnemyKind[] = ['tunnel_wrecker']
 
 const HAZARD_ID_OF_ARCHETYPE: ReadonlyMap<string, string> = new Map([['heat', 'heat_lava']])
+
+const MAGNETIC_HAZARD: DiscoveryKey = 'hazard:magnetic'
 
 /** Every enemy and hazard key the events meet, in event order, repeats included. */
 export function contactKeysOf(
@@ -66,6 +69,7 @@ function kindOfEnemy(
 }
 
 function hazardKeysOf(before: AuthorityState, event: DomainEvent): DiscoveryKey[] {
+  if (event.type === 'MagneticFieldEntered') return [MAGNETIC_HAZARD]
   if (event.type !== 'LavaTouched' && event.type !== 'HeatThreshold') return []
   const hazardId = hazardIdOn(before.planet.index)
   return hazardId === null ? [] : [`hazard:${hazardId}`]

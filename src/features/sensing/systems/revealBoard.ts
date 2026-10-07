@@ -3,10 +3,13 @@
  * readings): the cells its own echo pings and flare maps mark, every buoy pin in the world, and
  * the rings those buoys re-ping. Derived from `PowerUpUsed` and pure reads of the authority state
  * on each client, never kept by the authority, so nothing reaches the digest. A reload or a late
- * joiner starts with an empty board; a flare's map lasts until the dock.
+ * joiner starts with an empty board; a flare's map lasts until the dock. Inside a magnetic field
+ * each reach is cut to the kernel's field share, read where the ping, map or ring is centred
+ * (spec #258, ticket 290).
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
+import { sensingReachAt } from '../../../systems/authority/magnetic/sensingReach'
 import { droppedPinOf, pinAfterPasses, pinsWithBuoy, type BuoyPin } from './buoyPins'
 import { echoMarksOf } from './echoPing'
 import { flareLandingOf } from './flareMortar'
@@ -92,7 +95,7 @@ function pingOfUse(use: SensingUse, state: AuthorityState): RevealPing {
 function echoPingOf(use: SensingUse, state: AuthorityState): RevealPing {
   return {
     centre: use.origin,
-    marks: echoMarksOf(state, use.origin, echoRadiusTiles()),
+    marks: echoMarksOf(state, use.origin, sensingReachAt(state, use.origin, echoRadiusTiles())),
     bornTick: use.tick,
     untilTick: use.tick + echoRevealTicksAt(use.mark),
   }
@@ -103,7 +106,11 @@ function flareMapOf(use: SensingUse, state: AuthorityState): RevealPing {
   const landing = flareLandingOf(state, use.playerId, use.origin, flareRangeTiles())
   return {
     centre: landing,
-    marks: echoMarksOf(state, landing, flareRadiusTilesAt(use.mark)),
+    marks: echoMarksOf(
+      state,
+      landing,
+      sensingReachAt(state, landing, flareRadiusTilesAt(use.mark)),
+    ),
     bornTick: use.tick,
     untilTick: null,
   }
@@ -115,7 +122,7 @@ function boardWithBuoy(board: RevealBoard, use: SensingUse, state: AuthorityStat
     tile: use.origin,
     ownerId: use.playerId,
     placedTick: use.tick,
-    ringTiles: buoyRingTilesAt(use.mark),
+    ringTiles: sensingReachAt(state, use.origin, buoyRingTilesAt(use.mark)),
   })
   const pinned = { ...board, pins: pinsWithBuoy(board.pins, pin, BUOY_PIN_CAP) }
   return boardWithPing(pinned, ringPingOf(pin, state, use.tick))

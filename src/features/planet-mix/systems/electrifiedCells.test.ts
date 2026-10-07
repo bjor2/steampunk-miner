@@ -1,13 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import { PACING_WORLD_SEEDS } from '../../../constants/pacingSeeds'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
+import { ticksPerCell } from '../../../systems/authority/groundDrill'
+import { onCurveSessionOn } from '../../../systems/authority/magnetic/magneticFixtures'
 import { resourceTierOf } from '../../../systems/authority/minedOre'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import {
   continueScriptedSession,
+  drill,
+  poseAbove,
   type ScriptedSession,
 } from '../../../systems/authority/scriptedSession'
+import { shockTicks } from '../../../systems/economy/magneticHazard'
 import { stepOfMajor } from '../../../systems/economy/upgradeSteps'
+import { onCurveSteps, vehicleStatsAt } from '../../../systems/economy/vehicleStats'
+import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { gateVerdictOf } from '../../../systems/registries/gateChecks'
 import { oreTypeOf } from '../../../systems/registries/oreTypes'
 import { generateChunkCells } from '../../../systems/world/generateChunk'
@@ -131,6 +138,27 @@ describe('electrified cells', () => {
       }
       expect(new Set(ofTier.map((one) => outcomeOf(session, one)))).toEqual(new Set(['none']))
     }
+  })
+
+  it('a shock costs ticks, never money', () => {
+    const recorded = onCurveSessionOn(MAGNETIC_PLANET)
+    const params = planetParamsOf(recorded.session.state().planet) as PlanetParams
+    const { tile, cell } = ferrousCellsOf(params).find((one) => one.isElectrified) as FerrousCell
+    const ticks = ticksPerCell(vehicleStatsAt(onCurveSteps(MAGNETIC_PLANET)), params, tile, cell)
+    const cutTicks = (ticks as number) - shockTicks()
+    const walletBefore = recorded.session.state().players.p1.wallet
+    recorded.submit(1, poseAbove(tile, FACING.down))
+    recorded.submit(1 + cutTicks, drill(tile, cutTicks))
+    const types = () => recorded.session.events().map((event) => event.type)
+    expect(types()).not.toContain('TileDestroyed')
+    recorded.submit(1 + cutTicks + shockTicks(), drill(tile, shockTicks()))
+    expect(types()).toContain('TileDestroyed')
+    expect(
+      recorded.session.events().filter((event) => event.type === 'ElectrifiedCellShocked'),
+    ).toEqual([expect.objectContaining({ ticks: shockTicks(), withBit: false })])
+    expect(shockTicks()).toBeGreaterThan(0)
+    expect(recorded.session.state().players.p1.wallet).toEqual(walletBefore)
+    expect(types()).not.toContain('MoneyChanged')
   })
 
   it('electrifies only ferrous cells, near the share the economy file names', () => {

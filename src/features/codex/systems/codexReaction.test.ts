@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { createMemorySink } from '../../../logging/eventSink'
+import { createRunLog, installRunLog, uninstallRunLog } from '../../../logging/runLog'
 import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
@@ -12,11 +14,20 @@ import {
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import {
   createScriptedSession,
+  FREEZE_ENEMIES,
   mineTile,
+  poseAbove,
   surfaceOreTiles,
+  type ScriptedSession,
 } from '../../../systems/authority/scriptedSession'
+import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { oreTypeAtTile } from '../../../systems/authority/tileOre'
 import { hasDiscovered } from '../../../systems/registries/discovery'
+import { magneticFieldHolding } from '../../../systems/registries/magneticGround'
+import { planetParamsFor } from '../../../systems/world/planetParams'
+import type { TilePoint } from '../../../systems/world/tileGrid'
+import { readAuthorityState } from '../../../store/authorityLink'
+import { resetGameStore, useGameStore } from '../../../store/gameStore'
 import type { GateCheck } from '../../../systems/registries/gateChecks'
 import { oreTypeOf, type OreType } from '../../../systems/registries/oreTypes'
 import { RESOURCE_FAMILY } from '../../../systems/world/worldCell'
@@ -196,6 +207,85 @@ describe('codex discovery reaction', () => {
     expect(ask(preview.id)).toBe(false)
     expect(ask(ore(13, 2, metal).id)).toBe(true)
     expect(preview.tier).toBe(ore(13, 2, metal).tier)
+  })
+})
+
+/** Planet 25 is the Lodestone act's first magnetic planet (#258); its fields come from planet-mix. */
+const MAGNETIC_PLANET = 25
+const FIELD_SEED = 83921
+/** Either side of the top edge of the band-1 field round the ferrous vein at -20,831. */
+const OUTSIDE_FIELD: TilePoint = { tx: -20, ty: 837 }
+const INSIDE_FIELD: TilePoint = { tx: -20, ty: 836 }
+
+/** A pose report with the vehicle's centre on `tile`: standing on the tile under it. */
+const centredOn = (tile: TilePoint) => poseAbove({ tx: tile.tx, ty: tile.ty - 1 }, FACING.up)
+
+/** Player `p1` on planet 25 with the loaded slices, enemies frozen. */
+function onMagneticPlanet(): ScriptedSession {
+  const session = createScriptedSession()
+  session.submit(0, { type: 'debug.setPlanet', payload: { planetIndex: MAGNETIC_PLANET } })
+  session.submit(0, FREEZE_ENEMIES)
+  return session
+}
+
+describe('codex: hazard:magnetic (ticket 290)', () => {
+  let sink: ReturnType<typeof createMemorySink>
+
+  beforeEach(() => {
+    resetGameStore()
+    sink = createMemorySink()
+    installRunLog(createRunLog({ runId: 'run_codex_magnetic', sink, secondsSinceStart: () => 0 }))
+  })
+
+  afterEach(() => uninstallRunLog())
+
+  it('stands its fixture tiles either side of a field edge', () => {
+    const params = planetParamsFor(FIELD_SEED, MAGNETIC_PLANET)
+    expect(magneticFieldHolding(params, OUTSIDE_FIELD)).toBeNull()
+    expect(magneticFieldHolding(params, INSIDE_FIELD)).not.toBeNull()
+  })
+
+  it('hazard:magnetic is recorded on first entering a field', () => {
+    const session = onMagneticPlanet()
+    session.submit(12, centredOn(OUTSIDE_FIELD))
+    session.submit(24, centredOn(INSIDE_FIELD))
+    session.submit(36, centredOn(OUTSIDE_FIELD))
+    session.submit(48, centredOn(INSIDE_FIELD))
+    const events = session.events()
+    const entries = events.filter((event) => event.type === 'MagneticFieldEntered')
+    expect(entries).toEqual([
+      expect.objectContaining({ tick: 24, planetIndex: MAGNETIC_PLANET }),
+      expect.objectContaining({ tick: 48, planetIndex: MAGNETIC_PLANET }),
+    ])
+    expect(codexEventsOf(events)).toEqual([
+      expect.objectContaining({
+        tick: 24,
+        type: 'codex.EntryAdded',
+        key: 'hazard:magnetic',
+        stage: 'contacted',
+      }),
+    ])
+    expect(hasDiscovered(session.state(), 'p1', 'hazard:magnetic', REACHED_PLANET)).toBe(true)
+  })
+
+  it('a debug entry records `debug_command_applied` and no key', () => {
+    const game = () => useGameStore.getState()
+    game().setPlanetSeed(FIELD_SEED)
+    game().setPlanet(MAGNETIC_PLANET)
+    game().teleportToDepthTiles(24)
+    // The body lands where the teleport put it, and its next pose report says so.
+    game().reportPose(centredOn(INSIDE_FIELD).payload)
+    const state = readAuthorityState()
+    const playerId = game().playerId
+    expect(state.players[playerId].vehicle.mode).toBe('active')
+    expect(sink.events.map(({ event, data }) => ({ event, data }))).toContainEqual({
+      event: 'debug_command_applied',
+      data: { command: 'teleportToDepthTiles', args: { depthTiles: 24 } },
+    })
+    const lineNames = sink.events.map(({ event }) => event)
+    expect(lineNames).not.toContain('magnetic_field_entered')
+    expect(lineNames).not.toContain('codex.entry_added')
+    expect(hasDiscovered(state, playerId, 'hazard:magnetic', REACHED_PLANET)).toBe(false)
   })
 })
 
