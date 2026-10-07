@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T20:28:49Z",
+  "updated_at": "2026-10-07T20:28:54Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -251,9 +251,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #180 (Spec: Workshop redo: showcase platform, hold-to-buy chains, two-tier levels and escalating purchase audio) on d75b04e",
+      "note": "testing spec #169 (Wayfinder: Shop buildings, sell and buy juice, mining popups, and desktop/mobile/TV look) on ae7c189",
       "stale_after_min": 420,
-      "updated_at": "2026-10-07T19:58:04Z",
+      "updated_at": "2026-10-07T20:28:54Z",
       "host": "grok-bot-vm-452660841"
     }
   },
