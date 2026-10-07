@@ -66,6 +66,11 @@
       ]
     },
     {
+      "why": "The drill-gear lane's items in the drill sockets, their keys and their card lines.",
+      "paths": ["src/features/drill-gear/**"],
+      "specs": ["e2e/browser/drillGear.spec.ts", "e2e/browser/powerUpCore.spec.ts"]
+    },
+    {
       "why": "The mobility lane's items in the slots, their effect windows and their card lines, and on the rig.",
       "paths": ["src/features/mobility/**"],
       "specs": [
