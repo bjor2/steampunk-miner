@@ -6,8 +6,16 @@ import {
   type VehicleLoadout,
 } from '../../../../systems/vehicle/loadoutState'
 import { GEAR_ART, vehicleWithPoints } from './gearArtFixture'
-import { pivotedQuadOf, rigItemsOf, rigMountsOf, type RigMount } from './rigGear'
-import type { GearQuad } from './techGearQuads'
+import {
+  deployedPivotOf,
+  deployingExtractorPartOf,
+  FOLDED,
+  pivotedQuadOf,
+  rigItemsOf,
+  rigMountsOf,
+  type RigMount,
+} from './rigGear'
+import { mountedGearQuadsOf, type GearQuad, type MountedItem } from './techGearQuads'
 
 // The loaded slices register the mobility and sensing lanes' items; the twin-bit head (#205) and
 // the galvanic probe (#203 Q3) are still held vision rows, so they are invisible.
@@ -18,6 +26,9 @@ const vehicle = vehicleWithPoints([
   { id: 'hull.roof.aft', atM: [-0.42, 0.24], z: 6 },
   { id: 'hull.rear', atM: [-0.58, -0.04], z: 2 },
   { id: 'drill.head', atM: [0.65, 0], z: 9 },
+  { id: 'drill.fork', atM: [0.42, 0], z: 7 },
+  { id: 'drill.hood', atM: [0.5, 0.1], z: 7 },
+  { id: 'drill.flank', atM: [0.58, 0], z: 7 },
 ])
 
 function loadoutOf(slots: Record<string, string>, owned: readonly string[] = []): VehicleLoadout {
@@ -109,4 +120,56 @@ describe('rig gear', () => {
     expect(posed.pivot[0] + x).toBeCloseTo(0.6)
     expect(posed.pivot[1] + y * posed.scaleY).toBeCloseTo(-0.1)
   })
+
+  it('stands a deploying extractor part where laying the gear out at that fraction puts it', () => {
+    for (const itemId of ['rig.resonance', 'rig.containment']) {
+      for (const fraction of [0, 0.3, 1]) {
+        expect(pivotsDeployedFromFolded({ itemId, slot: null }, fraction)).toEqual(
+          pivotsLaidOutAt({ itemId, slot: null }, fraction),
+        )
+      }
+    }
+  })
+
+  it('reverses the turn of the far-side copy as the mirror places it', () => {
+    const cutters: MountedItem = { itemId: 'gear.side_cutters', slot: 'drill.flank' }
+    const [above, below] = mountedGearQuadsOf(GEAR_ART, vehicle, cutters, FOLDED).filter(
+      (quad) => quad.partId === 'cutter-arm',
+    )
+    const arm = {
+      id: 'cutter-arm',
+      folded: { turn: 0.9, shift: [0, 0.05] as const },
+      deployed: { turn: 0, shift: [0, 0] as const },
+    }
+    const [, aboveZ] = deployedPivotOf(above!, arm, 1).pivot
+    const [, belowZ] = deployedPivotOf(below!, arm, 1).pivot
+    expect(aboveZ).toBeCloseTo((above?.pivot[1] ?? 0) - 0.05)
+    expect(belowZ).toBeCloseTo((below?.pivot[1] ?? 0) + 0.05)
+    expect(deployedPivotOf(below!, arm, 0).turn).toBeCloseTo(-0.9)
+  })
+
+  it('deploys only extractor parts that move, leaving fixed parts and other gear folded', () => {
+    const partsOf = (item: MountedItem) =>
+      mountedGearQuadsOf(GEAR_ART, vehicle, item, FOLDED)
+        .filter((quad) => deployingExtractorPartOf(quad) !== null)
+        .map((quad) => quad.partId)
+    expect(partsOf({ itemId: 'rig.resonance', slot: null })).toEqual(['fork-prongs'])
+    expect(partsOf({ itemId: 'gear.side_cutters', slot: 'drill.flank' })).toEqual([])
+  })
 })
+
+function pivotsDeployedFromFolded(item: MountedItem, fraction: number) {
+  return mountedGearQuadsOf(GEAR_ART, vehicle, item, FOLDED).map((quad) => {
+    const part = deployingExtractorPartOf(quad)
+    return part === null ? pivotOf(quad) : deployedPivotOf(quad, part, fraction)
+  })
+}
+
+function pivotsLaidOutAt(item: MountedItem, fraction: number) {
+  return mountedGearQuadsOf(GEAR_ART, vehicle, item, fraction).map(pivotOf)
+}
+
+function pivotOf(quad: GearQuad) {
+  const { pivot, turn } = pivotedQuadOf(quad)
+  return { pivot, turn }
+}

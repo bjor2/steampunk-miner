@@ -14,23 +14,35 @@ const HOOD: GearPart = {
   deployed: { turn: 0, shift: [0, 0] },
 }
 
+function working(ticksSinceChange: number) {
+  return { isWorking: true, ticksSinceChange }
+}
+
+function idle(ticksSinceChange: number) {
+  return { isWorking: false, ticksSinceChange }
+}
+
 describe('extractor pose: the fold-flat rule', () => {
+  it('keeps an extractor that has not worked since the save began folded flat', () => {
+    expect(deployFractionOf(null)).toBe(0)
+  })
+
   it('deploys within 8 ticks of working a matching gated cell (G&V acceptance)', () => {
     expect(DEPLOY_TIMING.unfoldTicks).toBeLessThanOrEqual(8)
-    expect(deployFractionOf(true, 0)).toBe(0)
-    expect(deployFractionOf(true, DEPLOY_TIMING.unfoldTicks / 2)).toBeCloseTo(0.5)
-    expect(deployFractionOf(true, DEPLOY_TIMING.unfoldTicks)).toBe(1)
-    expect(deployFractionOf(true, 1000)).toBe(1)
+    expect(deployFractionOf(working(0))).toBe(0)
+    expect(deployFractionOf(working(DEPLOY_TIMING.unfoldTicks / 2))).toBeCloseTo(0.5)
+    expect(deployFractionOf(working(DEPLOY_TIMING.unfoldTicks))).toBe(1)
+    expect(deployFractionOf(working(1000))).toBe(1)
   })
 
   it('stays deployed for 30 ticks after the cell is left, then folds back', () => {
     expect(DEPLOY_TIMING.holdTicks).toBe(30)
-    expect(deployFractionOf(false, 0)).toBe(1)
-    expect(deployFractionOf(false, DEPLOY_TIMING.holdTicks)).toBe(1)
-    const folding = deployFractionOf(false, DEPLOY_TIMING.holdTicks + DEPLOY_TIMING.foldTicks / 2)
+    expect(deployFractionOf(idle(0))).toBe(1)
+    expect(deployFractionOf(idle(DEPLOY_TIMING.holdTicks))).toBe(1)
+    const folding = deployFractionOf(idle(DEPLOY_TIMING.holdTicks + DEPLOY_TIMING.foldTicks / 2))
     expect(folding).toBeCloseTo(0.5)
-    expect(deployFractionOf(false, DEPLOY_TIMING.holdTicks + DEPLOY_TIMING.foldTicks)).toBe(0)
-    expect(deployFractionOf(false, 1000)).toBe(0)
+    expect(deployFractionOf(idle(DEPLOY_TIMING.holdTicks + DEPLOY_TIMING.foldTicks))).toBe(0)
+    expect(deployFractionOf(idle(1000))).toBe(0)
   })
 
   it('poses a moving part at its folded pose at 0, its deployed pose at 1 and between on the way', () => {

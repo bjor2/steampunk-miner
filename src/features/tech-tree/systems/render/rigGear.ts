@@ -16,7 +16,8 @@ import { ATTACH_ASSET_ID } from '../../../../systems/art/sidecarAttach'
 import type { AttachId } from '../../../../systems/registries/vehicleAttach'
 import { isVehicleItemId } from '../../../../systems/registries/vehicleLoadout'
 import type { VehicleLoadout } from '../../../../systems/vehicle/loadoutState'
-import { mountedGearOf } from './techGear'
+import { isMovingPart, partPoseAt } from './extractorPose'
+import { mountedGearOf, type GearPart } from './techGear'
 import {
   gearAttachIdOf,
   mountedGearQuadsOf,
@@ -26,8 +27,8 @@ import {
 } from './techGearQuads'
 
 /**
- * Extractors stay folded flat: their unfold follows the drill's work on a gated cell, which
- * 148b (#237) drives.
+ * Mounts are laid out folded flat; the piece turns each moving part to the fraction its
+ * extractor's work gives (`deployedPivotOf`, ticket 297), so a deploy never rebuilds a mount.
  */
 export const FOLDED = 0
 
@@ -80,6 +81,39 @@ export function pivotedQuadOf(quad: GearQuad): PivotedQuad {
   const [pivotX, pivotY] = quad.pivot
   const centre: Pair = [quad.centre[0] - pivotX, (quad.centre[1] - pivotY) * scaleY]
   return { pivot: quad.pivot, turn: quad.turn, scaleY, quad: { ...quad, centre, pivot: [0, 0] } }
+}
+
+/** Where a part's group stands: its pivot and the turn it applies there. */
+export interface GearPivot {
+  pivot: Pair
+  turn: number
+}
+
+/**
+ * The quad's part when an extractor's work deploys it; null for a fixed part and for other gear
+ * (the corer, the boom, the cutters), which stays folded until its own work drives it.
+ */
+export function deployingExtractorPartOf(quad: GearQuad): GearPart | null {
+  const gear = mountedGearOf(quad.itemId)
+  const part = gear?.parts.find((candidate) => candidate.id === quad.partId)
+  if (gear?.kind !== 'extractor' || part === undefined) return null
+  return isMovingPart(part) ? part : null
+}
+
+/**
+ * Where a quad laid out `FOLDED` stands at `fraction` deployed, as `mountedGearQuadsOf` would
+ * place it: the pivot moved by the pose's shift past the folded one, the far-side copy's height
+ * and turn reversed. The quad keeps its offset from the pivot, so only the group moves.
+ */
+export function deployedPivotOf(quad: GearQuad, part: GearPart, fraction: number): GearPivot {
+  const side = quad.mirrorY ? -1 : 1
+  const folded = partPoseAt(part, FOLDED)
+  const pose = partPoseAt(part, fraction)
+  const [x, z] = quad.pivot
+  return {
+    pivot: [x + pose.shift[0] - folded.shift[0], z + side * (pose.shift[1] - folded.shift[1])],
+    turn: side * pose.turn,
+  }
 }
 
 function itemMountOf(art: ArtCatalogue, vehicle: PartsSidecar, item: MountedItem): RigMount[] {
