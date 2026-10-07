@@ -97,6 +97,14 @@ describe('descriptions: the Upgrade bay rows as item cards', () => {
     expect(openCardText(buys.rack.id)).toMatch(/Rack slots \d+ → \d+/)
   })
 
+  it('keeps each row’s icon on its card, left of the name', () => {
+    const model = readUpgradeBayModel()
+    const html = bayMarkup()
+    for (const iconId of [...model.tracks.map((row) => row.iconId), model.casing.iconId]) {
+      expect(html).toMatch(new RegExp(`<h3[^>]*>(?:(?!</h3>).)*data-testid="${iconId}"`))
+    }
+  })
+
   it('takes exactly the price the open card shows on the second tap', () => {
     const trackBuys = readUpgradeBayModel().tracks.map((row) => row.buy)
     for (const { id: buyId } of [...trackBuys, ...Object.values(gearBuys())]) {
