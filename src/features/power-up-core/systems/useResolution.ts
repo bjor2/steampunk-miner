@@ -6,6 +6,7 @@
  * - The item acts: its effect lands, its cooldown starts, `PowerUpUsed` says the charges left.
  * - A gate refuses it: the charge comes back and `PowerUpBlocked` names the cell (a refused use
  *   costs nothing).
+ * - It has nothing to act on: the charge comes back and `PowerUpRefused` says why.
  * - A channel whose miner moved: the charge comes back, nothing else changes, `ChannelCancelled`.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
@@ -28,6 +29,7 @@ import {
 import {
   channelCancelledOf,
   powerUpBlockedOf,
+  powerUpRefusedOf,
   powerUpUsedOf,
   type UseSubject,
 } from './powerUpEvents'
@@ -37,6 +39,7 @@ import {
   ticksToActOf,
   type GateBlock,
   type PowerUp,
+  type PowerUpOutcome,
   type PowerUpUse,
 } from './powerUpKind'
 
@@ -67,9 +70,22 @@ export function resolvePendingUse(
   const cleared = withPowerUpState(state, playerId, withPending(value, null))
   if (isToggleSwitchingOff(value, powerUp)) return switchToggleOff(cleared, playerId, pending)
   const outcome = powerUp.activate(cleared, powerUpUseOf(playerId, pending, tick))
-  if (outcome.kind === 'blocked')
-    return refuseByGate(cleared, playerId, powerUp, pending, outcome.block)
-  return finishActed(outcome.effect, playerId, powerUp, pending, tick)
+  return effectOfOutcome(cleared, playerId, powerUp, pending, outcome, tick)
+}
+
+/**
+ * One charge or unit back to an item that spent it, as a cancelled hold gives it back (ticket 204:
+ * the rivet patch's own 90-tick timer, the GD lock on #204 Q6). Never below none spent.
+ */
+export function returnCharge(state: AuthorityState, playerId: string, itemId: string) {
+  const powerUp = powerUpOfItem(itemId)
+  if (powerUp === null) return state
+  return withPowerUpState(state, playerId, refundCharge(powerUpStateOf(state, playerId), powerUp))
+}
+
+/** Whether the toggle is switched on for the player (#162 section 2.1, ticket 204). */
+export function isItemToggledOn(state: AuthorityState, playerId: string, itemId: string) {
+  return isToggledOn(powerUpStateOf(state, playerId), itemId)
 }
 
 /** The channel ends with nothing changed but the charge returned. */
@@ -134,6 +150,38 @@ function switchToggleOff(state: AuthorityState, playerId: string, pending: Pendi
   return {
     state: withPowerUpState(state, playerId, value),
     events: [{ ...used, toggledOn: false }],
+  }
+}
+
+function effectOfOutcome(
+  state: AuthorityState,
+  playerId: string,
+  powerUp: PowerUp,
+  pending: PendingUse,
+  outcome: PowerUpOutcome,
+  tick: number,
+): RuleEffect {
+  if (outcome.kind === 'blocked')
+    return refuseByGate(state, playerId, powerUp, pending, outcome.block)
+  if (outcome.kind === 'refused')
+    return refuseUse(state, playerId, powerUp, pending, outcome.reason)
+  return finishActed(outcome.effect, playerId, powerUp, pending, tick)
+}
+
+/** Nothing to act on: the charge comes back and no cooldown starts. */
+function refuseUse(
+  state: AuthorityState,
+  playerId: string,
+  powerUp: PowerUp,
+  pending: PendingUse,
+  reason: string,
+): RuleEffect {
+  const refunded = refundCharge(powerUpStateOf(state, playerId), powerUp)
+  return {
+    state: withPowerUpState(state, playerId, refunded),
+    events: [
+      powerUpRefusedOf(subjectOf(playerId, pending), reason, chargesLeftIn(refunded, powerUp)),
+    ],
   }
 }
 

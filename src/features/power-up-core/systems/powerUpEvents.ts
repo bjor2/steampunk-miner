@@ -40,6 +40,14 @@ declare module '../../../systems/authority/domainEvent' {
       ty: number
       chargesLeft: number
     }
+    /** The item found nothing to act on (ticket 204: a grapple with no hook); nothing spent. */
+    'power-up-core.PowerUpRefused': {
+      playerId: string
+      itemId: string
+      slot: LoadoutSlotId
+      reason: string
+      chargesLeft: number
+    }
     'power-up-core.ChannelCancelled': {
       playerId: string
       itemId: string
@@ -90,6 +98,10 @@ export function powerUpUsedOf(
 
 export function powerUpBlockedOf(subject: UseSubject, block: GateBlock, chargesLeft: number) {
   return { type: 'power-up-core.PowerUpBlocked' as const, ...subject, ...block, chargesLeft }
+}
+
+export function powerUpRefusedOf(subject: UseSubject, reason: string, chargesLeft: number) {
+  return { type: 'power-up-core.PowerUpRefused' as const, ...subject, reason, chargesLeft }
 }
 
 export function channelCancelledOf(subject: UseSubject, chargesLeft: number) {

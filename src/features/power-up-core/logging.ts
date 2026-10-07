@@ -1,7 +1,7 @@
 /**
  * The power-up log lines (#162 section 2.4, Systems on #200): `power_up_used`,
- * `power_up_blocked_by_gate`, `power_up_cancelled` for a broken channel, and `charges_refilled`
- * for each free dock refill. The envelope already carries planet, depth and tick.
+ * `power_up_blocked_by_gate`, `power_up_refused` for a use with nothing to act on (ticket 204),
+ * `power_up_cancelled` for a broken channel, and `charges_refilled` for each free dock refill. The envelope already carries planet, depth and tick.
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
@@ -22,6 +22,10 @@ export const POWER_UP_PROJECTIONS: SliceEventProjections = {
   'power-up-core.PowerUpBlocked': ({ itemId, cellTier, gateKind, tx, ty }) => ({
     event: 'power-up-core.power_up_blocked_by_gate',
     data: { itemId, cellTier, gateKind, tx, ty },
+  }),
+  'power-up-core.PowerUpRefused': ({ itemId, slot, reason, chargesLeft }) => ({
+    event: 'power-up-core.power_up_refused',
+    data: { itemId, slot, reason, chargesLeft },
   }),
   'power-up-core.ChannelCancelled': ({ itemId, slot, chargesLeft }) => ({
     event: 'power-up-core.power_up_cancelled',
@@ -56,6 +60,11 @@ export const POWER_UP_RUN_EVENTS: SliceRunEvents = {
       tx: 'integer',
       ty: 'integer',
     },
+  },
+  'power-up-core.power_up_refused': {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', slot: 'text', reason: 'text', chargesLeft: 'integer' },
   },
   'power-up-core.power_up_cancelled': {
     group: 'vehicle_and_combat',

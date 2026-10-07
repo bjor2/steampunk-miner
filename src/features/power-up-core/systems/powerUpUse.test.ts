@@ -5,7 +5,7 @@ import { GROUND, poseAbove, type ScriptedSession } from '../../../systems/author
 import { toCanonical } from '../../../systems/money'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { chargesLeftOf } from './chargeState'
-import { FAKE, FAKE_GATE, inField } from '../fakeItems'
+import { FAKE, FAKE_GATE, FAKE_REFUSAL, inField } from '../fakeItems'
 import { intentToUseSlot } from './slotUse'
 
 // Fake charged, channel, consumable and toggle items through `use_power_up` (#200 acceptance 1-3,
@@ -108,6 +108,33 @@ describe('power-up use: refused by a gate (G&V E2)', () => {
         expect(rejectionOf(session, 20, press('powerup.1'))).toBeNull()
       },
       { facing: FACING.down },
+    )
+  })
+})
+
+describe('power-up use: refused with nothing to act on (ticket 204)', () => {
+  it('spends no charge, starts no cooldown and logs why, naming no cell', () => {
+    inField(
+      (session) => {
+        session.submit(10, press('powerup.1'))
+        const events = session.advanceTo(20)
+        expect(ofType(events, 'power-up-core.PowerUpBlocked')).toEqual([])
+        expect(ofType(events, 'power-up-core.PowerUpRefused')).toEqual([
+          {
+            tick: 16,
+            type: 'power-up-core.PowerUpRefused',
+            playerId: 'p1',
+            itemId: FAKE.charged,
+            slot: 'powerup.1',
+            reason: FAKE_REFUSAL,
+            chargesLeft: 2,
+          },
+        ])
+        expect(chargesOf(session, FAKE.charged)).toBe(2)
+        expect(walletOf(session)).toBe('0e+0')
+        expect(rejectionOf(session, 20, press('powerup.1'))).toBeNull()
+      },
+      { facing: FACING.up },
     )
   })
 })

@@ -45,9 +45,16 @@ export interface GateBlock {
   ty: number
 }
 
-/** A use either acts, with its effect on the world, or is refused by a gate and costs nothing. */
+/**
+ * A use either acts, with its effect on the world, or is refused and costs nothing: by a gate on
+ * the cell it would change (`blocked`), or because it has nothing to act on, such as a grapple
+ * with no hook in range (`refused`, the GD lock on #204 Q5: only an act that would change a cell
+ * logs the gate).
+ */
 export type PowerUpOutcome =
-  { kind: 'acted'; effect: RuleEffect } | { kind: 'blocked'; block: GateBlock }
+  | { kind: 'acted'; effect: RuleEffect }
+  | { kind: 'blocked'; block: GateBlock }
+  | { kind: 'refused'; reason: string }
 
 export interface PowerUp extends ContentEntry {
   /** `<slice>.<name>`: the registering slice's id for this entry. */

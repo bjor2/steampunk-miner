@@ -3,7 +3,7 @@
  * consumable items"): one of each class, registered by a fixture slice beside the real one, the
  * way an item slice will. Each pays its user one coin when it acts, so a spec sees the effect in
  * the wallet; each is refused by a gate when the vehicle faces down, as if the cell below were
- * gated. Spec-only: no register.ts imports this.
+ * gated, and finds nothing to act on when it faces up. Spec-only: no register.ts imports this.
  */
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -36,6 +36,9 @@ export const FAKE_DRAW_PER_MILLE = 15
 
 /** The cell a downward-facing fake aims at is a tier-9 drill gate. */
 export const FAKE_GATE = { cellTier: 9, gateKind: 'drill_tier' } as const
+
+/** Why an upward-facing fake is refused: nothing above it to act on. */
+export const FAKE_REFUSAL = 'fake-items.nothing_above'
 
 interface FakeNumbers {
   powerUpClass: PowerUpClass
@@ -121,6 +124,7 @@ function payOneCoinUnlessFacingDown(state: AuthorityState, use: PowerUpUse): Pow
   if (vehicle.pose?.facing === FACING.down) {
     return { kind: 'blocked', block: { ...FAKE_GATE, tx: use.origin.tx, ty: use.origin.ty - 1 } }
   }
+  if (vehicle.pose?.facing === FACING.up) return { kind: 'refused', reason: FAKE_REFUSAL }
   const wallet = add(state.players[use.playerId].wallet, fromSafeInteger(1))
   return { kind: 'acted', effect: { state: withWallet(state, use.playerId, wallet), events: [] } }
 }

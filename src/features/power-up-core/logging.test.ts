@@ -7,7 +7,7 @@ import { withRegistrations } from '../../registries/registrar'
 import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { dockInBay } from '../../systems/authority/scriptedSession'
 import { FACING } from '../../systems/vehicle/vehiclePose'
-import { FAKE, FAKE_ITEMS, inField } from './fakeItems'
+import { FAKE, FAKE_ITEMS, FAKE_REFUSAL, inField } from './fakeItems'
 import { slice } from './register'
 import { intentToUseSlot } from './systems/slotUse'
 
@@ -82,6 +82,27 @@ describe('power-up log lines', () => {
         },
       },
     ])
+  })
+
+  it('logs a use with nothing to act on with its reason and the charges kept', () => {
+    const events = inField(
+      (session) => {
+        session.submit(10, intentToUseSlot('powerup.1'))
+        session.advanceTo(30)
+        return session.events()
+      },
+      { facing: FACING.up },
+    )
+    const lines = linesOf(events)
+    expect(dataOf(lines)).toEqual([
+      {
+        event: 'power-up-core.power_up_refused',
+        data: { itemId: FAKE.charged, slot: 'powerup.1', reason: FAKE_REFUSAL, chargesLeft: 2 },
+      },
+    ])
+    expect(withRegistrations([slice, FAKE_ITEMS], () => lines.flatMap(runEventProblems))).toEqual(
+      [],
+    )
   })
 
   it('writes every line to its registered schema', () => {
