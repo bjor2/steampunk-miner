@@ -1,25 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-07T05:02:20.858Z",
+ "updatedAt": "2026-10-07T05:02:28.857Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37530219256,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37530219256",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "df696a1eaf6c2b5ce4b936f72c40702f69ca9acb",
-   "branch": "main",
-   "startedAt": "2026-10-06T20:56:22Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 86,
-   "reportFound": true,
-   "files": 10,
-   "tests": 86,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37537675511,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37537675511",
@@ -852,6 +835,23 @@
    "tests": 86,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 37574249172,
+   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37574249172",
+   "event": "push",
+   "mode": "scoped",
+   "sha": "d83a6188a2581311aa0655dbca6eb7098805b2d0",
+   "branch": "main",
+   "startedAt": "2026-10-07T05:01:10Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 58,
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
@@ -864,24 +864,6 @@
   "scopingSuspects": []
  },
  "features": {
-  "tooling-metrics": {
-   "files": 7,
-   "p50Ms": 55,
-   "p95Ms": 76,
-   "fileRuns": 59,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "tooling-status": {
-   "files": 14,
-   "p50Ms": 170,
-   "p95Ms": 264,
-   "fileRuns": 128,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
   "debug": {
    "files": 6,
    "p50Ms": 987,
@@ -1089,6 +1071,15 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "tooling-status": {
+   "files": 14,
+   "p50Ms": 168,
+   "p95Ms": 263,
+   "fileRuns": 121,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "shell": {
    "files": 1,
    "p50Ms": 7,
@@ -1112,6 +1103,15 @@
    "p50Ms": 24,
    "p95Ms": 31,
    "fileRuns": 8,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "tooling-metrics": {
+   "files": 7,
+   "p50Ms": 54,
+   "p95Ms": 76,
+   "fileRuns": 56,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1181,136 +1181,6 @@
   }
  },
  "files": {
-  "scripts/metrics/claimedWindow.test.mjs": {
-   "feature": "tooling-metrics",
-   "runs": 9,
-   "lastMs": 4,
-   "p50Ms": 4,
-   "p95Ms": 5,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37569652767,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/metrics/ticketFile.test.mjs": {
-   "feature": "tooling-metrics",
-   "runs": 9,
-   "lastMs": 7,
-   "p50Ms": 6,
-   "p95Ms": 15,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37569652767,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/metrics/ticketRecord.test.mjs": {
-   "feature": "tooling-metrics",
-   "runs": 9,
-   "lastMs": 15,
-   "p50Ms": 14,
-   "p95Ms": 17,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37569652767,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/features.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 10,
-   "lastMs": 7,
-   "p50Ms": 11,
-   "p95Ms": 25,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37573078392,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/featureTime.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 9,
-   "lastMs": 18,
-   "p50Ms": 15,
-   "p95Ms": 18,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37569652767,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/featureTimeHtml.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 10,
-   "lastMs": 12,
-   "p50Ms": 10,
-   "p95Ms": 13,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37569652767,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/ticketsClosed.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 9,
-   "lastMs": 7,
-   "p50Ms": 7,
-   "p95Ms": 14,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37569652767,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/ticketsClosedHtml.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 10,
-   "lastMs": 8,
-   "p50Ms": 8,
-   "p95Ms": 21,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37569652767,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/ticketTimeOverview.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 9,
-   "lastMs": 16,
-   "p50Ms": 18,
-   "p95Ms": 22,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37569652767,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/ticketTimeOverviewHtml.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 10,
-   "lastMs": 25,
-   "p50Ms": 17,
-   "p95Ms": 25,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37569652767,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
   "src/debug/debugApi.test.ts": {
    "feature": "debug",
    "runs": 21,
@@ -4376,6 +4246,19 @@
    "flaky": false,
    "slowest": []
   },
+  "scripts/status/featureTimeHtml.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 9,
+   "lastMs": 12,
+   "p50Ms": 10,
+   "p95Ms": 12,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37569652767,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "scripts/status/issueBuckets.test.mjs": {
    "feature": "tooling-status",
    "runs": 9,
@@ -4408,6 +4291,32 @@
    "lastMs": 11,
    "p50Ms": 12,
    "p95Ms": 18,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37569652767,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/ticketsClosedHtml.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 9,
+   "lastMs": 8,
+   "p50Ms": 8,
+   "p95Ms": 21,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37569652767,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/ticketTimeOverviewHtml.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 9,
+   "lastMs": 25,
+   "p50Ms": 17,
+   "p95Ms": 25,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37569652767,
@@ -4784,6 +4693,19 @@
    "flaky": false,
    "slowest": []
   },
+  "scripts/metrics/claimedWindow.test.mjs": {
+   "feature": "tooling-metrics",
+   "runs": 8,
+   "lastMs": 4,
+   "p50Ms": 4,
+   "p95Ms": 5,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37569652767,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "scripts/metrics/classifyToolCall.test.mjs": {
    "feature": "tooling-metrics",
    "runs": 8,
@@ -4829,6 +4751,32 @@
    "lastMs": 14,
    "p50Ms": 12,
    "p95Ms": 14,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37569652767,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/metrics/ticketFile.test.mjs": {
+   "feature": "tooling-metrics",
+   "runs": 8,
+   "lastMs": 7,
+   "p50Ms": 6,
+   "p95Ms": 15,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37569652767,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/metrics/ticketRecord.test.mjs": {
+   "feature": "tooling-metrics",
+   "runs": 8,
+   "lastMs": 15,
+   "p50Ms": 13,
+   "p95Ms": 17,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37569652767,
@@ -4901,6 +4849,32 @@
    "flaky": false,
    "slowest": []
   },
+  "scripts/status/features.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 9,
+   "lastMs": 7,
+   "p50Ms": 11,
+   "p95Ms": 25,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37573078392,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/featureTime.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 8,
+   "lastMs": 18,
+   "p50Ms": 15,
+   "p95Ms": 18,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37569652767,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "scripts/status/perfOverview.test.mjs": {
    "feature": "tooling-status",
    "runs": 8,
@@ -4919,6 +4893,32 @@
    "runs": 8,
    "lastMs": 18,
    "p50Ms": 18,
+   "p95Ms": 22,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37569652767,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/ticketsClosed.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 8,
+   "lastMs": 7,
+   "p50Ms": 7,
+   "p95Ms": 14,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37569652767,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/ticketTimeOverview.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 8,
+   "lastMs": 16,
+   "p50Ms": 16,
    "p95Ms": 22,
    "passRate": 1,
    "lastStatus": "passed",
