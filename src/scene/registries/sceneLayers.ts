@@ -8,9 +8,10 @@
  * read-only store reads (`src/store/*Reads`) and its own slice store; it places objects from fixed
  * pools in `useFrame`, never through React per frame, and never writes the authority state, the
  * camera or the sound. Each layer declares the most it draws, so the kernel can hold the sum of
- * them to the #154 presentation line.
+ * them to `SCENE_LAYER_LINE`.
  */
 import type { ComponentType } from 'react'
+import { SCENE_LAYER_LINE } from '../../constants/scene'
 import { defineRegistry, entriesOf } from '../../systems/registries/seal'
 
 /** The most a layer draws in one frame. */
@@ -42,5 +43,13 @@ export function sceneLayersBudget(layers: readonly SceneLayer[]): SceneLayerBudg
       instances: total.instances + budget.instances,
     }),
     { drawCalls: 0, instances: 0 },
+  )
+}
+
+/** Whether the layers together stay within the scene-layer draw envelope (#213). */
+export function isWithinSceneLayerLine(layers: readonly SceneLayer[]): boolean {
+  const total = sceneLayersBudget(layers)
+  return (
+    total.drawCalls <= SCENE_LAYER_LINE.drawCalls && total.instances <= SCENE_LAYER_LINE.instances
   )
 }

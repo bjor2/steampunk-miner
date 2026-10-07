@@ -130,6 +130,15 @@ export const MAX_CHUNK_DRAW_CALLS = 16
  */
 export const MAX_PLATFORM_PARTS = 48
 
+/**
+ * What the slices' scene layers may draw at most, all together (TD and GD lock on #213): a
+ * seal-time draw envelope carved from #38's 150 draw calls, separate from #154's 2 ms rebuild line.
+ * 27 draw calls is what is left after #38's split (ground 2, vehicle 30, enemies 3, particles 4,
+ * platform 48, post 6) and one co-op vehicle's 30; a pooled `InstancedMesh` counts as one. 1024
+ * instances, about 10x #145a's debris pool, holds until a reference-machine GPU run measures fill.
+ */
+export const SCENE_LAYER_LINE = { drawCalls: 27, instances: 1024 } as const
+
 /** At most this many live ground colliders (#4, #22 acceptance, #36 acceptance 7). */
 export const MAX_GROUND_COLLIDERS = 600
 
