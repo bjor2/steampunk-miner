@@ -16,6 +16,13 @@ cradle (`markPlatesOf`, at the Mark the item acts at, #249), and the `tech-tree.
 into four point pools (`powerUpFxFeed.ts`). `steampunkDebug.features['tech-tree'].getRig()` reads
 both, and `previewPowerUpFx(itemId)` plays an effect at the vehicle.
 
+Since ticket 277 the rig also shows each Mark milestone an item has reached (the GD lock on
+#256): a gilt stud over that Mark's rivet on the plate (`markPlatesOf`'s `studs`), and one element
+of the item's effect changed per milestone, stacking (`milestoneLook.ts`): Mark 3 tints the motes
+halfway toward the plate gilt, Mark 6 doubles the strands, Mark 9 doubles the mote size. Both are
+stand-ins on the procedural plate and motes; the Blender pass may replace them. An item without an
+`fx` row shows its milestones on the plate alone.
+
 ## What is here
 
 Everything is placed by the data the game reads: a part sits at its attach point's `atM` from
