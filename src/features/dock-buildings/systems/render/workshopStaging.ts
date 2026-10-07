@@ -12,8 +12,9 @@ import { dockSiteOfPlanet } from '../../../../systems/authority/planetOfState'
 import type { VehicleStaging } from '../../../../systems/registries/vehicleStaging'
 import { bayOfPose, type VehiclePose } from '../../../../systems/vehicle/vehiclePose'
 import type { VehicleState } from '../../../../systems/vehicle/vehicleState'
-import { bayCentreColumnOf } from '../../../../systems/world/dockBays'
 import type { DockSite } from '../../../../systems/world/dockSite'
+import { shopBuildingOriginOf, type WorldPoint } from './buildingOrigin'
+import { easeInOut, shareOf } from './easing'
 
 /** #170: the car is on the turntable within 30 ticks; leaving hands control back within 30. */
 export const ROLL_TICKS = 30
@@ -60,15 +61,15 @@ function isRollingOff(vehicle: VehicleState, site: DockSite, elapsed: number): b
   return bayOfPose(site, vehicle.pose) === 'upgrade'
 }
 
-/** The building's origin: its zone's centre column on the pad top, as the art is placed (#174). */
-export function worksOriginOf(site: DockSite): { x: number; y: number } {
-  return { x: bayCentreColumnOf(site, 'upgrade'), y: site.padRow + 1 }
+/** The Works' origin: its zone's centre column on the pad top, as the art is placed (#174). */
+export function worksOriginOf(site: DockSite): WorldPoint {
+  return shopBuildingOriginOf(site, 'upgrade')
 }
 
 function stagingAt(
   phase: RollPhase,
   pose: VehiclePose,
-  origin: { x: number; y: number },
+  origin: WorldPoint,
   points: WorkshopRollPoints,
 ): VehicleStaging {
   const roll = rollShareOf(phase)
@@ -94,13 +95,4 @@ function cameraShareOf(phase: RollPhase): number {
   const ticks = phase.kind === 'on' ? SHOWCASE_CAMERA_TICKS : ROLL_TICKS
   const done = easeInOut(shareOf(phase.elapsed, ticks))
   return phase.kind === 'on' ? done : 1 - done
-}
-
-function shareOf(elapsed: number, ticks: number): number {
-  return Math.min(Math.max(elapsed / ticks, 0), 1)
-}
-
-/** Smoothstep: starts and ends at rest, exactly 0 and 1 at the ends. */
-function easeInOut(share: number): number {
-  return share * share * (3 - 2 * share)
 }
