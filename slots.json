@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T21:16:30+02:00",
+  "updated_at": "2026-10-07T21:16:39+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -27,11 +27,12 @@
         },
         {
           "slot": "C2",
-          "state": "free",
+          "state": "busy",
           "ticket": null,
           "grok_slot": null,
-          "kind": null,
-          "since": null
+          "kind": "aux",
+          "since": "2026-10-07T21:16:00+02:00",
+          "label": "fable GD lock #258"
         },
         {
           "slot": "C3",
@@ -51,9 +52,9 @@
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
-      "claims_last_hour": 9,
+      "used": 4,
+      "free": 0,
+      "claims_last_hour": 10,
       "name": "Claude Max 1"
     },
     {
@@ -324,10 +325,12 @@
     },
     {
       "slot": 2,
-      "state": "free",
+      "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": null,
+      "since": "2026-10-07T21:16:00+02:00",
+      "kind": "aux",
+      "label": "fable GD lock #258",
       "account": 1
     },
     {
@@ -398,8 +401,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 7,
-      "free": 1,
+      "used": 8,
+      "free": 0,
       "external": 0
     }
   }
