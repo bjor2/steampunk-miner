@@ -654,6 +654,12 @@
               "description": "A bought part bolts on with a puff of steam (instant with reduced motion).",
               "status": "built",
               "issues": [44, 62]
+            },
+            {
+              "title": "Workshop milestones",
+              "description": "A few big level-ups per track bring a new behaviour and a visible part on the miner: the first two majors of every track swap in or move its tier parts. The list is data; each behaviour (bit-spin flourish, piston pump, hopper tip, part swap) is built by its own ticket.",
+              "status": "planned",
+              "issues": [228, 177, 180]
             }
           ]
         },

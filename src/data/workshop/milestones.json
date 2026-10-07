@@ -1,0 +1,52 @@
+{
+  "$comment": "Workshop milestone majors (#180 Progression, #228): the big level-ups per track that bring a new behaviour and a visible change on the miner, keyed on the track's major level L. Seeded from Gameplay & Vehicle's 12 rows on #177: majors 1 and 2 on each of the six tracks, swapping among the tier 1-3 parts vehicle.parts.json already ships. A row may name a featureId of docs/scaling/horizontal/stats.json it upgrades; it is then owned only once FeatureUnlocked has fired, so a milestone never unlocks a scheduled feature early. cargo_hold is motion-only until a t2 or t3 hopper exists.",
+  "milestones": [
+    { "track": "drill_power", "major": 1, "behaviour": "swap.part", "partIds": ["t2-drill-head"] },
+    { "track": "drill_power", "major": 2, "behaviour": "swap.part", "partIds": ["t3-drill-head"] },
+    {
+      "track": "drill_tip",
+      "major": 1,
+      "behaviour": "motion.bit_spin_flourish",
+      "partIds": ["t1-drill-bit"]
+    },
+    { "track": "drill_tip", "major": 2, "behaviour": "swap.part", "partIds": ["t3-drill-bit"] },
+    { "track": "engine", "major": 1, "behaviour": "motion.piston_pump", "partIds": ["t1-piston"] },
+    {
+      "track": "engine",
+      "major": 2,
+      "behaviour": "swap.part",
+      "partIds": ["t3-wheel", "t3-wheel-2", "t3-wheel-3"]
+    },
+    { "track": "boiler", "major": 1, "behaviour": "swap.part", "partIds": ["t2-stack-2"] },
+    {
+      "track": "boiler",
+      "major": 2,
+      "behaviour": "swap.part",
+      "partIds": ["t3-boiler-2", "t3-stack"]
+    },
+    {
+      "track": "cargo_hold",
+      "major": 1,
+      "behaviour": "motion.hopper_tip",
+      "partIds": ["t1-hopper"]
+    },
+    {
+      "track": "cargo_hold",
+      "major": 2,
+      "behaviour": "motion.hopper_tip",
+      "partIds": ["t1-hopper"]
+    },
+    {
+      "track": "hull",
+      "major": 1,
+      "behaviour": "swap.part",
+      "partIds": ["t2-armour-plate", "t2-armour-plate-2"]
+    },
+    {
+      "track": "hull",
+      "major": 2,
+      "behaviour": "swap.part",
+      "partIds": ["t3-armour-plate", "t3-armour-plate-2", "t3-armour-plate-3", "t3-chassis"]
+    }
+  ]
+}
