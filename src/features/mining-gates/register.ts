@@ -25,6 +25,7 @@ import { extractorVerbs } from './systems/extractorReaction'
 import { EXTRACTOR_SECTION } from './systems/extractorState'
 import { GATE_ROWS } from './systems/gateRows'
 import { gateLedger } from './systems/gateLedger'
+import { GATE_SOUNDS } from './systems/render/gateSounds'
 import { RIG_CARDS, RIG_SELLER } from './systems/rigSales'
 import { vehicleItemOfRig } from './systems/rigs'
 
@@ -46,6 +47,8 @@ export const slice: SliceDefinition = {
     r.eventProjections(MINING_GATES_PROJECTIONS)
     r.runEvents(MINING_GATES_RUN_EVENTS)
     r.reportRows(miningGatesReportRows)
+    // A sound per gate kind at contact, and the flourish of a freed cell (ticket 238).
+    GATE_SOUNDS.cues.forEach((cue) => r.soundCue(cue))
     // steampunkDebug.features['mining-gates'].describe(), .gateTableOf(p, seed),
     // .dynamiteCellsOf(p, seeds), .ownsRig(id), .grantRig(id)
     r.debugActions(miningGatesDebugActions)

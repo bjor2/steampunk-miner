@@ -85,10 +85,13 @@ export function gatedCellOn(
 /** Columns the world scan walks, each from the surface to the centre. */
 const SCANNED_COLUMNS = 40
 
-/** The first generated ore cell whose gate `pick` names, walking columns down from the surface. */
+/**
+ * The first generated ore cell `pick` names by its gate and ore, walking columns down from the
+ * surface.
+ */
 export function worldCellOfGate(
   params: PlanetParams,
-  pick: (gate: CellGate) => boolean,
+  pick: (gate: CellGate, ore: OreType) => boolean,
 ): { tile: TilePoint; ore: OreType; gate: CellGate } {
   for (let tx = 0; tx < SCANNED_COLUMNS; tx++) {
     const found = gatedCellInColumn(params, tx, pick)
@@ -97,13 +100,17 @@ export function worldCellOfGate(
   throw new Error(`planet ${params.planetIndex} shows no such gated cell in its first columns`)
 }
 
-function gatedCellInColumn(params: PlanetParams, tx: number, pick: (gate: CellGate) => boolean) {
+function gatedCellInColumn(
+  params: PlanetParams,
+  tx: number,
+  pick: (gate: CellGate, ore: OreType) => boolean,
+) {
   for (let ty = surfaceRowOfColumn(tx, params.radiusTiles); ty > 0; ty--) {
     const cell = cellAt(EMPTY_WORLD, params, { tx, ty })
     if (kindOfCell(cell) !== CELL_KIND.ore) continue
     const ore = oreTypeOf({ tier: resourceTierOf(params, cell), cellFamily: familyOfCell(cell) })
     const gate = cellGateOf(params, { tx, ty }, ore)
-    if (pick(gate)) return { tile: { tx, ty }, ore, gate }
+    if (pick(gate, ore)) return { tile: { tx, ty }, ore, gate }
   }
   return null
 }

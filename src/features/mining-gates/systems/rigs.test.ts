@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import { contentOf } from '../../../systems/registries/content'
+import { flavourProblemsOf } from '../../descriptions'
 import { actOf, familyRows } from '../../planet-mix'
 import { GATE_ROWS } from './gateRows'
+import { fillLedgerTemplate, ledgerTemplatesOf } from './ledgerLines'
 import {
   availableFromPlanet,
   iconIdOfRig,
@@ -67,6 +69,14 @@ describe('extractors', () => {
       expect(rig.description.length).toBeLessThanOrEqual(80)
       expect(`${rig.name} ${rig.description}`).not.toMatch(/\d|\brigs?\b/i)
     }
+  })
+
+  it('word their ledger lines inside the #159 flavour rules, with the longest name filled in', () => {
+    const longestName = GATE_ROWS.rigs.map((rig) => rig.name).sort((a, b) => b.length - a.length)[0]
+    const lines = ledgerTemplatesOf().map((template) =>
+      fillLedgerTemplate(template, { extractor: longestName }),
+    )
+    expect(lines.flatMap((line) => flavourProblemsOf(line).map((p) => `${line}: ${p}`))).toEqual([])
   })
 
   it('register as slotless vehicle items, mounted once owned', () => {

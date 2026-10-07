@@ -1,0 +1,20 @@
+{
+  "source": "Ticket 238 and #142 'Before contact': a cracked shell for dynamite, a hard dark rim for the drill (open, glinting, once the tip of the last completed major cuts it), and one slow surface motion per extractor, from #142's extraction-rig table. A signature cell's marker takes its act's rim tint from #151's per-theme palette (Planet & Narrative, adopted by the Game Director); #151 names the tints, the hex values here are starting values for art. #151's hue-collision rule sends a rim within hueCollisionDeg of the family's hue to the theme's secondary colour, and a rim inside the reserved heat hues (#151 'Reserved colours', #142 'No orange' on the extractor marker) takes the secondary too, which is why Fire wears char red, not ember orange.",
+  "motionSignatures": {
+    "rig.resonance": "concentric-rings",
+    "rig.containment": "vapour-wisps",
+    "rig.acid_etcher": "drip-lines",
+    "rig.induction": "filing-lines",
+    "rig.aether_tether": "rising-ripples"
+  },
+  "hueCollisionDeg": 30,
+  "reservedHueBand": [15, 45],
+  "actTints": {
+    "foothold.base": { "rim": "#c9a24b", "secondary": "#c3c9d1" },
+    "foothold.heavy": { "rim": "#b4a3d8", "secondary": "#c3c9d1" },
+    "fire": { "rim": "#e8742c", "secondary": "#7c2a1e" },
+    "frost": { "rim": "#a9d3f2", "secondary": "#e8eef4" },
+    "lodestone": { "rim": "#7d5cff", "secondary": "#b87333" },
+    "hollow": { "rim": "#e4ecff", "secondary": "#ffffff" }
+  }
+}

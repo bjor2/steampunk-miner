@@ -1,0 +1,111 @@
+{
+  "source": "Ticket 238 and #142 'At contact' (a distinct sound per gate kind): the drill gate's dull clank and the cleared flourish are the Game Director's gate feedback on #151 (comment 6022896184); a deflection tone per extractor (a ringing note for the Resonance Fork, a magnetic thunk for the Induction Coil, a glassy scrape for the Acid Etcher); a vent hiss for the Containment Hood and an airy fall for the Aether Tether's lump drifting off; a dull knock on a dynamite shell. The tones are #13 placeholders synthesised by the shell, starting values for Gameplay & Vehicle. A stop at the cell last sounded stays quiet for repeatTicks (60 ticks a second), so a held drill does not hammer the cue; one voice each.",
+  "repeatTicks": 45,
+  "drillCue": "mining-gates.clank",
+  "dynamiteCue": "mining-gates.shell-knock",
+  "clearedCue": "mining-gates.cleared",
+  "extractorCues": {
+    "rig.resonance": "mining-gates.fork-ring",
+    "rig.containment": "mining-gates.vent-hiss",
+    "rig.acid_etcher": "mining-gates.etch-scrape",
+    "rig.induction": "mining-gates.coil-thunk",
+    "rig.aether_tether": "mining-gates.lump-drift"
+  },
+  "lostCues": {
+    "vented": "mining-gates.vent-hiss",
+    "drifted": "mining-gates.lump-drift"
+  },
+  "cues": [
+    {
+      "id": "mining-gates.clank",
+      "voices": 1,
+      "tone": {
+        "partials": [
+          { "wave": "triangle", "frequency": 147, "gain": 0.3 },
+          { "wave": "square", "frequency": 311, "gain": 0.05 }
+        ],
+        "noise": { "frequency": 900, "q": 1.2, "gain": 0.18 },
+        "seconds": 0.28
+      }
+    },
+    {
+      "id": "mining-gates.shell-knock",
+      "voices": 1,
+      "tone": {
+        "partials": [
+          { "wave": "sine", "frequency": 92, "gain": 0.35 },
+          { "wave": "triangle", "frequency": 184, "gain": 0.08 }
+        ],
+        "noise": { "frequency": 420, "q": 2, "gain": 0.16 },
+        "seconds": 0.22
+      }
+    },
+    {
+      "id": "mining-gates.fork-ring",
+      "voices": 1,
+      "tone": {
+        "partials": [
+          { "wave": "sine", "frequency": 880, "gain": 0.16 },
+          { "wave": "sine", "frequency": 1760, "gain": 0.06 }
+        ],
+        "noise": null,
+        "seconds": 1.1
+      }
+    },
+    {
+      "id": "mining-gates.coil-thunk",
+      "voices": 1,
+      "tone": {
+        "partials": [
+          { "wave": "square", "frequency": 73, "gain": 0.12 },
+          { "wave": "sine", "frequency": 146, "gain": 0.2 }
+        ],
+        "noise": { "frequency": 260, "q": 1.5, "gain": 0.1 },
+        "seconds": 0.32
+      }
+    },
+    {
+      "id": "mining-gates.etch-scrape",
+      "voices": 1,
+      "tone": {
+        "partials": [{ "wave": "triangle", "frequency": 2350, "gain": 0.05 }],
+        "noise": { "frequency": 5200, "q": 6, "gain": 0.16 },
+        "seconds": 0.4
+      }
+    },
+    {
+      "id": "mining-gates.vent-hiss",
+      "voices": 1,
+      "tone": {
+        "partials": [],
+        "noise": { "frequency": 3600, "q": 0.8, "gain": 0.2 },
+        "seconds": 0.9
+      }
+    },
+    {
+      "id": "mining-gates.lump-drift",
+      "voices": 1,
+      "tone": {
+        "partials": [
+          { "wave": "sine", "frequency": 392, "gain": 0.1 },
+          { "wave": "sine", "frequency": 523.25, "gain": 0.07 }
+        ],
+        "noise": { "frequency": 1400, "q": 0.7, "gain": 0.06 },
+        "seconds": 1.2
+      }
+    },
+    {
+      "id": "mining-gates.cleared",
+      "voices": 1,
+      "tone": {
+        "partials": [
+          { "wave": "sine", "frequency": 1046.5, "gain": 0.12 },
+          { "wave": "sine", "frequency": 1568, "gain": 0.08 },
+          { "wave": "triangle", "frequency": 523.25, "gain": 0.08 }
+        ],
+        "noise": null,
+        "seconds": 0.8
+      }
+    }
+  ]
+}
