@@ -1,0 +1,72 @@
+{
+  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): prices 4.1, charged items 4.2, consumables 4.3, toggle draw 4.4; the G&V feel pass (grapple aim) and the GD lock and G&V comment on #204 (rivet patch). Times are 60 Hz ticks, shares basis points, draws thousandths of energyMax a second.",
+  "mobility": {
+    "prices": {
+      "band": 5,
+      "oneOffOreUnits": "15",
+      "consumableOreUnits": "2"
+    },
+    "grapple": {
+      "charges": 4,
+      "cooldownTicks": 120,
+      "windupTicks": 6,
+      "rangeTiles": 8,
+      "aimConeTanPerMille": 364,
+      "reelHoldTicks": 30,
+      "reelTicksMax": 240
+    },
+    "ballast": {
+      "stack": 2,
+      "windupTicks": 6,
+      "windowTicks": 300,
+      "massShareBp": 6000
+    },
+    "heatSink": {
+      "stack": 2,
+      "windupTicks": 6,
+      "pauseTicks": 180,
+      "ventBp": 6000,
+      "gainBp": 0
+    },
+    "steamBoost": {
+      "charges": 3,
+      "cooldownTicks": 240,
+      "windupTicks": 6,
+      "burstTicks": 30,
+      "speedShareBp": 12000
+    },
+    "rivetPatch": {
+      "stack": 2,
+      "windupTicks": 6,
+      "holdTicks": 90,
+      "hullShareBp": 2500,
+      "movingSpeedMmPerS": 500
+    },
+    "steamShield": {
+      "charges": 2,
+      "cooldownTicks": 900,
+      "windupTicks": 6,
+      "windowTicks": 120,
+      "damageScaleBp": 0
+    },
+    "smoke": {
+      "stack": 2,
+      "windupTicks": 6,
+      "radiusTiles": 6,
+      "windowTicks": 300,
+      "detectionScaleBp": 0
+    },
+    "gravAnchor": {
+      "drawPerMillePerSecond": 10
+    },
+    "buoyancy": {
+      "drawPerMillePerSecond": 15
+    },
+    "escapeThruster": {
+      "stack": 1,
+      "windupTicks": 6,
+      "burstTicks": 240,
+      "speedShareBp": 12000
+    }
+  }
+}

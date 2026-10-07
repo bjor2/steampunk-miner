@@ -61,7 +61,7 @@ export const DEFERRED_SCHEDULE_ROWS: Readonly<Record<DeferredScheduleHome, reado
     'archive_cache',
   ],
   wagon: ['wagons'],
-  'tech-node': ['side_drills', 'shields', 'grav_anchor', 'buoyancy_tanks', 'escape_thrusters'],
+  'tech-node': ['side_drills'],
   unclaimed: [
     'core_harvest',
     'planet_2',

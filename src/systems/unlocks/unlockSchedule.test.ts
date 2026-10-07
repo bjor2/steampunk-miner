@@ -18,7 +18,7 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = '60367fc8edc6f6fdbc21d279bfecfc94d8547802983bf7023094a249f0240b53'
+const LOCKED_FILE_SHA256 = '0268ab12df359015e93819fad4bf67004e121c1b1df7deeb6044e4954600c8d5'
 
 /**
  * The canonical form of `source_hash_method` (docs/scaling/horizontal/source_hash.mjs, #153):
@@ -174,7 +174,7 @@ describe('locked unlock schedule', () => {
   it('unlocks no vision row whose module is not built, even when every bind is met', () => {
     const visionRows = LOCKED_SCHEDULE.rows.filter((row) => row.status === 'vision')
     const progress = progressWithEveryBindMet(visionRows)
-    expect(visionRows).toHaveLength(31)
+    expect(visionRows).toHaveLength(27)
     expect(visionRows.filter((row) => isUnlocked(row, progress))).toEqual([])
   })
 
@@ -243,6 +243,21 @@ describe('locked unlock schedule', () => {
     expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 21 })).toBe(false)
     expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 22 })).toBe(true)
   })
+
+  it.each([
+    ['shields', 22],
+    ['grav_anchor', 32],
+    ['buoyancy_tanks', 34],
+    ['escape_thrusters', 37],
+  ] as const)(
+    'opens the %s row at planet %i now the mobility slice ships its node (ticket 204)',
+    (id, planetIndex) => {
+      const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === id)!
+      expect(row).toMatchObject({ planetIndex, status: 'shipped' })
+      expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: planetIndex - 1 })).toBe(false)
+      expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: planetIndex })).toBe(true)
+    },
+  )
 
   it('opens the built blasting_charges row at planet 7, its locked planet (#95)', () => {
     const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'blasting_charges')!

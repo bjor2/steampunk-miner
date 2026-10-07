@@ -147,30 +147,30 @@
             },
             {
               "title": "Steam shield",
-              "description": "A shield that absorbs hits before the hull does.",
-              "status": "planned",
-              "issues": [80],
+              "description": "A steam curtain that turns aside enemy hits and collapse crush for a short window (at most half of each hit); it never stops heat or lava. Built as the mobility lane's power-up; the store buy and its curtain effect come later.",
+              "status": "partial",
+              "issues": [80, 204],
               "planet": 22
             },
             {
               "title": "Grav anchor",
-              "description": "A visible hull clamp for low-gravity interiors, prepared one planet before hollow worlds.",
-              "status": "planned",
-              "issues": [80],
+              "description": "A toggle that pins the miner to the wall or ceiling it touches, so it can drill while anchored; it draws 1% of the tank a second and drops off at an empty tank. The store buy and its model on the rig come later.",
+              "status": "partial",
+              "issues": [80, 204],
               "planet": 32
             },
             {
               "title": "Buoyancy tanks",
-              "description": "Float and anchor inside the open interiors of hollow planets.",
-              "status": "planned",
-              "issues": [80],
+              "description": "A toggle that hovers the miner in open cavern air without thrust, drawing 1.5% of the tank a second. The store buy and its model on the rig come later.",
+              "status": "partial",
+              "issues": [80, 204],
               "planet": 34
             },
             {
               "title": "Escape thrusters",
-              "description": "Burst thrusters for timed escapes from unstable cores.",
-              "status": "planned",
-              "issues": [80],
+              "description": "A one-shot cartridge that kicks the miner up the shaft in one long burst, stopping at the first solid cell. The store buy and its puff and thump come later.",
+              "status": "partial",
+              "issues": [80, 204],
               "planet": 37
             }
           ]
@@ -980,13 +980,21 @@
         },
         {
           "title": "Powerups",
-          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots and charges are built; the first real power-ups and the cradle buy come with their item slices.",
+          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots, charges and the mobility lane are built; the other lanes and the store buy come with their tickets.",
           "status": "partial",
-          "issues": [47, 162, 200]
+          "issues": [47, 162, 200],
+          "children": [
+            {
+              "title": "Mobility and survival power-ups",
+              "description": "Grapple winch (reel up to a wall or ceiling, refused at no cost with nothing to hook), emergency ballast, heat sink flask (once you own refractory lining), steam boost, rivet patch kit (hold still to plate the hull; moving gives the kit back), steam shield, smoke canister, grav anchor, buoyancy tanks and escape thruster, each with its tech node, Marks and item card. Buying them in the store, and their models and effects on the rig, come later.",
+              "status": "partial",
+              "issues": [204, 166]
+            }
+          ]
         },
         {
           "title": "Tech tree",
-          "description": "Research nodes with money to unlock store items: five lanes on a planet ruler, Marks every 3 planets, endless combos from P41, a tree screen from the HUD. The rules and screen are built; the lanes show 'coming soon' until their slices register nodes.",
+          "description": "Research nodes with money to unlock store items: five lanes on a planet ruler, Marks every 3 planets, endless combos from P41, a tree screen from the HUD. The rules and screen are built, and the mobility lane is in; the other lanes show 'coming soon' until their slices register nodes.",
           "status": "partial",
           "issues": [165, 200, 201, 202, 203, 204, 205, 206, 212],
           "doc": "docs/standards/feature-slices.md",
