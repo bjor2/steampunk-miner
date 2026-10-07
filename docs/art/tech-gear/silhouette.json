@@ -1,0 +1,9 @@
+{
+  "bare": 281542,
+  "extractors": 290839,
+  "folded": 323162,
+  "deployed": 325457,
+  "extractorsOverBare": 1.033,
+  "foldedOverBare": 1.1478,
+  "deployedOverBare": 1.156
+}

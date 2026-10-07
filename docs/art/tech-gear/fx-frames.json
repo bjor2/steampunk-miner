@@ -1,0 +1,2694 @@
+[
+  {
+    "id": "drain-brine-lines",
+    "itemId": "power.mineral_drain",
+    "kind": "stream",
+    "ticks": 60,
+    "sweepTicks": 60,
+    "reachTiles": 3,
+    "strands": 6,
+    "colour": "#5fd3c8",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 3,
+        "reachM": 0.021750000000000005,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 5,
+        "reachM": 0.059027777777777776,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 8,
+        "reachM": 0.14577777777777778,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 10,
+        "reachM": 0.2222222222222222,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 13,
+        "reachM": 0.36147222222222225,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 16,
+        "reachM": 0.5262222222222223,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 18,
+        "reachM": 0.648,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 21,
+        "reachM": 0.8452499999999998,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 23,
+        "reachM": 0.9845277777777779,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 26,
+        "reachM": 1.2017777777777778,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 29,
+        "reachM": 1.4250277777777778,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 31,
+        "reachM": 1.5749722222222224,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 34,
+        "reachM": 1.7982222222222222,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 37,
+        "reachM": 2.0154722222222228,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 39,
+        "reachM": 2.15475,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 42,
+        "reachM": 2.352,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 44,
+        "reachM": 2.4737777777777774,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 47,
+        "reachM": 2.638527777777778,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 50,
+        "reachM": 2.777777777777778,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 52,
+        "reachM": 2.8542222222222224,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 55,
+        "reachM": 2.9409722222222223,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 57,
+        "reachM": 2.97825,
+        "alpha": 1,
+        "strands": 6,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 60,
+        "reachM": 3,
+        "alpha": 0,
+        "strands": 6,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "siphon-stream",
+    "itemId": "power.slurry_siphon",
+    "kind": "stream",
+    "ticks": 45,
+    "sweepTicks": 12,
+    "reachTiles": 5,
+    "strands": 1,
+    "colour": "#8fb6a8",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 2,
+        "reachM": 0.37037037037037035,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 4,
+        "reachM": 1.2962962962962963,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 6,
+        "reachM": 2.5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 8,
+        "reachM": 3.7037037037037033,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 10,
+        "reachM": 4.62962962962963,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 12,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 14,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 16,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 18,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 20,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 22,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 23,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 25,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 27,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 29,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 31,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 33,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 35,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 37,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 39,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 41,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 43,
+        "reachM": 5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 45,
+        "reachM": 5,
+        "alpha": 0,
+        "strands": 1,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "shifter-drag",
+    "itemId": "power.ore_shifter",
+    "kind": "drag",
+    "ticks": 45,
+    "sweepTicks": 45,
+    "reachTiles": 6,
+    "strands": 8,
+    "colour": "#7f8df2",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 2,
+        "reachM": 0.03450205761316873,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 4,
+        "reachM": 0.1337942386831276,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 6,
+        "reachM": 0.29155555555555557,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 8,
+        "reachM": 0.5014650205761317,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 10,
+        "reachM": 0.7572016460905349,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 12,
+        "reachM": 1.0524444444444445,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 14,
+        "reachM": 1.3808724279835392,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 16,
+        "reachM": 1.736164609053498,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 18,
+        "reachM": 2.1120000000000005,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 20,
+        "reachM": 2.5020576131687244,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 22,
+        "reachM": 2.9000164609053494,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 23,
+        "reachM": 3.0999835390946497,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 25,
+        "reachM": 3.497942386831276,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 27,
+        "reachM": 3.888,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 29,
+        "reachM": 4.263835390946503,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 31,
+        "reachM": 4.619127572016461,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 33,
+        "reachM": 4.947555555555555,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 35,
+        "reachM": 5.242798353909465,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 37,
+        "reachM": 5.498534979423868,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 39,
+        "reachM": 5.708444444444445,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 41,
+        "reachM": 5.8662057613168725,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 43,
+        "reachM": 5.965497942386831,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 45,
+        "reachM": 6,
+        "alpha": 0,
+        "strands": 8,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "lodestone-gather",
+    "itemId": "consumable.lodestone_beacon",
+    "kind": "gather",
+    "ticks": 90,
+    "sweepTicks": 90,
+    "reachTiles": 10,
+    "strands": 12,
+    "colour": "#7f8df2",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 4,
+        "reachM": 0.0575034293552812,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 8,
+        "reachM": 0.22299039780521265,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 12,
+        "reachM": 0.485925925925926,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 16,
+        "reachM": 0.8357750342935528,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 20,
+        "reachM": 1.262002743484225,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 23,
+        "reachM": 1.6254595336076814,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 27,
+        "reachM": 2.16,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 31,
+        "reachM": 2.7419478737997256,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 35,
+        "reachM": 3.3607681755829906,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 39,
+        "reachM": 4.005925925925926,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 43,
+        "reachM": 4.666886145404664,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 47,
+        "reachM": 5.333113854595338,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 51,
+        "reachM": 5.994074074074074,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 55,
+        "reachM": 6.63923182441701,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 59,
+        "reachM": 7.258052126200274,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 63,
+        "reachM": 7.839999999999999,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 67,
+        "reachM": 8.374540466392318,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 70,
+        "reachM": 8.737997256515776,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 74,
+        "reachM": 9.164224965706447,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 78,
+        "reachM": 9.514074074074074,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 82,
+        "reachM": 9.777009602194788,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 86,
+        "reachM": 9.94249657064472,
+        "alpha": 1,
+        "strands": 12,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 90,
+        "reachM": 10,
+        "alpha": 0,
+        "strands": 12,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "induction-free",
+    "itemId": "rig.induction",
+    "kind": "free",
+    "ticks": 24,
+    "sweepTicks": 18,
+    "reachTiles": 3,
+    "strands": 1,
+    "colour": "#7f8df2",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 1,
+        "reachM": 0.026748971193415638,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 2,
+        "reachM": 0.10288065843621397,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 3,
+        "reachM": 0.2222222222222222,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 4,
+        "reachM": 0.37860082304526743,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 5,
+        "reachM": 0.5658436213991771,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 6,
+        "reachM": 0.7777777777777777,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 7,
+        "reachM": 1.008230452674897,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 8,
+        "reachM": 1.2510288065843622,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 9,
+        "reachM": 1.5,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 10,
+        "reachM": 1.748971193415638,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 11,
+        "reachM": 1.9917695473251031,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 13,
+        "reachM": 2.434156378600823,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 14,
+        "reachM": 2.6213991769547325,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 15,
+        "reachM": 2.777777777777778,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 16,
+        "reachM": 2.897119341563786,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 17,
+        "reachM": 2.9732510288065845,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 18,
+        "reachM": 3,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 19,
+        "reachM": 3,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 20,
+        "reachM": 3,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 21,
+        "reachM": 3,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 22,
+        "reachM": 3,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 23,
+        "reachM": 3,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 24,
+        "reachM": 3,
+        "alpha": 0,
+        "strands": 1,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "sounder-ring",
+    "itemId": "power.echo_sounder",
+    "kind": "ring",
+    "ticks": 600,
+    "sweepTicks": 36,
+    "reachTiles": 12,
+    "strands": 1,
+    "colour": "#e8d9a0",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 26,
+        "reachM": 9.736625514403292,
+        "alpha": 0.9566666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 52,
+        "reachM": 12,
+        "alpha": 0.9133333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 78,
+        "reachM": 12,
+        "alpha": 0.87,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 104,
+        "reachM": 12,
+        "alpha": 0.8266666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 130,
+        "reachM": 12,
+        "alpha": 0.7833333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 157,
+        "reachM": 12,
+        "alpha": 0.7383333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 183,
+        "reachM": 12,
+        "alpha": 0.6950000000000001,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 209,
+        "reachM": 12,
+        "alpha": 0.6516666666666666,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 235,
+        "reachM": 12,
+        "alpha": 0.6083333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 261,
+        "reachM": 12,
+        "alpha": 0.565,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 287,
+        "reachM": 12,
+        "alpha": 0.5216666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 313,
+        "reachM": 12,
+        "alpha": 0.4783333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 339,
+        "reachM": 12,
+        "alpha": 0.43500000000000005,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 365,
+        "reachM": 12,
+        "alpha": 0.3916666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 391,
+        "reachM": 12,
+        "alpha": 0.3483333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 417,
+        "reachM": 12,
+        "alpha": 0.30500000000000005,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 443,
+        "reachM": 12,
+        "alpha": 0.2616666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 470,
+        "reachM": 12,
+        "alpha": 0.21666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 496,
+        "reachM": 12,
+        "alpha": 0.17333333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 522,
+        "reachM": 12,
+        "alpha": 0.13,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 548,
+        "reachM": 12,
+        "alpha": 0.08666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 574,
+        "reachM": 12,
+        "alpha": 0.043333333333333335,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 600,
+        "reachM": 12,
+        "alpha": 0,
+        "strands": 1,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "void-sounder-ring",
+    "itemId": "power.void_sounder",
+    "kind": "ring",
+    "ticks": 900,
+    "sweepTicks": 48,
+    "reachTiles": 16,
+    "strands": 1,
+    "colour": "#e8d9a0",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 39,
+        "reachM": 14.5234375,
+        "alpha": 0.9566666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 78,
+        "reachM": 16,
+        "alpha": 0.9133333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 117,
+        "reachM": 16,
+        "alpha": 0.87,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 157,
+        "reachM": 16,
+        "alpha": 0.8255555555555556,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 196,
+        "reachM": 16,
+        "alpha": 0.7822222222222223,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 235,
+        "reachM": 16,
+        "alpha": 0.7388888888888889,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 274,
+        "reachM": 16,
+        "alpha": 0.6955555555555555,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 313,
+        "reachM": 16,
+        "alpha": 0.6522222222222223,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 352,
+        "reachM": 16,
+        "alpha": 0.6088888888888888,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 391,
+        "reachM": 16,
+        "alpha": 0.5655555555555556,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 430,
+        "reachM": 16,
+        "alpha": 0.5222222222222221,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 470,
+        "reachM": 16,
+        "alpha": 0.47777777777777775,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 509,
+        "reachM": 16,
+        "alpha": 0.4344444444444444,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 548,
+        "reachM": 16,
+        "alpha": 0.3911111111111111,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 587,
+        "reachM": 16,
+        "alpha": 0.34777777777777774,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 626,
+        "reachM": 16,
+        "alpha": 0.3044444444444444,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 665,
+        "reachM": 16,
+        "alpha": 0.26111111111111107,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 704,
+        "reachM": 16,
+        "alpha": 0.21777777777777774,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 743,
+        "reachM": 16,
+        "alpha": 0.1744444444444444,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 783,
+        "reachM": 16,
+        "alpha": 0.13,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 822,
+        "reachM": 16,
+        "alpha": 0.08666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 861,
+        "reachM": 16,
+        "alpha": 0.043333333333333335,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 900,
+        "reachM": 16,
+        "alpha": 0,
+        "strands": 1,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "galvanic-field",
+    "itemId": "power.galvanic_probe",
+    "kind": "ring",
+    "ticks": 600,
+    "sweepTicks": 36,
+    "reachTiles": 12,
+    "strands": 1,
+    "colour": "#b9a8ff",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 26,
+        "reachM": 9.736625514403292,
+        "alpha": 0.9566666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 52,
+        "reachM": 12,
+        "alpha": 0.9133333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 78,
+        "reachM": 12,
+        "alpha": 0.87,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 104,
+        "reachM": 12,
+        "alpha": 0.8266666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 130,
+        "reachM": 12,
+        "alpha": 0.7833333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 157,
+        "reachM": 12,
+        "alpha": 0.7383333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 183,
+        "reachM": 12,
+        "alpha": 0.6950000000000001,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 209,
+        "reachM": 12,
+        "alpha": 0.6516666666666666,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 235,
+        "reachM": 12,
+        "alpha": 0.6083333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 261,
+        "reachM": 12,
+        "alpha": 0.565,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 287,
+        "reachM": 12,
+        "alpha": 0.5216666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 313,
+        "reachM": 12,
+        "alpha": 0.4783333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 339,
+        "reachM": 12,
+        "alpha": 0.43500000000000005,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 365,
+        "reachM": 12,
+        "alpha": 0.3916666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 391,
+        "reachM": 12,
+        "alpha": 0.3483333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 417,
+        "reachM": 12,
+        "alpha": 0.30500000000000005,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 443,
+        "reachM": 12,
+        "alpha": 0.2616666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 470,
+        "reachM": 12,
+        "alpha": 0.21666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 496,
+        "reachM": 12,
+        "alpha": 0.17333333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 522,
+        "reachM": 12,
+        "alpha": 0.13,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 548,
+        "reachM": 12,
+        "alpha": 0.08666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 574,
+        "reachM": 12,
+        "alpha": 0.043333333333333335,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 600,
+        "reachM": 12,
+        "alpha": 0,
+        "strands": 1,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "seismic-cone",
+    "itemId": "artefact.seismic_ping",
+    "kind": "cone",
+    "ticks": 600,
+    "sweepTicks": 36,
+    "reachTiles": 12,
+    "strands": 1,
+    "colour": "#e8d9a0",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 26,
+        "reachM": 9.736625514403292,
+        "alpha": 0.9566666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 52,
+        "reachM": 12,
+        "alpha": 0.9133333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 78,
+        "reachM": 12,
+        "alpha": 0.87,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 104,
+        "reachM": 12,
+        "alpha": 0.8266666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 130,
+        "reachM": 12,
+        "alpha": 0.7833333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 157,
+        "reachM": 12,
+        "alpha": 0.7383333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 183,
+        "reachM": 12,
+        "alpha": 0.6950000000000001,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 209,
+        "reachM": 12,
+        "alpha": 0.6516666666666666,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 235,
+        "reachM": 12,
+        "alpha": 0.6083333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 261,
+        "reachM": 12,
+        "alpha": 0.565,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 287,
+        "reachM": 12,
+        "alpha": 0.5216666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 313,
+        "reachM": 12,
+        "alpha": 0.4783333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 339,
+        "reachM": 12,
+        "alpha": 0.43500000000000005,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 365,
+        "reachM": 12,
+        "alpha": 0.3916666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 391,
+        "reachM": 12,
+        "alpha": 0.3483333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 417,
+        "reachM": 12,
+        "alpha": 0.30500000000000005,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 443,
+        "reachM": 12,
+        "alpha": 0.2616666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 470,
+        "reachM": 12,
+        "alpha": 0.21666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 496,
+        "reachM": 12,
+        "alpha": 0.17333333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 522,
+        "reachM": 12,
+        "alpha": 0.13,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 548,
+        "reachM": 12,
+        "alpha": 0.08666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 574,
+        "reachM": 12,
+        "alpha": 0.043333333333333335,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 600,
+        "reachM": 12,
+        "alpha": 0,
+        "strands": 1,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "foam-cone",
+    "itemId": "consumable.stabiliser_foam",
+    "kind": "cone",
+    "ticks": 30,
+    "sweepTicks": 18,
+    "reachTiles": 4,
+    "strands": 16,
+    "colour": "#e6e2d8",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 1,
+        "reachM": 0.03566529492455418,
+        "alpha": 0.9666666666666667,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 3,
+        "reachM": 0.2962962962962963,
+        "alpha": 0.9,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 4,
+        "reachM": 0.50480109739369,
+        "alpha": 0.8666666666666667,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 5,
+        "reachM": 0.7544581618655695,
+        "alpha": 0.8333333333333334,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 7,
+        "reachM": 1.3443072702331962,
+        "alpha": 0.7666666666666666,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 8,
+        "reachM": 1.6680384087791496,
+        "alpha": 0.7333333333333334,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 9,
+        "reachM": 2,
+        "alpha": 0.7,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 10,
+        "reachM": 2.3319615912208507,
+        "alpha": 0.6666666666666667,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 12,
+        "reachM": 2.962962962962963,
+        "alpha": 0.6,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 13,
+        "reachM": 3.2455418381344305,
+        "alpha": 0.5666666666666667,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 14,
+        "reachM": 3.49519890260631,
+        "alpha": 0.5333333333333333,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 16,
+        "reachM": 3.8628257887517146,
+        "alpha": 0.4666666666666667,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 17,
+        "reachM": 3.964334705075446,
+        "alpha": 0.43333333333333335,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 18,
+        "reachM": 4,
+        "alpha": 0.4,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 20,
+        "reachM": 4,
+        "alpha": 0.33333333333333337,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 21,
+        "reachM": 4,
+        "alpha": 0.30000000000000004,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 22,
+        "reachM": 4,
+        "alpha": 0.2666666666666667,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 23,
+        "reachM": 4,
+        "alpha": 0.23333333333333328,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 25,
+        "reachM": 4,
+        "alpha": 0.16666666666666663,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 26,
+        "reachM": 4,
+        "alpha": 0.1333333333333333,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 27,
+        "reachM": 4,
+        "alpha": 0.09999999999999998,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 29,
+        "reachM": 4,
+        "alpha": 0.033333333333333326,
+        "strands": 16,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 30,
+        "reachM": 4,
+        "alpha": 0,
+        "strands": 16,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "flare-burn",
+    "itemId": "consumable.flare_mortar",
+    "kind": "burn",
+    "ticks": 300,
+    "sweepTicks": 30,
+    "reachTiles": 30,
+    "strands": 1,
+    "colour": "#fff1c2",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": [0, 0]
+      },
+      {
+        "tick": 13,
+        "reachM": 12.017777777777779,
+        "alpha": 0.9566666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": [1.9500000000000002, 5.8933333333333335]
+      },
+      {
+        "tick": 26,
+        "reachM": 28.542222222222225,
+        "alpha": 0.9133333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": [20.8, 2.773333333333333]
+      },
+      {
+        "tick": 39,
+        "reachM": 30,
+        "alpha": 0.87,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 52,
+        "reachM": 30,
+        "alpha": 0.8266666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 65,
+        "reachM": 30,
+        "alpha": 0.7833333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 78,
+        "reachM": 30,
+        "alpha": 0.74,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 91,
+        "reachM": 30,
+        "alpha": 0.6966666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 104,
+        "reachM": 30,
+        "alpha": 0.6533333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 117,
+        "reachM": 30,
+        "alpha": 0.61,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 130,
+        "reachM": 30,
+        "alpha": 0.5666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 143,
+        "reachM": 30,
+        "alpha": 0.5233333333333333,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 157,
+        "reachM": 30,
+        "alpha": 0.4766666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 170,
+        "reachM": 30,
+        "alpha": 0.43333333333333335,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 183,
+        "reachM": 30,
+        "alpha": 0.39,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 196,
+        "reachM": 30,
+        "alpha": 0.3466666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 209,
+        "reachM": 30,
+        "alpha": 0.30333333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 222,
+        "reachM": 30,
+        "alpha": 0.26,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 235,
+        "reachM": 30,
+        "alpha": 0.21666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 248,
+        "reachM": 30,
+        "alpha": 0.17333333333333334,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 261,
+        "reachM": 30,
+        "alpha": 0.13,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 274,
+        "reachM": 30,
+        "alpha": 0.08666666666666667,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 287,
+        "reachM": 30,
+        "alpha": 0.043333333333333335,
+        "strands": 1,
+        "isOver": false,
+        "shell": [30, 0]
+      },
+      {
+        "tick": 300,
+        "reachM": 30,
+        "alpha": 0,
+        "strands": 1,
+        "isOver": true,
+        "shell": [30, 0]
+      }
+    ]
+  },
+  {
+    "id": "shield-curtain",
+    "itemId": "power.steam_shield",
+    "kind": "curtain",
+    "ticks": 120,
+    "sweepTicks": 6,
+    "reachTiles": 1,
+    "strands": 24,
+    "colour": "#f2efe6",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 5,
+        "reachM": 0.925925925925926,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 10,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 16,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 21,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 26,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 31,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 37,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 42,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 47,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 52,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 57,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 63,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 68,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 73,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 78,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 83,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 89,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 94,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 99,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 104,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 110,
+        "reachM": 1,
+        "alpha": 1,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 115,
+        "reachM": 1,
+        "alpha": 0.8333333333333334,
+        "strands": 24,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 120,
+        "reachM": 1,
+        "alpha": 0,
+        "strands": 24,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "boost-plume",
+    "itemId": "power.steam_boost",
+    "kind": "plume",
+    "ticks": 30,
+    "sweepTicks": 8,
+    "reachTiles": 3,
+    "strands": 20,
+    "colour": "#f2efe6",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 1,
+        "reachM": 0.12890625,
+        "alpha": 0.9666666666666667,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 3,
+        "reachM": 0.94921875,
+        "alpha": 0.9,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 4,
+        "reachM": 1.5,
+        "alpha": 0.8666666666666667,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 5,
+        "reachM": 2.05078125,
+        "alpha": 0.8333333333333334,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 7,
+        "reachM": 2.87109375,
+        "alpha": 0.7666666666666666,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 8,
+        "reachM": 3,
+        "alpha": 0.7333333333333334,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 9,
+        "reachM": 3,
+        "alpha": 0.7,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 10,
+        "reachM": 3,
+        "alpha": 0.6666666666666667,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 12,
+        "reachM": 3,
+        "alpha": 0.6,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 13,
+        "reachM": 3,
+        "alpha": 0.5666666666666667,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 14,
+        "reachM": 3,
+        "alpha": 0.5333333333333333,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 16,
+        "reachM": 3,
+        "alpha": 0.4666666666666667,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 17,
+        "reachM": 3,
+        "alpha": 0.43333333333333335,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 18,
+        "reachM": 3,
+        "alpha": 0.4,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 20,
+        "reachM": 3,
+        "alpha": 0.33333333333333337,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 21,
+        "reachM": 3,
+        "alpha": 0.30000000000000004,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 22,
+        "reachM": 3,
+        "alpha": 0.2666666666666667,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 23,
+        "reachM": 3,
+        "alpha": 0.23333333333333328,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 25,
+        "reachM": 3,
+        "alpha": 0.16666666666666663,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 26,
+        "reachM": 3,
+        "alpha": 0.1333333333333333,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 27,
+        "reachM": 3,
+        "alpha": 0.09999999999999998,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 29,
+        "reachM": 3,
+        "alpha": 0.033333333333333326,
+        "strands": 20,
+        "isOver": false,
+        "shell": null
+      },
+      {
+        "tick": 30,
+        "reachM": 3,
+        "alpha": 0,
+        "strands": 20,
+        "isOver": true,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "grapple-line",
+    "itemId": "artefact.grapple_anchor",
+    "kind": "line",
+    "ticks": 1,
+    "sweepTicks": 1,
+    "reachTiles": 8,
+    "strands": 1,
+    "colour": "#c9a24b",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 1,
+        "isOver": false,
+        "shell": null
+      }
+    ]
+  },
+  {
+    "id": "salvage-plate",
+    "itemId": "artefact.salvage_magnet",
+    "kind": "plate",
+    "ticks": 1,
+    "sweepTicks": 1,
+    "reachTiles": 6,
+    "strands": 8,
+    "colour": "#7f8df2",
+    "frames": [
+      {
+        "tick": 0,
+        "reachM": 0,
+        "alpha": 1,
+        "strands": 8,
+        "isOver": false,
+        "shell": null
+      }
+    ]
+  }
+]

@@ -61,21 +61,23 @@ def write_rig_sheets():
 
 
 def report_silhouette():
-    """Opaque pixels of the folded rig over the bare rig, the G&V 110% rule, written beside the renders."""
-    areas = {look: silhouette_area(output_path('rig.%s.alpha.png' % look)) for look in ('bare', 'folded', 'deployed')}
+    """Opaque pixels over the bare rig: the five folded extractors alone (the G&V 110% rule), then the whole loadout."""
+    looks = ('bare', 'extractors', 'folded', 'deployed')
+    areas = {look: silhouette_area(output_path('rig.%s.alpha.png' % look)) for look in looks}
     report = {look: area for look, area in areas.items()}
+    report['extractorsOverBare'] = round(areas['extractors'] / areas['bare'], 4)
     report['foldedOverBare'] = round(areas['folded'] / areas['bare'], 4)
     report['deployedOverBare'] = round(areas['deployed'] / areas['bare'], 4)
     with open(output_path('silhouette.json'), 'w', encoding='utf8') as file:
         file.write(json.dumps(report, indent=2) + '\n')
-    for look in ('bare', 'folded', 'deployed'):
+    for look in looks:
         os.remove(output_path('rig.%s.alpha.png' % look))
     print('silhouette', report)
 
 
 def silhouette_area(path):
     alpha = Image.open(path).convert('RGBA').getchannel('A')
-    return sum(1 for value in alpha.getdata() if value > OPAQUE)
+    return sum(1 for value in alpha.get_flattened_data() if value > OPAQUE)
 
 
 # --- clips -----------------------------------------------------------------------------------------

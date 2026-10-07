@@ -2,7 +2,8 @@
 Review renders of the tech-unlocked gear (#166, spec #162 section 5): each gear asset alone in
 the game's front view; the loaded rig, the tier-3 vehicle with its turret and charge rack and
 every gear item mounted at the attach point the exported vehicle sidecar carries, folded and
-deployed; the bare rig for the silhouette check; and the unfold clip of each extractor.
+deployed; the bare rig and the rig with only its five extractors folded for the G&V silhouette check; and
+the unfold clip of each extractor.
 
     blender -b --factory-startup --python-exit-code 1 -P docs/art/tech-gear/render_tech_gear.py [-- alone|rig|clips]
     python3 docs/art/tech-gear/sheet_tech_gear.py
@@ -48,6 +49,14 @@ EQUIPPED = {
     'powerup.4': 'power.galvanic_probe',
     'powerup.5': 'power.grav_anchor',
 }
+# Each rig render: its name, how far deployed, and which kinds are mounted (None for all). The
+# `extractors` look is the G&V silhouette case: the five extractors owned and folded, nothing else.
+RIG_LOOKS = (
+    ('bare', None, None),
+    ('extractors', 0.0, ('extractor',)),
+    ('folded', 0.0, None),
+    ('deployed', 1.0, None),
+)
 ALONE_PX_PER_M = 768
 RIG_PX_PER_M = 512
 CLIP_PX_PER_M = 384
@@ -98,10 +107,10 @@ def render_each_alone(table):
 
 
 def render_rig(table, attach):
-    for look, fraction in (('bare', None), ('folded', 0.0), ('deployed', 1.0)):
+    for look, fraction, kinds in RIG_LOOKS:
         stage_vehicle()
         if fraction is not None:
-            mount_everything(table, attach, fraction)
+            mount_everything(table, attach, fraction, kinds)
         settle()
         stage.stage_lights_and_world()
         bpy.context.scene.cycles.samples = RIG_SAMPLES
@@ -142,10 +151,12 @@ def tier_and_slot_of(name):
     return int(head[1:]), slot
 
 
-def mount_everything(table, attach, fraction):
+def mount_everything(table, attach, fraction, kinds=None):
     for item in table['items']:
         slot = slot_holding(item['itemId'])
         if item['attach'] == 'slot' and slot is None:
+            continue
+        if kinds is not None and item['kind'] not in kinds:
             continue
         mount(item, attach, slot, fraction)
 
