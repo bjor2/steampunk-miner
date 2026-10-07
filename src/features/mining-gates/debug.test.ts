@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { readAuthorityState } from '../../store/authorityLink'
 import { resetGameStore } from '../../store/gameStore'
 import { miningGatesDebugActions as actions } from './debug'
+import { resetGateHintStore } from './store/gateHintStore'
 
 beforeEach(() => {
   resetGameStore()
@@ -58,5 +59,15 @@ describe('mining gates: debug actions', () => {
   it('lists the extractors with the planet each arrives on', () => {
     const described = actions.describe() as { ok: true; rigs: { availableFromPlanet: number }[] }
     expect(described.rigs.map((rig) => rig.availableFromPlanet)).toEqual([5, 12, 19, 26, 33])
+  })
+
+  it('reads the lock marker a tile wears, and refuses a tile that is not whole', () => {
+    expect(actions.lockMarkerAt(0, 0)).toEqual({ ok: true, kind: 'none', motion: null, tint: null })
+    expect(actions.lockMarkerAt(0.5, 0).ok).toBe(false)
+  })
+
+  it('shows no hint chip before the drill meets a gate', () => {
+    resetGateHintStore()
+    expect(actions.hintChip()).toEqual({ ok: true, chip: null })
   })
 })

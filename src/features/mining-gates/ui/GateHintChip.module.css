@@ -1,0 +1,36 @@
+/*
+ * The gate hint chip, bottom centre above the dock prompt (#33 section 5 places prompts there; #142
+ * leaves the chip's seat to Gameplay & Vehicle). A status line in the HUD's alarm copper with the
+ * 24 px gate-kind icon (#151's gate prompt, #158 sizes). Never catches the pointer.
+ */
+.chip {
+  position: absolute;
+  bottom: 3.5rem;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 36rem;
+  padding: var(--space-1) var(--space-3);
+  border: 2px solid var(--color-copper);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: chip-in 0.25s ease-out;
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    animation: none;
+  }
+}

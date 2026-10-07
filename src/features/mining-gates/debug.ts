@@ -6,7 +6,8 @@
  * dynamite-gated ore tiles for `balance:charges` (GD ruling on ticket 237),
  * `.ownsRig('rig.resonance')` reads ownership, and `.grantRig('rig.resonance')` grants one through
  * the kernel's `debug.setVehicleLoadout`, keeping every slotted and owned item, so it replays and
- * logs `debug_command_applied` like a scenario's grant.
+ * logs `debug_command_applied` like a scenario's grant. `.lockMarkerAt(tx, ty)` reads the lock
+ * marker the local player sees on a tile, and `.hintChip()` the HUD chip showing (ticket 238).
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import { submitSliceDebugCommand } from '../../debug/sliceDebugCommands'
@@ -15,6 +16,9 @@ import { toCanonical } from '../../systems/money'
 import type { VehicleLoadout } from '../../systems/vehicle/loadoutState'
 import { readAuthorityState } from '../../store/authorityLink'
 import { useGameStore } from '../../store/gameStore'
+import { useGateHintStore } from './store/gateHintStore'
+import { chipShownAt } from './systems/gateChipBoard'
+import { lockMarkerOf } from './systems/render/lockMarkers'
 import { oreMixFor, oreMixHistogram } from '../planet-mix'
 import { dynamiteTilesOf, isDynamiteAct } from './systems/dynamiteCells'
 import { GATE_ROWS } from './systems/gateRows'
@@ -23,6 +27,7 @@ import { availableFromPlanet, ownsRig, rigNamed, rigPriceOf } from './systems/ri
 
 const NOT_A_PLANET = 'gateTableOf takes a planet index from 1 and a world seed from 0'
 const NOT_PLANET_SEEDS = 'dynamiteCellsOf takes a planet index from 1 and world seeds from 0'
+const NOT_A_TILE = 'lockMarkerAt takes whole tile coordinates'
 
 function describe() {
   return {
@@ -84,6 +89,19 @@ function ownsRigNamed(rigId: unknown) {
   return { ok: true as const, owned: ownsRig(readAuthorityState(), localPlayerId(), String(rigId)) }
 }
 
+function lockMarkerAt(tx: unknown, ty: unknown) {
+  if (!Number.isSafeInteger(tx) || !Number.isSafeInteger(ty)) {
+    return { ok: false as const, problems: [NOT_A_TILE] }
+  }
+  const tile = { tx: tx as number, ty: ty as number }
+  return { ok: true as const, ...lockMarkerOf(readAuthorityState(), localPlayerId(), tile) }
+}
+
+function hintChip() {
+  const { board, tick } = useGateHintStore.getState()
+  return { ok: true as const, chip: chipShownAt(board, tick) }
+}
+
 function filledSlotsOf(loadout: VehicleLoadout): Record<string, string> {
   return Object.fromEntries(
     Object.entries(loadout.slots).filter((slot): slot is [string, string] => slot[1] !== null),
@@ -113,4 +131,6 @@ export const miningGatesDebugActions: Readonly<Record<string, DebugAction>> = {
   dynamiteCellsOf,
   ownsRig: ownsRigNamed,
   grantRig,
+  lockMarkerAt,
+  hintChip,
 }

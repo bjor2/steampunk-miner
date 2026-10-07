@@ -10,7 +10,8 @@
  * the reaction starts it from the drill's touch or a freed cell, the clock rings a tune and acts a
  * pull, the recharge refills canisters and marks, and the section keeps it across a save. Its
  * ledger logs every gated cell freed or lost, and the balance and session reports print each
- * planet's gate hits, clears and losses.
+ * planet's gate hits, clears and losses. A stopped cell sounds its gate kind and shows its ledger
+ * line on the HUD chip once per dive (ticket 238).
  * Gate content starts on planet 7 (GD lock on #148).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -28,6 +29,7 @@ import { gateLedger } from './systems/gateLedger'
 import { GATE_SOUNDS } from './systems/render/gateSounds'
 import { RIG_CARDS, RIG_SELLER } from './systems/rigSales'
 import { vehicleItemOfRig } from './systems/rigs'
+import { GateHintChip } from './ui/GateHintChip'
 
 export const MINING_GATES_GATE_CHECK_ID = 'mining-gates.can-mine'
 
@@ -49,8 +51,10 @@ export const slice: SliceDefinition = {
     r.reportRows(miningGatesReportRows)
     // A sound per gate kind at contact, and the flourish of a freed cell (ticket 238).
     GATE_SOUNDS.cues.forEach((cue) => r.soundCue(cue))
+    // The ledger line of a stopped cell, once per cell per dive (ticket 238).
+    r.hudPanel({ id: 'mining-gates.hint-chip', slot: 'prompts', Panel: GateHintChip })
     // steampunkDebug.features['mining-gates'].describe(), .gateTableOf(p, seed),
-    // .dynamiteCellsOf(p, seeds), .ownsRig(id), .grantRig(id)
+    // .dynamiteCellsOf(p, seeds), .ownsRig(id), .grantRig(id), .lockMarkerAt(tx, ty), .hintChip()
     r.debugActions(miningGatesDebugActions)
   },
 }

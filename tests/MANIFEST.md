@@ -21,8 +21,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | Campaign scaling gate (R1): band 5 sawtooth on planets 1-7 and the schedule cadence, with the C1-C4 and H1-H2 probes | #81, #89 | `src/logging/campaignScalingGate.test.ts`, `src/logging/campaignPacingGate.test.ts`, `src/systems/economy/upgradePrices.test.ts`, `src/systems/economy/economyGrowth.test.ts`, `src/systems/economy/casingPrices.test.ts`, `src/systems/authority/casingPlacement.test.ts`, `src/systems/vehicle/bandDig.test.ts`, `src/logging/sawtoothMedian.test.ts`, `src/systems/bot/botCoreRule.test.ts`, `src/logging/pacingReport.test.ts`, `src/systems/unlocks/readUnlockSchedule.test.ts`, `src/systems/unlocks/travelUnlocks.test.ts`, `src/systems/unlocks/scheduleCadence.test.ts`, `src/systems/authority/featureUnlocks.test.ts`, `npm run balance:planets` | 110 |
 | Balance guards, reported against the committed baseline or a control run | #84, #105, #107, #109, #113, #198 | `npm run balance:report`, `npm run balance:planets`, `npm run balance:guns`, `npm run balance:charges`, `npm run balance:refinery`, `npm run balance:heat` | - |
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 9 |
-| Every ore family has a gateClass row | #141, #142 | `src/features/planet-mix/systems/themeRows.test.ts`, `src/features/mining-gates/systems/rigs.test.ts`, `src/features/mining-gates/systems/gateTable.test.ts` | 18 |
-| Endless signature coverage, planets 41-65 | #148 | `src/features/mining-gates/systems/rigs.test.ts` | 7 |
+| Every ore family has a gateClass row | #141, #142 | `src/features/planet-mix/systems/themeRows.test.ts`, `src/features/mining-gates/systems/rigs.test.ts`, `src/features/mining-gates/systems/gateTable.test.ts` | 19 |
+| Endless signature coverage, planets 41-65 | #148 | `src/features/mining-gates/systems/rigs.test.ts` | 8 |
 | Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 34 |
 
 ## Slices
@@ -131,12 +131,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 
-### `mining-gates`: 14 files, 85 tests
+### `mining-gates`: 19 files, 122 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/mining-gates/debug.test.ts` | 6 | 6 |
+| `src/features/mining-gates/debug.test.ts` | 8 | 8 |
 | `src/features/mining-gates/gateReportRows.test.ts` | 3 | 3 |
+| `src/features/mining-gates/store/gateHintStore.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/botExtractors.test.ts` | 4 | 2 |
 | `src/features/mining-gates/systems/botGates.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/botShaftJog.test.ts` | 2 | 1 |
@@ -144,10 +145,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/dynamiteCells.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/extractorRules.test.ts` | 8 | 8 |
 | `src/features/mining-gates/systems/extractorVerbs.test.ts` | 12 | 12 |
+| `src/features/mining-gates/systems/gateChipBoard.test.ts` | 7 | 7 |
 | `src/features/mining-gates/systems/gateLedger.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/gateTable.test.ts` | 6 | 6 |
+| `src/features/mining-gates/systems/ledgerLines.test.ts` | 6 | 6 |
+| `src/features/mining-gates/systems/render/gateSounds.test.ts` | 7 | 7 |
+| `src/features/mining-gates/systems/render/lockMarkers.test.ts` | 11 | 11 |
 | `src/features/mining-gates/systems/rigSales.test.ts` | 3 | 3 |
-| `src/features/mining-gates/systems/rigs.test.ts` | 7 | 7 |
+| `src/features/mining-gates/systems/rigs.test.ts` | 8 | 8 |
 | `src/features/mining-gates/systems/toolsAndGear.test.ts` | 3 | 3 |
 
 ### `mining-popup`: 8 files, 47 tests
