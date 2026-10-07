@@ -311,6 +311,30 @@ the #52 kebab form of the row id (`src/systems/art/artIds.ts`).
 - `scripts/art/author_blasting_charges.py` wrote the first version of both `.blend` files. From then
   on the `.blend` files are the sources.
 
+## Dynamite sizes
+
+The art of the ten dynamite sizes ([#145](https://github.com/bjor2/steampunk-miner/issues/145),
+for the design [#153](https://github.com/bjor2/steampunk-miner/issues/153) and the ladder on
+[#143](https://github.com/bjor2/steampunk-miner/issues/143)), owned by the `dynamite-visuals`
+slice. Only the Blender sources and the review renders exist so far; the export, the manifest
+entries through the slice art-id registry (#214) and the swap for the two blasting-charge assets
+above are the wiring's ([#215](https://github.com/bjor2/steampunk-miner/issues/215)).
+
+| Id                      | Source         | What the build will draw                                                                        |
+| ----------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
+| `vehicle-dynamite-rack` | Blender, parts | the rack at `hull.rear`: `rack-frame`, `stick-1` to `stick-10` (shown as unlocked), `wire-reel` |
+| `prop-dynamite-charge`  | Blender, parts | the planted size: `planted-<n>` at the charge's tile, with `lamp-<n>` blinking                  |
+
+- The rack is authored in its own frame with the attach point at the origin, like the other gear
+  (K5), and holds one model per size on five shelves; the reel is its own part so it can show
+  from the remote detonator's unlock (#153 amendment 2: no new attach point).
+- Every planted size sits at the origin with its pivot at its centre, as today's charge does, so
+  the build draws one of them where the charge is. The lamp is apart from the body, as `fuse-lamp`
+  is today.
+- `scripts/art/author_dynamite_sizes.py` wrote the first version of both `.blend` files. From
+  then on the `.blend` files are the sources. The review renders are in
+  [docs/art/dynamite/](art/dynamite/README.md).
+
 ## Heat planets and the refractory lining
 
 The art of the `heat_lava` and `refractory_lining` schedule rows
