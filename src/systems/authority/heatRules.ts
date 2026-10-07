@@ -38,6 +38,7 @@ import {
   ZERO_MONEY,
   type BigStat,
 } from '../money'
+import { heatStepsWithPauses } from '../registries/heatPauses'
 import type { DrillStats } from '../vehicle/drillRule'
 import { liningTypeIndexOf } from '../vehicle/liningType'
 import { tileOfPose } from '../vehicle/vehiclePose'
@@ -169,7 +170,7 @@ function settleHeat(
   const heat = vehicleOf(state, playerId).heat
   const run = runHeatSegments(
     heat.level,
-    segments,
+    heatStepsWithPauses(state, playerId, heat.settledTick, segments),
     gaugeMaxUnitsOf(archetype),
     heatLinesOf(archetype),
   )

@@ -28,6 +28,7 @@ import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectionModifiers'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
+import type { HeatPause } from '../systems/registries/heatPauses'
 import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
@@ -76,6 +77,8 @@ export interface SliceRegistrar {
   hullDamageIntercept(intercept: HullDamageIntercept): void
   /** Shrinks how far a hunting enemy notices the vehicle, never below half (ticket 233). */
   enemyDetectionModifier(modifier: EnemyDetectionModifier): void
+  /** Vents the heat gauge and pauses heat gain for windows the slice keeps (ticket 233). */
+  heatPause(pause: HeatPause): void
   /** A dock building that opens its `facility` schedule row from that row's planet on (#221). */
   dockFacility(facility: DockFacility): void
   /** Answers a pressed action the kernel's routing table leaves open, such as `use_slot_1`. */

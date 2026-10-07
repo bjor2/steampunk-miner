@@ -5,7 +5,7 @@
  * gauge, the ticks spent at its max and the lines it crosses are exact and replay the same. Per
  * vehicle; the save holds the level and the tick it was settled at.
  */
-import { HEAT_UNITS_PER_POINT } from '../../constants/balance'
+import { BASIS_POINTS, HEAT_UNITS_PER_POINT } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { ceil, div, fromSafeInteger, mul, toSafeInteger, type BigStat } from '../money'
 
@@ -27,6 +27,16 @@ export interface HeatSegment {
   ticks: number
   unitsPerTick: number
 }
+
+/**
+ * An instant vent between segments (ticket 233, a slice's heat sink): the gauge keeps `keepBp`
+ * basis points of its level, rounded down.
+ */
+export interface HeatVent {
+  keepBp: number
+}
+
+export type HeatStep = HeatSegment | HeatVent
 
 /** Where a segment leaves the gauge: its level, the ticks it sat at the max, the lines it crossed. */
 export interface HeatRun {
@@ -54,17 +64,40 @@ export function heatPointsOf(units: number): BigStat {
   return div(fromSafeInteger(units), UNITS_PER_POINT)
 }
 
-/** Runs the segments in order from `level`, held to `0..maxUnits`, watching `lines`. */
+/** Runs the steps in order from `level`, held to `0..maxUnits`, watching `lines`. */
 export function runHeatSegments(
   level: number,
-  segments: readonly HeatSegment[],
+  steps: readonly HeatStep[],
   maxUnits: number,
   lines: readonly number[],
 ): HeatRun {
-  return segments.reduce<HeatRun>(
-    (run, segment) => joinRuns(run, runSegment(run.level, segment, maxUnits, lines)),
+  return steps.reduce<HeatRun>(
+    (run, step) => joinRuns(run, runStep(run.level, step, maxUnits, lines)),
     { level, ticksAtMax: 0, risenPast: [], fellBelow: [] },
   )
+}
+
+function runStep(
+  level: number,
+  step: HeatStep,
+  maxUnits: number,
+  lines: readonly number[],
+): HeatRun {
+  return isVent(step) ? runVent(level, step, lines) : runSegment(level, step, maxUnits, lines)
+}
+
+function isVent(step: HeatStep): step is HeatVent {
+  return 'keepBp' in step
+}
+
+function runVent(level: number, { keepBp }: HeatVent, lines: readonly number[]): HeatRun {
+  const after = Math.floor((level * keepBp) / BASIS_POINTS)
+  return {
+    level: after,
+    ticksAtMax: 0,
+    risenPast: [],
+    fellBelow: lines.filter((line) => level >= line && after < line),
+  }
 }
 
 function runSegment(

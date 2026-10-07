@@ -45,6 +45,7 @@ import { INPUT_REACTION_REGISTRY } from '../systems/registries/inputReactions'
 import { ENEMY_DETECTION_MODIFIER_REGISTRY } from '../systems/registries/enemyDetectionModifiers'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
+import { HEAT_PAUSE_REGISTRY } from '../systems/registries/heatPauses'
 import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
@@ -89,6 +90,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     dockFacility: (facility) => add(DOCK_FACILITY_REGISTRY, facility),
     hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),
     enemyDetectionModifier: (modifier) => add(ENEMY_DETECTION_MODIFIER_REGISTRY, modifier),
+    heatPause: (pause) => add(HEAT_PAUSE_REGISTRY, pause),
     inputReaction: (reaction) => add(INPUT_REACTION_REGISTRY, reaction),
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
