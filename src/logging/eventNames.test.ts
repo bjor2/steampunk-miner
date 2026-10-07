@@ -53,6 +53,12 @@ describe('run event registry', () => {
     expect(floatFieldProblems(registry)).toEqual([
       'mining_interval.collected is a float outside perf_sample',
     ])
+    const optionalFloat = {
+      snapshot_written: { group: 'run', level: 'perf', payload: { mb: { optional: 'float' } } },
+    } as const
+    expect(floatFieldProblems(optionalFloat)).toEqual([
+      'snapshot_written.mb is a float outside perf_sample',
+    ])
   })
 
   it('reserves player_killed and the multiplayer names', () => {

@@ -135,6 +135,23 @@ export const RUN_EVENT_REGISTRY = {
     },
   },
 
+  // #123: a debug run kept a snapshot (logging strategy section 1): a save on the 5-minute timer or
+  // at session end (slot saves log `checkpoint_saved`), a heap snapshot at each heap step, a
+  // screenshot on a planet change or a frame budget breach. `file` is a path in the run folder and
+  // `bytes` its size; a browser heap step writes no file (a CDP harness takes its own).
+  snapshot_written: {
+    group: 'run',
+    level: 'perf',
+    payload: {
+      kind: { oneOf: ['save', 'heap', 'screenshot'] },
+      trigger: {
+        oneOf: ['save', 'timer', 'session_end', 'heap_step', 'planet_change', 'budget_breach'],
+      },
+      file: { optional: 'text' },
+      bytes: { optional: 'integer' },
+    },
+  },
+
   // Progression
   planet_entered: {
     group: 'progression',
@@ -317,10 +334,18 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: { tier: 'integer', band: 'integer', unitPrice: 'money' },
   },
+  // #123: a debug run also keeps the save as `file` (a path in the run folder, logging strategy
+  // section 1); a played run writes no file and leaves the field out.
   checkpoint_saved: {
     group: 'platform',
     level: 'core',
-    payload: { slot: 'text', epoch: 'integer', bytes: 'integer', digest: 'text' },
+    payload: {
+      slot: 'text',
+      epoch: 'integer',
+      bytes: 'integer',
+      digest: 'text',
+      file: { optional: 'text' },
+    },
   },
   // #170: an older save was brought up to this build by one step of the migration chain, logged
   // per step just before checkpoint_loaded; #181 added the snapshot step (levels to steps). #224:

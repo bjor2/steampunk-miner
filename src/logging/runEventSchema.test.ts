@@ -88,6 +88,22 @@ describe('run event schema', () => {
     ])
   })
 
+  it('accepts a line that leaves an optional field out, and one that fills it', () => {
+    const saved = { slot: 'slot-1', epoch: 3, bytes: 20811, digest: '0123456789abcdef' }
+    const line = { ...resourceSold, event: 'checkpoint_saved', data: saved }
+    expect(runEventProblems(line)).toEqual([])
+    const withFile = { ...saved, file: 'snapshots/save-8120.json' }
+    expect(runEventProblems({ ...line, data: withFile })).toEqual([])
+  })
+
+  it('checks an optional field that is given against its kind', () => {
+    const heapStep = { kind: 'heap', trigger: 'heap_step', file: 'heap/8120.heapsnapshot' }
+    const line = { ...resourceSold, event: 'snapshot_written', data: { ...heapStep, bytes: 1.5 } }
+    expect(runEventProblems(line)).toEqual([
+      'snapshot_written.bytes must be a safe integer, got 1.5',
+    ])
+  })
+
   it('refuses a value outside an enum', () => {
     expect(runEventProblems(withData({ ...resourceSold.data, mode: 'some' }))).toEqual([
       'resource_sold.mode must be one of all, single, got "some"',
