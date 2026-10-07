@@ -15,6 +15,9 @@
  * A charge the wallet cannot pay is refused with `money_short`, never trimmed to what it can pay.
  * A player holding `assay_beacon` (#46) sells the planet's shallow-band ore at the mid-band unit
  * price, and each lifted tier says so in `artefact_assay_applied`.
+ *
+ * A recharge, alone or in the quick action, ends with the slices' dock services (#217): free
+ * refills on the same bill, which they never change.
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../constants/balance'
 import { ARTEFACT_ID } from '../artefacts/artefactOptions'
@@ -52,6 +55,7 @@ import { atBayRejection, atShopRejection } from './dockRules'
 import type { DomainEventBody, SaleMode, SoldItem } from './domainEvent'
 import { liningPaidOutOf, payLiningBillOutOf } from './liningBill'
 import { collectWhenReady, readyRefinedValueOf } from './refinery/refineryCollection'
+import { applyDockServicesOnRecharge } from '../registries/dockServices'
 
 /** One ore tier, or the whole hold's ore. */
 export type OreSelection = number | 'all'
@@ -297,7 +301,15 @@ function repairHull(state: AuthorityState, playerId: string): RuleEffect {
   }
 }
 
+/** The paid fill, then the slices' free dock services (#217); quick service recharges here too. */
 function rechargeEnergy(state: AuthorityState, playerId: string): RuleEffect {
+  return chainEffects(state, [
+    (current) => payForFullTank(current, playerId),
+    (current) => applyDockServicesOnRecharge(current, playerId),
+  ])
+}
+
+function payForFullTank(state: AuthorityState, playerId: string): RuleEffect {
   const { wallet, vehicle } = state.players[playerId]
   const cost = rechargeCostOf(state, playerId)
   const energyMax = energyMaxQuantaOf(vehicle)

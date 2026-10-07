@@ -30,6 +30,7 @@ import {
   isKernelDiscoveryKind,
   type DiscoveryKindRegistration,
 } from '../systems/registries/discovery'
+import { DOCK_SERVICE_REGISTRY } from '../systems/registries/dockServices'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
@@ -63,6 +64,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     gateCheck: (check) => add(GATE_CHECK_REGISTRY, check),
     blastEffect: (effect) => add(BLAST_EFFECT_REGISTRY, effect),
     clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),
+    dockService: (service) => add(DOCK_SERVICE_REGISTRY, service),
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
     saveSection: (section) => addSaveSection(sliceId, section),

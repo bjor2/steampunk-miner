@@ -19,6 +19,7 @@ import type {
   DiscoveryKind,
   DiscoveryProvider,
 } from '../systems/registries/discovery'
+import type { DockService } from '../systems/registries/dockServices'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
@@ -50,6 +51,8 @@ export interface SliceRegistrar {
   blastEffect(effect: BlastEffect): void
   /** Runs on the authority clock after the kernel's steps, in id order (#217). */
   clockStep(step: ClockStep): void
+  /** A free refill at the end of every paid recharge; the bill never changes (#217). */
+  dockService(service: DockService): void
   generationHook(hook: GenerationHook): void
   /** One provider across all slices. */
   oreLook(provider: OreLookProvider): void
