@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-rig-containment",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-rig-containment/vehicle-item-rig-containment.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-rig-containment.albedo.ktx2",
+    "normal": "vehicle-item-rig-containment.normal.ktx2",
+    "emissive": "vehicle-item-rig-containment.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "hood-rail",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        134,
+        109
+      ],
+      "sizeM": [
+        0.26,
+        0.212
+      ],
+      "pivotM": [
+        0.13,
+        0.07
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    },
+    {
+      "id": "hood-shell",
+      "tier": 1,
+      "rect": [
+        8,
+        133,
+        121,
+        27
+      ],
+      "sizeM": [
+        0.236,
+        0.052
+      ],
+      "pivotM": [
+        0.22,
+        0.036
+      ],
+      "atM": [
+        0.12,
+        0.045
+      ],
+      "z": 10
+    }
+  ]
+}

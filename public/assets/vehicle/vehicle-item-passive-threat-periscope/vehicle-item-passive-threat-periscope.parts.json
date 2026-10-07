@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-passive-threat-periscope",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-passive-threat-periscope/vehicle-item-passive-threat-periscope.blend",
+    "sha256": "c8d548b1a87cf37c02d2d41847d20a79da52721a9f92635873c7c4b67d1f9107",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    64,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-passive-threat-periscope.albedo.ktx2",
+    "normal": "vehicle-item-passive-threat-periscope.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "periscope-head",
+      "tier": 1,
+      "rect": [
+        8,
+        96,
+        42,
+        26
+      ],
+      "sizeM": [
+        0.082,
+        0.0495
+      ],
+      "pivotM": [
+        0.015,
+        0.012
+      ],
+      "atM": [
+        0.0,
+        0.14
+      ],
+      "z": 7
+    },
+    {
+      "id": "periscope-mast",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        23,
+        72
+      ],
+      "sizeM": [
+        0.044,
+        0.14
+      ],
+      "pivotM": [
+        0.022,
+        0.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

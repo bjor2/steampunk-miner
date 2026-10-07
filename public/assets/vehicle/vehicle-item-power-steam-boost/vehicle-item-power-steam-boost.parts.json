@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-power-steam-boost",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-steam-boost/vehicle-item-power-steam-boost.blend",
+    "sha256": "80d67329526640c210aabce0e4c0c0eab5408ff968d5d86c4d5d9f6562f46635",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-steam-boost.albedo.ktx2",
+    "normal": "vehicle-item-power-steam-boost.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "boost-housing",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        68,
+        73
+      ],
+      "sizeM": [
+        0.131,
+        0.142
+      ],
+      "pivotM": [
+        0.062,
+        0.057
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

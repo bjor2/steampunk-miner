@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-gear-reach-boom",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-gear-reach-boom/vehicle-item-gear-reach-boom.blend",
+    "sha256": "9c3a64d4e8adba8164e425b91d06e31742efdb2ff2b6af7e4a282379e492556e",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-gear-reach-boom.albedo.ktx2",
+    "normal": "vehicle-item-gear-reach-boom.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "boom-collar",
+      "tier": 1,
+      "rect": [
+        8,
+        94,
+        82,
+        66
+      ],
+      "sizeM": [
+        0.16,
+        0.128
+      ],
+      "pivotM": [
+        0.05,
+        0.064
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 7
+    },
+    {
+      "id": "boom-sleeve",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        62,
+        70
+      ],
+      "sizeM": [
+        0.12,
+        0.136
+      ],
+      "pivotM": [
+        0.02,
+        0.068
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 8
+    }
+  ]
+}

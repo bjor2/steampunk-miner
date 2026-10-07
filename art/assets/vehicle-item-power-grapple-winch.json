@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-power-grapple-winch",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "winch-drum": "#3b3631",
+    "winch-hook": "#c9a24b"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-power-pressure-pocket",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-pressure-pocket/vehicle-item-power-pressure-pocket.blend",
+    "sha256": "d07c4113dffc09895a0e0ee6b5045d996f0ef9f492c926c9500457591462908f",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-pressure-pocket.albedo.ktx2",
+    "normal": "vehicle-item-power-pressure-pocket.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "lance-housing",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        117,
+        59
+      ],
+      "sizeM": [
+        0.227,
+        0.114
+      ],
+      "pivotM": [
+        0.062,
+        0.057
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

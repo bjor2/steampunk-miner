@@ -1,11 +1,12 @@
 /**
  * The tech tree slice (#165, spec #161): the `tech-node` and `tech-combo-template` kinds the lane
  * slices register into, the rules over them, the `tech-tree` save section, the `unlock_node`
- * command, its run events, the pacing bot's research purchase, the debug actions, and the tree
- * screen with its HUD button. No side effects at import; the loader calls `register`.
+ * command, its run events, the pacing bot's research purchase, the debug actions, the tree
+ * screen with its HUD button, and the mounted gear's art assets (#166). No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { techTreeDebugActions } from './debug'
+import { techGearArtAssets } from './systems/render/techGear'
 import { TECH_TREE_PROJECTIONS, TECH_TREE_RUN_EVENTS } from './logging'
 import { RESEARCH_BOT_PURCHASE } from './systems/researchBotPurchase'
 import { TECH_TREE_RULES } from './systems/techTreeCommands'
@@ -17,6 +18,8 @@ export const slice: SliceDefinition = {
   id: 'tech-tree',
   register(r) {
     r.saveSection(TECH_TREE_SECTION)
+    // The mounted gear's Blender assets (#166), under public/assets/vehicle/ (#214).
+    r.artAssets(techGearArtAssets())
     r.commandRules(TECH_TREE_RULES)
     r.eventProjections(TECH_TREE_PROJECTIONS)
     r.runEvents(TECH_TREE_RUN_EVENTS)

@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-power-steam-shield",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-steam-shield/vehicle-item-power-steam-shield.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-steam-shield.albedo.ktx2",
+    "normal": "vehicle-item-power-steam-shield.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "shield-housing",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        64,
+        73
+      ],
+      "sizeM": [
+        0.124,
+        0.142
+      ],
+      "pivotM": [
+        0.062,
+        0.057
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

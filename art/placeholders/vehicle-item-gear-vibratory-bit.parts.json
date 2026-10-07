@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-gear-vibratory-bit",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-gear-vibratory-bit/vehicle-item-gear-vibratory-bit.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-gear-vibratory-bit.albedo.ktx2",
+    "normal": "vehicle-item-gear-vibratory-bit.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "vibratory-bit",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        175,
+        116
+      ],
+      "sizeM": [
+        0.34,
+        0.225
+      ],
+      "pivotM": [
+        0.01,
+        0.1
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    }
+  ]
+}

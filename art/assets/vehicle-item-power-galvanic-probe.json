@@ -1,0 +1,10 @@
+{
+  "id": "vehicle-item-power-galvanic-probe",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "probe-housing": "#3b3631"
+  }
+}

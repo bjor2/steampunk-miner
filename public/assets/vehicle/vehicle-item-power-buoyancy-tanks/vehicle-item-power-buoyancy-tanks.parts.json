@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-power-buoyancy-tanks",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-buoyancy-tanks/vehicle-item-power-buoyancy-tanks.blend",
+    "sha256": "2832f4f648641f76384968a9326396a7cf2478c236ad3a35c3f750b391a5d2bb",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-buoyancy-tanks.albedo.ktx2",
+    "normal": "vehicle-item-power-buoyancy-tanks.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "bladder-housing",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        64,
+        59
+      ],
+      "sizeM": [
+        0.124,
+        0.114
+      ],
+      "pivotM": [
+        0.062,
+        0.057
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

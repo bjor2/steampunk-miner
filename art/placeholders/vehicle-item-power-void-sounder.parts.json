@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-power-void-sounder",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-void-sounder/vehicle-item-power-void-sounder.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-void-sounder.albedo.ktx2",
+    "normal": "vehicle-item-power-void-sounder.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "void-horn-housing",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        124,
+        59
+      ],
+      "sizeM": [
+        0.2416,
+        0.114
+      ],
+      "pivotM": [
+        0.062,
+        0.057
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

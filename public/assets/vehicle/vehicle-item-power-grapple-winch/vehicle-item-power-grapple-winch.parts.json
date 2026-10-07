@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-power-grapple-winch",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-grapple-winch/vehicle-item-power-grapple-winch.blend",
+    "sha256": "830671136fa388ef56beb92b00c872c7cff9c5d21d8e53154882a2006fbe8225",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-grapple-winch.albedo.ktx2",
+    "normal": "vehicle-item-power-grapple-winch.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "winch-drum",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        70,
+        67
+      ],
+      "sizeM": [
+        0.136,
+        0.13
+      ],
+      "pivotM": [
+        0.066,
+        0.075
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    },
+    {
+      "id": "winch-hook",
+      "tier": 1,
+      "rect": [
+        94,
+        8,
+        118,
+        29
+      ],
+      "sizeM": [
+        0.2287,
+        0.0553
+      ],
+      "pivotM": [
+        0.016,
+        0.0277
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 7
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-rig-aether-tether",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-rig-aether-tether/vehicle-item-rig-aether-tether.blend",
+    "sha256": "6744a2abe1f6b58d17a1d8e5d292f3cdc4fb9f9230c3563e2789bf4c22d422e5",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-rig-aether-tether.albedo.ktx2",
+    "normal": "vehicle-item-rig-aether-tether.normal.ktx2",
+    "emissive": "vehicle-item-rig-aether-tether.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "tether-harpoon",
+      "tier": 1,
+      "rect": [
+        101,
+        8,
+        120,
+        21
+      ],
+      "sizeM": [
+        0.2335,
+        0.04
+      ],
+      "pivotM": [
+        0.016,
+        0.02
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 7
+    },
+    {
+      "id": "tether-reel",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        77,
+        75
+      ],
+      "sizeM": [
+        0.1498,
+        0.1448
+      ],
+      "pivotM": [
+        0.07,
+        0.08
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

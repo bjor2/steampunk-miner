@@ -1,0 +1,23 @@
+{
+  "id": "vehicle-rack-crates",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "crate-cryo-binder": "#66421f",
+    "crate-emergency-ballast": "#66421f",
+    "crate-escape-thruster": "#66421f",
+    "crate-flare-mortar": "#66421f",
+    "crate-heat-sink-flask": "#66421f",
+    "crate-lodestone-beacon": "#66421f",
+    "crate-rivet-patch": "#66421f",
+    "crate-seam-splitter": "#66421f",
+    "crate-shelf": "#3b3631",
+    "crate-shoring-props": "#66421f",
+    "crate-signal-buoy": "#66421f",
+    "crate-smoke-canister": "#66421f",
+    "crate-stabiliser-foam": "#66421f",
+    "mortar-tube": "#3b3631"
+  }
+}

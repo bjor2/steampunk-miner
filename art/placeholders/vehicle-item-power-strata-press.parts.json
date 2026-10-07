@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-power-strata-press",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-strata-press/vehicle-item-power-strata-press.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-strata-press.albedo.ktx2",
+    "normal": "vehicle-item-power-strata-press.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "press-housing",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        80,
+        59
+      ],
+      "sizeM": [
+        0.1545,
+        0.114
+      ],
+      "pivotM": [
+        0.062,
+        0.057
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

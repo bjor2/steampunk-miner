@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-power-echo-sounder",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-echo-sounder/vehicle-item-power-echo-sounder.blend",
+    "sha256": "0f7ea8df4712a8ad62b984c9a2045750992857c8b92498c2d1c6bd9d20f9da87",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-echo-sounder.albedo.ktx2",
+    "normal": "vehicle-item-power-echo-sounder.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "sounder-hammer",
+      "tier": 1,
+      "rect": [
+        8,
+        110,
+        48,
+        58
+      ],
+      "sizeM": [
+        0.092,
+        0.112
+      ],
+      "pivotM": [
+        0.045,
+        0.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    },
+    {
+      "id": "sounder-horn",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        75,
+        86
+      ],
+      "sizeM": [
+        0.1464,
+        0.1664
+      ],
+      "pivotM": [
+        0.1304,
+        0.016
+      ],
+      "atM": [
+        0.02,
+        0.06
+      ],
+      "z": 7
+    }
+  ]
+}

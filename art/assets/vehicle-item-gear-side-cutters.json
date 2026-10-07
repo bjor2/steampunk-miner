@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-gear-side-cutters",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "cutter-arm": "#c9a24b",
+    "cutter-bracket": "#3b3631"
+  }
+}

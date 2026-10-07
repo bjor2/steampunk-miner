@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-gear-spoil-auger",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "auger-collar": "#3b3631",
+    "auger-screw": "#3b3631"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-gear-reach-boom",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "boom-collar": "#3b3631",
+    "boom-sleeve": "#c9a24b"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-gear-dielectric-bit",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-gear-dielectric-bit/vehicle-item-gear-dielectric-bit.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-gear-dielectric-bit.albedo.ktx2",
+    "normal": "vehicle-item-gear-dielectric-bit.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "dielectric-bit",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        180,
+        107
+      ],
+      "sizeM": [
+        0.35,
+        0.208
+      ],
+      "pivotM": [
+        0.01,
+        0.104
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 9
+    }
+  ]
+}

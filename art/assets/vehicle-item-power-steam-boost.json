@@ -1,0 +1,10 @@
+{
+  "id": "vehicle-item-power-steam-boost",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "boost-housing": "#3b3631"
+  }
+}

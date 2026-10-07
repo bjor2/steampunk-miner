@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-power-ore-shifter",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-ore-shifter/vehicle-item-power-ore-shifter.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-ore-shifter.albedo.ktx2",
+    "normal": "vehicle-item-power-ore-shifter.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "shifter-housing",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        64,
+        59
+      ],
+      "sizeM": [
+        0.124,
+        0.114
+      ],
+      "pivotM": [
+        0.062,
+        0.057
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

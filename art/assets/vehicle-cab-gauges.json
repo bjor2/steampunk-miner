@@ -1,0 +1,12 @@
+{
+  "id": "vehicle-cab-gauges",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "dial-assay-lens": "#c9a24b",
+    "dial-hazard-barometer": "#c9a24b",
+    "gauge-cluster": "#c9a24b"
+  }
+}

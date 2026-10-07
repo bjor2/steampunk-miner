@@ -1,0 +1,44 @@
+{
+  "assetId": "vehicle-item-power-slurry-siphon",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-slurry-siphon/vehicle-item-power-slurry-siphon.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-slurry-siphon.albedo.ktx2",
+    "normal": "vehicle-item-power-slurry-siphon.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "siphon-housing",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        81,
+        59
+      ],
+      "sizeM": [
+        0.157,
+        0.114
+      ],
+      "pivotM": [
+        0.062,
+        0.057
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

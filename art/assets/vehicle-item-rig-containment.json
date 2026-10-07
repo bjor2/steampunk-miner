@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-rig-containment",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "hood-rail": "#3b3631",
+    "hood-shell": "#c9a24b"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-rig-resonance",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-rig-resonance/vehicle-item-rig-resonance.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-rig-resonance.albedo.ktx2",
+    "normal": "vehicle-item-rig-resonance.normal.ktx2",
+    "emissive": "vehicle-item-rig-resonance.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "fork-prongs",
+      "tier": 1,
+      "rect": [
+        8,
+        124,
+        101,
+        92
+      ],
+      "sizeM": [
+        0.197,
+        0.1793
+      ],
+      "pivotM": [
+        0.003,
+        0.0897
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 8
+    },
+    {
+      "id": "fork-yoke",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        26,
+        100
+      ],
+      "sizeM": [
+        0.05,
+        0.1947
+      ],
+      "pivotM": [
+        0.025,
+        0.085
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 7
+    }
+  ]
+}

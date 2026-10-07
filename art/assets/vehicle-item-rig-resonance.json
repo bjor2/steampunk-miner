@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-rig-resonance",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "fork-prongs": "#c9a24b",
+    "fork-yoke": "#c9a24b"
+  }
+}

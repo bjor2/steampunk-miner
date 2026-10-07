@@ -1,0 +1,10 @@
+{
+  "id": "vehicle-item-gear-twin-bit",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "twin-bit": "#c9a24b"
+  }
+}

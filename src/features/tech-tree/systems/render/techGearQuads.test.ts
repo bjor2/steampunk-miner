@@ -124,7 +124,7 @@ describe('tech gear quads: parts at the vehicle attach points', () => {
     expect(below?.mirrorY).toBe(true)
     expect(below?.pivot[1]).toBeCloseTo(-(above?.pivot[1] ?? 0))
     expect(below?.turn).toBeCloseTo(-(above?.turn ?? 0))
-    expect(above?.turn).toBeCloseTo(-0.9)
+    expect(above?.turn).toBeCloseTo(0.9)
   })
 
   it('lists what a loadout draws: owned extractors and crates, and slotted gear in its slot', () => {

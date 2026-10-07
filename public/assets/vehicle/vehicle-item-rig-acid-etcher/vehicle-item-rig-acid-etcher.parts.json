@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-rig-acid-etcher",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-rig-acid-etcher/vehicle-item-rig-acid-etcher.blend",
+    "sha256": "c1fddf05a6c21522c9fe26487506f5a1fafedaad9073c37a5d4457b51a14bf8e",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-rig-acid-etcher.albedo.ktx2",
+    "normal": "vehicle-item-rig-acid-etcher.normal.ktx2",
+    "emissive": "vehicle-item-rig-acid-etcher.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "etcher-arm",
+      "tier": 1,
+      "rect": [
+        8,
+        106,
+        157,
+        21
+      ],
+      "sizeM": [
+        0.306,
+        0.04
+      ],
+      "pivotM": [
+        0.016,
+        0.02
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 7
+    },
+    {
+      "id": "etcher-shoulder",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        71,
+        82
+      ],
+      "sizeM": [
+        0.138,
+        0.159
+      ],
+      "pivotM": [
+        0.03,
+        0.03
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

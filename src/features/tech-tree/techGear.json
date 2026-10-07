@@ -1,5 +1,5 @@
 {
-  "$comment": "The mounted gear of spec #162 section 5 and its VFX (#166). Every physical item names the attach point the TD locked, its Blender asset and its parts; a moving part carries its folded and deployed pose (a turn in radians about the part's pivot and a shift in metres), which `extractorPose.ts` blends over the G&V deploy timing. Pivots are at each part's own origin and placed at the point's atM: nothing is baked in the vehicle frame. Colours are the cap each folded extractor keeps visible at gameplay zoom (GD, 6 Oct). The fx rows are the power-up effects `powerUpFx.ts` shapes from the #162 section 4 magnitudes: a tile is one metre.",
+  "$comment": "The mounted gear of spec #162 section 5 and its VFX (#166). Every physical item names the attach point the TD locked, its Blender asset and its parts; a moving part carries its folded and deployed pose (a turn in radians about the part's pivot, counter-clockwise on screen as three.js turns a group, and a shift in metres), which `extractorPose.ts` blends over the G&V deploy timing. Pivots are at each part's own origin and placed at the point's atM: nothing is baked in the vehicle frame. Colours are the cap each folded extractor keeps visible at gameplay zoom (GD, 6 Oct). The fx rows are the power-up effects `powerUpFx.ts` shapes from the #162 section 4 magnitudes: a tile is one metre.",
   "deploy": { "unfoldTicks": 8, "holdTicks": 30, "foldTicks": 8 },
   "crateRack": {
     "assetId": "vehicle-rack-crates",
@@ -36,7 +36,7 @@
         { "id": "hood-rail" },
         {
           "id": "hood-shell",
-          "folded": { "turn": 1.2, "shift": [0, 0] },
+          "folded": { "turn": -1.2, "shift": [0, 0] },
           "deployed": { "turn": 0, "shift": [0, 0] }
         }
       ]
@@ -52,7 +52,7 @@
         {
           "id": "etcher-arm",
           "folded": { "turn": 0, "shift": [0, 0] },
-          "deployed": { "turn": 2.3, "shift": [0, 0] }
+          "deployed": { "turn": -2.6, "shift": [0, 0] }
         }
       ]
     },
@@ -159,7 +159,7 @@
         { "id": "cutter-bracket" },
         {
           "id": "cutter-arm",
-          "folded": { "turn": -0.9, "shift": [0, 0] },
+          "folded": { "turn": 0.9, "shift": [0, 0] },
           "deployed": { "turn": 0, "shift": [0, 0] }
         }
       ]

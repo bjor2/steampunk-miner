@@ -1,0 +1,10 @@
+{
+  "id": "vehicle-item-gear-vibratory-bit",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "vibratory-bit": "#c9a24b"
+  }
+}

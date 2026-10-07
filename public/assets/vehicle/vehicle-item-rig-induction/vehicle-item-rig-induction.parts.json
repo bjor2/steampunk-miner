@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-rig-induction",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-rig-induction/vehicle-item-rig-induction.blend",
+    "sha256": "ca2c9bf7175a303c90b3b8bc683bcbe78fe6413ad040e8f94e637fa93d9b5891",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-rig-induction.albedo.ktx2",
+    "normal": "vehicle-item-rig-induction.normal.ktx2",
+    "emissive": "vehicle-item-rig-induction.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "coil-mount",
+      "tier": 1,
+      "rect": [
+        8,
+        101,
+        39,
+        36
+      ],
+      "sizeM": [
+        0.075,
+        0.07
+      ],
+      "pivotM": [
+        0.035,
+        0.035
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    },
+    {
+      "id": "coil-ring",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        88,
+        77
+      ],
+      "sizeM": [
+        0.171,
+        0.1496
+      ],
+      "pivotM": [
+        0.016,
+        0.0748
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 7
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "vehicle-item-power-strata-press",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "press-housing": "#3b3631"
+  }
+}

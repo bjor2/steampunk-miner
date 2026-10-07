@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-rig-induction",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "coil-mount": "#3b3631",
+    "coil-ring": "#c9a24b"
+  }
+}
