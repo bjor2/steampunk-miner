@@ -44,8 +44,10 @@ import type { BayId } from '../world/dockBays'
  *    terrain edits apply from the queue.
  * 19: `QuickService` works at the Workshop (`upgrade`) as well as at Sell, and is refused
  *    `wrong_bay` at the Refinery only (#170, #175).
+ * 20: the brass tracks and casing grades flattened to drill power's ratio 1.225 on bases 24, 23,
+ *    36, 46 and 48 (#195), so the same `BuyUpgrade` and `BuyCasingGrade` cost a different amount.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 19
+export const AUTHORITY_PROTOCOL_VERSION = 20
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
