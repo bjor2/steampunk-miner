@@ -77,6 +77,41 @@ export function powInt(base: Money, exponent: number): Money {
   return wrap(unwrap(base).pow(exponent))
 }
 
+/** The growth ratios `nthRoot` is sized for: its fixed iteration count settles inside them. */
+const ROOT_BASE_MIN = new MoneyDecimal(1).dividedBy(2)
+const ROOT_BASE_MAX = new MoneyDecimal(2)
+const ROOT_ITERATIONS = 64
+
+/**
+ * `base^(1/n)` for a whole `n >= 1` and a growth ratio from 1/2 to 2 (#180 TD: the pip roots
+ * `ratio^(1/10)` and `g^(1/18)`). Newton's method with a fixed iteration count, using only add,
+ * mul, div and `powInt`, so every OS computes the same digits: decimal.js `pow` with a fraction
+ * seeds itself from the OS `Math.pow`. The start `1 + (base - 1) / n` is never below the root
+ * (Bernoulli), so the steps fall monotonically onto it.
+ */
+export function nthRoot(base: Money, n: number): Money {
+  const a = unwrap(base)
+  assertRootArguments(a, n)
+  const degree = new MoneyDecimal(n)
+  let x = a.minus(1).dividedBy(degree).plus(1)
+  for (let step = 0; step < ROOT_ITERATIONS; step++) {
+    x = x
+      .times(n - 1)
+      .plus(a.dividedBy(x.pow(n - 1)))
+      .dividedBy(degree)
+  }
+  return wrap(x)
+}
+
+function assertRootArguments(base: Decimal, n: number): void {
+  if (!Number.isSafeInteger(n) || n < 1) {
+    throw new RangeError(`nthRoot needs a whole degree >= 1, got ${n}`)
+  }
+  if (base.lessThan(ROOT_BASE_MIN) || base.greaterThan(ROOT_BASE_MAX)) {
+    throw new RangeError(`nthRoot takes a growth ratio from 1/2 to 2, got ${base.toString()}`)
+  }
+}
+
 export function floor(amount: Money): Money {
   return wrap(unwrap(amount).floor())
 }

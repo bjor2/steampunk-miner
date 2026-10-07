@@ -13,6 +13,7 @@ import {
   isMoney,
   isNonNegativeMoneyText,
   mul,
+  nthRoot,
   powInt,
   roundToWhole,
   sub,
@@ -131,6 +132,39 @@ describe('money: arithmetic', () => {
     const a = m('5')
     add(a, m('1'))
     expect(toCanonical(a)).toBe('5e+0')
+  })
+})
+
+describe('money: whole roots of growth ratios', () => {
+  // Pinned for the Windows determinism job (#180 TD acceptance 4): the pip roots of the brass
+  // price ratio and of the drill power and tip stat ratios.
+  it('takes the tenth root of the brass price ratio to 40 digits', () => {
+    expect(toCanonical(nthRoot(m('1.225'), 10))).toBe(
+      '1.020501409446083999257620138056963092034e+0',
+    )
+  })
+
+  it('takes the eighteenth roots of the drill power and tip ratios to 40 digits', () => {
+    expect(toCanonical(nthRoot(m('1.12'), 18))).toBe('1.006315899781797070410163283611672057434e+0')
+    expect(toCanonical(nthRoot(m('1.2544'), 18))).toBe(
+      '1.012671690153647845101946186270857273607e+0',
+    )
+  })
+
+  it('gives back the ratio to within the last of 40 digits when raised to the degree', () => {
+    const back = powInt(nthRoot(m('1.500625'), 10), 10)
+    expect(cmp(sub(back, m('1.500625')), m('1e-38'))).toBe(-1)
+    expect(cmp(sub(m('1.500625'), back), m('1e-38'))).toBe(-1)
+  })
+
+  it('leaves a first root unchanged', () => {
+    expect(toCanonical(nthRoot(m('2'), 1))).toBe('2e+0')
+  })
+
+  it('refuses a degree that is not whole or a base outside the growth ratios', () => {
+    expect(() => nthRoot(m('1.2'), 0)).toThrow(/degree/)
+    expect(() => nthRoot(m('1.2'), 2.5)).toThrow(/degree/)
+    expect(() => nthRoot(m('100'), 10)).toThrow(/growth ratio/)
   })
 })
 
