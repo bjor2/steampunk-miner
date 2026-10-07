@@ -1,9 +1,9 @@
 /**
  * The run vehicle's body parts (#52, #51), drawn from the `vehicle` asset's sidecar at the
  * authority replica's visual tier (#7: derived from the levels, never decided here), so an upgrade
- * threshold shows on the vehicle (37.7). Drawn inside the vehicle's body group, so it turns with
- * the body; the drill head's parts are `DrillHeadView`'s. Each part moves as the game state
- * drives it (#48); a hit recoils the body.
+ * threshold shows on the vehicle (37.7), with the parts a slice swaps in (#180). Drawn inside the
+ * vehicle's body group, so it turns with the body; the drill head's parts are `DrillHeadView`'s.
+ * Each part moves as the game state drives it (#48); a hit recoils the body.
  */
 import { useEffect, useMemo } from 'react'
 import { listenForFeedback } from '../store/feedbackBroadcast'
@@ -13,6 +13,7 @@ import { vehicleAtlasMaps, vehicleBodyQuadsOf } from '../systems/render/vehicleL
 import { recoilVehicleParts } from './partMotionPresence'
 import { PartQuadMesh } from './PartQuadMesh'
 import { SHIPPED_ART } from './shippedArt'
+import { useSwappedPartIds } from './useSwappedPartIds'
 
 /** Parts sit just in front of the tiles. */
 const BODY_Z = 0.1
@@ -20,7 +21,11 @@ const maps = vehicleAtlasMaps(SHIPPED_ART)
 
 export function VehiclePlaceholder() {
   const visualTier = useGameStore((state) => state.vehicle.visualTier)
-  const quads = useMemo(() => vehicleBodyQuadsOf(SHIPPED_ART, visualTier), [visualTier])
+  const swapped = useSwappedPartIds()
+  const quads = useMemo(
+    () => vehicleBodyQuadsOf(SHIPPED_ART, visualTier, swapped),
+    [visualTier, swapped],
+  )
   useEffect(() => listenForFeedback(recoilOnHit), [])
   return (
     <>

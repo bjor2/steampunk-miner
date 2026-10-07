@@ -10,6 +10,7 @@ import { folderOfEntry, type ManifestEntry } from './assetManifest'
 import type { PartsSidecar, Pair, SidecarPart } from './partsSidecar'
 import {
   colouredQuadOf,
+  NO_SWAPS,
   partsShownAtTier,
   placeholderQuadsOf,
   type PlaceholderQuad,
@@ -36,14 +37,24 @@ export interface AtlasMaps {
 
 const PUBLIC_FOLDER = 'public/'
 
-/** The quads an asset shows at a visual tier, lowest draw order first. */
-export function assetQuadsOf(art: ArtCatalogue, assetId: string, tier: number): AssetQuad[] {
+/**
+ * The quads an asset shows at a visual tier, with `swappedPartIds` in their slots (#180), lowest
+ * draw order first.
+ */
+export function assetQuadsOf(
+  art: ArtCatalogue,
+  assetId: string,
+  tier: number,
+  swappedPartIds: readonly string[] = NO_SWAPS,
+): AssetQuad[] {
   const entry = manifestEntryOf(art, assetId)
   const sidecar = finalSidecarOf(art, entry)
   if (entry === null || sidecar === null) {
-    return placeholderQuadsOf(art, assetId, tier).map(withoutAtlas)
+    return placeholderQuadsOf(art, assetId, tier, swappedPartIds).map(withoutAtlas)
   }
-  return partsShownAtTier(sidecar.parts, tier).map((part) => atlasQuadOf(entry, sidecar, part))
+  return partsShownAtTier(sidecar.parts, tier, swappedPartIds).map((part) =>
+    atlasQuadOf(entry, sidecar, part),
+  )
 }
 
 /** The maps a final asset draws with, or null while it is a placeholder. */

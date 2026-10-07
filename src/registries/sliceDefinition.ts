@@ -31,6 +31,7 @@ import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
 import type { OreTypeProvider } from '../systems/registries/oreTypes'
+import type { PartMotionRequestSource } from '../systems/registries/partMotionRequests'
 import type { SaveSection } from '../systems/registries/saveSections'
 import type { AttachUse } from '../systems/registries/vehicleAttach'
 import type { VehicleStagingProvider } from '../systems/registries/vehicleStaging'
@@ -95,6 +96,8 @@ export interface SliceRegistrar {
   sceneLayer(layer: SceneLayer): void
   /** One provider across all slices: how a dock building stages the local vehicle (#170). */
   vehicleStaging(provider: VehicleStagingProvider): void
+  /** Poses and part swaps on the drawn car, at vehicle-attach points, asked each tick (#180). */
+  partMotionRequests(source: PartMotionRequestSource): void
   /**
    * Blender assets the slice ships, joining `blenderAssetIds()`. Bare art ids, not prefixed:
    * kebab-case, starting with `<category>-`, never a kernel id or another slice's (#214).

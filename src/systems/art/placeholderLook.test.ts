@@ -52,6 +52,12 @@ describe('placeholder look', () => {
     expect(shown.map((shownPart) => shownPart.id)).toEqual(['t1-wheel', 't2-chassis'])
   })
 
+  it('draws a swapped-in part in its slot whatever its tier, and ignores an id the asset lacks', () => {
+    const parts = [part('t1-chassis', 1), part('t3-chassis', 3), part('t2-stack-2', 2)]
+    const shown = partsShownAtTier(parts, 1, ['t3-chassis', 't2-stack-2', 't9-wing'])
+    expect(shown.map((shownPart) => shownPart.id)).toEqual(['t2-stack-2', 't3-chassis'])
+  })
+
   it('lists parts lowest draw order first', () => {
     const shown = partsShownAtTier([part('t1-headlamp', 1, 4), part('t1-wheel', 1, 1)], 1)
     expect(shown.map((shownPart) => shownPart.z)).toEqual([1, 4])

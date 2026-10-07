@@ -1,11 +1,14 @@
 /**
  * The run vehicle's part motion (#48): stepped once per physics tick by the vehicle loop from the
  * tick's pose and flags, kicked by a hit cue, read by the parts each frame and by the debug API.
- * A mutable registry, because it changes every tick and never goes through React or the store;
- * this module is its only writer.
+ * Each tick it also asks the `partMotionRequests` sources what the slices want of the parts (#180
+ * showcase reactions and model swaps). A mutable registry, because it changes every tick and never
+ * goes through React or the store; this module is its only writer.
  */
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import type { ActionFlags } from '../systems/vehicle/poseReport'
+import { partMotionRequestSources } from '../systems/registries/partMotionRequests'
+import { foldPartRequests } from '../systems/render/requestedParts'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
 import {
   createPartMotion,
@@ -34,6 +37,7 @@ export function stepVehicleParts(pose: VehiclePose, flags: ActionFlags): void {
   step.isThrusting = flags.isThrusting
   step.isDrilling = flags.isDrilling
   stepPartMotion(partMotion, step, PHYSICS_TIMESTEP)
+  foldPartRequests(partMotion.requested, partMotionRequestSources())
 }
 
 export function recoilVehicleParts(): void {

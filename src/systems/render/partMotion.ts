@@ -5,8 +5,9 @@
  * per drilling tick, pistons pump with thrust, the boiler bobs with the energy draw. A landing
  * squashes the chassis and a hit recoils it, unless the player turned motion effects off. While
  * idle only the boiler's slow breath and the headlamp's flicker move. Each part's pose is read
- * from the motion by its slot, so the same rule poses the placeholder quads and the S7a art.
- * Presentation only: it reads the vehicle, never writes it.
+ * from the motion by its slot, so the same rule poses the placeholder quads and the S7a art. A
+ * slice's requested pose for a slot (`partMotionRequests`, #180) adds to it, its movement skipped
+ * like the squash when motion is reduced. Presentation only: it reads the vehicle, never writes it.
  */
 import {
   BOILER_BOB_HZ,
@@ -25,6 +26,7 @@ import {
   PISTON_HZ,
   PISTON_TRAVEL_M,
 } from '../../constants/scene'
+import { createRequestedParts, type RequestedPartPose, type RequestedParts } from './requestedParts'
 
 const TURN = 2 * Math.PI
 const HIT_SECONDS = HIT_SNAP_SECONDS + HIT_SETTLE_SECONDS
@@ -52,6 +54,8 @@ export interface PartMotion {
   wasFalling: boolean
   squashSeconds: number
   hitSeconds: number
+  /** What slices ask of the parts this step (`partMotionRequests`); nothing by default. */
+  requested: RequestedParts
 }
 
 /** One part's transform around its pivot, and how brightly it glows (1 is its own colour). */
@@ -73,6 +77,7 @@ export function createPartMotion(): PartMotion {
     wasFalling: false,
     squashSeconds: 0,
     hitSeconds: 0,
+    requested: createRequestedParts(),
   }
 }
 
@@ -128,6 +133,21 @@ export function writePartPose(
   pose.y = liftOf(motion, kind)
   pose.scaleY = isMotionReduced || kind !== 'chassis' ? 1 : 1 - squashOf(motion)
   pose.glow = glowOf(motion, kind)
+  addRequestedPose(pose, motion.requested.poses.get(slot), isMotionReduced)
+}
+
+/** A slice's reaction on the part (#180); with motion reduced only its glow shows. */
+function addRequestedPose(
+  pose: PartPose,
+  requested: RequestedPartPose | undefined,
+  isMotionReduced: boolean,
+): void {
+  if (requested === undefined) return
+  pose.glow += requested.glow
+  if (isMotionReduced) return
+  pose.x += requested.x
+  pose.y += requested.y
+  pose.angle += requested.angle
 }
 
 /** `wheel-2` is a wheel: the repeat suffix never changes how a part moves. */

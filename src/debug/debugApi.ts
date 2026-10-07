@@ -123,6 +123,8 @@ export interface VehiclePartsReport {
   rackCharges: number | null
   partIds: string[]
   poses: Record<string, PartPose>
+  /** The attach points a slice's part motion or swap names this tick (#180, sorted). */
+  requestedAttach: string[]
 }
 
 export interface DebugApi {
@@ -291,11 +293,12 @@ function vehiclePartsReport(): VehiclePartsReport {
     gunLevel: vehicle.gunLevel,
     rackCharges: vehicle.rackCharges,
     partIds: [
-      ...vehiclePartIdsOf(SHIPPED_ART, vehicle.visualTier),
+      ...vehiclePartIdsOf(SHIPPED_ART, vehicle.visualTier, partMotion.requested.shownPartIds),
       ...gunPartIdsOf(SHIPPED_ART, vehicle.gunLevel),
       ...chargeRackQuadsOf(SHIPPED_ART, vehicle.rackCharges).map((quad) => quad.partId),
     ],
     poses: vehiclePartPosesOf(SHIPPED_ART, partMotion, vehicle.visualTier, !prefs.shake),
+    requestedAttach: [...partMotion.requested.attach],
   }
 }
 

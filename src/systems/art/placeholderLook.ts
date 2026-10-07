@@ -25,16 +25,22 @@ export const MISSING_ART_COLOUR = '#ff00ff'
 
 const MISSING_ART_SIZE: Pair = [1, 1]
 
-/** The quads an asset shows at a visual tier, lowest draw order first. */
+/** No part swapped in: the tier alone picks each slot's part. */
+export const NO_SWAPS: readonly string[] = []
+
+/** The quads an asset shows at a visual tier, with `swappedPartIds` in, lowest draw order first. */
 export function placeholderQuadsOf(
   art: ArtCatalogue,
   assetId: string,
   tier: number,
+  swappedPartIds: readonly string[] = NO_SWAPS,
 ): PlaceholderQuad[] {
   const entry = manifestEntryOf(art, assetId)
   const sidecar = placeholderSidecarOf(art, assetId)
   if (entry === null || sidecar === null) return [missingArtQuadOf(assetId)]
-  return partsShownAtTier(sidecar.parts, tier).map((part) => colouredQuadOf(entry, part))
+  return partsShownAtTier(sidecar.parts, tier, swappedPartIds).map((part) =>
+    colouredQuadOf(entry, part),
+  )
 }
 
 /** One part as a flat quad in its manifest colour. */
@@ -45,15 +51,36 @@ export function colouredQuadOf(entry: ManifestEntry, part: SidecarPart): Placeho
 /**
  * The parts shown at a tier: for each slot the part of the highest tier not above it, so tier 2
  * adds or replaces parts and keeps the rest of tier 1 (#52, #44 "show the parts for tier N").
- * Past the last authored tier the vehicle stays at its last look.
+ * Past the last authored tier the vehicle stays at its last look. A swapped-in part takes its slot
+ * whatever its tier (#180 big level-ups, `partMotionRequests`); an id the asset lacks changes nothing.
  */
-export function partsShownAtTier(parts: readonly SidecarPart[], tier: number): SidecarPart[] {
+export function partsShownAtTier(
+  parts: readonly SidecarPart[],
+  tier: number,
+  swappedPartIds: readonly string[] = NO_SWAPS,
+): SidecarPart[] {
+  const bySlot = tierPartsBySlot(parts, tier)
+  swapPartsIn(bySlot, parts, swappedPartIds)
+  return [...bySlot.values()].sort(byDrawOrder)
+}
+
+function tierPartsBySlot(parts: readonly SidecarPart[], tier: number): Map<string, SidecarPart> {
   const bySlot = new Map<string, SidecarPart>()
   for (const part of parts.filter((candidate) => candidate.tier <= tier)) {
     const shown = bySlot.get(slotOfPartId(part.id))
     if (shown === undefined || part.tier > shown.tier) bySlot.set(slotOfPartId(part.id), part)
   }
-  return [...bySlot.values()].sort(byDrawOrder)
+  return bySlot
+}
+
+function swapPartsIn(
+  bySlot: Map<string, SidecarPart>,
+  parts: readonly SidecarPart[],
+  swappedPartIds: readonly string[],
+): void {
+  for (const part of parts) {
+    if (swappedPartIds.includes(part.id)) bySlot.set(slotOfPartId(part.id), part)
+  }
 }
 
 function byDrawOrder(a: SidecarPart, b: SidecarPart): number {

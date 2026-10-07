@@ -48,6 +48,7 @@ import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
 import { ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
+import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRequests'
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
 import {
   addToRegistry,
@@ -100,6 +101,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     worldPiece: (piece) => add(WORLD_PIECE_REGISTRY, piece),
     sceneLayer: (layer) => add(SCENE_LAYER_REGISTRY, layer),
     vehicleStaging: (provider) => add(VEHICLE_STAGING_REGISTRY, provider),
+    partMotionRequests: (source) => add(PART_MOTION_REQUEST_REGISTRY, source),
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
     botPurchase: (purchase) => add(BOT_PURCHASE_REGISTRY, purchase),
     screen: (panel) => add(SCREEN_REGISTRY, panel),
