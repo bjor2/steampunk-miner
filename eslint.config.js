@@ -88,6 +88,17 @@ const INEXACT_SYNTAX = [
 
 const EXPONENT_OPERATOR = INEXACT_SYNTAX.filter(({ selector }) => selector.includes('*'))
 
+// #196: the pacing bot plays endless planets, and a price as a double is Infinity past planet 582,
+// so its money stays Money (cmp, div); a bounded count leaves Money only through toSafeInteger.
+const MONEY_STAYS_MONEY_MESSAGE =
+  'The bot keeps money as Money (#196): compare with cmp; a bounded count goes through toSafeInteger.'
+const MONEY_STAYS_MONEY = [
+  'CallExpression[callee.name="Number"]',
+  'CallExpression[callee.name="parseFloat"]',
+  'CallExpression[callee.object.name="Number"][callee.property.name="parseFloat"]',
+  'CallExpression[callee.property.name="toNumber"]',
+].map((selector) => ({ selector, message: MONEY_STAYS_MONEY_MESSAGE }))
+
 const DECIMAL_ONLY_IN_MONEY = {
   group: ['decimal.js', 'decimal.js/*'],
   message: 'Only src/systems/money.ts constructs a Decimal (#5); use the Money functions.',
@@ -239,6 +250,12 @@ export default tseslint.config(
       'no-restricted-properties': ['error', ...CLOCK_AND_RANDOM, ...APPROXIMATED_MATH],
       'no-restricted-syntax': ['error', NO_IMPORT_META, ...EXPONENT_OPERATOR],
     },
+  },
+  {
+    // The pacing bot plans in Money at any depth (#196).
+    files: ['src/systems/bot/**/*.ts'],
+    ignores: ['src/systems/bot/**/*.test.ts'],
+    rules: { 'no-restricted-syntax': ['error', NO_IMPORT_META, ...MONEY_STAYS_MONEY] },
   },
   {
     // Scene/UI/store must not reach the platform directly; src/shell is the one bridge.
