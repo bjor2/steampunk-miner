@@ -2,8 +2,8 @@
  * The power-up core slice in the preview build (#200): read through `steampunkDebug`, never pixels.
  * The build registers the three bare-id cradles, so the loadout takes them and refuses an id
  * nobody registered; a new game draws no slot buttons; and a slot key on an empty slot is pressed
- * but reserves no charge. The tap and hold on a filled slot waits for the first real
- * power-up (#201, TD lock on #200).
+ * but leaves the `power-up-core` save section at its initial value. The tap and hold on a filled
+ * slot waits for the first real power-up (#201, TD lock on #200).
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -44,7 +44,8 @@ test('the build owns the three cradles by their bare ids and refuses an unregist
     const unknown = debug.setVehicleLoadout({}, ['slot.powerup_9'])
     const owned = debug.setVehicleLoadout({}, cradles)
     const snapshot = debug.snapshot()
-    const vehicle = snapshot.ok ? JSON.stringify(snapshot.snapshot.state.players.p1.vehicle) : ''
+    const [player] = snapshot.ok ? Object.values(snapshot.snapshot.state.players) : []
+    const vehicle = JSON.stringify(player?.vehicle ?? null)
     return {
       unknownOk: unknown.ok,
       ownedOk: owned.ok,
@@ -56,21 +57,30 @@ test('the build owns the three cradles by their bare ids and refuses an unregist
   expect(errors).toEqual([])
 })
 
-test('a slot key on an empty slot is pressed and reserves no charge', async ({ page }) => {
+test('a slot key on an empty slot is pressed and leaves the charge state at its start', async ({
+  page,
+}) => {
   const errors = await openGame(page)
   const answers = await page.evaluate(() => {
     const debug = window.steampunkDebug!
     const tapped = debug.input.tap('use_slot_1')
     const stream = debug.input.getActionStream()
     const snapshot = debug.snapshot()
-    const sections = snapshot.ok ? (snapshot.snapshot.state.players.p1.slices ?? {}) : {}
+    const [player] = snapshot.ok ? Object.values(snapshot.snapshot.state.players) : []
+    const sections: Record<string, unknown> = player?.slices ?? {}
     return {
       tappedOk: tapped.ok,
       pressed: stream.ok && stream.stream.some((edge) => edge.actionId === 'use_slot_1'),
-      hasChargeState: 'power-up-core' in sections,
+      hasPlayer: player !== undefined,
+      chargeState: sections['power-up-core'],
     }
   })
-  expect(answers).toEqual({ tappedOk: true, pressed: true, hasChargeState: false })
+  expect(answers).toEqual({
+    tappedOk: true,
+    pressed: true,
+    hasPlayer: true,
+    chargeState: { version: 1, body: { items: {}, pending: null, toggledOn: [] } },
+  })
   expect(await slotButtonCount(page)).toBe(0)
   expect(errors).toEqual([])
 })
