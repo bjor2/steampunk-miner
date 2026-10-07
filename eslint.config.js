@@ -99,6 +99,20 @@ const MONEY_STAYS_MONEY = [
   'CallExpression[callee.property.name="toNumber"]',
 ].map((selector) => ({ selector, message: MONEY_STAYS_MONEY_MESSAGE }))
 
+// The descriptions slice formats every stat through formatAmount and formatPercent, which read the
+// canonical decimal string; a double on the way would print 0 or round up at L 6007 (Vertical
+// Scaler on #164, K7 #199). The same shape as the bot's ban above.
+const DOUBLE_CONVERSION_MESSAGE =
+  'Item card text never goes through a double (#164): format Money with formatAmount/formatPercent.'
+const DOUBLE_CONVERSIONS = [
+  'CallExpression[callee.property.name="toFixed"]',
+  'CallExpression[callee.property.name="toPrecision"]',
+  'CallExpression[callee.property.name="toLocaleString"]',
+  'CallExpression[callee.name="Number"]',
+  'CallExpression[callee.name="parseFloat"]',
+  'CallExpression[callee.object.name="Number"][callee.property.name="parseFloat"]',
+].map((selector) => ({ selector, message: DOUBLE_CONVERSION_MESSAGE }))
+
 const DECIMAL_ONLY_IN_MONEY = {
   group: ['decimal.js', 'decimal.js/*'],
   message: 'Only src/systems/money.ts constructs a Decimal (#5); use the Money functions.',
@@ -291,6 +305,29 @@ export default tseslint.config(
     ignores: ['src/systems/render/artDirection.ts', 'src/systems/render/*.test.ts'],
     rules: {
       '@typescript-eslint/no-restricted-imports': ['error', { patterns: [ART_DIRECTION_JSON] }],
+    },
+  },
+  {
+    // The descriptions slice bans double conversions everywhere in it. A later block naming
+    // no-restricted-syntax replaces the earlier ones, so its pure rules restate the layer set.
+    files: ['src/features/descriptions/**/*.{ts,tsx}'],
+    rules: { 'no-restricted-syntax': ['error', ...DOUBLE_CONVERSIONS] },
+  },
+  {
+    files: ['src/features/descriptions/systems/**/*.ts'],
+    ignores: ['src/features/**/*.test.ts'],
+    rules: { 'no-restricted-syntax': ['error', NO_IMPORT_META, ...DOUBLE_CONVERSIONS] },
+  },
+  {
+    files: ['src/features/descriptions/systems/**/*.ts'],
+    ignores: ['src/features/**/*.test.ts', 'src/features/*/systems/render/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        NO_IMPORT_META,
+        ...EXPONENT_OPERATOR,
+        ...DOUBLE_CONVERSIONS,
+      ],
     },
   },
   {
