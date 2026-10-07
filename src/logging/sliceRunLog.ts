@@ -8,6 +8,7 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
+import type { ChainPolicy } from '../systems/bot/botChains'
 import type { ChargePolicy } from '../systems/bot/botCharges'
 import type { GunPolicy } from '../systems/bot/botGuns'
 import type { RefineryUse } from '../systems/bot/botRefining'
@@ -43,6 +44,8 @@ export interface LoggedRunOptions {
   chargePolicy?: ChargePolicy
   /** Whether the bot refines from the Refinery bay's planet (#105 acceptance 7); default `used`. */
   refinery?: RefineryUse
+  /** Whether the bot holds chains of steps (ticket 226); default `click` until the re-baseline. */
+  chainPolicy?: ChainPolicy
 }
 
 /** One run of a scenario on one of its pacing world seeds (#84). */
@@ -85,6 +88,7 @@ export function playLoggedSlice(
     gunPolicy: options.gunPolicy,
     chargePolicy: options.chargePolicy,
     refinery: options.refinery,
+    chainPolicy: options.chainPolicy,
     playerId: PLAYER_ID,
     startCommands: startCommandsOf(scenario),
     listener: {
