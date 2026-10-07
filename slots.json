@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T21:16:39+02:00",
+  "updated_at": "2026-10-07T21:16:44+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -383,11 +383,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 20:59 CEST",
+    "at": "2026-10-07 21:16 CEST",
     "mode": "refill-dev",
-    "triggers": "#254",
-    "started": "#237->C4/A1",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#249",
+    "started": "",
+    "note": "dev slots full"
   },
   "totals": {
     "grok": {
