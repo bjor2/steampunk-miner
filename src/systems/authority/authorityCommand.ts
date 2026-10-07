@@ -83,8 +83,12 @@ import type { BayId } from '../world/dockBays'
  * 34: the mobility lane (#204): `power-up-core.PowerUpRefused` for a use with nothing to act on,
  *    `mobility.GrappleHooked`, `mobility.HullPatched` and `mobility.PatchCancelled`, its
  *    `mobility` player section v1, and the four Schedule C rows it ships logged as unlocked.
+ * 35: the mining-gates slice (ticket 236): from planet 7 lead cells and signatures carry #142's
+ *    gates (dense cells, extractor gates, dynamite shells), `DrillGated` may be `blocked`, power-up
+ *    terrain edits leave gated cells standing, and `mining-gates.GateCleared` and
+ *    `mining-gates.GateOreLost` join.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 34
+export const AUTHORITY_PROTOCOL_VERSION = 35
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

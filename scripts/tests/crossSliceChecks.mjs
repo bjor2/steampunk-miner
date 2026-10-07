@@ -65,16 +65,20 @@ export const CROSS_SLICE_CHECKS = [
   {
     check: 'Every ore family has a gateClass row',
     decidedIn: '#141, #142',
-    files: [],
+    files: [
+      'src/features/planet-mix/systems/themeRows.test.ts',
+      'src/features/mining-gates/systems/rigs.test.ts',
+      'src/features/mining-gates/systems/gateTable.test.ts',
+    ],
     commands: [],
-    pending: 'not built yet (#148)',
+    pending: null,
   },
   {
     check: 'Endless signature coverage, planets 41-65',
     decidedIn: '#148',
-    files: [],
+    files: ['src/features/mining-gates/systems/rigs.test.ts'],
     commands: [],
-    pending: 'not built yet (#148)',
+    pending: null,
   },
   {
     check: 'Locked unlock schedule and one home per stats.json row (stay in the kernel)',
