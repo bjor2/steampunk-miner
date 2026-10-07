@@ -138,7 +138,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-popup/systems/render/chipPlacement.test.ts` | 8 | 8 |
 | `src/features/mining-popup/systems/render/plaqueFit.test.ts` | 11 | 4 |
 
-### `mobility`: 9 files, 88 tests
+### `mobility`: 9 files, 91 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -148,7 +148,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mobility/systems/mobilityCatalogue.test.ts` | 8 | 8 |
 | `src/features/mobility/systems/mobilityMotion.test.ts` | 8 | 7 |
 | `src/features/mobility/systems/mobilitySection.test.ts` | 5 | 5 |
-| `src/features/mobility/systems/rivetPatch.test.ts` | 5 | 5 |
+| `src/features/mobility/systems/rivetPatch.test.ts` | 8 | 8 |
 | `src/features/mobility/systems/statPreview.test.ts` | 15 | 6 |
 | `src/features/mobility/systems/survivalEffects.test.ts` | 5 | 5 |
 
@@ -188,7 +188,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
-### `power-up-core`: 10 files, 47 tests
+### `power-up-core`: 10 files, 49 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -198,7 +198,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/dockRefill.test.ts` | 4 | 4 |
 | `src/features/power-up-core/systems/powerUpKind.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/powerUpUse.test.ts` | 14 | 14 |
-| `src/features/power-up-core/systems/slotColumn.test.ts` | 4 | 4 |
+| `src/features/power-up-core/systems/slotColumn.test.ts` | 6 | 6 |
 | `src/features/power-up-core/systems/slotUse.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/toggleDraw.test.ts` | 5 | 5 |
 | `src/features/power-up-core/systems/toggleRead.test.ts` | 2 | 2 |
@@ -459,7 +459,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/feedback/accents.test.ts` | 15 | 2 |
-| `src/systems/feedback/feedbackCues.test.ts` | 12 | 12 |
+| `src/systems/feedback/feedbackCues.test.ts` | 14 | 14 |
 | `src/systems/feedback/haptics.test.ts` | 2 | 2 |
 | `src/systems/feedback/screenEffects.test.ts` | 9 | 9 |
 
