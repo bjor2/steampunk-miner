@@ -1,6 +1,7 @@
 /*
- * A chip centres on its anchor (an overlay card's corner sits on the point) and rises about 24 px
- * over 1 s, then fades over 0.4 s (#172 §1). Text and icon follow --ui-scale and the viewport, so
+ * A chip centres on its anchor (an overlay card's corner sits on the point), stacked
+ * `--chip-stack` of its own heights away from the first chip, and rises about 24 px over 1 s,
+ * then fades over 0.4 s (#172 §1). Text and icon follow --ui-scale and the viewport, so
  * desktop, mobile and TV read it at the same share of the screen (#173).
  */
 .chip {
@@ -15,7 +16,8 @@
   font-family: var(--font-mono);
   font-size: 0.85rem;
   white-space: nowrap;
-  transform: translate(-50%, -50%);
+  --chip-shift: calc(-50% + var(--chip-stack, 0) * 115%);
+  transform: translate(-50%, var(--chip-shift));
   animation: chip-rise 1s ease-out forwards;
   transition: opacity 0.4s linear;
 }
@@ -26,7 +28,7 @@
 
 @keyframes chip-rise {
   to {
-    transform: translate(-50%, calc(-50% - 24px * var(--ui-scale)));
+    transform: translate(-50%, calc(var(--chip-shift) - 24px * var(--ui-scale)));
   }
 }
 

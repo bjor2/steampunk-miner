@@ -1,6 +1,7 @@
 /**
  * The tier-0 "NEW MATERIAL" plaque (#172 §2) in the HUD's banner slot: under the banner in the
- * top band, in the bottom band while the vehicle lifts at speed. It comes in, holds and fades on
+ * top band, in the bottom band while the vehicle lifts at speed, and one line in the bottom band
+ * on a screen whose top band has no room for it (`plaqueFitOf`). It comes in, holds and fades on
  * the authority's clock and never takes a click. Reads only the popup store and the local vehicle.
  */
 import { useMemo } from 'react'
@@ -10,38 +11,46 @@ import { useMiningPopupStore } from '../store/miningPopupStore'
 import { localMotionOf } from '../systems/miningMoments'
 import { plaquePhaseAt, plaqueShownAt, type MaterialPlaque } from '../systems/plaqueBoard'
 import { plaqueTextOf } from '../systems/popupText'
-import { plaqueBandOf, type PlaqueBand } from '../systems/render/chipPlacement'
+import type { PlaqueBand } from '../systems/render/chipPlacement'
+import { plaqueBandOn, plaqueFitOf, type PlaqueFit } from '../systems/render/plaqueFit'
+import { readFittedScreen } from '../../../ui/stage/screenFit'
 import { OreIcon } from './OreIcon'
 import { MINING_POPUP_TEST_IDS } from './testIds'
 import { usePopupClock } from './usePopupClock'
 import { usePopupFeed } from './usePopupFeed'
 import styles from './NewMaterialPlaque.module.css'
 
+interface PlaqueSpot {
+  fit: PlaqueFit
+  band: PlaqueBand
+}
+
 export function NewMaterialPlaque() {
   usePopupFeed(useMiningPopupStore((state) => state.observeDiscoveries))
   const board = useMiningPopupStore((state) => state.plaqueBoard)
   const tick = useMiningPopupStore((state) => state.tick)
   const plaque = useMemo(() => plaqueShownAt(board, tick), [board, tick])
-  const band = useLocalPlaqueBand()
+  const spot = usePlaqueSpot()
   usePopupClock(plaque !== null)
   if (plaque === null) return null
-  return <NewMaterialPlaqueView plaque={plaque} tick={tick} band={band} />
+  return <NewMaterialPlaqueView plaque={plaque} tick={tick} spot={spot} />
 }
 
 /** Re-read each time the clock ages the board, ten times a second. */
-function useLocalPlaqueBand(): PlaqueBand {
+function usePlaqueSpot(): PlaqueSpot {
   const playerId = useGameStore((state) => state.playerId)
-  return plaqueBandOf(localMotionOf(readAuthorityState(), playerId))
+  const fit = plaqueFitOf(readFittedScreen())
+  return { fit, band: plaqueBandOn(fit, localMotionOf(readAuthorityState(), playerId)) }
 }
 
 function NewMaterialPlaqueView({
   plaque,
   tick,
-  band,
+  spot,
 }: {
   plaque: MaterialPlaque
   tick: number
-  band: PlaqueBand
+  spot: PlaqueSpot
 }) {
   const text = plaqueTextOf(plaque)
   return (
@@ -49,7 +58,8 @@ function NewMaterialPlaqueView({
       className={styles.plaque}
       role="status"
       data-testid={MINING_POPUP_TEST_IDS.plaque}
-      data-band={band}
+      data-fit={spot.fit}
+      data-band={spot.band}
       data-phase={plaquePhaseAt(plaque, tick)}
       data-materials={plaque.materials.length}
     >

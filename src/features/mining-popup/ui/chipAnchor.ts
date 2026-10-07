@@ -13,8 +13,8 @@ import {
   type LocalDirection,
 } from '../systems/render/chipPlacement'
 
-export function chipAnchorOf(away: LocalDirection, slot: number): Vec2 {
-  const offset = chipOffsetOf(away, slot)
+export function chipAnchorOf(away: LocalDirection): Vec2 {
+  const offset = chipOffsetOf(away)
   const point = { x: 0, y: 0 }
   const placed = () => {
     placeInLocalFrame(vehiclePresence, drillPresence.up, offset, point)

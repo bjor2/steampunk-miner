@@ -3,6 +3,7 @@ import { FACING, type Facing, type VehiclePose } from '../../../../systems/vehic
 import {
   awayDirectionOf,
   chipOffsetOf,
+  chipStackOf,
   motionOfPose,
   placeInLocalFrame,
   plaqueBandOf,
@@ -55,9 +56,12 @@ describe('chip placement', () => {
   })
 
   it('keeps every chip at least 1.5 tiles clear of the hull', () => {
-    const nearest = chipOffsetOf({ along: 0, upward: 1 }, 0)
-    expect(nearest.upward - 0.45).toBeGreaterThanOrEqual(1.5)
-    expect(chipOffsetOf({ along: 0, upward: 1 }, 1).upward).toBeGreaterThan(nearest.upward)
+    expect(chipOffsetOf({ along: 0, upward: 1 }).upward - 0.45).toBeGreaterThanOrEqual(1.5)
+  })
+
+  it('stacks later chips away from the vehicle, up above it and down below it', () => {
+    expect(chipStackOf({ along: 0, upward: 1 }, 2)).toBe(-2)
+    expect(chipStackOf({ along: 0, upward: -1 }, 2)).toBe(2)
   })
 
   it('turns a local offset into a world point with the vehicle local up', () => {

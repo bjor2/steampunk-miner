@@ -1,12 +1,12 @@
 /*
- * The kit plaque's riveted brass plate (src/ui/kit/Plaque.module.css), in the top band under the
- * banner, where the transmission also sits, well clear of the 3-tile ring round the vehicle at
- * the screen's centre (#172 §2 placement). While lifting at speed it moves to the bottom band
- * over the prompts. Never catches the pointer: it is never clicked.
+ * The kit plaque's riveted brass plate (src/ui/kit/Plaque.module.css), in the top band right under
+ * the banner, clear of the 3-tile ring round the vehicle at the screen's centre and of the chips
+ * above it (#172 §2 placement; plaqueFit.ts holds these sizes). While lifting at speed it moves to
+ * the bottom band over the prompts. Never catches the pointer: it is never clicked.
  */
 .plaque {
   position: absolute;
-  top: 4.5rem;
+  top: 3.5rem;
   left: 50%;
   display: flex;
   align-items: center;
@@ -27,7 +27,7 @@
 
 .plaque[data-band='bottom'] {
   top: auto;
-  bottom: 4.5rem;
+  bottom: 3.5rem;
 }
 
 /* 0.25 s in, 2.5 s hold, 0.6 s fade (#172 §2 tier 0). */
@@ -75,36 +75,29 @@
 }
 
 /*
- * A phone held sideways has under 100 px between the banner and the vehicle's 3-tile ring: the
- * plate becomes one line (title, name, price) right under the banner.
+ * One line (title, name, price) where the top band has no room for the full plate (`plaqueFitOf`:
+ * a phone held sideways, TV mode); the component puts it in the bottom band.
  */
-@media (max-height: 500px) {
-  .plaque {
-    top: 3.5rem;
-    padding: var(--space-1) var(--space-2);
-  }
+.plaque[data-fit='line'] {
+  padding: var(--space-1) var(--space-2);
+}
 
-  .plaque[data-band='bottom'] {
-    bottom: 3.5rem;
-  }
+.plaque[data-fit='line'] .lines {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-2);
+}
 
-  .lines {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    column-gap: var(--space-2);
-  }
+.plaque[data-fit='line'] .detail {
+  display: none;
+}
 
-  .detail {
-    display: none;
-  }
-
-  .name,
-  .price,
-  .joined {
-    margin-top: 0;
-    font-size: 0.8rem;
-  }
+.plaque[data-fit='line'] .name,
+.plaque[data-fit='line'] .price,
+.plaque[data-fit='line'] .joined {
+  margin-top: 0;
+  font-size: 0.8rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

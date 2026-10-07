@@ -33,8 +33,6 @@ const HULL_HALF_TILES = 0.45
 const CHIP_GAP_TILES = 1.5
 /** Half a chip's height at the default 12 m zoom, so its near edge keeps the gap. */
 const CHIP_HALF_TILES = 0.4
-/** Each later chip sits one chip further out, so three never overlap. */
-const CHIP_STEP_TILES = 0.8
 
 const AT_REST: VehicleMotion = { alongSpeed: 0, upwardSpeed: 0, driveSpeed: 0, facing: FACING.down }
 
@@ -65,10 +63,21 @@ export function plaqueBandOf(motion: VehicleMotion): PlaqueBand {
   return isTravellingFast(motion) && motion.upwardSpeed > 0 ? 'bottom' : 'top'
 }
 
+/** How far a chip's centre sits from the vehicle's, metres. */
+export const CHIP_REACH_TILES = HULL_HALF_TILES + CHIP_GAP_TILES + CHIP_HALF_TILES
+
 /** A chip's offset from the vehicle's centre in its local frame, metres. */
-export function chipOffsetOf(away: LocalDirection, slot: number): LocalDirection {
-  const reach = HULL_HALF_TILES + CHIP_GAP_TILES + CHIP_HALF_TILES + slot * CHIP_STEP_TILES
-  return { along: away.along * reach, upward: away.upward * reach }
+export function chipOffsetOf(away: LocalDirection): LocalDirection {
+  return { along: away.along * CHIP_REACH_TILES, upward: away.upward * CHIP_REACH_TILES }
+}
+
+/**
+ * How many chip heights a chip sits from the first, on screen: later slots stack away from the
+ * vehicle, upward for a chip above it and downward for one below, so three never overlap at any
+ * zoom (a stack in metres grows past the plaque's band when zoomed in).
+ */
+export function chipStackOf(away: LocalDirection, slot: number): number {
+  return away.upward < 0 ? slot : -slot
 }
 
 /** Writes `centre + offset` (offset in the frame whose up is `up`) into `out`; no allocation. */

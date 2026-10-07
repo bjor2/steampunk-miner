@@ -3,11 +3,12 @@
  * vehicle, away from where it is going, rising as it shows and fading at the end of its life.
  * Reads only the popup store; the cards place themselves every frame (#208).
  */
-import { useMemo } from 'react'
+import { useMemo, type CSSProperties } from 'react'
 import { OverlayCard } from '../../../ui/overlay/OverlayCard'
 import { useMiningPopupStore } from '../store/miningPopupStore'
 import { chipPhaseAt, chipsShownAt, type ResourceChip } from '../systems/chipBoard'
 import { chipCountTextOf } from '../systems/popupText'
+import { chipStackOf } from '../systems/render/chipPlacement'
 import { chipAnchorOf } from './chipAnchor'
 import { MINING_POPUP_TEST_IDS } from './testIds'
 import { OreIcon } from './OreIcon'
@@ -32,11 +33,13 @@ export function ResourceChips() {
 
 function ChipCard({ chip, tick }: { chip: ResourceChip; tick: number }) {
   const { away, slot } = chip
-  const anchor = useMemo(() => chipAnchorOf(away, slot), [away, slot])
+  const anchor = useMemo(() => chipAnchorOf(away), [away])
+  const stack = { '--chip-stack': chipStackOf(away, slot) } as CSSProperties
   return (
     <OverlayCard anchor={anchor}>
       <span
         className={styles.chip}
+        style={stack}
         data-testid={MINING_POPUP_TEST_IDS.chip}
         data-ore={chip.face.oreId}
         data-count={chip.count}
