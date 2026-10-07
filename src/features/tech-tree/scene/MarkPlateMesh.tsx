@@ -11,7 +11,8 @@ import { GILT_COLOUR, type MarkPlate } from '../systems/render/markPlate'
 /** Over the cradle housing's draw order (6) on the body's layer (0.1, 0.01 an order step). */
 const PLATE_Z = 0.165
 const RIVET_Z = 0.001
-const STUD_Z = 0.002
+/** One order step over the rivets it covers. */
+const STUD_Z = 2 * RIVET_Z
 const RIM_Z = -0.001
 /** A darker brass than the gilt rim and studs. */
 const BRASS = '#9a7432'
