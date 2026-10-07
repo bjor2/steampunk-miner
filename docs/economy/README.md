@@ -27,5 +27,6 @@ The tables list **major levels** `L`, today's curves. A vehicle stores each trac
 - **Stat** (`stepStats.ts`): each curve at `x = L + k/18`; cargo and boiler round their pips half up,
   the engine saturates on `x`. At `k = 0` every stat is the vehicle table's value.
 - The design tables do not change, because they read majors. `npm run balance:report` prints the
-  pacing bot's spree targets (median steps a visit, and the share of above-median trips that could
-  chain 10 steps).
+  pacing bot's spree targets per track (GD lock on #181): the median steps per bought track a
+  visit, 6 to 12, and the share of above-median trips that buy 10 or more steps on one track, 25 to
+  45%. Steps a whole visit and the steps the wallet could chain print as information.

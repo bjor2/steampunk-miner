@@ -15,13 +15,19 @@ const NO_CAPACITY = Object.fromEntries(UPGRADE_IDS.map((id) => [id, 0])) as Reco
   number
 >
 
-function visit(income: string, stepsBought: number, drillCapacity = 0): SpreeVisit {
+const NO_STEPS = NO_CAPACITY
+
+/** A visit that bought `steps` on each track named, in order. */
+function visit(
+  income: string,
+  steps: Partial<Record<UpgradeId, number>>,
+  drillCapacity = 0,
+): SpreeVisit {
   return {
     planetIndex: 2,
     income: m(income),
     capacity: { ...NO_CAPACITY, drill_power: drillCapacity, hull: 99 },
-    boughtTracks: stepsBought > 0 ? ['drill_power'] : [],
-    stepsBought,
+    stepsBought: { ...NO_STEPS, ...steps },
   }
 }
 
@@ -60,59 +66,77 @@ describe('bot: the spree measure (#180 section 4)', () => {
       items: [],
       value: '1.25e+2',
       mode: 'all',
+      coinsShown: 3,
     }
     const other: DomainEvent = { ...sold, playerId: 'p2' }
     expect(toCanonical(measureSpree(session, [sold, sold, other]).income)).toBe('2.5e+2')
   })
 
-  it('names the tracks bought at the visit and the steps bought', () => {
+  it('counts the steps bought on each track at the visit', () => {
     const session = botOnPlanet3('400')
     const measure = measureSpree(session, [])
     const after = { ...measure.levelsBefore, hull: 3, boiler: 1 }
-    expect(visitOf(measure, after)).toMatchObject({
-      boughtTracks: ['boiler', 'hull'],
-      stepsBought: 4,
-    })
+    expect(visitOf(measure, after).stepsBought).toEqual({ ...NO_STEPS, hull: 3, boiler: 1 })
   })
 })
 
-describe('bot: the spree targets (#180 section 4)', () => {
-  it('takes the median steps bought a visit', () => {
-    const visits = [visit('10', 2), visit('20', 5), visit('30', 6), visit('40', 9)]
-    expect(spreeTargetsOf(visits).medianStepsPerVisit).toBe(5)
+describe('bot: the spree targets (#180 section 4, GD lock on #181)', () => {
+  it('takes the median steps per bought track over the visits that bought', () => {
+    const visits = [
+      visit('10', { drill_power: 4 }),
+      visit('20', { drill_power: 9, hull: 3 }),
+      visit('30', {}),
+      visit('40', { cargo_hold: 10 }),
+    ]
+    expect(spreeTargetsOf(visits).medianStepsPerBoughtTrack).toBe(6)
   })
 
-  it('judges the spree share on above-median trips and the tracks the bot bought', () => {
+  it('keeps the median steps a whole visit as information', () => {
+    const visits = [visit('10', { hull: 2 }), visit('20', { hull: 2, boiler: 3 }), visit('30', {})]
+    expect(spreeTargetsOf(visits).medianStepsPerVisit).toBe(2)
+  })
+
+  it('judges the spree share on the steps above-median trips bought on one track', () => {
     const visits = [
-      visit('10', 4, 30),
-      visit('20', 5),
-      visit('30', 6, 12),
-      visit('40', 7, 3),
-      visit('50', 0),
+      visit('10', { drill_power: 12 }),
+      visit('20', { drill_power: 5 }),
+      visit('30', { drill_power: 5, hull: 5 }, 40),
+      visit('40', { cargo_hold: 10 }),
+      visit('50', {}),
     ]
     const targets = spreeTargetsOf(visits)
-    expect(targets).toMatchObject({ goodTrips: 2, goodTripsWithSpree: 0 })
-    expect(spreePercentOf(targets)).toBe(0)
+    expect(targets).toMatchObject({ goodTrips: 2, goodTripsWithSpree: 1 })
+    expect(spreePercentOf(targets)).toBe(50)
   })
 
-  it('meets both targets with 4 to 8 steps a visit and a third of good trips spreeing', () => {
+  it('counts the above-median trips that could have chained a spree, as information', () => {
+    const visits = [visit('10', {}), visit('20', { drill_power: 2 }, 10), visit('30', {}, 9)]
+    expect(spreeTargetsOf(visits).goodTripsWithSpreeCapacity).toBe(0)
+    expect(spreeTargetsOf([...visits, visit('40', { drill_power: 2 }, 10)])).toMatchObject({
+      goodTrips: 2,
+      goodTripsWithSpreeCapacity: 1,
+    })
+  })
+
+  it('meets both targets with 6 to 12 steps per bought track and a third of good trips spreeing', () => {
     const visits = [
-      visit('10', 4),
-      visit('20', 5),
-      visit('30', 6),
-      visit('40', 6, 10),
-      visit('50', 7, 10),
-      visit('60', 8),
-      visit('70', 5),
+      visit('10', { drill_power: 6 }),
+      visit('20', { drill_power: 7 }),
+      visit('30', { hull: 8 }),
+      visit('40', { hull: 10 }),
+      visit('50', { drill_power: 6, boiler: 6 }),
+      visit('60', { cargo_hold: 11 }),
+      visit('70', { engine: 4, hull: 4 }),
     ]
     expect(spreePercentOf(spreeTargetsOf(visits))).toBe(33)
     expect(spreeTargetMisses(spreeTargetsOf(visits))).toEqual([])
   })
 
   it('lists each target missed', () => {
-    expect(spreeTargetMisses(spreeTargetsOf([visit('10', 1), visit('20', 2)]))).toEqual([
-      'median steps a visit 1, target 4 to 8',
-      'above-median trips with a spree 0%, target 25 to 40%',
+    const visits = [visit('10', { hull: 1 }), visit('20', { hull: 2, boiler: 2 })]
+    expect(spreeTargetMisses(spreeTargetsOf(visits))).toEqual([
+      'median steps per bought track 1, target 6 to 12',
+      'above-median trips that bought a spree 0%, target 25 to 45%',
     ])
   })
 })

@@ -99,7 +99,7 @@ function seedsSection(seedReports: readonly SeededPacingReport[]): string {
 }
 
 /**
- * The #180 spree targets (reported only): each seed's Workshop visits, then all seeds' visits
+ * The #180 spree targets, judged per track (reported only): each seed's Workshop visits, then all seeds' visits
  * together, which the targets are judged on.
  */
 function spreeSection(seededRuns: readonly SeededSliceRun[]): string {
@@ -109,7 +109,7 @@ function spreeSection(seededRuns: readonly SeededSliceRun[]): string {
   )
   const pooled = spreeTargetsOf(seededRuns.flatMap(({ run }) => run.spreeVisits))
   return [
-    listSection('Spree targets (reported only, #180)', [
+    listSection('Spree targets per track (reported only, #180, GD lock on #181)', [
       ...seedLines,
       `all seeds: ${spreeTargetsText(pooled)}`,
     ]),

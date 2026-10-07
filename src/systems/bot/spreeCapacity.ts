@@ -3,7 +3,7 @@
  * every Workshop visit, after the sale and the service, `spree_capacity {track, steps}` is the run
  * of consecutive steps a held chain could buy on each track from `wallet - serviceReserve`, every
  * price in Money. The visit also keeps what the trip before it sold for and the steps the bot's
- * greedy plan bought, the two numbers the spree targets are judged on (`spreeTargets.ts`).
+ * greedy plan bought on each track, the numbers the spree targets are judged on (`spreeTargets.ts`).
  * Measured by the bot and kept beside its run like the shop spend, never written into the log.
  */
 import { serviceReserveOf } from '../authority/serviceReserve'
@@ -21,9 +21,8 @@ export interface SpreeVisit {
   income: Money
   /** Per track, the steps in a row `wallet - serviceReserve` pays for, counted to `SPREE_CAP`. */
   capacity: Readonly<Record<UpgradeId, number>>
-  /** The tracks the bot bought steps of at the visit. */
-  boughtTracks: readonly UpgradeId[]
-  stepsBought: number
+  /** Per track, the steps the bot bought at the visit; 0 on a track it left alone. */
+  stepsBought: Readonly<Record<UpgradeId, number>>
 }
 
 /** Ten majors of steps: far past the spree of 10 the targets ask about. */
@@ -72,12 +71,10 @@ function capacityOf(
 /** The visit, from the measure taken before shopping and the levels the shopping left. */
 export function visitOf(measure: SpreeMeasure, levelsAfter: UpgradeLevels): SpreeVisit {
   const { levelsBefore, ...visit } = measure
-  const bought = UPGRADE_IDS.filter((track) => levelsAfter[track] > levelsBefore[track])
-  const stepsBought = bought.reduce(
-    (steps, track) => steps + levelsAfter[track] - levelsBefore[track],
-    0,
+  const entries = UPGRADE_IDS.map(
+    (track) => [track, levelsAfter[track] - levelsBefore[track]] as const,
   )
-  return { ...visit, boughtTracks: bought, stepsBought }
+  return { ...visit, stepsBought: Object.fromEntries(entries) as Record<UpgradeId, number> }
 }
 
 /** Consecutive steps from `step` whose prices add up to at most `budget`, at most `SPREE_CAP`. */

@@ -50,14 +50,14 @@ export const PACING_TARGETS = {
    */
   refineryMaxPlanetSpeedupPercent: 10,
   /**
-   * Report only (#180 section 4, Systems): the median steps the bot buys a Workshop visit, and the
-   * share of above-median-income trips whose `wallet - serviceReserve` chains `spreeSteps` or more
-   * steps on a track the bot buys. A miss moves `minorsPerMajor` (10, 12, 15), then
-   * `minorStatShare` (0.5, 0.4, 0.3); past both it goes to the planner.
+   * Report only (#180 section 4, judged per track by the GD lock on #181, 7 Oct): the median steps
+   * per bought track a Workshop visit, and the share of above-median-income trips that buy
+   * `spreeSteps` or more steps on one track. 10 minors per major and the curves stay; a miss puts
+   * the measured number on the issue, and #225 re-measures after #195 and #146.
    */
   spree: {
-    stepsPerVisit: { min: 4, max: 8 },
+    stepsPerBoughtTrack: { min: 6, max: 12 },
     spreeSteps: 10,
-    spreePercent: { min: 25, max: 40 },
+    spreePercent: { min: 25, max: 45 },
   },
 } as const
