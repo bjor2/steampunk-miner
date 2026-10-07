@@ -87,6 +87,15 @@ describe('sell burst flight', () => {
     expect(end.y).toBeCloseTo(to.y)
   })
 
+  it('bows the screen flight down when the screen has no room above it', () => {
+    const nearTop = { x: 900, y: 60 }
+    const counter = { x: 150, y: 80 }
+    const middle = screenFlightPointAt(nearTop, counter, 0.5, point())
+    expect(middle.y).toBeGreaterThan(nearTop.y)
+    const low = screenFlightPointAt({ x: 900, y: 800 }, counter, 0.5, point())
+    expect(low.y).toBeGreaterThanOrEqual(0)
+  })
+
   it('climbs the cascade a pentatonic step per note, capped two octaves up', () => {
     expect(cascadeHzOf(5)).toBeCloseTo(cascadeHzOf(0) * 2)
     expect(cascadeHzOf(10)).toBeCloseTo(cascadeHzOf(0) * 4)

@@ -55,9 +55,10 @@ function placeStreamFrame(
   if (layer !== null) placeStreamCoins(layer, seats, burst, flight)
 }
 
-/** The stack the stream leaves from, on this planet's pad. */
+/** The Exchange's points the stream may leave from, on this planet's pad. */
 function streamFlightOfPlanet(): StreamFlight {
   const site = dockSiteOfPlanet(readAuthorityState().planet)
-  const stack = site === null ? { x: 0, y: 0 } : sellShopPointsOf(site).stack
-  return createStreamFlight(stack, SEATS.length)
+  const points = site === null ? null : sellShopPointsOf(site)
+  const starts = points === null ? [] : [points.stack, points.crown, points.chute]
+  return createStreamFlight(starts, SEATS.length)
 }

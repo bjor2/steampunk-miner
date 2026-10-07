@@ -79,7 +79,11 @@ export function screenFlightShareAt(
   return share < 0 || share >= 1 ? null : share
 }
 
-/** A point on the bowed screen path from `from` to `to`, eased so it leaves and lands softly. */
+/**
+ * A point on the bowed screen path from `from` to `to`, eased so it leaves and lands softly. The
+ * path bows up, or down when the screen has no room above it (the stack and the counter both sit
+ * near the top), so a coin never leaves the screen.
+ */
 export function screenFlightPointAt(
   from: FlightPoint,
   to: FlightPoint,
@@ -87,10 +91,15 @@ export function screenFlightPointAt(
   out: FlightPoint,
 ): FlightPoint {
   const eased = share * share * (3 - 2 * share)
-  const length = Math.abs(to.x - from.x) + Math.abs(to.y - from.y)
   out.x = from.x + (to.x - from.x) * eased
-  out.y = from.y + (to.y - from.y) * eased - SCREEN_ARC_SHARE * length * Math.sin(Math.PI * share)
+  out.y = from.y + (to.y - from.y) * eased - screenBowOf(from, to) * Math.sin(Math.PI * share)
   return out
+}
+
+/** Pixels the path bows up at its middle; negative bows it down. */
+function screenBowOf(from: FlightPoint, to: FlightPoint): number {
+  const bow = SCREEN_ARC_SHARE * (Math.abs(to.x - from.x) + Math.abs(to.y - from.y))
+  return Math.min(from.y, to.y) >= bow ? bow : -bow
 }
 
 /** Whether the wave's `index`-th coin is one the bill peeled off. */
