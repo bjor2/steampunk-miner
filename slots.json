@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T21:57:25+02:00",
+  "updated_at": "2026-10-07T21:58:06+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -99,41 +99,28 @@
       "size": 4,
       "used": 3,
       "free": 1,
-      "claims_last_hour": 5,
+      "claims_last_hour": 6,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 3,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "36e1a97f0519424bd5a57d437984a037440fba89",
-    "since": "2026-10-07T19:56:58Z",
-    "holds_gate": false,
+    "phase": "fast",
+    "sha": "d75b04edc07e3fc4e0924d2016e24f61cbef78cc",
+    "since": "2026-10-07T19:58:05Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-07T16:31:13Z",
+    "last_run": "2026-10-07T19:58:03Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null,
-    "feature": 71,
-    "feature_title": "Wayfinder: Campaign horizontal & vertical scaling",
+    "feature": 180,
+    "feature_title": "Spec: Workshop redo: showcase platform, hold-to-buy chains, two-tier levels and escalating purchase audio",
     "queue": [
-      {
-        "feature": 180,
-        "kind": "spec",
-        "title": "Spec: Workshop redo: showcase platform, hold-to-buy chains, two-tier levels and escalating purchase audio",
-        "tickets": [
-          177,
-          225,
-          226,
-          227,
-          228
-        ],
-        "since": "2026-10-07T17:21:15+02:00"
-      },
       {
         "feature": 169,
         "kind": "spec",
