@@ -23,7 +23,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 9 |
 | Every ore family has a gateClass row | #141, #142 | not built yet (#148) | - |
 | Endless signature coverage, planets 41-65 | #148 | not built yet (#148) | - |
-| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 29 |
+| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 33 |
 
 ## Slices
 
@@ -124,6 +124,20 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-popup/systems/render/chipPlacement.test.ts` | 8 | 8 |
 | `src/features/mining-popup/systems/render/plaqueFit.test.ts` | 11 | 4 |
 
+### `mobility`: 9 files, 88 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/mobility/logging.test.ts` | 2 | 2 |
+| `src/features/mobility/systems/gatesFixture.test.ts` | 34 | 3 |
+| `src/features/mobility/systems/grappleWinch.test.ts` | 6 | 6 |
+| `src/features/mobility/systems/mobilityCatalogue.test.ts` | 8 | 8 |
+| `src/features/mobility/systems/mobilityMotion.test.ts` | 8 | 7 |
+| `src/features/mobility/systems/mobilitySection.test.ts` | 5 | 5 |
+| `src/features/mobility/systems/rivetPatch.test.ts` | 5 | 5 |
+| `src/features/mobility/systems/statPreview.test.ts` | 15 | 6 |
+| `src/features/mobility/systems/survivalEffects.test.ts` | 5 | 5 |
+
 ### `ore-visuals`: 5 files, 48 tests
 
 | File | Tests | Sites |
@@ -160,19 +174,19 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
-### `power-up-core`: 10 files, 44 tests
+### `power-up-core`: 10 files, 47 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/power-up-core/logging.test.ts` | 3 | 3 |
+| `src/features/power-up-core/logging.test.ts` | 4 | 4 |
 | `src/features/power-up-core/systems/chargeState.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/cradles.test.ts` | 5 | 5 |
 | `src/features/power-up-core/systems/dockRefill.test.ts` | 4 | 4 |
 | `src/features/power-up-core/systems/powerUpKind.test.ts` | 3 | 3 |
-| `src/features/power-up-core/systems/powerUpUse.test.ts` | 13 | 13 |
+| `src/features/power-up-core/systems/powerUpUse.test.ts` | 14 | 14 |
 | `src/features/power-up-core/systems/slotColumn.test.ts` | 4 | 4 |
 | `src/features/power-up-core/systems/slotUse.test.ts` | 3 | 3 |
-| `src/features/power-up-core/systems/toggleDraw.test.ts` | 4 | 4 |
+| `src/features/power-up-core/systems/toggleDraw.test.ts` | 5 | 5 |
 | `src/features/power-up-core/systems/toggleRead.test.ts` | 2 | 2 |
 
 ### `sell-burst`: 7 files, 53 tests
@@ -775,7 +789,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/unlocks/readUnlockSchedule.test.ts` | 10 | 10 |
 | `src/systems/unlocks/scheduleCadence.test.ts` | 5 | 5 |
 | `src/systems/unlocks/travelUnlocks.test.ts` | 7 | 7 |
-| `src/systems/unlocks/unlockSchedule.test.ts` | 25 | 25 |
+| `src/systems/unlocks/unlockSchedule.test.ts` | 29 | 26 |
 
 ### `vehicle`
 
