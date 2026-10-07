@@ -226,17 +226,14 @@ export interface GunRules {
 }
 
 /**
- * `blasting_charges` (spec #109, Systems & Economy numbers): the fuse, the blast and its yield
- * trade, the hit on a vehicle and on enemies in the radius, the rack and its prices, and the
- * pacing bot's blast rule. The rack holds `rackStart` charges and each bought slot one more, up to
- * `rackMax` (`rackStart` plus one slot per level of the `bandOre` curve `rackSlotCostCurveId`).
+ * `blasting_charges` (spec #109, Systems & Economy numbers): the blast's hits on a vehicle and on
+ * enemies in the radius, the rack and its prices, and the pacing bot's blast rule. The rack holds
+ * `rackStart` slots and each bought slot one more, up to `rackMax` (`rackStart` plus one slot per
+ * level of the `bandOre` curve `rackSlotCostCurveId`). Everything that differs by charge size is in
+ * `sizes` (K8 #218).
  */
 export interface BlastingChargeRules {
-  fuseTicks: number
-  blastRadiusTiles: BigStat
-  /** The share of the value of the ore a blast breaks that reaches the hold. */
-  oreYieldFraction: BigStat
-  /** The hit on the planter's vehicle in the radius before enemy tier growth (1.5 crawler hits). */
+  /** The hit on the planter's vehicle in a size-1 radius before enemy tier growth (1.5 crawler hits). */
   selfHit: BigStat
   /** An enemy in the radius loses this many times its kind's health at the blast tile's tier. */
   enemyDamageHealthMultiple: BigStat
@@ -244,12 +241,40 @@ export interface BlastingChargeRules {
   warnTiles: number
   rackStart: number
   rackMax: number
-  chargeCost: BandOreCost
   rackSlotCostCurveId: string
   /** No tile harder than this band's rock of the current planet breaks; core tiles never do. */
   hardnessCapBand: number
   /** The bot blasts a tile whose drill time would be over this many ticks (4x `minTicksPerTile`). */
   botBlastThresholdTicks: number
+  sizes: ChargeSizeLadder
+}
+
+/**
+ * The dynamite size ladder (#143 numbers with amendments 2 and 3, #153 design, the #149 locks):
+ * size n (1 first) has `radius[n - 1]` tiles, opens on planet `unlockFrom + unlockEvery * (n - 1)`,
+ * costs `oreUnitsBase * oreUnitsRatio^(n - 1)` ore units of band `oreUnitsBand`, keeps
+ * `keptBase * keptRatio^(n - 1)` of the ordinary ore it breaks, takes `rackSlots[n - 1]` rack
+ * slots, and blows `fuseTicks[n - 1]` ticks after planting; a size past the fuse list is remote
+ * (the plunger, #149) and is disarmed `remoteDisarmTicks` after planting. From size
+ * `lethalCoreFrom` the inner `lethalCoreFraction` of the radius wrecks the planter. A dynamite-gated
+ * cell of lead `newestSizeLead` asks the newest open size, one of a lower lead that many sizes less.
+ */
+export interface ChargeSizeLadder {
+  /** The one radius ladder (Systems pin on #149): no formula and no second copy. */
+  radius: readonly BigStat[]
+  unlockFrom: number
+  unlockEvery: number
+  oreUnitsBand: number
+  oreUnitsBase: BigStat
+  oreUnitsRatio: BigStat
+  keptBase: BigStat
+  keptRatio: BigStat
+  rackSlots: readonly number[]
+  fuseTicks: readonly number[]
+  lethalCoreFrom: number
+  lethalCoreFraction: BigStat
+  newestSizeLead: number
+  remoteDisarmTicks: number
 }
 
 /**

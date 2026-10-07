@@ -14,52 +14,48 @@
  * slot adds one, up to 8.
  */
 import { MM_PER_METRE } from '../../constants/physics'
-import {
-  add,
-  ceil,
-  ceilMilli,
-  cmp,
-  floor,
-  fromSafeInteger,
-  mul,
-  toSafeInteger,
-  type BigStat,
-  type Money,
-} from '../money'
+import { add, floor, fromSafeInteger, mul, toSafeInteger, type BigStat, type Money } from '../money'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
-import { bandOrePrice, bandOreWorth } from './bandOreCost'
+import { bandOrePrice } from './bandOreCost'
 import { bandOreCurveOf } from './costCurveLookup'
 import type { BandOreCostCurve, EnemyKind } from './economyDefinition'
 import { enemyHealth, enemyTier } from './enemyStats'
 import { blockHardness } from './oreEconomy'
+import {
+  chargePrice,
+  chargeRadiusMm,
+  chargeReachTiles,
+  fuseTicksOf,
+  isInChargeRadius,
+  keptFractionOf,
+} from './chargeSizes'
 
 const { blastingCharges: charges } = ECONOMY
-const RADIUS_MM = mul(charges.blastRadiusTiles, fromSafeInteger(MM_PER_METRE))
-const RADIUS_MM_SQ = mul(RADIUS_MM, RADIUS_MM)
+/** The shipped charge is size 1 of the dynamite ladder (#153: sizes extend `blasting_charges`). */
+const SHIPPED_SIZE = 1
 
 export function chargeFuseTicks(): number {
-  return charges.fuseTicks
+  return fuseTicksOf(SHIPPED_SIZE) as number
 }
 
 /** Whether a point `dxMm, dyMm` from the charge tile's centre is inside the blast. */
 export function isInBlastRadius(dxMm: number, dyMm: number): boolean {
-  return cmp(fromSafeInteger(dxMm * dxMm + dyMm * dyMm), RADIUS_MM_SQ) <= 0
+  return isInChargeRadius(SHIPPED_SIZE, dxMm, dyMm)
 }
 
-/** The shipped charge is size 1 of the dynamite ladder (#153: sizes extend `blasting_charges`). */
 export function chargeSize(): number {
-  return 1
+  return SHIPPED_SIZE
 }
 
 /** The blast's radius in whole millimetres, rounded out. */
 export function blastRadiusMm(): number {
-  return toSafeInteger(ceil(RADIUS_MM))
+  return chargeRadiusMm(SHIPPED_SIZE)
 }
 
 /** The blast's reach in whole tiles round the charge tile, for the tiles worth testing. */
 export function blastReachTiles(): number {
-  return toSafeInteger(floor(charges.blastRadiusTiles))
+  return chargeReachTiles(SHIPPED_SIZE)
 }
 
 export function chargeWarnTiles(): number {
@@ -83,7 +79,7 @@ export function rackMaxSlotLevel(): number {
 
 /** Restocking `count` charges on planet `planetIndex`. */
 export function restockPrice(count: number, planetIndex: number): Money {
-  return ceilMilli(mul(fromSafeInteger(count), bandOreWorth(charges.chargeCost, planetIndex)))
+  return chargePrice(SHIPPED_SIZE, count, planetIndex)
 }
 
 /** Raising the rack from `slotLevel` (0 to 4) bought slots to the next on planet `planetIndex`. */
@@ -112,7 +108,7 @@ export function blastHardnessCap(planetIndex: number): BigStat {
 
 /** Of `units` ore units of one tier a blast broke, how many reach the hold, `dither` in [0, 1). */
 export function keptBlastOreUnits(units: number, dither: Money): number {
-  const share = mul(fromSafeInteger(units), charges.oreYieldFraction)
+  const share = mul(fromSafeInteger(units), keptFractionOf(SHIPPED_SIZE))
   return toSafeInteger(floor(add(share, dither)))
 }
 

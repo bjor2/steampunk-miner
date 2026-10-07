@@ -8,6 +8,7 @@
  */
 import { blastTilesAround } from '../authority/charges/blastOre'
 import { blastReachTiles, chargeFuseTicks, restockPrice } from '../economy/blastingCharges'
+import { keptFractionOf } from '../economy/chargeSizes'
 import { ECONOMY } from '../economy/economy'
 import { blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
 import type { VehicleStats } from '../economy/vehicleStats'
@@ -63,7 +64,7 @@ function oreMoneyPerTile(params: PlanetParams, band: number): Money {
 /** One blast's kept ore money, less the charge it took. */
 function blastMoney(params: PlanetParams, tileMoney: Money): Money {
   const blastOre = mul(fromSafeInteger(BLAST_TILES), tileMoney)
-  const kept = mul(blastOre, ECONOMY.blastingCharges.oreYieldFraction)
+  const kept = mul(blastOre, keptFractionOf(1))
   return sub(kept, chargeMoney(params))
 }
 

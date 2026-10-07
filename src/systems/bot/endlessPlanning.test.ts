@@ -3,6 +3,7 @@ import { blastTilesAround } from '../authority/charges/blastOre'
 import { createAuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
 import { blastReachTiles, chargeFuseTicks, restockPrice } from '../economy/blastingCharges'
+import { keptFractionOf } from '../economy/chargeSizes'
 import { ECONOMY } from '../economy/economy'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
@@ -178,9 +179,7 @@ function referenceBlastCalls(params: PlanetParams, stats: VehicleStats, trade: B
   const price = oreSalePrice(oreTier(params.planetIndex, trade.band))
   const tileLog = Math.log10(density) + log10Of(price)
   const keptLog =
-    Math.log10(blastTilesAround({ tx: 0, ty: 0 }).length) +
-    log10Of(ECONOMY.blastingCharges.oreYieldFraction) +
-    tileLog
+    Math.log10(blastTilesAround({ tx: 0, ty: 0 }).length) + log10Of(keptFractionOf(1)) + tileLog
   const chargeLog = log10Of(restockPrice(1, params.planetIndex))
   if (keptLog <= chargeLog) return { paysCharge: false, earnsMore: false }
   const cycleTicks = chargeFuseTicks() + 2 * moveTicks(blastReachTiles(), stats.engine.speedMax)
