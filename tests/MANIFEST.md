@@ -131,13 +131,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 
-### `mining-gates`: 20 files, 132 tests
+### `mining-gates`: 21 files, 135 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mining-gates/debug.test.ts` | 8 | 8 |
 | `src/features/mining-gates/gateReportRows.test.ts` | 3 | 3 |
 | `src/features/mining-gates/store/gateHintStore.test.ts` | 3 | 3 |
+| `src/features/mining-gates/systems/botExtractorBuys.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/botExtractors.test.ts` | 4 | 2 |
 | `src/features/mining-gates/systems/botGates.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/botShaftJog.test.ts` | 2 | 1 |
@@ -471,7 +472,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botRefining.test.ts` | 4 | 4 |
 | `src/systems/bot/botRetreat.test.ts` | 9 | 9 |
 | `src/systems/bot/botShopping.test.ts` | 6 | 6 |
-| `src/systems/bot/botSlicePurchases.test.ts` | 6 | 6 |
+| `src/systems/bot/botSlicePurchases.test.ts` | 9 | 9 |
 | `src/systems/bot/botWallet.test.ts` | 3 | 3 |
 | `src/systems/bot/chargePayoff.test.ts` | 5 | 5 |
 | `src/systems/bot/chargeSharePayoff.test.ts` | 6 | 6 |
@@ -571,9 +572,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/diveCasing.test.ts` | 3 | 3 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
 | `src/logging/domainEventLog.test.ts` | 18 | 18 |
+| `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
 | `src/logging/eventSink.test.ts` | 7 | 7 |
-| `src/logging/gateClearTables.test.ts` | 6 | 6 |
+| `src/logging/extractorPurchaseTrips.test.ts` | 3 | 3 |
+| `src/logging/gateClearTables.test.ts` | 7 | 7 |
 | `src/logging/gateClearTally.test.ts` | 3 | 3 |
 | `src/logging/gateRouteStalls.test.ts` | 2 | 2 |
 | `src/logging/goldenSliceSections.test.ts` | 4 | 4 |
