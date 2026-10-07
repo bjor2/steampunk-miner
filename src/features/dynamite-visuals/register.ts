@@ -1,12 +1,14 @@
 /**
- * The dynamite-visuals slice's registration: no side effects at import; the loader calls
- * `register`. Nothing is registered yet (#145): the art ids, the scene layer and the
- * `chargeBlastCue` provider land with the wiring (#215) once their kernel registries exist
- * (#213, #214). Until then the slice is its pure look rules and the committed Blender sources.
+ * The dynamite-visuals slice's registration (#215, the wiring of #145): the two Blender assets.
+ * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
+import { dynamiteArtAssets } from './systems/render/dynamiteArt'
 
 export const slice: SliceDefinition = {
   id: 'dynamite-visuals',
-  register() {},
+  register(r) {
+    // The rack and the planted prop, under public/assets/vehicle/ and public/assets/prop/ (#214).
+    r.artAssets(dynamiteArtAssets())
+  },
 }

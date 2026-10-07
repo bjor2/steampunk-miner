@@ -1,0 +1,10 @@
+{
+  "id": "vehicle-dynamite-rack",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#8a6a2f",
+  "partColors": {
+    "wire-reel": "#b0763a"
+  }
+}
