@@ -15,6 +15,10 @@
  * Heat planets (#113, #114): a lava cell draws as molten rock with its own style, and a ground
  * tile holding refractory lining is flagged in the same slot as the whisper flag, so the shader
  * draws it as firebrick with glowing joints.
+ *
+ * Gated cells (ticket 298): the `cellGateLook` provider names the gate a cell shows, and its bits
+ * (`cellGateBits.ts`) ride in the tile's gate slot, which the shader draws as the cell's top layer.
+ * With no provider the slot stays 0 and the provider is never asked.
  */
 import { GROUND_BLOCK_SIZE, ORE_WHISPER_ROCK_TILES } from '../../constants/scene'
 import type { PlanetParams } from '../world/planetParams'
@@ -27,7 +31,9 @@ import { BLOCKS_PER_CHUNK, BLOCKS_PER_CHUNK_SIDE, type BlockedTileInstances } fr
 import { ART_DIRECTION, type BandPalette } from './artDirection'
 import { bandColourOf, paletteOf, tileShadeOf } from './bandPalette'
 import type { Rgb } from './colour'
+import { cellGateLookProvider, type CellGateLookProvider } from '../registries/cellGateLook'
 import { oreLookProvider, type OreLookProvider } from '../registries/oreLook'
+import { gateBitsOf, NO_GATE_BITS } from './cellGateBits'
 import type { OreLook } from './oreLook'
 
 /** How the shader draws a tile. */
@@ -53,6 +59,10 @@ interface BatchContext {
   oreLooks: Map<number, OreLook>
   /** The `ore-visuals` slice's look, else the kernel's (feature-slices.md 3.9), read per chunk. */
   oreLook: OreLookProvider
+  /** The `mining-gates` slice's gate look (feature-slices.md 3.33), or null, read per chunk. */
+  cellGateLook: CellGateLookProvider | null
+  /** Reused for every tile the provider is asked about, so a rebuild allocates no points. */
+  gateTile: { tx: number; ty: number }
   /** 1 per cell holding refractory lining (#113), in cell order. */
   refractoryCells: Uint8Array
 }
@@ -146,6 +156,8 @@ function batchContextOf(
     firstTy: firstTileOfChunk(cy),
     oreLooks: new Map(),
     oreLook: oreLookProvider(),
+    cellGateLook: cellGateLookProvider(),
+    gateTile: { tx: 0, ty: 0 },
   }
 }
 
@@ -157,6 +169,7 @@ function emptyBatch(): ChunkTileBatch {
     baseColours: new Float32Array(CHUNK_CELLS * 3),
     oreColours: new Float32Array(CHUNK_CELLS * 4),
     styles: new Float32Array(CHUNK_CELLS * 4),
+    gates: new Float32Array(CHUNK_CELLS),
   }
 }
 
@@ -186,6 +199,7 @@ function writeTile(
     SILHOUETTE_CODE[ore?.silhouette ?? 'none'],
     ore?.sparkles ?? 0,
   )
+  batch.gates[at] = gateBitsOfTile(context, cell, lx, ly)
   batch.count = at + 1
 }
 
@@ -218,6 +232,13 @@ function tileFlagOf(
 ): number {
   if (ore !== null) return isNearAir(halo, lx, ly) ? 1 : 0
   return styleOf(cell) === TILE_STYLE.ground ? context.refractoryCells[ly * CHUNK_SIZE + lx] : 0
+}
+
+function gateBitsOfTile(context: BatchContext, cell: number, lx: number, ly: number): number {
+  if (context.cellGateLook === null) return NO_GATE_BITS
+  context.gateTile.tx = context.firstTx + lx
+  context.gateTile.ty = context.firstTy + ly
+  return gateBitsOf(context.cellGateLook.cellGateLookOf(context.params, cell, context.gateTile))
 }
 
 function oreLookOf(context: BatchContext, cell: number): OreLook {

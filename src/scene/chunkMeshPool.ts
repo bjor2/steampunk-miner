@@ -252,7 +252,7 @@ function refractoryCellsOfChunk(world: WorldState, cx: number, cy: number): Uint
   return casing === NO_CASING ? NO_REFRACTORY_CELLS : refractoryCellsOf(casing)
 }
 
-const INSTANCE_ATTRIBUTES = ['aTile', 'aBase', 'aOre', 'aStyle'] as const
+const INSTANCE_ATTRIBUTES = ['aTile', 'aBase', 'aOre', 'aStyle', 'aGate'] as const
 
 /** Sized for a whole chunk, so showing more blocks never reallocates. */
 function emptyInstances(): TileInstances {
@@ -262,6 +262,7 @@ function emptyInstances(): TileInstances {
     baseColours: new Float32Array(CHUNK_CELLS * 3),
     oreColours: new Float32Array(CHUNK_CELLS * 4),
     styles: new Float32Array(CHUNK_CELLS * 4),
+    gates: new Float32Array(CHUNK_CELLS),
   }
 }
 
@@ -292,6 +293,7 @@ function geometryOf(batch: TileInstances): InstancedBufferGeometry {
   geometry.setAttribute('aBase', new InstancedBufferAttribute(batch.baseColours, 3))
   geometry.setAttribute('aOre', new InstancedBufferAttribute(batch.oreColours, 4))
   geometry.setAttribute('aStyle', new InstancedBufferAttribute(batch.styles, 4))
+  geometry.setAttribute('aGate', new InstancedBufferAttribute(batch.gates, 1))
   geometry.instanceCount = batch.count
   return geometry
 }

@@ -17,6 +17,7 @@ import { ART_ASSET_REGISTRY, type ArtAsset } from '../systems/registries/artAsse
 import { AUTHORITY_REACTION_REGISTRY } from '../systems/registries/authorityReactions'
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
+import { CELL_GATE_LOOK_REGISTRY } from '../systems/registries/cellGateLook'
 import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
 import { CHARGE_BLAST_CUE_REGISTRY } from '../systems/registries/chargeBlastCue'
 import { CLOCK_STEP_REGISTRY } from '../systems/registries/clockSteps'
@@ -105,6 +106,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     inputReaction: (reaction) => add(INPUT_REACTION_REGISTRY, reaction),
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
+    cellGateLook: (provider) => add(CELL_GATE_LOOK_REGISTRY, provider),
     saveSection: (section) => addSaveSection(sliceId, section),
     discovery: (provider) => add(DISCOVERY_REGISTRY, provider),
     discoveryKind: (kind, ...codec) =>

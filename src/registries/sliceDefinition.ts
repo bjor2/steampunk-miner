@@ -35,6 +35,7 @@ import type { HullDamageIntercept } from '../systems/registries/hullDamageInterc
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
+import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
 import type { OreSignatureTag, OreTypeProvider } from '../systems/registries/oreTypes'
 import type { PartMotionRequestSource } from '../systems/registries/partMotionRequests'
@@ -103,6 +104,8 @@ export interface SliceRegistrar {
   generationHook(hook: GenerationHook): void
   /** One provider across all slices. */
   oreLook(provider: OreLookProvider): void
+  /** One provider across all slices: the gate each cell shows in the ground (ticket 298). */
+  cellGateLook(provider: CellGateLookProvider): void
   /** Its id is `<slice>` or `<slice>.<name>`. */
   saveSection<T>(section: SaveSection<T>): void
   /** One provider across all slices. */

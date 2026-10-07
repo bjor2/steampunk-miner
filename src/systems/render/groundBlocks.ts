@@ -24,6 +24,8 @@ export interface TileInstances {
   oreColours: Float32Array
   /** 4 per tile: style, the `ore_whisper` rim flag (1 or 0, #46), silhouette code, sparkle count. */
   styles: Float32Array
+  /** 1 per tile: the gate channel's bits (`cellGateBits.ts`, ticket 298), 0 on a cell with no gate. */
+  gates: Float32Array
 }
 
 /** A chunk's tiles laid out block by block: block `b` is `blockStarts[b]` to `blockStarts[b + 1]`. */
@@ -100,5 +102,6 @@ function copyBlock(batch: BlockedTileInstances, block: number, drawn: TileInstan
   drawn.baseColours.set(batch.baseColours.subarray(start * 3, end * 3), drawn.count * 3)
   drawn.oreColours.set(batch.oreColours.subarray(start * 4, end * 4), drawn.count * 4)
   drawn.styles.set(batch.styles.subarray(start * 4, end * 4), drawn.count * 4)
+  drawn.gates.set(batch.gates.subarray(start, end), drawn.count)
   drawn.count += end - start
 }
