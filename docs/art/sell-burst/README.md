@@ -15,8 +15,8 @@ browser is the 1.5 s of `sellBurst.json`.
 | `*-lining-bill.webm` | 4 tiles of planet 4 ore with a lining bill | peeled coins flying to `Lining −X`, the counter ending on the wallet |
 
 Recorded before #181 landed: the coin counts in the table are against whole Workshop levels.
-With #181's steps a sale's next step is about a tenth of a level, so the same sales show about 13
-more coins (the 3-coin sale shows about 10); the look and the timing are the same.
+With #181's steps a sale's next step is about a tenth of a level, so the same sales show
+more coins (on main the 3-coin sale shows 8 and the 22-coin one 36); the look and the timing are the same.
 
 Sizes: `desktop` 1920 x 1080, `phone-landscape` 844 x 390, `tv` 3840 x 2160 (recorded at
 1920 x 1080). Every sale here pays a lining bill, because scripted mining lays lining as the
