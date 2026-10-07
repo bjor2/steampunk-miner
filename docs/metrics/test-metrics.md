@@ -1,25 +1,34 @@
 # CI test metrics: timing and results of every Vitest run
 
-Every CI test run records its per-file timings and results, grouped by feature, on the orphan
-**`test-metrics`** branch. That covers the per-push `verify` job of `ci.yml` (scoped, full minus
-the three pacing bot files, or none) and the nightly true full suite of `nightly.yml`. The
-records are there to show which features are slow, which fail, and pipeline problems such as
-timeouts, flaky files and tests the per-push scoping missed. The status page's Tests tab (#192)
-reads them.
+Every test run records its per-file timings and results, grouped by feature, on the orphan
+**`test-metrics`** branch. Since 2026-10-07 tests no longer run in GitHub Actions (`ci.yml`
+`verify` keeps lint, formatting, types and the build; the Windows `determinism` job stays on pull
+requests). The build loop's **box Tester** (`claude-sessions/steampunk-loop/tester.sh` on the
+build box) runs them and writes the records. Records before that date come from Actions
+(`run.source` missing or `actions`). The status page's Tests tab (#192) reads them.
 
-- **Where:** branch `test-metrics`. It holds `runs/YYYY-MM/<run-id>.json` (one record per run,
-  `-a<attempt>` added for a re-run) and `summary.json` (the last 50 runs rolled up). Raw:
-  `https://raw.githubusercontent.com/bjor2/steampunk-miner/test-metrics/summary.json`.
+- **When:** after every green ticket close and on every loop pass when `origin/main` moved past
+  the last tested sha (several pushes coalesce into one run), and nightly from the first loop pass
+  after 01:30 Oslo.
+- **Push run, in order:** `fast` = `scripts/ci/selectPushTests.sh <last tested sha>` (scoped
+  `vitest related`, full, or none), pacing bot excluded, recorded at once; then, when `fast` is
+  green and the change touches `src/` (or was unmappable), `slow` = the three pacing bot files
+  (NIGHTLY_ONLY_TESTS) and Playwright e2e when the box has room (else nightly).
+- **Nightly:** the true full suite (`npm test`, every test's duration kept), then balance:report,
+  the four benches + bench:summary, balance:planets, e2e, soak:memory and packaged smoke; each
+  non-Vitest suite is a record with only its conclusion and duration (`reportFound: false`).
+- **Commit statuses:** `box-tester/fast`, `box-tester/slow`, `box-tester/full`, `box-tester/nightly`
+  on the tested sha, linking to the run record.
+- **Red:** failed files are rerun once (green = flaky, noted in `reason`). Still red, a headless
+  Claude triage names the culprit ticket(s); they get a comment, `needs-fix` and are reopened. A
+  red nightly full suite also pauses new dev workers until a `tester.sh --full` is green.
 - **Query:** `npm run metrics:tests [-- features|files|pass-rate|failures|pipeline|runs] [--limit N]`.
   It fetches the branch and reads `summary.json`; `--summary <file>` reads a local copy instead.
-- **How it gets there:** the test job adds `--reporter=json` and uploads the report as the
-  `vitest-report` artifact (`if: always()`, kept 14 days). The `metrics` job then calls
-  `.github/workflows/record-test-metrics.yml`, also when the test job failed or timed out. That
-  workflow downloads the report, reads the test job's steps from the Actions API and runs
-  `scripts/ci/pushTestMetrics.sh` → `recordTestRun.mjs` → `testMetrics.mjs`. Only that job has
-  `contents: write`. A rejected push fetches the new tip, writes the record again on top of it and
-  retries, never forcing. Every step is `continue-on-error`, so metrics never fail CI. Pushes from
-  the workflow token start no workflow, and the branch carries no workflow files.
+- **How it gets there:** the Tester runs Vitest with `--reporter=json`, writes a one-job jobs file
+  from its own step times and calls `scripts/ci/pushTestMetrics.sh` → `recordTestRun.mjs` →
+  `testMetrics.mjs` with `GITHUB_*` set by itself (run id = epoch ms) plus `TEST_SOURCE=box`,
+  `TEST_PHASE` and `TEST_RUN_URL`. A rejected push fetches the new tip, writes the record again on
+  top of it and retries, never forcing.
 - **Feature mapping:** `scripts/ci/testFeatures.mjs` is the one table. A slice folder
   `src/features/<slice>/` maps to its slice; `src/systems/<x>/` maps to `<x>`; the pacing bot and
   golden replays have their own names; other layers map by folder, and `scripts/<x>/` maps to
@@ -38,7 +47,9 @@ reads them.
     "workflow": "CI",
     "job": "verify",
     "event": "push",
-    "mode": "scoped", // scoped | full | none (per push) | nightly | unknown
+    "mode": "scoped", // scoped | full | none (per push) | nightly-only (slow) | e2e | nightly | unknown
+    "source": "box", // box (Tester) | actions (before 2026-10-07)
+    "phase": "fast", // fast | slow | full | nightly (box only)
     "reason": "7 changed files, tests picked by import graph and fs-read rules",
     "sha": "2f12f9c…",
     "branch": "main",

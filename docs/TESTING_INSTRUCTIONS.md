@@ -9,7 +9,7 @@ rules live; `CLAUDE.md` summarises it. Modelled on the `infernal-bistro` ruleboo
 | ------ | ---------------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------- |
 | Runs   | Node, no DOM, no canvas; a Rapier world only in `src/physics` specs    | Chromium on `vite preview` of the production build      | The `electron-builder --dir` output, no Steam      |
 | Covers | Formulas, store actions, logging, scenario rules, debug API, collision | Launch, `?debug&scenario=`, digests, snapshot, refusals | Window, run log folder, `--debug-api`, save folder |
-| Status | The whole rule layer, plus the golden and pacing gates. Run it.        | Pull requests touching the game (CI `e2e`)              | Nightly and by hand (CI `packaged-smoke`)          |
+| Status | The whole rule layer, plus the golden and pacing gates. Run it.        | Box Tester after pushes touching `src/`, and nightly    | Box Tester nightly, and by hand                    |
 
 `vite.config.ts` includes `src/**/*.test.ts` and, for the node build scripts (perf recorder,
 status dashboard, ticket phase metrics), `scripts/**/*.test.mjs`. There are no component tests and no screenshot
@@ -259,12 +259,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   above the first 3, geometries, textures or colliders rising in 3 or more of the last 10 steps
   without falling, any page error, or fewer than 15 cycles. The gate and summary are pure and
   tested in `scripts/soak/`; `--evaluate <soak.json>` re-checks a saved run and `--job-summary <dir>`
-  prints its summary as one Markdown row. CI runs it as a regression gate (#103,
-  `.github/workflows/memory-soak.yml`): nightly, by hand (`workflow_dispatch`) and on pull requests
-  labelled `perf`, never on every push, because 15 cycles of ~36 s cannot fit a shorter profile. The
-  job fails with the gate, appends the row to the job summary and uploads `soak.json`,
-  `summary.json` and the chart as the `memory-soak` artifact (the heap snapshots only on a failure).
-  To check a change for leaks before merging, add the `perf` label to its pull request. On a box with no
+  prints its summary as one Markdown row. The box Tester runs it as a regression gate (#103) every night (never on every push,
+  because 15 cycles of ~36 s cannot fit a shorter profile) and records the result on the
+  `test-metrics` branch (docs/metrics/test-metrics.md). To check a change for leaks before
+  merging, run it by hand. On a box with no
   Playwright browser, pass `--browser /usr/bin/google-chrome` (run the script itself, after a
   build). Record a run with `npm run perf:record -- --source soak --from test-results/soak/summary.json --from test-results/soak/soak.json`.
   The same soak runs the packaged game (#102): after `npm run electron:build`,
