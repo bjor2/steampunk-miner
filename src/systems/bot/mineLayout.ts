@@ -49,6 +49,8 @@ export interface MineLayout {
   /** The lowest row the shaft is open down to; the vehicle can stand anywhere above it. */
   shaftBottomRow: number
   galleries: Map<number, Gallery>
+  /** How far a band's ore galleries reach once the bot has widened them (#216). */
+  oreReachByBand: Map<number, number>
 }
 
 /** The shaft is this many columns off the pad, so the pad's edge tile stays whole. */
@@ -58,6 +60,12 @@ const GALLERY_SPACING_ROWS = 3
 const FIRST_GALLERY_DEPTH = 2
 /** A gallery stops this many rows short of breaking out of the planet's surface. */
 const SURFACE_MARGIN_ROWS = 2
+/**
+ * Ore galleries end this far from the shaft: a deeper gallery is a shorter walk than a long one,
+ * and a band has rows to spare (#6 band thresholds: band 2 alone is 27% of the radius). A band
+ * whose rows are all bored out is widened by this much again (#216).
+ */
+export const ORE_GALLERY_REACH = 20
 
 export function newMineLayout(params: PlanetParams, site: DockSite): MineLayout {
   const travelRow = site.padRow + 1
@@ -71,6 +79,7 @@ export function newMineLayout(params: PlanetParams, site: DockSite): MineLayout 
     refineryBay: hasBay(site, 'refinery') ? bayRestTileOf(site, 'refinery') : null,
     shaftBottomRow: travelRow,
     galleries: new Map(),
+    oreReachByBand: new Map(),
   }
 }
 
@@ -170,6 +179,69 @@ export function extendSide(layout: MineLayout, row: number, side: GallerySide): 
   const gallery = galleryOf(layout, row)
   if (side === 'east') gallery.east += 1
   else gallery.west += 1
+}
+
+/** How far the band's ore galleries reach from the shaft. */
+export function oreReachOf(layout: MineLayout, band: number): number {
+  return layout.oreReachByBand.get(band) ?? ORE_GALLERY_REACH
+}
+
+/**
+ * Widens the shallowest band down to `deepestBand` that has a side ended at its reach (#216);
+ * false when none has.
+ */
+export function widenShallowestBand(layout: MineLayout, deepestBand: number): boolean {
+  for (let band = 1; band <= deepestBand; band++) {
+    if (widenBandGalleries(layout, band)) return true
+  }
+  return false
+}
+
+/**
+ * Lets the band's ore galleries reach one `ORE_GALLERY_REACH` further, reopening every side that
+ * ended at the old reach (one that met the surface, the core or a tile it cannot bore stays done);
+ * false when no side of the band ended there.
+ */
+function widenBandGalleries(layout: MineLayout, band: number): boolean {
+  const reach = oreReachOf(layout, band)
+  const sides = sidesEndedAtReach(layout, band, reach)
+  if (sides.length === 0) return false
+  layout.oreReachByBand.set(band, reach + ORE_GALLERY_REACH)
+  for (const { gallery, side } of sides) reopenSide(gallery, side)
+  return true
+}
+
+const SIDES: readonly GallerySide[] = ['east', 'west']
+
+function sidesEndedAtReach(
+  layout: MineLayout,
+  band: number,
+  reach: number,
+): { gallery: Gallery; side: GallerySide }[] {
+  return [...layout.galleries]
+    .filter(([row]) => isOreRowOfBand(layout, row, band))
+    .flatMap(([, gallery]) =>
+      SIDES.filter((side) => isSideEndedAt(gallery, side, reach)).map((side) => ({
+        gallery,
+        side,
+      })),
+    )
+}
+
+function isOreRowOfBand(layout: MineLayout, row: number, band: number): boolean {
+  return !isCoreRow(layout, row) && bandOfRow(layout, row) === band
+}
+
+/** The reach check comes first at a face, so a side that stopped there reaches exactly `reach`. */
+function isSideEndedAt(gallery: Gallery, side: GallerySide, reach: number): boolean {
+  return side === 'east'
+    ? gallery.isEastDone && gallery.east === reach
+    : gallery.isWestDone && gallery.west === reach
+}
+
+function reopenSide(gallery: Gallery, side: GallerySide): void {
+  if (side === 'east') gallery.isEastDone = false
+  else gallery.isWestDone = false
 }
 
 /** The open side with the shorter walk, or null when both have ended. */

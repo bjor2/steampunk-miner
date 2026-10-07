@@ -9,6 +9,9 @@
  * the casing grade holds), run it, refine the best of the haul when the platform has the Refinery
  * bay and the bot will dive again (#105), then service and shop. Charges are bought only on a
  * planet where the bot met a tile it would blast with none in stock (#129); travel starts afresh.
+ * When no band the casing holds pays a trip, as after a rescue that took the last of the wallet
+ * with those bands bored out and the next grade unaffordable (#216), the bot retreats to the
+ * shallowest of them, widens its galleries and plays on.
  */
 import { SLICE_LAST_PLANET } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -27,6 +30,7 @@ import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
 import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
 import { driveToUpgradeBay, runTrip } from './botTrip'
+import { widenShallowestBand } from './mineLayout'
 import { botPlanetOf, travelWhenReady } from './botTravel'
 import type { ShopSpend } from './shopSpend'
 import type { TripGoal } from './tripGoal'
@@ -84,21 +88,45 @@ interface BotRun {
  */
 const CORE_TRIP_MAX_TICKS_PER_TILE = 20 * TICKS_PER_SECOND
 
+/** What playing on from a session under way needs: the run's options past its start. */
+export type PlayOnOptions = Omit<SliceRunOptions, 'playerId' | 'startCommands' | 'listener'>
+
 export function playSlice(start: AuthorityState, options: SliceRunOptions): SliceRun {
   const session = createBotSession(start, options.playerId ?? 'p1', options.listener)
   for (const intent of options.startCommands ?? []) session.submit(intent)
-  const run: BotRun = {
+  return playSliceFrom(session, botPlanetOf(session, chargePolicyOf(options)), options)
+}
+
+/** Plays on from a session under way, the bot on `planet` (a spec's fixture, or `playSlice`). */
+export function playSliceFrom(
+  session: BotSession,
+  planet: BotPlanet,
+  options: PlayOnOptions,
+): SliceRun {
+  const run = botRunOf(options)
+  let current = planet
+  while (!isLastCoreDone(session, run.lastPlanet) && session.tick() < options.maxTicks) {
+    current = travelWhenReady(session, current)
+    if (!playDockCycle(session, current, run)) break
+  }
+  return sliceRunOf(session, run)
+}
+
+function botRunOf(options: PlayOnOptions): BotRun {
+  return {
     lastPlanet: options.lastPlanet ?? SLICE_LAST_PLANET,
     refinery: options.refinery ?? 'used',
     gunPolicy: options.gunPolicy ?? 'mount',
-    chargePolicy: options.chargePolicy ?? 'blast',
+    chargePolicy: chargePolicyOf(options),
     shopSpend: [],
   }
-  let planet = botPlanetOf(session, run.chargePolicy)
-  while (!isLastCoreDone(session, run.lastPlanet) && session.tick() < options.maxTicks) {
-    planet = travelWhenReady(session, planet)
-    if (!playDockCycle(session, planet, run)) break
-  }
+}
+
+function chargePolicyOf(options: PlayOnOptions): ChargePolicy {
+  return options.chargePolicy ?? 'blast'
+}
+
+function sliceRunOf(session: BotSession, run: BotRun): SliceRun {
   return {
     commands: session.commands(),
     events: session.events(),
@@ -146,9 +174,22 @@ function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): 
 
 function chooseGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
   if (isCoreDiggable(session, planet)) return { kind: 'core' }
+  return chooseOreGoal(session, planet) ?? chooseRetreatGoal(session, planet)
+}
+
+function chooseOreGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
   const means = meansOfVehicle(session.vehicle())
   const plan = bestOrePlan(planet.layout, means, deepestHeldBand(session))
   return plan === null ? null : { kind: 'ore', band: plan.band }
+}
+
+/**
+ * No held band pays (#216): the shallowest held band with galleries bored out to their reach
+ * reaches further, and the bot plans again; null when no held band can widen.
+ */
+function chooseRetreatGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
+  const hasWidened = widenShallowestBand(planet.layout, deepestHeldBand(session))
+  return hasWidened ? chooseOreGoal(session, planet) : null
 }
 
 /**

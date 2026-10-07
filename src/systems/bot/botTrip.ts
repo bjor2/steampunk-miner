@@ -24,6 +24,7 @@ import {
   isCoreTileAt,
   isNearSurface,
   markSideDone,
+  oreReachOf,
   shaftColumnAt,
   shaftTileAt,
   type GallerySide,
@@ -34,11 +35,6 @@ import { nextRow, sideFor, type TripGoal } from './tripGoal'
 type GalleryEnd = 'stop' | 'ended'
 
 const TOW_WAIT_TICKS = 30
-/**
- * Ore galleries end this far from the shaft: a deeper gallery is a shorter walk than a long one,
- * and a band has rows to spare (#6 band thresholds: band 2 alone is 27% of the radius).
- */
-const ORE_GALLERY_REACH = 20
 
 export function runTrip(session: BotSession, planet: BotPlanet, goal: TripGoal): void {
   assertReturnReserve(session, planet, goal)
@@ -162,7 +158,7 @@ function isGalleryEnd(
 ): boolean {
   const state = session.state()
   const reach = Math.abs(face.tx - shaftColumnAt(layout, face.ty))
-  if (goal.kind === 'ore' && reach > ORE_GALLERY_REACH) return true
+  if (goal.kind === 'ore' && reach > oreReachOf(layout, goal.band)) return true
   if (!isInsideWorld(state, face) || isNearSurface(layout, face)) return true
   if (tileKindAt(state, face) === 'pad') return true
   if (goal.kind === 'ore') return isCoreTileAt(layout, face)
