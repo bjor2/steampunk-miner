@@ -8,6 +8,7 @@ import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import type { ChargePolicy } from './botCharges'
 import { playSlice, type SliceRun } from './playSlice'
+import { stepOfMajor } from '../economy/upgradeSteps'
 
 const WORLD_SEED = 83921
 /** Three minutes on planet 7: past the first dock visit, where the rack was once always bought. */
@@ -35,7 +36,7 @@ function arrivedOnPlanet7(drillBehind: number): CommandIntent[] {
 
 function arrivalLevel(upgradeId: UpgradeId, drillBehind: number): number {
   const onCurve = onCurveLevel(upgradeId, 7)
-  return DRILL_TRACKS.includes(upgradeId) ? onCurve - drillBehind : onCurve
+  return stepOfMajor(DRILL_TRACKS.includes(upgradeId) ? onCurve - drillBehind : onCurve)
 }
 
 function planet7Run(drillBehind: number, chargePolicy: ChargePolicy, maxTicks: number): SliceRun {

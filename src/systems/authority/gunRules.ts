@@ -2,15 +2,16 @@
  * Buying and switching the `auto_guns` turret (#107 design and numbers, built by #93):
  *
  * - `BuyGun`: at the Upgrade bay only, once `auto_guns` is unlocked (planet 4, #80). The first buy
- *   mounts the guns at level 1 for 30 band-5 ore units and logs `gun_mounted`; each later buy
- *   raises the gun track one level, up to its cap, and logs `gun_upgraded`. The guns are not a
- *   vehicle track, so they never move the visual tier.
+ *   mounts the guns, their first major (step 10, #180), for 30 band-5 ore units and logs
+ *   `gun_mounted`; each later buy raises the gun track one step, up to its cap of 16 majors, and
+ *   logs `gun_upgraded`. The guns are not a vehicle track, so they never move the visual tier.
  * - `SetGunMode {auto | off}`: the HUD toggle, any time the vehicle has guns; logs `gun_mode`.
- * - `debug.setGunLevel`: a scenario's guns, 0 (none) to the cap, with no unlock or price.
+ * - `debug.setGunLevel`: a scenario's guns as a step, 0 (none) or the mount to the cap, with no
+ *   unlock or price.
  *
  * A refused command changes nothing.
  */
-import { gunMaxLevel, nextGunPrice } from '../economy/gunStats'
+import { gunMountStep, gunTopStep, nextGunPrice } from '../economy/gunStats'
 import { sub, toCanonical, type Money } from '../money'
 import { isGunMode, isGunMounted, type GunMode, type VehicleGun } from '../vehicle/vehicleGun'
 import { vehicleOf, withVehicle, withWallet, type AuthorityState } from './authorityState'
@@ -88,13 +89,15 @@ function lockedGunRejection(state: AuthorityState): Rejection | null {
 }
 
 function maxGunLevelRejection(gun: VehicleGun): Rejection | null {
-  if (gun.level < gunMaxLevel()) return null
-  return rejectionOf('max_level', `the guns are at their top level ${gunMaxLevel()}`)
+  if (gun.level < gunTopStep()) return null
+  return rejectionOf('max_level', `the guns are at their top step ${gunTopStep()}`)
 }
 
+/** A gun step is 0 (none) or from the mount to the top: a tenth of a mount means nothing. */
 function gunLevelRangeRejection(level: number): Rejection | null {
-  if (level <= gunMaxLevel()) return null
-  return rejectionOf('out_of_range', `level must be 0 to ${gunMaxLevel()}, got ${level}`)
+  if (level === 0 || (level >= gunMountStep() && level <= gunTopStep())) return null
+  const range = `0 or ${gunMountStep()} to ${gunTopStep()}`
+  return rejectionOf('out_of_range', `level must be ${range}, got ${level}`)
 }
 
 function gunModeRefusal(state: AuthorityState, playerId: string, mode: string): Rejection | null {
@@ -106,15 +109,20 @@ function gunModeRefusal(state: AuthorityState, playerId: string, mode: string): 
 function buyNextGunLevel(state: AuthorityState, playerId: string): RuleEffect {
   const gun = gunOf(state, playerId)
   const price = nextGunPriceOf(state, playerId)
-  const raised = withGun(state, playerId, { ...gun, level: gun.level + 1 })
+  const raised = withGun(state, playerId, { ...gun, level: nextGunStep(gun) })
   return {
     state: withWallet(raised, playerId, sub(state.players[playerId].wallet, price)),
     events: [gunBuyEvent(gun, price)],
   }
 }
 
+/** The mount lands the whole first major; every later buy is one step. */
+export function nextGunStep(gun: VehicleGun): number {
+  return isGunMounted(gun) ? gun.level + 1 : gunMountStep()
+}
+
 function gunBuyEvent(before: VehicleGun, price: Money): DomainEventBody {
-  const to = before.level + 1
+  const to = nextGunStep(before)
   if (isGunMounted(before)) {
     return { type: 'GunUpgraded', from: before.level, to, price: toCanonical(price) }
   }

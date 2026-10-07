@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { gunMaxLevel, gunMountPrice, gunLevelPrice } from '../economy/gunStats'
+import { gunMountPrice, gunTopStep, nextGunPrice } from '../economy/gunStats'
 import { sub, toCanonical } from '../money'
 import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
@@ -37,30 +37,30 @@ const rejectionOf = (events: readonly DomainEvent[]) =>
   events.find((event) => event.type === 'CommandRejected')
 
 describe('guns: buying (#107)', () => {
-  it('mounts the guns at level 1 on planet 4 for 30 band-5 ore units, logged as gun_mounted', () => {
+  it('mounts the guns, their first major at step 10, on planet 4 for 30 band-5 ore units', () => {
     const session = dockedOn(4)
     const before = session.state().players.p1.wallet
     const events = session.submit(1, buyGun)
     expect(events[0]).toMatchObject({
       type: 'GunMounted',
-      level: 1,
+      level: 10,
       price: toCanonical(gunMountPrice(4)),
     })
-    expect(session.vehicle().gun).toEqual({ level: 1, mode: 'auto' })
+    expect(session.vehicle().gun).toEqual({ level: 10, mode: 'auto' })
     expect(session.state().players.p1.wallet).toEqual(sub(before, gunMountPrice(4)))
   })
 
-  it('raises the gun track one level a buy once mounted, logged as gun_upgraded', () => {
+  it('raises the gun track one step a buy once mounted, logged as gun_upgraded', () => {
     const session = dockedOn(5)
     session.submit(1, buyGun)
     const events = session.submit(2, buyGun)
     expect(events[0]).toMatchObject({
       type: 'GunUpgraded',
-      from: 1,
-      to: 2,
-      price: toCanonical(gunLevelPrice(1, 5)),
+      from: 10,
+      to: 11,
+      price: toCanonical(nextGunPrice(10, 5)),
     })
-    expect(session.vehicle().gun.level).toBe(2)
+    expect(session.vehicle().gun.level).toBe(11)
   })
 
   it('refuses the guns before planet 4, where auto_guns is not unlocked yet', () => {
@@ -83,9 +83,9 @@ describe('guns: buying (#107)', () => {
     expect(session.vehicle().gun.level).toBe(0)
   })
 
-  it('stops at the top level of the gun track', () => {
+  it('stops at the top step of the gun track, its 16th major', () => {
     const session = dockedOn(4)
-    session.submit(1, setGunLevel(gunMaxLevel()))
+    session.submit(1, setGunLevel(gunTopStep()))
     expect(rejectionOf(session.submit(2, buyGun))).toMatchObject({ reason: 'max_level' })
   })
 
@@ -120,12 +120,19 @@ describe('guns: the HUD toggle (#107)', () => {
 })
 
 describe('guns: debug level (#107 combat scenarios)', () => {
-  it('sets any level from 0 to the cap with no unlock or price, and refuses one above it', () => {
+  it('sets any step from the mount to the cap with no unlock or price, and refuses one above it', () => {
     const session = createScriptedSession()
-    session.submit(0, setGunLevel(3))
-    expect(session.vehicle().gun.level).toBe(3)
-    expect(rejectionOf(session.submit(1, setGunLevel(gunMaxLevel() + 1)))).toMatchObject({
+    session.submit(0, setGunLevel(34))
+    expect(session.vehicle().gun.level).toBe(34)
+    expect(rejectionOf(session.submit(1, setGunLevel(gunTopStep() + 1)))).toMatchObject({
       reason: 'out_of_range',
     })
+  })
+
+  it('refuses a step between none and the mount: a tenth of a mount means nothing', () => {
+    const session = createScriptedSession()
+    expect(rejectionOf(session.submit(0, setGunLevel(5)))).toMatchObject({ reason: 'out_of_range' })
+    session.submit(1, setGunLevel(0))
+    expect(session.vehicle().gun.level).toBe(0)
   })
 })

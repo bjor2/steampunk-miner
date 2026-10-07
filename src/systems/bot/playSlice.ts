@@ -224,7 +224,7 @@ function isCoreTheGoal(session: BotSession, planet: BotPlanet): boolean {
   const state = session.state()
   const { levels } = session.vehicle()
   const isShort = state.platform.coreBay < (coreNeededOf(state.planet) ?? 0)
-  const tip = statsOfVehicle(session.vehicle()).drillTip
+  const tip = statsOfVehicle(session.vehicle()).gateTip
   return (
     isShort &&
     !state.core.isCompleted &&

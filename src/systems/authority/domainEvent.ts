@@ -389,8 +389,13 @@ export interface KernelDomainEventBodies {
   UpgradePurchased: {
     upgradeId: string
     kind: 'vertical'
+    /** The stored steps before and after (#180: `10L + k`); the majors are derived beside them. */
     fromLevel: number
     toLevel: number
+    fromMajor: number
+    toMajor: number
+    /** Whether this step was the big level-up. */
+    isMajor: boolean
     cost: string
     costCurveId: string
     totalLevel: number

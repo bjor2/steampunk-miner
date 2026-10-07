@@ -65,8 +65,8 @@ export function enemyHitOnVehicle(kind: EnemyKind, tier: number, arc: HitArc): B
 }
 
 /** A pinned enemy loses `drillPower * kDrillVsEnemy` per second, a sixtieth of it per tick (#9). */
-export function pinnedDrillDamagePerTick(drillLevel: number): BigStat {
-  return div(mul(drillPower(drillLevel), enemies.combat.kDrillVsEnemy), TICKS_PER_SECOND_STAT)
+export function pinnedDrillDamagePerTick(drillPower: BigStat): BigStat {
+  return div(mul(drillPower, enemies.combat.kDrillVsEnemy), TICKS_PER_SECOND_STAT)
 }
 
 /** Seconds a pinned enemy survives on the drill: `health / (drillPower * kDrillVsEnemy)`. */

@@ -15,7 +15,7 @@ import {
   readPlanetWorld,
   useGameStore,
 } from '../store/gameStore'
-import { engineStats } from '../systems/economy/vehicleStats'
+import { engineStatsAtStep } from '../systems/economy/vehicleStats'
 import {
   countActionStep,
   NEW_POSE_REPORTER,
@@ -66,7 +66,7 @@ export function createVehicleLoop(): VehicleLoop {
       const result = controller.step(
         {
           intent: stagedIntent,
-          engine: engineStats(vehicle.levels.engine),
+          engine: engineStatsAtStep(vehicle.levels.engine),
           canAct: canVehicleAct(vehicle),
         },
         planetViewOf(loop, params, world),

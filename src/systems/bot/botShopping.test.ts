@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
+import { UPGRADE_IDS } from '../economy/economyDefinition'
+import { stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel } from '../economy/vehicleStats'
 import { leadCeiling } from './botCoreRule'
 import { buyUpgrades } from './botShopping'
@@ -34,9 +36,20 @@ function shopForTheCore(session: BotSession): void {
 }
 
 describe('bot: shopping at the Upgrade bay', () => {
-  it('holds drill power to one level past the planet on-curve level (#86)', () => {
-    expect(leadCeiling('drill_power', 1)).toBe(onCurveLevel('drill_power', 1) + 1)
-    expect(leadCeiling('drill_power', 3)).toBe(onCurveLevel('drill_power', 3) + 1)
+  it('buys one step a command, so a dock visit chains pips and big level-ups (#180)', () => {
+    const session = botAtUpgradeBayOn(2)
+    const before = session.vehicle().levels
+    shopForTheCore(session)
+    const buys = session.commands().filter((command) => command.type === 'buyUpgrade')
+    const after = session.vehicle().levels
+    const stepsBought = UPGRADE_IDS.reduce((total, id) => total + after[id] - before[id], 0)
+    expect(buys.length).toBe(stepsBought)
+    expect(stepsBought).toBeGreaterThan(stepOfMajor(1))
+  })
+
+  it('holds drill power to one major past the planet on-curve level (#86, caps count majors)', () => {
+    expect(leadCeiling('drill_power', 1)).toBe(stepOfMajor(onCurveLevel('drill_power', 1) + 1))
+    expect(leadCeiling('drill_power', 3)).toBe(stepOfMajor(onCurveLevel('drill_power', 3) + 1))
   })
 
   it('stops buying drill power for the core at the ceiling, however much money is left', () => {
@@ -56,13 +69,15 @@ describe('bot: shopping at the Upgrade bay', () => {
   it('buys drill_tip past its on-curve level for the core once drill power is at its cap', () => {
     const session = botAtUpgradeBayOn(4)
     shopForTheCore(session)
-    expect(session.vehicle().levels.drill_tip).toBeGreaterThan(onCurveLevel('drill_tip', 4))
+    expect(session.vehicle().levels.drill_tip).toBeGreaterThan(
+      stepOfMajor(onCurveLevel('drill_tip', 4)),
+    )
   })
 
-  it('stops buying drill_tip for the core at its cap, two levels past on-curve', () => {
+  it('stops buying drill_tip for the core at its cap, two majors past on-curve', () => {
     const session = botAtUpgradeBayOn(4)
     shopForTheCore(session)
-    expect(leadCeiling('drill_tip', 4)).toBe(onCurveLevel('drill_tip', 4) + 2)
+    expect(leadCeiling('drill_tip', 4)).toBe(stepOfMajor(onCurveLevel('drill_tip', 4) + 2))
     expect(session.vehicle().levels.drill_tip).toBe(leadCeiling('drill_tip', 4))
   })
 })

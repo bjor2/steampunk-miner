@@ -22,16 +22,16 @@ const enemyAt = (dxMetres: number, dyMetres: number) =>
 const aimAt = (enemies: Enemy[]) => gunAimTurnOf(TOP, FACING.right, enemies, createAimFrame())
 
 describe('gun look (#107, #108)', () => {
-  it('draws nothing before the mount, then barrel looks 1, 2 and 3 from levels 1, 6 and 12', () => {
+  it('draws nothing before the mount, then barrel looks 1, 2 and 3 from majors 1, 6 and 12', () => {
     expect(gunPartIdsOf(SHIPPED_ART, 0)).toEqual([])
-    expect([1, 5, 6, 11, 12, 16].map(gunLookOf)).toEqual([1, 1, 2, 2, 3, 3])
+    expect([10, 59, 60, 119, 120, 160].map(gunLookOf)).toEqual([1, 1, 2, 2, 3, 3])
   })
 
   it('keeps mount and head at every look and swaps only the barrel', () => {
     for (const [level, barrel] of [
-      [1, 't1-gun-barrel'],
-      [6, 't2-gun-barrel'],
-      [16, 't3-gun-barrel'],
+      [10, 't1-gun-barrel'],
+      [60, 't2-gun-barrel'],
+      [160, 't3-gun-barrel'],
     ] as const) {
       expect(
         gunFixedQuadsOf(SHIPPED_ART, level)
@@ -43,8 +43,8 @@ describe('gun look (#107, #108)', () => {
   })
 
   it('turns the barrel about the trunnion above the hull', () => {
-    expect(gunTrunnionOf(SHIPPED_ART, 1)).toEqual([0.04, 0.64])
-    expect(gunBarrelQuadsOf(SHIPPED_ART, 1)[0].pivot).toEqual([0, 0])
+    expect(gunTrunnionOf(SHIPPED_ART, 10)).toEqual([0.04, 0.64])
+    expect(gunBarrelQuadsOf(SHIPPED_ART, 10)[0].pivot).toEqual([0, 0])
   })
 })
 

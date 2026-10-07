@@ -12,13 +12,21 @@
  * simulator's deadlock (never buying the unblocking drill level) cannot happen: the forced rule
  * saves for that level instead of spending elsewhere. Once nothing of the kernel's pays, the bot
  * tries the slices' registered purchases (`botSlicePurchases.ts`, ticket 211).
+ *
+ * Every track buy is one step (#180): the on-curve rule buys toward its major once the steps left
+ * to it are paid for whole, the forced rule a step at a time. A pip of cargo or boiler may leave
+ * its whole-number stat where it is, and a drill pip may not win a whole tick, so a marginal track
+ * is offered for the fewest next steps, up to its next major, that raise the planned money, priced
+ * together and paid for whole; the bot buys their first step and weighs the offers again.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import { nextUpgradePrice } from '../authority/workshopRules'
 import { nextCasingPrice } from '../authority/casingRules'
 import type { UpgradeId } from '../economy/economyDefinition'
+import { stepPrice } from '../economy/upgradePrices'
+import { minorsPerMajor, pipOf, stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
-import { cmp, div, sub, ZERO_MONEY, type Money } from '../money'
+import { add, cmp, div, sub, ZERO_MONEY, type Money } from '../money'
 import { isCasingGradeShort } from './botCasing'
 import { forcedCoreTrack, isUnderLeadCap } from './botCoreRule'
 import { restockPriceFor } from './botCharges'
@@ -152,14 +160,22 @@ function isRestockDue(session: BotSession, situation: ShoppingSituation): boolea
   return price !== null && canPay(session, price)
 }
 
+/**
+ * A tip or hull pip alone opens no gate, so the rule buys toward the on-curve major only when the
+ * steps left to the next major are paid for whole, as it bought a whole level before #180.
+ */
 function belowCurveAffordable(session: BotSession): UpgradeId | null {
-  const { levels } = session.vehicle()
-  const planetIndex = session.state().planet.index
   return (
     ON_CURVE_FIRST.find(
-      (track) => levels[track] < onCurveLevel(track, planetIndex) && canAfford(session, track),
+      (track) => isBelowCurve(session, track) && canAffordToNextMajor(session, track),
     ) ?? null
   )
+}
+
+/** Short of the planet's on-curve major on this track. */
+function isBelowCurve(session: BotSession, track: UpgradeId): boolean {
+  const onCurveStep = stepOfMajor(onCurveLevel(track, session.state().planet.index))
+  return session.vehicle().levels[track] < onCurveStep
 }
 
 function forcedTrack(session: BotSession, situation: ShoppingSituation): UpgradeId | null {
@@ -167,7 +183,7 @@ function forcedTrack(session: BotSession, situation: ShoppingSituation): Upgrade
   return forcedCoreTrack(session.vehicle().levels, session.state().planet.index)
 }
 
-/** An open track whose next level raises the planned money per tick, and that gain per price. */
+/** An open track whose next steps raise the planned money per tick, and that gain per price. */
 interface MarginalOffer {
   track: UpgradeId
   gainPerPrice: Money
@@ -181,13 +197,46 @@ function bestMarginalPurchase(session: BotSession, layout: MineLayout): UpgradeI
 
 /** Gain and price stay Money: past planet 582 either one is Infinity as a double (#196). */
 function marginalOffers(session: BotSession, layout: MineLayout): MarginalOffer[] {
-  const { levels } = session.vehicle()
-  const now = plannedMoneyPerTick(layout, levels)
+  const now = plannedMoneyPerTick(layout, session.vehicle().levels)
   return openMarginalTracks(session).flatMap((track) => {
-    const gain = sub(plannedMoneyPerTick(layout, { ...levels, [track]: levels[track] + 1 }), now)
-    if (cmp(gain, ZERO_MONEY) <= 0) return []
-    return [{ track, gainPerPrice: div(gain, priceOf(session, track)) }]
+    const offer = marginalOfferOf(session, layout, now, track)
+    return offer === null ? [] : [offer]
   })
+}
+
+/** The fewest next steps, up to the next major, that raise the planned money; null if none pays. */
+function marginalOfferOf(
+  session: BotSession,
+  layout: MineLayout,
+  now: Money,
+  track: UpgradeId,
+): MarginalOffer | null {
+  const { levels } = session.vehicle()
+  const planetIndex = session.state().planet.index
+  let price = ZERO_MONEY
+  for (let steps = 1; steps <= stepsToNextMajor(levels[track]); steps++) {
+    price = add(price, stepPrice(track, levels[track] + steps - 1, planetIndex))
+    const after = { ...levels, [track]: levels[track] + steps }
+    const gain = sub(plannedMoneyPerTick(layout, after), now)
+    if (cmp(gain, ZERO_MONEY) > 0) {
+      return canPay(session, price) ? { track, gainPerPrice: div(gain, price) } : null
+    }
+  }
+  return null
+}
+
+function stepsToNextMajor(step: number): number {
+  return minorsPerMajor() - pipOf(step)
+}
+
+function canAffordToNextMajor(session: BotSession, track: UpgradeId): boolean {
+  const step = session.vehicle().levels[track]
+  const planetIndex = session.state().planet.index
+  let price = ZERO_MONEY
+  for (let at = step; at < step + stepsToNextMajor(step); at++) {
+    price = add(price, stepPrice(track, at, planetIndex))
+  }
+  return canPay(session, price)
 }
 
 /** On a tie the earlier track keeps it, in `MARGINAL_TRACKS` order. */
@@ -195,13 +244,11 @@ function betterOffer(best: MarginalOffer | null, offer: MarginalOffer): Marginal
   return best === null || cmp(offer.gainPerPrice, best.gainPerPrice) > 0 ? offer : best
 }
 
-/** The marginal tracks the bot can pay for and has not capped on this planet. */
+/** The marginal tracks the bot has not capped on this planet. */
 function openMarginalTracks(session: BotSession): UpgradeId[] {
   const { levels } = session.vehicle()
   const planetIndex = session.state().planet.index
-  return MARGINAL_TRACKS.filter(
-    (track) => isUnderLeadCap(levels, track, planetIndex) && canAfford(session, track),
-  )
+  return MARGINAL_TRACKS.filter((track) => isUnderLeadCap(levels, track, planetIndex))
 }
 
 function plannedMoneyPerTick(layout: MineLayout, levels: UpgradeLevels): Money {

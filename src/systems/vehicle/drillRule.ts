@@ -9,6 +9,9 @@
  * exact by working in units scaled by `H^2 * minTicks`: one tick adds `min(D * min(P, H)^2 * m,
  * 60 * H^3)` and the tile breaks at `60 * m * H^3` (m = minTicksPerTile). That is the same tick
  * count as the formula above with no division at all, so it never drifts by a tick.
+ *
+ * The scratch floor is a gate, so it compares the tip of the last completed major (#180 amendment
+ * 2): a cell opens on a big level-up, never on a pip. The efficiency reads the live tip.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { ECONOMY } from '../economy/economy'
@@ -26,6 +29,8 @@ import {
 export interface DrillStats {
   drillPower: BigStat
   drillTip: BigStat
+  /** The tip of the last completed major, which the scratch floor compares. */
+  gateTip: BigStat
 }
 
 const TICKS = fromSafeInteger(TICKS_PER_SECOND)
@@ -37,15 +42,15 @@ export function canScratch(tip: BigStat, hardness: BigStat): boolean {
 }
 
 /** `eff` of #7: 0 below the scratch floor, else `min(1, P/H)^2`. */
-export function drillEfficiency(tip: BigStat, hardness: BigStat): BigStat {
-  if (!canScratch(tip, hardness)) return ZERO_MONEY
-  const ratio = div(effectiveTip(tip, hardness), hardness)
+export function drillEfficiency(drill: DrillStats, hardness: BigStat): BigStat {
+  if (!canScratch(drill.gateTip, hardness)) return ZERO_MONEY
+  const ratio = div(effectiveTip(drill.drillTip, hardness), hardness)
   return mul(ratio, ratio)
 }
 
 /** The drill work one tick adds to a tile of this hardness (see the module comment). */
 export function drillWorkPerTick(drill: DrillStats, hardness: BigStat): BigStat {
-  if (!canScratch(drill.drillTip, hardness)) return ZERO_MONEY
+  if (!canScratch(drill.gateTip, hardness)) return ZERO_MONEY
   const tip = effectiveTip(drill.drillTip, hardness)
   const uncapped = mul(mul(drill.drillPower, mul(tip, tip)), MIN_TICKS)
   return smallerOf(uncapped, capPerTick(hardness))
@@ -69,7 +74,7 @@ export function ticksPerTile(drill: DrillStats, hardness: BigStat): number | nul
  */
 export function drillDamage(drill: DrillStats, hardness: BigStat, ticks: number): BigStat {
   const perSecond = smallerOf(
-    mul(drill.drillPower, drillEfficiency(drill.drillTip, hardness)),
+    mul(drill.drillPower, drillEfficiency(drill, hardness)),
     div(mul(hardness, TICKS), MIN_TICKS),
   )
   return div(mul(perSecond, fromSafeInteger(ticks)), TICKS)

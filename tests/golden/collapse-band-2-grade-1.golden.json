@@ -28,7 +28,7 @@
       "type": "debug.setUpgrade",
       "payload": {
         "upgradeId": "drill_tip",
-        "level": 8
+        "level": 80
       }
     },
     {
@@ -38,7 +38,7 @@
       "type": "debug.setUpgrade",
       "payload": {
         "upgradeId": "drill_power",
-        "level": 8
+        "level": 80
       }
     },
     {
@@ -2827,7 +2827,7 @@
     {
       "tick": 2125,
       "scope": "end",
-      "digest": "1a20d18feca0705c"
+      "digest": "9938eb0355dce82e"
     }
   ],
   "minedOrder": [

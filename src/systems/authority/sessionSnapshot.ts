@@ -56,6 +56,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
+ * 19: each track's level and the guns' level are steps `10L + k` (#180 section 3, #181), so an
+ * older save's levels migrate x10 (`saveMigrations.ts`);
  * 18: the live blasts, each with its front cursor and running totals, and the queued power-up
  * terrain edits (K6 #189); 17: the vehicle's loadout as its `loadout` section v1 (K4, #162); 16: heat, lava and the lining types (#113, #96): the vehicle's lining and heat gauge, typed
  * casing values, the lava layer of chunk deltas and the loose lava; 15: each vehicle's charge
@@ -69,7 +71,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 18
+export const SNAPSHOT_VERSION = 19
 
 export interface SessionSnapshot {
   snapshotVersion: number

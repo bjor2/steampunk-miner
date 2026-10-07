@@ -229,7 +229,7 @@ describe('game store: run log', () => {
 describe('game store: vehicle', () => {
   it('copies the vehicle from the authority after a debug command', () => {
     game().setEnergy('37.5')
-    game().setUpgrade('cargo_hold', 2)
+    game().setUpgrade('cargo_hold', 20)
     expect(game().vehicle).toMatchObject({ energy: 9000, cargoCapacity: 18, mode: 'active' })
   })
 
@@ -289,7 +289,7 @@ describe('game store: camera mode', () => {
 describe('game store: vehicle look', () => {
   it('shows visual tier 1 at the start and tier 2 once the levels reach the threshold', () => {
     expect(game().vehicle.visualTier).toBe(1)
-    game().setUpgrade('drill_tip', 8)
+    game().setUpgrade('drill_tip', 80)
     expect(game().vehicle.visualTier).toBe(2)
   })
 })

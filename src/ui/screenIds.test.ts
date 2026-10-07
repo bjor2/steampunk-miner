@@ -337,8 +337,8 @@ function renderUpgradeBay(): string[] {
  */
 function renderRefineryScreens(): string[] {
   const session = sessionOnPlanet(3, '1e30')
-  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 25 } })
-  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 13 } })
+  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 250 } })
+  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 130 } })
   const tick = mineSurfaceOre(session, 10, 6)
   dockAtBayOf(session, tick, REFINERY_SITE, 'refinery')
   const tier = Number.parseInt(Object.keys(session.vehicle().cargo.ore)[0], 10)
@@ -432,7 +432,7 @@ function renderAtArtefactCache(): string[] {
 /** The HUD with the guns held back by low steam, then planet 4's Upgrade bay offering their next level (#107). */
 function renderWithGuns(): string[] {
   const session = createScriptedSession()
-  session.submit(1, setGunLevelCommand(1))
+  session.submit(1, setGunLevelCommand(10))
   session.submit(1, setEnergyCommand('37.75'))
   const hud = selectHudModel({
     state: session.state(),
@@ -590,7 +590,8 @@ describe('screen ids (#33 acceptance 12)', () => {
   })
 
   it('marks the preview with the focused track and the tier after its purchase, digest untouched', () => {
-    game().setUpgrade('boiler', 7)
+    game().setUpgrade('boiler', 70)
+    game().setUpgrade('engine', 9)
     game().teleportToDock('upgrade')
     const digest = takeSessionSnapshot().digest
     game().moveFocus(1)

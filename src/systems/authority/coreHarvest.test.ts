@@ -20,9 +20,11 @@ import {
   typesOf,
   type ScriptedSession,
 } from './scriptedSession'
+import { stepOfMajor } from '../economy/upgradeSteps'
 
+/** A track at major `level`, sent as its step (#180). */
 const setUpgrade = (upgradeId: string, level: number) =>
-  ({ type: 'debug.setUpgrade', payload: { upgradeId, level } }) as const
+  ({ type: 'debug.setUpgrade', payload: { upgradeId, level: stepOfMajor(level) } }) as const
 
 const dock = { type: 'dock', payload: { bay: 'sell' } } as const
 const undock = { type: 'undock', payload: {} } as const

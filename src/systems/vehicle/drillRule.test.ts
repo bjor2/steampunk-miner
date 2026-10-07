@@ -13,7 +13,12 @@ import {
 import { ENERGY_QUANTA_PER_TICK, quantaOfUnitText } from './energyQuanta'
 
 const m = fromCanonical
-const LEVEL_0: DrillStats = { drillPower: drillPower(0), drillTip: drillTip(0) }
+
+/** A drill whose live tip is its gate tip: a vehicle at a major. */
+function drillOf(drillPower: BigStat, drillTip: BigStat): DrillStats {
+  return { drillPower, drillTip, gateTip: drillTip }
+}
+const LEVEL_0: DrillStats = drillOf(drillPower(0), drillTip(0))
 
 /** Ticks of accumulated work until the tile breaks, as the authority adds it. */
 function ticksByAccumulating(drill: DrillStats, hardness: BigStat): number {
@@ -28,6 +33,15 @@ function ticksByAccumulating(drill: DrillStats, hardness: BigStat): number {
 }
 
 describe('drill rule', () => {
+  it('opens a cell on the tip of the last completed major, never on a live pip past the floor', () => {
+    const hardness = m('8')
+    const onPip = { drillPower: m('1.5'), drillTip: m('2.1'), gateTip: m('1.9') }
+    expect(canScratch(onPip.drillTip, hardness)).toBe(true)
+    expect(ticksPerTile(onPip, hardness)).toBeNull()
+    expect(drillDamage(onPip, hardness, 60)).toEqual(ZERO_MONEY)
+    expect(ticksPerTile({ ...onPip, gateTip: m('2') }, hardness)).not.toBeNull()
+  })
+
   it('takes 40, 79, 156, 308 and 608 ticks for bands 1 to 5 at level 0 on planet 1', () => {
     const ticks = [1, 2, 3, 4, 5].map((band) => ticksPerTile(LEVEL_0, blockHardness(1, band)))
     expect(ticks).toEqual([40, 79, 156, 308, 608])
@@ -38,7 +52,7 @@ describe('drill rule', () => {
   })
 
   it('caps the tile speed at 24 ticks with drill_power level 20 on hardness 1', () => {
-    expect(ticksPerTile({ drillPower: drillPower(20), drillTip: drillTip(0) }, m('1'))).toBe(24)
+    expect(ticksPerTile(drillOf(drillPower(20), drillTip(0)), m('1'))).toBe(24)
   })
 
   it('breaks a tile after exactly ticksPerTile ticks of accumulated work', () => {
@@ -50,14 +64,14 @@ describe('drill rule', () => {
 
   it('takes four times the ticks, so four times the energy, when H is twice the tip', () => {
     const hardness = m('2')
-    const fullTip = ticksPerTile({ drillPower: m('1.5'), drillTip: m('2') }, hardness) ?? 0
-    const halfTip = ticksPerTile({ drillPower: m('1.5'), drillTip: m('1') }, hardness) ?? 0
+    const fullTip = ticksPerTile(drillOf(m('1.5'), m('2')), hardness) ?? 0
+    const halfTip = ticksPerTile(drillOf(m('1.5'), m('1')), hardness) ?? 0
     expect(halfTip).toBe(4 * fullTip)
     expect(halfTip * ENERGY_QUANTA_PER_TICK.drill).toBe(4 * fullTip * ENERGY_QUANTA_PER_TICK.drill)
   })
 
   it('cannot scratch a tile harder than four times the tip', () => {
-    const drill = { drillPower: m('1e9'), drillTip: m('1') }
+    const drill = drillOf(m('1e9'), m('1'))
     expect(canScratch(m('1'), m('4.0001'))).toBe(false)
     expect(drillWorkPerTick(drill, m('4.0001'))).toEqual(ZERO_MONEY)
     expect(ticksPerTile(drill, m('4.0001'))).toBeNull()

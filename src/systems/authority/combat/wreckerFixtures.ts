@@ -4,6 +4,7 @@
  * on its curve there, and a 40 m tunnel dug and lined at grade 2 on planet 6, long enough for its
  * route to call a wrecker.
  */
+import { stepOfMajor } from '../../economy/upgradeSteps'
 import { onCurveLevel } from '../../economy/vehicleStats'
 import type { CommandIntent } from '../authorityCommand'
 import { digAlong } from '../collapse/collapseFixtures'
@@ -39,6 +40,6 @@ function onPlanetIntents(planetIndex: number): CommandIntent[] {
 function onCurveDrill(upgradeId: 'drill_tip' | 'drill_power', planetIndex: number): CommandIntent {
   return {
     type: 'debug.setUpgrade',
-    payload: { upgradeId, level: onCurveLevel(upgradeId, planetIndex) },
+    payload: { upgradeId, level: stepOfMajor(onCurveLevel(upgradeId, planetIndex)) },
   }
 }

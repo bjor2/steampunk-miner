@@ -11,7 +11,7 @@ import {
 } from '../authority/scriptedSession'
 import type { DomainEvent } from '../authority/domainEvent'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
-import { upgradePrice } from '../economy/upgradePrices'
+import { stepPrice } from '../economy/upgradePrices'
 import { cmp, fromCanonical, sub, toCanonical } from '../money'
 import { dockCommand, undockCommand } from '../platform/platformCommands'
 import { dockedPoseAt, FACING } from '../vehicle/vehiclePose'
@@ -21,8 +21,8 @@ import { HINT_TABLE } from './hintTable'
 const GAP = HINT_TABLE.minTicksBetweenHints
 
 /** The cheapest first level of any track; the casing grade (48) costs more. */
-function cheapestLevel0Price() {
-  const prices = UPGRADE_IDS.map((upgradeId) => upgradePrice(upgradeId, 0, 1))
+function cheapestFirstStepPrice() {
+  const prices = UPGRADE_IDS.map((upgradeId) => stepPrice(upgradeId, 0, 1))
   return prices.reduce((cheapest, price) => (cmp(price, cheapest) < 0 ? price : cheapest))
 }
 
@@ -199,7 +199,9 @@ describe('hint board: the Upgrade bay hint (#58)', () => {
   })
 
   it('waits while the money is short of every upgrade and of the next casing grade', () => {
-    const watched = atSellBayWith(toCanonical(sub(cheapestLevel0Price(), fromCanonical('0.001'))))
+    const watched = atSellBayWith(
+      toCanonical(sub(cheapestFirstStepPrice(), fromCanonical('0.001'))),
+    )
     expect(watched.step().board.shown).toBeNull()
     expect(watched.step().board.queued).toEqual([])
   })
@@ -223,7 +225,8 @@ describe('hint board: the Upgrade bay hint (#58)', () => {
       'cargo_hold',
       'hull',
     ]) {
-      watched.submit(1, { type: 'debug.setUpgrade', payload: { upgradeId, level: 6 } })
+      // Major 20: even one step of every track costs more than the casing grade's 48.
+      watched.submit(1, { type: 'debug.setUpgrade', payload: { upgradeId, level: 200 } })
     }
     watched.submit(5, grant('48'))
     watched.submit(10, dockCommand('sell'))

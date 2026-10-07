@@ -47,8 +47,11 @@ const DESTROY_AND_TOW_TICKS = 300
 const TRIP_END_TICK = 4000
 /** Ore here sells for about 5e42 a unit (`V(t) = 10 * 1.5^(t-1)`, #6), so a sale earns past 1e40. */
 const RICH_PLANET = 80
-/** A cargo_hold level whose next price is about 4e40 (`24 * 1.225^L`, #6, #195), so a purchase spends past 1e40. */
-const RICH_CARGO_LEVEL = 445
+/**
+ * A cargo_hold major whose first step costs about 4e40 (near a tenth of `24 * 1.225^L`, #6, #195,
+ * #180), so a purchase spends past 1e40.
+ */
+const RICH_CARGO_LEVEL = 457
 const RICH_TIP_LEVEL = 240
 const RICH_DRILL_LEVEL = 500
 const MIXED_ORE_COUNT = 6

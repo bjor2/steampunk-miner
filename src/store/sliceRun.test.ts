@@ -25,6 +25,7 @@ import {
   useGameStore,
 } from './gameStore'
 import { recordStartingPlanetEntered } from './planetArrivalLog'
+import { stepOfMajor } from '../systems/economy/upgradeSteps'
 
 let sink: ReturnType<typeof createMemorySink>
 
@@ -131,9 +132,9 @@ function earnAndBuyEveryTrack(): void {
  * pacing bot's job (#29); this scenario step sets them, logged as debug commands.
  */
 function equipForCore(tipLevel: number, cargoHold: number): void {
-  game().setUpgrade('drill_tip', tipLevel)
-  game().setUpgrade('drill_power', 60)
-  game().setUpgrade('cargo_hold', cargoHold)
+  game().setUpgrade('drill_tip', stepOfMajor(tipLevel))
+  game().setUpgrade('drill_power', stepOfMajor(60))
+  game().setUpgrade('cargo_hold', stepOfMajor(cargoHold))
 }
 
 function harvestCore(params: PlanetParams, count: number): void {

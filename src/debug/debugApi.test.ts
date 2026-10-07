@@ -345,18 +345,18 @@ describe('debug api: vehicle', () => {
     ])
   })
 
-  it('adds the guns turret to the vehicle parts once mounted, its barrel look by level (#107)', () => {
+  it('adds the guns turret to the vehicle parts once mounted, its barrel look by major (#107)', () => {
     const debug = createDebugApi()
     expect(debug.vehicleParts()).toMatchObject({ gunLevel: 0 })
     expect(debug.vehicleParts()).not.toMatchObject({
       partIds: expect.arrayContaining(['t1-turret-mount']),
     })
-    expect(debug.setGunLevel(1)).toEqual({ ok: true })
+    expect(debug.setGunLevel(10)).toEqual({ ok: true })
     expect(debug.vehicleParts()).toMatchObject({
-      gunLevel: 1,
+      gunLevel: 10,
       partIds: expect.arrayContaining(['t1-turret-mount', 't1-turret-head', 't1-gun-barrel']),
     })
-    debug.setGunLevel(12)
+    debug.setGunLevel(120)
     expect(debug.vehicleParts()).toMatchObject({
       partIds: expect.arrayContaining(['t3-gun-barrel']),
     })
@@ -386,9 +386,9 @@ describe('debug api: vehicle', () => {
     expect(debug.vehicleParts()).toMatchObject({ rackCharges: null })
   })
 
-  it('refuses a gun level above the top of the gun track, applying nothing', () => {
+  it('refuses a gun step above the top of the gun track, applying nothing', () => {
     const debug = createDebugApi()
-    expect(debug.setGunLevel(17)).toMatchObject({ ok: false })
+    expect(debug.setGunLevel(161)).toMatchObject({ ok: false })
     expect(debug.vehicleParts()).toMatchObject({ gunLevel: 0 })
   })
 
@@ -422,10 +422,10 @@ describe('debug api: vehicle', () => {
     ['drill tracks first', ['drill_power', 'drill_tip', 'engine', 'boiler', 'cargo_hold', 'hull']],
     ['hull first', ['hull', 'cargo_hold', 'boiler', 'engine', 'drill_tip', 'drill_power']],
   ])('crosses T2 then T3 with one tier change logged each, in any order (%s)', (_order, tracks) => {
-    // T2 = 8 and T3 = 20 (#20): levels of 4 per track sum 4, 8, ..., 24.
+    // T2 = 8 and T3 = 20 (#20): 4 majors per track (step 40) sum 4, 8, ..., 24.
     const debug = createDebugApi()
     const tiers = tracks.map((track) => {
-      debug.setUpgrade(track, 4)
+      debug.setUpgrade(track, 40)
       return game().vehicle.visualTier
     })
     expect(tiers).toEqual([1, 2, 2, 2, 3, 3])

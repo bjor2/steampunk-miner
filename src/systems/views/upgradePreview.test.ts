@@ -6,6 +6,7 @@ import type { UpgradeId } from '../economy/economyDefinition'
 import { buyUpgradeCommand } from '../platform/platformCommands'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
+import { stepOfMajor } from '../economy/upgradeSteps'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import { selectUpgradeBayModel } from './upgradeBayModel'
 import { gaugeTicksOf } from './upgradePreview'
@@ -14,13 +15,23 @@ type Session = ReturnType<typeof createScriptedSession>
 
 const [T2, T3] = ECONOMY.visualTiers.slice(1).map((threshold) => threshold.minTotalLevel)
 
-function atUpgradeBay(levels: Partial<Record<UpgradeId, number>> = {}): Session {
+/** Docked at the Upgrade bay with these major levels, then these tracks at these steps (#180). */
+function atUpgradeBay(
+  majors: Partial<Record<UpgradeId, number>> = {},
+  steps: Partial<Record<UpgradeId, number>> = {},
+): Session {
   const session = createScriptedSession()
   session.submit(1, grantMoneyCommand('1e6'))
-  Object.entries(levels).forEach(([id, level]) => session.submit(1, setUpgradeCommand(id, level)))
+  Object.entries(majors).forEach(([id, level]) =>
+    session.submit(1, setUpgradeCommand(id, stepOfMajor(level))),
+  )
+  Object.entries(steps).forEach(([id, step]) => session.submit(1, setUpgradeCommand(id, step)))
   dockInBay(session, 2, 'upgrade')
   return session
 }
+
+/** The step before a track's first major: its next buy is the big level-up. */
+const BEFORE_MAJOR = 9
 
 function previewOf(
   session: Session,
@@ -60,8 +71,12 @@ describe('upgrade bay preview', () => {
     expect(preview).toMatchObject({ ownedTier: 3, gauge: { owned: 2, span: null } })
   })
 
-  it('shows the pending tick and the stats before and after with a track focused', () => {
-    const session = atUpgradeBay()
+  it('shows no pending tick for a focused pip, which adds no major', () => {
+    expect(previewOf(atUpgradeBay(), buyIdOf('cargo_hold')).gauge.pending).toBe(0)
+  })
+
+  it('shows the pending tick and the stats before and after with a big level-up focused', () => {
+    const session = atUpgradeBay({}, { cargo_hold: BEFORE_MAJOR })
     const preview = previewOf(session, buyIdOf('cargo_hold'))
     const row = selectUpgradeBayModel(session.state(), 'p1', {
       isTravelArmed: false,
@@ -75,12 +90,15 @@ describe('upgrade bay preview', () => {
   })
 
   it('ghosts the next tier when the focused buy crosses T2, and keeps the owned shape solid', () => {
-    const preview = previewOf(atUpgradeBay({ boiler: 7 }), buyIdOf('engine'))
+    const preview = previewOf(
+      atUpgradeBay({ boiler: 7 }, { engine: BEFORE_MAJOR }),
+      buyIdOf('engine'),
+    )
     expect(preview).toMatchObject({ visualTier: 2, ownedTier: 1, ghostTier: 2 })
   })
 
   it('ghosts tier 3 when the focused buy crosses T3', () => {
-    const preview = previewOf(atUpgradeBay({ boiler: 19 }), buyIdOf('hull'))
+    const preview = previewOf(atUpgradeBay({ boiler: 19 }, { hull: BEFORE_MAJOR }), buyIdOf('hull'))
     expect(preview).toMatchObject({ visualTier: 3, ownedTier: 2, ghostTier: 3 })
   })
 
@@ -102,7 +120,7 @@ describe('upgrade bay preview', () => {
   })
 
   it('opens on the first track, so the screen starts with its pending tick shown', () => {
-    expect(previewOf(atUpgradeBay())).toMatchObject({
+    expect(previewOf(atUpgradeBay({}, { drill_power: BEFORE_MAJOR }))).toMatchObject({
       highlight: 'drill_power',
       gauge: { pending: 1 },
     })
@@ -113,7 +131,7 @@ describe('upgrade bay preview', () => {
   })
 
   it('reports the part being installed, and the new tier once the buy is through', () => {
-    const session = atUpgradeBay({ boiler: 7 })
+    const session = atUpgradeBay({ boiler: 7 }, { engine: BEFORE_MAJOR })
     session.submit(3, buyUpgradeCommand('engine'))
     expect(previewOf(session, null, 'engine')).toMatchObject({
       installing: 'engine',

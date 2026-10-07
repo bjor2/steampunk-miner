@@ -4,7 +4,9 @@ import { canonicalStatsOf } from '../vehicle/vehicleStatsView'
 import { FACING, bayPoseAt, dockedPoseAt } from '../vehicle/vehiclePose'
 import type { BayId } from '../world/dockBays'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
-import { upgradePrice } from '../economy/upgradePrices'
+import { stepPrice } from '../economy/upgradePrices'
+import { stepOfMajor } from '../economy/upgradeSteps'
+import { hullMaxAtStep } from '../economy/vehicleStats'
 import { add, fromCanonical, sub, toCanonical, ZERO_MONEY } from '../money'
 import type { CommandIntent } from './authorityCommand'
 import { canDock, dockedBayOf } from './dockRules'
@@ -86,9 +88,9 @@ function mineOreAndDock(session: ScriptedSession, count: number, startTick = 10)
 /** Mining at the core, where crawlers live: frozen so the spec sees only the platform's rules. */
 function equipForCore(session: ScriptedSession): void {
   session.submit(0, FREEZE_ENEMIES)
-  session.submit(0, setUpgrade('drill_tip', 7))
-  session.submit(0, setUpgrade('drill_power', 60))
-  session.submit(0, setUpgrade('cargo_hold', 20))
+  session.submit(0, setUpgrade('drill_tip', stepOfMajor(7)))
+  session.submit(0, setUpgrade('drill_power', stepOfMajor(60)))
+  session.submit(0, setUpgrade('cargo_hold', stepOfMajor(20)))
 }
 
 function mineCore(
@@ -454,9 +456,9 @@ describe('platform: workshop', () => {
     return session
   }
 
-  it('charges each of the six tracks its curve price for level 0', () => {
+  it('charges each of the six tracks the price of its first step', () => {
     const session = dockedWithMoney('1000')
-    const prices = UPGRADE_IDS.map((id) => upgradePrice(id, 0, 1))
+    const prices = UPGRADE_IDS.map((id) => stepPrice(id, 0, 1))
     const costs = UPGRADE_IDS.map((id) => session.submit(2, buy(id))[0])
     expect(costs.map((event) => (event.type === 'UpgradePurchased' ? event.cost : ''))).toEqual(
       prices.map(toCanonical),
@@ -466,15 +468,21 @@ describe('platform: workshop', () => {
     )
   })
 
-  it('prices level 1 at ceil(base * ratio)', () => {
+  it('charges the ten steps of major 1 its level price ceil(base * ratio) (#180)', () => {
     const session = dockedWithMoney('1000')
-    session.submit(2, buy('cargo_hold'))
-    session.submit(2, buy('drill_tip'))
-    expect(session.submit(3, buy('cargo_hold'))[0]).toMatchObject({ cost: '3e+1' })
-    expect(session.submit(3, buy('drill_tip'))[0]).toMatchObject({ cost: '1.25e+2' })
+    const costOfMajor = (id: string, tick: number) =>
+      Array.from({ length: 10 }, () => session.submit(tick, buy(id))[0])
+        .map((event) =>
+          event.type === 'UpgradePurchased' ? fromCanonical(event.cost) : ZERO_MONEY,
+        )
+        .reduce(add, ZERO_MONEY)
+    costOfMajor('cargo_hold', 2)
+    costOfMajor('drill_tip', 2)
+    expect(toCanonical(costOfMajor('cargo_hold', 3))).toBe('3e+1')
+    expect(toCanonical(costOfMajor('drill_tip', 3))).toBe('1.25e+2')
   })
 
-  it('logs the purchase with the levels, curve, tier and the stats at the new level', () => {
+  it('logs the purchase with the steps, majors, curve, tier and the stats at the new step', () => {
     const session = dockedWithMoney('100')
     const [event] = session.submit(2, buy('hull'))
     const levels = { ...session.vehicle().levels }
@@ -487,18 +495,38 @@ describe('platform: workshop', () => {
         kind: 'vertical',
         fromLevel: 0,
         toLevel: 1,
-        cost: toCanonical(upgradePrice('hull', 0, 1)),
+        fromMajor: 0,
+        toMajor: 0,
+        isMajor: false,
+        cost: toCanonical(stepPrice('hull', 0, 1)),
         costCurveId: 'cost.vehicle.hull',
-        totalLevel: 1,
+        totalLevel: 0,
         visualTier: 1,
         statsAfter: 'stats' in stats ? canonicalStatsOf(stats.stats) : {},
       }),
     )
+    expect(event.type === 'UpgradePurchased' && event.statsAfter.hullMax).toBe(
+      toCanonical(hullMaxAtStep(1)),
+    )
+  })
+
+  it('logs the tenth step of a major as the big level-up, at the level 1 stats', () => {
+    const session = dockedWithMoney('1000')
+    session.submit(2, setUpgrade('hull', 9))
+    const [event] = session.submit(3, buy('hull'))
+    expect(event).toMatchObject({
+      fromLevel: 9,
+      toLevel: 10,
+      fromMajor: 0,
+      toMajor: 1,
+      isMajor: true,
+      totalLevel: 1,
+    })
     expect(event.type === 'UpgradePurchased' && event.statsAfter.hullMax).toBe('1.12e+2')
   })
 
   it('refuses an unaffordable purchase with no state change and no purchase event', () => {
-    const session = dockedWithMoney('71.999')
+    const session = dockedWithMoney('6.999')
     const before = session.state().players
     const events = session.submit(2, buy('drill_tip'))
     expect(typesOf(events)).toEqual(['CommandRejected'])
@@ -523,7 +551,7 @@ describe('platform: workshop', () => {
     expect(session.vehicle('p2').levels).toMatchObject({ engine: 0, boiler: 1 })
   })
 
-  it('logs the visual tier change once at 8 levels and once at 20, in any purchase order', () => {
+  it('logs the visual tier change once at 8 majors and once at 20, in any purchase order', () => {
     const tiersOf = (order: readonly string[]) => {
       const session = dockedWithMoney('1e9')
       const changes = order.flatMap((id, index) =>
@@ -534,12 +562,13 @@ describe('platform: workshop', () => {
       )
       return changes.map(({ purchase, event }) => [purchase, event])
     }
-    const roundRobin = Array.from({ length: 20 }, (_, index) => SIX_TRACKS[index % 6])
-    const oneTrackFirst = [...Array(12).fill('boiler'), ...Array(8).fill('cargo_hold')]
+    const majorsOf = (tracks: readonly string[]) => tracks.flatMap((id) => Array(10).fill(id))
+    const roundRobin = majorsOf(Array.from({ length: 20 }, (_, index) => SIX_TRACKS[index % 6]))
+    const oneTrackFirst = majorsOf([...Array(12).fill('boiler'), ...Array(8).fill('cargo_hold')])
     for (const order of [roundRobin, oneTrackFirst]) {
       expect(tiersOf(order)).toEqual([
-        [8, expect.objectContaining({ visualTier: 2 })],
-        [20, expect.objectContaining({ visualTier: 3 })],
+        [80, expect.objectContaining({ visualTier: 2 })],
+        [200, expect.objectContaining({ visualTier: 3 })],
       ])
     }
   })

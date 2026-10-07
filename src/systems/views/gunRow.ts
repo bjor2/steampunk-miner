@@ -1,18 +1,20 @@
 /**
  * The Upgrade bay's Guns row (#107 design): shown once `auto_guns` is unlocked on this planet or
  * the guns are already bolted on, and nothing before (#90 vision stub rule). Before the mount the
- * row offers the mount; after it, the next level of the gun track with its rate "now -> next";
+ * row offers the mount; after it, the next step of the gun track with its rate "now -> next";
  * at the cap it says so and its Buy carries `max_level`.
  */
 import type { AuthorityState } from '../authority/authorityState'
-import { gunOf, isGunOffered, nextGunPriceOf } from '../authority/gunRules'
+import { gunOf, isGunOffered, nextGunPriceOf, nextGunStep } from '../authority/gunRules'
 import { GUN_ICON_ID } from '../art/artIds'
-import { gunMaxLevel, gunShotsPerSecond } from '../economy/gunStats'
+import { gunShotsPerSecond, gunTopStep } from '../economy/gunStats'
+import { majorOf } from '../economy/upgradeSteps'
 import { buyGunCommand } from '../platform/platformCommands'
 import { isGunMounted, type VehicleGun } from '../vehicle/vehicleGun'
 import { KERNEL_ITEMS } from '../registries/kernelItems'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { UI_IDS } from './screenIds'
+import { stepLevelText } from './stepLevelText'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
 
@@ -20,7 +22,7 @@ export interface GunRow {
   iconId: string
   label: string
   level: number
-  /** "Mount", "1 → 2" or "16 (top)". */
+  /** "Mount", "1 · 3/9 → 1 · 4/9" or "16 (top)". */
   levelText: string
   /** The fire rate the buy gives: "2 shots/s", or "2 → 2.07 shots/s". */
   effectText: string
@@ -73,7 +75,11 @@ export function gunRowOf(state: AuthorityState, playerId: string): GunRow | null
 
 function badgeOf(gun: VehicleGun): RowBadge {
   if (!isGunMounted(gun)) return 'locked'
-  return gun.level >= gunMaxLevel() ? 'maxed' : null
+  return isGunAtTop(gun) ? 'maxed' : null
+}
+
+function isGunAtTop(gun: VehicleGun): boolean {
+  return gun.level >= gunTopStep()
 }
 
 function buyLabelOf(gun: VehicleGun): string {
@@ -82,14 +88,14 @@ function buyLabelOf(gun: VehicleGun): string {
 
 function levelTextOf(gun: VehicleGun): string {
   if (!isGunMounted(gun)) return 'Mount'
-  if (gun.level >= gunMaxLevel()) return `${gun.level} (top)`
-  return `${gun.level} → ${gun.level + 1}`
+  if (isGunAtTop(gun)) return `${majorOf(gun.level)} (top)`
+  return `${stepLevelText(gun.level)} → ${stepLevelText(nextGunStep(gun))}`
 }
 
 function effectTextOf(gun: VehicleGun): string {
-  if (!isGunMounted(gun)) return `${rateText(gun.level + 1)} shots/s`
-  if (gun.level >= gunMaxLevel()) return `${rateText(gun.level)} shots/s`
-  return `${rateText(gun.level)} → ${rateText(gun.level + 1)} shots/s`
+  if (!isGunMounted(gun)) return `${rateText(nextGunStep(gun))} shots/s`
+  if (isGunAtTop(gun)) return `${rateText(gun.level)} shots/s`
+  return `${rateText(gun.level)} → ${rateText(nextGunStep(gun))} shots/s`
 }
 
 function rateText(level: number): string {

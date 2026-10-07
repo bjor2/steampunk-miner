@@ -12,6 +12,7 @@ import {
   poseInBayOf,
   sessionOnPlanet,
 } from './refineryFixtures'
+import { stepOfMajor } from '../../economy/upgradeSteps'
 
 const TIER = oreTier(3, 1)
 const REFINE_TICKS = 180 * 60
@@ -19,8 +20,9 @@ const buySlot = { type: 'buyRefinerySlot', payload: {} } as const
 const collect = { type: 'collectRefined', payload: {} } as const
 const queue = (units: number) =>
   ({ type: 'queueRefine', payload: { resourceTier: TIER, units } }) as const
+/** A track at major `level`, sent as its step (#180). */
 const setUpgrade = (upgradeId: string, level: number) =>
-  ({ type: 'debug.setUpgrade', payload: { upgradeId, level } }) as const
+  ({ type: 'debug.setUpgrade', payload: { upgradeId, level: stepOfMajor(level) } }) as const
 
 const rejectionOf = (events: readonly DomainEvent[]) =>
   events.find((event) => event.type === 'CommandRejected')

@@ -1,9 +1,9 @@
 /**
- * The vehicle's `auto_guns` turret (#107 design): its level (0 before the mount, 1 once mounted,
- * up to the gun track's cap) and the HUD toggle. The guns start on Auto when mounted; Off saves the
+ * The vehicle's `auto_guns` turret (#107 design): its level, a step like the tracks' (#180: 0
+ * before the mount, 10 once mounted, up to 16 majors) and the HUD toggle. The guns start on Auto when mounted; Off saves the
  * boiler for drilling. Part of the vehicle, so it is saved and travels with the vehicle.
  */
-import { gunMountLevel } from '../economy/gunStats'
+import { gunMountStep } from '../economy/gunStats'
 import { GUN_SHOT_QUANTA, rescueFloorQuanta } from './energyQuanta'
 import type { VehicleState } from './vehicleState'
 
@@ -19,7 +19,7 @@ export interface VehicleGun {
 export const NO_GUN: VehicleGun = { level: 0, mode: 'auto' }
 
 export function isGunMounted(gun: VehicleGun): boolean {
-  return gun.level >= gunMountLevel()
+  return gun.level >= gunMountStep()
 }
 
 export function isGunMode(value: unknown): value is GunMode {

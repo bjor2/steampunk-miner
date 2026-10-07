@@ -1,0 +1,154 @@
+{
+  "formatVersion": 1,
+  "snapshotVersion": 18,
+  "generatorVersion": 6,
+  "saveEpoch": 7,
+  "tick": 1,
+  "digest": "815d6d24453f50e9",
+  "world": {
+    "saveEpoch": 7,
+    "worldSeed": 83921,
+    "planetIndex": 5,
+    "params": {
+      "worldSeed": 83921,
+      "planetIndex": 5,
+      "planetSeed": 2707927653,
+      "radiusTiles": 580,
+      "coreRadiusTiles": 10,
+      "bandStartsHalfTileSq": [1138915, 568516, 164836, 13456],
+      "oreDensityBp": [1000, 1400, 1800, 2000, 2200],
+      "patchMeanCells": [12, 16, 20, 24, 28],
+      "patchSeedChanceBp": [8420, 8870, 8980, 8220, 8800],
+      "caveThresholdBp": 7500,
+      "padFirstColumn": -8,
+      "padLastColumn": 12,
+      "dockClearanceTiles": 8,
+      "dockBays": ["sell", "upgrade", "refinery"],
+      "archetypeId": "archetype.heavy",
+      "gravityMultiplier": 1.25,
+      "paletteId": "palette.planet_2",
+      "familyWeights": {
+        "metal": 1,
+        "crystal": 2
+      },
+      "hasStarterVein": false,
+      "artefactCacheBand": 2
+    },
+    "chunks": {},
+    "platform": {
+      "coreBay": 0,
+      "visualState": "outpost",
+      "refinerySlots": [null]
+    },
+    "core": {
+      "reachedTick": null,
+      "harvestedTiles": 0,
+      "isCompleted": false
+    },
+    "combat": {
+      "isFrozen": false,
+      "nextEnemyNumber": 1,
+      "enemies": [],
+      "usedSpawnPointIds": [],
+      "encounteredKinds": [],
+      "vehicles": {},
+      "routes": {}
+    },
+    "collapse": {
+      "blocks": []
+    },
+    "lava": {
+      "loose": [],
+      "nextStepTick": null
+    },
+    "liveBlasts": [],
+    "terrainEdits": [],
+    "debugApplied": true
+  },
+  "profile": {
+    "saveEpoch": 7,
+    "players": {
+      "p1": {
+        "wallet": "1.23456789e+5",
+        "lastSeq": 12,
+        "vehicle": {
+          "mode": "docked",
+          "modeSinceTick": 1,
+          "levels": {
+            "drill_power": 37,
+            "drill_tip": 19,
+            "engine": 30,
+            "boiler": 28,
+            "cargo_hold": 32,
+            "hull": 26
+          },
+          "casingGrade": 2,
+          "casingShortBand": null,
+          "casingTrail": {
+            "lastAxisPoint": null,
+            "unlined": []
+          },
+          "lining": {
+            "active": "standard",
+            "owned": ["standard"]
+          },
+          "gun": {
+            "level": 7,
+            "mode": "auto"
+          },
+          "liningBill": "0e+0",
+          "liningPaidThisVisit": null,
+          "charges": {
+            "isRackMounted": true,
+            "slotLevel": 3,
+            "carried": 1,
+            "planted": null
+          },
+          "loadout": {
+            "version": 1,
+            "body": {
+              "slots": {
+                "powerup.1": null,
+                "powerup.2": null,
+                "powerup.3": null,
+                "powerup.4": null,
+                "powerup.5": null,
+                "drill.head": null,
+                "drill.flank": null,
+                "drill.collar": null
+              },
+              "owned": []
+            }
+          },
+          "energy": 36000,
+          "hull": "1e+2",
+          "cargo": {
+            "ore": {},
+            "coreFragments": 0
+          },
+          "pose": {
+            "x": 7000,
+            "y": 580500,
+            "vx": 0,
+            "vy": 0,
+            "upx": 0,
+            "upy": 1024,
+            "facing": 1
+          },
+          "accountedTick": 0,
+          "energyLowLogged": [],
+          "heat": {
+            "level": 0,
+            "settledTick": 0,
+            "lavaTouchTick": null
+          }
+        },
+        "artefact": null,
+        "slices": {
+          "codex": { "version": 1, "body": {} },
+          "tech-tree": { "version": 1, "body": { "unlocked": [] } }
+        }
+      }
+    }
+  }
+}

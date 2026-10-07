@@ -149,7 +149,10 @@ export interface DebugApi {
   snapshot(): DebugResult<{ snapshot: SessionSnapshot }>
   restore(snapshot: unknown): DebugResult<SessionPoint>
   // vehicle (#7, #11 amendment): the setters are `debug.*` commands, the read is not logged
-  /** One track to an integer level; level 1500 on `drill_tip` is fine (uncapped, #7). */
+  /**
+   * One track to an integer level, the stored step `10L + k` since #180 (major 13 is level 130);
+   * level 15000 on `drill_tip` is fine (uncapped, #7).
+   */
   setUpgrade(upgradeId: string, level: number): DebugResult
   /** Energy in units as a decimal string, a whole number of 1/240 quanta up to the tank. */
   setEnergy(units: string): DebugResult
@@ -191,7 +194,7 @@ export interface DebugApi {
   /** Breaches the ring of lining round `(x, y)` mm, as a tunnel wrecker's gnaw does (#111). */
   gnawCasing(x: number, y: number): DebugResult
   // guns (#107): a `debug.*` command
-  /** The guns at `level`, 0 (none) to the gun track's cap, with no unlock or price. */
+  /** The guns at step `level`: 0 (none), or the mount (10) to the cap (160), no unlock or price. */
   setGunLevel(level: number): DebugResult
   // blasting charges (#109): a `debug.*` command
   /** A bolted-on rack with `slotLevel` (0 to 5) bought slots carrying `carried` charges. */

@@ -19,7 +19,7 @@
       "type": "debug.setUpgrade",
       "payload": {
         "upgradeId": "drill_power",
-        "level": 60
+        "level": 600
       }
     },
     {
@@ -445,7 +445,7 @@
       "type": "debug.setUpgrade",
       "payload": {
         "upgradeId": "drill_power",
-        "level": 13
+        "level": 130
       }
     },
     {
@@ -455,7 +455,7 @@
       "type": "debug.setUpgrade",
       "payload": {
         "upgradeId": "hull",
-        "level": 2
+        "level": 20
       }
     },
     {
@@ -514,7 +514,7 @@
     {
       "tick": 704,
       "scope": "end",
-      "digest": "627daf6a1fceb467"
+      "digest": "2af8a829d1dd0f67"
     }
   ],
   "minedOrder": []

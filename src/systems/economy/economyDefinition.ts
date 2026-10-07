@@ -4,6 +4,7 @@
  * stay plain numbers (#5 rules 1, 2 and 5).
  */
 import type { BigStat, Money } from '../money'
+import type { WholeFraction } from '../wholeFractions'
 
 /** The six upgrade tracks of #7, in the order the workshop lists them. */
 export const UPGRADE_IDS = [
@@ -78,6 +79,19 @@ export interface UpgradeDef {
   effect: UpgradeEffect
   /** `onCurveLevel(track, p) = levelAtPlanet1 + levelsPerPlanet * (p - 1)` (#6 section 3). */
   onCurve: { levelAtPlanet1: number; levelsPerPlanet: number }
+}
+
+/** A share as a fraction in lowest terms, so the pip rules stay in integers (#180 Systems). */
+export type StatShare = WholeFraction
+
+/**
+ * The two-tier tracks (#180 sections 3 and 4, Systems): a major level is `minorsPerMajor` steps,
+ * the pips before the last share `minorStatShare` of the major's gain and the last step, the big
+ * level-up, gives the rest.
+ */
+export interface UpgradeTiers {
+  minorsPerMajor: number
+  minorStatShare: StatShare
 }
 
 export interface GeometricCostCurve {
@@ -346,6 +360,7 @@ export interface Economy {
   }
   blastingCharges: BlastingChargeRules
   upgrades: readonly UpgradeDef[]
+  upgradeTiers: UpgradeTiers
   gun: GunRules
   archetypes: readonly HazardArchetype[]
   visualTiers: readonly VisualTierThreshold[]

@@ -177,7 +177,7 @@ describe('enemy hits and the pinned drill (#9, #25 acceptance 2 and 3)', () => {
   })
 
   it('kills a tier 1 crawler pinned on a level 13 drill in 72 ticks', () => {
-    const perTick = pinnedDrillDamagePerTick(13)
+    const perTick = pinnedDrillDamagePerTick(drillPower(13))
     expect(toCanonical(mul(perTick, m('60')))).toBe(toCanonical(drillPower(13)))
     expect(ceil(div(enemyHealth('crawler', 1), perTick))).toEqual(m('72'))
   })

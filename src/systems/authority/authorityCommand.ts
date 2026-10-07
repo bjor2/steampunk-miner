@@ -59,8 +59,13 @@ import type { BayId } from '../world/dockBays'
  *    `research_lab` (P15) and `drone_bay` (P20), now built and shipped (#221, #222).
  * 26: `CargoAdded` may name the ore's catalogue `family` and whether it is a `signature` ore
  *    (#223, for #146 and #141); the kernel default names neither, so its answers are unchanged.
+ * 27: two-tier levels (#180 sections 3 and 4, #181): a track and the guns store a step `10L + k`,
+ *    `BuyUpgrade` buys one step at its chain price, `BuyGun` mounts at step 10 and then buys steps,
+ *    `debug.setUpgrade` and `debug.setGunLevel` take steps, `UpgradePurchased` holds steps in
+ *    `fromLevel`/`toLevel` and adds `fromMajor`, `toMajor` and `isMajor`, stats follow the pips,
+ *    the drill gates read the tip of the last completed major and the visual tier counts majors.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 26
+export const AUTHORITY_PROTOCOL_VERSION = 27
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -173,7 +178,7 @@ export interface KernelCommandPayloads {
    */
   'debug.carveCircle': { x: number; y: number; radius: number; amount: number }
   'debug.fillCircle': { x: number; y: number; radius: number; amount: number }
-  /** Sets the gun level directly, 0 (no guns) to the track's cap (#107 combat scenarios). */
+  /** Sets the gun step directly, 0 (no guns) or the mount to the cap (#107 combat scenarios, #180). */
   'debug.setGunLevel': { level: number }
   /** A mounted rack with `slotLevel` bought slots carrying `carried` charges (#109). */
   'debug.setCharges': { carried: number; slotLevel: number }

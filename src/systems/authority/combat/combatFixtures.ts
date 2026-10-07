@@ -11,6 +11,7 @@ import type { CommandIntent } from '../authorityCommand'
 import { drill, type ScriptedSession } from '../scriptedSession'
 import { freezeEnemiesCommand, spawnEnemyCommand } from './combatCommands'
 import { spawnPointsWithin } from './spawnPoints'
+import { stepOfMajor } from '../../economy/upgradeSteps'
 
 export const CORRIDOR_ROW = 297
 export const CORRIDOR_MIDDLE: TilePoint = { tx: 20, ty: CORRIDOR_ROW }
@@ -46,9 +47,10 @@ export function poseAt(tile: TilePoint, { facing, vx = 0, vy = 0 }: PoseOptions)
   }
 }
 
+/** A track at major level `level`, sent as its step (#180: `debug.setUpgrade` takes the step). */
 export const setUpgrade = (upgradeId: string, level: number): CommandIntent => ({
   type: 'debug.setUpgrade',
-  payload: { upgradeId, level },
+  payload: { upgradeId, level: stepOfMajor(level) },
 })
 
 export const setHull = (hull: string): CommandIntent => ({

@@ -1,11 +1,13 @@
 /**
  * The workshop's `BuyUpgrade {upgradeId}` (decisions #7 and #6 section 3, #23 acceptance 6 and 7):
- * one command at the Upgrade bay (#37) raises exactly one level of one track for `upgradePrice(id, fromLevel, planet)`.
- * Hull and energy keep their values; the new maximum shows in `statsAfter` and the next repair or
- * recharge fills up to it. `vehicle_configuration_changed` follows when the sum of the six levels
- * crosses `T2` or `T3`. A refused purchase changes nothing and logs no purchase.
+ * one command at the Upgrade bay (#37) raises one track by exactly one step for
+ * `stepPrice(id, fromStep, planet)`: a pip, or on the tenth step the big level-up (#180 sections 3
+ * and 4). Hull and energy keep their values; the new maximum shows in `statsAfter` and the next
+ * repair or recharge fills up to it. `vehicle_configuration_changed` follows when the sum of the
+ * six major levels crosses `T2` or `T3`. A refused purchase changes nothing and logs no purchase.
  */
-import { costCurveIdOf, upgradePrice } from '../economy/upgradePrices'
+import { costCurveIdOf, stepPrice } from '../economy/upgradePrices'
+import { isMajorStep, majorOf } from '../economy/upgradeSteps'
 import { totalUpgradeLevel, visualTier } from '../economy/vehicleStats'
 import { cmp, sub, toCanonical, type Money } from '../money'
 import { isUpgradeId } from '../vehicle/vehicleStats'
@@ -53,14 +55,14 @@ export function canBuyUpgrade(state: AuthorityState, playerId: string, upgradeId
   return upgradeRefusal(state, playerId, upgradeId) === null
 }
 
-/** The price of the next level of a track for this player on this planet. */
+/** The price of the next step of a track for this player on this planet. */
 export function nextUpgradePrice(
   state: AuthorityState,
   playerId: string,
   upgradeId: UpgradeId,
 ): Money {
-  const level = vehicleOf(state, playerId).levels[upgradeId]
-  return upgradePrice(upgradeId, level, state.planet.index)
+  const step = vehicleOf(state, playerId).levels[upgradeId]
+  return stepPrice(upgradeId, step, state.planet.index)
 }
 
 function unknownUpgradeRejection(upgradeId: string): Rejection | null {
@@ -86,7 +88,7 @@ function buyUpgradeLevel(
 ): RuleEffect {
   const { wallet, vehicle } = state.players[playerId]
   const cost = nextUpgradePrice(state, playerId, upgradeId)
-  const upgraded = raisedOneLevel(vehicle, upgradeId)
+  const upgraded = raisedOneStep(vehicle, upgradeId)
   const paid = withWallet(withVehicle(state, playerId, upgraded), playerId, sub(wallet, cost))
   return {
     state: paid,
@@ -97,7 +99,7 @@ function buyUpgradeLevel(
   }
 }
 
-function raisedOneLevel(vehicle: VehicleState, upgradeId: UpgradeId): VehicleState {
+function raisedOneStep(vehicle: VehicleState, upgradeId: UpgradeId): VehicleState {
   const levels = { ...vehicle.levels, [upgradeId]: vehicle.levels[upgradeId] + 1 }
   return { ...vehicle, levels }
 }
@@ -108,12 +110,16 @@ function purchaseEvent(
   upgradeId: UpgradeId,
   cost: Money,
 ): DomainEventBody {
+  const fromLevel = before.levels[upgradeId]
   return {
     type: 'UpgradePurchased',
     upgradeId,
     kind: 'vertical',
-    fromLevel: before.levels[upgradeId],
+    fromLevel,
     toLevel: after.levels[upgradeId],
+    fromMajor: majorOf(fromLevel),
+    toMajor: majorOf(after.levels[upgradeId]),
+    isMajor: isMajorStep(fromLevel),
     cost: toCanonical(cost),
     costCurveId: costCurveIdOf(upgradeId),
     totalLevel: totalUpgradeLevel(after.levels),

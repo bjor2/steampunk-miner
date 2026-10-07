@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
 import { liningTypeUnlockPrice } from '../economy/heatEconomy'
+import { stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel } from '../economy/vehicleStats'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { dockSiteOf } from '../world/dockSite'
@@ -89,7 +90,7 @@ describe('bot: shaft round lava (#113)', () => {
   function diggerAbovePocket(): { session: BotSession; planet: BotPlanet } {
     const session = botOn(8)
     for (const upgradeId of UPGRADE_IDS) {
-      const level = onCurveLevel(upgradeId, 8)
+      const level = stepOfMajor(onCurveLevel(upgradeId, 8))
       session.submit({ type: 'debug.setUpgrade', payload: { upgradeId, level } })
     }
     // The casing grade the bot buys before planet 8 too: scripted mining lays casing (#115), and a

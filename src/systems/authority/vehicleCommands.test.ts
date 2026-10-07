@@ -54,7 +54,7 @@ describe('vehicle drilling', () => {
     const session = createSession()
     session.submit(0, {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'drill_power', level: 20 },
+      payload: { upgradeId: 'drill_power', level: 200 },
     })
     session.submit(0, poseAbove(GROUND, FACING.down))
     expect(typesOf(session.submit(12, drill(GROUND, 12)))).not.toContain('TileDestroyed')
@@ -101,7 +101,7 @@ describe('vehicle drilling', () => {
     const damage = events.flatMap((event) =>
       event.type === 'DrillDamageDealt' ? [event.damage] : [],
     )
-    const level0 = { drillPower: drillPower(0), drillTip: drillTip(0) }
+    const level0 = { drillPower: drillPower(0), drillTip: drillTip(0), gateTip: drillTip(0) }
     expect(damage).toEqual(
       [10, 15, 15].map((ticks) => toCanonical(drillDamage(level0, blockHardness(1, 1), ticks))),
     )
@@ -174,10 +174,10 @@ describe('vehicle core fragments', () => {
   it('carries a core tile as one fragment, counted in the same cargo units as ore', () => {
     const session = createSession()
     session.submit(0, FREEZE_ENEMIES)
-    session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 7 } })
+    session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 70 } })
     session.submit(0, {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'drill_power', level: 40 },
+      payload: { upgradeId: 'drill_power', level: 400 },
     })
     const core = { tx: 0, ty: 3 }
     session.submit(10, poseAbove(core, FACING.down))
@@ -219,7 +219,7 @@ describe('vehicle energy', () => {
     const session = createSession()
     session.submit(0, {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'boiler', level: 1_000_000 },
+      payload: { upgradeId: 'boiler', level: 10_000_000 },
     })
     session.submit(0, { type: 'debug.setEnergy', payload: { energy: '6000150' } })
     const startEnergy = session.vehicle().energy

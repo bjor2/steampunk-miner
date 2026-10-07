@@ -24,7 +24,7 @@ export function UpgradeRow({ row, focusedId }: { row: WorkshopRow; focusedId: st
       >
         <VectorIcon iconId={row.iconId} badge={row.badge} hasGlint={row.isBuyOpen} />
         <span>{row.label}</span>
-        <span data-testid={UI_ID_TEMPLATES.workshopUpgradeLevel(id)}>{row.level}</span>
+        <span data-testid={UI_ID_TEMPLATES.workshopUpgradeLevel(id)}>{row.levelText}</span>
         <span
           className={rowStyles.cost}
           data-testid={UI_ID_TEMPLATES.workshopUpgradeCost(id)}

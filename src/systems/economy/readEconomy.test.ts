@@ -48,6 +48,28 @@ describe('economy data validation', () => {
     ])
   })
 
+  it('reads the two-tier share as a fraction in lowest terms (#180)', () => {
+    const reading = readEconomy(economyFile)
+    if (!('economy' in reading)) throw new Error(reading.problems.join('\n'))
+    expect(reading.economy.upgradeTiers).toEqual({
+      minorsPerMajor: 10,
+      minorStatShare: { numerator: 1, denominator: 2 },
+    })
+  })
+
+  it('refuses a major of one step and a pip share of nothing or more than the whole (#180)', () => {
+    const broken = economyFileCopy()
+    broken.upgradeTiers = { minorsPerMajor: 1, minorStatShare: '1.5' }
+    expect(problemsOf(broken)).toEqual([
+      'upgradeTiers.minorsPerMajor must be more than 1',
+      'upgradeTiers.minorStatShare must be a decimal string over 0 and at most 1',
+    ])
+    broken.upgradeTiers = { minorsPerMajor: 12, minorStatShare: '0.0' }
+    expect(problemsOf(broken)).toEqual([
+      'upgradeTiers.minorStatShare must be a decimal string over 0 and at most 1',
+    ])
+  })
+
   it('lists an unknown upgrade id as a problem', () => {
     const broken = economyFileCopy()
     broken.upgrades[0].id = 'laser'

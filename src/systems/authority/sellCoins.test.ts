@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { upgradePrice } from '../economy/upgradePrices'
+import { stepPrice } from '../economy/upgradePrices'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { cmp, fromCanonical, mul, type Money } from '../money'
 import { coinsShownOf, nextStepPriceOf } from './sellCoins'
@@ -49,9 +49,9 @@ describe('sell burst coins', () => {
 })
 
 describe('sell burst step price', () => {
-  it('is the cheapest next whole level among the six Workshop tracks', () => {
+  it('is the cheapest next step among the six Workshop tracks', () => {
     const session = createScriptedSession()
-    const prices = UPGRADE_IDS.map((id) => upgradePrice(id, 0, 1))
+    const prices = UPGRADE_IDS.map((id) => stepPrice(id, 0, 1))
     const cheapest = prices.reduce((a: Money, b: Money) => (cmp(b, a) < 0 ? b : a))
     expect(cmp(nextStepPriceOf(session.state(), 'p1'), cheapest)).toBe(0)
   })
@@ -60,7 +60,7 @@ describe('sell burst step price', () => {
     const session = createScriptedSession()
     const before = nextStepPriceOf(session.state(), 'p1')
     for (const upgradeId of UPGRADE_IDS) {
-      session.submit(1, { type: 'debug.setUpgrade', payload: { upgradeId, level: 5 } })
+      session.submit(1, { type: 'debug.setUpgrade', payload: { upgradeId, level: 50 } })
     }
     expect(cmp(nextStepPriceOf(session.state(), 'p1'), before)).toBe(1)
   })

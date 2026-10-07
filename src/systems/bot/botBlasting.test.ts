@@ -8,6 +8,7 @@ import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import type { ChargePolicy } from './botCharges'
 import { playSlice, type SliceRun } from './playSlice'
+import { stepOfMajor } from '../economy/upgradeSteps'
 
 const WORLD_SEED = 83921
 /** Fifteen minutes on planet 7: enough dock cycles to restock and blast. */
@@ -30,7 +31,7 @@ const ARRIVED_ON_PLANET_7: CommandIntent[] = [
 
 function arrivalLevel(upgradeId: UpgradeId): number {
   const onCurve = onCurveLevel(upgradeId, 7)
-  return DRILL_TRACKS.includes(upgradeId) ? onCurve - DRILL_LEVELS_BEHIND : onCurve
+  return stepOfMajor(DRILL_TRACKS.includes(upgradeId) ? onCurve - DRILL_LEVELS_BEHIND : onCurve)
 }
 
 const runs = new Map<ChargePolicy, SliceRun>()

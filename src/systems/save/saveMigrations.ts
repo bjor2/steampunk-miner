@@ -5,17 +5,32 @@
  * it with its version problems, as before. Each step that ran is reported, and the checkpoint logs
  * one `save_migrated {version, from, to}` line per step.
  *
+ * Snapshot 18 -> 19 (#180 section 3, TD on the migration rows, #181): a track's level and the
+ * guns' level become steps, `L -> 10L`, so prices and stats are the same at every major boundary.
+ * The old state is read as saved first, so a corrupt file is still refused on its digest; the
+ * charge rack (whole slots) and the casing grade (a gate) stay single-tier and are not touched.
+ * Wallet, items, codex and everything else are kept, and the digest is taken again.
+ *
  * Generator 5 -> 6 (#175): the pad grew to -8..+12 under the two shop buildings, so the chunk edits
  * of every chunk the old or new pad and its cleared air touch are dropped and regenerate under the
  * new stamp, every vehicle is put on the Sell bay's rest pose, and the params are recomputed from
  * seed and index. Wallet, levels, owned items and everything else in the state are kept.
  *
+ * A save from before both reads at snapshot 18 and generator 5: the snapshot step runs first, as
+ * the TD's save chain orders them, so the pad step restores the state with this build's reader.
+ *
  * A registered slice section the save lacks is no step: `readSnapshot` restores it at its initial
  * value, and the reading reports it after the steps as one `save_migrated {restoredSections}` (#224).
  */
-import type { AuthorityState } from '../authority/authorityState'
-import { readSnapshot, sectionsRestoredBy, takeSnapshot } from '../authority/sessionSnapshot'
+import type { AuthorityState, PlayerState } from '../authority/authorityState'
+import {
+  readSnapshot,
+  sectionsRestoredBy,
+  SNAPSHOT_VERSION,
+  takeSnapshot,
+} from '../authority/sessionSnapshot'
 import { refineryUnlockPlanet } from '../economy/refineryEconomy'
+import { stepsOfMajors, stepOfMajor } from '../economy/upgradeSteps'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import { dockedPoseAt } from '../vehicle/vehiclePose'
 import { dockSiteOf, type DockSite } from '../world/dockSite'
@@ -31,7 +46,7 @@ import {
 } from './saveSlot'
 
 /** The header version a step moves on. */
-export type MigratedVersion = 'generatorVersion'
+export type MigratedVersion = 'snapshotVersion' | 'generatorVersion'
 
 /** One step that ran: `save_migrated {version, from, to}`. */
 export interface HeaderVersionStep {
@@ -52,8 +67,9 @@ interface SaveMigrationStep extends HeaderVersionStep {
   migrate(file: SaveSlotFile): SaveSlotFile | null
 }
 
-/** The chain in the order the bumps landed. */
+/** The chain in the order a save written before every bump needs them (see the module comment). */
 const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
+  { version: 'snapshotVersion', from: 18, to: 19, migrate: levelsToSteps },
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
 ]
 
@@ -96,6 +112,45 @@ function sectionRestoresOf(file: unknown, reading: SaveSlotReading): SectionRest
 
 function isAtStepStart(file: unknown, step: SaveMigrationStep): file is SaveSlotFile {
   return typeof file === 'object' && file !== null && Reflect.get(file, step.version) === step.from
+}
+
+/** Snapshot 18 -> 19: the state is read as saved (the digest must hold), then its levels x10. */
+function levelsToSteps(file: SaveSlotFile): SaveSlotFile | null {
+  const restored = restoreUnderThisBuild(file)
+  if (restored === null) return null
+  const stepped = { ...restored, players: mapPlayers(restored, playerWithSteps) }
+  const { generatorVersion } = file
+  return {
+    ...saveSlotOf(takeSnapshot(stepped), file.saveEpoch),
+    generatorVersion,
+    snapshotVersion: 19,
+  }
+}
+
+/**
+ * Snapshot 18 has the shape of 19, only the meaning of the levels moved, so the old state restores
+ * under this build's versions; the generator is checked by its own step.
+ */
+function restoreUnderThisBuild(file: SaveSlotFile): AuthorityState | null {
+  const restored = readSnapshot({
+    ...snapshotOfSaveSlot(file),
+    snapshotVersion: SNAPSHOT_VERSION,
+    generatorVersion: GENERATOR_VERSION,
+  })
+  return 'state' in restored ? restored.state : null
+}
+
+function playerWithSteps(player: PlayerState): PlayerState {
+  const { vehicle } = player
+  const gun = { ...vehicle.gun, level: stepOfMajor(vehicle.gun.level) }
+  return { ...player, vehicle: { ...vehicle, levels: stepsOfMajors(vehicle.levels), gun } }
+}
+
+function mapPlayers(
+  state: AuthorityState,
+  map: (player: PlayerState) => PlayerState,
+): AuthorityState['players'] {
+  return Object.fromEntries(Object.entries(state.players).map(([id, player]) => [id, map(player)]))
 }
 
 /** Generator 5 -> 6: the state is read as saved (the digest must hold), then moved off the pad. */

@@ -13,9 +13,10 @@ import {
   surfaceOreTiles,
   type ScriptedSession,
 } from '../authority/scriptedSession'
-import { takeSnapshot } from '../authority/sessionSnapshot'
+import { SNAPSHOT_VERSION, takeSnapshot } from '../authority/sessionSnapshot'
 import { stateDigest } from '../authority/stateDigest'
 import { ECONOMY } from '../economy/economy'
+import { stepOfMajor } from '../economy/upgradeSteps'
 import { fromCanonical, toCanonical } from '../money'
 import { computeVehicleStats } from '../vehicle/vehicleStats'
 import { dockedPoseAt, FACING } from '../vehicle/vehiclePose'
@@ -145,7 +146,7 @@ describe('save slot', () => {
 
   it('retunes a saved drill_power 5 when the coefficients in the definitions change', () => {
     const session = createScriptedSession()
-    session.submit(1, setUpgrade('drill_power', 5))
+    session.submit(1, setUpgrade('drill_power', stepOfMajor(5)))
     session.submit(5, dock)
     const levels = restoredFrom(savedText(session.state())).players.p1.vehicle.levels
     const retuned = ECONOMY.upgrades.map((upgrade) =>
@@ -179,7 +180,8 @@ describe('save slot', () => {
   it('reaches the uninterrupted digest when the same commands follow a restore, across T2', () => {
     const session = createScriptedSession()
     session.submit(1, grant('1e9'))
-    session.submit(2, setUpgrade('drill_power', 7))
+    session.submit(2, setUpgrade('drill_power', stepOfMajor(7)))
+    session.submit(2, setUpgrade('hull', stepOfMajor(1) - 1))
     dockInBay(session, 5, 'upgrade')
     const saved = session.state()
     const [ore] = surfaceOreTiles(1)
@@ -210,7 +212,7 @@ describe('save slot: refusals', () => {
     ])
     expect(readSaveSlot({ ...file(), formatVersion: 9, snapshotVersion: 4 }).problems).toEqual([
       'save.formatVersion is 9, this build reads 1',
-      'save.snapshotVersion is 4, this build reads 18',
+      `save.snapshotVersion is 4, this build reads ${SNAPSHOT_VERSION}`,
     ])
   })
 

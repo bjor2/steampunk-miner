@@ -57,16 +57,16 @@ describe('vehicle stats from integer levels', () => {
     expect(stats.engine).toEqual({ speedMax: 6, accel: 1, thrustToWeight: 2 })
   })
 
-  it('gives "1.68", "1.2544", "112", 156 and 14 at level 1', () => {
-    const stats = statsOf(levelsWith(Object.fromEntries(UPGRADE_IDS.map((id) => [id, 1]))))
+  it('gives "1.68", "1.2544", "112", 156 and 14 at level 1 (step 10)', () => {
+    const stats = statsOf(levelsWith(Object.fromEntries(UPGRADE_IDS.map((id) => [id, 10]))))
     expect(stats.drillPower).toEqual(fromCanonical('1.68'))
     expect(stats.drillTip).toEqual(fromCanonical('1.2544'))
     expect(stats.hullMax).toEqual(fromCanonical('112'))
     expect([stats.energyMax, stats.cargoCapacity]).toEqual([156, 14])
   })
 
-  it('gives speed 10, accel 1.4 and twr 2.75 exactly at engine level 25', () => {
-    expect(statsOf(levelsWith({ engine: 25 })).engine).toEqual({
+  it('gives speed 10, accel 1.4 and twr 2.75 exactly at engine level 25 (step 250)', () => {
+    expect(statsOf(levelsWith({ engine: 250 })).engine).toEqual({
       speedMax: 10,
       accel: 1.4,
       thrustToWeight: 2.75,
@@ -106,7 +106,7 @@ describe('vehicle stats from integer levels', () => {
   })
 
   it('retunes the same saved levels when a coefficient in the definitions changes', () => {
-    const levels = levelsWith({ boiler: 3 })
+    const levels = levelsWith({ boiler: 30 })
     const retuned = ECONOMY.upgrades.map((upgrade) =>
       upgrade.id === 'boiler' && upgrade.effect.family === 'linear'
         ? { ...upgrade, effect: { ...upgrade.effect, step: 10 } }

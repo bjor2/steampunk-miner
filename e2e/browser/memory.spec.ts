@@ -33,7 +33,7 @@ async function openGame(page: Page): Promise<string[]> {
 function readyToDrill(page: Page) {
   return page.evaluate(() => {
     const debug = window.steampunkDebug!
-    for (const track of ['drill_power', 'drill_tip', 'engine']) debug.setUpgrade(track, 30)
+    for (const track of ['drill_power', 'drill_tip', 'engine']) debug.setUpgrade(track, 300)
     debug.freezeEnemies(true)
   })
 }

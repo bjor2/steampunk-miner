@@ -31,9 +31,8 @@ export function coinsShownOf(proceeds: Money, nextStepPrice: Money): number {
 }
 
 /**
- * The step a sale is measured in: until #181 brings steps, the cheapest next whole level among the
- * six Workshop tracks (TD lock on #176). No track has a level cap today, so every track counts.
- * Expect about 13 times the coins once #181 makes a step roughly a tenth of a level.
+ * The step a sale is measured in: the cheapest next step (#181) among the six Workshop tracks (TD
+ * lock on #176). No track has a level cap today, so every track counts.
  */
 export function nextStepPriceOf(state: AuthorityState, playerId: string): Money {
   return UPGRADE_IDS.map((upgradeId) => nextUpgradePrice(state, playerId, upgradeId)).reduce(

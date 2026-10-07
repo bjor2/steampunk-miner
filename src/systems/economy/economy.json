@@ -134,6 +134,10 @@
       "onCurve": { "levelAtPlanet1": 2, "levelsPerPlanet": 6 }
     }
   ],
+  "upgradeTiers": {
+    "minorsPerMajor": 10,
+    "minorStatShare": "0.5"
+  },
   "gun": {
     "damageFractionOfDrill": "0.25",
     "fireIntervalTicks": { "min": 30, "max": 12 },

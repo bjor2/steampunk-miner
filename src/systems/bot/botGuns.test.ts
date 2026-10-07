@@ -22,14 +22,14 @@ describe('bot: auto_guns policy (#107)', () => {
 
   it('wants no second mount, and none at all in a comparison run without guns', () => {
     const mounted = botOn(4)
-    mounted.submit(setGunLevelCommand(1))
+    mounted.submit(setGunLevelCommand(10))
     expect(gunMountPriceFor(mounted, 'mount')).toBeNull()
     expect(gunMountPriceFor(botOn(4), 'never')).toBeNull()
   })
 
   it('keeps the guns on Auto at 40% of the tank and switches them Off under it', () => {
     const session = botOn(4)
-    session.submit(setGunLevelCommand(1))
+    session.submit(setGunLevelCommand(10))
     session.submit(setEnergyCommand('60'))
     setGunsForEnergy(session)
     expect(session.vehicle().gun.mode).toBe('auto')

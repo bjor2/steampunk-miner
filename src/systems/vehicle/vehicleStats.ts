@@ -1,6 +1,6 @@
 /**
  * `computeVehicleStats(levels, defs)` (decision #7 "Upgrades as data", #21 acceptance 1 to 3): the
- * vehicle's stats as a pure function of its six integer upgrade levels. The save and the authority
+ * vehicle's stats as a pure function of its six integer upgrade levels (steps since #180). The save and the authority
  * hold the levels only, so restoring them recomputes the stats and a changed coefficient in the
  * definitions retunes an old save. Levels arrive from commands and scenarios, so they are checked
  * first: a level that is not a safe integer >= 0 is refused with a listed problem.

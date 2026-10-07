@@ -80,7 +80,8 @@ file turns it on, so scenario and bot runs never see hints.
   `teleportToDock(bay?)` (the `debug.teleportToDock {bay}` command: docked at rest in the Sell bay, or the Upgrade bay when named, no tow, no fee),
   `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
   `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
-  `setUpgrade(id, level)`, `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
+  `setUpgrade(id, level)` (the stored step `10L + k` since #181: major 13 is level 130),
+  `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
   `vehicleStats()` and `vehicleParts()` (the art part ids the run vehicle draws, #52); for the core, `setCoreFragments(count)`; for combat (#25), `spawnEnemy(kind, tier,
 offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEnemies(frozen)` and the
   unlogged read `enemyStatsTable(kind)`; for the ground (#36), `carveCircle(x, y, radius, amount?)` and
@@ -88,7 +89,7 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   `setCasingGrade(grade)` and `lineCasing(x, y, grade)` (one ring round a point of the tunnel axis, in mm,
   marking the rock beside air as lining; the vehicle lays the same rings by itself while it drills) and
   `gnawCasing(x, y)` (that ring breached, as a tunnel wrecker's gnaw leaves it, #111); for the guns (#107),
-  `setGunLevel(level)` (0 to the gun track's cap, no unlock or price; `vehicleParts()` then lists the
+  `setGunLevel(level)` (a step: 0, or the mount 10 to the cap 160, no unlock or price; `vehicleParts()` then lists the
   turret's parts); for blasting charges (#109), `setCharges(carried, slotLevel)` (a bolted-on rack, no
   unlock or price; `vehicleParts()` then reports `rackCharges` and the rack's parts); for the heat planets
   (#113), `setLiningType(type)` (`standard` or `refractory`, owned and laid from then on, no unlock or

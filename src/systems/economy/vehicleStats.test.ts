@@ -15,6 +15,7 @@ import {
   visualTier,
   type UpgradeLevels,
 } from './vehicleStats'
+import { stepsOfMajors } from './upgradeSteps'
 
 const m = fromCanonical
 const PLANETS_1_TO_40 = Array.from({ length: 40 }, (_, index) => index + 1)
@@ -24,11 +25,17 @@ function levelsWith(changes: Partial<Record<UpgradeId, number>>): UpgradeLevels 
   return { ...startLevels(), ...changes }
 }
 
+/** The stored steps of these major levels: the visual tier counts majors (#180). */
+function stepsWith(majors: Partial<Record<UpgradeId, number>>): UpgradeLevels {
+  return stepsOfMajors(levelsWith(majors))
+}
+
 describe('vehicle stats', () => {
   it('starts every track at its 1.0x value at level 0', () => {
     expect(vehicleStatsAt(startLevels())).toEqual({
       drillPower: m('1.5'),
       drillTip: m('1'),
+      gateTip: m('1'),
       hullMax: m('100'),
       energyMax: 150,
       cargoCapacity: 10,
@@ -118,13 +125,18 @@ describe('vehicle visual tier', () => {
     [19, 2],
     [20, 3],
   ])('shows a total of %i levels as tier %i', (total, tier) => {
-    expect(visualTier(levelsWith({ hull: total }))).toBe(tier)
+    expect(visualTier(stepsWith({ hull: total }))).toBe(tier)
   })
 
   it('gives the same tier for the same total in any spread over the tracks', () => {
-    expect(visualTier(levelsWith({ hull: 4, boiler: 4 }))).toBe(2)
-    expect(visualTier(levelsWith({ drill_tip: 1, cargo_hold: 7 }))).toBe(2)
-    expect(visualTier(levelsWith({ engine: 10, drill_power: 9, hull: 1 }))).toBe(3)
+    expect(visualTier(stepsWith({ hull: 4, boiler: 4 }))).toBe(2)
+    expect(visualTier(stepsWith({ drill_tip: 1, cargo_hold: 7 }))).toBe(2)
+    expect(visualTier(stepsWith({ engine: 10, drill_power: 9, hull: 1 }))).toBe(3)
+  })
+
+  it('counts major levels, so nine pips short of the eighth major is still tier 1', () => {
+    expect(visualTier(levelsWith({ hull: 79 }))).toBe(1)
+    expect(visualTier(levelsWith({ hull: 80 }))).toBe(2)
   })
 
   it('starts at tier 1', () => {

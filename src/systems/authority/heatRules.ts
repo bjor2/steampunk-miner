@@ -129,7 +129,8 @@ export function heatThrottledDrill(planetIndex: number, vehicle: VehicleState): 
   const archetype = hazardArchetypeOn(planetIndex)
   if (archetype === null) return stats
   const factor = throttleFactor(archetype, heatPointsOf(vehicle.heat.level))
-  return { drillPower: mul(stats.drillPower, factor), drillTip: stats.drillTip }
+  const { drillTip, gateTip } = stats
+  return { drillPower: mul(stats.drillPower, factor), drillTip, gateTip }
 }
 
 /** Whether the gauge is above the throttle line: the HUD and the vehicle's shimmer. */

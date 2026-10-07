@@ -6,6 +6,7 @@ import { readSnapshot, takeSnapshot } from '../sessionSnapshot'
 import type { DomainEvent } from '../domainEvent'
 import type { ScriptedSession } from '../scriptedSession'
 import { dockAtBayOf, mineSurfaceOre, REFINERY_SITE, sessionOnPlanet } from './refineryFixtures'
+import { stepOfMajor } from '../../economy/upgradeSteps'
 
 /** Planet 3's band-1 ore, the tier the fixtures mine. */
 const TIER = oreTier(3, 1)
@@ -16,8 +17,9 @@ const queue = (units: number, resourceTier = TIER) =>
   ({ type: 'queueRefine', payload: { resourceTier, units } }) as const
 const collect = { type: 'collectRefined', payload: {} } as const
 const buySlot = { type: 'buyRefinerySlot', payload: {} } as const
+/** A track at major `level`, sent as its step (#180). */
 const setUpgrade = (upgradeId: string, level: number) =>
-  ({ type: 'debug.setUpgrade', payload: { upgradeId, level } }) as const
+  ({ type: 'debug.setUpgrade', payload: { upgradeId, level: stepOfMajor(level) } }) as const
 
 const rejectionOf = (events: readonly DomainEvent[]) =>
   events.find((event) => event.type === 'CommandRejected')

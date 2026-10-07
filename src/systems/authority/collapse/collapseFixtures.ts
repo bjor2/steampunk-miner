@@ -7,6 +7,7 @@
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
 import type { CommandIntent } from '../authorityCommand'
 import { FREEZE_ENEMIES, GROUND, poseAbove, type ScriptedSession } from '../scriptedSession'
+import { stepOfMajor } from '../../economy/upgradeSteps'
 
 export const BAND_1_Y = 280500
 export const BAND_2_Y = 252500
@@ -37,8 +38,8 @@ export function prepareDigger(session: ScriptedSession, tick: number, casingGrad
 export function diggerIntents(casingGrade = 1): CommandIntent[] {
   return [
     FREEZE_ENEMIES,
-    { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 8 } },
-    { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 8 } },
+    { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: stepOfMajor(8) } },
+    { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: stepOfMajor(8) } },
     { type: 'debug.setCasingGrade', payload: { grade: casingGrade } },
   ]
 }

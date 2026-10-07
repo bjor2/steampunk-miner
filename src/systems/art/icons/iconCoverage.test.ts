@@ -105,8 +105,8 @@ function sellBayIconsOf(model: SellBayModel): string[] {
 /** The Sell bay with ore held, after a planet 3 refine batch is ready (#105). */
 function sellBayWithOreAndRefined(): SellBayModel {
   const session = sessionOnPlanet(3, '1e30')
-  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 25 } })
-  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 13 } })
+  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 250 } })
+  session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 130 } })
   const tick = mineSurfaceOre(session, 10, 6)
   dockAtBayOf(session, tick, REFINERY_SITE, 'refinery')
   const tier = Number.parseInt(Object.keys(session.vehicle().cargo.ore)[0], 10)

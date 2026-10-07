@@ -6,14 +6,24 @@ import { blastReachTiles, chargeFuseTicks, restockPrice } from '../economy/blast
 import { ECONOMY } from '../economy/economy'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
-import { upgradePrice } from '../economy/upgradePrices'
+import { stepPrice, upgradePrice } from '../economy/upgradePrices'
+import { majorOf, minorsPerMajor, pipOf, stepOfMajor, stepsOfMajors } from '../economy/upgradeSteps'
 import {
   onCurveLevels,
   vehicleStatsAt,
   type UpgradeLevels,
   type VehicleStats,
 } from '../economy/vehicleStats'
-import { cmp, fromSafeInteger, isMoney, mul, toCanonical, ZERO_MONEY, type Money } from '../money'
+import {
+  add,
+  cmp,
+  fromSafeInteger,
+  isMoney,
+  mul,
+  toCanonical,
+  ZERO_MONEY,
+  type Money,
+} from '../money'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
 import type { PlanetParams } from '../world/planetParams'
 import { blastTradeOf, type BlastTrade } from './blastTrade'
@@ -49,10 +59,11 @@ function log10Difference(a: number, b: number): number {
   return b === Number.NEGATIVE_INFINITY ? a : a + Math.log10(1 - 10 ** (b - a))
 }
 
-/** The on-curve vehicle with each marginal track in turn 4 levels behind, so each can lead. */
+/** The on-curve steps with each marginal track in turn 4 majors behind, so each can lead. */
 function levelVariants(planetIndex: number): UpgradeLevels[] {
-  const onCurve = onCurveLevels(planetIndex)
-  return [onCurve, ...MARGINAL_TRACKS.map((track) => ({ ...onCurve, [track]: onCurve[track] - 4 }))]
+  const onCurve = stepsOfMajors(onCurveLevels(planetIndex))
+  const behind = (track: UpgradeId) => ({ ...onCurve, [track]: onCurve[track] - stepOfMajor(4) })
+  return [onCurve, ...MARGINAL_TRACKS.map(behind)]
 }
 
 function layoutOn(session: BotSession): MineLayout {
@@ -74,7 +85,9 @@ function botShoppingOn(planetIndex: number, levels: UpgradeLevels): BotSession {
 }
 
 function walletFor(planetIndex: number, levels: UpgradeLevels): string {
-  const prices = MARGINAL_TRACKS.map((track) => upgradePrice(track, levels[track], planetIndex))
+  const prices = MARGINAL_TRACKS.map((track) =>
+    upgradePrice(track, majorOf(levels[track]), planetIndex),
+  )
   const dearest = prices.reduce((most, price) => (cmp(price, most) > 0 ? price : most))
   return toCanonical(mul(dearest, fromSafeInteger(WALLET_PRICES)))
 }
@@ -93,7 +106,10 @@ function plannedLog(layout: MineLayout, levels: UpgradeLevels): number {
   return plan === null ? Number.NEGATIVE_INFINITY : log10Of(plan.moneyPerTick)
 }
 
-/** The reference: the best gain in planned money per tick per price, ranked by its log10. */
+/**
+ * The reference: the best gain in planned money per tick per price, ranked by its log10, over the
+ * fewest next steps up to the next major that raise the planned money (#180).
+ */
 function referencePick(
   layout: MineLayout,
   levels: UpgradeLevels,
@@ -102,13 +118,27 @@ function referencePick(
   const now = plannedLog(layout, levels)
   let best: { track: UpgradeId; logGainPerPrice: number } | null = null
   for (const track of MARGINAL_TRACKS.filter((t) => isUnderLeadCap(levels, t, planetIndex))) {
-    const next = plannedLog(layout, { ...levels, [track]: levels[track] + 1 })
-    if (next <= now) continue
-    const price = upgradePrice(track, levels[track], planetIndex)
-    const logGainPerPrice = log10Difference(next, now) - log10Of(price)
+    const logGainPerPrice = referenceLogGainPerPrice(layout, levels, planetIndex, track, now)
+    if (logGainPerPrice === null) continue
     if (best === null || logGainPerPrice > best.logGainPerPrice) best = { track, logGainPerPrice }
   }
   return best?.track ?? null
+}
+
+function referenceLogGainPerPrice(
+  layout: MineLayout,
+  levels: UpgradeLevels,
+  planetIndex: number,
+  track: UpgradeId,
+  now: number,
+): number | null {
+  let price = ZERO_MONEY
+  for (let steps = 1; steps <= minorsPerMajor() - pipOf(levels[track]); steps++) {
+    price = add(price, stepPrice(track, levels[track] + steps - 1, planetIndex))
+    const next = plannedLog(layout, { ...levels, [track]: levels[track] + steps })
+    if (next > now) return log10Difference(next, now) - log10Of(price)
+  }
+  return null
 }
 
 function referencePicks(layout: MineLayout, start: UpgradeLevels, planetIndex: number) {
@@ -159,17 +189,17 @@ function paramsVariants(params: PlanetParams): PlanetParams[] {
 
 /** The on-curve drill and drills further behind it, down to where band 3 is out of reach. */
 function drillVariants(planetIndex: number): UpgradeLevels[] {
-  const onCurve = onCurveLevels(planetIndex)
+  const onCurve = stepsOfMajors(onCurveLevels(planetIndex))
   return DRILL_LEVELS_BEHIND.map((behind) => ({
     ...onCurve,
-    drill_power: onCurve.drill_power - behind,
-    drill_tip: onCurve.drill_tip - behind,
+    drill_power: onCurve.drill_power - stepOfMajor(behind),
+    drill_tip: onCurve.drill_tip - stepOfMajor(behind),
   }))
 }
 
 describe('bot: planning past planet 582 (#196)', () => {
   it.each(PLANETS)('picks the ore band log space picks on planet %i', (planetIndex) => {
-    const session = botShoppingOn(planetIndex, onCurveLevels(planetIndex))
+    const session = botShoppingOn(planetIndex, stepsOfMajors(onCurveLevels(planetIndex)))
     const layout = layoutOn(session)
     for (const levels of levelVariants(planetIndex)) {
       const stats = vehicleStatsAt(levels)
@@ -205,7 +235,7 @@ describe('bot: planning past planet 582 (#196)', () => {
   it.each(PLANETS)(
     'weighs blasting against drilling on planet %i as log space does',
     (planetIndex) => {
-      const session = botShoppingOn(planetIndex, onCurveLevels(planetIndex))
+      const session = botShoppingOn(planetIndex, stepsOfMajors(onCurveLevels(planetIndex)))
       const calls = paramsVariants(layoutOn(session).params).flatMap((params) =>
         drillVariants(planetIndex).flatMap((levels) => {
           const stats = vehicleStatsAt(levels)

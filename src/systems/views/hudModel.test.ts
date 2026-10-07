@@ -53,7 +53,7 @@ describe('HUD model: guns (#107)', () => {
 
   it('reads the mode with the toggle key once mounted', () => {
     const session = createScriptedSession()
-    session.submit(0, setGunLevelCommand(1))
+    session.submit(0, setGunLevelCommand(10))
     expect(hudOf(session).guns).toEqual({
       mode: 'auto',
       text: 'Auto (G)',
@@ -66,7 +66,7 @@ describe('HUD model: guns (#107)', () => {
 
   it('says guns idle: low steam on Auto where a shot would cross the rescue floor', () => {
     const session = createScriptedSession()
-    session.submit(0, setGunLevelCommand(1))
+    session.submit(0, setGunLevelCommand(10))
     session.submit(0, setEnergyCommand('38'))
     expect(hudOf(session).guns?.isIdle).toBe(false)
     session.submit(1, setEnergyCommand('37.75'))

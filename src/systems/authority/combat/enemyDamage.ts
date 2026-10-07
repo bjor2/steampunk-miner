@@ -13,6 +13,7 @@
  */
 import { ENEMY_DAMAGE_LOG_TICKS } from '../../../constants/balance'
 import { pinnedDrillDamagePerTick } from '../../economy/enemyStats'
+import { drillPowerAtStep } from '../../economy/vehicleStats'
 import {
   add,
   cmp,
@@ -206,7 +207,7 @@ function chargeOneDrillTick(state: AuthorityState, playerId: string): RuleEffect
 }
 
 function drillDamagePerTickOf(state: AuthorityState, playerId: string): BigStat {
-  return pinnedDrillDamagePerTick(vehicleOf(state, playerId).levels.drill_power)
+  return pinnedDrillDamagePerTick(drillPowerAtStep(vehicleOf(state, playerId).levels.drill_power))
 }
 
 function isSwimmingIn(enemy: Enemy, tile: TilePoint): boolean {

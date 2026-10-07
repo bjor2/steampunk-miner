@@ -13,6 +13,7 @@ import type { ScriptedSession } from '../scriptedSession'
 import type { Enemy } from './combatState'
 import { walkStepMmOf } from './enemyMovement'
 import { digPlanet6Tunnel, PLANET_6, TUNNEL_FROM_X, TUNNEL_TO_X } from './wreckerFixtures'
+import { stepOfMajor } from '../../economy/upgradeSteps'
 
 /**
  * Auto guns against a fleeing tunnel wrecker (#126, Systems' flee-window check on #111): at
@@ -65,15 +66,18 @@ function armForTheChase(wrecker: WreckerCase): CommandIntent[] {
     { type: 'debug.clearEnemies', payload: {} },
     {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'engine', level: onCurveLevel('engine', 6) },
+      payload: { upgradeId: 'engine', level: stepOfMajor(onCurveLevel('engine', 6)) },
     },
     {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'drill_power', level: onCurveLevel('drill_power', wrecker.planet) },
+      payload: {
+        upgradeId: 'drill_power',
+        level: stepOfMajor(onCurveLevel('drill_power', wrecker.planet)),
+      },
     },
-    { type: 'debug.setUpgrade', payload: { upgradeId: 'hull', level: hullLevel } },
+    { type: 'debug.setUpgrade', payload: { upgradeId: 'hull', level: stepOfMajor(hullLevel) } },
     { type: 'debug.setHull', payload: { hull: toCanonical(hullMax(hullLevel)) } },
-    { type: 'debug.setGunLevel', payload: { level: 1 } },
+    { type: 'debug.setGunLevel', payload: { level: stepOfMajor(1) } },
     {
       type: 'debug.spawnEnemy',
       payload: {

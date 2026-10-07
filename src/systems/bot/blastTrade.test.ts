@@ -3,6 +3,7 @@ import { onCurveLevels, vehicleStatsAt, type UpgradeLevels } from '../economy/ve
 import { cmp } from '../money'
 import { planetParamsFor } from '../world/planetParams'
 import { blastTradeOf, type BlastTrade } from './blastTrade'
+import { stepOfMajor, stepsOfMajors } from '../economy/upgradeSteps'
 
 const WORLD_SEED = 83921
 const PLANETS = [7, 8, 9, 10]
@@ -14,7 +15,7 @@ const DRILL_LEVELS_BEHIND = 12
 function tradesOfCampaign(): BlastTrade[] {
   return PLANETS.flatMap((planetIndex) => {
     const params = planetParamsFor(WORLD_SEED, planetIndex)
-    return drillLevelsBehind(onCurveLevels(planetIndex)).flatMap((levels) =>
+    return drillLevelsBehind(stepsOfMajors(onCurveLevels(planetIndex))).flatMap((levels) =>
       BANDS.flatMap((band) => blastTradeOf(params, vehicleStatsAt(levels), band) ?? []),
     )
   })
@@ -23,8 +24,8 @@ function tradesOfCampaign(): BlastTrade[] {
 function drillLevelsBehind(onCurve: UpgradeLevels): UpgradeLevels[] {
   return Array.from({ length: DRILL_LEVELS_BEHIND + 1 }, (_, behind) => ({
     ...onCurve,
-    drill_power: Math.max(0, onCurve.drill_power - behind),
-    drill_tip: Math.max(0, onCurve.drill_tip - behind),
+    drill_power: Math.max(0, onCurve.drill_power - stepOfMajor(behind)),
+    drill_tip: Math.max(0, onCurve.drill_tip - stepOfMajor(behind)),
   }))
 }
 

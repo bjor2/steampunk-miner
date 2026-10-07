@@ -15,6 +15,7 @@ import type { Pair } from '../art/partsSidecar'
 import type { Enemy } from '../authority/combat/combatState'
 import { isInDeadCone } from '../authority/combat/gunTargets'
 import { gunRangeTiles } from '../economy/gunStats'
+import { majorOf } from '../economy/upgradeSteps'
 import type { Facing } from '../vehicle/vehiclePose'
 
 export const GUN_ASSET_ID = vehicleModuleAssetIdOf('auto_guns')
@@ -29,9 +30,10 @@ export interface MetrePoint {
   y: number
 }
 
-/** 0 with no guns, else 1 to 3 by the gun level's breakpoint. */
-export function gunLookOf(gunLevel: number): number {
-  return GUN_LOOK_FIRST_LEVELS.filter((first) => gunLevel >= first).length
+/** 0 with no guns, else 1 to 3 by the breakpoint the gun step's major has reached (#180). */
+export function gunLookOf(gunStep: number): number {
+  const major = majorOf(gunStep)
+  return GUN_LOOK_FIRST_LEVELS.filter((first) => major >= first).length
 }
 
 /** The part ids the turret draws at `gunLevel`; none before the mount. */

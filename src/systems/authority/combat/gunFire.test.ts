@@ -22,6 +22,7 @@ import {
   setUpgrade,
   spawnEnemy,
 } from './combatFixtures'
+import { stepOfMajor } from '../../economy/upgradeSteps'
 
 /** Planet 4's on-curve fight (#107 numbers acceptance 3): drill and hull levels, band-3 enemies. */
 const PLANET = 4
@@ -31,9 +32,10 @@ const BAND_3_TIER = enemyTier(PLANET, 3)
 /** Pose reports at the shell's 5 Hz. */
 const REPORT_TICKS = 12
 
+/** The guns at major `level`, sent as its step (#180). */
 const setGunLevel = (level: number): CommandIntent => ({
   type: 'debug.setGunLevel',
-  payload: { level },
+  payload: { level: stepOfMajor(level) },
 })
 const setGunMode = (mode: string): CommandIntent => ({ type: 'setGunMode', payload: { mode } })
 const setEnergy = (energy: string): CommandIntent => ({
@@ -112,7 +114,7 @@ describe('guns: the flankers they are for (#107 combat scenarios)', () => {
     const damage = hits.reduce((total, hit) => add(total, fromCanonical(hit.damage)), ZERO_MONEY)
     const shots = shotsIn(events)
     expect(Math.abs(shots - 6)).toBeLessThanOrEqual(1)
-    expect(damage).toEqual(mul(gunShotDamage(DRILL_LEVEL), fromSafeInteger(shots)))
+    expect(damage).toEqual(mul(gunShotDamage(stepOfMajor(DRILL_LEVEL)), fromSafeInteger(shots)))
     expect(hits.every((hit) => hit.shots >= 1 && hit.energy === hit.shots * GUN_SHOT_QUANTA)).toBe(
       true,
     )
@@ -204,7 +206,7 @@ describe('guns: what they log (#107 logging)', () => {
         enemyId: 'e1',
         shots: 4,
         energy: 4 * GUN_SHOT_QUANTA,
-        damage: toCanonical(mul(gunShotDamage(DRILL_LEVEL), fromSafeInteger(4))),
+        damage: toCanonical(mul(gunShotDamage(stepOfMajor(DRILL_LEVEL)), fromSafeInteger(4))),
       }),
     ])
   })

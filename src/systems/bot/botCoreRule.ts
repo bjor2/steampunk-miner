@@ -12,6 +12,7 @@
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { UpgradeId } from '../economy/economyDefinition'
+import { stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
 import { isCoreDugWithin } from './tripEstimate'
 
@@ -47,8 +48,11 @@ export function isUnderLeadCap(
   return ceiling === null || levels[track] < ceiling
 }
 
-/** The highest level the bot buys on this planet, or null for a track with no lead cap. */
+/**
+ * The highest step the bot buys on this planet, or null for a track with no lead cap: the caps
+ * count majors (#180 section 3), so the ceiling is the step of the capped major.
+ */
 export function leadCeiling(track: UpgradeId, planetIndex: number): number | null {
   const lead = LEAD_CAPS[track]
-  return lead === undefined ? null : onCurveLevel(track, planetIndex) + lead
+  return lead === undefined ? null : stepOfMajor(onCurveLevel(track, planetIndex) + lead)
 }

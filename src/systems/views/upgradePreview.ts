@@ -14,6 +14,7 @@
  * Focus and installing are UI state: reading this never touches the authority or the digest.
  */
 import type { UpgradeId } from '../economy/economyDefinition'
+import { isMajorStep } from '../economy/upgradeSteps'
 import {
   visualTier,
   visualTierGaugeOf,
@@ -23,7 +24,7 @@ import {
 import type { StatPreview, WorkshopRow } from './workshopRows'
 
 export interface PreviewGauge extends VisualTierGauge {
-  /** 1 while a track's row is focused: the tick the buy would add. */
+  /** 1 while a focused track's buy is its big level-up: the major tick it adds (#180). */
   pending: number
 }
 
@@ -68,7 +69,7 @@ export function upgradePreviewOf(levels: UpgradeLevels, focus: PreviewFocus): Up
     visualTier: tierAfter,
     ownedTier,
     ghostTier: tierAfter > ownedTier ? tierAfter : null,
-    gauge: { ...visualTierGaugeOf(levels), pending: focused === null ? 0 : 1 },
+    gauge: { ...visualTierGaugeOf(levels), pending: pendingTicksOf(levels, focused) },
     effect: focused === null ? null : { before: focused.effectBefore, after: focused.effectAfter },
     liningGrade: focus.focusedId === focus.casingBuyId ? focus.casingGradeAfter : null,
     installing: focus.installing,
@@ -89,6 +90,11 @@ export function gaugeTicksOf(gauge: PreviewGauge): GaugeTick[] {
 function tickAt(gauge: PreviewGauge, at: number): GaugeTick {
   if (at < gauge.owned) return 'owned'
   return at < gauge.owned + gauge.pending ? 'pending' : 'open'
+}
+
+/** A tick is a major level: only the focused track's big level-up adds one. */
+function pendingTicksOf(levels: UpgradeLevels, focused: WorkshopRow | null): number {
+  return focused !== null && isMajorStep(levels[focused.upgradeId]) ? 1 : 0
 }
 
 function levelsAfterBuy(levels: UpgradeLevels, row: WorkshopRow): UpgradeLevels {

@@ -72,7 +72,7 @@ export function groundHardnessAt(params: PlanetParams, tile: TilePoint): BigStat
  * drill's own hardness, so a lead ore cell (#140) costs it what it costs the drill (#223).
  */
 export function canBore(drill: DrillStats, params: PlanetParams, tile: TilePoint, cell: number) {
-  return isRemovableCell(cell) && canScratch(drill.drillTip, hardnessOfTile(params, tile, cell))
+  return isRemovableCell(cell) && canScratch(drill.gateTip, hardnessOfTile(params, tile, cell))
 }
 
 /** Ticks to break an intact tile, or null when the tip cannot scratch it. */

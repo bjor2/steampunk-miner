@@ -25,6 +25,7 @@ import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import { blastTradeOf, type BlastTrade } from '../src/systems/bot/blastTrade'
 import type { ChargePolicy } from '../src/systems/bot/botCharges'
 import { formatAmount } from '../src/systems/displayAmount'
+import { stepsOfMajors } from '../src/systems/economy/upgradeSteps'
 import { onCurveLevels, vehicleStatsAt } from '../src/systems/economy/vehicleStats'
 import { cmp, fromSafeInteger, mul, roundToWhole, type Money } from '../src/systems/money'
 import type { Scenario } from '../src/systems/scenario'
@@ -103,7 +104,7 @@ function tradeRowsOf(planet: number): TradeRow[] {
     { drill: `${DRILL_LEVELS_BEHIND} behind`, levels: behind },
   ].flatMap(({ drill, levels }) =>
     BANDS.flatMap((band) => {
-      const trade = blastTradeOf(params, vehicleStatsAt(levels), band)
+      const trade = blastTradeOf(params, vehicleStatsAt(stepsOfMajors(levels)), band)
       return trade === null ? [] : [{ planet, drill, trade }]
     }),
   )

@@ -1,8 +1,8 @@
 /**
- * The Upgrade bay's track rows (#33 section 6, #37): the six tracks in #7's order, each with its level,
- * the next level's cost (`upgradePrice`, the same value `upgrade_purchased.cost` logs) and an
- * effect preview "before -> after" from `vehicleStatsAt` at this level and the next (the same
- * function as `upgrade_purchased.statsAfter`). `drill_tip` also says to which band of this planet
+ * The Upgrade bay's track rows (#33 section 6, #37): the six tracks in #7's order, each with its
+ * stored step and its major and pip as text (#180), the next step's cost (`stepPrice`, the same
+ * value `upgrade_purchased.cost` logs) and an effect preview "before -> after" from
+ * `vehicleStatsAt` at this step and the next (the same function as `upgrade_purchased.statsAfter`). `drill_tip` also says to which band of this planet
  * it drills at full speed (`P >= H`, #7).
  */
 import type { AuthorityState } from '../authority/authorityState'
@@ -25,6 +25,7 @@ import {
   type ScreenButton,
 } from './viewParts'
 import { UI_ID_TEMPLATES } from './screenIds'
+import { stepLevelText } from './stepLevelText'
 
 /**
  * The stats a track changes, keyed as `statsAfter` names them, with the screen text of all of
@@ -54,7 +55,10 @@ export interface WorkshopRow {
   /** One vector icon per track (#44 `icon-track-<id>`, kebab-case per #52). */
   iconId: string
   label: string
+  /** The stored step, `10L + k`. */
   level: number
+  /** "13" at a major, "13 · 4/9" on its pips. */
+  levelText: string
   cost: AmountReading
   effectBefore: StatPreview
   effectAfter: StatPreview
@@ -123,6 +127,7 @@ function workshopRowOf(
     iconId,
     label,
     level: levels[upgradeId],
+    levelText: stepLevelText(levels[upgradeId]),
     cost,
     effectBefore: previewOf(levels, upgradeId),
     effectAfter: previewOf(next, upgradeId),

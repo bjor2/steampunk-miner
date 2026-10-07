@@ -48,3 +48,4 @@ jobs:
           npx vitest run src/logging/goldenRun.test.ts src/logging/secondSliceGolden.test.ts
           src/systems/replay
           src/systems/money.test.ts src/systems/world/generatorGolden.test.ts
+          src/systems/economy/upgradeSteps.test.ts

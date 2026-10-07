@@ -188,8 +188,8 @@ describe('run summary', () => {
   it('keeps the band-1 dig time per metre of each planet with the levels it was entered and left with', () => {
     const run = [
       ...PLAYED_RUN.slice(0, 7),
-      bought(985, 'drill_power', 13),
-      bought(986, 'drill_tip', 7),
+      bought(985, 'drill_power', 130),
+      bought(986, 'drill_tip', 70),
       ...PLAYED_RUN.slice(7),
     ]
     expect(deriveSummary(run).firstBandDigTicks).toEqual({
@@ -201,8 +201,8 @@ describe('run summary', () => {
   it('keeps the band-5 dig time of each planet too, the band the sawtooth is judged on', () => {
     const run = [
       ...PLAYED_RUN.slice(0, 7),
-      bought(985, 'drill_power', 13),
-      bought(986, 'drill_tip', 7),
+      bought(985, 'drill_power', 130),
+      bought(986, 'drill_tip', 70),
       ...PLAYED_RUN.slice(7),
     ]
     expect(deriveSummary(run).sawtoothBandDigTicks).toEqual({
@@ -214,7 +214,7 @@ describe('run summary', () => {
   it('enters the planet with the start levels a scenario sets on the tick it is entered', () => {
     const setDrill = line(0, 'debug_command_applied', {
       command: 'debug.setUpgrade',
-      args: { upgradeId: 'drill_power', level: 13 },
+      args: { upgradeId: 'drill_power', level: 130 },
     })
     const run = [...PLAYED_RUN.slice(0, 2), setDrill, ...PLAYED_RUN.slice(2)]
     expect(deriveSummary(run).firstBandDigTicks['1']).toEqual({ arrival: 24, departure: 24 })

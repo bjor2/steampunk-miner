@@ -13,6 +13,7 @@ import { readArchetypes } from './readArchetypeEconomy'
 import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
 import { readPaceScale } from './readPaceScale'
+import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
 import {
   TRACK_EFFECTS,
@@ -62,6 +63,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
       costCurves,
     ),
     upgrades,
+    upgradeTiers: readUpgradeTiers(reader, file.upgradeTiers),
     gun: readGun(reader, reader.object('gun', file.gun)),
     archetypes: readArchetypes(reader, file.archetypes, ore.coreTierBand),
     visualTiers: reader

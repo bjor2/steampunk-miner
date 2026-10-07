@@ -37,8 +37,8 @@ const UNDOCK = { type: 'undock', payload: {} } as const
 const REFINE_TICKS = 180 * 60
 
 const DRILL_FOR_LATER_PLANETS = [
-  { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 25 } },
-  { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 13 } },
+  { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_power', level: 250 } },
+  { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 130 } },
 ] as const
 
 /** Planet 2's surface ore is tier 4 (#6: t = 3(p-1) + b), worth 33.75 a unit against tier 1's 10. */

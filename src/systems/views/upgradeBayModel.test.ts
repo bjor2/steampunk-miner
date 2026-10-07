@@ -4,7 +4,7 @@ import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
 import { stateDigest } from '../authority/stateDigest'
 import { casingUpgradePrice } from '../economy/casingPrices'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
-import { gunLevelPrice, gunMaxLevel, gunMountPrice } from '../economy/gunStats'
+import { gunMountPrice, gunTopStep, nextGunPrice } from '../economy/gunStats'
 import { toCanonical } from '../money'
 import {
   buyCasingGradeCommand,
@@ -75,22 +75,22 @@ describe('upgrade bay model: the Guns row (#107)', () => {
     })
   })
 
-  it('offers the next gun level after the mount, its Buy submitting BuyGun', () => {
+  it('offers the next gun step after the mount, its Buy submitting BuyGun', () => {
     const session = atUpgradeBayOn(4)
     session.submit(2, buyGunCommand())
     const guns = upgradeBayOf(session).guns
     expect(guns).toMatchObject({
-      level: 1,
-      levelText: '1 → 2',
-      effectText: '2 → 2.14 shots/s',
-      cost: { exact: toCanonical(gunLevelPrice(1, 4)) },
+      level: 10,
+      levelText: '1 → 1 · 1/9',
+      effectText: '2 → 2 shots/s',
+      cost: { exact: toCanonical(nextGunPrice(10, 4)) },
       buy: { label: 'Buy', action: { kind: 'submit', intent: buyGunCommand() } },
     })
   })
 
   it('says top level at the cap and carries max_level on its Buy', () => {
     const session = atUpgradeBayOn(4)
-    session.submit(2, setGunLevelCommand(gunMaxLevel()))
+    session.submit(2, setGunLevelCommand(gunTopStep()))
     expect(upgradeBayOf(session).guns).toMatchObject({
       levelText: '16 (top)',
       buy: { reason: 'max_level' },
@@ -224,7 +224,8 @@ describe('upgrade bay model', () => {
 
   it('previews the focused track and the visual tier its purchase crosses into', () => {
     const session = atUpgradeBay()
-    session.submit(3, setUpgradeCommand('boiler', 7))
+    session.submit(3, setUpgradeCommand('boiler', 70))
+    session.submit(3, setUpgradeCommand('engine', 9))
     expect(upgradeBayOf(session, buyIdOf('engine')).preview).toMatchObject({
       highlight: 'engine',
       visualTier: 2,
@@ -234,7 +235,7 @@ describe('upgrade bay model', () => {
 
   it('keeps the visual tier unchanged with the Casing row focused: casing is not a hull part', () => {
     const session = atUpgradeBay('1e6')
-    session.submit(3, setUpgradeCommand('boiler', 7))
+    session.submit(3, setUpgradeCommand('boiler', 70))
     expect(upgradeBayOf(session, UI_IDS.upgradebayCasingBuy).preview).toMatchObject({
       highlight: null,
       visualTier: 1,

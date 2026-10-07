@@ -8,6 +8,7 @@ import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import { playSlice, type SliceRun } from './playSlice'
 import type { RefineryUse } from './botRefining'
+import { stepOfMajor } from '../economy/upgradeSteps'
 
 const WORLD_SEED = 83921
 /** Fifteen minutes on planet 3: several dock cycles, each past a 180 s batch. */
@@ -18,7 +19,7 @@ const ARRIVED_ON_PLANET_3: CommandIntent[] = [
   setPlanetCommand(3),
   setPlanetSeedCommand(WORLD_SEED),
   { type: 'debug.setMoney', payload: { amount: '2000' } },
-  ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveLevel(id, 3))),
+  ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, 3)))),
 ]
 
 const runs = new Map<RefineryUse, SliceRun>()

@@ -24,6 +24,7 @@ import {
   type MineLayout,
 } from './mineLayout'
 import { nextRow, sideFor } from './tripGoal'
+import { stepOfMajor } from '../economy/upgradeSteps'
 
 const CORE: { kind: 'core' } = { kind: 'core' }
 
@@ -42,7 +43,9 @@ const ARRIVED_ON_PLANET_9: CommandIntent[] = [
   setPlanetCommand(OFF_CENTRE_PLANET),
   setPlanetSeedCommand(OFF_CENTRE_SEED),
   { type: 'debug.setMoney', payload: { amount: '1e30' } },
-  ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, onCurveLevel(id, OFF_CENTRE_PLANET))),
+  ...UPGRADE_IDS.map((id) =>
+    setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, OFF_CENTRE_PLANET))),
+  ),
   { type: 'debug.setCasingGrade', payload: { grade: 5 } },
   { type: 'debug.setLiningType', payload: { liningType: 'refractory' } },
   { type: 'debug.freezeEnemies', payload: { frozen: true } },

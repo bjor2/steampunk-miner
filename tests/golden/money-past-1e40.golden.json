@@ -28,7 +28,7 @@
       "type": "debug.setUpgrade",
       "payload": {
         "upgradeId": "drill_tip",
-        "level": 240
+        "level": 2400
       }
     },
     {
@@ -38,7 +38,7 @@
       "type": "debug.setUpgrade",
       "payload": {
         "upgradeId": "drill_power",
-        "level": 500
+        "level": 5000
       }
     },
     {
@@ -48,7 +48,7 @@
       "type": "debug.setUpgrade",
       "payload": {
         "upgradeId": "cargo_hold",
-        "level": 445
+        "level": 4570
       }
     },
     {
@@ -237,17 +237,17 @@
     {
       "tick": 124,
       "scope": "dock",
-      "digest": "70e62c8aa17f8d86"
+      "digest": "6fb0c23d9fdc9891"
     },
     {
       "tick": 166,
       "scope": "dock",
-      "digest": "29c6bc98cb80d26e"
+      "digest": "12cbf6d154baf8cb"
     },
     {
       "tick": 2000,
       "scope": "end",
-      "digest": "43649f71c80cb35a"
+      "digest": "8f5df500e25f3aa2"
     }
   ],
   "minedOrder": [
