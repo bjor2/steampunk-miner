@@ -90,8 +90,12 @@ import type { BayId } from '../world/dockBays'
  * 36: the store's buy path (ticket 248): `buyVehicleItem {itemId}` at the Upgrade bay, answered by
  *    `VehicleItemPurchased`, with the rejections `unknown_vehicle_item`, `vehicle_item_owned`,
  *    `not_researched` and `not_for_sale`.
+ * 37: the drill-gear lane (#205): `power-up-core.use_power_up` also takes `drill.flank` and
+ *    `drill.collar`, `drill-gear.GroundCrumbled`, `drill-gear.TunnelBackfilled` and
+ *    `drill-gear.OreSampled`, its terrain edits and drill gear asks, and `side_drills` logged as
+ *    unlocked.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 36
+export const AUTHORITY_PROTOCOL_VERSION = 37
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
