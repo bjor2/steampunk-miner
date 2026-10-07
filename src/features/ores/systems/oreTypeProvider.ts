@@ -6,16 +6,21 @@
  *
  * Icons are generated per tier (`icon-ore-<family>-t<tier>`), and the generator draws metal and
  * crystal; the other ten families take its `mixed` nugget until ore-visuals ships their glyphs.
+ *
+ * The codex bit index (#207, #219) is tier-major with a stride of every code the cell's 4-bit family
+ * field can hold, not just today's 12 families, so an appended family never moves a stored bit and
+ * the index tag stays. Signatures are #141's (planet-mix), so no type here sets `signature`.
  */
 import { CAMPAIGN_LAST_PLANET } from '../../../constants/balance'
 import { oreIconIdOf, type OreIconFamily } from '../../../systems/art/icons/oreIcon'
 import type { OreQuery, OreType, OreTypeProvider } from '../../../systems/registries/oreTypes'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import type { ResourceFamily } from '../../../systems/world/worldCell'
-import { familyOfCellCode, oreFamilies, oreTierOf, oreTypeOf } from './oreCatalogue'
-import type { OreFamily } from './oreRows'
+import { familyOfCellCode, oreFamilies, oreFamilyNamed, oreTierOf, oreTypeOf } from './oreCatalogue'
+import { MAX_FAMILY_CODE, type OreFamily } from './oreRows'
 
 export const ORE_TYPE_PROVIDER_ID = 'ores.catalogue'
+export const ORE_INDEX_TAG = 'ores.tier-family'
 
 /** #140: the largest lead the catalogue rolls. */
 const MAX_LEAD = 2
@@ -24,7 +29,9 @@ const NO_REQUIREMENTS: readonly string[] = Object.freeze([])
 
 export const oreTypeProvider: OreTypeProvider = {
   id: ORE_TYPE_PROVIDER_ID,
+  indexTag: ORE_INDEX_TAG,
   oreTypeOf: kernelOreTypeOf,
+  bitIndexOf: bitIndexOfOre,
   catalogue: campaignCatalogue,
 }
 
@@ -40,6 +47,11 @@ function kernelOreTypeOf({ tier, cellFamily }: OreQuery): OreType {
 /** A cell family code with no row (`none`) wears the first family, as the kernel look does. */
 function familyOfCell(cellFamily: ResourceFamily): OreFamily {
   return familyOfCellCode(cellFamily) ?? oreFamilies()[0]
+}
+
+/** `(tier - 1) * 15 + (family code - 1)`: deeper ores take higher bits. */
+function bitIndexOfOre({ family, tier }: OreType): number {
+  return (tier - 1) * MAX_FAMILY_CODE + oreFamilyNamed(family).cellCode - 1
 }
 
 function oreTypeOfFamily(family: OreFamily, cellFamily: number, tier: number): OreType {
