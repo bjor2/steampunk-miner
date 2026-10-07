@@ -33,6 +33,13 @@ export interface KeyChange {
   isShiftHeld: boolean
 }
 
+/** What `exportSnapshots()` handed the player (#123): the zip's download name, size and entries. */
+export interface SnapshotExport {
+  file: string
+  bytes: number
+  entries: string[]
+}
+
 /** One notch of the mouse wheel (or a trackpad's worth of scrolling): `up` rolls away from the player. */
 export type ScrollNotch = 'up' | 'down'
 
@@ -79,6 +86,15 @@ export interface Shell {
   onTouchInput(listener: () => void): () => void
   /** A short buzz on a device with a vibration motor; nothing elsewhere (#173 haptics). */
   vibrate(milliseconds: number): void
+  /**
+   * A debug run's snapshot (#123), `file` named by `src/logging/runLayout.ts`: into the run folder
+   * under Electron's `logs/`, into IndexedDB in a browser.
+   */
+  writeRunSnapshot(runId: string, file: string, bytes: Uint8Array): Promise<void>
+  /** Electron writes the page's heap snapshot and answers its size; a browser page cannot: null. */
+  writeHeapSnapshot(runId: string, file: string): Promise<number | null>
+  /** Browser: downloads every kept snapshot as one zip. Electron's are files already: null. */
+  exportRunSnapshots(): Promise<SnapshotExport | null>
 }
 
 /**

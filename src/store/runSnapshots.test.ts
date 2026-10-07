@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import type { RunEventData } from '../logging/eventNames'
 import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import type { SceneMemory } from '../logging/memorySample'
 import { perfSampleOf, type FrameCost } from '../logging/perfSample'
@@ -117,7 +118,8 @@ afterEach(() => {
 
 const game = () => useGameStore.getState()
 const linesNamed = (event: string) => sink.events.filter((line) => line.event === event)
-const snapshotLines = () => linesNamed('snapshot_written').map((line) => line.data)
+const snapshotLines = () =>
+  linesNamed('snapshot_written').map((line) => line.data as RunEventData<'snapshot_written'>)
 
 function sampleHeapAt(...readingsMiB: number[]): void {
   readingsMiB.forEach((usedMiB, index) => {
@@ -195,7 +197,10 @@ describe('debug run snapshots (#123)', () => {
     const copy = JSON.parse(
       new TextDecoder().decode(disk.files.get(`snapshots/save-${saved.tick}.json`)),
     )
-    expect(copy).toMatchObject({ saveEpoch: 1, digest: saved.data.digest })
+    expect(copy).toMatchObject({
+      saveEpoch: 1,
+      digest: (saved.data as RunEventData<'checkpoint_saved'>).digest,
+    })
     expect(snapshotLines()).toEqual([])
   })
 

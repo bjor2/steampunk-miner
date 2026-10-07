@@ -7,6 +7,7 @@ import { readShellLaunch } from './launchOptions.cjs'
 import { appendRunCommands, appendRunEvents, writeRunDocument } from './runLogFiles.cjs'
 import { readPreferences, writePreferences } from './preferencesFiles.cjs'
 import { readSaveSlot, setAsideSaveSlot, writeSaveSlot } from './saveFiles.cjs'
+import { writeHeapSnapshot, writeRunSnapshot } from './snapshotFiles.cjs'
 
 export function registerShellHandlers(): void {
   const userData = app.getPath('userData')
@@ -40,6 +41,28 @@ export function registerShellHandlers(): void {
   ipcMain.handle(SHELL_CHANNELS.writePreferences, (_event, file, json) =>
     writePreferences(userData, file, json),
   )
+  registerSnapshotHandlers(logsRoot, areSnapshotsAllowed(launch.debugEnabled))
+}
+
+/**
+ * Snapshots (#123) are for debug runs: `--debug-api`, or the unpackaged dev window, whose renderer
+ * turns the debug API on by itself. A player's build refuses them, heap snapshots above all.
+ */
+function areSnapshotsAllowed(isDebugApiOn: boolean): boolean {
+  return isDebugApiOn || !app.isPackaged
+}
+
+function registerSnapshotHandlers(logsRoot: string, isAllowed: boolean): void {
+  ipcMain.handle(SHELL_CHANNELS.writeRunSnapshot, (_event, runId, file, bytes) =>
+    refuseUnless(isAllowed, () => writeRunSnapshot(logsRoot, runId, file, bytes)),
+  )
+  ipcMain.handle(SHELL_CHANNELS.writeHeapSnapshot, (event, runId, file) =>
+    refuseUnless(isAllowed, () => writeHeapSnapshot(logsRoot, runId, file, event.sender)),
+  )
+}
+
+function refuseUnless<T>(isAllowed: boolean, write: () => Promise<T>): Promise<T> {
+  return isAllowed ? write() : Promise.reject(new Error('snapshots need --debug-api'))
 }
 
 function readAppInfo(): AppInfo {

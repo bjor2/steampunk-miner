@@ -41,7 +41,8 @@ export async function writeRunDocument(
   await writeFile(join(folder, `${name}.json`), acceptText(json), 'utf8')
 }
 
-async function prepareRunFolder(logsRoot: string, runId: unknown): Promise<string> {
+/** The run's folder, created when missing; refuses an id that could leave `logsRoot`. */
+export async function prepareRunFolder(logsRoot: string, runId: unknown): Promise<string> {
   if (typeof runId !== 'string' || !RUN_ID_PATTERN.test(runId)) {
     throw new Error('invalid run id')
   }

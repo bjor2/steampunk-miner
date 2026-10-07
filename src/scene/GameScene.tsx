@@ -9,6 +9,7 @@ import { PhysicsWorld } from '../physics/PhysicsWorld'
 import { useGameStore } from '../store/gameStore'
 import { CementSpray } from './CementSpray'
 import { BlastScorches } from './BlastScorches'
+import { CanvasScreenshots } from './CanvasScreenshots'
 import { CollapseTelegraph } from './CollapseTelegraph'
 import { EnemyFigures } from './EnemyFigures'
 import { LightRig } from './LightRig'
@@ -59,6 +60,7 @@ export function GameScene() {
       <PerfSampler />
       <ScreenProjectorFeed />
       <RenderPipeline />
+      <CanvasScreenshots />
     </Canvas>
   )
 }

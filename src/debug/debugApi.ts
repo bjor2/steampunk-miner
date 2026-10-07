@@ -72,6 +72,8 @@ import {
 import { forceCollapseCommand } from '../systems/authority/collapse/collapseCommands'
 import type { CollapseReport } from '../systems/authority/collapse/collapseReport'
 import { readCollapseReport } from '../store/collapseReads'
+import { exportSnapshotZip } from '../store/runSnapshots'
+import type { SnapshotExport } from '../shell/shell'
 import type { BayId } from '../systems/world/dockBays'
 import { SOLID_DENSITY } from '../systems/world/sampleGrid'
 import { depthTilesOfBasisPoints } from '../systems/world/planetGeometry'
@@ -227,6 +229,13 @@ export interface DebugApi {
   // memory (#119): reads, not logged
   /** Rigid bodies and colliders in the running Rapier world, and its WASM memory in bytes. */
   getPhysicsStats(): DebugResult<PhysicsStats>
+  // snapshots (#123): not logged, never `debugApplied`
+  /**
+   * Browser: downloads every kept run's snapshots (saves, screenshots) from IndexedDB as one
+   * uncompressed zip, `<runId>/<file>` per entry. Refused in Electron, which writes them into
+   * the run folder under `logs/`.
+   */
+  exportSnapshots(): Promise<DebugResult<SnapshotExport>>
   /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
   ui: DebugUi
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
@@ -431,6 +440,7 @@ export function createDebugApi(): DebugApi {
       ),
     collapseState: () => ({ ok: true, ...readCollapseReport() }),
     getPhysicsStats: readPhysicsStats,
+    exportSnapshots: exportSnapshotZip,
     ui: createDebugUi(),
     input: createDebugInput(),
     features: debugActionsBySlice(),

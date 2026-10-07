@@ -36,7 +36,7 @@ interface PlacedEntry {
   offset: number
 }
 
-export function zipStoredEntries(entries: readonly ZipEntry[]): Uint8Array {
+export function zipStoredEntries(entries: readonly ZipEntry[]): Uint8Array<ArrayBuffer> {
   const placed = placeEntries(entries)
   const zip = new Uint8Array(zipSizeOf(placed))
   const view = new DataView(zip.buffer)

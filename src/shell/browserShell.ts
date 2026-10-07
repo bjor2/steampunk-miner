@@ -1,10 +1,11 @@
 /**
  * The shell in a plain browser: no filesystem, so the newest run-log lines are kept in memory (a
- * bot can read them back through the debug handle). A real download/OPFS writer can replace this
+ * bot can read them back through the debug handle) and a debug run's snapshots in IndexedDB. A real download/OPFS writer can replace this
  * later. Save slots go to localStorage, so quit and resume works in the browser too; one `setItem`
  * is all-or-nothing, which is the browser's atomic write.
  */
 import { keepNewestLines } from '../logging/ndjson'
+import { createBrowserSnapshots } from './browserSnapshots'
 import { readBrowserLaunchParameters } from './launchParameters'
 import { watchPageListeners } from './listenerCount'
 import { readPageMemory } from './pageMemory'
@@ -37,6 +38,7 @@ export function createBrowserShell(): Shell {
   const eventLinesByRun = new Map<string, string>()
   const commandLinesByRun = new Map<string, string>()
   const documentsByRun = new Map<string, string>()
+  const snapshots = createBrowserSnapshots()
 
   return {
     kind: 'browser',
@@ -72,6 +74,9 @@ export function createBrowserShell(): Shell {
     setScreenStyle: setRootStyle,
     onTouchInput: listenForTouches,
     vibrate: vibrateDevice,
+    writeRunSnapshot: (runId, file, bytes) => snapshots.write(runId, file, bytes),
+    writeHeapSnapshot: async () => null,
+    exportRunSnapshots: () => snapshots.exportAll(),
   }
 }
 

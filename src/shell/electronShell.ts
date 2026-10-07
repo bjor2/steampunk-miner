@@ -47,5 +47,8 @@ export function createElectronShell(bridge: ShellBridge): Shell {
     setScreenStyle: setRootStyle,
     onTouchInput: listenForTouches,
     vibrate: vibrateDevice,
+    writeRunSnapshot: (runId, file, bytes) => bridge.writeRunSnapshot(runId, file, bytes),
+    writeHeapSnapshot: (runId, file) => bridge.writeHeapSnapshot(runId, file),
+    exportRunSnapshots: async () => null,
   }
 }

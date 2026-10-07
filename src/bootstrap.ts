@@ -19,18 +19,27 @@ import { createRunLog, getRunLog, installRunLog } from './logging/runLog'
 import { createRunMetadata } from './logging/runMetadata'
 import { createRunProgressSink, type RunProgressSink } from './logging/runProgress'
 import { watchRapierWasmMemory } from './physics/rapierWasmMemory'
+import { requestCanvasScreenshot } from './scene/canvasScreenshots'
 import { getShell, type Shell } from './shell/shell'
 import {
   installSaveSlots,
   loadCheckpoint,
+  saveFileNow,
   type CheckpointLoad,
   type SaveSlots,
 } from './store/checkpoint'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
+import { listenForDomainEvents } from './store/domainEventBroadcast'
 import { routeKeyChange, routeScrollNotch } from './store/inputRuntime'
 import { turnOnPerfLog } from './store/perfLog'
 import { recordStartingPlanetEntered } from './store/planetArrivalLog'
 import { installPreferencesStorage, loadPreferences } from './store/preferencesFile'
+import {
+  snapshotPlanetChange,
+  snapshotSaveAtSessionEnd,
+  turnOnSnapshots,
+  type SnapshotSources,
+} from './store/runSnapshots'
 import { parseScenario, type Scenario } from './systems/scenario'
 import { keepScreenFitted } from './ui/stage/screenFit'
 import { keepHapticsPlaying, showTouchControlsOnTouch } from './ui/touch/touchFollowers'
@@ -55,6 +64,7 @@ export async function startGame(): Promise<void> {
   const shell = getShell()
   const run = startRunLogging(shell, new Date())
   logPerfOnTestRuns(shell, run)
+  keepSnapshotsOnDebugRuns(shell, run.runId)
   recordGameStarted(shell)
   installSaveSlots(saveSlotsOf(shell))
   await adoptLocalPreferences(shell)
@@ -164,6 +174,28 @@ function logPerfOnTestRuns(shell: Shell, run: RunFiles): void {
     readPageMemory: () => shell.readPageMemory(),
     readRunProgress: () => run.progress.progress(),
   })
+}
+
+/**
+ * Snapshots (#123) are for debug runs only (`launch.debugEnabled`: dev, `?debug`, `--debug-api`);
+ * a plain scenario run logs perf lines but keeps no snapshots. Before the checkpoint is installed,
+ * so the first slot save already keeps its copy.
+ */
+function keepSnapshotsOnDebugRuns(shell: Shell, runId: string): void {
+  if (!shell.launch.debugEnabled) return
+  turnOnSnapshots(snapshotSourcesOf(shell, runId))
+  listenForDomainEvents(snapshotPlanetChange)
+  shell.onPageHide(snapshotSaveAtSessionEnd)
+}
+
+function snapshotSourcesOf(shell: Shell, runId: string): SnapshotSources {
+  return {
+    writeFile: (file, bytes) => shell.writeRunSnapshot(runId, file, bytes),
+    writeHeapSnapshot: (file) => shell.writeHeapSnapshot(runId, file),
+    captureScreenshot: requestCanvasScreenshot,
+    readSaveFile: saveFileNow,
+    exportZip: () => shell.exportRunSnapshots(),
+  }
 }
 
 function applyLaunchScenario(shell: Shell): void {

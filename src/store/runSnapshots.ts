@@ -18,6 +18,7 @@ import {
 } from '../logging/runLayout'
 import { getRunLog } from '../logging/runLog'
 import type { DomainEvent } from '../systems/authority/domainEvent'
+import type { SnapshotExport } from '../shell/shell'
 import type { SaveSlotFile } from '../systems/save/saveSlot'
 import {
   createBudgetBreachWatch,
@@ -33,13 +34,6 @@ import { hasPlanetChanged } from '../systems/snapshots/planetChange'
 import { readAuthorityState } from './authorityLink'
 import { runEventPlaceOf, useGameStore } from './gameStore'
 
-/** What `exportSnapshots()` handed the player: the zip's download name, size and entries. */
-export interface SnapshotExport {
-  file: string
-  bytes: number
-  entries: string[]
-}
-
 /** Where a debug run's snapshots go and what they are taken of. */
 export interface SnapshotSources {
   /** Writes `file`, a path in the run folder: `logs/<runId>/` in Electron, IndexedDB in a browser. */
@@ -53,8 +47,6 @@ export interface SnapshotSources {
   /** Zips the kept snapshots and hands the zip to the player; null where they are files already. */
   exportZip(): Promise<SnapshotExport | null>
 }
-
-export type SnapshotExportResult = { ok: true } & SnapshotExport
 
 type SnapshotLine = RunEventData<'snapshot_written'>
 type SaveTrigger = 'timer' | 'session_end'
@@ -137,7 +129,7 @@ export async function keepSlotSaveSnapshot(tick: number, json: string): Promise<
 
 /** The debug API's `exportSnapshots()` (#123 locked answer 3). */
 export async function exportSnapshotZip(): Promise<
-  SnapshotExportResult | { ok: false; problems: string[] }
+  ({ ok: true } & SnapshotExport) | { ok: false; problems: string[] }
 > {
   if (keeping === null) return { ok: false, problems: ['this run keeps no snapshots'] }
   await writes

@@ -56,4 +56,11 @@ export interface ShellBridge {
   readPreferences(file: PreferencesFileName): Promise<string | null>
   /** Replaces `<userData>/<file>.json` atomically (temp file, then rename). */
   writePreferences(file: PreferencesFileName, json: string): Promise<void>
+  /**
+   * Debug runs only (#123): writes a snapshot under `logs/<runId>/`, `file` being one of the
+   * snapshot names of `src/logging/runLayout.ts`. Refused unless launched with `--debug-api`.
+   */
+  writeRunSnapshot(runId: string, file: string, bytes: Uint8Array): Promise<void>
+  /** Debug runs only (#123): the page's heap snapshot into `logs/<runId>/<file>`; its size. */
+  writeHeapSnapshot(runId: string, file: string): Promise<number>
 }
