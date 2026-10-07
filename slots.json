@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T00:17:59+02:00",
+  "updated_at": "2026-10-08T00:20:34+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -192,15 +192,21 @@
     },
     {
       "slot": 5,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "planner",
+      "ticket": 309,
+      "since": "2026-10-08T00:20:02+02:00",
+      "map": 302,
+      "room": "9cc76e78-1e10-4130-8b0e-0865bac3f7a8",
+      "adopted": false
     },
     {
       "slot": 6,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "planner",
+      "ticket": 311,
+      "since": "2026-10-08T00:20:05+02:00",
+      "map": 302,
+      "room": "9cc76e78-1e10-4130-8b0e-0865bac3f7a8",
+      "adopted": false
     },
     {
       "slot": 7,
@@ -317,10 +323,10 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
+      "used": 7,
       "dev": 5,
       "dev_cap": 8,
-      "planner": 0,
+      "planner": 2,
       "planner_cap": 4
     },
     "claude": {
