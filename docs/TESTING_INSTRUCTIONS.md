@@ -5,11 +5,11 @@ rules live; `CLAUDE.md` summarises it. Modelled on the `infernal-bistro` ruleboo
 
 ## 1. The layers
 
-|        | `npm test` (Vitest)                                                    | `npm run test:e2e` (Playwright)                               | `npm run test:packaged` (Playwright)               |
-| ------ | ---------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------- |
-| Runs   | Node, no DOM, no canvas; a Rapier world only in `src/physics` specs    | Chromium on `vite preview` of the production build            | The `electron-builder --dir` output, no Steam      |
-| Covers | Formulas, store actions, logging, scenario rules, debug API, collision | Launch, `?debug&scenario=`, digests, snapshot, refusals       | Window, run log folder, `--debug-api`, save folder |
-| Status | The whole rule layer, plus the golden and pacing gates. Run it.        | Box Tester per completed feature touching `src/`, and nightly | Box Tester nightly, and by hand                    |
+|        | `npm test` (Vitest)                                                    | `npm run test:e2e` (Playwright)                            | `npm run test:packaged` (Playwright)               |
+| ------ | ---------------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------- |
+| Runs   | Node, no DOM, no canvas; a Rapier world only in `src/physics` specs    | Chromium on `vite preview` of the production build         | The `electron-builder --dir` output, no Steam      |
+| Covers | Formulas, store actions, logging, scenario rules, debug API, collision | Launch, `?debug&scenario=`, digests, snapshot, refusals    | Window, run log folder, `--debug-api`, save folder |
+| Status | The whole rule layer, plus the golden and pacing gates. Run it.        | Box Tester per completed spec touching `src/`, and nightly | Box Tester nightly, and by hand                    |
 
 `vite.config.ts` includes `src/**/*.test.ts` and, for the node build scripts (perf recorder,
 status dashboard, ticket phase metrics), `scripts/**/*.test.mjs`. There are no component tests and no screenshot

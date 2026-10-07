@@ -109,7 +109,7 @@ starts no workflow. There is no separate publish command to call. The fields the
   tester:   { state: 'idle'|'running', phase, sha, since, holds_gate, claude_slot,
               last_run, last_nightly, last_nightly_result, main_red_sha,
               feature, feature_title,            // the feature under test while running
-              queue: [{ feature, title, tickets, since }] } }   // completed features awaiting test
+              queue: [{ feature, title, tickets, since }] } }   // completed specs awaiting test (feature = the spec issue)
 ```
 
 `tester` is the box Tester (`tester.sh` beside the driver, docs/metrics/test-metrics.md). It
@@ -118,9 +118,9 @@ tab shows it holding a gate token or its triage Claude slot (an `aux` slot label
 `tester-triage`) within about a minute; it also publishes a `tester` entry in `loops.json`
 (working / idle / blocked on red / paused on main red), whose state changes rebuild the page. The
 Tests tab (#192) reads `tester` with the test-metrics `summary.json` and main's `box-tester/*`
-commit statuses: the feature under test, the features awaiting test, runs per phase (fast, slow,
+commit statuses: the spec under test, the specs awaiting test, runs per phase (fast, slow,
 full, nightly suites) with their feature, the main-red pause and a STALE warning when no box run
-happened for 26 h (`TESTER_STALE_AFTER_H`; runs are per completed feature plus the nightly). A ticket the Tester
+happened for 26 h (`TESTER_STALE_AFTER_H`; runs are per completed spec plus the nightly). A ticket the Tester
 reopens with `needs-fix` gets one attempt back in the loop's `state.json` (`tester_grants`), so the
 loop retries it even after `MAX_ATTEMPTS`; the Loops tab's Needs attention list says "Tester red
 (phase): retry granted" until it closes green.

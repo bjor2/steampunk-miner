@@ -7,13 +7,15 @@ requests). The build loop's **box Tester** (`claude-sessions/steampunk-loop/test
 build box) runs them and writes the records. Records before that date come from Actions
 (`run.source` missing or `actions`). The status page's Tests tab (#192) reads them.
 
-- **When:** per feature, when it completes, and nightly from the first loop pass after 01:30
-  Oslo. Worker gates run no Vitest (typecheck, lint, format:check, build only). When a close
-  leaves a parent issue with no open sub-issue, that parent is the completed feature (its tickets =
-  its closed children and grandchildren); a closed ticket without a parent is a feature of its
-  own. The loop queues it (`tester/queue.json`, shown as "Features awaiting test") and the Tester
-  works the queue on the `origin/main` tip.
-- **Feature run, in order:** `fast` = `CHANGED_FILES=<union of the files the feature's tickets'
+- **When:** per spec, when all its tickets are closed, and nightly from the first loop pass after
+  01:30 Oslo. Worker gates run no Vitest (typecheck, lint, format:check, build only). The unit is
+  the spec a ticket came from (rules in [issue-tracker.md](../agents/issue-tracker.md#specs-and-testing)):
+  the ticket body's `Spec: #N` line, else its `map #N`, else the ticket alone. A spec is complete
+  when every ticket under it, sub-specs included, is closed; an outer spec's `Testing: outer-only`
+  line tests its sub-specs only at the outer finish (default `per-subspec`). The loop queues each
+  completed spec (`tester/queue.json`, shown as "Specs awaiting test", resolved by the loop's
+  `spec-resolve.py`) and the Tester works the queue on the `origin/main` tip.
+- **Spec run, in order:** `fast` = `CHANGED_FILES=<union of the files the spec's tickets'
 commits changed> scripts/ci/selectPushTests.sh` (scoped `vitest related`, full, or none), pacing
   bot excluded, recorded at once; then, when `fast` is green and the feature touched `src/` (or
   was unmappable), `slow` = the three pacing bot files (NIGHTLY_ONLY_TESTS) and Playwright e2e
