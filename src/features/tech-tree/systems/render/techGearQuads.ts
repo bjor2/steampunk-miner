@@ -12,10 +12,16 @@ import { slotAttachPointOf, type AttachId } from '../../../../systems/registries
 import type { LoadoutSlotId } from '../../../../systems/registries/vehicleLoadout'
 import type { VehicleLoadout } from '../../../../systems/vehicle/loadoutState'
 import { partPoseAt } from './extractorPose'
-import { mountedGearOf, type MountedGear } from './techGear'
+import { mountedGearOf, type GearKind, type MountedGear } from './techGear'
 
 /** The asset's one look: every gear part is authored untiered. */
 const ONLY_LOOK = 1
+
+/**
+ * Drawn only while equipped: a power-up housing, and drill gear, whose socket holds one item, so
+ * a spare head or collar stays in the store rather than drawing over the one on the drill.
+ */
+const EQUIPPED_ONLY_KINDS: readonly GearKind[] = ['slot', 'head', 'collar', 'flank']
 
 /** A quad placed in the vehicle's frame, with the turn its group applies about `pivot`. */
 export interface GearQuad extends AssetQuad {
@@ -37,13 +43,13 @@ export function gearAttachIdOf(gear: MountedGear, slot: LoadoutSlotId | null): A
   return slot === null ? null : slotAttachPointOf(slot)
 }
 
-/** Every item the loadout draws: what is owned with no slot, and what sits in a slot. */
+/** Every item the loadout draws: what is mounted once owned, and what sits in a slot. */
 export function mountedItemsOf(loadout: VehicleLoadout): MountedItem[] {
   const slotted = Object.entries(loadout.slots)
     .filter((entry): entry is [LoadoutSlotId, string] => entry[1] !== null)
     .map(([slot, itemId]) => ({ itemId, slot }))
   const unslotted = loadout.owned
-    .filter((itemId) => mountedGearOf(itemId)?.attach !== 'slot')
+    .filter(isMountedOnceOwned)
     .filter((itemId) => !slotted.some((item) => item.itemId === itemId))
     .map((itemId) => ({ itemId, slot: null }))
   return [...unslotted, ...slotted]
@@ -80,6 +86,11 @@ export function vehicleGearQuadsOf(
     mountedGearQuadsOf(art, vehicle, item, fractionOf(item.itemId)),
   )
   return quads.filter((quad, at) => quads.findIndex((other) => isSamePart(other, quad)) === at)
+}
+
+function isMountedOnceOwned(itemId: string): boolean {
+  const kind = mountedGearOf(itemId)?.kind
+  return kind === undefined || !EQUIPPED_ONLY_KINDS.includes(kind)
 }
 
 function gearQuadsOf(art: ArtCatalogue, gear: MountedGear, fraction: number): GearQuad[] {

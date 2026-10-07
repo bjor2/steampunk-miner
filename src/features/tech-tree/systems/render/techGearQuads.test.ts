@@ -1,6 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import type { ArtCatalogue } from '../../../../systems/art/artCatalogue'
-import type { PartsSidecar, SidecarPart } from '../../../../systems/art/partsSidecar'
 import {
   EMPTY_LOADOUT,
   withItemsOwned,
@@ -12,10 +10,10 @@ import {
   mountedItemsOf,
   vehicleGearQuadsOf,
 } from './techGearQuads'
-import { CRATE_RACK, MOUNTED_GEAR, mountedGearOf } from './techGear'
+import { GEAR_ART, vehicleWithPoints } from './gearArtFixture'
+import { CRATE_RACK, mountedGearOf } from './techGear'
 
-// A catalogue holding the base vehicle's attach points and every gear asset as a final export
-// whose parts are one 0.2 m square each, pivot at the centre, at the asset's origin.
+// The base vehicle's points these specs need; `hull.front` is left out on purpose.
 const VEHICLE_ATTACH = [
   { id: 'drill.fork', atM: [0.42, 0], z: 7 },
   { id: 'drill.flank', atM: [0.58, 0], z: 7 },
@@ -24,53 +22,8 @@ const VEHICLE_ATTACH = [
   { id: 'cab.gauge', atM: [0.3, 0.08], z: 5 },
 ] as const
 
-const SIDE = 0.2
-
-function squarePart(id: string, at: number): SidecarPart {
-  return {
-    id,
-    tier: 1,
-    rect: [at * 110, 0, 100, 100],
-    sizeM: [SIDE, SIDE],
-    pivotM: [SIDE / 2, SIDE / 2],
-    atM: [0, 0],
-    z: 1,
-  }
-}
-
-function sidecarOf(assetId: string, partIds: readonly string[]): PartsSidecar {
-  return {
-    assetId,
-    schema: 1,
-    source: { blend: `art/blender/${assetId}/${assetId}.blend`, sha256: 'x', blender: '4.2.9' },
-    pxPerMetre: 512,
-    atlasPx: [4096, 128],
-    maps: { albedo: `${assetId}.albedo.ktx2`, normal: `${assetId}.normal.ktx2`, emissive: false },
-    parts: partIds.map(squarePart),
-  }
-}
-
-const gearAssetIds = [...new Set(MOUNTED_GEAR.map((gear) => gear.assetId))]
-const partIdsOf = (assetId: string) => [
-  ...new Set(
-    MOUNTED_GEAR.filter((gear) => gear.assetId === assetId).flatMap((gear) =>
-      gear.parts.map((part) => part.id),
-    ),
-  ),
-]
-
-const art: ArtCatalogue = {
-  manifest: {
-    assets: gearAssetIds.map((id) => ({ id, source: 'blender', form: 'parts', status: 'final' })),
-  },
-  placeholderSidecars: [],
-  exportedSidecars: gearAssetIds.map((id) => sidecarOf(id, partIdsOf(id))),
-}
-
-const vehicle: PartsSidecar = {
-  ...sidecarOf('vehicle', ['t1-chassis']),
-  attach: VEHICLE_ATTACH.map((point) => ({ ...point, atM: [...point.atM] })),
-}
+const art = GEAR_ART
+const vehicle = vehicleWithPoints(VEHICLE_ATTACH)
 
 describe('tech gear quads: parts at the vehicle attach points', () => {
   it('draws an owned extractor at its named point, moved by the sidecar atM and nothing else', () => {
@@ -147,6 +100,15 @@ describe('tech gear quads: parts at the vehicle attach points', () => {
   it('leaves an owned but unequipped slot item off the vehicle', () => {
     const loadout = withItemsOwned(EMPTY_LOADOUT, ['power.steam_shield'])
     expect(mountedItemsOf(loadout)).toEqual([])
+  })
+
+  it('leaves a spare drill head off the drill, drawing only the one in its socket', () => {
+    const loadout = withSlotItem(
+      withItemsOwned(EMPTY_LOADOUT, ['gear.thaw_crown', 'gear.vibratory_bit']),
+      'drill.head',
+      'gear.vibratory_bit',
+    )
+    expect(mountedItemsOf(loadout)).toEqual([{ itemId: 'gear.vibratory_bit', slot: 'drill.head' }])
   })
 
   it('draws the crate shelf once however many consumables ride it', () => {
