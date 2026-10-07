@@ -39,6 +39,7 @@ import {
 import {
   copyShownBlocks,
   drawnBlockCountOf,
+  gateBitsOfDrawnTile,
   shownChunksOf,
   visibleGroundBlocksAround,
   type ShownChunk,
@@ -46,7 +47,13 @@ import {
 } from '../systems/render/groundBlocks'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { PlanetParams } from '../systems/world/planetParams'
-import { CHUNK_CELLS, chunkKey, firstTileOfChunk } from '../systems/world/tileGrid'
+import {
+  CHUNK_CELLS,
+  chunkKey,
+  chunkOfTile,
+  firstTileOfChunk,
+  type TilePoint,
+} from '../systems/world/tileGrid'
 import {
   currentCasingOfChunk,
   currentDensityOfChunk,
@@ -70,6 +77,8 @@ export interface ChunkMeshPool {
   drawnBlockCount(): number
   /** Chunk meshes built now, drawn or hidden: what the pool holds on the GPU (#121). */
   builtChunkCount(): number
+  /** A drawn tile's gate bits, or null where no tile is drawn now (ticket 299 debug reads). */
+  gateBitsAt(tile: TilePoint): number | null
   dispose(): void
 }
 
@@ -116,6 +125,7 @@ export function createChunkMeshPool(parent: Group, material: ShaderMaterial): Ch
     drawnChunkCount: () => countDrawn(pool),
     drawnBlockCount: () => countDrawnBlocks(pool),
     builtChunkCount: () => pool.meshes.size,
+    gateBitsAt: (tile) => gateBitsOfTile(pool, tile),
     dispose: () => dropAll(pool, parent),
   }
 }
@@ -130,6 +140,13 @@ function countDrawnBlocks(pool: PoolState): number {
   let drawn = 0
   for (const chunk of pool.meshes.values()) drawn += drawnBlockCountOf(chunk.batch, chunk.blockMask)
   return drawn
+}
+
+function gateBitsOfTile(pool: PoolState, { tx, ty }: TilePoint): number | null {
+  const [cx, cy] = [chunkOfTile(tx), chunkOfTile(ty)]
+  const chunk = pool.meshes.get(chunkKey(cx, cy))
+  if (chunk === undefined || !chunk.mesh.visible) return null
+  return gateBitsOfDrawnTile(chunk.drawn, tx - firstTileOfChunk(cx), ty - firstTileOfChunk(cy))
 }
 
 function isSameView(pool: PoolState, view: TerrainView): boolean {

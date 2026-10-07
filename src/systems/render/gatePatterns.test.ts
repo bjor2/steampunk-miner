@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { createAuthorityState } from '../authority/authorityState'
+import { continueScriptedSession } from '../authority/scriptedSession'
+import { stepOfMajor } from '../economy/upgradeSteps'
 import { gateBitsOf, GATE_STATE, MAX_GATE_KIND, NO_GATE_BITS } from './cellGateBits'
 import {
   drawnGateOf,
@@ -6,6 +9,7 @@ import {
   GATE_PATTERNS,
   gatePatternDefines,
   isMovingPattern,
+  writeGateViewer,
   type GateViewer,
 } from './gatePatterns'
 
@@ -79,5 +83,18 @@ describe('gate marker patterns', () => {
   it('draws a kind past the catalogue as the placeholder', () => {
     const drawn = drawnGateOf(gateBitsOf({ kind: MAX_GATE_KIND, state: 0 }), AT_MAJOR_10)
     expect(drawn).toMatchObject({ pattern: null, kind: MAX_GATE_KIND })
+  })
+
+  it("views the ground from the tip of the player's last completed major, not its pips", () => {
+    const session = continueScriptedSession(
+      createAuthorityState({ planetIndex: 7, planetSeed: 1, playerIds: ['p1'] }),
+    )
+    const viewerAtTip = (level: number, isMotionReduced: boolean) => {
+      session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level } })
+      const viewer = { tipMajor: 0, isMotionReduced: false }
+      return writeGateViewer(viewer, session.state(), 'p1', isMotionReduced)
+    }
+    expect(viewerAtTip(stepOfMajor(12) - 1, true)).toEqual({ tipMajor: 11, isMotionReduced: true })
+    expect(viewerAtTip(stepOfMajor(12), false)).toEqual({ tipMajor: 12, isMotionReduced: false })
   })
 })

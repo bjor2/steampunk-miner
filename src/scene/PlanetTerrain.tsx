@@ -19,6 +19,8 @@ import { HeatTiles } from './HeatTiles'
 import { isHeatPlanet } from '../systems/economy/heatEconomy'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
 import { fitGateTintToPlanet } from './terrainGateTint'
+import { fitGateToViewer } from './terrainGateViewer'
+import { groundGatePresence, NO_DRAWN_GROUND } from './groundGatePresence'
 import { fitStrataToPlanet } from './terrainStrata'
 import { vehiclePresence } from './vehiclePresence'
 
@@ -35,7 +37,9 @@ export function PlanetTerrain() {
     if (group.current === null) return
     const created = createChunkMeshPool(group.current, material)
     pool.current = created
+    groundGatePresence.gateBitsAt = created.gateBitsAt
     return () => {
+      groundGatePresence.gateBitsAt = NO_DRAWN_GROUND
       created.dispose()
       material.dispose()
     }
@@ -56,6 +60,7 @@ export function PlanetTerrain() {
     lightTerrain(material, light)
     fitStrataToPlanet(material, params)
     fitGateTintToPlanet(material, params)
+    fitGateToViewer(material)
   })
 
   return (

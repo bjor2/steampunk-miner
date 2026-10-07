@@ -90,6 +90,17 @@ export function copyShownBlocks(
   }
 }
 
+/**
+ * The gate bits of the drawn tile at chunk-local (`lx`, `ly`), or null where no tile is drawn
+ * there: the debug reads that check the ground's markers (ticket 299), never a frame's work.
+ */
+export function gateBitsOfDrawnTile(drawn: TileInstances, lx: number, ly: number): number | null {
+  for (let at = 0; at < drawn.count; at++) {
+    if (drawn.tiles[at * 2] === lx && drawn.tiles[at * 2 + 1] === ly) return drawn.gates[at]
+  }
+  return null
+}
+
 function isShownWithTiles(batch: BlockedTileInstances, blockMask: number, block: number): boolean {
   const isShown = (blockMask & (1 << block)) !== 0
   return isShown && batch.blockStarts[block + 1] > batch.blockStarts[block]

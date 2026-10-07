@@ -27,6 +27,8 @@
  *
  * `drawnGateOf` is the shader's rule in TypeScript, for the debug reads that check the ground.
  */
+import { vehicleOf, type AuthorityState } from '../authority/authorityState'
+import { majorOf } from '../economy/upgradeSteps'
 import { gateLookOfBits, type CellGateLook } from './cellGateBits'
 
 export const GATE_PATTERNS = [
@@ -69,6 +71,22 @@ export interface DrawnGate {
   isOpen: boolean
   /** A moving pattern held still as its engraved glyph. */
   isGlyph: boolean
+}
+
+/**
+ * Writes the viewer `playerId` is into `into`: the tip of their last completed major, as the
+ * drill gates read it (#180 amendment 2), so a rim opens in the ground on the same major as in
+ * `canMine`; reduce motion is the player's own setting.
+ */
+export function writeGateViewer(
+  into: GateViewer,
+  state: AuthorityState,
+  playerId: string,
+  isMotionReduced: boolean,
+): GateViewer {
+  into.tipMajor = majorOf(vehicleOf(state, playerId).levels.drill_tip)
+  into.isMotionReduced = isMotionReduced
+  return into
 }
 
 /** The kind number a provider writes for `pattern`. */

@@ -9,6 +9,7 @@ import {
   BLOCKS_PER_CHUNK,
   copyShownBlocks,
   drawnBlockCountOf,
+  gateBitsOfDrawnTile,
   shownChunksOf,
   visibleGroundBlocksAround,
   type TileInstances,
@@ -121,5 +122,16 @@ describe('ground blocks', () => {
     expect(drawn.count).toBe(batch.blockStarts[oneBlock + 1] - batch.blockStarts[oneBlock])
     expect(drawnBlockCountOf(batch, 1 << oneBlock)).toBe(1)
     expect(drawnBlockCountOf(batch, 0)).toBe(0)
+  })
+
+  it("reads a drawn tile's gate bits, and nothing for a tile its shown blocks leave out", () => {
+    const batch = surfaceChunkBatch()
+    batch.gates[0] = 0b1000_0001
+    const drawn = emptyInstances()
+    copyShownBlocks(batch, (1 << BLOCKS_PER_CHUNK) - 1, drawn)
+    const [lx, ly] = [batch.tiles[0], batch.tiles[1]]
+    expect(gateBitsOfDrawnTile(drawn, lx, ly)).toBe(0b1000_0001)
+    copyShownBlocks(batch, 0, drawn)
+    expect(gateBitsOfDrawnTile(drawn, lx, ly)).toBeNull()
   })
 })

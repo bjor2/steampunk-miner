@@ -27,11 +27,15 @@
  * tinted per planet, and the baked normal tilting the lamp and point lights toward the slopes that
  * face them. Until then, and on the pad, core and cache, the flat band colour shows.
  *
- * A gated cell (ticket 298) carries the gate channel's bits (`cellGateBits.ts`) and draws its
+ * A gated cell (tickets 298, 299) carries the gate channel's bits (`cellGateBits.ts`) and draws its
  * marker as the cell's top layer, over the ore and its effects (#151 draw order: gate marker, grade
- * effects, theme overlay, ore base): for now a placeholder per kind, a dark rim and stripes turned
- * by kind in the planet's act tint (`uGateTint`), fainter as the state moves on. Static, so it
- * spends none of #151's motion budget; #299 draws the final patterns. A cell with no gate skips it.
+ * effects, theme overlay, ore base), in the planet's act tint (`uGateTint`). The patterns are the
+ * kernel's catalogue (`gatePatterns.ts`): the hard rim, which glints once the local player's tip
+ * major (`uGateTipMajor`) reaches the cell's opening major, the bare rim that is gone by then, the
+ * cracked shell, and five slow surface motions, moving at constant brightness. With reduce motion
+ * (`uGateStill`, the shake switch) time stops at one moment for the markers: a surface motion is
+ * cut as its engraved glyph, a groove with a lit lip, and the rim's glint holds still. A kind with
+ * no pattern yet draws the placeholder. A cell with no gate skips it all.
  */
 
 export const TERRAIN_VERTEX_SHADER = /* glsl */ `
@@ -100,6 +104,9 @@ uniform sampler2D uRefractoryAlbedo;
 uniform sampler2D uRefractoryEmissive;
 // The planet's act tint for gate markers (#151), never a per-cell bit (terrainGateTint.ts).
 uniform vec3 uGateTint;
+// The local player's drill tip major and reduce motion, 1 or 0 (terrainGateViewer.ts).
+uniform float uGateTipMajor;
+uniform float uGateStill;
 
 varying vec2 vLocal;
 varying vec2 vChunk;
@@ -208,7 +215,7 @@ float brickJoint(vec2 world) {
   return 1.0 - step(0.06, inBrick.x) * step(0.1, inBrick.y);
 }
 
-// The gate channel (cellGateBits.ts): bit GATED_BIT on a gated cell, then state, then kind.
+// The gate channel (cellGateBits.ts): the opening major above GATED_BIT, then state, then kind.
 float gateKindOf(float bits) {
   return mod(bits, float(GATE_KIND_COUNT));
 }
@@ -217,14 +224,152 @@ float gateStateOf(float bits) {
   return mod(floor(bits / float(GATE_KIND_COUNT)), float(GATE_STATE_COUNT));
 }
 
-// The placeholder marker (ticket 298): x is a dark rim round the cell, y stripes turned by kind,
-// the kinds' angles spread over half a turn so no two kinds match.
-vec2 gateMarker(vec2 local, float kind) {
-  vec2 fromCentre = local - 0.5;
-  float rim = smoothstep(0.36, 0.46, max(abs(fromCentre.x), abs(fromCentre.y)));
+bool isGatedCell(float bits) {
+  return mod(floor(bits / float(GATED_BIT)), 2.0) > 0.5;
+}
+
+// 1 once the local player's tip major reaches the cell's opening major; a field of 0 never opens.
+float gateOpenness(float bits) {
+  float opening = floor(bits / float(GATE_OPENING_UNIT));
+  return step(0.5, opening) * step(opening - 1.0, uGateTipMajor);
+}
+
+bool isGateKind(float kind, int pattern) {
+  return abs(kind - float(pattern)) < 0.5;
+}
+
+// The near-black of a rim, a crack or a groove; the warm white of the rim's glint (#151).
+const vec3 GATE_DARK = vec3(0.06, 0.05, 0.05);
+const vec3 GATE_GLINT = vec3(1.0, 0.94, 0.78);
+// The marker's lines glow this much in its tint, so a gate reads in the dark of band 5.
+const float GATE_TINT_GLOW = 0.16;
+// Reduce motion stops the markers here: the filings stand aligned, every pattern at rest.
+const float GATE_STILL_TIME = 4.488;
+// How far a line's shadow, or an engraved groove's lit lip, sits from the line, in tiles.
+const float GATE_LIP = 0.035;
+const float GATE_CLEARED_TRACE = 0.3;
+
+// Soft lines across every whole x, width either side of it, soft the edge in the same units.
+float gateLines(float x, float width, float soft) {
+  float distance = abs(fract(x + 0.5) - 0.5);
+  return 1.0 - smoothstep(width - soft, width + soft, distance);
+}
+
+// x: dark (the rim), y: none, z: the glint running round its inner edge once open.
+vec3 hardRim(vec2 fromCentre, float edge, float time, float openness, float soft) {
+  float rim = smoothstep(0.30 - soft, 0.38 + soft, edge);
+  float innerEdge = smoothstep(0.26, 0.31, edge) * (1.0 - smoothstep(0.34, 0.40, edge));
+  float around = atan(fromCentre.y, fromCentre.x);
+  float glint = innerEdge * pow(max(0.0, cos(around - time * 1.1)), 10.0);
+  return vec3(rim * (1.0 - 0.45 * openness), 0.0, glint * openness);
+}
+
+// Voronoi edges a few to the tile, seeded by the tile: the cracks of a sealed shell.
+float shellCracks(vec2 local, vec2 tile, float soft) {
+  vec2 grid = local * 2.6;
+  vec2 cell = floor(grid);
+  vec2 inCell = fract(grid);
+  float nearest = 8.0;
+  float second = 8.0;
+  for (int y = -1; y <= 1; y++) {
+    for (int x = -1; x <= 1; x++) {
+      vec2 offset = vec2(float(x), float(y));
+      vec2 seed = cell + offset + tile * 3.1;
+      float distance = length(offset + vec2(hash12(seed), hash12(seed + 11.7)) - inCell);
+      second = distance < nearest ? nearest : min(second, distance);
+      nearest = min(nearest, distance);
+    }
+  }
+  return 1.0 - smoothstep(0.04, 0.07 + soft * 2.6, second - nearest);
+}
+
+// x: the cracks and the shell's dark outer lip, y: the shell's plates in the tint.
+vec3 crackedShell(vec2 local, float edge, float soft) {
+  float shell = smoothstep(0.24, 0.32, edge);
+  float lip = smoothstep(0.44, 0.48, edge);
+  float cracks = shellCracks(local, vTile, soft);
+  return vec3(max(cracks, lip), shell * (1.0 - cracks) * 0.6, 0.0);
+}
+
+bool isSurfaceMotion(float kind) {
+  return isGateKind(kind, GATE_CONCENTRIC_RINGS) || isGateKind(kind, GATE_VAPOUR_WISPS) ||
+    isGateKind(kind, GATE_DRIP_LINES) || isGateKind(kind, GATE_FILING_LINES) ||
+    isGateKind(kind, GATE_RISING_RIPPLES);
+}
+
+// The line of each extractor's slow surface motion (#142's table), across and up the face.
+float surfaceLines(float kind, vec2 fromCentre, vec2 up, float time, float soft) {
+  vec2 face = vec2(dot(fromCentre, vec2(up.y, -up.x)), dot(fromCentre, up));
+  if (isGateKind(kind, GATE_CONCENTRIC_RINGS)) {
+    return gateLines(length(fromCentre) * 4.0 - time * 0.25, 0.09, soft * 4.0);
+  }
+  if (isGateKind(kind, GATE_VAPOUR_WISPS)) {
+    float curl = 0.25 * sin(face.y * 9.0 - time * 0.9);
+    float rising = smoothstep(0.15, 0.6, fract(face.y * 1.5 - time * 0.12));
+    return gateLines(face.x * 3.0 + curl, 0.09, soft * 3.0) * rising;
+  }
+  if (isGateKind(kind, GATE_DRIP_LINES)) {
+    float column = floor(face.x * 3.0 + 0.5);
+    float falling = fract(face.y * 1.2 + time * 0.1 + column * 0.37);
+    return gateLines(face.x * 3.0, 0.07, soft * 3.0) * (1.0 - smoothstep(0.5, 0.62, falling));
+  }
+  if (isGateKind(kind, GATE_FILING_LINES)) {
+    vec2 grid = (fromCentre + 0.5) * 4.0;
+    vec2 filing = fract(grid) - 0.5;
+    float scattered = (hash12(floor(grid) + vTile * 5.3) - 0.5) * 3.14159265;
+    float aligned = atan(up.y, up.x);
+    float angle = mix(scattered, aligned, 0.5 + 0.5 * sin(time * 0.35));
+    vec2 along = rotation(angle) * filing;
+    float thin = 1.0 - smoothstep(0.05, 0.05 + soft * 4.0, abs(along.y));
+    return thin * (1.0 - smoothstep(0.3, 0.3 + soft * 4.0, abs(along.x)));
+  }
+  // GATE_RISING_RIPPLES
+  return gateLines(face.y * 3.5 + 0.06 * sin(face.x * 10.0) - time * 0.2, 0.08, soft * 3.5);
+}
+
+// x: a thin dark frame and the lines' shadow, or the glyph's groove; y: the lines, or its lip.
+vec3 surfaceMotion(float kind, vec2 fromCentre, float edge, vec2 up, float time, float soft) {
+  float inside = 1.0 - smoothstep(0.40, 0.44, edge);
+  float frame = 0.8 * smoothstep(0.44, 0.48, edge);
+  float line = surfaceLines(kind, fromCentre, up, time, soft) * inside;
+  float beside = surfaceLines(kind, fromCentre - up * GATE_LIP, up, time, soft) * inside;
+  vec2 moving = vec2(max(frame, 0.7 * beside * (1.0 - line)), line);
+  vec2 engraved = vec2(max(frame, 0.85 * line), beside * (1.0 - line));
+  return vec3(mix(moving, engraved, uGateStill), 0.0);
+}
+
+// #298's placeholder, for a kind with no pattern yet: a dark rim and stripes turned by kind.
+vec3 placeholderMarker(vec2 fromCentre, float edge, float kind) {
+  float rim = smoothstep(0.36, 0.46, edge);
   vec2 turned = rotation(kind * 3.14159265 / float(GATE_KIND_COUNT)) * fromCentre;
-  float stripes = step(0.72, fract(turned.x * 4.0 + 0.5)) * (1.0 - rim);
-  return vec2(rim, stripes);
+  return vec3(rim, step(0.72, fract(turned.x * 4.0 + 0.5)) * (1.0 - rim), 0.0);
+}
+
+vec3 gatePatternOf(float kind, vec2 local, vec2 up, float openness, float soft) {
+  vec2 fromCentre = local - 0.5;
+  float edge = max(abs(fromCentre.x), abs(fromCentre.y));
+  float time = mix(uTime, GATE_STILL_TIME, uGateStill);
+  if (isGateKind(kind, GATE_HARD_RIM) || isGateKind(kind, GATE_BARE_RIM)) {
+    return hardRim(fromCentre, edge, time, openness, soft);
+  }
+  if (isGateKind(kind, GATE_CRACKED_SHELL)) return crackedShell(local, edge, soft);
+  if (isSurfaceMotion(kind)) return surfaceMotion(kind, fromCentre, edge, up, time, soft);
+  return placeholderMarker(fromCentre, edge, kind);
+}
+
+// Revealed lights an inner edge in the tint, cleared leaves a faint trace; others draw locked.
+vec3 gateMarkerInState(vec3 marker, float state, vec2 local) {
+  vec2 fromCentre = local - 0.5;
+  float edge = max(abs(fromCentre.x), abs(fromCentre.y));
+  float revealed = 1.0 - smoothstep(0.015, 0.035, abs(edge - 0.41));
+  if (abs(state - float(GATE_STATE_REVEALED)) < 0.5) marker.y = max(marker.y, revealed);
+  if (abs(state - float(GATE_STATE_CLEARED)) < 0.5) marker *= GATE_CLEARED_TRACE;
+  return marker;
+}
+
+// A bare rim is gone once open; every other marker draws, the hard rim glinting.
+bool isGateDrawn(float kind, float openness) {
+  return !(isGateKind(kind, GATE_BARE_RIM) && openness > 0.5);
 }
 
 // The tile's depth band by the integer rule of bandOfTile: exact below 2^24, so for any planet.
@@ -307,6 +452,8 @@ void main() {
   // Derivatives outside the branch: a pixel's neighbours may be in a tile that skips it.
   vec2 worldDx = dFdx(vWorld);
   vec2 worldDy = dFdy(vWorld);
+  // A gate marker's edges, about a pixel soft at any zoom, in tiles.
+  float gateSoft = clamp(fwidth(vLocal.x), 0.004, 0.05);
   if (uHasStrata > 0.5 && style < 1.5) {
     int band = bandOfTile(vTile);
     float turns = uStrataTurns[band - 1];
@@ -372,13 +519,17 @@ void main() {
   }
 
   float gateBits = floor(vGate + 0.5);
-  if (gateBits >= float(GATED_BIT)) {
-    // The top layer: it covers the ore and its glow beneath it; a later state draws fainter.
-    vec2 marker = gateMarker(vLocal, gateKindOf(gateBits)) / (1.0 + gateStateOf(gateBits));
-    colour = mix(colour, vec3(0.06, 0.05, 0.05), marker.x);
+  float gateKind = gateKindOf(gateBits);
+  float gateOpen = gateOpenness(gateBits);
+  if (isGatedCell(gateBits) && isGateDrawn(gateKind, gateOpen)) {
+    // The top layer: it covers the ore and its glow beneath it.
+    vec3 marker = gatePatternOf(gateKind, vLocal, normalize(vWorld), gateOpen, gateSoft);
+    marker = gateMarkerInState(marker, gateStateOf(gateBits), vLocal);
+    colour = mix(colour, GATE_DARK, marker.x);
     colour = mix(colour, uGateTint, marker.y);
-    emissive *= 1.0 - max(marker.x, marker.y);
-    emissive += uGateTint * 0.12 * marker.y;
+    colour = mix(colour, GATE_GLINT, marker.z);
+    emissive *= 1.0 - max(marker.x, max(marker.y, marker.z));
+    emissive += uGateTint * GATE_TINT_GLOW * marker.y + GATE_GLINT * marker.z;
   }
 
   gl_FragColor = vec4(displayToLinear(colour * light + emissive), 1.0);
