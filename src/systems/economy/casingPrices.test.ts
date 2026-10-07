@@ -9,10 +9,10 @@ describe('casing prices', () => {
     expect(casingGradeStart()).toBe(1)
   })
 
-  it('prices grades 1->2 .. 4->5 at 48, 60, 74 and 92, 274 together', () => {
+  it('prices grades 1->2 .. 4->5 at 48, 59, 73 and 89, 269 together', () => {
     const prices = [1, 2, 3, 4].map(casingUpgradePrice)
-    expect(prices.map(toCanonical)).toEqual(['4.8e+1', '6e+1', '7.4e+1', '9.2e+1'])
-    expect(toCanonical(prices.reduce(add, ZERO_MONEY))).toBe('2.74e+2')
+    expect(prices.map(toCanonical)).toEqual(['4.8e+1', '5.9e+1', '7.3e+1', '8.9e+1'])
+    expect(toCanonical(prices.reduce(add, ZERO_MONEY))).toBe('2.69e+2')
   })
 
   // Systems' value for C1a (#115) under the Sell-bay bill rule, down from 0.30: 0.004 and 0.003

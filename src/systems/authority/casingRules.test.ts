@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { visualTier } from '../economy/vehicleStats'
-import { toCanonical } from '../money'
+import { casingUpgradePrice } from '../economy/casingPrices'
+import { add, fromCanonical, sub, toCanonical, ZERO_MONEY } from '../money'
 import { buyCasingGradeCommand } from '../platform/platformCommands'
 import type { DomainEvent } from './domainEvent'
 import { createScriptedSession, dockInBay, typesOf } from './scriptedSession'
@@ -23,17 +24,25 @@ describe('casing grade', () => {
     expect(createScriptedSession().vehicle().casingGrade).toBe(1)
   })
 
-  it('ends at grade 5 after four buys, logging each and charging exactly 274', () => {
+  it('ends at grade 5 after four buys, logging each and charging exactly its curve prices', () => {
     const session = dockedWithMoney('300')
+    const fromGrades = [1, 2, 3, 4]
+    const prices = fromGrades.map(casingUpgradePrice)
     const events = [2, 3, 4, 5].flatMap((tick) => session.submit(tick, buyCasingGradeCommand()))
-    expect(events).toEqual([
-      expect.objectContaining({ type: 'CasingUpgraded', from: 1, to: 2, price: '4.8e+1' }),
-      expect.objectContaining({ type: 'CasingUpgraded', from: 2, to: 3, price: '6e+1' }),
-      expect.objectContaining({ type: 'CasingUpgraded', from: 3, to: 4, price: '7.4e+1' }),
-      expect.objectContaining({ type: 'CasingUpgraded', from: 4, to: 5, price: '9.2e+1' }),
-    ])
+    expect(events).toEqual(
+      fromGrades.map((from, index) =>
+        expect.objectContaining({
+          type: 'CasingUpgraded',
+          from,
+          to: from + 1,
+          price: toCanonical(prices[index]),
+        }),
+      ),
+    )
     expect(session.vehicle().casingGrade).toBe(5)
-    expect(toCanonical(session.state().players.p1.wallet)).toBe('2.6e+1')
+    expect(session.state().players.p1.wallet).toEqual(
+      sub(fromCanonical('300'), prices.reduce(add, ZERO_MONEY)),
+    )
   })
 
   it('refuses the buy at the Sell bay with wrong_bay, changing nothing', () => {

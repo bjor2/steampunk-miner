@@ -17,11 +17,11 @@ function ratioOfCurve(curveId: string): Money {
 
 describe('upgrade prices', () => {
   // #84: the drill and tip bases sit above the c0 * weight start (48, 72), so the flattened ratio
-  // costs the slice what the old curve did.
-  it('prices level 0 at 24, 24, 36, 48, 55 and 83 for cargo, boiler, engine, hull, drill, tip', () => {
+  // costs the slice what the old curve did. #195: the brass bases are the x0.8 land of the re-fit.
+  it('prices level 0 at 24, 23, 36, 46, 55 and 83 for cargo, boiler, engine, hull, drill, tip', () => {
     const order = ['cargo_hold', 'boiler', 'engine', 'hull', 'drill_power', 'drill_tip'] as const
     expect(order.map((upgradeId) => upgradePrice(upgradeId, 0, 1))).toEqual(
-      ['24', '24', '36', '48', '55', '83'].map(m),
+      ['24', '23', '36', '46', '55', '83'].map(m),
     )
   })
 
@@ -30,11 +30,25 @@ describe('upgrade prices', () => {
     expect(upgradePrice('drill_tip', 1, 1)).toEqual(m('125'))
   })
 
-  it('grows drill power by "1.225", the tip by "1.500625" and every other track by "1.24" per level', () => {
+  it('grows drill power and every brass track by "1.225" and the tip by "1.500625" per level', () => {
     expect(upgradePrice('drill_power', 20, 1)).toEqual(ceil(mul(m('55'), powInt(m('1.225'), 20))))
     expect(upgradePrice('drill_tip', 20, 1)).toEqual(ceil(mul(m('83'), powInt(m('1.500625'), 20))))
-    expect(upgradePrice('hull', 20, 1)).toEqual(ceil(mul(m('48'), powInt(m('1.24'), 20))))
-    expect(upgradePrice('engine', 20, 1)).toEqual(ceil(mul(m('36'), powInt(m('1.24'), 20))))
+    expect(upgradePrice('hull', 20, 1)).toEqual(ceil(mul(m('46'), powInt(m('1.225'), 20))))
+    expect(upgradePrice('engine', 20, 1)).toEqual(ceil(mul(m('36'), powInt(m('1.225'), 20))))
+  })
+
+  // #195: the brass tracks and casing share drill power's ratio, so six levels a planet grow
+  // r^6 = 1.5^3, the same as ore.
+  it('stores the drill ratio on the four brass tracks and the casing grades', () => {
+    const brassCurveIds = [
+      'cost.vehicle.cargo_hold',
+      'cost.vehicle.boiler',
+      'cost.vehicle.engine',
+      'cost.vehicle.hull',
+      'cost.casing.upgrade',
+    ]
+    const drillRatio = ratioOfCurve('cost.vehicle.drill_power')
+    expect(brassCurveIds.map(ratioOfCurve)).toEqual(brassCurveIds.map(() => drillRatio))
   })
 
   // #77: the drill ratio r is 3.375^(1/6) to the milli, so r^6 = 1.5^3 and six drill levels a

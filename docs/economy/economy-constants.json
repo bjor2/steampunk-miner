@@ -30,9 +30,13 @@
   "c0": 24,
   "base": {
     "drill_power": "55",
-    "drill_tip": "83"
+    "drill_tip": "83",
+    "cargo_hold": "24",
+    "boiler": "23",
+    "engine": "36",
+    "hull": "46"
   },
-  "r": "1.24",
+  "r": "1.225",
   "rDrill": "1.225",
   "rTip": "1.500625",
   "w": {

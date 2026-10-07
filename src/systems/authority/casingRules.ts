@@ -1,7 +1,7 @@
 /**
  * `BuyCasingGrade` (decision #41 Systems & Economy, the command id registered by #58): at the
  * Upgrade bay only (`wrong_bay` at the Sell bay, #37), one command raises the player's casing
- * grade by one for `ceil(48 * 1.24^(G-1))`, charged as it is priced, and logs
+ * grade by one for `ceil(48 * 1.225^(G-1))`, charged as it is priced, and logs
  * `casing_upgraded {from, to, price}`. A refused buy changes nothing. The casing grade is not a
  * vehicle track, so it never moves the visual tier. `debug.setCasingGrade` sets it directly for
  * scenarios (#41 debug API).

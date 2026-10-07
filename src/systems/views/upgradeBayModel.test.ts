@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { SHIPPED_ART } from '../../scene/shippedArt'
 import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
 import { stateDigest } from '../authority/stateDigest'
+import { casingUpgradePrice } from '../economy/casingPrices'
 import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
 import { gunLevelPrice, gunMaxLevel, gunMountPrice } from '../economy/gunStats'
 import { toCanonical } from '../money'
@@ -184,7 +185,8 @@ describe('upgrade bay model', () => {
     const session = atUpgradeBay('100')
     session.submit(3, buyCasingGradeCommand())
     const casing = upgradeBayOf(session).casing
-    expect(casing).toMatchObject({ grade: 2, gradeText: '2 → 3', cost: { exact: '6e+1' } })
+    const cost = { exact: toCanonical(casingUpgradePrice(2)) }
+    expect(casing).toMatchObject({ grade: 2, gradeText: '2 → 3', cost })
     expect(casing.buy.reason).toBe('money_short')
   })
 

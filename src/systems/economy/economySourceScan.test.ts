@@ -143,7 +143,6 @@ describe('economy source scan', () => {
       expect.arrayContaining([
         '1.2544',
         '1.12',
-        '1.24',
         '1.225',
         '1.500625',
         '0.002',

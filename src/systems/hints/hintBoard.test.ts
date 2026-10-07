@@ -10,12 +10,21 @@ import {
   surfaceOreTiles,
 } from '../authority/scriptedSession'
 import type { DomainEvent } from '../authority/domainEvent'
+import { UPGRADE_IDS } from '../economy/economyDefinition'
+import { upgradePrice } from '../economy/upgradePrices'
+import { cmp, fromCanonical, sub, toCanonical } from '../money'
 import { dockCommand, undockCommand } from '../platform/platformCommands'
 import { dockedPoseAt, FACING } from '../vehicle/vehiclePose'
 import { EMPTY_HINT_BOARD, observeHints, type HintStep } from './hintBoard'
 import { HINT_TABLE } from './hintTable'
 
 const GAP = HINT_TABLE.minTicksBetweenHints
+
+/** The cheapest first level of any track; the casing grade (48) costs more. */
+function cheapestLevel0Price() {
+  const prices = UPGRADE_IDS.map((upgradeId) => upgradePrice(upgradeId, 0, 1))
+  return prices.reduce((cheapest, price) => (cmp(price, cheapest) < 0 ? price : cheapest))
+}
 
 /** A scripted session whose every batch of events goes through the hint board. */
 function watchedSession(seen: readonly string[] = []) {
@@ -190,7 +199,7 @@ describe('hint board: the Upgrade bay hint (#58)', () => {
   })
 
   it('waits while the money is short of every upgrade and of the next casing grade', () => {
-    const watched = atSellBayWith('23.999')
+    const watched = atSellBayWith(toCanonical(sub(cheapestLevel0Price(), fromCanonical('0.001'))))
     expect(watched.step().board.shown).toBeNull()
     expect(watched.step().board.queued).toEqual([])
   })

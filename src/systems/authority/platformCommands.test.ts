@@ -3,7 +3,9 @@ import { computeVehicleStats } from '../vehicle/vehicleStats'
 import { canonicalStatsOf } from '../vehicle/vehicleStatsView'
 import { FACING, bayPoseAt, dockedPoseAt } from '../vehicle/vehiclePose'
 import type { BayId } from '../world/dockBays'
-import { fromCanonical, sub, toCanonical } from '../money'
+import { UPGRADE_IDS } from '../economy/economyDefinition'
+import { upgradePrice } from '../economy/upgradePrices'
+import { add, fromCanonical, sub, toCanonical, ZERO_MONEY } from '../money'
 import type { CommandIntent } from './authorityCommand'
 import { canDock, dockedBayOf } from './dockRules'
 import type { DomainEvent } from './domainEvent'
@@ -444,18 +446,16 @@ describe('platform: workshop', () => {
     return session
   }
 
-  it('prices level 0 of the six tracks at 24, 24, 36, 48, 55 and 83', () => {
+  it('charges each of the six tracks its curve price for level 0', () => {
     const session = dockedWithMoney('1000')
-    const costs = SIX_TRACKS.map((id) => session.submit(2, buy(id))[0])
-    expect(costs.map((event) => (event.type === 'UpgradePurchased' ? event.cost : ''))).toEqual([
-      '2.4e+1',
-      '2.4e+1',
-      '3.6e+1',
-      '4.8e+1',
-      '5.5e+1',
-      '8.3e+1',
-    ])
-    expect(walletOf(session)).toBe('7.3e+2')
+    const prices = UPGRADE_IDS.map((id) => upgradePrice(id, 0, 1))
+    const costs = UPGRADE_IDS.map((id) => session.submit(2, buy(id))[0])
+    expect(costs.map((event) => (event.type === 'UpgradePurchased' ? event.cost : ''))).toEqual(
+      prices.map(toCanonical),
+    )
+    expect(walletOf(session)).toBe(
+      toCanonical(sub(fromCanonical('1000'), prices.reduce(add, ZERO_MONEY))),
+    )
   })
 
   it('prices level 1 at ceil(base * ratio)', () => {
@@ -479,7 +479,7 @@ describe('platform: workshop', () => {
         kind: 'vertical',
         fromLevel: 0,
         toLevel: 1,
-        cost: '4.8e+1',
+        cost: toCanonical(upgradePrice('hull', 0, 1)),
         costCurveId: 'cost.vehicle.hull',
         totalLevel: 1,
         visualTier: 1,
