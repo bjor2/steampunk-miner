@@ -306,7 +306,11 @@ export interface KernelDomainEventBodies {
   /** A locked-schedule row opened by arriving at its planet (#88), keyed by its #79 row id. */
   FeatureUnlocked: { featureId: string }
   PlanetEntered: { planetSeed: number; generatorVersion: number; radius: number }
-  ResourceSold: { items: SoldItem[]; value: string; mode: SaleMode }
+  /**
+   * `value` is the gross sale, before any lining bill; `coinsShown` is the sell burst's coin count
+   * for it (`sellCoins.ts`, ticket 220).
+   */
+  ResourceSold: { items: SoldItem[]; value: string; mode: SaleMode; coinsShown: number }
   /**
    * The lining bill settled out of a sale (#76 amendment, #115): `paid` is at most the sale's
    * value, so there is never debt, and `forgiven` is the rest of `billed`. Canonical strings.

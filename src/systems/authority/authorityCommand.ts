@@ -50,8 +50,10 @@ import type { BayId } from '../world/dockBays'
  * 22: the tech tree slice (#165): `tech-tree.unlock_node` and `debug.tech-tree.unlockThrough`,
  *    answered by `tech-tree.TechNodeUnlocked`, `tech-tree.TechNodeRefused` and
  *    `tech-tree.TechNodesGranted`; its `tech-tree` player section v1.
+ * 23: `ResourceSold` carries `coinsShown`, the sell burst's coin count from the sale's gross value
+ *    against the cheapest next Workshop level (ticket 220, TD lock on #176).
  */
-export const AUTHORITY_PROTOCOL_VERSION = 22
+export const AUTHORITY_PROTOCOL_VERSION = 23
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

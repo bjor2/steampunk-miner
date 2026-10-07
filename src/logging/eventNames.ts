@@ -171,6 +171,7 @@ export const RUN_EVENT_REGISTRY = {
       items: { listOf: { tier: 'integer', amount: 'integer' } },
       value: 'money',
       mode: { oneOf: ['all', 'single'] },
+      coinsShown: 'integer',
     },
   },
   // #76 amendment (#115, #128): what a Sell bay payout paid of the bill it found (forgiven 0), or,

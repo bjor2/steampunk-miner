@@ -3,11 +3,8 @@
   "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
   "generatorVersion": 6,
   "authorityProtocolVersion": 22,
-  "logSchemaVersion": 3,
+  "logSchemaVersion": 4,
   "numberFormatVersion": 1,
-  "sliceSections": {
-    "tech-tree": 1
-  },
   "worldSeed": 83921,
   "endTick": 2000,
   "commands": [

@@ -38,7 +38,12 @@ function line<N extends RunEventName>(
 }
 
 const sale = (tick: number) =>
-  line(tick, 'resource_sold', { items: [{ tier: 1, amount: 3 }], value: '3e+1', mode: 'all' })
+  line(tick, 'resource_sold', {
+    items: [{ tier: 1, amount: 3 }],
+    value: '3e+1',
+    mode: 'all',
+    coinsShown: 7,
+  })
 
 const upgrade = (tick: number, upgradeId: string, toLevel: number) =>
   line(tick, 'upgrade_purchased', {

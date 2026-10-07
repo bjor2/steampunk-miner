@@ -3,11 +3,8 @@
   "description": "Hull set to 1 in the band-1 corridor, a crawler hits the rear, destroyed, towed (#9).",
   "generatorVersion": 6,
   "authorityProtocolVersion": 22,
-  "logSchemaVersion": 3,
+  "logSchemaVersion": 4,
   "numberFormatVersion": 1,
-  "sliceSections": {
-    "tech-tree": 1
-  },
   "worldSeed": 83921,
   "endTick": 704,
   "commands": [

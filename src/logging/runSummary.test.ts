@@ -75,6 +75,7 @@ const PLAYED_RUN: readonly RunEvent[] = [
     items: [{ tier: 1, amount: 10 }],
     value: '2.5125e+1',
     mode: 'all',
+    coinsShown: 6,
   }),
   line(970, 'energy_recharged', { from: 1000, to: 36000, cost: '6.75e+0' }),
   line(980, 'upgrade_purchased', {
@@ -282,7 +283,12 @@ describe('summary sink (#117)', () => {
   })
 
   it('keeps exact totals after far more events than a log could hold', () => {
-    const sale = line(960, 'resource_sold', { items: [], value: '1.5e+1', mode: 'all' })
+    const sale = line(960, 'resource_sold', {
+      items: [],
+      value: '1.5e+1',
+      mode: 'all',
+      coinsShown: 3,
+    })
     const sink = createSummarySink()
     for (let count = 0; count < 200_000; count += 1) sink.append(sale)
     expect(sink.summarize()).toMatchObject({ eventCount: 200_000, moneyEarned: '3e+6' })

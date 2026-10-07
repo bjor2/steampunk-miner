@@ -56,6 +56,7 @@ import type { DomainEventBody, SaleMode, SoldItem } from './domainEvent'
 import { liningPaidOutOf, payLiningBillOutOf } from './liningBill'
 import { collectWhenReady, readyRefinedValueOf } from './refinery/refineryCollection'
 import { applyDockServicesOnRecharge } from '../registries/dockServices'
+import { coinsShownOf, nextStepPriceOf } from './sellCoins'
 
 /** One ore tier, or the whole hold's ore. */
 export type OreSelection = number | 'all'
@@ -268,7 +269,13 @@ function payForOre(
     state: withWallet(sold, playerId, add(wallet, value)),
     events: [
       ...assayEventsOf(state, playerId, items),
-      { type: 'ResourceSold', items, value: toCanonical(value), mode: saleModeOf(selection) },
+      {
+        type: 'ResourceSold',
+        items,
+        value: toCanonical(value),
+        mode: saleModeOf(selection),
+        coinsShown: coinsShownOf(value, nextStepPriceOf(state, playerId)),
+      },
     ],
   }
 }

@@ -101,6 +101,7 @@ const platformEvents: DomainEvent[] = [
     items: [{ tier: 1, amount: 4 }],
     value: '4e+1',
     mode: 'all',
+    coinsShown: 8,
   },
   { ...commandStamp, type: 'RepairPurchased', hullFrom: '5e+1', hullTo: '1e+2', cost: '5.625e+0' },
   { ...commandStamp, type: 'EnergyRecharged', from: 9000, to: 36000, cost: '5.063e+0' },

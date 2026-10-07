@@ -1,1 +1,1 @@
-{"v":3,"seq":0,"tick":0,"timestamp":0.5,"runId":"run_2026-10-01_09-00-01_bench-ground","playerId":"bench","planet":1,"depthTiles":0,"event":"benchmark_result","data":{"name":"groundDrilling.carve","medianUs":2000,"p95Us":4000,"runs":30,"commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}
+{"v":4,"seq":0,"tick":0,"timestamp":0.5,"runId":"run_2026-10-01_09-00-01_bench-ground","playerId":"bench","planet":1,"depthTiles":0,"event":"benchmark_result","data":{"name":"groundDrilling.carve","medianUs":2000,"p95Us":4000,"runs":30,"commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}

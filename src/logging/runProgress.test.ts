@@ -36,7 +36,7 @@ describe('run progress', () => {
     sink.append(line('tile_destroyed', { tx: 3, ty: 289, kind: 'ore' }, 10))
     sink.append(line('resource_collected', collected(1, 2, '6e+0'), 10))
     sink.append(line('resource_collected', collected(2, 1, '9e+0'), 10))
-    sink.append(line('resource_sold', { items: [], value: '1.5e+1', mode: 'all' }))
+    sink.append(line('resource_sold', { items: [], value: '1.5e+1', mode: 'all', coinsShown: 3 }))
     sink.append(line('refine_collected', refinedBatch('4.5e+1')))
     expect(sink.progress()).toEqual({
       maxDepthTiles: 10,

@@ -13,7 +13,7 @@ const resourceSold = {
   depthTiles: 73,
   event: 'resource_sold',
   cmd: [8118, 3],
-  data: { items: [{ tier: 2, amount: 6 }], value: '1.25e+3', mode: 'all' },
+  data: { items: [{ tier: 2, amount: 6 }], value: '1.25e+3', mode: 'all', coinsShown: 12 },
 }
 
 const withData = (data: unknown) => ({ ...resourceSold, data })
@@ -133,6 +133,6 @@ describe('run event schema', () => {
   })
 
   it('refuses a line from another log schema version', () => {
-    expect(runEventProblems({ ...resourceSold, v: 1 })).toEqual(['v must be 3'])
+    expect(runEventProblems({ ...resourceSold, v: 1 })).toEqual(['v must be 4'])
   })
 })

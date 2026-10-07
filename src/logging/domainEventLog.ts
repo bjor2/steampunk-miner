@@ -215,9 +215,9 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'planet_entered',
     data: { planetSeed, generatorVersion, radius },
   }),
-  ResourceSold: ({ items, value, mode }) => ({
+  ResourceSold: ({ items, value, mode, coinsShown }) => ({
     event: 'resource_sold',
-    data: { items, value, mode },
+    data: { items, value, mode, coinsShown },
   }),
   LiningSettled: ({ billed, paid, forgiven }) => ({
     event: 'lining_settled',

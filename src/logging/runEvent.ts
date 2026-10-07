@@ -15,8 +15,9 @@ import type { RunEventData, RunEventName } from './eventNames'
  * 2: `casing_lined` lost `paid`, as lining is paid at the Sell bay (`lining_settled`, #115).
  * 3: `charge_detonated` keeps only `tx, ty`: a blast's totals moved to its `blast_resolved` line,
  *    and its tiles log no `tile_destroyed` lines (K6, #189).
+ * 4: `resource_sold` gains the required `coinsShown`, the sell burst's coin count (ticket 220).
  */
-export const LOG_SCHEMA_VERSION = 3
+export const LOG_SCHEMA_VERSION = 4
 
 /** Where the player is: the store supplies it, the log stamps it. */
 export interface RunEventPlace {

@@ -10,6 +10,7 @@ import type { CommandIntent } from './authorityCommand'
 import { canDock, dockedBayOf } from './dockRules'
 import type { DomainEvent } from './domainEvent'
 import { quickServiceCharges, serviceQuote } from './platformServices'
+import { coinsShownOf, nextStepPriceOf } from './sellCoins'
 import {
   coreTiles,
   createScriptedSession,
@@ -281,6 +282,13 @@ describe('platform: shop', () => {
     expect(events[0]).toMatchObject({ items: [{ tier: 1, amount: 4 }], value: '4e+1', mode: 'all' })
     expect(walletOf(session)).toBe(toCanonical(sub(fromCanonical('40'), lining)))
     expect(session.vehicle().cargo.ore).toEqual({})
+  })
+
+  it("says how many coins the sale's burst shows, from its gross value against the next step", () => {
+    const session = createScriptedSession()
+    const tick = mineOreAndDock(session, 4)
+    const expected = coinsShownOf(fromCanonical('40'), nextStepPriceOf(session.state(), 'p1'))
+    expect(session.submit(tick + 1, sell('all'))[0]).toMatchObject({ coinsShown: expected })
   })
 
   it('sells one tier as a single sale', () => {
