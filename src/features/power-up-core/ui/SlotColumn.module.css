@@ -1,0 +1,100 @@
+/*
+ * The power-up slot column (#162 section 2.3, #173): on the thumb's edge, above the cluster's two
+ * rows (56 + 72 px and their gap) and below the HUD strip, wrapping inwards when five do not fit.
+ * The buttons match the cluster's look: 35% at rest, 80% pressed, a 2 px brass rim.
+ */
+.column {
+  position: absolute;
+  top: 20%;
+  right: var(--space-3);
+  bottom: calc(var(--space-3) + 56px + 8px + 72px + 8px);
+  display: flex;
+  flex-flow: column wrap-reverse;
+  justify-content: flex-end;
+  align-content: flex-start;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.column[data-hand='left'] {
+  right: auto;
+  left: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.slot {
+  position: relative;
+}
+
+/* The cooldown ring sweeps the rim: `--cooldown` is the share still to run. */
+.button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 2px solid var(--color-brass);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--color-panel) 60%, transparent 61%),
+    conic-gradient(var(--color-parchment) var(--cooldown, 0%), transparent 0);
+  opacity: 0.35;
+  pointer-events: auto;
+  touch-action: none;
+  font-size: 1.6rem;
+}
+
+.button:active,
+.button[data-acting] {
+  opacity: 0.8;
+}
+
+.button[data-on] {
+  border-color: var(--color-teal);
+}
+
+/* Pips sit on the rim's lower arc; a spent one is hollow, so it reads in grayscale. */
+.pips {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  display: flex;
+  gap: 3px;
+  transform: translateX(-50%);
+}
+
+.pip {
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--color-parchment);
+  border-radius: 50%;
+  background: var(--color-parchment);
+}
+
+.pip[data-spent] {
+  background: transparent;
+}
+
+/* The held slot's item card opens beside the column, toward the screen's middle. */
+.card {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 8px);
+  width: 18rem;
+  pointer-events: none;
+}
+
+.column[data-hand='left'] .card {
+  right: auto;
+  left: calc(100% + 8px);
+}
+
+.cardName {
+  padding: var(--space-2);
+  border: 2px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  white-space: nowrap;
+}
