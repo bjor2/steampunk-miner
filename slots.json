@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T13:36:54+02:00",
+  "updated_at": "2026-10-07T14:15:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -19,11 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 227,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-07T13:36:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -51,9 +51,9 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
-      "claims_last_hour": 2,
+      "used": 0,
+      "free": 4,
+      "claims_last_hour": 1,
       "name": "Claude Max 1"
     },
     {
@@ -132,10 +132,9 @@
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 227,
-      "since": "2026-10-07T13:36:00+02:00",
-      "claude_slot": 1
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -204,10 +203,10 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 227,
-      "grok_slot": 2,
-      "since": "2026-10-07T13:36:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -268,17 +267,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 13:36 CEST",
+    "at": "2026-10-07 14:15 CEST",
     "mode": "refill-dev",
-    "triggers": "#146 #176 #177",
-    "started": "#226->C5/A2 #227->C1/A1",
-    "note": "spawned 2 worker(s)"
+    "triggers": "#227",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 2,
+      "used": 2,
+      "dev": 1,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -286,8 +285,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 2,
-      "free": 6,
+      "used": 1,
+      "free": 7,
       "external": 0
     }
   }
