@@ -189,12 +189,19 @@ function chooseOreGoal(session: BotSession, planet: BotPlanet): TripGoal | null 
 }
 
 /**
- * No held band pays (#216): the shallowest held band with galleries bored out to their reach
- * reaches further, and the bot plans again; null when no held band can widen.
+ * No held band pays (#216): when not even a full tank would find a gallery, the shallowest held
+ * band with galleries bored out to their reach reaches further, and the bot plans again; null
+ * when only the tank is short, or no held band can widen.
  */
 function chooseRetreatGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
+  if (!areHeldBandsBoredOut(session, planet)) return null
   const hasWidened = widenShallowestBand(planet.layout, deepestHeldBand(session))
   return hasWidened ? chooseOreGoal(session, planet) : null
+}
+
+function areHeldBandsBoredOut(session: BotSession, planet: BotPlanet): boolean {
+  const means = fullTankMeans(session.vehicle().levels)
+  return bestOrePlan(planet.layout, means, deepestHeldBand(session)) === null
 }
 
 /**

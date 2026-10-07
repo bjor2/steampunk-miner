@@ -39,6 +39,8 @@ const MAX_FIXTURE_TRIPS = 80
 const PLAY_ON_TICKS = 20 * 60 * 60
 /** Five minutes after a tow: long enough to mine and sell from the quarter tank it leaves. */
 const TOW_PLAY_ON_TICKS = 5 * 60 * 60
+/** Long enough for a tow and a trip after it. */
+const SHORT_PLAY_ON_TICKS = 2 * 60 * 60
 /** Two energy units: far below the quarter tank a tow leaves (#8). */
 const DRAINED_ENERGY_UNITS = '2'
 
@@ -106,14 +108,23 @@ function drainedBranchOfDeadEnd(): DeadEnd {
   return branch
 }
 
+/** The drained dead end with grade 2 bought: band 2 is untouched, only the tank is short. */
+function drainedBranchHoldingBand2(): DeadEnd {
+  const branch = drainedBranchOfDeadEnd()
+  branch.session.submit({ type: 'debug.setCasingGrade', payload: { grade: 2 } })
+  return branch
+}
+
 interface PlayedOn {
   run: SliceRun
   maxTicks: number
+  planet: BotPlanet
 }
 
 function playOn({ session, planet }: DeadEnd, ticks: number): PlayedOn {
   const maxTicks = session.tick() + ticks
-  return { run: playSliceFrom(session, planet, { maxTicks, gunPolicy: 'never' }), maxTicks }
+  const run = playSliceFrom(session, planet, { maxTicks, gunPolicy: 'never' })
+  return { run, maxTicks, planet }
 }
 
 let retreat: PlayedOn | null = null
@@ -191,6 +202,16 @@ describe('pacing bot tow for a broke bot (#216, #8 soft-lock rule)', () => {
     expect(stranded).toBeGreaterThanOrEqual(0)
     expect(types.slice(0, stranded)).not.toContain('TileDestroyed')
     expect(types.slice(stranded)).toContain('RescueTriggered')
+  })
+
+  it('takes the tow without widening a band when a full tank would still find a gallery', () => {
+    const { run, planet } = playOn(drainedBranchHoldingBand2(), SHORT_PLAY_ON_TICKS)
+    const types = typesOf(run.events)
+    const stranded = types.indexOf('EnergyDepleted')
+    expect(stranded).toBeGreaterThanOrEqual(0)
+    expect(types.slice(0, stranded)).not.toContain('TileDestroyed')
+    expect(types.slice(stranded)).toContain('RescueTriggered')
+    expect(oreReachOf(planet.layout, 1)).toBe(ORE_GALLERY_REACH)
   })
 
   it('plays on after the tow to the end of its budget, sending only commands the authority accepts', () => {
