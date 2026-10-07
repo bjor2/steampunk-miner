@@ -9,7 +9,7 @@ import { resetInput, routeKeyChange } from '../store/inputRuntime'
 import type { VehicleStaging } from '../systems/registries/vehicleStaging'
 import { buildIntent } from '../systems/input/buildIntent'
 import { IDLE_INTENT } from '../systems/vehicle/vehicleIntent'
-import { createVehicleStage, vehicleStagePresence } from './vehicleStage'
+import { createVehicleStage, turnStagedVehicle, vehicleStagePresence } from './vehicleStage'
 
 /** A fake dock building that stages every docked vehicle the same way. */
 const STAGED: VehicleStaging = {
@@ -29,6 +29,18 @@ const fakeBuilding: SliceDefinition = {
       id: 'fake-building.stage',
       stagingOf: (state, playerId) =>
         state.players[playerId].vehicle.mode === 'docked' ? STAGED : null,
+    })
+  },
+}
+
+/** The same building with its own turntable turned half a radian (#180). */
+const turnedBuilding: SliceDefinition = {
+  id: 'fake-building',
+  register(r) {
+    r.vehicleStaging({
+      id: 'fake-building.stage',
+      stagingOf: (state, playerId) =>
+        state.players[playerId].vehicle.mode === 'docked' ? { ...STAGED, rotation: 0.5 } : null,
     })
   },
 }
@@ -57,6 +69,7 @@ beforeEach(() => {
   )
   resetGameStore()
   resetInput()
+  turnStagedVehicle(0)
 })
 
 afterEach(() => uninstallRunLog())
@@ -80,7 +93,37 @@ describe('vehicle stage', () => {
       cameraX: 7,
       cameraY: 301.8,
       cameraWeight: 1,
+      rotation: 0,
     })
+  })
+
+  it("turns the staged car by the slice's turn on top of the provider's own rotation", () => {
+    game().dock('sell')
+    turnStagedVehicle(1.25)
+    withRegistrations([turnedBuilding], () => stepTimes(1))
+    expect(vehicleStagePresence.rotation).toBe(1.75)
+  })
+
+  it('draws the car unturned while nothing stages it, whatever a slice asked', () => {
+    game().dock('sell')
+    turnStagedVehicle(1.25)
+    withRegistrations([], () => stepTimes(1))
+    expect(vehicleStagePresence.rotation).toBe(0)
+  })
+
+  it('drops the turn when the staging ends, so the next visit starts as driven', () => {
+    game().dock('sell')
+    withRegistrations([fakeBuilding], () => {
+      const stage = createVehicleStage()
+      turnStagedVehicle(Math.PI)
+      stepTimes(1, stage)
+      expect(vehicleStagePresence.rotation).toBe(Math.PI)
+      game().undock()
+      stepTimes(1, stage)
+      game().dock('sell')
+      stepTimes(1, stage)
+    })
+    expect(vehicleStagePresence.rotation).toBe(0)
   })
 
   it('undocks once a drive key has been held for 15 ticks where the staging allows it', () => {
