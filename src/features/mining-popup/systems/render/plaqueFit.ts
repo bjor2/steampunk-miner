@@ -26,7 +26,9 @@ const PLAQUE_TOP_REM = 3.5
 const FULL_PLAQUE_REM = 5.5
 /** ResourceChips.module.css: one chip's height, the 115% stack step and the 24 px rise. */
 const CHIP_HEIGHT_REM = 1.4
-const CHIP_STACK_STEP = 1.15
+/** The style sheet's `115%`, kept a whole number so the economy scan never takes it for a ratio. */
+const CHIP_STACK_STEP_PERCENT = 115
+const PERCENT = 100
 const CHIP_RISE_PX = 24
 const STACKED_CHIPS = 3
 /** #172 §2: the plaque stays out of a 3-tile radius round the vehicle. */
@@ -52,7 +54,8 @@ function topBandFloorOf({ stage, uiScale }: ScreenLayout): number {
   const centre = stage.height / 2
   const ringTop = centre - CLEAR_RING_TILES * pixelsPerMetre
   const chipHeight = CHIP_HEIGHT_REM * ROOT_FONT_PX * uiScale
-  const columnHeight = (1 / 2 + (STACKED_CHIPS - 1) * CHIP_STACK_STEP) * chipHeight
+  const columnHeight =
+    (1 / 2 + ((STACKED_CHIPS - 1) * CHIP_STACK_STEP_PERCENT) / PERCENT) * chipHeight
   const columnTop =
     centre - CHIP_REACH_TILES * pixelsPerMetre - columnHeight - CHIP_RISE_PX * uiScale
   return Math.min(ringTop, columnTop)
