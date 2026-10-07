@@ -90,7 +90,15 @@ function minerAbove(tile: TilePoint) {
 function activate(itemId: string, tile: TilePoint, state: ReturnType<typeof minerAbove>) {
   const powerUp = DRILL_GEAR_POWER_UPS.find((candidate) => candidate.itemId === itemId)!
   const origin = { tx: tile.tx, ty: tile.ty + 2 }
-  return powerUp.activate(state, { playerId: 'p1', itemId, slot: 'drill.collar', tick: 20, origin })
+  return powerUp.activate(state, {
+    playerId: 'p1',
+    itemId,
+    slot: 'drill.collar',
+    tick: 20,
+    origin,
+    mark: 0,
+    magnitude: null,
+  })
 }
 
 function gated(gateKind: string) {

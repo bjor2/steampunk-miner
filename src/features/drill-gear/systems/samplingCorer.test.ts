@@ -46,6 +46,8 @@ function coreDownFrom(tile: TilePoint, slices: readonly SliceDefinition[] = []) 
       slot: 'drill.collar' as const,
       tick: 1,
       origin: tile,
+      mark: 0,
+      magnitude: null,
     }
     return { state, outcome: sampleOreAhead(state, use) }
   })
