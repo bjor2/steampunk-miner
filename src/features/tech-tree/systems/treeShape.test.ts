@@ -158,4 +158,13 @@ describe('tech tree: Schedule C absorber', () => {
       'tech.mobility.smoke_canister claims "shields", which the map does not give it',
     ])
   })
+
+  it('finds a Mark milestone off Marks 3, 6 and 9 of its ladder', () => {
+    const boost = nodeOf('tech.mobility.steam_boost')
+    const marks = boost.marks ?? { isIncomeItem: false }
+    const offMark = treeWith(boost.id, {
+      marks: { ...marks, milestones: [{ mark: 4, pattern: 'hold', verb: 'a longer burn' }] },
+    })
+    expect(shapeOf(offMark)).toEqual([`${boost.id}: milestone at Mark 4, not 3, 6 or 9`])
+  })
 })

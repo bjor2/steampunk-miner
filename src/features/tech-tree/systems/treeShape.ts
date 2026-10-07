@@ -3,12 +3,14 @@
  * is acyclic; no prerequisite sits deeper than its node; combos come at the research lab's planet
  * or later with prerequisites in exactly two lanes, and only combos cross lanes; extractor nodes
  * have none; at most two capabilities share a planet; every node has an icon that resolves, a
- * flavour line with no digits and a label; the absorbed Schedule C rows agree.
+ * flavour line with no digits and a label; the absorbed Schedule C rows agree; every Mark
+ * milestone sits at Mark 3, 6 or 9 of its ladder, each pattern at most once (#256).
  *
  * It runs over whatever the lane slices have registered, so it turns on as they land; the
  * cadence check (no gap longer than two planets on P2-P37) waits until all five lanes are in.
  */
 import { contentOf } from '../../../systems/registries/content'
+import { milestoneProblemsOf } from './markMilestones'
 import { absorbedRowProblems, researchLabPlanet } from './scheduleAbsorber'
 import { TECH_LANES, type TechNode } from './techNode'
 
@@ -36,6 +38,7 @@ export function treeShapeProblems(nodes: readonly TechNode[], rules: ShapeRules)
     ...cadenceProblems(nodes),
     ...presentationProblems(nodes, rules),
     ...absorbedRowProblems(nodes),
+    ...milestoneShapeProblems(nodes),
   ]
 }
 
@@ -161,6 +164,14 @@ function presentationProblems(nodes: readonly TechNode[], rules: ShapeRules): st
       : [`${node.id}: the flavour line is empty or has a digit`]),
     ...(node.label.length > 0 ? [] : [`${node.id} has no label`]),
   ])
+}
+
+function milestoneShapeProblems(nodes: readonly TechNode[]): string[] {
+  return nodes.flatMap((node) =>
+    node.marks === undefined
+      ? []
+      : milestoneProblemsOf(node.marks).map((problem) => `${node.id}: ${problem}`),
+  )
 }
 
 /** Stat and cost lines are generated (#159), so the flavour line carries no number. */

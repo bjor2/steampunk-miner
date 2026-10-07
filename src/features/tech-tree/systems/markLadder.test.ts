@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { isMasteredAt, lastMarkOf, markStepOf } from './markLadder'
-import type { MarkLadder } from './techNode'
+import {
+  MILESTONE_MARKS,
+  milestoneProblemsOf,
+  milestonesOf,
+  yieldMilestonesOf,
+  type MilestoneClass,
+  type MilestoneVerbs,
+} from './markMilestones'
+import { markBearerOf, markNodeOf } from './markNodes'
+import type { MarkLadder, TreeNode } from './techNode'
 
 // The echo sounder's #162 section 4.2 row; an ore-moving item with a duration; a foam crate whose
 // cone meets a terrain cap early.
@@ -123,5 +132,114 @@ describe('tech tree: Mark ladder', () => {
 
   it('masters a ladder with no stats at once', () => {
     expect(lastMarkOf({ isIncomeItem: false })).toBe(1)
+  })
+})
+
+// Milestones (the GD lock on #256), with every pattern's verb authored so the class mapping alone
+// decides what each item carries.
+const EVERY_VERB: MilestoneVerbs = {
+  hold: 'a longer burn',
+  secondTap: 'a sideways air-dash',
+  siblingLink: {
+    verb: 'fires the ballast at half lift',
+    siblingId: 'consumable.emergency_ballast',
+  },
+}
+const CLASSES: readonly MilestoneClass[] = [
+  'charged',
+  'consumable',
+  'channel',
+  'toggle',
+  'always-on',
+]
+
+function withMilestonesOf(ladder: MarkLadder, milestoneClass: MilestoneClass): MarkLadder {
+  return { ...ladder, milestones: milestonesOf(milestoneClass, EVERY_VERB) }
+}
+
+const CAPABILITY: TreeNode = {
+  id: 'tech.mobility.steam_boost',
+  kind: 'capability',
+  lane: 'mobility',
+  name: 'Steam boost',
+  unlockTier: 2,
+  prereqs: [],
+  unlocks: { itemId: 'power.steam_boost', mark: 1 },
+  iconId: 'power.steam_boost',
+  description: 'A burst of steam.',
+  label: 'vertical',
+  costKind: 'capability',
+  depthTerm: 2,
+}
+
+describe('tech tree: Mark milestones', () => {
+  it('milestones sit only at Marks 3, 6 and 9 and use each pattern at most once', () => {
+    const ladders = CLASSES.map((milestoneClass) => withMilestonesOf(ECHO_SOUNDER, milestoneClass))
+    for (const ladder of ladders) {
+      const patterns = ladder.milestones?.map((milestone) => milestone.pattern) ?? []
+      expect(ladder.milestones?.every(({ mark }) => MILESTONE_MARKS.includes(mark))).toBe(true)
+      expect(new Set(patterns).size).toBe(patterns.length)
+    }
+    expect(ladders.flatMap(milestoneProblemsOf)).toEqual([])
+  })
+
+  it("an income item's only yield milestone is its sibling-link", () => {
+    const yieldPatternsOf = (ladder: MarkLadder) =>
+      CLASSES.map((milestoneClass) =>
+        yieldMilestonesOf(withMilestonesOf(ladder, milestoneClass)).map((m) => m.pattern),
+      )
+    expect(yieldPatternsOf(INCOME_ITEM)).toEqual(CLASSES.map(() => ['sibling-link']))
+    expect(yieldPatternsOf(ECHO_SOUNDER)).toEqual(CLASSES.map(() => []))
+  })
+
+  it('always-on items carry a sibling-link only', () => {
+    expect(milestonesOf('always-on', EVERY_VERB)).toEqual([
+      { mark: 3, pattern: 'sibling-link', ...EVERY_VERB.siblingLink },
+    ])
+  })
+
+  it('places each class on the #256 mapping, a channel ending in a number step', () => {
+    const shapeOf = (milestoneClass: MilestoneClass) =>
+      milestonesOf(milestoneClass, EVERY_VERB).map(({ mark, pattern }) => `${mark} ${pattern}`)
+    expect(shapeOf('charged')).toEqual(['3 second-tap', '6 hold', '9 sibling-link'])
+    expect(shapeOf('channel')).toEqual(['3 second-tap', '6 sibling-link'])
+    expect(shapeOf('toggle')).toEqual(['3 hold', '6 second-tap', '9 sibling-link'])
+  })
+
+  it('leaves out a pattern its lane has not authored a verb for yet', () => {
+    const patterns = milestonesOf('charged', { hold: 'a longer burn' }).map((m) => m.pattern)
+    expect(patterns).toEqual(['hold'])
+  })
+
+  it('puts milestone Marks on the existing ladder with no premium step', () => {
+    const plain = markBearerOf(CAPABILITY, ECHO_SOUNDER)
+    const marked = markBearerOf(CAPABILITY, withMilestonesOf(ECHO_SOUNDER, 'charged'))
+    expect(marked.lastMark).toBe(plain.lastMark)
+    for (const mark of MILESTONE_MARKS) {
+      expect(markNodeOf(marked, mark)).toEqual(markNodeOf(plain, mark))
+      expect(markStepOf(marked.ladder, mark)).toEqual(markStepOf(ECHO_SOUNDER, mark))
+    }
+  })
+
+  it('finds a milestone off Marks 3, 6 and 9, past mastery, repeated or with a wrong sibling', () => {
+    const ladder: MarkLadder = {
+      ...ASSAY_LENS,
+      milestones: [
+        { mark: 4, pattern: 'hold', verb: 'a longer burn', siblingId: 'power.steam_boost' },
+        { mark: 9, pattern: 'hold', verb: ' ' },
+        { mark: 9, pattern: 'sibling-link', verb: 'fires the sounder' },
+      ],
+    }
+    expect(lastMarkOf(ASSAY_LENS)).toBeLessThan(9)
+    expect(milestoneProblemsOf(ladder)).toEqual([
+      'milestone at Mark 4, not 3, 6 or 9',
+      'milestone at Mark 9, past the last Mark',
+      'milestone at Mark 9 has no verb',
+      'milestone at Mark 9, past the last Mark',
+      'milestone at Mark 4 names a sibling but is no sibling-link',
+      'milestone at Mark 9 names no sibling',
+      'Mark 9 appears more than once',
+      'pattern hold appears more than once',
+    ])
   })
 })

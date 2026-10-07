@@ -50,6 +50,27 @@ export interface MarkLadder {
   magnitude?: { base: number; limit?: number }
   /** Charges per dock, or a consumable's stack: one more each step, up to the cap. */
   charges?: number
+  /**
+   * The behaviours Marks 3, 6 and 9 bring (the GD lock on #256), on the same ladder and price as
+   * any Mark. Absent until the item's lane authors its verbs (`milestonesOf`).
+   */
+  milestones?: readonly MarkMilestone[]
+}
+
+/**
+ * The three reusable milestone patterns (#256): holding the slot past the wind-up, a second press
+ * within 30 ticks of the first, and the act triggering a sibling in the same lane.
+ */
+export type MilestonePattern = 'hold' | 'second-tap' | 'sibling-link'
+
+/** One Mark that brings a new behaviour, not only a number step (#256 data shape). */
+export interface MarkMilestone {
+  mark: number
+  pattern: MilestonePattern
+  /** What the new behaviour does, in the player's words: the card's milestone line. */
+  verb: string
+  /** The sibling item a sibling-link fires; only a sibling-link has one. */
+  siblingId?: string
 }
 
 /** An authored node, as a lane slice registers it (#161 section 5). */
