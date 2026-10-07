@@ -1,0 +1,13 @@
+/*
+ * Like the HUD overlay (#208), the layer covers the canvas rather than the safe area, so its
+ * pixels are the projector's canvas pixels. The inset undoes the safe area's (GameStage.module.css).
+ */
+.layer {
+  position: absolute;
+  inset: calc(-1 * max(env(safe-area-inset-top), var(--tv-safe-y)))
+    calc(-1 * max(env(safe-area-inset-right), var(--tv-safe-x)))
+    calc(-1 * max(env(safe-area-inset-bottom), var(--tv-safe-y)))
+    calc(-1 * max(env(safe-area-inset-left), var(--tv-safe-x)));
+  overflow: hidden;
+  pointer-events: none;
+}

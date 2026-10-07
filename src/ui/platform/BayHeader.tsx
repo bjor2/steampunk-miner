@@ -1,12 +1,15 @@
 /**
  * The bay's emblem and name, money, planet, the core bay against the need, and the platform's
- * state (#33, #37), each field with its glyph of the icon set (#158).
+ * state (#33, #37), each field with its glyph of the icon set (#158). Slice `header` bay panels
+ * draw just left of the money (ticket 220).
  */
 import type { ReactNode } from 'react'
 import type { BayHeader as Header } from '../../systems/views/bayFrame'
 import { UI_IDS } from '../ids'
 import { Gauge } from '../kit/Gauge'
+import { bayPanelsOf } from '../registries/bayPanels'
 import { VectorIcon } from '../VectorIcon'
+import { MoneyCounter } from './MoneyCounter'
 import styles from './Platform.module.css'
 
 export function BayHeader({ header }: { header: Header }) {
@@ -16,10 +19,9 @@ export function BayHeader({ header }: { header: Header }) {
         <VectorIcon iconId={header.emblemId} size="menu" />
         {header.bayName}
       </strong>
+      <HeaderPanels />
       <Field label="Money" iconId={header.moneyIconId}>
-        <span data-testid={UI_IDS.platformMoney} data-exact={header.money.exact}>
-          {header.money.text}
-        </span>
+        <MoneyCounter wallet={header.money} />
       </Field>
       <Field label="Planet" iconId={header.planetIconId}>
         <span data-testid={UI_IDS.platformPlanet}>{header.planet}</span>
@@ -36,6 +38,16 @@ export function BayHeader({ header }: { header: Header }) {
         </span>
       </Field>
     </header>
+  )
+}
+
+function HeaderPanels() {
+  return (
+    <>
+      {bayPanelsOf('header').map(({ id, Panel }) => (
+        <Panel key={id} />
+      ))}
+    </>
   )
 }
 

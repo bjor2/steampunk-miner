@@ -286,6 +286,7 @@ describe('slice boundary lint', () => {
 | `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `authorityReactions` (#219, 3.21), `seal`; `itemDescriber`, `itemDescriptionEntries`, `buyableRefs` (K7, 3.19) |
 | `src/ui/registries/hudPanels.ts` **(new)** | HUD panels |
 | `src/ui/registries/screens.ts` | Full slice screens (#211) |
+| `src/ui/registries/bayPanels.ts`, `moneyCounter.ts` | Bay header and above-bay panels; the one money-counter provider (ticket 220) |
 | `src/ui/vectorIcons.ts` | Icon registry (extended) |
 | `src/debug/debugActionRegistry.ts` **(new)** | Debug actions |
 
@@ -319,6 +320,8 @@ export interface SliceRegistrar {
   attachUse(use: AttachUse): void
   buildingAttachUse(use: BuildingAttachUse): void      // #175, section 3.11
   hudPanel(panel: HudPanel): void
+  bayPanel(panel: BayPanel): void                      // ticket 220, section 3.21
+  moneyCounter(provider: MoneyCounterProvider): void   // one provider, ticket 220, section 3.21
   worldPiece(piece: WorldPiece): void                  // #175, section 3.14
   vehicleStaging(provider: VehicleStagingProvider): void  // one provider, #175, section 3.14
   artAssets(assets: readonly ArtAsset[]): void          // bare art ids, #214
@@ -744,6 +747,13 @@ export function oreTypeAtTile(state: AuthorityState, tile: TilePoint): OreType |
 - **State.** `before` is the state the command or tick started from, `after` the state it left with the earlier reactions applied. A reaction returns the new `after` and its event bodies. It hears only rule events, never another reaction's, so reactions never cascade.
 - **Contact.** `DrillDamageDealt` carries no ore id. A reaction reads the ore with `oreTypeAtTile(before, event)`, which answers even when the command broke the tile.
 - **Empty means today.** With nothing registered, every answer is unchanged and the goldens stay byte-identical. A slice's reaction events are its own domain events (section 3.15), and it writes its section with `withSection` (section 3.13).
+
+### 3.22 Bay panels and the money counter (ticket 220)
+
+The sell burst's kernel seams (TD lock on #176). With nothing registered, the bay screen and the app draw the same markup as before.
+- **`bayPanels`** (`src/ui/registries/bayPanels.ts`): `{ id, slot, Panel }`, with `slot` either `header` or `above`. A `header` panel draws in the bay header just left of the money (the `Lining −X` tag). The `above` slot is a full-canvas, click-through layer that `App` draws right after the bay screen (`ui/platform/AboveBayLayer.tsx`), so coins can fly across an open bay; it is drawn whether a bay is open or not.
+- **`moneyCounter`** (`src/ui/registries/moneyCounter.ts`), one provider: `useShownMoney(wallet)` is a hook that returns the Money the header counter shows while its roll runs. The kernel formats it once with `amountReading`. `data-exact` stays the authority wallet, and `data-shown` appears only while the two differ. With no provider the counter shows the wallet.
+- **The counter's anchor** (`ui/platform/moneyCounterAnchor.ts`): `moneyCounterPointIn(frame)` gives the counter's centre in the pixels of `frame`, or null while no bay header shows. Pass the `above` layer's element to get canvas pixels, the frame `project` uses.
 
 ## 4. Cross-slice contracts
 
