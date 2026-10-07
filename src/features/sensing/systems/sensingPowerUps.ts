@@ -27,7 +27,7 @@ function powerUpOf(item: SensingItem): PowerUp {
     name: item.name,
     channelTicks: 0,
     isToggle: false,
-    energyDrawPerMillePerSecond: 0,
+    energyDrawBpPerSecond: 0,
     activate: item.powerUpClass === 'passive' ? stayOn : revealOnly,
     ...rulesOf(item),
   }
