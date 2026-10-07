@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { createRunId, isValidRunId, runFilePaths } from './runLayout'
+import {
+  createRunId,
+  heapSnapshotFile,
+  isValidRunId,
+  isValidSnapshotFile,
+  runFilePaths,
+  saveSnapshotFile,
+  screenshotFile,
+} from './runLayout'
 
 describe('run layout', () => {
   it('names a run after its start time, as the design doc folder example does', () => {
@@ -23,5 +31,23 @@ describe('run layout', () => {
     expect(isValidRunId('../etc')).toBe(false)
     expect(isValidRunId('a/b')).toBe(false)
     expect(isValidRunId('')).toBe(false)
+  })
+
+  it('names each snapshot after its tick inside the run folder (#123)', () => {
+    expect(saveSnapshotFile(18000)).toBe('snapshots/save-18000.json')
+    expect(heapSnapshotFile(18000)).toBe('heap/18000.heapsnapshot')
+    expect(screenshotFile(18000, 'planet_change')).toBe('shots/18000-planet_change.png')
+  })
+
+  it('accepts the snapshot names it makes', () => {
+    const files = [saveSnapshotFile(0), heapSnapshotFile(7), screenshotFile(42, 'budget_breach')]
+    expect(files.every(isValidSnapshotFile)).toBe(true)
+  })
+
+  it('refuses snapshot names that could leave the run folder or are not snapshots', () => {
+    expect(isValidSnapshotFile('../events.ndjson')).toBe(false)
+    expect(isValidSnapshotFile('snapshots/../../x.json')).toBe(false)
+    expect(isValidSnapshotFile('events.ndjson')).toBe(false)
+    expect(isValidSnapshotFile('shots/1-a.png/x')).toBe(false)
   })
 })
