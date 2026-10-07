@@ -206,7 +206,7 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     expect(replay.digests.at(-1)?.digest).toBe(takeSessionSnapshot().digest)
   })
 
-  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker, the guns, the refinery, the lining bill, blasting charges, heat, benchmark results, the memory sample, the loadout, the gate hit, the live blast, save migrations, the charge sizes, the snapshot line, the item purchase, the ore sample and the magnetic hazard', () => {
+  it('registers the 56 event names from before the controls and HUD, plus hint_shown, casing, the four #46 artefact events, collapse, the lining charge, the tunnel wrecker, the guns, the refinery, the lining bill, blasting charges, heat, benchmark results, the memory sample, the loadout, the gate hit, the live blast, save migrations, the charge sizes, the snapshot line, the item purchase, the ore sample, the magnetic hazard and the bore gun', () => {
     // #41 added `casing_upgraded`, `casing_placed`, `casing_drilled` and the two grade edges; #46 four
     // artefact events; #43 `collapse_warning`, `collapse_cancelled` and `collapse`; #76 `casing_lined`;
     // #111 `ring_gnawed`, `wrecker_spawned` and `wrecker_fled`; #93 `gun_mounted`, `gun_upgraded`,
@@ -218,10 +218,10 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     // `equip_item` and `equip_refused`; K2 #185 `gate_hit`; K6 `blast_resolved`; #175
     // `save_migrated`; K8 #218 `remote_charge_planted` and `charge_disarmed`; #123
     // `snapshot_written` (debug runs only); #248 `vehicle_item_purchased`; #243 `ore_sampled`; #290
-    // `magnetic_field_entered` and `electrified_cell_shocked`; the controls and the HUD still add
-    // none.
+    // `magnetic_field_entered` and `electrified_cell_shocked`; ticket 313 `bore_fired` and
+    // `bore_ended`; the controls and the HUD still add none.
     expect(ALL_RUN_EVENT_NAMES).toHaveLength(
-      62 + 4 + 3 + 1 + 3 + 4 + 4 + 1 + 4 + 7 + 1 + 1 + 2 + 1 + 1 + 1 + 2 + 1 + 1 + 1 + 2,
+      62 + 4 + 3 + 1 + 3 + 4 + 4 + 1 + 4 + 7 + 1 + 1 + 2 + 1 + 1 + 1 + 2 + 1 + 1 + 1 + 2 + 2,
     )
   })
 })

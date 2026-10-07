@@ -52,13 +52,17 @@ function stepBore(
   tick: number,
 ): TickOutcome {
   const bore = boresOf(state)[index]
-  if (isBoreOpening(bore) && tick === bore.nextOpenTick) {
-    return openNextCell(state, params, index, tick)
-  }
-  if (bore.checkTick !== null && tick >= bore.checkTick) {
-    return checkBlocks(state, params, index, tick)
-  }
+  if (isCellDue(bore, tick)) return openNextCell(state, params, index, tick)
+  if (isCheckDue(bore, tick)) return checkBlocks(state, params, index, tick)
   return { state, events: [] }
+}
+
+function isCellDue(bore: PendingBore, tick: number): boolean {
+  return isBoreOpening(bore) && tick === bore.nextOpenTick
+}
+
+function isCheckDue(bore: PendingBore, tick: number): boolean {
+  return bore.checkTick !== null && tick >= bore.checkTick
 }
 
 function openNextCell(
@@ -90,14 +94,17 @@ function movedBore(
 ): PendingBore {
   if (opening.kind === 'stopped') return endedBore(bore, tick)
   const advanced = {
-    ...bore,
+    ...spentOn(bore, tile, opening),
     cells: rest,
     nextOpenTick: tick + bore.shot.openIntervalTicks,
-    ...(opening.kind === 'opened'
-      ? { budgetLeft: bore.budgetLeft - opening.ticks, bored: [...bore.bored, tile] }
-      : {}),
   }
   return rest.length === 0 ? endedBore(advanced, tick) : advanced
+}
+
+/** An opened cell spends its dig ticks and joins the bored line; an open one passes free. */
+function spentOn(bore: PendingBore, tile: TilePoint, opening: CellOpening): PendingBore {
+  if (opening.kind !== 'opened') return bore
+  return { ...bore, budgetLeft: bore.budgetLeft - opening.ticks, bored: [...bore.bored, tile] }
 }
 
 function endedBore(bore: PendingBore, tick: number): PendingBore {
