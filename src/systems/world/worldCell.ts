@@ -31,10 +31,18 @@ export const CELL_KIND = {
 
 export type CellKind = (typeof CELL_KIND)[keyof typeof CELL_KIND]
 
-/** The two resource families of the slice (#2 content budget). */
+/** The two resource families of the slice (#2 content budget), the ones the kernel draws itself. */
 export const RESOURCE_FAMILY = { none: 0, metal: 1, crystal: 2 } as const
 
-export type ResourceFamily = (typeof RESOURCE_FAMILY)[keyof typeof RESOURCE_FAMILY]
+/**
+ * Any value of the cell's 4-bit family field (#232): `none`, metal and crystal, then the codes a
+ * slice's catalogue names (#141's twelve families take 1 to 12). A code is only ever placed by a
+ * generation hook whose catalogue has a row for it; the rest stay spare.
+ */
+export type ResourceFamily = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
+
+/** The largest code the 4-bit family field holds. */
+export const MAX_RESOURCE_FAMILY = 15
 
 /** Core material is tier 3(p-1)+6 (#6), five above band-1 ore. */
 export const CORE_TIER_OFFSET = 5
