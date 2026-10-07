@@ -76,12 +76,7 @@ const OUT = outArg > 0 ? process.argv[outArg + 1] : 'dist/status'
 
 // Workflows shown on the page; the ones with `loop` also become a loop entry (state from the
 // last run), so a scheduled workflow is visible next to the agent loops without any reporting.
-const WORKFLOWS = [
-  { file: 'balance-planets.yml', loop: 'balance-planets', staleAfterMin: 26 * 60 },
-  { file: 'ci.yml' },
-  { file: 'e2e.yml' },
-  { file: 'pages.yml' },
-]
+const WORKFLOWS = [{ file: 'ci.yml' }, { file: 'pages.yml' }]
 
 async function rest(path, { raw = false, allow404 = false } = {}) {
   if (!TOKEN) {
