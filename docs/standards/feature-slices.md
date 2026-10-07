@@ -845,6 +845,10 @@ Kernel seam for the drill-gear lane (#205b), from the GD lock on #205. The kerne
 - **Energy**: the disc charges its ticks as before. Each cell adds its own carved ticks times the drill's rate times its share (a whole share ahead, `sideEnergyShareBp` beside), rounded up once per command. The cells cut only for the ticks the tank still pays after the disc's whole window, so a command never charges more than the tank holds.
 - A toggle's draw while on stays the `power-up` kind's `energyDrawBpPerSecond` (3.27).
 
+The `drill-gear` slice (#205) is the lane on this seam: the side cutters and reach boom ask while `isToggleEngaged`, the vibratory bit's crumble is an authority reaction with a K6 density edit, the spoil auger a clock step on the K6 queue, and the sampling corer a charged act. Drill gear sits in drill sockets, never a power-up slot, so the GD lock on #205 Q1 (a) took two named additions:
+- `power-up-core.use_power_up` also accepts `drill.flank` and `drill.collar` (`isPressableSlot`, one refusal rule; `drill.head` still refuses). Charges, cooldown, wind-up, gates and the toggle draw are unchanged.
+- Two kernel actions, `use_drill_flank` (KeyF) and `use_drill_collar` (KeyC), rebindable like `use_slot_n`, which only the drill-gear slice's input reactions answer. No touch tile yet (#244).
+
 ### 3.29 Ore drill classes (#236)
 
 Kernel seam for the mining gates (#148a), from the GD lock on #148: a per-cell scratch floor in `canScratch`, its values in kernel `economy.json`, keyed on the cell's real tier (lead included), never its sale tier. A gate opens when the tip of the last completed major reaches the floor (#180 amendment 2). With no provider the drill keeps #232's rule exactly.
