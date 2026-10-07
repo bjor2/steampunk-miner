@@ -565,6 +565,43 @@
           "status": "partial",
           "issues": [141, 147, 144, 148],
           "doc": "design.md §6"
+        },
+        {
+          "title": "Mining gates",
+          "description": "From planet 7 the rarer ore cells are locked: some need a better drill tip, some an extractor, some a charge of dynamite. Common ore is never locked, and no lock holds back more than 15% of a band's ore value. Still to come: the lock markers, sounds and hint chip (#238) and each extractor's own verb (#237).",
+          "status": "partial",
+          "issues": [142, 148, 236, 237, 238],
+          "planet": 7,
+          "children": [
+            {
+              "title": "Dense ore",
+              "description": "Rare previews of drill-class ores, and rare previews whose extractor has not arrived yet, are dense: the drill only skids until your last full drill-tip level is one past the ore's tier.",
+              "status": "built",
+              "issues": [236],
+              "planet": 7
+            },
+            {
+              "title": "Sealed ore shells",
+              "description": "Amberbone and Obsidian rare previews sit in shells the drill cannot open; a charge of the size the shell asks for frees the whole cell, full ore and no blast loss.",
+              "status": "built",
+              "issues": [236],
+              "planet": 7
+            },
+            {
+              "title": "Signature ores that need a better drill",
+              "description": "On planets 3 to 6 the signature ore is five tiers harder and the drill only scratches it until your tip catches up.",
+              "status": "built",
+              "issues": [232, 236],
+              "planet": 3
+            },
+            {
+              "title": "Extractors",
+              "description": "Five extractors, the Resonance Fork, Containment Hood, Acid Etcher, Induction Coil and Aether Tether, each open one class of rare ore and the planet's signature, arriving on planets 5, 12, 19, 26 and 33. Without one the drill skids off, or the ore vents or floats away. Still to come: buying them in the store and their own verbs (tune, capture, mark, pull, tow).",
+              "status": "partial",
+              "issues": [142, 236, 237],
+              "planet": 5
+            }
+          ]
         }
       ]
     },
