@@ -478,7 +478,10 @@ export interface GateQuery {
   blast: BlastEvent | null                                     // K2: null when the drill asks
   tool?: string                                                // #236: a power-up edit's source
 }
-export interface GateVerdict { outcome: GateOutcome; gateKind: string; required: string; have: string }
+export interface GateVerdict {
+  outcome: GateOutcome; gateKind: string; required: string; have: string
+  opensAfterTicks?: number                                     // ticket 237: standing by opens it
+}
 export interface GateCheck { id: string; check(query: GateQuery): GateVerdict | null }   // null: no gate on this cell
 /** refused > blocked > lost > cut; ties break on the lowest check id. null when no check has an opinion. */
 export function gateVerdictOf(query: GateQuery): GateVerdict | null
@@ -496,6 +499,8 @@ A verdict answers the means in the query: `cut` opens the cell to it, `refused` 
 - `cut`: the cell breaks past the charge's hardness cap and pays its full unit, after the kept share (#142: a qualifying charge frees a dynamite-gated cell whole).
 - `lost`: the cell breaks, and its sale value joins `blast_resolved.oreValueLost` (it was `charge_detonated`'s before K6).
 - A cell with no verdict takes today's blast.
+
+**Extractor verbs (ticket 237):** a verdict may read the asking player's slice state, since `query.state` carries it. `mining-gates` answers an owned extractor's cell by its verb: refused until a tune, an etch or a pull the drill's touch starts (its `required` reads `<extractor>:<state>`), or lost once the canisters or the tether's cable run out. `opensAfterTicks` says how long such a standing cell takes to open after a touch, so the pacing bot (`bot/botGates.ts` `extractorWaitOf`) waits there instead of routing round; absent, standing by opens nothing. The coil's pull opens its cell through the K6 terrain-edit queue with the source `mining-gates.induction`, the one tool its gate lets through.
 
 One verdict per tile is asked per drill command or blast slice (`cellGates.ts`), on the state the command or slice started from. A refused cell is an anchor the live blast passes over without counting it against its 64 tiles a tick (K6). With no check registered, nothing is asked and both paths are unchanged.
 

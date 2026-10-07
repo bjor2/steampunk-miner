@@ -112,14 +112,17 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/visionRows.test.ts` | 5 | 5 |
 
-### `mining-gates`: 9 files, 53 tests
+### `mining-gates`: 12 files, 77 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mining-gates/debug.test.ts` | 5 | 5 |
 | `src/features/mining-gates/gateReportRows.test.ts` | 3 | 3 |
+| `src/features/mining-gates/systems/botExtractors.test.ts` | 4 | 2 |
 | `src/features/mining-gates/systems/botGates.test.ts` | 4 | 4 |
 | `src/features/mining-gates/systems/canMine.test.ts` | 16 | 16 |
+| `src/features/mining-gates/systems/extractorRules.test.ts` | 8 | 8 |
+| `src/features/mining-gates/systems/extractorVerbs.test.ts` | 12 | 12 |
 | `src/features/mining-gates/systems/gateLedger.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/gateTable.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/rigSales.test.ts` | 3 | 3 |
@@ -537,6 +540,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/domainEventLog.test.ts` | 17 | 17 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
 | `src/logging/eventSink.test.ts` | 7 | 7 |
+| `src/logging/gateClearTables.test.ts` | 2 | 2 |
+| `src/logging/gateClearTally.test.ts` | 3 | 3 |
 | `src/logging/goldenSliceSections.test.ts` | 4 | 4 |
 | `src/logging/heatReport.test.ts` | 2 | 2 |
 | `src/logging/memorySample.test.ts` | 2 | 2 |
