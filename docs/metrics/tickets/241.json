@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "ticket": 241,
+  "title": "Data: Sensing lane slice (echo sounder, periscope, assay lens and the other sensing items) (data half of #203)",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-07T16:34:07Z",
+  "closed": "2026-10-07T17:17:44Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-07T16:34:07.000Z","end":"2026-10-07T16:52:27.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-07T16:52:27.000Z","end":"2026-10-07T16:52:51.025Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-07T16:52:51.025Z","end":"2026-10-07T16:53:02.163Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-07T16:53:02.163Z","end":"2026-10-07T16:53:05.857Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-07T16:53:05.857Z","end":"2026-10-07T16:55:21.999Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-07T16:55:21.999Z","end":"2026-10-07T16:57:32.016Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T16:57:32.016Z","end":"2026-10-07T17:00:09.949Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-07T17:00:09.949Z","end":"2026-10-07T17:00:36.226Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T17:00:36.226Z","end":"2026-10-07T17:14:40.078Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-07T17:14:40.078Z","end":"2026-10-07T17:15:00.357Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-07T17:15:00.357Z","end":"2026-10-07T17:15:04.734Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-07T17:15:04.734Z","end":"2026-10-07T17:15:12.957Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-07T17:15:12.957Z","end":"2026-10-07T17:17:37.541Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-07T17:17:37.541Z","end":"2026-10-07T17:17:44.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":0,"planner_wait":0,"idle":1100,"context":174,"planning":8,"developing":134,"testing":1002,"gates":145,"landing":30,"other":24},
+  "lead_time_s": 2617,
+  "cycle_time_s": 1517,
+  "claimed": "2026-10-07T16:52:27.000Z",
+  "claimed_to_done_s": 1517,
+  "backfilled": false
+}
