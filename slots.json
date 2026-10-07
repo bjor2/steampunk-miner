@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T16:22:34+02:00",
+  "updated_at": "2026-10-07T16:52:12+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -27,11 +27,11 @@
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 147,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-07T16:01:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -43,16 +43,16 @@
         },
         {
           "slot": "C4",
-          "state": "busy",
-          "ticket": 229,
-          "grok_slot": 8,
-          "kind": "dev",
-          "since": "2026-10-07T16:01:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
+      "used": 2,
+      "free": 2,
       "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
@@ -73,11 +73,11 @@
         },
         {
           "slot": "C6",
-          "state": "busy",
-          "ticket": 164,
-          "grok_slot": 4,
-          "kind": "dev",
-          "since": "2026-10-07T14:56:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C7",
@@ -97,14 +97,14 @@
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "claims_last_hour": 2,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 3,
     "max": 3
   },
   "tester": {
@@ -120,7 +120,17 @@
     "main_red_sha": null,
     "feature": 140,
     "feature_title": "Spec: Ore catalogue and depth tiers (many more ore types, rarer deeper)",
-    "queue": []
+    "queue": [
+      {
+        "feature": 159,
+        "kind": "spec",
+        "title": "Spec: Descriptions for every buyable item",
+        "tickets": [
+          164
+        ],
+        "since": "2026-10-07T16:31:12+02:00"
+      }
+    ]
   },
   "grok": [
     {
@@ -139,17 +149,15 @@
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 147,
-      "since": "2026-10-07T16:01:00+02:00",
-      "claude_slot": 2
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 164,
-      "since": "2026-10-07T14:56:00+02:00",
-      "claude_slot": 6
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -174,10 +182,9 @@
     },
     {
       "slot": 8,
-      "state": "dev",
-      "ticket": 229,
-      "since": "2026-10-07T16:01:00+02:00",
-      "claude_slot": 4
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 9,
@@ -218,10 +225,10 @@
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 147,
-      "grok_slot": 3,
-      "since": "2026-10-07T16:01:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -234,10 +241,10 @@
     },
     {
       "slot": 4,
-      "state": "busy",
-      "ticket": 229,
-      "grok_slot": 8,
-      "since": "2026-10-07T16:01:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -250,10 +257,10 @@
     },
     {
       "slot": 6,
-      "state": "busy",
-      "ticket": 164,
-      "grok_slot": 4,
-      "since": "2026-10-07T14:56:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 2
     },
     {
@@ -283,8 +290,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 9,
-      "dev": 8,
+      "used": 6,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -292,8 +299,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 8,
-      "free": 0,
+      "used": 5,
+      "free": 3,
       "external": 0
     }
   }
