@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T01:19:00+02:00",
+  "updated_at": "2026-10-08T01:19:10+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -104,34 +104,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "probes",
-    "sha": "0b55dd88bd87b34a08a0434e12e144a2aefaf3a4",
-    "since": "2026-10-07T22:49:49Z",
+    "phase": "fast",
+    "sha": "c9e49e10a90dafea836c1593d0cd5816fbc52464",
+    "since": "2026-10-07T23:19:01Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-07T22:41:46Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null,
-    "feature": 141,
-    "feature_title": "Spec: Per-planet ore distribution (common vs rare per planet)",
+    "feature": 143,
+    "feature_title": "Spec: Dynamite in ~10 sizes with realistic explosions and exponential cost",
     "queue": [
-      {
-        "feature": 143,
-        "kind": "spec",
-        "title": "Spec: Dynamite in ~10 sizes with realistic explosions and exponential cost",
-        "tickets": [
-          149,
-          218,
-          247
-        ],
-        "since": "2026-10-07T21:39:12+02:00"
-      },
       {
         "feature": 123,
         "kind": "ticket",
