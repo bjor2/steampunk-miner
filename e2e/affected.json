@@ -148,6 +148,7 @@
         "e2e/browser/workshop.spec.ts",
         "e2e/browser/vehiclePieces.spec.ts",
         "e2e/browser/dynamiteVisuals.spec.ts",
+        "e2e/browser/miningGates.spec.ts",
         "e2e/browser/screens/screenLayout.spec.ts",
         "e2e/browser/screens/reviewShots.spec.ts"
       ]
@@ -217,6 +218,11 @@
         "e2e/browser/itemCards.spec.ts",
         "e2e/browser/workshop.spec.ts"
       ]
+    },
+    {
+      "why": "The mining gates' looks in the ground and the debug reads that check them (ticket 299).",
+      "paths": ["src/features/mining-gates/**"],
+      "specs": ["e2e/browser/miningGates.spec.ts"]
     },
     {
       "why": "The game stage fits every screen cell and shows the portrait card.",
