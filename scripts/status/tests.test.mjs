@@ -117,6 +117,11 @@ describe('readTestsModel', () => {
         since: '2026-10-07T09:50:00Z',
         holds_gate: true,
         main_red_sha: SHA,
+        feature: 90,
+        feature_title: 'Build plan',
+        queue: [
+          { feature: 214, title: 'Lone ticket', tickets: [214], since: '2026-10-07T09:40:00Z' },
+        ],
       },
       nowMs: NOW_MS,
     })
@@ -127,6 +132,9 @@ describe('readTestsModel', () => {
     expect(html).toContain('running slow')
     expect(html).toContain('box-tester/fast')
     expect(html).toContain('holds a gate token')
+    expect(html).toContain('testing feature <a href="https://github.com/o/r/issues/90">#90</a>')
+    expect(html).toContain('Features awaiting test')
+    expect(html).toContain('Lone ticket')
   })
 
   it('falls back to the newest tested commit while main tip has no box status', () => {

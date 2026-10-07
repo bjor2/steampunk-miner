@@ -1,5 +1,6 @@
 // Renders the Tests tab of /status/ (#192) from the model of tests.mjs: the box Tester's state
-// (running phase, gate and Claude slot, main-red pause, the no-run-in-6h warning), main's
+// (feature under test, running phase, gate and Claude slot, main-red pause, the STALE warning),
+// the features waiting for their test run, main's
 // box-tester/* commit statuses, the latest run per phase and per nightly suite, the recent runs
 // (box and the older Actions ones) and the failing, flaky and slowest test files. Static HTML
 // strings; the page re-renders them on every live fetch. Classes come from scripts/status/index.html.
@@ -48,7 +49,7 @@ function mainRedBanner(model, view) {
 function staleBanner(model, view) {
   if (!model.freshness.isStale) return ''
   const seen = model.freshness.seenAt ? ageOf(model.freshness.seenAt, view.nowMs) : 'never'
-  return `<div class="warn te-banner"><span class="badge stale">STALE</span> No box Tester run in ${TESTER_STALE_AFTER_H} h (last ${seen}). Tests no longer run in GitHub Actions, so nothing is testing main.</div>`
+  return `<div class="warn te-banner"><span class="badge stale">STALE</span> No box Tester run in ${TESTER_STALE_AFTER_H} h (last ${seen}). Tests no longer run in GitHub Actions and the nightly run is overdue, so nothing is testing main.</div>`
 }
 
 function testerNowLine(model, view) {
@@ -59,7 +60,30 @@ function testerNowLine(model, view) {
     return `<div>Tester <span class="badge sl-free">idle</span> · ${last}</div>`
   const gate = t.holdsGate ? ' · holds a gate token' : ' · waiting for / without a gate token'
   const claude = t.claudeSlot ? ` · triage in Claude slot C${t.claudeSlot}` : ''
-  return `<div>Tester <span class="badge sl-busy">running ${escapeHtml(t.phase ?? '')}</span> on ${commitLink(t.sha, view)} since ${ageOf(t.since, view.nowMs)}${gate}${claude} · ${last}</div>`
+  return `<div>Tester <span class="badge sl-busy">running ${escapeHtml(t.phase ?? '')}</span>${featureText(t.feature, t.featureTitle, view)} on ${commitLink(t.sha, view)} since ${ageOf(t.since, view.nowMs)}${gate}${claude} · ${last}</div>`
+}
+
+function issueLink(n, view) {
+  return `<a href="https://github.com/${escapeHtml(view.repo)}/issues/${n}">#${n}</a>`
+}
+
+function featureText(feature, title, view) {
+  if (!feature) return ''
+  return ` testing feature ${issueLink(feature, view)}${title ? ` <span class="muted">${escapeHtml(title)}</span>` : ''}`
+}
+
+function queueRow(q, view) {
+  const tickets = q.tickets.map((t) => issueLink(t, view)).join(' ')
+  return `<tr><td>${issueLink(q.feature, view)} ${escapeHtml(q.title ?? '')}</td><td>${tickets || '<span class="muted">—</span>'}</td>${whenCell(q.since, view)}</tr>`
+}
+
+function queueSection(model, view) {
+  const queue = model.tester?.queue ?? []
+  const rows =
+    queue.map((q) => queueRow(q, view)).join('') ||
+    '<tr><td colspan="3" class="muted">No completed feature waiting for its test run.</td></tr>'
+  return `<section class="sl-pool"><h3>Features awaiting test <span class="muted">${queue.length} queued · a feature is tested when its last ticket closes</span></h3>
+    <table class="sl-table"><thead><tr><th>Feature</th><th>Tickets</th><th>Completed</th></tr></thead><tbody>${rows}</tbody></table></section>`
 }
 
 function statusRow(s) {
@@ -73,7 +97,7 @@ function statusRow(s) {
 function statusesSection(model, view) {
   const rows =
     model.statuses.map(statusRow).join('') ||
-    '<tr><td colspan="3" class="muted">No box-tester status on this commit yet (the Tester tests main after each push).</td></tr>'
+    '<tr><td colspan="3" class="muted">No box-tester status on this commit yet (the Tester tests a feature when its last ticket closes, and main nightly).</td></tr>'
   const title = model.isMainTipTested
     ? `Commit status on main ${commitLink(model.statusSha, view)}`
     : `Commit status on the last tested commit ${commitLink(model.statusSha, view)} <span class="muted">(main ${commitLink(model.mainSha, view)} not tested yet)</span>`
@@ -88,7 +112,7 @@ function phaseRow(phase, run, view) {
 
 function phasesSection(model, view) {
   const rows = TEST_PHASES.map((p) => phaseRow(p, model.latestByPhase[p], view)).join('')
-  return `<section class="sl-pool"><h3>Latest box run per phase <span class="muted">fast = relevant tests after a push · slow = pacing bot + e2e · full / nightly = every night</span></h3>
+  return `<section class="sl-pool"><h3>Latest box run per phase <span class="muted">fast = the feature's relevant tests · slow = pacing bot + e2e · full / nightly = every night</span></h3>
     <table class="sl-table"><thead><tr><th>Phase</th><th>Result</th><th>Mode</th><th>Commit</th><th>Duration · tests</th><th>When</th></tr></thead><tbody>${rows}</tbody></table></section>`
 }
 
@@ -109,13 +133,14 @@ function runRow(run, view) {
     run.source === 'box'
       ? `${escapeHtml(run.phase ?? '')}${run.job && run.job !== run.phase ? ` · ${escapeHtml(run.job)}` : ''}`
       : escapeHtml(run.job ?? '')
-  return `<tr><td><span class="badge${run.source === 'box' ? ' sl-busy' : ''}">${run.source}</span></td><td>${what}</td><td>${escapeHtml(run.mode ?? '')}</td><td>${commitLink(run.sha, view)}</td><td>${resultBadge(run)}</td><td>${durationText(run.durationSec)}</td><td>${countsText(run)}</td>${whenCell(run.startedAt, view)}<td class="muted">${escapeHtml(run.event ?? '')}</td></tr>`
+  const feature = run.feature ? issueLink(run.feature, view) : '<span class="muted">—</span>'
+  return `<tr><td><span class="badge${run.source === 'box' ? ' sl-busy' : ''}">${run.source}</span></td><td>${feature}</td><td>${what}</td><td>${escapeHtml(run.mode ?? '')}</td><td>${commitLink(run.sha, view)}</td><td>${resultBadge(run)}</td><td>${durationText(run.durationSec)}</td><td>${countsText(run)}</td>${whenCell(run.startedAt, view)}<td class="muted">${escapeHtml(run.event ?? '')}</td></tr>`
 }
 
 function runsSection(model, view) {
   const rows = model.runs.map((r) => runRow(r, view)).join('')
   return `<section class="sl-pool te-wide"><h3>Recent runs <span class="muted">${model.runs.length} of ${model.runCount} in summary.json · ${model.boxRunCount} from the box</span></h3>
-    <table class="sl-table"><thead><tr><th>Source</th><th>Phase · job</th><th>Mode</th><th>Commit</th><th>Result</th><th>Duration</th><th>Tests</th><th>When</th><th>Trigger</th></tr></thead><tbody>${rows}</tbody></table></section>`
+    <table class="sl-table"><thead><tr><th>Source</th><th>Feature</th><th>Phase · job</th><th>Mode</th><th>Commit</th><th>Result</th><th>Duration</th><th>Tests</th><th>When</th><th>Trigger</th></tr></thead><tbody>${rows}</tbody></table></section>`
 }
 
 function fileRow(f) {
@@ -131,7 +156,7 @@ function filesTable(title, files, empty) {
 /** The Tests tab body. `view` carries `repo` (`owner/name`) and `nowMs`. */
 export function renderTestsPanel(model, view) {
   return `${mainRedBanner(model, view)}${staleBanner(model, view)}${testerNowLine(model, view)}
-    <div class="sl-grid">${statusesSection(model, view)}${phasesSection(model, view)}${nightlySection(model, view)}
+    <div class="sl-grid">${queueSection(model, view)}${statusesSection(model, view)}${phasesSection(model, view)}${nightlySection(model, view)}
     ${filesTable('Failing files', model.failingFiles, 'none failing in their last run')}
     ${filesTable('Flaky files', model.flakyFiles, 'none flagged flaky')}
     ${filesTable('Slowest files (p95)', model.slowestFiles, 'no timings yet')}</div>

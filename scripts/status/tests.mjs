@@ -1,13 +1,13 @@
 // The model behind the Tests tab of /status/ (#192): the test runs recorded on the orphan
 // `test-metrics` branch (summary.json, docs/metrics/test-metrics.md), the box Tester's live state
 // from the loop's slots.json (`tester`, docs/loop-status.md) and the box-tester/* commit statuses
-// of main's tip. Since 2026-10-07 the box Tester runs every test (fast relevant tests after a push,
-// then slow: pacing bot and e2e; nightly: full suite and the long suites); older runs came from
-// Actions. Pure and DOM-free: the page imports it as an ES module, build-status.mjs and the tests
+// of main's tip. Since 2026-10-07 the box Tester runs every test: per feature when its last
+// ticket closes (fast relevant tests for the union of the feature's changes, then slow: pacing
+// bot and e2e) and nightly (full suite and the long suites); older runs came from Actions. Pure and DOM-free: the page imports it as an ES module, build-status.mjs and the tests
 // from node; the clock is passed in.
 
-/** A box Tester that recorded nothing for this long is flagged on the page. */
-export const TESTER_STALE_AFTER_H = 6
+/** A box Tester that recorded nothing for this long is flagged (runs are per feature + nightly). */
+export const TESTER_STALE_AFTER_H = 26
 export const TEST_PHASES = ['fast', 'slow', 'full', 'nightly']
 const HOUR_MS = 3_600_000
 const SHOWN_RUNS = 20
@@ -50,6 +50,21 @@ function readRun(run) {
     files: run.files ?? 0,
     tests: run.tests ?? 0,
     failed: run.failed ?? 0,
+    feature: positiveOrNull(run.feature),
+    tickets: Array.isArray(run.tickets) ? run.tickets.map(positiveOrNull).filter(Boolean) : [],
+  }
+}
+
+function positiveOrNull(value) {
+  return Number.isSafeInteger(value) && value > 0 ? value : null
+}
+
+function readQueued(entry) {
+  return {
+    feature: positiveOrNull(entry?.feature),
+    title: textOrNull(entry?.title),
+    tickets: Array.isArray(entry?.tickets) ? entry.tickets.map(positiveOrNull).filter(Boolean) : [],
+    since: stampOrNull(entry?.since),
   }
 }
 
@@ -90,6 +105,9 @@ function readTester(raw) {
     lastNightlyAt: stampOrNull(raw.last_nightly),
     lastNightlyResult: textOrNull(raw.last_nightly_result),
     mainRedSha: shaOrNull(raw.main_red_sha),
+    feature: positiveOrNull(raw.feature),
+    featureTitle: textOrNull(raw.feature_title),
+    queue: (Array.isArray(raw.queue) ? raw.queue : []).map(readQueued).filter((q) => q.feature),
   }
 }
 
