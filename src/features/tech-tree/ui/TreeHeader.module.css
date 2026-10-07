@@ -46,3 +46,19 @@
 .filter[aria-pressed='true'] {
   background: rgb(184 115 51 / 0.35);
 }
+
+/* #161 mobile: the controls on one row that scrolls sideways. */
+@media (max-width: 760px), (pointer: coarse) {
+  .header {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .search {
+    min-width: 8rem;
+  }
+
+  .header > * {
+    flex: none;
+  }
+}

@@ -15,3 +15,15 @@
   font-style: italic;
   opacity: 0.7;
 }
+
+/* #161 mobile: one row that scrolls sideways, so the lane list keeps the screen. */
+@media (max-width: 760px), (pointer: coarse) {
+  .strip {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .strip > * {
+    flex: none;
+  }
+}

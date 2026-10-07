@@ -185,7 +185,7 @@ function markChipOf(node: TreeNode, context: CardContext): MarkChipModel | null 
 }
 
 function markStepText(mark: number): string {
-  if (mark === 0) return 'Mk I once researched'
+  if (mark === 0) return 'Mk I when researched'
   return `Mk ${romanNumeralOf(mark)} → ${romanNumeralOf(mark + 1)}`
 }
 
