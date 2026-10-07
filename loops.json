@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T09:31:02Z",
+  "updated_at": "2026-10-07T09:32:10Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -8,7 +8,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T09:14:26Z",
+      "updated_at": "2026-10-07T09:32:10Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -16,8 +16,8 @@
       "slot": "2",
       "state": "working",
       "issue": 178,
-      "note": "tier hard, attempt 2/2 (session running)",
-      "updated_at": "2026-10-07T09:23:40Z",
+      "note": "started 2026-10-07 10:43 CEST",
+      "updated_at": "2026-10-07T09:32:10Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -25,17 +25,17 @@
       "slot": "3",
       "state": "working",
       "issue": 176,
-      "note": "tier hard, attempt 2/2 (session running)",
-      "updated_at": "2026-10-07T09:24:25Z",
+      "note": "started 2026-10-07 10:23 CEST",
+      "updated_at": "2026-10-07T09:32:10Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
       "loop": "steampunk-loop",
       "slot": "4",
-      "state": "blocked",
-      "issue": 223,
-      "note": "push_pending: ticket/223 green but not on main (slot free)",
-      "updated_at": "2026-10-07T09:31:02Z",
+      "state": "idle",
+      "issue": null,
+      "note": "free",
+      "updated_at": "2026-10-07T09:32:10Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "blocked",
       "issue": null,
-      "note": "push_pending #218 (ticket/218) waits to land on main; 6/8 Claude slots busy, 1/4 planner slots; no pickable build ticket; delegated 0 spec(s); planner slots 1/4",
+      "note": "push_pending #223 (ticket/223) waits to land on main; 3/8 Claude slots busy, 1/4 planner slots; status check",
       "extra": {
-        "active": 6,
+        "active": 3,
         "max": 8,
         "max_attempts": 2,
         "attempts": {
@@ -163,11 +163,11 @@
           }
         ],
         "push_pending": {
-          "ticket": 218,
-          "branch": "ticket/218"
+          "ticket": 223,
+          "branch": "ticket/223"
         }
       },
-      "updated_at": "2026-10-07T09:14:26Z",
+      "updated_at": "2026-10-07T09:32:10Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -185,7 +185,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T09:14:26Z",
+      "updated_at": "2026-10-07T09:32:10Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -193,8 +193,8 @@
       "slot": "6",
       "state": "idle",
       "issue": null,
-      "note": "free; #222 landed on main and closed",
-      "updated_at": "2026-10-07T09:30:57Z",
+      "note": "free",
+      "updated_at": "2026-10-07T09:32:10Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -202,8 +202,8 @@
       "slot": "7",
       "state": "working",
       "issue": 181,
-      "note": "tier hard, attempt 2/2 (session running)",
-      "updated_at": "2026-10-07T09:23:47Z",
+      "note": "started 2026-10-07 10:43 CEST",
+      "updated_at": "2026-10-07T09:32:10Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -211,12 +211,19 @@
       "slot": "8",
       "state": "idle",
       "issue": null,
-      "note": "free; #224 landed on main and closed",
-      "updated_at": "2026-10-07T09:15:46Z",
+      "note": "free",
+      "updated_at": "2026-10-07T09:32:10Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-07T09:32:10Z",
+      "key": "steampunk-loop/4",
+      "state": "idle",
+      "issue": null,
+      "note": "free"
+    },
     {
       "at": "2026-10-07T09:31:02Z",
       "key": "steampunk-loop/4",
@@ -629,13 +636,6 @@
       "state": "working",
       "issue": 217,
       "note": "tier easy, attempt 1/2"
-    },
-    {
-      "at": "2026-10-07T03:41:27Z",
-      "key": "steampunk-loop/1",
-      "state": "idle",
-      "issue": null,
-      "note": "free; #214 landed on main and closed"
     }
   ]
 }
