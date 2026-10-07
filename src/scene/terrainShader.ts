@@ -26,6 +26,12 @@
  * `uHasStrata`), wrapped around the planet in rings (`groundStrata.ts`): albedo for the colour,
  * tinted per planet, and the baked normal tilting the lamp and point lights toward the slopes that
  * face them. Until then, and on the pad, core and cache, the flat band colour shows.
+ *
+ * A gated cell (ticket 298) carries the gate channel's bits (`cellGateBits.ts`) and draws its
+ * marker as the cell's top layer, over the ore and its effects (#151 draw order: gate marker, grade
+ * effects, theme overlay, ore base): for now a placeholder per kind, a dark rim and stripes turned
+ * by kind in the planet's act tint (`uGateTint`), fainter as the state moves on. Static, so it
+ * spends none of #151's motion budget; #299 draws the final patterns. A cell with no gate skips it.
  */
 
 export const TERRAIN_VERTEX_SHADER = /* glsl */ `
@@ -33,6 +39,7 @@ attribute vec2 aTile;
 attribute vec3 aBase;
 attribute vec4 aOre;
 attribute vec4 aStyle;
+attribute float aGate;
 
 varying vec2 vLocal;
 varying vec2 vChunk;
@@ -41,6 +48,7 @@ varying vec2 vTile;
 varying vec3 vBase;
 varying vec4 vOre;
 varying vec4 vStyle;
+varying float vGate;
 
 void main() {
   vLocal = position.xy + 0.5;
@@ -51,6 +59,7 @@ void main() {
   vBase = aBase;
   vOre = aOre;
   vStyle = aStyle;
+  vGate = aGate;
   gl_Position = projectionMatrix * viewMatrix * world;
 }
 `
@@ -89,6 +98,8 @@ uniform sampler2D uLavaAlbedo;
 uniform sampler2D uLavaEmissive;
 uniform sampler2D uRefractoryAlbedo;
 uniform sampler2D uRefractoryEmissive;
+// The planet's act tint for gate markers (#151), never a per-cell bit (terrainGateTint.ts).
+uniform vec3 uGateTint;
 
 varying vec2 vLocal;
 varying vec2 vChunk;
@@ -97,6 +108,7 @@ varying vec2 vTile;
 varying vec3 vBase;
 varying vec4 vOre;
 varying vec4 vStyle;
+varying float vGate;
 
 // sampleGrid: 4 samples per tile, a 129-sample halo, the contour at 128 of 255.
 const float SAMPLES_PER_TILE = 4.0;
@@ -194,6 +206,25 @@ float brickJoint(vec2 world) {
   brick.x += 0.5 * mod(floor(brick.y), 2.0);
   vec2 inBrick = fract(brick);
   return 1.0 - step(0.06, inBrick.x) * step(0.1, inBrick.y);
+}
+
+// The gate channel (cellGateBits.ts): bit GATED_BIT on a gated cell, then state, then kind.
+float gateKindOf(float bits) {
+  return mod(bits, float(GATE_KIND_COUNT));
+}
+
+float gateStateOf(float bits) {
+  return mod(floor(bits / float(GATE_KIND_COUNT)), float(GATE_STATE_COUNT));
+}
+
+// The placeholder marker (ticket 298): x is a dark rim round the cell, y stripes turned by kind,
+// the kinds' angles spread over half a turn so no two kinds match.
+vec2 gateMarker(vec2 local, float kind) {
+  vec2 fromCentre = local - 0.5;
+  float rim = smoothstep(0.36, 0.46, max(abs(fromCentre.x), abs(fromCentre.y)));
+  vec2 turned = rotation(kind * 3.14159265 / float(GATE_KIND_COUNT)) * fromCentre;
+  float stripes = step(0.72, fract(turned.x * 4.0 + 0.5)) * (1.0 - rim);
+  return vec2(rim, stripes);
 }
 
 // The tile's depth band by the integer rule of bandOfTile: exact below 2^24, so for any planet.
@@ -338,6 +369,16 @@ void main() {
     float inRange = 1.0 - smoothstep(uWhisperRange - 2.0, uWhisperRange, distance(vWorld, uLampPosition));
     float rim = smoothstep(0.34, 0.5, max(abs(vLocal.x - 0.5), abs(vLocal.y - 0.5)));
     emissive += vOre.rgb * uWhisper * vStyle.y * inRange * rim * (0.75 + 0.25 * sin(uTime * 3.0));
+  }
+
+  float gateBits = floor(vGate + 0.5);
+  if (gateBits >= float(GATED_BIT)) {
+    // The top layer: it covers the ore and its glow beneath it; a later state draws fainter.
+    vec2 marker = gateMarker(vLocal, gateKindOf(gateBits)) / (1.0 + gateStateOf(gateBits));
+    colour = mix(colour, vec3(0.06, 0.05, 0.05), marker.x);
+    colour = mix(colour, uGateTint, marker.y);
+    emissive *= 1.0 - max(marker.x, marker.y);
+    emissive += uGateTint * 0.12 * marker.y;
   }
 
   gl_FragColor = vec4(displayToLinear(colour * light + emissive), 1.0);

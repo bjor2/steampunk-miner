@@ -31,7 +31,8 @@ export const GATE_STATE = { locked: 0, revealed: 1, cleared: 2 } as const
 /** The bits of a cell with no gate: the shader draws no marker. */
 export const NO_GATE_BITS = 0
 
-const GATED_BIT = 1 << (GATE_KIND_BITS + GATE_STATE_BITS)
+/** Set on every gated cell, above the kind and state bits. */
+export const GATED_BIT = 1 << (GATE_KIND_BITS + GATE_STATE_BITS)
 
 /** The bits for `look`; a kind or state outside the channel is refused, never trimmed. */
 export function gateBitsOf(look: CellGateLook | null): number {

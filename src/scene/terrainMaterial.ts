@@ -15,6 +15,7 @@ import {
   MAX_POINT_LIGHTS,
   ORE_WHISPER_RANGE_TILES,
 } from '../constants/scene'
+import { GATED_BIT, MAX_GATE_KIND, MAX_GATE_STATE } from '../systems/render/cellGateBits'
 import { rgbOfHex, type Rgb } from '../systems/render/colour'
 import { writeHeadlampDirection } from '../systems/render/headlamp'
 import type { ArtefactLook } from '../systems/render/artefactLook'
@@ -22,6 +23,7 @@ import type { PointLightSource } from '../systems/render/sceneLights'
 import type { Facing } from '../systems/vehicle/vehiclePose'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import { TERRAIN_FRAGMENT_SHADER, TERRAIN_VERTEX_SHADER } from './terrainShader'
+import { createGateTintUniforms } from './terrainGateTint'
 import { createHeatTileUniforms } from './terrainHeatTiles'
 import { createStrataUniforms } from './terrainStrata'
 
@@ -38,7 +40,13 @@ export interface TerrainLight extends ArtefactLook {
 
 export function createTerrainMaterial(): ShaderMaterial {
   return new ShaderMaterial({
-    defines: { MAX_POINT_LIGHTS },
+    defines: {
+      MAX_POINT_LIGHTS,
+      // The gate channel's layout (cellGateBits.ts), so the shader decodes what the mesher wrote.
+      GATED_BIT,
+      GATE_KIND_COUNT: MAX_GATE_KIND + 1,
+      GATE_STATE_COUNT: MAX_GATE_STATE + 1,
+    },
     vertexShader: TERRAIN_VERTEX_SHADER,
     fragmentShader: TERRAIN_FRAGMENT_SHADER,
     uniforms: {
@@ -63,6 +71,7 @@ export function createTerrainMaterial(): ShaderMaterial {
       uCacheLive: { value: 1 },
       ...createStrataUniforms(),
       ...createHeatTileUniforms(),
+      ...createGateTintUniforms(),
     },
   })
 }

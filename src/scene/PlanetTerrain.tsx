@@ -18,6 +18,7 @@ import { GroundStrata } from './GroundStrata'
 import { HeatTiles } from './HeatTiles'
 import { isHeatPlanet } from '../systems/economy/heatEconomy'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
+import { fitGateTintToPlanet } from './terrainGateTint'
 import { fitStrataToPlanet } from './terrainStrata'
 import { vehiclePresence } from './vehiclePresence'
 
@@ -54,6 +55,7 @@ export function PlanetTerrain() {
     writeArtefactLook(light, useGameStore.getState().playerId)
     lightTerrain(material, light)
     fitStrataToPlanet(material, params)
+    fitGateTintToPlanet(material, params)
   })
 
   return (

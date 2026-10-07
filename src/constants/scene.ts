@@ -357,3 +357,10 @@ export const SCORCH_COLOUR = '#17110c'
  */
 export const HEAT_SHIMMER_SIZE_M = 1.6
 export const HEAT_SHIMMER_Z = 0.2
+
+/**
+ * The terrain gate channel's placeholder marker (ticket 298; #299 draws the final patterns): its
+ * stripes take the planet's act tint (#151) from the `cellGateLook` provider, or this pale brass
+ * where the provider names none, so an untinted marker still reads on every band's ground.
+ */
+export const GATE_MARKER_UNTINTED = '#d8d2c4'
