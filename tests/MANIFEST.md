@@ -23,7 +23,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 9 |
 | Every ore family has a gateClass row | #141, #142 | not built yet (#148) | - |
 | Endless signature coverage, planets 41-65 | #148 | not built yet (#148) | - |
-| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 28 |
+| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 29 |
 
 ## Slices
 
@@ -59,6 +59,16 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/dockUnlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
+
+### `dynamite`: 5 files, 20 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/dynamite/logging.test.ts` | 2 | 2 |
+| `src/features/dynamite/systems/detonateReaction.test.ts` | 3 | 3 |
+| `src/features/dynamite/systems/dynamiteSizes.test.ts` | 4 | 4 |
+| `src/features/dynamite/systems/plunger.test.ts` | 6 | 6 |
+| `src/features/dynamite/systems/rackPanel.test.ts` | 5 | 5 |
 
 ### `dynamite-visuals`: 2 files, 15 tests
 
@@ -382,7 +392,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/input/actionMap.test.ts` | 15 | 15 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
-| `src/systems/input/inputRouting.test.ts` | 22 | 22 |
+| `src/systems/input/inputRouting.test.ts` | 23 | 23 |
 | `src/systems/input/preferences.test.ts` | 19 | 19 |
 | `src/systems/input/touchControls.test.ts` | 22 | 15 |
 
@@ -672,7 +682,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/unlocks/readUnlockSchedule.test.ts` | 10 | 10 |
 | `src/systems/unlocks/scheduleCadence.test.ts` | 5 | 5 |
 | `src/systems/unlocks/travelUnlocks.test.ts` | 7 | 7 |
-| `src/systems/unlocks/unlockSchedule.test.ts` | 24 | 24 |
+| `src/systems/unlocks/unlockSchedule.test.ts` | 25 | 25 |
 
 ### `vehicle`
 
