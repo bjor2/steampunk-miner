@@ -16,3 +16,5 @@ export {
   REMOTE_DETONATOR_ROW_ID,
   type DynamiteSize,
 } from './systems/dynamiteSizes'
+export { DETONATE_INTENT } from './systems/dynamiteCommands'
+export { interlockReachMm, isDetonatorOpen } from './systems/plunger'
