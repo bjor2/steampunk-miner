@@ -32,9 +32,12 @@ export const CROSS_SLICE_CHECKS = [
   {
     check: 'Every buyable has a description',
     decidedIn: '#159',
-    files: ['src/systems/registries/buyableRefs.test.ts'],
+    files: [
+      'src/systems/registries/buyableRefs.test.ts',
+      'src/features/descriptions/systems/descriptionCoverage.test.ts',
+    ],
     commands: [],
-    pending: 'the walk over the list lands with the descriptions slice (#164)',
+    pending: null,
   },
   {
     check: 'Every ore family has a gateClass row',

@@ -19,7 +19,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- | --- |
 | Pacing gates: slice band, planet 1 core and assay gate, median of the gate seeds | #84 | `src/logging/pacingGate.test.ts`, `src/logging/assayPacingGate.test.ts` | 9 |
 | Balance guards, reported against the committed baseline or a control run | #84, #105, #107, #109, #113 | `npm run balance:report`, `npm run balance:planets`, `npm run balance:guns`, `npm run balance:charges`, `npm run balance:refinery`, `npm run balance:heat` | - |
-| Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, the walk over the list lands with the descriptions slice (#164) | 4 |
+| Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 9 |
 | Every ore family has a gateClass row | #141, #142 | not built yet (#148) | - |
 | Endless signature coverage, planets 41-65 | #148 | not built yet (#148) | - |
 | Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 28 |
@@ -36,6 +36,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/codex/systems/codexReaction.test.ts` | 6 | 6 |
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
+
+### `descriptions`: 4 files, 49 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/descriptions/systems/descriptionCoverage.test.ts` | 5 | 5 |
+| `src/features/descriptions/systems/flavourRules.test.ts` | 8 | 8 |
+| `src/features/descriptions/systems/kernelEntries.test.ts` | 32 | 19 |
+| `src/features/descriptions/ui/upgradeBayCards.test.ts` | 4 | 4 |
 
 ### `dock-buildings`: 8 files, 34 tests
 
@@ -610,7 +619,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/platform/bayPanels.test.ts` | 8 | 8 |
 | `src/ui/platform/bayScreens.test.ts` | 6 | 6 |
 | `src/ui/projection/worldToScreen.test.ts` | 7 | 5 |
-| `src/ui/screenIds.test.ts` | 3 | 3 |
+| `src/ui/screenIds.test.ts` | 4 | 4 |
 | `src/ui/screens/sliceScreen.test.ts` | 8 | 8 |
 | `src/ui/touch/touchSlots.test.ts` | 3 | 3 |
 
