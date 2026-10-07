@@ -1,28 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-07T10:15:05.409Z",
+ "updatedAt": "2026-10-07T10:32:42.742Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37550251693,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37550251693",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "3ea879db272ecf9dc5971018a15a28133aa63169",
-   "branch": "main",
-   "startedAt": "2026-10-07T00:07:06Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 116,
-   "source": "actions",
-   "phase": null,
-   "job": "verify",
-   "reportFound": true,
-   "files": 141,
-   "tests": 1200,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37550325066,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37550325066",
@@ -37,6 +17,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 305,
    "tests": 2545,
@@ -57,6 +39,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -77,6 +61,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -97,6 +83,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 122,
    "tests": 1074,
@@ -117,6 +105,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -137,6 +127,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 112,
    "tests": 1014,
@@ -157,6 +149,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -177,6 +171,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 312,
    "tests": 2636,
@@ -197,6 +193,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -217,6 +215,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 317,
    "tests": 2668,
@@ -237,6 +237,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 317,
    "tests": 2668,
@@ -257,6 +259,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -277,6 +281,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 319,
    "tests": 2682,
@@ -297,6 +303,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -317,6 +325,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 6,
    "tests": 36,
@@ -337,6 +347,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -357,6 +369,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 22,
    "tests": 174,
@@ -377,6 +391,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -397,6 +413,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 161,
    "tests": 1399,
@@ -417,6 +435,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 332,
    "tests": 2765,
@@ -437,6 +457,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -457,6 +479,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -477,6 +501,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 138,
    "tests": 1195,
@@ -497,6 +523,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -517,6 +545,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 334,
    "tests": 2780,
@@ -537,6 +567,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -557,6 +589,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 207,
    "tests": 1770,
@@ -577,6 +611,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -597,6 +633,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 9,
    "tests": 52,
@@ -617,6 +655,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -637,6 +677,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 17,
    "tests": 86,
@@ -657,6 +699,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -677,6 +721,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 348,
    "tests": 2880,
@@ -697,6 +743,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -717,6 +765,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 161,
    "tests": 1386,
@@ -737,6 +787,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -757,6 +809,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 39,
    "tests": 350,
@@ -777,6 +831,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -797,6 +853,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 361,
    "tests": 2982,
@@ -817,6 +875,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 7,
    "tests": 54,
@@ -837,6 +897,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -857,6 +919,8 @@
    "source": "actions",
    "phase": null,
    "job": "verify",
+   "feature": null,
+   "tickets": [],
    "reportFound": false,
    "files": 0,
    "tests": 0,
@@ -877,6 +941,8 @@
    "source": "actions",
    "phase": null,
    "job": "full-suite",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 364,
    "tests": 2999,
@@ -897,6 +963,8 @@
    "source": "box",
    "phase": "fast",
    "job": "fast",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 0,
    "tests": 0,
@@ -917,6 +985,8 @@
    "source": "box",
    "phase": "fast",
    "job": "fast",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 0,
    "tests": 0,
@@ -937,6 +1007,8 @@
    "source": "box",
    "phase": "fast",
    "job": "fast",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 377,
    "tests": 3100,
@@ -957,6 +1029,8 @@
    "source": "box",
    "phase": "slow",
    "job": "slow",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 3,
    "tests": 17,
@@ -977,6 +1051,8 @@
    "source": "box",
    "phase": "fast",
    "job": "fast",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 385,
    "tests": 3142,
@@ -997,17 +1073,43 @@
    "source": "box",
    "phase": "slow",
    "job": "slow",
+   "feature": null,
+   "tickets": [],
    "reportFound": true,
    "files": 3,
    "tests": 17,
    "failed": 1,
    "failedFiles": 1
+  },
+  {
+   "id": 1791369160633,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/6e42d72856129d8497c7ed287f89c38b60634ca3",
+   "event": "manual-verify",
+   "mode": "scoped",
+   "sha": "6e42d72856129d8497c7ed287f89c38b60634ca3",
+   "branch": "main",
+   "startedAt": "2026-10-07T10:17:11Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 929,
+   "source": "box",
+   "phase": "fast",
+   "job": "fast",
+   "feature": 224,
+   "tickets": [
+    224
+   ],
+   "reportFound": true,
+   "files": 106,
+   "tests": 906,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 35,
    "full": 12,
+   "scoped": 35,
    "nightly": 1,
    "nightly-only": 2
   },
@@ -1016,213 +1118,6 @@
   "scopingSuspects": []
  },
  "features": {
-  "debug": {
-   "files": 6,
-   "p50Ms": 976,
-   "p95Ms": 1330,
-   "fileRuns": 114,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "unmapped": {
-   "files": 8,
-   "p50Ms": 3583,
-   "p95Ms": 17206,
-   "fileRuns": 114,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "golden-replay": {
-   "files": 3,
-   "p50Ms": 6500,
-   "p95Ms": 69814,
-   "fileRuns": 53,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "logging": {
-   "files": 31,
-   "p50Ms": 855,
-   "p95Ms": 5787,
-   "fileRuns": 385,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "physics": {
-   "files": 3,
-   "p50Ms": 2285,
-   "p95Ms": 7867,
-   "fileRuns": 52,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "scene": {
-   "files": 5,
-   "p50Ms": 124,
-   "p95Ms": 354,
-   "fileRuns": 48,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "store": {
-   "files": 12,
-   "p50Ms": 4401,
-   "p95Ms": 34459,
-   "fileRuns": 225,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "art": {
-   "files": 21,
-   "p50Ms": 567,
-   "p95Ms": 7351,
-   "fileRuns": 367,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "audio": {
-   "files": 7,
-   "p50Ms": 132,
-   "p95Ms": 605,
-   "fileRuns": 83,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "authority": {
-   "files": 57,
-   "p50Ms": 92127,
-   "p95Ms": 765751,
-   "fileRuns": 975,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "bot": {
-   "files": 15,
-   "p50Ms": 67065,
-   "p95Ms": 158289,
-   "fileRuns": 245,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "economy": {
-   "files": 20,
-   "p50Ms": 783,
-   "p95Ms": 7456,
-   "fileRuns": 247,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "systems-core": {
-   "files": 11,
-   "p50Ms": 618,
-   "p95Ms": 2407,
-   "fileRuns": 144,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "hints": {
-   "files": 4,
-   "p50Ms": 2296,
-   "p95Ms": 4017,
-   "fileRuns": 69,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "input": {
-   "files": 5,
-   "p50Ms": 57,
-   "p95Ms": 1188,
-   "fileRuns": 73,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "registries": {
-   "files": 22,
-   "p50Ms": 210,
-   "p95Ms": 3112,
-   "fileRuns": 229,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "render": {
-   "files": 33,
-   "p50Ms": 861,
-   "p95Ms": 9304,
-   "fileRuns": 459,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "replay": {
-   "files": 1,
-   "p50Ms": 1898,
-   "p95Ms": 34098,
-   "fileRuns": 19,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "save": {
-   "files": 3,
-   "p50Ms": 432,
-   "p95Ms": 8041,
-   "fileRuns": 46,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "vehicle": {
-   "files": 8,
-   "p50Ms": 106,
-   "p95Ms": 207,
-   "fileRuns": 109,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "views": {
-   "files": 14,
-   "p50Ms": 3758,
-   "p95Ms": 39848,
-   "fileRuns": 225,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "world": {
-   "files": 21,
-   "p50Ms": 34382,
-   "p95Ms": 108888,
-   "fileRuns": 274,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "ui": {
-   "files": 8,
-   "p50Ms": 2718,
-   "p95Ms": 3703,
-   "fileRuns": 89,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
   "tooling-ci": {
    "files": 1,
    "p50Ms": 16,
@@ -1268,11 +1163,65 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "debug": {
+   "files": 6,
+   "p50Ms": 1002,
+   "p95Ms": 4604,
+   "fileRuns": 115,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "example": {
    "files": 1,
    "p50Ms": 2,
    "p95Ms": 8,
    "fileRuns": 12,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "unmapped": {
+   "files": 8,
+   "p50Ms": 3592,
+   "p95Ms": 17493,
+   "fileRuns": 116,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "logging": {
+   "files": 32,
+   "p50Ms": 861,
+   "p95Ms": 6180,
+   "fileRuns": 393,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "golden-replay": {
+   "files": 3,
+   "p50Ms": 6509,
+   "p95Ms": 69814,
+   "fileRuns": 54,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "physics": {
+   "files": 3,
+   "p50Ms": 2373,
+   "p95Ms": 8049,
+   "fileRuns": 52,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "scene": {
+   "files": 5,
+   "p50Ms": 127,
+   "p95Ms": 548,
+   "fileRuns": 52,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1286,11 +1235,74 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "store": {
+   "files": 12,
+   "p50Ms": 4468,
+   "p95Ms": 35723,
+   "fileRuns": 226,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "art": {
+   "files": 21,
+   "p50Ms": 574,
+   "p95Ms": 13196,
+   "fileRuns": 350,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "artefacts": {
    "files": 1,
    "p50Ms": 8,
    "p95Ms": 253,
    "fileRuns": 12,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "audio": {
+   "files": 7,
+   "p50Ms": 132,
+   "p95Ms": 605,
+   "fileRuns": 82,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "authority": {
+   "files": 57,
+   "p50Ms": 92695,
+   "p95Ms": 810410,
+   "fileRuns": 955,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "bot": {
+   "files": 15,
+   "p50Ms": 68095,
+   "p95Ms": 497270,
+   "fileRuns": 235,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "systems-core": {
+   "files": 11,
+   "p50Ms": 619,
+   "p95Ms": 2407,
+   "fileRuns": 142,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "economy": {
+   "files": 20,
+   "p50Ms": 786,
+   "p95Ms": 7501,
+   "fileRuns": 246,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1304,11 +1316,101 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "hints": {
+   "files": 4,
+   "p50Ms": 2301,
+   "p95Ms": 4039,
+   "fileRuns": 65,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "input": {
+   "files": 5,
+   "p50Ms": 59,
+   "p95Ms": 1188,
+   "fileRuns": 73,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "registries": {
+   "files": 23,
+   "p50Ms": 308,
+   "p95Ms": 3527,
+   "fileRuns": 226,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "render": {
+   "files": 33,
+   "p50Ms": 863,
+   "p95Ms": 9363,
+   "fileRuns": 451,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "replay": {
+   "files": 1,
+   "p50Ms": 1898,
+   "p95Ms": 34098,
+   "fileRuns": 18,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "save": {
+   "files": 3,
+   "p50Ms": 448,
+   "p95Ms": 8059,
+   "fileRuns": 47,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "unlocks": {
    "files": 4,
    "p50Ms": 90,
    "p95Ms": 3215,
    "fileRuns": 48,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "vehicle": {
+   "files": 8,
+   "p50Ms": 106,
+   "p95Ms": 207,
+   "fileRuns": 109,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "views": {
+   "files": 14,
+   "p50Ms": 3764,
+   "p95Ms": 39993,
+   "fileRuns": 215,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "world": {
+   "files": 21,
+   "p50Ms": 34383,
+   "p95Ms": 108915,
+   "fileRuns": 274,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "ui": {
+   "files": 8,
+   "p50Ms": 1313,
+   "p95Ms": 11380,
+   "fileRuns": 93,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1323,10 +1425,10 @@
    "passRate": 1
   },
   "dock-buildings": {
-   "files": 4,
-   "p50Ms": 73,
-   "p95Ms": 1593,
-   "fileRuns": 31,
+   "files": 6,
+   "p50Ms": 441,
+   "p95Ms": 1961,
+   "fileRuns": 33,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1334,8 +1436,8 @@
   "ore-visuals": {
    "files": 5,
    "p50Ms": 332,
-   "p95Ms": 8529,
-   "fileRuns": 25,
+   "p95Ms": 8787,
+   "fileRuns": 27,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1358,2762 +1460,25 @@
    "passRate": 0.8888888888888888
   },
   "tech-tree": {
-   "files": 13,
-   "p50Ms": 5647,
-   "p95Ms": 21062,
-   "fileRuns": 26,
+   "files": 14,
+   "p50Ms": 6319,
+   "p95Ms": 21640,
+   "fileRuns": 37,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "codex": {
    "files": 6,
-   "p50Ms": 4237,
-   "p95Ms": 4237,
-   "fileRuns": 6,
+   "p50Ms": 938,
+   "p95Ms": 4556,
+   "fileRuns": 11,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   }
  },
  "files": {
-  "src/debug/debugApi.test.ts": {
-   "feature": "debug",
-   "runs": 21,
-   "lastMs": 2846,
-   "p50Ms": 384,
-   "p95Ms": 574,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "debug api: combat reads the crawler table for planets 1 to 40 without logging",
-     578
-    ],
-    [
-     "debug api: vehicle saves integer levels only, so a restore recomputes the same stats",
-     250
-    ],
-    [
-     "debug api: casing (#41) lines a ring in a carved hole and logs it as casing_placed",
-     240
-    ]
-   ]
-  },
-  "src/debug/debugArtefact.test.ts": {
-   "feature": "debug",
-   "runs": 20,
-   "lastMs": 33,
-   "p50Ms": 24,
-   "p95Ms": 33,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/debug/debugMemory.test.ts": {
-   "feature": "debug",
-   "runs": 20,
-   "lastMs": 101,
-   "p50Ms": 5,
-   "p95Ms": 11,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/debug/debugScreens.test.ts": {
-   "feature": "debug",
-   "runs": 20,
-   "lastMs": 1387,
-   "p50Ms": 544,
-   "p95Ms": 686,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "debug api: input acts like play (#33 acceptance 3 and 11) docks at each bay with interact and buys at the Upgrade bay through its buttons",
-     478
-    ],
-    [
-     "debug api: input acts like play (#33 acceptance 3 and 11) replays a screen-driven run from its commands to the same digests",
-     230
-    ],
-    [
-     "debug api: presentation never reaches the session (#33 acceptance 10) ends a scripted run on the same digest whatever the music volume and mute (#49)",
-     126
-    ]
-   ]
-  },
-  "src/debug/sliceDebugCommands.test.ts": {
-   "feature": "debug",
-   "runs": 21,
-   "lastMs": 585,
-   "p50Ms": 15,
-   "p95Ms": 20,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "slice debug commands changes state through a debug.<slice> command that is recorded for replay",
-     418
-    ],
-    [
-     "slice debug commands logs debug_command_applied with the command and its arguments",
-     166
-    ]
-   ]
-  },
-  "src/features/loadFeatures.test.ts": {
-   "feature": "unmapped",
-   "runs": 24,
-   "lastMs": 4,
-   "p50Ms": 4,
-   "p95Ms": 10,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/logging/goldenRun.test.ts": {
-   "feature": "golden-replay",
-   "runs": 19,
-   "lastMs": 9149,
-   "p50Ms": 1953,
-   "p95Ms": 9149,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "golden runs (committed in tests/golden) replays casing-lined-band-2 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
-     2872
-    ],
-    [
-     "golden runs (committed in tests/golden) replays collapse-band-2-grade-1 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
-     1563
-    ],
-    [
-     "golden runs (committed in tests/golden) replays dig-and-return to every committed digest and its mined order at the fixed step, 30 and 144 fps",
-     1216
-    ]
-   ]
-  },
-  "src/logging/goldenSliceSections.test.ts": {
-   "feature": "logging",
-   "runs": 20,
-   "lastMs": 243,
-   "p50Ms": 204,
-   "p95Ms": 285,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "golden slice sections writes no sliceSections while no section is registered",
-     119
-    ]
-   ]
-  },
-  "src/logging/secondSliceGolden.test.ts": {
-   "feature": "golden-replay",
-   "runs": 19,
-   "lastMs": 18569,
-   "p50Ms": 705,
-   "p95Ms": 18569,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "second-slice golden runs (S11) warns and refills the lined blocks behind a grade-1 dig into band 2",
-     10164
-    ],
-    [
-     "second-slice golden runs (S11) lines a grade-2 bore in band 2 that only collapses where debug forces it",
-     7054
-    ],
-    [
-     "second-slice golden runs (S11) keeps the husk cache chunk digest player-independent",
-     868
-    ]
-   ]
-  },
-  "src/physics/physicsStats.test.ts": {
-   "feature": "physics",
-   "runs": 20,
-   "lastMs": 643,
-   "p50Ms": 292,
-   "p95Ms": 366,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "debug api: physics stats (#119) reads Rapier's WASM memory in whole pages as it is now, so it grows as the world fills",
-     344
-    ],
-    [
-     "debug api: physics stats (#119) counts the vehicle and the ground colliders streamed in round it, and none once removed",
-     293
-    ]
-   ]
-  },
-  "src/physics/vehicleLoop.test.ts": {
-   "feature": "physics",
-   "runs": 19,
-   "lastMs": 4925,
-   "p50Ms": 1393,
-   "p95Ms": 4925,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "vehicle loop drives off the pad and digs straight down, charging energy through pose reports",
-     2833
-    ],
-    [
-     "vehicle loop drills a level tunnel sideways from the bottom of its shaft, along the planet curve",
-     1391
-    ],
-    [
-     "vehicle loop climbs on W alone, and S pressed after W stops the thrust at the next pose report (#40)",
-     420
-    ]
-   ]
-  },
-  "src/registries/registrar.test.ts": {
-   "feature": "unmapped",
-   "runs": 19,
-   "lastMs": 111,
-   "p50Ms": 13,
-   "p95Ms": 111,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/registries/sliceCommands.test.ts": {
-   "feature": "unmapped",
-   "runs": 20,
-   "lastMs": 750,
-   "p50Ms": 137,
-   "p95Ms": 199,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "slice commands (K1) replays a slice command to the same digests, jumping or at 30 and 144 frames per second",
-     501
-    ]
-   ]
-  },
-  "src/scene/sceneDisposal.test.ts": {
-   "feature": "scene",
-   "runs": 20,
-   "lastMs": 75,
-   "p50Ms": 67,
-   "p95Ms": 119,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/store/artefactChoice.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 224,
-   "p50Ms": 75,
-   "p95Ms": 224,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "the artefact cache from the keyboard (#46) closes the cards on Escape without a pick, leaving the cache live",
-     107
-    ]
-   ]
-  },
-  "src/store/authorityReads.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 17,
-   "p50Ms": 18,
-   "p95Ms": 36,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/store/checkpoint.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 540,
-   "p50Ms": 77,
-   "p95Ms": 540,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "checkpoint logs no save_migrated for a save of this build",
-     109
-    ],
-    [
-     "checkpoint logs nothing as debug when resuming",
-     104
-    ]
-   ]
-  },
-  "src/store/domainEventBroadcast.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 98,
-   "p50Ms": 17,
-   "p95Ms": 98,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/store/gameStore.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 1608,
-   "p50Ms": 71,
-   "p95Ms": 1608,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "game store: scenario commands puts the player on the requested planet at its surface",
-     372
-    ],
-    [
-     "game store: vehicle copies the vehicle from the authority after a debug command",
-     173
-    ],
-    [
-     "game store: authority shows that a debug command was applied, as the authority says",
-     159
-    ]
-   ]
-  },
-  "src/store/hintSlice.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 924,
-   "p50Ms": 269,
-   "p95Ms": 924,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "hint slice shows nothing before the run starts watching",
-     598
-    ],
-    [
-     "hint slice leaves the state digest of a run identical with hints on and off",
-     113
-    ]
-   ]
-  },
-  "src/store/inputRuntime.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 822,
-   "p50Ms": 217,
-   "p95Ms": 822,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "input: W lifts, Space docks (#40) confirms the focused button with Space on a bay screen",
-     129
-    ]
-   ]
-  },
-  "src/store/partInstall.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 318,
-   "p50Ms": 81,
-   "p95Ms": 594,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "upgrade bay preview: part install (#44) installs no vehicle part for a casing grade",
-     208
-    ]
-   ]
-  },
-  "src/store/perfLog.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 27,
-   "p50Ms": 10,
-   "p95Ms": 27,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/store/platformLoop.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 6815,
-   "p50Ms": 303,
-   "p95Ms": 6815,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "platform loop from a fresh profile mines, sells and buys one level of each of the six tracks, logged in order",
-     6772
-    ]
-   ]
-  },
-  "src/store/sliceRun.test.ts": {
-   "feature": "store",
-   "runs": 19,
-   "lastMs": 22648,
-   "p50Ms": 3238,
-   "p95Ms": 22648,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "slice run on both planets logs the #2 acceptance sequence and ends at the end-of-slice card",
-     16661
-    ],
-    [
-     "presentation settings and the run reaches the same state digest with every camera, shake and flash setting",
-     2697
-    ],
-    [
-     "slice run on both planets logs core_completed once per planet, on planet 1 then on planet 2",
-     1780
-    ]
-   ]
-  },
-  "src/systems/art/assetLint.test.ts": {
-   "feature": "art",
-   "runs": 19,
-   "lastMs": 2713,
-   "p50Ms": 129,
-   "p95Ms": 2713,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "asset lint: shipped files encodes every map at most 4096 px with power-of-two sides, in its Basis format",
-     1165
-    ],
-    [
-     "asset lint: shipped files ships every ground and casing map as the 1024 px square tile of #52",
-     623
-    ],
-    [
-     "asset lint: the manifest is the #51 inventory under the #52 naming",
-     181
-    ]
-   ]
-  },
-  "src/systems/art/assetLook.test.ts": {
-   "feature": "art",
-   "runs": 19,
-   "lastMs": 365,
-   "p50Ms": 8,
-   "p95Ms": 365,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "asset look shows the placeholder’s part ids at every tier once the vehicle art is final",
-     358
-    ]
-   ]
-  },
-  "src/systems/art/assetManifest.test.ts": {
-   "feature": "art",
-   "runs": 19,
-   "lastMs": 559,
-   "p50Ms": 33,
-   "p95Ms": 559,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "asset manifest refuses an emissive flag on anything but a tile, whose sidecar would say it instead",
-     286
-    ]
-   ]
-  },
-  "src/systems/art/autoGunsArt.test.ts": {
-   "feature": "art",
-   "runs": 19,
-   "lastMs": 380,
-   "p50Ms": 8,
-   "p95Ms": 380,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "auto guns art takes the tiered part names of a vehicle module on its own asset only",
-     156
-    ],
-    [
-     "auto guns art names each vehicle module from a row of the locked unlock schedule",
-     141
-    ]
-   ]
-  },
-  "src/systems/art/blastingChargesArt.test.ts": {
-   "feature": "art",
-   "runs": 18,
-   "lastMs": 9,
-   "p50Ms": 9,
-   "p95Ms": 18,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/art/heatLavaArt.test.ts": {
-   "feature": "art",
-   "runs": 19,
-   "lastMs": 142,
-   "p50Ms": 8,
-   "p95Ms": 142,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/art/icons/iconCoverage.test.ts": {
-   "feature": "art",
-   "runs": 20,
-   "lastMs": 6854,
-   "p50Ms": 244,
-   "p95Ms": 1009,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "icon coverage (#158 section 3) gives every HUD gauge, status, threat and enemy kind an icon",
-     4843
-    ],
-    [
-     "icon coverage (#158 section 3) gives every Sell and Refinery bay row and button an icon, ore rows by their tier",
-     1273
-    ],
-    [
-     "icon coverage (#158 section 3) gives every Upgrade bay row, header field and button an icon, on the planet with every row",
-     398
-    ]
-   ]
-  },
-  "src/systems/art/icons/iconFiles.test.ts": {
-   "feature": "art",
-   "runs": 16,
-   "lastMs": 683,
-   "p50Ms": 24,
-   "p95Ms": 683,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "icon files (npm run art:icons) ships every icon of the set as the SVG the composer writes",
-     491
-    ],
-    [
-     "icon files (npm run art:icons) lists every icon in the art manifest as a final vector asset",
-     147
-    ]
-   ]
-  },
-  "src/systems/art/icons/iconSet.test.ts": {
-   "feature": "art",
-   "runs": 16,
-   "lastMs": 7,
-   "p50Ms": 9,
-   "p95Ms": 117,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/art/icons/iconSvg.test.ts": {
-   "feature": "art",
-   "runs": 16,
-   "lastMs": 58,
-   "p50Ms": 14,
-   "p95Ms": 58,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/art/ktx2Header.test.ts": {
-   "feature": "art",
-   "runs": 18,
-   "lastMs": 660,
-   "p50Ms": 6,
-   "p95Ms": 660,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "ktx2 header reads the size, the Basis encoding and the colour space toktx wrote",
-     298
-    ],
-    [
-     "ktx2 map lint passes ETC1S sRGB albedo and emissive maps and a UASTC linear normal map",
-     174
-    ],
-    [
-     "ktx2 map lint refuses a side that is not a power of two",
-     106
-    ]
-   ]
-  },
-  "src/systems/art/partsSidecar.test.ts": {
-   "feature": "art",
-   "runs": 18,
-   "lastMs": 122,
-   "p50Ms": 15,
-   "p95Ms": 122,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/art/placeholderLook.test.ts": {
-   "feature": "art",
-   "runs": 19,
-   "lastMs": 6,
-   "p50Ms": 8,
-   "p95Ms": 10,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/art/refineryBayArt.test.ts": {
-   "feature": "art",
-   "runs": 18,
-   "lastMs": 21,
-   "p50Ms": 7,
-   "p95Ms": 21,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/art/shopBuildingArt.test.ts": {
-   "feature": "art",
-   "runs": 19,
-   "lastMs": 117,
-   "p50Ms": 9,
-   "p95Ms": 117,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/art/tileLook.test.ts": {
-   "feature": "art",
-   "runs": 19,
-   "lastMs": 24,
-   "p50Ms": 4,
-   "p95Ms": 24,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/art/tunnelWreckerArt.test.ts": {
-   "feature": "art",
-   "runs": 19,
-   "lastMs": 92,
-   "p50Ms": 6,
-   "p95Ms": 92,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/audio/drillVoice.test.ts": {
-   "feature": "audio",
-   "runs": 19,
-   "lastMs": 130,
-   "p50Ms": 94,
-   "p95Ms": 172,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/advanceTicks.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 47,
-   "p50Ms": 40,
-   "p95Ms": 61,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/applyCommand.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 759,
-   "p50Ms": 87,
-   "p95Ms": 759,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "authority: determinism gives the same digest and events when the same commands are applied twice",
-     704
-    ]
-   ]
-  },
-  "src/systems/authority/artefactRules.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 2466,
-   "p50Ms": 157,
-   "p95Ms": 2466,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "drilling the cache cell (#46) breaks like rock and yields nothing",
-     989
-    ],
-    [
-     "choosing an artefact (#46) puts the held artefact in the digest and brings it back from a snapshot",
-     457
-    ],
-    [
-     "choosing an artefact (#46) starts breathing_room with its brace ready",
-     317
-    ]
-   ]
-  },
-  "src/systems/authority/assaySale.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 165,
-   "p50Ms": 197,
-   "p95Ms": 274,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "selling with assay_beacon (#46) sells band-1 ore at the band-3 unit price and says so before the sale",
-     103
-    ]
-   ]
-  },
-  "src/systems/authority/casingDrill.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 1176,
-   "p50Ms": 116,
-   "p95Ms": 1176,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "re-drilling casing lines the wall beside a mined hole through debug.lineCasing and logs the ring",
-     427
-    ],
-    [
-     "re-drilling casing takes longer to drill higher-grade lining, as band-G rock",
-     297
-    ],
-    [
-     "re-drilling casing charges only the drill energy for the ticks it cut",
-     167
-    ]
-   ]
-  },
-  "src/systems/authority/casingGnaw.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 99780,
-   "p50Ms": 2425,
-   "p95Ms": 99780,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "breached casing in play (#94 acceptance 5 and 9) charges the first lining again where a collapse refilled a breached stretch",
-     31042
-    ],
-    [
-     "breached casing in play (#94 acceptance 5 and 9) breaches a stretch and says so per chunk and per ring, with no warning while no vehicle is near",
-     28195
-    ],
-    [
-     "breached casing in play (#94 acceptance 5 and 9) cancels the warning when the drill relines the stretch, and charges nothing for it",
-     21982
-    ]
-   ]
-  },
-  "src/systems/authority/casingPlacement.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 22574,
-   "p50Ms": 4914,
-   "p95Ms": 65264,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "automatic casing placement replays the same dig to the same digest, and a snapshot keeps the trail",
-     5204
-    ],
-    [
-     "first-place casing lining charge charges each half metre of new lining ceilMilli(k_casing * V(t(p,b)) * 0.5) at its wall band",
-     3598
-    ],
-    [
-     "first-place casing lining charge charges the same metre price at grade 5 as at grade 1",
-     2302
-    ]
-   ]
-  },
-  "src/systems/authority/casingRules.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 2618,
-   "p50Ms": 82,
-   "p95Ms": 2618,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "casing grade ends at grade 5 after four buys, logging each and charging exactly its curve prices",
-     2096
-    ],
-    [
-     "casing grade refuses the buy at the Sell bay with wrong_bay, changing nothing",
-     285
-    ],
-    [
-     "casing grade refuses a buy the wallet cannot pay with money_short, leaving the grade",
-     184
-    ]
-   ]
-  },
-  "src/systems/authority/casingSupport.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 245,
-   "p50Ms": 68,
-   "p95Ms": 245,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "casing grade telegraph needs grade 5 in the core, reported as band 6",
-     105
-    ]
-   ]
-  },
-  "src/systems/authority/charges/chargeBlast.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 873,
-   "p50Ms": 567,
-   "p95Ms": 2936,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "blasting charges: the blast (#109 numbers acceptance 1 and 2) leaves lined samples of the tunnel wall with their density and lining",
-     216
-    ],
-    [
-     "blasting charges: collapse (#109 \"Collapse risk\") starts the warning of weak lining next to the blast, with no vehicle near",
-     155
-    ],
-    [
-     "blasting charges: plant and fuse (#109) blows when the fuse runs out and not a tick before",
-     114
-    ]
-   ]
-  },
-  "src/systems/authority/charges/chargeBlastEffects.test.ts": {
-   "feature": "authority",
-   "runs": 20,
-   "lastMs": 105,
-   "p50Ms": 106,
-   "p95Ms": 145,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/charges/chargeShop.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 160,
-   "p50Ms": 48,
-   "p95Ms": 160,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/collapse/collapseRun.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 22557,
-   "p50Ms": 5695,
-   "p95Ms": 22557,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "collapse: a straight dig (#43 acceptance 8, 3) refills each warned block exactly 60 ticks after its warning, unless cancelled",
-     8624
-    ],
-    [
-     "collapse: a straight dig (#43 acceptance 8, 3) never collapses a band-2 shaft lined at grade 2, over ten minutes beside it",
-     3979
-    ],
-    [
-     "collapse: a straight dig (#43 acceptance 8, 3) warns on the lined blocks behind a band-2 dig at grade 1 and never on the face",
-     3239
-    ]
-   ]
-  },
-  "src/systems/authority/combat/burrower.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 543,
-   "p50Ms": 84,
-   "p95Ms": 543,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "combat: the burrower (#9, #25 acceptance 8) is damaged when the drill works the tile it swims in",
-     283
-    ],
-    [
-     "combat: the burrower (#9, #25 acceptance 8) swims through rock toward the vehicle and removes no tile",
-     131
-    ]
-   ]
-  },
-  "src/systems/authority/combat/combatRun.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 13729,
-   "p50Ms": 1740,
-   "p95Ms": 13729,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "combat: a scripted fight at two report rates (#25 acceptance 5) keeps every hit front when the player faces each wind-up, reporting every 1 ticks",
-     5289
-    ],
-    [
-     "combat: determinism (#25 acceptance 12) gives the same digest and events at 30 and 144 rendered frames a second",
-     3245
-    ],
-    [
-     "combat: the latency rule (#9, #25 acceptance 5) counts a hit as front when the report before the latest had the enemy in front",
-     2555
-    ]
-   ]
-  },
-  "src/systems/authority/combat/contactRule.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 4568,
-   "p50Ms": 589,
-   "p95Ms": 4568,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "combat: hits on the vehicle (#9, #25 acceptance 2) takes a front hit of exactly 1 off an on-curve hull",
-     2041
-    ],
-    [
-     "combat: hits on the vehicle (#9, #25 acceptance 2) deals nothing to the enemy on a side or rear hit and sends it back for its recoil",
-     519
-    ],
-    [
-     "combat: hits on the vehicle (#9, #25 acceptance 2) takes nothing from a second enemy hitting in the same tick, inside the 20-tick grace",
-     450
-    ]
-   ]
-  },
-  "src/systems/authority/combat/enemyRoster.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 4734,
-   "p50Ms": 263,
-   "p95Ms": 4734,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "combat: spawning and the cap (#9, #25 acceptance 7) keeps a killed enemy dead for the trip, and a dock frees its spawn point",
-     1241
-    ],
-    [
-     "combat: spawning and the cap (#9, #25 acceptance 7) forgets the last hit at a dock, so no hit grace carries into the next trip",
-     1012
-    ],
-    [
-     "combat: spawning and the cap (#9, #25 acceptance 7) wakes a spawn point when a vehicle comes within 24 tiles, not at 25",
-     895
-    ]
-   ]
-  },
-  "src/systems/authority/combat/gunFire.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 11355,
-   "p50Ms": 1196,
-   "p95Ms": 18172,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "guns: the flankers they are for (#107 combat scenarios) kills a rear flanker with the guns while the vehicle drills forward",
-     4244
-    ],
-    [
-     "guns: the flankers they are for (#107 combat scenarios) kills a side flanker with the guns while the vehicle drills down",
-     1888
-    ],
-    [
-     "guns: the flankers they are for (#107 combat scenarios) lets a planet 4 flanker land at least one attack before it dies (acceptance 3)",
-     1000
-    ]
-   ]
-  },
-  "src/systems/authority/combat/wreckerGuns.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 66836,
-   "p50Ms": 10569,
-   "p95Ms": 66836,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "tunnel wrecker against auto guns: head-on stays the drill (#126 acceptance 4, 5) fires no gun shot at the 'fastest (24 mm/tick)' wrecker fleeing head-on, and the drill kills it in the open tunnel",
-     20543
-    ],
-    [
-     "tunnel wrecker against auto guns: the cases (#126) walks the 'slowest (16 mm/tick)' case at its step",
-     8473
-    ],
-    [
-     "tunnel wrecker against auto guns: stop and commit (#126 acceptance 2, 3) lets the 'fastest (24 mm/tick)' wrecker get away from a vehicle that drives straight past at top speed",
-     6380
-    ]
-   ]
-  },
-  "src/systems/authority/combat/wreckerRun.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 26232,
-   "p50Ms": 12965,
-   "p95Ms": 119117,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "tunnel wrecker: gnawing (#111 Behaviour) breaches one ring every 300 ticks while the vehicle stays away",
-     3149
-    ],
-    [
-     "tunnel wrecker: fleeing and dying (#111 Behaviour, Systems numbers) flees a vehicle that comes within 12 tiles, logs wrecker_fled out of sight, and the next comes 3600 ticks later",
-     2809
-    ],
-    [
-     "tunnel wrecker: when one comes (#111 Spawn) still comes to a vehicle whose regular enemy cap is full of crawlers (#131)",
-     2291
-    ]
-   ]
-  },
-  "src/systems/authority/coreHarvest.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 6349,
-   "p50Ms": 993,
-   "p95Ms": 6349,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "core completed fires once, when the bay first holds 63, and keeps the surplus banked",
-     2232
-    ],
-    [
-     "core completed reaches coreNeeded by banking over several docks with a level-0 hold",
-     1960
-    ],
-    [
-     "core harvest destroys a core tile with a full hold, adds no fragment and still counts the tile",
-     1175
-    ]
-   ]
-  },
-  "src/systems/authority/drillGates.test.ts": {
-   "feature": "authority",
-   "runs": 20,
-   "lastMs": 435,
-   "p50Ms": 82,
-   "p95Ms": 113,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "drill gates collects the ore cell into the hold when no gate check is registered",
-     170
-    ],
-    [
-     "drill gates takes the same path when every gate check cuts the cell",
-     128
-    ]
-   ]
-  },
-  "src/systems/authority/featureUnlocks.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 2069,
-   "p50Ms": 117,
-   "p95Ms": 2069,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "feature unlocks on travel unlocks planet_2 on arriving at planet 2, logged between planet_unlocked and planet_entered",
-     1018
-    ],
-    [
-     "feature unlocks on travel holds the planet 1 gates open from the start without logging them again",
-     320
-    ],
-    [
-     "feature unlocks on travel unlocks blasting_charges on arriving at planet 7, its built module (#95)",
-     297
-    ]
-   ]
-  },
-  "src/systems/authority/groundDrill.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 6419,
-   "p50Ms": 4139,
-   "p95Ms": 6419,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "ground drilling (#36 Yield) credits each ore cell of a 1,000-cell scripted run once, at the first-slice value",
-     6358
-    ]
-   ]
-  },
-  "src/systems/authority/gunRules.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 1228,
-   "p50Ms": 81,
-   "p95Ms": 1228,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "guns: buying (#107) stops at the top level of the gun track",
-     283
-    ],
-    [
-     "guns: buying (#107) refuses the guns before planet 4, where auto_guns is not unlocked yet",
-     243
-    ],
-    [
-     "guns: the HUD toggle (#107) switches mounted guns off and back to auto, logging gun_mode each time",
-     183
-    ]
-   ]
-  },
-  "src/systems/authority/heatRun.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 15160,
-   "p50Ms": 4113,
-   "p95Ms": 39024,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "heat gauge (#113 numbers acceptance 1) heats the same at 5 and 10 pose reports a second",
-     4074
-    ],
-    [
-     "heat gauge (#113 numbers acceptance 1) reaches 70 from cold after 108 +- 5 s of drilling band 5 on planet 8",
-     3412
-    ],
-    [
-     "heat gauge (#113 numbers acceptance 1) throttles the drill from 70, before the hull takes any heat damage at 100",
-     2852
-    ]
-   ]
-  },
-  "src/systems/authority/lava/lavaRun.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 916,
-   "p50Ms": 138,
-   "p95Ms": 1062,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "lava a breach wakes (#133) leaves a pocket lying against a cave where it lay when a wrecker breaches a standard ring beside it",
-     261
-    ],
-    [
-     "lava on the authority clock (#113) keeps loose lava and its next step through a snapshot",
-     142
-    ],
-    [
-     "lava on the authority clock (#113) flows into the hole a step after it opens beside the pocket",
-     124
-    ]
-   ]
-  },
-  "src/systems/authority/liningBill.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 4256,
-   "p50Ms": 1537,
-   "p95Ms": 21873,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "lining bill (#76 amendment, #115) charges a vehicle that dives with an empty wallet the same lining as one with savings",
-     1572
-    ],
-    [
-     "lining bill (#76 amendment, #115) logs nothing for a payout with no bill",
-     1151
-    ],
-    [
-     "lining bill (#76 amendment, #115) settles the whole bill out of the next sale, before the payout reaches the wallet",
-     955
-    ]
-   ]
-  },
-  "src/systems/authority/liningTypes.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 5410,
-   "p50Ms": 1375,
-   "p95Ms": 5410,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "refractory lining laid by the drill (#113 numbers acceptance 3) charges each half metre 1.5 times k_casing * V(t(p,b)), logged as refractory",
-     2240
-    ],
-    [
-     "refractory lining laid by the drill (#113 numbers acceptance 3) charges relaying a standard tunnel in refractory as first placement of refractory",
-     2166
-    ],
-    [
-     "refractory lining laid by the drill (#113 numbers acceptance 3) relines a refractory tunnel in refractory for nothing",
-     893
-    ]
-   ]
-  },
-  "src/systems/authority/loadoutRules.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 1187,
-   "p50Ms": 94,
-   "p95Ms": 1187,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "equip refusals (#162 equip_refused) refuses away from the platform with not_docked and changes nothing",
-     565
-    ],
-    [
-     "equipping at the platform (#162, K4) puts an owned item in a slot that takes it and logs one ItemEquipped",
-     274
-    ],
-    [
-     "equipping at the platform (#162, K4) empties a slot for a null item, keeping the item owned",
-     101
-    ]
-   ]
-  },
-  "src/systems/authority/loadoutSection.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 135,
-   "p50Ms": 32,
-   "p95Ms": 135,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/loopbackAuthority.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 31,
-   "p50Ms": 18,
-   "p95Ms": 31,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/minedOre.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 515,
-   "p50Ms": 193,
-   "p95Ms": 515,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "mined ore identity (#122) adds the ore of a scripted dig in the order its cells were mined",
-     343
-    ],
-    [
-     "mined ore identity (#122) names the ore by the ore catalogue's id when a slice provides one (#155 3.5)",
-     151
-    ]
-   ]
-  },
-  "src/systems/authority/moneyRounding.test.ts": {
-   "feature": "authority",
-   "runs": 25,
-   "lastMs": 136,
-   "p50Ms": 4,
-   "p95Ms": 14,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/platformCommands.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 6958,
-   "p50Ms": 866,
-   "p95Ms": 6958,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "platform: core bay shows the core drive once, when the bay first reaches the 63 fragments planet 1 needs",
-     1147
-    ],
-    [
-     "platform: two bays buys and repairs at the Upgrade bay; selling and recharging alone are wrong_bay",
-     1036
-    ],
-    [
-     "platform: two bays sells, recharges and runs the quick action at the Sell bay; buys and repairs are wrong_bay",
-     748
-    ]
-   ]
-  },
-  "src/systems/authority/refinery/refineryDock.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 37,
-   "p50Ms": 37,
-   "p95Ms": 129,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/refinery/refineryRules.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 11343,
-   "p50Ms": 598,
-   "p95Ms": 11343,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "refinery queue moves the queued ore out of the hold at once into the first free slot",
-     3667
-    ],
-    [
-     "refinery timer and collection says refine_ready once, at its tick, whether the clock jumps there or steps tick by tick",
-     1592
-    ],
-    [
-     "refinery queue refuses to queue anywhere but the Refinery bay",
-     1125
-    ]
-   ]
-  },
-  "src/systems/authority/refinery/refinerySlots.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 2368,
-   "p50Ms": 165,
-   "p95Ms": 2368,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "refinery in co-op shares the slots first come first served",
-     1763
-    ],
-    [
-     "refinery in co-op pays a batch only to the player who queued it, and never collects another's",
-     433
-    ],
-    [
-     "refinery slots refuses a slot the wallet cannot pay",
-     153
-    ]
-   ]
-  },
-  "src/systems/authority/sessionSnapshot.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 3870,
-   "p50Ms": 335,
-   "p95Ms": 3870,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "session snapshot: live blasts and the terrain-edit queue (K6 #189) keeps a live blast mid-crater and the queued terrain edits through save and load",
-     1464
-    ],
-    [
-     "session snapshot: guns (#93) keeps the guns and their hits not yet logged mid-fight through save and load",
-     1403
-    ],
-    [
-     "session snapshot: live blasts and the terrain-edit queue (K6 #189) names a malformed live blast and a malformed terrain edit",
-     253
-    ]
-   ]
-  },
-  "src/systems/authority/sliceSectionSnapshot.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 81,
-   "p50Ms": 23,
-   "p95Ms": 81,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/stateDigest.test.ts": {
-   "feature": "authority",
-   "runs": 14,
-   "lastMs": 709,
-   "p50Ms": 17,
-   "p95Ms": 709,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "canonical json refuses values nested 100,000 levels deep without overflowing the stack",
-     315
-    ],
-    [
-     "state digest hashes UTF-8 bytes, not UTF-16 code units",
-     116
-    ]
-   ]
-  },
-  "src/systems/authority/teleportDebugRules.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 67,
-   "p50Ms": 54,
-   "p95Ms": 82,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/travelRules.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 164,
-   "p50Ms": 114,
-   "p95Ms": 397,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/vehicleCommands.test.ts": {
-   "feature": "authority",
-   "runs": 19,
-   "lastMs": 43095,
-   "p50Ms": 28975,
-   "p95Ms": 176551,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "vehicle energy has no rounding drift after 10^6 ticks of mixed thrust and drive",
-     42077
-    ],
-    [
-     "vehicle cargo destroys an ore tile with a full hold, keeps the cargo and logs one lost unit",
-     301
-    ],
-    [
-     "vehicle cargo adds one unit per ore tile at any tier and nothing for ground",
-     208
-    ]
-   ]
-  },
-  "src/systems/bot/blastTrade.test.ts": {
-   "feature": "bot",
-   "runs": 15,
-   "lastMs": 204,
-   "p50Ms": 7,
-   "p95Ms": 204,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "blast trade (#109 numbers acceptance 3) reaches the next band faster blasting wherever a tile takes 4x the floor or more",
-     151
-    ]
-   ]
-  },
-  "src/systems/bot/botBlasting.test.ts": {
-   "feature": "bot",
-   "runs": 20,
-   "lastMs": 179675,
-   "p50Ms": 6093,
-   "p95Ms": 6756,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "pacing bot blasting (#109 bot policy) replays a blasting run to the same digests and state",
-     69305
-    ],
-    [
-     "pacing bot blasting (#109 bot policy) blasts tiles slower than the threshold on planet 7, unhurt by its own charges",
-     69040
-    ],
-    [
-     "pacing bot blasting (#109 bot policy) never plants a charge when the run plays without them",
-     41002
-    ]
-   ]
-  },
-  "src/systems/bot/botChargeNeed.test.ts": {
-   "feature": "bot",
-   "runs": 20,
-   "lastMs": 45048,
-   "p50Ms": 13590,
-   "p95Ms": 15277,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "pacing bot charge rack (#129) plays exactly like a run without charges when no tile is slower than the threshold",
-     35509
-    ],
-    [
-     "pacing bot charge rack (#129) buys the rack at the visit after a trip that met a slow tile with none, then blasts",
-     9539
-    ]
-   ]
-  },
-  "src/systems/bot/botCharges.test.ts": {
-   "feature": "bot",
-   "runs": 20,
-   "lastMs": 933,
-   "p50Ms": 159,
-   "p95Ms": 422,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "bot: blasting charges policy (#109) wants charges once it meets a tile it would blast with none in stock (#129)",
-     443
-    ],
-    [
-     "bot: blasting charges policy (#109) backs out of the blast, waits for it, and comes back to an open wall unhurt",
-     140
-    ],
-    [
-     "bot: blasting charges policy (#109) wants no charges for a tile at the threshold, with one in stock, or without charges",
-     132
-    ]
-   ]
-  },
-  "src/systems/bot/botCombat.test.ts": {
-   "feature": "bot",
-   "runs": 20,
-   "lastMs": 13208,
-   "p50Ms": 379,
-   "p95Ms": 470,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "bot: combat reflex on the move (#29 Gameplay note 3, #130) drives on with its back to a crawler on a planet where it has not been destroyed",
-     8432
-    ],
-    [
-     "bot: combat reflex on the move (#29 Gameplay note 3, #130) drives carelessly again on the next planet after travel",
-     3110
-    ],
-    [
-     "bot: combat reflex on the move (#29 Gameplay note 3, #130) meets a crawler hunting it from behind with the drill head once destroyed on the planet",
-     1666
-    ]
-   ]
-  },
-  "src/systems/bot/botCoreGalleries.test.ts": {
-   "feature": "bot",
-   "runs": 20,
-   "lastMs": 106820,
-   "p50Ms": 7570,
-   "p95Ms": 8343,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "pacing bot core galleries from an off-centre shaft (#136) completes the core of seed 10 planet 9, whose shaft jogs across the core middle",
-     106755
-    ]
-   ]
-  },
-  "src/systems/bot/botCoreRule.test.ts": {
-   "feature": "bot",
-   "runs": 15,
-   "lastMs": 8,
-   "p50Ms": 6,
-   "p95Ms": 12,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/bot/botGuns.test.ts": {
-   "feature": "bot",
-   "runs": 19,
-   "lastMs": 82,
-   "p50Ms": 37,
-   "p95Ms": 82,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/bot/botHeat.test.ts": {
-   "feature": "bot",
-   "runs": 20,
-   "lastMs": 5533,
-   "p50Ms": 695,
-   "p95Ms": 1399,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "bot: shaft round lava (#113) steps the shaft sideways to a clear column and bores on below the pocket",
-     1956
-    ],
-    [
-     "bot: shaft round lava (#113) steps aside to a column clear past the pocket, so a gallery under the jog cannot trap it",
-     1304
-    ],
-    [
-     "bot: shaft round lava (#113) never frees the pocket or touches it on the way",
-     824
-    ]
-   ]
-  },
-  "src/systems/bot/botRefining.test.ts": {
-   "feature": "bot",
-   "runs": 20,
-   "lastMs": 21895,
-   "p50Ms": 16860,
-   "p95Ms": 21895,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "pacing bot refining (#105) queues its haul at the Refinery bay and collects ready batches at the Sell bay",
-     8876
-    ],
-    [
-     "pacing bot refining (#105) replays a refining run to the same digests and state",
-     7514
-    ],
-    [
-     "pacing bot refining (#105) never refines when the run ignores the refinery",
-     5496
-    ]
-   ]
-  },
-  "src/systems/bot/botShopping.test.ts": {
-   "feature": "bot",
-   "runs": 20,
-   "lastMs": 11689,
-   "p50Ms": 4131,
-   "p95Ms": 4818,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "bot: shopping at the Upgrade bay buys drill_tip past its on-curve level for the core once drill power is at its cap",
-     3874
-    ],
-    [
-     "bot: shopping at the Upgrade bay stops buying drill power for the core at the ceiling, however much money is left",
-     3066
-    ],
-    [
-     "bot: shopping at the Upgrade bay spends what the drill power ceiling saves on the other tracks",
-     2924
-    ]
-   ]
-  },
-  "src/systems/economy/blastingCharges.test.ts": {
-   "feature": "economy",
-   "runs": 18,
-   "lastMs": 237,
-   "p50Ms": 15,
-   "p95Ms": 237,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/economy/economySourceScan.test.ts": {
-   "feature": "economy",
-   "runs": 25,
-   "lastMs": 2538,
-   "p50Ms": 84,
-   "p95Ms": 140,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json",
-     1956
-    ],
-    [
-     "economy source scan keeps every number out of the economy formula modules except 0 and 1",
-     314
-    ],
-    [
-     "economy source scan searches every slice's code, its systems/ folder included",
-     141
-    ]
-   ]
-  },
-  "src/systems/fixedStepClock.test.ts": {
-   "feature": "systems-core",
-   "runs": 19,
-   "lastMs": 620,
-   "p50Ms": 183,
-   "p95Ms": 620,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "fixed-step clock replays a scripted dig-and-return trip to the same digest and events at 30 and 144 fps",
-     610
-    ]
-   ]
-  },
-  "src/systems/hints/hintAcceptance.test.ts": {
-   "feature": "hints",
-   "runs": 20,
-   "lastMs": 2083,
-   "p50Ms": 2083,
-   "p95Ms": 2750,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "hints over the first ten minutes (#16 acceptance) shows none again after a reload with the seen-set restored",
-     2079
-    ]
-   ]
-  },
-  "src/systems/hints/hintBoard.test.ts": {
-   "feature": "hints",
-   "runs": 19,
-   "lastMs": 1233,
-   "p50Ms": 200,
-   "p95Ms": 1233,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "hint board keeps hint_move up while the vehicle rests on the dock point",
-     471
-    ],
-    [
-     "hint board shows the move, drill, cargo and dock hints in that order on a first trip",
-     168
-    ]
-   ]
-  },
-  "src/systems/hints/hintTable.test.ts": {
-   "feature": "hints",
-   "runs": 15,
-   "lastMs": 6,
-   "p50Ms": 7,
-   "p95Ms": 22,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/hints/transmissionBoard.test.ts": {
-   "feature": "hints",
-   "runs": 15,
-   "lastMs": 6,
-   "p50Ms": 6,
-   "p95Ms": 12,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/input/preferences.test.ts": {
-   "feature": "input",
-   "runs": 16,
-   "lastMs": 18,
-   "p50Ms": 13,
-   "p95Ms": 23,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/registries/attachCoverage.test.ts": {
-   "feature": "registries",
-   "runs": 13,
-   "lastMs": 262,
-   "p50Ms": 9,
-   "p95Ms": 262,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "attach coverage finds no shared point with every extractor owned and every gear item equipped",
-     120
-    ]
-   ]
-  },
-  "src/systems/registries/blastEffects.test.ts": {
-   "feature": "registries",
-   "runs": 14,
-   "lastMs": 5,
-   "p50Ms": 3,
-   "p95Ms": 5,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/registries/commandRules.test.ts": {
-   "feature": "registries",
-   "runs": 19,
-   "lastMs": 8,
-   "p50Ms": 11,
-   "p95Ms": 16,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/registries/discovery.test.ts": {
-   "feature": "registries",
-   "runs": 15,
-   "lastMs": 3,
-   "p50Ms": 3,
-   "p95Ms": 5,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/registries/gateChecks.test.ts": {
-   "feature": "registries",
-   "runs": 15,
-   "lastMs": 5,
-   "p50Ms": 4,
-   "p95Ms": 7,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/registries/saveSections.test.ts": {
-   "feature": "registries",
-   "runs": 14,
-   "lastMs": 17,
-   "p50Ms": 5,
-   "p95Ms": 39,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/registries/vehicleLoadout.test.ts": {
-   "feature": "registries",
-   "runs": 13,
-   "lastMs": 9,
-   "p50Ms": 9,
-   "p95Ms": 11,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/chargeLook.test.ts": {
-   "feature": "render",
-   "runs": 19,
-   "lastMs": 15,
-   "p50Ms": 8,
-   "p95Ms": 29,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/chunkTileBatchOreLook.test.ts": {
-   "feature": "render",
-   "runs": 20,
-   "lastMs": 17,
-   "p50Ms": 27,
-   "p95Ms": 38,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/enemyArt.test.ts": {
-   "feature": "render",
-   "runs": 19,
-   "lastMs": 34,
-   "p50Ms": 6,
-   "p95Ms": 34,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/groundStrata.test.ts": {
-   "feature": "render",
-   "runs": 18,
-   "lastMs": 10,
-   "p50Ms": 7,
-   "p95Ms": 23,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/gunLook.test.ts": {
-   "feature": "render",
-   "runs": 19,
-   "lastMs": 8,
-   "p50Ms": 8,
-   "p95Ms": 20,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/heatTiles.test.ts": {
-   "feature": "render",
-   "runs": 18,
-   "lastMs": 165,
-   "p50Ms": 156,
-   "p95Ms": 202,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "heat planet tiles (#113 Visibility) draws a lava cell in the lava style",
-     116
-    ]
-   ]
-  },
-  "src/systems/render/refineryBayLook.test.ts": {
-   "feature": "render",
-   "runs": 19,
-   "lastMs": 5,
-   "p50Ms": 4,
-   "p95Ms": 16,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/vehicleLook.test.ts": {
-   "feature": "render",
-   "runs": 19,
-   "lastMs": 13,
-   "p50Ms": 11,
-   "p95Ms": 22,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/vehiclePreviewLook.test.ts": {
-   "feature": "render",
-   "runs": 19,
-   "lastMs": 12,
-   "p50Ms": 11,
-   "p95Ms": 19,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/replay/replayRun.test.ts": {
-   "feature": "replay",
-   "runs": 19,
-   "lastMs": 34098,
-   "p50Ms": 1898,
-   "p95Ms": 34098,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "replayRun gives the same digests and events when the clock runs in 30 and 144 fps frames",
-     28052
-    ],
-    [
-     "replayRun reproduces the digests a live session logged from the seed and its commands",
-     2809
-    ],
-    [
-     "replayRun ends with the digest of the state at the end tick",
-     1641
-    ]
-   ]
-  },
-  "src/systems/save/saveSlot.test.ts": {
-   "feature": "save",
-   "runs": 19,
-   "lastMs": 700,
-   "p50Ms": 376,
-   "p95Ms": 7094,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "save slot restores money, upgrades, planet and core bay exactly, through JSON text",
-     240
-    ],
-    [
-     "save slot resumes docked with the saved hull and energy, no hit grace and no enemy",
-     164
-    ],
-    [
-     "save slot restores a chunk holding breached casing exactly (#111)",
-     119
-    ]
-   ]
-  },
-  "src/systems/save/saveSlotSections.test.ts": {
-   "feature": "save",
-   "runs": 19,
-   "lastMs": 881,
-   "p50Ms": 16,
-   "p95Ms": 881,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "save slot sections round-trips a session and a player section through the world and the profile",
-     670
-    ],
-    [
-     "save slot sections writes no slices into the world or a profile player while no section is registered",
-     153
-    ]
-   ]
-  },
-  "src/systems/startScenario.test.ts": {
-   "feature": "systems-core",
-   "runs": 14,
-   "lastMs": 5,
-   "p50Ms": 6,
-   "p95Ms": 11,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/vehicle/vehicleStats.test.ts": {
-   "feature": "vehicle",
-   "runs": 25,
-   "lastMs": 479,
-   "p50Ms": 18,
-   "p95Ms": 30,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "vehicle rule sources use no pow, **, exp, log or trig anywhere in src/systems/vehicle",
-     208
-    ]
-   ]
-  },
-  "src/systems/views/bayPresentation.test.ts": {
-   "feature": "views",
-   "runs": 19,
-   "lastMs": 126,
-   "p50Ms": 60,
-   "p95Ms": 126,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/views/chargeViews.test.ts": {
-   "feature": "views",
-   "runs": 19,
-   "lastMs": 658,
-   "p50Ms": 171,
-   "p95Ms": 658,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "HUD: blasting charges (#109) clears the warning once the charge has blown",
-     138
-    ],
-    [
-     "HUD: blasting charges (#109) warns the planter inside the blast with the seconds left on the fuse",
-     130
-    ],
-    [
-     "HUD: blasting charges (#109) warns another vehicle within 16 tiles of the charge, and none further",
-     119
-    ]
-   ]
-  },
-  "src/systems/views/combatStatuses.test.ts": {
-   "feature": "views",
-   "runs": 19,
-   "lastMs": 5685,
-   "p50Ms": 474,
-   "p95Ms": 5685,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "combat statuses on the HUD model warns of a collapse while a block near the vehicle is telegraphing, and not after",
-     5570
-    ]
-   ]
-  },
-  "src/systems/views/heatViews.test.ts": {
-   "feature": "views",
-   "runs": 19,
-   "lastMs": 64,
-   "p50Ms": 62,
-   "p95Ms": 85,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/views/hudModel.test.ts": {
-   "feature": "views",
-   "runs": 19,
-   "lastMs": 2919,
-   "p50Ms": 1793,
-   "p95Ms": 12171,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "HUD model: casing badge (#41) pulses GNAW in amber while a tunnel wrecker gnaws the route (#111 telegraph)",
-     1765
-    ],
-    [
-     "HUD telegraphs lists a winding-up enemy with its octant, arc and the full wind-up left",
-     414
-    ],
-    [
-     "HUD telegraphs leaves idle enemies off the HUD",
-     386
-    ]
-   ]
-  },
-  "src/systems/views/plaqueModel.test.ts": {
-   "feature": "views",
-   "runs": 16,
-   "lastMs": 21,
-   "p50Ms": 5,
-   "p95Ms": 21,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/views/refineryBayModel.test.ts": {
-   "feature": "views",
-   "runs": 19,
-   "lastMs": 8534,
-   "p50Ms": 220,
-   "p95Ms": 8534,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "refinery bay screen offers each held tier as a batch of at most half the hold, focused first",
-     4368
-    ],
-    [
-     "refinery bay screen shows a running batch with its seconds left and refuses another with slots_busy",
-     2112
-    ],
-    [
-     "refinery bay screen prices the next slot, and says so when every slot is built",
-     1531
-    ]
-   ]
-  },
-  "src/systems/views/sellBayModel.test.ts": {
-   "feature": "views",
-   "runs": 19,
-   "lastMs": 11145,
-   "p50Ms": 600,
-   "p95Ms": 11145,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "sell bay model shows the visit lining bill, what its sales paid and what leaving would forgive (#128)",
-     6107
-    ],
-    [
-     "sell bay model lists a row per held tier and values Sell all exactly as the sale pays (#33 acceptance 8)",
-     3278
-    ],
-    [
-     "sell bay model carries wrong_bay on its buttons when the vehicle is docked at the Upgrade bay",
-     376
-    ]
-   ]
-  },
-  "src/systems/views/upgradeBayModel.test.ts": {
-   "feature": "views",
-   "runs": 20,
-   "lastMs": 428,
-   "p50Ms": 203,
-   "p95Ms": 428,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "upgrade bay model previews each upgrade as the purchase then logs it: cost and statsAfter",
-     104
-    ]
-   ]
-  },
-  "src/systems/views/upgradePreview.test.ts": {
-   "feature": "views",
-   "runs": 19,
-   "lastMs": 953,
-   "p50Ms": 149,
-   "p95Ms": 953,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "upgrade bay preview opens on the first track, so the screen starts with its pending tick shown",
-     157
-    ],
-    [
-     "upgrade bay preview gauges the levels owned since the current tier against the levels to the next",
-     142
-    ],
-    [
-     "upgrade bay preview shows the next casing grade as a lining swatch with the Casing row focused, the vehicle as it is",
-     113
-    ]
-   ]
-  },
-  "src/systems/world/generateChunkHooks.test.ts": {
-   "feature": "world",
-   "runs": 20,
-   "lastMs": 771,
-   "p50Ms": 55,
-   "p95Ms": 86,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "generation hooks at generateChunk changes the chunk's digest when a paint hook paints over its ore",
-     350
-    ],
-    [
-     "generation hooks at generateChunk generates the same chunk when a registered hook has no fold",
-     286
-    ]
-   ]
-  },
-  "src/ui/hud/hudPanels.test.ts": {
-   "feature": "ui",
-   "runs": 20,
-   "lastMs": 827,
-   "p50Ms": 53,
-   "p95Ms": 78,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "HUD slice panels draws a banner panel after the banner's kernel markup and before the position panel",
-     394
-    ],
-    [
-     "HUD slice panels draws no card before the browser seats it, so a server render shows none",
-     144
-    ],
-    [
-     "HUD slice panels draws a gauges panel before the banner",
-     120
-    ]
-   ]
-  },
-  "src/ui/iconCoverage.test.ts": {
-   "feature": "ui",
-   "runs": 20,
-   "lastMs": 200,
-   "p50Ms": 70,
-   "p95Ms": 105,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "icon registry coverage resolves every id the kernel and the loaded slices name, the ore of planets 1 to 100 included",
-     169
-    ]
-   ]
-  },
-  "src/ui/screenIds.test.ts": {
-   "feature": "ui",
-   "runs": 20,
-   "lastMs": 7957,
-   "p50Ms": 898,
-   "p95Ms": 1053,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "screen ids (#33 acceptance 12) renders every UI_IDS id somewhere with the model value as its text",
-     7869
-    ]
-   ]
-  },
   "scripts/ci/testMetrics.test.mjs": {
    "feature": "tooling-ci",
    "runs": 12,
@@ -4529,6 +1894,115 @@
    "flaky": false,
    "slowest": []
   },
+  "src/debug/debugApi.test.ts": {
+   "feature": "debug",
+   "runs": 21,
+   "lastMs": 4772,
+   "p50Ms": 389,
+   "p95Ms": 2846,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "debug api: set state drives the game through the design doc command names",
+     565
+    ],
+    [
+     "debug api: scenarios logs the exact sequence of core events of the committed planet 1 scenario",
+     426
+    ],
+    [
+     "debug api: combat reads the crawler table for planets 1 to 40 without logging",
+     420
+    ]
+   ]
+  },
+  "src/debug/debugArtefact.test.ts": {
+   "feature": "debug",
+   "runs": 20,
+   "lastMs": 1019,
+   "p50Ms": 25,
+   "p95Ms": 82,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "debug api: artefacts (#46) starts a scenario holding an artefact, and planet 2 then reads the cache as inert",
+     516
+    ],
+    [
+     "debug api: artefacts (#46) sets the held artefact as a logged debug command",
+     497
+    ]
+   ]
+  },
+  "src/debug/debugMemory.test.ts": {
+   "feature": "debug",
+   "runs": 20,
+   "lastMs": 315,
+   "p50Ms": 5,
+   "p95Ms": 101,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "debug api: renderer memory (#119) reads the drawing renderer counts as they are when asked",
+     164
+    ],
+    [
+     "debug api: renderer memory (#119) refuses with a problem while no game renderer is drawing",
+     150
+    ]
+   ]
+  },
+  "src/debug/debugScreens.test.ts": {
+   "feature": "debug",
+   "runs": 20,
+   "lastMs": 5903,
+   "p50Ms": 563,
+   "p95Ms": 1387,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "debug api: render scale and stats (#38) ends a scripted run on the same digest at every render scale and zoom (#38 acceptance 6)",
+     1516
+    ],
+    [
+     "debug api: presentation never reaches the session (#33 acceptance 10) ends a scripted run on the same digest whatever the music volume and mute (#49)",
+     689
+    ],
+    [
+     "debug api: presentation never reaches the session (#33 acceptance 10) ends a scripted run on the same digest under every camera, shake and flash setting",
+     656
+    ]
+   ]
+  },
+  "src/debug/sliceDebugCommands.test.ts": {
+   "feature": "debug",
+   "runs": 21,
+   "lastMs": 16,
+   "p50Ms": 16,
+   "p95Ms": 20,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/features/example/systems/describeExample.test.ts": {
    "feature": "example",
    "runs": 12,
@@ -4538,6 +2012,19 @@
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/loadFeatures.test.ts": {
+   "feature": "unmapped",
+   "runs": 24,
+   "lastMs": 88,
+   "p50Ms": 4,
+   "p95Ms": 10,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -4575,13 +2062,13 @@
   },
   "src/logging/benchmarkResult.test.ts": {
    "feature": "logging",
-   "runs": 13,
-   "lastMs": 10,
+   "runs": 14,
+   "lastMs": 119,
    "p50Ms": 7,
-   "p95Ms": 12,
+   "p95Ms": 119,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -4636,26 +2123,31 @@
   },
   "src/logging/domainEventLog.test.ts": {
    "feature": "logging",
-   "runs": 13,
-   "lastMs": 25,
+   "runs": 14,
+   "lastMs": 279,
    "p50Ms": 14,
-   "p95Ms": 236,
+   "p95Ms": 279,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "domain event projection logs an applied debug command with the tick and seq of its command",
+     117
+    ]
+   ]
   },
   "src/logging/eventNames.test.ts": {
    "feature": "logging",
-   "runs": 13,
-   "lastMs": 84,
+   "runs": 14,
+   "lastMs": 28,
    "p50Ms": 9,
    "p95Ms": 84,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -4672,6 +2164,58 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/logging/goldenRun.test.ts": {
+   "feature": "golden-replay",
+   "runs": 19,
+   "lastMs": 3317,
+   "p50Ms": 1960,
+   "p95Ms": 9149,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "golden runs (committed in tests/golden) replays casing-lined-band-2 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
+     1210
+    ],
+    [
+     "golden runs (committed in tests/golden) replays collapse-band-2-grade-1 to every committed digest and its mined order at the fixed step, 30 and 144 fps",
+     916
+    ],
+    [
+     "golden runs (committed in tests/golden) replays destroyed-and-towed to every committed digest and its mined order at the fixed step, 30 and 144 fps",
+     289
+    ]
+   ]
+  },
+  "src/logging/goldenSliceSections.test.ts": {
+   "feature": "logging",
+   "runs": 20,
+   "lastMs": 3507,
+   "p50Ms": 205,
+   "p95Ms": 307,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "golden slice sections asks to regenerate a file written before a section was registered",
+     1414
+    ],
+    [
+     "golden slice sections writes no sliceSections while no section is registered",
+     1085
+    ],
+    [
+     "golden slice sections asks to regenerate a file whose section version the code has bumped or dropped",
+     1007
+    ]
+   ]
   },
   "src/logging/heatReport.test.ts": {
    "feature": "logging",
@@ -4753,42 +2297,34 @@
   },
   "src/logging/registries/runEvents.test.ts": {
    "feature": "logging",
-   "runs": 13,
-   "lastMs": 13,
+   "runs": 14,
+   "lastMs": 161,
    "p50Ms": 6,
-   "p95Ms": 13,
+   "p95Ms": 161,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/logging/runEventSchema.test.ts": {
-   "feature": "logging",
-   "runs": 13,
-   "lastMs": 603,
-   "p50Ms": 13,
-   "p95Ms": 603,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "run event schema refuses a float depth, a missing tick, an unknown envelope field and a bad cmd at once",
-     293
-    ],
-    [
-     "run event schema accepts the example line of the logging contract",
-     184
-    ],
-    [
-     "run event schema refuses debug command arguments nested 100,000 levels deep without overflowing the stack",
-     118
+     "slice run events names every loaded slice run event <slice>.<snake_case>, off the envelope and float-free",
+     103
     ]
    ]
+  },
+  "src/logging/runEventSchema.test.ts": {
+   "feature": "logging",
+   "runs": 14,
+   "lastMs": 14,
+   "p50Ms": 13,
+   "p95Ms": 603,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
   },
   "src/logging/runLayout.test.ts": {
    "feature": "logging",
@@ -4877,6 +2413,28 @@
    "flaky": false,
    "slowest": []
   },
+  "src/logging/secondSliceGolden.test.ts": {
+   "feature": "golden-replay",
+   "runs": 19,
+   "lastMs": 794,
+   "p50Ms": 707,
+   "p95Ms": 18569,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "second-slice golden runs (S11) lines a grade-2 bore in band 2 that only collapses where debug forces it",
+     441
+    ],
+    [
+     "second-slice golden runs (S11) warns and refills the lined blocks behind a grade-1 dig into band 2",
+     314
+    ]
+   ]
+  },
   "src/logging/sessionAnalysis/benchTrend.test.ts": {
    "feature": "logging",
    "runs": 12,
@@ -4892,13 +2450,13 @@
   },
   "src/logging/sessionAnalysis/fixtureSessions.test.ts": {
    "feature": "logging",
-   "runs": 15,
-   "lastMs": 280,
-   "p50Ms": 56,
+   "runs": 16,
+   "lastMs": 47,
+   "p50Ms": 54,
    "p95Ms": 280,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -4973,6 +2531,54 @@
    "flaky": false,
    "slowest": []
   },
+  "src/physics/physicsStats.test.ts": {
+   "feature": "physics",
+   "runs": 20,
+   "lastMs": 548,
+   "p50Ms": 298,
+   "p95Ms": 548,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "debug api: physics stats (#119) reads Rapier's WASM memory in whole pages as it is now, so it grows as the world fills",
+     326
+    ],
+    [
+     "debug api: physics stats (#119) counts the vehicle and the ground colliders streamed in round it, and none once removed",
+     168
+    ]
+   ]
+  },
+  "src/physics/vehicleLoop.test.ts": {
+   "feature": "physics",
+   "runs": 19,
+   "lastMs": 1709,
+   "p50Ms": 1475,
+   "p95Ms": 4925,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "vehicle loop drives off the pad and digs straight down, charging energy through pose reports",
+     685
+    ],
+    [
+     "vehicle loop drills a level tunnel sideways from the bottom of its shaft, along the planet curve",
+     579
+    ],
+    [
+     "vehicle loop climbs back out of its shaft on the lift",
+     314
+    ]
+   ]
+  },
   "src/physics/vehiclePhysics.test.ts": {
    "feature": "physics",
    "runs": 13,
@@ -4999,6 +2605,37 @@
     ]
    ]
   },
+  "src/registries/registrar.test.ts": {
+   "feature": "unmapped",
+   "runs": 19,
+   "lastMs": 228,
+   "p50Ms": 14,
+   "p95Ms": 228,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/registries/sliceCommands.test.ts": {
+   "feature": "unmapped",
+   "runs": 20,
+   "lastMs": 352,
+   "p50Ms": 139,
+   "p95Ms": 352,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "slice commands (K1) replays a slice command to the same digests, jumping or at 30 and 144 frames per second",
+     260
+    ]
+   ]
+  },
   "src/registries/sliceModules.test.ts": {
    "feature": "unmapped",
    "runs": 12,
@@ -5012,12 +2649,384 @@
    "flaky": false,
    "slowest": []
   },
+  "src/scene/sceneDisposal.test.ts": {
+   "feature": "scene",
+   "runs": 20,
+   "lastMs": 76,
+   "p50Ms": 67,
+   "p95Ms": 119,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/shell/listenerCount.test.ts": {
    "feature": "shell",
    "runs": 12,
    "lastMs": 8,
    "p50Ms": 6,
    "p95Ms": 8,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/store/artefactChoice.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 76,
+   "p50Ms": 76,
+   "p95Ms": 224,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/store/authorityReads.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 17,
+   "p50Ms": 18,
+   "p95Ms": 36,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/store/checkpoint.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 160,
+   "p50Ms": 81,
+   "p95Ms": 540,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/store/domainEventBroadcast.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 158,
+   "p50Ms": 17,
+   "p95Ms": 158,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "domain event broadcast hands a listener the events of each command the store submits, for the local player",
+     145
+    ]
+   ]
+  },
+  "src/store/gameStore.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 101,
+   "p50Ms": 71,
+   "p95Ms": 1608,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/store/hintSlice.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 492,
+   "p50Ms": 271,
+   "p95Ms": 924,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "hint slice shows nothing before the run starts watching",
+     175
+    ],
+    [
+     "hint slice keeps the seen-set in the preferences file, so nothing repeats after a reload",
+     152
+    ]
+   ]
+  },
+  "src/store/inputRuntime.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 2026,
+   "p50Ms": 226,
+   "p95Ms": 2026,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "input: no direct mutation (#33 acceptance 3) submits the quick action at the Upgrade bay too (#170), and no casing buy at the Sell bay",
+     497
+    ],
+    [
+     "input: no direct mutation (#33 acceptance 3) submits the platform buttons as their commands",
+     326
+    ],
+    [
+     "input: no direct mutation (#33 acceptance 3) submits nothing for an action outside its context or a disabled button",
+     286
+    ]
+   ]
+  },
+  "src/store/partInstall.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 132,
+   "p50Ms": 83,
+   "p95Ms": 594,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/store/perfLog.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 14,
+   "p50Ms": 10,
+   "p95Ms": 27,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/store/platformLoop.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 378,
+   "p50Ms": 310,
+   "p95Ms": 6815,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "platform loop from a fresh profile mines, sells and buys one level of each of the six tracks, logged in order",
+     358
+    ]
+   ]
+  },
+  "src/store/sliceRun.test.ts": {
+   "feature": "store",
+   "runs": 19,
+   "lastMs": 5178,
+   "p50Ms": 3278,
+   "p95Ms": 22648,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "slice run on both planets logs the #2 acceptance sequence and ends at the end-of-slice card",
+     2614
+    ],
+    [
+     "slice run on both planets logs core_completed once per planet, on planet 1 then on planet 2",
+     1698
+    ],
+    [
+     "presentation settings and the run reaches the same state digest with every camera, shake and flash setting",
+     741
+    ]
+   ]
+  },
+  "src/systems/art/assetLint.test.ts": {
+   "feature": "art",
+   "runs": 18,
+   "lastMs": 2713,
+   "p50Ms": 129,
+   "p95Ms": 2713,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "asset lint: shipped files encodes every map at most 4096 px with power-of-two sides, in its Basis format",
+     1165
+    ],
+    [
+     "asset lint: shipped files ships every ground and casing map as the 1024 px square tile of #52",
+     623
+    ],
+    [
+     "asset lint: the manifest is the #51 inventory under the #52 naming",
+     181
+    ]
+   ]
+  },
+  "src/systems/art/assetLook.test.ts": {
+   "feature": "art",
+   "runs": 18,
+   "lastMs": 365,
+   "p50Ms": 8,
+   "p95Ms": 365,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "asset look shows the placeholder’s part ids at every tier once the vehicle art is final",
+     358
+    ]
+   ]
+  },
+  "src/systems/art/assetManifest.test.ts": {
+   "feature": "art",
+   "runs": 18,
+   "lastMs": 559,
+   "p50Ms": 33,
+   "p95Ms": 559,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "asset manifest refuses an emissive flag on anything but a tile, whose sidecar would say it instead",
+     286
+    ]
+   ]
+  },
+  "src/systems/art/autoGunsArt.test.ts": {
+   "feature": "art",
+   "runs": 18,
+   "lastMs": 380,
+   "p50Ms": 8,
+   "p95Ms": 380,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "auto guns art takes the tiered part names of a vehicle module on its own asset only",
+     156
+    ],
+    [
+     "auto guns art names each vehicle module from a row of the locked unlock schedule",
+     141
+    ]
+   ]
+  },
+  "src/systems/art/blastingChargesArt.test.ts": {
+   "feature": "art",
+   "runs": 17,
+   "lastMs": 9,
+   "p50Ms": 9,
+   "p95Ms": 18,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/art/heatLavaArt.test.ts": {
+   "feature": "art",
+   "runs": 18,
+   "lastMs": 142,
+   "p50Ms": 8,
+   "p95Ms": 142,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/art/icons/iconCoverage.test.ts": {
+   "feature": "art",
+   "runs": 19,
+   "lastMs": 6854,
+   "p50Ms": 246,
+   "p95Ms": 6854,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "icon coverage (#158 section 3) gives every HUD gauge, status, threat and enemy kind an icon",
+     4843
+    ],
+    [
+     "icon coverage (#158 section 3) gives every Sell and Refinery bay row and button an icon, ore rows by their tier",
+     1273
+    ],
+    [
+     "icon coverage (#158 section 3) gives every Upgrade bay row, header field and button an icon, on the planet with every row",
+     398
+    ]
+   ]
+  },
+  "src/systems/art/icons/iconFiles.test.ts": {
+   "feature": "art",
+   "runs": 15,
+   "lastMs": 683,
+   "p50Ms": 25,
+   "p95Ms": 683,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "icon files (npm run art:icons) ships every icon of the set as the SVG the composer writes",
+     491
+    ],
+    [
+     "icon files (npm run art:icons) lists every icon in the art manifest as a final vector asset",
+     147
+    ]
+   ]
+  },
+  "src/systems/art/icons/iconSet.test.ts": {
+   "feature": "art",
+   "runs": 15,
+   "lastMs": 7,
+   "p50Ms": 11,
+   "p95Ms": 117,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791365970990,
@@ -5038,12 +3047,129 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/art/icons/iconSvg.test.ts": {
+   "feature": "art",
+   "runs": 15,
+   "lastMs": 58,
+   "p50Ms": 15,
+   "p95Ms": 58,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/art/icons/oreIcon.test.ts": {
    "feature": "art",
    "runs": 12,
    "lastMs": 14,
    "p50Ms": 6,
    "p95Ms": 14,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/art/ktx2Header.test.ts": {
+   "feature": "art",
+   "runs": 17,
+   "lastMs": 660,
+   "p50Ms": 7,
+   "p95Ms": 660,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "ktx2 header reads the size, the Basis encoding and the colour space toktx wrote",
+     298
+    ],
+    [
+     "ktx2 map lint passes ETC1S sRGB albedo and emissive maps and a UASTC linear normal map",
+     174
+    ],
+    [
+     "ktx2 map lint refuses a side that is not a power of two",
+     106
+    ]
+   ]
+  },
+  "src/systems/art/partsSidecar.test.ts": {
+   "feature": "art",
+   "runs": 17,
+   "lastMs": 122,
+   "p50Ms": 15,
+   "p95Ms": 122,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/art/placeholderLook.test.ts": {
+   "feature": "art",
+   "runs": 18,
+   "lastMs": 6,
+   "p50Ms": 8,
+   "p95Ms": 10,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/art/refineryBayArt.test.ts": {
+   "feature": "art",
+   "runs": 17,
+   "lastMs": 21,
+   "p50Ms": 7,
+   "p95Ms": 21,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/art/shopBuildingArt.test.ts": {
+   "feature": "art",
+   "runs": 18,
+   "lastMs": 117,
+   "p50Ms": 9,
+   "p95Ms": 117,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/art/tileLook.test.ts": {
+   "feature": "art",
+   "runs": 18,
+   "lastMs": 24,
+   "p50Ms": 4,
+   "p95Ms": 24,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/art/tunnelWreckerArt.test.ts": {
+   "feature": "art",
+   "runs": 18,
+   "lastMs": 92,
+   "p50Ms": 6,
+   "p95Ms": 92,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791365970990,
@@ -5072,6 +3198,19 @@
      112
     ]
    ]
+  },
+  "src/systems/audio/drillVoice.test.ts": {
+   "feature": "audio",
+   "runs": 18,
+   "lastMs": 130,
+   "p50Ms": 94,
+   "p95Ms": 172,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
   },
   "src/systems/audio/musicBook.test.ts": {
    "feature": "audio",
@@ -5143,6 +3282,391 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/authority/advanceTicks.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 47,
+   "p50Ms": 40,
+   "p95Ms": 61,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/applyCommand.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 759,
+   "p50Ms": 87,
+   "p95Ms": 759,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "authority: determinism gives the same digest and events when the same commands are applied twice",
+     704
+    ]
+   ]
+  },
+  "src/systems/authority/artefactRules.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 474,
+   "p50Ms": 159,
+   "p95Ms": 2466,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "drilling the cache cell (#46) breaks like rock and yields nothing",
+     197
+    ]
+   ]
+  },
+  "src/systems/authority/assaySale.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 165,
+   "p50Ms": 197,
+   "p95Ms": 274,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "selling with assay_beacon (#46) sells band-1 ore at the band-3 unit price and says so before the sale",
+     103
+    ]
+   ]
+  },
+  "src/systems/authority/casingDrill.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 1176,
+   "p50Ms": 116,
+   "p95Ms": 1176,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "re-drilling casing lines the wall beside a mined hole through debug.lineCasing and logs the ring",
+     427
+    ],
+    [
+     "re-drilling casing takes longer to drill higher-grade lining, as band-G rock",
+     297
+    ],
+    [
+     "re-drilling casing charges only the drill energy for the ticks it cut",
+     167
+    ]
+   ]
+  },
+  "src/systems/authority/casingGnaw.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 99780,
+   "p50Ms": 2425,
+   "p95Ms": 99780,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "breached casing in play (#94 acceptance 5 and 9) charges the first lining again where a collapse refilled a breached stretch",
+     31042
+    ],
+    [
+     "breached casing in play (#94 acceptance 5 and 9) breaches a stretch and says so per chunk and per ring, with no warning while no vehicle is near",
+     28195
+    ],
+    [
+     "breached casing in play (#94 acceptance 5 and 9) cancels the warning when the drill relines the stretch, and charges nothing for it",
+     21982
+    ]
+   ]
+  },
+  "src/systems/authority/casingPlacement.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 6265,
+   "p50Ms": 5018,
+   "p95Ms": 65264,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "automatic casing placement lays one ring per half metre of a 20 m dig once the drill has passed each point",
+     1071
+    ],
+    [
+     "automatic casing placement replays the same dig to the same digest, and a snapshot keeps the trail",
+     826
+    ],
+    [
+     "first-place casing lining charge charges the same metre price at grade 5 as at grade 1",
+     646
+    ]
+   ]
+  },
+  "src/systems/authority/casingRules.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 2618,
+   "p50Ms": 82,
+   "p95Ms": 2618,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "casing grade ends at grade 5 after four buys, logging each and charging exactly its curve prices",
+     2096
+    ],
+    [
+     "casing grade refuses the buy at the Sell bay with wrong_bay, changing nothing",
+     285
+    ],
+    [
+     "casing grade refuses a buy the wallet cannot pay with money_short, leaving the grade",
+     184
+    ]
+   ]
+  },
+  "src/systems/authority/casingSupport.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 245,
+   "p50Ms": 68,
+   "p95Ms": 245,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "casing grade telegraph needs grade 5 in the core, reported as band 6",
+     105
+    ]
+   ]
+  },
+  "src/systems/authority/charges/chargeBlast.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 873,
+   "p50Ms": 567,
+   "p95Ms": 2936,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "blasting charges: the blast (#109 numbers acceptance 1 and 2) leaves lined samples of the tunnel wall with their density and lining",
+     216
+    ],
+    [
+     "blasting charges: collapse (#109 \"Collapse risk\") starts the warning of weak lining next to the blast, with no vehicle near",
+     155
+    ],
+    [
+     "blasting charges: plant and fuse (#109) blows when the fuse runs out and not a tick before",
+     114
+    ]
+   ]
+  },
+  "src/systems/authority/charges/chargeBlastEffects.test.ts": {
+   "feature": "authority",
+   "runs": 20,
+   "lastMs": 168,
+   "p50Ms": 106,
+   "p95Ms": 154,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "charge blast effects tells a registered effect the charge's blast as size 1, every field an integer",
+     100
+    ]
+   ]
+  },
+  "src/systems/authority/charges/chargeShop.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 160,
+   "p50Ms": 48,
+   "p95Ms": 160,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/collapse/collapseRun.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 67099,
+   "p50Ms": 5706,
+   "p95Ms": 67099,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "collapse: a straight dig (#43 acceptance 8, 3) never warns while digging 20 m in band 1 at grade 1, stopping at the face and at a dead end",
+     15895
+    ],
+    [
+     "collapse: a straight dig (#43 acceptance 8, 3) never collapses a band-2 shaft lined at grade 2, over ten minutes beside it",
+     8337
+    ],
+    [
+     "collapse: a straight dig (#43 acceptance 8, 3) warns on the lined blocks behind a band-2 dig at grade 1 and never on the face",
+     7493
+    ]
+   ]
+  },
+  "src/systems/authority/combat/burrower.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 543,
+   "p50Ms": 84,
+   "p95Ms": 543,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "combat: the burrower (#9, #25 acceptance 8) is damaged when the drill works the tile it swims in",
+     283
+    ],
+    [
+     "combat: the burrower (#9, #25 acceptance 8) swims through rock toward the vehicle and removes no tile",
+     131
+    ]
+   ]
+  },
+  "src/systems/authority/combat/combatRun.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 1651,
+   "p50Ms": 1740,
+   "p95Ms": 13729,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "combat: a scripted fight at two report rates (#25 acceptance 5) keeps every hit front when the player faces each wind-up, reporting every 1 ticks",
+     598
+    ],
+    [
+     "combat: determinism (#25 acceptance 12) gives the same digest and events at 30 and 144 rendered frames a second",
+     462
+    ],
+    [
+     "combat: the latency rule (#9, #25 acceptance 5) counts a hit as front when the report before the latest had the enemy in front",
+     219
+    ]
+   ]
+  },
+  "src/systems/authority/combat/contactRule.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 4568,
+   "p50Ms": 589,
+   "p95Ms": 4568,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "combat: hits on the vehicle (#9, #25 acceptance 2) takes a front hit of exactly 1 off an on-curve hull",
+     2041
+    ],
+    [
+     "combat: hits on the vehicle (#9, #25 acceptance 2) deals nothing to the enemy on a side or rear hit and sends it back for its recoil",
+     519
+    ],
+    [
+     "combat: hits on the vehicle (#9, #25 acceptance 2) takes nothing from a second enemy hitting in the same tick, inside the 20-tick grace",
+     450
+    ]
+   ]
+  },
+  "src/systems/authority/combat/enemyRoster.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 207,
+   "p50Ms": 263,
+   "p95Ms": 4734,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/combat/gunFire.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 1319,
+   "p50Ms": 1207,
+   "p95Ms": 18172,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "guns: the flankers they are for (#107 combat scenarios) kills a rear flanker with the guns while the vehicle drills forward",
+     326
+    ],
+    [
+     "guns: determinism fires the same shots when the clock moves a tick at a time as when commands move it",
+     204
+    ],
+    [
+     "guns: the flankers they are for (#107 combat scenarios) kills a side flanker with the guns while the vehicle drills down",
+     178
+    ]
+   ]
+  },
   "src/systems/authority/combat/hitArc.test.ts": {
    "feature": "authority",
    "runs": 12,
@@ -5182,6 +3706,97 @@
     ]
    ]
   },
+  "src/systems/authority/combat/wreckerGuns.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 66836,
+   "p50Ms": 10569,
+   "p95Ms": 66836,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "tunnel wrecker against auto guns: head-on stays the drill (#126 acceptance 4, 5) fires no gun shot at the 'fastest (24 mm/tick)' wrecker fleeing head-on, and the drill kills it in the open tunnel",
+     20543
+    ],
+    [
+     "tunnel wrecker against auto guns: the cases (#126) walks the 'slowest (16 mm/tick)' case at its step",
+     8473
+    ],
+    [
+     "tunnel wrecker against auto guns: stop and commit (#126 acceptance 2, 3) lets the 'fastest (24 mm/tick)' wrecker get away from a vehicle that drives straight past at top speed",
+     6380
+    ]
+   ]
+  },
+  "src/systems/authority/combat/wreckerRun.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 59460,
+   "p50Ms": 12979,
+   "p95Ms": 119117,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "tunnel wrecker: when one comes (#111 Spawn) comes to the newest ring more than 20 tiles behind once 20 rings are lined",
+     8142
+    ],
+    [
+     "tunnel wrecker: when one comes (#111 Spawn) never calls a wrecker to a ring beyond 48 tiles of its vehicle, where it would leave at once (#132)",
+     6278
+    ],
+    [
+     "tunnel wrecker: when one comes (#111 Spawn) never comes, and remembers no route, on a planet before 6",
+     5310
+    ]
+   ]
+  },
+  "src/systems/authority/coreHarvest.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 1724,
+   "p50Ms": 1000,
+   "p95Ms": 6349,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "core completed fires once, when the bay first holds 63, and keeps the surplus banked",
+     698
+    ],
+    [
+     "core completed reaches coreNeeded by banking over several docks with a level-0 hold",
+     658
+    ],
+    [
+     "core harvest destroys a core tile with a full hold, adds no fragment and still counts the tile",
+     175
+    ]
+   ]
+  },
+  "src/systems/authority/drillGates.test.ts": {
+   "feature": "authority",
+   "runs": 20,
+   "lastMs": 132,
+   "p50Ms": 83,
+   "p95Ms": 132,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/authority/exactMathLint.test.ts": {
    "feature": "authority",
    "runs": 12,
@@ -5208,6 +3823,293 @@
     ]
    ]
   },
+  "src/systems/authority/featureUnlocks.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 2069,
+   "p50Ms": 117,
+   "p95Ms": 2069,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "feature unlocks on travel unlocks planet_2 on arriving at planet 2, logged between planet_unlocked and planet_entered",
+     1018
+    ],
+    [
+     "feature unlocks on travel holds the planet 1 gates open from the start without logging them again",
+     320
+    ],
+    [
+     "feature unlocks on travel unlocks blasting_charges on arriving at planet 7, its built module (#95)",
+     297
+    ]
+   ]
+  },
+  "src/systems/authority/groundDrill.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 5781,
+   "p50Ms": 4174,
+   "p95Ms": 6419,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "ground drilling (#36 Yield) credits each ore cell of a 1,000-cell scripted run once, at the first-slice value",
+     5748
+    ]
+   ]
+  },
+  "src/systems/authority/gunRules.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 1228,
+   "p50Ms": 81,
+   "p95Ms": 1228,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "guns: buying (#107) stops at the top level of the gun track",
+     283
+    ],
+    [
+     "guns: buying (#107) refuses the guns before planet 4, where auto_guns is not unlocked yet",
+     243
+    ],
+    [
+     "guns: the HUD toggle (#107) switches mounted guns off and back to auto, logging gun_mode each time",
+     183
+    ]
+   ]
+  },
+  "src/systems/authority/heatRun.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 15160,
+   "p50Ms": 4113,
+   "p95Ms": 39024,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "heat gauge (#113 numbers acceptance 1) heats the same at 5 and 10 pose reports a second",
+     4074
+    ],
+    [
+     "heat gauge (#113 numbers acceptance 1) reaches 70 from cold after 108 +- 5 s of drilling band 5 on planet 8",
+     3412
+    ],
+    [
+     "heat gauge (#113 numbers acceptance 1) throttles the drill from 70, before the hull takes any heat damage at 100",
+     2852
+    ]
+   ]
+  },
+  "src/systems/authority/lava/lavaRun.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 126,
+   "p50Ms": 138,
+   "p95Ms": 1062,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/liningBill.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 6501,
+   "p50Ms": 1544,
+   "p95Ms": 21873,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "lining bill (#76 amendment, #115) settles the whole bill out of the next sale, before the payout reaches the wallet",
+     2435
+    ],
+    [
+     "lining bill (#76 amendment, #115) charges a vehicle that dives with an empty wallet the same lining as one with savings",
+     1615
+    ],
+    [
+     "lining bill (#76 amendment, #115) keeps the bill through a rescue tow and settles it at the next sale",
+     1186
+    ]
+   ]
+  },
+  "src/systems/authority/liningTypes.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 2338,
+   "p50Ms": 1390,
+   "p95Ms": 5410,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "refractory lining laid by the drill (#113 numbers acceptance 3) charges relaying a standard tunnel in refractory as first placement of refractory",
+     842
+    ],
+    [
+     "refractory lining laid by the drill (#113 numbers acceptance 3) charges each half metre 1.5 times k_casing * V(t(p,b)), logged as refractory",
+     769
+    ],
+    [
+     "refractory lining laid by the drill (#113 numbers acceptance 3) relines a refractory tunnel in refractory for nothing",
+     654
+    ]
+   ]
+  },
+  "src/systems/authority/loadoutRules.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 1187,
+   "p50Ms": 94,
+   "p95Ms": 1187,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "equip refusals (#162 equip_refused) refuses away from the platform with not_docked and changes nothing",
+     565
+    ],
+    [
+     "equipping at the platform (#162, K4) puts an owned item in a slot that takes it and logs one ItemEquipped",
+     274
+    ],
+    [
+     "equipping at the platform (#162, K4) empties a slot for a null item, keeping the item owned",
+     101
+    ]
+   ]
+  },
+  "src/systems/authority/loadoutSection.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 85,
+   "p50Ms": 32,
+   "p95Ms": 135,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/loopbackAuthority.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 31,
+   "p50Ms": 18,
+   "p95Ms": 31,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/minedOre.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 515,
+   "p50Ms": 193,
+   "p95Ms": 515,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "mined ore identity (#122) adds the ore of a scripted dig in the order its cells were mined",
+     343
+    ],
+    [
+     "mined ore identity (#122) names the ore by the ore catalogue's id when a slice provides one (#155 3.5)",
+     151
+    ]
+   ]
+  },
+  "src/systems/authority/moneyRounding.test.ts": {
+   "feature": "authority",
+   "runs": 25,
+   "lastMs": 85,
+   "p50Ms": 4,
+   "p95Ms": 85,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/platformCommands.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 6958,
+   "p50Ms": 866,
+   "p95Ms": 6958,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "platform: core bay shows the core drive once, when the bay first reaches the 63 fragments planet 1 needs",
+     1147
+    ],
+    [
+     "platform: two bays buys and repairs at the Upgrade bay; selling and recharging alone are wrong_bay",
+     1036
+    ],
+    [
+     "platform: two bays sells, recharges and runs the quick action at the Sell bay; buys and repairs are wrong_bay",
+     748
+    ]
+   ]
+  },
+  "src/systems/authority/refinery/refineryDock.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 37,
+   "p50Ms": 37,
+   "p95Ms": 129,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/authority/refinery/refineryFacility.test.ts": {
    "feature": "authority",
    "runs": 13,
@@ -5220,6 +4122,411 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/systems/authority/refinery/refineryRules.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 1952,
+   "p50Ms": 606,
+   "p95Ms": 11343,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "refinery timer and collection says refine_ready once, at its tick, whether the clock jumps there or steps tick by tick",
+     490
+    ],
+    [
+     "refinery queue moves the queued ore out of the hold at once into the first free slot",
+     379
+    ],
+    [
+     "refinery timer and collection is not ready at 179 s and ready at 180 s of sim time",
+     232
+    ]
+   ]
+  },
+  "src/systems/authority/refinery/refinerySlots.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 2368,
+   "p50Ms": 165,
+   "p95Ms": 2368,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "refinery in co-op shares the slots first come first served",
+     1763
+    ],
+    [
+     "refinery in co-op pays a batch only to the player who queued it, and never collects another's",
+     433
+    ],
+    [
+     "refinery slots refuses a slot the wallet cannot pay",
+     153
+    ]
+   ]
+  },
+  "src/systems/authority/sessionSnapshot.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 900,
+   "p50Ms": 346,
+   "p95Ms": 3870,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "session snapshot: guns (#93) keeps the guns and their hits not yet logged mid-fight through save and load",
+     216
+    ],
+    [
+     "session snapshot restores the exact state it was taken from, through JSON",
+     184
+    ],
+    [
+     "session snapshot: live blasts and the terrain-edit queue (K6 #189) names a malformed live blast and a malformed terrain edit",
+     159
+    ]
+   ]
+  },
+  "src/systems/authority/sliceSectionSnapshot.test.ts": {
+   "feature": "authority",
+   "runs": 19,
+   "lastMs": 99,
+   "p50Ms": 23,
+   "p95Ms": 99,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/stateDigest.test.ts": {
+   "feature": "authority",
+   "runs": 13,
+   "lastMs": 709,
+   "p50Ms": 17,
+   "p95Ms": 709,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "canonical json refuses values nested 100,000 levels deep without overflowing the stack",
+     315
+    ],
+    [
+     "state digest hashes UTF-8 bytes, not UTF-16 code units",
+     116
+    ]
+   ]
+  },
+  "src/systems/authority/teleportDebugRules.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 67,
+   "p50Ms": 54,
+   "p95Ms": 82,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/travelRules.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 164,
+   "p50Ms": 114,
+   "p95Ms": 397,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/authority/vehicleCommands.test.ts": {
+   "feature": "authority",
+   "runs": 18,
+   "lastMs": 43095,
+   "p50Ms": 28975,
+   "p95Ms": 176551,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "vehicle energy has no rounding drift after 10^6 ticks of mixed thrust and drive",
+     42077
+    ],
+    [
+     "vehicle cargo destroys an ore tile with a full hold, keeps the cargo and logs one lost unit",
+     301
+    ],
+    [
+     "vehicle cargo adds one unit per ore tile at any tier and nothing for ground",
+     208
+    ]
+   ]
+  },
+  "src/systems/bot/blastTrade.test.ts": {
+   "feature": "bot",
+   "runs": 14,
+   "lastMs": 204,
+   "p50Ms": 7,
+   "p95Ms": 204,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "blast trade (#109 numbers acceptance 3) reaches the next band faster blasting wherever a tile takes 4x the floor or more",
+     151
+    ]
+   ]
+  },
+  "src/systems/bot/botBlasting.test.ts": {
+   "feature": "bot",
+   "runs": 19,
+   "lastMs": 179675,
+   "p50Ms": 6099,
+   "p95Ms": 179675,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "pacing bot blasting (#109 bot policy) replays a blasting run to the same digests and state",
+     69305
+    ],
+    [
+     "pacing bot blasting (#109 bot policy) blasts tiles slower than the threshold on planet 7, unhurt by its own charges",
+     69040
+    ],
+    [
+     "pacing bot blasting (#109 bot policy) never plants a charge when the run plays without them",
+     41002
+    ]
+   ]
+  },
+  "src/systems/bot/botChargeNeed.test.ts": {
+   "feature": "bot",
+   "runs": 19,
+   "lastMs": 45048,
+   "p50Ms": 13707,
+   "p95Ms": 45048,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "pacing bot charge rack (#129) plays exactly like a run without charges when no tile is slower than the threshold",
+     35509
+    ],
+    [
+     "pacing bot charge rack (#129) buys the rack at the visit after a trip that met a slow tile with none, then blasts",
+     9539
+    ]
+   ]
+  },
+  "src/systems/bot/botCharges.test.ts": {
+   "feature": "bot",
+   "runs": 19,
+   "lastMs": 933,
+   "p50Ms": 163,
+   "p95Ms": 933,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "bot: blasting charges policy (#109) wants charges once it meets a tile it would blast with none in stock (#129)",
+     443
+    ],
+    [
+     "bot: blasting charges policy (#109) backs out of the blast, waits for it, and comes back to an open wall unhurt",
+     140
+    ],
+    [
+     "bot: blasting charges policy (#109) wants no charges for a tile at the threshold, with one in stock, or without charges",
+     132
+    ]
+   ]
+  },
+  "src/systems/bot/botCombat.test.ts": {
+   "feature": "bot",
+   "runs": 19,
+   "lastMs": 13208,
+   "p50Ms": 383,
+   "p95Ms": 13208,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "bot: combat reflex on the move (#29 Gameplay note 3, #130) drives on with its back to a crawler on a planet where it has not been destroyed",
+     8432
+    ],
+    [
+     "bot: combat reflex on the move (#29 Gameplay note 3, #130) drives carelessly again on the next planet after travel",
+     3110
+    ],
+    [
+     "bot: combat reflex on the move (#29 Gameplay note 3, #130) meets a crawler hunting it from behind with the drill head once destroyed on the planet",
+     1666
+    ]
+   ]
+  },
+  "src/systems/bot/botCoreGalleries.test.ts": {
+   "feature": "bot",
+   "runs": 19,
+   "lastMs": 106820,
+   "p50Ms": 7637,
+   "p95Ms": 106820,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "pacing bot core galleries from an off-centre shaft (#136) completes the core of seed 10 planet 9, whose shaft jogs across the core middle",
+     106755
+    ]
+   ]
+  },
+  "src/systems/bot/botCoreRule.test.ts": {
+   "feature": "bot",
+   "runs": 14,
+   "lastMs": 8,
+   "p50Ms": 6,
+   "p95Ms": 12,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/bot/botGuns.test.ts": {
+   "feature": "bot",
+   "runs": 18,
+   "lastMs": 82,
+   "p50Ms": 37,
+   "p95Ms": 82,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/bot/botHeat.test.ts": {
+   "feature": "bot",
+   "runs": 19,
+   "lastMs": 5533,
+   "p50Ms": 697,
+   "p95Ms": 5533,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "bot: shaft round lava (#113) steps the shaft sideways to a clear column and bores on below the pocket",
+     1956
+    ],
+    [
+     "bot: shaft round lava (#113) steps aside to a column clear past the pocket, so a gallery under the jog cannot trap it",
+     1304
+    ],
+    [
+     "bot: shaft round lava (#113) never frees the pocket or touches it on the way",
+     824
+    ]
+   ]
+  },
+  "src/systems/bot/botRefining.test.ts": {
+   "feature": "bot",
+   "runs": 19,
+   "lastMs": 21895,
+   "p50Ms": 17429,
+   "p95Ms": 35455,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "pacing bot refining (#105) queues its haul at the Refinery bay and collects ready batches at the Sell bay",
+     8876
+    ],
+    [
+     "pacing bot refining (#105) replays a refining run to the same digests and state",
+     7514
+    ],
+    [
+     "pacing bot refining (#105) never refines when the run ignores the refinery",
+     5496
+    ]
+   ]
+  },
+  "src/systems/bot/botShopping.test.ts": {
+   "feature": "bot",
+   "runs": 19,
+   "lastMs": 11689,
+   "p50Ms": 4177,
+   "p95Ms": 11689,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "bot: shopping at the Upgrade bay buys drill_tip past its on-curve level for the core once drill power is at its cap",
+     3874
+    ],
+    [
+     "bot: shopping at the Upgrade bay stops buying drill power for the core at the ceiling, however much money is left",
+     3066
+    ],
+    [
+     "bot: shopping at the Upgrade bay spends what the drill power ceiling saves on the other tracks",
+     2924
+    ]
+   ]
   },
   "src/systems/cellRandom.test.ts": {
    "feature": "systems-core",
@@ -5271,6 +4578,19 @@
    "lastMs": 3,
    "p50Ms": 4,
    "p95Ms": 11,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/economy/blastingCharges.test.ts": {
+   "feature": "economy",
+   "runs": 17,
+   "lastMs": 237,
+   "p50Ms": 15,
+   "p95Ms": 237,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791365970990,
@@ -5336,6 +4656,24 @@
     [
      "economy growth past the slice keeps the radius non-decreasing and at most 1000, and the core at most 316 tiles",
      119
+    ]
+   ]
+  },
+  "src/systems/economy/economySourceScan.test.ts": {
+   "feature": "economy",
+   "runs": 25,
+   "lastMs": 185,
+   "p50Ms": 87,
+   "p95Ms": 185,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json",
+     121
     ]
    ]
   },
@@ -5574,11 +4912,95 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/fixedStepClock.test.ts": {
+   "feature": "systems-core",
+   "runs": 18,
+   "lastMs": 620,
+   "p50Ms": 183,
+   "p95Ms": 620,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "fixed-step clock replays a scripted dig-and-return trip to the same digest and events at 30 and 144 fps",
+     610
+    ]
+   ]
+  },
   "src/systems/globalSheetGuard.test.ts": {
    "feature": "systems-core",
    "runs": 14,
    "lastMs": 12,
    "p50Ms": 4,
+   "p95Ms": 12,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/hints/hintAcceptance.test.ts": {
+   "feature": "hints",
+   "runs": 19,
+   "lastMs": 2083,
+   "p50Ms": 2088,
+   "p95Ms": 2772,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "hints over the first ten minutes (#16 acceptance) shows none again after a reload with the seen-set restored",
+     2079
+    ]
+   ]
+  },
+  "src/systems/hints/hintBoard.test.ts": {
+   "feature": "hints",
+   "runs": 18,
+   "lastMs": 1233,
+   "p50Ms": 200,
+   "p95Ms": 1233,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "hint board keeps hint_move up while the vehicle rests on the dock point",
+     471
+    ],
+    [
+     "hint board shows the move, drill, cargo and dock hints in that order on a first trip",
+     168
+    ]
+   ]
+  },
+  "src/systems/hints/hintTable.test.ts": {
+   "feature": "hints",
+   "runs": 14,
+   "lastMs": 6,
+   "p50Ms": 7,
+   "p95Ms": 22,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/hints/transmissionBoard.test.ts": {
+   "feature": "hints",
+   "runs": 14,
+   "lastMs": 6,
+   "p50Ms": 6,
    "p95Ms": 12,
    "passRate": 1,
    "lastStatus": "passed",
@@ -5615,10 +5037,23 @@
   },
   "src/systems/input/inputRouting.test.ts": {
    "feature": "input",
-   "runs": 14,
-   "lastMs": 193,
-   "p50Ms": 8,
+   "runs": 15,
+   "lastMs": 25,
+   "p50Ms": 9,
    "p95Ms": 193,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/input/preferences.test.ts": {
+   "feature": "input",
+   "runs": 15,
+   "lastMs": 18,
+   "p50Ms": 14,
+   "p95Ms": 23,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791365970990,
@@ -5639,10 +5074,80 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/registries/attachCoverage.test.ts": {
+   "feature": "registries",
+   "runs": 12,
+   "lastMs": 262,
+   "p50Ms": 9,
+   "p95Ms": 262,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "attach coverage finds no shared point with every extractor owned and every gear item equipped",
+     120
+    ]
+   ]
+  },
+  "src/systems/registries/blastEffects.test.ts": {
+   "feature": "registries",
+   "runs": 13,
+   "lastMs": 5,
+   "p50Ms": 3,
+   "p95Ms": 5,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/registries/commandRules.test.ts": {
+   "feature": "registries",
+   "runs": 18,
+   "lastMs": 8,
+   "p50Ms": 11,
+   "p95Ms": 16,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/registries/content.test.ts": {
    "feature": "registries",
    "runs": 12,
    "lastMs": 3,
+   "p50Ms": 4,
+   "p95Ms": 7,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/registries/discovery.test.ts": {
+   "feature": "registries",
+   "runs": 14,
+   "lastMs": 3,
+   "p50Ms": 3,
+   "p95Ms": 5,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/registries/gateChecks.test.ts": {
+   "feature": "registries",
+   "runs": 14,
+   "lastMs": 5,
    "p50Ms": 4,
    "p95Ms": 7,
    "passRate": 1,
@@ -5713,6 +5218,19 @@
     ]
    ]
   },
+  "src/systems/registries/saveSections.test.ts": {
+   "feature": "registries",
+   "runs": 13,
+   "lastMs": 17,
+   "p50Ms": 5,
+   "p95Ms": 39,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/registries/scheduleRows.test.ts": {
    "feature": "registries",
    "runs": 12,
@@ -5732,6 +5250,19 @@
    "lastMs": 30,
    "p50Ms": 10,
    "p95Ms": 30,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/registries/vehicleLoadout.test.ts": {
+   "feature": "registries",
+   "runs": 12,
+   "lastMs": 9,
+   "p50Ms": 9,
+   "p95Ms": 11,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791365970990,
@@ -5778,6 +5309,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/render/chargeLook.test.ts": {
+   "feature": "render",
+   "runs": 18,
+   "lastMs": 15,
+   "p50Ms": 8,
+   "p95Ms": 29,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/render/chunkTileBatch.test.ts": {
    "feature": "render",
    "runs": 14,
@@ -5804,6 +5348,24 @@
     ]
    ]
   },
+  "src/systems/render/chunkTileBatchOreLook.test.ts": {
+   "feature": "render",
+   "runs": 20,
+   "lastMs": 350,
+   "p50Ms": 27,
+   "p95Ms": 97,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "ore look at the chunk mesh draws every ore tile in the registered provider's look",
+     350
+    ]
+   ]
+  },
   "src/systems/render/collapseTelegraph.test.ts": {
    "feature": "render",
    "runs": 13,
@@ -5823,6 +5385,19 @@
    "lastMs": 5,
    "p50Ms": 5,
    "p95Ms": 24,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/render/enemyArt.test.ts": {
+   "feature": "render",
+   "runs": 18,
+   "lastMs": 34,
+   "p50Ms": 6,
+   "p95Ms": 34,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791365970990,
@@ -5895,6 +5470,32 @@
     ]
    ]
   },
+  "src/systems/render/groundStrata.test.ts": {
+   "feature": "render",
+   "runs": 17,
+   "lastMs": 10,
+   "p50Ms": 7,
+   "p95Ms": 23,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/render/gunLook.test.ts": {
+   "feature": "render",
+   "runs": 18,
+   "lastMs": 8,
+   "p50Ms": 8,
+   "p95Ms": 20,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/render/headlamp.test.ts": {
    "feature": "render",
    "runs": 12,
@@ -5920,6 +5521,24 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/systems/render/heatTiles.test.ts": {
+   "feature": "render",
+   "runs": 17,
+   "lastMs": 165,
+   "p50Ms": 158,
+   "p95Ms": 202,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "heat planet tiles (#113 Visibility) draws a lava cell in the lava style",
+     116
+    ]
+   ]
   },
   "src/systems/render/oreGrade.test.ts": {
    "feature": "render",
@@ -5986,6 +5605,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/render/refineryBayLook.test.ts": {
+   "feature": "render",
+   "runs": 18,
+   "lastMs": 5,
+   "p50Ms": 4,
+   "p95Ms": 16,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/render/renderScale.test.ts": {
    "feature": "render",
    "runs": 13,
@@ -6025,6 +5657,32 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/render/vehicleLook.test.ts": {
+   "feature": "render",
+   "runs": 18,
+   "lastMs": 13,
+   "p50Ms": 11,
+   "p95Ms": 22,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/render/vehiclePreviewLook.test.ts": {
+   "feature": "render",
+   "runs": 18,
+   "lastMs": 12,
+   "p50Ms": 11,
+   "p95Ms": 19,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/render/viewZoom.test.ts": {
    "feature": "render",
    "runs": 13,
@@ -6055,6 +5713,67 @@
      285
     ]
    ]
+  },
+  "src/systems/replay/replayRun.test.ts": {
+   "feature": "replay",
+   "runs": 18,
+   "lastMs": 34098,
+   "p50Ms": 1898,
+   "p95Ms": 34098,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "replayRun gives the same digests and events when the clock runs in 30 and 144 fps frames",
+     28052
+    ],
+    [
+     "replayRun reproduces the digests a live session logged from the seed and its commands",
+     2809
+    ],
+    [
+     "replayRun ends with the digest of the state at the end tick",
+     1641
+    ]
+   ]
+  },
+  "src/systems/save/saveSlot.test.ts": {
+   "feature": "save",
+   "runs": 19,
+   "lastMs": 1040,
+   "p50Ms": 391,
+   "p95Ms": 7094,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "save slot restores money, upgrades, planet and core bay exactly, through JSON text",
+     438
+    ],
+    [
+     "save slot: refusals refuses a section whose values do not match the digest",
+     135
+    ]
+   ]
+  },
+  "src/systems/save/saveSlotSections.test.ts": {
+   "feature": "save",
+   "runs": 19,
+   "lastMs": 53,
+   "p50Ms": 16,
+   "p95Ms": 881,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
   },
   "src/systems/scenario.test.ts": {
    "feature": "systems-core",
@@ -6097,6 +5816,19 @@
    "lastMs": 13,
    "p50Ms": 3,
    "p95Ms": 13,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/startScenario.test.ts": {
+   "feature": "systems-core",
+   "runs": 13,
+   "lastMs": 5,
+   "p50Ms": 7,
+   "p95Ms": 11,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791365970990,
@@ -6265,6 +5997,115 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/vehicle/vehicleStats.test.ts": {
+   "feature": "vehicle",
+   "runs": 25,
+   "lastMs": 22,
+   "p50Ms": 18,
+   "p95Ms": 30,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/views/bayPresentation.test.ts": {
+   "feature": "views",
+   "runs": 18,
+   "lastMs": 126,
+   "p50Ms": 60,
+   "p95Ms": 126,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/views/chargeViews.test.ts": {
+   "feature": "views",
+   "runs": 18,
+   "lastMs": 658,
+   "p50Ms": 171,
+   "p95Ms": 658,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "HUD: blasting charges (#109) clears the warning once the charge has blown",
+     138
+    ],
+    [
+     "HUD: blasting charges (#109) warns the planter inside the blast with the seconds left on the fuse",
+     130
+    ],
+    [
+     "HUD: blasting charges (#109) warns another vehicle within 16 tiles of the charge, and none further",
+     119
+    ]
+   ]
+  },
+  "src/systems/views/combatStatuses.test.ts": {
+   "feature": "views",
+   "runs": 18,
+   "lastMs": 5685,
+   "p50Ms": 474,
+   "p95Ms": 5685,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "combat statuses on the HUD model warns of a collapse while a block near the vehicle is telegraphing, and not after",
+     5570
+    ]
+   ]
+  },
+  "src/systems/views/heatViews.test.ts": {
+   "feature": "views",
+   "runs": 18,
+   "lastMs": 64,
+   "p50Ms": 62,
+   "p95Ms": 85,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/views/hudModel.test.ts": {
+   "feature": "views",
+   "runs": 18,
+   "lastMs": 2919,
+   "p50Ms": 1793,
+   "p95Ms": 12171,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "HUD model: casing badge (#41) pulses GNAW in amber while a tunnel wrecker gnaws the route (#111 telegraph)",
+     1765
+    ],
+    [
+     "HUD telegraphs lists a winding-up enemy with its octant, arc and the full wind-up left",
+     414
+    ],
+    [
+     "HUD telegraphs leaves idle enemies off the HUD",
+     386
+    ]
+   ]
+  },
   "src/systems/views/menuFocus.test.ts": {
    "feature": "views",
    "runs": 12,
@@ -6277,6 +6118,115 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/systems/views/plaqueModel.test.ts": {
+   "feature": "views",
+   "runs": 15,
+   "lastMs": 21,
+   "p50Ms": 6,
+   "p95Ms": 21,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/views/refineryBayModel.test.ts": {
+   "feature": "views",
+   "runs": 18,
+   "lastMs": 8534,
+   "p50Ms": 220,
+   "p95Ms": 8534,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "refinery bay screen offers each held tier as a batch of at most half the hold, focused first",
+     4368
+    ],
+    [
+     "refinery bay screen shows a running batch with its seconds left and refuses another with slots_busy",
+     2112
+    ],
+    [
+     "refinery bay screen prices the next slot, and says so when every slot is built",
+     1531
+    ]
+   ]
+  },
+  "src/systems/views/sellBayModel.test.ts": {
+   "feature": "views",
+   "runs": 18,
+   "lastMs": 11145,
+   "p50Ms": 600,
+   "p95Ms": 11145,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "sell bay model shows the visit lining bill, what its sales paid and what leaving would forgive (#128)",
+     6107
+    ],
+    [
+     "sell bay model lists a row per held tier and values Sell all exactly as the sale pays (#33 acceptance 8)",
+     3278
+    ],
+    [
+     "sell bay model carries wrong_bay on its buttons when the vehicle is docked at the Upgrade bay",
+     376
+    ]
+   ]
+  },
+  "src/systems/views/upgradeBayModel.test.ts": {
+   "feature": "views",
+   "runs": 19,
+   "lastMs": 428,
+   "p50Ms": 208,
+   "p95Ms": 573,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "upgrade bay model previews each upgrade as the purchase then logs it: cost and statsAfter",
+     104
+    ]
+   ]
+  },
+  "src/systems/views/upgradePreview.test.ts": {
+   "feature": "views",
+   "runs": 18,
+   "lastMs": 953,
+   "p50Ms": 149,
+   "p95Ms": 953,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791365970990,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "upgrade bay preview opens on the first track, so the screen starts with its pending tick shown",
+     157
+    ],
+    [
+     "upgrade bay preview gauges the levels owned since the current tier against the levels to the next",
+     142
+    ],
+    [
+     "upgrade bay preview shows the next casing grade as a lining swatch with the Casing row focused, the vehicle as it is",
+     113
+    ]
+   ]
   },
   "src/systems/world/artefactCache.test.ts": {
    "feature": "world",
@@ -6515,6 +6465,19 @@
     ]
    ]
   },
+  "src/systems/world/generateChunkHooks.test.ts": {
+   "feature": "world",
+   "runs": 20,
+   "lastMs": 113,
+   "p50Ms": 56,
+   "p95Ms": 113,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/world/generateDensity.test.ts": {
    "feature": "world",
    "runs": 13,
@@ -6535,27 +6498,23 @@
   },
   "src/systems/world/generatorGolden.test.ts": {
    "feature": "golden-replay",
-   "runs": 15,
-   "lastMs": 42096,
+   "runs": 16,
+   "lastMs": 5412,
    "p50Ms": 3842,
    "p95Ms": 42096,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "generator golden digest makes the committed planet 2 for world seed 4000000000",
-     20753
+     3308
     ],
     [
      "generator golden digest makes the committed planet 1 for world seed 83921",
-     20674
-    ],
-    [
-     "generator golden digest makes the committed chunks, negative coordinates included, on planet 2^40",
-     395
+     1943
     ]
    ]
   },
@@ -6716,6 +6675,63 @@
     ]
    ]
   },
+  "src/ui/hud/hudPanels.test.ts": {
+   "feature": "ui",
+   "runs": 20,
+   "lastMs": 86,
+   "p50Ms": 53,
+   "p95Ms": 86,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/ui/iconCoverage.test.ts": {
+   "feature": "ui",
+   "runs": 20,
+   "lastMs": 133,
+   "p50Ms": 75,
+   "p95Ms": 133,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "icon registry coverage resolves every id the kernel and the loaded slices name, the ore of planets 1 to 100 included",
+     112
+    ]
+   ]
+  },
+  "src/ui/screenIds.test.ts": {
+   "feature": "ui",
+   "runs": 20,
+   "lastMs": 21365,
+   "p50Ms": 909,
+   "p95Ms": 7957,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "screen ids (#33 acceptance 12) renders every UI_IDS id somewhere with the model value as its text",
+     19970
+    ],
+    [
+     "screen ids (#33 acceptance 12) marks the preview with the focused track and the tier after its purchase, digest untouched",
+     833
+    ],
+    [
+     "screen ids (#33 acceptance 12) carries the tier and family on every shop row",
+     563
+    ]
+   ]
+  },
   "src/systems/art/workshopShowcaseArt.test.ts": {
    "feature": "art",
    "runs": 17,
@@ -6731,31 +6747,26 @@
   },
   "src/systems/authority/charges/chargeBlastGates.test.ts": {
    "feature": "authority",
-   "runs": 17,
-   "lastMs": 523,
+   "runs": 18,
+   "lastMs": 179,
    "p50Ms": 110,
    "p95Ms": 523,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "charge blast gates tells the gate checks the blast and its planter",
-     228
-    ]
-   ]
+   "slowest": []
   },
   "src/store/touchRuntime.test.ts": {
    "feature": "store",
-   "runs": 16,
-   "lastMs": 123,
-   "p50Ms": 25,
+   "runs": 17,
+   "lastMs": 78,
+   "p50Ms": 27,
    "p95Ms": 123,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -6858,27 +6869,27 @@
   },
   "src/systems/authority/charges/chargeLiveBlast.test.ts": {
    "feature": "authority",
-   "runs": 15,
-   "lastMs": 4949,
+   "runs": 16,
+   "lastMs": 11642,
    "p50Ms": 2092,
    "p95Ms": 24811,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "live blast clears a blast in solid rock in ceil(inRadiusCount / 64) ticks, 64 tiles a tick, for R4 to R24",
-     2668
+     6599
     ],
     [
-     "live blast keeps the ore units one break of the whole blast would: floor(n * 0.4 + d) per tier",
-     514
+     "live blast finishes the same crater after a save mid-blast and a load",
+     1489
     ],
     [
-     "live blast leaves core tiles standing and does not count them against the 64 a tick",
-     508
+     "live blast: gated cells (#153 amendment) frees dynamite-gated cells whole only for a charge of at least their minCharge",
+     895
     ]
    ]
   },
@@ -6897,27 +6908,27 @@
   },
   "src/systems/authority/terrain/terrainEditQueue.test.ts": {
    "feature": "authority",
-   "runs": 15,
-   "lastMs": 3146,
+   "runs": 16,
+   "lastMs": 957,
    "p50Ms": 615,
    "p95Ms": 3146,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
+     "terrain edit queue clears R24 in 29 ticks with 4 players drilling and a pocket landing on its first tick",
+     335
+    ],
+    [
      "terrain edit queue gives the same digest when the blast, the drilling and the pocket replay",
-     1234
+     259
     ],
     [
      "terrain edit queue finishes the deferred pocket within 10 ticks of the blast going live",
-     1050
-    ],
-    [
-     "terrain edit queue clears R24 in 29 ticks with 4 players drilling and a pocket landing on its first tick",
-     498
+     207
     ]
    ]
   },
@@ -6993,29 +7004,34 @@
   },
   "src/registries/discoveryKinds.test.ts": {
    "feature": "unmapped",
-   "runs": 12,
-   "lastMs": 24,
+   "runs": 13,
+   "lastMs": 9,
    "p50Ms": 9,
    "p95Ms": 24,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/debug/debugOverlay.test.ts": {
    "feature": "debug",
-   "runs": 12,
-   "lastMs": 4,
+   "runs": 13,
+   "lastMs": 168,
    "p50Ms": 4,
-   "p95Ms": 6,
+   "p95Ms": 168,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "debug api: the HUD overlay (#208) counts the seated cards with no eviction up to the cap",
+     166
+    ]
+   ]
   },
   "src/systems/render/screenProjection.test.ts": {
    "feature": "render",
@@ -7084,34 +7100,29 @@
   },
   "src/scene/registries/worldPieces.test.ts": {
    "feature": "scene",
-   "runs": 10,
-   "lastMs": 24,
+   "runs": 11,
+   "lastMs": 34,
    "p50Ms": 5,
-   "p95Ms": 24,
+   "p95Ms": 34,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/scene/vehicleStage.test.ts": {
    "feature": "scene",
-   "runs": 10,
-   "lastMs": 187,
-   "p50Ms": 38,
+   "runs": 11,
+   "lastMs": 43,
+   "p50Ms": 41,
    "p95Ms": 187,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "vehicle stage stages nothing and passes the intent through with no provider registered",
-     128
-    ]
-   ]
+   "slowest": []
   },
   "src/systems/registries/buildingAttach.test.ts": {
    "feature": "registries",
@@ -7141,13 +7152,13 @@
   },
   "src/systems/save/saveMigrations.test.ts": {
    "feature": "save",
-   "runs": 8,
-   "lastMs": 66,
-   "p50Ms": 40,
-   "p95Ms": 66,
+   "runs": 9,
+   "lastMs": 84,
+   "p50Ms": 41,
+   "p95Ms": 84,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -7167,13 +7178,13 @@
   },
   "src/registries/artAssets.test.ts": {
    "feature": "unmapped",
-   "runs": 10,
-   "lastMs": 95,
-   "p50Ms": 25,
-   "p95Ms": 95,
+   "runs": 11,
+   "lastMs": 112,
+   "p50Ms": 31,
+   "p95Ms": 112,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -7193,27 +7204,27 @@
   },
   "src/systems/bot/botSlicePurchases.test.ts": {
    "feature": "bot",
-   "runs": 8,
-   "lastMs": 9118,
-   "p50Ms": 3694,
+   "runs": 9,
+   "lastMs": 5417,
+   "p50Ms": 3909,
    "p95Ms": 9118,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "bot: slice purchases makes the Upgrade bay worth a visit when only a slice purchase pays",
-     2886
+     "bot: slice purchases buys a registered slice purchase after the kernel purchases, through its command",
+     1401
     ],
     [
-     "bot: slice purchases keeps the next service paid for: a badge that would leave less is not bought",
-     2116
+     "bot: slice purchases puts the slice purchases' estimates in the spend-share diagnostic",
+     875
     ],
     [
      "bot: slice purchases buys nothing beyond the kernel purchases while no slice registered one",
-     1591
+     857
     ]
    ]
   },
@@ -7232,13 +7243,13 @@
   },
   "src/ui/screens/sliceScreen.test.ts": {
    "feature": "ui",
-   "runs": 7,
-   "lastMs": 35,
+   "runs": 8,
+   "lastMs": 59,
    "p50Ms": 20,
-   "p95Ms": 35,
+   "p95Ms": 59,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -7401,94 +7412,100 @@
   },
   "src/ui/kit/itemCard.test.ts": {
    "feature": "ui",
-   "runs": 7,
-   "lastMs": 807,
+   "runs": 8,
+   "lastMs": 1518,
    "p50Ms": 182,
-   "p95Ms": 807,
+   "p95Ms": 1518,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "item card: shop row shows a closed compact row as the name, the first stat line with its change and the cost",
-     212
+     "item card: empty fast path draws exactly today’s screens while no describer is registered",
+     686
     ],
     [
      "item card: shop row opens the full card in place on the focused row, with every stat line field",
-     163
+     183
     ],
     [
-     "item card: platform card draws the next refinery slot as the full card with the describer’s lines",
-     145
+     "item card: shop row buys nothing on the first tap and buys once on the second",
+     154
     ]
    ]
   },
   "src/systems/registries/clockSteps.test.ts": {
    "feature": "registries",
-   "runs": 5,
-   "lastMs": 2109,
+   "runs": 6,
+   "lastMs": 342,
    "p50Ms": 42,
    "p95Ms": 2109,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "slice clock steps runs a registered step at the tick it named, its event stamped with that tick",
-     1341
-    ],
-    [
-     "slice clock steps gives the same events and state jumping or stepping one tick or eight at a time",
-     531
-    ],
-    [
-     "slice clock steps moves a quiet clock on when a step names a tick already reached",
-     236
+     193
     ]
    ]
   },
   "src/systems/registries/dockServices.test.ts": {
    "feature": "registries",
-   "runs": 5,
-   "lastMs": 61,
+   "runs": 6,
+   "lastMs": 245,
    "p50Ms": 53,
-   "p95Ms": 64,
+   "p95Ms": 245,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "dock services runs a registered service right after a paid recharge, as part of that command",
+     115
+    ]
+   ]
   },
   "src/ui/touch/touchSlots.test.ts": {
    "feature": "ui",
-   "runs": 6,
-   "lastMs": 106,
-   "p50Ms": 15,
-   "p95Ms": 106,
+   "runs": 7,
+   "lastMs": 108,
+   "p50Ms": 16,
+   "p95Ms": 108,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/features/ore-visuals/systems/oreAtlasAsset.test.ts": {
    "feature": "ore-visuals",
-   "runs": 5,
-   "lastMs": 176,
+   "runs": 6,
+   "lastMs": 434,
    "p50Ms": 100,
-   "p95Ms": 176,
+   "p95Ms": 434,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "ore atlas asset ships the placeholder sidecar with exactly these parts, valid under schema 1",
+     216
+    ],
+    [
+     "ore atlas asset ships the exported sidecar with exactly these parts, valid under schema 1",
+     125
+    ]
+   ]
   },
   "src/features/ore-visuals/systems/oreAtlasLayout.test.ts": {
    "feature": "ore-visuals",
@@ -7536,65 +7553,62 @@
   },
   "src/features/ore-visuals/systems/render/oreLookProvider.test.ts": {
    "feature": "ore-visuals",
-   "runs": 5,
-   "lastMs": 8065,
+   "runs": 6,
+   "lastMs": 201,
    "p50Ms": 180,
    "p95Ms": 8065,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "ore look provider keeps every colour channel inside 0..1 for every family and tier",
-     5892
-    ],
-    [
-     "ore look provider ranks every volcanic tier above the one below it in greyscale, inside the family luma band",
-     416
-    ],
-    [
-     "ore look provider gives G1 and G2 no glow and no sparkle, and every grade above them both",
-     318
+     142
     ]
    ]
   },
   "src/logging/chargeDetonationLine.test.ts": {
    "feature": "logging",
-   "runs": 4,
-   "lastMs": 3,
-   "p50Ms": 3,
-   "p95Ms": 9,
+   "runs": 5,
+   "lastMs": 77,
+   "p50Ms": 5,
+   "p95Ms": 77,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/scene/registries/sceneLayerBudget.test.ts": {
    "feature": "scene",
-   "runs": 4,
-   "lastMs": 12,
+   "runs": 5,
+   "lastMs": 123,
    "p50Ms": 5,
-   "p95Ms": 12,
+   "p95Ms": 123,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "scene layer budget keeps the loaded slices' layers within the scene-layer line",
+     122
+    ]
+   ]
   },
   "src/scene/SceneLayers.test.ts": {
    "feature": "scene",
-   "runs": 4,
-   "lastMs": 9,
+   "runs": 5,
+   "lastMs": 85,
    "p50Ms": 9,
-   "p95Ms": 12,
+   "p95Ms": 85,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -7704,34 +7718,43 @@
   },
   "src/features/tech-tree/debug.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
-   "lastMs": 206,
-   "p50Ms": 117,
-   "p95Ms": 206,
+   "runs": 3,
+   "lastMs": 519,
+   "p50Ms": 206,
+   "p95Ms": 519,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "tech tree: debug actions unlocks the whole authored tree, combos included",
-     122
+     271
+    ],
+    [
+     "tech tree: debug actions jumps to depth N: every node whose tier is at most N is researched",
+     135
     ]
    ]
   },
   "src/features/tech-tree/store/treeScreenStore.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
-   "lastMs": 44,
-   "p50Ms": 44,
-   "p95Ms": 81,
+   "runs": 3,
+   "lastMs": 307,
+   "p50Ms": 81,
+   "p95Ms": 307,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": []
+   "slowest": [
+    [
+     "tech tree screen store researches a node for the local player through the authority",
+     285
+    ]
+   ]
   },
   "src/features/tech-tree/systems/markLadder.test.ts": {
    "feature": "tech-tree",
@@ -7761,31 +7784,26 @@
   },
   "src/features/tech-tree/systems/nodeCost.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
-   "lastMs": 204,
-   "p50Ms": 46,
+   "runs": 3,
+   "lastMs": 64,
+   "p50Ms": 64,
    "p95Ms": 204,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "tech tree: node cost charges bandOrePriceAt of k g^depth band-5 units, paced at the unlock planet, for every kind",
-     183
-    ]
-   ]
+   "slowest": []
   },
   "src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
+   "runs": 3,
    "lastMs": 0,
    "p50Ms": 0,
    "p95Ms": 0,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -7805,83 +7823,68 @@
   },
   "src/features/tech-tree/systems/researchBotPurchase.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
-   "lastMs": 9911,
+   "runs": 3,
+   "lastMs": 4625,
    "p50Ms": 4784,
    "p95Ms": 9911,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "tech tree: the pacing bot researches researches nodes through the purchase seam after its own Upgrade bay purchases",
-     3779
-    ],
-    [
-     "tech tree: the pacing bot researches buys nothing from the tree while no lane has registered a node",
-     3304
+     1784
     ],
     [
      "tech tree: the pacing bot researches puts the tree's spend in the spend-share diagnostic",
-     2600
+     1517
+    ],
+    [
+     "tech tree: the pacing bot researches buys nothing from the tree while no lane has registered a node",
+     1205
     ]
    ]
   },
   "src/features/tech-tree/systems/techTree.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
-   "lastMs": 367,
-   "p50Ms": 31,
+   "runs": 3,
+   "lastMs": 102,
+   "p50Ms": 102,
    "p95Ms": 367,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "tech tree: Marks ends a ladder at mastery: no Mark exists past it",
-     101
-    ]
-   ]
+   "slowest": []
   },
   "src/features/tech-tree/systems/techTreeCommands.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
-   "lastMs": 335,
+   "runs": 3,
+   "lastMs": 103,
    "p50Ms": 276,
    "p95Ms": 335,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "tech tree: commands and logs replays research to the same digests, jumping or at 30 and 144 frames per second",
-     304
-    ]
-   ]
+   "slowest": []
   },
   "src/features/tech-tree/systems/treeScreenModel.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
-   "lastMs": 395,
-   "p50Ms": 90,
+   "runs": 3,
+   "lastMs": 160,
+   "p50Ms": 160,
    "p95Ms": 395,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "tech tree screen: lanes shows every lane as coming soon while no lane slice has registered a node",
-     166
-    ]
-   ]
+   "slowest": []
   },
   "src/features/tech-tree/systems/treeShape.test.ts": {
    "feature": "tech-tree",
@@ -7898,128 +7901,97 @@
   },
   "src/features/tech-tree/systems/unlockRules.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
-   "lastMs": 3604,
-   "p50Ms": 118,
+   "runs": 3,
+   "lastMs": 415,
+   "p50Ms": 415,
    "p95Ms": 3604,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "tech tree: researching a node researches a reached node, paying its cost on the current planet",
-     981
-    ],
-    [
-     "tech tree: researching a node refuses a node whose prerequisite is not researched",
-     430
-    ],
-    [
-     "tech tree: researching a node researches Marks in order from their tier, each needing the one before",
-     413
-    ]
-   ]
+   "slowest": []
   },
   "src/features/tech-tree/ui/techTreeScreen.test.ts": {
    "feature": "tech-tree",
-   "runs": 2,
-   "lastMs": 4118,
-   "p50Ms": 70,
+   "runs": 3,
+   "lastMs": 121,
+   "p50Ms": 121,
    "p95Ms": 4118,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "tech tree screen draws the registered nodes on their lanes, with the next-up strip",
-     1878
-    ],
-    [
-     "tech tree screen opens from its HUD button into the kernel screen slot, and Back dismisses it",
-     1000
-    ],
-    [
-     "tech tree screen focuses one lane's cards, then one node's card with its Research button",
-     671
-    ]
-   ]
+   "slowest": []
   },
   "src/systems/authority/authorityReactions.test.ts": {
    "feature": "authority",
-   "runs": 2,
-   "lastMs": 3325,
-   "p50Ms": 220,
+   "runs": 3,
+   "lastMs": 562,
+   "p50Ms": 562,
    "p95Ms": 3325,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "authority reactions leaves every answer byte-identical when a reaction changes nothing",
-     1532
+     "authority reactions reacts on each clock tick once per player, stamped for the player whose events it heard",
+     172
     ],
     [
-     "authority reactions reacts on each clock tick once per player, stamped for the player whose events it heard",
-     836
+     "authority reactions leaves every answer byte-identical when a reaction changes nothing",
+     167
     ],
     [
      "authority reactions carries a reaction's state into the answer",
-     405
+     126
     ]
    ]
   },
   "src/systems/authority/builtFacilities.test.ts": {
    "feature": "authority",
-   "runs": 2,
-   "lastMs": 194,
+   "runs": 3,
+   "lastMs": 6,
    "p50Ms": 10,
    "p95Ms": 194,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "built facilities builds a registered dock building from its schedule row planet on",
-     189
-    ]
-   ]
+   "slowest": []
   },
   "src/systems/registries/dockFacilities.test.ts": {
    "feature": "registries",
-   "runs": 2,
-   "lastMs": 5,
+   "runs": 3,
+   "lastMs": 141,
    "p50Ms": 5,
-   "p95Ms": 5,
+   "p95Ms": 141,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/features/codex/logging.test.ts": {
    "feature": "codex",
-   "runs": 1,
-   "lastMs": 170,
+   "runs": 2,
+   "lastMs": 244,
    "p50Ms": 170,
-   "p95Ms": 170,
+   "p95Ms": 244,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "codex run events logs contact, discovery and both entries as schema-valid run events",
-     170
+     244
     ]
    ]
   },
@@ -8038,76 +8010,68 @@
   },
   "src/features/codex/systems/codexAliases.test.ts": {
    "feature": "codex",
-   "runs": 1,
-   "lastMs": 110,
+   "runs": 2,
+   "lastMs": 337,
    "p50Ms": 110,
-   "p95Ms": 110,
+   "p95Ms": 337,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/features/codex/systems/codexReaction.test.ts": {
-   "feature": "codex",
-   "runs": 1,
-   "lastMs": 3156,
-   "p50Ms": 3156,
-   "p95Ms": 3156,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "codex discovery reaction says nothing more for a type the player already mined",
-     1485
-    ],
+     "codex across the ores alias table shows no repeat plaque when the same type is mined after the move",
+     161
+    ]
+   ]
+  },
+  "src/features/codex/systems/codexReaction.test.ts": {
+   "feature": "codex",
+   "runs": 2,
+   "lastMs": 320,
+   "p50Ms": 320,
+   "p95Ms": 3156,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
     [
-     "codex discovery reaction records a type's first drill touch and first unit in the hold, stamped with the command",
-     1227
-    ],
-    [
-     "codex discovery reaction answers the kernel discovery query from the section, not the planet reached",
-     208
+     "codex discovery reaction gives each of two players mining the same types on the same tick their own discoveries",
+     140
     ]
    ]
   },
   "src/features/codex/systems/codexSection.test.ts": {
    "feature": "codex",
-   "runs": 1,
-   "lastMs": 611,
-   "p50Ms": 611,
+   "runs": 2,
+   "lastMs": 148,
+   "p50Ms": 148,
    "p95Ms": 611,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
-   "slowest": [
-    [
-     "codex section stays out of the state until the player touches an ore",
-     537
-    ]
-   ]
+   "slowest": []
   },
   "src/features/codex/systems/codexSize.test.ts": {
    "feature": "codex",
-   "runs": 1,
-   "lastMs": 166,
+   "runs": 2,
+   "lastMs": 184,
    "p50Ms": 166,
-   "p95Ms": 166,
+   "p95Ms": 184,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "codex size stays within 4 KB in the snapshot after every ore type of planets 1 to 600",
-     166
+     184
     ]
    ]
   },
@@ -8126,29 +8090,86 @@
   },
   "src/ui/platform/bayPanels.test.ts": {
    "feature": "ui",
-   "runs": 1,
-   "lastMs": 1472,
-   "p50Ms": 1472,
+   "runs": 2,
+   "lastMs": 50,
+   "p50Ms": 50,
    "p95Ms": 1472,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791365970990,
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/dock-buildings/store/unlockPanStore.test.ts": {
+   "feature": "dock-buildings",
+   "runs": 1,
+   "lastMs": 333,
+   "p50Ms": 333,
+   "p95Ms": 333,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "bay money counter shows the authority wallet with no provider, exactly as before the seam",
-     867
-    ],
-    [
-     "bay money counter shows the provider's rolled money, formatted once, and keeps the wallet as the exact value",
-     243
-    ],
-    [
-     "layer above the bay screen draws nothing while no above-bay panel is registered",
-     173
+     "unlock pan pans the camera onto the new building once the pad is on screen, then hands it back",
+     165
     ]
    ]
+  },
+  "src/features/dock-buildings/systems/dockAddOnArt.test.ts": {
+   "feature": "dock-buildings",
+   "runs": 1,
+   "lastMs": 35,
+   "p50Ms": 35,
+   "p95Ms": 35,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/tech-tree/systems/render/techGear.test.ts": {
+   "feature": "tech-tree",
+   "runs": 1,
+   "lastMs": 39,
+   "p50Ms": 39,
+   "p95Ms": 39,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/logging/reportRows.test.ts": {
+   "feature": "logging",
+   "runs": 1,
+   "lastMs": 5,
+   "p50Ms": 5,
+   "p95Ms": 5,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/registries/catalogueIds.test.ts": {
+   "feature": "registries",
+   "runs": 1,
+   "lastMs": 98,
+   "p50Ms": 98,
+   "p95Ms": 98,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791369160633,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
   }
  }
 }
