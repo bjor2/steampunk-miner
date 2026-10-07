@@ -3,9 +3,9 @@
   "logSchemaVersion": 4,
   "outcome": "ended",
   "endReason": "slice_completed",
-  "durationTicks": 365647,
-  "durationSeconds": 6094.116666666667,
-  "eventCount": 20256,
+  "durationTicks": 395362,
+  "durationSeconds": 6589.366666666667,
+  "eventCount": 23315,
   "planetsVisited": [
     1,
     2
@@ -15,33 +15,33 @@
   "tilesDestroyed": 0,
   "resourceUnitsCollected": 0,
   "resourceValueCollected": "0e+0",
-  "moneyEarned": "3.5231539e+4",
-  "moneySpent": "3.4477764e+4",
-  "upgradeSpending": "3.3424e+4",
-  "repairSpending": "1.56262e+2",
-  "chargingSpending": "4.4025e+2",
+  "moneyEarned": "3.7856068e+4",
+  "moneySpent": "3.7375467e+4",
+  "upgradeSpending": "3.6158e+4",
+  "repairSpending": "2.03006e+2",
+  "chargingSpending": "4.43998e+2",
   "travelSpending": "6.075e+1",
-  "rescueFees": "2.9618e+1",
-  "liningSpending": "3.66884e+2",
-  "liningCharged": "3.75374e+2",
+  "rescueFees": "6.6479e+1",
+  "liningSpending": "4.43234e+2",
+  "liningCharged": "4.51741e+2",
   "liningForgiven": "0e+0",
-  "upgradesPurchased": 86,
+  "upgradesPurchased": 856,
   "coreFragmentsHarvested": 190,
-  "enemiesKilled": 34,
-  "vehicleDeaths": 1,
+  "enemiesKilled": 17,
+  "vehicleDeaths": 2,
   "damageTaken": "0e+0",
   "debugCommandsApplied": 0,
   "upgradeLevels": {
-    "hull": 8,
-    "cargo_hold": 15,
-    "drill_tip": 10,
-    "drill_power": 20,
-    "engine": 16,
-    "boiler": 17
+    "hull": 80,
+    "cargo_hold": 160,
+    "drill_tip": 108,
+    "drill_power": 200,
+    "engine": 136,
+    "boiler": 172
   },
   "coreCompletedTicks": {
-    "1": 211117,
-    "2": 365565
+    "1": 205763,
+    "2": 395362
   },
   "firstBandDigTicks": {
     "1": {
@@ -67,22 +67,22 @@
     "arrival": {
       "1": {},
       "2": {
-        "hull": 2,
-        "cargo_hold": 11,
-        "drill_tip": 7,
-        "drill_power": 14,
-        "engine": 10,
-        "boiler": 8
+        "hull": 20,
+        "cargo_hold": 97,
+        "drill_tip": 70,
+        "drill_power": 140,
+        "engine": 59,
+        "boiler": 95
       }
     },
     "departure": {
       "1": {
-        "hull": 2,
-        "cargo_hold": 11,
-        "drill_tip": 7,
-        "drill_power": 14,
-        "engine": 10,
-        "boiler": 8
+        "hull": 20,
+        "cargo_hold": 97,
+        "drill_tip": 70,
+        "drill_power": 140,
+        "engine": 59,
+        "boiler": 95
       }
     }
   },
@@ -129,7 +129,15 @@
     ],
     [
       "kernel.metal.t2",
-      19
+      15
+    ],
+    [
+      "kernel.crystal.t2",
+      5
+    ],
+    [
+      "kernel.metal.t2",
+      13
     ],
     [
       "kernel.crystal.t2",
@@ -165,7 +173,7 @@
     ],
     [
       "kernel.metal.t3",
-      45
+      30
     ],
     [
       "kernel.metal.t4",
@@ -177,7 +185,15 @@
     ],
     [
       "kernel.metal.t4",
-      76
+      58
+    ],
+    [
+      "kernel.metal.t2",
+      6
+    ],
+    [
+      "kernel.metal.t4",
+      18
     ],
     [
       "kernel.crystal.t4",
@@ -189,11 +205,11 @@
     ],
     [
       "kernel.crystal.t4",
-      4
+      5
     ],
     [
       "kernel.metal.t4",
-      10
+      14
     ],
     [
       "kernel.metal.t5",
@@ -202,6 +218,30 @@
     [
       "kernel.crystal.t5",
       10
+    ],
+    [
+      "kernel.crystal.t4",
+      5
+    ],
+    [
+      "kernel.metal.t5",
+      24
+    ],
+    [
+      "kernel.crystal.t5",
+      10
+    ],
+    [
+      "kernel.crystal.t4",
+      5
+    ],
+    [
+      "kernel.crystal.t5",
+      2
+    ],
+    [
+      "kernel.metal.t2",
+      17
     ],
     [
       "kernel.crystal.t4",
@@ -225,15 +265,7 @@
     ],
     [
       "kernel.crystal.t5",
-      36
-    ],
-    [
-      "kernel.metal.t5",
-      3
-    ],
-    [
-      "kernel.crystal.t5",
-      7
+      40
     ],
     [
       "kernel.metal.t5",
@@ -325,23 +357,7 @@
     ],
     [
       "kernel.metal.t6",
-      24
-    ],
-    [
-      "kernel.crystal.t6",
-      3
-    ],
-    [
-      "kernel.metal.t6",
-      1
-    ],
-    [
-      "kernel.crystal.t6",
-      5
-    ],
-    [
-      "kernel.metal.t6",
-      3
+      19
     ],
     [
       "kernel.crystal.t6",
@@ -361,11 +377,19 @@
     ],
     [
       "kernel.metal.t7",
-      5
+      6
     ],
     [
       "kernel.crystal.t7",
-      10
+      24
+    ],
+    [
+      "kernel.metal.t7",
+      3
+    ],
+    [
+      "kernel.crystal.t7",
+      25
     ],
     [
       "kernel.metal.t7",
@@ -386,29 +410,29 @@
   ],
   "minedUnitsByOre": {
     "kernel.metal.t1": 28,
-    "kernel.crystal.t2": 27,
-    "kernel.metal.t2": 82,
-    "kernel.metal.t3": 109,
+    "kernel.crystal.t2": 32,
+    "kernel.metal.t2": 114,
+    "kernel.metal.t3": 94,
     "kernel.crystal.t3": 18,
-    "kernel.metal.t4": 110,
-    "kernel.crystal.t4": 10,
-    "kernel.metal.t5": 37,
-    "kernel.crystal.t5": 71,
-    "kernel.crystal.t6": 71,
-    "kernel.metal.t6": 95,
-    "kernel.crystal.t7": 39,
-    "kernel.metal.t7": 10,
+    "kernel.metal.t4": 114,
+    "kernel.crystal.t4": 21,
+    "kernel.metal.t5": 58,
+    "kernel.crystal.t5": 80,
+    "kernel.crystal.t6": 63,
+    "kernel.metal.t6": 86,
+    "kernel.crystal.t7": 78,
+    "kernel.metal.t7": 14,
     "kernel.crystal.t8": 10,
     "kernel.metal.t8": 7
   },
   "milestones": {
     "planetReached": {
       "1": 0,
-      "2": 211213
+      "2": 235612
     },
     "firstSale": 5700,
     "firstUpgrade": 5820,
-    "firstDeath": 21998,
-    "firstCoreCompleted": 211117
+    "firstDeath": 139684,
+    "firstCoreCompleted": 205763
   }
 }
