@@ -3,9 +3,9 @@
   "logSchemaVersion": 4,
   "outcome": "ended",
   "endReason": "slice_completed",
-  "durationTicks": 395362,
-  "durationSeconds": 6589.366666666667,
-  "eventCount": 23315,
+  "durationTicks": 329578,
+  "durationSeconds": 5492.966666666666,
+  "eventCount": 19443,
   "planetsVisited": [
     1,
     2
@@ -15,33 +15,33 @@
   "tilesDestroyed": 0,
   "resourceUnitsCollected": 0,
   "resourceValueCollected": "0e+0",
-  "moneyEarned": "3.7856068e+4",
-  "moneySpent": "3.7375467e+4",
-  "upgradeSpending": "3.6158e+4",
-  "repairSpending": "2.03006e+2",
-  "chargingSpending": "4.43998e+2",
+  "moneyEarned": "3.7467829e+4",
+  "moneySpent": "3.7109797e+4",
+  "upgradeSpending": "3.6104e+4",
+  "repairSpending": "1.95473e+2",
+  "chargingSpending": "3.76217e+2",
   "travelSpending": "6.075e+1",
-  "rescueFees": "6.6479e+1",
-  "liningSpending": "4.43234e+2",
-  "liningCharged": "4.51741e+2",
+  "rescueFees": "0e+0",
+  "liningSpending": "3.73357e+2",
+  "liningCharged": "3.78724e+2",
   "liningForgiven": "0e+0",
-  "upgradesPurchased": 856,
+  "upgradesPurchased": 837,
   "coreFragmentsHarvested": 190,
-  "enemiesKilled": 17,
-  "vehicleDeaths": 2,
+  "enemiesKilled": 16,
+  "vehicleDeaths": 0,
   "damageTaken": "0e+0",
   "debugCommandsApplied": 0,
   "upgradeLevels": {
     "hull": 80,
-    "cargo_hold": 160,
-    "drill_tip": 108,
+    "cargo_hold": 150,
+    "drill_tip": 110,
     "drill_power": 200,
-    "engine": 136,
-    "boiler": 172
+    "engine": 137,
+    "boiler": 160
   },
   "coreCompletedTicks": {
-    "1": 205763,
-    "2": 395362
+    "1": 193594,
+    "2": 329578
   },
   "firstBandDigTicks": {
     "1": {
@@ -69,370 +69,359 @@
       "2": {
         "hull": 20,
         "cargo_hold": 97,
-        "drill_tip": 70,
+        "drill_tip": 71,
         "drill_power": 140,
-        "engine": 59,
-        "boiler": 95
+        "engine": 68,
+        "boiler": 102
       }
     },
     "departure": {
       "1": {
         "hull": 20,
         "cargo_hold": 97,
-        "drill_tip": 70,
+        "drill_tip": 71,
         "drill_power": 140,
-        "engine": 59,
-        "boiler": 95
+        "engine": 68,
+        "boiler": 102
       }
     }
   },
   "minedOrder": [
     [
-      "kernel.metal.t1",
+      "metal_t1",
       28
     ],
     [
-      "kernel.crystal.t2",
+      "crystal_t2",
       5
     ],
     [
-      "kernel.metal.t2",
-      22
-    ],
-    [
-      "kernel.crystal.t2",
-      4
-    ],
-    [
-      "kernel.metal.t2",
+      "metal_t2",
       10
     ],
     [
-      "kernel.crystal.t2",
+      "metal_t3",
+      5
+    ],
+    [
+      "metal_t2",
+      7
+    ],
+    [
+      "crystal_t2",
+      4
+    ],
+    [
+      "metal_t2",
+      10
+    ],
+    [
+      "crystal_t2",
       2
     ],
     [
-      "kernel.metal.t2",
+      "metal_t2",
       26
     ],
     [
-      "kernel.crystal.t2",
-      7
-    ],
-    [
-      "kernel.metal.t2",
-      3
-    ],
-    [
-      "kernel.crystal.t2",
-      5
-    ],
-    [
-      "kernel.metal.t2",
-      15
-    ],
-    [
-      "kernel.crystal.t2",
-      5
-    ],
-    [
-      "kernel.metal.t2",
-      13
-    ],
-    [
-      "kernel.crystal.t2",
-      4
-    ],
-    [
-      "kernel.metal.t2",
+      "crystal_t2",
       2
     ],
     [
-      "kernel.metal.t3",
+      "crystal_t3",
+      3
+    ],
+    [
+      "crystal_t2",
+      2
+    ],
+    [
+      "metal_t2",
+      3
+    ],
+    [
+      "crystal_t2",
+      3
+    ],
+    [
+      "crystal_t3",
+      2
+    ],
+    [
+      "metal_t2",
+      13
+    ],
+    [
+      "crystal_t2",
+      4
+    ],
+    [
+      "metal_t2",
+      2
+    ],
+    [
+      "metal_t3",
       48
     ],
     [
-      "kernel.crystal.t3",
+      "crystal_t3",
       5
     ],
     [
-      "kernel.metal.t3",
+      "metal_t3",
       8
     ],
     [
-      "kernel.crystal.t3",
+      "crystal_t3",
       8
     ],
     [
-      "kernel.metal.t3",
+      "metal_t3",
       5
     ],
     [
-      "kernel.crystal.t3",
+      "crystal_t4",
       5
     ],
     [
-      "kernel.metal.t3",
-      30
+      "metal_t3",
+      16
     ],
     [
-      "kernel.metal.t4",
+      "metal_t4",
+      5
+    ],
+    [
+      "metal_t3",
+      32
+    ],
+    [
+      "metal_t4",
       10
     ],
     [
-      "kernel.metal.t3",
+      "metal_t3",
       3
     ],
     [
-      "kernel.metal.t4",
+      "metal_t4",
       58
     ],
     [
-      "kernel.metal.t2",
-      6
+      "metal_t5",
+      10
     ],
     [
-      "kernel.metal.t4",
-      18
+      "metal_t4",
+      10
     ],
     [
-      "kernel.crystal.t4",
-      5
-    ],
-    [
-      "kernel.metal.t4",
-      14
-    ],
-    [
-      "kernel.crystal.t4",
-      5
-    ],
-    [
-      "kernel.metal.t4",
-      14
-    ],
-    [
-      "kernel.metal.t5",
+      "metal_t5",
       13
     ],
     [
-      "kernel.crystal.t5",
+      "crystal_t5",
       10
     ],
     [
-      "kernel.crystal.t4",
-      5
-    ],
-    [
-      "kernel.metal.t5",
-      24
-    ],
-    [
-      "kernel.crystal.t5",
-      10
-    ],
-    [
-      "kernel.crystal.t4",
-      5
-    ],
-    [
-      "kernel.crystal.t5",
-      2
-    ],
-    [
-      "kernel.metal.t2",
-      17
-    ],
-    [
-      "kernel.crystal.t4",
+      "crystal_t4",
       1
     ],
     [
-      "kernel.crystal.t5",
-      2
-    ],
-    [
-      "kernel.metal.t5",
-      8
-    ],
-    [
-      "kernel.crystal.t5",
-      1
-    ],
-    [
-      "kernel.metal.t5",
-      3
-    ],
-    [
-      "kernel.crystal.t5",
-      40
-    ],
-    [
-      "kernel.metal.t5",
-      5
-    ],
-    [
-      "kernel.crystal.t5",
-      10
-    ],
-    [
-      "kernel.crystal.t6",
-      1
-    ],
-    [
-      "kernel.metal.t5",
-      5
-    ],
-    [
-      "kernel.crystal.t5",
-      5
-    ],
-    [
-      "kernel.crystal.t6",
-      10
-    ],
-    [
-      "kernel.metal.t6",
-      3
-    ],
-    [
-      "kernel.crystal.t6",
-      4
-    ],
-    [
-      "kernel.metal.t6",
-      9
-    ],
-    [
-      "kernel.crystal.t6",
-      10
-    ],
-    [
-      "kernel.metal.t6",
-      3
-    ],
-    [
-      "kernel.crystal.t6",
-      7
-    ],
-    [
-      "kernel.metal.t6",
-      24
-    ],
-    [
-      "kernel.crystal.t6",
-      5
-    ],
-    [
-      "kernel.metal.t6",
+      "crystal_t5",
       12
     ],
     [
-      "kernel.crystal.t6",
-      1
-    ],
-    [
-      "kernel.metal.t6",
+      "metal_t5",
       5
     ],
     [
-      "kernel.crystal.t6",
-      3
-    ],
-    [
-      "kernel.metal.t6",
-      2
-    ],
-    [
-      "kernel.crystal.t6",
-      5
-    ],
-    [
-      "kernel.metal.t6",
-      4
-    ],
-    [
-      "kernel.crystal.t6",
-      5
-    ],
-    [
-      "kernel.metal.t6",
-      19
-    ],
-    [
-      "kernel.crystal.t6",
-      7
-    ],
-    [
-      "kernel.metal.t6",
-      5
-    ],
-    [
-      "kernel.crystal.t6",
-      5
-    ],
-    [
-      "kernel.crystal.t7",
-      24
-    ],
-    [
-      "kernel.metal.t7",
-      6
-    ],
-    [
-      "kernel.crystal.t7",
-      24
-    ],
-    [
-      "kernel.metal.t7",
-      3
-    ],
-    [
-      "kernel.crystal.t7",
-      25
-    ],
-    [
-      "kernel.metal.t7",
-      5
-    ],
-    [
-      "kernel.crystal.t7",
-      5
-    ],
-    [
-      "kernel.crystal.t8",
+      "crystal_t5",
       10
     ],
     [
-      "kernel.metal.t8",
+      "crystal_t6",
+      1
+    ],
+    [
+      "metal_t5",
+      5
+    ],
+    [
+      "crystal_t5",
+      5
+    ],
+    [
+      "crystal_t6",
+      14
+    ],
+    [
+      "metal_t6",
+      12
+    ],
+    [
+      "crystal_t6",
+      10
+    ],
+    [
+      "metal_t6",
+      3
+    ],
+    [
+      "crystal_t6",
+      7
+    ],
+    [
+      "metal_t6",
+      8
+    ],
+    [
+      "metal_t7",
+      5
+    ],
+    [
+      "metal_t6",
+      2
+    ],
+    [
+      "metal_t7",
+      4
+    ],
+    [
+      "metal_t6",
+      3
+    ],
+    [
+      "metal_t7",
+      1
+    ],
+    [
+      "crystal_t6",
+      5
+    ],
+    [
+      "metal_t6",
+      12
+    ],
+    [
+      "crystal_t6",
+      1
+    ],
+    [
+      "metal_t6",
+      5
+    ],
+    [
+      "crystal_t6",
+      3
+    ],
+    [
+      "metal_t6",
+      2
+    ],
+    [
+      "crystal_t6",
+      5
+    ],
+    [
+      "metal_t6",
+      4
+    ],
+    [
+      "crystal_t6",
+      5
+    ],
+    [
+      "metal_t6",
+      18
+    ],
+    [
+      "metal_t7",
+      3
+    ],
+    [
+      "crystal_t6",
+      7
+    ],
+    [
+      "metal_t6",
+      5
+    ],
+    [
+      "crystal_t6",
+      5
+    ],
+    [
+      "crystal_t7",
+      24
+    ],
+    [
+      "metal_t8",
+      6
+    ],
+    [
+      "crystal_t7",
+      24
+    ],
+    [
+      "metal_t7",
+      3
+    ],
+    [
+      "crystal_t7",
+      2
+    ],
+    [
+      "crystal_t9",
+      5
+    ],
+    [
+      "crystal_t7",
+      17
+    ],
+    [
+      "metal_t7",
+      5
+    ],
+    [
+      "crystal_t7",
+      5
+    ],
+    [
+      "crystal_t8",
+      10
+    ],
+    [
+      "metal_t8",
       7
     ]
   ],
   "minedUnitsByOre": {
-    "kernel.metal.t1": 28,
-    "kernel.crystal.t2": 32,
-    "kernel.metal.t2": 114,
-    "kernel.metal.t3": 94,
-    "kernel.crystal.t3": 18,
-    "kernel.metal.t4": 114,
-    "kernel.crystal.t4": 21,
-    "kernel.metal.t5": 58,
-    "kernel.crystal.t5": 80,
-    "kernel.crystal.t6": 63,
-    "kernel.metal.t6": 86,
-    "kernel.crystal.t7": 78,
-    "kernel.metal.t7": 14,
-    "kernel.crystal.t8": 10,
-    "kernel.metal.t8": 7
+    "metal_t1": 28,
+    "crystal_t2": 22,
+    "metal_t2": 71,
+    "metal_t3": 117,
+    "crystal_t3": 18,
+    "crystal_t4": 6,
+    "metal_t4": 83,
+    "metal_t5": 33,
+    "crystal_t5": 37,
+    "crystal_t6": 63,
+    "metal_t6": 74,
+    "metal_t7": 21,
+    "crystal_t7": 72,
+    "metal_t8": 13,
+    "crystal_t9": 5,
+    "crystal_t8": 10
   },
   "milestones": {
     "planetReached": {
       "1": 0,
-      "2": 235612
+      "2": 193689
     },
     "firstSale": 5700,
     "firstUpgrade": 5820,
-    "firstDeath": 139684,
-    "firstCoreCompleted": 205763
+    "firstDeath": null,
+    "firstCoreCompleted": 193594
   }
 }
