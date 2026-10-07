@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T22:28:48+02:00",
+  "updated_at": "2026-10-07T22:28:55+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -104,51 +104,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "d75b04edc07e3fc4e0924d2016e24f61cbef78cc",
-    "since": "2026-10-07T20:28:42Z",
-    "holds_gate": false,
+    "sha": "ae7c1890689bb314ef670d3a763b794b0538251b",
+    "since": "2026-10-07T20:28:55Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-07T19:58:03Z",
+    "last_run": "2026-10-07T20:28:53Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null,
-    "feature": 180,
-    "feature_title": "Spec: Workshop redo: showcase platform, hold-to-buy chains, two-tier levels and escalating purchase audio",
+    "feature": 169,
+    "feature_title": "Wayfinder: Shop buildings, sell and buy juice, mining popups, and desktop/mobile/TV look",
     "queue": [
-      {
-        "feature": 169,
-        "kind": "spec",
-        "title": "Wayfinder: Shop buildings, sell and buy juice, mining popups, and desktop/mobile/TV look",
-        "tickets": [
-          174,
-          175,
-          176,
-          177,
-          178,
-          179,
-          181,
-          182,
-          195,
-          196,
-          197,
-          207,
-          219,
-          220,
-          221,
-          222,
-          225,
-          226,
-          227,
-          228
-        ],
-        "since": "2026-10-07T17:21:15+02:00"
-      },
       {
         "feature": 198,
         "kind": "ticket",
