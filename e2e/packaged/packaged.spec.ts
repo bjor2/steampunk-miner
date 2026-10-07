@@ -3,7 +3,7 @@
  * debug API behind its launch flag (#11 section 6 and acceptance 7). Each launch gets a fresh
  * user-data folder, so the files it finds are the ones this launch wrote.
  */
-import { existsSync, mkdtempSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -80,6 +80,50 @@ function metadataOf(userData: string): { debugEnabled: boolean } | null {
     : (JSON.parse(readFileSync(file, 'utf8')) as { debugEnabled: boolean })
 }
 
+/**
+ * Software GL, so the scene draws under xvfb (the box's Mesa fails WebGL otherwise), and a precise
+ * heap reading, so a heap step shows within one memory sample instead of minutes later.
+ */
+const SNAPSHOT_SWITCHES = [
+  '--use-gl=swiftshader',
+  '--enable-unsafe-swiftshader',
+  '--ignore-gpu-blocklist',
+  '--enable-precise-memory-info',
+]
+/**
+ * Retained double arrays that lift the heap past a whole 50 MB step above the first memory sample
+ * (2 x 4 M doubles, 64 MB). Few large arrays rather than many objects: each is one node in the
+ * heap snapshot, so the file stays small (1.5 M small objects made a 385 MB file that took a
+ * minute), and unlike `repeat`/`padEnd` strings, which V8 builds from shared pieces, they really
+ * take the memory.
+ */
+const HEAP_BALLAST_ARRAYS = 2
+const HEAP_BALLAST_DOUBLES = 4_000_000
+
+interface LoggedLine {
+  event: string
+  data: Record<string, number | string>
+}
+
+function runLinesOf(userData: string): LoggedLine[] {
+  return runFolders(userData)
+    .map((folder) => join(folder, 'events.ndjson'))
+    .filter((path) => existsSync(path))
+    .flatMap((path) => readFileSync(path, 'utf8').split('\n'))
+    .filter((text) => text.length > 0)
+    .map((text) => JSON.parse(text) as LoggedLine)
+}
+
+function snapshotLineWith(userData: string, trigger: string): LoggedLine | undefined {
+  return runLinesOf(userData).find(
+    (line) => line.event === 'snapshot_written' && line.data.trigger === trigger,
+  )
+}
+
+function sizeInRunFolder(userData: string, file: string | number): number {
+  return statSync(join(runFolders(userData)[0], String(file))).size
+}
+
 function savesIn(userData: string, folder: string): string[] {
   const path = join(userData, folder)
   return existsSync(path) ? readdirSync(path) : []
@@ -106,6 +150,45 @@ test.describe('packaged build (#29 packaged-smoke)', () => {
     })
     await expect.poll(() => savesIn(userData, 'saves-debug').length).toBeGreaterThan(0)
     expect(savesIn(userData, 'saves')).toEqual([])
+    await app.close()
+  })
+
+  test('with --debug-api, writes a heap snapshot at a heap step, a planet screenshot and the save copy into its run folder (#123)', async () => {
+    test.setTimeout(240_000)
+    const { app, userData } = await launchGame(['--debug-api', ...SNAPSHOT_SWITCHES])
+    const page = await app.firstWindow()
+    await page.waitForFunction(() => window.steampunkDebug?.getPhysicsStats().ok, null, {
+      timeout: 60_000,
+    })
+    await page.evaluate(() => window.steampunkDebug!.setPlanet(2))
+    await page.evaluate(() => window.steampunkDebug!.teleportToDock())
+    // The first memory sample is the heap's start; the ballast then lifts it a whole step.
+    await expect
+      .poll(() => runLinesOf(userData).some((line) => line.event === 'memory_sample'), {
+        timeout: 60_000,
+      })
+      .toBe(true)
+    await page.evaluate(
+      ([count, doubles]) => {
+        const ballast = Array.from({ length: count }, () => new Array(doubles).fill(0.5))
+        Object.defineProperty(window, 'heapBallast', { value: ballast })
+      },
+      [HEAP_BALLAST_ARRAYS, HEAP_BALLAST_DOUBLES],
+    )
+    await expect
+      .poll(() => snapshotLineWith(userData, 'heap_step'), { timeout: 90_000 })
+      .toBeTruthy()
+
+    const heap = snapshotLineWith(userData, 'heap_step')!.data
+    expect(heap).toMatchObject({
+      kind: 'heap',
+      file: expect.stringMatching(/^heap\/\d+\.heapsnapshot$/),
+    })
+    expect(sizeInRunFolder(userData, heap.file)).toBe(heap.bytes)
+    const shot = snapshotLineWith(userData, 'planet_change')!.data
+    expect(sizeInRunFolder(userData, shot.file)).toBe(shot.bytes)
+    const saved = runLinesOf(userData).find((line) => line.event === 'checkpoint_saved')!.data
+    expect(sizeInRunFolder(userData, saved.file)).toBe(saved.bytes)
     await app.close()
   })
 
