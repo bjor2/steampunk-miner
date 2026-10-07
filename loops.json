@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T19:57:39Z",
+  "updated_at": "2026-10-07T19:58:04Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -250,9 +250,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #71 (Wayfinder: Campaign horizontal & vertical scaling) on 36e1a97",
+      "note": "testing spec #180 (Spec: Workshop redo: showcase platform, hold-to-buy chains, two-tier levels and escalating purchase audio) on d75b04e",
       "stale_after_min": 420,
-      "updated_at": "2026-10-07T19:16:28Z",
+      "updated_at": "2026-10-07T19:58:04Z",
       "host": "grok-bot-vm-452660841"
     }
   },
