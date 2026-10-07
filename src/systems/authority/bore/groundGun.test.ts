@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { COLLAPSE_VEHICLE_CLEARANCE_MM } from '../../../constants/balance'
 import { withRegistrations } from '../../../registries/registrar'
 import { boreGunOf } from '../../registries/boreGun'
+import { feedbackCuesOf } from '../../feedback/feedbackCues'
 import { LOCKED_SCHEDULE } from '../../unlocks/unlockSchedule'
 import { cellDensitySum } from '../../world/cellYield'
 import { blockContaining, blockIdOf } from '../../world/collapseBlock'
@@ -174,6 +175,7 @@ describe('ground gun: penetration through the drill path (ticket 313, #309 test 
       const [ended] = ofType(session.events(), 'BoreEnded')
       expect(ended).toMatchObject({ stop: 'refused', ...third, cellsOpened: 2 })
       expect(isClankStop(ended.stop)).toBe(true)
+      expect(feedbackCuesOf(session.events(), 'p1')).toContainEqual({ kind: 'boreClank' })
       expect(
         lineEastOf(ORE_RIG)
           .slice(2)

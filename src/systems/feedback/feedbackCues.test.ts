@@ -241,6 +241,22 @@ describe('feedback cues', () => {
     ).toEqual([])
   })
 
+  it('clanks lightly when a bore stops at a cell it cannot open, never at its range (ticket 313)', () => {
+    const ended = (stop: 'refused' | 'lava' | 'range' | 'budget'): DomainEvent => ({
+      tick: 18,
+      playerId: 'p1',
+      type: 'BoreEnded',
+      stop,
+      tx: 3,
+      ty: 4,
+      cellsOpened: 2,
+    })
+    expect(feedbackCuesOf([ended('refused')], 'p1')).toEqual([{ kind: 'boreClank' }])
+    expect(feedbackCuesOf([ended('lava')], 'p1')).toEqual([{ kind: 'boreClank' }])
+    expect(feedbackCuesOf([ended('range'), ended('budget')], 'p1')).toEqual([])
+    expect(feedbackCuesOf([ended('refused')], 'p2')).toEqual([])
+  })
+
   it("ignores another player's pickups", () => {
     expect(feedbackCuesOf([cargo(4, 'p2')], 'p1')).toEqual([])
   })

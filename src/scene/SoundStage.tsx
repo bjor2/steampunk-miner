@@ -119,6 +119,8 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   // G&V on #204 (ticket 253): a cancelled hold clanks lightly, a finished one rings the chime.
   holdCancelled: (sound) => sound.playClank('light'),
   holdFinished: (sound) => sound.playChime(chimeFrequencyOf(1)),
+  // G&V on #309: the cell the bore could not open gives `playClank('light')` (ticket 313).
+  boreClank: (sound) => sound.playClank('light'),
 }
 
 /** Rock breaking all at once: the collapse's crash, until the blast has its own sound. */

@@ -9,14 +9,15 @@
  * vehicle stands (#213), and the drill biting, which is felt as a haptic tick rather than heard
  * (#173). A held chain's steps leave the clank to the workshop's ratchet (#180 section 5), so only a
  * click clanks. A slot's hold that a slice names (`slotHoldCues`, ticket 253) clanks lightly when
- * cancelled and chimes when it runs to the end. Presentation only: cues are read from the events, never written back, so they
+ * cancelled and chimes when it runs to the end. A bore gun line stopped at a cell the drill cannot
+ * dig, the core or lava clanks lightly (ticket 313, #309). Presentation only: cues are read from the events, never written back, so they
  * cannot touch state or the digest (#33).
  *
  * A batch gives at most one cue of each kind (the highest tier, the hardest hit), so a fast-forward
  * that mines a hundred tiles in one batch sounds one chime, not a hundred.
  */
 import type { AuthorityState } from '../authority/authorityState'
-import type { DomainEvent } from '../authority/domainEvent'
+import { isClankStop, type DomainEvent } from '../authority/domainEvent'
 import { isHeldStep } from '../authority/purchaseChain'
 import {
   chargeBlastKickOf,
@@ -49,6 +50,7 @@ export type FeedbackCue =
   | { kind: 'drillContact' }
   | { kind: 'holdCancelled' }
   | { kind: 'holdFinished' }
+  | { kind: 'boreClank' }
 
 type CueKind = FeedbackCue['kind']
 
@@ -69,6 +71,7 @@ const CUE_ORDER: readonly CueKind[] = [
   'drillContact',
   'holdCancelled',
   'holdFinished',
+  'boreClank',
 ]
 
 /** The player's vehicle's last reported pose, or null before it reported one or with no player. */
@@ -130,6 +133,8 @@ function cueOfEvent(event: DomainEvent, listener: ListenerPoint | null): Feedbac
       }
     case 'DrillDamageDealt':
       return { kind: 'drillContact' }
+    case 'BoreEnded':
+      return isClankStop(event.stop) ? { kind: 'boreClank' } : null
     default:
       return slotHoldCueOf(event)
   }

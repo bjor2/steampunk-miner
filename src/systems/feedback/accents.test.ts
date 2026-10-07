@@ -21,6 +21,7 @@ const CUES: FeedbackCue[] = [
   { kind: 'drillContact' },
   { kind: 'holdCancelled' },
   { kind: 'holdFinished' },
+  { kind: 'boreClank' },
 ]
 
 describe('accents', () => {

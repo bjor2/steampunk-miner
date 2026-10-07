@@ -28,6 +28,8 @@ export const ACCENT_OF_CUE: Readonly<Record<FeedbackCue['kind'], Accent | null>>
   drillContact: null,
   holdCancelled: null,
   holdFinished: null,
+  // The tracer's spark is the slice's (#314), drawn from the debris allowance.
+  boreClank: null,
 }
 
 export function accentOf(cue: FeedbackCue): Accent | null {
