@@ -56,6 +56,20 @@ export function withOreDiscoveries(section: CodexSection, ore: OreDiscoveries): 
   return ore.contacted === '' ? others : { ...others, ore }
 }
 
+/** An `ids` kind's part; nothing contacted when the section has none. */
+export function idDiscoveriesOf(section: CodexSection, kind: string): IdDiscoveries {
+  return (section[kind] as IdDiscoveries | undefined) ?? { contacted: [] }
+}
+
+/** The section with one `ids` kind's part set; write it only once something is contacted. */
+export function withIdDiscoveries(
+  section: CodexSection,
+  kind: string,
+  entry: IdDiscoveries,
+): CodexSection {
+  return { ...section, [kind]: entry }
+}
+
 /** A plain copy, so no caller's object or list is shared with the state. */
 function copyOfCodex(section: CodexSection): CodexSection {
   return Object.fromEntries(

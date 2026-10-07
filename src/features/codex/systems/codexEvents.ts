@@ -2,7 +2,8 @@
  * The codex's domain events (#172 section 3, GD rulings; #207): `codex.OreContacted` the first touch
  * of an ore type, a locked cell included; `codex.OreDiscovered` its first unit in the hold, which
  * drives the #178 plaque; `codex.EntryAdded` after each, a consequence and never a source. Each
- * comes once per player per type, inside the authority's answer that touched or mined it.
+ * comes once per player per type, inside the authority's answer that touched or mined it. An enemy
+ * or hazard met for the first time (ticket 252) says only `codex.EntryAdded`, at `contacted`.
  */
 import type { OreType } from '../../../systems/registries/oreTypes'
 

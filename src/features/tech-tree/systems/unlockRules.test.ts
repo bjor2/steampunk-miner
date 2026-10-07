@@ -114,6 +114,14 @@ describe('tech tree: discovery', () => {
     }, [codexWhoMet(['enemy:tunnel_wrecker'])])
   })
 
+  it('opens a hazard node at its tier once its hazard is met (ticket 252)', () => {
+    withFixtureTree(() => {
+      const atTier = sessionOnPlanet(7)
+      researchAll(atTier, ['tech.sensing.echo_sounder', 'tech.sensing.assay_lens'])
+      researchAll(atTier, ['tech.sensing.hazard_barometer'])
+    }, [codexWhoMet(['hazard:heat_lava'])])
+  })
+
   it('waits one planet past its tier while the key is not met, then opens anyway', () => {
     withFixtureTree(() => {
       const atTier = sessionOnPlanet(5)
