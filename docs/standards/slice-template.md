@@ -81,6 +81,8 @@ export const slice: SliceDefinition = {
 | `worldPiece(piece)` | `src/scene/registries/worldPieces.ts` | An R3F piece drawn in its world layer (`platform`), no props (#175). |
 | `vehicleStaging(provider)` | `src/systems/registries/vehicleStaging.ts` | One provider (`dock-buildings`): where the local car is drawn, the camera looks and input waits; presentation only (#170). |
 | `artAssets(assets)` | `src/systems/registries/artAssets.ts` | Blender assets the slice ships: bare #52 ids (`prop-dynamite-charge`), kebab-case, starting with `<category>-`, never a kernel or another slice's id. They join `blenderAssetIds()`, which the manifest lint and `npm run art:export` read; `parts` joins the asset's valid part ids (#214). |
+| `sceneLayer(layer)` | `src/scene/registries/sceneLayers.ts` | An R3F layer of the world scene with its draw budget, no props, drawn after the planted charges; it places pooled objects in `useFrame` and never writes state, camera or sound (#213). |
+| `chargeBlastCue(provider)` | `src/systems/registries/chargeBlastCue.ts` | One provider (`dynamite-visuals`): a blast's shake, flash and thump delay from the detonation and the listener's distance; the kernel clamps it (#213). |
 | `buildingAttachUse(use)` | `src/systems/registries/buildingAttach.ts` | A use of a shop building's attach point (#170). |
 | `debugActions(actions)` | `src/debug/debugActionRegistry.ts` | Exposed as `steampunkDebug.features['<slice>']`. |
 | `commandRules(rules)` | `src/systems/registries/commandRules.ts` | Keyed by command type: `<slice>.<name>`, or `debug.<slice>.<name>` for a debug command. `applyCommand` asks the kernel table first. |
