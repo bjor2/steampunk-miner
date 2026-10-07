@@ -434,8 +434,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/refineryReport.test.ts` | 5 | 5 |
 | `src/logging/registries/runEvents.test.ts` | 4 | 4 |
 | `src/logging/reportRows.test.ts` | 4 | 4 |
-| `src/logging/runEventSchema.test.ts` | 16 | 16 |
-| `src/logging/runLayout.test.ts` | 4 | 4 |
+| `src/logging/runEventSchema.test.ts` | 18 | 18 |
+| `src/logging/runLayout.test.ts` | 7 | 7 |
 | `src/logging/runLog.test.ts` | 3 | 3 |
 | `src/logging/runMetadata.test.ts` | 2 | 2 |
 | `src/logging/runProgress.test.ts` | 3 | 3 |
@@ -577,6 +577,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/shell/listenerCount.test.ts` | 8 | 8 |
+| `src/shell/storedZip.test.ts` | 4 | 4 |
 
 ### `slice-loader`
 
@@ -585,6 +586,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/doubleConversionLint.test.ts` | 8 | 4 |
 | `src/features/loadFeatures.test.ts` | 3 | 3 |
 | `src/features/sliceBoundaries.test.ts` | 5 | 5 |
+
+### `snapshots`
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/systems/snapshots/budgetBreach.test.ts` | 4 | 4 |
+| `src/systems/snapshots/heapThreshold.test.ts` | 7 | 7 |
+| `src/systems/snapshots/planetChange.test.ts` | 3 | 3 |
+| `src/systems/snapshots/saveSnapshotCadence.test.ts` | 1 | 1 |
 
 ### `store`
 
@@ -600,6 +610,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/partInstall.test.ts` | 5 | 5 |
 | `src/store/perfLog.test.ts` | 6 | 6 |
 | `src/store/platformLoop.test.ts` | 4 | 4 |
+| `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/touchRuntime.test.ts` | 9 | 9 |
 
