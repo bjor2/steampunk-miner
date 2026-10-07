@@ -12,8 +12,10 @@ import {
   steamBedLevelOf,
   type HeardStep,
 } from './purchaseSound'
+import { HOLD_CURVE } from '../holdChain'
 
-const ROWS = 11
+const ROWS = HOLD_CURVE.gapTicks.length
+const CAP_ROW = ROWS - 1
 
 function heldPip(pip: number, gapTicks: number | null, onRow = 0): HeardStep {
   return { moment: 'pip', pip, gapTicks, onRow, rowCount: ROWS }
@@ -39,18 +41,18 @@ describe('workshop purchase sound', () => {
   })
 
   it('stacks more layers as the chain speeds up', () => {
-    const layers = [null, 30, 19, 16, 12, 9, 6].map((gap) => ratchetLayersOf(gap))
+    const layers = [null, ...HOLD_CURVE.gapTicks].map((gap) => ratchetLayersOf(gap))
 
-    expect(layers).toEqual([1, 1, 1, 2, 2, 3, 3])
+    expect(layers).toEqual([1, 1, 1, 2, 2, 2, 3, 3])
   })
 
   it('raises the steam bed as the chain climbs the rows', () => {
-    expect(steamBedLevelOf(0, ROWS)).toBeLessThan(steamBedLevelOf(5, ROWS))
-    expect(steamBedLevelOf(10, ROWS)).toBe(1)
+    expect(steamBedLevelOf(0, ROWS)).toBeLessThan(steamBedLevelOf(3, ROWS))
+    expect(steamBedLevelOf(CAP_ROW, ROWS)).toBe(1)
   })
 
   it("plays a pip as the ratchet's layers, an octave and a twelfth above the climb", () => {
-    const plays = cuePlaysOfStep(heldPip(3, 6, 10))
+    const plays = cuePlaysOfStep(heldPip(3, 4, CAP_ROW))
 
     expect(plays.map((play) => play.cueId)).toEqual([
       RATCHET_CUE_ID,

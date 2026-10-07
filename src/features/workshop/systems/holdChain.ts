@@ -1,6 +1,7 @@
 /**
- * The hold-to-buy chain (#180 section 2, Gameplay & Vehicle's curve and the "two rows slower"
- * ruling on #180): when the next step of a held chain fires, in 60 Hz ticks, and what ends it.
+ * The hold-to-buy chain (#180 section 2; the faster curve is the GD's decision on #311, which
+ * replaced G&V's first table): when the next step of a held chain fires, in 60 Hz ticks, and what
+ * ends it.
  * Client-only feel: every step is still its own `buyUpgrade`, and the authority never sees the
  * curve, so retuning `holdCurve.json` never bumps the protocol or a golden.
  *

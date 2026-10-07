@@ -228,7 +228,7 @@ describe('workshop hold-to-buy controller', () => {
     expect(workshop().tally).toMatchObject({ steps: 3, cue: 'reserve_hold' })
   })
 
-  it('breathes 36 ticks on an ordinary major, resumes two rows slower and plays its flourish', () => {
+  it('breathes on an ordinary major for the pause, resumes a row slower and plays its flourish', () => {
     atUpgradeBayWith()
     holdFor('drill_power', 13)
     const ticks = boughtTicks()
@@ -243,14 +243,14 @@ describe('workshop hold-to-buy controller', () => {
     })
   })
 
-  it('fits 30 held buys with two majors on a full wallet in 340 to 400 ticks', () => {
+  it('fits 30 held buys with two majors on a full wallet in 170 to 200 ticks', () => {
     atUpgradeBayWith()
     holdFor('drill_power', 30)
     const ticks = boughtTicks()
 
     expect(ticks).toHaveLength(30)
-    expect(ticks[29] - ticks[0]).toBeGreaterThanOrEqual(340)
-    expect(ticks[29] - ticks[0]).toBeLessThanOrEqual(400)
+    expect(ticks[29] - ticks[0]).toBeGreaterThanOrEqual(170)
+    expect(ticks[29] - ticks[0]).toBeLessThanOrEqual(200)
   })
 
   it('keeps a 50-purchase spree within 4 ratchet voices and 1 flourish', () => {
@@ -292,11 +292,11 @@ describe("workshop: a press on a plaque's Buy", () => {
     expect(boughtTicks()).toEqual([])
   })
 
-  it('runs the chain on the curve for a touch held a second on the open card', () => {
+  it('runs the chain on the curve for a touch held past the wind-up on the open card', () => {
     atUpgradeBayWith()
     workshop().pressPlaqueBuy('drill_tip', tick(), FIRST_TOUCH)
     workshop().pressPlaqueBuy('drill_tip', tick(), { ...FIRST_TOUCH, isCardOpen: true })
-    runFrames(TICKS_PER_SECOND)
+    runFrames(HOLD_CURVE.windUpTicks + HOLD_CURVE.gapTicks[0])
     workshop().releaseHold()
     runFrames(120)
     const ticks = boughtTicks()

@@ -339,7 +339,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 
-### `workshop`: 12 files, 84 tests
+### `workshop`: 12 files, 86 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -348,7 +348,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/workshop/store/workshopStore.test.ts` | 15 | 15 |
 | `src/features/workshop/systems/chainCues.test.ts` | 6 | 6 |
 | `src/features/workshop/systems/chainPreview.test.ts` | 6 | 6 |
-| `src/features/workshop/systems/holdChain.test.ts` | 13 | 13 |
+| `src/features/workshop/systems/holdChain.test.ts` | 15 | 15 |
 | `src/features/workshop/systems/milestoneLandings.test.ts` | 5 | 5 |
 | `src/features/workshop/systems/plaquePress.test.ts` | 5 | 5 |
 | `src/features/workshop/systems/plaqueReading.test.ts` | 5 | 5 |

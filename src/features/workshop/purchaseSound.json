@@ -1,7 +1,7 @@
 {
   "$comment": "The escalating purchase audio (#180 section 5). Voices: 4 ratchet, 1 flourish (G&V's cap; the kernel's soundCues steals the oldest with its 15 ms fade). The ratchet climbs the major pentatonic per pip and resets at each major; a gap at or under each layerGapTicks entry stacks one more tick, pitched by layerSemitones (unison, octave, twelfth) so the layers stay musical; the steam bed is the ratchet's noise band, its level rising from bedFloorGain to 1 with the gap row the chain is on. The tones are #13 placeholders synthesised by the shell, starting values for G&V.",
   "pentatonicSemitones": [0, 2, 4, 7, 9],
-  "layerGapTicks": [16, 9],
+  "layerGapTicks": [8, 5],
   "layerSemitones": [0, 12, 19],
   "bedFloorGain": 0.55,
   "flourishSemitones": { "compressed": 0, "full": 0, "milestone": 5 },

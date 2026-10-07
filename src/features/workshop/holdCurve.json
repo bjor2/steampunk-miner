@@ -1,6 +1,6 @@
 {
-  "windUpTicks": 18,
-  "gapTicks": [30, 26, 22, 19, 16, 14, 12, 10, 9, 8, 6],
-  "majorPauseTicks": 36,
-  "resumeRowsBack": 2
+  "windUpTicks": 12,
+  "gapTicks": [12, 10, 8, 7, 6, 5, 4],
+  "majorPauseTicks": 20,
+  "resumeRowsBack": 1
 }

@@ -43,41 +43,53 @@ describe('workshop hold-to-buy chain', () => {
     expect(stepsBoughtReleasingAt(PRESS_TICK + HOLD_CURVE.windUpTicks + 1)).toBe(2)
   })
 
-  it("follows G&V's table: the wind-up, then 30 down to the 6-tick cap", () => {
-    const ticks = holdStepTicks(landingsWithMajorsAt(14, []), PRESS_TICK)
+  it("follows the GD's table on #311: the wind-up, then 12 down to the 4-tick cap", () => {
+    const ticks = holdStepTicks(landingsWithMajorsAt(10, []), PRESS_TICK)
 
     expect(ticks[0]).toBe(PRESS_TICK)
-    expect(gapsOf(ticks)).toEqual([18, 30, 26, 22, 19, 16, 14, 12, 10, 9, 8, 6, 6])
+    expect(gapsOf(ticks)).toEqual([12, 12, 10, 8, 7, 6, 5, 4, 4])
   })
 
-  it('pauses 36 ticks for a major on the cap row, then resumes at 9, 8, 6', () => {
-    const ticks = holdStepTicks(landingsWithMajorsAt(18, [14]), PRESS_TICK)
+  it('lands the 5th held buy at or before tick 49 from the press', () => {
+    const ticks = holdStepTicks(landingsWithMajorsAt(6, []), PRESS_TICK)
 
-    expect(gapsOf(ticks).slice(12)).toEqual([6, 36, 9, 8, 6])
+    expect(ticks[5] - PRESS_TICK).toBeLessThanOrEqual(49)
   })
 
-  it('resumes a major on row 3 at 26, 22, 19', () => {
+  it('lands a full 10-pip major at or before tick 70 from the press', () => {
+    const ticks = holdStepTicks(landingsWithMajorsAt(10, [10]), PRESS_TICK)
+
+    expect(ticks[9] - PRESS_TICK).toBeLessThanOrEqual(70)
+  })
+
+  it('pauses 20 ticks for a major on the cap row, then resumes at 5, 4', () => {
+    const ticks = holdStepTicks(landingsWithMajorsAt(17, [14]), PRESS_TICK)
+
+    expect(gapsOf(ticks).slice(12)).toEqual([4, 20, 5, 4])
+  })
+
+  it('resumes a major on row 4 at 8, 7, 6', () => {
     const ticks = holdStepTicks(landingsWithMajorsAt(10, [6]), PRESS_TICK)
 
-    expect(gapsOf(ticks).slice(4)).toEqual([19, 36, 26, 22, 19])
+    expect(gapsOf(ticks).slice(4)).toEqual([7, 20, 8, 7, 6])
   })
 
-  it('resumes a major on row 1 at row 0, never below', () => {
-    const ticks = holdStepTicks(landingsWithMajorsAt(7, [4]), PRESS_TICK)
+  it('resumes a major on row 0 at row 0, never below', () => {
+    const ticks = holdStepTicks(landingsWithMajorsAt(6, [3]), PRESS_TICK)
 
-    expect(gapsOf(ticks).slice(2)).toEqual([26, 36, 30, 26])
+    expect(gapsOf(ticks).slice(1)).toEqual([12, 20, 12, 10])
   })
 
-  it('steps two close majors back two rows each from the row the chain is on', () => {
+  it('steps two close majors back one row each from the row the chain is on', () => {
     const ticks = holdStepTicks(landingsWithMajorsAt(19, [14, 15]), PRESS_TICK)
 
-    expect(gapsOf(ticks).slice(13)).toEqual([36, 36, 12, 10, 9])
+    expect(gapsOf(ticks).slice(13)).toEqual([20, 20, 6, 5, 4])
   })
 
   it('never replays the wind-up after a major on the press', () => {
     const ticks = holdStepTicks(landingsWithMajorsAt(4, [1]), PRESS_TICK)
 
-    expect(gapsOf(ticks)).toEqual([36, 30, 26])
+    expect(gapsOf(ticks)).toEqual([20, 12, 10])
   })
 
   it('ends on a milestone without reading the resume rule', () => {
@@ -92,12 +104,12 @@ describe('workshop hold-to-buy chain', () => {
     expect(ticks).toHaveLength(3)
   })
 
-  it('fits 30 held buys with two ordinary majors at the cap in 340 to 400 ticks', () => {
+  it('fits 30 held buys with two ordinary majors at the cap in 170 to 200 ticks', () => {
     const ticks = holdStepTicks(landingsWithMajorsAt(30, [15, 25]), PRESS_TICK)
     const duration = ticks[29] - ticks[0]
 
-    expect(duration).toBeGreaterThanOrEqual(340)
-    expect(duration).toBeLessThanOrEqual(400)
+    expect(duration).toBeGreaterThanOrEqual(170)
+    expect(duration).toBeLessThanOrEqual(200)
   })
 
   it('ends on a refused step and keeps its reason', () => {
