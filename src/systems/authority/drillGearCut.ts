@@ -5,9 +5,14 @@
  * reported in the drill's `DrillGated`. The listed cells carve in the same edit and the same ticks
  * as the disc, at their own tier hardness and drill time, and collect like any drilled cell.
  *
+ * The twin bit's diagonal (GD lock on #257, ticket 279) replaces the ahead cell with the one 45
+ * degrees to a side; it runs the same `canMine`, takes its own full hardness and is never listed
+ * beside the bore.
+ *
  * Energy: the disc charges its ticks as before. Each listed cell charges its own ticks at the
- * drill's rate, an ahead cell at a whole share and a side cell at `sideEnergyShareBp` (never under
- * a whole share), rounded up once. The cells cut only for the ticks the tank can pay after the
+ * drill's rate, an ahead cell at `aheadEnergyShareBp` (a whole share along the facing, the side
+ * floor on a diagonal) and a side cell at `sideEnergyShareBp` (never under a whole share), rounded
+ * up once. The cells cut only for the ticks the tank can pay after the
  * disc's whole window, so a drill command never charges more than the tank holds.
  *
  * With no gear registered the disc carves exactly as before (`carveDisc`) and nothing more is
@@ -50,6 +55,7 @@ export interface DrillCarve extends Carve {
 /** The drill gear's cells for one drill command, after `canMine`. */
 export interface DrillGearRead {
   aheadCells: TilePoint[]
+  aheadEnergyShareBp: number
   sideCells: TilePoint[]
   sideEnergyShareBp: number
 }
@@ -89,6 +95,7 @@ export function drillGearReadAt(
   const canMine = (tile: TilePoint) => isMineableCell(state.world, params, gates, tile)
   return {
     aheadCells: cells.ahead.filter(canMine),
+    aheadEnergyShareBp: gear.aheadEnergyShareBp,
     sideCells: cells.side.filter(canMine),
     sideEnergyShareBp: gear.sideEnergyShareBp,
   }
@@ -128,7 +135,7 @@ function carveDiscAndGear(
 /** Each listed cell's energy share in basis points, in carve order: ahead cells, then side. */
 function cellSharesOf(read: DrillGearRead): number[] {
   return [
-    ...read.aheadCells.map(() => BASIS_POINTS),
+    ...read.aheadCells.map(() => read.aheadEnergyShareBp),
     ...read.sideCells.map(() => read.sideEnergyShareBp),
   ]
 }

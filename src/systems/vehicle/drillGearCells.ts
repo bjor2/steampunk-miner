@@ -5,16 +5,24 @@
  * machine lists the same tiles. A cell holds the tile under the point half a cell past the rim, so
  * only its samples outside the disc are left for it to cut (`cellSamplesBesideDisc`).
  *
+ * The twin bit's bearing (GD lock on #257, ticket 279) turns the ahead cells 45 degrees to the
+ * facing's left or right: each sits one metre further toward that side than the facing's cell, so
+ * driving down and to a side the ahead cell is the one diagonally below the bit, one column over
+ * and one row down on the tile grid. It replaces the facing's cell; it never adds one.
+ *
  * Order: the ahead cells nearest first, then the side cells nearest first, the facing's left side
  * before its right. A tile met twice is listed once.
  */
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
-import type { DrillGear } from '../economy/drillGearCaps'
+import type { AheadBearing, DrillGear } from '../economy/drillGearCaps'
 import type { DiscStamp } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
+import type { VehicleIntent } from './vehicleIntent'
 import {
+  FACING,
   facingVectorOf,
   tileOfMillimetres,
+  type Facing,
   type IntegerVector,
   type VehiclePose,
 } from './vehiclePose'
@@ -24,39 +32,79 @@ export interface DrillGearCells {
   side: TilePoint[]
 }
 
+/** The gear's cell counts, and where the ahead cells point (along the facing when left out). */
+export type DrillGearReach = Pick<DrillGear, 'aheadCells' | 'sideCells'> &
+  Partial<Pick<DrillGear, 'aheadBearing'>>
+
+const NO_SHIFT: IntegerVector = { x: 0, y: 0 }
+
 export function drillGearCellsAt(
   pose: VehiclePose,
   stamp: DiscStamp,
-  gear: Pick<DrillGear, 'aheadCells' | 'sideCells'>,
+  gear: DrillGearReach,
 ): DrillGearCells {
   const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
   const left = { x: -ahead.y, y: ahead.x }
   const right = { x: ahead.y, y: -ahead.x }
-  const aheadTiles = cellsAlong(stamp, [ahead], gear.aheadCells)
-  const sideTiles = cellsAlong(stamp, [left, right], gear.sideCells)
+  const shift = bearingShiftOf({ left, right }, gear.aheadBearing ?? 'facing')
+  const aheadTiles = cellsAlong(stamp, [ahead], gear.aheadCells, shift)
+  const sideTiles = cellsAlong(stamp, [left, right], gear.sideCells, NO_SHIFT)
   return { ahead: aheadTiles, side: withoutTiles(sideTiles, aheadTiles) }
 }
 
-/** `count` cells out from the rim along each direction, nearest first, each tile once. */
+/**
+ * The bearing the drive asks for (GD lock on #257: no new key): drilling down while driving to a
+ * side turns the ahead cell toward that side; anything else cuts along the facing. Facing down,
+ * the facing's left is the vehicle's local right (`moveX` 1), the tangent `perp(localUp)`.
+ */
+export function aheadBearingOfDrive(facing: Facing, moveX: VehicleIntent['moveX']): AheadBearing {
+  if (facing !== FACING.down || moveX === 0) return 'facing'
+  return moveX === 1 ? 'left' : 'right'
+}
+
+/** The side a diagonal bearing shifts the ahead cells toward; none along the facing. */
+function bearingShiftOf(
+  sides: { left: IntegerVector; right: IntegerVector },
+  bearing: AheadBearing,
+): IntegerVector {
+  return bearing === 'facing' ? NO_SHIFT : sides[bearing]
+}
+
+/**
+ * `count` cells out from the rim along each direction, nearest first, each tile once, each
+ * shifted one more metre along the 1024-scaled `shift` per step: a 45-degree line for a diagonal.
+ */
 function cellsAlong(
   stamp: DiscStamp,
   directions: readonly IntegerVector[],
   count: number,
+  shift: IntegerVector,
 ): TilePoint[] {
   const tiles: TilePoint[] = []
   for (let step = 0; step < count; step++) {
-    for (const direction of directions) tiles.push(cellPastRim(stamp, direction, step))
+    for (const direction of directions) tiles.push(cellPastRim(stamp, direction, step, shift))
   }
   return withoutTiles(tiles, [])
 }
 
 /** The tile `step` whole cells beyond the first one past the rim along a 1024-scaled direction. */
-function cellPastRim(stamp: DiscStamp, direction: IntegerVector, step: number): TilePoint {
+function cellPastRim(
+  stamp: DiscStamp,
+  direction: IntegerVector,
+  step: number,
+  shift: IntegerVector,
+): TilePoint {
   const reachMm = stamp.radiusMm + MM_PER_METRE / 2 + step * MM_PER_METRE
+  const shiftMm = (step + 1) * MM_PER_METRE
   return tileOfMillimetres(
-    stamp.xMm + Math.floor((direction.x * reachMm) / UP_VECTOR_SCALE),
-    stamp.yMm + Math.floor((direction.y * reachMm) / UP_VECTOR_SCALE),
+    stamp.xMm + scaled(direction.x, reachMm) + scaled(shift.x, shiftMm),
+    stamp.yMm + scaled(direction.y, reachMm) + scaled(shift.y, shiftMm),
   )
+}
+
+/** A component of a 1024-scaled unit vector, times a length in mm, in whole mm. */
+function scaled(component: number, lengthMm: number): number {
+  return Math.floor((component * lengthMm) / UP_VECTOR_SCALE)
 }
 
 /** The tiles in order, each once, leaving out any in `taken`. */

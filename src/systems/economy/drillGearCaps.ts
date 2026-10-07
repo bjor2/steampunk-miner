@@ -5,7 +5,8 @@
  * - `aheadCellsMax` (1): the reach boom's cells past the bit, held to one until the drill-track
  *   curve is re-derived.
  * - `sideEnergyShareFloorBp` (10000, a whole share): a side cell costs at least the drill's own
- *   energy for that cell, so side drilling adds reach, not free throughput.
+ *   energy for that cell, so side drilling adds reach, not free throughput. The twin bit's
+ *   diagonal ahead cell carries the same floor (GD lock on #257, ticket 279).
  *
  * A slice states the gear it wants; the kernel folds every answer through these caps, so no stack
  * of gear passes them.
@@ -18,10 +19,18 @@ export interface DrillGearCaps {
   sideEnergyShareFloorBp: number
 }
 
+/**
+ * Where the ahead cells point (GD lock on #257): along the facing, or 45 degrees to the facing's
+ * left (counter-clockwise on screen) or right. A diagonal replaces the ahead cell, never adds one.
+ */
+export type AheadBearing = 'facing' | 'left' | 'right'
+
 /** What one slice asks of the drill; a field left out asks nothing. */
 export interface DrillGearAsk {
-  /** Whole cells cut past the bit, along its facing. */
+  /** Whole cells cut past the bit, along `aheadBearing`. */
   aheadCells?: number
+  /** Where the ahead cells point; left out, along the facing. */
+  aheadBearing?: AheadBearing
   /** Whole cells cut on each side of the bore. */
   sideCells?: number
   /** Each side cell's energy as a share of the drill's for that cell, in basis points. */
@@ -31,13 +40,17 @@ export interface DrillGearAsk {
 /** The drill gear one player's drill cuts with, after the caps. */
 export interface DrillGear {
   aheadCells: number
+  aheadBearing: AheadBearing
+  /** Each ahead cell's energy share: a whole one along the facing, the side floor on a diagonal. */
+  aheadEnergyShareBp: number
   sideCells: number
   sideEnergyShareBp: number
 }
 
 /**
  * The largest ask of each kind wins (gear never stacks), the ahead cells held to the cap and the
- * side share never under the floor. null when no ask adds a cell: the drill cuts as before.
+ * side share never under the floor. One diagonal asked turns the ahead cells; two opposite ones
+ * leave them along the facing. null when no ask adds a cell: the drill cuts as before.
  */
 export function foldDrillGear(
   asks: readonly DrillGearAsk[],
@@ -46,11 +59,13 @@ export function foldDrillGear(
   const aheadCells = Math.min(caps.aheadCellsMax, largestCellsOf(asks.map((ask) => ask.aheadCells)))
   const sideCells = largestCellsOf(asks.map((ask) => ask.sideCells))
   if (aheadCells === 0 && sideCells === 0) return null
-  const shares = asks.map((ask) => ask.sideEnergyShareBp ?? 0)
+  const aheadBearing = aheadBearingOf(asks)
   return {
     aheadCells,
+    aheadBearing,
+    aheadEnergyShareBp: aheadEnergyShareOf(aheadBearing, caps),
     sideCells,
-    sideEnergyShareBp: Math.max(caps.sideEnergyShareFloorBp, ...shares),
+    sideEnergyShareBp: sideEnergyShareOf(asks, caps),
   }
 }
 
@@ -66,6 +81,27 @@ export function readDrillGearCaps(reader: FieldReader, value: unknown): DrillGea
     reader.record(`drillGearCaps.sideEnergyShareFloorBp must be ${BASIS_POINTS} or more`)
   }
   return { aheadCellsMax, sideEnergyShareFloorBp }
+}
+
+/** The one diagonal asked, else the facing. */
+function aheadBearingOf(asks: readonly DrillGearAsk[]): AheadBearing {
+  const diagonals = new Set(asks.map((ask) => ask.aheadBearing).filter(isDiagonal))
+  const [only] = diagonals
+  return diagonals.size === 1 ? only : 'facing'
+}
+
+function isDiagonal(bearing: AheadBearing | undefined): bearing is 'left' | 'right' {
+  return bearing === 'left' || bearing === 'right'
+}
+
+/** A diagonal cell is cut beside the bit's line, so it pays at least what a side cell does. */
+function aheadEnergyShareOf(bearing: AheadBearing, caps: DrillGearCaps): number {
+  return bearing === 'facing' ? BASIS_POINTS : caps.sideEnergyShareFloorBp
+}
+
+function sideEnergyShareOf(asks: readonly DrillGearAsk[], caps: DrillGearCaps): number {
+  const shares = asks.map((ask) => ask.sideEnergyShareBp ?? 0)
+  return Math.max(caps.sideEnergyShareFloorBp, ...shares)
 }
 
 /** Whole cells, never below none. */

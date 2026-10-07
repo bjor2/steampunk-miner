@@ -1,17 +1,26 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
-import type { DrillGearAsk } from '../economy/drillGearCaps'
+import type { AheadBearing, DrillGearAsk } from '../economy/drillGearCaps'
+import { stepOfMajor } from '../economy/upgradeSteps'
 import type { GateOutcome } from '../registries/gateChecks'
-import { drillGearCellsAt } from '../vehicle/drillGearCells'
+import { drillGearCellsAt, type DrillGearReach } from '../vehicle/drillGearCells'
 import { drillStampOf } from '../vehicle/drillStamp'
 import { FACING, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { cellAt, EMPTY_WORLD, type WorldState } from '../world/worldState'
+import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
-import { createScriptedSession, PARAMS, poseAbove, surfaceOreTiles } from './scriptedSession'
+import {
+  coreTiles,
+  createScriptedSession,
+  FREEZE_ENEMIES,
+  PARAMS,
+  poseAbove,
+  surfaceOreTiles,
+} from './scriptedSession'
 import { stateDigest } from './stateDigest'
 
 // Slice drill gear on the reported drill (ticket 234, the GD lock on #205): fake slices register
@@ -49,7 +58,28 @@ function poseOver(tile: TilePoint, facing: Facing): VehiclePose {
   return { x, y, vx, vy, upx, upy, facing }
 }
 
-function gearCellsOver(tile: TilePoint, facing: Facing, ask: Required<DrillGearAsk>) {
+/** A gate refusing every ore cell; gates never hold core or plain ground. */
+const REFUSE_ALL_ORE: SliceDefinition = {
+  id: 'refuse-probe',
+  register: (r) =>
+    r.gateCheck({
+      id: 'refuse-probe.all-ore',
+      check: () => ({ outcome: 'refused', gateKind: 'dynamite', required: '1', have: '0' }),
+    }),
+}
+
+/** A track at major `level`, sent as its step (#180). */
+const setUpgrade = (upgradeId: string, level: number) =>
+  ({ type: 'debug.setUpgrade', payload: { upgradeId, level: stepOfMajor(level) } }) as const
+
+/** Tip 7 and power 60 break a planet-1 core tile in 40 ticks (`coreHarvest.test.ts`). */
+const CORE_DRILL: readonly CommandIntent[] = [
+  FREEZE_ENEMIES,
+  setUpgrade('drill_tip', 7),
+  setUpgrade('drill_power', 60),
+]
+
+function gearCellsOver(tile: TilePoint, facing: Facing, ask: DrillGearReach) {
   const pose = poseOver(tile, facing)
   return drillGearCellsAt(pose, drillStampOf(pose, false), ask)
 }
@@ -59,9 +89,11 @@ function drillWith(
   slices: readonly SliceDefinition[],
   tile: TilePoint = TARGET,
   facing: Facing = FACING.down,
+  setup: readonly CommandIntent[] = [],
 ) {
   return withRegistrations(slices, () => {
     const session = createScriptedSession()
+    for (const intent of setup) session.submit(0, intent)
     session.submit(1, poseAbove(tile, facing))
     const before = session.vehicle().energy
     const events = session.submit(
@@ -91,6 +123,24 @@ function drillGatedOf(events: readonly DomainEvent[]) {
   return events.filter((event) => event.type === 'DrillGated')
 }
 
+/** The drill target, facing down, whose diagonal cell on `bearing` is `cell`. */
+function targetWithDiagonalOn(cell: TilePoint, bearing: AheadBearing): TilePoint {
+  const ask = { aheadCells: 1, sideCells: 0, aheadBearing: bearing }
+  const [diagonal] = gearCellsOver(TARGET, FACING.down, ask).ahead
+  return { tx: cell.tx + TARGET.tx - diagonal.tx, ty: cell.ty + TARGET.ty - diagonal.ty }
+}
+
+function kindAt(tile: TilePoint): number {
+  return kindOfCell(cellAt(EMPTY_WORLD, PARAMS, tile))
+}
+
+/** A cell the twin bit's diagonal reaches from a drill target of the `targetKind` the bit cuts. */
+function cellUnderDiagonal(cells: readonly TilePoint[], bearing: AheadBearing, targetKind: number) {
+  const cell = cells.find((tile) => kindAt(targetWithDiagonalOn(tile, bearing)) === targetKind)
+  if (cell === undefined) throw new Error('no cell under a diagonal from the target kind')
+  return { cell, target: targetWithDiagonalOn(cell, bearing) }
+}
+
 /** A surface ore cell and the drill target that puts it `step + 1` cells beside the bore. */
 function oreBesideBore(step: number) {
   const [ore] = surfaceOreTiles(1)
@@ -109,7 +159,6 @@ describe('drill gear cut', () => {
     const [oneSide, otherSide] = gearCellsOver(TARGET, FACING.down, {
       aheadCells: 0,
       sideCells: 1,
-      sideEnergyShareBp: 0,
     }).side
     const plain = drillWith([])
     const widened = drillWith([gearSlice({ sideCells: 1 })])
@@ -143,7 +192,6 @@ describe('drill gear cut', () => {
     const [roof, floor] = gearCellsOver(TARGET, FACING.right, {
       aheadCells: 0,
       sideCells: 1,
-      sideEnergyShareBp: 0,
     }).side
     const widened = drillWith([gearSlice({ sideCells: 1 })], TARGET, FACING.right)
     expect(roof.ty).toBeGreaterThan(floor.ty)
@@ -165,7 +213,7 @@ describe('drill gear cut', () => {
     'leaves a gated ore cell beside the bore standing when its gate says %s',
     (outcome) => {
       const { ore, target } = oreBesideBore(1)
-      const ask = { aheadCells: 0, sideCells: 2, sideEnergyShareBp: 0 }
+      const ask = { aheadCells: 0, sideCells: 2 }
       expect(gearCellsOver(target, FACING.down, ask).side).toContainEqual(ore)
       const cut = drillWith([gearSlice(ask), shellSlice(ore, outcome)], target)
       expect(densityOf(cut.world, ore)).toBe(densityOf(EMPTY_WORLD, ore))
@@ -181,5 +229,43 @@ describe('drill gear cut', () => {
       expect.objectContaining({ ...ore, gateKind: 'dynamite', outcome: 'refused' }),
     ])
     expect(densityOf(cut.world, nearer)).toBeLessThan(densityOf(EMPTY_WORLD, nearer))
+  })
+
+  it('cuts the diagonal cell instead of the cell past the bit', () => {
+    const next = { tx: TARGET.tx, ty: TARGET.ty - 1 }
+    const [diagonal] = gearCellsOver(TARGET, FACING.down, {
+      aheadCells: 1,
+      sideCells: 0,
+      aheadBearing: 'right',
+    }).ahead
+    const plain = drillWith([])
+    const twin = drillWith([gearSlice({ aheadCells: 1, aheadBearing: 'right' })])
+    expect(densityOf(twin.world, diagonal)).toBeLessThan(densityOf(plain.world, diagonal))
+    expect(densityOf(twin.world, next)).toBe(densityOf(plain.world, next))
+  })
+
+  it('a gated diagonal cell is refused through canMine and reported in DrillGated', () => {
+    const { cell: ore, target } = cellUnderDiagonal(surfaceOreTiles(40), 'left', CELL_KIND.ground)
+    const ask = { aheadCells: 1, aheadBearing: 'left' } as const
+    expect(densityOf(drillWith([gearSlice(ask)], target).world, ore)).toBeLessThan(
+      densityOf(EMPTY_WORLD, ore),
+    )
+    const cut = drillWith([gearSlice(ask), shellSlice(ore, 'refused')], target)
+    expect(densityOf(cut.world, ore)).toBe(densityOf(EMPTY_WORLD, ore))
+    expect(kindOfCell(cellAt(cut.world, PARAMS, ore))).toBe(CELL_KIND.ore)
+    expect(drillGatedOf(cut.events)).toEqual([
+      expect.objectContaining({ ...ore, gateKind: 'dynamite', outcome: 'refused' }),
+    ])
+  })
+
+  it('a core cell under the diagonal follows canMine', () => {
+    // The bit sits in core too, so the disc still cuts with every ore cell refused.
+    const { cell: core, target } = cellUnderDiagonal(coreTiles(40), 'right', CELL_KIND.core)
+    const twin = gearSlice({ aheadCells: 1, aheadBearing: 'right' })
+    const plain = drillWith([REFUSE_ALL_ORE], target, FACING.down, CORE_DRILL)
+    const cut = drillWith([twin, REFUSE_ALL_ORE], target, FACING.down, CORE_DRILL)
+    expect(densityOf(cut.world, core)).toBeLessThan(densityOf(plain.world, core))
+    expect(cut.events).toContainEqual(expect.objectContaining({ type: 'TileDestroyed', ...core }))
+    expect(drillGatedOf(cut.events)).not.toContainEqual(expect.objectContaining(core))
   })
 })
