@@ -11,6 +11,10 @@
  *
  * While it holds, the slot's ring fills (`holdOf`); a cancel clanks lightly and a finish chimes
  * (`slotHoldCues`, ticket 253).
+ *
+ * The plate is the kit's magnitude at the Mark researched when the hold finishes (#249): the hold
+ * keeps no number of its own, so a Mark bought in the field during the 90 ticks plates at the new
+ * Mark.
  */
 import { BASIS_POINTS } from '../../../constants/balance'
 import {
@@ -24,7 +28,13 @@ import type { SlotHoldCueSource, SlotHoldEnd } from '../../../systems/registries
 import { cmp, div, fromSafeInteger, mul, add, sub, type BigStat } from '../../../systems/money'
 import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import { statsOfVehicle, type VehicleState } from '../../../systems/vehicle/vehicleState'
-import { chargesLeftOf, returnCharge, toggleDrawQuantaOf, type SlotHold } from '../../power-up-core'
+import {
+  chargesLeftOf,
+  powerUpAtMarkOf,
+  returnCharge,
+  toggleDrawQuantaOf,
+  type SlotHold,
+} from '../../power-up-core'
 import { MOBILITY_ITEM } from './itemIds'
 import { MOBILITY_ECONOMY } from './mobilityEconomy'
 import { hullPatchedOf, patchCancelledOf } from './mobilityEvents'
@@ -95,7 +105,7 @@ function cancelRivetHold(state: AuthorityState, playerId: string): RuleEffect {
 
 function finishRivetHold(state: AuthorityState, playerId: string): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
-  const hullAfter = patchedHullOf(vehicle)
+  const hullAfter = patchedHullOf(vehicle, plateShareBpOf(state, playerId))
   const cleared = updateMobility(state, playerId, (value) => ({ ...value, patch: null }))
   return {
     state: withVehicle(cleared, playerId, { ...vehicleOf(cleared, playerId), hull: hullAfter }),
@@ -103,13 +113,17 @@ function finishRivetHold(state: AuthorityState, playerId: string): RuleEffect {
   }
 }
 
-/** The hull with a share of its maximum plated on, never past the maximum. */
-function patchedHullOf(vehicle: VehicleState): BigStat {
-  const hullMax = statsOfVehicle(vehicle).hullMax
-  const plate = div(
-    mul(hullMax, fromSafeInteger(NUMBERS.hullShareBp)),
-    fromSafeInteger(BASIS_POINTS),
+/** The share of `hullMax` the kit plates on at the player's Mark, in basis points. */
+function plateShareBpOf(state: AuthorityState, playerId: string): number {
+  return (
+    powerUpAtMarkOf(state, playerId, MOBILITY_ITEM.rivetPatch)?.magnitude ?? NUMBERS.hullShareBp
   )
+}
+
+/** The hull with a share of its maximum plated on, never past the maximum. */
+function patchedHullOf(vehicle: VehicleState, shareBp: number): BigStat {
+  const hullMax = statsOfVehicle(vehicle).hullMax
+  const plate = div(mul(hullMax, fromSafeInteger(shareBp)), fromSafeInteger(BASIS_POINTS))
   const patched = add(vehicle.hull, plate)
   return cmp(patched, hullMax) > 0 ? hullMax : patched
 }

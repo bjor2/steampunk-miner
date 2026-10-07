@@ -1,8 +1,8 @@
 /**
  * Each mobility item as `power-up-core` runs it (#162 section 2.1 classes, section 4 numbers):
  * charged items refill at the dock, consumables come as a stack, the two toggles draw a share of
- * `energyMax` a second while on (#162 4.4, ticket 233). Marks take effect in play in a
- * `power-up-core` follow-up (GD lock on #204 Q7), so every use acts at its Mark 1 numbers.
+ * `energyMax` a second while on (#162 4.4, ticket 233). These are the Mark 1 numbers: power-up-core
+ * steps them with each item's ladder at the Mark researched (#249, GD lock on #204 Q7).
  */
 import type { PowerUp, PowerUpClass } from '../../power-up-core'
 import { MOBILITY_ITEM, type MobilityItemId } from './itemIds'

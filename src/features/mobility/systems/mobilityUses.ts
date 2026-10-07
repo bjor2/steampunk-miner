@@ -6,6 +6,9 @@
  *
  * The toggles (grav anchor, buoyancy tanks) do nothing here: `power-up-core` switches them, and
  * their effect reads the switch.
+ *
+ * Each window, burst or reach is the use's magnitude: the item's ladder at the Mark researched when
+ * it acts (#249, `markLadders.ts`), or its #162 number when the use carries none.
  */
 import { BASIS_POINTS } from '../../../constants/balance'
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../../constants/physics'
@@ -42,7 +45,8 @@ type Activate = (state: AuthorityState, use: PowerUpUse) => PowerUpOutcome
 export const fireGrapple: Activate = (state, use) => {
   const pose = vehicleOf(state, use.playerId).pose
   if (pose === null) return { kind: 'refused', reason: OUT_OF_PLAY }
-  const hook = grappleHookOf(state, pose, NUMBERS.grapple)
+  const reach = { ...NUMBERS.grapple, rangeTiles: magnitudeOf(use, NUMBERS.grapple.rangeTiles) }
+  const hook = grappleHookOf(state, pose, reach)
   if (hook === null) return { kind: 'refused', reason: NO_HOOK }
   return actedWith(state, use, (value) => ({ ...value, reel: reelOf(state, use, hook) }), [
     grappleHookedOf(use.playerId, hook.hook, hook.to),
@@ -53,7 +57,7 @@ export const fireGrapple: Activate = (state, use) => {
 export const dropBallast: Activate = (state, use) =>
   actedWith(state, use, (value) => ({
     ...value,
-    ballastUntilTick: use.tick + NUMBERS.ballast.windowTicks,
+    ballastUntilTick: use.tick + magnitudeOf(use, NUMBERS.ballast.windowTicks),
   }))
 
 /** Dumps a share of the heat gauge at once and pauses heat gain for a while. */
@@ -62,7 +66,7 @@ export const ventHeatSink: Activate = (state, use) => {
   const fromTick = Math.max(use.tick, settledTick)
   const window = {
     fromTick,
-    untilTick: fromTick + NUMBERS.heatSink.pauseTicks,
+    untilTick: fromTick + magnitudeOf(use, NUMBERS.heatSink.pauseTicks),
     ventBp: NUMBERS.heatSink.ventBp,
     gainBp: NUMBERS.heatSink.gainBp,
   }
@@ -87,14 +91,18 @@ export const fireEscapeThruster: Activate = (state, use) =>
 export const raiseSteamShield: Activate = (state, use) =>
   actedWith(state, use, (value) => ({
     ...value,
-    shieldUntilTick: use.tick + NUMBERS.steamShield.windowTicks,
+    shieldUntilTick: use.tick + magnitudeOf(use, NUMBERS.steamShield.windowTicks),
   }))
 
 /** A cloud where the miner stands that breaks enemy detection in its radius for a while. */
 export const burstSmokeCanister: Activate = (state, use) => {
   const pose = vehicleOf(state, use.playerId).pose
   if (pose === null) return { kind: 'refused', reason: OUT_OF_PLAY }
-  const smoke = { x: pose.x, y: pose.y, untilTick: use.tick + NUMBERS.smoke.windowTicks }
+  const smoke = {
+    x: pose.x,
+    y: pose.y,
+    untilTick: use.tick + magnitudeOf(use, NUMBERS.smoke.windowTicks),
+  }
   return actedWith(state, use, (value) => ({ ...value, smoke }))
 }
 
@@ -136,9 +144,14 @@ function burstWith(
     dirX: direction.x,
     dirY: direction.y,
     speedMmPerS: shareOfTopSpeedMm(statsOfVehicle(vehicle).engine.speedMax, numbers.speedShareBp),
-    untilTick: use.tick + numbers.burstTicks,
+    untilTick: use.tick + magnitudeOf(use, numbers.burstTicks),
   }
   return actedWith(state, use, (value) => change(value, burst))
+}
+
+/** The use's magnitude at its Mark, else the item's number as bought. */
+function magnitudeOf(use: PowerUpUse, bought: number): number {
+  return use.magnitude ?? bought
 }
 
 /** Left or right as the miner faces; up when it faces up or down (#162: "sideways or up"). */

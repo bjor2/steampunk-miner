@@ -11,9 +11,12 @@ import {
 import { replayRun } from '../../../systems/replay/replayRun'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { energyMaxQuantaOf } from '../../../systems/vehicle/vehicleState'
+import { contentOf } from '../../../systems/registries/content'
 import { itemChargesOf, powerUpStateOf } from './chargeState'
+import { powerUpAtMarkOf } from './powerUpMarks'
 import { slotButtonsOf } from './slotColumn'
 import { intentToUseSlot } from './slotUse'
+import type { PowerUp } from './powerUpKind'
 import { toggleDrawQuantaOf } from './toggleDraw'
 
 // Marks in play (#249, #162 4.6) on the loaded slices: the mobility lane's steam boost (charged:
@@ -53,6 +56,23 @@ function usedLinesOf(session: ScriptedSession) {
 }
 
 describe('power-up marks in play', () => {
+  it('reads every registered power-up researched none of at its own numbers, so nothing moves before Mark 2', () => {
+    const state = createScriptedSession().state()
+    const numbersOf = ({ charges, cooldownTicks, energyDrawPerMillePerSecond }: PowerUp) => ({
+      charges,
+      cooldownTicks,
+      energyDrawPerMillePerSecond,
+    })
+    contentOf('power-up').forEach((powerUp) => {
+      const asBought = powerUpAtMarkOf(state, 'p1', powerUp.itemId)!
+      expect({ itemId: powerUp.itemId, mark: asBought.mark, ...numbersOf(asBought) }).toEqual({
+        itemId: powerUp.itemId,
+        mark: 0,
+        ...numbersOf(powerUp),
+      })
+    })
+  })
+
   it('acts as bought and logs Mark 0 while none of the item is researched', () => {
     const { session, submit } = fieldSession(STEAM_BOOST)
     submit(PRESS_TICK, intentToUseSlot('powerup.1'))
