@@ -28,10 +28,10 @@ import { PACING_WORLD_SEEDS } from '../src/constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
 import { loadFeatures } from '../src/features'
 import { medianPacingReport } from '../src/logging/pacingMedian'
-import { derivePacingReport } from '../src/logging/pacingReport'
+import { derivePacingReport, type PacingReport } from '../src/logging/pacingReport'
 import type { RunEvent } from '../src/logging/runEvent'
 import type { RunEventName } from '../src/logging/eventNames'
-import { playLoggedSliceOnSeeds } from '../src/logging/sliceRunLog'
+import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import { blastTradeOf, type BlastTrade } from '../src/systems/bot/blastTrade'
 import type { ChargePolicy } from '../src/systems/bot/botCharges'
 import {
@@ -70,6 +70,8 @@ const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
 const MAX_SPEED_UP_PERCENT = 10
 const QUICK_FLOOR_MULTIPLE = 2
 const SLOW_FLOOR_MULTIPLE = 4
+/** The run-log lines the pace rows count per planet. */
+const COUNTED_LINES: readonly RunEventName[] = ['charges_restocked', 'charge_detonated']
 
 const SCENARIO_FILE = new URL('../scenarios/bot-slice.scenario.json', import.meta.url)
 const REPORT_FOLDER = new URL('../balance-report/', import.meta.url)
@@ -121,6 +123,16 @@ interface TradeRow {
   planet: number
   drill: string
   trade: BlastTrade
+}
+
+interface CountedLine {
+  name: RunEventName
+  planet: number | undefined
+}
+
+interface PolicyRuns {
+  pacing: PacingReport
+  counted: CountedLine[]
 }
 
 interface PaceRow {
@@ -188,14 +200,27 @@ function whereOf(trade: ChargeSizeTrade): string {
   return `size ${trade.size} planet ${trade.planetIndex} band ${trade.band} at ${trade.drillTicksPerTile} ticks/tile`
 }
 
-function playTo(chargePolicy: ChargePolicy) {
-  const runs = playLoggedSliceOnSeeds(scenario, SEEDS, {
-    lastPlanet: LAST_PLANET,
-    maxTicks: BUDGET_TICKS,
-    chargePolicy,
+/**
+ * Each seed's run is cut down to its pacing report and line counts before the next one plays: six
+ * forty-planet logs held at once outgrow node's heap.
+ */
+function playTo(chargePolicy: ChargePolicy): PolicyRuns {
+  const runs = SEEDS.map((worldSeed) => {
+    const options = { lastPlanet: LAST_PLANET, maxTicks: BUDGET_TICKS, chargePolicy }
+    const { events } = playLoggedSlice({ ...scenario, worldSeed }, options)
+    return { report: derivePacingReport(events, worldSeed), counted: countedLinesOf(events) }
   })
-  const reports = runs.map(({ events, worldSeed }) => derivePacingReport(events, worldSeed))
-  return { pacing: medianPacingReport(reports), events: runs.flatMap((run) => run.events) }
+  return {
+    pacing: medianPacingReport(runs.map((run) => run.report)),
+    counted: runs.flatMap((run) => run.counted),
+  }
+}
+
+/** The lines the pace rows count, kept as name and planet only. */
+function countedLinesOf(events: readonly RunEvent[]): CountedLine[] {
+  return events
+    .filter((event) => COUNTED_LINES.includes(event.event))
+    .map((event) => ({ name: event.event, planet: event.planet }))
 }
 
 function paceRowOf(planet: number): PaceRow {
@@ -210,8 +235,8 @@ function paceRowOf(planet: number): PaceRow {
       blastingTicks === null || drillingTicks === null
         ? null
         : ((blastingTicks - drillingTicks) * 100) / drillingTicks,
-    restocks: linesOn(blasting.events, 'charges_restocked', planet),
-    blasts: linesOn(blasting.events, 'charge_detonated', planet),
+    restocks: linesOn(blasting.counted, 'charges_restocked', planet),
+    blasts: linesOn(blasting.counted, 'charge_detonated', planet),
     isInsideC4:
       blastingTicks !== null &&
       blastingTicks >= min * TICKS_PER_MINUTE &&
@@ -246,8 +271,8 @@ function c4MissOf(planet: number, ticks: number | null): string {
   return `planet ${planet} took ${minutes(ticks)} with charges, outside C4`
 }
 
-function linesOn(events: readonly RunEvent[], name: RunEventName, planet: number): number {
-  return events.filter((event) => event.event === name && event.planet === planet).length
+function linesOn(lines: readonly CountedLine[], name: RunEventName, planet: number): number {
+  return lines.filter((line) => line.name === name && line.planet === planet).length
 }
 
 function range(from: number, to: number): number[] {
