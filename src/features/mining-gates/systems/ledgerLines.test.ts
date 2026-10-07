@@ -20,6 +20,13 @@ describe('gate ledger lines', () => {
     )
   })
 
+  it('prints its numbers the way every count on screen prints', () => {
+    expect(ledgerLineOf(refused('drill', 'tip:1234', 'tip:999'))).toBe(
+      'Ledger: drill tip 1,234 required, the miner has 999.',
+    )
+    expect(ledgerLineOf(refused('drill', 'tip:034', 'tip:32'))).toBeNull()
+  })
+
   it('names the charge size a shell needs and the size carried, or none', () => {
     expect(ledgerLineOf(refused('dynamite', 'size:3', 'size:1'))).toBe(
       'Ledger: dynamite size 3 required, the miner carries size 1.',

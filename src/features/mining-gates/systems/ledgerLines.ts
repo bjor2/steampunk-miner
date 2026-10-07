@@ -4,7 +4,11 @@
  * (`tip:<major>`, `size:<n>`, an extractor id or `<extractor>:<state>`, `none`; see canMine.ts).
  * The same line is the HUD chip and the refusal text. The numbers come only from those words, so
  * the templates stay inside #159's flavour rules; a gate kind this slice does not word has no line.
+ * The numbers print through `formatAmount` like every count the player sees (#32; GD ruling on
+ * ticket 238, Vertical Scaler: ledger amounts go through Money/formatAmount, #164).
  */
+import { formatAmount } from '../../../systems/displayAmount'
+import { fromCanonical } from '../../../systems/money'
 import LEDGER_FILE from '../ledgerLines.json'
 import type { Rig } from './gateRows'
 import { iconIdOfRig, rigNamed } from './rigs'
@@ -35,6 +39,8 @@ const DYNAMITE_ICON_ID = 'icon-blasting-charges'
 
 const NONE_CARRIED = '0'
 const SLOT = /\{(\w+)\}/g
+/** A whole count with no leading zeros, so it reads as canonical Money text. */
+const WHOLE_COUNT = /^(0|[1-9][0-9]*)$/
 
 type LineOfHit = (hit: GateHit, templates: LedgerTemplates) => string | null
 
@@ -80,7 +86,7 @@ function drillLineOf(hit: GateHit, templates: LedgerTemplates): string | null {
   const need = countOf(hit.required, 'tip')
   const have = countOf(hit.have, 'tip')
   if (need === null || have === null) return null
-  return fillLedgerTemplate(templates.drill, { need, have })
+  return fillLedgerTemplate(templates.drill, shownCountsOf(need, have))
 }
 
 function dynamiteLineOf(hit: GateHit, templates: LedgerTemplates): string | null {
@@ -88,7 +94,7 @@ function dynamiteLineOf(hit: GateHit, templates: LedgerTemplates): string | null
   const have = countOf(hit.have, 'size')
   if (need === null || have === null) return null
   const template = have === NONE_CARRIED ? templates.dynamiteNoneCarried : templates.dynamite
-  return fillLedgerTemplate(template, { need, have })
+  return fillLedgerTemplate(template, shownCountsOf(need, have))
 }
 
 function extractorLineOf(hit: GateHit, templates: LedgerTemplates): string | null {
@@ -112,7 +118,11 @@ function extractorTemplateOf(
 /** `tip:34` → `34` for the word `tip`; null for any other shape. */
 function countOf(word: string, name: string): string | null {
   const [wordName, count] = word.split(':')
-  return wordName === name && /^\d+$/.test(count ?? '') ? count : null
+  return wordName === name && WHOLE_COUNT.test(count ?? '') ? count : null
+}
+
+function shownCountsOf(need: string, have: string): { need: string; have: string } {
+  return { need: formatAmount(fromCanonical(need)), have: formatAmount(fromCanonical(have)) }
 }
 
 function rigOfRequired(required: string): Rig | null {

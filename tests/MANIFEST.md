@@ -131,7 +131,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 
-### `mining-gates`: 19 files, 122 tests
+### `mining-gates`: 19 files, 123 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -148,7 +148,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/gateChipBoard.test.ts` | 7 | 7 |
 | `src/features/mining-gates/systems/gateLedger.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/gateTable.test.ts` | 6 | 6 |
-| `src/features/mining-gates/systems/ledgerLines.test.ts` | 6 | 6 |
+| `src/features/mining-gates/systems/ledgerLines.test.ts` | 7 | 7 |
 | `src/features/mining-gates/systems/render/gateSounds.test.ts` | 7 | 7 |
 | `src/features/mining-gates/systems/render/lockMarkers.test.ts` | 11 | 11 |
 | `src/features/mining-gates/systems/rigSales.test.ts` | 3 | 3 |
