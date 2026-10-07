@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T11:18:01+02:00",
+  "updated_at": "2026-10-07T11:32:07+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -43,17 +43,17 @@
         },
         {
           "slot": "C4",
-          "state": "busy",
-          "ticket": 223,
-          "grok_slot": 7,
-          "kind": "dev",
-          "since": "2026-10-07T10:43:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
-      "claims_last_hour": 3,
+      "used": 2,
+      "free": 2,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -73,11 +73,11 @@
         },
         {
           "slot": "C6",
-          "state": "busy",
-          "ticket": 222,
-          "grok_slot": 5,
-          "kind": "dev",
-          "since": "2026-10-07T10:01:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C7",
@@ -97,15 +97,27 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
+      "used": 1,
+      "free": 3,
       "claims_last_hour": 2,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 3,
+    "busy": 1,
     "max": 3
+  },
+  "tester": {
+    "state": "idle",
+    "phase": null,
+    "sha": null,
+    "since": null,
+    "holds_gate": false,
+    "claude_slot": null,
+    "last_run": "2026-10-07T08:31:40Z",
+    "last_nightly": null,
+    "last_nightly_result": null,
+    "main_red_sha": null
   },
   "grok": [
     {
@@ -136,10 +148,9 @@
     },
     {
       "slot": 5,
-      "state": "dev",
-      "ticket": 222,
-      "since": "2026-10-07T10:01:00+02:00",
-      "claude_slot": 6
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 6,
@@ -150,10 +161,9 @@
     },
     {
       "slot": 7,
-      "state": "dev",
-      "ticket": 223,
-      "since": "2026-10-07T10:43:00+02:00",
-      "claude_slot": 4
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 8,
@@ -216,10 +226,10 @@
     },
     {
       "slot": 4,
-      "state": "busy",
-      "ticket": 223,
-      "grok_slot": 7,
-      "since": "2026-10-07T10:43:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -232,10 +242,10 @@
     },
     {
       "slot": 6,
-      "state": "busy",
-      "ticket": 222,
-      "grok_slot": 5,
-      "since": "2026-10-07T10:01:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 2
     },
     {
@@ -265,8 +275,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 5,
+      "used": 4,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -274,8 +284,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 5,
-      "free": 3,
+      "used": 3,
+      "free": 5,
       "external": 0
     }
   }
