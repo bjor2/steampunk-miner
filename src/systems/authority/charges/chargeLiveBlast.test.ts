@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { MM_PER_METRE } from '../../../constants/physics'
 import { projectDomainEvent } from '../../../logging/domainEventLog'
+import { withRegistrations } from '../../../registries/registrar'
+import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { hashCell } from '../../cellRandom'
 import { keptBlastOreUnits } from '../../economy/blastingCharges'
 import { div, fromSafeInteger } from '../../money'
+import type { GateCheck } from '../../registries/gateChecks'
 import { cellDensitySum } from '../../world/cellYield'
 import type { TilePoint } from '../../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../../world/worldCell'
@@ -181,3 +184,61 @@ function expectedKeptUnits(site: TilePoint, radiusMm: number): number {
     0,
   )
 }
+
+// #153 amendment: dense and rig-gated cells stand as anchors in the crater, and only a dynamite gate
+// whose `minCharge` the blast's size meets opens. A fake slice's gate stands in for #148's.
+const MIN_CHARGE = 10
+
+function gateSliceOf(check: GateCheck['check']): SliceDefinition {
+  return { id: 'gate-probe', register: (r) => r.gateCheck({ id: 'gate-probe.ore', check }) }
+}
+
+const denseOre: GateCheck['check'] = () => ({
+  outcome: 'refused',
+  gateKind: 'dense',
+  required: 'drill:99',
+  have: 'charge',
+})
+
+const dynamiteOre: GateCheck['check'] = ({ blast }) => ({
+  outcome: (blast?.size ?? 0) >= MIN_CHARGE ? 'cut' : 'refused',
+  gateKind: 'dynamite',
+  required: `charge:${MIN_CHARGE}`,
+  have: `charge:${blast?.size ?? 0}`,
+})
+
+function oreTilesOf(site: TilePoint, radiusMm: number): TilePoint[] {
+  return frontTilesOf(site, radiusMm).filter(
+    (tile) => kindOfCell(cellAt(EMPTY_WORLD, PARAMS, tile)) === CELL_KIND.ore,
+  )
+}
+
+function gatedBlast(check: GateCheck['check'], size: number) {
+  return withRegistrations([gateSliceOf(check)], () => {
+    const session = liveBlastSession([blastAt(SOLID_SITE, R24_MM, { size })])
+    session.advanceTo(SETTLED_TICK)
+    return session
+  })
+}
+
+describe('live blast: gated cells (#153 amendment)', () => {
+  it('leaves cells a gate refuses standing, and passes over them without counting', () => {
+    const session = gatedBlast(denseOre, 10)
+    const ore = oreTilesOf(SOLID_SITE, R24_MM)
+    expect(ore.length).toBeGreaterThan(64)
+    expect(ore.filter((tile) => densityOfTile(session, tile) === 0)).toEqual([])
+    const [resolved] = ofType(session.events(), 'BlastResolved')
+    expect(resolved.tilesCleared).toBe(inRadiusCount(R24_MM) - ore.length)
+    expect(sliceTicksOf(session)).toHaveLength(Math.ceil(resolved.tilesCleared / 64))
+  })
+
+  it('frees dynamite-gated cells whole only for a charge of at least their minCharge', () => {
+    const ore = oreTilesOf(SOLID_SITE, R24_MM)
+    const opened = gatedBlast(dynamiteOre, MIN_CHARGE)
+    expect(ore.filter((tile) => densityOfTile(opened, tile) > 0)).toEqual([])
+    expect(ofType(opened.events(), 'BlastResolved')[0].oreUnits).toBe(ore.length)
+    const tooSmall = gatedBlast(dynamiteOre, MIN_CHARGE - 1)
+    expect(ore.filter((tile) => densityOfTile(tooSmall, tile) === 0)).toEqual([])
+    expect(ofType(tooSmall.events(), 'BlastResolved')[0].oreUnits).toBe(0)
+  })
+})

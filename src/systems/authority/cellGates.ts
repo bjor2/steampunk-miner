@@ -1,8 +1,9 @@
 /**
  * The slices' gate verdict on one cell (docs/standards/feature-slices.md 3.6, K2), shared by the
  * drill (`drillGates.ts`) and the blast (`charges/blastGates.ts`). Only ore cells are asked. A
- * memo keeps one answer per tile for the length of one drill command or one blast, so the many
- * samples of a cell ask once and every verdict is read off the state the command started from.
+ * memo keeps one answer per tile for the length of one drill command or one blast slice, so the
+ * many samples of a cell ask once and every verdict is read off the state the command or slice
+ * started from.
  */
 import type { BlastEvent } from '../registries/blastEffects'
 import { gateVerdictOf, type GateVerdict } from '../registries/gateChecks'

@@ -453,10 +453,10 @@ A verdict answers the means in the query: `cut` opens the cell to it, `refused` 
 **Blast (K2, #185)** (`src/systems/authority/charges/blastGates.ts`): a charge asks about every ore cell in its radius, with its `BlastEvent`.
 - `refused`: the cell stands (#153 amendment: dense and rig-gated cells are anchors in the crater).
 - `cut`: the cell breaks past the charge's hardness cap and pays its full unit, after the kept share (#142: a qualifying charge frees a dynamite-gated cell whole).
-- `lost`: the cell breaks, and its sale value joins `charge_detonated.oreValueLost`.
+- `lost`: the cell breaks, and its sale value joins `blast_resolved.oreValueLost` (it was `charge_detonated`'s before K6).
 - A cell with no verdict takes today's blast.
 
-One verdict per tile is asked per drill command or blast (`cellGates.ts`), on the state the command started from. With no check registered, nothing is asked and both paths are unchanged.
+One verdict per tile is asked per drill command or blast slice (`cellGates.ts`), on the state the command or slice started from. A refused cell is an anchor the live blast passes over without counting it against its 64 tiles a tick (K6). With no check registered, nothing is asked and both paths are unchanged.
 
 ### 3.7 Blast effects (`dynamite` and others provide)
 
