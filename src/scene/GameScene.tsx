@@ -18,6 +18,7 @@ import { PlanetTerrain } from './PlanetTerrain'
 import { PlantedCharges } from './PlantedCharges'
 import { PlatformYard } from './PlatformYard'
 import { RenderPipeline } from './RenderPipeline'
+import { SceneLayers } from './SceneLayers'
 import { ScreenFeedback } from './ScreenFeedback'
 import { ScreenProjectorFeed } from './ScreenProjectorFeed'
 import { SkyBackground } from './SkyBackground'
@@ -55,6 +56,7 @@ export function GameScene() {
       <CollapseTelegraph />
       <BlastScorches />
       <PlantedCharges />
+      <SceneLayers />
       <SoundStage />
       <PerfSampler />
       <ScreenProjectorFeed />

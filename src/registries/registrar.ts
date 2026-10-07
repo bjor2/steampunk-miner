@@ -50,6 +50,7 @@ import {
 } from '../systems/registries/seal'
 import { ATTACH_USE_REGISTRY } from '../systems/registries/vehicleAttach'
 import { VEHICLE_STAGING_REGISTRY } from '../systems/registries/vehicleStaging'
+import { SCENE_LAYER_REGISTRY } from '../scene/registries/sceneLayers'
 import { WORLD_PIECE_REGISTRY } from '../scene/registries/worldPieces'
 import { LOADOUT_ACCEPTANCE_REGISTRY } from '../systems/registries/vehicleLoadout'
 import { HUD_PANEL_REGISTRY } from '../ui/registries/hudPanels'
@@ -83,6 +84,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     buildingAttachUse: (use) => add(BUILDING_ATTACH_USE_REGISTRY, use),
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),
     worldPiece: (piece) => add(WORLD_PIECE_REGISTRY, piece),
+    sceneLayer: (layer) => add(SCENE_LAYER_REGISTRY, layer),
     vehicleStaging: (provider) => add(VEHICLE_STAGING_REGISTRY, provider),
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
     botPurchase: (purchase) => add(BOT_PURCHASE_REGISTRY, purchase),

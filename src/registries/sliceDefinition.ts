@@ -31,6 +31,7 @@ import type { OreTypeProvider } from '../systems/registries/oreTypes'
 import type { SaveSection } from '../systems/registries/saveSections'
 import type { AttachUse } from '../systems/registries/vehicleAttach'
 import type { VehicleStagingProvider } from '../systems/registries/vehicleStaging'
+import type { SceneLayer } from '../scene/registries/sceneLayers'
 import type { WorldPiece } from '../scene/registries/worldPieces'
 import type { LoadoutAcceptance } from '../systems/registries/vehicleLoadout'
 import type { HudPanel } from '../ui/registries/hudPanels'
@@ -79,6 +80,8 @@ export interface SliceRegistrar {
   hudPanel(panel: HudPanel): void
   /** A piece of the world scene, drawn in its layer (#175). */
   worldPiece(piece: WorldPiece): void
+  /** A layer of the world scene with the most it draws, after the planted charges (#213). */
+  sceneLayer(layer: SceneLayer): void
   /** One provider across all slices: how a dock building stages the local vehicle (#170). */
   vehicleStaging(provider: VehicleStagingProvider): void
   /**
