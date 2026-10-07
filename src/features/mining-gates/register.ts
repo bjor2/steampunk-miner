@@ -9,6 +9,7 @@
  * Gate content starts on planet 7 (GD lock on #148).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
+import { miningGatesDebugActions } from './debug'
 import { MINING_GATES_PROJECTIONS, MINING_GATES_RUN_EVENTS } from './logging'
 import { canMine } from './systems/canMine'
 import { miningGatesDrillClass } from './systems/drillClass'
@@ -27,5 +28,8 @@ export const slice: SliceDefinition = {
     r.authorityReaction(gateLedger)
     r.eventProjections(MINING_GATES_PROJECTIONS)
     r.runEvents(MINING_GATES_RUN_EVENTS)
+    // steampunkDebug.features['mining-gates'].describe(), .gateTableOf(p, seed), .ownsRig(id),
+    // .grantRig(id)
+    r.debugActions(miningGatesDebugActions)
   },
 }
