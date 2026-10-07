@@ -104,8 +104,20 @@ starts no workflow. There is no separate publish command to call. The fields the
   grok:     [{ slot, state: 'free'|'dev'|'planner', ticket, since, claude_slot }],
   claude:   [{ slot, state: 'free'|'busy'|'disabled', ticket, grok_slot, since }],
   accounts: [{ id, account, name, enabled, reason,
-               slots: [{ slot: 'C1', state, kind: 'dev'|'aux'|'external'|null, ticket, grok_slot, since }] }] }
+               slots: [{ slot: 'C1', state, kind: 'dev'|'aux'|'external'|null, label, ticket, grok_slot, since }] }],
+  gate:     { busy, max },          // gate-stage tokens: worker gates + box Tester heavy phases
+  tester:   { state: 'idle'|'running', phase, sha, since, holds_gate, claude_slot,
+              last_run, last_nightly, last_nightly_result, main_red_sha } }
 ```
+
+`tester` is the box Tester (`tester.sh` beside the driver, docs/metrics/test-metrics.md). It
+writes `tester/live.json` on every phase change and runs `next-ticket.sh --status`, so the Slots
+tab shows it holding a gate token or its triage Claude slot (an `aux` slot labelled
+`tester-triage`) within about a minute; it also publishes a `tester` entry in `loops.json`
+(working / idle / blocked on red / paused on main red), whose state changes rebuild the page. The
+Tests tab (#192) reads `tester` with the test-metrics `summary.json` and main's `box-tester/*`
+commit statuses: runs per phase (fast, slow, full, nightly suites), the main-red pause and a STALE
+warning when no box run happened for 6 h (`TESTER_STALE_AFTER_H`).
 
 Without `accounts` (a v1 snapshot) the Claude pool shows as one pool. The page copies only these
 fields (`scripts/status/slots.mjs`), so anything else in the file never reaches it, and drops a name
