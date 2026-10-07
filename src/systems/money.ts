@@ -113,6 +113,15 @@ export function fromSafeInteger(count: number): Money {
   return wrap(new MoneyDecimal(count))
 }
 
+/**
+ * A bounded float (a rate or a share in the pacing bot's plan) as money, so the plan multiplies it
+ * by a price in Money and never turns the price into a double, which is Infinity past 1.8e308
+ * (#196). An authority amount comes from canonical text or a safe integer, never from here.
+ */
+export function fromFiniteNumber(value: number): Money {
+  return wrap(new MoneyDecimal(value))
+}
+
 /** A whole amount that is a bounded count again (for example `ceil(0.4 * coreTileCount)`). */
 export function toSafeInteger(amount: Money): number {
   const value = unwrap(amount)

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { onCurveLevels, vehicleStatsAt, type UpgradeLevels } from '../economy/vehicleStats'
+import { cmp } from '../money'
 import { planetParamsFor } from '../world/planetParams'
 import { blastTradeOf, type BlastTrade } from './blastTrade'
 
@@ -33,7 +34,8 @@ describe('blast trade (#109 numbers acceptance 3)', () => {
   it('earns less a minute blasting than drilling wherever a tile takes at most 2x the floor', () => {
     const quick = trades.filter((trade) => trade.floorMultiple <= 2)
     expect(quick.length).toBeGreaterThan(0)
-    for (const trade of quick) expect(trade.blastMoneyPerTick).toBeLessThan(trade.drillMoneyPerTick)
+    for (const trade of quick)
+      expect(cmp(trade.blastMoneyPerTick, trade.drillMoneyPerTick)).toBe(-1)
   })
 
   it('reaches the next band faster blasting wherever a tile takes 4x the floor or more', () => {

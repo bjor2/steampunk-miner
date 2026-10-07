@@ -2,11 +2,13 @@
  * The bot's planning model (#29 Systems & Economy note 3, after the #6 simulator): the money per
  * tick an ore trip to each band would earn with given upgrade levels, from the movement-time model
  * and the expected ore of a gallery (one unit per bored tile at the band's ore density). Used to pick the trip and to rank upgrades by marginal gain per price. A plan, not a
- * rule: approximate floats are fine here, and nothing it returns reaches the authority.
+ * rule: the ore units a tick hauls are an approximate float, bounded by the vehicle, and nothing
+ * it returns reaches the authority. The ore price grows without bound and stays Money: as a double
+ * it is Infinity past planet 582 (#196).
  */
 import { oreSalePrice, oreTier } from '../economy/oreEconomy'
 import { vehicleStatsAt, type UpgradeLevels, type VehicleStats } from '../economy/vehicleStats'
-import { toCanonical, type Money } from '../money'
+import { cmp, fromFiniteNumber, mul, type Money } from '../money'
 import { ticksPerTile } from '../vehicle/drillRule'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
 import { statsOfVehicle, type VehicleState } from '../vehicle/vehicleState'
@@ -23,7 +25,7 @@ export interface TripMeans {
 
 export interface OrePlan {
   band: number
-  moneyPerTick: number
+  moneyPerTick: Money
 }
 
 /** The hold is never planned past this share of the tank, as the bot turns back early (#33). */
@@ -51,14 +53,22 @@ export function bestOrePlan(
   means: TripMeans,
   deepestBand = BANDS.length,
 ): OrePlan | null {
-  const plans = BANDS.filter((band) => band <= deepestBand).flatMap((band) => {
+  return orePlansOf(layout, means, deepestBand).reduce<OrePlan | null>(
+    (best, plan) => (best === null || cmp(plan.moneyPerTick, best.moneyPerTick) > 0 ? plan : best),
+    null,
+  )
+}
+
+/** Every ore band down to `deepestBand` that pays with these means, shallowest first. */
+export function orePlansOf(
+  layout: MineLayout,
+  means: TripMeans,
+  deepestBand = BANDS.length,
+): OrePlan[] {
+  return BANDS.filter((band) => band <= deepestBand).flatMap((band) => {
     const moneyPerTick = oreTripMoneyPerTick(layout, means, band)
     return moneyPerTick === null ? [] : [{ band, moneyPerTick }]
   })
-  return plans.reduce<OrePlan | null>(
-    (best, plan) => (best === null || plan.moneyPerTick > best.moneyPerTick ? plan : best),
-    null,
-  )
 }
 
 /** Ticks the drill takes per core tile; null when the tip cannot scratch them (#7). */
@@ -87,7 +97,15 @@ export function canReachCore(layout: MineLayout, { stats, tankQuanta }: TripMean
   return travel.quanta * CORE_TRAVEL_SHARE_DENOMINATOR <= tankQuanta
 }
 
-function oreTripMoneyPerTick(
+function oreTripMoneyPerTick(layout: MineLayout, means: TripMeans, band: number): Money | null {
+  const unitsPerTick = oreTripUnitsPerTick(layout, means, band)
+  return unitsPerTick === null
+    ? null
+    : mul(oreUnitValue(layout, band), fromFiniteNumber(unitsPerTick))
+}
+
+/** The ore units a trip to the band hauls per tick of the round trip; null when none. */
+function oreTripUnitsPerTick(
   layout: MineLayout,
   { stats, tankQuanta }: TripMeans,
   band: number,
@@ -107,8 +125,8 @@ function oreTripMoneyPerTick(
     tankLeft / gallery.quantaPerTile,
   )
   if (galleryTiles <= 0) return null
-  const money = galleryTiles * gallery.unitsPerTile * gallery.unitValue
-  return money / (travel.ticks + galleryTiles * gallery.ticksPerTile + DOCK_OVERHEAD_TICKS)
+  const units = galleryTiles * gallery.unitsPerTile
+  return units / (travel.ticks + galleryTiles * gallery.ticksPerTile + DOCK_OVERHEAD_TICKS)
 }
 
 interface TravelCost {
@@ -140,7 +158,6 @@ function travelOf(
 
 interface GalleryYield {
   unitsPerTile: number
-  unitValue: number
   ticksPerTile: number
   quantaPerTile: number
 }
@@ -148,13 +165,11 @@ interface GalleryYield {
 function galleryYield(layout: MineLayout, band: number, boreTicksHere: number): GalleryYield {
   return {
     unitsPerTile: layout.params.oreDensityBp[band - 1] / BASIS_POINTS,
-    unitValue: approximately(oreSalePrice(oreTier(layout.params.planetIndex, band))),
     ticksPerTile: boreTicksHere,
     quantaPerTile: boreQuanta(boreTicksHere),
   }
 }
 
-/** A Money as a float, for planning only; the canonical text parses to the nearest double. */
-export function approximately(amount: Money): number {
-  return Number.parseFloat(toCanonical(amount))
+function oreUnitValue(layout: MineLayout, band: number): Money {
+  return oreSalePrice(oreTier(layout.params.planetIndex, band))
 }

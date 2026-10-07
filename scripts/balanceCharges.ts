@@ -24,7 +24,9 @@ import type { RunEventName } from '../src/logging/eventNames'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import { blastTradeOf, type BlastTrade } from '../src/systems/bot/blastTrade'
 import type { ChargePolicy } from '../src/systems/bot/botCharges'
+import { formatAmount } from '../src/systems/displayAmount'
 import { onCurveLevels, vehicleStatsAt } from '../src/systems/economy/vehicleStats'
+import { cmp, fromSafeInteger, mul, roundToWhole, type Money } from '../src/systems/money'
 import type { Scenario } from '../src/systems/scenario'
 import { planetParamsFor } from '../src/systems/world/planetParams'
 
@@ -112,7 +114,7 @@ function tradeWarnings(): string[] {
     const where = `planet ${planet} band ${trade.band} (${drill}, ${trade.floorMultiple.toFixed(1)}x floor)`
     const isQuick = trade.floorMultiple <= QUICK_FLOOR_MULTIPLE
     const isSlow = trade.floorMultiple >= SLOW_FLOOR_MULTIPLE
-    if (isQuick && trade.blastMoneyPerTick >= trade.drillMoneyPerTick) {
+    if (isQuick && cmp(trade.blastMoneyPerTick, trade.drillMoneyPerTick) >= 0) {
       return [`${where}: blasting earns at least drilling`]
     }
     if (isSlow && trade.blastAdvanceTicks >= trade.drillAdvanceTicks) {
@@ -171,8 +173,9 @@ function linesOn(events: readonly RunEvent[], name: RunEventName, planet: number
   return events.filter((event) => event.event === name && event.planet === planet).length
 }
 
-function perMinute(moneyPerTick: number): string {
-  return (moneyPerTick * TICKS_PER_MINUTE).toPrecision(3)
+/** Whole money a minute: the rates are Money, as prices pass 1e308 on later planets (#196). */
+function perMinute(moneyPerTick: Money): string {
+  return formatAmount(roundToWhole(mul(moneyPerTick, fromSafeInteger(TICKS_PER_MINUTE))))
 }
 
 function seconds(ticks: number): string {

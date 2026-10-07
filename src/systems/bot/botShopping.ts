@@ -18,7 +18,7 @@ import { nextUpgradePrice } from '../authority/workshopRules'
 import { nextCasingPrice } from '../authority/casingRules'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
-import { add, cmp, fromSafeInteger, type Money } from '../money'
+import { add, cmp, div, fromSafeInteger, sub, ZERO_MONEY, type Money } from '../money'
 import { rechargePrice, repairPrice, travelFee } from '../economy/planetCharges'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { isCasingGradeShort } from './botCasing'
@@ -28,7 +28,7 @@ import { gunMountPriceFor, type GunPolicy } from './botGuns'
 import { liningUnlockFor } from './botHeat'
 import type { BotSession } from './botSession'
 import type { MineLayout } from './mineLayout'
-import { approximately, bestOrePlan, fullTankMeans } from './tripEstimate'
+import { bestOrePlan, fullTankMeans } from './tripEstimate'
 
 const ON_CURVE_FIRST: readonly UpgradeId[] = ['drill_tip', 'hull']
 const MARGINAL_TRACKS: readonly UpgradeId[] = ['drill_power', 'engine', 'boiler', 'cargo_hold']
@@ -149,18 +149,32 @@ function forcedTrack(session: BotSession, situation: ShoppingSituation): Upgrade
   return forcedCoreTrack(session.vehicle().levels, session.state().planet.index)
 }
 
+/** An open track whose next level raises the planned money per tick, and that gain per price. */
+interface MarginalOffer {
+  track: UpgradeId
+  gainPerPrice: Money
+}
+
 function bestMarginalPurchase(session: BotSession, layout: MineLayout): UpgradeId | null {
+  return (
+    marginalOffers(session, layout).reduce<MarginalOffer | null>(betterOffer, null)?.track ?? null
+  )
+}
+
+/** Gain and price stay Money: past planet 582 either one is Infinity as a double (#196). */
+function marginalOffers(session: BotSession, layout: MineLayout): MarginalOffer[] {
   const { levels } = session.vehicle()
   const now = plannedMoneyPerTick(layout, levels)
-  let best: { track: UpgradeId; gainPerPrice: number } | null = null
-  for (const track of openMarginalTracks(session)) {
-    const gain = plannedMoneyPerTick(layout, { ...levels, [track]: levels[track] + 1 }) - now
-    const gainPerPrice = gain / approximately(priceOf(session, track))
-    if (gain > 0 && (best === null || gainPerPrice > best.gainPerPrice)) {
-      best = { track, gainPerPrice }
-    }
-  }
-  return best?.track ?? null
+  return openMarginalTracks(session).flatMap((track) => {
+    const gain = sub(plannedMoneyPerTick(layout, { ...levels, [track]: levels[track] + 1 }), now)
+    if (cmp(gain, ZERO_MONEY) <= 0) return []
+    return [{ track, gainPerPrice: div(gain, priceOf(session, track)) }]
+  })
+}
+
+/** On a tie the earlier track keeps it, in `MARGINAL_TRACKS` order. */
+function betterOffer(best: MarginalOffer | null, offer: MarginalOffer): MarginalOffer {
+  return best === null || cmp(offer.gainPerPrice, best.gainPerPrice) > 0 ? offer : best
 }
 
 /** The marginal tracks the bot can pay for and has not capped on this planet. */
@@ -172,8 +186,8 @@ function openMarginalTracks(session: BotSession): UpgradeId[] {
   )
 }
 
-function plannedMoneyPerTick(layout: MineLayout, levels: UpgradeLevels): number {
-  return bestOrePlan(layout, fullTankMeans(levels))?.moneyPerTick ?? 0
+function plannedMoneyPerTick(layout: MineLayout, levels: UpgradeLevels): Money {
+  return bestOrePlan(layout, fullTankMeans(levels))?.moneyPerTick ?? ZERO_MONEY
 }
 
 function priceOf(session: BotSession, track: UpgradeId) {

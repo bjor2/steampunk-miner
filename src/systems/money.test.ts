@@ -8,6 +8,7 @@ import {
   floor,
   floorMilli,
   fromCanonical,
+  fromFiniteNumber,
   fromSafeInteger,
   isMoney,
   isNonNegativeMoneyText,
@@ -170,6 +171,18 @@ describe('money: whole counts', () => {
   it('refuses to read a fraction or a huge amount as a count', () => {
     expect(() => toSafeInteger(m('62.4'))).toThrow(/integer/)
     expect(() => toSafeInteger(m('1e30'))).toThrow(/integer/)
+  })
+})
+
+describe('money: planning floats', () => {
+  it("takes a bounded float such as the bot plan's ore units per tick as money", () => {
+    expect(fromFiniteNumber(0.0125)).toEqual(m('1.25e-2'))
+    expect(mul(m('1e600'), fromFiniteNumber(0.5))).toEqual(m('5e599'))
+  })
+
+  it('refuses Infinity and NaN instead of turning them into money', () => {
+    expect(() => fromFiniteNumber(Number.POSITIVE_INFINITY)).toThrow(RangeError)
+    expect(() => fromFiniteNumber(Number.NaN)).toThrow(RangeError)
   })
 })
 
