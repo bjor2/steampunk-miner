@@ -45,7 +45,7 @@ function powerUpOf(item: TerrainItem): PowerUp {
     windupTicks: balance.windupTicks ?? 0,
     channelTicks: 0,
     isToggle: false,
-    energyDrawPerMillePerSecond: 0,
+    energyDrawBpPerSecond: 0,
     activate: ACTIVATIONS[item.itemId],
   }
 }
