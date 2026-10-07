@@ -30,7 +30,7 @@ function drainedSession() {
   return session
 }
 
-function linesOf(events: readonly DomainEvent[], planet = 1): RunEvent[] {
+function linesOf(events: readonly DomainEvent[], planet = 1): readonly RunEvent[] {
   const sink = createMemorySink()
   const runLog = createRunLog({ runId: 'run_201', sink, secondsSinceStart: () => 0 })
   recordDomainEventsTo(runLog, { playerId: 'p1', planet, depthTiles: 0 }, events)
