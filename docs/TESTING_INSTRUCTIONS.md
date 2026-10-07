@@ -201,7 +201,11 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   ore money a minute drilling against blasting, and 3 tiles of shaft either way, for the on-curve
   drill and one 12 levels behind), then the size guard (`chargeSizeTrade.ts`, #143 guard 1: every
   size on its unlock planet and planet 40, every band, at 24 and 45 ticks a tile, a blast's net ore
-  money a minute against the drill's at the band's density and centred on a full patch), then plays
+  money a minute against the drill's at the band's density and centred on a full patch), then the
+  payoff guard (`chargePayoff.ts`, #143 guard 2 as the GD lock on K8 #218 wrote it: one `minCharge`
+  on a +1 or +2 dynamite-gated lead patch in bands 3 to 5 of planets 7 to 40 and 50, the patch cells
+  inside the radius at the lead tier over the charge's price, expected at 2 or more, with #142's 15%
+  share cap beside it for information; #148 gates the bot's `gate_cleared` medians), then plays
   the bot scenario to planet 40's core on each pacing seed blasting (the bot's default) and never,
   and prints both median core times per planet, the blasts and whether each is inside C4: planets 7
   to 10 judged, 13 to 34 and 40 diagnostic until #148. Reported, never gated; the one lever is the
