@@ -30,14 +30,14 @@ The command builds the preview, runs `reviewShots.spec.ts` in every cell and wri
 ## The shots
 
 #173 names four shots per size: the dock with both buildings, a dig with 3 chips and a discovery
-plaque, the workshop mid-chain, and the tech tree. Their features are later tickets, so until each
-lands its slot holds today's nearest screen:
+plaque, the workshop mid-chain, and the tech tree. Until each feature lands its slot holds today's
+nearest screen:
 
-| Shot           | Today                                        | Becomes, when it lands        |
-| -------------- | -------------------------------------------- | ----------------------------- |
-| `dock.jpg`     | the rig on today's pad                       | both shop buildings (#175)    |
-| `dig.jpg`      | a fresh shaft below the pad                  | 3 chips and a plaque (#178)   |
-| `workshop.jpg` | the Upgrade bay screen                       | the workshop mid-chain (#177) |
-| `settings.jpg` | the settings screen, stand-in for a big menu | the tech tree (#165)          |
+| Shot           | Today                                                                               | Becomes, when it lands        |
+| -------------- | ----------------------------------------------------------------------------------- | ----------------------------- |
+| `dock.jpg`     | both shop buildings, the yard and the car on the Works turntable, zoomed out (#175) | landed                        |
+| `dig.jpg`      | a fresh shaft below the pad                                                         | 3 chips and a plaque (#178)   |
+| `workshop.jpg` | the Upgrade bay screen                                                              | the workshop mid-chain (#177) |
+| `settings.jpg` | the settings screen, stand-in for a big menu                                        | the tech tree (#165)          |
 
 The portrait cell writes only `portrait-card.jpg`.

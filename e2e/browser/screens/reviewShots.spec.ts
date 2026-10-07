@@ -4,16 +4,20 @@
  * writes them to `docs/screens/<cell>/`; otherwise they land in the test's output folder.
  *
  * #173's set is the dock with both buildings, a dig with 3 chips and a discovery plaque, the
- * workshop mid-chain and the tech tree. The buildings (#175), chips (#178), workshop redo (#177)
- * and tech tree (#165) are not built yet, so the set shoots today's dock, a dig, the Upgrade bay
- * and the settings screen in their places; each ticket swaps its shot in when it lands.
+ * workshop mid-chain and the tech tree. The buildings landed with #175: the dock shot zooms out
+ * over both, the yard and the car left on the Works' turntable. The chips (#178), workshop redo
+ * (#177) and tech tree (#165) are not built yet, so the set shoots a dig, the Upgrade bay and the
+ * settings screen in their places; each ticket swaps its shot in when it lands.
  */
 import { expect, test, type Page } from '@playwright/test'
 import { currentCell, dockAt, openGame, renderStats } from './screenHelpers'
+import { VIEW_SHORT_AXIS_DEFAULT_M, VIEW_SHORT_AXIS_MAX_M } from '../../../src/constants/scene'
 
 const JPEG_QUALITY = 80
 /** A native 4K frame on software WebGL takes seconds; the shot waits for drawn ground, then this. */
 const GROUND_SETTLE_MS = 3000
+/** The buildings' atlases are uploaded once the renderer's texture count holds for this long. */
+const ART_SETTLE_MS = 3000
 
 test.describe('screen matrix: review shots (#173)', () => {
   test('writes the look set for this screen', async ({ page }) => {
@@ -27,7 +31,9 @@ test.describe('screen matrix: review shots (#173)', () => {
     await page.evaluate(() => window.steampunkDebug!.ui.setRenderScale(1))
     await dismissTransmission(page)
     await waitForGround(page)
+    await standOnTheTurntable(page)
     await shoot(page, 'dock')
+    await backToTheSellBay(page)
     await digDown(page)
     await waitForGround(page)
     await shoot(page, 'dig')
@@ -44,6 +50,38 @@ test.describe('screen matrix: review shots (#173)', () => {
 async function dismissTransmission(page: Page): Promise<void> {
   await page.keyboard.press('KeyX')
   if (currentCell().isTouch) await page.touchscreen.tap(currentCell().viewport.width / 2, 20)
+}
+
+/** Both buildings in view (#175): zoomed out, the car left on the Works' turntable. */
+async function standOnTheTurntable(page: Page): Promise<void> {
+  await page.evaluate((zoom) => window.steampunkDebug!.ui.setZoom(zoom), VIEW_SHORT_AXIS_MAX_M)
+  await dockAt(page, 'upgrade')
+  await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+  await waitForArt(page)
+}
+
+/** The dig starts where a run does, on the Sell bay at the default zoom. */
+async function backToTheSellBay(page: Page): Promise<void> {
+  await page.evaluate((zoom) => window.steampunkDebug!.ui.setZoom(zoom), VIEW_SHORT_AXIS_DEFAULT_M)
+  await dockAt(page, 'sell')
+  await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+}
+
+async function waitForArt(page: Page): Promise<void> {
+  let previous = -1
+  await expect
+    .poll(
+      async () => {
+        await page.waitForTimeout(ART_SETTLE_MS)
+        const memory = await page.evaluate(() => window.steampunkDebug!.ui.getRendererMemory())
+        const textures = memory.ok ? memory.textures : -1
+        const isSettled = textures > 0 && textures === previous
+        previous = textures
+        return isSettled
+      },
+      { timeout: 240_000 },
+    )
+    .toBe(true)
 }
 
 /** A strong drill, a short drive off the pad and four seconds straight down. */

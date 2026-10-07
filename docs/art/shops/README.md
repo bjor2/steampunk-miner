@@ -72,7 +72,9 @@ the asset lint gates (`MAX_PLATFORM_PARTS`, base set at most 30).
 
 ## In the game (#175, 7 Oct 2026)
 
-`dock-<size>.png` are screenshots of the production build (`vite preview`, headless Chromium on
+The look set of record is the #173 screen matrix: `docs/screens/<cell>/dock.jpg` in every
+reference cell, TV mode included, written by `npm run screens:update`. `dock-<size>.png` here are
+the first hand-check screenshots, taken before the matrix landed, of the production build (`vite preview`, headless Chromium on
 SwiftShader) after `steampunkDebug.ui.setZoom(20)` and `teleportToDock('upgrade')`, once the
 atlases loaded: the car on the Works' turntable, the camera on `workshop.showcase_cam`, the yard
 with its lamp posts and signpost between the buildings. The Upgrade bay screen was hidden with a
