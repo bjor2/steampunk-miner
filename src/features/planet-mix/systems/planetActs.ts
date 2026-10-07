@@ -27,8 +27,11 @@ export interface PlanetMixPlan {
   isStoryPlanet: boolean
 }
 
-/** Hash streams of the hook's sub-seed: one planet-wide roll each, and the per-patch signature. */
-export const MIX_STREAM = { swap: 1, accent: 2, signature: 3 } as const
+/**
+ * Hash streams of the hook's sub-seed: one planet-wide roll each, the per-patch signature, and the
+ * per-cell electrified roll of a magnetic planet (#258).
+ */
+export const MIX_STREAM = { swap: 1, accent: 2, signature: 3, electrified: 4 } as const
 
 const BASIS_POINTS = 10000
 
