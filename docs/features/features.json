@@ -718,6 +718,12 @@
               "issues": [6, 84]
             },
             {
+              "title": "Two-tier levels",
+              "description": "Every big level is ten steps: nine pips that each add a little, then the big level-up with the rest. The ten steps cost what the level did, so a good trip buys many in a row; the guns level the same way.",
+              "status": "built",
+              "issues": [180, 181]
+            },
+            {
               "title": "Rescue fee",
               "description": "The tow costs a small share of your money, with a floor and a cap.",
               "status": "built",
