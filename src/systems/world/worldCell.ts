@@ -5,7 +5,8 @@
  *
  * `tierOffset` is the ore tier above the planet's band-1 ore tier: ore in band `b` has offset
  * `b - 1` and core material has offset 5, because #6 sets tier `t = 3(p-1) + b` and core
- * material to `3(p-1) + 6`. Storing the offset keeps every cell small for any planet index.
+ * material to `3(p-1) + 6`. #140's lead roll may lift an ore cell up to 2 tiers above its band, so
+ * an ore offset runs from 0 to 6. Storing the offset keeps every cell small for any planet index.
  */
 
 export const CELL_KIND = {
@@ -37,6 +38,9 @@ export type ResourceFamily = (typeof RESOURCE_FAMILY)[keyof typeof RESOURCE_FAMI
 
 /** Core material is tier 3(p-1)+6 (#6), five above band-1 ore. */
 export const CORE_TIER_OFFSET = 5
+
+/** Band-5 ore (offset 4) with #140's largest lead, +2: no ore cell lies higher (#223). */
+export const MAX_ORE_TIER_OFFSET = 6
 
 const KIND_SHIFT = 28
 const FAMILY_SHIFT = 24

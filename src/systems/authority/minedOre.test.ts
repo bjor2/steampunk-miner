@@ -1,14 +1,23 @@
 import { describe, expect, it } from 'vitest'
+import { oreTier } from '../economy/oreEconomy'
 import { ORE_TYPE_REGISTRY, type OreType } from '../registries/oreTypes'
 import { addToRegistry, withFreshRegistrySet } from '../registries/seal'
 import { FACING } from '../vehicle/vehiclePose'
 import { depthTilesAt } from '../world/planetGeometry'
+import { planetParamsFor } from '../world/planetParams'
 import { chunkKey, chunkOfTile, type TilePoint } from '../world/tileGrid'
-import { familyOfCell, RESOURCE_FAMILY } from '../world/worldCell'
+import { familyOfCell, oreCell, RESOURCE_FAMILY } from '../world/worldCell'
 import { EMPTY_WORLD, materialCellAt } from '../world/worldState'
 import type { DomainEvent } from './domainEvent'
-import { minedOreOf } from './minedOre'
-import { createScriptedSession, drill, PARAMS, poseAbove, surfaceOreTiles } from './scriptedSession'
+import { minedOreOf, resourceTierOf } from './minedOre'
+import {
+  createScriptedSession,
+  drill,
+  PARAMS,
+  poseAbove,
+  surfaceOreTiles,
+  WORLD_SEED,
+} from './scriptedSession'
 
 /** Mines each tile clear from above, in order, refilling the tank as a dock would. */
 function mineInOrder(tiles: readonly TilePoint[]): DomainEvent[] {
@@ -78,5 +87,20 @@ describe('mined ore identity (#122)', () => {
       ore.map(oreOfTile).map(({ oreId, depthTiles, chunk }) => ({ oreId, depthTiles, chunk })),
     )
     expect(new Set(added.map(({ depthTiles }) => depthTiles)).size).toBeGreaterThan(1)
+  })
+})
+
+describe('ore tier of a cell (#140 cell storage, #223)', () => {
+  const planet3 = planetParamsFor(WORLD_SEED, 3)
+
+  it("is band 1's ore tier plus the cell's offset, for every offset from 0 to 6", () => {
+    const offsets = [0, 1, 2, 3, 4, 5, 6]
+    expect(
+      offsets.map((offset) => resourceTierOf(planet3, oreCell(RESOURCE_FAMILY.metal, offset))),
+    ).toEqual(offsets.map((offset) => oreTier(3, 1) + offset))
+  })
+
+  it('refuses a cell whose offset lies past band 5 with a +2 lead', () => {
+    expect(() => resourceTierOf(planet3, oreCell(RESOURCE_FAMILY.crystal, 7))).toThrow(RangeError)
   })
 })

@@ -12,7 +12,9 @@ import { depthTilesAt } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import { oreTypeOf } from '../registries/oreTypes'
 import { chunkKey, chunkOfTile, type TilePoint } from '../world/tileGrid'
-import { familyOfCell, tierOffsetOfCell } from '../world/worldCell'
+import { familyOfCell, MAX_ORE_TIER_OFFSET, tierOffsetOfCell } from '../world/worldCell'
+
+const BAND_ONE = 1
 
 export interface MinedOre {
   resourceTier: number
@@ -33,7 +35,20 @@ export function minedOreOf(params: PlanetParams, tile: TilePoint, cell: number):
   }
 }
 
-/** A cell stores its tier above the planet's band-1 ore (#4, #6). */
+/**
+ * A cell stores its tier above the planet's band-1 ore (#4, #6): `oreTier(p, 1) + offset`, so a
+ * lead cell (#140) may sit above its band's tier. An offset past 6 is a broken cell, never ore.
+ */
 export function resourceTierOf(params: PlanetParams, cell: number): number {
-  return oreTier(params.planetIndex, 1 + tierOffsetOfCell(cell))
+  return oreTier(params.planetIndex, BAND_ONE) + checkedTierOffsetOf(cell)
+}
+
+function checkedTierOffsetOf(cell: number): number {
+  const offset = tierOffsetOfCell(cell)
+  if (offset > MAX_ORE_TIER_OFFSET) {
+    throw new RangeError(
+      `an ore cell's tier offset runs from 0 to ${MAX_ORE_TIER_OFFSET}, got ${offset}`,
+    )
+  }
+  return offset
 }
