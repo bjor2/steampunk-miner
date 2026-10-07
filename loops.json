@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T21:27:55Z",
+  "updated_at": "2026-10-07T21:28:30Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -264,9 +264,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #198 (P9 attrition: bot wallet reserve, death-replay breaker, then route enemy volume) on e4f9973",
+      "note": "testing spec #191 (Spec: Vertical-slice test layout with a single test overview) on dee7b37",
       "stale_after_min": 420,
-      "updated_at": "2026-10-07T21:00:35Z",
+      "updated_at": "2026-10-07T21:28:30Z",
       "host": "grok-bot-vm-452660841"
     }
   },
