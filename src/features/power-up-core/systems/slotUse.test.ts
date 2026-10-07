@@ -6,7 +6,7 @@ import { FAKE, inField } from '../fakeItems'
 import type { ScriptedSession } from '../../../systems/authority/scriptedSession'
 
 // The slot keys (#162 G&V E1, the #217 input lock): Digit1-5 use what the slot holds at once; an
-// empty slot or an item no press uses does nothing.
+// empty or locked slot, or an item no press uses, does nothing.
 
 function drivingIn(session: ScriptedSession): InputSituation {
   return {
@@ -42,14 +42,14 @@ describe('power-up slot keys', () => {
     })
   })
 
-  it('does nothing for an empty slot, a locked one or an extractor', () => {
+  it('does nothing for an empty slot, a locked one holding a power-up, or an extractor', () => {
     inField(
       (session) => {
         expect(reactionToPress('use_slot_1', drivingIn(session))).toEqual({ kind: 'none' })
         expect(reactionToPress('use_slot_2', drivingIn(session))).toEqual({ kind: 'none' })
         expect(reactionToPress('use_slot_4', drivingIn(session))).toEqual({ kind: 'none' })
       },
-      { slots: { 'powerup.1': FAKE.extractor } },
+      { slots: { 'powerup.1': FAKE.extractor, 'powerup.4': FAKE.charged } },
     )
   })
 })

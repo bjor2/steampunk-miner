@@ -39,6 +39,13 @@ export function slottedPowerUpOf(vehicle: VehicleState, slot: LoadoutSlotId): Po
   return itemId === null ? null : powerUpOfItem(itemId)
 }
 
+/** What a slot press would use: the power-up in an open slot that a press uses, else null. */
+export function pressablePowerUpOf(vehicle: VehicleState, slot: LoadoutSlotId): PowerUp | null {
+  if (!isSlotOpen(vehicle.loadout, slot)) return null
+  const powerUp = slottedPowerUpOf(vehicle, slot)
+  return powerUp !== null && isUsableFromSlot(powerUp) ? powerUp : null
+}
+
 function slotRefusalOf(slot: string): Rejection | null {
   if (isPowerUpSlot(slot)) return null
   return rejectionOf('power-up-core.not_a_power_up_slot', `"${slot}" is not a power-up slot`)

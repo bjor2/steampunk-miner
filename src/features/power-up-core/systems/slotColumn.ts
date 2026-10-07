@@ -8,9 +8,9 @@ import { vehicleOf, type AuthorityState } from '../../../systems/authority/autho
 import type { SlotActionId } from '../../../systems/input/touchControls'
 import { chargesLeftIn, isToggledOn, itemChargesOf, powerUpStateOf } from './chargeState'
 import type { PowerUpState } from './chargeState'
-import { hasCharges, isUsableFromSlot, type PowerUp } from './powerUpKind'
+import { hasCharges, type PowerUp } from './powerUpKind'
 import { actionOfSlot, POWER_UP_SLOTS, type PowerUpSlot } from './powerUpSlots'
-import { slottedPowerUpOf } from './useRefusals'
+import { pressablePowerUpOf } from './useRefusals'
 
 export interface SlotButton {
   slot: PowerUpSlot
@@ -32,8 +32,8 @@ export function slotButtonsOf(state: AuthorityState, playerId: string): SlotButt
   const vehicle = vehicleOf(state, playerId)
   const value = powerUpStateOf(state, playerId)
   return POWER_UP_SLOTS.flatMap((slot) => {
-    const powerUp = slottedPowerUpOf(vehicle, slot)
-    if (powerUp === null || !isUsableFromSlot(powerUp)) return []
+    const powerUp = pressablePowerUpOf(vehicle, slot)
+    if (powerUp === null) return []
     return [slotButtonOf(value, powerUp, slot, state.tick)]
   })
 }

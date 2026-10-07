@@ -9,9 +9,8 @@ import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import type { InputReactionEntry } from '../../../systems/registries/inputReactions'
 import type { InputSituation } from '../../../systems/input/inputRouting'
 import './powerUpEvents'
-import { isUsableFromSlot } from './powerUpKind'
 import { actionOfSlot, POWER_UP_SLOTS, type PowerUpSlot } from './powerUpSlots'
-import { slottedPowerUpOf } from './useRefusals'
+import { pressablePowerUpOf } from './useRefusals'
 
 export const SLOT_USE_REACTIONS: readonly InputReactionEntry[] = POWER_UP_SLOTS.map((slot) => ({
   id: `power-up-core.${actionOfSlot(slot)}`,
@@ -28,6 +27,7 @@ function slotIntentOf(
   { state, playerId }: InputSituation,
   slot: PowerUpSlot,
 ): CommandIntent | null {
-  const powerUp = slottedPowerUpOf(vehicleOf(state, playerId), slot)
-  return powerUp !== null && isUsableFromSlot(powerUp) ? intentToUseSlot(slot) : null
+  return pressablePowerUpOf(vehicleOf(state, playerId), slot) === null
+    ? null
+    : intentToUseSlot(slot)
 }

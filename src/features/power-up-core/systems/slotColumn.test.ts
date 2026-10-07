@@ -3,7 +3,7 @@ import { FAKE, inField } from '../fakeItems'
 import { slotButtonsOf } from './slotColumn'
 import { intentToUseSlot } from './slotUse'
 
-// The touch slot column as data (#162 section 2.3, #173): a button only for a slot holding a
+// The touch slot column as data (#162 section 2.3, #173): a button only for an open slot holding a
 // usable power-up, with its pips and cooldown ring.
 
 describe('power-up slot column', () => {
@@ -21,6 +21,16 @@ describe('power-up slot column', () => {
         ])
       },
       { slots: { 'powerup.1': FAKE.charged, 'powerup.2': FAKE.toggle } },
+    )
+  })
+
+  it('shows no button for a locked slot, even one holding a power-up', () => {
+    inField(
+      (session) => {
+        const slots = slotButtonsOf(session.state(), 'p1').map((button) => button.slot)
+        expect(slots).toEqual(['powerup.1'])
+      },
+      { slots: { 'powerup.1': FAKE.charged, 'powerup.5': FAKE.consumable } },
     )
   })
 
