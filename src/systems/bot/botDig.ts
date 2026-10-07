@@ -13,7 +13,7 @@ import { blastOpen, isBlastWorthIt, noteTileWorthACharge } from './botCharges'
 import { canAffordBore } from './botEnergy'
 import { boreTile, enterBoredTile, moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
-import { boreTicks, isLavaRisk, tileKindAt } from './botWorld'
+import { boreTicks, cellOfTile, isLavaRisk, tileKindAt } from './botWorld'
 
 /** Opening a tile: done, impossible for this tip or for the lava, or too dear for the tank. */
 export type OpenOutcome = 'opened' | 'blocked' | 'short'
@@ -46,7 +46,7 @@ export function boreInPlace(session: BotSession, planet: BotPlanet, tile: TilePo
 function boreOnce(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
   const vehicle = session.vehicle()
   const drill = heatThrottledDrill(session.state().planet.index, vehicle)
-  const ticks = boreTicks(drill, planet.layout.params, tile, tileKindAt(session.state(), tile))
+  const ticks = boreTicks(drill, planet.layout.params, tile, cellOfTile(session.state(), tile))
   if (ticks === null) return 'blocked'
   if (!canAffordBore(session, planet, ticks)) return 'short'
   // #129: a tile it would blast with an empty rack is what makes its next visit buy charges.

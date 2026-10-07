@@ -13,7 +13,7 @@ import { ticksPerTile } from '../vehicle/drillRule'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
 import { statsOfVehicle, type VehicleState } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
-import { boreQuanta, hardnessAt, moveQuanta, moveTicks } from './botWorld'
+import { boreQuanta, groundHardnessAt, moveQuanta, moveTicks } from './botWorld'
 import { galleryOf, shaftTileAt, type MineLayout } from './mineLayout'
 import { nextRow } from './tripGoal'
 
@@ -90,7 +90,7 @@ export function isCoreDugWithin(
 export function canReachCore(layout: MineLayout, { stats, tankQuanta }: TripMeans): boolean {
   const row = nextRow(layout, { kind: 'core' })
   if (row === null) return false
-  const deepest = hardnessAt(layout.params, shaftTileAt(layout, row + 1), 'ground')
+  const deepest = groundHardnessAt(layout.params, shaftTileAt(layout, row + 1))
   const boreTicksThere = ticksPerTile(stats, deepest)
   if (boreTicksThere === null) return false
   const travel = travelOf(layout, stats, row, boreTicksThere)
@@ -114,7 +114,7 @@ function oreTripUnitsPerTick(
   if (row === null) return null
   const boreTicksHere = ticksPerTile(
     stats,
-    hardnessAt(layout.params, shaftTileAt(layout, row), 'ground'),
+    groundHardnessAt(layout.params, shaftTileAt(layout, row)),
   )
   if (boreTicksHere === null) return null
   const travel = travelOf(layout, stats, row, boreTicksHere)

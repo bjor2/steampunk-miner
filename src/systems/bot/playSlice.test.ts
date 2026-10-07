@@ -9,6 +9,7 @@ import { planetParamsFor } from '../world/planetParams'
 import type { DomainEvent } from '../authority/domainEvent'
 import { requiredCasingGrade } from '../economy/casingGrades'
 import { bandOfTile } from '../world/planetGeometry'
+import { CORE_CELL, GROUND_CELL } from '../world/worldCell'
 import { boreTicks } from './botWorld'
 import { playSlice, type SliceRun } from './playSlice'
 
@@ -95,13 +96,13 @@ describe('pacing bot save size (#36 acceptance 4)', () => {
 describe('pacing bot world model', () => {
   it('will not bore a tile the tip only skids on (P < H/4)', () => {
     const params = planetParamsFor(WORLD_SEED, 1)
-    expect(boreTicks(vehicleStatsAt(startLevels()), params, { tx: 0, ty: 0 }, 'core')).toBeNull()
+    expect(boreTicks(vehicleStatsAt(startLevels()), params, { tx: 0, ty: 0 }, CORE_CELL)).toBeNull()
   })
 
   it('bores band-1 ground in the 40 ticks of the #7 rule at level 0', () => {
     const params = planetParamsFor(WORLD_SEED, 1)
     const site = dockSiteOf(params)
     const ground = { tx: site.lastColumn + 2, ty: site.padRow - 1 }
-    expect(boreTicks(vehicleStatsAt(startLevels()), params, ground, 'ground')).toBe(40)
+    expect(boreTicks(vehicleStatsAt(startLevels()), params, ground, GROUND_CELL)).toBe(40)
   })
 })

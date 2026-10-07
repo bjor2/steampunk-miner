@@ -7,14 +7,14 @@
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { planetParamsOf } from '../authority/planetOfState'
 import type { AuthorityState } from '../authority/authorityState'
-import { blockHardness, coreHardness } from '../economy/oreEconomy'
+import { hardnessOfTile } from '../authority/groundDrill'
 import type { BigStat } from '../money'
 import { canScratch, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
-import { bandOfTile, isInsidePlanet } from '../world/planetGeometry'
+import { isInsidePlanet } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
-import { CELL_KIND, kindOfCell } from '../world/worldCell'
+import { CELL_KIND, GROUND_CELL, isAirCell, isRemovableCell, kindOfCell } from '../world/worldCell'
 import { cellAt } from '../world/worldState'
 
 export type BotTileKind = 'open' | 'ground' | 'ore' | 'core' | 'pad' | 'lava'
@@ -58,21 +58,21 @@ export function isInsideWorld(state: AuthorityState, tile: TilePoint): boolean {
   return isInsidePlanet(paramsOfSession(state), tile.tx, tile.ty)
 }
 
-export function hardnessAt(params: PlanetParams, tile: TilePoint, kind: BotTileKind): BigStat {
-  if (kind === 'core') return coreHardness(params.planetIndex)
-  return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
+export function cellOfTile(state: AuthorityState, tile: TilePoint): number {
+  return cellAt(state.world, paramsOfSession(state), tile)
 }
 
-/** #29 Gameplay note 3: the bot never bores a tile its tip only skids on (`P < H/4`). */
-export function canBore(
-  drill: DrillStats,
-  params: PlanetParams,
-  tile: TilePoint,
-  kind: BotTileKind,
-) {
-  return (
-    kind !== 'pad' && kind !== 'lava' && canScratch(drill.drillTip, hardnessAt(params, tile, kind))
-  )
+/** The planner prices a shaft row as plain ground of its band, before it knows what lies there. */
+export function groundHardnessAt(params: PlanetParams, tile: TilePoint): BigStat {
+  return hardnessOfTile(params, tile, GROUND_CELL)
+}
+
+/**
+ * #29 Gameplay note 3: the bot never bores a tile its tip only skids on (`P < H/4`). It reads the
+ * drill's own hardness, so a lead ore cell (#140) costs it what it costs the drill (#223).
+ */
+export function canBore(drill: DrillStats, params: PlanetParams, tile: TilePoint, cell: number) {
+  return isRemovableCell(cell) && canScratch(drill.drillTip, hardnessOfTile(params, tile, cell))
 }
 
 /** Ticks to break an intact tile, or null when the tip cannot scratch it. */
@@ -80,11 +80,11 @@ export function boreTicks(
   drill: DrillStats,
   params: PlanetParams,
   tile: TilePoint,
-  kind: BotTileKind,
+  cell: number,
 ): number | null {
-  if (kind === 'open') return 0
-  if (!canBore(drill, params, tile, kind)) return null
-  return ticksPerTile(drill, hardnessAt(params, tile, kind))
+  if (isAirCell(cell)) return 0
+  if (!canBore(drill, params, tile, cell)) return null
+  return ticksPerTile(drill, hardnessOfTile(params, tile, cell))
 }
 
 /** Ticks to cover `tiles` metres at `speedMax` m/s, whole steps rounded up. */

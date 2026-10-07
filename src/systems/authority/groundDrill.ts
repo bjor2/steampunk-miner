@@ -14,7 +14,7 @@
  * unchanged.
  */
 import { casingHardness } from '../economy/casingGrades'
-import { coreHardness, blockHardness, oreSalePrice } from '../economy/oreEconomy'
+import { coreHardness, blockHardness, oreHardness, oreSalePrice } from '../economy/oreEconomy'
 import { toCanonical, type BigStat } from '../money'
 import { drillDamage, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf } from '../vehicle/drillStamp'
@@ -41,7 +41,7 @@ import type { DomainEventBody } from './domainEvent'
 import { openDrillGates, type DrillGates } from './drillGates'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
-import { minedOreOf, type MinedOre } from './minedOre'
+import { minedOreOf, resourceTierOf, type MinedOre } from './minedOre'
 import { wakeLavaBeside } from './lava/lavaRules'
 
 type CarveIn = (world: WorldState, window: CarveWindow, drillTicksOf: CellDrillTicks) => Carve
@@ -75,9 +75,14 @@ export function drillAtPose(
   return drillGround(state, params, playerId, { tile: target, carve }, requestedTicks)
 }
 
-/** Hardness is looked up from the planet and depth, never stored in the cell (#4, #6). */
+/**
+ * Hardness is looked up, never stored in the cell (#4, #6): ore by its own tier, so a lead cell
+ * (#140) is as hard as the tier it sells at (#223), core by the planet, the rest by its band.
+ */
 export function hardnessOfTile(params: PlanetParams, tile: TilePoint, cell: number): BigStat {
-  if (kindOfCell(cell) === CELL_KIND.core) return coreHardness(params.planetIndex)
+  const kind = kindOfCell(cell)
+  if (kind === CELL_KIND.core) return coreHardness(params.planetIndex)
+  if (kind === CELL_KIND.ore) return oreHardness(resourceTierOf(params, cell))
   return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
 }
 
