@@ -61,13 +61,19 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 4 files, 33 tests
+### `drill-gear`: 10 files, 61 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/drill-gear/logging.test.ts` | 2 | 2 |
+| `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
+| `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
 | `src/features/drill-gear/systems/drillGearEconomy.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/drillGearItems.test.ts` | 12 | 12 |
+| `src/features/drill-gear/systems/drillGearPowerUps.test.ts` | 4 | 4 |
+| `src/features/drill-gear/systems/samplingCorer.test.ts` | 7 | 6 |
 | `src/features/drill-gear/systems/statPreview.test.ts` | 10 | 10 |
+| `src/features/drill-gear/systems/vibratoryCrumble.test.ts` | 4 | 4 |
 | `src/features/drill-gear/visionRows.test.ts` | 5 | 5 |
 
 ### `dynamite`: 5 files, 20 tests
