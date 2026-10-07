@@ -4,13 +4,13 @@
  * the shutter closes, the bay it showed stays drawn and takes no input. A slice that registered
  * the bay's screen, once its schedule row is open, draws it instead (`bayScreens`, #180).
  */
-import type { CSSProperties, ReactNode } from 'react'
+import { useCallback, type CSSProperties, type ReactNode } from 'react'
 import { useGameStore } from '../../store/gameStore'
 import {
   readDockedBay,
   readRefineryBayModel,
   readSellBayModel,
-  readShownSliceBayScreenId,
+  readSliceBayScreenIdAt,
   readUpgradeBayModel,
 } from '../../store/screenReads'
 import { refineryBayStartFocus } from '../../systems/views/refineryBayModel'
@@ -53,13 +53,14 @@ function ShutterFrame({ shutter, children }: { shutter: BayShutter; children: Re
 }
 
 function BayScreenOf({ bay }: { bay: BayId }) {
-  const sliceScreen = useShownSliceBayScreen()
+  const sliceScreen = useSliceBayScreenAt(bay)
   if (sliceScreen !== null) return <SliceBayScreenLayer screen={sliceScreen} />
   return <KernelBayScreenOf bay={bay} />
 }
 
-function useShownSliceBayScreen(): SliceBayScreen | null {
-  const screenId = useScreenModel(readShownSliceBayScreenId)
+function useSliceBayScreenAt(bay: BayId): SliceBayScreen | null {
+  const readScreenId = useCallback(() => readSliceBayScreenIdAt(bay), [bay])
+  const screenId = useScreenModel(readScreenId)
   return screenId === null ? null : bayScreenById(screenId)
 }
 

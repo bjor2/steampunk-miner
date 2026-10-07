@@ -50,10 +50,12 @@ export function readDockedBay(): BayId | null {
   return dockedBayOf(readAuthorityState(), useGameStore.getState().playerId)
 }
 
-/** The slice screen the docked bay shows (`bayScreens`, #180), or null for the kernel's own. */
-export function readShownSliceBayScreenId(): string | null {
-  const bay = readDockedBay()
-  return bay === null ? null : shownBayScreenIdOf(readAuthorityState(), bay)
+/**
+ * The slice screen `bay` shows (`bayScreens`, #180), or null for the kernel's own. Asked for the
+ * shutter's bay, not the docked one, so a closing shutter keeps the screen it opened with.
+ */
+export function readSliceBayScreenIdAt(bay: BayId): string | null {
+  return shownBayScreenIdOf(readAuthorityState(), bay)
 }
 
 /** The Sell bay's model, as it would draw now, docked there or not. */

@@ -5,8 +5,8 @@ import { createMemorySink } from '../../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../../logging/runLog'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
-import { resetGameStore, useGameStore } from '../../store/gameStore'
-import { readDockedBay, readShownSliceBayScreenId } from '../../store/screenReads'
+import { resetGameStore } from '../../store/gameStore'
+import { readSliceBayScreenIdAt } from '../../store/screenReads'
 import { sessionOnPlanet } from '../../systems/authority/refinery/refineryFixtures'
 import { createScriptedSession } from '../../systems/authority/scriptedSession'
 import { UI_IDS } from '../ids'
@@ -49,11 +49,10 @@ describe('bay screens', () => {
     expect(withRegistrations([], () => shownBayScreenIdOf(state, 'upgrade'))).toBeNull()
   })
 
-  it("shows a slice's Upgrade bay screen at the docked bay, and its layer draws the slice's markup", () => {
-    useGameStore.getState().teleportToDock('upgrade')
+  it("shows a slice's Upgrade bay screen, and its layer draws the slice's markup", () => {
     const slice = sliceWith(showcase(null))
     const html = withRegistrations([slice], () => {
-      expect(readShownSliceBayScreenId()).toBe('bay-probe.showcase')
+      expect(readSliceBayScreenIdAt('upgrade')).toBe('bay-probe.showcase')
       const screen = bayScreenById('bay-probe.showcase')!
       return renderToString(createElement(SliceBayScreenLayer, { screen }))
     })
@@ -63,10 +62,11 @@ describe('bay screens', () => {
   })
 
   it('leaves the other bays to the kernel', () => {
-    useGameStore.getState().teleportToDock('sell')
-    expect(readDockedBay()).toBe('sell')
     const slice = sliceWith(showcase(null))
-    expect(withRegistrations([slice], readShownSliceBayScreenId)).toBeNull()
+    withRegistrations([slice], () => {
+      expect(readSliceBayScreenIdAt('sell')).toBeNull()
+      expect(readSliceBayScreenIdAt('refinery')).toBeNull()
+    })
   })
 
   it('keeps a screen hidden until its schedule row opens, then shows it', () => {
