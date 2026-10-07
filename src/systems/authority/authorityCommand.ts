@@ -70,8 +70,10 @@ import type { BayId } from '../world/dockBays'
  *    for a held step, `reserveLeft`; `CommandRejected` names the chain of a refused held step.
  * 29: the ores slice's catalogue names every ore (#146): `CargoAdded.oreId` is `<family>_t<tier>`
  *    with its `family` and `signature`, and lead cells carry tiers up to two above their band.
+ * 30: the power-up core slice (#200): `power-up-core.use_power_up` and its clock step, the free
+ *    dock refill, its `power-up-core` player section v1 and the three `slot.powerup_*` cradles.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 29
+export const AUTHORITY_PROTOCOL_VERSION = 30
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
