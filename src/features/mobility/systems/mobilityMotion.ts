@@ -22,8 +22,7 @@ import type {
 import { FACING, noseTileOf, type VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import { isSolidCell } from '../../../systems/world/worldCell'
 import { cellAt } from '../../../systems/world/worldState'
-import { slotHoldingItem } from '../../../systems/vehicle/loadoutState'
-import { isItemToggledOn } from '../../power-up-core'
+import { isToggleEngaged } from '../../power-up-core'
 import { MOBILITY_ITEM } from './itemIds'
 import { MOBILITY_ECONOMY } from './mobilityEconomy'
 import { mobilityOf, type BurstWindow } from './mobilitySection'
@@ -63,13 +62,13 @@ export const BALLAST_MOTION: VehicleMotionEffectSource = {
 export const ANCHOR_MOTION: VehicleMotionEffectSource = {
   id: 'mobility.grav-anchor',
   effectOf: (state, playerId) =>
-    isSlottedToggleOn(state, playerId, MOBILITY_ITEM.gravAnchor) ? { cling: true } : null,
+    isToggleEngaged(state, playerId, MOBILITY_ITEM.gravAnchor) ? { cling: true } : null,
 }
 
 export const BUOYANCY_MOTION: VehicleMotionEffectSource = {
   id: 'mobility.buoyancy-tanks',
   effectOf: (state, playerId) =>
-    isSlottedToggleOn(state, playerId, MOBILITY_ITEM.buoyancyTanks) ? { hover: true } : null,
+    isToggleEngaged(state, playerId, MOBILITY_ITEM.buoyancyTanks) ? { hover: true } : null,
 }
 
 /** What a lighter miner gains: thrust-to-weight grows as `1 / massShare`. */
@@ -81,11 +80,6 @@ function burstEffectOf(burst: BurstWindow | null, tick: number): VehicleMotionEf
   if (burst === null || tick >= burst.untilTick) return null
   const { dirX, dirY, speedMmPerS, untilTick } = burst
   return { burst: { dirX, dirY, speedMmPerS, untilTick } }
-}
-
-function isSlottedToggleOn(state: AuthorityState, playerId: string, itemId: string): boolean {
-  const loadout = vehicleOf(state, playerId).loadout
-  return slotHoldingItem(loadout, itemId) !== null && isItemToggledOn(state, playerId, itemId)
 }
 
 /** The tile one up from the miner's centre is solid: the roof the thruster thumps into. */

@@ -83,11 +83,6 @@ export function returnCharge(state: AuthorityState, playerId: string, itemId: st
   return withPowerUpState(state, playerId, refundCharge(powerUpStateOf(state, playerId), powerUp))
 }
 
-/** Whether the toggle is switched on for the player (#162 section 2.1, ticket 204). */
-export function isItemToggledOn(state: AuthorityState, playerId: string, itemId: string) {
-  return isToggledOn(powerUpStateOf(state, playerId), itemId)
-}
-
 /** The channel ends with nothing changed but the charge returned. */
 export function cancelChannel(state: AuthorityState, playerId: string): RuleEffect {
   const value = powerUpStateOf(state, playerId)

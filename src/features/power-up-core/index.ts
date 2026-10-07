@@ -16,7 +16,7 @@ export {
   type PowerUpUse,
 } from './systems/powerUpKind'
 export { chargesLeftOf } from './systems/chargeState'
-export { isItemToggledOn, returnCharge } from './systems/useResolution'
+export { returnCharge } from './systems/useResolution'
 export { toggleDrawQuantaOf } from './systems/toggleDraw'
 export { POWER_UP_SLOTS, type PowerUpSlot } from './systems/powerUpSlots'
 export { intentToUseSlot } from './systems/slotUse'
