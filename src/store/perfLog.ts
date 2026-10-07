@@ -2,7 +2,8 @@
  * The perf log (#11: `perf` events only in dev, scenario and debug runs; #38: one sample per
  * second; #121: a memory sample every 10 s). The composition root turns it on for those runs and
  * hands it the page and progress readers; a played release run records none and reads nothing.
- * Samples are stamped like every other line, at the authority's tick.
+ * Samples are stamped like every other line, at the authority's tick. Each sample also tells a
+ * debug run's snapshots (#123) how the frames and the heap are doing.
  */
 import { memorySampleOf, type SceneMemory } from '../logging/memorySample'
 import type { PerfSample } from '../logging/perfSample'
@@ -12,6 +13,7 @@ import type { RunProgress } from '../logging/runProgress'
 import type { PageMemory } from '../shell/pageMemory'
 import { readAuthorityState } from './authorityLink'
 import { runEventPlaceOf, useGameStore } from './gameStore'
+import { snapshotBudgetBreach, snapshotHeapStep } from './runSnapshots'
 
 /** Where a memory sample's page and progress readings come from. */
 export interface PerfLogSources {
@@ -35,6 +37,7 @@ export function turnOffPerfLog(): void {
 export function recordPerfSample(sample: PerfSample): void {
   if (sources === null) return
   recordStamped('perf_sample', sample)
+  snapshotBudgetBreach(sample.frameMsP95)
 }
 
 /** `readScene` answers null while the renderer or the physics world is not up. */
@@ -43,7 +46,7 @@ export function recordMemorySample(
   elapsedSeconds: number,
 ): void {
   if (sources === null) return
-  recordStampedIfRead('memory_sample', memorySampleNow(sources, readScene(), elapsedSeconds))
+  recordMemorySampleIfRead(memorySampleNow(sources, readScene(), elapsedSeconds))
 }
 
 function memorySampleNow(
@@ -60,8 +63,10 @@ function memorySampleNow(
   })
 }
 
-function recordStampedIfRead<N extends PerfEventName>(event: N, data: RunEventData<N> | null) {
-  if (data !== null) recordStamped(event, data)
+function recordMemorySampleIfRead(sample: RunEventData<'memory_sample'> | null): void {
+  if (sample === null) return
+  recordStamped('memory_sample', sample)
+  snapshotHeapStep(sample.jsHeapUsedKB)
 }
 
 function recordStamped<N extends PerfEventName>(event: N, data: RunEventData<N>): void {

@@ -9,6 +9,8 @@
  * older build loads through its steps, each logged as `save_migrated` before `checkpoint_loaded`;
  * a save this build refuses is set aside, never overwritten, and the run starts fresh with the
  * problems on the console.
+ *
+ * A debug run also keeps each slot save as a snapshot file (#123), which `checkpoint_saved` names.
  */
 import { getRunLog } from '../logging/runLog'
 import type { RunEventPlace } from '../logging/runEvent'
@@ -24,6 +26,7 @@ import {
 } from '../systems/save/saveMigrations'
 import { CHECKPOINT_SLOT, saveSlotOf, type SaveSlotFile } from '../systems/save/saveSlot'
 import { readAuthorityState } from './authorityLink'
+import { keepSlotSaveSnapshot } from './runSnapshots'
 
 /** The shell's save files, as the checkpoint needs them; tests pass a memory copy. */
 export interface SaveSlots {
@@ -60,6 +63,14 @@ export function writeCheckpointAfter(events: readonly DomainEvent[], place: RunE
 
 function nextSaveSlot(): SaveSlotFile {
   lastEpoch += 1
+  return saveSlotOf(takeSnapshot(readAuthorityState()), lastEpoch)
+}
+
+/**
+ * The session as a save file now, under the last slot save's epoch: what a debug run's timed and
+ * session-end snapshots keep (#123). No slot is written and the epoch does not advance.
+ */
+export function saveFileNow(): SaveSlotFile {
   return saveSlotOf(takeSnapshot(readAuthorityState()), lastEpoch)
 }
 
@@ -117,15 +128,23 @@ function queueWrite(target: SaveSlots, file: SaveSlotFile, place: RunEventPlace)
   const json = JSON.stringify(file)
   writes = writes
     .then(() => target.write(CHECKPOINT_SLOT, json))
-    .then(() => recordCheckpointSaved(file, json, place))
+    .then(() => keepSlotSaveSnapshot(file.tick, json))
+    .then((snapshotFile) => recordCheckpointSaved(file, json, place, snapshotFile))
     .catch((error) => console.error('checkpoint write failed', error))
 }
 
-function recordCheckpointSaved(file: SaveSlotFile, json: string, place: RunEventPlace): void {
+/** `snapshotFile` is the debug run's copy of the save; a played run keeps none. */
+function recordCheckpointSaved(
+  file: SaveSlotFile,
+  json: string,
+  place: RunEventPlace,
+  snapshotFile: string | null,
+): void {
   getRunLog().record({ ...place, tick: file.tick }, 'checkpoint_saved', {
     slot: slotName(),
     epoch: file.saveEpoch,
     bytes: new TextEncoder().encode(json).length,
     digest: file.digest,
+    ...(snapshotFile === null ? {} : { file: snapshotFile }),
   })
 }
