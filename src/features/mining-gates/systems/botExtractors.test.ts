@@ -51,6 +51,7 @@ function planetOf(session: BotSession, stand: TilePoint): BotPlanet {
     shellChargeSize: 0,
     hasBeenDestroyedHere: false,
     routeDeaths: noRouteDeaths(),
+    gateRouteBlocks: [],
   }
 }
 

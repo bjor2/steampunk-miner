@@ -9,6 +9,7 @@ import { openTile } from '../../../systems/bot/botDig'
 import type { BotPlanet } from '../../../systems/bot/botPilot'
 import { NO_TICKS, reportPoseIntent } from '../../../systems/bot/botPose'
 import { createBotSession, type BotSession } from '../../../systems/bot/botSession'
+import { openRouteTile } from '../../../systems/bot/gateRouteBlocks'
 import { paramsOfSession, tileKindAt } from '../../../systems/bot/botWorld'
 import { newMineLayout } from '../../../systems/bot/mineLayout'
 import type { TilePoint } from '../../../systems/world/tileGrid'
@@ -50,6 +51,7 @@ function planetOf(session: BotSession, stand: TilePoint): BotPlanet {
     shellChargeSize: 0,
     hasBeenDestroyedHere: false,
     routeDeaths: noRouteDeaths(),
+    gateRouteBlocks: [],
   }
 }
 
@@ -98,5 +100,22 @@ describe('bot: dynamite-gated shells and gate walls', () => {
     expect(openTile(session, planet, target)).toBe('blocked')
     expect(typesOf(session)).not.toContain('DrillGated')
     expect(tileKindAt(session.state(), target)).toBe('ore')
+  })
+})
+
+describe('bot: gate_blocked_no_route (GD ruling on ticket 237)', () => {
+  it('notes an extractor wall on its way down once, with the extractor it needs', () => {
+    const { session, planet, target } = botFacing('rig', 0)
+    expect(openRouteTile(session, planet, target)).toBe('blocked')
+    expect(openRouteTile(session, planet, target)).toBe('blocked')
+    expect(planet.gateRouteBlocks).toEqual([
+      expect.objectContaining({ planet: PLANET, ...target, gateKind: 'rig' }),
+    ])
+  })
+
+  it('notes no stall for a shell that waits for a restock', () => {
+    const { session, planet, target } = botFacing('dynamite', 0)
+    expect(openRouteTile(session, planet, target)).toBe('blocked')
+    expect(planet.gateRouteBlocks).toEqual([])
   })
 })

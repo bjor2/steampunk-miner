@@ -80,6 +80,7 @@ function planetAt(_session: BotSession, where: 'pad' | 'deep'): BotPlanet {
     shellChargeSize: 0,
     hasBeenDestroyedHere: false,
     routeDeaths: noRouteDeaths(),
+    gateRouteBlocks: [],
   }
 }
 
@@ -120,6 +121,7 @@ describe('bot: shaft round lava (#113)', () => {
         shellChargeSize: 0,
         hasBeenDestroyedHere: false,
         routeDeaths: noRouteDeaths(),
+        gateRouteBlocks: [],
       },
     }
   }

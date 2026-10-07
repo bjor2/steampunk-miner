@@ -72,6 +72,7 @@ function botOnPlanet9(): { session: BotSession; planet: BotPlanet } {
       shellChargeSize: 0,
       hasBeenDestroyedHere: false,
       routeDeaths: noRouteDeaths(),
+      gateRouteBlocks: [],
     },
   }
 }

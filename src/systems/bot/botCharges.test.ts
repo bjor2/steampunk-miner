@@ -64,6 +64,7 @@ function botAtWall(openTilesBehind: number, chargePolicy: ChargePolicy = 'blast'
     shellChargeSize: 0,
     hasBeenDestroyedHere: false,
     routeDeaths: noRouteDeaths(),
+    gateRouteBlocks: [],
   }
   return { session, planet }
 }
@@ -154,6 +155,7 @@ describe('bot: charge sizes (K8 #218)', () => {
       shellChargeSize: 0,
       hasBeenDestroyedHere: false,
       routeDeaths: noRouteDeaths(),
+      gateRouteBlocks: [],
     }
     return { session, planet, stand, wall }
   }

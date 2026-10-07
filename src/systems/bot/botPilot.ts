@@ -19,6 +19,7 @@ import type { RouteDeaths } from './botDeathReplay'
 import { setGunsForEnergy } from './botGuns'
 import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
+import type { GateRouteBlock } from './gateRouteBlocks'
 import { moveTicks } from './botWorld'
 import type { MineLayout } from './mineLayout'
 
@@ -47,6 +48,11 @@ export interface BotPlanet {
   hasBeenDestroyedHere: boolean
   /** Deaths per route here, and the routes it retreated from (#198, `botDeathReplay.ts`). */
   routeDeaths: RouteDeaths
+  /**
+   * The run's gated walls that stopped its way down with no means to open them (ticket 237,
+   * `gateRouteBlocks.ts`): one record for the whole run, carried from planet to planet.
+   */
+  gateRouteBlocks: GateRouteBlock[]
 }
 
 /**

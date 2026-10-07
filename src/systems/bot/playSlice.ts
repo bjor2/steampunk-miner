@@ -39,6 +39,7 @@ import type { BotPlanet } from './botPilot'
 import { driveToUpgradeBay, runTrip } from './botTrip'
 import { widenShallowestBand } from './mineLayout'
 import { botPlanetOf, travelWhenReady } from './botTravel'
+import type { GateRouteBlock } from './gateRouteBlocks'
 import type { ShopSpend } from './shopSpend'
 import type { TripGoal } from './tripGoal'
 import {
@@ -59,6 +60,8 @@ export interface SliceRun {
   shopSpend: readonly ShopSpend[]
   /** Each dock visit's spree capacity and steps bought: the #180 spree targets' input. */
   spreeVisits: readonly SpreeVisit[]
+  /** Gated walls that stopped the way down with no means to open them (ticket 237): wanted none. */
+  gateRouteBlocks: readonly GateRouteBlock[]
 }
 
 export interface SliceRunOptions {
@@ -125,7 +128,7 @@ export function playSliceFrom(
     current = travelWhenReady(session, current)
     if (!playDockCycle(session, current, run)) break
   }
-  return sliceRunOf(session, run)
+  return sliceRunOf(session, run, current)
 }
 
 function botRunOf(options: PlayOnOptions): BotRun {
@@ -145,7 +148,7 @@ function chargePolicyOf(options: PlayOnOptions): ChargePolicy {
   return options.chargePolicy ?? 'blast'
 }
 
-function sliceRunOf(session: BotSession, run: BotRun): SliceRun {
+function sliceRunOf(session: BotSession, run: BotRun, planet: BotPlanet): SliceRun {
   return {
     commands: session.commands(),
     events: session.events(),
@@ -153,6 +156,7 @@ function sliceRunOf(session: BotSession, run: BotRun): SliceRun {
     isFinished: isLastCoreDone(session, run.lastPlanet),
     shopSpend: run.shopSpend,
     spreeVisits: run.spreeVisits,
+    gateRouteBlocks: planet.gateRouteBlocks,
   }
 }
 

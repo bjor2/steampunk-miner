@@ -6,10 +6,10 @@
  */
 import { LAVA_POCKET_TILES } from '../../constants/balance'
 import type { TilePoint } from '../world/tileGrid'
-import { openTile } from './botDig'
 import { isTooHotToDig } from './botHeat'
 import { moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
+import { openRouteTile } from './gateRouteBlocks'
 import { isLavaRisk } from './botWorld'
 import { shaftColumnAt, shaftTileAt, shaftWaypoints, type MineLayout } from './mineLayout'
 
@@ -44,7 +44,9 @@ export function boreShaftDownTo(session: BotSession, planet: BotPlanet, row: num
     if (isTooHotToDig(session, planet)) return false
     const below = shaftTileAt(layout, layout.shaftBottomRow - 1)
     if (isLavaRisk(session.state(), below) && !jogShaft(session, planet)) return false
-    if (openTile(session, planet, shaftTileAt(layout, layout.shaftBottomRow - 1)) !== 'opened') {
+    if (
+      openRouteTile(session, planet, shaftTileAt(layout, layout.shaftBottomRow - 1)) !== 'opened'
+    ) {
       return false
     }
     layout.shaftBottomRow -= 1
@@ -59,7 +61,7 @@ function jogShaft(session: BotSession, planet: BotPlanet): boolean {
   if (plan === null) return false
   moveAlongShaft(session, planet, plan.row)
   for (const tile of tilesAlong(shaftColumnAt(layout, plan.row), plan.column, plan.row)) {
-    if (openTile(session, planet, tile) !== 'opened') return false
+    if (openRouteTile(session, planet, tile) !== 'opened') return false
   }
   layout.shaftJogs.push(plan)
   layout.shaftBottomRow = plan.row

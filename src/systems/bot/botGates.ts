@@ -16,6 +16,8 @@ import { paramsOfSession } from './botWorld'
 
 /** The gate kind #142 names a sealed shell by. */
 const SHELL_GATE_KIND = 'dynamite'
+/** The gate kind #142 names an extractor's cell by. */
+const EXTRACTOR_GATE_KIND = 'rig'
 
 /** The drill's gate verdict on the tile, or null when it has none. */
 export function drillGateAt(session: BotSession, tile: TilePoint): GateVerdict | null {
@@ -32,6 +34,16 @@ export function isWallGate(verdict: GateVerdict | null): boolean {
 export function extractorWaitOf(verdict: GateVerdict | null): number | null {
   if (verdict === null || !isStandingVerdict(verdict)) return null
   return verdict.opensAfterTicks ?? null
+}
+
+/**
+ * A wall nothing the bot carries or buys opens (GD ruling on ticket 237): an extractor's cell it
+ * cannot work, or a drill-gated signature its tip only scratches. A shell waits for a restock and
+ * a dense cell for the tip lead, so neither is one.
+ */
+export function isWallNoMeansOpen(verdict: GateVerdict | null): boolean {
+  if (verdict === null || !isStandingVerdict(verdict)) return false
+  return verdict.outcome === 'blocked' || verdict.gateKind === EXTRACTOR_GATE_KIND
 }
 
 /** A dynamite-gated shell: the drill is refused and only a charge frees it. */

@@ -16,6 +16,7 @@ import { coolAtDock, isTooHotToDig } from './botHeat'
 import { moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import { boreShaftDownTo, moveAlongShaft } from './botShaft'
+import { openRouteTile } from './gateRouteBlocks'
 import { isInsideWorld, tileKindAt, type BotTileKind } from './botWorld'
 import {
   extendSide,
@@ -94,7 +95,7 @@ function openPathTo(session: BotSession, planet: BotPlanet, target: TilePoint): 
   while (planet.pilot.position.tx !== target.tx) {
     const step = Math.sign(target.tx - planet.pilot.position.tx)
     const next = { tx: planet.pilot.position.tx + step, ty: planet.pilot.position.ty }
-    if (openTile(session, planet, next) !== 'opened') return
+    if (openRouteTile(session, planet, next) !== 'opened') return
   }
 }
 
