@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { resetGameStore, useGameStore } from '../../store/gameStore'
 import { toCanonical, ZERO_MONEY } from '../../systems/money'
+import { readAuthorityState } from '../../store/authorityLink'
 import { workshopDebugActions } from './debug'
+import { resetWorkshopStore, useWorkshopStore } from './store/workshopStore'
 
 const game = () => useGameStore.getState()
 
 beforeEach(() => {
   resetGameStore()
+  resetWorkshopStore()
 })
 
 describe('workshop: debug actions', () => {
@@ -39,5 +42,27 @@ describe('workshop: debug actions', () => {
       ok: false,
       problems: ['jet_pack is not a track'],
     })
+  })
+
+  it('holds a track until the asked steps have landed, through the real controller', () => {
+    game().teleportToDock('upgrade')
+    game().giveMoney('1e9')
+
+    expect(workshopDebugActions.holdBuy('engine', 3)).toEqual({ ok: true, chainId: 1 })
+    for (let tick = 0; tick < 200; tick++) {
+      game().advanceOneTick()
+      useWorkshopStore.getState().advanceHoldTo(readAuthorityState().tick)
+    }
+    expect(workshopDebugActions.getChain()).toMatchObject({
+      ok: true,
+      selected: 'engine',
+      hold: { upgradeId: 'engine', steps: 3, end: 'release' },
+      tally: { steps: 3, cue: 'ka_chunk' },
+    })
+  })
+
+  it('refuses a hold of no whole step count', () => {
+    expect(workshopDebugActions.holdBuy('engine', 0)).toMatchObject({ ok: false })
+    expect(workshopDebugActions.holdBuy('engine', 2.5)).toMatchObject({ ok: false })
   })
 })

@@ -41,6 +41,14 @@ export type PlaqueSide = 'front' | 'rear'
 export const PLAQUE_SIDES: Readonly<Record<PlaqueSide, readonly UpgradeId[]>> =
   SHOWCASE_FILE.plaqueSides as Record<PlaqueSide, UpgradeId[]>
 
+/** The rows of one side's plaques, top to bottom as `plaqueSides` orders them. */
+export function rowsOnSide<Row extends { upgradeId: UpgradeId }>(
+  rows: readonly Row[],
+  side: PlaqueSide,
+): Row[] {
+  return PLAQUE_SIDES[side].flatMap((id) => rows.filter((row) => row.upgradeId === id))
+}
+
 export function pipRowOf(step: number): PipRow {
   return { filled: pipOf(step), count: minorsPerMajor() - 1, isJumpNext: isMajorStep(step) }
 }

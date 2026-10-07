@@ -135,6 +135,11 @@ export const useWorkshopStore = create<WorkshopState>()((set, get) => ({
   },
 }))
 
+/** Whether a hold on this track runs now: its plaque's ring shows. */
+export function isHoldingTrack(now: Pick<WorkshopValues, 'hold'>, upgradeId: UpgradeId): boolean {
+  return now.hold?.upgradeId === upgradeId && isChainLive(now.hold.chain)
+}
+
 /** For specs' `beforeEach`. */
 export function resetWorkshopStore(): void {
   useWorkshopStore.setState(STARTING_VALUES)

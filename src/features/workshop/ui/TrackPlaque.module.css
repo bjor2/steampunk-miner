@@ -1,0 +1,97 @@
+/*
+ * A brass plaque beside the car (#180 section 1): small enough that the car stays the hero, with
+ * the pips, the line and the held Buy readable at projector distance in the shop's type size.
+ */
+.plaque {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: 2px solid rgb(201 162 75 / 0.55);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  pointer-events: auto;
+}
+
+.plaque[data-selected] {
+  border-color: var(--color-brass);
+  box-shadow: 0 0 0.6em rgb(201 162 75 / 0.45);
+}
+
+.title,
+.numbers,
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.name {
+  flex: 1;
+  color: var(--color-brass);
+}
+
+.footer {
+  justify-content: space-between;
+}
+
+.cost {
+  font-variant-numeric: tabular-nums;
+}
+
+/* #158 "State badges": only the price turns red when the wallet is short. */
+.plaque[data-buy-state='money_short'] .cost {
+  color: var(--color-ember);
+}
+
+/* Can't afford flashes the price red once (#180 section 2). */
+.cost[data-flash] {
+  animation: price-flash 0.6s ease-out;
+}
+
+@keyframes price-flash {
+  from {
+    color: var(--color-ember);
+    text-shadow: 0 0 0.4em var(--color-ember);
+  }
+}
+
+.effect {
+  font-variant-numeric: tabular-nums;
+}
+
+.line {
+  color: var(--color-amber);
+}
+
+.line[data-kind='chain'] {
+  font-weight: bold;
+}
+
+.line[data-kind='max'] {
+  padding: 0 var(--space-1);
+  border: 2px solid var(--color-brass);
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+
+.pips {
+  display: flex;
+  gap: 0.3em;
+}
+
+.pip {
+  width: 0.7em;
+  height: 0.7em;
+  border: 1px solid var(--color-brass);
+  border-radius: 50%;
+}
+
+.pip[data-filled] {
+  background: var(--color-brass);
+}
+
+/* The last pip glows when the big level-up is one buy away (GD rule 3). */
+.pips[data-jump-next] .pip:last-child {
+  box-shadow: 0 0 0.5em var(--color-amber);
+}

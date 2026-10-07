@@ -3,7 +3,7 @@ import { readAuthorityState } from '../../../store/authorityLink'
 import { listenForDomainEvents } from '../../../store/domainEventBroadcast'
 import { resetGameStore, useGameStore } from '../../../store/gameStore'
 import type { PartPoseRequest } from '../../../systems/registries/partMotionRequests'
-import { momentTicksOf } from '../systems/render/showcaseReactions'
+import { momentTicksOf, SHOWCASE } from '../systems/render/showcaseReactions'
 import { resetWorkshopStore, useWorkshopStore } from '../store/workshopStore'
 import { SHOWCASE_PART_MOTION } from './showcaseParts'
 
@@ -45,11 +45,21 @@ describe('workshop showcase parts', () => {
     expect(Math.abs(poses[0].angle) + poses[0].glow).toBeGreaterThan(0)
   })
 
-  it('lets the part rest once its moment is over', () => {
+  it('lets the part rest once its moment is over, still lit while its plaque is selected', () => {
     buyOne('drill_power')
     for (let run = 0; run < momentTicksOf('pip'); run++) game().advanceOneTick()
+    const poses = posesNow()
 
-    expect(posesNow()).toEqual([])
+    expect(poses.every((pose) => pose.x === 0 && pose.y === 0 && pose.angle === 0)).toBe(true)
+    expect(poses.every((pose) => pose.glow === SHOWCASE.selectedGlow)).toBe(true)
+  })
+
+  it("lights the selected plaque's part while it rests", () => {
+    useWorkshopStore.getState().selectTrack('boiler', readAuthorityState().tick)
+    const poses = posesNow()
+
+    expect(poses.map((pose) => pose.attach)).toEqual(['hull.boiler', 'hull.boiler'])
+    expect(poses.every((pose) => pose.glow > 0 && pose.x === 0)).toBe(true)
   })
 
   it('answers the same kept array every step', () => {

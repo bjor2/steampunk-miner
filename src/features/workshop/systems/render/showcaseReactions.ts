@@ -40,6 +40,8 @@ export interface TrackReaction {
 
 export interface Showcase {
   turnTicks: number
+  /** The glow on the selected plaque's part while no step's reaction plays on it. */
+  selectedGlow: number
   momentTicks: Readonly<Record<StepMoment, number>>
   tracks: Readonly<Record<UpgradeId, TrackReaction>>
 }
@@ -80,6 +82,15 @@ export function swingMoveAt(
   out.y = peak.y * swing
   out.angle = peak.angle * swing
   out.glow = peak.glow * decay
+  return out
+}
+
+/** The selected part's resting glow, written into `out`. */
+export function lightSelectedMove<T extends PartSwing>(out: T, showcase: Showcase = SHOWCASE): T {
+  out.x = 0
+  out.y = 0
+  out.angle = 0
+  out.glow = showcase.selectedGlow
   return out
 }
 
@@ -127,7 +138,8 @@ function showcaseOf(file: typeof SHOWCASE_FILE): Showcase {
   const tracks = Object.fromEntries(
     Object.entries(file.tracks).map(([track, reaction]) => [track, reactionOf(reaction)]),
   ) as Record<UpgradeId, TrackReaction>
-  return { turnTicks: file.turnTicks, momentTicks: file.momentTicks, tracks }
+  const { turnTicks, selectedGlow, momentTicks } = file
+  return { turnTicks, selectedGlow, momentTicks, tracks }
 }
 
 function reactionOf(raw: (typeof SHOWCASE_FILE.tracks)[UpgradeId]): TrackReaction {

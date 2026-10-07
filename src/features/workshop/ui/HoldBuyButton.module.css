@@ -1,0 +1,67 @@
+/* The plaque's Buy: the kernel button's look, plus the wind-up ring (#180 touch long-press). */
+.buy {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 5em;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: transparent;
+  color: var(--color-parchment);
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.buy:hover:not(:disabled) {
+  background: rgb(201 162 75 / 0.15);
+}
+
+/* Focus is a double frame and a pointer glyph, never colour alone (#33 section 7). */
+.buy[data-focused],
+.buy:focus-visible {
+  outline: 3px double var(--color-brass);
+  outline-offset: 2px;
+}
+
+.buy[data-focused]::before {
+  content: '\25B8\00A0';
+}
+
+.buy:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+/* Fills over the 18-tick wind-up (0.3 s), then stays lit while the hold runs. */
+.ring {
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.buy[data-holding] .ring {
+  animation: wind-up 0.3s linear forwards;
+}
+
+@keyframes wind-up {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}

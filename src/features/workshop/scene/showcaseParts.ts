@@ -15,7 +15,12 @@ import type {
 } from '../../../systems/registries/partMotionRequests'
 import { NO_MILESTONES, ownedSwapsOf } from '../systems/milestoneLandings'
 import type { StepReaction } from '../systems/liveHold'
-import { momentTicksOf, SHOWCASE, swingMoveAt } from '../systems/render/showcaseReactions'
+import {
+  lightSelectedMove,
+  momentTicksOf,
+  SHOWCASE,
+  swingMoveAt,
+} from '../systems/render/showcaseReactions'
 import { useWorkshopStore } from '../store/workshopStore'
 
 const POSES: Readonly<Record<UpgradeId, readonly PartPoseRequest[]>> = Object.fromEntries(
@@ -33,7 +38,9 @@ export const SHOWCASE_PART_MOTION: PartMotionRequestSource = {
   requestsNow() {
     shown.length = 0
     const tick = readAuthorityTick()
-    for (const reaction of useWorkshopStore.getState().reactions) showReactionAt(reaction, tick)
+    const { reactions, selected } = useWorkshopStore.getState()
+    for (const reaction of reactions) showReactionAt(reaction, tick)
+    if (selected !== null && !isPlaying(selected, reactions, tick)) lightSelected(selected)
     showOwnedSwaps(readLocalVehicle().levels)
     return shown
   },
@@ -47,14 +54,35 @@ function restingPoseOf(
 }
 
 function showReactionAt(reaction: StepReaction, tick: number): void {
+  if (!isReactionLive(reaction, tick)) return
   const age = tick - reaction.startTick
-  if (age < 0 || age >= momentTicksOf(reaction.moment)) return
   const moves = SHOWCASE.tracks[reaction.upgradeId].moves
   const poses = POSES[reaction.upgradeId]
   for (let at = 0; at < moves.length; at++) {
     swingMoveAt(moves[at], reaction.moment, age, poses[at])
     shown.push(poses[at])
   }
+}
+
+function isPlaying(
+  upgradeId: UpgradeId,
+  reactions: readonly StepReaction[],
+  tick: number,
+): boolean {
+  for (const reaction of reactions) {
+    if (reaction.upgradeId === upgradeId && isReactionLive(reaction, tick)) return true
+  }
+  return false
+}
+
+function isReactionLive(reaction: StepReaction, tick: number): boolean {
+  const age = tick - reaction.startTick
+  return age >= 0 && age < momentTicksOf(reaction.moment)
+}
+
+/** "Selecting a plaque lights the part" (#180 section 1). */
+function lightSelected(upgradeId: UpgradeId): void {
+  for (const pose of POSES[upgradeId]) shown.push(lightSelectedMove(pose))
 }
 
 function showOwnedSwaps(levels: UpgradeLevels): void {
