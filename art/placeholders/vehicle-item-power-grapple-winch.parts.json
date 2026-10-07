@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    256,
-    128
-  ],
+  "atlasPx": [256, 128],
   "maps": {
     "albedo": "vehicle-item-power-grapple-winch.albedo.ktx2",
     "normal": "vehicle-item-power-grapple-winch.normal.ktx2",
@@ -20,47 +17,19 @@
     {
       "id": "winch-drum",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        70,
-        67
-      ],
-      "sizeM": [
-        0.136,
-        0.13
-      ],
-      "pivotM": [
-        0.066,
-        0.075
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 8, 70, 67],
+      "sizeM": [0.136, 0.13],
+      "pivotM": [0.066, 0.075],
+      "atM": [0.0, 0.0],
       "z": 6
     },
     {
       "id": "winch-hook",
       "tier": 1,
-      "rect": [
-        94,
-        8,
-        118,
-        29
-      ],
-      "sizeM": [
-        0.2287,
-        0.0553
-      ],
-      "pivotM": [
-        0.016,
-        0.0277
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [94, 8, 118, 29],
+      "sizeM": [0.2287, 0.0553],
+      "pivotM": [0.016, 0.0277],
+      "atM": [0.0, 0.0],
       "z": 7
     }
   ]

@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    128,
-    128
-  ],
+  "atlasPx": [128, 128],
   "maps": {
     "albedo": "vehicle-cab-gauges.albedo.ktx2",
     "normal": "vehicle-cab-gauges.normal.ktx2",
@@ -20,70 +17,28 @@
     {
       "id": "dial-assay-lens",
       "tier": 1,
-      "rect": [
-        81,
-        8,
-        20,
-        20
-      ],
-      "sizeM": [
-        0.038,
-        0.038
-      ],
-      "pivotM": [
-        0.019,
-        0.019
-      ],
-      "atM": [
-        -0.028,
-        0.0
-      ],
+      "rect": [81, 8, 20, 20],
+      "sizeM": [0.038, 0.038],
+      "pivotM": [0.019, 0.019],
+      "atM": [-0.028, 0.0],
       "z": 6
     },
     {
       "id": "dial-hazard-barometer",
       "tier": 1,
-      "rect": [
-        8,
-        56,
-        20,
-        20
-      ],
-      "sizeM": [
-        0.038,
-        0.038
-      ],
-      "pivotM": [
-        0.019,
-        0.019
-      ],
-      "atM": [
-        0.028,
-        0.0
-      ],
+      "rect": [8, 56, 20, 20],
+      "sizeM": [0.038, 0.038],
+      "pivotM": [0.019, 0.019],
+      "atM": [0.028, 0.0],
       "z": 6
     },
     {
       "id": "gauge-cluster",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        57,
-        32
-      ],
-      "sizeM": [
-        0.11,
-        0.062
-      ],
-      "pivotM": [
-        0.055,
-        0.031
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 8, 57, 32],
+      "sizeM": [0.11, 0.062],
+      "pivotM": [0.055, 0.031],
+      "atM": [0.0, 0.0],
       "z": 5
     }
   ]

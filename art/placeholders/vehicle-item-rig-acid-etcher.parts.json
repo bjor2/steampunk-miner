@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    256,
-    256
-  ],
+  "atlasPx": [256, 256],
   "maps": {
     "albedo": "vehicle-item-rig-acid-etcher.albedo.ktx2",
     "normal": "vehicle-item-rig-acid-etcher.normal.ktx2",
@@ -20,47 +17,19 @@
     {
       "id": "etcher-arm",
       "tier": 1,
-      "rect": [
-        8,
-        106,
-        157,
-        21
-      ],
-      "sizeM": [
-        0.306,
-        0.04
-      ],
-      "pivotM": [
-        0.016,
-        0.02
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 106, 157, 21],
+      "sizeM": [0.306, 0.04],
+      "pivotM": [0.016, 0.02],
+      "atM": [0.0, 0.0],
       "z": 7
     },
     {
       "id": "etcher-shoulder",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        71,
-        82
-      ],
-      "sizeM": [
-        0.138,
-        0.159
-      ],
-      "pivotM": [
-        0.03,
-        0.03
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 8, 71, 82],
+      "sizeM": [0.138, 0.159],
+      "pivotM": [0.03, 0.03],
+      "atM": [0.0, 0.0],
       "z": 6
     }
   ]

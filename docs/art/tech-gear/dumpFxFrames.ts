@@ -1,8 +1,8 @@
 /**
  * Prints the power-up effect looks (#166) frame by frame as JSON, so the review clips under
- * docs/art/tech-gear/ draw exactly what `powerUpFx.ts` shapes, with no second copy of the rule.
+ * this folder draw exactly what `powerUpFx.ts` shapes, with no second copy of the rule.
  *
- *   npx vite-node scripts/art/dumpPowerUpFx.ts > docs/art/tech-gear/fx-frames.json
+ *   npx vite-node docs/art/tech-gear/dumpFxFrames.ts > docs/art/tech-gear/fx-frames.json
  */
 import {
   flareShellPointOf,
@@ -10,7 +10,7 @@ import {
   isStanding,
   POWER_UP_FX,
   type PowerUpFx,
-} from '../../src/features/tech-tree'
+} from '../../../src/features/tech-tree'
 
 /** Frames per clip; a standing effect gets one. */
 const CLIP_FRAMES = 24

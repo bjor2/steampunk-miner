@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    256,
-    128
-  ],
+  "atlasPx": [256, 128],
   "maps": {
     "albedo": "vehicle-item-rig-aether-tether.albedo.ktx2",
     "normal": "vehicle-item-rig-aether-tether.normal.ktx2",
@@ -20,47 +17,19 @@
     {
       "id": "tether-harpoon",
       "tier": 1,
-      "rect": [
-        101,
-        8,
-        120,
-        21
-      ],
-      "sizeM": [
-        0.2335,
-        0.04
-      ],
-      "pivotM": [
-        0.016,
-        0.02
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [101, 8, 120, 21],
+      "sizeM": [0.2335, 0.04],
+      "pivotM": [0.016, 0.02],
+      "atM": [0.0, 0.0],
       "z": 7
     },
     {
       "id": "tether-reel",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        77,
-        75
-      ],
-      "sizeM": [
-        0.1498,
-        0.1448
-      ],
-      "pivotM": [
-        0.07,
-        0.08
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 8, 77, 75],
+      "sizeM": [0.1498, 0.1448],
+      "pivotM": [0.07, 0.08],
+      "atM": [0.0, 0.0],
       "z": 6
     }
   ]

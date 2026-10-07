@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    128,
-    256
-  ],
+  "atlasPx": [128, 256],
   "maps": {
     "albedo": "vehicle-item-gear-side-cutters.albedo.ktx2",
     "normal": "vehicle-item-gear-side-cutters.normal.ktx2",
@@ -20,47 +17,19 @@
     {
       "id": "cutter-arm",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        72,
-        147
-      ],
-      "sizeM": [
-        0.14,
-        0.286
-      ],
-      "pivotM": [
-        0.07,
-        0.016
-      ],
-      "atM": [
-        0.0,
-        0.04
-      ],
+      "rect": [8, 8, 72, 147],
+      "sizeM": [0.14, 0.286],
+      "pivotM": [0.07, 0.016],
+      "atM": [0.0, 0.04],
       "z": 8
     },
     {
       "id": "cutter-bracket",
       "tier": 1,
-      "rect": [
-        96,
-        8,
-        21,
-        57
-      ],
-      "sizeM": [
-        0.04,
-        0.11
-      ],
-      "pivotM": [
-        0.02,
-        0.05
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [96, 8, 21, 57],
+      "sizeM": [0.04, 0.11],
+      "pivotM": [0.02, 0.05],
+      "atM": [0.0, 0.0],
       "z": 7
     }
   ]

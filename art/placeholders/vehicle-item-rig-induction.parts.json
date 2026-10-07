@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    128,
-    256
-  ],
+  "atlasPx": [128, 256],
   "maps": {
     "albedo": "vehicle-item-rig-induction.albedo.ktx2",
     "normal": "vehicle-item-rig-induction.normal.ktx2",
@@ -20,47 +17,19 @@
     {
       "id": "coil-mount",
       "tier": 1,
-      "rect": [
-        8,
-        101,
-        39,
-        36
-      ],
-      "sizeM": [
-        0.075,
-        0.07
-      ],
-      "pivotM": [
-        0.035,
-        0.035
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 101, 39, 36],
+      "sizeM": [0.075, 0.07],
+      "pivotM": [0.035, 0.035],
+      "atM": [0.0, 0.0],
       "z": 6
     },
     {
       "id": "coil-ring",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        88,
-        77
-      ],
-      "sizeM": [
-        0.171,
-        0.1496
-      ],
-      "pivotM": [
-        0.016,
-        0.0748
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 8, 88, 77],
+      "sizeM": [0.171, 0.1496],
+      "pivotM": [0.016, 0.0748],
+      "atM": [0.0, 0.0],
       "z": 7
     }
   ]

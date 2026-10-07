@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    256,
-    128
-  ],
+  "atlasPx": [256, 128],
   "maps": {
     "albedo": "vehicle-item-gear-sampling-corer.albedo.ktx2",
     "normal": "vehicle-item-gear-sampling-corer.normal.ktx2",
@@ -20,47 +17,19 @@
     {
       "id": "corer-collar",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        41,
-        88
-      ],
-      "sizeM": [
-        0.08,
-        0.171
-      ],
-      "pivotM": [
-        0.04,
-        0.064
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 8, 41, 88],
+      "sizeM": [0.08, 0.171],
+      "pivotM": [0.04, 0.064],
+      "atM": [0.0, 0.0],
       "z": 7
     },
     {
       "id": "corer-tube",
       "tier": 1,
-      "rect": [
-        65,
-        8,
-        157,
-        21
-      ],
-      "sizeM": [
-        0.305,
-        0.04
-      ],
-      "pivotM": [
-        0.09,
-        0.02
-      ],
-      "atM": [
-        0.0,
-        0.085
-      ],
+      "rect": [65, 8, 157, 21],
+      "sizeM": [0.305, 0.04],
+      "pivotM": [0.09, 0.02],
+      "atM": [0.0, 0.085],
       "z": 8
     }
   ]

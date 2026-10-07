@@ -939,7 +939,16 @@
           "description": "Research nodes with money to unlock store items: five lanes on a planet ruler, Marks every 3 planets, endless combos from P41, a tree screen from the HUD. The rules and screen are built; the lanes show 'coming soon' until their slices register nodes.",
           "status": "partial",
           "issues": [165, 200, 201, 202, 203, 204, 205, 206, 212],
-          "doc": "docs/standards/feature-slices.md"
+          "doc": "docs/standards/feature-slices.md",
+          "children": [
+            {
+              "title": "Gear on the rig and power-up effects",
+              "description": "Every bought extractor, drill head, collar and flank gear, scanner horn, winch, periscope and crate shows on the miner at its own mount; extractors fold flat when idle and unfold on a matching ore. Power-ups draw their effect: brine lines, tumbling nodules, sounder rings, steam. The models, poses and effect looks are made; a later ticket draws them on the rig.",
+              "status": "partial",
+              "issues": [166],
+              "doc": "docs/art/tech-gear/README.md"
+            }
+          ]
         }
       ]
     },

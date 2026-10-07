@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    256,
-    256
-  ],
+  "atlasPx": [256, 256],
   "maps": {
     "albedo": "vehicle-item-gear-twin-bit.albedo.ktx2",
     "normal": "vehicle-item-gear-twin-bit.normal.ktx2",
@@ -20,24 +17,10 @@
     {
       "id": "twin-bit",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        175,
-        113
-      ],
-      "sizeM": [
-        0.34,
-        0.219
-      ],
-      "pivotM": [
-        0.01,
-        0.1095
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 8, 175, 113],
+      "sizeM": [0.34, 0.219],
+      "pivotM": [0.01, 0.1095],
+      "atM": [0.0, 0.0],
       "z": 9
     }
   ]

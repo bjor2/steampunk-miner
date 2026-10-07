@@ -382,6 +382,38 @@ above are the wiring's ([#215](https://github.com/bjor2/steampunk-miner/issues/2
   then on the `.blend` files are the sources. The review renders are in
   [docs/art/dynamite/](art/dynamite/README.md).
 
+## Tech gear
+
+The mounted gear of [Spec: Tech-unlocked store items and power-ups (#162)](https://github.com/bjor2/steampunk-miner/issues/162)
+section 5, built by [#166](https://github.com/bjor2/steampunk-miner/issues/166): every physical
+catalogue row shows on the vehicle as parts at the attach point the TD locked, and the power-up
+effects are procedural (#51), shaped by the tech-tree slice's `powerUpFx.ts`. The one table is
+`src/features/tech-tree/techGear.json`: the slice's rules, `scripts/art/author_tech_gear.py`
+(which wrote the first version of every file; from then on the `.blend` files are the sources)
+and the review renders under [docs/art/tech-gear/](art/tech-gear/README.md) all read it. The
+slice registers the 29 assets through `r.artAssets` (#214) under the vehicle category:
+
+| Asset                                   | Items                                                | Parts                                                           |
+| --------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------- |
+| `vehicle-item-rig-<extractor>` (5)      | the extractors, always mounted once owned            | a fixed base and one part that folds and deploys                |
+| `vehicle-item-gear-<head>` (4)          | the drill heads on `drill.head`                      | one bit drawn over the stock bit                                |
+| `vehicle-item-gear-<collar>` (3)        | spoil auger, sampling corer, reach boom              | a collar ring and the auger, tube or sleeve                     |
+| `vehicle-item-gear-side-cutters`        | the flank cutters, drawn mirrored below the axis     | `cutter-bracket`, `cutter-arm`                                  |
+| `vehicle-item-power-<signature>` (2)    | grapple winch, echo sounder                          | a drum and hook, a hammer and horn                              |
+| `vehicle-item-passive-threat-periscope` | the periscope on `hull.roof.fore`                    | `periscope-mast`, `periscope-head`                              |
+| `vehicle-cab-gauges`                    | assay lens and hazard barometer on `cab.gauge`       | `gauge-cluster` once, a dial per owned passive                  |
+| `vehicle-item-power-<power-up>` (11)    | every `attach: "slot"` power-up, at its slot's point | one module housing with the item's signature detail             |
+| `vehicle-rack-crates`                   | the 12 consumables on `hull.rear`                    | `crate-shelf` once, a `crate-<item>` each, `mortar-tube` on top |
+
+Each asset is authored in its own frame with its attach point at the origin, so the game draws
+it at `attachPointOf(vehicleSidecar, id)` with no offset in code (TD acceptance 6). A moving part
+has its origin at its hinge or slide and carries a `folded` and a `deployed` pose in the table
+(a turn in radians, counter-clockwise on screen, and a shift in metres); `extractorPose.ts`
+blends them over the G&V timing (unfold within 8 ticks, hold 30, fold 8). A folded extractor
+keeps a brass edge and its family-coloured cap in view; the caps are the glowing materials. The
+crates share the charge rack's point as shelves above it rather than editing the kernel's rack
+asset; the wiring may fold them into one asset later.
+
 ## Heat planets and the refractory lining
 
 The art of the `heat_lava` and `refractory_lining` schedule rows

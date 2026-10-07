@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    64,
-    256
-  ],
+  "atlasPx": [64, 256],
   "maps": {
     "albedo": "vehicle-item-passive-threat-periscope.albedo.ktx2",
     "normal": "vehicle-item-passive-threat-periscope.normal.ktx2",
@@ -20,47 +17,19 @@
     {
       "id": "periscope-head",
       "tier": 1,
-      "rect": [
-        8,
-        96,
-        42,
-        26
-      ],
-      "sizeM": [
-        0.082,
-        0.0495
-      ],
-      "pivotM": [
-        0.015,
-        0.012
-      ],
-      "atM": [
-        0.0,
-        0.14
-      ],
+      "rect": [8, 96, 42, 26],
+      "sizeM": [0.082, 0.0495],
+      "pivotM": [0.015, 0.012],
+      "atM": [0.0, 0.14],
       "z": 7
     },
     {
       "id": "periscope-mast",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        23,
-        72
-      ],
-      "sizeM": [
-        0.044,
-        0.14
-      ],
-      "pivotM": [
-        0.022,
-        0.0
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 8, 23, 72],
+      "sizeM": [0.044, 0.14],
+      "pivotM": [0.022, 0.0],
+      "atM": [0.0, 0.0],
       "z": 6
     }
   ]

@@ -7,10 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 512,
-  "atlasPx": [
-    256,
-    128
-  ],
+  "atlasPx": [256, 128],
   "maps": {
     "albedo": "vehicle-item-gear-thaw-crown.albedo.ktx2",
     "normal": "vehicle-item-gear-thaw-crown.normal.ktx2",
@@ -20,24 +17,10 @@
     {
       "id": "thaw-crown",
       "tier": 1,
-      "rect": [
-        8,
-        8,
-        175,
-        103
-      ],
-      "sizeM": [
-        0.34,
-        0.2
-      ],
-      "pivotM": [
-        0.01,
-        0.1
-      ],
-      "atM": [
-        0.0,
-        0.0
-      ],
+      "rect": [8, 8, 175, 103],
+      "sizeM": [0.34, 0.2],
+      "pivotM": [0.01, 0.1],
+      "atM": [0.0, 0.0],
       "z": 9
     }
   ]
