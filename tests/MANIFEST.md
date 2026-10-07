@@ -27,13 +27,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
-### `codex`: 6 files, 25 tests
+### `codex`: 7 files, 31 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/codex/logging.test.ts` | 1 | 1 |
 | `src/features/codex/systems/bitset.test.ts` | 6 | 6 |
 | `src/features/codex/systems/codexAliases.test.ts` | 4 | 4 |
+| `src/features/codex/systems/codexContacts.test.ts` | 6 | 6 |
 | `src/features/codex/systems/codexReaction.test.ts` | 6 | 6 |
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
@@ -223,7 +224,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/statPreview.test.ts` | 9 | 9 |
 | `src/features/sensing/visionRows.test.ts` | 5 | 5 |
 
-### `tech-tree`: 17 files, 132 tests
+### `tech-tree`: 17 files, 133 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -242,7 +243,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/treeScreenModel.test.ts` | 10 | 10 |
 | `src/features/tech-tree/systems/treeShape.test.ts` | 13 | 13 |
-| `src/features/tech-tree/systems/unlockRules.test.ts` | 18 | 18 |
+| `src/features/tech-tree/systems/unlockRules.test.ts` | 19 | 19 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
 ### `terrain-tools`: 4 files, 30 tests
