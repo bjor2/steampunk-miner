@@ -6,25 +6,19 @@ on:
   pull_request:
 
 jobs:
-  # Every push and pull request: lint, types, the Vitest tests the change can reach and the build.
-  # scripts/ci/selectPushTests.sh picks the tests:
-  # scoped to the import graph of the changed files (plus fs-read rules), or the whole suite when a
-  # change cannot be mapped. The pacing bot regressions (NIGHTLY_ONLY_TESTS in vite.config.ts)
-  # never run here; nightly.yml runs the true full suite, `npm test`, and balance:report nightly.
+  # Every push and pull request: lint, formatting, types and the build. Tests no longer run in
+  # Actions: the loop's Tester runs them on the build box after every push to main (relevant tests
+  # first, then the pacing bot and e2e) and nightly (full suite, soak, packaged smoke, balance,
+  # benches), records them on the test-metrics branch and posts box-tester/* commit statuses
+  # (docs/metrics/test-metrics.md).
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    outputs:
-      mode: ${{ steps.pick.outputs.mode }}
-      reason: ${{ steps.pick.outputs.reason }}
     env:
       # CI never launches Electron here, so skip its ~100 MB binary download.
       ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
     steps:
       - uses: actions/checkout@v4
-        with:
-          # Whole history, so the push's `before` commit and the pull request's merge base resolve.
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -33,96 +27,7 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: npm run typecheck
-      - name: Pick the Vitest run (scoped or full)
-        id: pick
-        env:
-          PUSH_BEFORE: ${{ github.event.before }}
-          PR_BASE_REF: ${{ github.base_ref }}
-          RELATED_LIST: ${{ runner.temp }}/vitest-related.txt
-        run: |
-          set -o pipefail
-          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
-            BASE=$(git merge-base "origin/$PR_BASE_REF" HEAD || true)
-          else
-            BASE="$PUSH_BEFORE"
-          fi
-          scripts/ci/selectPushTests.sh "$BASE" | tee -a "$GITHUB_STEP_SUMMARY"
-      - name: Vitest (${{ steps.pick.outputs.mode }})
-        env:
-          SKIP_NIGHTLY_ONLY_TESTS: '1'
-          MODE: ${{ steps.pick.outputs.mode }}
-          REASON: ${{ steps.pick.outputs.reason }}
-          RELATED_LIST: ${{ runner.temp }}/vitest-related.txt
-          REPORT: ${{ runner.temp }}/vitest-report.json
-        run: |
-          # The JSON report feeds the test metrics (record-test-metrics.yml).
-          reporters=(--reporter=default --reporter=json "--outputFile.json=$REPORT")
-          case "$MODE" in
-            full)
-              echo "Full suite minus the nightly-only pacing tests: $REASON"
-              npm run test:push -- "${reporters[@]}"
-              ;;
-            scoped)
-              echo "Scoped to the tests related to: $(paste -sd ' ' - <"$RELATED_LIST")"
-              mapfile -t related <"$RELATED_LIST"
-              npx vitest related --run --passWithNoTests "${reporters[@]}" "${related[@]}"
-              ;;
-            *)
-              echo "Skipping Vitest: $REASON"
-              ;;
-          esac
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: vitest-report
-          path: ${{ runner.temp }}/vitest-report.json
-          if-no-files-found: ignore
-          retention-days: 14
       - run: npm run build
-      # balance:report replays the pacing bot (over 4 minutes by itself), so it runs nightly only.
-
-  # Every verify run, also failed or timed out: its timings and results to the test-metrics branch.
-  metrics:
-    needs: verify
-    if: always()
-    permissions:
-      contents: write
-      actions: read
-    uses: ./.github/workflows/record-test-metrics.yml
-    with:
-      job: verify
-      mode: ${{ needs.verify.outputs.mode || 'unknown' }}
-      reason: ${{ needs.verify.outputs.reason }}
-      timeout-minutes: 10
-
-  # Every push and pull request: the four CPU benches with --log (#124, logging strategy section 5).
-  # Report only: CI machines vary, so no budget gates here. A malformed benchmark_result line fails
-  # bench:summary. The bench run folders upload as one artifact named for the workflow, the commit
-  # and the GitHub run, and their table goes to the job summary.
-  bench:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run bench:world -- --log
-      - run: npm run bench:render -- --log
-      - run: npm run bench:ground -- --log
-      - run: npm run bench:combat -- --log
-      - run: npm run bench:summary
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: session-ci-${{ github.sha }}-${{ github.run_id }}
-          path: logs/
-          if-no-files-found: warn
-          overwrite: true
 
   # Every pull request: the same golden digests on Windows as on Linux (#3, #5 and #11 acceptance),
   # including the second slice's casing, collapse, bay and artefact runs (S11, #65).
