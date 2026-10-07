@@ -78,6 +78,15 @@ describe('drill rule', () => {
     expect(canScratch(m('1'), m('4'))).toBe(true)
   })
 
+  it("holds a cell's own scratch floor of 1 until the tip matches its hardness (#142, #232)", () => {
+    const drill = drillOf(m('1e9'), m('1'))
+    const floor = m('1')
+    expect(canScratch(m('1'), m('1.0001'), floor)).toBe(false)
+    expect(ticksPerTile(drill, m('1.0001'), floor)).toBeNull()
+    expect(drillDamage(drill, m('1.0001'), 60, floor)).toEqual(ZERO_MONEY)
+    expect(ticksPerTile(drill, m('1'), floor)).toBe(ticksPerTile(drill, m('1')))
+  })
+
   it('deals ticks * drillPower * eff / 60 of damage', () => {
     expect(drillDamage(LEVEL_0, m('1'), 40)).toEqual(m('1'))
     expect(drillDamage(LEVEL_0, m('2'), 60)).toEqual(m('0.375'))

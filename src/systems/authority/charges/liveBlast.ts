@@ -16,9 +16,9 @@ export interface LiveBlast {
   /** Front tiles looked at so far; the next slice starts at this one. */
   cursor: number
   tilesCleared: number
-  /** Ordinary ore units broken so far by resource tier: the kept share is of the running total. */
+  /** Ordinary ore units broken so far by sale tier (#232): the kept share is of the running total. */
   oreBrokenByTier: Readonly<Record<string, number>>
-  /** Gated ore units a gate said are lost, by resource tier, and units a gate freed whole (K2). */
+  /** Gated ore units a gate said are lost, by sale tier, and units a gate freed whole (K2). */
   oreLostByTier: Readonly<Record<string, number>>
   oreUnitsFreed: number
   /** Rim blocks checked so far (`blastCollapse.ts`), nearest first, and the warnings they started. */

@@ -11,7 +11,9 @@
  * count as the formula above with no division at all, so it never drifts by a tick.
  *
  * The scratch floor is a gate, so it compares the tip of the last completed major (#180 amendment
- * 2): a cell opens on a big level-up, never on a pip. The efficiency reads the live tip.
+ * 2): a cell opens on a big level-up, never on a pip. The efficiency reads the live tip. A cell may
+ * bring its own floor (#142: a drill-gated signature's is 1, so `P >= H`); every rule here takes
+ * it last and falls back to the global `drill.scratchFloor`.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { ECONOMY } from '../economy/economy'
@@ -35,22 +37,35 @@ export interface DrillStats {
 
 const TICKS = fromSafeInteger(TICKS_PER_SECOND)
 const MIN_TICKS = fromSafeInteger(ECONOMY.drill.minTicksPerTile)
+const SCRATCH_FLOOR = ECONOMY.drill.scratchFloor
 
 /** `P >= H/4`: below that the tip only skids, with no damage and no energy drain (#7). */
-export function canScratch(tip: BigStat, hardness: BigStat): boolean {
-  return cmp(tip, mul(hardness, ECONOMY.drill.scratchFloor)) >= 0
+export function canScratch(
+  tip: BigStat,
+  hardness: BigStat,
+  scratchFloor: BigStat = SCRATCH_FLOOR,
+): boolean {
+  return cmp(tip, mul(hardness, scratchFloor)) >= 0
 }
 
 /** `eff` of #7: 0 below the scratch floor, else `min(1, P/H)^2`. */
-export function drillEfficiency(drill: DrillStats, hardness: BigStat): BigStat {
-  if (!canScratch(drill.gateTip, hardness)) return ZERO_MONEY
+export function drillEfficiency(
+  drill: DrillStats,
+  hardness: BigStat,
+  scratchFloor: BigStat = SCRATCH_FLOOR,
+): BigStat {
+  if (!canScratch(drill.gateTip, hardness, scratchFloor)) return ZERO_MONEY
   const ratio = div(effectiveTip(drill.drillTip, hardness), hardness)
   return mul(ratio, ratio)
 }
 
 /** The drill work one tick adds to a tile of this hardness (see the module comment). */
-export function drillWorkPerTick(drill: DrillStats, hardness: BigStat): BigStat {
-  if (!canScratch(drill.gateTip, hardness)) return ZERO_MONEY
+export function drillWorkPerTick(
+  drill: DrillStats,
+  hardness: BigStat,
+  scratchFloor: BigStat = SCRATCH_FLOOR,
+): BigStat {
+  if (!canScratch(drill.gateTip, hardness, scratchFloor)) return ZERO_MONEY
   const tip = effectiveTip(drill.drillTip, hardness)
   const uncapped = mul(mul(drill.drillPower, mul(tip, tip)), MIN_TICKS)
   return smallerOf(uncapped, capPerTick(hardness))
@@ -62,8 +77,12 @@ export function tileWorkToBreak(hardness: BigStat): BigStat {
 }
 
 /** Whole ticks to break an intact tile, or null when the tip cannot scratch it. */
-export function ticksPerTile(drill: DrillStats, hardness: BigStat): number | null {
-  const work = drillWorkPerTick(drill, hardness)
+export function ticksPerTile(
+  drill: DrillStats,
+  hardness: BigStat,
+  scratchFloor: BigStat = SCRATCH_FLOOR,
+): number | null {
+  const work = drillWorkPerTick(drill, hardness, scratchFloor)
   if (cmp(work, ZERO_MONEY) === 0) return null
   return toSafeInteger(ceil(div(tileWorkToBreak(hardness), work)))
 }
@@ -72,9 +91,14 @@ export function ticksPerTile(drill: DrillStats, hardness: BigStat): number | nul
  * The damage `ticks` of drilling deal in hardness units, for `drill_damage_dealt`:
  * `ticks * D * eff / 60`, with `D * eff` held to the tile speed cap.
  */
-export function drillDamage(drill: DrillStats, hardness: BigStat, ticks: number): BigStat {
+export function drillDamage(
+  drill: DrillStats,
+  hardness: BigStat,
+  ticks: number,
+  scratchFloor: BigStat = SCRATCH_FLOOR,
+): BigStat {
   const perSecond = smallerOf(
-    mul(drill.drillPower, drillEfficiency(drill, hardness)),
+    mul(drill.drillPower, drillEfficiency(drill, hardness, scratchFloor)),
     div(mul(hardness, TICKS), MIN_TICKS),
   )
   return div(mul(perSecond, fromSafeInteger(ticks)), TICKS)

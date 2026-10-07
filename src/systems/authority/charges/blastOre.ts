@@ -55,8 +55,9 @@ export interface BrokenSlice {
 }
 
 /**
- * One tier's ore the slice broke, in the order it broke it, and how many units reach the hold: the
- * first `kept` of them, so each kept unit names a cell the blast broke (#122).
+ * One sale tier's ore the slice broke (#232: a signature counts one tier up), in the order it broke
+ * it, and how many units reach the hold: the first `kept` of them, so each kept unit names a cell
+ * the blast broke (#122).
  */
 interface BlastedTier {
   tier: number
@@ -189,9 +190,9 @@ function slicedTiersOf(shared: readonly MinedOre[], live: LiveBlast, dither: Mon
 function oresByTierOf(shared: readonly MinedOre[]) {
   const oresByTier = new Map<number, MinedOre[]>()
   for (const ore of shared) {
-    const ores = oresByTier.get(ore.resourceTier) ?? []
+    const ores = oresByTier.get(ore.saleTier) ?? []
     ores.push(ore)
-    oresByTier.set(ore.resourceTier, ores)
+    oresByTier.set(ore.saleTier, ores)
   }
   return oresByTier
 }
@@ -234,8 +235,8 @@ function withUnitsByTier(
   ores: readonly MinedOre[],
 ): Record<string, number> {
   const counted = { ...units }
-  for (const { resourceTier } of ores) {
-    counted[String(resourceTier)] = (counted[String(resourceTier)] ?? 0) + 1
+  for (const { saleTier } of ores) {
+    counted[String(saleTier)] = (counted[String(saleTier)] ?? 0) + 1
   }
   return counted
 }

@@ -14,7 +14,7 @@
  * unchanged.
  */
 import { casingHardness } from '../economy/casingGrades'
-import { coreHardness, blockHardness, oreHardness, oreSalePrice } from '../economy/oreEconomy'
+import { coreHardness, blockHardness, oreSalePrice } from '../economy/oreEconomy'
 import { toCanonical, type BigStat } from '../money'
 import { drillDamage, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf } from '../vehicle/drillStamp'
@@ -41,7 +41,8 @@ import type { DomainEventBody } from './domainEvent'
 import { openDrillGates, type DrillGates } from './drillGates'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
-import { minedOreOf, resourceTierOf, type MinedOre } from './minedOre'
+import { minedOreOf, type MinedOre } from './minedOre'
+import { oreCellHardness, scratchFloorOfCell } from './signatureCells'
 import { wakeLavaBeside } from './lava/lavaRules'
 
 type CarveIn = (world: WorldState, window: CarveWindow, drillTicksOf: CellDrillTicks) => Carve
@@ -77,13 +78,24 @@ export function drillAtPose(
 
 /**
  * Hardness is looked up, never stored in the cell (#4, #6): ore by its own tier, so a lead cell
- * (#140) is as hard as the tier it sells at (#223), core by the planet, the rest by its band.
+ * (#140) is as hard as its tier (#223) and a signature as five tiers up (`signatureCells.ts`),
+ * core by the planet, the rest by its band.
  */
 export function hardnessOfTile(params: PlanetParams, tile: TilePoint, cell: number): BigStat {
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.core) return coreHardness(params.planetIndex)
-  if (kind === CELL_KIND.ore) return oreHardness(resourceTierOf(params, cell))
+  if (kind === CELL_KIND.ore) return oreCellHardness(params, cell)
   return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
+}
+
+/** The ticks the drill takes to break an intact cell, at its hardness and its scratch floor. */
+export function ticksPerCell(
+  drill: DrillStats,
+  params: PlanetParams,
+  tile: TilePoint,
+  cell: number,
+): number | null {
+  return ticksPerTile(drill, hardnessOfTile(params, tile, cell), scratchFloorOfCell(params, cell))
 }
 
 interface DrillTarget {
@@ -134,17 +146,9 @@ function affordableTicksOf(vehicle: VehicleState): number {
  */
 function drillTicksOfCells(params: PlanetParams, drill: DrillStats): CellDrillTicks {
   return (tile, material, casingGrade) =>
-    ticksPerTile(drill, hardnessOfSample(params, tile, material, casingGrade))
-}
-
-function hardnessOfSample(
-  params: PlanetParams,
-  tile: TilePoint,
-  material: number,
-  casingGrade: number,
-): BigStat {
-  if (casingGrade === 0) return hardnessOfTile(params, tile, material)
-  return casingHardness(params.planetIndex, casingGrade)
+    casingGrade === 0
+      ? ticksPerCell(drill, params, tile, material)
+      : ticksPerTile(drill, casingHardness(params.planetIndex, casingGrade))
 }
 
 function collectYieldedCells(
@@ -191,24 +195,20 @@ function collectTile(
 }
 
 /**
- * One ore unit into the hold, named with its tier, ore id, depth and chunk (#122); with a full
- * hold it is lost, never refused (#7).
+ * One ore unit into the hold at its sale tier (#232), named with its tier, ore id, depth and chunk
+ * (#122); with a full hold it is lost, never refused (#7).
  */
 export function collectOreUnit(state: AuthorityState, playerId: string, ore: MinedOre): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
   if (!hasCargoRoom(vehicle)) return { state, events: [{ type: 'StorageFull', lostUnits: 1 }] }
+  const { saleTier, ...named } = ore
   return {
     state: withVehicle(state, playerId, {
       ...vehicle,
-      cargo: withOreUnit(vehicle.cargo, ore.resourceTier),
+      cargo: withOreUnit(vehicle.cargo, saleTier),
     }),
     events: [
-      {
-        type: 'CargoAdded',
-        ...ore,
-        amount: 1,
-        value: toCanonical(oreSalePrice(ore.resourceTier)),
-      },
+      { type: 'CargoAdded', ...named, amount: 1, value: toCanonical(oreSalePrice(saleTier)) },
     ],
   }
 }
@@ -229,8 +229,11 @@ function damageEvent(
   drill: DrillStats,
   ticks: number,
 ): DomainEventBody {
-  const hardness = hardnessOfTile(params, tile, materialCellAt(world, params, tile))
-  const damage = toCanonical(drillDamage(drill, hardness, ticks))
+  const material = materialCellAt(world, params, tile)
+  const hardness = hardnessOfTile(params, tile, material)
+  const damage = toCanonical(
+    drillDamage(drill, hardness, ticks, scratchFloorOfCell(params, material)),
+  )
   return { type: 'DrillDamageDealt', tx: tile.tx, ty: tile.ty, ticks, damage }
 }
 

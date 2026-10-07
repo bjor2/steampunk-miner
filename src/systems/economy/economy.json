@@ -7,7 +7,9 @@
     "valueRatio": "1.5",
     "hardnessRatio": "1.2544",
     "coreHardnessMultiplier": "4",
-    "coreHardnessBand": 5
+    "coreHardnessBand": 5,
+    "signatureValueLead": 1,
+    "signatureDrillHardnessTierOffset": 5
   },
   "planets": {
     "coreFraction": "0.4",
@@ -36,7 +38,7 @@
     "drillUpEnergyMult": "2.5",
     "perShot": "0.5"
   },
-  "drill": { "scratchFloor": "0.25", "minTicksPerTile": 24 },
+  "drill": { "scratchFloor": "0.25", "gateScratchFloor": "1", "minTicksPerTile": 24 },
   "costCurves": [
     { "id": "cost.vehicle.cargo_hold", "family": "geometric", "base": "24", "ratio": "1.225" },
     { "id": "cost.vehicle.boiler", "family": "geometric", "base": "23", "ratio": "1.225" },

@@ -82,6 +82,11 @@ function readOre(reader: FieldReader, ore: Record<string, unknown>): Economy['or
     hardnessRatio: reader.money('ore.hardnessRatio', ore.hardnessRatio),
     coreHardnessMultiplier: reader.money('ore.coreHardnessMultiplier', ore.coreHardnessMultiplier),
     coreHardnessBand: reader.safeInteger('ore.coreHardnessBand', ore.coreHardnessBand),
+    signatureValueLead: reader.safeInteger('ore.signatureValueLead', ore.signatureValueLead),
+    signatureDrillHardnessTierOffset: reader.safeInteger(
+      'ore.signatureDrillHardnessTierOffset',
+      ore.signatureDrillHardnessTierOffset,
+    ),
   }
 }
 
@@ -149,6 +154,7 @@ function readGun(reader: FieldReader, gun: Record<string, unknown>): Economy['gu
 function readDrill(reader: FieldReader, drill: Record<string, unknown>): Economy['drill'] {
   return {
     scratchFloor: reader.money('drill.scratchFloor', drill.scratchFloor),
+    gateScratchFloor: reader.money('drill.gateScratchFloor', drill.gateScratchFloor),
     minTicksPerTile: reader.safeInteger('drill.minTicksPerTile', drill.minTicksPerTile),
   }
 }

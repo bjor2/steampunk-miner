@@ -318,6 +318,10 @@ export interface Economy {
     hardnessRatio: BigStat
     coreHardnessMultiplier: BigStat
     coreHardnessBand: number
+    /** A signature ore sells this many tiers above its own (#141 Systems: 1, so x1.5). */
+    signatureValueLead: number
+    /** A drill-gated signature is as hard as the tier this many above its own (#142: `H(t+5)`). */
+    signatureDrillHardnessTierOffset: number
   }
   planets: {
     coreFraction: Money
@@ -349,6 +353,11 @@ export interface Economy {
   drill: {
     /** Below `tip / hardness` of this the drill cannot scratch the tile (`P < H/4`). */
     scratchFloor: BigStat
+    /**
+     * The floor of a drill-gated signature cell alone (#142: 1, so the tip needs `P >= H`);
+     * every other cell keeps `scratchFloor`.
+     */
+    gateScratchFloor: BigStat
     /** The tile speed cap: 2.5 tiles/s at 60 ticks/s is 24 ticks per tile. */
     minTicksPerTile: number
   }

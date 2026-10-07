@@ -47,7 +47,7 @@ import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
-import { ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
+import { ORE_SIGNATURE_REGISTRY, ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
 import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRequests'
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
 import { SOUND_CUE_REGISTRY } from '../systems/registries/soundCues'
@@ -79,6 +79,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     content: (kind, entries) =>
       entries.forEach((entry) => addContent(sliceId, contentRegistrationOf(kind, entry))),
     oreTypes: (provider) => add(ORE_TYPE_REGISTRY, provider),
+    oreSignature: (tag) => add(ORE_SIGNATURE_REGISTRY, tag),
     gateCheck: (check) => add(GATE_CHECK_REGISTRY, check),
     blastEffect: (effect) => add(BLAST_EFFECT_REGISTRY, effect),
     clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),

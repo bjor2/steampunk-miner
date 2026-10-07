@@ -30,7 +30,7 @@ import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
-import type { OreTypeProvider } from '../systems/registries/oreTypes'
+import type { OreSignatureTag, OreTypeProvider } from '../systems/registries/oreTypes'
 import type { PartMotionRequestSource } from '../systems/registries/partMotionRequests'
 import type { SaveSection } from '../systems/registries/saveSections'
 import type { SoundCue } from '../systems/registries/soundCues'
@@ -59,6 +59,8 @@ export interface SliceRegistrar {
   content<K extends ContentKind>(kind: K, entries: readonly ContentKinds[K][]): void
   /** One provider across all slices. */
   oreTypes(provider: OreTypeProvider): void
+  /** Folded over every ore the provider answers: a yes makes it a signature (#232). */
+  oreSignature(tag: OreSignatureTag): void
   gateCheck(check: GateCheck): void
   blastEffect(effect: BlastEffect): void
   /** Runs on the authority clock after the kernel's steps, in id order (#217). */

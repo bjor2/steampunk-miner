@@ -3,6 +3,9 @@
  * ore tier `t = 3(p-1) + b` for planet `p` and band `b` (core material is band 6), so planet p's
  * surface is planet p-1's band 4 ore and a new planet never starts at a dead end.
  *   V(t) = v0 * rho^(t-1)        H(t) = eta^(t-1)        Hc(p) = 4 * H(t(p, 5))
+ *
+ * A planet's signature ore (#141) sells one tier up and, drill-gated, is as hard as five tiers up
+ * (#142, amended 6 Oct by the Vertical Scaler): `V(t + 1)` and `H(t + 5)`, never a new curve.
  */
 import { floorMilli, mul, type BigStat, type Money } from '../money'
 import { compoundRatio, growGeometric } from './curveFamilies'
@@ -36,6 +39,16 @@ export function oreSalePrice(tier: number): Money {
 /** `H(t)`: hardness of an ore-tier block, compared against drill tip and power (#7). */
 export function oreHardness(tier: number): BigStat {
   return compoundRatio(ore.hardnessRatio, tier - FIRST_TIER)
+}
+
+/** The tier a signature ore of tier `t` sells at: `t + signatureValueLead` (#141 Systems). */
+export function signatureSaleTier(tier: number): number {
+  return tier + ore.signatureValueLead
+}
+
+/** `H(t + 5)`: a drill-gated signature of tier `t`, about 3.11 times its tier's hardness (#142). */
+export function signatureHardness(tier: number): BigStat {
+  return oreHardness(tier + ore.signatureDrillHardnessTierOffset)
 }
 
 /** `blockHardness` of #6 section 2: band `b` of planet `p`; core tiles use `coreHardness`. */

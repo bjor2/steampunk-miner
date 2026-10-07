@@ -7,9 +7,10 @@
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { planetParamsOf } from '../authority/planetOfState'
 import type { AuthorityState } from '../authority/authorityState'
-import { hardnessOfTile } from '../authority/groundDrill'
+import { hardnessOfTile, ticksPerCell } from '../authority/groundDrill'
+import { scratchFloorOfCell } from '../authority/signatureCells'
 import type { BigStat } from '../money'
-import { canScratch, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
+import { canScratch, type DrillStats } from '../vehicle/drillRule'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { isInsidePlanet } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -69,10 +70,11 @@ export function groundHardnessAt(params: PlanetParams, tile: TilePoint): BigStat
 
 /**
  * #29 Gameplay note 3: the bot never bores a tile its tip only skids on (`P < H/4`). It reads the
- * drill's own hardness, so a lead ore cell (#140) costs it what it costs the drill (#223).
+ * drill's own hardness and floor, so a lead ore cell (#140) costs it what it costs the drill (#223)
+ * and a signature it cannot cut (#232) is a wall to route around.
  */
 export function canBore(drill: DrillStats, params: PlanetParams, tile: TilePoint, cell: number) {
-  return isRemovableCell(cell) && canScratch(drill.gateTip, hardnessOfTile(params, tile, cell))
+  return isRemovableCell(cell) && isScratchableCell(drill, params, tile, cell)
 }
 
 /** Ticks to break an intact tile, or null when the tip cannot scratch it. */
@@ -84,7 +86,17 @@ export function boreTicks(
 ): number | null {
   if (isAirCell(cell)) return 0
   if (!canBore(drill, params, tile, cell)) return null
-  return ticksPerTile(drill, hardnessOfTile(params, tile, cell))
+  return ticksPerCell(drill, params, tile, cell)
+}
+
+function isScratchableCell(
+  drill: DrillStats,
+  params: PlanetParams,
+  tile: TilePoint,
+  cell: number,
+): boolean {
+  const floor = scratchFloorOfCell(params, cell)
+  return canScratch(drill.gateTip, hardnessOfTile(params, tile, cell), floor)
 }
 
 /** Ticks to cover `tiles` metres at `speedMax` m/s, whole steps rounded up. */

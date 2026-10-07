@@ -1,14 +1,13 @@
 /**
  * "Time per tile here" (#7, #33 section 5): how long the drill needs for the intact tile at its
- * nose, from the same `hardnessOfTile` and `ticksPerTile` the authority drills with. A tip below
- * a quarter of the hardness cannot scratch it (`blocked`: "needs a better tip"); air or the
- * indestructible pad in front gives `none`.
+ * nose, from the same `ticksPerCell` the authority drills with. A tip below the cell's scratch
+ * floor (a quarter of the hardness, or all of it on a signature, #232) cannot scratch it
+ * (`blocked`: "needs a better tip"); air or the indestructible pad in front gives `none`.
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { AuthorityState } from '../authority/authorityState'
-import { hardnessOfTile } from '../authority/groundDrill'
+import { ticksPerCell } from '../authority/groundDrill'
 import { planetParamsOf } from '../authority/planetOfState'
-import { ticksPerTile } from '../vehicle/drillRule'
 import { noseTileOf } from '../vehicle/vehiclePose'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { isRemovableCell } from '../world/worldCell'
@@ -29,7 +28,7 @@ export function tileTimeAhead(state: AuthorityState, playerId: string): TileTime
   const tile = noseTileOf(vehicle.pose)
   const cell = cellAt(state.world, params, tile)
   if (!isRemovableCell(cell)) return NO_TILE
-  const ticks = ticksPerTile(statsOfVehicle(vehicle), hardnessOfTile(params, tile, cell))
+  const ticks = ticksPerCell(statsOfVehicle(vehicle), params, tile, cell)
   if (ticks === null) return BLOCKED
   return { state: 'time', text: `${secondsText(ticks)} s`, ticks }
 }
