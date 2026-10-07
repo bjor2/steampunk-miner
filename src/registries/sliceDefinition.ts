@@ -9,6 +9,7 @@ import type { SliceRunEvents } from '../logging/registries/runEvents'
 import type { ArtAsset } from '../systems/registries/artAssets'
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
+import type { BotPurchase } from '../systems/registries/botPurchases'
 import type { SliceCommandRules } from '../systems/registries/commandRules'
 import type { ContentKind, ContentKinds } from '../systems/registries/content'
 import type {
@@ -27,6 +28,7 @@ import type { VehicleStagingProvider } from '../systems/registries/vehicleStagin
 import type { WorldPiece } from '../scene/registries/worldPieces'
 import type { LoadoutAcceptance } from '../systems/registries/vehicleLoadout'
 import type { HudPanel } from '../ui/registries/hudPanels'
+import type { ScreenPanel } from '../ui/registries/screens'
 
 export { FeaturesNotLoadedError } from '../systems/registries/seal'
 
@@ -68,6 +70,10 @@ export interface SliceRegistrar {
    * kebab-case, starting with `<category>-`, never a kernel id or another slice's (#214).
    */
   artAssets(assets: readonly ArtAsset[]): void
+  /** A slice command the pacing bot may buy after the kernel's own purchases. */
+  botPurchase(purchase: BotPurchase): void
+  /** A full screen the kernel shell draws while the store holds it open. */
+  screen(panel: ScreenPanel): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   /**

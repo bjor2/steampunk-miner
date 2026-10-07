@@ -107,6 +107,8 @@ export const UI_IDS = {
   artefactChoice: 'artefact-choice',
   artefactLeave: 'artefact-leave',
   settingsPanel: 'settings-panel',
+  /** The frame a slice's full screen is drawn in (ticket 211); `data-screen-id` names the screen. */
+  sliceScreen: 'slice-screen',
   settingsBindingProblems: 'settings-binding-problems',
   settingsResetBindings: 'settings-reset-bindings',
   settingsClose: 'settings-close',

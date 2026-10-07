@@ -283,8 +283,9 @@ describe('slice boundary lint', () => {
 | --- | --- |
 | `src/registries/sliceDefinition.ts` **(new kernel dir)** | `SliceDefinition`, `SliceRegistrar`, `FeaturesNotLoadedError` |
 | `src/registries/registrar.ts` **(new)** | `registrarFor(sliceId)`, `sealRegistries()`, `withRegistrations(slices, run)`, the test seam that swaps in a fresh sealed set and restores it |
-| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `seal` |
+| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `seal` |
 | `src/ui/registries/hudPanels.ts` **(new)** | HUD panels |
+| `src/ui/registries/screens.ts` | Full slice screens (#211) |
 | `src/ui/vectorIcons.ts` | Icon registry (extended) |
 | `src/debug/debugActionRegistry.ts` **(new)** | Debug actions |
 
@@ -316,6 +317,8 @@ export interface SliceRegistrar {
   worldPiece(piece: WorldPiece): void                  // #175, section 3.14
   vehicleStaging(provider: VehicleStagingProvider): void  // one provider, #175, section 3.14
   artAssets(assets: readonly ArtAsset[]): void          // bare art ids, #214
+  botPurchase(purchase: BotPurchase): void                  // #211, section 3.17
+  screen(panel: ScreenPanel): void                          // #211, section 3.18
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   commandRules(rules: SliceCommandRules): void              // K1, section 3.15
   eventProjections(projections: SliceEventProjections): void
@@ -680,6 +683,14 @@ A power-up that changes the terrain never edits the world in its command. Its co
 3. the queued edits: first in first out per player, round-robin across players, 32 density cells or 64 swaps and at most 2 chunks a tick (lowest `chunkKey` first), the rest carried over (`terrainEditPlan.ts`).
 
 The queue is in the snapshot and the digest. An edit credits no ore, so a slice queues only cells it may change, and it changes the ground as plain `GroundChanged`.
+
+### 3.17 Bot purchases (#211)
+
+`src/systems/registries/botPurchases.ts`: a slice whose command the pacing bot should buy registers `{ id, command, payloadsToTry, estimateCost, isAvailable }`. After the kernel's own Upgrade bay purchases, the bot takes the first purchase in id order with a payload that `isAvailable`, that the wallet pays with the next service kept back (`estimateCost`), and that the authority would accept, and submits `{ type: command, payload }`; it repeats while one pays. `payloadsToTry` is the one addition to the Q3 shape on #165: it keeps the choice of payload (which node) in the slice. The bot records every Upgrade bay purchase in `SliceRun.shopSpend` (the kernel's at what the wallet paid, a slice's at its estimate), and `spendShareByPlanet` (`src/systems/bot/shopSpend.ts`) turns that into the per-planet slice share. With nothing registered the bot's run log is byte-identical.
+
+### 3.18 Slice screens (#211)
+
+`src/ui/registries/screens.ts`: `{ id, priority, render }`, where `render` takes `ScreenProps` (`onDismiss`). The store holds at most one open screen (`openScreen(id)`, `dismissScreen()`); while one is open a lower-priority request leaves it, and an equal or higher one replaces it. The shell (`src/ui/screens/SliceScreen.tsx`) draws it over the HUD and the dock screen, under the cache cards and settings. The `screen` input layer sits between those: `ui_cancel` (Escape, Backspace) dismisses it. Opening a screen is presentation only: no command, no log line, no digest change. A slice opens its screen from its own UI through the store's `openScreen`; `steampunkDebug.ui.openScreen(id)` does the same for specs.
 
 ## 4. Cross-slice contracts
 

@@ -1,6 +1,6 @@
 {
   "inputMapVersion": 2,
-  "contexts": ["vehicle", "platform", "artefact", "settings"],
+  "contexts": ["vehicle", "platform", "artefact", "settings", "screen"],
   "reservedKeys": ["Escape"],
   "actions": [
     {
@@ -104,7 +104,7 @@
     {
       "id": "ui_cancel",
       "displayName": "Back",
-      "contexts": ["platform", "artefact", "settings"],
+      "contexts": ["platform", "artefact", "settings", "screen"],
       "kind": "press",
       "keyboard": ["Escape", "Backspace"]
     },

@@ -46,6 +46,7 @@ import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import { readOverlayStats, type OverlayStats } from '../ui/overlay/overlaySeatTable'
 import { bayScreenPresence } from '../ui/platform/bayScreenPresence'
+import { screenIdProblems } from '../ui/registries/screens'
 import { readFittedScreen } from '../ui/stage/screenFit'
 import type { ScreenLayout } from '../systems/views/screenLayout'
 import { readRendererMemory, type RendererMemory } from './debugMemory'
@@ -85,6 +86,10 @@ export interface DebugUi {
   getScreenLayout(): DebugResult<{ layout: ScreenLayout }>
   /** The HUD overlay's cards holding a seat now, and how many the 16-card cap evicted (#208). */
   getOverlayStats(): DebugResult<{ stats: OverlayStats }>
+  /** Opens a slice's registered full screen (ticket 211); refused for an id no slice registered. */
+  openScreen(screenId: unknown): DebugResult
+  /** The slice screen drawn now, or null; `input.tap('ui_cancel')` dismisses it like Escape. */
+  getOpenScreen(): DebugResult<{ screenId: string | null }>
 }
 
 export interface BayPresentation {
@@ -135,6 +140,8 @@ export function createDebugUi(): DebugUi {
     getAudioModel: () => ({ ok: true, model: readAudioModel() }),
     getScreenLayout: screenLayoutNow,
     getOverlayStats: () => ({ ok: true, stats: readOverlayStats() }),
+    openScreen: openScreenUnlessRefused,
+    getOpenScreen: () => ({ ok: true, screenId: game().openScreenId }),
   }
 }
 
@@ -168,6 +175,12 @@ function setZoomUnlessRefused(viewShortAxisMetres: unknown): DebugResult {
 function pinRenderScaleUnlessRefused(scale: unknown): DebugResult {
   const problems = renderScalePinProblems(scale)
   if (problems.length === 0) game().pinRenderScale(scale)
+  return resultOf(problems)
+}
+
+function openScreenUnlessRefused(screenId: unknown): DebugResult {
+  const problems = screenIdProblems(screenId)
+  if (problems.length === 0) game().openScreen(screenId)
   return resultOf(problems)
 }
 

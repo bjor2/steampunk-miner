@@ -4,9 +4,10 @@
  * the world is an ordinary authority command; the rest move UI state. Nothing here mutates state.
  *
  * Contexts are layers: `settings` over everything, then the artefact cache's cards while open
- * (#46), then `platform` while docked (the screen is open exactly then), else `vehicle`. Escape
- * closes the top layer: settings, the cards (no pick, the cache stays live), then the platform
- * screen (that is `Undock`), and in `vehicle` it opens settings. `interact` opens a live cache the
+ * (#46), then a slice's full screen while one is open (ticket 211), then `platform` while docked
+ * (the screen is open exactly then), else `vehicle`. Escape closes the top layer: settings, the
+ * cards (no pick, the cache stays live), the slice screen, then the platform screen (that is
+ * `Undock`), and in `vehicle` it opens settings. `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
  * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
  * still move, the guns' toggle with no guns mounted (#107) and a charge the authority would not
@@ -32,6 +33,7 @@ export type InputReaction =
   | { kind: 'openSettings' }
   | { kind: 'closeSettings' }
   | { kind: 'closeArtefactChoice' }
+  | { kind: 'dismissScreen' }
   | { kind: 'moveFocus'; step: -1 | 1 }
   | { kind: 'activateFocused' }
   | { kind: 'zoom'; change: ZoomChange }
@@ -57,6 +59,8 @@ export interface InputSituation {
 export interface OpenOverlays {
   isSettingsOpen: boolean
   isArtefactChoiceOpen: boolean
+  /** The slice screen drawn (ticket 211); null while none is. */
+  openScreenId: string | null
 }
 
 type ReactionRule = (situation: InputSituation) => InputReaction
@@ -99,16 +103,20 @@ const REACTIONS_BY_LAYER: Readonly<
     ...MENU_REACTIONS,
     ui_cancel: () => ({ kind: 'closeSettings' }),
   },
+  screen: {
+    ui_cancel: () => ({ kind: 'dismissScreen' }),
+  },
 }
 
 export function reactionToPress(action: ActionId, situation: InputSituation): InputReaction {
   return REACTIONS_BY_LAYER[situation.layer][action]?.(situation) ?? NONE
 }
 
-/** The layer input goes to: settings, the cache's cards, else the dock screen while docked. */
+/** The layer input goes to: settings, the cache's cards, a slice screen, else the dock screen. */
 export function topLayerOf(vehicleMode: VehicleMode, overlays: OpenOverlays): InputContext {
   if (overlays.isSettingsOpen) return 'settings'
   if (overlays.isArtefactChoiceOpen) return 'artefact'
+  if (overlays.openScreenId !== null) return 'screen'
   return vehicleMode === 'docked' ? 'platform' : 'vehicle'
 }
 

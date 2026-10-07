@@ -45,6 +45,7 @@ import type { ButtonAction, ScreenButton } from '../systems/views/viewParts'
 import { refuseProblems, submitCommand } from './authorityLink'
 import { writePreferences } from './preferencesFile'
 import { menuScreenOf, type ScreenSources } from './screenModels'
+import { screenIdProblems, winningScreenId } from '../ui/registries/screens'
 import type { VehicleReplica } from './vehicleReplica'
 
 export interface PresentationValues {
@@ -59,6 +60,8 @@ export interface PresentationValues {
   isSettingsOpen: boolean
   /** The artefact cache's three cards (#46): open on this player's `artefact_open`. */
   isArtefactChoiceOpen: boolean
+  /** The slice full screen drawn over the game (ticket 211); null while none is. */
+  openScreenId: string | null
   focusedControlId: string | null
   /** The first press of Travel arms it; only the second submits (#33 section 6). */
   isTravelArmed: boolean
@@ -98,6 +101,13 @@ export interface PresentationActions {
   closeSettings(): void
   /** "Leave it" or Escape on the cache's cards: no pick, the cache stays live. */
   closeArtefactChoice(): void
+  /**
+   * Opens a registered slice screen; refused (thrown) for an unknown id. While another is open
+   * the higher priority stays (ticket 211). Presentation only: no command is submitted.
+   */
+  openScreen(screenId: unknown): void
+  /** Escape or the screen's own back button: the slice screen closes. */
+  dismissScreen(): void
   /** Opens or closes the cards as the authority's answers say (`artefact_open`, `_chosen`). */
   followArtefactChoice(events: readonly DomainEvent[]): void
   moveFocus(step: -1 | 1): void
@@ -133,6 +143,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
   bindingProblems: [],
   isSettingsOpen: false,
   isArtefactChoiceOpen: false,
+  openScreenId: null,
   focusedControlId: null,
   isTravelArmed: false,
   rebindingActionId: null,
@@ -194,6 +205,11 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
     closeSettings: () =>
       set({ isSettingsOpen: false, focusedControlId: null, rebindingActionId: null }),
     closeArtefactChoice: () => set({ isArtefactChoiceOpen: false, focusedControlId: null }),
+    openScreen: (screenId) => {
+      refuseProblems(screenIdProblems(screenId))
+      set({ openScreenId: winningScreenId(get().openScreenId, screenId as string) })
+    },
+    dismissScreen: () => set({ openScreenId: null }),
     followArtefactChoice: (events) => {
       const isOpen = isChoiceOpenAfter(events, get().playerId, get().isArtefactChoiceOpen)
       if (isOpen !== get().isArtefactChoiceOpen) {

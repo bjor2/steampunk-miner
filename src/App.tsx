@@ -7,6 +7,7 @@ import { Plaques } from './ui/plaques/Plaques'
 import { SettingsPanel } from './ui/settings/SettingsPanel'
 import { GameStage } from './ui/stage/GameStage'
 import { PortraitCard } from './ui/stage/PortraitCard'
+import { SliceScreen } from './ui/screens/SliceScreen'
 import { TouchControls } from './ui/touch/TouchControls'
 import { TravelTransitionCard } from './ui/TravelTransitionCard'
 
@@ -19,6 +20,7 @@ export default function App() {
       <TouchControls />
       <TravelTransitionCard />
       <EndOfSliceCard />
+      <SliceScreen />
       <ArtefactChoice />
       <SettingsPanel />
       <PortraitCard />

@@ -24,7 +24,8 @@ const OVER_CACHE: InputSituation = { ...DRIVING, canOpenArtefactCache: true }
 const AT_UPGRADE_BAY: InputSituation = { ...DOCKED, dockedBay: 'upgrade' }
 const SETTINGS: InputSituation = { ...DRIVING, layer: 'settings' }
 const CARDS: InputSituation = { ...DRIVING, layer: 'artefact' }
-const NO_OVERLAY = { isSettingsOpen: false, isArtefactChoiceOpen: false }
+const SLICE_SCREEN: InputSituation = { ...DOCKED, layer: 'screen' }
+const NO_OVERLAY = { isSettingsOpen: false, isArtefactChoiceOpen: false, openScreenId: null }
 
 const submitted = (type: string, payload: object = {}) => ({
   kind: 'submit',
@@ -125,5 +126,18 @@ describe('input routing', () => {
     const cardsOpen = { ...NO_OVERLAY, isArtefactChoiceOpen: true }
     expect(topLayerOf('active', cardsOpen)).toBe('artefact')
     expect(topLayerOf('active', { ...cardsOpen, isSettingsOpen: true })).toBe('settings')
+  })
+
+  it('puts a slice screen over the dock screen and the vehicle, and under the cards', () => {
+    const screenOpen = { ...NO_OVERLAY, openScreenId: 'example.screen' }
+    expect(topLayerOf('docked', screenOpen)).toBe('screen')
+    expect(topLayerOf('active', screenOpen)).toBe('screen')
+    expect(topLayerOf('active', { ...screenOpen, isArtefactChoiceOpen: true })).toBe('artefact')
+  })
+
+  it('dismisses a slice screen on Back without undocking, and drives nothing under it', () => {
+    expect(reactionToPress('ui_cancel', SLICE_SCREEN)).toEqual({ kind: 'dismissScreen' })
+    expect(reactionToPress('quick_service', SLICE_SCREEN)).toEqual({ kind: 'none' })
+    expect(reactionToPress('interact', SLICE_SCREEN)).toEqual({ kind: 'none' })
   })
 })

@@ -14,6 +14,7 @@ import { artAssetIdProblems } from '../systems/art/artAssetRules'
 import { ART_ASSET_REGISTRY, type ArtAsset } from '../systems/registries/artAssets'
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
+import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
 import {
   COMMAND_RULE_REGISTRY,
   commandRuleRegistrationsOf,
@@ -46,6 +47,7 @@ import { VEHICLE_STAGING_REGISTRY } from '../systems/registries/vehicleStaging'
 import { WORLD_PIECE_REGISTRY } from '../scene/registries/worldPieces'
 import { LOADOUT_ACCEPTANCE_REGISTRY } from '../systems/registries/vehicleLoadout'
 import { HUD_PANEL_REGISTRY } from '../ui/registries/hudPanels'
+import { SCREEN_REGISTRY } from '../ui/registries/screens'
 import type { SliceDefinition, SliceRegistrar } from './sliceDefinition'
 
 export function registrarFor(sliceId: string): SliceRegistrar {
@@ -71,6 +73,8 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     worldPiece: (piece) => add(WORLD_PIECE_REGISTRY, piece),
     vehicleStaging: (provider) => add(VEHICLE_STAGING_REGISTRY, provider),
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
+    botPurchase: (purchase) => add(BOT_PURCHASE_REGISTRY, purchase),
+    screen: (panel) => add(SCREEN_REGISTRY, panel),
     debugActions: (actions) =>
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),
     commandRules: (rules) =>

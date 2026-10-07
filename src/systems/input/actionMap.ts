@@ -13,11 +13,12 @@
 import SHIPPED_ACTION_MAP from '../../data/input/actions.json'
 import { isKnownKeyChord, keyLabelOf } from './keyCodes'
 
-export const INPUT_CONTEXTS = ['vehicle', 'platform', 'artefact', 'settings'] as const
+export const INPUT_CONTEXTS = ['vehicle', 'platform', 'artefact', 'settings', 'screen'] as const
 
 /**
  * `vehicle` while driving, `platform` on the dock screen, `settings` on the overlay (#33),
- * `artefact` while the cache's three cards are open (#46).
+ * `artefact` while the cache's three cards are open (#46), `screen` while a slice's full screen is
+ * (ticket 211).
  */
 export type InputContext = (typeof INPUT_CONTEXTS)[number]
 
