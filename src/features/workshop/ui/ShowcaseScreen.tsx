@@ -29,6 +29,11 @@ export function ShowcaseScreen() {
   const model = useScreenModel(readUpgradeBayModel)
   const focusedId = useUpgradeBayFocus(model)
   useShowcaseClock()
+  return <ShowcaseView model={model} focusedId={focusedId} />
+}
+
+/** The showcase's markup for a bay model and the resolved menu focus. */
+export function ShowcaseView({ model, focusedId }: { model: UpgradeBayModel; focusedId: string }) {
   return (
     <div
       className={styles.showcase}

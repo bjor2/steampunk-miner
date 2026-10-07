@@ -3,4 +3,6 @@ export const WORKSHOP_TEST_IDS = {
   showcase: 'workshop-showcase',
   plaqueLine: (upgradeId: string) => `workshop-plaque-${upgradeId}-line`,
   plaquePips: (upgradeId: string) => `workshop-plaque-${upgradeId}-pips`,
+  /** The held Buy once the plaque is drawn as a card, which carries the #33 buy id (#164). */
+  plaqueBuy: (upgradeId: string) => `workshop-plaque-${upgradeId}-buy`,
 } as const

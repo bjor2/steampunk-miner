@@ -651,9 +651,9 @@
             },
             {
               "title": "Hold-to-buy chains",
-              "description": "Hold Buy (a long-press on touch) to buy the same upgrade faster and faster: a click buys one, then a short wind-up, then quicker steps up to 10 a second, a breath at each big level-up, and a stop on release, sliding off, can't afford or the service reserve, each with its own cadence. Plaques tempt with 'can buy ×12, 1 big level' and count the running chain.",
+              "description": "Hold Buy (a long-press on touch, once the plaque's card is open) to buy the same upgrade faster and faster: a click buys one, then a short wind-up, then quicker steps up to 10 a second, a breath at each big level-up, and a stop on release, sliding off, can't afford or the service reserve, each with its own cadence. Plaques tempt with 'can buy ×12, 1 big level' and count the running chain; each plaque is its track's item card, opened by a tap or menu focus.",
               "status": "built",
-              "issues": [177, 180, 226]
+              "issues": [164, 177, 180, 226]
             },
             {
               "title": "Escalating purchase sound",

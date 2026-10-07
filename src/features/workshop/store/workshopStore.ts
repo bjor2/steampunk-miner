@@ -16,6 +16,7 @@ import { useGameStore } from '../../../store/gameStore'
 import { requestSoundCue } from '../../../store/soundCueRequests'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import type { UpgradeId } from '../../../systems/economy/economyDefinition'
+import { UI_ID_TEMPLATES } from '../../../systems/views/screenIds'
 import { add, ZERO_MONEY, type Money } from '../../../systems/money'
 import { stopCueOf, type ChainStopCue } from '../systems/chainCues'
 import {
@@ -36,6 +37,7 @@ import {
   type HoldChain,
 } from '../systems/holdChain'
 import { NO_MILESTONES } from '../systems/milestoneLandings'
+import { plaquePressOf, type PlaquePointer } from '../systems/plaquePress'
 import { cuePlaysOfStop, type CuePlay } from '../systems/render/purchaseSound'
 import {
   RESTING_TURN,
@@ -75,6 +77,8 @@ interface WorkshopValues {
 interface WorkshopState extends WorkshopValues {
   /** Lights the track's part and turns its face to the camera; never while a hold runs. */
   selectTrack(upgradeId: UpgradeId, tick: number): void
+  /** A press on a plaque's Buy (the GD's input rules on #164): opens its card, or buys and holds. */
+  pressPlaqueBuy(upgradeId: UpgradeId, tick: number, pointer: PlaquePointer): void
   /** A press on a plaque or part: buys one now and holds on the curve until let go. */
   pressTrack(upgradeId: UpgradeId, tick: number, stepLimit?: number | null): void
   releaseHold(): void
@@ -105,6 +109,10 @@ export const useWorkshopStore = create<WorkshopState>()((set, get) => ({
   selectTrack: (upgradeId, tick) => {
     if (isHoldLive(get().hold) || get().selected === upgradeId) return
     set({ selected: upgradeId, turn: turnTowardTrack(get().turn, upgradeId, tick) })
+  },
+  pressPlaqueBuy: (upgradeId, tick, pointer) => {
+    if (plaquePressOf(pointer) === 'open_card') return openPlaqueCard(upgradeId, tick)
+    get().pressTrack(upgradeId, tick)
   },
   pressTrack: (upgradeId, tick, stepLimit = null) => {
     endLiveHold(leaveHoldFocus, tick)
@@ -153,6 +161,12 @@ function readTick(): number {
 
 function localPlayerId(): string {
   return useGameStore.getState().playerId
+}
+
+/** The game's menu focus moves to the plaque's Buy, which draws its card open. */
+function openPlaqueCard(upgradeId: UpgradeId, tick: number): void {
+  useGameStore.getState().focusControl(UI_ID_TEMPLATES.workshopUpgradeBuy(upgradeId))
+  useWorkshopStore.getState().selectTrack(upgradeId, tick)
 }
 
 function pressedOn(

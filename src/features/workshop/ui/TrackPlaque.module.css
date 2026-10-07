@@ -95,3 +95,9 @@
 .pips[data-jump-next] .pip:last-child {
   box-shadow: 0 0 0.5em var(--color-amber);
 }
+
+/* The open item card (#164), between the plaque's title and its pips. */
+.card {
+  display: grid;
+  gap: var(--space-1);
+}

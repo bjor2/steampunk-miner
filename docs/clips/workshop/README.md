@@ -25,6 +25,9 @@ plays through the browser's audio engine, which a headless recording does not ca
 cap, at most 4 ratchet voices and 1 flourish in a 50-purchase spree, is checked by
 `src/features/workshop/store/workshopStore.test.ts`.
 
+The clips were recorded before each plaque became its track's item card (#164): the open card
+on the focused plaque, and on touch the first tap that opens it, are not in them.
+
 Not in these clips, by the locks on #177: no milestone moment, because the milestone list ships
 empty here and arrives with #228; the turntable's turn is the flat art's narrowing, since the
 Works' turntable is one baked quad (K-b, ticket 227); the camera keeps the Works' staging framing,

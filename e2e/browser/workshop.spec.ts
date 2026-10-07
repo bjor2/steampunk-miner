@@ -3,12 +3,15 @@
  * authority snapshot and the bay's #33 ids, never pixels. A click on a plaque's Buy buys exactly
  * one step; holding the pointer on it chains steps until let go; `holdBuy` runs a 10-step chain
  * across a big level-up; a hold stops on can't afford with its cue; and the showcase keeps the
- * kernel rows' ids while the preview's second WebGL context stays unmounted.
+ * kernel rows' ids while the preview's second WebGL context stays unmounted. On touch (the GD's
+ * input rules on #164), each plaque is its track's item card: the first tap opens it and buys
+ * nothing, and a held touch on its Buy then chains.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
 import { UPGRADE_IDS } from '../../src/systems/economy/economyDefinition'
 import { UI_ID_TEMPLATES, UI_IDS } from '../../src/systems/views/screenIds'
+import { WORKSHOP_TEST_IDS } from '../../src/features/workshop/ui/testIds'
 
 declare global {
   interface Window {
@@ -75,7 +78,7 @@ test.describe('workshop showcase (#177)', () => {
   test("a click on a plaque's Buy buys exactly one step", async ({ page }) => {
     test.setTimeout(180_000)
     const errors = await openAtTheShowcase(page)
-    await page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeBuy('engine')).click()
+    await page.getByTestId(WORKSHOP_TEST_IDS.plaqueBuy('engine')).click()
 
     expect((await chainOnceEnded(page)).tally).toMatchObject({ steps: 1, cue: 'ka_chunk' })
     expect(await stepOf(page, 'engine')).toBe(1)
@@ -88,7 +91,7 @@ test.describe('workshop showcase (#177)', () => {
   test('holding the pointer on Buy chains steps until it is let go', async ({ page }) => {
     test.setTimeout(180_000)
     const errors = await openAtTheShowcase(page)
-    await page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeBuy('boiler')).hover()
+    await page.getByTestId(WORKSHOP_TEST_IDS.plaqueBuy('boiler')).hover()
     await page.mouse.down()
     await expect.poll(() => stepOf(page, 'boiler'), { timeout: 60_000 }).toBeGreaterThanOrEqual(4)
     await page.mouse.up()
@@ -143,6 +146,36 @@ test.describe('workshop showcase (#177)', () => {
     await expect(page.getByTestId(UI_IDS.upgradebayCasingBuy)).toBeVisible()
     await expect(page.getByTestId(UI_IDS.upgradebayPreview)).toHaveCount(0)
     expect(await previewPanelHeight(page)).toBe(0)
+    expect(errors).toEqual([])
+  })
+})
+
+test.describe('workshop showcase on touch (#177, the GD input rules on #164)', () => {
+  test.use({ hasTouch: true })
+
+  test("a first tap opens a plaque's card, and a held touch on its Buy then chains", async ({
+    page,
+  }) => {
+    test.setTimeout(240_000)
+    const errors = await openAtTheShowcase(page)
+    const plaque = page.getByTestId(UI_ID_TEMPLATES.workshopUpgradeBuy('drill_tip'))
+    const buy = page.getByTestId(WORKSHOP_TEST_IDS.plaqueBuy('drill_tip'))
+    await buy.tap()
+    await expect(plaque).toHaveAttribute('aria-expanded', 'true', { timeout: 15_000 })
+    expect(await stepOf(page, 'drill_tip')).toBe(0)
+
+    const fingers = await page.context().newCDPSession(page)
+    const box = (await buy.boundingBox())!
+    const finger = { x: box.x + box.width / 2, y: box.y + box.height / 2 }
+    await fingers.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [finger] })
+    await expect
+      .poll(() => stepOf(page, 'drill_tip'), { timeout: 60_000 })
+      .toBeGreaterThanOrEqual(3)
+    await fingers.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    const reading = await chainOnceEnded(page)
+
+    expect(reading.hold).toMatchObject({ upgradeId: 'drill_tip', end: 'release' })
+    expect(await stepOf(page, 'drill_tip')).toBe(reading.tally?.steps)
     expect(errors).toEqual([])
   })
 })

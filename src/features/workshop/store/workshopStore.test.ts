@@ -26,6 +26,7 @@ import {
   type Money,
 } from '../../../systems/money'
 import { replayRun } from '../../../systems/replay/replayRun'
+import { UI_ID_TEMPLATES } from '../../../systems/views/screenIds'
 import { HOLD_CURVE } from '../systems/holdChain'
 import {
   CADENCE_CUE_ID,
@@ -274,6 +275,48 @@ describe('workshop hold-to-buy controller', () => {
 
     expect(replay.digests.at(-1)?.digest).toBe(takeSessionSnapshot().digest)
     expect(chain).toMatchObject({ track: 'cargo_hold', steps: 11, stoppedBy: 'money_short' })
+  })
+})
+
+const FIRST_TOUCH = { isTouch: true, isCardOpen: false, hasCard: true, isBuyOpen: true }
+
+describe("workshop: a press on a plaque's Buy", () => {
+  it('opens the card on a first touch and buys nothing', () => {
+    atUpgradeBayWith()
+    workshop().pressPlaqueBuy('drill_tip', tick(), FIRST_TOUCH)
+    runFrames(60)
+
+    expect(game().focusedControlId).toBe(UI_ID_TEMPLATES.workshopUpgradeBuy('drill_tip'))
+    expect(workshop().selected).toBe('drill_tip')
+    expect(stepOf('drill_tip')).toBe(0)
+    expect(boughtTicks()).toEqual([])
+  })
+
+  it('runs the chain on the curve for a touch held a second on the open card', () => {
+    atUpgradeBayWith()
+    workshop().pressPlaqueBuy('drill_tip', tick(), FIRST_TOUCH)
+    workshop().pressPlaqueBuy('drill_tip', tick(), { ...FIRST_TOUCH, isCardOpen: true })
+    runFrames(TICKS_PER_SECOND)
+    workshop().releaseHold()
+    runFrames(120)
+    const ticks = boughtTicks()
+
+    expect(ticks.slice(1).map((at, index) => at - ticks[index])).toEqual([
+      HOLD_CURVE.windUpTicks,
+      HOLD_CURVE.gapTicks[0],
+    ])
+    expect(boughtChains()).toEqual([0, 1, 1])
+    expect(stepOf('drill_tip')).toBe(3)
+  })
+
+  it('never sends a step for a plaque whose Buy is refused', () => {
+    atUpgradeBayWith()
+    const refused = { ...FIRST_TOUCH, isTouch: false, isCardOpen: true, isBuyOpen: false }
+    workshop().pressPlaqueBuy('engine', tick(), refused)
+    runFrames(60)
+
+    expect(boughtTicks()).toEqual([])
+    expect(workshop().hold).toBeNull()
   })
 })
 
