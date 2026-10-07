@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T19:16:26Z",
+  "updated_at": "2026-10-07T19:16:28Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -247,9 +247,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "queue run on 36e1a97 (close-#249)",
+      "note": "testing spec #71 (Wayfinder: Campaign horizontal & vertical scaling) on 36e1a97",
       "stale_after_min": 420,
-      "updated_at": "2026-10-07T19:16:26Z",
+      "updated_at": "2026-10-07T19:16:28Z",
       "host": "grok-bot-vm-452660841"
     }
   },
