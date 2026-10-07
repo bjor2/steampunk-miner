@@ -1,8 +1,9 @@
 /**
  * The bay screens (#45, #44, #62): read through `steampunkDebug.ui`, never pixels. Docked at the
- * Upgrade bay, the live preview frames the vehicle at 60% ±5% of its panel's height at 1080p and
- * 4K (#39 acceptance 5, moved here from S5 by the scope review on #54), the shop text is at least
- * 2.2% of the short axis, the shutter opens and closes, and the seven icons sit on their rows.
+ * Upgrade bay, the workshop showcase (#177) draws the car in the main canvas, where the retired
+ * live preview framed it in a panel of its own (#39 acceptance 5; #180 section 7 retires the
+ * preview), and the shop text is at least 2.2% of the short axis at 1080p and 4K; the shutter opens
+ * and closes, and the seven icons sit on their plaques and rows.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -14,9 +15,8 @@ declare global {
   }
 }
 
-// #39 acceptance 5: 60% of the panel height, ±5%.
-const SHARE_PERCENT = { target: 60, tolerance: 5 }
 const TEXT_SHARE = 0.022
+const SHOWCASE = '[data-slice-screen="workshop.showcase"]'
 
 async function openAtUpgradeBay(page: Page): Promise<string[]> {
   const errors: string[] = []
@@ -38,15 +38,13 @@ function presentation(page: Page): Promise<BayPresentation> {
   })
 }
 
-/** Once the shutter is open and the preview camera has framed a frame at this panel size. */
+/** Once the shutter is open and the screen has been laid out at this size. */
 async function settledPresentation(page: Page, shortAxisPixels: number): Promise<BayPresentation> {
   await expect
     .poll(
       async () => {
         const now = await presentation(page)
         return now.shutter.phase === 'open' && now.type.shortAxisPixels === shortAxisPixels
-          ? now.preview.vehicleShare > 0
-          : false
       },
       { timeout: 30_000 },
     )
@@ -55,20 +53,18 @@ async function settledPresentation(page: Page, shortAxisPixels: number): Promise
 }
 
 test.describe('bay screens (#62)', () => {
-  test('frames the upgradebay-preview vehicle at 60% ±5% of the panel height at 1080p and 4K', async ({
+  test('shows the car in the main canvas behind the showcase, its text at least 2.2% of the short axis at 1080p and 4K', async ({
     page,
   }) => {
     test.setTimeout(120_000)
     await page.setViewportSize({ width: 1920, height: 1080 })
     const errors = await openAtUpgradeBay(page)
+    await expect(page.locator(SHOWCASE)).toBeVisible({ timeout: 30_000 })
     const at1080p = await settledPresentation(page, 1080)
     await page.setViewportSize({ width: 3840, height: 2160 })
     const at4k = await settledPresentation(page, 2160)
     for (const { preview, type } of [at1080p, at4k]) {
-      expect(Math.abs(preview.vehicleShare * 100 - SHARE_PERCENT.target)).toBeLessThanOrEqual(
-        SHARE_PERCENT.tolerance,
-      )
-      expect(preview.panelHeightPixels).toBeGreaterThan(0)
+      expect(preview.panelHeightPixels).toBe(0)
       expect(type.smallestTextPixels).toBeGreaterThanOrEqual(type.shortAxisPixels * TEXT_SHARE)
     }
     expect(errors).toEqual([])
