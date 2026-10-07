@@ -7,7 +7,7 @@ import { readAuthorityState } from '../../../store/authorityLink'
 import { resetTreeScreenStore, type TreeZoom } from '../store/treeScreenStore'
 import { registeredTechTree } from '../systems/techTree'
 import { nodeCardModelOf, treeScreenModelOf } from '../systems/treeScreenModel'
-import { withFixtureTree } from '../treeTestSession'
+import { withFixtureTree, withNoLanes } from '../treeTestSession'
 import { TechTreeButton } from './TechTreeButton'
 import { TECH_TREE_SCREEN_ID, TechTreeScreenView } from './TechTreeScreen'
 
@@ -43,8 +43,10 @@ describe('tech tree screen', () => {
   })
 
   it('shows every swimlane as coming soon until the lane slices land', () => {
-    openTreeOnPlanet(3)
-    const html = shellMarkup()
+    const html = withNoLanes(() => {
+      openTreeOnPlanet(3)
+      return shellMarkup()
+    })
     expect(html.match(/Coming soon/g)).toHaveLength(6)
     expect(html).toContain('data-testid="tech-tree-lane-extraction"')
   })

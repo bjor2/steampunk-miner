@@ -19,6 +19,11 @@ export function withFixtureTree<T>(run: () => T, extra: readonly SliceDefinition
   return withRegistrations([TECH_TREE_SLICE, TREE_FIXTURE_SLICE, ...extra], run)
 }
 
+/** Runs `run` with the tree slice alone: no lane has registered a node. */
+export function withNoLanes<T>(run: () => T): T {
+  return withRegistrations([TECH_TREE_SLICE], run)
+}
+
 /** Player `p1` on `planetIndex`, holding `money` (a decimal string). */
 export function sessionOnPlanet(planetIndex: number, money = '1e30'): BotSession {
   const start = createAuthorityState({

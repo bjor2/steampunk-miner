@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { PLAYER, researchAll, sessionOnPlanet, withFixtureTree } from '../treeTestSession'
+import {
+  PLAYER,
+  researchAll,
+  sessionOnPlanet,
+  withFixtureTree,
+  withNoLanes,
+} from '../treeTestSession'
 import { romanNumeralOf } from './nodeCardModel'
 import { registeredTechTree } from './techTree'
 import {
@@ -22,7 +28,7 @@ function laneIds(model: TreeScreenModel, lane: string): string[] {
 
 describe('tech tree screen: lanes', () => {
   it('shows every lane as coming soon while no lane slice has registered a node', () => {
-    const beforeLanes = modelOn(3)
+    const beforeLanes = withNoLanes(() => modelOn(3))
     expect(beforeLanes.lanes.map((lane) => [lane.title, lane.isComingSoon])).toEqual([
       ['Extractors', true],
       ['Terrain', true],

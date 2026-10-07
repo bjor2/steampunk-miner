@@ -6,7 +6,7 @@ import { paramsOfSession } from '../../../systems/bot/botWorld'
 import { newMineLayout } from '../../../systems/bot/mineLayout'
 import { spendShareByPlanet } from '../../../systems/bot/shopSpend'
 import { cmp, ZERO_MONEY } from '../../../systems/money'
-import { PLAYER, sessionOnPlanet, withFixtureTree } from '../treeTestSession'
+import { PLAYER, sessionOnPlanet, withFixtureTree, withNoLanes } from '../treeTestSession'
 import { registeredTechTree } from './techTree'
 import { researchOrderOf } from './researchBotPurchase'
 import { unlockedNodeIdsOf } from './techTreeSection'
@@ -72,9 +72,12 @@ describe('tech tree: the pacing bot researches', () => {
   })
 
   it('buys nothing from the tree while no lane has registered a node', () => {
-    const session = withFixtureTree(() => botAtUpgradeBay(6, '1e12'), [])
-    expect(registeredTechTree().authored).toEqual([])
-    buyUpgrades(session, situationOf(session))
-    expect(session.commands().map((command) => command.type)).not.toContain('tech-tree.unlock_node')
+    withNoLanes(() => {
+      const session = botAtUpgradeBay(6, '1e12')
+      expect(registeredTechTree().authored).toEqual([])
+      buyUpgrades(session, situationOf(session))
+      const types = session.commands().map((command) => command.type)
+      expect(types).not.toContain('tech-tree.unlock_node')
+    })
   })
 })
