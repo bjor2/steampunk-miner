@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T17:50:44+02:00",
+  "updated_at": "2026-10-07T18:05:47+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -20,10 +20,10 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 149,
+          "ticket": 148,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-07T17:36:00+02:00"
+          "since": "2026-10-07T18:05:00+02:00"
         },
         {
           "slot": "C2",
@@ -35,11 +35,11 @@
         },
         {
           "slot": "C3",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 215,
+          "grok_slot": 5,
+          "kind": "dev",
+          "since": "2026-10-07T18:05:00+02:00"
         },
         {
           "slot": "C4",
@@ -51,8 +51,8 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
+      "used": 3,
+      "free": 1,
       "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
@@ -99,7 +99,7 @@
       "size": 4,
       "used": 2,
       "free": 2,
-      "claims_last_hour": 6,
+      "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
   ],
@@ -200,6 +200,16 @@
           198
         ],
         "since": "2026-10-07T17:48:33+02:00"
+      },
+      {
+        "feature": 143,
+        "kind": "spec",
+        "title": "Spec: Dynamite in ~10 sizes with realistic explosions and exponential cost",
+        "tickets": [
+          149,
+          218
+        ],
+        "since": "2026-10-07T18:03:28+02:00"
       }
     ]
   },
@@ -207,8 +217,8 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 149,
-      "since": "2026-10-07T17:36:00+02:00",
+      "ticket": 148,
+      "since": "2026-10-07T18:05:00+02:00",
       "claude_slot": 1
     },
     {
@@ -234,9 +244,10 @@
     },
     {
       "slot": 5,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 215,
+      "since": "2026-10-07T18:05:00+02:00",
+      "claude_slot": 3
     },
     {
       "slot": 6,
@@ -288,9 +299,9 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 149,
+      "ticket": 148,
       "grok_slot": 1,
-      "since": "2026-10-07T17:36:00+02:00",
+      "since": "2026-10-07T18:05:00+02:00",
       "account": 1
     },
     {
@@ -303,10 +314,10 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 215,
+      "grok_slot": 5,
+      "since": "2026-10-07T18:05:00+02:00",
       "account": 1
     },
     {
@@ -351,17 +362,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 17:50 CEST",
+    "at": "2026-10-07 18:05 CEST",
     "mode": "refill-dev",
-    "triggers": "#198",
-    "started": "#232->C5/A2 #233->C2/A1 #235->C6/A2",
-    "note": "spawned 3 worker(s)"
+    "triggers": "#149",
+    "started": "#148->C1/A1 #215->C3/A1",
+    "note": "spawned 2 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 4,
+      "used": 6,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
@@ -369,8 +380,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 4,
-      "free": 4,
+      "used": 5,
+      "free": 3,
       "external": 0
     }
   }
