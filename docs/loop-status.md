@@ -118,8 +118,9 @@ tab shows it holding a gate token or its triage Claude slot (an `aux` slot label
 `tester-triage`) within about a minute; it also publishes a `tester` entry in `loops.json`
 (working / idle / blocked on red / paused on main red), whose state changes rebuild the page. The
 Tests tab (#192) reads `tester` with the test-metrics `summary.json` and main's `box-tester/*`
-commit statuses: the spec under test, the specs awaiting test, runs per phase (fast, slow,
-full, nightly suites) with their feature, the main-red pause and a STALE warning when no box run
+commit statuses: the spec under test, the specs awaiting test, runs per phase (fast, slow, probes,
+full, nightly suites; `probes` are the `Tester checks:` commands of a spec's resolution comments, since
+build workers no longer run pacing, `balance:*` or e2e themselves) with their feature, the main-red pause and a STALE warning when no box run
 happened for 26 h (`TESTER_STALE_AFTER_H`; runs are per completed spec plus the nightly). A ticket the Tester
 reopens with `needs-fix` gets one attempt back in the loop's `state.json` (`tester_grants`), so the
 loop retries it even after `MAX_ATTEMPTS`; the Loops tab's Needs attention list says "Tester red

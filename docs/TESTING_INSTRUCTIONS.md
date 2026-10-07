@@ -283,5 +283,22 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
 
 ## 6. Before every commit
 
-`npm run typecheck`, the touched Vitest files green (and `npm run lint` for boundary rules). By hand for
+`npm run typecheck`, the touched Vitest files green (and `npm run lint` for boundary rules).
+
+**Long runs belong to the box Tester, not to build workers (Bjor, 2026-10-07).** A loop build worker
+runs only typecheck, lint, format:check, build and quick targeted Vitest files (`npx vitest run <files>` or
+`npx vitest related --run <changed files>`). It does not run pacing bot comparisons, full `balance:*`
+reports, Playwright/e2e or packaged specs, screenshot or clip capture, benches, soak or multi-seed
+sweeps. It still writes and registers the e2e, pacing and balance tests its ticket needs. Acceptance
+that needs pacing, balance or e2e numbers is judged by the box Tester when the spec's tickets are all
+closed (and nightly, ~01:30 Oslo); red reopens the ticket with `needs-fix`. The worker's resolution
+comment ends with one line listing those commands in backticks, which the Tester runs as its `probes`
+job:
+
+```text
+Tester checks: `npm run balance:charges`, `npx playwright test e2e/workshop.spec.ts`
+```
+
+Allowed shapes: `npm run balance:<report|planets|guns|charges|refinery|heat>`, `npm run bench:<name>`,
+`npx playwright test [files]`, `npx vitest run <files>`; write `Tester checks: none` when nothing applies. By hand for
 anything visual: `npm run dev`, then say what you checked in the commit message.

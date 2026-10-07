@@ -31,8 +31,11 @@ branch or in the repo and are linked from the issue, not pasted into it.
 
 A **spec** is an issue titled `Spec: …` or a wayfinder map. Build tickets come from one spec, and
 the box Tester tests per spec: when every ticket of a spec is closed, it runs that spec's tests (the
-union of the files its tickets changed, fast relevant tests, then the pacing bot and e2e) and reopens
-the culprit ticket with `needs-fix` when red. The loop's `spec-resolve.py` reads these lines:
+union of the files its tickets changed, fast relevant tests, then the pacing bot and e2e, then the
+`Tester checks:` commands from the tickets' resolution comments) and reopens the culprit ticket with
+`needs-fix` when red. Build workers do not run long checks themselves (pacing, `balance:*`, e2e,
+captures, sweeps): acceptance that needs those numbers is judged by the Tester at spec finish, and
+nightly runs every `balance:*` report (docs/TESTING_INSTRUCTIONS.md section 6). The loop's `spec-resolve.py` reads these lines:
 
 - **Every build ticket** names its spec on a line of its own: `Spec: #<n>`. Without it the ticket's
   first `map #<n>` reference counts, and without either the ticket is tested alone at its close.

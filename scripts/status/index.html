@@ -1811,7 +1811,12 @@
       <section class="tab hidden" id="tab-tests" data-tab="tests">
         <section class="panel" id="tests-panel">
           <h2>
-            Tests <small class="muted">box Tester (tests no longer run in GitHub Actions)</small>
+            Tests
+            <small class="muted"
+              >box Tester (tests no longer run in GitHub Actions; build workers skip long runs:
+              pacing, balance:*, e2e and listed "Tester checks:" run here per spec and
+              nightly)</small
+            >
           </h2>
           <div id="tests-body" class="muted">loading…</div>
         </section>
@@ -2147,7 +2152,7 @@
               return `<tr><td><a href="${esc(w.url)}">${esc(w.name)}</a></td><td>${r ? `<a href="${esc(r.url)}">${res}</a> <span class="muted">${esc(r.event)}</span>` : res}</td><td class="muted" title="${esc(local(r?.updatedAt))}">${r ? ago(r.updatedAt) : ''}</td></tr>`
             })
             .join('') +
-          '<tr id="wf-tester"><td><a href="#tests">Box Tester (tests)</a></td><td class="muted">loading…</td><td></td></tr>'
+          '<tr id="wf-tester"><td><a href="#tests" title="Runs pacing, balance:*, e2e and the Tester checks: probes that build workers no longer run">Box Tester (tests)</a></td><td class="muted">loading…</td><td></td></tr>'
         renderTests()
 
         // events
@@ -2421,7 +2426,7 @@
         if (row && !model.error) {
           const cls = !last ? 'muted' : TESTS_VIEW.model.isGreenRun(last) ? 'ok' : 'bad'
           const stale = model.freshness.isStale ? ' <span class="badge stale">STALE</span>' : ''
-          row.innerHTML = `<td><a href="#tests">Box Tester (tests)</a></td><td><span class="${cls}">${last ? esc(last.conclusion || '?') : 'no runs'}</span> <span class="muted">${last ? esc(last.phase || '') : ''}</span>${stale}</td><td class="muted">${last ? ago(last.startedAt) : ''}</td>`
+          row.innerHTML = `<td><a href="#tests" title="Runs pacing, balance:*, e2e and the Tester checks: probes that build workers no longer run">Box Tester (tests)</a></td><td><span class="${cls}">${last ? esc(last.conclusion || '?') : 'no runs'}</span> <span class="muted">${last ? esc(last.phase || '') : ''}</span>${stale}</td><td class="muted">${last ? ago(last.startedAt) : ''}</td>`
         }
       }
       async function refreshTestsSummary() {
