@@ -56,10 +56,12 @@ import {
 } from './vehicleSnapshot'
 
 /**
- * 19: each track's level and the guns' level are steps `10L + k` (#180 section 3, #181), so an
- * older save's levels migrate x10 (`saveMigrations.ts`);
- * 18: the live blasts, each with its front cursor and running totals, and the queued power-up
- * terrain edits (K6 #189); 17: the vehicle's loadout as its `loadout` section v1 (K4, #162); 16: heat, lava and the lining types (#113, #96): the vehicle's lining and heat gauge, typed
+ * 20: the charge rack carries charges by size and a planted charge its size, planting tick and a
+ * fuse tick or null (K8 #218; older saves reach it through `saveMigrations.ts`); 19: each track's
+ * level and the guns' level are steps `10L + k` (#180 section 3, #181), so an older save's levels
+ * migrate x10 (`saveMigrations.ts`); 18: the live blasts, each with its front cursor and running
+ * totals, and the queued power-up terrain edits (K6 #189); 17: the vehicle's loadout as its
+ * `loadout` section v1 (K4, #162); 16: heat, lava and the lining types (#113, #96): the vehicle's lining and heat gauge, typed
  * casing values, the lava layer of chunk deltas and the loose lava; 15: each vehicle's charge
  * rack, carried charges and planted charge (#109, #95);
  * 14: what the vehicle's Sell bay visit has paid of its lining bill (#128); 13: the vehicle's
@@ -71,7 +73,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 19
+export const SNAPSHOT_VERSION = 20
 
 export interface SessionSnapshot {
   snapshotVersion: number
@@ -167,6 +169,21 @@ export function sectionsRestoredBy(snapshot: SessionSnapshot): string[] {
     ...players.flatMap((player) => missingSectionIdsOf(player.slices, 'player')),
   ]
   return [...new Set(missing)].sort()
+}
+
+/**
+ * A snapshot of an older `snapshotVersion` reshaped by a save migration step (#170): the old
+ * digest must hold over the state as it was taken, and the reshaped state, now `snapshotVersion`,
+ * is digested afresh. Null when the old digest does not hold, so the step refuses the file.
+ */
+export function reshapedSnapshot(
+  snapshot: SessionSnapshot,
+  snapshotVersion: number,
+  reshape: (state: PortableState) => PortableState,
+): SessionSnapshot | null {
+  if (stateDigest(authorityStateOf(snapshot.state)) !== snapshot.digest) return null
+  const state = reshape(snapshot.state)
+  return { ...snapshot, snapshotVersion, state, digest: stateDigest(authorityStateOf(state)) }
 }
 
 function verifiedRestore(snapshot: SessionSnapshot): SnapshotRestore {

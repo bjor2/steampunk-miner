@@ -41,7 +41,7 @@ describe('session snapshot', () => {
   it('carries the state digest and the versions it was taken under', () => {
     const snapshot = takeSnapshot(richState())
     expect(snapshot).toMatchObject({
-      snapshotVersion: 19,
+      snapshotVersion: 20,
       generatorVersion: 7,
       tick: 600,
       digest: stateDigest(richState()),
@@ -70,7 +70,7 @@ describe('session snapshot', () => {
       state: { tick: 600, planet: { index: -1, seed: 1 }, players: { p1: { wallet: 5 } } },
     }
     expect(readSnapshot(broken).problems).toEqual([
-      'snapshot.snapshotVersion is 0, this build reads 19',
+      'snapshot.snapshotVersion is 0, this build reads 20',
       'snapshot.state.planet must hold a whole index and a safe-integer seed',
       'snapshot.state.players.p1 must hold a money wallet and a whole lastSeq',
       'snapshot.state.world must be an object',
@@ -123,7 +123,7 @@ describe('session snapshot: casing (#41)', () => {
   it('refuses a snapshot taken before breached casing, at version 9, with the version message', () => {
     const snapshot = { ...throughJson(takeSnapshot(linedState())), snapshotVersion: 9 }
     expect(readSnapshot(snapshot).problems).toEqual([
-      'snapshot.snapshotVersion is 9, this build reads 19',
+      'snapshot.snapshotVersion is 9, this build reads 20',
     ])
   })
 

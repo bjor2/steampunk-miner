@@ -147,6 +147,7 @@ describe('checkpoint', () => {
     expect(names.indexOf('save_migrated')).toBeLessThan(names.indexOf('checkpoint_loaded'))
     expect(linesNamed('save_migrated').map((line) => line.data)).toEqual([
       { version: 'snapshotVersion', from: 18, to: 19 },
+      { version: 'snapshotVersion', from: 19, to: 20 },
       { version: 'generatorVersion', from: 5, to: 6 },
       { version: 'generatorVersion', from: 6, to: 7 },
       ...restoredSectionLines(),

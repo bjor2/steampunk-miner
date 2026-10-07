@@ -32,6 +32,8 @@ import { readSaveSlot } from './saveSlot'
 const GENERATOR_STEP = { version: 'generatorVersion', from: 5, to: 6 }
 const SNAPSHOT_STEP = { version: 'snapshotVersion', from: 18, to: 19 }
 const ORE_LEAD_STEP = { version: 'generatorVersion', from: 6, to: 7 }
+/** K8 #218: every fixture was written before the charge racks went by size. */
+const CHARGE_RACK_STEP = { version: 'snapshotVersion', from: 19, to: 20 }
 
 const NOTES: SaveSection<readonly string[]> = {
   id: 'save-probe.notes',
@@ -72,9 +74,14 @@ describe('save migration chain', () => {
     ])
   })
 
-  it('loads a pre-#175 save through the snapshot 18 -> 19 step, then the generator 5 -> 6 and 6 -> 7 steps', () => {
+  it('loads a pre-#175 save through the snapshot 18 -> 19 and 19 -> 20 steps, then the generator 5 -> 6 and 6 -> 7 steps', () => {
     const reading = withRegistrations([], () => restored(PLANET_1_SAVE))
-    expect(reading.migrations).toEqual([SNAPSHOT_STEP, GENERATOR_STEP, ORE_LEAD_STEP])
+    expect(reading.migrations).toEqual([
+      SNAPSHOT_STEP,
+      CHARGE_RACK_STEP,
+      GENERATOR_STEP,
+      ORE_LEAD_STEP,
+    ])
     expect(reading.saveEpoch).toBe(3)
   })
 
@@ -85,6 +92,7 @@ describe('save migration chain', () => {
     })
     expect(reading.migrations).toEqual([
       SNAPSHOT_STEP,
+      CHARGE_RACK_STEP,
       GENERATOR_STEP,
       ORE_LEAD_STEP,
       { restoredSections: [{ section: 'save-probe.notes' }] },
@@ -176,8 +184,12 @@ describe('save migration chain', () => {
 describe('save migration chain: levels to steps (#181)', () => {
   const saved = PLANET_5_SAVE.profile.players.p1
 
-  it('loads a pre-#181 save through the snapshot 18 -> 19 step, then the generator 6 -> 7 step', () => {
-    expect(versionStepsOf(restored(PLANET_5_SAVE))).toEqual([SNAPSHOT_STEP, ORE_LEAD_STEP])
+  it('loads a pre-#181 save through the snapshot 18 -> 19 and 19 -> 20 steps, then the generator 6 -> 7 step', () => {
+    expect(versionStepsOf(restored(PLANET_5_SAVE))).toEqual([
+      SNAPSHOT_STEP,
+      CHARGE_RACK_STEP,
+      ORE_LEAD_STEP,
+    ])
   })
 
   it('turns every track level L into step 10L and the gun level 7 into step 70', () => {
@@ -190,6 +202,7 @@ describe('save migration chain: levels to steps (#181)', () => {
     const { state } = restored(PLANET_5_SAVE)
     const { vehicle } = state.players.p1
     expect(vehicle.charges.slotLevel).toBe(3)
+    expect(vehicle.charges.carriedBySize).toEqual({ '1': saved.vehicle.charges.carried })
     expect(vehicle.casingGrade).toBe(2)
     expect(toCanonical(state.players.p1.wallet)).toBe(saved.wallet)
     expect(vehicle.pose).toEqual(saved.vehicle.pose)

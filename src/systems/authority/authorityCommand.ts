@@ -72,8 +72,12 @@ import type { BayId } from '../world/dockBays'
  *    with its `family` and `signature`, and lead cells carry tiers up to two above their band.
  * 30: the power-up core slice (#200): `power-up-core.use_power_up` and its clock step, the free
  *    dock refill, its `power-up-core` player section v1 and the three `slot.powerup_*` cradles.
+ * 31: dynamite sizes (K8 #218): `plantCharge {size}` and `restockCharges {size, count}`,
+ *    `debug.setCharges` names its size, `size_locked` and `no_charge_of_size` replace
+ *    `no_charges`, `ChargePlanted` and `ChargesRestocked` carry the size, `ChargeDetonated` its
+ *    trigger `by`, and `ChargeDisarmed` joins.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 30
+export const AUTHORITY_PROTOCOL_VERSION = 31
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
