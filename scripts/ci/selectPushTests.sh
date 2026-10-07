@@ -2,6 +2,8 @@
 # Picks the Vitest run for the per-push CI job (verify in .github/workflows/ci.yml).
 #
 #   scripts/ci/selectPushTests.sh <base-sha-or-empty>
+#   CHANGED_FILES=<file listing paths> scripts/ci/selectPushTests.sh   # box Tester: a feature's
+#       changed files (the union over its tickets' commits) instead of a diff against a base
 #
 # Writes mode=scoped|full|none and reason=... to $GITHUB_OUTPUT (stdout when
 # unset), and the files for `vitest related` to $RELATED_LIST (default: vitest-related.txt).
@@ -46,12 +48,16 @@ has_usable_base() {
     git cat-file -e "$BASE^{commit}" 2>/dev/null
 }
 
-if ! has_usable_base; then
+if [ -n "${CHANGED_FILES:-}" ]; then
+  # Only the paths that still exist: a feature's later commit may have removed or renamed a file.
+  CHANGED=$(sort -u "$CHANGED_FILES" | while read -r f; do [ -n "$f" ] && [ -e "$f" ] && echo "$f"; done)
+  BASE="feature"
+elif ! has_usable_base; then
   write_choice full "no usable base commit ('${BASE:-none}'), e.g. a new branch or a force push"
   exit 0
 fi
 
-CHANGED=$(git diff --name-only "$BASE"...HEAD)
+[ -n "${CHANGED_FILES:-}" ] || CHANGED=$(git diff --name-only "$BASE"...HEAD)
 echo "Changed files since ${BASE:0:12}:"
 sed 's/^/  /' <<<"${CHANGED:-(none)}"
 
