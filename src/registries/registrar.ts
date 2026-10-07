@@ -65,6 +65,7 @@ import { SCENE_LAYER_REGISTRY } from '../scene/registries/sceneLayers'
 import { WORLD_PIECE_REGISTRY } from '../scene/registries/worldPieces'
 import { LOADOUT_ACCEPTANCE_REGISTRY } from '../systems/registries/vehicleLoadout'
 import { BAY_PANEL_REGISTRY } from '../ui/registries/bayPanels'
+import { BAY_SCREEN_REGISTRY } from '../ui/registries/bayScreens'
 import { HUD_PANEL_REGISTRY } from '../ui/registries/hudPanels'
 import { MONEY_COUNTER_REGISTRY } from '../ui/registries/moneyCounter'
 import { SCREEN_REGISTRY } from '../ui/registries/screens'
@@ -98,6 +99,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     buildingAttachUse: (use) => add(BUILDING_ATTACH_USE_REGISTRY, use),
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),
     bayPanel: (panel) => add(BAY_PANEL_REGISTRY, panel),
+    bayScreen: (screen) => add(BAY_SCREEN_REGISTRY, screen),
     moneyCounter: (provider) => add(MONEY_COUNTER_REGISTRY, provider),
     worldPiece: (piece) => add(WORLD_PIECE_REGISTRY, piece),
     sceneLayer: (layer) => add(SCENE_LAYER_REGISTRY, layer),

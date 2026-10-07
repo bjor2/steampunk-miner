@@ -18,6 +18,7 @@ import { chargesOf } from '../systems/authority/charges/chargeRules'
 import type { TouchSituation } from '../systems/input/touchControls'
 import { mountedGunModeOf } from '../systems/vehicle/vehicleGun'
 import type { BayId } from '../systems/world/dockBays'
+import { shownBayScreenIdOf } from '../ui/registries/bayScreens'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
 import type { ArtefactChoiceModel } from '../systems/views/artefactChoiceModel'
@@ -47,6 +48,12 @@ export function readBayScreen(): BayScreen {
 /** The bay the vehicle is docked at, or null (#37): what opens the bay screen's shutter. */
 export function readDockedBay(): BayId | null {
   return dockedBayOf(readAuthorityState(), useGameStore.getState().playerId)
+}
+
+/** The slice screen the docked bay shows (`bayScreens`, #180), or null for the kernel's own. */
+export function readShownSliceBayScreenId(): string | null {
+  const bay = readDockedBay()
+  return bay === null ? null : shownBayScreenIdOf(readAuthorityState(), bay)
 }
 
 /** The Sell bay's model, as it would draw now, docked there or not. */

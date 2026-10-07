@@ -40,6 +40,7 @@ import type { SceneLayer } from '../scene/registries/sceneLayers'
 import type { WorldPiece } from '../scene/registries/worldPieces'
 import type { LoadoutAcceptance } from '../systems/registries/vehicleLoadout'
 import type { BayPanel } from '../ui/registries/bayPanels'
+import type { SliceBayScreen } from '../ui/registries/bayScreens'
 import type { HudPanel } from '../ui/registries/hudPanels'
 import type { MoneyCounterProvider } from '../ui/registries/moneyCounter'
 import type { ScreenPanel } from '../ui/registries/screens'
@@ -89,6 +90,8 @@ export interface SliceRegistrar {
   hudPanel(panel: HudPanel): void
   /** A panel in the bay header, left of the money, or in the layer above the bay screen. */
   bayPanel(panel: BayPanel): void
+  /** A bay's whole screen, one per bay, shown once its schedule row is open (#180). */
+  bayScreen(screen: SliceBayScreen): void
   /** One provider across all slices: the money the bay header's counter shows (ticket 220). */
   moneyCounter(provider: MoneyCounterProvider): void
   /** A piece of the world scene, drawn in its layer (#175). */

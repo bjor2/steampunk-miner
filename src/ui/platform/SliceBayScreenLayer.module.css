@@ -1,0 +1,9 @@
+/*
+ * A slice's bay screen (#180 Workshop showcase): no chrome and no fill, so the scene shows
+ * through, but it takes the pointer, unlike the shutter around it and the `above` bay layer.
+ */
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+}
