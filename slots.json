@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T00:49:58+02:00",
+  "updated_at": "2026-10-08T00:52:43+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -36,10 +36,10 @@
         {
           "slot": "C3",
           "state": "busy",
-          "ticket": 301,
+          "ticket": 312,
           "grok_slot": 6,
           "kind": "dev",
-          "since": "2026-10-08T00:24:00+02:00"
+          "since": "2026-10-08T00:52:00+02:00"
         },
         {
           "slot": "C4",
@@ -104,7 +104,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -158,6 +158,15 @@
           190
         ],
         "since": "2026-10-07T22:25:43+02:00"
+      },
+      {
+        "feature": 301,
+        "kind": "ticket",
+        "title": "Finish smooth vehicle movement from PR #210: port to main and fix the scenario digest mismatch",
+        "tickets": [
+          301
+        ],
+        "since": "2026-10-08T00:50:55+02:00"
       }
     ]
   },
@@ -202,8 +211,8 @@
     {
       "slot": 6,
       "state": "dev",
-      "ticket": 301,
-      "since": "2026-10-08T00:24:00+02:00",
+      "ticket": 312,
+      "since": "2026-10-08T00:52:00+02:00",
       "claude_slot": 3
     },
     {
@@ -266,9 +275,9 @@
     {
       "slot": 3,
       "state": "busy",
-      "ticket": 301,
+      "ticket": 312,
       "grok_slot": 6,
-      "since": "2026-10-08T00:24:00+02:00",
+      "since": "2026-10-08T00:52:00+02:00",
       "account": 1
     },
     {
@@ -313,10 +322,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 00:42 CEST",
+    "at": "2026-10-08 00:52 CEST",
     "mode": "refill-dev",
-    "triggers": "#289",
-    "started": "#290->C5/A2",
+    "triggers": "#301",
+    "started": "#312->C3/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
