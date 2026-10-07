@@ -27,8 +27,12 @@ export const FAKE = {
   channel: 'fake-items.channel',
   consumable: 'fake-items.consumable',
   toggle: 'fake-items.toggle',
+  drawingToggle: 'fake-items.drawing-toggle',
   extractor: 'fake-items.extractor',
 } as const
+
+/** The drawing toggle's draw: 1.5% of `energyMax` a second, the buoyancy tanks' (#162 4.4). */
+export const FAKE_DRAW_PER_MILLE = 15
 
 /** The cell a downward-facing fake aims at is a tier-9 drill gate. */
 export const FAKE_GATE = { cellTier: 9, gateKind: 'drill_tier' } as const
@@ -40,6 +44,7 @@ interface FakeNumbers {
   windupTicks: number
   channelTicks: number
   isToggle: boolean
+  energyDrawPerMillePerSecond: number
 }
 
 const FAKE_NUMBERS: Readonly<Record<string, FakeNumbers>> = {
@@ -47,6 +52,10 @@ const FAKE_NUMBERS: Readonly<Record<string, FakeNumbers>> = {
   [FAKE.channel]: numbers('channel', { charges: 2, cooldownTicks: 90, channelTicks: 60 }),
   [FAKE.consumable]: numbers('consumable', { charges: 3, windupTicks: 4 }),
   [FAKE.toggle]: numbers('passive', { isToggle: true }),
+  [FAKE.drawingToggle]: numbers('passive', {
+    isToggle: true,
+    energyDrawPerMillePerSecond: FAKE_DRAW_PER_MILLE,
+  }),
   [FAKE.extractor]: numbers('extractor', {}),
 }
 
@@ -81,7 +90,14 @@ export function inField<T>(body: (session: ScriptedSession) => T, setup: FieldSe
 }
 
 function numbers(powerUpClass: PowerUpClass, values: Partial<FakeNumbers>): FakeNumbers {
-  const none = { charges: 0, cooldownTicks: 0, windupTicks: 0, channelTicks: 0, isToggle: false }
+  const none = {
+    charges: 0,
+    cooldownTicks: 0,
+    windupTicks: 0,
+    channelTicks: 0,
+    isToggle: false,
+    energyDrawPerMillePerSecond: 0,
+  }
   return { ...none, ...values, powerUpClass }
 }
 

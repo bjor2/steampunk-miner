@@ -65,6 +65,12 @@ export interface PowerUp extends ContentEntry {
   channelTicks: number
   /** A passive that flips on and off from its slot; a passive that is not is on while owned. */
   isToggle: boolean
+  /**
+   * A toggle's draw while on, in thousandths of `energyMax` a second (#162 section 4.4: the grav
+   * anchor's 1.0%/s is 10); 0 for everything else. The tank empties as thrust empties it, and an
+   * empty tank switches the toggle off (the GD lock on #204 Q3 a, ticket 233).
+   */
+  energyDrawPerMillePerSecond: number
   /** Called when the wind-up or channel ends; for a toggle, only when it turns on. */
   activate(state: AuthorityState, use: PowerUpUse): PowerUpOutcome
 }
@@ -113,7 +119,15 @@ export function powerUpProblems(powerUp: PowerUp): string[] {
     ...(powerUp.powerUpClass === 'channel' || powerUp.channelTicks === 0
       ? []
       : [`${powerUp.id} is not a channel but holds ${powerUp.channelTicks} ticks`]),
+    ...energyDrawProblems(powerUp),
   ]
+}
+
+function energyDrawProblems({ id, isToggle, energyDrawPerMillePerSecond: draw }: PowerUp) {
+  if (!Number.isSafeInteger(draw) || draw < 0) {
+    return [`${id} draws ${draw} per mille a second, not a whole number from 0`]
+  }
+  return isToggle || draw === 0 ? [] : [`${id} is no toggle but draws ${draw} per mille a second`]
 }
 
 const CHARGE_CLASSES: readonly PowerUpClass[] = ['charged', 'channel', 'consumable']

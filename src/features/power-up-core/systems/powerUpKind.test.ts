@@ -25,4 +25,15 @@ describe('power-up kind', () => {
       `${fake.id} is not a channel but holds 5 ticks`,
     ])
   })
+
+  it('refuses an energy draw on anything but a toggle, and one that is not a whole number', () => {
+    const fake = withRegistrations([slice, FAKE_ITEMS], LOADED)[0]
+    expect(powerUpProblems({ ...fake, energyDrawPerMillePerSecond: 10 })).toEqual([
+      `${fake.id} is no toggle but draws 10 per mille a second`,
+    ])
+    const toggle = { ...fake, isToggle: true, energyDrawPerMillePerSecond: 1.5 }
+    expect(powerUpProblems(toggle)).toEqual([
+      `${fake.id} draws 1.5 per mille a second, not a whole number from 0`,
+    ])
+  })
 })

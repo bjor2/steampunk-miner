@@ -1,9 +1,9 @@
 /**
  * The power-up core slice (#200, spec #162 sections 2 and 4): the `power-up` content kind and its
  * charge classes, `use_power_up` with its wind-up and channel on the authority clock, the free
- * dock refill, the three slot cradles, the slot keys and the touch slot column, and the power-up
- * log lines. It does not own the loadout (TD, #162). No side effects at import; the loader calls
- * `register`.
+ * dock refill, the toggles' energy draw (ticket 233), the three slot cradles, the slot keys and
+ * the touch slot column, and the power-up log lines. It does not own the loadout (TD, #162). No
+ * side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { powerUpCoreDebugActions } from './debug'
@@ -13,6 +13,7 @@ import { CRADLES } from './systems/cradles'
 import { REFILL_CHARGES_SERVICE } from './systems/dockRefill'
 import { POWER_UP_RULES } from './systems/powerUpCommands'
 import { SLOT_USE_REACTIONS } from './systems/slotUse'
+import { DRAW_TOGGLES_STEP } from './systems/toggleDraw'
 import { RESOLVE_USES_STEP } from './systems/useClock'
 import { SlotColumn } from './ui/SlotColumn'
 
@@ -22,6 +23,7 @@ export const slice: SliceDefinition = {
     r.content('vehicle-item', CRADLES)
     r.saveSection(POWER_UP_SECTION)
     r.commandRules(POWER_UP_RULES)
+    r.clockStep(DRAW_TOGGLES_STEP)
     r.clockStep(RESOLVE_USES_STEP)
     r.dockService(REFILL_CHARGES_SERVICE)
     SLOT_USE_REACTIONS.forEach((reaction) => r.inputReaction(reaction))
