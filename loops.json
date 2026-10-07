@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T00:42:53Z",
+  "updated_at": "2026-10-07T00:43:01Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "working",
       "issue": 175,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T00:30:48Z",
+      "note": "started 2026-10-07 00:18 CEST",
+      "updated_at": "2026-10-07T00:43:01Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -16,8 +16,8 @@
       "slot": "2",
       "state": "working",
       "issue": 179,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T00:35:52Z",
+      "note": "started 2026-10-06 22:18 CEST",
+      "updated_at": "2026-10-07T00:43:01Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -25,8 +25,8 @@
       "slot": "3",
       "state": "working",
       "issue": 144,
-      "note": "tier fable, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T00:26:54Z",
+      "note": "started 2026-10-07 00:45 CEST",
+      "updated_at": "2026-10-07T00:43:01Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -34,8 +34,8 @@
       "slot": "4",
       "state": "working",
       "issue": 189,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T00:36:18Z",
+      "note": "started 2026-10-07 02:15 CEST",
+      "updated_at": "2026-10-07T00:43:01Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "8/8 Claude slots busy, 1/4 planner slots; status check",
+      "note": "7/8 Claude slots busy, 1/4 planner slots; status check",
       "extra": {
-        "active": 8,
+        "active": 7,
         "max": 8,
         "max_attempts": 2,
         "attempts": {
@@ -140,7 +140,7 @@
         ],
         "push_pending": null
       },
-      "updated_at": "2026-10-07T00:17:54Z",
+      "updated_at": "2026-10-07T00:43:01Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -157,17 +157,17 @@
       "slot": "5",
       "state": "working",
       "issue": 185,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T00:21:08Z",
+      "note": "started 2026-10-07 00:59 CEST",
+      "updated_at": "2026-10-07T00:43:01Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
       "loop": "steampunk-loop",
       "slot": "6",
-      "state": "blocked",
-      "issue": 145,
-      "note": "#145 needs-planner (slot free)",
-      "updated_at": "2026-10-07T00:20:39Z",
+      "state": "idle",
+      "issue": null,
+      "note": "free",
+      "updated_at": "2026-10-07T00:43:01Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -175,8 +175,8 @@
       "slot": "7",
       "state": "working",
       "issue": 123,
-      "note": "tier hard, attempt 2/2 (session running)",
-      "updated_at": "2026-10-07T00:42:53Z",
+      "note": "started 2026-10-07 01:52 CEST",
+      "updated_at": "2026-10-07T00:43:01Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -184,12 +184,19 @@
       "slot": "8",
       "state": "working",
       "issue": 195,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T00:37:50Z",
+      "note": "started 2026-10-07 02:17 CEST",
+      "updated_at": "2026-10-07T00:43:01Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-07T00:43:01Z",
+      "key": "steampunk-loop/6",
+      "state": "idle",
+      "issue": null,
+      "note": "free"
+    },
     {
       "at": "2026-10-07T00:20:39Z",
       "key": "steampunk-loop/6",
@@ -602,13 +609,6 @@
       "state": "idle",
       "issue": null,
       "note": "#120 landed; idle"
-    },
-    {
-      "at": "2026-10-06T19:32:46Z",
-      "key": "steampunk-loop/8",
-      "state": "idle",
-      "issue": null,
-      "note": "disabled (account 2 not signed in)"
     }
   ]
 }
