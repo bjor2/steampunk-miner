@@ -16,6 +16,7 @@ const radioactiveCatalogue: SliceDefinition = {
   register: (r) =>
     r.oreTypes({
       id: 'ores.catalogue',
+      indexTag: 'ores.radioactive-by-tier',
       oreTypeOf: ({ tier, cellFamily }) => ({
         id: `ores.radioactive_t${tier}`,
         name: 'Lumen Radioactive',
@@ -26,6 +27,7 @@ const radioactiveCatalogue: SliceDefinition = {
         iconId: 'none',
         requires: [],
       }),
+      bitIndexOf: (ore) => ore.tier,
       catalogue: () => [],
     }),
 }
