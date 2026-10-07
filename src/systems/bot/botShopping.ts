@@ -10,23 +10,25 @@
  * then `drill_tip` at the drill cap, #86); otherwise the bot buys the upgrade with the best gain in
  * planned money per tick per price, while one pays, never `drill_power` past its lead cap. The #6
  * simulator's deadlock (never buying the unblocking drill level) cannot happen: the forced rule
- * saves for that level instead of spending elsewhere.
+ * saves for that level instead of spending elsewhere. Once nothing of the kernel's pays, the bot
+ * tries the slices' registered purchases (`botSlicePurchases.ts`, ticket 211).
  */
 import type { CommandIntent } from '../authority/authorityCommand'
-import { applyCommand } from '../authority/applyCommand'
 import { nextUpgradePrice } from '../authority/workshopRules'
 import { nextCasingPrice } from '../authority/casingRules'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
-import { add, cmp, div, fromSafeInteger, sub, ZERO_MONEY, type Money } from '../money'
-import { rechargePrice, repairPrice, travelFee } from '../economy/planetCharges'
-import { statsOfVehicle } from '../vehicle/vehicleState'
+import { cmp, div, sub, ZERO_MONEY, type Money } from '../money'
 import { isCasingGradeShort } from './botCasing'
 import { forcedCoreTrack, isUnderLeadCap } from './botCoreRule'
 import { restockPriceFor } from './botCharges'
 import { gunMountPriceFor, type GunPolicy } from './botGuns'
 import { liningUnlockFor } from './botHeat'
 import type { BotSession } from './botSession'
+import { wouldAccept } from './botDryRun'
+import { buySlicePurchases, nextSlicePurchase } from './botSlicePurchases'
+import { canPay, walletOf } from './botWallet'
+import type { ShopSpend } from './shopSpend'
 import type { MineLayout } from './mineLayout'
 import { bestOrePlan, fullTankMeans } from './tripEstimate'
 
@@ -74,14 +76,30 @@ function serviceIntents(session: BotSession): CommandIntent[] {
 
 /** Whether the bot would buy anything now, wherever it is docked. */
 export function hasPurchase(session: BotSession, situation: ShoppingSituation): boolean {
-  return nextPurchase(session, situation) !== null
+  return nextPurchase(session, situation) !== null || nextSlicePurchase(session) !== null
 }
 
-export function buyUpgrades(session: BotSession, situation: ShoppingSituation): void {
+/** The kernel's purchases while one pays, then the slices' (ticket 211); answers what each cost. */
+export function buyUpgrades(session: BotSession, situation: ShoppingSituation): ShopSpend[] {
+  return [...buyKernelPurchases(session, situation), ...buySlicePurchases(session)]
+}
+
+function buyKernelPurchases(session: BotSession, situation: ShoppingSituation): ShopSpend[] {
+  const spends: ShopSpend[] = []
   for (let pick = nextPurchase(session, situation); pick !== null;) {
-    session.submit(pick)
+    spends.push(submitKernelPurchase(session, pick))
     pick = nextPurchase(session, situation)
   }
+  return spends
+}
+
+/** What the wallet paid is the spend: the purchase events carry their prices in five shapes. */
+function submitKernelPurchase(session: BotSession, pick: Purchase): ShopSpend {
+  const planetIndex = session.state().planet.index
+  const before = walletOf(session)
+  session.submit(pick)
+  const cost = sub(before, walletOf(session))
+  return { planetIndex, source: 'kernel', purchaseId: pick.type, cost }
 }
 
 function nextPurchase(session: BotSession, situation: ShoppingSituation): Purchase | null {
@@ -200,31 +218,4 @@ function canAfford(session: BotSession, track: UpgradeId): boolean {
 
 function canAffordCasing(session: BotSession): boolean {
   return canPay(session, nextCasingPrice(session.state(), session.playerId))
-}
-
-/** A purchase must leave the next service (and the travel fee, once the core is done) paid for. */
-function canPay(session: BotSession, price: Money): boolean {
-  const wallet = session.state().players[session.playerId].wallet
-  return cmp(wallet, add(price, moneyKeptBack(session))) >= 0
-}
-
-function moneyKeptBack(session: BotSession): Money {
-  const state = session.state()
-  const planetIndex = state.planet.index
-  const stats = statsOfVehicle(session.vehicle())
-  const service = add(
-    repairPrice(planetIndex, stats.hullMax, stats.hullMax),
-    rechargePrice(planetIndex, fromSafeInteger(stats.energyMax)),
-  )
-  return state.core.isCompleted ? add(service, travelFee(planetIndex)) : service
-}
-
-/** A dry run of the pure authority: the bot never sends a command it knows will be refused. */
-export function wouldAccept(session: BotSession, intent: CommandIntent): boolean {
-  const state = session.state()
-  const seq = state.players[session.playerId].lastSeq + 1
-  const command = { playerId: session.playerId, tick: state.tick, seq, ...intent }
-  return applyCommand(state, command as never).events.every(
-    (event) => event.type !== 'CommandRejected',
-  )
 }

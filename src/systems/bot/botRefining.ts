@@ -16,7 +16,7 @@ import { add, cmp, sub } from '../money'
 import { collectRefinedCommand, queueRefineCommand } from '../platform/platformCommands'
 import type { BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
-import { wouldAccept } from './botShopping'
+import { wouldAccept } from './botDryRun'
 import { driveToRefineryBay, driveToSellBay } from './botTrip'
 
 /** Whether a run uses the refinery from its unlock planet, or plays as if it had none (#105 acc. 7). */

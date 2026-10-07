@@ -28,6 +28,7 @@ import { createBotSession, type BotListener, type BotSession } from './botSessio
 import type { BotPlanet } from './botPilot'
 import { driveToUpgradeBay, runTrip } from './botTrip'
 import { botPlanetOf, travelWhenReady } from './botTravel'
+import type { ShopSpend } from './shopSpend'
 import type { TripGoal } from './tripGoal'
 import {
   bestOrePlan,
@@ -43,6 +44,8 @@ export interface SliceRun {
   state: AuthorityState
   /** The last planet's core was completed inside the tick budget. */
   isFinished: boolean
+  /** Everything bought at the Upgrade bay, in order: the spend-share diagnostic's input. */
+  shopSpend: readonly ShopSpend[]
 }
 
 export interface SliceRunOptions {
@@ -71,6 +74,8 @@ interface BotRun {
   refinery: RefineryUse
   gunPolicy: GunPolicy
   chargePolicy: ChargePolicy
+  /** Appended to at each Upgrade bay visit. */
+  shopSpend: ShopSpend[]
 }
 
 /**
@@ -87,6 +92,7 @@ export function playSlice(start: AuthorityState, options: SliceRunOptions): Slic
     refinery: options.refinery ?? 'used',
     gunPolicy: options.gunPolicy ?? 'mount',
     chargePolicy: options.chargePolicy ?? 'blast',
+    shopSpend: [],
   }
   let planet = botPlanetOf(session, run.chargePolicy)
   while (!isLastCoreDone(session, run.lastPlanet) && session.tick() < options.maxTicks) {
@@ -98,6 +104,7 @@ export function playSlice(start: AuthorityState, options: SliceRunOptions): Slic
     events: session.events(),
     state: session.state(),
     isFinished: isLastCoreDone(session, run.lastPlanet),
+    shopSpend: run.shopSpend,
   }
 }
 
@@ -134,7 +141,7 @@ function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): 
   }
   if (!hasPurchase(session, situation)) return
   driveToUpgradeBay(session, planet)
-  buyUpgrades(session, situation)
+  run.shopSpend.push(...buyUpgrades(session, situation))
 }
 
 function chooseGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
