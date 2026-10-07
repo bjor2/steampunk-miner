@@ -15,7 +15,7 @@ function reportOf(changes: Partial<PacingReport>): PacingReport {
     coreTicksOnPlanet: { '1': 50 * MINUTE, '2': 48 * MINUTE },
     sliceEndTick: 100 * MINUTE,
     tripsByPlanet: { '1': 6, '2': 5 },
-    finalLevels: { drill_power: 19, drill_tip: 10 },
+    finalLevels: { drill_power: 190, drill_tip: 104 },
     rescuesByCause: {},
     ...changes,
   }
@@ -84,7 +84,7 @@ describe('pacing median over seeded runs', () => {
       { worldSeed: 31415, report: reportOf({ sliceEndTick: 100 * MINUTE }) },
       { worldSeed: 27182, report: reportOf({ sliceEndTick: 134 * MINUTE }) },
     ])
-    expect(table).toContain('| 83921 | 50.0 min | 48.0 min | 94.0 min | 0 | 19 / 10 |')
-    expect(table).toContain('| median | 50.0 min | 48.0 min | 100.0 min | 0 | 19 / 10 |')
+    expect(table).toContain('| 83921 | 50.0 min | 48.0 min | 94.0 min | 0 | 19 / 10 · 4/9 |')
+    expect(table).toContain('| median | 50.0 min | 48.0 min | 100.0 min | 0 | 19 / 10 · 4/9 |')
   })
 })
