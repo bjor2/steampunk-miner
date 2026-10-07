@@ -30,6 +30,7 @@ art/
   build/<id>/                    intermediate PNG bakes (gitignored)
 scripts/art/
   export.sh                      the one export command: bake, then encode
+  listBlenderAssetIds.ts         prints blenderAssetIds() for export.sh, slices' ids included
   export_asset.py                headless Blender: refuse or bake, write parts.json
   bake_tile.py                   headless Blender: bake a ground or casing tile (S7d)
   encode.sh                      toktx: PNG bakes to KTX2 maps
@@ -92,6 +93,10 @@ This runs `blender -b art/blender/<id>/<id>.blend --python-exit-code 1 -P script
 and then `scripts/art/encode.sh <id>`. Set `BLENDER` to use another Blender binary, or
 `ART_BLEND` to export from a file outside `art/blender/` (for example a scratch file you're
 trying out). The `.blend` is never saved.
+
+**It refuses the id** before Blender starts when it isn't in `blenderAssetIds()`: the kernel's #51
+inventory plus the ids slices register with `r.artAssets([...])` (#214), the same list the manifest
+lint reads (`scripts/art/listBlenderAssetIds.ts` prints it).
 
 **It refuses the scene** (exit 1, with every problem listed) when the asset id names no category or
 isn't a `parts`, `tile` or `backdrop` asset in the manifest, when the file has an armature, a shape key or an action, or
