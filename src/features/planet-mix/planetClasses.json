@@ -1,0 +1,11 @@
+{
+  "source": "GD lock on spec #258 (Magnetic planet, 7 Oct 2026), Q1: a planet class is keyed on its act id, never on planet numbers, so the endless cycle answers it too; the frost and hollow specs reuse this table. P30 keeps its own relic_planet row and relic wins there.",
+  "classByAct": {
+    "frost": "frozen",
+    "lodestone": "magnetic",
+    "hollow": "hollow"
+  },
+  "classByStoryPlanet": {
+    "30": "relic"
+  }
+}
