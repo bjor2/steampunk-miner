@@ -184,3 +184,6 @@ export const LAVA_FLOW_STEP_TICKS = 15
  * flows into a cell whose square comes this close to a body, so it never buries a vehicle.
  */
 export const LAVA_CONTACT_REACH_MM = 450 + 150
+
+/** A whole share in basis points: the unit of the item effect caps (ticket 233, `itemEffectCaps`). */
+export const BASIS_POINTS = 10000

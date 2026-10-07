@@ -3,6 +3,7 @@
  * Money/BigStat; bounded values (levels, tiers, ticks, ranges for the physics and the enemy grid)
  * stay plain numbers (#5 rules 1, 2 and 5).
  */
+import type { ItemEffectCaps } from './itemEffectCaps'
 import type { BigStat, Money } from '../money'
 import type { WholeFraction } from '../wholeFractions'
 
@@ -406,4 +407,6 @@ export interface Economy {
     tunnelWrecker: TunnelWreckerRules
     combat: CombatRules
   }
+  /** What slice items may do to a vehicle at most (ticket 233, `itemEffectCaps.ts`). */
+  itemEffectCaps: ItemEffectCaps
 }

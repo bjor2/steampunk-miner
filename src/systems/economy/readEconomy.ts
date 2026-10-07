@@ -12,6 +12,7 @@ import {
 import { readArchetypes } from './readArchetypeEconomy'
 import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
+import { readItemEffectCaps } from './itemEffectCaps'
 import { readPaceScale } from './readPaceScale'
 import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
@@ -70,6 +71,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
       .list('visualTiers', file.visualTiers)
       .map((tier, index) => readVisualTier(reader, `visualTiers[${index}]`, tier)),
     enemies: readEnemies(reader, reader.object('enemies', file.enemies)),
+    itemEffectCaps: readItemEffectCaps(reader, file.itemEffectCaps),
   }
 }
 
