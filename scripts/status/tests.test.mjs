@@ -129,6 +129,18 @@ describe('readTestsModel', () => {
     expect(html).toContain('holds a gate token')
   })
 
+  it('falls back to the newest tested commit while main tip has no box status', () => {
+    const model = readTestsModel({
+      summary: summary([run({})]),
+      statuses: { sha: 'aaaaaaa1', statuses: [] },
+      testedStatuses: { sha: SHA, statuses: [{ context: 'box-tester/fast', state: 'success' }] },
+      nowMs: NOW_MS,
+    })
+    expect(model.isMainTipTested).toBe(false)
+    expect(model.statusSha).toBe(SHA)
+    expect(renderTestsPanel(model, view)).toContain('not tested yet')
+  })
+
   it('reports a missing summary', () => {
     const model = readTestsModel({ summary: null, nowMs: NOW_MS })
     expect(model.error).toMatch(/summary/)

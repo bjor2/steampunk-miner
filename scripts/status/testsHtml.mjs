@@ -74,7 +74,10 @@ function statusesSection(model, view) {
   const rows =
     model.statuses.map(statusRow).join('') ||
     '<tr><td colspan="3" class="muted">No box-tester status on this commit yet (the Tester tests main after each push).</td></tr>'
-  return `<section class="sl-pool"><h3>Commit status on main ${commitLink(model.statusSha, view)}</h3>
+  const title = model.isMainTipTested
+    ? `Commit status on main ${commitLink(model.statusSha, view)}`
+    : `Commit status on the last tested commit ${commitLink(model.statusSha, view)} <span class="muted">(main ${commitLink(model.mainSha, view)} not tested yet)</span>`
+  return `<section class="sl-pool"><h3>${title}</h3>
     <table class="sl-table"><thead><tr><th>Context</th><th>State</th><th>Description</th></tr></thead><tbody>${rows}</tbody></table></section>`
 }
 

@@ -108,6 +108,19 @@ function readStatuses(raw) {
     .sort((a, b) => TEST_PHASES.indexOf(a.phase) - TEST_PHASES.indexOf(b.phase))
 }
 
+// main's tip when the Tester has posted on it, else the newest tested commit (tip not tested yet).
+function statusesShownOf(main, tested) {
+  const onMain = readStatuses(main)
+  const onTested = readStatuses(tested)
+  const useTested = onMain.length === 0 && onTested.length > 0
+  return {
+    mainSha: shaOrNull(main?.sha),
+    statusSha: shaOrNull((useTested ? tested : main)?.sha),
+    statuses: useTested ? onTested : onMain,
+    isMainTipTested: onMain.length > 0,
+  }
+}
+
 function filesOf(summary) {
   const files = isObject(summary?.files) ? summary.files : {}
   return Object.entries(files)
@@ -141,7 +154,13 @@ function freshnessOf(lastBoxRun, tester, nowMs) {
  * The page model. `summary` is test-metrics summary.json, `statuses` the GitHub combined status
  * of main's tip ({ sha, statuses }), `tester` the `tester` object of slots.json.
  */
-export function readTestsModel({ summary, statuses = null, tester = null, nowMs }) {
+export function readTestsModel({
+  summary,
+  statuses = null,
+  testedStatuses = null,
+  tester = null,
+  nowMs,
+}) {
   if (!isObject(summary)) return { error: 'test-metrics summary.json unavailable' }
   const runs = runsOf(summary)
   const boxRuns = runs.filter((r) => r.source === 'box')
@@ -158,8 +177,7 @@ export function readTestsModel({ summary, statuses = null, tester = null, nowMs 
     tester: testerModel,
     freshness: freshnessOf(boxRuns[0], testerModel, nowMs),
     mainRedSha: testerModel?.mainRedSha ?? null,
-    statusSha: shaOrNull(statuses?.sha),
-    statuses: readStatuses(statuses),
+    ...statusesShownOf(statuses, testedStatuses),
     failingFiles: files.filter((f) => f.lastStatus === 'failed').slice(0, SHOWN_FILES),
     flakyFiles: files.filter((f) => f.flaky).slice(0, SHOWN_FILES),
     slowestFiles: files

@@ -226,6 +226,23 @@ async function fetchSlots() {
   }
 }
 
+function publicStatusesOf(combined) {
+  return {
+    sha: combined.sha,
+    statuses: (combined.statuses ?? []).map(
+      ({ context, state, description, target_url, updated_at }) => ({
+        ...{ context, state, description, target_url, updated_at },
+      }),
+    ),
+  }
+}
+
+function newestBoxRunShaOf(summary) {
+  const box = (summary?.runs ?? []).filter((r) => r.source === 'box' && r.sha)
+  box.sort((a, b) => Date.parse(b.startedAt ?? 0) - Date.parse(a.startedAt ?? 0))
+  return box[0]?.sha ?? null
+}
+
 // The Tests tab's first paint: test-metrics summary.json and the box-tester/* statuses of main's
 // tip (the page re-reads the summary live). Missing data is shown as such, never fails the build.
 async function fetchTests() {
@@ -238,17 +255,17 @@ async function fetchTests() {
       (err) => (console.warn(`main commit status unavailable: ${err.message}`), null),
     ),
   ])
+  // main's tip is often still untested (the Tester is running); also show the newest tested commit.
+  const testedSha = newestBoxRunShaOf(summary)
+  const tested =
+    testedSha && testedSha !== statuses?.sha
+      ? await rest(`repos/${REPO}/commits/${testedSha}/status`).catch(() => null)
+      : null
   return {
     metricsBranch: METRICS_BRANCH,
     summary,
-    statuses: statuses && {
-      sha: statuses.sha,
-      statuses: (statuses.statuses ?? []).map(
-        ({ context, state, description, target_url, updated_at }) => ({
-          ...{ context, state, description, target_url, updated_at },
-        }),
-      ),
-    },
+    testedStatuses: tested && publicStatusesOf(tested),
+    statuses: statuses && publicStatusesOf(statuses),
   }
 }
 

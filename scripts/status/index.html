@@ -2392,6 +2392,7 @@
         return TESTS_VIEW.model.readTestsModel({
           summary: TESTS_SUMMARY || t.summary,
           statuses: t.statuses,
+          testedStatuses: t.testedStatuses,
           tester: SLOTS && SLOTS.tester,
           nowMs: Date.now(),
         })
