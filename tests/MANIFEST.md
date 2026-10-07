@@ -676,6 +676,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `scripts/status/slots.test.mjs` | 17 | 13 |
 | `scripts/status/slotsHtml.test.mjs` | 12 | 12 |
 | `scripts/status/tests.test.mjs` | 5 | 5 |
+| `scripts/status/testsOverview.test.mjs` | 11 | 11 |
+| `scripts/status/testsOverviewHtml.test.mjs` | 9 | 9 |
 | `scripts/status/ticketTimeOverview.test.mjs` | 11 | 11 |
 | `scripts/status/ticketTimeOverviewHtml.test.mjs` | 12 | 12 |
 | `scripts/status/ticketsClosed.test.mjs` | 7 | 7 |
