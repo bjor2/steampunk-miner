@@ -5,7 +5,7 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import { cmp, fromCanonical, fromSafeInteger, mul } from '../systems/money'
 import type { Scenario } from '../systems/scenario'
 import { countDrillDives, diveTicksWithoutCasing } from './diveCasing'
-import { RUN_EVENT_REGISTRY, type RegisteredEvent } from './eventNames'
+import { registeredEventOf } from './eventNames'
 import { formatNdjsonLine } from './ndjson'
 import { formatSeedPacingTable, medianPacingReport, seededPacingReportsOf } from './pacingMedian'
 import {
@@ -70,8 +70,8 @@ function isSubsequence(names: readonly string[], log: readonly string[]): boolea
 }
 
 function isCoreLevel(event: RunEvent): boolean {
-  const registered: RegisteredEvent = RUN_EVENT_REGISTRY[event.event]
-  return 'level' in registered && registered.level === 'core'
+  const registered = registeredEventOf(event.event)
+  return registered !== undefined && 'level' in registered && registered.level === 'core'
 }
 
 function bytesOf(lines: readonly object[]): number {
