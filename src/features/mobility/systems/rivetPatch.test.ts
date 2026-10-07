@@ -3,10 +3,12 @@ import { GROUND, type ScriptedSession } from '../../../systems/authority/scripte
 import { add, div, fromSafeInteger, toCanonical } from '../../../systems/money'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { statsOfVehicle } from '../../../systems/vehicle/vehicleState'
+import { feedbackCuesOf } from '../../../systems/feedback/feedbackCues'
 import { chargesLeftOf } from '../../power-up-core'
 import { MM, ofType, poseAt, press, sessionWith } from '../mobilityTestSession'
 import { MOBILITY_ITEM } from './itemIds'
 import { mobilityOf } from './mobilitySection'
+import { rivetHoldOf } from './rivetPatch'
 
 // The rivet patch kit (#162 4.3, GD lock on #204 Q6, G&V on #204): a 6-tick wind-up, then a
 // 90-tick hold that plates +25% of hullMax on. Moving is any movement or drill input, or a speed
@@ -18,6 +20,7 @@ const STAND = { x: GROUND.tx * MM + MM / 2, y: (GROUND.ty + 1) * MM + MM / 2 }
 /** The wind-up ends on tick 16 and the hold on tick 106. */
 const PRESS_TICK = 10
 const FINISH_TICK = 106
+const HOLD_START_TICK = 16
 /** A 5° slope settling: a creep well under 0.5 cells/s, with no input. */
 const SLOPE_CREEP = { vx: 87, vy: -8 }
 
@@ -104,5 +107,34 @@ describe('rivet patch kit', () => {
     expect(ofType(events, 'power-up-core.PowerUpRefused')).toMatchObject([
       { reason: 'mobility.patch_holding', chargesLeft: 1 },
     ])
+  })
+
+  it('holds from the end of the wind-up to the finish tick, for the slot ring to fill over', () => {
+    const session = damagedPatchSession()
+    session.advanceTo(PRESS_TICK + 1)
+    expect(rivetHoldOf(session.state(), 'p1')).toBeNull()
+    session.advanceTo(HOLD_START_TICK + 45)
+    expect(rivetHoldOf(session.state(), 'p1')).toEqual({
+      startTick: HOLD_START_TICK,
+      finishTick: FINISH_TICK,
+    })
+  })
+
+  it('chimes when the patch finishes and keeps no hold after it', () => {
+    const session = damagedPatchSession()
+    idleOnSlope(session, FINISH_TICK + 2, false)
+    expect(feedbackCuesOf(session.events(), 'p1')).toContainEqual({ kind: 'holdFinished' })
+    expect(feedbackCuesOf(session.events(), 'p1')).not.toContainEqual({ kind: 'holdCancelled' })
+    expect(rivetHoldOf(session.state(), 'p1')).toBeNull()
+  })
+
+  it('clanks lightly when a thrust tap cancels the patch, and the hold ends with it', () => {
+    const session = damagedPatchSession()
+    session.advanceTo(44)
+    session.submit(45, poseAt(STAND.x, STAND.y, FACING.right, { thrustTicks: 1 }))
+    session.advanceTo(FINISH_TICK + 10)
+    expect(feedbackCuesOf(session.events(), 'p1')).toContainEqual({ kind: 'holdCancelled' })
+    expect(feedbackCuesOf(session.events(), 'p1')).not.toContainEqual({ kind: 'holdFinished' })
+    expect(rivetHoldOf(session.state(), 'p1')).toBeNull()
   })
 })

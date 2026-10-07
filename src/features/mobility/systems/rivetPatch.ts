@@ -8,6 +8,9 @@
  * costs energy (drive, thrust and drill each bill the tank per tick), so the hold watches the
  * tank: each tick it expects the tank the toggles' draw will leave, and finding less means the
  * player spent some. Docking or a wreck ends the hold the same way.
+ *
+ * While it holds, the slot's ring fills (`holdOf`); a cancel clanks lightly and a finish chimes
+ * (`slotHoldCues`, ticket 253).
  */
 import { BASIS_POINTS } from '../../../constants/balance'
 import {
@@ -16,10 +19,12 @@ import {
   type AuthorityState,
 } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
+import type { DomainEvent } from '../../../systems/authority/domainEvent'
+import type { SlotHoldCueSource, SlotHoldEnd } from '../../../systems/registries/slotHoldCues'
 import { cmp, div, fromSafeInteger, mul, add, sub, type BigStat } from '../../../systems/money'
 import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import { statsOfVehicle, type VehicleState } from '../../../systems/vehicle/vehicleState'
-import { chargesLeftOf, returnCharge, toggleDrawQuantaOf } from '../../power-up-core'
+import { chargesLeftOf, returnCharge, toggleDrawQuantaOf, type SlotHold } from '../../power-up-core'
 import { MOBILITY_ITEM } from './itemIds'
 import { MOBILITY_ECONOMY } from './mobilityEconomy'
 import { hullPatchedOf, patchCancelledOf } from './mobilityEvents'
@@ -34,6 +39,24 @@ export function settleRivetHold(state: AuthorityState, playerId: string, tick: n
   if (hasMovedDuring(vehicleOf(state, playerId), patch)) return cancelRivetHold(state, playerId)
   if (tick >= patch.finishTick) return finishRivetHold(state, playerId)
   return unchanged(watchNextTick(state, playerId, patch))
+}
+
+/** The hold running now, from the end of the wind-up to its finish tick, for the slot's ring. */
+export function rivetHoldOf(state: AuthorityState, playerId: string): SlotHold | null {
+  const patch = mobilityOf(state, playerId).patch
+  if (patch === null) return null
+  return { startTick: patch.finishTick - NUMBERS.holdTicks, finishTick: patch.finishTick }
+}
+
+/** A cancel clanks and a finish chimes (G&V on #204). */
+export const RIVET_HOLD_CUES: SlotHoldCueSource = {
+  id: 'mobility.rivet-patch',
+  holdEndOf: rivetHoldEndOf,
+}
+
+function rivetHoldEndOf(event: DomainEvent): SlotHoldEnd | null {
+  if (event.type === 'mobility.PatchCancelled') return 'cancelled'
+  return event.type === 'mobility.HullPatched' ? 'finished' : null
 }
 
 function hasMovedDuring(vehicle: VehicleState, patch: RivetHold): boolean {

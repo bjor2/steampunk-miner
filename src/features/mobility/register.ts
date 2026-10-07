@@ -3,8 +3,8 @@
  * ballast, heat sink flask, steam boost, rivet patch kit, steam shield, smoke canister, grav
  * anchor, buoyancy tanks and escape thruster as vehicle items and power-ups, their
  * `tech.mobility.*` nodes with the third cradle's, their item cards, and their effects on ticket
- * 233's seams, kept in the `mobility` section and cleared on the authority clock. No side effects
- * at import; the loader calls `register`.
+ * 233's seams, kept in the `mobility` section and cleared on the authority clock, and the rivet
+ * patch's hold cues (ticket 253). No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { mobilityDebugActions } from './debug'
@@ -22,6 +22,7 @@ import {
 } from './systems/mobilityMotion'
 import { MOBILITY_POWER_UPS } from './systems/mobilityPowerUps'
 import { MOBILITY_SECTION } from './systems/mobilitySection'
+import { RIVET_HOLD_CUES } from './systems/rivetPatch'
 import { HEAT_SINK_PAUSE, SMOKE_DETECTION, STEAM_SHIELD_INTERCEPT } from './systems/survivalEffects'
 
 export const slice: SliceDefinition = {
@@ -44,6 +45,7 @@ export const slice: SliceDefinition = {
     r.hullDamageIntercept(STEAM_SHIELD_INTERCEPT)
     r.enemyDetectionModifier(SMOKE_DETECTION)
     r.heatPause(HEAT_SINK_PAUSE)
+    r.slotHoldCue(RIVET_HOLD_CUES)
     r.eventProjections(MOBILITY_PROJECTIONS)
     r.runEvents(MOBILITY_RUN_EVENTS)
     // steampunkDebug.features.mobility.getEffects() / .statPreview(itemId, mark, planet)

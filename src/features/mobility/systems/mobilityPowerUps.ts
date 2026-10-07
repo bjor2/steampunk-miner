@@ -19,6 +19,7 @@ import {
   switchToggle,
   ventHeatSink,
 } from './mobilityUses'
+import { rivetHoldOf } from './rivetPatch'
 
 type PowerUpRules = Pick<
   PowerUp,
@@ -29,6 +30,7 @@ type PowerUpRules = Pick<
   | 'isToggle'
   | 'energyDrawPerMillePerSecond'
   | 'activate'
+  | 'holdOf'
 >
 
 const N = MOBILITY_ECONOMY
@@ -38,7 +40,10 @@ const RULES: Readonly<Record<MobilityItemId, PowerUpRules>> = {
   [MOBILITY_ITEM.emergencyBallast]: consumable(N.ballast, dropBallast),
   [MOBILITY_ITEM.heatSinkFlask]: consumable(N.heatSink, ventHeatSink),
   [MOBILITY_ITEM.steamBoost]: charged(N.steamBoost, blowSteamBoost),
-  [MOBILITY_ITEM.rivetPatch]: consumable(N.rivetPatch, startRivetPatch),
+  [MOBILITY_ITEM.rivetPatch]: {
+    ...consumable(N.rivetPatch, startRivetPatch),
+    holdOf: rivetHoldOf,
+  },
   [MOBILITY_ITEM.steamShield]: charged(N.steamShield, raiseSteamShield),
   [MOBILITY_ITEM.smokeCanister]: consumable(N.smoke, burstSmokeCanister),
   [MOBILITY_ITEM.gravAnchor]: toggle(N.gravAnchor.drawPerMillePerSecond),
