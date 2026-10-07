@@ -2,7 +2,7 @@
   "name": "money-past-1e40",
   "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
   "generatorVersion": 6,
-  "authorityProtocolVersion": 19,
+  "authorityProtocolVersion": 20,
   "logSchemaVersion": 3,
   "numberFormatVersion": 1,
   "worldSeed": 83921,
@@ -44,7 +44,7 @@
       "type": "debug.setUpgrade",
       "payload": {
         "upgradeId": "cargo_hold",
-        "level": 420
+        "level": 445
       }
     },
     {
@@ -233,17 +233,17 @@
     {
       "tick": 124,
       "scope": "dock",
-      "digest": "aa41caa19765e7af"
+      "digest": "5960d25047c03f16"
     },
     {
       "tick": 166,
       "scope": "dock",
-      "digest": "07ec8a1fd4973519"
+      "digest": "5749203f933ace06"
     },
     {
       "tick": 2000,
       "scope": "end",
-      "digest": "1647c797fd65f7aa"
+      "digest": "adafff9087b6555a"
     }
   ],
   "minedOrder": [
