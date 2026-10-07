@@ -315,6 +315,7 @@ export interface SliceRegistrar {
   hudPanel(panel: HudPanel): void
   worldPiece(piece: WorldPiece): void                  // #175, section 3.14
   vehicleStaging(provider: VehicleStagingProvider): void  // one provider, #175, section 3.14
+  artAssets(assets: readonly ArtAsset[]): void          // bare art ids, #214
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   commandRules(rules: SliceCommandRules): void              // K1, section 3.15
   eventProjections(projections: SliceEventProjections): void
