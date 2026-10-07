@@ -19,9 +19,17 @@ import { oreTypeOf, type OreType } from '../../../systems/registries/oreTypes'
 import { bandOfTile } from '../../../systems/world/planetGeometry'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../../../systems/world/tileGrid'
-import { oreCell, type ResourceFamily } from '../../../systems/world/worldCell'
+import { resourceTierOf } from '../../../systems/authority/minedOre'
+import {
+  CELL_KIND,
+  familyOfCell,
+  kindOfCell,
+  oreCell,
+  type ResourceFamily,
+} from '../../../systems/world/worldCell'
+import { cellAt, EMPTY_WORLD } from '../../../systems/world/worldState'
 import { oreFamilies } from '../../ores'
-import { gateTableOfPlanet } from './cellGates'
+import { cellGateOf, gateTableOfPlanet } from './cellGates'
 import type { CellGate, GatedEntry } from './gateTable'
 
 export const FIXTURE_SEED = PACING_WORLD_SEEDS['bot-slice'][0]
@@ -72,6 +80,32 @@ export function gatedCellOn(
     if (gated !== undefined) return fixtureOf(params, gated, at + 1)
   }
   throw new Error(`planet ${params.planetIndex} has no gate-table entry the fixture asks for`)
+}
+
+/** Columns the world scan walks, each from the surface to the centre. */
+const SCANNED_COLUMNS = 40
+
+/** The first generated ore cell whose gate `pick` names, walking columns down from the surface. */
+export function worldCellOfGate(
+  params: PlanetParams,
+  pick: (gate: CellGate) => boolean,
+): { tile: TilePoint; ore: OreType; gate: CellGate } {
+  for (let tx = 0; tx < SCANNED_COLUMNS; tx++) {
+    const found = gatedCellInColumn(params, tx, pick)
+    if (found !== null) return found
+  }
+  throw new Error(`planet ${params.planetIndex} shows no such gated cell in its first columns`)
+}
+
+function gatedCellInColumn(params: PlanetParams, tx: number, pick: (gate: CellGate) => boolean) {
+  for (let ty = surfaceRowOfColumn(tx, params.radiusTiles); ty > 0; ty--) {
+    const cell = cellAt(EMPTY_WORLD, params, { tx, ty })
+    if (kindOfCell(cell) !== CELL_KIND.ore) continue
+    const ore = oreTypeOf({ tier: resourceTierOf(params, cell), cellFamily: familyOfCell(cell) })
+    const gate = cellGateOf(params, { tx, ty }, ore)
+    if (pick(gate)) return { tile: { tx, ty }, ore, gate }
+  }
+  return null
 }
 
 /** The drill asking; a blast of `size` asking; or a tool. */

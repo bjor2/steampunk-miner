@@ -17,7 +17,8 @@
       "withoutRig": "lost",
       "attach": "drill.hood",
       "unlockedBy": "tech.extraction.containment_hood",
-      "description": "A chilled hood and canister rack that bottle volatile ore before it vents."
+      "description": "A chilled hood and canister rack that bottle volatile ore before it vents.",
+      "lostAs": "vented"
     },
     {
       "id": "rig.acid_etcher",
@@ -44,7 +45,8 @@
       "withoutRig": "lost",
       "attach": "hull.roof.mid",
       "unlockedBy": "tech.extraction.aether_tether",
-      "description": "A roof reel and harpoon that keep weightless ore from drifting off."
+      "description": "A roof reel and harpoon that keep weightless ore from drifting off.",
+      "lostAs": "drifted"
     }
   ]
 }

@@ -27,6 +27,11 @@ import rigsFile from '../rigs.json'
 /** What a rig-gated cell does to a drill without its extractor (#142 "The extraction rigs"). */
 export type RiglessOutcome = 'refused' | 'lost'
 
+/** How a cell lost without its extractor goes: its ore vents, or the freed lump floats off. */
+export type LostAs = 'vented' | 'drifted'
+
+export const LOST_AS: readonly LostAs[] = ['vented', 'drifted']
+
 export interface Rig {
   /** The bare catalogue id, `rig.<name>` (#162). */
   id: string
@@ -35,6 +40,8 @@ export interface Rig {
   /** Player text: an extractor, never a rig (#159). */
   name: string
   withoutRig: RiglessOutcome
+  /** Set exactly when `withoutRig` is `lost`. */
+  lostAs: LostAs | null
   attach: AttachId
   /** The tech node that unlocks it (#162). */
   unlockedBy: string
@@ -101,6 +108,7 @@ function readRig(reader: FieldReader, path: string, raw: unknown): Rig {
     gateClass: reader.text(`${path}.gateClass`, row.gateClass),
     name: reader.text(`${path}.name`, row.name),
     withoutRig: readRiglessOutcome(reader, `${path}.withoutRig`, row.withoutRig),
+    lostAs: readLostAs(reader, `${path}.lostAs`, row.withoutRig, row.lostAs),
     attach: readAttach(reader, `${path}.attach`, row.attach),
     unlockedBy: reader.text(`${path}.unlockedBy`, row.unlockedBy),
     description: reader.text(`${path}.description`, row.description),
@@ -112,6 +120,18 @@ function readRiglessOutcome(reader: FieldReader, path: string, raw: unknown): Ri
   if (RIGLESS_OUTCOMES.includes(outcome)) return outcome as RiglessOutcome
   reader.record(`${path} must be refused or lost, got ${JSON.stringify(raw)}`)
   return 'refused'
+}
+
+function readLostAs(reader: FieldReader, path: string, withoutRig: unknown, raw: unknown) {
+  if (withoutRig !== 'lost' && raw === undefined) return null
+  const lostAs = reader.text(path, raw)
+  if (withoutRig === 'lost' && (LOST_AS as readonly string[]).includes(lostAs)) {
+    return lostAs as LostAs
+  }
+  reader.record(
+    `${path} must be vented or drifted on a lost extractor alone, got ${JSON.stringify(raw)}`,
+  )
+  return null
 }
 
 function readAttach(reader: FieldReader, path: string, raw: unknown): AttachId {
