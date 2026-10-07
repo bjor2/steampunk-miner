@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T00:17:40+02:00",
+  "updated_at": "2026-10-08T00:17:59+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -81,11 +81,11 @@
         },
         {
           "slot": "C7",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 299,
+          "grok_slot": 4,
+          "kind": "dev",
+          "since": "2026-10-08T00:17:00+02:00"
         },
         {
           "slot": "C8",
@@ -97,9 +97,9 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
-      "claims_last_hour": 7,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 8,
       "name": "Claude Max 2"
     }
   ],
@@ -185,9 +185,10 @@
     },
     {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 299,
+      "since": "2026-10-08T00:17:00+02:00",
+      "claude_slot": 7
     },
     {
       "slot": 5,
@@ -291,10 +292,10 @@
     },
     {
       "slot": 7,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 299,
+      "grok_slot": 4,
+      "since": "2026-10-08T00:17:00+02:00",
       "account": 2
     },
     {
@@ -307,17 +308,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 00:15 CEST",
+    "at": "2026-10-08 00:17 CEST",
     "mode": "refill-dev",
-    "triggers": "#280",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#298",
+    "started": "#299->C7/A2",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 5,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -325,8 +326,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 5,
-      "free": 3,
+      "used": 6,
+      "free": 2,
       "external": 1
     }
   }
