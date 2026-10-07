@@ -1,12 +1,12 @@
 // The model behind the Tests tab of /status/ (#192): the test runs recorded on the orphan
 // `test-metrics` branch (summary.json, docs/metrics/test-metrics.md), the box Tester's live state
 // from the loop's slots.json (`tester`, docs/loop-status.md) and the box-tester/* commit statuses
-// of main's tip. Since 2026-10-07 the box Tester runs every test: per feature when its last
-// ticket closes (fast relevant tests for the union of the feature's changes, then slow: pacing
+// of main's tip. Since 2026-10-07 the box Tester runs every test: per spec when all its
+// tickets are closed (fast relevant tests for the union of the spec's changes, then slow: pacing
 // bot and e2e) and nightly (full suite and the long suites); older runs came from Actions. Pure and DOM-free: the page imports it as an ES module, build-status.mjs and the tests
 // from node; the clock is passed in.
 
-/** A box Tester that recorded nothing for this long is flagged (runs are per feature + nightly). */
+/** A box Tester that recorded nothing for this long is flagged (runs are per spec + nightly). */
 export const TESTER_STALE_AFTER_H = 26
 export const TEST_PHASES = ['fast', 'slow', 'full', 'nightly']
 const HOUR_MS = 3_600_000

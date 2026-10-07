@@ -1,6 +1,6 @@
 // Renders the Tests tab of /status/ (#192) from the model of tests.mjs: the box Tester's state
-// (feature under test, running phase, gate and Claude slot, main-red pause, the STALE warning),
-// the features waiting for their test run, main's
+// (spec under test, running phase, gate and Claude slot, main-red pause, the STALE warning),
+// the specs waiting for their test run, main's
 // box-tester/* commit statuses, the latest run per phase and per nightly suite, the recent runs
 // (box and the older Actions ones) and the failing, flaky and slowest test files. Static HTML
 // strings; the page re-renders them on every live fetch. Classes come from scripts/status/index.html.
@@ -69,7 +69,7 @@ function issueLink(n, view) {
 
 function featureText(feature, title, view) {
   if (!feature) return ''
-  return ` testing feature ${issueLink(feature, view)}${title ? ` <span class="muted">${escapeHtml(title)}</span>` : ''}`
+  return ` testing spec ${issueLink(feature, view)}${title ? ` <span class="muted">${escapeHtml(title)}</span>` : ''}`
 }
 
 function queueRow(q, view) {
@@ -81,9 +81,9 @@ function queueSection(model, view) {
   const queue = model.tester?.queue ?? []
   const rows =
     queue.map((q) => queueRow(q, view)).join('') ||
-    '<tr><td colspan="3" class="muted">No completed feature waiting for its test run.</td></tr>'
-  return `<section class="sl-pool"><h3>Features awaiting test <span class="muted">${queue.length} queued · a feature is tested when its last ticket closes</span></h3>
-    <table class="sl-table"><thead><tr><th>Feature</th><th>Tickets</th><th>Completed</th></tr></thead><tbody>${rows}</tbody></table></section>`
+    '<tr><td colspan="3" class="muted">No completed spec waiting for its test run.</td></tr>'
+  return `<section class="sl-pool"><h3>Specs awaiting test <span class="muted">${queue.length} queued · a spec is tested when all its tickets are closed (an outer spec's Testing: line decides for its sub-specs)</span></h3>
+    <table class="sl-table"><thead><tr><th>Spec</th><th>Tickets</th><th>Completed</th></tr></thead><tbody>${rows}</tbody></table></section>`
 }
 
 function statusRow(s) {
@@ -97,7 +97,7 @@ function statusRow(s) {
 function statusesSection(model, view) {
   const rows =
     model.statuses.map(statusRow).join('') ||
-    '<tr><td colspan="3" class="muted">No box-tester status on this commit yet (the Tester tests a feature when its last ticket closes, and main nightly).</td></tr>'
+    '<tr><td colspan="3" class="muted">No box-tester status on this commit yet (the Tester tests a spec when all its tickets are closed, and main nightly).</td></tr>'
   const title = model.isMainTipTested
     ? `Commit status on main ${commitLink(model.statusSha, view)}`
     : `Commit status on the last tested commit ${commitLink(model.statusSha, view)} <span class="muted">(main ${commitLink(model.mainSha, view)} not tested yet)</span>`
@@ -112,7 +112,7 @@ function phaseRow(phase, run, view) {
 
 function phasesSection(model, view) {
   const rows = TEST_PHASES.map((p) => phaseRow(p, model.latestByPhase[p], view)).join('')
-  return `<section class="sl-pool"><h3>Latest box run per phase <span class="muted">fast = the feature's relevant tests · slow = pacing bot + e2e · full / nightly = every night</span></h3>
+  return `<section class="sl-pool"><h3>Latest box run per phase <span class="muted">fast = the spec's relevant tests · slow = pacing bot + e2e · full / nightly = every night</span></h3>
     <table class="sl-table"><thead><tr><th>Phase</th><th>Result</th><th>Mode</th><th>Commit</th><th>Duration · tests</th><th>When</th></tr></thead><tbody>${rows}</tbody></table></section>`
 }
 
@@ -140,7 +140,7 @@ function runRow(run, view) {
 function runsSection(model, view) {
   const rows = model.runs.map((r) => runRow(r, view)).join('')
   return `<section class="sl-pool te-wide"><h3>Recent runs <span class="muted">${model.runs.length} of ${model.runCount} in summary.json · ${model.boxRunCount} from the box</span></h3>
-    <table class="sl-table"><thead><tr><th>Source</th><th>Feature</th><th>Phase · job</th><th>Mode</th><th>Commit</th><th>Result</th><th>Duration</th><th>Tests</th><th>When</th><th>Trigger</th></tr></thead><tbody>${rows}</tbody></table></section>`
+    <table class="sl-table"><thead><tr><th>Source</th><th>Spec</th><th>Phase · job</th><th>Mode</th><th>Commit</th><th>Result</th><th>Duration</th><th>Tests</th><th>When</th><th>Trigger</th></tr></thead><tbody>${rows}</tbody></table></section>`
 }
 
 function fileRow(f) {

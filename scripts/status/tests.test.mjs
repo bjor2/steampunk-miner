@@ -132,8 +132,8 @@ describe('readTestsModel', () => {
     expect(html).toContain('running slow')
     expect(html).toContain('box-tester/fast')
     expect(html).toContain('holds a gate token')
-    expect(html).toContain('testing feature <a href="https://github.com/o/r/issues/90">#90</a>')
-    expect(html).toContain('Features awaiting test')
+    expect(html).toContain('testing spec <a href="https://github.com/o/r/issues/90">#90</a>')
+    expect(html).toContain('Specs awaiting test')
     expect(html).toContain('Lone ticket')
   })
 

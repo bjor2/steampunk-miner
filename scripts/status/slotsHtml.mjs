@@ -130,13 +130,13 @@ function freshnessLine(freshness, view) {
 function testerText(tester, view) {
   if (!tester) return 'Tester: <span class="muted">not published</span>'
   const queued = tester.queued
-    ? ` · ${tester.queued} feature(s) awaiting test (<a href="#tests">Tests tab</a>)`
+    ? ` · ${tester.queued} spec(s) awaiting test (<a href="#tests">Tests tab</a>)`
     : ''
   if (tester.state !== 'running') {
     return `Tester: <span class="badge sl-free">idle</span> <span class="muted">last run ${ageOf(tester.lastRunAt, view.nowMs)}</span>${queued}`
   }
   const feature = tester.feature
-    ? ` feature <a href="https://github.com/${escapeHtml(view.repo)}/issues/${tester.feature}">#${tester.feature}</a>`
+    ? ` spec <a href="https://github.com/${escapeHtml(view.repo)}/issues/${tester.feature}">#${tester.feature}</a>`
     : ''
   const holds = [
     tester.holdsGate ? 'a gate token' : null,
