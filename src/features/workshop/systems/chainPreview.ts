@@ -4,10 +4,9 @@
  * the service reserve the next step would have to keep. Read-only: it walks the authority's own
  * `buyUpgrade` rule on a copy of the state and submits nothing.
  *
- * A held step stops where a click would be refused (money first, #180 amendment 2), or where it
- * can pay but would leave the wallet under the reserve, recomputed after every step (a boiler step
- * raises the energy a recharge must fill). Until the kernel's `buyUpgrade {chain}` refuses
- * `service_reserve` itself, that second check is made here against `serviceReserveOf`.
+ * Every step is walked as a held step, so the authority itself refuses it: money first (#180
+ * amendment 2), then `service_reserve` where it can pay but would leave the wallet under the
+ * reserve, read after every step (a boiler step raises the energy a recharge must fill).
  */
 import { applyCommand, refusalOfIntent } from '../../../systems/authority/applyCommand'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
@@ -16,13 +15,16 @@ import { serviceReserveOf } from '../../../systems/authority/serviceReserve'
 import { nextUpgradePrice } from '../../../systems/authority/workshopRules'
 import type { UpgradeId } from '../../../systems/economy/economyDefinition'
 import { isMajorStep } from '../../../systems/economy/upgradeSteps'
-import { add, cmp, sub, ZERO_MONEY, type Money } from '../../../systems/money'
+import { add, ZERO_MONEY, type Money } from '../../../systems/money'
 import { buyUpgradeCommand } from '../../../systems/platform/platformCommands'
 
 /** The most steps one preview walks: a plaque reads "×200+" past it. */
 export const PREVIEW_STEP_LIMIT = 200
 
-export type ChainPreviewStop = RejectionReason | 'service_reserve' | 'preview_limit'
+/** The hold id the preview's steps carry: any held id is refused alike. */
+const PREVIEW_CHAIN = 1
+
+export type ChainPreviewStop = RejectionReason | 'preview_limit'
 
 export interface ChainPreview {
   upgradeId: UpgradeId
@@ -62,18 +64,8 @@ export function heldStepStopOf(
   playerId: string,
   upgradeId: UpgradeId,
 ): ChainPreviewStop | null {
-  const refusal = refusalOfIntent(state, playerId, buyUpgradeCommand(upgradeId))
-  if (refusal !== null) return refusal.reason
-  return isUnderReserveAfterStep(state, playerId, upgradeId) ? 'service_reserve' : null
-}
-
-function isUnderReserveAfterStep(
-  state: AuthorityState,
-  playerId: string,
-  upgradeId: UpgradeId,
-): boolean {
-  const left = sub(state.players[playerId].wallet, nextUpgradePrice(state, playerId, upgradeId))
-  return cmp(left, serviceReserveOf(state, playerId)) < 0
+  const refusal = refusalOfIntent(state, playerId, buyUpgradeCommand(upgradeId, PREVIEW_CHAIN))
+  return refusal === null ? null : refusal.reason
 }
 
 function walkedOneStep(walk: PreviewWalk, playerId: string, upgradeId: UpgradeId): PreviewWalk {
@@ -93,7 +85,12 @@ function stateAfterBuying(
   upgradeId: UpgradeId,
 ): AuthorityState {
   const seq = state.players[playerId].lastSeq + 1
-  const command = { playerId, tick: state.tick, seq, ...buyUpgradeCommand(upgradeId) }
+  const command = {
+    playerId,
+    tick: state.tick,
+    seq,
+    ...buyUpgradeCommand(upgradeId, PREVIEW_CHAIN),
+  }
   return applyCommand(state, command).state
 }
 
