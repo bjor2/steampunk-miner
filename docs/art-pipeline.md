@@ -227,8 +227,9 @@ rules) and wired by #222: the scanner mast up the Assay & Exchange (`scanner_sta
 research annex behind the Engineering Works (`research_lab`, P15) and the drone hangar on the
 Works' roof (`drone_bay`, P20). Each stands on the pad only where the platform has built its
 facility row (H1: a vision row shows nothing). The ids are the #52 kebab form of the row ids under
-the platform category; the `dock-buildings` slice registers them through `r.artAssets` (#214) on
-wiring, so until then nothing exports, lints or draws them. Each add-on is authored in its own
+the platform category; the `dock-buildings` slice registers them through `r.artAssets` (#214), and
+#222 exported them to `public/assets/platform/` (`dockAddOnArt.test.ts` pins each sidecar to the
+shell and the moving part). Each add-on is authored in its own
 frame and bolted onto its host at `atM` (metres from the host's origin, the zone centre on the pad
 top) from `src/features/dock-buildings/dockAddOns.json`, which the review render reads too. Each is
 at most two parts (#170 amendment "Parts": the base set at most 30, an add-on 2, a counter building

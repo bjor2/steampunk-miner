@@ -1,0 +1,10 @@
+{
+  "id": "platform-research-lab",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#4a4a4e",
+  "partColors": {
+    "lab-orrery": "#b08a3c"
+  }
+}

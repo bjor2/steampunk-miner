@@ -1,0 +1,67 @@
+{
+  "assetId": "platform-drone-bay",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-drone-bay/platform-drone-bay.blend",
+    "sha256": "77d7471c4dc1ff68d0c319643308b26110345dd06c7a9cf926c625d6e16ab85d",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [
+    1024,
+    1024
+  ],
+  "maps": {
+    "albedo": "platform-drone-bay.albedo.ktx2",
+    "normal": "platform-drone-bay.normal.ktx2",
+    "emissive": "platform-drone-bay.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "hangar-drone",
+      "tier": 1,
+      "rect": [
+        636,
+        8,
+        308,
+        252
+      ],
+      "sizeM": [
+        1.2,
+        0.9807
+      ],
+      "pivotM": [
+        0.63,
+        0.5413
+      ],
+      "atM": [
+        -0.6,
+        0.75
+      ],
+      "z": 3
+    },
+    {
+      "id": "platform-drone-bay",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        612,
+        950
+      ],
+      "sizeM": [
+        2.39,
+        3.71
+      ],
+      "pivotM": [
+        1.1,
+        1.42
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 2
+    }
+  ]
+}

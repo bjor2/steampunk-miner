@@ -1,0 +1,67 @@
+{
+  "assetId": "platform-research-lab",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-research-lab/platform-research-lab.blend",
+    "sha256": "85b26d306a031a00198d38f9bb2ef350f5c40bb11a8a52bde7f9ee35c87afdcc",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [
+    1024,
+    4096
+  ],
+  "maps": {
+    "albedo": "platform-research-lab.albedo.ktx2",
+    "normal": "platform-research-lab.normal.ktx2",
+    "emissive": "platform-research-lab.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "lab-orrery",
+      "tier": 1,
+      "rect": [
+        8,
+        2497,
+        192,
+        282
+      ],
+      "sizeM": [
+        0.7478,
+        1.0989
+      ],
+      "pivotM": [
+        0.3739,
+        0.725
+      ],
+      "atM": [
+        0.0,
+        9.15
+      ],
+      "z": -1
+    },
+    {
+      "id": "platform-research-lab",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        948,
+        2473
+      ],
+      "sizeM": [
+        3.7,
+        9.66
+      ],
+      "pivotM": [
+        1.85,
+        0.1
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": -2
+    }
+  ]
+}

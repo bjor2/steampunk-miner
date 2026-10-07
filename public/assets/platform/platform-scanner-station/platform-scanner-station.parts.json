@@ -1,0 +1,67 @@
+{
+  "assetId": "platform-scanner-station",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/platform-scanner-station/platform-scanner-station.blend",
+    "sha256": "de9024ac89118ff2601627b38d99f981e7cdf8d707bb0e606250ed3b239c6e48",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 256,
+  "atlasPx": [
+    512,
+    4096
+  ],
+  "maps": {
+    "albedo": "platform-scanner-station.albedo.ktx2",
+    "normal": "platform-scanner-station.normal.ktx2",
+    "emissive": "platform-scanner-station.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "platform-scanner-station",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        291,
+        1890
+      ],
+      "sizeM": [
+        1.1366,
+        7.38
+      ],
+      "pivotM": [
+        0.55,
+        0.0
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 1
+    },
+    {
+      "id": "scanner-dish",
+      "tier": 1,
+      "rect": [
+        8,
+        1914,
+        462,
+        370
+      ],
+      "sizeM": [
+        1.801,
+        1.4433
+      ],
+      "pivotM": [
+        0.4367,
+        0.3008
+      ],
+      "atM": [
+        0.0,
+        6.6
+      ],
+      "z": 2
+    }
+  ]
+}

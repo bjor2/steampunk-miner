@@ -5,6 +5,8 @@
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { dockBuildingsDebugActions } from './debug'
+import { DOCK_ADD_ONS } from './systems/dockAddOns'
+import { dockAddOnArtAssetsOf } from './systems/dockAddOnArt'
 import { ShopBuildings } from './scene/ShopBuildings'
 import { createWorkshopRoll, WORKSHOP_ROLL_ATTACH_USES } from './workshopRoll'
 
@@ -14,6 +16,8 @@ export const slice: SliceDefinition = {
     r.worldPiece({ id: 'dock-buildings.shop-buildings', layer: 'platform', Piece: ShopBuildings })
     WORKSHOP_ROLL_ATTACH_USES.forEach((use) => r.buildingAttachUse(use))
     r.vehicleStaging(createWorkshopRoll())
+    // The add-ons' art under public/assets/platform/, shell and moving part each (#197, #214).
+    r.artAssets(dockAddOnArtAssetsOf(DOCK_ADD_ONS))
     // steampunkDebug.features['dock-buildings'].getWorkshopRoll()
     r.debugActions(dockBuildingsDebugActions)
   },
