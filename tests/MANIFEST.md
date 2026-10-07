@@ -288,6 +288,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sellCoins.test.ts` | 8 | 8 |
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
 | `src/systems/authority/sessionSnapshot.test.ts` | 17 | 17 |
+| `src/systems/authority/signatureCells.test.ts` | 4 | 4 |
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
 | `src/systems/authority/teleportDebugRules.test.ts` | 5 | 5 |
@@ -481,7 +482,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/itemDescriber.test.ts` | 7 | 7 |
 | `src/systems/registries/itemDescriptionEntries.test.ts` | 5 | 5 |
 | `src/systems/registries/oreLook.test.ts` | 2 | 2 |
-| `src/systems/registries/oreTypes.test.ts` | 8 | 8 |
+| `src/systems/registries/oreTypes.test.ts` | 12 | 12 |
 | `src/systems/registries/saveSections.test.ts` | 3 | 3 |
 | `src/systems/registries/scheduleRows.test.ts` | 4 | 4 |
 | `src/systems/registries/seal.test.ts` | 12 | 12 |
@@ -695,7 +696,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
 | `src/systems/vehicle/casingTrail.test.ts` | 8 | 8 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
-| `src/systems/vehicle/drillRule.test.ts` | 11 | 11 |
+| `src/systems/vehicle/drillRule.test.ts` | 12 | 12 |
 | `src/systems/vehicle/poseReport.test.ts` | 6 | 6 |
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/vehicleCharges.test.ts` | 4 | 4 |
@@ -743,8 +744,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/generateDensity.test.ts` | 7 | 5 |
 | `src/systems/world/groundEdit.test.ts` | 11 | 7 |
 | `src/systems/world/lavaFlow.test.ts` | 6 | 6 |
-| `src/systems/world/lavaPockets.test.ts` | 3 | 3 |
+| `src/systems/world/lavaPockets.test.ts` | 7 | 7 |
 | `src/systems/world/orePatches.test.ts` | 31 | 8 |
 | `src/systems/world/planetParams.test.ts` | 21 | 16 |
+| `src/systems/world/worldCell.test.ts` | 3 | 3 |
 | `src/systems/world/worldExactMathLint.test.ts` | 15 | 3 |
 | `src/systems/world/worldState.test.ts` | 1 | 1 |
