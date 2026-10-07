@@ -1,14 +1,15 @@
 /**
  * The drain's card entry (#159, the K7 `itemDescriptionEntries` seam): the #162 flavour line, one
- * stat line per `statPreview` line read at the Mark the card's level names, the one-off price,
- * and the trip cap line (#164 Systems): the share of this trip's cap the income items have used,
- * read from the `extraction` section in the card's snapshot view, the same number on every income
- * item's card. A card at level 0 (the slot card, an item not yet marked up) reads Mark 1.
+ * stat line per `statPreview` line read at the Mark the card's level names, the next Mark
+ * milestone's verb (#256), the one-off price, and the trip cap line (#164 Systems): the share of
+ * this trip's cap the income items have used, read from the `extraction` section in the card's
+ * snapshot view, the same number on every income item's card. A card at level 0 (the slot card,
+ * an item not yet marked up) reads Mark 1.
  */
 import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
-import { isMasteredAt } from '../../tech-tree'
+import { isMasteredAt, milestoneLineSpecsOf } from '../../tech-tree'
 import { extractionItemOf, itemPriceOf, markLadderOf, type ExtractionItem } from './extractionItems'
 import { EXTRACTION_TRIP_SECTION } from './incomeTrip'
 import { toolOf } from './mineralDrain'
@@ -31,6 +32,7 @@ export function itemCardOf(item: ExtractionItem): ItemDescriptionEntry {
     flavour: item.description,
     statLines: [
       ...(preview?.lines ?? []).map((line, index) => statLineSpecOf(line.stat, line.label, index)),
+      ...milestoneLineSpecsOf(markLadderOf(item)),
       priceLineSpec(),
       tripCapLineSpec(),
     ],

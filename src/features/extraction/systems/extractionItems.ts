@@ -13,6 +13,7 @@ import type { LoadoutSlotId, VehicleItem } from '../../../systems/registries/veh
 import { POWER_UP_SLOTS, type PowerUpClass } from '../../power-up-core'
 import type { MarkLadder, ProgressionLabel, TechNode } from '../../tech-tree'
 import { EXTRACTION_ECONOMY, type ExtractionBalance } from './extractionEconomy'
+import { extractionMilestonesOf } from './extractionMilestones'
 
 /** One store item of the lane, as #162 and #161 write it. */
 export interface ExtractionItem {
@@ -102,14 +103,19 @@ export function vehicleItemOf(item: ExtractionItem): VehicleItem {
   return { id: item.itemId, iconId: item.iconId, slots: item.slots, attach: item.attach }
 }
 
-/** The Mark 1 ladder: cooldown, then cells per use, then charges (#162 4.6, the #165 rotation). */
+/**
+ * The Mark 1 ladder: cooldown, then cells per use, then charges (#162 4.6, the #165 rotation);
+ * Marks 3 and 6 bring the drain's milestones (#256, `extractionMilestones.ts`).
+ */
 export function markLadderOf(item: ExtractionItem): MarkLadder {
   const balance = balanceOf(item)
+  const milestones = extractionMilestonesOf(item.itemId)
   return {
     isIncomeItem: item.isIncomeItem,
     cooldown: balance.cooldownTicks,
     magnitude: { base: balance.cellsPerUse },
     charges: balance.charges,
+    ...(milestones.length > 0 && { milestones }),
   }
 }
 

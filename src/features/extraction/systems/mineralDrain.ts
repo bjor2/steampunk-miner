@@ -11,6 +11,9 @@
  * - the hold has no room for the first unit: `extraction.hold_full`;
  * - nothing in reach is drainable: blocked by the nearest gated, too-hard or core cell, or with no
  *   ore at all, `extraction.no_ore_in_reach`.
+ *
+ * Its Mark 3 second tap (#256) drains from the rim of its reach inward: the farthest drainable
+ * cells first, at the same cells per use, cap and cooldown, so only where it drains changes.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { chainEffects, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -25,7 +28,7 @@ import type { PlanetParams } from '../../../systems/world/planetParams'
 import { GROUND_CELL } from '../../../systems/world/worldCell'
 import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
 import { cellsInHookOrder, hookedReachOf } from './drainHooks'
-import { drainReachOf, type DrainReach } from './drainReach'
+import { drainReachOf, type DrainableCell, type DrainReach } from './drainReach'
 import { paidCountOf, takeDrainCells, type DrainTake } from './drainTake'
 import { drainYieldedOf } from './extractionEvents'
 import { balanceOf, extractionItemOf, type ExtractionItem } from './extractionItems'
@@ -74,7 +77,7 @@ function drainSceneOf(state: AuthorityState, params: PlanetParams, use: PowerUpU
     origin: use.origin,
     reachTiles: hookedReachOf(state, use, item),
   })
-  const take = takeDrainCells(cellsInHookOrder(state, use, item, reach.drainable), {
+  const take = takeDrainCells(cellsInHookOrder(state, use, item, drainOrderOf(reach, use)), {
     maxCells: use.magnitude ?? balanceOf(item).cellsPerUse,
     room: roomUnderCapOf(trip.incomeItemValue, cap),
     holdRoom: statsOfVehicle(vehicle).cargoCapacity - cargoUnitsOf(vehicle.cargo),
@@ -82,6 +85,11 @@ function drainSceneOf(state: AuthorityState, params: PlanetParams, use: PowerUpU
     yieldCarry: trip.yieldCarry,
   })
   return { use, item, band, cap, trip, reach, take }
+}
+
+/** Nearest first; farthest first for a second tap. */
+function drainOrderOf(reach: DrainReach, use: PowerUpUse): readonly DrainableCell[] {
+  return use.milestone === 'second-tap' ? [...reach.drainable].reverse() : reach.drainable
 }
 
 /** The first rule that refuses the use, in the header's order; null when it acts. */
