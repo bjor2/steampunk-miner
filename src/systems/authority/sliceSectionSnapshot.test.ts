@@ -3,11 +3,16 @@ import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { readSection, withSection, type SaveSection } from '../registries/saveSections'
 import { createAuthorityState, type AuthorityState } from './authorityState'
-import { readSnapshot, takeSnapshot, type SessionSnapshot } from './sessionSnapshot'
+import {
+  readSnapshot,
+  sectionsRestoredBy,
+  takeSnapshot,
+  type SessionSnapshot,
+} from './sessionSnapshot'
 import { stateDigest } from './stateDigest'
 
 // A slice's save sections ride in the snapshot under `slices`, each restored by exact version
-// (feature-slices.md 3.13); a fake slice registers them through withRegistrations.
+// (feature-slices.md 3.13), or at its initial value when an older snapshot lacks it (#224); a fake slice registers them through withRegistrations.
 
 const START = { planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] }
 
@@ -126,14 +131,44 @@ describe('slice save sections in the snapshot', () => {
     })
   })
 
-  it('refuses a snapshot missing a section this build registers', () => {
-    const text = withRegistrations([], () => snapshotText(createAuthorityState(START)))
-    expect(withRegistrations([BOTH_SECTIONS], () => readText(text))).toEqual({
-      problems: [
-        'snapshot.state.players.p1.slices.section-probe.notes is missing: this build registers it',
-        'snapshot.state.slices.section-probe is missing: this build registers it',
-      ],
+  it('restores a section an older snapshot lacks at its initial value, to the same digest', () => {
+    const older = withRegistrations([], () => createAuthorityState(START))
+    const text = withRegistrations([], () => snapshotText(older))
+    const reading = withRegistrations([BOTH_SECTIONS], () => readText(text))
+    expect(reading.problems).toEqual([])
+    const state = (reading as { state: AuthorityState }).state
+    expect(
+      withRegistrations([BOTH_SECTIONS], () => readSection(state, null, countSection(1))),
+    ).toBe(0)
+    expect(withRegistrations([BOTH_SECTIONS], () => readSection(state, 'p1', NOTES))).toEqual([])
+    expect(stateDigest(state)).toBe(stateDigest(older))
+  })
+
+  it('saves a snapshot that lacked a section the same as one taken fresh', () => {
+    const fresh = withRegistrations([BOTH_SECTIONS], () =>
+      snapshotText(createAuthorityState(START)),
+    )
+    const older = withRegistrations([], () => snapshotText(createAuthorityState(START)))
+    const resaved = withRegistrations([BOTH_SECTIONS], () => {
+      const reading = readText(older) as { state: AuthorityState }
+      return snapshotText(reading.state)
     })
+    expect(resaved).toBe(fresh)
+  })
+
+  it('names the registered sections a snapshot lacks, once each across its players', () => {
+    const START_TWO = { ...START, playerIds: ['p1', 'p2'] }
+    const older = withRegistrations([], () => takeSnapshot(createAuthorityState(START_TWO)))
+    const partial = withRegistrations([probeSliceOf([NOTES] as SaveSection<never>[])], () =>
+      takeSnapshot(createAuthorityState(START_TWO)),
+    )
+    expect(withRegistrations([BOTH_SECTIONS], () => sectionsRestoredBy(older))).toEqual([
+      'section-probe',
+      'section-probe.notes',
+    ])
+    expect(withRegistrations([BOTH_SECTIONS], () => sectionsRestoredBy(partial))).toEqual([
+      'section-probe',
+    ])
   })
 
   it("lists a section's own problems with its body", () => {

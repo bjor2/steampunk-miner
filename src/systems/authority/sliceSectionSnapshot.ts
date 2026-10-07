@@ -2,7 +2,8 @@
  * The slices' sections in the session snapshot (docs/standards/feature-slices.md 3.13, 5.3):
  * `{ [id]: { version, body } }` of every registered section under an optional `slices` key of the
  * portable state and of each portable player, omitted while the scope has no section. Restoring matches each section's version
- * exactly and refuses an unknown or a missing section: refused, never migrated.
+ * exactly and refuses an unknown section: refused, never migrated. A registered section an older
+ * snapshot lacks is restored at its initial value, with no migration step (#224, the #200 locks).
  */
 import {
   isAtInitial,
@@ -47,26 +48,45 @@ export function sectionsOfPortable(
   scope: SaveSectionScope,
 ): { slices?: SliceSections } {
   const values = saveSectionsOf(scope)
-    .map((section) => [section, section.ofPortable(portable?.[section.id].body)] as const)
+    .map((section) => [section, restoredValueOf(section, portable)] as const)
     .filter(([section, value]) => !isAtInitial(section, value))
   return slicesKeyOf(Object.fromEntries(values.map(([section, value]) => [section.id, value])))
 }
 
-/** Every unknown, missing, mismatched or malformed section under `<path>.slices`. */
+/** The ids of the scope's registered sections `portable` lacks, which restore at initial. */
+export function missingSectionIdsOf(
+  portable: PortableSections | undefined,
+  scope: SaveSectionScope,
+): string[] {
+  return saveSectionsOf(scope)
+    .filter((section) => !isSectionIn(section, portable))
+    .map((section) => section.id)
+}
+
+/** Every unknown, mismatched or malformed section under `<path>.slices`. */
 export function portableSectionsProblems(
   portable: unknown,
   scope: SaveSectionScope,
   path: string,
 ): string[] {
-  const registered = saveSectionsOf(scope)
-  if (portable === undefined) return missingSectionProblems(registered, {}, path)
+  if (portable === undefined) return []
   if (!isJsonObject(portable)) return [`${path}.slices must be an object`]
-  return [
-    ...Object.entries(portable).flatMap(([id, entry]) =>
-      portableSectionProblems(registered, id, entry, `${path}.slices.${id}`),
-    ),
-    ...missingSectionProblems(registered, portable, path),
-  ]
+  const registered = saveSectionsOf(scope)
+  return Object.entries(portable).flatMap(([id, entry]) =>
+    portableSectionProblems(registered, id, entry, `${path}.slices.${id}`),
+  )
+}
+
+function restoredValueOf(section: SaveSection<unknown>, portable: PortableSections | undefined) {
+  if (!isSectionIn(section, portable)) return section.initial
+  return section.ofPortable(portable[section.id].body)
+}
+
+function isSectionIn(
+  section: SaveSection<unknown>,
+  portable: PortableSections | undefined,
+): portable is PortableSections {
+  return portable !== undefined && section.id in portable
 }
 
 function portableSectionProblems(
@@ -82,16 +102,6 @@ function portableSectionProblems(
   if (entry.version !== section.version)
     return [`${path}.version is ${entry.version}, this build reads ${section.version}`]
   return section.problems(entry.body).map((problem) => `${path}.body: ${problem}`)
-}
-
-function missingSectionProblems(
-  registered: readonly SaveSection<unknown>[],
-  portable: Record<string, unknown>,
-  path: string,
-): string[] {
-  return registered
-    .filter((section) => !(section.id in portable))
-    .map((section) => `${path}.slices.${section.id} is missing: this build registers it`)
 }
 
 function portableSectionOf(

@@ -3,6 +3,7 @@ import { createMemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { toCanonical } from '../systems/money'
+import { saveSectionsOf } from '../systems/registries/saveSections'
 import PRE_175_SAVE from '../systems/save/fixtures/pre-175-planet-1.save.json'
 import { readSaveSlot, type SaveSlotFile } from '../systems/save/saveSlot'
 import { checkpointWrites, installSaveSlots, loadCheckpoint, type SaveSlots } from './checkpoint'
@@ -48,6 +49,13 @@ const game = () => useGameStore.getState()
 const savedFile = () => JSON.parse(disk.files.get('slot-1.json') as string) as SaveSlotFile
 
 const linesNamed = (event: string) => sink.events.filter((line) => line.event === event)
+
+/** The fixture predates every slice section, so each registered one is named as restored (#224). */
+function restoredSectionLines() {
+  const ids = [...saveSectionsOf('session'), ...saveSectionsOf('player')].map(({ id }) => id)
+  if (ids.length === 0) return []
+  return [{ restoredSections: [...new Set(ids)].sort().map((section) => ({ section })) }]
+}
 
 async function resumeFromDisk(): Promise<void> {
   const checkpoint = await loadCheckpoint()
@@ -139,6 +147,7 @@ describe('checkpoint', () => {
     expect(names.indexOf('save_migrated')).toBeLessThan(names.indexOf('checkpoint_loaded'))
     expect(linesNamed('save_migrated').map((line) => line.data)).toEqual([
       { version: 'generatorVersion', from: 5, to: 6 },
+      ...restoredSectionLines(),
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })

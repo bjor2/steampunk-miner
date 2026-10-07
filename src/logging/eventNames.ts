@@ -304,11 +304,18 @@ export const RUN_EVENT_REGISTRY = {
     payload: { slot: 'text', epoch: 'integer', bytes: 'integer', digest: 'text' },
   },
   // #170: an older save was brought up to this build by one step of the migration chain, logged
-  // per step just before checkpoint_loaded.
+  // per step just before checkpoint_loaded. #224: one more line names the registered slice
+  // sections the save lacked, restored at their initial values; it has no version step, so the
+  // step fields became optional (every line written before still reads the same).
   save_migrated: {
     group: 'platform',
     level: 'core',
-    payload: { version: { oneOf: ['generatorVersion'] }, from: 'integer', to: 'integer' },
+    payload: {
+      version: { optional: { oneOf: ['generatorVersion'] } },
+      from: { optional: 'integer' },
+      to: { optional: 'integer' },
+      restoredSections: { optional: { listOf: { section: 'text' } } },
+    },
   },
   // #26: the run resumed from a checkpoint; its commands replay from this state, not the seed.
   checkpoint_loaded: {

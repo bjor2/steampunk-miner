@@ -6,7 +6,8 @@
  * Restoring refuses, never migrates: a version mismatch, a malformed state or a digest that does
  * not match the state is a listed problem, and nothing is restored. The slices' save sections
  * ride along under an optional `slices` key, each checked by its own version
- * (`sliceSectionSnapshot.ts`), so adding one never bumps `SNAPSHOT_VERSION`.
+ * (`sliceSectionSnapshot.ts`), so adding one never bumps `SNAPSHOT_VERSION`; a section an older
+ * snapshot lacks restores at its initial value (#224).
  */
 import { fromCanonical, isNonNegativeMoneyText, toCanonical } from '../money'
 import { GENERATOR_VERSION } from '../generatorVersion'
@@ -36,6 +37,7 @@ import { isJsonObject, isWholeNumber } from './payloadFields'
 import { isPlatformVisualState, type PlatformState } from './platformState'
 import { copyRefinerySlots, refinerySlotsProblems } from './refinery/refineryBatch'
 import {
+  missingSectionIdsOf,
   portableSectionsOf,
   portableSectionsProblems,
   sectionsOfPortable,
@@ -150,6 +152,19 @@ export function readSnapshot(snapshot: unknown): SnapshotRestore {
   const problems = snapshotProblems(snapshot)
   if (problems.length > 0) return { problems }
   return verifiedRestore(snapshot as SessionSnapshot)
+}
+
+/**
+ * The registered sections a snapshot `readSnapshot` accepted lacks, which it restored at their
+ * initial values: each id once, sorted, across the session and every player.
+ */
+export function sectionsRestoredBy(snapshot: SessionSnapshot): string[] {
+  const players = Object.values(snapshot.state.players)
+  const missing = [
+    ...missingSectionIdsOf(snapshot.state.slices, 'session'),
+    ...players.flatMap((player) => missingSectionIdsOf(player.slices, 'player')),
+  ]
+  return [...new Set(missing)].sort()
 }
 
 function verifiedRestore(snapshot: SessionSnapshot): SnapshotRestore {

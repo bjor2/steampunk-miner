@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { withRegistrations } from '../../registries/registrar'
+import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
+import { readSection, type SaveSection } from '../registries/saveSections'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import { toCanonical } from '../money'
 import { bayOfPose, dockedPoseAt } from '../vehicle/vehiclePose'
@@ -13,8 +16,24 @@ import { readSaveSlot } from './saveSlot'
  * Both fixtures were written by the build before #175 (generator 5, pad -6..+5, or -6..+13 with
  * the Refinery bay): planet 1 docked at the old Upgrade bay (+4) after mining near and away from
  * the pad as the live game's `player_1`, planet 10 active away from it with on-curve levels.
+ * They hold no slice section: each registered one restores at its initial value (#224).
  */
 const GENERATOR_STEP = { version: 'generatorVersion', from: 5, to: 6 }
+
+const NOTES: SaveSection<readonly string[]> = {
+  id: 'save-probe.notes',
+  version: 1,
+  scope: 'player',
+  initial: [],
+  problems: (body) => (Array.isArray(body) ? [] : ['must be a list']),
+  toPortable: (value) => [...value],
+  ofPortable: (body) => [...(body as string[])],
+}
+
+const NOTES_SLICE: SliceDefinition = {
+  id: 'save-probe',
+  register: (r) => r.saveSection(NOTES as SaveSection<never>),
+}
 
 function restored(file: unknown) {
   const reading = readMigratedSaveSlot(file)
@@ -30,9 +49,29 @@ describe('save migration chain', () => {
   })
 
   it('loads a pre-#175 save through the one generator 5 -> 6 step', () => {
-    const reading = restored(PLANET_1_SAVE)
+    const reading = withRegistrations([], () => restored(PLANET_1_SAVE))
     expect(reading.migrations).toEqual([GENERATOR_STEP])
     expect(reading.saveEpoch).toBe(3)
+  })
+
+  it('restores a player section the save was written before at its initial value, reported after the steps', () => {
+    const { reading, notes } = withRegistrations([NOTES_SLICE], () => {
+      const reading = restored(PLANET_1_SAVE)
+      return { reading, notes: readSection(reading.state, 'player_1', NOTES) }
+    })
+    expect(reading.migrations).toEqual([
+      GENERATOR_STEP,
+      { restoredSections: [{ section: 'save-probe.notes' }] },
+    ])
+    expect(notes).toEqual([])
+  })
+
+  it('reports no restored section for a save that holds every registered one', () => {
+    const reading = withRegistrations([NOTES_SLICE], () => {
+      const { migrated } = migrateSaveSlot(PLANET_1_SAVE)
+      return restored(migrated)
+    })
+    expect(reading.migrations).toEqual([])
   })
 
   it('keeps the wallet, levels, casing and core bay of the save', () => {

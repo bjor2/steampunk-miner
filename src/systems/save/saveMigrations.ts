@@ -9,9 +9,12 @@
  * of every chunk the old or new pad and its cleared air touch are dropped and regenerate under the
  * new stamp, every vehicle is put on the Sell bay's rest pose, and the params are recomputed from
  * seed and index. Wallet, levels, owned items and everything else in the state are kept.
+ *
+ * A registered slice section the save lacks is no step: `readSnapshot` restores it at its initial
+ * value, and the reading reports it after the steps as one `save_migrated {restoredSections}` (#224).
  */
 import type { AuthorityState } from '../authority/authorityState'
-import { readSnapshot, takeSnapshot } from '../authority/sessionSnapshot'
+import { readSnapshot, sectionsRestoredBy, takeSnapshot } from '../authority/sessionSnapshot'
 import { refineryUnlockPlanet } from '../economy/refineryEconomy'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import { dockedPoseAt } from '../vehicle/vehiclePose'
@@ -31,13 +34,20 @@ import {
 export type MigratedVersion = 'generatorVersion'
 
 /** One step that ran: `save_migrated {version, from, to}`. */
-export interface SaveMigration {
+export interface HeaderVersionStep {
   version: MigratedVersion
   from: number
   to: number
 }
 
-interface SaveMigrationStep extends SaveMigration {
+/** The registered sections the save lacked, restored at initial: `save_migrated {restoredSections}`. */
+export interface SectionRestore {
+  restoredSections: readonly { section: string }[]
+}
+
+export type SaveMigration = HeaderVersionStep | SectionRestore
+
+interface SaveMigrationStep extends HeaderVersionStep {
   /** The migrated file, or null when the file cannot be read at `from` (then nothing more runs). */
   migrate(file: SaveSlotFile): SaveSlotFile | null
 }
@@ -49,19 +59,20 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
 
 export type MigratedSaveSlotReading = SaveSlotReading & { migrations: readonly SaveMigration[] }
 
-/** The chain, then the header check and restore of `readSaveSlot`. */
+/** The chain, then the header check and restore of `readSaveSlot`, then the sections it restored. */
 export function readMigratedSaveSlot(file: unknown): MigratedSaveSlotReading {
   const { migrated, migrations } = migrateSaveSlot(file)
-  return { ...readSaveSlot(migrated), migrations }
+  const reading = readSaveSlot(migrated)
+  return { ...reading, migrations: [...migrations, ...sectionRestoresOf(file, reading)] }
 }
 
 /** Runs every step whose `from` the file is at, in chain order. */
 export function migrateSaveSlot(file: unknown): {
   migrated: unknown
-  migrations: SaveMigration[]
+  migrations: HeaderVersionStep[]
 } {
   let migrated = file
-  const migrations: SaveMigration[] = []
+  const migrations: HeaderVersionStep[] = []
   for (const step of SAVE_MIGRATION_STEPS) {
     const next = isAtStepStart(migrated, step) ? step.migrate(migrated) : null
     if (next === null) continue
@@ -69,6 +80,18 @@ export function migrateSaveSlot(file: unknown): {
     migrations.push({ version: step.version, from: step.from, to: step.to })
   }
   return { migrated, migrations }
+}
+
+/**
+ * Read off the file as saved, since a step re-saves every section: a file that read back has the
+ * shape of a save, whatever its header versions were.
+ */
+function sectionRestoresOf(file: unknown, reading: SaveSlotReading): SectionRestore[] {
+  if (!('state' in reading)) return []
+  const restored = sectionsRestoredBy(snapshotOfSaveSlot(file as SaveSlotFile))
+  return restored.length === 0
+    ? []
+    : [{ restoredSections: restored.map((section) => ({ section })) }]
 }
 
 function isAtStepStart(file: unknown, step: SaveMigrationStep): file is SaveSlotFile {
