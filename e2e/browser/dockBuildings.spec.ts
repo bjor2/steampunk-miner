@@ -50,6 +50,13 @@ function openScreenBay(page: Page): Promise<string | null> {
   })
 }
 
+function shutterPhase(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const result = window.steampunkDebug!.ui.getBayPresentation()
+    return result.ok ? result.presentation.shutter.phase : 'closed'
+  })
+}
+
 function workshopRoll(page: Page): Promise<WorkshopRoll> {
   return page.evaluate(() => {
     const read = window.steampunkDebug!.features['dock-buildings'].getWorkshopRoll
@@ -90,10 +97,12 @@ test.describe('dock buildings (#175)', () => {
     test.setTimeout(120_000)
     const errors = await openGame(page)
     await teleportToDock(page, 'sell')
-    await expect.poll(() => openScreenBay(page), { timeout: 30_000 }).toBe('sell')
+    await expect.poll(() => openScreenBay(page), { timeout: 60_000 }).toBe('sell')
     await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+    // The shutter runs on frames, which software GL under load makes slow: let it close first.
+    await expect.poll(() => shutterPhase(page), { timeout: 60_000 }).toBe('closed')
     await teleportToDock(page, 'upgrade')
-    await expect.poll(() => openScreenBay(page), { timeout: 30_000 }).toBe('upgrade')
+    await expect.poll(() => openScreenBay(page), { timeout: 60_000 }).toBe('upgrade')
     expect(errors).toEqual([])
   })
 
