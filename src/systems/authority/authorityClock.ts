@@ -12,6 +12,9 @@
  *   step has work due (#217), or to the end (tows due by then first); tows happen at their due tick
  *   (#7 strand grace, destroy delay).
  *
+ * After each tick it settles, and after the closing tows, the slices' authority reactions fold the
+ * events it raised into their sections (#219).
+ *
  * It leaves `state.tick` at the tick it reached, so it never runs a tick twice, and a run gives the
  * same state and events however its ticks are batched.
  */
@@ -24,6 +27,7 @@ import { nextCollapseTick } from './collapse/collapseState'
 import { runCollapseTick } from './collapse/collapseTick'
 import { isCombatLive, runCombatTick, type TickOutcome } from './combat/combatTick'
 import { nextLavaTick, runLavaTick } from './lava/lavaRules'
+import { reactToStep } from './reactionRun'
 import { announceReadyBatches, nextRefineReadyTick } from './refinery/refineryClock'
 import { towVehiclesDueBy } from './vehicleTransitions'
 import { nextSliceClockTick, runSliceClockSteps } from '../registries/clockSteps'
@@ -31,14 +35,18 @@ import { nextSliceClockTick, runSliceClockSteps } from '../registries/clockSteps
 export function settleClockTo(state: AuthorityState, toTick: number): TickOutcome {
   let outcome: TickOutcome = { state, events: [] }
   while (outcome.state.tick < toTick) {
-    const tick = outcome.state.tick + 1
-    const next = isCombatLive(outcome.state, tick)
-      ? runLiveTick(outcome.state, tick)
-      : skipQuietTicks(outcome.state, toTick)
+    const next = settleNextTick(outcome.state, toTick)
     outcome = { state: next.state, events: [...outcome.events, ...next.events] }
   }
-  const towed = towVehiclesDueBy(outcome.state, toTick)
+  const towed = reactToStep(outcome.state, towVehiclesDueBy(outcome.state, toTick))
   return { state: towed.state, events: [...outcome.events, ...towed.events] }
+}
+
+/** One live tick, or the jump to the next scheduled one; then the reactions to what it raised. */
+function settleNextTick(state: AuthorityState, toTick: number): TickOutcome {
+  const tick = state.tick + 1
+  const next = isCombatLive(state, tick) ? runLiveTick(state, tick) : skipQuietTicks(state, toTick)
+  return reactToStep(state, next)
 }
 
 function runLiveTick(state: AuthorityState, tick: number): TickOutcome {

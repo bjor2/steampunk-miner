@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { applyCommand } from '../authority/applyCommand'
-import type { AuthorityCommand } from '../authority/authorityCommand'
+import type { AuthorityCommand, CommandType } from '../authority/authorityCommand'
 import { createAuthorityState } from '../authority/authorityState'
-import type { CommandRule } from '../authority/commandRule'
+import { rejectionOf, type CommandRule } from '../authority/commandRule'
 import { add, fromCanonical, toCanonical } from '../money'
 import { COMMAND_RULE_REGISTRY, commandRuleRegistrationsOf } from './commandRules'
-import { addToRegistry, createRegistrySet, swapRegistrySet, withFreshRegistrySet } from './seal'
+import { addToRegistry, withFreshRegistrySet } from './seal'
 
 // A slice's command, added the way a slice adds one. The augmentation also keeps the kernel's
 // typecheck honest: a kernel table written over every CommandType would stop compiling.
@@ -43,6 +43,25 @@ function applyWithTipRule(command: AuthorityCommand) {
   )
 }
 
+/**
+ * A rule filed straight into the registry under a kernel type, past the registrar's prefix check
+ * (every command reads the authority reactions registry since #219, so the kernel table's
+ * precedence is shown by the slice rule never being asked, not by an unsealed registry set).
+ */
+function registerShadowOfGrantMoney(): void {
+  const refuseAll: CommandRule<'probe.tipWallet'> = {
+    fields: { amount: 'nonNegativeMoney' },
+    reject: () => rejectionOf('invalid_payload', 'the slice rule was asked'),
+    apply: () => {
+      throw new Error('the slice rule was applied')
+    },
+  }
+  addToRegistry(COMMAND_RULE_REGISTRY, 'probe', {
+    id: 'debug.grantMoney',
+    rule: refuseAll as CommandRule<CommandType>,
+  })
+}
+
 describe('slice command rules', () => {
   it('applies a command whose rule a slice registered', () => {
     const { state, events } = applyWithTipRule(tipCommand('7'))
@@ -63,19 +82,16 @@ describe('slice command rules', () => {
     expect(events).toMatchObject([{ type: 'CommandRejected', reason: 'unknown_command' }])
   })
 
-  it('answers a kernel command without reading the slice registry', () => {
-    const loaded = swapRegistrySet(createRegistrySet())
-    try {
-      const { state } = applyCommand(freshState(), {
+  it('answers a kernel command by its kernel rule, never asking a slice rule of that type', () => {
+    const { state } = withFreshRegistrySet(registerShadowOfGrantMoney, () =>
+      applyCommand(freshState(), {
         playerId: 'p1',
         tick: 0,
         seq: 1,
         type: 'debug.grantMoney',
         payload: { amount: '3' },
-      })
-      expect(toCanonical(state.players.p1.wallet)).toBe('3e+0')
-    } finally {
-      swapRegistrySet(loaded)
-    }
+      }),
+    )
+    expect(toCanonical(state.players.p1.wallet)).toBe('3e+0')
   })
 })

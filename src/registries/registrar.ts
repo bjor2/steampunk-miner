@@ -12,6 +12,7 @@ import {
 import { RUN_EVENT_REGISTRATIONS, runEventRegistrationsOf } from '../logging/registries/runEvents'
 import { artAssetIdProblems } from '../systems/art/artAssetRules'
 import { ART_ASSET_REGISTRY, type ArtAsset } from '../systems/registries/artAssets'
+import { AUTHORITY_REACTION_REGISTRY } from '../systems/registries/authorityReactions'
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
 import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
@@ -94,6 +95,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),
     commandRules: (rules) =>
       commandRuleRegistrationsOf(rules).forEach((rule) => addCommandRule(sliceId, rule)),
+    authorityReaction: (reaction) => add(AUTHORITY_REACTION_REGISTRY, reaction),
     eventProjections: (projections) =>
       eventProjectionRegistrationsOf(projections).forEach((projection) =>
         add(EVENT_PROJECTION_REGISTRY, projection),

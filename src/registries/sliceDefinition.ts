@@ -7,6 +7,7 @@ import type { DebugAction } from '../debug/debugActionRegistry'
 import type { SliceEventProjections } from '../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../logging/registries/runEvents'
 import type { ArtAsset } from '../systems/registries/artAssets'
+import type { AuthorityReaction } from '../systems/registries/authorityReactions'
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
 import type { BotPurchase } from '../systems/registries/botPurchases'
@@ -102,6 +103,11 @@ export interface SliceRegistrar {
    * or `debug.<slice>.<name>` for a debug command, which replays and logs `debug_command_applied`.
    */
   commandRules(rules: SliceCommandRules): void
+  /**
+   * Folds the domain events of each accepted command and settled tick into the slice's section,
+   * in id order, its events stamped for the player it heard (#219).
+   */
+  authorityReaction(reaction: AuthorityReaction): void
   /** Run-log projections of the domain events the slice adds, keyed by `<slice>.<Event>` type. */
   eventProjections(projections: SliceEventProjections): void
   /** The run events those projections log, keyed by `<slice>.<snake_case>` name. */

@@ -13,6 +13,8 @@
  *
  * After an accepted command the collapse watch looks at the ground and the vehicles as they now
  * stand (#43): new weak blocks near a vehicle start warning, and warnings no longer held cancel.
+ * Then the slices' authority reactions fold its events into their sections (#219), reading the
+ * state from before the command.
  */
 import {
   isDebugCommandType,
@@ -43,6 +45,7 @@ import { LOADOUT_RULES } from './loadoutRules'
 import type { DomainEvent, DomainEventBody } from './domainEvent'
 import { isJsonObject, isWholeNumber, payloadProblems } from './payloadFields'
 import { PLATFORM_SERVICE_RULES } from './platformServices'
+import { reactToStep } from './reactionRun'
 import { REFINERY_COLLECTION_RULES } from './refinery/refineryCollection'
 import { REFINERY_RULES } from './refinery/refineryRules'
 import { VEHICLE_COMMAND_RULES } from './vehicleCommandRules'
@@ -183,10 +186,10 @@ function ruleRejection(state: AuthorityState, command: unknown): Rejection | nul
 function acceptCommand(state: AuthorityState, command: AuthorityCommand): CommandOutcome {
   const receipted = recordReceipt(state, command)
   const effect = chainEffects(receipted, [(current) => applyRule(current, command), followCollapse])
-  return {
+  return reactToStep(state, {
     state: effect.state,
     events: stampEvents(command, [...effect.events, ...debugTrailOf(command)]),
-  }
+  })
 }
 
 /** Every accepted command moves the authority to its tick and spends its seq. */

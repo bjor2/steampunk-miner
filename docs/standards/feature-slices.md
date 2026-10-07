@@ -283,7 +283,7 @@ describe('slice boundary lint', () => {
 | --- | --- |
 | `src/registries/sliceDefinition.ts` **(new kernel dir)** | `SliceDefinition`, `SliceRegistrar`, `FeaturesNotLoadedError` |
 | `src/registries/registrar.ts` **(new)** | `registrarFor(sliceId)`, `sealRegistries()`, `withRegistrations(slices, run)`, the test seam that swaps in a fresh sealed set and restores it |
-| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `seal`; `itemDescriber`, `itemDescriptionEntries`, `buyableRefs` (K7, 3.19) |
+| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `authorityReactions` (#219, 3.21), `seal`; `itemDescriber`, `itemDescriptionEntries`, `buyableRefs` (K7, 3.19) |
 | `src/ui/registries/hudPanels.ts` **(new)** | HUD panels |
 | `src/ui/registries/screens.ts` | Full slice screens (#211) |
 | `src/ui/vectorIcons.ts` | Icon registry (extended) |
@@ -328,6 +328,7 @@ export interface SliceRegistrar {
   chargeBlastCue(provider: ChargeBlastCueProvider): void  // one provider, #213, section 3.14
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   commandRules(rules: SliceCommandRules): void              // K1, section 3.15
+  authorityReaction(reaction: AuthorityReaction): void      // #219, section 3.21
   eventProjections(projections: SliceEventProjections): void
   runEvents(events: SliceRunEvents): void
 }
@@ -723,6 +724,26 @@ Kernel seams for `power-up-core` (#200), from the TD lock on #200. With nothing 
 - **`clockSteps`** (`src/systems/registries/clockSteps.ts`): `{ id, nextTick(state): number | null, run(state, tick): RuleEffect }`. `authorityClock.ts` runs the steps in id order after its own steps, on every live tick and at every tick a quiet clock stops at; `nextTick` joins the quiet clock's stop list. `run` must do nothing when nothing is due. Its events are stamped with the tick. Wind-ups and channel cancels resolve here, so spend logs stay on the authority clock.
 - **`inputReactions`** (`src/systems/registries/inputReactions.ts`): `{ id, actionId, contexts, toIntent(situation): CommandIntent | null }`. `reactionToPress` asks the reactions only for an action its fixed table has no rule for in the top layer; the first intent in id order is submitted, and a null intent does nothing. `InputSituation` carries the authority replica and the player. The kernel ships `use_slot_1` to `use_slot_5` on `Digit1` to `Digit5`, rebindable. On touch, a slot button calls `pressSlotButton` / `releaseSlotButton` in `src/store/touchRuntime.ts`: a tap uses the slot at once, and a hold of `ITEM_CARD_LONG_PRESS_MS` (400 ms, the same touch hold as the #199 item tooltips) shows the #164 item card (`isSlotCardShown`) and uses nothing.
 - **`dockServices`** (`src/systems/registries/dockServices.ts`): `{ id, onRecharge(state, playerId): RuleEffect }`, run in id order at the end of `rechargeEnergy`, so also on quick service's recharge leg. A refill is free on the paid bill, which never changes. A service logs what it refilled (charges-after) so a balance read can tell a refill from a paid buy.
+
+### 3.21 Authority reactions (built in #219)
+
+A slice folds the kernel's domain events into its own section inside the authority's answer, so what it records lands with the events it heard, in headless, bot and golden runs alike. The codex (#207) is the first user: `CargoAdded` marks an ore mined, a drill touch marks it contacted.
+
+```ts
+// src/systems/registries/authorityReactions.ts
+export interface AuthorityReaction {
+  id: string                                    // '<slice>.<name>'
+  react(before: AuthorityState, after: AuthorityState, events: readonly DomainEvent[]): RuleEffect
+}
+// src/systems/authority/tileOre.ts
+export function oreTypeAtTile(state: AuthorityState, tile: TilePoint): OreType | null
+```
+
+- **When.** `acceptCommand` runs the reactions after `applyRule` and `followCollapse`; `settleClockTo` runs them after each tick it settles and after its closing tows (`reactionRun.ts`). A refused command runs none.
+- **Per player.** The step's events are grouped by `playerId`, in the order the players first appear (the clock's playerless events form one group). Each group runs every reaction in id order. A reaction's events take the stamp of the last event it heard: a command's stamp, or a tick's `{tick, playerId}`.
+- **State.** `before` is the state the command or tick started from, `after` the state it left with the earlier reactions applied. A reaction returns the new `after` and its event bodies. It hears only rule events, never another reaction's, so reactions never cascade.
+- **Contact.** `DrillDamageDealt` carries no ore id. A reaction reads the ore with `oreTypeAtTile(before, event)`, which answers even when the command broke the tile.
+- **Empty means today.** With nothing registered, every answer is unchanged and the goldens stay byte-identical. A slice's reaction events are its own domain events (section 3.15), and it writes its section with `withSection` (section 3.13).
 
 ## 4. Cross-slice contracts
 

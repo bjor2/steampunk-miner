@@ -89,6 +89,7 @@ export const slice: SliceDefinition = {
 | `buildingAttachUse(use)` | `src/systems/registries/buildingAttach.ts` | A use of a shop building's attach point (#170). |
 | `debugActions(actions)` | `src/debug/debugActionRegistry.ts` | Exposed as `steampunkDebug.features['<slice>']`. |
 | `commandRules(rules)` | `src/systems/registries/commandRules.ts` | Keyed by command type: `<slice>.<name>`, or `debug.<slice>.<name>` for a debug command. `applyCommand` asks the kernel table first. |
+| `authorityReaction(reaction)` | `src/systems/registries/authorityReactions.ts` | Folds each accepted command's and settled tick's events into the slice's section, per player, in id order; its events take the stamp of the events it heard. Read a `DrillDamageDealt` tile's ore with `oreTypeAtTile(before, event)` (feature-slices.md 3.21). |
 | `eventProjections(projections)` | `src/logging/registries/eventProjections.ts` | Keyed by `<slice>.<Event>` domain event type; `() => null` for an event with no log line. |
 | `runEvents(events)` | `src/logging/registries/runEvents.ts` | Keyed by `<slice>.<snake_case>` name, payload fully specified. |
 
