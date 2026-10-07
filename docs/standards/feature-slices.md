@@ -316,6 +316,7 @@ export interface SliceRegistrar {
   inputReaction(reaction: InputReactionEntry): void    // #217, section 3.20
   generationHook(hook: GenerationHook): void
   oreLook(provider: OreLookProvider): void            // one provider
+  cellGateLook(provider: CellGateLookProvider): void  // one provider, ticket 298, section 3.33
   saveSection<T>(section: SaveSection<T>): void
   discovery(provider: DiscoveryProvider): void        // one provider
   discoveryKind<K extends DiscoveryKind>(kind: K, ...codec: DiscoveryCodecArgument<K>): void  // #209
@@ -887,6 +888,17 @@ No new seam; the TD lock on #203 Q1 records how a slice draws world markers unti
 - **The layer.** `sensing.reveals` is one pooled `InstancedMesh`, one draw call, a quad per marked cell or pin. The lock allows up to 384 instances; the dynamite visuals (681) and the rig's power-up FX (256) leave 87 of `SCENE_LAYER_LINE`'s 1024, so `REVEAL_LAYER_BUDGET` takes 87 until the TD moves the line or a pool. A ping past the cap keeps its cells nearest its centre; older marks give way soonest-to-expire first, a flare map last; buoy pins hold seats of their own.
 - **HUD.** The periscope draws its own arrows in the `threats` slot (the kernel's `ThreatMarkers` shows telegraphs only); the lens's cards (priority 5) and the barometer's chip (priority 20) are overlay panels.
 - **Held rows.** The galvanic probe and the void sounder stay unregistered (GD ruling on Q3) and draw no marker (Horizontal guard). Codex contact from the scanners waits on #243 (Q2 b).
+
+### 3.33 Terrain gate channel (ticket 298)
+
+The TD lock and GD ruling on #238 (option (a)): gate state belongs to the cell, so it rides in the cell's look, not in an instance pool. Render-only: no authority, digest, log or golden change; zero extra draw calls and instances, so `SCENE_LAYER_LINE` is unchanged.
+
+- **`cellGateLook`** (`src/systems/registries/cellGateLook.ts`, one provider, `mining-gates`): `{ id, cellGateLookOf(params, cell, tile) → { kind, state } | null, markerTintOf(params) → Rgb | null }`. It reads the planet and the cell only, never a player, so a chunk is rebuilt only when its cells change and every miner sees a gate before owning its tool. The tile comes with the cell because a gate hangs on the cell's band; it is the mesher's scratch point, never kept. With no provider the mesher never asks and every tile's gate slot is 0.
+- **The bits** (`src/systems/render/cellGateBits.ts`): one float per tile in the new `aGate` instance attribute (`TileInstances.gates`), bits 0-3 the kind (16 kinds), 4-6 the state (`GATE_STATE`: locked 0, revealed 1, cleared 2, then 5 spare), bit 7 set on every gated cell. Sized for the whole act table, so frozen, magnetic and hollow need no second kernel change. A kind or state outside the channel is refused, never trimmed. The shader takes the layout from the same module as `defines`.
+- **The shader** draws the marker as the cell's top layer (#151 draw order: gate marker, grade effects, theme overlay, ore base), covering the glow beneath it. Today it draws a placeholder per kind: a dark rim and stripes turned to the kind's own angle, fainter as the state moves on, static. The final patterns, the reduce-motion glyph and the screenshots are #299's.
+- **The tint** is the planet's act tint (#151) from `markerTintOf`, one uniform (`uGateTint`, `src/scene/terrainGateTint.ts`) rewritten on a planet change, never a per-cell bit; `GATE_MARKER_UNTINTED` where the provider names none.
+- **mining-gates** numbers each marker pattern in `lockMarkers.json` `terrainKinds` (hard rim 0, cracked shell 1, the five extractor motions 2-6): the pattern only, never an extractor's name or icon (Horizontal's guard). Every gated cell is `locked` for now. The rim opening on the tip's last major (`hard_rim_open`) and the ordinary-cell rim from P7 depend on the player's tip, which the cell bits cannot carry; a tip-major uniform is the ruled path for them.
+- **Perf:** `npm run bench:render` times a rebuild on P8 and P17 with the provider registered and with none (`buildChunkTileBatch.gates` / `.noGates`), each against #154's 2 ms presentation line.
 
 ## 4. Cross-slice contracts
 

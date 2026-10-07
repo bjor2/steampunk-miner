@@ -131,7 +131,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 
-### `mining-gates`: 19 files, 123 tests
+### `mining-gates`: 20 files, 132 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -149,6 +149,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/gateLedger.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/gateTable.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/ledgerLines.test.ts` | 7 | 7 |
+| `src/features/mining-gates/systems/render/cellGateLooks.test.ts` | 9 | 9 |
 | `src/features/mining-gates/systems/render/gateSounds.test.ts` | 7 | 7 |
 | `src/features/mining-gates/systems/render/lockMarkers.test.ts` | 11 | 11 |
 | `src/features/mining-gates/systems/rigSales.test.ts` | 3 | 3 |
@@ -631,6 +632,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/buildingAttach.test.ts` | 3 | 3 |
 | `src/systems/registries/buyableRefs.test.ts` | 4 | 4 |
 | `src/systems/registries/catalogueIds.test.ts` | 6 | 6 |
+| `src/systems/registries/cellGateLook.test.ts` | 3 | 3 |
 | `src/systems/registries/chargeBlastCue.test.ts` | 5 | 5 |
 | `src/systems/registries/clockSteps.test.ts` | 4 | 4 |
 | `src/systems/registries/commandRules.test.ts` | 4 | 4 |
@@ -661,8 +663,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/artefactLook.test.ts` | 2 | 2 |
 | `src/systems/render/bandPalette.test.ts` | 6 | 6 |
 | `src/systems/render/cameraTurn.test.ts` | 7 | 7 |
+| `src/systems/render/cellGateBits.test.ts` | 6 | 6 |
 | `src/systems/render/chargePlacement.test.ts` | 2 | 2 |
 | `src/systems/render/chunkTileBatch.test.ts` | 8 | 8 |
+| `src/systems/render/chunkTileBatchGates.test.ts` | 10 | 3 |
 | `src/systems/render/chunkTileBatchOreLook.test.ts` | 1 | 1 |
 | `src/systems/render/collapseTelegraph.test.ts` | 5 | 5 |
 | `src/systems/render/drillHeadPose.test.ts` | 7 | 4 |
