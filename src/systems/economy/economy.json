@@ -275,6 +275,9 @@
     "aheadCellsMax": 1,
     "sideEnergyShareFloorBp": 10000
   },
+  "itemHookCaps": {
+    "reachCellsMax": 12
+  },
   "magnets": {
     "maxCellsMoved": 8,
     "movableCells": "diggable",

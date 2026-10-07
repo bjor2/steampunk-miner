@@ -13,6 +13,7 @@ import { readArchetypes } from './readArchetypeEconomy'
 import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
 import { readDrillGearCaps } from './drillGearCaps'
+import { readItemHookCaps } from './itemHookCaps'
 import { readItemEffectCaps } from './itemEffectCaps'
 import { readMagnetCaps } from './magnetCaps'
 import { readMagneticHazardCaps } from './magneticHazardCaps'
@@ -76,6 +77,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     enemies: readEnemies(reader, reader.object('enemies', file.enemies)),
     itemEffectCaps: readItemEffectCaps(reader, file.itemEffectCaps),
     drillGearCaps: readDrillGearCaps(reader, file.drillGearCaps),
+    itemHookCaps: readItemHookCaps(reader, file.itemHookCaps),
     magnets: readMagnetCaps(reader, file.magnets),
     magneticHazard: readMagneticHazardCaps(reader, file.magneticHazard),
   }

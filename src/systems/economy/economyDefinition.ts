@@ -4,6 +4,7 @@
  * stay plain numbers (#5 rules 1, 2 and 5).
  */
 import type { DrillGearCaps } from './drillGearCaps'
+import type { ItemHookCaps } from './itemHookCaps'
 import type { ItemEffectCaps } from './itemEffectCaps'
 import type { MagnetCaps } from './magnetCaps'
 import type { MagneticHazardCaps } from './magneticHazardCaps'
@@ -420,6 +421,8 @@ export interface Economy {
   itemEffectCaps: ItemEffectCaps
   /** What slice drill gear may add to the drill's cut at most (ticket 234, `drillGearCaps.ts`). */
   drillGearCaps: DrillGearCaps
+  /** How far a slice item hook may take a lane at most (ticket 323, `itemHookCaps.ts`). */
+  itemHookCaps: ItemHookCaps
   /** The terrain magnets family's caps (GD lock on #246, ticket 282, `magnetCaps.ts`). */
   magnets: MagnetCaps
   /** What a magnetic planet's fields and electrified cells cost at most (#258, ticket 290). */
