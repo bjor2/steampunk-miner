@@ -68,16 +68,17 @@ def configure_cycles_bake():
 def bake_cell(cell_id, size, emission_scale, glows):
     """The cell's marks (its collection, lights left out) baked from a quad covering its 1 m."""
     marks = [obj for obj in bpy.data.collections[cell_id].objects if obj.type in ('MESH', 'CURVE')]
+    bodies = [obj for obj in marks if not is_glow_layer(obj)]
     centre = cell_centre_of(cell_id)
     images = {kind: blank_image(cell_id, kind, size) for kind in COLOUR_SPACES}
     quad = bake_quad_for(marks, centre)
     hidden = hide_other_collections(cell_id)
     try:
-        with_stand_ins(marks, albedo_stand_in, lambda: bake_onto(quad, marks, images['albedo'], 'EMIT'))
-        bake_onto(quad, marks, images['normal'], 'NORMAL')
+        with_stand_ins(bodies, albedo_stand_in, lambda: bake_onto(quad, bodies, images['albedo'], 'EMIT'))
+        bake_onto(quad, bodies, images['normal'], 'NORMAL')
         if glows:
             bake_onto(quad, marks, images['emissive'], 'EMIT')
-        with_stand_ins(marks, mask_stand_in, lambda: bake_onto(quad, marks, images['mask'], 'EMIT'))
+        with_stand_ins(bodies, mask_stand_in, lambda: bake_onto(quad, bodies, images['mask'], 'EMIT'))
     finally:
         for collection in hidden:
             collection.hide_render = False
@@ -86,6 +87,11 @@ def bake_cell(cell_id, size, emission_scale, glows):
     save_tile(cell_id, images, glows)
     for image in images.values():
         bpy.data.images.remove(image)
+
+
+def is_glow_layer(obj):
+    """Cores, veins, arcs and sparkles are emission the shader animates: emissive map only."""
+    return any(slot.material is not None and slot.material.get('glow_only') for slot in obj.material_slots)
 
 
 def hide_other_collections(cell_id):

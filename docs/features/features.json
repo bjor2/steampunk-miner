@@ -528,6 +528,13 @@
           "issues": [13, 28]
         },
         {
+          "title": "Ore looks that escalate with depth",
+          "description": "Twelve ore families with their own silhouettes, each climbing five visual grades as the tier deepens: plain form, then sheen, crystal structure, inner light and finally its own effect with arcs, authored and baked in Blender. Not drawn in the game yet: the atlas renderer, the twelve-family cells and the neighbour light are kernel follow-ups.",
+          "status": "partial",
+          "issues": [144, 151],
+          "doc": "docs/art/ores/README.md"
+        },
+        {
           "title": "Ore pickup",
           "description": "A cell's ore drops into the hold once you've carved through most of it, lined or not.",
           "status": "built",

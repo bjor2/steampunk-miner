@@ -38,17 +38,36 @@ DEUTERANOPIA = np.array([
 def main():
     looks = layout.load_looks()
     families = [family['id'] for family in looks['families']]
-    for name in sheet_names():
+    names = sheet_names()
+    for name in names:
         post_sheet(name)
     contact_sheet(families, 'shallow', 'families.contact.png')
     contact_sheet(families, 'deep', 'families.contact.deep.png')
     silhouette_sheet(families, looks)
-    print('post done for %d sheets' % len(sheet_names()))
+    shrink_for_git()
+    print('post done for %d sheets' % len(names))
 
 
 def sheet_names():
     return sorted(name for name in os.listdir(SHEET_DIR)
                   if name.endswith('.png') and not any(tag in name for tag in ('-gray', '-ingame', '-deutan', 'contact', 'silhouettes')))
+
+
+JPEG_QUALITY = 90
+
+
+def shrink_for_git():
+    """
+    The full-size colour sheets (about 3.5 MB each as PNG, over 100 MB for the set) are committed
+    as JPEG at quality 90; the measurements were taken from the PNGs when they were rendered. The
+    85 px/m downsamples and the silhouette sheet stay PNG, being small or two-tone.
+    """
+    for name in sorted(os.listdir(SHEET_DIR)):
+        if not name.endswith('.png') or '-ingame' in name or 'silhouettes' in name:
+            continue
+        path = os.path.join(SHEET_DIR, name)
+        Image.open(path).convert('RGB').save(path[:-4] + '.jpg', quality=JPEG_QUALITY, optimize=True)
+        os.remove(path)
 
 
 def post_sheet(name):

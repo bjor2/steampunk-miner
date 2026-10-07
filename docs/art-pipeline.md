@@ -415,6 +415,17 @@ form of the row ids, and the refractory tiles take the lining type #113 names
   `author_tiles.py`'s seamless graph. From then on the `.blend` files are the sources.
 - The archetype stinger on arrival at P8 (#113) is audio, not art.
 
+## Ore atlases
+
+The ore art of [#144](https://github.com/bjor2/steampunk-miner/issues/144) (spec
+[#151](https://github.com/bjor2/steampunk-miner/issues/151)) is authored per family in
+`docs/art/ores/blend/ore-<family>.blend` and baked by the scripts beside them into 248 px cells of
+three 4096 atlases (albedo with the mask in alpha, normal, emissive from grade 3), one cell per
+family x variant x grade on the table of `docs/art/ores/atlas-layout.json`, which the
+`ore-visuals` slice's `oreAtlasCellOf` mirrors. See [docs/art/ores/README.md](art/ores/README.md).
+The atlases have no manifest form or id yet, so they stay in `art/build/ores/` until the kernel
+renderer ticket adds both and ships them under `public/assets/`.
+
 ## The `parts.json` sidecar, schema 1
 
 ```json

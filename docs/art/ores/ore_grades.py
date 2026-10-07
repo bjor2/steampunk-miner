@@ -23,16 +23,23 @@ HALF_RANK_TIER = 4
 # A tier in the middle of each grade's range (#140 thresholds 4, 12, 30, 70; G5 ramps to 97).
 MID_TIER_OF_GRADE = {1: 2, 2: 7, 3: 20, 4: 50, 5: 83}
 GLOW_LUMA = 0.72
+# G1 sits below the family's luma band: this share of its low edge, with duller colour.
+G1_EARTH_LUMA = 0.5
+G1_EARTH_SATURATION = 0.7
 CORE_LUMA = 0.92
 PULSE = ((1, 0.7), (2, 1.0), (3, 0.85))
 # Emission strengths; the bake divides by `coreEmissionMax` so the map holds strength / 4.
 RIM_STRENGTH = {3: 0.45, 4: 0.6, 5: 0.7}
 CORE_STRENGTH = {4: 2.0, 5: 4.0}
+# The share of the body's rim glow every part of a G4 or G5 body gives off: the inner light.
+INNER_LIGHT_FLOOR = {4: 0.3, 5: 0.4}
 VEIN_STRENGTH = 0.9
 ARC_STRENGTH = 3.0
 SPARKLE_STRENGTH = 2.5
 SPARKLES = {3: 5, 4: 4, 5: 3}
 HOVER_Y = -0.12
+# A glint is a small highlight whatever the mark's reach: long traces and forks get no bigger ones.
+GLINT_EXTENT_CAP = 0.12
 METALLIC_FAMILIES = ('metal', 'relic', 'ancient')
 GLASSY_FAMILIES = ('crystal', 'cryo', 'energy', 'exotic')
 
@@ -69,10 +76,19 @@ def variant_hue(family, variant):
 
 
 def body_hex(family, variant, grade):
-    """The family's hue at the variant's position, at the grade's mid-tier luma in the family band."""
+    """
+    The family's hue at the variant's position, at the grade's luma: G2 at the low edge of the
+    family's luma band and G5 at its top, evenly spaced; G1, "flecks or seams in the rock, matte,
+    earthy" (#151), sits below the band, darker and duller, half-sunk in the rock, so the step to
+    G2's sheen reads in greyscale over the darkening host rock. The game tints per tier on top.
+    """
     low, high = family['lumaBand']
-    base = colorsys.hls_to_rgb(variant_hue(family, variant) / 360.0, 0.5, family['saturation'])
-    return hex_of_rgb(with_luma(base, low + (high - low) * rank_of_tier(MID_TIER_OF_GRADE[grade])))
+    saturation = family['saturation'] * (G1_EARTH_SATURATION if grade == 1 else 1.0)
+    base = colorsys.hls_to_rgb(variant_hue(family, variant) / 360.0, 0.5, saturation)
+    if grade == 1:
+        return hex_of_rgb(with_luma(base, low * G1_EARTH_LUMA))
+    position = (grade - 2) / (len(MID_TIER_OF_GRADE) - 2)
+    return hex_of_rgb(with_luma(base, low + (high - low) * position))
 
 
 def glow_hex(family, luma=GLOW_LUMA):
@@ -109,36 +125,43 @@ def matte_body(name, family, body):
 
 def sheen_body(name, family, body):
     if family['id'] in METALLIC_FAMILIES:
-        return materials.surface_material(name, body, metallic=0.85, roughness=0.32, coat=0.35)
+        return materials.surface_material(name, body, metallic=0.25, roughness=0.3, coat=0.5)
     if family['id'] in GLASSY_FAMILIES:
-        return materials.surface_material(name, body, roughness=0.12, transmission=0.25, ior=1.5, coat=0.5)
+        return materials.surface_material(name, body, roughness=0.12, transmission=0.08, ior=1.5, coat=0.5)
     return materials.surface_material(name, body, roughness=0.28, coat=0.65)
 
 
 def structure_body(name, family, body):
     """Three-dimensional and rim-lit: metals polished with a facing glow, the rest translucent."""
-    glow = glow_hex(family)
     if family['id'] in METALLIC_FAMILIES:
-        material = materials.surface_material(name, body, metallic=0.9, roughness=0.25, coat=0.3,
-                                              emission_hex=glow, emission_strength=0.0)
+        material = materials.surface_material(name, body, metallic=0.3, roughness=0.25, coat=0.5,
+                                              emission_hex=glow_hex(family), emission_strength=0.0)
         return drive_emission_by_facing(material, RIM_STRENGTH[3])
-    return materials.rim_lit_glass(name, body, glow, RIM_STRENGTH[3], roughness=0.08, transmission=0.6)
+    return translucent_body(name, family, body, RIM_STRENGTH[3], floor=0.0, transmission=0.12)
 
 
 def inner_light_body(name, family, body):
-    """Lit from inside: a translucent body with a faint glow of its own and a stronger rim."""
-    glow = glow_hex(family)
+    """Lit from inside: a translucent body glowing faintly all over, with a stronger rim."""
     if family['id'] in METALLIC_FAMILIES:
-        material = materials.surface_material(name, body, metallic=0.7, roughness=0.3,
-                                              emission_hex=glow, emission_strength=0.0)
+        material = materials.surface_material(name, body, metallic=0.25, roughness=0.3, coat=0.4,
+                                              emission_hex=glow_hex(family), emission_strength=0.0)
         return drive_emission_by_facing(material, RIM_STRENGTH[4], floor=0.2)
-    material = materials.rim_lit_glass(name, body, glow, RIM_STRENGTH[4], roughness=0.06, transmission=0.7)
-    return material
+    return translucent_body(name, family, body, RIM_STRENGTH[4], floor=INNER_LIGHT_FLOOR[4], transmission=0.18)
+
+
+def translucent_body(name, family, body, rim, floor, transmission, roughness=0.08):
+    """
+    A glassy body kept light enough to read over dark rock (#151 fix: lightened bodies), with a
+    facing-driven rim glow in the family's hue and `floor` of that glow all over.
+    """
+    material = materials.surface_material(name, body, roughness=roughness, transmission=transmission, ior=1.55,
+                                          coat=0.4, emission_hex=glow_hex(family), emission_strength=0.0)
+    return drive_emission_by_facing(material, rim, floor=floor)
 
 
 def own_effect_body(name, family, body):
     """Dichroic: the body hue on the facing side shifting to the dichroic hue on the grazing edge."""
-    material = materials.rim_lit_glass(name, body, core_hex(family), RIM_STRENGTH[5], roughness=0.04, transmission=0.55)
+    material = translucent_body(name, family, body, RIM_STRENGTH[5], floor=INNER_LIGHT_FLOOR[5], transmission=0.15, roughness=0.04)
     tree = material.node_tree
     bsdf = materials.principled_of(material)
     facing = tree.nodes.new('ShaderNodeLayerWeight')
@@ -166,8 +189,10 @@ def drive_emission_by_facing(material, strength, floor=0.0):
 
 
 def glow_material(name, hex_colour, strength, pulse=False):
+    """Emission alone: an object wearing it is a glow layer, baked into the emissive map only."""
     material = materials.glow_material(name, hex_colour, strength)
     material['albedo_hex'] = hex_colour
+    material['glow_only'] = True
     if pulse:
         materials.pulse_emission(material, PULSE)
     return material
@@ -183,7 +208,7 @@ def relief_of_grade(grade):
 
 def mark_count(grade, family_density):
     """Sparse at G1, denser at G2, a cluster at G3, a ring at G4, a crown at G5."""
-    base = {1: 8, 2: 10, 3: 8, 4: 8, 5: 7}[grade]
+    base = {1: 9, 2: 10, 3: 10, 4: 8, 5: 7}[grade]
     return max(3, round(base * family_density))
 
 
@@ -191,11 +216,11 @@ def placements(grade, count, rng, cell):
     """(centre_x, centre_z, size, angle) per mark in the cell's frame."""
     cx, cz = cell
     if grade == 1:
-        return [(cx + px, cz + pz, rng.uniform(0.09, 0.14), rng.uniform(0, math.tau))
-                for px, pz in shapes.scatter_positions(rng, count, 0.36, 0.17)]
+        return [(cx + px, cz + pz, rng.uniform(0.12, 0.18), rng.uniform(0, math.tau))
+                for px, pz in shapes.scatter_positions(rng, count, 0.34, 0.18)]
     if grade == 2:
-        return [(cx + px, cz + pz, rng.uniform(0.08, 0.13), rng.uniform(0, math.tau))
-                for px, pz in shapes.scatter_positions(rng, count, 0.36, 0.17)]
+        return [(cx + px, cz + pz, rng.uniform(0.14, 0.2), rng.uniform(0, math.tau))
+                for px, pz in shapes.scatter_positions(rng, count, 0.33, 0.21)]
     if grade == 3:
         root = (cx + rng.uniform(-0.08, 0.08), cz + rng.uniform(-0.08, 0.08))
         placed = []
@@ -203,10 +228,10 @@ def placements(grade, count, rng, cell):
             angle = i / count * math.tau + rng.uniform(-0.2, 0.2)
             reach = rng.uniform(0.12, 0.38)
             placed.append((root[0] + math.cos(angle) * reach, root[1] + math.sin(angle) * reach,
-                           rng.uniform(0.1, 0.17), angle))
+                           rng.uniform(0.14, 0.22), angle))
         return placed
     if grade == 4:
-        placed = [(cx + px, cz + pz, rng.uniform(0.09, 0.13), math.atan2(pz, px))
+        placed = [(cx + px, cz + pz, rng.uniform(0.11, 0.15), math.atan2(pz, px))
                   for px, pz in shapes.ring_positions(count, 0.27, rng.uniform(0, math.tau))]
         for turn in (0.1, 0.45, 0.8):
             angle = turn * math.tau
@@ -238,10 +263,10 @@ def add_glints(marks, family, rng):
     glint['albedo_hex'] = '#e8e2d6'
     points = []
     for i, mark in enumerate(marks):
-        if rng.random() < 0.35:
+        if rng.random() < 0.15:
             continue
         x, y, z = centre_of(mark)
-        size = extent_of(mark) * 0.09
+        size = min(extent_of(mark), GLINT_EXTENT_CAP) * 0.11
         points.append(shapes.assign(shapes.add_icosphere('glint-%d' % i, size, (x - size * 1.6, y - 0.012, z + size * 1.6),
                                                          subdivisions=1, scale=(1.0, 0.4, 1.0)), glint))
     return points

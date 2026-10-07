@@ -162,12 +162,20 @@ def report_grid_luma(png_path, columns, rows, labels, dst_json, px_per_m=PX_PER_
     for row in range(rows):
         for column in range(columns):
             cells.append(cell_luma_row(luma, column, row, columns, rows, labels[row][column], px_per_m))
-    rises = [all(a['oreLuma'] < b['oreLuma'] for a, b in zip(cells[r * columns:(r + 1) * columns], cells[r * columns + 1:(r + 1) * columns]))
-             for r in range(rows)]
-    report = {'pxPerMetre': px_per_m, 'cells': cells, 'oreLumaRisesAlongEveryRow': all(rises)}
+    report = {'pxPerMetre': px_per_m, 'cells': cells,
+              'oreLumaRisesAlongEveryRow': rises_along_every_row(cells, columns, rows, 'oreLuma'),
+              'bodyLumaRisesAlongEveryRow': rises_along_every_row(cells, columns, rows, 'bodyLuma')}
     with open(dst_json, 'w', encoding='utf-8', newline='\n') as file:
         file.write(layout.json_text_of(report))
     return report
+
+
+def rises_along_every_row(cells, columns, rows, key):
+    """Whether the measure climbs with the grade along every variant row; None if it was not measured."""
+    if any(key not in cell for cell in cells):
+        return None
+    return all(a[key] < b[key] for r in range(rows)
+               for a, b in zip(cells[r * columns:(r + 1) * columns], cells[r * columns + 1:(r + 1) * columns]))
 
 
 def cell_luma_row(luma, column, row, columns, rows, label, px_per_m):
@@ -181,5 +189,25 @@ def cell_luma_row(luma, column, row, columns, rows, label, px_per_m):
     margin[round(0.1 * px):-round(0.1 * px), round(0.1 * px):-round(0.1 * px)] = np.nan
     ore_luma, rock_luma = float(ore.mean()), float(np.nanmean(margin))
     contrast = (max(ore_luma, rock_luma) + 0.05) / (min(ore_luma, rock_luma) + 0.05)
-    return {'id': label, 'oreLuma': round(ore_luma, 4), 'rockLuma': round(rock_luma, 4),
-            'orePeakLuma': round(float(ore.max()), 4), 'contrast': round(contrast, 2)}
+    row = {'id': label, 'oreLuma': round(ore_luma, 4), 'rockLuma': round(rock_luma, 4),
+           'orePeakLuma': round(float(ore.max()), 4), 'contrast': round(contrast, 2)}
+    mask = mask_of_tile(label, cell.shape[0])
+    if mask is not None and mask.any():
+        body_luma = float(cell[mask].mean())
+        row['bodyLuma'] = round(body_luma, 4)
+        row['bodyContrast'] = round((body_luma + 0.05) / (rock_luma + 0.05), 2)
+        row['coverage'] = round(float(mask.mean()), 3)
+    return row
+
+
+def mask_of_tile(cell_id, px):
+    """The baked albedo's alpha, scaled to the sheet's cell, so body luma is measured on the ore alone."""
+    path = os.path.join(REPO_ROOT, 'art', 'build', 'ores', cell_id + '.albedo.png')
+    if not os.path.isfile(path):
+        return None
+    image = bpy.data.images.load(path, check_existing=False)
+    image.scale(px, px)
+    pixels = np.empty(px * px * 4, dtype=np.float32)
+    image.pixels.foreach_get(pixels)
+    bpy.data.images.remove(image)
+    return pixels.reshape(px, px, 4)[::-1, :, 3] > 0.5

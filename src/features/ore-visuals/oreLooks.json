@@ -1,5 +1,5 @@
 {
-  "$comment": "The ore look data of #151 (Game Director, 6 Oct 2026): the 12 family rows (silhouette, hue band, luma band), the five-grade channel ladder, the visual echo past G5, the atlas cell rule of the Technical Director's budgets and the planet-tint caps. Hue in degrees, saturation and luma in 0..1. No family hue falls in the reserved heat (15-45) or enemy-purple (268-285) bands; the fossil row is 46-50 (the table said 40-50, which touches the heat band; ivory at saturation 0.25 reads the same).",
+  "$comment": "The ore look data of #151 (Game Director, 6 Oct 2026): the 12 family rows (silhouette, hue band, luma band), the five-grade channel ladder, the visual echo past G5, the atlas cell rule of the Technical Director's budgets and the planet-tint caps. Hue in degrees, saturation and luma in 0..1 (display luma, Rec. 601, as the kernel colour module measures). Luma bands sit above the host rock (band 1 is 0.43, band 5 is 0.19 on planet 1), so ore reads as ore; G1 bakes below its band, half-sunk and earthy. No family hue falls in the reserved heat (15-45) or enemy-purple (268-285) bands; the fossil row is 46-50 (the table said 40-50, which touches the heat band; ivory at saturation 0.25 reads the same).",
   "families": [
     {
       "id": "metal",
@@ -9,7 +9,7 @@
       "shaderSilhouette": "flecks",
       "hueBand": [205, 215],
       "saturation": 0.12,
-      "lumaBand": [0.38, 0.62],
+      "lumaBand": [0.52, 0.74],
       "emission": { "hue": 210, "saturation": 0.25 },
       "variants": 4
     },
@@ -21,7 +21,7 @@
       "shaderSilhouette": "flecks",
       "hueBand": [55, 65],
       "saturation": 0.75,
-      "lumaBand": [0.46, 0.72],
+      "lumaBand": [0.58, 0.8],
       "emission": { "hue": 58, "saturation": 0.55 },
       "variants": 4
     },
@@ -33,7 +33,7 @@
       "shaderSilhouette": "flecks",
       "hueBand": [46, 50],
       "saturation": 0.25,
-      "lumaBand": [0.55, 0.82],
+      "lumaBand": [0.64, 0.86],
       "emission": { "hue": 46, "saturation": 0.2 },
       "variants": 4
     },
@@ -45,7 +45,7 @@
       "shaderSilhouette": "flecks",
       "hueBand": [80, 95],
       "saturation": 0.85,
-      "lumaBand": [0.55, 0.82],
+      "lumaBand": [0.64, 0.86],
       "emission": { "hue": 88, "saturation": 0.7 },
       "variants": 4
     },
@@ -57,7 +57,7 @@
       "shaderSilhouette": "flecks",
       "hueBand": [120, 135],
       "saturation": 0.7,
-      "lumaBand": [0.38, 0.62],
+      "lumaBand": [0.52, 0.74],
       "emission": { "hue": 128, "saturation": 0.6 },
       "variants": 4
     },
@@ -69,7 +69,7 @@
       "shaderSilhouette": "flecks",
       "hueBand": [155, 168],
       "saturation": 0.5,
-      "lumaBand": [0.3, 0.52],
+      "lumaBand": [0.46, 0.68],
       "emission": { "hue": 162, "saturation": 0.45 },
       "variants": 4
     },
@@ -81,7 +81,7 @@
       "shaderSilhouette": "shards",
       "hueBand": [180, 192],
       "saturation": 0.8,
-      "lumaBand": [0.55, 0.82],
+      "lumaBand": [0.64, 0.86],
       "emission": { "hue": 186, "saturation": 0.6 },
       "variants": 4
     },
@@ -93,7 +93,7 @@
       "shaderSilhouette": "shards",
       "hueBand": [200, 212],
       "saturation": 0.3,
-      "lumaBand": [0.64, 0.92],
+      "lumaBand": [0.7, 0.92],
       "emission": { "hue": 206, "saturation": 0.25 },
       "variants": 4
     },
@@ -105,7 +105,7 @@
       "shaderSilhouette": "shards",
       "hueBand": [222, 238],
       "saturation": 0.85,
-      "lumaBand": [0.46, 0.72],
+      "lumaBand": [0.58, 0.8],
       "emission": { "hue": 230, "saturation": 0.6 },
       "variants": 4
     },
@@ -117,7 +117,7 @@
       "shaderSilhouette": "shards",
       "hueBand": [295, 310],
       "saturation": 0.75,
-      "lumaBand": [0.38, 0.62],
+      "lumaBand": [0.52, 0.74],
       "emission": { "hue": 302, "saturation": 0.6 },
       "dichroicHue": 190,
       "variants": 4
@@ -130,7 +130,7 @@
       "shaderSilhouette": "flecks",
       "hueBand": [318, 332],
       "saturation": 0.65,
-      "lumaBand": [0.38, 0.62],
+      "lumaBand": [0.52, 0.74],
       "emission": { "hue": 325, "saturation": 0.5 },
       "variants": 4
     },
@@ -142,7 +142,7 @@
       "shaderSilhouette": "flecks",
       "hueBand": [345, 358],
       "saturation": 0.6,
-      "lumaBand": [0.14, 0.32],
+      "lumaBand": [0.3, 0.55],
       "emission": { "hue": 50, "saturation": 0.3 },
       "variants": 4
     }

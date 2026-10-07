@@ -196,9 +196,10 @@ def cryo_mark(name, x, z, size, angle, relief, grade, rng):
 def energy_mark(name, x, z, size, angle, relief, grade, rng):
     """A lightning fork: a sawtooth trunk with two shorter sawtooth branches, thin at G1 and raised from G3."""
     y = mark_depth(relief, size * 0.4)
-    length = size * 2.6
-    trunk = zigzag((x, y, z), angle, length, 5, size * 0.42, rng)
-    radius = size * (0.045 if grade <= 1 else 0.07)
+    length = size * 2.0
+    start = (x - math.cos(angle) * length / 2, y, z - math.sin(angle) * length / 2)
+    trunk = zigzag(start, angle, length, 5, size * 0.4, rng)
+    radius = size * (0.09 if grade <= 1 else 0.11)
     forks = [shapes.add_tube(name, trunk, radius, resolution=1)]
     for j, branch_angle in enumerate((angle + 0.75, angle - 0.75)):
         root = trunk[1 + j]
@@ -253,8 +254,9 @@ def organic_mark(name, x, z, size, angle, relief, grade, rng):
             t = i / 5
             wobble = math.sin(t * 7 + j) * size * 0.15
             lift = -size * 0.5 * t if relief in ('stand', 'hover') else 0.0
-            points.append((x + math.cos(theta) * length * t - math.sin(theta) * wobble, y + lift,
-                           z + math.sin(theta) * length * t + math.cos(theta) * wobble))
+            along = length * (t - 0.5) if j == 0 else length * t
+            points.append((x + math.cos(theta) * along - math.sin(theta) * wobble, y + lift,
+                           z + math.sin(theta) * along + math.cos(theta) * wobble))
         tendrils.append(shapes.add_tube('%s-%d' % (name, j), points, radius * (1.0 if j == 0 else 0.7)))
     return tendrils
 
