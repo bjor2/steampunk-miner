@@ -1,6 +1,6 @@
 /**
  * A plaque's Buy, held to chain (#180 section 2): a press buys one at once and holds on the curve,
- * letting go or sliding off ends the hold after the step in flight. A long-press on touch is the
+ * letting go or sliding off the plaque ends the hold after the step in flight. A long-press on touch is the
  * same press; a ring fills over the wind-up while the hold runs, so the repeat is seen coming. The
  * id, `data-reason` and `data-state` are the kernel row's (#33), and a keyboard or controller
  * confirm still buys one through the store's `pressScreenButton`, as on every bay button.
@@ -35,8 +35,8 @@ export function HoldBuyButton({
       data-holding={isHolding || undefined}
       disabled={button.reason !== null}
       onPointerDown={(event) => pressToBuy(event, upgradeId)}
+      onPointerMove={(event) => leaveWhenOffPlaque(event, upgradeId)}
       onPointerUp={() => useWorkshopStore.getState().releaseHold()}
-      onPointerLeave={() => useWorkshopStore.getState().leaveTrack(upgradeId)}
       onPointerCancel={() => useWorkshopStore.getState().leaveTrack(upgradeId)}
       onContextMenu={(event) => event.preventDefault()}
       onFocus={() => focusPlaque(button.id, upgradeId)}
@@ -48,14 +48,28 @@ export function HoldBuyButton({
 }
 
 /**
- * The left button or a finger only. The press keeps the game's focus (no browser focus moves),
- * and a finger's implicit capture is let go so sliding off the plaque ends the hold.
+ * The left button or a finger only. The press keeps the game's focus (no browser focus moves) and
+ * captures the pointer, so a plaque that grows or shrinks under a still pointer as its line
+ * changes never ends the hold; only the pointer itself leaving the plaque does.
  */
 function pressToBuy(event: PointerEvent<HTMLButtonElement>, upgradeId: UpgradeId): void {
   if (event.button !== 0) return
   event.preventDefault()
-  event.currentTarget.releasePointerCapture(event.pointerId)
+  event.currentTarget.setPointerCapture(event.pointerId)
   useWorkshopStore.getState().pressTrack(upgradeId, readAuthorityTick())
+}
+
+/** "Focus leaving the plaque stops after the current step" (#180 section 2). */
+function leaveWhenOffPlaque(event: PointerEvent<HTMLButtonElement>, upgradeId: UpgradeId): void {
+  const plaque = event.currentTarget.closest('[data-plaque]') ?? event.currentTarget
+  if (!isPointerOver(plaque.getBoundingClientRect(), event)) {
+    useWorkshopStore.getState().leaveTrack(upgradeId)
+  }
+}
+
+function isPointerOver(box: DOMRect, event: PointerEvent): boolean {
+  const isWithinWidth = event.clientX >= box.left && event.clientX <= box.right
+  return isWithinWidth && event.clientY >= box.top && event.clientY <= box.bottom
 }
 
 function focusPlaque(buttonId: string, upgradeId: UpgradeId): void {
