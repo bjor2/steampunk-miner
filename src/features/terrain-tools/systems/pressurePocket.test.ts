@@ -28,7 +28,7 @@ function blowAt(depth: number, facing = FACING.right) {
 describe('pressure pocket lance', () => {
   it('opens a pocket ahead of the miner and spends a charge', () => {
     const { session, edited } = blowAt(9)
-    expect(edited).toMatchObject({ itemId: PRESSURE_POCKET_ID, mark: 1 })
+    expect(edited).toMatchObject({ itemId: PRESSURE_POCKET_ID, mark: 0 })
     expect(edited.cellsChanged).toBeGreaterThan(4)
     expect(chargesLeftOf(session.state(), 'p1', PRESSURE_POCKET_ID)).toBe(1)
   })

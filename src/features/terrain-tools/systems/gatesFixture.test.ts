@@ -126,7 +126,15 @@ function activate(itemId: string, state: AuthorityState, tile: TilePoint) {
   const powerUp = TERRAIN_POWER_UPS.find((candidate) => candidate.itemId === itemId)
   if (powerUp === undefined) throw new Error(`${itemId} is not shipped`)
   const origin = { tx: tile.tx - STAND_OFFSET[itemId], ty: tile.ty }
-  return powerUp.activate(state, { playerId: 'p1', itemId, slot: 'powerup.1', tick: 20, origin })
+  return powerUp.activate(state, {
+    playerId: 'p1',
+    itemId,
+    slot: 'powerup.1',
+    tick: 20,
+    origin,
+    mark: 0,
+    magnitude: null,
+  })
 }
 
 /** An ore cell a few tiles down with plain ground on the three tiles to its left. */

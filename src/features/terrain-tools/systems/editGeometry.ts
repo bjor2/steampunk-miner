@@ -82,10 +82,20 @@ export function tilesFarthestFirst(centre: TilePoint, radius: number, seed: numb
 
 /** One grid step from `tile` toward `target`, along the longer leg; a seeded pick on a diagonal. */
 export function stepToward(tile: TilePoint, target: TilePoint, seed: number): TilePoint {
+  return stepsToward(tile, target, seed)[0]
+}
+
+/**
+ * The grid steps from `tile` that bring it closer to `target`: the one along the longer leg (a
+ * seeded pick on a diagonal) first, then the other leg's, if it has one.
+ */
+export function stepsToward(tile: TilePoint, target: TilePoint, seed: number): TilePoint[] {
   const dx = target.tx - tile.tx
   const dy = target.ty - tile.ty
-  if (isAlongX(dx, dy, seed, tile)) return { tx: tile.tx + Math.sign(dx), ty: tile.ty }
-  return { tx: tile.tx, ty: tile.ty + Math.sign(dy) }
+  const alongX = { tx: tile.tx + Math.sign(dx), ty: tile.ty }
+  const alongY = { tx: tile.tx, ty: tile.ty + Math.sign(dy) }
+  const legs = isAlongX(dx, dy, seed, tile) ? [alongX, alongY] : [alongY, alongX]
+  return dx === 0 || dy === 0 ? legs.slice(0, 1) : legs
 }
 
 /** One grid step from `tile` away from `centre`, along the longer leg; seeded on a diagonal. */

@@ -19,7 +19,7 @@ import { canAfford, draftMove, MOVE_UNITS, openDraft, type EditDraft } from './e
 import { distanceSqOf, tilesFarthestFirst, tilesNearestFirst } from './editGeometry'
 import { editSeedOf } from './editSeed'
 import { canHoldOre, isLooseOre, materialNow, openGroundView, type GroundView } from './groundView'
-import { magnitudeAt, MARK_IN_PLAY, terrainItemNamed } from './itemMagnitude'
+import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
 import { balanceOf } from './terrainItems'
 import { beaconPlantedOf, TERRAIN_REFUSAL } from './terrainEvents'
 import { editSourceOf, queueEditOf } from './terrainOutcome'
@@ -43,7 +43,7 @@ export function plantLodestone(state: AuthorityState, use: PowerUpUse): PowerUpO
   if (planetIndex === null) return { kind: 'refused', reason: TERRAIN_REFUSAL.outOfPlay }
   if (isBeaconLiveOn(state, use.playerId, planetIndex))
     return { kind: 'refused', reason: TERRAIN_REFUSAL.beaconLive }
-  const beacon = { ...use.origin, planetIndex, plantedTick: use.tick, mark: MARK_IN_PLAY }
+  const beacon = { ...use.origin, planetIndex, plantedTick: use.tick, mark: use.mark }
   return {
     kind: 'acted',
     effect: {

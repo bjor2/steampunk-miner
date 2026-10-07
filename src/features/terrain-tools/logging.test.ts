@@ -44,6 +44,7 @@ function everyToolUsed(): DomainEvent[] {
   const first = sessionWith({ 'powerup.1': ORE_SHIFTER_ID, 'powerup.2': SEAM_SPLITTER_ID })
   standAt(first, 5, buriedTile(8), FACING.right)
   first.submit(10, press())
+  standAt(first, 25, buriedTile(15), FACING.right)
   first.submit(30, press('powerup.2'))
   first.advanceTo(50)
   const second = sessionWith({ 'powerup.1': PRESSURE_POCKET_ID, 'powerup.2': LODESTONE_BEACON_ID })
@@ -67,7 +68,7 @@ describe('terrain-tools logging', () => {
     ])
     for (const { data } of edits) {
       expect(data).toMatchObject({
-        mark: 1,
+        mark: 0,
         origin: expect.any(Object),
         editHash: expect.any(String),
       })

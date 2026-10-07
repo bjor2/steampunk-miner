@@ -1,15 +1,15 @@
 /**
  * Each shipped terrain tool as `power-up-core` runs it (#162 section 2.1 classes, 4.2 and 4.3
  * numbers): the charged shifter and pocket lance refill at the dock, the splitter and lodestone come
- * as a stack. When the wind-up ends the tool plans its whole edit on the state the act sees, and the
- * edit joins the K6 queue on that tick (`terrainOutcome.ts`).
+ * as a stack. When the wind-up ends the tool plans its whole edit on the state the act sees, at the
+ * Mark the player researched (#249), and the edit joins the K6 queue on that tick
+ * (`terrainOutcome.ts`).
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import type { PowerUp, PowerUpOutcome, PowerUpUse } from '../../power-up-core'
 import type { EditKey } from './editSeed'
 import { openGroundView, type GroundView } from './groundView'
-import { MARK_IN_PLAY } from './itemMagnitude'
 import { LODESTONE_BEACON_ID, plantLodestone } from './lodestoneBeacon'
 import { ORE_SHIFTER_ID, planOreDrag } from './oreShifter'
 import { planPressurePocket, PRESSURE_POCKET_ID } from './pressurePocket'
@@ -57,7 +57,7 @@ function editWith(plan: Planner): Activate {
     const pose = vehicleOf(state, use.playerId).pose
     if (view === null || pose === null)
       return { kind: 'refused', reason: TERRAIN_REFUSAL.outOfPlay }
-    const key = { origin: use.origin, tick: use.tick, itemId: use.itemId, mark: MARK_IN_PLAY }
+    const key = { origin: use.origin, tick: use.tick, itemId: use.itemId, mark: use.mark }
     const author = {
       playerId: use.playerId,
       itemId: use.itemId,

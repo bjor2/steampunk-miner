@@ -32,7 +32,7 @@ describe('ore-shifter', () => {
   it('queues one terrain edit of swaps and spends a charge', () => {
     const { session } = shiftAt(8)
     const [edited] = ofType(session.events(), 'terrain-tools.TerrainEdited')
-    expect(edited).toMatchObject({ playerId: 'p1', itemId: ORE_SHIFTER_ID, mark: 1 })
+    expect(edited).toMatchObject({ playerId: 'p1', itemId: ORE_SHIFTER_ID, mark: 0 })
     if (edited?.type !== 'terrain-tools.TerrainEdited') throw new Error('no edit')
     expect(edited.cellsChanged).toBeGreaterThan(0)
     expect(edited.cellsChanged % 2).toBe(0)

@@ -20,7 +20,7 @@ import {
   openDraft,
   type EditDraft,
 } from './editDraft'
-import { tilesNearestFirst, stepToward } from './editGeometry'
+import { stepsToward, tilesNearestFirst } from './editGeometry'
 import { editSeedOf, type EditKey } from './editSeed'
 import { canHoldOre, fixedBlockOf, isLooseOre, materialNow, type GroundView } from './groundView'
 import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
@@ -71,16 +71,23 @@ function dragOne(draft: EditDraft, pull: DragPull, tile: TilePoint): boolean {
   return true
 }
 
-/** The last tile of the nodule's path that can hold it, or null when it cannot take one step. */
+/**
+ * The last tile of the nodule's path that can hold it, or null when it cannot take one step. Each
+ * step goes along the longer leg toward the hull, or the other leg where that one is blocked.
+ */
 function restingTileOf(view: GroundView, from: TilePoint, pull: DragPull): TilePoint | null {
   const ore = materialNow(view, from)
   let at = from
-  let next = stepToward(at, pull.hull, pull.seed)
-  while (canHoldOre(view, next, ore)) {
+  let next = nextStepOf(view, at, pull, ore)
+  while (next !== null) {
     at = next
-    next = stepToward(at, pull.hull, pull.seed)
+    next = nextStepOf(view, at, pull, ore)
   }
   return at === from ? null : at
+}
+
+function nextStepOf(view: GroundView, at: TilePoint, pull: DragPull, ore: number) {
+  return stepsToward(at, pull.hull, pull.seed).find((step) => canHoldOre(view, step, ore)) ?? null
 }
 
 function planOfDrag(draft: EditDraft, firstBlock: GateBlock | null): TerrainPlan {
