@@ -54,7 +54,8 @@ import {
 } from './vehicleSnapshot'
 
 /**
- * 17: the vehicle's loadout as its `loadout` section v1 (K4, #162); 16: heat, lava and the lining types (#113, #96): the vehicle's lining and heat gauge, typed
+ * 18: the live blasts, each with its front cursor and running totals, and the queued power-up
+ * terrain edits (K6 #189); 17: the vehicle's loadout as its `loadout` section v1 (K4, #162); 16: heat, lava and the lining types (#113, #96): the vehicle's lining and heat gauge, typed
  * casing values, the lava layer of chunk deltas and the loose lava; 15: each vehicle's charge
  * rack, carried charges and planted charge (#109, #95);
  * 14: what the vehicle's Sell bay visit has paid of its lining bill (#128); 13: the vehicle's
@@ -66,7 +67,7 @@ import {
  * vehicle's casing grade (#41, #58); 5: combat joined the state (#25); 4 the planet's core
  * progress (#24); 3 the platform (#23).
  */
-export const SNAPSHOT_VERSION = 17
+export const SNAPSHOT_VERSION = 18
 
 export interface SessionSnapshot {
   snapshotVersion: number

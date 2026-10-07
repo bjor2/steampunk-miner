@@ -13,8 +13,10 @@ import type { RunEventData, RunEventName } from './eventNames'
 /**
  * Bump when a field is renamed, removed, retyped or changes meaning (#11 section 1).
  * 2: `casing_lined` lost `paid`, as lining is paid at the Sell bay (`lining_settled`, #115).
+ * 3: `charge_detonated` keeps only `tx, ty`: a blast's totals moved to its `blast_resolved` line,
+ *    and its tiles log no `tile_destroyed` lines (K6, #189).
  */
-export const LOG_SCHEMA_VERSION = 2
+export const LOG_SCHEMA_VERSION = 3
 
 /** Where the player is: the store supplies it, the log stamps it. */
 export interface RunEventPlace {

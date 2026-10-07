@@ -1,6 +1,6 @@
 {
   "runId": "run_2026-10-05_12-00-00",
-  "logSchemaVersion": 2,
+  "logSchemaVersion": 3,
   "buildCommit": "bbbbbbb",
   "worldSeed": 83921,
   "platform": "browser",

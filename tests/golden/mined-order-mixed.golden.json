@@ -2,8 +2,8 @@
   "name": "mined-order-mixed",
   "description": "Planet 1, level 0: drill metal, crystal, crystal, metal, crystal, metal surface ore; the replay must mine the same ores in the same order (#122).",
   "generatorVersion": 5,
-  "authorityProtocolVersion": 17,
-  "logSchemaVersion": 2,
+  "authorityProtocolVersion": 18,
+  "logSchemaVersion": 3,
   "numberFormatVersion": 1,
   "worldSeed": 83921,
   "endTick": 307,
@@ -205,7 +205,7 @@
     {
       "tick": 307,
       "scope": "end",
-      "digest": "9cac142c91132909"
+      "digest": "b2bc419d8790fc30"
     }
   ],
   "minedOrder": [

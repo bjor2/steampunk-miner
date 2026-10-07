@@ -215,7 +215,9 @@ describe('debug api: input acts like play (#33 acceptance 3 and 11)', () => {
     // and `lava_blocked`; #124 `benchmark_result` (bench scripts only); #121 `memory_sample`; K4
     // `equip_item` and `equip_refused`; K2 #185 `gate_hit`; K6
     // `blast_resolved`; the controls and the HUD still add none.
-    expect(ALL_RUN_EVENT_NAMES).toHaveLength(62 + 4 + 3 + 1 + 3 + 4 + 4 + 1 + 4 + 7 + 1 + 1 + 2 + 1 + 1)
+    expect(ALL_RUN_EVENT_NAMES).toHaveLength(
+      62 + 4 + 3 + 1 + 3 + 4 + 4 + 1 + 4 + 7 + 1 + 1 + 2 + 1 + 1,
+    )
   })
 })
 

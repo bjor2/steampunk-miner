@@ -71,7 +71,7 @@ describe('state digest', () => {
 
   it('keeps the digest of a fresh authority state, as the golden runs do', () => {
     const state = createAuthorityState({ planetIndex: 1, planetSeed: 7, playerIds: ['p1'] })
-    expect(stateDigest(state)).toBe('1e1e7472b44b3a8f')
+    expect(stateDigest(state)).toBe('abb1930fbeb74036')
   })
 
   it('changes when any value changes', () => {
