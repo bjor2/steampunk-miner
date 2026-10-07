@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "ticket": 209,
+  "title": "Kernel: open discovery kinds",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-06T20:57:08Z",
+  "closed": "2026-10-07T02:49:11Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-06T20:57:08.000Z","end":"2026-10-07T02:08:06.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-07T02:08:06.000Z","end":"2026-10-07T02:08:38.513Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-07T02:08:38.513Z","end":"2026-10-07T02:09:39.816Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-07T02:09:39.816Z","end":"2026-10-07T02:09:56.881Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T02:09:56.881Z","end":"2026-10-07T02:10:55.033Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-07T02:10:55.033Z","end":"2026-10-07T02:10:58.942Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-07T02:10:58.942Z","end":"2026-10-07T02:11:17.785Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T02:11:17.785Z","end":"2026-10-07T02:12:45.566Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-07T02:12:45.566Z","end":"2026-10-07T02:12:49.547Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T02:12:49.547Z","end":"2026-10-07T02:26:13.862Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-07T02:26:13.862Z","end":"2026-10-07T02:26:20.036Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T02:26:20.036Z","end":"2026-10-07T02:32:43.817Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-07T02:32:43.817Z","end":"2026-10-07T02:32:58.853Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-07T02:32:58.853Z","end":"2026-10-07T02:33:06.158Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-07T02:33:06.158Z","end":"2026-10-07T02:49:02.104Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-07T02:49:02.104Z","end":"2026-10-07T02:49:11.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":0,"planner_wait":0,"idle":18658,"context":69,"planning":7,"developing":42,"testing":1334,"gates":956,"landing":24,"other":33},
+  "lead_time_s": 21123,
+  "cycle_time_s": 2465,
+  "claimed": "2026-10-07T02:08:06.000Z",
+  "claimed_to_done_s": 2465,
+  "backfilled": false
+}
