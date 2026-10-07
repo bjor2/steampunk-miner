@@ -144,6 +144,31 @@ describe('slice registrar', () => {
     )
   })
 
+  it('refuses a second item describer from another slice', () => {
+    const describer = (id: string) => ({ id, describe: () => null })
+    const first = sliceOf('descriptions', (r) => r.itemDescriber(describer('descriptions.card')))
+    const second = sliceOf('codex', (r) => r.itemDescriber(describer('codex.card')))
+    expect(() => withRegistrations([first, second], () => undefined)).toThrow(
+      /"itemDescriber" takes one provider/,
+    )
+  })
+
+  it('refuses two slices whose item description entries match the same ref', () => {
+    const entry = (id: string) => ({
+      id,
+      matches: { kind: 'track' as const, id: 'drill_power' },
+      flavour: 'A brass bit.',
+      statLines: [],
+    })
+    const first = sliceOf('descriptions', (r) =>
+      r.itemDescriptionEntries([entry('descriptions.drill')]),
+    )
+    const second = sliceOf('tech-tree', (r) => r.itemDescriptionEntries([entry('tech-tree.drill')]))
+    expect(() => withRegistrations([first, second], () => undefined)).toThrow(
+      /"descriptions.drill" \(slice "descriptions"\) and "tech-tree.drill" \(slice "tech-tree"\)/,
+    )
+  })
+
   it('refuses a registration after the seal', () => {
     const late = registrarFor('mining-gates')
     expect(() =>

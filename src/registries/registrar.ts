@@ -31,6 +31,8 @@ import {
 } from '../systems/registries/discovery'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
+import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
+import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
 import { ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
@@ -66,6 +68,9 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     discoveryKind: (kind, ...codec) =>
       addDiscoveryKind(sliceId, discoveryKindRegistrationOf(kind, ...codec)),
     discoveryAliases: (table) => add(DISCOVERY_ALIAS_REGISTRY, table),
+    itemDescriber: (provider) => add(ITEM_DESCRIBER_REGISTRY, provider),
+    itemDescriptionEntries: (entries) =>
+      entries.forEach((entry) => add(ITEM_DESCRIPTION_ENTRY_REGISTRY, entry)),
     loadoutAcceptance: (rule) => add(LOADOUT_ACCEPTANCE_REGISTRY, rule),
     attachUse: (use) => add(ATTACH_USE_REGISTRY, use),
     buildingAttachUse: (use) => add(BUILDING_ATTACH_USE_REGISTRY, use),

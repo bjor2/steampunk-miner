@@ -16,14 +16,21 @@ export interface Registry<T extends RegistryEntry> {
   readonly name: string
   /** `oreTypes`, `oreLook` and `discovery` take one provider; the seal refuses a second. */
   readonly providerLimit: number | null
+  /**
+   * A problem across all of the registry's entries that the seal refuses, such as two item
+   * description entries matching one ref; null when there is none.
+   */
+  sealProblemOf?(registrations: readonly SealedRegistration<T>[]): string | null
   /** Never set: it carries the entry type, so a read returns what was registered. */
   readonly entryType?: T
 }
 
-interface Registration {
+export interface SealedRegistration<T extends RegistryEntry> {
   readonly sliceId: string
-  readonly entry: RegistryEntry
+  readonly entry: T
 }
+
+type Registration = SealedRegistration<RegistryEntry>
 
 interface Shelf {
   readonly registrations: Registration[]
@@ -83,8 +90,11 @@ export function withFreshRegistrySet<T>(fill: () => void, run: () => T): T {
   }
 }
 
-export function defineRegistry<T extends RegistryEntry>(name: string): Registry<T> {
-  return { name, providerLimit: null }
+export function defineRegistry<T extends RegistryEntry>(
+  name: string,
+  sealProblemOf?: (registrations: readonly SealedRegistration<T>[]) => string | null,
+): Registry<T> {
+  return { name, providerLimit: null, sealProblemOf }
 }
 
 export function defineOneProviderRegistry<T extends RegistryEntry>(name: string): Registry<T> {
@@ -107,9 +117,10 @@ export function entriesOf<T extends RegistryEntry>(registry: Registry<T>): reado
   return (current.shelves.get(registry)?.sorted ?? NO_ENTRIES) as readonly T[]
 }
 
-/** Checks every provider limit, then freezes each registry sorted by id. */
+/** Checks every provider limit and seal problem, then freezes each registry sorted by id. */
 export function sealRegistrySet(): void {
   current.shelves.forEach(refuseProvidersOverLimit)
+  current.shelves.forEach(refuseSealProblem)
   current.shelves.forEach(sortShelf)
   current.isSealed = true
 }
@@ -157,6 +168,11 @@ function refuseProvidersOverLimit(shelf: Shelf, registry: Registry<RegistryEntry
   throw new RegistrationRefusedError(
     `"${registry.name}" takes one provider, but slices ${slices.join(' and ')} each registered one`,
   )
+}
+
+function refuseSealProblem(shelf: Shelf, registry: Registry<RegistryEntry>): void {
+  const problem = registry.sealProblemOf?.(shelf.registrations) ?? null
+  if (problem !== null) throw new RegistrationRefusedError(`"${registry.name}": ${problem}`)
 }
 
 function isOverProviderLimit(shelf: Shelf, registry: Registry<RegistryEntry>): boolean {

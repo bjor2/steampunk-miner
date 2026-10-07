@@ -20,6 +20,8 @@ import type {
 } from '../systems/registries/discovery'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
+import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
+import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
 import type { OreTypeProvider } from '../systems/registries/oreTypes'
 import type { SaveSection } from '../systems/registries/saveSections'
@@ -56,6 +58,10 @@ export interface SliceRegistrar {
   discoveryKind<K extends DiscoveryKind>(kind: K, ...codec: DiscoveryCodecArgument<K>): void
   /** Keys the codex canonicalises through, on load and on every write. */
   discoveryAliases(table: DiscoveryAliasTable): void
+  /** One provider across all slices: the `descriptions` slice, the item card's one voice. */
+  itemDescriber(provider: ItemDescriberProvider): void
+  /** Card lines for the slice's own items; two entries matching one ref are refused at the seal. */
+  itemDescriptionEntries(entries: readonly ItemDescriptionEntry[]): void
   loadoutAcceptance(rule: LoadoutAcceptance): void
   attachUse(use: AttachUse): void
   /** A use of a shop building's attach point (#170 `building-attach`): render-only. */
