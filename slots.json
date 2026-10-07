@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T23:36:10+02:00",
+  "updated_at": "2026-10-07T23:39:08+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -19,11 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 274,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-07T23:21:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -51,8 +51,8 @@
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
+      "used": 2,
+      "free": 2,
       "claims_last_hour": 8,
       "name": "Claude Max 1"
     },
@@ -104,7 +104,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -174,10 +174,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 274,
-      "since": "2026-10-07T23:21:00+02:00",
-      "claude_slot": 1
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -253,10 +252,10 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 274,
-      "grok_slot": 1,
-      "since": "2026-10-07T23:21:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -317,17 +316,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 23:30 CEST",
+    "at": "2026-10-07 23:39 CEST",
     "mode": "refill-dev",
-    "triggers": "claude-run:tester-triage",
-    "started": "#238->C2/A1 #248->C6/A2 #279->C3/A1",
-    "note": "spawned 3 worker(s)"
+    "triggers": "#274",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 5,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -335,8 +334,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 5,
-      "free": 3,
+      "used": 4,
+      "free": 4,
       "external": 0
     }
   }
