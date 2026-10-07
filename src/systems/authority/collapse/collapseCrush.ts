@@ -6,6 +6,7 @@
  * (`rescue_triggered.cause` stays `destroyed`). Only an active or stranded vehicle can be crushed.
  */
 import { collapseCrushDamage } from '../../economy/collapseCrush'
+import { interceptedHullDamage } from '../../registries/hullDamageIntercepts'
 import { statsOfVehicle, type VehicleState } from '../../vehicle/vehicleState'
 import { vehicleOf, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
@@ -25,12 +26,20 @@ export function crushVehicle(
 ): RuleEffect {
   if (!isCrushable(vehicleOf(state, playerId))) return unchanged(state)
   return chainEffects(state, [
-    (current) => takeCrush(current, playerId, band),
+    (current) => takeCrush(current, playerId, band, tick),
     (current) => destroyIfHullGone(current, playerId, tick, 'collapse'),
   ])
 }
 
-function takeCrush(state: AuthorityState, playerId: string, band: number): RuleEffect {
+/** The crush after any shield a slice raised (ticket 233), never below half of it. */
+function takeCrush(
+  state: AuthorityState,
+  playerId: string,
+  band: number,
+  tick: number,
+): RuleEffect {
   const hullMax = statsOfVehicle(vehicleOf(state, playerId)).hullMax
-  return damageHullBy(state, playerId, collapseCrushDamage(band, hullMax), 'collapse')
+  const crush = collapseCrushDamage(band, hullMax)
+  const amount = interceptedHullDamage(state, playerId, 'collapse', tick, crush)
+  return damageHullBy(state, playerId, amount, 'collapse')
 }

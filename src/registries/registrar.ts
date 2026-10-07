@@ -44,6 +44,7 @@ import { DOCK_SERVICE_REGISTRY } from '../systems/registries/dockServices'
 import { INPUT_REACTION_REGISTRY } from '../systems/registries/inputReactions'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
+import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
@@ -85,6 +86,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),
     dockService: (service) => add(DOCK_SERVICE_REGISTRY, service),
     dockFacility: (facility) => add(DOCK_FACILITY_REGISTRY, facility),
+    hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),
     inputReaction: (reaction) => add(INPUT_REACTION_REGISTRY, reaction),
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),

@@ -15,6 +15,7 @@ import { COMBAT_EXTRAPOLATION_TICKS } from '../../../constants/balance'
 import { ECONOMY } from '../../economy/economy'
 import { enemyHitOnVehicle } from '../../economy/enemyStats'
 import { cmp, sub, toCanonical, ZERO_MONEY, type BigStat } from '../../money'
+import { interceptedHullDamage } from '../../registries/hullDamageIntercepts'
 import { vehicleOf, withCombat, withVehicle, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
 import { destroyIfHullGone } from '../vehicleTransitions'
@@ -51,7 +52,7 @@ export function strikeVehicle(
 ): RuleEffect {
   if (isInHitGrace(combatVehicleOf(state.combat, enemy.ownerId), tick)) return unchanged(state)
   return chainEffects(state, [
-    (current) => takeHit(current, enemy, enemyHitOnVehicle(enemy.kind, enemy.tier, arc), arc, tick),
+    (current) => takeHit(current, enemy, hitAmountOf(current, enemy, arc, tick), arc, tick),
     (current) =>
       destroyIfHullGone(current, enemy.ownerId, tick, 'enemy', {
         kind: enemy.kind,
@@ -59,6 +60,12 @@ export function strikeVehicle(
         arc,
       }),
   ])
+}
+
+/** The enemy's hit for the arc, after any shield a slice raised (ticket 233). */
+function hitAmountOf(state: AuthorityState, enemy: Enemy, arc: HitArc, tick: number): BigStat {
+  const base = enemyHitOnVehicle(enemy.kind, enemy.tier, arc)
+  return interceptedHullDamage(state, enemy.ownerId, 'drill-contact enemy', tick, base)
 }
 
 function wasFrontAtRecentReport(vehicle: CombatVehicle, enemy: Enemy, tick: number): boolean {

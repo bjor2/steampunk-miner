@@ -27,6 +27,7 @@ import type { DockService } from '../systems/registries/dockServices'
 import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
+import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
@@ -67,6 +68,11 @@ export interface SliceRegistrar {
   clockStep(step: ClockStep): void
   /** A free refill at the end of every paid recharge; the bill never changes (#217). */
   dockService(service: DockService): void
+  /**
+   * Scales an enemy's hit or a collapse's crush on the vehicle; all of them multiplied never take
+   * it below half (ticket 233).
+   */
+  hullDamageIntercept(intercept: HullDamageIntercept): void
   /** A dock building that opens its `facility` schedule row from that row's planet on (#221). */
   dockFacility(facility: DockFacility): void
   /** Answers a pressed action the kernel's routing table leaves open, such as `use_slot_1`. */
