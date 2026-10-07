@@ -1017,9 +1017,9 @@
         },
         {
           "title": "Powerups",
-          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots, charges, the mobility and sensing lanes, the terrain tools and buying researched one-offs and cradles at the Upgrade bay are built; the other lanes and buying consumables by the unit come with their tickets.",
+          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5, researched on the mobility, terrain and sensing lanes at P10, P20 and P30. The slots, charges, the mobility and sensing lanes, the terrain tools and buying researched one-offs and cradles at the Upgrade bay are built; the other lanes and buying consumables by the unit come with their tickets.",
           "status": "partial",
-          "issues": [47, 162, 200, 248],
+          "issues": [47, 162, 200, 248, 251],
           "children": [
             {
               "title": "Mobility and survival power-ups",
@@ -1047,7 +1047,7 @@
             },
             {
               "title": "Terrain tools",
-              "description": "Magnetic ore-shifter (drags a few loose ore nodules toward the miner), seam splitter (opens a fissure of plain ground along the rock's grain), pressure pocket lance (blows a small pocket ahead and pushes its ore aside) and lodestone beacon (plant it, dock, and nearby ore has gathered into a vein beside it), each with its tech node, Marks and item card; gated, core and lined cells and cells next to any miner never change. Stabiliser foam, the cryo binder, shoring props and the strata press wait for the collapse, fluid-ground and cavern mechanics they act on. Buying them in the store, the beacon's map pin and dock line, and their effects on the rig come later.",
+              "description": "Magnetic ore-shifter (drags a few loose ore nodules toward the miner), seam splitter (opens a fissure of plain ground along the rock's grain), pressure pocket lance (blows a small pocket ahead and pushes its ore aside) and lodestone beacon (plant it, dock, and nearby ore has gathered into a vein beside it), each with its tech node, Marks and item card; gated, core and lined cells and cells next to any miner never change. Stabiliser foam, the cryo binder, shoring props and the strata press wait for the collapse, fluid-ground and cavern mechanics they act on. The ore-shifter and the pocket lance are bought at the Upgrade bay once researched; the splitter and the beacon wait for buying consumables by the unit. The beacon's map pin and dock line, and their effects on the rig, come later.",
               "status": "partial",
               "issues": [202, 162, 166]
             }

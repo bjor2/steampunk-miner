@@ -50,10 +50,13 @@ const cardOf = (itemId: string, level: number, planetIndex: number) =>
   describeItem({ kind: 'vehicle-item', id: itemId }, { playerId: 'p1', planetIndex, level, view })
 
 describe('sensing shipped rows', () => {
-  it('registers six items as vehicle items and power-ups, each with its tree node', () => {
+  it('registers six items as vehicle items and power-ups, each with its node, and the fifth cradle', () => {
     expect(SHIPPED_IDS.filter((id) => !isVehicleItemId(id))).toEqual([])
     expect(SHIPPED_IDS.filter((id) => powerUpOfItem(id) === null)).toEqual([])
-    expect(laneNodeIds()).toEqual(SHIPPED.map((item) => item.node.id).sort())
+    const cradleNode = 'tech.sensing.cradle_5'
+    expect(laneNodeIds().sort()).toEqual(
+      [...SHIPPED.map((item) => item.node.id), cradleNode].sort(),
+    )
   })
 
   it('holds the galvanic probe and the void sounder: no item, power-up, node or card', () => {
@@ -78,8 +81,10 @@ describe('sensing shipped rows', () => {
     expect(SHIPPED.filter((item) => item.description.length > 80)).toEqual([])
   })
 
-  it('labels every row horizontal, item and node alike', () => {
-    const nodes = contentOf('tech-node').filter((node) => node.lane === 'sensing')
+  it('labels every row horizontal, item and node alike; the cradle is both (#162 "Labels")', () => {
+    const nodes = contentOf('tech-node').filter(
+      (node) => node.lane === 'sensing' && node.costKind !== 'slot',
+    )
     expect(SHIPPED.map((item) => item.label).every((label) => label === 'horizontal')).toBe(true)
     expect(nodes.every((node) => node.label === 'horizontal')).toBe(true)
   })

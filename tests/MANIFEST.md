@@ -225,13 +225,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
-### `power-up-core`: 16 files, 106 tests
+### `power-up-core`: 17 files, 111 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/power-up-core/logging.test.ts` | 5 | 5 |
 | `src/features/power-up-core/markReportRows.test.ts` | 6 | 6 |
 | `src/features/power-up-core/systems/chargeState.test.ts` | 5 | 5 |
+| `src/features/power-up-core/systems/cradleNodes.test.ts` | 5 | 3 |
 | `src/features/power-up-core/systems/cradleSales.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/cradles.test.ts` | 5 | 5 |
 | `src/features/power-up-core/systems/dockRefill.test.ts` | 4 | 4 |

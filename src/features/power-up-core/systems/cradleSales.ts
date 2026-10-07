@@ -2,7 +2,7 @@
  * What the Upgrade bay sells of the cradles (ticket 248, kernel `vehicleItemSellers`): each at 20
  * band-5 ore units at its unlock planet through `bandOrePriceAt` (#162 4.1, the Systems note on
  * #200), the planet of the tree node that unlocks it. A cradle no registered node unlocks is not
- * on sale, so `slot.powerup_4` and `_5` wait for their nodes.
+ * on sale.
  *
  * Its card (#159, the K7 `itemDescriptionEntries` seam) says the slot it opens and its price.
  */

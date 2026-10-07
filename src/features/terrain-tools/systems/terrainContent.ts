@@ -1,9 +1,10 @@
 /**
  * The shipped terrain tools as the kernel and `tech-tree` take them: one `vehicle-item` per tool
- * (slot acceptance and one attach point, #162 acceptance 1) and one `tech.terrain.*` node each, and
- * their item cards (#159, the K7 `itemDescriptionEntries` seam): the #162 flavour line, one line
- * per `statPreview` line read at the Mark the card's level names, and the price last. A card at
- * level 0 reads Mark 1, the item as bought; its next value is the next Mark until it is Mastered.
+ * (slot acceptance and one attach point, #162 acceptance 1), one `tech.terrain.*` node each plus
+ * the fourth cradle's (ticket 251), and their item cards (#159, the K7 `itemDescriptionEntries`
+ * seam): the #162 flavour line, one line per `statPreview` line read at the Mark the card's level
+ * names, and the price last. A card at level 0 reads Mark 1, the item as bought; its next value is
+ * the next Mark until it is Mastered.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
@@ -13,6 +14,7 @@ import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { isMasteredAt, type TechNode } from '../../tech-tree'
 import { SHIPPED_TERRAIN_ITEMS } from './shippedTools'
+import { FOURTH_CRADLE_NODE } from './terrainCradle'
 import { statPreview, type TerrainStatLine, type TerrainStatUnit } from './statPreview'
 import {
   isConsumable,
@@ -41,7 +43,11 @@ const UNIT_SUFFIX: Readonly<Record<TerrainStatUnit, string>> = {
 export const TERRAIN_VEHICLE_ITEMS: readonly VehicleItem[] =
   SHIPPED_TERRAIN_ITEMS.map(vehicleItemOf)
 
-export const TERRAIN_TECH_NODES: readonly TechNode[] = SHIPPED_TERRAIN_ITEMS.map(techNodeOf)
+/** The tools' nodes and the fourth cradle's (ticket 251). */
+export const TERRAIN_TECH_NODES: readonly TechNode[] = [
+  ...SHIPPED_TERRAIN_ITEMS.map(techNodeOf),
+  FOURTH_CRADLE_NODE,
+]
 
 export const TERRAIN_ITEM_CARDS: readonly ItemDescriptionEntry[] = SHIPPED_TERRAIN_ITEMS.map(cardOf)
 

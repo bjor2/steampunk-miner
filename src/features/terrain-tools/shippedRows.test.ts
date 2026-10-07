@@ -59,7 +59,7 @@ function describedAt(itemId: string, mark: number, planetIndex: number) {
 }
 
 describe('terrain-tools shipped rows', () => {
-  it('registers four tools as vehicle items and power-ups, and their four terrain nodes', () => {
+  it('registers four tools as vehicle items and power-ups, their four nodes and the fourth cradle', () => {
     expect(SHIPPED_IDS).toEqual([
       'power.ore_shifter',
       'consumable.seam_splitter',
@@ -71,7 +71,9 @@ describe('terrain-tools shipped rows', () => {
     expect(SHIPPED_IDS.filter((id) => !vehicleItems.includes(id))).toEqual([])
     expect(SHIPPED_IDS.filter((id) => !powerUps.includes(id))).toEqual([])
     const lane = contentOf('tech-node').filter((node) => node.lane === 'terrain')
-    expect(lane.map((node) => node.unlocks).sort()).toEqual([...SHIPPED_IDS].sort())
+    expect(lane.map((node) => node.unlocks).sort()).toEqual(
+      [...SHIPPED_IDS, 'slot.powerup_4'].sort(),
+    )
   })
 
   it('takes each tool in the power-up slots, with exactly one attach point', () => {

@@ -8,6 +8,7 @@
 import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import type { TechNode } from '../../tech-tree'
 import { SENSING_ITEMS, type SensingItem } from './sensingCatalogue'
+import { FIFTH_CRADLE_NODE } from './sensingCradle'
 import { techNodeOf, vehicleItemOf } from './sensingItems'
 
 /** Held by the GD ruling on #203 Q3; no marker of theirs draws either (TD guard). */
@@ -21,7 +22,11 @@ export const SHIPPED_SENSING_ITEMS: readonly SensingItem[] = SENSING_ITEMS.filte
 export const SENSING_VEHICLE_ITEMS: readonly VehicleItem[] =
   SHIPPED_SENSING_ITEMS.map(vehicleItemOf)
 
-export const SENSING_TECH_NODES: readonly TechNode[] = SHIPPED_SENSING_ITEMS.map(techNodeOf)
+/** The items' nodes and the fifth cradle's (ticket 251). */
+export const SENSING_TECH_NODES: readonly TechNode[] = [
+  ...SHIPPED_SENSING_ITEMS.map(techNodeOf),
+  FIFTH_CRADLE_NODE,
+]
 
 function isShipped(item: SensingItem): boolean {
   return !HELD_SENSING_ITEM_IDS.includes(item.itemId)

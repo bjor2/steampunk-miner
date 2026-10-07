@@ -13,7 +13,8 @@ import { cradlePriceOf } from './cradleSales'
 
 // The cradles at the Upgrade bay (ticket 248, #162 4.1): 20 band-5 units at the planet of the node
 // that unlocks them, bought once researched, opening their slot; on the loaded slices, where the
-// mobility lane registers the third cradle's node at planet 10.
+// mobility lane registers the third cradle's node at planet 10 and the terrain lane the fourth's at
+// planet 20 (ticket 251).
 
 const THIRD = 'slot.powerup_3'
 const FOURTH = 'slot.powerup_4'
@@ -55,10 +56,11 @@ describe('power-up cradles on sale (ticket 248)', () => {
     expect(isSlotOpen(session.state().players.p1.vehicle.loadout, 'powerup.3')).toBe(true)
   })
 
-  it('keeps a cradle no registered node unlocks off sale, with no price', () => {
+  it('keeps the fourth cradle off sale until its P20 node is researched, priced at P20', () => {
     const session = dockedWithTreeThroughTen()
     const [refused] = session.submit(1, buyVehicleItemCommand(FOURTH))
     expect(refused).toMatchObject({ type: 'CommandRejected', reason: 'not_researched' })
-    expect(cradlePriceOf(FOURTH)).toBeNull()
+    const atPlanetTwenty = bandOrePriceAt(POWER_UP_CORE_ECONOMY.cradlePrice, 20, 20)
+    expect(cradlePriceOf(FOURTH)).toEqual(atPlanetTwenty)
   })
 })
