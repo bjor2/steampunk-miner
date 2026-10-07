@@ -1,0 +1,77 @@
+{
+  "gateClassByFamily": {
+    "metal": "drill",
+    "crystal": "resonance",
+    "fossil": "dynamite",
+    "relic": "induction",
+    "volcanic": "dynamite",
+    "radioactive": "containment",
+    "cryo": "etcher",
+    "organic": "containment",
+    "alien": "tether",
+    "energy": "containment",
+    "ancient": "etcher",
+    "exotic": "tether"
+  },
+  "acts": [
+    {
+      "id": "foothold.base",
+      "firstPlanet": 1,
+      "lastPlanet": 1,
+      "commons": null,
+      "rare": null,
+      "signature": null
+    },
+    {
+      "id": "foothold.heavy",
+      "firstPlanet": 2,
+      "lastPlanet": 7,
+      "commons": ["crystal", "metal"],
+      "rare": "fossil",
+      "signature": "relic"
+    },
+    {
+      "id": "fire",
+      "firstPlanet": 8,
+      "lastPlanet": 16,
+      "commons": ["volcanic", "metal"],
+      "rare": "crystal",
+      "signature": "radioactive"
+    },
+    {
+      "id": "frost",
+      "firstPlanet": 17,
+      "lastPlanet": 24,
+      "commons": ["cryo", "crystal"],
+      "rare": "organic",
+      "signature": "alien"
+    },
+    {
+      "id": "lodestone",
+      "firstPlanet": 25,
+      "lastPlanet": 32,
+      "commons": ["metal", "energy"],
+      "rare": "relic",
+      "signature": "ancient"
+    },
+    {
+      "id": "hollow",
+      "firstPlanet": 33,
+      "lastPlanet": 40,
+      "commons": ["crystal", "radioactive"],
+      "rare": "alien",
+      "signature": "exotic"
+    }
+  ],
+  "endless": {
+    "fromPlanet": 41,
+    "cycle": ["fire", "frost", "lodestone", "hollow", "foothold.heavy"]
+  },
+  "mixFromPlanet": 3,
+  "swapFromPlanet": 4,
+  "swapChanceBp": 5000,
+  "accentExcludes": ["metal", "crystal"],
+  "accentSignatureWeight": 2,
+  "storyPlanets": [30, 40],
+  "lavaRadiusTiles": 6
+}
