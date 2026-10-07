@@ -96,8 +96,11 @@ import type { BayId } from '../world/dockBays'
  *    unlocked.
  * 38: the extraction slice (#201): the mineral drain acts, `extraction.DrainYielded` joins, and
  *    the `extraction` player section v1 keeps the income items' trip counter.
+ * 39: the kernel's `OreSampled {playerId, tx, ty, oreId, via}` (#243): the sampling corer's plug
+ *    replaces `drill-gear.OreSampled`, and the codex answers it with `codex.OreContacted` via the
+ *    tool.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 38
+export const AUTHORITY_PROTOCOL_VERSION = 39
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
