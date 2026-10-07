@@ -10,6 +10,7 @@ import {
   EVENT_PROJECTION_REGISTRY,
   eventProjectionRegistrationsOf,
 } from '../logging/registries/eventProjections'
+import { REPORT_ROW_REGISTRY } from '../logging/registries/reportRows'
 import { RUN_EVENT_REGISTRATIONS, runEventRegistrationsOf } from '../logging/registries/runEvents'
 import { artAssetIdProblems } from '../systems/art/artAssetRules'
 import { ART_ASSET_REGISTRY, type ArtAsset } from '../systems/registries/artAssets'
@@ -114,6 +115,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
       ),
     runEvents: (events) =>
       runEventRegistrationsOf(events).forEach((event) => add(RUN_EVENT_REGISTRATIONS, event)),
+    reportRows: (source) => add(REPORT_ROW_REGISTRY, source),
   }
 }
 

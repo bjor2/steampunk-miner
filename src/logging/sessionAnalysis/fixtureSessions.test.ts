@@ -1,6 +1,9 @@
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { readSessionFolders } from '../../../scripts/perf/sessionFolders'
+import { withRegistrations } from '../../registries/registrar'
+import type { SliceDefinition } from '../../registries/sliceDefinition'
+import type { RunEvent } from '../runEvent'
 import { runEventProblems } from '../runEventSchema'
 import { analyzeSessions, formatAnalysisSummary } from './sessionAnalysis'
 import { renderSessionReportHtml } from './sessionReportHtml'
@@ -14,6 +17,23 @@ const FIXTURES = fileURLToPath(new URL('./fixtures/sessions', import.meta.url))
 
 function fixtureTable() {
   return sessionTableOf(readSessionFolders(FIXTURES))
+}
+
+/** A probe slice counting each planet's resource_collected lines (#223). */
+const unitsReport: SliceDefinition = {
+  id: 'probe',
+  register: (r) =>
+    r.reportRows({
+      id: 'probe.units',
+      rowsOf: (events, _worldSeed, planet) => [
+        { label: 'units collected', value: String(unitsCollectedOn(events, planet)) },
+      ],
+    }),
+}
+
+function unitsCollectedOn(events: readonly RunEvent[], planet: number): number {
+  return events.filter((event) => event.planet === planet && event.event === 'resource_collected')
+    .length
 }
 
 describe('session analysis on the fixture sessions', () => {
@@ -82,5 +102,19 @@ describe('session analysis on the fixture sessions', () => {
     ])
       expect(page).toContain(`<section id="${id}">`)
     expect(page.match(/<svg /g)).toHaveLength(4)
+  })
+
+  it("prints a slice's registered report row for each run log with a world seed (#223)", () => {
+    const { analysis, page } = withRegistrations([unitsReport], () => {
+      const analyzed = analyzeSessions(fixtureTable())
+      return { analysis: analyzed, page: renderSessionReportHtml(analyzed, '2026-10-07T00:00:00Z') }
+    })
+    expect(analysis.reportRows.map(({ commit, sourceId }) => `${commit} ${sourceId}`)).toEqual([
+      'bbbbbbb probe.units',
+      'ccccccc probe.units',
+    ])
+    expect(analysis.reportRows.every((row) => Number(row.value) > 0)).toBe(true)
+    expect(page).toContain('<section id="report-rows">')
+    expect(page).toContain('<td>probe.units</td><td>units collected</td>')
   })
 })

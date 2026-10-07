@@ -5,6 +5,7 @@
  */
 import type { DebugAction } from '../debug/debugActionRegistry'
 import type { SliceEventProjections } from '../logging/registries/eventProjections'
+import type { ReportRowSource } from '../logging/registries/reportRows'
 import type { SliceRunEvents } from '../logging/registries/runEvents'
 import type { ArtAsset } from '../systems/registries/artAssets'
 import type { AuthorityReaction } from '../systems/registries/authorityReactions'
@@ -121,4 +122,9 @@ export interface SliceRegistrar {
   eventProjections(projections: SliceEventProjections): void
   /** The run events those projections log, keyed by `<slice>.<snake_case>` name. */
   runEvents(events: SliceRunEvents): void
+  /**
+   * Rows the balance and session reports print per planet, read off a run's events (#223); never
+   * a feature-unlock id.
+   */
+  reportRows(source: ReportRowSource): void
 }

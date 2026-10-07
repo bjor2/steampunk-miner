@@ -8,6 +8,7 @@ import { benchTrendOf, REGRESSION_PERCENT, type BenchTrendRow } from './benchTre
 import { frameCostRowsOf, type FrameCostRow } from './frameCost'
 import { frameStretchesOf, slowdownsByOreBefore, type FrameStretch } from './frameStretches'
 import { countTrendsOf, heapTrendsOf, type CountTrend, type HeapTrend } from './memoryTrend'
+import { sessionReportRowsOf, type SessionReportRow } from './sessionReportRows'
 import { summaryComparisonsOf, type SessionComparison } from './summaryComparison'
 import type { RefusedSession, SessionLog, SessionTable } from './sessionTable'
 
@@ -23,6 +24,8 @@ export interface SessionAnalysis {
   slowdownsByOre: [string, number][]
   benchTrend: BenchTrendRow[]
   comparisons: SessionComparison[]
+  /** The rows slices register for each planet of a run (#223). */
+  reportRows: SessionReportRow[]
 }
 
 export function analyzeSessions({ sessions, refused }: SessionTable): SessionAnalysis {
@@ -38,6 +41,7 @@ export function analyzeSessions({ sessions, refused }: SessionTable): SessionAna
     slowdownsByOre: mostFirst(slowdownsByOreBefore(slowdowns)),
     benchTrend: benchTrendOf(sessions),
     comparisons: summaryComparisonsOf(sessions),
+    reportRows: sessionReportRowsOf(sessions),
   }
 }
 

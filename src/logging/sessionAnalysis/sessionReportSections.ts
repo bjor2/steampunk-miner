@@ -1,5 +1,6 @@
 /**
- * The frame, mined-order, bench and summary sections of the session report page (#125).
+ * The frame, mined-order, bench, summary and slice report-row sections of the session report page
+ * (#125, #223).
  */
 import { FRAME_BUDGET_MS } from '../../constants/scene'
 import { BASELINE_DAYS, REGRESSION_PERCENT, type BenchTrendRow } from './benchTrend'
@@ -8,6 +9,7 @@ import { fixed, flaggedIndexes, sectionHtml, tableHtml } from './htmlTable'
 import { signedText, type SessionAnalysis } from './sessionAnalysis'
 import { escapeHtml } from './sessionChart'
 import { chartedSessions, chartsHtml, frameChartOf } from './sessionReportCharts'
+import type { SessionReportRow } from './sessionReportRows'
 import type { SessionComparison } from './summaryComparison'
 
 export function frameAndBenchSections(analysis: SessionAnalysis): string[] {
@@ -17,6 +19,7 @@ export function frameAndBenchSections(analysis: SessionAnalysis): string[] {
     minedOrderSection(analysis),
     benchSection(analysis),
     comparisonsSection(analysis),
+    reportRowsSection(analysis),
   ]
 }
 
@@ -169,4 +172,20 @@ function comparisonHtml(one: SessionComparison): string {
       })
     : `<p>Refused: ${escapeHtml(one.comparison.problems.join('; '))}</p>`
   return `<h3>${escapeHtml(heading)}</h3>\n${body}`
+}
+
+function reportRowsSection({ reportRows }: SessionAnalysis): string {
+  return sectionHtml(
+    'report-rows',
+    'Slice report rows',
+    "The rows the slices register (reportRows, #223), read off each run's events for every planet it logged. Runs with no world seed have none.",
+    tableHtml({
+      headers: ['run', 'commit', 'seed', 'planet', 'source', 'row', 'value'],
+      rows: reportRows.map(reportRowCells),
+    }),
+  )
+}
+
+function reportRowCells(row: SessionReportRow): (string | number)[] {
+  return [row.runId, row.commit, row.worldSeed, row.planet, row.sourceId, row.label, row.value]
 }

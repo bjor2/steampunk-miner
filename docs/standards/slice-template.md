@@ -95,6 +95,7 @@ export const slice: SliceDefinition = {
 | `authorityReaction(reaction)` | `src/systems/registries/authorityReactions.ts` | Folds each accepted command's and settled tick's events into the slice's section, per player, in id order; its events take the stamp of the events it heard. Read a `DrillDamageDealt` tile's ore with `oreTypeAtTile(before, event)` (feature-slices.md 3.21). |
 | `eventProjections(projections)` | `src/logging/registries/eventProjections.ts` | Keyed by `<slice>.<Event>` domain event type; `() => null` for an event with no log line. |
 | `runEvents(events)` | `src/logging/registries/runEvents.ts` | Keyed by `<slice>.<snake_case>` name, payload fully specified. |
+| `reportRows(source)` | `src/logging/registries/reportRows.ts` | Pure `rowsOf(events, worldSeed, planet)` returning `{ label, value }` rows. `balance:report` and `perf:sessions` print them; a row naming a feature-unlock id is refused (feature-slices.md 3.23). |
 
 Registries are read only after `loadFeatures()` has sealed them, so no slice module reads one at import time.
 

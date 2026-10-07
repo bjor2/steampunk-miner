@@ -4,9 +4,9 @@
  * commands and summary to `balance-report/`, and prints its pacing table, each seed's row and the
  * median, the pass/fail of the three gates on that median (S11, #65) and `compareRuns` of the first
  * seed against the committed baseline summary, also into the GitHub job summary when there is
- * one. The bot holding assay_beacon is played on its seeds too and its median gates reported. It
- * never fails: the pacing gates are the Vitest specs `src/logging/pacingGate.test.ts` and
- * `assayPacingGate.test.ts`.
+ * one. The rows slices register (`reportRows`, #223) are listed per seed and planet. The bot holding
+ * assay_beacon is played on its seeds too and its median gates reported. It never fails: the
+ * pacing gates are the Vitest specs `src/logging/pacingGate.test.ts` and `assayPacingGate.test.ts`.
  *
  *   npm run balance:report      the report
  *   npm run balance:baseline    the same, then the run's summary becomes the committed baseline
@@ -17,6 +17,7 @@ import { loadFeatures } from '../src/features'
 import { compareRuns, formatComparisonTable } from '../src/logging/compareRuns'
 import { bandDigAlerts } from '../src/logging/bandDigReport'
 import { formatNdjsonLine } from '../src/logging/ndjson'
+import { reportRowLines } from '../src/logging/reportRows'
 import {
   formatSeedPacingTable,
   medianPacingReport,
@@ -70,6 +71,7 @@ const report = [
     ...bandDigAlerts(summary.sawtoothBandDigTicks, SAWTOOTH_BAND),
   ]),
   listSection('Tunnel wrecker (reported only, #111)', wreckerDiveLines(deriveWreckerDives(events))),
+  listSection('Slice report rows (reported only, #223)', reportRowLines(runs)),
   comparisonSection(summary),
   assaySection(),
 ].join('\n\n')
