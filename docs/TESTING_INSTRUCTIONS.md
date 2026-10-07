@@ -234,7 +234,9 @@ dynamite}`) on planets 7, 10, 16, 22, 28, 34 and 40, and their median, expected 
   the heat table is the first seed's, and the attrition table (#198, `attritionReport.ts`) prints
   every seed's P8–P10 core time, trips, deaths and deaths per trip with the medians, and lists what
   misses #198 (median above 0.15 or a seed above 0.25 deaths a trip, a stall, P9 under 30 minutes,
-  P8 or P10 outside 45 to 60). Heat specs drill band 5 of planet 8 straight
+  P8 or P10 outside 45 to 60). It then lists the slice report rows for every seed and planet: the
+  `power-up-core.marks` rows put each P3–P10 core time beside its Marks-off time and the Mark spend
+  and effect (#249). Heat specs drill band 5 of planet 8 straight
   above the core (`heatRun.test.ts`); lava specs find a pocket's floor in band 3 of planet 8
   (`lavaFlow.test.ts`, `lava/lavaRun.test.ts`) and build refractory rings with `debug.lineCasing`;
   breach specs find a generated pocket lying against an open cave cell and gnaw a ring lined in
