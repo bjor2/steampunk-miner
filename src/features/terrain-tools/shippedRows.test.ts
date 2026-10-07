@@ -14,7 +14,7 @@ import { flavourProblemsOf } from '../descriptions'
 import { POWER_UP_SLOTS } from '../power-up-core'
 import { lastMarkOf } from '../tech-tree'
 import { HELD_BACK_ITEM_IDS, SHIPPED_TERRAIN_ITEMS } from './systems/shippedTools'
-import { markLadderOf, TERRAIN_ITEMS } from './systems/terrainItems'
+import { isConsumable, markLadderOf, TERRAIN_ITEMS } from './systems/terrainItems'
 
 // #202 on the loaded slices: the ore-shifter, seam splitter, pressure pocket lance and lodestone
 // beacon ship as vehicle items, power-ups, tree nodes and item cards (#162 acceptance 1). Stabiliser
@@ -108,9 +108,12 @@ describe('terrain-tools shipped rows', () => {
     expect(unpriced).toEqual([])
   })
 
-  it('lets the research bot research the shipped nodes, rich on planet 40', () => {
-    const shippedNodeIds = SHIPPED_TERRAIN_ITEMS.map((item) => item.node.id)
-    expect(researchablePayloads().filter(mentionsAny(shippedNodeIds))).not.toEqual([])
+  it('lets the research bot research the nodes of the tools the store sells, rich on planet 40', () => {
+    // Ticket 248: the bot researches only a node whose item some slice sells, so the one-offs.
+    const soldNodeIds = SHIPPED_TERRAIN_ITEMS.filter((item) => !isConsumable(item)).map(
+      (item) => item.node.id,
+    )
+    expect(researchablePayloads().filter(mentionsAny(soldNodeIds))).not.toEqual([])
   })
 
   it('leaves no trace of foam, the cryo binder, shoring props or the strata press', () => {

@@ -314,7 +314,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 17 files, 123 tests
+### `terrain-tools`: 18 files, 125 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -332,6 +332,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/terrainEconomy.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/terrainEditCaps.test.ts` | 13 | 3 |
 | `src/features/terrain-tools/systems/terrainItems.test.ts` | 11 | 11 |
+| `src/features/terrain-tools/systems/terrainSales.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/terrainSection.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
