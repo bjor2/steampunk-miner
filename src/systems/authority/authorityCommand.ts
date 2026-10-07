@@ -99,8 +99,11 @@ import type { BayId } from '../world/dockBays'
  * 39: the kernel's `OreSampled {playerId, tx, ty, oreId, via}` (#243): the sampling corer's plug
  *    replaces `drill-gear.OreSampled`, and the codex answers it with `codex.OreContacted` via the
  *    tool.
+ * 40: the sibling-link Mark milestone (ticket 274): `power-up-core.toggle_link {itemId}` with the
+ *    rejection `power-up-core.no_sibling_link`, `power-up-core.LinkToggled`, and
+ *    `power-up-core.LinkFired` after an act whose Mark reached its link.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 39
+export const AUTHORITY_PROTOCOL_VERSION = 40
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
