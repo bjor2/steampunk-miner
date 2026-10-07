@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" data-frame="none" data-axis="brass">
+  <title>Survey flare mortar node</title>
+  <path d="M6 20L11 13" stroke="#8a6a3a" stroke-width="4" stroke-linecap="round"/><path d="M12 11Q15 3 20 6" fill="none" stroke="#c9a24a" stroke-width="1.2" stroke-dasharray="2 1.5"/><circle cx="20" cy="6" r="2" fill="#f2d46b" stroke="#1b1613" stroke-width="1"/>
+</svg>

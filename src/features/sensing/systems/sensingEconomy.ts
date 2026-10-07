@@ -1,0 +1,114 @@
+/**
+ * The sensing lane's numbers from `sensing.economy.json` (spec #162 section 4, locked): the one-off
+ * price of the charged items and passives and the consumables' unit price (4.1), each charged
+ * item's row (4.2) and each consumable's row (4.3). The passives have no row: #162 4.6 gives them
+ * a magnitude only, and 4.2 names no base for it. The file is refused whole on any problem, like
+ * the kernel's economy file, so a stand-in never reaches a formula.
+ */
+import {
+  createFieldReader,
+  readBandOreCost,
+  type FieldReader,
+} from '../../../systems/economy/economyFieldReader'
+import type { BandOreCost } from '../../../systems/economy/economyDefinition'
+import SENSING_ECONOMY_FILE from '../sensing.economy.json'
+
+/** One charged item's Mark 1 numbers, in whole ticks and tiles. */
+export interface ChargedSensingBalance {
+  /** Charges per dock. */
+  charges: number
+  cooldownTicks: number
+  windupTicks: number
+  /** The ping's radius; null for the void sounder, which maps one whole cavern. */
+  radiusTiles: number | null
+  /** How long what it reveals stays shown: the stat the Mark magnitude step grows. */
+  revealTicks: number
+}
+
+/** One consumable's Mark 1 numbers. */
+export interface ConsumableSensingBalance {
+  /** Crates carried on the rack. */
+  stack: number
+  /** How far the flare mortar lobs its shell; null for the buoy, dropped where it stands. */
+  rangeTiles: number | null
+  /** The mapped or re-pinged ring: the stat the Mark magnitude step grows. */
+  radiusTiles: number
+}
+
+export interface SensingEconomy {
+  /** `k` band-5 ore units, paid at the item's unlock planet (#162 4.1). */
+  price: BandOreCost
+  /** `k` band-5 ore units per consumable, paid at the planet it is restocked on (#162 4.1). */
+  unitPrice: BandOreCost
+  charged: Readonly<Record<string, ChargedSensingBalance>>
+  consumable: Readonly<Record<string, ConsumableSensingBalance>>
+}
+
+export const SENSING_ECONOMY: SensingEconomy = loadSensingEconomy(SENSING_ECONOMY_FILE)
+
+/** Every problem with the file, or the numbers when it has none. */
+export function readSensingEconomy(
+  raw: unknown,
+): { economy: SensingEconomy } | { problems: string[] } {
+  const reader = createFieldReader()
+  const items = reader.object('items', reader.object('file', raw).items)
+  const economy = {
+    price: readBandOreCost(reader, 'items.price', items.price),
+    unitPrice: readBandOreCost(reader, 'items.unitPrice', items.unitPrice),
+    charged: readRows(reader, 'items.charged', items.charged, readChargedRow),
+    consumable: readRows(reader, 'items.consumable', items.consumable, readConsumableRow),
+  }
+  return reader.problems.length > 0 ? { problems: reader.problems } : { economy }
+}
+
+function loadSensingEconomy(raw: unknown): SensingEconomy {
+  const reading = readSensingEconomy(raw)
+  if ('problems' in reading) {
+    throw new Error(`sensing.economy.json is refused:\n${reading.problems.join('\n')}`)
+  }
+  return reading.economy
+}
+
+function readRows<Row>(
+  reader: FieldReader,
+  path: string,
+  raw: unknown,
+  readRow: (reader: FieldReader, path: string, raw: unknown) => Row,
+): Readonly<Record<string, Row>> {
+  const rows = reader.object(path, raw)
+  return Object.fromEntries(
+    Object.entries(rows).map(([itemId, row]) => [
+      itemId,
+      readRow(reader, `${path}.${itemId}`, row),
+    ]),
+  )
+}
+
+function readChargedRow(reader: FieldReader, path: string, raw: unknown): ChargedSensingBalance {
+  const row = reader.object(path, raw)
+  return {
+    charges: reader.safeInteger(`${path}.charges`, row.charges),
+    cooldownTicks: reader.safeInteger(`${path}.cooldownTicks`, row.cooldownTicks),
+    windupTicks: reader.safeInteger(`${path}.windupTicks`, row.windupTicks),
+    radiusTiles: readOptionalInteger(reader, `${path}.radiusTiles`, row.radiusTiles),
+    revealTicks: reader.safeInteger(`${path}.revealTicks`, row.revealTicks),
+  }
+}
+
+function readConsumableRow(
+  reader: FieldReader,
+  path: string,
+  raw: unknown,
+): ConsumableSensingBalance {
+  const row = reader.object(path, raw)
+  return {
+    stack: reader.safeInteger(`${path}.stack`, row.stack),
+    rangeTiles: readOptionalInteger(reader, `${path}.rangeTiles`, row.rangeTiles),
+    radiusTiles: reader.safeInteger(`${path}.radiusTiles`, row.radiusTiles),
+  }
+}
+
+/** A field an item may leave out: null when absent, a safe integer when present. */
+function readOptionalInteger(reader: FieldReader, path: string, value: unknown): number | null {
+  return value === undefined ? null : reader.safeInteger(path, value)
+}

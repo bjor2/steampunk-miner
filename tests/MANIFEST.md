@@ -187,6 +187,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
+### `sensing`: 4 files, 31 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/sensing/systems/sensingEconomy.test.ts` | 4 | 4 |
+| `src/features/sensing/systems/sensingItems.test.ts` | 13 | 13 |
+| `src/features/sensing/systems/statPreview.test.ts` | 9 | 9 |
+| `src/features/sensing/visionRows.test.ts` | 5 | 5 |
+
 ### `tech-tree`: 17 files, 132 tests
 
 | File | Tests | Sites |
