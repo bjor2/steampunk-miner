@@ -10,9 +10,13 @@
  * the comparison run (`never`), which plays without charges.
  *
  * Sizes (K8 #218): the stuck rule buys size 1, the cheapest charge that opens a tile (#153: the bot
- * blasts only dynamite gates, which #148 adds at their `minCharge`, and slow tiles). It plants the
- * smallest fused size its rack holds and backs off past that size's radius; it never plants a
- * remote size, which only #149's plunger fires.
+ * blasts only dynamite gates and slow tiles). It plants the smallest fused size its rack holds and
+ * backs off past that size's radius; it never plants a remote size, which only #149's plunger fires.
+ *
+ * Dynamite gates (#142 acceptance 9, ticket 236): a dynamite-gated shell in its way is blasted with
+ * the smallest fused size it carries that frees it whole (`botGates.ts`). With none that does, it
+ * notes the size the shell needs, which makes its next Upgrade bay visit buy that size, and routes
+ * round the shell meanwhile. Under `never` it never blasts a shell, as the comparison run.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import { chargesOf } from '../authority/charges/chargeRules'
@@ -23,6 +27,7 @@ import type { Money } from '../money'
 import { restockChargesCommand } from '../platform/platformCommands'
 import { plantChargeCommand } from '../vehicle/vehicleCommands'
 import { carriedSizesOf, chargesThatFitOf, type VehicleCharges } from '../vehicle/vehicleCharges'
+import { shellChargeSizeOf } from './botGates'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { moveStraight, type BotPlanet } from './botPilot'
@@ -42,15 +47,35 @@ export interface ChargeRestock {
 /** The size the stuck rule buys: the cheapest charge, which opens any tile it blasts. */
 const STUCK_RULE_SIZE = 1
 
-/** Filling the rack's free slots, while charges are offered here and it has room; null otherwise. */
-export function chargeRestockOf(session: BotSession): ChargeRestock | null {
+/**
+ * Filling the rack's free slots with `size`, while charges are offered here and it has room; null
+ * otherwise. `size` is the stuck rule's, or the size the shells met on this planet need.
+ */
+export function chargeRestockOf(session: BotSession, size: number): ChargeRestock | null {
   const state = session.state()
-  const count = chargesThatFitOf(chargesOf(state, session.playerId), STUCK_RULE_SIZE)
+  const count = chargesThatFitOf(chargesOf(state, session.playerId), size)
   if (count === 0 || !areChargesOffered(state, session.playerId)) return null
-  return {
-    intent: restockChargesCommand(STUCK_RULE_SIZE, count),
-    price: restockPriceOf(state, STUCK_RULE_SIZE, count),
-  }
+  return { intent: restockChargesCommand(size, count), price: restockPriceOf(state, size, count) }
+}
+
+/** The size the next restock buys: the shells' need on this planet, else the stuck rule's. */
+export function restockSizeOf(planet: BotPlanet): number {
+  return Math.max(planet.shellChargeSize, STUCK_RULE_SIZE)
+}
+
+/**
+ * Blasts a dynamite-gated shell open with the smallest carried fused size that frees it (#142
+ * acceptance 9). Answers whether the tile is open now; when it is not, the shell is a wall. With
+ * no such size carried, the planet's flag and the shell's size make the next visit buy one.
+ */
+export function blastShellOpen(session: BotSession, planet: BotPlanet, tile: TilePoint): boolean {
+  if (planet.chargePolicy !== 'blast') return false
+  const needed = shellChargeSizeOf(session, tile)
+  if (needed === null) return false
+  const size = carriedSizeFreeing(session.vehicle().charges, needed)
+  if (size === null) return noteShellWorthACharge(planet, needed)
+  if (backOffTileOf(session, planet, tile, size) === null) return false
+  return blastOpen(session, planet, tile, size)
 }
 
 /**
@@ -99,19 +124,24 @@ function wouldBlast(
  * Answers whether the tile is open now; when it is not (the blast was refused or left it), the
  * caller bores it.
  */
-export function blastOpen(session: BotSession, planet: BotPlanet, tile: TilePoint): boolean {
+export function blastOpen(
+  session: BotSession,
+  planet: BotPlanet,
+  tile: TilePoint,
+  size: number = sizeToPlantOf(session.vehicle().charges),
+): boolean {
   const from = planet.pilot.position
-  const refuge = backOffTileOf(session, planet, tile) as TilePoint
-  if (!plantFacing(session, from, tile)) return false
+  const refuge = backOffTileOf(session, planet, tile, size) as TilePoint
+  if (!plantFacing(session, from, tile, size)) return false
   moveStraight(session, planet, refuge)
   waitForBlast(session)
   if (isVehicleActive(session.vehicle())) moveStraight(session, planet, from)
   return tileKindAt(session.state(), tile) === 'open'
 }
 
-function plantFacing(session: BotSession, from: TilePoint, tile: TilePoint): boolean {
+function plantFacing(session: BotSession, from: TilePoint, tile: TilePoint, size: number) {
   session.submit(reportPoseIntent(from, facingTowards(from, tile), NO_TICKS))
-  session.submit(plantChargeCommand(sizeToPlantOf(session.vehicle().charges)))
+  session.submit(plantChargeCommand(size))
   return session.vehicle().charges.planted !== null
 }
 
@@ -124,6 +154,18 @@ function waitForBlast(session: BotSession): void {
 /** The smallest fused size the rack holds; the stuck rule's size while it holds none. */
 function sizeToPlantOf(charges: VehicleCharges): number {
   return fusedSizesOf(charges)[0] ?? STUCK_RULE_SIZE
+}
+
+/** The smallest fused size carried that is at least `needed`, or null. */
+function carriedSizeFreeing(charges: VehicleCharges, needed: number): number | null {
+  return fusedSizesOf(charges).find((size) => size >= needed) ?? null
+}
+
+/** Raises the planet's flag with the largest size a shell here needs; the shell stays a wall. */
+function noteShellWorthACharge(planet: BotPlanet, needed: number): false {
+  planet.hasMetBlastTile = true
+  planet.shellChargeSize = Math.max(planet.shellChargeSize, needed)
+  return false
 }
 
 function hasFusedChargeToPlant(charges: VehicleCharges): boolean {
@@ -139,11 +181,16 @@ function fusedSizesOf(charges: VehicleCharges): number[] {
  * vehicle, so the vehicle's centre ends a tile past the reach (3 tiles from the charge, outside
  * its 2.5, at size 1); null unless every tile on the way is open.
  */
-function backOffTileOf(session: BotSession, planet: BotPlanet, tile: TilePoint): TilePoint | null {
+function backOffTileOf(
+  session: BotSession,
+  planet: BotPlanet,
+  tile: TilePoint,
+  size: number = sizeToPlantOf(session.vehicle().charges),
+): TilePoint | null {
   const { position } = planet.pilot
   const dx = position.tx - tile.tx
   const dy = position.ty - tile.ty
-  const reach = chargeReachTiles(sizeToPlantOf(session.vehicle().charges))
+  const reach = chargeReachTiles(size)
   const way = Array.from({ length: reach }, (_, step) => ({
     tx: position.tx + dx * (step + 1),
     ty: position.ty + dy * (step + 1),

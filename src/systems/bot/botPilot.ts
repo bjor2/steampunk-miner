@@ -38,6 +38,8 @@ export interface BotPlanet {
   chargePolicy: ChargePolicy
   /** It met a tile here it would blast with no charge in stock, so it wants charges (#129). */
   hasMetBlastTile: boolean
+  /** The largest charge size a dynamite-gated shell met here needs and the rack lacked, else 0. */
+  shellChargeSize: number
   /**
    * Its vehicle was destroyed here, so it meets enemies while it drives too (#130): with the
    * reflex only between bores, a fatal dive replayed after every tow. Travel starts afresh.

@@ -22,6 +22,7 @@ export function botPlanetOf(session: BotSession, chargePolicy: ChargePolicy): Bo
     pilot: { position: bayRestTileOf(site, 'sell'), facing: 1 },
     chargePolicy,
     hasMetBlastTile: false,
+    shellChargeSize: 0,
     hasBeenDestroyedHere: false,
     routeDeaths: noRouteDeaths(),
   }

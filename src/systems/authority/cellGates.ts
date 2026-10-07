@@ -12,6 +12,7 @@ import type { YieldedCell } from '../world/cellYield'
 import type { PlanetParams } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
 import { CELL_KIND, familyOfCell, kindOfCell } from '../world/worldCell'
+import { materialCellAt } from '../world/worldState'
 import type { AuthorityState } from './authorityState'
 import type { DomainEventBody } from './domainEvent'
 import { resourceTierOf } from './minedOre'
@@ -49,6 +50,11 @@ export function gateOfCell(
   const gated = askGatesAbout(asker, tile, cell)
   gates.set(key, gated)
   return gated
+}
+
+/** The gates' verdict on the ore a tile holds now, asked once with no memo (the bot's look ahead). */
+export function gateOfTile(asker: GateAsker, tile: TilePoint): GatedCell | null {
+  return askGatesAbout(asker, tile, materialCellAt(asker.state.world, asker.params, tile))
 }
 
 /** The `DrillGated` report of a cell the gate stopped the drill at. */

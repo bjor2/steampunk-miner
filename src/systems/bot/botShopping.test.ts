@@ -32,6 +32,7 @@ function shopForTheCore(session: BotSession): void {
     isCoreTheGoal: true,
     gunPolicy: 'never',
     hasMetBlastTile: false,
+    restockSize: 1,
     chainPolicy: 'click',
   })
 }

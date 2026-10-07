@@ -26,7 +26,7 @@ import { canScratch } from '../vehicle/drillRule'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
 import { deepestHeldBand, holdsCore } from './botCasing'
-import type { ChargePolicy } from './botCharges'
+import { restockSizeOf, type ChargePolicy } from './botCharges'
 import { DEFAULT_CHAIN_POLICY, type ChainPolicy } from './botChains'
 import type { GunPolicy } from './botGuns'
 import { collectWhenReady, refineWhenWorthIt, type RefineryUse } from './botRefining'
@@ -203,6 +203,7 @@ function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): 
     isCoreTheGoal: isCoreGoal,
     gunPolicy: run.gunPolicy,
     hasMetBlastTile: planet.hasMetBlastTile,
+    restockSize: restockSizeOf(planet),
     chainPolicy: run.chainPolicy,
   }
   if (!hasPurchase(session, situation)) return

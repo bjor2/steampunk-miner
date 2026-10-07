@@ -98,6 +98,7 @@ function upgradesBought(session: BotSession, layout: MineLayout): string[] {
     isCoreTheGoal: false,
     gunPolicy: 'never',
     hasMetBlastTile: false,
+    restockSize: 1,
     chainPolicy: 'click',
   })
   return session

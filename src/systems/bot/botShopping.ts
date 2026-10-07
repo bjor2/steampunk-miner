@@ -69,6 +69,8 @@ export interface ShoppingSituation {
   gunPolicy: GunPolicy
   /** The bot met a tile on this planet it would blast with no charge in stock (#129). */
   hasMetBlastTile: boolean
+  /** The charge size a restock buys: what the shells met here need, else the stuck rule's. */
+  restockSize: number
   chainPolicy: ChainPolicy
 }
 
@@ -169,7 +171,7 @@ function isGunMountDue(session: BotSession, policy: GunPolicy): boolean {
 
 function chargeRestockDue(session: BotSession, situation: ShoppingSituation): Purchase | null {
   if (!situation.hasMetBlastTile) return null
-  const restock = chargeRestockOf(session)
+  const restock = chargeRestockOf(session, situation.restockSize)
   return restock !== null && canPay(session, restock.price) ? restock.intent : null
 }
 

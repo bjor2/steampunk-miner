@@ -5,11 +5,15 @@
  * (#109, `botCharges.ts`) is blasted open instead, and one met with an empty rack makes the next
  * Upgrade bay visit buy charges (#129). A tile that would free lava, or
  * the bot's tip cannot scratch, is `blocked`; one the tank cannot afford with the way home, `short`.
+ * A cell a gate leaves standing is `blocked` before any bore (#142 acceptance 8), and a dynamite
+ * shell is blasted open with a charge that frees it, or `blocked` until it carries one (#142
+ * acceptance 9, `botCharges.ts`).
  */
 import { heatThrottledDrill } from '../authority/heatRules'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
-import { blastOpen, isBlastWorthIt, noteTileWorthACharge } from './botCharges'
+import { blastOpen, blastShellOpen, isBlastWorthIt, noteTileWorthACharge } from './botCharges'
+import { drillGateAt, isShellGate, isWallGate } from './botGates'
 import { canAffordBore } from './botEnergy'
 import { boreTile, enterBoredTile, moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
@@ -44,6 +48,19 @@ export function boreInPlace(session: BotSession, planet: BotPlanet, tile: TilePo
 }
 
 function boreOnce(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
+  const gate = drillGateAt(session, tile)
+  if (isShellGate(gate)) return outcomeOfOpening(session, blastShellOpen(session, planet, tile))
+  if (isWallGate(gate)) return 'blocked'
+  return boreUngated(session, planet, tile)
+}
+
+/** A shell blasted open is entered like a bored tile; one left standing is a wall. */
+function outcomeOfOpening(session: BotSession, isOpen: boolean): OpenOutcome {
+  if (!isOpen) return 'blocked'
+  return isVehicleActive(session.vehicle()) ? 'opened' : 'short'
+}
+
+function boreUngated(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
   const vehicle = session.vehicle()
   const drill = heatThrottledDrill(session.state().planet.index, vehicle)
   const ticks = boreTicks(drill, planet.layout.params, tile, cellOfTile(session.state(), tile))

@@ -61,6 +61,7 @@ function botAtWall(openTilesBehind: number, chargePolicy: ChargePolicy = 'blast'
     pilot: { position: STAND_TILE, facing: 1 },
     chargePolicy,
     hasMetBlastTile: false,
+    shellChargeSize: 0,
     hasBeenDestroyedHere: false,
     routeDeaths: noRouteDeaths(),
   }
@@ -80,8 +81,8 @@ function carveTile(session: BotSession, tile: TilePoint): void {
 
 describe('bot: blasting charges policy (#109)', () => {
   it('fills the rack at the Upgrade bay from planet 7, and not before', () => {
-    expect(chargeRestockOf(botAtUpgradeBayOn(6))).toBeNull()
-    expect(chargeRestockOf(botAtUpgradeBayOn(7))).toEqual({
+    expect(chargeRestockOf(botAtUpgradeBayOn(6), 1)).toBeNull()
+    expect(chargeRestockOf(botAtUpgradeBayOn(7), 1)).toEqual({
       intent: restockChargesCommand(1, 3),
       price: chargePrice(1, 3, 7),
     })
@@ -90,7 +91,7 @@ describe('bot: blasting charges policy (#109)', () => {
   it('wants no restock with a full rack', () => {
     const full = botAtUpgradeBayOn(7)
     full.submit(restockChargesCommand(1, 3))
-    expect(chargeRestockOf(full)).toBeNull()
+    expect(chargeRestockOf(full, 1)).toBeNull()
   })
 
   it('wants charges once it meets a tile it would blast with none in stock (#129)', () => {
@@ -150,6 +151,7 @@ describe('bot: charge sizes (K8 #218)', () => {
       pilot: { position: stand, facing: 1 },
       chargePolicy: 'blast',
       hasMetBlastTile: false,
+      shellChargeSize: 0,
       hasBeenDestroyedHere: false,
       routeDeaths: noRouteDeaths(),
     }

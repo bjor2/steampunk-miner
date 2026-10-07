@@ -25,6 +25,7 @@ function situationOf(session: BotSession): ShoppingSituation {
     isCoreTheGoal: false,
     gunPolicy: 'never',
     hasMetBlastTile: false,
+    restockSize: 1,
     chainPolicy: 'click',
   }
 }

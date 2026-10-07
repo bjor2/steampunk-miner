@@ -29,6 +29,7 @@ function shop(session: BotSession, chainPolicy: ChainPolicy): void {
     isCoreTheGoal: true,
     gunPolicy: 'never',
     hasMetBlastTile: false,
+    restockSize: 1,
     chainPolicy,
   })
 }

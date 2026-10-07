@@ -43,6 +43,7 @@ describe('bot: heat planets (#113)', () => {
       isCoreTheGoal: false,
       gunPolicy: 'never',
       hasMetBlastTile: false,
+      restockSize: 1,
       chainPolicy: 'click',
     })
     expect(session.vehicle().lining.active).toBe('refractory')
@@ -76,6 +77,7 @@ function planetAt(_session: BotSession, where: 'pad' | 'deep'): BotPlanet {
     pilot: { position: shaftTileAt(layout, row), facing: 0 },
     chargePolicy: 'never',
     hasMetBlastTile: false,
+    shellChargeSize: 0,
     hasBeenDestroyedHere: false,
     routeDeaths: noRouteDeaths(),
   }
@@ -115,6 +117,7 @@ describe('bot: shaft round lava (#113)', () => {
         pilot: { position, facing: 0 },
         chargePolicy: 'never',
         hasMetBlastTile: false,
+        shellChargeSize: 0,
         hasBeenDestroyedHere: false,
         routeDeaths: noRouteDeaths(),
       },
