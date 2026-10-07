@@ -2,7 +2,7 @@
   "name": "money-past-1e40",
   "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
   "generatorVersion": 8,
-  "authorityProtocolVersion": 40,
+  "authorityProtocolVersion": 41,
   "logSchemaVersion": 4,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -73,7 +73,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -105,7 +109,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -137,7 +145,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -169,7 +181,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -215,7 +231,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 2,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {

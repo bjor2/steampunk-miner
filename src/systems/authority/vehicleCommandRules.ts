@@ -2,7 +2,7 @@
  * The vehicle's play commands (decisions #7, #3, #11 amendments):
  *
  * - `reportPose`: the client-owned pose at 5 Hz plus the fixed steps each action was active since
- *   the last report; the authority charges energy as count times rate (drill 4, thrust 6, drive 1
+ *   the last report and the drive signs pushed at the report (ticket 279, read by drill gear); the authority charges energy as count times rate (drill 4, thrust 6, drive 1
  *   quanta) and carves the drill's stamp at the pose for the drill ticks (#36), then lays casing
  *   rings behind the drill every 0.5 m it cut (#41, #56); it also telegraphs a casing grade too low
  *   for the band (#41), and logs the guns' hits since the last report (#107), then settles the heat gauge
@@ -77,6 +77,7 @@ export const VEHICLE_COMMAND_RULES: {
       thrustTicks: 'wholeNumber',
       driveTicks: 'wholeNumber',
       drillTicks: 'wholeNumber',
+      drive: 'driveSigns',
     },
     reject: (state, command) =>
       firstRejection([
@@ -254,8 +255,8 @@ function drillAtPoseAndBurrowers(
   const params = planetParamsOf(state.planet)
   if (params === null) return unchanged(state)
   const nose = noseTileOf(pose)
-  const { thrusting, drillTicks } = payload
-  const drilled = drillAtPose(state, params, playerId, pose, thrusting, nose, drillTicks)
+  const reported = { pose, drive: payload.drive, isLifting: payload.thrusting }
+  const drilled = drillAtPose(state, params, playerId, reported, nose, payload.drillTicks)
   return withBurrowersCut(drilled, playerId, nose)
 }
 

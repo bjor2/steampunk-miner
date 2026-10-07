@@ -20,6 +20,8 @@ import { toCanonical, type BigStat } from '../money'
 import { drillDamage, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
+import type { AheadLatch } from '../vehicle/aheadBearingLatch'
+import type { DriveSigns } from '../vehicle/driveSigns'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { hasCargoRoom, withOreUnit, type VehicleState } from '../vehicle/vehicleState'
 import { carveCell, type Carve, type CellDrillTicks } from '../world/groundEdit'
@@ -61,18 +63,28 @@ export function drillCell(
   return drillGround(state, params, playerId, { tile, carve }, requestedTicks)
 }
 
-/** The reported drill: the stamp at the pose, aimed by its facing (#40), and any drill gear. */
+/** What a pose report drills with: the pose, its reported drive, and whether it lifts. */
+export interface ReportedDrill {
+  pose: VehiclePose
+  drive: DriveSigns
+  isLifting: boolean
+}
+
+/**
+ * The reported drill: the stamp at the pose, aimed by its facing (#40), and any drill gear, which
+ * may read the reported drive (ticket 279).
+ */
 export function drillAtPose(
   state: AuthorityState,
   params: PlanetParams,
   playerId: string,
-  pose: VehiclePose,
-  isLifting: boolean,
+  reported: ReportedDrill,
   target: TilePoint,
   requestedTicks: number,
 ): RuleEffect {
-  const stamp = { pose, disc: drillStampOf(pose, isLifting) }
-  const carve: CarveIn = (request) => carveStampWithGear(state, params, playerId, stamp, request)
+  const { pose, drive, isLifting } = reported
+  const bit = { pose, disc: drillStampOf(pose, isLifting), drive }
+  const carve: CarveIn = (request) => carveStampWithGear(state, params, playerId, bit, request)
   return drillGround(state, params, playerId, { tile: target, carve }, requestedTicks)
 }
 
@@ -121,7 +133,7 @@ function drillGround(
   const carved = target.carve({ world: state.world, window, gates, energy: vehicle.energy })
   if (carved.ticksUsed === 0) return { state, events: gates.refusedEvents() }
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
-    ...vehicle,
+    ...withAheadLatch(vehicle, carved.aheadLatch),
     energy: vehicle.energy - carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill - carved.gearQuanta,
   })
   const collected = collectYieldedCells(charged, playerId, params, carved.yielded, gates)
@@ -135,6 +147,11 @@ function drillGround(
       ...gates.refusedEvents(),
     ],
   }
+}
+
+/** The vehicle keeps the cut's latch; a cut with no gear aimed by the drive leaves it as it was. */
+function withAheadLatch(vehicle: VehicleState, latch: AheadLatch | null): VehicleState {
+  return latch === null ? vehicle : { ...vehicle, aheadLatch: latch }
 }
 
 function affordableTicksOf(vehicle: VehicleState): number {

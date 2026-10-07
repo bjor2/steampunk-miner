@@ -5,6 +5,7 @@
  * The vehicle stands in the corridor's middle; enemies come along it.
  */
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
+import { NO_DRIVE } from '../../vehicle/driveSigns'
 import type { PlanetParams } from '../../world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../../world/tileGrid'
 import type { CommandIntent } from '../authorityCommand'
@@ -43,6 +44,7 @@ export function poseAt(tile: TilePoint, { facing, vx = 0, vy = 0 }: PoseOptions)
       thrustTicks: 0,
       driveTicks: 0,
       drillTicks: 0,
+      drive: NO_DRIVE,
     },
   }
 }

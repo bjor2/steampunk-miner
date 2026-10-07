@@ -8,6 +8,7 @@
  */
 
 import type { BayId } from '../world/dockBays'
+import type { DriveSigns } from '../vehicle/driveSigns'
 
 /**
  * Bump when a command or domain event changes shape or meaning; run metadata records it.
@@ -102,8 +103,11 @@ import type { BayId } from '../world/dockBays'
  * 40: the sibling-link Mark milestone (ticket 274): `power-up-core.toggle_link {itemId}` with the
  *    rejection `power-up-core.no_sibling_link`, `power-up-core.LinkToggled`, and
  *    `power-up-core.LinkFired` after an act whose Mark reached its link.
+ * 41: `reportPose` carries `drive {x, y}`, the push as signs (TD lock on #279), refused unless each
+ *    is -1, 0 or 1; drill gear aimed by the drive turns the twin bit's ahead cell from `drive.x`,
+ *    latched per cell. With no gear registered no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 40
+export const AUTHORITY_PROTOCOL_VERSION = 41
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -111,6 +115,7 @@ export interface KernelCommandPayloads {
    * The local vehicle's pose at 5 Hz (#11 amendments, #7): integer mm and mm/s, the body-up vector
    * scaled to 1024, `facing` 0 to 3, the action flags at the moment of the report, and how many
    * fixed steps since the previous report each action was active, which the authority charges.
+   * `drive` is the push at the report as signs (TD lock on #279); drill gear reads its `x`.
    */
   reportPose: {
     x: number
@@ -126,6 +131,7 @@ export interface KernelCommandPayloads {
     thrustTicks: number
     driveTicks: number
     drillTicks: number
+    drive: DriveSigns
   }
   /** Scripted mining (#3, #11 section 5): `ticks` fixed steps of drilling on one tile. */
   drillTile: { tx: number; ty: number; ticks: number }

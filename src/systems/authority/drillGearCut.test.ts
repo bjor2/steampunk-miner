@@ -6,6 +6,7 @@ import { stepOfMajor } from '../economy/upgradeSteps'
 import type { GateOutcome } from '../registries/gateChecks'
 import { drillGearCellsAt, type DrillGearReach } from '../vehicle/drillGearCells'
 import { drillStampOf } from '../vehicle/drillStamp'
+import { NO_DRIVE, signOfPush, type DriveSign, type DriveSigns } from '../vehicle/driveSigns'
 import { FACING, type Facing, type VehiclePose } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
 import type { TilePoint } from '../world/tileGrid'
@@ -90,6 +91,7 @@ function drillWith(
   tile: TilePoint = TARGET,
   facing: Facing = FACING.down,
   setup: readonly CommandIntent[] = [],
+  drive: DriveSigns = NO_DRIVE,
 ) {
   return withRegistrations(slices, () => {
     const session = createScriptedSession()
@@ -98,7 +100,7 @@ function drillWith(
     const before = session.vehicle().energy
     const events = session.submit(
       1 + DRILL_TICKS,
-      poseAbove(tile, facing, { drillTicks: DRILL_TICKS }),
+      poseAbove(tile, facing, { drillTicks: DRILL_TICKS, drive }),
     )
     return {
       events,
@@ -121,6 +123,20 @@ function cargoAddedOf(events: readonly DomainEvent[]) {
 
 function drillGatedOf(events: readonly DomainEvent[]) {
   return events.filter((event) => event.type === 'DrillGated')
+}
+
+/** The twin bit (#257): one cell ahead, turned by the drive. */
+const TWIN_BIT = gearSlice({ aheadCells: 1, aheadAim: 'drive' })
+
+/** Drilling down while pushing to one side: 1 the vehicle's right, -1 its left. */
+const pushingSide = (x: DriveSign): DriveSigns => ({ x, y: -1 })
+
+/** The push that turns the ahead cell to `bearing` while drilling down. */
+const PUSH_OF_BEARING = { left: pushingSide(1), right: pushingSide(-1) } as const
+
+/** The cell one column to the side of the straight cell under the bit, `dx` 1 the screen right. */
+function cellBesideStraight(dx: number): TilePoint {
+  return { tx: TARGET.tx + dx, ty: TARGET.ty - 1 }
 }
 
 /** The drill target, facing down, whose diagonal cell on `bearing` is `cell`. */
@@ -239,18 +255,18 @@ describe('drill gear cut', () => {
       aheadBearing: 'right',
     }).ahead
     const plain = drillWith([])
-    const twin = drillWith([gearSlice({ aheadCells: 1, aheadBearing: 'right' })])
+    const twin = drillWith([TWIN_BIT], TARGET, FACING.down, [], PUSH_OF_BEARING.right)
     expect(densityOf(twin.world, diagonal)).toBeLessThan(densityOf(plain.world, diagonal))
     expect(densityOf(twin.world, next)).toBe(densityOf(plain.world, next))
   })
 
   it('a gated diagonal cell is refused through canMine and reported in DrillGated', () => {
     const { cell: ore, target } = cellUnderDiagonal(surfaceOreTiles(40), 'left', CELL_KIND.ground)
-    const ask = { aheadCells: 1, aheadBearing: 'left' } as const
-    expect(densityOf(drillWith([gearSlice(ask)], target).world, ore)).toBeLessThan(
+    const push = PUSH_OF_BEARING.left
+    expect(densityOf(drillWith([TWIN_BIT], target, FACING.down, [], push).world, ore)).toBeLessThan(
       densityOf(EMPTY_WORLD, ore),
     )
-    const cut = drillWith([gearSlice(ask), shellSlice(ore, 'refused')], target)
+    const cut = drillWith([TWIN_BIT, shellSlice(ore, 'refused')], target, FACING.down, [], push)
     expect(densityOf(cut.world, ore)).toBe(densityOf(EMPTY_WORLD, ore))
     expect(kindOfCell(cellAt(cut.world, PARAMS, ore))).toBe(CELL_KIND.ore)
     expect(drillGatedOf(cut.events)).toEqual([
@@ -261,11 +277,65 @@ describe('drill gear cut', () => {
   it('a core cell under the diagonal follows canMine', () => {
     // The bit sits in core too, so the disc still cuts with every ore cell refused.
     const { cell: core, target } = cellUnderDiagonal(coreTiles(40), 'right', CELL_KIND.core)
-    const twin = gearSlice({ aheadCells: 1, aheadBearing: 'right' })
+    const push = PUSH_OF_BEARING.right
     const plain = drillWith([REFUSE_ALL_ORE], target, FACING.down, CORE_DRILL)
-    const cut = drillWith([twin, REFUSE_ALL_ORE], target, FACING.down, CORE_DRILL)
+    const cut = drillWith([TWIN_BIT, REFUSE_ALL_ORE], target, FACING.down, CORE_DRILL, push)
     expect(densityOf(cut.world, core)).toBeLessThan(densityOf(plain.world, core))
     expect(cut.events).toContainEqual(expect.objectContaining({ type: 'TileDestroyed', ...core }))
     expect(drillGatedOf(cut.events)).not.toContainEqual(expect.objectContaining(core))
+  })
+
+  it('a side push of 0.4 while drilling down cuts straight down', () => {
+    const plain = drillWith([])
+    const twin = drillWith([TWIN_BIT], TARGET, FACING.down, [], pushingSide(signOfPush(0.4)))
+    const straight = cellBesideStraight(0)
+    expect(densityOf(twin.world, straight)).toBeLessThan(densityOf(plain.world, straight))
+    for (const dx of [-1, 1]) {
+      expect(densityOf(twin.world, cellBesideStraight(dx))).toBe(FULL_CELL)
+    }
+  })
+
+  it('a side push of 0.6 while drilling down cuts diagonally on the same side', () => {
+    const plain = drillWith([])
+    const right = drillWith([TWIN_BIT], TARGET, FACING.down, [], pushingSide(signOfPush(0.6)))
+    const left = drillWith([TWIN_BIT], TARGET, FACING.down, [], pushingSide(signOfPush(-0.6)))
+    expect(densityOf(right.world, cellBesideStraight(1))).toBeLessThan(FULL_CELL)
+    expect(densityOf(right.world, cellBesideStraight(-1))).toBe(FULL_CELL)
+    expect(densityOf(left.world, cellBesideStraight(-1))).toBeLessThan(FULL_CELL)
+    expect(densityOf(right.world, cellBesideStraight(0))).toBe(
+      densityOf(plain.world, cellBesideStraight(0)),
+    )
+  })
+
+  it("flipping the drive mid-cell keeps the current cell's bearing and turns the next cell", () => {
+    withRegistrations([TWIN_BIT], () => {
+      const session = createScriptedSession()
+      const left = cellBesideStraight(-1)
+      const right = cellBesideStraight(1)
+      const report = (tick: number, x: DriveSign) =>
+        session.submit(
+          tick,
+          poseAbove(TARGET, FACING.down, { drillTicks: 12, drive: pushingSide(x) }),
+        )
+      session.submit(1, poseAbove(TARGET, FACING.down))
+      report(13, -1)
+      expect(densityOf(session.state().world, left)).toBeLessThan(FULL_CELL)
+      const events = report(25, 1)
+      expect(events).toContainEqual(expect.objectContaining({ type: 'TileDestroyed', ...left }))
+      expect(densityOf(session.state().world, right)).toBe(FULL_CELL)
+      report(37, 1)
+      expect(densityOf(session.state().world, right)).toBeLessThan(FULL_CELL)
+    })
+  })
+
+  it('leaves the reach boom on the facing whatever the drive', () => {
+    const boom = gearSlice({ aheadCells: 1 })
+    const pushed = drillWith([boom], TARGET, FACING.down, [], pushingSide(1))
+    expect(pushed.digest).toBe(drillWith([boom]).digest)
+    expect(densityOf(pushed.world, cellBesideStraight(1))).toBe(FULL_CELL)
+  })
+
+  it('cuts the same with any drive when no gear is registered', () => {
+    expect(drillWith([], TARGET, FACING.down, [], pushingSide(1)).digest).toBe(drillWith([]).digest)
   })
 })

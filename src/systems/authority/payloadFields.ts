@@ -4,6 +4,7 @@
  * trimmed, with every problem listed.
  */
 import { isNonNegativeMoneyText } from '../money'
+import { isDriveSigns } from '../vehicle/driveSigns'
 import { isBayId } from '../world/dockBays'
 
 export type FieldKind =
@@ -22,6 +23,8 @@ export type FieldKind =
   | 'textMap'
   /** A list of strings, as `debug.setVehicleLoadout` names the items owned with no slot (K4). */
   | 'textList'
+  /** `{ x, y }`, each -1, 0 or 1: the drive signs a pose report carries (ticket 279). */
+  | 'driveSigns'
 
 export type PayloadFields = Readonly<Record<string, FieldKind>>
 
@@ -57,6 +60,7 @@ const FIELD_CHECKS: Record<FieldKind, { isValid: (value: unknown) => boolean; ex
     },
     textMap: { isValid: isTextMap, expected: 'an object of strings' },
     textList: { isValid: isTextList, expected: 'a list of strings' },
+    driveSigns: { isValid: isDriveSigns, expected: 'an x and a y, each -1, 0 or 1' },
   }
 
 function fieldKindProblems(name: string, value: unknown, kind: FieldKind): string[] {

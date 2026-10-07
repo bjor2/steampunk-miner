@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { AheadBearing } from '../economy/drillGearCaps'
-import { aheadBearingOfDrive, drillGearCellsAt } from './drillGearCells'
+import { drillGearCellsAt } from './drillGearCells'
 import { drillStampOf } from './drillStamp'
 import { FACING, type Facing, type VehiclePose } from './vehiclePose'
 
@@ -98,23 +98,5 @@ describe('drill gear cells', () => {
         }
       }
     }
-  })
-
-  it('turns the ahead cell toward the side driven while drilling down, and only then', () => {
-    expect(aheadBearingOfDrive(FACING.down, 1)).toBe('left')
-    expect(aheadBearingOfDrive(FACING.down, -1)).toBe('right')
-    expect(aheadBearingOfDrive(FACING.down, 0)).toBe('facing')
-    for (const facing of [FACING.left, FACING.right, FACING.up]) {
-      expect(aheadBearingOfDrive(facing, 1)).toBe('facing')
-      expect(aheadBearingOfDrive(facing, -1)).toBe('facing')
-    }
-  })
-
-  it('cuts the diagonal on the screen side the vehicle drives toward', () => {
-    const [driveRight] = cellsAt(FACING.down, 1, 0, aheadBearingOfDrive(FACING.down, 1)).ahead
-    const [driveLeft] = cellsAt(FACING.down, 1, 0, aheadBearingOfDrive(FACING.down, -1)).ahead
-    const [straight] = cellsAt(FACING.down, 1, 0).ahead
-    expect(driveRight.tx).toBe(straight.tx + 1)
-    expect(driveLeft.tx).toBe(straight.tx - 1)
   })
 })

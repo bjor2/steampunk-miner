@@ -1,9 +1,9 @@
 /**
  * The live game's fixed step for the local vehicle (#3, #11): the authority's clock moves one
  * tick, the controller drives the body for that tick with the current intent, the step's actions
- * are counted, a pose report goes to the authority when one is due, the drill's facing and
- * activity go to the scene for the headlamp and sparks, the speed and lift to the sounds, and the
- * tick's motion to the part animation (#48). After the tow or a planet change the body
+ * are counted, a pose report goes to the authority when one is due (with the drive the intent
+ * pushes, ticket 279), the drill's facing and activity go to the scene for the headlamp and
+ * sparks, the speed and lift to the sounds, and the tick's motion to the part animation (#48). After the tow or a planet change the body
  * is placed on the dock the authority put the vehicle on. A dock building may stage the vehicle
  * first (#170 auto-roll, `vehicleStage.ts`): the drawn car and the camera move, the body does not.
  */
@@ -25,6 +25,7 @@ import {
   type PoseReporter,
 } from '../systems/vehicle/poseReport'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { driveSignsOfIntent } from '../systems/vehicle/driveSigns'
 import { noseTileOf } from '../systems/vehicle/vehiclePose'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
 import type { PlanetParams } from '../systems/world/planetParams'
@@ -74,7 +75,7 @@ export function createVehicleLoop(): VehicleLoop {
         },
         planetViewOf(loop, params, world),
       )
-      reportWhenDue(loop, result)
+      reportWhenDue(loop, result, stagedIntent)
       showDrill(result)
       showMotion(result)
       stepVehicleParts(result.pose, result.flags)
@@ -146,9 +147,10 @@ function showMotion(result: VehicleStepResult): void {
   motionPresence.isLifting = result.flags.isThrusting
 }
 
-function reportWhenDue(loop: LoopState, result: VehicleStepResult): void {
+function reportWhenDue(loop: LoopState, result: VehicleStepResult, intent: VehicleIntent): void {
   const counted = countActionStep(loop.reporter, result.flags)
-  const report = takePoseReport(counted, result.pose, result.flags, readAuthorityTick())
+  const moment = { flags: result.flags, drive: driveSignsOfIntent(intent) }
+  const report = takePoseReport(counted, result.pose, moment, readAuthorityTick())
   loop.reporter = report.reporter
   if (report.payload !== null) useGameStore.getState().reportPose(report.payload)
 }

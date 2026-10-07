@@ -8,6 +8,7 @@ import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
 import { heatLineEvents, heatLinesOf, heatThrottledDrill } from './heatRules'
 import { createScriptedSession, FREEZE_ENEMIES, type ScriptedSession } from './scriptedSession'
+import { NO_DRIVE } from '../vehicle/driveSigns'
 
 /** Planet 8, the first heat planet: radius 676 tiles, band 5 from 67.6 tiles in, core 10. */
 const HEAT_PLANET = 8
@@ -43,6 +44,7 @@ function reportAt(at: { x: number; y: number }, ticks: { drill?: number; drive?:
       thrustTicks: 0,
       driveTicks: ticks.drive ?? 0,
       drillTicks: ticks.drill ?? 0,
+      drive: NO_DRIVE,
     },
   }
 }

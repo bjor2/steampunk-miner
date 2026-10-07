@@ -18,6 +18,7 @@ import { gatedCellOn, grantItems, paramsOn, queryOf, sessionOn } from './gateFix
 import { GATE_ROWS } from './gateRows'
 import verbsFile from '../extractorVerbs.json'
 import { readVerbRows, VERB_ROWS } from './verbRows'
+import { NO_DRIVE } from '../../../systems/vehicle/driveSigns'
 
 // What the extractors run out of and get back (ticket 237): canisters and marks per dive, refilled
 // with the recharge; one lump on the cable until the hold is sold; and a planet's tiles forgotten
@@ -40,7 +41,14 @@ function dockAt(session: ScriptedSession, tick: number, bay: BayId): void {
   const pose = bayPoseAt(dockSiteOfPlanet(session.state().planet)!, bay)
   session.submit(tick, {
     type: 'reportPose',
-    payload: { ...pose, driving: false, thrusting: false, drilling: false, ...NO_TICKS },
+    payload: {
+      ...pose,
+      driving: false,
+      thrusting: false,
+      drilling: false,
+      ...NO_TICKS,
+      drive: NO_DRIVE,
+    },
   })
   session.submit(tick, { type: 'dock', payload: { bay } })
 }

@@ -3,12 +3,13 @@
  * integer mm, mm/s and a 1024-scaled up vector before the command is built, so the authority and
  * `commands.ndjson` hold integers only. Action tick counts add up every fixed step between
  * reports; a report goes out at most every 12 ticks (5 per second) and never repeats an identical
- * pose with all-zero counts.
+ * pose with all-zero counts. The drive pushed at the report rides along as signs (ticket 279).
  */
 import { POSE_REPORT_INTERVAL_TICKS } from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { CommandPayloads } from '../authority/authorityCommand'
 import type { Vector2 } from './localFrame'
+import type { DriveSigns } from './driveSigns'
 import type { Facing, VehiclePose } from './vehiclePose'
 
 export interface ActionFlags {
@@ -69,11 +70,17 @@ export function countActionStep(reporter: PoseReporter, flags: ActionFlags): Pos
   }
 }
 
+/** What the vehicle does at the moment of a report: its action flags and the drive pushed. */
+export interface ReportMoment {
+  flags: ActionFlags
+  drive: DriveSigns
+}
+
 /** The report due at `tick`, if any, and the reporter after sending it. */
 export function takePoseReport(
   reporter: PoseReporter,
   pose: VehiclePose,
-  flags: ActionFlags,
+  { flags, drive }: ReportMoment,
   tick: number,
 ): { reporter: PoseReporter; payload: PosePayload | null } {
   if (!isReportDue(reporter, pose, tick)) return { reporter, payload: null }
@@ -85,6 +92,7 @@ export function takePoseReport(
       thrusting: flags.isThrusting,
       drilling: flags.isDrilling,
       ...reporter.counts,
+      drive,
     },
   }
 }

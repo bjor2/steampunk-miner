@@ -25,12 +25,18 @@ export interface DrillGearCaps {
  */
 export type AheadBearing = 'facing' | 'left' | 'right'
 
+/**
+ * Who points the ahead cells: the facing alone, or the drive (the twin bit, TD lock on #279): the
+ * authority turns them from the reported drive side and latches the bearing per cell.
+ */
+export type AheadAim = 'facing' | 'drive'
+
 /** What one slice asks of the drill; a field left out asks nothing. */
 export interface DrillGearAsk {
-  /** Whole cells cut past the bit, along `aheadBearing`. */
+  /** Whole cells cut past the bit, along the bearing `aheadAim` gives. */
   aheadCells?: number
-  /** Where the ahead cells point; left out, along the facing. */
-  aheadBearing?: AheadBearing
+  /** Left out, the ahead cells point along the facing. */
+  aheadAim?: AheadAim
   /** Whole cells cut on each side of the bore. */
   sideCells?: number
   /** Each side cell's energy as a share of the drill's for that cell, in basis points. */
@@ -40,17 +46,17 @@ export interface DrillGearAsk {
 /** The drill gear one player's drill cuts with, after the caps. */
 export interface DrillGear {
   aheadCells: number
-  aheadBearing: AheadBearing
-  /** Each ahead cell's energy share: a whole one along the facing, the side floor on a diagonal. */
-  aheadEnergyShareBp: number
+  aheadAim: AheadAim
   sideCells: number
   sideEnergyShareBp: number
+  /** An ahead cell's energy share on a diagonal bearing: the side floor. */
+  diagonalEnergyShareBp: number
 }
 
 /**
  * The largest ask of each kind wins (gear never stacks), the ahead cells held to the cap and the
- * side share never under the floor. One diagonal asked turns the ahead cells; two opposite ones
- * leave them along the facing. null when no ask adds a cell: the drill cuts as before.
+ * side share never under the floor. One ask aiming by the drive aims every ahead cell by it. null
+ * when no ask adds a cell: the drill cuts as before.
  */
 export function foldDrillGear(
   asks: readonly DrillGearAsk[],
@@ -59,13 +65,12 @@ export function foldDrillGear(
   const aheadCells = Math.min(caps.aheadCellsMax, largestCellsOf(asks.map((ask) => ask.aheadCells)))
   const sideCells = largestCellsOf(asks.map((ask) => ask.sideCells))
   if (aheadCells === 0 && sideCells === 0) return null
-  const aheadBearing = aheadBearingOf(asks)
   return {
     aheadCells,
-    aheadBearing,
-    aheadEnergyShareBp: aheadEnergyShareOf(aheadBearing, caps),
+    aheadAim: aheadAimOf(asks),
     sideCells,
     sideEnergyShareBp: sideEnergyShareOf(asks, caps),
+    diagonalEnergyShareBp: caps.sideEnergyShareFloorBp,
   }
 }
 
@@ -83,20 +88,17 @@ export function readDrillGearCaps(reader: FieldReader, value: unknown): DrillGea
   return { aheadCellsMax, sideEnergyShareFloorBp }
 }
 
-/** The one diagonal asked, else the facing. */
-function aheadBearingOf(asks: readonly DrillGearAsk[]): AheadBearing {
-  const diagonals = new Set(asks.map((ask) => ask.aheadBearing).filter(isDiagonal))
-  const [only] = diagonals
-  return diagonals.size === 1 ? only : 'facing'
+/**
+ * An ahead cell's energy share on `bearing`: a whole one along the facing; a diagonal cell is cut
+ * beside the bit's line, so it pays at least what a side cell does.
+ */
+export function aheadEnergyShareOf(gear: DrillGear, bearing: AheadBearing): number {
+  return bearing === 'facing' ? BASIS_POINTS : gear.diagonalEnergyShareBp
 }
 
-function isDiagonal(bearing: AheadBearing | undefined): bearing is 'left' | 'right' {
-  return bearing === 'left' || bearing === 'right'
-}
-
-/** A diagonal cell is cut beside the bit's line, so it pays at least what a side cell does. */
-function aheadEnergyShareOf(bearing: AheadBearing, caps: DrillGearCaps): number {
-  return bearing === 'facing' ? BASIS_POINTS : caps.sideEnergyShareFloorBp
+/** The drive aims the ahead cells when any ask lets it; the twin bit with drive 0 cuts along the facing. */
+function aheadAimOf(asks: readonly DrillGearAsk[]): AheadAim {
+  return asks.some((ask) => ask.aheadAim === 'drive') ? 'drive' : 'facing'
 }
 
 function sideEnergyShareOf(asks: readonly DrillGearAsk[], caps: DrillGearCaps): number {

@@ -4,6 +4,7 @@
  * planet-1 places the vehicle specs mine at. Pure, so it runs in node with no store.
  */
 import { bayPoseAt, FACING, type Facing } from '../vehicle/vehiclePose'
+import { NO_DRIVE, type DriveSigns } from '../vehicle/driveSigns'
 import type { BayId } from '../world/dockBays'
 import { vehicleOf, createAuthorityState, type AuthorityState } from './authorityState'
 import { dockSiteOf } from '../world/dockSite'
@@ -61,8 +62,13 @@ export interface ActionTicks {
   drillTicks: number
 }
 
+/** What a report says beyond the pose: the action ticks and the drive (none pushed by default). */
+export interface ReportedActions extends ActionTicks {
+  drive: DriveSigns
+}
+
 /** The centre of a tile in mm, upright at the planet's top (the slice's surface), as a pose. */
-export function poseAbove(tile: TilePoint, facing: Facing, counts: Partial<ActionTicks> = {}) {
+export function poseAbove(tile: TilePoint, facing: Facing, counts: Partial<ReportedActions> = {}) {
   return {
     type: 'reportPose' as const,
     payload: {
@@ -79,6 +85,7 @@ export function poseAbove(tile: TilePoint, facing: Facing, counts: Partial<Actio
       thrustTicks: 0,
       driveTicks: 0,
       drillTicks: 0,
+      drive: NO_DRIVE,
       ...counts,
     },
   }

@@ -26,6 +26,7 @@ import {
 } from './gameStore'
 import { recordStartingPlanetEntered } from './planetArrivalLog'
 import { stepOfMajor } from '../systems/economy/upgradeSteps'
+import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 let sink: ReturnType<typeof createMemorySink>
 
@@ -66,6 +67,7 @@ const idlePose = {
   thrustTicks: 0,
   driveTicks: 0,
   drillTicks: 0,
+  drive: NO_DRIVE,
 }
 
 function poseOver(tile: TilePoint, tick: number): ScriptedCommand {

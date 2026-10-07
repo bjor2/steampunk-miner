@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { FACING } from '../vehicle/vehiclePose'
 import type { PlantedCharge } from '../vehicle/vehicleCharges'
+import type { AheadLatch } from '../vehicle/aheadBearingLatch'
 import { applyCommand } from './applyCommand'
 import { createAuthorityState, type AuthorityState } from './authorityState'
 import { CASING_BREACHED, decodeCasing } from '../world/chunkDelta'
@@ -149,6 +150,22 @@ describe('session snapshot: guns (#93)', () => {
     expect(readSnapshot(throughJson(takeSnapshot(state)))).toEqual({ state, problems: [] })
   })
 
+  it("keeps the twin bit's latched bearing through save and load (ticket 279)", () => {
+    const state = withAheadLatch(richState(), { bearing: 'left', tile: { tx: 31, ty: 284 } })
+    expect(readSnapshot(throughJson(takeSnapshot(state)))).toEqual({ state, problems: [] })
+  })
+
+  it('refuses a latched bearing off the three, and keeps a vehicle with none as it was', () => {
+    const snapshot = throughJson(takeSnapshot(richState()))
+    expect(snapshot.state.players.p1.vehicle).not.toHaveProperty('aheadLatch')
+    const vehicle = snapshot.state.players.p1.vehicle
+    const aheadLatch = { bearing: 'up' as 'left', tile: { tx: 31, ty: 284 } }
+    snapshot.state.players.p1.vehicle = { ...vehicle, aheadLatch }
+    expect(readSnapshot(snapshot).problems).toEqual([
+      'snapshot.state.players.p1.vehicle.aheadLatch must hold a bearing and a tile, or be left out',
+    ])
+  })
+
   it('refuses a vehicle whose guns are in an unknown mode', () => {
     const snapshot = throughJson(takeSnapshot(richState()))
     const vehicle = snapshot.state.players.p1.vehicle
@@ -158,6 +175,12 @@ describe('session snapshot: guns (#93)', () => {
     ])
   })
 })
+
+/** The state with the twin bit's bearing latched for player p1. */
+function withAheadLatch(state: AuthorityState, aheadLatch: AheadLatch): AuthorityState {
+  const vehicle = { ...state.players.p1.vehicle, aheadLatch }
+  return { ...state, players: { p1: { ...state.players.p1, vehicle } } }
+}
 
 /** The state with a charge on the wall for player p1. */
 function withPlanted(state: AuthorityState, planted: PlantedCharge): AuthorityState {

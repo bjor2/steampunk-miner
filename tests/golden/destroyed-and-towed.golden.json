@@ -2,7 +2,7 @@
   "name": "destroyed-and-towed",
   "description": "Hull set to 1 in the band-1 corridor, a crawler hits the rear, destroyed, towed (#9).",
   "generatorVersion": 8,
-  "authorityProtocolVersion": 40,
+  "authorityProtocolVersion": 41,
   "logSchemaVersion": 4,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -44,7 +44,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -76,7 +80,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -108,7 +116,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -140,7 +152,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -172,7 +188,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -204,7 +224,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -236,7 +260,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -268,7 +296,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -300,7 +332,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -332,7 +368,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -364,7 +404,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -396,7 +440,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -428,7 +476,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {
@@ -489,7 +541,11 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0
+        "drillTicks": 0,
+        "drive": {
+          "x": 0,
+          "y": 0
+        }
       }
     },
     {

@@ -5,6 +5,7 @@
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
 import { isChargeSize } from '../economy/chargeSizes'
+import type { AheadBearing } from '../economy/drillGearCaps'
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
@@ -39,6 +40,7 @@ export interface PortableWorld {
 }
 
 const VEHICLE_MODES: readonly VehicleMode[] = ['docked', 'active', 'stranded', 'destroyed']
+const AHEAD_BEARINGS: readonly AheadBearing[] = ['facing', 'left', 'right']
 const POSE_FIELDS = ['x', 'y', 'vx', 'vy', 'upx', 'upy'] as const
 const MAX_BYTE = 255
 
@@ -118,6 +120,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableHeat(vehicle.heat)
       ? []
       : [`${path}.heat must hold a whole level, its settled tick and a lava touch tick or null`]),
+    ...(vehicle.aheadLatch === undefined || isPortableAheadLatch(vehicle.aheadLatch)
+      ? []
+      : [`${path}.aheadLatch must hold a bearing and a tile, or be left out`]),
   ]
 }
 
@@ -203,6 +208,17 @@ function isPortableHeat(heat: unknown): boolean {
     isWholeNumber(heat.level) &&
     isWholeNumber(heat.settledTick) &&
     (heat.lavaTouchTick === null || isWholeNumber(heat.lavaTouchTick))
+  )
+}
+
+/** The twin bit's latch (ticket 279): a bearing and the cell it was latched on. */
+function isPortableAheadLatch(latch: unknown): boolean {
+  return (
+    isJsonObject(latch) &&
+    AHEAD_BEARINGS.includes(latch.bearing as AheadBearing) &&
+    isJsonObject(latch.tile) &&
+    Number.isSafeInteger(latch.tile.tx) &&
+    Number.isSafeInteger(latch.tile.ty)
   )
 }
 

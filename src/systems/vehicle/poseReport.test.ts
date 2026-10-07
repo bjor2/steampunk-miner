@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { NO_DRIVE, type DriveSigns } from './driveSigns'
 import { FACING, isWithinZoneTestRange } from './vehiclePose'
 import {
   countActionStep,
@@ -14,14 +15,14 @@ const DRIVING: ActionFlags = { isDriving: true, isThrusting: false, isDrilling: 
 const IDLE: ActionFlags = { isDriving: false, isThrusting: false, isDrilling: false }
 
 /** Drives along x at 3 m/s for `ticks` fixed steps, collecting every report sent. */
-function driveAndReport(ticks: number, flags: ActionFlags = DRIVING) {
+function driveAndReport(ticks: number, flags: ActionFlags = DRIVING, drive: DriveSigns = NO_DRIVE) {
   let reporter: PoseReporter = NEW_POSE_REPORTER
   const sent: { tick: number; payload: PosePayload }[] = []
   for (let tick = 1; tick <= ticks; tick++) {
     reporter = countActionStep(reporter, flags)
     const x = flags.isDriving ? (3 * tick) / 60 : 0
     const pose = quantisePose({ x, y: 300.5 }, { x: 3, y: 0 }, { x: 0, y: 1 }, FACING.right)
-    const report = takePoseReport(reporter, pose, flags, tick)
+    const report = takePoseReport(reporter, pose, { flags, drive }, tick)
     reporter = report.reporter
     if (report.payload !== null) sent.push({ tick, payload: report.payload })
   }
@@ -57,11 +58,20 @@ describe('pose reports', () => {
     expect(driveAndReport(600, IDLE)).toHaveLength(1)
   })
 
-  it('hold integers and booleans only', () => {
+  it('hold integers and booleans only, besides the drive signs', () => {
     for (const { payload } of driveAndReport(120)) {
-      for (const value of Object.values(payload)) {
+      const { drive, ...rest } = payload
+      for (const value of Object.values(rest)) {
         expect(typeof value === 'boolean' || Number.isSafeInteger(value)).toBe(true)
       }
+      expect(drive).toEqual(NO_DRIVE)
+    }
+  })
+
+  it('carry the drive pushed at the moment of the report', () => {
+    const pushing: DriveSigns = { x: -1, y: -1 }
+    for (const { payload } of driveAndReport(120, DRIVING, pushing)) {
+      expect(payload.drive).toEqual(pushing)
     }
   })
 

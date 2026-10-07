@@ -21,6 +21,7 @@ import { EMPTY_LOADOUT, type VehicleLoadout } from './loadoutState'
 import { coldHeatAt, type VehicleHeat } from './vehicleHeat'
 import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
+import type { AheadLatch } from './aheadBearingLatch'
 
 /** The #7 state machine; `docked` is entered by the rescue tow here and by docking in #23. */
 export const VEHICLE_MODES = ['docked', 'active', 'stranded', 'destroyed'] as const
@@ -78,6 +79,11 @@ export interface VehicleState {
   energyLowLogged: readonly number[]
   /** The heat gauge (#113): 0 off the heat planets. */
   heat: VehicleHeat
+  /**
+   * The bearing the twin bit's current cell was latched to (ticket 279). Absent until drill gear
+   * aimed by the drive first cuts, so with none registered the state and its digest are unchanged.
+   */
+  aheadLatch?: AheadLatch
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

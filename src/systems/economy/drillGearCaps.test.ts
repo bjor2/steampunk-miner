@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ECONOMY } from './economy'
 import { createFieldReader } from './economyFieldReader'
-import { foldDrillGear, readDrillGearCaps } from './drillGearCaps'
+import { aheadEnergyShareOf, foldDrillGear, readDrillGearCaps } from './drillGearCaps'
 
 // The kernel's caps on slice drill gear (GD lock on #205, ticket 234).
 
@@ -40,10 +40,10 @@ describe('drill gear caps', () => {
     )
     expect(gear).toEqual({
       aheadCells: 1,
-      aheadBearing: 'facing',
-      aheadEnergyShareBp: 10000,
+      aheadAim: 'facing',
       sideCells: 1,
       sideEnergyShareBp: 12000,
+      diagonalEnergyShareBp: 10000,
     })
   })
 
@@ -53,41 +53,33 @@ describe('drill gear caps', () => {
   })
 
   it('aheadCells stays 1 with the twin bit and the reach boom both asking', () => {
-    const twinBit = { aheadCells: 1, aheadBearing: 'left' } as const
+    const twinBit = { aheadCells: 1, aheadAim: 'drive' } as const
     const reachBoom = { aheadCells: 1 }
     const gear = foldDrillGear([reachBoom, twinBit], CAPS)
     expect(gear?.aheadCells).toBe(1)
-    expect(gear?.aheadBearing).toBe('left')
+    expect(gear?.aheadAim).toBe('drive')
     expect(foldDrillGear([twinBit, reachBoom], CAPS)).toEqual(gear)
   })
 
-  it('points the ahead cells along the facing unless one diagonal is asked', () => {
-    expect(foldDrillGear([{ aheadCells: 1 }], CAPS)?.aheadBearing).toBe('facing')
-    expect(foldDrillGear([{ aheadCells: 1, aheadBearing: 'right' }], CAPS)?.aheadBearing).toBe(
-      'right',
-    )
-    const opposite = foldDrillGear(
-      [
-        { aheadCells: 1, aheadBearing: 'left' },
-        { aheadCells: 1, aheadBearing: 'right' },
-      ],
-      CAPS,
-    )
-    expect(opposite?.aheadBearing).toBe('facing')
+  it('aims the ahead cells along the facing unless an ask lets the drive aim them', () => {
+    expect(foldDrillGear([{ aheadCells: 1 }], CAPS)?.aheadAim).toBe('facing')
+    expect(foldDrillGear([{ aheadCells: 1, aheadAim: 'facing' }], CAPS)?.aheadAim).toBe('facing')
+    expect(foldDrillGear([{ aheadCells: 1, aheadAim: 'drive' }], CAPS)?.aheadAim).toBe('drive')
   })
 
-  it('adds no cell for a bearing alone', () => {
-    expect(foldDrillGear([{ aheadBearing: 'left' }], CAPS)).toBeNull()
-    expect(foldDrillGear([{ sideCells: 1, aheadBearing: 'left' }], CAPS)?.aheadCells).toBe(0)
+  it('adds no cell for an aim alone', () => {
+    expect(foldDrillGear([{ aheadAim: 'drive' }], CAPS)).toBeNull()
+    expect(foldDrillGear([{ sideCells: 1, aheadAim: 'drive' }], CAPS)?.aheadCells).toBe(0)
   })
 
   it("charges a diagonal ahead cell at least the side floor, the facing's cell a whole share", () => {
-    expect(foldDrillGear([{ aheadCells: 1 }], CAPS)?.aheadEnergyShareBp).toBe(10000)
+    const gear = foldDrillGear([{ aheadCells: 1, aheadAim: 'drive' }], CAPS)!
+    expect(aheadEnergyShareOf(gear, 'facing')).toBe(10000)
+    expect(aheadEnergyShareOf(gear, 'left')).toBe(10000)
     const floor = { ...CAPS, sideEnergyShareFloorBp: 15000 }
-    expect(foldDrillGear([{ aheadCells: 1 }], floor)?.aheadEnergyShareBp).toBe(10000)
-    expect(
-      foldDrillGear([{ aheadCells: 1, aheadBearing: 'left' }], floor)?.aheadEnergyShareBp,
-    ).toBe(15000)
+    const floored = foldDrillGear([{ aheadCells: 1, aheadAim: 'drive' }], floor)!
+    expect(aheadEnergyShareOf(floored, 'facing')).toBe(10000)
+    expect(aheadEnergyShareOf(floored, 'right')).toBe(15000)
   })
 
   it('refuses a side share floor under a whole share and a negative ahead cap', () => {

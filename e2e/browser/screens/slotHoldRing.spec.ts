@@ -84,6 +84,7 @@ async function holdPatchHalfway(page: Page): Promise<void> {
           thrustTicks: 0,
           driveTicks: 0,
           drillTicks: 0,
+          drive: { x: 0, y: 0 } as const,
         }
       }
     },
@@ -113,6 +114,7 @@ async function tapThrust(page: Page): Promise<void> {
       thrustTicks: 1,
       driveTicks: 0,
       drillTicks: 0,
+      drive: { x: 0, y: 0 } as const,
     }
     const result = debug.fastForward(2, [{ tick, type: 'reportPose', payload: pose }])
     if (!result.ok) throw new Error(result.problems.join('; '))

@@ -16,6 +16,7 @@ import { bayPoseAt } from '../systems/vehicle/vehiclePose'
 import { dockSiteOf } from '../systems/world/dockSite'
 import { planetParamsFor } from '../systems/world/planetParams'
 import { createDebugApi } from './debugApi'
+import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 // #33 acceptance at the debug API seam: what a Playwright spec can do through
 // window.steampunkDebug without clicking pixels.
@@ -69,6 +70,7 @@ const IDLE = {
   thrustTicks: 0,
   driveTicks: 0,
   drillTicks: 0,
+  drive: NO_DRIVE,
 }
 
 /**

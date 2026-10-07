@@ -8,7 +8,8 @@
  * The twin bit's bearing (GD lock on #257, ticket 279) turns the ahead cells 45 degrees to the
  * facing's left or right: each sits one metre further toward that side than the facing's cell, so
  * driving down and to a side the ahead cell is the one diagonally below the bit, one column over
- * and one row down on the tile grid. It replaces the facing's cell; it never adds one.
+ * and one row down on the tile grid. It replaces the facing's cell; it never adds one. Which bearing
+ * a cut takes is the drive's, latched per cell (`aheadBearingLatch.ts`).
  *
  * Order: the ahead cells nearest first, then the side cells nearest first, the facing's left side
  * before its right. A tile met twice is listed once.
@@ -17,12 +18,9 @@ import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
 import type { AheadBearing, DrillGear } from '../economy/drillGearCaps'
 import type { DiscStamp } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
-import type { VehicleIntent } from './vehicleIntent'
 import {
-  FACING,
   facingVectorOf,
   tileOfMillimetres,
-  type Facing,
   type IntegerVector,
   type VehiclePose,
 } from './vehiclePose'
@@ -33,8 +31,9 @@ export interface DrillGearCells {
 }
 
 /** The gear's cell counts, and where the ahead cells point (along the facing when left out). */
-export type DrillGearReach = Pick<DrillGear, 'aheadCells' | 'sideCells'> &
-  Partial<Pick<DrillGear, 'aheadBearing'>>
+export type DrillGearReach = Pick<DrillGear, 'aheadCells' | 'sideCells'> & {
+  aheadBearing?: AheadBearing
+}
 
 const NO_SHIFT: IntegerVector = { x: 0, y: 0 }
 
@@ -50,16 +49,6 @@ export function drillGearCellsAt(
   const aheadTiles = cellsAlong(stamp, [ahead], gear.aheadCells, shift)
   const sideTiles = cellsAlong(stamp, [left, right], gear.sideCells, NO_SHIFT)
   return { ahead: aheadTiles, side: withoutTiles(sideTiles, aheadTiles) }
-}
-
-/**
- * The bearing the drive asks for (GD lock on #257: no new key): drilling down while driving to a
- * side turns the ahead cell toward that side; anything else cuts along the facing. Facing down,
- * the facing's left is the vehicle's local right (`moveX` 1), the tangent `perp(localUp)`.
- */
-export function aheadBearingOfDrive(facing: Facing, moveX: VehicleIntent['moveX']): AheadBearing {
-  if (facing !== FACING.down || moveX === 0) return 'facing'
-  return moveX === 1 ? 'left' : 'right'
 }
 
 /** The side a diagonal bearing shifts the ahead cells toward; none along the facing. */

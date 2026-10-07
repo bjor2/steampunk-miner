@@ -7,6 +7,7 @@ import { createLoopbackAuthority } from './authority/loopbackAuthority'
 import { NEW_FIXED_STEP_CLOCK, stepsForFrame, type FixedStepClock } from './fixedStepClock'
 import { planetParamsFor } from './world/planetParams'
 import { surfaceRowOfColumn } from './world/tileGrid'
+import { NO_DRIVE } from './vehicle/driveSigns'
 
 const MAX_STEPS = 8
 const WORLD_SEED = 83921
@@ -31,6 +32,7 @@ function report(ty: number, facing: number, counts: { drillTicks?: number; thrus
       thrustTicks: counts.thrustTicks ?? 0,
       driveTicks: 0,
       drillTicks: counts.drillTicks ?? 0,
+      drive: NO_DRIVE,
     },
   } as const satisfies CommandIntent
 }

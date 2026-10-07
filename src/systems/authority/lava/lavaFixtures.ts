@@ -3,6 +3,7 @@
  * the scripted seed, a hole carved under it, and pose reports beside it. Only specs use it.
  */
 import { FACING } from '../../vehicle/vehiclePose'
+import { NO_DRIVE } from '../../vehicle/driveSigns'
 import { isLavaAt } from '../../world/lavaFlow'
 import { bandOfTile } from '../../world/planetGeometry'
 import { planetParamsFor } from '../../world/planetParams'
@@ -71,6 +72,7 @@ export function reportAt(at: { x: number; y: number }, drillTicks = 0): CommandI
       thrustTicks: 0,
       driveTicks: 0,
       drillTicks,
+      drive: NO_DRIVE,
     },
   }
 }

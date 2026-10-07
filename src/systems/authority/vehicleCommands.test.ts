@@ -8,6 +8,7 @@ import { cargoUnitsOf } from '../vehicle/vehicleState'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { cellDensitySum } from '../world/cellYield'
 import { cellAt, EMPTY_WORLD } from '../world/worldState'
+import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
 import {
   createScriptedSession,
@@ -135,6 +136,23 @@ describe('vehicle drilling', () => {
     session.submit(10, poseAbove(GROUND, FACING.down))
     const [refused] = session.submit(20, drill(GROUND, 23))
     expect(refused).toMatchObject({ type: 'CommandRejected', reason: 'too_many_ticks' })
+  })
+
+  it('refuses a pose report whose drive is anything but signs, or missing (ticket 279)', () => {
+    const session = createSession()
+    const { payload } = poseAbove(GROUND, FACING.down)
+    const { drive: _drive, ...withoutDrive } = payload
+    const malformed: unknown[] = [{ x: 0.6, y: 0 }, { x: 2, y: 0 }, { x: 1 }, null]
+    for (const [index, drive] of malformed.entries()) {
+      const pose = { type: 'reportPose', payload: { ...payload, drive } } as CommandIntent
+      const [refused] = session.submit(10 + index, pose)
+      expect(refused).toMatchObject({ type: 'CommandRejected', reason: 'invalid_payload' })
+    }
+    const old = { type: 'reportPose', payload: withoutDrive } as unknown as CommandIntent
+    expect(session.submit(20, old)).toMatchObject([{ reason: 'invalid_payload' }])
+    expect(session.submit(21, poseAbove(GROUND, FACING.down, { drive: { x: -1, y: 1 } }))).toEqual(
+      [],
+    )
   })
 })
 

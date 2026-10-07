@@ -57,6 +57,7 @@ import { SellBayView } from './platform/SellBayView'
 import { UpgradeBayView } from './platform/UpgradeBayView'
 import { PlaquesView } from './plaques/PlaquesView'
 import { SettingsView } from './settings/SettingsView'
+import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 // #33 acceptance 12: the screens rendered on the server (no browser, no DOM) carry an element for
 // every id in UI_IDS, and its text is the model's value. Ids, not markup shape, are the contract.
@@ -553,6 +554,7 @@ const strandedPose = {
   thrustTicks: 0,
   driveTicks: 0,
   drillTicks: 0,
+  drive: NO_DRIVE,
 }
 
 /** Every UI_IDS id, across the screens and states that show them. */

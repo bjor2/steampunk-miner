@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import { GOLDEN_SCRIPTS, stampScript } from '../systems/replay/goldenScripts'
 import {
   currentGoldenVersions,
@@ -19,6 +20,12 @@ function committedGoldenRuns(): GoldenRun[] {
 }
 
 const firstGolden = () => recordGoldenRun(GOLDEN_SCRIPTS[0])
+
+/** A pose report pushing down and right, the twin bit's diagonal input; any other command as is. */
+function withDrivePushedDownRight(command: AuthorityCommand): AuthorityCommand {
+  if (command.type !== 'reportPose') return command
+  return { ...command, payload: { ...command.payload, drive: { x: 1, y: -1 } } }
+}
 
 describe('golden runs (committed in tests/golden)', () => {
   it('has a committed file for every golden script and no file without one', () => {
@@ -71,6 +78,15 @@ describe('golden run gate', () => {
     const mined = committedGoldenRuns().filter((golden) => golden.minedOrder.length > 0)
     expect(mined.length).toBeGreaterThan(0)
   })
+
+  it.each(committedGoldenRuns().map((golden) => [golden.name, golden] as const))(
+    'replays %s to its committed digests and mined order whatever drive its reports push (ticket 279)',
+    (_name, golden) => {
+      const pushed = { ...golden, commands: golden.commands.map(withDrivePushedDownRight) }
+      expect(pushed.commands).not.toEqual(golden.commands)
+      expect(goldenRunProblems(pushed)).toEqual([])
+    },
+  )
 
   it('keeps the committed command lists in step with the scripts that made them', () => {
     const committed = committedGoldenRuns()

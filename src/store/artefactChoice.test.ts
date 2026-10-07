@@ -10,6 +10,7 @@ import { resetGameStore, useGameStore } from './gameStore'
 import { pressAction, releaseAction, resetInput } from './inputRuntime'
 import { inputLayerOf } from './presentationSlice'
 import { readArtefactChoiceModel, readHudModel } from './screenReads'
+import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 let sink: MemorySink
 
@@ -49,6 +50,7 @@ function driveOntoCache(): void {
     thrustTicks: 0,
     driveTicks: 0,
     drillTicks: 0,
+    drive: NO_DRIVE,
   })
 }
 

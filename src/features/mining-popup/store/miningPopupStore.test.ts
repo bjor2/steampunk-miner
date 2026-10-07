@@ -11,6 +11,7 @@ import type { TilePoint } from '../../../systems/world/tileGrid'
 import { chipsShownAt } from '../systems/chipBoard'
 import { plaqueShownAt } from '../systems/plaqueBoard'
 import { resetMiningPopupStore, useMiningPopupStore } from './miningPopupStore'
+import { NO_DRIVE } from '../../../systems/vehicle/driveSigns'
 
 // The popup hears the game as the HUD does: every batch the game store follows, through
 // listenForDomainEvents, while the drill mines real surface ore on the store's starting planet.
@@ -48,6 +49,7 @@ function poseOver(tile: TilePoint, tick: number): ScriptedCommand {
     thrustTicks: 0,
     driveTicks: 0,
     drillTicks: 0,
+    drive: NO_DRIVE,
   }
   return { tick, type: 'reportPose', payload }
 }

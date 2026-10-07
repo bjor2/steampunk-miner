@@ -6,6 +6,7 @@ import { createScriptedSession, FREEZE_ENEMIES } from '../authority/scriptedSess
 import { stateDigest } from '../authority/stateDigest'
 import { FACING } from '../vehicle/vehiclePose'
 import type { HeatPauseWindow } from './heatPauses'
+import { NO_DRIVE } from '../vehicle/driveSigns'
 
 // The heatPause seam through the authority (ticket 233, the GD lock on #204 Q2): a slice's flask
 // window vents the gauge and halves heat gain at the kernel floor while the vehicle drills band 5
@@ -40,6 +41,7 @@ function drillReport(drillTicks: number): CommandIntent {
       thrustTicks: 0,
       driveTicks: 0,
       drillTicks,
+      drive: NO_DRIVE,
     },
   }
 }

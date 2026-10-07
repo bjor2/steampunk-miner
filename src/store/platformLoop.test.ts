@@ -13,6 +13,7 @@ import { dockSiteOf } from '../systems/world/dockSite'
 import { planetParamsFor } from '../systems/world/planetParams'
 import type { TilePoint } from '../systems/world/tileGrid'
 import { readAuthorityTick, resetGameStore, useGameStore } from './gameStore'
+import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 let sink: ReturnType<typeof createMemorySink>
 
@@ -40,6 +41,7 @@ const idlePose = {
   thrustTicks: 0,
   driveTicks: 0,
   drillTicks: 0,
+  drive: NO_DRIVE,
 }
 
 function poseOver(tile: TilePoint, tick: number): ScriptedCommand {

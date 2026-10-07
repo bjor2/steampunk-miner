@@ -21,6 +21,7 @@ import {
   type ScriptedSession,
 } from './scriptedSession'
 import { stepOfMajor } from '../economy/upgradeSteps'
+import { NO_DRIVE } from '../vehicle/driveSigns'
 
 /** A track at major `level`, sent as its step (#180). */
 const setUpgrade = (upgradeId: string, level: number) =>
@@ -39,6 +40,7 @@ const poseAtDock = {
     thrustTicks: 0,
     driveTicks: 0,
     drillTicks: 0,
+    drive: NO_DRIVE,
   },
 } as const
 

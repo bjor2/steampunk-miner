@@ -72,6 +72,7 @@ async function drillFromAbove(page: Page, tile: { tx: number; ty: number }): Pro
         thrustTicks: 0,
         driveTicks: 0,
         drillTicks: 0,
+        drive: { x: 0, y: 0 } as const,
       }
       const commands: ScriptedCommand[] = [
         { tick, type: 'undock', payload: {} },

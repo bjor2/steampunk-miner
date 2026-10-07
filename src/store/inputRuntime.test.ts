@@ -25,6 +25,7 @@ import {
 } from './inputRuntime'
 import { readUpgradeBayModel } from './screenReads'
 import { installPreferencesStorage, loadPreferences, preferencesWrites } from './preferencesFile'
+import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 let submitted: AuthorityCommand[]
 let clockMoves: number
@@ -102,6 +103,7 @@ const poseAway = {
   thrustTicks: 0,
   driveTicks: 0,
   drillTicks: 0,
+  drive: NO_DRIVE,
 }
 
 describe('input: no direct mutation (#33 acceptance 3)', () => {

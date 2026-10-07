@@ -12,6 +12,7 @@ import {
   takeSessionSnapshot,
   useGameStore,
 } from './gameStore'
+import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 let sink: ReturnType<typeof createMemorySink>
 
@@ -255,6 +256,7 @@ describe('game store: vehicle', () => {
       thrustTicks: 0,
       driveTicks: 0,
       drillTicks: 0,
+      drive: NO_DRIVE,
     })
     expect(sink.commands.map((command) => command.type)).toEqual(['requestRescue', 'reportPose'])
     expect(game().debugApplied).toBe(false)

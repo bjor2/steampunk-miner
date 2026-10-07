@@ -7,7 +7,8 @@
  *
  * The twin bit's diagonal (GD lock on #257, ticket 279) replaces the ahead cell with the one 45
  * degrees to a side; it runs the same `canMine`, takes its own full hardness and is never listed
- * beside the bore.
+ * beside the bore. Gear aimed by the drive takes its bearing from the reported drive side, latched
+ * per cell (`aheadBearingLatch.ts`); the read hands the latch back for the vehicle to keep.
  *
  * Energy: the disc charges its ticks as before. Each listed cell charges its own ticks at the
  * drill's rate, an ahead cell at `aheadEnergyShareBp` (a whole share along the facing, the side
@@ -19,10 +20,11 @@
  * charged.
  */
 import { BASIS_POINTS } from '../../constants/balance'
+import { aheadEnergyShareOf, type DrillGear } from '../economy/drillGearCaps'
 import { drillGearOf } from '../registries/drillGear'
+import { latchAheadBearing, type AheadLatch, type DrillBit } from '../vehicle/aheadBearingLatch'
 import { drillGearCellsAt } from '../vehicle/drillGearCells'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
-import type { VehiclePose } from '../vehicle/vehiclePose'
 import {
   carveDisc,
   carveDiscWithCells,
@@ -34,8 +36,8 @@ import type { PlanetParams } from '../world/planetParams'
 import type { DiscStamp } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
 import { isRemovableCell } from '../world/worldCell'
-import { materialCellAt, type WorldState } from '../world/worldState'
-import type { AuthorityState } from './authorityState'
+import { isTileYielded, materialCellAt, type WorldState } from '../world/worldState'
+import { vehicleOf, type AuthorityState } from './authorityState'
 import type { DrillGates } from './drillGates'
 
 /** What a drill command's carve is given. */
@@ -50,6 +52,8 @@ export interface DrillCarveRequest {
 export interface DrillCarve extends Carve {
   /** The energy the drill gear's cells cost beyond the disc's ticks, in quanta. */
   gearQuanta: number
+  /** The ahead bearing this cut latched, or null when no gear is aimed by the drive. */
+  aheadLatch: AheadLatch | null
 }
 
 /** The drill gear's cells for one drill command, after `canMine`. */
@@ -58,47 +62,64 @@ export interface DrillGearRead {
   aheadEnergyShareBp: number
   sideCells: TilePoint[]
   sideEnergyShareBp: number
+  aheadLatch: AheadLatch | null
 }
 
 /** A carve with no drill gear: nothing beyond the disc's ticks. */
 export function withoutGear(carve: Carve): DrillCarve {
-  return { ...carve, gearQuanta: 0 }
+  return { ...carve, gearQuanta: 0, aheadLatch: null }
 }
 
 export function carveStampWithGear(
   state: AuthorityState,
   params: PlanetParams,
   playerId: string,
-  stamp: { pose: VehiclePose; disc: DiscStamp },
+  bit: DrillBit,
   request: DrillCarveRequest,
 ): DrillCarve {
-  const read = drillGearReadAt(state, params, playerId, stamp, request.gates)
+  const read = drillGearReadAt(state, params, playerId, bit, request.gates)
   if (read === null) {
     return withoutGear(
-      carveDisc(request.world, params, stamp.disc, request.window, request.gates.drillTicksOf),
+      carveDisc(request.world, params, bit.disc, request.window, request.gates.drillTicksOf),
     )
   }
-  return carveDiscAndGear(params, stamp.disc, read, request)
+  return carveDiscAndGear(params, bit.disc, read, request)
 }
 
-/** The player's drill gear at the stamp, listing only the cells that pass `canMine`; else null. */
+/** The player's drill gear at the bit, listing only the cells that pass `canMine`; else null. */
 export function drillGearReadAt(
   state: AuthorityState,
   params: PlanetParams,
   playerId: string,
-  stamp: { pose: VehiclePose; disc: DiscStamp },
+  bit: DrillBit,
   gates: DrillGates,
 ): DrillGearRead | null {
   const gear = drillGearOf(state, playerId)
   if (gear === null) return null
-  const cells = drillGearCellsAt(stamp.pose, stamp.disc, gear)
   const canMine = (tile: TilePoint) => isMineableCell(state.world, params, gates, tile)
+  const isUncut = (tile: TilePoint) => canMine(tile) && !isTileYielded(state.world, tile)
+  const aheadLatch = aheadLatchOf(state, playerId, gear, bit, isUncut)
+  const aheadBearing = aheadLatch?.bearing ?? 'facing'
+  const cells = drillGearCellsAt(bit.pose, bit.disc, { ...gear, aheadBearing })
   return {
     aheadCells: cells.ahead.filter(canMine),
-    aheadEnergyShareBp: gear.aheadEnergyShareBp,
+    aheadEnergyShareBp: aheadEnergyShareOf(gear, aheadBearing),
     sideCells: cells.side.filter(canMine),
     sideEnergyShareBp: gear.sideEnergyShareBp,
+    aheadLatch,
   }
+}
+
+/** The bearing latched for this cut when the drive aims the ahead cells; else none. */
+function aheadLatchOf(
+  state: AuthorityState,
+  playerId: string,
+  gear: DrillGear,
+  bit: DrillBit,
+  isUncut: (tile: TilePoint) => boolean,
+): AheadLatch | null {
+  if (gear.aheadAim !== 'drive' || gear.aheadCells === 0) return null
+  return latchAheadBearing(vehicleOf(state, playerId).aheadLatch ?? null, bit, isUncut)
 }
 
 /** Solid ground a drill may remove that no gate holds. */
@@ -129,7 +150,7 @@ function carveDiscAndGear(
     windows,
     request.gates.drillTicksOf,
   )
-  return { ...carved, gearQuanta: gearQuantaOf(carved, shares) }
+  return { ...carved, gearQuanta: gearQuantaOf(carved, shares), aheadLatch: read.aheadLatch }
 }
 
 /** Each listed cell's energy share in basis points, in carve order: ahead cells, then side. */

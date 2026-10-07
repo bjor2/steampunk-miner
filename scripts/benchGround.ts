@@ -64,6 +64,7 @@ function reportPose(state: AuthorityState, seq: number, x: number, y: number, fa
     thrustTicks: 0,
     driveTicks: 0,
     drillTicks: REPORT_TICKS,
+    drive: { x: 0, y: 0 },
   }
   const command = {
     playerId: 'p1',

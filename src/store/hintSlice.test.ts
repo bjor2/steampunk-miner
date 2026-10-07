@@ -13,6 +13,7 @@ import { readAuthorityTick, resetGameStore, takeSessionSnapshot, useGameStore } 
 import { readVehicleIntent, resetInput, routeKeyChange } from './inputRuntime'
 import { installPreferencesStorage, loadPreferences, preferencesWrites } from './preferencesFile'
 import { readPlaqueModel, readSellBayModel } from './screenReads'
+import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 const PLANET_1 = planetParamsFor(1, 1)
 const GAP = HINT_TABLE.minTicksBetweenHints
@@ -52,6 +53,7 @@ const idle = {
   thrustTicks: 0,
   driveTicks: 0,
   drillTicks: 0,
+  drive: NO_DRIVE,
 }
 
 function poseOver(tile: TilePoint, tick: number): ScriptedCommand {

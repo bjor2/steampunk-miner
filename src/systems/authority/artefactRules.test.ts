@@ -21,6 +21,7 @@ import {
   WORLD_SEED,
   type ScriptedSession,
 } from './scriptedSession'
+import { NO_DRIVE } from '../vehicle/driveSigns'
 
 const CACHE = artefactCacheTile(PARAMS)
 const open = { type: 'openArtefactCache', payload: {} } as const
@@ -49,6 +50,7 @@ function poseOn(tile: TilePoint, offset = { dx: 0, dy: 0 }): CommandIntent<'repo
       thrustTicks: 0,
       driveTicks: 0,
       drillTicks: 0,
+      drive: NO_DRIVE,
     },
   }
 }
