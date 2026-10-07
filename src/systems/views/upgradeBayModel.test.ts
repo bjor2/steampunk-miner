@@ -197,11 +197,14 @@ describe('upgrade bay model', () => {
     expect(model.tracks.every((row) => row.buy.reason === 'wrong_bay')).toBe(true)
   })
 
-  it('shows the quick action as a disabled wrong_bay sign that focus never lands on', () => {
-    const model = upgradeBayOf(atUpgradeBay('100'))
+  it('offers the quick action here too (#170), outside the focus order: Q runs it', () => {
+    const session = atUpgradeBay('100')
+    session.submit(3, { type: 'debug.setEnergy', payload: { energy: '75' } })
+    const model = upgradeBayOf(session)
     expect(model.quickService).toMatchObject({
       id: UI_IDS.upgradebayQuickService,
-      reason: 'wrong_bay',
+      label: 'Sell, repair and recharge',
+      reason: null,
     })
     expect(model.focusStops.map((stop) => stop.id)).not.toContain(UI_IDS.upgradebayQuickService)
   })

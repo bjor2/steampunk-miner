@@ -21,7 +21,7 @@
 import { toCanonical } from '../money'
 import { bayOfPose, isInBayZone, isPoseStationary, type VehiclePose } from '../vehicle/vehiclePose'
 import { cargoUnitsOf, isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
-import { BAY_IDS, hasBay, type BayId } from '../world/dockBays'
+import { BAY_IDS, hasBay, SLICE_BAY_IDS, type BayId } from '../world/dockBays'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import {
   chainEffects,
@@ -125,6 +125,23 @@ export function atBayRejection(
     () => notDockedRejection(vehicleOf(state, playerId)),
     () => wrongBayRejection(dockedBayOf(state, playerId), bay),
   ])
+}
+
+/** Quick service (#170): at either shop building, Sell or the Workshop; `wrong_bay` elsewhere. */
+export function atShopRejection(state: AuthorityState, playerId: string): Rejection | null {
+  return firstRejection([
+    () => notDockedRejection(vehicleOf(state, playerId)),
+    () => notAtShopRejection(dockedBayOf(state, playerId)),
+  ])
+}
+
+export function isShopBay(bay: BayId | null): boolean {
+  return bay !== null && SLICE_BAY_IDS.includes(bay)
+}
+
+function notAtShopRejection(docked: BayId | null): Rejection | null {
+  if (isShopBay(docked)) return null
+  return rejectionOf('wrong_bay', `only at a shop; the vehicle is at ${docked ?? 'no bay'}`)
 }
 
 function wrongBayRejection(docked: BayId | null, required: BayId): Rejection | null {

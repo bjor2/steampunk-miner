@@ -159,11 +159,11 @@ describe('input: no direct mutation (#33 acceptance 3)', () => {
     expect(readUpgradeBayModel().casing.grade).toBe(3)
   })
 
-  it('submits no quick action at the Upgrade bay, and no casing buy at the Sell bay', () => {
+  it('submits the quick action at the Upgrade bay too (#170), and no casing buy at the Sell bay', () => {
     game().giveMoney('100')
     game().setEnergy('100')
     game().teleportToDock('upgrade')
-    expect(submittedDuring(() => tap('quick_service'))).toEqual([])
+    expect(submittedDuring(() => tap('quick_service'))).toEqual(['quickService'])
     game().undock()
     game().teleportToDock('sell')
     expect(submittedDuring(() => game().pressScreenButton('upgradebay-casing-buy'))).toEqual([])

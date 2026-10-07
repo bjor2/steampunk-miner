@@ -25,6 +25,21 @@ describe('refinery bay docking', () => {
     })
   })
 
+  it('refuses the quick service at the Refinery bay as wrong_bay (#170)', () => {
+    const session = sessionOnPlanet(3, '1000')
+    dockAtBayOf(session, 10, REFINERY_SITE, 'refinery')
+    session.submit(11, { type: 'debug.setEnergy', payload: { energy: '75' } })
+    const events = session.submit(12, { type: 'quickService', payload: {} })
+    expect(rejectionOf(events)).toMatchObject({ reason: 'wrong_bay' })
+  })
+
+  it('docks the yard at the Refinery bay, between the two shops (#170)', () => {
+    const session = sessionOnPlanet(3)
+    const events = dockAtBayOf(session, 10, REFINERY_SITE, 'refinery')
+    expect(events.find((event) => event.type === 'DockEntered')).toMatchObject({ bay: 'refinery' })
+    expect(session.state().players.p1.vehicle.pose?.x).toBe(0)
+  })
+
   it('refuses a debug teleport to the Refinery bay before planet 3', () => {
     const session = sessionOnPlanet(2)
     const events = session.submit(10, {

@@ -78,9 +78,12 @@ describe('input routing', () => {
     expect(reactionToPress('ui_cancel', DOCKED)).toEqual(submitted('undock'))
   })
 
-  it('runs the quick service only at the Sell bay', () => {
+  it('runs the quick service at either shop, never at the Refinery (#170)', () => {
     expect(reactionToPress('quick_service', DOCKED)).toEqual(submitted('quickService'))
-    expect(reactionToPress('quick_service', AT_UPGRADE_BAY)).toEqual({ kind: 'none' })
+    expect(reactionToPress('quick_service', AT_UPGRADE_BAY)).toEqual(submitted('quickService'))
+    expect(reactionToPress('quick_service', { ...DOCKED, dockedBay: 'refinery' })).toEqual({
+      kind: 'none',
+    })
     expect(reactionToPress('quick_service', DRIVING)).toEqual({ kind: 'none' })
   })
 

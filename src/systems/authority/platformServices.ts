@@ -4,12 +4,13 @@
  * hull and the charging station refills the missing energy, each charge rounded up with
  * `ceilMilli` by its price function. `QuickService` is the three in order (sell all, repair,
  * recharge) at current prices, with their own events and none of its own; selling all starts by
- * collecting the player's ready Refinery batches (#105), which are paid at the Sell bay only.
+ * collecting the player's ready Refinery batches (#105), paid at the shop it runs at.
  * Every ore sale pays what it can of the vehicle's lining bill out of its value, the rest carrying
  * to the visit's next payout (#76 amendment, #128, `liningBill.ts`).
  *
- * Selling, recharging and the quick action are the Sell bay's; repair is the Upgrade bay's (#37),
- * though the quick action at the Sell bay still repairs at the same price.
+ * Selling and recharging are the Sell bay's; repair is the Upgrade bay's (#37). The quick action
+ * works at both shops (#170): at the Sell bay it still repairs, at the Workshop it still sells and
+ * recharges, at the same prices; only the Refinery refuses it.
  *
  * A charge the wallet cannot pay is refused with `money_short`, never trimmed to what it can pay.
  * A player holding `assay_beacon` (#46) sells the planet's shallow-band ore at the mid-band unit
@@ -47,7 +48,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
-import { atBayRejection } from './dockRules'
+import { atBayRejection, atShopRejection } from './dockRules'
 import type { DomainEventBody, SaleMode, SoldItem } from './domainEvent'
 import { liningPaidOutOf, payLiningBillOutOf } from './liningBill'
 import { collectWhenReady, readyRefinedValueOf } from './refinery/refineryCollection'
@@ -107,7 +108,7 @@ export const PLATFORM_SERVICE_RULES: {
     fields: {},
     reject: (state, { playerId }) =>
       firstRejection([
-        () => atBayRejection(state, playerId, 'sell'),
+        () => atShopRejection(state, playerId),
         () => nothingToServiceRejection(serviceQuote(state, playerId)),
         () => quickServiceMoneyRejection(state, playerId),
       ]),

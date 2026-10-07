@@ -8,12 +8,13 @@
  * closes the top layer: settings, the cards (no pick, the cache stays live), then the platform
  * screen (that is `Undock`), and in `vehicle` it opens settings. `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
- * refuse, the quick action away from the Sell bay (#37, #40), a tow call while the vehicle can
+ * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
  * still move, the guns' toggle with no guns mounted (#107) and a charge the authority would not
  * plant (#109: none carried, one live, no wall ahead) do nothing and are not buffered.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import { openArtefactCacheCommand } from '../artefacts/artefactCommands'
+import { isShopBay } from '../authority/dockRules'
 import { dockCommand, quickServiceCommand, undockCommand } from '../platform/platformCommands'
 import {
   plantChargeCommand,
@@ -87,7 +88,7 @@ const REACTIONS_BY_LAYER: Readonly<
   },
   platform: {
     ...MENU_REACTIONS,
-    quick_service: ({ dockedBay }) => (dockedBay === 'sell' ? submit(quickServiceCommand()) : NONE),
+    quick_service: ({ dockedBay }) => (isShopBay(dockedBay) ? submit(quickServiceCommand()) : NONE),
     ui_cancel: () => submit(undockCommand()),
   },
   artefact: {

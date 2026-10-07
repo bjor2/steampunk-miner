@@ -10,8 +10,8 @@
  * The preview is presentation only (#37, `upgradePreview`): focus and the install animation are UI
  * state, so moving focus never touches the authority or the digest.
  *
- * The quick action belongs to the Sell bay; here it is a disabled sign carrying `wrong_bay`
- * (#40), never a focus stop.
+ * The quick action works here as at the Sell bay (#170); as on the old sign (#40) it is never a
+ * focus stop, and `quick_service` (Q) runs it.
  */
 import { buttonIconIdOf, CASING_ICON_ID, PREVIEW_TIER_ICON_ID } from '../art/icons/iconSet'
 import type { AuthorityState } from '../authority/authorityState'
@@ -116,7 +116,7 @@ export function selectUpgradeBayModel(
   const footer = bayFooterOf(state, playerId, ui)
   const rows: ShopRows = { tracks, casing, lining, guns, charges, repair }
   const focusStops = upgradeBayFocusStops(rows, footer)
-  const quickService = wrongBayQuickServiceOf(state, playerId)
+  const quickService = quickServiceOf(state, playerId)
   return {
     header: bayHeaderOf(state, playerId, 'upgrade'),
     tracks,
@@ -181,13 +181,13 @@ function repairReadingOf(state: AuthorityState, playerId: string): RepairReading
   }
 }
 
-function wrongBayQuickServiceOf(state: AuthorityState, playerId: string): ScreenButton {
+function quickServiceOf(state: AuthorityState, playerId: string): ScreenButton {
   return withIcon(
     commandButton(
       state,
       playerId,
       UI_IDS.upgradebayQuickService,
-      'Sell, repair and recharge: at the Sell bay',
+      'Sell, repair and recharge',
       quickServiceCommand(),
     ),
     buttonIconIdOf('quick_service'),

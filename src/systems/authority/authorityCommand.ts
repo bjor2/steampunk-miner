@@ -42,8 +42,10 @@ import type { BayId } from '../world/dockBays'
  *    64 tiles a tick after it blows, `ChargeDetonated` keeps only its tile, `BlastFront` and
  *    `BlastResolved` join, a blast's `TileDestroyed` carries `cause: 'blast'`, and power-up
  *    terrain edits apply from the queue.
+ * 19: `QuickService` works at the Workshop (`upgrade`) as well as at Sell, and is refused
+ *    `wrong_bay` at the Refinery only (#170, #175).
  */
-export const AUTHORITY_PROTOCOL_VERSION = 18
+export const AUTHORITY_PROTOCOL_VERSION = 19
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

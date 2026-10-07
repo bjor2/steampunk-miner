@@ -1,7 +1,7 @@
 /**
  * The Upgrade bay screen (#37, #45 wire): the tracks, the Casing row and repair on the left 45%,
- * the live vehicle preview on the right 55%, and the quick action's sign pointing back at the
- * Sell bay. Markup only.
+ * the live vehicle preview on the right 55%, and the quick action, which works at both shops
+ * (#170). Markup only.
  */
 import type { UpgradeBayModel } from '../../systems/views/upgradeBayModel'
 import { UI_IDS } from '../ids'

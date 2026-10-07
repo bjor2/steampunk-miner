@@ -86,7 +86,8 @@ describe('sell bay model', () => {
     session.submit(200, teleportToDockCommand('upgrade'))
     const model = sellBayOf(session)
     expect(model.shop.sellAll.reason).toBe('wrong_bay')
-    expect(model.quickService.button.reason).toBe('wrong_bay')
+    // The quick action works at both shops (#170).
+    expect(model.quickService.button.reason).toBeNull()
   })
 
   it('says core_short at 62 fragments and ready at 63 with 60.8 money', () => {

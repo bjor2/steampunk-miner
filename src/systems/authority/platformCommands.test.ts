@@ -538,7 +538,7 @@ describe('platform: workshop', () => {
 })
 
 describe('platform: two bays', () => {
-  const SELL_BAY_COMMANDS: readonly CommandIntent[] = [sell('all'), recharge, quickService]
+  const SELL_BAY_COMMANDS: readonly CommandIntent[] = [sell('all'), recharge]
   const UPGRADE_BAY_COMMANDS: readonly CommandIntent[] = [
     repair,
     buy('engine'),
@@ -586,8 +586,20 @@ describe('platform: two bays', () => {
     expect(typesOf(session.submit(6, dock))).toContain('DockEntered')
   })
 
+  it('runs the quick action at the Workshop too: it sells, repairs and recharges there (#170)', () => {
+    const { session, tick } = wornWithOre()
+    session.submit(tick, undock)
+    session.submit(tick, poseAtBay('upgrade'))
+    session.submit(tick, dockAtUpgradeBay)
+    const types = typesOf(session.submit(tick + 1, quickService))
+    expect(types).toEqual(
+      expect.arrayContaining(['ResourceSold', 'RepairPurchased', 'EnergyRecharged']),
+    )
+    expect(types).not.toContain('CommandRejected')
+  })
+
   it('sells, recharges and runs the quick action at the Sell bay; buys and repairs are wrong_bay', () => {
-    for (const intent of SELL_BAY_COMMANDS) {
+    for (const intent of [...SELL_BAY_COMMANDS, quickService]) {
       const { session, tick } = wornWithOre()
       expect(rejectionOf(session.submit(tick, intent))).toBeNull()
     }
@@ -599,7 +611,7 @@ describe('platform: two bays', () => {
     }
   })
 
-  it('buys and repairs at the Upgrade bay; selling, recharging and the quick action are wrong_bay', () => {
+  it('buys and repairs at the Upgrade bay; selling and recharging alone are wrong_bay', () => {
     for (const intent of UPGRADE_BAY_COMMANDS) {
       const { session, tick } = wornWithOre()
       moveToUpgradeBay(session, tick)
