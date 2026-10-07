@@ -151,3 +151,53 @@ describe('slots tab html', () => {
     ])
   })
 })
+
+describe('gate tokens and the box Tester (2026-10-07)', () => {
+  const view = (model) => ({
+    repo: 'o/r',
+    nowMs: NOW_MS,
+    freshness: slotsFreshness(model, [], NOW_MS),
+  })
+  const withTester = (tester) => {
+    const raw = allFree()
+    raw.claude[0] = {
+      slot: 1,
+      state: 'busy',
+      kind: 'aux',
+      label: 'tester-triage',
+      ticket: null,
+      grok_slot: null,
+      since: UPDATED,
+    }
+    return readSlotsSnapshot({ ...raw, gate: { busy: 2, max: 3 }, tester })
+  }
+
+  it('shows the gate tokens in use and the tester holding a gate token and a Claude slot', () => {
+    const model = withTester({
+      state: 'running',
+      phase: 'slow',
+      since: UPDATED,
+      holds_gate: true,
+      claude_slot: 1,
+    })
+    const html = renderSlotsPanel(model, view(model))
+    expect(html).toContain('Gate tokens <b>2/3</b> busy')
+    expect(html).toContain('holds a gate token + Claude slot C1')
+    expect(html).toContain('aux · tester-triage')
+  })
+
+  it('shows an idle tester and the main-red pause', () => {
+    const model = withTester({ state: 'idle', last_run: UPDATED, main_red_sha: 'abc1234' })
+    const html = renderSlotsPanel(model, view(model))
+    expect(html).toContain('sl-free">idle')
+    expect(html).toContain('MAIN RED')
+  })
+
+  it('keeps working on a snapshot without gate or tester', () => {
+    const model = readSlotsSnapshot(allFree())
+    expect(model.gate).toBeNull()
+    expect(renderSlotsPanel(model, view(model))).toContain(
+      'Tester: <span class="muted">not published',
+    )
+  })
+})

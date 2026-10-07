@@ -44,8 +44,9 @@ function sinceCell(since, view) {
   return `<td class="muted" title="${escapeHtml(since ?? '')}">${ageOf(since, view.nowMs)}</td>`
 }
 
-function stateBadge(state, kind) {
-  const kindHtml = kind && kind !== 'dev' ? ` <span class="muted">${escapeHtml(kind)}</span>` : ''
+function stateBadge(state, kind, label = null) {
+  const kindText = [kind && kind !== 'dev' ? kind : null, label].filter(Boolean).join(' · ')
+  const kindHtml = kindText ? ` <span class="muted">${escapeHtml(kindText)}</span>` : ''
   return `<span class="badge sl-${escapeHtml(state)}">${escapeHtml(state)}</span>${kindHtml}`
 }
 
@@ -76,7 +77,7 @@ function claudeRow(s, view) {
   const slotHtml = s.grokSlot === null ? s.slot : pairChip(s.slot, s.grokSlot)
   return `<tr>
     <td>${slotHtml}</td>
-    <td>${stateBadge(s.state, s.kind)}</td>
+    <td>${stateBadge(s.state, s.kind, s.label)}</td>
     <td>${ticketLink(s.ticket, view)}</td>
     <td>${claudeLinkCell(s)}</td>
     ${sinceCell(s.since, view)}</tr>`
@@ -126,12 +127,35 @@ function freshnessLine(freshness, view) {
   return `<div class="warn sl-fresh"><span class="badge stale">STALE</span> The loop last confirmed this snapshot ${seen} (over ${SLOTS_STALE_AFTER_MIN} min): slots may have changed since.</div>`
 }
 
+function testerText(tester, view) {
+  if (!tester) return 'Tester: <span class="muted">not published</span>'
+  if (tester.state !== 'running') {
+    return `Tester: <span class="badge sl-free">idle</span> <span class="muted">last run ${ageOf(tester.lastRunAt, view.nowMs)}</span>`
+  }
+  const holds = [
+    tester.holdsGate ? 'a gate token' : null,
+    tester.claudeSlot ? `Claude slot C${tester.claudeSlot}` : null,
+  ]
+    .filter(Boolean)
+    .join(' + ')
+  return `Tester: <span class="badge sl-busy">${escapeHtml(tester.phase ?? 'running')}</span> holds ${holds || 'nothing yet (waiting for a gate token)'} <span class="muted">since ${ageOf(tester.since, view.nowMs)}</span>`
+}
+
+// Gate tokens (worker gates + Tester heavy phases) and the box Tester, under the freshness line.
+function stageLine(model, view) {
+  const gate = model.gate ? `Gate tokens <b>${model.gate.busy}/${model.gate.max}</b> busy` : ''
+  const red = model.tester?.mainRedSha
+    ? ' · <span class="badge stale">MAIN RED</span> no new dev workers (<a href="#tests">Tests tab</a>)'
+    : ''
+  return `<div class="sl-fresh">${[gate, testerText(model.tester, view)].filter(Boolean).join(' · ')}${red}</div>`
+}
+
 /**
  * The Slots tab body. `view` carries what the model does not: `repo` (`owner/name`), `nowMs`,
  * the `freshness` from slotsFreshness and optional issue `titles` by number.
  */
 export function renderSlotsPanel(model, view) {
-  return `${freshnessLine(view.freshness, view)}<div class="sl-grid">${grokSection(model, view)}${claudeSection(model, view)}</div>`
+  return `${freshnessLine(view.freshness, view)}${stageLine(model, view)}<div class="sl-grid">${grokSection(model, view)}${claudeSection(model, view)}</div>`
 }
 
 /** The tab body when slots.json is missing or malformed. */

@@ -63,6 +63,8 @@ function readClaudeSlot(entry) {
     slot: `${CLAUDE_SLOT_PREFIX}${number ?? '?'}`,
     state: knownOr(entry?.state, CLAUDE_STATES, 'free'),
     kind: knownOr(entry?.kind, CLAUDE_KINDS, null),
+    // An aux session's purpose (e.g. tester-triage: the box Tester's Claude triage).
+    label: publicTextOrNull(entry?.label),
     ticket: positiveIntegerOrNull(entry?.ticket),
     grokSlot: positiveIntegerOrNull(entry?.grok_slot),
     since: stampOrNull(entry?.since),
@@ -158,6 +160,34 @@ function poolsOf(raw) {
   return { grok, accounts, isSplitByAccount: hasAccounts }
 }
 
+function countOrNull(value) {
+  return Number.isSafeInteger(value) && value >= 0 ? value : null
+}
+
+// The gate stage semaphore: worker gate runs and the box Tester's heavy phases share its tokens.
+function readGate(raw) {
+  const gate = isObject(raw.gate) ? raw.gate : {}
+  const max = positiveIntegerOrNull(gate.max) ?? capOrNull(raw.caps, 'gate')
+  return max === null ? null : { busy: countOrNull(gate.busy) ?? 0, max }
+}
+
+const TESTER_STATES = ['idle', 'running']
+
+// The box Tester (tester.sh): which phase runs, whether it holds a gate token or a Claude slot.
+function readTester(raw) {
+  const t = raw.tester
+  if (!isObject(t)) return null
+  return {
+    state: knownOr(t.state, TESTER_STATES, 'idle'),
+    phase: publicTextOrNull(t.phase),
+    since: stampOrNull(t.since),
+    holdsGate: t.holds_gate === true,
+    claudeSlot: positiveIntegerOrNull(t.claude_slot),
+    lastRunAt: stampOrNull(t.last_run),
+    mainRedSha: publicTextOrNull(t.main_red_sha),
+  }
+}
+
 function modelOf(raw, pools) {
   const accounts = linkClaudeToGrok(pools.accounts, pools.grok).map(withAccountTotals)
   return {
@@ -165,6 +195,8 @@ function modelOf(raw, pools) {
     grok: linkGrokToClaude(pools.grok, accounts),
     accounts,
     isSplitByAccount: pools.isSplitByAccount,
+    gate: readGate(raw),
+    tester: readTester(raw),
     totals: {
       grok: grokTotalsOf(pools.grok, raw.caps),
       claude: claudeTotalsOf(accounts.flatMap((a) => a.slots)),
