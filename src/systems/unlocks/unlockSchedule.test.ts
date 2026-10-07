@@ -18,7 +18,7 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = 'a2e145aba9a40b374604b98e0e7eac97ab2edbd9ad8fda5e6aa8f806ca6dcfff'
+const LOCKED_FILE_SHA256 = 'f7bfd3f1708cfde8fbe1e4dd8ca3c182593b774e6e75b64474db385a4fb3d127'
 
 /**
  * The canonical form of `source_hash_method` (docs/scaling/horizontal/source_hash.mjs, #153):
@@ -174,7 +174,7 @@ describe('locked unlock schedule', () => {
   it('unlocks no vision row whose module is not built, even when every bind is met', () => {
     const visionRows = LOCKED_SCHEDULE.rows.filter((row) => row.status === 'vision')
     const progress = progressWithEveryBindMet(visionRows)
-    expect(visionRows).toHaveLength(35)
+    expect(visionRows).toHaveLength(32)
     expect(visionRows.filter((row) => isUnlocked(row, progress))).toEqual([])
   })
 
@@ -225,6 +225,16 @@ describe('locked unlock schedule', () => {
       builtFacilityRowIds: new Set([row.id]),
     }
     expect(isUnlocked(row, withBay)).toBe(true)
+  })
+
+  it('marks the three dock add-on facility rows shipped in the locked file (#222)', () => {
+    const addOnRows = ['scanner_station', 'research_lab', 'drone_bay']
+    const rows = LOCKED_SCHEDULE.rows.filter((row) => addOnRows.includes(row.id))
+    expect(rows.map((row) => [row.id, row.planetIndex, row.bind, row.status])).toEqual([
+      ['scanner_station', 14, 'facility', 'shipped'],
+      ['research_lab', 15, 'facility', 'shipped'],
+      ['drone_bay', 20, 'facility', 'shipped'],
+    ])
   })
 
   it('opens the built blasting_charges row at planet 7, its locked planet (#95)', () => {

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
-import type { UnlockSchedule } from '../unlocks/readUnlockSchedule'
+import type { UnlockRow, UnlockSchedule } from '../unlocks/readUnlockSchedule'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 import { builtFacilityRowIdsOn } from './builtFacilities'
-import { featureUnlocksOfTravel, featureUnlocksOfTravelIn } from './featureUnlocks'
+import { featureUnlocksOfTravelIn } from './featureUnlocks'
 
 // A slice stamps a dock building through the dock-building registry (#221); a fake slice
 // registers one through withRegistrations, so no real slice is imported.
@@ -14,15 +14,15 @@ const LAB_PROBE: SliceDefinition = {
   register: (r) => r.dockFacility({ id: 'lab-probe.annex', scheduleRowId: 'research_lab' }),
 }
 
-/** The locked schedule with `rowId` shipped, as the wiring ticket (#222) flips it. */
-function scheduleWithShipped(rowId: string): UnlockSchedule {
+/** The locked schedule with `rowId` at `status`: shipped as #222 flipped it, or still vision. */
+function scheduleWithStatus(rowId: string, status: UnlockRow['status']): UnlockSchedule {
   return {
     ...LOCKED_SCHEDULE,
-    rows: LOCKED_SCHEDULE.rows.map((row) =>
-      row.id === rowId ? { ...row, status: 'shipped' } : row,
-    ),
+    rows: LOCKED_SCHEDULE.rows.map((row) => (row.id === rowId ? { ...row, status } : row)),
   }
 }
+
+const scheduleWithShipped = (rowId: string) => scheduleWithStatus(rowId, 'shipped')
 
 const builtRowsOn = (slices: readonly SliceDefinition[], planetIndex: number) =>
   withRegistrations(slices, () => [...builtFacilityRowIdsOn(planetIndex)])
@@ -56,7 +56,8 @@ describe('built facilities', () => {
   })
 
   it('keeps a vision row shut though its building stands, until the lock ships it', () => {
-    const unlocks = withRegistrations([LAB_PROBE], () => featureUnlocksOfTravel(14, 15))
+    const vision = scheduleWithStatus('research_lab', 'vision')
+    const unlocks = withRegistrations([LAB_PROBE], () => featureUnlocksOfTravelIn(vision, 14, 15))
     expect(unlocks).not.toContainEqual({ type: 'FeatureUnlocked', featureId: 'research_lab' })
   })
 
