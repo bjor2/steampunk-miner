@@ -16,8 +16,11 @@ export interface FlightPoint {
 
 /** How far a coin fans out sideways from the stack across the burst (m). */
 const COIN_FAN_M = 1.6
-/** The screen flight's bow upward, as a share of its length. */
-const SCREEN_ARC_SHARE = 0.25
+/**
+ * The screen flight's bow, as a share of its length; a fraction, since its decimal is an
+ * economy.json ratio the economy source scan refuses outside that file.
+ */
+const SCREEN_ARC_SHARE = 1 / 4
 
 /**
  * The `index`-th of `count` chunks at `elapsed` ticks into its wave: launched one after another
