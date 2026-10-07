@@ -94,6 +94,11 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...LOADOUT_RULES,
 }
 
+/** Every kernel command type: the keys of the kernel's own rule table. */
+export function kernelCommandTypes(): readonly string[] {
+  return Object.keys(COMMAND_RULES)
+}
+
 /** The kernel's rule first, so a kernel command never reads the slice registry. */
 function ruleOf(type: string): CommandRule<CommandType> | undefined {
   return Object.hasOwn(COMMAND_RULES, type) ? COMMAND_RULES[type] : sliceCommandRuleOf(type)
