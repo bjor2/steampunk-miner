@@ -14,6 +14,8 @@ export const ROWS_SHOWN = 200
 export const SLOWDOWN_RATIO = 1.5
 /** …and at least this many ms more, so a 2 ms test going to 4 ms does not stand out. */
 export const SLOWDOWN_MIN_MS = 20
+/** …over at least this many earlier runs, so one noisy run (another machine) flags nothing. */
+export const SLOWDOWN_MIN_RUNS = 3
 
 const STATUS_OF_CHAR = { p: 'passed', f: 'failed', s: 'skipped', '-': 'not run' }
 const STATUS_ORDER = ['failed', 'not run', 'skipped', 'passed']
@@ -61,7 +63,7 @@ function median(values) {
 function slowdownOf(trend, current) {
   const before = trend.slice(0, current).filter((ms) => ms !== null)
   const latest = trend[current]
-  if (before.length === 0 || latest === null || latest === undefined)
+  if (before.length < SLOWDOWN_MIN_RUNS || latest === null || latest === undefined)
     return { ratio: null, isSlowing: false }
   const baseline = median(before)
   const isSlowing = latest >= baseline * SLOWDOWN_RATIO && latest - baseline >= SLOWDOWN_MIN_MS

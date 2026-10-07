@@ -31,27 +31,27 @@ function history(over = {}) {
     schema: 1,
     updatedAt: '2026-10-07T02:00:00Z',
     lastRuns: 20,
-    currentRunId: 3,
-    runs: [runLine(1), runLine(2), runLine(3)],
+    currentRunId: 4,
+    runs: [runLine(1), runLine(2), runLine(3), runLine(4)],
     files: {
       [ORES]: {
         feature: 'ores',
         area: 'ores',
         status: 'passed',
-        ms: [100, 110, 400],
+        ms: [100, 105, 110, 400],
         tests: {
-          'ore tiers sell one tier up': [[10, 10, 300], 'ppp'],
-          'ore tiers drill at H(t+5)': [[5, 6, 6], 'ppf'],
+          'ore tiers sell one tier up': [[10, 10, 10, 300], 'pppp'],
+          'ore tiers drill at H(t+5)': [[5, 6, 6, 6], 'pppf'],
         },
       },
       [PRICES]: {
         feature: 'kernel',
         area: 'economy',
         status: 'passed',
-        ms: [50, null, 60],
+        ms: [50, null, 55, 60],
         tests: {
-          'prices round up': [[40, null, 41], 'p-p'],
-          'prices later': [[0, null, 0], 's-s'],
+          'prices round up': [[40, null, 40, 41], 'p-pp'],
+          'prices later': [[0, null, 0, 0], 's-ss'],
         },
       },
     },
@@ -65,7 +65,7 @@ describe('tests overview', () => {
   it('lists every test of the current run with its feature, status, duration and trend', () => {
     const model = readTestsOverview(history())
 
-    expect(model.run).toMatchObject({ id: 3, sha: SHA, label: 'nightly', conclusion: 'success' })
+    expect(model.run).toMatchObject({ id: 4, sha: SHA, label: 'nightly', conclusion: 'success' })
     expect(model.rows).toContainEqual(
       expect.objectContaining({
         file: PRICES,
@@ -74,7 +74,7 @@ describe('tests overview', () => {
         area: 'economy',
         status: 'passed',
         ms: 41,
-        trend: [40, null, 41],
+        trend: [40, null, 40, 41],
       }),
     )
   })
@@ -89,8 +89,8 @@ describe('tests overview', () => {
     const model = readTestsOverview(history())
 
     expect(model.features.map((f) => [f.feature, f.files, f.tests, f.ms, f.trend])).toEqual([
-      ['ores', 1, 2, 400, [100, 110, 400]],
-      ['kernel', 1, 2, 60, [50, null, 60]],
+      ['ores', 1, 2, 400, [100, 105, 110, 400]],
+      ['kernel', 1, 2, 60, [50, null, 55, 60]],
     ])
   })
 
@@ -103,11 +103,15 @@ describe('tests overview', () => {
     expect(model.features.find((f) => f.feature === 'ores').isSlowing).toBe(true)
   })
 
-  it('does not flag a few ms on a tiny test or a test with no earlier run', () => {
+  it('does not flag a few ms on a tiny test or a test with under three earlier runs', () => {
     const files = {
       [PRICES]: {
         ...history().files[PRICES],
-        tests: { tiny: [[2, 3, 9], 'ppp'], fresh: [[null, null, 900], '--p'] },
+        tests: {
+          tiny: [[2, 3, 3, 9], 'pppp'],
+          young: [[null, 10, 10, 300], '-ppp'],
+          fresh: [[null, null, null, 900], '---p'],
+        },
       },
     }
     const model = readTestsOverview(history({ files }))
@@ -142,7 +146,7 @@ describe('tests overview', () => {
 
   it('shows the first rows until asked for all', () => {
     const tests = Object.fromEntries(
-      Array.from({ length: ROWS_SHOWN + 5 }, (_, i) => [`test ${i}`, [[i, i, i], 'ppp']]),
+      Array.from({ length: ROWS_SHOWN + 5 }, (_, i) => [`test ${i}`, [[i, i, i, i], 'pppp']]),
     )
     const files = { [PRICES]: { ...history().files[PRICES], tests } }
 

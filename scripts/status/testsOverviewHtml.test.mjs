@@ -25,17 +25,17 @@ const runLine = (id) => ({
 
 const HISTORY = {
   updatedAt: '2026-10-07T02:00:00Z',
-  currentRunId: 3,
-  runs: [runLine(1), runLine(2), runLine(3)],
+  currentRunId: 4,
+  runs: [runLine(1), runLine(2), runLine(3), runLine(4)],
   files: {
     [FILE]: {
       feature: 'ores',
       area: 'ores',
       status: 'failed',
-      ms: [100, 110, 400],
+      ms: [100, 105, 110, 400],
       tests: {
-        'ore tiers sell <one> tier up': [[10, 10, 300], 'ppp'],
-        'ore tiers drill deeper': [[5, null, 6], 'p-f'],
+        'ore tiers sell <one> tier up': [[10, 10, 10, 300], 'pppp'],
+        'ore tiers drill deeper': [[5, null, 5, 6], 'p-pf'],
       },
     },
   },
@@ -60,7 +60,7 @@ describe('tests overview html', () => {
     expect(html).toContain(`/commit/${SHA}">e8d776b</a>`)
     expect(html).toContain('<b>2</b> tests in <b>1</b> files')
     expect(html).toContain('<span class="bad">1 failed</span>')
-    expect(html).toContain('trend over the last 3 runs')
+    expect(html).toContain('trend over the last 4 runs')
   })
 
   it('marks a test and a feature getting slower and links the slow-down sort', () => {

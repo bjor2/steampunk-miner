@@ -1,9 +1,10 @@
 # Loop status: the one-liner
 
-The status dashboard — **https://bjor2.github.io/steampunk-miner/status/** — has five tabs, each
+The status dashboard — **https://bjor2.github.io/steampunk-miner/status/** — has six tabs, each
 linkable: **Issue trees** (`#issues`), **Loops** (`#loops`, the default), **Slots** (`#slots`, the
-build loop's slot pools), **Features** (`#features`, the game feature tree) and **Performance**
-(`#performance`, short link `/status/performance/`). It shows the issue trees and what every automated loop is
+build loop's slot pools), **Tests** (`#tests`, the box Tester and every test's duration, feature
+and trend), **Features** (`#features`, the game feature tree) and **Performance** (`#performance`,
+short link `/status/performance/`). It shows the issue trees and what every automated loop is
 doing. A loop reports its state with one command:
 
 ```bash
@@ -150,6 +151,30 @@ the tables.
   the `steampunk-loop` entries in `loops.json` (sent every 10 min while a session runs, and on every
   pass); older than 20 min (`SLOTS_STALE_AFTER_MIN`) and the tab, its badge and the header line say
   STALE.
+
+## Tests tab
+
+**https://bjor2.github.io/steampunk-miner/status/#tests** shows the box Tester's state and runs
+(above, see the Slots tab section) and, under **Every test**, each Vitest test with its feature,
+latest status and duration, a sparkline of its duration over the recorded runs and a link to its
+file at the run's commit. Above the list: which run it comes from (commit, time, run record), the
+counts of files and tests with passed, failed and skipped, each feature's files, tests and total
+duration with its own trend, and the slowest 10 tests. A test or feature whose latest run is at
+least 1.5× and 20 ms over the median of three or more earlier runs is marked **slower**
+(`scripts/status/testsOverview.mjs`).
+
+The feature is the #191 lock: the test's `src/features/<slice>/` folder, else `cross-slice` for a
+kernel file a check in `scripts/tests/crossSliceChecks.mjs` names, else `kernel`, with the
+`tests/MANIFEST.md` area beside it. Sort and filter by feature, status, duration, file or slow-down
+and search file, test or area; the choice stays in the hash (`#tests?feature=ores&sort=slowdown`,
+`&status=failed`, `&q=bag`, `&dir=asc`; the first 200 rows show, `&all=1` shows every one).
+
+The data is `tests.json` on the orphan `test-metrics` branch, rebuilt with `summary.json` each time
+the Tester records a run ([test-metrics.md](metrics/test-metrics.md#per-test-history-testsjson-schema-1)).
+Only runs that keep every test's duration feed it, so the trend has one point per nightly (the last
+20). Nothing is committed to main, and the branch has no workflows, so no CI or Pages run starts.
+The page reads it from raw when the tab opens and on the 60 s poll while the tab is shown;
+`build-status.mjs` copies it beside the page as `test-history.json` for when raw fails.
 
 ## Feature tree
 

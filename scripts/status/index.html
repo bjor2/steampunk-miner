@@ -1676,6 +1676,33 @@
         margin-top: 12px;
         overflow-x: auto;
       }
+      .te-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        align-items: center;
+        margin: 12px 0 6px;
+      }
+      .te-filters input {
+        min-width: 16em;
+      }
+      .te-tests td {
+        vertical-align: top;
+      }
+      .te-spark {
+        display: block;
+        fill: var(--accent);
+        stroke: var(--accent);
+      }
+      .te-spark polyline {
+        fill: none;
+        stroke-width: 1.5;
+        stroke-linejoin: round;
+      }
+      .te-spark.slow {
+        fill: var(--red);
+        stroke: var(--red);
+      }
       .sl-pool h3 {
         font-size: 14px;
         margin: 0 0 6px;
@@ -1819,6 +1846,7 @@
             >
           </h2>
           <div id="tests-body" class="muted">loading…</div>
+          <div id="tests-overview" class="muted">loading the test list…</div>
         </section>
       </section>
       <section class="tab hidden" id="tab-issues" data-tab="issues">
@@ -2447,6 +2475,84 @@
         }
       }
 
+      // ---------- Tests tab test list (#192): testsOverview.mjs + testsOverviewHtml.mjs, tests.json ----------
+      // Read when the tab is shown and on the live poll while it is; the filter bar keeps focus
+      // because typing re-renders only the rows and rewrites the hash in place.
+      let TEST_LIST_VIEW = null
+      let TEST_HISTORY = null
+      let TEST_QUERY = null
+      let TEST_TYPING = null
+      async function refreshTestHistory() {
+        const branch = (DATA && DATA.tests && DATA.tests.metricsBranch) || 'test-metrics'
+        const sources = [
+          `https://raw.githubusercontent.com/${DATA.repo}/${branch}/tests.json`,
+          './test-history.json',
+        ]
+        for (const url of sources) {
+          try {
+            const r = await fetch(url, { cache: 'no-store' })
+            if (!r.ok) continue
+            const doc = await r.json()
+            const isNewer = !TEST_HISTORY || (doc.updatedAt || '') > (TEST_HISTORY.updatedAt || '')
+            if (isNewer) TEST_HISTORY = doc
+            return isNewer
+          } catch (_) {
+            /* try the copy beside the page */
+          }
+        }
+        return false
+      }
+      function testListModel() {
+        return TEST_LIST_VIEW.model.readTestsOverview(TEST_HISTORY, TEST_QUERY)
+      }
+      function renderTestList() {
+        if (!TEST_LIST_VIEW || !DATA || !TEST_QUERY) return
+        const model = testListModel()
+        const view = { repo: DATA.repo, nowMs: Date.now() }
+        $('#tests-overview').className = ''
+        $('#tests-overview').innerHTML = model.error
+          ? TEST_LIST_VIEW.html.renderTestsOverviewFailure(model.error)
+          : TEST_LIST_VIEW.html.renderTestsOverview(model, view)
+      }
+      function renderTestRows() {
+        const model = testListModel()
+        if (model.error) return renderTestList()
+        $('#te-list').innerHTML = TEST_LIST_VIEW.html.renderTestsList(model, {
+          repo: DATA.repo,
+          nowMs: Date.now(),
+        })
+      }
+      function showTestList(params) {
+        TEST_QUERY = TEST_LIST_VIEW.model.readTestsQuery(Object.fromEntries(params))
+        if (TEST_HISTORY) return renderTestList()
+        refreshTestHistory().then(renderTestList)
+      }
+      // A new sort starts in its own direction (duration high to low, file A to Z).
+      function readTestFilterBar(changed) {
+        const value = (name) => $(`#te-filter-bar [data-te="${name}"]`).value
+        return TEST_LIST_VIEW.model.readTestsQuery({
+          feature: value('feature'),
+          status: value('status'),
+          sort: value('sort'),
+          dir: changed === 'sort' ? null : value('dir'),
+          q: value('q'),
+        })
+      }
+      function applyTestFilterBar(changed) {
+        TEST_QUERY = readTestFilterBar(changed)
+        history.replaceState(null, '', TEST_LIST_VIEW.html.testsHashOf(TEST_QUERY))
+        if (changed === 'sort') return renderTestList()
+        renderTestRows()
+      }
+      $('#tests-overview').addEventListener('change', (e) => {
+        if (e.target.closest('#te-filter-bar select')) applyTestFilterBar(e.target.dataset.te)
+      })
+      $('#tests-overview').addEventListener('input', (e) => {
+        if (!e.target.closest('#te-filter-bar input')) return
+        clearTimeout(TEST_TYPING)
+        TEST_TYPING = setTimeout(() => applyTestFilterBar('q'), 250)
+      })
+
       function renderMeta() {
         const run = DATA.run
         $('#meta').innerHTML =
@@ -2569,6 +2675,8 @@
         })
         if (!SLOTS || !SLOTS_SRC.startsWith('live')) SLOTS = DATA.slots ?? null
         renderAll()
+        if (TEST_LIST_VIEW && !TEST_QUERY && parseHash().tab === 'tests')
+          showTestList(parseHash().params)
         loadFeatures().catch((e) => {
           $('#ft-error').innerHTML =
             `<div class="ft-error">Feature tree failed to load: ${esc(e)}</div>`
@@ -2953,8 +3061,9 @@
         }),
       )
 
-      // ---------- tabs: #issues, #loops (default), #slots, #features, #performance; `#features?q=lava`
-      // pre-fills search; the old #perf-panel and a chart's own #metric-… id open Performance.
+      // ---------- tabs: #issues, #loops (default), #slots, #tests, #features, #performance;
+      // `#features?q=lava` pre-fills search, `#tests?feature=ores&sort=slowdown` filters the test
+      // list; the old #perf-panel and a chart's own #metric-… id open Performance.
       const TABS = {
         issues: 'Issue trees',
         loops: 'Loops',
@@ -2995,6 +3104,7 @@
           readIssueView(params)
           showIssueView()
         }
+        if (tab === 'tests' && TEST_LIST_VIEW && DATA) showTestList(params)
         if (target) document.getElementById(target)?.scrollIntoView({ block: 'center' })
       }
       window.addEventListener('hashchange', showTab)
@@ -3062,9 +3172,20 @@
           $('#tests-body').innerHTML =
             `<div class="warn">Tests view failed to load: ${esc(e)}</div>`
         })
+      Promise.all([import('./testsOverview.mjs'), import('./testsOverviewHtml.mjs')])
+        .then(([model, html]) => {
+          TEST_LIST_VIEW = { model, html }
+          if (DATA && parseHash().tab === 'tests') showTestList(parseHash().params)
+        })
+        .catch((e) => {
+          $('#tests-overview').innerHTML =
+            `<div class="warn">Test list failed to load: ${esc(e)}</div>`
+        })
       async function pollLoops() {
         if (!DATA || document.hidden) return
         refreshTestsSummary().then(renderTests)
+        if (TEST_HISTORY && parseHash().tab === 'tests')
+          refreshTestHistory().then((isNewer) => isNewer && renderTestList())
         if (await refreshLoops()) {
           renderMeta()
           renderLoops()

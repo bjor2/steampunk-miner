@@ -10,7 +10,9 @@
 // window, under a "Tickets closed over time" chart from the same issue list (#138). The Issue trees
 // status filter and issue cards (#194) run in the page from the three issue*.mjs modules copied
 // next to index.html, fed by status.json (issues with their in-progress label time, the published
-// slots.json and each measured ticket's phase bar). Static output, no server.
+// slots.json and each measured ticket's phase bar). The Tests tab (#192) renders in the page from
+// the four tests*.mjs modules, fed by the test-metrics branch: summary.json in status.json, and the
+// per-test tests.json read live, with a copy as test-history.json. Static output, no server.
 //
 //   node scripts/status/build-status.mjs [--out dist/status]
 //
@@ -67,6 +69,8 @@ const PAGE_MODULES = [
   'perfOverviewHtml.mjs',
   'tests.mjs',
   'testsHtml.mjs',
+  'testsOverview.mjs',
+  'testsOverviewHtml.mjs',
 ]
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
 const [OWNER, NAME] = REPO.split('/')
@@ -267,6 +271,15 @@ async function fetchTests() {
     testedStatuses: tested && publicStatusesOf(tested),
     statuses: statuses && publicStatusesOf(statuses),
   }
+}
+
+// The Tests tab's per-test list (tests.json, #192), copied next to the page as the fallback when
+// the live read from the branch fails. Missing is fine: the tab says so.
+async function fetchTestHistory() {
+  return rest(`repos/${REPO}/contents/tests.json?ref=${METRICS_BRANCH}`, {
+    raw: true,
+    allow404: true,
+  }).catch((err) => (console.warn(`test-metrics tests.json unavailable: ${err.message}`), null))
 }
 
 async function fetchWorkflows() {
@@ -489,13 +502,14 @@ const perf = buildPerfSection()
 const ticketTime = buildTicketTimeSection()
 const pageBeforeFeatures = pageWithSections(perf.html, ticketTime.html)
 
-const [issues, loops, slots, workflows, featuresCommit, tests] = await Promise.all([
+const [issues, loops, slots, workflows, featuresCommit, tests, testHistory] = await Promise.all([
   fetchIssues(),
   fetchLoops(),
   fetchSlots(),
   fetchWorkflows(),
   fetchLastCommitOf(FEATURES_FILE),
   fetchTests(),
+  fetchTestHistory(),
 ])
 const featureTime = buildFeatureTimeSection(
   buildFeatures(issues, featuresCommit, ticketTime.model.tickets ?? []),
@@ -540,6 +554,7 @@ writeFileSync(join(OUT, 'loops.json'), JSON.stringify(loops, null, 2))
 writeFileSync(join(OUT, 'perf.json'), JSON.stringify(perf.model))
 writeFileSync(join(OUT, 'ticket-time.json'), JSON.stringify(ticketTime.model))
 writeFileSync(join(OUT, 'features.json'), JSON.stringify(features))
+if (testHistory) writeFileSync(join(OUT, 'test-history.json'), JSON.stringify(testHistory))
 writeFileSync(join(OUT, 'index.html'), page)
 for (const name of PAGE_MODULES) copyFileSync(join(HERE, name), join(OUT, name))
 for (const [tab, title] of Object.entries(SHORT_LINKS)) {
