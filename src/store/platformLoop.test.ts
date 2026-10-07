@@ -4,6 +4,8 @@ import { RUN_EVENT_REGISTRY, type RunEventName } from '../logging/eventNames'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { surfaceOreTiles } from '../systems/authority/scriptedSession'
+import { UPGRADE_IDS } from '../systems/economy/economyDefinition'
+import { upgradePrice } from '../systems/economy/upgradePrices'
 import { add, fromCanonical, sub, toCanonical, ZERO_MONEY } from '../systems/money'
 import { FACING, bayPoseAt, dockedPoseAt } from '../systems/vehicle/vehiclePose'
 import type { ScriptedCommand } from '../systems/fastForward'
@@ -86,6 +88,11 @@ const sumOfLogged = (name: RunEventName, field: string) =>
       ZERO_MONEY,
     )
 
+/** What one level of each of the six tracks costs on planet 1, read from their curves. */
+function levelZeroPriceOfEveryTrack() {
+  return UPGRADE_IDS.map((upgradeId) => upgradePrice(upgradeId, 0, 1)).reduce(add, ZERO_MONEY)
+}
+
 describe('platform loop from a fresh profile', () => {
   it('mines, sells and buys one level of each of the six tracks, logged in order', () => {
     const ore = surfaceOreTiles(30, PARAMS)
@@ -124,7 +131,7 @@ describe('platform loop from a fresh profile', () => {
     const sold = sumOfLogged('resource_sold', 'value')
     const lining = sumOfLogged('lining_settled', 'paid')
     expect(toCanonical(game().money)).toBe(
-      toCanonical(sub(sub(sold, lining), fromCanonical('270'))),
+      toCanonical(sub(sub(sold, lining), levelZeroPriceOfEveryTrack())),
     )
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
     expect(game().debugApplied).toBe(false)
