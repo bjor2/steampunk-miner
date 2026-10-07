@@ -933,6 +933,13 @@
           "description": "Timed buffs or consumables, deferred for now; artefacts carry the horizontal beat instead.",
           "status": "planned",
           "issues": [47]
+        },
+        {
+          "title": "Tech tree",
+          "description": "Research nodes with money to unlock store items: five lanes on a planet ruler, Marks every 3 planets, endless combos from P41, a tree screen from the HUD. The rules and screen are built; the lanes show 'coming soon' until their slices register nodes.",
+          "status": "partial",
+          "issues": [165, 200, 201, 202, 203, 204, 205, 206, 212],
+          "doc": "docs/standards/feature-slices.md"
         }
       ]
     },
