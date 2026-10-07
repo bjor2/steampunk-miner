@@ -114,19 +114,20 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 
-### `extraction`: 9 files, 50 tests
+### `extraction`: 10 files, 58 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/extraction/gatesFixture.test.ts` | 3 | 2 |
 | `src/features/extraction/incomeLines.test.ts` | 4 | 4 |
-| `src/features/extraction/mineralDrain.test.ts` | 5 | 5 |
+| `src/features/extraction/laneRows.test.ts` | 13 | 13 |
+| `src/features/extraction/mineralDrain.test.ts` | 6 | 6 |
+| `src/features/extraction/systems/drainPerMinute.test.ts` | 2 | 2 |
 | `src/features/extraction/systems/drainTake.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/extractionEconomy.test.ts` | 4 | 4 |
 | `src/features/extraction/systems/extractionItems.test.ts` | 8 | 8 |
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
-| `src/features/extraction/visionRows.test.ts` | 8 | 8 |
 
 ### `mining-gates`: 14 files, 85 tests
 
