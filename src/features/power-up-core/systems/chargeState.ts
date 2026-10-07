@@ -1,7 +1,7 @@
 /**
  * Each player's power-up state (#200, the `power-up-core` save section v1): what each item has
- * spent since its last refill, when its cooldown ends, the one use winding up or channelling, and
- * which toggles are on.
+ * spent since its last refill, when its cooldown ends, the one use winding up or channelling,
+ * which toggles are on, and which sibling-links the player switched off (ticket 274).
  *
  * Charges are kept as `spent`, not as charges left: a new item is full without the section having
  * to know every registered item, and the section stays at its initial value (out of the state and
@@ -22,6 +22,11 @@ export interface ItemCharges {
   spent: number
   /** The first tick the item may be used again; 0 before its first use. */
   readyAtTick: number
+  /**
+   * The tick a sibling-link last fired this item (ticket 274), for its slot tile's flash. Absent
+   * until a link fires it, so the record and the digest stay as they were.
+   */
+  linkedAtTick?: number
 }
 
 /** A use between its press and its act: a wind-up (never cancelled) or a channel. */
@@ -45,6 +50,11 @@ export interface PowerUpState {
    * quanta a tick, every item's today, never writes it, and the digest stays as it was.
    */
   drawRemainder?: number
+  /**
+   * Items whose sibling-link the player switched off on the item card, sorted (the GD lock on
+   * #256: on by default, saved per player). Absent while every link is on.
+   */
+  linksOff?: readonly string[]
 }
 
 export const NO_POWER_UPS: PowerUpState = { items: {}, pending: null, toggledOn: [] }
@@ -124,6 +134,18 @@ export function withDrawRemainder(value: PowerUpState, remainder: number): Power
   return remainder === 0 ? others : { ...others, drawRemainder: remainder }
 }
 
+/** A sibling-link fires only while it is on; every link starts on (the GD lock on #256). */
+export function isLinkOn(value: PowerUpState, itemId: string): boolean {
+  return !(value.linksOff ?? []).includes(itemId)
+}
+
+export function withLinkOn(value: PowerUpState, itemId: string, isOn: boolean): PowerUpState {
+  const { linksOff: _replaced, ...others } = value
+  const off = (value.linksOff ?? []).filter((id) => id !== itemId)
+  const linksOff = isOn ? off : [...off, itemId].sort(compareIds)
+  return linksOff.length === 0 ? others : { ...others, linksOff }
+}
+
 export function withPending(value: PowerUpState, pending: PendingUse | null): PowerUpState {
   return { ...value, pending }
 }
@@ -147,7 +169,13 @@ function powerUpStateProblems(body: unknown): string[] {
     ...pendingProblems(body.pending),
     ...(isTextList(body.toggledOn) ? [] : ['power-up-core.toggledOn must be a list of item ids']),
     ...drawRemainderProblems(body.drawRemainder),
+    ...linksOffProblems(body.linksOff),
   ]
+}
+
+function linksOffProblems(linksOff: unknown): string[] {
+  if (linksOff === undefined || isTextList(linksOff)) return []
+  return ['power-up-core.linksOff must be a list of item ids']
 }
 
 function drawRemainderProblems(remainder: unknown): string[] {
@@ -163,7 +191,12 @@ function itemsProblems(items: unknown): string[] {
 }
 
 function isItemCharges(value: unknown): boolean {
-  return isJsonObject(value) && isWholeNumber(value.spent) && isWholeNumber(value.readyAtTick)
+  return (
+    isJsonObject(value) &&
+    isWholeNumber(value.spent) &&
+    isWholeNumber(value.readyAtTick) &&
+    (value.linkedAtTick === undefined || isWholeNumber(value.linkedAtTick))
+  )
 }
 
 function pendingProblems(pending: unknown): string[] {

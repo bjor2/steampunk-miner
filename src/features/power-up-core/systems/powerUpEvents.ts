@@ -12,6 +12,8 @@ declare module '../../../systems/authority/authorityCommand' {
   interface CommandPayloads {
     /** #162 section 2.3: press the power-up in a slot (`use_slot_1`-`5`), or a drill socket's gear. */
     'power-up-core.use_power_up': { slot: string }
+    /** The item card's switch (ticket 274): turn the item's sibling-link off, or back on. */
+    'power-up-core.toggle_link': { itemId: string }
     /** A scenario's charges left for one owned power-up. */
     'debug.power-up-core.setCharges': { itemId: string; chargesLeft: number }
   }
@@ -55,6 +57,17 @@ declare module '../../../systems/authority/domainEvent' {
       chargesLeft: number
     }
     'power-up-core.ChargesRefilled': { playerId: string; itemId: string; chargesLeft: number }
+    /**
+     * The item's act fired its sibling-link (the GD lock on #256): `siblingId` acted from `slot`,
+     * its own, and spent its charge and cooldown.
+     */
+    'power-up-core.LinkFired': {
+      playerId: string
+      itemId: string
+      siblingId: string
+      slot: LoadoutSlotId
+    }
+    'power-up-core.LinkToggled': { playerId: string; itemId: string; isOn: boolean }
   }
   interface RejectionReasons {
     'power-up-core.not_a_power_up_slot': true
@@ -67,6 +80,7 @@ declare module '../../../systems/authority/domainEvent' {
     'power-up-core.cooling_down': true
     'power-up-core.not_still': true
     'power-up-core.invalid_charges': true
+    'power-up-core.no_sibling_link': true
   }
 }
 
@@ -106,4 +120,16 @@ export function channelCancelledOf(subject: UseSubject, chargesLeft: number) {
 
 export function chargesRefilledOf(playerId: string, itemId: string, chargesLeft: number) {
   return { type: 'power-up-core.ChargesRefilled' as const, playerId, itemId, chargesLeft }
+}
+
+export function linkFiredOf(
+  playerId: string,
+  link: { itemId: string; siblingId: string },
+  slot: LoadoutSlotId,
+) {
+  return { type: 'power-up-core.LinkFired' as const, playerId, ...link, slot }
+}
+
+export function linkToggledOf(playerId: string, itemId: string, isOn: boolean) {
+  return { type: 'power-up-core.LinkToggled' as const, playerId, itemId, isOn }
 }

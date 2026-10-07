@@ -42,6 +42,12 @@ export interface PowerUpUse {
    * duration step grows); null for an item whose ladder has none.
    */
   magnitude: number | null
+  /**
+   * Set when another item's sibling-link fired this one (ticket 274): the item whose act fired it.
+   * `magnitude` is then already at the link's reduced strength; an item whose strength is not its
+   * magnitude reads this to act at its own reduced strength.
+   */
+  linkedFrom?: string
 }
 
 /** The gated cell that refused a use (#162 `power_up_blocked_by_gate {cellTier, gateKind}`). */

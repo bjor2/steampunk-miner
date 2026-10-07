@@ -5,15 +5,25 @@
  * locked slot draws nothing, so a P1 phone still shows just the stick and Interact (#173
  * acceptance 3). A drill socket holding gear a press uses gets a tile after slot 5 that presses
  * the socket's key, so a touch-only player can flip the side cutters (#244). Each button reads its item at the player's Mark (#249): its pips, its cooldown
- * and the Mark a brass plate on the cradle will show.
+ * and the Mark a brass plate on the cradle will show. A sibling-link that fires a slotted item
+ * flashes that item's tile (ticket 274), and an item whose Mark reached its link carries the link
+ * for the card's switch.
  */
+import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import type { SlotTileActionId } from '../../../systems/input/touchControls'
-import { chargesLeftIn, isToggledOn, itemChargesOf, powerUpStateOf } from './chargeState'
-import type { PowerUpState } from './chargeState'
-import { hasCharges, type PowerUp, type SlotHold } from './powerUpKind'
+import {
+  chargesLeftIn,
+  isLinkOn,
+  isToggledOn,
+  itemChargesOf,
+  powerUpStateOf,
+  type PowerUpState,
+} from './chargeState'
+import { hasCharges, powerUpOfItem, type PowerUp, type SlotHold } from './powerUpKind'
 import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
 import { actionOfTile, PRESSABLE_SLOTS, type PressableSlot } from './powerUpSlots'
+import { reachedSiblingLinkOf } from './siblingLink'
 import { pressablePowerUpOf } from './useRefusals'
 
 export interface SlotButton {
@@ -36,7 +46,21 @@ export interface SlotButton {
   mark: number
   /** Every stat capped: the gilded plate. */
   isMastered: boolean
+  /** Another item's sibling-link fired this one just now: its tile flashes (ticket 274). */
+  isLinkFlashing: boolean
+  /** The item's sibling-link once its Mark reached it, for the card's switch; null before. */
+  link: SlotLink | null
 }
+
+export interface SlotLink {
+  siblingId: string
+  /** The sibling's name; its id while the sibling is still a vision row. */
+  siblingName: string
+  isOn: boolean
+}
+
+/** How long a linked tile flashes: half a second, so the player sees where the charge went. */
+const LINK_FLASH_TICKS = TICKS_PER_SECOND / 2
 
 export function slotButtonsOf(state: AuthorityState, playerId: string): SlotButton[] {
   const vehicle = vehicleOf(state, playerId)
@@ -71,7 +95,27 @@ function slotButtonOf(
     isOn: isToggledOn(value, itemId),
     mark,
     isMastered,
+    isLinkFlashing: isLinkFlashingAt(value, itemId, tick),
+    link: slotLinkOf(state, playerId, value, itemId),
   }
+}
+
+function isLinkFlashingAt(value: PowerUpState, itemId: string, tick: number): boolean {
+  const { linkedAtTick } = itemChargesOf(value, itemId)
+  return linkedAtTick !== undefined && tick - linkedAtTick < LINK_FLASH_TICKS
+}
+
+function slotLinkOf(
+  state: AuthorityState,
+  playerId: string,
+  value: PowerUpState,
+  itemId: string,
+): SlotLink | null {
+  const link = reachedSiblingLinkOf(state, playerId, itemId)
+  if (link === null) return null
+  const { siblingId } = link
+  const siblingName = powerUpOfItem(siblingId)?.name ?? siblingId
+  return { siblingId, siblingName, isOn: isLinkOn(value, itemId) }
 }
 
 function holdPercentOf(state: AuthorityState, playerId: string, powerUp: PowerUp): number {

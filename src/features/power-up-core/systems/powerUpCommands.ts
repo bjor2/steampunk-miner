@@ -3,6 +3,8 @@
  *
  * - `power-up-core.use_power_up {slot}`: press the power-up in a slot. Refused, at no cost, for the
  *   reasons in `useRefusals.ts`; accepted, it reserves a charge and winds up or channels.
+ * - `power-up-core.toggle_link {itemId}`: the item card's switch for the item's sibling-link
+ *   (ticket 274), refused for an item whose Mark has reached none (`linkToggle.ts`).
  * - `debug.power-up-core.setCharges {itemId, chargesLeft}`: a scenario's charges left for one
  *   power-up that counts charges, at most the count at the player's Mark (#249).
  */
@@ -13,6 +15,7 @@ import type { SliceCommandRules } from '../../../systems/registries/commandRules
 import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
 import { itemChargesOf, powerUpStateOf, withItemCharges, withPowerUpState } from './chargeState'
 import './powerUpEvents'
+import { linkToggleRefusalOf, toggleSiblingLink } from './linkToggle'
 import { hasCharges, type PowerUp } from './powerUpKind'
 import { powerUpAtMarkOf } from './powerUpMarks'
 import { slottedPowerUpOf, refusalOfUse } from './useRefusals'
@@ -28,6 +31,11 @@ export const POWER_UP_RULES: SliceCommandRules = {
       const powerUp = slottedPowerUpOf(vehicleOf(state, playerId), slot) as PowerUp
       return startUse(state, playerId, powerUp, slot, tick)
     },
+  },
+  'power-up-core.toggle_link': {
+    fields: { itemId: 'text' },
+    reject: (state, { playerId, payload }) => linkToggleRefusalOf(state, playerId, payload.itemId),
+    apply: (state, { playerId, payload }) => toggleSiblingLink(state, playerId, payload.itemId),
   },
   'debug.power-up-core.setCharges': {
     fields: { itemId: 'text', chargesLeft: 'wholeNumber' },

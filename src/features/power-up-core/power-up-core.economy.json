@@ -1,9 +1,10 @@
 {
-  "source": "Spec #162 section 4.1 (Systems & Economy, locked 6 Oct 2026) and the Systems note on #200: a power-up cradle costs 20 band-5 ore units at its unlock planet, charged as bandOrePriceAt(cost, unlockPlanet, unlockPlanet).",
+  "source": "Spec #162 section 4.1 (Systems & Economy, locked 6 Oct 2026) and the Systems note on #200: a power-up cradle costs 20 band-5 ore units at its unlock planet, charged as bandOrePriceAt(cost, unlockPlanet, unlockPlanet). The GD lock on #256 (Mark milestones, ticket 274): a sibling-link fires its sibling at reduced strength, half in every worked example, as 5000 basis points of its magnitude.",
   "powerUpCore": {
     "cradlePrice": {
       "band": 5,
       "oreUnits": "20"
-    }
+    },
+    "siblingLinkStrengthBp": 5000
   }
 }

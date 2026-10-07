@@ -4,7 +4,8 @@
  * authority clock (`clockSteps`, #217), so the spend logs stay on the authority's ticks. The item
  * acts at the Mark researched when it acts (#249, `powerUpMarks.ts`).
  *
- * - The item acts: its effect lands, its cooldown starts, `PowerUpUsed` says the charges left.
+ * - The item acts: its effect lands, its cooldown starts, `PowerUpUsed` says the charges left;
+ *   then its sibling-link fires, once the item's Mark has reached one (ticket 274, `siblingLink.ts`).
  * - A gate refuses it: the charge comes back and `PowerUpBlocked` names the cell (a refused use
  *   costs nothing).
  * - It has nothing to act on: the charge comes back and `PowerUpRefused` says why.
@@ -44,6 +45,7 @@ import {
   type PowerUpUse,
 } from './powerUpKind'
 import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
+import { withSiblingLink } from './siblingLink'
 
 /** The press: reserve the charge and wait, or act at once for an item with no wind-up. */
 export function startUse(
@@ -168,7 +170,19 @@ function effectOfOutcome(
     return refuseByGate(state, playerId, powerUp, pending, outcome.block)
   if (outcome.kind === 'refused')
     return refuseUse(state, playerId, powerUp, pending, outcome.reason)
-  return finishActed(outcome.effect, playerId, powerUp, pending, tick)
+  return settleAct(outcome.effect, playerId, powerUp, pending, tick)
+}
+
+/** The item's own act first, then its sibling-link fires its sibling (ticket 274). */
+function settleAct(
+  effect: RuleEffect,
+  playerId: string,
+  powerUp: MarkedPowerUp,
+  pending: PendingUse,
+  tick: number,
+): RuleEffect {
+  const acted = finishActed(effect, playerId, powerUp, pending, tick)
+  return withSiblingLink(acted, powerUpUseOf(playerId, pending, tick, powerUp))
 }
 
 /** Nothing to act on: the charge comes back and no cooldown starts. */
