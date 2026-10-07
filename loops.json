@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T09:04:20Z",
+  "updated_at": "2026-10-07T09:09:28Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
-      "state": "blocked",
-      "issue": 218,
-      "note": "push_pending: ticket/218 green but not on main (slot free)",
-      "updated_at": "2026-10-07T08:55:38Z",
+      "state": "idle",
+      "issue": null,
+      "note": "free",
+      "updated_at": "2026-10-07T09:09:28Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -16,8 +16,8 @@
       "slot": "2",
       "state": "working",
       "issue": 178,
-      "note": "tier hard, attempt 2/2 (session running)",
-      "updated_at": "2026-10-07T09:03:33Z",
+      "note": "started 2026-10-07 10:43 CEST",
+      "updated_at": "2026-10-07T09:09:28Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -25,8 +25,8 @@
       "slot": "3",
       "state": "working",
       "issue": 176,
-      "note": "tier hard, attempt 2/2 (session running)",
-      "updated_at": "2026-10-07T09:04:20Z",
+      "note": "started 2026-10-07 10:23 CEST",
+      "updated_at": "2026-10-07T09:09:28Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -34,18 +34,18 @@
       "slot": "4",
       "state": "working",
       "issue": 223,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T09:03:36Z",
+      "note": "started 2026-10-07 10:43 CEST",
+      "updated_at": "2026-10-07T09:09:28Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
       "loop": "steampunk-loop",
       "slot": null,
-      "state": "working",
+      "state": "blocked",
       "issue": null,
-      "note": "8/8 Claude slots busy, 1/4 planner slots; status check",
+      "note": "push_pending #218 (ticket/218) waits to land on main; 7/8 Claude slots busy, 1/4 planner slots; status check",
       "extra": {
-        "active": 8,
+        "active": 7,
         "max": 8,
         "max_attempts": 2,
         "attempts": {
@@ -162,9 +162,12 @@
             "map": 139
           }
         ],
-        "push_pending": null
+        "push_pending": {
+          "ticket": 218,
+          "branch": "ticket/218"
+        }
       },
-      "updated_at": "2026-10-07T08:43:48Z",
+      "updated_at": "2026-10-07T09:09:28Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -181,8 +184,8 @@
       "slot": "5",
       "state": "working",
       "issue": 166,
-      "note": "tier fable, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T08:53:36Z",
+      "note": "started 2026-10-07 10:13 CEST",
+      "updated_at": "2026-10-07T09:09:28Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -190,8 +193,8 @@
       "slot": "6",
       "state": "working",
       "issue": 222,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T09:01:47Z",
+      "note": "started 2026-10-07 10:01 CEST",
+      "updated_at": "2026-10-07T09:09:28Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -199,8 +202,8 @@
       "slot": "7",
       "state": "working",
       "issue": 181,
-      "note": "tier hard, attempt 2/2 (session running)",
-      "updated_at": "2026-10-07T09:03:41Z",
+      "note": "started 2026-10-07 10:43 CEST",
+      "updated_at": "2026-10-07T09:09:28Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -208,12 +211,26 @@
       "slot": "8",
       "state": "working",
       "issue": 224,
-      "note": "tier easy, attempt 1/2 (session running)",
-      "updated_at": "2026-10-07T09:03:44Z",
+      "note": "started 2026-10-07 10:43 CEST",
+      "updated_at": "2026-10-07T09:09:28Z",
       "host": "grok-bot-vm-452660841"
     }
   },
   "events": [
+    {
+      "at": "2026-10-07T09:09:28Z",
+      "key": "steampunk-loop",
+      "state": "blocked",
+      "issue": null,
+      "note": "push_pending #218 (ticket/218) waits to land on main; 7/8 Claude slots busy, 1/4 planner slots; status check"
+    },
+    {
+      "at": "2026-10-07T09:09:28Z",
+      "key": "steampunk-loop/1",
+      "state": "idle",
+      "issue": null,
+      "note": "free"
+    },
     {
       "at": "2026-10-07T08:55:38Z",
       "key": "steampunk-loop/1",
@@ -619,20 +636,6 @@
       "state": "idle",
       "issue": null,
       "note": "free; #199 not accepted (needs-fix), will retry"
-    },
-    {
-      "at": "2026-10-07T03:28:46Z",
-      "key": "steampunk-loop/2",
-      "state": "blocked",
-      "issue": 195,
-      "note": "push_pending: ticket/195 green but not on main (slot free)"
-    },
-    {
-      "at": "2026-10-07T03:09:07Z",
-      "key": "steampunk-loop/4",
-      "state": "working",
-      "issue": 216,
-      "note": "tier hard, attempt 1/2"
     }
   ]
 }
