@@ -29,6 +29,14 @@ export interface OreType {
   iconId: string
   /** #140 `requires`, read only by mining-gates; empty in the kernel default. */
   requires: readonly string[]
+  /** A planet's signature ore (#141); absent in the kernel default. */
+  signature?: boolean
+}
+
+/** What `CargoAdded` names beside the ore id (#223). */
+export interface OreCargoTags {
+  family?: string
+  signature?: boolean
 }
 
 export interface OreTypeProvider {
@@ -58,6 +66,15 @@ const ORE_FAMILIES_PER_TIER = 2
 export function oreTypeOf(query: OreQuery): OreType {
   const [provider] = entriesOf(ORE_TYPE_REGISTRY)
   return provider === undefined ? kernelOreTypeOf(query) : provider.oreTypeOf(query)
+}
+
+/**
+ * A provider's ore names its family and signature flag on `CargoAdded`; the kernel default names
+ * neither, so a run with no catalogue logs what it logged before (#223).
+ */
+export function oreCargoTagsOf(ore: OreType): OreCargoTags {
+  const [provider] = entriesOf(ORE_TYPE_REGISTRY)
+  return provider === undefined ? {} : { family: ore.family, signature: ore.signature === true }
 }
 
 /** The provider's catalogue; empty with no provider. */

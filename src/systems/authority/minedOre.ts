@@ -10,13 +10,13 @@
 import { oreTier } from '../economy/oreEconomy'
 import { depthTilesAt } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
-import { oreTypeOf } from '../registries/oreTypes'
+import { oreCargoTagsOf, oreTypeOf, type OreCargoTags } from '../registries/oreTypes'
 import { chunkKey, chunkOfTile, type TilePoint } from '../world/tileGrid'
 import { familyOfCell, MAX_ORE_TIER_OFFSET, tierOffsetOfCell } from '../world/worldCell'
 
 const BAND_ONE = 1
 
-export interface MinedOre {
+export interface MinedOre extends OreCargoTags {
   resourceTier: number
   oreId: string
   /** Whole tiles below the surface of the cell's column, as the run log counts depth. */
@@ -27,9 +27,11 @@ export interface MinedOre {
 
 export function minedOreOf(params: PlanetParams, tile: TilePoint, cell: number): MinedOre {
   const resourceTier = resourceTierOf(params, cell)
+  const ore = oreTypeOf({ tier: resourceTier, cellFamily: familyOfCell(cell) })
   return {
     resourceTier,
-    oreId: oreTypeOf({ tier: resourceTier, cellFamily: familyOfCell(cell) }).id,
+    oreId: ore.id,
+    ...oreCargoTagsOf(ore),
     depthTiles: depthTilesAt(params, tile.tx, tile.ty),
     chunk: chunkKey(chunkOfTile(tile.tx), chunkOfTile(tile.ty)),
   }

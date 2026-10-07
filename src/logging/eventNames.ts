@@ -505,6 +505,9 @@ export const RUN_EVENT_REGISTRY = {
       amount: 'integer',
       value: 'money',
       oreId: 'text',
+      // #223: a slice catalogue's family and signature flag; the kernel default logs neither.
+      family: { optional: 'text' },
+      signature: { optional: 'flag' },
       oreDepthTiles: 'integer',
       chunk: 'text',
     },

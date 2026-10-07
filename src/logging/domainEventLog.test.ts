@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { projectDomainEvent, recordDomainEvents } from './domainEventLog'
 import { createMemorySink } from './eventSink'
+import { formatNdjsonLine, parseNdjson } from './ndjson'
 import { createRunLog, installRunLog, uninstallRunLog } from './runLog'
 import { runEventProblems } from './runEventSchema'
 
@@ -256,6 +257,34 @@ describe('domain event log', () => {
       oreId: 'kernel.metal.t1',
       oreDepthTiles: 2,
       chunk: '0,9',
+    })
+  })
+
+  it("records a catalogue's family and signature flag and reads them back from NDJSON (#223)", () => {
+    const signatureUnit: DomainEvent = {
+      ...commandStamp,
+      type: 'CargoAdded',
+      resourceTier: 13,
+      amount: 1,
+      value: '2.5e+3',
+      oreId: 'relic_t13',
+      family: 'relic',
+      signature: true,
+      depthTiles: 140,
+      chunk: '1,7',
+    }
+    recordDomainEvents({ playerId: 'p1', planet: 3, depthTiles: 0 }, [signatureUnit])
+    const [line] = parseNdjson(sink.events.map(formatNdjsonLine).join(''))
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+    expect(line.data).toEqual({
+      resourceTier: 13,
+      amount: 1,
+      value: '2.5e+3',
+      oreId: 'relic_t13',
+      family: 'relic',
+      signature: true,
+      oreDepthTiles: 140,
+      chunk: '1,7',
     })
   })
 

@@ -16,6 +16,7 @@ import {
   type KernelDomainEventType,
 } from '../systems/authority/domainEvent'
 import { chargeDetonatedDataOf } from './chargeDetonationLine'
+import { resourceCollectedDataOf } from './resourceCollectedLine'
 import type { RunEventData, RunEventName } from './eventNames'
 import { sliceEventProjectionOf, type SliceRunLogLine } from './registries/eventProjections'
 import type { CommandRef, RunEventPlace, RunEventStamp } from './runEvent'
@@ -97,11 +98,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'collapse',
     data: { block, samplesFilled, vehiclesHit },
   }),
-  // The cell's depth is `oreDepthTiles`: the envelope's `depthTiles` is where the vehicle is (#122).
-  CargoAdded: ({ resourceTier, amount, value, oreId, depthTiles, chunk }) => ({
-    event: 'resource_collected',
-    data: { resourceTier, amount, value, oreId, oreDepthTiles: depthTiles, chunk },
-  }),
+  CargoAdded: (added) => ({ event: 'resource_collected', data: resourceCollectedDataOf(added) }),
   StorageFull: ({ lostUnits }) => ({ event: 'storage_full', data: { lostUnits } }),
   EnergyLow: ({ threshold }) => ({ event: 'energy_low', data: { threshold } }),
   EnergyDepleted: () => ({ event: 'energy_depleted', data: {} }),

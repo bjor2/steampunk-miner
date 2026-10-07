@@ -203,13 +203,17 @@ export interface KernelDomainEventBodies {
   /**
    * One ore unit reached the hold: its tier and sale value, and which ore it was (#122): the
    * `oreId` #155 names, whole tiles below the surface of the cell's column, and the cell's chunk
-   * as `cx,cy`, so the log can replay the mined order.
+   * as `cx,cy`, so the log can replay the mined order. A slice's ore catalogue adds the ore's
+   * `family` and whether it is a `signature` ore (#140, #141, #223); the kernel default names
+   * neither, so older lines still read.
    */
   CargoAdded: {
     resourceTier: number
     amount: number
     value: string
     oreId: string
+    family?: string
+    signature?: boolean
     depthTiles: number
     chunk: string
   }

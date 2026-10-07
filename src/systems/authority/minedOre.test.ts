@@ -55,6 +55,23 @@ function registerCopperProvider(): void {
   })
 }
 
+const signatureCopper: OreType = { ...copper, id: 'ores.copper_sig', signature: true }
+
+/** A fake catalogue whose every ore is a signature (#141). */
+function registerSignatureProvider(): void {
+  addToRegistry(ORE_TYPE_REGISTRY, 'ores', {
+    id: 'ores.catalogue',
+    indexTag: 'ores.signature-only',
+    oreTypeOf: () => signatureCopper,
+    bitIndexOf: () => 0,
+    catalogue: () => [signatureCopper],
+  })
+}
+
+function firstCargoAdded(events: readonly DomainEvent[]) {
+  return events.find((event) => event.type === 'CargoAdded')
+}
+
 function oreOfTile(tile: TilePoint) {
   return minedOreOf(PARAMS, tile, materialCellAt(EMPTY_WORLD, PARAMS, tile))
 }
@@ -78,6 +95,25 @@ describe('mined ore identity (#122)', () => {
       depthTiles: depthTilesAt(PARAMS, ore.tx, ore.ty),
       chunk: chunkKey(chunkOfTile(ore.tx), chunkOfTile(ore.ty)),
     })
+  })
+
+  it("names the catalogue's family and signature flag on CargoAdded (#141 acceptance 8, #223)", () => {
+    const [ore] = surfaceOreTiles(1)
+    const plain = firstCargoAdded(
+      withFreshRegistrySet(registerCopperProvider, () => mineInOrder([ore])),
+    )
+    const signature = firstCargoAdded(
+      withFreshRegistrySet(registerSignatureProvider, () => mineInOrder([ore])),
+    )
+    expect(plain).toMatchObject({ oreId: 'ores.copper', family: 'copper', signature: false })
+    expect(signature).toMatchObject({ oreId: 'ores.copper_sig', family: 'copper', signature: true })
+  })
+
+  it('leaves family and signature off CargoAdded with the kernel default, as before (#223)', () => {
+    const [ore] = surfaceOreTiles(1)
+    const added = firstCargoAdded(mineInOrder([ore]))
+    expect(added).not.toHaveProperty('family')
+    expect(added).not.toHaveProperty('signature')
   })
 
   it('adds the ore of a scripted dig in the order its cells were mined', () => {

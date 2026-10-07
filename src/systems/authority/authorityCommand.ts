@@ -57,8 +57,10 @@ import type { BayId } from '../world/dockBays'
  *    `codex` player section v1.
  * 25: travel logs `FeatureUnlocked` for the dock add-on facilities `scanner_station` (P14),
  *    `research_lab` (P15) and `drone_bay` (P20), now built and shipped (#221, #222).
+ * 26: `CargoAdded` may name the ore's catalogue `family` and whether it is a `signature` ore
+ *    (#223, for #146 and #141); the kernel default names neither, so its answers are unchanged.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 25
+export const AUTHORITY_PROTOCOL_VERSION = 26
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
