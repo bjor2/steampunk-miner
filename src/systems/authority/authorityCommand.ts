@@ -52,8 +52,11 @@ import type { BayId } from '../world/dockBays'
  *    `tech-tree.TechNodesGranted`; its `tech-tree` player section v1.
  * 23: `ResourceSold` carries `coinsShown`, the sell burst's coin count from the sale's gross value
  *    against the cheapest next Workshop level (ticket 220, TD lock on #176).
+ * 24: the codex slice (#207): its authority reaction answers `codex.OreContacted`,
+ *    `codex.OreDiscovered` and `codex.EntryAdded` beside the touch or unit that caused them; its
+ *    `codex` player section v1.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 23
+export const AUTHORITY_PROTOCOL_VERSION = 24
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
