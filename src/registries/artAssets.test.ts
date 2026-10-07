@@ -35,8 +35,14 @@ const FIXTURE_FILES = expectedFilesOf(FIXTURE_ENTRY, [
   'prop-fixture-charge.albedo.ktx2',
   'prop-fixture-charge.normal.ktx2',
 ])
+// The kernel's own entries plus the fixture: the entries real slices ship (ore-visuals' atlas)
+// belong to registrations the fixture-only registry set below does not hold.
 const MANIFEST_WITH_FIXTURE: AssetManifest = {
-  assets: [...SHIPPED_ART.manifest.assets, FIXTURE_ENTRY],
+  assets: [...SHIPPED_ART.manifest.assets.filter(isKernelEntry), FIXTURE_ENTRY],
+}
+
+function isKernelEntry(entry: ManifestEntry): boolean {
+  return entry.source !== 'blender' || kernelBlenderAssetIds().includes(entry.id)
 }
 
 function assetLintProblems(): string[] {

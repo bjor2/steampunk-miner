@@ -71,6 +71,52 @@ def cell_id_of(cell):
     return '%s-v%d-g%d' % (cell['familyId'], cell['variant'], cell['grade'])
 
 
+ASSET_ID = 'ground-ore-atlas'
+ASSET_CATEGORY = 'ground'
+PX_PER_METRE = 256  # art/asset-rules.json pxPerMetre.ground
+BLEND_DIR = os.path.join(HERE, 'blend')
+ASSET_DIR = os.path.join(REPO_ROOT, 'public', 'assets', ASSET_CATEGORY, ASSET_ID)
+PLACEHOLDER_PATH = os.path.join(REPO_ROOT, 'art', 'placeholders', ASSET_ID + '.parts.json')
+EXPORTED_PATH = os.path.join(ASSET_DIR, ASSET_ID + '.parts.json')
+
+
+def sidecar_part_of(looks, cell):
+    """The slice's `oreAtlasSidecarPartsOf`: the content rect, 248 px as metres at 256 px/m, flat."""
+    side = looks['atlas']['contentPx'] / PX_PER_METRE
+    return {
+        'id': cell_id_of(cell),
+        'tier': 1,
+        'rect': cell['rectPx'],
+        'sizeM': [side, side],
+        'pivotM': [side / 2, side / 2],
+        'atM': [0, 0],
+        'z': 0,
+    }
+
+
+def sidecar_of(looks, sha256=None, blender=None):
+    """
+    The atlas as one `parts` asset, schema 1 (src/systems/art/partsSidecar.ts): every cell a part.
+    With no hash it is the placeholder the asset lint keeps the export on; with one, the export.
+    """
+    return {
+        'assetId': ASSET_ID,
+        'schema': 1,
+        'source': {'blend': os.path.relpath(BLEND_DIR, REPO_ROOT) + '/', 'sha256': sha256, 'blender': blender},
+        'pxPerMetre': PX_PER_METRE,
+        'atlasPx': [looks['atlas']['sidePx'], looks['atlas']['sidePx']],
+        'maps': {kind: '%s.%s.ktx2' % (ASSET_ID, kind) for kind in MAP_KINDS},
+        'parts': [sidecar_part_of(looks, cell) for cell in atlas_cells(looks)],
+    }
+
+
+def write_json(path, value):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w', encoding='utf-8', newline='\n') as file:
+        file.write(json_text_of(value))
+    return path
+
+
 def write_layout(path=LAYOUT_PATH):
     looks = load_looks()
     layout = {
@@ -79,8 +125,8 @@ def write_layout(path=LAYOUT_PATH):
         'emissiveFromGrade': looks['grades']['emissiveFromGrade'],
         'cells': atlas_cells(looks),
     }
-    with open(path, 'w', encoding='utf-8', newline='\n') as file:
-        file.write(json_text_of(layout))
+    write_json(path, layout)
+    write_json(PLACEHOLDER_PATH, sidecar_of(looks))
     return layout
 
 

@@ -7,10 +7,14 @@
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { oreVisualsDebugActions } from './debug'
+import { oreAtlasArtAssetOf } from './systems/oreAtlasAsset'
+import { ORE_LOOKS } from './systems/oreFamilyLooks'
 
 export const slice: SliceDefinition = {
   id: 'ore-visuals',
   register(r) {
+    // The three ore atlases under public/assets/ground/ground-ore-atlas/, one part per cell (#214).
+    r.artAssets([oreAtlasArtAssetOf(ORE_LOOKS)])
     // steampunkDebug.features['ore-visuals'].describe(), .lookOf(family, tier), .atlasCells()
     r.debugActions(oreVisualsDebugActions)
   },

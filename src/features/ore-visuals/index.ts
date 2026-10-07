@@ -24,6 +24,12 @@ export {
   oreLookProblems,
 } from './systems/oreFamilyLooks'
 export type { OreAtlasCell } from './systems/oreAtlasLayout'
+export {
+  ORE_ATLAS_ASSET_ID,
+  oreAtlasArtAssetOf,
+  oreAtlasPartIdOf,
+  oreAtlasSidecarPartsOf,
+} from './systems/oreAtlasAsset'
 export { oreAtlasCellOf, oreAtlasCellsOf, oreAtlasCellsPerRowOf } from './systems/oreAtlasLayout'
 export type { OreGradeChannel, VisualEcho } from './systems/oreGradeChannels'
 export {

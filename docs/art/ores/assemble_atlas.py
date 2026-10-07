@@ -9,12 +9,17 @@ emission) and is reported. Plain python3 with Pillow and numpy; no Blender.
 
     python3 docs/art/ores/assemble_atlas.py [--no-encode]
 
-Reads art/build/ores/<cell-id>.<map>.png (bake_cells.py) and writes art/build/ores/ore-atlas.<map>.png
-and .ktx2 (both gitignored until the kernel manifest form for the atlas lands).
+Reads art/build/ores/<cell-id>.<map>.png (bake_cells.py), writes art/build/ores/ore-atlas.<map>.png
+and .ktx2 (gitignored), then ships the asset: the three KTX2 maps and the schema-1 `parts.json`
+sidecar (every cell a part, hashed over the 12 `.blend` sources) under
+public/assets/ground/ground-ore-atlas/, where the asset lint checks them against the slice's
+registration (`oreAtlasArtAssetOf`) and its placeholder sidecar.
 """
 
+import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 
@@ -27,6 +32,7 @@ sys.path.insert(0, HERE)
 import atlas_layout as layout  # noqa: E402
 
 BUILD_DIR = os.path.join(layout.REPO_ROOT, 'art', 'build', 'ores')
+BLENDER_VERSION = '4.2.9 LTS'
 FLAT_NORMAL = (128, 128, 255, 255)
 EMPTY = {'albedo': (0, 0, 0, 0), 'normal': FLAT_NORMAL, 'emissive': (0, 0, 0, 255)}
 TOKTX = {
@@ -41,19 +47,26 @@ def main():
     with open(layout.LAYOUT_PATH, encoding='utf-8') as file:
         table = json.load(file)
     missing = {}
+    dark = []
     for kind in table['maps']:
-        path = assemble(table, kind, missing)
+        path = assemble(table, kind, missing, dark)
         if encode:
             encode_ktx2(path, kind)
-    report(table, missing)
+    report(table, missing, dark)
+    if not missing:
+        ship_asset(table)
 
 
-def assemble(table, kind, missing):
+def assemble(table, kind, missing, dark):
     side = table['atlas']['sidePx']
     atlas = np.zeros((side, side, 4), dtype=np.uint8)
     atlas[:, :] = EMPTY[kind]
     for cell in table['cells']:
         tile = read_tile(cell, kind, table)
+        if tile is None and kind == 'emissive' and has_tile(cell, 'albedo'):
+            # Baked, but no texel above the bake's threshold: a dark cell, not a missing one.
+            dark.append(layout.cell_id_of(cell))
+            tile = empty_tile(kind)
         if tile is None:
             missing.setdefault(kind, []).append(layout.cell_id_of(cell))
             continue
@@ -66,12 +79,23 @@ def assemble(table, kind, missing):
 def read_tile(cell, kind, table):
     """The baked tile, or None; an emissive cell below the glowing grades is empty by design."""
     if kind == 'emissive' and cell['grade'] < table['emissiveFromGrade']:
-        return np.array(EMPTY[kind], dtype=np.uint8)[None, None, :]
-    path = os.path.join(BUILD_DIR, '%s.%s.png' % (layout.cell_id_of(cell), kind))
-    if not os.path.isfile(path):
+        return empty_tile(kind)
+    if not has_tile(cell, kind):
         return None
-    image = Image.open(path).convert('RGBA')
+    image = Image.open(tile_path(cell, kind)).convert('RGBA')
     return np.asarray(image, dtype=np.uint8)
+
+
+def tile_path(cell, kind):
+    return os.path.join(BUILD_DIR, '%s.%s.png' % (layout.cell_id_of(cell), kind))
+
+
+def has_tile(cell, kind):
+    return os.path.isfile(tile_path(cell, kind))
+
+
+def empty_tile(kind):
+    return np.array(EMPTY[kind], dtype=np.uint8)[None, None, :]
 
 
 def place_tile(atlas, tile, rect, gutter):
@@ -91,7 +115,28 @@ def encode_ktx2(png_path, kind):
     return out
 
 
-def report(table, missing):
+def ship_asset(table):
+    """The maps and the exported sidecar under public/assets; the placeholder sidecar beside the others."""
+    looks = layout.load_looks()
+    os.makedirs(layout.ASSET_DIR, exist_ok=True)
+    for kind in table['maps']:
+        shutil.copyfile(os.path.join(BUILD_DIR, 'ore-atlas.%s.ktx2' % kind),
+                        os.path.join(layout.ASSET_DIR, '%s.%s.ktx2' % (layout.ASSET_ID, kind)))
+    layout.write_json(layout.PLACEHOLDER_PATH, layout.sidecar_of(looks))
+    layout.write_json(layout.EXPORTED_PATH, layout.sidecar_of(looks, sha256=blend_sources_sha256(looks), blender=BLENDER_VERSION))
+    print('shipped %s: 3 maps and the sidecar' % os.path.relpath(layout.ASSET_DIR, layout.REPO_ROOT))
+
+
+def blend_sources_sha256(looks):
+    """One hash over the 12 family sources in id order, so a re-authored family changes it."""
+    digest = hashlib.sha256()
+    for family in looks['families']:
+        with open(os.path.join(layout.BLEND_DIR, 'ore-%s.blend' % family['id']), 'rb') as file:
+            digest.update(file.read())
+    return digest.hexdigest()
+
+
+def report(table, missing, dark):
     for kind in table['maps']:
         png = os.path.join(BUILD_DIR, 'ore-atlas.%s.png' % kind)
         ktx = png[:-4] + '.ktx2'
@@ -99,6 +144,8 @@ def report(table, missing):
         print(', '.join(sizes))
     for kind, cells in missing.items():
         print('%s: %d of %d cells have no tile yet (first: %s)' % (kind, len(cells), len(table['cells']), ', '.join(cells[:4])))
+    if dark:
+        print('emissive: %d glowing-grade cells baked no texel above the threshold and ship dark: %s' % (len(dark), ', '.join(dark)))
 
 
 if __name__ == '__main__':
