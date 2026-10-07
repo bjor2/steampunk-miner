@@ -50,10 +50,18 @@ export interface TreeCadence {
   discoveryGrace: number
 }
 
+/** The nodes-only spend share the #165 diagnostic watches: reported, never failed on. */
+export interface NodeShareWatch {
+  firstPlanet: number
+  lastPlanet: number
+  share: Money
+}
+
 export interface TreeEconomy {
   costs: TreeCosts
   markAbsorb: MarkAbsorb
   cadence: TreeCadence
+  nodeShareWatch: NodeShareWatch
 }
 
 export const TREE_ECONOMY: TreeEconomy = loadTreeEconomy(TREE_ECONOMY_FILE)
@@ -66,6 +74,7 @@ export function readTreeEconomy(raw: unknown): { economy: TreeEconomy } | { prob
     costs: readCosts(reader, tech.costs),
     markAbsorb: readMarkAbsorb(reader, tech.markAbsorb),
     cadence: readCadence(reader, tech.cadence),
+    nodeShareWatch: readNodeShareWatch(reader, tech.nodeShareWatch),
   }
   return reader.problems.length > 0 ? { problems: reader.problems } : { economy }
 }
@@ -132,5 +141,14 @@ function readCadence(reader: FieldReader, raw: unknown): TreeCadence {
     ),
     comboEvery: reader.safeInteger('tech.cadence.comboEvery', cadence.comboEvery),
     discoveryGrace: reader.safeInteger('tech.cadence.discoveryGrace', cadence.discoveryGrace),
+  }
+}
+
+function readNodeShareWatch(reader: FieldReader, raw: unknown): NodeShareWatch {
+  const watch = reader.object('tech.nodeShareWatch', raw)
+  return {
+    firstPlanet: reader.safeInteger('tech.nodeShareWatch.firstPlanet', watch.firstPlanet),
+    lastPlanet: reader.safeInteger('tech.nodeShareWatch.lastPlanet', watch.lastPlanet),
+    share: reader.money('tech.nodeShareWatch.share', watch.share),
   }
 }

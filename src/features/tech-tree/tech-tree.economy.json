@@ -27,6 +27,12 @@
       "firstGeneratedCombo": 41,
       "comboEvery": 3,
       "discoveryGrace": 1
+    },
+    "nodeShareWatch": {
+      "source": "#165 (Vertical Scaler, GD split): a diagnostic, never a gate; above it on P2-P20, pull kCapability / kCombo before #212.",
+      "firstPlanet": 2,
+      "lastPlanet": 20,
+      "share": "0.150"
     }
   }
 }
