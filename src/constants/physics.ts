@@ -29,6 +29,12 @@ export const UP_VECTOR_SCALE = 1024
 export const MM_PER_METRE = 1000
 
 /**
+ * A side push reaches the pose report's drive sign only from this share of a full push (Gameplay
+ * & Vehicle on #279, accepted by the GD): below it the twin bit drills straight down.
+ */
+export const DRIVE_PUSH_SHARE_MIN = 0.5
+
+/**
  * Tangential drive acceleration at the engine's 1.0x `accel` (#7 gives only the 1.0x to 1.8x
  * multiplier). A placeholder from the demo scene, tuned by hand in the vehicle feel test.
  */
