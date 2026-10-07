@@ -1,0 +1,22 @@
+/*
+ * The stream fills the `above` layer, whose pixels are the canvas pixels `project` gives. A coin
+ * is at least 32 px across (#171 "TV": readable at the 12 m default) and grows with the screen;
+ * a flat brass disc until #214's spin sheet.
+ */
+.stream {
+  position: absolute;
+  inset: 0;
+}
+
+.coin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max(32px, 2.4vmin);
+  height: max(32px, 2.4vmin);
+  border: 2px solid #8a6a24;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f3d98a, #c9a24b 55%, #8a6a24);
+  visibility: hidden;
+  will-change: transform;
+}

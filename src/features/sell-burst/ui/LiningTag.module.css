@@ -1,0 +1,21 @@
+/*
+ * Iron grey, not the brass of money (G&V on #176), sized like the header's other fields. The fade
+ * is the 12 ticks of `liningTagFadeTicks` (200 ms) in `sellBurst.json`.
+ */
+.tag {
+  align-self: center;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid #8a8f94;
+  border-radius: var(--radius-panel);
+  color: #c4c8cc;
+  background: rgb(60 64 68 / 0.85);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 200ms linear;
+}
+
+.fading {
+  composes: tag;
+  opacity: 0;
+}
