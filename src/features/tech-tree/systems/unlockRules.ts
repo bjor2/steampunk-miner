@@ -1,8 +1,9 @@
 /**
  * When a node can be researched (spec #161 sections 1 and 5). In order, a node is refused when
  * no node has the id, it is already researched, its tier is not reached, it waits on a discovery
- * (`locked_tier` / `undiscovered`), a prerequisite is missing, it is a combo and the
- * `research_lab` is not built, or the wallet is short.
+ * (`locked_tier` / `undiscovered`), a prerequisite is missing, the player does not own what it
+ * `requiresOwned` (`not_owned`, ticket 233), it is a combo and the `research_lab` is not built,
+ * or the wallet is short.
  *
  * The tier is the furthest planet the session has travelled to: the one it is on. A node with a
  * discovery key opens at its tier once the key is met and at tier + `discoveryGrace` regardless,
@@ -15,6 +16,7 @@ import { cmp } from '../../../systems/money'
 import { hasDiscovered } from '../../../systems/registries/discovery'
 import { progressFromTravel } from '../../../systems/unlocks/travelUnlocks'
 import { nodeCost } from './nodeCost'
+import { ownsEveryRequirement } from './ownedRequirement'
 import { isAbsorbedRowReached, RESEARCH_LAB_ROW_ID } from './scheduleAbsorber'
 import { registeredTechTree, treeNodeOf, treeNodesThrough, type TechTree } from './techTree'
 import type { DiscoveryRequirement, ItemUnlock, TreeNode } from './techNode'
@@ -27,6 +29,7 @@ export const TECH_NODE_REFUSALS = [
   'locked_tier',
   'undiscovered',
   'missing_prereq',
+  'not_owned',
   'no_lab',
   'money_short',
 ] as const
@@ -56,6 +59,7 @@ export function researchRefusalOf(
   if (!isTierReached(state.planet.index, node)) return 'locked_tier'
   if (isWaitingOnDiscovery(state, playerId, node)) return 'undiscovered'
   if (node.prereqs.some((prereq) => !unlocked.has(prereq))) return 'missing_prereq'
+  if (!ownsEveryRequirement(state, playerId, node.requiresOwned ?? [])) return 'not_owned'
   if (node.kind === 'combo' && !isFeatureUnlocked(state, RESEARCH_LAB_ROW_ID)) return 'no_lab'
   return null
 }

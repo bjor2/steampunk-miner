@@ -27,6 +27,7 @@ export function authoredTreeNodeOf(node: TechNode, slots: ReadonlyMap<string, nu
     unlockTier: node.unlockTier,
     prereqs: node.prereqs,
     ...(node.requiresDiscovery !== undefined && { requiresDiscovery: node.requiresDiscovery }),
+    ...(node.requiresOwned !== undefined && { requiresOwned: node.requiresOwned }),
     unlocks: { itemId: node.unlocks, mark: 1 },
     iconId: node.iconId,
     description: node.description,

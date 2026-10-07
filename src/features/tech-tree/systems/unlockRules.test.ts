@@ -5,7 +5,9 @@ import { readSnapshot, takeSnapshot } from '../../../systems/authority/sessionSn
 import { sub, toCanonical } from '../../../systems/money'
 import type { DiscoveryKey } from '../../../systems/registries/discovery'
 import { PLAYER, research, researchAll, sessionOnPlanet, withFixtureTree } from '../treeTestSession'
+import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
 import { nodeCostOf } from './nodeCost'
+import type { TechNode } from './techNode'
 import { unlockedNodeIdsOf } from './techTreeSection'
 import { availableNodes, isUnlocked, unlockedItems } from './unlockRules'
 
@@ -135,6 +137,62 @@ describe('tech tree: discovery', () => {
     withFixtureTree(() => {
       researchAll(sessionOnPlanet(4), ['tech.extraction.resonance_fork'])
     }, [codexWhoMet(['ore:resonance'])])
+  })
+})
+
+describe('tech tree: owned requirements (ticket 233, #162 acceptance 8)', () => {
+  const FLASK = 'own-probe.flask'
+  const TWIST = 'own-probe.twist'
+  const BASE_ITEM = 'own-probe.anchor'
+
+  /** A flask node that waits on refractory lining and a twist that waits on its base item. */
+  const OWN_PROBE: SliceDefinition = {
+    id: 'own-probe',
+    register: (r) => {
+      r.content('vehicle-item', [
+        { id: BASE_ITEM, iconId: 'icon-panel-slots', slots: ['powerup.1'], attach: null },
+      ])
+      r.content('tech-node', [
+        probeNode(FLASK, 'consumable.flask_probe', ['refractory_lining']),
+        probeNode(TWIST, 'power.twist_probe', [BASE_ITEM]),
+      ])
+    },
+  }
+
+  function probeNode(id: string, unlocks: string, requiresOwned: readonly string[]): TechNode {
+    return {
+      id,
+      iconId: 'icon-panel-slots',
+      lane: 'mobility',
+      name: id,
+      unlockTier: 1,
+      prereqs: [],
+      requiresOwned,
+      unlocks,
+      description: 'A probe node.',
+      label: 'horizontal',
+      costKind: 'capability',
+    }
+  }
+
+  it('refuses a node with not_owned until the player owns refractory lining', () => {
+    withFixtureTree(() => {
+      const session = sessionOnPlanet(1)
+      expect(refusalIn(research(session, FLASK))).toBe('not_owned')
+      expect(availableNodes(session.state(), PLAYER).map((node) => node.id)).not.toContain(FLASK)
+      session.submit({ type: 'debug.setLiningType', payload: { liningType: 'refractory' } })
+      expect(refusalIn(research(session, FLASK))).toBeNull()
+      expect(isUnlocked(session.state(), PLAYER, FLASK)).toBe(true)
+    }, [OWN_PROBE])
+  })
+
+  it('refuses a twist until its base vehicle item is owned', () => {
+    withFixtureTree(() => {
+      const session = sessionOnPlanet(1)
+      expect(refusalIn(research(session, TWIST))).toBe('not_owned')
+      session.submit(setVehicleLoadoutCommand({}, [BASE_ITEM]))
+      expect(refusalIn(research(session, TWIST))).toBeNull()
+    }, [OWN_PROBE])
   })
 })
 

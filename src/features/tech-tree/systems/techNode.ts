@@ -61,6 +61,11 @@ export interface TechNode extends ContentEntry {
   unlockTier: number
   prereqs: readonly string[]
   requiresDiscovery?: DiscoveryRequirement
+  /**
+   * What the player must own before it can be researched (#162 acceptance 8, ticket 233): vehicle
+   * item ids, or a lining's module id such as `refractory_lining`.
+   */
+  requiresOwned?: readonly string[]
   /** The store item it unlocks. */
   unlocks: string
   /** The flavour line, no digits: stat and cost lines are generated (#159). */
@@ -101,6 +106,7 @@ export interface TreeNode {
   unlockTier: number
   prereqs: readonly string[]
   requiresDiscovery?: DiscoveryRequirement
+  requiresOwned?: readonly string[]
   unlocks: ItemUnlock
   iconId: string
   description: string

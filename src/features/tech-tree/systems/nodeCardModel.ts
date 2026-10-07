@@ -73,6 +73,7 @@ const REFUSAL_TEXT: Readonly<Record<TechNodeRefusal, (node: TreeNode) => string>
   locked_tier: (node) => `Opens on planet ${node.unlockTier}`,
   undiscovered: () => 'Waits on a discovery, or one more planet',
   missing_prereq: () => 'Research what it builds on first',
+  not_owned: () => 'Own the gear it works with first',
   no_lab: () => 'Needs the research lab',
   money_short: () => 'Not enough money yet',
 }
