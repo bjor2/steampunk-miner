@@ -1,28 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-07T09:39:32.598Z",
+ "updatedAt": "2026-10-07T10:15:05.409Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37548879422,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37548879422",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "034fb8c01ed1f5a60c67928ba7617230b3bd51c3",
-   "branch": "main",
-   "startedAt": "2026-10-06T23:52:01Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 91,
-   "source": "actions",
-   "phase": null,
-   "job": "verify",
-   "reportFound": false,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37550251693,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37550251693",
@@ -1002,14 +982,34 @@
    "tests": 3142,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 1791368103846,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/697f5f9e697a473ede23f40028c23b590a541fbd",
+   "event": "close-#207",
+   "mode": "nightly-only",
+   "sha": "697f5f9e697a473ede23f40028c23b590a541fbd",
+   "branch": "main",
+   "startedAt": "2026-10-07T09:39:39Z",
+   "jobConclusion": "failure",
+   "timedOut": false,
+   "jobDurationSec": 2124,
+   "source": "box",
+   "phase": "slow",
+   "job": "slow",
+   "reportFound": true,
+   "files": 3,
+   "tests": 17,
+   "failed": 1,
+   "failedFiles": 1
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 36,
+   "scoped": 35,
    "full": 12,
    "nightly": 1,
-   "nightly-only": 1
+   "nightly-only": 2
   },
   "timedOut": [],
   "withoutReport": [],
@@ -1342,12 +1342,20 @@
   },
   "pacing-bot": {
    "files": 3,
-   "p50Ms": 198973,
-   "p95Ms": 286590,
-   "fileRuns": 6,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
+   "p50Ms": 286590,
+   "p95Ms": 2376147,
+   "fileRuns": 9,
+   "failedFileRuns": 1,
+   "lastFailure": {
+    "runId": 1791368103846,
+    "sha": "697f5f9e697a473ede23f40028c23b590a541fbd",
+    "at": "2026-10-07T09:39:39Z",
+    "tests": [
+     "balance regression: the pacing bot on the slice (#29, S11) keeps the first hour of core events and commands under the 4 MB budget"
+    ],
+    "file": "src/logging/pacingGate.test.ts"
+   },
+   "passRate": 0.8888888888888888
   },
   "tech-tree": {
    "files": 13,
@@ -7619,71 +7627,78 @@
   },
   "src/logging/assayPacingGate.test.ts": {
    "feature": "pacing-bot",
-   "runs": 2,
-   "lastMs": 145634,
-   "p50Ms": 66372,
-   "p95Ms": 145634,
+   "runs": 3,
+   "lastMs": 847054,
+   "p50Ms": 145634,
+   "p95Ms": 847054,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791362139994,
+   "lastRunId": 1791368103846,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "balance regression: the pacing bot holding assay_beacon (#46, S11) passes the first-ten-minutes, planet 1 core and slice gates on the seed median",
-     145631
+     847052
     ]
    ]
   },
   "src/logging/pacingGate.test.ts": {
    "feature": "pacing-bot",
-   "runs": 2,
-   "lastMs": 80142,
-   "p50Ms": 80142,
-   "p95Ms": 86478,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791362139994,
-   "lastFailure": null,
+   "runs": 3,
+   "lastMs": 794650,
+   "p50Ms": 86478,
+   "p95Ms": 794650,
+   "passRate": 0.6666666666666666,
+   "lastStatus": "failed",
+   "lastRunId": 1791368103846,
+   "lastFailure": {
+    "runId": 1791368103846,
+    "sha": "697f5f9e697a473ede23f40028c23b590a541fbd",
+    "at": "2026-10-07T09:39:39Z",
+    "tests": [
+     "balance regression: the pacing bot on the slice (#29, S11) keeps the first hour of core events and commands under the 4 MB budget"
+    ]
+   },
    "flaky": false,
    "slowest": [
     [
      "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median",
-     61294
+     760428
     ],
     [
      "balance regression: the pacing bot on the slice (#29, S11) derives the same summary from a second run of the same scenario",
-     18672
+     33569
     ],
     [
      "balance regression: the pacing bot on the slice (#29, S11) emits only registered events, with registered fields and kinds",
-     103
+     373
     ]
    ]
   },
   "src/systems/bot/playSlice.test.ts": {
    "feature": "pacing-bot",
-   "runs": 2,
-   "lastMs": 52459,
-   "p50Ms": 52459,
-   "p95Ms": 54478,
+   "runs": 3,
+   "lastMs": 734443,
+   "p50Ms": 54478,
+   "p95Ms": 734443,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 1791362139994,
+   "lastRunId": 1791368103846,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "pacing bot plays a fresh planet 1 through to the planet 2 core inside its budget",
-     20593
+     438447
     ],
     [
      "pacing bot replays from the world seed and its own commands to the same digests and state",
-     19382
+     254580
     ],
     [
      "pacing bot save size (#36 acceptance 4) keeps the save of a 60-minute run under 1 MB",
-     12425
+     41277
     ]
    ]
   },
