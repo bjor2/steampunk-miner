@@ -4,6 +4,9 @@
  * machine. The kernel seams read them (ticket 233): the motion fold, the hull damage intercept,
  * the detection modifier and the heat pause. The window clock clears each one when it ends, so
  * the section goes back to its initial value (out of the state and the digest) once nothing runs.
+ *
+ * The Mark milestone verbs (ticket 275, the GD lock on #256) add optional fields, each absent until
+ * a verb sets it, so a run without milestone Marks keeps the section and its digest as before.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { isJsonObject, isWholeNumber } from '../../../systems/authority/payloadFields'
@@ -13,6 +16,7 @@ import {
   type SaveSection,
 } from '../../../systems/registries/saveSections'
 import type { HeatPauseWindow } from '../../../systems/registries/heatPauses'
+import { isFacing, type Facing } from '../../../systems/vehicle/vehiclePose'
 
 /** A grapple's reel: toward the open tile beside the hooked cell, until `untilTick`. */
 export interface ReelWindow {
@@ -21,6 +25,8 @@ export interface ReelWindow {
   tx: number
   ty: number
   untilTick: number
+  /** The hold's faster reel (Mark 6): the drive boost the winch hauls at; absent at normal speed. */
+  driveBp?: number
 }
 
 /** A burst along a world direction (any length but zero), until `untilTick`. */
@@ -29,6 +35,8 @@ export interface BurstWindow {
   dirY: number
   speedMmPerS: number
   untilTick: number
+  /** The escape thruster's aimed burst (Mark 3) stops at the first solid cell this way; absent: up. */
+  facing?: Facing
 }
 
 /** A smoke cloud where the canister burst, in millimetres. */
@@ -36,6 +44,20 @@ export interface SmokeCloud {
   x: number
   y: number
   untilTick: number
+  /** A linked puff's smaller reach (Mark 9 links); absent: the canister's `radiusTiles`. */
+  radiusTiles?: number
+}
+
+/**
+ * A milestone verb's short push (ticket 275): a kick (a burst along `burst` until `untilTick`), a
+ * pin (`hover`), a rise (`liftBp`) or a drift (`driveBp`), folded under the kernel's caps.
+ */
+export interface MoveWindow {
+  untilTick: number
+  burst?: { dirX: number; dirY: number; speedMmPerS: number }
+  hover?: boolean
+  liftBp?: number
+  driveBp?: number
 }
 
 /**
@@ -46,6 +68,10 @@ export interface SmokeCloud {
 export interface RivetHold {
   finishTick: number
   expectedEnergy: number
+  /** Plates riding the hold: a second tap (Mark 3) adds one; absent for one. */
+  plates?: number
+  /** A linked patch's share of `hullMax` (Mark 6 links); absent: the kit's share at its Mark. */
+  plateShareBp?: number
 }
 
 export interface MobilityState {
@@ -60,6 +86,10 @@ export interface MobilityState {
   /** Kept until the heat gauge has settled past each, so no vent is missed (`heatPauses`). */
   heatSinks: readonly HeatPauseWindow[]
   patch: RivetHold | null
+  /** A linked drop's lift gain (Mark 9 links); absent: the ballast's own gain. */
+  ballastGainBp?: number
+  /** The milestone verbs' pushes still running; absent with none. */
+  moves?: readonly MoveWindow[]
 }
 
 export const NO_MOBILITY_EFFECTS: MobilityState = {
@@ -124,13 +154,64 @@ function mobilityStateProblems(body: unknown): string[] {
     ...nullableProblems('smoke', body.smoke, SMOKE_FIELDS),
     ...heatSinkProblems(body.heatSinks),
     ...nullableProblems('patch', body.patch, ['finishTick', 'expectedEnergy']),
+    ...optionalFieldProblems(body),
   ]
+}
+
+/** The milestone verbs' optional fields, each checked only when present. */
+function optionalFieldProblems(body: Record<string, unknown>): string[] {
+  return [
+    ...optionalIntegerProblems('reel.driveBp', fieldOf(body.reel, 'driveBp')),
+    ...optionalFacingProblems('escape.facing', fieldOf(body.escape, 'facing')),
+    ...optionalIntegerProblems('smoke.radiusTiles', fieldOf(body.smoke, 'radiusTiles')),
+    ...optionalIntegerProblems('patch.plates', fieldOf(body.patch, 'plates')),
+    ...optionalIntegerProblems('patch.plateShareBp', fieldOf(body.patch, 'plateShareBp')),
+    ...optionalIntegerProblems('ballastGainBp', body.ballastGainBp),
+    ...moveProblems(body.moves),
+  ]
+}
+
+function fieldOf(value: unknown, field: string): unknown {
+  return isJsonObject(value) ? value[field] : undefined
+}
+
+function optionalIntegerProblems(name: string, value: unknown): string[] {
+  return value === undefined || isWholeNumber(value)
+    ? []
+    : [`mobility.${name} must be a whole number`]
+}
+
+function optionalFacingProblems(name: string, value: unknown): string[] {
+  return value === undefined || isFacing(value) ? [] : [`mobility.${name} must be a facing`]
+}
+
+function moveProblems(value: unknown): string[] {
+  if (value === undefined) return []
+  const isList = Array.isArray(value) && value.every(isMoveWindow)
+  return isList
+    ? []
+    : ['mobility.moves must be a list of {untilTick, burst?, hover?, liftBp?, driveBp?}']
+}
+
+function isMoveWindow(value: unknown): boolean {
+  if (!isJsonObject(value) || !Number.isSafeInteger(value.untilTick)) return false
+  return (
+    isAbsentOr(value.burst, (burst) => hasIntegerFields(burst, MOVE_BURST_FIELDS)) &&
+    isAbsentOr(value.hover, (hover) => typeof hover === 'boolean') &&
+    isAbsentOr(value.liftBp, Number.isSafeInteger) &&
+    isAbsentOr(value.driveBp, Number.isSafeInteger)
+  )
+}
+
+function isAbsentOr(value: unknown, isValid: (present: unknown) => boolean): boolean {
+  return value === undefined || isValid(value)
 }
 
 const REEL_FIELDS = ['hookTx', 'hookTy', 'tx', 'ty', 'untilTick'] as const
 const BURST_FIELDS = ['dirX', 'dirY', 'speedMmPerS', 'untilTick'] as const
 const SMOKE_FIELDS = ['x', 'y', 'untilTick'] as const
 const HEAT_SINK_FIELDS = ['fromTick', 'untilTick', 'ventBp', 'gainBp'] as const
+const MOVE_BURST_FIELDS = ['dirX', 'dirY', 'speedMmPerS'] as const
 
 function nullableProblems(name: string, value: unknown, fields: readonly string[]): string[] {
   if (value === null || hasIntegerFields(value, fields)) return []

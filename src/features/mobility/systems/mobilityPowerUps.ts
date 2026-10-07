@@ -2,12 +2,41 @@
  * Each mobility item as `power-up-core` runs it (#162 section 2.1 classes, section 4 numbers):
  * charged items refill at the dock, consumables come as a stack, the two toggles draw a share of
  * `energyMax` a second while on (#162 4.4, ticket 233). These are the Mark 1 numbers: power-up-core
- * steps them with each item's ladder at the Mark researched (#249, GD lock on #204 Q7).
+ * steps them with each item's ladder at the Mark researched (#249, GD lock on #204 Q7). Each item
+ * plays its plain use, its Mark milestone second tap and hold, and the use a sibling-link fires
+ * (ticket 275, `useVerbs.ts`).
  */
 import type { PowerUp, PowerUpClass } from '../../power-up-core'
 import { MOBILITY_ITEM, type MobilityItemId } from './itemIds'
 import { MOBILITY_ITEM_ROWS, type MobilityRow } from './mobilityCatalogue'
 import { MOBILITY_ECONOMY } from './mobilityEconomy'
+import {
+  addPlateToPatch,
+  airDashSteamBoost,
+  aimEscapeThruster,
+  burnEscapeLonger,
+  burnSteamBoostLonger,
+  chainHeatSink,
+  driftOnTanks,
+  fireGrappleAtNextAnchor,
+  fireGrappleReelingFast,
+  hopOnBallast,
+  jetHeatSink,
+  keepBallastLonger,
+  keepShieldLonger,
+  keepSmokeLonger,
+  kickOffAnchor,
+  pinWithAnchor,
+  raiseCoolingCurtain,
+  riseOnTanks,
+  throwSmokeAhead,
+} from './followUpUses'
+import {
+  dropLinkedBallast,
+  puffLinkedSmoke,
+  raiseLinkedShield,
+  startLinkedPatch,
+} from './linkedUses'
 import {
   blowSteamBoost,
   burstSmokeCanister,
@@ -20,6 +49,7 @@ import {
   ventHeatSink,
 } from './mobilityUses'
 import { rivetHoldOf } from './rivetPatch'
+import { playingVerbs, type UseVerbs } from './useVerbs'
 
 type PowerUpRules = Pick<
   PowerUp,
@@ -31,24 +61,72 @@ type PowerUpRules = Pick<
   | 'energyDrawBpPerSecond'
   | 'activate'
   | 'holdOf'
+  | 'linkMoment'
 >
 
 const N = MOBILITY_ECONOMY
 
 const RULES: Readonly<Record<MobilityItemId, PowerUpRules>> = {
-  [MOBILITY_ITEM.grappleWinch]: charged(N.grapple, fireGrapple),
-  [MOBILITY_ITEM.emergencyBallast]: consumable(N.ballast, dropBallast),
-  [MOBILITY_ITEM.heatSinkFlask]: consumable(N.heatSink, ventHeatSink),
-  [MOBILITY_ITEM.steamBoost]: charged(N.steamBoost, blowSteamBoost),
+  [MOBILITY_ITEM.grappleWinch]: charged(N.grapple, {
+    plain: fireGrapple,
+    secondTap: fireGrappleAtNextAnchor,
+    hold: fireGrappleReelingFast,
+  }),
+  [MOBILITY_ITEM.emergencyBallast]: consumable(N.ballast, {
+    plain: dropBallast,
+    secondTap: hopOnBallast,
+    hold: keepBallastLonger,
+    linked: dropLinkedBallast,
+  }),
+  [MOBILITY_ITEM.heatSinkFlask]: consumable(N.heatSink, {
+    plain: ventHeatSink,
+    secondTap: jetHeatSink,
+    hold: chainHeatSink,
+  }),
+  [MOBILITY_ITEM.steamBoost]: charged(N.steamBoost, {
+    plain: blowSteamBoost,
+    secondTap: airDashSteamBoost,
+    hold: burnSteamBoostLonger,
+  }),
   [MOBILITY_ITEM.rivetPatch]: {
-    ...consumable(N.rivetPatch, startRivetPatch),
+    ...consumable(N.rivetPatch, {
+      plain: startRivetPatch,
+      secondTap: addPlateToPatch,
+      linked: startLinkedPatch,
+    }),
     holdOf: rivetHoldOf,
   },
-  [MOBILITY_ITEM.steamShield]: charged(N.steamShield, raiseSteamShield),
-  [MOBILITY_ITEM.smokeCanister]: consumable(N.smoke, burstSmokeCanister),
-  [MOBILITY_ITEM.gravAnchor]: toggle(N.gravAnchor.drawBpPerSecond),
-  [MOBILITY_ITEM.buoyancyTanks]: toggle(N.buoyancy.drawBpPerSecond),
-  [MOBILITY_ITEM.escapeThruster]: consumable(N.escapeThruster, fireEscapeThruster),
+  // The curtain's break, not its raise, fires its smoke puff (the GD lock on #256).
+  [MOBILITY_ITEM.steamShield]: {
+    ...charged(N.steamShield, {
+      plain: raiseSteamShield,
+      secondTap: raiseCoolingCurtain,
+      hold: keepShieldLonger,
+      linked: raiseLinkedShield,
+    }),
+    linkMoment: 'own',
+  },
+  [MOBILITY_ITEM.smokeCanister]: consumable(N.smoke, {
+    plain: burstSmokeCanister,
+    secondTap: throwSmokeAhead,
+    hold: keepSmokeLonger,
+    linked: puffLinkedSmoke,
+  }),
+  [MOBILITY_ITEM.gravAnchor]: toggle(N.gravAnchor.drawBpPerSecond, {
+    plain: switchToggle,
+    hold: pinWithAnchor,
+    secondTap: kickOffAnchor,
+  }),
+  [MOBILITY_ITEM.buoyancyTanks]: toggle(N.buoyancy.drawBpPerSecond, {
+    plain: switchToggle,
+    hold: riseOnTanks,
+    secondTap: driftOnTanks,
+  }),
+  [MOBILITY_ITEM.escapeThruster]: consumable(N.escapeThruster, {
+    plain: fireEscapeThruster,
+    secondTap: aimEscapeThruster,
+    hold: burnEscapeLonger,
+  }),
 }
 
 export const MOBILITY_POWER_UPS: readonly PowerUp[] = MOBILITY_ITEM_ROWS.map(powerUpOfRow)
@@ -71,21 +149,22 @@ function shortNameOf(itemId: string): string {
 
 function charged(
   numbers: { charges: number; cooldownTicks: number; windupTicks: number },
-  activate: PowerUp['activate'],
+  verbs: UseVerbs,
 ): PowerUpRules {
-  return rulesOf('charged', numbers.charges, numbers.cooldownTicks, numbers.windupTicks, activate)
+  const { charges, cooldownTicks, windupTicks } = numbers
+  return rulesOf('charged', charges, cooldownTicks, windupTicks, playingVerbs(verbs))
 }
 
 function consumable(
   numbers: { stack: number; windupTicks: number },
-  activate: PowerUp['activate'],
+  verbs: UseVerbs,
 ): PowerUpRules {
-  return rulesOf('consumable', numbers.stack, 0, numbers.windupTicks, activate)
+  return rulesOf('consumable', numbers.stack, 0, numbers.windupTicks, playingVerbs(verbs))
 }
 
-function toggle(drawBpPerSecond: number): PowerUpRules {
+function toggle(drawBpPerSecond: number, verbs: UseVerbs): PowerUpRules {
   return {
-    ...rulesOf('passive', 0, 0, 0, switchToggle),
+    ...rulesOf('passive', 0, 0, 0, playingVerbs(verbs)),
     isToggle: true,
     energyDrawBpPerSecond: drawBpPerSecond,
   }

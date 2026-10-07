@@ -39,6 +39,13 @@ interface HookCandidate {
   distanceSq: number
 }
 
+interface AimedShot {
+  aim: IntegerVector
+  tanPerMille: number
+  /** Only candidates farther off than this squared distance; -1 skips none. */
+  pastSq: number
+}
+
 interface Ground {
   world: WorldState
   params: PlanetParams
@@ -49,19 +56,31 @@ const HALF_TILE_MM = MM_PER_METRE / 2
 /** Line-of-sight samples a tile: four per tile, so no cell between the miner and a hook is skipped. */
 const SIGHT_STEP_MM = MM_PER_METRE / 4
 
-/** The cell the grapple bites from this pose, or null with no valid hook. */
+/**
+ * The cell the grapple bites from this pose, or null with no valid hook. Given `pastTile` (the hook
+ * the winch holds, for the Mark 3 second tap), it bites only farther off than that tile: the next
+ * anchor along the aim.
+ */
 export function grappleHookOf(
   state: AuthorityState,
   pose: VehiclePose,
   numbers: GrappleNumbers,
+  pastTile: TilePoint | null = null,
 ): GrappleHook | null {
   const params = planetParamsOf(state.planet)
   if (params === null) return null
-  const aim = aimOf(pose)
-  const inCone = candidatesNearestFirst(pose, numbers.rangeTiles).filter((candidate) =>
-    isInAimCone(candidate.offset, aim, numbers.aimConeTanPerMille),
+  const shot = { aim: aimOf(pose), tanPerMille: numbers.aimConeTanPerMille, pastSq: -1 }
+  if (pastTile !== null) shot.pastSq = distanceSqOf(offsetToTileCentre(pose, pastTile))
+  const aimed = candidatesNearestFirst(pose, numbers.rangeTiles).filter((candidate) =>
+    isAimedAt(candidate, shot),
   )
-  return firstHookOf({ world: state.world, params }, pose, inCone)
+  return firstHookOf({ world: state.world, params }, pose, aimed)
+}
+
+/** In the aim cone, and farther off than the hook the shot skips past. */
+function isAimedAt(candidate: HookCandidate, shot: AimedShot): boolean {
+  if (candidate.distanceSq <= shot.pastSq) return false
+  return isInAimCone(candidate.offset, shot.aim, shot.tanPerMille)
 }
 
 /** Straight up the miner's own up; 45° up toward the side it faces left or right. */
@@ -87,7 +106,7 @@ function candidatesNearestFirst(pose: VehiclePose, rangeTiles: number): HookCand
   for (let ty = centre.ty - rangeTiles; ty <= centre.ty + rangeTiles; ty += 1) {
     for (let tx = centre.tx - rangeTiles; tx <= centre.tx + rangeTiles; tx += 1) {
       const offset = offsetToTileCentre(pose, { tx, ty })
-      const distanceSq = offset.x * offset.x + offset.y * offset.y
+      const distanceSq = distanceSqOf(offset)
       if (distanceSq <= rangeSq) candidates.push({ tile: { tx, ty }, offset, distanceSq })
     }
   }
@@ -98,6 +117,10 @@ function compareNearestFirst(a: HookCandidate, b: HookCandidate): number {
   if (a.distanceSq !== b.distanceSq) return a.distanceSq - b.distanceSq
   if (a.tile.ty !== b.tile.ty) return a.tile.ty - b.tile.ty
   return a.tile.tx - b.tile.tx
+}
+
+function distanceSqOf(offset: IntegerVector): number {
+  return offset.x * offset.x + offset.y * offset.y
 }
 
 function offsetToTileCentre(pose: VehiclePose, tile: TilePoint): IntegerVector {

@@ -14,7 +14,8 @@
  *
  * The plate is the kit's magnitude at the Mark researched when the hold finishes (#249): the hold
  * keeps no number of its own, so a Mark bought in the field during the 90 ticks plates at the new
- * Mark.
+ * Mark. A linked patch keeps the half share the link handed it, and a second tap (Mark 3) puts a
+ * second plate on the same hold, which lands or comes back with it (ticket 275).
  */
 import { BASIS_POINTS } from '../../../constants/balance'
 import {
@@ -46,8 +47,10 @@ const NUMBERS = MOBILITY_ECONOMY.rivetPatch
 export function settleRivetHold(state: AuthorityState, playerId: string, tick: number): RuleEffect {
   const patch = mobilityOf(state, playerId).patch
   if (patch === null) return unchanged(state)
-  if (hasMovedDuring(vehicleOf(state, playerId), patch)) return cancelRivetHold(state, playerId)
-  if (tick >= patch.finishTick) return finishRivetHold(state, playerId)
+  if (hasMovedDuring(vehicleOf(state, playerId), patch)) {
+    return cancelRivetHold(state, playerId, patch)
+  }
+  if (tick >= patch.finishTick) return finishRivetHold(state, playerId, patch)
   return unchanged(watchNextTick(state, playerId, patch))
 }
 
@@ -92,9 +95,13 @@ function watchNextTick(state: AuthorityState, playerId: string, patch: RivetHold
   }))
 }
 
-function cancelRivetHold(state: AuthorityState, playerId: string): RuleEffect {
+/** Every unit riding the hold comes back: one, or two with a second tap's plate. */
+function cancelRivetHold(state: AuthorityState, playerId: string, patch: RivetHold): RuleEffect {
   const cleared = updateMobility(state, playerId, (value) => ({ ...value, patch: null }))
-  const refunded = returnCharge(cleared, playerId, MOBILITY_ITEM.rivetPatch)
+  const refunded = Array.from({ length: platesOf(patch) }).reduce<AuthorityState>(
+    (current) => returnCharge(current, playerId, MOBILITY_ITEM.rivetPatch),
+    cleared,
+  )
   return {
     state: refunded,
     events: [
@@ -103,14 +110,19 @@ function cancelRivetHold(state: AuthorityState, playerId: string): RuleEffect {
   }
 }
 
-function finishRivetHold(state: AuthorityState, playerId: string): RuleEffect {
+function finishRivetHold(state: AuthorityState, playerId: string, patch: RivetHold): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
-  const hullAfter = patchedHullOf(vehicle, plateShareBpOf(state, playerId))
+  const shareBp = (patch.plateShareBp ?? plateShareBpOf(state, playerId)) * platesOf(patch)
+  const hullAfter = patchedHullOf(vehicle, shareBp)
   const cleared = updateMobility(state, playerId, (value) => ({ ...value, patch: null }))
   return {
     state: withVehicle(cleared, playerId, { ...vehicleOf(cleared, playerId), hull: hullAfter }),
     events: [hullPatchedOf(playerId, sub(hullAfter, vehicle.hull), hullAfter)],
   }
+}
+
+function platesOf(patch: RivetHold): number {
+  return patch.plates ?? 1
 }
 
 /** The share of `hullMax` the kit plates on at the player's Mark, in basis points. */

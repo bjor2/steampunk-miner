@@ -1,5 +1,5 @@
 {
-  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): prices 4.1, charged items 4.2, consumables 4.3, toggle draw 4.4; the G&V feel pass (grapple aim) and the GD lock and G&V comment on #204 (rivet patch). Times are 60 Hz ticks, shares basis points, draws thousandths of energyMax a second.",
+  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): prices 4.1, charged items 4.2, consumables 4.3, toggle draw 4.4; the G&V feel pass (grapple aim) and the GD lock and G&V comment on #204 (rivet patch); milestones are ticket 275's readings of the GD lock on #256 (a kick at the boost's speed share, half a second; a pin, rise or drift of a second at the +2000 bp cap; the shield's cooling at half heat gain; a linked ballast's lift and smoke puff's reach at the lock's half). Times are 60 Hz ticks, shares basis points, draws thousandths of energyMax a second.",
   "mobility": {
     "prices": {
       "band": 5,
@@ -67,6 +67,15 @@
       "windupTicks": 6,
       "burstTicks": 240,
       "speedShareBp": 12000
+    },
+    "milestones": {
+      "kickTicks": 30,
+      "kickSpeedShareBp": 12000,
+      "fastReelDriveBp": 2000,
+      "coolingGainBp": 5000,
+      "spellTicks": 60,
+      "spellBoostBp": 2000,
+      "linkedStrengthBp": 5000
     }
   }
 }

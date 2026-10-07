@@ -4,7 +4,8 @@
  * - The steam shield's curtain turns aside enemy hits and collapse crush while it stands
  *   (`hullDamageIntercepts`); heat and lava are never asked, so it never stops them (#162 row).
  * - A smoke cloud blinds every enemy in it, and hides a miner standing in it
- *   (`enemyDetectionModifiers`); it adds no enemy and changes no spawn budget.
+ *   (`enemyDetectionModifiers`); it adds no enemy and changes no spawn budget. A linked puff
+ *   reaches half as far (ticket 275).
  * - A heat sink flask's window vents the gauge and pauses heat gain (`heatPauses`).
  *
  * The kernel floors each scale (`itemEffectCaps`, ticket 233), so the shield takes at most half a
@@ -53,7 +54,7 @@ function isEnemyOrMinerInCloud(
 }
 
 function isInCloud(x: number, y: number, smoke: SmokeCloud): boolean {
-  const radius = MOBILITY_ECONOMY.smoke.radiusTiles * MM_PER_METRE
+  const radius = (smoke.radiusTiles ?? MOBILITY_ECONOMY.smoke.radiusTiles) * MM_PER_METRE
   const dx = x - smoke.x
   const dy = y - smoke.y
   return dx * dx + dy * dy <= radius * radius

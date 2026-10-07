@@ -5,9 +5,9 @@
  *
  * - The grapple's reel hauls the miner to the open tile beside its hook.
  * - The steam boost and the escape thruster are bursts; the thruster stops at the first solid
- *   cell above the miner.
+ *   cell above the miner, or the way an aimed one fires. A held grapple reels faster.
  * - A dropped ballast states the lift and drive a lighter miner gains: mass ×0.6 is ×1/0.6 of
- *   thrust-to-weight, which the kernel caps.
+ *   thrust-to-weight, which the kernel caps; a linked drop states half of it.
  * - While switched on in a slot (the toggles `power-up-core` draws energy for), the grav anchor
  *   clings to the wall or ceiling a side touches, so the miner can drill while anchored, and the
  *   buoyancy tanks hover in open air. Switched off, the normal fall rules take over.
@@ -19,7 +19,12 @@ import type {
   VehicleMotionEffect,
   VehicleMotionEffectSource,
 } from '../../../systems/registries/vehicleMotionEffects'
-import { FACING, noseTileOf, type VehiclePose } from '../../../systems/vehicle/vehiclePose'
+import {
+  FACING,
+  noseTileOf,
+  type Facing,
+  type VehiclePose,
+} from '../../../systems/vehicle/vehiclePose'
 import { isSolidCell } from '../../../systems/world/worldCell'
 import { cellAt } from '../../../systems/world/worldState'
 import { isToggleEngaged } from '../../power-up-core'
@@ -32,7 +37,8 @@ export const REEL_MOTION: VehicleMotionEffectSource = {
   effectOf: (state, playerId, tick) => {
     const reel = mobilityOf(state, playerId).reel
     if (reel === null || tick >= reel.untilTick) return null
-    return { reelTo: { tx: reel.tx, ty: reel.ty } }
+    const reelTo = { tx: reel.tx, ty: reel.ty }
+    return reel.driveBp === undefined ? { reelTo } : { reelTo, driveBp: reel.driveBp }
   },
 }
 
@@ -45,7 +51,7 @@ export const ESCAPE_MOTION: VehicleMotionEffectSource = {
   id: 'mobility.escape-thruster',
   effectOf: (state, playerId, tick) => {
     const escape = mobilityOf(state, playerId).escape
-    if (escape === null || isSolidAboveMiner(state, playerId)) return null
+    if (escape === null || isEscapeStopped(state, playerId, escape)) return null
     return burstEffectOf(escape, tick)
   },
 }
@@ -53,8 +59,9 @@ export const ESCAPE_MOTION: VehicleMotionEffectSource = {
 export const BALLAST_MOTION: VehicleMotionEffectSource = {
   id: 'mobility.emergency-ballast',
   effectOf: (state, playerId, tick) => {
-    if (tick >= mobilityOf(state, playerId).ballastUntilTick) return null
-    const gainBp = ballastGainBp()
+    const value = mobilityOf(state, playerId)
+    if (tick >= value.ballastUntilTick) return null
+    const gainBp = value.ballastGainBp ?? ballastGainBp()
     return { liftBp: gainBp, driveBp: gainBp }
   },
 }
@@ -82,14 +89,21 @@ function burstEffectOf(burst: BurstWindow | null, tick: number): VehicleMotionEf
   return { burst: { dirX, dirY, speedMmPerS, untilTick } }
 }
 
-/** The tile one up from the miner's centre is solid: the roof the thruster thumps into. */
-export function isSolidAboveMiner(state: AuthorityState, playerId: string): boolean {
+/**
+ * The tile one along the thruster's way from the miner's centre is solid: the roof it thumps into,
+ * or the wall an aimed burst (Mark 3) meets.
+ */
+export function isEscapeStopped(
+  state: AuthorityState,
+  playerId: string,
+  escape: BurstWindow,
+): boolean {
   const pose = vehicleOf(state, playerId).pose
   const params = planetParamsOf(state.planet)
   if (pose === null || params === null) return true
-  return isSolidCell(cellAt(state.world, params, tileAbove(pose)))
+  return isSolidCell(cellAt(state.world, params, tileAlong(pose, escape.facing ?? FACING.up)))
 }
 
-function tileAbove(pose: VehiclePose) {
-  return noseTileOf({ ...pose, facing: FACING.up })
+function tileAlong(pose: VehiclePose, facing: Facing) {
+  return noseTileOf({ ...pose, facing })
 }

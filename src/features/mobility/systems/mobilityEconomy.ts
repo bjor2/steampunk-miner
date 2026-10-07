@@ -8,6 +8,8 @@
  * hook for `reelHoldTicks` and a reel that never arrives lets go after `reelTicksMax`, and a burst asks for the engine's top speed plus the kernel's +2000 bp cap
  * (`speedShareBp`), which the kernel holds it to anyway.
  *
+ * The milestone verbs' numbers are ticket 275's readings of the GD lock on #256 (`MilestoneNumbers`).
+ *
  * The toggles' draws stay in the file in ‰ a second (#162 4.4's 1.0% and 1.5%) and are read ×10
  * into basis points, the unit of `power-up-core`'s draw contract (ticket 295).
  */
@@ -106,6 +108,23 @@ export interface ToggleNumbers {
   drawBpPerSecond: number
 }
 
+/**
+ * The Mark milestone verbs' own numbers (ticket 275, the GD lock on #256), where a verb is a push
+ * no #162 row names: a kick is a short burst at the boost's share of top speed, a spell a pin, rise
+ * or drift that asks the kernel's +2000 bp cap, and the shield's cooling curtain halves heat gain.
+ */
+export interface MilestoneNumbers {
+  kickTicks: number
+  kickSpeedShareBp: number
+  /** The hold's faster reel: the drive boost the winch hauls at. */
+  fastReelDriveBp: number
+  coolingGainBp: number
+  spellTicks: number
+  spellBoostBp: number
+  /** A linked ballast's lift gain and a linked smoke puff's reach: "half" (#256 worked examples). */
+  linkedStrengthBp: number
+}
+
 export interface MobilityEconomy {
   prices: MobilityPrices
   grapple: GrappleNumbers
@@ -118,6 +137,7 @@ export interface MobilityEconomy {
   gravAnchor: ToggleNumbers
   buoyancy: ToggleNumbers
   escapeThruster: EscapeThrusterNumbers
+  milestones: MilestoneNumbers
 }
 
 const BP_PER_MILLE = 10
@@ -180,6 +200,15 @@ export function readMobilityEconomy(
       'windupTicks',
       'burstTicks',
       'speedShareBp',
+    ]),
+    milestones: integers('milestones', [
+      'kickTicks',
+      'kickSpeedShareBp',
+      'fastReelDriveBp',
+      'coolingGainBp',
+      'spellTicks',
+      'spellBoostBp',
+      'linkedStrengthBp',
     ]),
   }
   return reader.problems.length > 0 ? { problems: reader.problems } : { economy }

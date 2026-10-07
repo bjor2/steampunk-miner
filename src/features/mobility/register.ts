@@ -4,13 +4,15 @@
  * anchor, buoyancy tanks and escape thruster as vehicle items and power-ups, their
  * `tech.mobility.*` nodes with the third cradle's, their item cards, and their effects on ticket
  * 233's seams, kept in the `mobility` section and cleared on the authority clock, and the rivet
- * patch's hold cues (ticket 253). No side effects at import; the loader calls `register`.
+ * patch's hold cues (ticket 253), and their Mark milestone verbs (ticket 275). No side effects at
+ * import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { mobilityDebugActions } from './debug'
 import { MOBILITY_PROJECTIONS, MOBILITY_RUN_EVENTS } from './logging'
 import { MOBILITY_EFFECTS_STEP } from './systems/effectClock'
 import { MOBILITY_ITEM_CARDS } from './systems/itemCards'
+import { MILESTONE_MOTION } from './systems/milestoneMoves'
 import { MOBILITY_TECH_NODES, MOBILITY_VEHICLE_ITEMS } from './systems/mobilityContent'
 import {
   ANCHOR_MOTION,
@@ -44,6 +46,7 @@ export const slice: SliceDefinition = {
       BUOYANCY_MOTION,
       ESCAPE_MOTION,
       REEL_MOTION,
+      MILESTONE_MOTION,
     ].forEach((source) => r.vehicleMotionEffect(source))
     r.hullDamageIntercept(STEAM_SHIELD_INTERCEPT)
     r.enemyDetectionModifier(SMOKE_DETECTION)
