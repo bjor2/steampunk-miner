@@ -3,7 +3,8 @@
  * `shields`, `grav_anchor`, `buoyancy_tanks` and `escape_thrusters` carry `unlockVia: tech_tree`
  * on the locked schedule, so each is one tech node at its own planet, not a second unlock beside
  * it. The fixed map below ties each row to its node; the node claims the row (`scheduleRowId`),
- * opens no earlier than the row's planet, and counts once on the planet's unlock cadence.
+ * opens no earlier than the row's planet, and counts once on the planet's unlock cadence. The
+ * `research_lab` row is read here too: combos are researched there, never before its planet.
  */
 import type { UnlockRow } from '../../../systems/unlocks/readUnlockSchedule'
 import { LOCKED_SCHEDULE } from '../../../systems/unlocks/unlockSchedule'
