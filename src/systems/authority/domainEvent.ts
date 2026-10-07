@@ -135,9 +135,10 @@ export interface KernelDomainEventBodies {
   DrillDamageDealt: { tx: number; ty: number; ticks: number; damage: string }
   /**
    * A material cell yielded (#36: its 16 density samples fell to half): the first-slice per-tile
-   * mining event, same payload, fired once per cell.
+   * mining event, same payload, fired once per cell. `cause: 'blast'` marks a live blast's tile,
+   * which the run log leaves to the blast's `blast_resolved` line (K6 #189).
    */
-  TileDestroyed: { tx: number; ty: number; kind: 'ground' | 'ore' | 'core' }
+  TileDestroyed: { tx: number; ty: number; kind: 'ground' | 'ore' | 'core'; cause?: 'blast' }
   /**
    * A slice's gate check stopped the drill at an ore cell (feature-slices.md 3.6, K2): `refused`
    * once per drill command that met the cell, `lost` beside the cell's `TileDestroyed`. The fields
@@ -343,16 +344,31 @@ export interface KernelDomainEventBodies {
   /** A charge on the wall at tile `tx, ty`, blowing at `detonateTick`; `carried` is what is left (#109). */
   ChargePlanted: { tx: number; ty: number; detonateTick: number; carried: number }
   /**
-   * The charge at `tx, ty` blew (#109): the tiles it cleared, the sale value of the ore it broke
-   * that never reached the hold, the collapse blocks it checked and the warnings it started.
+   * The charge at `tx, ty` blew (#109): its hits land now, its ground breaks as a live blast that
+   * `BlastResolved` sums up (K6 #189).
    */
-  ChargeDetonated: {
+  ChargeDetonated: { tx: number; ty: number }
+  /**
+   * A live blast's slice this tick (K6 #189): the ring of its front from the first tile it looked
+   * at to the last, in mm from the charge tile's centre. Presentation only; the run log skips it.
+   */
+  BlastFront: { tx: number; ty: number; rInnerMm: number; rOuterMm: number }
+  /**
+   * A live blast finished (#154, K6 #189): the tiles it cleared, the ore units it sent to the hold
+   * and the sale value of the ore it broke and lost, the rim blocks it checked and the collapse
+   * warnings they started, and the ticks it was live, its detonation tick included.
+   */
+  BlastResolved: {
     tx: number
     ty: number
+    radiusMm: number
+    size: number
     tilesCleared: number
+    oreUnits: number
     oreValueLost: string
     collapseChecks: number
     collapsesTriggered: number
+    ticks: number
   }
   /** The rack filled with `count` charges for `price` (#109). */
   ChargesRestocked: { count: number; price: string }

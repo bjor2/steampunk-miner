@@ -2,8 +2,8 @@
  * The checkpoint save file (decisions #4 and #12, amended by #12 to one file per slot; #26):
  *
  *   header   formatVersion, snapshotVersion, generatorVersion, saveEpoch, tick, digest
- *   world    the planet as seed + params + chunk deltas, the platform, the core, combat and the
- *            blocks warning or refilling (#43)
+ *   world    the planet as seed + params + chunk deltas, the platform, the core, combat, the
+ *            blocks warning or refilling (#43), loose lava (#113), live blasts and queued power-up terrain edits (K6 #189)
  *   profile  per player the wallet, the last seq and the vehicle (integer levels, never stats)
  *
  * The slices' save sections ride inside these two parts (feature-slices.md 3.13): the session
@@ -62,6 +62,8 @@ export interface SaveWorldSection {
   combat: PortableState['combat']
   collapse: PortableState['collapse']
   lava: PortableState['lava']
+  liveBlasts: PortableState['liveBlasts']
+  terrainEdits: PortableState['terrainEdits']
   debugApplied: boolean
   /** The session sections; omitted while none is registered. */
   slices?: PortableState['slices']
@@ -100,6 +102,8 @@ function worldSectionOf(state: PortableState, saveEpoch: number): SaveWorldSecti
     combat: state.combat,
     collapse: state.collapse,
     lava: state.lava,
+    liveBlasts: state.liveBlasts,
+    terrainEdits: state.terrainEdits,
     debugApplied: state.debugApplied,
     ...(state.slices === undefined ? {} : { slices: state.slices }),
   }
@@ -139,6 +143,8 @@ function snapshotOfSaveSlot(file: SaveSlotFile): SessionSnapshot {
       combat: world.combat,
       collapse: world.collapse,
       lava: world.lava,
+      liveBlasts: world.liveBlasts,
+      terrainEdits: world.terrainEdits,
       debugApplied: world.debugApplied,
       ...(world.slices === undefined ? {} : { slices: world.slices }),
     },

@@ -11,6 +11,8 @@ import { ZERO_MONEY, type Money } from '../money'
 import type { SliceSections } from '../registries/saveSections'
 import { newVehicleState, type VehicleState } from '../vehicle/vehicleState'
 import { EMPTY_WORLD, type WorldState } from '../world/worldState'
+import { NO_LIVE_BLASTS, type LiveBlast } from './charges/liveBlast'
+import { NO_TERRAIN_EDITS, type QueuedTerrainEdit } from './terrain/terrainEdits'
 import { NO_COLLAPSE, type CollapseState } from './collapse/collapseState'
 import { NO_LOOSE_LAVA, type LavaState } from './lava/lavaState'
 import { NEW_COMBAT, type CombatState } from './combat/combatState'
@@ -45,6 +47,10 @@ export interface AuthorityState {
   collapse: CollapseState
   /** Lava flowing on a heat planet (#113); emptied on every planet. */
   lava: LavaState
+  /** Blasts still opening their crater, oldest first (K6 #189); emptied on every planet. */
+  liveBlasts: readonly LiveBlast[]
+  /** Power-up terrain edits waiting for their share of a tick (K6 #189); emptied on every planet. */
+  terrainEdits: readonly QueuedTerrainEdit[]
   /** Set by the first accepted `debug.*` command and never reset (#11 section 4). */
   debugApplied: boolean
   /** The slices' session sections away from their initial value (feature-slices.md 3.13). */
@@ -69,6 +75,8 @@ export function createAuthorityState(start: SessionStart): AuthorityState {
     combat: NEW_COMBAT,
     collapse: NO_COLLAPSE,
     lava: NO_LOOSE_LAVA,
+    liveBlasts: NO_LIVE_BLASTS,
+    terrainEdits: NO_TERRAIN_EDITS,
     debugApplied: false,
   }
 }

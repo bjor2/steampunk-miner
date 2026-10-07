@@ -15,6 +15,16 @@ import { portableCollapseOf, portableCollapseProblems } from './collapse/collaps
 import type { CollapseState } from './collapse/collapseState'
 import { portableLavaOf, portableLavaProblems, type LavaState } from './lava/lavaState'
 import {
+  portableLiveBlastsOf,
+  portableLiveBlastsProblems,
+  type LiveBlast,
+} from './charges/liveBlast'
+import {
+  portableTerrainEditsOf,
+  portableTerrainEditsProblems,
+  type QueuedTerrainEdit,
+} from './terrain/terrainEdits'
+import {
   combatOfPortable,
   portableCombatOf,
   portableCombatProblems,
@@ -78,6 +88,8 @@ export interface PortableState {
   combat: PortableCombat
   collapse: CollapseState
   lava: LavaState
+  liveBlasts: LiveBlast[]
+  terrainEdits: QueuedTerrainEdit[]
   debugApplied: boolean
   /** The session sections; omitted while none is registered. */
   slices?: PortableSections
@@ -124,6 +136,8 @@ function portableStateOf(state: AuthorityState): PortableState {
     combat: portableCombatOf(state.combat),
     collapse: portableCollapseOf(state.collapse),
     lava: portableLavaOf(state.lava),
+    liveBlasts: portableLiveBlastsOf(state.liveBlasts),
+    terrainEdits: portableTerrainEditsOf(state.terrainEdits),
     debugApplied: state.debugApplied,
     ...portableSectionsOf(state.slices, 'session'),
   }
@@ -158,6 +172,8 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     combat: combatOfPortable(portable.combat),
     collapse: portableCollapseOf(portable.collapse),
     lava: portableLavaOf(portable.lava),
+    liveBlasts: portableLiveBlastsOf(portable.liveBlasts),
+    terrainEdits: portableTerrainEditsOf(portable.terrainEdits),
     debugApplied: portable.debugApplied,
     ...sectionsOfPortable(portable.slices, 'session'),
   }
@@ -202,6 +218,8 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...portableCombatProblems(state.combat, 'snapshot.state.combat'),
     ...portableCollapseProblems(state.collapse, 'snapshot.state.collapse'),
     ...portableLavaProblems(state.lava, 'snapshot.state.lava'),
+    ...portableLiveBlastsProblems(state.liveBlasts, 'snapshot.state.liveBlasts'),
+    ...portableTerrainEditsProblems(state.terrainEdits, 'snapshot.state.terrainEdits'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),

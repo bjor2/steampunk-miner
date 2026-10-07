@@ -3,7 +3,9 @@ import type { GroundEdit } from '../world/groundEdit'
 import { deltaOfChunk } from '../world/worldState'
 import type { DomainEventBody } from './domainEvent'
 
-export function groundChangedEventsOf(edit: GroundEdit): DomainEventBody[] {
+export function groundChangedEventsOf(
+  edit: Pick<GroundEdit, 'world' | 'changes'>,
+): DomainEventBody[] {
   return edit.changes.map((change) => ({
     type: 'GroundChanged',
     ...change,

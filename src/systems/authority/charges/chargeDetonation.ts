@@ -1,14 +1,14 @@
 /**
  * A planted charge's fuse on the authority's clock (spec #109): at its `detonateTick` it blows,
  * whether or not a command arrives then, so a run gives the same blast however its ticks are
- * batched. Charges due at one tick blow in player id order. A blast breaks the ground and pays its
- * ore (the slices' gates deciding the gated cells, K2), hits its planter and the enemies in its
- * radius, then checks the collapse blocks round it, and says all of it in one `charge_detonated`
- * ahead of the consequences. The slices' blast effects run last, and their events follow
- * (feature-slices.md 3.7); with none registered nothing changes.
+ * batched. Charges due at one tick blow in player id order. A blast says so in one
+ * `charge_detonated` (the flash, shake and sound key off it), hits its planter and the enemies in
+ * its radius at once, and runs the slices' blast effects (feature-slices.md 3.7; with none
+ * registered nothing changes). Its ground then breaks as a live blast, a slice a tick from this
+ * same tick (`blastSlice.ts`, K6 #189), the slices' gates deciding its gated cells (K2), which
+ * checks the rim for collapse and ends in one `blast_resolved`.
  */
 import { blastRadiusMm, chargeSize } from '../../economy/blastingCharges'
-import { toCanonical } from '../../money'
 import { applyBlastEffects, type BlastEvent } from '../../registries/blastEffects'
 import type { PlantedCharge } from '../../vehicle/vehicleCharges'
 import type { PlanetParams } from '../../world/planetParams'
@@ -16,10 +16,9 @@ import type { AuthorityState } from '../authorityState'
 import { stampedFor, type TickOutcome } from '../combat/combatTick'
 import type { DomainEventBody } from '../domainEvent'
 import { planetParamsOf } from '../planetOfState'
-import { checkCollapseNearBlast } from './blastCollapse'
 import { hitEnemiesInBlast, hitPlanterInBlast } from './blastHits'
-import { breakBlastGround } from './blastOre'
 import { chargesOf, withCharges } from './chargeRules'
+import { startLiveBlast } from './liveBlast'
 
 /** The earliest tick after `afterTick` a planted charge blows, or null with none planted. */
 export function nextDetonationTick(state: AuthorityState, afterTick: number): number | null {
@@ -60,33 +59,21 @@ function blastCharge(
   tick: number,
 ): TickOutcome {
   const blast = chargeBlastOf(playerId, charge, tick)
-  const ground = breakBlastGround(state, params, blast)
-  const planterHit = hitPlanterInBlast(ground.effect.state, params, playerId, charge, tick)
+  const planterHit = hitPlanterInBlast(state, params, playerId, charge, tick)
   const enemiesHit = hitEnemiesInBlast(planterHit.state, params, charge, tick)
-  const collapse = checkCollapseNearBlast(enemiesHit.state, params, charge)
-  const sliceEffects = applyBlastEffects(collapse.effect.state, blast, params)
-  const summary: DomainEventBody = {
-    type: 'ChargeDetonated',
-    tx: charge.tx,
-    ty: charge.ty,
-    tilesCleared: ground.tilesCleared,
-    oreValueLost: toCanonical(ground.oreValueLost),
-    collapseChecks: collapse.checks,
-    collapsesTriggered: collapse.triggered,
-  }
-  const planterEvents = [summary, ...ground.effect.events, ...planterHit.events]
+  const sliceEffects = applyBlastEffects(enemiesHit.state, blast, params)
+  const detonated: DomainEventBody = { type: 'ChargeDetonated', tx: charge.tx, ty: charge.ty }
   return {
-    state: sliceEffects.state,
+    state: startLiveBlast(sliceEffects.state, blast),
     events: [
-      ...stampedFor({ state, events: planterEvents }, playerId, tick).events,
+      ...stampedFor({ state, events: [detonated, ...planterHit.events] }, playerId, tick).events,
       ...enemiesHit.events,
-      ...stampedFor(collapse.effect, playerId, tick).events,
       ...stampedFor(sliceEffects, playerId, tick).events,
     ],
   }
 }
 
-/** What the slices' gates and blast effects are told: a charge's blast, every field an integer. */
+/** What the slices' gates and blast effects and the live blast are told: every field an integer. */
 function chargeBlastOf(playerId: string, charge: PlantedCharge, tick: number): BlastEvent {
   return {
     tx: charge.tx,

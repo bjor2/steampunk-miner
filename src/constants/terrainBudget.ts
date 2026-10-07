@@ -18,3 +18,11 @@ export const DENSITY_CELL_UNITS = 2
 export const SWAP_CELL_UNITS = 1
 /** At most 2 chunks touched per tick: at most 6 render rebuilds, final within 6 frames (#162). */
 export const TERRAIN_EDIT_CHUNKS_PER_TICK = 2
+
+/**
+ * A live blast checks at most this many rim collapse blocks a tick (#153: the TD caps how many
+ * telegraphs start in one tick). #154 measured the one-shot check at ~60 us a block under load
+ * (8.2 ms for R21) and put the checks at ~0.33 ms a slice, about 5 blocks; 8 keeps an R24 rim
+ * (154 blocks) within ~10 ticks of its last slice.
+ */
+export const BLAST_COLLAPSE_CHECKS_PER_TICK = 8

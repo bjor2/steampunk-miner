@@ -62,18 +62,20 @@ describe('charge blast effects', () => {
     ])
   })
 
-  it("puts a registered effect's events after ChargeDetonated's, stamped for the planter", () => {
+  it("puts a registered effect's events after ChargeDetonated's and before the ground's", () => {
     const { blast } = blastWith([recordingSliceOf([])])
     const types = typesOf(blast)
-    expect(types.at(-1)).toBe('StorageFull')
-    expect(types.indexOf('StorageFull')).toBeGreaterThan(types.indexOf('ChargeDetonated'))
-    expect(blast.at(-1)).toMatchObject({ tick: BLAST_TICK, playerId: 'p1', lostUnits: 7 })
+    const marker = types.indexOf('StorageFull')
+    expect(marker).toBeGreaterThan(types.indexOf('ChargeDetonated'))
+    expect(marker).toBeLessThan(types.indexOf('BlastFront'))
+    expect(blast[marker]).toMatchObject({ tick: BLAST_TICK, playerId: 'p1', lostUnits: 7 })
   })
 
   it("keeps today's blast events and state when an effect only adds an event", () => {
     const plain = blastWith([])
     const withMarker = blastWith([recordingSliceOf([])])
-    expect(withMarker.blast.slice(0, -1)).toEqual(plain.blast)
+    const isMarker = (event: { type: string }) => event.type === 'StorageFull'
+    expect(withMarker.blast.filter((event) => !isMarker(event))).toEqual(plain.blast)
     expect(withMarker.digest).toBe(plain.digest)
   })
 })

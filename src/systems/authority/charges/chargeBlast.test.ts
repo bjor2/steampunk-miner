@@ -29,6 +29,8 @@ import {
 
 const FUSE_TICKS = 120
 const FULL_CELL = SAMPLES_PER_CELL * SOLID_DENSITY
+/** A 2.5-tile blast clears on its detonation tick; its rim checks are done a few ticks later. */
+const RESOLVED_TICK = 1 + FUSE_TICKS + 5
 
 /** Plants at tick 1, backs off unless told to stay, and runs the clock past the fuse. */
 function blastFromStand(options: { isBackingOff: boolean } = { isBackingOff: true }) {
@@ -37,7 +39,7 @@ function blastFromStand(options: { isBackingOff: boolean } = { isBackingOff: tru
   plantOnWall(session, 1)
   if (options.isBackingOff) session.submit(2, poseOnTile(BACKED_OFF_TILE, FACING.right))
   const before = session.events().length
-  session.advanceTo(1 + FUSE_TICKS)
+  session.advanceTo(RESOLVED_TICK)
   return { session, blast: session.events().slice(before) }
 }
 
@@ -118,7 +120,8 @@ describe('blasting charges: the blast (#109 numbers acceptance 1 and 2)', () => 
     expect(inRadius.map((tile) => densityOfTile(session, tile))).toEqual(inRadius.map(() => 0))
     expect(densityOfTile(session, { tx: WALL_TILE.tx + 3, ty: WALL_TILE.ty })).toBe(FULL_CELL)
     expect(densityOfTile(session, { tx: WALL_TILE.tx + 2, ty: WALL_TILE.ty + 2 })).toBe(FULL_CELL)
-    expect(ofType(blast, 'ChargeDetonated')).toEqual([
+    expect(ofType(blast, 'ChargeDetonated')).toEqual([expect.objectContaining(WALL_TILE)])
+    expect(ofType(blast, 'BlastResolved')).toEqual([
       expect.objectContaining({ ...WALL_TILE, tilesCleared: 21 }),
     ])
   })
@@ -216,10 +219,11 @@ describe('blasting charges: ore yield (#109 numbers acceptance 1)', () => {
     session.submit(0, poseOnTile({ tx: wall.tx - 1, ty: wall.ty }))
     session.submit(1, PLANT)
     session.submit(2, poseOnTile({ tx: wall.tx - 5, ty: wall.ty }))
-    session.advanceTo(1 + FUSE_TICKS)
-    const [detonated] = ofType(session.events(), 'ChargeDetonated')
+    session.advanceTo(RESOLVED_TICK)
+    const [resolved] = ofType(session.events(), 'BlastResolved')
     const inRadiusValue = mul(fromSafeInteger(5), oreSalePrice(tier))
-    expect(detonated.oreValueLost).toBe(toCanonical(mul(fromCanonical('0.6'), inRadiusValue)))
+    expect(resolved.oreValueLost).toBe(toCanonical(mul(fromCanonical('0.6'), inRadiusValue)))
+    expect(resolved.oreUnits).toBe(2)
     expect(session.vehicle().cargo.ore).toEqual({ [String(tier)]: 2 })
     expect(ofType(session.events(), 'CargoAdded')).toHaveLength(2)
   })
@@ -253,19 +257,19 @@ describe('blasting charges: collapse (#109 "Collapse risk")', () => {
     session.submit(1, PLANT)
     session.submit(2, poseOnTile({ tx: charge.tx + 40, ty: charge.ty }))
     const before = session.events().length
-    session.advanceTo(1 + FUSE_TICKS)
+    session.advanceTo(RESOLVED_TICK)
     const blast = session.events().slice(before)
-    const [detonated] = ofType(blast, 'ChargeDetonated')
-    expect(detonated.collapseChecks).toBeGreaterThan(0)
-    expect(detonated.collapsesTriggered).toBe(ofType(blast, 'CollapseWarned').length)
-    expect(detonated.collapsesTriggered).toBeGreaterThan(0)
+    const [resolved] = ofType(blast, 'BlastResolved')
+    expect(resolved.collapseChecks).toBeGreaterThan(0)
+    expect(resolved.collapsesTriggered).toBe(ofType(blast, 'CollapseWarned').length)
+    expect(resolved.collapsesTriggered).toBeGreaterThan(0)
   })
 
   it('starts no warning where the lining holds the band', () => {
     const { blast } = blastFromStand()
-    const [detonated] = ofType(blast, 'ChargeDetonated')
-    expect(detonated.collapseChecks).toBeGreaterThan(0)
-    expect(detonated.collapsesTriggered).toBe(0)
+    const [resolved] = ofType(blast, 'BlastResolved')
+    expect(resolved.collapseChecks).toBeGreaterThan(0)
+    expect(resolved.collapsesTriggered).toBe(0)
     expect(ofType(blast, 'CollapseWarned')).toEqual([])
   })
 })

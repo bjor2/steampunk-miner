@@ -48,7 +48,9 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'drill_damage_dealt',
     data: { tx, ty, ticks, damage },
   }),
-  TileDestroyed: ({ tx, ty, kind }) => ({ event: 'tile_destroyed', data: { tx, ty, kind } }),
+  // A blast's tiles are summed up by its `blast_resolved` line instead (#154: 3,157 lines at R32).
+  TileDestroyed: ({ tx, ty, kind, cause }) =>
+    cause === 'blast' ? null : { event: 'tile_destroyed', data: { tx, ty, kind } },
   DrillGated: (gated) => ({
     event: 'gate_hit',
     data: {
@@ -263,15 +265,22 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'charge_planted',
     data: { tx, ty, detonateTick, carried },
   }),
-  ChargeDetonated: (blast) => ({
-    event: 'charge_detonated',
+  ChargeDetonated: ({ tx, ty }) => ({ event: 'charge_detonated', data: { tx, ty } }),
+  // The front is for presentation; the blast is logged once, when it resolves.
+  BlastFront: () => null,
+  BlastResolved: (blast) => ({
+    event: 'blast_resolved',
     data: {
       tx: blast.tx,
       ty: blast.ty,
+      radiusMm: blast.radiusMm,
+      size: blast.size,
       tilesCleared: blast.tilesCleared,
+      oreUnits: blast.oreUnits,
       oreValueLost: blast.oreValueLost,
       collapseChecks: blast.collapseChecks,
       collapsesTriggered: blast.collapsesTriggered,
+      ticks: blast.ticks,
     },
   }),
   ChargesRestocked: ({ count, price }) => ({

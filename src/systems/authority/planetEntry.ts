@@ -15,6 +15,8 @@ import { EMPTY_WORLD } from '../world/worldState'
 import type { AuthorityState } from './authorityState'
 import { NO_COLLAPSE } from './collapse/collapseState'
 import { NO_LOOSE_LAVA } from './lava/lavaState'
+import { NO_LIVE_BLASTS } from './charges/liveBlast'
+import { NO_TERRAIN_EDITS } from './terrain/terrainEdits'
 import { combatOnNewPlanet } from './combat/enemyRoster'
 import { NEW_CORE_PROGRESS } from './coreProgress'
 import type { DomainEventBodies } from './domainEvent'
@@ -37,6 +39,8 @@ export function withSessionOnPlanet(state: AuthorityState, planet: SessionPlanet
     combat: combatOnNewPlanet(state.combat),
     collapse: NO_COLLAPSE,
     lava: NO_LOOSE_LAVA,
+    liveBlasts: NO_LIVE_BLASTS,
+    terrainEdits: NO_TERRAIN_EDITS,
     players,
   }
 }

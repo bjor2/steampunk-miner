@@ -404,8 +404,10 @@ export const RUN_EVENT_REGISTRY = {
   // #111: a tunnel wrecker (or `debug.gnawCasing`) breached one ring; `ring` is its axis point `x,y`
   // in mm and `band` the deepest band of the wall it breached.
   ring_gnawed: { group: 'mining', level: 'core', payload: { ring: 'text', band: 'integer' } },
-  // #109: a charge planted on the wall at tile `tx, ty`, and its blast: tiles cleared, the sale
-  // value of the blasted ore that never reached the hold, and the collapse checks it ran.
+  // #109: a charge planted on the wall at tile `tx, ty`, and its detonation there. K6 (#189): its
+  // ground breaks as a live blast, summed up once by `blast_resolved`: tiles cleared, ore units sent
+  // to the hold, the sale value of the blasted ore that never reached it, the rim blocks checked,
+  // the warnings they started, and the ticks it was live.
   charge_planted: {
     group: 'mining',
     level: 'core',
@@ -414,13 +416,22 @@ export const RUN_EVENT_REGISTRY = {
   charge_detonated: {
     group: 'mining',
     level: 'core',
+    payload: { tx: 'integer', ty: 'integer' },
+  },
+  blast_resolved: {
+    group: 'mining',
+    level: 'core',
     payload: {
       tx: 'integer',
       ty: 'integer',
+      radiusMm: 'integer',
+      size: 'integer',
       tilesCleared: 'integer',
+      oreUnits: 'integer',
       oreValueLost: 'money',
       collapseChecks: 'integer',
       collapsesTriggered: 'integer',
+      ticks: 'integer',
     },
   },
   casing_drilled: {

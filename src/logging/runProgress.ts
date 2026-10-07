@@ -35,6 +35,10 @@ const PROGRESS_FOLDS: { readonly [N in RunEventName]?: ProgressFold<N> } = {
   tile_destroyed: (tally) => {
     tally.tilesDestroyed += 1
   },
+  // A blast's tiles are logged once, on its `blast_resolved` line (K6 #189).
+  blast_resolved: (tally, { data }) => {
+    tally.tilesDestroyed += data.tilesCleared
+  },
   resource_collected: (tally, { data }) => {
     tally.mineralsCollected += data.amount
   },

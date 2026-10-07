@@ -119,10 +119,6 @@ describe('feedback cues', () => {
       type: 'ChargeDetonated',
       tx: 3,
       ty: 280,
-      tilesCleared: 21,
-      oreValueLost: '0',
-      collapseChecks: 2,
-      collapsesTriggered: 0,
     }
     expect(feedbackCuesOf([blast], 'p1')).toEqual([{ kind: 'chargeBlast' }])
     expect(feedbackCuesOf([blast], 'p2')).toEqual([])

@@ -7,6 +7,14 @@ import { readSnapshot, takeSnapshot } from './sessionSnapshot'
 import { stateDigest } from './stateDigest'
 import { freezeEnemies, prepareCorridor, spawnEnemy } from './combat/combatFixtures'
 import { createScriptedSession } from './scriptedSession'
+import {
+  BLAST_TICK,
+  blastAt,
+  liveBlastSession,
+  R24_MM,
+  SOLID_SITE,
+} from './charges/liveBlastFixtures'
+import { queueTerrainEdit } from './terrain/terrainEdits'
 
 function richState(): AuthorityState {
   const start = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
@@ -70,6 +78,8 @@ describe('session snapshot', () => {
       'snapshot.state.combat must be an object',
       'snapshot.state.collapse must hold a list of blocks',
       'snapshot.state.lava must hold loose lava tiles and a next step tick or null',
+      'snapshot.state.liveBlasts must be a list of live blasts',
+      'snapshot.state.terrainEdits must be a list of terrain edits',
       'snapshot.state.debugApplied must be a boolean',
     ])
   })
@@ -187,5 +197,42 @@ describe('session snapshot: blasting charges (#109)', () => {
     expect(readSnapshot(broken).problems).toContain(
       'snapshot.state.players.p1.vehicle.charges must hold a rack flag, whole counts and a planted charge or null',
     )
+  })
+})
+
+describe('session snapshot: live blasts and the terrain-edit queue (K6 #189)', () => {
+  function midBlastState(): AuthorityState {
+    const session = liveBlastSession([blastAt(SOLID_SITE, R24_MM)])
+    session.advanceTo(BLAST_TICK + 5)
+    return queueTerrainEdit(session.state(), {
+      playerId: 'p1',
+      source: 'probe.pocket',
+      cells: [
+        { kind: 'density', tx: 3, ty: 280, density: 0 },
+        { kind: 'swap', tx: 4, ty: 280, cell: 2 },
+      ],
+    })
+  }
+
+  it('keeps a live blast mid-crater and the queued terrain edits through save and load', () => {
+    const state = midBlastState()
+    expect(state.liveBlasts[0].cursor).toBeGreaterThan(0)
+    expect(readSnapshot(throughJson(takeSnapshot(state)))).toEqual({ state, problems: [] })
+  })
+
+  it('names a malformed live blast and a malformed terrain edit', () => {
+    const snapshot = throughJson(takeSnapshot(midBlastState()))
+    const broken = {
+      ...snapshot,
+      state: {
+        ...snapshot.state,
+        liveBlasts: [{ ...snapshot.state.liveBlasts[0], cursor: -1 }],
+        terrainEdits: [{ ...snapshot.state.terrainEdits[0], cells: [{ kind: 'density' }] }],
+      },
+    }
+    expect(readSnapshot(broken).problems).toEqual([
+      'snapshot.state.liveBlasts[0] is malformed',
+      'snapshot.state.terrainEdits[0] is malformed',
+    ])
   })
 })

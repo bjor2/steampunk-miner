@@ -18,10 +18,6 @@ const blastAt = (tx: number, ty: number): DomainEvent => ({
   tick: 0,
   tx,
   ty,
-  tilesCleared: 21,
-  oreValueLost: '0',
-  collapseChecks: 0,
-  collapsesTriggered: 0,
 })
 
 describe('charge look (#109 visibility, art #110)', () => {

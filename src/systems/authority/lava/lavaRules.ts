@@ -127,7 +127,7 @@ export function runLavaTick(state: AuthorityState, tick: number): TickOutcome {
   const bodies = vehicleBodiesOf(state).map(({ centre }) => centre)
   const step = flowLava(state.world, params, state.lava.loose, { guardTypeIndex, bodies })
   const events: DomainEventBody[] = [
-    ...groundChangedEventsOf({ world: step.world, changes: step.changes, yielded: [] }),
+    ...groundChangedEventsOf({ world: step.world, changes: step.changes }),
     ...step.blocked.map(lavaBlockedEvent),
   ]
   return {

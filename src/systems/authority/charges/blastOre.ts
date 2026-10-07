@@ -1,16 +1,20 @@
 /**
  * What a charge's blast breaks and pays (spec #109 "Yield trade" and "Limits", numbers): every
  * tile within the radius that is no harder than the planet's band-5 rock and not core loses its
- * unlined ground at once, lined rings hold, and of each tier's ore units the blast broke
+ * unlined ground, lined rings hold, and of each tier's ore units the blast broke
  * `floor(n * 0.4 + d)` reach the hold, `d` drawn from the blast tile so 40% arrive on average. The
- * rest is lost and its sale value is what `charge_detonated.oreValueLost` reports. A kept unit
+ * rest is lost and its sale value is what `blast_resolved.oreValueLost` reports. A kept unit
  * that finds the hold full is lost as a drilled one is (`storage_full`).
  *
  * The slices' gates have the last word on a gated ore cell (`blastGates.ts`, K2): it stands, is
  * freed whole (its unit collected after the kept share), or breaks with its ore lost and counted.
+ *
+ * The ground breaks a slice a tick (K6 #189): at most `maxCleared` tiles along the front, the gates
+ * asked once per tile on the state the slice starts from. The kept share is of the running total
+ * per tier, so a slice keeps `floor(N' * 0.4 + d) - floor(N * 0.4 + d)` of its units and the whole
+ * blast keeps exactly what one break of every tile would.
  */
 import { hashCell } from '../../cellRandom'
-import { MM_PER_METRE } from '../../../constants/physics'
 import {
   blastHardnessCap,
   blastReachTiles,
@@ -19,8 +23,8 @@ import {
 } from '../../economy/blastingCharges'
 import { oreSalePrice } from '../../economy/oreEconomy'
 import { add, cmp, div, fromSafeInteger, mul, ZERO_MONEY, type Money } from '../../money'
-import type { BlastEvent } from '../../registries/blastEffects'
-import { blastGround, type IsBlastBreakable } from '../../world/blastGround'
+import { MM_PER_METRE } from '../../../constants/physics'
+import { blastGround, type GroundBlast, type IsBlastBreakable } from '../../world/blastGround'
 import type { YieldedCell } from '../../world/cellYield'
 import type { PlanetParams } from '../../world/planetParams'
 import type { TilePoint } from '../../world/tileGrid'
@@ -31,6 +35,7 @@ import type { DomainEventBody } from '../domainEvent'
 import { groundChangedEventsOf } from '../groundChangedEvents'
 import { collectOreUnit, hardnessOfTile, kindNameOf } from '../groundDrill'
 import { minedOreOf, type MinedOre } from '../minedOre'
+import { blastFrontOf } from './blastFront'
 import {
   blastGatesOf,
   blastOreFateOf,
@@ -38,18 +43,22 @@ import {
   type BlastGateOf,
   type BlastOreFate,
 } from './blastGates'
+import type { LiveBlast } from './liveBlast'
 
 /** A 32-bit cell hash over this is a dither in [0, 1). */
 const HASH_RANGE = fromSafeInteger(0x100000000)
 
-export interface BrokenGround {
+/** One slice of a live blast's ground: the world and hold after it, and the blast moved on. */
+export interface BrokenSlice {
   effect: RuleEffect
+  live: LiveBlast
+  /** Front tiles the slice looked at, cleared or passed over. */
+  tilesVisited: number
   tilesCleared: number
-  oreValueLost: Money
 }
 
 /**
- * One tier's blasted ore, in the order the blast broke it, and how many units reach the hold: the
+ * One tier's ore the slice broke, in the order it broke it, and how many units reach the hold: the
  * first `kept` of them, so each kept unit names a cell the blast broke (#122).
  */
 interface BlastedTier {
@@ -58,36 +67,58 @@ interface BlastedTier {
   kept: number
 }
 
-/** The blast's ore cells by what happens to their ore, each list in the order the blast broke it. */
+/** The slice's ore cells by what happens to their ore, each list in the order the blast broke it. */
 type BlastedOre = Record<BlastOreFate, MinedOre[]>
 
-export function breakBlastGround(
+export function breakBlastSlice(
   state: AuthorityState,
   params: PlanetParams,
-  blast: BlastEvent,
-): BrokenGround {
-  const charge = { tx: blast.tx, ty: blast.ty }
-  const gateOf = blastGatesOf(state, params, blast)
-  const tiles = blastTilesAround(charge)
-  const ground = blastGround(state.world, params, tiles, isBreakableOn(params, gateOf))
+  live: LiveBlast,
+  maxCleared: number,
+): BrokenSlice {
+  const gateOf = blastGatesOf(state, params, live.blast)
+  const tiles = frontTilesFrom(live)
+  const ground = blastGround(state.world, params, tiles, isBreakableOn(params, gateOf), maxCleared)
   const ores = blastedOreOf(params, ground.yielded, gateOf)
-  const tiers = blastedTiersOf(ores.shared, ditherAt(state.planet.seed, charge))
-  const collected = collectKeptOre({ ...state, world: ground.world }, blast.playerId, tiers, ores)
+  const tiers = slicedTiersOf(ores.shared, live, ditherOf(state, live))
+  const world = { ...state, world: ground.world }
+  const collected = collectKeptOre(world, live.blast.playerId, tiers, ores)
   return {
-    effect: {
-      state: collected.state,
-      events: [
-        ...groundChangedEventsOf(ground),
-        ...ground.yielded.map(destroyedEventOf),
-        ...collected.events,
-      ],
-    },
+    effect: { state: collected.state, events: sliceEventsOf(ground, collected) },
+    live: liveAfterSlice(live, ground, tiers, ores),
+    tilesVisited: ground.tilesVisited,
     tilesCleared: ground.tilesCleared,
-    oreValueLost: valueLostOf(tiers, ores.lost),
   }
 }
 
-/** The tiles whose centre lies within the radius of the charge tile's centre, in row order. */
+/** The sale value of the ore the whole blast broke and did not keep, a gate's losses included. */
+export function oreValueLostOf(state: AuthorityState, live: LiveBlast): Money {
+  const dither = ditherOf(state, live)
+  const sharesLost = Object.entries(live.oreBrokenByTier).reduce(
+    (total, [tier, units]) =>
+      add(total, valueOfUnits(tier, units - keptBlastOreUnits(units, dither))),
+    ZERO_MONEY,
+  )
+  return Object.entries(live.oreLostByTier).reduce(
+    (total, [tier, units]) => add(total, valueOfUnits(tier, units)),
+    sharesLost,
+  )
+}
+
+/** Ore units the whole blast sent to the hold, its kept shares and the cells gates freed whole. */
+export function oreUnitsKeptOf(state: AuthorityState, live: LiveBlast): number {
+  const dither = ditherOf(state, live)
+  return Object.values(live.oreBrokenByTier).reduce(
+    (total, units) => total + keptBlastOreUnits(units, dither),
+    live.oreUnitsFreed,
+  )
+}
+
+function valueOfUnits(tier: string, units: number): Money {
+  return mul(fromSafeInteger(units), oreSalePrice(Number.parseInt(tier, 10)))
+}
+
+/** The tiles whose centre lies within the radius of the shipped charge, in row order. */
 export function blastTilesAround(charge: TilePoint): TilePoint[] {
   const reach = blastReachTiles()
   const tiles: TilePoint[] = []
@@ -101,7 +132,15 @@ export function blastTilesAround(charge: TilePoint): TilePoint[] {
   return tiles
 }
 
-/** A gated cell breaks as its gate says; any other as today, under the planet's hardness cap. */
+/** The live blast's front from its cursor on, as world tiles. */
+function* frontTilesFrom(live: LiveBlast): Generator<TilePoint> {
+  const front = blastFrontOf(live.blast.radiusMm)
+  for (let at = live.cursor; at < front.length; at++) {
+    yield { tx: live.blast.tx + front[at].dx, ty: live.blast.ty + front[at].dy }
+  }
+}
+
+/** A gated cell breaks as its gate says; any other as before, under the planet's hardness cap. */
 function isBreakableOn(params: PlanetParams, gateOf: BlastGateOf): IsBlastBreakable {
   const isBreakableRock = isBreakableRockOn(params)
   return (tile, material) => {
@@ -118,8 +157,9 @@ function isBreakableRockOn(params: PlanetParams): IsBlastBreakable {
     cmp(hardnessOfTile(params, tile, material), cap) <= 0
 }
 
-function ditherAt(planetSeed: number, charge: TilePoint): Money {
-  return div(fromSafeInteger(hashCell(planetSeed, charge.tx, charge.ty)), HASH_RANGE)
+function ditherOf(state: AuthorityState, live: LiveBlast): Money {
+  const { tx, ty } = live.blast
+  return div(fromSafeInteger(hashCell(state.planet.seed, tx, ty)), HASH_RANGE)
 }
 
 function blastedOreOf(
@@ -135,17 +175,26 @@ function blastedOreOf(
   return ores
 }
 
-/** Ascending by tier, each with its kept share. */
-function blastedTiersOf(shared: readonly MinedOre[], dither: Money): BlastedTier[] {
+/** Ascending by tier, each with the kept share its units add to the blast's running total. */
+function slicedTiersOf(shared: readonly MinedOre[], live: LiveBlast, dither: Money): BlastedTier[] {
+  return [...oresByTierOf(shared).entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([tier, ores]) => {
+      const before = live.oreBrokenByTier[String(tier)] ?? 0
+      const kept =
+        keptBlastOreUnits(before + ores.length, dither) - keptBlastOreUnits(before, dither)
+      return { tier, ores, kept }
+    })
+}
+
+function oresByTierOf(shared: readonly MinedOre[]) {
   const oresByTier = new Map<number, MinedOre[]>()
   for (const ore of shared) {
     const ores = oresByTier.get(ore.resourceTier) ?? []
     ores.push(ore)
     oresByTier.set(ore.resourceTier, ores)
   }
-  return [...oresByTier.entries()]
-    .sort(([a], [b]) => a - b)
-    .map(([tier, ores]) => ({ tier, ores, kept: keptBlastOreUnits(ores.length, dither) }))
+  return oresByTier
 }
 
 /** The kept share tier by tier, then every unit a gate freed whole. */
@@ -162,16 +211,45 @@ function collectKeptOre(
   )
 }
 
-/** The shares the blast lost, plus every unit a gate says is lost. */
-function valueLostOf(tiers: readonly BlastedTier[], lost: readonly MinedOre[]): Money {
-  const sharesLost = tiers.reduce(
-    (total, { tier, ores, kept }) =>
-      add(total, mul(fromSafeInteger(ores.length - kept), oreSalePrice(tier))),
-    ZERO_MONEY,
-  )
-  return lost.reduce((total, ore) => add(total, oreSalePrice(ore.resourceTier)), sharesLost)
+function liveAfterSlice(
+  live: LiveBlast,
+  ground: GroundBlast,
+  tiers: readonly BlastedTier[],
+  ores: BlastedOre,
+): LiveBlast {
+  return {
+    ...live,
+    cursor: live.cursor + ground.tilesVisited,
+    tilesCleared: live.tilesCleared + ground.tilesCleared,
+    oreBrokenByTier: withUnitsByTier(
+      live.oreBrokenByTier,
+      tiers.flatMap(({ ores }) => ores),
+    ),
+    oreLostByTier: withUnitsByTier(live.oreLostByTier, ores.lost),
+    oreUnitsFreed: live.oreUnitsFreed + ores.whole.length,
+  }
 }
 
+function withUnitsByTier(
+  units: Readonly<Record<string, number>>,
+  ores: readonly MinedOre[],
+): Record<string, number> {
+  const counted = { ...units }
+  for (const { resourceTier } of ores) {
+    counted[String(resourceTier)] = (counted[String(resourceTier)] ?? 0) + 1
+  }
+  return counted
+}
+
+function sliceEventsOf(ground: GroundBlast, collected: RuleEffect): DomainEventBody[] {
+  return [
+    ...groundChangedEventsOf(ground),
+    ...ground.yielded.map(destroyedEventOf),
+    ...collected.events,
+  ]
+}
+
+/** The run log leaves a blast's tiles to its `blast_resolved` line (#154 logging). */
 function destroyedEventOf({ tile, cell }: YieldedCell): DomainEventBody {
-  return { type: 'TileDestroyed', ...tile, kind: kindNameOf(cell) }
+  return { type: 'TileDestroyed', ...tile, kind: kindNameOf(cell), cause: 'blast' }
 }

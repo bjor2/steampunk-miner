@@ -21,6 +21,8 @@ import { fiveOreBlastSite, ofType, PLANT, poseOnTile, setChargesIntent } from '.
 
 const FUSE_TICKS = 120
 const BLAST_TICK = 1 + FUSE_TICKS
+/** The 2.5-tile blast clears on its tick; its rim checks are done a few ticks later (K6). */
+const RESOLVED_TICK = BLAST_TICK + 5
 const SITE = fiveOreBlastSite()
 const FULL_CELL = SAMPLES_PER_CELL * SOLID_DENSITY
 
@@ -54,11 +56,11 @@ function blastSiteWith(slices: readonly SliceDefinition[]) {
     session.submit(0, poseOnTile({ tx: SITE.wall.tx - 1, ty: SITE.wall.ty }))
     session.submit(1, PLANT)
     session.submit(2, poseOnTile({ tx: SITE.wall.tx - 5, ty: SITE.wall.ty }))
-    const events = session.advanceTo(BLAST_TICK)
-    const [detonated] = ofType(events, 'ChargeDetonated')
+    const events = session.advanceTo(RESOLVED_TICK)
+    const [resolved] = ofType(events, 'BlastResolved')
     return {
       events,
-      detonated,
+      resolved,
       cargo: session.vehicle().cargo.ore,
       oreDensities: oreTilesOfSite().map((tile) =>
         cellDensitySum(session.state().world, PARAMS, tile),
@@ -81,7 +83,9 @@ describe('charge blast gates', () => {
   it('tells the gate checks the blast and its planter', () => {
     const queries: GateQuery[] = []
     blastSiteWith([gateSliceOf((query) => (queries.push(query), null))])
-    expect(queries.map(({ tile }) => tile)).toEqual(oreTilesOfSite())
+    // The live blast asks along its front, nearest first (K6), so compare the tiles as a set.
+    expect(queries.map(({ tile }) => tile)).toEqual(expect.arrayContaining(oreTilesOfSite()))
+    expect(queries).toHaveLength(oreTilesOfSite().length)
     expect(queries.map(({ playerId }) => playerId)).toEqual(Array(5).fill('p1'))
     expect(queries[0].blast).toEqual({
       ...SITE.wall,
@@ -104,7 +108,7 @@ describe('charge blast gates', () => {
     const blasted = blastSiteWith([gateSliceOf(dynamiteGate)])
     expect(blasted.cargo).toEqual({ [String(SITE.tier)]: 5 })
     expect(ofType(blasted.events, 'CargoAdded')).toHaveLength(5)
-    expect(blasted.detonated.oreValueLost).toBe(toCanonical(ZERO_MONEY))
+    expect(blasted.resolved.oreValueLost).toBe(toCanonical(ZERO_MONEY))
     expect(blasted.oreDensities).toEqual(Array(5).fill(0))
   })
 
@@ -113,14 +117,14 @@ describe('charge blast gates', () => {
     const blasted = blastSiteWith([gateSliceOf(everyOre('refused'))])
     expect(blasted.oreDensities).toEqual(Array(5).fill(FULL_CELL))
     expect(blasted.cargo).toEqual({})
-    expect(blasted.detonated.tilesCleared).toBe(plain.detonated.tilesCleared - 5)
-    expect(blasted.detonated.oreValueLost).toBe(toCanonical(ZERO_MONEY))
+    expect(blasted.resolved.tilesCleared).toBe(plain.resolved.tilesCleared - 5)
+    expect(blasted.resolved.oreValueLost).toBe(toCanonical(ZERO_MONEY))
   })
 
   it('breaks an ore cell a gate says is lost and counts all its ore as lost', () => {
     const blasted = blastSiteWith([gateSliceOf(everyOre('lost'))])
     expect(blasted.oreDensities).toEqual(Array(5).fill(0))
     expect(blasted.cargo).toEqual({})
-    expect(blasted.detonated.oreValueLost).toBe(valueOfUnits(5))
+    expect(blasted.resolved.oreValueLost).toBe(valueOfUnits(5))
   })
 })

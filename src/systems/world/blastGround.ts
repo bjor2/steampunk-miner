@@ -4,6 +4,10 @@
  * sample keeps its density and its casing, so lined rings hold as usual. A tile the caller refuses
  * (core, too hard, the dock pad) keeps every sample. Cells that fall to their yield are reported
  * as the drill's are (#36), so the caller credits their ore.
+ *
+ * A live blast breaks its tiles a slice at a time (K6 #189): the tiles in front order, stopping
+ * once `maxCleared` of them gave ground. A tile that gives none (air, a refused cell, lining) is
+ * passed over without counting, so anchors never slow the front.
  */
 import { cellSamplesOf } from './stampShape'
 import {
@@ -27,17 +31,36 @@ export type IsBlastBreakable = (tile: TilePoint, material: number) => boolean
 export interface GroundBlast extends GroundEdit {
   /** Tiles the blast took any ground from. */
   tilesCleared: number
+  /** Tiles looked at, from the first: a later slice starts after them. */
+  tilesVisited: number
 }
 
 export function blastGround(
   world: WorldState,
   params: PlanetParams,
-  tiles: readonly TilePoint[],
+  tiles: Iterable<TilePoint>,
   isBreakable: IsBlastBreakable,
+  maxCleared: number,
 ): GroundBlast {
   const session = openSession(world, params)
-  const tilesCleared = tiles.filter((tile) => blastTile(session, tile, isBreakable)).length
-  return { ...closeSession(session), tilesCleared }
+  const counts = blastTilesUpTo(session, tiles, isBreakable, maxCleared)
+  return { ...closeSession(session), ...counts }
+}
+
+function blastTilesUpTo(
+  session: EditSession,
+  tiles: Iterable<TilePoint>,
+  isBreakable: IsBlastBreakable,
+  maxCleared: number,
+): { tilesCleared: number; tilesVisited: number } {
+  let tilesCleared = 0
+  let tilesVisited = 0
+  for (const tile of tiles) {
+    if (tilesCleared === maxCleared) break
+    if (blastTile(session, tile, isBreakable)) tilesCleared++
+    tilesVisited++
+  }
+  return { tilesCleared, tilesVisited }
 }
 
 /** Clears the tile's unlined samples; true when it took any ground. */
