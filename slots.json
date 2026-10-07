@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T01:23:30+02:00",
+  "updated_at": "2026-10-08T01:27:06+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -31,7 +31,7 @@
           "ticket": 322,
           "grok_slot": 8,
           "kind": "dev",
-          "since": "2026-10-08T01:22:00+02:00"
+          "since": "2026-10-08T01:27:00+02:00"
         },
         {
           "slot": "C3",
@@ -99,12 +99,12 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 4,
+      "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 3,
     "max": 3
   },
   "tester": {
@@ -222,7 +222,7 @@
       "slot": 8,
       "state": "dev",
       "ticket": 322,
-      "since": "2026-10-08T01:22:00+02:00",
+      "since": "2026-10-08T01:27:00+02:00",
       "claude_slot": 2
     },
     {
@@ -264,7 +264,7 @@
       "state": "busy",
       "ticket": 322,
       "grok_slot": 8,
-      "since": "2026-10-08T01:22:00+02:00",
+      "since": "2026-10-08T01:27:00+02:00",
       "account": 1
     },
     {
@@ -317,10 +317,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 01:11 CEST",
+    "at": "2026-10-08 01:27 CEST",
     "mode": "refill-dev",
-    "triggers": "#206",
-    "started": "#313->C1/A1",
+    "triggers": "#322",
+    "started": "#322->C2/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
