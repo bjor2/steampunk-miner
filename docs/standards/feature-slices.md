@@ -283,7 +283,7 @@ describe('slice boundary lint', () => {
 | --- | --- |
 | `src/registries/sliceDefinition.ts` **(new kernel dir)** | `SliceDefinition`, `SliceRegistrar`, `FeaturesNotLoadedError` |
 | `src/registries/registrar.ts` **(new)** | `registrarFor(sliceId)`, `sealRegistries()`, `withRegistrations(slices, run)`, the test seam that swaps in a fresh sealed set and restores it |
-| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `seal` |
+| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `seal`; `itemDescriber`, `itemDescriptionEntries`, `buyableRefs` (K7, 3.19) |
 | `src/ui/registries/hudPanels.ts` **(new)** | HUD panels |
 | `src/ui/registries/screens.ts` | Full slice screens (#211) |
 | `src/ui/vectorIcons.ts` | Icon registry (extended) |
@@ -310,6 +310,8 @@ export interface SliceRegistrar {
   discovery(provider: DiscoveryProvider): void        // one provider
   discoveryKind<K extends DiscoveryKind>(kind: K, ...codec: DiscoveryCodecArgument<K>): void  // #209
   discoveryAliases(table: DiscoveryAliasTable): void                                          // #209
+  itemDescriber(provider: ItemDescriberProvider): void              // one provider (K7, 3.19)
+  itemDescriptionEntries(entries: readonly ItemDescriptionEntry[]): void
   loadoutAcceptance(rule: LoadoutAcceptance): void
   attachUse(use: AttachUse): void
   buildingAttachUse(use: BuildingAttachUse): void      // #175, section 3.11
@@ -692,6 +694,15 @@ The queue is in the snapshot and the digest. An edit credits no ore, so a slice 
 
 `src/ui/registries/screens.ts`: `{ id, priority, render }`, where `render` takes `ScreenProps` (`onDismiss`). The store holds at most one open screen (`openScreen(id)`, `dismissScreen()`); while one is open a lower-priority request leaves it, and an equal or higher one replaces it. The shell (`src/ui/screens/SliceScreen.tsx`) draws it over the HUD and the dock screen, under the cache cards and settings. The `screen` input layer sits between those: `ui_cancel` (Escape, Backspace) dismisses it. Opening a screen is presentation only: no command, no log line, no digest change. A slice opens its screen from its own UI through the store's `openScreen`; `steampunkDebug.ui.openScreen(id)` does the same for specs.
 
+### 3.19 Item cards (K7, built in #199)
+
+The descriptions slice (#164) reaches the kernel's shop rows, platform cards and tooltips as data, never as a component:
+- **`itemDescriber`** (`src/systems/registries/itemDescriber.ts`), one provider. `describeItem(ref, ctx)` returns `ItemDescription | null` (`flavour`, `statLines`, `unlock?`, `gateNote?`); null with no provider. `ItemRef = {kind, id, grade?}`, where `ItemKind` is the kernel kinds (`track | service | module | bay | artefact`), every `ContentKind`, and the augmentable `ItemKinds`. `ItemCtx` carries `playerId`, `planetIndex`, `level`, an optional `source` (`shop | merchant | drop | reward`) and a frozen `ItemSnapshotView` (`itemSnapshotView.ts`: wallet, levels, docked bay, `section(s)`), never authority state. Answers are memoised per ref, level, planet and source on one view. `StatLine.kind` is a `TrackKind` (`trackKindOf` in `economy/trackKind.ts` for the kernel tracks).
+- **`itemDescriptionEntries`**, append-only and sorted by id. An entry `matches` by kind plus an exact `id` or an `idPrefix`, gives a `flavour`, raw `statLines` specs (`value(ref, ctx)` returns `number | Money`, never text) and optional generated `refs(planetIndex)`. Two entries that can match one ref are refused at the seal (`Registry.sealProblemOf`).
+- **`listBuyableRefs(maxPlanet = 1)`** (`buyableRefs.ts`): the kernel's buyables (`kernelItems.ts` names each ref; every kernel player command says what it buys, so a new one fails the typecheck and `buyableRefs.test.ts`) plus every entry's refs for planets 1 to `maxPlanet`, each once, sorted.
+- **`ItemCard`** (`src/ui/kit/ItemCard.tsx`): screen models carry an `ItemCardModel` (`systems/views/itemCardModel.ts`). `compact` is the Upgrade bay's buy rows (tracks, casing, lining, guns, charges, rack): tapping or focusing opens the full card in place and the store's `tapItemCard` buys on the second tap. `full` is the platform card (the next refinery slot, the artefact cache's cards) and `ItemTooltip` (repair, recharge, quick service; hover or focus 250 ms, a 400 ms touch hold). With no provider every surface draws its old markup.
+- **`formatPercent(ratio)`** sits beside `formatAmount` in `src/systems/displayAmount.ts`, and lint bans `toFixed`, `toPrecision`, `toLocaleString`, `Number(` and `parseFloat` in `src/features/descriptions/**`.
+
 ## 4. Cross-slice contracts
 
 ```mermaid
@@ -904,6 +915,7 @@ Outside `src/`: 11 vite-node scripts import `../src`, and `e2e/` has 5 specs. Th
 | K3 | `BlastEvent` size fields per #153 | #149, #145 |
 | K4 | Loadout: state, `equip_item`, `equip_refused`, `loadout` section v1, snapshot and protocol bumps, `setVehicleLoadout` | #162 item builds |
 | K5 | Sidecar `attach` array + attach coverage test | #166 |
+| K7 (built in #199) | `itemDescriber` and `itemDescriptionEntries` registries, `ItemCard`, `listBuyableRefs`, `formatPercent` (3.19) | #164 |
 
 ### 6.4 gameStore coupling
 
