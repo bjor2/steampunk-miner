@@ -7,14 +7,16 @@
  * scrape as it breaches a ring of the vehicle's route (#111 telegraph), and the crack and shake of
  * the player's own charge blowing (#109), kicked by the blast cue's provider from how far the
  * vehicle stands (#213), and the drill biting, which is felt as a haptic tick rather than heard
- * (#173). Presentation only: cues
- * are read from the events, never written back, so they cannot touch state or the digest (#33).
+ * (#173). A held chain's steps leave the clank to the workshop's ratchet (#180 section 5), so only a
+ * click clanks. Presentation only: cues are read from the events, never written back, so they
+ * cannot touch state or the digest (#33).
  *
  * A batch gives at most one cue of each kind (the highest tier, the hardest hit), so a fast-forward
  * that mines a hundred tiles in one batch sounds one chime, not a hundred.
  */
 import type { AuthorityState } from '../authority/authorityState'
 import type { DomainEvent } from '../authority/domainEvent'
+import { isHeldStep } from '../authority/purchaseChain'
 import {
   chargeBlastKickOf,
   type ChargeBlastKick,
@@ -96,7 +98,7 @@ function cueOfEvent(event: DomainEvent, listener: ListenerPoint | null): Feedbac
     case 'DockEntered':
       return { kind: 'dockClank' }
     case 'UpgradePurchased':
-      return { kind: 'upgradeClank' }
+      return isHeldStep(event.chain) ? null : { kind: 'upgradeClank' }
     case 'VehicleDamaged':
       return { kind: 'hit' }
     case 'VehicleDestroyed':

@@ -175,6 +175,28 @@ describe('feedback cues', () => {
     expect(feedbackCuesOf([bite('p2')], 'p1')).toEqual([])
   })
 
+  it('clanks for a clicked upgrade and leaves a held chain step to the ratchet (#180)', () => {
+    const bought = (chain: number): DomainEvent => ({
+      ...stamp('p1'),
+      type: 'UpgradePurchased',
+      chain,
+      upgradeId: 'boiler',
+      kind: 'vertical',
+      fromLevel: 3,
+      toLevel: 4,
+      fromMajor: 0,
+      toMajor: 0,
+      isMajor: false,
+      cost: '9',
+      costCurveId: 'cost.vehicle.boiler',
+      totalLevel: 4,
+      visualTier: 1,
+      statsAfter: {},
+    })
+    expect(feedbackCuesOf([bought(0)], 'p1')).toEqual([{ kind: 'upgradeClank' }])
+    expect(feedbackCuesOf([bought(4)], 'p1')).toEqual([])
+  })
+
   it("ignores another player's pickups", () => {
     expect(feedbackCuesOf([cargo(4, 'p2')], 'p1')).toEqual([])
   })
