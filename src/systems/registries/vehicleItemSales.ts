@@ -23,6 +23,12 @@ export interface VehicleItemOffer {
   name: string
   /** What the authority debits, fixed in the catalogue for a one-off (#162 4.1). */
   price: Money
+  /**
+   * The pacing bot researches and buys it ahead of its track levels, saving for it while the
+   * wallet is short (ticket 296: an extractor within 4 trips on its planet, #142 acceptance 7).
+   * Left out, the bot buys it after its tracks, as any slice purchase.
+   */
+  isBoughtBeforeTracks?: boolean
 }
 
 export interface VehicleItemSeller {

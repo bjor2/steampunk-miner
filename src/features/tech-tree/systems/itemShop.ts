@@ -8,6 +8,10 @@
  * something it can buy, a registered item some slice sells here that it does not own yet. Research
  * spend with nothing to buy pulls pace down for a reason no player would hit. No node unlocks a
  * track level, so the "track level" half of that rule has nothing to match yet.
+ *
+ * An item whose offer is bought before the tracks (ticket 296: an extractor on its planet, #142
+ * acceptance 7) is due: its node and then the item come ahead of the bot's track levels, and the
+ * bot saves for them while the wallet is short.
  */
 import { ownsItem } from '../../../systems/authority/loadoutRules'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
@@ -18,6 +22,7 @@ import {
 } from '../../../systems/authority/vehicleItemRules'
 import { cmp, ZERO_MONEY, type Money } from '../../../systems/money'
 import type { BotPurchase } from '../../../systems/registries/botPurchases'
+import { contentOf } from '../../../systems/registries/content'
 import {
   vehicleItemOfferOf,
   type VehicleItemResearch,
@@ -45,6 +50,14 @@ export const ITEM_BOT_PURCHASE: BotPurchase = {
   estimateCost: (state, playerId, args) => priceOnSale(state, playerId, args as ItemPayload),
   isAvailable: (state, playerId, args) => isOnSale(state, playerId, args as ItemPayload),
   boughtIdOf: (args) => (args as ItemPayload).itemId,
+  duePayloadsOf: (state, playerId) =>
+    vehicleItemsOnSale(state, playerId).filter(isDueOnSale).sort(compareByPrice).map(payloadOf),
+}
+
+/** The unowned items whose offer here is bought before the tracks, by id (ticket 296). */
+export function dueItemIdsOf(state: AuthorityState, playerId: string): Set<string> {
+  const due = contentOf('vehicle-item').filter((item) => isItemDue(state, playerId, item.id))
+  return new Set(due.map((item) => item.id))
 }
 
 /** The bot's research filter: the node's item is one it could buy here and does not own. */
@@ -56,6 +69,15 @@ export function unlocksSomethingToBuy(
   const { itemId } = node.unlocks
   if (!isVehicleItemId(itemId) || ownsItem(state, playerId, itemId)) return false
   return vehicleItemOfferOf(itemId, state.planet.index) !== null
+}
+
+function isItemDue(state: AuthorityState, playerId: string, itemId: string): boolean {
+  if (ownsItem(state, playerId, itemId)) return false
+  return vehicleItemOfferOf(itemId, state.planet.index)?.isBoughtBeforeTracks === true
+}
+
+function isDueOnSale({ offer }: VehicleItemOnSale): boolean {
+  return offer.isBoughtBeforeTracks === true
 }
 
 function compareByPrice(a: VehicleItemOnSale, b: VehicleItemOnSale): number {

@@ -6,6 +6,7 @@ import { serviceReserveOf } from '../authority/serviceReserve'
 import { cmp } from '../money'
 import { DEFAULT_CHAIN_POLICY, type ChainPolicy } from './botChains'
 import { buyUpgrades } from './botShopping'
+import { buyDueSlicePurchases } from './botSlicePurchases'
 import { createBotSession, type BotSession } from './botSession'
 import { paramsOfSession } from './botWorld'
 import { newMineLayout } from './mineLayout'
@@ -42,9 +43,15 @@ function stepsBought(session: BotSession): StepCommand[] {
   })
 }
 
-/** A rack with empty slots on planet 7: a reserve the bot's own service money never keeps. */
+/**
+ * A rack with empty slots on planet 7: a reserve the bot's own service money never keeps. The
+ * bot already owns what a slice has due here (ticket 296, an extractor), so the visit is the
+ * track steps alone.
+ */
 function botWithEmptyRack(policy: ChainPolicy): BotSession {
-  const session = botAtUpgradeBayOn(7, '2e6')
+  const session = botAtUpgradeBayOn(7, '1e12')
+  buyDueSlicePurchases(session)
+  session.submit({ type: 'debug.setMoney', payload: { amount: '2e6' } })
   session.submit({ type: 'debug.setCharges', payload: { size: 1, carried: 0, slotLevel: 2 } })
   shop(session, policy)
   return session

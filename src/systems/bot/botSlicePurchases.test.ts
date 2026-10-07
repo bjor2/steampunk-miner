@@ -79,6 +79,32 @@ const BADGE_SLICE: SliceDefinition = {
   },
 }
 
+/** The same badges, due ahead of the track levels (ticket 296). */
+const DUE_BADGE_SLICE: SliceDefinition = {
+  id: 'botprobe',
+  register: (r) => {
+    r.saveSection(BADGES)
+    r.commandRules({ 'botprobe.buyBadge': BUY_BADGE })
+    r.botPurchase({ ...BADGE_PURCHASE, duePayloadsOf: BADGE_PURCHASE.payloadsToTry })
+  },
+}
+
+/** Badges as before, and a due medal the bot reckons at more than any wallet here holds. */
+const DEAR_MEDAL_SLICE: SliceDefinition = {
+  id: 'botprobe',
+  register: (r) => {
+    r.saveSection(BADGES)
+    r.commandRules({ 'botprobe.buyBadge': BUY_BADGE })
+    r.botPurchase(BADGE_PURCHASE)
+    r.botPurchase({
+      ...BADGE_PURCHASE,
+      id: 'botprobe.medal',
+      estimateCost: () => fromCanonical('1e30'),
+      duePayloadsOf: () => [{ grade: 1 }],
+    })
+  },
+}
+
 /** The bot docked at planet 2's Upgrade bay with `wallet` to spend. */
 function botAtUpgradeBay(wallet: string): BotSession {
   const start = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
@@ -163,5 +189,36 @@ describe('bot: slice purchases', () => {
       expect(spends.every((spend) => spend.source === 'kernel')).toBe(true)
       expect(spendShareByPlanet(spends)[0].sliceSpend).toEqual(ZERO_MONEY)
     })
+  })
+})
+
+describe('bot: slice purchases due ahead of the tracks (ticket 296)', () => {
+  it('buys a due slice purchase before any track level', () => {
+    withRegistrations([DUE_BADGE_SLICE], () => {
+      const session = botAtUpgradeBay('1e9')
+      const spends = buyUpgrades(session, situationOf(session))
+      const types = commandTypesOf(session)
+      expect(types.filter((type) => type === 'botprobe.buyBadge')).toHaveLength(TOP_GRADE)
+      expect(types.indexOf('botprobe.buyBadge')).toBeLessThan(types.indexOf('buyUpgrade'))
+      expect(spends[0]).toMatchObject({ source: 'slice', purchaseId: 'botprobe.badge' })
+    })
+  })
+
+  it('saves for a due purchase it cannot pay: no track level and no other slice purchase', () => {
+    withRegistrations([DEAR_MEDAL_SLICE], () => {
+      const session = botAtUpgradeBay('1e9')
+      const before = session.state().players.p1.wallet
+      expect(buyUpgrades(session, situationOf(session))).toEqual([])
+      expect(commandTypesOf(session)).not.toContain('buyUpgrade')
+      expect(commandTypesOf(session)).not.toContain('botprobe.buyBadge')
+      expect(session.state().players.p1.wallet).toEqual(before)
+    })
+  })
+
+  it('skips the Upgrade bay while it saves for a due purchase', () => {
+    const session = botAtUpgradeBay('1e9')
+    const situation = situationOf(session)
+    expect(withRegistrations([BADGE_SLICE], () => hasPurchase(session, situation))).toBe(true)
+    expect(withRegistrations([DEAR_MEDAL_SLICE], () => hasPurchase(session, situation))).toBe(false)
   })
 })

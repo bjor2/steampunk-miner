@@ -28,6 +28,14 @@ export interface BotPurchase {
    * split its spend by what was bought (ticket 248: #212 reads it per lane); optional.
    */
   boughtIdOf?(args: unknown): string
+  /**
+   * The payloads due ahead of the kernel's track levels now, money aside (ticket 296: an
+   * extractor on its planet, #142 acceptance 7). The bot buys them before its other purchases
+   * and, while one is listed that the wallet cannot pay, saves for it: no track level and no other
+   * slice purchase. A payload listed here must be one the authority accepts once paid for, or the
+   * bot saves for good. Optional: nothing is due.
+   */
+  duePayloadsOf?(state: AuthorityState, playerId: string): readonly unknown[]
 }
 
 export const BOT_PURCHASE_REGISTRY = defineRegistry<BotPurchase>('botPurchases')

@@ -3,16 +3,18 @@
  * guard): after its own Upgrade bay purchases and the items the tree already unlocked, it tries
  * the nodes it could research now that unlock something it can buy (ticket 248, `itemShop.ts`),
  * new capabilities before Marks, cheapest first. `isAvailable` is the authority's own refusal
- * check, so the bot never sends a node the tree would refuse.
+ * check, so the bot never sends a node the tree would refuse. A node whose item is due ahead of
+ * the tracks (ticket 296, an extractor on its planet) is due too, once the tree would open it.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { cmp, ZERO_MONEY, type Money } from '../../../systems/money'
 import type { BotPurchase } from '../../../systems/registries/botPurchases'
-import { unlocksSomethingToBuy } from './itemShop'
+import { dueItemIdsOf, unlocksSomethingToBuy } from './itemShop'
 import { nodeCost, nodeCostOf } from './nodeCost'
 import type { TreeNode } from './techNode'
 import { UNLOCK_NODE_COMMAND } from './techTreeCommands'
-import { availableNodes, unlockRefusalOf } from './unlockRules'
+import { registeredTechTree, treeNodesThrough } from './techTree'
+import { availableNodes, isItemResearched, researchRefusalOf, unlockRefusalOf } from './unlockRules'
 
 interface ResearchPayload {
   nodeId: string
@@ -27,6 +29,21 @@ export const RESEARCH_BOT_PURCHASE: BotPurchase = {
   isAvailable: (state, playerId, args) =>
     unlockRefusalOf(state, playerId, (args as ResearchPayload).nodeId) === null,
   boughtIdOf: (args) => (args as ResearchPayload).nodeId,
+  duePayloadsOf: (state, playerId) => nodesDueNow(state, playerId).map(payloadOf),
+}
+
+/** The nodes the tree would open now, money aside, that unlock an unresearched due item. */
+function nodesDueNow(state: AuthorityState, playerId: string): TreeNode[] {
+  const due = unresearchedDueItemIdsOf(state, playerId)
+  if (due.size === 0) return []
+  return treeNodesThrough(registeredTechTree(), state.planet.index).filter(
+    (node) => due.has(node.unlocks.itemId) && researchRefusalOf(state, playerId, node) === null,
+  )
+}
+
+function unresearchedDueItemIdsOf(state: AuthorityState, playerId: string): Set<string> {
+  const due = [...dueItemIdsOf(state, playerId)]
+  return new Set(due.filter((itemId) => !isItemResearched(state, playerId, itemId)))
 }
 
 /** The nodes open to research now whose item the bot could then buy. */

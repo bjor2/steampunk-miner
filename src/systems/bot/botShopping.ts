@@ -11,7 +11,10 @@
  * planned money per tick per price, while one pays, never `drill_power` past its lead cap. The #6
  * simulator's deadlock (never buying the unblocking drill level) cannot happen: the forced rule
  * saves for that level instead of spending elsewhere. Once nothing of the kernel's pays, the bot
- * tries the slices' registered purchases (`botSlicePurchases.ts`, ticket 211).
+ * tries the slices' registered purchases (`botSlicePurchases.ts`, ticket 211). A slice purchase
+ * due ahead of the tracks (ticket 296: an extractor on its planet, within 4 trips by #142
+ * acceptance 7) is bought first, and while one is due and the wallet short, the bot saves for it:
+ * the casing, lining, guns and charges still come, no track level or other slice purchase does.
  *
  * Every track buy is one step (#180): the on-curve rule buys toward its major once the steps left
  * to it are paid for whole, the forced rule a step at a time. A pip of cargo or boiler may leave
@@ -43,7 +46,13 @@ import { gunMountPriceFor, type GunPolicy } from './botGuns'
 import { liningUnlockFor } from './botHeat'
 import type { BotSession } from './botSession'
 import { wouldAccept } from './botDryRun'
-import { buySlicePurchases, nextSlicePurchase } from './botSlicePurchases'
+import {
+  buyDueSlicePurchases,
+  buySlicePurchases,
+  isSavingForDuePurchase,
+  nextDueSlicePurchase,
+  nextSlicePurchase,
+} from './botSlicePurchases'
 import { canPay, canPayForBrass, walletOf } from './botWallet'
 import type { ShopSpend } from './shopSpend'
 import type { MineLayout } from './mineLayout'
@@ -95,18 +104,30 @@ function serviceIntents(session: BotSession): CommandIntent[] {
 
 /** Whether the bot would buy anything now, wherever it is docked. */
 export function hasPurchase(session: BotSession, situation: ShoppingSituation): boolean {
-  return nextPurchase(session, situation) !== null || nextSlicePurchase(session) !== null
+  return (
+    nextDueSlicePurchase(session) !== null ||
+    nextPurchase(session, situation) !== null ||
+    hasUnsavedSlicePurchase(session)
+  )
 }
 
 /**
- * The kernel's purchases while one pays, then the slices' (ticket 211); answers what each cost. A
- * refused held step ends the visit's buying, so the slices' purchases never spend the service
- * reserve the hold stopped at (ticket 248's research and items came after it).
+ * The due slice purchases (ticket 296), the kernel's purchases while one pays, then the slices'
+ * (ticket 211); answers what each cost. A refused held step ends the visit's buying, so the
+ * slices' purchases never spend the service reserve the hold stopped at (ticket 248's research
+ * and items came after it); a purchase still due keeps them back too.
  */
 export function buyUpgrades(session: BotSession, situation: ShoppingSituation): ShopSpend[] {
+  const due = buyDueSlicePurchases(session)
   const kernel = buyKernelPurchases(session, situation)
-  if (kernel.isHoldRefused) return kernel.spends
-  return [...kernel.spends, ...buySlicePurchases(session)]
+  const spends = [...due, ...kernel.spends]
+  if (kernel.isHoldRefused || isSavingForDuePurchase(session)) return spends
+  return [...spends, ...buySlicePurchases(session)]
+}
+
+/** A slice purchase pays, and no due one keeps the money back for itself. */
+function hasUnsavedSlicePurchase(session: BotSession): boolean {
+  return !isSavingForDuePurchase(session) && nextSlicePurchase(session) !== null
 }
 
 /** The kernel's buys in one visit, and whether a refused held step ended them. */
@@ -143,6 +164,7 @@ function nextPurchase(session: BotSession, situation: ShoppingSituation): Purcha
   if (isGunMountDue(session, situation.gunPolicy)) return BUY_GUN
   const restock = chargeRestockDue(session, situation)
   if (restock !== null) return restock
+  if (isSavingForDuePurchase(session)) return null
   const track = nextTrackPurchase(session, situation)
   if (track === null) return null
   return { type: 'buyUpgrade', payload: { upgradeId: track, chain: CLICK_CHAIN } }

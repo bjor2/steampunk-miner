@@ -3,7 +3,9 @@
  * its own planet on (#142 `availableFromPlanet`), at 40 band-5 ore at that planet through
  * `bandOrePriceAt` (`rigPriceOf`), so the card shows the number the store debits. Bought, it is
  * owned (`ownsRig`) and always mounted. The store still sells it only once the tree researched its
- * node.
+ * node. Its offer is bought before the tracks (ticket 296): the pacing bot researches the node and
+ * buys the extractor ahead of its track levels, saving for them, so it owns each within the first
+ * 4 trips on its planet (#142 acceptance 7).
  *
  * Its card (#159, the K7 `itemDescriptionEntries` seam): #162's flavour line and the price.
  */
@@ -28,7 +30,7 @@ export const RIG_CARDS: readonly ItemDescriptionEntry[] = GATE_ROWS.rigs.map(car
 function rigOfferOf(itemId: string, planetIndex: number): VehicleItemOffer | null {
   const rig = rigNamed(itemId)
   if (rig === null || !isRigAvailableOn(rig, planetIndex)) return null
-  return { name: rig.name, price: rigPriceOf(rig) }
+  return { name: rig.name, price: rigPriceOf(rig), isBoughtBeforeTracks: true }
 }
 
 function cardOf(rig: Rig): ItemDescriptionEntry {
