@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T03:47:34+02:00",
+  "updated_at": "2026-10-07T04:08:06+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -66,18 +66,18 @@
         {
           "slot": "C5",
           "state": "busy",
-          "ticket": 145,
+          "ticket": 149,
           "grok_slot": 3,
           "kind": "dev",
-          "since": "2026-10-07T02:55:00+02:00"
+          "since": "2026-10-07T04:08:00+02:00"
         },
         {
           "slot": "C6",
           "state": "busy",
-          "ticket": 196,
+          "ticket": 209,
           "grok_slot": 4,
           "kind": "dev",
-          "since": "2026-10-07T02:45:00+02:00"
+          "since": "2026-10-07T04:08:00+02:00"
         },
         {
           "slot": "C7",
@@ -104,7 +104,7 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 0,
     "max": 3
   },
   "grok": [
@@ -125,15 +125,15 @@
     {
       "slot": 3,
       "state": "dev",
-      "ticket": 145,
-      "since": "2026-10-07T02:55:00+02:00",
+      "ticket": 149,
+      "since": "2026-10-07T04:08:00+02:00",
       "claude_slot": 5
     },
     {
       "slot": 4,
       "state": "dev",
-      "ticket": 196,
-      "since": "2026-10-07T02:45:00+02:00",
+      "ticket": 209,
+      "since": "2026-10-07T04:08:00+02:00",
       "claude_slot": 6
     },
     {
@@ -228,17 +228,17 @@
     {
       "slot": 5,
       "state": "busy",
-      "ticket": 145,
+      "ticket": 149,
       "grok_slot": 3,
-      "since": "2026-10-07T02:55:00+02:00",
+      "since": "2026-10-07T04:08:00+02:00",
       "account": 2
     },
     {
       "slot": 6,
       "state": "busy",
-      "ticket": 196,
+      "ticket": 209,
       "grok_slot": 4,
-      "since": "2026-10-07T02:45:00+02:00",
+      "since": "2026-10-07T04:08:00+02:00",
       "account": 2
     },
     {
@@ -259,10 +259,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 03:47 CEST",
-    "mode": "pass",
-    "triggers": "#189 #200",
-    "started": "#195->C2/A1 #208->C4/A1",
+    "at": "2026-10-07 04:08 CEST",
+    "mode": "refill-dev",
+    "triggers": "#145 #196",
+    "started": "#149->C5/A2 #209->C6/A2",
     "note": "spawned 2 worker(s)"
   },
   "totals": {
