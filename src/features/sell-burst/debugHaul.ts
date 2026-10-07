@@ -13,7 +13,7 @@ import {
   surfaceOreTiles,
   WORLD_SEED,
 } from '../../systems/authority/scriptedSession'
-import { stepOfMajor } from '../../systems/economy/upgradeSteps'
+import { onCurveSteps } from '../../systems/economy/vehicleStats'
 import type { ScriptedCommand } from '../../systems/fastForward'
 import { setPlanetCommand, setPlanetSeedCommand } from '../../systems/startScenarioCommands'
 import { bayPoseAt, FACING } from '../../systems/vehicle/vehiclePose'
@@ -53,10 +53,7 @@ export function haulPlanProblems(legs: unknown): string[] {
   )
 }
 
-/**
- * The drill a planet's surface ore needs, as the authority's later-planet specs set it: whole
- * majors, stored as their step (#181).
- */
+/** The drill a planet's surface ore needs: the economy's on-curve steps for that planet. */
 function legSetupAt(tick: number, planet: number): ScriptedCommand[] {
   const toPlanet: ScriptedCommand[] = [
     { tick, ...setPlanetCommand(planet) },
@@ -67,12 +64,12 @@ function legSetupAt(tick: number, planet: number): ScriptedCommand[] {
     {
       tick,
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'drill_power', level: 25 + planet * 6 },
+      payload: { upgradeId: 'drill_power', level: onCurveSteps(planet).drill_power },
     },
     {
       tick,
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'drill_tip', level: stepOfMajor(13 + planet * 3) },
+      payload: { upgradeId: 'drill_tip', level: onCurveSteps(planet).drill_tip },
     },
   ]
 }

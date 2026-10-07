@@ -29,6 +29,13 @@ describe('sell burst haul scripts', () => {
     expect(sold?.type === 'ResourceSold' ? sold.items.map((item) => item.tier) : []).toEqual([1, 4])
   })
 
+  it("mines planet 8's surface ore, worth a 40-coin sale with the flare", () => {
+    const sold = haulAndSell([{ planet: 8, tiles: 4 }]).find(
+      (event) => event.type === 'ResourceSold',
+    )
+    expect(sold?.type === 'ResourceSold' ? sold.coinsShown : 0).toBe(40)
+  })
+
   it('refuses a plan with every problem listed', () => {
     expect(
       haulPlanProblems([
