@@ -2,7 +2,7 @@
  * The Refinery bay on the platform (#105, #106 art, #81 acceptance 3): from the planet the
  * platform has it, the baked bay stands on its pad with the look the authority's slots give it,
  * and while a batch refines, smoke rises from its stack (procedural, #51). Drawn in the platform's
- * group, so its offset is from the hub; the look changes only when the replica's does, so the parts
+ * group, so its offset is from the yard's middle (#170); the look changes only when the replica's does, so the parts
  * render through React, and only the smoke runs per frame, from one fixed pool.
  */
 import { useFrame } from '@react-three/fiber'

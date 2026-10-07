@@ -117,7 +117,7 @@ export function isInBayZone(site: DockSite, bay: BayId, pose: VehiclePose): bool
   return isTileInBay(site, bay, tileOfPose(pose))
 }
 
-/** The bay whose pad zone the vehicle is in, or null on the hub and away from the pad (#37). */
+/** The bay whose pad zone the vehicle is in, or null in a yard with no bay and away from the pad (#37, #170). */
 export function bayOfPose(site: DockSite, pose: VehiclePose): BayId | null {
   return bayOfTile(site, tileOfPose(pose))
 }
