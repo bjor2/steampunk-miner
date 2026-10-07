@@ -316,12 +316,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 18 files, 125 tests
+### `terrain-tools`: 18 files, 127 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
-| `src/features/terrain-tools/magnetGuard.test.ts` | 4 | 4 |
+| `src/features/terrain-tools/magnetGuard.test.ts` | 6 | 6 |
 | `src/features/terrain-tools/shippedRows.test.ts` | 7 | 7 |
 | `src/features/terrain-tools/systems/gatesFixture.test.ts` | 22 | 5 |
 | `src/features/terrain-tools/systems/lodestoneBeacon.test.ts` | 5 | 5 |

@@ -5,17 +5,20 @@ import { createAuthorityState } from '../../systems/authority/authorityState'
 import { createBotSession } from '../../systems/bot/botSession'
 import { botPurchases } from '../../systems/registries/botPurchases'
 import { listBuyableRefs } from '../../systems/registries/buyableRefs'
-import { contentIconIds, contentOf } from '../../systems/registries/content'
+import { contentIconIds, contentOf, type ContentIconUse } from '../../systems/registries/content'
 import { itemDescriptionEntryOf } from '../../systems/registries/itemDescriptionEntries'
 import { isVehicleItemId } from '../../systems/registries/vehicleLoadout'
+import type { TechNode } from '../tech-tree'
 import { isUnlocked, LOCKED_SCHEDULE } from '../../systems/unlocks/unlockSchedule'
 import { MAGNET_ITEM_CARDS } from './systems/magnetCards'
-import { MAGNET_ITEMS, magnetVehicleItemOf } from './systems/magnetItems'
+import { LODESTONE_BEACON_NODE_ID, MAGNET_ITEMS, magnetVehicleItemOf } from './systems/magnetItems'
+import { techNodeOf, terrainItemOf } from './systems/terrainItems'
 
 // The terrain magnets' guard (GD lock on #246, Horizontal Scaler; ticket 282): the family enters
 // at P25 with the magnetic planet, never as a tease at P24. Ticket 289 shipped `magnetic_planets`
 // (spec #258 Q4) and released the vision-row pin: the effect builds may now register the family,
-// and it shows from P25.
+// and it shows from P25. Ticket 300 registers the two nodes, rooted at the beacon's, which stays
+// the attract member exactly as #202 ships it.
 
 const PLAYER = 'p1'
 
@@ -27,8 +30,23 @@ const FAMILY_IDS = MAGNET_ITEMS.flatMap((item) => [item.itemId, item.node.id, it
 
 const ITEM_IDS = MAGNET_ITEMS.map((item) => item.itemId)
 
+const BEACON_ITEM_ID = 'consumable.lodestone_beacon'
+
 const mentionsTheFamily = (value: unknown) =>
   FAMILY_IDS.some((id) => JSON.stringify(value).includes(id))
+
+/** A node shows in the tree from its unlock planet, so one later than `lastPlanet` is no trace. */
+const isNodeOnOrBefore = (lastPlanet: number) => (node: TechNode) => node.unlockTier <= lastPlanet
+
+/** A node's icon shows with its node; any other icon shows wherever its content does. */
+function isIconShownBy(lastPlanet: number) {
+  const laterNodeIds = new Set(
+    contentOf('tech-node')
+      .filter((node) => !isNodeOnOrBefore(lastPlanet)(node))
+      .map((node) => node.id),
+  )
+  return (icon: ContentIconUse) => icon.kind !== 'tech-node' || !laterNodeIds.has(icon.id)
+}
 
 function magneticPlanetsRow() {
   const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === MAGNETIC_PLANETS_ROW)
@@ -64,8 +82,8 @@ function familyTracesThrough(lastPlanet: number): unknown[] {
     ...ITEM_IDS.filter(isVehicleItemId),
     ...contentOf('vehicle-item').filter(mentionsTheFamily),
     ...contentOf('power-up').filter(mentionsTheFamily),
-    ...contentOf('tech-node').filter(mentionsTheFamily),
-    ...contentIconIds().filter(mentionsTheFamily),
+    ...contentOf('tech-node').filter(isNodeOnOrBefore(lastPlanet)).filter(mentionsTheFamily),
+    ...contentIconIds().filter(isIconShownBy(lastPlanet)).filter(mentionsTheFamily),
     ...listBuyableRefs(lastPlanet).filter(mentionsTheFamily),
     ...refs.map(itemDescriptionEntryOf).filter((entry) => entry !== null),
     ...payloads.filter(mentionsTheFamily),
@@ -95,6 +113,49 @@ describe('terrain magnets guard', () => {
     withRegistrations([SHIPPED_PROBE], () => {
       expect(familyTracesThrough(FAMILY_ENTRY_PLANET)).not.toEqual([])
     })
+  })
+
+  it('the lodestone beacon is unchanged at P23', () => {
+    const beacon = terrainItemOf(BEACON_ITEM_ID)
+    if (beacon === null) throw new RangeError(`no ${BEACON_ITEM_ID} row`)
+    const node = contentOf('tech-node').find((entry) => entry.id === LODESTONE_BEACON_NODE_ID)
+    expect(node).toEqual(techNodeOf(beacon))
+    expect(node).toMatchObject({
+      unlockTier: 23,
+      prereqs: ['tech.terrain.ore_shifter'],
+      unlocks: BEACON_ITEM_ID,
+      marks: { isIncomeItem: true, magnitude: { base: 10 }, charges: 1 },
+    })
+    expect(node).not.toHaveProperty('requiresDiscovery')
+    expect(isVehicleItemId(BEACON_ITEM_ID)).toBe(true)
+  })
+
+  it('roots both new nodes at the beacon, the repulsor coil behind the magnetic hazard too', () => {
+    const nodes = contentOf('tech-node').filter(mentionsTheFamily)
+    expect(
+      nodes.map(({ id, unlockTier, prereqs, requiresDiscovery, unlocks }) => ({
+        id,
+        unlockTier,
+        prereqs,
+        requiresDiscovery,
+        unlocks,
+      })),
+    ).toEqual([
+      {
+        id: 'tech.terrain.lode_clamp',
+        unlockTier: 28,
+        prereqs: [LODESTONE_BEACON_NODE_ID],
+        requiresDiscovery: undefined,
+        unlocks: 'power.lode_clamp',
+      },
+      {
+        id: 'tech.terrain.repulsor_coil',
+        unlockTier: 25,
+        prereqs: [LODESTONE_BEACON_NODE_ID],
+        requiresDiscovery: 'hazard:magnetic',
+        unlocks: 'power.repulsor_coil',
+      },
+    ])
   })
 
   it('enters no earlier than the magnetic planet itself', () => {
