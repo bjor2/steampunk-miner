@@ -151,6 +151,7 @@ describe('bot: charge sizes (K8 #218)', () => {
       chargePolicy: 'blast',
       hasMetBlastTile: false,
       hasBeenDestroyedHere: false,
+      routeDeaths: noRouteDeaths(),
     }
     return { session, planet, stand, wall }
   }
