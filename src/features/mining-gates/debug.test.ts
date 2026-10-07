@@ -66,6 +66,24 @@ describe('mining gates: debug actions', () => {
     expect(actions.lockMarkerAt(0.5, 0).ok).toBe(false)
   })
 
+  it('reads no drawn marker where no ground is drawn, and refuses a tile that is not whole', () => {
+    expect(actions.drawnMarkerAt(0, 0)).toMatchObject({
+      ok: true,
+      isDrawn: false,
+      kind: 'none',
+      motion: null,
+      isGlyph: false,
+    })
+    expect(actions.drawnMarkerAt(0, 0.5).ok).toBe(false)
+  })
+
+  it('lists the gated cells a docked vehicle sees, and refuses a planet that is not one', () => {
+    const near = actions.gatesNearDock(17, 10) as { ok: true; tiles: { gate: { kind: string } }[] }
+    expect(near.ok).toBe(true)
+    expect(near.tiles).toContainEqual(expect.objectContaining({ gate: { kind: 'dense' } }))
+    expect(actions.gatesNearDock(0, 10).ok).toBe(false)
+  })
+
   it('shows no hint chip before the drill meets a gate', () => {
     resetGateHintStore()
     expect(actions.hintChip()).toEqual({ ok: true, chip: null })
