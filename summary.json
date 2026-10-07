@@ -1,28 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-07T08:31:34.533Z",
+ "updatedAt": "2026-10-07T08:35:41.539Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37545027345,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37545027345",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "8ffd8d0bfc11643e93c87468b77bc7086337942e",
-   "branch": "main",
-   "startedAt": "2026-10-06T23:10:14Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 91,
-   "source": "actions",
-   "phase": null,
-   "job": "verify",
-   "reportFound": false,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37548815808,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37548815808",
@@ -1002,13 +982,34 @@
    "tests": 3100,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 1791362139994,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/e8d776b6afdbe7cb411fcea37d2753ba1dae2ddf",
+   "event": "manual-first-run",
+   "mode": "nightly-only",
+   "sha": "e8d776b6afdbe7cb411fcea37d2753ba1dae2ddf",
+   "branch": "main",
+   "startedAt": "2026-10-07T08:31:41Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 238,
+   "source": "box",
+   "phase": "slow",
+   "job": "slow",
+   "reportFound": true,
+   "files": 3,
+   "tests": 17,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 38,
+   "scoped": 37,
    "full": 11,
-   "nightly": 1
+   "nightly": 1,
+   "nightly-only": 1
   },
   "timedOut": [],
   "withoutReport": [],
@@ -1341,9 +1342,9 @@
   },
   "pacing-bot": {
    "files": 3,
-   "p50Ms": 207328,
-   "p95Ms": 207328,
-   "fileRuns": 3,
+   "p50Ms": 198973,
+   "p95Ms": 286590,
+   "fileRuns": 6,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -6864,71 +6865,71 @@
   },
   "src/logging/assayPacingGate.test.ts": {
    "feature": "pacing-bot",
-   "runs": 1,
-   "lastMs": 66372,
+   "runs": 2,
+   "lastMs": 145634,
    "p50Ms": 66372,
-   "p95Ms": 66372,
+   "p95Ms": 145634,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37586897684,
+   "lastRunId": 1791362139994,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "balance regression: the pacing bot holding assay_beacon (#46, S11) passes the first-ten-minutes, planet 1 core and slice gates on the seed median",
-     66369
+     145631
     ]
    ]
   },
   "src/logging/pacingGate.test.ts": {
    "feature": "pacing-bot",
-   "runs": 1,
-   "lastMs": 86478,
-   "p50Ms": 86478,
+   "runs": 2,
+   "lastMs": 80142,
+   "p50Ms": 80142,
    "p95Ms": 86478,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37586897684,
+   "lastRunId": 1791362139994,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median",
-     65999
+     61294
     ],
     [
      "balance regression: the pacing bot on the slice (#29, S11) derives the same summary from a second run of the same scenario",
-     20203
+     18672
     ],
     [
      "balance regression: the pacing bot on the slice (#29, S11) emits only registered events, with registered fields and kinds",
-     186
+     103
     ]
    ]
   },
   "src/systems/bot/playSlice.test.ts": {
    "feature": "pacing-bot",
-   "runs": 1,
-   "lastMs": 54478,
-   "p50Ms": 54478,
+   "runs": 2,
+   "lastMs": 52459,
+   "p50Ms": 52459,
    "p95Ms": 54478,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37586897684,
+   "lastRunId": 1791362139994,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "pacing bot plays a fresh planet 1 through to the planet 2 core inside its budget",
-     22757
+     20593
     ],
     [
      "pacing bot replays from the world seed and its own commands to the same digests and state",
-     19871
+     19382
     ],
     [
      "pacing bot save size (#36 acceptance 4) keeps the save of a 60-minute run under 1 MB",
-     11825
+     12425
     ]
    ]
   },
