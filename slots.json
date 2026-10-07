@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T22:24:47+02:00",
+  "updated_at": "2026-10-07T22:28:48+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -20,18 +20,18 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 190,
+          "ticket": 205,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-07T22:15:00+02:00"
+          "since": "2026-10-07T22:28:00+02:00"
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 295,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-07T22:18:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -51,8 +51,8 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
+      "used": 1,
+      "free": 3,
       "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
@@ -99,20 +99,20 @@
       "size": 4,
       "used": 1,
       "free": 3,
-      "claims_last_hour": 8,
+      "claims_last_hour": 7,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 3,
+    "busy": 0,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
     "sha": "d75b04edc07e3fc4e0924d2016e24f61cbef78cc",
-    "since": "2026-10-07T19:58:05Z",
-    "holds_gate": true,
+    "since": "2026-10-07T20:28:42Z",
+    "holds_gate": false,
     "claude_slot": null,
     "last_run": "2026-10-07T19:58:03Z",
     "last_nightly": null,
@@ -157,15 +157,6 @@
           198
         ],
         "since": "2026-10-07T17:48:33+02:00"
-      },
-      {
-        "feature": 190,
-        "kind": "ticket",
-        "title": "Build: Faster browser (Playwright e2e) tests",
-        "tickets": [
-          190
-        ],
-        "since": "2026-10-07T18:49:37+02:00"
       },
       {
         "feature": 191,
@@ -217,6 +208,15 @@
           215
         ],
         "since": "2026-10-07T22:13:01+02:00"
+      },
+      {
+        "feature": 190,
+        "kind": "ticket",
+        "title": "Build: Faster browser (Playwright e2e) tests",
+        "tickets": [
+          190
+        ],
+        "since": "2026-10-07T22:25:43+02:00"
       }
     ]
   },
@@ -224,16 +224,15 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 190,
-      "since": "2026-10-07T22:15:00+02:00",
+      "ticket": 205,
+      "since": "2026-10-07T22:28:00+02:00",
       "claude_slot": 1
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 295,
-      "since": "2026-10-07T22:18:00+02:00",
-      "claude_slot": 2
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -301,17 +300,17 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 190,
+      "ticket": 205,
       "grok_slot": 1,
-      "since": "2026-10-07T22:15:00+02:00",
+      "since": "2026-10-07T22:28:00+02:00",
       "account": 1
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 295,
-      "grok_slot": 2,
-      "since": "2026-10-07T22:18:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -364,17 +363,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 22:24 CEST",
+    "at": "2026-10-07 22:28 CEST",
     "mode": "refill-dev",
-    "triggers": "#201",
-    "started": "",
-    "note": "no pickable build ticket"
+    "triggers": "#190",
+    "started": "#205->C1/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
-      "dev": 3,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -382,8 +381,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 3,
-      "free": 5,
+      "used": 2,
+      "free": 6,
       "external": 0
     }
   }
