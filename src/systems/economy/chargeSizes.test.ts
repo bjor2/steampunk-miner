@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { ceilMilli, fromCanonical, mul, toCanonical, type BigStat } from '../money'
+import { ceilMilli, cmp, fromCanonical, mul, toCanonical, type BigStat } from '../money'
+import { bandOrePriceAt, bandOreWorthAt } from './bandOreCost'
 import {
+  chargeCostOf,
   chargePrice,
   chargeRadiusMm,
   chargeSizeCount,
@@ -88,6 +90,18 @@ describe('charge size ladder', () => {
     expect(textOf(chargePrice(1, 1, 7))).toBe(textOf(band5Units('2', 7)))
     expect(textOf(chargePrice(4, 1, 16))).toBe(textOf(band5Units('11.664', 16)))
     expect(textOf(chargePrice(10, 1, 34))).toBe(textOf(band5Units('396.718580736', 34)))
+  })
+
+  it('charges every size on planets 7 to 40 through bandOrePriceAt, ceiled, never the raw worth', () => {
+    for (const size of SIZES) {
+      const { band, oreUnits } = chargeCostOf(size)
+      for (let planet = 7; planet <= 40; planet++) {
+        const units = mul(fromCanonical('3'), oreUnits)
+        const expected = bandOrePriceAt({ band, oreUnits: units }, planet, planet)
+        expect(textOf(chargePrice(size, 3, planet))).toBe(textOf(expected))
+        expect(cmp(expected, bandOreWorthAt({ band, oreUnits: units }, planet, planet))).toBe(1)
+      }
+    }
   })
 
   it('rounds a buy of several charges once, as the ceiled bandOre price of all their ore units', () => {

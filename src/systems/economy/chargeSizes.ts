@@ -5,8 +5,8 @@
  *
  *   radius        `sizes.radius[n - 1]` tiles: 2.5 3.5 4.5 6 8 10 13 16 20 24, the only ladder
  *   unlock        planet 7 + 3 (n - 1); largest size s(p) = min(10, 1 + floor((p - 7) / 3))
- *   price         ceilMilli(count * 2 * 1.8^(n - 1) * V(t(p, 5)) * paceScale(p)), the `bandOre`
- *                 price, never its raw worth (Systems on #218)
+ *   price         ceilMilli(count * 2 * 1.8^(n - 1) * V(t(p, 5)) * paceScale(p)), through
+ *                 `bandOrePriceAt`, never its raw worth (Systems on #218)
  *   kept          0.4 * 0.8^(n - 1) of the ordinary ore the blast breaks
  *   rack slots    1 1 1 2 2 3 4 5 6 8
  *   fuse          120 120 120 150 180 210 ticks; sizes 7-10 are remote, fired by the plunger
@@ -26,9 +26,10 @@ import {
   type BigStat,
   type Money,
 } from '../money'
-import { bandOrePrice } from './bandOreCost'
+import { bandOrePriceAt } from './bandOreCost'
 import { growGeometric } from './curveFamilies'
 import { ECONOMY } from './economy'
+import type { BandOreCost } from './economyDefinition'
 
 const { sizes } = ECONOMY.blastingCharges
 const MM_PER_TILE = fromSafeInteger(MM_PER_METRE)
@@ -151,15 +152,20 @@ export function rackSlotsOf(size: number): number {
   return sizes.rackSlots[indexOfSize(size)]
 }
 
-/** Ore units of band `oreUnitsBand` one charge of this size costs. */
-export function chargeOreUnits(size: number): BigStat {
-  return growGeometric(sizes.oreUnitsBase, sizes.oreUnitsRatio, indexOfSize(size))
+/** One charge of this size as a `bandOre` cost: its ore units of band `oreUnitsBand`. */
+export function chargeCostOf(size: number): BandOreCost {
+  const oreUnits = growGeometric(sizes.oreUnitsBase, sizes.oreUnitsRatio, indexOfSize(size))
+  return { band: sizes.oreUnitsBand, oreUnits }
 }
 
-/** `count` charges of `size` bought on planet `planetIndex`, rounded once like every buy. */
+/**
+ * `count` charges of `size` bought on planet `planetIndex`: the ceiled `bandOrePriceAt` of all
+ * their ore units, worth and pace both of the planet they are bought on, rounded once.
+ */
 export function chargePrice(size: number, count: number, planetIndex: number): Money {
-  const oreUnits = mul(fromSafeInteger(count), chargeOreUnits(size))
-  return bandOrePrice({ band: sizes.oreUnitsBand, oreUnits }, planetIndex)
+  const { band, oreUnits } = chargeCostOf(size)
+  const bought = { band, oreUnits: mul(fromSafeInteger(count), oreUnits) }
+  return bandOrePriceAt(bought, planetIndex, planetIndex)
 }
 
 /** The self hit grows with the radius: `r(n) / r(1)`, 1 for size 1 (#143 "Self-hit"). */
