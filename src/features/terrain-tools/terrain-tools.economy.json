@@ -1,0 +1,63 @@
+{
+  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 prices (one-off k 15 band-5 ore at the unlock planet, consumables k 2 per unit at the current planet), 4.2 charged items, 4.3 consumables, 4.6 and the TD terrain caps (32 density cells or 64 swaps per activation) as magnitude limits, and the lodestone's 256 swaps per beacon. A slice's numbers live beside it (feature-slices.md 1.1).",
+  "items": {
+    "price": {
+      "oneOff": {
+        "band": 5,
+        "oreUnits": "15"
+      },
+      "perUnit": {
+        "band": 5,
+        "oreUnits": "2"
+      }
+    },
+    "balance": {
+      "consumable.stabiliser_foam": {
+        "charges": 4,
+        "reachTiles": 4,
+        "magnitude": 16,
+        "magnitudeLimit": 32
+      },
+      "power.ore_shifter": {
+        "charges": 2,
+        "cooldownTicks": 600,
+        "windupTicks": 6,
+        "reachTiles": 6,
+        "magnitude": 8,
+        "magnitudeLimit": 64
+      },
+      "consumable.seam_splitter": {
+        "charges": 3,
+        "magnitude": 8,
+        "magnitudeLimit": 32
+      },
+      "power.pressure_pocket": {
+        "charges": 2,
+        "cooldownTicks": 480,
+        "windupTicks": 6,
+        "magnitude": 2
+      },
+      "consumable.cryo_binder": {
+        "charges": 3,
+        "magnitude": 16,
+        "magnitudeLimit": 32
+      },
+      "consumable.lodestone_beacon": {
+        "charges": 1,
+        "magnitude": 10,
+        "swapCap": 256
+      },
+      "consumable.shoring_props": {
+        "charges": 2,
+        "magnitude": 8
+      },
+      "power.strata_press": {
+        "charges": 3,
+        "cooldownTicks": 360,
+        "windupTicks": 6,
+        "magnitude": 6,
+        "magnitudeLimit": 32
+      }
+    }
+  }
+}

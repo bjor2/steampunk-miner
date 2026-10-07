@@ -178,6 +178,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 18 | 18 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
+### `terrain-tools`: 4 files, 30 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/terrain-tools/systems/statPreview.test.ts` | 10 | 10 |
+| `src/features/terrain-tools/systems/terrainEconomy.test.ts` | 4 | 4 |
+| `src/features/terrain-tools/systems/terrainItems.test.ts` | 11 | 11 |
+| `src/features/terrain-tools/visionRows.test.ts` | 5 | 5 |
+
 ### `workshop`: 12 files, 84 tests
 
 | File | Tests | Sites |
