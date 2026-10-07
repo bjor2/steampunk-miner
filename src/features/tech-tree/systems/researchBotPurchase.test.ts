@@ -6,7 +6,9 @@ import { paramsOfSession } from '../../../systems/bot/botWorld'
 import { newMineLayout } from '../../../systems/bot/mineLayout'
 import { spendShareByPlanet } from '../../../systems/bot/shopSpend'
 import { cmp, ZERO_MONEY } from '../../../systems/money'
+import { TREE_SHOP_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { PLAYER, sessionOnPlanet, withFixtureTree, withNoLanes } from '../treeTestSession'
+import { unlocksSomethingToBuy } from './itemShop'
 import { registeredTechTree } from './techTree'
 import { researchOrderOf } from './researchBotPurchase'
 import { unlockedNodeIdsOf } from './techTreeSection'
@@ -30,20 +32,26 @@ function situationOf(session: BotSession): ShoppingSituation {
   }
 }
 
+/** The fixture tree with its items on sale, so the research filter (ticket 248) lets nodes through. */
+const withShop = <T>(run: () => T) => withFixtureTree(run, [TREE_SHOP_FIXTURE_SLICE])
+
 describe('tech tree: the pacing bot researches', () => {
   it('researches nodes through the purchase seam after its own Upgrade bay purchases', () => {
-    withFixtureTree(() => {
+    withShop(() => {
       const session = botAtUpgradeBay(6, '1e12')
       buyUpgrades(session, situationOf(session))
       const types = session.commands().map((command) => command.type)
       expect(types.lastIndexOf('buyUpgrade')).toBeLessThan(types.indexOf('tech-tree.unlock_node'))
       expect(unlockedNodeIdsOf(session.state(), PLAYER)).toContain('tech.sensing.echo_sounder')
-      expect(availableNodes(session.state(), PLAYER)).toEqual([])
+      const left = availableNodes(session.state(), PLAYER)
+      expect(left.filter((node) => unlocksSomethingToBuy(session.state(), PLAYER, node))).toEqual(
+        [],
+      )
     })
   })
 
   it("puts the tree's spend in the spend-share diagnostic", () => {
-    withFixtureTree(() => {
+    withShop(() => {
       const session = botAtUpgradeBay(6, '1e12')
       const [planet] = spendShareByPlanet(buyUpgrades(session, situationOf(session)))
       expect(planet.planetIndex).toBe(6)
@@ -52,7 +60,7 @@ describe('tech tree: the pacing bot researches', () => {
   })
 
   it('sends only nodes the tree accepts: no refusal on the log', () => {
-    withFixtureTree(() => {
+    withShop(() => {
       const session = botAtUpgradeBay(9, '1e12')
       buyUpgrades(session, situationOf(session))
       expect(session.events().some((event) => event.type === 'tech-tree.TechNodeRefused')).toBe(

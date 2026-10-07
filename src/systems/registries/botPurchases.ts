@@ -23,6 +23,11 @@ export interface BotPurchase {
   estimateCost(state: AuthorityState, playerId: string, args: unknown): Money
   /** True when the bot may attempt this purchase now. */
   isAvailable(state: AuthorityState, playerId: string, args: unknown): boolean
+  /**
+   * The id of what `args` buys (a node, an item), kept on the bot's spend record so a slice can
+   * split its spend by what was bought (ticket 248: #212 reads it per lane); optional.
+   */
+  boughtIdOf?(args: unknown): string
 }
 
 export const BOT_PURCHASE_REGISTRY = defineRegistry<BotPurchase>('botPurchases')

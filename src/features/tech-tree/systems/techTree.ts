@@ -82,6 +82,17 @@ export function unlockAllPlanetOf(tree: TechTree, planetIndex: number): number {
   return Math.max(planetIndex, ...tree.authored.map((node) => node.unlockTier))
 }
 
+/**
+ * The planet the item unlocks on: the tier of the earliest authored node that unlocks it, the
+ * planet a one-off's price is fixed at (#162 4.1); null when no node unlocks it.
+ */
+export function itemUnlockTierOf(tree: TechTree, itemId: string): number | null {
+  const tiers = tree.authored
+    .filter((node) => node.unlocks.itemId === itemId)
+    .map((node) => node.unlockTier)
+  return tiers.length === 0 ? null : Math.min(...tiers)
+}
+
 /** The Mark-bearing item a capability unlocked, by item id. */
 export function markBearerOfItem(tree: TechTree, itemId: string): MarkBearer | null {
   return tree.markBearers.find((bearer) => bearer.capability.unlocks.itemId === itemId) ?? null

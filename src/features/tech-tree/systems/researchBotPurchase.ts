@@ -1,12 +1,14 @@
 /**
  * How the pacing bot researches nodes (ticket 211's purchase seam, wired for the #212 spend
- * guard): after its own Upgrade bay purchases it tries the nodes it could research now, new
- * capabilities and combos before Marks, cheapest first. `isAvailable` is the authority's own
- * refusal check, so the bot never sends a node the tree would refuse.
+ * guard): after its own Upgrade bay purchases and the items the tree already unlocked, it tries
+ * the nodes it could research now that unlock something it can buy (ticket 248, `itemShop.ts`),
+ * new capabilities before Marks, cheapest first. `isAvailable` is the authority's own refusal
+ * check, so the bot never sends a node the tree would refuse.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { cmp, ZERO_MONEY, type Money } from '../../../systems/money'
 import type { BotPurchase } from '../../../systems/registries/botPurchases'
+import { unlocksSomethingToBuy } from './itemShop'
 import { nodeCost, nodeCostOf } from './nodeCost'
 import type { TreeNode } from './techNode'
 import { UNLOCK_NODE_COMMAND } from './techTreeCommands'
@@ -20,10 +22,18 @@ export const RESEARCH_BOT_PURCHASE: BotPurchase = {
   id: 'tech-tree.research',
   command: UNLOCK_NODE_COMMAND,
   payloadsToTry: (state, playerId) =>
-    researchOrderOf(availableNodes(state, playerId), state.planet.index).map(payloadOf),
+    researchOrderOf(nodesWorthResearching(state, playerId), state.planet.index).map(payloadOf),
   estimateCost: (state, _playerId, args) => estimatedCostOf(state, args as ResearchPayload),
   isAvailable: (state, playerId, args) =>
     unlockRefusalOf(state, playerId, (args as ResearchPayload).nodeId) === null,
+  boughtIdOf: (args) => (args as ResearchPayload).nodeId,
+}
+
+/** The nodes open to research now whose item the bot could then buy. */
+function nodesWorthResearching(state: AuthorityState, playerId: string): TreeNode[] {
+  return availableNodes(state, playerId).filter((node) =>
+    unlocksSomethingToBuy(state, playerId, node),
+  )
 }
 
 /** New capabilities and combos first, then Marks; each group cheapest first, then by id. */

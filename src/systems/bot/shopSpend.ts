@@ -12,6 +12,8 @@ export interface ShopSpend {
   source: 'kernel' | 'slice'
   /** The command type for a kernel purchase, the `BotPurchase` id for a slice's. */
   purchaseId: string
+  /** What a slice purchase bought, when its `BotPurchase` names it (`boughtIdOf`, ticket 248). */
+  boughtId?: string
   cost: Money
 }
 

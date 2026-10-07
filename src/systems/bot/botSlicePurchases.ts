@@ -59,10 +59,12 @@ function payablePickOf(
 }
 
 function spendOf(session: BotSession, pick: SlicePurchasePick): ShopSpend {
+  const { purchase, intent } = pick
   return {
     planetIndex: session.state().planet.index,
     source: 'slice',
-    purchaseId: pick.purchase.id,
+    purchaseId: purchase.id,
+    ...(purchase.boughtIdOf !== undefined && { boughtId: purchase.boughtIdOf(intent.payload) }),
     cost: pick.estimatedCost,
   }
 }

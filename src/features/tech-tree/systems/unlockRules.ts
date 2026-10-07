@@ -94,6 +94,16 @@ export function unlockedItems(
     .map(([itemId, mark]) => ({ itemId, mark }))
 }
 
+/** Whether a researched node unlocked the store item, at any Mark or grade (ticket 248's store). */
+export function isItemResearched(
+  state: AuthorityState,
+  playerId: string,
+  itemId: string,
+  tree: TechTree = registeredTechTree(),
+): boolean {
+  return unlockedItems(state, playerId, tree).some((unlock) => unlock.itemId === itemId)
+}
+
 /** Its own tier, and the planet of the Schedule C row it absorbs, if it absorbs one. */
 function isTierReached(planetIndex: number, node: TreeNode): boolean {
   return planetIndex >= node.unlockTier && isAbsorbedRowReached(planetIndex, node.id)
