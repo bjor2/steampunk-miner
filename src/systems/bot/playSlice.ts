@@ -29,6 +29,7 @@ import type { GunPolicy } from './botGuns'
 import { collectWhenReady, refineWhenWorthIt, type RefineryUse } from './botRefining'
 import { towWhenItRefills } from './botRetreat'
 import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
+import { measureSpree, visitOf, type SpreeMeasure, type SpreeVisit } from './spreeCapacity'
 import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
 import { driveToUpgradeBay, runTrip } from './botTrip'
@@ -52,6 +53,8 @@ export interface SliceRun {
   isFinished: boolean
   /** Everything bought at the Upgrade bay, in order: the spend-share diagnostic's input. */
   shopSpend: readonly ShopSpend[]
+  /** Each dock visit's spree capacity and steps bought: the #180 spree targets' input. */
+  spreeVisits: readonly SpreeVisit[]
 }
 
 export interface SliceRunOptions {
@@ -82,6 +85,10 @@ interface BotRun {
   chargePolicy: ChargePolicy
   /** Appended to at each Upgrade bay visit. */
   shopSpend: ShopSpend[]
+  /** Appended to at each dock visit, after the sale and the service. */
+  spreeVisits: SpreeVisit[]
+  /** How many of the session's events the last spree visit had seen. */
+  eventsSeen: number
 }
 
 /**
@@ -121,6 +128,8 @@ function botRunOf(options: PlayOnOptions): BotRun {
     gunPolicy: options.gunPolicy ?? 'mount',
     chargePolicy: chargePolicyOf(options),
     shopSpend: [],
+    spreeVisits: [],
+    eventsSeen: 0,
   }
 }
 
@@ -135,6 +144,7 @@ function sliceRunOf(session: BotSession, run: BotRun): SliceRun {
     state: session.state(),
     isFinished: isLastCoreDone(session, run.lastPlanet),
     shopSpend: run.shopSpend,
+    spreeVisits: run.spreeVisits,
   }
 }
 
@@ -159,8 +169,15 @@ function playDockCycle(session: BotSession, planet: BotPlanet, run: BotRun): boo
   collectWhenReady(session)
   if (isRefining(session, run)) refineWhenWorthIt(session, planet)
   serviceAtDock(session)
+  const spree = measureSpree(session, session.events().slice(run.eventsSeen))
   shopAtUpgradeBay(session, planet, run)
+  recordSpreeVisit(session, run, spree)
   return true
+}
+
+function recordSpreeVisit(session: BotSession, run: BotRun, spree: SpreeMeasure): void {
+  run.spreeVisits.push(visitOf(spree, session.vehicle().levels))
+  run.eventsSeen = session.events().length
 }
 
 /** The bot drives over to the Upgrade bay (#37) only when it has something to buy there. */

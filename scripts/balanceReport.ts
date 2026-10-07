@@ -34,8 +34,13 @@ import {
   pacingVerdicts,
 } from '../src/logging/pacingReport'
 import { deriveSummary, formatRunSummary, type RunSummary } from '../src/logging/runSummary'
-import { playLoggedSliceOnSeeds } from '../src/logging/sliceRunLog'
+import { playLoggedSliceOnSeeds, type SeededSliceRun } from '../src/logging/sliceRunLog'
 import { deriveWreckerDives, wreckerDiveLines } from '../src/logging/wreckerDiveReport'
+import {
+  spreeTargetMisses,
+  spreeTargetsOf,
+  spreeTargetsText,
+} from '../src/systems/bot/spreeTargets'
 import type { Scenario } from '../src/systems/scenario'
 import { SAWTOOTH_BAND } from '../src/systems/vehicle/bandDig'
 
@@ -72,6 +77,7 @@ const report = [
   ]),
   listSection('Tunnel wrecker (reported only, #111)', wreckerDiveLines(deriveWreckerDives(events))),
   listSection('Slice report rows (reported only, #223)', reportRowLines(runs)),
+  spreeSection(runs),
   comparisonSection(summary),
   assaySection(),
 ].join('\n\n')
@@ -90,6 +96,25 @@ function listSection(title: string, lines: readonly string[]): string {
 /** Each seed's row and the median the gates judge (#84). */
 function seedsSection(seedReports: readonly SeededPacingReport[]): string {
   return `### Seeds\n\n${formatSeedPacingTable(seedReports)}`
+}
+
+/**
+ * The #180 spree targets (reported only): each seed's Workshop visits, then all seeds' visits
+ * together, which the targets are judged on.
+ */
+function spreeSection(seededRuns: readonly SeededSliceRun[]): string {
+  const seedLines = seededRuns.map(
+    ({ worldSeed, run }) =>
+      `seed ${worldSeed}: ${spreeTargetsText(spreeTargetsOf(run.spreeVisits))}`,
+  )
+  const pooled = spreeTargetsOf(seededRuns.flatMap(({ run }) => run.spreeVisits))
+  return [
+    listSection('Spree targets (reported only, #180)', [
+      ...seedLines,
+      `all seeds: ${spreeTargetsText(pooled)}`,
+    ]),
+    listSection('Spree targets missed on all seeds', spreeTargetMisses(pooled)),
+  ].join('\n\n')
 }
 
 /** The same gates for the bot holding assay_beacon (#46 acceptance 6, #65 note 3). */
