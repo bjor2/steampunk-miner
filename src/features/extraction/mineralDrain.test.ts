@@ -16,6 +16,7 @@ import {
   PRESS_TICK,
   standingTileWithOre,
 } from './drainTestSession'
+import { EXTRACTION_POWER_UPS } from './systems/extractionContent'
 import { FRESH_TRIP, incomeTripOf } from './systems/incomeTrip'
 import { tripCapAt } from './systems/tripCap'
 
@@ -37,6 +38,18 @@ function drainedOnce() {
 
 const chargesLeft = (session: ReturnType<typeof drainSessionAt>) =>
   chargesLeftOf(session.state(), 'p1', DRAIN_ID)
+
+/** The cells one drain at `ORIGIN` takes when power-up-core hands it `magnitude` (#249). */
+function cellsTakenWithMagnitude(magnitude: number | null): number {
+  const session = drainSessionAt(ORIGIN)
+  session.advanceTo(PRESS_TICK)
+  const [drain] = EXTRACTION_POWER_UPS
+  const use = { playerId: 'p1', itemId: DRAIN_ID, slot: 'powerup.1' as const, tick: ACT_TICK }
+  const outcome = drain.activate(session.state(), { ...use, origin: ORIGIN, mark: 0, magnitude })
+  if (outcome.kind !== 'acted') throw new Error(`the drain did not act: ${outcome.kind}`)
+  const yielded = outcome.effect.events.find((event) => event.type === 'extraction.DrainYielded')
+  return (yielded as unknown as { cells: number }).cells
+}
 
 describe('mineral drain', () => {
   it('turns the nearest ore cells to plain ground and pays half their ore into the hold', () => {
@@ -87,6 +100,11 @@ describe('mineral drain', () => {
       oreTilesAround(ORIGIN).map(() => CELL_KIND.ore),
     )
     expect(chargesLeft(session)).toBe(2)
+  })
+
+  it('takes as many cells per use as its Mark gives it, and the #162 base with none', () => {
+    expect(cellsTakenWithMagnitude(1)).toBe(1)
+    expect(cellsTakenWithMagnitude(null)).toBeGreaterThan(1)
   })
 
   it('starts every trip fresh: the counter resets when the miner docks', () => {
