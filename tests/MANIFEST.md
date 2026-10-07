@@ -134,11 +134,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 
-### `mining-gates`: 21 files, 135 tests
+### `mining-gates`: 23 files, 148 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/mining-gates/debug.test.ts` | 8 | 8 |
+| `src/features/mining-gates/debug.test.ts` | 10 | 10 |
 | `src/features/mining-gates/gateReportRows.test.ts` | 3 | 3 |
 | `src/features/mining-gates/store/gateHintStore.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/botExtractorBuys.test.ts` | 3 | 3 |
@@ -152,8 +152,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/gateChipBoard.test.ts` | 7 | 7 |
 | `src/features/mining-gates/systems/gateLedger.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/gateTable.test.ts` | 6 | 6 |
-| `src/features/mining-gates/systems/ledgerLines.test.ts` | 7 | 7 |
-| `src/features/mining-gates/systems/render/cellGateLooks.test.ts` | 9 | 9 |
+| `src/features/mining-gates/systems/gatesNearDock.test.ts` | 2 | 2 |
+| `src/features/mining-gates/systems/ledgerLines.test.ts` | 8 | 8 |
+| `src/features/mining-gates/systems/render/cellGateLooks.test.ts` | 11 | 11 |
+| `src/features/mining-gates/systems/render/drawnMarkers.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/render/gateSounds.test.ts` | 7 | 7 |
 | `src/features/mining-gates/systems/render/lockMarkers.test.ts` | 11 | 11 |
 | `src/features/mining-gates/systems/rigSales.test.ts` | 3 | 3 |
@@ -691,7 +693,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/artefactLook.test.ts` | 2 | 2 |
 | `src/systems/render/bandPalette.test.ts` | 6 | 6 |
 | `src/systems/render/cameraTurn.test.ts` | 7 | 7 |
-| `src/systems/render/cellGateBits.test.ts` | 6 | 6 |
+| `src/systems/render/cellGateBits.test.ts` | 10 | 10 |
 | `src/systems/render/chargePlacement.test.ts` | 2 | 2 |
 | `src/systems/render/chunkTileBatch.test.ts` | 8 | 8 |
 | `src/systems/render/chunkTileBatchGates.test.ts` | 10 | 3 |
@@ -702,7 +704,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/enemyPlaceholder.test.ts` | 7 | 3 |
 | `src/systems/render/enemyTint.test.ts` | 5 | 5 |
 | `src/systems/render/frameWindow.test.ts` | 4 | 4 |
-| `src/systems/render/groundBlocks.test.ts` | 6 | 6 |
+| `src/systems/render/gatePatterns.test.ts` | 10 | 10 |
+| `src/systems/render/groundBlocks.test.ts` | 7 | 7 |
 | `src/systems/render/groundStrata.test.ts` | 4 | 4 |
 | `src/systems/render/gunLook.test.ts` | 7 | 7 |
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |

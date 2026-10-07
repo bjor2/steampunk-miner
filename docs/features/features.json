@@ -568,7 +568,7 @@
         },
         {
           "title": "Mining gates",
-          "description": "From planet 7 the rarer ore cells are locked: some need a better drill tip, some an extractor, some a charge of dynamite. Common ore is never locked, and no lock holds back more than 15% of a band's ore value. A drill stopped by a lock plays the lock's own sound (a clank, a knock on a shell, an extractor's ring, thunk or scrape, a vent hiss) and shows a ledger line once per cell per dive, naming what it needs and what the miner has. Every locked cell now shows a plain placeholder marker in the ground for its kind of lock, tinted for its act (#298). Still to come: the final markers (cracked shell, hard rim that opens with the tip, each extractor's slow surface motion) and a still marker for reduced motion (#299).",
+          "description": "From planet 7 the rarer ore cells are locked: some need a better drill tip, some an extractor, some a charge of dynamite. Common ore is never locked, and no lock holds back more than 15% of a band's ore value. A drill stopped by a lock plays the lock's own sound (a clank, a knock on a shell, an extractor's ring, thunk or scrape, a vent hiss) and shows a ledger line once per cell per dive, naming what it needs and what the miner has. Every locked cell wears its lock in the ground, tinted for its act (#298, #299): a cracked shell for dynamite, a dark rim that glints once your drill tip can cut it, and each extractor's own slow surface motion, which holds still as an engraved mark when screen shake is off.",
           "status": "partial",
           "issues": [142, 148, 236, 237, 238, 298, 299],
           "planet": 7,
