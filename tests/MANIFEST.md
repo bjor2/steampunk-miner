@@ -227,11 +227,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/statPreview.test.ts` | 9 | 9 |
 | `src/features/sensing/visionRows.test.ts` | 5 | 5 |
 
-### `tech-tree`: 20 files, 142 tests
+### `tech-tree`: 24 files, 172 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/tech-tree/debug.test.ts` | 4 | 4 |
+| `src/features/tech-tree/debug.test.ts` | 8 | 8 |
+| `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/markLadder.test.ts` | 12 | 12 |
@@ -240,9 +241,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts` | 0 | 1 |
 | `src/features/tech-tree/systems/nodeSpendShare.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/render/extractorPose.test.ts` | 5 | 5 |
+| `src/features/tech-tree/systems/render/markPlate.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/render/powerUpFx.test.ts` | 9 | 9 |
+| `src/features/tech-tree/systems/render/powerUpFxFeed.test.ts` | 10 | 10 |
+| `src/features/tech-tree/systems/render/rigGear.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/render/techGear.test.ts` | 12 | 12 |
-| `src/features/tech-tree/systems/render/techGearQuads.test.ts` | 8 | 8 |
+| `src/features/tech-tree/systems/render/techGearQuads.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/researchBotPurchase.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/techTree.test.ts` | 15 | 15 |
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
