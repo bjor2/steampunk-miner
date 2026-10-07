@@ -64,7 +64,8 @@ const recharge = { type: 'rechargeEnergy', payload: {} } as const
 const quickService = { type: 'quickService', payload: {} } as const
 const sell = (resourceTier: number | 'all') =>
   ({ type: 'sellCargo', payload: { resourceTier } }) as const
-const buy = (upgradeId: string) => ({ type: 'buyUpgrade', payload: { upgradeId } }) as const
+const buy = (upgradeId: string) =>
+  ({ type: 'buyUpgrade', payload: { upgradeId, chain: 0 } }) as const
 const grant = (amount: string) => ({ type: 'debug.grantMoney', payload: { amount } }) as const
 const setUpgrade = (upgradeId: string, level: number) =>
   ({ type: 'debug.setUpgrade', payload: { upgradeId, level } }) as const
@@ -579,7 +580,7 @@ describe('platform: two bays', () => {
   const UPGRADE_BAY_COMMANDS: readonly CommandIntent[] = [
     repair,
     buy('engine'),
-    { type: 'buyCasingGrade', payload: {} },
+    { type: 'buyCasingGrade', payload: { chain: 0 } },
   ]
 
   /** Worn, with ore in the hold and money, so every service has something to do. */

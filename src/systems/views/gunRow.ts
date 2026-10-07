@@ -10,6 +10,7 @@ import { GUN_ICON_ID } from '../art/artIds'
 import { gunShotsPerSecond, gunTopStep } from '../economy/gunStats'
 import { majorOf } from '../economy/upgradeSteps'
 import { buyGunCommand } from '../platform/platformCommands'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { isGunMounted, type VehicleGun } from '../vehicle/vehicleGun'
 import { KERNEL_ITEMS } from '../registries/kernelItems'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
@@ -47,7 +48,7 @@ export function gunRowOf(state: AuthorityState, playerId: string): GunRow | null
     playerId,
     UI_IDS.upgradebayGunsBuy,
     buyLabelOf(gun),
-    buyGunCommand(),
+    buyGunCommand(CLICK_CHAIN),
   )
   const cost = amountReading(nextGunPriceOf(state, playerId))
   return {

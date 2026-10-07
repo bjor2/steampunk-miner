@@ -5,6 +5,7 @@
  *   mounts the guns, their first major (step 10, #180), for 30 band-5 ore units and logs
  *   `gun_mounted`; each later buy raises the gun track one step, up to its cap of 16 majors, and
  *   logs `gun_upgraded`. The guns are not a vehicle track, so they never move the visual tier.
+ *   A held step (`chain` not 0) is also refused under the service reserve (`purchaseChain.ts`).
  * - `SetGunMode {auto | off}`: the HUD toggle, any time the vehicle has guns; logs `gun_mode`.
  * - `debug.setGunLevel`: a scenario's guns as a step, 0 (none) or the mount to the cap, with no
  *   unlock or price.
@@ -24,9 +25,10 @@ import {
   unchanged,
 } from './commandRule'
 import { atBayRejection } from './dockRules'
-import type { DomainEventBody } from './domainEvent'
+import type { DomainEventBody, PurchaseChainStamp } from './domainEvent'
 import { isFeatureUnlocked } from './featureUnlocks'
 import { moneyShortRejection } from './platformServices'
+import { chainStampOf, serviceReserveRejection } from './purchaseChain'
 
 /** The schedule row the guns open with (#80, #107). */
 export const AUTO_GUNS_ROW_ID = 'auto_guns'
@@ -36,9 +38,9 @@ export const GUN_RULES: {
   readonly setGunMode: CommandRule<'setGunMode'>
 } = {
   buyGun: {
-    fields: {},
-    reject: (state, { playerId }) => gunBuyRefusal(state, playerId),
-    apply: (state, { playerId }) => buyNextGunLevel(state, playerId),
+    fields: { chain: 'wholeNumber' },
+    reject: (state, { playerId, payload }) => gunBuyRefusal(state, playerId, payload.chain),
+    apply: (state, { playerId, payload }) => buyNextGunLevel(state, playerId, payload.chain),
   },
   setGunMode: {
     fields: { mode: 'text' },
@@ -59,13 +61,18 @@ export const GUN_DEBUG_RULES: { readonly 'debug.setGunLevel': CommandRule<'debug
   },
 }
 
-/** Why the next gun buy would be refused now; null when it would apply. */
-export function gunBuyRefusal(state: AuthorityState, playerId: string): Rejection | null {
+/** Why the next gun buy in `chain` would be refused now; null when it would apply. */
+export function gunBuyRefusal(
+  state: AuthorityState,
+  playerId: string,
+  chain: number,
+): Rejection | null {
   return firstRejection([
     () => atBayRejection(state, playerId, 'upgrade'),
     () => lockedGunRejection(state),
     () => maxGunLevelRejection(gunOf(state, playerId)),
     () => moneyShortRejection(state.players[playerId].wallet, nextGunPriceOf(state, playerId)),
+    () => serviceReserveRejection(state, playerId, chain, nextGunPriceOf(state, playerId)),
   ])
 }
 
@@ -106,13 +113,14 @@ function gunModeRefusal(state: AuthorityState, playerId: string, mode: string): 
   return rejectionOf('no_guns', 'the vehicle has no guns to switch')
 }
 
-function buyNextGunLevel(state: AuthorityState, playerId: string): RuleEffect {
+function buyNextGunLevel(state: AuthorityState, playerId: string, chain: number): RuleEffect {
   const gun = gunOf(state, playerId)
   const price = nextGunPriceOf(state, playerId)
   const raised = withGun(state, playerId, { ...gun, level: nextGunStep(gun) })
+  const paid = withWallet(raised, playerId, sub(state.players[playerId].wallet, price))
   return {
-    state: withWallet(raised, playerId, sub(state.players[playerId].wallet, price)),
-    events: [gunBuyEvent(gun, price)],
+    state: paid,
+    events: [gunBuyEvent(gun, price, chainStampOf(paid, playerId, chain))],
   }
 }
 
@@ -121,12 +129,15 @@ export function nextGunStep(gun: VehicleGun): number {
   return isGunMounted(gun) ? gun.level + 1 : gunMountStep()
 }
 
-function gunBuyEvent(before: VehicleGun, price: Money): DomainEventBody {
+function gunBuyEvent(
+  before: VehicleGun,
+  price: Money,
+  chainStamp: PurchaseChainStamp,
+): DomainEventBody {
   const to = nextGunStep(before)
-  if (isGunMounted(before)) {
-    return { type: 'GunUpgraded', from: before.level, to, price: toCanonical(price) }
-  }
-  return { type: 'GunMounted', level: to, price: toCanonical(price) }
+  const paid = { price: toCanonical(price), ...chainStamp }
+  if (isGunMounted(before)) return { type: 'GunUpgraded', from: before.level, to, ...paid }
+  return { type: 'GunMounted', level: to, ...paid }
 }
 
 function switchGunMode(state: AuthorityState, playerId: string, mode: GunMode): RuleEffect {

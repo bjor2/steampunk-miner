@@ -11,6 +11,7 @@ import {
   buyGunCommand,
   buyUpgradeCommand,
 } from '../platform/platformCommands'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import {
   setGunLevelCommand,
@@ -77,14 +78,14 @@ describe('upgrade bay model: the Guns row (#107)', () => {
 
   it('offers the next gun step after the mount, its Buy submitting BuyGun', () => {
     const session = atUpgradeBayOn(4)
-    session.submit(2, buyGunCommand())
+    session.submit(2, buyGunCommand(CLICK_CHAIN))
     const guns = upgradeBayOf(session).guns
     expect(guns).toMatchObject({
       level: 10,
       levelText: '1 → 1 · 1/9',
       effectText: '2 → 2 shots/s',
       cost: { exact: toCanonical(nextGunPrice(10, 4)) },
-      buy: { label: 'Buy', action: { kind: 'submit', intent: buyGunCommand() } },
+      buy: { label: 'Buy', action: { kind: 'submit', intent: buyGunCommand(CLICK_CHAIN) } },
     })
   })
 
@@ -143,7 +144,9 @@ describe('upgrade bay model', () => {
     for (const upgradeId of UPGRADE_IDS) {
       const row = upgradeBayOf(session).tracks.find((r) => r.upgradeId === upgradeId)!
       const tick = session.state().tick
-      const events = eventsAfter(session, () => session.submit(tick, buyUpgradeCommand(upgradeId)))
+      const events = eventsAfter(session, () =>
+        session.submit(tick, buyUpgradeCommand(upgradeId, CLICK_CHAIN)),
+      )
       const purchase = events.find((event) => event.type === 'UpgradePurchased')
       if (purchase?.type !== 'UpgradePurchased') throw new Error(`no purchase of ${upgradeId}`)
       expect(row.cost.exact).toBe(purchase.cost)
@@ -159,7 +162,7 @@ describe('upgrade bay model', () => {
     expect(row.buyState).toBe('money_short')
     expect(row.buy.reason).toBe('money_short')
     const [refusal] = eventsAfter(session, () =>
-      session.submit(3, buyUpgradeCommand(row.upgradeId)),
+      session.submit(3, buyUpgradeCommand(row.upgradeId, CLICK_CHAIN)),
     )
     expect(refusal).toMatchObject({ type: 'CommandRejected', reason: 'money_short' })
   })
@@ -176,14 +179,14 @@ describe('upgrade bay model', () => {
     })
     expect(casing.buy).toMatchObject({
       id: UI_IDS.upgradebayCasingBuy,
-      action: { kind: 'submit', intent: buyCasingGradeCommand() },
+      action: { kind: 'submit', intent: buyCasingGradeCommand(CLICK_CHAIN) },
       reason: null,
     })
   })
 
   it('reads the next casing price after a buy, and money_short when the wallet is short', () => {
     const session = atUpgradeBay('100')
-    session.submit(3, buyCasingGradeCommand())
+    session.submit(3, buyCasingGradeCommand(CLICK_CHAIN))
     const casing = upgradeBayOf(session).casing
     const cost = { exact: toCanonical(casingUpgradePrice(2)) }
     expect(casing).toMatchObject({ grade: 2, gradeText: '2 → 3', cost })

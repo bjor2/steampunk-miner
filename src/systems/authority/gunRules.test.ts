@@ -5,7 +5,7 @@ import type { CommandIntent } from './authorityCommand'
 import type { DomainEvent } from './domainEvent'
 import { createScriptedSession, type ScriptedSession } from './scriptedSession'
 
-const buyGun: CommandIntent = { type: 'buyGun', payload: {} }
+const buyGun: CommandIntent = { type: 'buyGun', payload: { chain: 0 } }
 const setGunMode = (mode: string): CommandIntent => ({ type: 'setGunMode', payload: { mode } })
 const setGunLevel = (level: number): CommandIntent => ({
   type: 'debug.setGunLevel',

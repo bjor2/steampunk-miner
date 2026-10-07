@@ -25,6 +25,7 @@ import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
 import { deepestHeldBand, holdsCore } from './botCasing'
 import type { ChargePolicy } from './botCharges'
+import { DEFAULT_CHAIN_POLICY, type ChainPolicy } from './botChains'
 import type { GunPolicy } from './botGuns'
 import { collectWhenReady, refineWhenWorthIt, type RefineryUse } from './botRefining'
 import { towWhenItRefills } from './botRetreat'
@@ -72,6 +73,8 @@ export interface SliceRunOptions {
   gunPolicy?: GunPolicy
   /** Blast hard tiles from planet 7 (the default, #109 bot policy), or never, to compare. */
   chargePolicy?: ChargePolicy
+  /** Buy every step as a click (the default until the re-baseline), or hold chains (ticket 226). */
+  chainPolicy?: ChainPolicy
   listener?: BotListener
   /** `used` (the default) from the Refinery bay's planet; `ignored` plays as if it had none. */
   refinery?: RefineryUse
@@ -83,6 +86,7 @@ interface BotRun {
   refinery: RefineryUse
   gunPolicy: GunPolicy
   chargePolicy: ChargePolicy
+  chainPolicy: ChainPolicy
   /** Appended to at each Upgrade bay visit. */
   shopSpend: ShopSpend[]
   /** Appended to at each dock visit, after the sale and the service. */
@@ -127,6 +131,7 @@ function botRunOf(options: PlayOnOptions): BotRun {
     refinery: options.refinery ?? 'used',
     gunPolicy: options.gunPolicy ?? 'mount',
     chargePolicy: chargePolicyOf(options),
+    chainPolicy: options.chainPolicy ?? DEFAULT_CHAIN_POLICY,
     shopSpend: [],
     spreeVisits: [],
     eventsSeen: 0,
@@ -188,6 +193,7 @@ function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): 
     isCoreTheGoal: isCoreGoal,
     gunPolicy: run.gunPolicy,
     hasMetBlastTile: planet.hasMetBlastTile,
+    chainPolicy: run.chainPolicy,
   }
   if (!hasPurchase(session, situation)) return
   driveToUpgradeBay(session, planet)

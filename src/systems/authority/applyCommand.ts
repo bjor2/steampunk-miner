@@ -5,7 +5,7 @@
  *
  * Commands may arrive from a replayed file, so the envelope and payload are checked at runtime.
  * A refused command changes nothing and answers with one `CommandRejected` event, which replays
- * identically.
+ * identically and names the hold of a refused held purchase step (ticket 226).
  *
  * Before a command is looked at, the clock's own changes up to its tick happen first (enemy ticks,
  * a tow whose grace ran out), so a command never acts on a vehicle the clock has already moved.
@@ -45,6 +45,7 @@ import { LOADOUT_RULES } from './loadoutRules'
 import type { DomainEvent, DomainEventBody } from './domainEvent'
 import { isJsonObject, isWholeNumber, payloadProblems } from './payloadFields'
 import { PLATFORM_SERVICE_RULES } from './platformServices'
+import { refusedChainOf } from './purchaseChain'
 import { reactToStep } from './reactionRun'
 import { REFINERY_COLLECTION_RULES } from './refinery/refineryCollection'
 import { REFINERY_RULES } from './refinery/refineryRules'
@@ -229,6 +230,7 @@ function rejectCommand(
     type: 'CommandRejected',
     commandType: typeof fields.type === 'string' ? fields.type : '',
     ...rejection,
+    ...refusedChainOf(fields.payload),
   }
   return { state, events: [event] }
 }

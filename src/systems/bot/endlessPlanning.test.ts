@@ -94,7 +94,13 @@ function walletFor(planetIndex: number, levels: UpgradeLevels): string {
 
 function upgradesBought(session: BotSession, layout: MineLayout): string[] {
   const before = session.commands().length
-  buyUpgrades(session, { layout, isCoreTheGoal: false, gunPolicy: 'never', hasMetBlastTile: false })
+  buyUpgrades(session, {
+    layout,
+    isCoreTheGoal: false,
+    gunPolicy: 'never',
+    hasMetBlastTile: false,
+    chainPolicy: 'click',
+  })
   return session
     .commands()
     .slice(before)

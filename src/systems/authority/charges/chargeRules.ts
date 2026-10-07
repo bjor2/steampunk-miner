@@ -45,6 +45,7 @@ import { atBayRejection } from '../dockRules'
 import { isFeatureUnlocked } from '../featureUnlocks'
 import { noPlanetRejection, planetParamsOf } from '../planetOfState'
 import { moneyShortRejection } from '../platformServices'
+import { chainStampOf, serviceReserveRejection } from '../purchaseChain'
 
 export const CHARGE_RULES: {
   readonly plantCharge: CommandRule<'plantCharge'>
@@ -62,9 +63,9 @@ export const CHARGE_RULES: {
     apply: (state, { playerId }) => restockCharges(state, playerId),
   },
   buyChargeRackSlot: {
-    fields: {},
-    reject: (state, { playerId }) => rackSlotRefusal(state, playerId),
-    apply: (state, { playerId }) => buyRackSlot(state, playerId),
+    fields: { chain: 'wholeNumber' },
+    reject: (state, { playerId, payload }) => rackSlotRefusal(state, playerId, payload.chain),
+    apply: (state, { playerId, payload }) => buyRackSlot(state, playerId, payload.chain),
   },
 }
 
@@ -108,13 +109,21 @@ export function restockRefusal(state: AuthorityState, playerId: string): Rejecti
   ])
 }
 
-/** Why a rack slot buy would be refused now; null when it would add one. */
-export function rackSlotRefusal(state: AuthorityState, playerId: string): Rejection | null {
+/**
+ * Why a rack slot buy in `chain` would be refused now; null when it would add one. A held step is
+ * refused under the service reserve too (`purchaseChain.ts`).
+ */
+export function rackSlotRefusal(
+  state: AuthorityState,
+  playerId: string,
+  chain: number,
+): Rejection | null {
   return firstRejection([
     () => atBayRejection(state, playerId, 'upgrade'),
     () => lockedChargesRejection(state),
     () => lastSlotRejection(chargesOf(state, playerId)),
     () => moneyShortRejection(walletOf(state, playerId), rackSlotPriceOf(state, playerId)),
+    () => serviceReserveRejection(state, playerId, chain, rackSlotPriceOf(state, playerId)),
   ])
 }
 
@@ -226,16 +235,16 @@ function restockCharges(state: AuthorityState, playerId: string): RuleEffect {
   }
 }
 
-function buyRackSlot(state: AuthorityState, playerId: string): RuleEffect {
+function buyRackSlot(state: AuthorityState, playerId: string, chain: number): RuleEffect {
   const charges = chargesOf(state, playerId)
   const price = rackSlotPriceOf(state, playerId)
   const to = charges.slotLevel + 1
   const raised = { ...charges, isRackMounted: true, slotLevel: to }
+  const after = paid(withCharges(state, playerId, raised), playerId, price)
+  const purchase = { from: charges.slotLevel, to, price: toCanonical(price) }
   return {
-    state: paid(withCharges(state, playerId, raised), playerId, price),
-    events: [
-      { type: 'ChargeRackUpgraded', from: charges.slotLevel, to, price: toCanonical(price) },
-    ],
+    state: after,
+    events: [{ type: 'ChargeRackUpgraded', ...purchase, ...chainStampOf(after, playerId, chain) }],
   }
 }
 

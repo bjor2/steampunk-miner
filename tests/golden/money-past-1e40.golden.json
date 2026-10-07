@@ -2,7 +2,7 @@
   "name": "money-past-1e40",
   "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
   "generatorVersion": 6,
-  "authorityProtocolVersion": 27,
+  "authorityProtocolVersion": 28,
   "logSchemaVersion": 4,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -229,7 +229,8 @@
       "seq": 17,
       "type": "buyUpgrade",
       "payload": {
-        "upgradeId": "cargo_hold"
+        "upgradeId": "cargo_hold",
+        "chain": 0
       }
     }
   ],

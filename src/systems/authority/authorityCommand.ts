@@ -64,8 +64,12 @@ import type { BayId } from '../world/dockBays'
  *    `debug.setUpgrade` and `debug.setGunLevel` take steps, `UpgradePurchased` holds steps in
  *    `fromLevel`/`toLevel` and adds `fromMajor`, `toMajor` and `isMajor`, stats follow the pips,
  *    the drill gates read the tip of the last completed major and the visual tier counts majors.
+ * 28: hold-to-buy chains (#180 section 2, ticket 226): `BuyUpgrade`, `BuyGun`, `BuyChargeRackSlot`
+ *    and `BuyCasingGrade` carry `chain` (0 a click, else the hold's id), a held step under the
+ *    service reserve is refused `service_reserve`, and their purchase events carry the chain and,
+ *    for a held step, `reserveLeft`; `CommandRejected` names the chain of a refused held step.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 27
+export const AUTHORITY_PROTOCOL_VERSION = 28
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -103,15 +107,18 @@ export interface KernelCommandPayloads {
   rechargeEnergy: Record<string, never>
   /** "Sell, repair and recharge": sell all, repair, recharge, in that order (#8). */
   quickService: Record<string, never>
-  /** The workshop: one level of one upgrade track (#7). */
-  buyUpgrade: { upgradeId: string }
+  /**
+   * The workshop: one step of one upgrade track (#7, #180). On every stepped row `chain` is 0 for a
+   * click, else the id of the hold the step belongs to (ticket 226, `purchaseChain.ts`).
+   */
+  buyUpgrade: { upgradeId: string; chain: number }
   /** The Upgrade bay's Casing row: one casing grade, not a vehicle track (#41, #58). */
-  buyCasingGrade: Record<string, never>
+  buyCasingGrade: { chain: number }
   /**
    * The Upgrade bay's Guns row (#107): mounts the guns once `auto_guns` is unlocked, then raises
    * the gun track one level a buy.
    */
-  buyGun: Record<string, never>
+  buyGun: { chain: number }
   /** The HUD toggle: `"auto"` fires by itself, `"off"` saves the boiler (#107). */
   setGunMode: { mode: string }
   /**
@@ -138,7 +145,7 @@ export interface KernelCommandPayloads {
   /** The Upgrade bay fills the rack's empty slots at the price per charge (#109). */
   restockCharges: Record<string, never>
   /** The Upgrade bay adds one slot to the rack (#109). */
-  buyChargeRackSlot: Record<string, never>
+  buyChargeRackSlot: { chain: number }
   /**
    * The loadout (#162 TD lock, K4): puts an owned item in a slot that accepts it, or empties the
    * slot with a null item; docked at the platform only. A refusal is answered as `EquipRefused`.

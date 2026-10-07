@@ -50,6 +50,7 @@ import {
   travelCommand,
   undockCommand,
 } from '../systems/platform/platformCommands'
+import { CLICK_CHAIN } from '../systems/authority/purchaseChain'
 import type { BayId } from '../systems/world/dockBays'
 import type { PlanetParams } from '../systems/world/planetParams'
 import type { WorldState } from '../systems/world/worldState'
@@ -303,7 +304,8 @@ export const useGameStore = create<GameState>()((set, get) => ({
 
   quickService: () => submitCommand(get().playerId, quickServiceCommand()),
 
-  buyUpgrade: (upgradeId) => submitCommand(get().playerId, buyUpgradeCommand(upgradeId)),
+  buyUpgrade: (upgradeId) =>
+    submitCommand(get().playerId, buyUpgradeCommand(upgradeId, CLICK_CHAIN)),
 
   travel: () => submitCommand(get().playerId, travelCommand(get().planetTier + 1)),
 

@@ -109,6 +109,7 @@ const platformEvents: DomainEvent[] = [
   {
     ...commandStamp,
     type: 'UpgradePurchased',
+    chain: 0,
     upgradeId: 'hull',
     kind: 'vertical',
     fromLevel: 0,
@@ -122,7 +123,7 @@ const platformEvents: DomainEvent[] = [
     visualTier: 1,
     statsAfter: { hullMax: '1.12e+2', energyMax: '1.5e+2' },
   },
-  { ...commandStamp, type: 'CasingUpgraded', from: 1, to: 2, price: '4.8e+1' },
+  { ...commandStamp, type: 'CasingUpgraded', from: 1, to: 2, price: '4.8e+1', chain: 0 },
   { ...commandStamp, type: 'RefineQueued', slot: 0, tier: 7, units: 5, requestedUnits: 9 },
   { tick: 11000, playerId: 'p1', type: 'RefineReady', slot: 0, tier: 7, units: 5 },
   {

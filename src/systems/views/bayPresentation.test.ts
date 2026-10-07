@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createScriptedSession, dockInBay } from '../authority/scriptedSession'
 import { buyCasingGradeCommand, buyUpgradeCommand } from '../platform/platformCommands'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import {
   bayTransitionOf,
@@ -34,13 +35,19 @@ describe('bay screen presentation', () => {
   })
 
   it('starts installing the track the local player just bought', () => {
-    const events = purchaseEvents((session) => session.submit(3, buyUpgradeCommand('boiler')))
+    const events = purchaseEvents((session) =>
+      session.submit(3, buyUpgradeCommand('boiler', CLICK_CHAIN)),
+    )
     expect(partToInstallOf(events, 'p1', false)).toBe('boiler')
   })
 
   it('installs nothing for another player, a casing grade, or with reduce motion', () => {
-    const bought = purchaseEvents((session) => session.submit(3, buyUpgradeCommand('boiler')))
-    const casing = purchaseEvents((session) => session.submit(3, buyCasingGradeCommand()))
+    const bought = purchaseEvents((session) =>
+      session.submit(3, buyUpgradeCommand('boiler', CLICK_CHAIN)),
+    )
+    const casing = purchaseEvents((session) =>
+      session.submit(3, buyCasingGradeCommand(CLICK_CHAIN)),
+    )
     expect(partToInstallOf(bought, 'p2', false)).toBeNull()
     expect(partToInstallOf(casing, 'p1', false)).toBeNull()
     expect(partToInstallOf(bought, 'p1', true)).toBeNull()

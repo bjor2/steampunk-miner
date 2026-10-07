@@ -25,7 +25,10 @@ import { readSaveSlot, saveSlotOf, type SaveSlotFile } from './saveSlot'
 
 const dock: CommandIntent = { type: 'dock', payload: { bay: 'sell' } }
 const undock: CommandIntent = { type: 'undock', payload: {} }
-const buy = (upgradeId: string): CommandIntent => ({ type: 'buyUpgrade', payload: { upgradeId } })
+const buy = (upgradeId: string): CommandIntent => ({
+  type: 'buyUpgrade',
+  payload: { upgradeId, chain: 0 },
+})
 const grant = (amount: string): CommandIntent => ({ type: 'debug.grantMoney', payload: { amount } })
 const setUpgrade = (upgradeId: string, level: number): CommandIntent => ({
   type: 'debug.setUpgrade',

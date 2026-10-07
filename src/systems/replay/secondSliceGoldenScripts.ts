@@ -99,13 +99,13 @@ function twoBaysCommands(): ScriptedCommand[] {
   return [
     { tick: 0, type: 'debug.grantMoney', payload: { amount: '1000' } },
     ...dockAt(1, 'sell'),
-    { tick: 2, type: 'buyUpgrade', payload: { upgradeId: 'drill_tip' } },
-    { tick: 3, type: 'buyCasingGrade', payload: {} },
+    { tick: 2, type: 'buyUpgrade', payload: { upgradeId: 'drill_tip', chain: 0 } },
+    { tick: 3, type: 'buyCasingGrade', payload: { chain: 0 } },
     { tick: 10, type: 'undock', payload: {} },
     ...dockAt(12, 'upgrade'),
     { tick: 13, type: 'sellCargo', payload: { resourceTier: 'all' } },
-    { tick: 14, type: 'buyUpgrade', payload: { upgradeId: 'drill_tip' } },
-    { tick: 15, type: 'buyCasingGrade', payload: {} },
+    { tick: 14, type: 'buyUpgrade', payload: { upgradeId: 'drill_tip', chain: 0 } },
+    { tick: 15, type: 'buyCasingGrade', payload: { chain: 0 } },
   ]
 }
 

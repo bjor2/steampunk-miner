@@ -12,6 +12,7 @@ import { rackSlotPrice, restockPrice } from '../economy/blastingCharges'
 import { ACTION_MAP, defaultBindings } from '../input/actionMap'
 import { toCanonical } from '../money'
 import { buyChargeRackSlotCommand, restockChargesCommand } from '../platform/platformCommands'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import { teleportToDockCommand } from '../vehicle/vehicleCommands'
 import { selectHudModel } from './hudModel'
@@ -129,7 +130,7 @@ describe('upgrade bay model: the charge rows (#109)', () => {
 
   it('says top size at the last slot, with no price, and carries max_level', () => {
     const session = atUpgradeBayOn(7)
-    for (let slot = 0; slot < 5; slot += 1) session.submit(2, buyChargeRackSlotCommand())
+    for (let slot = 0; slot < 5; slot += 1) session.submit(2, buyChargeRackSlotCommand(CLICK_CHAIN))
     expect(upgradeBayOf(session).charges?.rack).toMatchObject({
       levelText: '8 (top)',
       cost: null,

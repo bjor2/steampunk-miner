@@ -87,6 +87,9 @@ export interface RejectionReasons {
   // Registered by `debug.setVehicleLoadout` (K4): an unknown slot, an item the slot does not take,
   // or one item in two slots. Play's `equipItem` answers refusals as `EquipRefused` instead.
   invalid_loadout: true
+  // Registered by hold-to-buy (#180, ticket 226): a held step the wallet can pay that would leave
+  // it under the service reserve.
+  service_reserve: true
 }
 
 export type RejectionReason = keyof RejectionReasons
@@ -118,6 +121,15 @@ export interface Attacker {
   arc: HitArc
 }
 
+/**
+ * What a purchase step says of its hold (#180, ticket 226): `chain` 0 is a click, any other value
+ * the hold's id; a held step adds `reserveLeft`, the wallet above the service reserve after it.
+ */
+export interface PurchaseChainStamp {
+  chain: number
+  reserveLeft?: string
+}
+
 export interface SoldItem {
   tier: number
   amount: number
@@ -129,7 +141,13 @@ export interface KernelDomainEventBodies {
   PlanetSeedChanged: { planetSeed: number }
   MoneyChanged: { from: string; to: string }
   DebugCommandApplied: { command: CommandType; args: Readonly<Record<string, unknown>> }
-  CommandRejected: { commandType: string; reason: RejectionReason; problems: string[] }
+  /** `chain` names the hold a refused held purchase step belonged to (ticket 226). */
+  CommandRejected: {
+    commandType: string
+    reason: RejectionReason
+    problems: string[]
+    chain?: number
+  }
   StateDigested: { digest: string; scope: DigestScope }
   /** Drill damage one command dealt to one tile, in hardness units (`ticks * D * eff / 60`). */
   DrillDamageDealt: { tx: number; ty: number; ticks: number; damage: string }
@@ -255,9 +273,9 @@ export interface KernelDomainEventBodies {
    */
   GunHit: { enemyId: string; damage: string; shots: number; energy: number }
   /** The guns were bought and bolted on at level 1 (#107); `price` as a canonical string. */
-  GunMounted: { level: number; price: string }
+  GunMounted: PurchaseChainStamp & { level: number; price: string }
   /** One gun level bought (#107). */
-  GunUpgraded: { from: number; to: number; price: string }
+  GunUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
   /** The HUD toggle (#107). */
   GunModeChanged: { mode: GunMode }
   /** A lining type unlocked at the Upgrade bay (#113); `price` as a canonical string. */
@@ -383,10 +401,10 @@ export interface KernelDomainEventBodies {
   /** The rack filled with `count` charges for `price` (#109). */
   ChargesRestocked: { count: number; price: string }
   /** One rack slot bought: slot level `from` to `to`, for `price` (#109). */
-  ChargeRackUpgraded: { from: number; to: number; price: string }
+  ChargeRackUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
   /** One casing grade bought (#41): `price` as a canonical string. */
-  CasingUpgraded: { from: number; to: number; price: string }
-  UpgradePurchased: {
+  CasingUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
+  UpgradePurchased: PurchaseChainStamp & {
     upgradeId: string
     kind: 'vertical'
     /** The stored steps before and after (#180: `10L + k`); the majors are derived beside them. */

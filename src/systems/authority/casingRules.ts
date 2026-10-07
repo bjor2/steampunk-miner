@@ -4,7 +4,8 @@
  * grade by one for `ceil(48 * 1.225^(G-1))`, charged as it is priced, and logs
  * `casing_upgraded {from, to, price}`. A refused buy changes nothing. The casing grade is not a
  * vehicle track, so it never moves the visual tier. `debug.setCasingGrade` sets it directly for
- * scenarios (#41 debug API).
+ * scenarios (#41 debug API). A held step (`chain` not 0) is also refused under the service reserve
+ * (`purchaseChain.ts`).
  */
 import { casingUpgradePrice } from '../economy/casingPrices'
 import { sub, toCanonical, type Money } from '../money'
@@ -18,12 +19,13 @@ import {
 } from './commandRule'
 import { atBayRejection } from './dockRules'
 import { moneyShortRejection } from './platformServices'
+import { chainStampOf, serviceReserveRejection } from './purchaseChain'
 
 export const CASING_RULES: { readonly buyCasingGrade: CommandRule<'buyCasingGrade'> } = {
   buyCasingGrade: {
-    fields: {},
-    reject: (state, { playerId }) => casingRefusal(state, playerId),
-    apply: (state, { playerId }) => raiseCasingGrade(state, playerId),
+    fields: { chain: 'wholeNumber' },
+    reject: (state, { playerId, payload }) => casingRefusal(state, playerId, payload.chain),
+    apply: (state, { playerId, payload }) => raiseCasingGrade(state, playerId, payload.chain),
   },
 }
 
@@ -46,11 +48,16 @@ export function casingGradeRangeRejection(grade: number): Rejection | null {
   return rejectionOf('out_of_range', `grade must be at least 1, got ${grade}`)
 }
 
-/** Why buying the next casing grade would be refused now; null when it would apply. */
-export function casingRefusal(state: AuthorityState, playerId: string): Rejection | null {
+/** Why buying the next casing grade in `chain` would be refused now; null when it would apply. */
+export function casingRefusal(
+  state: AuthorityState,
+  playerId: string,
+  chain: number,
+): Rejection | null {
   return firstRejection([
     () => atBayRejection(state, playerId, 'upgrade'),
     () => moneyShortRejection(state.players[playerId].wallet, nextCasingPrice(state, playerId)),
+    () => serviceReserveRejection(state, playerId, chain, nextCasingPrice(state, playerId)),
   ])
 }
 
@@ -59,18 +66,20 @@ export function nextCasingPrice(state: AuthorityState, playerId: string): Money 
   return casingUpgradePrice(vehicleOf(state, playerId).casingGrade)
 }
 
-function raiseCasingGrade(state: AuthorityState, playerId: string): RuleEffect {
+function raiseCasingGrade(state: AuthorityState, playerId: string, chain: number): RuleEffect {
   const { wallet, vehicle } = state.players[playerId]
   const price = nextCasingPrice(state, playerId)
   const raised = withCasingGrade(state, playerId, vehicle.casingGrade + 1)
+  const paid = withWallet(raised, playerId, sub(wallet, price))
   return {
-    state: withWallet(raised, playerId, sub(wallet, price)),
+    state: paid,
     events: [
       {
         type: 'CasingUpgraded',
         from: vehicle.casingGrade,
         to: vehicle.casingGrade + 1,
         price: toCanonical(price),
+        ...chainStampOf(paid, playerId, chain),
       },
     ],
   }

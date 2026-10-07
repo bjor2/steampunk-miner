@@ -5,6 +5,7 @@
  * and 4). Hull and energy keep their values; the new maximum shows in `statsAfter` and the next
  * repair or recharge fills up to it. `vehicle_configuration_changed` follows when the sum of the
  * six major levels crosses `T2` or `T3`. A refused purchase changes nothing and logs no purchase.
+ * A held step (`chain` not 0) is also refused under the service reserve (`purchaseChain.ts`).
  */
 import { costCurveIdOf, stepPrice } from '../economy/upgradePrices'
 import { isMajorStep, majorOf } from '../economy/upgradeSteps'
@@ -23,36 +24,40 @@ import {
   type RuleEffect,
 } from './commandRule'
 import { atBayRejection } from './dockRules'
-import type { DomainEventBody } from './domainEvent'
+import type { DomainEventBody, PurchaseChainStamp } from './domainEvent'
+import { chainStampOf, CLICK_CHAIN, serviceReserveRejection } from './purchaseChain'
 import { visualTierEvents } from './vehicleDebugRules'
 
 export const WORKSHOP_RULES: { readonly buyUpgrade: CommandRule<'buyUpgrade'> } = {
   buyUpgrade: {
-    fields: { upgradeId: 'text' },
-    reject: (state, { playerId, payload }) => upgradeRefusal(state, playerId, payload.upgradeId),
+    fields: { upgradeId: 'text', chain: 'wholeNumber' },
+    reject: (state, { playerId, payload }) =>
+      upgradeRefusal(state, playerId, payload.upgradeId, payload.chain),
     apply: (state, { playerId, payload }) =>
       isUpgradeId(payload.upgradeId)
-        ? buyUpgradeLevel(state, playerId, payload.upgradeId)
+        ? buyUpgradeLevel(state, playerId, payload.upgradeId, payload.chain)
         : { state, events: [] },
   },
 }
 
-/** Why buying the next level of `upgradeId` would be refused now; null when it would apply. */
+/** Why the next step of `upgradeId` in `chain` would be refused now; null when it would apply. */
 export function upgradeRefusal(
   state: AuthorityState,
   playerId: string,
   upgradeId: string,
+  chain: number,
 ): Rejection | null {
   return firstRejection([
     () => atBayRejection(state, playerId, 'upgrade'),
     () => unknownUpgradeRejection(upgradeId),
     () => upgradeMoneyRejection(state, playerId, upgradeId as UpgradeId),
+    () => upgradeReserveRejection(state, playerId, upgradeId as UpgradeId, chain),
   ])
 }
 
-/** #33 `canBuy`: the workshop row is enabled exactly when the authority would accept it. */
+/** #33 `canBuy`: the workshop row is enabled exactly when the authority would accept a click. */
 export function canBuyUpgrade(state: AuthorityState, playerId: string, upgradeId: string): boolean {
-  return upgradeRefusal(state, playerId, upgradeId) === null
+  return upgradeRefusal(state, playerId, upgradeId, CLICK_CHAIN) === null
 }
 
 /** The price of the next step of a track for this player on this planet. */
@@ -81,19 +86,31 @@ function upgradeMoneyRejection(
   return rejectionOf('money_short', `costs ${toCanonical(price)}, has ${toCanonical(wallet)}`)
 }
 
+function upgradeReserveRejection(
+  state: AuthorityState,
+  playerId: string,
+  upgradeId: UpgradeId,
+  chain: number,
+): Rejection | null {
+  const price = nextUpgradePrice(state, playerId, upgradeId)
+  return serviceReserveRejection(state, playerId, chain, price)
+}
+
 function buyUpgradeLevel(
   state: AuthorityState,
   playerId: string,
   upgradeId: UpgradeId,
+  chain: number,
 ): RuleEffect {
   const { wallet, vehicle } = state.players[playerId]
   const cost = nextUpgradePrice(state, playerId, upgradeId)
   const upgraded = raisedOneStep(vehicle, upgradeId)
   const paid = withWallet(withVehicle(state, playerId, upgraded), playerId, sub(wallet, cost))
+  const chainStamp = chainStampOf(paid, playerId, chain)
   return {
     state: paid,
     events: [
-      purchaseEvent(vehicle, upgraded, upgradeId, cost),
+      purchaseEvent(vehicle, upgraded, upgradeId, cost, chainStamp),
       ...visualTierEvents(vehicle, upgraded),
     ],
   }
@@ -109,10 +126,12 @@ function purchaseEvent(
   after: VehicleState,
   upgradeId: UpgradeId,
   cost: Money,
+  chainStamp: PurchaseChainStamp,
 ): DomainEventBody {
   const fromLevel = before.levels[upgradeId]
   return {
     type: 'UpgradePurchased',
+    ...chainStamp,
     upgradeId,
     kind: 'vertical',
     fromLevel,

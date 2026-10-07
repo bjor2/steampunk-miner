@@ -8,7 +8,10 @@ import { WORLD_SEED } from '../scriptedSession'
 import { setChargesIntent } from './chargeFixtures'
 
 const RESTOCK: CommandIntent<'restockCharges'> = { type: 'restockCharges', payload: {} }
-const RACK_SLOT: CommandIntent<'buyChargeRackSlot'> = { type: 'buyChargeRackSlot', payload: {} }
+const RACK_SLOT: CommandIntent<'buyChargeRackSlot'> = {
+  type: 'buyChargeRackSlot',
+  payload: { chain: 0 },
+}
 
 /** A session on `planetIndex` with money, docked at one bay, answering each intent's events. */
 function shopOn(planetIndex: number, bay: 'sell' | 'upgrade' = 'upgrade', money = '1e12') {

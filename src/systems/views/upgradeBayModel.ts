@@ -23,6 +23,7 @@ import {
   quickServiceCommand,
   repairHullCommand,
 } from '../platform/platformCommands'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { hullGaugeText } from '../vehicle/vehicleReadout'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import {
@@ -159,7 +160,7 @@ function casingRowOf(state: AuthorityState, playerId: string): CasingRow {
     playerId,
     UI_IDS.upgradebayCasingBuy,
     'Buy',
-    buyCasingGradeCommand(),
+    buyCasingGradeCommand(CLICK_CHAIN),
   )
   const cost = amountReading(nextCasingPrice(state, playerId))
   return {

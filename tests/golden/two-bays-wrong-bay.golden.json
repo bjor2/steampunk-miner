@@ -2,7 +2,7 @@
   "name": "two-bays-wrong-bay",
   "description": "Buying at the Sell bay and selling at the Upgrade bay are refused as wrong_bay; the same buys at the Upgrade bay apply (#37, #41).",
   "generatorVersion": 6,
-  "authorityProtocolVersion": 27,
+  "authorityProtocolVersion": 28,
   "logSchemaVersion": 4,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -57,7 +57,8 @@
       "seq": 4,
       "type": "buyUpgrade",
       "payload": {
-        "upgradeId": "drill_tip"
+        "upgradeId": "drill_tip",
+        "chain": 0
       }
     },
     {
@@ -65,7 +66,9 @@
       "tick": 3,
       "seq": 5,
       "type": "buyCasingGrade",
-      "payload": {}
+      "payload": {
+        "chain": 0
+      }
     },
     {
       "playerId": "p1",
@@ -119,7 +122,8 @@
       "seq": 10,
       "type": "buyUpgrade",
       "payload": {
-        "upgradeId": "drill_tip"
+        "upgradeId": "drill_tip",
+        "chain": 0
       }
     },
     {
@@ -127,7 +131,9 @@
       "tick": 15,
       "seq": 11,
       "type": "buyCasingGrade",
-      "payload": {}
+      "payload": {
+        "chain": 0
+      }
     }
   ],
   "digests": [

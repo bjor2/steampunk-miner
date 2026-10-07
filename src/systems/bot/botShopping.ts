@@ -18,8 +18,12 @@
  * its whole-number stat where it is, and a drill pip may not win a whole tick, so a marginal track
  * is offered for the fewest next steps, up to its next major, that raise the planned money, priced
  * together and paid for whole; the bot buys their first step and weighs the offers again.
+ *
+ * Every buy is a click unless the run's chain policy holds (`botChains.ts`, ticket 226): then the
+ * steps bought in a row on one track are one held chain, and a refused held step ends the buying.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { nextUpgradePrice } from '../authority/workshopRules'
 import { nextCasingPrice } from '../authority/casingRules'
 import type { UpgradeId } from '../economy/economyDefinition'
@@ -28,6 +32,7 @@ import { minorsPerMajor, pipOf, stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
 import { add, cmp, div, sub, ZERO_MONEY, type Money } from '../money'
 import { isCasingGradeShort } from './botCasing'
+import { startBotHold, stepOfHold, type ChainPolicy } from './botChains'
 import { forcedCoreTrack, isUnderLeadCap } from './botCoreRule'
 import { restockPriceFor } from './botCharges'
 import { gunMountPriceFor, type GunPolicy } from './botGuns'
@@ -51,8 +56,8 @@ type Purchase =
   | CommandIntent<'buyGun'>
   | CommandIntent<'restockCharges'>
 
-const BUY_CASING_GRADE: Purchase = { type: 'buyCasingGrade', payload: {} }
-const BUY_GUN: Purchase = { type: 'buyGun', payload: {} }
+const BUY_CASING_GRADE: Purchase = { type: 'buyCasingGrade', payload: { chain: CLICK_CHAIN } }
+const BUY_GUN: Purchase = { type: 'buyGun', payload: { chain: CLICK_CHAIN } }
 const RESTOCK_CHARGES: Purchase = { type: 'restockCharges', payload: {} }
 
 export interface ShoppingSituation {
@@ -62,6 +67,7 @@ export interface ShoppingSituation {
   gunPolicy: GunPolicy
   /** The bot met a tile on this planet it would blast with no charge in stock (#129). */
   hasMetBlastTile: boolean
+  chainPolicy: ChainPolicy
 }
 
 export function serviceAtDock(session: BotSession): void {
@@ -94,15 +100,18 @@ export function buyUpgrades(session: BotSession, situation: ShoppingSituation): 
 
 function buyKernelPurchases(session: BotSession, situation: ShoppingSituation): ShopSpend[] {
   const spends: ShopSpend[] = []
+  const hold = startBotHold(situation.chainPolicy)
   for (let pick = nextPurchase(session, situation); pick !== null;) {
-    spends.push(submitKernelPurchase(session, pick))
+    const step = stepOfHold(session, hold, pick)
+    if (step === null) break
+    spends.push(submitKernelPurchase(session, step))
     pick = nextPurchase(session, situation)
   }
   return spends
 }
 
 /** What the wallet paid is the spend: the purchase events carry their prices in five shapes. */
-function submitKernelPurchase(session: BotSession, pick: Purchase): ShopSpend {
+function submitKernelPurchase(session: BotSession, pick: CommandIntent): ShopSpend {
   const planetIndex = session.state().planet.index
   const before = walletOf(session)
   session.submit(pick)
@@ -117,7 +126,8 @@ function nextPurchase(session: BotSession, situation: ShoppingSituation): Purcha
   if (isGunMountDue(session, situation.gunPolicy)) return BUY_GUN
   if (isRestockDue(session, situation)) return RESTOCK_CHARGES
   const track = nextTrackPurchase(session, situation)
-  return track === null ? null : { type: 'buyUpgrade', payload: { upgradeId: track } }
+  if (track === null) return null
+  return { type: 'buyUpgrade', payload: { upgradeId: track, chain: CLICK_CHAIN } }
 }
 
 function nextTrackPurchase(session: BotSession, situation: ShoppingSituation): UpgradeId | null {

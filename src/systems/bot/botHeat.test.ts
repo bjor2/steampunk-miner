@@ -42,6 +42,7 @@ describe('bot: heat planets (#113)', () => {
       isCoreTheGoal: false,
       gunPolicy: 'never',
       hasMetBlastTile: false,
+      chainPolicy: 'click',
     })
     expect(session.vehicle().lining.active).toBe('refractory')
     expect(liningUnlockFor(session)).toBeNull()

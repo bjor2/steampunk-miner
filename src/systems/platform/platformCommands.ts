@@ -35,24 +35,25 @@ export function quickServiceCommand(): CommandIntent<'quickService'> {
   return { type: 'quickService', payload: {} }
 }
 
-export function buyUpgradeCommand(upgradeId: string): CommandIntent<'buyUpgrade'> {
-  return { type: 'buyUpgrade', payload: { upgradeId } }
+/** `chain` is 0 for a click, else the hold the step belongs to (`purchaseChain.ts`). */
+export function buyUpgradeCommand(upgradeId: string, chain: number): CommandIntent<'buyUpgrade'> {
+  return { type: 'buyUpgrade', payload: { upgradeId, chain } }
 }
 
-export function buyCasingGradeCommand(): CommandIntent<'buyCasingGrade'> {
-  return { type: 'buyCasingGrade', payload: {} }
+export function buyCasingGradeCommand(chain: number): CommandIntent<'buyCasingGrade'> {
+  return { type: 'buyCasingGrade', payload: { chain } }
 }
 
-export function buyGunCommand(): CommandIntent<'buyGun'> {
-  return { type: 'buyGun', payload: {} }
+export function buyGunCommand(chain: number): CommandIntent<'buyGun'> {
+  return { type: 'buyGun', payload: { chain } }
 }
 
 export function restockChargesCommand(): CommandIntent<'restockCharges'> {
   return { type: 'restockCharges', payload: {} }
 }
 
-export function buyChargeRackSlotCommand(): CommandIntent<'buyChargeRackSlot'> {
-  return { type: 'buyChargeRackSlot', payload: {} }
+export function buyChargeRackSlotCommand(chain: number): CommandIntent<'buyChargeRackSlot'> {
+  return { type: 'buyChargeRackSlot', payload: { chain } }
 }
 
 export function buyLiningTypeCommand(liningType: string): CommandIntent<'buyLiningType'> {

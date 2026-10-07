@@ -15,6 +15,7 @@ import {
 } from '../authority/charges/chargeRules'
 import { rackMaxSlotLevel } from '../economy/blastingCharges'
 import { buyChargeRackSlotCommand, restockChargesCommand } from '../platform/platformCommands'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { emptyRackSlotsOf, rackCapacityOf, type VehicleCharges } from '../vehicle/vehicleCharges'
 import { KERNEL_ITEMS } from '../registries/kernelItems'
 import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
@@ -95,7 +96,7 @@ function rackRowOf(state: AuthorityState, playerId: string): ChargeRow {
     playerId,
     UI_IDS.upgradebayRackBuy,
     'Buy',
-    buyChargeRackSlotCommand(),
+    buyChargeRackSlotCommand(CLICK_CHAIN),
   )
   const capacity = rackCapacityOf(charges)
   const cost = isTop ? null : amountReading(rackSlotPriceOf(state, playerId))

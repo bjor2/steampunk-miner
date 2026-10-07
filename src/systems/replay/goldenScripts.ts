@@ -176,7 +176,7 @@ function moneyPast1e40Commands(params: PlanetParams): ScriptedCommand[] {
     ...mineTilesFrom(1, surfaceOreTiles(3, params)),
     ...homeAndSellAt(tripEnd, params).slice(0, 3),
     ...dockInUpgradeBayAt(tripEnd + 40, params),
-    { tick: tripEnd + 45, type: 'buyUpgrade', payload: { upgradeId: 'cargo_hold' } },
+    { tick: tripEnd + 45, type: 'buyUpgrade', payload: { upgradeId: 'cargo_hold', chain: 0 } },
   ]
 }
 

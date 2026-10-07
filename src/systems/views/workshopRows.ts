@@ -13,6 +13,7 @@ import { UPGRADE_IDS, type UpgradeId } from '../economy/economyDefinition'
 import { vehicleStatsAt, type UpgradeLevels } from '../economy/vehicleStats'
 import { cmp } from '../money'
 import { buyUpgradeCommand } from '../platform/platformCommands'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { canonicalStatsOf } from '../vehicle/vehicleStatsView'
 import { BAND_COUNT } from '../world/planetGeometry'
 import { trackItemOf } from '../registries/kernelItems'
@@ -117,7 +118,7 @@ function workshopRowOf(
     playerId,
     UI_ID_TEMPLATES.workshopUpgradeBuy(upgradeId),
     'Buy',
-    buyUpgradeCommand(upgradeId),
+    buyUpgradeCommand(upgradeId, CLICK_CHAIN),
   )
   const cost = amountReading(nextUpgradePrice(state, playerId, upgradeId))
   const iconId = trackIconIdOf(upgradeId)

@@ -4,6 +4,7 @@ import { stateDigest } from '../authority/stateDigest'
 import { ECONOMY } from '../economy/economy'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { buyUpgradeCommand } from '../platform/platformCommands'
+import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import { setUpgradeCommand } from '../vehicle/vehicleCommands'
 import { stepOfMajor } from '../economy/upgradeSteps'
@@ -132,7 +133,7 @@ describe('upgrade bay preview', () => {
 
   it('reports the part being installed, and the new tier once the buy is through', () => {
     const session = atUpgradeBay({ boiler: 7 }, { engine: BEFORE_MAJOR })
-    session.submit(3, buyUpgradeCommand('engine'))
+    session.submit(3, buyUpgradeCommand('engine', CLICK_CHAIN))
     expect(previewOf(session, null, 'engine')).toMatchObject({
       installing: 'engine',
       ownedTier: 2,
