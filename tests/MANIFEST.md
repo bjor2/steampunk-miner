@@ -23,7 +23,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 9 |
 | Every ore family has a gateClass row | #141, #142 | `src/features/planet-mix/systems/themeRows.test.ts`, `src/features/mining-gates/systems/rigs.test.ts`, `src/features/mining-gates/systems/gateTable.test.ts` | 19 |
 | Endless signature coverage, planets 41-65 | #148 | `src/features/mining-gates/systems/rigs.test.ts` | 8 |
-| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 36 |
+| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 38 |
 
 ## Slices
 
@@ -432,6 +432,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/artefactRules.test.ts` | 16 | 16 |
 | `src/systems/authority/assaySale.test.ts` | 4 | 4 |
 | `src/systems/authority/authorityReactions.test.ts` | 7 | 7 |
+| `src/systems/authority/bore/boreAim.test.ts` | 10 | 10 |
+| `src/systems/authority/bore/boreWalk.test.ts` | 6 | 6 |
+| `src/systems/authority/bore/groundGun.test.ts` | 26 | 26 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
@@ -574,8 +577,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/systems/feedback/accents.test.ts` | 15 | 2 |
-| `src/systems/feedback/feedbackCues.test.ts` | 14 | 14 |
+| `src/systems/feedback/accents.test.ts` | 18 | 2 |
+| `src/systems/feedback/feedbackCues.test.ts` | 15 | 15 |
 | `src/systems/feedback/haptics.test.ts` | 2 | 2 |
 | `src/systems/feedback/screenEffects.test.ts` | 9 | 9 |
 
@@ -933,7 +936,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/unlocks/readUnlockSchedule.test.ts` | 10 | 10 |
 | `src/systems/unlocks/scheduleCadence.test.ts` | 5 | 5 |
 | `src/systems/unlocks/travelUnlocks.test.ts` | 7 | 7 |
-| `src/systems/unlocks/unlockSchedule.test.ts` | 32 | 29 |
+| `src/systems/unlocks/unlockSchedule.test.ts` | 34 | 31 |
 
 ### `vehicle`
 
