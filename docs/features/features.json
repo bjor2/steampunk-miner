@@ -1032,6 +1032,12 @@
               "description": "Echo sounder (a ping marks caves, lava, ore silhouettes and gate badges round the miner for a while), threat periscope (an arrow for every enemy in range, with its family, distance band and burrower dust), assay lens (cards over the ore in sight: family, grade, lead, sell price, gate), hazard barometer (warns of lava or weak lining a few cells ahead), survey flare mortar (maps a ring where it lands until the dock) and signal buoy (a pin every miner in the world sees, re-pinging its ring as vehicles pass), each with its tech node, Marks and item card. What they reveal is drawn on each client and never changes the world. The echo and the passives are bought at the Upgrade bay once researched; the galvanic probe and void sounder wait for magnetic and hollow planets, and codex contact from scans for #243.",
               "status": "partial",
               "issues": [203, 241, 243, 248]
+            },
+            {
+              "title": "Extraction power-ups",
+              "description": "Mineral drain: hold still for a moment and the nearest ore around the miner fades to plain ground, half of it into the hold. Gated, too-hard and core cells are left alone, and the income items share a trip cap of 15% of a full hold of the band's ore, reset at the dock. The slurry siphon, the lane's tree nodes and the store buy come later.",
+              "status": "partial",
+              "issues": [201, 239]
             }
           ]
         },

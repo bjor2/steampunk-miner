@@ -1,7 +1,10 @@
 {
-  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 one-off price (k 15 band-5 ore at the unlock planet), 4.2 charged items. A slice's numbers live beside it (feature-slices.md 1.1).",
+  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 one-off price (k 15 band-5 ore at the unlock planet), 4.2 charged items, 4.5 the drain and siphon yield and the hard trip clamp. A slice's numbers live beside it (feature-slices.md 1.1).",
   "items": {
-    "price": { "band": 5, "oreUnits": "15" },
+    "price": {
+      "band": 5,
+      "oreUnits": "15"
+    },
     "balance": {
       "power.mineral_drain": {
         "charges": 2,
@@ -17,6 +20,10 @@
         "reachTiles": 5,
         "cellsPerUse": 6
       }
+    },
+    "income": {
+      "yieldShare": "0.5",
+      "tripCapShare": "0.150"
     }
   }
 }

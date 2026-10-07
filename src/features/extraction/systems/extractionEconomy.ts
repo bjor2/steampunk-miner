@@ -1,7 +1,7 @@
 /**
  * The extraction lane's numbers from `extraction.economy.json` (spec #162 section 4, locked): the
- * one-off price every item here pays (4.1) and each item's `items.balance.<id>` row (4.2). The
- * file is refused whole on any problem, like the kernel's economy file, so a stand-in never
+ * one-off price every item here pays (4.1), each item's `items.balance.<id>` row (4.2) and the
+ * income items' yield and trip clamp (4.5). The file is refused whole on any problem, like the kernel's economy file, so a stand-in never
  * reaches a formula.
  */
 import {
@@ -10,6 +10,7 @@ import {
   type FieldReader,
 } from '../../../systems/economy/economyFieldReader'
 import type { BandOreCost } from '../../../systems/economy/economyDefinition'
+import type { Money } from '../../../systems/money'
 import EXTRACTION_ECONOMY_FILE from '../extraction.economy.json'
 
 /** One item's Mark 1 numbers, in whole ticks, tiles and cells. */
@@ -25,10 +26,19 @@ export interface ExtractionBalance {
   cellsPerUse: number
 }
 
+/** #162 4.5: what an income item moves, and the hard clamp on it per trip. */
+export interface IncomeRules {
+  /** The share of each drained cell's ore that reaches the hold (50%). */
+  yieldShare: Money
+  /** `tripCap` as a share of a full hold of the band's ore (15%), a hard clamp. */
+  tripCapShare: Money
+}
+
 export interface ExtractionEconomy {
   /** `k` band-5 ore units, paid at the item's unlock planet (#162 4.1). */
   price: BandOreCost
   balance: Readonly<Record<string, ExtractionBalance>>
+  income: IncomeRules
 }
 
 export const EXTRACTION_ECONOMY: ExtractionEconomy = loadExtractionEconomy(EXTRACTION_ECONOMY_FILE)
@@ -42,6 +52,7 @@ export function readExtractionEconomy(
   const economy = {
     price: readBandOreCost(reader, 'items.price', items.price),
     balance: readBalanceRows(reader, items.balance),
+    income: readIncomeRules(reader, items.income),
   }
   return reader.problems.length > 0 ? { problems: reader.problems } : { economy }
 }
@@ -72,5 +83,13 @@ function readBalance(reader: FieldReader, path: string, raw: unknown): Extractio
     actTicks: reader.safeInteger(`${path}.actTicks`, row.actTicks),
     reachTiles: reader.safeInteger(`${path}.reachTiles`, row.reachTiles),
     cellsPerUse: reader.safeInteger(`${path}.cellsPerUse`, row.cellsPerUse),
+  }
+}
+
+function readIncomeRules(reader: FieldReader, raw: unknown): IncomeRules {
+  const rules = reader.object('items.income', raw)
+  return {
+    yieldShare: reader.money('items.income.yieldShare', rules.yieldShare),
+    tripCapShare: reader.money('items.income.tripCapShare', rules.tripCapShare),
   }
 }

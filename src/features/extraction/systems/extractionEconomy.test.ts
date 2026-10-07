@@ -27,9 +27,17 @@ describe('extraction economy', () => {
     })
   })
 
+  it('reads the 50% drain yield and the 15% trip clamp of #162 4.5', () => {
+    expect(EXTRACTION_ECONOMY.income).toEqual({
+      yieldShare: fromCanonical('0.5'),
+      tripCapShare: fromCanonical('0.15'),
+    })
+  })
+
   it('refuses the whole file and lists every broken field', () => {
     const broken: { items: Record<string, Record<string, unknown>> } = structuredClone(economyFile)
     broken.items.price = { band: 5, oreUnits: -15 }
+    broken.items.income = { yieldShare: '0.5', tripCapShare: 0.15 }
     broken.items.balance = {
       'power.slurry_siphon': { ...economyFile.items.balance['power.slurry_siphon'], charges: '3' },
     }
@@ -37,6 +45,7 @@ describe('extraction economy', () => {
       problems: [
         'items.price.oreUnits must be a decimal string >= 0',
         'items.balance.power.slurry_siphon.charges must be a safe integer',
+        'items.income.tripCapShare must be a decimal string >= 0',
       ],
     })
   })
