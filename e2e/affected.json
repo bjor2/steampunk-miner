@@ -1,0 +1,147 @@
+{
+  "$comment": [
+    "Affected-spec selection for the browser e2e layer (#190), read by scripts/e2e/affectedSpecs.mjs.",
+    "Each changed path is looked up in order: a browser spec runs itself; a fullSuite path runs every spec;",
+    "a noBrowserEffect path runs none; otherwise every rule whose paths match adds its specs, and a path",
+    "no rule matches runs every spec. Every spec loads the whole game, so a rule names the specs that",
+    "exercise the change, and the nightly full run catches a cross-feature miss.",
+    "affectedSpecs.test.mjs checks that every spec under e2e/browser is named by a rule."
+  ],
+  "fullSuite": [
+    "playwright.config.ts",
+    "vite.config.ts",
+    "package.json",
+    "package-lock.json",
+    "index.html",
+    "tsconfig*.json",
+    "e2e/affected.json",
+    "e2e/browser/**",
+    "scripts/e2e/**"
+  ],
+  "noBrowserEffect": [
+    "**/*.md",
+    "docs/**",
+    "tests/**",
+    "art/**",
+    "scripts/**",
+    "src/**/*.test.ts",
+    "electron/**",
+    "electron-builder.yml",
+    "playwright.electron.config.ts",
+    "tsconfig.electron.json",
+    "e2e/packaged/**",
+    "scenarios/bot-*.scenario.json"
+  ],
+  "rules": [
+    {
+      "why": "The example slice answers smoke's features read, opens the slice screen and hangs the test piece.",
+      "paths": ["src/features/example/**"],
+      "specs": [
+        "e2e/browser/smoke.spec.ts",
+        "e2e/browser/sliceScreen.spec.ts",
+        "e2e/browser/vehiclePieces.spec.ts"
+      ]
+    },
+    {
+      "why": "The mining popup's chips and plaque, and the dig in the look set.",
+      "paths": ["src/features/mining-popup/**"],
+      "specs": ["e2e/browser/miningPopup.spec.ts", "e2e/browser/screens/reviewShots.spec.ts"]
+    },
+    {
+      "why": "The power-up loadout and its HUD slots.",
+      "paths": ["src/features/power-up-core/**"],
+      "specs": ["e2e/browser/powerUpCore.spec.ts", "e2e/browser/screens/screenLayout.spec.ts"]
+    },
+    {
+      "why": "The sell burst on the bay header.",
+      "paths": ["src/features/sell-burst/**"],
+      "specs": ["e2e/browser/sellBurst.spec.ts"]
+    },
+    {
+      "why": "The item cards fill the Upgrade bay entries and the workshop plaques.",
+      "paths": ["src/features/descriptions/**"],
+      "specs": ["e2e/browser/itemCards.spec.ts", "e2e/browser/workshop.spec.ts"]
+    },
+    {
+      "why": "The workshop showcase is the Upgrade bay screen and the Works' turntable.",
+      "paths": ["src/features/workshop/**"],
+      "specs": [
+        "e2e/browser/workshop.spec.ts",
+        "e2e/browser/itemCards.spec.ts",
+        "e2e/browser/shops.spec.ts",
+        "e2e/browser/dockBuildings.spec.ts",
+        "e2e/browser/screens/reviewShots.spec.ts",
+        "e2e/browser/screens/screenLayout.spec.ts"
+      ]
+    },
+    {
+      "why": "The dock buildings stand in the zoomed-out frame the draw-call budgets measure.",
+      "paths": ["src/features/dock-buildings/**"],
+      "specs": [
+        "e2e/browser/dockBuildings.spec.ts",
+        "e2e/browser/render.spec.ts",
+        "e2e/browser/screens/screenLayout.spec.ts",
+        "e2e/browser/screens/reviewShots.spec.ts"
+      ]
+    },
+    {
+      "why": "The render rules set what the frame draws: budgets, the showcase car, mounted parts, the look set.",
+      "paths": ["src/systems/render/**"],
+      "specs": [
+        "e2e/browser/render.spec.ts",
+        "e2e/browser/dockBuildings.spec.ts",
+        "e2e/browser/sellBurst.spec.ts",
+        "e2e/browser/shops.spec.ts",
+        "e2e/browser/workshop.spec.ts",
+        "e2e/browser/vehiclePieces.spec.ts",
+        "e2e/browser/screens/screenLayout.spec.ts",
+        "e2e/browser/screens/reviewShots.spec.ts"
+      ]
+    },
+    {
+      "why": "The memory reads of the debug API and the run log's samples.",
+      "paths": [
+        "src/debug/debugMemory.ts",
+        "src/scene/rendererMemory.ts",
+        "src/scene/sceneMemory.ts",
+        "src/scene/PerfSampler.tsx"
+      ],
+      "specs": ["e2e/browser/memory.spec.ts", "e2e/browser/memorySample.spec.ts"]
+    },
+    {
+      "why": "Replay and snapshots give smoke's digests; the camera gives its framing checks.",
+      "paths": [
+        "src/systems/replay/**",
+        "src/scene/PlanetCamera.tsx",
+        "src/scene/cameraPresence.ts"
+      ],
+      "specs": ["e2e/browser/smoke.spec.ts", "e2e/browser/screens/screenLayout.spec.ts"]
+    },
+    {
+      "why": "The committed scenarios the specs open with ?scenario=.",
+      "paths": ["scenarios/planet1-start.scenario.json", "scenarios/broken.scenario.json"],
+      "specs": ["e2e/browser/smoke.spec.ts", "e2e/browser/miningPopup.spec.ts"]
+    },
+    {
+      "why": "The touch controls, and the specs that drive the game by touch.",
+      "paths": ["src/ui/touch/**"],
+      "specs": [
+        "e2e/browser/screens/touchControls.spec.ts",
+        "e2e/browser/screens/screenLayout.spec.ts",
+        "e2e/browser/screens/reviewShots.spec.ts",
+        "e2e/browser/itemCards.spec.ts",
+        "e2e/browser/workshop.spec.ts"
+      ]
+    },
+    {
+      "why": "The game stage fits every screen cell and shows the portrait card.",
+      "paths": ["src/ui/stage/**"],
+      "specs": [
+        "e2e/browser/screens/portrait.spec.ts",
+        "e2e/browser/screens/screenLayout.spec.ts",
+        "e2e/browser/screens/touchControls.spec.ts",
+        "e2e/browser/screens/reviewShots.spec.ts"
+      ]
+    }
+  ]
+}
