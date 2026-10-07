@@ -304,3 +304,15 @@ describe('HUD model: casing badge (#41)', () => {
     expect(hudOf(session).casing).toBeNull()
   })
 })
+
+describe('HUD model: scenario ready (ticket 301)', () => {
+  it('asks for a key only while a scenario or a restore waits for play', () => {
+    const state = createScriptedSession().state()
+    const sources = { state, playerId: 'p1', depthTiles: 0, bindings: BINDINGS }
+    expect(selectHudModel({ ...sources, isAwaitingPlay: true }).readyPrompt).toEqual({
+      isShown: true,
+      text: 'Scenario ready — press any key',
+    })
+    expect(selectHudModel(sources).readyPrompt.isShown).toBe(false)
+  })
+})

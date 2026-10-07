@@ -64,6 +64,8 @@ export interface HudSources {
   /** Client-owned whole tiles below the surface, the log envelope's `depthTiles`. */
   depthTiles: number
   bindings: Bindings
+  /** A scenario or a restore stands at its tick until play starts it (ticket 301); absent: no. */
+  isAwaitingPlay?: boolean
 }
 
 /**
@@ -125,6 +127,8 @@ export interface HudModel {
   /** "Space: Ancient cache" (interact's first key) exactly while `interact` would open a live cache (#46). */
   cachePrompt: DockPrompt
   isDebugRun: boolean
+  /** "Scenario ready — press any key" while the live step waits for play (ticket 301). */
+  readyPrompt: DockPrompt
   warning: EnergyWarning
 }
 
@@ -137,6 +141,8 @@ const WARNING_MARKERS: Readonly<Record<EnergyWarningLevel, { text: string; icon:
 }
 
 const PERMILLE = 1000
+
+const READY_PROMPT_TEXT = 'Scenario ready — press any key'
 
 export function selectHudModel(sources: HudSources): HudModel {
   const { state, playerId } = sources
@@ -178,6 +184,7 @@ export function selectHudModel(sources: HudSources): HudModel {
     dockPrompt: dockPromptOf(state, playerId, sources.bindings),
     cachePrompt: cachePromptOf(state, playerId, sources.bindings),
     isDebugRun: state.debugApplied,
+    readyPrompt: { isShown: sources.isAwaitingPlay === true, text: READY_PROMPT_TEXT },
     warning,
   }
 }

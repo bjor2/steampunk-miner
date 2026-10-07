@@ -1,7 +1,8 @@
 /**
  * Bottom centre (#33 section 5): the dock prompt exactly when the authority would accept a dock,
- * the artefact cache prompt exactly when it would open the cache (#46), and the "DEBUG RUN" mark
- * once a debug command was accepted (#11).
+ * the artefact cache prompt exactly when it would open the cache (#46), "Scenario ready" while a
+ * scenario waits for play (ticket 301), and the "DEBUG RUN" mark once a debug command was
+ * accepted (#11).
  */
 import type { HudModel } from '../../systems/views/hudModel'
 import { UI_IDS } from '../ids'
@@ -18,6 +19,11 @@ export function HudPrompts({ model }: { model: HudModel }) {
       {model.cachePrompt.isShown && (
         <span className={styles.prompt} data-testid={UI_IDS.hudCachePrompt}>
           {model.cachePrompt.text}
+        </span>
+      )}
+      {model.readyPrompt.isShown && (
+        <span className={styles.prompt} data-testid={UI_IDS.hudReadyPrompt}>
+          {model.readyPrompt.text}
         </span>
       )}
       {model.isDebugRun && (

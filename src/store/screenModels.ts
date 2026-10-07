@@ -47,6 +47,7 @@ import {
   type ArtefactChoiceModel,
 } from '../systems/views/artefactChoiceModel'
 import { readAuthorityState } from './authorityLink'
+import type { LiveStepHold } from './liveStepSlice'
 
 /** What the screens read from the store besides the authority. */
 export interface ScreenSources {
@@ -58,6 +59,7 @@ export interface ScreenSources {
   rebindingActionId: ActionId | null
   isTravelArmed: boolean
   focusedControlId: string | null
+  liveStepHold: LiveStepHold
   installingUpgradeId: UpgradeId | null
   hintBoard: HintBoard
   transmissionBoard: TransmissionBoard
@@ -76,6 +78,7 @@ export function hudModelOf(sources: ScreenSources): HudModel {
     playerId: sources.playerId,
     depthTiles: sources.depthTiles,
     bindings: sources.bindings,
+    isAwaitingPlay: sources.liveStepHold === 'awaitingPlay',
   })
 }
 

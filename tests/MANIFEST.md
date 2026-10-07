@@ -920,7 +920,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
-| `src/systems/views/hudModel.test.ts` | 26 | 26 |
+| `src/systems/views/hudModel.test.ts` | 27 | 27 |
 | `src/systems/views/itemCardText.test.ts` | 4 | 4 |
 | `src/systems/views/menuFocus.test.ts` | 2 | 2 |
 | `src/systems/views/overlaySeats.test.ts` | 5 | 5 |

@@ -140,6 +140,7 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
       : { [UI_IDS.hudRescueCountdown]: model.vehicleState.rescueCountdownText }),
     ...(model.dockPrompt.isShown ? { [UI_IDS.hudDockPrompt]: model.dockPrompt.text } : {}),
     ...(model.cachePrompt.isShown ? { [UI_IDS.hudCachePrompt]: model.cachePrompt.text } : {}),
+    ...(model.readyPrompt.isShown ? { [UI_IDS.hudReadyPrompt]: model.readyPrompt.text } : {}),
     ...(model.isDebugRun ? { [UI_IDS.hudDebugMark]: 'DEBUG RUN' } : {}),
     ...(model.warning.level === 'ok' ? {} : { [UI_IDS.hudWarningEnergy]: model.warning.text }),
   }
@@ -402,6 +403,7 @@ function renderFullHoldHud(): string[] {
     playerId: 'p1',
     depthTiles: 0,
     bindings: game().bindings,
+    isAwaitingPlay: true,
   })
   expect(model.cargo.isFull).toBe(true)
   return checkScreen(createElement(HudView, { model, isFlashing: false }), hudTexts(model))

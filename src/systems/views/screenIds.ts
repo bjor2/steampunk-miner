@@ -35,6 +35,7 @@ export const UI_IDS = {
   hudDockPrompt: 'hud-dock-prompt',
   hudCachePrompt: 'hud-cache-prompt',
   hudDebugMark: 'hud-debug-mark',
+  hudReadyPrompt: 'hud-ready-prompt',
   hudWarningEnergy: 'hud-warning-energy',
   hudStatuses: 'hud-statuses',
   hudHintPlaque: 'hud-hint-plaque',
