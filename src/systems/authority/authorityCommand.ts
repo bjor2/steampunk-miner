@@ -106,8 +106,10 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  * 41: `reportPose` carries `drive {x, y}`, the push as signs (TD lock on #279), refused unless each
  *    is -1, 0 or 1; drill gear aimed by the drive turns the twin bit's ahead cell from `drive.x`,
  *    latched per cell. With no gear registered no digest or mined order changes.
+ * 42: hold and second tap (ticket 273, #256): `power-up-core.hold_power_up {slot}` with the
+ *    rejections `no_milestone` and `nothing_to_hold`, and `PowerUpUsed` may name its `milestone`.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 41
+export const AUTHORITY_PROTOCOL_VERSION = 42
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
