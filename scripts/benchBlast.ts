@@ -8,10 +8,19 @@
  * tick at a time until it resolves; each tick is timed whole. A second run adds 4 players drilling
  * and a 32-cell power-up pocket queued on the blast's first tick, timing each tick's clock and
  * commands together. With `-- --log` it also writes `benchmark_result` lines (#124).
+ *
+ * K8 (#218): every size of the dynamite ladder then blows alone at the same site, its radius read
+ * from `blastingCharges.sizes`, and its ticks to clear, p95 and max are printed under `sizes` (the
+ * perf recorder keeps only the R24 fields, as before).
  */
 import { loadFeatures } from '../src/features'
 import { BLAST_TILES_PER_TICK } from '../src/constants/terrainBudget'
 import { blastChunksOf } from '../src/systems/authority/charges/blastPrefetch'
+import {
+  chargeRadiusMm,
+  chargeSizeCount,
+  chargeSizesUpTo,
+} from '../src/systems/economy/chargeSizes'
 import {
   blastAt,
   liveBlastSession,
@@ -105,6 +114,23 @@ function benchBlastAlone(): number[] {
   return timeTicksUntilSettled(session, () => undefined)
 }
 
+/** One blast of `size` alone at the R24 site, its radius from the ladder. */
+function benchSizeAlone(size: number): number[] {
+  const blast = blastAt(SOLID_SITE, chargeRadiusMm(size), { size })
+  return timeTicksUntilSettled(liveBlastSession([blast]), () => undefined)
+}
+
+function sizeReportOf(size: number) {
+  const times = repeated(() => benchSizeAlone(size))
+  return {
+    size,
+    radiusMm: chargeRadiusMm(size),
+    ticks: times.length / REPS,
+    tickP95Ms: round(percentile(times, 0.95)),
+    tickMaxMs: round(Math.max(...times)),
+  }
+}
+
 function benchBlastWithDiggersAndPocket(): number[] {
   const prepared = liveBlastSession(
     [blastAt(SOLID_SITE, R24_MM, { tick: BLAST_TICK, size: 10 })],
@@ -150,6 +176,7 @@ const report = {
   sharedTickP95Ms: round(percentile(shared, 0.95)),
   sharedTickMaxMs: round(Math.max(...shared)),
   budget: BUDGET,
+  sizes: chargeSizesUpTo(chargeSizeCount()).map(sizeReportOf),
 }
 console.log(JSON.stringify(report))
 logBenchmarkSeriesWhenAsked('blast', [

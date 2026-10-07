@@ -196,16 +196,22 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (`refineryLeverFindings`: a planet pushed under 45 minutes or shortened more than 10%) and the
   realised refine gain per planet from `refine_collected`. Reported, never gated; the lever is
   `valueMultiplier` (floor 1.15), never `k_casing`.
-- **Blasting charges** (#109 numbers acceptance 3 and 4): `npm run balance:charges` prints the
-  blast trade (`blastTrade.ts`: per band of planets 7 to 10, drill time over the floor, ore money a
-  minute drilling against blasting, and 3 tiles of shaft either way, for the on-curve drill and one 12
-  levels behind), then plays the bot scenario to planet 10's core blasting (the bot's default) and
-  never, and prints both core times per planet, the blasts and whether each is inside C4. Reported,
-  never gated; the one lever is the price per charge (1 to 4 band-5 units). Charge specs stand in
-  band-2 rock with `charges/chargeFixtures.ts`; the bot's blasting run starts on planet 7 with a
-  stocked rack and a lagging drill (`bot/botBlasting.test.ts`). The bot buys charges only on a
+- **Blasting charges** (#109 numbers acceptance 3 and 4, sizes K8 #218): `npm run balance:charges`
+  prints the blast trade (`blastTrade.ts`: per band of planets 7 to 10, drill time over the floor,
+  ore money a minute drilling against blasting, and 3 tiles of shaft either way, for the on-curve
+  drill and one 12 levels behind), then the size guard (`chargeSizeTrade.ts`, #143 guard 1: every
+  size on its unlock planet and planet 40, every band, at 24 and 45 ticks a tile, a blast's net ore
+  money a minute against the drill's at the band's density and centred on a full patch), then plays
+  the bot scenario to planet 40's core on each pacing seed blasting (the bot's default) and never,
+  and prints both median core times per planet, the blasts and whether each is inside C4: planets 7
+  to 10 judged, 13 to 34 and 40 diagnostic until #148. Reported, never gated; the one lever is the
+  price per charge. The band-density guard is also a spec (`bot/chargeSizeTrade.test.ts`). Charge
+  specs stand in band-2 rock with `charges/chargeFixtures.ts`, and the size specs in solid rock of
+  the planet their size opens on (`sizedBlasterOn`); the bot's blasting run starts on planet 7 with
+  a stocked rack and a lagging drill (`bot/botBlasting.test.ts`). The bot buys charges only on a
   planet where it met a tile it would blast with none in stock (#129, `bot/botChargeNeed.test.ts`:
-  an on-curve run plays exactly like `chargePolicy: 'never'`).
+  an on-curve run plays exactly like `chargePolicy: 'never'`); the stuck rule buys size 1 and the
+  bot plants only fused sizes.
 - **Heat** (#113 acceptance 4): `npm run balance:heat` plays the bot scenario to planet 10's core
   and prints planets 8 to 10 (`heatPlanetLines`): each core time against the campaign's 45 to 60
   minutes (C4), when refractory was unlocked, the refractory laid, the throttle and heat-damage

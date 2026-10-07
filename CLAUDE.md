@@ -26,7 +26,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run screens:update`                  | rewrite the screen matrix shots in `docs/screens/`        |
 | `npm run balance:report` / `:baseline`    | pacing bot report vs the committed baseline / rewrite it  |
 | `npm run balance:guns`                    | bot to planet 7 with and without `auto_guns` (reported)   |
-| `npm run balance:charges`                 | blast trade + P7-P10 bot with vs without charges (#109)   |
+| `npm run balance:charges`                 | blast trade, size guard + P7-P40 bot runs (#109, #218)    |
 | `npm run balance:refinery`                | P1-P8 bot with vs without the Refinery bay (#105, logged) |
 | `npm run balance:heat`                    | bot to planet 10: heat planets 8-10 against C4 (#113)     |
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |

@@ -322,6 +322,13 @@
               "description": "The HUD warns of a live fuse nearby; the charge blinks on the wall and leaves a scorch mark.",
               "status": "built",
               "issues": [95, 110]
+            },
+            {
+              "title": "Dynamite sizes",
+              "description": "Ten charge sizes from a 2.5- to a 24-tile blast, one more every 3 planets from planet 10, each taking more rack slots and costing more; V picks the size B plants. Sizes 7 to 10 wait for the plunger, and their own looks and rack panel are still to come.",
+              "status": "partial",
+              "issues": [218, 149, 215],
+              "planet": 10
             }
           ]
         }
