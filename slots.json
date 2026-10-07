@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T11:35:18+02:00",
+  "updated_at": "2026-10-07T11:56:23+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 2,
       "free": 2,
-      "claims_last_hour": 2,
+      "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
     {
@@ -73,19 +73,19 @@
         },
         {
           "slot": "C6",
+          "state": "busy",
+          "ticket": 146,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-07T11:56:00+02:00"
+        },
+        {
+          "slot": "C7",
           "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
-        },
-        {
-          "slot": "C7",
-          "state": "busy",
-          "ticket": 181,
-          "grok_slot": 6,
-          "kind": "dev",
-          "since": "2026-10-07T10:43:00+02:00"
         },
         {
           "slot": "C8",
@@ -99,7 +99,7 @@
       "size": 4,
       "used": 2,
       "free": 2,
-      "claims_last_hour": 3,
+      "claims_last_hour": 2,
       "name": "Claude Max 2"
     }
   ],
@@ -114,7 +114,7 @@
     "since": null,
     "holds_gate": false,
     "claude_slot": null,
-    "last_run": "2026-10-07T08:31:40Z",
+    "last_run": "2026-10-07T09:39:38Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null
@@ -129,9 +129,10 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 146,
+      "since": "2026-10-07T11:56:00+02:00",
+      "claude_slot": 6
     },
     {
       "slot": 3,
@@ -155,10 +156,9 @@
     },
     {
       "slot": 6,
-      "state": "dev",
-      "ticket": 181,
-      "since": "2026-10-07T10:43:00+02:00",
-      "claude_slot": 7
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 7,
@@ -243,18 +243,18 @@
     },
     {
       "slot": 6,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 146,
+      "grok_slot": 2,
+      "since": "2026-10-07T11:56:00+02:00",
       "account": 2
     },
     {
       "slot": 7,
-      "state": "busy",
-      "ticket": 181,
-      "grok_slot": 6,
-      "since": "2026-10-07T10:43:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 2
     },
     {
@@ -267,10 +267,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 11:33 CEST",
+    "at": "2026-10-07 11:56 CEST",
     "mode": "refill-dev",
-    "triggers": "#222 #223",
-    "started": "#218->C5/A2",
+    "triggers": "#181",
+    "started": "#146->C6/A2",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
