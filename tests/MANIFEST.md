@@ -39,6 +39,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
 
+### `combos`: 4 files, 21 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/combos/systems/comboCatalogue.test.ts` | 8 | 8 |
+| `src/features/combos/systems/comboRows.test.ts` | 8 | 8 |
+| `src/features/combos/systems/combosEconomy.test.ts` | 2 | 2 |
+| `src/features/combos/visionRows.test.ts` | 3 | 3 |
+
 ### `descriptions`: 4 files, 49 tests
 
 | File | Tests | Sites |
