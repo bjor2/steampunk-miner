@@ -37,7 +37,8 @@ export const slice: SliceDefinition = {
     r.runEvents(POWER_UP_RUN_EVENTS)
     r.reportRows(MARK_REPORT_ROWS)
     r.hudPanel({ id: 'power-up-core.slot-column', slot: 'slots', Panel: SlotColumn })
-    // steampunkDebug.features['power-up-core'].getSlots() / .getCharges(id) / .setCharges(id, n)
+    // steampunkDebug.features['power-up-core'].getSlots() / .getCharges(id) / .setCharges(id, n) /
+    // .holdSlot(slot)
     r.debugActions(powerUpCoreDebugActions)
   },
 }
