@@ -19,6 +19,7 @@ import { PlantedCharges } from './PlantedCharges'
 import { PlatformPlaceholder } from './PlatformPlaceholder'
 import { RenderPipeline } from './RenderPipeline'
 import { ScreenFeedback } from './ScreenFeedback'
+import { ScreenProjectorFeed } from './ScreenProjectorFeed'
 import { SkyBackground } from './SkyBackground'
 import { SoundStage } from './SoundStage'
 import { Sparks } from './Sparks'
@@ -54,6 +55,7 @@ export function GameScene() {
       <PlantedCharges />
       <SoundStage />
       <PerfSampler />
+      <ScreenProjectorFeed />
       <RenderPipeline />
     </Canvas>
   )

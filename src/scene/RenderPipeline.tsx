@@ -8,7 +8,7 @@
  */
 import { useFrame, useThree, type RootState } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
-import { LONG_FRAME_MS, POST_PASSES } from '../constants/scene'
+import { LONG_FRAME_MS, POST_PASSES, RENDER_FRAME_PRIORITY } from '../constants/scene'
 import { useGameStore } from '../store/gameStore'
 import {
   addFrame,
@@ -29,9 +29,6 @@ import {
 import { createPostPipeline } from './postPipeline'
 import { renderPresence } from './renderPresence'
 import { watchRendererInfo } from './rendererMemory'
-
-/** After the scene's own frame work, so the frame is drawn last. */
-const RENDER_PRIORITY = 1
 
 export function RenderPipeline() {
   const gl = useThree((state) => state.gl)
@@ -58,7 +55,7 @@ export function RenderPipeline() {
     pipeline.render(state.gl, state.scene, state.camera)
     recordFrameCost(state)
     adaptToFrame(state, scale, readOutputShortAxis(state, shortAxis), frames, delta)
-  }, RENDER_PRIORITY)
+  }, RENDER_FRAME_PRIORITY)
   return null
 }
 

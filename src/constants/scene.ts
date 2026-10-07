@@ -27,6 +27,13 @@ export const STAGE_MAX_ASPECT = 64 / 27
 /** A whole-number ratio, so the economy scan never mistakes it for a price ratio. */
 export const ZOOM_STEP_FACTOR = 5 / 4
 export const ZOOM_EASE_SECONDS = 0.2
+/**
+ * `useFrame` order (#208): the scene's own frame work at priority 0 moves the camera and the
+ * bodies, then the projector feed publishes the frame about to be drawn, then the pipeline draws
+ * it. A positive priority takes R3F's render over, which the pipeline does anyway.
+ */
+export const PROJECTOR_FRAME_PRIORITY = 1
+export const RENDER_FRAME_PRIORITY = 2
 
 /**
  * At most this many 32 m chunks drawn at the 20 m zoom-out, at any resolution (#38 visible-block
