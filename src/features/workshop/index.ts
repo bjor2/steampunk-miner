@@ -1,0 +1,21 @@
+/**
+ * The workshop slice's public API (docs/standards/feature-slices.md 2.1): the only file another
+ * slice may import from this folder. The Workshop redo of #180 (ticket 177): the hold-to-buy
+ * chain on its client-only curve.
+ */
+export const WORKSHOP_SLICE_ID = 'workshop'
+export {
+  HOLD_CURVE,
+  holdStepTicks,
+  isChainLive,
+  isStepDue,
+  landStep,
+  leaveHoldFocus,
+  pressHoldChain,
+  refuseStep,
+  releaseHoldChain,
+  type ChainEnd,
+  type HoldChain,
+  type HoldCurve,
+  type StepLanding,
+} from './systems/holdChain'
