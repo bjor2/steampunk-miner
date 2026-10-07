@@ -1,0 +1,97 @@
+{
+  "$comment": "The showcase reactions (#180 section 1, Gameplay & Vehicle's table keyed to vehicle-attach ids). A step's moves start at full swing on the tick it lands (the 'moves on the part itself within 4 ticks' rule) and wobble down to rest over the moment: a pip in 15 ticks, the compressed in-chain major in 36, the full moment of a click or a chain ending on its major in 80 (G&V: 72-90), a milestone in 90. The swing of each move, in metres along the car and radians about the part's pivot, and the glow added to it, is a starting value for G&V to tune. faceTurnRadians is the turntable's turn when the track's plaque is selected, eased over turnTicks; the drill turns toward the camera, the cargo away (G&V).",
+  "turnTicks": 20,
+  "momentTicks": { "pip": 15, "compressed": 36, "full": 80, "milestone": 90 },
+  "tracks": {
+    "drill_power": {
+      "attach": "drill.housing",
+      "faceTurnRadians": 0.5,
+      "moves": [
+        {
+          "slots": ["motor-housing", "drill-head"],
+          "wobbles": 3,
+          "pip": { "x": 0.02, "y": 0, "angle": 0, "glow": 0.3 },
+          "major": { "x": 0.05, "y": 0.02, "angle": 0, "glow": 0.9 }
+        },
+        {
+          "slots": ["drill-bit"],
+          "wobbles": 4,
+          "pip": { "x": 0, "y": 0, "angle": 0.18, "glow": 0.6 },
+          "major": { "x": 0, "y": 0, "angle": 0.35, "glow": 1.2 }
+        }
+      ]
+    },
+    "drill_tip": {
+      "attach": "drill.head",
+      "faceTurnRadians": 0.5,
+      "moves": [
+        {
+          "slots": ["drill-bit"],
+          "wobbles": 2,
+          "pip": { "x": 0.015, "y": 0, "angle": 0, "glow": 1 },
+          "major": { "x": 0.04, "y": 0, "angle": 0.12, "glow": 1.6 }
+        }
+      ]
+    },
+    "engine": {
+      "attach": "chassis.drive",
+      "faceTurnRadians": 0,
+      "moves": [
+        {
+          "slots": ["wheel", "wheel-2", "wheel-3", "chassis"],
+          "wobbles": 2,
+          "pip": { "x": 0.04, "y": 0, "angle": 0, "glow": 0.15 },
+          "major": { "x": 0.1, "y": 0.02, "angle": 0, "glow": 0.6 }
+        },
+        {
+          "slots": ["piston"],
+          "wobbles": 4,
+          "pip": { "x": 0, "y": 0.03, "angle": 0, "glow": 0.3 },
+          "major": { "x": 0, "y": 0.06, "angle": 0, "glow": 0.9 }
+        }
+      ]
+    },
+    "boiler": {
+      "attach": "hull.boiler",
+      "faceTurnRadians": -0.3,
+      "moves": [
+        {
+          "slots": ["boiler", "boiler-2"],
+          "wobbles": 3,
+          "pip": { "x": 0, "y": 0.01, "angle": 0, "glow": 0.4 },
+          "major": { "x": 0, "y": 0.03, "angle": 0, "glow": 1 }
+        },
+        {
+          "slots": ["stack", "stack-2"],
+          "wobbles": 3,
+          "pip": { "x": 0, "y": 0.04, "angle": 0.05, "glow": 0.5 },
+          "major": { "x": 0, "y": 0.08, "angle": 0.1, "glow": 1.2 }
+        }
+      ]
+    },
+    "cargo_hold": {
+      "attach": "hull.cargo",
+      "faceTurnRadians": -0.5,
+      "moves": [
+        {
+          "slots": ["hopper"],
+          "wobbles": 2,
+          "pip": { "x": 0, "y": 0.02, "angle": 0.15, "glow": 0.3 },
+          "major": { "x": 0, "y": 0.05, "angle": 0.35, "glow": 0.9 }
+        }
+      ]
+    },
+    "hull": {
+      "attach": "hull.plates",
+      "faceTurnRadians": 0,
+      "moves": [
+        {
+          "slots": ["armour-plate", "armour-plate-2", "armour-plate-3", "chassis"],
+          "wobbles": 5,
+          "pip": { "x": 0, "y": 0.01, "angle": 0, "glow": 0.8 },
+          "major": { "x": 0, "y": 0.04, "angle": 0, "glow": 1.4 }
+        }
+      ]
+    }
+  }
+}

@@ -1,8 +1,48 @@
 {
+  "$comment": "The escalating purchase audio (#180 section 5). Voices: 4 ratchet, 1 flourish (G&V's cap; the kernel's soundCues steals the oldest with its 15 ms fade). The ratchet climbs the major pentatonic per pip and resets at each major; a gap at or under each layerGapTicks entry stacks one more tick, pitched by layerSemitones (unison, octave, twelfth) so the layers stay musical; the steam bed is the ratchet's noise band, its level rising from bedFloorGain to 1 with the gap row the chain is on. The tones are #13 placeholders synthesised by the shell, starting values for G&V.",
   "pentatonicSemitones": [0, 2, 4, 7, 9],
-  "ratchetVoiceCap": 4,
-  "flourishVoiceCap": 1,
-  "stealFadeMs": 15,
-  "ratchetTailTicks": 12,
-  "layerGapTicks": [16, 9]
+  "layerGapTicks": [16, 9],
+  "layerSemitones": [0, 12, 19],
+  "bedFloorGain": 0.55,
+  "flourishSemitones": { "compressed": 0, "full": 0, "milestone": 5 },
+  "cadenceSemitones": { "ka_chunk": 0, "empty_clunk": -7, "reserve_hold": -3, "max_stamp": 5 },
+  "cues": [
+    {
+      "id": "workshop.ratchet",
+      "voices": 4,
+      "tone": {
+        "partials": [
+          { "wave": "square", "frequency": 1320, "gain": 0.07 },
+          { "wave": "triangle", "frequency": 2640, "gain": 0.05 }
+        ],
+        "noise": { "frequency": 3200, "q": 4, "gain": 0.06 },
+        "seconds": 0.2
+      }
+    },
+    {
+      "id": "workshop.flourish",
+      "voices": 1,
+      "tone": {
+        "partials": [
+          { "wave": "sine", "frequency": 1046.5, "gain": 0.12 },
+          { "wave": "sine", "frequency": 1568, "gain": 0.08 },
+          { "wave": "triangle", "frequency": 523.25, "gain": 0.1 }
+        ],
+        "noise": { "frequency": 1800, "q": 2, "gain": 0.1 },
+        "seconds": 1.2
+      }
+    },
+    {
+      "id": "workshop.cadence",
+      "voices": 1,
+      "tone": {
+        "partials": [
+          { "wave": "triangle", "frequency": 110, "gain": 0.25 },
+          { "wave": "square", "frequency": 165, "gain": 0.06 }
+        ],
+        "noise": { "frequency": 500, "q": 1.5, "gain": 0.15 },
+        "seconds": 0.35
+      }
+    }
+  ]
 }

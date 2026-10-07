@@ -1,50 +1,58 @@
 /**
  * The escalating purchase audio (#180 section 5, the Game Director's climb and G&V's voice cap):
- * what each bought step sounds like, and which voices it takes. Pure presentation rules; the
- * slice's sound layer hands the answers to the shell's sound output.
+ * which of the slice's sound cues a landed step or a chain's end plays, at what pitch and level.
+ * Pure presentation rules; the slice's store hands the plays to the kernel's `requestSoundCue`,
+ * and the kernel's sound stage keeps each cue within its voices (`soundCues`, K-b ticket 227).
  *
  * - A ratchet tick climbs a major pentatonic scale, one degree per pip, and resets at each major,
  *   so stacked ticks stay musical.
- * - Layers rise with the chain's speed: one per tick at the slow rows, more as the gaps shrink.
- * - At most `ratchetVoiceCap` ratchet voices sound at once; a new one steals the oldest with a
- *   `stealFadeMs` fade. One flourish voice is kept apart for the major's whistle and clang or a
- *   milestone's chord, and a new flourish replaces it.
- *
- * `ratchetTailTicks` and `layerGapTicks` are starting values for Gameplay & Vehicle to tune.
+ * - Layers rise with the chain's speed: one tick at the slow rows, more as the gaps shrink, each
+ *   layer an octave or a twelfth above. Its steam band swells as the chain climbs the rows.
+ * - A major's moment takes the one flourish voice (whistle and clang); a milestone plays it a
+ *   fourth higher, as the chord. Every stop ends on the cadence, pitched for its cue.
  */
+import type { SoundCue, CueWave } from '../../../../systems/registries/soundCues'
 import PURCHASE_SOUND_FILE from '../../purchaseSound.json'
+import type { ChainStopCue, StepMoment } from '../chainCues'
 
 export interface PurchaseSound {
   /** Semitones of one octave of the major pentatonic scale, from the root. */
   pentatonicSemitones: readonly number[]
-  ratchetVoiceCap: number
-  flourishVoiceCap: number
-  stealFadeMs: number
-  /** How long one ratchet tick rings, in 60 Hz ticks. */
-  ratchetTailTicks: number
   /** Each gap at or under one of these adds a layer to the tick. */
   layerGapTicks: readonly number[]
+  /** The pitch of each layer above the tick's own: the first is the tick itself. */
+  layerSemitones: readonly number[]
+  /** The ratchet's level on the slowest row; it rises to 1 at the cap. */
+  bedFloorGain: number
+  flourishSemitones: Readonly<Record<Exclude<StepMoment, 'pip'>, number>>
+  cadenceSemitones: Readonly<Record<Exclude<ChainStopCue, 'milestone'>, number>>
+  cues: readonly SoundCue[]
 }
 
-export const PURCHASE_SOUND: PurchaseSound = PURCHASE_SOUND_FILE
-
-export interface PurchaseVoice {
-  startTick: number
-  endTick: number
+/** One play of one of the slice's cues, as `requestSoundCue` takes it. */
+export interface CuePlay {
+  cueId: string
+  pitchSemitones: number
+  gain: number
 }
 
-export interface PurchaseVoices {
-  ratchet: readonly PurchaseVoice[]
-  flourish: PurchaseVoice | null
+/** A landed step, as its sound reads it. */
+export interface HeardStep {
+  moment: StepMoment
+  /** The pip the step bought inside its major, 0 for the first. */
+  pip: number
+  /** Ticks since the chain's step before; null for a press or a click. */
+  gapTicks: number | null
+  /** The gap row the chain is on after the step. */
+  onRow: number
+  rowCount: number
 }
 
-export interface RatchetStart {
-  voices: PurchaseVoices
-  /** Ratchet voices cut short (with the steal fade) to keep under the cap. */
-  stolen: number
-}
+export const PURCHASE_SOUND: PurchaseSound = purchaseSoundOf(PURCHASE_SOUND_FILE)
 
-export const SILENT_PURCHASE_VOICES: PurchaseVoices = { ratchet: [], flourish: null }
+export const RATCHET_CUE_ID = 'workshop.ratchet'
+export const FLOURISH_CUE_ID = 'workshop.flourish'
+export const CADENCE_CUE_ID = 'workshop.cadence'
 
 /** The tick's pitch above the root for the pip it bought (0 for the first pip of a major). */
 export function ratchetSemitonesOf(pip: number, sound: PurchaseSound = PURCHASE_SOUND): number {
@@ -52,7 +60,7 @@ export function ratchetSemitonesOf(pip: number, sound: PurchaseSound = PURCHASE_
   return 12 * Math.floor(pip / degrees) + sound.pentatonicSemitones[pip % degrees]
 }
 
-/** How many voices one tick stacks at this gap to the step before; a press has no gap. */
+/** How many ticks one step stacks at this gap to the step before; a press has no gap. */
 export function ratchetLayersOf(
   gapTicks: number | null,
   sound: PurchaseSound = PURCHASE_SOUND,
@@ -66,38 +74,45 @@ export function steamBedLevelOf(onRow: number, rowCount: number): number {
   return (onRow + 1) / rowCount
 }
 
-/** A tick of `layers` voices starts at `tick`; the oldest are stolen past the cap. */
-export function startRatchet(
-  voices: PurchaseVoices,
-  tick: number,
-  layers: number,
+/** What a landed step plays: the ratchet's layers for a pip, the flourish for a big level-up. */
+export function cuePlaysOfStep(step: HeardStep, sound: PurchaseSound = PURCHASE_SOUND): CuePlay[] {
+  if (step.moment !== 'pip') return [flourishPlayOf(step.moment, sound)]
+  return ratchetPlaysOf(step, sound)
+}
+
+/** The cadence a chain ends on; a milestone's flourish already is its end. */
+export function cuePlaysOfStop(
+  cue: ChainStopCue,
   sound: PurchaseSound = PURCHASE_SOUND,
-): RatchetStart {
-  const ringing = voices.ratchet.filter((voice) => voice.endTick > tick)
-  const started = Array.from({ length: layers }, () => ({
-    startTick: tick,
-    endTick: tick + sound.ratchetTailTicks,
+): CuePlay[] {
+  if (cue === 'milestone') return []
+  return [{ cueId: CADENCE_CUE_ID, pitchSemitones: sound.cadenceSemitones[cue], gain: 1 }]
+}
+
+function ratchetPlaysOf(step: HeardStep, sound: PurchaseSound): CuePlay[] {
+  const root = ratchetSemitonesOf(step.pip, sound)
+  const gain = bedGainOf(step, sound)
+  const layers = sound.layerSemitones.slice(0, ratchetLayersOf(step.gapTicks, sound))
+  return layers.map((above) => ({ cueId: RATCHET_CUE_ID, pitchSemitones: root + above, gain }))
+}
+
+function bedGainOf(step: HeardStep, sound: PurchaseSound): number {
+  const level = step.gapTicks === null ? 0 : steamBedLevelOf(step.onRow, step.rowCount)
+  return sound.bedFloorGain + (1 - sound.bedFloorGain) * level
+}
+
+function flourishPlayOf(moment: Exclude<StepMoment, 'pip'>, sound: PurchaseSound): CuePlay {
+  return { cueId: FLOURISH_CUE_ID, pitchSemitones: sound.flourishSemitones[moment], gain: 1 }
+}
+
+/** The JSON's waves are plain strings; the cue registry checks the rest at its seal. */
+function purchaseSoundOf(file: typeof PURCHASE_SOUND_FILE): PurchaseSound {
+  const cues = file.cues.map((cue) => ({
+    ...cue,
+    tone: {
+      ...cue.tone,
+      partials: cue.tone.partials.map((partial) => ({ ...partial, wave: partial.wave as CueWave })),
+    },
   }))
-  const all = [...ringing, ...started]
-  const stolen = Math.max(all.length - sound.ratchetVoiceCap, 0)
-  return { voices: { ...voices, ratchet: all.slice(stolen) }, stolen }
-}
-
-/** The major's or milestone's moment takes the one flourish voice, replacing any before it. */
-export function startFlourish(
-  voices: PurchaseVoices,
-  tick: number,
-  lengthTicks: number,
-): PurchaseVoices {
-  return { ...voices, flourish: { startTick: tick, endTick: tick + lengthTicks } }
-}
-
-/** How many voices of each kind sound at `tick`. */
-export function soundingVoicesAt(
-  voices: PurchaseVoices,
-  tick: number,
-): { ratchet: number; flourish: number } {
-  const isSounding = (voice: PurchaseVoice) => voice.startTick <= tick && tick < voice.endTick
-  const flourish = voices.flourish !== null && isSounding(voices.flourish) ? 1 : 0
-  return { ratchet: voices.ratchet.filter(isSounding).length, flourish }
+  return { ...file, cues }
 }

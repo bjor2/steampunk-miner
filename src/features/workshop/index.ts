@@ -29,16 +29,19 @@ export {
   type ChainPreviewStop,
 } from './systems/chainPreview'
 export {
+  cuePlaysOfStep,
+  cuePlaysOfStop,
   PURCHASE_SOUND,
   ratchetLayersOf,
   ratchetSemitonesOf,
-  SILENT_PURCHASE_VOICES,
-  soundingVoicesAt,
-  startFlourish,
-  startRatchet,
   steamBedLevelOf,
+  type CuePlay,
+  type HeardStep,
   type PurchaseSound,
-  type PurchaseVoice,
-  type PurchaseVoices,
-  type RatchetStart,
 } from './systems/render/purchaseSound'
+export {
+  landingOf,
+  NO_MILESTONES,
+  ownedSwapPartIdsOf,
+  type MilestoneMajor,
+} from './systems/milestoneLandings'

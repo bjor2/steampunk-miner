@@ -1,65 +1,35 @@
 import { describe, expect, it } from 'vitest'
-import { holdStepTicks, type StepLanding } from '../holdChain'
+import { soundCueProblems } from '../../../../systems/registries/soundCues'
 import {
+  CADENCE_CUE_ID,
+  cuePlaysOfStep,
+  cuePlaysOfStop,
+  FLOURISH_CUE_ID,
   PURCHASE_SOUND,
+  RATCHET_CUE_ID,
   ratchetLayersOf,
   ratchetSemitonesOf,
-  SILENT_PURCHASE_VOICES,
-  soundingVoicesAt,
-  startFlourish,
-  startRatchet,
   steamBedLevelOf,
-  type PurchaseVoices,
+  type HeardStep,
 } from './purchaseSound'
 
-/** A major's compressed in-chain moment (#180 section 2). */
-const COMPRESSED_MOMENT_TICKS = 36
+const ROWS = 11
 
-/** A held spree of `count` steps with a major every tenth step, as two-tier tracks give. */
-function spreeLandings(count: number): StepLanding[] {
-  return Array.from({ length: count }, (_, index) => ((index + 1) % 10 === 0 ? 'major' : 'pip'))
-}
-
-/** The most voices of each kind that sound at any step of the spree. */
-function loudestMomentOfSpree(count: number): { ratchet: number; flourish: number } {
-  const landings = spreeLandings(count)
-  const ticks = holdStepTicks(landings, 0)
-  let voices: PurchaseVoices = SILENT_PURCHASE_VOICES
-  const loudest = { ratchet: 0, flourish: 0 }
-  ticks.forEach((tick, index) => {
-    const gap = index === 0 ? null : tick - ticks[index - 1]
-    voices = startRatchet(voices, tick, ratchetLayersOf(gap)).voices
-    if (landings[index] === 'major') voices = startFlourish(voices, tick, COMPRESSED_MOMENT_TICKS)
-    const sounding = soundingVoicesAt(voices, tick)
-    loudest.ratchet = Math.max(loudest.ratchet, sounding.ratchet)
-    loudest.flourish = Math.max(loudest.flourish, sounding.flourish)
-  })
-  return loudest
+function heldPip(pip: number, gapTicks: number | null, onRow = 0): HeardStep {
+  return { moment: 'pip', pip, gapTicks, onRow, rowCount: ROWS }
 }
 
 describe('workshop purchase sound', () => {
-  it('keeps a 50-purchase spree within 4 ratchet voices and 1 flourish', () => {
-    expect(loudestMomentOfSpree(50)).toEqual({
-      ratchet: PURCHASE_SOUND.ratchetVoiceCap,
-      flourish: PURCHASE_SOUND.flourishVoiceCap,
-    })
-    expect(PURCHASE_SOUND.ratchetVoiceCap).toBe(4)
-    expect(PURCHASE_SOUND.flourishVoiceCap).toBe(1)
+  it("caps the ratchet at 4 voices and the flourish at 1, G&V's cap", () => {
+    const voices = Object.fromEntries(PURCHASE_SOUND.cues.map((cue) => [cue.id, cue.voices]))
+
+    expect(voices[RATCHET_CUE_ID]).toBe(4)
+    expect(voices[FLOURISH_CUE_ID]).toBe(1)
+    expect(voices[CADENCE_CUE_ID]).toBe(1)
   })
 
-  it('steals the oldest ratchet voice when a fifth would sound', () => {
-    const four = startRatchet(SILENT_PURCHASE_VOICES, 0, 4).voices
-    const fifth = startRatchet(four, 1, 1)
-
-    expect(fifth.stolen).toBe(1)
-    expect(fifth.voices.ratchet.map((voice) => voice.startTick)).toEqual([0, 0, 0, 1])
-  })
-
-  it('lets a rung-out voice go without stealing', () => {
-    const one = startRatchet(SILENT_PURCHASE_VOICES, 0, 1).voices
-    const later = startRatchet(one, PURCHASE_SOUND.ratchetTailTicks, 4)
-
-    expect(later.stolen).toBe(0)
+  it('registers only cues the sound stage can play', () => {
+    for (const cue of PURCHASE_SOUND.cues) expect(soundCueProblems(cue)).toEqual([])
   })
 
   it('climbs the pentatonic scale one degree per pip', () => {
@@ -75,15 +45,41 @@ describe('workshop purchase sound', () => {
   })
 
   it('raises the steam bed as the chain climbs the rows', () => {
-    expect(steamBedLevelOf(0, 11)).toBeLessThan(steamBedLevelOf(5, 11))
-    expect(steamBedLevelOf(10, 11)).toBe(1)
+    expect(steamBedLevelOf(0, ROWS)).toBeLessThan(steamBedLevelOf(5, ROWS))
+    expect(steamBedLevelOf(10, ROWS)).toBe(1)
   })
 
-  it('gives a new major the one flourish voice', () => {
-    const first = startFlourish(SILENT_PURCHASE_VOICES, 0, COMPRESSED_MOMENT_TICKS)
-    const second = startFlourish(first, 10, COMPRESSED_MOMENT_TICKS)
+  it("plays a pip as the ratchet's layers, an octave and a twelfth above the climb", () => {
+    const plays = cuePlaysOfStep(heldPip(3, 6, 10))
 
-    expect(soundingVoicesAt(second, 10).flourish).toBe(1)
-    expect(second.flourish?.startTick).toBe(10)
+    expect(plays.map((play) => play.cueId)).toEqual([
+      RATCHET_CUE_ID,
+      RATCHET_CUE_ID,
+      RATCHET_CUE_ID,
+    ])
+    expect(plays.map((play) => play.pitchSemitones)).toEqual([7, 19, 26])
+    expect(plays[0].gain).toBe(1)
+  })
+
+  it('plays a click as one quiet tick on the bed floor', () => {
+    expect(cuePlaysOfStep(heldPip(0, null))).toEqual([
+      { cueId: RATCHET_CUE_ID, pitchSemitones: 0, gain: PURCHASE_SOUND.bedFloorGain },
+    ])
+  })
+
+  it('plays a big level-up as the flourish, and a milestone as its higher chord', () => {
+    const major = cuePlaysOfStep({ ...heldPip(9, 6), moment: 'compressed' })
+    const milestone = cuePlaysOfStep({ ...heldPip(9, 6), moment: 'milestone' })
+
+    expect(major).toEqual([{ cueId: FLOURISH_CUE_ID, pitchSemitones: 0, gain: 1 }])
+    expect(milestone[0].pitchSemitones).toBeGreaterThan(major[0].pitchSemitones)
+  })
+
+  it('ends every stop on the cadence, and a milestone on its own flourish', () => {
+    expect(cuePlaysOfStop('ka_chunk')).toEqual([
+      { cueId: CADENCE_CUE_ID, pitchSemitones: 0, gain: 1 },
+    ])
+    expect(cuePlaysOfStop('empty_clunk')[0].pitchSemitones).toBeLessThan(0)
+    expect(cuePlaysOfStop('milestone')).toEqual([])
   })
 })
