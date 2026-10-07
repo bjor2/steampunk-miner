@@ -1,0 +1,516 @@
+{
+  "$comment": "The mounted gear of spec #162 section 5 and its VFX (#166). Every physical item names the attach point the TD locked, its Blender asset and its parts; a moving part carries its folded and deployed pose (a turn in radians about the part's pivot and a shift in metres), which `extractorPose.ts` blends over the G&V deploy timing. Pivots are at each part's own origin and placed at the point's atM: nothing is baked in the vehicle frame. Colours are the cap each folded extractor keeps visible at gameplay zoom (GD, 6 Oct). The fx rows are the power-up effects `powerUpFx.ts` shapes from the #162 section 4 magnitudes: a tile is one metre.",
+  "deploy": { "unfoldTicks": 8, "holdTicks": 30, "foldTicks": 8 },
+  "crateRack": {
+    "assetId": "vehicle-rack-crates",
+    "shelfPartId": "crate-shelf",
+    "columns": 3,
+    "rows": 4,
+    "pitchM": [0.095, 0.08],
+    "firstM": [-0.095, 0.19]
+  },
+  "gauges": { "assetId": "vehicle-cab-gauges", "clusterPartId": "gauge-cluster" },
+  "items": [
+    {
+      "itemId": "rig.resonance",
+      "kind": "extractor",
+      "attach": "drill.fork",
+      "assetId": "vehicle-item-rig-resonance",
+      "capColour": "#5fd3c8",
+      "parts": [
+        { "id": "fork-yoke" },
+        {
+          "id": "fork-prongs",
+          "folded": { "turn": 0, "shift": [-0.11, 0] },
+          "deployed": { "turn": 0, "shift": [0, 0] }
+        }
+      ]
+    },
+    {
+      "itemId": "rig.containment",
+      "kind": "extractor",
+      "attach": "drill.hood",
+      "assetId": "vehicle-item-rig-containment",
+      "capColour": "#9fd6f2",
+      "parts": [
+        { "id": "hood-rail" },
+        {
+          "id": "hood-shell",
+          "folded": { "turn": 1.2, "shift": [0, 0] },
+          "deployed": { "turn": 0, "shift": [0, 0] }
+        }
+      ]
+    },
+    {
+      "itemId": "rig.acid_etcher",
+      "kind": "extractor",
+      "attach": "hull.arm.left",
+      "assetId": "vehicle-item-rig-acid-etcher",
+      "capColour": "#a9d84a",
+      "parts": [
+        { "id": "etcher-shoulder" },
+        {
+          "id": "etcher-arm",
+          "folded": { "turn": 0, "shift": [0, 0] },
+          "deployed": { "turn": 2.3, "shift": [0, 0] }
+        }
+      ]
+    },
+    {
+      "itemId": "rig.induction",
+      "kind": "extractor",
+      "attach": "hull.front",
+      "assetId": "vehicle-item-rig-induction",
+      "capColour": "#7f8df2",
+      "parts": [
+        { "id": "coil-mount" },
+        {
+          "id": "coil-ring",
+          "folded": { "turn": 1.5, "shift": [0, 0] },
+          "deployed": { "turn": 0, "shift": [0, 0] }
+        }
+      ]
+    },
+    {
+      "itemId": "rig.aether_tether",
+      "kind": "extractor",
+      "attach": "hull.roof.mid",
+      "assetId": "vehicle-item-rig-aether-tether",
+      "capColour": "#d3b4f0",
+      "parts": [
+        { "id": "tether-reel" },
+        {
+          "id": "tether-harpoon",
+          "folded": { "turn": 0, "shift": [0, 0] },
+          "deployed": { "turn": 1.05, "shift": [0, 0] }
+        }
+      ]
+    },
+    {
+      "itemId": "gear.vibratory_bit",
+      "kind": "head",
+      "attach": "drill.head",
+      "assetId": "vehicle-item-gear-vibratory-bit",
+      "parts": [{ "id": "vibratory-bit" }]
+    },
+    {
+      "itemId": "gear.thaw_crown",
+      "kind": "head",
+      "attach": "drill.head",
+      "assetId": "vehicle-item-gear-thaw-crown",
+      "parts": [{ "id": "thaw-crown" }]
+    },
+    {
+      "itemId": "gear.twin_bit",
+      "kind": "head",
+      "attach": "drill.head",
+      "assetId": "vehicle-item-gear-twin-bit",
+      "parts": [{ "id": "twin-bit" }]
+    },
+    {
+      "itemId": "gear.dielectric_bit",
+      "kind": "head",
+      "attach": "drill.head",
+      "assetId": "vehicle-item-gear-dielectric-bit",
+      "parts": [{ "id": "dielectric-bit" }]
+    },
+    {
+      "itemId": "gear.spoil_auger",
+      "kind": "collar",
+      "attach": "drill.collar",
+      "assetId": "vehicle-item-gear-spoil-auger",
+      "parts": [{ "id": "auger-collar" }, { "id": "auger-screw" }]
+    },
+    {
+      "itemId": "gear.sampling_corer",
+      "kind": "collar",
+      "attach": "drill.collar",
+      "assetId": "vehicle-item-gear-sampling-corer",
+      "parts": [
+        { "id": "corer-collar" },
+        {
+          "id": "corer-tube",
+          "folded": { "turn": 0, "shift": [0, 0] },
+          "deployed": { "turn": 0, "shift": [0.22, 0] }
+        }
+      ]
+    },
+    {
+      "itemId": "gear.reach_boom",
+      "kind": "collar",
+      "attach": "drill.collar",
+      "assetId": "vehicle-item-gear-reach-boom",
+      "parts": [
+        { "id": "boom-collar" },
+        {
+          "id": "boom-sleeve",
+          "folded": { "turn": 0, "shift": [0, 0] },
+          "deployed": { "turn": 0, "shift": [0.18, 0] }
+        }
+      ]
+    },
+    {
+      "itemId": "gear.side_cutters",
+      "kind": "flank",
+      "attach": "drill.flank",
+      "assetId": "vehicle-item-gear-side-cutters",
+      "mirrored": true,
+      "parts": [
+        { "id": "cutter-bracket" },
+        {
+          "id": "cutter-arm",
+          "folded": { "turn": -0.9, "shift": [0, 0] },
+          "deployed": { "turn": 0, "shift": [0, 0] }
+        }
+      ]
+    },
+    {
+      "itemId": "power.grapple_winch",
+      "kind": "signature",
+      "attach": "hull.arm.right",
+      "assetId": "vehicle-item-power-grapple-winch",
+      "parts": [{ "id": "winch-drum" }, { "id": "winch-hook" }]
+    },
+    {
+      "itemId": "power.echo_sounder",
+      "kind": "signature",
+      "attach": "hull.roof.aft",
+      "assetId": "vehicle-item-power-echo-sounder",
+      "parts": [{ "id": "sounder-hammer" }, { "id": "sounder-horn" }]
+    },
+    {
+      "itemId": "passive.threat_periscope",
+      "kind": "passive",
+      "attach": "hull.roof.fore",
+      "assetId": "vehicle-item-passive-threat-periscope",
+      "parts": [{ "id": "periscope-mast" }, { "id": "periscope-head" }]
+    },
+    {
+      "itemId": "passive.assay_lens",
+      "kind": "gauge",
+      "attach": "cab.gauge",
+      "assetId": "vehicle-cab-gauges",
+      "parts": [{ "id": "gauge-cluster" }, { "id": "dial-assay-lens" }]
+    },
+    {
+      "itemId": "passive.hazard_barometer",
+      "kind": "gauge",
+      "attach": "cab.gauge",
+      "assetId": "vehicle-cab-gauges",
+      "parts": [{ "id": "gauge-cluster" }, { "id": "dial-hazard-barometer" }]
+    },
+    {
+      "itemId": "power.mineral_drain",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-mineral-drain",
+      "parts": [{ "id": "drain-housing" }]
+    },
+    {
+      "itemId": "power.slurry_siphon",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-slurry-siphon",
+      "parts": [{ "id": "siphon-housing" }]
+    },
+    {
+      "itemId": "power.ore_shifter",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-ore-shifter",
+      "parts": [{ "id": "shifter-housing" }]
+    },
+    {
+      "itemId": "power.pressure_pocket",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-pressure-pocket",
+      "parts": [{ "id": "lance-housing" }]
+    },
+    {
+      "itemId": "power.strata_press",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-strata-press",
+      "parts": [{ "id": "press-housing" }]
+    },
+    {
+      "itemId": "power.galvanic_probe",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-galvanic-probe",
+      "parts": [{ "id": "probe-housing" }]
+    },
+    {
+      "itemId": "power.void_sounder",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-void-sounder",
+      "parts": [{ "id": "void-horn-housing" }]
+    },
+    {
+      "itemId": "power.steam_boost",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-steam-boost",
+      "parts": [{ "id": "boost-housing" }]
+    },
+    {
+      "itemId": "power.steam_shield",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-steam-shield",
+      "parts": [{ "id": "shield-housing" }]
+    },
+    {
+      "itemId": "power.grav_anchor",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-grav-anchor",
+      "parts": [{ "id": "anchor-housing" }]
+    },
+    {
+      "itemId": "power.buoyancy_tanks",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-buoyancy-tanks",
+      "parts": [{ "id": "bladder-housing" }]
+    },
+    {
+      "itemId": "consumable.flare_mortar",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-flare-mortar" }, { "id": "mortar-tube" }]
+    },
+    {
+      "itemId": "consumable.stabiliser_foam",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-stabiliser-foam" }]
+    },
+    {
+      "itemId": "consumable.seam_splitter",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-seam-splitter" }]
+    },
+    {
+      "itemId": "consumable.cryo_binder",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-cryo-binder" }]
+    },
+    {
+      "itemId": "consumable.lodestone_beacon",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-lodestone-beacon" }]
+    },
+    {
+      "itemId": "consumable.shoring_props",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-shoring-props" }]
+    },
+    {
+      "itemId": "consumable.signal_buoy",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-signal-buoy" }]
+    },
+    {
+      "itemId": "consumable.emergency_ballast",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-emergency-ballast" }]
+    },
+    {
+      "itemId": "consumable.heat_sink_flask",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-heat-sink-flask" }]
+    },
+    {
+      "itemId": "consumable.rivet_patch",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-rivet-patch" }]
+    },
+    {
+      "itemId": "consumable.smoke_canister",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-smoke-canister" }]
+    },
+    {
+      "itemId": "consumable.escape_thruster",
+      "kind": "crate",
+      "attach": "hull.rear",
+      "assetId": "vehicle-rack-crates",
+      "parts": [{ "id": "crate-shelf" }, { "id": "crate-escape-thruster" }]
+    }
+  ],
+  "fx": [
+    {
+      "id": "drain-brine-lines",
+      "itemId": "power.mineral_drain",
+      "kind": "stream",
+      "ticks": 60,
+      "sweepTicks": 60,
+      "reachTiles": 3,
+      "strands": 6,
+      "colour": "#5fd3c8"
+    },
+    {
+      "id": "siphon-stream",
+      "itemId": "power.slurry_siphon",
+      "kind": "stream",
+      "ticks": 45,
+      "sweepTicks": 12,
+      "reachTiles": 5,
+      "strands": 1,
+      "colour": "#8fb6a8"
+    },
+    {
+      "id": "shifter-drag",
+      "itemId": "power.ore_shifter",
+      "kind": "drag",
+      "ticks": 45,
+      "sweepTicks": 45,
+      "reachTiles": 6,
+      "strands": 8,
+      "colour": "#7f8df2"
+    },
+    {
+      "id": "lodestone-gather",
+      "itemId": "consumable.lodestone_beacon",
+      "kind": "gather",
+      "ticks": 90,
+      "sweepTicks": 90,
+      "reachTiles": 10,
+      "strands": 12,
+      "colour": "#7f8df2"
+    },
+    {
+      "id": "induction-free",
+      "itemId": "rig.induction",
+      "kind": "free",
+      "ticks": 24,
+      "sweepTicks": 18,
+      "reachTiles": 3,
+      "strands": 1,
+      "colour": "#7f8df2"
+    },
+    {
+      "id": "sounder-ring",
+      "itemId": "power.echo_sounder",
+      "kind": "ring",
+      "ticks": 600,
+      "sweepTicks": 36,
+      "reachTiles": 12,
+      "strands": 1,
+      "colour": "#e8d9a0"
+    },
+    {
+      "id": "void-sounder-ring",
+      "itemId": "power.void_sounder",
+      "kind": "ring",
+      "ticks": 900,
+      "sweepTicks": 48,
+      "reachTiles": 16,
+      "strands": 1,
+      "colour": "#e8d9a0"
+    },
+    {
+      "id": "galvanic-field",
+      "itemId": "power.galvanic_probe",
+      "kind": "ring",
+      "ticks": 600,
+      "sweepTicks": 36,
+      "reachTiles": 12,
+      "strands": 1,
+      "colour": "#b9a8ff"
+    },
+    {
+      "id": "seismic-cone",
+      "itemId": "artefact.seismic_ping",
+      "kind": "cone",
+      "ticks": 600,
+      "sweepTicks": 36,
+      "reachTiles": 12,
+      "strands": 1,
+      "colour": "#e8d9a0"
+    },
+    {
+      "id": "foam-cone",
+      "itemId": "consumable.stabiliser_foam",
+      "kind": "cone",
+      "ticks": 30,
+      "sweepTicks": 18,
+      "reachTiles": 4,
+      "strands": 16,
+      "colour": "#e6e2d8"
+    },
+    {
+      "id": "flare-burn",
+      "itemId": "consumable.flare_mortar",
+      "kind": "burn",
+      "ticks": 300,
+      "sweepTicks": 30,
+      "reachTiles": 30,
+      "strands": 1,
+      "colour": "#fff1c2"
+    },
+    {
+      "id": "shield-curtain",
+      "itemId": "power.steam_shield",
+      "kind": "curtain",
+      "ticks": 120,
+      "sweepTicks": 6,
+      "reachTiles": 1,
+      "strands": 24,
+      "colour": "#f2efe6"
+    },
+    {
+      "id": "boost-plume",
+      "itemId": "power.steam_boost",
+      "kind": "plume",
+      "ticks": 30,
+      "sweepTicks": 8,
+      "reachTiles": 3,
+      "strands": 20,
+      "colour": "#f2efe6"
+    },
+    {
+      "id": "grapple-line",
+      "itemId": "artefact.grapple_anchor",
+      "kind": "line",
+      "ticks": 1,
+      "sweepTicks": 1,
+      "reachTiles": 8,
+      "strands": 1,
+      "colour": "#c9a24b"
+    },
+    {
+      "id": "salvage-plate",
+      "itemId": "artefact.salvage_magnet",
+      "kind": "plate",
+      "ticks": 1,
+      "sweepTicks": 1,
+      "reachTiles": 6,
+      "strands": 8,
+      "colour": "#7f8df2"
+    }
+  ]
+}
