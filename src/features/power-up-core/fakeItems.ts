@@ -19,7 +19,13 @@ import {
 import { FACING, type Facing } from '../../systems/vehicle/vehiclePose'
 import { slice } from './register'
 import type { VehicleItem } from '../../systems/registries/vehicleLoadout'
-import type { PowerUp, PowerUpClass, PowerUpOutcome, PowerUpUse } from './systems/powerUpKind'
+import type {
+  PowerUp,
+  PowerUpClass,
+  PowerUpOutcome,
+  PowerUpUse,
+  SlotHold,
+} from './systems/powerUpKind'
 import { POWER_UP_SLOTS } from './systems/powerUpSlots'
 
 export const FAKE = {
@@ -36,6 +42,9 @@ export const FAKE_DRAW_PER_MILLE = 15
 
 /** The cell a downward-facing fake aims at is a tier-9 drill gate. */
 export const FAKE_GATE = { cellTier: 9, gateKind: 'drill_tier' } as const
+
+/** The fake consumable's hold, on the clock alone: the slot ring fills over these ticks. */
+export const FAKE_HOLD: Readonly<SlotHold> = { startTick: 100, finishTick: 190 }
 
 /** Why an upward-facing fake is refused: nothing above it to act on. */
 export const FAKE_REFUSAL = 'fake-items.nothing_above'
@@ -116,7 +125,12 @@ function fakePowerUpOf(itemId: string): PowerUp {
     name: itemId,
     ...FAKE_NUMBERS[itemId],
     activate: payOneCoinUnlessFacingDown,
+    ...(itemId === FAKE.consumable ? { holdOf: fakeHoldAt } : {}),
   }
+}
+
+function fakeHoldAt(state: AuthorityState): SlotHold | null {
+  return state.tick >= FAKE_HOLD.startTick && state.tick < FAKE_HOLD.finishTick ? FAKE_HOLD : null
 }
 
 function payOneCoinUnlessFacingDown(state: AuthorityState, use: PowerUpUse): PowerUpOutcome {

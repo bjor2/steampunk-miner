@@ -14,6 +14,7 @@ export {
   type PowerUpClass,
   type PowerUpOutcome,
   type PowerUpUse,
+  type SlotHold,
 } from './systems/powerUpKind'
 export { chargesLeftOf } from './systems/chargeState'
 export { returnCharge } from './systems/useResolution'

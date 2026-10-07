@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FAKE, inField } from '../fakeItems'
+import { FAKE, FAKE_HOLD, inField } from '../fakeItems'
 import { slotButtonsOf } from './slotColumn'
 import { intentToUseSlot } from './slotUse'
 
@@ -50,6 +50,30 @@ describe('power-up slot column', () => {
       })
       session.advanceTo(46)
       expect(slotButtonsOf(session.state(), 'p1')[0].cooldownPercent).toBe(0)
+    })
+  })
+
+  it("fills the hold ring with the share of the item's hold already held (253)", () => {
+    inField(
+      (session) => {
+        const holdPercentAt = (tick: number) => {
+          session.advanceTo(tick)
+          return slotButtonsOf(session.state(), 'p1')[0].holdPercent
+        }
+        expect(holdPercentAt(FAKE_HOLD.startTick - 1)).toBe(0)
+        expect(holdPercentAt(FAKE_HOLD.startTick)).toBe(0)
+        expect(holdPercentAt(FAKE_HOLD.startTick + 45)).toBe(50)
+        expect(holdPercentAt(FAKE_HOLD.finishTick - 1)).toBe(98)
+        expect(holdPercentAt(FAKE_HOLD.finishTick)).toBe(0)
+      },
+      { slots: { 'powerup.1': FAKE.consumable } },
+    )
+  })
+
+  it('leaves the hold ring empty for an item that keeps no hold', () => {
+    inField((session) => {
+      session.advanceTo(FAKE_HOLD.startTick + 45)
+      expect(slotButtonsOf(session.state(), 'p1')[0].holdPercent).toBe(0)
     })
   })
 })

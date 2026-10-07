@@ -54,6 +54,20 @@
   border-color: var(--color-teal);
 }
 
+/*
+ * The hold ring sits just outside the rim and fills clockwise with `--hold`, the share already
+ * held (ticket 253). No transition: when the hold is cancelled it snaps back at once.
+ */
+.button[data-holding]::after {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: conic-gradient(var(--color-teal) var(--hold, 0%), transparent 0);
+  content: '';
+  mask: radial-gradient(circle, transparent 63%, #000 64%);
+  pointer-events: none;
+}
+
 /* Pips sit on the rim's lower arc; a spent one is hollow, so it reads in grayscale. */
 .pips {
   position: absolute;

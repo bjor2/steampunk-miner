@@ -1,7 +1,9 @@
 /**
  * One slot button (#162 section 2.3, G&V feel pass A4): a 56 px round target with the item's
  * 32 px glyph, a pip per charge around the rim and a sweeping cooldown ring, readable in
- * grayscale (#158). A tap uses the slot; a hold shows the item's card instead.
+ * grayscale (#158). While the item's hold runs, a ring outside the rim fills with it and snaps
+ * back when the hold ends (G&V on #204, ticket 253). A tap uses the slot; a hold shows the item's
+ * card instead.
  */
 import type { CSSProperties } from 'react'
 import { ItemCard } from '../../../ui/kit/ItemCard'
@@ -13,18 +15,22 @@ import { useSlotHold } from './useSlotHold'
 
 export function SlotButtonView({ button }: { button: SlotButton }) {
   const hold = useSlotHold(button.action)
-  const ring = { '--cooldown': `${button.cooldownPercent}%` } as CSSProperties
+  const rings = {
+    '--cooldown': `${button.cooldownPercent}%`,
+    '--hold': `${button.holdPercent}%`,
+  } as CSSProperties
   return (
     <div className={styles.slot}>
       {/* Touch only: the keyboard has Digit1-5 themselves, so Tab never stops here. */}
       <button
         type="button"
         className={styles.button}
-        style={ring}
+        style={rings}
         data-testid={`power-up-slot-${button.slot}`}
         data-acting={button.isActing || undefined}
         data-on={button.isOn || undefined}
         data-cooling={button.cooldownPercent > 0 || undefined}
+        data-holding={button.holdPercent > 0 || undefined}
         aria-label={button.name}
         tabIndex={-1}
         onPointerDown={hold.press}

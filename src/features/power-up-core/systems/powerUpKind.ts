@@ -56,6 +56,15 @@ export type PowerUpOutcome =
   | { kind: 'blocked'; block: GateBlock }
   | { kind: 'refused'; reason: string }
 
+/**
+ * A hold the item's slice keeps after the act, such as the rivet patch's 90 ticks standing still
+ * (G&V on #204, ticket 253): the slot's ring fills from `startTick` to `finishTick`.
+ */
+export interface SlotHold {
+  startTick: number
+  finishTick: number
+}
+
 export interface PowerUp extends ContentEntry {
   /** `<slice>.<name>`: the registering slice's id for this entry. */
   id: string
@@ -80,6 +89,8 @@ export interface PowerUp extends ContentEntry {
   energyDrawPerMillePerSecond: number
   /** Called when the wind-up or channel ends; for a toggle, only when it turns on. */
   activate(state: AuthorityState, use: PowerUpUse): PowerUpOutcome
+  /** The player's hold running now, read from the slice's section; absent for an item with none. */
+  holdOf?(state: AuthorityState, playerId: string): SlotHold | null
 }
 
 declare module '../../../systems/registries/content' {
