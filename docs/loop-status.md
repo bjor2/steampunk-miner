@@ -32,6 +32,12 @@ Each card expands to the issue's parent, blockers, created/updated/closed times,
 claim time from the published `slots.json` or the loop event log, else when `in-progress` was
 applied. The rule lives in `scripts/status/issueBuckets.mjs`, which the page imports as is.
 
+Parents close themselves: on every pass the build loop closes any open issue labelled `build`,
+`wayfinder:map`, `wayfinder:task`, `perf` or `design` (build plans, wayfinder maps, specs, perf
+plans) once its `sub_issues_summary` has `total > 0` and `completed == total`, with a comment saying
+all sub-issues are closed. Root map #1 follows the same strict rule. So a parent leaves the Open
+list as soon as its last child closes.
+
 ## Performance tab
 
 **https://bjor2.github.io/steampunk-miner/status/#performance** shows the budget verdicts (latest value,
