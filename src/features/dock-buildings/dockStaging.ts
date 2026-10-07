@@ -1,11 +1,14 @@
 /**
- * The slice's staging provider (#170 auto-roll): the Works' two attach points, read once from the
- * shipped art through the kernel `building-attach` ids, bound into the pure roll.
+ * The slice's one staging provider: the Workshop auto-roll (#170) while docked at the Works, else
+ * the unlock pan (#222) while one runs. The roll reads the Works' two attach points once from the
+ * shipped art through the kernel `building-attach` ids; the pan reads the slice's own store.
  */
 import { SHIPPED_ART } from '../../scene/shippedArt'
 import { shopBuildingAttachPointOf } from '../../systems/art/shopBuildingArt'
 import type { BuildingAttachUse } from '../../systems/registries/buildingAttach'
 import type { VehicleStagingProvider } from '../../systems/registries/vehicleStaging'
+import { shownUnlockPan } from './store/unlockPanStore'
+import { dockUnlockPanStagingOf } from './systems/render/dockUnlockPan'
 import { workshopStagingOf, type WorkshopRollPoints } from './systems/render/workshopStaging'
 
 /** The uses this slice makes of the Works' attach points. */
@@ -14,11 +17,12 @@ export const WORKSHOP_ROLL_ATTACH_USES: readonly BuildingAttachUse[] = [
   { id: 'dock-buildings.showcase-camera', attach: 'workshop.showcase_cam' },
 ]
 
-export function createWorkshopRoll(): VehicleStagingProvider {
+export function createDockStaging(): VehicleStagingProvider {
   const points = workshopRollPoints()
   return {
-    id: 'dock-buildings.workshop-roll',
-    stagingOf: (state, playerId) => workshopStagingOf(state, playerId, points),
+    id: 'dock-buildings.dock-staging',
+    stagingOf: (state, playerId) =>
+      workshopStagingOf(state, playerId, points) ?? dockUnlockPanStagingOf(state, shownUnlockPan()),
   }
 }
 

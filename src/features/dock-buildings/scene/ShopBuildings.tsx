@@ -4,17 +4,15 @@
  * vehicle and the yard. No colliders: the pad is the only solid. The pad moves only with the
  * planet, so this renders through React on travel, never per frame.
  */
-import { readPlanetWorld, useGameStore } from '../../../store/gameStore'
+import { useGameStore } from '../../../store/gameStore'
 import { PartQuadMesh } from '../../../scene/PartQuadMesh'
 import { SHIPPED_ART } from '../../../scene/shippedArt'
 import { SHOP_BUILDING_BAY_IDS, shopBuildingAssetIdOf } from '../../../systems/art/artIds'
 import { assetQuadsOf, atlasMapsOf } from '../../../systems/art/assetLook'
 import type { ShopBuildingBayId } from '../../../systems/art/shopBuildingArt'
 import { bayCentreColumnOf } from '../../../systems/world/dockBays'
-import { dockSiteOf, type DockSite } from '../../../systems/world/dockSite'
-
-/** Behind the Refinery bay (0.015) and the yard (0.02); the turntable part sits one step up. */
-const BUILDING_Z = 0.005
+import type { DockSite } from '../../../systems/world/dockSite'
+import { BUILDING_Z, siteOfPlanet } from './padSite'
 
 const BUILDINGS = SHOP_BUILDING_BAY_IDS.map((bay) => ({
   bay,
@@ -49,10 +47,4 @@ function ShopBuilding({
       ))}
     </group>
   )
-}
-
-/** The pad moves only with the planet; read on a render, never per frame. */
-function siteOfPlanet(): DockSite | null {
-  const { params } = readPlanetWorld()
-  return params === null ? null : dockSiteOf(params)
 }

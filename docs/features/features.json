@@ -745,22 +745,22 @@
             },
             {
               "title": "Scanner station",
-              "description": "Reveals what lies underground. Its mast on the Assay & Exchange is modelled; the station itself is not built.",
-              "status": "planned",
+              "description": "Reveals what lies underground. From planet 14 its mast stands on the Assay & Exchange and the camera pans to it on first landing; the scanning itself is not built.",
+              "status": "partial",
               "issues": [80, 197, 221, 222],
               "planet": 14
             },
             {
               "title": "Drone bay",
-              "description": "Hauler drones that ferry cargo. Its hangar on the Works' roof is modelled; the drones are not built.",
-              "status": "planned",
+              "description": "Hauler drones that ferry cargo. From planet 20 its hangar stands on the Works' roof and the camera pans to it on first landing; the drones are not built.",
+              "status": "partial",
               "issues": [80, 197, 221, 222],
               "planet": 20
             },
             {
               "title": "Research lab",
-              "description": "Research to unlock new technology, from the annex behind the Works (modelled; the lab's research is not built).",
-              "status": "planned",
+              "description": "Research to unlock new technology. From planet 15 its annex stands behind the Works and the camera pans to it on first landing; the lab's research is not built.",
+              "status": "partial",
               "issues": [80, 197, 221, 222, 206],
               "planet": 15
             },
