@@ -9,6 +9,8 @@ final balance. Nothing here is game code.
 - `economy-constants.json`: the constants from the decision, as decimal strings and integers.
 - `planet-table.md`, `vehicle-table.md`, `price-table.md`, `enemy-table.md`: one row per planet.
 - `tools/gen.py` regenerates the tables from the constants. `tools/sim.py` is the pacing simulation.
+- `pace-baseline.md`: the pacing bot's core minutes on planets 1 to 10 with ore leads (#146), the
+  P3–P10 reference for later tickets.
 
 The game reads its constants from `src/systems/economy/economy.json`; the pure formulas in
 `src/systems/economy/` render these four tables again, and `economyTables.test.ts` compares them cell
