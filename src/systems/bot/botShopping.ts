@@ -19,6 +19,9 @@
  * is offered for the fewest next steps, up to its next major, that raise the planned money, priced
  * together and paid for whole; the bot buys their first step and weighs the offers again.
  *
+ * From planet 8 on, every track buy also leaves #180's service reserve and one rescue fee (#198,
+ * `botWallet.ts`); the casing, lining, guns and charges keep only the next service, as before.
+ *
  * Every buy is a click unless the run's chain policy holds (`botChains.ts`, ticket 226): then the
  * steps bought in a row on one track are one held chain, and a refused held step ends the buying.
  */
@@ -40,7 +43,7 @@ import { liningUnlockFor } from './botHeat'
 import type { BotSession } from './botSession'
 import { wouldAccept } from './botDryRun'
 import { buySlicePurchases, nextSlicePurchase } from './botSlicePurchases'
-import { canPay, walletOf } from './botWallet'
+import { canPay, canPayForBrass, walletOf } from './botWallet'
 import type { ShopSpend } from './shopSpend'
 import type { MineLayout } from './mineLayout'
 import { bestOrePlan, fullTankMeans } from './tripEstimate'
@@ -229,7 +232,7 @@ function marginalOfferOf(
     const after = { ...levels, [track]: levels[track] + steps }
     const gain = sub(plannedMoneyPerTick(layout, after), now)
     if (cmp(gain, ZERO_MONEY) > 0) {
-      return canPay(session, price) ? { track, gainPerPrice: div(gain, price) } : null
+      return canPayForBrass(session, price) ? { track, gainPerPrice: div(gain, price) } : null
     }
   }
   return null
@@ -246,7 +249,7 @@ function canAffordToNextMajor(session: BotSession, track: UpgradeId): boolean {
   for (let at = step; at < step + stepsToNextMajor(step); at++) {
     price = add(price, stepPrice(track, at, planetIndex))
   }
-  return canPay(session, price)
+  return canPayForBrass(session, price)
 }
 
 /** On a tie the earlier track keeps it, in `MARGINAL_TRACKS` order. */
@@ -270,7 +273,7 @@ function priceOf(session: BotSession, track: UpgradeId) {
 }
 
 function canAfford(session: BotSession, track: UpgradeId): boolean {
-  return canPay(session, priceOf(session, track))
+  return canPayForBrass(session, priceOf(session, track))
 }
 
 function canAffordCasing(session: BotSession): boolean {
