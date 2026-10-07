@@ -605,6 +605,12 @@
               "description": "Shows the visit's lining bill, what it paid and what leaving will forgive.",
               "status": "built",
               "issues": [128]
+            },
+            {
+              "title": "Sell burst",
+              "description": "Selling throws the ore up into the Exchange and bursts coins out of its stack that fly to the money counter, which rolls as they land; a big sale lights a gold flare, and a paid lining bill peels coins off to a 'Lining −X' tag. Placeholder quads and synthesised sounds until the final sprite sheets.",
+              "status": "partial",
+              "issues": [171, 176, 214]
             }
           ]
         },
