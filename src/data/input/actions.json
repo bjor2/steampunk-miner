@@ -135,6 +135,41 @@
       "contexts": ["vehicle"],
       "kind": "press",
       "keyboard": ["Escape"]
+    },
+    {
+      "id": "use_slot_1",
+      "displayName": "Use slot 1",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["Digit1"]
+    },
+    {
+      "id": "use_slot_2",
+      "displayName": "Use slot 2",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["Digit2"]
+    },
+    {
+      "id": "use_slot_3",
+      "displayName": "Use slot 3",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["Digit3"]
+    },
+    {
+      "id": "use_slot_4",
+      "displayName": "Use slot 4",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["Digit4"]
+    },
+    {
+      "id": "use_slot_5",
+      "displayName": "Use slot 5",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["Digit5"]
     }
   ]
 }

@@ -12,8 +12,12 @@
  * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
  * still move, the guns' toggle with no guns mounted (#107) and a charge the authority would not
  * plant (#109: none carried, one live, no wall ahead) do nothing and are not buffered.
+ *
+ * An action with no rule here in the top layer asks the slices' input reactions (#217): the
+ * power-up slots' `use_slot_N` submit the slice's use command, or do nothing on an empty slot.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
+import type { AuthorityState } from '../authority/authorityState'
 import { openArtefactCacheCommand } from '../artefacts/artefactCommands'
 import { isShopBay } from '../authority/dockRules'
 import { dockCommand, quickServiceCommand, undockCommand } from '../platform/platformCommands'
@@ -23,6 +27,7 @@ import {
   setGunModeCommand,
 } from '../vehicle/vehicleCommands'
 import { toggledGunMode, type GunMode } from '../vehicle/vehicleGun'
+import { sliceIntentOfPress } from '../registries/inputReactions'
 import type { ZoomChange } from '../render/viewZoom'
 import type { VehicleMode } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
@@ -53,6 +58,9 @@ export interface InputSituation {
   gunMode: GunMode | null
   /** `plantRefusal` is null (#109): `plant_charge` plants exactly then. */
   canPlantCharge: boolean
+  /** The authority replica and the local player, for the slices' input reactions (#217). */
+  state: AuthorityState
+  playerId: string
 }
 
 /** The overlays that sit above the vehicle or platform layer when open. */
@@ -109,7 +117,8 @@ const REACTIONS_BY_LAYER: Readonly<
 }
 
 export function reactionToPress(action: ActionId, situation: InputSituation): InputReaction {
-  return REACTIONS_BY_LAYER[situation.layer][action]?.(situation) ?? NONE
+  const kernelRule = REACTIONS_BY_LAYER[situation.layer][action]
+  return kernelRule === undefined ? sliceReactionToPress(action, situation) : kernelRule(situation)
 }
 
 /** The layer input goes to: settings, the cache's cards, a slice screen, else the dock screen. */
@@ -118,6 +127,11 @@ export function topLayerOf(vehicleMode: VehicleMode, overlays: OpenOverlays): In
   if (overlays.isArtefactChoiceOpen) return 'artefact'
   if (overlays.openScreenId !== null) return 'screen'
   return vehicleMode === 'docked' ? 'platform' : 'vehicle'
+}
+
+function sliceReactionToPress(action: ActionId, situation: InputSituation): InputReaction {
+  const intent = sliceIntentOfPress(action, situation)
+  return intent === null ? NONE : submit(intent)
 }
 
 /** The cache and the pad are far apart, so at most one of the two applies. */

@@ -43,6 +43,12 @@ export const ACTION_IDS = [
   'zoom_out',
   'zoom_reset',
   'open_settings',
+  // The power-up slots (#162, #217): only the slices' input reactions answer them.
+  'use_slot_1',
+  'use_slot_2',
+  'use_slot_3',
+  'use_slot_4',
+  'use_slot_5',
 ] as const
 
 export type ActionId = (typeof ACTION_IDS)[number]

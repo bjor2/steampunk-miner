@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemorySink } from '../logging/eventSink'
+import { withRegistrations } from '../registries/registrar'
+import type { SliceDefinition } from '../registries/sliceDefinition'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import type { KeyChange } from '../shell/shell'
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
@@ -457,5 +459,46 @@ describe('preferences: settings and rebinding stay local', () => {
     expect(game().bindingProblems).toEqual([])
     expect(warn).toHaveBeenCalledTimes(1)
     warn.mockRestore()
+  })
+})
+
+// A slice answers the power-up slot keys through an input reaction (#217); a fake slice registers
+// one through withRegistrations, so no real slice is imported. Slot 1 is filled, slot 2 empty.
+const SLOT_PROBE: SliceDefinition = {
+  id: 'slot-probe',
+  register: (r) => {
+    r.inputReaction({
+      id: 'slot-probe.use_1',
+      actionId: 'use_slot_1',
+      contexts: ['vehicle'],
+      toIntent: () => ({ type: 'requestRescue', payload: {} }),
+    })
+    r.inputReaction({
+      id: 'slot-probe.use_2',
+      actionId: 'use_slot_2',
+      contexts: ['vehicle'],
+      toIntent: () => null,
+    })
+  },
+}
+
+describe('input runtime: power-up slot keys', () => {
+  it('submits one use on the first Digit1 press of a filled slot, with no confirm', () => {
+    const types = withRegistrations([SLOT_PROBE], () =>
+      submittedDuring(() => {
+        routeKeyChange(key('Digit1', true))
+        routeKeyChange(key('Digit1', false))
+      }),
+    )
+    expect(types).toEqual(['requestRescue'])
+  })
+
+  it('submits nothing for an empty slot or with no slice registered', () => {
+    const pressDigit = (code: string) => () => {
+      routeKeyChange(key(code, true))
+      routeKeyChange(key(code, false))
+    }
+    expect(withRegistrations([SLOT_PROBE], () => submittedDuring(pressDigit('Digit2')))).toEqual([])
+    expect(withRegistrations([], () => submittedDuring(pressDigit('Digit1')))).toEqual([])
   })
 })

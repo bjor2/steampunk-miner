@@ -20,6 +20,7 @@ import type {
   DiscoveryProvider,
 } from '../systems/registries/discovery'
 import type { DockService } from '../systems/registries/dockServices'
+import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
@@ -53,6 +54,8 @@ export interface SliceRegistrar {
   clockStep(step: ClockStep): void
   /** A free refill at the end of every paid recharge; the bill never changes (#217). */
   dockService(service: DockService): void
+  /** Answers a pressed action the kernel's routing table leaves open, such as `use_slot_1`. */
+  inputReaction(reaction: InputReactionEntry): void
   generationHook(hook: GenerationHook): void
   /** One provider across all slices. */
   oreLook(provider: OreLookProvider): void

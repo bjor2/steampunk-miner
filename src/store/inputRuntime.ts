@@ -11,7 +11,11 @@
 import type { KeyChange, ScrollNotch } from '../shell/shell'
 import { ACTION_MAP, actionDefOf, actionsOfChord, type ActionId } from '../systems/input/actionMap'
 import { buildIntent } from '../systems/input/buildIntent'
-import { reactionToPress, type InputReaction } from '../systems/input/inputRouting'
+import {
+  reactionToPress,
+  type InputReaction,
+  type InputSituation,
+} from '../systems/input/inputRouting'
 import { chordOf } from '../systems/input/keyCodes'
 import { canOpenArtefactCache } from '../systems/authority/artefactRules'
 import { dockableBayOf, dockedBayOf } from '../systems/authority/dockRules'
@@ -151,7 +155,7 @@ function captureRebinding(key: KeyChange): void {
   game.rebindToChord(chordOf(key.code, key.isShiftHeld))
 }
 
-function situationNow() {
+function situationNow(): InputSituation {
   const game = useGameStore.getState()
   const state = readAuthorityState()
   return {
@@ -162,6 +166,8 @@ function situationNow() {
     canOpenArtefactCache: canOpenArtefactCache(state, game.playerId),
     gunMode: mountedGunModeOf(state.players[game.playerId].vehicle.gun),
     canPlantCharge: plantRefusal(state, game.playerId) === null,
+    state,
+    playerId: game.playerId,
   }
 }
 

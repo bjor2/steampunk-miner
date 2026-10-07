@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import { withRegistrations } from '../../registries/registrar'
+import type { SliceDefinition } from '../../registries/sliceDefinition'
+import { createAuthorityState } from '../authority/authorityState'
 import { reactionToPress, topLayerOf, type InputSituation } from './inputRouting'
+
+const START = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
 
 const DRIVING: InputSituation = {
   layer: 'vehicle',
@@ -9,6 +14,8 @@ const DRIVING: InputSituation = {
   canOpenArtefactCache: false,
   gunMode: null,
   canPlantCharge: false,
+  state: START,
+  playerId: 'p1',
 }
 const ON_PAD: InputSituation = { ...DRIVING, dockableBay: 'sell' }
 const DOCKED: InputSituation = {
@@ -19,6 +26,8 @@ const DOCKED: InputSituation = {
   canOpenArtefactCache: false,
   gunMode: null,
   canPlantCharge: false,
+  state: START,
+  playerId: 'p1',
 }
 const OVER_CACHE: InputSituation = { ...DRIVING, canOpenArtefactCache: true }
 const AT_UPGRADE_BAY: InputSituation = { ...DOCKED, dockedBay: 'upgrade' }
@@ -139,5 +148,57 @@ describe('input routing', () => {
     expect(reactionToPress('ui_cancel', SLICE_SCREEN)).toEqual({ kind: 'dismissScreen' })
     expect(reactionToPress('quick_service', SLICE_SCREEN)).toEqual({ kind: 'none' })
     expect(reactionToPress('interact', SLICE_SCREEN)).toEqual({ kind: 'none' })
+  })
+})
+
+// A slice answers an action the kernel table leaves open, such as a power-up slot (#217); a fake
+// slice registers through withRegistrations, so no real slice is imported.
+const SLOT_PROBE: SliceDefinition = {
+  id: 'slot-probe',
+  register: (r) => {
+    r.inputReaction({
+      id: 'slot-probe.use_1',
+      actionId: 'use_slot_1',
+      contexts: ['vehicle'],
+      toIntent: ({ playerId }) => (playerId === 'p1' ? { type: 'plantCharge', payload: {} } : null),
+    })
+    r.inputReaction({
+      id: 'slot-probe.use_2',
+      actionId: 'use_slot_2',
+      contexts: ['vehicle'],
+      toIntent: () => null,
+    })
+    r.inputReaction({
+      id: 'slot-probe.interact',
+      actionId: 'interact',
+      contexts: ['vehicle'],
+      toIntent: () => ({ type: 'plantCharge', payload: {} }),
+    })
+  },
+}
+
+const pressWithProbe = (action: Parameters<typeof reactionToPress>[0], at: InputSituation) =>
+  withRegistrations([SLOT_PROBE], () => reactionToPress(action, at))
+
+describe('input routing: slice reactions', () => {
+  it("submits a slice's intent for a filled power-up slot", () => {
+    expect(pressWithProbe('use_slot_1', DRIVING)).toEqual(submitted('plantCharge'))
+  })
+
+  it('does nothing for an empty slot, a slot no slice answers, or with no slice registered', () => {
+    expect(pressWithProbe('use_slot_2', DRIVING)).toEqual({ kind: 'none' })
+    expect(pressWithProbe('use_slot_5', DRIVING)).toEqual({ kind: 'none' })
+    expect(withRegistrations([], () => reactionToPress('use_slot_1', DRIVING))).toEqual({
+      kind: 'none',
+    })
+  })
+
+  it('answers only in the contexts the reaction lists', () => {
+    expect(pressWithProbe('use_slot_1', DOCKED)).toEqual({ kind: 'none' })
+  })
+
+  it("never overrides the kernel's own rule for an action", () => {
+    expect(pressWithProbe('interact', ON_PAD)).toEqual(submitted('dock', { bay: 'sell' }))
+    expect(pressWithProbe('interact', DRIVING)).toEqual({ kind: 'none' })
   })
 })

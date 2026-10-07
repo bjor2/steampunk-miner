@@ -31,6 +31,7 @@ import {
   type DiscoveryKindRegistration,
 } from '../systems/registries/discovery'
 import { DOCK_SERVICE_REGISTRY } from '../systems/registries/dockServices'
+import { INPUT_REACTION_REGISTRY } from '../systems/registries/inputReactions'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
@@ -65,6 +66,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     blastEffect: (effect) => add(BLAST_EFFECT_REGISTRY, effect),
     clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),
     dockService: (service) => add(DOCK_SERVICE_REGISTRY, service),
+    inputReaction: (reaction) => add(INPUT_REACTION_REGISTRY, reaction),
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
     saveSection: (section) => addSaveSection(sliceId, section),

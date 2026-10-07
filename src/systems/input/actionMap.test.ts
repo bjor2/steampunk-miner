@@ -48,6 +48,23 @@ describe('action map', () => {
     ])
   })
 
+  it('binds the five power-up slots to Digit1 to Digit5 while driving, rebindable (#217)', () => {
+    const bindings = defaultBindings(ACTION_MAP)
+    const slots = ['use_slot_1', 'use_slot_2', 'use_slot_3', 'use_slot_4', 'use_slot_5'] as const
+    expect(slots.map((slot) => bindings[slot])).toEqual([
+      ['Digit1'],
+      ['Digit2'],
+      ['Digit3'],
+      ['Digit4'],
+      ['Digit5'],
+    ])
+    expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'Digit3')).toEqual(['use_slot_3'])
+    expect(actionsOfChord(ACTION_MAP, bindings, 'platform', 'Digit3')).toEqual([])
+    const rebound = bindingsWithOverrides(ACTION_MAP, { use_slot_1: { keyboard: ['KeyZ'] } })
+    expect(rebound.problems).toEqual([])
+    expect(actionsOfChord(ACTION_MAP, rebound.bindings, 'vehicle', 'KeyZ')).toEqual(['use_slot_1'])
+  })
+
   it('never lets Space lift: in the vehicle it docks, on a menu it confirms', () => {
     const bindings = defaultBindings(ACTION_MAP)
     expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'Space')).toEqual(['interact'])
