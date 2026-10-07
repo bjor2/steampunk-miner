@@ -414,7 +414,7 @@ const STAND_IN_LADDER: MarkLadder = { isIncomeItem: false, cooldown: 300, magnit
 
 const MARK_BEARING_ITEM = /^(power|consumable|passive|gear)\./
 
-/** The 50 authored nodes, ids `tech.<lane>.<name>` as #161 writes them (lane in snake case, #224). */
+/** The 49 authored nodes, ids `tech.<lane>.<name>` as #161 writes them (lane in snake case, #224). */
 export const AUTHORED_TREE_FIXTURE: readonly TechNode[] = [
   ...extractionTechNodes(),
   ...ROWS.map(nodeOfRow),
