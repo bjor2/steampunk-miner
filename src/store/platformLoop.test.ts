@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createMemorySink } from '../logging/eventSink'
-import { RUN_EVENT_REGISTRY, type RunEventName } from '../logging/eventNames'
+import { registeredEventOf, type RunEventName } from '../logging/eventNames'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { surfaceOreTiles } from '../systems/authority/scriptedSession'
@@ -77,8 +77,9 @@ function driveToUpgradeBay(): void {
 
 const loggedNames = () => sink.events.map((event) => event.event as RunEventName)
 
+/** Kernel and slice names alike: a loaded slice (the codex) logs its own lines while mining. */
 const platformNames = () =>
-  loggedNames().filter((name) => RUN_EVENT_REGISTRY[name].group === 'platform')
+  loggedNames().filter((name) => registeredEventOf(name)?.group === 'platform')
 
 const sumOfLogged = (name: RunEventName, field: string) =>
   sink.events
