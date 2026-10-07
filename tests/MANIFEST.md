@@ -27,7 +27,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
-### `codex`: 7 files, 33 tests
+### `codex`: 7 files, 36 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -35,7 +35,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/codex/systems/bitset.test.ts` | 6 | 6 |
 | `src/features/codex/systems/codexAliases.test.ts` | 4 | 4 |
 | `src/features/codex/systems/codexContacts.test.ts` | 6 | 6 |
-| `src/features/codex/systems/codexReaction.test.ts` | 8 | 8 |
+| `src/features/codex/systems/codexReaction.test.ts` | 11 | 11 |
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
 
@@ -216,14 +216,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/oreRows.test.ts` | 3 | 3 |
 | `src/features/ores/systems/oreTypeProvider.test.ts` | 6 | 6 |
 
-### `planet-mix`: 11 files, 69 tests
+### `planet-mix`: 11 files, 70 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/planet-mix/histogramCheck.test.ts` | 5 | 5 |
 | `src/features/planet-mix/mixHistogram.test.ts` | 7 | 3 |
 | `src/features/planet-mix/mixReportRows.test.ts` | 5 | 5 |
-| `src/features/planet-mix/systems/electrifiedCells.test.ts` | 2 | 2 |
+| `src/features/planet-mix/systems/electrifiedCells.test.ts` | 3 | 3 |
 | `src/features/planet-mix/systems/magneticFields.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/mixRoll.test.ts` | 5 | 5 |
 | `src/features/planet-mix/systems/oreMix.test.ts` | 13 | 13 |
@@ -266,7 +266,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
-### `sensing`: 19 files, 119 tests
+### `sensing`: 19 files, 120 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -279,7 +279,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/gatesFixture.test.ts` | 22 | 3 |
 | `src/features/sensing/systems/hazardBarometer.test.ts` | 5 | 5 |
 | `src/features/sensing/systems/passiveReach.test.ts` | 3 | 3 |
-| `src/features/sensing/systems/passiveReads.test.ts` | 3 | 3 |
+| `src/features/sensing/systems/passiveReads.test.ts` | 4 | 4 |
 | `src/features/sensing/systems/render/revealLook.test.ts` | 3 | 3 |
 | `src/features/sensing/systems/revealBoard.test.ts` | 11 | 11 |
 | `src/features/sensing/systems/revealPing.test.ts` | 3 | 3 |
@@ -456,6 +456,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/loadoutRules.test.ts` | 14 | 14 |
 | `src/systems/authority/loadoutSection.test.ts` | 5 | 5 |
 | `src/systems/authority/loopbackAuthority.test.ts` | 5 | 5 |
+| `src/systems/authority/magnetic/magneticHazard.test.ts` | 7 | 7 |
 | `src/systems/authority/minedOre.test.ts` | 7 | 7 |
 | `src/systems/authority/moneyRounding.test.ts` | 3 | 3 |
 | `src/systems/authority/platformCommands.test.ts` | 43 | 43 |
@@ -597,7 +598,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/compareRuns.test.ts` | 11 | 11 |
 | `src/logging/diveCasing.test.ts` | 3 | 3 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
-| `src/logging/domainEventLog.test.ts` | 18 | 18 |
+| `src/logging/domainEventLog.test.ts` | 19 | 19 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
 | `src/logging/eventSink.test.ts` | 7 | 7 |

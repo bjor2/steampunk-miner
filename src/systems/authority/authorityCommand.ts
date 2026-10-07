@@ -111,8 +111,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  * 43: the terrain-tools lane (#202): the ore-shifter, seam splitter, pressure pocket lance and
  *    lodestone beacon queue seeded K6 edits, `terrain-tools.TerrainEdited` and
  *    `terrain-tools.BeaconPlanted` join, and its `terrain-tools` player section v1.
+ * 44: `hazard:magnetic` (ticket 290, spec #258): `MagneticFieldEntered {planetIndex}` and
+ *    `ElectrifiedCellShocked {tx, ty, ticks, hullBp, withBit}` join, an electrified cell takes its
+ *    shock's ticks longer to drill, and the vehicle may carry `shockHullBp`. Off the magnetic
+ *    planets no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 43
+export const AUTHORITY_PROTOCOL_VERSION = 44
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
