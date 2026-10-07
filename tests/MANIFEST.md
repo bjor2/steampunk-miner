@@ -156,6 +156,21 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 16 | 16 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
+### `workshop`: 10 files, 74 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/workshop/debug.test.ts` | 5 | 5 |
+| `src/features/workshop/scene/showcaseParts.test.ts` | 5 | 5 |
+| `src/features/workshop/store/workshopStore.test.ts` | 12 | 12 |
+| `src/features/workshop/systems/chainCues.test.ts` | 6 | 6 |
+| `src/features/workshop/systems/chainPreview.test.ts` | 6 | 6 |
+| `src/features/workshop/systems/holdChain.test.ts` | 13 | 13 |
+| `src/features/workshop/systems/milestoneLandings.test.ts` | 5 | 5 |
+| `src/features/workshop/systems/plaqueReading.test.ts` | 5 | 5 |
+| `src/features/workshop/systems/render/purchaseSound.test.ts` | 9 | 9 |
+| `src/features/workshop/systems/render/showcaseReactions.test.ts` | 8 | 8 |
+
 ## Kernel
 
 ### `art`
