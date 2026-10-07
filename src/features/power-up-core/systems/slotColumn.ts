@@ -3,21 +3,22 @@
  * a power-up a press can use, slot 1 first, with its charge pips, cooldown ring and the ring an
  * item's hold fills (ticket 253). An empty or
  * locked slot draws nothing, so a P1 phone still shows just the stick and Interact (#173
- * acceptance 3). Each button reads its item at the player's Mark (#249): its pips, its cooldown
+ * acceptance 3). A drill socket holding gear a press uses gets a tile after slot 5 that presses
+ * the socket's key, so a touch-only player can flip the side cutters (#244). Each button reads its item at the player's Mark (#249): its pips, its cooldown
  * and the Mark a brass plate on the cradle will show.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
-import type { SlotActionId } from '../../../systems/input/touchControls'
+import type { SlotTileActionId } from '../../../systems/input/touchControls'
 import { chargesLeftIn, isToggledOn, itemChargesOf, powerUpStateOf } from './chargeState'
 import type { PowerUpState } from './chargeState'
 import { hasCharges, type PowerUp, type SlotHold } from './powerUpKind'
 import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
-import { actionOfSlot, POWER_UP_SLOTS, type PowerUpSlot } from './powerUpSlots'
+import { actionOfTile, PRESSABLE_SLOTS, type PressableSlot } from './powerUpSlots'
 import { pressablePowerUpOf } from './useRefusals'
 
 export interface SlotButton {
-  slot: PowerUpSlot
-  action: SlotActionId
+  slot: PressableSlot
+  action: SlotTileActionId
   itemId: string
   iconId: string
   name: string
@@ -40,7 +41,7 @@ export interface SlotButton {
 export function slotButtonsOf(state: AuthorityState, playerId: string): SlotButton[] {
   const vehicle = vehicleOf(state, playerId)
   const value = powerUpStateOf(state, playerId)
-  return POWER_UP_SLOTS.flatMap((slot) => {
+  return PRESSABLE_SLOTS.flatMap((slot) => {
     const powerUp = pressablePowerUpOf(vehicle, slot)
     if (powerUp === null) return []
     return [slotButtonOf(state, playerId, value, atResearchedMark(state, playerId, powerUp), slot)]
@@ -52,13 +53,13 @@ function slotButtonOf(
   playerId: string,
   value: PowerUpState,
   powerUp: MarkedPowerUp,
-  slot: PowerUpSlot,
+  slot: PressableSlot,
 ): SlotButton {
   const { itemId, iconId, name, mark, isMastered } = powerUp
   const { tick } = state
   return {
     slot,
-    action: actionOfSlot(slot),
+    action: actionOfTile(slot),
     itemId,
     iconId,
     name,

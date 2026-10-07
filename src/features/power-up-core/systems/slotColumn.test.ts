@@ -34,6 +34,47 @@ describe('power-up slot column', () => {
     )
   })
 
+  it('adds a tile for drill gear in the flank and collar after slot 5, pressing their keys (244)', () => {
+    inField(
+      (session) => {
+        const buttons = slotButtonsOf(session.state(), 'p1')
+        expect(buttons.map(({ slot, action, itemId }) => ({ slot, action, itemId }))).toEqual([
+          { slot: 'powerup.1', action: 'use_slot_1', itemId: FAKE.charged },
+          { slot: 'drill.flank', action: 'use_drill_flank', itemId: FAKE.toggle },
+          { slot: 'drill.collar', action: 'use_drill_collar', itemId: FAKE.drawingToggle },
+        ])
+      },
+      {
+        slots: {
+          'drill.collar': FAKE.drawingToggle,
+          'powerup.1': FAKE.charged,
+          'drill.flank': FAKE.toggle,
+        },
+      },
+    )
+  })
+
+  it('shows no tile for an empty socket or one holding gear a press does not use (244)', () => {
+    inField(
+      (session) => expect(slotButtonsOf(session.state(), 'p1').map(({ slot }) => slot)).toEqual([]),
+      { slots: { 'drill.flank': FAKE.extractor } },
+    )
+  })
+
+  it('lights a drill socket tile while its toggle is on (244)', () => {
+    inField(
+      (session) => {
+        const isOn = () => slotButtonsOf(session.state(), 'p1')[0].isOn
+        expect(isOn()).toBe(false)
+        session.submit(2, intentToUseSlot('drill.flank'))
+        expect(isOn()).toBe(true)
+        session.submit(3, intentToUseSlot('drill.flank'))
+        expect(isOn()).toBe(false)
+      },
+      { slots: { 'drill.flank': FAKE.toggle } },
+    )
+  })
+
   it('counts the pips down and sweeps the cooldown ring after a use', () => {
     inField((session) => {
       session.submit(10, intentToUseSlot('powerup.1'))

@@ -12,7 +12,7 @@ import {
   isSlotHeldForCard,
   pinchZoomStepsOf,
   stickActionsOf,
-  type SlotActionId,
+  type SlotTileActionId,
   type StickOffset,
   type TapPoint,
 } from '../systems/input/touchControls'
@@ -39,7 +39,7 @@ let pinchStartDistance = 0
 let pinchStepsTaken = 0
 let lastTap: TapPoint | null = null
 /** When each slot button now under a finger went down, in ms. */
-const slotPressedAtMs = new Map<SlotActionId, number>()
+const slotPressedAtMs = new Map<SlotTileActionId, number>()
 
 /** A thumb lands in the stick zone: the stick appears under it, holding nothing yet. */
 export function landStick(pointerId: number, x: number, y: number): void {
@@ -72,15 +72,16 @@ export function releaseTouchButton(action: ActionId): void {
 }
 
 /**
- * A finger lands on a power-up slot button (#217): nothing fires yet, as a hold opens the slot's
- * item card instead. The slice's panel passes the pointer event's time.
+ * A finger lands on a power-up slot button (#217) or a drill socket's tile (#244): nothing fires
+ * yet, as a hold opens the slot's item card instead. The slice's panel passes the pointer event's
+ * time.
  */
-export function pressSlotButton(action: SlotActionId, atMs: number): void {
+export function pressSlotButton(action: SlotTileActionId, atMs: number): void {
   slotPressedAtMs.set(action, atMs)
 }
 
 /** The finger lifts: a tap uses the slot as its digit key would; after a hold nothing fires. */
-export function releaseSlotButton(action: SlotActionId, atMs: number): void {
+export function releaseSlotButton(action: SlotTileActionId, atMs: number): void {
   const pressedAtMs = slotPressedAtMs.get(action)
   slotPressedAtMs.delete(action)
   if (pressedAtMs === undefined || isSlotHeldForCard(pressedAtMs, atMs)) return
@@ -88,12 +89,12 @@ export function releaseSlotButton(action: SlotActionId, atMs: number): void {
 }
 
 /** The finger slid off or the browser took the touch: the press ends with no use. */
-export function cancelSlotButton(action: SlotActionId): void {
+export function cancelSlotButton(action: SlotTileActionId): void {
   slotPressedAtMs.delete(action)
 }
 
 /** Whether the slot's button has been held long enough to show its item card (#164). */
-export function isSlotCardShown(action: SlotActionId, nowMs: number): boolean {
+export function isSlotCardShown(action: SlotTileActionId, nowMs: number): boolean {
   const pressedAtMs = slotPressedAtMs.get(action)
   return pressedAtMs !== undefined && isSlotHeldForCard(pressedAtMs, nowMs)
 }

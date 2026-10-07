@@ -5,7 +5,7 @@
  */
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { ITEM_CARD_LONG_PRESS_MS } from '../../../constants/itemCard'
-import type { SlotActionId } from '../../../systems/input/touchControls'
+import type { SlotTileActionId } from '../../../systems/input/touchControls'
 import { cancelSlotButton, pressSlotButton, releaseSlotButton } from '../../../store/touchRuntime'
 
 export interface SlotHold {
@@ -15,7 +15,7 @@ export interface SlotHold {
   cancel(): void
 }
 
-export function useSlotHold(action: SlotActionId): SlotHold {
+export function useSlotHold(action: SlotTileActionId): SlotHold {
   const [isCardShown, setIsCardShown] = useState(false)
   const timer = useRef<number | null>(null)
   useEffect(() => () => stopTimer(timer), [])

@@ -45,6 +45,20 @@ export const SLOT_ACTION_IDS = [
 
 export type SlotActionId = (typeof SLOT_ACTION_IDS)[number]
 
+/**
+ * The drill sockets' actions, flank first (the GD lock on #205 Q1 a): their tiles sit in the slot
+ * column after slot 5 and press as a slot button does (#244).
+ */
+export const SOCKET_ACTION_IDS = [
+  'use_drill_flank',
+  'use_drill_collar',
+] as const satisfies readonly ActionId[]
+
+export type SocketActionId = (typeof SOCKET_ACTION_IDS)[number]
+
+/** What a tile in the slot column presses: a slot key or a drill socket key. */
+export type SlotTileActionId = SlotActionId | SocketActionId
+
 /** What decides which cluster buttons show, read from the store and the authority replica. */
 export interface TouchSituation {
   layer: InputContext

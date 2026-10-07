@@ -7,7 +7,12 @@
  * bits that are on while slotted, so no press reaches it. The drill-gear slice owns their keys.
  */
 import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
-import { SLOT_ACTION_IDS, type SlotActionId } from '../../../systems/input/touchControls'
+import {
+  SLOT_ACTION_IDS,
+  SOCKET_ACTION_IDS,
+  type SlotActionId,
+  type SlotTileActionId,
+} from '../../../systems/input/touchControls'
 
 export const POWER_UP_SLOTS = [
   'powerup.1',
@@ -33,11 +38,21 @@ export type DrillGearSocket = (typeof DRILL_GEAR_SOCKETS)[number]
 /** A slot `use_power_up` may press: a power-up slot or a drill socket that holds field gear. */
 export type PressableSlot = PowerUpSlot | DrillGearSocket
 
+/** Every pressable slot in the slot column's order: slots 1-5, then the flank and the collar. */
+export const PRESSABLE_SLOTS: readonly PressableSlot[] = [...POWER_UP_SLOTS, ...DRILL_GEAR_SOCKETS]
+
 export function isPressableSlot(slot: string): slot is PressableSlot {
-  return isPowerUpSlot(slot) || DRILL_GEAR_SOCKETS.includes(slot as DrillGearSocket)
+  return PRESSABLE_SLOTS.includes(slot as PressableSlot)
 }
 
 /** `use_slot_n` for `powerup.n`. */
 export function actionOfSlot(slot: PowerUpSlot): SlotActionId {
   return SLOT_ACTION_IDS[POWER_UP_SLOTS.indexOf(slot)]
+}
+
+/** What a tile presses: `use_slot_n`, or the socket's own key (KeyF, KeyC) for a drill socket. */
+export function actionOfTile(slot: PressableSlot): SlotTileActionId {
+  return isPowerUpSlot(slot)
+    ? actionOfSlot(slot)
+    : SOCKET_ACTION_IDS[DRILL_GEAR_SOCKETS.indexOf(slot)]
 }
