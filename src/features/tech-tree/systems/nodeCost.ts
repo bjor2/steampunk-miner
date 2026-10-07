@@ -8,11 +8,22 @@ import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import type { BandOreCost } from '../../../systems/economy/economyDefinition'
 import { fromSafeInteger, mul, powInt, type Money } from '../../../systems/money'
 import type { TechCostKind, TreeNode } from './techNode'
+import { registeredTechTree, treeNodeOf, type TechTree } from './techTree'
 import { TREE_ECONOMY, type TreeCosts } from './treeEconomy'
 
 /** The charged price of `node` bought on `planetIndex`. */
 export function nodeCost(node: TreeNode, planetIndex: number): Money {
   return bandOrePriceAt(nodeOreCostOf(node), planetIndex, node.unlockTier)
+}
+
+/** The price of the node with this id bought on `planetIndex`; null for an id no node has. */
+export function nodeCostOf(
+  nodeId: string,
+  planetIndex: number,
+  tree: TechTree = registeredTechTree(),
+): Money | null {
+  const node = treeNodeOf(tree, nodeId)
+  return node === null ? null : nodeCost(node, planetIndex)
 }
 
 /** The node's price in its band's ore units, before the planet's ore value. */

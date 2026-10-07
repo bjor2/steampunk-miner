@@ -461,6 +461,15 @@ const KNOWN_LADDERS: Readonly<Record<string, MarkLadder>> = {
   'consumable.lodestone_beacon': { isIncomeItem: true, magnitude: { base: 10 }, charges: 1 },
 }
 
+/** The Schedule C rows these nodes absorb (#161 section 1 row-to-node map). */
+const CLAIMED_ROWS: Readonly<Record<string, string>> = {
+  'tech.drill-gear.side_cutters': 'side_drills',
+  'tech.mobility.steam_shield': 'shields',
+  'tech.mobility.grav_anchor': 'grav_anchor',
+  'tech.mobility.buoyancy_tanks': 'buoyancy_tanks',
+  'tech.mobility.escape_thruster': 'escape_thrusters',
+}
+
 const STAND_IN_LADDER: MarkLadder = { isIncomeItem: false, cooldown: 300, magnitude: { base: 12 } }
 
 const MARK_BEARING_ITEM = /^(power|consumable|passive|gear)\./
@@ -547,6 +556,7 @@ function nodeOfRow([lane, unlockTier, name, title, prereqs, unlocks, discovery]:
     description: `${title}, as the Guild's engineers drew it.`,
     label: isSlot ? 'both' : 'horizontal',
     costKind: lane === 'combo' ? 'combo' : isSlot ? 'slot' : 'capability',
+    ...(id in CLAIMED_ROWS && { scheduleRowId: CLAIMED_ROWS[id] }),
     ...(MARK_BEARING_ITEM.test(unlocks) && { marks: KNOWN_LADDERS[unlocks] ?? STAND_IN_LADDER }),
   }
 }

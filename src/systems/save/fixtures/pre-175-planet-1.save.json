@@ -148,7 +148,8 @@
           "energyLowLogged": [],
           "heat": { "level": 0, "settledTick": 1200, "lavaTouchTick": null }
         },
-        "artefact": null
+        "artefact": null,
+        "slices": { "tech-tree": { "version": 1, "body": { "unlocked": [] } } }
       }
     }
   }
