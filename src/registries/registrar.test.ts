@@ -3,9 +3,11 @@ import { debugActionsBySlice } from '../debug/debugActionRegistry'
 import type { SliceEventProjections } from '../logging/registries/eventProjections'
 import { unchanged } from '../systems/authority/commandRule'
 import { COMMAND_RULE_REGISTRY, type SliceCommandRules } from '../systems/registries/commandRules'
+import { contentOf } from '../systems/registries/content'
 import { GATE_CHECK_REGISTRY, type GateCheck } from '../systems/registries/gateChecks'
 import type { OreLookProvider } from '../systems/registries/oreLook'
 import { saveSectionsOf, type SaveSection } from '../systems/registries/saveSections'
+import type { VehicleItem } from '../systems/registries/vehicleLoadout'
 import {
   createRegistrySet,
   entriesOf,
@@ -42,6 +44,12 @@ function section(id: string): SaveSection<number> {
     ofPortable: (body) => body as number,
   }
 }
+
+function cradle(id: string): VehicleItem {
+  return { id, iconId: 'icon-cradle', slots: [], attach: null, opensSlot: 'powerup.4' }
+}
+
+const contentIds = () => contentOf('vehicle-item').map(({ id }) => id)
 
 /** Rules that change nothing, for the given command types: only their ids matter here. */
 function rulesFor(...types: string[]): SliceCommandRules {
@@ -89,6 +97,50 @@ describe('slice registrar', () => {
   it('refuses an id that only shares the slice name as a prefix', () => {
     const stray = sliceOf('ores', (r) => r.gateCheck(refuseAll('ores-extra.rig')))
     expect(() => withRegistrations([stray], () => undefined)).toThrow(RegistrationRefusedError)
+  })
+
+  it('accepts a bare <category>.<name> catalogue id beside a prefixed one', () => {
+    const cradles = sliceOf('power-up-core', (r) =>
+      r.content('vehicle-item', [cradle('slot.powerup_4'), cradle('power-up-core.spare')]),
+    )
+    expect(withRegistrations([cradles], contentIds)).toEqual([
+      'power-up-core.spare',
+      'slot.powerup_4',
+    ])
+  })
+
+  it('refuses a bare catalogue id a second slice registers, naming both slices', () => {
+    const first = sliceOf('power-up-core', (r) =>
+      r.content('vehicle-item', [cradle('slot.powerup_4')]),
+    )
+    const second = sliceOf('terrain-tools', (r) =>
+      r.content('vehicle-item', [cradle('slot.powerup_4')]),
+    )
+    expect(() => withRegistrations([first, second], () => undefined)).toThrow(
+      '"slot.powerup_4" is registered twice in "content": by slice "power-up-core" and by slice "terrain-tools"',
+    )
+  })
+
+  it('refuses a bare content id with no category or a category outside the catalogue', () => {
+    const flat = sliceOf('power-up-core', (r) =>
+      r.content('vehicle-item', [cradle('remote_detonator')]),
+    )
+    const foreign = sliceOf('power-up-core', (r) =>
+      r.content('vehicle-item', [cradle('mobility.cradle_3')]),
+    )
+    expect(() => withRegistrations([flat], () => undefined)).toThrow(
+      /registered "remote_detonator" in "content", which has no category/,
+    )
+    expect(() => withRegistrations([foreign], () => undefined)).toThrow(
+      /registered "mobility.cradle_3" in "content", which has category "mobility"/,
+    )
+  })
+
+  it('keeps refusing a bare catalogue id outside content', () => {
+    const stray = sliceOf('mining-gates', (r) => r.gateCheck(refuseAll('slot.powerup_4')))
+    expect(() => withRegistrations([stray], () => undefined)).toThrow(
+      /registered "slot.powerup_4" in "gateChecks"/,
+    )
   })
 
   it('accepts a save section named by the bare slice id or a prefixed name', () => {

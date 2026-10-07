@@ -301,7 +301,7 @@ export interface SliceDefinition {
   register(r: SliceRegistrar): void
 }
 export interface SliceRegistrar {
-  content<K extends ContentKind>(kind: K, entries: readonly ContentKinds[K][]): void
+  content<K extends ContentKind>(kind: K, entries: readonly ContentKinds[K][]): void  // bare catalogue ids, #224
   oreTypes(provider: OreTypeProvider): void           // one provider
   gateCheck(check: GateCheck): void
   blastEffect(effect: BlastEffect): void
@@ -385,6 +385,8 @@ declare module '../../../systems/registries/content' {
 ```
 
 Other slices register entries of that kind and import its type from the owner's `index.ts`. This replaces per-slice registration functions like #160's `registerTechNodes`: other slices register `content('tech-node', ...)`, and only `tech-tree` reads it.
+
+**Bare catalogue ids (#224).** A content entry's id is `<slice>.<name>`, or a bare catalogue id `<category>.<name>` (`slot.powerup_4`, `power.mineral_drain`, `tech.terrain.cradle_4`), so the store, the tree and the descriptions share one id. The categories are `power`, `consumable`, `passive`, `gear`, `rig`, `slot` and `tech`, in the one kernel constant `BARE_CATALOGUE_CATEGORIES` (`src/systems/registries/catalogueIds.ts`); none is a kernel item kind. The registrar refuses a bare id with no category (a flat stats.json row id like `remote_detonator`), with any other category, or with no snake_case name. Each bare id has one owning slice: a second slice registering it is refused at boot, naming both slices. Every other registry keeps the `<slice>.` prefix.
 
 **Icon registry.** `src/ui/vectorIcons.ts` keeps its glob over `./icons/*.svg` and adds a second one over `'../features/*/icons/*.svg'`. The id is the file stem in both cases. It exports:
 - `iconUrlOf(iconId): string | null`, unchanged

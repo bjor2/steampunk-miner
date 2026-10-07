@@ -1,6 +1,7 @@
 /**
  * Files what slices register into the kernel registries (docs/standards/feature-slices.md 3.1,
- * 3.3): one registrar per slice, which refuses an id without the slice's prefix; slices register
+ * 3.3): one registrar per slice, which refuses an id without the slice's prefix, save for the
+ * named exceptions below (bare content catalogue ids, art ids, discovery kinds); slices register
  * in id order; the seal closes every registry. `withRegistrations` is the kernel specs' seam: it
  * runs on a fresh sealed set holding only the given fakes, then puts the loaded set back.
  */
@@ -23,7 +24,12 @@ import {
   commandRuleRegistrationsOf,
   type CommandRuleRegistration,
 } from '../systems/registries/commandRules'
-import { CONTENT_REGISTRY, contentRegistrationOf } from '../systems/registries/content'
+import { bareCatalogueIdProblems } from '../systems/registries/catalogueIds'
+import {
+  CONTENT_REGISTRY,
+  contentRegistrationOf,
+  type ContentRegistration,
+} from '../systems/registries/content'
 import {
   DISCOVERY_ALIAS_REGISTRY,
   DISCOVERY_KIND_REGISTRY,
@@ -66,7 +72,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     addPrefixed(registry, sliceId, entry)
   return {
     content: (kind, entries) =>
-      entries.forEach((entry) => add(CONTENT_REGISTRY, contentRegistrationOf(kind, entry))),
+      entries.forEach((entry) => addContent(sliceId, contentRegistrationOf(kind, entry))),
     oreTypes: (provider) => add(ORE_TYPE_REGISTRY, provider),
     gateCheck: (check) => add(GATE_CHECK_REGISTRY, check),
     blastEffect: (effect) => add(BLAST_EFFECT_REGISTRY, effect),
@@ -138,6 +144,28 @@ export function withRegistrations<T>(slices: readonly SliceDefinition[], run: ()
 function addPrefixed<T extends RegistryEntry>(registry: Registry<T>, sliceId: string, entry: T) {
   if (!entry.id.startsWith(`${sliceId}.`)) refuseUnprefixed(registry, sliceId, entry.id)
   addToRegistry(registry, sliceId, entry)
+}
+
+/**
+ * A store item or tech node may keep its bare catalogue id (`slot.powerup_4`), one id across the
+ * store, the tree and the descriptions (#224); the registry's duplicate refusal keeps one owner.
+ */
+function addContent(sliceId: string, registration: ContentRegistration) {
+  const isPrefixed = registration.id.startsWith(`${sliceId}.`)
+  if (isPrefixed) addToRegistry(CONTENT_REGISTRY, sliceId, registration)
+  else addBareContent(sliceId, registration)
+}
+
+function addBareContent(sliceId: string, registration: ContentRegistration) {
+  const problems = bareCatalogueIdProblems(registration.id)
+  if (problems.length > 0) refuseBareContent(sliceId, registration.id, problems)
+  addToRegistry(CONTENT_REGISTRY, sliceId, registration)
+}
+
+function refuseBareContent(sliceId: string, id: string, problems: readonly string[]): never {
+  throw new RegistrationRefusedError(
+    `slice "${sliceId}" registered "${id}" in "content", which ${problems.join(' and ')}: its ids start with "${sliceId}." or are bare <category>.<name> catalogue ids`,
+  )
 }
 
 /** A section may also be named by the bare slice id: `codex` beside `codex.pages`. */
