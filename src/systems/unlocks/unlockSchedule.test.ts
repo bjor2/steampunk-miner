@@ -18,10 +18,47 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = '68135afa890f3e109c2e9f54d619d64149d888fad3819102812ed0a6a5d6dcdc'
+const LOCKED_FILE_SHA256 = '00994a897eb096b768046a780b7d04d7d0840b9361c3a18e64531b0513365206'
 
 /** The pin before ticket 289 flipped `magnetic_planets` to shipped, its one named re-pin (#258 Q4). */
 const PIN_BEFORE_MAGNETIC_FLIP = '88ddb93162fa86883c8b3903d1a2588e3f23e6f41fdd98949c911ba4e93c9fc0'
+
+/** The pin before ticket 313 added the `bore_gun` row, its named exception (#309 GD decision). */
+const PIN_BEFORE_BORE_GUN_ROW = '68135afa890f3e109c2e9f54d619d64149d888fad3819102812ed0a6a5d6dcdc'
+
+/** What ticket 313 wrote into the file besides the cumulative counts, each as `[before, after]`. */
+const BORE_GUN_EDIT: readonly (readonly [string, string])[] = [
+  ['    "issues/153"\n  ],', '    "issues/153",\n    "issues/309"\n  ],'],
+  [
+    'sha256:a420cb57bdc831be41eea490fe199873b567388c7159510acac920acd2814c8f',
+    'sha256:4543f787bfaa38083631a917492562bb178fe5c3705da79632a09bd60845276d',
+  ],
+  [
+    ' source_hash recomputed',
+    ' #309 (GD decision, Horizontal): bore_gun added at P1 (Upgrade, planet_gate, planned), the named exception that pushes no other P1 row; P1\\u2013P40 cumulative +1 (P40 62). source_hash recomputed',
+  ],
+]
+
+/** The file's text as it stood before ticket 313: its row out, every count one lower. */
+function textBeforeBoreGunRow(text: string): string {
+  const row = text.indexOf('    {\n      "id": "bore_gun"')
+  const rowEnd = text.indexOf('    },\n', row) + '    },\n'.length
+  const withoutRow = text.slice(0, row) + text.slice(rowEnd)
+  const counts = withoutRow.indexOf('"cumulative_by_planet"')
+  const lowered =
+    withoutRow.slice(0, counts) +
+    withoutRow
+      .slice(counts)
+      .replace(/"cumulative": (\d+)/g, (_, count: string) => `"cumulative": ${+count - 1}`)
+  return BORE_GUN_EDIT.reduce((current, [before, after]) => current.replace(after, before), lowered)
+}
+
+function lockedFileText(): string {
+  return readFileSync(
+    new URL('../../../docs/scaling/horizontal/stats.json', import.meta.url),
+    'utf8',
+  )
+}
 
 /**
  * The canonical form of `source_hash_method` (docs/scaling/horizontal/source_hash.mjs, #153):
@@ -114,13 +151,13 @@ function progressWithEveryBindMet(rows: readonly UnlockRow[]): UnlockProgress {
 }
 
 describe('locked unlock schedule', () => {
-  it('loads the 56 locked Schedule C rows', () => {
-    expect(LOCKED_SCHEDULE.rows).toHaveLength(56)
+  it('loads the 57 locked Schedule C rows', () => {
+    expect(LOCKED_SCHEDULE.rows).toHaveLength(57)
   })
 
   it('carries the Horizontal Scaler source hash pin', () => {
     expect(LOCKED_SCHEDULE.sourceHash).toBe(
-      'sha256:a420cb57bdc831be41eea490fe199873b567388c7159510acac920acd2814c8f',
+      'sha256:4543f787bfaa38083631a917492562bb178fe5c3705da79632a09bd60845276d',
     )
     expect(LOCKED_SCHEDULE_SOURCE_HASH).toBe(LOCKED_SCHEDULE.sourceHash)
   })
@@ -142,8 +179,8 @@ describe('locked unlock schedule', () => {
     expect(createHash('sha256').update(bytes).digest('hex')).toBe(LOCKED_FILE_SHA256)
   })
 
-  it('schedules 61 unlocks cumulatively by planet 40', () => {
-    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(61)
+  it('schedules 62 unlocks cumulatively by planet 40', () => {
+    expect(unlockCountThrough(LOCKED_SCHEDULE, 40)).toBe(62)
   })
 
   it('matches the cumulative count the scaler recorded for every campaign planet', () => {
@@ -270,10 +307,7 @@ describe('locked unlock schedule', () => {
   })
 
   it('changed only magnetic_planets.status in the flip, leaving grounded_lining a vision row', () => {
-    const text = readFileSync(
-      new URL('../../../docs/scaling/horizontal/stats.json', import.meta.url),
-      'utf8',
-    )
+    const text = textBeforeBoreGunRow(lockedFileText())
     const row = text.indexOf('"id": "magnetic_planets"')
     const rowEnd = text.indexOf('}', row)
     const unflipped =
@@ -285,6 +319,23 @@ describe('locked unlock schedule', () => {
     )
     const lining = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'grounded_lining')!
     expect(lining).toMatchObject({ planetIndex: 25, status: 'vision' })
+  })
+
+  it('added only the bore_gun row, the counts it moves and its provenance in ticket 313 (#309)', () => {
+    const before = textBeforeBoreGunRow(lockedFileText())
+    expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(PIN_BEFORE_BORE_GUN_ROW)
+  })
+
+  it('opens the planned bore_gun row on planet 1, in the Upgrade lane, pushing no other P1 row (#309)', () => {
+    const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'bore_gun')!
+    expect(row).toMatchObject({
+      planetIndex: 1,
+      lane: 'Upgrade',
+      bind: 'planet_gate',
+      status: 'planned',
+    })
+    expect(isUnlocked(row, NO_PROGRESS)).toBe(true)
+    expect(rowsAt(LOCKED_SCHEDULE, 1)).toHaveLength(15)
   })
 
   it('opens the side_drills row at planet 13 now the drill-gear slice ships its node (ticket 205)', () => {

@@ -69,6 +69,8 @@ export const DEFERRED_SCHEDULE_ROWS: Readonly<Record<DeferredScheduleHome, reado
     'casing_cement',
     'collapse_vacuum',
     'music_layers',
+    // Joined with its row (ticket 313, #309); the ground-gun slice claims it when it ships.
+    'bore_gun',
     'auto_guns',
     'blasting_charges',
     'refractory_lining',

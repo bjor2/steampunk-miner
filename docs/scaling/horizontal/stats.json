@@ -12,11 +12,12 @@
     "issues/81",
     "issues/160",
     "issues/162",
-    "issues/153"
+    "issues/153",
+    "issues/309"
   ],
-  "source_hash": "sha256:a420cb57bdc831be41eea490fe199873b567388c7159510acac920acd2814c8f",
+  "source_hash": "sha256:4543f787bfaa38083631a917492562bb178fe5c3705da79632a09bd60845276d",
   "source_hash_method": "node docs/scaling/horizontal/source_hash.mjs: sha256 (UTF-8, hex) of JSON.stringify({ids, schema, fills}) with object keys sorted recursively and array order kept; ids = every features[].id sorted; schema = the #79 schema object; fills = the #80 lock fills, features with origin schedule_lock_80 as {id, planetIndex, lockNote} sorted by id. Status and other row fields are not hashed.",
-  "source_note": "Schedule C locked (#80). #78 survive 35 + 5 thin-act fills (P31 archive_cache, P32 grav_anchor, P34 buoyancy_tanks, P37 escape_thrusters, P39 finale_key). Intentional 1-gap at P16/P24/P29. #81 \u22642 empty satisfied. Endless gate remains finale+endless_unlock @40 (manual bind on endless). #162 (GD): research_lab P24->P15 as the combo-research building; side_drills, shields, grav_anchor, buoyancy_tanks, escape_thrusters are tech-tree nodes at their own planet (unlockVia tech_tree, treeLane per #160). #153 (GD amendment 2): remote_detonator added at P22 (Upgrade, planet_gate, planned) after shields; dynamite sizes 2\u201310 extend blasting_charges (labelled both, no rows); P22\u2013P40 cumulative +1 (P40 61). source_hash recomputed by source_hash.mjs (method now committed; the #80 value 419ca56d\u2026 was not reproducible).",
+  "source_note": "Schedule C locked (#80). #78 survive 35 + 5 thin-act fills (P31 archive_cache, P32 grav_anchor, P34 buoyancy_tanks, P37 escape_thrusters, P39 finale_key). Intentional 1-gap at P16/P24/P29. #81 \u22642 empty satisfied. Endless gate remains finale+endless_unlock @40 (manual bind on endless). #162 (GD): research_lab P24->P15 as the combo-research building; side_drills, shields, grav_anchor, buoyancy_tanks, escape_thrusters are tech-tree nodes at their own planet (unlockVia tech_tree, treeLane per #160). #153 (GD amendment 2): remote_detonator added at P22 (Upgrade, planet_gate, planned) after shields; dynamite sizes 2\u201310 extend blasting_charges (labelled both, no rows); P22\u2013P40 cumulative +1 (P40 61). #309 (GD decision, Horizontal): bore_gun added at P1 (Upgrade, planet_gate, planned), the named exception that pushes no other P1 row; P1\u2013P40 cumulative +1 (P40 62). source_hash recomputed by source_hash.mjs (method now committed; the #80 value 419ca56d\u2026 was not reproducible).",
   "schedule_approved": "C",
   "schema": {
     "issue": 79,
@@ -174,6 +175,18 @@
       "bind": "artefact",
       "name": "Assay beacon (artefact pick)",
       "slice": 2
+    },
+    {
+      "id": "bore_gun",
+      "planetIndex": 1,
+      "lane": "Upgrade",
+      "progressionAxis": "horizontal",
+      "status": "planned",
+      "bind": "planet_gate",
+      "name": "Bore gun (planet-1 ground weapon)",
+      "slice": "campaign",
+      "origin": "issues/309",
+      "scopeNote": "Brass bore gun on the rig: a reach tool that opens a short line of cells by the drill's own dig law and makes unlined ground collapse (#309 GD decision); its tracks and armoury lane add no rows (#310)."
     },
     {
       "id": "refinery_bay",
@@ -655,163 +668,163 @@
   "cumulative_by_planet": [
     {
       "planet": 1,
-      "cumulative": 14
-    },
-    {
-      "planet": 2,
       "cumulative": 15
     },
     {
-      "planet": 3,
+      "planet": 2,
       "cumulative": 16
     },
     {
-      "planet": 4,
+      "planet": 3,
       "cumulative": 17
     },
     {
-      "planet": 5,
-      "cumulative": 19
+      "planet": 4,
+      "cumulative": 18
     },
     {
-      "planet": 6,
+      "planet": 5,
       "cumulative": 20
     },
     {
-      "planet": 7,
+      "planet": 6,
       "cumulative": 21
     },
     {
-      "planet": 8,
-      "cumulative": 23
+      "planet": 7,
+      "cumulative": 22
     },
     {
-      "planet": 9,
+      "planet": 8,
       "cumulative": 24
     },
     {
-      "planet": 10,
+      "planet": 9,
       "cumulative": 25
     },
     {
-      "planet": 11,
-      "cumulative": 27
+      "planet": 10,
+      "cumulative": 26
     },
     {
-      "planet": 12,
+      "planet": 11,
       "cumulative": 28
     },
     {
-      "planet": 13,
+      "planet": 12,
       "cumulative": 29
     },
     {
-      "planet": 14,
+      "planet": 13,
       "cumulative": 30
     },
     {
+      "planet": 14,
+      "cumulative": 31
+    },
+    {
       "planet": 15,
-      "cumulative": 32
+      "cumulative": 33
     },
     {
       "planet": 16,
-      "cumulative": 32
+      "cumulative": 33
     },
     {
       "planet": 17,
-      "cumulative": 34
-    },
-    {
-      "planet": 18,
       "cumulative": 35
     },
     {
-      "planet": 19,
-      "cumulative": 37
+      "planet": 18,
+      "cumulative": 36
     },
     {
-      "planet": 20,
+      "planet": 19,
       "cumulative": 38
     },
     {
-      "planet": 21,
+      "planet": 20,
       "cumulative": 39
     },
     {
+      "planet": 21,
+      "cumulative": 40
+    },
+    {
       "planet": 22,
-      "cumulative": 41
+      "cumulative": 42
     },
     {
       "planet": 23,
-      "cumulative": 42
+      "cumulative": 43
     },
     {
       "planet": 24,
-      "cumulative": 42
+      "cumulative": 43
     },
     {
       "planet": 25,
-      "cumulative": 44
-    },
-    {
-      "planet": 26,
       "cumulative": 45
     },
     {
+      "planet": 26,
+      "cumulative": 46
+    },
+    {
       "planet": 27,
-      "cumulative": 47
+      "cumulative": 48
     },
     {
       "planet": 28,
-      "cumulative": 48
-    },
-    {
-      "planet": 29,
-      "cumulative": 48
-    },
-    {
-      "planet": 30,
       "cumulative": 49
     },
     {
-      "planet": 31,
+      "planet": 29,
+      "cumulative": 49
+    },
+    {
+      "planet": 30,
       "cumulative": 50
     },
     {
-      "planet": 32,
+      "planet": 31,
       "cumulative": 51
     },
     {
-      "planet": 33,
+      "planet": 32,
       "cumulative": 52
     },
     {
-      "planet": 34,
+      "planet": 33,
       "cumulative": 53
     },
     {
-      "planet": 35,
-      "cumulative": 55
+      "planet": 34,
+      "cumulative": 54
     },
     {
-      "planet": 36,
+      "planet": 35,
       "cumulative": 56
     },
     {
-      "planet": 37,
+      "planet": 36,
       "cumulative": 57
     },
     {
-      "planet": 38,
+      "planet": 37,
       "cumulative": 58
     },
     {
-      "planet": 39,
+      "planet": 38,
       "cumulative": 59
     },
     {
+      "planet": 39,
+      "cumulative": 60
+    },
+    {
       "planet": 40,
-      "cumulative": 61
+      "cumulative": 62
     }
   ],
   "gap_justifications": {
