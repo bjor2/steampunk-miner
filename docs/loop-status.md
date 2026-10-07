@@ -33,6 +33,14 @@ Each card expands to the issue's parent, blockers, created/updated/closed times,
 claim time from the published `slots.json` or the loop event log, else when `in-progress` was
 applied. The rule lives in `scripts/status/issueBuckets.mjs`, which the page imports as is.
 
+Where build tickets come from: the build loop picks from #90's sub-issues, the hand-kept
+`EXTRA_TICKETS` list, and (since 2026-10-07) every open `build` issue that is a sub-issue of an open
+`wayfinder:map`, or of an open spec one level below such a map. #90 is at GitHub's 100 sub-issue
+cap, so new builds are filed under their map (#157, #139, ...) and the loop finds them without a
+hand edit. An epic (an issue with open sub-issues) is never picked itself. The usual pick rule still
+applies to all of them (see Ready to begin above). Cost: one open-issue list and one sub-issue read
+per open map (and per open spec under it), cached for two minutes.
+
 Parents close themselves: on every pass the build loop closes any open issue labelled `build`,
 `wayfinder:map`, `wayfinder:task`, `perf` or `design` (build plans, wayfinder maps, specs, perf
 plans) once its `sub_issues_summary` has `total > 0` and `completed == total` **and** the issues it
