@@ -7,13 +7,17 @@ requests). The build loop's **box Tester** (`claude-sessions/steampunk-loop/test
 build box) runs them and writes the records. Records before that date come from Actions
 (`run.source` missing or `actions`). The status page's Tests tab (#192) reads them.
 
-- **When:** after every green ticket close and on every loop pass when `origin/main` moved past
-  the last tested sha (several pushes coalesce into one run), and nightly from the first loop pass
-  after 01:30 Oslo.
-- **Push run, in order:** `fast` = `scripts/ci/selectPushTests.sh <last tested sha>` (scoped
-  `vitest related`, full, or none), pacing bot excluded, recorded at once; then, when `fast` is
-  green and the change touches `src/` (or was unmappable), `slow` = the three pacing bot files
-  (NIGHTLY_ONLY_TESTS) and Playwright e2e when the box has room (else nightly).
+- **When:** per feature, when it completes, and nightly from the first loop pass after 01:30
+  Oslo. Worker gates run no Vitest (typecheck, lint, format:check, build only). When a close
+  leaves a parent issue with no open sub-issue, that parent is the completed feature (its tickets =
+  its closed children and grandchildren); a closed ticket without a parent is a feature of its
+  own. The loop queues it (`tester/queue.json`, shown as "Features awaiting test") and the Tester
+  works the queue on the `origin/main` tip.
+- **Feature run, in order:** `fast` = `CHANGED_FILES=<union of the files the feature's tickets'
+commits changed> scripts/ci/selectPushTests.sh` (scoped `vitest related`, full, or none), pacing
+  bot excluded, recorded at once; then, when `fast` is green and the feature touched `src/` (or
+  was unmappable), `slow` = the three pacing bot files (NIGHTLY_ONLY_TESTS) and Playwright e2e
+  when the box has room (else nightly). Records carry `run.feature` and `run.tickets`.
 - **Nightly:** the true full suite (`npm test`, every test's duration kept), then balance:report,
   the four benches + bench:summary, balance:planets, e2e, soak:memory and packaged smoke; each
   non-Vitest suite is a record with only its conclusion and duration (`reportFound: false`).
@@ -47,7 +51,7 @@ build box) runs them and writes the records. Records before that date come from 
     "workflow": "CI",
     "job": "verify",
     "event": "push",
-    "mode": "scoped", // scoped | full | none (per push) | nightly-only (slow) | e2e | nightly | unknown
+    "mode": "scoped", // scoped | full | none (per feature) | nightly-only (slow) | e2e | nightly | unknown
     "source": "box", // box (Tester) | actions (before 2026-10-07)
     "phase": "fast", // fast | slow | full | nightly (box only)
     "reason": "7 changed files, tests picked by import graph and fs-read rules",

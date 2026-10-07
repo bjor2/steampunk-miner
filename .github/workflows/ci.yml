@@ -7,8 +7,8 @@ on:
 
 jobs:
   # Every push and pull request: lint, formatting, types and the build. Tests no longer run in
-  # Actions: the loop's Tester runs them on the build box after every push to main (relevant tests
-  # first, then the pacing bot and e2e) and nightly (full suite, soak, packaged smoke, balance,
+  # Actions: the loop's Tester runs them on the build box per feature when its last ticket closes
+  # (relevant tests first, then the pacing bot and e2e) and nightly (full suite, soak, packaged smoke, balance,
   # benches), records them on the test-metrics branch and posts box-tester/* commit statuses
   # (docs/metrics/test-metrics.md).
   verify:

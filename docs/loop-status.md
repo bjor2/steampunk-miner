@@ -107,7 +107,9 @@ starts no workflow. There is no separate publish command to call. The fields the
                slots: [{ slot: 'C1', state, kind: 'dev'|'aux'|'external'|null, label, ticket, grok_slot, since }] }],
   gate:     { busy, max },          // gate-stage tokens: worker gates + box Tester heavy phases
   tester:   { state: 'idle'|'running', phase, sha, since, holds_gate, claude_slot,
-              last_run, last_nightly, last_nightly_result, main_red_sha } }
+              last_run, last_nightly, last_nightly_result, main_red_sha,
+              feature, feature_title,            // the feature under test while running
+              queue: [{ feature, title, tickets, since }] } }   // completed features awaiting test
 ```
 
 `tester` is the box Tester (`tester.sh` beside the driver, docs/metrics/test-metrics.md). It
@@ -116,8 +118,9 @@ tab shows it holding a gate token or its triage Claude slot (an `aux` slot label
 `tester-triage`) within about a minute; it also publishes a `tester` entry in `loops.json`
 (working / idle / blocked on red / paused on main red), whose state changes rebuild the page. The
 Tests tab (#192) reads `tester` with the test-metrics `summary.json` and main's `box-tester/*`
-commit statuses: runs per phase (fast, slow, full, nightly suites), the main-red pause and a STALE
-warning when no box run happened for 6 h (`TESTER_STALE_AFTER_H`).
+commit statuses: the feature under test, the features awaiting test, runs per phase (fast, slow,
+full, nightly suites) with their feature, the main-red pause and a STALE warning when no box run
+happened for 26 h (`TESTER_STALE_AFTER_H`; runs are per completed feature plus the nightly).
 
 Without `accounts` (a v1 snapshot) the Claude pool shows as one pool. The page copies only these
 fields (`scripts/status/slots.mjs`), so anything else in the file never reaches it, and drops a name
