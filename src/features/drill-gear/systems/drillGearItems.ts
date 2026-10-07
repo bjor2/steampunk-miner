@@ -203,7 +203,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     itemId: 'gear.sampling_corer',
     name: 'Sampling corer',
     iconId: 'item-gear-sampling-corer',
-    description: 'A hollow tube punches ahead and draws back a plug of what lies beyond.',
+    description: 'A hollow tube punches ahead and draws back a plug that fills a codex entry.',
     label: 'horizontal',
     powerUpClass: 'charged',
     isToggle: false,

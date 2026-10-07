@@ -65,7 +65,7 @@ describe('sampling corer', () => {
       effect: {
         state,
         events: [
-          expect.objectContaining({ type: 'drill-gear.OreSampled', playerId: 'p1', ...ORE }),
+          expect.objectContaining({ type: 'OreSampled', playerId: 'p1', via: 'corer', ...ORE }),
         ],
       },
     })
@@ -74,7 +74,7 @@ describe('sampling corer', () => {
   it('reaches through rock to an ore cell six cells past the bit', () => {
     const { outcome } = coreDownFrom({ tx: ORE.tx, ty: ORE.ty + 6 })
     expect(outcome.kind === 'acted' && outcome.effect.events).toEqual([
-      expect.objectContaining({ type: 'drill-gear.OreSampled', ...ORE }),
+      expect.objectContaining({ type: 'OreSampled', ...ORE }),
     ])
   })
 

@@ -74,6 +74,12 @@ describe('drill-gear shipped rows', () => {
     expect(problems).toEqual([])
   })
 
+  // #243: the plug is codex contact again, so the corer's line says what it is for.
+  it("names the codex in the sampling corer's flavour line", () => {
+    const corer = SHIPPED_DRILL_GEAR.find((item) => item.itemId === 'gear.sampling_corer')
+    expect(corer?.description).toMatch(/\bcodex\b/)
+  })
+
   it('files a card with stat lines and a price for every item at every Mark to its last', () => {
     const uncarded = SHIPPED_IDS.filter(
       (id) => itemDescriptionEntryOf({ kind: 'vehicle-item', id }) === null,

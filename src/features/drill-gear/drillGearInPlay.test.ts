@@ -23,8 +23,8 @@ import { CUTTERS_AND_BOOM_SOURCE } from './systems/cuttersAndBoom'
 
 // The drill gear in play on the loaded slices (#205): KeyF and KeyC press the flank and collar
 // sockets (GD lock Q1 a), the toggles switch their effects on and off, the auger draws from the
-// tank and plugs the bored tunnel behind, and the corer spends a charge on a plug but none on a
-// core cell (#162 acceptance 3).
+// tank and plugs the bored tunnel behind, and the corer spends a charge on a plug, which the codex
+// records as contact (#243), but none on a core cell (#162 acceptance 3).
 
 const CUTTERS = 'gear.side_cutters'
 const AUGER = 'gear.spoil_auger'
@@ -157,9 +157,25 @@ describe('drill-gear sampling corer', () => {
   it('winds up, then plugs the ore ahead and spends one of its four charges', () => {
     const session = sessionWith({ 'drill.collar': CORER }, ABOVE_ORE, FACING.down)
     session.submit(2, press('drill.collar'))
-    const sampled = ofType(session.advanceTo(10), 'drill-gear.OreSampled')
-    expect(sampled).toMatchObject([{ tick: 8, tx: ABOVE_ORE.tx, ty: ABOVE_ORE.ty - 1 }])
+    const sampled = ofType(session.advanceTo(10), 'OreSampled')
+    expect(sampled).toMatchObject([
+      { tick: 8, playerId: 'p1', tx: ABOVE_ORE.tx, ty: ABOVE_ORE.ty - 1, via: 'corer' },
+    ])
     expect(chargesLeftOf(session.state(), 'p1', CORER)).toBe(3)
+  })
+
+  // #243: the plug is the kernel's OreSampled, which the codex hears as first contact.
+  it("records the plugged ore as codex contact via the corer, and the plug's ore stays unmined", () => {
+    const session = sessionWith({ 'drill.collar': CORER }, ABOVE_ORE, FACING.down)
+    session.submit(2, press('drill.collar'))
+    const events = session.advanceTo(10)
+    const [plug] = ofType(events, 'OreSampled')
+    const oreId = plug.type === 'OreSampled' ? plug.oreId : ''
+    expect(ofType(events, 'codex.OreContacted')).toMatchObject([{ tick: 8, oreId, via: 'corer' }])
+    expect(ofType(events, 'codex.EntryAdded')).toMatchObject([
+      { playerId: 'p1', key: `ore:${oreId}`, stage: 'contacted' },
+    ])
+    expect(ofType(events, 'codex.OreDiscovered')).toEqual([])
   })
 
   // #162 acceptance 3 in play: the gate is the core itself, so no probe slice is needed.
@@ -175,7 +191,7 @@ describe('drill-gear sampling corer', () => {
     expect(ofType(events, 'power-up-core.PowerUpBlocked')).toMatchObject([
       { itemId: CORER, gateKind: 'core', tx: core.tx, ty: core.ty },
     ])
-    expect(ofType(events, 'drill-gear.OreSampled')).toEqual([])
+    expect(ofType(events, 'OreSampled')).toEqual([])
     expect(chargesLeftOf(session.state(), 'p1', CORER)).toBe(4)
     const world = session.state().world
     expect(cellDensitySum(world, PARAMS, core)).toBe(cellDensitySum(EMPTY_WORLD, PARAMS, core))

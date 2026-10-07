@@ -8,8 +8,8 @@
  * `cut` verdict means the drill may take the cell, so the corer samples it. With no ore in reach
  * the tube comes back empty and the charge is spent.
  *
- * The codex hears no corer contact yet: `first_contact {via: corer}` needs a kernel route the codex
- * folds in (#205 Q4), so the plug is logged as the slice's own `drill-gear.ore_sampled`.
+ * The plug is the kernel's `OreSampled {via: corer}` (#243, from the #205 lock Q2), which the codex
+ * hears as `first_contact {via: corer}`.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged } from '../../../systems/authority/commandRule'
@@ -27,7 +27,6 @@ import { CELL_KIND, kindOfCell } from '../../../systems/world/worldCell'
 import { cellAt } from '../../../systems/world/worldState'
 import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
 import { gearValueOf } from './drillGearItems'
-import './drillGearEvents'
 
 export const SAMPLING_CORER_ID = 'gear.sampling_corer'
 
@@ -99,7 +98,7 @@ function sampled(
     kind: 'acted',
     effect: {
       state,
-      events: [{ type: 'drill-gear.OreSampled', playerId, ...tile, oreId: ore.id }],
+      events: [{ type: 'OreSampled', playerId, ...tile, oreId: ore.id, via: 'corer' }],
     },
   }
 }
