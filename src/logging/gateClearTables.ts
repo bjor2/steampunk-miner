@@ -1,90 +1,109 @@
 /**
  * The bot's gate clears judged across the pacing seeds, as `balance:charges` prints them (GD lock
- * on #148, ticket 237): per judged planet, each seed's dynamite clears and their median (wanted at
- * 1.5 or more a run), each seed's dynamite payback and its median (wanted at 2x or more: #143 guard
- * 2, moved here from K8 #218), and each seed's extractor clears and their median (wanted at 1.5 or
- * more). A seed whose bot blasted no gated cell has no payback and sits out of that median.
+ * on #148, ticket 237 and its GD ruling of 7 Oct):
+ *
+ * - Dynamite clears: the hard bar, a median of 1.5 or more a run, worked out per planet over only
+ *   the seeds whose generated planet has dynamite-gated cells. A planet is judged when at least 2
+ *   seeds have such cells; with 1 it is an insufficient sample, printed and passed; with none it
+ *   reads n/a. At least 4 planets must be judged, one of them from planet 28 on. A planet of a
+ *   dynamite act (`isDynamiteAct`) with no cells on any seed is flagged as a content finding.
+ * - Dynamite payback: the freed cells' value over the price of the charges that freed them (#143
+ *   guard 2, moved from K8 #218), reported beside the clears and never a bar. A seed whose bot
+ *   blasted no gated cell has no payback and sits out of that median.
+ * - Extractor clears: reported only; the bar (a median of 1.5 or more) is 148d's (#296), once the
+ *   bot buys its extractors.
  */
 import { add, cmp, div, fromSafeInteger, toCanonical, type Money } from '../systems/money'
 import { dynamitePaybackOf, gateClearsOn, type PlanetGateClears } from './gateClearTally'
 
 export const DYNAMITE_CLEAR_FLOOR = 1.5
-export const DYNAMITE_PAYBACK_FLOOR = 2
-export const EXTRACTOR_CLEAR_FLOOR = 1.5
+/** #143 guard 2's figure, printed beside the clears for information. */
+export const DYNAMITE_PAYBACK_FIGURE = 2
+/** 148d's bar (#296), printed here for information. */
+export const EXTRACTOR_CLEAR_FIGURE = 1.5
+/** The GD ruling's coverage: judged planets, and the planet one of them must be at or past. */
+export const MIN_JUDGED_PLANETS = 4
+export const LATE_JUDGED_PLANET = 28
+const MIN_SEEDS_WITH_CELLS = 2
+
+/** A planet's dynamite-gated tiles per seed, and whether its act has a dynamite family. */
+export interface DynamiteCensus {
+  planet: number
+  isDynamiteAct: boolean
+  tilesBySeed: readonly number[]
+}
+
+export type DynamiteJudgement = 'judged' | 'insufficient sample' | 'no dynamite cells'
 
 export interface GateClearRow {
   planet: number
-  dynamiteBySeed: number[]
-  dynamiteMedian: number
+  isDynamiteAct: boolean
+  dynamiteTilesBySeed: readonly number[]
+  judgement: DynamiteJudgement
+  /** Null on a seed with no dynamite cells: it sits out of the median. */
+  dynamiteBySeed: (number | null)[]
+  dynamiteMedian: number | null
   paybackBySeed: (Money | null)[]
   paybackMedian: Money | null
   extractorBySeed: number[]
-  extractorMedian: number
+  extractorMedian: number | null
 }
 
-/** One row per planet, from each seed's tally in seed order. */
+/** One row per censused planet, from each seed's tally in seed order. */
 export function gateClearRowsOf(
   bySeed: readonly ReadonlyMap<number, PlanetGateClears>[],
-  planets: readonly number[],
+  census: readonly DynamiteCensus[],
 ): GateClearRow[] {
-  return planets.map((planet) => gateClearRowOf(bySeed, planet))
+  return census.map((planet) => gateClearRowOf(bySeed, planet))
 }
 
 export function dynamiteTableOf(rows: readonly GateClearRow[], seeds: readonly number[]): string {
   return [
-    `| planet | ${seeds.join(' | ')} | median | at least ${DYNAMITE_CLEAR_FLOOR} | ${seeds.map((seed) => `payback ${seed}`).join(' | ')} | median payback | at least ${DYNAMITE_PAYBACK_FLOOR}x |`,
-    `| --- | ${seeds.map(() => '---').join(' | ')} | --- | --- | ${seeds.map(() => '---').join(' | ')} | --- | --- |`,
+    `| planet | ${seeds.map((seed) => `cells ${seed}`).join(' | ')} | ${seeds.join(' | ')} | median | judged | at least ${DYNAMITE_CLEAR_FLOOR} | ${seeds.map((seed) => `payback ${seed}`).join(' | ')} | median payback (report) |`,
+    `| --- | ${seeds.map(() => '---').join(' | ')} | ${seeds.map(() => '---').join(' | ')} | --- | --- | --- | ${seeds.map(() => '---').join(' | ')} | --- |`,
     ...rows.map(
       (row) =>
-        `| ${row.planet} | ${row.dynamiteBySeed.join(' | ')} | ${row.dynamiteMedian} | ${yesNo(row.dynamiteMedian >= DYNAMITE_CLEAR_FLOOR)} | ${row.paybackBySeed.map(paybackText).join(' | ')} | ${paybackText(row.paybackMedian)} | ${yesNo(isPaybackMet(row.paybackMedian))} |`,
+        `| ${row.planet} | ${row.dynamiteTilesBySeed.join(' | ')} | ${row.dynamiteBySeed.map(clearsText).join(' | ')} | ${clearsText(row.dynamiteMedian)} | ${row.judgement} | ${dynamiteVerdictOf(row)} | ${row.paybackBySeed.map(paybackText).join(' | ')} | ${paybackText(row.paybackMedian)} |`,
     ),
   ].join('\n')
 }
 
 export function extractorTableOf(rows: readonly GateClearRow[], seeds: readonly number[]): string {
   return [
-    `| planet | ${seeds.join(' | ')} | median | at least ${EXTRACTOR_CLEAR_FLOOR} |`,
-    `| --- | ${seeds.map(() => '---').join(' | ')} | --- | --- |`,
+    `| planet | ${seeds.join(' | ')} | median |`,
+    `| --- | ${seeds.map(() => '---').join(' | ')} | --- |`,
     ...rows.map(
       (row) =>
-        `| ${row.planet} | ${row.extractorBySeed.join(' | ')} | ${row.extractorMedian} | ${yesNo(row.extractorMedian >= EXTRACTOR_CLEAR_FLOOR)} |`,
+        `| ${row.planet} | ${row.extractorBySeed.join(' | ')} | ${clearsText(row.extractorMedian)} |`,
     ),
   ].join('\n')
 }
 
-/** Every median under its floor, one line each. */
+/** Every judged median under the bar, every dry dynamite act, and a short coverage, one line each. */
 export function gateClearWarnings(rows: readonly GateClearRow[]): string[] {
-  return rows.flatMap((row) => [
-    ...(row.dynamiteMedian < DYNAMITE_CLEAR_FLOOR
-      ? [`planet ${row.planet}: the bot freed a median of ${row.dynamiteMedian} shells a run`]
-      : []),
-    ...(isPaybackMet(row.paybackMedian)
-      ? []
-      : [`planet ${row.planet}: dynamite paid back ${paybackText(row.paybackMedian)} (median)`]),
-    ...(row.extractorMedian < EXTRACTOR_CLEAR_FLOOR
-      ? [
-          `planet ${row.planet}: the bot freed a median of ${row.extractorMedian} extractor cells a run`,
-        ]
-      : []),
-  ])
-}
-
-export function isPaybackMet(payback: Money | null): boolean {
-  return payback !== null && cmp(payback, fromSafeInteger(DYNAMITE_PAYBACK_FLOOR)) >= 0
+  return [
+    ...rows.filter(isUnderTheBar).map(underTheBarLine),
+    ...rows.filter(isDryDynamiteAct).map(dryActLine),
+    ...coverageWarnings(rows),
+  ]
 }
 
 function gateClearRowOf(
   bySeed: readonly ReadonlyMap<number, PlanetGateClears>[],
-  planet: number,
+  census: DynamiteCensus,
 ): GateClearRow {
-  const seeds = bySeed.map((byPlanet) => gateClearsOn(byPlanet, planet))
-  const dynamiteBySeed = seeds.map((clears) => clears.dynamiteClears)
-  const paybackBySeed = seeds.map(dynamitePaybackOf)
+  const seeds = bySeed.map((byPlanet) => gateClearsOn(byPlanet, census.planet))
+  const hasCells = census.tilesBySeed.map((tiles) => tiles > 0)
+  const dynamiteBySeed = seeds.map((clears, at) => (hasCells[at] ? clears.dynamiteClears : null))
+  const paybackBySeed = seeds.map((clears, at) => (hasCells[at] ? dynamitePaybackOf(clears) : null))
   const extractorBySeed = seeds.map((clears) => clears.extractorClears)
   return {
-    planet,
+    planet: census.planet,
+    isDynamiteAct: census.isDynamiteAct,
+    dynamiteTilesBySeed: census.tilesBySeed,
+    judgement: judgementOf(hasCells.filter(Boolean).length),
     dynamiteBySeed,
-    dynamiteMedian: medianOf(dynamiteBySeed),
+    dynamiteMedian: medianOf(dynamiteBySeed.filter((clears) => clears !== null)),
     paybackBySeed,
     paybackMedian: medianMoneyOf(paybackBySeed),
     extractorBySeed,
@@ -92,7 +111,46 @@ function gateClearRowOf(
   }
 }
 
-function medianOf(values: readonly number[]): number {
+function judgementOf(seedsWithCells: number): DynamiteJudgement {
+  if (seedsWithCells >= MIN_SEEDS_WITH_CELLS) return 'judged'
+  return seedsWithCells === 0 ? 'no dynamite cells' : 'insufficient sample'
+}
+
+function dynamiteVerdictOf(row: GateClearRow): string {
+  if (row.judgement !== 'judged') return 'n/a'
+  return isUnderTheBar(row) ? 'no' : 'yes'
+}
+
+function isUnderTheBar(row: GateClearRow): boolean {
+  return row.judgement === 'judged' && (row.dynamiteMedian ?? 0) < DYNAMITE_CLEAR_FLOOR
+}
+
+function underTheBarLine(row: GateClearRow): string {
+  return `planet ${row.planet}: the bot freed a median of ${clearsText(row.dynamiteMedian)} shells a run over the seeds with dynamite cells`
+}
+
+function isDryDynamiteAct(row: GateClearRow): boolean {
+  return row.isDynamiteAct && row.judgement === 'no dynamite cells'
+}
+
+function dryActLine(row: GateClearRow): string {
+  return `planet ${row.planet}: a dynamite act with no dynamite cells on any seed (a content finding for Content and Planet)`
+}
+
+function coverageWarnings(rows: readonly GateClearRow[]): string[] {
+  const judged = rows.filter((row) => row.judgement === 'judged').map((row) => row.planet)
+  return [
+    ...(judged.length < MIN_JUDGED_PLANETS
+      ? [`only ${judged.length} planets judged for dynamite (${MIN_JUDGED_PLANETS} wanted)`]
+      : []),
+    ...(judged.some((planet) => planet >= LATE_JUDGED_PLANET)
+      ? []
+      : [`no planet from ${LATE_JUDGED_PLANET} on judged for dynamite`]),
+  ]
+}
+
+function medianOf(values: readonly number[]): number | null {
+  if (values.length === 0) return null
   const sorted = [...values].sort((a, b) => a - b)
   const middle = Math.floor(sorted.length / 2)
   return sorted.length % 2 === 1 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2
@@ -106,11 +164,11 @@ function medianMoneyOf(values: readonly (Money | null)[]): Money | null {
   return div(add(sorted[middle - 1], sorted[middle]), fromSafeInteger(2))
 }
 
+function clearsText(clears: number | null): string {
+  return clears === null ? 'n/a' : String(clears)
+}
+
 /** Two places, as the report prints its multiples; a report line, never a rule. */
 function paybackText(payback: Money | null): string {
   return payback === null ? '-' : `${Number(toCanonical(payback)).toFixed(2)}x`
-}
-
-function yesNo(isMet: boolean): string {
-  return isMet ? 'yes' : 'no'
 }

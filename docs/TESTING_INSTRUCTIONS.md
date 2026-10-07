@@ -216,13 +216,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   the bot scenario to planet 40's core on each pacing seed blasting (the bot's default) and never,
   and prints both median core times per planet, the blasts and whether each is inside C4: planets 7
   to 10 judged, 13 to 34 and 40 diagnostic until #148. Last, the dynamite gate (GD lock on #148,
-  ticket 236): the shells each seed's blasting bot freed (`mining-gates.gate_cleared {gateKind:
-dynamite}`) on planets 7, 10, 16, 22, 28, 34 and 40, and their median, expected at 1.5 or more a
-  run, beside their payback (ticket 237, the hard payoff gate K8 #218 left to the gates: the freed
-  value over the price of the charges that freed them, median expected at 2x or more), and the
-  matching extractor row (the cells each seed's bot freed with its own extractors, median 1.5 or
-  more). The tally and the tables are `logging/gateClearTally.ts` and `gateClearTables.ts`, with
-  their specs. Reported, never gated; the one lever is the price per charge. The band-density guard is also a spec (`bot/chargeSizeTrade.test.ts`). Charge
+  ticket 236, the GD ruling on ticket 237): the shells each seed's blasting bot freed
+  (`mining-gates.gate_cleared {gateKind: dynamite}`) on planets 7, 10, 16, 22, 28, 34 and 40 beside
+  each seed's dynamite-gated tiles (the debug action `dynamiteCellsOf` generates the planet). The
+  median over the seeds with such tiles is expected at 1.5 or more where at least 2 seeds have
+  them; a planet with 1 is an insufficient sample, with none n/a; at least 4 planets are judged,
+  one from planet 28 on, and a dynamite act (from its families) with no tiles on any seed is a
+  content finding. Beside it the payback (#218's 2x figure, reported: the freed value over the
+  price of the charges that freed them), the extractor row (reported; 148d #296 judges it once
+  the bot buys extractors), and `gate_blocked_no_route` per seed: gated walls on the bot's way
+  down (pad path, shaft, jog) nothing it carries or buys opens, expected 0
+  (`bot/gateRouteBlocks.ts`, `SliceRun.gateRouteBlocks`). The tally and the tables are
+  `logging/gateClearTally.ts`, `gateClearTables.ts` and `gateRouteStalls.ts`, with their specs. Reported, never gated; the one lever is the price per charge. The band-density guard is also a spec (`bot/chargeSizeTrade.test.ts`). Charge
   specs stand in band-2 rock with `charges/chargeFixtures.ts`, and the size specs in solid rock of
   the planet their size opens on (`sizedBlasterOn`); the bot's blasting run starts on planet 7 with
   a stocked rack and a lagging drill (`bot/botBlasting.test.ts`). The bot buys charges only on a

@@ -25,13 +25,18 @@
  *    without charges: judged on planets 7 to 10, and logged as a diagnostic on planets 13 to 34 and
  *    40 until #148's dynamite gates give the bot a reason to blast there (Vertical Scaler on #149).
  *    The one lever is the price per charge, never moved from the soft rows.
- * 5. The dynamite gate (GD lock on #148, ticket 236): in the blasting runs, the dynamite-gated
- *    cells each seed's bot freed (`mining-gates.gate_cleared {gateKind: dynamite}`) on planets 7,
- *    10, 16, 22, 28, 34 and 40, and their median, expected at 1.5 or more a run. Beside them the
- *    payback (ticket 237, moved from K8 #218): the freed cells' value over the price of the charges
- *    that freed them, its median expected at 2x or more.
- * 6. The matching extractor row (GD lock on #148, ticket 237): the extractor-gated cells each
- *    seed's bot freed with its own extractors on the same planets, median expected at 1.5 or more.
+ * 5. The dynamite gate (GD lock on #148, ticket 236, the GD ruling on ticket 237): in the blasting
+ *    runs, the dynamite-gated cells each seed's bot freed (`mining-gates.gate_cleared {gateKind:
+ *    dynamite}`) on planets 7, 10, 16, 22, 28, 34 and 40, beside each seed's dynamite-gated tiles
+ *    (the mining-gates debug action generates the planet). The median, over the seeds with such
+ *    tiles, is expected at 1.5 or more on each planet where at least 2 seeds have them; at least 4
+ *    planets are judged, one from planet 28 on, and a dynamite act with none is flagged. Beside
+ *    them the payback (moved from K8 #218), reported only: the freed cells' value over the price of
+ *    the charges that freed them.
+ * 6. The matching extractor row (GD lock on #148, ticket 237), reported only until 148d (#296)
+ *    has the bot buy its extractors: the extractor-gated cells each seed's bot freed with them.
+ * 7. `gate_blocked_no_route` (the GD ruling on ticket 237): per seed, the gated walls that stopped
+ *    the blasting bot's way down with nothing it carries or buys to open them, expected 0.
  *
  * The slice is untouched by charges, which open on planet 7. Run it with `npm run balance:charges`;
  * the forty-planet runs take a while.
@@ -46,13 +51,17 @@ import { medianPacingReport } from '../src/logging/pacingMedian'
 import { derivePacingReport, type PacingReport } from '../src/logging/pacingReport'
 import {
   DYNAMITE_CLEAR_FLOOR,
-  DYNAMITE_PAYBACK_FLOOR,
+  DYNAMITE_PAYBACK_FIGURE,
   dynamiteTableOf,
-  EXTRACTOR_CLEAR_FLOOR,
+  EXTRACTOR_CLEAR_FIGURE,
   extractorTableOf,
   gateClearRowsOf,
   gateClearWarnings,
+  LATE_JUDGED_PLANET,
+  MIN_JUDGED_PLANETS,
+  type DynamiteCensus,
 } from '../src/logging/gateClearTables'
+import { gateRouteStallTableOf, gateRouteStallWarnings } from '../src/logging/gateRouteStalls'
 import { gateClearsByPlanet, type PlanetGateClears } from '../src/logging/gateClearTally'
 import type { RunEvent } from '../src/logging/runEvent'
 import type { RunEventName } from '../src/logging/eventNames'
@@ -63,6 +72,7 @@ import {
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import { blastTradeOf, type BlastTrade } from '../src/systems/bot/blastTrade'
 import type { ChargePolicy } from '../src/systems/bot/botCharges'
+import type { GateRouteBlock } from '../src/systems/bot/gateRouteBlocks'
 import {
   chargePayoffsOf,
   isUnderPayoffFloor,
@@ -106,7 +116,7 @@ const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
 const MAX_SPEED_UP_PERCENT = 10
 const QUICK_FLOOR_MULTIPLE = 2
 const SLOW_FLOOR_MULTIPLE = 4
-/** The planets the dynamite and extractor gates are judged on (GD lock on #148). */
+/** The planets the dynamite and extractor gates are read on (GD lock on #148). */
 const GATE_PLANETS = [7, 10, 16, 22, 28, 34, 40]
 /** The run-log lines the pace rows count per planet. */
 const COUNTED_LINES: readonly RunEventName[] = ['charges_restocked', 'charge_detonated']
@@ -125,13 +135,14 @@ const blasting = playTo('blast')
 const drilling = playTo('never')
 const judgedRows = judgedPlanets.map((planet) => paceRowOf(planet))
 const diagnosticRows = DIAGNOSTIC_PLANETS.map((planet) => paceRowOf(planet))
-const gateRows = gateClearRowsOf(blasting.gateClears, GATE_PLANETS)
+const gateRows = gateClearRowsOf(blasting.gateClears, GATE_PLANETS.map(dynamiteCensusOf))
 const warnings = [
   ...tradeWarnings(),
   ...sizeGuardWarnings(),
   ...payoffWarnings(),
   ...paceWarnings(),
   ...gateClearWarnings(gateRows),
+  ...gateRouteStallWarnings(blasting.routeBlocks, SEEDS),
 ]
 const text = [
   `## blasting_charges and the dynamite sizes against the pacing bot (report only)`,
@@ -171,10 +182,12 @@ const text = [
   paceTableOf(judgedRows),
   '### The bot, planets 13 to 34 and 40 (C4, diagnostic until #148)',
   paceTableOf(diagnosticRows),
-  `### The dynamite gate: shells the bot freed a run (GD lock on #148, expected a median of ${DYNAMITE_CLEAR_FLOOR} or more) and their payback (expected a median of ${DYNAMITE_PAYBACK_FLOOR}x or more)`,
+  `### The dynamite gate: shells the bot freed a run (GD ruling on ticket 237: a median of ${DYNAMITE_CLEAR_FLOOR} or more over the seeds with dynamite cells, judged where 2 seeds have them, ${MIN_JUDGED_PLANETS} planets judged, one from ${LATE_JUDGED_PLANET} on) and their payback (#218's ${DYNAMITE_PAYBACK_FIGURE}x figure, reported)`,
   dynamiteTableOf(gateRows, SEEDS),
-  `### The extractor gate: cells the bot freed a run with its own extractors (GD lock on #148, expected a median of ${EXTRACTOR_CLEAR_FLOOR} or more)`,
+  `### The extractor gate: cells the bot freed a run with its own extractors (reported; 148d #296 judges a median of ${EXTRACTOR_CLEAR_FIGURE} or more)`,
   extractorTableOf(gateRows, SEEDS),
+  '### gate_blocked_no_route: gated walls on the way down the bot could not open (GD ruling on ticket 237, expected 0 on every seed)',
+  gateRouteStallTableOf(blasting.routeBlocks, SEEDS),
   `### Warnings\n\n${warnings.length === 0 ? 'none' : warnings.map((line) => `- ${line}`).join('\n')}`,
 ].join('\n\n')
 
@@ -195,6 +208,14 @@ interface GateTableAnswer {
   problems?: string[]
 }
 
+/** A planet's dynamite census as the mining-gates debug action answers it. */
+interface DynamiteCellsAnswer {
+  ok: boolean
+  isDynamiteAct?: boolean
+  tilesBySeed?: number[]
+  problems?: string[]
+}
+
 interface TradeRow {
   planet: number
   drill: string
@@ -211,6 +232,8 @@ interface PolicyRuns {
   counted: CountedLine[]
   /** Per seed, in seed order: what each planet's gated cells gave up. */
   gateClears: Map<number, PlanetGateClears>[]
+  /** Per seed, in seed order: the walls that stopped the way down. */
+  routeBlocks: (readonly GateRouteBlock[])[]
 }
 
 interface PaceRow {
@@ -221,6 +244,17 @@ interface PaceRow {
   restocks: number
   blasts: number
   isInsideC4: boolean
+}
+
+/** Each seed's dynamite-gated tiles on the planet, generated by the mining-gates debug action. */
+function dynamiteCensusOf(planet: number): DynamiteCensus {
+  const dynamiteCellsOf = debugActionsBySlice()['mining-gates']?.dynamiteCellsOf
+  if (dynamiteCellsOf === undefined) throw new Error('the mining-gates slice is not loaded')
+  const answer = dynamiteCellsOf(planet, SEEDS) as DynamiteCellsAnswer
+  if (!answer.ok || answer.tilesBySeed === undefined) {
+    throw new Error((answer.problems ?? []).join('\n'))
+  }
+  return { planet, isDynamiteAct: answer.isDynamiteAct === true, tilesBySeed: answer.tilesBySeed }
 }
 
 /** The seed's resolved gate table, read through the mining-gates slice's debug action. */
@@ -319,17 +353,19 @@ function whereOf(trade: ChargeSizeTrade): string {
 function playTo(chargePolicy: ChargePolicy): PolicyRuns {
   const runs = SEEDS.map((worldSeed) => {
     const options = { lastPlanet: LAST_PLANET, maxTicks: BUDGET_TICKS, chargePolicy }
-    const { events } = playLoggedSlice({ ...scenario, worldSeed }, options)
+    const { run, events } = playLoggedSlice({ ...scenario, worldSeed }, options)
     return {
       report: derivePacingReport(events, worldSeed),
       counted: countedLinesOf(events),
       gateClears: gateClearsByPlanet(events),
+      routeBlocks: run.gateRouteBlocks,
     }
   })
   return {
     pacing: medianPacingReport(runs.map((run) => run.report)),
     counted: runs.flatMap((run) => run.counted),
     gateClears: runs.map((run) => run.gateClears),
+    routeBlocks: runs.map((run) => run.routeBlocks),
   }
 }
 
