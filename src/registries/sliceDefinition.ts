@@ -25,6 +25,7 @@ import type {
 import type { DockFacility } from '../systems/registries/dockFacilities'
 import type { DockService } from '../systems/registries/dockServices'
 import type { InputReactionEntry } from '../systems/registries/inputReactions'
+import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectionModifiers'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
@@ -73,6 +74,8 @@ export interface SliceRegistrar {
    * it below half (ticket 233).
    */
   hullDamageIntercept(intercept: HullDamageIntercept): void
+  /** Shrinks how far a hunting enemy notices the vehicle, never below half (ticket 233). */
+  enemyDetectionModifier(modifier: EnemyDetectionModifier): void
   /** A dock building that opens its `facility` schedule row from that row's planet on (#221). */
   dockFacility(facility: DockFacility): void
   /** Answers a pressed action the kernel's routing table leaves open, such as `use_slot_1`. */

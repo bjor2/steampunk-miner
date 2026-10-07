@@ -21,6 +21,7 @@
 import { MM_PER_METRE } from '../../../constants/physics'
 import type { EnemyKind } from '../../economy/economyDefinition'
 import { enemyBoundedStats, type EnemyBoundedStats } from '../../economy/enemyStats'
+import { detectionReachMm } from '../../registries/enemyDetectionModifiers'
 import type { AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
 import { isOnTheNose, isTouching, isWithinMm, stepAwayFrom, stepToward } from './combatGeometry'
@@ -84,7 +85,7 @@ export function stepEnemy(
 }
 
 function hunt({ state, enemy, target, terrain, tick }: EnemyTurn): RuleEffect {
-  if (!isWithinMm(target.position, enemy, statsOf(enemy).detectionTiles * MM_PER_METRE)) {
+  if (!isWithinMm(target.position, enemy, detectionReachOf(state, enemy, tick))) {
     return updated(state, enemy.phase === 'idle' ? enemy : inPhase(enemy, 'idle', tick))
   }
   if (!isWithinMm(target.position, enemy, lungeReachMm(enemy))) {
@@ -92,6 +93,11 @@ function hunt({ state, enemy, target, terrain, tick }: EnemyTurn): RuleEffect {
   }
   if (tick < enemy.readyTick) return updated(state, { ...enemy, phase: 'approach' })
   return updated(state, inPhase(enemy, 'windup', tick))
+}
+
+/** The enemy's detection reach, after any smoke a slice laid (ticket 233). */
+function detectionReachOf(state: AuthorityState, enemy: Enemy, tick: number): number {
+  return detectionReachMm(state, enemy, tick, statsOf(enemy).detectionTiles * MM_PER_METRE)
 }
 
 function windUp({ state, enemy, target, tick }: EnemyTurn): RuleEffect {

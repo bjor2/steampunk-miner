@@ -42,6 +42,7 @@ import {
 import { DOCK_FACILITY_REGISTRY } from '../systems/registries/dockFacilities'
 import { DOCK_SERVICE_REGISTRY } from '../systems/registries/dockServices'
 import { INPUT_REACTION_REGISTRY } from '../systems/registries/inputReactions'
+import { ENEMY_DETECTION_MODIFIER_REGISTRY } from '../systems/registries/enemyDetectionModifiers'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
 import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
@@ -87,6 +88,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     dockService: (service) => add(DOCK_SERVICE_REGISTRY, service),
     dockFacility: (facility) => add(DOCK_FACILITY_REGISTRY, facility),
     hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),
+    enemyDetectionModifier: (modifier) => add(ENEMY_DETECTION_MODIFIER_REGISTRY, modifier),
     inputReaction: (reaction) => add(INPUT_REACTION_REGISTRY, reaction),
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
