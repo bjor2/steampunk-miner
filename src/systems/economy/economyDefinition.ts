@@ -5,6 +5,7 @@
  */
 import type { DrillGearCaps } from './drillGearCaps'
 import type { ItemEffectCaps } from './itemEffectCaps'
+import type { MagnetCaps } from './magnetCaps'
 import type { BigStat, Money } from '../money'
 import type { WholeFraction } from '../wholeFractions'
 
@@ -418,4 +419,6 @@ export interface Economy {
   itemEffectCaps: ItemEffectCaps
   /** What slice drill gear may add to the drill's cut at most (ticket 234, `drillGearCaps.ts`). */
   drillGearCaps: DrillGearCaps
+  /** The terrain magnets family's caps (GD lock on #246, ticket 282, `magnetCaps.ts`). */
+  magnets: MagnetCaps
 }

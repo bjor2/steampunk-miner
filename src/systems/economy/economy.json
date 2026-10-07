@@ -274,5 +274,13 @@
   "drillGearCaps": {
     "aheadCellsMax": 1,
     "sideEnergyShareFloorBp": 10000
+  },
+  "magnets": {
+    "maxCellsMoved": 8,
+    "movableCells": "diggable",
+    "movedCells": "conserved",
+    "cellEnergyFloorBp": 10000,
+    "cooldownFloorTicks": 600,
+    "incomeCapBp": 1500
   }
 }

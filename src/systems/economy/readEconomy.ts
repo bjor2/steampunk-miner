@@ -14,6 +14,7 @@ import { readBlastingCharges } from './readBlastingEconomy'
 import { readEnemies } from './readEnemyEconomy'
 import { readDrillGearCaps } from './drillGearCaps'
 import { readItemEffectCaps } from './itemEffectCaps'
+import { readMagnetCaps } from './magnetCaps'
 import { readPaceScale } from './readPaceScale'
 import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
@@ -74,6 +75,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     enemies: readEnemies(reader, reader.object('enemies', file.enemies)),
     itemEffectCaps: readItemEffectCaps(reader, file.itemEffectCaps),
     drillGearCaps: readDrillGearCaps(reader, file.drillGearCaps),
+    magnets: readMagnetCaps(reader, file.magnets),
   }
 }
 
