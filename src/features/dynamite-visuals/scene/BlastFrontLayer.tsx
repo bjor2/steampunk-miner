@@ -3,20 +3,16 @@
  * `BlastFront` slice (K6 #189) throws fire and dust across the ring it uncovered and debris out
  * of it, so the ring rides the clearing's edge tick by tick; each detonation lights the size's
  * flash sprite for two frames while the player's flash switch is on. Fixed pools placed in
- * `useFrame`, never through React; it never writes the authority, the camera or the sound.
+ * `useFrame`, never through React; it never writes the authority, the camera or the sound. A
+ * debug preview (`previewBlast`) feeds it a solid-rock blast with no world change.
  */
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
 import { useDisposeEachOnRelease } from '../../../scene/disposeOnRelease'
 import { listenForDomainEvents } from '../../../store/domainEventBroadcast'
 import { useGameStore } from '../../../store/gameStore'
-import {
-  clearBlastEventQueue,
-  createBlastEventQueue,
-  queueBlastEvents,
-  type BlastEventQueue,
-} from '../systems/render/blastEventQueue'
-import { QUEUED_BLAST_EVENTS } from '../systems/render/blastLookConstants'
+import { clearBlastFeed, hearBlastEvents, takeBlastFeed } from '../store/blastFeed'
+import type { BlastEventQueue } from '../systems/render/blastEventQueue'
 import {
   createBlastFrontPools,
   drawBlastFrontPools,
@@ -30,13 +26,12 @@ import {
 export const BLAST_FRONT_LAYER_ID = 'dynamite-visuals.front'
 
 export function BlastFrontLayer() {
-  const queue = useMemo(() => createBlastEventQueue(QUEUED_BLAST_EVENTS), [])
   const pools = useMemo(createBlastFrontPools, [])
   useDisposeEachOnRelease(useMemo(() => gpuResourcesOf(pools), [pools]))
-  useEffect(() => listenForDomainEvents((events) => queueBlastEvents(queue, events)), [queue])
+  useEffect(() => listenForDomainEvents(hearBlastEvents), [])
   useFrame((_, delta) => {
     stepBlastFrontPools(pools, delta)
-    throwQueuedBlasts(pools, queue)
+    throwQueuedBlasts(pools, takeBlastFeed())
     drawBlastFrontPools(pools)
   })
   return (
@@ -53,7 +48,7 @@ export function BlastFrontLayer() {
 function throwQueuedBlasts(pools: BlastFrontPools, queue: BlastEventQueue): void {
   for (let at = 0; at < queue.frontCount; at++) throwFront(pools, queue.fronts[at])
   if (useGameStore.getState().prefs.flashes) lightQueuedFlashes(pools, queue)
-  clearBlastEventQueue(queue)
+  clearBlastFeed()
 }
 
 function lightQueuedFlashes(pools: BlastFrontPools, queue: BlastEventQueue): void {

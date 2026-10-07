@@ -39,7 +39,14 @@ import {
 } from '../../../systems/render/particles'
 import { createSeededRandom, type SeededRandom } from '../../../systems/seededRandom'
 import type { QueuedFlash, QueuedFront } from '../systems/render/blastEventQueue'
-import { flashSpriteOf, frontSprayOf } from '../systems/render/blastFrontLook'
+import { blastFrontPresence } from './blastFrontPresence'
+import {
+  flashSpriteOf,
+  frontLayerDrawOf,
+  frontSprayOf,
+  raisePeak,
+  type FrontPoolCounts,
+} from '../systems/render/blastFrontLook'
 import {
   BLAST_DEBRIS_CAPACITY,
   BLAST_FRONT_SEED,
@@ -84,6 +91,7 @@ export interface BlastFrontPools {
   spray: Spray
   centre: ChargePlacement
   piece: Object3D
+  counts: FrontPoolCounts
   fireGeometry: BufferGeometry
   dustGeometry: BufferGeometry
   fireMaterial: PointsMaterial
@@ -112,6 +120,7 @@ export function createBlastFrontPools(): BlastFrontPools {
     spray: { x: 0, y: 0, dirX: 0, dirY: 1, speed: 0, spreadRadians: 0, lifeSeconds: 0 },
     centre: { x: 0, y: 0, turn: 0 },
     piece: new Object3D(),
+    counts: { fire: 0, dust: 0, debris: 0, isFlashShown: false },
     fireGeometry: createPointGeometry(SPARK_CAPACITY),
     dustGeometry: createPointGeometry(COLLAPSE_DUST_CAPACITY),
     fireMaterial: createFireMaterial(),
@@ -143,6 +152,7 @@ export function throwFront(pools: BlastFrontPools, front: QueuedFront): void {
   throwAcrossRing(pools, pools.fire, front, counts.fire)
   throwAcrossRing(pools, pools.dust, front, counts.dust)
   throwAcrossRing(pools, pools.debris, front, counts.debris)
+  blastFrontPresence.frontsThrown++
 }
 
 /** Lights the flash sprite over the clearing for its frames; a size with no flash shows none. */
@@ -154,6 +164,7 @@ export function lightFlash(pools: BlastFrontPools, flash: QueuedFlash): void {
   pools.flashMesh.scale.set(sprite.radiusM, sprite.radiusM, 1)
   pools.flashMesh.material.opacity = sprite.opacity
   pools.flashFramesLeft = sprite.frames
+  blastFrontPresence.flashesLit++
 }
 
 export function stepBlastFrontPools(pools: BlastFrontPools, dt: number): void {
@@ -162,13 +173,23 @@ export function stepBlastFrontPools(pools: BlastFrontPools, dt: number): void {
   stepParticles(pools.debris.pool, dt)
 }
 
-/** Uploads this frame's pieces and counts the flash down a frame. */
+/** Uploads this frame's pieces, counts the flash down a frame and records what it drew. */
 export function drawBlastFrontPools(pools: BlastFrontPools): void {
   uploadPoints(pools.fire.pool, pools.fireGeometry, FIRE_Z)
   uploadPoints(pools.dust.pool, pools.dustGeometry, DUST_Z)
   placeDebris(pools.debris.pool, pools.debrisMesh, pools.piece)
   pools.flashMesh.visible = pools.flashFramesLeft > 0
   pools.flashFramesLeft = Math.max(0, pools.flashFramesLeft - 1)
+  recordFrameDraw(pools)
+}
+
+function recordFrameDraw(pools: BlastFrontPools): void {
+  const { counts } = pools
+  counts.fire = pools.fire.pool.count
+  counts.dust = pools.dust.pool.count
+  counts.debris = pools.debris.pool.count
+  counts.isFlashShown = pools.flashMesh.visible
+  raisePeak(blastFrontPresence.peak, frontLayerDrawOf(counts))
 }
 
 function ringThrowOf(

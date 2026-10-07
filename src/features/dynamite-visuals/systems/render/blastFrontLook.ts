@@ -116,3 +116,33 @@ export function debrisCountOf(radiusMm: number): number {
 function countOnRim(radiusMm: number, perTile: number, capacity: number): number {
   return Math.min(capacity, Math.round(rimTilesOf(radiusMm) * perTile))
 }
+
+/** What the front layer draws in a frame: a pool draws one call while it holds any piece. */
+export interface LayerDraw {
+  drawCalls: number
+  instances: number
+}
+
+/** The pieces the front's pools hold this frame, and whether the flash sprite shows. */
+export interface FrontPoolCounts {
+  fire: number
+  dust: number
+  debris: number
+  isFlashShown: boolean
+}
+
+export function frontLayerDrawOf(counts: FrontPoolCounts): LayerDraw {
+  const flash = counts.isFlashShown ? 1 : 0
+  const pools = [counts.fire, counts.dust, counts.debris]
+  return {
+    drawCalls: pools.filter((count) => count > 0).length + flash,
+    instances: counts.fire + counts.dust + counts.debris + flash,
+  }
+}
+
+/** Raises `peak` to `now` where `now` is higher; returns `peak`. */
+export function raisePeak(peak: LayerDraw, now: LayerDraw): LayerDraw {
+  peak.drawCalls = Math.max(peak.drawCalls, now.drawCalls)
+  peak.instances = Math.max(peak.instances, now.instances)
+  return peak
+}

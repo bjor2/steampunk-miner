@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { COLLAPSE_DUST_CAPACITY, SPARK_CAPACITY } from '../../../../constants/scene'
-import { BLAST_TILES_PER_TICK } from '../../../../constants/terrainBudget'
-import { blastFrontOf, frontRadiusMm } from '../../../../systems/authority/charges/blastFront'
 import {
   blastFrontLookOf,
   blastRingOf,
@@ -9,11 +7,14 @@ import {
   dustCountOf,
   fireCountOf,
   flashSpriteOf,
+  frontLayerDrawOf,
   frontSprayOf,
+  raisePeak,
   rimTilesOf,
   type FrontSpray,
 } from './blastFrontLook'
 import { BLAST_DEBRIS_CAPACITY, FLASH_FRAMES, FLASH_SPRITE_MAX_OPACITY } from './blastLookConstants'
+import { solidRockSlicesOf } from './blastPreview'
 
 // The #143 ladder's radii for sizes 1, 5 and 10 (2.5, 8 and 24 tiles), fixtures only.
 const SIZE_1_MM = 2500
@@ -75,19 +76,8 @@ describe('blast front look', () => {
   })
 })
 
-/** The rings K6 slices a blast of `radiusMm` into in solid rock: 64 tiles a tick, nearest first. */
-function slicedFrontsOf(radiusMm: number): [number, number][] {
-  const front = blastFrontOf(radiusMm)
-  const slices: [number, number][] = []
-  for (let first = 0; first < front.length; first += BLAST_TILES_PER_TICK) {
-    const last = Math.min(front.length, first + BLAST_TILES_PER_TICK) - 1
-    slices.push([frontRadiusMm(front[first].distanceSq), frontRadiusMm(front[last].distanceSq)])
-  }
-  return slices
-}
-
 function sprayOfWholeBlast(radiusMm: number): FrontSpray {
-  return slicedFrontsOf(radiusMm)
+  return solidRockSlicesOf(radiusMm)
     .map(([rInnerMm, rOuterMm]) => frontSprayOf(rInnerMm, rOuterMm))
     .reduce((sum, spray) => ({
       fire: sum.fire + spray.fire,
@@ -98,8 +88,8 @@ function sprayOfWholeBlast(radiusMm: number): FrontSpray {
 
 describe('blast front spray', () => {
   it("throws a one-slice blast's whole rim on its one slice", () => {
-    expect(slicedFrontsOf(SIZE_1_MM)).toHaveLength(1)
-    const [[rInnerMm, rOuterMm]] = slicedFrontsOf(SIZE_1_MM)
+    expect(solidRockSlicesOf(SIZE_1_MM)).toHaveLength(1)
+    const [[rInnerMm, rOuterMm]] = solidRockSlicesOf(SIZE_1_MM)
     expect(frontSprayOf(rInnerMm, rOuterMm)).toEqual({
       fire: fireCountOf(rOuterMm),
       dust: dustCountOf(rOuterMm),
@@ -113,7 +103,7 @@ describe('blast front spray', () => {
   })
 
   it('never asks the pools for more than they hold over a whole R24 blast of 29 slices', () => {
-    expect(slicedFrontsOf(SIZE_10_MM)).toHaveLength(29)
+    expect(solidRockSlicesOf(SIZE_10_MM)).toHaveLength(29)
     const spray = sprayOfWholeBlast(SIZE_10_MM)
     expect(spray.fire).toBeLessThanOrEqual(SPARK_CAPACITY)
     expect(spray.dust).toBeLessThanOrEqual(COLLAPSE_DUST_CAPACITY)
@@ -134,5 +124,24 @@ describe('blast flash sprite', () => {
       opacity: FLASH_SPRITE_MAX_OPACITY / 2,
     })
     expect(flashSpriteOf(10, SIZE_10_MM).opacity).toBe(FLASH_SPRITE_MAX_OPACITY)
+  })
+})
+
+describe('blast front layer draw', () => {
+  it('draws a call per pool holding any piece, and the flash sprite while it shows', () => {
+    expect(frontLayerDrawOf({ fire: 0, dust: 0, debris: 0, isFlashShown: false })).toEqual({
+      drawCalls: 0,
+      instances: 0,
+    })
+    expect(frontLayerDrawOf({ fire: 40, dust: 0, debris: 12, isFlashShown: true })).toEqual({
+      drawCalls: 3,
+      instances: 53,
+    })
+  })
+
+  it('keeps the highest draw seen', () => {
+    const peak = { drawCalls: 2, instances: 300 }
+    raisePeak(peak, { drawCalls: 4, instances: 100 })
+    expect(peak).toEqual({ drawCalls: 4, instances: 300 })
   })
 })
