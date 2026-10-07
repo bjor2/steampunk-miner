@@ -12,7 +12,7 @@ import { statsOfVehicle } from '../../../systems/vehicle/vehicleState'
 import type { OrePickup } from './chipBoard'
 import { oreFaceOf, type OreFace } from './oreFace'
 import type { NewMaterial } from './plaqueBoard'
-import { awayDirectionOf, motionOfPose } from './render/chipPlacement'
+import { awayDirectionOf, motionOfPose, type VehicleMotion } from './render/chipPlacement'
 import { unitPriceTextOf } from './unitPrice'
 
 type CargoAdded = Extract<DomainEvent, { type: 'CargoAdded' }>
@@ -53,15 +53,19 @@ function pickupOf(
   state: AuthorityState,
   playerId: string,
 ): OrePickup {
-  const vehicle = vehicleOf(state, playerId)
-  const motion = motionOfPose(vehicle.pose, statsOfVehicle(vehicle).engine.speedMax)
   return {
     face,
     amount: added.amount,
     tick: added.tick,
     planetIndex: state.planet.index,
-    away: awayDirectionOf(motion),
+    away: awayDirectionOf(localMotionOf(state, playerId)),
   }
+}
+
+/** The player's vehicle as last reported, against how fast it drives. */
+export function localMotionOf(state: AuthorityState, playerId: string): VehicleMotion {
+  const vehicle = vehicleOf(state, playerId)
+  return motionOfPose(vehicle.pose, statsOfVehicle(vehicle).engine.speedMax)
 }
 
 function momentOf(

@@ -1,0 +1,55 @@
+/*
+ * A chip centres on its anchor (an overlay card's corner sits on the point) and rises about 24 px
+ * over 1 s, then fades over 0.4 s (#172 §1). Text and icon follow --ui-scale and the viewport, so
+ * desktop, mobile and TV read it at the same share of the screen (#173).
+ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2) 2px 2px;
+  border: 1px solid var(--color-brass);
+  border-radius: 999px;
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  animation: chip-rise 1s ease-out forwards;
+  transition: opacity 0.4s linear;
+}
+
+.chip[data-phase='fading'] {
+  opacity: 0;
+}
+
+@keyframes chip-rise {
+  to {
+    transform: translate(-50%, calc(-50% - 24px * var(--ui-scale)));
+  }
+}
+
+.name {
+  color: var(--color-brass);
+}
+
+/* A merge bumps the count (#172 GD draft: "the count ticks up with a small bump"). */
+.count {
+  display: inline-block;
+  font-weight: bold;
+  animation: count-bump 0.2s ease-out;
+}
+
+@keyframes count-bump {
+  from {
+    transform: scale(1.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .count {
+    animation: none;
+  }
+}

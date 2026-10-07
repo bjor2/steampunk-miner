@@ -1,0 +1,33 @@
+/*
+ * A flat hex in the ore's tile colour inside a brass rim (#158 hex icons, #151 tile colour): the
+ * rim is the outer hex showing round the inner one, since a clip path cuts a border off.
+ */
+.hex {
+  display: inline-block;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--ore-icon-size);
+  height: var(--ore-icon-size);
+  padding: 2px;
+  clip-path: polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0% 50%);
+  background: var(--color-brass);
+}
+
+.hex::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0% 50%);
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.35), transparent 55%), var(--ore-swatch);
+}
+
+/* #172 §4: at least 24 px on desktop and mobile, as the HUD icons (VectorIcon.module.css). */
+.chip {
+  --ore-icon-size: max(24px, calc(24 / 1080 * 100vh));
+}
+
+/* §2: the plaque's 48 px tile at 1080p, never under 32 px. */
+.tile {
+  --ore-icon-size: max(32px, calc(48 / 1080 * 100vh));
+}
