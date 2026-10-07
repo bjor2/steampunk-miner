@@ -287,11 +287,20 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   launch parameters (`?debug&scenario=<committed file>` in a browser, `--debug-api` and
   `--scenario=<path>` for the packaged build). Assert state and digests, never pixels; no
   screenshot comparisons in the slice. Every browser spec also asserts no console error.
-- `e2e/browser/` runs on the preview build (`npm run test:e2e`, which builds first; install the
-  browser once with `npx playwright install chromium`). `e2e/packaged/` runs on the packaged game
+- `e2e/browser/` runs on the preview build (`npm run test:e2e`, which builds first unless `dist/` is
+  newer than every build input, as right after `npm run build`; install the browser once with
+  `npx playwright install chromium`; `E2E_PORT` moves the preview off the shared 4173). `e2e/packaged/` runs on the packaged game
   (`npm run electron:build`, then `npm run test:packaged`, under `xvfb-run -a` on Linux); each
   launch gets a fresh user-data folder.
 - Not covered, by design: vehicle feel, camera, art and audio. Those stay hand checks.
+- **Affected specs** (#190): `npm run test:e2e:affected` runs only the browser specs a change can
+  affect (against `origin/main`, `-- --base <ref>`, or the listing in `CHANGED_FILES`; `-- --dry-run`
+  prints the choice). The map is `e2e/affected.json`: a changed spec runs itself, config, package,
+  e2e helper and map changes run the full suite, docs and unit tests run none, and a path no rule
+  maps runs the full suite. A new spec joins a rule (`scripts/e2e/affectedSpecs.test.mjs` fails until
+  it does). The nightly full run catches what the map misses. With `CI=1` a failed test gets one
+  retry and counts as flaky; `npm run test:e2e:timings` prints the run's phase and per-spec times
+  from `e2e-report/results.json`.
 - **Screen matrix** (#173, #179): `e2e/browser/screens/` runs once per reference screen, one
   Playwright project per cell of `screenCells.ts` (desktop, ultra-wide, 32:9, TV and TV at 1080p
   with TV mode on, iPhone 13 and Pixel 7 class phones in landscape, a phone in portrait, a tablet).

@@ -21,6 +21,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run typecheck`                       | `tsc` for `src/`, `electron/` and the Playwright `e2e/`   |
 | `npm test`                                | Vitest (node, no DOM, no canvas; Rapier in physics specs) |
 | `npm run test:e2e` / `test:packaged`      | Playwright: preview build / packaged Electron build       |
+| `npm run test:e2e:affected`               | only the browser specs a change reaches (#190)            |
 | `npm run golden:update`                   | rewrite `tests/golden/` after a version bump              |
 | `npm run tests:manifest`                  | refresh `tests/MANIFEST.md` after adding or moving tests  |
 | `npm run screens:update`                  | rewrite the screen matrix shots in `docs/screens/`        |
