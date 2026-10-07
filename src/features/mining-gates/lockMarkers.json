@@ -1,5 +1,15 @@
 {
   "source": "Ticket 238 and #142 'Before contact': a cracked shell for dynamite, a hard dark rim for the drill (open, glinting, once the tip of the last completed major cuts it), and one slow surface motion per extractor, from #142's extraction-rig table. A signature cell's marker takes its act's rim tint from #151's per-theme palette (Planet & Narrative, adopted by the Game Director); #151 names the tints, the hex values here are starting values for art. #151's hue-collision rule sends a rim within hueCollisionDeg of the family's hue to the theme's secondary colour, and a rim inside the reserved heat hues (#151 'Reserved colours', #142 'No orange' on the extractor marker) takes the secondary too, which is why Fire wears char red, not ember orange.",
+  "terrainKindsSource": "Ticket 298 (kernel terrain gate channel): the number each marker pattern takes in the cell's 4 kind bits, which the terrain shader draws apart. One per pattern, never per extractor name or icon (Horizontal's guard), 0 to 15; the numbers past the last are free for frozen, magnetic and hollow.",
+  "terrainKinds": {
+    "hard_rim": 0,
+    "cracked_shell": 1,
+    "concentric-rings": 2,
+    "vapour-wisps": 3,
+    "drip-lines": 4,
+    "filing-lines": 5,
+    "rising-ripples": 6
+  },
   "motionSignatures": {
     "rig.resonance": "concentric-rings",
     "rig.containment": "vapour-wisps",

@@ -30,6 +30,17 @@ export function signatureTintOf(planetIndex: number, family: string): string | n
   return needsSecondary(hueOfHex(tint.rim), family) ? tint.secondary : tint.rim
 }
 
+/**
+ * The act's marker tint for the whole planet (ticket 298: the terrain shader's one tint uniform):
+ * the rim, or the secondary when the rim lies in the reserved heat hues; no family is asked, so
+ * the hue-collision rule stays with the signature tint. Null for an act with none.
+ */
+export function actMarkerTintOf(planetIndex: number): string | null {
+  const tint = actTintOf(actOf(planetIndex).id)
+  if (tint === null) return null
+  return isReservedHue(hueOfHex(tint.rim)) ? tint.secondary : tint.rim
+}
+
 /** The act's tint row, or null for an act the palette does not name. */
 export function actTintOf(actId: string): ActTint | null {
   return ACT_TINTS[actId] ?? null

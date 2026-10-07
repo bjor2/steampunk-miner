@@ -11,7 +11,8 @@
  * pull, the recharge refills canisters and marks, and the section keeps it across a save. Its
  * ledger logs every gated cell freed or lost, and the balance and session reports print each
  * planet's gate hits, clears and losses. A stopped cell sounds its gate kind and shows its ledger
- * line on the HUD chip once per dive (ticket 238).
+ * line on the HUD chip once per dive (ticket 238). Every gated cell shows its marker kind in the
+ * ground through the kernel's terrain gate channel (ticket 298).
  * Gate content starts on planet 7 (GD lock on #148).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -26,6 +27,7 @@ import { extractorVerbs } from './systems/extractorReaction'
 import { EXTRACTOR_SECTION } from './systems/extractorState'
 import { GATE_ROWS } from './systems/gateRows'
 import { gateLedger } from './systems/gateLedger'
+import { CELL_GATE_LOOK } from './systems/render/cellGateLooks'
 import { GATE_SOUNDS } from './systems/render/gateSounds'
 import { RIG_CARDS, RIG_SELLER } from './systems/rigSales'
 import { vehicleItemOfRig } from './systems/rigs'
@@ -53,6 +55,8 @@ export const slice: SliceDefinition = {
     GATE_SOUNDS.cues.forEach((cue) => r.soundCue(cue))
     // The ledger line of a stopped cell, once per cell per dive (ticket 238).
     r.hudPanel({ id: 'mining-gates.hint-chip', slot: 'prompts', Panel: GateHintChip })
+    // Each gated cell's marker kind in the terrain's gate channel, and the act's tint (ticket 298).
+    r.cellGateLook(CELL_GATE_LOOK)
     // steampunkDebug.features['mining-gates'].describe(), .gateTableOf(p, seed),
     // .dynamiteCellsOf(p, seeds), .ownsRig(id), .grantRig(id), .lockMarkerAt(tx, ty), .hintChip()
     r.debugActions(miningGatesDebugActions)
