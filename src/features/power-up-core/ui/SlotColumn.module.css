@@ -55,6 +55,15 @@
 }
 
 /*
+ * A sibling-link fired this item (ticket 274): its tile lights up for half a second while its
+ * cooldown ring starts, so the player sees where the charge went. A steady glow, no motion.
+ */
+.button[data-link-flash] {
+  opacity: 0.8;
+  box-shadow: 0 0 0 4px var(--color-amber);
+}
+
+/*
  * The hold ring sits just outside the rim and fills clockwise with `--hold`, the share already
  * held (ticket 253). No transition: when the hold is cancelled it snaps back at once.
  */
@@ -97,6 +106,16 @@
   right: calc(100% + 8px);
   width: 18rem;
   pointer-events: none;
+}
+
+/* Kept open after a long press, the card carrying a link switch takes taps (ticket 274). */
+.card[data-pinned] {
+  pointer-events: auto;
+}
+
+.linkSwitch {
+  display: block;
+  margin-top: var(--space-2);
 }
 
 .column[data-hand='left'] .card {

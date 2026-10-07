@@ -3,18 +3,21 @@
  * 32 px glyph, a pip per charge around the rim and a sweeping cooldown ring, readable in
  * grayscale (#158). While the item's hold runs, a ring outside the rim fills with it and snaps
  * back when the hold ends (G&V on #204, ticket 253). A tap uses the slot; a hold shows the item's
- * card instead.
+ * card instead, with the item's sibling-link switch once its Mark reached one (ticket 274). When a
+ * link fires this item, its tile flashes as its cooldown ring starts.
  */
 import type { CSSProperties } from 'react'
 import { ItemCard } from '../../../ui/kit/ItemCard'
 import { VectorIcon } from '../../../ui/VectorIcon'
-import type { SlotButton } from '../systems/slotColumn'
+import { Button } from '../../../ui/kit/Button'
+import type { SlotButton, SlotLink } from '../systems/slotColumn'
 import styles from './SlotColumn.module.css'
 import { readSlotCard } from '../store/slotColumnReads'
-import { useSlotHold } from './useSlotHold'
+import { toggleSiblingLink } from '../store/siblingLinkActions'
+import { useSlotHold, type SlotHold } from './useSlotHold'
 
 export function SlotButtonView({ button }: { button: SlotButton }) {
-  const hold = useSlotHold(button.action)
+  const hold = useSlotHold(button)
   const rings = {
     '--cooldown': `${button.cooldownPercent}%`,
     '--hold': `${button.holdPercent}%`,
@@ -31,6 +34,7 @@ export function SlotButtonView({ button }: { button: SlotButton }) {
         data-on={button.isOn || undefined}
         data-cooling={button.cooldownPercent > 0 || undefined}
         data-holding={button.holdPercent > 0 || undefined}
+        data-link-flash={button.isLinkFlashing || undefined}
         aria-label={button.name}
         tabIndex={-1}
         onPointerDown={hold.press}
@@ -41,7 +45,7 @@ export function SlotButtonView({ button }: { button: SlotButton }) {
         <VectorIcon iconId={button.iconId} size="menu" />
         <ChargePips left={button.chargesLeft} max={button.chargesMax} />
       </button>
-      {hold.isCardShown && <SlotCard button={button} />}
+      {hold.isCardShown && <SlotCard button={button} hold={hold} />}
     </div>
   )
 }
@@ -56,12 +60,35 @@ function ChargePips({ left, max }: { left: number; max: number }) {
   )
 }
 
-function SlotCard({ button }: { button: SlotButton }) {
+/** Pinned open after the release, any tap on the card closes it; its switch flips first. */
+function SlotCard({ button, hold }: { button: SlotButton; hold: SlotHold }) {
   return (
-    <div className={styles.card} data-testid="power-up-slot-card">
+    <div
+      className={styles.card}
+      data-testid="power-up-slot-card"
+      data-pinned={hold.isCardPinned || undefined}
+      onClick={hold.closeCard}
+    >
       <ItemCard variant="full" card={readSlotCard(button)}>
         <span className={styles.cardName}>{button.name}</span>
       </ItemCard>
+      {button.link !== null && <LinkSwitch itemId={button.itemId} link={button.link} />}
     </div>
   )
+}
+
+function LinkSwitch({ itemId, link }: { itemId: string; link: SlotLink }) {
+  return (
+    <span
+      className={styles.linkSwitch}
+      data-testid="power-up-slot-link-switch"
+      data-on={link.isOn || undefined}
+    >
+      <Button label={linkSwitchLabelOf(link)} onPress={() => toggleSiblingLink(itemId)} />
+    </span>
+  )
+}
+
+function linkSwitchLabelOf({ siblingName, isOn }: SlotLink): string {
+  return `Link to ${siblingName}: ${isOn ? 'on' : 'off'}`
 }
