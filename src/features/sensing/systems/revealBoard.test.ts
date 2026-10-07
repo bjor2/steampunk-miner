@@ -10,6 +10,7 @@ import { MM, press, sensingSession, standInPocket } from '../sensingTestSession'
 import { BUOY_PIN_CAP, REVEAL_MARK_CAP } from './revealBudget'
 import {
   boardAfterDock,
+  boardAfterHeard,
   boardAfterUses,
   boardAt,
   EMPTY_REVEAL_BOARD,
@@ -92,6 +93,17 @@ describe('sensing reveal board', () => {
     expect(board.marks.every((mark) => distanceSq(mark.tile, landing) <= 6 * 6)).toBe(true)
     expect(boardAt(board, session.state(), 1_000_000).marks).toEqual(board.marks)
     expect(boardAfterDock(board).marks).toEqual([])
+  })
+
+  it('drops the flare map when the local player docks, not when another player does', () => {
+    const session = sensingSession(FLARE)
+    standInPocket(session, 2, UNDERGROUND, FACING.right)
+    const board = boardAfterUses(EMPTY_REVEAL_BOARD, pressSlotOne(session), session.state(), 'p1')
+    expect(board.marks.length).toBeGreaterThan(0)
+    const dockOf = (playerId: string) =>
+      ({ type: 'DockEntered', tick: 900, playerId, seq: 9, bay: 'sell' }) as unknown as DomainEvent
+    expect(boardAfterHeard(board, [dockOf('p2')], session.state(), 'p1')).toBe(board)
+    expect(boardAfterHeard(board, [dockOf('p1')], session.state(), 'p1').marks).toEqual([])
   })
 
   it('pins a dropped buoy for a second vehicle in the world, with its ring pinged', () => {
