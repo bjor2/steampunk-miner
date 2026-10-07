@@ -16,6 +16,9 @@
  *    and 50, in bands 3 to 5, for a +1 and a +2 dynamite-gated lead patch, what one `minCharge`
  *    frees (Vertical's patch model) over its price, expected at 2 or more, with #142's 15% share
  *    cap beside it for information. Reported only: #148 gates the bot's `gate_cleared` medians.
+ *    Beside it, the share model (`chargeSharePayoff.ts`, Systems on K8 #218, ticket 247): per size,
+ *    planet and band with dynamite-gated lead cells in the seed's gate table (the mining-gates
+ *    debug action), the gated value one charge frees, capped by #142's 15% guard, over its price.
  * 4. The bot plays the bot scenario to planet 40's core on each pacing seed, blasting (its #109
  *    policy) and never, and each planet's median time from arriving to its core is compared. C4
  *    wants every planet at 45 to 60 min with the bot blasting and none more than 10% faster than
@@ -34,10 +37,15 @@ import { PACING_TARGETS } from '../src/constants/pacingTargets'
 import { PACING_WORLD_SEEDS } from '../src/constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
 import { loadFeatures } from '../src/features'
+import { debugActionsBySlice } from '../src/debug/debugActionRegistry'
 import { medianPacingReport } from '../src/logging/pacingMedian'
 import { derivePacingReport, type PacingReport } from '../src/logging/pacingReport'
 import type { RunEvent } from '../src/logging/runEvent'
 import type { RunEventName } from '../src/logging/eventNames'
+import {
+  chargeSharePayoffTable,
+  lowBandsWithDynamiteCells,
+} from '../src/logging/chargeSharePayoffReport'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import { blastTradeOf, type BlastTrade } from '../src/systems/bot/blastTrade'
 import type { ChargePolicy } from '../src/systems/bot/botCharges'
@@ -47,6 +55,7 @@ import {
   PAYOFF_FLOOR,
   type ChargePayoff,
 } from '../src/systems/bot/chargePayoff'
+import { chargeSharePayoffsOf, type GatedMixBands } from '../src/systems/bot/chargeSharePayoff'
 import {
   chargeSizeTradesOf,
   isBlastAboveDrill,
@@ -99,6 +108,7 @@ const judgedPlanets = range(FIRST_CHARGE_PLANET, LAST_JUDGED_PLANET)
 const trades = judgedPlanets.flatMap((planet) => tradeRowsOf(planet))
 const sizeTrades = chargeSizeTradesOf(scenario.worldSeed)
 const payoffs = chargePayoffsOf(scenario.worldSeed)
+const sharePayoffs = chargeSharePayoffsOf(gateTableOnScenarioSeed)
 const blasting = playTo('blast')
 const drilling = playTo('never')
 const judgedRows = judgedPlanets.map((planet) => paceRowOf(planet))
@@ -142,6 +152,9 @@ const text = [
     ),
   ].join('\n'),
   `Lowest payoff: ${lowestPayoffText()}.`,
+  `### The payoff guard under #142's share model: every size up to the band (Systems on K8 #218, ticket 247, reported)`,
+  chargeSharePayoffTable(sharePayoffs),
+  `Bands 1 to 3 holding dynamite-gated lead cells (ticket 247 expected none): ${lowBandsWithDynamiteCells(sharePayoffs)}.`,
   `### The bot, planets 7 to 10 (C4, judged; median of seeds ${SEEDS.join(', ')})`,
   paceTableOf(judgedRows),
   '### The bot, planets 13 to 34 and 40 (C4, diagnostic until #148)',
@@ -155,6 +168,18 @@ mkdirSync(REPORT_FOLDER, { recursive: true })
 writeFileSync(new URL('charges.md', REPORT_FOLDER), `${text}\n`)
 console.log(text)
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${text}\n`)
+
+/** A gate table as the mining-gates debug action answers it, gates as plain JSON. */
+interface GateTableAnswer {
+  ok: boolean
+  bands?: {
+    tier: number
+    weightBp: number
+    signature: boolean
+    gate: { kind: string; minCharge?: number }
+  }[][]
+  problems?: string[]
+}
 
 interface TradeRow {
   planet: number
@@ -188,6 +213,22 @@ interface PaceRow {
   restocks: number
   blasts: number
   isInsideC4: boolean
+}
+
+/** The seed's resolved gate table, read through the mining-gates slice's debug action. */
+function gateTableOnScenarioSeed(planet: number): GatedMixBands {
+  const gateTableOf = debugActionsBySlice()['mining-gates']?.gateTableOf
+  if (gateTableOf === undefined) throw new Error('the mining-gates slice is not loaded')
+  const answer = gateTableOf(planet, scenario.worldSeed) as GateTableAnswer
+  if (!answer.ok || answer.bands === undefined) throw new Error((answer.problems ?? []).join('\n'))
+  return answer.bands.map((entries) =>
+    entries.map(({ tier, weightBp, signature, gate }) => ({
+      tier,
+      weightBp,
+      signature,
+      minCharge: gate.kind === 'dynamite' ? (gate.minCharge ?? null) : null,
+    })),
+  )
 }
 
 function tradeRowsOf(planet: number): TradeRow[] {

@@ -208,7 +208,11 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   payoff guard (`chargePayoff.ts`, #143 guard 2 as the GD lock on K8 #218 wrote it: one `minCharge`
   on a +1 or +2 dynamite-gated lead patch in bands 3 to 5 of planets 7 to 40 and 50, the patch cells
   inside the radius at the lead tier over the charge's price, expected at 2 or more, with #142's 15%
-  share cap beside it for information; #148 gates the bot's `gate_cleared` medians), then plays
+  share cap beside it for information; #148 gates the bot's `gate_cleared` medians), then the same
+  guard under #142's share model (`chargeSharePayoff.ts`, ticket 247: every open size up to the
+  band, in each band the seed's gate table gives dynamite-gated lead cells on planets 7 to 40 and
+  50, the gated value one charge frees capped by the 15% guard over its price; the table's shape
+  is the snapshot in `logging/chargeSharePayoffReport.test.ts`), then plays
   the bot scenario to planet 40's core on each pacing seed blasting (the bot's default) and never,
   and prints both median core times per planet, the blasts and whether each is inside C4: planets 7
   to 10 judged, 13 to 34 and 40 diagnostic until #148. Last, the dynamite gate (GD lock on #148,

@@ -415,6 +415,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botSlicePurchases.test.ts` | 6 | 6 |
 | `src/systems/bot/botWallet.test.ts` | 3 | 3 |
 | `src/systems/bot/chargePayoff.test.ts` | 5 | 5 |
+| `src/systems/bot/chargeSharePayoff.test.ts` | 6 | 6 |
 | `src/systems/bot/chargeSizeTrade.test.ts` | 4 | 4 |
 | `src/systems/bot/endlessPlanning.test.ts` | 6 | 3 |
 | `src/systems/bot/leadCellHardness.test.ts` | 3 | 3 |
@@ -505,6 +506,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/benchmarkResult.test.ts` | 4 | 4 |
 | `src/logging/campaignScalingGate.test.ts` | 9 | 9 |
 | `src/logging/chargeDetonationLine.test.ts` | 4 | 4 |
+| `src/logging/chargeSharePayoffReport.test.ts` | 3 | 3 |
 | `src/logging/compareRuns.test.ts` | 11 | 11 |
 | `src/logging/diveCasing.test.ts` | 3 | 3 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
