@@ -16,6 +16,7 @@ import {
   type KernelDomainEventType,
 } from '../systems/authority/domainEvent'
 import { chargeDetonatedDataOf } from './chargeDetonationLine'
+import { heldStepFieldsOf } from './purchaseStepLine'
 import { resourceCollectedDataOf } from './resourceCollectedLine'
 import type { RunEventData, RunEventName } from './eventNames'
 import { sliceEventProjectionOf, type SliceRunLogLine } from './registries/eventProjections'
@@ -41,9 +42,10 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'debug_command_applied',
     data: { command, args },
   }),
-  CommandRejected: ({ commandType, reason }) => ({
+  CommandRejected: ({ commandType, reason, chain }) => ({
     event: 'command_rejected',
-    data: { type: commandType, reason },
+    data:
+      chain === undefined ? { type: commandType, reason } : { type: commandType, reason, chain },
   }),
   StateDigested: ({ digest, scope }) => ({ event: 'state_digest', data: { digest, scope } }),
   DrillDamageDealt: ({ tx, ty, ticks, damage }) => ({
@@ -142,8 +144,14 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'gun_hit',
     data: { enemyId, damage, shots, energy },
   }),
-  GunMounted: ({ level, price }) => ({ event: 'gun_mounted', data: { level, price } }),
-  GunUpgraded: ({ from, to, price }) => ({ event: 'gun_upgraded', data: { from, to, price } }),
+  GunMounted: ({ level, price, ...held }) => ({
+    event: 'gun_mounted',
+    data: { level, price, ...heldStepFieldsOf(held) },
+  }),
+  GunUpgraded: ({ from, to, price, ...held }) => ({
+    event: 'gun_upgraded',
+    data: { from, to, price, ...heldStepFieldsOf(held) },
+  }),
   GunModeChanged: ({ mode }) => ({ event: 'gun_mode', data: { mode } }),
   LiningTypeUnlocked: ({ liningType, price }) => ({
     event: 'lining_type_unlocked',
@@ -288,13 +296,13 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'charges_restocked',
     data: { count, price },
   }),
-  ChargeRackUpgraded: ({ from, to, price }) => ({
+  ChargeRackUpgraded: ({ from, to, price, ...held }) => ({
     event: 'charge_rack_upgraded',
-    data: { from, to, price },
+    data: { from, to, price, ...heldStepFieldsOf(held) },
   }),
-  CasingUpgraded: ({ from, to, price }) => ({
+  CasingUpgraded: ({ from, to, price, ...held }) => ({
     event: 'casing_upgraded',
-    data: { from, to, price },
+    data: { from, to, price, ...heldStepFieldsOf(held) },
   }),
   UpgradePurchased: (purchase) => ({
     event: 'upgrade_purchased',
@@ -308,6 +316,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
       totalLevel: purchase.totalLevel,
       visualTier: purchase.visualTier,
       statsAfter: purchase.statsAfter,
+      ...heldStepFieldsOf(purchase),
     },
   }),
 }

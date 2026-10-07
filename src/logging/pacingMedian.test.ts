@@ -17,6 +17,8 @@ function reportOf(changes: Partial<PacingReport>): PacingReport {
     tripsByPlanet: { '1': 6, '2': 5 },
     finalLevels: { drill_power: 190, drill_tip: 104 },
     rescuesByCause: {},
+    purchaseChains: 0,
+    chainedSteps: 0,
     ...changes,
   }
 }

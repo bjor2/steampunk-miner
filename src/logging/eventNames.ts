@@ -33,6 +33,14 @@ const ENEMY_KIND = {
 } as const satisfies FieldKind
 const HIT_ARC = { oneOf: ['front', 'side', 'rear'] } as const satisfies FieldKind
 const BAY = { oneOf: ['sell', 'upgrade', 'refinery'] } as const satisfies FieldKind
+/**
+ * A held purchase step's hold and the wallet above the service reserve after it (ticket 226,
+ * `purchaseStepLine.ts`). A click's line leaves both out, so it reads as before.
+ */
+const HELD_STEP = {
+  chain: { optional: 'integer' },
+  reserveLeft: { optional: 'money' },
+} as const satisfies PayloadFields
 
 export const RUN_EVENT_REGISTRY = {
   // Run
@@ -57,7 +65,12 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { command: 'text', args: 'jsonArgs' },
   },
-  command_rejected: { group: 'run', level: 'detail', payload: { type: 'text', reason: 'text' } },
+  // `chain` names the hold of a refused held purchase step (ticket 226).
+  command_rejected: {
+    group: 'run',
+    level: 'detail',
+    payload: { type: 'text', reason: 'text', chain: { optional: 'integer' } },
+  },
   // #58: an onboarding hint went up, once per id; presentation, never part of the digest.
   hint_shown: { group: 'run', level: 'core', payload: { hintId: 'text' } },
   // One per second of frames (#38 Consequences: render scale, frame p50/p95, draw calls,
@@ -204,13 +217,14 @@ export const RUN_EVENT_REGISTRY = {
       totalLevel: 'integer',
       visualTier: 'integer',
       statsAfter: { mapOf: 'money' },
+      ...HELD_STEP,
     },
   },
   // #41: one casing grade bought at the Upgrade bay.
   casing_upgraded: {
     group: 'platform',
     level: 'core',
-    payload: { from: 'integer', to: 'integer', price: 'money' },
+    payload: { from: 'integer', to: 'integer', price: 'money', ...HELD_STEP },
   },
   // #113: a lining type unlocked at the Upgrade bay, and the type the rings are laid in from now on.
   lining_type_unlocked: {
@@ -234,11 +248,15 @@ export const RUN_EVENT_REGISTRY = {
     },
   },
   // #107: the auto_guns turret bolted on at level 1, then each gun level bought.
-  gun_mounted: { group: 'platform', level: 'core', payload: { level: 'integer', price: 'money' } },
+  gun_mounted: {
+    group: 'platform',
+    level: 'core',
+    payload: { level: 'integer', price: 'money', ...HELD_STEP },
+  },
   gun_upgraded: {
     group: 'platform',
     level: 'core',
-    payload: { from: 'integer', to: 'integer', price: 'money' },
+    payload: { from: 'integer', to: 'integer', price: 'money', ...HELD_STEP },
   },
   // #109: the Upgrade bay filled the charge rack, or added one slot to it.
   charges_restocked: {
@@ -249,7 +267,7 @@ export const RUN_EVENT_REGISTRY = {
   charge_rack_upgraded: {
     group: 'platform',
     level: 'core',
-    payload: { from: 'integer', to: 'integer', price: 'money' },
+    payload: { from: 'integer', to: 'integer', price: 'money', ...HELD_STEP },
   },
   purchase_made: { group: 'platform', level: 'core', payload: 'unspecified' },
   // The Refinery bay (#105). The envelope's `planet` is where the line happened: the queue's and

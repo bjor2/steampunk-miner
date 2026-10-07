@@ -1,8 +1,8 @@
 /**
  * The pacing report of a bot run (#29 Systems & Economy note 4, Gameplay note 3), derived from its
  * run events only: first sale and first upgrade, the ten-minute beats of #16, the time to each
- * planet's core and to the end of the slice, trips per planet, the final level of every track and
- * the rescues per cause. `pacingProblems` lists the targets it misses (the CI gate);
+ * planet's core and to the end of the slice, trips per planet, the final level of every track,
+ * the rescues per cause and the hold-to-buy chains the bot bought (ticket 226). `pacingProblems` lists the targets it misses (the CI gate);
  * `pacingAlerts` lists what is reported but never fails a build.
  */
 import { SLICE_LAST_PLANET } from '../constants/balance'
@@ -12,6 +12,7 @@ import { UPGRADE_IDS } from '../systems/economy/economyDefinition'
 import { bandOfTile } from '../systems/world/planetGeometry'
 import { planetParamsFor } from '../systems/world/planetParams'
 import type { RunEventName } from './eventNames'
+import { derivePurchaseChains, type PurchaseChain } from './purchaseChains'
 import type { RunEvent } from './runEvent'
 
 export interface PacingReport {
@@ -29,6 +30,9 @@ export interface PacingReport {
   tripsByPlanet: Record<string, number>
   finalLevels: Record<string, number>
   rescuesByCause: Record<string, number>
+  /** Hold-to-buy chains bought, and the steps bought in them (`purchaseChains.ts`). */
+  purchaseChains: number
+  chainedSteps: number
 }
 
 const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
@@ -42,6 +46,7 @@ export function derivePacingReport(events: readonly RunEvent[], worldSeed: numbe
     foldPacingEvent(report, event, { worldSeed, arrivals, earlyTracks })
   }
   report.tracksByEarlyCheck = earlyTracks.size
+  countPurchaseChains(report, derivePurchaseChains(events))
   return report
 }
 
@@ -64,7 +69,14 @@ function emptyReport(): PacingReport {
     tripsByPlanet: {},
     finalLevels: Object.fromEntries(UPGRADE_IDS.map((id) => [id, 0])),
     rescuesByCause: {},
+    purchaseChains: 0,
+    chainedSteps: 0,
   }
+}
+
+function countPurchaseChains(report: PacingReport, chains: readonly PurchaseChain[]): void {
+  report.purchaseChains = chains.length
+  report.chainedSteps = chains.reduce((steps, chain) => steps + chain.steps, 0)
 }
 
 function foldPacingEvent(report: PacingReport, event: RunEvent, context: FoldContext): void {

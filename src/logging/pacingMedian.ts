@@ -28,6 +28,8 @@ export function medianPacingReport(reports: readonly PacingReport[]): PacingRepo
     tripsByPlanet: medianCountsByKey(reports.map((report) => report.tripsByPlanet)),
     finalLevels: medianCountsByKey(reports.map((report) => report.finalLevels)),
     rescuesByCause: medianCountsByKey(reports.map((report) => report.rescuesByCause)),
+    purchaseChains: medianCountOf(reports.map((report) => report.purchaseChains)),
+    chainedSteps: medianCountOf(reports.map((report) => report.chainedSteps)),
   }
 }
 

@@ -391,6 +391,32 @@ describe('domain event log', () => {
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
 
+  it("records a held purchase step's chain and reserve on every stepped row (ticket 226)", () => {
+    const held = { ...commandStamp, chain: 6, reserveLeft: '2.5e+2' }
+    recordDomainEvents({ playerId: 'p1', planet: 7, depthTiles: 0 }, [
+      { ...held, type: 'GunMounted', level: 10, price: '3e+2' },
+      { ...held, type: 'GunUpgraded', from: 10, to: 11, price: '4e+1' },
+      { ...held, type: 'ChargeRackUpgraded', from: 0, to: 1, price: '7e+1' },
+      { ...held, type: 'CasingUpgraded', from: 1, to: 2, price: '4.8e+1' },
+      {
+        ...commandStamp,
+        type: 'CommandRejected',
+        commandType: 'buyCasingGrade',
+        reason: 'service_reserve',
+        problems: [],
+        chain: 6,
+      },
+    ])
+    expect(sink.events.map(({ data }) => data)).toEqual([
+      { level: 10, price: '3e+2', chain: 6, reserveLeft: '2.5e+2' },
+      { from: 10, to: 11, price: '4e+1', chain: 6, reserveLeft: '2.5e+2' },
+      { from: 0, to: 1, price: '7e+1', chain: 6, reserveLeft: '2.5e+2' },
+      { from: 1, to: 2, price: '4.8e+1', chain: 6, reserveLeft: '2.5e+2' },
+      { type: 'buyCasingGrade', reason: 'service_reserve', chain: 6 },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
   it('records equipping and its refusals as registered lines, an empty slot as none (K4)', () => {
     recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, [
       { ...commandStamp, type: 'ItemEquipped', slot: 'powerup.1', itemId: null },

@@ -20,6 +20,11 @@ import {
   type MinedOrder,
   type MinedRun,
 } from './minedOrder'
+import {
+  startPurchaseChainFold,
+  type PurchaseChain,
+  type PurchaseChainFold,
+} from './purchaseChains'
 import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 
 /** The band the first #86 probe measured; kept beside the sawtooth band, reported only. */
@@ -86,6 +91,8 @@ export interface RunSummary {
   minedOrder: MinedRun[]
   /** Ore id to the units of it collected (#122). */
   minedUnitsByOre: Record<string, number>
+  /** The hold-to-buy chains of the run, in the order they started (ticket 226). */
+  purchaseChains: PurchaseChain[]
   milestones: RunMilestones
 }
 
@@ -149,6 +156,7 @@ interface Tally {
   coreCompletedTicks: Record<string, number>
   planetLevels: PlanetLevels
   minedOrder: MinedOrder
+  purchaseChains: PurchaseChainFold
   milestones: RunMilestones
 }
 
@@ -183,6 +191,7 @@ function emptyTally(): Tally {
     coreCompletedTicks: {},
     planetLevels: { arrival: {}, departure: {} },
     minedOrder: emptyMinedOrder(),
+    purchaseChains: startPurchaseChainFold(),
     milestones: {
       planetReached: {},
       firstSale: null,
@@ -196,6 +205,7 @@ function emptyTally(): Tally {
 function foldEvent(tally: Tally, event: RunEvent): Tally {
   foldEnvelope(tally, event)
   EVENT_FOLDS[event.event]?.(tally, event as never)
+  tally.purchaseChains.add(event)
   return tally
 }
 
@@ -344,6 +354,7 @@ function summaryOf(tally: Tally): RunSummary {
       departure: { ...tally.planetLevels.departure },
     },
     ...minedOrderFieldsOf(copyMinedOrder(tally.minedOrder)),
+    purchaseChains: tally.purchaseChains.chains(),
     milestones: { ...tally.milestones, planetReached: { ...tally.milestones.planetReached } },
   }
 }
