@@ -314,16 +314,27 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 6 files, 43 tests
+### `terrain-tools`: 17 files, 123 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetGuard.test.ts` | 4 | 4 |
+| `src/features/terrain-tools/shippedRows.test.ts` | 7 | 7 |
+| `src/features/terrain-tools/systems/gatesFixture.test.ts` | 22 | 5 |
+| `src/features/terrain-tools/systems/lodestoneBeacon.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/magnetItems.test.ts` | 9 | 9 |
+| `src/features/terrain-tools/systems/marksInPlay.test.ts` | 1 | 1 |
+| `src/features/terrain-tools/systems/oreShifter.test.ts` | 3 | 3 |
+| `src/features/terrain-tools/systems/pressurePocket.test.ts` | 3 | 3 |
+| `src/features/terrain-tools/systems/seamSplitter.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/statPreview.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/terrainEconomy.test.ts` | 4 | 4 |
+| `src/features/terrain-tools/systems/terrainEditCaps.test.ts` | 13 | 3 |
 | `src/features/terrain-tools/systems/terrainItems.test.ts` | 11 | 11 |
-| `src/features/terrain-tools/visionRows.test.ts` | 5 | 5 |
+| `src/features/terrain-tools/systems/terrainSection.test.ts` | 3 | 3 |
+| `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
+| `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 
 ### `workshop`: 12 files, 84 tests
 

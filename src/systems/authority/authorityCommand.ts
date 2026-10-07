@@ -108,8 +108,11 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    latched per cell. With no gear registered no digest or mined order changes.
  * 42: hold and second tap (ticket 273, #256): `power-up-core.hold_power_up {slot}` with the
  *    rejections `no_milestone` and `nothing_to_hold`, and `PowerUpUsed` may name its `milestone`.
+ * 43: the terrain-tools lane (#202): the ore-shifter, seam splitter, pressure pocket lance and
+ *    lodestone beacon queue seeded K6 edits, `terrain-tools.TerrainEdited` and
+ *    `terrain-tools.BeaconPlanted` join, and its `terrain-tools` player section v1.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 42
+export const AUTHORITY_PROTOCOL_VERSION = 43
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
