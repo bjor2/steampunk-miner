@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T00:42:04+02:00",
+  "updated_at": "2026-10-08T00:47:07+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -31,7 +31,7 @@
           "ticket": null,
           "grok_slot": null,
           "kind": "external",
-          "since": "2026-10-08T00:34:37+02:00"
+          "since": "2026-10-08T00:46:46+02:00"
         },
         {
           "slot": "C3",
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 6,
+      "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
     {
@@ -99,7 +99,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 9,
+      "claims_last_hour": 7,
       "name": "Claude Max 2"
     }
   ],
@@ -256,7 +256,7 @@
       "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-08T00:34:37+02:00",
+      "since": "2026-10-08T00:46:46+02:00",
       "kind": "external",
       "account": 1
     },
