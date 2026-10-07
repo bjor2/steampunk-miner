@@ -12,12 +12,14 @@ import { ORE_SHIFTER_ID, planOreDrag } from './oreShifter'
 import { planPressurePocket, PRESSURE_POCKET_ID } from './pressurePocket'
 import { planSeamSplit, SEAM_SPLITTER_ID } from './seamSplitter'
 import { editSourceOf, type TerrainPlan } from './terrainOutcome'
+import { PLAIN_VERB, type ToolVerb } from './toolVerb'
 
 // #162 acceptance 5 (G&V E3): a property test over seeds with 2 vehicles. No terrain edit changes
 // a cell within 1 m of any vehicle, and none moves a vehicle. The second miner stands where the
-// first's edits reach: in front of it, below it, or beside its pocket.
+// first's edits reach: in front of it, below it, or beside its pocket. Every Mark milestone verb
+// (#256: a second tap, a hold) keeps the same rule.
 
-type Planner = (view: GroundView, key: EditKey, pose: VehiclePose) => TerrainPlan
+type Planner = (view: GroundView, key: EditKey, pose: VehiclePose, verb: ToolVerb) => TerrainPlan
 
 const PLANNERS: readonly (readonly [string, Planner])[] = [
   [ORE_SHIFTER_ID, planOreDrag],
@@ -35,6 +37,12 @@ const TEAMMATE_OFFSETS: readonly TilePoint[] = [
   { tx: 4, ty: 1 },
   { tx: 2, ty: -2 },
   { tx: 6, ty: 0 },
+]
+
+const VERBS: readonly ToolVerb[] = [
+  PLAIN_VERB,
+  { milestone: 'second-tap', linkedSize: null },
+  { milestone: 'hold', linkedSize: null },
 ]
 
 const ANCHOR_REACH_MM = (VEHICLE_COLLIDER_SIZE * MM_PER_METRE) / 2 + MM_PER_METRE
@@ -66,11 +74,13 @@ function posesOf(state: AuthorityState): VehiclePose[] {
 }
 
 function plannedCells(itemId: string, plan: Planner, miners: TwoMiners, mark: number) {
-  const view = openGroundView(miners.state, 'p1', editSourceOf(itemId))
-  if (view === null) throw new Error('no planet')
   const [pose] = posesOf(miners.state)
-  const result = plan(view, { origin: miners.stand, tick: 10, itemId, mark }, pose)
-  return result.kind === 'edit' ? result.cells : []
+  return VERBS.flatMap((verb) => {
+    const view = openGroundView(miners.state, 'p1', editSourceOf(itemId))
+    if (view === null) throw new Error('no planet')
+    const result = plan(view, { origin: miners.stand, tick: 10, itemId, mark }, pose, verb)
+    return result.kind === 'edit' ? result.cells : []
+  })
 }
 
 function gatherCells(miners: TwoMiners, mark: number) {

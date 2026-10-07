@@ -5,7 +5,9 @@
  * Mark the player researched (#249), and the edit joins the K6 queue on that tick
  * (`terrainOutcome.ts`). The repulsor coil (ticket 284), a charged magnet, releases its push-wave
  * through the kernel's magnet shift instead (`repulsorCoil.ts`). The lode clamp (ticket 285) is
- * used by holding its slot: its act locks a field, and letting go ends it (`lodeClamp.ts`).
+ * used by holding its slot: its act locks a field, and letting go ends it (`lodeClamp.ts`). A Mark
+ * milestone's second tap or
+ * hold, and a sibling-link's reduced size, reach the planner as its verb (`toolVerb.ts`, #256).
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
@@ -23,8 +25,9 @@ import { SHIPPED_MAGNET_ITEMS, SHIPPED_TERRAIN_ITEMS } from './shippedTools'
 import { TERRAIN_REFUSAL } from './terrainEvents'
 import { balanceOf, isConsumable, type TerrainItem } from './terrainItems'
 import { editSourceOf, outcomeOfPlan, type TerrainPlan } from './terrainOutcome'
+import { toolVerbOf, type ToolVerb } from './toolVerb'
 
-type Planner = (view: GroundView, key: EditKey, pose: VehiclePose) => TerrainPlan
+type Planner = (view: GroundView, key: EditKey, pose: VehiclePose, verb: ToolVerb) => TerrainPlan
 
 type Activate = (state: AuthorityState, use: PowerUpUse) => PowerUpOutcome
 
@@ -104,6 +107,6 @@ function editWith(plan: Planner): Activate {
       mark: key.mark,
       origin: use.origin,
     }
-    return outcomeOfPlan(state, author, plan(view, key, pose))
+    return outcomeOfPlan(state, author, plan(view, key, pose, toolVerbOf(use)))
   }
 }

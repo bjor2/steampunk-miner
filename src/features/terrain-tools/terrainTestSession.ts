@@ -3,6 +3,7 @@
  * slotted, the miner standing at rest in a small pocket carved underground, and reads of the ore
  * around a tile, set up through `debug.*` commands like a start scenario. Only specs use it.
  */
+import type { AuthorityCommand, CommandIntent } from '../../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../../systems/authority/authorityState'
 import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { carveCircleCommand } from '../../systems/authority/groundCommands'
@@ -17,6 +18,8 @@ import {
 } from '../../systems/authority/scriptedSession'
 import { planetParamsOf } from '../../systems/authority/planetOfState'
 import { queueTerrainEdit } from '../../systems/authority/terrain/terrainEdits'
+import { replayRun, type ReplayResult } from '../../systems/replay/replayRun'
+import { cellDensitySum } from '../../systems/world/cellYield'
 import { FACING, type Facing } from '../../systems/vehicle/vehiclePose'
 import type { PlanetParams } from '../../systems/world/planetParams'
 import { SOLID_DENSITY } from '../../systems/world/sampleGrid'
@@ -134,4 +137,61 @@ export function paramsOf(state: AuthorityState): PlanetParams {
   const params = planetParamsOf(state.planet)
   if (params === null) throw new Error('the session is between planets')
   return params
+}
+
+/** One command of a recorded run, at its tick. */
+export type TimedIntent = readonly [number, CommandIntent]
+
+/** The run's commands as `applyCommand` receives them, from `p1`, numbered in order. */
+export function commandsOf(intents: readonly TimedIntent[]): AuthorityCommand[] {
+  return intents.map(
+    ([tick, intent], index) =>
+      ({ playerId: 'p1', tick, seq: index + 1, ...intent }) as AuthorityCommand,
+  )
+}
+
+/** Every node through `planetIndex` researched, as the debug "jump to depth" grants it. */
+export function researchThrough(planetIndex: number): CommandIntent {
+  return { type: 'debug.tech-tree.unlockThrough', payload: { planetIndex } } as CommandIntent
+}
+
+/** Carves a pocket round `tile` and reports the miner at rest at its centre, as `standAt` does. */
+export function standIntents(tick: number, tile: TilePoint, facing: Facing): TimedIntent[] {
+  const centre = { x: tile.tx * MM + MM / 2, y: tile.ty * MM + MM / 2 }
+  const { payload } = poseAbove(GROUND, facing)
+  return [
+    [tick, carveCircleCommand({ ...centre, radius: STANDING_POCKET_MM, amount: SOLID_DENSITY })],
+    [tick, { type: 'reportPose', payload: { ...payload, ...centre } }],
+  ]
+}
+
+/** The run jumped to each command, then in render frames of 30 and of 144 a second. */
+export function replayedAtEveryRate(
+  commands: readonly AuthorityCommand[],
+  endTick: number,
+): ReplayResult[] {
+  return [undefined, 30, 144].map((framesPerSecond) =>
+    replayRun(WORLD_SEED, commands, { endTick, framesPerSecond }),
+  )
+}
+
+/** The tiles in a square round `centre` that hold no density now but did in `before`. */
+export function tilesOpenedBetween(
+  before: AuthorityState,
+  after: AuthorityState,
+  centre: TilePoint,
+  reach: number,
+): TilePoint[] {
+  const opened: TilePoint[] = []
+  for (let dy = -reach; dy <= reach; dy += 1) {
+    for (let dx = -reach; dx <= reach; dx += 1) {
+      const tile = { tx: centre.tx + dx, ty: centre.ty + dy }
+      if (isEmptyAt(after, tile) && !isEmptyAt(before, tile)) opened.push(tile)
+    }
+  }
+  return opened
+}
+
+function isEmptyAt(state: AuthorityState, tile: TilePoint): boolean {
+  return cellDensitySum(state.world, paramsOf(state), tile) === 0
 }

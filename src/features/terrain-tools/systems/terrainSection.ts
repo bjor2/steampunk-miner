@@ -26,6 +26,11 @@ export interface LodestoneBeacon {
   planetIndex: number
   plantedTick: number
   mark: number
+  /**
+   * The gather's swap cap when a sibling-link planted it at reduced strength (#256); absent for
+   * the item's own 256, so a beacon planted by hand saves and digests as before.
+   */
+  swapCap?: number
 }
 
 /** A lode clamp field being held: the cells it pins, fixed at the act, and its draw so far. */
@@ -122,6 +127,7 @@ function isBeacon(beacon: unknown): boolean {
     Number.isSafeInteger(beacon.ty) &&
     isWholeNumber(beacon.planetIndex) &&
     isWholeNumber(beacon.plantedTick) &&
-    isWholeNumber(beacon.mark)
+    isWholeNumber(beacon.mark) &&
+    (beacon.swapCap === undefined || isWholeNumber(beacon.swapCap))
   )
 }

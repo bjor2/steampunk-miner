@@ -15,6 +15,7 @@ import type { LoadoutSlotId, VehicleItem } from '../../../systems/registries/veh
 import { POWER_UP_SLOTS, type PowerUpClass } from '../../power-up-core'
 import type { DiscoveryRequirement, MarkLadder, ProgressionLabel, TechNode } from '../../tech-tree'
 import { TERRAIN_ECONOMY, type TerrainBalance } from './terrainEconomy'
+import { terrainMilestonesOf } from './terrainMilestones'
 
 /** The unit a terrain item's size is counted in, as its stat line prints it. */
 export type TerrainSizeUnit = 'cells' | 'tiles'
@@ -242,14 +243,17 @@ export function vehicleItemOf(item: TerrainItem): VehicleItem {
 /**
  * The Mark 1 ladder (#162 4.6, the #165 rotation): cooldown, then size, then charges; a
  * consumable has no cooldown, and its charges are its stack. The size stops at the TD's cap.
+ * Marks 3, 6 and 9 bring the tool's milestones (#256, `terrainMilestones.ts`).
  */
 export function markLadderOf(item: TerrainItem): MarkLadder {
   const balance = balanceOf(item)
+  const milestones = terrainMilestonesOf(item.itemId, item.powerUpClass)
   return {
     isIncomeItem: item.isIncomeItem,
     ...(balance.cooldownTicks !== undefined && { cooldown: balance.cooldownTicks }),
     magnitude: magnitudeOf(balance),
     charges: balance.charges,
+    ...(milestones.length > 0 && { milestones }),
   }
 }
 

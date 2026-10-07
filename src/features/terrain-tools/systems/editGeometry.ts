@@ -57,11 +57,30 @@ export function stepped(tile: TilePoint, step: GridStep, times = 1): TilePoint {
 
 /** The tile `distanceMm` ahead of the miner's centre along its facing. */
 export function tileAheadOf(pose: VehiclePose, distanceMm: number): TilePoint {
-  const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  return tileAlongOf(pose, facingVectorOf(pose.upx, pose.upy, pose.facing), distanceMm)
+}
+
+/** The tile `distanceMm` from the miner's centre along `direction` (a unit up-vector scale). */
+export function tileAlongOf(
+  pose: VehiclePose,
+  direction: IntegerVector,
+  distanceMm: number,
+): TilePoint {
   return tileOfMillimetres(
-    pose.x + Math.floor((facing.x * distanceMm) / UP_VECTOR_SCALE),
-    pose.y + Math.floor((facing.y * distanceMm) / UP_VECTOR_SCALE),
+    pose.x + Math.floor((direction.x * distanceMm) / UP_VECTOR_SCALE),
+    pose.y + Math.floor((direction.y * distanceMm) / UP_VECTOR_SCALE),
   )
+}
+
+/** The miner's facing turned round: what lies behind it. */
+export function behindVectorOf(pose: VehiclePose): IntegerVector {
+  const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
+  return { x: -facing.x, y: -facing.y }
+}
+
+/** The miner's local up: what lies above it, away from the planet's centre. */
+export function aboveVectorOf(pose: VehiclePose): IntegerVector {
+  return { x: pose.upx, y: pose.upy }
 }
 
 export function distanceSqOf(a: TilePoint, b: TilePoint): number {
@@ -117,8 +136,17 @@ export function tilesOutwardOf(tile: TilePoint, centre: TilePoint): TilePoint[] 
 
 /** One grid step from `tile` away from `centre`, along the longer leg; seeded on a diagonal. */
 export function stepAway(tile: TilePoint, centre: TilePoint, seed: number): TilePoint {
-  const mirrored = { tx: 2 * tile.tx - centre.tx, ty: 2 * tile.ty - centre.ty }
-  return stepToward(tile, mirrored, seed)
+  return stepsAwayFrom(tile, centre, seed)[0]
+}
+
+/** The grid steps from `tile` that take it further from `centre`, the longer leg's first. */
+export function stepsAwayFrom(tile: TilePoint, centre: TilePoint, seed: number): TilePoint[] {
+  return stepsToward(tile, mirroredOf(tile, centre), seed)
+}
+
+/** `centre` mirrored through `tile`: a target that lies straight away from the centre. */
+function mirroredOf(tile: TilePoint, centre: TilePoint): TilePoint {
+  return { tx: 2 * tile.tx - centre.tx, ty: 2 * tile.ty - centre.ty }
 }
 
 /** Negative when `a` points nearer `out` than `b`: the squared cosines, cross-multiplied. */

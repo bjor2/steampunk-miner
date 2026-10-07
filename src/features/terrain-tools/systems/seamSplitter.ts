@@ -8,6 +8,10 @@
  * the first cell it may not open: gated, core, ore, casing, too hard for the drill, open air, or
  * within 1 m of a vehicle. A face that is a gated or core cell blocks the use at no cost; a face
  * the wedge cannot split (ore, casing, rock too hard) refuses it at no cost.
+ *
+ * Mark milestones (#256, an income item's where and how): the Mark 3 second tap splits across the
+ * face, a quarter turn from the facing; the Mark 6 hold splits straight along the facing, ignoring
+ * the grain. Each opens the same length from the same face.
  */
 import { vehicleOf } from '../../../systems/authority/authorityState'
 import type { TerrainCellEdit } from '../../../systems/authority/terrain/terrainEdits'
@@ -26,9 +30,10 @@ import {
   isWorkableGround,
   type GroundView,
 } from './groundView'
-import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
+import { terrainItemNamed } from './itemMagnitude'
 import { TERRAIN_REFUSAL } from './terrainEvents'
 import type { TerrainPlan } from './terrainOutcome'
+import { isHold, isSecondTap, PLAIN_VERB, sizeOf, type ToolVerb } from './toolVerb'
 
 export const SEAM_SPLITTER_ID = 'consumable.seam_splitter'
 
@@ -38,15 +43,30 @@ const FACE_SEARCH_TILES = 4
 /** The grain runs straight ahead, or one eighth of a turn to either side. */
 const GRAIN_TURNS: readonly number[] = [0, 1, -1]
 
-export function planSeamSplit(view: GroundView, key: EditKey, pose: VehiclePose): TerrainPlan {
+/** The second tap's split across the face: two eighths, a quarter turn from the facing. */
+const ACROSS_TURN = 2
+
+export function planSeamSplit(
+  view: GroundView,
+  key: EditKey,
+  pose: VehiclePose,
+  verb: ToolVerb = PLAIN_VERB,
+): TerrainPlan {
   const facing = facingStepOf(pose)
   const face = faceTileOf(view, tileOfPose(pose), facing)
   if (face === null) return { kind: 'refused', reason: TERRAIN_REFUSAL.noGrain }
   const block = fixedBlockOf(view, face)
   if (block !== null) return { kind: 'blocked', block }
-  const grain = grainOf(facing, editSeedOf(view.params, key), face)
-  const length = magnitudeAt(terrainItemNamed(SEAM_SPLITTER_ID), key.mark)
+  const grain = splitLineOf(verb, facing, editSeedOf(view.params, key), face)
+  const length = sizeOf(terrainItemNamed(SEAM_SPLITTER_ID), key, verb)
   return planOfFissure(splitAlong(view, face, grain, length))
+}
+
+/** Along the grain; across the face for a second tap; along the facing for a hold. */
+function splitLineOf(verb: ToolVerb, facing: GridStep, seed: number, face: TilePoint): GridStep {
+  if (isSecondTap(verb)) return turnedStep(facing, ACROSS_TURN)
+  if (isHold(verb)) return facing
+  return grainOf(facing, seed, face)
 }
 
 /** The first solid cell along the facing past the anchors, or null with none near. */

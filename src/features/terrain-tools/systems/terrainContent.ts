@@ -13,7 +13,7 @@ import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
-import { isMasteredAt, type TechNode } from '../../tech-tree'
+import { isMasteredAt, milestoneLineSpecsOf, type TechNode } from '../../tech-tree'
 import { SHIPPED_MAGNET_ITEMS, SHIPPED_TERRAIN_ITEMS } from './shippedTools'
 import { magnetCardOf } from './magnetCards'
 import { MAGNET_ITEMS, magnetTechNodeOf, magnetVehicleItemOf } from './magnetItems'
@@ -71,7 +71,11 @@ function cardOf(item: TerrainItem): ItemDescriptionEntry {
     id: `terrain-tools.${item.itemId.slice(item.itemId.indexOf('.') + 1)}`,
     matches: { kind: 'vehicle-item', id: item.itemId },
     flavour: item.description,
-    statLines: [...lines.map(markLineSpecOf), priceLineSpecOf(item)],
+    statLines: [
+      ...lines.map(markLineSpecOf),
+      ...milestoneLineSpecsOf(markLadderOf(item)),
+      priceLineSpecOf(item),
+    ],
   }
 }
 

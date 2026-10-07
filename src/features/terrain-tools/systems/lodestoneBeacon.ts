@@ -11,14 +11,26 @@
  *
  * A live beacon (its tile and gather radius) is told to every combo item hook through the kernel
  * `liveBeacon` provider, for `lodestone_drain` (TD ruling on #206, ticket 326): no slice imports it.
+ *
+ * Mark milestones (#256, an income item's where and how): the Mark 3 second tap throws the beacon
+ * its gather radius ahead along the facing, the Mark 6 hold sinks it its gather radius below the
+ * miner; each re-plants the live beacon there, at the same radius and cap. A beacon an ore-shifter's
+ * sibling-link plants gathers at the link's half of its 256-swap cap (the lock's worked example).
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import type { AuthorityReaction } from '../../../systems/registries/authorityReactions'
 import type { LiveBeacon, LiveBeaconProvider } from '../../../systems/registries/liveBeacon'
+import { vehicleOf } from '../../../systems/authority/authorityState'
+import { UP_VECTOR_SCALE } from '../../../constants/physics'
+import {
+  facingVectorOf,
+  type IntegerVector,
+  type VehiclePose,
+} from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
-import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
+import { atLinkStrength, type PowerUpOutcome, type PowerUpUse } from '../../power-up-core'
 import { canAfford, draftMove, MOVE_UNITS, openDraft, type EditDraft } from './editDraft'
 import { distanceSqOf, tilesFarthestFirst, tilesNearestFirst } from './editGeometry'
 import { editSeedOf } from './editSeed'
@@ -28,6 +40,7 @@ import { balanceOf } from './terrainItems'
 import { beaconPlantedOf, TERRAIN_REFUSAL } from './terrainEvents'
 import { editSourceOf, queueEditOf } from './terrainOutcome'
 import { terrainToolsOf, withBeacon, type LodestoneBeacon } from './terrainSection'
+import { isHold, isSecondTap, toolVerbOf, type ToolVerb } from './toolVerb'
 
 export const LODESTONE_BEACON_ID = 'consumable.lodestone_beacon'
 
@@ -47,13 +60,19 @@ export const LIVE_LODESTONE_PROVIDER: LiveBeaconProvider = {
   liveBeaconOf: liveLodestoneOf,
 }
 
-/** Plants the beacon at the miner's tile; a second live beacon on this planet is refused. */
+/**
+ * Plants the beacon at the miner's tile; a second live beacon on this planet is refused. A second
+ * tap or a hold re-plants the live one ahead or below.
+ */
 export function plantLodestone(state: AuthorityState, use: PowerUpUse): PowerUpOutcome {
   const planetIndex = planetParamsOf(state.planet)?.planetIndex ?? null
-  if (planetIndex === null) return { kind: 'refused', reason: TERRAIN_REFUSAL.outOfPlay }
-  if (isBeaconLiveOn(state, use.playerId, planetIndex))
+  const pose = vehicleOf(state, use.playerId).pose
+  if (planetIndex === null || pose === null)
+    return { kind: 'refused', reason: TERRAIN_REFUSAL.outOfPlay }
+  const verb = toolVerbOf(use)
+  if (verb.milestone === null && isBeaconLiveOn(state, use.playerId, planetIndex))
     return { kind: 'refused', reason: TERRAIN_REFUSAL.beaconLive }
-  const beacon = { ...use.origin, planetIndex, plantedTick: use.tick, mark: use.mark }
+  const beacon = beaconOf(use, verb, pose, planetIndex)
   return {
     kind: 'acted',
     effect: {
@@ -61,6 +80,38 @@ export function plantLodestone(state: AuthorityState, use: PowerUpUse): PowerUpO
       events: [beaconPlantedOf(use.playerId, beacon.tx, beacon.ty, beacon.plantedTick)],
     },
   }
+}
+
+function beaconOf(
+  use: PowerUpUse,
+  verb: ToolVerb,
+  pose: VehiclePose,
+  planetIndex: number,
+): LodestoneBeacon {
+  const tile = plantingTileOf(use, verb, pose)
+  const beacon = { ...tile, planetIndex, plantedTick: use.tick, mark: use.mark }
+  return verb.linkedSize === null ? beacon : { ...beacon, swapCap: atLinkStrength(fullSwapCap()) }
+}
+
+/** The miner's tile; a gather radius along the facing for a second tap, below it for a hold. */
+function plantingTileOf(use: PowerUpUse, verb: ToolVerb, pose: VehiclePose): TilePoint {
+  const radius = magnitudeAt(terrainItemNamed(LODESTONE_BEACON_ID), use.mark)
+  if (isSecondTap(verb))
+    return tilesAlong(use.origin, facingVectorOf(pose.upx, pose.upy, pose.facing), radius)
+  if (isHold(verb)) return tilesAlong(use.origin, { x: -pose.upx, y: -pose.upy }, radius)
+  return use.origin
+}
+
+/** `tiles` whole tiles from `origin` along `direction` (an up-vector-scale vector). */
+function tilesAlong(origin: TilePoint, direction: IntegerVector, tiles: number): TilePoint {
+  return {
+    tx: origin.tx + Math.round((direction.x * tiles) / UP_VECTOR_SCALE),
+    ty: origin.ty + Math.round((direction.y * tiles) / UP_VECTOR_SCALE),
+  }
+}
+
+function fullSwapCap(): number {
+  return balanceOf(terrainItemNamed(LODESTONE_BEACON_ID)).swapCap ?? 0
 }
 
 /**
@@ -86,7 +137,7 @@ export function planLodestoneGather(view: GroundView, beacon: LodestoneBeacon) {
   const radius = gatherRadiusOf(beacon)
   const key = { origin: centre, tick: beacon.plantedTick, itemId: item.itemId, mark: beacon.mark }
   const seed = editSeedOf(view.params, key)
-  const draft = openDraft(view, balanceOf(item).swapCap ?? 0)
+  const draft = openDraft(view, beacon.swapCap ?? fullSwapCap())
   const nodules = tilesFarthestFirst(centre, radius, seed).filter((tile) => isLooseOre(view, tile))
   drawInward(draft, centre, nodules, tilesNearestFirst(centre, radius, seed))
   return draft.cells

@@ -17,13 +17,14 @@ import { planSeamSplit, SEAM_SPLITTER_ID } from './seamSplitter'
 import { SHIPPED_TERRAIN_ITEMS } from './shippedTools'
 import { editSourceOf, type TerrainPlan } from './terrainOutcome'
 import { terrainItemOf } from './terrainItems'
+import { PLAIN_VERB, type ToolVerb } from './toolVerb'
 
 // The TD's caps (#162 section 3 and the endless Mark cap): each activation edits at most 32
 // density cells or 64 swaps in total, whatever the Mark, and a lodestone beacon at most 256 swaps.
 // Mark-ladder cases at the Marks reachable on P60 and P100 (`markTier = unlockTier + 3(N-1)`, #161),
-// for every terrain tool, at many places on the planet.
+// for every terrain tool, at many places on the planet, plain and as each Mark milestone verb (#256).
 
-type Planner = (view: GroundView, key: EditKey, pose: VehiclePose) => TerrainPlan
+type Planner = (view: GroundView, key: EditKey, pose: VehiclePose, verb: ToolVerb) => TerrainPlan
 
 const PLANNERS: Readonly<Record<string, Planner>> = {
   [ORE_SHIFTER_ID]: planOreDrag,
@@ -32,6 +33,11 @@ const PLANNERS: Readonly<Record<string, Planner>> = {
 }
 
 const DEPTHS = [6, 9, 13, 18, 24, 31]
+const VERBS: readonly ToolVerb[] = [
+  PLAIN_VERB,
+  { milestone: 'second-tap', linkedSize: null },
+  { milestone: 'hold', linkedSize: null },
+]
 const PLANETS = [1, 60, 100]
 
 /** The Mark a player can hold of the item on planet `planet`. */
@@ -68,10 +74,13 @@ describe('terrain edit caps', () => {
     (itemId, _planet, mark) => {
       for (const depth of DEPTHS) {
         for (const facing of [FACING.right, FACING.left, FACING.down]) {
-          const { view, pose, stand } = standingView(itemId, depth, facing)
-          const plan = PLANNERS[itemId](view, { origin: stand, tick: 10, itemId, mark }, pose)
-          if (plan.kind !== 'edit') continue
-          expect(unitsOf(plan.cells)).toBeLessThanOrEqual(TERRAIN_EDIT_UNITS_PER_TICK)
+          for (const verb of VERBS) {
+            const { view, pose, stand } = standingView(itemId, depth, facing)
+            const key = { origin: stand, tick: 10, itemId, mark }
+            const plan = PLANNERS[itemId](view, key, pose, verb)
+            if (plan.kind !== 'edit') continue
+            expect(unitsOf(plan.cells)).toBeLessThanOrEqual(TERRAIN_EDIT_UNITS_PER_TICK)
+          }
         }
       }
     },

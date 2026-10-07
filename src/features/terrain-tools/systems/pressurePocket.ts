@@ -8,9 +8,16 @@
  *
  * A pocket centred on a gated or core cell is blocked at no cost; one with nothing to open is
  * refused at no cost.
+ *
+ * Mark milestones (#256, an income item's where and how): the Mark 3 second tap blows the same
+ * pocket behind the miner, the Mark 6 hold above it, each at the same distance from the hull.
  */
 import { MM_PER_METRE, VEHICLE_COLLIDER_SIZE } from '../../../constants/physics'
-import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
+import {
+  facingVectorOf,
+  type IntegerVector,
+  type VehiclePose,
+} from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import {
   ACTIVATION_UNIT_CAP,
@@ -22,7 +29,14 @@ import {
   openDraft,
   type EditDraft,
 } from './editDraft'
-import { distanceSqOf, stepAway, tileAheadOf, tilesNearestFirst } from './editGeometry'
+import {
+  aboveVectorOf,
+  behindVectorOf,
+  distanceSqOf,
+  stepAway,
+  tileAlongOf,
+  tilesNearestFirst,
+} from './editGeometry'
 import { editSeedOf, type EditKey } from './editSeed'
 import {
   canHoldOre,
@@ -32,9 +46,10 @@ import {
   materialNow,
   type GroundView,
 } from './groundView'
-import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
+import { terrainItemNamed } from './itemMagnitude'
 import { TERRAIN_REFUSAL } from './terrainEvents'
 import type { TerrainPlan } from './terrainOutcome'
+import { isHold, isSecondTap, PLAIN_VERB, sizeOf, type ToolVerb } from './toolVerb'
 
 export const PRESSURE_POCKET_ID = 'power.pressure_pocket'
 
@@ -51,15 +66,31 @@ interface Pocket {
   seed: number
 }
 
-export function planPressurePocket(view: GroundView, key: EditKey, pose: VehiclePose): TerrainPlan {
-  const radius = magnitudeAt(terrainItemNamed(PRESSURE_POCKET_ID), key.mark)
-  const centre = tileAheadOf(pose, RIM_OFFSET_MM + radius * MM_PER_METRE)
+export function planPressurePocket(
+  view: GroundView,
+  key: EditKey,
+  pose: VehiclePose,
+  verb: ToolVerb = PLAIN_VERB,
+): TerrainPlan {
+  const radius = sizeOf(terrainItemNamed(PRESSURE_POCKET_ID), key, verb)
+  const centre = tileAlongOf(
+    pose,
+    blowDirectionOf(pose, verb),
+    RIM_OFFSET_MM + radius * MM_PER_METRE,
+  )
   const block = fixedBlockOf(view, centre)
   if (block !== null) return { kind: 'blocked', block }
   const draft = openDraft(view, ACTIVATION_UNIT_CAP)
   blowPocket(draft, { centre, radius, seed: editSeedOf(view.params, key) })
   if (draft.cells.length > 0) return { kind: 'edit', cells: draft.cells }
   return { kind: 'refused', reason: TERRAIN_REFUSAL.nothingToOpen }
+}
+
+/** Ahead along the facing; behind the miner for a second tap; above it for a hold. */
+function blowDirectionOf(pose: VehiclePose, verb: ToolVerb): IntegerVector {
+  if (isSecondTap(verb)) return behindVectorOf(pose)
+  if (isHold(verb)) return aboveVectorOf(pose)
+  return facingVectorOf(pose.upx, pose.upy, pose.facing)
 }
 
 /** Every tile of the disc, nearest the centre first, while the cap pays. */

@@ -170,8 +170,15 @@ function linkedUseOf(moment: LinkMoment, { powerUp, slot }: ReadySibling): Power
 
 /** Rounded down to whole units, as every ladder magnitude is. */
 function linkStrengthOf(magnitude: number | null): number | null {
-  if (magnitude === null) return null
-  return Math.floor((magnitude * POWER_UP_CORE_ECONOMY.siblingLinkStrengthBp) / BASIS_POINTS)
+  return magnitude === null ? null : atLinkStrength(magnitude)
+}
+
+/**
+ * Any whole stat of a sibling at the link's reduced strength, rounded down as its magnitude is:
+ * for a sibling whose reduced strength is not its magnitude, such as a lodestone beacon's swap cap.
+ */
+export function atLinkStrength(value: number): number {
+  return Math.floor((value * POWER_UP_CORE_ECONOMY.siblingLinkStrengthBp) / BASIS_POINTS)
 }
 
 /** One charge spent, the sibling's cooldown at its Mark started, its tile's flash marked. */
