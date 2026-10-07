@@ -1,7 +1,7 @@
 /**
  * What the sensing catalogue rows become (spec #162 sections 1 and 4, #161 section 1): the
- * `vehicle-item` rows, the Mark ladders, the tech nodes and the prices. Vision rows until #203
- * registers them (ticket 241).
+ * `vehicle-item` rows, the Mark ladders, the tech nodes and the prices (ticket 241); #203
+ * registers the shipped ones.
  */
 import type { Money } from '../../../systems/money'
 import { bandOrePrice, bandOrePriceAt } from '../../../systems/economy/bandOreCost'

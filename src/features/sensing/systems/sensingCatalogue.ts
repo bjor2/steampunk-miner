@@ -4,8 +4,8 @@
  * signal buoy, galvanic probe and void sounder. The fifth cradle in the same lane is
  * `power-up-core`'s (#200).
  *
- * Vision rows (ticket 241, the data half of #203): nothing here is registered, so no store, tree,
- * item card or bot sees them; #203 registers them with the effect.
+ * #203 registers six of them (`sensingContent.ts`); the galvanic probe and the void sounder stay
+ * held, unregistered and unseen (GD ruling on #203 Q3).
  */
 import type { DiscoveryRequirement } from '../../tech-tree'
 import type { ItemAttach } from '../../../systems/registries/vehicleAttach'

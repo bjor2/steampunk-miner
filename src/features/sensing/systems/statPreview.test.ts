@@ -34,14 +34,16 @@ describe('sensing stat preview', () => {
     })
   })
 
-  it('shows the flare mortar with its stack, range and mapped radius, and the buoy with no range', () => {
+  it('shows the flare mortar with its stack, wind-up, range and mapped radius, and the buoy with no range', () => {
     expect(valuesOf(statPreview('consumable.flare_mortar', 1, PLANET))).toEqual({
       stack: 3,
+      windup: 6,
       range: 30,
       radius: 6,
     })
     expect(valuesOf(statPreview('consumable.signal_buoy', 1, PLANET))).toEqual({
       stack: 3,
+      windup: 6,
       radius: 4,
     })
   })
@@ -74,6 +76,7 @@ describe('sensing stat preview', () => {
     const last = lastMarkOf('consumable.signal_buoy')
     expect(valuesOf(statPreview('consumable.signal_buoy', last, PLANET))).toEqual({
       stack: 6,
+      windup: 6,
       radius: 8,
     })
   })
@@ -101,6 +104,16 @@ describe('sensing stat preview', () => {
     expect(statPreview('power.galvanic_probe', 4, 40)).toEqual(
       statPreview('power.galvanic_probe', 4, PLANET),
     )
+  })
+
+  it('marks the lines a Mark steps, so a card gives only those a next value', () => {
+    const steppedOf = (itemId: string) =>
+      statPreview(itemId, 1, PLANET)!
+        .lines.filter((line) => line.isMarkStepped)
+        .map((line) => line.stat)
+    expect(steppedOf('power.echo_sounder')).toEqual(['charges', 'cooldown', 'reveal'])
+    expect(steppedOf('consumable.flare_mortar')).toEqual(['stack', 'radius'])
+    expect(steppedOf('passive.hazard_barometer')).toEqual(['lookahead'])
   })
 
   it('answers null for an item of another lane', () => {

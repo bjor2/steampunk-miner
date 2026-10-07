@@ -37,8 +37,8 @@ describe('sensing economy', () => {
 
   it('reads the flare mortar and signal buoy rows of #162 4.3', () => {
     expect(SENSING_ECONOMY.consumable).toEqual({
-      'consumable.flare_mortar': { stack: 3, rangeTiles: 30, radiusTiles: 6 },
-      'consumable.signal_buoy': { stack: 3, rangeTiles: null, radiusTiles: 4 },
+      'consumable.flare_mortar': { stack: 3, windupTicks: 6, rangeTiles: 30, radiusTiles: 6 },
+      'consumable.signal_buoy': { stack: 3, windupTicks: 6, rangeTiles: null, radiusTiles: 4 },
     })
   })
 
@@ -60,7 +60,7 @@ describe('sensing economy', () => {
       },
     }
     broken.items.consumable = {
-      'consumable.signal_buoy': { stack: 3 },
+      'consumable.signal_buoy': { stack: 3, windupTicks: 6 },
     }
     broken.items.passive = {
       'passive.assay_lens': { radiusTiles: 6, lookaheadCells: 4 },

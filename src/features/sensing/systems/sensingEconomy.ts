@@ -29,6 +29,7 @@ export interface ChargedSensingBalance {
 export interface ConsumableSensingBalance {
   /** Crates carried on the rack. */
   stack: number
+  windupTicks: number
   /** How far the flare mortar lobs its shell; null for the buoy, dropped where it stands. */
   rangeTiles: number | null
   /** The mapped or re-pinged ring: the stat the Mark magnitude step grows. */
@@ -115,6 +116,7 @@ function readConsumableRow(
   const row = reader.object(path, raw)
   return {
     stack: reader.safeInteger(`${path}.stack`, row.stack),
+    windupTicks: reader.safeInteger(`${path}.windupTicks`, row.windupTicks),
     rangeTiles: readOptionalInteger(reader, `${path}.rangeTiles`, row.rangeTiles),
     radiusTiles: reader.safeInteger(`${path}.radiusTiles`, row.radiusTiles),
   }

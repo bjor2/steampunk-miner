@@ -23,6 +23,8 @@ export interface SensingStatLine {
   label: string
   value: number
   unit: SensingStatUnit
+  /** Whether a Mark of the item steps it; a card shows a next value only for these. */
+  isMarkStepped: boolean
 }
 
 export interface SensingStatPreview {
@@ -68,20 +70,21 @@ function linesOf(item: SensingItem, mark: number, stats: MarkStats): readonly Se
 function chargedLinesOf(item: SensingItem, stats: MarkStats): readonly SensingStatLine[] {
   const balance = chargedBalanceOf(item)
   return [
-    line('charges', 'Charges', stats.charges ?? balance.charges, 'charges'),
-    line('cooldown', 'Cooldown', stats.cooldown ?? balance.cooldownTicks, 'ticks'),
-    line('windup', 'Wind-up', balance.windupTicks, 'ticks'),
-    ...optionalLine('radius', 'Radius', balance.radiusTiles, 'tiles'),
-    line('reveal', 'Reveal', stats.magnitude ?? balance.revealTicks, 'ticks'),
+    stepped('charges', 'Charges', stats.charges ?? balance.charges, 'charges'),
+    stepped('cooldown', 'Cooldown', stats.cooldown ?? balance.cooldownTicks, 'ticks'),
+    fixed('windup', 'Wind-up', balance.windupTicks, 'ticks'),
+    ...optionalFixed('radius', 'Radius', balance.radiusTiles, 'tiles'),
+    stepped('reveal', 'Reveal', stats.magnitude ?? balance.revealTicks, 'ticks'),
   ]
 }
 
 function consumableLinesOf(item: SensingItem, stats: MarkStats): readonly SensingStatLine[] {
   const balance = consumableBalanceOf(item)
   return [
-    line('stack', 'Stack', stats.charges ?? balance.stack, 'crates'),
-    ...optionalLine('range', 'Range', balance.rangeTiles, 'tiles'),
-    line('radius', 'Radius', stats.magnitude ?? balance.radiusTiles, 'tiles'),
+    stepped('stack', 'Stack', stats.charges ?? balance.stack, 'crates'),
+    fixed('windup', 'Wind-up', balance.windupTicks, 'ticks'),
+    ...optionalFixed('range', 'Range', balance.rangeTiles, 'tiles'),
+    stepped('radius', 'Radius', stats.magnitude ?? balance.radiusTiles, 'tiles'),
   ]
 }
 
@@ -92,25 +95,36 @@ function consumableLinesOf(item: SensingItem, stats: MarkStats): readonly Sensin
 function passiveLinesOf(item: SensingItem, mark: number): readonly SensingStatLine[] {
   const magnitude = passiveReachOf(item, mark)
   return passiveBalanceOf(item).reach === 'radius'
-    ? [line('radius', 'Radius', magnitude, 'tiles')]
-    : [line('lookahead', 'Lookahead', magnitude, 'cells')]
+    ? [stepped('radius', 'Radius', magnitude, 'tiles')]
+    : [stepped('lookahead', 'Lookahead', magnitude, 'cells')]
 }
 
-/** One line, or none for a stat the item does not have. */
-function optionalLine(
+/** One fixed line, or none for a stat the item does not have. */
+function optionalFixed(
   stat: SensingStatName,
   label: string,
   value: number | null,
   unit: SensingStatUnit,
 ): SensingStatLine[] {
-  return value === null ? [] : [line(stat, label, value, unit)]
+  return value === null ? [] : [fixed(stat, label, value, unit)]
 }
 
-function line(
+/** A stat some Mark of the item steps. */
+function stepped(
   stat: SensingStatName,
   label: string,
   value: number,
   unit: SensingStatUnit,
 ): SensingStatLine {
-  return { stat, label, value, unit }
+  return { stat, label, value, unit, isMarkStepped: true }
+}
+
+/** A stat no Mark changes: the wind-up, the echo's radius, the mortar's range. */
+function fixed(
+  stat: SensingStatName,
+  label: string,
+  value: number,
+  unit: SensingStatUnit,
+): SensingStatLine {
+  return { stat, label, value, unit, isMarkStepped: false }
 }
