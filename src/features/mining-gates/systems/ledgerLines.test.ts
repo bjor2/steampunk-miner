@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { formatAmount } from '../../../systems/displayAmount'
+import { fromCanonical } from '../../../systems/money'
 import { ledgerIconIdOf, ledgerLineOf, type GateHit } from './ledgerLines'
 
 // The HUD chip's and the refusal's line (ticket 238): #159's ledger voice over gate_hit's words.
@@ -9,6 +11,16 @@ const refused = (gateKind: string, required: string, have: string): GateHit => (
   required,
   have,
 })
+
+const amountShown = (count: string) => formatAmount(fromCanonical(count))
+
+/** The line with each shown amount taken out once, in order; an amount it lacks fails here. */
+function withoutAmounts(line: string, amounts: string[]): string {
+  return amounts.reduce((rest, amount) => {
+    expect(rest).toContain(amount)
+    return rest.replace(amount, '')
+  }, line)
+}
 
 describe('gate ledger lines', () => {
   it('names the drill tip a cell needs and the major the miner has', () => {
@@ -25,6 +37,22 @@ describe('gate ledger lines', () => {
       'Ledger: drill tip 1,234 required, the miner has 999.',
     )
     expect(ledgerLineOf(refused('drill', 'tip:034', 'tip:32'))).toBeNull()
+  })
+
+  it('prints every amount in every line through formatAmount, and no other number (ticket 299)', () => {
+    const hits = [
+      refused('drill', 'tip:123456789', 'tip:1000000'),
+      refused('dynamite', 'size:12345', 'size:1000'),
+      refused('rig', 'rig.resonance', 'none'),
+      refused('rig', 'rig.resonance:tuned', 'rig.resonance'),
+    ]
+    for (const hit of hits) {
+      const counts = [hit.required, hit.have].map((word) => word.split(':')[1] ?? '')
+      const formatted = counts.filter((count) => /^\d+$/.test(count)).map(amountShown)
+      const line = ledgerLineOf(hit) ?? ''
+      expect(line).not.toBe('')
+      expect(withoutAmounts(line, formatted)).not.toMatch(/\d/)
+    }
   })
 
   it('names the charge size a shell needs and the size carried, or none', () => {
