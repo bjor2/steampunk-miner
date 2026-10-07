@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T16:49:39Z",
+  "updated_at": "2026-10-07T16:50:55Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
-      "state": "idle",
-      "issue": null,
-      "note": "free; #190 landed on main and closed",
-      "updated_at": "2026-10-07T16:49:39Z",
+      "state": "working",
+      "issue": 240,
+      "note": "tier easy, attempt 1/2",
+      "updated_at": "2026-10-07T16:50:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -240,6 +240,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-07T16:50:55Z",
+      "key": "steampunk-loop/1",
+      "state": "working",
+      "issue": 240,
+      "note": "tier easy, attempt 1/2"
+    },
     {
       "at": "2026-10-07T16:49:39Z",
       "key": "steampunk-loop/1",
@@ -652,13 +659,6 @@
       "state": "working",
       "issue": null,
       "note": "2/8 Claude slots busy, 1/4 planner slots; no pickable build ticket; delegated 0 spec(s); planner slots 1/4"
-    },
-    {
-      "at": "2026-10-07T12:20:19Z",
-      "key": "steampunk-loop/5",
-      "state": "working",
-      "issue": 228,
-      "note": "tier fable, attempt 1/2"
     }
   ]
 }
