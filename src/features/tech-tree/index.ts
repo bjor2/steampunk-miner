@@ -1,15 +1,17 @@
 /**
  * The tech tree slice's public API (docs/standards/feature-slices.md 2.1, spec #161 section 5):
  * the content types the lane slices register, the reads the store and the item slices use, and
- * the Mark rotation each item's `statPreview` steps through. The only file another slice may
- * import from this folder. The mounted gear and power-up effect looks (#166) are read-only
- * presentation rules the wiring draws from.
+ * the Mark rotation each item's `statPreview` steps through, with its milestones and their card
+ * line (#256). The only file another slice may import from this folder. The mounted gear and
+ * power-up effect looks (#166) are read-only presentation rules the wiring draws from.
  */
 export const TECH_TREE_SLICE_ID = 'tech-tree'
 export type {
   DiscoveryRequirement,
   ItemUnlock,
   MarkLadder,
+  MarkMilestone,
+  MilestonePattern,
   ProgressionLabel,
   TechComboTemplate,
   TechCostKind,
@@ -22,6 +24,15 @@ export type {
 export { TECH_LANES } from './systems/techNode'
 export { isMasteredAt, lastMarkOf, markStepOf } from './systems/markLadder'
 export { markLadderOfItem, researchedMarkOf } from './systems/itemMarks'
+export {
+  isYieldMilestone,
+  MILESTONE_MARKS,
+  milestonesOf,
+  nextMilestoneOf,
+  type MilestoneClass,
+  type MilestoneVerbs,
+} from './systems/markMilestones'
+export { milestoneLineSpecsOf, nextMilestoneLineOf } from './systems/milestoneCardLine'
 export type { MarkStatName, MarkStats, MarkStep } from './systems/markLadder'
 export { nodeCostOf } from './systems/nodeCost'
 export { laneSpendRowsOf, type LaneSpendRow } from './systems/laneSpend'

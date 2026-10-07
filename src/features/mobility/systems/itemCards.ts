@@ -2,12 +2,13 @@
  * The mobility items' card entries (#159, the K7 `itemDescriptionEntries` seam): the #162 flavour
  * line and one stat line per `statPreview` line, read at the Mark the card's level names. A card
  * at level 0 (the slot card, an item not yet marked up) reads Mark 1, the item as bought; its next
- * value is the next Mark until the item is Mastered. The price never changes with the Mark.
+ * value is the next Mark until the item is Mastered. The price never changes with the Mark. An
+ * item with Mark milestones (#256) also shows the next one's verb in one line.
  */
 import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
-import { isMasteredAt } from '../../tech-tree'
+import { isMasteredAt, milestoneLineSpecsOf } from '../../tech-tree'
 import { MOBILITY_ITEM_ROWS, type MobilityRow } from './mobilityCatalogue'
 import { markLadderOf } from './markLadders'
 import { statPreview } from './statPreview'
@@ -32,6 +33,7 @@ function cardOf(row: MobilityRow): ItemDescriptionEntry {
     flavour: row.flavour,
     statLines: [
       ...labels.slice(0, priceIndex).map(markLineSpecOf),
+      ...milestoneLineSpecsOf(markLadderOf(row.itemId)),
       priceLineSpecOf(labels[priceIndex], priceIndex),
     ],
   }
