@@ -6,7 +6,7 @@ C=dict(v0="10",rho="1.5",eta="1.2544",d0="1.5",gD="1.12",P0="1",gP="1.2544",H0="
  coreMult="4",coreFrac="0.4",travelK="0.12",chargeK="0.002",repairK="0.5",feeFrac="0.05",feeFloorK="3",feeCapK="30",
  c0=24,base=dict(drill_power="55",drill_tip="83",cargo_hold="24",boiler="23",engine="36",hull="46"),r="1.225",rDrill="1.225",rTip="1.500625",w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
  Hk="7",Dkc="17.5",Dkb="16.5",gE="1.12",ET0=1,etPlanet=6,etBand=1,KxE=60,tkill="1.5",
- paceFrom=[[3,"1.4"],[8,"0.75"],[11,"1"]])
+ paceFrom=[[3,"1.4"],[8,"1"]])
 d=lambda s:D(str(s))
 def tier(p,b): return 3*(p-1)+b
 def V(t): return d(C['v0'])*d(C['rho'])**(t-1)

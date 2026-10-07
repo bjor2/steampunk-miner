@@ -58,10 +58,9 @@ export const MAX_DRAW_CALLS = 150
 /**
  * Adaptive render scale (#38 "4K strategy"): the canvas renders at `scale x devicePixelRatio` and
  * is upscaled; the HTML UI stays native. 1.0 is a native render; the floor is a 1920 x 1080
- * internal render (0.5 at 4K). It starts at three quarters and steps 0.1 once per second of frames;
- * written as a ratio so it is not read as the economy's 0.75 pace row (#137).
+ * internal render (0.5 at 4K). It starts at 0.75 and steps 0.1 once per second of frames.
  */
-export const RENDER_SCALE_START = 3 / 4
+export const RENDER_SCALE_START = 0.75
 export const RENDER_SCALE_STEP = 0.1
 export const RENDER_SCALE_MAX = 1
 export const RENDER_SCALE_FLOOR_SHORT_AXIS_PX = 1080
@@ -310,10 +309,9 @@ export const GUN_TURN_RADIANS_PER_SECOND = 9
 /**
  * The Refinery bay's smoke while a batch runs (#105, #106 art: procedural, #51), rising from its
  * stack top at `REFINERY_STACK_TOP_M` in the bay's frame (the art's documented point). Placeholders,
- * tuned by eye; presentation only. x is written as a ratio so the economy scan does not read it as
- * the 0.75 pace row (#137).
+ * tuned by eye; presentation only.
  */
-export const REFINERY_STACK_TOP_M = [-3 / 4, 2.98] as const
+export const REFINERY_STACK_TOP_M = [-0.75, 2.98] as const
 export const REFINERY_SMOKE_CAPACITY = 64
 export const REFINERY_SMOKE_PER_SECOND = 14
 export const REFINERY_SMOKE_SPEED = 0.7

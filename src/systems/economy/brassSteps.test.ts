@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { add, cmp, div, fromCanonical, fromSafeInteger, mul, sub, type Money } from '../money'
 import { oreSalePrice, oreTier } from './oreEconomy'
 import { rechargePrice, repairPrice, rescueFeeBounds } from './planetCharges'
-import { paceScale } from './planetEconomy'
 import { upgradePrice } from './upgradePrices'
 import { cargoCapacity, energyMax, hullMax, onCurveLevel } from './vehicleStats'
 
@@ -18,14 +17,8 @@ function nextBrassStepPrice(track: BrassTrack, planetIndex: number): Money {
   return upgradePrice(track, onCurveLevel(track, planetIndex), planetIndex)
 }
 
-/**
- * The curve's own drift against ore, with the planet's pace row taken back out: `paceScale(p)` is
- * the separate per-planet lever (#131, #137 put planets 8 to 10 at 0.75), multiplying every track
- * alike, so it is not a change in the curve's shape.
- */
-function band5OreUnitsPerBrassStepBeforePace(track: BrassTrack, planetIndex: number): Money {
-  const curvePrice = div(nextBrassStepPrice(track, planetIndex), paceScale(planetIndex))
-  return div(curvePrice, band5SalePrice(planetIndex))
+function band5OreUnitsPerBrassStep(track: BrassTrack, planetIndex: number): Money {
+  return div(nextBrassStepPrice(track, planetIndex), band5SalePrice(planetIndex))
 }
 
 function band5SalePrice(planetIndex: number): Money {
@@ -58,12 +51,12 @@ function cheapestBrassStep(planetIndex: number): Money {
 
 describe('brass steps against ore income (#195)', () => {
   it.each([10, 20, 40])(
-    'keeps the band-5 ore units per next brass step, before the pace row, within 1.2x of planet 1 on planet %i',
+    'keeps the band-5 ore units per next brass step within 1.2x of planet 1 on planet %i',
     (planetIndex) => {
       for (const track of BRASS_TRACKS) {
         const drift = div(
-          band5OreUnitsPerBrassStepBeforePace(track, planetIndex),
-          band5OreUnitsPerBrassStepBeforePace(track, FIRST_PLANET),
+          band5OreUnitsPerBrassStep(track, planetIndex),
+          band5OreUnitsPerBrassStep(track, FIRST_PLANET),
         )
         expect({ track, belowCeiling: cmp(drift, m('1.2')) < 0 }).toEqual({
           track,

@@ -56,16 +56,10 @@ describe('planet charges', () => {
     expect(paceScale(2)).toEqual(m('1'))
   })
 
-  it('scales planets 3 to 7 by the refinery row of 1.4 (#131)', () => {
+  it('scales planets 3 to 7 by the refinery row of 1.4, and planet 8 on by its own row (#131)', () => {
     expect([3, 5, 7].map(paceScale)).toEqual([m('1.4'), m('1.4'), m('1.4')])
-  })
-
-  it('scales planets 8 to 10 by the campaign pace row of 0.75 (#137)', () => {
-    expect([8, 9, 10].map(paceScale)).toEqual([m('0.75'), m('0.75'), m('0.75')])
-  })
-
-  it('ends the 0.75 row at planet 10, so planet 11 on, endless included, keeps pace 1 (#137)', () => {
-    expect([11, 40, 1_000_000].map(paceScale)).toEqual([m('1'), m('1'), m('1')])
+    expect(paceScale(8)).toEqual(m('1'))
+    expect(paceScale(1_000_000)).toEqual(m('1'))
   })
 
   it('takes no fee from a player with no money', () => {
