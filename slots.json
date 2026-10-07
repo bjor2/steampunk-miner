@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T22:59:53+02:00",
+  "updated_at": "2026-10-07T23:00:39+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -81,12 +81,11 @@
         },
         {
           "slot": "C7",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": null,
-          "label": "tester-triage"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C8",
@@ -98,39 +97,30 @@
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "claims_last_hour": 7,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "ae7c1890689bb314ef670d3a763b794b0538251b",
-    "since": "2026-10-07T20:59:38Z",
-    "holds_gate": false,
-    "claude_slot": 7,
-    "last_run": "2026-10-07T20:28:53Z",
+    "phase": "fast",
+    "sha": "e4f99735be754147ccef2a80a8be8569007d09da",
+    "since": "2026-10-07T21:00:36Z",
+    "holds_gate": true,
+    "claude_slot": null,
+    "last_run": "2026-10-07T21:00:33Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null,
-    "feature": 169,
-    "feature_title": "Wayfinder: Shop buildings, sell and buy juice, mining popups, and desktop/mobile/TV look",
+    "feature": 198,
+    "feature_title": "P9 attrition: bot wallet reserve, death-replay breaker, then route enemy volume",
     "queue": [
-      {
-        "feature": 198,
-        "kind": "ticket",
-        "title": "P9 attrition: bot wallet reserve, death-replay breaker, then route enemy volume",
-        "tickets": [
-          198
-        ],
-        "since": "2026-10-07T17:48:33+02:00"
-      },
       {
         "feature": 191,
         "kind": "spec",
@@ -324,12 +314,10 @@
     },
     {
       "slot": 7,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "kind": "aux",
-      "label": "tester-triage",
       "account": 2
     },
     {
@@ -360,8 +348,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 7,
-      "free": 1,
+      "used": 6,
+      "free": 2,
       "external": 0
     }
   }
