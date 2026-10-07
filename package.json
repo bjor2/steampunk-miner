@@ -15,6 +15,7 @@
     "test:push": "cross-env SKIP_NIGHTLY_ONLY_TESTS=1 vitest run",
     "test:e2e": "playwright test",
     "test:e2e:affected": "node scripts/e2e/runAffectedSpecs.mjs",
+    "test:e2e:timings": "node scripts/e2e/summarizeE2eTimings.mjs",
     "test:packaged": "playwright test -c playwright.electron.config.ts",
     "screens:update": "UPDATE_SCREENS=1 playwright test e2e/browser/screens/reviewShots.spec.ts",
     "bench:world": "vite-node scripts/benchGenerateChunk.ts",

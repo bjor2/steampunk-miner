@@ -11,16 +11,28 @@
 import { defineConfig, devices } from '@playwright/test'
 import { SCREEN_CELLS } from './e2e/browser/screens/screenCells'
 
-const PREVIEW_PORT = 4173
+/** `E2E_PORT` moves the preview off the shared 4173 when another checkout serves its own build. */
+const PREVIEW_PORT = Number(process.env.E2E_PORT ?? 4173)
+const isCi = Boolean(process.env.CI)
+/**
+ * The box Tester's 8 cores, Playwright's own default there (#190: e2e no longer runs on GitHub's
+ * 4-vCPU runners, ca26be6b); fixed so the run does not change shape with the machine.
+ */
+const CI_WORKERS = 4
 /** The matrix's specs, wherever the config is run from. */
 const SCREENS_GLOB = '**/browser/screens/**'
 
 export default defineConfig({
   testDir: 'e2e/browser',
   fullyParallel: false,
-  forbidOnly: Boolean(process.env.CI),
-  retries: 0,
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  forbidOnly: isCi,
+  workers: isCi ? CI_WORKERS : undefined,
+  // A load flake on the shared box passes on its retry and is counted as flaky in the summary and
+  // in e2e-report/results.json (`npm run test:e2e:timings`), so slowness stays visible (#190).
+  retries: isCi ? 1 : 0,
+  reporter: isCi
+    ? [['list'], ['html', { open: 'never' }], ['json', { outputFile: 'e2e-report/results.json' }]]
+    : 'list',
   use: {
     baseURL: `http://localhost:${PREVIEW_PORT}`,
     trace: 'retain-on-failure',
@@ -48,9 +60,10 @@ export default defineConfig({
     })),
   ],
   webServer: {
-    command: `npm run build && npx vite preview --port ${PREVIEW_PORT} --strictPort`,
+    // Builds only when dist/ is older than a build input: the box Tester has just built (#190).
+    command: `node scripts/e2e/buildPreviewIfStale.mjs && npx vite preview --port ${PREVIEW_PORT} --strictPort`,
     url: `http://localhost:${PREVIEW_PORT}`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !isCi,
     timeout: 180_000,
   },
 })

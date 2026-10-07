@@ -27,4 +27,5 @@ docs/art/ores/__pycache__/
 
 # Playwright output
 playwright-report/
+e2e-report/
 test-results/

@@ -630,6 +630,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `scripts/e2e/affectedSpecs.test.mjs` | 19 | 10 |
+| `scripts/e2e/e2eTimings.test.mjs` | 3 | 3 |
+| `scripts/e2e/previewBuild.test.mjs` | 4 | 4 |
 
 ### `tooling-metrics`
 

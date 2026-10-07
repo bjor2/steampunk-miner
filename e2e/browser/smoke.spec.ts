@@ -44,6 +44,9 @@ function fastForward(page: Page, ticks: number): Promise<SessionPoint> {
   }, ticks)
 }
 
+// Each test opens its own page, so the workers share them out instead of one worker running all (#190).
+test.describe.configure({ mode: 'parallel' })
+
 test.describe('browser smoke (#29)', () => {
   test('starts a committed scenario from ?scenario= with the run log and the debug API', async ({
     page,
