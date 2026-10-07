@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T13:27:20Z",
+  "updated_at": "2026-10-07T13:27:23Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -222,9 +222,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "queue run on 680113c (close-#146)",
+      "note": "testing spec #140 (Spec: Ore catalogue and depth tiers (many more ore types, rarer deeper)) on 680113c",
       "stale_after_min": 420,
-      "updated_at": "2026-10-07T13:27:20Z",
+      "updated_at": "2026-10-07T13:27:23Z",
       "host": "grok-bot-vm-452660841"
     }
   },
