@@ -8,6 +8,7 @@ import { bandOrePrice, bandOrePriceAt } from '../../../systems/economy/bandOreCo
 import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import type { MarkLadder, TechNode } from '../../tech-tree'
 import type { SensingItem } from './sensingCatalogue'
+import { sensingMilestonesOf } from './sensingMilestones'
 import {
   SENSING_ECONOMY,
   type ChargedSensingBalance,
@@ -37,9 +38,15 @@ export function passiveBalanceOf(item: SensingItem): PassiveSensingBalance {
 /**
  * The Mark 1 ladder (#162 4.6, the #165 rotation): a charged item steps cooldown, then reveal
  * time, then charges; a consumable steps its ring radius, then its stack; a passive steps its
- * radius or lookahead only (4.4).
+ * radius or lookahead only (4.4). Marks 3, 6 and 9 bring its milestones (#256).
  */
 export function markLadderOf(item: SensingItem): MarkLadder {
+  const milestones = sensingMilestonesOf(item)
+  const ladder = steppedLadderOf(item)
+  return milestones.length === 0 ? ladder : { ...ladder, milestones }
+}
+
+function steppedLadderOf(item: SensingItem): MarkLadder {
   if (item.powerUpClass === 'charged') return chargedLadderOf(chargedBalanceOf(item))
   if (item.powerUpClass === 'consumable') return consumableLadderOf(consumableBalanceOf(item))
   return passiveLadderOf(passiveBalanceOf(item))

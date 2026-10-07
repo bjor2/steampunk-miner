@@ -3,7 +3,9 @@
  * periscope, assay lens, hazard barometer, survey flare mortar and signal buoy as vehicle items
  * and power-ups, their `tech.sensing.*` nodes, their item cards and the one-offs' sale at the
  * Upgrade bay (ticket 248); the reveal layer that draws pings, flare maps and buoy pins; the
- * periscope's arrows in the threats slot and the lens's and barometer's overlay cards. Render-only: no section, no command, no log line of its own. The
+ * periscope's arrows in the threats slot and the lens's and barometer's overlay cards. Render-only:
+ * no section, no command, no log line of its own. The passives' Mark 3 sibling-links (#256) fire
+ * at their own moments, a clock step and two reactions that hand power-up-core the moment. The
  * galvanic probe and the void sounder stay held (GD ruling on #203 Q3). No side effects at
  * import; the loader calls `register`.
  */
@@ -11,6 +13,11 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { sensingDebugActions } from './debug'
 import { REVEAL_LAYER_ID, RevealMarkLayer } from './scene/RevealMarkLayer'
 import { SENSING_ITEM_CARDS } from './systems/itemCards'
+import {
+  BAROMETER_LINK_REACTION,
+  LENS_LINK_REACTION,
+  PERISCOPE_LINK_STEP,
+} from './systems/passiveLinks'
 import { REVEAL_LAYER_BUDGET } from './systems/revealBudget'
 import { SENSING_TECH_NODES, SENSING_VEHICLE_ITEMS } from './systems/sensingContent'
 import { SENSING_POWER_UPS } from './systems/sensingPowerUps'
@@ -31,6 +38,9 @@ export const slice: SliceDefinition = {
     r.content('tech-node', SENSING_TECH_NODES)
     r.itemDescriptionEntries(SENSING_ITEM_CARDS)
     r.vehicleItemSeller(SENSING_SELLER)
+    r.clockStep(PERISCOPE_LINK_STEP)
+    r.authorityReaction(LENS_LINK_REACTION)
+    r.authorityReaction(BAROMETER_LINK_REACTION)
     r.sceneLayer({ id: REVEAL_LAYER_ID, Layer: RevealMarkLayer, budget: REVEAL_LAYER_BUDGET })
     r.hudPanel({ id: 'sensing.periscope', slot: 'threats', Panel: PeriscopeArrows })
     r.hudPanel({

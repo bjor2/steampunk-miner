@@ -1,12 +1,18 @@
 /**
  * The sensing uses in a batch of authority events: each `power-up-core.PowerUpUsed` of a shipped
- * echo sounder, flare mortar or signal buoy, with the tick it acted on, its Mark and its origin.
- * Everything a client draws for a use comes from this one line (the TD lock on #203 Q1), so the
- * authority keeps no reveal state. A held item's use, were one ever logged, is no sensing use (the
- * Horizontal guard on #203: no markers for the galvanic probe or the void sounder).
+ * echo sounder, flare mortar or signal buoy, with the tick it acted on, its Mark, its origin and
+ * the Mark milestone it was; and each such item a sibling-link fired (`LinkFired`, #256), from
+ * where its player stands then, at its researched Mark. Everything a client draws for a use comes
+ * from these lines (the TD lock on #203 Q1), so the authority keeps no reveal state. A held item's
+ * use, were one ever logged, is no sensing use (the Horizontal guard on #203: no markers for the
+ * galvanic probe or the void sounder).
  */
+import type { AuthorityState } from '../../../systems/authority/authorityState'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
+import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
+import type { FollowUpPattern } from '../../power-up-core'
+import { researchedMarkOf } from '../../tech-tree'
 
 export const ECHO_SOUNDER = 'power.echo_sounder'
 export const FLARE_MORTAR = 'consumable.flare_mortar'
@@ -23,14 +29,18 @@ export interface SensingUse {
   /** The Mark it acted at; 0 for none researched, which acts as bought (#249). */
   mark: number
   origin: TilePoint
+  /** The Mark milestone's follow-up this use was (#256); null for a plain use. */
+  milestone: FollowUpPattern | null
+  /** Fired by another item's sibling-link: it reveals at the link's reduced strength. */
+  isLinked: boolean
 }
 
-/** The batch's sensing uses, in the order they were logged. */
-export function sensingUsesOf(events: readonly DomainEvent[]): SensingUse[] {
-  return events.flatMap(sensingUseOf)
+/** The batch's sensing uses, in the order they were logged, read against the state after it. */
+export function sensingUsesOf(events: readonly DomainEvent[], state: AuthorityState): SensingUse[] {
+  return events.flatMap((event) => [...usedLineOf(event), ...linkedFireOf(event, state)])
 }
 
-function sensingUseOf(event: DomainEvent): SensingUse[] {
+function usedLineOf(event: DomainEvent): SensingUse[] {
   if (event.type !== 'power-up-core.PowerUpUsed' || !isRevealItemId(event.itemId)) return []
   return [
     {
@@ -39,6 +49,26 @@ function sensingUseOf(event: DomainEvent): SensingUse[] {
       tick: event.tick,
       mark: event.mark,
       origin: { tx: event.originTx, ty: event.originTy },
+      milestone: event.milestone ?? null,
+      isLinked: false,
+    },
+  ]
+}
+
+/** A reveal item a sibling-link fired: from its player's tile, at the Mark researched. */
+function linkedFireOf(event: DomainEvent, state: AuthorityState): SensingUse[] {
+  if (event.type !== 'power-up-core.LinkFired' || !isRevealItemId(event.siblingId)) return []
+  const pose = state.players[event.playerId]?.vehicle.pose ?? null
+  if (pose === null) return []
+  return [
+    {
+      itemId: event.siblingId,
+      playerId: event.playerId,
+      tick: event.tick,
+      mark: researchedMarkOf(state, event.playerId, event.siblingId),
+      origin: tileOfPose(pose),
+      milestone: null,
+      isLinked: true,
     },
   ]
 }

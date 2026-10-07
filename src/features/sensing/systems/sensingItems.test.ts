@@ -17,6 +17,12 @@ const iconIdsOf = (item: SensingItem) => [item.iconId, item.node.iconId]
 
 const itemNamed = (itemId: string) => sensingItemOf(itemId)!
 
+/** The ladder's stat steps, without the milestones Marks 3, 6 and 9 bring (#256). */
+function steppedLadderOf(itemId: string) {
+  const { milestones: _milestones, ...stepped } = markLadderOf(itemNamed(itemId))
+  return stepped
+}
+
 describe('sensing items', () => {
   it('sells the eight #162 sensing items, in tree order', () => {
     expect(SENSING_ITEMS.map((item) => item.itemId)).toEqual([
@@ -103,7 +109,7 @@ describe('sensing items', () => {
   })
 
   it('ladders a charged item by cooldown, reveal time and charges, none of them income items', () => {
-    expect(markLadderOf(itemNamed('power.echo_sounder'))).toEqual({
+    expect(steppedLadderOf('power.echo_sounder')).toEqual({
       isIncomeItem: false,
       cooldown: 300,
       magnitude: { base: 600 },
@@ -113,7 +119,7 @@ describe('sensing items', () => {
   })
 
   it('ladders a consumable by its ring radius and stack, with no cooldown', () => {
-    expect(markLadderOf(itemNamed('consumable.flare_mortar'))).toEqual({
+    expect(steppedLadderOf('consumable.flare_mortar')).toEqual({
       isIncomeItem: false,
       magnitude: { base: 6 },
       charges: 3,
@@ -122,8 +128,24 @@ describe('sensing items', () => {
 
   it('ladders a passive by its magnitude alone, with no cooldown and no charges (#162 4.6)', () => {
     const ladder = { isIncomeItem: false, magnitude: { base: 6 } }
-    expect(markLadderOf(itemNamed('passive.assay_lens'))).toEqual(ladder)
-    expect(techNodeOf(itemNamed('passive.assay_lens')).marks).toEqual(ladder)
+    expect(steppedLadderOf('passive.assay_lens')).toEqual(ladder)
+    expect(techNodeOf(itemNamed('passive.assay_lens')).marks).toEqual(
+      markLadderOf(itemNamed('passive.assay_lens')),
+    )
+  })
+
+  it("puts each shipped item's milestones at its class's Marks, and none on a held item (#256)", () => {
+    const patternsOf = (itemId: string) =>
+      (markLadderOf(itemNamed(itemId)).milestones ?? []).map(({ mark, pattern }) => [mark, pattern])
+    const charged = [
+      [3, 'second-tap'],
+      [6, 'hold'],
+      [9, 'sibling-link'],
+    ]
+    expect(patternsOf('power.echo_sounder')).toEqual(charged)
+    expect(patternsOf('consumable.flare_mortar')).toEqual(charged)
+    expect(patternsOf('passive.assay_lens')).toEqual([[3, 'sibling-link']])
+    expect(patternsOf('power.void_sounder')).toEqual([])
   })
 
   it('prices a charged item or passive at 15 band-5 ore on its unlock planet, on any planet', () => {

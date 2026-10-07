@@ -98,13 +98,14 @@ describe('sensing shipped rows', () => {
     expect(blank).toEqual([])
   })
 
-  it('cards each item with its flavour, its stat lines and a price, as bought and Mastered', () => {
+  it('cards each item with its flavour, its stat lines, its next milestone and a price, as bought and Mastered', () => {
     SHIPPED.forEach((item) => {
       const lines = statPreview(item.itemId, 1, 13)!.lines.length
       const bought = cardOf(item.itemId, 0, 13)
       const mastered = cardOf(item.itemId, lastMarkOf(markLadderOf(item)), 13)
       expect(bought?.flavour).toBe(item.description)
-      expect(bought?.statLines).toHaveLength(lines + 1)
+      expect(bought?.statLines).toHaveLength(lines + 2)
+      expect(bought?.statLines.at(-2)?.label).toBe('Next milestone')
       expect(bought?.statLines.at(-1)?.label).toMatch(/^Price/)
       expect(mastered?.statLines.every((line) => line.next === undefined)).toBe(true)
     })

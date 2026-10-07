@@ -1,16 +1,17 @@
 /**
  * The sensing items' card entries (#159, the K7 `itemDescriptionEntries` seam): the #162 flavour
- * line, one stat line per `statPreview` line read at the Mark the card's level names, and the
- * price last. A card at level 0 (an item not yet marked up) reads Mark 1, the item as bought; a
- * line a Mark steps shows the next Mark's value until the item is Mastered, and a fixed line (the
- * wind-up, the echo's radius, the mortar's range) and the price show none. Times read in seconds.
+ * line, one stat line per `statPreview` line read at the Mark the card's level names, the next Mark
+ * milestone's verb (#256), and the price last. A card at level 0 (an item not yet marked up) reads
+ * Mark 1, the item as bought; a line a Mark steps shows the next Mark's value until the item is
+ * Mastered, and a fixed line (the wind-up, the echo's radius, the mortar's range) and the price
+ * show none. Times read in seconds.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
 import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
-import { isMasteredAt } from '../../tech-tree'
+import { isMasteredAt, milestoneLineSpecsOf } from '../../tech-tree'
 import { sensingItemOf, type SensingItem } from './sensingCatalogue'
 import { SHIPPED_SENSING_ITEMS } from './sensingContent'
 import { itemPriceOf, markLadderOf } from './sensingItems'
@@ -41,7 +42,11 @@ function cardOf(item: SensingItem): ItemDescriptionEntry {
     id: cardIdOf(item),
     matches: { kind: 'vehicle-item', id: item.itemId },
     flavour: item.description,
-    statLines: [...lines.map(statLineSpecOf), priceLineSpecOf(item)],
+    statLines: [
+      ...lines.map(statLineSpecOf),
+      ...milestoneLineSpecsOf(markLadderOf(item)),
+      priceLineSpecOf(item),
+    ],
   }
 }
 

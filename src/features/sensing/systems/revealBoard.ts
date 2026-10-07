@@ -1,9 +1,9 @@
 /**
  * What one client shows of the sensing uses (#203, the TD lock on its Q1 and the GD's smaller
  * readings): the cells its own echo pings and flare maps mark, every buoy pin in the world, and
- * the rings those buoys re-ping. Derived from `PowerUpUsed` and pure reads of the authority state
- * on each client, never kept by the authority, so nothing reaches the digest. A reload or a late
- * joiner starts with an empty board; a flare's map lasts until the dock. Inside a magnetic field
+ * the rings those buoys re-ping; each where and as far as its Mark milestone or link says (#256).
+ * Derived from `PowerUpUsed` and pure reads of the authority state on each client, never kept by
+ * the authority, so nothing reaches the digest. A reload or a late joiner starts with an empty board; a flare's map lasts until the dock. Inside a magnetic field
  * each reach is cut to the kernel's field share, read where the ping, map or ring is centred
  * (spec #258, ticket 290).
  */
@@ -12,16 +12,17 @@ import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { sensingReachAt } from '../../../systems/authority/magnetic/sensingReach'
 import { droppedPinOf, pinAfterPasses, pinsWithBuoy, type BuoyPin } from './buoyPins'
 import { echoMarksOf } from './echoPing'
-import { flareLandingOf } from './flareMortar'
 import { BUOY_PIN_CAP, REVEAL_MARK_CAP } from './revealBudget'
+import { buoyRepingTicks } from './revealReach'
 import {
-  buoyRepingTicks,
-  buoyRingTilesAt,
-  echoRadiusTiles,
-  echoRevealTicksAt,
-  flareRadiusTilesAt,
-  flareRangeTiles,
-} from './revealReach'
+  buoyRingOf,
+  buoyTileOf,
+  echoCentreOf,
+  echoRadiusOf,
+  echoUntilOf,
+  flareLandingOfUse,
+  flareRadiusOf,
+} from './revealVerbs'
 import {
   marksAfterDock,
   marksAfterPing,
@@ -56,7 +57,7 @@ export function boardAfterUses(
   state: AuthorityState,
   localPlayerId: string,
 ): RevealBoard {
-  return sensingUsesOf(events).reduce(
+  return sensingUsesOf(events, state).reduce(
     (running, use) => boardAfterUse(running, use, state, localPlayerId),
     board,
   )
@@ -92,25 +93,23 @@ function pingOfUse(use: SensingUse, state: AuthorityState): RevealPing {
   return use.itemId === ECHO_SOUNDER ? echoPingOf(use, state) : flareMapOf(use, state)
 }
 
+/** The ping round its centre, for its reveal time (`revealVerbs.ts`: a milestone, a link). */
 function echoPingOf(use: SensingUse, state: AuthorityState): RevealPing {
+  const centre = echoCentreOf(use, state)
   return {
-    centre: use.origin,
-    marks: echoMarksOf(state, use.origin, sensingReachAt(state, use.origin, echoRadiusTiles())),
+    centre,
+    marks: echoMarksOf(state, centre, sensingReachAt(state, centre, echoRadiusOf(use))),
     bornTick: use.tick,
-    untilTick: use.tick + echoRevealTicksAt(use.mark),
+    untilTick: echoUntilOf(use),
   }
 }
 
 /** The ring round where the shell lands, mapped for the rest of the trip. */
 function flareMapOf(use: SensingUse, state: AuthorityState): RevealPing {
-  const landing = flareLandingOf(state, use.playerId, use.origin, flareRangeTiles())
+  const landing = flareLandingOfUse(use, state)
   return {
     centre: landing,
-    marks: echoMarksOf(
-      state,
-      landing,
-      sensingReachAt(state, landing, flareRadiusTilesAt(use.mark)),
-    ),
+    marks: echoMarksOf(state, landing, sensingReachAt(state, landing, flareRadiusOf(use))),
     bornTick: use.tick,
     untilTick: null,
   }
@@ -118,11 +117,12 @@ function flareMapOf(use: SensingUse, state: AuthorityState): RevealPing {
 
 /** The pin, and its ring pinged as it lands. */
 function boardWithBuoy(board: RevealBoard, use: SensingUse, state: AuthorityState): RevealBoard {
+  const tile = buoyTileOf(use, state)
   const pin = droppedPinOf(state, {
-    tile: use.origin,
+    tile,
     ownerId: use.playerId,
     placedTick: use.tick,
-    ringTiles: sensingReachAt(state, use.origin, buoyRingTilesAt(use.mark)),
+    ringTiles: sensingReachAt(state, tile, buoyRingOf(use)),
   })
   const pinned = { ...board, pins: pinsWithBuoy(board.pins, pin, BUOY_PIN_CAP) }
   return boardWithPing(pinned, ringPingOf(pin, state, use.tick))
