@@ -29,6 +29,11 @@ export function momentOf(landing: StepLanding, chainAfter: HoldChain): StepMomen
   return isChainLive(chainAfter) ? 'compressed' : 'full'
 }
 
+/** The moment a click's step plays: a big level-up bought alone gets the full moment. */
+export function clickMomentOf(landing: StepLanding): StepMoment {
+  return landing === 'major' ? 'full' : landing
+}
+
 /** The cue that ends this chain; null while it is live. */
 export function stopCueOf(chain: HoldChain): ChainStopCue | null {
   if (chain.end === null) return null
