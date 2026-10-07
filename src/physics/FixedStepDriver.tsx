@@ -8,34 +8,25 @@
  */
 import { useFrame } from '@react-three/fiber'
 import { useRapier } from '@react-three/rapier'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
+import { FIXED_STEP_FRAME_PRIORITY } from '../constants/physics'
 import {
-  FIXED_STEP_FRAME_PRIORITY,
-  MAX_STEPS_PER_FRAME,
-  PHYSICS_TIMESTEP,
-} from '../constants/physics'
-import { carryPastFrameSteps, countFrameSteps, stepBlendOf } from '../systems/fixedStepClock'
-import { stepBlend } from './stepBlend'
+  exposeLiveStepper,
+  runFixedStepFrame,
+  runLiveSteps,
+  type FrameClock,
+  type LiveWorld,
+} from './liveFixedStep'
 
-interface FrameClock {
-  carried: number
-}
-
-/** `isPaused` stops the clock: no step, and bodies stay drawn where they were. */
-export function FixedStepDriver({ isPaused }: { isPaused: boolean }) {
+/**
+ * `isHeld` is read every frame, not taken as a prop, so a hold set by a debug call stops the very
+ * next frame: no step, and bodies stay drawn where they were.
+ */
+export function FixedStepDriver({ isHeld }: { isHeld: () => boolean }) {
   const { step } = useRapier()
   const clock = useMemo<FrameClock>(() => ({ carried: 0 }), [])
-  useFrame((_, delta) => {
-    if (isPaused) return
-    runDueSteps(clock, delta, step)
-    stepBlend.share = stepBlendOf(clock.carried, PHYSICS_TIMESTEP)
-  }, FIXED_STEP_FRAME_PRIORITY)
+  const world = useMemo<LiveWorld>(() => ({ isHeld, stepWorld: step }), [isHeld, step])
+  useEffect(() => exposeLiveStepper((ticks) => runLiveSteps(ticks, world)), [world])
+  useFrame((_, delta) => runFixedStepFrame(clock, delta, world), FIXED_STEP_FRAME_PRIORITY)
   return null
-}
-
-/** Each manual `step` of exactly one timestep advances the world exactly one fixed step. */
-function runDueSteps(clock: FrameClock, frameSeconds: number, step: (dt: number) => void): void {
-  const steps = countFrameSteps(clock.carried, frameSeconds, PHYSICS_TIMESTEP, MAX_STEPS_PER_FRAME)
-  clock.carried = carryPastFrameSteps(clock.carried, frameSeconds, PHYSICS_TIMESTEP, steps)
-  for (let done = 0; done < steps; done++) step(PHYSICS_TIMESTEP)
 }

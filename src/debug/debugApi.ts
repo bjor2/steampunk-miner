@@ -86,6 +86,13 @@ import {
   type DebugUi,
 } from './debugScreens'
 import { debugActionsBySlice, type SliceDebugActions } from './debugActionRegistry'
+import {
+  pauseLiveGame,
+  resumeLiveGame,
+  sessionPoint,
+  stepLiveGame,
+  type SessionPoint,
+} from './debugLiveTime'
 
 export class DebugCommandNotImplementedError extends Error {
   constructor(command: string) {
@@ -96,11 +103,7 @@ export class DebugCommandNotImplementedError extends Error {
 
 export type { DebugResult }
 
-/** Where the authority stands after a time or snapshot command. */
-export interface SessionPoint {
-  tick: number
-  digest: string
-}
+export type { SessionPoint }
 
 /** `vehicleStats()`: the levels the vehicle holds, its stats, and the on-curve table (#7, #14). */
 export interface VehicleStatsReport {
@@ -146,14 +149,27 @@ export interface DebugApi {
   teleportToDock(bay?: string): DebugResult
   /** `amount` is a decimal string >= 0, for example "1e100" (decision #5). */
   giveMoney(amount: string): DebugResult
-  /** A `scenarioVersion` 1 file, already parsed from JSON. */
+  /**
+   * A `scenarioVersion` 1 file, already parsed from JSON, on a fresh session from tick 0; the
+   * live game then waits at its end tick for play, `fastForward`, `step` or `resume`.
+   */
   applyScenario(scenario: unknown): DebugResult<SessionPoint>
   scenarioProblems(scenario: unknown): string[]
   // time
-  /** Advances the authority headlessly; `commands` are submitted at their absolute ticks. */
+  /**
+   * Advances the authority headlessly; `commands` are submitted at their absolute ticks. Starts a
+   * scenario or a restore waiting for play, as `step` and `resume` do.
+   */
   fastForward(ticks: number, commands?: readonly ScriptedCommand[]): DebugResult<SessionPoint>
+  /** Holds the live game's fixed step until `resume()`; frames are still drawn. */
+  pause(): DebugResult<SessionPoint>
+  /** The live fixed step runs again, after `pause()` or a scenario waiting for play. */
+  resume(): DebugResult<SessionPoint>
+  /** `ticks` (1 to 3600) fixed steps of the running world now, physics and all; logged. */
+  step(ticks: number): DebugResult<SessionPoint>
   // snapshot and restore
   snapshot(): DebugResult<{ snapshot: SessionSnapshot }>
+  /** The live game then waits at the snapshot's tick for play, like `applyScenario`. */
   restore(snapshot: unknown): DebugResult<SessionPoint>
   // vehicle (#7, #11 amendment): the setters are `debug.*` commands, the read is not logged
   /**
@@ -267,11 +283,6 @@ function runAndReportPoint(problems: string[], run: () => void): DebugResult<Ses
   return result.ok ? { ok: true, ...sessionPoint() } : result
 }
 
-function sessionPoint(): SessionPoint {
-  const { tick, digest } = takeSessionSnapshot()
-  return { tick, digest }
-}
-
 const game = (): GameState => useGameStore.getState()
 
 function enemyKindProblems(kind: unknown): string[] {
@@ -359,6 +370,9 @@ export function createDebugApi(): DebugApi {
       runAndReportPoint(fastForwardProblems(sessionPoint().tick, ticks, commands), () =>
         game().fastForward(ticks, commands),
       ),
+    pause: pauseLiveGame,
+    resume: resumeLiveGame,
+    step: stepLiveGame,
     snapshot: () => ({ ok: true, snapshot: takeSessionSnapshot() }),
     restore: (snapshot) =>
       runAndReportPoint(readSnapshot(snapshot).problems, () => game().restoreSnapshot(snapshot)),

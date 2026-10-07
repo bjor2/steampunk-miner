@@ -48,12 +48,14 @@ const actionStream: ActionEdge[] = []
 
 /**
  * One key from the shell: a rebinding capture, or the actions its chord has in the top layer.
- * Any key also takes a shown transmission down (#16) and hides the touch controls until the next
- * touch (#173), and still does what it is bound to.
+ * Any key also takes a shown transmission down (#16), hides the touch controls until the next
+ * touch (#173) and starts a scenario waiting for play (ticket 301), and still does what it is
+ * bound to.
  */
 export function routeKeyChange(key: KeyChange): void {
   rememberKey(key)
   if (!key.isDown) return releaseKey(key.code)
+  useGameStore.getState().releaseHoldUntilPlay()
   useGameStore.getState().dismissTransmission()
   useGameStore.getState().hideTouchControls()
   if (useGameStore.getState().rebindingActionId !== null) return captureRebinding(key)
@@ -66,10 +68,14 @@ export function routeScrollNotch(notch: ScrollNotch): void {
   pressAction(notch === 'up' ? 'zoom_in' : 'zoom_out')
 }
 
-/** An action goes down: a held one joins the intent, a pressed one reacts once. */
+/**
+ * An action goes down: a held one joins the intent, a pressed one reacts once. A touch or a
+ * scripted press is play too, so it starts a scenario waiting for play, as a key does.
+ */
 export function pressAction(action: ActionId): void {
   const game = useGameStore.getState()
   if (!actionDefOf(ACTION_MAP, action).contexts.includes(inputLayerOf(game))) return
+  game.releaseHoldUntilPlay()
   recordEdge(action, true)
   if (actionDefOf(ACTION_MAP, action).kind === 'hold') return holdAction(action)
   applyReaction(reactionToPress(action, situationNow()))

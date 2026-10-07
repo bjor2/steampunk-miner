@@ -7,6 +7,7 @@ import { Canvas } from '@react-three/fiber'
 import { CAMERA_POSITION, CANVAS_DPR_RANGE } from '../constants/scene'
 import { PhysicsWorld } from '../physics/PhysicsWorld'
 import { useGameStore } from '../store/gameStore'
+import { isLiveStepHeld } from '../store/liveStepSlice'
 import { CementSpray } from './CementSpray'
 import { BlastScorches } from './BlastScorches'
 import { CanvasScreenshots } from './CanvasScreenshots'
@@ -27,9 +28,15 @@ import { Sparks } from './Sparks'
 import { Vehicle } from './Vehicle'
 import { WorldPieces } from './WorldPieces'
 
+/**
+ * One human player in the slice, so settings pause the local game (#33), and a scenario waits for
+ * play (ticket 301); never a command. Read each frame, so a hold set by a debug call holds at once.
+ */
+function isGameHeld(): boolean {
+  return isLiveStepHeld(useGameStore.getState())
+}
+
 export function GameScene() {
-  // One human player in the slice, so settings pause the local game (#33); never a command.
-  const isPaused = useGameStore((state) => state.isSettingsOpen)
   // `PlanetCamera` sets the zoom from the canvas size every frame (#39).
   return (
     <Canvas
@@ -48,7 +55,7 @@ export function GameScene() {
       <PlatformYard />
       <WorldPieces layer="platform" />
       <EnemyFigures />
-      <PhysicsWorld isPaused={isPaused}>
+      <PhysicsWorld isHeld={isGameHeld}>
         <Vehicle />
       </PhysicsWorld>
       <Sparks />

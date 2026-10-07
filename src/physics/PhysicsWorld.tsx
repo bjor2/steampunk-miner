@@ -15,14 +15,15 @@ import { watchPhysicsWorld } from './physicsStats'
 const NO_WORLD_GRAVITY: [number, number, number] = [0, 0, 0]
 
 /**
- * `isPaused` stops the fixed step: no tick, no motion. The local pause while the settings overlay
- * is open with one human player (#33 section 1), the same mechanism as the debug `pause()`.
+ * `isHeld` stops the fixed step while it answers true: no tick, no motion. The local pause while
+ * the settings overlay is open with one human player (#33 section 1), a scenario waiting for play
+ * and the debug `pause()` (ticket 301) all hold it this way.
  */
-export function PhysicsWorld({ children, isPaused }: { children: ReactNode; isPaused: boolean }) {
+export function PhysicsWorld({ children, isHeld }: { children: ReactNode; isHeld: () => boolean }) {
   return (
     <Physics gravity={NO_WORLD_GRAVITY} timeStep={PHYSICS_TIMESTEP} paused interpolate={false}>
       <WorldStatsWatch />
-      <FixedStepDriver isPaused={isPaused} />
+      <FixedStepDriver isHeld={isHeld} />
       {children}
     </Physics>
   )

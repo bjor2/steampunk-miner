@@ -85,6 +85,12 @@ import { groundDebugActionsOf, type GroundDebugActions } from './groundDebugActi
 import { announceDomainEvents } from './domainEventBroadcast'
 import { announceFeedback } from './feedbackBroadcast'
 import { hintActionsOf, STARTING_HINTS, type HintActions, type HintValues } from './hintSlice'
+import {
+  liveStepActionsOf,
+  STARTING_LIVE_STEP,
+  type LiveStepActions,
+  type LiveStepValues,
+} from './liveStepSlice'
 import { forgetMusicStingers, recordMusicStingers } from './musicStingerRecord'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import {
@@ -106,7 +112,14 @@ type DebugActions = CombatDebugActions &
   ArtefactActions
 
 export interface GameState
-  extends DebugActions, PresentationValues, PresentationActions, HintValues, HintActions {
+  extends
+    DebugActions,
+    PresentationValues,
+    PresentationActions,
+    HintValues,
+    HintActions,
+    LiveStepValues,
+    LiveStepActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -130,11 +143,14 @@ export interface GameState
   /** `amount` is a decimal string >= 0, for example "1e100". */
   giveMoney(amount: string): void
   applyStartScenario(scenario: StartScenario): void
-  /** A scenario file (#11 section 4): its start as `debug.*` commands, then its script. */
+  /**
+   * A scenario file (#11 section 4) on a fresh session at tick 0: its start as `debug.*`
+   * commands, then its script; the live step then holds until play starts it.
+   */
   applyScenario(scenario: Scenario): void
   /** Advances the authority headlessly, submitting scripted commands at their ticks. */
   fastForward(ticks: number, commands?: readonly ScriptedCommand[]): void
-  /** Replaces the session with a snapshot's state; refused whole on any problem. */
+  /** Replaces the session with a snapshot's state, held until play; refused whole on a problem. */
   restoreSnapshot(snapshot: unknown): void
   /** Quit and resume (#26): play goes on from the checkpoint, docked; not a debug command. */
   resumeCheckpoint(checkpoint: Checkpoint): void
@@ -182,6 +198,7 @@ type GameValues = Pick<
   | 'isCoreCompleted'
   | keyof PresentationValues
   | keyof HintValues
+  | keyof LiveStepValues
   | 'travelTransition'
 >
 
@@ -201,6 +218,7 @@ export const STARTING_VALUES: GameValues = {
   isCoreCompleted: false,
   ...STARTING_PRESENTATION,
   ...STARTING_HINTS,
+  ...STARTING_LIVE_STEP,
   travelTransition: null,
 }
 
@@ -216,6 +234,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...artefactActionsOf(() => get().playerId),
   ...presentationActionsOf(set, get),
   ...hintActionsOf(set, get),
+  ...liveStepActionsOf(set, get),
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
@@ -248,15 +267,18 @@ export const useGameStore = create<GameState>()((set, get) => ({
   applyScenario: (scenario) => {
     refuseProblems(validateScenario(scenario))
     get().allowPlaquesFor(scenario)
-    const scriptStartTick = readAuthorityState().tick
+    set({ depthTiles: 0, travelTransition: null })
+    replaceSession(freshSessionAfter(readAuthorityState()))
     get().applyStartScenario(startOfScenario(scenario))
-    runScenarioScript(scriptStartTick, scenario.script ?? [], get().fastForward)
+    runScenarioScript(scenario.script ?? [], get().fastForward)
+    get().holdLiveStepUntilPlay()
   },
 
   fastForward: (ticks, commands = []) => {
     const fromTick = readAuthorityState().tick
     refuseProblems(fastForwardProblems(fromTick, ticks, commands))
     recordDebugCommand(get(), 'fastForward', { ticks, commands: commands.length })
+    get().releaseHoldUntilPlay()
     runFastForwardSteps(get().playerId, fastForwardSteps(fromTick, ticks, commands))
   },
 
@@ -265,6 +287,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
     if (!('state' in restored)) return refuseProblems(restored.problems)
     replaceSession(restored.state)
     recordDebugCommand(get(), 'restoreSnapshot', { tick: restored.state.tick })
+    get().holdLiveStepUntilPlay()
   },
 
   resumeCheckpoint: (checkpoint) => {
@@ -350,6 +373,15 @@ export function takeSessionSnapshot(): SessionSnapshot {
 /** A new session for the starting values; tests pass a spy to watch what the store submits. */
 export function createStartingAuthority(): Authority {
   return createLoopbackAuthority(startingAuthorityState())
+}
+
+/**
+ * A scenario's session (#11 section 4: its commands at tick 0): the starting state, so live ticks
+ * played before it change neither its end tick nor its digest. `debugApplied` is kept, since it is
+ * never reset within a run.
+ */
+function freshSessionAfter(state: AuthorityState): AuthorityState {
+  return { ...startingAuthorityState(), debugApplied: state.debugApplied }
 }
 
 function startingAuthorityState(): AuthorityState {

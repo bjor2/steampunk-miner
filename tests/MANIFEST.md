@@ -492,6 +492,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/debug/debugApi.test.ts` | 52 | 51 |
 | `src/debug/debugArtefact.test.ts` | 5 | 5 |
+| `src/debug/debugLiveTime.test.ts` | 3 | 3 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
 | `src/debug/debugScreens.test.ts` | 29 | 28 |
@@ -622,6 +623,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/physics/liveFixedStep.test.ts` | 4 | 4 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
 | `src/physics/vehicleLoop.test.ts` | 5 | 5 |
 | `src/physics/vehiclePhysics.test.ts` | 8 | 2 |
@@ -770,6 +772,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 9 | 9 |
 | `src/store/inputRuntime.test.ts` | 40 | 40 |
+| `src/store/liveStepSlice.test.ts` | 13 | 13 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
 | `src/store/perfLog.test.ts` | 6 | 6 |
 | `src/store/platformLoop.test.ts` | 4 | 4 |

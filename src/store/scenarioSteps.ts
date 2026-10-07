@@ -13,16 +13,15 @@ export function submitEach(playerId: string, intents: readonly CommandIntent[]):
 }
 
 /**
- * Script ticks count from the tick the scenario was applied at; a step whose tick an earlier
- * fast-forward already passed runs at once, so time never goes backwards.
+ * Script ticks count from tick 0, where the scenario's session starts; a step whose tick an
+ * earlier fast-forward already passed runs at once, so time never goes backwards.
  */
 export function runScenarioScript(
-  scriptStartTick: number,
   script: readonly ScriptStep[],
   fastForward: (ticks: number) => void,
 ): void {
   for (const step of script) {
-    advanceAuthorityTo(Math.max(scriptStartTick + step.tick, readAuthorityState().tick))
+    advanceAuthorityTo(Math.max(step.tick, readAuthorityState().tick))
     fastForward(step.args.ticks)
   }
 }
