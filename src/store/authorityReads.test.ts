@@ -1,25 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemorySink } from '../logging/eventSink'
-import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
-import * as digestModule from '../systems/authority/stateDigest'
 import { toCanonical } from '../systems/money'
-import {
-  readAuthorityTick,
-  readEnemies,
-  readLocalVehicle,
-  readPlanetWorld,
-  resetGameStore,
-  takeSessionSnapshot,
-  useGameStore,
-  vehicleDebugProblems,
-} from './gameStore'
-import { readAuthorityState } from './authorityLink'
 
 // Counts every state digest computed anywhere behind the store (#101): the frame and step loops
 // read the authority many times a second, and a digest there hashed the whole state each time.
 const digests = vi.hoisted(() => ({ computed: 0 }))
 vi.mock('../systems/authority/stateDigest', async (importOriginal) => {
-  const real = await importOriginal<typeof digestModule>()
+  const real = await importOriginal<typeof import('../systems/authority/stateDigest')>()
   return {
     ...real,
     stateDigest: (state: unknown) => {
@@ -29,27 +16,48 @@ vi.mock('../systems/authority/stateDigest', async (importOriginal) => {
   }
 })
 
+// The setup file loads the slices, and a slice that reads the authority loads the real digest
+// before this file's mock applies, so the store under test is a fresh module graph with no slices
+// registered (a kernel spec never imports one), on which the mock is in place.
+let store: typeof import('./gameStore')
+let link: typeof import('./authorityLink')
+let runLog: typeof import('../logging/runLog')
+let digestModule: typeof import('../systems/authority/stateDigest')
+
+beforeAll(async () => {
+  vi.resetModules()
+  ;(await import('../registries/registrar')).loadSlices([])
+  runLog = await import('../logging/runLog')
+  store = await import('./gameStore')
+  link = await import('./authorityLink')
+  digestModule = await import('../systems/authority/stateDigest')
+})
+
 beforeEach(() => {
-  resetGameStore()
-  installRunLog(
-    createRunLog({ runId: 'run_test', sink: createMemorySink(), secondsSinceStart: () => 0 }),
+  store.resetGameStore()
+  runLog.installRunLog(
+    runLog.createRunLog({
+      runId: 'run_test',
+      sink: createMemorySink(),
+      secondsSinceStart: () => 0,
+    }),
   )
   digests.computed = 0
 })
 
-afterEach(() => uninstallRunLog())
+afterEach(() => runLog.uninstallRunLog())
 
-const game = () => useGameStore.getState()
+const game = () => store.useGameStore.getState()
 
 describe('authority reads', () => {
   it('reads the tick, vehicle, enemies and planet world each step without hashing the state', () => {
     game().advanceOneTick()
     game().advanceOneTick()
     const reads = {
-      tick: readAuthorityTick(),
-      energy: readLocalVehicle().energy,
-      enemies: readEnemies().length,
-      hasPlanet: readPlanetWorld().params !== null,
+      tick: store.readAuthorityTick(),
+      energy: store.readLocalVehicle().energy,
+      enemies: store.readEnemies().length,
+      hasPlanet: store.readPlanetWorld().params !== null,
     }
     expect(reads).toEqual({ tick: 2, energy: 36000, enemies: 0, hasPlanet: true })
     expect(digests.computed).toBe(0)
@@ -57,7 +65,10 @@ describe('authority reads', () => {
 
   it('stamps and dry-runs commands without hashing the state', () => {
     game().giveMoney('7')
-    const problems = vehicleDebugProblems({ type: 'debug.setEnergy', payload: { energy: '-1' } })
+    const problems = store.vehicleDebugProblems({
+      type: 'debug.setEnergy',
+      payload: { energy: '-1' },
+    })
     expect({ money: toCanonical(game().money), refused: problems.length > 0 }).toEqual({
       money: '7e+0',
       refused: true,
@@ -66,8 +77,8 @@ describe('authority reads', () => {
   })
 
   it('hashes the state once for a session snapshot, the digest of the state the reads return', () => {
-    const snapshot = takeSessionSnapshot()
+    const snapshot = store.takeSessionSnapshot()
     expect(digests.computed).toBe(1)
-    expect(snapshot.digest).toBe(digestModule.stateDigest(readAuthorityState()))
+    expect(snapshot.digest).toBe(digestModule.stateDigest(link.readAuthorityState()))
   })
 })

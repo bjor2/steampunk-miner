@@ -85,7 +85,7 @@ const GAUGE_PLINTH: readonly PartShape[] = [box([0.7, 0.3], [-1.05, 0.15], DARK_
 
 const CORE_DRIVE: readonly PartShape[] = [
   box([0.9, 0.48], [1.0, 0.24], DARK_IRON),
-  box([0.22, 1.5], [0.7, 1.25], IRON),
+  box([0.22, 1.52], [0.7, 1.26], IRON),
   box([0.13, 0.9], [1.3, 0.95], COPPER),
   { ...disc(0.8, [1.0, 1.5], CORE_GLOW), isGlowing: true },
   { ...disc(0.38, [1.0, 1.5], CORE_HEART), isGlowing: true },

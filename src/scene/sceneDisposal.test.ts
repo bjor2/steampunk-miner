@@ -11,20 +11,8 @@
 import { act, createRoot, extend, type ReconcilerRoot } from '@react-three/fiber'
 import { createElement, type FunctionComponent } from 'react'
 import * as THREE from 'three'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { readPlanetWorld, resetGameStore } from '../store/gameStore'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AssetQuad, AtlasMaps, AtlasUv } from '../systems/art/assetLook'
-import { vehicleAtlasMaps, vehicleBodyQuadsOf } from '../systems/render/vehicleLook'
-import { dockSiteOf } from '../systems/world/dockSite'
-import { AtlasQuadMesh } from './AtlasQuadMesh'
-import { BlastScorches } from './BlastScorches'
-import { CementSpray } from './CementSpray'
-import { CollapseTelegraph } from './CollapseTelegraph'
-import { EnemyFigures } from './EnemyFigures'
-import { EnemyPlaceholders } from './EnemyPlaceholders'
-import { RefineryBay } from './RefineryBay'
-import { SHIPPED_ART } from './shippedArt'
-import { Sparks } from './Sparks'
 
 vi.mock('./atlasTextures', () => {
   const textures = new Map<string, THREE.Texture>()
@@ -47,11 +35,43 @@ Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
 
 type GpuObject = THREE.BufferGeometry | THREE.Material
 
+/**
+ * The setup file loads the slices, and a slice that draws atlas parts loads the real atlas
+ * textures before this file's mock applies, so the scene under test is a fresh module graph with
+ * no slices registered (a kernel spec never imports one), on which the stub loader is in place.
+ */
+let loaded: Awaited<ReturnType<typeof importScene>>
+
+async function importScene() {
+  vi.resetModules()
+  ;(await import('../registries/registrar')).loadSlices([])
+  return {
+    store: await import('../store/gameStore'),
+    vehicleLook: await import('../systems/render/vehicleLook'),
+    dockSite: await import('../systems/world/dockSite'),
+    shippedArt: await import('./shippedArt'),
+    AtlasQuadMesh: (await import('./AtlasQuadMesh')).AtlasQuadMesh,
+    RefineryBay: (await import('./RefineryBay')).RefineryBay,
+    disposable: [
+      ['Sparks', (await import('./Sparks')).Sparks],
+      ['CementSpray', (await import('./CementSpray')).CementSpray],
+      ['CollapseTelegraph', (await import('./CollapseTelegraph')).CollapseTelegraph],
+      ['EnemyPlaceholders', (await import('./EnemyPlaceholders')).EnemyPlaceholders],
+      ['EnemyFigures', (await import('./EnemyFigures')).EnemyFigures],
+      ['BlastScorches', (await import('./BlastScorches')).BlastScorches],
+    ] as [string, FunctionComponent][],
+  }
+}
+
+beforeAll(async () => {
+  loaded = await importScene()
+})
+
 let root: ReconcilerRoot<HTMLCanvasElement>
 let scene: THREE.Scene
 
 beforeEach(async () => {
-  resetGameStore()
+  loaded.store.resetGameStore()
   root = createRoot({ style: {}, addEventListener() {}, removeEventListener() {} } as never)
   await act(async () => {
     root.configure({
@@ -69,27 +89,25 @@ afterEach(async () => {
 
 describe('scene disposal', () => {
   it.each([
-    ['Sparks', Sparks],
-    ['CementSpray', CementSpray],
-    ['CollapseTelegraph', CollapseTelegraph],
-    ['EnemyPlaceholders', EnemyPlaceholders],
-    ['EnemyFigures', EnemyFigures],
-    ['BlastScorches', BlastScorches],
-  ] as [string, FunctionComponent][])(
-    'frees every geometry and material %s draws with when it unmounts',
-    async (_name, component) => {
-      await mount(createElement(component))
-      const drawn = gpuObjectsIn(scene)
-      const freed = listenForDisposal(drawn)
-      await mount(null)
-      expect(drawn.length).toBeGreaterThan(0)
-      expect(drawn.filter((object) => !freed.has(object))).toEqual([])
-    },
-  )
+    'Sparks',
+    'CementSpray',
+    'CollapseTelegraph',
+    'EnemyPlaceholders',
+    'EnemyFigures',
+    'BlastScorches',
+  ])('frees every geometry and material %s draws with when it unmounts', async (name) => {
+    const [, component] = loaded.disposable.find(([candidate]) => candidate === name)!
+    await mount(createElement(component))
+    const drawn = gpuObjectsIn(scene)
+    const freed = listenForDisposal(drawn)
+    await mount(null)
+    expect(drawn.length).toBeGreaterThan(0)
+    expect(drawn.filter((object) => !freed.has(object))).toEqual([])
+  })
 
   it('frees the Refinery bay smoke and parts when the bay leaves the platform', async () => {
-    const site = dockSiteOf(readPlanetWorld().params!)
-    await mount(createElement(RefineryBay, { site, look: 'refining' }))
+    const site = loaded.dockSite.dockSiteOf(loaded.store.readPlanetWorld().params!)
+    await mount(createElement(loaded.RefineryBay, { site, look: 'refining' }))
     const drawn = gpuObjectsIn(scene)
     const freed = listenForDisposal(drawn)
     await mount(null)
@@ -98,12 +116,12 @@ describe('scene disposal', () => {
   })
 
   it('frees an atlas part quad when a new look re-cuts it, and keeps the one it now draws', async () => {
-    const maps = vehicleAtlasMaps(SHIPPED_ART)!
+    const maps = loaded.vehicleLook.vehicleAtlasMaps(loaded.shippedArt.SHIPPED_ART)!
     const [tierOne, tierThree] = [chassisQuadAt(1), chassisQuadAt(3)]
-    await mount(createElement(AtlasQuadMesh, { quad: tierOne, maps, baseZ: 0 }))
+    await mount(createElement(loaded.AtlasQuadMesh, { quad: tierOne, maps, baseZ: 0 }))
     const [before] = geometriesIn(scene)
     const freed = listenForDisposal([before])
-    await mount(createElement(AtlasQuadMesh, { quad: tierThree, maps, baseZ: 0 }))
+    await mount(createElement(loaded.AtlasQuadMesh, { quad: tierThree, maps, baseZ: 0 }))
     const [after] = geometriesIn(scene)
     const freedAfter = listenForDisposal([after])
     expect(after).not.toBe(before)
@@ -141,9 +159,9 @@ function listenForDisposal(objects: readonly GpuObject[]): Set<GpuObject> {
 }
 
 function chassisQuadAt(visualTier: number): AssetQuad & { uv: AtlasUv } {
-  const quad = vehicleBodyQuadsOf(SHIPPED_ART, visualTier).find((part) =>
-    part.partId.endsWith('-chassis'),
-  )
+  const quad = loaded.vehicleLook
+    .vehicleBodyQuadsOf(loaded.shippedArt.SHIPPED_ART, visualTier)
+    .find((part) => part.partId.endsWith('-chassis'))
   if (quad === undefined || quad.uv === null)
     throw new Error(`no atlas chassis at tier ${visualTier}`)
   return quad as AssetQuad & { uv: AtlasUv }
