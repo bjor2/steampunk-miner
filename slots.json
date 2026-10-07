@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T22:20:45+02:00",
+  "updated_at": "2026-10-07T22:24:47+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 2,
       "free": 2,
-      "claims_last_hour": 7,
+      "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
     {
@@ -89,22 +89,22 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
-          "ticket": 201,
-          "grok_slot": 6,
-          "kind": "dev",
-          "since": "2026-10-07T22:04:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
-      "claims_last_hour": 10,
+      "used": 1,
+      "free": 3,
+      "claims_last_hour": 8,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 3,
     "max": 3
   },
   "tester": {
@@ -256,10 +256,9 @@
     },
     {
       "slot": 6,
-      "state": "dev",
-      "ticket": 201,
-      "since": "2026-10-07T22:04:00+02:00",
-      "claude_slot": 8
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 7,
@@ -357,25 +356,25 @@
     },
     {
       "slot": 8,
-      "state": "busy",
-      "ticket": 201,
-      "grok_slot": 6,
-      "since": "2026-10-07T22:04:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 2
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 22:20 CEST",
-    "mode": "pass",
-    "triggers": "#203",
+    "at": "2026-10-07 22:24 CEST",
+    "mode": "refill-dev",
+    "triggers": "#201",
     "started": "",
     "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -383,8 +382,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 4,
-      "free": 4,
+      "used": 3,
+      "free": 5,
       "external": 0
     }
   }
