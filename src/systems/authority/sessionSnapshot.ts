@@ -25,6 +25,7 @@ import {
   portableTerrainEditsProblems,
   type QueuedTerrainEdit,
 } from './terrain/terrainEdits'
+import { portableBoresOf, portableBoresProblems, type PendingBore } from './bore/boreState'
 import {
   combatOfPortable,
   portableCombatOf,
@@ -97,6 +98,8 @@ export interface PortableState {
   lava: LavaState
   liveBlasts: LiveBlast[]
   terrainEdits: QueuedTerrainEdit[]
+  /** The bore gun's pending shots (ticket 313); omitted while there are none. */
+  bores?: PendingBore[]
   debugApplied: boolean
   /** The session sections; omitted while none is registered. */
   slices?: PortableSections
@@ -145,6 +148,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     lava: portableLavaOf(state.lava),
     liveBlasts: portableLiveBlastsOf(state.liveBlasts),
     terrainEdits: portableTerrainEditsOf(state.terrainEdits),
+    ...portableBoresField(state.bores),
     debugApplied: state.debugApplied,
     ...portableSectionsOf(state.slices, 'session'),
   }
@@ -209,6 +213,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     lava: portableLavaOf(portable.lava),
     liveBlasts: portableLiveBlastsOf(portable.liveBlasts),
     terrainEdits: portableTerrainEditsOf(portable.terrainEdits),
+    ...portableBoresField(portable.bores),
     debugApplied: portable.debugApplied,
     ...sectionsOfPortable(portable.slices, 'session'),
   }
@@ -255,11 +260,17 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...portableLavaProblems(state.lava, 'snapshot.state.lava'),
     ...portableLiveBlastsProblems(state.liveBlasts, 'snapshot.state.liveBlasts'),
     ...portableTerrainEditsProblems(state.terrainEdits, 'snapshot.state.terrainEdits'),
+    ...portableBoresProblems(state.bores, 'snapshot.state.bores'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),
     ...portableSectionsProblems(state.slices, 'session', 'snapshot.state'),
   ]
+}
+
+/** A copy of the bores under their key, or no key at all while there are none. */
+function portableBoresField(bores: readonly PendingBore[] | undefined): { bores?: PendingBore[] } {
+  return bores === undefined ? {} : { bores: portableBoresOf(bores) }
 }
 
 function planetProblems(planet: unknown): string[] {

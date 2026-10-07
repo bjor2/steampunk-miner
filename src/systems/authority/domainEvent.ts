@@ -98,6 +98,11 @@ export interface RejectionReasons {
   vehicle_item_owned: true
   not_researched: true
   not_for_sale: true
+  // Registered by the bore gun (ticket 313, #309): the player has no gun, its last shot's cooldown
+  // still runs, or the tank cannot pay for the first cell the line would open.
+  no_bore_gun: true
+  bore_cooling: true
+  energy_short: true
 }
 
 export type RejectionReason = keyof RejectionReasons
@@ -168,9 +173,15 @@ export interface KernelDomainEventBodies {
   /**
    * A material cell yielded (#36: its 16 density samples fell to half): the first-slice per-tile
    * mining event, same payload, fired once per cell. `cause: 'blast'` marks a live blast's tile,
-   * which the run log leaves to the blast's `blast_resolved` line (K6 #189).
+   * which the run log leaves to the blast's `blast_resolved` line (K6 #189); `cause: 'bore'` a
+   * bore gun's cell, whose ore lies loose and never reaches the hold (ticket 313).
    */
-  TileDestroyed: { tx: number; ty: number; kind: 'ground' | 'ore' | 'core'; cause?: 'blast' }
+  TileDestroyed: {
+    tx: number
+    ty: number
+    kind: 'ground' | 'ore' | 'core'
+    cause?: 'blast' | 'bore'
+  }
   /**
    * A slice's gate check stopped the drill at an ore cell (feature-slices.md 3.6, K2): `refused`
    * or `blocked` (#142's scratch-only cell) once per drill command that met the cell, `lost`
@@ -239,6 +250,18 @@ export interface KernelDomainEventBodies {
   CollapseCancelled: { block: string }
   /** The refill starts: the samples it will fill and the vehicles it crushes. */
   CollapseStarted: { block: string; samplesFilled: number; vehiclesHit: number }
+  /**
+   * The bore gun fired (ticket 313, #309): `aimed` is the bearing the command sent, `bearing` the
+   * one bored after the arc clamp, and `rangeCells` the cells the line reaches. Its cells open on
+   * the clock, one every few ticks.
+   */
+  BoreFired: { aimed: number; bearing: number; rangeCells: number }
+  /**
+   * A bore stopped: at its range, its budget or the tank (quietly), or with the clank at a cell
+   * the drill cannot dig, the core or lava (`isClankStop`). `tx, ty` is the cell it stopped at, or
+   * its last cell; `cellsOpened` the cells it opened.
+   */
+  BoreEnded: { stop: BoreStop; tx: number; ty: number; cellsOpened: number }
   /**
    * One ore unit reached the hold: its tier and sale value, and which ore it was (#122): the
    * `oreId` #155 names, whole tiles below the surface of the cell's column, and the cell's chunk
@@ -483,6 +506,17 @@ export interface KernelDomainEventBodies {
  * authority-side emitter reads it (the #203 key map on #243).
  */
 export type SampleRoute = 'corer' | 'lens'
+
+/**
+ * Why a bore stopped (ticket 313): its last cell, its dig budget, the tank, or with the clank a
+ * cell the drill cannot dig (scratch floor, gate, dock pad), the core or lava.
+ */
+export type BoreStop = 'range' | 'budget' | 'energy' | 'refused' | 'core' | 'lava'
+
+/** The stops that clank (#309: the drill could not, a gate, the core or lava). */
+export function isClankStop(stop: BoreStop): boolean {
+  return stop === 'refused' || stop === 'core' || stop === 'lava'
+}
 
 /** When a digest is taken (#11 section 3): every 3600 ticks, at docks and travel, at the end. */
 export type DigestScope = 'periodic' | 'dock' | 'travel' | 'end'

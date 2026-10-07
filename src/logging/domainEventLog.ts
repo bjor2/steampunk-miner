@@ -101,6 +101,14 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'collapse',
     data: { block, samplesFilled, vehiclesHit },
   }),
+  BoreFired: ({ aimed, bearing, rangeCells }) => ({
+    event: 'bore_fired',
+    data: { aimed, bearing, rangeCells },
+  }),
+  BoreEnded: ({ stop, tx, ty, cellsOpened }) => ({
+    event: 'bore_ended',
+    data: { stop, tx, ty, cellsOpened },
+  }),
   CargoAdded: (added) => ({ event: 'resource_collected', data: resourceCollectedDataOf(added) }),
   StorageFull: ({ lostUnits }) => ({ event: 'storage_full', data: { lostUnits } }),
   EnergyLow: ({ threshold }) => ({ event: 'energy_low', data: { threshold } }),

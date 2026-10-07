@@ -68,6 +68,7 @@ export function kernelCommandBuys(maxPlanet: number = FIRST_PLANET): {
     buyChargeRackSlot: [KERNEL_ITEMS.chargeRack],
     equipItem: NOT_A_BUY,
     buyVehicleItem: soldVehicleItemRefsUpTo(maxPlanet),
+    'ground_gun.fire': NOT_A_BUY,
   }
 }
 

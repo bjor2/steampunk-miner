@@ -187,9 +187,10 @@ function affordableTicksOf(vehicle: VehicleState): number {
 /**
  * A sample's drill time from its own hardness: hard rock carves slower inside the same stamp, and
  * lining carves as band-G rock of its grade on this planet (#41 `casingHardness`). An electrified
- * cell adds the shock the player's drill pays.
+ * cell adds the shock the player's drill pays. The shared dig function the bore gun spends its
+ * budget through too (ticket 313).
  */
-function drillTicksOfCells(
+export function drillTicksOfCells(
   params: PlanetParams,
   drill: DrillStats,
   shockTicksAt: ShockTicksAt,
@@ -287,7 +288,7 @@ function damageEvent(
 }
 
 /** The lining the drill cleared (#41), logged once per drill command (#56 Q3); nothing when none. */
-function casingDrilledEvents({ casingCleared }: Carve): DomainEventBody[] {
+export function casingDrilledEvents({ casingCleared }: Carve): DomainEventBody[] {
   if (casingCleared.samples === 0) return []
   return [{ type: 'CasingDrilled', ...casingCleared }]
 }

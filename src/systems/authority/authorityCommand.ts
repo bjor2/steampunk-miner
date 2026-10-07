@@ -115,8 +115,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `ElectrifiedCellShocked {tx, ty, ticks, hullBp, withBit}` join, an electrified cell takes its
  *    shock's ticks longer to drill, and the vehicle may carry `shockHullBp`. Off the magnetic
  *    planets no digest or mined order changes.
+ * 45: the bore gun (ticket 313, #309): `ground_gun.fire {bearing}` with the rejections
+ *    `no_bore_gun`, `bore_cooling` and `energy_short`, `BoreFired` and `BoreEnded`, bored cells'
+ *    `TileDestroyed {cause: 'bore'}`, the pending bores in state and their bore-disturbance
+ *    collapse checks. With no shot fired no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 44
+export const AUTHORITY_PROTOCOL_VERSION = 45
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -208,6 +212,11 @@ export interface KernelCommandPayloads {
    * (ticket 248); owned, it can be slotted by `equipItem`.
    */
   buyVehicleItem: { itemId: string }
+  /**
+   * The bore gun (ticket 313, #309): one shot along `bearing` 0 to 255 round the lower half-plane
+   * of the rig's frame, clamped to the arc; its cells open on the authority's clock.
+   */
+  'ground_gun.fire': { bearing: number }
   'debug.setUpgrade': { upgradeId: string; level: number }
   /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
   'debug.setEnergy': { energy: string }

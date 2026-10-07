@@ -5,11 +5,12 @@
  * - while combat is live, every tick runs: tows due at that tick first, then the enemy tick (#9),
  *   then any charge whose fuse blows at that tick (#109), then any remote charge that times out
  *   unfired (K8 #218), then the world's terrain edits (K6 #189:
- *   the live blasts' slice, then the queued power-up edits' share), then any collapse due at that
- *   tick (#43), then the slices' clock steps in id order (#217);
+ *   the live blasts' slice, then the queued power-up edits' share), then the bore gun's cells and
+ *   collapse checks (ticket 313), then any collapse due at that tick (#43), then the slices' clock
+ *   steps in id order (#217);
  * - otherwise nothing can change between ticks but a blast, a collapse, a refinery batch or flowing
  *   lava, so the clock jumps to the next tick a charge blows or times out or a terrain edit moves,
- *   a block warns into its refill or refills, a batch is ready (#105), loose lava steps (#113) or a
+ *   a bore opens a cell, checks its blocks or cools down, a block warns into its refill or refills, a batch is ready (#105), loose lava steps (#113) or a
  *   slice's clock step has work due (#217), or to the end (tows due by then first); tows happen at
  *   their due tick (#7 strand grace, destroy delay).
  *
@@ -23,6 +24,7 @@ import type { AuthorityState } from './authorityState'
 import { nextBlastSliceTick, sliceLiveBlasts } from './charges/blastSlice'
 import { nextTerrainEditTick } from './terrain/terrainEdits'
 import { applyQueuedTerrainEdits } from './terrain/terrainEditTick'
+import { nextBoreTick, runBoreTick } from './bore/boreTick'
 import { detonateChargesDue, nextDetonationTick } from './charges/chargeDetonation'
 import { disarmExpiredCharges, nextDisarmTick } from './charges/chargeDisarm'
 import { nextCollapseTick } from './collapse/collapseState'
@@ -59,6 +61,7 @@ function runLiveTick(state: AuthorityState, tick: number): TickOutcome {
     (current) => disarmExpiredCharges(current, tick),
     (current) => sliceLiveBlasts(current, tick),
     (current) => applyQueuedTerrainEdits(current, tick),
+    (current) => runBoreTick(current, tick),
     (current) => runCollapseTick(current, tick),
     (current) => announceReadyBatches(current, tick),
     (current) => runLavaTick(current, tick),
@@ -66,7 +69,7 @@ function runLiveTick(state: AuthorityState, tick: number): TickOutcome {
   ])
 }
 
-/** Up to the next blast, collapse, refinery, lava or slice step tick, if one comes before `toTick`; else to `toTick`. */
+/** Up to the next blast, bore, collapse, refinery, lava or slice step tick, if one comes before `toTick`; else to `toTick`. */
 function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
   const stopTick = nextScheduledTick(state)
   if (stopTick === null || stopTick > toTick) {
@@ -78,6 +81,7 @@ function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
     (current) => disarmExpiredCharges(current, stopTick),
     (current) => sliceLiveBlasts(current, stopTick),
     (current) => applyQueuedTerrainEdits(current, stopTick),
+    (current) => runBoreTick(current, stopTick),
     (current) => runCollapseTick(current, stopTick),
     (current) => announceReadyBatches(current, stopTick),
     (current) => runLavaTick(current, stopTick),
@@ -91,6 +95,7 @@ function nextScheduledTick(state: AuthorityState): number | null {
     nextDisarmTick(state, state.tick),
     nextBlastSliceTick(state),
     nextTerrainEditTick(state),
+    nextBoreTick(state),
     nextCollapseTick(state.collapse, state.tick),
     nextRefineReadyTick(state.platform.refinerySlots, state.tick),
     nextLavaTick(state),

@@ -20,6 +20,7 @@ import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
 import { CELL_GATE_LOOK_REGISTRY } from '../systems/registries/cellGateLook'
 import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
+import { BORE_GUN_REGISTRY } from '../systems/registries/boreGun'
 import { CHARGE_BLAST_CUE_REGISTRY } from '../systems/registries/chargeBlastCue'
 import { CLOCK_STEP_REGISTRY } from '../systems/registries/clockSteps'
 import {
@@ -142,6 +143,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     screen: (panel) => add(SCREEN_REGISTRY, panel),
     soundCue: (cue) => add(SOUND_CUE_REGISTRY, cue),
     chargeBlastCue: (provider) => add(CHARGE_BLAST_CUE_REGISTRY, provider),
+    boreGun: (provider) => add(BORE_GUN_REGISTRY, provider),
     slotHoldCue: (source) => add(SLOT_HOLD_CUE_REGISTRY, source),
     debugActions: (actions) =>
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),

@@ -585,6 +585,25 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { block: 'text', samplesFilled: 'integer', vehiclesHit: 'integer' },
   },
+  // Ticket 313 (#309): the bore gun fired, `aimed` as sent and `bearing` as bored after the arc
+  // clamp, its cells opening on the clock; then the bore stopped at its range, budget or tank, or
+  // with the clank at a cell the drill cannot dig, the core or lava. Its cells log as
+  // `tile_destroyed` like drilled ones; their ore never reaches the hold.
+  bore_fired: {
+    group: 'mining',
+    level: 'core',
+    payload: { aimed: 'integer', bearing: 'integer', rangeCells: 'integer' },
+  },
+  bore_ended: {
+    group: 'mining',
+    level: 'core',
+    payload: {
+      stop: { oneOf: ['range', 'budget', 'energy', 'refused', 'core', 'lava'] },
+      tx: 'integer',
+      ty: 'integer',
+      cellsOpened: 'integer',
+    },
+  },
   // One line per drilling command (a pose report's interval or a `drillTile`), #7: `damage` is
   // `ticks * drillPower * eff / 60` in hardness units.
   drill_damage_dealt: {

@@ -17,7 +17,16 @@ import { builtFacilityRowIdsOn } from './builtFacilities'
 
 /** Whether the schedule row `featureId` is open on the session's planet; false for an unknown id. */
 export function isFeatureUnlocked(state: AuthorityState, featureId: string): boolean {
-  const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === featureId)
+  return isFeatureUnlockedIn(LOCKED_SCHEDULE, state, featureId)
+}
+
+/** The same against `schedule`: the spec seam for a row the lock opens on the first planet. */
+export function isFeatureUnlockedIn(
+  schedule: UnlockSchedule,
+  state: AuthorityState,
+  featureId: string,
+): boolean {
+  const row = schedule.rows.find((candidate) => candidate.id === featureId)
   return row !== undefined && isOpenIn(row, state)
 }
 

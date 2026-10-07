@@ -13,6 +13,7 @@ import type { AuthorityReaction } from '../systems/registries/authorityReactions
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
 import type { BotPurchase } from '../systems/registries/botPurchases'
+import type { BoreGunProvider } from '../systems/registries/boreGun'
 import type { ChargeBlastCueProvider } from '../systems/registries/chargeBlastCue'
 import type { ClockStep } from '../systems/registries/clockSteps'
 import type { SliceCommandRules } from '../systems/registries/commandRules'
@@ -174,6 +175,8 @@ export interface SliceRegistrar {
   soundCue(cue: SoundCue): void
   /** One provider across all slices: a charge's shake, flash and thump delay (#213). */
   chargeBlastCue(provider: ChargeBlastCueProvider): void
+  /** One provider across all slices: a player's bore gun numbers (ticket 313, #309). */
+  boreGun(provider: BoreGunProvider): void
   /** Names the slice's events that end a slot hold: cancelled clanks, finished chimes (253). */
   slotHoldCue(source: SlotHoldCueSource): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */
