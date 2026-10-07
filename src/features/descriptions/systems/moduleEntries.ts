@@ -8,13 +8,9 @@
  * major, so their lines show the next major and the step as the bay prints it.
  */
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../../constants/physics'
-import {
-  blastRadiusMm,
-  chargeFuseTicks,
-  rackCapacity,
-  rackMaxSlotLevel,
-} from '../../../systems/economy/blastingCharges'
+import { rackCapacity, rackMaxSlotLevel } from '../../../systems/economy/blastingCharges'
 import { casingHardness } from '../../../systems/economy/casingGrades'
+import { chargeRadiusMm, fuseTicksOf } from '../../../systems/economy/chargeSizes'
 import {
   gunMountStep,
   gunRangeTiles,
@@ -35,6 +31,9 @@ import {
   type DescribedEntry,
   type StepLadder,
 } from './kernelEntry'
+
+/** The restock card describes the shipped charge: size 1 of the dynamite ladder (K8 #218). */
+const SHIPPED_CHARGE_SIZE = 1
 
 /** One flavour per buyable lining type; a type without one fails the coverage spec. */
 const LINING_FLAVOURS: Readonly<Record<string, string>> = {
@@ -126,9 +125,11 @@ function gunStepAfter(step: number, onward: number): number | null {
 }
 
 function blastRadiusMetres(): Money {
-  return div(fromSafeInteger(blastRadiusMm()), fromSafeInteger(MM_PER_METRE))
+  return div(fromSafeInteger(chargeRadiusMm(SHIPPED_CHARGE_SIZE)), fromSafeInteger(MM_PER_METRE))
 }
 
+/** Size 1 always has a fuse; only sizes 7-10 are remote (#153). */
 function fuseSeconds(): Money {
-  return div(fromSafeInteger(chargeFuseTicks()), fromSafeInteger(TICKS_PER_SECOND))
+  const fuseTicks = fuseTicksOf(SHIPPED_CHARGE_SIZE) ?? 0
+  return div(fromSafeInteger(fuseTicks), fromSafeInteger(TICKS_PER_SECOND))
 }
