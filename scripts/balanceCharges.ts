@@ -32,11 +32,18 @@
  *    tiles, is expected at 1.5 or more on each planet where at least 2 seeds have them; at least 4
  *    planets are judged, one from planet 28 on, and a dynamite act with none is flagged. Beside
  *    them the payback (moved from K8 #218), reported only: the freed cells' value over the price of
- *    the charges that freed them.
- * 6. The matching extractor row (GD lock on #148, ticket 237), reported only until 148d (#296)
- *    has the bot buy its extractors: the extractor-gated cells each seed's bot freed with them.
+ *    the charges that freed them. The (planet, seed) pairs with no dynamite cells print as data
+ *    for Systems.
+ * 6. The matching extractor row (GD lock on #148, judged by 148d #296): the extractor-gated cells
+ *    each seed's bot freed with its own extractors, a median of 1.5 or more on each of those
+ *    planets. Beside it, when each seed bought each extractor (#142 acceptance 7): on its own
+ *    planet by the end of trip 4.
  * 7. `gate_blocked_no_route` (the GD ruling on ticket 237): per seed, the gated walls that stopped
  *    the blasting bot's way down with nothing it carries or buys to open them, expected 0.
+ * 8. The dynamite dry runs (ticket 296, Horizontal, report only): over planets 7 to 60, the
+ *    planets of a dynamite act (read from each act's families by the mining-gates census; every
+ *    other planet reads n/a) and each seed's longest run of them in a row with no dynamite cells,
+ *    flagged past 2 as data for Systems; one dry on every seed is a content finding.
  *
  * The slice is untouched by charges, which open on planet 7. Run it with `npm run balance:charges`;
  * the forty-planet runs take a while.
@@ -53,14 +60,32 @@ import {
   DYNAMITE_CLEAR_FLOOR,
   DYNAMITE_PAYBACK_FIGURE,
   dynamiteTableOf,
-  EXTRACTOR_CLEAR_FIGURE,
+  EXTRACTOR_CLEAR_FLOOR,
   extractorTableOf,
   gateClearRowsOf,
   gateClearWarnings,
   LATE_JUDGED_PLANET,
   MIN_JUDGED_PLANETS,
+  pairsWithoutDynamiteText,
   type DynamiteCensus,
 } from '../src/logging/gateClearTables'
+import {
+  dryRunTableOf,
+  dryRunWarnings,
+  dynamiteScopeTableOf,
+  longestDryRunsOf,
+  MAX_DRY_RUN,
+  type DynamiteScopePlanet,
+} from '../src/logging/dynamiteDryRuns'
+import {
+  extractorPurchaseRowsOf,
+  extractorPurchasesOf,
+  extractorPurchaseTableOf,
+  extractorPurchaseWarnings,
+  MAX_TRIPS_BEFORE_EXTRACTOR,
+  type ExtractorOnSale,
+  type ExtractorPurchase,
+} from '../src/logging/extractorPurchaseTrips'
 import { gateRouteStallTableOf, gateRouteStallWarnings } from '../src/logging/gateRouteStalls'
 import { gateClearsByPlanet, type PlanetGateClears } from '../src/logging/gateClearTally'
 import type { RunEvent } from '../src/logging/runEvent'
@@ -118,6 +143,8 @@ const QUICK_FLOOR_MULTIPLE = 2
 const SLOW_FLOOR_MULTIPLE = 4
 /** The planets the dynamite and extractor gates are read on (GD lock on #148). */
 const GATE_PLANETS = [7, 10, 16, 22, 28, 34, 40]
+/** The dry-run census: from the dynamite gate's first planet through #142's gate report range. */
+const DRY_RUN_PLANETS = range(FIRST_CHARGE_PLANET, 60)
 /** The run-log lines the pace rows count per planet. */
 const COUNTED_LINES: readonly RunEventName[] = ['charges_restocked', 'charge_detonated']
 
@@ -126,6 +153,9 @@ const REPORT_FOLDER = new URL('../balance-report/', import.meta.url)
 
 const scenario = JSON.parse(readFileSync(SCENARIO_FILE, 'utf8')) as Scenario
 const SEEDS = PACING_WORLD_SEEDS['bot-slice']
+const EXTRACTORS = extractorsOnSale()
+/** Each planet's census answer, generated once for both the gate rows and the dry runs. */
+const censusAnswers = new Map<number, DynamiteCellsAnswer>()
 const judgedPlanets = range(FIRST_CHARGE_PLANET, LAST_JUDGED_PLANET)
 const trades = judgedPlanets.flatMap((planet) => tradeRowsOf(planet))
 const sizeTrades = chargeSizeTradesOf(scenario.worldSeed)
@@ -136,13 +166,18 @@ const drilling = playTo('never')
 const judgedRows = judgedPlanets.map((planet) => paceRowOf(planet))
 const diagnosticRows = DIAGNOSTIC_PLANETS.map((planet) => paceRowOf(planet))
 const gateRows = gateClearRowsOf(blasting.gateClears, GATE_PLANETS.map(dynamiteCensusOf))
+const extractorPurchaseRows = extractorPurchaseRowsOf(blasting.extractorPurchases, EXTRACTORS)
+const scopeCensus = DRY_RUN_PLANETS.map(dynamiteScopePlanetOf)
+const dryRuns = longestDryRunsOf(scopeCensus, SEEDS)
 const warnings = [
   ...tradeWarnings(),
   ...sizeGuardWarnings(),
   ...payoffWarnings(),
   ...paceWarnings(),
   ...gateClearWarnings(gateRows),
+  ...extractorPurchaseWarnings(extractorPurchaseRows),
   ...gateRouteStallWarnings(blasting.routeBlocks, SEEDS),
+  ...dryRunWarnings(scopeCensus, dryRuns),
 ]
 const text = [
   `## blasting_charges and the dynamite sizes against the pacing bot (report only)`,
@@ -184,10 +219,17 @@ const text = [
   paceTableOf(diagnosticRows),
   `### The dynamite gate: shells the bot freed a run (GD ruling on ticket 237: a median of ${DYNAMITE_CLEAR_FLOOR} or more over the seeds with dynamite cells, judged where 2 seeds have them, ${MIN_JUDGED_PLANETS} planets judged, one from ${LATE_JUDGED_PLANET} on) and their payback (#218's ${DYNAMITE_PAYBACK_FIGURE}x figure, reported)`,
   dynamiteTableOf(gateRows, SEEDS),
-  `### The extractor gate: cells the bot freed a run with its own extractors (reported; 148d #296 judges a median of ${EXTRACTOR_CLEAR_FIGURE} or more)`,
+  `Planet and seed pairs with no dynamite cells (data for Systems): ${pairsWithoutDynamiteText(gateRows, SEEDS)}.`,
+  `### The extractor gate: cells the bot freed a run with its own extractors (148d #296: a median of ${EXTRACTOR_CLEAR_FLOOR} or more on every planet)`,
   extractorTableOf(gateRows, SEEDS),
+  `### Extractor purchases: when each seed's bot bought each extractor (#142 acceptance 7: on its own planet by the end of trip ${MAX_TRIPS_BEFORE_EXTRACTOR})`,
+  extractorPurchaseTableOf(extractorPurchaseRows, SEEDS),
   '### gate_blocked_no_route: gated walls on the way down the bot could not open (GD ruling on ticket 237, expected 0 on every seed)',
   gateRouteStallTableOf(blasting.routeBlocks, SEEDS),
+  `### Dynamite dry runs, planets ${FIRST_CHARGE_PLANET} to ${DRY_RUN_PLANETS.at(-1)} (ticket 296, Horizontal, report only): dynamite-gated cells per seed on the dynamite acts, n/a elsewhere`,
+  dynamiteScopeTableOf(scopeCensus, SEEDS),
+  `Each seed's longest run of dynamite-act planets in a row with no dynamite cells (flagged past ${MAX_DRY_RUN} as data for Systems):`,
+  dryRunTableOf(dryRuns),
   `### Warnings\n\n${warnings.length === 0 ? 'none' : warnings.map((line) => `- ${line}`).join('\n')}`,
 ].join('\n\n')
 
@@ -234,6 +276,13 @@ interface PolicyRuns {
   gateClears: Map<number, PlanetGateClears>[]
   /** Per seed, in seed order: the walls that stopped the way down. */
   routeBlocks: (readonly GateRouteBlock[])[]
+  /** Per seed, in seed order: where and when each extractor was bought. */
+  extractorPurchases: Map<string, ExtractorPurchase>[]
+}
+
+/** The extractors as the mining-gates debug action describes them. */
+interface ExtractorsAnswer {
+  rigs?: { id: string; availableFromPlanet: number }[]
 }
 
 interface PaceRow {
@@ -248,13 +297,40 @@ interface PaceRow {
 
 /** Each seed's dynamite-gated tiles on the planet, generated by the mining-gates debug action. */
 function dynamiteCensusOf(planet: number): DynamiteCensus {
+  return { planet, tilesBySeed: tilesBySeedOf(planet) }
+}
+
+/** The planet's tiles per seed when its act has a dynamite family; else n/a, never generated. */
+function dynamiteScopePlanetOf(planet: number): DynamiteScopePlanet {
+  const isInScope = censusAnswerOf(planet, []).isDynamiteAct === true
+  return { planet, tilesBySeed: isInScope ? tilesBySeedOf(planet) : null }
+}
+
+function tilesBySeedOf(planet: number): number[] {
+  const known = censusAnswers.get(planet)
+  const answer = known ?? censusAnswerOf(planet, SEEDS)
+  censusAnswers.set(planet, answer)
+  if (answer.tilesBySeed === undefined) throw new Error((answer.problems ?? []).join('\n'))
+  return answer.tilesBySeed
+}
+
+/** The mining-gates census of the planet on `seeds`; with none it only reads the act. */
+function censusAnswerOf(planet: number, seeds: readonly number[]): DynamiteCellsAnswer {
   const dynamiteCellsOf = debugActionsBySlice()['mining-gates']?.dynamiteCellsOf
   if (dynamiteCellsOf === undefined) throw new Error('the mining-gates slice is not loaded')
-  const answer = dynamiteCellsOf(planet, SEEDS) as DynamiteCellsAnswer
-  if (!answer.ok || answer.tilesBySeed === undefined) {
-    throw new Error((answer.problems ?? []).join('\n'))
-  }
-  return { planet, isDynamiteAct: answer.isDynamiteAct === true, tilesBySeed: answer.tilesBySeed }
+  const answer = dynamiteCellsOf(planet, [...seeds]) as DynamiteCellsAnswer
+  if (!answer.ok) throw new Error((answer.problems ?? []).join('\n'))
+  return answer
+}
+
+/** The extractors sold within the run's planets, each with the planet it is first sold on. */
+function extractorsOnSale(): ExtractorOnSale[] {
+  const describeSlice = debugActionsBySlice()['mining-gates']?.describe
+  if (describeSlice === undefined) throw new Error('the mining-gates slice is not loaded')
+  const { rigs = [] } = describeSlice() as ExtractorsAnswer
+  return rigs
+    .map((rig) => ({ id: rig.id, planet: rig.availableFromPlanet }))
+    .filter((extractor) => extractor.planet <= LAST_PLANET)
 }
 
 /** The seed's resolved gate table, read through the mining-gates slice's debug action. */
@@ -359,6 +435,7 @@ function playTo(chargePolicy: ChargePolicy): PolicyRuns {
       counted: countedLinesOf(events),
       gateClears: gateClearsByPlanet(events),
       routeBlocks: run.gateRouteBlocks,
+      extractorPurchases: extractorPurchasesOf(events, EXTRACTORS),
     }
   })
   return {
@@ -366,6 +443,7 @@ function playTo(chargePolicy: ChargePolicy): PolicyRuns {
     counted: runs.flatMap((run) => run.counted),
     gateClears: runs.map((run) => run.gateClears),
     routeBlocks: runs.map((run) => run.routeBlocks),
+    extractorPurchases: runs.map((run) => run.extractorPurchases),
   }
 }
 

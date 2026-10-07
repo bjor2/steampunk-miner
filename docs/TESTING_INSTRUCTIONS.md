@@ -221,10 +221,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   each seed's dynamite-gated tiles (the debug action `dynamiteCellsOf` generates the planet). The
   median over the seeds with such tiles is expected at 1.5 or more where at least 2 seeds have
   them; a planet with 1 is an insufficient sample, with none n/a; at least 4 planets are judged,
-  one from planet 28 on, and a dynamite act (from its families) with no tiles on any seed is a
-  content finding. Beside it the payback (#218's 2x figure, reported: the freed value over the
-  price of the charges that freed them), the extractor row (reported; 148d #296 judges it once
-  the bot buys extractors), and `gate_blocked_no_route` per seed: gated walls on the bot's way
+  one from planet 28 on. Beside it the payback (#218's 2x figure, reported: the freed value over the
+  price of the charges that freed them) and the (planet, seed) pairs with no dynamite cells, the
+  extractor row (148d #296: a median of 1.5 or more extractor-gated cells freed a run on each of
+  those planets), when each seed's bot bought each extractor (#142 acceptance 7: on its own planet
+  by the end of trip 4, a trip ending at the Sell bay; `logging/extractorPurchaseTrips.ts`; the bot
+  buys an offer marked `isBoughtBeforeTracks` ahead of its tracks and saves for it, spec
+  `features/mining-gates/systems/botExtractorBuys.test.ts`), the dynamite dry runs (ticket 296,
+  report only: planets 7 to 60 of a dynamite act read from its families, n/a elsewhere, each
+  seed's longest run of them with no dynamite cells flagged past 2, one dry on every seed a
+  content finding; `logging/dynamiteDryRuns.ts`), and `gate_blocked_no_route` per seed: gated walls on the bot's way
   down (pad path, shaft, jog) nothing it carries or buys opens and its shaft found no clear column
   to step round (`bot/botShaft.ts` jogs round them as round lava), expected 0
   (`bot/gateRouteBlocks.ts`, `SliceRun.gateRouteBlocks`; the jog spec is

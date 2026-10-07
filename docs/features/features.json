@@ -596,9 +596,9 @@
             },
             {
               "title": "Extractors",
-              "description": "Five extractors, the Resonance Fork, Containment Hood, Acid Etcher, Induction Coil and Aether Tether, each open one class of rare ore and the planet's signature, arriving on planets 5, 12, 19, 26 and 33. Without one the drill skids off, or the ore vents or floats away. The Upgrade bay sells each from its own planet once its tech node is researched; still to come: those nodes and the extractors' own verbs (tune, capture, mark, pull, tow).",
+              "description": "Five extractors, the Resonance Fork, Containment Hood, Acid Etcher, Induction Coil and Aether Tether, each open one class of rare ore and the planet's signature, arriving on planets 5, 12, 19, 26 and 33. Without one the drill skids off, or the ore vents or floats away. The Upgrade bay sells each from its own planet once its tech node is researched, and each works its own verb (tune, capture, mark, pull, tow). The pacing bot researches and buys each on its planet ahead of its upgrades. Still to come: the extractors unfolding on the miner while they work.",
               "status": "partial",
-              "issues": [142, 236, 237, 248],
+              "issues": [142, 236, 237, 248, 296],
               "planet": 5
             }
           ]

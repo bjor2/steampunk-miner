@@ -5,13 +5,14 @@
  * - Dynamite clears: the hard bar, a median of 1.5 or more a run, worked out per planet over only
  *   the seeds whose generated planet has dynamite-gated cells. A planet is judged when at least 2
  *   seeds have such cells; with 1 it is an insufficient sample, printed and passed; with none it
- *   reads n/a. At least 4 planets must be judged, one of them from planet 28 on. A planet of a
- *   dynamite act (`isDynamiteAct`) with no cells on any seed is flagged as a content finding.
+ *   reads n/a. At least 4 planets must be judged, one of them from planet 28 on. The (planet,
+ *   seed) pairs with no cells print as data for Systems; a dynamite act with none on any seed is
+ *   `dynamiteDryRuns.ts`'s content finding, over every planet of the dynamite acts.
  * - Dynamite payback: the freed cells' value over the price of the charges that freed them (#143
  *   guard 2, moved from K8 #218), reported beside the clears and never a bar. A seed whose bot
  *   blasted no gated cell has no payback and sits out of that median.
- * - Extractor clears: reported only; the bar (a median of 1.5 or more) is 148d's (#296), once the
- *   bot buys its extractors.
+ * - Extractor clears: the bar of 148d (#296), a median of 1.5 or more a run on every planet the
+ *   table reads, now that the bot buys each extractor on its planet.
  */
 import { add, cmp, div, fromSafeInteger, toCanonical, type Money } from '../systems/money'
 import { dynamitePaybackOf, gateClearsOn, type PlanetGateClears } from './gateClearTally'
@@ -19,17 +20,16 @@ import { dynamitePaybackOf, gateClearsOn, type PlanetGateClears } from './gateCl
 export const DYNAMITE_CLEAR_FLOOR = 1.5
 /** #143 guard 2's figure, printed beside the clears for information. */
 export const DYNAMITE_PAYBACK_FIGURE = 2
-/** 148d's bar (#296), printed here for information. */
-export const EXTRACTOR_CLEAR_FIGURE = 1.5
+/** 148d's bar (#296): extractor-gated cells the bot freed a run, median over the seeds. */
+export const EXTRACTOR_CLEAR_FLOOR = 1.5
 /** The GD ruling's coverage: judged planets, and the planet one of them must be at or past. */
 export const MIN_JUDGED_PLANETS = 4
 export const LATE_JUDGED_PLANET = 28
 const MIN_SEEDS_WITH_CELLS = 2
 
-/** A planet's dynamite-gated tiles per seed, and whether its act has a dynamite family. */
+/** A planet's dynamite-gated tiles per seed. */
 export interface DynamiteCensus {
   planet: number
-  isDynamiteAct: boolean
   tilesBySeed: readonly number[]
 }
 
@@ -37,7 +37,6 @@ export type DynamiteJudgement = 'judged' | 'insufficient sample' | 'no dynamite 
 
 export interface GateClearRow {
   planet: number
-  isDynamiteAct: boolean
   dynamiteTilesBySeed: readonly number[]
   judgement: DynamiteJudgement
   /** Null on a seed with no dynamite cells: it sits out of the median. */
@@ -70,20 +69,31 @@ export function dynamiteTableOf(rows: readonly GateClearRow[], seeds: readonly n
 
 export function extractorTableOf(rows: readonly GateClearRow[], seeds: readonly number[]): string {
   return [
-    `| planet | ${seeds.join(' | ')} | median |`,
-    `| --- | ${seeds.map(() => '---').join(' | ')} | --- |`,
+    `| planet | ${seeds.join(' | ')} | median | at least ${EXTRACTOR_CLEAR_FLOOR} |`,
+    `| --- | ${seeds.map(() => '---').join(' | ')} | --- | --- |`,
     ...rows.map(
       (row) =>
-        `| ${row.planet} | ${row.extractorBySeed.join(' | ')} | ${clearsText(row.extractorMedian)} |`,
+        `| ${row.planet} | ${row.extractorBySeed.join(' | ')} | ${clearsText(row.extractorMedian)} | ${isExtractorUnderTheBar(row) ? 'no' : 'yes'} |`,
     ),
   ].join('\n')
 }
 
-/** Every judged median under the bar, every dry dynamite act, and a short coverage, one line each. */
+/** The (planet, seed) pairs with no dynamite cells, as data for Systems (GD ruling on #237 Q3). */
+export function pairsWithoutDynamiteText(
+  rows: readonly GateClearRow[],
+  seeds: readonly number[],
+): string {
+  const pairs = rows.flatMap((row) =>
+    seedsWithoutCellsOf(row, seeds).map((seed) => `(${row.planet}, ${seed})`),
+  )
+  return pairs.length === 0 ? 'none' : pairs.join(', ')
+}
+
+/** Every judged median under its bar, dynamite and extractor, and a short coverage, one each. */
 export function gateClearWarnings(rows: readonly GateClearRow[]): string[] {
   return [
     ...rows.filter(isUnderTheBar).map(underTheBarLine),
-    ...rows.filter(isDryDynamiteAct).map(dryActLine),
+    ...rows.filter(isExtractorUnderTheBar).map(extractorUnderTheBarLine),
     ...coverageWarnings(rows),
   ]
 }
@@ -99,7 +109,6 @@ function gateClearRowOf(
   const extractorBySeed = seeds.map((clears) => clears.extractorClears)
   return {
     planet: census.planet,
-    isDynamiteAct: census.isDynamiteAct,
     dynamiteTilesBySeed: census.tilesBySeed,
     judgement: judgementOf(hasCells.filter(Boolean).length),
     dynamiteBySeed,
@@ -109,6 +118,10 @@ function gateClearRowOf(
     extractorBySeed,
     extractorMedian: medianOf(extractorBySeed),
   }
+}
+
+function seedsWithoutCellsOf(row: GateClearRow, seeds: readonly number[]): number[] {
+  return seeds.filter((_seed, at) => row.dynamiteTilesBySeed[at] === 0)
 }
 
 function judgementOf(seedsWithCells: number): DynamiteJudgement {
@@ -129,12 +142,12 @@ function underTheBarLine(row: GateClearRow): string {
   return `planet ${row.planet}: the bot freed a median of ${clearsText(row.dynamiteMedian)} shells a run over the seeds with dynamite cells`
 }
 
-function isDryDynamiteAct(row: GateClearRow): boolean {
-  return row.isDynamiteAct && row.judgement === 'no dynamite cells'
+function isExtractorUnderTheBar(row: GateClearRow): boolean {
+  return (row.extractorMedian ?? 0) < EXTRACTOR_CLEAR_FLOOR
 }
 
-function dryActLine(row: GateClearRow): string {
-  return `planet ${row.planet}: a dynamite act with no dynamite cells on any seed (a content finding for Content and Planet)`
+function extractorUnderTheBarLine(row: GateClearRow): string {
+  return `planet ${row.planet}: the bot freed a median of ${clearsText(row.extractorMedian)} extractor-gated cells a run`
 }
 
 function coverageWarnings(rows: readonly GateClearRow[]): string[] {
