@@ -7,11 +7,11 @@
 import {
   DOUBLE_TAP_MS,
   DOUBLE_TAP_SLOP_PX,
-  SLOT_CARD_HOLD_MS,
   STICK_DEADZONE_SHARE,
   STICK_OCTANT_SLOPE,
   STICK_RADIUS_PX,
 } from '../../constants/touch'
+import { ITEM_CARD_LONG_PRESS_MS } from '../../constants/itemCard'
 import { ZOOM_STEP_FACTOR } from '../../constants/scene'
 import {
   buttonIconIdOf,
@@ -124,7 +124,7 @@ export function isDoubleTap(previous: TapPoint | null, tap: TapPoint): boolean {
  * lifting it uses nothing; a shorter press is a tap that uses the slot at once, with no confirm.
  */
 export function isSlotHeldForCard(pressedAtMs: number, nowMs: number): boolean {
-  return nowMs - pressedAtMs >= SLOT_CARD_HOLD_MS
+  return nowMs - pressedAtMs >= ITEM_CARD_LONG_PRESS_MS
 }
 
 /** What changes between two sets of held move actions: releases first, then presses. */
