@@ -5,7 +5,7 @@
  * the same way in solid rock on the later planet their size opens on.
  */
 import { FACING, type Facing } from '../../vehicle/vehiclePose'
-import { planetParamsFor, type PlanetParams } from '../../world/planetParams'
+import { planetParamsFor } from '../../world/planetParams'
 import { surfaceRowOfColumn, type TilePoint } from '../../world/tileGrid'
 import { CELL_KIND, isSolidCell, kindOfCell } from '../../world/worldCell'
 import { cellAt, EMPTY_WORLD } from '../../world/worldState'
@@ -100,7 +100,7 @@ export function sizedBlasterOn(planetIndex: number, size: number, carried = 1) {
   const session = continueScriptedSession(
     createAuthorityState({ planetIndex, planetSeed: WORLD_SEED, playerIds: ['p1'] }),
   )
-  const site = solidBlastSiteOf(params)
+  const site = solidBlastSiteOn(planetIndex)
   session.submit(0, FREEZE_ENEMIES)
   session.submit(0, setChargesIntent(carried, FULL_RACK_SLOT_LEVEL, size))
   session.submit(0, poseOnTile(site.stand))
@@ -122,7 +122,9 @@ const FULL_RACK_SLOT_LEVEL = 5
 /** Deep enough to be under the surface's air and caves of any planet the specs use. */
 const SITE_DEPTH_TILES = 40
 
-function solidBlastSiteOf(params: PlanetParams): BlastSite {
+/** A solid stand tile with a solid wall east of it, in band-1 rock of planet `planetIndex`. */
+export function solidBlastSiteOn(planetIndex: number): BlastSite {
+  const params = planetParamsFor(WORLD_SEED, planetIndex)
   const ty = surfaceRowOfColumn(0, params.radiusTiles) - SITE_DEPTH_TILES
   for (let tx = -60; tx <= 60; tx++) {
     const stand = { tx, ty }

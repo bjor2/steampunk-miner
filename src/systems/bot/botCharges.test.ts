@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
-import { setChargesIntent, STAND_TILE, WALL_TILE } from '../authority/charges/chargeFixtures'
+import {
+  ofType,
+  setChargesIntent,
+  solidBlastSiteOn,
+  STAND_TILE,
+  WALL_TILE,
+} from '../authority/charges/chargeFixtures'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
 import { FREEZE_ENEMIES } from '../authority/scriptedSession'
 import { chargePrice } from '../economy/chargeSizes'
@@ -121,5 +127,48 @@ describe('bot: blasting charges policy (#109)', () => {
     expect(session.vehicle().hull).toEqual(hull)
     expect(session.vehicle().charges).toMatchObject({ carriedBySize: { '1': 2 }, planted: null })
     expect(session.events().map((event) => event.type)).not.toContain('CommandRejected')
+  })
+})
+
+describe('bot: charge sizes (K8 #218)', () => {
+  /** The bot on planet 19 in solid rock carrying `carried` size-`size` charges, `open` tiles carved behind. */
+  function sizedBotAtWall(size: number, open: number, carried = 1) {
+    const session = createBotSession(
+      createAuthorityState({ planetIndex: 19, planetSeed: WORLD_SEED, playerIds: ['p1'] }),
+      'p1',
+    )
+    const { stand, wall } = solidBlastSiteOn(19)
+    session.submit(FREEZE_ENEMIES)
+    session.submit(setChargesIntent(carried, 5, size))
+    for (let back = 0; back <= open; back++) carveTile(session, westOf(stand, back))
+    session.submit(reportPoseIntent(stand, 1, NO_TICKS))
+    const site = dockSiteOfPlanet(session.state().planet)!
+    const planet: BotPlanet = {
+      layout: newMineLayout(paramsOfSession(session.state()), site),
+      pilot: { position: stand, facing: 1 },
+      chargePolicy: 'blast',
+      hasMetBlastTile: false,
+      hasBeenDestroyedHere: false,
+    }
+    return { session, planet, stand, wall }
+  }
+
+  it('backs a size-5 charge off past its 8-tile radius and comes back unhurt', () => {
+    const { session, planet, stand, wall } = sizedBotAtWall(5, 8)
+    const hull = session.vehicle().hull
+    expect(blastOpen(session, planet, wall)).toBe(true)
+    expect(planet.pilot.position).toEqual(stand)
+    expect(session.vehicle().hull).toEqual(hull)
+    expect(ofType(session.events(), 'ChargePlanted')).toMatchObject([{ size: 5 }])
+  })
+
+  it('will not blast with a size-5 charge when the way back is shorter than its reach', () => {
+    const { session, planet, wall } = sizedBotAtWall(5, 4)
+    expect(isBlastWorthIt(session, planet, wall, HARD_TICKS)).toBe(false)
+  })
+
+  it('never plants a remote charge, which only the plunger fires', () => {
+    const { session, planet, wall } = sizedBotAtWall(7, 16)
+    expect(isBlastWorthIt(session, planet, wall, HARD_TICKS)).toBe(false)
   })
 })

@@ -91,11 +91,6 @@ export function withCarried(charges: VehicleCharges, size: number, count: number
   return { ...charges, carriedBySize }
 }
 
-/** A charge of any size to plant and none live: the bot's quick question. */
-export function hasChargeToPlant(charges: VehicleCharges): boolean {
-  return totalCarriedOf(charges) > 0 && charges.planted === null
-}
-
 /** The centre of a charge's tile in mm: the blast and the fuse warning measure from it. */
 export function chargeCentreMm(charge: TilePoint): { xMm: number; yMm: number } {
   return {
