@@ -1,12 +1,14 @@
 /**
  * The rig as the local player's replica holds it now (ticket 250): the mounted items the vehicle
  * piece draws and the debug read reports, each at the Mark it acts at (#249), from the same rule
- * on the same state.
+ * on the same state, and how far each extractor stands deployed from its work (ticket 297).
  */
 import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import type { ArtCatalogue } from '../../../systems/art/artCatalogue'
+import { extractorWorkOf } from '../../mining-gates'
+import { deployFractionOf } from '../systems/render/extractorPose'
 import { actingMarksOf, BOUGHT_MARK } from '../systems/render/markPlate'
 import { rigItemsOf } from '../systems/render/rigGear'
 import { rigSightOf, type RigSight } from '../systems/render/rigSight'
@@ -40,6 +42,16 @@ export function carriedRigOfKey(rigKey: string): CarriedRig {
 export function rigSightOfCarried(art: ArtCatalogue, rig: CarriedRig): RigSight {
   const markOf = (itemId: string) => rig.marks[itemId] ?? BOUGHT_MARK
   return rigSightOf(art, rig.items, registeredTechTree(), markOf)
+}
+
+/** The fold-flat fraction of the item's extractor, from the work mining-gates reads (#237 Q2). */
+export function readDeployFractionOf(itemId: string): number {
+  const { playerId } = useGameStore.getState()
+  return deployFractionOf(extractorWorkOf(readAuthorityState(), playerId, itemId))
+}
+
+export function readRigTick(): number {
+  return readAuthorityState().tick
 }
 
 /** No items, no tree walk: the selector runs on every store change. */
