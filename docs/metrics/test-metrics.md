@@ -1,7 +1,7 @@
 # CI test metrics: timing and results of every Vitest run
 
 Every test run records its per-file timings and results, grouped by feature, on the orphan
-**`test-metrics`** branch. Since 2026-10-07 tests no longer run in GitHub Actions (`ci.yml`
+**`test-metrics`** branch, with a per-test history for the status page's Tests tab. Since 2026-10-07 tests no longer run in GitHub Actions (`ci.yml`
 `verify` keeps lint, formatting, types and the build; the Windows `determinism` job stays on pull
 requests). The build loop's **box Tester** (`claude-sessions/steampunk-loop/tester.sh` on the
 build box) runs them and writes the records. Records before that date come from Actions
@@ -38,8 +38,10 @@ commits changed> scripts/ci/selectPushTests.sh` (scoped `vitest related`, full, 
 - **Feature mapping:** `scripts/ci/testFeatures.mjs` is the one table. A slice folder
   `src/features/<slice>/` maps to its slice; `src/systems/<x>/` maps to `<x>`; the pacing bot and
   golden replays have their own names; other layers map by folder, and `scripts/<x>/` maps to
-  `tooling-<x>`. Anything else is `unmapped`. Change this once #191 decides how tests declare
-  their feature.
+  `tooling-<x>`. Anything else is `unmapped`. These are the kernel areas of `tests/MANIFEST.md`.
+  The Tests tab groups by the #191 lock instead (`scripts/tests/testFeatureGroups.mjs`): the slice
+  folder, else `cross-slice` for a kernel file a check in `scripts/tests/crossSliceChecks.mjs`
+  names, else `kernel`, with the area beside it.
 
 ## Run record (`runs/YYYY-MM/<run-id>.json`, schema 1)
 
@@ -131,6 +133,34 @@ Rebuilt from the run files on every record, over the last 50 runs by run id:
 
 Percentiles are nearest-rank over the runs that ran the file, so a scoped run only adds to the
 files it ran. Per-test history across runs lives in the nightly records (`testDurations`).
+
+## Per-test history (`tests.json`, schema 1)
+
+The Tests tab's test list (#192) reads this file, rebuilt next to `summary.json` on every record by
+`scripts/ci/testHistory.mjs`. It holds the last 20 runs that kept every test's duration
+(`files[].testDurations`, so the nightly full suite: one point per night) and every test of the
+newest of them that completed (not cancelled or timed out). A cancelled run with a report still
+adds its points; a run without a report adds nothing. A renamed or deleted test drops out, and a
+new name starts with no history. A file that failed to load keeps the tests it had before, marked
+failed. One line of JSON, about 0.5 MB at 3,000 tests and 20 runs:
+
+```jsonc
+{
+  "schema": 1, "updatedAt": "…", "lastRuns": 20,
+  "currentRunId": 1791400000000,          // the run the list, statuses and counts come from
+  "runs": [ { "id", "url", "sha", "startedAt", "source", "phase", "job", "mode",
+              "conclusion", "timedOut", "isComplete" } ],            // oldest first
+  "files": { "<path>": {
+    "feature": "ores",                     // slice, kernel or cross-slice (the #191 lock)
+    "area": "ores",                        // featureOfTestFile, the manifest's kernel area
+    "status": "passed",                    // the file's status in the current run
+    "ms": [512, null, 530],                // the file's duration per run, null when not run
+    "tests": { "<full test name>": [[12, null, 14], "p-p"] }   // ms per run, status per run
+  } }                                      // p passed, f failed, s skipped/todo, - not run
+}
+```
+
+A name Vitest reports twice in one file gets ` (2)` appended to its second row.
 
 The runs of 2026-10-06 before this landed were backfilled once from their job logs
 (`run.source: "log-backfill"`): per-file duration and counts from the default reporter, slowest

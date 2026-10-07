@@ -3,9 +3,9 @@
 # .github/workflows/record-test-metrics.yml; the record itself is scripts/ci/recordTestRun.mjs).
 #
 # Never force-pushes. When the push is rejected because another run got there first, it fetches
-# the new tip, writes this run's record and the rebuilt summary.json again on top of it, and
-# retries: the run files never collide, and summary.json is always rebuilt from them. Always exits
-# 0, so metrics can never fail CI.
+# the new tip, writes this run's record and the rebuilt summary.json and tests.json again on top
+# of it, and retries: the run files never collide, and both are always rebuilt from them. Always
+# exits 0, so metrics can never fail CI.
 set -uo pipefail
 
 BRANCH="${METRICS_BRANCH:-test-metrics}"
@@ -35,7 +35,7 @@ check_out_branch_tip() {
 }
 
 commit_record() {
-  git -C "$METRICS_DIR" add -- summary.json runs &&
+  git -C "$METRICS_DIR" add -- summary.json tests.json runs &&
     { [ ! -f "$METRICS_DIR/README.md" ] || git -C "$METRICS_DIR" add -- README.md; } &&
     git -C "$METRICS_DIR" -c user.name='github-actions[bot]' \
       -c user.email='41898599+github-actions[bot]@users.noreply.github.com' \

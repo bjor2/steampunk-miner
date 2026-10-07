@@ -1,5 +1,6 @@
 // CI wrapper of testMetrics.mjs (run by .github/workflows/record-test-metrics.yml): writes this
-// run's record into a checkout of the `test-metrics` branch and rebuilds its summary.json.
+// run's record into a checkout of the `test-metrics` branch and rebuilds its summary.json and the
+// per-test history tests.json (testHistory.mjs, the Tests tab's test list, #192).
 //
 //   METRICS_DIR=<checkout> TEST_REPORT=<vitest json> TEST_JOBS=<actions jobs json> \
 //   TEST_JOB=verify TEST_MODE=scoped TEST_REASON=... node scripts/ci/recordTestRun.mjs
@@ -12,10 +13,12 @@
 // or crashed run is the one worth having.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { rollUpTestHistory } from './testHistory.mjs'
 import { buildRunRecord, rollUpSummary } from './testMetrics.mjs'
 
 const RUNS_DIR = 'runs'
 const SUMMARY_FILE = 'summary.json'
+const TEST_HISTORY_FILE = 'tests.json'
 const RUN_FILES_READ = 400
 
 function readJsonOrNull(path) {
@@ -82,10 +85,15 @@ function readRecentRunRecords(dir) {
     .filter((record) => record?.schema === 1)
 }
 
-function writeSummary(dir) {
-  const summary = rollUpSummary(readRecentRunRecords(dir))
+function writeSummary(dir, records) {
+  const summary = rollUpSummary(records)
   writeFileSync(join(dir, SUMMARY_FILE), `${JSON.stringify(summary, null, 1)}\n`)
   return summary
+}
+
+// One line: the page fetches it whole, and it is rewritten on every record.
+function writeTestHistory(dir, records) {
+  writeFileSync(join(dir, TEST_HISTORY_FILE), `${JSON.stringify(rollUpTestHistory(records))}\n`)
 }
 
 function findTestJob(env) {
@@ -103,7 +111,9 @@ function recordTestRun(env) {
     keepAllTests: env.TEST_KEEP_ALL === '1',
   })
   const path = writeRunRecord(env.METRICS_DIR, record)
-  const summary = writeSummary(env.METRICS_DIR)
+  const records = readRecentRunRecords(env.METRICS_DIR)
+  const summary = writeSummary(env.METRICS_DIR, records)
+  writeTestHistory(env.METRICS_DIR, records)
   return { path, record, summary }
 }
 
