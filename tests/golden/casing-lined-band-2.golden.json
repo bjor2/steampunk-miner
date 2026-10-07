@@ -1,8 +1,8 @@
 {
   "name": "casing-lined-band-2",
   "description": "Grade 2 digs 8 m into band 2 and parks beside its lining: no collapse; then debug.forceCollapse refills a lined block anyway (#41, #43).",
-  "generatorVersion": 6,
-  "authorityProtocolVersion": 28,
+  "generatorVersion": 7,
+  "authorityProtocolVersion": 29,
   "logSchemaVersion": 4,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -2836,12 +2836,12 @@
     {
       "tick": 2137,
       "scope": "end",
-      "digest": "d5c14539d5f141b2"
+      "digest": "fc1011661f830a18"
     }
   ],
   "minedOrder": [
     [
-      "kernel.metal.t2",
+      "metal_t2",
       1
     ]
   ]
