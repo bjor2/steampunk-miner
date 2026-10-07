@@ -241,7 +241,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/charges/chargeBlastEffects.test.ts` | 3 | 3 |
 | `src/systems/authority/charges/chargeBlastGates.test.ts` | 5 | 5 |
 | `src/systems/authority/charges/chargeLiveBlast.test.ts` | 12 | 12 |
-| `src/systems/authority/charges/chargeShop.test.ts` | 6 | 6 |
+| `src/systems/authority/charges/chargeShop.test.ts` | 10 | 10 |
+| `src/systems/authority/charges/chargeSizeRules.test.ts` | 14 | 14 |
 | `src/systems/authority/collapse/collapseRun.test.ts` | 19 | 19 |
 | `src/systems/authority/combat/burrower.test.ts` | 5 | 5 |
 | `src/systems/authority/combat/combatRun.test.ts` | 8 | 7 |
@@ -275,7 +276,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/refinery/refinerySlots.test.ts` | 4 | 4 |
 | `src/systems/authority/sellCoins.test.ts` | 8 | 8 |
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
-| `src/systems/authority/sessionSnapshot.test.ts` | 15 | 15 |
+| `src/systems/authority/sessionSnapshot.test.ts` | 17 | 17 |
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
 | `src/systems/authority/teleportDebugRules.test.ts` | 5 | 5 |
@@ -292,7 +293,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botBlasting.test.ts` | 4 | 4 |
 | `src/systems/bot/botChains.test.ts` | 4 | 4 |
 | `src/systems/bot/botChargeNeed.test.ts` | 2 | 2 |
-| `src/systems/bot/botCharges.test.ts` | 6 | 6 |
+| `src/systems/bot/botCharges.test.ts` | 9 | 9 |
 | `src/systems/bot/botCombat.test.ts` | 3 | 3 |
 | `src/systems/bot/botCoreGalleries.test.ts` | 3 | 2 |
 | `src/systems/bot/botCoreRule.test.ts` | 5 | 5 |
@@ -303,6 +304,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botRetreat.test.ts` | 9 | 9 |
 | `src/systems/bot/botShopping.test.ts` | 6 | 6 |
 | `src/systems/bot/botSlicePurchases.test.ts` | 6 | 6 |
+| `src/systems/bot/chargePayoff.test.ts` | 5 | 5 |
+| `src/systems/bot/chargeSizeTrade.test.ts` | 4 | 4 |
 | `src/systems/bot/endlessPlanning.test.ts` | 6 | 3 |
 | `src/systems/bot/leadCellHardness.test.ts` | 3 | 3 |
 | `src/systems/bot/spreeTargets.test.ts` | 10 | 10 |
@@ -324,10 +327,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/economy/assayPricing.test.ts` | 4 | 4 |
 | `src/systems/economy/bandOreCost.test.ts` | 5 | 5 |
-| `src/systems/economy/blastingCharges.test.ts` | 10 | 10 |
+| `src/systems/economy/blastingCharges.test.ts` | 12 | 12 |
 | `src/systems/economy/brassSteps.test.ts` | 5 | 2 |
 | `src/systems/economy/casingGrades.test.ts` | 5 | 5 |
 | `src/systems/economy/casingPrices.test.ts` | 8 | 8 |
+| `src/systems/economy/chargeSizes.test.ts` | 23 | 23 |
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
 | `src/systems/economy/economyGrowth.test.ts` | 5 | 5 |
 | `src/systems/economy/economySourceScan.test.ts` | 6 | 6 |
@@ -376,7 +380,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/input/actionMap.test.ts` | 15 | 15 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
-| `src/systems/input/inputRouting.test.ts` | 20 | 20 |
+| `src/systems/input/inputRouting.test.ts` | 22 | 22 |
 | `src/systems/input/preferences.test.ts` | 19 | 19 |
 | `src/systems/input/touchControls.test.ts` | 22 | 15 |
 
@@ -522,6 +526,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/saveMigrations.test.ts` | 19 | 19 |
 | `src/systems/save/saveSlot.test.ts` | 20 | 16 |
 | `src/systems/save/saveSlotSections.test.ts` | 3 | 3 |
+| `src/systems/save/sizedChargeRacks.test.ts` | 3 | 3 |
 
 ### `scene`
 
@@ -672,9 +677,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
 | `src/systems/vehicle/casingTrail.test.ts` | 8 | 8 |
+| `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/drillRule.test.ts` | 11 | 11 |
 | `src/systems/vehicle/poseReport.test.ts` | 6 | 6 |
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
+| `src/systems/vehicle/vehicleCharges.test.ts` | 4 | 4 |
 | `src/systems/vehicle/vehicleControls.test.ts` | 14 | 14 |
 | `src/systems/vehicle/vehicleReadout.test.ts` | 3 | 3 |
 | `src/systems/vehicle/vehicleStats.test.ts` | 9 | 9 |
@@ -685,7 +692,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
-| `src/systems/views/chargeViews.test.ts` | 11 | 11 |
+| `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
 | `src/systems/views/hudModel.test.ts` | 26 | 26 |
