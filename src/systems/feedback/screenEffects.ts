@@ -32,8 +32,16 @@ export interface EffectSwitches {
   flashes: boolean
 }
 
-/** How hard each cue kicks the screen: shake 0 to 1, flash as a share of the cap. */
-const KICKS: Readonly<Record<FeedbackCue['kind'], { shake: number; flash: number }>> = {
+interface ScreenKick {
+  shake: number
+  flash: number
+}
+
+/**
+ * How hard each cue kicks the screen: shake 0 to 1, flash as a share of the cap. A charge's blast
+ * carries its own kick (`chargeBlastCue`, #213), the shipped charge's by default.
+ */
+const KICKS: Readonly<Record<Exclude<FeedbackCue['kind'], 'chargeBlast'>, ScreenKick>> = {
   pickup: { shake: 0, flash: 0 },
   dockClank: { shake: 0.35, flash: 0 },
   upgradeClank: { shake: 0.3, flash: 0 },
@@ -47,7 +55,6 @@ const KICKS: Readonly<Record<FeedbackCue['kind'], { shake: number; flash: number
   collapseCrash: { shake: 0.6, flash: 0 },
   // The wrecker gnaws more than 20 tiles away: heard, not felt.
   wreckerScrape: { shake: 0, flash: 0 },
-  chargeBlast: { shake: 0.8, flash: 0 },
   // Felt in the hand only (#173 haptics): the screen stays still while the drill cuts.
   drillContact: { shake: 0, flash: 0 },
 }
@@ -56,9 +63,16 @@ export function createScreenEffects(): ScreenEffects {
   return { shake: 0, wobbleSeconds: 0, flash: 0, offsetX: 0, offsetY: 0 }
 }
 
-/** The flash is the bloom-flash accent (#48): only a cue whose one accent it is may flash. */
-function isFlashAccent(cue: FeedbackCue): boolean {
-  return accentOf(cue) === 'bloomFlash'
+function kickOf(cue: FeedbackCue): ScreenKick {
+  return cue.kind === 'chargeBlast' ? cue.kick : KICKS[cue.kind]
+}
+
+/**
+ * The flash is the bloom-flash accent (#48): only a cue whose one accent it is may flash, and a
+ * charge's blast, whose flash its cue provider sizes (#213, TD on #145).
+ */
+function mayFlash(cue: FeedbackCue): boolean {
+  return accentOf(cue) === 'bloomFlash' || cue.kind === 'chargeBlast'
 }
 
 /** A cue's kick, only through the switches the player left on. */
@@ -67,9 +81,9 @@ export function kickScreen(
   cue: FeedbackCue,
   switches: EffectSwitches,
 ): void {
-  const kick = KICKS[cue.kind]
+  const kick = kickOf(cue)
   if (switches.shake) effects.shake = Math.min(1, effects.shake + kick.shake)
-  if (switches.flashes && isFlashAccent(cue)) {
+  if (switches.flashes && mayFlash(cue)) {
     effects.flash = Math.max(effects.flash, kick.flash * FLASH_MAX_OPACITY)
   }
 }

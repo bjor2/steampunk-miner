@@ -10,6 +10,7 @@ import type { ArtAsset } from '../systems/registries/artAssets'
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
 import type { BotPurchase } from '../systems/registries/botPurchases'
+import type { ChargeBlastCueProvider } from '../systems/registries/chargeBlastCue'
 import type { ClockStep } from '../systems/registries/clockSteps'
 import type { SliceCommandRules } from '../systems/registries/commandRules'
 import type { ContentKind, ContentKinds } from '../systems/registries/content'
@@ -89,6 +90,8 @@ export interface SliceRegistrar {
   botPurchase(purchase: BotPurchase): void
   /** A full screen the kernel shell draws while the store holds it open. */
   screen(panel: ScreenPanel): void
+  /** One provider across all slices: a charge's shake, flash and thump delay (#213). */
+  chargeBlastCue(provider: ChargeBlastCueProvider): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   /**

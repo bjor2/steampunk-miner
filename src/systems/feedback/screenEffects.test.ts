@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { FLASH_MAX_OPACITY, SHAKE_MAX_METRES } from '../../constants/scene'
+import { SHIPPED_CHARGE_BLAST_KICK } from '../registries/chargeBlastCue'
 import {
   createScreenEffects,
   kickScreen,
@@ -56,6 +57,26 @@ describe('screen shake and flash', () => {
 
   it('never covers the screen with flashes off', () => {
     expect(run(1, 60, { shake: true, flashes: false }).largestFlash).toBe(0)
+  })
+
+  it("kicks the shipped charge's blast as it always has: 0.8 of the shake and no flash", () => {
+    const effects = createScreenEffects()
+    kickScreen(effects, { kind: 'chargeBlast', kick: SHIPPED_CHARGE_BLAST_KICK }, ALL_ON)
+    expect([effects.shake, effects.flash]).toEqual([0.8, 0])
+  })
+
+  it("flashes for a blast whose kick asks, though the blast's accent is not the bloom flash (#213)", () => {
+    const effects = createScreenEffects()
+    const kick = { shake: 0.5, flash: 0.5, thumpDelayTicks: 0 }
+    kickScreen(effects, { kind: 'chargeBlast', kick }, ALL_ON)
+    expect([effects.shake, effects.flash]).toEqual([0.5, 0.5 * FLASH_MAX_OPACITY])
+  })
+
+  it("keeps a blast's kick behind the player's shake and flash switches", () => {
+    const effects = createScreenEffects()
+    const kick = { shake: 0.5, flash: 0.5, thumpDelayTicks: 0 }
+    kickScreen(effects, { kind: 'chargeBlast', kick }, { shake: false, flashes: false })
+    expect([effects.shake, effects.flash]).toEqual([0, 0])
   })
 
   it('clears a running shake and flash the moment the switches go off', () => {

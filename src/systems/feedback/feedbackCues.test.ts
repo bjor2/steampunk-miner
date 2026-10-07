@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { DomainEvent } from '../authority/domainEvent'
+import {
+  CHARGE_BLAST_CUE_REGISTRY,
+  SHIPPED_CHARGE_BLAST_KICK,
+  type ChargeBlastCueProvider,
+} from '../registries/chargeBlastCue'
+import { addToRegistry, withFreshRegistrySet } from '../registries/seal'
 import { feedbackCuesOf } from './feedbackCues'
 
 const stamp = (playerId: string) => ({ playerId, tick: 10, seq: 1 })
@@ -119,9 +125,41 @@ describe('feedback cues', () => {
       type: 'ChargeDetonated',
       tx: 3,
       ty: 280,
+      size: 1,
+      radiusMm: 2500,
     }
-    expect(feedbackCuesOf([blast], 'p1')).toEqual([{ kind: 'chargeBlast' }])
+    expect(feedbackCuesOf([blast], 'p1')).toEqual([
+      { kind: 'chargeBlast', kick: SHIPPED_CHARGE_BLAST_KICK },
+    ])
     expect(feedbackCuesOf([blast], 'p2')).toEqual([])
+  })
+
+  it("kicks a blast by the cue provider's answer for how far the vehicle stands (#213)", () => {
+    const blast: DomainEvent = {
+      tick: 720,
+      playerId: 'p1',
+      type: 'ChargeDetonated',
+      tx: 3,
+      ty: 280,
+      size: 10,
+      radiusMm: 24000,
+    }
+    const byDistance: ChargeBlastCueProvider = {
+      id: 'fake-blast.cue',
+      kickOf: (detonated, distanceMm) => ({
+        shake: detonated.size / 10,
+        flash: 0.5,
+        thumpDelayTicks: distanceMm / 1000,
+      }),
+    }
+    // The charge tile's centre is (3500, 280500) mm; the vehicle stands 3 m right and 4 m up.
+    const cues = withFreshRegistrySet(
+      () => addToRegistry(CHARGE_BLAST_CUE_REGISTRY, 'fake-blast', byDistance),
+      () => feedbackCuesOf([blast], 'p1', { xMm: 6500, yMm: 284500 }),
+    )
+    expect(cues).toEqual([
+      { kind: 'chargeBlast', kick: { shake: 1, flash: 0.5, thumpDelayTicks: 5 } },
+    ])
   })
 
   it("marks the player's own drill biting, once a batch, for the haptics (#173)", () => {

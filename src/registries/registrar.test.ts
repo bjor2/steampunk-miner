@@ -169,6 +169,19 @@ describe('slice registrar', () => {
     )
   })
 
+  it('refuses a second charge blast cue provider from another slice (#213)', () => {
+    const kick = { shake: 1, flash: 1, thumpDelayTicks: 0 }
+    const first = sliceOf('dynamite-visuals', (r) =>
+      r.chargeBlastCue({ id: 'dynamite-visuals.cue', kickOf: () => kick }),
+    )
+    const second = sliceOf('dynamite', (r) =>
+      r.chargeBlastCue({ id: 'dynamite.cue', kickOf: () => kick }),
+    )
+    expect(() => withRegistrations([first, second], () => undefined)).toThrow(
+      /"chargeBlastCue" takes one provider/,
+    )
+  })
+
   it('refuses a registration after the seal', () => {
     const late = registrarFor('mining-gates')
     expect(() =>

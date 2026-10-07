@@ -1,7 +1,7 @@
 /**
  * The game's sound (#13 audio direction): one-shots for each feedback cue (the pickup chime by
  * tier, the dock and upgrade clanks, a hit's thud, the core and travel stingers, casing's hiss and
- * pop), the music
+ * pop, a charge's blast, its thump delayed by the blast cue with distance, #213), the music
  * stingers (#49) and, every frame, the drill, engine and steam loops and the crossfaded music
  * layers. What each voice plays comes from the pure rules in `systems/audio` and the audio view
  * model; this only hands it to the shell's sound output. Presentation only: it never writes the
@@ -33,6 +33,13 @@ import {
   steamGainOf,
 } from '../systems/audio/soundRules'
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
+import {
+  createDelayedThumps,
+  delayThump,
+  takeDueThumps,
+  thumpDelayTicksOf,
+  type DelayedThumps,
+} from '../systems/audio/delayedThumps'
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
 
@@ -69,12 +76,14 @@ export function SoundStage() {
     () => ({ load: 0, voice: 'rock', sinceRead: LOAD_REFRESH_SECONDS }),
     [],
   )
-  useEffect(() => listenForFeedback((cue) => playCue(sound, cue)), [sound])
+  const thumps = useMemo(createDelayedThumps, [])
+  useEffect(() => listenForFeedback((cue) => playOrDelayCue(sound, thumps, cue)), [sound, thumps])
   useEffect(
     () => listenForStingers((stingerId) => sound.playMusicStinger(stingerId, planetTuning())),
     [sound],
   )
   useFrame((_, delta) => {
+    playDueThumps(sound, thumps, delta)
     refreshDrillLoad(drill, delta)
     playLoops(sound, drill)
     playMusic(sound, music, delta)
@@ -98,14 +107,29 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   collapseRumble: (sound) => sound.playCollapseRumble(),
   collapseCrash: (sound) => sound.playCollapseCrash(),
   wreckerScrape: (sound) => sound.playWreckerScrape(),
-  // Rock breaking all at once: the collapse's crash, until the blast has its own sound.
-  chargeBlast: (sound) => sound.playCollapseCrash(),
+  chargeBlast: (sound) => playBlastThump(sound),
   // Felt, not heard (#173 haptics): the drill's own voice already sounds while it cuts.
   drillContact: () => {},
 }
 
+/** Rock breaking all at once: the collapse's crash, until the blast has its own sound. */
+function playBlastThump(sound: SoundOut): void {
+  sound.playCollapseCrash()
+}
+
+/** A blast's thump may wait with the listener's distance (#213); every other cue sounds now. */
+function playOrDelayCue(sound: SoundOut, thumps: DelayedThumps, cue: FeedbackCue): void {
+  const delayTicks = thumpDelayTicksOf(cue)
+  if (delayTicks > 0) delayThump(thumps, delayTicks)
+  else playCue(sound, cue)
+}
+
 function playCue(sound: SoundOut, cue: FeedbackCue): void {
   CUE_SOUNDS[cue.kind](sound, cue, planetTuning())
+}
+
+function playDueThumps(sound: SoundOut, thumps: DelayedThumps, dt: number): void {
+  for (let due = takeDueThumps(thumps, dt); due > 0; due--) playBlastThump(sound)
 }
 
 function planetTuning(): number {

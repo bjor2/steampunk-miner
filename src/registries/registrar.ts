@@ -15,6 +15,7 @@ import { ART_ASSET_REGISTRY, type ArtAsset } from '../systems/registries/artAsse
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
 import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
+import { CHARGE_BLAST_CUE_REGISTRY } from '../systems/registries/chargeBlastCue'
 import { CLOCK_STEP_REGISTRY } from '../systems/registries/clockSteps'
 import {
   COMMAND_RULE_REGISTRY,
@@ -86,6 +87,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
     botPurchase: (purchase) => add(BOT_PURCHASE_REGISTRY, purchase),
     screen: (panel) => add(SCREEN_REGISTRY, panel),
+    chargeBlastCue: (provider) => add(CHARGE_BLAST_CUE_REGISTRY, provider),
     debugActions: (actions) =>
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),
     commandRules: (rules) =>

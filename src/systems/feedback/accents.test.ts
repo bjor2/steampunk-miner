@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ACCENT_OF_CUE } from './accents'
+import { SHIPPED_CHARGE_BLAST_KICK } from '../registries/chargeBlastCue'
 import type { FeedbackCue } from './feedbackCues'
 import { createScreenEffects, kickScreen } from './screenEffects'
 
@@ -16,7 +17,7 @@ const CUES: FeedbackCue[] = [
   { kind: 'collapseRumble' },
   { kind: 'collapseCrash' },
   { kind: 'wreckerScrape' },
-  { kind: 'chargeBlast' },
+  { kind: 'chargeBlast', kick: SHIPPED_CHARGE_BLAST_KICK },
   { kind: 'drillContact' },
 ]
 
