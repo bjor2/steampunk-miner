@@ -852,6 +852,15 @@ G&V's rivet-patch definition on #204: while an item's hold runs, a ring fills on
 - **`slotHoldCues`** (`src/systems/registries/slotHoldCues.ts`): `{ id, holdEndOf(event) }` answers `cancelled`, `finished` or null for a domain event, usually the slice's own. `feedbackCuesOf` asks it for every event its switch does not know (the first answer in id order wins) and turns it into the `holdCancelled` or `holdFinished` cue, one of each per batch like every cue. `SoundStage` plays them on the light clank and the tier-1 pickup chime; they neither shake, flash nor buzz. Presentation only.
 - **The ring** is `power-up-core`'s (feature-slices 7.4 contract change): the `power-up` kind's optional `holdOf(state, playerId) → { startTick, finishTick } | null`, read from the item slice's section. The slot button's `holdPercent` is the share held, rounded down, 0 with no hold; the button draws it as a ring outside the rim with no transition, so it snaps back. `mobility` answers it for the rivet patch and registers `mobility.rivet-patch` for `PatchCancelled` and `HullPatched`.
 
+### 3.31 Vehicle item sales (ticket 248)
+
+The store's buy path for the items the tree unlocks (#157 gap review X1). Kernel command `buyVehicleItem {itemId}` (`src/systems/authority/vehicleItemRules.ts`) debits the item's offer at the Upgrade bay, sets `ownsItem` and is answered by `VehicleItemPurchased` (`vehicle_item_purchased {itemId, price}`). Refusals, in order: `unknown_vehicle_item` (no registered `vehicle-item`: a vision row stays invisible), the Upgrade bay, `vehicle_item_owned`, `not_researched`, `not_for_sale`, `money_short`. With nothing registered nothing is on sale and every screen, log and bot run is as before.
+
+- **`vehicleItemSellers`** (`src/systems/registries/vehicleItemSales.ts`): `{ id, offerOf(itemId, planetIndex) → { name, price } | null }`. Each item slice sells its own rows: one-offs at 15 band-5 units and cradles at 20 at the unlock planet, extractors at 40 from their own planet (#162 4.1), all through `bandOrePriceAt`. A consumable answers null: its stack is the restock's (X2). The first answer in id order wins.
+- **`vehicleItemResearch`** (one provider, `tech-tree`): `isResearched(state, playerId, itemId)`; false while none is registered. `tech-tree` exports `unlockTierOfItem(itemId)` for the sellers that price at the unlock planet.
+- **The bay**: `vehicleItemRowsOf` lists each researched, unowned item a seller offers here as a K7 compact card after the Charges rows (`upgradebay-item-<id>`, `-cost`, `-buy`). Its cost is the same offer the command debits.
+- **The bot** (3.17): `tech-tree.buy-item` buys researched items cheapest first, before `tech-tree.research`, and the research purchase sends only nodes whose item some seller offers and the bot does not own (the Vertical Scaler's filter). A `BotPurchase` may name what it bought (`boughtIdOf`), kept as `ShopSpend.boughtId`; `tech-tree`'s `laneSpendRowsOf` splits the tree's spend into node and item spend per planet and lane for #212.
+
 ## 4. Cross-slice contracts
 
 ```mermaid

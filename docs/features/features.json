@@ -147,23 +147,23 @@
             },
             {
               "title": "Steam shield",
-              "description": "A steam curtain that turns aside enemy hits and collapse crush for a short window (at most half of each hit); it never stops heat or lava. Built as the mobility lane's power-up; the store buy and its curtain effect come later.",
+              "description": "A steam curtain that turns aside enemy hits and collapse crush for a short window (at most half of each hit); it never stops heat or lava. Built as the mobility lane's power-up and bought at the Upgrade bay once researched; its curtain on the rig comes later.",
               "status": "partial",
-              "issues": [80, 204],
+              "issues": [80, 204, 248],
               "planet": 22
             },
             {
               "title": "Grav anchor",
-              "description": "A toggle that pins the miner to the wall or ceiling it touches, so it can drill while anchored; it draws 1% of the tank a second and drops off at an empty tank. The store buy and its model on the rig come later.",
+              "description": "A toggle that pins the miner to the wall or ceiling it touches, so it can drill while anchored; it draws 1% of the tank a second and drops off at an empty tank. Bought at the Upgrade bay once researched; its model on the rig comes later.",
               "status": "partial",
-              "issues": [80, 204],
+              "issues": [80, 204, 248],
               "planet": 32
             },
             {
               "title": "Buoyancy tanks",
-              "description": "A toggle that hovers the miner in open cavern air without thrust, drawing 1.5% of the tank a second. The store buy and its model on the rig come later.",
+              "description": "A toggle that hovers the miner in open cavern air without thrust, drawing 1.5% of the tank a second. Bought at the Upgrade bay once researched; its model on the rig comes later.",
               "status": "partial",
-              "issues": [80, 204],
+              "issues": [80, 204, 248],
               "planet": 34
             },
             {
@@ -596,9 +596,9 @@
             },
             {
               "title": "Extractors",
-              "description": "Five extractors, the Resonance Fork, Containment Hood, Acid Etcher, Induction Coil and Aether Tether, each open one class of rare ore and the planet's signature, arriving on planets 5, 12, 19, 26 and 33. Without one the drill skids off, or the ore vents or floats away. Still to come: buying them in the store and their own verbs (tune, capture, mark, pull, tow).",
+              "description": "Five extractors, the Resonance Fork, Containment Hood, Acid Etcher, Induction Coil and Aether Tether, each open one class of rare ore and the planet's signature, arriving on planets 5, 12, 19, 26 and 33. Without one the drill skids off, or the ore vents or floats away. The Upgrade bay sells each from its own planet once its tech node is researched; still to come: those nodes and the extractors' own verbs (tune, capture, mark, pull, tow).",
               "status": "partial",
-              "issues": [142, 236, 237],
+              "issues": [142, 236, 237, 248],
               "planet": 5
             }
           ]
@@ -1017,15 +1017,15 @@
         },
         {
           "title": "Powerups",
-          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots, charges and the mobility lane are built; the other lanes and the store buy come with their tickets.",
+          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots, charges, the mobility lane and buying researched one-offs and cradles at the Upgrade bay are built; the other lanes and buying consumables by the unit come with their tickets.",
           "status": "partial",
-          "issues": [47, 162, 200],
+          "issues": [47, 162, 200, 248],
           "children": [
             {
               "title": "Mobility and survival power-ups",
-              "description": "Grapple winch (reel up to a wall or ceiling, refused at no cost with nothing to hook), emergency ballast, heat sink flask (once you own refractory lining), steam boost, rivet patch kit (hold still to plate the hull; moving gives the kit back), steam shield, smoke canister, grav anchor, buoyancy tanks and escape thruster, each with its tech node, Marks and item card. Buying them in the store, and their models and effects on the rig, come later.",
+              "description": "Grapple winch (reel up to a wall or ceiling, refused at no cost with nothing to hook), emergency ballast, heat sink flask (once you own refractory lining), steam boost, rivet patch kit (hold still to plate the hull; moving gives the kit back), steam shield, smoke canister, grav anchor, buoyancy tanks and escape thruster, each with its tech node, Marks and item card. The five one-offs are bought at the Upgrade bay once researched; buying the consumables by the unit, and the models and effects on the rig, come later.",
               "status": "partial",
-              "issues": [204, 166]
+              "issues": [204, 166, 248]
             }
           ]
         },
