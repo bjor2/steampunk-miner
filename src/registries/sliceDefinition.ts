@@ -6,6 +6,7 @@
 import type { DebugAction } from '../debug/debugActionRegistry'
 import type { SliceEventProjections } from '../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../logging/registries/runEvents'
+import type { ArtAsset } from '../systems/registries/artAssets'
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
 import type { SliceCommandRules } from '../systems/registries/commandRules'
@@ -62,6 +63,11 @@ export interface SliceRegistrar {
   worldPiece(piece: WorldPiece): void
   /** One provider across all slices: how a dock building stages the local vehicle (#170). */
   vehicleStaging(provider: VehicleStagingProvider): void
+  /**
+   * Blender assets the slice ships, joining `blenderAssetIds()`. Bare art ids, not prefixed:
+   * kebab-case, starting with `<category>-`, never a kernel id or another slice's (#214).
+   */
+  artAssets(assets: readonly ArtAsset[]): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   /**

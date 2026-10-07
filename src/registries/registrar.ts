@@ -10,6 +10,8 @@ import {
   eventProjectionRegistrationsOf,
 } from '../logging/registries/eventProjections'
 import { RUN_EVENT_REGISTRATIONS, runEventRegistrationsOf } from '../logging/registries/runEvents'
+import { artAssetIdProblems } from '../systems/art/artAssetRules'
+import { ART_ASSET_REGISTRY, type ArtAsset } from '../systems/registries/artAssets'
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
 import {
@@ -68,6 +70,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),
     worldPiece: (piece) => add(WORLD_PIECE_REGISTRY, piece),
     vehicleStaging: (provider) => add(VEHICLE_STAGING_REGISTRY, provider),
+    artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
     debugActions: (actions) =>
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),
     commandRules: (rules) =>
@@ -128,6 +131,19 @@ function addDiscoveryKind(sliceId: string, registration: DiscoveryKindRegistrati
 function refuseKernelDiscoveryKind(sliceId: string, kind: string): never {
   throw new RegistrationRefusedError(
     `slice "${sliceId}" registered discovery kind "${kind}", which the kernel already declares`,
+  )
+}
+
+/** An art id is bare (`prop-dynamite-charge`): the #52 rule replaces the slice prefix (#214). */
+function addArtAsset(sliceId: string, asset: ArtAsset) {
+  const problems = artAssetIdProblems(asset)
+  if (problems.length > 0) refuseArtAsset(sliceId, asset.id, problems)
+  addToRegistry(ART_ASSET_REGISTRY, sliceId, asset)
+}
+
+function refuseArtAsset(sliceId: string, id: string, problems: readonly string[]): never {
+  throw new RegistrationRefusedError(
+    `slice "${sliceId}" registered art asset "${id}", which ${problems.join(' and ')}`,
   )
 }
 

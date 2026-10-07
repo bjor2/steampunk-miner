@@ -6,6 +6,7 @@
  */
 import ASSET_RULES from '../../../art/asset-rules.json'
 import { REFINERY_BAY_LOOKS } from '../authority/platformState'
+import { registeredArtAssets } from '../registries/artAssets'
 import { BAND_COUNT } from '../world/planetGeometry'
 import { ENEMY_IDS, PLATFORM_BAY_IDS, PLATFORM_VISUAL_STATES } from '../registeredIds'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
@@ -80,8 +81,16 @@ export function slotItemAssetIdOf(itemId: string): string {
   return `vehicle-item-${kebabOf(itemId).replaceAll('.', '-')}`
 }
 
-/** Every Blender asset of the #51 inventory and the vehicle modules, named from the registries (#52). */
+/**
+ * Every Blender asset: the kernel's and the ones slices register (#214), sorted by code unit. The
+ * manifest lint and the Blender export (`scripts/art/listBlenderAssetIds.ts`) both read this list.
+ */
 export function blenderAssetIds(): string[] {
+  return [...kernelBlenderAssetIds(), ...registeredArtAssets().map((asset) => asset.id)].sort()
+}
+
+/** The #51 inventory and the vehicle modules, named from the registries (#52). */
+export function kernelBlenderAssetIds(): string[] {
   return [
     'vehicle',
     ...vehicleModuleRowIds().map(vehicleModuleAssetIdOf),
@@ -219,8 +228,8 @@ function numbered(prefix: string, count: number): string[] {
  * Part ids outside the vehicle: each single-part asset's own id, the hub's two visual states
  * (#8 `outpost`, `core_drive`), which are its collections in Blender (#52), the refinery
  * bay's three looks drawn over its frame (#105), the charge rack's slots, the planted
- * charge's fuse lamp, the shop buildings' moving parts (#170) and the Workshop showcase's rig
- * and reaction pieces (#180).
+ * charge's fuse lamp, the shop buildings' moving parts (#170), the Workshop showcase's rig
+ * and reaction pieces (#180) and the parts each slice asset names (#214).
  */
 export function registryPartIds(): string[] {
   return [
@@ -231,6 +240,7 @@ export function registryPartIds(): string[] {
     FUSE_LAMP_PART_ID,
     ...shopBuildingMovingPartIds(),
     ...workshopShowcasePartIds(),
+    ...registeredArtAssets().flatMap((asset) => asset.parts ?? []),
   ]
 }
 
