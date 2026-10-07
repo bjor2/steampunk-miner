@@ -1,25 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-07T04:44:44.430Z",
+ "updatedAt": "2026-10-07T04:47:57.347Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37529246158,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37529246158",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "ef17b87caf1c839bb8b35957b736744921502fdd",
-   "branch": "main",
-   "startedAt": "2026-10-06T20:48:38Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 62,
-   "reportFound": false,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37530066083,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37530066083",
@@ -852,12 +835,29 @@
    "tests": 0,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 37573078392,
+   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37573078392",
+   "event": "push",
+   "mode": "scoped",
+   "sha": "94db0881b4bf21024125fcd697b6d518c70cfd00",
+   "branch": "main",
+   "startedAt": "2026-10-07T04:46:39Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 67,
+   "reportFound": true,
+   "files": 9,
+   "tests": 52,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 41,
-   "full": 9
+   "full": 9,
+   "scoped": 41
   },
   "timedOut": [],
   "withoutReport": [],
@@ -904,7 +904,7 @@
    "files": 14,
    "p50Ms": 171,
    "p95Ms": 268,
-   "fileRuns": 136,
+   "fileRuns": 137,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -931,7 +931,7 @@
    "files": 7,
    "p50Ms": 1875,
    "p95Ms": 2116,
-   "fileRuns": 87,
+   "fileRuns": 88,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1012,7 +1012,7 @@
    "files": 54,
    "p50Ms": 91463,
    "p95Ms": 101976,
-   "fileRuns": 987,
+   "fileRuns": 988,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1039,7 +1039,7 @@
    "files": 19,
    "p50Ms": 809,
    "p95Ms": 1069,
-   "fileRuns": 192,
+   "fileRuns": 193,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1120,7 +1120,7 @@
    "files": 8,
    "p50Ms": 110,
    "p95Ms": 158,
-   "fileRuns": 91,
+   "fileRuns": 92,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1171,10 +1171,10 @@
    "passRate": 1
   },
   "dock-buildings": {
-   "files": 1,
-   "p50Ms": 52,
-   "p95Ms": 80,
-   "fileRuns": 4,
+   "files": 4,
+   "p50Ms": 61,
+   "p95Ms": 89,
+   "fileRuns": 8,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1352,13 +1352,13 @@
   },
   "scripts/status/features.test.mjs": {
    "feature": "tooling-status",
-   "runs": 10,
-   "lastMs": 25,
+   "runs": 11,
+   "lastMs": 7,
    "p50Ms": 11,
    "p95Ms": 25,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37569652767,
+   "lastRunId": 37573078392,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -1539,13 +1539,13 @@
   },
   "src/features/loadFeatures.test.ts": {
    "feature": "unmapped",
-   "runs": 23,
-   "lastMs": 4,
+   "runs": 24,
+   "lastMs": 3,
    "p50Ms": 4,
    "p95Ms": 6,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37573078392,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -3060,13 +3060,13 @@
   },
   "src/systems/authority/moneyRounding.test.ts": {
    "feature": "authority",
-   "runs": 23,
-   "lastMs": 4,
+   "runs": 24,
+   "lastMs": 5,
    "p50Ms": 4,
    "p95Ms": 5,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37573078392,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -3555,13 +3555,13 @@
   },
   "src/systems/economy/economySourceScan.test.ts": {
    "feature": "economy",
-   "runs": 23,
-   "lastMs": 98,
+   "runs": 24,
+   "lastMs": 50,
    "p50Ms": 89,
    "p95Ms": 136,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37573078392,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -4668,13 +4668,13 @@
   },
   "src/systems/vehicle/vehicleStats.test.ts": {
    "feature": "vehicle",
-   "runs": 23,
-   "lastMs": 15,
+   "runs": 24,
+   "lastMs": 9,
    "p50Ms": 19,
    "p95Ms": 30,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37573078392,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -5990,13 +5990,13 @@
   },
   "src/features/dock-buildings/systems/render/workshopStaging.test.ts": {
    "feature": "dock-buildings",
-   "runs": 4,
-   "lastMs": 41,
+   "runs": 5,
+   "lastMs": 30,
    "p50Ms": 52,
    "p95Ms": 80,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37573078392,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -6153,6 +6153,45 @@
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37572201878,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/dock-buildings/systems/dockAddOns.test.ts": {
+   "feature": "dock-buildings",
+   "runs": 1,
+   "lastMs": 4,
+   "p50Ms": 4,
+   "p95Ms": 4,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37573078392,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/dock-buildings/systems/render/dockAddOnPlacement.test.ts": {
+   "feature": "dock-buildings",
+   "runs": 1,
+   "lastMs": 3,
+   "p50Ms": 3,
+   "p95Ms": 3,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37573078392,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/features/dock-buildings/systems/render/unlockPan.test.ts": {
+   "feature": "dock-buildings",
+   "runs": 1,
+   "lastMs": 2,
+   "p50Ms": 2,
+   "p95Ms": 2,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37573078392,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
