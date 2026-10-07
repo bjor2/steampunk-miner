@@ -5,11 +5,13 @@
  * It registers #142's `canMine` as the gate check the drill, the blast and power-up terrain edits
  * ask, names each ore cell's drill class (dense, drill-gated signature, ordinary) so the kernel's
  * scratch floor reads it, and adds the five extractors as `vehicle-item` rows, so the kernel's
- * loadout can own them (a store buy or a grant). Its ledger logs every gated cell freed or lost.
+ * loadout can own them (a store buy or a grant). Its ledger logs every gated cell freed or lost,
+ * and the balance and session reports print each planet's gate hits, clears and losses.
  * Gate content starts on planet 7 (GD lock on #148).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { miningGatesDebugActions } from './debug'
+import { miningGatesReportRows } from './gateReportRows'
 import { MINING_GATES_PROJECTIONS, MINING_GATES_RUN_EVENTS } from './logging'
 import { canMine } from './systems/canMine'
 import { miningGatesDrillClass } from './systems/drillClass'
@@ -28,6 +30,7 @@ export const slice: SliceDefinition = {
     r.authorityReaction(gateLedger)
     r.eventProjections(MINING_GATES_PROJECTIONS)
     r.runEvents(MINING_GATES_RUN_EVENTS)
+    r.reportRows(miningGatesReportRows)
     // steampunkDebug.features['mining-gates'].describe(), .gateTableOf(p, seed), .ownsRig(id),
     // .grantRig(id)
     r.debugActions(miningGatesDebugActions)

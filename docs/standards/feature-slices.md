@@ -87,7 +87,7 @@ The subfolder names are the kernel layer names, so the existing layer rules in `
 | --- | --- | --- | --- |
 | `ores` (#140 said `ore-catalogue`) | Ore catalogue: identity, families, cycle/echo, grade thresholds, lead weights, `requires`; registers `oreTypes` | Value and hardness by tier: `src/systems/economy/oreEconomy.ts` (≈20 kernel importers), the `ore` block of `economy.json` | #146 |
 | `planet-mix` | Planet themes and ore roles (#141 `oreThemes.json`, `oreRoles`); registers generation hooks | Patch lattice `src/systems/world/orePatches.ts`, cell layout `worldCell.ts` | #147 |
-| `mining-gates` | Gate rules from an ore's `requires`; locked-marker model; registers `gateChecks` | Drill rule `src/systems/authority/groundDrill.ts` | #148 |
+| `mining-gates` | #142's gate table from the planet mix, `canMine`, the drill classes, the five extractors and the gate ledger; registers `gateChecks`, `oreDrillClasses`, the extractors' `vehicle-item` rows (148a, ticket 236); locked-marker model (148c) | Drill rule `src/systems/authority/groundDrill.ts` | #148 |
 | `dynamite` | Sizes, plant/fuse, its blast command (after K1); registers `blastEffects` and `content` `dynamite-size` | Ground removal; the shipped charges code until #153 decides | #149 |
 | `ore-visuals` | Ore look by family/tier/grade (#151); registers `oreLook`; ore icons | `src/systems/render/chunkTileBatch.ts`, `artDirection.ts` loader | #144, #150 |
 | `example` **(new)** | Template and lint fixture; one read-only debug action | | #156 |

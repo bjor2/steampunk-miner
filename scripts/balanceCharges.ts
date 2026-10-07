@@ -22,6 +22,9 @@
  *    without charges: judged on planets 7 to 10, and logged as a diagnostic on planets 13 to 34 and
  *    40 until #148's dynamite gates give the bot a reason to blast there (Vertical Scaler on #149).
  *    The one lever is the price per charge, never moved from the soft rows.
+ * 5. The dynamite gate (GD lock on #148, ticket 236): in the blasting runs, the dynamite-gated
+ *    cells each seed's bot freed (`mining-gates.gate_cleared {gateKind: dynamite}`) on planets 7,
+ *    10, 16, 22, 28, 34 and 40, and their median, expected at 1.5 or more a run.
  *
  * The slice is untouched by charges, which open on planet 7. Run it with `npm run balance:charges`;
  * the forty-planet runs take a while.
@@ -80,6 +83,10 @@ const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
 const MAX_SPEED_UP_PERCENT = 10
 const QUICK_FLOOR_MULTIPLE = 2
 const SLOW_FLOOR_MULTIPLE = 4
+/** The planets the dynamite gate is judged on, and the median clears a run it wants there. */
+const DYNAMITE_GATE_PLANETS = [7, 10, 16, 22, 28, 34, 40]
+const DYNAMITE_CLEAR_FLOOR = 1.5
+const GATE_CLEARED_LINE = 'mining-gates.gate_cleared'
 /** The run-log lines the pace rows count per planet. */
 const COUNTED_LINES: readonly RunEventName[] = ['charges_restocked', 'charge_detonated']
 
@@ -96,11 +103,13 @@ const blasting = playTo('blast')
 const drilling = playTo('never')
 const judgedRows = judgedPlanets.map((planet) => paceRowOf(planet))
 const diagnosticRows = DIAGNOSTIC_PLANETS.map((planet) => paceRowOf(planet))
+const dynamiteRows = DYNAMITE_GATE_PLANETS.map((planet) => dynamiteRowOf(planet))
 const warnings = [
   ...tradeWarnings(),
   ...sizeGuardWarnings(),
   ...payoffWarnings(),
   ...paceWarnings(),
+  ...dynamiteWarnings(),
 ]
 const text = [
   `## blasting_charges and the dynamite sizes against the pacing bot (report only)`,
@@ -137,6 +146,8 @@ const text = [
   paceTableOf(judgedRows),
   '### The bot, planets 13 to 34 and 40 (C4, diagnostic until #148)',
   paceTableOf(diagnosticRows),
+  `### The dynamite gate: shells the bot freed a run (GD lock on #148, expected a median of ${DYNAMITE_CLEAR_FLOOR} or more)`,
+  dynamiteTableOf(dynamiteRows),
   `### Warnings\n\n${warnings.length === 0 ? 'none' : warnings.map((line) => `- ${line}`).join('\n')}`,
 ].join('\n\n')
 
@@ -159,6 +170,14 @@ interface CountedLine {
 interface PolicyRuns {
   pacing: PacingReport
   counted: CountedLine[]
+  /** Per seed, in seed order: the dynamite-gated cells freed on each planet. */
+  dynamiteClears: Map<number, number>[]
+}
+
+interface DynamiteRow {
+  planet: number
+  bySeed: number[]
+  median: number
 }
 
 interface PaceRow {
@@ -252,12 +271,60 @@ function playTo(chargePolicy: ChargePolicy): PolicyRuns {
   const runs = SEEDS.map((worldSeed) => {
     const options = { lastPlanet: LAST_PLANET, maxTicks: BUDGET_TICKS, chargePolicy }
     const { events } = playLoggedSlice({ ...scenario, worldSeed }, options)
-    return { report: derivePacingReport(events, worldSeed), counted: countedLinesOf(events) }
+    return {
+      report: derivePacingReport(events, worldSeed),
+      counted: countedLinesOf(events),
+      dynamiteClears: dynamiteClearsOf(events),
+    }
   })
   return {
     pacing: medianPacingReport(runs.map((run) => run.report)),
     counted: runs.flatMap((run) => run.counted),
+    dynamiteClears: runs.map((run) => run.dynamiteClears),
   }
+}
+
+/** The dynamite-gated cells a run freed, per planet. */
+function dynamiteClearsOf(events: readonly RunEvent[]): Map<number, number> {
+  const clears = new Map<number, number>()
+  for (const event of events) {
+    if (!isDynamiteClear(event) || event.planet === undefined) continue
+    clears.set(event.planet, (clears.get(event.planet) ?? 0) + 1)
+  }
+  return clears
+}
+
+function isDynamiteClear(event: RunEvent): boolean {
+  const data = event.data as Record<string, unknown>
+  return (event.event as string) === GATE_CLEARED_LINE && data.gateKind === 'dynamite'
+}
+
+function dynamiteRowOf(planet: number): DynamiteRow {
+  const bySeed = blasting.dynamiteClears.map((clears) => clears.get(planet) ?? 0)
+  return { planet, bySeed, median: medianOf(bySeed) }
+}
+
+function dynamiteTableOf(rows: readonly DynamiteRow[]): string {
+  return [
+    `| planet | ${SEEDS.join(' | ')} | median | at least ${DYNAMITE_CLEAR_FLOOR} |`,
+    `| --- | ${SEEDS.map(() => '---').join(' | ')} | --- | --- |`,
+    ...rows.map(
+      (row) =>
+        `| ${row.planet} | ${row.bySeed.join(' | ')} | ${row.median} | ${row.median >= DYNAMITE_CLEAR_FLOOR ? 'yes' : 'no'} |`,
+    ),
+  ].join('\n')
+}
+
+function dynamiteWarnings(): string[] {
+  return dynamiteRows
+    .filter((row) => row.median < DYNAMITE_CLEAR_FLOOR)
+    .map((row) => `planet ${row.planet}: the bot freed a median of ${row.median} shells a run`)
+}
+
+function medianOf(values: readonly number[]): number {
+  const sorted = [...values].sort((a, b) => a - b)
+  const middle = Math.floor(sorted.length / 2)
+  return sorted.length % 2 === 1 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2
 }
 
 /** The lines the pace rows count, kept as name and planet only. */
