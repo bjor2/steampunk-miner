@@ -38,6 +38,7 @@ import type { PartMotionRequestSource } from '../systems/registries/partMotionRe
 import type { SaveSection } from '../systems/registries/saveSections'
 import type { SoundCue } from '../systems/registries/soundCues'
 import type { AttachUse } from '../systems/registries/vehicleAttach'
+import type { VehicleMotionEffectSource } from '../systems/registries/vehicleMotionEffects'
 import type { VehicleStagingProvider } from '../systems/registries/vehicleStaging'
 import type { SceneLayer } from '../scene/registries/sceneLayers'
 import type { VehiclePiece } from '../scene/registries/vehiclePieces'
@@ -79,6 +80,11 @@ export interface SliceRegistrar {
   enemyDetectionModifier(modifier: EnemyDetectionModifier): void
   /** Vents the heat gauge and pauses heat gain for windows the slice keeps (ticket 233). */
   heatPause(pause: HeatPause): void
+  /**
+   * Boosts, bursts, reels, hover or cling on a vehicle, read from the slice's section each fixed
+   * step; boosts sum to at most +2000 bp over the engine track (ticket 233).
+   */
+  vehicleMotionEffect(source: VehicleMotionEffectSource): void
   /** A dock building that opens its `facility` schedule row from that row's planet on (#221). */
   dockFacility(facility: DockFacility): void
   /** Answers a pressed action the kernel's routing table leaves open, such as `use_slot_1`. */

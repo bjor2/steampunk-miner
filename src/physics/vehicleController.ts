@@ -26,10 +26,13 @@ import type { ActionFlags } from '../systems/vehicle/poseReport'
 import { quantisePose } from '../systems/vehicle/poseReport'
 import { gravityAt } from '../systems/vehicle/radialGravity'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import { isPlainMotion, type VehicleMotion } from '../systems/vehicle/motionEffects'
 import {
   groundProbeOf,
   offsetToTileCentre,
   stepVehicleMotion,
+  surfaceProbesOf,
+  type MotionEffectInput,
 } from '../systems/vehicle/vehicleMotion'
 import {
   FACING,
@@ -59,6 +62,8 @@ export interface VehicleStepInput {
   engine: EngineStats
   /** Active with energy left (#7): otherwise the wheels, lift and drill do nothing. */
   canAct: boolean
+  /** The slices' motion effects on this vehicle this step (ticket 233); none when absent. */
+  motion?: VehicleMotion
 }
 
 export interface VehicleStepResult {
@@ -145,6 +150,7 @@ export function createVehicleController(
         isCuttingLevel: isCuttingLevel,
         isWaitingForCut: isCuttingLevel && contact === 'inTheWay',
         dt: PHYSICS_TIMESTEP,
+        effect: motionEffectInputOf(input.motion, position, up, planet.ground),
       })
       driveBody(body, motion.velocity, up)
       return {
@@ -181,6 +187,22 @@ function drillContactFor(
     facing,
     stamp: drillStampOf(pose, isLifting),
   })
+}
+
+/** The effect for the motion rule, or nothing for no effect; ground is probed only to cling. */
+function motionEffectInputOf(
+  motion: VehicleMotion | undefined,
+  position: Vector2,
+  up: Vector2,
+  ground: GroundReader,
+): MotionEffectInput | undefined {
+  if (motion === undefined || isPlainMotion(motion)) return undefined
+  const isTouchingSurface = motion.isClinging && isTouchingAnySide(ground, position, up)
+  return { motion, position, isTouchingSurface }
+}
+
+function isTouchingAnySide(ground: GroundReader, position: Vector2, up: Vector2): boolean {
+  return surfaceProbesOf(position, up).some((probe) => isSolidAt(ground, probe))
 }
 
 function isSolidAt(ground: GroundReader, point: Vector2): boolean {

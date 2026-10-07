@@ -15,7 +15,9 @@ import {
   readPlanetWorld,
   useGameStore,
 } from '../store/gameStore'
+import { readAuthorityState } from '../store/authorityLink'
 import { engineStatsAtStep } from '../systems/economy/vehicleStats'
+import { vehicleMotionAt, type VehicleMotion } from '../systems/registries/vehicleMotionEffects'
 import {
   countActionStep,
   NEW_POSE_REPORTER,
@@ -68,6 +70,7 @@ export function createVehicleLoop(): VehicleLoop {
           intent: stagedIntent,
           engine: engineStatsAtStep(vehicle.levels.engine),
           canAct: canVehicleAct(vehicle),
+          motion: readLocalMotion(),
         },
         planetViewOf(loop, params, world),
       )
@@ -78,6 +81,12 @@ export function createVehicleLoop(): VehicleLoop {
       renderPresence.groundColliders = controller.colliderCount()
     },
   }
+}
+
+/** The slices' motion effects on the local vehicle at the authority's tick (ticket 233). */
+function readLocalMotion(): VehicleMotion {
+  const state = readAuthorityState()
+  return vehicleMotionAt(state, useGameStore.getState().playerId, state.tick)
 }
 
 /** A stranded or empty vehicle neither drives, lifts nor drills (#7). */

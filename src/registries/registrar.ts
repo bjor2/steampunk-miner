@@ -63,6 +63,7 @@ import {
   type RegistryEntry,
 } from '../systems/registries/seal'
 import { ATTACH_USE_REGISTRY } from '../systems/registries/vehicleAttach'
+import { VEHICLE_MOTION_EFFECT_REGISTRY } from '../systems/registries/vehicleMotionEffects'
 import { VEHICLE_STAGING_REGISTRY } from '../systems/registries/vehicleStaging'
 import { SCENE_LAYER_REGISTRY } from '../scene/registries/sceneLayers'
 import { VEHICLE_PIECE_REGISTRY } from '../scene/registries/vehiclePieces'
@@ -91,6 +92,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),
     enemyDetectionModifier: (modifier) => add(ENEMY_DETECTION_MODIFIER_REGISTRY, modifier),
     heatPause: (pause) => add(HEAT_PAUSE_REGISTRY, pause),
+    vehicleMotionEffect: (source) => add(VEHICLE_MOTION_EFFECT_REGISTRY, source),
     inputReaction: (reaction) => add(INPUT_REACTION_REGISTRY, reaction),
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
