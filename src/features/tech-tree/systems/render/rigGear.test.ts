@@ -9,8 +9,8 @@ import { GEAR_ART, vehicleWithPoints } from './gearArtFixture'
 import { pivotedQuadOf, rigItemsOf, rigMountsOf, type RigMount } from './rigGear'
 import type { GearQuad } from './techGearQuads'
 
-// The loaded slices register the mobility lane's items; the drill gear and sensing lanes are
-// still vision rows, so their items are invisible.
+// The loaded slices register the mobility and sensing lanes' items; the twin-bit head (#205) and
+// the galvanic probe (#203 Q3) are still held vision rows, so they are invisible.
 const vehicle = vehicleWithPoints([
   { id: 'hull.powerup.1', atM: [-0.3, -0.02], z: 6 },
   { id: 'hull.powerup.2', atM: [-0.15, -0.02], z: 6 },
@@ -74,7 +74,10 @@ describe('rig gear', () => {
   })
 
   it('never mounts an item that is still a vision row, whatever the loadout holds', () => {
-    const loadout = loadoutOf({ 'drill.head': 'gear.twin_bit' }, ['power.echo_sounder'])
+    const loadout = loadoutOf({
+      'drill.head': 'gear.twin_bit',
+      'powerup.1': 'power.galvanic_probe',
+    })
     expect(rigItemsOf(loadout)).toEqual([])
     expect(mountsOf(loadout)).toEqual([])
   })
