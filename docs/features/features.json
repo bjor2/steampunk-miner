@@ -627,9 +627,9 @@
           "children": [
             {
               "title": "Buy upgrades",
-              "description": "The six vehicle tracks, each with icon, level, next cost and 'before to after' stats.",
+              "description": "The six vehicle tracks, each a plaque with icon, level, rivet pips toward the next big level, next cost and 'before to after' stats.",
               "status": "built",
-              "issues": [37, 58, 62]
+              "issues": [37, 58, 62, 177]
             },
             {
               "title": "Extra rows",
@@ -644,10 +644,22 @@
               "issues": [8, 37]
             },
             {
-              "title": "Live vehicle preview",
-              "description": "A live preview of the rig: focusing a row highlights the part, shows stats before and after, and ghosts the next visual tier.",
+              "title": "Workshop showcase",
+              "description": "The rig stands on the Works' turntable in the main view with nothing over it, and the six tracks are plaques around it with leader lines to their parts: selecting one lights its part and turns the turntable, and every purchase sways that part, wider for a big level-up. Still missing: the milestone parts and cards (#228), the coins pulled into the part, the camera punch-in and the final art.",
+              "status": "partial",
+              "issues": [177, 180, 228]
+            },
+            {
+              "title": "Hold-to-buy chains",
+              "description": "Hold Buy (a long-press on touch) to buy the same upgrade faster and faster: a click buys one, then a short wind-up, then quicker steps up to 10 a second, a breath at each big level-up, and a stop on release, sliding off, can't afford or the service reserve, each with its own cadence. Plaques tempt with 'can buy ×12, 1 big level' and count the running chain.",
               "status": "built",
-              "issues": [44, 62]
+              "issues": [177, 180, 226]
+            },
+            {
+              "title": "Escalating purchase sound",
+              "description": "Each purchase ticks a ratchet that climbs a pentatonic scale and layers up as the chain speeds, a whistle-and-clang for a big level-up, and a cadence when the chain stops, capped at 4 ratchet voices and 1 flourish. Synthesised stand-in tones until the final sounds.",
+              "status": "partial",
+              "issues": [177, 180]
             },
             {
               "title": "Upgrade icons",
