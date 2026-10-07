@@ -159,6 +159,22 @@
       ]
     },
     {
+      "why": "The store sells researched vehicle items: the buy command, the sellers, the bay rows.",
+      "paths": [
+        "src/systems/authority/vehicleItemRules.ts",
+        "src/systems/registries/vehicleItemSales.ts",
+        "src/systems/views/vehicleItemRows.ts",
+        "src/features/tech-tree/systems/itemShop.ts",
+        "src/features/mobility/systems/mobilitySales.ts",
+        "src/features/power-up-core/systems/cradleSales.ts"
+      ],
+      "specs": [
+        "e2e/browser/vehicleItemShop.spec.ts",
+        "e2e/browser/itemCards.spec.ts",
+        "e2e/browser/workshop.spec.ts"
+      ]
+    },
+    {
       "why": "The game stage fits every screen cell and shows the portrait card.",
       "paths": ["src/ui/stage/**"],
       "specs": [
