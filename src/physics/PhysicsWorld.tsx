@@ -1,10 +1,15 @@
 /**
  * The Rapier world on the fixed step. World gravity is zero: gravity on a round planet is radial
  * and applied by the vehicle's motor (#7). Rapier is imported only under src/physics.
+ *
+ * `@react-three/rapier`'s own stepper is held paused and its mesh interpolation off: the game's
+ * bodies are plain Rapier bodies it never draws, so `FixedStepDriver` steps the world on the
+ * game's clock and hands the bodies the share to draw them between steps.
  */
 import { Physics, useRapier } from '@react-three/rapier'
 import { useEffect, type ReactNode } from 'react'
 import { PHYSICS_TIMESTEP } from '../constants/physics'
+import { FixedStepDriver } from './FixedStepDriver'
 import { watchPhysicsWorld } from './physicsStats'
 
 const NO_WORLD_GRAVITY: [number, number, number] = [0, 0, 0]
@@ -15,8 +20,9 @@ const NO_WORLD_GRAVITY: [number, number, number] = [0, 0, 0]
  */
 export function PhysicsWorld({ children, isPaused }: { children: ReactNode; isPaused: boolean }) {
   return (
-    <Physics gravity={NO_WORLD_GRAVITY} timeStep={PHYSICS_TIMESTEP} paused={isPaused}>
+    <Physics gravity={NO_WORLD_GRAVITY} timeStep={PHYSICS_TIMESTEP} paused interpolate={false}>
       <WorldStatsWatch />
+      <FixedStepDriver isPaused={isPaused} />
       {children}
     </Physics>
   )

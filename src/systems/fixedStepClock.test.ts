@@ -4,7 +4,14 @@ import type { CommandIntent } from './authority/authorityCommand'
 import { createAuthorityState } from './authority/authorityState'
 import type { DomainEvent } from './authority/domainEvent'
 import { createLoopbackAuthority } from './authority/loopbackAuthority'
-import { NEW_FIXED_STEP_CLOCK, stepsForFrame, type FixedStepClock } from './fixedStepClock'
+import {
+  carryPastFrameSteps,
+  countFrameSteps,
+  NEW_FIXED_STEP_CLOCK,
+  stepBlendOf,
+  stepsForFrame,
+  type FixedStepClock,
+} from './fixedStepClock'
 import { planetParamsFor } from './world/planetParams'
 import { surfaceRowOfColumn } from './world/tileGrid'
 import { NO_DRIVE } from './vehicle/driveSigns'
@@ -53,6 +60,35 @@ function digAndReturnTrip(): Map<number, CommandIntent> {
     trip.set(tick, report(ty, 3, { thrustTicks: 12 }))
   }
   return trip
+}
+
+/** Frame times of a display at `hz` whose frames start up to `jitterSeconds` late, repeating. */
+function jitteredFrames(hz: number, jitterSeconds: number, count: number): number[] {
+  const lateness = [0, 0.7, 0.2, 1, 0.4, 0.9, 0.1, 0.6].map((share) => share * jitterSeconds)
+  return Array.from(
+    { length: count },
+    (_, frame) => 1 / hz + lateness[(frame + 1) % 8]! - lateness[frame % 8]!,
+  )
+}
+
+/**
+ * Where a body moving at `speed` m/s is drawn on each frame: the frame loop's step count and
+ * carry on plain numbers, the body drawn between its poses before and after the last step.
+ */
+function drawnPositions(frameTimes: readonly number[], speed: number) {
+  let carried = 0
+  let steps = 0
+  let elapsed = 0
+  return frameTimes.map((frameSeconds) => {
+    const due = countFrameSteps(carried, frameSeconds, PHYSICS_TIMESTEP, MAX_STEPS)
+    carried = carryPastFrameSteps(carried, frameSeconds, PHYSICS_TIMESTEP, due)
+    steps += due
+    elapsed += frameSeconds
+    const before = Math.max(0, steps - 1) * PHYSICS_TIMESTEP * speed
+    const after = steps * PHYSICS_TIMESTEP * speed
+    const blend = stepBlendOf(carried, PHYSICS_TIMESTEP)
+    return { elapsed, steps, blend, drawn: before + (after - before) * blend }
+  })
 }
 
 /** Plays the trip with render frames of `fps`, stepping the authority once per fixed step. */
@@ -108,5 +144,42 @@ describe('fixed-step clock', () => {
     expect(at144.digest).toBe(at30.digest)
     expect(at144.events).toEqual(at30.events)
     expect(at30.events.filter((event) => event.type === 'TileDestroyed')).toHaveLength(3)
+  })
+
+  it('counts the same steps and carry on plain numbers as on the clock', () => {
+    let clock: FixedStepClock = NEW_FIXED_STEP_CLOCK
+    let carried = 0
+    for (const frameSeconds of jitteredFrames(144, 0.002, 500)) {
+      const next = stepsForFrame(clock, frameSeconds, PHYSICS_TIMESTEP, MAX_STEPS)
+      const steps = countFrameSteps(carried, frameSeconds, PHYSICS_TIMESTEP, MAX_STEPS)
+      carried = carryPastFrameSteps(carried, frameSeconds, PHYSICS_TIMESTEP, steps)
+      clock = next.clock
+      expect(steps).toBe(next.steps)
+      expect(carried).toBe(clock.carried)
+    }
+  })
+
+  it.each([
+    [60, 0.0015],
+    [59.94, 0.0015],
+    [75, 0.001],
+    [120, 0.001],
+    [144, 0.0005],
+  ])(
+    'draws a body at constant speed one step behind its true place on every frame at %s Hz',
+    (hz, jitterSeconds) => {
+      const speed = 6
+      const frames = drawnPositions(jitteredFrames(hz, jitterSeconds, Math.round(hz * 3)), speed)
+      for (const frame of frames.slice(Math.ceil(hz / 10))) {
+        expect(frame.blend).toBeGreaterThanOrEqual(0)
+        expect(frame.blend).toBeLessThanOrEqual(1)
+        expect(frame.drawn).toBeCloseTo((frame.elapsed - PHYSICS_TIMESTEP) * speed, 6)
+      }
+    },
+  )
+
+  it('blends by the share of a step the frame carries past its last step', () => {
+    expect(stepBlendOf(0, PHYSICS_TIMESTEP)).toBe(0)
+    expect(stepBlendOf(PHYSICS_TIMESTEP / 2, PHYSICS_TIMESTEP)).toBeCloseTo(0.5, 12)
   })
 })

@@ -1,17 +1,20 @@
 /**
  * The vehicle's Rapier body under React: created once in the R3F physics world, driven once per
- * fixed step by the vehicle controller, and drawn by copying the body's transform onto a group
- * each frame (presentation only; nothing per-frame reaches React state), shifted by the dock
- * building's staging (#170 auto-roll) and turned about its own up axis on a turntable (#180), which
- * never moves or turns the body.
+ * fixed step by the vehicle controller, and drawn each frame between its pose before and after
+ * the last step by the step blend, so it glides on every frame instead of jumping on the frames
+ * that complete a step (presentation only; nothing per-frame reaches React state). The drawn car
+ * is shifted by the dock building's staging (#170 auto-roll) and turned about its own up axis on a
+ * turntable (#180), which never moves or turns the body.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { useFrame } from '@react-three/fiber'
 import { useBeforePhysicsStep, useRapier } from '@react-three/rapier'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import type { Group } from 'three'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Quaternion, Vector3, type Group } from 'three'
+import { BODY_DRAW_FRAME_PRIORITY } from '../constants/physics'
 import { turnedWidthShareOf } from '../systems/render/stagedTurn'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
+import { stepBlend } from './stepBlend'
 import {
   createVehicleBody,
   createVehicleController,
@@ -40,6 +43,18 @@ interface MountedVehicle {
   controller: VehicleController
 }
 
+/** A body transform in three's terms: the pose a step starts from, or scratch for the latest. */
+interface DrawnPose {
+  position: Vector3
+  quaternion: Quaternion
+}
+
+/** The two poses a frame draws the body between, kept for the body's life (no per-frame allocation). */
+interface StepPoses {
+  stepStart: DrawnPose
+  latest: DrawnPose
+}
+
 export function VehicleBody({
   startPose,
   onFixedStep,
@@ -50,10 +65,12 @@ export function VehicleBody({
   const { world, rapier } = useRapier()
   const group = useRef<Group>(null)
   const [mounted, setMounted] = useState<MountedVehicle | null>(null)
+  const poses = useMemo(createStepPoses, [])
 
   useEffect(() => {
     const body = createVehicleBody(rapier, world, startPose)
     const controller = createVehicleController(rapier, world, body)
+    readBodyPose(body, poses.stepStart)
     setMounted({ body, controller })
     return () => {
       controller.dispose()
@@ -63,29 +80,58 @@ export function VehicleBody({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [world, rapier])
 
+  // Read after the controller, so a tow or travel placement starts the step where it lands.
   useBeforePhysicsStep(() => {
-    if (mounted !== null) onFixedStep(mounted.controller)
+    if (mounted === null) return
+    onFixedStep(mounted.controller)
+    readBodyPose(mounted.body, poses.stepStart)
   })
 
   useFrame(() => {
     if (mounted !== null && group.current !== null)
-      copyBodyTransform(mounted.body, group.current, presence, stage)
-  })
+      drawBetweenSteps(mounted.body, poses, group.current, presence, stage)
+  }, BODY_DRAW_FRAME_PRIORITY)
 
   return <group ref={group}>{mounted === null ? null : children(mounted.controller)}</group>
 }
 
-function copyBodyTransform(
+function createStepPoses(): StepPoses {
+  return { stepStart: createDrawnPose(), latest: createDrawnPose() }
+}
+
+function createDrawnPose(): DrawnPose {
+  return { position: new Vector3(), quaternion: new Quaternion() }
+}
+
+function readBodyPose(body: RAPIER.RigidBody, into: DrawnPose): void {
+  const position = body.translation()
+  const rotation = body.rotation()
+  into.position.set(position.x, position.y, 0)
+  into.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w)
+}
+
+function drawBetweenSteps(
   body: RAPIER.RigidBody,
+  poses: StepPoses,
   group: Group,
   presence: { x: number; y: number },
   stage: DrawStaging,
-) {
-  const position = body.translation()
-  const rotation = body.rotation()
-  presence.x = position.x + stage.drawOffsetX
-  presence.y = position.y + stage.drawOffsetY
-  group.position.set(presence.x, presence.y, 0)
-  group.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w)
+): void {
+  readBodyPose(body, poses.latest)
+  blendStepPoses(poses.stepStart, poses.latest, group)
+  stageDrawnCar(group, stage)
+  presence.x = group.position.x
+  presence.y = group.position.y
+}
+
+/** The body's place and turn `stepBlend.share` of the way through the last step. */
+function blendStepPoses(stepStart: DrawnPose, latest: DrawnPose, group: Group): void {
+  group.position.lerpVectors(stepStart.position, latest.position, stepBlend.share)
+  group.quaternion.slerpQuaternions(stepStart.quaternion, latest.quaternion, stepBlend.share)
+}
+
+function stageDrawnCar(group: Group, stage: DrawStaging): void {
+  group.position.x += stage.drawOffsetX
+  group.position.y += stage.drawOffsetY
   group.scale.x = turnedWidthShareOf(stage.rotation)
 }

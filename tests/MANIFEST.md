@@ -784,7 +784,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/cellRandom.test.ts` | 6 | 6 |
 | `src/systems/displayAmount.test.ts` | 43 | 16 |
 | `src/systems/fastForward.test.ts` | 4 | 4 |
-| `src/systems/fixedStepClock.test.ts` | 3 | 3 |
+| `src/systems/fixedStepClock.test.ts` | 10 | 6 |
 | `src/systems/globalSheetGuard.test.ts` | 5 | 5 |
 | `src/systems/money.test.ts` | 47 | 35 |
 | `src/systems/scenario.test.ts` | 18 | 18 |
