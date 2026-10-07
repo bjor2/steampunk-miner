@@ -53,6 +53,8 @@ function activateDrainAt(state: AuthorityState, origin: TilePoint) {
     slot: 'powerup.1',
     tick: ACT_TICK,
     origin,
+    mark: 0,
+    magnitude: null,
   })
 }
 

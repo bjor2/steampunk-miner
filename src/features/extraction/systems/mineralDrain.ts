@@ -2,6 +2,8 @@
  * The mineral drain's act (#162 extractors table, 2.1 channel, 4.2 and 4.5): once its 60-tick
  * channel ends with the miner still, the nearest drainable ore cells within its radius fade to
  * plain ground, half of their ore goes to the hold, and the trip counter moves by what it paid.
+ * The cells per use are the use's magnitude, the drain's ladder at the Mark researched (#249); a
+ * use that carries none takes the #162 base.
  *
  * Nothing changes and nothing is spent (power-up-core returns the charge) when:
  * - the trip is at its cap, or the first cell would pay past it: `extraction.drain_capped`;
@@ -71,7 +73,7 @@ function drainSceneOf(state: AuthorityState, params: PlanetParams, use: PowerUpU
     reachTiles: balanceOf(item).reachTiles,
   })
   const take = takeDrainCells(reach.drainable, {
-    maxCells: balanceOf(item).cellsPerUse,
+    maxCells: use.magnitude ?? balanceOf(item).cellsPerUse,
     room: roomUnderCapOf(trip.incomeItemValue, cap),
     holdRoom: statsOfVehicle(vehicle).cargoCapacity - cargoUnitsOf(vehicle.cargo),
     yieldShare: EXTRACTION_ECONOMY.income.yieldShare,

@@ -1,8 +1,8 @@
 /**
  * The mineral drain as `power-up-core` runs it (#162 2.1, 4.2): a channel of two charges that
  * refill at the dock, a 900-tick cooldown and a 60-tick hold, during which moving cancels it and
- * returns the charge. Marks take effect in play in a `power-up-core` follow-up (the GD lock on
- * #204 Q7), so every use acts at its Mark 1 numbers.
+ * returns the charge. These are the Mark 1 numbers: power-up-core steps them with the drain's
+ * ladder at the Mark researched (#249), and hands the use its cells per use as the magnitude.
  */
 import type { PowerUp } from '../../power-up-core'
 import { balanceOf, type ExtractionItem } from './extractionItems'
