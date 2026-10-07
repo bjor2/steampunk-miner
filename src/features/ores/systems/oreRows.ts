@@ -3,7 +3,7 @@
  * files and refused whole when broken, so a bad row fails at load with every problem listed.
  *
  * - `ores.economy.json`: the rarity lead weights per band, the signature value lead and share caps,
- *   and the catalogue knobs. #140 writes the weights as fractions (`plus1` 0.05); they are stored
+ *   and the variants per family. #140 writes the weights as fractions (`plus1` 0.05); they are stored
  *   in basis points so the generation hook rolls them in integers and no fraction collides with
  *   the economy source scan.
  * - `oreFamilies.json`: #141's 12 families in its table order. A family's place in the list is its
@@ -30,8 +30,6 @@ export interface LeadWeights {
 
 export interface CatalogueKnobs {
   variantsPerFamily: number
-  echoEvery: number
-  echoFrom: number
 }
 
 export interface OreRows {
@@ -132,9 +130,9 @@ function signatureCapProblems(caps: Raw | undefined): string[] {
 }
 
 function catalogueProblems(catalogue: Raw | undefined): string[] {
-  return (['variantsPerFamily', 'echoEvery', 'echoFrom'] as const)
-    .filter((knob) => !isWhole(catalogue?.[knob], 1))
-    .map((knob) => `ore.catalogue.${knob} must be a whole number from 1`)
+  return isWhole(catalogue?.variantsPerFamily, 1)
+    ? []
+    : ['ore.catalogue.variantsPerFamily must be a whole number from 1']
 }
 
 function isWhole(value: unknown, from: number): value is number {

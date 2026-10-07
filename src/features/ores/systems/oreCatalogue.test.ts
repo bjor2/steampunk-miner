@@ -51,9 +51,9 @@ describe('ore catalogue', () => {
     })
   })
 
-  it('keeps the echo at 0 through tier 125 and adds 1 every 25 tiers from 126', () => {
-    expect(CAMPAIGN_TIERS.map((tier) => echoOf(tier)).every((echo) => echo === 0)).toBe(true)
-    expect([125, 126, 150, 151, 176].map((tier) => echoOf(tier))).toEqual([0, 1, 1, 2, 3])
+  it("echoes on #151's locked rule: 0 below tier 97, then 1 more every 24 tiers", () => {
+    expect([96, 97, 120, 121].map(echoOf)).toEqual([0, 1, 1, 2])
+    expect([1, 124, 145, 169].map(echoOf)).toEqual([0, 2, 3, 4])
   })
 
   it('puts tier 3(p-1) + b + lead under band b of planet p', () => {

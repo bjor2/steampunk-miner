@@ -14,7 +14,7 @@ describe('ore catalogue data', () => {
         leadWeightsBpByBand: { plus1: [9000, 600, 700, 800, 900], plus2: [2000, 0, 100, 200, 300] },
         signatureValueLead: -1,
         signatureShareCapBpByBand: { '3': 600 },
-        catalogue: { variantsPerFamily: 0, echoEvery: 25, echoFrom: 126 },
+        catalogue: { variantsPerFamily: 0 },
       },
     }
     const families = {

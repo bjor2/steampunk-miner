@@ -4,11 +4,14 @@
  * and hardness read the tier alone (`oreSalePrice`, `oreHardness` in the kernel's oreEconomy).
  *
  *   t(p, b, lead) = 3(p-1) + b + lead        id `<family>_t<t>`        name `<gradeName> <familyName>`
- *   variant = (t-1) mod 4                    echo = t < 126 ? 0 : floor((t-126)/25) + 1
+ *   variant = (t-1) mod 4                    echo = t < 97 ? 0 : floor((t-97)/24) + 1
  *
  * Grades are #151's (`oreGrades` [4, 12, 30, 70]: Raw, Lustrous, Crystal, Lumen, Aether), read
  * from the kernel's `oreGrade`, the one reader of those thresholds. Vertical: the tier axis, the
  * grades and the echo. Both: the catalogue as a new thing to see.
+ *
+ * The echo is #151's locked `visualEcho`, the one echo rule (GD and TD locks on #146): it starts at
+ * the alien boundary (t 97, P33) and steps every 8 planets, so #140's own t 126 rule is retired.
  */
 import { oreTier } from '../../../systems/economy/oreEconomy'
 import { oreGradeNameOf, oreGradeOf } from '../../../systems/render/oreGrade'
@@ -25,15 +28,18 @@ export interface CatalogueOre {
   grade: number
   /** The family's look slot, 0 to `variantsPerFamily - 1`; neighbouring tiers never share one. */
   variant: number
-  /** 0 through the campaign; past it the strength input #151's look keeps climbing on. */
+  /** 0 below t 97, then +1 every 24 tiers: the strength input #151's look climbs on. */
   echo: number
 }
 
 const FIRST_TIER = 1
+/** #151 `visualEcho`: the first echoed tier and the tiers per step (8 planets of 3). */
+const ECHO_FROM_TIER = 97
+const TIERS_PER_ECHO = 24
 
 /** The type of a family at a tier: its id, name and the look inputs #151 reads. */
 export function oreTypeOf(familyId: string, tier: number, rows: OreRows = ORE_ROWS): CatalogueOre {
-  const family = familyOfId(familyId, rows)
+  const family = oreFamilyNamed(familyId, rows)
   assertTier(tier)
   return {
     id: `${family.id}_t${tier}`,
@@ -42,7 +48,7 @@ export function oreTypeOf(familyId: string, tier: number, rows: OreRows = ORE_RO
     tier,
     grade: gradeOf(tier),
     variant: variantOf(tier, rows),
-    echo: echoOf(tier, rows),
+    echo: echoOf(tier),
   }
 }
 
@@ -59,9 +65,8 @@ export function variantOf(tier: number, rows: OreRows = ORE_ROWS): number {
   return (tier - FIRST_TIER) % rows.catalogue.variantsPerFamily
 }
 
-export function echoOf(tier: number, rows: OreRows = ORE_ROWS): number {
-  const { echoFrom, echoEvery } = rows.catalogue
-  return tier < echoFrom ? 0 : Math.floor((tier - echoFrom) / echoEvery) + 1
+export function echoOf(tier: number): number {
+  return tier < ECHO_FROM_TIER ? 0 : Math.floor((tier - ECHO_FROM_TIER) / TIERS_PER_ECHO) + 1
 }
 
 /** The basis points of band `b`'s ore that roll a +1 or a +2 lead (#140 `leadWeights`). */
@@ -81,7 +86,8 @@ export function familyOfCellCode(cellCode: number, rows: OreRows = ORE_ROWS): Or
   return rows.families.find((family) => family.cellCode === cellCode) ?? null
 }
 
-function familyOfId(familyId: string, rows: OreRows): OreFamily {
+/** The family row of an id; throws for an id the catalogue does not list. */
+export function oreFamilyNamed(familyId: string, rows: OreRows = ORE_ROWS): OreFamily {
   const family = rows.families.find((row) => row.id === familyId)
   if (family === undefined) throw new RangeError(`no ore family "${familyId}" in the catalogue`)
   return family
