@@ -202,6 +202,11 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   on the move too once its vehicle was destroyed on that planet; travel resets that. A run with no
   death plays as before, and a fatal dive no longer replays after every tow (`bot/botCombat.test.ts`,
   in the band-1 corridor).
+- **Bot retreat** (#216): when no band the casing holds pays a trip, the bot widens the shallowest
+  held band whose galleries ended at their reach by another reach; broke with a tank below what a
+  tow leaves (#8), it strands itself off the pad for the tow. A run that never meets the dead end
+  plays as before. `bot/botRetreat.test.ts` bores band 1 out at grade 1, wrecks the vehicle and
+  empties the wallet, then plays on from there with `playSliceFrom`.
 - **Comparison** (`compareRuns`): `npm run balance:report` prints each seed's row and the median,
   writes the first seed's run to `balance-report/` and compares it with
   `tests/balance/bot-slice.summary.json`; differences are numbers, never failures. After a
