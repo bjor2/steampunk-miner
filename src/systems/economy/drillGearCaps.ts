@@ -45,7 +45,13 @@ export interface DrillGearAsk {
 
 /** The drill gear one player's drill cuts with, after the caps. */
 export interface DrillGear {
+  /** Cells past the bit on a diagonal bearing: every ask's. */
   aheadCells: number
+  /**
+   * Cells past the bit along the facing: only asks the drive does not aim (the reach boom), so the
+   * twin bit with no side pushed cuts as the bare drill (TD lock on #280). Never over `aheadCells`.
+   */
+  facingAheadCells: number
   aheadAim: AheadAim
   sideCells: number
   sideEnergyShareBp: number
@@ -55,18 +61,20 @@ export interface DrillGear {
 
 /**
  * The largest ask of each kind wins (gear never stacks), the ahead cells held to the cap and the
- * side share never under the floor. One ask aiming by the drive aims every ahead cell by it. null
- * when no ask adds a cell: the drill cuts as before.
+ * side share never under the floor. One ask aiming by the drive aims every ahead cell by it, but a
+ * drive-aimed ask cuts ahead only on a diagonal. null when no ask adds a cell: the drill cuts as
+ * before.
  */
 export function foldDrillGear(
   asks: readonly DrillGearAsk[],
   caps: DrillGearCaps,
 ): DrillGear | null {
-  const aheadCells = Math.min(caps.aheadCellsMax, largestCellsOf(asks.map((ask) => ask.aheadCells)))
+  const aheadCells = aheadCellsOf(asks, caps)
   const sideCells = largestCellsOf(asks.map((ask) => ask.sideCells))
   if (aheadCells === 0 && sideCells === 0) return null
   return {
     aheadCells,
+    facingAheadCells: aheadCellsOf(asks.filter(isFacingAimed), caps),
     aheadAim: aheadAimOf(asks),
     sideCells,
     sideEnergyShareBp: sideEnergyShareOf(asks, caps),
@@ -96,7 +104,15 @@ export function aheadEnergyShareOf(gear: DrillGear, bearing: AheadBearing): numb
   return bearing === 'facing' ? BASIS_POINTS : gear.diagonalEnergyShareBp
 }
 
-/** The drive aims the ahead cells when any ask lets it; the twin bit with drive 0 cuts along the facing. */
+function aheadCellsOf(asks: readonly DrillGearAsk[], caps: DrillGearCaps): number {
+  return Math.min(caps.aheadCellsMax, largestCellsOf(asks.map((ask) => ask.aheadCells)))
+}
+
+function isFacingAimed(ask: DrillGearAsk): boolean {
+  return ask.aheadAim !== 'drive'
+}
+
+/** The drive aims the ahead cells when any ask lets it; with drive 0 the bearing stays the facing. */
 function aheadAimOf(asks: readonly DrillGearAsk[]): AheadAim {
   return asks.some((ask) => ask.aheadAim === 'drive') ? 'drive' : 'facing'
 }

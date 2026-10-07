@@ -8,7 +8,9 @@
  * The twin bit's diagonal (GD lock on #257, ticket 279) replaces the ahead cell with the one 45
  * degrees to a side; it runs the same `canMine`, takes its own full hardness and is never listed
  * beside the bore. Gear aimed by the drive takes its bearing from the reported drive side, latched
- * per cell (`aheadBearingLatch.ts`); the read hands the latch back for the vehicle to keep.
+ * per cell (`aheadBearingLatch.ts`); the read hands the latch back for the vehicle to keep. Such
+ * gear cuts ahead only on a diagonal: with no side pushed the twin bit cuts as the bare drill (TD
+ * lock on #280), and only facing-aimed gear (the reach boom) cuts past the bit along the facing.
  *
  * Energy: the disc charges its ticks as before. Each listed cell charges its own ticks at the
  * drill's rate, an ahead cell at `aheadEnergyShareBp` (a whole share along the facing, the side
@@ -20,7 +22,7 @@
  * charged.
  */
 import { BASIS_POINTS } from '../../constants/balance'
-import { aheadEnergyShareOf, type DrillGear } from '../economy/drillGearCaps'
+import { aheadEnergyShareOf, type AheadBearing, type DrillGear } from '../economy/drillGearCaps'
 import { drillGearOf } from '../registries/drillGear'
 import { latchAheadBearing, type AheadLatch, type DrillBit } from '../vehicle/aheadBearingLatch'
 import { drillGearCellsAt } from '../vehicle/drillGearCells'
@@ -100,7 +102,8 @@ export function drillGearReadAt(
   const isUncut = (tile: TilePoint) => canMine(tile) && !isTileYielded(state.world, tile)
   const aheadLatch = aheadLatchOf(state, playerId, gear, bit, isUncut)
   const aheadBearing = aheadLatch?.bearing ?? 'facing'
-  const cells = drillGearCellsAt(bit.pose, bit.disc, { ...gear, aheadBearing })
+  const aheadCells = aheadCellsOn(gear, aheadBearing)
+  const cells = drillGearCellsAt(bit.pose, bit.disc, { ...gear, aheadCells, aheadBearing })
   return {
     aheadCells: cells.ahead.filter(canMine),
     aheadEnergyShareBp: aheadEnergyShareOf(gear, aheadBearing),
@@ -108,6 +111,11 @@ export function drillGearReadAt(
     sideEnergyShareBp: gear.sideEnergyShareBp,
     aheadLatch,
   }
+}
+
+/** A drive-aimed ask cuts ahead only on a diagonal; along the facing only the others do (#280). */
+function aheadCellsOn(gear: DrillGear, bearing: AheadBearing): number {
+  return bearing === 'facing' ? gear.facingAheadCells : gear.aheadCells
 }
 
 /** The bearing latched for this cut when the drive aims the ahead cells; else none. */

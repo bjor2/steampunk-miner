@@ -40,6 +40,7 @@ describe('drill gear caps', () => {
     )
     expect(gear).toEqual({
       aheadCells: 1,
+      facingAheadCells: 1,
       aheadAim: 'facing',
       sideCells: 1,
       sideEnergyShareBp: 12000,
@@ -59,6 +60,29 @@ describe('drill gear caps', () => {
     expect(gear?.aheadCells).toBe(1)
     expect(gear?.aheadAim).toBe('drive')
     expect(foldDrillGear([twinBit, reachBoom], CAPS)).toEqual(gear)
+  })
+
+  it('cuts ahead along the facing only for asks the drive does not aim', () => {
+    const twinBit = { aheadCells: 1, aheadAim: 'drive' } as const
+    expect(foldDrillGear([twinBit], CAPS)?.facingAheadCells).toBe(0)
+    expect(foldDrillGear([{ aheadCells: 3 }], CAPS)?.facingAheadCells).toBe(1)
+    expect(foldDrillGear([twinBit, { aheadCells: 1 }], CAPS)?.facingAheadCells).toBe(1)
+  })
+
+  it('never cuts more ahead along the facing than on a diagonal', () => {
+    const asks = [
+      [{ aheadCells: 1, aheadAim: 'drive' }],
+      [{ aheadCells: 2 }],
+      [
+        { aheadCells: 1, aheadAim: 'drive' },
+        { aheadCells: 4, aheadAim: 'facing' },
+      ],
+      [{ sideCells: 1 }],
+    ] as const
+    for (const ask of asks) {
+      const gear = foldDrillGear(ask, CAPS)!
+      expect(gear.facingAheadCells).toBeLessThanOrEqual(gear.aheadCells)
+    }
   })
 
   it('aims the ahead cells along the facing unless an ask lets the drive aim them', () => {

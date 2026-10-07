@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import type { AheadBearing, DrillGearAsk } from '../economy/drillGearCaps'
+import { NO_TICKS, reportPoseIntent } from '../bot/botPose'
 import { stepOfMajor } from '../economy/upgradeSteps'
 import type { GateOutcome } from '../registries/gateChecks'
 import { drillGearCellsAt, type DrillGearReach } from '../vehicle/drillGearCells'
@@ -108,6 +109,30 @@ function drillWith(
       spent: before - session.vehicle().energy,
       digest: stateDigest(session.state()),
     }
+  })
+}
+
+/** The bot's reports down the column from just above `TARGET`: a few short drills on each row. */
+const DESCENT_ROWS = 4
+const DESCENT_REPORTS_PER_ROW = 6
+const DESCENT_DRILL_TICKS = 12
+
+/** Each report's events as the bot drills straight down, its drive the one it sends (`botPose`). */
+function botDescentWith(slices: readonly SliceDefinition[]): DomainEvent[][] {
+  return withRegistrations(slices, () => {
+    const session = createScriptedSession()
+    const reports: DomainEvent[][] = []
+    let tick = 1
+    for (let row = 0; row < DESCENT_ROWS; row++) {
+      const tile = { tx: TARGET.tx, ty: TARGET.ty + 1 - row }
+      session.submit(tick, reportPoseIntent(tile, FACING.down))
+      for (let report = 0; report < DESCENT_REPORTS_PER_ROW; report++) {
+        tick += DESCENT_DRILL_TICKS
+        const ticks = { ...NO_TICKS, drillTicks: DESCENT_DRILL_TICKS }
+        reports.push(session.submit(tick, reportPoseIntent(tile, FACING.down, ticks)))
+      }
+    }
+    return reports
   })
 }
 
@@ -288,11 +313,19 @@ describe('drill gear cut', () => {
   it('a side push of 0.4 while drilling down cuts straight down', () => {
     const plain = drillWith([])
     const twin = drillWith([TWIN_BIT], TARGET, FACING.down, [], pushingSide(signOfPush(0.4)))
-    const straight = cellBesideStraight(0)
-    expect(densityOf(twin.world, straight)).toBeLessThan(densityOf(plain.world, straight))
-    for (const dx of [-1, 1]) {
-      expect(densityOf(twin.world, cellBesideStraight(dx))).toBe(FULL_CELL)
+    expect(twin.events).toEqual(plain.events)
+    expect(twin.spent).toBe(plain.spent)
+    for (const dx of [-1, 0, 1]) {
+      const cell = cellBesideStraight(dx)
+      expect(densityOf(twin.world, cell)).toBe(densityOf(plain.world, cell))
     }
+  })
+
+  it("cuts the bot's straight-down path tick for tick as the bare drill with the twin bit", () => {
+    const plain = botDescentWith([])
+    const twin = botDescentWith([TWIN_BIT])
+    expect(plain.flat().filter((event) => event.type === 'TileDestroyed').length).toBeGreaterThan(0)
+    expect(twin).toEqual(plain)
   })
 
   it('a side push of 0.6 while drilling down cuts diagonally on the same side', () => {
