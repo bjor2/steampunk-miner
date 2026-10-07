@@ -19,7 +19,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- | --- |
 | Pacing gates: slice band, planet 1 core and assay gate, median of the gate seeds | #84 | `src/logging/pacingGate.test.ts`, `src/logging/assayPacingGate.test.ts` | 9 |
 | Campaign scaling gate (R1): band 5 sawtooth on planets 1-7 and the schedule cadence, with the C1-C4 and H1-H2 probes | #81, #89 | `src/logging/campaignScalingGate.test.ts`, `src/logging/campaignPacingGate.test.ts`, `src/systems/economy/upgradePrices.test.ts`, `src/systems/economy/economyGrowth.test.ts`, `src/systems/economy/casingPrices.test.ts`, `src/systems/authority/casingPlacement.test.ts`, `src/systems/vehicle/bandDig.test.ts`, `src/logging/sawtoothMedian.test.ts`, `src/systems/bot/botCoreRule.test.ts`, `src/logging/pacingReport.test.ts`, `src/systems/unlocks/readUnlockSchedule.test.ts`, `src/systems/unlocks/travelUnlocks.test.ts`, `src/systems/unlocks/scheduleCadence.test.ts`, `src/systems/authority/featureUnlocks.test.ts`, `npm run balance:planets` | 110 |
-| Balance guards, reported against the committed baseline or a control run | #84, #105, #107, #109, #113 | `npm run balance:report`, `npm run balance:planets`, `npm run balance:guns`, `npm run balance:charges`, `npm run balance:refinery`, `npm run balance:heat` | - |
+| Balance guards, reported against the committed baseline or a control run | #84, #105, #107, #109, #113, #198 | `npm run balance:report`, `npm run balance:planets`, `npm run balance:guns`, `npm run balance:charges`, `npm run balance:refinery`, `npm run balance:heat` | - |
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 9 |
 | Every ore family has a gateClass row | #141, #142 | not built yet (#148) | - |
 | Endless signature coverage, planets 41-65 | #148 | not built yet (#148) | - |
@@ -297,6 +297,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botCombat.test.ts` | 3 | 3 |
 | `src/systems/bot/botCoreGalleries.test.ts` | 3 | 2 |
 | `src/systems/bot/botCoreRule.test.ts` | 5 | 5 |
+| `src/systems/bot/botDeathReplay.test.ts` | 8 | 8 |
 | `src/systems/bot/botGuns.test.ts` | 4 | 4 |
 | `src/systems/bot/botHeat.test.ts` | 9 | 9 |
 | `src/systems/bot/botMoneyLint.test.ts` | 6 | 3 |
@@ -304,6 +305,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/botRetreat.test.ts` | 9 | 9 |
 | `src/systems/bot/botShopping.test.ts` | 6 | 6 |
 | `src/systems/bot/botSlicePurchases.test.ts` | 6 | 6 |
+| `src/systems/bot/botWallet.test.ts` | 3 | 3 |
 | `src/systems/bot/chargePayoff.test.ts` | 5 | 5 |
 | `src/systems/bot/chargeSizeTrade.test.ts` | 4 | 4 |
 | `src/systems/bot/endlessPlanning.test.ts` | 6 | 3 |
@@ -388,6 +390,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/logging/attritionReport.test.ts` | 6 | 6 |
 | `src/logging/bandDigReport.test.ts` | 5 | 5 |
 | `src/logging/benchmarkResult.test.ts` | 4 | 4 |
 | `src/logging/campaignScalingGate.test.ts` | 9 | 9 |
