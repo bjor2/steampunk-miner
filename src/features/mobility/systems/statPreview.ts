@@ -41,7 +41,6 @@ const MAGNITUDE_LINES: Readonly<Record<MobilityItemId, MagnitudeLine | null>> = 
 }
 
 const PERCENT_OF_BASIS_POINTS = 100
-const PERCENT_OF_PER_MILLE = 10
 const CONSUMABLE = /^consumable\./
 
 /** The item's lines at `mark`, its price last; none for an id this lane does not own. */
@@ -93,7 +92,12 @@ function markLinesOf(itemId: string, ladder: MarkLadder, mark: number): StatPrev
 function cooldownLineOf(ladder: MarkLadder, stats: MarkStats): StatPreviewLine[] {
   if (stats.cooldown === undefined) return []
   if (ladder.charges === undefined) {
-    return [{ label: 'Energy draw (% of tank a second)', value: percentOfPerMille(stats.cooldown) }]
+    return [
+      {
+        label: 'Energy draw (% of tank a second)',
+        value: valueInUnit(stats.cooldown, 'basisPoints'),
+      },
+    ]
   }
   return [{ label: 'Cooldown (s)', value: secondsOf(stats.cooldown) }]
 }
@@ -124,8 +128,4 @@ function valueInUnit(amount: number, unit: Unit): Money {
 
 function secondsOf(ticks: number): Money {
   return div(fromSafeInteger(ticks), fromSafeInteger(TICKS_PER_SECOND))
-}
-
-function percentOfPerMille(perMille: number): Money {
-  return div(fromSafeInteger(perMille), fromSafeInteger(PERCENT_OF_PER_MILLE))
 }

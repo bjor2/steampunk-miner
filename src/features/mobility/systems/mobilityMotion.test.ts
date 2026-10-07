@@ -24,8 +24,9 @@ import { mobilityOf } from './mobilitySection'
 const motionOf = (session: ScriptedSession, tick: number) =>
   vehicleMotionAt(session.state(), 'p1', tick)
 
-const drawPerTick = (session: ScriptedSession, perMille: number) =>
-  Math.ceil((energyMaxQuantaOf(session.vehicle()) * perMille) / (1000 * TICKS_PER_SECOND))
+/** The draw over one second: energyMax x bp / 10 000, exactly (ticket 295). */
+const drawPerSecond = (session: ScriptedSession, drawBp: number) =>
+  (energyMaxQuantaOf(session.vehicle()) * drawBp) / 10_000
 
 describe('mobility motion: bursts and ballast', () => {
   it('lightens the miner for 300 ticks after the ballast drops, its lift and drive capped', () => {
@@ -80,14 +81,14 @@ describe('mobility motion: toggles', () => {
   })
 
   it.each([
-    [MOBILITY_ITEM.gravAnchor, 10],
-    [MOBILITY_ITEM.buoyancyTanks, 15],
-  ])('drains %s at %i thousandths of the tank a second while on', (itemId, perMille) => {
+    [MOBILITY_ITEM.gravAnchor, 100],
+    [MOBILITY_ITEM.buoyancyTanks, 150],
+  ])('drains %s at %i bp of the tank a second while on', (itemId, drawBp) => {
     const session = sessionWith({ 'powerup.1': itemId })
     session.submit(10, press())
     const full = session.vehicle().energy
     session.advanceTo(10 + TICKS_PER_SECOND)
-    expect(full - session.vehicle().energy).toBe(TICKS_PER_SECOND * drawPerTick(session, perMille))
+    expect(full - session.vehicle().energy).toBe(drawPerSecond(session, drawBp))
   })
 
   it('switches the toggle off at an empty tank, and its effect with it', () => {

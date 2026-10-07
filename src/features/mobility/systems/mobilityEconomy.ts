@@ -7,6 +7,9 @@
  * the grapple's aim cone is G&V's 20° as its tangent (0.364), the winch holds the miner at the
  * hook for `reelHoldTicks` and a reel that never arrives lets go after `reelTicksMax`, and a burst asks for the engine's top speed plus the kernel's +2000 bp cap
  * (`speedShareBp`), which the kernel holds it to anyway.
+ *
+ * The toggles' draws stay in the file in ‰ a second (#162 4.4's 1.0% and 1.5%) and are read ×10
+ * into basis points, the unit of `power-up-core`'s draw contract (ticket 295).
  */
 import {
   createFieldReader,
@@ -100,7 +103,7 @@ export interface SmokeNumbers {
 }
 
 export interface ToggleNumbers {
-  drawPerMillePerSecond: number
+  drawBpPerSecond: number
 }
 
 export interface MobilityEconomy {
@@ -116,6 +119,8 @@ export interface MobilityEconomy {
   buoyancy: ToggleNumbers
   escapeThruster: EscapeThrusterNumbers
 }
+
+const BP_PER_MILLE = 10
 
 export const MOBILITY_ECONOMY: MobilityEconomy = loadMobilityEconomy(MOBILITY_ECONOMY_FILE)
 
@@ -168,8 +173,8 @@ export function readMobilityEconomy(
       'windowTicks',
       'detectionScaleBp',
     ]),
-    gravAnchor: integers('gravAnchor', ['drawPerMillePerSecond']),
-    buoyancy: integers('buoyancy', ['drawPerMillePerSecond']),
+    gravAnchor: toggleNumbersOf(integers('gravAnchor', ['drawPerMillePerSecond'])),
+    buoyancy: toggleNumbersOf(integers('buoyancy', ['drawPerMillePerSecond'])),
     escapeThruster: integers('escapeThruster', [
       'stack',
       'windupTicks',
@@ -199,6 +204,10 @@ function readPrices(reader: FieldReader, raw: unknown): MobilityPrices {
 
 function bandCostOf(reader: FieldReader, band: number, name: string, oreUnits: unknown) {
   return readBandOreCost(reader, `mobility.prices.${name}`, { band, oreUnits })
+}
+
+function toggleNumbersOf(file: { drawPerMillePerSecond: number }): ToggleNumbers {
+  return { drawBpPerSecond: file.drawPerMillePerSecond * BP_PER_MILLE }
 }
 
 /** Whole numbers from 0, one per field. */

@@ -17,7 +17,8 @@ import { powerUpAtMarkOf } from './powerUpMarks'
 import { slotButtonsOf } from './slotColumn'
 import { intentToUseSlot } from './slotUse'
 import type { PowerUp } from './powerUpKind'
-import { toggleDrawQuantaOf } from './toggleDraw'
+import { tickDrawOf, toggleDrawQuantaOf } from './toggleDraw'
+import { lastMarkOf, markLadderOfItem, markStepOf } from '../../tech-tree'
 
 // Marks in play (#249, #162 4.6) on the loaded slices: the mobility lane's steam boost (charged:
 // 3 charges, a 240-tick cooldown, a 30-tick burst; unlocked at P12, a Mark every 3 planets) and
@@ -55,13 +56,34 @@ function usedLinesOf(session: ScriptedSession) {
   return session.events().filter((event) => event.type === 'power-up-core.PowerUpUsed')
 }
 
+/** A toggle's draw in bp a second at each of its Marks, Mark 1 first. */
+function marksOf(powerUp: PowerUp): number[] {
+  const ladder = markLadderOfItem(powerUp.itemId)
+  if (ladder === null) return [powerUp.energyDrawBpPerSecond]
+  const marks = Array.from({ length: lastMarkOf(ladder) }, (_, index) => index + 1)
+  return marks.map(
+    (mark) => markStepOf(ladder, mark).stats.cooldown ?? powerUp.energyDrawBpPerSecond,
+  )
+}
+
+/** The quanta the toggle draw takes over `ticks`, one tick at a time with the carried remainder. */
+function drawnOver(ticks: number, energyMaxQuanta: number, drawBp: number): number {
+  let draw = { quanta: 0, remainder: 0 }
+  let total = 0
+  for (let tick = 0; tick < ticks; tick += 1) {
+    draw = tickDrawOf(energyMaxQuanta, drawBp, draw.remainder)
+    total += draw.quanta
+  }
+  return total
+}
+
 describe('power-up marks in play', () => {
   it('reads every registered power-up researched none of at its own numbers, so nothing moves before Mark 2', () => {
     const state = createScriptedSession().state()
-    const numbersOf = ({ charges, cooldownTicks, energyDrawPerMillePerSecond }: PowerUp) => ({
+    const numbersOf = ({ charges, cooldownTicks, energyDrawBpPerSecond }: PowerUp) => ({
       charges,
       cooldownTicks,
-      energyDrawPerMillePerSecond,
+      energyDrawBpPerSecond,
     })
     contentOf('power-up').forEach((powerUp) => {
       const asBought = powerUpAtMarkOf(state, 'p1', powerUp.itemId)!
@@ -134,16 +156,31 @@ describe('power-up marks in play', () => {
   })
 
   it("draws a toggle's energy at its Mark's rate and logs the Mark it switched on at", () => {
-    // Mark 3 (P38) draws 8 thousandths a second (10 x 0.92 x 0.92), against Mark 1's 10.
-    const drawQuantaAt = (perMille: number, energyMax: number) =>
-      Math.ceil((energyMax * perMille) / (1000 * 60))
+    // Mark 3 (P38) draws 85 bp a second (100 x 0.92 x 0.92, rounded), against Mark 1's 100: 5.1
+    // quanta a tick on the level-0 tank, so 10 s take exactly 3060 (ticket 295).
     const { session, submit } = fieldSession(GRAV_ANCHOR)
     submit(2, researchThrough(38))
     submit(PRESS_TICK, intentToUseSlot('powerup.1'))
     const energyMax = energyMaxQuantaOf(session.vehicle())
-    expect(drawQuantaAt(8, energyMax)).toBeLessThan(drawQuantaAt(10, energyMax))
-    expect(toggleDrawQuantaOf(session.state(), 'p1')).toBe(drawQuantaAt(8, energyMax))
+    expect(powerUpAtMarkOf(session.state(), 'p1', GRAV_ANCHOR)?.energyDrawBpPerSecond).toBe(85)
+    expect(toggleDrawQuantaOf(session.state(), 'p1')).toBe(Math.floor((energyMax * 85) / 600_000))
+    const before = session.vehicle().energy
+    session.advanceTo(PRESS_TICK + 600)
+    expect(before - session.vehicle().energy).toBe((energyMax * 85 * 10) / 10_000)
     expect(usedLinesOf(session)).toMatchObject([{ itemId: GRAV_ANCHOR, mark: 3, toggledOn: true }])
+  })
+
+  it('draws exactly rate x 600 over 600 s at every Mark of every registered drawing toggle', () => {
+    const toggles = contentOf('power-up').filter((powerUp) => powerUp.energyDrawBpPerSecond > 0)
+    const ENERGY_MAX = 36_000
+    const drawnAt = (drawBp: number) => drawnOver(600 * 60, ENERGY_MAX, drawBp)
+    const rows = toggles.flatMap((powerUp) =>
+      marksOf(powerUp).map((drawBp) => [drawBp, drawnAt(drawBp)]),
+    )
+    expect(toggles.length).toBeGreaterThan(0)
+    expect(rows).toEqual(
+      rows.map(([drawBp]) => [drawBp, (ENERGY_MAX * (drawBp as number) * 600) / 10_000]),
+    )
   })
 
   it('shows the Mark, the Mark’s pips and its cooldown ring on the slot column', () => {

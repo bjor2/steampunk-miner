@@ -61,5 +61,5 @@ function steppedPowerUpOf(powerUp: PowerUp, mark: number, step: MarkStep): Marke
 /** A toggle's ladder carries its energy draw where a charged item's carries its cooldown (#162 4.6). */
 function steppedCooldownOf(powerUp: PowerUp, cooldown: number | undefined): Partial<PowerUp> {
   if (cooldown === undefined) return {}
-  return powerUp.isToggle ? { energyDrawPerMillePerSecond: cooldown } : { cooldownTicks: cooldown }
+  return powerUp.isToggle ? { energyDrawBpPerSecond: cooldown } : { cooldownTicks: cooldown }
 }

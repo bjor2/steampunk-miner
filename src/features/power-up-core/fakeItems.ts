@@ -38,7 +38,7 @@ export const FAKE = {
 } as const
 
 /** The drawing toggle's draw: 1.5% of `energyMax` a second, the buoyancy tanks' (#162 4.4). */
-export const FAKE_DRAW_PER_MILLE = 15
+export const FAKE_DRAW_BP = 150
 
 /** The cell a downward-facing fake aims at is a tier-9 drill gate. */
 export const FAKE_GATE = { cellTier: 9, gateKind: 'drill_tier' } as const
@@ -56,7 +56,7 @@ interface FakeNumbers {
   windupTicks: number
   channelTicks: number
   isToggle: boolean
-  energyDrawPerMillePerSecond: number
+  energyDrawBpPerSecond: number
 }
 
 const FAKE_NUMBERS: Readonly<Record<string, FakeNumbers>> = {
@@ -66,7 +66,7 @@ const FAKE_NUMBERS: Readonly<Record<string, FakeNumbers>> = {
   [FAKE.toggle]: numbers('passive', { isToggle: true }),
   [FAKE.drawingToggle]: numbers('passive', {
     isToggle: true,
-    energyDrawPerMillePerSecond: FAKE_DRAW_PER_MILLE,
+    energyDrawBpPerSecond: FAKE_DRAW_BP,
   }),
   [FAKE.extractor]: numbers('extractor', {}),
 }
@@ -108,7 +108,7 @@ function numbers(powerUpClass: PowerUpClass, values: Partial<FakeNumbers>): Fake
     windupTicks: 0,
     channelTicks: 0,
     isToggle: false,
-    energyDrawPerMillePerSecond: 0,
+    energyDrawBpPerSecond: 0,
   }
   return { ...none, ...values, powerUpClass }
 }

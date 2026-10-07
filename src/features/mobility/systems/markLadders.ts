@@ -3,7 +3,7 @@
  * Mark 1 is the item as bought, and every Mark steps cooldown, then magnitude, then charges, until
  * all are capped and the item is Mastered. Charged items step all three; consumables step their
  * magnitude and stack; the toggles step their energy draw (#162 4.6: "energy draw ×0.92, floor
- * 0.5×", carried in the ladder's cooldown) and have no magnitude. None moves ore, so none takes
+ * 0.5×", carried in bp in the ladder's cooldown) and have no magnitude. None moves ore, so none takes
  * the income limits.
  *
  * Each magnitude is the stat #162 4.2 and 4.3 name: the grapple's range in tiles, the rivet
@@ -23,8 +23,8 @@ export const MARK_LADDERS: Readonly<Record<MobilityItemId, MarkLadder>> = {
   [MOBILITY_ITEM.rivetPatch]: consumable(N.rivetPatch.stack, N.rivetPatch.hullShareBp),
   [MOBILITY_ITEM.steamShield]: charged(N.steamShield, N.steamShield.windowTicks),
   [MOBILITY_ITEM.smokeCanister]: consumable(N.smoke.stack, N.smoke.windowTicks),
-  [MOBILITY_ITEM.gravAnchor]: toggle(N.gravAnchor.drawPerMillePerSecond),
-  [MOBILITY_ITEM.buoyancyTanks]: toggle(N.buoyancy.drawPerMillePerSecond),
+  [MOBILITY_ITEM.gravAnchor]: toggle(N.gravAnchor.drawBpPerSecond),
+  [MOBILITY_ITEM.buoyancyTanks]: toggle(N.buoyancy.drawBpPerSecond),
   [MOBILITY_ITEM.escapeThruster]: consumable(N.escapeThruster.stack, N.escapeThruster.burstTicks),
 }
 
@@ -48,6 +48,6 @@ function consumable(stack: number, magnitude: number): MarkLadder {
   return { isIncomeItem: false, magnitude: { base: magnitude }, charges: stack }
 }
 
-function toggle(drawPerMillePerSecond: number): MarkLadder {
-  return { isIncomeItem: false, cooldown: drawPerMillePerSecond }
+function toggle(drawBpPerSecond: number): MarkLadder {
+  return { isIncomeItem: false, cooldown: drawBpPerSecond }
 }

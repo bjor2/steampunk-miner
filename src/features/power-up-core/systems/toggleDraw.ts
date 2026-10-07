@@ -1,7 +1,9 @@
 /**
  * Toggles that draw energy (#162 section 4.4, the GD lock on #204 Q3 a, ticket 233): every tick
  * an active vehicle has a drawing toggle switched on in a slot, the tank loses the toggles' share
- * of `energyMax` a second, as whole quanta a tick rounded up so a draw is never missed. The tank
+ * of `energyMax` a second in basis points (ticket 295, the TD lock on #205's draw unit). A tick
+ * takes the whole quanta owed and carries the fraction to the next, so the summed draw over any
+ * span is the rate times the span, never rounded up and never lost. The tank
  * then follows the kernel's energy rules, the same as after thrust: the low-energy lines, and a
  * strand at zero outside the pad, with no special case. At zero every drawing toggle switches
  * off, logged as the `PowerUpUsed {toggledOn: false}` a switch-off press logs.
@@ -22,7 +24,14 @@ import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
 import { slotHoldingItem } from '../../../systems/vehicle/loadoutState'
 import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
 import { energyMaxQuantaOf, type VehicleState } from '../../../systems/vehicle/vehicleState'
-import { powerUpStateOf, withPowerUpState, withToggle, type PowerUpState } from './chargeState'
+import {
+  drawRemainderOf,
+  powerUpStateOf,
+  withDrawRemainder,
+  withPowerUpState,
+  withToggle,
+  type PowerUpState,
+} from './chargeState'
 import { powerUpUsedOf } from './powerUpEvents'
 import { powerUpOfItem } from './powerUpKind'
 import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
@@ -39,7 +48,14 @@ interface DrawingToggle {
   slot: LoadoutSlotId
 }
 
-const PER_MILLE = 1000
+/** A tick's draw owes `energyMax x bp` in these parts of a quantum: 10 000 bp a second. */
+const DRAW_PARTS_PER_QUANTUM = 10_000 * TICKS_PER_SECOND
+
+/** The whole quanta a tick takes, and the parts of a quantum it leaves owed to the next. */
+export interface TickDraw {
+  quanta: number
+  remainder: number
+}
 
 function nextDrawTick(state: AuthorityState): number | null {
   const isDrawing = playerIdsOf(state).some(
@@ -84,7 +100,7 @@ function drawingToggleOf(
 ): DrawingToggle | null {
   const powerUp = powerUpOfItem(itemId)
   const slot = slotHoldingItem(vehicle.loadout, itemId)
-  if (powerUp === null || slot === null || powerUp.energyDrawPerMillePerSecond === 0) return null
+  if (powerUp === null || slot === null || powerUp.energyDrawBpPerSecond === 0) return null
   return { powerUp: atResearchedMark(state, playerId, powerUp), slot }
 }
 
@@ -96,7 +112,23 @@ function drawingToggleOf(
 export function toggleDrawQuantaOf(state: AuthorityState, playerId: string): number {
   const drawing = drawingTogglesOf(state, playerId)
   if (drawing.length === 0) return 0
-  return drawQuantaPerTickOf(vehicleOf(state, playerId), drawing)
+  return playerTickDrawOf(state, playerId, drawing).quanta
+}
+
+/**
+ * The tick's draw of `energyMax` at `drawBpPerSecond`, with the parts owed from the last tick: the
+ * whole quanta now and the rest carried, so N ticks draw exactly N x energyMax x bp / 600 000.
+ */
+export function tickDrawOf(
+  energyMaxQuanta: number,
+  drawBpPerSecond: number,
+  remainder: number,
+): TickDraw {
+  const owed = energyMaxQuanta * drawBpPerSecond + remainder
+  return {
+    quanta: Math.floor(owed / DRAW_PARTS_PER_QUANTUM),
+    remainder: owed % DRAW_PARTS_PER_QUANTUM,
+  }
 }
 
 function drainTank(
@@ -105,17 +137,26 @@ function drainTank(
   drawing: readonly DrawingToggle[],
 ): AuthorityState {
   const vehicle = vehicleOf(state, playerId)
-  const energy = Math.max(0, vehicle.energy - drawQuantaPerTickOf(vehicle, drawing))
-  return withVehicle(state, playerId, { ...vehicle, energy })
+  const draw = playerTickDrawOf(state, playerId, drawing)
+  const energy = Math.max(0, vehicle.energy - draw.quanta)
+  const value = withDrawRemainder(powerUpStateOf(state, playerId), draw.remainder)
+  return withPowerUpState(withVehicle(state, playerId, { ...vehicle, energy }), playerId, value)
 }
 
-/** The toggles' draw a tick in quanta: `energyMax` times the per-mille rate, rounded up. */
-function drawQuantaPerTickOf(vehicle: VehicleState, drawing: readonly DrawingToggle[]): number {
-  const perMille = drawing.reduce(
-    (sum, toggle) => sum + toggle.powerUp.energyDrawPerMillePerSecond,
-    0,
+function playerTickDrawOf(
+  state: AuthorityState,
+  playerId: string,
+  drawing: readonly DrawingToggle[],
+): TickDraw {
+  return tickDrawOf(
+    energyMaxQuantaOf(vehicleOf(state, playerId)),
+    drawBpPerSecondOf(drawing),
+    drawRemainderOf(powerUpStateOf(state, playerId)),
   )
-  return Math.ceil((energyMaxQuantaOf(vehicle) * perMille) / (PER_MILLE * TICKS_PER_SECOND))
+}
+
+function drawBpPerSecondOf(drawing: readonly DrawingToggle[]): number {
+  return drawing.reduce((sum, toggle) => sum + toggle.powerUp.energyDrawBpPerSecond, 0)
 }
 
 function switchOffWhenEmpty(

@@ -28,7 +28,7 @@ type PowerUpRules = Pick<
   | 'cooldownTicks'
   | 'windupTicks'
   | 'isToggle'
-  | 'energyDrawPerMillePerSecond'
+  | 'energyDrawBpPerSecond'
   | 'activate'
   | 'holdOf'
 >
@@ -46,8 +46,8 @@ const RULES: Readonly<Record<MobilityItemId, PowerUpRules>> = {
   },
   [MOBILITY_ITEM.steamShield]: charged(N.steamShield, raiseSteamShield),
   [MOBILITY_ITEM.smokeCanister]: consumable(N.smoke, burstSmokeCanister),
-  [MOBILITY_ITEM.gravAnchor]: toggle(N.gravAnchor.drawPerMillePerSecond),
-  [MOBILITY_ITEM.buoyancyTanks]: toggle(N.buoyancy.drawPerMillePerSecond),
+  [MOBILITY_ITEM.gravAnchor]: toggle(N.gravAnchor.drawBpPerSecond),
+  [MOBILITY_ITEM.buoyancyTanks]: toggle(N.buoyancy.drawBpPerSecond),
   [MOBILITY_ITEM.escapeThruster]: consumable(N.escapeThruster, fireEscapeThruster),
 }
 
@@ -83,11 +83,11 @@ function consumable(
   return rulesOf('consumable', numbers.stack, 0, numbers.windupTicks, activate)
 }
 
-function toggle(drawPerMillePerSecond: number): PowerUpRules {
+function toggle(drawBpPerSecond: number): PowerUpRules {
   return {
     ...rulesOf('passive', 0, 0, 0, switchToggle),
     isToggle: true,
-    energyDrawPerMillePerSecond: drawPerMillePerSecond,
+    energyDrawBpPerSecond: drawBpPerSecond,
   }
 }
 
@@ -104,7 +104,7 @@ function rulesOf(
     cooldownTicks,
     windupTicks,
     isToggle: false,
-    energyDrawPerMillePerSecond: 0,
+    energyDrawBpPerSecond: 0,
     activate,
   }
 }

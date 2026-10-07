@@ -89,11 +89,12 @@ export interface PowerUp extends ContentEntry {
   /** A passive that flips on and off from its slot; a passive that is not is on while owned. */
   isToggle: boolean
   /**
-   * A toggle's draw while on, in thousandths of `energyMax` a second (#162 section 4.4: the grav
-   * anchor's 1.0%/s is 10); 0 for everything else. The tank empties as thrust empties it, and an
+   * A toggle's draw while on, in basis points of `energyMax` a second (#162 section 4.4: the grav
+   * anchor's 1.0%/s is 100; integer bp is the TD lock on #205's draw unit, ticket 295, and ‰ is
+   * display only); 0 for everything else. The tank empties as thrust empties it, and an
    * empty tank switches the toggle off (the GD lock on #204 Q3 a, ticket 233).
    */
-  energyDrawPerMillePerSecond: number
+  energyDrawBpPerSecond: number
   /** Called when the wind-up or channel ends; for a toggle, only when it turns on. */
   activate(state: AuthorityState, use: PowerUpUse): PowerUpOutcome
   /** The player's hold running now, read from the slice's section; absent for an item with none. */
@@ -148,11 +149,11 @@ export function powerUpProblems(powerUp: PowerUp): string[] {
   ]
 }
 
-function energyDrawProblems({ id, isToggle, energyDrawPerMillePerSecond: draw }: PowerUp) {
+function energyDrawProblems({ id, isToggle, energyDrawBpPerSecond: draw }: PowerUp) {
   if (!Number.isSafeInteger(draw) || draw < 0) {
-    return [`${id} draws ${draw} per mille a second, not a whole number from 0`]
+    return [`${id} draws ${draw} bp a second, not a whole number from 0`]
   }
-  return isToggle || draw === 0 ? [] : [`${id} is no toggle but draws ${draw} per mille a second`]
+  return isToggle || draw === 0 ? [] : [`${id} is no toggle but draws ${draw} bp a second`]
 }
 
 const CHARGE_CLASSES: readonly PowerUpClass[] = ['charged', 'channel', 'consumable']

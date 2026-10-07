@@ -28,12 +28,12 @@ describe('power-up kind', () => {
 
   it('refuses an energy draw on anything but a toggle, and one that is not a whole number', () => {
     const fake = withRegistrations([slice, FAKE_ITEMS], LOADED)[0]
-    expect(powerUpProblems({ ...fake, energyDrawPerMillePerSecond: 10 })).toEqual([
-      `${fake.id} is no toggle but draws 10 per mille a second`,
+    expect(powerUpProblems({ ...fake, energyDrawBpPerSecond: 100 })).toEqual([
+      `${fake.id} is no toggle but draws 100 bp a second`,
     ])
-    const toggle = { ...fake, isToggle: true, energyDrawPerMillePerSecond: 1.5 }
+    const toggle = { ...fake, isToggle: true, energyDrawBpPerSecond: 1.5 }
     expect(powerUpProblems(toggle)).toEqual([
-      `${fake.id} draws 1.5 per mille a second, not a whole number from 0`,
+      `${fake.id} draws 1.5 bp a second, not a whole number from 0`,
     ])
   })
 })

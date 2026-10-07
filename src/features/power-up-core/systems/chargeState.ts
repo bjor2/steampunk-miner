@@ -39,6 +39,12 @@ export interface PowerUpState {
   pending: PendingUse | null
   /** Toggle passives switched on, sorted. */
   toggledOn: readonly string[]
+  /**
+   * The toggle draw owed but not yet a whole quantum, in quanta / (10 000 x ticks a second)
+   * (ticket 295), so a draw over many ticks is exactly its rate. Absent at 0: a draw of whole
+   * quanta a tick, every item's today, never writes it, and the digest stays as it was.
+   */
+  drawRemainder?: number
 }
 
 export const NO_POWER_UPS: PowerUpState = { items: {}, pending: null, toggledOn: [] }
@@ -109,6 +115,15 @@ export function withToggle(value: PowerUpState, itemId: string, isOn: boolean): 
   return { ...value, toggledOn: isOn ? [...others, itemId].sort(compareIds) : others }
 }
 
+export function drawRemainderOf(value: PowerUpState): number {
+  return value.drawRemainder ?? 0
+}
+
+export function withDrawRemainder(value: PowerUpState, remainder: number): PowerUpState {
+  const { drawRemainder: _replaced, ...others } = value
+  return remainder === 0 ? others : { ...others, drawRemainder: remainder }
+}
+
 export function withPending(value: PowerUpState, pending: PendingUse | null): PowerUpState {
   return { ...value, pending }
 }
@@ -131,7 +146,13 @@ function powerUpStateProblems(body: unknown): string[] {
     ...itemsProblems(body.items),
     ...pendingProblems(body.pending),
     ...(isTextList(body.toggledOn) ? [] : ['power-up-core.toggledOn must be a list of item ids']),
+    ...drawRemainderProblems(body.drawRemainder),
   ]
+}
+
+function drawRemainderProblems(remainder: unknown): string[] {
+  if (remainder === undefined || isWholeNumber(remainder)) return []
+  return ['power-up-core.drawRemainder must be a whole number']
 }
 
 function itemsProblems(items: unknown): string[] {

@@ -4,10 +4,10 @@ import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import type { ScriptedSession } from '../../../systems/authority/scriptedSession'
 import { energyMaxQuantaOf } from '../../../systems/vehicle/vehicleState'
-import { FAKE, FAKE_DRAW_PER_MILLE, inField } from '../fakeItems'
+import { FAKE, FAKE_DRAW_BP, inField } from '../fakeItems'
 import { isToggledOn, powerUpStateOf } from './chargeState'
 import { intentToUseSlot } from './slotUse'
-import { toggleDrawQuantaOf } from './toggleDraw'
+import { tickDrawOf, toggleDrawQuantaOf } from './toggleDraw'
 
 // A toggle's energy draw (#162 section 4.4, the GD lock on #204 Q3 a, ticket 233): a share of
 // energyMax a second while on, an empty tank strands the vehicle as thrust does, and switches
@@ -23,9 +23,9 @@ const setEnergy = (units: string): CommandIntent => ({
 
 const energyOf = (session: ScriptedSession) => session.vehicle().energy
 
-/** The fake's draw a tick: 1.5% of the level-0 tank a second, 9 quanta at 60 ticks a second. */
+/** The fake's draw a tick: 150 bp of the level-0 tank a second, 9 quanta at 60 ticks a second. */
 const drawPerTick = (session: ScriptedSession) =>
-  Math.ceil((energyMaxQuantaOf(session.vehicle()) * FAKE_DRAW_PER_MILLE) / 60_000)
+  (energyMaxQuantaOf(session.vehicle()) * FAKE_DRAW_BP) / 600_000
 
 const ofType = (events: readonly DomainEvent[], type: string) =>
   events.filter((event) => event.type === type)
@@ -86,6 +86,13 @@ describe('toggle energy draw', () => {
     })
   })
 
+  it('writes no remainder into the section while a tick draws whole quanta, so the digest keeps', () => {
+    withDrawingToggleOn((session) => {
+      session.advanceTo(ON_TICK + 600)
+      expect(powerUpStateOf(session.state(), 'p1')).not.toHaveProperty('drawRemainder')
+    })
+  })
+
   it('drains the same stepping one tick at a time or jumping the clock', () => {
     const energyAfter = (stride: number) =>
       withDrawingToggleOn((session) => {
@@ -95,5 +102,39 @@ describe('toggle energy draw', () => {
         return { energy: energyOf(session), events: session.events() }
       })
     expect(energyAfter(1)).toEqual(energyAfter(120))
+  })
+})
+
+describe('toggle draw in basis points', () => {
+  /** 10 000 bp of energyMax a second at 60 ticks a second: a tick owes energyMax x bp / 600 000. */
+  const PARTS_PER_QUANTUM = 600_000
+
+  const drawnOver = (ticks: number, energyMaxQuanta: number, drawBp: number) => {
+    let draw = { quanta: 0, remainder: 0 }
+    let total = 0
+    for (let tick = 0; tick < ticks; tick += 1) {
+      draw = tickDrawOf(energyMaxQuanta, drawBp, draw.remainder)
+      total += draw.quanta
+    }
+    return { total, remainder: draw.remainder }
+  }
+
+  it('takes whole quanta a tick and carries the fraction, never rounding a tick up', () => {
+    // #205's auger at 30 bp/s on the level-0 tank owes 1.8 quanta a tick.
+    expect(tickDrawOf(36_000, 30, 0)).toEqual({ quanta: 1, remainder: 480_000 })
+    expect(tickDrawOf(36_000, 30, 480_000)).toEqual({ quanta: 2, remainder: 360_000 })
+  })
+
+  it('draws exactly the rate times the span over 600 s, at a sub-per-mille rate', () => {
+    expect(drawnOver(600 * 60, 36_000, 30)).toEqual({
+      total: (36_000 * 30 * 600) / 10_000,
+      remainder: 0,
+    })
+  })
+
+  it('loses no part of a quantum on a tank whose rate is no whole number a tick', () => {
+    const owed = 37_440 * 85 * 600 * 60
+    const drawn = drawnOver(600 * 60, 37_440, 85)
+    expect(drawn.total * PARTS_PER_QUANTUM + drawn.remainder).toBe(owed)
   })
 })
