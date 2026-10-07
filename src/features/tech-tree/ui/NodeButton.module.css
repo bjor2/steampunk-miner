@@ -11,6 +11,9 @@
   color: var(--color-parchment);
   font: inherit;
   cursor: pointer;
+  /* A held node opens its card (#161 section 4), so no text selection or callout covers it. */
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .node:focus-visible {

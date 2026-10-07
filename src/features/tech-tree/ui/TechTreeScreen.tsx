@@ -1,7 +1,8 @@
 /**
  * The tech tree screen (#165, spec #161 section 4), drawn by the kernel's slice screen slot:
  * the controls, the "next up" strip, then the zoom level's view, the campaign map, one lane's
- * cards or one node's card. Escape or Back closes it.
+ * cards or one node's card. Escape or Back closes it. The click that ends a long press on a node
+ * is swallowed here, whatever the opened card put under the finger.
  */
 import type { ScreenProps } from '../../../ui/registries/screens'
 import type { NodeCardModel } from '../systems/nodeCardModel'
@@ -9,6 +10,7 @@ import type { TechNodeLane } from '../systems/techNode'
 import type { TreeScreenModel } from '../systems/treeScreenModel'
 import { useTreeScreenStore, type TreeZoom } from '../store/treeScreenStore'
 import { LaneFocus } from './LaneFocus'
+import { forgetHoldOnNewPress, keepMenuOffAfterHold, swallowClickAfterHold } from './nodeCardHold'
 import { LaneMap } from './LaneMap'
 import { NextUpStrip } from './NextUpStrip'
 import { NodeCardView } from './NodeCardView'
@@ -43,7 +45,14 @@ export function TechTreeScreenView({
   onDismiss: () => void
 }) {
   return (
-    <div className={styles.screen} data-testid="tech-tree-screen" data-zoom={view.zoom}>
+    <div
+      className={styles.screen}
+      data-testid="tech-tree-screen"
+      data-zoom={view.zoom}
+      onPointerDownCapture={forgetHoldOnNewPress}
+      onClickCapture={swallowClickAfterHold}
+      onContextMenuCapture={keepMenuOffAfterHold}
+    >
       <TreeHeader model={view.model} onDismiss={onDismiss} />
       <NextUpStrip cards={view.model.nextUp} />
       <ZoomView view={view} />

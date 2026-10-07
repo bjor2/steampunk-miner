@@ -227,7 +227,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/statPreview.test.ts` | 9 | 9 |
 | `src/features/sensing/visionRows.test.ts` | 5 | 5 |
 
-### `tech-tree`: 18 files, 136 tests
+### `tech-tree`: 20 files, 142 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -236,6 +236,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/markLadder.test.ts` | 12 | 12 |
 | `src/features/tech-tree/systems/nodeCost.test.ts` | 6 | 6 |
+| `src/features/tech-tree/systems/nodePress.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts` | 0 | 1 |
 | `src/features/tech-tree/systems/nodeSpendShare.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/render/extractorPose.test.ts` | 5 | 5 |
@@ -248,6 +249,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/treeScreenModel.test.ts` | 10 | 10 |
 | `src/features/tech-tree/systems/treeShape.test.ts` | 13 | 13 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 19 | 19 |
+| `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
 ### `terrain-tools`: 4 files, 30 tests
