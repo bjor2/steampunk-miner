@@ -5,9 +5,9 @@ import { createRunLog } from '../../../logging/runLog'
 import { runEventProblems } from '../../../logging/runEventSchema'
 import { withRegistrations } from '../../../registries/registrar'
 import type { CommandIntent } from '../../../systems/authority/authorityCommand'
-import type { DomainEvent } from '../../../systems/authority/domainEvent'
+import type { DomainEvent, DomainEventBody } from '../../../systems/authority/domainEvent'
 import { readSnapshot, takeSnapshot } from '../../../systems/authority/sessionSnapshot'
-import type { ScriptedSession } from '../../../systems/authority/scriptedSession'
+import { GROUND, type ScriptedSession } from '../../../systems/authority/scriptedSession'
 import { fromSafeInteger, toCanonical } from '../../../systems/money'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import {
@@ -21,6 +21,7 @@ import { slice } from '../register'
 import { chargesLeftOf, isLinkOn, itemChargesOf, powerUpStateOf } from './chargeState'
 import { intentToToggleLink } from './linkToggle'
 import { powerUpAtMarkOf } from './powerUpMarks'
+import { fireSiblingLinkAt } from './siblingLink'
 import { slotButtonsOf } from './slotColumn'
 import { intentToUseSlot } from './slotUse'
 
@@ -34,7 +35,7 @@ const pressBoost = () => intentToUseSlot('powerup.1')
 
 const walletOf = (session: ScriptedSession) => toCanonical(session.state().players.p1.wallet)
 
-const linkLinesOf = (events: readonly DomainEvent[]) =>
+const linkLinesOf = (events: readonly DomainEventBody[]) =>
   events.filter((event) => event.type === 'power-up-core.LinkFired')
 
 function ballastChargesOf(session: ScriptedSession): number {
@@ -102,6 +103,28 @@ describe('power-up core: sibling-link', () => {
       const halfMagnitude = Math.floor((ballast.magnitude as number) / 2)
       expect(walletOf(session)).toBe(toCanonical(fromSafeInteger(1 + halfMagnitude)))
     })
+  })
+
+  it('fires the link of an item with its own moment then, never on its act', () => {
+    inLinkField(
+      (session) => {
+        const stack = ballastChargesOf(session)
+        const acted = session.submit(PRESS_TICK, pressBoost())
+        expect(linkLinesOf(acted)).toEqual([])
+        expect(ballastChargesOf(session)).toBe(stack)
+        const moment = { playerId: 'p1', itemId: LINKED.curtain, tick: 40, origin: GROUND }
+        const fired = fireSiblingLinkAt(session.state(), moment)
+        expect(linkLinesOf(fired.events)).toMatchObject([
+          { itemId: LINKED.curtain, siblingId: LINKED.ballast, slot: 'powerup.2' },
+        ])
+        expect(chargesLeftOf(fired.state, 'p1', LINKED.ballast)).toBe(stack - 1)
+        expect(itemChargesOf(powerUpStateOf(fired.state, 'p1'), LINKED.ballast)).toMatchObject({
+          readyAtTick: 40 + BALLAST_COOLDOWN_TICKS,
+          linkedAtTick: 40,
+        })
+      },
+      { slots: { 'powerup.1': LINKED.curtain, 'powerup.2': LINKED.ballast } },
+    )
   })
 
   it('stops the flash after half a second, while the cooldown ring runs on', () => {

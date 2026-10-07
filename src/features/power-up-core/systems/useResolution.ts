@@ -181,7 +181,7 @@ function effectOfOutcome(
   return settleAct(outcome.effect, playerId, powerUp, pending, tick)
 }
 
-/** The item's own act first, then its sibling-link fires its sibling (ticket 274). */
+/** The item's own act first, then its sibling-link fires its sibling (ticket 274), on the act. */
 function settleAct(
   effect: RuleEffect,
   playerId: string,
@@ -190,7 +190,7 @@ function settleAct(
   tick: number,
 ): RuleEffect {
   const acted = finishActed(effect, playerId, powerUp, pending, tick)
-  return withSiblingLink(acted, powerUpUseOf(playerId, pending, tick, powerUp))
+  return withSiblingLink(acted, powerUpUseOf(playerId, pending, tick, powerUp), powerUp)
 }
 
 /** Nothing to act on: the charge comes back and no cooldown starts. */

@@ -22,6 +22,7 @@ export { chargesLeftOf, type FollowUpPattern } from './systems/chargeState'
 export { FOLLOW_UP_WINDOW_TICKS } from './systems/followUps'
 export { powerUpAtMarkOf, type MarkedPowerUp } from './systems/powerUpMarks'
 export { returnCharge } from './systems/useResolution'
+export { fireSiblingLinkAt, type LinkMoment } from './systems/siblingLink'
 export { toggleDrawQuantaOf } from './systems/toggleDraw'
 export {
   DRILL_GEAR_SOCKETS,

@@ -12,6 +12,8 @@
  *   changes nothing and writes nothing: the item's own act and log are as if it had no link.
  * - A linked act never fires the sibling's own link, and is a plain use even when the item's act
  *   was a hold or a second tap.
+ * - An item whose link fires at a later moment than its act (`linkMoment: 'own'`, a steam shield's
+ *   break, ticket 275) fires it through `fireSiblingLinkAt` when its slice says so.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -39,6 +41,9 @@ export interface SiblingLink {
   siblingId: string
 }
 
+/** Who fires the link, and when and from where: a use as it acts, or the item's own moment. */
+export type LinkMoment = Pick<PowerUpUse, 'playerId' | 'itemId' | 'tick' | 'origin'>
+
 interface SlottedPowerUp {
   slot: PowerUpSlot
   powerUp: PowerUp
@@ -62,11 +67,27 @@ export function reachedSiblingLinkOf(
   return { itemId, siblingId: milestone.siblingId }
 }
 
-/** After the item acted: its link fires the sibling, appending the sibling's effect and log. */
-export function withSiblingLink(acted: RuleEffect, use: PowerUpUse): RuleEffect {
-  const link = liveSiblingLinkOf(acted.state, use.playerId, use.itemId)
+/**
+ * After the item acted: its link fires the sibling, appending the sibling's effect and log. An item
+ * whose link fires at its own moment (`linkMoment: 'own'`) leaves the act as it is.
+ */
+export function withSiblingLink(acted: RuleEffect, use: PowerUpUse, powerUp: PowerUp): RuleEffect {
+  if (powerUp.linkMoment === 'own') return acted
+  return withLinkFiredAt(acted, use)
+}
+
+/**
+ * The item's link fired at a moment its slice names (`linkMoment: 'own'`), such as a steam
+ * shield's break: the same rules as on an act, at the moment's tick and from its origin.
+ */
+export function fireSiblingLinkAt(state: AuthorityState, moment: LinkMoment): RuleEffect {
+  return withLinkFiredAt(unchanged(state), moment)
+}
+
+function withLinkFiredAt(acted: RuleEffect, moment: LinkMoment): RuleEffect {
+  const link = liveSiblingLinkOf(acted.state, moment.playerId, moment.itemId)
   if (link === null) return acted
-  const fired = fireSiblingLink(acted.state, use, link)
+  const fired = fireSiblingLink(acted.state, moment, link)
   return { state: fired.state, events: [...acted.events, ...fired.events] }
 }
 
@@ -80,12 +101,12 @@ function liveSiblingLinkOf(
   return link
 }
 
-function fireSiblingLink(state: AuthorityState, use: PowerUpUse, link: SiblingLink): RuleEffect {
-  const sibling = readySiblingOf(state, use, link.siblingId)
+function fireSiblingLink(state: AuthorityState, moment: LinkMoment, link: SiblingLink): RuleEffect {
+  const sibling = readySiblingOf(state, moment, link.siblingId)
   if (sibling === null) return unchanged(state)
-  const outcome = sibling.powerUp.activate(state, linkedUseOf(use, sibling))
+  const outcome = sibling.powerUp.activate(state, linkedUseOf(moment, sibling))
   if (outcome.kind !== 'acted') return unchanged(state)
-  return spendSibling(outcome.effect, use, link, sibling)
+  return spendSibling(outcome.effect, moment, link, sibling)
 }
 
 function linkMilestoneOf(ladder: MarkLadder | null): { mark: number; siblingId: string } | null {
@@ -96,14 +117,14 @@ function linkMilestoneOf(ladder: MarkLadder | null): { mark: number; siblingId: 
 
 function readySiblingOf(
   state: AuthorityState,
-  use: PowerUpUse,
+  moment: LinkMoment,
   siblingId: string,
 ): ReadySibling | null {
-  const slotted = slottedSiblingOf(vehicleOf(state, use.playerId), siblingId)
+  const slotted = slottedSiblingOf(vehicleOf(state, moment.playerId), siblingId)
   if (slotted === null) return null
-  const powerUp = atResearchedMark(state, use.playerId, slotted.powerUp)
-  const value = powerUpStateOf(state, use.playerId)
-  return isReadyToLink(value, powerUp, use.tick) ? { powerUp, slot: slotted.slot } : null
+  const powerUp = atResearchedMark(state, moment.playerId, slotted.powerUp)
+  const value = powerUpStateOf(state, moment.playerId)
+  return isReadyToLink(value, powerUp, moment.tick) ? { powerUp, slot: slotted.slot } : null
 }
 
 /** The open power-up slot a press uses that holds the item, first slot first; null for none. */
@@ -133,15 +154,17 @@ function isIdle(value: PowerUpState, powerUp: MarkedPowerUp, tick: number): bool
  * The sibling's use: from the item's origin and tick, its own slot and Mark, at link strength. It
  * is a plain use: the item's follow-up milestone (ticket 273) is the item's verb, not the sibling's.
  */
-function linkedUseOf(use: PowerUpUse, { powerUp, slot }: ReadySibling): PowerUpUse {
-  const { milestone: _itemsMilestone, ...plainUse } = use
+function linkedUseOf(moment: LinkMoment, { powerUp, slot }: ReadySibling): PowerUpUse {
+  const { playerId, tick, origin } = moment
   return {
-    ...plainUse,
+    playerId,
     itemId: powerUp.itemId,
     slot,
+    tick,
+    origin,
     mark: powerUp.mark,
     magnitude: linkStrengthOf(powerUp.magnitude),
-    linkedFrom: use.itemId,
+    linkedFrom: moment.itemId,
   }
 }
 
@@ -154,19 +177,19 @@ function linkStrengthOf(magnitude: number | null): number | null {
 /** One charge spent, the sibling's cooldown at its Mark started, its tile's flash marked. */
 function spendSibling(
   effect: RuleEffect,
-  use: PowerUpUse,
+  moment: LinkMoment,
   link: SiblingLink,
   { powerUp, slot }: ReadySibling,
 ): RuleEffect {
-  const value = powerUpStateOf(effect.state, use.playerId)
+  const value = powerUpStateOf(effect.state, moment.playerId)
   const charges = itemChargesOf(value, powerUp.itemId)
   const spent = withItemCharges(value, powerUp.itemId, {
     spent: charges.spent + 1,
-    readyAtTick: use.tick + powerUp.cooldownTicks,
-    linkedAtTick: use.tick,
+    readyAtTick: moment.tick + powerUp.cooldownTicks,
+    linkedAtTick: moment.tick,
   })
   return {
-    state: withPowerUpState(effect.state, use.playerId, spent),
-    events: [...effect.events, linkFiredOf(use.playerId, link, slot)],
+    state: withPowerUpState(effect.state, moment.playerId, spent),
+    events: [...effect.events, linkFiredOf(moment.playerId, link, slot)],
   }
 }

@@ -10,6 +10,8 @@
  *   the wallet; a gate refuses it facing down, and it finds nothing to act on facing up.
  * - The horn (charged) links to the lamp, a toggle that counts no charges.
  * - The bell (charged) links to an item that is still a vision row: never registered.
+ * - The curtain (charged) links to the ballast at a moment of its own (`linkMoment: 'own'`), as the
+ *   steam shield's break does (ticket 275): never on its act.
  */
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -44,6 +46,7 @@ export const LINKED = {
   horn: 'link-items.horn',
   lamp: 'link-items.lamp',
   bell: 'link-items.bell',
+  curtain: 'link-items.curtain',
   visionRow: 'link-items.vision_row',
 } as const
 
@@ -64,6 +67,7 @@ const LINKS: Readonly<Record<string, string>> = {
   [LINKED.boost]: LINKED.ballast,
   [LINKED.horn]: LINKED.lamp,
   [LINKED.bell]: LINKED.visionRow,
+  [LINKED.curtain]: LINKED.ballast,
 }
 
 interface LinkedNumbers {
@@ -73,12 +77,14 @@ interface LinkedNumbers {
   isToggle: boolean
   ladder: MarkLadder
   activate(state: AuthorityState, use: PowerUpUse): PowerUpOutcome
+  linkMoment?: PowerUp['linkMoment']
 }
 
 const LINKED_NUMBERS: Readonly<Record<string, LinkedNumbers>> = {
   [LINKED.boost]: charged(),
   [LINKED.horn]: charged(),
   [LINKED.bell]: charged(),
+  [LINKED.curtain]: { ...charged(), linkMoment: 'own' },
   [LINKED.ballast]: {
     powerUpClass: 'consumable',
     charges: 3,

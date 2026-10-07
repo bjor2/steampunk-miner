@@ -111,6 +111,12 @@ export interface PowerUp extends ContentEntry {
   activate(state: AuthorityState, use: PowerUpUse): PowerUpOutcome
   /** The player's hold running now, read from the slice's section; absent for an item with none. */
   holdOf?(state: AuthorityState, playerId: string): SlotHold | null
+  /**
+   * When the item's sibling-link fires (ticket 274): on its act (`'act'`, also when left out), or
+   * at a later moment its own slice names through `fireSiblingLinkAt` (`'own'`), as the steam
+   * shield's break fires its smoke puff (the GD lock on #256).
+   */
+  linkMoment?: 'act' | 'own'
 }
 
 declare module '../../../systems/registries/content' {
