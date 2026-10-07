@@ -16,6 +16,8 @@ import {
 import { rackMaxSlotLevel } from '../economy/blastingCharges'
 import { buyChargeRackSlotCommand, restockChargesCommand } from '../platform/platformCommands'
 import { emptyRackSlotsOf, rackCapacityOf, type VehicleCharges } from '../vehicle/vehicleCharges'
+import { KERNEL_ITEMS } from '../registries/kernelItems'
+import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { UI_IDS } from './screenIds'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
@@ -33,6 +35,8 @@ export interface ChargeRow {
   /** A padlock before the rack is bolted on; a star on the Rack row at its top size. */
   badge: RowBadge
   isBuyOpen: boolean
+  /** The kernel item card this row draws as, compact (K7 #199). */
+  card: ItemCardModel
 }
 
 export interface ChargeRows {
@@ -60,16 +64,26 @@ function restockRowOf(state: AuthorityState, playerId: string): ChargeRow {
     charges.isRackMounted ? 'Restock' : 'Buy rack',
     restockChargesCommand(),
   )
+  const cost = amountReading(restockPriceOf(state, playerId))
   return {
     iconId: BLASTING_CHARGES_ICON_ID,
     label: 'Charges',
     levelText: `${charges.carried}/${rackCapacityOf(charges)}`,
     effectText: restockEffectOf(charges),
-    cost: amountReading(restockPriceOf(state, playerId)),
+    cost,
     buy,
     buyState: buyStateOf(buy),
     badge: charges.isRackMounted ? null : 'locked',
     isBuyOpen: isBuyOpen(buy),
+    card: itemCardOf(state, playerId, {
+      item: KERNEL_ITEMS.charges,
+      iconId: BLASTING_CHARGES_ICON_ID,
+      name: 'Charges',
+      cost,
+      level: charges.carried,
+      buy,
+      source: SHOP_SOURCE,
+    }),
   }
 }
 
@@ -84,16 +98,26 @@ function rackRowOf(state: AuthorityState, playerId: string): ChargeRow {
     buyChargeRackSlotCommand(),
   )
   const capacity = rackCapacityOf(charges)
+  const cost = isTop ? null : amountReading(rackSlotPriceOf(state, playerId))
   return {
     iconId: CHARGE_RACK_ICON_ID,
     label: 'Rack',
     levelText: isTop ? `${capacity} (top)` : `${capacity} → ${capacity + 1}`,
     effectText: isTop ? `${capacity} charges` : `${capacity + 1} charges`,
-    cost: isTop ? null : amountReading(rackSlotPriceOf(state, playerId)),
+    cost,
     buy,
     buyState: buyStateOf(buy),
     badge: isTop ? 'maxed' : null,
     isBuyOpen: isBuyOpen(buy),
+    card: itemCardOf(state, playerId, {
+      item: KERNEL_ITEMS.chargeRack,
+      iconId: CHARGE_RACK_ICON_ID,
+      name: 'Rack',
+      cost,
+      level: charges.slotLevel,
+      buy,
+      source: SHOP_SOURCE,
+    }),
   }
 }
 

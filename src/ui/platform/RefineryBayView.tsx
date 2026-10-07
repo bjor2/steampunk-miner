@@ -1,7 +1,8 @@
 /**
  * The Refinery bay screen (#105): the hold's ore by tier, each with Refine and what its batch
  * pays refined against raw, then the platform's slots and the next slot's price. Collecting is
- * the Sell bay's. Markup only.
+ * the Sell bay's. The next slot is the kernel item card's platform card once a describer answers
+ * (K7 #199). Markup only.
  */
 import type {
   RefineryBayModel,
@@ -9,6 +10,7 @@ import type {
   RefinerySlotReading,
 } from '../../systems/views/refineryBayModel'
 import { panelIconIdOf } from '../../systems/art/icons/iconSet'
+import { ItemCard } from '../kit/ItemCard'
 import { Panel } from '../kit/Panel'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
@@ -39,15 +41,21 @@ export function RefineryBayView({
           {model.slots.map((slot) => (
             <SlotView key={slot.index} slot={slot} />
           ))}
-          <div className={styles.action}>
-            <ScreenButtonView button={model.buySlot} focusedId={focusedId} />
-            <span
-              data-testid={UI_IDS.refinerybaySlotPrice}
-              data-exact={model.slotPrice?.exact ?? ''}
-            >
-              {model.slotPrice?.text ?? 'All slots built'}
-            </span>
-          </div>
+          <ItemCard
+            variant="full"
+            card={model.slotCard}
+            action={<ScreenButtonView button={model.buySlot} focusedId={focusedId} />}
+          >
+            <div className={styles.action}>
+              <ScreenButtonView button={model.buySlot} focusedId={focusedId} />
+              <span
+                data-testid={UI_IDS.refinerybaySlotPrice}
+                data-exact={model.slotPrice?.exact ?? ''}
+              >
+                {model.slotPrice?.text ?? 'All slots built'}
+              </span>
+            </div>
+          </ItemCard>
         </Panel>
       </div>
     </BayFrame>

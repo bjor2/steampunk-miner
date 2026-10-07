@@ -1,0 +1,78 @@
+/*
+ * The kernel item card (K7 #199): one look on the shop row, the platform card and the tooltip.
+ * The compact row keeps the shop list's rhythm; opened, it grows into the full card in place.
+ */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px dotted rgb(201 162 75 / 0.4);
+  color: var(--color-parchment);
+}
+
+.card[data-variant='compact'] {
+  cursor: pointer;
+}
+
+/* Focus is a double frame and a pointer glyph, never colour alone (#33 section 7), as on buttons. */
+.card[data-focused] {
+  outline: 3px double var(--color-brass);
+  outline-offset: 2px;
+}
+
+.card[data-focused] > .name::before {
+  content: '\25B8\00A0';
+}
+
+.card:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: inherit;
+}
+
+.row,
+.lines,
+.costLine,
+.flavour,
+.note {
+  margin: 0;
+}
+
+.lines {
+  padding: 0;
+  list-style: none;
+}
+
+.line,
+.price {
+  font-variant-numeric: tabular-nums;
+}
+
+.change {
+  color: var(--color-teal);
+}
+
+.aside {
+  color: var(--color-brass);
+}
+
+/* #158 "State badges": only the price turns red when the wallet is short. */
+.price[data-money-short] {
+  color: var(--color-ember);
+}
+
+.flavour {
+  font-style: italic;
+}
+
+.note {
+  color: var(--color-brass);
+}

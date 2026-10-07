@@ -37,6 +37,8 @@ import {
 import { chargeButtonsOf, chargeRowsOf, type ChargeRows } from './chargeRows'
 import { gunRowOf, type GunRow } from './gunRow'
 import { liningRowOf, type LiningRow } from './liningRow'
+import { KERNEL_ITEMS } from '../registries/kernelItems'
+import { itemCardOf, serviceCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { focusOnScreen, type FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
 import { upgradePreviewOf, type UpgradePreview } from './upgradePreview'
@@ -69,12 +71,16 @@ export interface CasingRow {
   buyState: BuyState
   badge: RowBadge
   isBuyOpen: boolean
+  /** The kernel item card this row draws as, compact (K7 #199). */
+  card: ItemCardModel
 }
 
 export interface RepairReading {
   hullText: string
   button: ScreenButton
   cost: AmountReading
+  /** The service's card, a tooltip over Repair (K7 #199). */
+  card: ItemCardModel
 }
 
 export interface UpgradeBayModel {
@@ -155,29 +161,44 @@ function casingRowOf(state: AuthorityState, playerId: string): CasingRow {
     'Buy',
     buyCasingGradeCommand(),
   )
+  const cost = amountReading(nextCasingPrice(state, playerId))
   return {
     iconId: CASING_ICON_ID,
     label: 'Casing',
     grade,
     gradeAfter: grade + 1,
     gradeText: `${grade} → ${grade + 1}`,
-    cost: amountReading(nextCasingPrice(state, playerId)),
+    cost,
     buy,
     buyState: buyStateOf(buy),
     badge: null,
     isBuyOpen: isBuyOpen(buy),
+    card: itemCardOf(state, playerId, {
+      item: KERNEL_ITEMS.casing,
+      iconId: CASING_ICON_ID,
+      name: 'Casing',
+      cost,
+      level: grade,
+      buy,
+      source: SHOP_SOURCE,
+    }),
   }
 }
 
 function repairReadingOf(state: AuthorityState, playerId: string): RepairReading {
   const vehicle = state.players[playerId].vehicle
+  const iconId = buttonIconIdOf('repair')
+  const button = withIcon(
+    commandButton(state, playerId, UI_IDS.workshopRepair, 'Repair', repairHullCommand()),
+    iconId,
+  )
+  const cost = amountReading(repairCostOf(state, playerId))
+  const service = { item: KERNEL_ITEMS.repair, name: 'Repair', iconId, button, cost }
   return {
     hullText: hullGaugeText(vehicle.hull, statsOfVehicle(vehicle).hullMax),
-    button: withIcon(
-      commandButton(state, playerId, UI_IDS.workshopRepair, 'Repair', repairHullCommand()),
-      buttonIconIdOf('repair'),
-    ),
-    cost: amountReading(repairCostOf(state, playerId)),
+    button,
+    cost,
+    card: serviceCardOf(state, playerId, service),
   }
 }
 

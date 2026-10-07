@@ -15,6 +15,8 @@ import { cmp } from '../money'
 import { buyUpgradeCommand } from '../platform/platformCommands'
 import { canonicalStatsOf } from '../vehicle/vehicleStatsView'
 import { BAND_COUNT } from '../world/planetGeometry'
+import { trackItemOf } from '../registries/kernelItems'
+import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import {
   amountReading,
   commandButton,
@@ -62,6 +64,8 @@ export interface WorkshopRow {
   isBuyOpen: boolean
   /** `drill_tip` only: the deepest band of this planet its tip cuts at full speed (0: none). */
   fullSpeedBand: number | null
+  /** The kernel item card this row draws as, compact (K7 #199). */
+  card: ItemCardModel
 }
 
 const TRACK_LABELS: Readonly<Record<UpgradeId, string>> = {
@@ -111,12 +115,15 @@ function workshopRowOf(
     'Buy',
     buyUpgradeCommand(upgradeId),
   )
+  const cost = amountReading(nextUpgradePrice(state, playerId, upgradeId))
+  const iconId = trackIconIdOf(upgradeId)
+  const label = TRACK_LABELS[upgradeId]
   return {
     upgradeId,
-    iconId: trackIconIdOf(upgradeId),
-    label: TRACK_LABELS[upgradeId],
+    iconId,
+    label,
     level: levels[upgradeId],
-    cost: amountReading(nextUpgradePrice(state, playerId, upgradeId)),
+    cost,
     effectBefore: previewOf(levels, upgradeId),
     effectAfter: previewOf(next, upgradeId),
     buy,
@@ -124,6 +131,15 @@ function workshopRowOf(
     badge: null,
     isBuyOpen: isBuyOpen(buy),
     fullSpeedBand: upgradeId === 'drill_tip' ? fullSpeedBandOf(state.planet.index, levels) : null,
+    card: itemCardOf(state, playerId, {
+      item: trackItemOf(upgradeId),
+      iconId,
+      name: label,
+      cost,
+      level: levels[upgradeId],
+      buy,
+      source: SHOP_SOURCE,
+    }),
   }
 }
 

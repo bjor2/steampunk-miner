@@ -12,10 +12,10 @@ import { ARTEFACT_OPTIONS } from '../artefacts/artefactOptions'
 import type { KernelCommandType } from '../authority/authorityCommand'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { liningTypes, STANDARD_LINING_TYPE } from '../economy/heatEconomy'
-import { liningRowIdOf } from '../vehicle/liningType'
 import { BAY_IDS } from '../world/dockBays'
-import type { ItemKind, ItemRef } from './itemDescriber'
+import type { ItemRef } from './itemDescriber'
 import { generatedItemRefsOn } from './itemDescriptionEntries'
+import { artefactItemOf, bayItemOf, KERNEL_ITEMS, liningItemOf, trackItemOf } from './kernelItems'
 
 export type KernelPlayerCommandType = Exclude<KernelCommandType, `debug.${string}`>
 
@@ -35,24 +35,24 @@ export function kernelCommandBuys(): {
     dock: NOT_A_BUY,
     undock: NOT_A_BUY,
     sellCargo: NOT_A_BUY,
-    repairHull: [refOf('service', 'repair')],
-    rechargeEnergy: [refOf('service', 'recharge')],
-    quickService: [refOf('service', 'quick_service')],
-    buyUpgrade: UPGRADE_IDS.map((upgradeId) => refOf('track', upgradeId)),
-    buyCasingGrade: [refOf('module', 'casing')],
-    buyGun: [refOf('module', 'guns')],
+    repairHull: [KERNEL_ITEMS.repair],
+    rechargeEnergy: [KERNEL_ITEMS.recharge],
+    quickService: [KERNEL_ITEMS.quickService],
+    buyUpgrade: UPGRADE_IDS.map(trackItemOf),
+    buyCasingGrade: [KERNEL_ITEMS.casing],
+    buyGun: [KERNEL_ITEMS.guns],
     setGunMode: NOT_A_BUY,
-    buyLiningType: buyableLiningTypes().map((type) => refOf('module', liningRowIdOf(type))),
+    buyLiningType: buyableLiningTypes().map(liningItemOf),
     selectLiningType: NOT_A_BUY,
-    queueRefine: [refOf('service', 'refine')],
-    buyRefinerySlot: [refOf('module', 'refinery_slot')],
+    queueRefine: [KERNEL_ITEMS.refine],
+    buyRefinerySlot: [KERNEL_ITEMS.refinerySlot],
     collectRefined: NOT_A_BUY,
-    travel: [refOf('service', 'travel')],
+    travel: [KERNEL_ITEMS.travel],
     openArtefactCache: NOT_A_BUY,
-    chooseArtefact: ARTEFACT_OPTIONS.map((option) => refOf('artefact', option.id)),
+    chooseArtefact: ARTEFACT_OPTIONS.map((option) => artefactItemOf(option.id)),
     plantCharge: NOT_A_BUY,
-    restockCharges: [refOf('module', 'charges')],
-    buyChargeRackSlot: [refOf('module', 'charge_rack')],
+    restockCharges: [KERNEL_ITEMS.charges],
+    buyChargeRackSlot: [KERNEL_ITEMS.chargeRack],
     equipItem: NOT_A_BUY,
   }
 }
@@ -70,7 +70,7 @@ function kernelBuyableRefs(): readonly ItemRef[] {
   const bought = Object.values(kernelCommandBuys()).flatMap((buys) =>
     buys === NOT_A_BUY ? [] : buys,
   )
-  return [...bought, ...BAY_IDS.map((bay) => refOf('bay', bay))]
+  return [...bought, ...BAY_IDS.map(bayItemOf)]
 }
 
 function generatedRefsUpTo(maxPlanet: number): readonly ItemRef[] {
@@ -81,10 +81,6 @@ function generatedRefsUpTo(maxPlanet: number): readonly ItemRef[] {
 /** The standard lining comes with the casing; every other type is unlocked for a price (#113). */
 function buyableLiningTypes(): readonly string[] {
   return liningTypes().filter((type) => type !== STANDARD_LINING_TYPE)
-}
-
-function refOf(kind: ItemKind, id: string): ItemRef {
-  return { kind, id }
 }
 
 function uniqueRefsOf(refs: readonly ItemRef[]): ItemRef[] {

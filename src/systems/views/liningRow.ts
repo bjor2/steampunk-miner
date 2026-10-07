@@ -16,6 +16,8 @@ import {
 import { toCanonical, ZERO_MONEY } from '../money'
 import { buyLiningTypeCommand, selectLiningTypeCommand } from '../platform/platformCommands'
 import { isLiningTypeOwned, type VehicleLining } from '../vehicle/liningType'
+import { liningItemOf } from '../registries/kernelItems'
+import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { UI_IDS } from './screenIds'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
@@ -34,6 +36,8 @@ export interface LiningRow {
   /** A padlock until the type is unlocked. */
   badge: RowBadge
   isBuyOpen: boolean
+  /** The kernel item card this row draws as, compact (K7 #199). */
+  card: ItemCardModel
 }
 
 const TYPE_NAMES: Readonly<Record<string, string>> = {
@@ -53,18 +57,27 @@ export function liningRowOf(state: AuthorityState, playerId: string): LiningRow 
   if (offered === undefined) return null
   const lining = liningOf(state, playerId)
   const button = liningButtonOf(state, playerId, lining, offered)
+  const isOwned = isLiningTypeOwned(lining, offered)
+  const cost = amountReading(isOwned ? ZERO_MONEY : liningPriceOf(state, offered))
   return {
     iconId: REFRACTORY_LINING_ICON_ID,
     label: 'Lining',
     activeText: nameOf(lining.active),
     effectText: effectTextOf(offered),
-    cost: amountReading(
-      isLiningTypeOwned(lining, offered) ? ZERO_MONEY : liningPriceOf(state, offered),
-    ),
+    cost,
     button,
     buyState: buyStateOf(button),
-    badge: isLiningTypeOwned(lining, offered) ? null : 'locked',
+    badge: isOwned ? null : 'locked',
     isBuyOpen: isBuyOpen(button),
+    card: itemCardOf(state, playerId, {
+      item: liningItemOf(offered),
+      iconId: REFRACTORY_LINING_ICON_ID,
+      name: `${nameOf(offered)} lining`,
+      cost,
+      level: isOwned ? 1 : 0,
+      buy: button,
+      source: SHOP_SOURCE,
+    }),
   }
 }
 

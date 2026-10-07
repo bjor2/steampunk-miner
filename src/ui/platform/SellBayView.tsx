@@ -1,10 +1,12 @@
 /**
  * The Sell bay screen (#37): "Sell, repair and recharge" with its exact total (highlighted on the
  * first visit, #16), the shop, the refined batches once the platform has the Refinery bay (#105),
- * the visit's lining bill while there is one (#128) and the charging station. Markup only.
+ * the visit's lining bill while there is one (#128) and the charging station. The quick action
+ * carries its service's item card as a tooltip once a describer answers (K7 #199). Markup only.
  */
 import type { QuickServiceReading, SellBayModel } from '../../systems/views/sellBayModel'
 import { UI_IDS } from '../ids'
+import { ItemTooltip } from '../kit/ItemTooltip'
 import { ScreenButtonView } from '../ScreenButtonView'
 import { BayFrame } from './BayFrame'
 import { ChargingPanel } from './ChargingPanel'
@@ -38,11 +40,13 @@ function QuickServiceAction({
 }) {
   return (
     <span className={styles.action}>
-      <ScreenButtonView
-        button={quickService.button}
-        focusedId={focusedId}
-        state={quickService.isHighlighted ? 'highlighted' : undefined}
-      />
+      <ItemTooltip card={quickService.card}>
+        <ScreenButtonView
+          button={quickService.button}
+          focusedId={focusedId}
+          state={quickService.isHighlighted ? 'highlighted' : undefined}
+        />
+      </ItemTooltip>
       <span data-testid={UI_IDS.platformQuickTotal} data-exact={quickService.total.exact}>
         {quickService.total.text}
       </span>

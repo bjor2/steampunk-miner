@@ -10,6 +10,8 @@ import { GUN_ICON_ID } from '../art/artIds'
 import { gunMaxLevel, gunShotsPerSecond } from '../economy/gunStats'
 import { buyGunCommand } from '../platform/platformCommands'
 import { isGunMounted, type VehicleGun } from '../vehicle/vehicleGun'
+import { KERNEL_ITEMS } from '../registries/kernelItems'
+import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { UI_IDS } from './screenIds'
 import { amountReading, commandButton, type AmountReading, type ScreenButton } from './viewParts'
 import { buyStateOf, isBuyOpen, type BuyState, type RowBadge } from './workshopRows'
@@ -28,6 +30,8 @@ export interface GunRow {
   /** A padlock before the mount, a star at the track's top. */
   badge: RowBadge
   isBuyOpen: boolean
+  /** The kernel item card this row draws as, compact (K7 #199). */
+  card: ItemCardModel
 }
 
 const RATE_DECIMALS = 2
@@ -43,17 +47,27 @@ export function gunRowOf(state: AuthorityState, playerId: string): GunRow | null
     buyLabelOf(gun),
     buyGunCommand(),
   )
+  const cost = amountReading(nextGunPriceOf(state, playerId))
   return {
     iconId: GUN_ICON_ID,
     label: 'Guns',
     level: gun.level,
     levelText: levelTextOf(gun),
     effectText: effectTextOf(gun),
-    cost: amountReading(nextGunPriceOf(state, playerId)),
+    cost,
     buy,
     buyState: buyStateOf(buy),
     badge: badgeOf(gun),
     isBuyOpen: isBuyOpen(buy),
+    card: itemCardOf(state, playerId, {
+      item: KERNEL_ITEMS.guns,
+      iconId: GUN_ICON_ID,
+      name: 'Guns',
+      cost,
+      level: gun.level,
+      buy,
+      source: SHOP_SOURCE,
+    }),
   }
 }
 

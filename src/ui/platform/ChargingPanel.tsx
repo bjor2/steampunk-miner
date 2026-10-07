@@ -1,6 +1,10 @@
-/** Energy, the price per unit and the cost of filling the tank (#8, #33 section 6). */
+/**
+ * Energy, the price per unit and the cost of filling the tank (#8, #33 section 6); Recharge carries
+ * the service's item card as a tooltip once a describer answers (K7 #199).
+ */
 import type { ChargingPanel as Charging } from '../../systems/views/sellBayModel'
 import { panelIconIdOf } from '../../systems/art/icons/iconSet'
+import { ItemTooltip } from '../kit/ItemTooltip'
 import { Panel } from '../kit/Panel'
 import { UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
@@ -19,7 +23,9 @@ export function ChargingPanel({ charging, focusedId }: { charging: Charging; foc
         </span>
       </Field>
       <div className={styles.action}>
-        <ScreenButtonView button={charging.recharge} focusedId={focusedId} />
+        <ItemTooltip card={charging.rechargeCard}>
+          <ScreenButtonView button={charging.recharge} focusedId={focusedId} />
+        </ItemTooltip>
         <span data-testid={UI_IDS.chargingCost} data-exact={charging.cost.exact}>
           {charging.cost.text}
         </span>

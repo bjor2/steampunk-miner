@@ -23,6 +23,8 @@ import {
   type BayHeader,
   type BayUiState,
 } from './bayFrame'
+import { KERNEL_ITEMS } from '../registries/kernelItems'
+import { serviceCardOf, type ItemCardModel } from './itemCardModel'
 import type { FocusStop } from './menuFocus'
 import { UI_IDS } from './screenIds'
 import { liningPanelOf, type LiningPanel } from './liningPanel'
@@ -43,12 +45,16 @@ export interface ChargingPanel {
   price: AmountReading
   cost: AmountReading
   recharge: ScreenButton
+  /** The service's card, a tooltip over Recharge (K7 #199). */
+  rechargeCard: ItemCardModel
 }
 
 export interface QuickServiceReading {
   button: ScreenButton
   isHighlighted: boolean
   total: AmountReading
+  /** The service's card, a tooltip over the quick action (K7 #199). */
+  card: ItemCardModel
 }
 
 export interface SellBayModel {
@@ -101,14 +107,19 @@ export function selectSellBayModel(
 
 function chargingPanelOf(state: AuthorityState, playerId: string): ChargingPanel {
   const vehicle = state.players[playerId].vehicle
+  const iconId = buttonIconIdOf('recharge')
+  const cost = amountReading(rechargeCostOf(state, playerId))
+  const recharge = withIcon(
+    commandButton(state, playerId, UI_IDS.chargingRecharge, 'Recharge', rechargeEnergyCommand()),
+    iconId,
+  )
+  const service = { item: KERNEL_ITEMS.recharge, name: 'Recharge', iconId, button: recharge, cost }
   return {
     energyText: energyGaugeText(vehicle.energy, energyMaxQuantaOf(vehicle)),
     price: statReading(toCanonical(energyUnitPrice(state.planet.index))),
-    cost: amountReading(rechargeCostOf(state, playerId)),
-    recharge: withIcon(
-      commandButton(state, playerId, UI_IDS.chargingRecharge, 'Recharge', rechargeEnergyCommand()),
-      buttonIconIdOf('recharge'),
-    ),
+    cost,
+    recharge,
+    rechargeCard: serviceCardOf(state, playerId, service),
   }
 }
 
@@ -118,19 +129,19 @@ function quickServiceOf(
   ui: BayUiState,
 ): QuickServiceReading {
   const quote = serviceQuote(state, playerId)
+  const name = 'Sell, repair and recharge'
+  const iconId = buttonIconIdOf('quick_service')
+  const button = withIcon(
+    commandButton(state, playerId, UI_IDS.platformQuickService, name, quickServiceCommand()),
+    iconId,
+  )
+  const total = amountReading(quickServiceTotalOf(quote))
+  const service = { item: KERNEL_ITEMS.quickService, name, iconId, button, cost: total }
   return {
-    button: withIcon(
-      commandButton(
-        state,
-        playerId,
-        UI_IDS.platformQuickService,
-        'Sell, repair and recharge',
-        quickServiceCommand(),
-      ),
-      buttonIconIdOf('quick_service'),
-    ),
+    button,
     isHighlighted: ui.isQuickServiceHighlighted,
-    total: amountReading(quickServiceTotalOf(quote)),
+    total,
+    card: serviceCardOf(state, playerId, service),
   }
 }
 

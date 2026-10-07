@@ -15,6 +15,8 @@ import { artefactIconIdOf, panelIconIdOf } from '../art/icons/iconSet'
 import { chooseArtefactCommand } from '../artefacts/artefactCommands'
 import type { AuthorityState } from '../authority/authorityState'
 import type { DomainEvent } from '../authority/domainEvent'
+import { artefactItemOf } from '../registries/kernelItems'
+import { itemCardOf, type ItemCardModel } from './itemCardModel'
 import type { FocusStop } from './menuFocus'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import { commandButton, uiButton, type ScreenButton } from './viewParts'
@@ -26,6 +28,8 @@ export interface ArtefactCard {
   name: string
   summary: string
   choose: ScreenButton
+  /** The kernel item card this option draws as, full; picked, so it has no price (K7 #199). */
+  card: ItemCardModel
 }
 
 export interface ArtefactChoiceModel {
@@ -76,17 +80,27 @@ function openStateAfterEvent(event: DomainEvent, isOpen: boolean): boolean {
 }
 
 function cardOf(state: AuthorityState, playerId: string, option: ArtefactOption): ArtefactCard {
+  const iconId = artefactIconIdOf(option.id)
+  const choose = commandButton(
+    state,
+    playerId,
+    UI_ID_TEMPLATES.artefactChoose(option.id),
+    'Choose',
+    chooseArtefactCommand(option.id),
+  )
   return {
     optionId: option.id,
-    iconId: artefactIconIdOf(option.id),
+    iconId,
     name: option.name,
     summary: option.summary,
-    choose: commandButton(
-      state,
-      playerId,
-      UI_ID_TEMPLATES.artefactChoose(option.id),
-      'Choose',
-      chooseArtefactCommand(option.id),
-    ),
+    choose,
+    card: itemCardOf(state, playerId, {
+      item: artefactItemOf(option.id),
+      iconId,
+      name: option.name,
+      cost: null,
+      level: 0,
+      buy: choose,
+    }),
   }
 }

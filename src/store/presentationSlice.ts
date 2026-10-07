@@ -119,6 +119,11 @@ export interface PresentationActions {
   activateFocusedControl(): void
   /** A screen button by id, as a click or `ui_confirm` presses it; a disabled one does nothing. */
   pressScreenButton(buttonId: string): boolean
+  /**
+   * A tap on a compact item card (#164 G&V input rules, K7 #199): the first tap focuses the entry,
+   * which opens its full card in place and buys nothing; a tap on the focused entry presses its buy.
+   */
+  tapItemCard(buyButtonId: string): void
   /** A player command from a key or a button; it ends any armed travel. */
   submitPlayerIntent(intent: CommandIntent): void
   /** Starts the preview's install animation for a purchase in these events (none with reduce motion). */
@@ -227,6 +232,10 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       set({ focusedControlId: buttonId, isTravelArmed: button.action.kind === 'armTravel' })
       runButtonAction(get(), button.action)
       return true
+    },
+    tapItemCard: (buyButtonId) => {
+      if (get().focusedControlId === buyButtonId) get().pressScreenButton(buyButtonId)
+      else get().focusControl(buyButtonId)
     },
     submitPlayerIntent: (intent) => {
       set({ isTravelArmed: false })

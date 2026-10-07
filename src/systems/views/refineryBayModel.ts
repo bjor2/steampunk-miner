@@ -23,6 +23,8 @@ import {
   type BayHeader,
   type BayUiState,
 } from './bayFrame'
+import { KERNEL_ITEMS } from '../registries/kernelItems'
+import { itemCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import type { FocusStop } from './menuFocus'
 import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import {
@@ -64,6 +66,8 @@ export interface RefineryBayModel {
   buySlot: ScreenButton
   /** Null once the refinery has every slot it can have. */
   slotPrice: AmountReading | null
+  /** The next slot's card, drawn full on the platform (K7 #199). */
+  slotCard: ItemCardModel
   footer: BayFooter
   focusStops: FocusStop[]
   buttons: ScreenButton[]
@@ -81,6 +85,7 @@ export function selectRefineryBayModel(
   )
   const footer = bayFooterOf(state, playerId, ui)
   const price = nextRefinerySlotPrice(state)
+  const slotPrice = price === null ? null : amountReading(price)
   return {
     header: bayHeaderOf(state, playerId, 'refinery'),
     ore,
@@ -89,7 +94,16 @@ export function selectRefineryBayModel(
       slotReadingOf(slot, index, playerId, state.tick),
     ),
     buySlot,
-    slotPrice: price === null ? null : amountReading(price),
+    slotPrice,
+    slotCard: itemCardOf(state, playerId, {
+      item: KERNEL_ITEMS.refinerySlot,
+      iconId: REFINERY_SLOT_ICON_ID,
+      name: 'Refinery slot',
+      cost: slotPrice,
+      level: state.platform.refinerySlots.length,
+      buy: buySlot,
+      source: SHOP_SOURCE,
+    }),
     footer,
     focusStops: [
       ...ore.map((row) => stopIn('ore')(row.queue)),
