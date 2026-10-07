@@ -78,6 +78,15 @@
       "specs": ["e2e/browser/rigGear.spec.ts", "e2e/browser/vehiclePieces.spec.ts"]
     },
     {
+      "why": "The sized charge rack hangs as a vehicle piece; the blast front and planted charges are scene layers inside the frame budget.",
+      "paths": ["src/features/dynamite-visuals/**"],
+      "specs": [
+        "e2e/browser/dynamiteVisuals.spec.ts",
+        "e2e/browser/vehiclePieces.spec.ts",
+        "e2e/browser/render.spec.ts"
+      ]
+    },
+    {
       "why": "The sell burst on the bay header.",
       "paths": ["src/features/sell-burst/**"],
       "specs": ["e2e/browser/sellBurst.spec.ts"]
@@ -119,6 +128,7 @@
         "e2e/browser/shops.spec.ts",
         "e2e/browser/workshop.spec.ts",
         "e2e/browser/vehiclePieces.spec.ts",
+        "e2e/browser/dynamiteVisuals.spec.ts",
         "e2e/browser/screens/screenLayout.spec.ts",
         "e2e/browser/screens/reviewShots.spec.ts"
       ]

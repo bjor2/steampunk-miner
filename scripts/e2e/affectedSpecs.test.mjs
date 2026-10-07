@@ -60,6 +60,14 @@ describe('e2e: affected-spec map', () => {
     ])
   })
 
+  it('runs the rack, front and frame-budget specs when the dynamite looks change', () => {
+    expect(select('src/features/dynamite-visuals/register.ts').specs).toEqual([
+      'e2e/browser/dynamiteVisuals.spec.ts',
+      'e2e/browser/render.spec.ts',
+      'e2e/browser/vehiclePieces.spec.ts',
+    ])
+  })
+
   it('joins the specs of every changed path once, sorted', () => {
     const choice = select('src/features/sell-burst/burst.ts', 'src/features/example/register.ts')
     expect(choice.specs).toEqual([
