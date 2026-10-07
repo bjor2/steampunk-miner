@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
-import { blastRadiusMm } from '../../economy/blastingCharges'
+import { blastRadiusMm, chargeSize } from '../../economy/blastingCharges'
 import { oreSalePrice } from '../../economy/oreEconomy'
 import { fromSafeInteger, mul, toCanonical, ZERO_MONEY } from '../../money'
 import type { GateQuery, GateVerdict } from '../../registries/gateChecks'
@@ -33,12 +33,12 @@ function gateSliceOf(gate: Gate): SliceDefinition {
   }
 }
 
-/** #142's dynamite gate: the drill skids off the shell, a charge frees the cell. */
+/** #142's dynamite gate at `minCharge` 1: the drill skids off the shell, a size-1 charge frees it. */
 const dynamiteGate: Gate = ({ blast }) => ({
-  outcome: blast === null ? 'refused' : 'cut',
+  outcome: (blast?.size ?? 0) >= 1 ? 'cut' : 'refused',
   gateKind: 'dynamite',
   required: 'charge:1',
-  have: blast === null ? 'none' : 'charge:1',
+  have: `charge:${blast?.size ?? 0}`,
 })
 
 const everyOre =
@@ -86,6 +86,7 @@ describe('charge blast gates', () => {
     expect(queries[0].blast).toEqual({
       ...SITE.wall,
       radiusMm: blastRadiusMm(),
+      size: chargeSize(),
       playerId: 'p1',
       source: 'charge',
       tick: BLAST_TICK,
