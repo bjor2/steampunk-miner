@@ -81,7 +81,10 @@ export const chainHeatSink: Activate = (state, use) => {
   })
 }
 
-/** Steam boost, second tap: a sideways air-dash, to the side the miner faces (its right if up or down). */
+/**
+ * Steam boost, second tap: a sideways air-dash, to the side the miner faces (its right when it
+ * faces up or down).
+ */
 export const airDashSteamBoost: Activate = (state, use) =>
   burstWith(state, use, N.steamBoost, sidewaysOf, (value, boost) => ({ ...value, boost }))
 
@@ -93,7 +96,10 @@ export const burnSteamBoostLonger: Activate = (state, use) => {
   return actedWith(state, use, (value) => ({ ...value, boost: { ...boost, untilTick } }))
 }
 
-/** Escape thruster, second tap: aimed the way the miner faces; it stops at the first solid cell that way. */
+/**
+ * Escape thruster, second tap: aimed the way the miner faces; it stops at the first solid cell
+ * that way.
+ */
 export const aimEscapeThruster: Activate = (state, use) =>
   burstWith(state, use, N.escapeThruster, facingOf, (value, escape, pose) => ({
     ...value,
@@ -142,7 +148,7 @@ export const keepShieldLonger: Activate = (state, use) =>
     shieldUntilTick: longerUntil(value.shieldUntilTick, use, N.steamShield.windowTicks),
   }))
 
-/** Smoke canister, second tap: thrown ahead; the cloud bursts its own radius the way the miner faces. */
+/** Smoke canister, second tap: thrown ahead; the cloud bursts one radius the way the miner faces. */
 export const throwSmokeAhead: Activate = (state, use) =>
   smokeAt(state, use, (pose) => pointAheadOf(pose, N.smoke.radiusTiles))
 

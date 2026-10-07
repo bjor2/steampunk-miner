@@ -3,7 +3,7 @@
  * items slotted, a cavity carved underground to grapple in, and pose reports at chosen millimetre
  * points, set up through `debug.*` commands like a start scenario. Only specs use it.
  */
-import type { CommandIntent } from '../../systems/authority/authorityCommand'
+import type { AuthorityCommand, CommandIntent } from '../../systems/authority/authorityCommand'
 import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { carveCircleCommand } from '../../systems/authority/groundCommands'
 import { setVehicleLoadoutCommand } from '../../systems/authority/loadoutCommands'
@@ -39,6 +39,28 @@ export function sessionWith(
   session.submit(0, setVehicleLoadoutCommand(slots))
   session.submit(1, poseAbove(GROUND, facing))
   return session
+}
+
+/** A scripted session that keeps the commands it was given, so a spec can replay them. */
+export interface RecordedSession extends ScriptedSession {
+  commands: readonly AuthorityCommand[]
+}
+
+/** As `sessionWith`, recording every command from the loadout on. */
+export function recordedSessionWith(
+  slots: Readonly<Record<string, string>>,
+  facing: Facing = FACING.right,
+): RecordedSession {
+  const session = createScriptedSession()
+  const commands: AuthorityCommand[] = []
+  const submit = (tick: number, intent: CommandIntent) => {
+    commands.push({ playerId: 'p1', tick, seq: commands.length + 1, ...intent } as AuthorityCommand)
+    return session.submit(tick, intent)
+  }
+  const recorded = { ...session, submit, commands }
+  recorded.submit(0, setVehicleLoadoutCommand(slots))
+  recorded.submit(1, poseAbove(GROUND, facing))
+  return recorded
 }
 
 /** Carves the cavity and reports the miner at rest at its centre, facing `facing`. */
