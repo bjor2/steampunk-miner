@@ -114,6 +114,45 @@
       "budget": 600,
       "source": "npm run bench:ground"
     },
+    "liveBlast.tickP50Ms": {
+      "label": "Live blast tick p50 · R24",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:blast"
+    },
+    "liveBlast.tickP95Ms": {
+      "label": "Live blast tick p95 · R24",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:blast"
+    },
+    "liveBlast.tickMaxMs": {
+      "label": "Live blast tick max · R24",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 4,
+      "source": "npm run bench:blast"
+    },
+    "liveBlast.sharedTickP95Ms": {
+      "label": "Live blast tick p95 · R24, 4 drillers + pocket",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 2,
+      "source": "npm run bench:blast"
+    },
+    "liveBlast.sharedTickMaxMs": {
+      "label": "Live blast tick max · R24, 4 drillers + pocket",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 4,
+      "source": "npm run bench:blast"
+    },
     "groundDrillingBundledCpu.carveP50Ms": {
       "label": "Ground carve p50 · bundled, CPU time",
       "unit": "ms",
