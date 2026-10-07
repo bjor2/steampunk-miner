@@ -307,6 +307,8 @@ export interface SliceRegistrar {
   oreLook(provider: OreLookProvider): void            // one provider
   saveSection<T>(section: SaveSection<T>): void
   discovery(provider: DiscoveryProvider): void        // one provider
+  discoveryKind<K extends DiscoveryKind>(kind: K, ...codec: DiscoveryCodecArgument<K>): void  // #209
+  discoveryAliases(table: DiscoveryAliasTable): void                                          // #209
   loadoutAcceptance(rule: LoadoutAcceptance): void
   attachUse(use: AttachUse): void
   hudPanel(panel: HudPanel): void
@@ -575,7 +577,11 @@ K5 (#188), with #166, adds:
 
 ```ts
 // src/systems/registries/discovery.ts (new)
-export type DiscoveryKey = `ore:${string}` | `enemy:${string}` | `hazard:${string}`
+export type DiscoveryCodec = 'ids' | 'bitset'
+export interface DiscoveryKinds { ore: 'bitset'; enemy: 'ids'; hazard: 'ids' }  // slices augment (#209)
+export type DiscoveryKind = keyof DiscoveryKinds
+export type DiscoveryKey = `${DiscoveryKind}:${string}`
+export interface DiscoveryAliasTable { id: string; aliases: Readonly<Partial<Record<DiscoveryKey, DiscoveryKey>>> }
 export interface DiscoveryProvider { id: string; hasDiscovered(state: AuthorityState, playerId: string, key: DiscoveryKey): boolean }
 /** Provider answer, else the fallback: discovered once the node's unlock planet is reached. */
 export function hasDiscovered(state: AuthorityState, playerId: string, key: DiscoveryKey,
@@ -583,6 +589,10 @@ export function hasDiscovered(state: AuthorityState, playerId: string, key: Disc
 ```
 
 With no provider, the answer is `progress.highestPlanetIndex >= unlockPlanetIndex`. `UnlockProgress` is in `src/systems/unlocks/unlockSchedule.ts`.
+
+Discovery kinds are open (#209, from the TD rulings on #178). Ore, enemy and hazard are kernel kinds. A slice adds a kind by augmenting `DiscoveryKinds` with the kind's storage codec as the value, then registers it with `r.discoveryKind(kind)`. The codec is `ids` (a sorted id list, the default) or `bitset` (base64 bytes; only `ore` uses it), and a non-`ids` codec must be named at registration. A kind is bare (`artefact`, keys `artefact:<id>`), so the kind is its registry id: it registers once across slices, and a kernel kind is refused. `discoveryKinds()` lists every kind with its codec, sorted, and `discoveryCodecOf(kind)` reads one.
+
+A slice may register an alias table (`r.discoveryAliases`, id `<slice>.<name>`). `canonicalDiscoveryKey(key)` maps a key through the first table, in id order, that holds it. The codex canonicalises through it on load and on every write, so the ores slice (#146) can map `ore:kernel.<family>.t<tier>` onto its `typeId` with no section migration.
 
 The codex build (after K1) adds:
 - the provider

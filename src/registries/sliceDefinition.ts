@@ -9,7 +9,12 @@ import type { SliceRunEvents } from '../logging/registries/runEvents'
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { SliceCommandRules } from '../systems/registries/commandRules'
 import type { ContentKind, ContentKinds } from '../systems/registries/content'
-import type { DiscoveryProvider } from '../systems/registries/discovery'
+import type {
+  DiscoveryAliasTable,
+  DiscoveryCodecArgument,
+  DiscoveryKind,
+  DiscoveryProvider,
+} from '../systems/registries/discovery'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { OreLookProvider } from '../systems/registries/oreLook'
@@ -41,6 +46,10 @@ export interface SliceRegistrar {
   saveSection<T>(section: SaveSection<T>): void
   /** One provider across all slices. */
   discovery(provider: DiscoveryProvider): void
+  /** A kind the slice declared in `DiscoveryKinds`; `ids` is the default codec. Bare, unprefixed. */
+  discoveryKind<K extends DiscoveryKind>(kind: K, ...codec: DiscoveryCodecArgument<K>): void
+  /** Keys the codex canonicalises through, on load and on every write. */
+  discoveryAliases(table: DiscoveryAliasTable): void
   loadoutAcceptance(rule: LoadoutAcceptance): void
   attachUse(use: AttachUse): void
   hudPanel(panel: HudPanel): void

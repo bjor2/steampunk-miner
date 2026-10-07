@@ -17,7 +17,14 @@ import {
   type CommandRuleRegistration,
 } from '../systems/registries/commandRules'
 import { CONTENT_REGISTRY, contentRegistrationOf } from '../systems/registries/content'
-import { DISCOVERY_REGISTRY } from '../systems/registries/discovery'
+import {
+  DISCOVERY_ALIAS_REGISTRY,
+  DISCOVERY_KIND_REGISTRY,
+  DISCOVERY_REGISTRY,
+  discoveryKindRegistrationOf,
+  isKernelDiscoveryKind,
+  type DiscoveryKindRegistration,
+} from '../systems/registries/discovery'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
@@ -49,6 +56,9 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
     saveSection: (section) => addSaveSection(sliceId, section),
     discovery: (provider) => add(DISCOVERY_REGISTRY, provider),
+    discoveryKind: (kind, ...codec) =>
+      addDiscoveryKind(sliceId, discoveryKindRegistrationOf(kind, ...codec)),
+    discoveryAliases: (table) => add(DISCOVERY_ALIAS_REGISTRY, table),
     loadoutAcceptance: (rule) => add(LOADOUT_ACCEPTANCE_REGISTRY, rule),
     attachUse: (use) => add(ATTACH_USE_REGISTRY, use),
     hudPanel: (panel) => add(HUD_PANEL_REGISTRY, panel),
@@ -98,6 +108,21 @@ function addPrefixed<T extends RegistryEntry>(registry: Registry<T>, sliceId: st
 function addSaveSection(sliceId: string, section: SaveSection<unknown>) {
   if (section.id === sliceId) addToRegistry(SAVE_SECTION_REGISTRY, sliceId, section)
   else addPrefixed(SAVE_SECTION_REGISTRY, sliceId, section)
+}
+
+/**
+ * A kind is named bare (`artefact`, as its keys read `artefact:<id>`), so it is the registry id and
+ * registers once across slices; the kernel's own kinds are never registered again.
+ */
+function addDiscoveryKind(sliceId: string, registration: DiscoveryKindRegistration) {
+  if (isKernelDiscoveryKind(registration.id)) refuseKernelDiscoveryKind(sliceId, registration.id)
+  addToRegistry(DISCOVERY_KIND_REGISTRY, sliceId, registration)
+}
+
+function refuseKernelDiscoveryKind(sliceId: string, kind: string): never {
+  throw new RegistrationRefusedError(
+    `slice "${sliceId}" registered discovery kind "${kind}", which the kernel already declares`,
+  )
 }
 
 /** A slice's debug commands live under `debug.<slice>.`, so they are `debug.*` commands too. */
