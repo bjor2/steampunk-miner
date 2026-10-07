@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T18:20:18+02:00",
+  "updated_at": "2026-10-07T18:31:14+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -109,12 +109,12 @@
   },
   "tester": {
     "state": "running",
-    "phase": "fast",
+    "phase": "slow",
     "sha": "90c954fb56a31a278a1a9d7a486c0d662c847c10",
-    "since": "2026-10-07T16:18:18Z",
-    "holds_gate": true,
+    "since": "2026-10-07T16:31:13Z",
+    "holds_gate": false,
     "claude_slot": null,
-    "last_run": "2026-10-07T15:40:35Z",
+    "last_run": "2026-10-07T16:31:13Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null,
@@ -263,12 +263,9 @@
     },
     {
       "slot": 10,
-      "state": "planner",
-      "ticket": 191,
-      "since": "2026-10-06T21:51:39+02:00",
-      "map": 139,
-      "room": "a7c87ace-8f7a-4c9f-937f-ce50b2d7315b",
-      "adopted": true
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 11,
@@ -359,10 +356,10 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 3,
+      "used": 2,
       "dev": 2,
       "dev_cap": 8,
-      "planner": 1,
+      "planner": 0,
       "planner_cap": 4
     },
     "claude": {
