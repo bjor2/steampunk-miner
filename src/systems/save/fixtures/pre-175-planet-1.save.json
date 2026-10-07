@@ -1,10 +1,10 @@
 {
   "formatVersion": 1,
-  "snapshotVersion": 17,
+  "snapshotVersion": 18,
   "generatorVersion": 5,
   "saveEpoch": 3,
   "tick": 1203,
-  "digest": "6bb359d778112da7",
+  "digest": "2be64a085ed18d98",
   "world": {
     "saveEpoch": 3,
     "worldSeed": 83921,
@@ -95,6 +95,8 @@
     },
     "collapse": { "blocks": [] },
     "lava": { "loose": [], "nextStepTick": null },
+    "liveBlasts": [],
+    "terrainEdits": [],
     "debugApplied": true
   },
   "profile": {
