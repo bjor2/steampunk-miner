@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T01:09:00+02:00",
+  "updated_at": "2026-10-08T01:11:16+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -20,18 +20,18 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": "external",
-          "since": "2026-10-08T01:02:46+02:00"
+          "ticket": 313,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-08T01:11:00+02:00"
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 206,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-08T00:58:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -51,8 +51,8 @@
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "claims_last_hour": 9,
       "name": "Claude Max 1"
     },
@@ -197,9 +197,9 @@
     {
       "slot": 3,
       "state": "dev",
-      "ticket": 206,
-      "since": "2026-10-08T00:58:00+02:00",
-      "claude_slot": 2
+      "ticket": 313,
+      "since": "2026-10-08T01:11:00+02:00",
+      "claude_slot": 1
     },
     {
       "slot": 4,
@@ -264,18 +264,17 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": null,
-      "grok_slot": null,
-      "since": "2026-10-08T01:02:46+02:00",
-      "kind": "external",
+      "ticket": 313,
+      "grok_slot": 3,
+      "since": "2026-10-08T01:11:00+02:00",
       "account": 1
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 206,
-      "grok_slot": 3,
-      "since": "2026-10-08T00:58:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -328,10 +327,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 01:09 CEST",
+    "at": "2026-10-08 01:11 CEST",
     "mode": "refill-dev",
-    "triggers": "#251",
-    "started": "#300->C4/A1",
+    "triggers": "#206",
+    "started": "#313->C1/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
@@ -346,9 +345,9 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 8,
-      "free": 0,
-      "external": 1
+      "used": 7,
+      "free": 1,
+      "external": 0
     }
   }
 }
