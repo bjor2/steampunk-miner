@@ -23,8 +23,12 @@ const DRILL_ENTRY = 'workshop-upgrade-drill_power-buy'
 const TIP_ENTRY = 'workshop-upgrade-drill_tip-buy'
 const REPAIR_TOOLTIP = '[data-item-tooltip="service:repair"]'
 const LONG_PRESS_MS = 400
+/** One page read takes about 1.5 s under software WebGL on a busy box. */
+const SLOW_POLL = { timeout: 15_000 }
 
 test.use({ hasTouch: true })
+// Loading the build and docking takes most of the default 30 s under software WebGL on a busy box.
+test.describe.configure({ timeout: 120_000 })
 
 async function openAtUpgradeBay(page: Page): Promise<string[]> {
   const errors: string[] = []
@@ -84,23 +88,28 @@ test.describe('item cards (#164)', () => {
     await expect(page.getByTestId(TIP_ENTRY)).toContainText('Level 0 → 0 · 1/9')
     expect(await levelsTotal(page)).toBe(before)
     await page.getByTestId(TIP_ENTRY).tap()
-    await expect.poll(() => levelsTotal(page)).toBe(before + 1)
+    await expect.poll(() => levelsTotal(page), SLOW_POLL).toBe(before + 1)
     expect(errors).toEqual([])
   })
 
   test('shows each focused entry’s card in turn and buys only on confirm', async ({ page }) => {
     const errors = await openAtUpgradeBay(page)
     const before = await levelsTotal(page)
-    const seen: string[][] = []
+    const seen: string[] = []
+    let open = await openEntries(page)
     for (let step = 0; step < 3; step++) {
+      const previous = open
       await tapAction(page, 'ui_down')
-      await expect.poll(async () => (await openEntries(page)).length).toBe(1)
-      seen.push(await openEntries(page))
+      await expect
+        .poll(async () => (open = await openEntries(page)), SLOW_POLL)
+        .not.toEqual(previous)
+      expect(open).toHaveLength(1)
+      seen.push(...open)
     }
-    expect(new Set(seen.flat()).size).toBe(3)
+    expect(new Set(seen).size).toBe(3)
     expect(await levelsTotal(page)).toBe(before)
     await tapAction(page, 'ui_confirm')
-    await expect.poll(() => levelsTotal(page)).toBe(before + 1)
+    await expect.poll(() => levelsTotal(page), SLOW_POLL).toBe(before + 1)
     expect(errors).toEqual([])
   })
 
