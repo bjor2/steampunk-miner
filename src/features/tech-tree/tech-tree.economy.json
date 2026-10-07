@@ -1,0 +1,32 @@
+{
+  "source": "Spec #161 section 3 (final, 2026-10-06: Systems & Economy under the Game Director's steer) and the #161 Systems absorber amendment; #162 section 4.6. A slice's numbers live beside it (feature-slices.md 1.1).",
+  "tech": {
+    "costs": {
+      "band": 5,
+      "kCapability": "12",
+      "kSlot": "20",
+      "kCombo": "20",
+      "kMark": "4",
+      "g": "1.04",
+      "markDepthCap": 10,
+      "laneBias": {}
+    },
+    "markAbsorb": {
+      "cooldownStep": "0.920",
+      "cooldownFloor": "0.5",
+      "chargesCap": 3,
+      "durationStep": "1.15",
+      "durationCap": "2",
+      "income": {
+        "cooldownFloor": "0.7",
+        "durationCap": "1.4"
+      }
+    },
+    "cadence": {
+      "markEvery": 3,
+      "firstGeneratedCombo": 41,
+      "comboEvery": 3,
+      "discoveryGrace": 1
+    }
+  }
+}
