@@ -166,7 +166,8 @@
         "src/systems/views/vehicleItemRows.ts",
         "src/features/tech-tree/systems/itemShop.ts",
         "src/features/mobility/systems/mobilitySales.ts",
-        "src/features/power-up-core/systems/cradleSales.ts"
+        "src/features/power-up-core/systems/cradleSales.ts",
+        "src/features/mining-gates/systems/rigSales.ts"
       ],
       "specs": [
         "e2e/browser/vehicleItemShop.spec.ts",
