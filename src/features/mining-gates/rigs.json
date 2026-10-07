@@ -1,0 +1,50 @@
+{
+  "source": "Spec #142 'The extraction rigs' (rig k arrives on planet 5 + 7k, in this order), #162's extractor rows (ids, names, tree nodes, the TD socket amendment's attach points) and #159's naming ruling: player text says extractor, never rig.",
+  "rigs": [
+    {
+      "id": "rig.resonance",
+      "gateClass": "resonance",
+      "name": "Resonance Fork",
+      "withoutRig": "refused",
+      "attach": "drill.fork",
+      "unlockedBy": "tech.extraction.resonance_fork",
+      "description": "Tuning-fork prongs that sing a stubborn crystal soft enough to drill."
+    },
+    {
+      "id": "rig.containment",
+      "gateClass": "containment",
+      "name": "Containment Hood",
+      "withoutRig": "lost",
+      "attach": "drill.hood",
+      "unlockedBy": "tech.extraction.containment_hood",
+      "description": "A chilled hood and canister rack that bottle volatile ore before it vents."
+    },
+    {
+      "id": "rig.acid_etcher",
+      "gateClass": "etcher",
+      "name": "Acid Etcher",
+      "withoutRig": "refused",
+      "attach": "hull.arm.left",
+      "unlockedBy": "tech.extraction.acid_etcher",
+      "description": "A sprayer arm that eats glassy ore skins with patient, measured acid."
+    },
+    {
+      "id": "rig.induction",
+      "gateClass": "induction",
+      "name": "Induction Coil",
+      "withoutRig": "refused",
+      "attach": "hull.front",
+      "unlockedBy": "tech.extraction.induction_coil",
+      "description": "A copper coil ring that pulls magnetic ore clean out of the wall."
+    },
+    {
+      "id": "rig.aether_tether",
+      "gateClass": "tether",
+      "name": "Aether Tether",
+      "withoutRig": "lost",
+      "attach": "hull.roof.mid",
+      "unlockedBy": "tech.extraction.aether_tether",
+      "description": "A roof reel and harpoon that keep weightless ore from drifting off."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "source": "Spec #142 Numbers and its economy.json block (amended 6 Oct), the GD lock on #148 (gate content from P7, the dense floor in kernel economy.json), #143 amendment 2 (minCharge, read from the dynamite index) and #162 section 4 (extractors 40 band-5 ore at their unlock planet). A slice's numbers live beside it (feature-slices.md 1.1).",
+  "miningGates": {
+    "gateContentFromPlanet": 7,
+    "maxGatedValueShareBp": 1500,
+    "rigAvailability": { "first": 5, "every": 7 },
+    "rigPrice": { "band": 5, "oreUnits": "40" },
+    "endlessSignatureCycle": { "fromPlanet": 41, "every": 5 }
+  }
+}
