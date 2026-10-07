@@ -89,7 +89,8 @@ function valueProblems(value: unknown, kind: FieldKind, path: string): string[] 
   if (typeof kind === 'string') return scalarProblems(value, kind, path)
   if ('oneOf' in kind) return oneOfProblems(value, kind.oneOf, path)
   if ('listOf' in kind) return listProblems(value, kind.listOf, path)
-  if ('optional' in kind) return value === undefined ? [] : valueProblems(value, kind.optional, path)
+  if ('optional' in kind)
+    return value === undefined ? [] : valueProblems(value, kind.optional, path)
   return mapProblems(value, kind.mapOf, path)
 }
 
