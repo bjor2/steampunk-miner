@@ -1,0 +1,16 @@
+{
+  "families": [
+    { "id": "metal", "name": "Brassvein" },
+    { "id": "crystal", "name": "Quartzine" },
+    { "id": "fossil", "name": "Amberbone" },
+    { "id": "relic", "name": "Cogwork" },
+    { "id": "volcanic", "name": "Obsidian" },
+    { "id": "radioactive", "name": "Pitchglow" },
+    { "id": "cryo", "name": "Rimestone" },
+    { "id": "organic", "name": "Fernwax" },
+    { "id": "alien", "name": "Xenolith" },
+    { "id": "energy", "name": "Voltspar" },
+    { "id": "ancient", "name": "Glyphstone" },
+    { "id": "exotic", "name": "Voidglass" }
+  ]
+}

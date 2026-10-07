@@ -1,0 +1,11 @@
+{
+  "ore": {
+    "leadWeightsBpByBand": {
+      "plus1": [500, 600, 700, 800, 900],
+      "plus2": [0, 0, 100, 200, 300]
+    },
+    "signatureValueLead": 1,
+    "signatureShareCapBpByBand": { "4": 600, "5": 800 },
+    "catalogue": { "variantsPerFamily": 4, "echoEvery": 25, "echoFrom": 126 }
+  }
+}
