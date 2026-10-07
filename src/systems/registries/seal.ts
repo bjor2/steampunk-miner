@@ -117,6 +117,18 @@ export function entriesOf<T extends RegistryEntry>(registry: Registry<T>): reado
   return (current.shelves.get(registry)?.sorted ?? NO_ENTRIES) as readonly T[]
 }
 
+/**
+ * The registry's registrations with the slice that made each, sorted by entry id, for the coverage
+ * specs that ask which slice ships an entry; throws `FeaturesNotLoadedError` before the seal.
+ */
+export function registrationsOf<T extends RegistryEntry>(
+  registry: Registry<T>,
+): readonly SealedRegistration<T>[] {
+  if (!current.isSealed) throw new FeaturesNotLoadedError(registry.name)
+  return (current.shelves.get(registry)?.registrations ??
+    NO_ENTRIES) as readonly SealedRegistration<T>[]
+}
+
 /** Checks every provider limit and seal problem, then freezes each registry sorted by id. */
 export function sealRegistrySet(): void {
   current.shelves.forEach(refuseProvidersOverLimit)
@@ -181,8 +193,8 @@ function isOverProviderLimit(shelf: Shelf, registry: Registry<RegistryEntry>): b
 }
 
 function sortShelf(shelf: Shelf): void {
-  const entries = shelf.registrations.map((registration) => registration.entry)
-  shelf.sorted = Object.freeze(entries.sort(compareIds))
+  shelf.registrations.sort((a, b) => compareIds(a.entry, b.entry))
+  shelf.sorted = Object.freeze(shelf.registrations.map((registration) => registration.entry))
 }
 
 /** Code-unit order, never locale order, so every machine iterates the same way. */

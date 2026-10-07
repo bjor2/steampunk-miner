@@ -7,6 +7,7 @@ import {
   entriesOf,
   FeaturesNotLoadedError,
   RegistrationRefusedError,
+  registrationsOf,
   sealRegistrySet,
   swapRegistrySet,
   withFreshRegistrySet,
@@ -47,6 +48,20 @@ describe('registry seal', () => {
     addToRegistry(probes, 'zeta', { id: 'zeta.a', weight: 3 })
     sealRegistrySet()
     expect(entriesOf(probes).map((probe) => probe.id)).toEqual(['alpha.c', 'zeta.a', 'zeta.b'])
+  })
+
+  it('reads registrations with the slice that made each, sorted by entry id', () => {
+    addToRegistry(probes, 'zeta', { id: 'zeta.b', weight: 1 })
+    addToRegistry(probes, 'alpha', { id: 'alpha.c', weight: 2 })
+    sealRegistrySet()
+    expect(registrationsOf(probes).map(({ sliceId, entry }) => [sliceId, entry.id])).toEqual([
+      ['alpha', 'alpha.c'],
+      ['zeta', 'zeta.b'],
+    ])
+  })
+
+  it('throws FeaturesNotLoadedError when registrations are read before the seal', () => {
+    expect(() => registrationsOf(probes)).toThrow(FeaturesNotLoadedError)
   })
 
   it('refuses a registration after the seal', () => {

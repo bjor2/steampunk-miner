@@ -9,7 +9,7 @@
  *
  * Other slices register entries of that kind and import its type from the owner's `index.ts`.
  */
-import { defineRegistry, entriesOf } from './seal'
+import { defineRegistry, entriesOf, registrationsOf } from './seal'
 import type { VehicleItem } from './vehicleLoadout'
 
 export interface ContentEntry {
@@ -39,6 +39,8 @@ export interface ContentRegistration {
 export interface ScheduleRowClaim {
   rowId: string
   entryId: string
+  /** The slice that registered the entry, so it ships the row (the #191 horizontal test guard). */
+  sliceId: string
 }
 
 export interface ContentIconUse {
@@ -65,8 +67,8 @@ export function contentOf<K extends ContentKind>(kind: K): readonly ContentKinds
 
 /** Every schedule row a content entry claims, with the entry that claims it. */
 export function contentScheduleRowClaims(): readonly ScheduleRowClaim[] {
-  return entriesOf(CONTENT_REGISTRY).flatMap(({ id, entry }) =>
-    entry.scheduleRowId === undefined ? [] : [{ rowId: entry.scheduleRowId, entryId: id }],
+  return registrationsOf(CONTENT_REGISTRY).flatMap(({ sliceId, entry: { id, entry } }) =>
+    entry.scheduleRowId === undefined ? [] : [{ rowId: entry.scheduleRowId, entryId: id, sliceId }],
   )
 }
 

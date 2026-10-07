@@ -40,9 +40,11 @@ describe('dock facilities', () => {
     ])
   })
 
-  it('claims each building row for the schedule coverage spec', () => {
+  it('claims each building row, with the slice that ships it, for the coverage specs', () => {
     const claims = withRegistrations([probeOf(MAST)], dockFacilityScheduleRowClaims)
-    expect(claims).toEqual([{ rowId: 'scanner_station', entryId: 'dock-probe.mast' }])
+    expect(claims).toEqual([
+      { rowId: 'scanner_station', entryId: 'dock-probe.mast', sliceId: 'dock-probe' },
+    ])
   })
 
   it('refuses a building on a row that is no facility row, and never stamps it', () => {

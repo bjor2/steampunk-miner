@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { CONTENT_REGISTRY, contentIconIds, contentOf, contentRegistrationOf } from './content'
+import {
+  CONTENT_REGISTRY,
+  contentIconIds,
+  contentOf,
+  contentRegistrationOf,
+  contentScheduleRowClaims,
+} from './content'
 import { addToRegistry, withFreshRegistrySet } from './seal'
 import type { VehicleItem } from './vehicleLoadout'
 
@@ -40,6 +46,17 @@ describe('content registry', () => {
     expect(withFreshRegistrySet(registerItems, contentIconIds)).toEqual([
       { kind: 'vehicle-item', id: 'drill-gear.bit', iconId: 'icon-bit' },
       { kind: 'vehicle-item', id: 'mobility.anchor', iconId: 'icon-anchor' },
+    ])
+  })
+
+  it('claims the schedule rows its entries ship, with the slice that registered each', () => {
+    const wagon: VehicleItem = { ...anchor, id: 'mobility.wagon', scheduleRowId: 'wagons' }
+    const register = () => {
+      registerItems()
+      addToRegistry(CONTENT_REGISTRY, 'mobility', contentRegistrationOf('vehicle-item', wagon))
+    }
+    expect(withFreshRegistrySet(register, contentScheduleRowClaims)).toEqual([
+      { rowId: 'wagons', entryId: 'mobility.wagon', sliceId: 'mobility' },
     ])
   })
 })

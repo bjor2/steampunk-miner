@@ -8,7 +8,7 @@
 import type { UnlockRow } from '../unlocks/readUnlockSchedule'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 import type { ScheduleRowClaim } from './content'
-import { defineRegistry, entriesOf } from './seal'
+import { defineRegistry, entriesOf, registrationsOf } from './seal'
 
 export interface DockFacility {
   id: string
@@ -27,9 +27,10 @@ export function dockFacilityRowIdsOn(planetIndex: number): readonly string[] {
 
 /** Every schedule row a registered building claims, for the schedule coverage spec. */
 export function dockFacilityScheduleRowClaims(): readonly ScheduleRowClaim[] {
-  return entriesOf(DOCK_FACILITY_REGISTRY).map(({ id, scheduleRowId }) => ({
-    rowId: scheduleRowId,
-    entryId: id,
+  return registrationsOf(DOCK_FACILITY_REGISTRY).map(({ sliceId, entry }) => ({
+    rowId: entry.scheduleRowId,
+    entryId: entry.id,
+    sliceId,
   }))
 }
 
