@@ -1,7 +1,7 @@
 /**
  * The #166 gear on the rig in the preview build (ticket 250): owned mobility items hang at their
  * attach points through the tech tree's vehicle piece, unowned and still-invisible items do not,
- * each cradle shows its Mark 1 plate, and raising the steam shield starts its curtain effect.
+ * each cradle shows a Mark 1 plate (nothing researched, so the items act as bought), and raising the steam shield starts its curtain effect.
  * Asserted through `steampunkDebug.vehicleParts().mounted` and the slice's `getRig()`, never
  * pixels; the shot of the loaded rig is written to the test's output folder for review, never
  * compared.

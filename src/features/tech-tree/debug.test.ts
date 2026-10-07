@@ -3,6 +3,9 @@ import { readAuthorityState } from '../../store/authorityLink'
 import { resetGameStore, useGameStore } from '../../store/gameStore'
 import { setVehicleLoadout } from '../../store/loadoutActions'
 import { techTreeDebugActions } from './debug'
+import { researchedMarkOf } from './systems/itemMarks'
+import { markTierOf } from './systems/markNodes'
+import { markBearerOfItem, registeredTechTree } from './systems/techTree'
 import { withFixtureTree } from './treeTestSession'
 
 const actions = techTreeDebugActions
@@ -46,6 +49,7 @@ describe('tech tree: debug actions', () => {
 })
 
 describe('tech tree: the rig debug read (ticket 250)', () => {
+  const CRADLED = ['power.steam_shield', 'power.grapple_winch']
   const slotShieldAndWinch = () =>
     setVehicleLoadout(
       useGameStore.getState().playerId,
@@ -75,6 +79,26 @@ describe('tech tree: the rig debug read (ticket 250)', () => {
     ])
   })
 
+  it('steps each plate up to the Mark its item acts at (#249)', () => {
+    slotShieldAndWinch()
+    expect(actions.unlockAll()).toEqual({ ok: true })
+    const { plates } = actions.getRig() as { ok: true; plates: { itemId: string; mark: number }[] }
+    const researched = plates.map(({ itemId }) => researchedMarkOfLocal(itemId))
+    expect(researched.every((mark) => mark > 1)).toBe(true)
+    expect(plates.map(({ mark }) => mark)).toEqual(researched)
+  })
+
+  it('gilds each plate once its item is Mastered at its last Mark', () => {
+    slotShieldAndWinch()
+    expect(actions.jumpToDepth(masteredDepthOf(CRADLED))).toEqual({ ok: true })
+    const { plates } = actions.getRig() as {
+      ok: true
+      plates: { mark: number; isGilded: boolean }[]
+    }
+    expect(plates.map(({ mark }) => mark)).toEqual(CRADLED.map(lastMarkOfItem))
+    expect(plates.map(({ isGilded }) => isGilded)).toEqual([true, true])
+  })
+
   it('reports no effect drawn while no scene has mounted the effects layer', () => {
     expect(actions.getRig()).toMatchObject({ fx: { isDrawn: false, started: 0, active: [] } })
   })
@@ -84,3 +108,21 @@ describe('tech tree: the rig debug read (ticket 250)', () => {
     expect(actions.previewPowerUpFx('power.grav_anchor')).toMatchObject({ ok: false })
   })
 })
+
+function researchedMarkOfLocal(itemId: string): number {
+  return researchedMarkOf(readAuthorityState(), useGameStore.getState().playerId, itemId)
+}
+
+function lastMarkOfItem(itemId: string): number {
+  return markBearerOfItem(registeredTechTree(), itemId)?.lastMark ?? 0
+}
+
+/** The planet whose research reaches every item's last Mark. */
+function masteredDepthOf(itemIds: readonly string[]): number {
+  const tree = registeredTechTree()
+  const tiers = itemIds.flatMap((itemId) => {
+    const bearer = markBearerOfItem(tree, itemId)
+    return bearer === null ? [] : [markTierOf(bearer, bearer.lastMark)]
+  })
+  return Math.max(...tiers)
+}

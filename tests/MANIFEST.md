@@ -227,11 +227,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/statPreview.test.ts` | 9 | 9 |
 | `src/features/sensing/visionRows.test.ts` | 5 | 5 |
 
-### `tech-tree`: 24 files, 172 tests
+### `tech-tree`: 24 files, 174 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/tech-tree/debug.test.ts` | 8 | 8 |
+| `src/features/tech-tree/debug.test.ts` | 10 | 10 |
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 3 | 3 |

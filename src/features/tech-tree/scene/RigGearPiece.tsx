@@ -2,7 +2,7 @@
  * The #166 gear on the car (ticket 250): a vehicle piece (#235) that hangs every registered item
  * the loadout mounts at its attach point, posed (extractors folded until 148b drives them) and
  * mirrored where the art says, with a brass Mark plate under each cradle that holds a Mark-bearing
- * item. It changes only when the loadout does, so it renders through React; each asset shows in
+ * item, at the Mark the item acts at. It changes only when the loadout or a Mark does, so it renders through React; each asset shows in
  * `steampunkDebug.vehicleParts().mounted` while it is on the car. With no items, it draws nothing.
  */
 import { useEffect, useMemo } from 'react'
@@ -11,7 +11,7 @@ import { showMountedParts } from '../../../scene/mountedPartsPresence'
 import { SHIPPED_ART } from '../../../scene/shippedArt'
 import { useGameStore } from '../../../store/gameStore'
 import { atlasMapsOf, type AtlasMaps } from '../../../systems/art/assetLook'
-import { readRigKey, rigItemsOfKey, rigSightOfItems } from '../store/rigReads'
+import { carriedRigOfKey, readCarriedRigKey, rigSightOfCarried } from '../store/rigReads'
 import { pivotedQuadOf, type RigMount } from '../systems/render/rigGear'
 import type { GearQuad } from '../systems/render/techGearQuads'
 import { MarkPlateMesh } from './MarkPlateMesh'
@@ -22,8 +22,8 @@ export const RIG_GEAR_PIECE_ID = 'tech-tree.rig-gear'
 const RIG_Z = 0.1
 
 export function RigGearPiece() {
-  const rigKey = useGameStore(readRigKey)
-  const sight = useMemo(() => rigSightOfItems(SHIPPED_ART, rigItemsOfKey(rigKey)), [rigKey])
+  const rigKey = useGameStore(readCarriedRigKey)
+  const sight = useMemo(() => rigSightOfCarried(SHIPPED_ART, carriedRigOfKey(rigKey)), [rigKey])
   useEffect(() => showRigMounts(sight.mounts), [sight])
   return (
     <>

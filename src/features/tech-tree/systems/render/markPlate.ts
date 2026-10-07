@@ -10,15 +10,17 @@ import { attachPointOf, type Pair, type PartsSidecar } from '../../../../systems
 import { slotAttachPointOf } from '../../../../systems/registries/vehicleAttach'
 import type { LoadoutSlotId } from '../../../../systems/registries/vehicleLoadout'
 import { isMasteredAt } from '../markLadder'
+import type { ItemUnlock } from '../techNode'
 import { markBearerOfItem, type TechTree } from '../techTree'
 import type { RigMount } from './rigGear'
 import type { GearQuad, MountedItem } from './techGearQuads'
 
 /**
- * Every use acts at Mark 1 until power-up-core applies the researched Mark (#249, X3), so the
- * plate shows Mark 1 until then: it shows the Mark the item acts at, never one it does not.
+ * Mark 1 is the item as bought (#162 4.6): power-up-core plays an item researched none of (owned
+ * through a debug loadout) at Mark 1 (#249), so its plate shows Mark 1, never a Mark it does not
+ * act at.
  */
-export const MARK_UNTIL_MARKS_ACT = 1
+export const BOUGHT_MARK = 1
 
 /** A plate as wide as two cradle pitches leave room for; a row holds five rivets. */
 const PLATE_WIDTH_M = 0.1
@@ -40,6 +42,17 @@ export interface MarkPlate extends CradleMark {
   size: Pair
   /** One per Mark, from the plate's centre, the top row first. */
   rivets: Pair[]
+}
+
+/** The Mark each item acts at: the highest researched, and Mark 1 for an item researched none of. */
+export function actingMarksOf(
+  items: readonly MountedItem[],
+  unlocks: readonly ItemUnlock[],
+): Record<string, number> {
+  const researched = new Map(unlocks.map((unlock) => [unlock.itemId, unlock.mark]))
+  return Object.fromEntries(
+    items.map(({ itemId }) => [itemId, Math.max(researched.get(itemId) ?? 0, BOUGHT_MARK)]),
+  )
 }
 
 /** The cradled items that bear Marks, each at `markOf` its Mark, gilded once Mastered there. */

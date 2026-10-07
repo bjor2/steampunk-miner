@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { lastMarkOf } from '../markLadder'
 import { markBearerOfItem, registeredTechTree } from '../techTree'
 import { GEAR_ART, GEAR_PART_SIDE_M, vehicleWithPoints } from './gearArtFixture'
-import { cradleMarksOf, MARK_UNTIL_MARKS_ACT, markPlatesOf, type CradleMark } from './markPlate'
+import { actingMarksOf, cradleMarksOf, markPlatesOf, type CradleMark } from './markPlate'
 import { rigMountsOf } from './rigGear'
 import type { MountedItem } from './techGearQuads'
 
@@ -27,8 +27,15 @@ function lastMarkOfItem(itemId: string): number {
 }
 
 describe('mark plate', () => {
-  it('shows Mark 1 until power-up-core makes Marks act (#249)', () => {
-    expect(MARK_UNTIL_MARKS_ACT).toBe(1)
+  it('shows each item at its highest researched Mark, and one researched none of at Mark 1 (#249)', () => {
+    const unlocks = [
+      { itemId: SHIELD.itemId, mark: 4 },
+      { itemId: 'power.steam_boost', mark: 2 },
+    ]
+    expect(actingMarksOf([SHIELD, WINCH], unlocks)).toEqual({
+      [SHIELD.itemId]: 4,
+      [WINCH.itemId]: 1,
+    })
   })
 
   it('hangs a brass plate with one rivet flush under the housing of a cradled item at Mark 1', () => {

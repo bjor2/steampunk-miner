@@ -17,7 +17,7 @@ import { SHIPPED_ART } from '../../scene/shippedArt'
 import { iconUrlOf } from '../../ui/vectorIcons'
 import { powerUpFxPresence } from './scene/powerUpFxPresence'
 import { previewFxAtVehicle } from './store/powerUpFxFeed'
-import { readRigItems, rigSightOfItems } from './store/rigReads'
+import { readCarriedRig, rigSightOfCarried } from './store/rigReads'
 import type { MarkPlate } from './systems/render/markPlate'
 import { activeFxIdsOf } from './systems/render/powerUpFxFeed'
 import type { RigMount } from './systems/render/rigGear'
@@ -42,11 +42,11 @@ export const techTreeDebugActions: Readonly<Record<string, DebugAction>> = {
 }
 
 function readRig() {
-  const items = readRigItems()
-  const sight = rigSightOfItems(SHIPPED_ART, items)
+  const rig = readCarriedRig()
+  const sight = rigSightOfCarried(SHIPPED_ART, rig)
   return {
     ok: true as const,
-    items,
+    items: rig.items,
     mounts: sight.mounts.map(listedMount),
     plates: sight.plates.map(listedPlate),
     fx: readFx(),

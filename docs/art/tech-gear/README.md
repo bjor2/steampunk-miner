@@ -12,7 +12,7 @@ tree changes nothing else about the rig. Authored in Blender 4.2.9 on the shared
 the manifest and registered by the tech-tree slice (`r.artAssets`, #214). Since ticket 250 the
 slice's `tech-tree.rig-gear` vehicle piece (#235) hangs every registered item the loadout mounts
 (`rigMountsOf`, extractors folded until 148b #237 drives them) with a brass Mark plate under each
-cradle (`markPlatesOf`), and the `tech-tree.power-up-fx` scene layer feeds each `PowerUpUsed`
+cradle (`markPlatesOf`, at the Mark the item acts at, #249), and the `tech-tree.power-up-fx` scene layer feeds each `PowerUpUsed`
 into four point pools (`powerUpFxFeed.ts`). `steampunkDebug.features['tech-tree'].getRig()` reads
 both, and `previewPowerUpFx(itemId)` plays an effect at the vehicle.
 
