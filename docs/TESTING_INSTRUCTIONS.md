@@ -86,8 +86,14 @@ kind, tier, offset) spawn through `debug.spawnEnemy`; `facilities` (level 1 only
 (it must agree with `coreFragments`) are checked, never applied. `hintsEnabled` (#16) is off unless a
 file turns it on, so scenario and bot runs never see hints.
 
-- Applying a scenario submits `debug.*` authority commands (so it replays from `commands.ndjson` and logs
+- Applying a scenario starts a fresh session at tick 0 (#11 section 4; live ticks played before it never
+  count), submits `debug.*` authority commands (so it replays from `commands.ndjson` and logs
   `debug_command_applied`), then runs its script (`fastForward` steps).
+- After a scenario or a `restore(snapshot)`, the live game's fixed step holds at that tick until play
+  starts it (ticket 301): any key, an action press (`input.*` too), `fastForward`, `step` or `resume`.
+  The HUD shows "Scenario ready — press any key" meanwhile. So `?scenario=` and `applyScenario` land on
+  the same tick and digest however long the page takes between two `page.evaluate` calls. A spec that
+  wants live play after a scenario presses an action or calls `resume()` first.
 - Browser: `?scenario=<json>` at launch (parsed by `parseScenario`); `?debug` (or the dev build) exposes
   `window.steampunkDebug` (the `DebugApi`), `window.steampunkRunLog()` and `window.steampunkRunCommands()`
   (the newest NDJSON lines, up to a million characters per file, browser shell only, #117).
@@ -95,7 +101,10 @@ file turns it on, so scenario and bot runs never see hints.
   `setPlanetSeed`, `teleportToDepthTiles`, `teleportToDepth(depthBp)` (basis points of the radius),
   `teleportToDock(bay?)` (the `debug.teleportToDock {bay}` command: docked at rest in the Sell bay, or the Upgrade bay when named, no tow, no fee),
   `giveMoney` (a decimal string such as `"1e30"`), `applyScenario`,
-  `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, and for the vehicle
+  `fastForward(ticks, commands?)`, `snapshot()`, `restore(snapshot)`, for the live game `pause()` (the
+  fixed step holds until `resume()`, frames still draw), `resume()` and `step(ticks)` (1 to 3600 whole
+  fixed steps of the running world now, physics and all, logged as `debug_command_applied`; refused
+  while no physics world is mounted), and for the vehicle
   `setUpgrade(id, level)` (the stored step `10L + k` since #181: major 13 is level 130),
   `setEnergy(units)`, `setHull(hull)` (decimal strings) and the unlogged read
   `vehicleStats()` and `vehicleParts()` (the art part ids the run vehicle draws, #52); for the core, `setCoreFragments(count)`; for combat (#25), `spawnEnemy(kind, tier,
