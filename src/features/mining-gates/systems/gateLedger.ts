@@ -64,7 +64,7 @@ function ledgerEventsOf(
   return [clearedEventOf(gate, tile, ore, methodOf(gate, destroyed))]
 }
 
-function clearedEventOf(gate: CellGate, tile: TilePoint, ore: OreType, method: ClearMethod) {
+export function clearedEventOf(gate: CellGate, tile: TilePoint, ore: OreType, method: ClearMethod) {
   return {
     type: 'mining-gates.GateCleared' as const,
     ...tile,
@@ -92,7 +92,8 @@ function lostEventsOf(gate: CellGate, tile: TilePoint, ore: OreType): DomainEven
   ]
 }
 
-function isLostAt(heard: readonly DomainEvent[], { tx, ty }: TilePoint): boolean {
+/** Whether the drill's gate said the cell at the tile was lost in this step. */
+export function isLostAt(heard: readonly DomainEvent[], { tx, ty }: TilePoint): boolean {
   return heard.some(
     (event) =>
       event.type === 'DrillGated' && event.outcome === 'lost' && event.tx === tx && event.ty === ty,

@@ -12,6 +12,7 @@ import {
   setTipMajor,
 } from './gateFixtures'
 import type { CellGateKind, GatedEntry } from './gateTable'
+import { VERB_ROWS } from './verbRows'
 
 const TIERS = Array.from({ length: 200 }, (_, at) => at + 1)
 const PIPS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -97,7 +98,7 @@ describe('canMine: drill tiers', () => {
 })
 
 describe('canMine: extractors', () => {
-  it('refuses a resonance cell to a drill without the Resonance Fork, and cuts it with one', () => {
+  it('refuses a resonance cell to a drill without the Resonance Fork, and asks the fork to tune it', () => {
     const { session, fixture } = gatedOn(7, 'rig')
     expect(canMine(queryOf(session, fixture))).toEqual({
       outcome: 'refused',
@@ -106,9 +107,12 @@ describe('canMine: extractors', () => {
       have: 'none',
     })
     grantItems(session, ['rig.resonance'])
-    expect(canMine(queryOf(session, fixture))).toMatchObject({
-      outcome: 'cut',
+    expect(canMine(queryOf(session, fixture))).toEqual({
+      outcome: 'refused',
+      gateKind: 'rig',
+      required: 'rig.resonance:tuned',
       have: 'rig.resonance',
+      opensAfterTicks: VERB_ROWS.tune.tuneTicks,
     })
   })
 

@@ -37,6 +37,12 @@ export interface GateVerdict {
   gateKind: string
   required: string
   have: string
+  /**
+   * For a cell left standing that the player's own extractor opens by standing by it (ticket 237:
+   * a tune, an etch, a pull): the ticks it takes once the drill has touched the cell, so the
+   * pacing bot can wait instead of routing round. Absent when standing by opens nothing.
+   */
+  opensAfterTicks?: number
 }
 
 export interface GateCheck {

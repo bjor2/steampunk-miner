@@ -1,0 +1,15 @@
+{
+  "source": "Spec #142 Numbers, 'Verb parameters [Feel]' (no parameter grows with level; extractors have no levels), and 'The extraction rigs' table: one verb per extractor. maxTunedCells bounds the tune's spread through connected cells of one ore (ticket 237), above any patch #141 places.",
+  "tune": {
+    "rig": "rig.resonance",
+    "tuneTicks": 90,
+    "maxSpeedMmPerSecond": 500,
+    "rangeTiles": 2,
+    "tunedHoldTicks": 600,
+    "maxTunedCells": 64
+  },
+  "capture": { "rig": "rig.containment", "canistersPerDive": 6 },
+  "mark": { "rig": "rig.acid_etcher", "marksPerDive": 4, "markRadiusTiles": 1, "etchTicks": 1800 },
+  "pull": { "rig": "rig.induction", "rangeTiles": 3, "pullTicks": 120 },
+  "tow": { "rig": "rig.aether_tether", "lumpsInTow": 1 }
+}

@@ -2,12 +2,14 @@
  * The mining-gates slice's public API (feature-slices.md 2.1, #142 "Slice and contract"): the only
  * file another slice may import from this folder. `canMine` and the cell's gate, the read-only gate
  * table for the bot and the reports, the five extractors with their arrival, price and ownership,
- * and the drill gate's tip arithmetic. Types, pure selectors and constants only.
+ * the drill gate's tip arithmetic, and whether an extractor is at work (the fold-flat pose).
+ * Types, pure selectors and constants only.
  */
 export const MINING_GATES_SLICE_ID = 'mining-gates'
 
 export { canMine, minTipLevelOf } from './systems/canMine'
 export { cellGateOf, gateTableOfPlanet } from './systems/cellGates'
+export { extractorWorkOf, type ExtractorWork } from './systems/extractorWork'
 export type { ClearMethod, GateKindName } from './systems/gateEvents'
 export { GATE_ROWS, type LostAs, type Rig, type RiglessOutcome } from './systems/gateRows'
 export {

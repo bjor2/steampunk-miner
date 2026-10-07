@@ -7,8 +7,11 @@
  * | none (from P7)  | refused below the ordinary floor        | none                   | none    |
  * | dense           | refused below its floor                 | refused (an anchor)    | refused |
  * | drill signature | blocked below its floor (scratch-only)  | none (the kernel cap)  | refused |
- * | rig             | cut with the extractor, else its rule   | refused (an anchor)    | refused |
+ * | rig             | its extractor's verb, else its rule     | refused (an anchor)    | refused |
  * | dynamite        | refused (a sealed shell)                | cut from `minCharge`   | refused |
+ *
+ * An extractor's verb (tune, capture, mark, pull, tow) is `extractorVerdicts.ts`; the coil's own
+ * pull is the one tool an extractor cell lets through.
  *
  * Drill gates read the tip of the last completed major (#180 amendment 2) through the kernel's
  * floors, so a gate opens exactly where `canScratch` does. `required` and `have` are the words of
@@ -26,9 +29,13 @@ import { carriedSizesOf } from '../../../systems/vehicle/vehicleCharges'
 import { canScratch } from '../../../systems/vehicle/drillRule'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { cellGateOf } from './cellGates'
-import { GATE_ROWS, type Rig } from './gateRows'
+import {
+  extractorDrillVerdictOf,
+  extractorStandingVerdictOf,
+  isCoilPull,
+} from './extractorVerdicts'
+import { GATE_ROWS } from './gateRows'
 import type { CellGate } from './gateTable'
-import { ownsRig } from './rigs'
 
 /** The deepest major `minTipLevelOf` looks at: far past any campaign or endless tier. */
 const HIGHEST_MAJOR = 4096
@@ -43,7 +50,7 @@ export function canMine(query: GateQuery): GateVerdict | null {
 }
 
 function drillVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery) {
-  if (gate.kind === 'rig') return rigVerdictOf(gate.rig, query)
+  if (gate.kind === 'rig') return extractorDrillVerdictOf(gate.rig, query)
   if (gate.kind === 'dynamite') return shellVerdictOf(gate.minCharge, carriedSizeOf(query))
   if (isScratchable(params, query)) return null
   if (gate.kind === 'none' && !hasGateContent(params)) return null
@@ -51,7 +58,7 @@ function drillVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery) 
 }
 
 function blastVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery, size: number) {
-  if (gate.kind === 'rig') return { ...rigVerdictOf(gate.rig, query), outcome: 'refused' as const }
+  if (gate.kind === 'rig') return extractorStandingVerdictOf(gate.rig, query)
   if (gate.kind === 'dense') return tipVerdictOf('refused', params, query)
   if (gate.kind !== 'dynamite') return null
   const verdict = shellVerdictOf(gate.minCharge, size)
@@ -61,19 +68,10 @@ function blastVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery, 
 /** #142 "Constraints on other systems": a power-up never takes a gated cell, whatever is owned. */
 function toolVerdictOf(gate: CellGate, params: PlanetParams, query: GateQuery) {
   if (gate.kind === 'none') return null
-  if (gate.kind === 'rig') return { ...rigVerdictOf(gate.rig, query), outcome: 'refused' as const }
+  if (gate.kind === 'rig' && isCoilPull(gate.rig, query)) return null
+  if (gate.kind === 'rig') return extractorStandingVerdictOf(gate.rig, query)
   if (gate.kind === 'dynamite') return shellVerdictOf(gate.minCharge, carriedSizeOf(query))
   return tipVerdictOf('refused', params, query)
-}
-
-function rigVerdictOf(rig: Rig, { state, playerId }: GateQuery): GateVerdict {
-  const isOwned = ownsRig(state, playerId, rig.id)
-  return {
-    outcome: isOwned ? 'cut' : rig.withoutRig,
-    gateKind: 'rig',
-    required: rig.id,
-    have: isOwned ? rig.id : 'none',
-  }
 }
 
 function shellVerdictOf(minCharge: number, size: number): GateVerdict {
