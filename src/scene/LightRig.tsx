@@ -10,7 +10,7 @@ import { useMemo, useRef } from 'react'
 import { Color, type AmbientLight, type PointLight } from 'three'
 import { HEADLAMP_BODY_LIGHT, HEADLAMP_COLOUR, MAX_POINT_LIGHTS } from '../constants/scene'
 import { readPlanetWorld, useGameStore } from '../store/gameStore'
-import { platformLookOf, platformOriginOf } from '../systems/render/platformPlaceholder'
+import { platformOriginOf, platformYardLookOf } from '../systems/render/platformYard'
 import {
   ambientAtDepth,
   choosePointLights,
@@ -82,7 +82,7 @@ function usePlatformLights(): PointLightSource[] {
   if (params === null) return []
   const site = dockSiteOf(params)
   const origin = platformOriginOf(site)
-  return platformLightsOf(origin, platformLookOf(visualState, site).lamps)
+  return platformLightsOf(origin, platformYardLookOf(visualState).lamps)
 }
 
 function gatherSources(rig: RigScratch, platformLights: readonly PointLightSource[]): void {

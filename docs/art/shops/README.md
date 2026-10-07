@@ -7,8 +7,9 @@ for the look locked in
 Authored in Blender 4.2.9 on the shared box through the Blender MCP
 (`scripts/art/author_shop_buildings.py` wrote the first version; the `.blend` files under
 `art/blender/platform-building-<bay>/` are the sources from now on, Git LFS) and exported with
-`npm run art:export` at the platform density of 256 px/m. Nothing draws them yet: the build
-([#175](https://github.com/bjor2/steampunk-miner/issues/175)) places them at the zone centres.
+`npm run art:export` at the platform density of 256 px/m. The build
+([#175](https://github.com/bjor2/steampunk-miner/issues/175)) draws them at the zone centres from
+the `dock-buildings` slice; its in-game dock screenshots are at the end of this page.
 
 ## The two buildings
 
@@ -68,3 +69,22 @@ the asset lint gates (`MAX_PLATFORM_PARTS`, base set at most 30).
   screenshot from the #173 matrix; the texel density leaves headroom for it.
 - **Looked over live** in the shared Blender through the MCP before the export (front and
   three-quarter views of each building, material shading).
+
+## In the game (#175, 7 Oct 2026)
+
+`dock-<size>.png` are screenshots of the production build (`vite preview`, headless Chromium on
+SwiftShader) after `steampunkDebug.ui.setZoom(20)` and `teleportToDock('upgrade')`, once the
+atlases loaded: the car on the Works' turntable, the camera on `workshop.showcase_cam`, the yard
+with its lamp posts and signpost between the buildings. The Upgrade bay screen was hidden with a
+style rule for the shot only (it covers the scene while docked), and the opening transmission
+dismissed with a key.
+
+| File                               | Size                                                 |
+| ---------------------------------- | ---------------------------------------------------- |
+| `dock-desktop-1920x1080.png`       | desktop 1920×1080                                    |
+| `dock-phone-landscape-844x390.png` | phone landscape, 844×390 CSS px at 3× (2532×1170)    |
+| `dock-tv-3840x2160.png`            | TV 3840×2160 (no TV mode exists yet; #173 builds it) |
+
+Hand checks: both buildings, the yard and the car on the turntable show at all three sizes and
+the silhouettes read apart. On the phone the HUD's gauge cluster covers the Exchange's lower
+storeys at this zoom; the HUD's phone layout is #173's.

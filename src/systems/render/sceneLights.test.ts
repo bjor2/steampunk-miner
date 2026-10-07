@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { AMBIENT_DEEP, AMBIENT_SURFACE, MAX_POINT_LIGHTS } from '../../constants/scene'
-import { dockSiteOf } from '../world/dockSite'
-import { planetParamsFor } from '../world/planetParams'
-import { platformLookOf } from './platformPlaceholder'
+import { platformYardLookOf } from './platformYard'
 import {
   ambientAtDepth,
   choosePointLights,
@@ -10,8 +8,6 @@ import {
   platformLightsOf,
   type PointLightSource,
 } from './sceneLights'
-
-const SITE = dockSiteOf(planetParamsFor(83921, 1))
 
 function lampAt(id: string, x: number, rangeM = 3): PointLightSource {
   return { id, x, y: 0, colour: '#ffffff', rangeM, strength: 1 }
@@ -40,8 +36,8 @@ describe('scene lights', () => {
 
   it('adds the core drive glow to the platform lamps once the platform shows it', () => {
     const origin = { x: 0.5, y: 300 }
-    const outpost = platformLightsOf(origin, platformLookOf('outpost', SITE).lamps)
-    const coreDrive = platformLightsOf(origin, platformLookOf('core_drive', SITE).lamps)
+    const outpost = platformLightsOf(origin, platformYardLookOf('outpost').lamps)
+    const coreDrive = platformLightsOf(origin, platformYardLookOf('core_drive').lamps)
     expect(outpost.map((light) => light.id)).toEqual(['platform-lamp'])
     expect(coreDrive.map((light) => light.id)).toEqual(['platform-lamp', 'core-drive-glow'])
     expect(coreDrive[1].y).toBeGreaterThan(origin.y)

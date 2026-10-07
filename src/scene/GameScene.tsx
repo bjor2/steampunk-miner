@@ -16,7 +16,7 @@ import { PerfSampler } from './PerfSampler'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetTerrain } from './PlanetTerrain'
 import { PlantedCharges } from './PlantedCharges'
-import { PlatformPlaceholder } from './PlatformPlaceholder'
+import { PlatformYard } from './PlatformYard'
 import { RenderPipeline } from './RenderPipeline'
 import { ScreenFeedback } from './ScreenFeedback'
 import { ScreenProjectorFeed } from './ScreenProjectorFeed'
@@ -24,6 +24,7 @@ import { SkyBackground } from './SkyBackground'
 import { SoundStage } from './SoundStage'
 import { Sparks } from './Sparks'
 import { Vehicle } from './Vehicle'
+import { WorldPieces } from './WorldPieces'
 
 export function GameScene() {
   // One human player in the slice, so settings pause the local game (#33); never a command.
@@ -43,7 +44,8 @@ export function GameScene() {
       <PlanetCamera />
       <LightRig />
       <PlanetTerrain />
-      <PlatformPlaceholder />
+      <PlatformYard />
+      <WorldPieces layer="platform" />
       <EnemyFigures />
       <PhysicsWorld isPaused={isPaused}>
         <Vehicle />

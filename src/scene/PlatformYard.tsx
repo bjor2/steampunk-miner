@@ -1,19 +1,19 @@
 /**
- * The platform on its pad (#8, #13, #37): the hub between the two bays and their signs, the
- * outpost, and the core drive once the authority's
- * `platform.visualState` says so, with the core bay's fill gauge on its body; from planet 3 the
- * Refinery bay at its look (#105). Lit by the scene's
- * lights (#38, #48); its lamps are `LightRig`'s. Drawn behind the
+ * The yard on the pad between the two shop buildings (#170; the hub of #8, #13 and #37): its lamp
+ * posts and signpost, the core bay's fill gauge, the core drive once the authority's
+ * `platform.visualState` says so, and from planet 3 the Refinery bay at its look behind the yard
+ * (#105). The buildings themselves are the `dock-buildings` slice's, drawn in the `platform`
+ * world layer. Lit by the scene's lights (#38, #48); its lamps are `LightRig`'s. Drawn behind the
  * vehicle; it changes only when the replica does, so it renders through React like the vehicle's
  * parts, never per frame.
  */
 import { readPlanetWorld, useGameStore } from '../store/gameStore'
 import {
   coreBayFillOf,
-  platformLookOf,
   platformOriginOf,
+  platformYardLookOf,
   type PartShape,
-} from '../systems/render/platformPlaceholder'
+} from '../systems/render/platformYard'
 import { dockSiteOf, type DockSite } from '../systems/world/dockSite'
 import { RefineryBay } from './RefineryBay'
 
@@ -28,14 +28,14 @@ const NO_GLOW = '#000000'
 /** Matte, like the vehicle's parts (#48 one material language); tuned by eye. */
 const PART_ROUGHNESS = 0.55
 
-export function PlatformPlaceholder() {
+export function PlatformYard() {
   // The planet's seed re-renders this on travel or a new seed, where the pad moves.
   useGameStore((state) => `${state.planetTier}:${state.planetSeed}`)
   const platform = useGameStore((state) => state.platform)
   const site = siteOfPlanet()
   if (site === null) return null
   const origin = platformOriginOf(site)
-  const look = platformLookOf(platform.visualState, site)
+  const look = platformYardLookOf(platform.visualState)
   const fill = coreBayFillOf(platform.coreBay, platform.coreNeeded)
   return (
     <group position={[origin.x, origin.y, 0]}>

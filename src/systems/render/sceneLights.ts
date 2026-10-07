@@ -13,7 +13,7 @@ import {
   MAX_POINT_LIGHTS,
 } from '../../constants/scene'
 import type { Vector2 } from '../vehicle/localFrame'
-import type { PlatformLamp } from './platformPlaceholder'
+import type { PlatformLamp } from './platformYard'
 
 export interface PointLightSource {
   id: string
