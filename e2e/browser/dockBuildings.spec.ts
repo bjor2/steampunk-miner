@@ -5,7 +5,8 @@
  * buildings in view at the 20 m zoom-out, on planet 1 and on planet 38's grown pad (with the three
  * add-ons of #222 standing), the frame stays within the #38 budget of 150 draw calls (TD acceptance
  * 7 and the 48-part amendment). Travelling onto planet 14 builds the scanner mast and, once the
- * travel card is gone, pans the camera to it once (TD lock on #197 Q4).
+ * travel card is gone and the player has left the bay, pans the camera to it once (TD lock on #197
+ * Q4).
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -215,11 +216,18 @@ test.describe('dock buildings (#175)', () => {
       planetIndex: 14,
       addOns: [{ id: 'scanner_mast', rowId: 'scanner_station' }],
     })
-    // The travel card covers the landing for up to 10 s; the pan starts once it is gone and lasts
-    // under 2 s of ticks, so poll quickly.
-    await expect
-      .poll(async () => (await unlockPan(page)).cameraWeight, { timeout: 60_000, intervals: [20] })
-      .toBeGreaterThan(0)
+    // The platform lands docked, under the bay screen: the pan waits for the player to leave the
+    // Exchange and for the travel card (up to 10 s) to go, then lasts under 2 s: poll every frame.
+    expect((await unlockPan(page)).armedRowId).toBe('scanner_station')
+    await page.evaluate(() => window.steampunkDebug!.input.tap('ui_cancel'))
+    await page.waitForFunction(
+      () => {
+        const read = window.steampunkDebug!.features['dock-buildings'].getUnlockPan
+        return (read() as { ok: true } & UnlockPanReport).cameraWeight > 0
+      },
+      undefined,
+      { timeout: 60_000, polling: 'raf' },
+    )
     const pan = await unlockPan(page)
     expect(pan.shown).toMatchObject({ rowId: 'scanner_station', planetIndex: 14 })
     expect(pan.armedRowId).toBeNull()

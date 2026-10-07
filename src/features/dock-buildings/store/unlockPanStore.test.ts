@@ -47,12 +47,21 @@ describe('unlock pan', () => {
     expect(game().planetTier).toBe(14)
     expect(game().travelTransition).not.toBeNull()
     expect(armedUnlockPanRowId()).toBe('scanner_station')
+    game().undock()
     expect(shownUnlockPan()).toBeNull()
   })
 
-  it('pans the camera onto the new building once the card closes, then hands it back', () => {
+  it('waits while the platform lands docked, as the bay screen covers the pad', () => {
     travelFrom(13)
     game().finishTravelTransition()
+    expect(armedUnlockPanRowId()).toBe('scanner_station')
+    expect(shownUnlockPan()).toBeNull()
+  })
+
+  it('pans the camera onto the new building once the pad is on screen, then hands it back', () => {
+    travelFrom(13)
+    game().finishTravelTransition()
+    game().undock()
     const shown = shownUnlockPan()!
     expect(shown.planetIndex).toBe(14)
     expect(shown.pan.startTick).toBe(readAuthorityState().tick)
@@ -71,6 +80,7 @@ describe('unlock pan', () => {
   it('replays no pan after a reload: the restored session arms nothing', () => {
     travelFrom(13)
     game().finishTravelTransition()
+    game().undock()
     const saved = takeSessionSnapshot()
     resetDockBuildingsStore()
     game().restoreSnapshot(saved)
@@ -82,6 +92,7 @@ describe('unlock pan', () => {
   it('pans onto nothing on arriving at a planet with no new add-on', () => {
     travelFrom(1)
     game().finishTravelTransition()
+    game().undock()
     expect(armedUnlockPanRowId()).toBeNull()
     expect(shownUnlockPan()).toBeNull()
     expect(cameraNow()).toBeNull()

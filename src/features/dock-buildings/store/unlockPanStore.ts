@@ -1,13 +1,15 @@
 /**
  * The slice's unlock pan state (feature-slices.md 6.4: fed by `listenForDomainEvents`, never a
- * `GameState` field). An add-on's `FeatureUnlocked` arms the pan; it starts on the first step the
- * landing is on screen, after the travel card, so the player sees the new building. Read once
+ * `GameState` field). An add-on's `FeatureUnlocked` arms the pan; it starts once the pad is on
+ * screen, with the travel card gone and the vehicle undocked (docked, the bay screen covers the
+ * pad, and the platform lands docked), so the player sees the new building. Read once
  * per fixed step by the staging provider, so it is a plain module record, not React state. It is
  * never saved: a reload starts with no pan and replays none (TD lock on #197 Q4).
  */
 import { readAuthorityState } from '../../../store/authorityLink'
 import { listenForDomainEvents } from '../../../store/domainEventBroadcast'
 import { useGameStore } from '../../../store/gameStore'
+import { dockedBayOf } from '../../../systems/authority/dockRules'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { dockAddOnOfRow, type DockAddOn } from '../systems/dockAddOns'
 import {
@@ -58,7 +60,7 @@ function armUnlockPanFrom(events: readonly DomainEvent[]): void {
   if (addOn !== null) record.armedRowId = addOn.rowId
 }
 
-/** Starts the armed pan now unless the travel card still covers the landing. */
+/** Starts the armed pan now unless the travel card or the bay screen still covers the pad. */
 function startArmedPan(): void {
   if (!isLandingCovered()) startPanOnto(armedAddOn())
 }
@@ -74,5 +76,14 @@ function armedAddOn(): DockAddOn | null {
 }
 
 function isLandingCovered(): boolean {
+  return isTravelCardShowing() || isVehicleDocked()
+}
+
+function isTravelCardShowing(): boolean {
   return useGameStore.getState().travelTransition !== null
+}
+
+/** Docked, the bay screen is drawn over the pad (#37). */
+function isVehicleDocked(): boolean {
+  return dockedBayOf(readAuthorityState(), useGameStore.getState().playerId) !== null
 }
