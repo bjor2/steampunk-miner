@@ -18,7 +18,7 @@ build box) runs them and writes the records. Records before that date come from 
 - **Spec run, in order:** `fast` = `CHANGED_FILES=<union of the files the spec's tickets'
 commits changed> scripts/ci/selectPushTests.sh` (scoped `vitest related`, full, or none), pacing
   bot excluded, recorded at once; then, when `fast` is green and the feature touched `src/` (or
-  was unmappable), `slow` = the three pacing bot files (NIGHTLY_ONLY_TESTS) and Playwright e2e
+  was unmappable), `slow` = the four pacing bot files (NIGHTLY_ONLY_TESTS) and Playwright e2e
   when the box has room (else nightly). Records carry `run.feature` and `run.tickets`.
 - **Nightly:** the true full suite (`npm test`, every test's duration kept), then balance:report,
   the four benches + bench:summary, balance:planets, e2e, soak:memory and packaged smoke; each

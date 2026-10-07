@@ -6,8 +6,11 @@
 export const UNMAPPED_FEATURE = 'unmapped'
 
 export const FEATURE_RULES = [
-  // The three pacing bot regressions: nightly only (NIGHTLY_ONLY_TESTS in vite.config.ts).
-  { pattern: /^src\/logging\/(pacingGate|assayPacingGate)\.test\.ts$/, feature: 'pacing-bot' },
+  // The four pacing bot regressions: nightly only (NIGHTLY_ONLY_TESTS in vite.config.ts).
+  {
+    pattern: /^src\/logging\/(pacingGate|assayPacingGate|campaignPacingGate)\.test\.ts$/,
+    feature: 'pacing-bot',
+  },
   { pattern: /^src\/systems\/bot\/playSlice\.test\.ts$/, feature: 'pacing-bot' },
   // The golden replays of tests/golden.
   {

@@ -27,6 +27,7 @@ function readBuildCommit(): string {
 const NIGHTLY_ONLY_TESTS = [
   'src/logging/pacingGate.test.ts',
   'src/logging/assayPacingGate.test.ts',
+  'src/logging/campaignPacingGate.test.ts',
   'src/systems/bot/playSlice.test.ts',
 ]
 const skipsNightlyOnlyTests = process.env.SKIP_NIGHTLY_ONLY_TESTS === '1'

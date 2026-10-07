@@ -88,6 +88,7 @@ describe('test feature mapping', () => {
     expect(featureOfTestFile('src/systems/seededRandom.test.ts')).toBe('systems-core')
     expect(featureOfTestFile('src/store/gameStore.test.ts')).toBe('store')
     expect(featureOfTestFile('src/logging/pacingGate.test.ts')).toBe('pacing-bot')
+    expect(featureOfTestFile('src/logging/campaignPacingGate.test.ts')).toBe('pacing-bot')
     expect(featureOfTestFile('src/systems/bot/playSlice.test.ts')).toBe('pacing-bot')
     expect(featureOfTestFile('src/logging/goldenRun.test.ts')).toBe('golden-replay')
     expect(featureOfTestFile('scripts/status/features.test.mjs')).toBe('tooling-status')

@@ -237,7 +237,19 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   departure (`planetLeads.ts`). The bot holds drill_power to one level past the planet's on-curve
   level and its forced core rule then buys drill_tip to two past (`bot/botCoreRule.ts`, #86), so a
   lead above those bounds is a bot bug, not a balance finding. Band 1 already digs at the
-  24-tick cap on arrival, so it is printed, never judged. Reported, never gated.
+  24-tick cap on arrival, so it is printed, never judged. Reported in `balance:planets`; gated on
+  planets 1 to 7 by R1 below.
+- **Campaign scaling gate** (R1, #89): `src/logging/campaignPacingGate.test.ts` (nightly only) plays
+  the bot scenario on each pacing seed to planet 8's core (`campaignGateLastPlanet`) and fails, via
+  `campaignScalingGate.ts`, on a median band-5 departure over 0.7x arrival on a planet left, a
+  seed still short of planet 8's core inside the slice budget plus 120 minutes a later planet, or a
+  locked schedule with more than 2 campaign planets in a row without a horizontal row (#81).
+  Campaign pacing (45 to 60 minutes a planet, C4) is printed with its dial, never gated: a miss is
+  a Systems & Economy finding, and `k_casing` stays at its floor (Game Director on #84).
+  `src/logging/campaignScalingGate.test.ts` breaks each check in a test double, pins the Horizontal
+  Scaler's `source_hash`, and holds the M1-M5 module rows back at `vision` to show the gate needs
+  none of them. The C1-C4 and H1-H2 probe files are listed with it in the manifest's cross-slice
+  checks.
 
 - **Move-PR guard** (#230, Vertical direction of the #191 lock): tests move into
   `src/features/<slice>/` with their slice's migration, and `npm run tests:move-guard` (against
