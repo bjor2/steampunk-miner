@@ -9,6 +9,7 @@
  * `debug_command_applied`. Stubs (typed, throw DebugCommandNotImplementedError) wait for the
  * system they poke.
  */
+import { mountedPartsShown, type MountedPartsShown } from '../scene/mountedPartsPresence'
 import { partMotion } from '../scene/partMotionPresence'
 import { SHIPPED_ART } from '../scene/shippedArt'
 import {
@@ -114,7 +115,8 @@ export type { ArtefactReport }
  * `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6), and
  * each part's pose now (#48 acceptance 1-2: wheel and drill angles, lifts, squash, glow). Mounted
  * guns add their turret's part ids at the look of their level (#107, #81 acceptance 3), and a
- * bolted-on charge rack its frame and one part per rack slot its charges fill (#109, #218).
+ * bolted-on charge rack its frame and one part per rack slot its charges fill (#109, #218). The
+ * slices' vehicle pieces report what they hang at attach points under `mounted` (#235).
  */
 export interface VehiclePartsReport {
   visualTier: number
@@ -125,6 +127,8 @@ export interface VehiclePartsReport {
   poses: Record<string, PartPose>
   /** The attach points a slice's part motion or swap names this tick (#180, sorted). */
   requestedAttach: string[]
+  /** What the slices' vehicle pieces hang on the car now, by attach point (#235). */
+  mounted: MountedPartsShown[]
 }
 
 export interface DebugApi {
@@ -302,6 +306,7 @@ function vehiclePartsReport(): VehiclePartsReport {
     ],
     poses: vehiclePartPosesOf(SHIPPED_ART, partMotion, vehicle.visualTier, !prefs.shake),
     requestedAttach: [...partMotion.requested.attach],
+    mounted: mountedPartsShown(),
   }
 }
 

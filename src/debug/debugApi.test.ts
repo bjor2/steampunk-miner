@@ -345,6 +345,10 @@ describe('debug api: vehicle', () => {
     ])
   })
 
+  it('reports no mounted parts while no vehicle piece hangs gear on the car (#235)', () => {
+    expect(createDebugApi().vehicleParts()).toMatchObject({ mounted: [] })
+  })
+
   it('adds the guns turret to the vehicle parts once mounted, its barrel look by major (#107)', () => {
     const debug = createDebugApi()
     expect(debug.vehicleParts()).toMatchObject({ gunLevel: 0 })

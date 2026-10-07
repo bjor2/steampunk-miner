@@ -62,6 +62,7 @@ import {
 import { ATTACH_USE_REGISTRY } from '../systems/registries/vehicleAttach'
 import { VEHICLE_STAGING_REGISTRY } from '../systems/registries/vehicleStaging'
 import { SCENE_LAYER_REGISTRY } from '../scene/registries/sceneLayers'
+import { VEHICLE_PIECE_REGISTRY } from '../scene/registries/vehiclePieces'
 import { WORLD_PIECE_REGISTRY } from '../scene/registries/worldPieces'
 import { LOADOUT_ACCEPTANCE_REGISTRY } from '../systems/registries/vehicleLoadout'
 import { BAY_PANEL_REGISTRY } from '../ui/registries/bayPanels'
@@ -103,6 +104,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     moneyCounter: (provider) => add(MONEY_COUNTER_REGISTRY, provider),
     worldPiece: (piece) => add(WORLD_PIECE_REGISTRY, piece),
     sceneLayer: (layer) => add(SCENE_LAYER_REGISTRY, layer),
+    vehiclePiece: (piece) => add(VEHICLE_PIECE_REGISTRY, piece),
     vehicleStaging: (provider) => add(VEHICLE_STAGING_REGISTRY, provider),
     partMotionRequests: (source) => add(PART_MOTION_REQUEST_REGISTRY, source),
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),

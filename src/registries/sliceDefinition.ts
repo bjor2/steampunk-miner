@@ -37,6 +37,7 @@ import type { SoundCue } from '../systems/registries/soundCues'
 import type { AttachUse } from '../systems/registries/vehicleAttach'
 import type { VehicleStagingProvider } from '../systems/registries/vehicleStaging'
 import type { SceneLayer } from '../scene/registries/sceneLayers'
+import type { VehiclePiece } from '../scene/registries/vehiclePieces'
 import type { WorldPiece } from '../scene/registries/worldPieces'
 import type { LoadoutAcceptance } from '../systems/registries/vehicleLoadout'
 import type { BayPanel } from '../ui/registries/bayPanels'
@@ -98,6 +99,8 @@ export interface SliceRegistrar {
   worldPiece(piece: WorldPiece): void
   /** A layer of the world scene with the most it draws, after the planted charges (#213). */
   sceneLayer(layer: SceneLayer): void
+  /** A piece drawn in the local vehicle's body frame, at the base vehicle's attach points (#235). */
+  vehiclePiece(piece: VehiclePiece): void
   /** One provider across all slices: how a dock building stages the local vehicle (#170). */
   vehicleStaging(provider: VehicleStagingProvider): void
   /** Poses and part swaps on the drawn car, at vehicle-attach points, asked each tick (#180). */
