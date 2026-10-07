@@ -21,7 +21,7 @@ export function powerUpOfDrain(item: ExtractionItem): PowerUp {
     windupTicks: 0,
     channelTicks: balance.actTicks,
     isToggle: false,
-    energyDrawPerMillePerSecond: 0,
+    energyDrawBpPerSecond: 0,
     activate: drainMinerals,
   }
 }
