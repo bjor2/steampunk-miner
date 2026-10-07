@@ -423,8 +423,10 @@ The ore art of [#144](https://github.com/bjor2/steampunk-miner/issues/144) (spec
 three 4096 atlases (albedo with the mask in alpha, normal, emissive from grade 3), one cell per
 family x variant x grade on the table of `docs/art/ores/atlas-layout.json`, which the
 `ore-visuals` slice's `oreAtlasCellOf` mirrors. See [docs/art/ores/README.md](art/ores/README.md).
-The atlases have no manifest form or id yet, so they stay in `art/build/ores/` until the kernel
-renderer ticket adds both and ships them under `public/assets/`.
+They ship as one `parts` asset, `ground-ore-atlas` (registered by the slice through
+`r.artAssets`, #214): the three KTX2 maps and a schema-1 sidecar with one part per cell under
+`public/assets/ground/ground-ore-atlas/`, written by `assemble_atlas.py` rather than `export.sh`,
+since the source is twelve family files. Nothing draws it yet; the kernel ore renderer will.
 
 ## The `parts.json` sidecar, schema 1
 
