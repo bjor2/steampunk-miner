@@ -7,7 +7,7 @@
  */
 import { COLLAPSE_BLOCK_SAMPLES } from '../../../constants/balance'
 import { MM_PER_METRE } from '../../../constants/physics'
-import { blastRadiusMm } from '../../economy/blastingCharges'
+import { chargeRadiusMm } from '../../economy/chargeSizes'
 import type { PlanetParams } from '../../world/planetParams'
 import { SAMPLES_PER_TILE } from '../../world/sampleGrid'
 import { chunkKey, chunkOfTile, type TilePoint } from '../../world/tileGrid'
@@ -38,7 +38,9 @@ export function prefetchPlantedBlastChunks(state: AuthorityState, ticks: number)
 
 /** The planted charges' blast chunks not generated yet, in charge then row order. */
 export function chunksAwaitingPrefetch(state: AuthorityState, params: PlanetParams): ChunkPoint[] {
-  const chunks = liveChargesOf(state).flatMap((charge) => blastChunksOf(charge, blastRadiusMm()))
+  const chunks = liveChargesOf(state).flatMap((charge) =>
+    blastChunksOf(charge, chargeRadiusMm(charge.size)),
+  )
   return uniqueChunks(chunks).filter(({ cx, cy }) => !isGeneratedChunkHeld(params, cx, cy))
 }
 

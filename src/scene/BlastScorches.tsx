@@ -15,7 +15,7 @@ import {
 } from '../constants/scene'
 import { MM_PER_METRE } from '../constants/physics'
 import { readBlastScorches } from '../store/blastScorchRecord'
-import { blastRadiusMm } from '../systems/economy/blastingCharges'
+import { chargeRadiusMm } from '../systems/economy/chargeSizes'
 import { rgbOfHex } from '../systems/render/colour'
 import type { ChargePlacement } from '../systems/render/chargeLook'
 import { SCORCH_FRAGMENT_SHADER, SCORCH_VERTEX_SHADER } from './blastScorchShader'
@@ -23,7 +23,8 @@ import { useDisposeEachOnRelease } from './disposeOnRelease'
 
 /** On the ground's face, under the planted charges (0.26). */
 const SCORCH_Z = 0.2
-const RADIUS_M = blastRadiusMm() / MM_PER_METRE
+/** The shipped size's scorch: `ChargeDetonated` gains its size with the scene layers (#213). */
+const RADIUS_M = chargeRadiusMm(1) / MM_PER_METRE
 const HALF_SIZE_M = RADIUS_M + SCORCH_OUTER_FADE_M
 
 export function BlastScorches() {

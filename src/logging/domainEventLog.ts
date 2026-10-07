@@ -267,9 +267,14 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'energy_recharged',
     data: { from, to, cost },
   }),
-  ChargePlanted: ({ tx, ty, detonateTick, carried }) => ({
-    event: 'charge_planted',
-    data: { tx, ty, detonateTick, carried },
+  // A remote charge has no fuse tick, so it logs as its own event rather than retyping the field.
+  ChargePlanted: ({ tx, ty, size, detonateTick, carried }) =>
+    detonateTick === null
+      ? { event: 'remote_charge_planted', data: { tx, ty, size, carried } }
+      : { event: 'charge_planted', data: { tx, ty, size, detonateTick, carried } },
+  ChargeDisarmed: ({ tx, ty, size, reason }) => ({
+    event: 'charge_disarmed',
+    data: { tx, ty, size, reason },
   }),
   ChargeDetonated: (detonated) => ({
     event: 'charge_detonated',
@@ -292,9 +297,9 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
       ticks: blast.ticks,
     },
   }),
-  ChargesRestocked: ({ count, price }) => ({
+  ChargesRestocked: ({ size, count, price }) => ({
     event: 'charges_restocked',
-    data: { count, price },
+    data: { size, count, price },
   }),
   ChargeRackUpgraded: ({ from, to, price, ...held }) => ({
     event: 'charge_rack_upgraded',

@@ -11,6 +11,7 @@ import { PLANTED_CHARGE_SLOTS } from '../constants/scene'
 import { readLiveChargesInto } from '../store/chargeReads'
 import {
   fuseLampQuadsOf,
+  fuseTicksLeftOf,
   isFuseLampLit,
   plantedChargeBodyQuadsOf,
   plantedChargeMaps,
@@ -87,5 +88,5 @@ function placeCharge(
   const { x, y, turn } = writeChargePlacement(charge, slot.placement)
   slot.group.position.set(x, y, 0)
   slot.group.rotation.set(0, 0, turn)
-  if (slot.lamp !== null) slot.lamp.visible = isFuseLampLit(seconds, charge.detonateTick - tick)
+  if (slot.lamp !== null) slot.lamp.visible = isFuseLampLit(seconds, fuseTicksLeftOf(charge, tick))
 }

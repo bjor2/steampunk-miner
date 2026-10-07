@@ -3,14 +3,15 @@
  * looked at and whenever time moves with no command (#3, #11 section 5):
  *
  * - while combat is live, every tick runs: tows due at that tick first, then the enemy tick (#9),
- *   then any charge whose fuse blows at that tick (#109), then the world's terrain edits (K6 #189:
+ *   then any charge whose fuse blows at that tick (#109), then any remote charge that times out
+ *   unfired (K8 #218), then the world's terrain edits (K6 #189:
  *   the live blasts' slice, then the queued power-up edits' share), then any collapse due at that
  *   tick (#43), then the slices' clock steps in id order (#217);
  * - otherwise nothing can change between ticks but a blast, a collapse, a refinery batch or flowing
- *   lava, so the clock jumps to the next tick a charge blows or a terrain edit moves, a block warns
- *   into its refill or refills, a batch is ready (#105), loose lava steps (#113) or a slice's clock
- *   step has work due (#217), or to the end (tows due by then first); tows happen at their due tick
- *   (#7 strand grace, destroy delay).
+ *   lava, so the clock jumps to the next tick a charge blows or times out or a terrain edit moves,
+ *   a block warns into its refill or refills, a batch is ready (#105), loose lava steps (#113) or a
+ *   slice's clock step has work due (#217), or to the end (tows due by then first); tows happen at
+ *   their due tick (#7 strand grace, destroy delay).
  *
  * After each tick it settles, and after the closing tows, the slices' authority reactions fold the
  * events it raised into their sections (#219).
@@ -23,6 +24,7 @@ import { nextBlastSliceTick, sliceLiveBlasts } from './charges/blastSlice'
 import { nextTerrainEditTick } from './terrain/terrainEdits'
 import { applyQueuedTerrainEdits } from './terrain/terrainEditTick'
 import { detonateChargesDue, nextDetonationTick } from './charges/chargeDetonation'
+import { disarmExpiredCharges, nextDisarmTick } from './charges/chargeDisarm'
 import { nextCollapseTick } from './collapse/collapseState'
 import { runCollapseTick } from './collapse/collapseTick'
 import { isCombatLive, runCombatTick, type TickOutcome } from './combat/combatTick'
@@ -54,6 +56,7 @@ function runLiveTick(state: AuthorityState, tick: number): TickOutcome {
     (current) => towVehiclesDueBy(current, tick),
     (current) => runCombatTick(current, tick),
     (current) => detonateChargesDue(current, tick),
+    (current) => disarmExpiredCharges(current, tick),
     (current) => sliceLiveBlasts(current, tick),
     (current) => applyQueuedTerrainEdits(current, tick),
     (current) => runCollapseTick(current, tick),
@@ -72,6 +75,7 @@ function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
   return runClockSteps(state, [
     (current) => towVehiclesDueBy(current, stopTick),
     (current) => detonateChargesDue(current, stopTick),
+    (current) => disarmExpiredCharges(current, stopTick),
     (current) => sliceLiveBlasts(current, stopTick),
     (current) => applyQueuedTerrainEdits(current, stopTick),
     (current) => runCollapseTick(current, stopTick),
@@ -84,6 +88,7 @@ function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
 function nextScheduledTick(state: AuthorityState): number | null {
   const ticks = [
     nextDetonationTick(state, state.tick),
+    nextDisarmTick(state, state.tick),
     nextBlastSliceTick(state),
     nextTerrainEditTick(state),
     nextCollapseTick(state.collapse, state.tick),

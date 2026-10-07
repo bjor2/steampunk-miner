@@ -21,6 +21,7 @@ import { canOpenArtefactCache } from '../systems/authority/artefactRules'
 import { dockableBayOf, dockedBayOf } from '../systems/authority/dockRules'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { plantRefusal } from '../systems/authority/charges/chargeRules'
+import { chargeSizeToPlantOf, nextChargeSizeOf } from '../systems/vehicle/chargeSelection'
 import { mountedGunModeOf } from '../systems/vehicle/vehicleGun'
 import { readAuthorityState } from './authorityLink'
 import { useGameStore } from './gameStore'
@@ -158,6 +159,8 @@ function captureRebinding(key: KeyChange): void {
 function situationNow(): InputSituation {
   const game = useGameStore.getState()
   const state = readAuthorityState()
+  const { charges } = state.players[game.playerId].vehicle
+  const sizeToPlant = chargeSizeToPlantOf(charges, game.chosenChargeSize)
   return {
     layer: inputLayerOf(game),
     vehicleMode: game.vehicle.mode,
@@ -165,7 +168,9 @@ function situationNow(): InputSituation {
     dockedBay: dockedBayOf(state, game.playerId),
     canOpenArtefactCache: canOpenArtefactCache(state, game.playerId),
     gunMode: mountedGunModeOf(state.players[game.playerId].vehicle.gun),
-    canPlantCharge: plantRefusal(state, game.playerId) === null,
+    plantableChargeSize:
+      plantRefusal(state, game.playerId, sizeToPlant) === null ? sizeToPlant : null,
+    nextChargeSize: nextChargeSizeOf(charges, game.chosenChargeSize),
     state,
     playerId: game.playerId,
   }
@@ -181,4 +186,5 @@ function applyReaction(reaction: InputReaction): void {
   else if (reaction.kind === 'moveFocus') game.moveFocus(reaction.step)
   else if (reaction.kind === 'activateFocused') game.activateFocusedControl()
   else if (reaction.kind === 'zoom') game.zoom(reaction.change)
+  else if (reaction.kind === 'chooseChargeSize') game.chooseChargeSize(reaction.size)
 }

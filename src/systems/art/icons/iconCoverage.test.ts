@@ -78,7 +78,7 @@ function upgradeBayIconsOf(model: UpgradeBayModel): string[] {
     model.casing,
     model.lining,
     model.guns,
-    model.charges?.restock,
+    ...(model.charges?.restock ?? []),
     model.charges?.rack,
   ]
   return [

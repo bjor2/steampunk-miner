@@ -35,6 +35,7 @@ import {
 } from './commandRule'
 import { CASING_RULES } from './casingRules'
 import { CHARGE_RULES } from './charges/chargeRules'
+import { CHARGE_SHOP_RULES } from './charges/chargeShopRules'
 import { sliceCommandRuleOf } from '../registries/commandRules'
 import { followCollapse } from './collapse/collapseWatch'
 import { DEBUG_COMMAND_RULES } from './debugCommandRules'
@@ -95,6 +96,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...REFINERY_RULES,
   ...REFINERY_COLLECTION_RULES,
   ...CHARGE_RULES,
+  ...CHARGE_SHOP_RULES,
   ...LOADOUT_RULES,
 }
 

@@ -4,6 +4,7 @@
  * strings, and the loadout as its versioned `loadout` section (K4). Reading checks the shape so a malformed snapshot is refused with listed problems before
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
+import { isChargeSize } from '../economy/chargeSizes'
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
@@ -99,7 +100,7 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(isPortableGun(vehicle.gun) ? [] : [`${path}.gun must hold a whole level and a gun mode`]),
     ...(isPortableCharges(vehicle.charges)
       ? []
-      : [`${path}.charges must hold a rack flag, whole counts and a planted charge or null`]),
+      : [`${path}.charges must hold a rack flag, counts by size and a planted charge or null`]),
     ...(isPortableLining(vehicle.lining)
       ? []
       : [`${path}.lining must hold an owned active lining type and the owned types`]),
@@ -166,9 +167,23 @@ function isPortableCharges(charges: unknown): boolean {
     isJsonObject(charges) &&
     typeof charges.isRackMounted === 'boolean' &&
     isWholeNumber(charges.slotLevel) &&
-    isWholeNumber(charges.carried) &&
+    isCarriedBySize(charges.carriedBySize) &&
     (charges.planted === null || isPlantedCharge(charges.planted))
   )
+}
+
+/** Counts above zero keyed by a size on the ladder (K8 #218): a size with none has no key. */
+function isCarriedBySize(carried: unknown): boolean {
+  return (
+    isJsonObject(carried) &&
+    Object.entries(carried).every(
+      ([size, count]) => isChargeSizeKey(size) && isWholeNumber(count) && (count as number) > 0,
+    )
+  )
+}
+
+function isChargeSizeKey(size: string): boolean {
+  return String(Number.parseInt(size, 10)) === size && isChargeSize(Number.parseInt(size, 10))
 }
 
 function isPlantedCharge(planted: unknown): boolean {
@@ -176,7 +191,9 @@ function isPlantedCharge(planted: unknown): boolean {
     isJsonObject(planted) &&
     Number.isSafeInteger(planted.tx) &&
     Number.isSafeInteger(planted.ty) &&
-    isWholeNumber(planted.detonateTick)
+    isChargeSize(planted.size as number) &&
+    isWholeNumber(planted.plantedTick) &&
+    (planted.detonateTick === null || isWholeNumber(planted.detonateTick))
   )
 }
 

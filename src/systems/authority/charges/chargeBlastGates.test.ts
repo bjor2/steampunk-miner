@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
-import { blastRadiusMm, chargeSize } from '../../economy/blastingCharges'
+import { chargeRadiusMm } from '../../economy/chargeSizes'
 import { oreSalePrice } from '../../economy/oreEconomy'
 import { fromSafeInteger, mul, toCanonical, ZERO_MONEY } from '../../money'
 import type { GateQuery, GateVerdict } from '../../registries/gateChecks'
@@ -71,7 +71,7 @@ function blastSiteWith(slices: readonly SliceDefinition[]) {
 }
 
 function oreTilesOfSite(): TilePoint[] {
-  return blastTilesAround(SITE.wall).filter(
+  return blastTilesAround(SITE.wall, 1).filter(
     (tile) => kindOfCell(cellAt(EMPTY_WORLD, PARAMS, tile)) === CELL_KIND.ore,
   )
 }
@@ -89,8 +89,8 @@ describe('charge blast gates', () => {
     expect(queries.map(({ playerId }) => playerId)).toEqual(Array(5).fill('p1'))
     expect(queries[0].blast).toEqual({
       ...SITE.wall,
-      radiusMm: blastRadiusMm(),
-      size: chargeSize(),
+      radiusMm: chargeRadiusMm(1),
+      size: 1,
       playerId: 'p1',
       source: 'charge',
       tick: BLAST_TICK,

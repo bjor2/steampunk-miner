@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { blastRadiusMm, blastSelfHit } from '../../economy/blastingCharges'
+import { blastSelfHit } from '../../economy/blastingCharges'
+import { chargeRadiusMm } from '../../economy/chargeSizes'
 import { oreSalePrice } from '../../economy/oreEconomy'
 import { fromCanonical, fromSafeInteger, mul, toCanonical } from '../../money'
 import { FACING } from '../../vehicle/vehiclePose'
@@ -53,9 +54,12 @@ describe('blasting charges: plant and fuse (#109)', () => {
     prepareBlaster(session, 0)
     const events = plantOnWall(session, 1)
     expect(ofType(events, 'ChargePlanted')).toEqual([
-      expect.objectContaining({ ...WALL_TILE, detonateTick: 1 + FUSE_TICKS, carried: 2 }),
+      expect.objectContaining({ ...WALL_TILE, size: 1, detonateTick: 1 + FUSE_TICKS, carried: 2 }),
     ])
-    expect(session.vehicle().charges).toMatchObject({ carried: 2, planted: { ...WALL_TILE } })
+    expect(session.vehicle().charges).toMatchObject({
+      carriedBySize: { '1': 2 },
+      planted: { ...WALL_TILE, size: 1, plantedTick: 1 },
+    })
   })
 
   it('blows when the fuse runs out and not a tick before', () => {
@@ -86,7 +90,7 @@ describe('blasting charges: plant and fuse (#109)', () => {
   it('refuses a plant with an empty rack, with a charge live, facing air, or docked', () => {
     const empty = createScriptedSession()
     empty.submit(0, poseOnTile(STAND_TILE))
-    expect(empty.submit(1, PLANT)).toMatchObject([{ reason: 'no_charges' }])
+    expect(empty.submit(1, PLANT)).toMatchObject([{ reason: 'no_charge_of_size' }])
     const live = createScriptedSession()
     prepareBlaster(live, 0)
     plantOnWall(live, 1)
@@ -107,7 +111,7 @@ describe('blasting charges: plant and fuse (#109)', () => {
     plantOnWall(session, 1)
     session.submit(2, { type: 'debug.setPlanet', payload: { planetIndex: 2 } })
     session.advanceTo(400)
-    expect(session.vehicle().charges).toMatchObject({ carried: 2, planted: null })
+    expect(session.vehicle().charges).toMatchObject({ carriedBySize: { '1': 2 }, planted: null })
     expect(ofType(session.events(), 'ChargeDetonated')).toEqual([])
   })
 })
@@ -115,7 +119,7 @@ describe('blasting charges: plant and fuse (#109)', () => {
 describe('blasting charges: the blast (#109 numbers acceptance 1 and 2)', () => {
   it('clears every tile within 2.5 tiles of the charge and none further', () => {
     const { session, blast } = blastFromStand()
-    const inRadius = blastTilesAround(WALL_TILE)
+    const inRadius = blastTilesAround(WALL_TILE, 1)
     expect(inRadius).toHaveLength(21)
     expect(inRadius.map((tile) => densityOfTile(session, tile))).toEqual(inRadius.map(() => 0))
     expect(densityOfTile(session, { tx: WALL_TILE.tx + 3, ty: WALL_TILE.ty })).toBe(FULL_CELL)
@@ -129,7 +133,7 @@ describe('blasting charges: the blast (#109 numbers acceptance 1 and 2)', () => 
   it("tells the detonation its blast's ladder size and radius: size 1 for the shipped charge (#213)", () => {
     const { blast } = blastFromStand()
     expect(ofType(blast, 'ChargeDetonated')).toEqual([
-      expect.objectContaining({ ...WALL_TILE, size: 1, radiusMm: blastRadiusMm() }),
+      expect.objectContaining({ ...WALL_TILE, size: 1, radiusMm: chargeRadiusMm(1) }),
     ])
   })
 
@@ -142,7 +146,7 @@ describe('blasting charges: the blast (#109 numbers acceptance 1 and 2)', () => 
     session.submit(0, poseOnTile({ tx: above.tx, ty: above.ty + 1 }, FACING.down))
     expect(ofType(session.submit(1, PLANT), 'ChargePlanted')).toMatchObject([above])
     session.advanceTo(1 + FUSE_TICKS)
-    const core = blastTilesAround(above).filter(
+    const core = blastTilesAround(above, 1).filter(
       (tile) => kindOfCell(cellAt(EMPTY_WORLD, PARAMS, tile)) === CELL_KIND.core,
     )
     expect(core.length).toBeGreaterThan(0)
@@ -163,7 +167,7 @@ describe('blasting charges: the blast (#109 numbers acceptance 1 and 2)', () => 
     session.submit(2, poseOnTile({ tx: charge.tx - 6, ty: charge.ty }, FACING.right))
     session.advanceTo(1 + FUSE_TICKS)
     expect(liningAround(session, charge)).toEqual(lining)
-    const heldTiles = blastTilesAround(charge).filter((tile) => densityOfTile(session, tile) > 0)
+    const heldTiles = blastTilesAround(charge, 1).filter((tile) => densityOfTile(session, tile) > 0)
     expect(heldTiles.length).toBeGreaterThan(0)
   })
 
@@ -173,7 +177,7 @@ describe('blasting charges: the blast (#109 numbers acceptance 1 and 2)', () => 
     expect(ofType(blast, 'VehicleDamaged')).toEqual([
       expect.objectContaining({
         source: 'blast',
-        amount: toCanonical(blastSelfHit(1, band)),
+        amount: toCanonical(blastSelfHit(1, band, 1)),
         arc: null,
         enemyId: null,
       }),
@@ -244,7 +248,7 @@ describe('blasting charges: ore yield (#109 numbers acceptance 1)', () => {
     session.submit(1, PLANT)
     session.submit(2, poseOnTile({ tx: wall.tx - 5, ty: wall.ty }))
     session.advanceTo(1 + FUSE_TICKS)
-    const brokenOre = blastTilesAround(wall)
+    const brokenOre = blastTilesAround(wall, 1)
       .filter((tile) => kindOfCell(cellAt(EMPTY_WORLD, PARAMS, tile)) === CELL_KIND.ore)
       .map((tile) => minedOreOf(PARAMS, tile, cellAt(EMPTY_WORLD, PARAMS, tile)))
     const added = ofType(session.events(), 'CargoAdded')

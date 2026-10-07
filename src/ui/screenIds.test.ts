@@ -217,10 +217,10 @@ function upgradeBayTexts(model: UpgradeBayModel): Partial<Record<UiId, string | 
       ? {}
       : {
           [UI_IDS.upgradebayCharges]: null,
-          [UI_IDS.upgradebayChargesCarried]: model.charges.restock.levelText,
-          [UI_IDS.upgradebayChargesCost]: model.charges.restock.cost?.text ?? '-',
-          [UI_IDS.upgradebayChargesEffect]: model.charges.restock.effectText,
-          [UI_IDS.upgradebayChargesRestock]: model.charges.restock.buy.label,
+          [UI_IDS.upgradebayChargesCarried]: model.charges.restock[0].levelText,
+          [UI_IDS.upgradebayChargesCost]: model.charges.restock[0].cost?.text ?? '-',
+          [UI_IDS.upgradebayChargesEffect]: model.charges.restock[0].effectText,
+          [UI_IDS.upgradebayChargesRestock]: model.charges.restock[0].buy.label,
           [UI_IDS.upgradebayRack]: null,
           [UI_IDS.upgradebayRackSize]: model.charges.rack.levelText,
           [UI_IDS.upgradebayRackCost]: model.charges.rack.cost?.text ?? '-',

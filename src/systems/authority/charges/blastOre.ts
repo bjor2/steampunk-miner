@@ -2,7 +2,8 @@
  * What a charge's blast breaks and pays (spec #109 "Yield trade" and "Limits", numbers): every
  * tile within the radius that is no harder than the planet's band-5 rock and not core loses its
  * unlined ground, lined rings hold, and of each tier's ore units the blast broke
- * `floor(n * 0.4 + d)` reach the hold, `d` drawn from the blast tile so 40% arrive on average. The
+ * `floor(n * k + d)` reach the hold, `k` the charge size's kept fraction (0.4 at size 1, K8 #218)
+ * and `d` drawn from the blast tile so a share `k` arrives on average. The
  * rest is lost and its sale value is what `blast_resolved.oreValueLost` reports. A kept unit
  * that finds the hold full is lost as a drilled one is (`storage_full`).
  *
@@ -11,16 +12,12 @@
  *
  * The ground breaks a slice a tick (K6 #189): at most `maxCleared` tiles along the front, the gates
  * asked once per tile on the state the slice starts from. The kept share is of the running total
- * per tier, so a slice keeps `floor(N' * 0.4 + d) - floor(N * 0.4 + d)` of its units and the whole
+ * per tier, so a slice keeps `floor(N' * k + d) - floor(N * k + d)` of its units and the whole
  * blast keeps exactly what one break of every tile would.
  */
 import { hashCell } from '../../cellRandom'
-import {
-  blastHardnessCap,
-  blastReachTiles,
-  isInBlastRadius,
-  keptBlastOreUnits,
-} from '../../economy/blastingCharges'
+import { blastHardnessCap, keptBlastOreUnits } from '../../economy/blastingCharges'
+import { chargeReachTiles, isInChargeRadius } from '../../economy/chargeSizes'
 import { oreSalePrice } from '../../economy/oreEconomy'
 import { add, cmp, div, fromSafeInteger, mul, ZERO_MONEY, type Money } from '../../money'
 import { MM_PER_METRE } from '../../../constants/physics'
@@ -96,7 +93,7 @@ export function oreValueLostOf(state: AuthorityState, live: LiveBlast): Money {
   const dither = ditherOf(state, live)
   const sharesLost = Object.entries(live.oreBrokenByTier).reduce(
     (total, [tier, units]) =>
-      add(total, valueOfUnits(tier, units - keptBlastOreUnits(units, dither))),
+      add(total, valueOfUnits(tier, units - keptBlastOreUnits(units, dither, live.blast.size))),
     ZERO_MONEY,
   )
   return Object.entries(live.oreLostByTier).reduce(
@@ -109,7 +106,7 @@ export function oreValueLostOf(state: AuthorityState, live: LiveBlast): Money {
 export function oreUnitsKeptOf(state: AuthorityState, live: LiveBlast): number {
   const dither = ditherOf(state, live)
   return Object.values(live.oreBrokenByTier).reduce(
-    (total, units) => total + keptBlastOreUnits(units, dither),
+    (total, units) => total + keptBlastOreUnits(units, dither, live.blast.size),
     live.oreUnitsFreed,
   )
 }
@@ -118,13 +115,13 @@ function valueOfUnits(tier: string, units: number): Money {
   return mul(fromSafeInteger(units), oreSalePrice(Number.parseInt(tier, 10)))
 }
 
-/** The tiles whose centre lies within the radius of the shipped charge, in row order. */
-export function blastTilesAround(charge: TilePoint): TilePoint[] {
-  const reach = blastReachTiles()
+/** The tiles whose centre lies within the radius of a charge of `size`, in row order. */
+export function blastTilesAround(charge: TilePoint, size: number): TilePoint[] {
+  const reach = chargeReachTiles(size)
   const tiles: TilePoint[] = []
   for (let dy = -reach; dy <= reach; dy++) {
     for (let dx = -reach; dx <= reach; dx++) {
-      if (isInBlastRadius(dx * MM_PER_METRE, dy * MM_PER_METRE)) {
+      if (isInChargeRadius(size, dx * MM_PER_METRE, dy * MM_PER_METRE)) {
         tiles.push({ tx: charge.tx + dx, ty: charge.ty + dy })
       }
     }
@@ -181,8 +178,10 @@ function slicedTiersOf(shared: readonly MinedOre[], live: LiveBlast, dither: Mon
     .sort(([a], [b]) => a - b)
     .map(([tier, ores]) => {
       const before = live.oreBrokenByTier[String(tier)] ?? 0
+      const size = live.blast.size
       const kept =
-        keptBlastOreUnits(before + ores.length, dither) - keptBlastOreUnits(before, dither)
+        keptBlastOreUnits(before + ores.length, dither, size) -
+        keptBlastOreUnits(before, dither, size)
       return { tier, ores, kept }
     })
 }

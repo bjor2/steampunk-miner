@@ -8,19 +8,28 @@
  */
 import { travelFee } from '../economy/planetCharges'
 import { add, ZERO_MONEY, type Money } from '../money'
+import { chargesThatFitOf } from '../vehicle/vehicleCharges'
 import type { AuthorityState } from './authorityState'
-import { chargesOf, restockPriceOf } from './charges/chargeRules'
+import { chargesOf } from './charges/chargeRules'
+import { restockPriceOf } from './charges/chargeShopRules'
 import { coreNeededOf } from './coreBay'
 import { rechargeCostOf, repairCostOf } from './platformServices'
+
+const BASE_CHARGE_SIZE = 1
 
 export function serviceReserveOf(state: AuthorityState, playerId: string): Money {
   const service = add(repairCostOf(state, playerId), rechargeCostOf(state, playerId))
   return add(add(service, restockReserveOf(state, playerId)), travelReserveOf(state))
 }
 
-/** Only a rack the vehicle carries is restocked. */
+/**
+ * Only a rack the vehicle carries is restocked. Its free slots are priced as size-1 charges, the
+ * one size every planet sells, so the reserve stays what it was before the sizes (K8 #218).
+ */
 function restockReserveOf(state: AuthorityState, playerId: string): Money {
-  return chargesOf(state, playerId).isRackMounted ? restockPriceOf(state, playerId) : ZERO_MONEY
+  const charges = chargesOf(state, playerId)
+  if (!charges.isRackMounted) return ZERO_MONEY
+  return restockPriceOf(state, BASE_CHARGE_SIZE, chargesThatFitOf(charges, BASE_CHARGE_SIZE))
 }
 
 /** The fee joins once the bay holds the fragments the travel gate asks for. */

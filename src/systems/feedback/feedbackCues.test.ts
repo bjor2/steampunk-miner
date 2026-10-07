@@ -127,6 +127,7 @@ describe('feedback cues', () => {
       ty: 280,
       size: 1,
       radiusMm: 2500,
+      by: 'fuse',
     }
     expect(feedbackCuesOf([blast], 'p1')).toEqual([
       { kind: 'chargeBlast', kick: SHIPPED_CHARGE_BLAST_KICK },
@@ -143,6 +144,7 @@ describe('feedback cues', () => {
       ty: 280,
       size: 10,
       radiusMm: 24000,
+      by: 'fuse',
     }
     const byDistance: ChargeBlastCueProvider = {
       id: 'fake-blast.cue',

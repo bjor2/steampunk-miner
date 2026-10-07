@@ -44,7 +44,7 @@ function stepsBought(session: BotSession): StepCommand[] {
 /** A rack with empty slots on planet 7: a reserve the bot's own service money never keeps. */
 function botWithEmptyRack(policy: ChainPolicy): BotSession {
   const session = botAtUpgradeBayOn(7, '2e6')
-  session.submit({ type: 'debug.setCharges', payload: { carried: 0, slotLevel: 2 } })
+  session.submit({ type: 'debug.setCharges', payload: { size: 1, carried: 0, slotLevel: 2 } })
   shop(session, policy)
   return session
 }

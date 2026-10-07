@@ -7,8 +7,7 @@
  * as ore and charge prices are Infinity as doubles past planet 582 (#196); the ticks are counts.
  */
 import { blastTilesAround } from '../authority/charges/blastOre'
-import { blastReachTiles, chargeFuseTicks, restockPrice } from '../economy/blastingCharges'
-import { keptFractionOf } from '../economy/chargeSizes'
+import { chargePrice, chargeReachTiles, fuseTicksOf, keptFractionOf } from '../economy/chargeSizes'
 import { ECONOMY } from '../economy/economy'
 import { blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
 import type { VehicleStats } from '../economy/vehicleStats'
@@ -31,7 +30,8 @@ export interface BlastTrade {
 
 const BASIS_POINTS = 10000
 const ONE_CHARGE = 1
-const BLAST_TILES = blastTilesAround({ tx: 0, ty: 0 }).length
+const SHIPPED_SIZE = 1
+const BLAST_TILES = blastTilesAround({ tx: 0, ty: 0 }, SHIPPED_SIZE).length
 
 /** The trade in `band` for a vehicle with `stats`; null where its drill cannot cut the band. */
 export function blastTradeOf(
@@ -43,7 +43,7 @@ export function blastTradeOf(
   if (drillTicks === null) return null
   const tileMoney = oreMoneyPerTile(params, band)
   const cycleTicks = blastCycleTicks(stats)
-  const advanceTiles = blastReachTiles() + 1
+  const advanceTiles = chargeReachTiles(SHIPPED_SIZE) + 1
   return {
     band,
     drillTicksPerTile: drillTicks,
@@ -64,15 +64,16 @@ function oreMoneyPerTile(params: PlanetParams, band: number): Money {
 /** One blast's kept ore money, less the charge it took. */
 function blastMoney(params: PlanetParams, tileMoney: Money): Money {
   const blastOre = mul(fromSafeInteger(BLAST_TILES), tileMoney)
-  const kept = mul(blastOre, keptFractionOf(1))
+  const kept = mul(blastOre, keptFractionOf(SHIPPED_SIZE))
   return sub(kept, chargeMoney(params))
 }
 
 /** Plant, back off out of the blast, wait out the fuse, drive back. */
 function blastCycleTicks(stats: VehicleStats): number {
-  return chargeFuseTicks() + 2 * moveTicks(blastReachTiles(), stats.engine.speedMax)
+  const fuseTicks = fuseTicksOf(SHIPPED_SIZE) as number
+  return fuseTicks + 2 * moveTicks(chargeReachTiles(SHIPPED_SIZE), stats.engine.speedMax)
 }
 
 function chargeMoney(params: PlanetParams): Money {
-  return restockPrice(ONE_CHARGE, params.planetIndex)
+  return chargePrice(SHIPPED_SIZE, ONE_CHARGE, params.planetIndex)
 }

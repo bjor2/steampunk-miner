@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { FACING } from '../vehicle/vehiclePose'
+import type { PlantedCharge } from '../vehicle/vehicleCharges'
 import { applyCommand } from './applyCommand'
 import { createAuthorityState, type AuthorityState } from './authorityState'
 import { CASING_BREACHED, decodeCasing } from '../world/chunkDelta'
@@ -158,6 +159,13 @@ describe('session snapshot: guns (#93)', () => {
   })
 })
 
+/** The state with a charge on the wall for player p1. */
+function withPlanted(state: AuthorityState, planted: PlantedCharge): AuthorityState {
+  const vehicle = state.players.p1.vehicle
+  const charges = { ...vehicle.charges, planted }
+  return { ...state, players: { p1: { ...state.players.p1, vehicle: { ...vehicle, charges } } } }
+}
+
 describe('session snapshot: blasting charges (#109)', () => {
   it('keeps the rack and a planted charge through save and load', () => {
     const start = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
@@ -166,25 +174,52 @@ describe('session snapshot: blasting charges (#109)', () => {
       tick: 600,
       seq: 1,
       type: 'debug.setCharges',
-      payload: { carried: 2, slotLevel: 1 },
+      payload: { size: 1, carried: 2, slotLevel: 1 },
     }).state
-    const vehicle = racked.players.p1.vehicle
-    const planted = {
-      ...racked,
-      players: {
-        p1: {
-          ...racked.players.p1,
-          vehicle: {
-            ...vehicle,
-            charges: { ...vehicle.charges, planted: { tx: 3, ty: 280, detonateTick: 720 } },
-          },
-        },
-      },
-    }
+    const planted = withPlanted(racked, {
+      tx: 3,
+      ty: 280,
+      size: 1,
+      plantedTick: 600,
+      detonateTick: 720,
+    })
     expect(readSnapshot(throughJson(takeSnapshot(planted)))).toEqual({
       state: planted,
       problems: [],
     })
+  })
+
+  it('keeps a rack of two sizes and a remote charge with no fuse through save and load (#218)', () => {
+    const start = createAuthorityState({ planetIndex: 25, planetSeed: 83921, playerIds: ['p1'] })
+    const racked = applyCommand(start, {
+      playerId: 'p1',
+      tick: 600,
+      seq: 1,
+      type: 'debug.setCharges',
+      payload: { size: 4, carried: 2, slotLevel: 5 },
+    }).state
+    const remote = { tx: 3, ty: 280, size: 7, plantedTick: 600, detonateTick: null }
+    const planted = withPlanted(racked, remote)
+    expect(readSnapshot(throughJson(takeSnapshot(planted)))).toEqual({
+      state: planted,
+      problems: [],
+    })
+  })
+
+  it('refuses a rack holding a size off the ladder (#218)', () => {
+    const snapshot = throughJson(takeSnapshot(richState()))
+    const vehicle = snapshot.state.players.p1.vehicle
+    const charges = { ...vehicle.charges, carriedBySize: { '11': 1 } }
+    const broken = {
+      ...snapshot,
+      state: {
+        ...snapshot.state,
+        players: { p1: { ...snapshot.state.players.p1, vehicle: { ...vehicle, charges } } },
+      },
+    }
+    expect(readSnapshot(broken).problems).toContain(
+      'snapshot.state.players.p1.vehicle.charges must hold a rack flag, counts by size and a planted charge or null',
+    )
   })
 
   it('refuses a snapshot whose vehicle has no charge rack', () => {
@@ -195,7 +230,7 @@ describe('session snapshot: blasting charges (#109)', () => {
       state: { ...snapshot.state, players: { p1: { ...snapshot.state.players.p1, vehicle } } },
     }
     expect(readSnapshot(broken).problems).toContain(
-      'snapshot.state.players.p1.vehicle.charges must hold a rack flag, whole counts and a planted charge or null',
+      'snapshot.state.players.p1.vehicle.charges must hold a rack flag, counts by size and a planted charge or null',
     )
   })
 })

@@ -74,10 +74,12 @@ export interface RejectionReasons {
   nothing_to_refine: true
   slots_max: true
   nothing_to_collect: true
-  // Registered by the charge commands (#109): the rack is full, no charge is carried, one is
-  // already live, or the vehicle faces no wall to plant on (`feature_locked` and `max_level` above).
+  // Registered by the charge commands (#109, sizes K8 #218): the charges asked for do not fit the
+  // rack's free slots, no charge of that size is carried, the size is not open on this planet, one
+  // is already live, or the vehicle faces no wall to plant on (`feature_locked`, `max_level` above).
   rack_full: true
-  no_charges: true
+  no_charge_of_size: true
+  size_locked: true
   charge_live: true
   no_wall: true
   // Registered by the lining types (#113): not a lining type, already unlocked, or not unlocked yet.
@@ -95,6 +97,12 @@ export interface RejectionReasons {
 export type RejectionReason = keyof RejectionReasons
 
 export type RescueCause = 'stranded' | 'destroyed'
+
+/** What fired a charge: its fuse running out, or the plunger (#153 amendment 2, #149). */
+export type DetonationTrigger = 'fuse' | 'plunger'
+
+/** Why a live charge was lost unfired (#153): docking, a wreck, or its 3600 ticks running out. */
+export type DisarmReason = 'dock' | 'wreck' | 'expired'
 
 /** Where core fragments came into the bay from (#10). */
 export type CoreDepositSource = 'dock' | 'rescue'
@@ -367,15 +375,33 @@ export interface KernelDomainEventBodies {
   RepairPurchased: { hullFrom: string; hullTo: string; cost: string }
   /** Energy in quanta. */
   EnergyRecharged: { from: number; to: number; cost: string }
-  /** A charge on the wall at tile `tx, ty`, blowing at `detonateTick`; `carried` is what is left (#109). */
-  ChargePlanted: { tx: number; ty: number; detonateTick: number; carried: number }
+  /**
+   * A charge of `size` on the wall at tile `tx, ty`, blowing at `detonateTick`, or null for a remote
+   * charge only the plunger fires (K8 #218); `carried` is what the rack holds after, of any size.
+   */
+  ChargePlanted: {
+    tx: number
+    ty: number
+    size: number
+    detonateTick: number | null
+    carried: number
+  }
   /**
    * The charge at `tx, ty` blew (#109): its hits land now, its ground breaks as a live blast that
    * `BlastResolved` sums up (K6 #189). `size` is its rung on the dynamite ladder and `radiusMm`
    * its blast's radius, both copied from the `BlastEvent` (K3 #186, #213). The radius is a render
-   * hint for the flash, shake and thump; balance keys off `size`, never the radius.
+   * hint for the flash, shake and thump; balance keys off `size`, never the radius. `by` says
+   * whether its fuse ran out or the plunger fired it (#153 amendment 2; the plunger is #149's).
    */
-  ChargeDetonated: { tx: number; ty: number; size: number; radiusMm?: number }
+  ChargeDetonated: {
+    tx: number
+    ty: number
+    size: number
+    radiusMm?: number
+    by: DetonationTrigger
+  }
+  /** A live charge lost unfired (#153): the planter docked or was wrecked, or it timed out. */
+  ChargeDisarmed: { tx: number; ty: number; size: number; reason: DisarmReason }
   /**
    * A live blast's slice this tick (K6 #189): the ring of its front from the first tile it looked
    * at to the last, in mm from the charge tile's centre. Presentation only; the run log skips it.
@@ -398,8 +424,8 @@ export interface KernelDomainEventBodies {
     collapsesTriggered: number
     ticks: number
   }
-  /** The rack filled with `count` charges for `price` (#109). */
-  ChargesRestocked: { count: number; price: string }
+  /** `count` charges of `size` bought into the rack for `price` (#109, sizes K8 #218). */
+  ChargesRestocked: { size: number; count: number; price: string }
   /** One rack slot bought: slot level `from` to `to`, for `price` (#109). */
   ChargeRackUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
   /** One casing grade bought (#41): `price` as a canonical string. */

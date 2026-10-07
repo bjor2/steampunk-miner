@@ -20,6 +20,7 @@ const blastAt = (tx: number, ty: number): DomainEvent => ({
   ty,
   size: 1,
   radiusMm: 2500,
+  by: 'fuse',
 })
 
 describe('charge look (#109 visibility, art #110)', () => {

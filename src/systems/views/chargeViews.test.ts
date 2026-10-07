@@ -8,7 +8,8 @@ import {
   WALL_TILE,
 } from '../authority/charges/chargeFixtures'
 import { createScriptedSession } from '../authority/scriptedSession'
-import { rackSlotPrice, restockPrice } from '../economy/blastingCharges'
+import { rackSlotPrice } from '../economy/blastingCharges'
+import { chargePrice } from '../economy/chargeSizes'
 import { ACTION_MAP, defaultBindings } from '../input/actionMap'
 import { toCanonical } from '../money'
 import { buyChargeRackSlotCommand, restockChargesCommand } from '../platform/platformCommands'
@@ -16,7 +17,7 @@ import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { grantMoneyCommand } from '../startScenarioCommands'
 import { teleportToDockCommand } from '../vehicle/vehicleCommands'
 import { selectHudModel } from './hudModel'
-import { UI_IDS } from './screenIds'
+import { UI_ID_TEMPLATES, UI_IDS } from './screenIds'
 import { selectUpgradeBayModel } from './upgradeBayModel'
 
 type Session = ReturnType<typeof createScriptedSession>
@@ -51,6 +52,12 @@ describe('HUD: blasting charges (#109)', () => {
     const session = createScriptedSession()
     session.submit(1, setChargesIntent(2, 1))
     expect(hudOf(session).charges).toEqual({ carried: 2, capacity: 4, text: '2/4 (B)' })
+  })
+
+  it('reads the slots the charges fill, two for each size-4 charge (#218)', () => {
+    const session = createScriptedSession()
+    session.submit(1, setChargesIntent(2, 1, 4))
+    expect(hudOf(session).charges).toEqual({ carried: 2, capacity: 4, text: '4/4 (B)' })
   })
 
   it('warns the planter inside the blast with the seconds left on the fuse', () => {
@@ -102,12 +109,13 @@ describe('upgrade bay model: the charge rows (#109)', () => {
 
   it('offers the rack with three charges on planet 7 at two band-5 units each', () => {
     const charges = upgradeBayOf(atUpgradeBayOn(7)).charges
-    expect(charges?.restock).toMatchObject({
+    expect(charges?.restock).toHaveLength(1)
+    expect(charges?.restock[0]).toMatchObject({
       iconId: 'icon-blasting-charges',
       label: 'Charges',
       levelText: '0/3',
       effectText: '+3 charges',
-      cost: { exact: toCanonical(restockPrice(3, 7)) },
+      cost: { exact: toCanonical(chargePrice(1, 3, 7)) },
       buy: { id: UI_IDS.upgradebayChargesRestock, label: 'Buy rack', reason: null },
     })
     expect(charges?.rack).toMatchObject({
@@ -120,8 +128,8 @@ describe('upgrade bay model: the charge rows (#109)', () => {
 
   it('says the rack is full after a restock, its Buy carrying rack_full', () => {
     const session = atUpgradeBayOn(7)
-    session.submit(2, restockChargesCommand())
-    expect(upgradeBayOf(session).charges?.restock).toMatchObject({
+    session.submit(2, restockChargesCommand(1, 3))
+    expect(upgradeBayOf(session).charges?.restock[0]).toMatchObject({
       levelText: '3/3',
       effectText: 'rack full',
       buy: { label: 'Restock', reason: 'rack_full' },
@@ -135,6 +143,28 @@ describe('upgrade bay model: the charge rows (#109)', () => {
       levelText: '8 (top)',
       cost: null,
       buy: { reason: 'max_level' },
+    })
+  })
+
+  it('offers a row per open size, size 2 from planet 10, under its own ids (#218)', () => {
+    const rows = upgradeBayOf(atUpgradeBayOn(10)).charges?.restock
+    expect(rows?.map((row) => row.label)).toEqual(['Charges', 'Charges size 2'])
+    expect(rows?.[1]).toMatchObject({
+      ids: { row: UI_ID_TEMPLATES.upgradebayChargeSize(2) },
+      levelText: '0/3',
+      cost: { exact: toCanonical(chargePrice(2, 3, 10)) },
+      buy: { id: UI_ID_TEMPLATES.upgradebayChargeSizeRestock(2), reason: null },
+    })
+  })
+
+  it('offers only the size-4 charges that fit the free slots (#218)', () => {
+    const session = atUpgradeBayOn(16)
+    session.submit(2, restockChargesCommand(1, 1))
+    expect(upgradeBayOf(session).charges?.restock[3]).toMatchObject({
+      label: 'Charges size 4',
+      levelText: '0/1',
+      effectText: '+1 charges',
+      cost: { exact: toCanonical(chargePrice(4, 1, 16)) },
     })
   })
 

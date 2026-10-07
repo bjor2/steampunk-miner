@@ -116,7 +116,7 @@ export const UI_IDS = {
 
 export type UiId = (typeof UI_IDS)[keyof typeof UI_IDS]
 
-/** Ids of repeated rows: one per threat, ore tier, upgrade track, setting and action. */
+/** Ids of repeated rows: one per threat, ore tier, upgrade track, charge size, setting and action. */
 export const UI_ID_TEMPLATES = {
   hudThreat: (index: number) => `hud-threat-${index}`,
   hudStatus: (status: string) => `hud-status-${status}`,
@@ -134,6 +134,12 @@ export const UI_ID_TEMPLATES = {
   workshopUpgradeEffectAfter: (upgradeId: UpgradeId) =>
     `workshop-upgrade-${upgradeId}-effect-after`,
   workshopUpgradeBuy: (upgradeId: UpgradeId) => `workshop-upgrade-${upgradeId}-buy`,
+  // Charge sizes 2 and up (K8 #218); size 1 keeps the shipped `upgradebay-charges-*` ids.
+  upgradebayChargeSize: (size: number) => `upgradebay-charges-${size}`,
+  upgradebayChargeSizeCarried: (size: number) => `upgradebay-charges-${size}-carried`,
+  upgradebayChargeSizeCost: (size: number) => `upgradebay-charges-${size}-cost`,
+  upgradebayChargeSizeEffect: (size: number) => `upgradebay-charges-${size}-effect`,
+  upgradebayChargeSizeRestock: (size: number) => `upgradebay-charges-${size}-restock`,
   artefactCard: (optionId: string) => `artefact-card-${optionId}`,
   artefactChoose: (optionId: string) => `artefact-choose-${optionId}`,
   settingsToggle: (name: string) => `settings-toggle-${name}`,

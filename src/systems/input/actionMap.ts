@@ -33,6 +33,7 @@ export const ACTION_IDS = [
   'request_rescue',
   'toggle_guns',
   'plant_charge',
+  'next_charge_size',
   'ui_up',
   'ui_down',
   'ui_left',

@@ -13,7 +13,8 @@ const DRIVING: InputSituation = {
   dockedBay: null,
   canOpenArtefactCache: false,
   gunMode: null,
-  canPlantCharge: false,
+  plantableChargeSize: null,
+  nextChargeSize: null,
   state: START,
   playerId: 'p1',
 }
@@ -25,7 +26,8 @@ const DOCKED: InputSituation = {
   dockedBay: 'sell',
   canOpenArtefactCache: false,
   gunMode: null,
-  canPlantCharge: false,
+  plantableChargeSize: null,
+  nextChargeSize: null,
   state: START,
   playerId: 'p1',
 }
@@ -75,11 +77,28 @@ describe('input routing', () => {
   })
 
   it('plants a charge only when the authority would take it, and never from the pad screen (#109)', () => {
-    expect(reactionToPress('plant_charge', { ...DRIVING, canPlantCharge: true })).toEqual(
-      submitted('plantCharge'),
+    expect(reactionToPress('plant_charge', { ...DRIVING, plantableChargeSize: 1 })).toEqual(
+      submitted('plantCharge', { size: 1 }),
     )
     expect(reactionToPress('plant_charge', DRIVING)).toEqual({ kind: 'none' })
-    expect(reactionToPress('plant_charge', { ...DOCKED, canPlantCharge: true })).toEqual({
+    expect(reactionToPress('plant_charge', { ...DOCKED, plantableChargeSize: 1 })).toEqual({
+      kind: 'none',
+    })
+  })
+
+  it('plants the size it would plant, naming it in the command (#218)', () => {
+    expect(reactionToPress('plant_charge', { ...DRIVING, plantableChargeSize: 4 })).toEqual(
+      submitted('plantCharge', { size: 4 }),
+    )
+  })
+
+  it('steps the charge size on next_charge_size only with two sizes in the rack (#153)', () => {
+    expect(reactionToPress('next_charge_size', { ...DRIVING, nextChargeSize: 3 })).toEqual({
+      kind: 'chooseChargeSize',
+      size: 3,
+    })
+    expect(reactionToPress('next_charge_size', DRIVING)).toEqual({ kind: 'none' })
+    expect(reactionToPress('next_charge_size', { ...DOCKED, nextChargeSize: 3 })).toEqual({
       kind: 'none',
     })
   })
@@ -160,7 +179,8 @@ const SLOT_PROBE: SliceDefinition = {
       id: 'slot-probe.use_1',
       actionId: 'use_slot_1',
       contexts: ['vehicle'],
-      toIntent: ({ playerId }) => (playerId === 'p1' ? { type: 'plantCharge', payload: {} } : null),
+      toIntent: ({ playerId }) =>
+        playerId === 'p1' ? { type: 'plantCharge', payload: { size: 1 } } : null,
     })
     r.inputReaction({
       id: 'slot-probe.use_2',
@@ -172,7 +192,7 @@ const SLOT_PROBE: SliceDefinition = {
       id: 'slot-probe.interact',
       actionId: 'interact',
       contexts: ['vehicle'],
-      toIntent: () => ({ type: 'plantCharge', payload: {} }),
+      toIntent: () => ({ type: 'plantCharge', payload: { size: 1 } }),
     })
   },
 }
@@ -182,7 +202,7 @@ const pressWithProbe = (action: Parameters<typeof reactionToPress>[0], at: Input
 
 describe('input routing: slice reactions', () => {
   it("submits a slice's intent for a filled power-up slot", () => {
-    expect(pressWithProbe('use_slot_1', DRIVING)).toEqual(submitted('plantCharge'))
+    expect(pressWithProbe('use_slot_1', DRIVING)).toEqual(submitted('plantCharge', { size: 1 }))
   })
 
   it('does nothing for an empty slot, a slot no slice answers, or with no slice registered', () => {

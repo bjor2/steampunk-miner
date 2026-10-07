@@ -25,7 +25,7 @@ const ARRIVED_ON_PLANET_7: CommandIntent[] = [
   setPlanetCommand(7),
   setPlanetSeedCommand(WORLD_SEED),
   { type: 'debug.setMoney', payload: { amount: '5000' } },
-  { type: 'debug.setCharges', payload: { carried: 8, slotLevel: 5 } },
+  { type: 'debug.setCharges', payload: { size: 1, carried: 8, slotLevel: 5 } },
   ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, arrivalLevel(id))),
 ]
 

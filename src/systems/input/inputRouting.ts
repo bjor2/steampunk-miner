@@ -10,8 +10,9 @@
  * `Undock`), and in `vehicle` it opens settings. `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
  * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
- * still move, the guns' toggle with no guns mounted (#107) and a charge the authority would not
- * plant (#109: none carried, one live, no wall ahead) do nothing and are not buffered.
+ * still move, the guns' toggle with no guns mounted (#107), a charge the authority would not
+ * plant (#109: none carried, one live, no wall ahead) and a size step with fewer than two sizes in
+ * the rack (K8 #218) do nothing and are not buffered.
  *
  * An action with no rule here in the top layer asks the slices' input reactions (#217): the
  * power-up slots' `use_slot_N` submit the slice's use command, or do nothing on an empty slot.
@@ -42,6 +43,8 @@ export type InputReaction =
   | { kind: 'moveFocus'; step: -1 | 1 }
   | { kind: 'activateFocused' }
   | { kind: 'zoom'; change: ZoomChange }
+  /** `next_charge_size` (#153, K8 #218): the size `plant_charge` plants next. */
+  | { kind: 'chooseChargeSize'; size: number }
   | { kind: 'none' }
 
 /** What the routing needs to know about the session; read from the authority replica. */
@@ -56,8 +59,10 @@ export interface InputSituation {
   canOpenArtefactCache: boolean
   /** The guns' mode, or null with no guns mounted: then `toggle_guns` does nothing (#107). */
   gunMode: GunMode | null
-  /** `plantRefusal` is null (#109): `plant_charge` plants exactly then. */
-  canPlantCharge: boolean
+  /** The size `plant_charge` plants when `plantRefusal` is null for it (#109, #218); else null. */
+  plantableChargeSize: number | null
+  /** The size `next_charge_size` steps to; null while the rack holds fewer than two sizes. */
+  nextChargeSize: number | null
   /** The authority replica and the local player, for the slices' input reactions (#217). */
   state: AuthorityState
   playerId: string
@@ -92,7 +97,10 @@ const REACTIONS_BY_LAYER: Readonly<
       isWaitingForTow(vehicleMode) ? submit(requestRescueCommand()) : NONE,
     toggle_guns: ({ gunMode }) =>
       gunMode === null ? NONE : submit(setGunModeCommand(toggledGunMode(gunMode))),
-    plant_charge: ({ canPlantCharge }) => (canPlantCharge ? submit(plantChargeCommand()) : NONE),
+    plant_charge: ({ plantableChargeSize }) =>
+      plantableChargeSize === null ? NONE : submit(plantChargeCommand(plantableChargeSize)),
+    next_charge_size: ({ nextChargeSize }) =>
+      nextChargeSize === null ? NONE : { kind: 'chooseChargeSize', size: nextChargeSize },
     open_settings: () => ({ kind: 'openSettings' }),
     zoom_in: () => ({ kind: 'zoom', change: 'in' }),
     zoom_out: () => ({ kind: 'zoom', change: 'out' }),

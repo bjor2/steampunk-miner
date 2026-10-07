@@ -16,6 +16,7 @@ const DETONATED = {
   ty: 280,
   size: 5,
   radiusMm: 8000,
+  by: 'fuse',
 } as const satisfies DomainEvent
 
 function providerKicking(kick: ChargeBlastKick, id = 'fake-blast.cue'): ChargeBlastCueProvider {

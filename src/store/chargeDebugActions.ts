@@ -8,13 +8,13 @@ import { setChargesCommand } from '../systems/vehicle/vehicleCommands'
 import { submitUnlessRefused } from './authorityLink'
 
 export interface ChargeDebugActions {
-  /** Debug: a bolted-on rack with `slotLevel` bought slots carrying `carried` charges. */
-  setCharges(carried: number, slotLevel: number): void
+  /** Debug: a bolted-on rack with `slotLevel` bought slots carrying `carried` charges of `size`. */
+  setCharges(carried: number, slotLevel: number, size: number): void
 }
 
 export function chargeDebugActionsOf(playerIdOf: () => string): ChargeDebugActions {
   return {
-    setCharges: (carried, slotLevel) =>
-      submitUnlessRefused(playerIdOf(), setChargesCommand(carried, slotLevel)),
+    setCharges: (carried, slotLevel, size) =>
+      submitUnlessRefused(playerIdOf(), setChargesCommand(carried, slotLevel, size)),
   }
 }

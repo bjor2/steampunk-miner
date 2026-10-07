@@ -180,7 +180,7 @@ function expectedKeptUnits(site: TilePoint, radiusMm: number): number {
     unitsByTier.set(tier, (unitsByTier.get(tier) ?? 0) + 1)
   }
   return [...unitsByTier.values()].reduce(
-    (total, units) => total + keptBlastOreUnits(units, dither),
+    (total, units) => total + keptBlastOreUnits(units, dither, 1),
     0,
   )
 }

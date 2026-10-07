@@ -144,10 +144,13 @@ export interface KernelCommandPayloads {
   openArtefactCache: Record<string, never>
   /** Takes one of the three options for good; the other two are gone (#46). */
   chooseArtefact: { optionId: string }
-  /** Plants a charge on the wall the last reported pose faces; it blows after its fuse (#109). */
-  plantCharge: Record<string, never>
-  /** The Upgrade bay fills the rack's empty slots at the price per charge (#109). */
-  restockCharges: Record<string, never>
+  /**
+   * Plants a charge of `size` from the rack on the wall the last reported pose faces; it blows after
+   * its size's fuse, or waits for the plunger if remote (#109, sizes K8 #218).
+   */
+  plantCharge: { size: number }
+  /** The Upgrade bay sells `count` charges of `size` if they fit the rack, never fewer (K8 #218). */
+  restockCharges: { size: number; count: number }
   /** The Upgrade bay adds one slot to the rack (#109). */
   buyChargeRackSlot: { chain: number }
   /**
@@ -191,8 +194,8 @@ export interface KernelCommandPayloads {
   'debug.fillCircle': { x: number; y: number; radius: number; amount: number }
   /** Sets the gun step directly, 0 (no guns) or the mount to the cap (#107 combat scenarios, #180). */
   'debug.setGunLevel': { level: number }
-  /** A mounted rack with `slotLevel` bought slots carrying `carried` charges (#109). */
-  'debug.setCharges': { carried: number; slotLevel: number }
+  /** A mounted rack with `slotLevel` bought slots carrying only `carried` charges of `size` (#109). */
+  'debug.setCharges': { size: number; carried: number; slotLevel: number }
   /** Sets the vehicle's casing grade directly (#41 `debug.setCasingGrade`). */
   'debug.setCasingGrade': { grade: number }
   /** Owns and selects a lining type, with no unlock or price (#113 scenarios). */

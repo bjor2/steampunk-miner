@@ -16,6 +16,7 @@ import type { ArtCatalogue } from '../art/artCatalogue'
 import { CHARGE_RACK_ASSET_ID, FUSE_LAMP_PART_ID, PLANTED_CHARGE_ASSET_ID } from '../art/artIds'
 import { assetQuadsOf, atlasMapsOf, type AssetQuad, type AtlasMaps } from '../art/assetLook'
 import type { DomainEvent } from '../authority/domainEvent'
+import type { PlantedCharge } from '../vehicle/vehicleCharges'
 import type { TilePoint } from '../world/tileGrid'
 import type { MetrePoint } from './gunLook'
 
@@ -58,6 +59,11 @@ export function plantedChargeMaps(art: ArtCatalogue): AtlasMaps | null {
 }
 
 /** Whether the lamp is lit `seconds` into its blinking with `ticksLeft` on the fuse. */
+/** Ticks left on a charge's fuse; a remote charge (#218) has none, so its lamp never hurries. */
+export function fuseTicksLeftOf(charge: PlantedCharge, tick: number): number {
+  return charge.detonateTick === null ? Number.POSITIVE_INFINITY : charge.detonateTick - tick
+}
+
 export function isFuseLampLit(seconds: number, ticksLeft: number): boolean {
   const period =
     ticksLeft <= LAST_SECOND_TICKS ? FUSE_BLINK_LAST_SECOND_SECONDS : FUSE_BLINK_SECONDS

@@ -9,11 +9,21 @@
  * buys no rack slots, the policy names none. A run that never meets such a tile plays exactly like
  * the comparison run (`never`), which plays without charges.
  */
-import { areChargesOffered, chargesOf, restockPriceOf } from '../authority/charges/chargeRules'
-import { blastReachTiles, botBlastThresholdTicks } from '../economy/blastingCharges'
+import type { CommandIntent } from '../authority/authorityCommand'
+import { chargesOf } from '../authority/charges/chargeRules'
+import { areChargesOffered, restockPriceOf } from '../authority/charges/chargeShopRules'
+import { botBlastThresholdTicks } from '../economy/blastingCharges'
+import { chargeReachTiles } from '../economy/chargeSizes'
 import type { Money } from '../money'
+import { restockChargesCommand } from '../platform/platformCommands'
+import { chargeSizeToPlantOf } from '../vehicle/chargeSelection'
 import { plantChargeCommand } from '../vehicle/vehicleCommands'
-import { emptyRackSlotsOf, hasChargeToPlant } from '../vehicle/vehicleCharges'
+import {
+  chargesThatFitOf,
+  hasChargeToPlant,
+  totalCarriedOf,
+  type VehicleCharges,
+} from '../vehicle/vehicleCharges'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { moveStraight, type BotPlanet } from './botPilot'
@@ -24,12 +34,24 @@ import { tileKindAt } from './botWorld'
 /** Whether the bot uses charges at all; a comparison run plays without them (#109 acceptance 4). */
 export type ChargePolicy = 'blast' | 'never'
 
-/** Filling the rack, while charges are offered here and it has room; null otherwise. */
-export function restockPriceFor(session: BotSession): Money | null {
+/** One Upgrade bay buy and what it costs. */
+export interface ChargeRestock {
+  intent: CommandIntent<'restockCharges'>
+  price: Money
+}
+
+/** The size the bot buys and plants: the shipped charge (#109 bot policy). */
+const BOT_CHARGE_SIZE = 1
+
+/** Filling the rack's free slots, while charges are offered here and it has room; null otherwise. */
+export function chargeRestockOf(session: BotSession): ChargeRestock | null {
   const state = session.state()
-  const hasRoom = emptyRackSlotsOf(chargesOf(state, session.playerId)) > 0
-  if (!hasRoom || !areChargesOffered(state, session.playerId)) return null
-  return restockPriceOf(state, session.playerId)
+  const count = chargesThatFitOf(chargesOf(state, session.playerId), BOT_CHARGE_SIZE)
+  if (count === 0 || !areChargesOffered(state, session.playerId)) return null
+  return {
+    intent: restockChargesCommand(BOT_CHARGE_SIZE, count),
+    price: restockPriceOf(state, BOT_CHARGE_SIZE, count),
+  }
 }
 
 /**
@@ -42,7 +64,7 @@ export function noteTileWorthACharge(
   tile: TilePoint,
   boreTicks: number,
 ): void {
-  const isRackEmpty = session.vehicle().charges.carried === 0
+  const isRackEmpty = totalCarriedOf(session.vehicle().charges) === 0
   if (isRackEmpty && wouldBlast(session, planet, tile, boreTicks)) planet.hasMetBlastTile = true
 }
 
@@ -88,24 +110,31 @@ export function blastOpen(session: BotSession, planet: BotPlanet, tile: TilePoin
 
 function plantFacing(session: BotSession, from: TilePoint, tile: TilePoint): boolean {
   session.submit(reportPoseIntent(from, facingTowards(from, tile), NO_TICKS))
-  session.submit(plantChargeCommand())
+  session.submit(plantChargeCommand(sizeToPlantOf(session.vehicle().charges)))
   return session.vehicle().charges.planted !== null
 }
 
+/** A remote charge has no fuse to wait out; the bot plants none (it buys the shipped size). */
 function waitForBlast(session: BotSession): void {
-  const planted = session.vehicle().charges.planted
-  if (planted !== null) session.wait(planted.detonateTick - session.tick())
+  const detonateTick = session.vehicle().charges.planted?.detonateTick ?? null
+  if (detonateTick !== null) session.wait(detonateTick - session.tick())
+}
+
+function sizeToPlantOf(charges: VehicleCharges): number {
+  return chargeSizeToPlantOf(charges, BOT_CHARGE_SIZE)
 }
 
 /**
- * The tile `blastReachTiles()` (2) straight back from `tile` past the vehicle, so the vehicle's
- * centre ends 3 tiles from the charge, outside its 2.5; null unless every tile on the way is open.
+ * The tile the blast's reach (2 tiles at size 1) straight back from `tile` past the vehicle, so the
+ * vehicle's centre ends 3 tiles from the charge, outside its 2.5; null unless every tile on the
+ * way is open.
  */
 function backOffTileOf(session: BotSession, planet: BotPlanet, tile: TilePoint): TilePoint | null {
   const { position } = planet.pilot
   const dx = position.tx - tile.tx
   const dy = position.ty - tile.ty
-  const way = Array.from({ length: blastReachTiles() }, (_, step) => ({
+  const reach = chargeReachTiles(sizeToPlantOf(session.vehicle().charges))
+  const way = Array.from({ length: reach }, (_, step) => ({
     tx: position.tx + dx * (step + 1),
     ty: position.ty + dy * (step + 1),
   }))

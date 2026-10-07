@@ -34,7 +34,7 @@ import { add, cmp, div, sub, ZERO_MONEY, type Money } from '../money'
 import { isCasingGradeShort } from './botCasing'
 import { startBotHold, stepOfHold, type ChainPolicy } from './botChains'
 import { forcedCoreTrack, isUnderLeadCap } from './botCoreRule'
-import { restockPriceFor } from './botCharges'
+import { chargeRestockOf } from './botCharges'
 import { gunMountPriceFor, type GunPolicy } from './botGuns'
 import { liningUnlockFor } from './botHeat'
 import type { BotSession } from './botSession'
@@ -58,7 +58,6 @@ type Purchase =
 
 const BUY_CASING_GRADE: Purchase = { type: 'buyCasingGrade', payload: { chain: CLICK_CHAIN } }
 const BUY_GUN: Purchase = { type: 'buyGun', payload: { chain: CLICK_CHAIN } }
-const RESTOCK_CHARGES: Purchase = { type: 'restockCharges', payload: {} }
 
 export interface ShoppingSituation {
   layout: MineLayout
@@ -124,7 +123,8 @@ function nextPurchase(session: BotSession, situation: ShoppingSituation): Purcha
   const lining = liningUnlockDue(session)
   if (lining !== null) return { type: 'buyLiningType', payload: { liningType: lining } }
   if (isGunMountDue(session, situation.gunPolicy)) return BUY_GUN
-  if (isRestockDue(session, situation)) return RESTOCK_CHARGES
+  const restock = chargeRestockDue(session, situation)
+  if (restock !== null) return restock
   const track = nextTrackPurchase(session, situation)
   if (track === null) return null
   return { type: 'buyUpgrade', payload: { upgradeId: track, chain: CLICK_CHAIN } }
@@ -164,10 +164,10 @@ function isGunMountDue(session: BotSession, policy: GunPolicy): boolean {
   return price !== null && canPay(session, price)
 }
 
-function isRestockDue(session: BotSession, situation: ShoppingSituation): boolean {
-  if (!situation.hasMetBlastTile) return false
-  const price = restockPriceFor(session)
-  return price !== null && canPay(session, price)
+function chargeRestockDue(session: BotSession, situation: ShoppingSituation): Purchase | null {
+  if (!situation.hasMetBlastTile) return null
+  const restock = chargeRestockOf(session)
+  return restock !== null && canPay(session, restock.price) ? restock.intent : null
 }
 
 /**

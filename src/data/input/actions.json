@@ -67,6 +67,13 @@
       "keyboard": ["KeyB"]
     },
     {
+      "id": "next_charge_size",
+      "displayName": "Next charge size",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["KeyV"]
+    },
+    {
       "id": "ui_up",
       "displayName": "Focus up",
       "contexts": ["platform", "artefact", "settings"],

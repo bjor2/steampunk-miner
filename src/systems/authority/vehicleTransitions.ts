@@ -30,6 +30,7 @@ import {
 import { vehicleOf, withVehicle, withWallet, type AuthorityState } from './authorityState'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
 import { endTrip } from './combat/enemyRoster'
+import { disarmOnModeChange } from './charges/chargeDisarm'
 import { bankCoreFragments } from './coreBay'
 import type { Attacker, DomainEvent, DomainEventBody, RescueCause } from './domainEvent'
 import { dockSiteOfPlanet } from './planetOfState'
@@ -159,7 +160,21 @@ function isAtThePad(state: AuthorityState, vehicle: VehicleState): boolean {
   return site !== null && vehicle.pose !== null && isInPadZone(site, vehicle.pose)
 }
 
+/** A dock or a wreck also loses a live remote charge (#153, K8 #218). */
 export function changeMode(
+  state: AuthorityState,
+  playerId: string,
+  to: VehicleMode,
+  reason: string,
+  tick: number,
+): RuleEffect {
+  return chainEffects(state, [
+    (current) => recordModeChange(current, playerId, to, reason, tick),
+    (current) => disarmOnModeChange(current, playerId, to),
+  ])
+}
+
+function recordModeChange(
   state: AuthorityState,
   playerId: string,
   to: VehicleMode,

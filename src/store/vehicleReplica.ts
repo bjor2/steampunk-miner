@@ -4,6 +4,7 @@
  * vehicle alone gives the same replica and no subscriber re-renders.
  */
 import { visualTier } from '../systems/economy/vehicleStats'
+import { rackSlotsUsedOf } from '../systems/vehicle/vehicleCharges'
 import { quantaOfUnits } from '../systems/vehicle/energyQuanta'
 import {
   cargoUnitsOf,
@@ -26,7 +27,7 @@ export interface VehicleReplica {
   visualTier: number
   /** 0 with no guns; the turret and its barrel look follow it (#107). */
   gunLevel: number
-  /** The charges on the rack, or null with no rack bolted on; the rack's slots show them (#109). */
+  /** The rack slots charges fill, or null with no rack bolted on; the rack shows them (#109, #218). */
   rackCharges: number | null
 }
 
@@ -47,7 +48,7 @@ export function vehicleReplicaOf(vehicle: VehicleState): VehicleReplica {
     cargoCapacity: stats.cargoCapacity,
     visualTier: visualTier(vehicle.levels),
     gunLevel: vehicle.gun.level,
-    rackCharges: vehicle.charges.isRackMounted ? vehicle.charges.carried : null,
+    rackCharges: vehicle.charges.isRackMounted ? rackSlotsUsedOf(vehicle.charges) : null,
   }
   return lastReplica
 }

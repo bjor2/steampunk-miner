@@ -22,12 +22,12 @@ describe('charge detonation line', () => {
     expect(runEventProblems(olderLine)).toEqual([])
   })
 
-  it('reads a line logged before the dynamite sizes as the shipped charge, size 1', () => {
-    expect(readChargeDetonation(olderLine.data)).toEqual({ tx: 3, ty: -41, size: 1 })
+  it('reads a line logged before the dynamite sizes as the shipped charge, size 1, on its fuse', () => {
+    expect(readChargeDetonation(olderLine.data)).toEqual({ tx: 3, ty: -41, size: 1, by: 'fuse' })
   })
 
-  it('reads the size and radius a line carries', () => {
-    const data = { tx: 3, ty: -41, size: 10, radiusMm: 24000 }
+  it('reads the size, radius and trigger a line carries (K8 #218)', () => {
+    const data = { tx: 3, ty: -41, size: 10, radiusMm: 24000, by: 'plunger' } as const
     expect(readChargeDetonation(data)).toEqual(data)
   })
 

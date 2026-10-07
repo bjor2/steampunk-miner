@@ -48,8 +48,12 @@ export function buyGunCommand(chain: number): CommandIntent<'buyGun'> {
   return { type: 'buyGun', payload: { chain } }
 }
 
-export function restockChargesCommand(): CommandIntent<'restockCharges'> {
-  return { type: 'restockCharges', payload: {} }
+/** Buys `count` charges of `size` (K8 #218): refused, never trimmed, if they do not fit the rack. */
+export function restockChargesCommand(
+  size: number,
+  count: number,
+): CommandIntent<'restockCharges'> {
+  return { type: 'restockCharges', payload: { size, count } }
 }
 
 export function buyChargeRackSlotCommand(chain: number): CommandIntent<'buyChargeRackSlot'> {

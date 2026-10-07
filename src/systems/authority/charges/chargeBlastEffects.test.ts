@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
-import { blastRadiusMm } from '../../economy/blastingCharges'
+import { chargeRadiusMm } from '../../economy/chargeSizes'
 import type { BlastEvent } from '../../registries/blastEffects'
 import { FACING } from '../../vehicle/vehiclePose'
 import { stateDigest } from '../stateDigest'
@@ -53,7 +53,7 @@ describe('charge blast effects', () => {
     expect(seen).toEqual([
       {
         ...WALL_TILE,
-        radiusMm: blastRadiusMm(),
+        radiusMm: chargeRadiusMm(1),
         size: 1,
         playerId: 'p1',
         source: 'charge',

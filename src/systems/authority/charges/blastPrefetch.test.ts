@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { COLLAPSE_BLOCK_SAMPLES } from '../../../constants/balance'
-import { chargeFuseTicks } from '../../economy/blastingCharges'
+import { fuseTicksOf } from '../../economy/chargeSizes'
 import { chargeCentreMm } from '../../vehicle/vehicleCharges'
 import { blocksNear } from '../../world/collapseBlock'
 import { chunksReadByBlock } from '../../world/collapseBlockGround'
@@ -20,7 +20,7 @@ describe('blast prefetch', () => {
     prepareBlaster(session, 0)
     plantOnWall(session, PLANT_TICK)
     const waiting = [chunksAwaitingPrefetch(session.state(), PARAMS).length]
-    for (let tick = PLANT_TICK + 1; tick < PLANT_TICK + chargeFuseTicks(); tick++) {
+    for (let tick = PLANT_TICK + 1; tick < PLANT_TICK + (fuseTicksOf(1) as number); tick++) {
       session.advanceTo(tick)
       waiting.push(chunksAwaitingPrefetch(session.state(), PARAMS).length)
     }

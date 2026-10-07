@@ -20,17 +20,18 @@ export function setGunModeCommand(mode: string): CommandIntent<'setGunMode'> {
   return { type: 'setGunMode', payload: { mode } }
 }
 
-/** Plants a charge on the wall the vehicle faces (#109); the authority checks rack, wall and fuse. */
-export function plantChargeCommand(): CommandIntent<'plantCharge'> {
-  return { type: 'plantCharge', payload: {} }
+/** Plants a charge of `size` on the wall the vehicle faces (#109, K8 #218); the authority checks. */
+export function plantChargeCommand(size: number): CommandIntent<'plantCharge'> {
+  return { type: 'plantCharge', payload: { size } }
 }
 
-/** A scenario's mounted rack with `slotLevel` bought slots carrying `carried` charges (#109). */
+/** A scenario's mounted rack with `slotLevel` bought slots carrying `carried` charges of `size`. */
 export function setChargesCommand(
   carried: number,
   slotLevel: number,
+  size: number,
 ): CommandIntent<'debug.setCharges'> {
-  return { type: 'debug.setCharges', payload: { carried, slotLevel } }
+  return { type: 'debug.setCharges', payload: { size, carried, slotLevel } }
 }
 
 export function setGunLevelCommand(level: number): CommandIntent<'debug.setGunLevel'> {

@@ -258,11 +258,12 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { from: 'integer', to: 'integer', price: 'money', ...HELD_STEP },
   },
-  // #109: the Upgrade bay filled the charge rack, or added one slot to it.
+  // #109: the Upgrade bay sold `count` charges into the rack, or added one slot. K8 (#218): of
+  // `size`, optional so a line from before the sizes (all size 1) still reads.
   charges_restocked: {
     group: 'platform',
     level: 'core',
-    payload: { count: 'integer', price: 'money' },
+    payload: { size: { optional: 'integer' }, count: 'integer', price: 'money' },
   },
   charge_rack_upgraded: {
     group: 'platform',
@@ -442,10 +443,25 @@ export const RUN_EVENT_REGISTRY = {
   // ground breaks as a live blast, summed up once by `blast_resolved`: tiles cleared, ore units sent
   // to the hold, the sale value of the blasted ore that never reached it, the rim blocks checked,
   // the warnings they started, and the ticks it was live.
+  // K8 (#218): every charge has a size, optional so a line from before the sizes still reads (it
+  // was size 1); a remote one (sizes 7 to 10) has no fuse, waits for the plunger (#149) and logs
+  // `remote_charge_planted`. `by` says what fired a charge (a line without it was its fuse), and a
+  // live one lost unfired (dock, wreck, or 3600 ticks) logs `charge_disarmed`.
   charge_planted: {
     group: 'mining',
     level: 'core',
-    payload: { tx: 'integer', ty: 'integer', detonateTick: 'integer', carried: 'integer' },
+    payload: {
+      tx: 'integer',
+      ty: 'integer',
+      size: { optional: 'integer' },
+      detonateTick: 'integer',
+      carried: 'integer',
+    },
+  },
+  remote_charge_planted: {
+    group: 'mining',
+    level: 'core',
+    payload: { tx: 'integer', ty: 'integer', size: 'integer', carried: 'integer' },
   },
   // #213: the detonation's ladder size and radius, copied from its blast (K3 #186). Optional, so a
   // line logged before them still reads (`readChargeDetonation` takes it as size 1); the game
@@ -459,6 +475,17 @@ export const RUN_EVENT_REGISTRY = {
       ty: 'integer',
       size: { optional: 'integer' },
       radiusMm: { optional: 'integer' },
+      by: { optional: { oneOf: ['fuse', 'plunger'] } },
+    },
+  },
+  charge_disarmed: {
+    group: 'mining',
+    level: 'core',
+    payload: {
+      tx: 'integer',
+      ty: 'integer',
+      size: 'integer',
+      reason: { oneOf: ['dock', 'wreck', 'expired'] },
     },
   },
   blast_resolved: {

@@ -114,7 +114,7 @@ export type { ArtefactReport }
  * `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6), and
  * each part's pose now (#48 acceptance 1-2: wheel and drill angles, lifts, squash, glow). Mounted
  * guns add their turret's part ids at the look of their level (#107, #81 acceptance 3), and a
- * bolted-on charge rack its frame and one part per charge carried (#109).
+ * bolted-on charge rack its frame and one part per rack slot its charges fill (#109, #218).
  */
 export interface VehiclePartsReport {
   visualTier: number
@@ -199,8 +199,11 @@ export interface DebugApi {
   /** The guns at step `level`: 0 (none), or the mount (10) to the cap (160), no unlock or price. */
   setGunLevel(level: number): DebugResult
   // blasting charges (#109): a `debug.*` command
-  /** A bolted-on rack with `slotLevel` (0 to 5) bought slots carrying `carried` charges. */
-  setCharges(carried: number, slotLevel: number): DebugResult
+  /**
+   * A bolted-on rack with `slotLevel` (0 to 5) bought slots carrying only `carried` charges of
+   * `size` (1, the shipped charge, unless named; K8 #218).
+   */
+  setCharges(carried: number, slotLevel: number, size?: number): DebugResult
   // heat planets (#113): `debug.*` commands
   /** The lining type the vehicle owns and lays from now on (`standard`, `refractory`), no price. */
   setLiningType(liningType: string): DebugResult
@@ -405,9 +408,9 @@ export function createDebugApi(): DebugApi {
       runUnlessRefused(vehicleDebugProblems(setGunLevelCommand(level)), () =>
         game().setGunLevel(level),
       ),
-    setCharges: (carried, slotLevel) =>
-      runUnlessRefused(vehicleDebugProblems(setChargesCommand(carried, slotLevel)), () =>
-        game().setCharges(carried, slotLevel),
+    setCharges: (carried, slotLevel, size = 1) =>
+      runUnlessRefused(vehicleDebugProblems(setChargesCommand(carried, slotLevel, size)), () =>
+        game().setCharges(carried, slotLevel, size),
       ),
     setLiningType: (liningType) =>
       runUnlessRefused(vehicleDebugProblems(setLiningTypeCommand(liningType)), () =>

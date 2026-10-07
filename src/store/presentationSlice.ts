@@ -1,7 +1,7 @@
 /**
  * The game store's presentation slice (#33): local settings and rebinding, which layer is open
- * (the artefact cache's cards too, #46), menu focus, the travel confirmation and the Upgrade bay
- * preview's install animation (#44). None of it is authority state, a command, a log line or
+ * (the artefact cache's cards too, #46), menu focus, the travel confirmation, the Upgrade bay
+ * preview's install animation (#44) and the charge size `plant_charge` plants (#153, K8 #218). None of it is authority state, a command, a log line or
  * part of the digest; buttons that change the world submit ordinary authority commands.
  *
  * Kept beside the store so the store stays one reason to change; `gameStore` spreads it in, so
@@ -73,6 +73,11 @@ export interface PresentationValues {
   installingUpgradeId: UpgradeId | null
   /** The on-screen driving controls (#173): shown on a finger's touch, hidden by a key. */
   isTouchControlsShown: boolean
+  /**
+   * The size `plant_charge` plants while the rack holds one (`next_charge_size`, #153, K8 #218);
+   * the plant command names its size, so this never reaches the authority.
+   */
+  chosenChargeSize: number
 }
 
 export interface PresentationActions {
@@ -134,6 +139,7 @@ export interface PresentationActions {
   showTouchControls(): void
   /** A key went down: the keyboard has the game until the next touch (#173). */
   hideTouchControls(): void
+  chooseChargeSize(size: number): void
 }
 
 type SliceHost = PresentationValues &
@@ -155,6 +161,7 @@ export const STARTING_PRESENTATION: PresentationValues = {
   renderScalePin: null,
   installingUpgradeId: null,
   isTouchControlsShown: false,
+  chosenChargeSize: 1,
 }
 
 export function inputLayerOf(state: SliceHost): InputContext {
@@ -252,6 +259,7 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
     hideTouchControls: () => {
       if (get().isTouchControlsShown) set({ isTouchControlsShown: false })
     },
+    chooseChargeSize: (size) => set({ chosenChargeSize: size }),
   }
 }
 

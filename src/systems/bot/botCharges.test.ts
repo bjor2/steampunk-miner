@@ -3,14 +3,14 @@ import { createAuthorityState } from '../authority/authorityState'
 import { setChargesIntent, STAND_TILE, WALL_TILE } from '../authority/charges/chargeFixtures'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
 import { FREEZE_ENEMIES } from '../authority/scriptedSession'
-import { restockPrice } from '../economy/blastingCharges'
+import { chargePrice } from '../economy/chargeSizes'
 import { restockChargesCommand } from '../platform/platformCommands'
 import type { TilePoint } from '../world/tileGrid'
 import {
   blastOpen,
   isBlastWorthIt,
   noteTileWorthACharge,
-  restockPriceFor,
+  chargeRestockOf,
   type ChargePolicy,
 } from './botCharges'
 import type { BotPlanet } from './botPilot'
@@ -72,14 +72,17 @@ function carveTile(session: BotSession, tile: TilePoint): void {
 
 describe('bot: blasting charges policy (#109)', () => {
   it('fills the rack at the Upgrade bay from planet 7, and not before', () => {
-    expect(restockPriceFor(botAtUpgradeBayOn(6))).toBeNull()
-    expect(restockPriceFor(botAtUpgradeBayOn(7))).toEqual(restockPrice(3, 7))
+    expect(chargeRestockOf(botAtUpgradeBayOn(6))).toBeNull()
+    expect(chargeRestockOf(botAtUpgradeBayOn(7))).toEqual({
+      intent: restockChargesCommand(1, 3),
+      price: chargePrice(1, 3, 7),
+    })
   })
 
   it('wants no restock with a full rack', () => {
     const full = botAtUpgradeBayOn(7)
-    full.submit(restockChargesCommand())
-    expect(restockPriceFor(full)).toBeNull()
+    full.submit(restockChargesCommand(1, 3))
+    expect(chargeRestockOf(full)).toBeNull()
   })
 
   it('wants charges once it meets a tile it would blast with none in stock (#129)', () => {
@@ -116,7 +119,7 @@ describe('bot: blasting charges policy (#109)', () => {
     expect(tileKindAt(session.state(), WALL_TILE)).toBe('open')
     expect(planet.pilot.position).toEqual(STAND_TILE)
     expect(session.vehicle().hull).toEqual(hull)
-    expect(session.vehicle().charges).toMatchObject({ carried: 2, planted: null })
+    expect(session.vehicle().charges).toMatchObject({ carriedBySize: { '1': 2 }, planted: null })
     expect(session.events().map((event) => event.type)).not.toContain('CommandRejected')
   })
 })

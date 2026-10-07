@@ -1,17 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import { ceilMilli, cmp, mul, toCanonical } from '../money'
 import { bandOrePrice, bandOrePriceAt, bandOreWorth, bandOreWorthAt } from './bandOreCost'
+import { chargeOreUnits, chargeSizeCount, chargeSizesUpTo } from './chargeSizes'
 import { ECONOMY } from './economy'
 import type { BandOreCost } from './economyDefinition'
 import { oreTier, oreValue } from './oreEconomy'
 import { paceScale } from './planetEconomy'
 
-// Every band-ore cost economy.json prices today: the gun mount and levels, the charge, and each
-// hazard act's lining unlock.
+// Every band-ore cost economy.json prices today: the gun mount and levels, each charge size, and
+// each hazard act's lining unlock.
 const FIXTURE_COSTS: readonly BandOreCost[] = [
   ECONOMY.gun.mountCost,
   ECONOMY.gun.levelCost,
-  ECONOMY.blastingCharges.chargeCost,
+  ...chargeSizesUpTo(chargeSizeCount()).map((size) => ({
+    band: ECONOMY.blastingCharges.sizes.oreUnitsBand,
+    oreUnits: chargeOreUnits(size),
+  })),
   ...ECONOMY.archetypes.map((archetype) => archetype.liningUnlockCost),
 ]
 

@@ -44,6 +44,7 @@ const DETONATED: DomainEvent = {
   ty: 280,
   size: 6,
   radiusMm: 10000,
+  by: 'fuse',
 }
 
 const sceneLayersMarkupWith = (slices: readonly SliceDefinition[]) =>
