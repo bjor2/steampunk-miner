@@ -81,6 +81,8 @@ export const slice: SliceDefinition = {
 | `discovery(provider)` | `discovery.ts` | One provider (`codex`). |
 | `loadoutAcceptance(rule)`, `attachUse(use)` | `vehicleLoadout.ts`, `vehicleAttach.ts` | Item slices only. |
 | `hudPanel(panel)` | `src/ui/registries/hudPanels.ts` | The panel reads the slice's own store and takes no props. |
+| `bayPanel(panel)` | `src/ui/registries/bayPanels.ts` | `header` (left of the bay's money) or `above` (a click-through layer over the bay screen); no props (feature-slices.md 3.19). |
+| `moneyCounter(provider)` | `src/ui/registries/moneyCounter.ts` | One provider (`sell-burst`): the hook `useShownMoney(wallet)` returns the Money the bay header shows. |
 | `worldPiece(piece)` | `src/scene/registries/worldPieces.ts` | An R3F piece drawn in its world layer (`platform`), no props (#175). |
 | `vehicleStaging(provider)` | `src/systems/registries/vehicleStaging.ts` | One provider (`dock-buildings`): where the local car is drawn, the camera looks and input waits; presentation only (#170). |
 | `dockFacility(facility)` | `src/systems/registries/dockFacilities.ts` | A dock building on a `facility` row of the schedule, which it claims (`scheduleRowId`): the row joins `builtFacilityRowIdsOn` from its `planetIndex` on, so travel logs its `FeatureUnlocked` once the row is shipped (#221). Delete the row from the deferred `dock-building` list in the same commit. |
