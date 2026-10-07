@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { oreHardness, oreSalePrice, signatureHardness } from '../economy/oreEconomy'
 import { stepOfMajor } from '../economy/upgradeSteps'
 import { toCanonical } from '../money'
+import { ORE_DRILL_CLASS_REGISTRY, type OreDrillClass } from '../registries/oreDrillClasses'
 import { ORE_SIGNATURE_REGISTRY } from '../registries/oreTypes'
 import { addToRegistry, withFreshRegistrySet } from '../registries/seal'
 import { EMPTY_WORLD, materialCellAt } from '../world/worldState'
@@ -34,6 +35,23 @@ function registerTierOneSignature(): void {
 }
 
 const nothing = () => undefined
+
+/** A class provider, as mining-gates registers one, naming every ore cell `drillClass`. */
+function registerDrillClass(drillClass: OreDrillClass): () => void {
+  return () =>
+    addToRegistry(ORE_DRILL_CLASS_REGISTRY, 'mining-gates', {
+      id: 'mining-gates.drill-class',
+      drillClassOf: () => drillClass,
+    })
+}
+
+/** A signature tag and a provider that calls the signature `drillClass`. */
+function registerSignatureClassed(drillClass: OreDrillClass): () => void {
+  return () => {
+    registerTierOneSignature()
+    registerDrillClass(drillClass)()
+  }
+}
 
 /** Drills planet 1's first surface ore cell with the tip at `tipMajor` and a fast drill. */
 function drillSurfaceOre(tipMajor: number) {
@@ -105,5 +123,54 @@ describe('signature ore cells (#232)', () => {
       resourceTier: SURFACE_TIER,
       value: toCanonical(oreSalePrice(SURFACE_TIER)),
     })
+  })
+})
+
+// A dense cell (#142 "Dense cells", #236): its own tier's hardness, but the tip of the last
+// completed major must be one level past its tier, so planet 1's tier-1 ore needs major 2.
+describe('ore drill classes (#236)', () => {
+  it('keeps a dense cell as hard as its own tier', () => {
+    expect(withFreshRegistrySet(registerDrillClass('dense'), surfaceOreHardness)).toEqual(
+      oreHardness(SURFACE_TIER),
+    )
+  })
+
+  it('only skids on a dense cell below the major one past its tier, and cuts it at that major', () => {
+    const dense = registerDrillClass('dense')
+    const below = withFreshRegistrySet(dense, () => drillSurfaceOre(SURFACE_TIER).events)
+    const at = withFreshRegistrySet(dense, () => drillSurfaceOre(SURFACE_TIER + 1).events)
+    expect(cargoAddedOf(below)).toBeUndefined()
+    expect(cargoAddedOf(at)).toMatchObject({
+      resourceTier: SURFACE_TIER,
+      value: toCanonical(oreSalePrice(SURFACE_TIER)),
+    })
+  })
+
+  it('reads the major for a dense cell, so nine pips past the major below still skid', () => {
+    const events = withFreshRegistrySet(registerDrillClass('dense'), () => {
+      const [tile] = surfaceOreTiles(1)
+      const session = createScriptedSession()
+      session.submit(0, FREEZE_ENEMIES)
+      session.submit(0, setUpgrade('drill_tip', stepOfMajor(SURFACE_TIER) + 9))
+      session.submit(0, setUpgrade('drill_power', stepOfMajor(30)))
+      session.submit(0, { type: 'debug.setEnergy', payload: { energy: '150' } })
+      session.submit(1, poseAbove(tile, FACING.down))
+      return session.submit(200, drill(tile, 150))
+    })
+    expect(cargoAddedOf(events)).toBeUndefined()
+  })
+
+  it('gives a signature a provider calls ordinary its own tier and the quarter floor', () => {
+    const ordinary = registerSignatureClassed('ordinary')
+    expect(withFreshRegistrySet(ordinary, surfaceOreHardness)).toEqual(oreHardness(SURFACE_TIER))
+    expect(
+      cargoAddedOf(withFreshRegistrySet(ordinary, () => drillSurfaceOre(4).events)),
+    ).toMatchObject({ value: toCanonical(oreSalePrice(SURFACE_TIER + 1)) })
+  })
+
+  it('keeps a signature the provider calls signature five tiers hard', () => {
+    expect(withFreshRegistrySet(registerSignatureClassed('signature'), surfaceOreHardness)).toEqual(
+      signatureHardness(SURFACE_TIER),
+    )
   })
 })

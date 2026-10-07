@@ -84,7 +84,7 @@ export function drillAtPose(
 export function hardnessOfTile(params: PlanetParams, tile: TilePoint, cell: number): BigStat {
   const kind = kindOfCell(cell)
   if (kind === CELL_KIND.core) return coreHardness(params.planetIndex)
-  if (kind === CELL_KIND.ore) return oreCellHardness(params, cell)
+  if (kind === CELL_KIND.ore) return oreCellHardness(params, tile, cell)
   return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
 }
 
@@ -95,7 +95,8 @@ export function ticksPerCell(
   tile: TilePoint,
   cell: number,
 ): number | null {
-  return ticksPerTile(drill, hardnessOfTile(params, tile, cell), scratchFloorOfCell(params, cell))
+  const floor = scratchFloorOfCell(params, tile, cell)
+  return ticksPerTile(drill, hardnessOfTile(params, tile, cell), floor)
 }
 
 interface DrillTarget {
@@ -232,7 +233,7 @@ function damageEvent(
   const material = materialCellAt(world, params, tile)
   const hardness = hardnessOfTile(params, tile, material)
   const damage = toCanonical(
-    drillDamage(drill, hardness, ticks, scratchFloorOfCell(params, material)),
+    drillDamage(drill, hardness, ticks, scratchFloorOfCell(params, tile, material)),
   )
   return { type: 'DrillDamageDealt', tx: tile.tx, ty: tile.ty, ticks, damage }
 }

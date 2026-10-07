@@ -356,6 +356,12 @@ export interface Economy {
     /** Below `tip / hardness` of this the drill cannot scratch the tile (`P < H/4`). */
     scratchFloor: BigStat
     /**
+     * The floor of a dense ore cell (#142 "Dense cells", #236): any value past the tip ratio and
+     * up to its square puts the gate at `minTipLevel = t + 1` on the major tip, at every tier,
+     * with no rounding at the edge (`P(L) = 1.2544^L`, `H(t) = 1.2544^(t-1)`).
+     */
+    denseScratchFloor: BigStat
+    /**
      * The floor of a drill-gated signature cell alone (#142: 1, so the tip needs `P >= H`);
      * every other cell keeps `scratchFloor`.
      */

@@ -158,6 +158,7 @@ function readGun(reader: FieldReader, gun: Record<string, unknown>): Economy['gu
 function readDrill(reader: FieldReader, drill: Record<string, unknown>): Economy['drill'] {
   return {
     scratchFloor: reader.money('drill.scratchFloor', drill.scratchFloor),
+    denseScratchFloor: reader.money('drill.denseScratchFloor', drill.denseScratchFloor),
     gateScratchFloor: reader.money('drill.gateScratchFloor', drill.gateScratchFloor),
     minTicksPerTile: reader.safeInteger('drill.minTicksPerTile', drill.minTicksPerTile),
   }

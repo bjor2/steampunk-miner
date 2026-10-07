@@ -70,7 +70,8 @@ export const slice: SliceDefinition = {
 | --- | --- | --- |
 | `content(kind, entries)` | `src/systems/registries/content.ts` | Every entry has an `iconId`. The kind's owner declares it by module augmentation of `ContentKinds`. |
 | `oreTypes(provider)` | `oreTypes.ts` | One provider across all slices (`ores`). |
-| `gateCheck(check)` | `gateChecks.ts` | Verdict `cut`, `refused` or `lost` with `required` and `have`, or null for a cell with no gate. `query.blast` is null on the drill; the drill reports stops as `DrillGated` (feature-slices.md 3.6). |
+| `gateCheck(check)` | `gateChecks.ts` | Verdict `cut`, `refused`, `blocked` or `lost` with `required` and `have`, or null for a cell with no gate. `query.blast` is null on the drill; the drill reports stops as `DrillGated` (feature-slices.md 3.6). |
+| `oreDrillClass(provider)` | `oreDrillClasses.ts` | One provider: an ore cell's drill class, `ordinary`, `dense` or `signature`; the kernel owns each class's hardness and floor (feature-slices.md 3.29). |
 | `blastEffect(effect)` | `blastEffects.ts` | Runs after the kernel's blast, in id order. |
 | `clockStep(step)` | `clockSteps.ts` | Runs on the authority clock after the kernel's steps, in id order; `nextTick` stops a quiet clock (#217). |
 | `inputReaction(reaction)` | `inputReactions.ts` | Answers a pressed action the kernel table leaves open (`use_slot_1` to `_5`); a null intent does nothing (#217). |

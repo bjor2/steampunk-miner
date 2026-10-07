@@ -34,6 +34,7 @@ import type { HullDamageIntercept } from '../systems/registries/hullDamageInterc
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
+import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
 import type { OreSignatureTag, OreTypeProvider } from '../systems/registries/oreTypes'
 import type { PartMotionRequestSource } from '../systems/registries/partMotionRequests'
 import type { SaveSection } from '../systems/registries/saveSections'
@@ -66,6 +67,8 @@ export interface SliceRegistrar {
   oreTypes(provider: OreTypeProvider): void
   /** Folded over every ore the provider answers: a yes makes it a signature (#232). */
   oreSignature(tag: OreSignatureTag): void
+  /** One provider across all slices: the drill class of an ore cell (#236, dense or signature). */
+  oreDrillClass(provider: OreDrillClassProvider): void
   gateCheck(check: GateCheck): void
   blastEffect(effect: BlastEffect): void
   /** Runs on the authority clock after the kernel's steps, in id order (#217). */

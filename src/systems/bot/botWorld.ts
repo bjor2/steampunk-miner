@@ -95,7 +95,7 @@ function isScratchableCell(
   tile: TilePoint,
   cell: number,
 ): boolean {
-  const floor = scratchFloorOfCell(params, cell)
+  const floor = scratchFloorOfCell(params, tile, cell)
   return canScratch(drill.gateTip, hardnessOfTile(params, tile, cell), floor)
 }
 

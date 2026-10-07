@@ -38,7 +38,12 @@
     "drillUpEnergyMult": "2.5",
     "perShot": "0.5"
   },
-  "drill": { "scratchFloor": "0.25", "gateScratchFloor": "1", "minTicksPerTile": 24 },
+  "drill": {
+    "scratchFloor": "0.25",
+    "denseScratchFloor": "1.5",
+    "gateScratchFloor": "1",
+    "minTicksPerTile": 24
+  },
   "costCurves": [
     { "id": "cost.vehicle.cargo_hold", "family": "geometric", "base": "24", "ratio": "1.225" },
     { "id": "cost.vehicle.boiler", "family": "geometric", "base": "23", "ratio": "1.225" },

@@ -51,6 +51,7 @@ import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamage
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
+import { ORE_DRILL_CLASS_REGISTRY } from '../systems/registries/oreDrillClasses'
 import { ORE_SIGNATURE_REGISTRY, ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
 import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRequests'
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
@@ -85,6 +86,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
       entries.forEach((entry) => addContent(sliceId, contentRegistrationOf(kind, entry))),
     oreTypes: (provider) => add(ORE_TYPE_REGISTRY, provider),
     oreSignature: (tag) => add(ORE_SIGNATURE_REGISTRY, tag),
+    oreDrillClass: (provider) => add(ORE_DRILL_CLASS_REGISTRY, provider),
     gateCheck: (check) => add(GATE_CHECK_REGISTRY, check),
     blastEffect: (effect) => add(BLAST_EFFECT_REGISTRY, effect),
     clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),
