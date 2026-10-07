@@ -72,6 +72,9 @@ export const slice: SliceDefinition = {
 | `oreTypes(provider)` | `oreTypes.ts` | One provider across all slices (`ores`). |
 | `gateCheck(check)` | `gateChecks.ts` | Verdict `cut`, `refused` or `lost` with `required` and `have`, or null for a cell with no gate. `query.blast` is null on the drill; the drill reports stops as `DrillGated` (feature-slices.md 3.6). |
 | `blastEffect(effect)` | `blastEffects.ts` | Runs after the kernel's blast, in id order. |
+| `clockStep(step)` | `clockSteps.ts` | Runs on the authority clock after the kernel's steps, in id order; `nextTick` stops a quiet clock (#217). |
+| `inputReaction(reaction)` | `inputReactions.ts` | Answers a pressed action the kernel table leaves open (`use_slot_1` to `_5`); a null intent does nothing (#217). |
+| `dockService(service)` | `dockServices.ts` | A free refill at the end of every paid recharge; the bill never changes (#217). |
 | `generationHook(hook)` | `generationHooks.ts` | Integer-only folds; the hook's seed is `subSeedForHook(params, hook.id)`. Adding one bumps `GENERATOR_VERSION`. |
 | `oreLook(provider)` | `oreLook.ts` | One provider (`ore-visuals`). |
 | `saveSection(section)` | `saveSections.ts` | Its own `version`, matched exactly on restore. Read it with `readSection`, write it with `withSection`. A value at `initial` stays out of the state, so a section changes no digest until it is written. |

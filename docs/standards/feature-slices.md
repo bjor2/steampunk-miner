@@ -304,6 +304,9 @@ export interface SliceRegistrar {
   oreTypes(provider: OreTypeProvider): void           // one provider
   gateCheck(check: GateCheck): void
   blastEffect(effect: BlastEffect): void
+  clockStep(step: ClockStep): void                     // #217, section 3.20
+  dockService(service: DockService): void              // #217, section 3.20
+  inputReaction(reaction: InputReactionEntry): void    // #217, section 3.20
   generationHook(hook: GenerationHook): void
   oreLook(provider: OreLookProvider): void            // one provider
   saveSection<T>(section: SaveSection<T>): void
@@ -644,7 +647,7 @@ export function withSection<T>(state: AuthorityState, playerId: string | null, s
 
 ```ts
 // src/ui/registries/hudPanels.ts (new)
-export type HudSlot = 'overlay' | 'gauges' | 'banner' | 'position' | 'prompts' | 'threats'
+export type HudSlot = 'overlay' | 'gauges' | 'banner' | 'position' | 'prompts' | 'threats' | 'slots'
 export type HudPanel =                                                          // reads its own slice store; no props
   | { id: string; slot: Exclude<HudSlot, 'overlay'>; Panel: ComponentType }
   | { id: string; slot: 'overlay'; priority: number; Panel: ComponentType }    // #208
@@ -661,7 +664,7 @@ export type DebugAction = (...args: readonly unknown[]) => DebugResult          
 export function debugActionsBySlice(): Readonly<Record<string, Readonly<Record<string, DebugAction>>>>
 ```
 
-**HUD.** `HudView.tsx` renders each slot's panels right after its kernel component (`GaugeCluster`, `HudBanner`, `PositionPanel`, `HudPrompts`, `ThreatMarkers`). An empty slot renders no markup.
+**HUD.** `HudView.tsx` renders each slot's panels right after its kernel component (`GaugeCluster`, `HudBanner`, `PositionPanel`, `HudPrompts`, `ThreatMarkers`). An empty slot renders no markup. The `slots` slot (#217) is the power-up slot column inside the touch controls, drawn after the cluster by `TouchControls.tsx` while they show.
 
 **World pieces and vehicle staging (#175).** `src/scene/registries/worldPieces.ts` is the scene's counterpart of the HUD slots: `GameScene` draws each layer's pieces (`platform`, on the pad behind the vehicle) in id order, and an empty layer draws nothing. `src/systems/registries/vehicleStaging.ts` takes one provider that says, from the authority state alone, where the local car is drawn relative to its body, where the camera looks and whether input waits (the Workshop auto-roll of #170). `scene/vehicleStage.ts` reads it once per fixed step; it never moves the body or the authority pose, and with no provider nothing is staged.
 
@@ -706,6 +709,14 @@ The descriptions slice (#164) reaches the kernel's shop rows, platform cards and
 - **`listBuyableRefs(maxPlanet = 1)`** (`buyableRefs.ts`): the kernel's buyables (`kernelItems.ts` names each ref; every kernel player command says what it buys, so a new one fails the typecheck and `buyableRefs.test.ts`) plus every entry's refs for planets 1 to `maxPlanet`, each once, sorted.
 - **`ItemCard`** (`src/ui/kit/ItemCard.tsx`): screen models carry an `ItemCardModel` (`systems/views/itemCardModel.ts`). `compact` is the Upgrade bay's buy rows (tracks, casing, lining, guns, charges, rack): tapping or focusing opens the full card in place and the store's `tapItemCard` buys on the second tap. `full` is the platform card (the next refinery slot, the artefact cache's cards) and `ItemTooltip` (repair, recharge, quick service; hover or focus 250 ms, a 400 ms touch hold). With no provider every surface draws its old markup.
 - **`formatPercent(ratio)`** sits beside `formatAmount` in `src/systems/displayAmount.ts`, and lint bans `toFixed`, `toPrecision`, `toLocaleString`, `Number(` and `parseFloat` in `src/features/descriptions/**`.
+
+### 3.20 Clock steps, input reactions and dock services (#217)
+
+Kernel seams for `power-up-core` (#200), from the TD lock on #200. With nothing registered the clock, routing, recharge and goldens are unchanged.
+
+- **`clockSteps`** (`src/systems/registries/clockSteps.ts`): `{ id, nextTick(state): number | null, run(state, tick): RuleEffect }`. `authorityClock.ts` runs the steps in id order after its own steps, on every live tick and at every tick a quiet clock stops at; `nextTick` joins the quiet clock's stop list. `run` must do nothing when nothing is due. Its events are stamped with the tick. Wind-ups and channel cancels resolve here, so spend logs stay on the authority clock.
+- **`inputReactions`** (`src/systems/registries/inputReactions.ts`): `{ id, actionId, contexts, toIntent(situation): CommandIntent | null }`. `reactionToPress` asks the reactions only for an action its fixed table has no rule for in the top layer; the first intent in id order is submitted, and a null intent does nothing. `InputSituation` carries the authority replica and the player. The kernel ships `use_slot_1` to `use_slot_5` on `Digit1` to `Digit5`, rebindable. On touch, a slot button calls `pressSlotButton` / `releaseSlotButton` in `src/store/touchRuntime.ts`: a tap uses the slot at once, and a hold of `SLOT_CARD_HOLD_MS` (400 ms) shows the #164 item card (`isSlotCardShown`) and uses nothing.
+- **`dockServices`** (`src/systems/registries/dockServices.ts`): `{ id, onRecharge(state, playerId): RuleEffect }`, run in id order at the end of `rechargeEnergy`, so also on quick service's recharge leg. A refill is free on the paid bill, which never changes. A service logs what it refilled (charges-after) so a balance read can tell a refill from a paid buy.
 
 ## 4. Cross-slice contracts
 
