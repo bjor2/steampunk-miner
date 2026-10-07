@@ -30,6 +30,23 @@ against the 14 min seed spread, and half weights stay. The combined re-baseline 
 must reach 100–110 with no slack: a slice median under 100, or any seed under 90, goes back to the
 lead weights first, then #137 T9 `fromPlanet 8` from 0.75 to 0.8. Never quarter weights.
 
+## P3–P5 against `minorStatShare` (#225)
+
+The re-measure the GD lock on #181 asked for, after #195 (brass at 1.225) and the #146 re-baseline.
+Both are in `9945252`, so the baseline above is that measurement. `minorStatShare` stays at `0.5`
+(`upgradeTiers` in `economy.json`); this records the pace and leaves it untuned.
+
+| median minutes, arrival to core           | P3   | P4   | P5   |
+| ----------------------------------------- | ---- | ---- | ---- |
+| main `9945252`, two-tier, no leads        | 42.3 | 43.2 | 43.1 |
+| as built, two-tier with half-weight leads | 40.6 | 46.7 | 44.7 |
+
+On #181's two seeds, single-tier levels ran P3–P5 at 46.1–57.9 min (83921) and 43.5–49.2 min
+(31415), and two-tier levels came in 2–10 min faster. That made `minorStatShare` 0.4 the
+candidate lever. The medians above sit at 40.6–46.7 min. The spree targets (median 6–12 steps per bought track, 25–45%
+of above-median trips buying 10+ on one track) are judged by `npm run balance:report`, under
+"Spree targets per track".
+
 ## Lead, gated lead and signature cells per planet
 
 Counted off generation, over every chunk of each planet, by `oreCensusOf`
