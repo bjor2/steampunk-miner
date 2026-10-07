@@ -93,6 +93,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 
+### `extraction`: 4 files, 22 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/extraction/systems/extractionEconomy.test.ts` | 3 | 3 |
+| `src/features/extraction/systems/extractionItems.test.ts` | 8 | 8 |
+| `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
+| `src/features/extraction/visionRows.test.ts` | 5 | 5 |
+
 ### `mining-popup`: 8 files, 47 tests
 
 | File | Tests | Sites |
