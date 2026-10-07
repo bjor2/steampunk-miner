@@ -13,7 +13,7 @@ import { fromSafeInteger, mul, toSafeInteger, floor } from '../money'
 import { SEED_PURPOSE, subSeedFor } from './generatorSeeds'
 import type { PlanetParams } from './planetParams'
 import { bandOfTile } from './planetGeometry'
-import { CHUNK_SIZE, firstTileOfChunk } from './tileGrid'
+import { CHUNK_SIZE, firstTileOfChunk, type TilePoint } from './tileGrid'
 import { GROUND_CELL, LAVA_CELL } from './worldCell'
 
 const CHANCE_SCALE = 10000
@@ -39,6 +39,39 @@ export function paintLavaPockets(params: PlanetParams, cells: Uint32Array, cx: n
   }
 }
 
+/**
+ * Whether a tile of the pocket lattice lies within `radiusTiles` of `tile`, centre to centre (#141
+ * "signature near lava", #232). It asks the lattice, not the cells: ore patches paint before the
+ * pockets, so a generation hook asks before any lava is in the chunk, and a pocket tile counts
+ * whether its cell ends up lava or keeps the ore or cave it already held. False off heat planets.
+ */
+export function isLavaPocketNear(
+  params: PlanetParams,
+  tile: TilePoint,
+  radiusTiles: number,
+): boolean {
+  const chances = pocketChancesOf(params)
+  if (chances.every((chance) => chance === 0)) return false
+  const seed = subSeedFor(params, SEED_PURPOSE.lavaPocket)
+  return isAnyTileWithin(tile, radiusTiles, (near) => isPocketBlock(params, seed, chances, near))
+}
+
+/** Whether `isWanted` holds for a tile whose centre is within `radiusTiles` of `centre`. */
+function isAnyTileWithin(
+  centre: TilePoint,
+  radiusTiles: number,
+  isWanted: (tile: TilePoint) => boolean,
+): boolean {
+  const radiusSq = radiusTiles * radiusTiles
+  for (let dy = -radiusTiles; dy <= radiusTiles; dy++) {
+    for (let dx = -radiusTiles; dx <= radiusTiles; dx++) {
+      const tile = { tx: centre.tx + dx, ty: centre.ty + dy }
+      if (dx * dx + dy * dy <= radiusSq && isWanted(tile)) return true
+    }
+  }
+  return false
+}
+
 /** Each band's pocket chance in ten-thousandths, rounded down. */
 function pocketChancesOf(params: PlanetParams): number[] {
   return BANDS.map((band) =>
@@ -57,7 +90,7 @@ function isPocketBlock(
   params: PlanetParams,
   seed: number,
   chances: readonly number[],
-  tile: { tx: number; ty: number },
+  tile: TilePoint,
 ): boolean {
   const bx = Math.floor(tile.tx / LAVA_POCKET_TILES)
   const by = Math.floor(tile.ty / LAVA_POCKET_TILES)
