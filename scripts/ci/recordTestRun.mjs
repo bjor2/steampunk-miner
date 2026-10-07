@@ -36,6 +36,12 @@ function runContextOf(env, job) {
     // box: the loop's Tester on the build box (scripts run outside Actions); actions: older records.
     source: env.TEST_SOURCE || 'actions',
     phase: env.TEST_PHASE || null,
+    // The feature (parent issue, or a parentless ticket) whose completion this run tests.
+    feature: Number(env.TEST_FEATURE) || null,
+    tickets: (env.TEST_TICKETS || '')
+      .split(/[\s,]+/)
+      .filter(Boolean)
+      .map(Number),
     workflow: env.GITHUB_WORKFLOW,
     job: env.TEST_JOB,
     event: env.GITHUB_EVENT_NAME,

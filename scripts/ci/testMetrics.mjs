@@ -155,11 +155,11 @@ const isPerPushRun = (record) => record.run.mode !== 'nightly'
 function runLineOf(record) {
   const { id, url, event, mode, sha, branch, startedAt, jobConclusion, timedOut, jobDurationSec } =
     record.run
-  const { source = 'actions', phase = null, job } = record.run
+  const { source = 'actions', phase = null, job, feature = null, tickets = [] } = record.run
   const { reportFound, files, tests, failed, failedFiles } = record.totals
   return {
     ...{ id, url, event, mode, sha, branch, startedAt, jobConclusion, timedOut, jobDurationSec },
-    ...{ source, phase, job },
+    ...{ source, phase, job, feature, tickets },
     ...{ reportFound, files, tests, failed, failedFiles },
   }
 }
