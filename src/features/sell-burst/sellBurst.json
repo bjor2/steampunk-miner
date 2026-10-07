@@ -1,0 +1,38 @@
+{
+  "$comment": "The sell burst's timing and caps (#171 section 3, G&V owns the values; the lining beat from G&V on #176). Ticks are 60 Hz and count from the sale.",
+  "chunks": {
+    "max": 24,
+    "launchSpreadTicks": 24,
+    "flightTicks": 16,
+    "arcLowM": 4,
+    "arcHighM": 6,
+    "clatterTick": 24
+  },
+  "ticker": {
+    "tick": 30,
+    "clackGapTicks": 3,
+    "maxClacks": 6
+  },
+  "coins": {
+    "max": 40,
+    "burstTick": 36,
+    "burstSpreadTicks": 12,
+    "riseTicks": 6,
+    "riseM": 2,
+    "hangTick": 54,
+    "flightTicks": 18,
+    "landTick": 90,
+    "cascadeGapTicks": 2
+  },
+  "lining": {
+    "liningPeelTick": 54,
+    "liningTagHoldTicks": 96,
+    "liningTagFadeTicks": 12
+  },
+  "flare": {
+    "stepMultiple": 10,
+    "ticks": 18
+  },
+  "mergeWindowTicks": 90,
+  "reducedCountDivisor": 2
+}
