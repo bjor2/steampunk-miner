@@ -2,8 +2,8 @@
  * The mining popup (#178, spec #172) in the preview build: read through the slice's debug read
  * and the DOM's test ids, never pixels. Drilling the first surface ore of the committed start
  * scenario shows its chip and the NEW MATERIAL plaque, a second tile of the type shows no second
- * plaque, and both clear on the game's own clock with no input. The page's clock is held while
- * the DOM is read, so a busy box never outlives a 1.4 s chip between two checks.
+ * plaque, and both clear on the game's own clock with no input. The page's clock is held from
+ * the drill until the DOM is read, so a busy box never outlives a 1.4 s chip between two checks.
  */
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
@@ -34,12 +34,13 @@ const SAME_TYPE_ORE = { tx: 30, ty: 293 }
 const PLAQUE_GONE_TICKS = 400
 const FIRST_ORE_ID = 'kernel.metal.t1'
 const DRILL_TICKS = 40
-/** Far enough ahead that the clock has not passed it by the time the pause lands. */
-const HOLD_AFTER_MS = 500
+/** Far enough ahead that the page clock has not passed it when the pause lands. */
+const HOLD_AFTER_MS = 2000
 /** Long enough for the HUD to render the batch and the overlay to place the chip. */
 const DRAW_FRAMES_MS = 250
-/** The tier-0 plaque's 3.35 s, with room for software WebGL's slow frames. */
-const CLEARS_WITHIN_MS = 20_000
+/** The tier-0 plaque's 3.35 s, with room for software WebGL's slow frames on a busy box. */
+const CLEARS_WITHIN_MS = 60_000
+const SLOW_BOX_TIMEOUT_MS = 120_000
 
 async function openStartScenario(page: Page): Promise<string[]> {
   const errors: string[] = []
@@ -85,13 +86,13 @@ async function drillFromAbove(page: Page, tile: { tx: number; ty: number }): Pro
 }
 
 /**
- * Stops the page's clock a few frames on, so the game, its tick and the popup hold still while
- * the DOM is read: a chip lives 1.4 s, less than a busy box takes between two checks.
+ * Stops the page's clock, so the game and the popup only move when the spec says: a chip lives
+ * 1.4 s, less than a busy box can take between two checks. The drill's fastForward runs whether
+ * the clock is held or not.
  */
 async function holdTime(page: Page): Promise<void> {
   const now = await page.evaluate(() => Date.now())
   await page.clock.pauseAt(now + HOLD_AFTER_MS)
-  await page.clock.runFor(DRAW_FRAMES_MS)
 }
 
 function popupShown(page: Page): Promise<PopupShown> {
@@ -106,10 +107,12 @@ test.describe('mining popup (#178)', () => {
   test('shows a chip and one self-clearing NEW MATERIAL plaque on the first mine', async ({
     page,
   }) => {
+    test.setTimeout(SLOW_BOX_TIMEOUT_MS)
     await page.clock.install()
     const errors = await openStartScenario(page)
-    await drillFromAbove(page, FIRST_ORE)
     await holdTime(page)
+    await drillFromAbove(page, FIRST_ORE)
+    await page.clock.runFor(DRAW_FRAMES_MS)
     const shown = await popupShown(page)
     expect(shown.chips).toEqual([expect.objectContaining({ oreId: FIRST_ORE_ID, count: 1 })])
     expect(shown.plaque?.oreIds).toEqual([FIRST_ORE_ID])
@@ -124,10 +127,13 @@ test.describe('mining popup (#178)', () => {
   })
 
   test('never shows a second plaque for a type already mined', async ({ page }) => {
+    await page.clock.install()
     await openStartScenario(page)
+    await holdTime(page)
     await drillFromAbove(page, FIRST_ORE)
     await page.evaluate((ticks) => window.steampunkDebug!.fastForward(ticks), PLAQUE_GONE_TICKS)
     await drillFromAbove(page, SAME_TYPE_ORE)
+    await page.clock.runFor(DRAW_FRAMES_MS)
     const shown = await popupShown(page)
     expect(shown.chips).toEqual([expect.objectContaining({ oreId: FIRST_ORE_ID, count: 1 })])
     expect([shown.plaque, shown.plaquesShown]).toEqual([null, 1])
