@@ -1017,7 +1017,7 @@
         },
         {
           "title": "Powerups",
-          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots, charges, the mobility and sensing lanes and buying researched one-offs and cradles at the Upgrade bay are built; the other lanes and buying consumables by the unit come with their tickets.",
+          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots, charges, the mobility and sensing lanes, the terrain tools and buying researched one-offs and cradles at the Upgrade bay are built; the other lanes and buying consumables by the unit come with their tickets.",
           "status": "partial",
           "issues": [47, 162, 200, 248],
           "children": [
@@ -1044,12 +1044,18 @@
               "description": "Marks 3, 6 and 9 bring a new behaviour rather than another number step: a second tap, a hold, or a sibling-link. With a sibling-link, the item's act also fires a slotted sibling in its lane at half strength, spending the sibling's own charge and cooldown and flashing its slot. The slot card has an on/off switch for each link. The data shape, the card line and the sibling-link are built. Hold and second tap, and each item's verbs, come with their tickets.",
               "status": "partial",
               "issues": [256, 272, 273, 274, 275, 276]
+            },
+            {
+              "title": "Terrain tools",
+              "description": "Magnetic ore-shifter (drags a few loose ore nodules toward the miner), seam splitter (opens a fissure of plain ground along the rock's grain), pressure pocket lance (blows a small pocket ahead and pushes its ore aside) and lodestone beacon (plant it, dock, and nearby ore has gathered into a vein beside it), each with its tech node, Marks and item card; gated, core and lined cells and cells next to any miner never change. Stabiliser foam, the cryo binder, shoring props and the strata press wait for the collapse, fluid-ground and cavern mechanics they act on. Buying them in the store, the beacon's map pin and dock line, and their effects on the rig come later.",
+              "status": "partial",
+              "issues": [202, 162, 166]
             }
           ]
         },
         {
           "title": "Tech tree",
-          "description": "Research nodes with money to unlock store items: five lanes on a planet ruler, Marks every 3 planets that step an item's charges, cooldown and effect in play, endless combos from P41, a tree screen from the HUD. The rules and screen are built, and the mobility, sensing and drill-gear lanes are in; the other lanes show 'coming soon' until their slices register nodes.",
+          "description": "Research nodes with money to unlock store items: five lanes on a planet ruler, Marks every 3 planets that step an item's charges, cooldown and effect in play, endless combos from P41, a tree screen from the HUD. The rules and screen are built, and the mobility, sensing and drill-gear lanes and four terrain tools are in; the other lanes show 'coming soon' until their slices register nodes.",
           "status": "partial",
           "issues": [165, 200, 201, 202, 203, 204, 205, 206, 212, 249],
           "doc": "docs/standards/feature-slices.md",
