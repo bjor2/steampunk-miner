@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T01:36:03+02:00",
+  "updated_at": "2026-10-08T01:39:56+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 12,
+      "claims_last_hour": 11,
       "name": "Claude Max 1"
     },
     {
@@ -82,10 +82,10 @@
         {
           "slot": "C7",
           "state": "busy",
-          "ticket": 299,
+          "ticket": 323,
           "grok_slot": 4,
           "kind": "dev",
-          "since": "2026-10-08T00:17:00+02:00"
+          "since": "2026-10-08T01:39:00+02:00"
         },
         {
           "slot": "C8",
@@ -104,7 +104,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -165,6 +165,60 @@
           312
         ],
         "since": "2026-10-08T01:03:01+02:00"
+      },
+      {
+        "feature": 142,
+        "kind": "spec",
+        "title": "Spec: Mining gates: drill tier, skill, and dynamite-only ores",
+        "tickets": [
+          148,
+          236,
+          237,
+          238,
+          296,
+          297,
+          298,
+          299
+        ],
+        "since": "2026-10-08T01:37:35+02:00"
+      },
+      {
+        "feature": 139,
+        "kind": "spec",
+        "title": "Wayfinder: Materials expansion (ore variety, depth and planet distribution, gates, dynamite, visual progression)",
+        "tickets": [
+          144,
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          156,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          192,
+          218,
+          223,
+          229,
+          230,
+          231,
+          232,
+          236,
+          237,
+          238,
+          247,
+          296,
+          297,
+          298,
+          299
+        ],
+        "since": "2026-10-08T01:37:35+02:00"
       }
     ]
   },
@@ -193,8 +247,8 @@
     {
       "slot": 4,
       "state": "dev",
-      "ticket": 299,
-      "since": "2026-10-08T00:17:00+02:00",
+      "ticket": 323,
+      "since": "2026-10-08T01:39:00+02:00",
       "claude_slot": 7
     },
     {
@@ -302,9 +356,9 @@
     {
       "slot": 7,
       "state": "busy",
-      "ticket": 299,
+      "ticket": 323,
       "grok_slot": 4,
-      "since": "2026-10-08T00:17:00+02:00",
+      "since": "2026-10-08T01:39:00+02:00",
       "account": 2
     },
     {
@@ -317,11 +371,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 01:35 CEST",
-    "mode": "recheck",
-    "triggers": "#275 #290",
-    "started": "",
-    "note": "dev slots full"
+    "at": "2026-10-08 01:39 CEST",
+    "mode": "refill-dev",
+    "triggers": "#299",
+    "started": "#323->C7/A2",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
