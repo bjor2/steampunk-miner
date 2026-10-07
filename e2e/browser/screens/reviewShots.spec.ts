@@ -5,9 +5,10 @@
  *
  * #173's set is the dock with both buildings, a dig with 3 chips and a discovery plaque, the
  * workshop mid-chain and the tech tree. The buildings landed with #175: the dock shot zooms out
- * over both, the yard and the car left on the Works' turntable. The chips (#178), workshop redo
- * (#177) and tech tree (#165) are not built yet, so the set shoots a dig, the Upgrade bay and the
- * settings screen in their places; each ticket swaps its shot in when it lands.
+ * over both, the yard and the car left on the Works' turntable. The workshop redo (#177) holds a
+ * drill power chain for its shot. The chips (#178) and tech tree (#165) are not built yet, so the
+ * set shoots a dig and the settings screen in their places; each ticket swaps its shot in when it
+ * lands.
  */
 import { expect, test, type Page } from '@playwright/test'
 import { currentCell, dockAt, openGame, renderStats } from './screenHelpers'
@@ -38,6 +39,7 @@ test.describe('screen matrix: review shots (#173)', () => {
     await waitForGround(page)
     await shoot(page, 'dig')
     await dockAt(page, 'upgrade')
+    await holdMidChain(page)
     await shoot(page, 'workshop')
     await page.getByTestId('platform-settings').click()
     await expect(page.getByTestId('settings-panel')).toBeVisible()
@@ -45,6 +47,24 @@ test.describe('screen matrix: review shots (#173)', () => {
     expect(errors).toEqual([])
   })
 })
+
+/** The workshop mid-chain (#177): a drill power hold, shot once it has climbed past its wind-up. */
+async function holdMidChain(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    window.steampunkDebug!.giveMoney('1e9')
+    window.steampunkDebug!.features.workshop.holdBuy('drill_power', 30)
+  })
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const chain = window.steampunkDebug!.features.workshop.getChain() as unknown as {
+          hold: { steps: number } | null
+        }
+        return chain.hold?.steps ?? 0
+      }),
+    )
+    .toBeGreaterThanOrEqual(6)
+}
 
 /** Any key takes the opening transmission down; on touch, a tap brings the controls back. */
 async function dismissTransmission(page: Page): Promise<void> {
