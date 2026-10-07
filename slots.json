@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T23:28:38+02:00",
+  "updated_at": "2026-10-07T23:30:25+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -27,19 +27,19 @@
         },
         {
           "slot": "C2",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 238,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-07T23:30:00+02:00"
         },
         {
           "slot": "C3",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 279,
+          "grok_slot": 5,
+          "kind": "dev",
+          "since": "2026-10-07T23:30:00+02:00"
         },
         {
           "slot": "C4",
@@ -51,9 +51,9 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
-      "claims_last_hour": 6,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 8,
       "name": "Claude Max 1"
     },
     {
@@ -73,11 +73,11 @@
         },
         {
           "slot": "C6",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 248,
+          "grok_slot": 4,
+          "kind": "dev",
+          "since": "2026-10-07T23:30:00+02:00"
         },
         {
           "slot": "C7",
@@ -97,9 +97,9 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
-      "claims_last_hour": 7,
+      "used": 2,
+      "free": 2,
+      "claims_last_hour": 8,
       "name": "Claude Max 2"
     }
   ],
@@ -188,21 +188,24 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 238,
+      "since": "2026-10-07T23:30:00+02:00",
+      "claude_slot": 2
     },
     {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 248,
+      "since": "2026-10-07T23:30:00+02:00",
+      "claude_slot": 6
     },
     {
       "slot": 5,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 279,
+      "since": "2026-10-07T23:30:00+02:00",
+      "claude_slot": 3
     },
     {
       "slot": 6,
@@ -258,18 +261,18 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 238,
+      "grok_slot": 3,
+      "since": "2026-10-07T23:30:00+02:00",
       "account": 1
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 279,
+      "grok_slot": 5,
+      "since": "2026-10-07T23:30:00+02:00",
       "account": 1
     },
     {
@@ -290,10 +293,10 @@
     },
     {
       "slot": 6,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 248,
+      "grok_slot": 4,
+      "since": "2026-10-07T23:30:00+02:00",
       "account": 2
     },
     {
@@ -314,17 +317,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 23:27 CEST",
-    "mode": "recheck",
-    "triggers": "#273",
-    "started": "#273->C5/A2",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-07 23:30 CEST",
+    "mode": "refill-dev",
+    "triggers": "claude-run:tester-triage",
+    "started": "#238->C2/A1 #248->C6/A2 #279->C3/A1",
+    "note": "spawned 3 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 5,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -332,8 +335,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 2,
-      "free": 6,
+      "used": 5,
+      "free": 3,
       "external": 0
     }
   }
