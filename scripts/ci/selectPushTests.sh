@@ -20,7 +20,7 @@ RELATED_LIST="${RELATED_LIST:-vitest-related.txt}"
 : >"$RELATED_LIST"
 
 # Changes Vitest's import graph cannot see, or that change every test: run the whole suite.
-FULL_SUITE_PATHS='^(package\.json|package-lock\.json|(vite|vitest)\.config\.[^/]+|tsconfig[^/]*\.json|eslint\.config\.[^/]+|src/testSetup\.ts|\.github/workflows/ci\.yml|scripts/ci/.*|tests/.*)$'
+FULL_SUITE_PATHS='^(package\.json|package-lock\.json|(vite|vitest)\.config\.[^/]+|tsconfig[^/]*\.json|eslint\.config\.[^/]+|src/testSetup\.ts|\.github/workflows/ci\.yml|scripts/ci/.*|tests/(golden|balance)/.*)$'
 
 # Tests that read their inputs with node:fs (not import), so the import graph misses them.
 # Each line: <path regex> <test files...>
@@ -31,6 +31,7 @@ FS_READ_RULES=$(
 ^scenarios/ src/systems/scenario.test.ts src/debug/debugApi.test.ts
 ^docs/economy/ src/systems/economy/economyTables.test.ts
 ^docs/features/features\.json$ scripts/status/features.test.mjs
+^(src/.*\.test\.ts|scripts/.*\.test\.mjs|tests/MANIFEST\.md|src/features/.*|docs/scaling/horizontal/stats\.json)$ scripts/tests/manifestDrift.test.mjs
 ^(public/assets|src/ui/icons)/ src/systems/art/assetLint.test.ts
 RULES
 )

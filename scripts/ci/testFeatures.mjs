@@ -16,6 +16,9 @@ export const FEATURE_RULES = [
     feature: 'golden-replay',
   },
   { pattern: /^src\/features\/([^/]+)\//, feature: '$1' },
+  // The slice loader and lint proofs beside it, and the registrar: kernel tests of the slices.
+  { pattern: /^src\/features\/[^/]+\.test\.ts$/, feature: 'slice-loader' },
+  { pattern: /^src\/registries\//, feature: 'registries' },
   { pattern: /^src\/systems\/([^/]+)\//, feature: '$1' },
   { pattern: /^src\/systems\/[^/]+\.test\.ts$/, feature: 'systems-core' },
   { pattern: /^src\/(logging|store|debug|physics|scene|ui|shell|constants|data)\//, feature: '$1' },

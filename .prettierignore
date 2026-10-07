@@ -11,6 +11,9 @@ docs/standards
 # exactly as written.
 tests/golden
 tests/balance
+# Written by `npm run tests:manifest` (scripts/tests): unpadded tables, so a new row never re-pads
+# its neighbours into a merge conflict.
+tests/MANIFEST.md
 # Written by `npm run art:export` (scripts/art); re-exporting must rewrite the same bytes.
 public/assets
 # three's Basis transcoder, copied verbatim (docs/art-pipeline.md "Drawing final art").

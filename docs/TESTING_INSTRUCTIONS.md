@@ -46,6 +46,22 @@ in the commit.
 - `src/systems/bot/` – the pacing bot; `src/systems/replay/` – `replayRun` and the golden scripts.
   Both are pure and run in node (section 4).
 
+### The test manifest
+
+`tests/MANIFEST.md` is the one overview of every Vitest file (the GD lock on #191, #229): each slice
+with its files and test counts, the kernel by area (the folder rules of `scripts/ci/testFeatures.mjs`),
+and the cross-slice checks the kernel owns (pacing gates and their seeds, the `balance:*` guards,
+buyable descriptions, gate classes, endless signatures; listed in `scripts/tests/crossSliceChecks.mjs`).
+It is generated from `vitest list` and never edited by hand. `scripts/tests/manifestDrift.test.mjs`
+fails when a test file is added, deleted or gains or loses an `it`/`test` call without the manifest
+following, and when a slice that ships a scheduled `stats.json` row (a registered entry claiming it)
+has no test. It reads files only, so the box Tester runs it whenever a test file changes.
+
+After adding, moving or deleting tests, run `npm run tests:manifest` and commit the manifest with the
+tests. It lists only the new and changed files (seconds); pass test files to refresh them too (an
+`it.each` table that grew changes no call site), or `-- --all` for the whole suite (minutes, collects
+every file). On a merge conflict in the manifest, take either side and run it again.
+
 ## 2. Conventions
 
 - `describe('<area>')`, `it('<behaviour stated as a sentence>')`, one behaviour per test.
@@ -283,7 +299,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
 
 ## 6. Before every commit
 
-`npm run typecheck`, the touched Vitest files green (and `npm run lint` for boundary rules).
+`npm run typecheck`, the touched Vitest files green (and `npm run lint` for boundary rules), and
+`npm run tests:manifest` when tests were added, moved or deleted (section 1, the test manifest).
 
 **Long runs belong to the box Tester, not to build workers (Bjor, 2026-10-07).** A loop build worker
 runs only typecheck, lint, format:check, build and quick targeted Vitest files (`npx vitest run <files>` or

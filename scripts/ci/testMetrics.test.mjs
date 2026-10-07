@@ -83,6 +83,8 @@ describe('test feature mapping', () => {
   it('maps slices, systems folders, layers and the pacing bot, and leaves the rest unmapped', () => {
     expect(featureOfTestFile('src/features/dynamite/systems/fuse.test.ts')).toBe('dynamite')
     expect(featureOfTestFile('src/systems/economy/prices.test.ts')).toBe('economy')
+    expect(featureOfTestFile('src/features/loadFeatures.test.ts')).toBe('slice-loader')
+    expect(featureOfTestFile('src/registries/registrar.test.ts')).toBe('registries')
     expect(featureOfTestFile('src/systems/seededRandom.test.ts')).toBe('systems-core')
     expect(featureOfTestFile('src/store/gameStore.test.ts')).toBe('store')
     expect(featureOfTestFile('src/logging/pacingGate.test.ts')).toBe('pacing-bot')
