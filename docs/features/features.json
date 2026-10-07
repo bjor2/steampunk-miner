@@ -1038,6 +1038,12 @@
               "description": "Mineral drain: hold still for a moment and the nearest ore around the miner fades to plain ground, half of it into the hold, more cells a use at higher Marks. Gated, too-hard and core cells are left alone, and the income items share a trip cap of 15% of a full hold of the band's ore, reset at the dock. The lane's tree holds the five extractor nodes and the drain's. The drain is bought at the Upgrade bay once researched. The slurry siphon waits for a planet with ore in fluid ground.",
               "status": "partial",
               "issues": [201, 239]
+            },
+            {
+              "title": "Mark milestones",
+              "description": "Marks 3, 6 and 9 bring a new behaviour rather than another number step: a second tap, a hold, or a sibling-link. With a sibling-link, the item's act also fires a slotted sibling in its lane at half strength, spending the sibling's own charge and cooldown and flashing its slot. The slot card has an on/off switch for each link. The data shape, the card line and the sibling-link are built. Hold and second tap, and each item's verbs, come with their tickets.",
+              "status": "partial",
+              "issues": [256, 272, 273, 274, 275, 276]
             }
           ]
         },
