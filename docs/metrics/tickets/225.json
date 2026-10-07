@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "ticket": 225,
+  "title": "Follow-up: re-measure #181 spree targets after #195 and #146 re-baseline",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-07T08:30:27Z",
+  "closed": "2026-10-07T14:19:14Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-07T08:30:27.000Z","end":"2026-10-07T08:30:34.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"blocked","start":"2026-10-07T08:30:34.000Z","end":"2026-10-07T13:27:01.000Z","attempt":0,"tier":null,"model":null,"source":"github"},
+    {"category":"idle","start":"2026-10-07T13:27:01.000Z","end":"2026-10-07T14:01:33.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-07T14:01:33.000Z","end":"2026-10-07T14:02:02.866Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-07T14:02:02.866Z","end":"2026-10-07T14:02:50.289Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T14:02:50.289Z","end":"2026-10-07T14:12:02.798Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-07T14:12:02.798Z","end":"2026-10-07T14:12:26.814Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-07T14:12:26.814Z","end":"2026-10-07T14:12:32.444Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-07T14:12:32.444Z","end":"2026-10-07T14:19:05.270Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-07T14:19:05.270Z","end":"2026-10-07T14:19:14.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":17787,"planner_wait":0,"idle":2079,"context":47,"planning":6,"developing":0,"testing":553,"gates":393,"landing":33,"other":30},
+  "lead_time_s": 20927,
+  "cycle_time_s": 1061,
+  "claimed": "2026-10-07T14:01:33.000Z",
+  "claimed_to_done_s": 1061,
+  "backfilled": false
+}
