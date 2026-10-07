@@ -77,10 +77,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite-visuals/systems/render/blastCue.test.ts` | 8 | 8 |
 | `src/features/dynamite-visuals/systems/render/blastFrontLook.test.ts` | 7 | 7 |
 
-### `example`: 1 file, 1 test
+### `example`: 2 files, 3 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 
 ### `mining-popup`: 8 files, 47 tests
@@ -326,7 +327,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/debug/debugApi.test.ts` | 51 | 50 |
+| `src/debug/debugApi.test.ts` | 52 | 51 |
 | `src/debug/debugArtefact.test.ts` | 5 | 5 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
@@ -509,6 +510,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
+| `src/systems/render/mountedPartLook.test.ts` | 3 | 3 |
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
 | `src/systems/render/oreLook.test.ts` | 11 | 9 |
 | `src/systems/render/partMotion.test.ts` | 11 | 9 |
@@ -546,6 +548,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/scene/SceneLayers.test.ts` | 5 | 5 |
+| `src/scene/VehiclePieces.test.ts` | 2 | 2 |
+| `src/scene/mountedPartsPresence.test.ts` | 3 | 3 |
 | `src/scene/partMotionPresence.test.ts` | 4 | 4 |
 | `src/scene/registries/sceneLayerBudget.test.ts` | 5 | 5 |
 | `src/scene/registries/worldPieces.test.ts` | 3 | 3 |
