@@ -1,0 +1,55 @@
+.node {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: var(--control-min);
+  min-height: var(--control-min);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font: inherit;
+  cursor: pointer;
+}
+
+.node:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.node[data-status='locked'] {
+  opacity: 0.6;
+}
+
+.node[data-kind='combo'] {
+  border-style: dashed;
+}
+
+.name {
+  white-space: nowrap;
+}
+
+.cost {
+  color: var(--color-brass);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+/* #158: a red price while the wallet is short. */
+.node[data-status='available'] .cost {
+  color: var(--color-ember);
+}
+
+/* #158: a rivet dot once researched; the price no longer applies. */
+.node[data-status='researched'] .cost {
+  visibility: hidden;
+}
+
+.node[data-status='researched']::after {
+  content: '';
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: var(--color-brass);
+}

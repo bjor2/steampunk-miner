@@ -74,6 +74,14 @@ export function treeNodesThrough(tree: TechTree, planetIndex: number): TreeNode[
   ].sort(compareByTier)
 }
 
+/**
+ * The planet "unlock all" grants through: the deepest authored node, or the planet the session is
+ * on when that is further, so every Mark and endless combo reached so far comes with it.
+ */
+export function unlockAllPlanetOf(tree: TechTree, planetIndex: number): number {
+  return Math.max(planetIndex, ...tree.authored.map((node) => node.unlockTier))
+}
+
 /** The Mark-bearing item a capability unlocked, by item id. */
 export function markBearerOfItem(tree: TechTree, itemId: string): MarkBearer | null {
   return tree.markBearers.find((bearer) => bearer.capability.unlocks.itemId === itemId) ?? null

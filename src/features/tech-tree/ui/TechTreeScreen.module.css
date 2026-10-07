@@ -1,0 +1,9 @@
+.screen {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: var(--space-3);
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--space-3);
+  color: var(--color-parchment);
+}

@@ -1,0 +1,113 @@
+/* One planet's width on the ruler; a node sits at (tier - 1) of them, a shared planet stacks. */
+.map {
+  --planet-width: calc(9rem * var(--ui-scale));
+  --row-height: calc(var(--control-min) + var(--space-1));
+
+  display: grid;
+  gap: var(--space-2);
+  min-height: 0;
+}
+
+.viewport {
+  overflow: auto;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.viewport:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.ruler,
+.strip {
+  position: relative;
+  width: calc(var(--planets) * var(--planet-width));
+}
+
+.ruler {
+  height: 1.5rem;
+  border-bottom: 1px solid var(--color-brass);
+}
+
+.mark,
+.here {
+  position: absolute;
+  left: calc((var(--tier) - 1) * var(--planet-width));
+}
+
+.mark {
+  color: var(--color-brass);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.here {
+  bottom: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-amber);
+}
+
+.lane {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
+  border-bottom: 1px dotted rgb(201 162 75 / 0.4);
+}
+
+.laneTitle {
+  position: sticky;
+  left: 0;
+  justify-self: start;
+  padding: 0 var(--space-1);
+  border: none;
+  background: transparent;
+  color: var(--color-brass);
+  font: inherit;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.strip {
+  min-height: calc(2 * var(--row-height));
+}
+
+.strip > * {
+  position: absolute;
+  top: calc(var(--stack) * var(--row-height));
+  left: calc((var(--tier) - 1) * var(--planet-width));
+}
+
+.comingSoon {
+  position: sticky;
+  left: 0;
+  margin: 0;
+  padding: var(--space-2);
+  color: var(--color-parchment);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* #161 mobile: the shown lane only, as a list in planet order with 44 px targets. */
+@media (max-width: 760px), (pointer: coarse) {
+  .ruler {
+    display: none;
+  }
+
+  .lane:not([data-shown-tab='true']) {
+    display: none;
+  }
+
+  .strip {
+    display: grid;
+    gap: var(--space-1);
+    width: auto;
+  }
+
+  .strip > * {
+    position: static;
+  }
+}

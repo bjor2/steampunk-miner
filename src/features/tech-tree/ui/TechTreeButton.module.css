@@ -1,0 +1,6 @@
+/* Bottom left, clear of the gauges (top left), the position panel (top right) and the prompts. */
+.slot {
+  position: absolute;
+  bottom: var(--space-3);
+  left: var(--space-3);
+}

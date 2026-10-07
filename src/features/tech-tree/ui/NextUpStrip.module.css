@@ -1,0 +1,17 @@
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.title {
+  color: var(--color-brass);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.none {
+  font-style: italic;
+  opacity: 0.7;
+}
