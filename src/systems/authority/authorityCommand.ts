@@ -46,8 +46,9 @@ import type { BayId } from '../world/dockBays'
  *    `wrong_bay` at the Refinery only (#170, #175).
  * 20: the brass tracks and casing grades flattened to drill power's ratio 1.225 on bases 24, 23,
  *    36, 46 and 48 (#195), so the same `BuyUpgrade` and `BuyCasingGrade` cost a different amount.
+ * 21: `ChargeDetonated` carries its blast's ladder `size` and `radiusMm` (#213).
  */
-export const AUTHORITY_PROTOCOL_VERSION = 20
+export const AUTHORITY_PROTOCOL_VERSION = 21
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
