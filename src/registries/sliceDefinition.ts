@@ -26,6 +26,7 @@ import type {
 import type { DockFacility } from '../systems/registries/dockFacilities'
 import type { DockService } from '../systems/registries/dockServices'
 import type { DrillGearSource } from '../systems/registries/drillGear'
+import type { ItemHook } from '../systems/registries/itemHooks'
 import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectionModifiers'
 import type { GateCheck } from '../systems/registries/gateChecks'
@@ -107,6 +108,11 @@ export interface SliceRegistrar {
    * side cell costs at least the drill's own energy for it (ticket 234).
    */
   drillGear(source: DrillGearSource): void
+  /**
+   * A combo's or twist's answer at a lane item's decision point (ticket 323): never a dig hook, a
+   * reach of at most 12 cells, and an id that names no unlock row.
+   */
+  itemHook(hook: ItemHook): void
   /** Answers a pressed action the kernel's routing table leaves open, such as `use_slot_1`. */
   inputReaction(reaction: InputReactionEntry): void
   generationHook(hook: GenerationHook): void

@@ -51,6 +51,19 @@ export function isUnlocked(row: UnlockRow, progress: UnlockProgress): boolean {
   return hasModule(row) && isBindMet[row.bind](row, progress)
 }
 
+/**
+ * The first schedule row id written as a word of `text`: a report row (#146, #223) or an item hook
+ * id (ticket 323) naming one is refused, since unlocks are stats.json's and `feature_unlocked`'s.
+ */
+export function unlockIdNamedIn(schedule: UnlockSchedule, text: string): string | undefined {
+  const unlockIds = new Set(schedule.rows.map((row) => row.id))
+  return wordsOf(text).find((word) => unlockIds.has(word))
+}
+
+function wordsOf(text: string): string[] {
+  return text.split(/[^A-Za-z0-9_]+/).filter((word) => word.length > 0)
+}
+
 function hasModule(row: UnlockRow): boolean {
   return row.status !== 'vision' && row.status !== 'cut'
 }
