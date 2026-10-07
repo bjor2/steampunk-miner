@@ -112,7 +112,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/visionRows.test.ts` | 5 | 5 |
 
-### `mining-gates`: 13 files, 83 tests
+### `mining-gates`: 14 files, 85 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -120,6 +120,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/gateReportRows.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/botExtractors.test.ts` | 4 | 2 |
 | `src/features/mining-gates/systems/botGates.test.ts` | 6 | 6 |
+| `src/features/mining-gates/systems/botShaftJog.test.ts` | 2 | 1 |
 | `src/features/mining-gates/systems/canMine.test.ts` | 16 | 16 |
 | `src/features/mining-gates/systems/dynamiteCells.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/extractorRules.test.ts` | 8 | 8 |

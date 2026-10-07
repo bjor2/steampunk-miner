@@ -225,8 +225,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   content finding. Beside it the payback (#218's 2x figure, reported: the freed value over the
   price of the charges that freed them), the extractor row (reported; 148d #296 judges it once
   the bot buys extractors), and `gate_blocked_no_route` per seed: gated walls on the bot's way
-  down (pad path, shaft, jog) nothing it carries or buys opens, expected 0
-  (`bot/gateRouteBlocks.ts`, `SliceRun.gateRouteBlocks`). The tally and the tables are
+  down (pad path, shaft, jog) nothing it carries or buys opens and its shaft found no clear column
+  to step round (`bot/botShaft.ts` jogs round them as round lava), expected 0
+  (`bot/gateRouteBlocks.ts`, `SliceRun.gateRouteBlocks`; the jog spec is
+  `features/mining-gates/systems/botShaftJog.test.ts`). The tally and the tables are
   `logging/gateClearTally.ts`, `gateClearTables.ts` and `gateRouteStalls.ts`, with their specs. Reported, never gated; the one lever is the price per charge. The band-density guard is also a spec (`bot/chargeSizeTrade.test.ts`). Charge
   specs stand in band-2 rock with `charges/chargeFixtures.ts`, and the size specs in solid rock of
   the planet their size opens on (`sizedBlasterOn`); the bot's blasting run starts on planet 7 with

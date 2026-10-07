@@ -1,9 +1,9 @@
 /**
  * The GD ruling on ticket 237, `gate_blocked_no_route`: a gated wall on the bot's way down (the
- * path from the pad, the shaft or a jog of it) that nothing the bot carries or buys opens. The
- * extractors' cells stay optional until 148d (#296), so the count must be 0 on every seed and a
- * stall is a placement bug. A gallery face a gate stops is no stall: that side of the gallery
- * ends and the bot mines on. Each wall is noted once per planet.
+ * path from the pad, the shaft or a jog of it) that nothing the bot carries or buys opens, where
+ * the shaft found no clear column to step round it (`botShaft.ts`). The extractors' cells stay
+ * optional until 148d (#296), so the count must be 0 on every seed. A gallery face a gate stops is
+ * no stall: that side of the gallery ends and the bot mines on. Each wall is noted once per planet.
  */
 import type { TilePoint } from '../world/tileGrid'
 import { openTile, type OpenOutcome } from './botDig'

@@ -1,11 +1,15 @@
 /**
  * The bot's shaft (#29): travelling it, and boring it deeper. On a heat planet the next tile down
- * may free a lava pocket (#113); the shaft then steps sideways to the nearest clear column (east
- * first) along its bottom row, or failing that along one of the few open rows just above it, and
- * carries on down there, the jog remembered in the layout.
+ * may free a lava pocket (#113), and from planet 5 it may be a gated wall nothing the bot carries
+ * or buys opens, an extractor's cell or a drill-gated signature (ticket 237: #142 acceptance 8 has
+ * the bot skip those, and the GD ruling keeps extractor cells optional until 148d). The shaft then
+ * steps sideways to the nearest clear column (east first) along its bottom row, or failing that
+ * along one of the few open rows just above it, and carries on down there, the jog remembered in
+ * the layout. A wall with no clear column beside it is noted as `gate_blocked_no_route`.
  */
 import { LAVA_POCKET_TILES } from '../../constants/balance'
 import type { TilePoint } from '../world/tileGrid'
+import { drillGateAt, isWallNoMeansOpen } from './botGates'
 import { isTooHotToDig } from './botHeat'
 import { moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
@@ -42,16 +46,20 @@ export function boreShaftDownTo(session: BotSession, planet: BotPlanet, row: num
   const { layout } = planet
   while (layout.shaftBottomRow > row) {
     if (isTooHotToDig(session, planet)) return false
-    const below = shaftTileAt(layout, layout.shaftBottomRow - 1)
-    if (isLavaRisk(session.state(), below) && !jogShaft(session, planet)) return false
-    if (
-      openRouteTile(session, planet, shaftTileAt(layout, layout.shaftBottomRow - 1)) !== 'opened'
-    ) {
-      return false
-    }
+    stepRoundStopBelow(session, planet)
+    if (openRouteTile(session, planet, tileBelowShaft(layout)) !== 'opened') return false
     layout.shaftBottomRow -= 1
   }
   return true
+}
+
+/** Jogs off a stop under the shaft; a failed jog leaves it there for the open to refuse and note. */
+function stepRoundStopBelow(session: BotSession, planet: BotPlanet): void {
+  if (isShaftStop(session, tileBelowShaft(planet.layout))) jogShaft(session, planet)
+}
+
+function tileBelowShaft(layout: MineLayout): TilePoint {
+  return shaftTileAt(layout, layout.shaftBottomRow - 1)
 }
 
 /** Steps the shaft sideways to the nearest clear column; false when there is none. */
@@ -104,12 +112,16 @@ function clearColumnNear(session: BotSession, layout: MineLayout, row: number): 
   return null
 }
 
-/** The way along the row and the new column's tiles below its end are all clear of lava. */
+/** The way along the row and the new column's tiles below its end hold no stop. */
 function isClearJog(session: BotSession, from: number, to: number, row: number): boolean {
-  const state = session.state()
   return [...tilesAlong(from, to, row), ...columnBelow(to, row)].every(
-    (tile) => !isLavaRisk(state, tile),
+    (tile) => !isShaftStop(session, tile),
   )
+}
+
+/** A tile the shaft steps round: one that would free lava, or a wall no means of the bot opens. */
+function isShaftStop(session: BotSession, tile: TilePoint): boolean {
+  return isLavaRisk(session.state(), tile) || isWallNoMeansOpen(drillGateAt(session, tile))
 }
 
 /** The `JOG_CLEAR_ROWS` tiles of `column` under `row`. */
