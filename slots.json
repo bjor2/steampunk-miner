@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T17:27:35+02:00",
+  "updated_at": "2026-10-07T17:29:54+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -104,32 +104,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "slow",
-    "sha": "680113ce408638c4091736a6664749cfa4dd2dee",
-    "since": "2026-10-07T14:55:59Z",
+    "phase": "fast",
+    "sha": "4d1b5acec598985d30edb40a09e831598e1e4369",
+    "since": "2026-10-07T15:29:50Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-07T14:55:58Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null,
-    "feature": 140,
-    "feature_title": "Spec: Ore catalogue and depth tiers (many more ore types, rarer deeper)",
+    "feature": 159,
+    "feature_title": "Spec: Descriptions for every buyable item",
     "queue": [
-      {
-        "feature": 159,
-        "kind": "spec",
-        "title": "Spec: Descriptions for every buyable item",
-        "tickets": [
-          164
-        ],
-        "since": "2026-10-07T16:31:12+02:00"
-      },
       {
         "feature": 137,
         "kind": "ticket",
