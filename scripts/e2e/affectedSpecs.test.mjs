@@ -60,6 +60,14 @@ describe('e2e: affected-spec map', () => {
     ])
   })
 
+  it('runs the snapshot spec when only the debug-run snapshot writers change', () => {
+    expect(select('src/systems/snapshots/planetChange.ts', 'src/shell/storedZip.ts')).toEqual({
+      mode: 'affected',
+      reason: '2 changed path(s) map to 1 spec(s)',
+      specs: ['e2e/browser/snapshots.spec.ts'],
+    })
+  })
+
   it('runs the rack, front and frame-budget specs when the dynamite looks change', () => {
     expect(select('src/features/dynamite-visuals/register.ts').specs).toEqual([
       'e2e/browser/dynamiteVisuals.spec.ts',
