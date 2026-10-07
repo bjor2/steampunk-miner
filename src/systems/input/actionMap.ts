@@ -50,6 +50,9 @@ export const ACTION_IDS = [
   'use_slot_3',
   'use_slot_4',
   'use_slot_5',
+  // The drill sockets' gear (#205 GD lock Q1 a): drill-gear's input reactions answer them.
+  'use_drill_flank',
+  'use_drill_collar',
 ] as const
 
 export type ActionId = (typeof ACTION_IDS)[number]

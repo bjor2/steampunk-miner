@@ -65,6 +65,18 @@ describe('action map', () => {
     expect(actionsOfChord(ACTION_MAP, rebound.bindings, 'vehicle', 'KeyZ')).toEqual(['use_slot_1'])
   })
 
+  it("binds the drill sockets' gear to KeyF and KeyC while driving, rebindable (#205)", () => {
+    const bindings = defaultBindings(ACTION_MAP)
+    expect([bindings.use_drill_flank, bindings.use_drill_collar]).toEqual([['KeyF'], ['KeyC']])
+    expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'KeyF')).toEqual(['use_drill_flank'])
+    expect(actionsOfChord(ACTION_MAP, bindings, 'platform', 'KeyC')).toEqual([])
+    const rebound = bindingsWithOverrides(ACTION_MAP, { use_drill_collar: { keyboard: ['KeyX'] } })
+    expect(rebound.problems).toEqual([])
+    expect(actionsOfChord(ACTION_MAP, rebound.bindings, 'vehicle', 'KeyX')).toEqual([
+      'use_drill_collar',
+    ])
+  })
+
   it('never lets Space lift: in the vehicle it docks, on a menu it confirms', () => {
     const bindings = defaultBindings(ACTION_MAP)
     expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'Space')).toEqual(['interact'])

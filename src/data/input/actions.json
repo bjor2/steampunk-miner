@@ -177,6 +177,20 @@
       "contexts": ["vehicle"],
       "kind": "press",
       "keyboard": ["Digit5"]
+    },
+    {
+      "id": "use_drill_flank",
+      "displayName": "Use flank gear",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["KeyF"]
+    },
+    {
+      "id": "use_drill_collar",
+      "displayName": "Use collar gear",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["KeyC"]
     }
   ]
 }
