@@ -471,26 +471,26 @@ The query is `{tier, cellFamily}`, the two things a cell knows (`kind | family |
 
 ```ts
 // src/systems/registries/gateChecks.ts
-export type GateOutcome = 'cut' | 'refused' | 'lost'
+export type GateOutcome = 'cut' | 'refused' | 'blocked' | 'lost'
 export interface GateQuery {
   state: AuthorityState; playerId: string; tile: TilePoint; cell: number; ore: OreType
   blast: BlastEvent | null                                     // K2: null when the drill asks
 }
 export interface GateVerdict { outcome: GateOutcome; gateKind: string; required: string; have: string }
 export interface GateCheck { id: string; check(query: GateQuery): GateVerdict | null }   // null: no gate on this cell
-/** refused > lost > cut; ties break on the lowest check id. null when no check has an opinion. */
+/** refused > blocked > lost > cut; ties break on the lowest check id. null when no check has an opinion. */
 export function gateVerdictOf(query: GateQuery): GateVerdict | null
 ```
 
-A verdict answers the means in the query: `cut` opens the cell to it, `refused` leaves the cell standing, `lost` breaks it without ore. `required` and `have` are the gate's own words for #142's `gate_hit` and HUD chip.
+A verdict answers the means in the query: `cut` opens the cell to it, `refused` leaves the cell standing, `lost` breaks it without ore. `blocked` (#236) also leaves it standing: #142's scratch-only cell, a drill-gated signature the tip only scratches, which `gate_hit` reports apart from a skid. `required` and `have` are the gate's own words for #142's `gate_hit` and HUD chip.
 
 **Drill** (#156/#183, `src/systems/authority/drillGates.ts`), for ore cells only:
-- A `refused` verdict makes the `CellDrillTicks` answer `null` (not drillable).
+- A `refused` or `blocked` verdict makes the `CellDrillTicks` answer `null` (not drillable).
 - `collectYieldedCells` skips `collectTile` for a `lost` verdict. `TileDestroyed` still fires.
-- **K2 (#185):** each stop is reported as the kernel domain event `DrillGated {tx, ty, oreId, family, tier, gateKind, outcome: refused|lost, required, have}`: a refused cell once per drill command that met it, a lost one right after its `TileDestroyed`. A command the gates refused entirely charges no energy and answers only its `DrillGated` events. It is logged as the core run event `gate_hit` with the same fields.
+- **K2 (#185):** each stop is reported as the kernel domain event `DrillGated {tx, ty, oreId, family, tier, gateKind, outcome: refused|blocked|lost, required, have}`: a refused or blocked cell once per drill command that met it, a lost one right after its `TileDestroyed`. A command the gates refused entirely charges no energy and answers only its `DrillGated` events. It is logged as the core run event `gate_hit` with the same fields.
 
 **Blast (K2, #185)** (`src/systems/authority/charges/blastGates.ts`): a charge asks about every ore cell in its radius, with its `BlastEvent`.
-- `refused`: the cell stands (#153 amendment: dense and rig-gated cells are anchors in the crater).
+- `refused` or `blocked`: the cell stands (#153 amendment: dense and rig-gated cells are anchors in the crater).
 - `cut`: the cell breaks past the charge's hardness cap and pays its full unit, after the kept share (#142: a qualifying charge frees a dynamite-gated cell whole).
 - `lost`: the cell breaks, and its sale value joins `blast_resolved.oreValueLost` (it was `charge_detonated`'s before K6).
 - A cell with no verdict takes today's blast.

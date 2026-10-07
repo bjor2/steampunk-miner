@@ -62,6 +62,21 @@ describe('gate checks registry', () => {
     ).toBe('lost')
   })
 
+  it('lets refused win over blocked and blocked over lost', () => {
+    expect(
+      verdictWith([
+        ['mining-gates.a', 'blocked'],
+        ['mining-gates.b', 'refused'],
+      ])?.outcome,
+    ).toBe('refused')
+    expect(
+      verdictWith([
+        ['mining-gates.a', 'lost'],
+        ['mining-gates.b', 'blocked'],
+      ])?.outcome,
+    ).toBe('blocked')
+  })
+
   it('breaks a tie on the lowest check id, whatever order they were registered in', () => {
     const verdict = verdictWith([
       ['mining-gates.zeta', 'lost'],

@@ -2,7 +2,8 @@
  * The gate checks on the blast path (docs/standards/feature-slices.md 3.6, K2). A charge asks the
  * slices' gates about every ore cell in its radius, telling them the blast:
  *
- * - `refused`: the cell stands, as the anchors of #153's amendment (dense and rig-gated cells).
+ * - `refused` or `blocked`: the cell stands, as the anchors of #153's amendment (dense and
+ *   rig-gated cells).
  * - `cut`: the gate opens to this charge, which frees the cell whole: its full ore unit, not the
  *   blast's kept share, and past the charge's hardness cap (#142 "Dynamite-only share per band").
  * - `lost`: the cell breaks and its ore is lost with the share the blast loses.
@@ -10,7 +11,7 @@
  * A cell with no verdict takes today's blast. With no check registered nothing is asked.
  */
 import type { BlastEvent } from '../../registries/blastEffects'
-import { hasGateChecks } from '../../registries/gateChecks'
+import { hasGateChecks, isStandingVerdict } from '../../registries/gateChecks'
 import type { YieldedCell } from '../../world/cellYield'
 import type { PlanetParams } from '../../world/planetParams'
 import type { AuthorityState } from '../authorityState'
@@ -33,9 +34,9 @@ export function blastGatesOf(
   return (cell) => gateOfCell(gates, asker, cell)
 }
 
-/** A gate that refuses the blast keeps the cell; any other verdict lets the blast break it. */
+/** A gate that refuses or blocks the blast keeps the cell; any other verdict lets it break. */
 export function isStandingAgainstBlast(gated: GatedCell): boolean {
-  return gated.verdict.outcome === 'refused'
+  return isStandingVerdict(gated.verdict)
 }
 
 export function blastOreFateOf(gated: GatedCell | null): BlastOreFate {

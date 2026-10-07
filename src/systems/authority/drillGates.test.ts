@@ -137,6 +137,18 @@ describe('drill gates', () => {
     expect(typesOf(events)).toContain('DrillDamageDealt')
   })
 
+  it('leaves a cell a gate blocks standing and reports it as blocked (#142 scratch-only)', () => {
+    const mined = mineOreWith([gateSliceOf('blocked')])
+    const events = withRegistrations([gateSliceOf('blocked')], () =>
+      mineTile(createScriptedSession(), 1, ORE_TILE),
+    )
+    expect(mined.cellKind).toBe(CELL_KIND.ore)
+    expect(mined.cargo).toEqual({})
+    expect(drillGatedOf(events)).toEqual([
+      expect.objectContaining({ ...ORE_TILE, outcome: 'blocked', gateKind: 'probe' }),
+    ])
+  })
+
   it('reports an ore cell a gate says is lost right after its TileDestroyed (K2)', () => {
     const events = withRegistrations([gateSliceOf('lost')], () =>
       mineTile(createScriptedSession(), 1, ORE_TILE),

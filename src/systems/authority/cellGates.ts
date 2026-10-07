@@ -50,7 +50,7 @@ export function gateOfCell(
 /** The `DrillGated` report of a cell the gate stopped the drill at. */
 export function drillGatedEventOf(
   { tile, ore, verdict }: GatedCell,
-  outcome: 'refused' | 'lost',
+  outcome: 'refused' | 'blocked' | 'lost',
 ): DomainEventBody {
   return {
     type: 'DrillGated',

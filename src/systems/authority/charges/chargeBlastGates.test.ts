@@ -121,6 +121,12 @@ describe('charge blast gates', () => {
     expect(blasted.resolved.oreValueLost).toBe(toCanonical(ZERO_MONEY))
   })
 
+  it('leaves an ore cell a gate blocks standing in the crater, as a refused one', () => {
+    const blasted = blastSiteWith([gateSliceOf(everyOre('blocked'))])
+    expect(blasted.oreDensities).toEqual(Array(5).fill(FULL_CELL))
+    expect(blasted.cargo).toEqual({})
+  })
+
   it('breaks an ore cell a gate says is lost and counts all its ore as lost', () => {
     const blasted = blastSiteWith([gateSliceOf(everyOre('lost'))])
     expect(blasted.oreDensities).toEqual(Array(5).fill(0))

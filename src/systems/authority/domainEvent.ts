@@ -167,8 +167,9 @@ export interface KernelDomainEventBodies {
   TileDestroyed: { tx: number; ty: number; kind: 'ground' | 'ore' | 'core'; cause?: 'blast' }
   /**
    * A slice's gate check stopped the drill at an ore cell (feature-slices.md 3.6, K2): `refused`
-   * once per drill command that met the cell, `lost` beside the cell's `TileDestroyed`. The fields
-   * are the ore and the verdict, as #142's `gate_hit` logs them.
+   * or `blocked` (#142's scratch-only cell) once per drill command that met the cell, `lost`
+   * beside the cell's `TileDestroyed`. The fields are the ore and the verdict, as #142's
+   * `gate_hit` logs them.
    */
   DrillGated: {
     tx: number
@@ -177,7 +178,7 @@ export interface KernelDomainEventBodies {
     family: string
     tier: number
     gateKind: string
-    outcome: 'refused' | 'lost'
+    outcome: 'refused' | 'blocked' | 'lost'
     required: string
     have: string
   }

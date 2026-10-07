@@ -1,11 +1,11 @@
 /**
  * The gate checks on the drill path (docs/standards/feature-slices.md 3.6, #142's `canMine`): for
- * ore cells only, a `refused` verdict makes the cell undrillable and a `lost` one destroys it
- * without cargo. Each says so in a `DrillGated` (K2): a refused cell once per drill command that
- * met it, a lost one beside its `TileDestroyed`. With no check registered the drill keeps today's
+ * ore cells only, a `refused` or `blocked` verdict makes the cell undrillable and a `lost` one
+ * destroys it without cargo. Each says so in a `DrillGated` (K2): a standing cell once per drill
+ * command that met it, a lost one beside its `TileDestroyed`. With no check registered the drill keeps today's
  * path exactly, so nothing here builds an ore query then.
  */
-import { hasGateChecks } from '../registries/gateChecks'
+import { hasGateChecks, isStandingVerdict } from '../registries/gateChecks'
 import type { YieldedCell } from '../world/cellYield'
 import type { CellDrillTicks } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
@@ -21,15 +21,15 @@ import type { DomainEventBody } from './domainEvent'
 
 /** The gates of one drill command. */
 export interface DrillGates {
-  /** `drillTicksOf`, answering null (not drillable) for an ore cell a gate refuses. */
+  /** `drillTicksOf`, answering null (not drillable) for an ore cell a gate refuses or blocks. */
   drillTicksOf: CellDrillTicks
-  /** `DrillGated` for each ore cell a gate refused, in the order the drill met them. */
+  /** `DrillGated` for each ore cell a gate refused or blocked, in the order the drill met them. */
   refusedEvents(): DomainEventBody[]
   /** `DrillGated` for a yielded cell a gate says is lost (destroyed without cargo); else null. */
   lostEventOf(yielded: YieldedCell): DomainEventBody | null
   /**
    * #142's `canMine` for a cell the drill gear would add (ticket 234): no gate, or one that cuts
-   * it. A refused cell is reported with the others; a refused or lost one is left standing.
+   * it. A standing cell is reported with the others; a standing or lost one is left in place.
    */
   canMine(cell: YieldedCell): boolean
 }
@@ -45,10 +45,10 @@ export function openDrillGates(
   const gates: CellGates = new Map()
   return {
     drillTicksOf: (tile, material, casingGrade) =>
-      gateOfCell(gates, asker, { tile, cell: material })?.verdict.outcome === 'refused'
+      isStanding(gateOfCell(gates, asker, { tile, cell: material }))
         ? null
         : drillTicksOf(tile, material, casingGrade),
-    refusedEvents: () => refusedEventsOf(gates),
+    refusedEvents: () => standingEventsOf(gates),
     lostEventOf: (yielded) => lostEventOf(gateOfCell(gates, asker, yielded)),
     canMine: (cell) => isCut(gateOfCell(gates, asker, cell)),
   }
@@ -62,12 +62,18 @@ function isCut(gated: GatedCell | null): boolean {
   return gated === null || gated.verdict.outcome === 'cut'
 }
 
-function refusedEventsOf(gates: CellGates): DomainEventBody[] {
-  return [...gates.values()].filter(isRefused).map((gated) => drillGatedEventOf(gated, 'refused'))
+function standingEventsOf(gates: CellGates): DomainEventBody[] {
+  return [...gates.values()]
+    .filter(isStanding)
+    .map((gated) => drillGatedEventOf(gated, standingOutcomeOf(gated)))
 }
 
-function isRefused(gated: GatedCell | null): gated is GatedCell {
-  return gated?.verdict.outcome === 'refused'
+function standingOutcomeOf(gated: GatedCell): 'refused' | 'blocked' {
+  return gated.verdict.outcome === 'blocked' ? 'blocked' : 'refused'
+}
+
+function isStanding(gated: GatedCell | null): gated is GatedCell {
+  return gated !== null && isStandingVerdict(gated.verdict)
 }
 
 function lostEventOf(gated: GatedCell | null): DomainEventBody | null {
