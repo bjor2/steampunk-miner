@@ -379,4 +379,30 @@ describe('domain event log', () => {
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
+
+  it("records a charge's detonation with its ladder size and radius (#213)", () => {
+    recordDomainEvents({ playerId: 'p1', planet: 7, depthTiles: 40 }, [
+      {
+        tick: 900,
+        playerId: 'p1',
+        type: 'ChargeDetonated',
+        tx: 3,
+        ty: -41,
+        size: 1,
+        radiusMm: 2500,
+      },
+    ])
+    expect(sink.events.map(({ event, data }) => ({ event, data }))).toEqual([
+      { event: 'charge_detonated', data: { tx: 3, ty: -41, size: 1, radiusMm: 2500 } },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
+  it('records a detonation with no radius hint as a schema-valid line without radiusMm (#213)', () => {
+    recordDomainEvents({ playerId: 'p1', planet: 7, depthTiles: 40 }, [
+      { tick: 900, playerId: 'p1', type: 'ChargeDetonated', tx: 3, ty: -41, size: 4 },
+    ])
+    expect(sink.events.map(({ data }) => data)).toEqual([{ tx: 3, ty: -41, size: 4 }])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
 })

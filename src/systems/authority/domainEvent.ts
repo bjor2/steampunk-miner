@@ -345,9 +345,11 @@ export interface KernelDomainEventBodies {
   ChargePlanted: { tx: number; ty: number; detonateTick: number; carried: number }
   /**
    * The charge at `tx, ty` blew (#109): its hits land now, its ground breaks as a live blast that
-   * `BlastResolved` sums up (K6 #189).
+   * `BlastResolved` sums up (K6 #189). `size` is its rung on the dynamite ladder and `radiusMm`
+   * its blast's radius, both copied from the `BlastEvent` (K3 #186, #213). The radius is a render
+   * hint for the flash, shake and thump; balance keys off `size`, never the radius.
    */
-  ChargeDetonated: { tx: number; ty: number }
+  ChargeDetonated: { tx: number; ty: number; size: number; radiusMm?: number }
   /**
    * A live blast's slice this tick (K6 #189): the ring of its front from the first tile it looked
    * at to the last, in mm from the charge tile's centre. Presentation only; the run log skips it.

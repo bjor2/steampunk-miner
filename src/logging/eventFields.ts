@@ -19,6 +19,11 @@ export type FieldKind =
   | { readonly oneOf: readonly string[] }
   | { readonly listOf: PayloadFields }
   | { readonly mapOf: FieldKind }
+  /**
+   * A field a line may leave out (#11 section 1: adding an optional field keeps
+   * `logSchemaVersion`); when present it is checked as `optional`.
+   */
+  | { readonly optional: FieldKind }
 
 export type PayloadFields = { readonly [field: string]: FieldKind }
 
@@ -36,9 +41,18 @@ export type ValueOfKind<K> = K extends 'integer' | 'float'
             ? readonly PayloadOf<F>[]
             : K extends { readonly mapOf: infer M }
               ? Readonly<Record<string, ValueOfKind<M>>>
-              : never
+              : K extends { readonly optional: infer O }
+                ? ValueOfKind<O>
+                : never
 
-export type PayloadOf<F> = { readonly [N in keyof F]: ValueOfKind<F[N]> }
+/** The fields of `F` declared `{ optional: ... }`. */
+type OptionalFieldNames<F> = {
+  [N in keyof F]: F[N] extends { readonly optional: unknown } ? N : never
+}[keyof F]
+
+export type PayloadOf<F> = {
+  readonly [N in Exclude<keyof F, OptionalFieldNames<F>>]: ValueOfKind<F[N]>
+} & { readonly [N in OptionalFieldNames<F>]?: ValueOfKind<F[N]> }
 
 /** Every problem with `payload` against `fields`; `path` names where it sits, for the message. */
 export function payloadProblems(payload: unknown, fields: PayloadFields, path: string): string[] {
@@ -75,6 +89,7 @@ function valueProblems(value: unknown, kind: FieldKind, path: string): string[] 
   if (typeof kind === 'string') return scalarProblems(value, kind, path)
   if ('oneOf' in kind) return oneOfProblems(value, kind.oneOf, path)
   if ('listOf' in kind) return listProblems(value, kind.listOf, path)
+  if ('optional' in kind) return value === undefined ? [] : valueProblems(value, kind.optional, path)
   return mapProblems(value, kind.mapOf, path)
 }
 

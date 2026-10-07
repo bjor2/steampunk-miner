@@ -62,7 +62,7 @@ function blastCharge(
   const planterHit = hitPlanterInBlast(state, params, playerId, charge, tick)
   const enemiesHit = hitEnemiesInBlast(planterHit.state, params, charge, tick)
   const sliceEffects = applyBlastEffects(enemiesHit.state, blast, params)
-  const detonated: DomainEventBody = { type: 'ChargeDetonated', tx: charge.tx, ty: charge.ty }
+  const detonated = chargeDetonatedOf(blast)
   return {
     state: startLiveBlast(sliceEffects.state, blast),
     events: [
@@ -84,6 +84,12 @@ function chargeBlastOf(playerId: string, charge: PlantedCharge, tick: number): B
     source: 'charge',
     tick,
   }
+}
+
+/** The flash, shake and sound read the blast's size and radius off its detonation (#213). */
+function chargeDetonatedOf(blast: BlastEvent): DomainEventBody {
+  const { tx, ty, size, radiusMm } = blast
+  return { type: 'ChargeDetonated', tx, ty, size, radiusMm }
 }
 
 /** Players with a charge on a wall, in id order. */

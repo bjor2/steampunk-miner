@@ -18,6 +18,8 @@ const blastAt = (tx: number, ty: number): DomainEvent => ({
   tick: 0,
   tx,
   ty,
+  size: 1,
+  radiusMm: 2500,
 })
 
 describe('charge look (#109 visibility, art #110)', () => {

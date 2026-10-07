@@ -15,6 +15,7 @@ import {
   type DomainEventBodies,
   type KernelDomainEventType,
 } from '../systems/authority/domainEvent'
+import { chargeDetonatedDataOf } from './chargeDetonationLine'
 import type { RunEventData, RunEventName } from './eventNames'
 import { sliceEventProjectionOf, type SliceRunLogLine } from './registries/eventProjections'
 import type { CommandRef, RunEventPlace, RunEventStamp } from './runEvent'
@@ -265,7 +266,10 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'charge_planted',
     data: { tx, ty, detonateTick, carried },
   }),
-  ChargeDetonated: ({ tx, ty }) => ({ event: 'charge_detonated', data: { tx, ty } }),
+  ChargeDetonated: (detonated) => ({
+    event: 'charge_detonated',
+    data: chargeDetonatedDataOf(detonated),
+  }),
   // The front is for presentation; the blast is logged once, when it resolves.
   BlastFront: () => null,
   BlastResolved: (blast) => ({

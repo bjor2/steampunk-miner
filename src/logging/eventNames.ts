@@ -420,10 +420,19 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { tx: 'integer', ty: 'integer', detonateTick: 'integer', carried: 'integer' },
   },
+  // #213: the detonation's ladder size and radius, copied from its blast (K3 #186). Optional, so a
+  // line logged before them still reads (`readChargeDetonation` takes it as size 1); the game
+  // always writes `size`, and `radiusMm` whenever the blast has one. A render hint only: balance
+  // keys off `size`, never the radius.
   charge_detonated: {
     group: 'mining',
     level: 'core',
-    payload: { tx: 'integer', ty: 'integer' },
+    payload: {
+      tx: 'integer',
+      ty: 'integer',
+      size: { optional: 'integer' },
+      radiusMm: { optional: 'integer' },
+    },
   },
   blast_resolved: {
     group: 'mining',

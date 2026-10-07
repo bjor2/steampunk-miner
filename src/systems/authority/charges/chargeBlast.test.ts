@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { blastSelfHit } from '../../economy/blastingCharges'
+import { blastRadiusMm, blastSelfHit } from '../../economy/blastingCharges'
 import { oreSalePrice } from '../../economy/oreEconomy'
 import { fromCanonical, fromSafeInteger, mul, toCanonical } from '../../money'
 import { FACING } from '../../vehicle/vehiclePose'
@@ -123,6 +123,13 @@ describe('blasting charges: the blast (#109 numbers acceptance 1 and 2)', () => 
     expect(ofType(blast, 'ChargeDetonated')).toEqual([expect.objectContaining(WALL_TILE)])
     expect(ofType(blast, 'BlastResolved')).toEqual([
       expect.objectContaining({ ...WALL_TILE, tilesCleared: 21 }),
+    ])
+  })
+
+  it("tells the detonation its blast's ladder size and radius: size 1 for the shipped charge (#213)", () => {
+    const { blast } = blastFromStand()
+    expect(ofType(blast, 'ChargeDetonated')).toEqual([
+      expect.objectContaining({ ...WALL_TILE, size: 1, radiusMm: blastRadiusMm() }),
     ])
   })
 
