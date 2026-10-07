@@ -1,5 +1,5 @@
 {
-  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 prices (one-off k 15 band-5 ore at the unlock planet, consumables k 2 per unit at the current planet), 4.2 charged items, 4.3 consumables, 4.6 and the TD terrain caps (32 density cells or 64 swaps per activation) as magnitude limits, and the lodestone's 256 swaps per beacon. A slice's numbers live beside it (feature-slices.md 1.1).",
+  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 prices (one-off k 15 band-5 ore at the unlock planet, consumables k 2 per unit at the current planet), 4.2 charged items, 4.3 consumables, 4.6 and the TD terrain caps (32 density cells or 64 swaps per activation) as magnitude limits, and the lodestone's 256 swaps per beacon. The terrain magnets (GD lock on #246, ticket 282): cooldown 1200 for both, wave radius 2 cells and clamp duration 180 ticks, charges 2 and wind-up 6 like the lane's other charged items. A slice's numbers live beside it (feature-slices.md 1.1).",
   "items": {
     "price": {
       "oneOff": {
@@ -57,6 +57,18 @@
         "windupTicks": 6,
         "magnitude": 6,
         "magnitudeLimit": 32
+      },
+      "power.repulsor_coil": {
+        "charges": 2,
+        "cooldownTicks": 1200,
+        "windupTicks": 6,
+        "magnitude": 2
+      },
+      "power.lode_clamp": {
+        "charges": 2,
+        "cooldownTicks": 1200,
+        "windupTicks": 6,
+        "magnitude": 180
       }
     }
   }

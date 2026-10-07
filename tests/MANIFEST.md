@@ -307,10 +307,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 4 files, 30 tests
+### `terrain-tools`: 6 files, 43 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/terrain-tools/magnetGuard.test.ts` | 4 | 4 |
+| `src/features/terrain-tools/systems/magnetItems.test.ts` | 9 | 9 |
 | `src/features/terrain-tools/systems/statPreview.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/terrainEconomy.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/terrainItems.test.ts` | 11 | 11 |
@@ -508,6 +510,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/gunStats.test.ts` | 9 | 9 |
 | `src/systems/economy/heatEconomy.test.ts` | 11 | 11 |
 | `src/systems/economy/itemEffectCaps.test.ts` | 6 | 6 |
+| `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/planetCharges.test.ts` | 16 | 12 |
 | `src/systems/economy/readEconomy.test.ts` | 19 | 19 |
