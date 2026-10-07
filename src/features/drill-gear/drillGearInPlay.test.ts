@@ -117,8 +117,9 @@ describe('drill-gear spoil auger', () => {
     on.advanceTo(302)
     off.advanceTo(302)
     const max = energyMaxQuantaOf(on.state().players.p1.vehicle)
-    const perTick = Math.ceil((max * 3) / (1000 * TICKS_PER_SECOND))
-    expect(energyOf(off) - energyOf(on)).toBe(300 * perTick)
+    // 30 bp of the tank a second for 300 ticks; the carried remainder loses nothing (ticket 295).
+    const drawn = Math.floor((max * 30 * 300) / (10_000 * TICKS_PER_SECOND))
+    expect(energyOf(off) - energyOf(on)).toBe(drawn)
   })
 
   it('plugs the bored shaft at least 2 m behind the hull with packed plain ground', () => {

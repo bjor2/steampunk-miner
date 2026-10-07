@@ -28,15 +28,15 @@ describe('drill-gear power-ups', () => {
   it('draws 0.3% of the tank a second for the auger and nothing for the other toggles', () => {
     expect(powerUpOfId('gear.spoil_auger')).toMatchObject({
       isToggle: true,
-      energyDrawPerMillePerSecond: 3,
+      energyDrawBpPerSecond: 30,
     })
     expect(powerUpOfId('gear.side_cutters')).toMatchObject({
       isToggle: true,
-      energyDrawPerMillePerSecond: 0,
+      energyDrawBpPerSecond: 0,
     })
     expect(powerUpOfId('gear.reach_boom')).toMatchObject({
       isToggle: true,
-      energyDrawPerMillePerSecond: 0,
+      energyDrawBpPerSecond: 0,
     })
   })
 

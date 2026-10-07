@@ -54,6 +54,15 @@ describe('drill-gear stat preview', () => {
     expect(auger(masteringMarkOf('gear.spoil_auger')).drawBpPerSecond).toBe(15)
   })
 
+  it('lowers the auger draw at every Mark until mastery, so no Mark is dead (#205 GD ruling)', () => {
+    const last = masteringMarkOf('gear.spoil_auger')
+    const draws = Array.from(
+      { length: last },
+      (_, at) => valuesOf(statPreview('gear.spoil_auger', at + 1, PLANET)).drawBpPerSecond,
+    )
+    expect(draws).toEqual([30, 28, 25, 23, 21, 20, 18, 17, 15])
+  })
+
   it('widens the side cutters to two cells but never cheapens a side cell', () => {
     const last = masteringMarkOf('gear.side_cutters')
     expect(valuesOf(statPreview('gear.side_cutters', last, PLANET))).toEqual({
