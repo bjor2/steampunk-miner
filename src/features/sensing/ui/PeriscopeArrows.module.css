@@ -1,0 +1,64 @@
+/*
+ * The periscope's arrows sit just inside the kernel's threat markers (Hud.module.css .threats),
+ * one octant per edge point, so an enemy that is also telegraphing shows both, side by side.
+ */
+.arrows {
+  position: absolute;
+  inset: calc(var(--space-3) * 3);
+  pointer-events: none;
+}
+
+.arrow {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
+  border: 1px dashed var(--color-brass);
+  border-radius: 1em;
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.arrow[data-band='near'] {
+  border-style: solid;
+}
+
+.arrow[data-dust]::after {
+  content: ' ~';
+}
+
+.arrow[data-octant='0'] {
+  top: 0;
+  left: 50%;
+}
+.arrow[data-octant='1'] {
+  top: 0;
+  right: 0;
+}
+.arrow[data-octant='2'] {
+  top: 50%;
+  right: 0;
+}
+.arrow[data-octant='3'] {
+  bottom: 0;
+  right: 0;
+}
+.arrow[data-octant='4'] {
+  bottom: 0;
+  left: 50%;
+}
+.arrow[data-octant='5'] {
+  bottom: 0;
+  left: 0;
+}
+.arrow[data-octant='6'] {
+  top: 50%;
+  left: 0;
+}
+.arrow[data-octant='7'] {
+  top: 0;
+  left: 0;
+}

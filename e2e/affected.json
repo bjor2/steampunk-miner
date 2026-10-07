@@ -57,6 +57,15 @@
       ]
     },
     {
+      "why": "The sensing lane's items in the slots, the reveal layer and board, the passives' HUD panels, and on the rig.",
+      "paths": ["src/features/sensing/**"],
+      "specs": [
+        "e2e/browser/sensing.spec.ts",
+        "e2e/browser/powerUpCore.spec.ts",
+        "e2e/browser/rigGear.spec.ts"
+      ]
+    },
+    {
       "why": "The mobility lane's items in the slots, their effect windows and their card lines, and on the rig.",
       "paths": ["src/features/mobility/**"],
       "specs": [

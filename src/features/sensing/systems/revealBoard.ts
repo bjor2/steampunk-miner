@@ -35,7 +35,18 @@ export interface RevealBoard {
 
 export const EMPTY_REVEAL_BOARD: RevealBoard = { marks: [], pins: [] }
 
-/** The board after a batch of events: the local player's pings, and anyone's buoy. */
+/** The board after a batch of events: its uses, then the trip's flare maps gone if it docked. */
+export function boardAfterHeard(
+  board: RevealBoard,
+  events: readonly DomainEvent[],
+  state: AuthorityState,
+  localPlayerId: string,
+): RevealBoard {
+  const used = boardAfterUses(board, events, state, localPlayerId)
+  return hasDockedIn(events, localPlayerId) ? boardAfterDock(used) : used
+}
+
+/** The board after a batch's uses: the local player's pings, and anyone's buoy. */
 export function boardAfterUses(
   board: RevealBoard,
   events: readonly DomainEvent[],
@@ -57,6 +68,10 @@ export function boardAt(board: RevealBoard, state: AuthorityState, tick: number)
 export function boardAfterDock(board: RevealBoard): RevealBoard {
   const marks = marksAfterDock(board.marks)
   return marks.length === board.marks.length ? board : { ...board, marks }
+}
+
+function hasDockedIn(events: readonly DomainEvent[], playerId: string): boolean {
+  return events.some((event) => event.type === 'DockEntered' && event.playerId === playerId)
 }
 
 function boardAfterUse(

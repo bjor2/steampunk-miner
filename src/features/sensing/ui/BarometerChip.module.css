@@ -1,0 +1,13 @@
+/* A warning chip centred on the warned cell, in the HUD's alarm copper (#33 section 5). */
+.chip {
+  display: inline-block;
+  padding: 1px var(--space-2);
+  border: 2px solid var(--color-copper);
+  border-radius: 999px;
+  background: var(--color-panel);
+  color: var(--color-parchment);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
