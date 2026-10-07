@@ -35,13 +35,21 @@ export function landingOf(
   return isMilestoneMajor(track, reached, milestones) ? 'milestone' : 'major'
 }
 
-/** The parts every track's highest owned milestone swaps in, in track order. */
-export function ownedSwapPartIdsOf(
+/** A track's swapped parts: those of the highest milestone it owns. */
+export interface OwnedSwap {
+  track: UpgradeId
+  partIds: readonly string[]
+}
+
+/** Each track's highest owned milestone with parts to swap in, in list order. */
+export function ownedSwapsOf(
   levels: UpgradeLevels,
   milestones: readonly MilestoneMajor[] = NO_MILESTONES,
-): string[] {
+): OwnedSwap[] {
   const tracks = [...new Set(milestones.map((row) => row.track))]
-  return tracks.flatMap((track) => highestOwnedOf(track, majorOf(levels[track]), milestones))
+  return tracks
+    .map((track) => ({ track, partIds: highestOwnedOf(track, majorOf(levels[track]), milestones) }))
+    .filter((owned) => owned.partIds.length > 0)
 }
 
 function isMilestoneMajor(

@@ -31,6 +31,8 @@ export interface ShowcaseMove {
 
 export interface TrackReaction {
   attach: AttachId
+  /** The attach point in the car's frame, metres (vehicle.parts.json): where the leader ends. */
+  attachAtM: readonly [number, number]
   /** The turntable's turn while the track is selected. */
   faceTurnRadians: number
   moves: readonly ShowcaseMove[]
@@ -103,6 +105,24 @@ export function turnRadiansAt(
   return turn.fromRadians + (turn.toRadians - turn.fromRadians) * eased
 }
 
+/**
+ * Where a track's part is drawn, in world metres: the car's drawn centre plus the attach point in
+ * its frame, turned with its local up, mirrored when it faces left and narrowed by the
+ * turntable's turn (`widthShare`, the kernel's projection of the flat art). Written into `out`.
+ */
+export function placePartPoint(
+  reaction: TrackReaction,
+  centre: Readonly<{ x: number; y: number }>,
+  up: Readonly<{ x: number; y: number }>,
+  widthShare: number,
+  out: { x: number; y: number },
+): void {
+  const along = reaction.attachAtM[0] * widthShare
+  const upward = reaction.attachAtM[1]
+  out.x = centre.x + along * up.y + upward * up.x
+  out.y = centre.y - along * up.x + upward * up.y
+}
+
 function showcaseOf(file: typeof SHOWCASE_FILE): Showcase {
   const tracks = Object.fromEntries(
     Object.entries(file.tracks).map(([track, reaction]) => [track, reactionOf(reaction)]),
@@ -112,5 +132,6 @@ function showcaseOf(file: typeof SHOWCASE_FILE): Showcase {
 
 function reactionOf(raw: (typeof SHOWCASE_FILE.tracks)[UpgradeId]): TrackReaction {
   if (!isAttachId(raw.attach)) throw new Error(`showcase.json: "${raw.attach}" is no attach id`)
-  return { ...raw, attach: raw.attach }
+  const [x, y] = raw.attachAtM
+  return { ...raw, attach: raw.attach, attachAtM: [x, y] }
 }

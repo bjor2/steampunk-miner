@@ -6,6 +6,7 @@ import {
   RESTING_TURN,
   SHOWCASE,
   momentTicksOf,
+  placePartPoint,
   swingMoveAt,
   turnRadiansAt,
   turnTowardTrack,
@@ -38,6 +39,27 @@ describe('workshop showcase reactions', () => {
       expect(moves.length).toBeGreaterThan(0)
       for (const move of moves) expect(move.slots.filter((slot) => !slots.has(slot))).toEqual([])
     }
+  })
+
+  it("ends each track's leader line on its attach point in the vehicle's sidecar", () => {
+    const sidecar = JSON.parse(readFileSync(VEHICLE_PARTS, 'utf8')) as {
+      attach: { id: string; atM: [number, number] }[]
+    }
+    for (const track of UPGRADE_IDS) {
+      const { attach, attachAtM } = SHOWCASE.tracks[track]
+      expect(attachAtM).toEqual(sidecar.attach.find((point) => point.id === attach)?.atM)
+    }
+  })
+
+  it('places a part on the drawn car, turned with its up and mirrored facing left', () => {
+    const drill = SHOWCASE.tracks.drill_tip
+    const point = { x: 0, y: 0 }
+    placePartPoint(drill, { x: 10, y: 20 }, { x: 0, y: 1 }, 1, point)
+    expect(point).toEqual({ x: 10 + drill.attachAtM[0], y: 20 + drill.attachAtM[1] })
+    placePartPoint(drill, { x: 10, y: 20 }, { x: 0, y: 1 }, -1, point)
+    expect(point.x).toBeCloseTo(10 - drill.attachAtM[0])
+    placePartPoint(drill, { x: 0, y: 0 }, { x: 1, y: 0 }, 1, point)
+    expect(point.y).toBeCloseTo(-drill.attachAtM[0])
   })
 
   it("moves each track's own part on the tick its step lands, within G&V's 4 ticks", () => {

@@ -84,6 +84,8 @@ interface WorkshopState extends WorkshopValues {
   advanceHoldTo(tick: number): void
   /** A `listenForDomainEvents` listener: reactions and sounds for every local purchase. */
   hearPurchases(events: readonly DomainEvent[], playerId: string): void
+  /** The bay screen closed: a live hold is let go, and the turntable comes back to rest. */
+  leaveShowcase(): void
 }
 
 /** The client restarts its hold ids at 1 each session (TD on #180). */
@@ -126,6 +128,10 @@ export const useWorkshopStore = create<WorkshopState>()((set, get) => ({
     heardRefusalsOf(events, playerId).forEach(({ chain, reason }) =>
       endHoldOfChain(chain, (live) => refuseStep(live, reason)),
     )
+  },
+  leaveShowcase: () => {
+    get().releaseHold()
+    set({ selected: null, turn: RESTING_TURN, reactions: [] })
   },
 }))
 

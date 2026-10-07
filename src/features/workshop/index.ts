@@ -42,6 +42,7 @@ export {
 export {
   landingOf,
   NO_MILESTONES,
-  ownedSwapPartIdsOf,
+  ownedSwapsOf,
+  type OwnedSwap,
   type MilestoneMajor,
 } from './systems/milestoneLandings'

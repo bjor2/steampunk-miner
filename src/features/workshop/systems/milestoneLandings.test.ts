@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { stepOfMajor } from '../../../systems/economy/upgradeSteps'
 import { createScriptedSession } from '../../../systems/authority/scriptedSession'
-import { landingOf, ownedSwapPartIdsOf, type MilestoneMajor } from './milestoneLandings'
+import { landingOf, ownedSwapsOf, type MilestoneMajor } from './milestoneLandings'
 
 /** A stand-in for the #228 list, so the rule is shown before the data lands. */
 const DRILL_MILESTONES: readonly MilestoneMajor[] = [
@@ -32,16 +32,16 @@ describe('workshop milestone landings', () => {
   })
 
   it("swaps in the parts of the track's highest owned milestone, from the step that lands it", () => {
-    expect(ownedSwapPartIdsOf(levelsWithDrillAt(stepOfMajor(1) - 1), DRILL_MILESTONES)).toEqual([])
-    expect(ownedSwapPartIdsOf(levelsWithDrillAt(stepOfMajor(1)), DRILL_MILESTONES)).toEqual([
-      't2-drill-head',
+    expect(ownedSwapsOf(levelsWithDrillAt(stepOfMajor(1) - 1), DRILL_MILESTONES)).toEqual([])
+    expect(ownedSwapsOf(levelsWithDrillAt(stepOfMajor(1)), DRILL_MILESTONES)).toEqual([
+      { track: 'drill_power', partIds: ['t2-drill-head'] },
     ])
-    expect(ownedSwapPartIdsOf(levelsWithDrillAt(stepOfMajor(4) + 3), DRILL_MILESTONES)).toEqual([
-      't3-drill-head',
+    expect(ownedSwapsOf(levelsWithDrillAt(stepOfMajor(4) + 3), DRILL_MILESTONES)).toEqual([
+      { track: 'drill_power', partIds: ['t3-drill-head'] },
     ])
   })
 
   it('swaps nothing with no milestone list', () => {
-    expect(ownedSwapPartIdsOf(levelsWithDrillAt(stepOfMajor(6)))).toEqual([])
+    expect(ownedSwapsOf(levelsWithDrillAt(stepOfMajor(6)))).toEqual([])
   })
 })
