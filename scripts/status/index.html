@@ -2113,6 +2113,8 @@
             const why = i.labels
               .map((l) => l.name)
               .filter((n) => ['needs-planner', 'needs-fix', 'blocked', 'hitl'].includes(n))
+              // a planner pause refunds its attempt in the loop (not a failed build)
+              .map((n) => (n === 'needs-planner' ? 'needs-planner (attempt refunded)' : n))
             if ((attempts[i.number] || 0) >= maxAtt)
               why.push(`attempts ${attempts[i.number]}/${maxAtt}`)
             const grant = testerGrants[i.number]

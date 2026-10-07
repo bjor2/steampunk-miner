@@ -125,6 +125,11 @@ reopens with `needs-fix` gets one attempt back in the loop's `state.json` (`test
 loop retries it even after `MAX_ATTEMPTS`; the Loops tab's Needs attention list says "Tester red
 (phase): retry granted" until it closes green.
 
+A session that pauses its ticket at `needs-planner` (a planner question, not a failed build) gets
+its attempt refunded in `state.json` (`attempts`, floor 0), so it never runs out of tries while
+waiting on planners. Needs attention shows it as "needs-planner (attempt refunded)". Real failures
+(`needs-fix`, gate failures, no-change rejections) still count against `MAX_ATTEMPTS` = 2.
+
 Without `accounts` (a v1 snapshot) the Claude pool shows as one pool. The page copies only these
 fields (`scripts/status/slots.mjs`), so anything else in the file never reaches it, and drops a name
 or reason that looks like a path, email or host name. A malformed file shows its reason instead of
