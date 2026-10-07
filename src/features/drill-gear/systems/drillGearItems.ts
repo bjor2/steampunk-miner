@@ -4,9 +4,9 @@
  * `vehicle-item` rows, tech nodes and prices made from them. Node ids are `tech.drill_gear.*`
  * (#205 GD lock: the #224 bare-id rule refuses the hyphen of `tech.drill-gear.*`).
  *
- * Vision rows (ticket 242, the data half of #205): nothing here is registered, so no store, tree,
- * item card or bot sees them; #205 registers them with the effect. The twin-bit head stays
- * "coming soon" even then, with no price, until the mechanic it removes exists.
+ * #205 registers six of them with their effects (`drillGearContent.ts`). The twin-bit head and the
+ * dielectric bit are held back (GD lock on #205 Q3 a): unregistered, unseen and unpriced until the
+ * mechanic the twin bit removes exists, and the dielectric bit's prereq is the twin bit.
  */
 import type { Money } from '../../../systems/money'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
@@ -46,8 +46,8 @@ export interface DrillGearItem {
   powerUpClass: Extract<PowerUpClass, 'passive' | 'charged'>
   /** Flipped in the field (#162 2.1); equipping is still platform only. */
   isToggle: boolean
-  /** Shown in its lane but never sold (#205 GD lock: the twin-bit head). */
-  isComingSoon: boolean
+  /** Never registered, so no store, tree, card or bot sees it (#205 GD lock, Q3 a). */
+  isHeldBack: boolean
   /** Its drill socket; the part draws at the attach point of the same name (#162 TD lock). */
   slot: Extract<LoadoutSlotId, 'drill.head' | 'drill.flank' | 'drill.collar'>
   attach: AttachId
@@ -97,7 +97,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'passive',
     isToggle: false,
-    isComingSoon: false,
+    isHeldBack: false,
     slot: 'drill.head',
     attach: 'drill.head',
     // The TD's terrain-cap note on #162 names the vibratory bit's reach as its Mark magnitude.
@@ -120,7 +120,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'passive',
     isToggle: true,
-    isComingSoon: false,
+    isHeldBack: false,
     slot: 'drill.collar',
     attach: 'drill.collar',
     stats: [
@@ -143,7 +143,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'passive',
     isToggle: true,
-    isComingSoon: false,
+    isHeldBack: false,
     slot: 'drill.flank',
     attach: 'drill.flank',
     // The energy share never steps: the Vertical Scaler holds it at or above the main drill's.
@@ -167,7 +167,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'passive',
     isToggle: false,
-    isComingSoon: false,
+    isHeldBack: false,
     slot: 'drill.head',
     attach: 'drill.head',
     // No numbers until the frozen-planet spec gives the frost penalty it removes.
@@ -188,7 +188,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'passive',
     isToggle: false,
-    isComingSoon: true,
+    isHeldBack: true,
     slot: 'drill.head',
     attach: 'drill.head',
     stats: [],
@@ -207,7 +207,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'charged',
     isToggle: false,
-    isComingSoon: false,
+    isHeldBack: false,
     slot: 'drill.collar',
     attach: 'drill.collar',
     stats: [
@@ -231,7 +231,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'passive',
     isToggle: false,
-    isComingSoon: false,
+    isHeldBack: true,
     slot: 'drill.head',
     attach: 'drill.head',
     // No numbers until the magnetic-planet spec gives the shock it removes.
@@ -252,7 +252,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'passive',
     isToggle: true,
-    isComingSoon: false,
+    isHeldBack: false,
     slot: 'drill.collar',
     attach: 'drill.collar',
     // Neither stat steps: the draw is nil (#162 4.4) and the reach is clamped (#205 GD lock).
@@ -265,6 +265,11 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     },
   },
 ]
+
+/** The items #205 registers: every row but the held-back ones. */
+export const SHIPPED_DRILL_GEAR: readonly DrillGearItem[] = DRILL_GEAR_ITEMS.filter(
+  (item) => !item.isHeldBack,
+)
 
 /** The catalogue row of `itemId`, or null for an item of another lane. */
 export function drillGearItemOf(itemId: string): DrillGearItem | null {
@@ -343,11 +348,11 @@ export function techNodeOf(item: DrillGearItem): TechNode {
 
 /**
  * The one-off price (#162 4.1): `k` band-5 ore priced at the unlock planet, with its `paceScale`,
- * so the card shows one fixed number on every planet. Null for a coming-soon item: it has no price
+ * so the card shows one fixed number on every planet. Null for a held-back item: it has no price
  * because it cannot be bought.
  */
 export function itemPriceOf(item: DrillGearItem): Money | null {
-  if (item.isComingSoon) return null
+  if (item.isHeldBack) return null
   const unlockPlanet = item.node.unlockTier
   return bandOrePriceAt(DRILL_GEAR_ECONOMY.price, unlockPlanet, unlockPlanet)
 }

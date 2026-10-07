@@ -1,7 +1,8 @@
 /**
  * The drill-gear slice's public API (feature-slices.md 2.1): the only file another slice may
  * import from this folder. The eight drill-gear rows (#162), their `tech.drill_gear.*` nodes,
- * prices and `statPreview`; all vision rows until #205 registers them with the effect.
+ * prices and `statPreview`; #205 registers six of them, the twin-bit head and dielectric bit held
+ * back.
  */
 export const DRILL_GEAR_SLICE_ID = 'drill-gear'
 export type { DrillPathCaps } from './systems/drillGearEconomy'

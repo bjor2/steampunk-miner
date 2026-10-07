@@ -119,15 +119,15 @@ describe('drill-gear items', () => {
   })
 
   it('prices each item at 15 band-5 ore on its unlock planet, through bandOrePriceAt', () => {
-    const forSale = DRILL_GEAR_ITEMS.filter((item) => !item.isComingSoon)
+    const forSale = DRILL_GEAR_ITEMS.filter((item) => !item.isHeldBack)
     expect(forSale.map(itemPriceOf)).toEqual(
       forSale.map((item) => bandOrePriceAt(ONE_OFF, item.node.unlockTier, item.node.unlockTier)),
     )
   })
 
-  it('shows the twin-bit head as coming soon, with no price to buy it at (#205 GD lock)', () => {
-    const comingSoon = DRILL_GEAR_ITEMS.filter((item) => item.isComingSoon)
-    expect(comingSoon.map((item) => item.itemId)).toEqual(['gear.twin_bit'])
-    expect(comingSoon.map(itemPriceOf)).toEqual([null])
+  it('holds back the twin-bit head and the dielectric bit, with no price (#205 GD lock Q3)', () => {
+    const heldBack = DRILL_GEAR_ITEMS.filter((item) => item.isHeldBack)
+    expect(heldBack.map((item) => item.itemId)).toEqual(['gear.twin_bit', 'gear.dielectric_bit'])
+    expect(heldBack.map(itemPriceOf)).toEqual([null, null])
   })
 })

@@ -27,14 +27,13 @@ export interface DrillGearStatPreview {
   /** The stat this Mark changed; null for Mark 1 and past mastery. */
   stepped: MarkStatName | null
   isMastered: boolean
-  /** Shown in its lane but never sold (the twin-bit head). */
-  isComingSoon: boolean
   lines: readonly DrillGearStatLine[]
 }
 
 /**
- * The item's stats at `mark`, or null for an id this lane does not sell. A one-off item is the
- * same on every planet, so `_planetIndex` is the shared contract's and changes nothing here.
+ * The item's stats at `mark`, or null for an id this lane does not sell, held-back items included.
+ * A one-off item is the same on every planet, so `_planetIndex` is the shared contract's and
+ * changes nothing here.
  */
 export function statPreview(
   entryId: string,
@@ -42,7 +41,7 @@ export function statPreview(
   _planetIndex: number,
 ): DrillGearStatPreview | null {
   const item = drillGearItemOf(entryId)
-  if (item === null) return null
+  if (item === null || item.isHeldBack) return null
   return previewOf(item, mark)
 }
 
@@ -53,7 +52,6 @@ function previewOf(item: DrillGearItem, mark: number): DrillGearStatPreview {
     mark,
     stepped: step.stepped,
     isMastered: step.isMastered,
-    isComingSoon: item.isComingSoon,
     lines: item.stats.map((stat) => lineOf(item, stat, step.stats)),
   }
 }
