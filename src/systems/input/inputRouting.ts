@@ -16,6 +16,9 @@
  *
  * An action with no rule here in the top layer asks the slices' input reactions (#217): the
  * power-up slots' `use_slot_N` submit the slice's use command, or do nothing on an empty slot.
+ * `plant_charge` asks them too while it has nothing to plant: the plant key becomes the plunger's
+ * Detonate while a charge is live (#153 section 2, the dynamite slice #149). A slice never
+ * overrides a press the kernel answers.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import type { AuthorityState } from '../authority/authorityState'
@@ -97,8 +100,10 @@ const REACTIONS_BY_LAYER: Readonly<
       isWaitingForTow(vehicleMode) ? submit(requestRescueCommand()) : NONE,
     toggle_guns: ({ gunMode }) =>
       gunMode === null ? NONE : submit(setGunModeCommand(toggledGunMode(gunMode))),
-    plant_charge: ({ plantableChargeSize }) =>
-      plantableChargeSize === null ? NONE : submit(plantChargeCommand(plantableChargeSize)),
+    plant_charge: (situation) =>
+      situation.plantableChargeSize === null
+        ? sliceReactionToPress('plant_charge', situation)
+        : submit(plantChargeCommand(situation.plantableChargeSize)),
     next_charge_size: ({ nextChargeSize }) =>
       nextChargeSize === null ? NONE : { kind: 'chooseChargeSize', size: nextChargeSize },
     open_settings: () => ({ kind: 'openSettings' }),

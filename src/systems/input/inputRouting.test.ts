@@ -221,4 +221,26 @@ describe('input routing: slice reactions', () => {
     expect(pressWithProbe('interact', ON_PAD)).toEqual(submitted('dock', { bay: 'sell' }))
     expect(pressWithProbe('interact', DRIVING)).toEqual({ kind: 'none' })
   })
+
+  it('asks the slices on the plant key only while the kernel has nothing to plant (#153, #149)', () => {
+    const PLUNGER_PROBE: SliceDefinition = {
+      id: 'plunger-probe',
+      register: (r) =>
+        r.inputReaction({
+          id: 'plunger-probe.detonate',
+          actionId: 'plant_charge',
+          contexts: ['vehicle'],
+          toIntent: () => ({ type: 'requestRescue', payload: {} }),
+        }),
+    }
+    const press = (at: InputSituation) =>
+      withRegistrations([PLUNGER_PROBE], () => reactionToPress('plant_charge', at))
+    expect(press(DRIVING)).toEqual(submitted('requestRescue'))
+    expect(press({ ...DRIVING, plantableChargeSize: 2 })).toEqual(
+      submitted('plantCharge', { size: 2 }),
+    )
+    expect(withRegistrations([], () => reactionToPress('plant_charge', DRIVING))).toEqual({
+      kind: 'none',
+    })
+  })
 })
