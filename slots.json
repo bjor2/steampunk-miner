@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T00:52:43+02:00",
+  "updated_at": "2026-10-08T00:58:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -23,15 +23,15 @@
           "ticket": null,
           "grok_slot": null,
           "kind": "external",
-          "since": "2026-10-08T00:24:00+02:00"
+          "since": "2026-10-08T00:46:46+02:00"
         },
         {
           "slot": "C2",
           "state": "busy",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": "external",
-          "since": "2026-10-08T00:46:46+02:00"
+          "ticket": 206,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-08T00:58:00+02:00"
         },
         {
           "slot": "C3",
@@ -44,16 +44,16 @@
         {
           "slot": "C4",
           "state": "busy",
-          "ticket": 202,
-          "grok_slot": 3,
+          "ticket": 251,
+          "grok_slot": 7,
           "kind": "dev",
-          "since": "2026-10-08T00:38:00+02:00"
+          "since": "2026-10-08T00:58:00+02:00"
         }
       ],
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 4,
+      "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
     {
@@ -89,17 +89,17 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
-          "ticket": 280,
-          "grok_slot": 8,
-          "kind": "dev",
-          "since": "2026-10-08T00:24:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
-      "claims_last_hour": 6,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 5,
       "name": "Claude Max 2"
     }
   ],
@@ -188,9 +188,9 @@
     {
       "slot": 3,
       "state": "dev",
-      "ticket": 202,
-      "since": "2026-10-08T00:38:00+02:00",
-      "claude_slot": 4
+      "ticket": 206,
+      "since": "2026-10-08T00:58:00+02:00",
+      "claude_slot": 2
     },
     {
       "slot": 4,
@@ -217,16 +217,16 @@
     },
     {
       "slot": 7,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 251,
+      "since": "2026-10-08T00:58:00+02:00",
+      "claude_slot": 4
     },
     {
       "slot": 8,
-      "state": "dev",
-      "ticket": 280,
-      "since": "2026-10-08T00:24:00+02:00",
-      "claude_slot": 8
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 9,
@@ -259,17 +259,16 @@
       "state": "busy",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-08T00:24:00+02:00",
+      "since": "2026-10-08T00:46:46+02:00",
       "kind": "external",
       "account": 1
     },
     {
       "slot": 2,
       "state": "busy",
-      "ticket": null,
-      "grok_slot": null,
-      "since": "2026-10-08T00:46:46+02:00",
-      "kind": "external",
+      "ticket": 206,
+      "grok_slot": 3,
+      "since": "2026-10-08T00:58:00+02:00",
       "account": 1
     },
     {
@@ -283,9 +282,9 @@
     {
       "slot": 4,
       "state": "busy",
-      "ticket": 202,
-      "grok_slot": 3,
-      "since": "2026-10-08T00:38:00+02:00",
+      "ticket": 251,
+      "grok_slot": 7,
+      "since": "2026-10-08T00:58:00+02:00",
       "account": 1
     },
     {
@@ -314,19 +313,19 @@
     },
     {
       "slot": 8,
-      "state": "busy",
-      "ticket": 280,
-      "grok_slot": 8,
-      "since": "2026-10-08T00:24:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 2
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 00:52 CEST",
+    "at": "2026-10-08 00:58 CEST",
     "mode": "refill-dev",
-    "triggers": "#301",
-    "started": "#312->C3/A1",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#202 #280",
+    "started": "#206->C2/A1 #251->C4/A1",
+    "note": "spawned 2 worker(s)"
   },
   "totals": {
     "grok": {
@@ -340,9 +339,9 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 8,
-      "free": 0,
-      "external": 2
+      "used": 7,
+      "free": 1,
+      "external": 1
     }
   }
 }
