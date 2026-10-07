@@ -55,8 +55,10 @@ import type { BayId } from '../world/dockBays'
  * 24: the codex slice (#207): its authority reaction answers `codex.OreContacted`,
  *    `codex.OreDiscovered` and `codex.EntryAdded` beside the touch or unit that caused them; its
  *    `codex` player section v1.
+ * 25: travel logs `FeatureUnlocked` for the dock add-on facilities `scanner_station` (P14),
+ *    `research_lab` (P15) and `drone_bay` (P20), now built and shipped (#221, #222).
  */
-export const AUTHORITY_PROTOCOL_VERSION = 24
+export const AUTHORITY_PROTOCOL_VERSION = 25
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
