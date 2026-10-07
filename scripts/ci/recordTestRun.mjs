@@ -4,6 +4,10 @@
 //   METRICS_DIR=<checkout> TEST_REPORT=<vitest json> TEST_JOBS=<actions jobs json> \
 //   TEST_JOB=verify TEST_MODE=scoped TEST_REASON=... node scripts/ci/recordTestRun.mjs
 //
+// The box Tester (claude-sessions/steampunk-loop/tester.sh) sets the same GITHUB_* names itself
+// (run id = epoch ms, so box runs sort after Actions runs) plus TEST_SOURCE=box, TEST_PHASE and
+// TEST_RUN_URL, and passes a one-job jobs file it writes from its own step times.
+//
 // A missing report or jobs file is recorded as such, never an error: the record of a cancelled
 // or crashed run is the one worth having.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -28,7 +32,10 @@ function runContextOf(env, job) {
   return {
     id,
     attempt: Number(env.GITHUB_RUN_ATTEMPT ?? 1),
-    url: `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${id}`,
+    url: env.TEST_RUN_URL || `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${id}`,
+    // box: the loop's Tester on the build box (scripts run outside Actions); actions: older records.
+    source: env.TEST_SOURCE || 'actions',
+    phase: env.TEST_PHASE || null,
     workflow: env.GITHUB_WORKFLOW,
     job: env.TEST_JOB,
     event: env.GITHUB_EVENT_NAME,
