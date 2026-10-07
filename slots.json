@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T23:27:43+02:00",
+  "updated_at": "2026-10-07T23:28:38+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -104,35 +104,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "e4f99735be754147ccef2a80a8be8569007d09da",
-    "since": "2026-10-07T21:27:10Z",
-    "holds_gate": false,
+    "phase": "fast",
+    "sha": "dee7b3719f7e32f90b76cca8b4cb65ded8d780fc",
+    "since": "2026-10-07T21:28:31Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-07T21:00:33Z",
+    "last_run": "2026-10-07T21:28:29Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null,
-    "feature": 198,
-    "feature_title": "P9 attrition: bot wallet reserve, death-replay breaker, then route enemy volume",
+    "feature": 191,
+    "feature_title": "Spec: Vertical-slice test layout with a single test overview",
     "queue": [
-      {
-        "feature": 191,
-        "kind": "spec",
-        "title": "Spec: Vertical-slice test layout with a single test overview",
-        "tickets": [
-          192,
-          229,
-          230,
-          231
-        ],
-        "since": "2026-10-07T18:52:06+02:00"
-      },
       {
         "feature": 141,
         "kind": "spec",
