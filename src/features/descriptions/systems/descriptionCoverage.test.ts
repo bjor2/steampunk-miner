@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../../../systems/authority/authorityState'
 import { listBuyableRefs } from '../../../systems/registries/buyableRefs'
-import type { ItemDescription, ItemRef } from '../../../systems/registries/itemDescriber'
+import {
+  describeItem,
+  type ItemDescription,
+  type ItemRef,
+} from '../../../systems/registries/itemDescriber'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../../../systems/registries/itemDescriptionEntries'
 import { itemSnapshotViewOf } from '../../../systems/registries/itemSnapshotView'
 import { entriesOf } from '../../../systems/registries/seal'
-import { describeItemCard, flavourOf } from './describeItemCard'
+import { flavourOf } from './describeItemCard'
 import { COVERAGE_MAX_PLANET, descriptionCoverageProblems } from './descriptionCoverage'
 import { flavourProblemsOf } from './flavourRules'
 
@@ -15,7 +19,7 @@ const view = itemSnapshotViewOf(
 )
 
 function describeOnPlanetOne(ref: ItemRef): ItemDescription | null {
-  return describeItemCard(ref, { playerId: 'p1', planetIndex: 1, level: ref.grade ?? 1, view })
+  return describeItem(ref, { playerId: 'p1', planetIndex: 1, level: ref.grade ?? 1, view })
 }
 
 const DRILL: ItemRef = { kind: 'track', id: 'drill_power' }

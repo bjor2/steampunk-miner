@@ -1,8 +1,8 @@
 /**
  * The open state of an item card tooltip (#164 G&V input rules, K7 #199): a mouse hover or the
  * browser's focus opens it after `ITEM_CARD_HOVER_MS`; a touch held for `ITEM_CARD_LONG_PRESS_MS`
- * opens it while held, and the click that ends that press is swallowed so no action fires. UI
- * state only, never a command.
+ * opens it while held, with a short haptic tick when the haptics setting is on (#173), and the
+ * click that ends that press is swallowed so no action fires. UI state only, never a command.
  */
 import {
   useEffect,
@@ -12,7 +12,13 @@ import {
   type MouseEvent,
   type PointerEvent,
 } from 'react'
-import { ITEM_CARD_HOVER_MS, ITEM_CARD_LONG_PRESS_MS } from '../../constants/itemCard'
+import {
+  ITEM_CARD_HAPTIC_MS,
+  ITEM_CARD_HOVER_MS,
+  ITEM_CARD_LONG_PRESS_MS,
+} from '../../constants/itemCard'
+import { getShell } from '../../shell/shell'
+import { useGameStore } from '../../store/gameStore'
 
 export interface ItemTooltipHandlers {
   onPointerEnter(event: PointerEvent): void
@@ -41,6 +47,7 @@ export function useItemTooltip(): { isOpen: boolean; handlers: ItemTooltipHandle
   const holdOpen = () => {
     isHeldOpen.current = true
     setIsOpen(true)
+    tickHapticsOnHold()
   }
   return {
     isOpen,
@@ -63,6 +70,10 @@ export function useItemTooltip(): { isOpen: boolean; handlers: ItemTooltipHandle
       onClickCapture: (event) => swallowClickAfterHold(event, isHeldOpen),
     },
   }
+}
+
+function tickHapticsOnHold(): void {
+  if (useGameStore.getState().prefs.haptics) getShell().vibrate(ITEM_CARD_HAPTIC_MS)
 }
 
 function stopTimer(timer: { current: number | null }): void {

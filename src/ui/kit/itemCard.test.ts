@@ -112,11 +112,18 @@ function textOf(html: string): string {
 }
 
 describe('item card: empty fast path', () => {
+  // The baseline is the empty set, not the loaded one: the descriptions slice (#164) registers the
+  // describer, and its rows' contract is the card's (GD and TD locks on #164).
   it('draws exactly today’s screens while no describer is registered', () => {
-    const today = renderToString(upgradeBay(DRILL_BUY))
     const withNone = withRegistrations([], () => renderToString(upgradeBay(DRILL_BUY)))
-    expect(withNone).toBe(today)
-    expect(today).not.toContain('data-item-card')
+    const withEntriesOnly = withRegistrations([MARK_SLICE], () =>
+      renderToString(upgradeBay(DRILL_BUY)),
+    )
+    expect(withEntriesOnly).toBe(withNone)
+    expect(withNone).not.toContain('data-item-card')
+    expect(withNone).toContain(
+      `data-testid="${UI_ID_TEMPLATES.workshopUpgradeLevel('drill_power')}"`,
+    )
   })
 
   it('falls back to the kernel artefact summaries while no describer is registered', () => {

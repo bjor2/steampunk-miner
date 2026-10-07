@@ -555,38 +555,70 @@ const strandedPose = {
   drillTicks: 0,
 }
 
+/** Every UI_IDS id, across the screens and states that show them. */
+function expectEveryIdRendered(): void {
+  const found = new Set<string>()
+  const keep = (ids: string[]) => ids.forEach((id) => found.add(id))
+  keep(renderHud())
+  game().startPlaques()
+  keep(renderPlaques())
+  tap('interact')
+  game().setCoreFragments(63)
+  game().giveMoney('60.8')
+  game().pressScreenButton('platform-travel')
+  keep(renderSellBay())
+  keep(renderUpgradeBay())
+  game().setBindings({ lift: { keyboard: ['KeyE'] } })
+  keep(renderSettings())
+  game().pressScreenButton('platform-travel')
+  tap('interact')
+  keep(renderSellBay())
+  tap('ui_cancel')
+  game().setUpgrade('cargo_hold', 0)
+  game().reportPose(strandedPose)
+  game().setEnergy('0')
+  keep(renderHud())
+  keep(renderFullHoldHud())
+  keep(renderAtArtefactCache())
+  keep(renderWithGuns())
+  keep(renderWithCharges())
+  keep(renderWithHeat())
+  keep(renderRefineryScreens())
+  keep(renderLiningVisit())
+  keep(renderSliceScreen())
+  expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
+}
+
+/** A stand-in describer: what the row draws once any describer answers, not what it says. */
+const DESCRIBER_PROBE: SliceDefinition = {
+  id: 'ids-describer',
+  register: (r) =>
+    r.itemDescriber({
+      id: 'ids-describer.cards',
+      describe: () => ({ flavour: 'A probe.', statLines: [] }),
+    }),
+}
+
 describe('screen ids (#33 acceptance 12)', () => {
+  // The ids are the empty fast path's contract: with a describer registered, a shop row draws as
+  // its item card, whose contract is `data-item-card` plus the buy id (GD and TD locks on #164).
   it('renders every UI_IDS id somewhere with the model value as its text', () => {
-    const found = new Set<string>()
-    const keep = (ids: string[]) => ids.forEach((id) => found.add(id))
-    keep(renderHud())
-    game().startPlaques()
-    keep(renderPlaques())
-    tap('interact')
-    game().setCoreFragments(63)
-    game().giveMoney('60.8')
-    game().pressScreenButton('platform-travel')
-    keep(renderSellBay())
-    keep(renderUpgradeBay())
-    game().setBindings({ lift: { keyboard: ['KeyE'] } })
-    keep(renderSettings())
-    game().pressScreenButton('platform-travel')
-    tap('interact')
-    keep(renderSellBay())
-    tap('ui_cancel')
-    game().setUpgrade('cargo_hold', 0)
-    game().reportPose(strandedPose)
-    game().setEnergy('0')
-    keep(renderHud())
-    keep(renderFullHoldHud())
-    keep(renderAtArtefactCache())
-    keep(renderWithGuns())
-    keep(renderWithCharges())
-    keep(renderWithHeat())
-    keep(renderRefineryScreens())
-    keep(renderLiningVisit())
-    keep(renderSliceScreen())
-    expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
+    withRegistrations([], expectEveryIdRendered)
+  })
+
+  it('draws each Upgrade bay row as its item card, carrying the buy id, once a describer answers', () => {
+    game().giveMoney('1e6')
+    game().teleportToDock('upgrade')
+    const model = readUpgradeBayModel()
+    const html = withRegistrations([DESCRIBER_PROBE], () =>
+      renderToString(
+        createElement(UpgradeBayView, { model: readUpgradeBayModel(), focusedId: '' }),
+      ),
+    )
+    for (const buy of [...model.tracks.map((row) => row.buy), model.casing.buy]) {
+      expect(html).toMatch(new RegExp(`data-item-card="[^"]+"[^>]*data-testid="${buy.id}"`))
+    }
+    expect(textOfTestId(html, UI_IDS.upgradebayCasing)).toBeNull()
   })
 
   it('marks the preview with the focused track and the tier after its purchase, digest untouched', () => {

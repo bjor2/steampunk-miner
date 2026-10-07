@@ -8,3 +8,5 @@
 export const ITEM_CARD_HOVER_MS = 250
 /** A touch held this long shows the card while held; releasing it fires no action. */
 export const ITEM_CARD_LONG_PRESS_MS = 400
+/** The tick felt when a long press opens a card, under the #173 haptics setting (G&V on #164). */
+export const ITEM_CARD_HAPTIC_MS = 10

@@ -713,6 +713,12 @@
           "issues": [37, 40]
         },
         {
+          "title": "Item cards",
+          "description": "Every shop entry, platform card and service tooltip shows a one-line flavour text and live stats: now, next, the change and its share, and the cap still to gain. Tap opens a card and a second tap buys; hover, focus or a touch hold shows a tooltip.",
+          "status": "built",
+          "issues": [164, 199]
+        },
+        {
           "title": "Platform grows",
           "description": "The outpost hub gains a glowing core drive with a fill gauge when the core quota is met, then the Refinery bay from planet 3.",
           "status": "built",
