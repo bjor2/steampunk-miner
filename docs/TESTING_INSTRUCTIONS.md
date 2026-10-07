@@ -120,7 +120,10 @@ offset?)` (offset in whole tiles from the vehicle), `clearEnemies()`, `freezeEne
   (`{ rigidBodies, colliders, wasmBytes }` of the running Rapier world; `wasmBytes` is Rapier's WASM
   memory, seen as Rapier loads in a debug run) and `ui.getRendererMemory()` (`{ geometries, textures,
 programs }` from three's `renderer.info` of the game canvas), read only when called, for the memory
-  soak (#99); both refuse while nothing is mounted. Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first
+  soak (#99); both refuse while nothing is mounted; for snapshots (#123), `exportSnapshots()` (a
+  promise: in a browser it downloads the kept runs' saves and screenshots from IndexedDB as one
+  uncompressed zip and answers `{ file, bytes, entries }`; Electron refuses, its snapshots are files
+  under `logs/<runId>/`). Collapse specs build a weak band-2 tunnel or dig one with `collapse/collapseFixtures.ts`. Specs that mine deep (where crawlers live) freeze enemies first
   (`FREEZE_ENEMIES` in `scriptedSession.ts`); combat specs fight in the band-1 corridor of
   `combat/combatFixtures.ts`, where no spawn point is in reach. The `ui` namespace (`ui.setCameraMode('rotating' | 'fixed')`, `ui.setPref(name, value)`,
   `ui.getPrefs()`, `ui.getHudModel()`, `ui.getSellBayModel()`, `ui.getUpgradeBayModel()`, `ui.getRefineryBayModel()` (#105), `ui.getBayPresentation()`, `ui.getAudioModel()`, `ui.getScreenLayout()` (#173: the stage, `--ui-scale`, the TV safe inset, the smallest control and the bay-screen text size)) reads the
@@ -347,6 +350,16 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `--enable-precise-memory-info` (the soak passes it): without the flag the heap fields stay flat for
   minutes. A browser without `performance.memory` writes no `memory_sample`. `e2e/browser/memorySample.spec.ts`
   checks the lines of a real `?debug` session against the schema.
+- **Snapshots** (#123, debug runs only: dev, `?debug`, `--debug-api`; a plain `?scenario=` run keeps
+  none): every slot save is copied to `snapshots/save-<tick>.json` and `checkpoint_saved` names it in
+  `file`; a save every 5 minutes of frames and at page hide, a heap snapshot each time the heap
+  climbs another 50 MB above the first `memory_sample`, and a screenshot of the canvas on a planet
+  change and on the first second of a frame budget breach each log one `snapshot_written`
+  (`kind`, `trigger`, `file`, `bytes`). Electron writes them under `logs/<runId>/` and takes the
+  `.heapsnapshot` in the main process; a browser keeps the newest three runs in IndexedDB and its
+  heap step logs a line with no file (a CDP harness takes its own). The triggers are pure
+  (`src/systems/snapshots/`), the writer is tested with memory fakes (`store/runSnapshots.test.ts`)
+  and `e2e/browser/snapshots.spec.ts` checks a planet change, a dock and the zip on the preview build.
 
 ## 6. Before every commit
 
