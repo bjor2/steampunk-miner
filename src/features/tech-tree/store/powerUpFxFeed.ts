@@ -24,8 +24,9 @@ export function clearFxStarts(): void {
   queued.length = 0
 }
 
-/** Plays the item's effects at the vehicle's tile; nothing in the world changes. */
-export function previewFxAtVehicle(itemId: string): void {
+/** Plays the item's effects at the vehicle's tile as a use at `mark`; nothing in the world changes. */
+export function previewFxAtVehicle(itemId: string, mark: number): void {
   // A tile is a metre (#4), so the vehicle's tile is its drawn position floored.
-  queued.push({ itemId, tx: Math.floor(vehiclePresence.x), ty: Math.floor(vehiclePresence.y) })
+  const [tx, ty] = [Math.floor(vehiclePresence.x), Math.floor(vehiclePresence.y)]
+  queued.push({ itemId, tx, ty, mark })
 }

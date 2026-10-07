@@ -81,3 +81,30 @@ describe('mark plate', () => {
     expect(marks).toEqual([])
   })
 })
+
+describe('mark plate: milestone studs (ticket 277)', () => {
+  it('sets a gilt stud over the rivet of each milestone reached, so the plate steps at Marks 3, 6 and 9', () => {
+    expect(platesAt([SHIELD], 2)[0]?.studs).toEqual([])
+    const [atThree] = platesAt([SHIELD], 3)
+    expect(atThree?.milestoneMarks).toEqual([3])
+    expect(atThree?.studs).toEqual([atThree?.rivets[2]])
+    expect(platesAt([SHIELD], 5)[0]?.studs).toHaveLength(1)
+    const [atNine] = platesAt([SHIELD], 9)
+    expect(atNine?.milestoneMarks).toEqual([3, 6, 9])
+    expect(atNine?.studs).toEqual([atNine?.rivets[2], atNine?.rivets[5], atNine?.rivets[8]])
+    expect(atNine?.rivets).toHaveLength(9)
+  })
+
+  it('gives a plate no stud when its item reached no milestone, whatever its Mark', () => {
+    const unreached: CradleMark = {
+      itemId: 'power.steam_shield',
+      slot: 'powerup.1',
+      mark: 9,
+      isGilded: false,
+      milestoneMarks: [],
+    }
+    const [plate] = markPlatesOf(vehicle, [], [unreached])
+    expect(plate?.rivets).toHaveLength(9)
+    expect(plate?.studs).toEqual([])
+  })
+})

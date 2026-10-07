@@ -4,9 +4,10 @@
  * command, so they replay and log `debug_command_applied` and never count as play;
  * `shapeProblems()` prints the shape test over the registered tree; `getUnlocked()` reads the
  * local player's researched nodes for specs. `getRig()` reads what the rig draws now (ticket 250):
- * the mounted items, each asset at its point, each cradle's Mark plate and the power-up effects
- * running; `previewPowerUpFx(itemId)` plays an item's effects at the vehicle through the real
- * layer, presentation only: no command and no log line.
+ * the mounted items, each asset at its point, each cradle's Mark plate with its milestone studs,
+ * and the power-up effects running with their looks (ticket 277); `previewPowerUpFx(itemId, mark?)`
+ * plays an item's effects at the vehicle through the real layer, at the Mark the item acts at
+ * unless `mark` says otherwise, presentation only: no command and no log line.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
@@ -18,8 +19,9 @@ import { iconUrlOf } from '../../ui/vectorIcons'
 import { powerUpFxPresence } from './scene/powerUpFxPresence'
 import { previewFxAtVehicle } from './store/powerUpFxFeed'
 import { readCarriedRig, rigSightOfCarried } from './store/rigReads'
+import { researchedMarkOf } from './systems/itemMarks'
 import type { MarkPlate } from './systems/render/markPlate'
-import { activeFxIdsOf } from './systems/render/powerUpFxFeed'
+import { activeFxIdsOf, activeFxLooksOf } from './systems/render/powerUpFxFeed'
 import type { RigMount } from './systems/render/rigGear'
 import { powerUpFxOfItem } from './systems/render/techGear'
 import { registeredTechTree, unlockAllPlanetOf } from './systems/techTree'
@@ -38,7 +40,7 @@ export const techTreeDebugActions: Readonly<Record<string, DebugAction>> = {
     unlocked: unlockedNodeIdsOf(readAuthorityState(), useGameStore.getState().playerId),
   }),
   getRig: () => readRig(),
-  previewPowerUpFx: (itemId) => previewItemFx(itemId),
+  previewPowerUpFx: (itemId, mark) => previewItemFx(itemId, mark),
 }
 
 function readRig() {
@@ -60,22 +62,35 @@ function listedMount(mount: RigMount) {
 
 function listedPlate(plate: MarkPlate) {
   const { slot, itemId, mark, isGilded } = plate
-  return { slot, itemId, mark, isGilded, rivets: plate.rivets.length }
+  return { slot, itemId, mark, isGilded, rivets: plate.rivets.length, studs: plate.studs.length }
 }
 
 function readFx() {
   const runs = powerUpFxPresence.runs
   return runs === null
-    ? { isDrawn: false, started: 0, active: [] }
-    : { isDrawn: true, started: runs.started, active: activeFxIdsOf(runs) }
+    ? { isDrawn: false, started: 0, active: [], looks: [] }
+    : {
+        isDrawn: true,
+        started: runs.started,
+        active: activeFxIdsOf(runs),
+        looks: activeFxLooksOf(runs),
+      }
 }
 
-function previewItemFx(itemId: unknown): DebugResult {
+function previewItemFx(itemId: unknown, mark: unknown): DebugResult {
   if (typeof itemId !== 'string' || powerUpFxOfItem(itemId).length === 0) {
     return { ok: false, problems: [`${String(itemId)} has no power-up effect`] }
   }
-  previewFxAtVehicle(itemId)
+  if (mark !== undefined && !Number.isInteger(mark)) {
+    return { ok: false, problems: [`${String(mark)} is not a Mark`] }
+  }
+  previewFxAtVehicle(itemId, mark === undefined ? actingMarkOf(itemId) : (mark as number))
   return { ok: true }
+}
+
+/** The Mark a use of the item would act at: the researched Mark, 0 for none (#249). */
+function actingMarkOf(itemId: string): number {
+  return researchedMarkOf(readAuthorityState(), useGameStore.getState().playerId, itemId)
 }
 
 function grantThrough(planetIndex: number) {

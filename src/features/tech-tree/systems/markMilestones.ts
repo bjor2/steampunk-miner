@@ -52,6 +52,11 @@ export function yieldMilestonesOf(ladder: MarkLadder): MarkMilestone[] {
   return (ladder.milestones ?? []).filter((milestone) => isYieldMilestone(ladder, milestone))
 }
 
+/** The ladder's milestones researched at `mark`, in ladder order; none for an item with no ladder. */
+export function reachedMilestonesOf(ladder: MarkLadder | null, mark: number): MarkMilestone[] {
+  return (ladder?.milestones ?? []).filter((milestone) => milestone.mark <= mark)
+}
+
 /** The first milestone above `mark`, the one the next Marks lead to; null with none ahead. */
 export function nextMilestoneOf(ladder: MarkLadder, mark: number): MarkMilestone | null {
   const inMarkOrder = [...(ladder.milestones ?? [])].sort((a, b) => a.mark - b.mark)

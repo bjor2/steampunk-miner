@@ -1,22 +1,25 @@
 /**
  * The brass Mark plate under a cradle (#161 Systems, ticket 250): a plate, a gilded rim once the
- * item is Mastered, and one rivet per Mark from `markPlatesOf`. Not a Blender asset: three flat
- * shapes lit like the placeholders (#48 lit brass), the rivets one instanced draw.
+ * item is Mastered, one rivet per Mark and a gilt stud over each reached milestone's rivet (ticket
+ * 277) from `markPlatesOf`. Not a Blender asset: flat shapes lit like the placeholders (#48 lit
+ * brass), the rivets one instanced draw and the studs another.
  */
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { Object3D, type InstancedMesh } from 'three'
-import type { MarkPlate } from '../systems/render/markPlate'
+import { GILT_COLOUR, type MarkPlate } from '../systems/render/markPlate'
 
 /** Over the cradle housing's draw order (6) on the body's layer (0.1, 0.01 an order step). */
 const PLATE_Z = 0.165
 const RIVET_Z = 0.001
+const STUD_Z = 0.002
 const RIM_Z = -0.001
-/** A darker brass than the gilt rim, which is the kit's `--color-brass`, the tree's Mastered chip. */
+/** A darker brass than the gilt rim and studs. */
 const BRASS = '#9a7432'
-const GILT = '#c9a24b'
 const RIVET_COLOUR = '#5a4320'
 const RIM_M = 0.012
 const RIVET_RADIUS_M = 0.005
+/** A stud covers its rivet and most of the pitch between rivets, so a milestone reads at a glance. */
+const STUD_RADIUS_M = 0.008
 const PLATE_ROUGHNESS = 0.45
 const RIVET_SEGMENTS = 8
 
@@ -29,7 +32,8 @@ export function MarkPlateMesh({ plate }: { plate: MarkPlate }) {
         <planeGeometry args={[width, height]} />
         <meshStandardMaterial color={BRASS} roughness={PLATE_ROUGHNESS} />
       </mesh>
-      <Rivets rivets={plate.rivets} />
+      <Dots at={plate.rivets} radius={RIVET_RADIUS_M} colour={RIVET_COLOUR} z={RIVET_Z} />
+      <Dots at={plate.studs} radius={STUD_RADIUS_M} colour={GILT_COLOUR} z={STUD_Z} />
     </group>
   )
 }
@@ -38,35 +42,49 @@ function GiltRim({ width, height }: { width: number; height: number }) {
   return (
     <mesh position={[0, 0, RIM_Z]}>
       <planeGeometry args={[width + RIM_M, height + RIM_M]} />
-      <meshStandardMaterial color={GILT} roughness={PLATE_ROUGHNESS} />
+      <meshStandardMaterial color={GILT_COLOUR} roughness={PLATE_ROUGHNESS} />
     </mesh>
   )
 }
 
-function Rivets({ rivets }: { rivets: MarkPlate['rivets'] }) {
+interface DotsProps {
+  at: MarkPlate['rivets']
+  radius: number
+  colour: string
+  z: number
+}
+
+/** The rivets, or the studs: one instanced draw of flat discs. Nothing with none to draw. */
+function Dots({ at, radius, colour, z }: DotsProps) {
   const mesh = useRef<InstancedMesh>(null)
   const piece = useMemo(() => new Object3D(), [])
-  useLayoutEffect(() => placeRivets(mesh.current, piece, rivets), [piece, rivets])
+  useLayoutEffect(() => placeDots(mesh.current, piece, at, z), [piece, at, z])
+  if (at.length === 0) return null
   return (
-    // A new Mark is a new count: keyed on it, the mesh is rebuilt with room for every rivet.
+    // A new Mark is a new count: keyed on it, the mesh is rebuilt with room for every disc.
     <instancedMesh
-      key={rivets.length}
+      key={at.length}
       ref={mesh}
-      args={[undefined, undefined, rivets.length]}
+      args={[undefined, undefined, at.length]}
       frustumCulled={false}
     >
-      <circleGeometry args={[RIVET_RADIUS_M, RIVET_SEGMENTS]} />
-      <meshStandardMaterial color={RIVET_COLOUR} roughness={PLATE_ROUGHNESS} />
+      <circleGeometry args={[radius, RIVET_SEGMENTS]} />
+      <meshStandardMaterial color={colour} roughness={PLATE_ROUGHNESS} />
     </instancedMesh>
   )
 }
 
-function placeRivets(mesh: InstancedMesh | null, piece: Object3D, rivets: MarkPlate['rivets']) {
+function placeDots(
+  mesh: InstancedMesh | null,
+  piece: Object3D,
+  at: MarkPlate['rivets'],
+  z: number,
+) {
   if (mesh === null) return
-  rivets.forEach(([x, y], at) => {
-    piece.position.set(x, y, RIVET_Z)
+  at.forEach(([x, y], index) => {
+    piece.position.set(x, y, z)
     piece.updateMatrix()
-    mesh.setMatrixAt(at, piece.matrix)
+    mesh.setMatrixAt(index, piece.matrix)
   })
   mesh.instanceMatrix.needsUpdate = true
 }

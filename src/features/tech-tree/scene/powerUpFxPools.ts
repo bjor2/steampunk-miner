@@ -1,8 +1,9 @@
 /**
  * The power-up effects' fixed pools (ticket 250): one point pool per effect run, each tinted the
- * colour of the effect it draws (#166 `POWER_UP_FX`), so four effects at once cost four draw calls
- * however many motes they hold. Emitting, stepping and uploading never allocate. Presentation
- * only, on the render delta with its own seed.
+ * colour of the effect it draws (#166 `POWER_UP_FX`) and sized as its run's milestone look says
+ * (ticket 277), so four effects at once cost four draw calls however many motes they hold.
+ * Emitting, stepping and uploading never allocate. Presentation only, on the render delta with its
+ * own seed.
  */
 import { AdditiveBlending, BufferAttribute, BufferGeometry, PointsMaterial } from 'three'
 import { drillPresence } from '../../../scene/drillPresence'
@@ -43,8 +44,8 @@ export interface PowerUpFxPools {
   pools: ParticlePool[]
   geometries: BufferGeometry[]
   materials: PointsMaterial[]
-  /** The colour each material shows, so it is set only when its run changes effect. */
-  tints: string[]
+  /** The look each material shows, so it is set only when its run changes effect or Mark. */
+  looks: string[]
   random: SeededRandom
   /** Scratch: one mote's spray and the hull this frame. */
   spray: Spray
@@ -57,7 +58,7 @@ export function createPowerUpFxPools(): PowerUpFxPools {
     pools: Array.from({ length: FX_RUNS }, () => createParticlePool(FX_POOL_CAPACITY)),
     geometries: Array.from({ length: FX_RUNS }, createPointGeometry),
     materials: Array.from({ length: FX_RUNS }, createMoteMaterial),
-    tints: Array.from({ length: FX_RUNS }, () => ''),
+    looks: Array.from({ length: FX_RUNS }, () => ''),
     random: createSeededRandom(POWER_UP_FX_SEED),
     spray: { x: 0, y: 0, dirX: 0, dirY: 1, speed: 0, spreadRadians: 0, lifeSeconds: 0 },
     hull: { x: 0, y: 0, aheadX: 1, aheadY: 0 },
@@ -79,7 +80,7 @@ export function stepPowerUpFx(fx: PowerUpFxPools, dt: number): void {
   for (let at = 0; at < FX_RUNS; at++) stepRun(fx, at, dt)
 }
 
-/** Uploads this frame's motes, each pool tinted its run's effect. */
+/** Uploads this frame's motes, each pool tinted and sized as its run's look says. */
 export function drawPowerUpFx(fx: PowerUpFxPools): void {
   for (let at = 0; at < FX_RUNS; at++) drawRun(fx, at)
 }
@@ -105,15 +106,21 @@ function emitMote(fx: PowerUpFxPools, run: FxRun, pool: ParticlePool): void {
 }
 
 function drawRun(fx: PowerUpFxPools, at: number): void {
-  tintPool(fx, at, fx.runs.runs[at])
+  dressPool(fx, at, fx.runs.runs[at])
   uploadPoints(fx.pools[at], fx.geometries[at])
 }
 
-/** A freed run keeps its tint while its last motes die out. */
-function tintPool(fx: PowerUpFxPools, at: number, run: FxRun): void {
-  if (run.fx === null || fx.tints[at] === run.fx.colour) return
-  fx.tints[at] = run.fx.colour
-  fx.materials[at].color.set(run.fx.colour)
+/** A freed run keeps its look while its last motes die out. */
+function dressPool(fx: PowerUpFxPools, at: number, run: FxRun): void {
+  const look = lookKeyOf(run)
+  if (run.fx === null || fx.looks[at] === look) return
+  fx.looks[at] = look
+  fx.materials[at].color.set(run.look.colour)
+  fx.materials[at].size = MOTE_SIZE_PIXELS * run.look.moteScale
+}
+
+function lookKeyOf(run: FxRun): string {
+  return `${run.look.colour} ${run.look.moteScale}`
 }
 
 function uploadPoints(pool: ParticlePool, geometry: BufferGeometry): void {

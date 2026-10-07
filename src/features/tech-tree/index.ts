@@ -29,6 +29,7 @@ export {
   MILESTONE_MARKS,
   milestonesOf,
   nextMilestoneOf,
+  reachedMilestonesOf,
   type MilestoneClass,
   type MilestoneVerbs,
 } from './systems/markMilestones'
@@ -75,6 +76,13 @@ export {
   vehicleGearQuadsOf,
 } from './systems/render/techGearQuads'
 export type { FxFrame } from './systems/render/powerUpFx'
+export {
+  fxLookOf,
+  MILESTONE_FX_ELEMENTS,
+  plainLookOf,
+  type FxElement,
+  type FxLook,
+} from './systems/render/milestoneLook'
 export {
   flareShellPointOf,
   fxFrameOf,

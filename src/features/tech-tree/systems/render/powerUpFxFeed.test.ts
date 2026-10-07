@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest'
 import type { DomainEvent } from '../../../../systems/authority/domainEvent'
 import type { Spray } from '../../../../systems/render/particles'
 import { createSeededRandom } from '../../../../systems/seededRandom'
+import { markLadderOfItem } from '../itemMarks'
+import { reachedMilestonesOf } from '../markMilestones'
+import { fxLookOf, plainLookOf } from './milestoneLook'
 import {
   activeFxIdsOf,
   advanceFxRun,
@@ -19,14 +22,14 @@ import {
 const SHIELD = 'power.steam_shield'
 const BOOST = 'power.steam_boost'
 
-function used(itemId: string, toggledOn?: boolean): DomainEvent {
+function used(itemId: string, toggledOn?: boolean, mark = 0): DomainEvent {
   return {
     type: 'power-up-core.PowerUpUsed',
     tick: 10,
     playerId: 'p1',
     itemId,
     slot: 'powerup.1',
-    mark: 0,
+    mark,
     originTx: 4,
     originTy: -7,
     chargesLeft: 1,
@@ -45,10 +48,10 @@ function hullDrillingDown(): FxHull {
   return hull
 }
 
-/** Starts one use of the item and plays it `seconds` on at `fps`. */
-function runOf(itemId: string, seconds = 0, fps = 60): FxRun {
+/** Starts one use of the item at `mark` and plays it `seconds` on at `fps`. */
+function runOf(itemId: string, seconds = 0, fps = 60, mark = 0): FxRun {
   const runs = createFxRuns()
-  startItemFx(runs, { itemId, tx: 4, ty: -7 })
+  startItemFx(runs, { itemId, tx: 4, ty: -7, mark })
   const run = runs.runs[0]!
   for (let frame = 0; frame < Math.round(seconds * fps); frame++) advanceFxRun(run, 1 / fps)
   return run
@@ -61,11 +64,11 @@ function moteOf(run: FxRun, hull: FxHull): Spray {
 }
 
 describe('power-up fx feed', () => {
-  it('draws every use in a batch of events, and nothing for a toggle switched off', () => {
-    const events = [used(SHIELD), used(BOOST, false), used(BOOST, true)]
+  it('draws every use in a batch of events at the Mark it acted at, and nothing for a toggle switched off', () => {
+    const events = [used(SHIELD, undefined, 6), used(BOOST, false), used(BOOST, true)]
     expect(fxStartsOf(events)).toEqual([
-      { itemId: SHIELD, tx: 4, ty: -7 },
-      { itemId: BOOST, tx: 4, ty: -7 },
+      { itemId: SHIELD, tx: 4, ty: -7, mark: 6 },
+      { itemId: BOOST, tx: 4, ty: -7, mark: 0 },
     ])
   })
 
@@ -78,7 +81,7 @@ describe('power-up fx feed', () => {
   it('replaces the oldest effect once every run is busy', () => {
     const runs = createFxRuns()
     const items = [SHIELD, BOOST, SHIELD, BOOST, SHIELD]
-    items.forEach((itemId) => startItemFx(runs, { itemId, tx: 0, ty: 0 }))
+    items.forEach((itemId) => startItemFx(runs, { itemId, tx: 0, ty: 0, mark: 0 }))
     expect(runs.started).toBe(items.length)
     expect(runs.runs.map((run) => run.startedAt).sort()).toEqual([1, 2, 3, 4])
     expect(activeFxIdsOf(runs)).toHaveLength(FX_RUNS)
@@ -86,7 +89,7 @@ describe('power-up fx feed', () => {
 
   it('starts nothing for an item with no effect', () => {
     const runs = createFxRuns()
-    startItemFx(runs, { itemId: 'power.grav_anchor', tx: 0, ty: 0 })
+    startItemFx(runs, { itemId: 'power.grav_anchor', tx: 0, ty: 0, mark: 0 })
     expect(activeFxIdsOf(runs)).toEqual([])
   })
 
@@ -132,5 +135,29 @@ describe('power-up fx feed', () => {
     const hull = { x: 1, y: 1, aheadX: 0, aheadY: 0 }
     aimHullAt(hull, 1, 1)
     expect([hull.aheadX, hull.aheadY]).toEqual([1, 0])
+  })
+
+  it('draws a use below Mark 3 in the table look, so a run with no milestone researched looks as it did', () => {
+    for (const mark of [0, 1, 2]) {
+      const run = runOf(SHIELD, 1, 60, mark)
+      expect(run.look).toEqual(plainLookOf(run.fx!))
+      expect(motesDue(run, 1 / 2)).toBe(24 * 8 * (1 / 2))
+    }
+  })
+
+  it('dresses a use at a milestone Mark in that milestone look: Mark 6 owes twice the motes (ticket 277)', () => {
+    const atSix = runOf(SHIELD, 1, 60, 6)
+    const reached = reachedMilestonesOf(markLadderOfItem(SHIELD), 6)
+    expect(reached.map(({ mark }) => mark)).toEqual([3, 6])
+    expect(atSix.look).toEqual(fxLookOf(atSix.fx!, reached))
+    expect(atSix.look.strandScale).toBe(2)
+    expect(motesDue(atSix, 1 / 2)).toBe(2 * 24 * 8 * (1 / 2))
+    expect(runOf(SHIELD, 1, 60, 9).look.moteScale).toBe(2)
+  })
+
+  it('reads the ladder it is handed, so an item with no milestones draws plain at any Mark', () => {
+    const runs = createFxRuns()
+    startItemFx(runs, { itemId: SHIELD, tx: 0, ty: 0, mark: 9 }, () => null)
+    expect(runs.runs[0]!.look).toEqual(plainLookOf(runs.runs[0]!.fx!))
   })
 })

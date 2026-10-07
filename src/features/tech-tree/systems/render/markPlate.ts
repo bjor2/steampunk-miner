@@ -4,12 +4,15 @@
  * `powerup.n` slot gets a plate hung flush under what the cradle draws at its `hull.powerup.n`
  * point, with one rivet per Mark in rows of five, so the plate grows a row every fifth Mark. Its
  * place comes from the sidecar point and the housing's own quads, never an offset of its own.
+ * Each Mark milestone the item has reached (the GD lock on #256, ticket 277) is a gilt stud over
+ * that Mark's rivet, so the plate steps visibly at Marks 3, 6 and 9, not only by one more rivet.
  * Render-only.
  */
 import { attachPointOf, type Pair, type PartsSidecar } from '../../../../systems/art/partsSidecar'
 import { slotAttachPointOf } from '../../../../systems/registries/vehicleAttach'
 import type { LoadoutSlotId } from '../../../../systems/registries/vehicleLoadout'
 import { isMasteredAt } from '../markLadder'
+import { reachedMilestonesOf } from '../markMilestones'
 import type { ItemUnlock } from '../techNode'
 import { markBearerOfItem, type TechTree } from '../techTree'
 import type { RigMount } from './rigGear'
@@ -21,6 +24,9 @@ import type { GearQuad, MountedItem } from './techGearQuads'
  * act at.
  */
 export const BOUGHT_MARK = 1
+
+/** The kit's `--color-brass`, the tree's Mastered chip: the plate's rim and its milestone studs. */
+export const GILT_COLOUR = '#c9a24b'
 
 /** A plate as wide as two cradle pitches leave room for; a row holds five rivets. */
 const PLATE_WIDTH_M = 0.1
@@ -34,6 +40,8 @@ export interface CradleMark {
   slot: LoadoutSlotId
   mark: number
   isGilded: boolean
+  /** The Marks of the milestones reached at `mark`, each a stud on the plate. */
+  milestoneMarks: number[]
 }
 
 export interface MarkPlate extends CradleMark {
@@ -42,6 +50,8 @@ export interface MarkPlate extends CradleMark {
   size: Pair
   /** One per Mark, from the plate's centre, the top row first. */
   rivets: Pair[]
+  /** One per reached milestone, over that Mark's rivet. */
+  studs: Pair[]
 }
 
 /** The Mark each item acts at: the highest researched, and Mark 1 for an item researched none of. */
@@ -65,7 +75,9 @@ export function cradleMarksOf(
     const ladder = markBearerOfItem(tree, item.itemId)?.ladder
     if (ladder === undefined || !isCradle(item.slot)) return []
     const mark = markOf(item.itemId)
-    return [{ itemId: item.itemId, slot: item.slot, mark, isGilded: isMasteredAt(ladder, mark) }]
+    const milestoneMarks = reachedMilestonesOf(ladder, mark).map((milestone) => milestone.mark)
+    const isGilded = isMasteredAt(ladder, mark)
+    return [{ itemId: item.itemId, slot: item.slot, mark, isGilded, milestoneMarks }]
   })
 }
 
@@ -103,11 +115,13 @@ function bottomMiddleOf(quads: readonly GearQuad[]): Pair {
 
 function plateOf(cradleMark: CradleMark, [x, top]: Pair): MarkPlate {
   const height = rowsOf(cradleMark.mark) * ROW_HEIGHT_M
+  const rivets = rivetsOf(cradleMark.mark, height)
   return {
     ...cradleMark,
     centre: [x, top - height / 2],
     size: [PLATE_WIDTH_M, height],
-    rivets: rivetsOf(cradleMark.mark, height),
+    rivets,
+    studs: studsOf(cradleMark.milestoneMarks, rivets),
   }
 }
 
@@ -121,5 +135,13 @@ function rivetsOf(mark: number, height: number): Pair[] {
     const row = Math.floor(at / RIVETS_PER_ROW)
     const middleColumn = (RIVETS_PER_ROW - 1) / 2
     return [(column - middleColumn) * RIVET_PITCH_M, height / 2 - (row + 1 / 2) * ROW_HEIGHT_M]
+  })
+}
+
+/** A milestone's stud sits over the rivet of its Mark. */
+function studsOf(milestoneMarks: readonly number[], rivets: readonly Pair[]): Pair[] {
+  return milestoneMarks.flatMap((mark) => {
+    const rivet = rivets[mark - 1]
+    return rivet === undefined ? [] : [rivet]
   })
 }

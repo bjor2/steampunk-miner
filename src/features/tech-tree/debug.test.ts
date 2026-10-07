@@ -74,8 +74,22 @@ describe('tech tree: the rig debug read (ticket 250)', () => {
       'hull.rear vehicle-rack-crates',
     ])
     expect(rig.plates).toEqual([
-      { slot: 'powerup.1', itemId: 'power.steam_shield', mark: 1, isGilded: false, rivets: 1 },
-      { slot: 'powerup.2', itemId: 'power.grapple_winch', mark: 1, isGilded: false, rivets: 1 },
+      {
+        slot: 'powerup.1',
+        itemId: 'power.steam_shield',
+        mark: 1,
+        isGilded: false,
+        rivets: 1,
+        studs: 0,
+      },
+      {
+        slot: 'powerup.2',
+        itemId: 'power.grapple_winch',
+        mark: 1,
+        isGilded: false,
+        rivets: 1,
+        studs: 0,
+      },
     ])
   })
 
@@ -99,12 +113,24 @@ describe('tech tree: the rig debug read (ticket 250)', () => {
     expect(plates.map(({ isGilded }) => isGilded)).toEqual([true, true])
   })
 
-  it('reports no effect drawn while no scene has mounted the effects layer', () => {
-    expect(actions.getRig()).toMatchObject({ fx: { isDrawn: false, started: 0, active: [] } })
+  it('studs each plate once per milestone its item reached, and not before (ticket 277)', () => {
+    slotShieldAndWinch()
+    expect(actions.jumpToDepth(masteredDepthOf(CRADLED))).toEqual({ ok: true })
+    const { plates } = actions.getRig() as { ok: true; plates: { studs: number }[] }
+    expect(plates.map(({ studs }) => studs)).toEqual(CRADLED.map(milestoneCountOf))
+    expect(plates.every(({ studs }) => studs === 3)).toBe(true)
   })
 
-  it('previews an item with an effect and refuses one without', () => {
+  it('reports no effect drawn while no scene has mounted the effects layer', () => {
+    expect(actions.getRig()).toMatchObject({
+      fx: { isDrawn: false, started: 0, active: [], looks: [] },
+    })
+  })
+
+  it('previews an item with an effect, at its acting Mark or a given one, and refuses one without', () => {
     expect(actions.previewPowerUpFx('power.steam_boost')).toEqual({ ok: true })
+    expect(actions.previewPowerUpFx('power.steam_boost', 6)).toEqual({ ok: true })
+    expect(actions.previewPowerUpFx('power.steam_boost', 'six')).toMatchObject({ ok: false })
     expect(actions.previewPowerUpFx('power.grav_anchor')).toMatchObject({ ok: false })
   })
 })
@@ -125,4 +151,8 @@ function masteredDepthOf(itemIds: readonly string[]): number {
     return bearer === null ? [] : [markTierOf(bearer, bearer.lastMark)]
   })
   return Math.max(...tiers)
+}
+
+function milestoneCountOf(itemId: string): number {
+  return markBearerOfItem(registeredTechTree(), itemId)?.ladder.milestones?.length ?? 0
 }

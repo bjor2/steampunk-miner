@@ -3,13 +3,19 @@
  * `POWER_UP_FX` and `fxFrameOf`, drawn by the kernel's procedural particles, #51). Each use of an
  * item starts its effects on one of a few runs, the oldest replaced when all are busy; each frame
  * a run owes motes at the rate its frame's strands and strength set, placed at the frame's reach
- * around where its kind is anchored and flowing in or out as its kind moves. Presentation only:
- * time is the render delta in ticks, nothing here reaches the authority, the log or a digest.
+ * around where its kind is anchored and flowing in or out as its kind moves. A use at a Mark that
+ * has reached a milestone draws with that milestone's look (`milestoneLook.ts`, ticket 277).
+ * Presentation only: time is the render delta in ticks, nothing here reaches the authority, the
+ * log or a digest.
  */
 import { TICKS_PER_SECOND } from '../../../../constants/physics'
 import type { DomainEvent } from '../../../../systems/authority/domainEvent'
 import { particlesDue, type EmissionCarry, type Spray } from '../../../../systems/render/particles'
 import type { SeededRandom } from '../../../../systems/seededRandom'
+import { markLadderOfItem } from '../itemMarks'
+import { reachedMilestonesOf } from '../markMilestones'
+import type { MarkLadder } from '../techNode'
+import { fxLookOf, type FxLook } from './milestoneLook'
 import { writeFlareShellPoint, writeFxFrame, type FxFrame } from './powerUpFx'
 import { powerUpFxOfItem, type FxKind, type PowerUpFx } from './techGear'
 
@@ -69,6 +75,8 @@ export interface FxHull {
 /** One effect being drawn, or a free run when `fx` is null. */
 export interface FxRun {
   fx: PowerUpFx | null
+  /** How the motes draw: the table's look, changed by each milestone the use's Mark reached. */
+  look: FxLook
   ticks: number
   /** The centre of the tile the item was used on, metres. */
   originX: number
@@ -86,12 +94,16 @@ export interface FxRuns {
   started: number
 }
 
-/** A use the layer draws: the item and the tile it was used on. */
+/** A use the layer draws: the item, the tile it was used on and the Mark it acted at (#249). */
 export interface FxStart {
   itemId: string
   tx: number
   ty: number
+  mark: number
 }
+
+/** The ladder a use's item steps, so a spec can hand in its own. */
+export type LadderOfItem = (itemId: string) => MarkLadder | null
 
 export function createFxRuns(): FxRuns {
   return { runs: Array.from({ length: FX_RUNS }, createFxRun), started: 0 }
@@ -101,13 +113,23 @@ export function createFxRuns(): FxRuns {
 export function fxStartsOf(events: readonly DomainEvent[]): FxStart[] {
   return events.flatMap((event) => {
     if (event.type !== 'power-up-core.PowerUpUsed' || event.toggledOn === false) return []
-    return [{ itemId: event.itemId, tx: event.originTx, ty: event.originTy }]
+    return [{ itemId: event.itemId, tx: event.originTx, ty: event.originTy, mark: event.mark }]
   })
 }
 
-/** Starts each of the item's effects on a free run, or on the oldest when all are busy. */
-export function startItemFx(runs: FxRuns, start: FxStart): void {
-  for (const fx of powerUpFxOfItem(start.itemId)) startRun(runs, claimRun(runs), fx, start)
+/**
+ * Starts each of the item's effects on a free run, or on the oldest when all are busy, in the
+ * look of the milestones the use's Mark reached.
+ */
+export function startItemFx(
+  runs: FxRuns,
+  start: FxStart,
+  ladderOf: LadderOfItem = markLadderOfItem,
+): void {
+  const reached = reachedMilestonesOf(ladderOf(start.itemId), start.mark)
+  for (const fx of powerUpFxOfItem(start.itemId)) {
+    startRun(runs, claimRun(runs), fx, start, fxLookOf(fx, reached))
+  }
 }
 
 /** Moves the run on by the render delta, freeing it once its effect is over. */
@@ -117,10 +139,10 @@ export function advanceFxRun(run: FxRun, dt: number): void {
   if (writeFxFrame(run.fx, run.ticks, run.frame).isOver) run.fx = null
 }
 
-/** The motes the run owes this frame. */
+/** The motes the run owes this frame; a Mark 6 look doubles the strands. */
 export function motesDue(run: FxRun, dt: number): number {
   if (run.fx === null) return 0
-  const strands = Math.max(run.frame.strands, MIN_MOTE_STRANDS)
+  const strands = Math.max(run.frame.strands, MIN_MOTE_STRANDS) * run.look.strandScale
   return particlesDue(run.carry, run.frame.alpha * strands * MOTES_PER_STRAND_SECOND, dt)
 }
 
@@ -147,9 +169,15 @@ export function activeFxIdsOf(runs: FxRuns): string[] {
   return runs.runs.flatMap((run) => (run.fx === null ? [] : [run.fx.id]))
 }
 
+/** Each effect drawn now with its look, for the debug read. */
+export function activeFxLooksOf(runs: FxRuns): { fxId: string; look: FxLook }[] {
+  return runs.runs.flatMap((run) => (run.fx === null ? [] : [{ fxId: run.fx.id, look: run.look }]))
+}
+
 function createFxRun(): FxRun {
   return {
     fx: null,
+    look: { colour: '', strandScale: 1, moteScale: 1 },
     ticks: 0,
     originX: 0,
     originY: 0,
@@ -168,8 +196,9 @@ function claimRun(runs: FxRuns): FxRun {
 }
 
 /** A tile is a metre (#4): the effect starts from the middle of the tile it was used on. */
-function startRun(runs: FxRuns, run: FxRun, fx: PowerUpFx, start: FxStart): void {
+function startRun(runs: FxRuns, run: FxRun, fx: PowerUpFx, start: FxStart, look: FxLook): void {
   run.fx = fx
+  run.look = look
   run.ticks = 0
   run.originX = start.tx + 1 / 2
   run.originY = start.ty + 1 / 2
