@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-10-07T15:57:50+02:00",
+  "updated_at": "2026-10-07T16:01:46+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
-    "claude_enabled": 4,
+    "claude_enabled": 8,
     "dev": 8,
     "planner": 4,
     "gate": 3,
@@ -14,8 +14,8 @@
       "id": "A1",
       "account": 1,
       "label": "Claude Max 1",
-      "enabled": false,
-      "reason": "not signed in",
+      "enabled": true,
+      "reason": "signed in",
       "slots": [
         {
           "slot": "C1",
@@ -27,11 +27,11 @@
         },
         {
           "slot": "C2",
-          "state": "disabled",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 147,
+          "grok_slot": 3,
+          "kind": "dev",
+          "since": "2026-10-07T16:01:00+02:00"
         },
         {
           "slot": "C3",
@@ -43,17 +43,17 @@
         },
         {
           "slot": "C4",
-          "state": "disabled",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 229,
+          "grok_slot": 8,
+          "kind": "dev",
+          "since": "2026-10-07T16:01:00+02:00"
         }
       ],
       "size": 4,
-      "used": 2,
+      "used": 4,
       "free": 0,
-      "claims_last_hour": 0,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -89,17 +89,17 @@
         },
         {
           "slot": "C8",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 225,
+          "grok_slot": 7,
+          "kind": "dev",
+          "since": "2026-10-07T16:01:00+02:00"
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
-      "claims_last_hour": 0,
+      "used": 4,
+      "free": 0,
+      "claims_last_hour": 1,
       "name": "Claude Max 2"
     }
   ],
@@ -139,9 +139,10 @@
     },
     {
       "slot": 3,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 147,
+      "since": "2026-10-07T16:01:00+02:00",
+      "claude_slot": 2
     },
     {
       "slot": 4,
@@ -166,15 +167,17 @@
     },
     {
       "slot": 7,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 225,
+      "since": "2026-10-07T16:01:00+02:00",
+      "claude_slot": 8
     },
     {
       "slot": 8,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 229,
+      "since": "2026-10-07T16:01:00+02:00",
+      "claude_slot": 4
     },
     {
       "slot": 9,
@@ -215,11 +218,10 @@
     },
     {
       "slot": 2,
-      "state": "disabled",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "reason": "not signed in",
+      "state": "busy",
+      "ticket": 147,
+      "grok_slot": 3,
+      "since": "2026-10-07T16:01:00+02:00",
       "account": 1
     },
     {
@@ -232,11 +234,10 @@
     },
     {
       "slot": 4,
-      "state": "disabled",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "reason": "not signed in",
+      "state": "busy",
+      "ticket": 229,
+      "grok_slot": 8,
+      "since": "2026-10-07T16:01:00+02:00",
       "account": 1
     },
     {
@@ -265,34 +266,34 @@
     },
     {
       "slot": 8,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 225,
+      "grok_slot": 7,
+      "since": "2026-10-07T16:01:00+02:00",
       "account": 2
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 14:34 CEST",
-    "mode": "refill-dev",
-    "triggers": "#228",
-    "started": "",
-    "note": "no pickable build ticket"
+    "at": "2026-10-07 16:01 CEST",
+    "mode": "pass",
+    "triggers": "#146",
+    "started": "#147->C2/A1 #225->C8/A2 #229->C4/A1",
+    "note": "spawned 3 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 5,
+      "used": 9,
+      "dev": 8,
       "dev_cap": 8,
       "planner": 1,
       "planner_cap": 4
     },
     "claude": {
       "size": 8,
-      "enabled": 4,
-      "used": 5,
-      "free": 1,
+      "enabled": 8,
+      "used": 8,
+      "free": 0,
       "external": 0
     }
   }
