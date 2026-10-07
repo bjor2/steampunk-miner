@@ -849,6 +849,8 @@ The `drill-gear` slice (#205) is the lane on this seam: the side cutters and rea
 - `power-up-core.use_power_up` also accepts `drill.flank` and `drill.collar` (`isPressableSlot`, one refusal rule; `drill.head` still refuses). Charges, cooldown, wind-up, gates and the toggle draw are unchanged.
 - Two kernel actions, `use_drill_flank` (KeyF) and `use_drill_collar` (KeyC), rebindable like `use_slot_n`, which only the drill-gear slice's input reactions answer. No touch tile yet (#244).
 
+The lane registers a `vehicleItemSeller` (ticket 248's buy path) for its six shipped items at their card price; the held-back two have no price and are not sold. The spoil auger's draw goes to the core in bp as it is in the file (30 bp/s, ticket 295), and its ladder falls at every Mark to 15 at mastery.
+
 ### 3.29 Ore drill classes (#236)
 
 Kernel seam for the mining gates (#148a), from the GD lock on #148: a per-cell scratch floor in `canScratch`, its values in kernel `economy.json`, keyed on the cell's real tier (lead included), never its sale tier. A gate opens when the tip of the last completed major reaches the floor (#180 amendment 2). With no provider the drill keeps #232's rule exactly.

@@ -1044,9 +1044,9 @@
           "children": [
             {
               "title": "Drill gear",
-              "description": "Vibratory bit (soft ground ahead crumbles), spoil auger (fills the tunnel behind you, C to switch), side cutters, thaw crown, sampling corer (C: draws a plug from the first ore ahead, refused at no cost by a gated or core cell) and reach boom, each in its drill socket with its tech node, Marks and item card. The twin-bit head and dielectric bit wait for the mechanics they answer. Buying them in the store and their models on the miner come later.",
+              "description": "Vibratory bit (soft ground ahead crumbles), spoil auger (fills the tunnel behind you, C to switch), side cutters, thaw crown, sampling corer (C: draws a plug from the first ore ahead, refused at no cost by a gated or core cell) and reach boom, each in its drill socket with its tech node, Marks and item card, sold at the Upgrade bay once researched. The twin-bit head and dielectric bit wait for the mechanics they answer. Their models on the miner come later.",
               "status": "partial",
-              "issues": [205, 242]
+              "issues": [205, 242, 248, 295]
             },
             {
               "title": "Gear on the rig and power-up effects",
