@@ -134,6 +134,20 @@
       "specs": ["e2e/browser/memory.spec.ts", "e2e/browser/memorySample.spec.ts"]
     },
     {
+      "why": "A debug run's snapshot writers: triggers, the one writer, IndexedDB, the zip, the canvas shot.",
+      "paths": [
+        "src/systems/snapshots/**",
+        "src/store/runSnapshots.ts",
+        "src/store/perfLog.ts",
+        "src/store/checkpoint.ts",
+        "src/shell/browserSnapshots.ts",
+        "src/shell/storedZip.ts",
+        "src/scene/canvasScreenshots.ts",
+        "src/scene/CanvasScreenshots.tsx"
+      ],
+      "specs": ["e2e/browser/snapshots.spec.ts"]
+    },
+    {
       "why": "Replay and snapshots give smoke's digests; the camera gives its framing checks.",
       "paths": [
         "src/systems/replay/**",
