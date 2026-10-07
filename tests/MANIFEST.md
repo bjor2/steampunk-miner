@@ -120,7 +120,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/oreRows.test.ts` | 3 | 3 |
 | `src/features/ores/systems/oreTypeProvider.test.ts` | 6 | 6 |
 
-### `power-up-core`: 8 files, 37 tests
+### `power-up-core`: 9 files, 42 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -128,10 +128,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/chargeState.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/cradles.test.ts` | 5 | 5 |
 | `src/features/power-up-core/systems/dockRefill.test.ts` | 4 | 4 |
-| `src/features/power-up-core/systems/powerUpKind.test.ts` | 2 | 2 |
+| `src/features/power-up-core/systems/powerUpKind.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/powerUpUse.test.ts` | 13 | 13 |
 | `src/features/power-up-core/systems/slotColumn.test.ts` | 4 | 4 |
 | `src/features/power-up-core/systems/slotUse.test.ts` | 3 | 3 |
+| `src/features/power-up-core/systems/toggleDraw.test.ts` | 4 | 4 |
 
 ### `sell-burst`: 7 files, 53 tests
 
@@ -145,7 +146,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
-### `tech-tree`: 17 files, 130 tests
+### `tech-tree`: 17 files, 132 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -164,7 +165,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/treeScreenModel.test.ts` | 10 | 10 |
 | `src/features/tech-tree/systems/treeShape.test.ts` | 13 | 13 |
-| `src/features/tech-tree/systems/unlockRules.test.ts` | 16 | 16 |
+| `src/features/tech-tree/systems/unlockRules.test.ts` | 18 | 18 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
 ### `workshop`: 12 files, 84 tests
@@ -353,6 +354,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/enemyStats.test.ts` | 24 | 20 |
 | `src/systems/economy/gunStats.test.ts` | 9 | 9 |
 | `src/systems/economy/heatEconomy.test.ts` | 11 | 11 |
+| `src/systems/economy/itemEffectCaps.test.ts` | 6 | 6 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/planetCharges.test.ts` | 16 | 12 |
 | `src/systems/economy/readEconomy.test.ts` | 19 | 19 |
@@ -476,9 +478,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/discovery.test.ts` | 2 | 2 |
 | `src/systems/registries/dockFacilities.test.ts` | 5 | 5 |
 | `src/systems/registries/dockServices.test.ts` | 4 | 4 |
+| `src/systems/registries/enemyDetectionModifiers.test.ts` | 4 | 4 |
 | `src/systems/registries/gateChecks.test.ts` | 4 | 4 |
 | `src/systems/registries/generationHooks.test.ts` | 4 | 4 |
+| `src/systems/registries/heatPauses.test.ts` | 4 | 4 |
 | `src/systems/registries/hookSeed.test.ts` | 4 | 4 |
+| `src/systems/registries/hullDamageIntercepts.test.ts` | 5 | 5 |
 | `src/systems/registries/itemDescriber.test.ts` | 7 | 7 |
 | `src/systems/registries/itemDescriptionEntries.test.ts` | 5 | 5 |
 | `src/systems/registries/oreLook.test.ts` | 2 | 2 |
@@ -697,6 +702,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/casingTrail.test.ts` | 8 | 8 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/drillRule.test.ts` | 12 | 12 |
+| `src/systems/vehicle/heatPauseSteps.test.ts` | 7 | 7 |
+| `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
 | `src/systems/vehicle/poseReport.test.ts` | 6 | 6 |
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/vehicleCharges.test.ts` | 4 | 4 |
