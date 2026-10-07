@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T16:18:20Z",
+  "updated_at": "2026-10-07T16:18:23Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -234,9 +234,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "queue run on 90c954f (close-#232)",
+      "note": "testing spec #137 (T9: Campaign pace planets 8–10, from: 8 pace row (Systems)) on 90c954f",
       "stale_after_min": 420,
-      "updated_at": "2026-10-07T16:18:20Z",
+      "updated_at": "2026-10-07T16:18:23Z",
       "host": "grok-bot-vm-452660841"
     }
   },
