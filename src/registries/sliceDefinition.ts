@@ -10,6 +10,7 @@ import type { ArtAsset } from '../systems/registries/artAssets'
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
 import type { BotPurchase } from '../systems/registries/botPurchases'
+import type { ClockStep } from '../systems/registries/clockSteps'
 import type { SliceCommandRules } from '../systems/registries/commandRules'
 import type { ContentKind, ContentKinds } from '../systems/registries/content'
 import type {
@@ -47,6 +48,8 @@ export interface SliceRegistrar {
   oreTypes(provider: OreTypeProvider): void
   gateCheck(check: GateCheck): void
   blastEffect(effect: BlastEffect): void
+  /** Runs on the authority clock after the kernel's steps, in id order (#217). */
+  clockStep(step: ClockStep): void
   generationHook(hook: GenerationHook): void
   /** One provider across all slices. */
   oreLook(provider: OreLookProvider): void

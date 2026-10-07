@@ -5,11 +5,12 @@
  * - while combat is live, every tick runs: tows due at that tick first, then the enemy tick (#9),
  *   then any charge whose fuse blows at that tick (#109), then the world's terrain edits (K6 #189:
  *   the live blasts' slice, then the queued power-up edits' share), then any collapse due at that
- *   tick (#43);
+ *   tick (#43), then the slices' clock steps in id order (#217);
  * - otherwise nothing can change between ticks but a blast, a collapse, a refinery batch or flowing
  *   lava, so the clock jumps to the next tick a charge blows or a terrain edit moves, a block warns
- *   into its refill or refills, a batch is ready (#105) or loose lava steps (#113), or to the end
- *   (tows due by then first); tows happen at their due tick (#7 strand grace, destroy delay).
+ *   into its refill or refills, a batch is ready (#105), loose lava steps (#113) or a slice's clock
+ *   step has work due (#217), or to the end (tows due by then first); tows happen at their due tick
+ *   (#7 strand grace, destroy delay).
  *
  * It leaves `state.tick` at the tick it reached, so it never runs a tick twice, and a run gives the
  * same state and events however its ticks are batched.
@@ -25,6 +26,7 @@ import { isCombatLive, runCombatTick, type TickOutcome } from './combat/combatTi
 import { nextLavaTick, runLavaTick } from './lava/lavaRules'
 import { announceReadyBatches, nextRefineReadyTick } from './refinery/refineryClock'
 import { towVehiclesDueBy } from './vehicleTransitions'
+import { nextSliceClockTick, runSliceClockSteps } from '../registries/clockSteps'
 
 export function settleClockTo(state: AuthorityState, toTick: number): TickOutcome {
   let outcome: TickOutcome = { state, events: [] }
@@ -49,10 +51,11 @@ function runLiveTick(state: AuthorityState, tick: number): TickOutcome {
     (current) => runCollapseTick(current, tick),
     (current) => announceReadyBatches(current, tick),
     (current) => runLavaTick(current, tick),
+    (current) => runSliceClockSteps(current, tick),
   ])
 }
 
-/** Up to the next blast, collapse, refinery or lava tick, if one comes before `toTick`; else to `toTick`. */
+/** Up to the next blast, collapse, refinery, lava or slice step tick, if one comes before `toTick`; else to `toTick`. */
 function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
   const stopTick = nextScheduledTick(state)
   if (stopTick === null || stopTick > toTick) {
@@ -66,6 +69,7 @@ function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
     (current) => runCollapseTick(current, stopTick),
     (current) => announceReadyBatches(current, stopTick),
     (current) => runLavaTick(current, stopTick),
+    (current) => runSliceClockSteps(current, stopTick),
   ])
 }
 
@@ -77,6 +81,7 @@ function nextScheduledTick(state: AuthorityState): number | null {
     nextCollapseTick(state.collapse, state.tick),
     nextRefineReadyTick(state.platform.refinerySlots, state.tick),
     nextLavaTick(state),
+    nextSliceClockTick(state),
   ].filter((tick): tick is number => tick !== null)
   return ticks.length === 0 ? null : Math.min(...ticks)
 }

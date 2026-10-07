@@ -15,6 +15,7 @@ import { ART_ASSET_REGISTRY, type ArtAsset } from '../systems/registries/artAsse
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
 import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
+import { CLOCK_STEP_REGISTRY } from '../systems/registries/clockSteps'
 import {
   COMMAND_RULE_REGISTRY,
   commandRuleRegistrationsOf,
@@ -61,6 +62,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     oreTypes: (provider) => add(ORE_TYPE_REGISTRY, provider),
     gateCheck: (check) => add(GATE_CHECK_REGISTRY, check),
     blastEffect: (effect) => add(BLAST_EFFECT_REGISTRY, effect),
+    clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
     saveSection: (section) => addSaveSection(sliceId, section),
