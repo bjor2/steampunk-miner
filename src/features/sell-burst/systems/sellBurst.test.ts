@@ -4,13 +4,7 @@ import { BURST_TIMING, firstCoinLandTick } from './burstTiming'
 import { landingCoinsOf, type BurstSale } from './burstWave'
 import { landedCoinsAt, rolledTotalOf, shownMoneyOf } from './counterRoll'
 import { liningBilledOf, liningTagPhaseAt } from './liningTag'
-import {
-  burstEndTickOf,
-  burstWithSale,
-  flareStartTickOf,
-  isBurstOverAt,
-  type SellBurst,
-} from './sellBurst'
+import { burstWithSale, isBurstOverAt, type SellBurst } from './sellBurst'
 
 const { coins, lining, flare, mergeWindowTicks } = BURST_TIMING
 
@@ -42,7 +36,7 @@ function burstOf(sale: BurstSale, tick = 100): SellBurst {
 /** Every tick of the burst, from its sale to its end. */
 function ticksOf(burst: SellBurst): number[] {
   const start = burst.waves[0].startTick
-  return Array.from({ length: burstEndTickOf(burst) - start + 1 }, (_, index) => start + index)
+  return Array.from({ length: burst.endTick - start + 1 }, (_, index) => start + index)
 }
 
 describe('sell burst lining beat (G&V on #176)', () => {
@@ -51,8 +45,8 @@ describe('sell burst lining beat (G&V on #176)', () => {
     const burst = burstOf(sale)
     expect(burst.waves[0].peel).toBe(0)
     expect(ticksOf(burst).map((tick) => liningTagPhaseAt(burst, tick))).not.toContain('shown')
-    expect(landedCoinsAt(burst, burstEndTickOf(burst))).toBe(12)
-    expect(shownMoneyOf(walletAfter('50', sale), burst, burstEndTickOf(burst))).toEqual(
+    expect(landedCoinsAt(burst, burst.endTick)).toBe(12)
+    expect(shownMoneyOf(walletAfter('50', sale), burst, burst.endTick)).toEqual(
       walletAfter('50', sale),
     )
   })
@@ -84,13 +78,13 @@ describe('sell burst lining beat (G&V on #176)', () => {
 
   it('case 4: credits of ten steps whose net falls short after the bill light no flare', () => {
     const burst = burstOf(saleOf('1000', '0.001'))
-    expect(flareStartTickOf(burst)).toBeNull()
-    expect(flareStartTickOf(burstOf(saleOf('1000', '0')))).toBe(100 + coins.landTick)
+    expect(burst.flareStartTick).toBeNull()
+    expect(burstOf(saleOf('1000', '0')).flareStartTick).toBe(100 + coins.landTick)
   })
 
   it('keeps the whole burst, flare included, inside 90 ticks to the counter plus 18', () => {
     const burst = burstOf(saleOf('1000', '0'))
-    expect(burstEndTickOf(burst) - 100).toBe(coins.landTick + flare.ticks)
+    expect(burst.endTick - 100).toBe(coins.landTick + flare.ticks)
   })
 
   it('holds the tag 96 ticks after the last peeled coin lands, then fades it over 12', () => {
@@ -153,7 +147,7 @@ describe('sell burst counter roll', () => {
     const merged = burstWithSale(burstOf(first), second, 140, false)
     const credits = add(first.credits, second.credits)
     expect(rolledTotalOf(merged)).toEqual(sub(credits, first.liningPaid))
-    expect(shownMoneyOf(wallet, merged, burstEndTickOf(merged))).toEqual(wallet)
+    expect(shownMoneyOf(wallet, merged, merged.endTick)).toEqual(wallet)
     expect(shownMoneyOf(wallet, merged, 100)).toEqual(sub(wallet, rolledTotalOf(merged)))
   })
 })

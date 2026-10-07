@@ -6,7 +6,7 @@
  */
 import { add, ZERO_MONEY, type Money } from '../../../systems/money'
 import { BURST_TIMING } from './burstTiming'
-import { tagFadeTickOf, tagStartTickOf, type SellBurst } from './sellBurst'
+import type { SellBurst } from './sellBurst'
 
 export type LiningTagPhase = 'hidden' | 'shown' | 'fading'
 
@@ -16,8 +16,7 @@ export function liningTagPhaseAt(
   timing = BURST_TIMING,
 ): LiningTagPhase {
   if (burst === null) return 'hidden'
-  const start = tagStartTickOf(burst, timing)
-  const fade = tagFadeTickOf(burst, timing)
+  const { tagStartTick: start, tagFadeTick: fade } = burst
   if (start === null || fade === null || tick < start) return 'hidden'
   if (tick < fade) return 'shown'
   return tick < fade + timing.lining.liningTagFadeTicks ? 'fading' : 'hidden'

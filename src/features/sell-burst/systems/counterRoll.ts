@@ -40,9 +40,25 @@ export function rolledTotalOf(burst: SellBurst): Money {
   return burst.waves.reduce((total, wave) => add(total, netOf(wave)), ZERO_MONEY)
 }
 
-/** How many of the burst's counter coins have landed by `tick`. */
+/** How many of the burst's counter coins have landed by `tick`. Read every frame: no allocation. */
 export function landedCoinsAt(burst: SellBurst, tick: number): number {
-  return burst.waves.reduce((total, wave) => total + landedOfWave(wave, tick), 0)
+  let landed = 0
+  for (let index = 0; index < burst.waves.length; index++) {
+    landed += landedOfWave(burst.waves[index], tick)
+  }
+  return landed
+}
+
+/**
+ * How far the roll has come at `tick`: the coins landed plus the waves whose stream has arrived.
+ * Every part only grows with the tick, so the shown money changes exactly when this does.
+ */
+export function rollMarkAt(burst: SellBurst, tick: number): number {
+  let arrived = 0
+  for (let index = 0; index < burst.waves.length; index++) {
+    if (waveFirstLandTickOf(burst.waves[index]) <= tick) arrived += 1
+  }
+  return landedCoinsAt(burst, tick) + arrived
 }
 
 /**

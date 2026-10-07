@@ -3,8 +3,11 @@
  * 1.5 s of the last merges into it as a new wave, adding chunks and coins up to the caps and
  * extending the timeline. A pure function of the tick, so it plays the same at any frame rate and
  * never touches the authority state, a snapshot or a digest.
+ *
+ * The beats that do not move with the tick (when the tag shows and fades, when the flare burns,
+ * when it all ends) are scheduled once per sale, so a frame's reading only compares numbers.
  */
-import { BURST_TIMING, firstCoinLandTick, peelLandTick, type BurstTiming } from './burstTiming'
+import { BURST_TIMING, firstCoinLandTick, peelLandTick } from './burstTiming'
 import {
   freshRoom,
   isBillPaid,
@@ -14,7 +17,20 @@ import {
   type WaveRoom,
 } from './burstWave'
 
-export interface SellBurst {
+export interface BurstSchedule {
+  /** When the last coin lands, on the counter or the tag. */
+  coinsDoneTick: number
+  /** Null unless a wave's net reached ten steps; it burns once the last coin landed. */
+  flareStartTick: number | null
+  /** Null unless a wave paid a bill: the tag shows from the first peel. */
+  tagStartTick: number | null
+  /** 96 ticks after the last peeled coin lands. */
+  tagFadeTick: number | null
+  /** Every coin landed, the flare burnt out and the tag faded. */
+  endTick: number
+}
+
+export interface SellBurst extends BurstSchedule {
   waves: readonly BurstWave[]
   isReduced: boolean
 }
@@ -26,51 +42,20 @@ export function burstWithSale(
   tick: number,
   isReduced: boolean,
 ): SellBurst {
-  if (burst === null || !canMergeAt(burst, tick)) return freshBurstOf(sale, tick, isReduced)
+  if (burst === null || !canMergeAt(burst, tick)) {
+    return scheduledBurstOf([waveOfSale(sale, tick, freshRoom(isReduced))], isReduced)
+  }
   const wave = waveOfSale(sale, tick, roomLeftIn(burst))
-  return { ...burst, waves: [...burst.waves, wave] }
+  return scheduledBurstOf([...burst.waves, wave], burst.isReduced)
 }
 
 /** Whether a sale at `tick` joins the running burst: within 1.5 s of its last sale. */
 export function canMergeAt(burst: SellBurst, tick: number, timing = BURST_TIMING): boolean {
-  return tick - lastWaveOf(burst).startTick <= timing.mergeWindowTicks
+  return tick - lastWaveOf(burst.waves).startTick <= timing.mergeWindowTicks
 }
 
-/** Once every coin landed, the flare burnt out and the lining tag faded. */
 export function isBurstOverAt(burst: SellBurst, tick: number): boolean {
-  return tick >= burstEndTickOf(burst)
-}
-
-export function burstEndTickOf(burst: SellBurst, timing: BurstTiming = BURST_TIMING): number {
-  return Math.max(
-    coinsDoneTickOf(burst, timing),
-    flareEndTickOf(burst, timing),
-    tagEndTickOf(burst),
-  )
-}
-
-/** The tick the last coin of the burst lands, on the counter or the tag. */
-export function coinsDoneTickOf(burst: SellBurst, timing: BurstTiming = BURST_TIMING): number {
-  return lastWaveOf(burst).startTick + timing.coins.landTick
-}
-
-/** The flare burns after the last coin lands, once a wave's net reached ten steps; else never. */
-export function flareStartTickOf(burst: SellBurst, timing = BURST_TIMING): number | null {
-  return burst.waves.some((wave) => wave.isFlare) ? coinsDoneTickOf(burst, timing) : null
-}
-
-/** The tick the tag first shows, or null when no wave paid a bill. */
-export function tagStartTickOf(burst: SellBurst, timing = BURST_TIMING): number | null {
-  const billed = burst.waves.find((wave) => isBillPaid(wave.liningPaid))
-  return billed === undefined ? null : billed.startTick + timing.lining.liningPeelTick
-}
-
-/** The tag holds 96 ticks after the last peeled coin lands, then fades over 12. */
-export function tagFadeTickOf(burst: SellBurst, timing = BURST_TIMING): number | null {
-  const billed = burst.waves.filter((wave) => isBillPaid(wave.liningPaid))
-  if (billed.length === 0) return null
-  const lastPeelLand = billed[billed.length - 1].startTick + peelLandTick(timing)
-  return lastPeelLand + timing.lining.liningTagHoldTicks
+  return tick >= burst.endTick
 }
 
 /** The first tick a coin of the wave reaches the counter. */
@@ -78,8 +63,38 @@ export function waveFirstLandTickOf(wave: BurstWave, timing = BURST_TIMING): num
   return wave.startTick + firstCoinLandTick(timing)
 }
 
-function freshBurstOf(sale: BurstSale, tick: number, isReduced: boolean): SellBurst {
-  return { waves: [waveOfSale(sale, tick, freshRoom(isReduced))], isReduced }
+function scheduledBurstOf(waves: readonly BurstWave[], isReduced: boolean): SellBurst {
+  return { waves, isReduced, ...scheduleOf(waves) }
+}
+
+function scheduleOf(waves: readonly BurstWave[], timing = BURST_TIMING): BurstSchedule {
+  const coinsDoneTick = lastWaveOf(waves).startTick + timing.coins.landTick
+  const billed = waves.filter((wave) => isBillPaid(wave.liningPaid))
+  const flareStartTick = waves.some((wave) => wave.isFlare) ? coinsDoneTick : null
+  const tagFadeTick = billed.length === 0 ? null : tagFadeTickOf(lastWaveOf(billed))
+  return {
+    coinsDoneTick,
+    flareStartTick,
+    tagStartTick: billed.length === 0 ? null : billed[0].startTick + timing.lining.liningPeelTick,
+    tagFadeTick,
+    endTick: endTickOf(coinsDoneTick, flareStartTick, tagFadeTick),
+  }
+}
+
+function endTickOf(
+  coinsDoneTick: number,
+  flareStartTick: number | null,
+  tagFadeTick: number | null,
+  timing = BURST_TIMING,
+): number {
+  const flareEnd = flareStartTick === null ? 0 : flareStartTick + timing.flare.ticks
+  const tagEnd = tagFadeTick === null ? 0 : tagFadeTick + timing.lining.liningTagFadeTicks
+  return Math.max(coinsDoneTick, flareEnd, tagEnd)
+}
+
+/** The tag holds 96 ticks after the last billed wave's peeled coins land. */
+function tagFadeTickOf(lastBilled: BurstWave, timing = BURST_TIMING): number {
+  return lastBilled.startTick + peelLandTick(timing) + timing.lining.liningTagHoldTicks
 }
 
 function roomLeftIn(burst: SellBurst): WaveRoom {
@@ -91,16 +106,6 @@ function roomLeftIn(burst: SellBurst): WaveRoom {
   }
 }
 
-function lastWaveOf(burst: SellBurst): BurstWave {
-  return burst.waves[burst.waves.length - 1]
-}
-
-function flareEndTickOf(burst: SellBurst, timing: BurstTiming): number {
-  const start = flareStartTickOf(burst, timing)
-  return start === null ? 0 : start + timing.flare.ticks
-}
-
-function tagEndTickOf(burst: SellBurst, timing = BURST_TIMING): number {
-  const fade = tagFadeTickOf(burst, timing)
-  return fade === null ? 0 : fade + timing.lining.liningTagFadeTicks
+function lastWaveOf(waves: readonly BurstWave[]): BurstWave {
+  return waves[waves.length - 1]
 }

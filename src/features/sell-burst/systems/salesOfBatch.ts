@@ -20,10 +20,22 @@ export function salesOfBatch(
   nextStepPrice: Money,
 ): HeardSale[] {
   return events.flatMap((event, index) =>
-    event.type === 'ResourceSold' && event.playerId === playerId
+    isSaleBy(event, playerId)
       ? [heardSaleOf(event, liningPaidAfter(events, index), nextStepPrice)]
       : [],
   )
+}
+
+/** Whether the batch holds a sale of this player's: most batches hold none. */
+export function hasSaleBy(events: readonly DomainEvent[], playerId: string): boolean {
+  return events.some((event) => isSaleBy(event, playerId))
+}
+
+function isSaleBy(
+  event: DomainEvent,
+  playerId: string,
+): event is Extract<DomainEvent, { type: 'ResourceSold' }> {
+  return event.type === 'ResourceSold' && event.playerId === playerId
 }
 
 function heardSaleOf(
