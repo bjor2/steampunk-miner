@@ -6,6 +6,7 @@
 import type { DrillGearCaps } from './drillGearCaps'
 import type { ItemEffectCaps } from './itemEffectCaps'
 import type { MagnetCaps } from './magnetCaps'
+import type { MagneticHazardCaps } from './magneticHazardCaps'
 import type { BigStat, Money } from '../money'
 import type { WholeFraction } from '../wholeFractions'
 
@@ -421,4 +422,6 @@ export interface Economy {
   drillGearCaps: DrillGearCaps
   /** The terrain magnets family's caps (GD lock on #246, ticket 282, `magnetCaps.ts`). */
   magnets: MagnetCaps
+  /** What a magnetic planet's fields and electrified cells cost at most (#258, ticket 290). */
+  magneticHazard: MagneticHazardCaps
 }

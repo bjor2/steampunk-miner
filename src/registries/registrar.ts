@@ -49,6 +49,7 @@ import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
 import { HEAT_PAUSE_REGISTRY } from '../systems/registries/heatPauses'
 import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
+import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
@@ -56,6 +57,7 @@ import { ORE_DRILL_CLASS_REGISTRY } from '../systems/registries/oreDrillClasses'
 import { ORE_SIGNATURE_REGISTRY, ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
 import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRequests'
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
+import { SHOCK_SHIELD_REGISTRY } from '../systems/registries/shockShields'
 import { SLOT_HOLD_CUE_REGISTRY } from '../systems/registries/slotHoldCues'
 import { SOUND_CUE_REGISTRY } from '../systems/registries/soundCues'
 import {
@@ -107,6 +109,8 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     generationHook: (hook) => add(GENERATION_HOOK_REGISTRY, hook),
     oreLook: (provider) => add(ORE_LOOK_REGISTRY, provider),
     cellGateLook: (provider) => add(CELL_GATE_LOOK_REGISTRY, provider),
+    magneticGround: (provider) => add(MAGNETIC_GROUND_REGISTRY, provider),
+    shockShield: (shield) => add(SHOCK_SHIELD_REGISTRY, shield),
     saveSection: (section) => addSaveSection(sliceId, section),
     discovery: (provider) => add(DISCOVERY_REGISTRY, provider),
     discoveryKind: (kind, ...codec) =>

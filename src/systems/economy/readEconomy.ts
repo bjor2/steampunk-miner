@@ -15,6 +15,7 @@ import { readEnemies } from './readEnemyEconomy'
 import { readDrillGearCaps } from './drillGearCaps'
 import { readItemEffectCaps } from './itemEffectCaps'
 import { readMagnetCaps } from './magnetCaps'
+import { readMagneticHazardCaps } from './magneticHazardCaps'
 import { readPaceScale } from './readPaceScale'
 import { readUpgradeTiers } from './readUpgradeTiers'
 import { readCostCurve, readRefinery } from './readRefineryEconomy'
@@ -76,6 +77,7 @@ function readEconomyFields(reader: FieldReader, file: Record<string, unknown>): 
     itemEffectCaps: readItemEffectCaps(reader, file.itemEffectCaps),
     drillGearCaps: readDrillGearCaps(reader, file.drillGearCaps),
     magnets: readMagnetCaps(reader, file.magnets),
+    magneticHazard: readMagneticHazardCaps(reader, file.magneticHazard),
   }
 }
 

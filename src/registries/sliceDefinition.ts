@@ -36,6 +36,8 @@ import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
 import type { OreLookProvider } from '../systems/registries/oreLook'
 import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
+import type { MagneticGroundProvider } from '../systems/registries/magneticGround'
+import type { ShockShield } from '../systems/registries/shockShields'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
 import type { OreSignatureTag, OreTypeProvider } from '../systems/registries/oreTypes'
 import type { PartMotionRequestSource } from '../systems/registries/partMotionRequests'
@@ -106,6 +108,10 @@ export interface SliceRegistrar {
   oreLook(provider: OreLookProvider): void
   /** One provider across all slices: the gate each cell shows in the ground (ticket 298). */
   cellGateLook(provider: CellGateLookProvider): void
+  /** One provider across all slices: a magnetic planet's fields and electrified cells (#290). */
+  magneticGround(provider: MagneticGroundProvider): void
+  /** Whether a player's drill is shielded from an electrified cell's shock (#258 Q6, #290). */
+  shockShield(shield: ShockShield): void
   /** Its id is `<slice>` or `<slice>.<name>`. */
   saveSection<T>(section: SaveSection<T>): void
   /** One provider across all slices. */

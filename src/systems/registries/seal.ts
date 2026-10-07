@@ -14,7 +14,10 @@ export interface RegistryEntry {
 
 export interface Registry<T extends RegistryEntry> {
   readonly name: string
-  /** `oreTypes`, `oreLook`, `cellGateLook` and `discovery` take one provider; the seal refuses a second. */
+  /**
+   * `oreTypes`, `oreLook`, `cellGateLook`, `magneticGround` and `discovery` take one provider; the
+   * seal refuses a second.
+   */
   readonly providerLimit: number | null
   /**
    * A problem across all of the registry's entries that the seal refuses, such as two item

@@ -282,5 +282,12 @@
     "cellEnergyFloorBp": 10000,
     "cooldownFloorTicks": 600,
     "incomeCapBp": 1500
+  },
+  "magneticHazard": {
+    "tugShareOfEngineBp": 1000,
+    "sensingReachShareBp": 5000,
+    "shockTicks": 30,
+    "shockHullShareBp": 200,
+    "diveHullCapBp": 2500
   }
 }
