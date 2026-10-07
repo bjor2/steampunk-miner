@@ -27,7 +27,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
-### `codex`: 7 files, 31 tests
+### `codex`: 7 files, 33 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -35,7 +35,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/codex/systems/bitset.test.ts` | 6 | 6 |
 | `src/features/codex/systems/codexAliases.test.ts` | 4 | 4 |
 | `src/features/codex/systems/codexContacts.test.ts` | 6 | 6 |
-| `src/features/codex/systems/codexReaction.test.ts` | 6 | 6 |
+| `src/features/codex/systems/codexReaction.test.ts` | 8 | 8 |
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
 
@@ -61,15 +61,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 16 files, 107 tests
+### `drill-gear`: 16 files, 109 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/drill-gear/drillGearInPlay.test.ts` | 10 | 10 |
+| `src/features/drill-gear/drillGearInPlay.test.ts` | 11 | 11 |
 | `src/features/drill-gear/drillGearPace.test.ts` | 2 | 1 |
 | `src/features/drill-gear/drillGearTouch.test.ts` | 2 | 2 |
 | `src/features/drill-gear/logging.test.ts` | 2 | 2 |
-| `src/features/drill-gear/shippedRows.test.ts` | 7 | 7 |
+| `src/features/drill-gear/shippedRows.test.ts` | 8 | 8 |
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
 | `src/features/drill-gear/systems/cardLines.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
@@ -560,7 +560,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/compareRuns.test.ts` | 11 | 11 |
 | `src/logging/diveCasing.test.ts` | 3 | 3 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
-| `src/logging/domainEventLog.test.ts` | 17 | 17 |
+| `src/logging/domainEventLog.test.ts` | 18 | 18 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
 | `src/logging/eventSink.test.ts` | 7 | 7 |
 | `src/logging/gateClearTables.test.ts` | 6 | 6 |
