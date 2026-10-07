@@ -3,6 +3,8 @@ import { withRegistrations } from '../../../../registries/registrar'
 import type { SliceDefinition } from '../../../../registries/sliceDefinition'
 import { blenderAssetIds, isValidPartId, slotItemAssetIdOf } from '../../../../systems/art/artIds'
 import { exportedSidecarOf, placeholderSidecarOf } from '../../../../systems/art/artCatalogue'
+import { assetQuadsOf } from '../../../../systems/art/assetLook'
+import type { Pair } from '../../../../systems/art/partsSidecar'
 import { ATTACH_ASSET_ID, attachIdsOf } from '../../../../systems/art/sidecarAttach'
 import { SHIPPED_ART } from '../../../../scene/shippedArt'
 import {
@@ -12,6 +14,7 @@ import {
 import { isAttachId } from '../../../../systems/registries/vehicleAttach'
 import type { LoadoutSlotId } from '../../../../systems/registries/vehicleLoadout'
 import { isMovingPart } from './extractorPose'
+import { mountedGearQuadsOf } from './techGearQuads'
 import {
   CRATE_RACK,
   GAUGE_CLUSTER,
@@ -207,5 +210,48 @@ describe('tech gear: the mounted gear table', () => {
       expect.arrayContaining(['artefact.salvage_magnet', 'consumable.stabiliser_foam']),
     )
     expect(new Set(POWER_UP_FX.map((fx) => fx.id)).size).toBe(POWER_UP_FX.length)
+  })
+})
+
+// The G&V silhouette rule (#162 feel pass, GD approved): with all five extractors owned and
+// folded, the vehicle's silhouette in normal digging stays within 110% of its no-extractor area.
+// Measured on the exported sidecars' part rectangles, rasterised at a centimetre: a bounding
+// rectangle overstates a part, so a pass here is conservative.
+describe('tech gear: the folded silhouette', () => {
+  const CELL_M = 0.01
+  const TOP_TIER = 3
+
+  function rectsOf(quads: readonly { centre: Pair; size: Pair }[]): number[][] {
+    return quads.map(({ centre, size }) => [
+      centre[0] - size[0] / 2,
+      centre[1] - size[1] / 2,
+      centre[0] + size[0] / 2,
+      centre[1] + size[1] / 2,
+    ])
+  }
+
+  function unionAreaOf(rects: readonly number[][]): number {
+    const cells = new Set<string>()
+    for (const [left, bottom, right, top] of rects) {
+      for (let x = Math.floor(left / CELL_M); x < Math.ceil(right / CELL_M); x += 1) {
+        for (let y = Math.floor(bottom / CELL_M); y < Math.ceil(top / CELL_M); y += 1) {
+          cells.add(`${x},${y}`)
+        }
+      }
+    }
+    return cells.size
+  }
+
+  it('keeps the five folded extractors within 110% of the bare tier-3 vehicle', () => {
+    const vehicle = exportedSidecarOf(SHIPPED_ART, ATTACH_ASSET_ID)
+    expect(vehicle).not.toBeNull()
+    if (vehicle === null) return
+    const bare = rectsOf(assetQuadsOf(SHIPPED_ART, ATTACH_ASSET_ID, TOP_TIER))
+    const folded = MOUNTED_GEAR.filter((gear) => gear.kind === 'extractor').flatMap((gear) =>
+      rectsOf(mountedGearQuadsOf(SHIPPED_ART, vehicle, { itemId: gear.itemId, slot: null }, 0)),
+    )
+    expect(folded.length).toBe(10)
+    const ratio = unionAreaOf([...bare, ...folded]) / unionAreaOf(bare)
+    expect(ratio).toBeLessThanOrEqual(1.1)
   })
 })
