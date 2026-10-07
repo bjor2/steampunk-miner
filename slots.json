@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T00:04:37+02:00",
+  "updated_at": "2026-10-08T00:05:13+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -104,33 +104,23 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "dee7b3719f7e32f90b76cca8b4cb65ded8d780fc",
-    "since": "2026-10-07T22:04:31Z",
-    "holds_gate": false,
+    "sha": "0b55dd88bd87b34a08a0434e12e144a2aefaf3a4",
+    "since": "2026-10-07T22:05:12Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-07T21:28:29Z",
+    "last_run": "2026-10-07T22:05:10Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null,
-    "feature": 191,
-    "feature_title": "Spec: Vertical-slice test layout with a single test overview",
+    "feature": 141,
+    "feature_title": "Spec: Per-planet ore distribution (common vs rare per planet)",
     "queue": [
-      {
-        "feature": 141,
-        "kind": "spec",
-        "title": "Spec: Per-planet ore distribution (common vs rare per planet)",
-        "tickets": [
-          147,
-          232
-        ],
-        "since": "2026-10-07T19:14:37+02:00"
-      },
       {
         "feature": 143,
         "kind": "spec",
