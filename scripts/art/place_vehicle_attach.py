@@ -26,8 +26,8 @@ POINTS = {
     'hull.front': (0.48, -0.08, 6),  # the front armour plate
     'hull.arm.left': (-0.36, -0.12, 6),
     'hull.arm.right': (0.36, -0.12, 6),
-    'hull.roof.fore': (0.3, 0.26, 6),
-    'hull.roof.mid': (0.04, 0.42, 6),
+    'hull.roof.fore': (0.36, 0.28, 6),  # on the piston and headlamp, clear of the tether reel (#166)
+    'hull.roof.mid': (0.17, 0.4, 6),  # on the second boiler, right of the turret's pillar (#166)
     'hull.roof.aft': (-0.42, 0.24, 6),
     'hull.turret': (0.04, 0.13, 10),  # the auto-guns mount (#107)
     'hull.rear': (-0.58, -0.04, 2),  # the charge rack (#109)

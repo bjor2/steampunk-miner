@@ -3,7 +3,7 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/vehicle/vehicle.blend",
-    "sha256": "7e69d1e3d6227011ab98d4651a5d749512d23e755914e89cceff53680cb70c5b",
+    "sha256": "4bfc940d3bd7b39420f3a45087cf44ec289a114eb792075e2ff22846dad60dff",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 512,
@@ -896,16 +896,16 @@
     {
       "id": "hull.roof.fore",
       "atM": [
-        0.3,
-        0.26
+        0.36,
+        0.28
       ],
       "z": 6
     },
     {
       "id": "hull.roof.mid",
       "atM": [
-        0.04,
-        0.42
+        0.17,
+        0.4
       ],
       "z": 6
     },
