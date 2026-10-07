@@ -31,7 +31,7 @@ export const PAYOFF_LEADS: readonly number[] = [1, 2]
 /** The payoff the GD lock expects of every row. */
 export const PAYOFF_FLOOR = 2
 /** #142 guard 5 `maxGatedValueShare` (15%), the mining-gates slice's number, read here as a figure. */
-const GATED_VALUE_SHARE_CAP_BP = 1500
+export const GATED_VALUE_SHARE_CAP_BP = 1500
 const BASIS_POINTS = 10000
 const ONE_CHARGE = 1
 
