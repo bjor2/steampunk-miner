@@ -10,18 +10,19 @@ import { chunkRangeOfDisc } from './tileGrid'
  * Decision #4 acceptance 1 (#36 acceptance 1, #42 acceptance 4 under generator 2, the #46 artefact cache under 3,
  * the Refinery bay's pad from planet 3 under 4, which leaves these digests as they were, and the
  * lava pockets of the heat planets under 5, pinned by the planet 8 chunks, and the -8..+12 pad
- * under the shop buildings under 6, #170, and the ores slice's rarity lead under 7, #146, with the
- * features loaded as the game loads them): a committed
+ * under the shop buildings under 6, #170, the ores slice's rarity lead under 7, #146, and the planet
+ * mix from planet 3 under 8, #147, which leaves planets 1 and 2 as they were, with the features
+ * loaded as the game loads them): a committed
  * digest of the generator's cells and density. If this fails, the
  * generator changed what a seed makes: bump GENERATOR_VERSION (saves and replays of the old
  * world are then refused) and update the version and digests below in the same commit.
  */
 const GOLDEN = {
-  generatorVersion: 7,
+  generatorVersion: 8,
   wholePlanet1: '4219af3346401cb7',
   wholePlanet2: 'ff1572afae8b0e0f',
-  farPlanetChunks: '2ee7a5fc953660f1',
-  heatPlanetChunks: '6673a1aec38488d0',
+  farPlanetChunks: 'c602124184c77617',
+  heatPlanetChunks: 'c231252e3b76c103',
 }
 
 /** One digest over every chunk's digest in a fixed order. */

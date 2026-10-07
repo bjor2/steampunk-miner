@@ -6,6 +6,8 @@
  * widens the pad under the Refinery bay from planet 3 (#105), planets 1 and 2 unchanged; version 5
  * paints lava pockets on the heat planets 8 to 16 (#113), planets 1 to 7 unchanged; version 6 lays
  * the pad from -8 to +12 under the two shop buildings, growing east from planet 10 (#170, #175);
- * version 7 rolls each ore patch's rarity lead, 0, +1 or +2 tiers, on every planet (#140, #146).
+ * version 7 rolls each ore patch's rarity lead, 0, +1 or +2 tiers, on every planet (#140, #146);
+ * version 8 gives each ore patch from planet 3 its planet's family mix and signature (#141, #147),
+ * planets 1 and 2 unchanged.
  */
-export const GENERATOR_VERSION = 7
+export const GENERATOR_VERSION = 8

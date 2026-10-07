@@ -25,6 +25,10 @@
  * generated material cell, so every edit stays as it is and the ore no one has mined yet reads its
  * lead. The whole state is kept.
  *
+ * Generator 7 -> 8 (#147): each ore patch from planet 3 wears its planet's family mix and
+ * signature, which changes only the family of generated ore cells; as for 6 -> 7, every edit and
+ * the whole state are kept.
+ *
  * A save from before every bump reads at snapshot 18 and generator 5: the snapshot steps run
  * first, as the TD's save chain orders them, so the generator steps restore the state with this
  * build's reader.
@@ -86,6 +90,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'snapshotVersion', from: 19, to: 20, migrate: sizeChargeRacks },
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
+  { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
 ]
 
 export type MigratedSaveSlotReading = SaveSlotReading & { migrations: readonly SaveMigration[] }
@@ -162,9 +167,18 @@ function regeneratePadArea(file: SaveSlotFile): SaveSlotFile | null {
 
 /** Generator 6 -> 7: the state is read as saved and written again under this generator. */
 function keepEditsUnderOreLeads(file: SaveSlotFile): SaveSlotFile | null {
+  return keptUnderGenerator(file, 7)
+}
+
+/** Generator 7 -> 8: as 6 -> 7, since the mix too moves only cells no one has dug. */
+function keepEditsUnderOreMix(file: SaveSlotFile): SaveSlotFile | null {
+  return keptUnderGenerator(file, 8)
+}
+
+function keptUnderGenerator(file: SaveSlotFile, generatorVersion: number): SaveSlotFile | null {
   const restored = restoreUnderThisGenerator(file)
   if (restored === null) return null
-  return { ...saveSlotOf(takeSnapshot(restored), file.saveEpoch), generatorVersion: 7 }
+  return { ...saveSlotOf(takeSnapshot(restored), file.saveEpoch), generatorVersion }
 }
 
 /** A generator bump never changes the state's shape, so the old state restores as it is. */

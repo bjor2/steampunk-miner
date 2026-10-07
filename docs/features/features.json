@@ -561,8 +561,9 @@
         },
         {
           "title": "More resource families",
-          "description": "Crystals, volcanic, relic and other families with names, colours and special properties.",
-          "status": "planned",
+          "description": "Each planet from planet 3 mines its own mix of twelve ore families, set by its act (Foothold, Fire, Frost, Lodestone, Hollow, then cycling in endless) and its seed, with one signature ore in the two deepest bands that sells a tier up and needs a better drill tip. Still to come: each family's own look in the ground and the extractors that free the gated ores.",
+          "status": "partial",
+          "issues": [141, 147, 144, 148],
           "doc": "design.md §6"
         }
       ]

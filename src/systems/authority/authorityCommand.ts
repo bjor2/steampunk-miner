@@ -78,8 +78,10 @@ import type { BayId } from '../world/dockBays'
  *    trigger `by`, and `ChargeDisarmed` joins.
  * 32: the dynamite slice (#149): the plunger `dynamite.detonate_charge {}` with its rejections
  *    `dynamite.detonator_locked` and `dynamite.no_live_charge`, and `dynamite.DetonateRefused`.
+ * 33: the planet-mix slice (#147): from planet 3 `CargoAdded` names the planet mix's families, a
+ *    signature unit carries `signature: true` and is held and sold one tier up (#232 `saleTier`).
  */
-export const AUTHORITY_PROTOCOL_VERSION = 32
+export const AUTHORITY_PROTOCOL_VERSION = 33
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
