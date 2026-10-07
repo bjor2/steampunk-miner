@@ -219,6 +219,48 @@ iron and soot, and the only light is warm window, lamp and skylight glass on the
 sheets are in [docs/art/shops/](art/shops/README.md). `scripts/art/author_shop_buildings.py` wrote
 the first version of both files. From then on the `.blend` files are the sources.
 
+## The dock add-ons
+
+The three in-place add-ons of the [#170](https://github.com/bjor2/steampunk-miner/issues/170)
+amendment, built by [#197](https://github.com/bjor2/steampunk-miner/issues/197) (sources and pure
+rules) and wired by #222: the scanner mast up the Assay & Exchange (`scanner_station`, P14), the
+research annex behind the Engineering Works (`research_lab`, P15) and the drone hangar on the
+Works' roof (`drone_bay`, P20). Each stands on the pad only where the platform has built its
+facility row (H1: a vision row shows nothing). The ids are the #52 kebab form of the row ids under
+the platform category; the `dock-buildings` slice registers them through `r.artAssets` (#214) on
+wiring, so until then nothing exports, lints or draws them. Each add-on is authored in its own
+frame and bolted onto its host at `atM` (metres from the host's origin, the zone centre on the pad
+top) from `src/features/dock-buildings/dockAddOns.json`, which the review render reads too. Each is
+at most two parts (#170 amendment "Parts": the base set at most 30, an add-on 2, a counter building
+4, 48 in all): the shell, named for the asset, and the one part the code can move.
+
+| Asset                      | Host, `atM`          | Moving part (pivot)                   | Draw order against the host         |
+| -------------------------- | -------------------- | ------------------------------------- | ----------------------------------- |
+| `platform-scanner-station` | Sell, (2.4, 5.3)     | `scanner-dish` (its bearing)          | over the shell and the ticker       |
+| `platform-research-lab`    | Workshop, (−2.9, 0)  | `lab-orrery` (the rings' centre)      | behind the shell, above the roof    |
+| `platform-drone-bay`       | Workshop, (1.9, 5.6) | `hangar-drone` (its centre, hovering) | over the shell and the gantry's jib |
+
+- **The scanner mast** is a 7 m gunmetal lattice up the tower's right flank, bracketed into the
+  wall under the funnel's rim, brass-banded, with a railed crow's nest and a lantern. The dish is
+  in profile on its bearing, pointed up and right, with a lit feed at its focus; the code turns it
+  about the bearing.
+- **The research annex** is a riveted iron block at pad level behind the Works' back wall, so only
+  what rises over the sawtooth roofline shows: two tall arched windows, a brass nameplate, a glazed
+  observatory dome ribbed in brass, a glass condenser column with a warm core and a copper cap,
+  piped into the dome, and a short stack. The armillary orrery on the dome's finial is the moving
+  part.
+- **The drone hangar** is a riveted deck on short legs down to the roof's slope, an arched iron
+  shed open to the camera (a dark mouth under a lit lintel, rimmed in brass) with a beacon, and a
+  railed landing ring on the deck's left. The hauler drone, a small gas bag with a brass gondola, a
+  stern screw and a hook, hovers over the ring; the code can bob it or fly it.
+
+The palette is the shop buildings' brass, iron and soot; the only light is warm glass on the
+emissive maps (window, lamp, the condenser's core, the dish's feed), so orange stays reserved for
+heat. The review renders are in [docs/art/dock-add-ons/](art/dock-add-ons/README.md).
+`scripts/art/author_dock_add_ons.py` wrote the first version of the three files and refuses a
+file with more than two parts or a pivot outside its part. From then on the `.blend` files are
+the sources.
+
 ## The Workshop showcase
 
 The rig and reaction pieces of [#180](https://github.com/bjor2/steampunk-miner/issues/180) section

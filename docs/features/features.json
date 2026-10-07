@@ -738,24 +738,24 @@
             },
             {
               "title": "Scanner station",
-              "description": "Reveals what lies underground.",
+              "description": "Reveals what lies underground. Its mast on the Assay & Exchange is modelled; the station itself is not built.",
               "status": "planned",
-              "issues": [80],
+              "issues": [80, 197, 221, 222],
               "planet": 14
             },
             {
               "title": "Drone bay",
-              "description": "Hauler drones that ferry cargo.",
+              "description": "Hauler drones that ferry cargo. Its hangar on the Works' roof is modelled; the drones are not built.",
               "status": "planned",
-              "issues": [80],
+              "issues": [80, 197, 221, 222],
               "planet": 20
             },
             {
               "title": "Research lab",
-              "description": "Research to unlock new technology.",
+              "description": "Research to unlock new technology, from the annex behind the Works (modelled; the lab's research is not built).",
               "status": "planned",
-              "issues": [80],
-              "planet": 24
+              "issues": [80, 197, 221, 222, 206],
+              "planet": 15
             },
             {
               "title": "Quest office",
