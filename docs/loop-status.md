@@ -35,9 +35,13 @@ applied. The rule lives in `scripts/status/issueBuckets.mjs`, which the page imp
 
 Parents close themselves: on every pass the build loop closes any open issue labelled `build`,
 `wayfinder:map`, `wayfinder:task`, `perf` or `design` (build plans, wayfinder maps, specs, perf
-plans) once its `sub_issues_summary` has `total > 0` and `completed == total`, with a comment saying
-all sub-issues are closed. Root map #1 follows the same strict rule. So a parent leaves the Open
-list as soon as its last child closes.
+plans) once its `sub_issues_summary` has `total > 0` and `completed == total` **and** the issues it
+links in its body (`issues/<n>`, this repo; the umbrella plan #90 and the issue itself don't count)
+are closed too, with a comment saying so. A wayfinder map stays open until everything it lists is
+built: its decision tickets **and** every build (or other issue) it links must be closed. A spec or
+plan parent waits for the `build` tickets it links. Two parents that link each other don't block
+each other. Root map #1 follows the same strict rule. So a map leaves the Open list only when its
+last decision ticket and its last linked build have closed.
 
 ## Performance tab
 
