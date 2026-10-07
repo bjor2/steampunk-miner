@@ -320,8 +320,8 @@ export interface SliceRegistrar {
   attachUse(use: AttachUse): void
   buildingAttachUse(use: BuildingAttachUse): void      // #175, section 3.11
   hudPanel(panel: HudPanel): void
-  bayPanel(panel: BayPanel): void                      // ticket 220, section 3.21
-  moneyCounter(provider: MoneyCounterProvider): void   // one provider, ticket 220, section 3.21
+  bayPanel(panel: BayPanel): void                      // ticket 220, section 3.22
+  moneyCounter(provider: MoneyCounterProvider): void   // one provider, ticket 220, section 3.22
   worldPiece(piece: WorldPiece): void                  // #175, section 3.14
   vehicleStaging(provider: VehicleStagingProvider): void  // one provider, #175, section 3.14
   artAssets(assets: readonly ArtAsset[]): void          // bare art ids, #214
