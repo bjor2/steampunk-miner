@@ -11,7 +11,8 @@
     "mining-gates": 1,
     "mobility": 1,
     "power-up-core": 1,
-    "tech-tree": 1
+    "tech-tree": 1,
+    "terrain-tools": 1
   },
   "worldSeed": 83921,
   "endTick": 704,
