@@ -10,7 +10,7 @@ import type { GateBlock } from './powerUpKind'
 
 declare module '../../../systems/authority/authorityCommand' {
   interface CommandPayloads {
-    /** #162 section 2.3: press the power-up in a slot (`use_slot_1`-`5`). */
+    /** #162 section 2.3: press the power-up in a slot (`use_slot_1`-`5`), or a drill socket's gear. */
     'power-up-core.use_power_up': { slot: string }
     /** A scenario's charges left for one owned power-up. */
     'debug.power-up-core.setCharges': { itemId: string; chargesLeft: number }

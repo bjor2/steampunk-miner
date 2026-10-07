@@ -22,6 +22,12 @@ export { chargesLeftOf } from './systems/chargeState'
 export { powerUpAtMarkOf, type MarkedPowerUp } from './systems/powerUpMarks'
 export { returnCharge } from './systems/useResolution'
 export { toggleDrawQuantaOf } from './systems/toggleDraw'
-export { POWER_UP_SLOTS, type PowerUpSlot } from './systems/powerUpSlots'
+export {
+  DRILL_GEAR_SOCKETS,
+  POWER_UP_SLOTS,
+  type DrillGearSocket,
+  type PowerUpSlot,
+  type PressableSlot,
+} from './systems/powerUpSlots'
 export { intentToUseSlot } from './systems/slotUse'
 export { isToggleEngaged } from './systems/toggleRead'

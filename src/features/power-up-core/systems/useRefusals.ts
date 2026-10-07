@@ -12,7 +12,7 @@ import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
 import { chargesLeftIn, itemChargesOf, powerUpStateOf } from './chargeState'
 import { hasCharges, isUsableFromSlot, powerUpOfItem, type PowerUp } from './powerUpKind'
 import { atResearchedMark } from './powerUpMarks'
-import { isPowerUpSlot } from './powerUpSlots'
+import { isPressableSlot } from './powerUpSlots'
 
 export function refusalOfUse(
   state: AuthorityState,
@@ -48,8 +48,8 @@ export function pressablePowerUpOf(vehicle: VehicleState, slot: LoadoutSlotId): 
 }
 
 function slotRefusalOf(slot: string): Rejection | null {
-  if (isPowerUpSlot(slot)) return null
-  return rejectionOf('power-up-core.not_a_power_up_slot', `"${slot}" is not a power-up slot`)
+  if (isPressableSlot(slot)) return null
+  return rejectionOf('power-up-core.not_a_power_up_slot', `no press reaches "${slot}"`)
 }
 
 /** A wrecked vehicle uses nothing; a stranded one still may (the ballast is a self-rescue). */

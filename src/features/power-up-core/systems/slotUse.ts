@@ -9,7 +9,7 @@ import type { CommandIntent } from '../../../systems/authority/authorityCommand'
 import type { InputReactionEntry } from '../../../systems/registries/inputReactions'
 import type { InputSituation } from '../../../systems/input/inputRouting'
 import './powerUpEvents'
-import { actionOfSlot, POWER_UP_SLOTS, type PowerUpSlot } from './powerUpSlots'
+import { actionOfSlot, POWER_UP_SLOTS, type PowerUpSlot, type PressableSlot } from './powerUpSlots'
 import { pressablePowerUpOf } from './useRefusals'
 
 export const SLOT_USE_REACTIONS: readonly InputReactionEntry[] = POWER_UP_SLOTS.map((slot) => ({
@@ -19,7 +19,7 @@ export const SLOT_USE_REACTIONS: readonly InputReactionEntry[] = POWER_UP_SLOTS.
   toIntent: (situation: InputSituation) => slotIntentOf(situation, slot),
 }))
 
-export function intentToUseSlot(slot: PowerUpSlot): CommandIntent {
+export function intentToUseSlot(slot: PressableSlot): CommandIntent {
   return { type: 'power-up-core.use_power_up', payload: { slot } }
 }
 

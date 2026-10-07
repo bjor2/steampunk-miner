@@ -6,12 +6,13 @@ import { toCanonical } from '../../../systems/money'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { chargesLeftOf } from './chargeState'
 import { FAKE, FAKE_GATE, FAKE_REFUSAL, inField } from '../fakeItems'
+import type { PressableSlot } from './powerUpSlots'
 import { intentToUseSlot } from './slotUse'
 
 // Fake charged, channel, consumable and toggle items through `use_power_up` (#200 acceptance 1-3,
 // #162 G&V E2 and E6 on a fake channel): each acts, is refused, and comes back as the dock says.
 
-const press = (slot: 'powerup.1' | 'powerup.2' | 'powerup.3') => intentToUseSlot(slot)
+const press = (slot: PressableSlot) => intentToUseSlot(slot)
 
 const ofType = (events: readonly DomainEvent[], type: string) =>
   events.filter((event) => event.type === type)
@@ -239,13 +240,59 @@ describe('power-up use: what a slot press cannot use', () => {
     )
   })
 
-  it('refuses a slot that is not a power-up slot', () => {
-    inField((session) => {
-      const intent = {
-        type: 'power-up-core.use_power_up',
-        payload: { slot: 'drill.head' },
-      } as const
-      expect(rejectionOf(session, 10, intent)).toBe('power-up-core.not_a_power_up_slot')
-    })
+  it('refuses a slot no press reaches: drill.head holds only bits on while slotted', () => {
+    inField(
+      (session) => {
+        const intent = {
+          type: 'power-up-core.use_power_up',
+          payload: { slot: 'drill.head' },
+        } as const
+        expect(rejectionOf(session, 10, intent)).toBe('power-up-core.not_a_power_up_slot')
+      },
+      { slots: { 'drill.head': FAKE.toggle } },
+    )
+  })
+})
+
+// The GD lock on #205 Q1 (a): a press reaches the drill sockets' field gear the way it reaches a
+// slot, with the same charges, cooldown, wind-up and gate paths.
+describe('power-up use: the drill sockets', () => {
+  it('switches a toggle in drill.flank on and off', () => {
+    inField(
+      (session) => {
+        const toggledOn = (tick: number) =>
+          ofType(session.submit(tick, press('drill.flank')), 'power-up-core.PowerUpUsed').map(
+            (event) => event.type === 'power-up-core.PowerUpUsed' && event.toggledOn,
+          )
+        expect(toggledOn(10)).toEqual([true])
+        expect(toggledOn(11)).toEqual([false])
+      },
+      { slots: { 'drill.flank': FAKE.toggle } },
+    )
+  })
+
+  it('uses a charged item in drill.collar: wind-up, one charge, then its cooldown', () => {
+    inField(
+      (session) => {
+        session.submit(10, press('drill.collar'))
+        session.advanceTo(16)
+        expect(walletOf(session)).toBe('1e+0')
+        expect(chargesOf(session, FAKE.charged)).toBe(1)
+        expect(rejectionOf(session, 20, press('drill.collar'))).toBe('power-up-core.cooling_down')
+      },
+      { slots: { 'drill.collar': FAKE.charged } },
+    )
+  })
+
+  it('gives the charge back when a gate blocks the collar gear', () => {
+    inField(
+      (session) => {
+        session.submit(10, press('drill.collar'))
+        const events = session.advanceTo(20)
+        expect(ofType(events, 'power-up-core.PowerUpBlocked')).toHaveLength(1)
+        expect(chargesOf(session, FAKE.charged)).toBe(2)
+      },
+      { slots: { 'drill.collar': FAKE.charged }, facing: FACING.down },
+    )
   })
 })

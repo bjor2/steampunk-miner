@@ -26,7 +26,7 @@ import type {
   PowerUpUse,
   SlotHold,
 } from './systems/powerUpKind'
-import { POWER_UP_SLOTS } from './systems/powerUpSlots'
+import { DRILL_GEAR_SOCKETS, POWER_UP_SLOTS } from './systems/powerUpSlots'
 
 export const FAKE = {
   charged: 'fake-items.charged',
@@ -114,7 +114,8 @@ function numbers(powerUpClass: PowerUpClass, values: Partial<FakeNumbers>): Fake
 }
 
 function fakeItemOf(itemId: string): VehicleItem {
-  return { id: itemId, iconId: 'icon-panel-slots', slots: POWER_UP_SLOTS, attach: null }
+  const slots = [...POWER_UP_SLOTS, ...DRILL_GEAR_SOCKETS]
+  return { id: itemId, iconId: 'icon-panel-slots', slots, attach: null }
 }
 
 function fakePowerUpOf(itemId: string): PowerUp {
