@@ -64,6 +64,8 @@ export interface VehicleStepInput {
   canAct: boolean
   /** The slices' motion effects on this vehicle this step (ticket 233); none when absent. */
   motion?: VehicleMotion
+  /** A magnetic field's tug in m/s (#258, ticket 290); none when absent. */
+  tug?: Vector2
 }
 
 export interface VehicleStepResult {
@@ -151,6 +153,7 @@ export function createVehicleController(
         isWaitingForCut: isCuttingLevel && contact === 'inTheWay',
         dt: PHYSICS_TIMESTEP,
         effect: motionEffectInputOf(input.motion, position, up, planet.ground),
+        tug: input.tug,
       })
       driveBody(body, motion.velocity, up)
       return {

@@ -6,6 +6,7 @@
  * sparks, the speed and lift to the sounds, and the tick's motion to the part animation (#48). After the tow or a planet change the body
  * is placed on the dock the authority put the vehicle on. A dock building may stage the vehicle
  * first (#170 auto-roll, `vehicleStage.ts`): the drawn car and the camera move, the body does not.
+ * On a magnetic planet the field the body stood in at the last step tugs it (#258, ticket 290).
  */
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
 import type { PlanetView, VehicleController, VehicleStepResult } from '../physics/vehicleController'
@@ -16,6 +17,8 @@ import {
   useGameStore,
 } from '../store/gameStore'
 import { readAuthorityState } from '../store/authorityLink'
+import type { AuthorityState } from '../systems/authority/authorityState'
+import { magneticTugAt } from '../systems/authority/magnetic/magneticTug'
 import { engineStatsAtStep } from '../systems/economy/vehicleStats'
 import { vehicleMotionAt, type VehicleMotion } from '../systems/registries/vehicleMotionEffects'
 import {
@@ -25,12 +28,13 @@ import {
   type PoseReporter,
 } from '../systems/vehicle/poseReport'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import type { Vector2 } from '../systems/vehicle/localFrame'
 import { driveSignsOfIntent } from '../systems/vehicle/driveSigns'
 import { noseTileOf } from '../systems/vehicle/vehiclePose'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { groundReaderOf } from '../systems/world/groundReader'
-import { chunkKey } from '../systems/world/tileGrid'
+import { chunkKey, type TilePoint } from '../systems/world/tileGrid'
 import type { WorldState } from '../systems/world/worldState'
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
@@ -49,6 +53,20 @@ interface LoopState {
   reporter: PoseReporter
   placement: string
   view: { world: WorldState; params: PlanetParams; planet: PlanetView } | null
+  /** The tile the body stood on after the last step (scratch, rewritten each step). */
+  tile: TilePoint
+  hasStepped: boolean
+  tug: TugMemo | null
+}
+
+/** The tug read for one tile, kept while the ground, the planet and the vehicle stay the same. */
+interface TugMemo {
+  world: WorldState
+  planet: AuthorityState['planet']
+  vehicle: VehicleState
+  tile: TilePoint
+  /** Absent where no field pulls. */
+  tug: Vector2 | undefined
 }
 
 export function createVehicleLoop(): VehicleLoop {
@@ -57,6 +75,9 @@ export function createVehicleLoop(): VehicleLoop {
     reporter: NEW_POSE_REPORTER,
     placement: '',
     view: null,
+    tile: { tx: 0, ty: 0 },
+    hasStepped: false,
+    tug: null,
   }
   return {
     step(controller, intent) {
@@ -72,9 +93,11 @@ export function createVehicleLoop(): VehicleLoop {
           engine: engineStatsAtStep(vehicle.levels.engine),
           canAct: canVehicleAct(vehicle),
           motion: readLocalMotion(),
+          tug: readLocalTug(loop),
         },
         planetViewOf(loop, params, world),
       )
+      noteBodyTile(loop, result)
       reportWhenDue(loop, result, stagedIntent)
       showDrill(result)
       showMotion(result)
@@ -88,6 +111,41 @@ export function createVehicleLoop(): VehicleLoop {
 function readLocalMotion(): VehicleMotion {
   const state = readAuthorityState()
   return vehicleMotionAt(state, useGameStore.getState().playerId, state.tick)
+}
+
+/** The field's tug on the local vehicle where the body stood after the last step. */
+function readLocalTug(loop: LoopState): Vector2 | undefined {
+  const state = readAuthorityState()
+  const playerId = useGameStore.getState().playerId
+  if (!loop.hasStepped) return undefined
+  if (isTugMemoFresh(loop.tug, state, playerId, loop.tile)) return loop.tug.tug
+  const tile = { tx: loop.tile.tx, ty: loop.tile.ty }
+  const tug = magneticTugAt(state, playerId, tile) ?? undefined
+  const vehicle = state.players[playerId].vehicle
+  loop.tug = { world: state.world, planet: state.planet, vehicle, tile, tug }
+  return tug
+}
+
+function noteBodyTile(loop: LoopState, result: VehicleStepResult): void {
+  loop.tile.tx = Math.floor(result.pose.x / MM_PER_METRE)
+  loop.tile.ty = Math.floor(result.pose.y / MM_PER_METRE)
+  loop.hasStepped = true
+}
+
+function isTugMemoFresh(
+  memo: TugMemo | null,
+  state: AuthorityState,
+  playerId: string,
+  tile: TilePoint,
+): memo is TugMemo {
+  if (memo === null) return false
+  return (
+    memo.world === state.world &&
+    memo.planet === state.planet &&
+    memo.vehicle === state.players[playerId].vehicle &&
+    memo.tile.tx === tile.tx &&
+    memo.tile.ty === tile.ty
+  )
 }
 
 /** A stranded or empty vehicle neither drives, lifts nor drills (#7). */

@@ -12,7 +12,9 @@
  * never refused. The slices' gate checks may refuse an ore cell or destroy it without cargo, and
  * the drill reports each as a `DrillGated` (`drillGates.ts`); with none registered the drill is
  * unchanged. A slice's drill gear adds cells past the bit and beside the bore to the reported
- * drill's cut (`drillGearCut.ts`); with none registered the cut is the disc alone.
+ * drill's cut (`drillGearCut.ts`); with none registered the cut is the disc alone. On a magnetic
+ * planet an electrified cell takes its shock's ticks longer, and shocks the vehicle as it breaks
+ * (`magnetic/electrifiedShock.ts`, spec #258).
  */
 import { casingHardness } from '../economy/casingGrades'
 import { coreHardness, blockHardness, oreSalePrice } from '../economy/oreEconomy'
@@ -47,6 +49,12 @@ import { heatThrottledDrill } from './heatRules'
 import { minedOreOf, type MinedOre } from './minedOre'
 import { oreCellHardness, scratchFloorOfCell } from './signatureCells'
 import { wakeLavaBeside } from './lava/lavaRules'
+import {
+  shockElectrifiedCells,
+  shockTicksFor,
+  unshieldedShockTicksAt,
+  type ShockTicksAt,
+} from './magnetic/electrifiedShock'
 
 type CarveIn = (request: DrillCarveRequest) => DrillCarve
 
@@ -100,15 +108,29 @@ export function hardnessOfTile(params: PlanetParams, tile: TilePoint, cell: numb
   return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
 }
 
-/** The ticks the drill takes to break an intact cell, at its hardness and its scratch floor. */
+/**
+ * The ticks the drill takes to break an intact cell, at its hardness and its scratch floor, with
+ * an electrified cell's shock (unshielded), so the bot and the tile-time view read what it costs.
+ */
 export function ticksPerCell(
   drill: DrillStats,
   params: PlanetParams,
   tile: TilePoint,
   cell: number,
 ): number | null {
+  return shockedTicksPerCell(drill, params, tile, cell, unshieldedShockTicksAt)
+}
+
+function shockedTicksPerCell(
+  drill: DrillStats,
+  params: PlanetParams,
+  tile: TilePoint,
+  cell: number,
+  shockTicksAt: ShockTicksAt,
+): number | null {
   const floor = scratchFloorOfCell(params, tile, cell)
-  return ticksPerTile(drill, hardnessOfTile(params, tile, cell), floor)
+  const cut = ticksPerTile(drill, hardnessOfTile(params, tile, cell), floor)
+  return cut === null ? null : cut + shockTicksAt(params, tile, cell)
 }
 
 interface DrillTarget {
@@ -129,14 +151,18 @@ function drillGround(
   const ticks = Math.min(requestedTicks, affordableTicksOf(vehicle))
   if (ticks === 0) return unchanged(state)
   const window = { firstTick: Math.max(0, state.tick - ticks), ticks }
-  const gates = openDrillGates(state, playerId, params, drillTicksOfCells(params, drill))
+  const cellTicks = drillTicksOfCells(params, drill, shockTicksFor(state, playerId))
+  const gates = openDrillGates(state, playerId, params, cellTicks)
   const carved = target.carve({ world: state.world, window, gates, energy: vehicle.energy })
   if (carved.ticksUsed === 0) return { state, events: gates.refusedEvents() }
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
     ...withAheadLatch(vehicle, carved.aheadLatch),
     energy: vehicle.energy - carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill - carved.gearQuanta,
   })
-  const collected = collectYieldedCells(charged, playerId, params, carved.yielded, gates)
+  const collected = chainEffects(charged, [
+    (current) => collectYieldedCells(current, playerId, params, carved.yielded, gates),
+    (current) => shockElectrifiedCells(current, playerId, params, carved.yielded),
+  ])
   return {
     state: wakeLavaBeside(collected.state, params, carved.yielded, state.tick),
     events: [
@@ -160,12 +186,17 @@ function affordableTicksOf(vehicle: VehicleState): number {
 
 /**
  * A sample's drill time from its own hardness: hard rock carves slower inside the same stamp, and
- * lining carves as band-G rock of its grade on this planet (#41 `casingHardness`).
+ * lining carves as band-G rock of its grade on this planet (#41 `casingHardness`). An electrified
+ * cell adds the shock the player's drill pays.
  */
-function drillTicksOfCells(params: PlanetParams, drill: DrillStats): CellDrillTicks {
+function drillTicksOfCells(
+  params: PlanetParams,
+  drill: DrillStats,
+  shockTicksAt: ShockTicksAt,
+): CellDrillTicks {
   return (tile, material, casingGrade) =>
     casingGrade === 0
-      ? ticksPerCell(drill, params, tile, material)
+      ? shockedTicksPerCell(drill, params, tile, material, shockTicksAt)
       : ticksPerTile(drill, casingHardness(params.planetIndex, casingGrade))
 }
 

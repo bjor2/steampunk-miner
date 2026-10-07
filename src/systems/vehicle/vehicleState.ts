@@ -84,6 +84,12 @@ export interface VehicleState {
    * aimed by the drive first cuts, so with none registered the state and its digest are unchanged.
    */
   aheadLatch?: AheadLatch
+  /**
+   * The on-curve hull share, in basis points, that electrified cells' shocks took this dive (spec
+   * #258, ticket 290), held to the dive cap. Absent until the first shock and again from the dock,
+   * so off the magnetic planets the state and its digest are unchanged.
+   */
+  shockHullBp?: number
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

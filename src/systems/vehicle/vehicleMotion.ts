@@ -7,7 +7,9 @@
  *
  * A slice's motion effects (ticket 233, `motionEffects.ts`) boost the engine, hold the body against
  * gravity, or set its velocity outright for a burst or a reel. With none, or a vehicle that cannot
- * act, the step is exactly the plain one.
+ * act, the step is exactly the plain one. A magnetic field's tug (#258, ticket 290) moves the
+ * wheels' target along the ground by its share along it, so the rig drifts at the tug's speed and
+ * drives at its own plus that; the axis along `localUp` stays gravity's and the lift's.
  */
 import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
 import {
@@ -53,6 +55,8 @@ export interface MotionStepInput {
   dt: number
   /** The slices' motion effects this step; absent when none applies. */
   effect?: MotionEffectInput
+  /** A magnetic field's tug in m/s (`magneticTug.ts`); absent outside a field. */
+  tug?: Vector2
 }
 
 export interface MotionEffectInput {
@@ -149,11 +153,16 @@ function upwardSpeedOf(input: MotionStepInput): number {
  */
 function nextAlongSpeed(input: MotionStepInput, engine: EngineStats): number {
   const current = dot(input.velocity, tangentOf(input.up))
-  const target = input.canAct ? targetAlongSpeed(input, engine) : 0
+  const target = (input.canAct ? targetAlongSpeed(input, engine) : 0) + tugAlongOf(input)
   const maxChange = BASE_DRIVE_ACCELERATION * engine.accel * input.dt
   const gap = target - current
   if (Math.abs(gap) <= maxChange) return target
   return current + Math.sign(gap) * maxChange
+}
+
+/** The tug's share along the ground; 0 outside a field. */
+function tugAlongOf(input: MotionStepInput): number {
+  return input.tug === undefined ? 0 : dot(input.tug, tangentOf(input.up))
 }
 
 function targetAlongSpeed(input: MotionStepInput, engine: EngineStats): number {

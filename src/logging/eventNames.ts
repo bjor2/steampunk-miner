@@ -423,6 +423,19 @@ export const RUN_EVENT_REGISTRY = {
     payload: { tx: 'integer', ty: 'integer' },
   },
   lava_blocked: { group: 'mining', level: 'core', payload: { ring: 'text' } },
+  // Spec #258, ticket 290: the vehicle drove into a magnetic field, and the drill broke an
+  // electrified cell, whose shock cost ticks and a share of the on-curve hull in basis points, or
+  // nothing when the dielectric bit shielded the cut.
+  magnetic_field_entered: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { planetIndex: 'integer' },
+  },
+  electrified_cell_shocked: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { ticks: 'integer', hullBp: 'integer', withBit: 'flag' },
+  },
   energy_low: { group: 'mining', level: 'core', payload: { threshold: 'integer' } },
   rare_resource_discovered: { group: 'mining', level: 'core', payload: 'unspecified' },
   tile_drilled: { group: 'mining', level: 'detail', payload: 'unspecified' },

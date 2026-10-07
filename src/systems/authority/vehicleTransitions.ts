@@ -33,6 +33,7 @@ import { endTrip } from './combat/enemyRoster'
 import { disarmOnModeChange } from './charges/chargeDisarm'
 import { bankCoreFragments } from './coreBay'
 import type { Attacker, DomainEvent, DomainEventBody, RescueCause } from './domainEvent'
+import { endShockDiveOnDock } from './magnetic/shockDive'
 import { dockSiteOfPlanet } from './planetOfState'
 
 /** What follows any change to a vehicle's energy: the low-energy lines, then a possible strand. */
@@ -171,6 +172,7 @@ export function changeMode(
   return chainEffects(state, [
     (current) => recordModeChange(current, playerId, to, reason, tick),
     (current) => disarmOnModeChange(current, playerId, to),
+    (current) => endShockDiveOnDock(current, playerId, to),
   ])
 }
 

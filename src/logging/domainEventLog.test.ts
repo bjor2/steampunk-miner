@@ -343,6 +343,28 @@ describe('domain event log', () => {
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
 
+  it('records a field entry and a shock as schema-valid lines, the shock without its cell (#290)', () => {
+    const stamp = { tick: 900, playerId: 'p1', seq: 4 }
+    const events: DomainEvent[] = [
+      { ...stamp, type: 'MagneticFieldEntered', planetIndex: 25 },
+      {
+        ...stamp,
+        type: 'ElectrifiedCellShocked',
+        tx: -43,
+        ty: 781,
+        ticks: 30,
+        hullBp: 200,
+        withBit: false,
+      },
+    ]
+    recordDomainEvents({ playerId: 'p1', planet: 25, depthTiles: 78 }, events)
+    expect(sink.events.map(({ event, data }) => ({ event, data }))).toEqual([
+      { event: 'magnetic_field_entered', data: { planetIndex: 25 } },
+      { event: 'electrified_cell_shocked', data: { ticks: 30, hullBp: 200, withBit: false } },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
   it('records every combat event as a registered line; an enemy kill names no enemy id', () => {
     recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, combatEvents)
     expect(sink.events.map((event) => event.event)).toEqual([

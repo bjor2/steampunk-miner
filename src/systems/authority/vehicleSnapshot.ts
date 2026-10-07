@@ -123,6 +123,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.aheadLatch === undefined || isPortableAheadLatch(vehicle.aheadLatch)
       ? []
       : [`${path}.aheadLatch must hold a bearing and a tile, or be left out`]),
+    ...(vehicle.shockHullBp === undefined || isWholeNumber(vehicle.shockHullBp)
+      ? []
+      : [`${path}.shockHullBp must be a whole number of basis points, or be left out`]),
   ]
 }
 

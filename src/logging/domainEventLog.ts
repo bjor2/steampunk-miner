@@ -109,6 +109,14 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
   OverheatStarted: () => ({ event: 'overheat_started', data: {} }),
   OverheatEnded: () => ({ event: 'overheat_ended', data: {} }),
   LavaTouched: ({ tx, ty }) => ({ event: 'lava_contact', data: { tx, ty } }),
+  MagneticFieldEntered: ({ planetIndex }) => ({
+    event: 'magnetic_field_entered',
+    data: { planetIndex },
+  }),
+  ElectrifiedCellShocked: ({ ticks, hullBp, withBit }) => ({
+    event: 'electrified_cell_shocked',
+    data: { ticks, hullBp, withBit },
+  }),
   LavaBlocked: ({ ring }) => ({ event: 'lava_blocked', data: { ring } }),
   VehicleModeChanged: ({ from, to, reason }) => ({
     event: 'vehicle_state_changed',

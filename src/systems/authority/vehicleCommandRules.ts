@@ -6,7 +6,8 @@
  *   quanta) and carves the drill's stamp at the pose for the drill ticks (#36), then lays casing
  *   rings behind the drill every 0.5 m it cut (#41, #56); it also telegraphs a casing grade too low
  *   for the band (#41), and logs the guns' hits since the last report (#107), then settles the heat gauge
- *   on a heat planet and burns a vehicle touching lava (#113). A stranded or destroyed vehicle
+ *   on a heat planet and burns a vehicle touching lava (#113). A report that drives the vehicle
+ *   into a magnetic field says so (spec #258, ticket 290). A stranded or destroyed vehicle
  *   still reports its pose (gravity and hits apply) but its action ticks are ignored.
  * - `drillTile`: scripted mining of one tile within reach: the same drilling path, carving that
  *   cell's own samples, and the same casing rings behind the drill from the last reported pose
@@ -51,6 +52,7 @@ import { noteReportForCombat } from './combat/poseReportCombat'
 import { drillAtPose, drillCell } from './groundDrill'
 import { followHeat, type HeatActivity } from './heatRules'
 import { touchLavaAtPose } from './lava/lavaRules'
+import { enterMagneticField } from './magnetic/fieldEntry'
 import type { DomainEventBody } from './domainEvent'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 import { followEnergyChange, rescueCauseOf, towVehicle } from './vehicleTransitions'
@@ -88,6 +90,13 @@ export const VEHICLE_COMMAND_RULES: {
     apply: (state, command) =>
       chainEffects(state, [
         (current) => recordPose(current, command),
+        (current) =>
+          enterMagneticField(
+            current,
+            command.playerId,
+            vehicleOf(state, command.playerId),
+            command.tick,
+          ),
         (current) => followCasingSupport(current, command.playerId),
         (current) => noteReportForCombat(current, command.playerId, command.tick),
         (current) => flushGunHits(current, command.playerId),

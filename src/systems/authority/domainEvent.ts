@@ -265,6 +265,20 @@ export interface KernelDomainEventBodies {
   LavaTouched: { tx: number; ty: number }
   /** Loose lava stopped at a cell its lining type guards; `ring` is that cell's centre in mm. */
   LavaBlocked: { ring: string }
+  /** The vehicle drove from outside every magnetic field into one (spec #258, ticket 290). */
+  MagneticFieldEntered: { planetIndex: number }
+  /**
+   * The drill broke the electrified cell `tx, ty` (spec #258, ticket 290): the shock cost `ticks`
+   * more drilling and `hullBp` of the planet's on-curve hull, or nothing when the dielectric bit
+   * shielded the cut (`withBit`).
+   */
+  ElectrifiedCellShocked: {
+    tx: number
+    ty: number
+    ticks: number
+    hullBp: number
+    withBit: boolean
+  }
   /** The gauge rose past `throttleAt`: the drill is throttled until it falls back below (#113). */
   OverheatStarted: Record<never, never>
   OverheatEnded: Record<never, never>
