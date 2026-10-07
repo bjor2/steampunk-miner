@@ -94,8 +94,10 @@ import type { BayId } from '../world/dockBays'
  *    `drill.collar`, `drill-gear.GroundCrumbled`, `drill-gear.TunnelBackfilled` and
  *    `drill-gear.OreSampled`, its terrain edits and drill gear asks, and `side_drills` logged as
  *    unlocked.
+ * 38: the extraction slice (#201): the mineral drain acts, `extraction.DrainYielded` joins, and
+ *    the `extraction` player section v1 keeps the income items' trip counter.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 37
+export const AUTHORITY_PROTOCOL_VERSION = 38
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

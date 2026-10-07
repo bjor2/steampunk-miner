@@ -2,11 +2,12 @@
   "name": "money-past-1e40",
   "description": "Planet 80 ore sold for more than 1e40, then a cargo_hold level bought for more than 1e40 (#5, #11).",
   "generatorVersion": 8,
-  "authorityProtocolVersion": 37,
+  "authorityProtocolVersion": 38,
   "logSchemaVersion": 4,
   "numberFormatVersion": 1,
   "sliceSections": {
     "codex": 1,
+    "extraction": 1,
     "mining-gates": 1,
     "mobility": 1,
     "power-up-core": 1,
