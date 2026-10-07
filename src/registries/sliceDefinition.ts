@@ -21,6 +21,7 @@ import type {
   DiscoveryKind,
   DiscoveryProvider,
 } from '../systems/registries/discovery'
+import type { DockFacility } from '../systems/registries/dockFacilities'
 import type { DockService } from '../systems/registries/dockServices'
 import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { GateCheck } from '../systems/registries/gateChecks'
@@ -57,6 +58,8 @@ export interface SliceRegistrar {
   clockStep(step: ClockStep): void
   /** A free refill at the end of every paid recharge; the bill never changes (#217). */
   dockService(service: DockService): void
+  /** A dock building that opens its `facility` schedule row from that row's planet on (#221). */
+  dockFacility(facility: DockFacility): void
   /** Answers a pressed action the kernel's routing table leaves open, such as `use_slot_1`. */
   inputReaction(reaction: InputReactionEntry): void
   generationHook(hook: GenerationHook): void

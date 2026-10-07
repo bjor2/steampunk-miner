@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 import { contentScheduleRowClaims } from './content'
+import { dockFacilityScheduleRowClaims } from './dockFacilities'
 import {
   DEFERRED_SCHEDULE_ROWS,
   GENERATED_SCHEDULE_ROWS,
@@ -14,7 +15,7 @@ describe('schedule row coverage', () => {
   it('gives every row of the locked schedule exactly one home among the loaded slices', () => {
     const rowIds = LOCKED_SCHEDULE.rows.map(({ id }) => id)
     const homes: ScheduleRowHomes = {
-      claims: contentScheduleRowClaims(),
+      claims: [...contentScheduleRowClaims(), ...dockFacilityScheduleRowClaims()],
       generated: GENERATED_SCHEDULE_ROWS,
       deferred: DEFERRED_SCHEDULE_ROWS,
     }
