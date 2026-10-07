@@ -4,8 +4,9 @@
  * the drill sockets and as power-ups, their `tech.drill_gear.*` nodes and item cards, and their
  * effects: the bit's crumble as an authority reaction, the cutters and boom on the kernel's drill
  * gear read, the auger as a clock step and the corer as a charged act. KeyF and KeyC press the
- * flank and collar sockets. The twin-bit head and the dielectric bit stay held back (GD lock, Q3).
- * No side effects at import; the loader calls `register`.
+ * flank and collar sockets, and the Upgrade bay sells each item (ticket 248's seller). The
+ * twin-bit head and the dielectric bit stay held back (GD lock, Q3). No side effects at import;
+ * the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { drillGearDebugActions } from './debug'
@@ -17,6 +18,7 @@ import {
   DRILL_GEAR_VEHICLE_ITEMS,
 } from './systems/drillGearContent'
 import { DRILL_SOCKET_REACTIONS } from './systems/drillSocketKeys'
+import { DRILL_GEAR_SELLER } from './systems/drillGearSales'
 import { DRILL_GEAR_ITEM_CARDS } from './systems/itemCards'
 import { SPOIL_AUGER_STEP } from './systems/spoilAuger'
 import { VIBRATORY_CRUMBLE_REACTION } from './systems/vibratoryCrumble'
@@ -28,6 +30,7 @@ export const slice: SliceDefinition = {
     r.content('power-up', DRILL_GEAR_POWER_UPS)
     r.content('tech-node', DRILL_GEAR_TECH_NODES)
     r.itemDescriptionEntries(DRILL_GEAR_ITEM_CARDS)
+    r.vehicleItemSeller(DRILL_GEAR_SELLER)
     r.authorityReaction(VIBRATORY_CRUMBLE_REACTION)
     r.drillGear(CUTTERS_AND_BOOM_SOURCE)
     r.clockStep(SPOIL_AUGER_STEP)
