@@ -120,7 +120,10 @@ tab shows it holding a gate token or its triage Claude slot (an `aux` slot label
 Tests tab (#192) reads `tester` with the test-metrics `summary.json` and main's `box-tester/*`
 commit statuses: the feature under test, the features awaiting test, runs per phase (fast, slow,
 full, nightly suites) with their feature, the main-red pause and a STALE warning when no box run
-happened for 26 h (`TESTER_STALE_AFTER_H`; runs are per completed feature plus the nightly).
+happened for 26 h (`TESTER_STALE_AFTER_H`; runs are per completed feature plus the nightly). A ticket the Tester
+reopens with `needs-fix` gets one attempt back in the loop's `state.json` (`tester_grants`), so the
+loop retries it even after `MAX_ATTEMPTS`; the Loops tab's Needs attention list says "Tester red
+(phase): retry granted" until it closes green.
 
 Without `accounts` (a v1 snapshot) the Claude pool shows as one pool. The page copies only these
 fields (`scripts/status/slots.mjs`), so anything else in the file never reaches it, and drops a name

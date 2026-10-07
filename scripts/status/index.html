@@ -2098,10 +2098,13 @@
 
         // needs attention: open issues with needs-planner / needs-fix / blocked / attempts exhausted
         const attempts = {}
+        // Tickets the box Tester reopened red: it gives one attempt back so the loop retries them.
+        const testerGrants = {}
         let maxAtt = 2
         for (const e of entries)
           if (e.extra && e.extra.attempts) {
             Object.assign(attempts, e.extra.attempts)
+            Object.assign(testerGrants, e.extra.tester_grants || {})
             maxAtt = e.extra.max_attempts || maxAtt
           }
         const stuck = DATA.issues
@@ -2112,6 +2115,11 @@
               .filter((n) => ['needs-planner', 'needs-fix', 'blocked', 'hitl'].includes(n))
             if ((attempts[i.number] || 0) >= maxAtt)
               why.push(`attempts ${attempts[i.number]}/${maxAtt}`)
+            const grant = testerGrants[i.number]
+            if (grant)
+              why.push(
+                `Tester red (${grant.phase || '?'}) ${ago(grant.at)}: retry granted, attempt ${(attempts[i.number] || 0) + 1}/${maxAtt}`,
+              )
             const openBlk = i.blockedBy.filter((b) => b.state === 'OPEN')
             return { i, why, openBlk }
           })
