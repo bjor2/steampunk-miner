@@ -16,7 +16,8 @@ function drivingIn(session: ScriptedSession): InputSituation {
     dockedBay: null,
     canOpenArtefactCache: false,
     gunMode: null,
-    canPlantCharge: false,
+    plantableChargeSize: null,
+    nextChargeSize: null,
     state: session.state(),
     playerId: 'p1',
   }
