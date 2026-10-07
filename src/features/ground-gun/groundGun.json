@@ -1,0 +1,144 @@
+{
+  "source": "Ticket 322 (Systems & Economy, 8 Oct 2026): the armoury numbers the GD decisions on #309 and #310 left open, read against their fixed values. Bore: #309 GD (range 4 at L1, cells 2 ticks apart, the 30-tick hold) with the GD amendment on #310 (rangeCap 10 cells, 6 range Marks) and the Vertical Scaler's shot budget (gun.shotDigTicks 90). Tracks: the Systems follow-up on #322 (one gap drives the rate track's kGunPct 25 to 45 and cooldown 45 to 15 over 11 levels; penetration 49% to 100% over 18; energy 198% to 100% over 15; each level at least 3% better) under the TD's recurrence gap(m+1) = gap(m) - max(1, floor(gap(m)/10)), and the locked re-pricing (a level costs oreUnits of band-5 ore at its target planet, as a tree node does, x1.225 for a second level on the same planet; rate ends at P11, penetration and energy at P10). Long barrel: holdStep 3, holdCap 15 (hold + warning stays under the 60-tick warning, so collapse always happens). Auto-shoot: reserve 10 points above the rescue floor, the 10-tick preview and the 60-tick manual wait (GD, floor 20). Bot: 60 shots per planet run per seed. Turret: gunRangeCap 10 tiles (TD), past the cap energy per shot x0.92 to its 0.5 floor. Modules: Content's placeholders (#310 node table), gun Marks on the income absorb limits, auto_guns Marks on the general ones. A slice's numbers live beside it (feature-slices.md 1.1).",
+  "bore": {
+    "boreRangeBase": 4,
+    "rangeCap": 10,
+    "openIntervalTicks": 2,
+    "collapseHoldTicks": 30,
+    "shotDigTicks": 90
+  },
+  "tracks": {
+    "rate": {
+      "gap0": 10,
+      "stats": {
+        "kGunPct": { "wall": 45, "perGap": -2 },
+        "cooldownTicks": { "wall": 15, "perGap": 3 }
+      },
+      "price": { "band": 5, "oreUnits": "1", "samePlanetRatio": "1.225" },
+      "targetPlanet": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    },
+    "penetration": {
+      "gap0": 17,
+      "stats": {
+        "gunFactorPct": { "wall": 100, "perGap": -3 }
+      },
+      "price": { "band": 5, "oreUnits": "1", "samePlanetRatio": "1.225" },
+      "targetPlanet": [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 10]
+    },
+    "energy": {
+      "gap0": 14,
+      "stats": {
+        "energyPerCellPct": { "wall": 100, "perGap": 7 }
+      },
+      "price": { "band": 5, "oreUnits": "1", "samePlanetRatio": "1.225" },
+      "targetPlanet": [1, 1, 2, 2, 3, 4, 4, 5, 6, 6, 7, 8, 8, 9, 10]
+    }
+  },
+  "longBarrel": {
+    "holdStep": 3,
+    "holdCap": 15
+  },
+  "autoShoot": {
+    "reserveAboveRescueBp": 1000,
+    "previewTicks": 10,
+    "manualWaitFloorTicks": 20
+  },
+  "bot": {
+    "minShots": 60
+  },
+  "turret": {
+    "gunRangeCap": 10,
+    "pastCapStat": "energyPerShot"
+  },
+  "modules": {
+    "weapon.gimbal_sight": {
+      "marks": { "isIncomeItem": true, "cooldown": "retargetTicks" },
+      "stats": { "retargetTicks": 30 }
+    },
+    "weapon.steam_sear": {
+      "marks": { "isIncomeItem": false, "cooldown": "manualWaitTicks" },
+      "stats": { "manualWaitTicks": 60 }
+    },
+    "weapon.splay_choke": {
+      "marks": { "isIncomeItem": true, "cooldown": "splayCooldownTicks", "charges": "splayLines" },
+      "stats": { "splaySteps": 8, "splayCooldownTicks": 15, "splayLines": 2 }
+    },
+    "weapon.cementing_round": {
+      "marks": {
+        "isIncomeItem": true,
+        "cooldown": "cementCooldownTicks",
+        "charges": "cementCharges"
+      },
+      "stats": { "cementCooldownTicks": 120, "cementCharges": 3, "cementEnergyPerCellBp": 10000 }
+    },
+    "weapon.earthing_spike": {
+      "marks": {
+        "isIncomeItem": true,
+        "cooldown": "groundCooldownTicks",
+        "magnitude": "groundTicks"
+      },
+      "stats": { "groundTicks": 600, "groundCooldownTicks": 300 }
+    },
+    "weapon.rifled_bore": {
+      "marks": { "isIncomeItem": true, "cooldown": "rifleCooldownTicks", "charges": "rifleTurns" },
+      "stats": { "rifleTurns": 1, "rifleCooldownTicks": 15 }
+    },
+    "weapon.strut_bore": {
+      "marks": { "isIncomeItem": true, "magnitude": "strutTicks", "charges": "strutCharges" },
+      "stats": { "strutTicks": 600, "strutCharges": 2 }
+    },
+    "weapon.fire_director": {
+      "marks": { "isIncomeItem": false, "cooldown": "directorRetargetTicks" },
+      "stats": { "directorRetargetTicks": 30 }
+    },
+    "weapon.sentry_cam": {
+      "marks": { "isIncomeItem": false, "cooldown": "camOpenDelayTicks" },
+      "stats": { "camOpenDelayTicks": 60 }
+    },
+    "weapon.concussion_shells": {
+      "marks": {
+        "isIncomeItem": false,
+        "cooldown": "knockCooldownTicks",
+        "magnitude": "knockCells"
+      },
+      "stats": { "knockCells": 2, "knockCooldownTicks": 180 }
+    },
+    "weapon.grapeshot_breech": {
+      "marks": {
+        "isIncomeItem": false,
+        "cooldown": "grapeCooldownTicks",
+        "charges": "grapeTargets"
+      },
+      "stats": { "grapeTargets": 2, "grapeConeDeg": 30, "grapeCooldownTicks": 120 }
+    },
+    "weapon.flushing_shell": {
+      "marks": {
+        "isIncomeItem": false,
+        "cooldown": "flushCooldownTicks",
+        "magnitude": "flushRange"
+      },
+      "stats": { "flushRange": 4, "flushTicks": 90, "flushCooldownTicks": 300 }
+    },
+    "weapon.overpressure_burst": {
+      "marks": { "isIncomeItem": false, "cooldown": "ventTicks", "magnitude": "burstTicks" },
+      "stats": {
+        "burstTicks": 120,
+        "ventTicks": 300,
+        "burstIntervalNumerator": 2,
+        "burstIntervalDenominator": 3
+      }
+    },
+    "weapon.ricochet_shot": {
+      "marks": {
+        "isIncomeItem": false,
+        "cooldown": "ricochetCooldownTicks",
+        "magnitude": "bounceLegCells"
+      },
+      "stats": { "bounceLegCells": 3, "ricochetCooldownTicks": 120 }
+    }
+  },
+  "combos": {
+    "combo.sounding_bore": { "soundRadius": 2 },
+    "combo.winch_bore": { "hookWindowTicks": 60 }
+  }
+}
