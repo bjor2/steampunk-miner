@@ -20,6 +20,7 @@ export {
   type HoldCurve,
   type StepLanding,
 } from './systems/holdChain'
+export { momentOf, stopCueOf, type ChainStopCue, type StepMoment } from './systems/chainCues'
 export {
   chainPreviewOf,
   heldStepStopOf,
