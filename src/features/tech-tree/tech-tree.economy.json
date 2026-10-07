@@ -1,5 +1,5 @@
 {
-  "source": "Spec #161 section 3 (final, 2026-10-06: Systems & Economy under the Game Director's steer) and the #161 Systems absorber amendment; #162 section 4.6. A slice's numbers live beside it (feature-slices.md 1.1).",
+  "source": "Spec #161 section 3 (final, 2026-10-06: Systems & Economy under the Game Director's steer) and the #161 Systems absorber amendment; #162 section 4.6. The armoury lanes each get their own laneBias key, both 1 (GD decision on #310, ticket 322). A slice's numbers live beside it (feature-slices.md 1.1).",
   "tech": {
     "costs": {
       "band": 5,
@@ -9,7 +9,7 @@
       "kMark": "4",
       "g": "1.04",
       "markDepthCap": 10,
-      "laneBias": {}
+      "laneBias": { "bore_gun": "1", "auto_guns": "1" }
     },
     "markAbsorb": {
       "cooldownStep": "0.920",

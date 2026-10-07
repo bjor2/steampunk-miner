@@ -44,3 +44,20 @@ export {
   rateCardOf,
   shotsPerMinuteOf,
 } from './systems/gunRecovery'
+export type { ExtendedBarrelsStep, LongBarrelStep } from './systems/boreLadders'
+export {
+  energyPerShotLadder,
+  extendedBarrelsAt,
+  extendedBarrelsRangeMarks,
+  longBarrelAt,
+  longBarrelMasteredMark,
+  longBarrelRangeMarks,
+} from './systems/boreLadders'
+export type { ModuleMarkStep, ModuleStats } from './systems/armouryModules'
+export {
+  armouryModuleIds,
+  armouryModuleOf,
+  isOverpressureNetRateHeld,
+  moduleLadderOf,
+  moduleStatsAt,
+} from './systems/armouryModules'
