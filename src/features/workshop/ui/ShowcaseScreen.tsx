@@ -66,7 +66,12 @@ function PlaqueColumn({
   return (
     <div className={styles.column} data-side={side}>
       {rowsOnSide(model.tracks, side).map((row) => (
-        <TrackPlaque key={row.upgradeId} row={row} focusedId={focusedId} />
+        <TrackPlaque
+          key={row.upgradeId}
+          row={row}
+          focusedId={focusedId}
+          moneyIconId={model.header.moneyIconId}
+        />
       ))}
     </div>
   )

@@ -13,9 +13,13 @@ interface Anchor {
   y: number
 }
 
-/** Where each line leaves its plaque, measured when the layout changes, not per frame. */
+/**
+ * Where each line leaves its plaque, relative to the lines' own frame: measured when the layout
+ * changes, not per frame. The frame's place on the page is read each frame instead, because the
+ * shutter slides the whole screen in with a transform, which no resize reports.
+ */
 interface LeaderLayout {
-  origin: Anchor
+  svg: SVGSVGElement
   plaques: Map<UpgradeId, Anchor>
   lines: Map<UpgradeId, SVGLineElement>
 }
@@ -30,7 +34,7 @@ export function useLeaderLines(svg: RefObject<SVGSVGElement>): void {
   useEffect(() => {
     const element = svg.current
     if (element === null) return
-    const layout: LeaderLayout = { origin: { x: 0, y: 0 }, plaques: new Map(), lines: new Map() }
+    const layout: LeaderLayout = { svg: element, plaques: new Map(), lines: new Map() }
     const measure = () => measureLayout(element, layout)
     const observer = new ResizeObserver(measure)
     observer.observe(element)
@@ -45,7 +49,6 @@ export function useLeaderLines(svg: RefObject<SVGSVGElement>): void {
 
 function measureLayout(svg: SVGSVGElement, layout: LeaderLayout): void {
   const frame = svg.getBoundingClientRect()
-  layout.origin = { x: frame.left, y: frame.top }
   for (const id of UPGRADE_IDS) {
     const plaque = svg.parentElement?.querySelector(`[data-plaque="${id}"]`)
     const line = svg.querySelector<SVGLineElement>(`[data-leader="${id}"]`)
@@ -65,9 +68,10 @@ function innerEdgeOf(plaque: DOMRect, frame: DOMRect): Anchor {
 
 function drawLeaders(layout: LeaderLayout): void {
   const widthShare = facingSign() * turnedWidthShareOf(vehicleStagePresence.rotation)
+  const origin = layout.svg.getBoundingClientRect()
   for (const [id, line] of layout.lines) {
     placePartPoint(SHOWCASE.tracks[id], vehiclePresence, drillPresence.up, widthShare, part)
-    drawLeader(line, layout.plaques.get(id), project(part), layout.origin)
+    drawLeader(line, layout.plaques.get(id), project(part), origin)
   }
 }
 
@@ -79,12 +83,12 @@ function drawLeader(
   line: SVGLineElement,
   from: Anchor | undefined,
   to: Anchor | null,
-  origin: Anchor,
+  origin: DOMRect,
 ): void {
   if (from === undefined || to === null) return line.setAttribute('visibility', 'hidden')
   line.setAttribute('visibility', 'visible')
   line.x1.baseVal.value = from.x
   line.y1.baseVal.value = from.y
-  line.x2.baseVal.value = to.x - origin.x
-  line.y2.baseVal.value = to.y - origin.y
+  line.x2.baseVal.value = to.x - origin.left
+  line.y2.baseVal.value = to.y - origin.top
 }

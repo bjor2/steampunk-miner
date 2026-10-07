@@ -29,7 +29,7 @@
 .stage {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(14em, 26%) 1fr minmax(14em, 26%);
+  grid-template-columns: minmax(11em, 24%) 1fr minmax(11em, 24%);
   gap: var(--space-3);
   min-height: 0;
 }

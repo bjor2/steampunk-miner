@@ -16,7 +16,16 @@ import { WORKSHOP_TEST_IDS } from './testIds'
 import { usePlaqueLine } from './usePlaqueLine'
 import styles from './TrackPlaque.module.css'
 
-export function TrackPlaque({ row, focusedId }: { row: WorkshopRow; focusedId: string }) {
+export function TrackPlaque({
+  row,
+  focusedId,
+  moneyIconId,
+}: {
+  row: WorkshopRow
+  focusedId: string
+  /** The bay header's money glyph, so the price reads as a price. */
+  moneyIconId: string
+}) {
   const id = row.upgradeId
   const isSelected = useWorkshopStore((now) => now.selected === id)
   const { line, priceFlashKey } = usePlaqueLine(id)
@@ -36,6 +45,7 @@ export function TrackPlaque({ row, focusedId }: { row: WorkshopRow; focusedId: s
       </div>
       <PipRowView step={row.level} testId={WORKSHOP_TEST_IDS.plaquePips(id)} />
       <div className={styles.numbers}>
+        <VectorIcon iconId={moneyIconId} size="menu" />
         <span
           key={priceFlashKey}
           className={styles.cost}
