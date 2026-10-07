@@ -53,6 +53,11 @@
       "specs": ["e2e/browser/powerUpCore.spec.ts", "e2e/browser/screens/screenLayout.spec.ts"]
     },
     {
+      "why": "The mobility lane's items in the slots, their effect windows and their card lines.",
+      "paths": ["src/features/mobility/**"],
+      "specs": ["e2e/browser/mobility.spec.ts", "e2e/browser/powerUpCore.spec.ts"]
+    },
+    {
       "why": "The sell burst on the bay header.",
       "paths": ["src/features/sell-burst/**"],
       "specs": ["e2e/browser/sellBurst.spec.ts"]
