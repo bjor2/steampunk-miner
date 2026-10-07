@@ -138,13 +138,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-popup/systems/render/chipPlacement.test.ts` | 8 | 8 |
 | `src/features/mining-popup/systems/render/plaqueFit.test.ts` | 11 | 4 |
 
-### `mobility`: 9 files, 91 tests
+### `mobility`: 10 files, 95 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mobility/logging.test.ts` | 2 | 2 |
 | `src/features/mobility/systems/gatesFixture.test.ts` | 34 | 3 |
 | `src/features/mobility/systems/grappleWinch.test.ts` | 6 | 6 |
+| `src/features/mobility/systems/marksInPlay.test.ts` | 4 | 4 |
 | `src/features/mobility/systems/mobilityCatalogue.test.ts` | 8 | 8 |
 | `src/features/mobility/systems/mobilityMotion.test.ts` | 8 | 7 |
 | `src/features/mobility/systems/mobilitySection.test.ts` | 5 | 5 |
@@ -188,15 +189,17 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
-### `power-up-core`: 10 files, 49 tests
+### `power-up-core`: 12 files, 63 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/power-up-core/logging.test.ts` | 4 | 4 |
+| `src/features/power-up-core/markReportRows.test.ts` | 6 | 6 |
 | `src/features/power-up-core/systems/chargeState.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/cradles.test.ts` | 5 | 5 |
 | `src/features/power-up-core/systems/dockRefill.test.ts` | 4 | 4 |
 | `src/features/power-up-core/systems/powerUpKind.test.ts` | 3 | 3 |
+| `src/features/power-up-core/systems/powerUpMarks.test.ts` | 8 | 8 |
 | `src/features/power-up-core/systems/powerUpUse.test.ts` | 14 | 14 |
 | `src/features/power-up-core/systems/slotColumn.test.ts` | 6 | 6 |
 | `src/features/power-up-core/systems/slotUse.test.ts` | 3 | 3 |
@@ -224,12 +227,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/statPreview.test.ts` | 9 | 9 |
 | `src/features/sensing/visionRows.test.ts` | 5 | 5 |
 
-### `tech-tree`: 17 files, 133 tests
+### `tech-tree`: 18 files, 136 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/tech-tree/debug.test.ts` | 4 | 4 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
+| `src/features/tech-tree/systems/itemMarks.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/markLadder.test.ts` | 12 | 12 |
 | `src/features/tech-tree/systems/nodeCost.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts` | 0 | 1 |
