@@ -21,6 +21,7 @@ import {
   REEL_MOTION,
 } from './systems/mobilityMotion'
 import { MOBILITY_POWER_UPS } from './systems/mobilityPowerUps'
+import { MOBILITY_SELLER } from './systems/mobilitySales'
 import { MOBILITY_SECTION } from './systems/mobilitySection'
 import { RIVET_HOLD_CUES } from './systems/rivetPatch'
 import { HEAT_SINK_PAUSE, SMOKE_DETECTION, STEAM_SHIELD_INTERCEPT } from './systems/survivalEffects'
@@ -32,6 +33,8 @@ export const slice: SliceDefinition = {
     r.content('power-up', MOBILITY_POWER_UPS)
     r.content('tech-node', MOBILITY_TECH_NODES)
     r.itemDescriptionEntries(MOBILITY_ITEM_CARDS)
+    // The one-offs on sale at the Upgrade bay once researched (ticket 248).
+    r.vehicleItemSeller(MOBILITY_SELLER)
     r.saveSection(MOBILITY_SECTION)
     r.clockStep(MOBILITY_EFFECTS_STEP)
     ;[

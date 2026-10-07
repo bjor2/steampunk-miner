@@ -57,18 +57,27 @@ export function statPreview(
 }
 
 /**
- * The price the store reads (after #165's buy path): fixed at the unlock planet, or per unit on
- * the planet it is bought on; null for an id this lane does not sell.
+ * The price the card shows: fixed at the unlock planet, or per unit on the planet it is bought on;
+ * null for an id this lane does not sell. The store debits the one-off price (`mobilitySales.ts`).
  */
 export function mobilityItemPriceOf(itemId: string, planetIndex: number): Money | null {
   const row = mobilityRowOf(itemId)
   return row === null || markLadderOf(itemId) === null ? null : priceOfRow(row, planetIndex)
 }
 
+/** A one-off's price: 15 band-5 units at its unlock planet (#162 4.1), what the store debits. */
+export function oneOffPriceOf(row: MobilityRow): Money {
+  return bandOrePriceAt(MOBILITY_ECONOMY.prices.oneOff, row.unlockTier, row.unlockTier)
+}
+
+/** A consumable is bought by the unit, its stack restocked; never sold whole as a one-off. */
+export function isConsumableItem(itemId: string): boolean {
+  return CONSUMABLE.test(itemId)
+}
+
 function priceOfRow(row: MobilityRow, planetIndex: number): Money {
-  const { oneOff, consumableUnit } = MOBILITY_ECONOMY.prices
-  if (CONSUMABLE.test(row.itemId)) return bandOrePrice(consumableUnit, planetIndex)
-  return bandOrePriceAt(oneOff, row.unlockTier, row.unlockTier)
+  if (!isConsumableItem(row.itemId)) return oneOffPriceOf(row)
+  return bandOrePrice(MOBILITY_ECONOMY.prices.consumableUnit, planetIndex)
 }
 
 function markLinesOf(itemId: string, ladder: MarkLadder, mark: number): StatPreviewLine[] {
@@ -102,7 +111,7 @@ function chargesLineOf(ladder: MarkLadder, stats: MarkStats): StatPreviewLine[] 
 }
 
 function priceLineOf(row: MobilityRow, planetIndex: number): StatPreviewLine {
-  const label = CONSUMABLE.test(row.itemId) ? 'Price per unit' : 'Price'
+  const label = isConsumableItem(row.itemId) ? 'Price per unit' : 'Price'
   return { label, value: priceOfRow(row, planetIndex) }
 }
 

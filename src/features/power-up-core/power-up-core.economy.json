@@ -1,0 +1,9 @@
+{
+  "source": "Spec #162 section 4.1 (Systems & Economy, locked 6 Oct 2026) and the Systems note on #200: a power-up cradle costs 20 band-5 ore units at its unlock planet, charged as bandOrePriceAt(cost, unlockPlanet, unlockPlanet).",
+  "powerUpCore": {
+    "cradlePrice": {
+      "band": 5,
+      "oreUnits": "20"
+    }
+  }
+}
