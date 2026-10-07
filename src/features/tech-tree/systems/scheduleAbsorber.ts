@@ -12,7 +12,7 @@ import type { TechNode } from './techNode'
 
 /** Row id to node id, as #161 fixes it. */
 export const ABSORBED_SCHEDULE_ROWS: Readonly<Record<string, string>> = {
-  side_drills: 'tech.drill-gear.side_cutters',
+  side_drills: 'tech.drill_gear.side_cutters',
   shields: 'tech.mobility.steam_shield',
   grav_anchor: 'tech.mobility.grav_anchor',
   buoyancy_tanks: 'tech.mobility.buoyancy_tanks',

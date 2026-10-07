@@ -463,7 +463,7 @@ const KNOWN_LADDERS: Readonly<Record<string, MarkLadder>> = {
 
 /** The Schedule C rows these nodes absorb (#161 section 1 row-to-node map). */
 const CLAIMED_ROWS: Readonly<Record<string, string>> = {
-  'tech.drill-gear.side_cutters': 'side_drills',
+  'tech.drill_gear.side_cutters': 'side_drills',
   'tech.mobility.steam_shield': 'shields',
   'tech.mobility.grav_anchor': 'grav_anchor',
   'tech.mobility.buoyancy_tanks': 'buoyancy_tanks',
@@ -474,7 +474,7 @@ const STAND_IN_LADDER: MarkLadder = { isIncomeItem: false, cooldown: 300, magnit
 
 const MARK_BEARING_ITEM = /^(power|consumable|passive|gear)\./
 
-/** The 50 authored nodes, ids `tech.<lane>.<name>` as #161 writes them. */
+/** The 50 authored nodes, ids `tech.<lane>.<name>` as #161 writes them (lane in snake case, #224). */
 export const AUTHORED_TREE_FIXTURE: readonly TechNode[] = ROWS.map(nodeOfRow)
 
 /** The ten lane-pair templates: the six authored combos and the four #161 adds. */
@@ -542,7 +542,7 @@ export const COMBO_TEMPLATES_FIXTURE: readonly TechComboTemplate[] = [
 ]
 
 function nodeOfRow([lane, unlockTier, name, title, prereqs, unlocks, discovery]: Row): TechNode {
-  const id = `tech.${lane}.${name}`
+  const id = nodeIdOf(`${lane}.${name}`)
   const isSlot = unlocks.startsWith('slot.')
   return {
     id,
@@ -550,7 +550,7 @@ function nodeOfRow([lane, unlockTier, name, title, prereqs, unlocks, discovery]:
     lane,
     name: title,
     unlockTier,
-    prereqs: prereqs.map((short) => `tech.${short}`),
+    prereqs: prereqs.map(nodeIdOf),
     ...(discovery !== null && { requiresDiscovery: discovery }),
     unlocks,
     description: `${title}, as the Guild's engineers drew it.`,
@@ -559,6 +559,14 @@ function nodeOfRow([lane, unlockTier, name, title, prereqs, unlocks, discovery]:
     ...(id in CLAIMED_ROWS && { scheduleRowId: CLAIMED_ROWS[id] }),
     ...(MARK_BEARING_ITEM.test(unlocks) && { marks: KNOWN_LADDERS[unlocks] ?? STAND_IN_LADDER }),
   }
+}
+
+/**
+ * `tech.<lane>.<name>` from `<lane>.<name>`, the lane in snake case: the #224 bare-id rule refuses
+ * the hyphen of `drill-gear` (#205 GD lock: `tech.drill_gear.*`).
+ */
+function nodeIdOf(short: string): string {
+  return `tech.${short.replace('-', '_')}`
 }
 
 function template(
@@ -573,7 +581,7 @@ function template(
     lanes,
     name: name.replaceAll('_', ' '),
     unlocks: `combo.${name}`,
-    parents: [`tech.${firstParent}`, `tech.${secondParent}`],
+    parents: [nodeIdOf(firstParent), nodeIdOf(secondParent)],
     description: `The ${name.replaceAll('_', ' ')}, graded again at the research lab.`,
   }
 }

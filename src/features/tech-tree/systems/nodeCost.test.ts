@@ -60,7 +60,7 @@ describe('tech tree: node cost', () => {
 
   it('is the ceilMilli of the worth, never the raw worth', () => {
     withFixtureTree((tree) => {
-      const node = nodeOf(tree, 'tech.drill-gear.reach_boom')
+      const node = nodeOf(tree, 'tech.drill_gear.reach_boom')
       const worth = bandOreWorthAt(nodeOreCostOf(node), 6007, node.unlockTier)
       expect(nodeCost(node, 6007)).toEqual(ceilMilli(worth))
     })
