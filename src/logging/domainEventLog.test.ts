@@ -440,6 +440,21 @@ describe('domain event log', () => {
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
 
+  it('records a vehicle item bought at the Upgrade bay as a registered line (ticket 248)', () => {
+    recordDomainEvents({ playerId: 'p1', planet: 3, depthTiles: 0 }, [
+      {
+        ...commandStamp,
+        type: 'VehicleItemPurchased',
+        itemId: 'power.grapple_winch',
+        price: '1.5e+3',
+      },
+    ])
+    expect(sink.events.map(({ event, data }) => ({ event, data }))).toEqual([
+      { event: 'vehicle_item_purchased', data: { itemId: 'power.grapple_winch', price: '1.5e+3' } },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
   it("records a charge's detonation with its ladder size and radius (#213)", () => {
     recordDomainEvents({ playerId: 'p1', planet: 7, depthTiles: 40 }, [
       {

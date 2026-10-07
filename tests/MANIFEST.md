@@ -519,7 +519,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/compareRuns.test.ts` | 11 | 11 |
 | `src/logging/diveCasing.test.ts` | 3 | 3 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
-| `src/logging/domainEventLog.test.ts` | 16 | 16 |
+| `src/logging/domainEventLog.test.ts` | 17 | 17 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
 | `src/logging/eventSink.test.ts` | 7 | 7 |
 | `src/logging/goldenSliceSections.test.ts` | 4 | 4 |
