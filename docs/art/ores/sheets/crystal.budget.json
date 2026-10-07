@@ -1,0 +1,82 @@
+{
+  "crystal-v0-g1": {
+    "triangles": 108,
+    "objects": 9
+  },
+  "crystal-v0-g2": {
+    "triangles": 660,
+    "objects": 38
+  },
+  "crystal-v0-g3": {
+    "triangles": 760,
+    "objects": 43
+  },
+  "crystal-v0-g4": {
+    "triangles": 1514,
+    "objects": 51
+  },
+  "crystal-v0-g5": {
+    "triangles": 1462,
+    "objects": 36
+  },
+  "crystal-v1-g1": {
+    "triangles": 108,
+    "objects": 9
+  },
+  "crystal-v1-g2": {
+    "triangles": 610,
+    "objects": 35
+  },
+  "crystal-v1-g3": {
+    "triangles": 700,
+    "objects": 40
+  },
+  "crystal-v1-g4": {
+    "triangles": 1494,
+    "objects": 50
+  },
+  "crystal-v1-g5": {
+    "triangles": 1502,
+    "objects": 38
+  },
+  "crystal-v2-g1": {
+    "triangles": 108,
+    "objects": 9
+  },
+  "crystal-v2-g2": {
+    "triangles": 660,
+    "objects": 38
+  },
+  "crystal-v2-g3": {
+    "triangles": 780,
+    "objects": 44
+  },
+  "crystal-v2-g4": {
+    "triangles": 1534,
+    "objects": 52
+  },
+  "crystal-v2-g5": {
+    "triangles": 1482,
+    "objects": 37
+  },
+  "crystal-v3-g1": {
+    "triangles": 108,
+    "objects": 9
+  },
+  "crystal-v3-g2": {
+    "triangles": 550,
+    "objects": 32
+  },
+  "crystal-v3-g3": {
+    "triangles": 760,
+    "objects": 43
+  },
+  "crystal-v3-g4": {
+    "triangles": 1514,
+    "objects": 51
+  },
+  "crystal-v3-g5": {
+    "triangles": 1542,
+    "objects": 40
+  }
+}

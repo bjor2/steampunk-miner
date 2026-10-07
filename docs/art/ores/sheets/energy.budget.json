@@ -1,0 +1,82 @@
+{
+  "energy-v0-g1": {
+    "triangles": 660,
+    "objects": 15
+  },
+  "energy-v0-g2": {
+    "triangles": 1112,
+    "objects": 34
+  },
+  "energy-v0-g3": {
+    "triangles": 1192,
+    "objects": 38
+  },
+  "energy-v0-g4": {
+    "triangles": 2280,
+    "objects": 55
+  },
+  "energy-v0-g5": {
+    "triangles": 1528,
+    "objects": 31
+  },
+  "energy-v1-g1": {
+    "triangles": 660,
+    "objects": 15
+  },
+  "energy-v1-g2": {
+    "triangles": 1052,
+    "objects": 31
+  },
+  "energy-v1-g3": {
+    "triangles": 1232,
+    "objects": 40
+  },
+  "energy-v1-g4": {
+    "triangles": 2180,
+    "objects": 50
+  },
+  "energy-v1-g5": {
+    "triangles": 1568,
+    "objects": 33
+  },
+  "energy-v2-g1": {
+    "triangles": 660,
+    "objects": 15
+  },
+  "energy-v2-g2": {
+    "triangles": 1132,
+    "objects": 35
+  },
+  "energy-v2-g3": {
+    "triangles": 1172,
+    "objects": 37
+  },
+  "energy-v2-g4": {
+    "triangles": 2260,
+    "objects": 54
+  },
+  "energy-v2-g5": {
+    "triangles": 1528,
+    "objects": 31
+  },
+  "energy-v3-g1": {
+    "triangles": 660,
+    "objects": 15
+  },
+  "energy-v3-g2": {
+    "triangles": 1132,
+    "objects": 35
+  },
+  "energy-v3-g3": {
+    "triangles": 1232,
+    "objects": 40
+  },
+  "energy-v3-g4": {
+    "triangles": 2260,
+    "objects": 54
+  },
+  "energy-v3-g5": {
+    "triangles": 1508,
+    "objects": 30
+  }
+}

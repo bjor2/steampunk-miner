@@ -1,0 +1,207 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "crystal-v0-g1",
+      "oreLuma": 0.132,
+      "rockLuma": 0.1504,
+      "orePeakLuma": 0.4849,
+      "contrast": 1.1,
+      "bodyLuma": 0.1042,
+      "bodyContrast": 0.77,
+      "coverage": 0.221
+    },
+    {
+      "id": "crystal-v0-g2",
+      "oreLuma": 0.2719,
+      "rockLuma": 0.1323,
+      "orePeakLuma": 1.0,
+      "contrast": 1.77,
+      "bodyLuma": 0.3243,
+      "bodyContrast": 2.05,
+      "coverage": 0.44
+    },
+    {
+      "id": "crystal-v0-g3",
+      "oreLuma": 0.3293,
+      "rockLuma": 0.139,
+      "orePeakLuma": 1.0,
+      "contrast": 2.01,
+      "bodyLuma": 0.417,
+      "bodyContrast": 2.47,
+      "coverage": 0.485
+    },
+    {
+      "id": "crystal-v0-g4",
+      "oreLuma": 0.3526,
+      "rockLuma": 0.1266,
+      "orePeakLuma": 1.0,
+      "contrast": 2.28,
+      "bodyLuma": 0.4861,
+      "bodyContrast": 3.04,
+      "coverage": 0.355
+    },
+    {
+      "id": "crystal-v0-g5",
+      "oreLuma": 0.3554,
+      "rockLuma": 0.112,
+      "orePeakLuma": 1.0,
+      "contrast": 2.5,
+      "bodyLuma": 0.6132,
+      "bodyContrast": 4.09,
+      "coverage": 0.257
+    },
+    {
+      "id": "crystal-v1-g1",
+      "oreLuma": 0.1327,
+      "rockLuma": 0.1484,
+      "orePeakLuma": 0.4323,
+      "contrast": 1.09,
+      "bodyLuma": 0.1036,
+      "bodyContrast": 0.77,
+      "coverage": 0.215
+    },
+    {
+      "id": "crystal-v1-g2",
+      "oreLuma": 0.2512,
+      "rockLuma": 0.1449,
+      "orePeakLuma": 1.0,
+      "contrast": 1.55,
+      "bodyLuma": 0.2997,
+      "bodyContrast": 1.79,
+      "coverage": 0.493
+    },
+    {
+      "id": "crystal-v1-g3",
+      "oreLuma": 0.3484,
+      "rockLuma": 0.1498,
+      "orePeakLuma": 1.0,
+      "contrast": 1.99,
+      "bodyLuma": 0.4133,
+      "bodyContrast": 2.32,
+      "coverage": 0.533
+    },
+    {
+      "id": "crystal-v1-g4",
+      "oreLuma": 0.3402,
+      "rockLuma": 0.1141,
+      "orePeakLuma": 1.0,
+      "contrast": 2.38,
+      "bodyLuma": 0.4908,
+      "bodyContrast": 3.29,
+      "coverage": 0.331
+    },
+    {
+      "id": "crystal-v1-g5",
+      "oreLuma": 0.3708,
+      "rockLuma": 0.1159,
+      "orePeakLuma": 1.0,
+      "contrast": 2.54,
+      "bodyLuma": 0.6171,
+      "bodyContrast": 4.02,
+      "coverage": 0.277
+    },
+    {
+      "id": "crystal-v2-g1",
+      "oreLuma": 0.1295,
+      "rockLuma": 0.1484,
+      "orePeakLuma": 0.3354,
+      "contrast": 1.11,
+      "bodyLuma": 0.1005,
+      "bodyContrast": 0.76,
+      "coverage": 0.196
+    },
+    {
+      "id": "crystal-v2-g2",
+      "oreLuma": 0.2342,
+      "rockLuma": 0.1401,
+      "orePeakLuma": 0.8062,
+      "contrast": 1.49,
+      "bodyLuma": 0.2902,
+      "bodyContrast": 1.79,
+      "coverage": 0.452
+    },
+    {
+      "id": "crystal-v2-g3",
+      "oreLuma": 0.343,
+      "rockLuma": 0.1272,
+      "orePeakLuma": 1.0,
+      "contrast": 2.22,
+      "bodyLuma": 0.4226,
+      "bodyContrast": 2.67,
+      "coverage": 0.485
+    },
+    {
+      "id": "crystal-v2-g4",
+      "oreLuma": 0.3383,
+      "rockLuma": 0.1192,
+      "orePeakLuma": 1.0,
+      "contrast": 2.29,
+      "bodyLuma": 0.4909,
+      "bodyContrast": 3.2,
+      "coverage": 0.331
+    },
+    {
+      "id": "crystal-v2-g5",
+      "oreLuma": 0.3749,
+      "rockLuma": 0.1165,
+      "orePeakLuma": 1.0,
+      "contrast": 2.55,
+      "bodyLuma": 0.6134,
+      "bodyContrast": 3.99,
+      "coverage": 0.275
+    },
+    {
+      "id": "crystal-v3-g1",
+      "oreLuma": 0.1289,
+      "rockLuma": 0.1418,
+      "orePeakLuma": 0.2569,
+      "contrast": 1.07,
+      "bodyLuma": 0.0971,
+      "bodyContrast": 0.77,
+      "coverage": 0.203
+    },
+    {
+      "id": "crystal-v3-g2",
+      "oreLuma": 0.2283,
+      "rockLuma": 0.1194,
+      "orePeakLuma": 1.0,
+      "contrast": 1.64,
+      "bodyLuma": 0.2623,
+      "bodyContrast": 1.84,
+      "coverage": 0.437
+    },
+    {
+      "id": "crystal-v3-g3",
+      "oreLuma": 0.3186,
+      "rockLuma": 0.1,
+      "orePeakLuma": 1.0,
+      "contrast": 2.46,
+      "bodyLuma": 0.3877,
+      "bodyContrast": 2.92,
+      "coverage": 0.459
+    },
+    {
+      "id": "crystal-v3-g4",
+      "oreLuma": 0.3368,
+      "rockLuma": 0.1098,
+      "orePeakLuma": 1.0,
+      "contrast": 2.42,
+      "bodyLuma": 0.467,
+      "bodyContrast": 3.23,
+      "coverage": 0.349
+    },
+    {
+      "id": "crystal-v3-g5",
+      "oreLuma": 0.3842,
+      "rockLuma": 0.1207,
+      "orePeakLuma": 1.0,
+      "contrast": 2.54,
+      "bodyLuma": 0.6239,
+      "bodyContrast": 3.95,
+      "coverage": 0.284
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": false,
+  "bodyLumaRisesAlongEveryRow": true
+}

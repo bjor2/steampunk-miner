@@ -1,0 +1,82 @@
+{
+  "cryo-v0-g1": {
+    "triangles": 448,
+    "objects": 14
+  },
+  "cryo-v0-g2": {
+    "triangles": 608,
+    "objects": 22
+  },
+  "cryo-v0-g3": {
+    "triangles": 912,
+    "objects": 36
+  },
+  "cryo-v0-g4": {
+    "triangles": 1680,
+    "objects": 43
+  },
+  "cryo-v0-g5": {
+    "triangles": 1532,
+    "objects": 32
+  },
+  "cryo-v1-g1": {
+    "triangles": 448,
+    "objects": 14
+  },
+  "cryo-v1-g2": {
+    "triangles": 812,
+    "objects": 31
+  },
+  "cryo-v1-g3": {
+    "triangles": 912,
+    "objects": 36
+  },
+  "cryo-v1-g4": {
+    "triangles": 1640,
+    "objects": 41
+  },
+  "cryo-v1-g5": {
+    "triangles": 1552,
+    "objects": 33
+  },
+  "cryo-v2-g1": {
+    "triangles": 448,
+    "objects": 14
+  },
+  "cryo-v2-g2": {
+    "triangles": 792,
+    "objects": 30
+  },
+  "cryo-v2-g3": {
+    "triangles": 872,
+    "objects": 34
+  },
+  "cryo-v2-g4": {
+    "triangles": 1660,
+    "objects": 42
+  },
+  "cryo-v2-g5": {
+    "triangles": 1492,
+    "objects": 30
+  },
+  "cryo-v3-g1": {
+    "triangles": 448,
+    "objects": 14
+  },
+  "cryo-v3-g2": {
+    "triangles": 792,
+    "objects": 30
+  },
+  "cryo-v3-g3": {
+    "triangles": 892,
+    "objects": 35
+  },
+  "cryo-v3-g4": {
+    "triangles": 1600,
+    "objects": 39
+  },
+  "cryo-v3-g5": {
+    "triangles": 1552,
+    "objects": 33
+  }
+}

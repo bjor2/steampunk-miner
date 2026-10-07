@@ -1,0 +1,5 @@
+{
+  "families": ["alien", "ancient", "cryo", "crystal", "energy", "exotic", "fossil", "metal", "organic", "radioactive", "relic", "volcanic"],
+  "grades": [1, 2, 3, 4, 5],
+  "tilesFound": 60
+}

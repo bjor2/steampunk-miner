@@ -1,0 +1,82 @@
+{
+  "relic-v0-g1": {
+    "triangles": 424,
+    "objects": 18
+  },
+  "relic-v0-g2": {
+    "triangles": 904,
+    "objects": 40
+  },
+  "relic-v0-g3": {
+    "triangles": 1192,
+    "objects": 44
+  },
+  "relic-v0-g4": {
+    "triangles": 2144,
+    "objects": 59
+  },
+  "relic-v0-g5": {
+    "triangles": 1564,
+    "objects": 34
+  },
+  "relic-v1-g1": {
+    "triangles": 452,
+    "objects": 18
+  },
+  "relic-v1-g2": {
+    "triangles": 944,
+    "objects": 41
+  },
+  "relic-v1-g3": {
+    "triangles": 1148,
+    "objects": 43
+  },
+  "relic-v1-g4": {
+    "triangles": 2208,
+    "objects": 61
+  },
+  "relic-v1-g5": {
+    "triangles": 1596,
+    "objects": 36
+  },
+  "relic-v2-g1": {
+    "triangles": 476,
+    "objects": 18
+  },
+  "relic-v2-g2": {
+    "triangles": 816,
+    "objects": 36
+  },
+  "relic-v2-g3": {
+    "triangles": 1140,
+    "objects": 43
+  },
+  "relic-v2-g4": {
+    "triangles": 2188,
+    "objects": 60
+  },
+  "relic-v2-g5": {
+    "triangles": 1660,
+    "objects": 38
+  },
+  "relic-v3-g1": {
+    "triangles": 440,
+    "objects": 18
+  },
+  "relic-v3-g2": {
+    "triangles": 912,
+    "objects": 41
+  },
+  "relic-v3-g3": {
+    "triangles": 1192,
+    "objects": 46
+  },
+  "relic-v3-g4": {
+    "triangles": 2172,
+    "objects": 60
+  },
+  "relic-v3-g5": {
+    "triangles": 1604,
+    "objects": 36
+  }
+}

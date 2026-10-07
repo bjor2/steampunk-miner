@@ -1,0 +1,207 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "fossil-v0-g1",
+      "oreLuma": 0.1366,
+      "rockLuma": 0.1499,
+      "orePeakLuma": 0.2735,
+      "contrast": 1.07,
+      "bodyLuma": 0.1159,
+      "bodyContrast": 0.83,
+      "coverage": 0.228
+    },
+    {
+      "id": "fossil-v0-g2",
+      "oreLuma": 0.2133,
+      "rockLuma": 0.1422,
+      "orePeakLuma": 1.0,
+      "contrast": 1.37,
+      "bodyLuma": 0.2351,
+      "bodyContrast": 1.48,
+      "coverage": 0.554
+    },
+    {
+      "id": "fossil-v0-g3",
+      "oreLuma": 0.3415,
+      "rockLuma": 0.0957,
+      "orePeakLuma": 1.0,
+      "contrast": 2.69,
+      "bodyLuma": 0.3445,
+      "bodyContrast": 2.71,
+      "coverage": 0.563
+    },
+    {
+      "id": "fossil-v0-g4",
+      "oreLuma": 0.4289,
+      "rockLuma": 0.1164,
+      "orePeakLuma": 1.0,
+      "contrast": 2.88,
+      "bodyLuma": 0.5099,
+      "bodyContrast": 3.37,
+      "coverage": 0.425
+    },
+    {
+      "id": "fossil-v0-g5",
+      "oreLuma": 0.4128,
+      "rockLuma": 0.0773,
+      "orePeakLuma": 1.0,
+      "contrast": 3.64,
+      "bodyLuma": 0.6327,
+      "bodyContrast": 5.36,
+      "coverage": 0.281
+    },
+    {
+      "id": "fossil-v1-g1",
+      "oreLuma": 0.1353,
+      "rockLuma": 0.1496,
+      "orePeakLuma": 0.2728,
+      "contrast": 1.08,
+      "bodyLuma": 0.1146,
+      "bodyContrast": 0.82,
+      "coverage": 0.263
+    },
+    {
+      "id": "fossil-v1-g2",
+      "oreLuma": 0.2301,
+      "rockLuma": 0.1372,
+      "orePeakLuma": 1.0,
+      "contrast": 1.5,
+      "bodyLuma": 0.2444,
+      "bodyContrast": 1.57,
+      "coverage": 0.56
+    },
+    {
+      "id": "fossil-v1-g3",
+      "oreLuma": 0.3155,
+      "rockLuma": 0.1141,
+      "orePeakLuma": 1.0,
+      "contrast": 2.23,
+      "bodyLuma": 0.3376,
+      "bodyContrast": 2.36,
+      "coverage": 0.549
+    },
+    {
+      "id": "fossil-v1-g4",
+      "oreLuma": 0.4475,
+      "rockLuma": 0.1218,
+      "orePeakLuma": 1.0,
+      "contrast": 2.9,
+      "bodyLuma": 0.5142,
+      "bodyContrast": 3.28,
+      "coverage": 0.441
+    },
+    {
+      "id": "fossil-v1-g5",
+      "oreLuma": 0.4481,
+      "rockLuma": 0.0802,
+      "orePeakLuma": 1.0,
+      "contrast": 3.82,
+      "bodyLuma": 0.648,
+      "bodyContrast": 5.36,
+      "coverage": 0.3
+    },
+    {
+      "id": "fossil-v2-g1",
+      "oreLuma": 0.1331,
+      "rockLuma": 0.1457,
+      "orePeakLuma": 0.274,
+      "contrast": 1.07,
+      "bodyLuma": 0.1124,
+      "bodyContrast": 0.83,
+      "coverage": 0.264
+    },
+    {
+      "id": "fossil-v2-g2",
+      "oreLuma": 0.2347,
+      "rockLuma": 0.1303,
+      "orePeakLuma": 1.0,
+      "contrast": 1.58,
+      "bodyLuma": 0.2465,
+      "bodyContrast": 1.64,
+      "coverage": 0.553
+    },
+    {
+      "id": "fossil-v2-g3",
+      "oreLuma": 0.284,
+      "rockLuma": 0.1324,
+      "orePeakLuma": 1.0,
+      "contrast": 1.83,
+      "bodyLuma": 0.3245,
+      "bodyContrast": 2.05,
+      "coverage": 0.569
+    },
+    {
+      "id": "fossil-v2-g4",
+      "oreLuma": 0.455,
+      "rockLuma": 0.1168,
+      "orePeakLuma": 1.0,
+      "contrast": 3.03,
+      "bodyLuma": 0.5158,
+      "bodyContrast": 3.39,
+      "coverage": 0.447
+    },
+    {
+      "id": "fossil-v2-g5",
+      "oreLuma": 0.3943,
+      "rockLuma": 0.0858,
+      "orePeakLuma": 1.0,
+      "contrast": 3.27,
+      "bodyLuma": 0.6334,
+      "bodyContrast": 5.03,
+      "coverage": 0.267
+    },
+    {
+      "id": "fossil-v3-g1",
+      "oreLuma": 0.1303,
+      "rockLuma": 0.1438,
+      "orePeakLuma": 0.2556,
+      "contrast": 1.07,
+      "bodyLuma": 0.1107,
+      "bodyContrast": 0.83,
+      "coverage": 0.24
+    },
+    {
+      "id": "fossil-v3-g2",
+      "oreLuma": 0.2222,
+      "rockLuma": 0.1316,
+      "orePeakLuma": 1.0,
+      "contrast": 1.5,
+      "bodyLuma": 0.229,
+      "bodyContrast": 1.54,
+      "coverage": 0.602
+    },
+    {
+      "id": "fossil-v3-g3",
+      "oreLuma": 0.3123,
+      "rockLuma": 0.1212,
+      "orePeakLuma": 1.0,
+      "contrast": 2.12,
+      "bodyLuma": 0.3267,
+      "bodyContrast": 2.2,
+      "coverage": 0.596
+    },
+    {
+      "id": "fossil-v3-g4",
+      "oreLuma": 0.4455,
+      "rockLuma": 0.1119,
+      "orePeakLuma": 1.0,
+      "contrast": 3.06,
+      "bodyLuma": 0.5007,
+      "bodyContrast": 3.4,
+      "coverage": 0.457
+    },
+    {
+      "id": "fossil-v3-g5",
+      "oreLuma": 0.4073,
+      "rockLuma": 0.0774,
+      "orePeakLuma": 1.0,
+      "contrast": 3.59,
+      "bodyLuma": 0.6314,
+      "bodyContrast": 5.35,
+      "coverage": 0.274
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": false,
+  "bodyLumaRisesAlongEveryRow": true
+}

@@ -1,0 +1,207 @@
+{
+  "pxPerMetre": 256,
+  "cells": [
+    {
+      "id": "alien-v0-g1",
+      "oreLuma": 0.0269,
+      "rockLuma": 0.0299,
+      "orePeakLuma": 0.1275,
+      "contrast": 1.04,
+      "bodyLuma": 0.0215,
+      "bodyContrast": 0.89,
+      "coverage": 0.202
+    },
+    {
+      "id": "alien-v0-g2",
+      "oreLuma": 0.0427,
+      "rockLuma": 0.0243,
+      "orePeakLuma": 1.0,
+      "contrast": 1.25,
+      "bodyLuma": 0.0558,
+      "bodyContrast": 1.42,
+      "coverage": 0.34
+    },
+    {
+      "id": "alien-v0-g3",
+      "oreLuma": 0.1144,
+      "rockLuma": 0.0269,
+      "orePeakLuma": 1.0,
+      "contrast": 2.14,
+      "bodyLuma": 0.1707,
+      "bodyContrast": 2.87,
+      "coverage": 0.357
+    },
+    {
+      "id": "alien-v0-g4",
+      "oreLuma": 0.202,
+      "rockLuma": 0.0436,
+      "orePeakLuma": 1.0,
+      "contrast": 2.69,
+      "bodyLuma": 0.3395,
+      "bodyContrast": 4.16,
+      "coverage": 0.223
+    },
+    {
+      "id": "alien-v0-g5",
+      "oreLuma": 0.2454,
+      "rockLuma": 0.0345,
+      "orePeakLuma": 1.0,
+      "contrast": 3.5,
+      "bodyLuma": 0.4715,
+      "bodyContrast": 6.17,
+      "coverage": 0.143
+    },
+    {
+      "id": "alien-v1-g1",
+      "oreLuma": 0.0267,
+      "rockLuma": 0.0299,
+      "orePeakLuma": 0.1069,
+      "contrast": 1.04,
+      "bodyLuma": 0.0218,
+      "bodyContrast": 0.9,
+      "coverage": 0.224
+    },
+    {
+      "id": "alien-v1-g2",
+      "oreLuma": 0.0424,
+      "rockLuma": 0.0242,
+      "orePeakLuma": 1.0,
+      "contrast": 1.25,
+      "bodyLuma": 0.0563,
+      "bodyContrast": 1.43,
+      "coverage": 0.316
+    },
+    {
+      "id": "alien-v1-g3",
+      "oreLuma": 0.1106,
+      "rockLuma": 0.0307,
+      "orePeakLuma": 1.0,
+      "contrast": 1.99,
+      "bodyLuma": 0.1639,
+      "bodyContrast": 2.65,
+      "coverage": 0.371
+    },
+    {
+      "id": "alien-v1-g4",
+      "oreLuma": 0.2142,
+      "rockLuma": 0.0437,
+      "orePeakLuma": 1.0,
+      "contrast": 2.82,
+      "bodyLuma": 0.3462,
+      "bodyContrast": 4.23,
+      "coverage": 0.241
+    },
+    {
+      "id": "alien-v1-g5",
+      "oreLuma": 0.26,
+      "rockLuma": 0.037,
+      "orePeakLuma": 1.0,
+      "contrast": 3.56,
+      "bodyLuma": 0.4856,
+      "bodyContrast": 6.16,
+      "coverage": 0.161
+    },
+    {
+      "id": "alien-v2-g1",
+      "oreLuma": 0.0263,
+      "rockLuma": 0.0295,
+      "orePeakLuma": 0.123,
+      "contrast": 1.04,
+      "bodyLuma": 0.0219,
+      "bodyContrast": 0.9,
+      "coverage": 0.216
+    },
+    {
+      "id": "alien-v2-g2",
+      "oreLuma": 0.0442,
+      "rockLuma": 0.0249,
+      "orePeakLuma": 1.0,
+      "contrast": 1.26,
+      "bodyLuma": 0.0563,
+      "bodyContrast": 1.42,
+      "coverage": 0.363
+    },
+    {
+      "id": "alien-v2-g3",
+      "oreLuma": 0.11,
+      "rockLuma": 0.0343,
+      "orePeakLuma": 1.0,
+      "contrast": 1.9,
+      "bodyLuma": 0.1653,
+      "bodyContrast": 2.55,
+      "coverage": 0.387
+    },
+    {
+      "id": "alien-v2-g4",
+      "oreLuma": 0.1914,
+      "rockLuma": 0.0443,
+      "orePeakLuma": 1.0,
+      "contrast": 2.56,
+      "bodyLuma": 0.331,
+      "bodyContrast": 4.04,
+      "coverage": 0.209
+    },
+    {
+      "id": "alien-v2-g5",
+      "oreLuma": 0.2475,
+      "rockLuma": 0.0375,
+      "orePeakLuma": 1.0,
+      "contrast": 3.4,
+      "bodyLuma": 0.4773,
+      "bodyContrast": 6.03,
+      "coverage": 0.146
+    },
+    {
+      "id": "alien-v3-g1",
+      "oreLuma": 0.0257,
+      "rockLuma": 0.0285,
+      "orePeakLuma": 0.1159,
+      "contrast": 1.04,
+      "bodyLuma": 0.0211,
+      "bodyContrast": 0.91,
+      "coverage": 0.224
+    },
+    {
+      "id": "alien-v3-g2",
+      "oreLuma": 0.0396,
+      "rockLuma": 0.0236,
+      "orePeakLuma": 0.7244,
+      "contrast": 1.22,
+      "bodyLuma": 0.0514,
+      "bodyContrast": 1.38,
+      "coverage": 0.343
+    },
+    {
+      "id": "alien-v3-g3",
+      "oreLuma": 0.1042,
+      "rockLuma": 0.0232,
+      "orePeakLuma": 1.0,
+      "contrast": 2.11,
+      "bodyLuma": 0.1577,
+      "bodyContrast": 2.84,
+      "coverage": 0.338
+    },
+    {
+      "id": "alien-v3-g4",
+      "oreLuma": 0.2153,
+      "rockLuma": 0.0427,
+      "orePeakLuma": 1.0,
+      "contrast": 2.86,
+      "bodyLuma": 0.3418,
+      "bodyContrast": 4.23,
+      "coverage": 0.247
+    },
+    {
+      "id": "alien-v3-g5",
+      "oreLuma": 0.2471,
+      "rockLuma": 0.0336,
+      "orePeakLuma": 1.0,
+      "contrast": 3.56,
+      "bodyLuma": 0.4734,
+      "bodyContrast": 6.26,
+      "coverage": 0.145
+    }
+  ],
+  "oreLumaRisesAlongEveryRow": true,
+  "bodyLumaRisesAlongEveryRow": true
+}
