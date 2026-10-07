@@ -436,11 +436,17 @@ export interface OreType {
 }
 export interface OreTypeProvider {
   id: string
+  indexTag: string                  // names the bit index beside the bytes it wrote (#219)
   oreTypeOf(query: OreQuery): OreType
+  bitIndexOf(ore: OreType): number  // whole number >= 0, one bit per ore (#219)
   catalogue(): readonly OreType[]   // for icon coverage and the codex
 }
 export function oreTypeOf(query: OreQuery): OreType   // provider, else the kernel default
+export function oreBitIndexOf(ore: OreType): number   // provider, else `tier * 2 + (crystal ? 1 : 0)`
+export function oreIndexTag(): string                 // provider, else 'kernel.tier-family-grade'
 ```
+
+The bit index is the codex's `ore` bitset position (#207 TD lock). The kernel default orders by `(tier, cellFamily, grade)`, so `kernel.metal.t5` and `kernel.crystal.t5` take bits 10 and 11; grade is 0 there and adds no bits. #146 swaps the provider's index and tag, and the codex re-encodes on load.
 
 The query is `{tier, cellFamily}`, the two things a cell knows (`kind | family | tierOffset`). That leaves the #140/#141 family question to the provider. Adding a cell family beyond `RESOURCE_FAMILY` (`none`, `metal`, `crystal`) edits kernel `worldCell.ts` and is a kernel ticket.
 

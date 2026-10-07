@@ -39,7 +39,9 @@ const copper: OreType = {
 function registerCopperProvider(): void {
   addToRegistry(ORE_TYPE_REGISTRY, 'ores', {
     id: 'ores.catalogue',
+    indexTag: 'ores.copper-only',
     oreTypeOf: () => copper,
+    bitIndexOf: () => 0,
     catalogue: () => [copper],
   })
 }
