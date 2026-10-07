@@ -73,7 +73,6 @@ export const DEFERRED_SCHEDULE_ROWS: Readonly<Record<DeferredScheduleHome, reado
     'blasting_charges',
     'refractory_lining',
     'insulated_lining',
-    'remote_detonator',
     'grounded_lining',
     'relic_planet',
     'unstable_cores',
