@@ -34,3 +34,13 @@ export {
   trackWallLevel,
   wallLevelOf,
 } from './systems/gunTracks'
+export type { BoreShot, RateCard } from './systems/gunRecovery'
+export {
+  boreShotOnGround,
+  gunDrillOf,
+  gunRecoveryTicks,
+  gunTicksPerCell,
+  OPEN_GROUND_SHOT,
+  rateCardOf,
+  shotsPerMinuteOf,
+} from './systems/gunRecovery'
