@@ -84,10 +84,12 @@ describe('world-to-screen projector', () => {
     const placement = createScreenPlacement()
     const shop = { x: 0, y: 100 }
     unsubscribes.push(onFrame(() => placeAtWorldPoint(card, placement, shop)))
+    publishFrameOver(0, 100)
+    expect(card.style).toEqual({ transform: MIDDLE, visibility: 'visible' })
     publishFrameOver(50, 100)
     expect(card.style.visibility).toBe('hidden')
     publishFrameOver(0, 100)
-    expect(card.style).toEqual({ transform: MIDDLE, visibility: '' })
+    expect(card.style).toEqual({ transform: MIDDLE, visibility: 'visible' })
   })
 
   it('stops calling a listener once it unsubscribes', () => {

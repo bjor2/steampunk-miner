@@ -44,6 +44,7 @@ import type { HudModel } from '../systems/views/hudModel'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
+import { readOverlayStats, type OverlayStats } from '../ui/overlay/overlaySeatTable'
 import { bayScreenPresence } from '../ui/platform/bayScreenPresence'
 import { readFittedScreen } from '../ui/stage/screenFit'
 import type { ScreenLayout } from '../systems/views/screenLayout'
@@ -82,6 +83,8 @@ export interface DebugUi {
   getAudioModel(): DebugResult<{ model: AudioModel }>
   /** How the UI fits the screen (#173): stage, UI scale, TV safe inset, smallest control. */
   getScreenLayout(): DebugResult<{ layout: ScreenLayout }>
+  /** The HUD overlay's cards holding a seat now, and how many the 16-card cap evicted (#208). */
+  getOverlayStats(): DebugResult<{ stats: OverlayStats }>
 }
 
 export interface BayPresentation {
@@ -131,6 +134,7 @@ export function createDebugUi(): DebugUi {
     getBayPresentation: () => ({ ok: true, presentation: bayPresentationNow() }),
     getAudioModel: () => ({ ok: true, model: readAudioModel() }),
     getScreenLayout: screenLayoutNow,
+    getOverlayStats: () => ({ ok: true, stats: readOverlayStats() }),
   }
 }
 

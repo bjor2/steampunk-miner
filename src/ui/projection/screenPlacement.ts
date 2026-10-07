@@ -17,8 +17,9 @@ export interface ScreenPlacement {
   isShown: boolean
 }
 
+/** Starts hidden, as the overlay's card class does, until the first frame places it. */
 export function createScreenPlacement(): ScreenPlacement {
-  return { x: Number.NaN, y: Number.NaN, isShown: true }
+  return { x: Number.NaN, y: Number.NaN, isShown: false }
 }
 
 export function placeAtWorldPoint(
@@ -38,7 +39,7 @@ function hideOffscreen(element: PlaceableElement, placement: ScreenPlacement): v
 }
 
 function showAt(element: PlaceableElement, placement: ScreenPlacement, x: number, y: number) {
-  if (!placement.isShown) element.style.visibility = ''
+  if (!placement.isShown) element.style.visibility = 'visible'
   placement.isShown = true
   if (x === placement.x && y === placement.y) return
   placement.x = x

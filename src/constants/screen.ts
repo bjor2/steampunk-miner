@@ -35,3 +35,9 @@ export const MIN_TARGET_PX = 44
 
 /** On a coarse pointer (a finger) controls are at least 56 CSS px, #162's slot size (#173). */
 export const COARSE_TARGET_PX = 56
+
+/**
+ * The HUD overlay's card cap (#208, Technical Director with the Horizontal Scaler on #178): at most
+ * 16 DOM cards and labels over the picture; many small pings go on a later batched marker layer.
+ */
+export const OVERLAY_CARD_CAP = 16

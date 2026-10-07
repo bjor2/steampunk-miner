@@ -1,0 +1,22 @@
+/*
+ * #208: the overlay covers the canvas, not the safe area the HUD lays out in, so a projected
+ * pixel lands where the world draws it. The inset undoes the safe area's (GameStage.module.css).
+ */
+.overlay {
+  position: absolute;
+  inset: calc(-1 * max(env(safe-area-inset-top), var(--tv-safe-y)))
+    calc(-1 * max(env(safe-area-inset-right), var(--tv-safe-x)))
+    calc(-1 * max(env(safe-area-inset-bottom), var(--tv-safe-y)))
+    calc(-1 * max(env(safe-area-inset-left), var(--tv-safe-x)));
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Hidden until its first frame places it, so a new card never flashes at the corner. */
+.card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  will-change: transform;
+}

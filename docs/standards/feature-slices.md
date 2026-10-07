@@ -631,9 +631,17 @@ export function withSection<T>(state: AuthorityState, playerId: string | null, s
 
 ```ts
 // src/ui/registries/hudPanels.ts (new)
-export type HudSlot = 'gauges' | 'banner' | 'position' | 'prompts' | 'threats'
-export interface HudPanel { id: string; slot: HudSlot; Panel: ComponentType }  // reads its own slice store; no props
+export type HudSlot = 'overlay' | 'gauges' | 'banner' | 'position' | 'prompts' | 'threats'
+export type HudPanel =                                                          // reads its own slice store; no props
+  | { id: string; slot: Exclude<HudSlot, 'overlay'>; Panel: ComponentType }
+  | { id: string; slot: 'overlay'; priority: number; Panel: ComponentType }    // #208
 export function hudPanelsOf(slot: HudSlot): readonly HudPanel[]               // sorted by id
+
+// #208: the overlay slot is a full-screen, click-through layer over the canvas and under every
+// other slot. Its panels draw `OverlayCard`s (src/ui/overlay) at world points, placed each frame
+// by the projector in src/ui/projection/worldToScreen.ts (`project`, `onFrame`) through a ref and
+// a CSS transform. At most 16 cards hold a seat; past that the lowest priority, then the oldest,
+// is evicted (`ui.getOverlayStats()`).
 
 // src/debug/debugActionRegistry.ts (new)
 export type DebugAction = (...args: readonly unknown[]) => DebugResult          // debug/debugScreens.ts:45
