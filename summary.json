@@ -1,25 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-07T03:00:48.071Z",
+ "updatedAt": "2026-10-07T03:43:36.678Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37524551181,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37524551181",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "20baa7cd02cbaf5d1c59eb83df51bcb1c4f73fe9",
-   "branch": "main",
-   "startedAt": "2026-10-06T20:11:27Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 87,
-   "reportFound": true,
-   "files": 7,
-   "tests": 63,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37524638524,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37524638524",
@@ -852,6 +835,23 @@
    "tests": 0,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 37567958153,
+   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37567958153",
+   "event": "push",
+   "mode": "scoped",
+   "sha": "d06bc93504964a91bcc40d276b5bb80ea40f497e",
+   "branch": "main",
+   "startedAt": "2026-10-07T03:42:02Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 81,
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
@@ -864,15 +864,6 @@
   "scopingSuspects": []
  },
  "features": {
-  "tooling-status": {
-   "files": 14,
-   "p50Ms": 164,
-   "p95Ms": 281,
-   "fileRuns": 145,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
   "debug": {
    "files": 6,
    "p50Ms": 977,
@@ -1062,6 +1053,15 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "tooling-status": {
+   "files": 14,
+   "p50Ms": 165,
+   "p95Ms": 281,
+   "fileRuns": 138,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "tooling-ci": {
    "files": 1,
    "p50Ms": 28,
@@ -1181,97 +1181,6 @@
   }
  },
  "files": {
-  "scripts/status/features.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 12,
-   "lastMs": 11,
-   "p50Ms": 11,
-   "p95Ms": 17,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37564356248,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/featureTime.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 12,
-   "lastMs": 14,
-   "p50Ms": 14,
-   "p95Ms": 22,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37564356248,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/featureTimeHtml.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 13,
-   "lastMs": 9,
-   "p50Ms": 10,
-   "p95Ms": 15,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37564356248,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/ticketsClosed.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 12,
-   "lastMs": 8,
-   "p50Ms": 7,
-   "p95Ms": 14,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37564356248,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/ticketsClosedHtml.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 13,
-   "lastMs": 8,
-   "p50Ms": 8,
-   "p95Ms": 21,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37564356248,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/ticketTimeOverview.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 12,
-   "lastMs": 16,
-   "p50Ms": 18,
-   "p95Ms": 37,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37564356248,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "scripts/status/ticketTimeOverviewHtml.test.mjs": {
-   "feature": "tooling-status",
-   "runs": 13,
-   "lastMs": 14,
-   "p50Ms": 17,
-   "p95Ms": 25,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37564356248,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
   "src/debug/debugApi.test.ts": {
    "feature": "debug",
    "runs": 22,
@@ -3209,6 +3118,97 @@
      798
     ]
    ]
+  },
+  "scripts/status/features.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 11,
+   "lastMs": 11,
+   "p50Ms": 11,
+   "p95Ms": 17,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37564356248,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/featureTime.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 11,
+   "lastMs": 14,
+   "p50Ms": 14,
+   "p95Ms": 22,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37564356248,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/featureTimeHtml.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 12,
+   "lastMs": 9,
+   "p50Ms": 10,
+   "p95Ms": 15,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37564356248,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/ticketsClosed.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 11,
+   "lastMs": 8,
+   "p50Ms": 7,
+   "p95Ms": 14,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37564356248,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/ticketsClosedHtml.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 12,
+   "lastMs": 8,
+   "p50Ms": 8,
+   "p95Ms": 21,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37564356248,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/ticketTimeOverview.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 11,
+   "lastMs": 16,
+   "p50Ms": 19,
+   "p95Ms": 37,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37564356248,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "scripts/status/ticketTimeOverviewHtml.test.mjs": {
+   "feature": "tooling-status",
+   "runs": 12,
+   "lastMs": 14,
+   "p50Ms": 17,
+   "p95Ms": 25,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37564356248,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
   },
   "scripts/ci/testMetrics.test.mjs": {
    "feature": "tooling-ci",
