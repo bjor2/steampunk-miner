@@ -7,15 +7,23 @@
  * the bot's tip cannot scratch, is `blocked`; one the tank cannot afford with the way home, `short`.
  * A cell a gate leaves standing is `blocked` before any bore (#142 acceptance 8), and a dynamite
  * shell is blasted open with a charge that frees it, or `blocked` until it carries one (#142
- * acceptance 9, `botCharges.ts`).
+ * acceptance 9, `botCharges.ts`). A wall its own extractor opens is touched and waited out, then
+ * bored or entered (ticket 237: the tune, the etch, the pull).
  */
 import { heatThrottledDrill } from '../authority/heatRules'
 import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { blastOpen, blastShellOpen, isBlastWorthIt, noteTileWorthACharge } from './botCharges'
-import { drillGateAt, isShellGate, isWallGate } from './botGates'
+import { drillGateAt, extractorWaitOf, isShellGate, isWallGate } from './botGates'
 import { canAffordBore } from './botEnergy'
-import { boreTile, enterBoredTile, moveStraight, type BotPlanet } from './botPilot'
+import {
+  boreTile,
+  enterBoredTile,
+  moveStraight,
+  standBy,
+  touchTile,
+  type BotPlanet,
+} from './botPilot'
 import type { BotSession } from './botSession'
 import { boreTicks, cellOfTile, isLavaRisk, tileKindAt } from './botWorld'
 
@@ -24,6 +32,9 @@ export type OpenOutcome = 'opened' | 'blocked' | 'short'
 
 /** A throttled bore tries again at most this many times before giving the tile up. */
 const MAX_REBORES = 8
+
+/** Past an extractor's own ticks: the clock acting on them, and a pulled cell's edit landing. */
+const EXTRACTOR_SETTLE_TICKS = 2
 
 /** Opens a neighbouring tile and moves into it: bores it, or drives in when it is open. */
 export function openTile(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
@@ -50,7 +61,24 @@ export function boreInPlace(session: BotSession, planet: BotPlanet, tile: TilePo
 function boreOnce(session: BotSession, planet: BotPlanet, tile: TilePoint): OpenOutcome {
   const gate = drillGateAt(session, tile)
   if (isShellGate(gate)) return outcomeOfOpening(session, blastShellOpen(session, planet, tile))
+  const wait = extractorWaitOf(gate)
+  if (wait !== null) return openWithExtractor(session, planet, tile, wait)
   if (isWallGate(gate)) return 'blocked'
+  return boreUngated(session, planet, tile)
+}
+
+/** Touches the wall, waits its extractor out, then finds it open, drillable or still a wall. */
+function openWithExtractor(
+  session: BotSession,
+  planet: BotPlanet,
+  tile: TilePoint,
+  waitTicks: number,
+): OpenOutcome {
+  touchTile(session, planet.pilot, tile)
+  standBy(session, planet.pilot, waitTicks + EXTRACTOR_SETTLE_TICKS)
+  if (!isVehicleActive(session.vehicle())) return 'short'
+  if (tileKindAt(session.state(), tile) === 'open') return 'opened'
+  if (isWallGate(drillGateAt(session, tile))) return 'blocked'
   return boreUngated(session, planet, tile)
 }
 

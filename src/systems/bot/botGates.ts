@@ -2,7 +2,9 @@
  * What the pacing bot reads of the slices' gates (#142 acceptance 8 and 9, ticket 236) before it
  * bores a tile: the drill's verdict, as the authority's drill will ask it, so a cell the gate
  * leaves standing is a wall to route around and not eight refused bores; and for a dynamite-gated
- * shell, the smallest charge size that frees it whole. With no gate registered nothing is asked.
+ * shell, the smallest charge size that frees it whole. A wall the player's own extractor opens by
+ * standing by it (a tune, an etch, a pull: ticket 237) says how long after a touch, so the bot
+ * waits there instead of routing round. With no gate registered nothing is asked.
  */
 import { gateOfTile, type GateAsker } from '../authority/cellGates'
 import { chargeRadiusMm, chargeSizeCount, isRemoteSize } from '../economy/chargeSizes'
@@ -24,6 +26,12 @@ export function drillGateAt(session: BotSession, tile: TilePoint): GateVerdict |
 /** A gate the drill cannot pass: refused or blocked. */
 export function isWallGate(verdict: GateVerdict | null): boolean {
   return verdict !== null && isStandingVerdict(verdict)
+}
+
+/** Ticks the bot stands by a touched wall until its own extractor opens it; null when none does. */
+export function extractorWaitOf(verdict: GateVerdict | null): number | null {
+  if (verdict === null || !isStandingVerdict(verdict)) return null
+  return verdict.opensAfterTicks ?? null
 }
 
 /** A dynamite-gated shell: the drill is refused and only a charge frees it. */

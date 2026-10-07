@@ -71,6 +71,29 @@ export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, 
 }
 
 /**
+ * Presses the drill on the tile for one tick, so its gate answers the touch: an extractor's verb
+ * starts there (ticket 237). A refused cell takes no drill ticks, so the touch costs no energy.
+ */
+export function touchTile(session: BotSession, pilot: BotPilot, tile: TilePoint): void {
+  const facing = facingTowards(pilot.position, tile)
+  session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
+  session.wait(1)
+  session.submit({ type: 'drillTile', payload: { ...tile, ticks: 1 } })
+  pilot.facing = facing
+}
+
+/** Waits where it stands for `ticks`, meeting threats and setting its guns as a bore does. */
+export function standBy(session: BotSession, pilot: BotPilot, ticks: number): void {
+  for (let left = ticks; left > 0 && isVehicleActive(session.vehicle());) {
+    faceThreats(session, pilot)
+    setGunsForEnergy(session)
+    const chunk = Math.min(left, BORE_REPORT_TICKS)
+    session.wait(chunk)
+    left -= chunk
+  }
+}
+
+/**
  * Moves into a tile the drill just opened: the bore's speed already covers the advance (#6), and
  * the next report (the next bore or move) carries the new position.
  */
