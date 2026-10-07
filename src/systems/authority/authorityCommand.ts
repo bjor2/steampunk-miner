@@ -47,8 +47,11 @@ import type { BayId } from '../world/dockBays'
  * 20: the brass tracks and casing grades flattened to drill power's ratio 1.225 on bases 24, 23,
  *    36, 46 and 48 (#195), so the same `BuyUpgrade` and `BuyCasingGrade` cost a different amount.
  * 21: `ChargeDetonated` carries its blast's ladder `size` and `radiusMm` (#213).
+ * 22: the tech tree slice (#165): `tech-tree.unlock_node` and `debug.tech-tree.unlockThrough`,
+ *    answered by `tech-tree.TechNodeUnlocked`, `tech-tree.TechNodeRefused` and
+ *    `tech-tree.TechNodesGranted`; its `tech-tree` player section v1.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 21
+export const AUTHORITY_PROTOCOL_VERSION = 22
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

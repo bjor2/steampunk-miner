@@ -5,6 +5,9 @@
   "authorityProtocolVersion": 21,
   "logSchemaVersion": 3,
   "numberFormatVersion": 1,
+  "sliceSections": {
+    "tech-tree": 1
+  },
   "worldSeed": 83921,
   "endTick": 120,
   "commands": [
