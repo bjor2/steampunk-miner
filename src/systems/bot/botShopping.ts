@@ -23,7 +23,8 @@
  * `botWallet.ts`); the casing, lining, guns and charges keep only the next service, as before.
  *
  * Every buy is a click unless the run's chain policy holds (`botChains.ts`, ticket 226): then the
- * steps bought in a row on one track are one held chain, and a refused held step ends the buying.
+ * steps bought in a row on one track are one held chain, and a refused held step ends the buying,
+ * the slices' purchases included.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import { CLICK_CHAIN } from '../authority/purchaseChain'
@@ -97,21 +98,33 @@ export function hasPurchase(session: BotSession, situation: ShoppingSituation): 
   return nextPurchase(session, situation) !== null || nextSlicePurchase(session) !== null
 }
 
-/** The kernel's purchases while one pays, then the slices' (ticket 211); answers what each cost. */
+/**
+ * The kernel's purchases while one pays, then the slices' (ticket 211); answers what each cost. A
+ * refused held step ends the visit's buying, so the slices' purchases never spend the service
+ * reserve the hold stopped at (ticket 248's research and items came after it).
+ */
 export function buyUpgrades(session: BotSession, situation: ShoppingSituation): ShopSpend[] {
-  return [...buyKernelPurchases(session, situation), ...buySlicePurchases(session)]
+  const kernel = buyKernelPurchases(session, situation)
+  if (kernel.isHoldRefused) return kernel.spends
+  return [...kernel.spends, ...buySlicePurchases(session)]
 }
 
-function buyKernelPurchases(session: BotSession, situation: ShoppingSituation): ShopSpend[] {
+/** The kernel's buys in one visit, and whether a refused held step ended them. */
+interface KernelVisit {
+  spends: ShopSpend[]
+  isHoldRefused: boolean
+}
+
+function buyKernelPurchases(session: BotSession, situation: ShoppingSituation): KernelVisit {
   const spends: ShopSpend[] = []
   const hold = startBotHold(situation.chainPolicy)
   for (let pick = nextPurchase(session, situation); pick !== null;) {
     const step = stepOfHold(session, hold, pick)
-    if (step === null) break
+    if (step === null) return { spends, isHoldRefused: true }
     spends.push(submitKernelPurchase(session, step))
     pick = nextPurchase(session, situation)
   }
-  return spends
+  return { spends, isHoldRefused: false }
 }
 
 /** What the wallet paid is the spend: the purchase events carry their prices in five shapes. */
