@@ -131,12 +131,23 @@ def write_layout(path=LAYOUT_PATH):
 
 
 SCALAR_LIST = re.compile(r'\[\s*((?:(?:-?\d+(?:\.\d+)?|"[^"]*"),?\s*)+)\]')
+PRINT_WIDTH = 100  # .prettierrc
 
 
 def json_text_of(value):
-    """Two-space JSON with scalar lists on one line, the way the repo's Prettier writes JSON."""
+    """
+    Two-space JSON with a scalar list on one line when the line fits Prettier's print width, one
+    item per line otherwise: the way the repo's Prettier writes JSON, so a check never rewrites it.
+    """
     text = json.dumps(value, indent=2, ensure_ascii=False)
-    return SCALAR_LIST.sub(lambda match: '[' + ', '.join(match.group(1).split()).replace(',,', ',') + ']', text) + '\n'
+
+    def collapse(match):
+        line_start = text.rfind('\n', 0, match.start()) + 1
+        joined = '[' + ', '.join(match.group(1).split()).replace(',,', ',') + ']'
+        fits = match.start() - line_start + len(joined) + 1 <= PRINT_WIDTH
+        return joined if fits else match.group(0)
+
+    return SCALAR_LIST.sub(collapse, text) + '\n'
 
 
 if __name__ == '__main__':
