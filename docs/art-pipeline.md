@@ -372,6 +372,11 @@ rung fails the asset lint until it is modelled.
 - Every planted size sits at the origin with its pivot at its centre, so the slice's planted layer
   draws the charge's size where the charge is. The lamp is apart from the body so it blinks by
   showing and hiding, faster in the fuse's last second; a remote charge's never hurries.
+- The blast itself is procedural, the slice's second scene layer: each `BlastFront` slice (K6)
+  throws fire and dust across the ring it uncovered and debris out of it, so the ring rides the
+  clearing's edge; each detonation lights the size's flash sprite for two frames while the flash
+  switch is on. Four pooled draw calls (fire and dust points, one instanced debris mesh, the
+  sprite), declared with the planted layer's eight within `SCENE_LAYER_LINE` (#213).
 - `scripts/art/author_dynamite_sizes.py` wrote the first version of both `.blend` files. From
   then on the `.blend` files are the sources. The review renders are in
   [docs/art/dynamite/](art/dynamite/README.md).

@@ -70,13 +70,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite/systems/plunger.test.ts` | 6 | 6 |
 | `src/features/dynamite/systems/rackPanel.test.ts` | 5 | 5 |
 
-### `dynamite-visuals`: 6 files, 33 tests
+### `dynamite-visuals`: 8 files, 44 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/dynamite-visuals/sceneBudget.test.ts` | 3 | 3 |
 | `src/features/dynamite-visuals/systems/render/blastCue.test.ts` | 8 | 8 |
 | `src/features/dynamite-visuals/systems/render/blastCueProvider.test.ts` | 5 | 5 |
-| `src/features/dynamite-visuals/systems/render/blastFrontLook.test.ts` | 7 | 7 |
+| `src/features/dynamite-visuals/systems/render/blastEventQueue.test.ts` | 3 | 3 |
+| `src/features/dynamite-visuals/systems/render/blastFrontLook.test.ts` | 12 | 12 |
 | `src/features/dynamite-visuals/systems/render/dynamiteArt.test.ts` | 3 | 3 |
 | `src/features/dynamite-visuals/systems/render/plantedDynamiteLook.test.ts` | 4 | 4 |
 | `src/features/dynamite-visuals/systems/render/rackLook.test.ts` | 6 | 6 |

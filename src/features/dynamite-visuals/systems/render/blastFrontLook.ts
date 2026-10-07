@@ -14,10 +14,12 @@ import {
   DUST_PER_RIM_TILE,
   FIRE_PER_RIM_TILE,
   FLASH_FRAMES,
+  FLASH_SPRITE_MAX_OPACITY,
   RING_WIDTH_MAX_M,
   RING_WIDTH_MIN_M,
   RING_WIDTH_SHARE,
 } from './blastLookConstants'
+import { blastCueOf } from './blastCue'
 
 export interface BlastRing {
   /** The clearing's edge, metres from the blast tile's centre. */
@@ -31,6 +33,18 @@ export interface BlastFlash {
   frames: number
   /** The flash sprite's reach, metres: it covers the clearing. */
   radiusM: number
+}
+
+/** What one `BlastFront` slice throws: the rim it uncovered, so a whole blast throws its look. */
+export interface FrontSpray {
+  fire: number
+  dust: number
+  debris: number
+}
+
+/** The flash sprite on the detonation tick: the clearing's reach, at the size's flash share. */
+export interface FlashSprite extends BlastFlash {
+  opacity: number
 }
 
 export interface BlastFrontLook {
@@ -51,6 +65,28 @@ export function blastFrontLookOf(radiusMm: number): BlastFrontLook {
     dustCount: dustCountOf(radiusMm),
     debrisCount: debrisCountOf(radiusMm),
     flash: { frames: FLASH_FRAMES, radiusM: radiusMm / MM_PER_METRE },
+  }
+}
+
+/**
+ * The counts a slice from `rInnerMm` to `rOuterMm` adds: the rim's look at its outer edge less the
+ * look at its inner edge. A blast's slices follow on, so together they throw the full rim's
+ * counts and never more, each inside its pool (#154).
+ */
+export function frontSprayOf(rInnerMm: number, rOuterMm: number): FrontSpray {
+  return {
+    fire: Math.max(0, fireCountOf(rOuterMm) - fireCountOf(rInnerMm)),
+    dust: Math.max(0, dustCountOf(rOuterMm) - dustCountOf(rInnerMm)),
+    debris: Math.max(0, debrisCountOf(rOuterMm) - debrisCountOf(rInnerMm)),
+  }
+}
+
+/** The size's flash, the same share the cue flashes the screen with at the blast (#153 look 1). */
+export function flashSpriteOf(size: number, radiusMm: number): FlashSprite {
+  return {
+    frames: FLASH_FRAMES,
+    radiusM: radiusMm / MM_PER_METRE,
+    opacity: blastCueOf(size, radiusMm, 0).flash * FLASH_SPRITE_MAX_OPACITY,
   }
 }
 

@@ -39,3 +39,22 @@ export const DEBRIS_PER_RIM_TILE = 1
  * (#154 "Particles and debris"). Enough for a tile of rim at every size up to the R24 cap.
  */
 export const BLAST_DEBRIS_CAPACITY = 96
+
+// --- the layer that draws them (#215): pools, motion and the flash sprite, tuned by eye --------
+/** Fire rides the kernel's spark look and dust the collapse dust's (#154: reuse the pools' look). */
+export const RING_FIRE_SPREAD_RADIANS = 0.6
+export const RING_DUST_SPREAD_RADIANS = 0.9
+/** Debris flies out of the front faster than the ring and tumbles as it goes. */
+export const DEBRIS_SPEED_MPS = 6
+export const DEBRIS_SPREAD_RADIANS = 0.5
+export const DEBRIS_LIFE_SECONDS = 0.7
+export const DEBRIS_SIZE_M = 0.18
+export const DEBRIS_SPIN_RADIANS_PER_SECOND = 9
+export const DEBRIS_COLOUR = '#3a2e24'
+/** The flash sprite at full size share: a warm disc over the clearing, under the screen veil. */
+export const FLASH_SPRITE_MAX_OPACITY = 0.6
+export const FLASH_SPRITE_COLOUR = '#fff1d6'
+/** Its own fixed seed: presentation only, never part of the world. */
+export const BLAST_FRONT_SEED = 0xb1a5
+/** Front and detonation events waiting for the next frame; more in one batch are dropped. */
+export const QUEUED_BLAST_EVENTS = 32

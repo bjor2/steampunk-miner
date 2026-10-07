@@ -1,14 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { COLLAPSE_DUST_CAPACITY, SPARK_CAPACITY } from '../../../../constants/scene'
+import { BLAST_TILES_PER_TICK } from '../../../../constants/terrainBudget'
+import { blastFrontOf, frontRadiusMm } from '../../../../systems/authority/charges/blastFront'
 import {
   blastFrontLookOf,
   blastRingOf,
   debrisCountOf,
   dustCountOf,
   fireCountOf,
+  flashSpriteOf,
+  frontSprayOf,
   rimTilesOf,
+  type FrontSpray,
 } from './blastFrontLook'
-import { BLAST_DEBRIS_CAPACITY, FLASH_FRAMES } from './blastLookConstants'
+import { BLAST_DEBRIS_CAPACITY, FLASH_FRAMES, FLASH_SPRITE_MAX_OPACITY } from './blastLookConstants'
 
 // The #143 ladder's radii for sizes 1, 5 and 10 (2.5, 8 and 24 tiles), fixtures only.
 const SIZE_1_MM = 2500
@@ -67,5 +72,67 @@ describe('blast front look', () => {
       debrisCount: 50,
       flash: { frames: 2, radiusM: 8 },
     })
+  })
+})
+
+/** The rings K6 slices a blast of `radiusMm` into in solid rock: 64 tiles a tick, nearest first. */
+function slicedFrontsOf(radiusMm: number): [number, number][] {
+  const front = blastFrontOf(radiusMm)
+  const slices: [number, number][] = []
+  for (let first = 0; first < front.length; first += BLAST_TILES_PER_TICK) {
+    const last = Math.min(front.length, first + BLAST_TILES_PER_TICK) - 1
+    slices.push([frontRadiusMm(front[first].distanceSq), frontRadiusMm(front[last].distanceSq)])
+  }
+  return slices
+}
+
+function sprayOfWholeBlast(radiusMm: number): FrontSpray {
+  return slicedFrontsOf(radiusMm)
+    .map(([rInnerMm, rOuterMm]) => frontSprayOf(rInnerMm, rOuterMm))
+    .reduce((sum, spray) => ({
+      fire: sum.fire + spray.fire,
+      dust: sum.dust + spray.dust,
+      debris: sum.debris + spray.debris,
+    }))
+}
+
+describe('blast front spray', () => {
+  it("throws a one-slice blast's whole rim on its one slice", () => {
+    expect(slicedFrontsOf(SIZE_1_MM)).toHaveLength(1)
+    const [[rInnerMm, rOuterMm]] = slicedFrontsOf(SIZE_1_MM)
+    expect(frontSprayOf(rInnerMm, rOuterMm)).toEqual({
+      fire: fireCountOf(rOuterMm),
+      dust: dustCountOf(rOuterMm),
+      debris: debrisCountOf(rOuterMm),
+    })
+  })
+
+  it('throws a slice only the rim it uncovered, nothing for a ring it stands still on', () => {
+    expect(frontSprayOf(8000, 8000)).toEqual({ fire: 0, dust: 0, debris: 0 })
+    expect(frontSprayOf(4000, 8000).fire).toBe(fireCountOf(8000) - fireCountOf(4000))
+  })
+
+  it('never asks the pools for more than they hold over a whole R24 blast of 29 slices', () => {
+    expect(slicedFrontsOf(SIZE_10_MM)).toHaveLength(29)
+    const spray = sprayOfWholeBlast(SIZE_10_MM)
+    expect(spray.fire).toBeLessThanOrEqual(SPARK_CAPACITY)
+    expect(spray.dust).toBeLessThanOrEqual(COLLAPSE_DUST_CAPACITY)
+    expect(spray.debris).toBeLessThanOrEqual(BLAST_DEBRIS_CAPACITY)
+    expect(spray.debris).toBeGreaterThan(debrisCountOf(SIZE_5_MM))
+  })
+})
+
+describe('blast flash sprite', () => {
+  it('shows no flash for the shipped size, as it never flashed', () => {
+    expect(flashSpriteOf(1, SIZE_1_MM).opacity).toBe(0)
+  })
+
+  it('flashes harder with size, for two frames over the clearing', () => {
+    expect(flashSpriteOf(5, SIZE_5_MM)).toEqual({
+      frames: FLASH_FRAMES,
+      radiusM: 8,
+      opacity: FLASH_SPRITE_MAX_OPACITY / 2,
+    })
+    expect(flashSpriteOf(10, SIZE_10_MM).opacity).toBe(FLASH_SPRITE_MAX_OPACITY)
   })
 })
