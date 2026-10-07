@@ -27,6 +27,11 @@ export interface DrillGates {
   refusedEvents(): DomainEventBody[]
   /** `DrillGated` for a yielded cell a gate says is lost (destroyed without cargo); else null. */
   lostEventOf(yielded: YieldedCell): DomainEventBody | null
+  /**
+   * #142's `canMine` for a cell the drill gear would add (ticket 234): no gate, or one that cuts
+   * it. A refused cell is reported with the others; a refused or lost one is left standing.
+   */
+  canMine(cell: YieldedCell): boolean
 }
 
 export function openDrillGates(
@@ -45,11 +50,16 @@ export function openDrillGates(
         : drillTicksOf(tile, material, casingGrade),
     refusedEvents: () => refusedEventsOf(gates),
     lostEventOf: (yielded) => lostEventOf(gateOfCell(gates, asker, yielded)),
+    canMine: (cell) => isCut(gateOfCell(gates, asker, cell)),
   }
 }
 
 function ungatedDrill(drillTicksOf: CellDrillTicks): DrillGates {
-  return { drillTicksOf, refusedEvents: () => [], lostEventOf: () => null }
+  return { drillTicksOf, refusedEvents: () => [], lostEventOf: () => null, canMine: () => true }
+}
+
+function isCut(gated: GatedCell | null): boolean {
+  return gated === null || gated.verdict.outcome === 'cut'
 }
 
 function refusedEventsOf(gates: CellGates): DomainEventBody[] {

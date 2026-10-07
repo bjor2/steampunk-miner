@@ -19,6 +19,7 @@
  */
 import {
   FULL_WEIGHT,
+  cellSamplesBesideDisc,
   cellSamplesOf,
   discSamplesOf,
   type DiscStamp,
@@ -78,6 +79,46 @@ export function carveDisc(
   return carveSamples(world, params, discSamplesOf(disc), window, drillTicksOf)
 }
 
+/** A disc carve with cells beside it (slice drill gear, ticket 234). */
+export interface CarveBesideDisc extends Carve {
+  /** Per cell, in the order given: the ticks in which it still lost something. */
+  cellTicksUsed: number[]
+}
+
+/** The ticks each carve of the cells beside a disc may use. */
+export interface CarveWindows {
+  disc: CarveWindow
+  cells: CarveWindow
+}
+
+/**
+ * The disc and, in the same edit, the cells beside it (`cellSamplesBesideDisc`), so a widened bore
+ * cuts in the same ticks as the bit. `ticksUsed` stays the disc's; cells are cut only when the disc
+ * removed something.
+ */
+export function carveDiscWithCells(
+  world: WorldState,
+  params: PlanetParams,
+  disc: DiscStamp,
+  cells: readonly TilePoint[],
+  windows: CarveWindows,
+  drillTicksOf: CellDrillTicks,
+): CarveBesideDisc {
+  const session = openSession(world, params)
+  const ticksUsed = carveEachSample(session, discSamplesOf(disc), windows.disc, drillTicksOf)
+  const cellTicksUsed = cells.map((tile) =>
+    ticksUsed === 0
+      ? 0
+      : carveEachSample(session, cellSamplesBesideDisc(tile, disc), windows.cells, drillTicksOf),
+  )
+  return {
+    ...closeSession(session),
+    ticksUsed,
+    casingCleared: session.casingCleared,
+    cellTicksUsed,
+  }
+}
+
 /** One material cell's own samples at full weight: the scripted `drillTile` stamp. */
 export function carveCell(
   world: WorldState,
@@ -129,12 +170,23 @@ function carveSamples(
   drillTicksOf: CellDrillTicks,
 ): Carve {
   const session = openSession(world, params)
+  const ticksUsed = carveEachSample(session, samples, window, drillTicksOf)
+  return { ...closeSession(session), ticksUsed, casingCleared: session.casingCleared }
+}
+
+/** Carves the samples in order; answers the most ticks any of them took. */
+function carveEachSample(
+  session: EditSession,
+  samples: readonly WeightedSample[],
+  window: CarveWindow,
+  drillTicksOf: CellDrillTicks,
+): number {
   let ticksUsed = 0
   for (const sample of samples) {
     const ticks = carveOneSample(session, sample, window, drillTicksOf)
     ticksUsed = Math.max(ticksUsed, ticks)
   }
-  return { ...closeSession(session), ticksUsed, casingCleared: session.casingCleared }
+  return ticksUsed
 }
 
 /** Carves one sample; answers the ticks of the window it took to remove what it removed. */

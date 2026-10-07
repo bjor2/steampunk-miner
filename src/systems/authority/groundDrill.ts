@@ -11,7 +11,8 @@
  * yields once: 1 cargo unit of ore or core fragments (#7, #10); with a full hold the unit is lost,
  * never refused. The slices' gate checks may refuse an ore cell or destroy it without cargo, and
  * the drill reports each as a `DrillGated` (`drillGates.ts`); with none registered the drill is
- * unchanged.
+ * unchanged. A slice's drill gear adds cells past the bit and beside the bore to the reported
+ * drill's cut (`drillGearCut.ts`); with none registered the cut is the disc alone.
  */
 import { casingHardness } from '../economy/casingGrades'
 import { coreHardness, blockHardness, oreSalePrice } from '../economy/oreEconomy'
@@ -21,13 +22,7 @@ import { drillStampOf } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { hasCargoRoom, withOreUnit, type VehicleState } from '../vehicle/vehicleState'
-import {
-  carveCell,
-  carveDisc,
-  type Carve,
-  type CarveWindow,
-  type CellDrillTicks,
-} from '../world/groundEdit'
+import { carveCell, type Carve, type CellDrillTicks } from '../world/groundEdit'
 import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -38,6 +33,12 @@ import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import { chainEffects, unchanged, type RuleEffect } from './commandRule'
 import { harvestCoreTile } from './coreHarvest'
 import type { DomainEventBody } from './domainEvent'
+import {
+  carveStampWithGear,
+  withoutGear,
+  type DrillCarve,
+  type DrillCarveRequest,
+} from './drillGearCut'
 import { openDrillGates, type DrillGates } from './drillGates'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
@@ -45,7 +46,7 @@ import { minedOreOf, type MinedOre } from './minedOre'
 import { oreCellHardness, scratchFloorOfCell } from './signatureCells'
 import { wakeLavaBeside } from './lava/lavaRules'
 
-type CarveIn = (world: WorldState, window: CarveWindow, drillTicksOf: CellDrillTicks) => Carve
+type CarveIn = (request: DrillCarveRequest) => DrillCarve
 
 /** Scripted mining: one cell's samples; call with a planet that has params. */
 export function drillCell(
@@ -55,12 +56,12 @@ export function drillCell(
   tile: TilePoint,
   requestedTicks: number,
 ): RuleEffect {
-  const carve: CarveIn = (world, window, drillTicksOf) =>
-    carveCell(world, params, tile, window, drillTicksOf)
+  const carve: CarveIn = ({ world, window, gates }) =>
+    withoutGear(carveCell(world, params, tile, window, gates.drillTicksOf))
   return drillGround(state, params, playerId, { tile, carve }, requestedTicks)
 }
 
-/** The reported drill: the stamp at the pose, aimed by its facing (#40). */
+/** The reported drill: the stamp at the pose, aimed by its facing (#40), and any drill gear. */
 export function drillAtPose(
   state: AuthorityState,
   params: PlanetParams,
@@ -70,9 +71,8 @@ export function drillAtPose(
   target: TilePoint,
   requestedTicks: number,
 ): RuleEffect {
-  const stamp = drillStampOf(pose, isLifting)
-  const carve: CarveIn = (world, window, drillTicksOf) =>
-    carveDisc(world, params, stamp, window, drillTicksOf)
+  const stamp = { pose, disc: drillStampOf(pose, isLifting) }
+  const carve: CarveIn = (request) => carveStampWithGear(state, params, playerId, stamp, request)
   return drillGround(state, params, playerId, { tile: target, carve }, requestedTicks)
 }
 
@@ -117,11 +117,11 @@ function drillGround(
   if (ticks === 0) return unchanged(state)
   const window = { firstTick: Math.max(0, state.tick - ticks), ticks }
   const gates = openDrillGates(state, playerId, params, drillTicksOfCells(params, drill))
-  const carved = target.carve(state.world, window, gates.drillTicksOf)
+  const carved = target.carve({ world: state.world, window, gates, energy: vehicle.energy })
   if (carved.ticksUsed === 0) return { state, events: gates.refusedEvents() }
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
     ...vehicle,
-    energy: vehicle.energy - carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill,
+    energy: vehicle.energy - carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill - carved.gearQuanta,
   })
   const collected = collectYieldedCells(charged, playerId, params, carved.yielded, gates)
   return {

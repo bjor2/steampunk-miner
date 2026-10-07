@@ -24,6 +24,7 @@ import type {
 } from '../systems/registries/discovery'
 import type { DockFacility } from '../systems/registries/dockFacilities'
 import type { DockService } from '../systems/registries/dockServices'
+import type { DrillGearSource } from '../systems/registries/drillGear'
 import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectionModifiers'
 import type { GateCheck } from '../systems/registries/gateChecks'
@@ -87,6 +88,11 @@ export interface SliceRegistrar {
   vehicleMotionEffect(source: VehicleMotionEffectSource): void
   /** A dock building that opens its `facility` schedule row from that row's planet on (#221). */
   dockFacility(facility: DockFacility): void
+  /**
+   * Cells the player's drill cuts past the bit and beside the bore, listed only after `canMine`; a
+   * side cell costs at least the drill's own energy for it (ticket 234).
+   */
+  drillGear(source: DrillGearSource): void
   /** Answers a pressed action the kernel's routing table leaves open, such as `use_slot_1`. */
   inputReaction(reaction: InputReactionEntry): void
   generationHook(hook: GenerationHook): void

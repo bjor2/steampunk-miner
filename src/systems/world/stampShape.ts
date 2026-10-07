@@ -9,6 +9,8 @@
  *   `128 + 255 (R^2 - r^2) / 2R` per sample, so the cut floor's contour lies on the circle itself,
  *   however the sample grid meets it (`drillStamp.ts` says why the drill wants one).
  * - A **cell** stamp covers one material cell's 16 samples at full weight (scripted mining).
+ * - A cell **beside a disc** (slice drill gear, ticket 234) covers the cell's samples the disc does
+ *   not reach, at full weight, kept above the disc's level floor, so a widened bore keeps its floor.
  */
 import { MM_PER_SAMPLE, SAMPLES_PER_TILE, SOLID_DENSITY, ISO_DENSITY } from './sampleGrid'
 import type { TilePoint } from './tileGrid'
@@ -77,6 +79,23 @@ export function cellSamplesOf(tile: TilePoint): WeightedSample[] {
     }
   }
   return samples
+}
+
+/**
+ * A cell's samples outside the disc's radius at full weight, each carved no lower than the disc's
+ * level floor; the samples the floor keeps solid are left out. The disc carves the rest.
+ */
+export function cellSamplesBesideDisc(tile: TilePoint, disc: DiscStamp): WeightedSample[] {
+  return cellSamplesOf(tile)
+    .filter((sample) => !isWithinDisc(disc, sample))
+    .map((sample) => ({ ...sample, floor: levelFloorAt(disc.floorRadiusMm, sample.sx, sample.sy) }))
+    .filter((sample) => sample.floor !== SOLID_DENSITY)
+}
+
+function isWithinDisc(disc: DiscStamp, { sx, sy }: WeightedSample): boolean {
+  const dx = sx * MM_PER_SAMPLE - disc.xMm
+  const dy = sy * MM_PER_SAMPLE - disc.yMm
+  return dx * dx + dy * dy <= disc.radiusMm * disc.radiusMm
 }
 
 /** The level floor's ramp at a sample: 128 on the floor circle, 255 a sample below it. */

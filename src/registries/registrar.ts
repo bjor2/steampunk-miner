@@ -41,6 +41,7 @@ import {
 } from '../systems/registries/discovery'
 import { DOCK_FACILITY_REGISTRY } from '../systems/registries/dockFacilities'
 import { DOCK_SERVICE_REGISTRY } from '../systems/registries/dockServices'
+import { DRILL_GEAR_REGISTRY } from '../systems/registries/drillGear'
 import { INPUT_REACTION_REGISTRY } from '../systems/registries/inputReactions'
 import { ENEMY_DETECTION_MODIFIER_REGISTRY } from '../systems/registries/enemyDetectionModifiers'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
@@ -89,6 +90,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),
     dockService: (service) => add(DOCK_SERVICE_REGISTRY, service),
     dockFacility: (facility) => add(DOCK_FACILITY_REGISTRY, facility),
+    drillGear: (source) => add(DRILL_GEAR_REGISTRY, source),
     hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),
     enemyDetectionModifier: (modifier) => add(ENEMY_DETECTION_MODIFIER_REGISTRY, modifier),
     heatPause: (pause) => add(HEAT_PAUSE_REGISTRY, pause),
