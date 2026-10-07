@@ -37,6 +37,10 @@ const BAND_1: TripGoal = { kind: 'ore', band: 1 }
 const MAX_FIXTURE_TRIPS = 80
 /** Twenty minutes of play after the rescue: long enough to sell and buy the next grade. */
 const PLAY_ON_TICKS = 20 * 60 * 60
+/** Five minutes after a tow: long enough to mine and sell from the quarter tank it leaves. */
+const TOW_PLAY_ON_TICKS = 5 * 60 * 60
+/** Two energy units: far below the quarter tank a tow leaves (#8). */
+const DRAINED_ENERGY_UNITS = '2'
 
 /** Whether no band the casing holds pays a trip with the tank the vehicle has now. */
 function hasNoOrePlan(session: BotSession, planet: BotPlanet): boolean {
@@ -76,44 +80,56 @@ function botRescuedWithNoOrePlan(): { session: BotSession; planet: BotPlanet } {
   return { session, planet }
 }
 
-/** The fixture as it stood after the rescue, and the bot's play on from there. */
+interface DeadEnd {
+  session: BotSession
+  planet: BotPlanet
+}
+
+let deadEnd: DeadEnd | null = null
+
+/** One bore-out, shared: it takes a while, and each case plays on from a branch of it. */
+function rescuedDeadEnd(): DeadEnd {
+  deadEnd ??= botRescuedWithNoOrePlan()
+  return deadEnd
+}
+
+/** A session of its own from the dead end's state, with the mine remembered as it was. */
+function branchOfDeadEnd(): DeadEnd {
+  const { session, planet } = rescuedDeadEnd()
+  return { session: createBotSession(session.state(), 'p1'), planet: structuredClone(planet) }
+}
+
+/** The same dead end with the tank run down below what a tow leaves. */
+function drainedBranchOfDeadEnd(): DeadEnd {
+  const branch = branchOfDeadEnd()
+  branch.session.submit({ type: 'debug.setEnergy', payload: { energy: DRAINED_ENERGY_UNITS } })
+  return branch
+}
+
 interface PlayedOn {
-  deadEnd: {
-    mode: string
-    casingGrade: number
-    hasNoOrePlan: boolean
-    hasNoOrePlanOnFullTank: boolean
-    isGradeUnaffordable: boolean
-  }
-  rescueEvents: string[]
   run: SliceRun
   maxTicks: number
-  /** The first event of the play on. */
-  from: number
 }
 
-let played: PlayedOn | null = null
-
-/** One fixture and one play on, shared: the bore-out and twenty minutes of play take a while. */
-function playedOn(): PlayedOn {
-  played ??= playOnFromDeadEnd()
-  return played
+function playOn({ session, planet }: DeadEnd, ticks: number): PlayedOn {
+  const maxTicks = session.tick() + ticks
+  return { run: playSliceFrom(session, planet, { maxTicks, gunPolicy: 'never' }), maxTicks }
 }
 
-function playOnFromDeadEnd(): PlayedOn {
-  const { session, planet } = botRescuedWithNoOrePlan()
-  const deadEnd = deadEndOf(session, planet)
-  const from = session.events().length
-  const maxTicks = session.tick() + PLAY_ON_TICKS
-  const run = playSliceFrom(session, planet, { maxTicks, gunPolicy: 'never' })
-  const rescueEvents = session
-    .events()
-    .slice(0, from)
-    .map((event) => event.type)
-  return { deadEnd, rescueEvents, run, maxTicks, from }
+let retreat: PlayedOn | null = null
+let tow: PlayedOn | null = null
+
+function retreatPlayedOn(): PlayedOn {
+  retreat ??= playOn(branchOfDeadEnd(), PLAY_ON_TICKS)
+  return retreat
 }
 
-function deadEndOf(session: BotSession, planet: BotPlanet): PlayedOn['deadEnd'] {
+function towPlayedOn(): PlayedOn {
+  tow ??= playOn(drainedBranchOfDeadEnd(), TOW_PLAY_ON_TICKS)
+  return tow
+}
+
+function deadEndOf({ session, planet }: DeadEnd) {
   const { wallet } = session.state().players.p1
   return {
     mode: session.vehicle().mode,
@@ -124,11 +140,13 @@ function deadEndOf(session: BotSession, planet: BotPlanet): PlayedOn['deadEnd'] 
   }
 }
 
-/** Each tile broken after `from` with the casing grade held then (the #65 casing rule). */
-function digsWithGrade(events: readonly DomainEvent[], from: number) {
+const typesOf = (events: readonly DomainEvent[]) => events.map((event) => event.type)
+
+/** Each tile broken with the casing grade held then (the #65 casing rule), from grade 1. */
+function digsWithGrade(events: readonly DomainEvent[]) {
   const params = planetParamsFor(WORLD_SEED, 1)
   let held = 1
-  return events.slice(from).flatMap((event) => {
+  return events.flatMap((event) => {
     if (event.type === 'CasingUpgraded') held = event.to
     if (event.type !== 'TileDestroyed' || event.kind === 'core') return []
     return [{ band: bandOfTile(params, event.tx, event.ty), grade: held }]
@@ -137,9 +155,8 @@ function digsWithGrade(events: readonly DomainEvent[], from: number) {
 
 describe('pacing bot retreat (#216)', () => {
   it('is left by the fixture docked after a rescue at grade 1, broke, with no ore plan', () => {
-    const { deadEnd, rescueEvents } = playedOn()
-    expect(rescueEvents).toContain('RescueTriggered')
-    expect(deadEnd).toEqual({
+    expect(typesOf(rescuedDeadEnd().session.events())).toContain('RescueTriggered')
+    expect(deadEndOf(rescuedDeadEnd())).toEqual({
       mode: 'docked',
       casingGrade: 1,
       hasNoOrePlan: true,
@@ -149,21 +166,38 @@ describe('pacing bot retreat (#216)', () => {
   })
 
   it('plays on from that state to the end of its budget instead of ending the run', () => {
-    const { run, maxTicks } = playedOn()
+    const { run, maxTicks } = retreatPlayedOn()
     expect(run.state.tick).toBeGreaterThanOrEqual(maxTicks)
+    expect(typesOf(run.events)).not.toContain('CommandRejected')
   })
 
   it('sells the ore of its retreat and buys the next casing grade with it', () => {
-    const { run, from } = playedOn()
-    expect(run.events.slice(from).map((event) => event.type)).toContain('ResourceSold')
+    const { run } = retreatPlayedOn()
+    expect(typesOf(run.events)).toContain('ResourceSold')
     expect(run.state.players.p1.vehicle.casingGrade).toBeGreaterThan(1)
   })
 
   it('retreats only into bands its casing grade holds', () => {
-    const { run, from } = playedOn()
-    const digs = digsWithGrade(run.events, from)
+    const digs = digsWithGrade(retreatPlayedOn().run.events)
     expect(digs.length).toBeGreaterThan(0)
     expect(digs.filter((dig) => dig.grade < requiredCasingGrade(dig.band))).toEqual([])
+  })
+})
+
+describe('pacing bot tow for a broke bot (#216, #8 soft-lock rule)', () => {
+  it('strands itself off the pad for the tow before any trip when its tank is below the tow floor', () => {
+    const types = typesOf(towPlayedOn().run.events)
+    const stranded = types.indexOf('EnergyDepleted')
+    expect(stranded).toBeGreaterThanOrEqual(0)
+    expect(types.slice(0, stranded)).not.toContain('TileDestroyed')
+    expect(types.slice(stranded)).toContain('RescueTriggered')
+  })
+
+  it('plays on after the tow to the end of its budget, sending only commands the authority accepts', () => {
+    const { run, maxTicks } = towPlayedOn()
+    expect(run.state.tick).toBeGreaterThanOrEqual(maxTicks)
+    expect(typesOf(run.events)).not.toContain('CommandRejected')
+    expect(typesOf(run.events)).toContain('ResourceSold')
   })
 })
 

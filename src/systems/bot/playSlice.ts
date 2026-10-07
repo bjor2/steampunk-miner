@@ -11,7 +11,8 @@
  * planet where the bot met a tile it would blast with none in stock (#129); travel starts afresh.
  * When no band the casing holds pays a trip, as after a rescue that took the last of the wallet
  * with those bands bored out and the next grade unaffordable (#216), the bot retreats to the
- * shallowest of them, widens its galleries and plays on.
+ * shallowest of them, widens its galleries and plays on; broke with a tank too low even for that,
+ * it strands itself for the tow that leaves a quarter of the tank (#8).
  */
 import { SLICE_LAST_PLANET } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -26,6 +27,7 @@ import { deepestHeldBand, holdsCore } from './botCasing'
 import type { ChargePolicy } from './botCharges'
 import type { GunPolicy } from './botGuns'
 import { collectWhenReady, refineWhenWorthIt, type RefineryUse } from './botRefining'
+import { towWhenItRefills } from './botRetreat'
 import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
 import { createBotSession, type BotListener, type BotSession } from './botSession'
 import type { BotPlanet } from './botPilot'
@@ -146,10 +148,13 @@ function isLastCoreDone(session: BotSession, lastPlanet: number): boolean {
   return state.planet.index >= lastPlanet && state.core.isCompleted
 }
 
-/** One trip and the dock after it; false when no trip can earn anything. */
+/**
+ * One trip and the dock after it; with no trip that pays, a tow for a broke bot's empty tank
+ * (`botRetreat.ts`, #216), and false when not even that is left.
+ */
 function playDockCycle(session: BotSession, planet: BotPlanet, run: BotRun): boolean {
   const goal = chooseGoal(session, planet)
-  if (goal === null) return false
+  if (goal === null) return towWhenItRefills(session, planet)
   runTrip(session, planet, goal)
   collectWhenReady(session)
   if (isRefining(session, run)) refineWhenWorthIt(session, planet)

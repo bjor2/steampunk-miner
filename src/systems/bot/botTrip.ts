@@ -67,7 +67,7 @@ function driveToBay(session: BotSession, planet: BotPlanet, bay: BayId, tile: Ti
   session.submit(dockCommand(bay))
 }
 
-function leavePad(session: BotSession): void {
+export function leavePad(session: BotSession): void {
   if (session.vehicle().mode === 'docked') session.submit(undockCommand())
 }
 
