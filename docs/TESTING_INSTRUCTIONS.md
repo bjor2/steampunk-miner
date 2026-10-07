@@ -274,6 +274,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (`lavaFlow.test.ts`, `lava/lavaRun.test.ts`) and build refractory rings with `debug.lineCasing`;
   breach specs find a generated pocket lying against an open cave cell and gnaw a ring lined in
   plain ground near it (#133: a breach frees only lava a refractory lining kept out).
+- **Twin-bit head** (GD lock on #257, ticket 281): `npm run balance:twin-bit` runs
+  `features/drill-gear/twinBitPace.test.ts`: the bot arrives on planets 7 and 10 on-curve and plays
+  to the core on each pacing seed with the head in `drill.head` and with the same loadout command
+  slotting nothing. Gated twice on the same runs: the median core-time ratio stays at or above 0.98
+  (the #205 assert, `drillGearPace.test.ts`), and with drive 0 the head mines exactly the bare
+  run's cells, ticks and ore value (no free cell, GD ruling on #280). The scenario
+  `drill-gear.twin-bit-diagonal` (`drill-gear/systems/twinBitDiagonal.ts`) is a `fastForward` script
+  from the debug action `features['drill-gear'].twinBitDiagonal()`: P19 on-curve with the head, a
+  down-right and a down-left bore of six cells from the surface east of the pad. The eye check in
+  `npm run dev` plays it from the console: take `s` from `twinBitDiagonal()`, then call
+  `steampunkDebug.fastForward(s.ticks, s.commands)`.
 - **Bot combat** (#130): the bot meets a hunting enemy with the drill head between bores (#29), and
   on the move too once its vehicle was destroyed on that planet; travel resets that. A run with no
   death plays as before, and a fatal dive no longer replays after every tow (`bot/botCombat.test.ts`,

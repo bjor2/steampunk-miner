@@ -39,6 +39,7 @@
     "balance:charges": "vite-node scripts/balanceCharges.ts",
     "balance:refinery": "vite-node scripts/balanceRefinery.ts",
     "balance:heat": "vite-node scripts/balanceHeat.ts",
+    "balance:twin-bit": "vitest run src/features/drill-gear/twinBitPace.test.ts",
     "ore:mix": "vite-node scripts/oreMix.ts",
     "art:export": "scripts/art/export.sh",
     "art:merge-check": "scripts/art/merge_check.sh",

@@ -4,7 +4,8 @@
  * drill sockets; the flank key (KeyF, `use_drill_flank`) switches the side cutters on and off; the
  * collar key (KeyC, `use_drill_collar`) uses the sampling corer, which spends one charge; the card's
  * raw stat lines read from `statPreview`; and `getTwinBit` reads the twin-bit head in `drill.head`
- * (ticket 280) with no bearing latched before it cuts.
+ * (ticket 280) with no bearing latched before it cuts. The scenario `drill-gear.twin-bit-diagonal`
+ * (ticket 281), played through `fastForward`, logs one `diagonal_cell_cut` per cell of its two bores.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -12,12 +13,15 @@ import type { DebugApi } from '../../src/debug/debugApi'
 declare global {
   interface Window {
     steampunkDebug?: DebugApi
+    steampunkRunLog?: () => string
   }
 }
 
 const CUTTERS = 'gear.side_cutters'
 const CORER = 'gear.sampling_corer'
 const TWIN_BIT = 'gear.twin_bit'
+/** Two bores of six cells each (`twinBitDiagonal.ts`). */
+const DIAGONAL_CELLS = 12
 
 async function openGameWithCuttersAndCorer(page: Page): Promise<string[]> {
   const errors: string[] = []
@@ -109,5 +113,32 @@ test('the twin-bit head mounts in drill.head and previews its one diagonal cell'
     ok: true,
     preview: { itemId: TWIN_BIT, lines: [{ stat: 'aheadCells', value: 1 }] },
   })
+  expect(errors).toEqual([])
+})
+
+test('the twin-bit diagonal scenario cuts two 45-degree bores on planet 19', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(String(error)))
+  await page.goto('/?debug')
+  await page.waitForFunction(() => window.steampunkDebug !== undefined)
+  const played = await page.evaluate(() => {
+    const debug = window.steampunkDebug!
+    const script = debug.features['drill-gear'].twinBitDiagonal() as unknown as {
+      ticks: number
+      commands: NonNullable<Parameters<DebugApi['fastForward']>[1]>
+    }
+    return debug.fastForward(script.ticks, script.commands).ok
+  })
+  expect(played).toBe(true)
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => window.steampunkRunLog!().split('"event":"drill-gear.diagonal_cell_cut"').length - 1,
+      ),
+    )
+    .toBe(DIAGONAL_CELLS)
+  await expect
+    .poll(() => page.evaluate(() => window.steampunkDebug!.features['drill-gear'].getTwinBit()))
+    .toMatchObject({ ok: true, isMounted: true })
   expect(errors).toEqual([])
 })
