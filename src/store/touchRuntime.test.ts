@@ -1,17 +1,23 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createMemorySink } from '../logging/eventSink'
+import { withRegistrations } from '../registries/registrar'
+import type { SliceDefinition } from '../registries/sliceDefinition'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import type { Authority } from '../systems/authority/loopbackAuthority'
 import { createStartingAuthority, resetGameStore, useGameStore } from './gameStore'
 import { readActionStream, readVehicleIntent, resetInput, routeKeyChange } from './inputRuntime'
 import {
+  cancelSlotButton,
+  isSlotCardShown,
   landStick,
   leaveScreen,
   liftStick,
   moveOnScreen,
+  pressSlotButton,
   pressTouchButton,
   pushStick,
+  releaseSlotButton,
   releaseTouchButton,
   resetTouch,
   touchScreen,
@@ -147,5 +153,65 @@ describe('touch controls: showing and hiding (#173)', () => {
     expect(game().isTouchControlsShown).toBe(false)
     game().showTouchControls()
     expect(game().isTouchControlsShown).toBe(true)
+  })
+})
+
+// The power-up slot buttons (#217, G&V and GD on 7 Oct): a tap uses a filled slot at once, a hold
+// of 400 ms shows the item card (#164) and uses nothing. A fake slice fills slot 1 only.
+const SLOT_PROBE: SliceDefinition = {
+  id: 'slot-probe',
+  register: (r) =>
+    r.inputReaction({
+      id: 'slot-probe.use_1',
+      actionId: 'use_slot_1',
+      contexts: ['vehicle'],
+      toIntent: () => ({ type: 'requestRescue', payload: {} }),
+    }),
+}
+
+const runWithSlot = (play: () => void) => withRegistrations([SLOT_PROBE], () => runFresh(play))
+
+describe('touch controls: power-up slot buttons (#217)', () => {
+  it('submit one use on a tap of a filled slot, the same as Digit1, and show no card', () => {
+    let isCardShown = true
+    const onTouch = runWithSlot(() => {
+      pressSlotButton('use_slot_1', 1000)
+      isCardShown = isSlotCardShown('use_slot_1', 1120)
+      releaseSlotButton('use_slot_1', 1120)
+    })
+    const onKeys = runWithSlot(() => {
+      routeKeyChange(key('Digit1', true))
+      routeKeyChange(key('Digit1', false))
+    })
+    expect(onTouch.commands).toEqual(['requestRescue'])
+    expect(onTouch.commands).toEqual(onKeys.commands)
+    expect(isCardShown).toBe(false)
+  })
+
+  it('show the card after a 400 ms hold and use nothing on release', () => {
+    let isCardShown = false
+    const held = runWithSlot(() => {
+      pressSlotButton('use_slot_1', 1000)
+      isCardShown = isSlotCardShown('use_slot_1', 1400)
+      releaseSlotButton('use_slot_1', 1400)
+    })
+    expect(isCardShown).toBe(true)
+    expect(held.commands).toEqual([])
+    expect(held.stream).toEqual([])
+  })
+
+  it('use nothing for an empty slot or a cancelled press', () => {
+    const empty = runWithSlot(() => {
+      pressSlotButton('use_slot_2', 0)
+      releaseSlotButton('use_slot_2', 100)
+    })
+    const cancelled = runWithSlot(() => {
+      pressSlotButton('use_slot_1', 0)
+      cancelSlotButton('use_slot_1')
+      releaseSlotButton('use_slot_1', 100)
+    })
+    expect(empty.commands).toEqual([])
+    expect(cancelled.commands).toEqual([])
+    expect(isSlotCardShown('use_slot_1', 1000)).toBe(false)
   })
 })

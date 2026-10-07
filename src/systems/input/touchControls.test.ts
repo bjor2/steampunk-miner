@@ -7,6 +7,7 @@ import {
   knobOffsetOf,
   heldChangesOf,
   isDoubleTap,
+  isSlotHeldForCard,
   isStickShown,
   pinchZoomStepsOf,
   stickActionsOf,
@@ -124,5 +125,12 @@ describe('touch held actions', () => {
       released: ['aim_left'],
       pressed: ['aim_down', 'aim_right'],
     })
+  })
+})
+
+describe('touch slot buttons (#217)', () => {
+  it('count a press under 400 ms as a tap and one of 400 ms or more as a hold for the card', () => {
+    expect(isSlotHeldForCard(1000, 1399)).toBe(false)
+    expect(isSlotHeldForCard(1000, 1400)).toBe(true)
   })
 })

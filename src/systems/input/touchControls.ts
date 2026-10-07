@@ -7,6 +7,7 @@
 import {
   DOUBLE_TAP_MS,
   DOUBLE_TAP_SLOP_PX,
+  SLOT_CARD_HOLD_MS,
   STICK_DEADZONE_SHARE,
   STICK_OCTANT_SLOPE,
   STICK_RADIUS_PX,
@@ -32,6 +33,17 @@ export const CLUSTER_ACTION_IDS = [
 ] as const satisfies readonly ActionId[]
 
 export type ClusterActionId = (typeof CLUSTER_ACTION_IDS)[number]
+
+/** The power-up slots' actions, slot 1 first (#162 section 3, #217). */
+export const SLOT_ACTION_IDS = [
+  'use_slot_1',
+  'use_slot_2',
+  'use_slot_3',
+  'use_slot_4',
+  'use_slot_5',
+] as const satisfies readonly ActionId[]
+
+export type SlotActionId = (typeof SLOT_ACTION_IDS)[number]
 
 /** What decides which cluster buttons show, read from the store and the authority replica. */
 export interface TouchSituation {
@@ -105,6 +117,14 @@ export function isDoubleTap(previous: TapPoint | null, tap: TapPoint): boolean {
   if (previous === null) return false
   const isSoon = tap.atMs - previous.atMs <= DOUBLE_TAP_MS
   return isSoon && Math.hypot(tap.x - previous.x, tap.y - previous.y) <= DOUBLE_TAP_SLOP_PX
+}
+
+/**
+ * A finger on a slot button for this long has opened the slot's item card (#164 draws it), so
+ * lifting it uses nothing; a shorter press is a tap that uses the slot at once, with no confirm.
+ */
+export function isSlotHeldForCard(pressedAtMs: number, nowMs: number): boolean {
+  return nowMs - pressedAtMs >= SLOT_CARD_HOLD_MS
 }
 
 /** What changes between two sets of held move actions: releases first, then presses. */

@@ -1,15 +1,18 @@
 /**
- * Touch in, actions out (#173): the floating stick, the cluster's buttons, a pinch and a double
- * tap press actions through `pressAction` and `releaseAction`, the path the keys take, so a touch
- * run submits exactly the commands of the matching key run and replays alike. Which pointer does
- * what lives here, in module state, never in React or the store; the stick's drawing reads it.
+ * Touch in, actions out (#173): the floating stick, the cluster's buttons, the power-up slot
+ * buttons (#217), a pinch and a double tap press actions through `pressAction` and
+ * `releaseAction`, the path the keys take, so a touch run submits exactly the commands of the
+ * matching key run and replays alike. Which pointer does what lives here, in module state, never
+ * in React or the store; the stick's drawing reads it.
  */
 import type { ActionId } from '../systems/input/actionMap'
 import {
   heldChangesOf,
   isDoubleTap,
+  isSlotHeldForCard,
   pinchZoomStepsOf,
   stickActionsOf,
+  type SlotActionId,
   type StickOffset,
   type TapPoint,
 } from '../systems/input/touchControls'
@@ -35,6 +38,8 @@ const pinchPoints = new Map<number, { x: number; y: number }>()
 let pinchStartDistance = 0
 let pinchStepsTaken = 0
 let lastTap: TapPoint | null = null
+/** When each slot button now under a finger went down, in ms. */
+const slotPressedAtMs = new Map<SlotActionId, number>()
 
 /** A thumb lands in the stick zone: the stick appears under it, holding nothing yet. */
 export function landStick(pointerId: number, x: number, y: number): void {
@@ -66,6 +71,33 @@ export function releaseTouchButton(action: ActionId): void {
   releaseAction(action)
 }
 
+/**
+ * A finger lands on a power-up slot button (#217): nothing fires yet, as a hold opens the slot's
+ * item card instead. The slice's panel passes the pointer event's time.
+ */
+export function pressSlotButton(action: SlotActionId, atMs: number): void {
+  slotPressedAtMs.set(action, atMs)
+}
+
+/** The finger lifts: a tap uses the slot as its digit key would; after a hold nothing fires. */
+export function releaseSlotButton(action: SlotActionId, atMs: number): void {
+  const pressedAtMs = slotPressedAtMs.get(action)
+  slotPressedAtMs.delete(action)
+  if (pressedAtMs === undefined || isSlotHeldForCard(pressedAtMs, atMs)) return
+  tapAction(action)
+}
+
+/** The finger slid off or the browser took the touch: the press ends with no use. */
+export function cancelSlotButton(action: SlotActionId): void {
+  slotPressedAtMs.delete(action)
+}
+
+/** Whether the slot's button has been held long enough to show its item card (#164). */
+export function isSlotCardShown(action: SlotActionId, nowMs: number): boolean {
+  const pressedAtMs = slotPressedAtMs.get(action)
+  return pressedAtMs !== undefined && isSlotHeldForCard(pressedAtMs, nowMs)
+}
+
 /** A finger on the open screen: the second of a double tap resets the zoom, a second finger pinches. */
 export function touchScreen(pointerId: number, tap: TapPoint): void {
   pinchPoints.set(pointerId, { x: tap.x, y: tap.y })
@@ -89,6 +121,7 @@ export function resetTouch(): void {
   stickHeld = []
   pinchPoints.clear()
   lastTap = null
+  slotPressedAtMs.clear()
   placeStick(null, 0, 0)
 }
 

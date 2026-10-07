@@ -27,6 +27,12 @@ export const CLUSTER_GAP_PX = 8
 export const DOUBLE_TAP_MS = 300
 export const DOUBLE_TAP_SLOP_PX = 24
 
+/**
+ * A power-up slot button held this long shows its item card instead of using it (#217, G&V and
+ * GD on 7 Oct, matching #173 and #164): release after that uses nothing.
+ */
+export const SLOT_CARD_HOLD_MS = 400
+
 /** A short tick on drill contact and a pulse when the hull takes damage (G&V haptics). */
 export const HAPTIC_DRILL_MS = 10
 export const HAPTIC_HIT_MS = 30

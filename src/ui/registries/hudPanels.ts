@@ -6,11 +6,14 @@
  * The `overlay` slot (#208) is the full-screen layer over the canvas, under the rest of the HUD:
  * its panels draw `OverlayCard`s at world points, and each declares the `priority` its cards hold
  * a seat with when more than the cap want to show.
+ *
+ * The `slots` slot (#217) is the power-up slot column inside the touch controls: drawn after the
+ * cluster while the touch controls show, where #200 puts its 56 px slot buttons.
  */
 import type { ComponentType } from 'react'
 import { defineRegistry, entriesOf } from '../../systems/registries/seal'
 
-export type HudSlot = 'overlay' | 'gauges' | 'banner' | 'position' | 'prompts' | 'threats'
+export type HudSlot = 'overlay' | 'gauges' | 'banner' | 'position' | 'prompts' | 'threats' | 'slots'
 
 export interface SlotPanel {
   id: string
