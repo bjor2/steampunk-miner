@@ -69,6 +69,21 @@
       "budget": 2,
       "source": "npm run bench:render"
     },
+    "overlayFrame.p50Ms": {
+      "label": "HUD overlay frame p50 · 3 chips",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "source": "npm run bench:render"
+    },
+    "overlayFrame.p95Ms": {
+      "label": "HUD overlay frame p95 · 3 chips",
+      "unit": "ms",
+      "group": "CPU benches",
+      "better": "lower",
+      "budget": 0.1,
+      "source": "npm run bench:render"
+    },
     "groundDrilling.carveP95Ms": {
       "label": "Ground carve p95",
       "unit": "ms",
