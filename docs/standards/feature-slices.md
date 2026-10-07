@@ -284,7 +284,7 @@ describe('slice boundary lint', () => {
 | --- | --- |
 | `src/registries/sliceDefinition.ts` **(new kernel dir)** | `SliceDefinition`, `SliceRegistrar`, `FeaturesNotLoadedError` |
 | `src/registries/registrar.ts` **(new)** | `registrarFor(sliceId)`, `sealRegistries()`, `withRegistrations(slices, run)`, the test seam that swaps in a fresh sealed set and restores it |
-| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `oreSignatures` (#232, 3.26), `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `authorityReactions` (#219, 3.21), `seal`; `vehicleMotionEffects`, `hullDamageIntercepts`, `enemyDetectionModifiers`, `heatPauses` (ticket 233, 3.27); `drillGear` (ticket 234, 3.28); `itemDescriber`, `itemDescriptionEntries`, `buyableRefs` (K7, 3.19) |
+| `src/systems/registries/*.ts` **(new)** | Pure registries: `content`, `oreTypes`, `oreSignatures` (#232, 3.26), `gateChecks`, `blastEffects`, `generationHooks`, `hookSeed`, `saveSections`, `discovery`, `vehicleLoadout`, `vehicleAttach`, `oreLook`, `botPurchases`, `authorityReactions` (#219, 3.21), `seal`; `vehicleMotionEffects`, `hullDamageIntercepts`, `enemyDetectionModifiers`, `heatPauses` (ticket 233, 3.27); `drillGear` (ticket 234, 3.28); `slotHoldCues` (ticket 253, 3.30); `itemDescriber`, `itemDescriptionEntries`, `buyableRefs` (K7, 3.19) |
 | `src/ui/registries/hudPanels.ts` **(new)** | HUD panels |
 | `src/ui/registries/screens.ts` | Full slice screens (#211) |
 | `src/ui/registries/bayPanels.ts`, `moneyCounter.ts` | Bay header and above-bay panels; the one money-counter provider (ticket 220) |
@@ -338,6 +338,7 @@ export interface SliceRegistrar {
   screen(panel: ScreenPanel): void                          // #211, section 3.18
   sceneLayer(layer: SceneLayer): void                  // #213, section 3.14
   chargeBlastCue(provider: ChargeBlastCueProvider): void  // one provider, #213, section 3.14
+  slotHoldCue(source: SlotHoldCueSource): void             // ticket 253, section 3.30
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   commandRules(rules: SliceCommandRules): void              // K1, section 3.15
   authorityReaction(reaction: AuthorityReaction): void      // #219, section 3.21
@@ -841,6 +842,13 @@ Kernel seam for the mining gates (#148a), from the GD lock on #148: a per-cell s
 
 - **`oreDrillClasses`** (`src/systems/registries/oreDrillClasses.ts`, one provider): `{ id, drillClassOf({ params, tile, ore }) }` answers `ordinary`, `dense` or `signature`. With none, a signature-tagged ore is `signature` and every other `ordinary`.
 - **What each class means** (`src/systems/authority/signatureCells.ts`): `ordinary` is the tier's hardness and `drill.scratchFloor` (0.25); `dense` the tier's hardness and `drill.denseScratchFloor` (1.5, anything past the tip ratio 1.2544 and up to its square, so `minTipLevel = t + 1` at every tier with no rounding at the edge); `signature` is `H(t + 5)` with `drill.gateScratchFloor` (1). `hardnessOfTile`, `ticksPerCell`, the drill damage, the bot's `canBore`/`boreTicks` and the blast's hardness cap read the class through `oreCellHardness` and `scratchFloorOfCell(params, tile, cell)`.
+
+### 3.30 Slot hold ring and cues (ticket 253)
+
+G&V's rivet-patch definition on #204: while an item's hold runs, a ring fills on its slot; a cancel snaps it back with `playClank('light')`, a finish plays `playChime`, and no new sound voice is added. With nothing registered every slot draws and every batch sounds as before.
+
+- **`slotHoldCues`** (`src/systems/registries/slotHoldCues.ts`): `{ id, holdEndOf(event) }` answers `cancelled`, `finished` or null for a domain event, usually the slice's own. `feedbackCuesOf` asks it for every event its switch does not know (the first answer in id order wins) and turns it into the `holdCancelled` or `holdFinished` cue, one of each per batch like every cue. `SoundStage` plays them on the light clank and the tier-1 pickup chime; they neither shake, flash nor buzz. Presentation only.
+- **The ring** is `power-up-core`'s (feature-slices 7.4 contract change): the `power-up` kind's optional `holdOf(state, playerId) → { startTick, finishTick } | null`, read from the item slice's section. The slot button's `holdPercent` is the share held, rounded down, 0 with no hold; the button draws it as a ring outside the rim with no transition, so it snaps back. `mobility` answers it for the rivet patch and registers `mobility.rivet-patch` for `PatchCancelled` and `HullPatched`.
 
 ## 4. Cross-slice contracts
 
