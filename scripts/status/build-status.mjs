@@ -65,10 +65,14 @@ const PAGE_MODULES = [
   'slots.mjs',
   'slotsHtml.mjs',
   'perfOverviewHtml.mjs',
+  'tests.mjs',
+  'testsHtml.mjs',
 ]
 const REPO = process.env.GITHUB_REPOSITORY || 'bjor2/steampunk-miner'
 const [OWNER, NAME] = REPO.split('/')
 const LOOP_BRANCH = process.env.LOOP_STATUS_BRANCH || 'loop-status'
+// The box Tester's records (docs/metrics/test-metrics.md); the Tests tab (#192) reads them.
+const METRICS_BRANCH = process.env.METRICS_BRANCH || 'test-metrics'
 const TOKEN = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || ''
 const API = process.env.GITHUB_API_URL || 'https://api.github.com'
 const outArg = process.argv.indexOf('--out')
@@ -76,6 +80,8 @@ const OUT = outArg > 0 ? process.argv[outArg + 1] : 'dist/status'
 
 // Workflows shown on the page; the ones with `loop` also become a loop entry (state from the
 // last run), so a scheduled workflow is visible next to the agent loops without any reporting.
+// Since 2026-10-07 CI is lint, format, types, build (+ Windows determinism on PRs) and Pages;
+// the tests run on the box (Tests tab), so no test workflow is listed.
 const WORKFLOWS = [{ file: 'ci.yml' }, { file: 'pages.yml' }]
 
 async function rest(path, { raw = false, allow404 = false } = {}) {
@@ -203,8 +209,8 @@ async function fetchLoops() {
 // documented fields and the pool caps are kept: the page is public.
 function publishedSlotsOf(doc) {
   if (!doc) return null
-  const { updated_at, caps, accounts, grok, claude } = doc
-  return { updated_at, caps, accounts, grok, claude }
+  const { updated_at, caps, accounts, grok, claude, gate, tester } = doc
+  return { updated_at, caps, accounts, grok, claude, gate, tester }
 }
 
 async function fetchSlots() {
@@ -217,6 +223,32 @@ async function fetchSlots() {
   } catch (err) {
     console.warn(`slots.json unavailable: ${err.message}`)
     return null
+  }
+}
+
+// The Tests tab's first paint: test-metrics summary.json and the box-tester/* statuses of main's
+// tip (the page re-reads the summary live). Missing data is shown as such, never fails the build.
+async function fetchTests() {
+  const [summary, statuses] = await Promise.all([
+    rest(`repos/${REPO}/contents/summary.json?ref=${METRICS_BRANCH}`, {
+      raw: true,
+      allow404: true,
+    }).catch((err) => (console.warn(`test-metrics summary unavailable: ${err.message}`), null)),
+    rest(`repos/${REPO}/commits/main/status`).catch(
+      (err) => (console.warn(`main commit status unavailable: ${err.message}`), null),
+    ),
+  ])
+  return {
+    metricsBranch: METRICS_BRANCH,
+    summary,
+    statuses: statuses && {
+      sha: statuses.sha,
+      statuses: (statuses.statuses ?? []).map(
+        ({ context, state, description, target_url, updated_at }) => ({
+          ...{ context, state, description, target_url, updated_at },
+        }),
+      ),
+    },
   }
 }
 
@@ -440,12 +472,13 @@ const perf = buildPerfSection()
 const ticketTime = buildTicketTimeSection()
 const pageBeforeFeatures = pageWithSections(perf.html, ticketTime.html)
 
-const [issues, loops, slots, workflows, featuresCommit] = await Promise.all([
+const [issues, loops, slots, workflows, featuresCommit, tests] = await Promise.all([
   fetchIssues(),
   fetchLoops(),
   fetchSlots(),
   fetchWorkflows(),
   fetchLastCommitOf(FEATURES_FILE),
+  fetchTests(),
 ])
 const featureTime = buildFeatureTimeSection(
   buildFeatures(issues, featuresCommit, ticketTime.model.tickets ?? []),
@@ -481,6 +514,7 @@ const status = {
   phases: ticketPhasesOf(ticketTime.model),
   workflowLoops: workflowLoopEntries(workflows),
   workflows,
+  tests,
 }
 
 mkdirSync(OUT, { recursive: true })

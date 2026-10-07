@@ -1666,6 +1666,16 @@
           grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         }
       }
+      .te-banner {
+        margin: 0 0 8px;
+        padding: 6px 8px;
+        border: 1px solid currentColor;
+        border-radius: 6px;
+      }
+      .te-wide {
+        margin-top: 12px;
+        overflow-x: auto;
+      }
       .sl-pool h3 {
         font-size: 14px;
         margin: 0 0 6px;
@@ -1734,6 +1744,9 @@
         <a href="#slots" data-tab="slots" role="tab"
           >Slots<span class="tabn" id="tabn-slots"></span
         ></a>
+        <a href="#tests" data-tab="tests" role="tab"
+          >Tests<span class="tabn" id="tabn-tests"></span
+        ></a>
         <a href="#features" data-tab="features" role="tab"
           >Features<span class="tabn" id="tabn-features"></span
         ></a>
@@ -1793,6 +1806,14 @@
         <section class="panel" id="slots-panel">
           <h2>Loop slots</h2>
           <div id="slots-body" class="muted">loading…</div>
+        </section>
+      </section>
+      <section class="tab hidden" id="tab-tests" data-tab="tests">
+        <section class="panel" id="tests-panel">
+          <h2>
+            Tests <small class="muted">box Tester (tests no longer run in GitHub Actions)</small>
+          </h2>
+          <div id="tests-body" class="muted">loading…</div>
         </section>
       </section>
       <section class="tab hidden" id="tab-issues" data-tab="issues">
@@ -2104,17 +2125,20 @@
             .join('') || '<li class="muted">nothing</li>'
 
         // workflows
-        $('#wf-table tbody').innerHTML = (DATA.workflows || [])
-          .map((w) => {
-            const r = w.run
-            const res = !r
-              ? '<span class="muted">no runs</span>'
-              : r.status !== 'completed'
-                ? `<span class="warn">${esc(r.status)}</span>`
-                : `<span class="${r.conclusion === 'success' ? 'ok' : 'bad'}">${esc(r.conclusion)}</span>`
-            return `<tr><td><a href="${esc(w.url)}">${esc(w.name)}</a></td><td>${r ? `<a href="${esc(r.url)}">${res}</a> <span class="muted">${esc(r.event)}</span>` : res}</td><td class="muted" title="${esc(local(r?.updatedAt))}">${r ? ago(r.updatedAt) : ''}</td></tr>`
-          })
-          .join('')
+        $('#wf-table tbody').innerHTML =
+          (DATA.workflows || [])
+            .map((w) => {
+              const r = w.run
+              const res = !r
+                ? '<span class="muted">no runs</span>'
+                : r.status !== 'completed'
+                  ? `<span class="warn">${esc(r.status)}</span>`
+                  : `<span class="${r.conclusion === 'success' ? 'ok' : 'bad'}">${esc(r.conclusion)}</span>`
+              return `<tr><td><a href="${esc(w.url)}">${esc(w.name)}</a></td><td>${r ? `<a href="${esc(r.url)}">${res}</a> <span class="muted">${esc(r.event)}</span>` : res}</td><td class="muted" title="${esc(local(r?.updatedAt))}">${r ? ago(r.updatedAt) : ''}</td></tr>`
+            })
+            .join('') +
+          '<tr id="wf-tester"><td><a href="#tests">Box Tester (tests)</a></td><td class="muted">loading…</td><td></td></tr>'
+        renderTests()
 
         // events
         const evs = ((LOOPS && LOOPS.events) || []).slice(0, 25)
@@ -2360,6 +2384,53 @@
         else showSlots(model)
       }
 
+      // ---------- Tests tab (#192): tests.mjs + testsHtml.mjs, live summary from test-metrics ----------
+      let TESTS_VIEW = null
+      let TESTS_SUMMARY = null
+      function testsModel() {
+        const t = DATA.tests || {}
+        return TESTS_VIEW.model.readTestsModel({
+          summary: TESTS_SUMMARY || t.summary,
+          statuses: t.statuses,
+          tester: SLOTS && SLOTS.tester,
+          nowMs: Date.now(),
+        })
+      }
+      function renderTests() {
+        if (!TESTS_VIEW || !DATA) return
+        const model = testsModel()
+        const badge = TESTS_VIEW.model.testsTabBadge(model)
+        $('#tests-body').innerHTML = model.error
+          ? TESTS_VIEW.html.renderTestsFailure(model.error)
+          : TESTS_VIEW.html.renderTestsPanel(model, { repo: DATA.repo, nowMs: Date.now() })
+        $('#tabn-tests').textContent = badge.text
+        $('#tabn-tests').className = `tabn ${badge.cls}`
+        const last = model.lastBoxRun
+        const row = $('#wf-tester')
+        if (row && !model.error) {
+          const cls = !last ? 'muted' : TESTS_VIEW.model.isGreenRun(last) ? 'ok' : 'bad'
+          const stale = model.freshness.isStale ? ' <span class="badge stale">STALE</span>' : ''
+          row.innerHTML = `<td><a href="#tests">Box Tester (tests)</a></td><td><span class="${cls}">${last ? esc(last.conclusion || '?') : 'no runs'}</span> <span class="muted">${last ? esc(last.phase || '') : ''}</span>${stale}</td><td class="muted">${last ? ago(last.startedAt) : ''}</td>`
+        }
+      }
+      async function refreshTestsSummary() {
+        try {
+          const branch = (DATA.tests && DATA.tests.metricsBranch) || 'test-metrics'
+          const r = await fetch(
+            `https://raw.githubusercontent.com/${DATA.repo}/${branch}/summary.json`,
+            {
+              cache: 'no-store',
+            },
+          )
+          if (!r.ok) return
+          const doc = await r.json()
+          if (!TESTS_SUMMARY || !doc.updatedAt || doc.updatedAt >= (TESTS_SUMMARY.updatedAt || ''))
+            TESTS_SUMMARY = doc
+        } catch (_) {
+          /* keep the build-time copy */
+        }
+      }
+
       function renderMeta() {
         const run = DATA.run
         $('#meta').innerHTML =
@@ -2465,6 +2536,7 @@
         renderMeta()
         renderLoops()
         renderSlots()
+        renderTests()
         renderTree()
         renderIssueList()
         renderPerfWork()
@@ -2871,6 +2943,7 @@
         issues: 'Issue trees',
         loops: 'Loops',
         slots: 'Slots',
+        tests: 'Tests',
         features: 'Features',
         performance: 'Performance',
       }
@@ -2962,8 +3035,20 @@
           $('#slots-body').innerHTML =
             `<div class="warn">Slots view failed to load: ${esc(e)}</div>`
         })
+      Promise.all([import('./tests.mjs'), import('./testsHtml.mjs')])
+        .then(([model, html]) => {
+          TESTS_VIEW = { model, html }
+          if (!DATA) return
+          renderLoops()
+          refreshTestsSummary().then(renderTests)
+        })
+        .catch((e) => {
+          $('#tests-body').innerHTML =
+            `<div class="warn">Tests view failed to load: ${esc(e)}</div>`
+        })
       async function pollLoops() {
         if (!DATA || document.hidden) return
+        refreshTestsSummary().then(renderTests)
         if (await refreshLoops()) {
           renderMeta()
           renderLoops()
@@ -2982,6 +3067,7 @@
           renderMeta()
           renderIssueList()
           renderSlots()
+          renderTests()
           renderPerfBadge()
           renderPerfTimes()
         }
