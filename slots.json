@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T00:05:13+02:00",
+  "updated_at": "2026-10-08T00:05:25+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -65,11 +65,11 @@
       "slots": [
         {
           "slot": "C5",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 289,
+          "grok_slot": 1,
+          "kind": "dev",
+          "since": "2026-10-08T00:05:00+02:00"
         },
         {
           "slot": "C6",
@@ -97,9 +97,9 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
-      "claims_last_hour": 6,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 7,
       "name": "Claude Max 2"
     }
   ],
@@ -164,9 +164,10 @@
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 289,
+      "since": "2026-10-08T00:05:00+02:00",
+      "claude_slot": 5
     },
     {
       "slot": 2,
@@ -276,10 +277,10 @@
     },
     {
       "slot": 5,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 289,
+      "grok_slot": 1,
+      "since": "2026-10-08T00:05:00+02:00",
       "account": 2
     },
     {
@@ -308,17 +309,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 23:55 CEST",
+    "at": "2026-10-08 00:05 CEST",
     "mode": "refill-dev",
-    "triggers": "#148",
-    "started": "#301->C7/A2",
+    "triggers": "#282",
+    "started": "#289->C5/A2",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 6,
+      "used": 7,
+      "dev": 7,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -326,8 +327,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 6,
-      "free": 2,
+      "used": 7,
+      "free": 1,
       "external": 0
     }
   }
