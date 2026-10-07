@@ -1,8 +1,8 @@
 /**
  * What a band's ore is worth under the mix (#141 "Value", #142's 15% guard): the expected sale
  * price per ore unit over the band's own `V(t_b)`, and the share of that value the signature holds.
- * Prices come from the kernel curve through the `ores` index; a signature sells
- * `signatureValueLead` tiers up (`oreSalePrice(t_5 + 1)`). Vertical.
+ * Prices come from the kernel curve through the `ores` index; a signature sells at the kernel's
+ * `signatureSaleTier` (`oreSalePrice(t_5 + 1)`), the tier its cargo is kept at (#232). Vertical.
  */
 import {
   add,
@@ -12,7 +12,8 @@ import {
   mul,
   type Money,
 } from '../../../systems/money'
-import { ORE_ROWS, oreSalePrice, oreTierOf } from '../../ores'
+import { signatureSaleTier } from '../../../systems/economy/oreEconomy'
+import { oreSalePrice, oreTierOf } from '../../ores'
 import type { OreMixEntry } from './oreMix'
 
 const BASIS_POINTS = fromSafeInteger(10000)
@@ -33,9 +34,9 @@ export function signatureValueShareOf(entries: readonly OreMixEntry[]): Money {
   return div(expectedValueBpOf(signatures), expectedValueBpOf(entries))
 }
 
-/** A cell's sale price: its tier's, a signature `signatureValueLead` tiers up. */
+/** A cell's sale price: its tier's, a signature the kernel's `saleTier` (#232). */
 export function entrySalePriceOf(entry: OreMixEntry): Money {
-  return oreSalePrice(entry.signature ? entry.tier + ORE_ROWS.signatureValueLead : entry.tier)
+  return oreSalePrice(entry.signature ? signatureSaleTier(entry.tier) : entry.tier)
 }
 
 function expectedValueBpOf(entries: readonly OreMixEntry[]): Money {

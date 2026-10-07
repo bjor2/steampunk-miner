@@ -12,6 +12,7 @@
 import { hashCell } from '../../../systems/cellRandom'
 import { isHeatPlanet } from '../../../systems/economy/heatEconomy'
 import type { GenerationHook, PatchContent } from '../../../systems/registries/generationHooks'
+import { isLavaPocketNear } from '../../../systems/world/lavaPockets'
 import type { OrePatch } from '../../../systems/world/orePatches'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import type { ResourceFamily } from '../../../systems/world/worldCell'
@@ -25,11 +26,12 @@ import {
   signatureShareBpOf,
 } from './oreMix'
 import { MIX_STREAM, planetMixPlanOf, type PlanetMixPlan } from './planetActs'
+import { THEME_ROWS } from './themeRows'
 
 /** Whether a patch centred here lies within the lava radius of a pocket (#141, heat act only). */
 export type IsNearLava = (params: PlanetParams, patch: OrePatch) => boolean
 
-/** The fold, with the lava question the kernel answers once it exposes the pocket lattice. */
+/** The fold, with the lava question passed in so a spec can fix it. */
 export function planetMixHookOf(isNearLava: IsNearLava): GenerationHook {
   return {
     id: PLANET_MIX_HOOK_ID,
@@ -38,6 +40,11 @@ export function planetMixHookOf(isNearLava: IsNearLava): GenerationHook {
         ? withMixedFamily(params, patch, content, seed, isNearLava)
         : content,
   }
+}
+
+/** #141 "signature near lava": the patch's centre within the lava radius of a pocket (#232). */
+export function isPatchNearLava(params: PlanetParams, patch: OrePatch): boolean {
+  return isLavaPocketNear(params, patch.centre, THEME_ROWS.lavaRadiusTiles)
 }
 
 /** The family a patch wears on a mixed planet, given the lead `ores.lead` gave it. */
