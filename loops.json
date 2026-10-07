@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T22:04:40Z",
+  "updated_at": "2026-10-07T22:05:11Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -262,9 +262,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #191 (Spec: Vertical-slice test layout with a single test overview) on dee7b37",
+      "note": "testing spec #141 (Spec: Per-planet ore distribution (common vs rare per planet)) on 0b55dd8",
       "stale_after_min": 420,
-      "updated_at": "2026-10-07T21:28:30Z",
+      "updated_at": "2026-10-07T22:05:11Z",
       "host": "grok-bot-vm-452660841"
     }
   },
