@@ -23,7 +23,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 9 |
 | Every ore family has a gateClass row | #141, #142 | `src/features/planet-mix/systems/themeRows.test.ts`, `src/features/mining-gates/systems/rigs.test.ts`, `src/features/mining-gates/systems/gateTable.test.ts` | 18 |
 | Endless signature coverage, planets 41-65 | #148 | `src/features/mining-gates/systems/rigs.test.ts` | 7 |
-| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 33 |
+| Locked unlock schedule and one home per stats.json row (stay in the kernel) | #184, #191 | `src/systems/unlocks/unlockSchedule.test.ts`, `src/systems/registries/scheduleRows.test.ts` | 34 |
 
 ## Slices
 
@@ -61,20 +61,24 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 10 files, 61 tests
+### `drill-gear`: 14 files, 102 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/drill-gear/drillGearInPlay.test.ts` | 10 | 10 |
+| `src/features/drill-gear/drillGearPace.test.ts` | 2 | 1 |
 | `src/features/drill-gear/logging.test.ts` | 2 | 2 |
+| `src/features/drill-gear/shippedRows.test.ts` | 7 | 7 |
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
+| `src/features/drill-gear/systems/cardLines.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
 | `src/features/drill-gear/systems/drillGearEconomy.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/drillGearItems.test.ts` | 12 | 12 |
 | `src/features/drill-gear/systems/drillGearPowerUps.test.ts` | 4 | 4 |
+| `src/features/drill-gear/systems/gatesFixture.test.ts` | 22 | 3 |
 | `src/features/drill-gear/systems/samplingCorer.test.ts` | 7 | 6 |
 | `src/features/drill-gear/systems/statPreview.test.ts` | 10 | 10 |
 | `src/features/drill-gear/systems/vibratoryCrumble.test.ts` | 4 | 4 |
-| `src/features/drill-gear/visionRows.test.ts` | 5 | 5 |
 
 ### `dynamite`: 5 files, 20 tests
 
@@ -202,7 +206,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
-### `power-up-core`: 13 files, 71 tests
+### `power-up-core`: 13 files, 74 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -214,7 +218,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/dockRefill.test.ts` | 4 | 4 |
 | `src/features/power-up-core/systems/powerUpKind.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/powerUpMarks.test.ts` | 9 | 9 |
-| `src/features/power-up-core/systems/powerUpUse.test.ts` | 14 | 14 |
+| `src/features/power-up-core/systems/powerUpUse.test.ts` | 17 | 17 |
 | `src/features/power-up-core/systems/slotColumn.test.ts` | 6 | 6 |
 | `src/features/power-up-core/systems/slotUse.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/toggleDraw.test.ts` | 9 | 9 |
@@ -527,7 +531,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/systems/input/actionMap.test.ts` | 15 | 15 |
+| `src/systems/input/actionMap.test.ts` | 16 | 16 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
 | `src/systems/input/inputRouting.test.ts` | 23 | 23 |
 | `src/systems/input/preferences.test.ts` | 19 | 19 |
@@ -851,7 +855,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/unlocks/readUnlockSchedule.test.ts` | 10 | 10 |
 | `src/systems/unlocks/scheduleCadence.test.ts` | 5 | 5 |
 | `src/systems/unlocks/travelUnlocks.test.ts` | 7 | 7 |
-| `src/systems/unlocks/unlockSchedule.test.ts` | 29 | 26 |
+| `src/systems/unlocks/unlockSchedule.test.ts` | 30 | 27 |
 
 ### `vehicle`
 
