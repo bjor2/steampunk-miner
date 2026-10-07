@@ -420,9 +420,9 @@
             },
             {
               "title": "Magnetic / electrified planets",
-              "description": "Planets that interfere with the rig's systems.",
-              "status": "planned",
-              "issues": [80],
+              "description": "The Lodestone act's planet class (P25 to P32, P30 stays the relic planet; in endless every Lodestone planet, P43, P48 and every fifth): each ferrous vein throws a field and some of its cells are electrified, both from the planet seed so every player sees the same. The field tug, shocks, look and planet card come with the hazard and art builds.",
+              "status": "partial",
+              "issues": [80, 258, 289],
               "planet": 25
             },
             {

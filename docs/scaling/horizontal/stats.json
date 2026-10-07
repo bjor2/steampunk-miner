@@ -456,7 +456,7 @@
       "planetIndex": 25,
       "lane": "Environment",
       "progressionAxis": "horizontal",
-      "status": "vision",
+      "status": "shipped",
       "bind": "planet_gate",
       "name": "Magnetic / electrified planets",
       "slice": "campaign",

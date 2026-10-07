@@ -18,7 +18,10 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = '88ddb93162fa86883c8b3903d1a2588e3f23e6f41fdd98949c911ba4e93c9fc0'
+const LOCKED_FILE_SHA256 = '68135afa890f3e109c2e9f54d619d64149d888fad3819102812ed0a6a5d6dcdc'
+
+/** The pin before ticket 289 flipped `magnetic_planets` to shipped, its one named re-pin (#258 Q4). */
+const PIN_BEFORE_MAGNETIC_FLIP = '88ddb93162fa86883c8b3903d1a2588e3f23e6f41fdd98949c911ba4e93c9fc0'
 
 /**
  * The canonical form of `source_hash_method` (docs/scaling/horizontal/source_hash.mjs, #153):
@@ -174,7 +177,7 @@ describe('locked unlock schedule', () => {
   it('unlocks no vision row whose module is not built, even when every bind is met', () => {
     const visionRows = LOCKED_SCHEDULE.rows.filter((row) => row.status === 'vision')
     const progress = progressWithEveryBindMet(visionRows)
-    expect(visionRows).toHaveLength(26)
+    expect(visionRows).toHaveLength(25)
     expect(visionRows.filter((row) => isUnlocked(row, progress))).toEqual([])
   })
 
@@ -258,6 +261,31 @@ describe('locked unlock schedule', () => {
       expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: planetIndex })).toBe(true)
     },
   )
+
+  it('opens the magnetic_planets row at planet 25 now planet-mix ships the class (ticket 289)', () => {
+    const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'magnetic_planets')!
+    expect(row).toMatchObject({ planetIndex: 25, bind: 'planet_gate', status: 'shipped' })
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 24 })).toBe(false)
+    expect(isUnlocked(row, { ...NO_PROGRESS, highestPlanetIndex: 25 })).toBe(true)
+  })
+
+  it('changed only magnetic_planets.status in the flip, leaving grounded_lining a vision row', () => {
+    const text = readFileSync(
+      new URL('../../../docs/scaling/horizontal/stats.json', import.meta.url),
+      'utf8',
+    )
+    const row = text.indexOf('"id": "magnetic_planets"')
+    const rowEnd = text.indexOf('}', row)
+    const unflipped =
+      text.slice(0, row) +
+      text.slice(row, rowEnd).replace('"status": "shipped"', '"status": "vision"') +
+      text.slice(rowEnd)
+    expect(createHash('sha256').update(unflipped, 'utf8').digest('hex')).toBe(
+      PIN_BEFORE_MAGNETIC_FLIP,
+    )
+    const lining = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'grounded_lining')!
+    expect(lining).toMatchObject({ planetIndex: 25, status: 'vision' })
+  })
 
   it('opens the side_drills row at planet 13 now the drill-gear slice ships its node (ticket 205)', () => {
     const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === 'side_drills')!

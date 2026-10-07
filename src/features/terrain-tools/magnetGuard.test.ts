@@ -8,21 +8,20 @@ import { listBuyableRefs } from '../../systems/registries/buyableRefs'
 import { contentIconIds, contentOf } from '../../systems/registries/content'
 import { itemDescriptionEntryOf } from '../../systems/registries/itemDescriptionEntries'
 import { isVehicleItemId } from '../../systems/registries/vehicleLoadout'
-import { LOCKED_SCHEDULE } from '../../systems/unlocks/unlockSchedule'
+import { isUnlocked, LOCKED_SCHEDULE } from '../../systems/unlocks/unlockSchedule'
 import { MAGNET_ITEM_CARDS } from './systems/magnetCards'
 import { MAGNET_ITEMS, magnetVehicleItemOf } from './systems/magnetItems'
 
 // The terrain magnets' guard (GD lock on #246, Horizontal Scaler; ticket 282): the family enters
-// at P25 with the magnetic planet, never as a tease at P24, and stays data only, with no trace in
-// the loaded game, while the #71 magnetic-planet spec has not shipped `magnetic_planets`.
+// at P25 with the magnetic planet, never as a tease at P24. Ticket 289 shipped `magnetic_planets`
+// (spec #258 Q4) and released the vision-row pin: the effect builds may now register the family,
+// and it shows from P25.
 
 const PLAYER = 'p1'
 
 const MAGNETIC_PLANETS_ROW = 'magnetic_planets'
 
 const FAMILY_ENTRY_PLANET = 25
-
-const LAST_SCHEDULED_PLANET = 40
 
 const FAMILY_IDS = MAGNET_ITEMS.flatMap((item) => [item.itemId, item.node.id, item.iconId])
 
@@ -35,6 +34,16 @@ function magneticPlanetsRow() {
   const row = LOCKED_SCHEDULE.rows.find((candidate) => candidate.id === MAGNETIC_PLANETS_ROW)
   if (row === undefined) throw new RangeError(`no ${MAGNETIC_PLANETS_ROW} row in stats.json`)
   return row
+}
+
+/** A run that has reached `planetIndex` and met no other bind. */
+function progressOn(planetIndex: number) {
+  return {
+    highestPlanetIndex: planetIndex,
+    collectedArtefactRowIds: new Set<string>(),
+    builtFacilityRowIds: new Set<string>(),
+    manualUnlockRowIds: new Set<string>(),
+  }
 }
 
 /** Player `p1` on `planetIndex` with money for anything. */
@@ -78,9 +87,14 @@ describe('terrain magnets guard', () => {
     expect(familyTracesThrough(FAMILY_ENTRY_PLANET - 1)).toEqual([])
   })
 
-  it('nothing of the family appears while `magnetic_planets` is a vision row', () => {
-    const isVisionRow = magneticPlanetsRow().status === 'vision'
-    expect(isVisionRow ? familyTracesThrough(LAST_SCHEDULED_PLANET) : []).toEqual([])
+  it('the family appears from P25 once `magnetic_planets` is shipped', () => {
+    const row = magneticPlanetsRow()
+    expect(row).toMatchObject({ planetIndex: FAMILY_ENTRY_PLANET, status: 'shipped' })
+    expect(isUnlocked(row, progressOn(FAMILY_ENTRY_PLANET - 1))).toBe(false)
+    expect(isUnlocked(row, progressOn(FAMILY_ENTRY_PLANET))).toBe(true)
+    withRegistrations([SHIPPED_PROBE], () => {
+      expect(familyTracesThrough(FAMILY_ENTRY_PLANET)).not.toEqual([])
+    })
   })
 
   it('enters no earlier than the magnetic planet itself', () => {
