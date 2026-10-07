@@ -1017,7 +1017,7 @@
         },
         {
           "title": "Powerups",
-          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots, charges, the mobility lane and buying researched one-offs and cradles at the Upgrade bay are built; the other lanes and buying consumables by the unit come with their tickets.",
+          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots, charges, the mobility and sensing lanes and buying researched one-offs and cradles at the Upgrade bay are built; the other lanes and buying consumables by the unit come with their tickets.",
           "status": "partial",
           "issues": [47, 162, 200, 248],
           "children": [
@@ -1026,19 +1026,25 @@
               "description": "Grapple winch (reel up to a wall or ceiling, refused at no cost with nothing to hook), emergency ballast, heat sink flask (once you own refractory lining), steam boost, rivet patch kit (hold still to plate the hull; moving gives the kit back), steam shield, smoke canister, grav anchor, buoyancy tanks and escape thruster, each with its tech node, Marks and item card. The five one-offs are bought at the Upgrade bay once researched; buying the consumables by the unit, and the models and effects on the rig, come later.",
               "status": "partial",
               "issues": [204, 166, 248]
+            },
+            {
+              "title": "Sensing power-ups",
+              "description": "Echo sounder (a ping marks caves, lava, ore silhouettes and gate badges round the miner for a while), threat periscope (an arrow for every enemy in range, with its family, distance band and burrower dust), assay lens (cards over the ore in sight: family, grade, lead, sell price, gate), hazard barometer (warns of lava or weak lining a few cells ahead), survey flare mortar (maps a ring where it lands until the dock) and signal buoy (a pin every miner in the world sees, re-pinging its ring as vehicles pass), each with its tech node, Marks and item card. What they reveal is drawn on each client and never changes the world. The echo and the passives are bought at the Upgrade bay once researched; the galvanic probe and void sounder wait for magnetic and hollow planets, and codex contact from scans for #243.",
+              "status": "partial",
+              "issues": [203, 241, 243, 248]
             }
           ]
         },
         {
           "title": "Tech tree",
-          "description": "Research nodes with money to unlock store items: five lanes on a planet ruler, Marks every 3 planets that step an item's charges, cooldown and effect in play, endless combos from P41, a tree screen from the HUD. The rules and screen are built, and the mobility lane is in; the other lanes show 'coming soon' until their slices register nodes.",
+          "description": "Research nodes with money to unlock store items: five lanes on a planet ruler, Marks every 3 planets that step an item's charges, cooldown and effect in play, endless combos from P41, a tree screen from the HUD. The rules and screen are built, and the mobility and sensing lanes are in; the other lanes show 'coming soon' until their slices register nodes.",
           "status": "partial",
           "issues": [165, 200, 201, 202, 203, 204, 205, 206, 212, 249],
           "doc": "docs/standards/feature-slices.md",
           "children": [
             {
               "title": "Gear on the rig and power-up effects",
-              "description": "Every bought extractor, drill head, collar and flank gear, scanner horn, winch, periscope and crate shows on the miner at its own mount, and each power-up cradle wears a brass Mark plate, gilded once Mastered. Power-ups draw their effect: brine lines, tumbling nodules, sounder rings, steam. Owned items of registered lanes (mobility today) show on the rig; extractors stay folded until they unfold on a matching ore (#237), and each plate shows the Mark its item acts at (#249).",
+              "description": "Every bought extractor, drill head, collar and flank gear, scanner horn, winch, periscope and crate shows on the miner at its own mount, and each power-up cradle wears a brass Mark plate, gilded once Mastered. Power-ups draw their effect: brine lines, tumbling nodules, sounder rings, steam. Owned items of registered lanes (mobility and sensing today) show on the rig; extractors stay folded until they unfold on a matching ore (#237), and each plate shows the Mark its item acts at (#249).",
               "status": "partial",
               "issues": [166, 250, 237, 249],
               "doc": "docs/art/tech-gear/README.md"

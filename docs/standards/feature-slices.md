@@ -861,6 +861,15 @@ The store's buy path for the items the tree unlocks (#157 gap review X1). Kernel
 - **The bay**: `vehicleItemRowsOf` lists each researched, unowned item a seller offers here as a K7 compact card after the Charges rows (`upgradebay-item-<id>`, `-cost`, `-buy`). Its cost is the same offer the command debits.
 - **The bot** (3.17): `tech-tree.buy-item` buys researched items cheapest first, before `tech-tree.research`, and the research purchase sends only nodes whose item some seller offers and the bot does not own (the Vertical Scaler's filter). A `BotPurchase` may name what it bought (`boughtIdOf`), kept as `ShopSpend.boughtId`; `tech-tree`'s `laneSpendRowsOf` splits the tree's spend into node and item spend per planet and lane for #212.
 
+### 3.32 Sensing reveals: render-only, on a slice scene layer (#203)
+
+No new seam; the TD lock on #203 Q1 records how a slice draws world markers until a second slice needs a kernel marker layer `{kind, world, ttlTicks, style}`, which is lifted out of this one then.
+
+- **Render-only.** The echo sounder, flare mortar and signal buoy `activate` by returning the state they were given, so `power-up-core`'s charge and `PowerUpUsed` line are their only trace in authority state. Each client derives its reveal board (`sensing/systems/revealBoard.ts`) from `PowerUpUsed` and pure reads of the state it hears it with: its own echo pings and flare maps, and every player's buoy pins and the rings they re-ping as a vehicle comes inside. Passives read on the client while owned, at the researched Mark. Nothing reaches a section, the digest or the log; a reload or a late joiner starts with an empty board, and a flare's map lasts until the local player docks.
+- **The layer.** `sensing.reveals` is one pooled `InstancedMesh`, one draw call, a quad per marked cell or pin. The lock allows up to 384 instances; the dynamite visuals (681) and the rig's power-up FX (256) leave 87 of `SCENE_LAYER_LINE`'s 1024, so `REVEAL_LAYER_BUDGET` takes 87 until the TD moves the line or a pool. A ping past the cap keeps its cells nearest its centre; older marks give way soonest-to-expire first, a flare map last; buoy pins hold seats of their own.
+- **HUD.** The periscope draws its own arrows in the `threats` slot (the kernel's `ThreatMarkers` shows telegraphs only); the lens's cards (priority 5) and the barometer's chip (priority 20) are overlay panels.
+- **Held rows.** The galvanic probe and the void sounder stay unregistered (GD ruling on Q3) and draw no marker (Horizontal guard). Codex contact from the scanners waits on #243 (Q2 b).
+
 ## 4. Cross-slice contracts
 
 ```mermaid
