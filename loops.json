@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T21:00:06Z",
+  "updated_at": "2026-10-07T21:00:35Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -258,9 +258,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #169 (Wayfinder: Shop buildings, sell and buy juice, mining popups, and desktop/mobile/TV look) on ae7c189",
+      "note": "testing spec #198 (P9 attrition: bot wallet reserve, death-replay breaker, then route enemy volume) on e4f9973",
       "stale_after_min": 420,
-      "updated_at": "2026-10-07T20:28:54Z",
+      "updated_at": "2026-10-07T21:00:35Z",
       "host": "grok-bot-vm-452660841"
     }
   },
