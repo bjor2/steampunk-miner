@@ -165,6 +165,19 @@ describe('Mark milestones: hold (#256)', () => {
     })
   })
 
+  it('hands a follow-up the same Mark and magnitude as the use it follows, never more', () => {
+    const numbersOf = (mark: number, follow: (field: MarkedField) => void) =>
+      inMarkedField(mark, (field) => {
+        follow(field)
+        return actsOf(field.state()).map((act) => ({ mark: act.mark, magnitude: act.magnitude }))
+      })
+    const held = numbersOf(6, heldPastWindup)
+    const tapped = numbersOf(6, (field) => tappedTwice(field, 20))
+    expect(held).toHaveLength(2)
+    expect(held[1]).toEqual(held[0])
+    expect(tapped[1]).toEqual(tapped[0])
+  })
+
   it('refuses, at no cost, a hold with no use of the slot to follow', () => {
     inMarkedField(6, (field) => {
       expect(rejectionOf(field, PRESS_TICK, intentToHoldSlot('powerup.1'))).toBe(

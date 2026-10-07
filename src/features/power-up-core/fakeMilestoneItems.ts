@@ -74,6 +74,9 @@ export interface FakeAct {
   itemId: string
   verb: string
   tick: number
+  /** The use's Mark numbers as the core handed them: a follow-up gets the plain use's. */
+  mark: number
+  magnitude: number | null
 }
 
 interface FakeActs {
@@ -249,7 +252,8 @@ function noteActUnlessFacingDown(state: AuthorityState, use: PowerUpUse): PowerU
 
 function withActNoted(state: AuthorityState, use: PowerUpUse): AuthorityState {
   const verbs = VERBS[use.itemId as keyof typeof VERBS]
-  const act = { itemId: use.itemId, verb: verbs[use.milestone ?? 'plain'], tick: use.tick }
+  const { itemId, tick, mark, magnitude } = use
+  const act = { itemId, verb: verbs[use.milestone ?? 'plain'], tick, mark, magnitude }
   const { acts } = readSection(state, use.playerId, ACTS_SECTION)
   return withSection(state, use.playerId, ACTS_SECTION, { acts: [...acts, act] })
 }
