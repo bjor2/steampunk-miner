@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T12:20:19Z",
+  "updated_at": "2026-10-07T12:21:38Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "working",
       "issue": 177,
-      "note": "tier hard, attempt 2/2",
-      "updated_at": "2026-10-07T12:20:15Z",
+      "note": "started 2026-10-07 14:19 CEST",
+      "updated_at": "2026-10-07T12:21:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -17,7 +17,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T12:19:56Z",
+      "updated_at": "2026-10-07T12:21:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -26,7 +26,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T12:19:56Z",
+      "updated_at": "2026-10-07T12:21:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -35,17 +35,17 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T12:19:56Z",
+      "updated_at": "2026-10-07T12:21:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
       "loop": "steampunk-loop",
       "slot": null,
-      "state": "idle",
+      "state": "working",
       "issue": null,
-      "note": "status check; 1/4 planner slots",
+      "note": "2/8 Claude slots busy, 1/4 planner slots; no pickable build ticket; delegated 0 spec(s); planner slots 1/4",
       "extra": {
-        "active": 0,
+        "active": 2,
         "max": 8,
         "max_attempts": 2,
         "attempts": {
@@ -154,9 +154,10 @@
           "166": 1,
           "223": 1,
           "224": 1,
-          "177": 1,
+          "177": 2,
           "226": 1,
-          "227": 1
+          "227": 1,
+          "228": 1
         },
         "tester_grants": {},
         "planner": [
@@ -168,7 +169,7 @@
         ],
         "push_pending": null
       },
-      "updated_at": "2026-10-07T12:19:56Z",
+      "updated_at": "2026-10-07T12:21:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -185,8 +186,8 @@
       "slot": "5",
       "state": "working",
       "issue": 228,
-      "note": "tier fable, attempt 1/2",
-      "updated_at": "2026-10-07T12:20:19Z",
+      "note": "started 2026-10-07 14:19 CEST",
+      "updated_at": "2026-10-07T12:21:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -195,7 +196,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T12:19:56Z",
+      "updated_at": "2026-10-07T12:21:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -204,7 +205,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T12:19:56Z",
+      "updated_at": "2026-10-07T12:21:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -213,7 +214,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-07T12:19:56Z",
+      "updated_at": "2026-10-07T12:21:38Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -228,6 +229,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-07T12:21:38Z",
+      "key": "steampunk-loop",
+      "state": "working",
+      "issue": null,
+      "note": "2/8 Claude slots busy, 1/4 planner slots; no pickable build ticket; delegated 0 spec(s); planner slots 1/4"
+    },
     {
       "at": "2026-10-07T12:20:19Z",
       "key": "steampunk-loop/5",
@@ -640,13 +648,6 @@
       "state": "idle",
       "issue": null,
       "note": "free"
-    },
-    {
-      "at": "2026-10-07T07:31:26Z",
-      "key": "steampunk-loop/3",
-      "state": "blocked",
-      "issue": 146,
-      "note": "#146 needs-planner (slot free)"
     }
   ]
 }
