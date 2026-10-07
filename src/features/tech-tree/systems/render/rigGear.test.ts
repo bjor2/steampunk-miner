@@ -6,7 +6,8 @@ import {
   type VehicleLoadout,
 } from '../../../../systems/vehicle/loadoutState'
 import { GEAR_ART, vehicleWithPoints } from './gearArtFixture'
-import { rigItemsOf, rigMountsOf, type RigMount } from './rigGear'
+import { pivotedQuadOf, rigItemsOf, rigMountsOf, type RigMount } from './rigGear'
+import type { GearQuad } from './techGearQuads'
 
 // The loaded slices register the mobility lane's items; the drill gear and sensing lanes are
 // still vision rows, so their items are invisible.
@@ -83,5 +84,26 @@ describe('rig gear', () => {
     const [boost] = rigMountsOf(GEAR_ART, vehicle, rigItemsOf(loadout))
     expect(boost?.attachId).toBe('hull.powerup.2')
     expect(boost?.quads[0]?.pivot).toEqual([-0.15, -0.02])
+  })
+
+  it('holds a mirrored part about its pivot so its group lands it where the mirror placed it', () => {
+    const below: GearQuad = {
+      partId: 'cutter-arm',
+      centre: [0.6, -0.1],
+      pivot: [0.58, -0.04],
+      size: [0.2, 0.2],
+      z: 7,
+      colour: '#888888',
+      uv: null,
+      itemId: 'gear.side_cutters',
+      turn: -0.9,
+      mirrorY: true,
+    }
+    const posed = pivotedQuadOf(below)
+    expect(posed).toMatchObject({ pivot: [0.58, -0.04], turn: -0.9, scaleY: -1 })
+    const [x, y] = posed.quad.centre
+    expect(posed.quad.pivot).toEqual([0, 0])
+    expect(posed.pivot[0] + x).toBeCloseTo(0.6)
+    expect(posed.pivot[1] + y * posed.scaleY).toBeCloseTo(-0.1)
   })
 })

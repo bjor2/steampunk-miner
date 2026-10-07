@@ -57,13 +57,25 @@
       ]
     },
     {
-      "why": "The mobility lane's items in the slots, their effect windows and their card lines.",
+      "why": "The mobility lane's items in the slots, their effect windows and their card lines, and on the rig.",
       "paths": ["src/features/mobility/**"],
       "specs": [
         "e2e/browser/mobility.spec.ts",
         "e2e/browser/powerUpCore.spec.ts",
-        "e2e/browser/screens/slotHoldRing.spec.ts"
+        "e2e/browser/screens/slotHoldRing.spec.ts",
+        "e2e/browser/rigGear.spec.ts"
       ]
+    },
+    {
+      "why": "The tech gear on the rig, the Mark plates and the power-up effects (ticket 250).",
+      "paths": [
+        "src/features/tech-tree/scene/**",
+        "src/features/tech-tree/store/rigReads.ts",
+        "src/features/tech-tree/store/powerUpFxFeed.ts",
+        "src/features/tech-tree/systems/render/**",
+        "src/features/tech-tree/techGear.json"
+      ],
+      "specs": ["e2e/browser/rigGear.spec.ts", "e2e/browser/vehiclePieces.spec.ts"]
     },
     {
       "why": "The sell burst on the bay header.",

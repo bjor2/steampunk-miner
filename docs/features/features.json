@@ -1038,9 +1038,9 @@
           "children": [
             {
               "title": "Gear on the rig and power-up effects",
-              "description": "Every bought extractor, drill head, collar and flank gear, scanner horn, winch, periscope and crate shows on the miner at its own mount; extractors fold flat when idle and unfold on a matching ore. Power-ups draw their effect: brine lines, tumbling nodules, sounder rings, steam. The models, poses and effect looks are made; a later ticket draws them on the rig.",
+              "description": "Every bought extractor, drill head, collar and flank gear, scanner horn, winch, periscope and crate shows on the miner at its own mount, and each power-up cradle wears a brass Mark plate, gilded once Mastered. Power-ups draw their effect: brine lines, tumbling nodules, sounder rings, steam. Owned items of registered lanes (mobility today) show on the rig; extractors stay folded until they unfold on a matching ore (#237), and the plate reads Mark 1 until Marks act in play (#249).",
               "status": "partial",
-              "issues": [166],
+              "issues": [166, 250, 237, 249],
               "doc": "docs/art/tech-gear/README.md"
             }
           ]

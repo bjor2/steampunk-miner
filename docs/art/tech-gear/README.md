@@ -9,10 +9,12 @@ reskin:** every bought item shows as its own parts at the attach point it was gi
 tree changes nothing else about the rig. Authored in Blender 4.2.9 on the shared box headlessly
 (`scripts/art/author_tech_gear.py` wrote the first version of every file; the `.blend` files under
 `art/blender/<id>/` are the sources from now on, Git LFS). The 29 assets are exported, listed in
-the manifest and registered by the tech-tree slice (`r.artAssets`, #214); nothing draws them in
-the game yet. The slice's `index.ts` exposes the table, the pose blend and the quads at the
-sidecar's points (`vehicleGearQuadsOf`), and the effect looks (`fxFrameOf`), for the wiring
-ticket to mount in a scene piece.
+the manifest and registered by the tech-tree slice (`r.artAssets`, #214). Since ticket 250 the
+slice's `tech-tree.rig-gear` vehicle piece (#235) hangs every registered item the loadout mounts
+(`rigMountsOf`, extractors folded until 148b #237 drives them) with a brass Mark plate under each
+cradle (`markPlatesOf`), and the `tech-tree.power-up-fx` scene layer feeds each `PowerUpUsed`
+into four point pools (`powerUpFxFeed.ts`). `steampunkDebug.features['tech-tree'].getRig()` reads
+both, and `previewPowerUpFx(itemId)` plays an effect at the vehicle.
 
 ## What is here
 

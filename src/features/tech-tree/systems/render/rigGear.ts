@@ -11,7 +11,7 @@ import {
   placeholderSidecarOf,
   type ArtCatalogue,
 } from '../../../../systems/art/artCatalogue'
-import type { PartsSidecar } from '../../../../systems/art/partsSidecar'
+import type { Pair, PartsSidecar } from '../../../../systems/art/partsSidecar'
 import { ATTACH_ASSET_ID } from '../../../../systems/art/sidecarAttach'
 import type { AttachId } from '../../../../systems/registries/vehicleAttach'
 import { isVehicleItemId } from '../../../../systems/registries/vehicleLoadout'
@@ -38,6 +38,18 @@ export interface RigMount {
   quads: GearQuad[]
 }
 
+/**
+ * A gear quad as its group draws it: the group sits at the pivot, turns and (for the far-side
+ * copy) mirrors in height, and holds the quad about the pivot, so the posed part lands where
+ * `mountedGearQuadsOf` placed it.
+ */
+export interface PivotedQuad {
+  pivot: Pair
+  turn: number
+  scaleY: 1 | -1
+  quad: GearQuad
+}
+
 /** The loadout's mounted items that a slice has registered, in `mountedItemsOf` order. */
 export function rigItemsOf(loadout: VehicleLoadout): MountedItem[] {
   return mountedItemsOf(loadout).filter((item) => isVehicleItemId(item.itemId))
@@ -61,6 +73,13 @@ export function rigMountsOf(
 ): RigMount[] {
   const mounts = items.flatMap((item) => itemMountOf(art, vehicle, item))
   return mergedByAssetAndPoint(mounts).sort(byPointThenAsset)
+}
+
+export function pivotedQuadOf(quad: GearQuad): PivotedQuad {
+  const scaleY = quad.mirrorY ? -1 : 1
+  const [pivotX, pivotY] = quad.pivot
+  const centre: Pair = [quad.centre[0] - pivotX, (quad.centre[1] - pivotY) * scaleY]
+  return { pivot: quad.pivot, turn: quad.turn, scaleY, quad: { ...quad, centre, pivot: [0, 0] } }
 }
 
 function itemMountOf(art: ArtCatalogue, vehicle: PartsSidecar, item: MountedItem): RigMount[] {
