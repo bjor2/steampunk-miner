@@ -2,8 +2,9 @@
  * Decision #4 / #22 acceptance: terrain updates stay under 2 ms per frame. The scene rebuilds at
  * most one chunk mesh per frame, so one density halo plus `buildChunkTileBatch` (chunks already
  * generated) must fit the budget. Measured and logged here, not gated in CI, because CI machines vary.
- * Run with `npm run bench:render`; it prints one JSON line per planet, then the overlay's frame
- * cost (#208, `bench/overlayFrame.ts`).
+ * Run with `npm run bench:render`; it prints one JSON line per planet, then the rebuild on gated
+ * planets with the gate channel's provider registered and with none (ticket 298,
+ * `bench/gateChannelRebuild.ts`), then the overlay's frame cost (#208, `bench/overlayFrame.ts`).
  * With `-- --log` it also writes `benchmark_result` lines to `logs/<runId>/events.ndjson` (#124).
  */
 import { loadFeatures } from '../src/features'
@@ -18,6 +19,7 @@ import {
   materialCellsOfChunk,
 } from '../src/systems/world/worldState'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { benchGateChannelRebuild } from './bench/gateChannelRebuild'
 import { benchOverlayFrame } from './bench/overlayFrame'
 
 loadFeatures()
@@ -74,4 +76,8 @@ function benchPlanet(planetIndex: number): BenchmarkSeries {
   return { name: 'buildChunkTileBatch', planet: planetIndex, timesMs: times }
 }
 
-logBenchmarkSeriesWhenAsked('render', [...PLANETS.map(benchPlanet), benchOverlayFrame()])
+logBenchmarkSeriesWhenAsked('render', [
+  ...PLANETS.map(benchPlanet),
+  ...benchGateChannelRebuild(WORLD_SEED),
+  benchOverlayFrame(),
+])
