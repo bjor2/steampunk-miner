@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { hardnessOfTile } from '../authority/groundDrill'
 import { surfaceOreTiles, WORLD_SEED } from '../authority/scriptedSession'
 import { blockHardness, oreHardness, oreTier } from '../economy/oreEconomy'
+import { stepOfMajor } from '../economy/upgradeSteps'
 import { startLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { ticksPerTile } from '../vehicle/drillRule'
 import { bandOfTile } from '../world/planetGeometry'
@@ -26,7 +27,8 @@ describe('ore hardness by the cell (#140 Numbers "Hardness", #223)', () => {
   })
 
   it('has the pacing bot bore a lead cell in the ticks the drill takes on it', () => {
-    const drill = vehicleStatsAt({ ...startLevels(), drill_power: 12, drill_tip: 12 })
+    const major12 = stepOfMajor(12)
+    const drill = vehicleStatsAt({ ...startLevels(), drill_power: major12, drill_tip: major12 })
     const drillTicks = ticksPerTile(drill, hardnessOfTile(PLANET_3, BAND_1_TILE, LEAD_CELL))
     expect(drillTicks).not.toBeNull()
     expect(boreTicks(drill, PLANET_3, BAND_1_TILE, LEAD_CELL)).toBe(drillTicks)
