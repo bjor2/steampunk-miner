@@ -1,0 +1,8 @@
+{
+  "pentatonicSemitones": [0, 2, 4, 7, 9],
+  "ratchetVoiceCap": 4,
+  "flourishVoiceCap": 1,
+  "stealFadeMs": 15,
+  "ratchetTailTicks": 12,
+  "layerGapTicks": [16, 9]
+}

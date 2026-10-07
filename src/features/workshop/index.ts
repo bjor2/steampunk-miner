@@ -1,7 +1,7 @@
 /**
  * The workshop slice's public API (docs/standards/feature-slices.md 2.1): the only file another
  * slice may import from this folder. The Workshop redo of #180 (ticket 177): the hold-to-buy
- * chain on its client-only curve.
+ * chain on its client-only curve and the escalating purchase sound with its voice cap.
  */
 export const WORKSHOP_SLICE_ID = 'workshop'
 export {
@@ -19,3 +19,17 @@ export {
   type HoldCurve,
   type StepLanding,
 } from './systems/holdChain'
+export {
+  PURCHASE_SOUND,
+  ratchetLayersOf,
+  ratchetSemitonesOf,
+  SILENT_PURCHASE_VOICES,
+  soundingVoicesAt,
+  startFlourish,
+  startRatchet,
+  steamBedLevelOf,
+  type PurchaseSound,
+  type PurchaseVoice,
+  type PurchaseVoices,
+  type RatchetStart,
+} from './systems/render/purchaseSound'
