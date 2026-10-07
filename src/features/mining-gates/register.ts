@@ -46,8 +46,8 @@ export const slice: SliceDefinition = {
     r.eventProjections(MINING_GATES_PROJECTIONS)
     r.runEvents(MINING_GATES_RUN_EVENTS)
     r.reportRows(miningGatesReportRows)
-    // steampunkDebug.features['mining-gates'].describe(), .gateTableOf(p, seed), .ownsRig(id),
-    // .grantRig(id)
+    // steampunkDebug.features['mining-gates'].describe(), .gateTableOf(p, seed),
+    // .dynamiteCellsOf(p, seeds), .ownsRig(id), .grantRig(id)
     r.debugActions(miningGatesDebugActions)
   },
 }
