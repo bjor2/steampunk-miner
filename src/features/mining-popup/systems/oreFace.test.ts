@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { withRegistrations } from '../../../registries/registrar'
 import { planetParamsFor } from '../../../systems/world/planetParams'
 import { oreFaceOf } from './oreFace'
 
@@ -6,7 +7,8 @@ const PLANET_1 = planetParamsFor(1, 1)
 
 describe('ore face', () => {
   it('names a kernel ore with its family and the grade its tier reaches', () => {
-    const face = oreFaceOf('kernel.crystal.t2', PLANET_1)
+    // The kernel default's name and icon: with the ores slice (#146) the catalogue answers instead.
+    const face = withRegistrations([], () => oreFaceOf('kernel.crystal.t2', PLANET_1))
     expect(face).toMatchObject({
       oreId: 'kernel.crystal.t2',
       name: 'Crystal ore, tier 2',

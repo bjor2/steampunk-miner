@@ -172,8 +172,8 @@ describe('save migration chain', () => {
 describe('save migration chain: levels to steps (#181)', () => {
   const saved = PLANET_5_SAVE.profile.players.p1
 
-  it('loads a pre-#181 save through the one snapshot 18 -> 19 step', () => {
-    expect(restored(PLANET_5_SAVE).migrations).toEqual([SNAPSHOT_STEP])
+  it('loads a pre-#181 save through the snapshot 18 -> 19 step, then the generator 6 -> 7 step', () => {
+    expect(restored(PLANET_5_SAVE).migrations).toEqual([SNAPSHOT_STEP, ORE_LEAD_STEP])
   })
 
   it('turns every track level L into step 10L and the gun level 7 into step 70', () => {
@@ -226,6 +226,7 @@ describe('save migration chain: levels to steps (#181)', () => {
     expect(reading.migrations).toEqual([])
     expect(reading.problems).toEqual([
       `save.snapshotVersion is 18, this build reads ${SNAPSHOT_VERSION}`,
+      `save.generatorVersion is 6, this build reads ${GENERATOR_VERSION}`,
     ])
   })
 })
