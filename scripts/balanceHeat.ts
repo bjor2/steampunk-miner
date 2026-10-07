@@ -4,14 +4,23 @@
  * planet 8 (its #113 policy), and planets 8 to 10 are printed with their core time against the
  * campaign's 45 to 60 minutes (C4), the refractory it laid and what heat and lava did. A planet
  * outside the target is a balance finding whose one lever is the `bandHeat` scale (0.8 to 1.2
- * times), never `k_casing`. Takes the better part of an hour; run it with `npm run balance:heat`.
+ * times), never `k_casing`. The run is played on each pacing seed (#84): the heat table is the
+ * first seed's, and the attrition table (#198) prints every seed's core time and deaths per trip
+ * on planets 8 to 10 with their medians. Takes an hour or more; run it with `npm run balance:heat`.
  */
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { PACING_WORLD_SEEDS } from '../src/constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../src/constants/physics'
 import { loadFeatures } from '../src/features'
+import {
+  attritionFindings,
+  attritionMedians,
+  attritionRows,
+  formatAttritionTables,
+} from '../src/logging/attritionReport'
 import { formatHeatPlanetLines, heatPlanetLines } from '../src/logging/heatReport'
 import { derivePacingReport } from '../src/logging/pacingReport'
-import { playLoggedSlice } from '../src/logging/sliceRunLog'
+import { playLoggedSliceOnSeeds } from '../src/logging/sliceRunLog'
 import type { Scenario } from '../src/systems/scenario'
 
 loadFeatures()
@@ -25,10 +34,11 @@ const SCENARIO_FILE = new URL('../scenarios/bot-slice.scenario.json', import.met
 const REPORT_FOLDER = new URL('../balance-report/', import.meta.url)
 
 const scenario = JSON.parse(readFileSync(SCENARIO_FILE, 'utf8')) as Scenario
-const { run, events } = playLoggedSlice(scenario, {
+const runs = playLoggedSliceOnSeeds(scenario, PACING_WORLD_SEEDS['bot-slice'], {
   lastPlanet: LAST_PLANET,
   maxTicks: BUDGET_TICKS,
 })
+const { run, events } = runs[0]
 const pacing = derivePacingReport(events, scenario.worldSeed)
 const planets = Array.from(
   { length: LAST_PLANET - FIRST_HEAT_PLANET + 1 },
@@ -36,11 +46,14 @@ const planets = Array.from(
 )
 const lines = heatPlanetLines(events, pacing, planets)
 const misses = lines.filter((line) => line.isInCampaignTarget !== true)
+const attrition = attritionRows(runs)
+const attritionMedianRows = attritionMedians(attrition)
+const attritionMisses = attritionFindings(attrition, attritionMedianRows)
 const text = [
   `## Heat planets against the pacing bot, planets ${FIRST_HEAT_PLANET} to ${LAST_PLANET} (report only)`,
   run.isFinished
     ? ''
-    : `The bot did not reach planet ${LAST_PLANET}'s core inside its budget; it stopped on planet ${run.state.planet.index}.`,
+    : `The bot did not reach planet ${LAST_PLANET}'s core inside its budget on world seed ${scenario.worldSeed}; it stopped on planet ${run.state.planet.index}.`,
   formatHeatPlanetLines(lines),
   `### Findings\n\n${
     misses.length === 0
@@ -51,6 +64,10 @@ const text = [
               `- planet ${line.planet} is outside 45 to 60 minutes; the one lever is the bandHeat scale (0.8 to 1.2)`,
           )
           .join('\n')
+  }`,
+  `### Deaths per trip, planets ${FIRST_HEAT_PLANET} to ${LAST_PLANET}, per seed (#198)\n\n${formatAttritionTables(attrition, attritionMedianRows)}`,
+  `### Attrition findings (#198)\n\n${
+    attritionMisses.length === 0 ? 'none' : attritionMisses.map((miss) => `- ${miss}`).join('\n')
   }`,
 ].join('\n\n')
 

@@ -220,7 +220,11 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   and prints planets 8 to 10 (`heatPlanetLines`): each core time against the campaign's 45 to 60
   minutes (C4), when refractory was unlocked, the refractory laid, the throttle and heat-damage
   episodes, lava touches and lava a refractory ring stopped. Reported, never gated; the one lever is
-  the `bandHeat` scale (0.8 to 1.2), never `k_casing`. Heat specs drill band 5 of planet 8 straight
+  the `bandHeat` scale (0.8 to 1.2), never `k_casing`. The run is played on the three pacing seeds:
+  the heat table is the first seed's, and the attrition table (#198, `attritionReport.ts`) prints
+  every seed's P8–P10 core time, trips, deaths and deaths per trip with the medians, and lists what
+  misses #198 (median above 0.15 or a seed above 0.25 deaths a trip, a stall, P9 under 30 minutes,
+  P8 or P10 outside 45 to 60). Heat specs drill band 5 of planet 8 straight
   above the core (`heatRun.test.ts`); lava specs find a pocket's floor in band 3 of planet 8
   (`lavaFlow.test.ts`, `lava/lavaRun.test.ts`) and build refractory rings with `debug.lineCasing`;
   breach specs find a generated pocket lying against an open cave cell and gnaw a ring lined in
@@ -229,6 +233,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   on the move too once its vehicle was destroyed on that planet; travel resets that. A run with no
   death plays as before, and a fatal dive no longer replays after every tow (`bot/botCombat.test.ts`,
   in the band-1 corridor).
+- **Bot attrition** (#198): from planet 8 on, a track step must leave #180's service reserve plus
+  one rescue fee (`bot/botWallet.test.ts`), and the second death on one route (a goal: an ore band or
+  the core) closes it and every deeper one until the vehicle has a level it did not die with; the
+  bot mines the bands above meanwhile (`bot/botDeathReplay.test.ts`). Planets 1 to 7 play as before.
 - **Bot retreat** (#216): when no band the casing holds pays a trip, the bot widens the shallowest
   held band whose galleries ended at their reach by another reach; broke with a tank below what a
   tow leaves (#8), it strands itself off the pad for the tow. A run that never meets the dead end

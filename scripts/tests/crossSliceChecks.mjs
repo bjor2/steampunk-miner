@@ -40,7 +40,7 @@ export const CROSS_SLICE_CHECKS = [
   },
   {
     check: 'Balance guards, reported against the committed baseline or a control run',
-    decidedIn: '#84, #105, #107, #109, #113',
+    decidedIn: '#84, #105, #107, #109, #113, #198',
     files: [],
     commands: [
       'npm run balance:report',

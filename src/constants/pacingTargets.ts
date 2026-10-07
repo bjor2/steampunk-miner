@@ -67,4 +67,17 @@ export const PACING_TARGETS = {
     spreeSteps: 10,
     spreePercent: { min: 25, max: 45 },
   },
+  /**
+   * Report only (#198 acceptance, Systems' call on T9 #137): on planets 8 to 10 the median seed
+   * dies at most 0.15 times a trip and no seed above a quarter; planet 9 is a known short planet
+   * whose median core takes at least 30 minutes, while 8 and 10 keep `campaignPlanetMinutes`.
+   * Printed by `npm run balance:heat` (`attritionReport.ts`).
+   */
+  attrition: {
+    planets: { first: 8, last: 10 },
+    medianDeathsPerTripMax: 0.15,
+    seedDeathsPerTripMax: 1 / 4,
+    shortPlanet: 9,
+    shortPlanetCoreMinutesMin: 30,
+  },
 } as const
