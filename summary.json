@@ -1,25 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-07T04:49:18.378Z",
+ "updatedAt": "2026-10-07T05:02:20.858Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37530160015,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37530160015",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "441f4427e85472148a73e12dbffe562a964a92f4",
-   "branch": "main",
-   "startedAt": "2026-10-06T20:55:54Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 88,
-   "reportFound": false,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37530219256,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37530219256",
@@ -852,6 +835,23 @@
    "tests": 0,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 37574144042,
+   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37574144042",
+   "event": "push",
+   "mode": "scoped",
+   "sha": "2d6e378fb17da696da325199602a70947a2ba75b",
+   "branch": "main",
+   "startedAt": "2026-10-07T05:00:01Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 128,
+   "reportFound": true,
+   "files": 17,
+   "tests": 86,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
@@ -895,7 +895,7 @@
    "files": 7,
    "p50Ms": 1872,
    "p95Ms": 2116,
-   "fileRuns": 84,
+   "fileRuns": 85,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -967,16 +967,16 @@
    "files": 54,
    "p50Ms": 90721,
    "p95Ms": 101864,
-   "fileRuns": 945,
+   "fileRuns": 946,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "bot": {
-   "files": 14,
-   "p50Ms": 56031,
-   "p95Ms": 64023,
-   "fileRuns": 219,
+   "files": 15,
+   "p50Ms": 64312,
+   "p95Ms": 72314,
+   "fileRuns": 231,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -985,7 +985,7 @@
    "files": 19,
    "p50Ms": 769,
    "p95Ms": 1055,
-   "fileRuns": 176,
+   "fileRuns": 177,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1003,7 +1003,7 @@
    "files": 4,
    "p50Ms": 2699,
    "p95Ms": 3018,
-   "fileRuns": 68,
+   "fileRuns": 69,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1057,7 +1057,7 @@
    "files": 8,
    "p50Ms": 110,
    "p95Ms": 152,
-   "fileRuns": 84,
+   "fileRuns": 85,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1370,13 +1370,13 @@
   },
   "src/features/loadFeatures.test.ts": {
    "feature": "unmapped",
-   "runs": 23,
-   "lastMs": 3,
+   "runs": 24,
+   "lastMs": 5,
    "p50Ms": 4,
    "p95Ms": 6,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37573078392,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -2673,13 +2673,13 @@
   },
   "src/systems/authority/moneyRounding.test.ts": {
    "feature": "authority",
-   "runs": 23,
-   "lastMs": 5,
+   "runs": 24,
+   "lastMs": 4,
    "p50Ms": 4,
    "p95Ms": 5,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37573078392,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -2840,114 +2840,110 @@
   },
   "src/systems/bot/botBlasting.test.ts": {
    "feature": "bot",
-   "runs": 20,
-   "lastMs": 5358,
-   "p50Ms": 6093,
+   "runs": 21,
+   "lastMs": 6145,
+   "p50Ms": 6099,
    "p95Ms": 6756,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "pacing bot blasting (#109 bot policy) blasts tiles slower than the threshold on planet 7, unhurt by its own charges",
-     2216
+     2586
     ],
     [
      "pacing bot blasting (#109 bot policy) never plants a charge when the run plays without them",
-     1659
+     1844
     ],
     [
      "pacing bot blasting (#109 bot policy) replays a blasting run to the same digests and state",
-     1482
+     1714
     ]
    ]
   },
   "src/systems/bot/botChargeNeed.test.ts": {
    "feature": "bot",
-   "runs": 20,
-   "lastMs": 11560,
-   "p50Ms": 13710,
+   "runs": 21,
+   "lastMs": 13734,
+   "p50Ms": 13734,
    "p95Ms": 14724,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "pacing bot charge rack (#129) plays exactly like a run without charges when no tile is slower than the threshold",
-     8713
+     9667
     ],
     [
      "pacing bot charge rack (#129) buys the rack at the visit after a trip that met a slow tile with none, then blasts",
-     2847
+     4067
     ]
    ]
   },
   "src/systems/bot/botCharges.test.ts": {
    "feature": "bot",
-   "runs": 20,
+   "runs": 21,
    "lastMs": 116,
    "p50Ms": 157,
    "p95Ms": 250,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
   },
   "src/systems/bot/botCombat.test.ts": {
    "feature": "bot",
-   "runs": 20,
-   "lastMs": 379,
+   "runs": 21,
+   "lastMs": 324,
    "p50Ms": 379,
    "p95Ms": 451,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "bot: combat reflex on the move (#29 Gameplay note 3, #130) drives on with its back to a crawler on a planet where it has not been destroyed",
-     189
-    ],
-    [
-     "bot: combat reflex on the move (#29 Gameplay note 3, #130) meets a crawler hunting it from behind with the drill head once destroyed on the planet",
-     111
+     175
     ]
    ]
   },
   "src/systems/bot/botCoreGalleries.test.ts": {
    "feature": "bot",
-   "runs": 20,
-   "lastMs": 7114,
-   "p50Ms": 7267,
+   "runs": 21,
+   "lastMs": 7661,
+   "p50Ms": 7570,
    "p95Ms": 8391,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "pacing bot core galleries from an off-centre shaft (#136) completes the core of seed 10 planet 9, whose shaft jogs across the core middle",
-     7092
+     7626
     ]
    ]
   },
   "src/systems/bot/botCoreRule.test.ts": {
    "feature": "bot",
-   "runs": 14,
-   "lastMs": 4,
-   "p50Ms": 6,
+   "runs": 15,
+   "lastMs": 7,
+   "p50Ms": 7,
    "p95Ms": 12,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -2967,74 +2963,74 @@
   },
   "src/systems/bot/botHeat.test.ts": {
    "feature": "bot",
-   "runs": 20,
-   "lastMs": 669,
-   "p50Ms": 691,
+   "runs": 21,
+   "lastMs": 697,
+   "p50Ms": 695,
    "p95Ms": 762,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "bot: shaft round lava (#113) steps the shaft sideways to a clear column and bores on below the pocket",
-     201
+     241
     ],
     [
      "bot: heat planets (#113) unlocks and selects refractory at the Upgrade bay, and wants it no more",
-     177
+     199
     ]
    ]
   },
   "src/systems/bot/botRefining.test.ts": {
    "feature": "bot",
-   "runs": 20,
-   "lastMs": 16860,
+   "runs": 21,
+   "lastMs": 12634,
    "p50Ms": 15640,
    "p95Ms": 18894,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "pacing bot refining (#105) queues its haul at the Refinery bay and collects ready batches at the Sell bay",
-     7029
+     6265
     ],
     [
      "pacing bot refining (#105) replays a refining run to the same digests and state",
-     5187
+     3408
     ],
     [
      "pacing bot refining (#105) never refines when the run ignores the refinery",
-     4643
+     2960
     ]
    ]
   },
   "src/systems/bot/botShopping.test.ts": {
    "feature": "bot",
-   "runs": 20,
-   "lastMs": 4277,
-   "p50Ms": 3993,
+   "runs": 21,
+   "lastMs": 4328,
+   "p50Ms": 4107,
    "p95Ms": 4425,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "bot: shopping at the Upgrade bay spends what the drill power ceiling saves on the other tracks",
-     1126
-    ],
-    [
-     "bot: shopping at the Upgrade bay stops buying drill power for the core at the ceiling, however much money is left",
-     1100
-    ],
-    [
      "bot: shopping at the Upgrade bay buys drill_tip past its on-curve level for the core once drill power is at its cap",
+     1113
+    ],
+    [
+     "bot: shopping at the Upgrade bay stops buying drill_tip for the core at its cap, two levels past on-curve",
+     1104
+    ],
+    [
+     "bot: shopping at the Upgrade bay spends what the drill power ceiling saves on the other tracks",
      1057
     ]
    ]
@@ -3085,13 +3081,13 @@
   },
   "src/systems/economy/economySourceScan.test.ts": {
    "feature": "economy",
-   "runs": 23,
-   "lastMs": 50,
+   "runs": 24,
+   "lastMs": 77,
    "p50Ms": 89,
    "p95Ms": 136,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37573078392,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -3168,19 +3164,19 @@
   },
   "src/systems/hints/hintAcceptance.test.ts": {
    "feature": "hints",
-   "runs": 20,
-   "lastMs": 1749,
+   "runs": 21,
+   "lastMs": 1870,
    "p50Ms": 2504,
    "p95Ms": 2750,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "hints over the first ten minutes (#16 acceptance) shows none again after a reload with the seen-set restored",
-     1746
+     1867
     ]
    ]
   },
@@ -3743,13 +3739,13 @@
   },
   "src/systems/vehicle/vehicleStats.test.ts": {
    "feature": "vehicle",
-   "runs": 23,
-   "lastMs": 9,
+   "runs": 24,
+   "lastMs": 13,
    "p50Ms": 19,
    "p95Ms": 30,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37573078392,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": []
@@ -5877,23 +5873,27 @@
   },
   "src/systems/bot/endlessPlanning.test.ts": {
    "feature": "bot",
-   "runs": 6,
-   "lastMs": 4005,
-   "p50Ms": 2984,
+   "runs": 7,
+   "lastMs": 3884,
+   "p50Ms": 3105,
    "p95Ms": 4078,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
-     "bot: planning past planet 582 (#196) buys upgrades on planet 1000 in the order log space ranks them",
-     2043
+     "bot: planning past planet 582 (#196) buys upgrades on planet 600 in the order log space ranks them",
+     1970
     ],
     [
-     "bot: planning past planet 582 (#196) buys upgrades on planet 600 in the order log space ranks them",
-     1791
+     "bot: planning past planet 582 (#196) buys upgrades on planet 1000 in the order log space ranks them",
+     1712
+    ],
+    [
+     "bot: planning past planet 582 (#196) picks the ore band log space picks on planet 600",
+     104
     ]
    ]
   },
@@ -6107,27 +6107,27 @@
   },
   "src/systems/bot/botSlicePurchases.test.ts": {
    "feature": "bot",
-   "runs": 1,
-   "lastMs": 3463,
+   "runs": 2,
+   "lastMs": 4046,
    "p50Ms": 3463,
-   "p95Ms": 3463,
+   "p95Ms": 4046,
    "passRate": 1,
    "lastStatus": "passed",
-   "lastRunId": 37572201878,
+   "lastRunId": 37574144042,
    "lastFailure": null,
    "flaky": false,
    "slowest": [
     [
      "bot: slice purchases buys a registered slice purchase after the kernel purchases, through its command",
-     692
+     853
     ],
     [
      "bot: slice purchases puts the slice purchases' estimates in the spend-share diagnostic",
-     574
+     695
     ],
     [
      "bot: slice purchases records each kernel purchase at what the wallet paid",
-     556
+     677
     ]
    ]
   },
@@ -6195,6 +6195,32 @@
    "lastFailure": null,
    "flaky": false,
    "slowest": []
+  },
+  "src/systems/bot/botRetreat.test.ts": {
+   "feature": "bot",
+   "runs": 1,
+   "lastMs": 7708,
+   "p50Ms": 7708,
+   "p95Ms": 7708,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37574144042,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "pacing bot retreat (#216) plays on from that state to the end of its budget instead of ending the run",
+     4043
+    ],
+    [
+     "pacing bot retreat (#216) is left by the fixture docked after a rescue at grade 1, broke, with no ore plan",
+     1889
+    ],
+    [
+     "pacing bot tow for a broke bot (#216, #8 soft-lock rule) strands itself off the pad for the tow before any trip when its tank is below the tow floor",
+     1183
+    ]
+   ]
   }
  }
 }
