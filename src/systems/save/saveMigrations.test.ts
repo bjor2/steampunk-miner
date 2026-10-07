@@ -20,7 +20,7 @@ import { planetParamsFor } from '../world/planetParams'
 import PLANET_1_SAVE from './fixtures/pre-175-planet-1.save.json'
 import PLANET_10_SAVE from './fixtures/pre-175-planet-10.save.json'
 import PLANET_5_SAVE from './fixtures/pre-181-planet-5.save.json'
-import { migrateSaveSlot, readMigratedSaveSlot } from './saveMigrations'
+import { migrateSaveSlot, readMigratedSaveSlot, type SaveMigration } from './saveMigrations'
 import { readSaveSlot } from './saveSlot'
 
 /**
@@ -53,6 +53,10 @@ function generator6SaveOf(file: unknown): unknown {
   const { migrated } = migrateSaveSlot(file)
   return { ...(migrated as object), generatorVersion: 6 }
 }
+
+/** The header version steps a reading ran, without the slice sections it restored. */
+const versionStepsOf = (reading: { migrations: readonly SaveMigration[] }) =>
+  reading.migrations.filter((migration) => 'version' in migration)
 
 function restored(file: unknown) {
   const reading = readMigratedSaveSlot(file)
@@ -173,7 +177,7 @@ describe('save migration chain: levels to steps (#181)', () => {
   const saved = PLANET_5_SAVE.profile.players.p1
 
   it('loads a pre-#181 save through the snapshot 18 -> 19 step, then the generator 6 -> 7 step', () => {
-    expect(restored(PLANET_5_SAVE).migrations).toEqual([SNAPSHOT_STEP, ORE_LEAD_STEP])
+    expect(versionStepsOf(restored(PLANET_5_SAVE))).toEqual([SNAPSHOT_STEP, ORE_LEAD_STEP])
   })
 
   it('turns every track level L into step 10L and the gun level 7 into step 70', () => {

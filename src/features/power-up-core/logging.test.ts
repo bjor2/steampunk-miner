@@ -8,7 +8,7 @@ import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { dockInBay } from '../../systems/authority/scriptedSession'
 import { FACING } from '../../systems/vehicle/vehiclePose'
 import { FAKE, FAKE_ITEMS, inField } from './fakeItems'
-import { wiredSlice } from './register'
+import { slice } from './register'
 import { intentToUseSlot } from './systems/slotUse'
 
 // The power-up lines (#162 section 2.4, Systems on #200) as the run log records them, each
@@ -17,7 +17,7 @@ import { intentToUseSlot } from './systems/slotUse'
 function linesOf(events: readonly DomainEvent[]) {
   const sink = createMemorySink()
   const runLog = createRunLog({ runId: 'run_200', sink, secondsSinceStart: () => 0 })
-  withRegistrations([wiredSlice, FAKE_ITEMS], () =>
+  withRegistrations([slice, FAKE_ITEMS], () =>
     recordDomainEventsTo(runLog, { playerId: 'p1', planet: 1, depthTiles: 0 }, events),
   )
   return sink.events.filter((line) => line.event.startsWith('power-up-core.'))
@@ -86,9 +86,7 @@ describe('power-up log lines', () => {
 
   it('writes every line to its registered schema', () => {
     const lines = linesOf(usedAndCancelled())
-    const problems = withRegistrations([wiredSlice, FAKE_ITEMS], () =>
-      lines.flatMap(runEventProblems),
-    )
+    const problems = withRegistrations([slice, FAKE_ITEMS], () => lines.flatMap(runEventProblems))
     expect(problems).toEqual([])
   })
 })

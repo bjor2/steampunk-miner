@@ -17,7 +17,7 @@ import {
   type ScriptedSession,
 } from '../../systems/authority/scriptedSession'
 import { FACING, type Facing } from '../../systems/vehicle/vehiclePose'
-import { wiredSlice } from './register'
+import { slice } from './register'
 import type { VehicleItem } from '../../systems/registries/vehicleLoadout'
 import type { PowerUp, PowerUpClass, PowerUpOutcome, PowerUpUse } from './systems/powerUpKind'
 import { POWER_UP_SLOTS } from './systems/powerUpSlots'
@@ -60,6 +60,8 @@ export const FAKE_ITEMS: SliceDefinition = {
 
 export interface FieldSetup {
   slots?: Readonly<Record<string, string>>
+  /** Owned vehicle items beside the slotted ones: cradles open their slots. */
+  owned?: readonly string[]
   facing?: Facing
 }
 
@@ -69,10 +71,10 @@ export interface FieldSetup {
  * on open ground from tick 1.
  */
 export function inField<T>(body: (session: ScriptedSession) => T, setup: FieldSetup = {}): T {
-  const { slots = { 'powerup.1': FAKE.charged, 'powerup.2': FAKE.channel } } = setup
-  return withRegistrations([wiredSlice, FAKE_ITEMS], () => {
+  const { slots = { 'powerup.1': FAKE.charged, 'powerup.2': FAKE.channel }, owned = [] } = setup
+  return withRegistrations([slice, FAKE_ITEMS], () => {
     const session = createScriptedSession()
-    session.submit(0, setVehicleLoadoutCommand(slots))
+    session.submit(0, setVehicleLoadoutCommand(slots, owned))
     session.submit(1, poseAbove(GROUND, setup.facing ?? FACING.right))
     return body(session)
   })

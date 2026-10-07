@@ -960,9 +960,9 @@
         },
         {
           "title": "Powerups",
-          "description": "Timed buffs or consumables, deferred for now; artefacts carry the horizontal beat instead.",
-          "status": "planned",
-          "issues": [47]
+          "description": "Up to five power-up slots, used with keys 1 to 5 or the touch slot column; charges refill free with the dock recharge, and three cradles open slots 3 to 5. The slots and charges are built; the first real power-ups and the cradle buy come with their item slices.",
+          "status": "partial",
+          "issues": [47, 162, 200]
         },
         {
           "title": "Tech tree",
@@ -1998,7 +1998,7 @@
     "**Schedule file is behind the code.** `docs/scaling/horizontal/stats.json` still marks slice-2 features as \"building\" or \"planned\" (fluid ground, casing, collapse, two bays, artefacts, music). All of them are in the code. The six campaign modules (refinery, guns, wrecker, charges, heat/lava, refractory lining) are marked shipped since #127.",
     "**Plan text is out of date.** #90 still lists M1–M5 (#92–#96) as held or blocked, but all five are closed and merged.",
     "**Music hooks for artefacts aren't connected.** The artefact stinger has music data but no trigger, and the music dip during the artefact choice is always off. Comments say both were waiting for S10 (#64), which has since shipped.",
-    "**Vision and code differ in scope.** design.md describes many ore families, repair and storage facilities, and powerups. The code has metal and crystal ores only. Repair is at the Upgrade bay (or the Sell bay's quick action). Powerups were deferred (#47).",
+    "**Vision and code differ in scope.** design.md describes many ore families, repair and storage facilities, and powerups. The code has metal and crystal ores only. Repair is at the Upgrade bay (or the Sell bay's quick action). Powerups were deferred (#47); the slots and charges came back with the power-up core (#200), and the real power-ups are still to come.",
     "**Heat came back.** The slice ruled out heat (#7, #2). It now exists only on the heat planets (8–16), added by the campaign plan (#96)."
   ],
   "sources": "Seeded from code and docs at main 202b6e2 (6 Oct 2026, 09:20 CEST), docs/design.md, docs/scaling/horizontal/stats.json (locked campaign schedule), all 129 GitHub issues and the sub-issue tree, and the git log. Built = in the code today; Partial = partly built; Planned = decided or scheduled in an issue but not built."
