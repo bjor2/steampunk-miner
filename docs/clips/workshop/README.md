@@ -5,8 +5,10 @@ sign-off against the quality bar before the slice merges. Each clip opens on the
 bay just before the purchase and runs until about 100 ticks after the last step. Recorded
 headless on the preview build with software WebGL, so the frame rate is low and uneven. The
 chain itself runs on authority ticks, so in a real browser its timing is the curve in
-`src/features/workshop/holdCurve.json`: a click, an 18-tick wind-up, then gaps from 30 ticks down
-to 6 (10 buys a second).
+`src/features/workshop/holdCurve.json`. The clips predate the faster curve of #311 (ticket 312): they
+show a click, an 18-tick wind-up, then gaps from 30 ticks down to 6 (10 buys a second) and a
+36-tick breath at each major. The curve is now a 12-tick wind-up, gaps from 12 ticks down to 4
+(15 buys a second) and a 20-tick breath.
 
 | Clip                  | Purchase                                           | What to look for                                                                                                   |
 | --------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |

@@ -7,14 +7,21 @@
  * Buy's only while no card is drawn, since a card carries it. A keyboard or controller confirm
  * still buys one through the store's `pressScreenButton`, as on every bay button.
  */
-import type { PointerEvent } from 'react'
+import type { CSSProperties, PointerEvent } from 'react'
+import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { readAuthorityTick, useGameStore } from '../../../store/gameStore'
 import type { UpgradeId } from '../../../systems/economy/economyDefinition'
 import type { ScreenButton } from '../../../systems/views/viewParts'
 import { isHoldingTrack, useWorkshopStore } from '../store/workshopStore'
+import { HOLD_CURVE } from '../systems/holdChain'
 import type { PlaquePointer } from '../systems/plaquePress'
 import { WORKSHOP_TEST_IDS } from './testIds'
 import styles from './HoldBuyButton.module.css'
+
+/** The ring fills over the curve's wind-up, so retuning `holdCurve.json` retimes it too. */
+const WIND_UP_RING = {
+  '--wind-up-seconds': `${HOLD_CURVE.windUpTicks / TICKS_PER_SECOND}s`,
+} as CSSProperties
 
 export function HoldBuyButton({
   button,
@@ -50,7 +57,7 @@ export function HoldBuyButton({
       onClick={(event) => event.stopPropagation()}
       onFocus={() => focusPlaque(button.id, upgradeId)}
     >
-      <span className={styles.ring} aria-hidden />
+      <span className={styles.ring} style={WIND_UP_RING} aria-hidden />
       {button.label}
     </button>
   )

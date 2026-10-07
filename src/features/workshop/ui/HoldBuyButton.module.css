@@ -40,7 +40,7 @@
   text-decoration: line-through;
 }
 
-/* Fills over the 18-tick wind-up (0.3 s), then stays lit while the hold runs. */
+/* Fills over the curve's wind-up (--wind-up-seconds, from holdCurve.json), then stays lit while the hold runs. */
 .ring {
   position: absolute;
   inset: -4px;
@@ -51,7 +51,7 @@
 }
 
 .buy[data-holding] .ring {
-  animation: wind-up 0.3s linear forwards;
+  animation: wind-up var(--wind-up-seconds) linear forwards;
 }
 
 @keyframes wind-up {
