@@ -16,7 +16,7 @@ import type {
 } from '../../../systems/registries/vehicleItemSales'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { unlockTierOfItem } from '../../tech-tree'
-import { POWER_UP_CORE_ECONOMY } from './cradleEconomy'
+import { POWER_UP_CORE_ECONOMY } from './powerUpEconomy'
 import { CRADLE_ROWS, cradleRowOf, type CradleRow } from './cradles'
 import { POWER_UP_SLOTS } from './powerUpSlots'
 

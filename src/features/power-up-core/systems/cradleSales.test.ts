@@ -8,7 +8,7 @@ import {
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import { toCanonical } from '../../../systems/money'
 import { isSlotOpen } from '../../../systems/vehicle/loadoutState'
-import { POWER_UP_CORE_ECONOMY } from './cradleEconomy'
+import { POWER_UP_CORE_ECONOMY } from './powerUpEconomy'
 import { cradlePriceOf } from './cradleSales'
 
 // The cradles at the Upgrade bay (ticket 248, #162 4.1): 20 band-5 units at the planet of the node
