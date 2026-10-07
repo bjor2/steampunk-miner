@@ -15,6 +15,7 @@ import {
 } from '../fakeMilestoneItems'
 import { chargesLeftOf, itemChargesOf, powerUpStateOf } from './chargeState'
 import { FOLLOW_UP_WINDOW_TICKS } from './followUps'
+import { intentToToggleLink } from './linkToggle'
 import { powerUpAtMarkOf } from './powerUpMarks'
 import { intentToHoldSlot, intentToUseSlot } from './slotUse'
 
@@ -202,6 +203,22 @@ describe('Mark milestones: hold (#256)', () => {
         { toggledOn: true, milestone: 'hold' },
       ])
       expect(powerUpStateOf(field.state(), 'p1').toggledOn).toEqual([SWITCH])
+    })
+  })
+})
+
+describe('Mark milestones: a follow-up with a sibling-link (#256)', () => {
+  it("fires the sibling's plain use, not the follow-up's verb", () => {
+    inMarkedField(9, (field) => {
+      field.submit(2, intentToToggleLink(SWITCH))
+      field.submit(PRESS_TICK, press('powerup.2'))
+      field.submit(PRESS_TICK + 1, intentToToggleLink(SWITCH))
+      field.submit(PRESS_TICK + 2, intentToHoldSlot('powerup.2'))
+      expect(actsOf(field.state()).map(({ itemId, verb }) => [itemId, verb])).toEqual([
+        [SWITCH, VERBS[SWITCH].plain],
+        [SWITCH, VERBS[SWITCH].hold],
+        [DASHER, VERBS[DASHER].plain],
+      ])
     })
   })
 })

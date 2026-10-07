@@ -1,7 +1,8 @@
 /**
  * Fake Mark-milestone items for the slice's specs (#256, build 2): a charged dasher whose Mark 3
  * second tap is a sideways air-dash and whose Mark 6 hold is a longer burn, as the lock's steam
- * boost, and a toggle whose Mark 3 hold and Mark 6 second tap name their own verbs. Each is a
+ * boost, and a toggle whose Mark 3 hold and Mark 6 second tap name their own verbs and whose Mark 9
+ * sibling-link fires the dasher (ticket 274). Each is a
  * capability on the tech tree with its Mark ladder, so a spec researches its Marks through the
  * tree's own debug grant. Every act is noted in the fixture's section, which is all a spec reads
  * of the verb, and the dasher's notes drive the vehicle through `vehicleMotionEffects`, so a spec
@@ -68,6 +69,7 @@ export const RESEARCH_PLANET_OF_MARK: Readonly<Record<number, number>> = {
   3: 7,
   5: 13,
   6: 16,
+  9: 25,
 }
 
 export interface FakeAct {
@@ -110,6 +112,7 @@ const LADDERS: Readonly<Record<string, MarkLadder>> = {
     milestones: [
       { mark: 3, pattern: 'hold', verb: 'cuts the faced side only' },
       { mark: 6, pattern: 'second-tap', verb: 'one pass, then off' },
+      { mark: 9, pattern: 'sibling-link', verb: 'fires the dasher', siblingId: DASHER },
     ],
   },
 }

@@ -10,7 +10,8 @@
  *   charges never fires, so a milestone never yields a use without spending a charge.
  * - A link that does not fire, or whose sibling finds nothing to act on or is refused by a gate,
  *   changes nothing and writes nothing: the item's own act and log are as if it had no link.
- * - A linked act never fires the sibling's own link.
+ * - A linked act never fires the sibling's own link, and is a plain use even when the item's act
+ *   was a hold or a second tap.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -128,10 +129,14 @@ function isIdle(value: PowerUpState, powerUp: MarkedPowerUp, tick: number): bool
   return isCooledDown && value.pending?.itemId !== powerUp.itemId
 }
 
-/** The sibling's use: from the item's origin and tick, its own slot and Mark, at link strength. */
+/**
+ * The sibling's use: from the item's origin and tick, its own slot and Mark, at link strength. It
+ * is a plain use: the item's follow-up milestone (ticket 273) is the item's verb, not the sibling's.
+ */
 function linkedUseOf(use: PowerUpUse, { powerUp, slot }: ReadySibling): PowerUpUse {
+  const { milestone: _itemsMilestone, ...plainUse } = use
   return {
-    ...use,
+    ...plainUse,
     itemId: powerUp.itemId,
     slot,
     mark: powerUp.mark,
