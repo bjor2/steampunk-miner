@@ -285,6 +285,16 @@ export function baseValueOf(item: DrillGearItem, stat: DrillGearStatName): numbe
   return value
 }
 
+/**
+ * The Mark 1 value of one stat of a lane item, by id: what the effect uses while Marks are not in
+ * play (`power_up_used.mark` is 0 until they land, #200). An id this lane lacks is a broken caller.
+ */
+export function gearValueOf(itemId: string, stat: DrillGearStatName): number {
+  const item = drillGearItemOf(itemId)
+  if (item === null) throw new RangeError(`${itemId} is no drill-gear item`)
+  return baseValueOf(item, stat)
+}
+
 export function vehicleItemOf(item: DrillGearItem): VehicleItem {
   return { id: item.itemId, iconId: item.iconId, slots: [item.slot], attach: item.attach }
 }
