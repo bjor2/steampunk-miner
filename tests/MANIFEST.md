@@ -61,12 +61,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 15 files, 105 tests
+### `drill-gear`: 16 files, 107 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/drill-gear/drillGearInPlay.test.ts` | 10 | 10 |
 | `src/features/drill-gear/drillGearPace.test.ts` | 2 | 1 |
+| `src/features/drill-gear/drillGearTouch.test.ts` | 2 | 2 |
 | `src/features/drill-gear/logging.test.ts` | 2 | 2 |
 | `src/features/drill-gear/shippedRows.test.ts` | 7 | 7 |
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
@@ -214,7 +215,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
-### `power-up-core`: 13 files, 74 tests
+### `power-up-core`: 13 files, 77 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -227,7 +228,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/powerUpKind.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/powerUpMarks.test.ts` | 9 | 9 |
 | `src/features/power-up-core/systems/powerUpUse.test.ts` | 17 | 17 |
-| `src/features/power-up-core/systems/slotColumn.test.ts` | 6 | 6 |
+| `src/features/power-up-core/systems/slotColumn.test.ts` | 9 | 9 |
 | `src/features/power-up-core/systems/slotUse.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/toggleDraw.test.ts` | 9 | 9 |
 | `src/features/power-up-core/systems/toggleRead.test.ts` | 2 | 2 |
