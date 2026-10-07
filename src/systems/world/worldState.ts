@@ -170,6 +170,11 @@ export function generatedChunkOf(params: PlanetParams, cx: number, cy: number): 
   return cacheOf(params).generatedChunkOf(cx, cy)
 }
 
+/** Whether the planet's cache holds the chunk's cells and density now; never generates them. */
+export function isGeneratedChunkHeld(params: PlanetParams, cx: number, cy: number): boolean {
+  return cacheOf(params).isGenerated(cx, cy)
+}
+
 /** Generation is pure, so one cache per planet only saves time; it never changes an answer. */
 /** Generated chunks held now, touched ones included, for the memory sample (#121). */
 export function cachedChunkCount(): number {

@@ -3,12 +3,14 @@
  * fixed step). Besides the tick, the clock runs the enemy simulation and tows vehicles whose
  * strand grace or destroy delay runs out (`authorityClock.ts`), and takes the periodic state
  * digest every 3600 ticks (#11 section 3), each over the state as it stands at that tick, so a
- * replay that advances to the same ticks logs the same digests, fights and tows.
+ * replay that advances to the same ticks logs the same digests, fights and tows. While it moves,
+ * planted charges' ground is generated ahead of their blast, a chunk a tick (`blastPrefetch.ts`).
  */
 import type { CommandOutcome } from './applyCommand'
 import type { AuthorityState } from './authorityState'
 import type { DomainEvent } from './domainEvent'
 import { settleClockTo } from './authorityClock'
+import { prefetchPlantedBlastChunks } from './charges/blastPrefetch'
 import { stateDigest } from './stateDigest'
 
 /** One minute of fixed 1/60 s steps between periodic digests (#11 section 3). */
@@ -16,6 +18,7 @@ export const DIGEST_INTERVAL_TICKS = 3600
 
 export function advanceTicks(state: AuthorityState, toTick: number): CommandOutcome {
   assertForwardTick(state.tick, toTick)
+  prefetchPlantedBlastChunks(state, toTick - state.tick)
   const digested = periodicDigestTicks(state.tick, toTick).reduce(runClockToDigest, {
     state,
     events: [],

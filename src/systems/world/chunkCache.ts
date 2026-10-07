@@ -20,6 +20,11 @@ export interface ChunkCache {
   generatedChunkOf(cx: number, cy: number): GeneratedChunk
   /** Keeps the chunk in the cache for good once it has a delta. */
   markTouched(cx: number, cy: number): void
+  /**
+   * Whether the chunk's cells and density are both held now; asking never generates them or
+   * changes what is evicted next.
+   */
+  isGenerated(cx: number, cy: number): boolean
   /** Chunks currently held, touched ones included. */
   size(): number
 }
@@ -56,6 +61,7 @@ export function createChunkCache(params: PlanetParams, capacity: number): ChunkC
       touched.add(chunkKey(cx, cy))
       heldChunkOf(cx, cy)
     },
+    isGenerated: (cx, cy) => (held.get(chunkKey(cx, cy))?.density ?? null) !== null,
     size: () => held.size,
   }
 }

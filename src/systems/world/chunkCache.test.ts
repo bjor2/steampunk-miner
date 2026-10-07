@@ -19,6 +19,16 @@ describe('chunk cache', () => {
     expect(cache.generatedChunkOf(1, 1).cells).toBe(cache.generatedCellsOf(1, 1))
   })
 
+  it('counts a chunk generated once its cells and density are held, and asking generates nothing', () => {
+    const cache = createChunkCache(params, 4)
+    expect(cache.isGenerated(2, 2)).toBe(false)
+    expect(cache.size()).toBe(0)
+    cache.generatedCellsOf(2, 2)
+    expect(cache.isGenerated(2, 2)).toBe(false)
+    cache.generatedChunkOf(2, 2)
+    expect(cache.isGenerated(2, 2)).toBe(true)
+  })
+
   it('evicts the least recently used chunk past its capacity', () => {
     const cache = createChunkCache(params, 2)
     const first = cache.generatedCellsOf(0, 0)
