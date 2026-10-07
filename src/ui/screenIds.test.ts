@@ -28,6 +28,9 @@ import {
 import { artefactCacheTile } from '../systems/world/artefactCache'
 import { plantOnWall, prepareBlaster } from '../systems/authority/charges/chargeFixtures'
 import { ArtefactChoiceView } from './artefact/ArtefactChoiceView'
+import { SliceScreenView } from './screens/SliceScreen'
+import { withRegistrations } from '../registries/registrar'
+import type { SliceDefinition } from '../registries/sliceDefinition'
 import {
   setEnergyCommand,
   setGunLevelCommand,
@@ -291,6 +294,19 @@ function checkScreen(element: ReactElement, texts: Partial<Record<UiId, string |
     if (text !== null) expect(shown, `${id} shows the model value`).toBe(text)
   }
   return Object.keys(texts)
+}
+
+/** A fake slice's full screen in the shell's frame (ticket 211); the frame carries no model text. */
+function renderSliceScreen(): string[] {
+  const probe: SliceDefinition = {
+    id: 'ids-probe',
+    register: (r) => r.screen({ id: 'ids-probe.screen', priority: 0, render: () => null }),
+  }
+  const frame = createElement(SliceScreenView, {
+    openScreenId: 'ids-probe.screen',
+    onDismiss: () => undefined,
+  })
+  return withRegistrations([probe], () => checkScreen(frame, { [UI_IDS.sliceScreen]: null }))
 }
 
 function renderHud(): string[] {
@@ -569,6 +585,7 @@ describe('screen ids (#33 acceptance 12)', () => {
     keep(renderWithHeat())
     keep(renderRefineryScreens())
     keep(renderLiningVisit())
+    keep(renderSliceScreen())
     expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
   })
 
