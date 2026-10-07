@@ -125,9 +125,7 @@ export const useWorkshopStore = create<WorkshopState>()((set, get) => ({
   hearPurchases: (events, playerId) => {
     const purchases = heardPurchasesOf(events, playerId)
     if (purchases.length > 0) hearOwnPurchases(purchases)
-    heardRefusalsOf(events, playerId).forEach(({ chain, reason }) =>
-      endHoldOfChain(chain, (live) => refuseStep(live, reason)),
-    )
+    endHoldsRefusedIn(events, playerId)
   },
   leaveShowcase: () => {
     get().releaseHold()
@@ -203,6 +201,13 @@ function endLiveHold(end: (chain: HoldChain) => HoldChain, tick: number): void {
   const ended = { ...hold, chain: end(hold.chain) }
   useWorkshopStore.setState({ hold: ended })
   stopTally(ended.chain, tick)
+}
+
+/** A refusal the prediction missed (a co-op race) still ends its hold, on its cue. */
+function endHoldsRefusedIn(events: readonly DomainEvent[], playerId: string): void {
+  for (const { chain, reason } of heardRefusalsOf(events, playerId)) {
+    endHoldOfChain(chain, (live) => refuseStep(live, reason))
+  }
 }
 
 function endHoldOfChain(chainId: number, end: (chain: HoldChain) => HoldChain): void {

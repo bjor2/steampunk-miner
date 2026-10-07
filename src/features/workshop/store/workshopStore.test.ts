@@ -200,6 +200,33 @@ describe('workshop hold-to-buy controller', () => {
     expect(stepOf('drill_power')).toBe(6)
   })
 
+  it('ends a hold on a refusal its prediction missed, and no bought step reverts', () => {
+    atUpgradeBayWith()
+    workshop().pressTrack('engine', tick())
+    runFrames(HOLD_CURVE.windUpTicks + HOLD_CURVE.gapTicks[0])
+    const chainId = workshop().hold?.chainId ?? 0
+    workshop().hearPurchases(
+      [
+        {
+          type: 'CommandRejected',
+          commandType: 'buyUpgrade',
+          reason: 'service_reserve',
+          problems: ['another client spent the wallet first'],
+          chain: chainId,
+          tick: tick(),
+          playerId: game().playerId,
+          seq: 99,
+        },
+      ],
+      game().playerId,
+    )
+    runFrames(240)
+
+    expect(stepOf('engine')).toBe(3)
+    expect(workshop().hold?.chain).toMatchObject({ end: 'refused', refusal: 'service_reserve' })
+    expect(workshop().tally).toMatchObject({ steps: 3, cue: 'reserve_hold' })
+  })
+
   it('breathes 36 ticks on an ordinary major, resumes two rows slower and plays its flourish', () => {
     atUpgradeBayWith()
     holdFor('drill_power', 13)
