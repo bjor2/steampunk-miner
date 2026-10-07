@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "ticket": 221,
+  "title": "Kernel: dock-building facility registry and FeatureUnlocked",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-07T03:24:20Z",
+  "closed": "2026-10-07T08:00:53Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-07T03:24:20.000Z","end":"2026-10-07T06:54:37.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-07T06:54:37.000Z","end":"2026-10-07T06:55:04.075Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-07T06:55:04.075Z","end":"2026-10-07T06:56:54.669Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-07T06:56:54.669Z","end":"2026-10-07T06:57:29.501Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T06:57:29.501Z","end":"2026-10-07T07:00:01.875Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-07T07:00:01.875Z","end":"2026-10-07T07:00:06.542Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T07:00:06.542Z","end":"2026-10-07T07:00:16.434Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-07T07:00:16.434Z","end":"2026-10-07T07:00:26.678Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-07T07:00:26.678Z","end":"2026-10-07T07:00:33.346Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-07T07:00:33.346Z","end":"2026-10-07T07:45:30.666Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-07T07:45:30.666Z","end":"2026-10-07T07:45:54.274Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-07T07:45:54.274Z","end":"2026-10-07T07:46:03.100Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-07T07:46:03.100Z","end":"2026-10-07T08:00:44.954Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-07T08:00:44.954Z","end":"2026-10-07T08:00:53.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":0,"planner_wait":0,"idle":12617,"context":115,"planning":9,"developing":45,"testing":2860,"gates":882,"landing":38,"other":27},
+  "lead_time_s": 16593,
+  "cycle_time_s": 3976,
+  "claimed": "2026-10-07T06:54:37.000Z",
+  "claimed_to_done_s": 3976,
+  "backfilled": false
+}
