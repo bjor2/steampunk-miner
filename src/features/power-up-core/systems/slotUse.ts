@@ -23,6 +23,15 @@ export function intentToUseSlot(slot: PressableSlot): CommandIntent {
   return { type: 'power-up-core.use_power_up', payload: { slot } }
 }
 
+/**
+ * The slot still held past the wind-up of the use it made (#256's hold milestone). No key sends it
+ * yet: slot keys react on the press only, so the debug API's `holdSlot` stands in for the held key
+ * until the kernel's input routes a slot release.
+ */
+export function intentToHoldSlot(slot: PowerUpSlot): CommandIntent {
+  return { type: 'power-up-core.hold_power_up', payload: { slot } }
+}
+
 function slotIntentOf(
   { state, playerId }: InputSituation,
   slot: PowerUpSlot,

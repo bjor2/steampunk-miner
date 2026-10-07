@@ -10,7 +10,14 @@
  * carries no ladder acts at its own numbers.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
-import { markLadderOfItem, markStepOf, researchedMarkOf, type MarkStep } from '../../tech-tree'
+import {
+  markLadderOfItem,
+  markStepOf,
+  researchedMarkOf,
+  type MarkLadder,
+  type MarkStep,
+  type MilestonePattern,
+} from '../../tech-tree'
 import { powerUpOfItem, type PowerUp } from './powerUpKind'
 
 export interface MarkedPowerUp extends PowerUp {
@@ -20,6 +27,8 @@ export interface MarkedPowerUp extends PowerUp {
   magnitude: number | null
   /** Every stat is capped: the gilded plate. */
   isMastered: boolean
+  /** The milestone patterns the researched Mark has reached (#256: Marks 3, 6 and 9). */
+  reachedMilestones: readonly MilestonePattern[]
 }
 
 /** Mark 1 is the item as bought (#162 4.6). */
@@ -42,11 +51,14 @@ export function atResearchedMark(
 ): MarkedPowerUp {
   const mark = researchedMarkOf(state, playerId, powerUp.itemId)
   const ladder = markLadderOfItem(powerUp.itemId)
-  if (ladder === null) return { ...powerUp, mark, magnitude: null, isMastered: false }
-  return steppedPowerUpOf(powerUp, mark, markStepOf(ladder, Math.max(mark, BOUGHT_MARK)))
+  if (ladder === null) {
+    return { ...powerUp, mark, magnitude: null, isMastered: false, reachedMilestones: [] }
+  }
+  return steppedPowerUpOf(powerUp, mark, ladder)
 }
 
-function steppedPowerUpOf(powerUp: PowerUp, mark: number, step: MarkStep): MarkedPowerUp {
+function steppedPowerUpOf(powerUp: PowerUp, mark: number, ladder: MarkLadder): MarkedPowerUp {
+  const step: MarkStep = markStepOf(ladder, Math.max(mark, BOUGHT_MARK))
   const { cooldown, magnitude, charges } = step.stats
   return {
     ...powerUp,
@@ -55,7 +67,15 @@ function steppedPowerUpOf(powerUp: PowerUp, mark: number, step: MarkStep): Marke
     mark,
     magnitude: magnitude ?? null,
     isMastered: step.isMastered,
+    reachedMilestones: reachedMilestonesOf(ladder, mark),
   }
+}
+
+/** A milestone acts from its own Mark on: a Mark 3 second tap is there at Marks 3 to 9. */
+function reachedMilestonesOf(ladder: MarkLadder, mark: number): MilestonePattern[] {
+  return (ladder.milestones ?? [])
+    .filter((milestone) => milestone.mark <= mark)
+    .map((milestone) => milestone.pattern)
 }
 
 /** A toggle's ladder carries its energy draw where a charged item's carries its cooldown (#162 4.6). */

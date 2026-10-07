@@ -8,6 +8,7 @@ import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { dockInBay } from '../../systems/authority/scriptedSession'
 import { FACING } from '../../systems/vehicle/vehiclePose'
 import { FAKE, FAKE_ITEMS, FAKE_REFUSAL, inField } from './fakeItems'
+import { DASHER, inMarkedField } from './fakeMilestoneItems'
 import { slice } from './register'
 import { intentToUseSlot } from './systems/slotUse'
 
@@ -100,6 +101,28 @@ describe('power-up log lines', () => {
         data: { itemId: FAKE.charged, slot: 'powerup.1', reason: FAKE_REFUSAL, chargesLeft: 2 },
       },
     ])
+    expect(withRegistrations([slice, FAKE_ITEMS], () => lines.flatMap(runEventProblems))).toEqual(
+      [],
+    )
+  })
+
+  it('names the Mark milestone a follow-up use was on power_up_used (#256)', () => {
+    const events = inMarkedField(3, (field) => {
+      field.submit(10, intentToUseSlot('powerup.1'))
+      field.advanceTo(16)
+      field.submit(20, intentToUseSlot('powerup.1'))
+      field.advanceTo(30)
+      return field.events()
+    })
+    const lines = linesOf(events)
+    expect(dataOf(lines)).toMatchObject([
+      { event: 'power-up-core.power_up_used', data: { itemId: DASHER, mark: 3 } },
+      {
+        event: 'power-up-core.power_up_used',
+        data: { itemId: DASHER, mark: 3, milestone: 'second-tap' },
+      },
+    ])
+    expect(lines[0].data).not.toHaveProperty('milestone')
     expect(withRegistrations([slice, FAKE_ITEMS], () => lines.flatMap(runEventProblems))).toEqual(
       [],
     )

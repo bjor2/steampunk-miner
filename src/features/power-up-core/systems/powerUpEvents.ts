@@ -6,6 +6,7 @@
  * events carry no command stamp.
  */
 import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
+import type { FollowUpPattern } from './chargeState'
 import type { GateBlock } from './powerUpKind'
 
 declare module '../../../systems/authority/authorityCommand' {
@@ -14,6 +15,11 @@ declare module '../../../systems/authority/authorityCommand' {
     'power-up-core.use_power_up': { slot: string }
     /** The item card's switch (ticket 274): turn the item's sibling-link off, or back on. */
     'power-up-core.toggle_link': { itemId: string }
+    /**
+     * The slot is still held past the wind-up of the use it just made (#256's hold milestone):
+     * the hold follows that use as one more action.
+     */
+    'power-up-core.hold_power_up': { slot: string }
     /** A scenario's charges left for one owned power-up. */
     'debug.power-up-core.setCharges': { itemId: string; chargesLeft: number }
   }
@@ -31,6 +37,8 @@ declare module '../../../systems/authority/domainEvent' {
       chargesLeft: number
       /** A toggle passive only: whether this use switched it on or off. */
       toggledOn?: boolean
+      /** A Mark milestone's follow-up only (#256): which pattern this use was. */
+      milestone?: FollowUpPattern
     }
     'power-up-core.PowerUpBlocked': {
       playerId: string
@@ -81,6 +89,8 @@ declare module '../../../systems/authority/domainEvent' {
     'power-up-core.not_still': true
     'power-up-core.invalid_charges': true
     'power-up-core.no_sibling_link': true
+    'power-up-core.no_milestone': true
+    'power-up-core.nothing_to_hold': true
   }
 }
 

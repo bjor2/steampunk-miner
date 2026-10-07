@@ -37,6 +37,24 @@ export interface PendingUse {
   actTick: number
   originTx: number
   originTy: number
+  /** A Mark milestone's follow-up (#256); absent for a plain use. */
+  milestone?: FollowUpPattern
+}
+
+/**
+ * The milestone patterns that follow a use the player just made (#256): a second press within
+ * the window, or the slot held past the wind-up. The sibling-link is not one: it rides the act.
+ */
+export type FollowUpPattern = 'second-tap' | 'hold'
+
+/**
+ * The last use that acted of an item whose Mark has reached a follow-up: a second tap or a hold of
+ * the same slot may follow it once, within the window (`followUps.ts`).
+ */
+export interface UseOpener {
+  itemId: string
+  slot: LoadoutSlotId
+  actTick: number
 }
 
 export interface PowerUpState {
@@ -55,6 +73,11 @@ export interface PowerUpState {
    * #256: on by default, saved per player). Absent while every link is on.
    */
   linksOff?: readonly string[]
+  /**
+   * The use a follow-up may answer (#256). Absent unless an item with a follow-up milestone acted,
+   * so a run with no milestone Mark researched digests as it did.
+   */
+  opener?: UseOpener
 }
 
 export const NO_POWER_UPS: PowerUpState = { items: {}, pending: null, toggledOn: [] }
@@ -150,6 +173,15 @@ export function withPending(value: PowerUpState, pending: PendingUse | null): Po
   return { ...value, pending }
 }
 
+export function openerOf(value: PowerUpState): UseOpener | null {
+  return value.opener ?? null
+}
+
+export function withOpener(value: PowerUpState, opener: UseOpener | null): PowerUpState {
+  const { opener: _replaced, ...others } = value
+  return opener === null ? others : { ...others, opener }
+}
+
 function sortedById<T>(record: Readonly<Record<string, T>>): Readonly<Record<string, T>> {
   return Object.fromEntries(
     Object.keys(record)
@@ -170,12 +202,31 @@ function powerUpStateProblems(body: unknown): string[] {
     ...(isTextList(body.toggledOn) ? [] : ['power-up-core.toggledOn must be a list of item ids']),
     ...drawRemainderProblems(body.drawRemainder),
     ...linksOffProblems(body.linksOff),
+    ...openerProblems(body.opener),
   ]
 }
 
 function linksOffProblems(linksOff: unknown): string[] {
   if (linksOff === undefined || isTextList(linksOff)) return []
   return ['power-up-core.linksOff must be a list of item ids']
+}
+
+function openerProblems(opener: unknown): string[] {
+  if (opener === undefined || isUseOpener(opener)) return []
+  return ['power-up-core.opener must be {itemId, slot, actTick}']
+}
+
+function isUseOpener(value: unknown): boolean {
+  return (
+    isJsonObject(value) &&
+    typeof value.itemId === 'string' &&
+    isLoadoutSlotId(value.slot) &&
+    isWholeNumber(value.actTick)
+  )
+}
+
+function isFollowUpPattern(value: unknown): boolean {
+  return value === undefined || value === 'second-tap' || value === 'hold'
 }
 
 function drawRemainderProblems(remainder: unknown): string[] {
@@ -212,7 +263,8 @@ function isPendingUse(value: unknown): boolean {
     (value.kind === 'windup' || value.kind === 'channel') &&
     isWholeNumber(value.actTick) &&
     Number.isSafeInteger(value.originTx) &&
-    Number.isSafeInteger(value.originTy)
+    Number.isSafeInteger(value.originTy) &&
+    isFollowUpPattern(value.milestone)
   )
 }
 

@@ -10,6 +10,9 @@
  *   costs nothing).
  * - It has nothing to act on: the charge comes back and `PowerUpRefused` says why.
  * - A channel whose miner moved: the charge comes back, nothing else changes, `ChannelCancelled`.
+ *
+ * A Mark milestone's follow-up (#256, `followUps.ts`) is a use like any other: it reserves its own
+ * charge, winds up, and its act reads the pattern from the use; a toggle it follows stays on.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -25,9 +28,11 @@ import {
   withPending,
   withPowerUpState,
   withToggle,
+  type FollowUpPattern,
   type PendingUse,
   type PowerUpState,
 } from './chargeState'
+import { withOpenerAfterAct } from './followUps'
 import {
   channelCancelledOf,
   powerUpBlockedOf,
@@ -47,15 +52,18 @@ import {
 import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
 import { withSiblingLink } from './siblingLink'
 
+/** One press, or a milestone's follow-up of the use before it (null for a plain use). */
+export interface UseStart {
+  powerUp: PowerUp
+  slot: LoadoutSlotId
+  tick: number
+  milestone: FollowUpPattern | null
+}
+
 /** The press: reserve the charge and wait, or act at once for an item with no wind-up. */
-export function startUse(
-  state: AuthorityState,
-  playerId: string,
-  powerUp: PowerUp,
-  slot: LoadoutSlotId,
-  tick: number,
-): RuleEffect {
-  const pending = pendingUseOf(vehicleOf(state, playerId), powerUp, slot, tick)
+export function startUse(state: AuthorityState, playerId: string, start: UseStart): RuleEffect {
+  const { powerUp, tick } = start
+  const pending = pendingUseOf(vehicleOf(state, playerId), start)
   const value = withPending(reserveCharge(powerUpStateOf(state, playerId), powerUp), pending)
   const started = withPowerUpState(state, playerId, value)
   if (pending.actTick > tick) return unchanged(started)
@@ -72,7 +80,7 @@ export function resolvePendingUse(
   const pending = value.pending as PendingUse
   const powerUp = atResearchedMark(state, playerId, powerUpOfItem(pending.itemId) as PowerUp)
   const cleared = withPowerUpState(state, playerId, withPending(value, null))
-  if (isToggleSwitchingOff(value, powerUp))
+  if (isToggleSwitchingOff(value, powerUp, pending))
     return switchToggleOff(cleared, playerId, pending, powerUp)
   const outcome = powerUp.activate(cleared, powerUpUseOf(playerId, pending, tick, powerUp))
   return effectOfOutcome(cleared, playerId, powerUp, pending, outcome, tick)
@@ -109,9 +117,7 @@ export function isChannelBroken(vehicle: VehicleState, pending: PendingUse): boo
 
 function pendingUseOf(
   vehicle: VehicleState,
-  powerUp: PowerUp,
-  slot: LoadoutSlotId,
-  tick: number,
+  { powerUp, slot, tick, milestone }: UseStart,
 ): PendingUse {
   const origin = tileOfPose(vehicle.pose as NonNullable<VehicleState['pose']>)
   return {
@@ -121,6 +127,7 @@ function pendingUseOf(
     actTick: tick + ticksToActOf(powerUp),
     originTx: origin.tx,
     originTy: origin.ty,
+    ...(milestone !== null && { milestone }),
   }
 }
 
@@ -140,8 +147,9 @@ function refundCharge(value: PowerUpState, powerUp: PowerUp): PowerUpState {
   })
 }
 
-function isToggleSwitchingOff(value: PowerUpState, powerUp: PowerUp): boolean {
-  return powerUp.isToggle && isToggledOn(value, powerUp.itemId)
+/** A press of a toggle that is on switches it off, unless it is a milestone's follow-up. */
+function isToggleSwitchingOff(value: PowerUpState, powerUp: PowerUp, pending: PendingUse): boolean {
+  return powerUp.isToggle && isToggledOn(value, powerUp.itemId) && pending.milestone === undefined
 }
 
 function switchToggleOff(
@@ -218,7 +226,10 @@ function refuseByGate(
   }
 }
 
-/** The item's own effect first, then its cooldown at its Mark, its toggle and the used line. */
+/**
+ * The item's own effect first, then its cooldown at its Mark, its toggle, the follow-up it opens
+ * or closes, and the used line.
+ */
 function finishActed(
   effect: RuleEffect,
   playerId: string,
@@ -226,17 +237,43 @@ function finishActed(
   pending: PendingUse,
   tick: number,
 ): RuleEffect {
-  const value = cooledDown(powerUpStateOf(effect.state, playerId), powerUp, tick)
-  const after = powerUp.isToggle ? withToggle(value, powerUp.itemId, true) : value
+  const after = actedPowerUpState(powerUpStateOf(effect.state, playerId), powerUp, pending, tick)
+  return {
+    state: withPowerUpState(effect.state, playerId, after),
+    events: [
+      ...effect.events,
+      usedLineOf(playerId, powerUp, pending, chargesLeftIn(after, powerUp)),
+    ],
+  }
+}
+
+function actedPowerUpState(
+  value: PowerUpState,
+  powerUp: MarkedPowerUp,
+  pending: PendingUse,
+  tick: number,
+): PowerUpState {
+  const cooled = cooledDown(value, powerUp, tick)
+  const toggled = powerUp.isToggle ? withToggle(cooled, powerUp.itemId, true) : cooled
+  return withOpenerAfterAct(toggled, powerUp, pending, tick)
+}
+
+function usedLineOf(
+  playerId: string,
+  powerUp: MarkedPowerUp,
+  pending: PendingUse,
+  chargesLeft: number,
+) {
   const used = powerUpUsedOf(
     subjectOf(playerId, pending),
     originOf(pending),
-    chargesLeftIn(after, powerUp),
+    chargesLeft,
     powerUp.mark,
   )
   return {
-    state: withPowerUpState(effect.state, playerId, after),
-    events: [...effect.events, powerUp.isToggle ? { ...used, toggledOn: true } : used],
+    ...used,
+    ...(powerUp.isToggle && { toggledOn: true }),
+    ...(pending.milestone !== undefined && { milestone: pending.milestone }),
   }
 }
 
@@ -255,7 +292,9 @@ function powerUpUseOf(
   { mark, magnitude }: MarkedPowerUp,
 ): PowerUpUse {
   const { itemId, slot, originTx, originTy } = pending
-  return { playerId, itemId, slot, tick, origin: { tx: originTx, ty: originTy }, mark, magnitude }
+  const origin = { tx: originTx, ty: originTy }
+  const use = { playerId, itemId, slot, tick, origin, mark, magnitude }
+  return pending.milestone === undefined ? use : { ...use, milestone: pending.milestone }
 }
 
 function subjectOf(playerId: string, pending: PendingUse): UseSubject {

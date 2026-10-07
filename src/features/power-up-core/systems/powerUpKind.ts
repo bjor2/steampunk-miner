@@ -12,6 +12,7 @@ import type { RuleEffect } from '../../../systems/authority/commandRule'
 import { contentOf, type ContentEntry } from '../../../systems/registries/content'
 import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
 import type { TilePoint } from '../../../systems/world/tileGrid'
+import type { FollowUpPattern } from './chargeState'
 
 /** #162 section 2.1. */
 export const POWER_UP_CLASSES = [
@@ -48,6 +49,11 @@ export interface PowerUpUse {
    * magnitude reads this to act at its own reduced strength.
    */
   linkedFrom?: string
+  /**
+   * The Mark milestone this use is (#256): a second tap or a hold of the use before it; absent
+   * for a plain use. It changes only where or how the item acts, never what it yields.
+   */
+  milestone?: FollowUpPattern
 }
 
 /** The gated cell that refused a use (#162 `power_up_blocked_by_gate {cellTier, gateKind}`). */

@@ -1,9 +1,11 @@
 /**
- * The power-up log lines (#162 section 2.4, Systems on #200): `power_up_used`,
- * `power_up_blocked_by_gate`, `power_up_refused` for a use with nothing to act on (ticket 204),
- * `power_up_cancelled` for a broken channel, and `charges_refilled` for each free dock refill. The envelope already carries planet, depth and tick.
- * The sibling-link milestone (the GD lock on #256, ticket 274) adds `link_fired {itemId, siblingId,
- * slot}`, the sibling's slot, and `link_toggled {itemId, isOn}` for the item card's switch.
+ * The power-up log lines (#162 section 2.4, Systems on #200): `power_up_used` (naming the Mark
+ * milestone a follow-up use was, #256), `power_up_blocked_by_gate`, `power_up_refused` for a use
+ * with nothing to act on (ticket 204), `power_up_cancelled` for a broken channel, and
+ * `charges_refilled` for each free dock refill. The envelope already carries planet, depth and
+ * tick. The sibling-link milestone (the GD lock on #256, ticket 274) adds `link_fired {itemId,
+ * siblingId, slot}`, the sibling's slot, and `link_toggled {itemId, isOn}` for the item card's
+ * switch.
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
@@ -19,6 +21,7 @@ export const POWER_UP_PROJECTIONS: SliceEventProjections = {
       origin: { tx: used.originTx, ty: used.originTy },
       chargesLeft: used.chargesLeft,
       ...(used.toggledOn === undefined ? {} : { toggledOn: used.toggledOn }),
+      ...(used.milestone === undefined ? {} : { milestone: used.milestone }),
     },
   }),
   'power-up-core.PowerUpBlocked': ({ itemId, cellTier, gateKind, tx, ty }) => ({
@@ -58,6 +61,7 @@ export const POWER_UP_RUN_EVENTS: SliceRunEvents = {
       origin: { mapOf: 'integer' },
       chargesLeft: 'integer',
       toggledOn: { optional: 'flag' },
+      milestone: { optional: 'text' },
     },
   },
   'power-up-core.power_up_blocked_by_gate': {

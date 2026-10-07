@@ -2,7 +2,11 @@
  * The command rules `power-up-core` registers (feature-slices.md 3.15):
  *
  * - `power-up-core.use_power_up {slot}`: press the power-up in a slot. Refused, at no cost, for the
- *   reasons in `useRefusals.ts`; accepted, it reserves a charge and winds up or channels.
+ *   reasons in `useRefusals.ts`; accepted, it reserves a charge and winds up or channels. A press
+ *   within the window of the item's last use, once its Mark has reached the second tap, is that
+ *   milestone (#256, `followUps.ts`).
+ * - `power-up-core.hold_power_up {slot}`: the slot is still held past the wind-up of the use it
+ *   made; once the item's Mark has reached the hold, it follows that use as one more action.
  * - `power-up-core.toggle_link {itemId}`: the item card's switch for the item's sibling-link
  *   (ticket 274), refused for an item whose Mark has reached none (`linkToggle.ts`).
  * - `debug.power-up-core.setCharges {itemId, chargesLeft}`: a scenario's charges left for one
@@ -14,23 +18,31 @@ import { vehicleOf } from '../../../systems/authority/authorityState'
 import type { SliceCommandRules } from '../../../systems/registries/commandRules'
 import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
 import { itemChargesOf, powerUpStateOf, withItemCharges, withPowerUpState } from './chargeState'
-import './powerUpEvents'
+import { followUpOfPress } from './followUps'
 import { linkToggleRefusalOf, toggleSiblingLink } from './linkToggle'
+import './powerUpEvents'
 import { hasCharges, type PowerUp } from './powerUpKind'
-import { powerUpAtMarkOf } from './powerUpMarks'
-import { slottedPowerUpOf, refusalOfUse } from './useRefusals'
-import { startUse } from './useResolution'
+import { atResearchedMark, powerUpAtMarkOf } from './powerUpMarks'
+import { refusalOfHold, refusalOfUse, slottedPowerUpOf } from './useRefusals'
+import { startUse, type UseStart } from './useResolution'
 
 export const POWER_UP_RULES: SliceCommandRules = {
   'power-up-core.use_power_up': {
     fields: { slot: 'text' },
     reject: (state, { playerId, tick, payload }) =>
       refusalOfUse(state, playerId, payload.slot, tick),
-    apply: (state, { playerId, tick, payload }) => {
-      const slot = payload.slot as LoadoutSlotId
-      const powerUp = slottedPowerUpOf(vehicleOf(state, playerId), slot) as PowerUp
-      return startUse(state, playerId, powerUp, slot, tick)
-    },
+    apply: (state, { playerId, tick, payload }) =>
+      startUse(state, playerId, pressOf(state, playerId, payload.slot, tick)),
+  },
+  'power-up-core.hold_power_up': {
+    fields: { slot: 'text' },
+    reject: (state, { playerId, tick, payload }) =>
+      refusalOfHold(state, playerId, payload.slot, tick),
+    apply: (state, { playerId, tick, payload }) =>
+      startUse(state, playerId, {
+        ...pressOf(state, playerId, payload.slot, tick),
+        milestone: 'hold',
+      }),
   },
   'power-up-core.toggle_link': {
     fields: { itemId: 'text' },
@@ -46,6 +58,15 @@ export const POWER_UP_RULES: SliceCommandRules = {
       events: [],
     }),
   },
+}
+
+/** The press of an accepted slot: a second tap when it follows the item's last use. */
+function pressOf(state: AuthorityState, playerId: string, slot: string, tick: number): UseStart {
+  const slotId = slot as LoadoutSlotId
+  const powerUp = slottedPowerUpOf(vehicleOf(state, playerId), slotId) as PowerUp
+  const marked = atResearchedMark(state, playerId, powerUp)
+  const milestone = followUpOfPress(powerUpStateOf(state, playerId), marked, slot, tick)
+  return { powerUp, slot: slotId, tick, milestone }
 }
 
 function chargesRefusalOf(
