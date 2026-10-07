@@ -12,7 +12,11 @@
  *    band, at 24 and 45 ticks a tile, the net ore money a minute of a blast against the drill, at
  *    the band's ore density (the guard: never above the drill) and centred on a full patch
  *    (reported; #143 amendment 2 accepts sizes 1 and 2 above the drill there).
- * 3. The bot plays the bot scenario to planet 40's core on each pacing seed, blasting (its #109
+ * 3. The payoff guard (`chargePayoff.ts`, #143 guard 2, GD lock on K8 #218): on planets 7 to 40
+ *    and 50, in bands 3 to 5, for a +1 and a +2 dynamite-gated lead patch, what one `minCharge`
+ *    frees (Vertical's patch model) over its price, expected at 2 or more, with #142's 15% share
+ *    cap beside it for information. Reported only: #148 gates the bot's `gate_cleared` medians.
+ * 4. The bot plays the bot scenario to planet 40's core on each pacing seed, blasting (its #109
  *    policy) and never, and each planet's median time from arriving to its core is compared. C4
  *    wants every planet at 45 to 60 min with the bot blasting and none more than 10% faster than
  *    without charges: judged on planets 7 to 10, and logged as a diagnostic on planets 13 to 34 and
@@ -34,6 +38,12 @@ import type { RunEventName } from '../src/logging/eventNames'
 import { playLoggedSlice } from '../src/logging/sliceRunLog'
 import { blastTradeOf, type BlastTrade } from '../src/systems/bot/blastTrade'
 import type { ChargePolicy } from '../src/systems/bot/botCharges'
+import {
+  chargePayoffsOf,
+  isUnderPayoffFloor,
+  PAYOFF_FLOOR,
+  type ChargePayoff,
+} from '../src/systems/bot/chargePayoff'
 import {
   chargeSizeTradesOf,
   isBlastAboveDrill,
@@ -81,11 +91,17 @@ const SEEDS = PACING_WORLD_SEEDS['bot-slice']
 const judgedPlanets = range(FIRST_CHARGE_PLANET, LAST_JUDGED_PLANET)
 const trades = judgedPlanets.flatMap((planet) => tradeRowsOf(planet))
 const sizeTrades = chargeSizeTradesOf(scenario.worldSeed)
+const payoffs = chargePayoffsOf(scenario.worldSeed)
 const blasting = playTo('blast')
 const drilling = playTo('never')
 const judgedRows = judgedPlanets.map((planet) => paceRowOf(planet))
 const diagnosticRows = DIAGNOSTIC_PLANETS.map((planet) => paceRowOf(planet))
-const warnings = [...tradeWarnings(), ...sizeGuardWarnings(), ...paceWarnings()]
+const warnings = [
+  ...tradeWarnings(),
+  ...sizeGuardWarnings(),
+  ...payoffWarnings(),
+  ...paceWarnings(),
+]
 const text = [
   `## blasting_charges and the dynamite sizes against the pacing bot (report only)`,
   '### The shipped charge trade, planets 7 to 10 (#109 acceptance 3)',
@@ -107,6 +123,16 @@ const text = [
     ),
   ].join('\n'),
   `### Centred on a full patch, above the drill (reported: #143 amendment 2)\n\n${patchFindingsText()}`,
+  `### The payoff guard: one minCharge on a dynamite-gated lead patch (#143 guard 2, reported; expected at least ${PAYOFF_FLOOR}x)`,
+  [
+    '| planet | band | lead | minCharge | cells freed | value freed | price | payoff | share-cap payoff (info) |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+    ...payoffs.map(
+      (row) =>
+        `| ${row.planetIndex} | ${row.band} | +${row.lead} | ${row.size} | ${row.cellsFreed} | ${formatAmount(roundToWhole(row.valueFreed))} | ${formatAmount(roundToWhole(row.price))} | ${times(row.payoff)} | ${times(row.sharePayoff)} |`,
+    ),
+  ].join('\n'),
+  `Lowest payoff: ${lowestPayoffText()}.`,
   `### The bot, planets 7 to 10 (C4, judged; median of seeds ${SEEDS.join(', ')})`,
   paceTableOf(judgedRows),
   '### The bot, planets 13 to 34 and 40 (C4, diagnostic until #148)',
@@ -183,6 +209,24 @@ function sizeGuardWarnings(): string[] {
   return sizeTrades
     .filter(isBlastAboveDrill)
     .map((trade) => `${whereOf(trade)}: blasting earns more than drilling at the band's density`)
+}
+
+function payoffWarnings(): string[] {
+  return payoffs
+    .filter(isUnderPayoffFloor)
+    .map(
+      (row) =>
+        `${payoffWhereOf(row)}: payoff ${times(row.payoff)}, under the expected ${PAYOFF_FLOOR}x`,
+    )
+}
+
+function lowestPayoffText(): string {
+  const lowest = payoffs.reduce((low, row) => (cmp(row.payoff, low.payoff) < 0 ? row : low))
+  return `${times(lowest.payoff)} at ${payoffWhereOf(lowest)}`
+}
+
+function payoffWhereOf(row: ChargePayoff): string {
+  return `planet ${row.planetIndex} band ${row.band} lead +${row.lead} (size ${row.size})`
 }
 
 function patchFindingsText(): string {
@@ -286,7 +330,11 @@ function perMinute(moneyPerTick: Money): string {
 
 /** `a / b` to two places, signed: a blast that loses money reads below zero. */
 function ratio(a: Money, b: Money): string {
-  return `${Number(toCanonical(div(a, b))).toFixed(2)}x`
+  return times(div(a, b))
+}
+
+function times(multiple: Money): string {
+  return `${Number(toCanonical(multiple)).toFixed(2)}x`
 }
 
 function seconds(ticks: number): string {
