@@ -11,6 +11,7 @@ import { dockSiteOf } from '../world/dockSite'
 import { coreTileCount } from '../world/planetGeometry'
 import { planetParamsFor } from '../world/planetParams'
 import type { TilePoint } from '../world/tileGrid'
+import { noRouteDeaths } from './botDeathReplay'
 import type { BotPlanet } from './botPilot'
 import { createBotSession, type BotSession } from './botSession'
 import { serviceAtDock } from './botShopping'
@@ -69,6 +70,7 @@ function botOnPlanet9(): { session: BotSession; planet: BotPlanet } {
       chargePolicy: 'never',
       hasMetBlastTile: false,
       hasBeenDestroyedHere: false,
+      routeDeaths: noRouteDeaths(),
     },
   }
 }

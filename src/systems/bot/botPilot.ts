@@ -15,6 +15,7 @@ import type { Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
 import { faceThreats } from './botCombat'
 import type { ChargePolicy } from './botCharges'
+import type { RouteDeaths } from './botDeathReplay'
 import { setGunsForEnergy } from './botGuns'
 import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
@@ -42,6 +43,8 @@ export interface BotPlanet {
    * reflex only between bores, a fatal dive replayed after every tow. Travel starts afresh.
    */
   hasBeenDestroyedHere: boolean
+  /** Deaths per route here, and the routes it retreated from (#198, `botDeathReplay.ts`). */
+  routeDeaths: RouteDeaths
 }
 
 /**

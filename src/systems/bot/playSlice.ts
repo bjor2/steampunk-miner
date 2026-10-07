@@ -12,7 +12,9 @@
  * When no band the casing holds pays a trip, as after a rescue that took the last of the wallet
  * with those bands bored out and the next grade unaffordable (#216), the bot retreats to the
  * shallowest of them, widens its galleries and plays on; broke with a tank too low even for that,
- * it strands itself for the tow that leaves a quarter of the tank (#8).
+ * it strands itself for the tow that leaves a quarter of the tank (#8). From planet 8 on, the
+ * second death on one route closes it, and every deeper one, until the vehicle has changed; the
+ * bot mines the bands above meanwhile (#198, `botDeathReplay.ts`).
  */
 import { SLICE_LAST_PLANET } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
@@ -28,6 +30,7 @@ import type { ChargePolicy } from './botCharges'
 import { DEFAULT_CHAIN_POLICY, type ChainPolicy } from './botChains'
 import type { GunPolicy } from './botGuns'
 import { collectWhenReady, refineWhenWorthIt, type RefineryUse } from './botRefining'
+import { breakDeathReplay, deepestOpenBand } from './botDeathReplay'
 import { towWhenItRefills } from './botRetreat'
 import { buyUpgrades, hasPurchase, serviceAtDock } from './botShopping'
 import { measureSpree, visitOf, type SpreeMeasure, type SpreeVisit } from './spreeCapacity'
@@ -170,7 +173,7 @@ function isLastCoreDone(session: BotSession, lastPlanet: number): boolean {
 function playDockCycle(session: BotSession, planet: BotPlanet, run: BotRun): boolean {
   const goal = chooseGoal(session, planet)
   if (goal === null) return towWhenItRefills(session, planet)
-  runTrip(session, planet, goal)
+  playTrip(session, planet, goal)
   collectWhenReady(session)
   if (isRefining(session, run)) refineWhenWorthIt(session, planet)
   serviceAtDock(session)
@@ -178,6 +181,13 @@ function playDockCycle(session: BotSession, planet: BotPlanet, run: BotRun): boo
   shopAtUpgradeBay(session, planet, run)
   recordSpreeVisit(session, run, spree)
   return true
+}
+
+/** The trip, then its death counted against its route (#198). */
+function playTrip(session: BotSession, planet: BotPlanet, goal: TripGoal): void {
+  const eventsBefore = session.events().length
+  runTrip(session, planet, goal)
+  breakDeathReplay(session, planet, goal, session.events().slice(eventsBefore))
 }
 
 function recordSpreeVisit(session: BotSession, run: BotRun, spree: SpreeMeasure): void {
@@ -200,14 +210,30 @@ function shopAtUpgradeBay(session: BotSession, planet: BotPlanet, run: BotRun): 
   run.shopSpend.push(...buyUpgrades(session, situation))
 }
 
+/** A band above the routes the bot retreated from (#198), else any goal, as it always chose. */
 function chooseGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
+  return chooseGoalAboveClosedRoutes(session, planet) ?? chooseAnyGoal(session, planet)
+}
+
+function chooseAnyGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
   if (isCoreDiggable(session, planet)) return { kind: 'core' }
   return chooseOreGoal(session, planet) ?? chooseRetreatGoal(session, planet)
 }
 
-function chooseOreGoal(session: BotSession, planet: BotPlanet): TripGoal | null {
+/** Null when no route is closed, or no band above the closed ones pays a trip. */
+function chooseGoalAboveClosedRoutes(session: BotSession, planet: BotPlanet): TripGoal | null {
+  const deepest = deepestOpenBand(planet, session.vehicle().levels)
+  return deepest === null ? null : chooseOreGoal(session, planet, deepest)
+}
+
+function chooseOreGoal(
+  session: BotSession,
+  planet: BotPlanet,
+  deepestBand = deepestHeldBand(session),
+): TripGoal | null {
   const means = meansOfVehicle(session.vehicle())
-  const plan = bestOrePlan(planet.layout, means, deepestHeldBand(session))
+  const deepest = Math.min(deepestBand, deepestHeldBand(session))
+  const plan = bestOrePlan(planet.layout, means, deepest)
   return plan === null ? null : { kind: 'ore', band: plan.band }
 }
 

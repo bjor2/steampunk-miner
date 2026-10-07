@@ -19,6 +19,7 @@ import {
   chargeRestockOf,
   type ChargePolicy,
 } from './botCharges'
+import { noRouteDeaths } from './botDeathReplay'
 import type { BotPlanet } from './botPilot'
 import { NO_TICKS, reportPoseIntent } from './botPose'
 import { createBotSession, type BotSession } from './botSession'
@@ -61,6 +62,7 @@ function botAtWall(openTilesBehind: number, chargePolicy: ChargePolicy = 'blast'
     chargePolicy,
     hasMetBlastTile: false,
     hasBeenDestroyedHere: false,
+    routeDeaths: noRouteDeaths(),
   }
   return { session, planet }
 }

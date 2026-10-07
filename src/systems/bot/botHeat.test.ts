@@ -7,6 +7,7 @@ import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { dockSiteOf } from '../world/dockSite'
 import { planetParamsFor } from '../world/planetParams'
 import { isTooHotToDig, liningUnlockFor } from './botHeat'
+import { noRouteDeaths } from './botDeathReplay'
 import type { BotPlanet } from './botPilot'
 import { createBotSession, type BotSession } from './botSession'
 import { boreShaftDownTo } from './botShaft'
@@ -76,6 +77,7 @@ function planetAt(_session: BotSession, where: 'pad' | 'deep'): BotPlanet {
     chargePolicy: 'never',
     hasMetBlastTile: false,
     hasBeenDestroyedHere: false,
+    routeDeaths: noRouteDeaths(),
   }
 }
 
@@ -114,6 +116,7 @@ describe('bot: shaft round lava (#113)', () => {
         chargePolicy: 'never',
         hasMetBlastTile: false,
         hasBeenDestroyedHere: false,
+        routeDeaths: noRouteDeaths(),
       },
     }
   }
