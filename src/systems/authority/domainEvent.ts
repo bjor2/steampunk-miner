@@ -189,6 +189,12 @@ export interface KernelDomainEventBodies {
     have: string
   }
   /**
+   * A tool read an ore cell without breaking it (#243, from the #205 lock Q2): the sampling corer's
+   * plug. The cell and the hold are unchanged; the codex hears it as contact. It names its player,
+   * since a wind-up resolves on the clock, whose stamp carries none.
+   */
+  OreSampled: { playerId: string; tx: number; ty: number; oreId: string; via: SampleRoute }
+  /**
    * The density of one chunk changed (#36, replacing the first slice's tile change): the dirty
    * rectangle in chunk-local samples, inclusive, and the chunk's version after the change. The
    * renderer, the collider halo and later the network consume it; the run log does not.
@@ -457,6 +463,12 @@ export interface KernelDomainEventBodies {
     statsAfter: Readonly<Record<string, string>>
   }
 }
+
+/**
+ * What sampled an ore cell (#243): the drill-gear corer, or the sensing assay lens once an
+ * authority-side emitter reads it (the #203 key map on #243).
+ */
+export type SampleRoute = 'corer' | 'lens'
 
 /** When a digest is taken (#11 section 3): every 3600 ticks, at docks and travel, at the end. */
 export type DigestScope = 'periodic' | 'dock' | 'travel' | 'end'

@@ -128,6 +128,27 @@ describe('codex discovery reaction', () => {
     expect(withRegistrations([CODEX], () => hasMinedOre(state, 'p1', TILES.ore.id))).toBe(false)
   })
 
+  it('records a sampled cell as contacted by the tool that sampled it and never as mined (#243)', () => {
+    const { events, state } = withRegistrations([CODEX], () =>
+      CODEX_DISCOVERY_REACTION.react(START_STATE, START_STATE, [oreSampledOf(TILES.ore)]),
+    )
+    expect(events).toEqual([
+      expect.objectContaining({ type: 'codex.OreContacted', oreId: TILES.ore.id, via: 'corer' }),
+      { type: 'codex.EntryAdded', key: `ore:${TILES.ore.id}`, stage: 'contacted' },
+    ])
+    expect(withRegistrations([CODEX], () => hasMinedOre(state, 'p1', TILES.ore.id))).toBe(false)
+  })
+
+  it('says only the discovery when a sampled type later reaches the hold', () => {
+    const events = withRegistrations([CODEX], () => {
+      const sampled = CODEX_DISCOVERY_REACTION.react(START_STATE, START_STATE, [
+        oreSampledOf(TILES.ore),
+      ]).state
+      return CODEX_DISCOVERY_REACTION.react(sampled, sampled, [cargoAddedOf(TILES.ore, 0)]).events
+    })
+    expect(events.map(({ type }) => type)).toEqual(['codex.OreDiscovered', 'codex.EntryAdded'])
+  })
+
   it('gives each of two players mining the same types on the same tick their own discoveries', () => {
     const events = withRegistrations([CODEX], () => {
       const twoBlasts = liveBlastSession(
@@ -197,5 +218,18 @@ function cargoAddedOf(ore: OreType, seq: number): DomainEvent {
     oreId: ore.id,
     depthTiles: 0,
     chunk: '0,0',
+  }
+}
+
+/** The corer's plug of `ore`, resolved on the clock after its wind-up. */
+function oreSampledOf(ore: OreType): DomainEvent {
+  return {
+    playerId: 'p1',
+    tick: 8,
+    type: 'OreSampled',
+    tx: 30,
+    ty: 279,
+    oreId: ore.id,
+    via: 'corer',
   }
 }

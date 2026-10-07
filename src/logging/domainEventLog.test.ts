@@ -326,6 +326,23 @@ describe('domain event log', () => {
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
   })
 
+  it('records a sampled ore cell as a schema-valid ore_sampled naming the tool (#243)', () => {
+    const sampled: DomainEvent = {
+      tick: 812,
+      playerId: 'p1',
+      type: 'OreSampled',
+      tx: 30,
+      ty: 279,
+      oreId: 'kernel.metal.t1',
+      via: 'corer',
+    }
+    recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 3 }, [sampled])
+    expect(sink.events.map(({ event, data }) => ({ event, data }))).toEqual([
+      { event: 'ore_sampled', data: { tx: 30, ty: 279, oreId: 'kernel.metal.t1', via: 'corer' } },
+    ])
+    expect(sink.events.flatMap(runEventProblems)).toEqual([])
+  })
+
   it('records every combat event as a registered line; an enemy kill names no enemy id', () => {
     recordDomainEvents({ playerId: 'p1', planet: 1, depthTiles: 0 }, combatEvents)
     expect(sink.events.map((event) => event.event)).toEqual([

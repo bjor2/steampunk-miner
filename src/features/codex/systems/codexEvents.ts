@@ -5,11 +5,12 @@
  * comes once per player per type, inside the authority's answer that touched or mined it. An enemy
  * or hazard met for the first time (ticket 252) says only `codex.EntryAdded`, at `contacted`.
  */
+import type { SampleRoute } from '../../../systems/authority/domainEvent'
 import type { OreType } from '../../../systems/registries/oreTypes'
 
-/** How a type was first touched: the drill's damage, a gate refusing or losing the cell, or a unit
- * reaching the hold untouched (a charge's blast). */
-export type ContactRoute = 'drill' | 'gate' | 'cargo'
+/** How a type was first touched: the drill's damage, a gate refusing or losing the cell, a unit
+ * reaching the hold untouched (a charge's blast), or a tool sampling the cell (#243). */
+export type ContactRoute = 'drill' | 'gate' | 'cargo' | SampleRoute
 
 /** Which of the codex's two states an entry reached. */
 export type CodexStage = 'contacted' | 'mined'

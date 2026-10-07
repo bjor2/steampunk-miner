@@ -6,7 +6,8 @@
  *
  * Contact is the drill's damage on an ore tile, read on the state before the command (the
  * `DrillDamageDealt` event names no ore), or a gate stopping the drill at one (`DrillGated`); a
- * unit reaching the hold (`CargoAdded`, drill or blast) is mined. Enemies and hazards are only
+ * unit reaching the hold (`CargoAdded`, drill or blast) is mined. A tool sampling a cell it leaves
+ * standing (`OreSampled`, the corer, #243) is contact by that tool. Enemies and hazards are only
  * ever contacted (ticket 252, `contactKeys.ts`), recorded after the step's ore.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
@@ -84,6 +85,7 @@ function oreTouchOf(before: AuthorityState, event: DomainEvent): OreTouch[] {
   if (event.type === 'DrillDamageDealt') return touchesOf(oreTypeAtTile(before, event), 'drill')
   if (event.type === 'DrillGated') return touchesOf(oreNamed(event.oreId), 'gate')
   if (event.type === 'CargoAdded') return touchesOf(oreNamed(event.oreId), 'cargo')
+  if (event.type === 'OreSampled') return touchesOf(oreNamed(event.oreId), event.via)
   return []
 }
 

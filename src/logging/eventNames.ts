@@ -449,6 +449,13 @@ export const RUN_EVENT_REGISTRY = {
       ty: 'integer',
     },
   },
+  // #243: a tool read an ore cell and left it standing (the corer's plug, which the drill-gear
+  // slice logged as `drill-gear.ore_sampled` before).
+  ore_sampled: {
+    group: 'mining',
+    level: 'core',
+    payload: { tx: 'integer', ty: 'integer', oreId: 'text', via: { oneOf: ['corer', 'lens'] } },
+  },
   // #41: one ring of lining, and lining the drill cleared (one line per drilling command).
   casing_placed: {
     group: 'mining',

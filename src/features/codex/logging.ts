@@ -27,7 +27,8 @@ export const CODEX_RUN_EVENTS: SliceRunEvents = {
   'codex.ore_contacted': {
     group: 'progression',
     level: 'core',
-    payload: { ...ORE_FACTS, via: { oneOf: ['drill', 'gate', 'cargo'] } },
+    // `corer` and `lens` joined with the kernel's `OreSampled` (#243); new values, old lines read.
+    payload: { ...ORE_FACTS, via: { oneOf: ['drill', 'gate', 'cargo', 'corer', 'lens'] } },
   },
   'codex.ore_discovered': { group: 'progression', level: 'core', payload: ORE_FACTS },
   'codex.entry_added': {

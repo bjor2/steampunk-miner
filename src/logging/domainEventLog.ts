@@ -69,6 +69,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
       ty: gated.ty,
     },
   }),
+  OreSampled: ({ tx, ty, oreId, via }) => ({ event: 'ore_sampled', data: { tx, ty, oreId, via } }),
   // Per-carve chunk changes would swamp the log; the yields above are its record of mining (#4).
   GroundChanged: () => null,
   CasingPlaced: ({ samples, relined, grade }) => ({
