@@ -1,12 +1,12 @@
 /**
  * The game's sound (#13 audio direction): one-shots for each feedback cue (the pickup chime by
  * tier, the dock and upgrade clanks, a hit's thud, the core and travel stingers, casing's hiss and
- * pop, a charge's blast, its thump delayed by the blast cue with distance, #213), the music
- * stingers (#49), the slices' sound cues within their voice budgets (#180, `soundCuePlayer.ts`)
- * and, every frame, the drill, engine and steam loops and the crossfaded music layers. What each
- * voice plays comes from the pure rules in `systems/audio` and the audio view
- * model; this only hands it to the shell's sound output. Presentation only: it never writes the
- * store or submits.
+ * pop, a charge's blast, its thump delayed by the blast cue with distance, #213, a slot hold's
+ * cancel clank and finish chime, ticket 253), the music stingers (#49), the slices' sound cues
+ * within their voice budgets (#180, `soundCuePlayer.ts`) and, every frame, the drill, engine and
+ * steam loops and the crossfaded music layers. What each voice plays comes from the pure rules in
+ * `systems/audio` and the audio view model; this only hands it to the shell's sound output.
+ * Presentation only: it never writes the store or submits.
  */
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
@@ -116,6 +116,9 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   chargeBlast: (sound) => playBlastThump(sound),
   // Felt, not heard (#173 haptics): the drill's own voice already sounds while it cuts.
   drillContact: () => {},
+  // G&V on #204 (ticket 253): a cancelled hold clanks lightly, a finished one rings the chime.
+  holdCancelled: (sound) => sound.playClank('light'),
+  holdFinished: (sound) => sound.playChime(chimeFrequencyOf(1)),
 }
 
 /** Rock breaking all at once: the collapse's crash, until the blast has its own sound. */

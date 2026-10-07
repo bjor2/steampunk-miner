@@ -26,6 +26,8 @@ export const ACCENT_OF_CUE: Readonly<Record<FeedbackCue['kind'], Accent | null>>
   chargeBlast: null,
   // Felt in the hand only (#173 haptics).
   drillContact: null,
+  holdCancelled: null,
+  holdFinished: null,
 }
 
 export function accentOf(cue: FeedbackCue): Accent | null {

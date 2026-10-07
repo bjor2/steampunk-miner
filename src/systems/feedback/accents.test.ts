@@ -19,6 +19,8 @@ const CUES: FeedbackCue[] = [
   { kind: 'wreckerScrape' },
   { kind: 'chargeBlast', kick: SHIPPED_CHARGE_BLAST_KICK },
   { kind: 'drillContact' },
+  { kind: 'holdCancelled' },
+  { kind: 'holdFinished' },
 ]
 
 describe('accents', () => {

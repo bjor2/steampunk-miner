@@ -57,6 +57,9 @@ const KICKS: Readonly<Record<Exclude<FeedbackCue['kind'], 'chargeBlast'>, Screen
   wreckerScrape: { shake: 0, flash: 0 },
   // Felt in the hand only (#173 haptics): the screen stays still while the drill cuts.
   drillContact: { shake: 0, flash: 0 },
+  // A slot's hold ending is heard at the thumb (ticket 253); the screen stays still.
+  holdCancelled: { shake: 0, flash: 0 },
+  holdFinished: { shake: 0, flash: 0 },
 }
 
 export function createScreenEffects(): ScreenEffects {

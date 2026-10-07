@@ -55,6 +55,7 @@ import { ORE_DRILL_CLASS_REGISTRY } from '../systems/registries/oreDrillClasses'
 import { ORE_SIGNATURE_REGISTRY, ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
 import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRequests'
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
+import { SLOT_HOLD_CUE_REGISTRY } from '../systems/registries/slotHoldCues'
 import { SOUND_CUE_REGISTRY } from '../systems/registries/soundCues'
 import {
   addToRegistry,
@@ -125,6 +126,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     screen: (panel) => add(SCREEN_REGISTRY, panel),
     soundCue: (cue) => add(SOUND_CUE_REGISTRY, cue),
     chargeBlastCue: (provider) => add(CHARGE_BLAST_CUE_REGISTRY, provider),
+    slotHoldCue: (source) => add(SLOT_HOLD_CUE_REGISTRY, source),
     debugActions: (actions) =>
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),
     commandRules: (rules) =>

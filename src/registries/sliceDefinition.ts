@@ -30,6 +30,7 @@ import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectio
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { HeatPause } from '../systems/registries/heatPauses'
+import type { SlotHoldCueSource } from '../systems/registries/slotHoldCues'
 import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../systems/registries/itemDescriptionEntries'
@@ -147,6 +148,8 @@ export interface SliceRegistrar {
   soundCue(cue: SoundCue): void
   /** One provider across all slices: a charge's shake, flash and thump delay (#213). */
   chargeBlastCue(provider: ChargeBlastCueProvider): void
+  /** Names the slice's events that end a slot hold: cancelled clanks, finished chimes (253). */
+  slotHoldCue(source: SlotHoldCueSource): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
   /**

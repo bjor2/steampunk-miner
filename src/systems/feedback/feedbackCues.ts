@@ -8,7 +8,8 @@
  * the player's own charge blowing (#109), kicked by the blast cue's provider from how far the
  * vehicle stands (#213), and the drill biting, which is felt as a haptic tick rather than heard
  * (#173). A held chain's steps leave the clank to the workshop's ratchet (#180 section 5), so only a
- * click clanks. Presentation only: cues are read from the events, never written back, so they
+ * click clanks. A slot's hold that a slice names (`slotHoldCues`, ticket 253) clanks lightly when
+ * cancelled and chimes when it runs to the end. Presentation only: cues are read from the events, never written back, so they
  * cannot touch state or the digest (#33).
  *
  * A batch gives at most one cue of each kind (the highest tier, the hardest hit), so a fast-forward
@@ -22,6 +23,7 @@ import {
   type ChargeBlastKick,
   type ChargeDetonatedEvent,
 } from '../registries/chargeBlastCue'
+import { slotHoldEndOf } from '../registries/slotHoldCues'
 import { chargeCentreMm } from '../vehicle/vehicleCharges'
 
 /** Where the local player hears and feels from: its vehicle's last reported pose, in mm. */
@@ -45,6 +47,8 @@ export type FeedbackCue =
   | { kind: 'wreckerScrape' }
   | { kind: 'chargeBlast'; kick: ChargeBlastKick }
   | { kind: 'drillContact' }
+  | { kind: 'holdCancelled' }
+  | { kind: 'holdFinished' }
 
 type CueKind = FeedbackCue['kind']
 
@@ -63,6 +67,8 @@ const CUE_ORDER: readonly CueKind[] = [
   'wreckerScrape',
   'chargeBlast',
   'drillContact',
+  'holdCancelled',
+  'holdFinished',
 ]
 
 /** The player's vehicle's last reported pose, or null before it reported one or with no player. */
@@ -125,8 +131,15 @@ function cueOfEvent(event: DomainEvent, listener: ListenerPoint | null): Feedbac
     case 'DrillDamageDealt':
       return { kind: 'drillContact' }
     default:
-      return null
+      return slotHoldCueOf(event)
   }
+}
+
+/** A slice's own event that ends one of its slot holds (ticket 253); null for any other. */
+function slotHoldCueOf(event: DomainEvent): FeedbackCue | null {
+  const end = slotHoldEndOf(event)
+  if (end === null) return null
+  return end === 'cancelled' ? { kind: 'holdCancelled' } : { kind: 'holdFinished' }
 }
 
 /** From the charge tile's centre, as the blast's hits measure (#109), in whole mm. */

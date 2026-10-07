@@ -6,6 +6,7 @@ import {
   type ChargeBlastCueProvider,
 } from '../registries/chargeBlastCue'
 import { addToRegistry, withFreshRegistrySet } from '../registries/seal'
+import { SLOT_HOLD_CUE_REGISTRY, type SlotHoldCueSource } from '../registries/slotHoldCues'
 import { feedbackCuesOf } from './feedbackCues'
 
 const stamp = (playerId: string) => ({ playerId, tick: 10, seq: 1 })
@@ -197,6 +198,47 @@ describe('feedback cues', () => {
     })
     expect(feedbackCuesOf([bought(0)], 'p1')).toEqual([{ kind: 'upgradeClank' }])
     expect(feedbackCuesOf([bought(4)], 'p1')).toEqual([])
+  })
+
+  it('clanks lightly for a slot hold a slice cancels and chimes for one it finishes (253)', () => {
+    const recharged = (to: number): DomainEvent => ({
+      ...stamp('p1'),
+      type: 'EnergyRecharged',
+      from: 0,
+      to,
+      cost: '1',
+    })
+    const holdEnds: SlotHoldCueSource = {
+      id: 'fake-hold.ends',
+      holdEndOf: (event) => {
+        if (event.type !== 'EnergyRecharged') return null
+        return event.to === 0 ? 'cancelled' : 'finished'
+      },
+    }
+    const cuesOf = (events: DomainEvent[]) =>
+      withFreshRegistrySet(
+        () => addToRegistry(SLOT_HOLD_CUE_REGISTRY, 'fake-hold', holdEnds),
+        () => feedbackCuesOf(events, 'p1'),
+      )
+    expect(cuesOf([recharged(0)])).toEqual([{ kind: 'holdCancelled' }])
+    expect(cuesOf([recharged(9)])).toEqual([{ kind: 'holdFinished' }])
+    expect(cuesOf([docked])).toEqual([{ kind: 'dockClank' }])
+  })
+
+  it('stays quiet for a hold-ending event while no slice names one', () => {
+    const recharged: DomainEvent = {
+      ...stamp('p1'),
+      type: 'EnergyRecharged',
+      from: 0,
+      to: 9,
+      cost: '1',
+    }
+    expect(
+      withFreshRegistrySet(
+        () => {},
+        () => feedbackCuesOf([recharged], 'p1'),
+      ),
+    ).toEqual([])
   })
 
   it("ignores another player's pickups", () => {
