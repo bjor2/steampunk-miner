@@ -103,6 +103,11 @@ export function describeItem(ref: ItemRef, ctx: ItemCtx): ItemDescription | null
   return rememberedDescriptionOf(provider, ref, ctx)
 }
 
+/** Whether a describer answers at all: with none, screens skip building the snapshot view. */
+export function isItemDescriberRegistered(): boolean {
+  return entriesOf(ITEM_DESCRIBER_REGISTRY).length > 0
+}
+
 function rememberedDescriptionOf(
   provider: ItemDescriberProvider,
   ref: ItemRef,

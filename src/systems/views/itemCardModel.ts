@@ -7,6 +7,7 @@
 import type { AuthorityState } from '../authority/authorityState'
 import {
   describeItem,
+  isItemDescriberRegistered,
   type ItemDescription,
   type ItemRef,
   type ItemSource,
@@ -85,6 +86,7 @@ function describeSubject(
   playerId: string,
   subject: ItemCardSubject,
 ): ItemDescription | null {
+  if (!isItemDescriberRegistered()) return null
   const view = itemSnapshotViewOf(state, playerId)
   const { level, source } = subject
   return describeItem(subject.item, {
