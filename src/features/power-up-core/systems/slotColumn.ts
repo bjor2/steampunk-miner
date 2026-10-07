@@ -3,13 +3,15 @@
  * a power-up a press can use, slot 1 first, with its charge pips, cooldown ring and the ring an
  * item's hold fills (ticket 253). An empty or
  * locked slot draws nothing, so a P1 phone still shows just the stick and Interact (#173
- * acceptance 3).
+ * acceptance 3). Each button reads its item at the player's Mark (#249): its pips, its cooldown
+ * and the Mark a brass plate on the cradle will show.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import type { SlotActionId } from '../../../systems/input/touchControls'
 import { chargesLeftIn, isToggledOn, itemChargesOf, powerUpStateOf } from './chargeState'
 import type { PowerUpState } from './chargeState'
 import { hasCharges, type PowerUp, type SlotHold } from './powerUpKind'
+import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
 import { actionOfSlot, POWER_UP_SLOTS, type PowerUpSlot } from './powerUpSlots'
 import { pressablePowerUpOf } from './useRefusals'
 
@@ -29,6 +31,10 @@ export interface SlotButton {
   /** Winding up or channelling now. */
   isActing: boolean
   isOn: boolean
+  /** The Mark researched, 0 for none: the cradle's brass plate. */
+  mark: number
+  /** Every stat capped: the gilded plate. */
+  isMastered: boolean
 }
 
 export function slotButtonsOf(state: AuthorityState, playerId: string): SlotButton[] {
@@ -37,7 +43,7 @@ export function slotButtonsOf(state: AuthorityState, playerId: string): SlotButt
   return POWER_UP_SLOTS.flatMap((slot) => {
     const powerUp = pressablePowerUpOf(vehicle, slot)
     if (powerUp === null) return []
-    return [slotButtonOf(state, playerId, value, powerUp, slot)]
+    return [slotButtonOf(state, playerId, value, atResearchedMark(state, playerId, powerUp), slot)]
   })
 }
 
@@ -45,10 +51,10 @@ function slotButtonOf(
   state: AuthorityState,
   playerId: string,
   value: PowerUpState,
-  powerUp: PowerUp,
+  powerUp: MarkedPowerUp,
   slot: PowerUpSlot,
 ): SlotButton {
-  const { itemId, iconId, name } = powerUp
+  const { itemId, iconId, name, mark, isMastered } = powerUp
   const { tick } = state
   return {
     slot,
@@ -62,6 +68,8 @@ function slotButtonOf(
     holdPercent: holdPercentOf(state, playerId, powerUp),
     isActing: value.pending?.itemId === itemId,
     isOn: isToggledOn(value, itemId),
+    mark,
+    isMastered,
   }
 }
 
@@ -77,8 +85,14 @@ function heldPercentOf({ startTick, finishTick }: SlotHold, tick: number): numbe
   return Math.floor((held * 100) / (finishTick - startTick))
 }
 
-function cooldownPercentOf(value: PowerUpState, powerUp: PowerUp, tick: number): number {
+/**
+ * Out of the cooldown at the current Mark; a cooldown started before a Mark shortened it is
+ * still running, so the ring stays full until it is back inside the shorter one.
+ */
+function cooldownPercentOf(value: PowerUpState, powerUp: MarkedPowerUp, tick: number): number {
   const remaining = itemChargesOf(value, powerUp.itemId).readyAtTick - tick
   if (remaining <= 0 || powerUp.cooldownTicks === 0) return 0
-  return Math.ceil((remaining * 100) / powerUp.cooldownTicks)
+  return Math.min(FULL_PERCENT, Math.ceil((remaining * FULL_PERCENT) / powerUp.cooldownTicks))
 }
+
+const FULL_PERCENT = 100

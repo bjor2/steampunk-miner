@@ -35,6 +35,13 @@ export interface PowerUpUse {
   tick: number
   /** The tile the vehicle stood on when the use was pressed. */
   origin: TilePoint
+  /** The Mark researched when it acts (#249); 0 for none, which acts as bought. */
+  mark: number
+  /**
+   * The item's magnitude at that Mark, from its ladder (#162 4.6: the time, range or share the
+   * duration step grows); null for an item whose ladder has none.
+   */
+  magnitude: number | null
 }
 
 /** The gated cell that refused a use (#162 `power_up_blocked_by_gate {cellTier, gateKind}`). */

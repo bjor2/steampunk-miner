@@ -4,7 +4,7 @@
  * - `power-up-core.use_power_up {slot}`: press the power-up in a slot. Refused, at no cost, for the
  *   reasons in `useRefusals.ts`; accepted, it reserves a charge and winds up or channels.
  * - `debug.power-up-core.setCharges {itemId, chargesLeft}`: a scenario's charges left for one
- *   power-up that counts charges.
+ *   power-up that counts charges, at most the count at the player's Mark (#249).
  */
 import { rejectionOf, type Rejection } from '../../../systems/authority/commandRule'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
@@ -13,7 +13,8 @@ import type { SliceCommandRules } from '../../../systems/registries/commandRules
 import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
 import { itemChargesOf, powerUpStateOf, withItemCharges, withPowerUpState } from './chargeState'
 import './powerUpEvents'
-import { hasCharges, powerUpOfItem, type PowerUp } from './powerUpKind'
+import { hasCharges, type PowerUp } from './powerUpKind'
+import { powerUpAtMarkOf } from './powerUpMarks'
 import { slottedPowerUpOf, refusalOfUse } from './useRefusals'
 import { startUse } from './useResolution'
 
@@ -30,7 +31,8 @@ export const POWER_UP_RULES: SliceCommandRules = {
   },
   'debug.power-up-core.setCharges': {
     fields: { itemId: 'text', chargesLeft: 'wholeNumber' },
-    reject: (_state, { payload }) => chargesRefusalOf(payload.itemId, payload.chargesLeft),
+    reject: (state, { playerId, payload }) =>
+      chargesRefusalOf(powerUpAtMarkOf(state, playerId, payload.itemId), payload),
     apply: (state, { playerId, payload }) => ({
       state: withChargesLeft(state, playerId, payload.itemId, payload.chargesLeft),
       events: [],
@@ -38,8 +40,10 @@ export const POWER_UP_RULES: SliceCommandRules = {
   },
 }
 
-function chargesRefusalOf(itemId: string, chargesLeft: number): Rejection | null {
-  const powerUp = powerUpOfItem(itemId)
+function chargesRefusalOf(
+  powerUp: PowerUp | null,
+  { itemId, chargesLeft }: { itemId: string; chargesLeft: number },
+): Rejection | null {
   if (powerUp === null || !hasCharges(powerUp))
     return rejectionOf('power-up-core.invalid_charges', `"${itemId}" counts no charges`)
   if (chargesLeft <= powerUp.charges) return null
@@ -55,7 +59,7 @@ function withChargesLeft(
   itemId: string,
   chargesLeft: number,
 ): AuthorityState {
-  const powerUp = powerUpOfItem(itemId) as PowerUp
+  const powerUp = powerUpAtMarkOf(state, playerId, itemId) as PowerUp
   const value = powerUpStateOf(state, playerId)
   const charges = { ...itemChargesOf(value, itemId), spent: powerUp.charges - chargesLeft }
   return withPowerUpState(state, playerId, withItemCharges(value, itemId, charges))

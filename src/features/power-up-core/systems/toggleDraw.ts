@@ -7,6 +7,7 @@
  * off, logged as the `PowerUpUsed {toggledOn: false}` a switch-off press logs.
  *
  * A toggle that draws nothing, or one switched on but no longer slotted, never wakes the clock.
+ * Each tick draws at the toggle's researched Mark (#249: its ladder steps the draw down).
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import {
@@ -23,7 +24,8 @@ import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
 import { energyMaxQuantaOf, type VehicleState } from '../../../systems/vehicle/vehicleState'
 import { powerUpStateOf, withPowerUpState, withToggle, type PowerUpState } from './chargeState'
 import { powerUpUsedOf } from './powerUpEvents'
-import { powerUpOfItem, type PowerUp } from './powerUpKind'
+import { powerUpOfItem } from './powerUpKind'
+import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
 
 export const DRAW_TOGGLES_STEP: ClockStep = {
   id: 'power-up-core.draw-toggles',
@@ -31,9 +33,9 @@ export const DRAW_TOGGLES_STEP: ClockStep = {
   run: drawTogglesAt,
 }
 
-/** A toggle switched on in a slot that draws energy. */
+/** A toggle switched on in a slot that draws energy, at the player's Mark. */
 interface DrawingToggle {
-  powerUp: PowerUp
+  powerUp: MarkedPowerUp
   slot: LoadoutSlotId
 }
 
@@ -70,15 +72,20 @@ function drawingTogglesOf(state: AuthorityState, playerId: string): DrawingToggl
   const vehicle = vehicleOf(state, playerId)
   if (vehicle.mode !== 'active' || vehicle.pose === null) return []
   return powerUpStateOf(state, playerId)
-    .toggledOn.map((itemId) => drawingToggleOf(vehicle, itemId))
+    .toggledOn.map((itemId) => drawingToggleOf(state, playerId, vehicle, itemId))
     .filter((toggle): toggle is DrawingToggle => toggle !== null)
 }
 
-function drawingToggleOf(vehicle: VehicleState, itemId: string): DrawingToggle | null {
+function drawingToggleOf(
+  state: AuthorityState,
+  playerId: string,
+  vehicle: VehicleState,
+  itemId: string,
+): DrawingToggle | null {
   const powerUp = powerUpOfItem(itemId)
   const slot = slotHoldingItem(vehicle.loadout, itemId)
   if (powerUp === null || slot === null || powerUp.energyDrawPerMillePerSecond === 0) return null
-  return { powerUp, slot }
+  return { powerUp: atResearchedMark(state, playerId, powerUp), slot }
 }
 
 /**
@@ -130,6 +137,7 @@ function switchOffWhenEmpty(
         { playerId, itemId: toggle.powerUp.itemId, slot: toggle.slot },
         { originTx: origin.tx, originTy: origin.ty },
         0,
+        toggle.powerUp.mark,
       ),
       toggledOn: false,
     })),

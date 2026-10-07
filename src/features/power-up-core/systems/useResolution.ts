@@ -1,7 +1,8 @@
 /**
  * A use from press to act (#162 section 2.3, the #200 lock): the press reserves the charge and
  * starts a wind-up (at most 6 ticks, never cancelled) or a channel; the act resolves on the
- * authority clock (`clockSteps`, #217), so the spend logs stay on the authority's ticks.
+ * authority clock (`clockSteps`, #217), so the spend logs stay on the authority's ticks. The item
+ * acts at the Mark researched when it acts (#249, `powerUpMarks.ts`).
  *
  * - The item acts: its effect lands, its cooldown starts, `PowerUpUsed` says the charges left.
  * - A gate refuses it: the charge comes back and `PowerUpBlocked` names the cell (a refused use
@@ -42,6 +43,7 @@ import {
   type PowerUpOutcome,
   type PowerUpUse,
 } from './powerUpKind'
+import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
 
 /** The press: reserve the charge and wait, or act at once for an item with no wind-up. */
 export function startUse(
@@ -66,10 +68,11 @@ export function resolvePendingUse(
 ): RuleEffect {
   const value = powerUpStateOf(state, playerId)
   const pending = value.pending as PendingUse
-  const powerUp = powerUpOfItem(pending.itemId) as PowerUp
+  const powerUp = atResearchedMark(state, playerId, powerUpOfItem(pending.itemId) as PowerUp)
   const cleared = withPowerUpState(state, playerId, withPending(value, null))
-  if (isToggleSwitchingOff(value, powerUp)) return switchToggleOff(cleared, playerId, pending)
-  const outcome = powerUp.activate(cleared, powerUpUseOf(playerId, pending, tick))
+  if (isToggleSwitchingOff(value, powerUp))
+    return switchToggleOff(cleared, playerId, pending, powerUp)
+  const outcome = powerUp.activate(cleared, powerUpUseOf(playerId, pending, tick, powerUp))
   return effectOfOutcome(cleared, playerId, powerUp, pending, outcome, tick)
 }
 
@@ -87,7 +90,7 @@ export function returnCharge(state: AuthorityState, playerId: string, itemId: st
 export function cancelChannel(state: AuthorityState, playerId: string): RuleEffect {
   const value = powerUpStateOf(state, playerId)
   const pending = value.pending as PendingUse
-  const powerUp = powerUpOfItem(pending.itemId) as PowerUp
+  const powerUp = atResearchedMark(state, playerId, powerUpOfItem(pending.itemId) as PowerUp)
   const refunded = withPending(refundCharge(value, powerUp), null)
   return {
     state: withPowerUpState(state, playerId, refunded),
@@ -139,9 +142,14 @@ function isToggleSwitchingOff(value: PowerUpState, powerUp: PowerUp): boolean {
   return powerUp.isToggle && isToggledOn(value, powerUp.itemId)
 }
 
-function switchToggleOff(state: AuthorityState, playerId: string, pending: PendingUse): RuleEffect {
+function switchToggleOff(
+  state: AuthorityState,
+  playerId: string,
+  pending: PendingUse,
+  powerUp: MarkedPowerUp,
+): RuleEffect {
   const value = withToggle(powerUpStateOf(state, playerId), pending.itemId, false)
-  const used = powerUpUsedOf(subjectOf(playerId, pending), originOf(pending), 0)
+  const used = powerUpUsedOf(subjectOf(playerId, pending), originOf(pending), 0, powerUp.mark)
   return {
     state: withPowerUpState(state, playerId, value),
     events: [{ ...used, toggledOn: false }],
@@ -151,7 +159,7 @@ function switchToggleOff(state: AuthorityState, playerId: string, pending: Pendi
 function effectOfOutcome(
   state: AuthorityState,
   playerId: string,
-  powerUp: PowerUp,
+  powerUp: MarkedPowerUp,
   pending: PendingUse,
   outcome: PowerUpOutcome,
   tick: number,
@@ -196,11 +204,11 @@ function refuseByGate(
   }
 }
 
-/** The item's own effect first, then its cooldown, its toggle and the used line. */
+/** The item's own effect first, then its cooldown at its Mark, its toggle and the used line. */
 function finishActed(
   effect: RuleEffect,
   playerId: string,
-  powerUp: PowerUp,
+  powerUp: MarkedPowerUp,
   pending: PendingUse,
   tick: number,
 ): RuleEffect {
@@ -210,6 +218,7 @@ function finishActed(
     subjectOf(playerId, pending),
     originOf(pending),
     chargesLeftIn(after, powerUp),
+    powerUp.mark,
   )
   return {
     state: withPowerUpState(effect.state, playerId, after),
@@ -225,9 +234,14 @@ function cooledDown(value: PowerUpState, powerUp: PowerUp, tick: number): PowerU
   })
 }
 
-function powerUpUseOf(playerId: string, pending: PendingUse, tick: number): PowerUpUse {
+function powerUpUseOf(
+  playerId: string,
+  pending: PendingUse,
+  tick: number,
+  { mark, magnitude }: MarkedPowerUp,
+): PowerUpUse {
   const { itemId, slot, originTx, originTy } = pending
-  return { playerId, itemId, slot, tick, origin: { tx: originTx, ty: originTy } }
+  return { playerId, itemId, slot, tick, origin: { tx: originTx, ty: originTy }, mark, magnitude }
 }
 
 function subjectOf(playerId: string, pending: PendingUse): UseSubject {

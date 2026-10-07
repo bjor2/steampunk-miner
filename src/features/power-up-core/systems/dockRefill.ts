@@ -2,7 +2,8 @@
  * Charges snap back at the dock (#162 section 2.1, Systems on #200): a free side-effect of the paid
  * recharge (`dockServices`, #217), with no line on the bill. Each refilled item logs its charges
  * after (`charges_refilled {itemId, to}`), so the spend-share read can tell a free refill from a
- * paid buy. Consumable stacks are bought, so the free refill leaves them as they are.
+ * paid buy. Consumable stacks are bought, so the free refill leaves them as they are. Charges
+ * fill to the count at the player's Mark (#249).
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -15,7 +16,8 @@ import {
   type PowerUpState,
 } from './chargeState'
 import { chargesRefilledOf } from './powerUpEvents'
-import { isRefilledAtDock, powerUpOfItem, type PowerUp } from './powerUpKind'
+import { isRefilledAtDock, type PowerUp } from './powerUpKind'
+import { powerUpAtMarkOf, type MarkedPowerUp } from './powerUpMarks'
 
 export const REFILL_CHARGES_SERVICE: DockService = {
   id: 'power-up-core.refill-charges',
@@ -24,7 +26,7 @@ export const REFILL_CHARGES_SERVICE: DockService = {
 
 function refillChargesAtDock(state: AuthorityState, playerId: string): RuleEffect {
   const value = powerUpStateOf(state, playerId)
-  const refilled = spentRefillablesOf(value)
+  const refilled = spentRefillablesOf(state, playerId, value)
   if (refilled.length === 0) return unchanged(state)
   return {
     state: withPowerUpState(state, playerId, refilledAll(value, refilled)),
@@ -32,12 +34,16 @@ function refillChargesAtDock(state: AuthorityState, playerId: string): RuleEffec
   }
 }
 
-/** The charged items with a charge spent, in item order. */
-function spentRefillablesOf(value: PowerUpState): PowerUp[] {
+/** The charged items with a charge spent, in item order, at the player's Mark. */
+function spentRefillablesOf(
+  state: AuthorityState,
+  playerId: string,
+  value: PowerUpState,
+): MarkedPowerUp[] {
   return Object.keys(value.items)
     .filter((itemId) => itemChargesOf(value, itemId).spent > 0)
-    .map(powerUpOfItem)
-    .filter((powerUp): powerUp is PowerUp => powerUp !== null && isRefilledAtDock(powerUp))
+    .map((itemId) => powerUpAtMarkOf(state, playerId, itemId))
+    .filter((powerUp): powerUp is MarkedPowerUp => powerUp !== null && isRefilledAtDock(powerUp))
 }
 
 function refilledAll(value: PowerUpState, refilled: readonly PowerUp[]): PowerUpState {

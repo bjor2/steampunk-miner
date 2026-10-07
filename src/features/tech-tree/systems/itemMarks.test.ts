@@ -16,7 +16,10 @@ describe('tech tree: the Mark an item plays at', () => {
       const session = sessionOnPlanet(11)
       researchAll(session, ['tech.sensing.echo_sounder'])
       expect(researchedMarkOf(session.state(), PLAYER, ECHO_SOUNDER)).toBe(1)
-      researchAll(session, [2, 3, 4].map((mark) => `tech.mark.${ECHO_SOUNDER}.${mark}`))
+      researchAll(
+        session,
+        [2, 3, 4].map((mark) => `tech.mark.${ECHO_SOUNDER}.${mark}`),
+      )
       expect(researchedMarkOf(session.state(), PLAYER, ECHO_SOUNDER)).toBe(4)
     })
   })

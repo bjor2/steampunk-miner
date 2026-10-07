@@ -1,7 +1,9 @@
 /**
  * The power-up core slice's public API (feature-slices.md 2.1): the only file another slice may
  * import from this folder. Item slices register `power-up` entries of these types beside their
- * `vehicle-item` rows, and read charges through `chargesLeftOf` (#162 "Slice and contract").
+ * `vehicle-item` rows, and read charges through `chargesLeftOf` (#162 "Slice and contract"). An
+ * effect that outlasts its use, or a passive's, reads the item at the player's Mark through
+ * `powerUpAtMarkOf` (#249).
  */
 export const POWER_UP_CORE_SLICE_ID = 'power-up-core'
 export {
@@ -17,6 +19,7 @@ export {
   type SlotHold,
 } from './systems/powerUpKind'
 export { chargesLeftOf } from './systems/chargeState'
+export { powerUpAtMarkOf, type MarkedPowerUp } from './systems/powerUpMarks'
 export { returnCharge } from './systems/useResolution'
 export { toggleDrawQuantaOf } from './systems/toggleDraw'
 export { POWER_UP_SLOTS, type PowerUpSlot } from './systems/powerUpSlots'

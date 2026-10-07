@@ -11,6 +11,7 @@ import type { VehicleState } from '../../../systems/vehicle/vehicleState'
 import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
 import { chargesLeftIn, itemChargesOf, powerUpStateOf } from './chargeState'
 import { hasCharges, isUsableFromSlot, powerUpOfItem, type PowerUp } from './powerUpKind'
+import { atResearchedMark } from './powerUpMarks'
 import { isPowerUpSlot } from './powerUpSlots'
 
 export function refusalOfUse(
@@ -83,7 +84,8 @@ function chargesRefusalOf(
   powerUp: PowerUp | null,
 ): Rejection | null {
   if (powerUp === null || !hasCharges(powerUp)) return null
-  if (chargesLeftIn(powerUpStateOf(state, playerId), powerUp) > 0) return null
+  const marked = atResearchedMark(state, playerId, powerUp)
+  if (chargesLeftIn(powerUpStateOf(state, playerId), marked) > 0) return null
   return rejectionOf('power-up-core.no_charges', `"${powerUp.itemId}" has no charges left`)
 }
 

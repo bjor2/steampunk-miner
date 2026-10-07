@@ -15,7 +15,8 @@ import {
   withSection,
   type SaveSection,
 } from '../../../systems/registries/saveSections'
-import { hasCharges, powerUpOfItem, type PowerUp } from './powerUpKind'
+import { hasCharges, type PowerUp } from './powerUpKind'
+import { powerUpAtMarkOf } from './powerUpMarks'
 
 export interface ItemCharges {
   spent: number
@@ -85,9 +86,12 @@ function isFresh(charges: ItemCharges): boolean {
   return charges.spent === 0 && charges.readyAtTick === 0
 }
 
-/** #162 `chargesLeft(playerId, itemId)`: 0 for an item with no charges or not a power-up. */
+/**
+ * #162 `chargesLeft(playerId, itemId)`, out of the charges or stack at the player's Mark (#249): 0
+ * for an item with no charges or not a power-up.
+ */
 export function chargesLeftOf(state: AuthorityState, playerId: string, itemId: string): number {
-  const powerUp = powerUpOfItem(itemId)
+  const powerUp = powerUpAtMarkOf(state, playerId, itemId)
   if (powerUp === null || !hasCharges(powerUp)) return 0
   return chargesLeftIn(powerUpStateOf(state, playerId), powerUp)
 }

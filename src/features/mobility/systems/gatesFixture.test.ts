@@ -73,6 +73,8 @@ describe('mobility gates fixture', () => {
           slot: 'powerup.1',
           tick: 20,
           origin,
+          mark: 0,
+          magnitude: null,
         })
         expect(outcome.kind).not.toBe('blocked')
         if (outcome.kind === 'acted') expect(outcome.effect.state.world).toBe(state.world)
@@ -92,6 +94,8 @@ describe('mobility gates fixture', () => {
         slot: 'powerup.1',
         tick: 20,
         origin: { tx: tile.tx, ty: tile.ty - 2 },
+        mark: 0,
+        magnitude: null,
       })
       expect(outcome.kind).toBe('acted')
       if (outcome.kind !== 'acted') return

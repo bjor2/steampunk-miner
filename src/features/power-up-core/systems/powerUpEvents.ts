@@ -70,27 +70,23 @@ declare module '../../../systems/authority/domainEvent' {
   }
 }
 
-/**
- * Every use logs Mark 0 until the tech tree's Marks land (#161, #165); the field is in the line
- * from the start so the log schema does not change when they do.
- */
-export const MARK_BEFORE_THE_TREE = 0
-
 export interface UseSubject {
   playerId: string
   itemId: string
   slot: LoadoutSlotId
 }
 
+/** `mark` is the Mark the use acted at (#249): 0 for an item the player researched none of. */
 export function powerUpUsedOf(
   subject: UseSubject,
   origin: { originTx: number; originTy: number },
   chargesLeft: number,
+  mark: number,
 ) {
   return {
     type: 'power-up-core.PowerUpUsed' as const,
     ...subject,
-    mark: MARK_BEFORE_THE_TREE,
+    mark,
     ...origin,
     chargesLeft,
   }
