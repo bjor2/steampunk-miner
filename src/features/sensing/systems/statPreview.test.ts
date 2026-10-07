@@ -78,14 +78,23 @@ describe('sensing stat preview', () => {
     })
   })
 
-  it('shows no stat line for a passive until #203 names its magnitude', () => {
-    expect(statPreview('passive.hazard_barometer', 1, PLANET)).toEqual({
-      itemId: 'passive.hazard_barometer',
-      mark: 1,
-      stepped: null,
-      isMastered: false,
-      lines: [],
-    })
+  it('shows each passive as bought: periscope radius 10, lens radius 6, barometer lookahead 4', () => {
+    expect(valuesOf(statPreview('passive.threat_periscope', 1, PLANET))).toEqual({ radius: 10 })
+    expect(valuesOf(statPreview('passive.assay_lens', 1, PLANET))).toEqual({ radius: 6 })
+    expect(valuesOf(statPreview('passive.hazard_barometer', 1, PLANET))).toEqual({ lookahead: 4 })
+  })
+
+  it('steps a passive magnitude only, and masters it at twice its base (#162 4.4)', () => {
+    expect(statPreview('passive.threat_periscope', 2, PLANET)!.stepped).toBe('magnitude')
+    expect(statPreview('passive.threat_periscope', 3, PLANET)!.stepped).toBe('magnitude')
+    const masteredValues = [
+      'passive.threat_periscope',
+      'passive.assay_lens',
+      'passive.hazard_barometer',
+    ]
+      .map((itemId) => statPreview(itemId, lastMarkOf(itemId), PLANET))
+      .map(valuesOf)
+    expect(masteredValues).toEqual([{ radius: 20 }, { radius: 12 }, { lookahead: 8 }])
   })
 
   it('reads the same on every planet', () => {

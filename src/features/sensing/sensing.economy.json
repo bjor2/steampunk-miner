@@ -1,8 +1,14 @@
 {
-  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 one-off price (k 15 band-5 ore at the unlock planet) and consumable unit price (k 2 band-5 ore at the current planet), 4.2 charged items, 4.3 consumables. A slice's numbers live beside it (feature-slices.md 1.1).",
+  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 one-off price (k 15 band-5 ore at the unlock planet) and consumable unit price (k 2 band-5 ore at the current planet), 4.2 charged items, 4.3 consumables, 4.4 the passives' base magnitudes (set by Content on 7 Oct, gap S3 of the #157 review, comment on #203). A slice's numbers live beside it (feature-slices.md 1.1).",
   "items": {
-    "price": { "band": 5, "oreUnits": "15" },
-    "unitPrice": { "band": 5, "oreUnits": "2" },
+    "price": {
+      "band": 5,
+      "oreUnits": "15"
+    },
+    "unitPrice": {
+      "band": 5,
+      "oreUnits": "2"
+    },
     "charged": {
       "power.echo_sounder": {
         "charges": 3,
@@ -26,8 +32,26 @@
       }
     },
     "consumable": {
-      "consumable.flare_mortar": { "stack": 3, "rangeTiles": 30, "radiusTiles": 6 },
-      "consumable.signal_buoy": { "stack": 3, "radiusTiles": 4 }
+      "consumable.flare_mortar": {
+        "stack": 3,
+        "rangeTiles": 30,
+        "radiusTiles": 6
+      },
+      "consumable.signal_buoy": {
+        "stack": 3,
+        "radiusTiles": 4
+      }
+    },
+    "passive": {
+      "passive.threat_periscope": {
+        "radiusTiles": 10
+      },
+      "passive.assay_lens": {
+        "radiusTiles": 6
+      },
+      "passive.hazard_barometer": {
+        "lookaheadCells": 4
+      }
     }
   }
 }

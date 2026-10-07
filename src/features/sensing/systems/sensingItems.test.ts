@@ -120,9 +120,10 @@ describe('sensing items', () => {
     })
   })
 
-  it('leaves a passive without a ladder until #203 names its magnitude', () => {
-    expect(markLadderOf(itemNamed('passive.assay_lens'))).toBeNull()
-    expect(techNodeOf(itemNamed('passive.assay_lens')).marks).toBeUndefined()
+  it('ladders a passive by its magnitude alone, with no cooldown and no charges (#162 4.6)', () => {
+    const ladder = { isIncomeItem: false, magnitude: { base: 6 } }
+    expect(markLadderOf(itemNamed('passive.assay_lens'))).toEqual(ladder)
+    expect(techNodeOf(itemNamed('passive.assay_lens')).marks).toEqual(ladder)
   })
 
   it('prices a charged item or passive at 15 band-5 ore on its unlock planet, on any planet', () => {

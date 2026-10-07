@@ -12,6 +12,7 @@ import {
   SENSING_ECONOMY,
   type ChargedSensingBalance,
   type ConsumableSensingBalance,
+  type PassiveSensingBalance,
 } from './sensingEconomy'
 
 export function vehicleItemOf(item: SensingItem): VehicleItem {
@@ -28,19 +29,23 @@ export function consumableBalanceOf(item: SensingItem): ConsumableSensingBalance
   return rowOf(SENSING_ECONOMY.consumable, item.itemId, 'items.consumable')
 }
 
+/** The passive's `items.passive.<id>` row; every passive here has one. */
+export function passiveBalanceOf(item: SensingItem): PassiveSensingBalance {
+  return rowOf(SENSING_ECONOMY.passive, item.itemId, 'items.passive')
+}
+
 /**
  * The Mark 1 ladder (#162 4.6, the #165 rotation): a charged item steps cooldown, then reveal
- * time, then charges; a consumable steps its ring radius, then its stack. Null for a passive:
- * #162 gives it a magnitude only and names no base, so #203 sets it with the effect.
+ * time, then charges; a consumable steps its ring radius, then its stack; a passive steps its
+ * radius or lookahead only (4.4).
  */
-export function markLadderOf(item: SensingItem): MarkLadder | null {
+export function markLadderOf(item: SensingItem): MarkLadder {
   if (item.powerUpClass === 'charged') return chargedLadderOf(chargedBalanceOf(item))
   if (item.powerUpClass === 'consumable') return consumableLadderOf(consumableBalanceOf(item))
-  return null
+  return passiveLadderOf(passiveBalanceOf(item))
 }
 
 export function techNodeOf(item: SensingItem): TechNode {
-  const marks = markLadderOf(item)
   const { requiresDiscovery } = item.node
   return {
     id: item.node.id,
@@ -54,7 +59,7 @@ export function techNodeOf(item: SensingItem): TechNode {
     description: item.description,
     label: item.label,
     costKind: 'capability',
-    ...(marks !== null && { marks }),
+    marks: markLadderOf(item),
   }
 }
 
@@ -88,6 +93,10 @@ function chargedLadderOf(balance: ChargedSensingBalance): MarkLadder {
 
 function consumableLadderOf(balance: ConsumableSensingBalance): MarkLadder {
   return { isIncomeItem: false, magnitude: { base: balance.radiusTiles }, charges: balance.stack }
+}
+
+function passiveLadderOf(balance: PassiveSensingBalance): MarkLadder {
+  return { isIncomeItem: false, magnitude: { base: balance.magnitude } }
 }
 
 function rowOf<Row>(rows: Readonly<Record<string, Row>>, itemId: string, path: string): Row {

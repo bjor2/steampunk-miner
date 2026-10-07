@@ -5,12 +5,17 @@
  */
 import { markStepOf, type MarkStatName, type MarkStats } from '../../tech-tree'
 import { sensingItemOf, type SensingItem } from './sensingCatalogue'
-import { chargedBalanceOf, consumableBalanceOf, markLadderOf } from './sensingItems'
+import {
+  chargedBalanceOf,
+  consumableBalanceOf,
+  markLadderOf,
+  passiveBalanceOf,
+} from './sensingItems'
 
 export type SensingStatName =
-  'charges' | 'cooldown' | 'windup' | 'radius' | 'reveal' | 'stack' | 'range'
+  'charges' | 'cooldown' | 'windup' | 'radius' | 'reveal' | 'stack' | 'range' | 'lookahead'
 
-export type SensingStatUnit = 'charges' | 'ticks' | 'tiles' | 'crates'
+export type SensingStatUnit = 'charges' | 'ticks' | 'tiles' | 'crates' | 'cells'
 
 export interface SensingStatLine {
   stat: SensingStatName
@@ -22,10 +27,9 @@ export interface SensingStatLine {
 export interface SensingStatPreview {
   itemId: string
   mark: number
-  /** The stat this Mark changed; null for Mark 1, past mastery and for a passive. */
+  /** The stat this Mark changed; null for Mark 1 and past mastery. */
   stepped: MarkStatName | null
   isMastered: boolean
-  /** Empty for a passive until #203 sets its magnitude (#162 4.6 names none). */
   lines: readonly SensingStatLine[]
 }
 
@@ -44,21 +48,20 @@ export function statPreview(
 }
 
 function previewOf(item: SensingItem, mark: number): SensingStatPreview {
-  const ladder = markLadderOf(item)
-  const step = ladder === null ? null : markStepOf(ladder, mark)
+  const step = markStepOf(markLadderOf(item), mark)
   return {
     itemId: item.itemId,
     mark,
-    stepped: step?.stepped ?? null,
-    isMastered: step?.isMastered ?? false,
-    lines: step === null ? [] : linesOf(item, step.stats),
+    stepped: step.stepped,
+    isMastered: step.isMastered,
+    lines: linesOf(item, step.stats),
   }
 }
 
 function linesOf(item: SensingItem, stats: MarkStats): readonly SensingStatLine[] {
-  return item.powerUpClass === 'charged'
-    ? chargedLinesOf(item, stats)
-    : consumableLinesOf(item, stats)
+  if (item.powerUpClass === 'charged') return chargedLinesOf(item, stats)
+  if (item.powerUpClass === 'consumable') return consumableLinesOf(item, stats)
+  return passiveLinesOf(item, stats)
 }
 
 function chargedLinesOf(item: SensingItem, stats: MarkStats): readonly SensingStatLine[] {
@@ -79,6 +82,15 @@ function consumableLinesOf(item: SensingItem, stats: MarkStats): readonly Sensin
     ...optionalLine('range', 'Range', balance.rangeTiles, 'tiles'),
     line('radius', 'Radius', stats.magnitude ?? balance.radiusTiles, 'tiles'),
   ]
+}
+
+/** A ring around the miner in tiles (periscope, lens), or cells ahead of the drill (barometer). */
+function passiveLinesOf(item: SensingItem, stats: MarkStats): readonly SensingStatLine[] {
+  const balance = passiveBalanceOf(item)
+  const magnitude = stats.magnitude ?? balance.magnitude
+  return balance.reach === 'radius'
+    ? [line('radius', 'Radius', magnitude, 'tiles')]
+    : [line('lookahead', 'Lookahead', magnitude, 'cells')]
 }
 
 /** One line, or none for a stat the item does not have. */

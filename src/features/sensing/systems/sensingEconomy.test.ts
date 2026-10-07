@@ -42,6 +42,14 @@ describe('sensing economy', () => {
     })
   })
 
+  it("reads the passives' base magnitudes of #162 4.4: periscope 10 and lens 6 tiles, barometer 4 cells", () => {
+    expect(SENSING_ECONOMY.passive).toEqual({
+      'passive.threat_periscope': { reach: 'radius', magnitude: 10 },
+      'passive.assay_lens': { reach: 'radius', magnitude: 6 },
+      'passive.hazard_barometer': { reach: 'lookahead', magnitude: 4 },
+    })
+  })
+
   it('refuses the whole file and lists every broken field', () => {
     const broken: { items: Record<string, Record<string, unknown>> } = structuredClone(economyFile)
     broken.items.unitPrice = { band: 5, oreUnits: -2 }
@@ -54,11 +62,15 @@ describe('sensing economy', () => {
     broken.items.consumable = {
       'consumable.signal_buoy': { stack: 3 },
     }
+    broken.items.passive = {
+      'passive.assay_lens': { radiusTiles: 6, lookaheadCells: 4 },
+    }
     expect(readSensingEconomy(broken)).toEqual({
       problems: [
         'items.unitPrice.oreUnits must be a decimal string >= 0',
         'items.charged.power.void_sounder.radiusTiles must be a safe integer',
         'items.consumable.consumable.signal_buoy.radiusTiles must be a safe integer',
+        'items.passive.passive.assay_lens must name exactly one of radiusTiles and lookaheadCells',
       ],
     })
   })
