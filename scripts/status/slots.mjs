@@ -185,6 +185,8 @@ function readTester(raw) {
     claudeSlot: positiveIntegerOrNull(t.claude_slot),
     lastRunAt: stampOrNull(t.last_run),
     mainRedSha: publicTextOrNull(t.main_red_sha),
+    feature: positiveIntegerOrNull(t.feature),
+    queued: Array.isArray(t.queue) ? t.queue.length : 0,
   }
 }
 

@@ -179,8 +179,12 @@ describe('gate tokens and the box Tester (2026-10-07)', () => {
       since: UPDATED,
       holds_gate: true,
       claude_slot: 1,
+      feature: 90,
+      queue: [{ feature: 214 }],
     })
     const html = renderSlotsPanel(model, view(model))
+    expect(html).toContain('feature <a href="https://github.com/o/r/issues/90">#90</a>')
+    expect(html).toContain('1 feature(s) awaiting test')
     expect(html).toContain('Gate tokens <b>2/3</b> busy')
     expect(html).toContain('holds a gate token + Claude slot C1')
     expect(html).toContain('aux · tester-triage')
