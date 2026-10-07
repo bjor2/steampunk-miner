@@ -953,6 +953,7 @@ Solid arrows are registrations and kernel reads. Dotted arrows are the only slic
 | Ore look | `ore-visuals` | `chunkTileBatch` | `oreLook` |
 | Discovery | `codex` | `tech-tree`, `sensing` | `discovery` |
 | Item slots and attach | item slices | loadout rule (K4), scene (K5) | `vehicle-loadout`, `vehicle-attach` |
+| Extractor tree nodes (`tech.extraction.*`, unlocking `rig.*` by id; `class:<gateClass>` as `ore:<family>` keys) | `extraction` (reads the `mining-gates` and `planet-mix` index; #201 TD lock) | `tech-tree` (its spec fixture takes them from the `extraction` index, no copy) | `content` (`tech-node`) |
 | Icons | every slice's `icons/` + `iconId` on entries | `VectorIcon` | icon registry + coverage test |
 
 ## 5. Determinism and save

@@ -103,7 +103,7 @@ describe('tech tree screen: node cards', () => {
         registeredTechTree(),
         'tech.extraction.resonance_fork',
       )!
-      expect(card.discoveryHint).toBe('Find resonance ore to research it a planet early.')
+      expect(card.discoveryHint).toBe('Find crystal ore to research it a planet early.')
       expect(card.prereqNames).toEqual([])
     })
   })
@@ -138,7 +138,7 @@ describe('tech tree screen: next up, search and filters', () => {
         modelOn(3, { search, filters: [] }).lanes.flatMap((lane) => lane.nodes.map((n) => n.id))
       expect(found('grapple')).toEqual(['tech.mobility.grapple_winch'])
       expect(found('POWER.ECHO')).toEqual(['tech.sensing.echo_sounder'])
-      expect(found('  ')).toHaveLength(50)
+      expect(found('  ')).toHaveLength(49)
     })
   })
 
@@ -151,8 +151,8 @@ describe('tech tree screen: next up, search and filters', () => {
         'tech.sensing.echo_sounder',
         'tech.mobility.grapple_winch',
       ])
-      expect(kept(['locked'])).toHaveLength(47)
-      expect(kept(['affordable', 'locked'])).toHaveLength(50)
+      expect(kept(['locked'])).toHaveLength(46)
+      expect(kept(['affordable', 'locked'])).toHaveLength(49)
       expect(kept(['marks'])).toEqual([])
     })
   })

@@ -54,7 +54,7 @@ export interface NodeCardModel {
   prereqNames: readonly string[]
   /** The prerequisites as one line: "Nothing" for none. */
   prereqText: string
-  /** How to research it early, such as "Find resonance ore to research it a planet early." */
+  /** How to research it early, such as "Find crystal ore to research it a planet early." */
   discoveryHint: string | null
   markChip: MarkChipModel | null
 }

@@ -2,10 +2,9 @@
  * The extraction lane's store items (spec #162 section 1, the extractors table; #161 section 1 for
  * the tree nodes): the mineral drain and the slurry siphon, as catalogue rows, and the
  * `vehicle-item` rows, tech nodes and prices made from them. The extractors themselves belong to
- * `mining-gates` (#142), the drain combos to the tree.
+ * `mining-gates` (#142), their tree nodes to `extractorNodes.ts`, the drain combos to the tree.
  *
- * Vision rows (ticket 239, the data half of #201): nothing here is registered, so no store, tree,
- * item card or bot sees them; #201 registers them with the effect.
+ * What is registered is chosen in `extractionContent.ts`: the drain ships, the siphon is held.
  */
 import type { Money } from '../../../systems/money'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'

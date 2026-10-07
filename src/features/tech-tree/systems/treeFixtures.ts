@@ -1,9 +1,14 @@
 /**
- * The authored campaign tree of spec #161 section 1 (50 nodes) and the combo templates of
- * section 2, as fixtures: the lane slices (#200-#206) register the real rows, so the tree's rules,
- * the shape test and the cost tables are proved on this copy until they land. Mark ladders take
- * the #162 section 4.2 and 4.3 numbers where they exist; the rest are stand-ins of the same shape.
+ * The authored campaign tree of spec #161 section 1 and the combo templates of section 2, as
+ * fixtures: the lane slices (#200-#206) register the real rows, so the tree's rules, the shape
+ * test and the cost tables are proved on this copy until they land. Mark ladders take the #162
+ * section 4.2 and 4.3 numbers where they exist; the rest are stand-ins of the same shape.
+ *
+ * The extraction lane's nodes are not copied: they are the `extraction` slice's own, so each has
+ * one registrar (TD lock on #201 Q2). The slurry siphon's node is held with the siphon, so the
+ * tree has 49 nodes.
  */
+import { extractionTechNodes } from '../../extraction'
 import type { DiscoveryRequirement, MarkLadder, TechComboTemplate, TechNode } from './techNode'
 
 type Row = readonly [
@@ -18,69 +23,6 @@ type Row = readonly [
 
 // lane, P, node name, player-facing name, prereqs (short names), item, discovery.
 const ROWS: readonly Row[] = [
-  [
-    'extraction',
-    4,
-    'resonance_fork',
-    'Resonance Fork',
-    [],
-    'rig.resonance',
-    { anyOf: ['ore:resonance'] },
-  ],
-  [
-    'extraction',
-    9,
-    'mineral_drain',
-    'Mineral drain',
-    ['extraction.resonance_fork'],
-    'power.mineral_drain',
-    null,
-  ],
-  [
-    'extraction',
-    11,
-    'containment_hood',
-    'Containment Hood',
-    [],
-    'rig.containment',
-    { anyOf: ['ore:containment'] },
-  ],
-  [
-    'extraction',
-    16,
-    'slurry_siphon',
-    'Slurry siphon',
-    ['extraction.mineral_drain'],
-    'power.slurry_siphon',
-    null,
-  ],
-  [
-    'extraction',
-    18,
-    'acid_etcher',
-    'Acid Etcher',
-    [],
-    'rig.acid_etcher',
-    { anyOf: ['ore:etcher'] },
-  ],
-  [
-    'extraction',
-    25,
-    'induction_coil',
-    'Induction Coil',
-    [],
-    'rig.induction',
-    { anyOf: ['ore:induction'] },
-  ],
-  [
-    'extraction',
-    32,
-    'aether_tether',
-    'Aether Tether',
-    [],
-    'rig.aether_tether',
-    { anyOf: ['ore:tether'] },
-  ],
   ['terrain', 3, 'stabiliser_foam', 'Stabiliser foam', [], 'consumable.stabiliser_foam', null],
   ['terrain', 6, 'ore_shifter', 'Magnetic ore-shifter', [], 'power.ore_shifter', null],
   [
@@ -437,7 +379,6 @@ const KNOWN_LADDERS: Readonly<Record<string, MarkLadder>> = {
     magnitude: { base: 8, limit: 64 },
     charges: 2,
   },
-  'power.mineral_drain': { isIncomeItem: true, cooldown: 900, magnitude: { base: 6 }, charges: 2 },
   'power.steam_boost': { isIncomeItem: false, cooldown: 240, magnitude: { base: 30 }, charges: 3 },
   'power.pressure_pocket': {
     isIncomeItem: true,
@@ -445,7 +386,6 @@ const KNOWN_LADDERS: Readonly<Record<string, MarkLadder>> = {
     magnitude: { base: 2 },
     charges: 2,
   },
-  'power.slurry_siphon': { isIncomeItem: true, cooldown: 600, magnitude: { base: 6 }, charges: 3 },
   'power.steam_shield': {
     isIncomeItem: false,
     cooldown: 900,
@@ -475,7 +415,10 @@ const STAND_IN_LADDER: MarkLadder = { isIncomeItem: false, cooldown: 300, magnit
 const MARK_BEARING_ITEM = /^(power|consumable|passive|gear)\./
 
 /** The 50 authored nodes, ids `tech.<lane>.<name>` as #161 writes them (lane in snake case, #224). */
-export const AUTHORED_TREE_FIXTURE: readonly TechNode[] = ROWS.map(nodeOfRow)
+export const AUTHORED_TREE_FIXTURE: readonly TechNode[] = [
+  ...extractionTechNodes(),
+  ...ROWS.map(nodeOfRow),
+]
 
 /** The ten lane-pair templates: the six authored combos and the four #161 adds. */
 export const COMBO_TEMPLATES_FIXTURE: readonly TechComboTemplate[] = [

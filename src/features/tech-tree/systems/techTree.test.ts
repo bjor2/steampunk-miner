@@ -51,10 +51,10 @@ describe('tech tree: structure', () => {
 })
 
 describe('tech tree: Marks', () => {
-  it('bears Marks on the 36 power-ups, consumables, passives and drill gear only', () => {
+  it('bears Marks on the 35 power-ups, consumables, passives and drill gear only, the held siphon aside', () => {
     withFixtureTree((tree) => {
       const items = tree.markBearers.map((bearer) => bearer.capability.unlocks.itemId)
-      expect(items).toHaveLength(36)
+      expect(items).toHaveLength(35)
       expect(items.some((item) => /^(rig|slot|combo)\./.test(item))).toBe(false)
     })
   })

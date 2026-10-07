@@ -143,8 +143,8 @@ describe('tech tree: discovery', () => {
 
   it('counts any key of an anyOf requirement', () => {
     withFixtureTree(() => {
-      researchAll(sessionOnPlanet(4), ['tech.extraction.resonance_fork'])
-    }, [codexWhoMet(['ore:resonance'])])
+      researchAll(sessionOnPlanet(11), ['tech.extraction.containment_hood'])
+    }, [codexWhoMet(['ore:organic'])])
   })
 })
 
