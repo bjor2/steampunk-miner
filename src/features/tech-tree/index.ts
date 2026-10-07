@@ -21,6 +21,7 @@ export type {
 } from './systems/techNode'
 export { TECH_LANES } from './systems/techNode'
 export { isMasteredAt, lastMarkOf, markStepOf } from './systems/markLadder'
+export { markLadderOfItem, researchedMarkOf } from './systems/itemMarks'
 export type { MarkStatName, MarkStats, MarkStep } from './systems/markLadder'
 export { nodeCostOf } from './systems/nodeCost'
 export {
