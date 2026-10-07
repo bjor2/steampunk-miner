@@ -72,17 +72,17 @@ describe('ore catalogue', () => {
     }
   })
 
-  it("rolls rarer leads deeper: #140's weights per band, at most +8.3% value", () => {
+  it("rolls rarer leads deeper: #140's weights halved by its pace fallback, at most +4.2% value", () => {
     expect(BANDS.map((band) => leadWeights(band))).toEqual([
-      { plus1Bp: 500, plus2Bp: 0 },
-      { plus1Bp: 600, plus2Bp: 0 },
-      { plus1Bp: 700, plus2Bp: 100 },
-      { plus1Bp: 800, plus2Bp: 200 },
-      { plus1Bp: 900, plus2Bp: 300 },
+      { plus1Bp: 250, plus2Bp: 0 },
+      { plus1Bp: 300, plus2Bp: 0 },
+      { plus1Bp: 350, plus2Bp: 50 },
+      { plus1Bp: 400, plus2Bp: 100 },
+      { plus1Bp: 450, plus2Bp: 150 },
     ])
     const multipliers = BANDS.map(expectedValueMultiplier)
-    ;[1.025, 1.03, 1.048, 1.065, 1.083].forEach((spec, at) =>
-      expect(multipliers[at]).toBeCloseTo(spec, 3),
+    ;[1.0125, 1.015, 1.02375, 1.0325, 1.04125].forEach((spec, at) =>
+      expect(multipliers[at]).toBeCloseTo(spec, 4),
     )
   })
 

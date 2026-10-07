@@ -5,7 +5,8 @@
  * - `ores.economy.json`: the rarity lead weights per band, the signature value lead and share caps,
  *   and the variants per family. #140 writes the weights as fractions (`plus1` 0.05); they are stored
  *   in basis points so the generation hook rolls them in integers and no fraction collides with
- *   the economy source scan.
+ *   the economy source scan. Both rows are #140's halved, its pace fallback (acceptance 6): at full
+ *   weight the slice ran under 100 minutes on the seed median (#146 re-baseline).
  * - `oreFamilies.json`: #141's 12 families in its table order. A family's place in the list is its
  *   code in the cell's 4-bit family field, plus one (`metal` 1 and `crystal` 2, as the kernel's
  *   `RESOURCE_FAMILY` already writes them), so the order is append-only.

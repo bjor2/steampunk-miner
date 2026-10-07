@@ -35,6 +35,10 @@ describe('vertical source hash', () => {
     const committed = sourceHashAt(REPO_ROOT)
     expect(committed).toMatch(/^[0-9a-f]{16}$/)
     expect(sourceHashWithOresFile((text) => text)).toBe(committed)
-    expect(sourceHashWithOresFile((text) => text.replace('[500,', '[250,'))).not.toBe(committed)
+    expect(
+      sourceHashWithOresFile((text) =>
+        text.replace('"signatureValueLead": 1', '"signatureValueLead": 2'),
+      ),
+    ).not.toBe(committed)
   })
 })

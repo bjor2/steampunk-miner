@@ -83,10 +83,10 @@ describe('drill gates', () => {
   })
 
   it('reports an ore cell a gate refuses as one DrillGated naming the ore and the verdict (K2)', () => {
-    const ore = oreOnTile()
-    const events = withRegistrations([gateSliceOf('refused')], () =>
-      mineTile(createScriptedSession(), 1, ORE_TILE),
-    )
+    const { ore, events } = withRegistrations([gateSliceOf('refused')], () => ({
+      ore: oreOnTile(),
+      events: mineTile(createScriptedSession(), 1, ORE_TILE),
+    }))
     expect(drillGatedOf(events)).toEqual([
       expect.objectContaining({
         type: 'DrillGated',

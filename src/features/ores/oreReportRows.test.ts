@@ -100,7 +100,7 @@ describe('ore report rows', () => {
       ...minedUnit(10, B4_FIRST, 4, 0, 30),
       ...minedUnit(20, B4_SECOND, 4, 2, 30),
     ])
-    expect(rows['mean value per unit over V(t_b) by band (expected)']).toBe('b4 x1.625 (x1.065)')
+    expect(rows['mean value per unit over V(t_b) by band (expected)']).toBe('b4 x1.625 (x1.032)')
   })
 
   it("prints band 5's median drill ticks per tile by lead, blasted tiles left out", () => {

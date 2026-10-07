@@ -31,6 +31,7 @@ import { readSaveSlot } from './saveSlot'
  */
 const GENERATOR_STEP = { version: 'generatorVersion', from: 5, to: 6 }
 const SNAPSHOT_STEP = { version: 'snapshotVersion', from: 18, to: 19 }
+const ORE_LEAD_STEP = { version: 'generatorVersion', from: 6, to: 7 }
 
 const NOTES: SaveSection<readonly string[]> = {
   id: 'save-probe.notes',
@@ -47,6 +48,12 @@ const NOTES_SLICE: SliceDefinition = {
   register: (r) => r.saveSection(NOTES as SaveSection<never>),
 }
 
+/** A save as the build before #146 wrote it: this chain's file, stamped generator 6. */
+function generator6SaveOf(file: unknown): unknown {
+  const { migrated } = migrateSaveSlot(file)
+  return { ...(migrated as object), generatorVersion: 6 }
+}
+
 function restored(file: unknown) {
   const reading = readMigratedSaveSlot(file)
   if (!('state' in reading)) throw new Error(reading.problems.join('; '))
@@ -61,9 +68,9 @@ describe('save migration chain', () => {
     ])
   })
 
-  it('loads a pre-#175 save through the snapshot 18 -> 19 step, then the generator 5 -> 6 step', () => {
+  it('loads a pre-#175 save through the snapshot 18 -> 19 step, then the generator 5 -> 6 and 6 -> 7 steps', () => {
     const reading = withRegistrations([], () => restored(PLANET_1_SAVE))
-    expect(reading.migrations).toEqual([SNAPSHOT_STEP, GENERATOR_STEP])
+    expect(reading.migrations).toEqual([SNAPSHOT_STEP, GENERATOR_STEP, ORE_LEAD_STEP])
     expect(reading.saveEpoch).toBe(3)
   })
 
@@ -75,6 +82,7 @@ describe('save migration chain', () => {
     expect(reading.migrations).toEqual([
       SNAPSHOT_STEP,
       GENERATOR_STEP,
+      ORE_LEAD_STEP,
       { restoredSections: [{ section: 'save-probe.notes' }] },
     ])
     expect(notes).toEqual([])
@@ -121,12 +129,24 @@ describe('save migration chain', () => {
     )
   })
 
-  it('writes the params this build generates and generator version 6', () => {
+  it('writes the params this build generates and generator version 7', () => {
     const { migrated } = migrateSaveSlot(PLANET_10_SAVE)
     expect(migrated).toMatchObject({
-      generatorVersion: 6,
+      generatorVersion: 7,
       world: { params: planetParamsFor(83921, 10) },
     })
+  })
+
+  it('keeps every chunk edit, the wallet and the levels of a generator 6 save (#146)', () => {
+    const before146 = generator6SaveOf(PLANET_10_SAVE)
+    const reading = restored(before146)
+    expect(reading.migrations).toEqual([ORE_LEAD_STEP])
+    const { state } = reading
+    const saved = restored(PLANET_10_SAVE).state
+    expect(Object.keys(state.world.chunks)).toEqual(Object.keys(saved.world.chunks))
+    expect(state.world.chunks).toEqual(saved.world.chunks)
+    expect(toCanonical(state.players.p1.wallet)).toBe(toCanonical(saved.players.p1.wallet))
+    expect(state.players.p1.vehicle.levels).toEqual(saved.players.p1.vehicle.levels)
   })
 
   it('runs no step on a save of this build', () => {

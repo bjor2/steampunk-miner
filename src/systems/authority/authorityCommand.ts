@@ -68,8 +68,10 @@ import type { BayId } from '../world/dockBays'
  *    and `BuyCasingGrade` carry `chain` (0 a click, else the hold's id), a held step under the
  *    service reserve is refused `service_reserve`, and their purchase events carry the chain and,
  *    for a held step, `reserveLeft`; `CommandRejected` names the chain of a refused held step.
+ * 29: the ores slice's catalogue names every ore (#146): `CargoAdded.oreId` is `<family>_t<tier>`
+ *    with its `family` and `signature`, and lead cells carry tiers up to two above their band.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 28
+export const AUTHORITY_PROTOCOL_VERSION = 29
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

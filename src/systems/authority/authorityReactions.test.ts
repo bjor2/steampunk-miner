@@ -163,12 +163,14 @@ describe('authority reactions', () => {
   })
 
   it('reads the ore a drill touched from the state before the command that broke it', () => {
-    const session = withRegistrations([probeSliceOf(ORE_TOUCH)], () => {
+    const { session, ore } = withRegistrations([probeSliceOf(ORE_TOUCH)], () => {
       const scripted = createScriptedSession()
-      return { events: mineTile(scripted, 1, ORE_TILE), after: scripted.state() }
+      const cell = cellAt(EMPTY_WORLD, PARAMS, ORE_TILE)
+      return {
+        session: { events: mineTile(scripted, 1, ORE_TILE), after: scripted.state() },
+        ore: oreTypeOf({ tier: resourceTierOf(PARAMS, cell), cellFamily: familyOfCell(cell) }),
+      }
     })
-    const cell = cellAt(EMPTY_WORLD, PARAMS, ORE_TILE)
-    const ore = oreTypeOf({ tier: resourceTierOf(PARAMS, cell), cellFamily: familyOfCell(cell) })
     expect(session.events.map((event) => event.type)).toContain('TileDestroyed')
     expect(oreTypeAtTile(session.after, ORE_TILE)).toBeNull()
     expect(session.events.filter((event) => event.type === 'probe.OreTouched')).toEqual([

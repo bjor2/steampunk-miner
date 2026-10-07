@@ -36,7 +36,7 @@ function leadSharesBp(seed: number, band: number): [number, number] {
 
 /** Every tile of chunk `(cx, cy)` with its cell, with and without the lead hook. */
 function chunkWithAndWithoutLeads(params: PlanetParams, cx: number, cy: number) {
-  const plain = generateChunkCells(params, cx, cy)
+  const plain = withRegistrations([], () => generateChunkCells(params, cx, cy))
   const leaded = withRegistrations([leadSlice], () => generateChunkCells(params, cx, cy))
   return Array.from(plain, (cell, index) => ({
     tile: {
@@ -56,10 +56,10 @@ function columnChunks(params: PlanetParams): number[] {
 
 describe('ore rarity lead', () => {
   it('rolls +2 below plus2, +1 below plus2 + plus1, else 0', () => {
-    expect([0, 299, 300, 1199, 1200, 9999].map((roll) => leadOfRoll(5, roll))).toEqual([
+    expect([0, 149, 150, 599, 600, 9999].map((roll) => leadOfRoll(5, roll))).toEqual([
       2, 2, 1, 1, 0, 0,
     ])
-    expect([0, 499, 500].map((roll) => leadOfRoll(1, roll))).toEqual([1, 1, 0])
+    expect([0, 249, 250].map((roll) => leadOfRoll(1, roll))).toEqual([1, 1, 0])
   })
 
   it.each(BANDS)('rolls band %i leads at its weights within 0.2 pp over 90,000 patches', (band) => {
@@ -101,7 +101,8 @@ describe('ore rarity lead', () => {
       expect(tierOffsetOfCell(leaded)).toBe(tierOffsetOfCell(plain) + leads[at])
       expect(tierOffsetOfCell(plain)).toBe(bandOfTile(params, tile.tx, tile.ty) - 1)
     })
-    expect(new Set(leads)).toEqual(new Set([0, 1, 2]))
+    expect(leads.every((lead) => lead >= 0 && lead <= 2)).toBe(true)
+    expect(new Set(leads).size).toBeGreaterThan(1)
   })
 
   it('reads no lead off a cell the hook never touched', () => {

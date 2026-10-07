@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { baseCellOfTile, generateBaseTerrain } from './baseTerrain'
 import { dockGuaranteeCount, isInDockCone } from './dockGuarantee'
 import { dockSiteOf } from './dockSite'
+import { withFreshRegistrySet } from '../registries/seal'
 import { generateChunk } from './generateChunk'
 import { bandPatchesInBox } from './orePatches'
 import { bandOfTile } from './planetGeometry'
@@ -35,6 +36,14 @@ function planetOreOf(params: PlanetParams): PlanetOre {
   }
   ore.patchSizesByBand = patchSizesOf(ore.oreTiles)
   return ore
+}
+
+/** The kernel's lattice, before any slice's generation hook folds over it (#146's rarity lead). */
+function kernelPlanetOreOf(params: PlanetParams): PlanetOre {
+  return withFreshRegistrySet(
+    () => {},
+    () => planetOreOf(params),
+  )
 }
 
 function countChunk(ore: PlanetOre, params: PlanetParams, cx: number, cy: number): void {
@@ -93,7 +102,7 @@ function mean(values: readonly number[]): number {
 }
 
 const PLANETS = [planetParamsFor(83921, 1), planetParamsFor(83921, 2)]
-const ORE = PLANETS.map(planetOreOf)
+const ORE = PLANETS.map(kernelPlanetOreOf)
 
 describe('ore patches (#42)', () => {
   it.each([0, 1])('keeps each band within 5% of its #6 ore density on planet %i + 1', (planet) => {
@@ -125,7 +134,7 @@ describe('ore patches (#42)', () => {
   })
 
   it('paints the same ore tiles from the same seed and params', () => {
-    expect(planetOreOf(planetParamsFor(83921, 1)).oreTiles).toEqual(ORE[0].oreTiles)
+    expect(kernelPlanetOreOf(planetParamsFor(83921, 1)).oreTiles).toEqual(ORE[0].oreTiles)
   })
 
   it('grows every patch as one connected piece of plain ground of its band', () => {

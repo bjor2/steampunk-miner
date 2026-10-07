@@ -16,8 +16,14 @@
  * new stamp, every vehicle is put on the Sell bay's rest pose, and the params are recomputed from
  * seed and index. Wallet, levels, owned items and everything else in the state are kept.
  *
- * A save from before both reads at snapshot 18 and generator 5: the snapshot step runs first, as
- * the TD's save chain orders them, so the pad step restores the state with this build's reader.
+ * Generator 6 -> 7 (#146): each ore patch rolls its rarity lead, which changes only the tier of
+ * generated ore cells. A chunk delta holds what was dug, yielded, lined or flooded, never a
+ * generated material cell, so every edit stays as it is and the ore no one has mined yet reads its
+ * lead. The whole state is kept.
+ *
+ * A save from before all three reads at snapshot 18 and generator 5: the snapshot step runs first,
+ * as the TD's save chain orders them, so the generator steps restore the state with this build's
+ * reader.
  *
  * A registered slice section the save lacks is no step: `readSnapshot` restores it at its initial
  * value, and the reading reports it after the steps as one `save_migrated {restoredSections}` (#224).
@@ -71,6 +77,7 @@ interface SaveMigrationStep extends HeaderVersionStep {
 const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'snapshotVersion', from: 18, to: 19, migrate: levelsToSteps },
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
+  { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
 ]
 
 export type MigratedSaveSlotReading = SaveSlotReading & { migrations: readonly SaveMigration[] }
@@ -159,6 +166,13 @@ function regeneratePadArea(file: SaveSlotFile): SaveSlotFile | null {
   if (restored === null) return null
   const moved = placeVehiclesAtSellBay(withoutPadAreaChunks(restored))
   return { ...saveSlotOf(takeSnapshot(moved), file.saveEpoch), generatorVersion: 6 }
+}
+
+/** Generator 6 -> 7: the state is read as saved and written again under this generator. */
+function keepEditsUnderOreLeads(file: SaveSlotFile): SaveSlotFile | null {
+  const restored = restoreUnderThisGenerator(file)
+  if (restored === null) return null
+  return { ...saveSlotOf(takeSnapshot(restored), file.saveEpoch), generatorVersion: 7 }
 }
 
 /** A generator bump never changes the state's shape, so the old state restores as it is. */

@@ -46,7 +46,11 @@ function sameAndOtherOreTiles() {
   return { first: tiles[0], same: tiles[second], ore: oreAt(0) as OreType }
 }
 
-const TILES = sameAndOtherOreTiles()
+/**
+ * Fixtures name their ores under the registrations the sessions run under: the codex alone, so the
+ * kernel default names them (the ores slice's catalogue would rename them, #146).
+ */
+const TILES = withRegistrations([CODEX], sameAndOtherOreTiles)
 
 /** The ore of the same tier in the other cell family: a type the tiles never hold. */
 function otherFamilyOf(ore: OreType): OreType {
@@ -104,7 +108,7 @@ describe('codex discovery reaction', () => {
     })
     const ask = (state: typeof after, oreId: string, slices = [CODEX]) =>
       withRegistrations(slices, () => hasDiscovered(state, 'p1', `ore:${oreId}`, REACHED_PLANET))
-    const other = otherFamilyOf(TILES.ore)
+    const other = withRegistrations([CODEX], () => otherFamilyOf(TILES.ore))
     expect(ask(before, TILES.ore.id)).toBe(false)
     expect(ask(after, TILES.ore.id)).toBe(true)
     expect(ask(after, other.id)).toBe(false)
@@ -151,7 +155,7 @@ describe('codex discovery reaction', () => {
 
   it('keeps a rare preview skipped on planet 12 undiscovered after planet 13 is mined', () => {
     const ore = (planet: number, band: number, cellFamily: 1 | 2) =>
-      oreTypeOf({ tier: oreTier(planet, band), cellFamily })
+      withRegistrations([CODEX], () => oreTypeOf({ tier: oreTier(planet, band), cellFamily }))
     const { metal, crystal } = RESOURCE_FAMILY
     // Planet 12's band-5 crystal is a preview of planet 13's band 2; the player passed it by.
     const preview = ore(12, 5, crystal)

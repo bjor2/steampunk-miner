@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { withFreshRegistrySet } from '../registries/seal'
 import { dockSiteOf, isDockPadTile } from './dockSite'
 import { generateChunk } from './generateChunk'
 import { bandOfTile, coreTileCount } from './planetGeometry'
@@ -108,7 +109,12 @@ describe('generated planet shape', () => {
   })
 
   it('stores ore of band b at tier offset b - 1, in the metal or crystal family', () => {
-    const ore = tilesOfKind(planet1Tiles, CELL_KIND.ore)
+    // The kernel's rule, before a slice's generation hook (#146's rarity lead) folds over it.
+    const kernelTiles = withFreshRegistrySet(
+      () => {},
+      () => everyTileOf(planet1),
+    )
+    const ore = tilesOfKind(kernelTiles, CELL_KIND.ore)
     expect(
       ore.every(({ tx, ty, cell }) => tierOffsetOfCell(cell) === bandOfTile(planet1, tx, ty) - 1),
     ).toBe(true)

@@ -45,6 +45,11 @@ const copper: OreType = {
 }
 
 /** A fake `ores` catalogue that calls every ore copper. */
+/** Runs `run` with nothing registered, so ore is named by the kernel default. */
+function withKernelDefault<T>(run: () => T): T {
+  return withFreshRegistrySet(() => {}, run)
+}
+
 function registerCopperProvider(): void {
   addToRegistry(ORE_TYPE_REGISTRY, 'ores', {
     id: 'ores.catalogue',
@@ -87,8 +92,10 @@ describe('mined ore identity (#122)', () => {
 
   it('puts the ore id, the depth of its cell and its chunk on CargoAdded', () => {
     const [ore] = surfaceOreTiles(1)
-    const added = mineInOrder([ore]).find((event) => event.type === 'CargoAdded')
-    const family = familyOfCell(materialCellAt(EMPTY_WORLD, PARAMS, ore))
+    const { added, family } = withKernelDefault(() => ({
+      added: mineInOrder([ore]).find((event) => event.type === 'CargoAdded'),
+      family: familyOfCell(materialCellAt(EMPTY_WORLD, PARAMS, ore)),
+    }))
     expect(added).toMatchObject({
       resourceTier: 1,
       oreId: `kernel.${family === RESOURCE_FAMILY.crystal ? 'crystal' : 'metal'}.t1`,
@@ -111,7 +118,7 @@ describe('mined ore identity (#122)', () => {
 
   it('leaves family and signature off CargoAdded with the kernel default, as before (#223)', () => {
     const [ore] = surfaceOreTiles(1)
-    const added = firstCargoAdded(mineInOrder([ore]))
+    const added = firstCargoAdded(withKernelDefault(() => mineInOrder([ore])))
     expect(added).not.toHaveProperty('family')
     expect(added).not.toHaveProperty('signature')
   })

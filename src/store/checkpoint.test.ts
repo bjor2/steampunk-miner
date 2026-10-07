@@ -148,6 +148,7 @@ describe('checkpoint', () => {
     expect(linesNamed('save_migrated').map((line) => line.data)).toEqual([
       { version: 'snapshotVersion', from: 18, to: 19 },
       { version: 'generatorVersion', from: 5, to: 6 },
+      { version: 'generatorVersion', from: 6, to: 7 },
       ...restoredSectionLines(),
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])
@@ -173,7 +174,7 @@ describe('checkpoint', () => {
     disk.files.set('slot-1.json', refused)
     startProcess()
     expect(await loadCheckpoint()).toEqual({
-      problems: ['save.generatorVersion is 99, this build reads 6'],
+      problems: ['save.generatorVersion is 99, this build reads 7'],
     })
     expect(disk.files.get('slot-1.refused.json')).toBe(refused)
     expect(disk.files.has('slot-1.json')).toBe(false)
