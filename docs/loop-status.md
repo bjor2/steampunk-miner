@@ -150,6 +150,13 @@ its attempt refunded in `state.json` (`attempts`, floor 0), so it never runs out
 waiting on planners. Needs attention shows it as "needs-planner (attempt refunded)". Real failures
 (`needs-fix`, gate failures, no-change rejections) still count against `MAX_ATTEMPTS` = 2.
 
+A ticket whose gates were green but whose branch then conflicted with `origin/main` at push time
+is handed back `needs-fix` with its attempt refunded too (conflict refund, since 2026-10-07 23:35),
+at most 3 times per ticket (`CONFLICT_REFUND_MAX`, counted in `state.json` `conflict_refunds`).
+With up to 8 parallel lanes moving main, two conflicts used to use up `MAX_ATTEMPTS` and strand
+every ticket blocked by that one. After 3 refunds a conflict counts like any other failure. The
+hand-back comment on the issue shows the refund count and the attempts used.
+
 Without `accounts` (a v1 snapshot) the Claude pool shows as one pool. The page copies only these
 fields (`scripts/status/slots.mjs`), so anything else in the file never reaches it, and drops a name
 or reason that looks like a path, email or host name. A malformed file shows its reason instead of
