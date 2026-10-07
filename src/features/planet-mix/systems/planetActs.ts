@@ -13,6 +13,7 @@
  * - Swap: from P4, about one planet in two shows the rare in band 3 instead of its common.
  */
 import { hashCell } from '../../../systems/cellRandom'
+import { RESOURCE_FAMILY } from '../../../systems/world/worldCell'
 import { oreFamilies } from '../../ores'
 import { THEME_ROWS, type OreAct, type ThemeRows } from './themeRows'
 
@@ -79,9 +80,27 @@ export function familiesOfAct(act: OreAct): string[] {
   return [...act.commons, act.rare, act.signature].filter((family) => family !== null)
 }
 
+/**
+ * The first planet a family can show on (GD lock on #147, Horizontal Scaler): P1 for the kernel's
+ * metal and crystal, else the first mixed planet of the earliest act naming it; never for a family
+ * no act names.
+ */
+export function firstPlanetOfFamily(family: string, rows: ThemeRows = THEME_ROWS): number {
+  if (isKernelFamily(family)) return 1
+  const home = rows.acts.find((act) => familiesOfAct(act).includes(family))
+  if (home === undefined) return Number.POSITIVE_INFINITY
+  return Math.max(home.firstPlanet, rows.mixFromPlanet)
+}
+
 /** The family's #142 gate class. */
 export function gateClassOf(family: string, rows: ThemeRows = THEME_ROWS): string {
   return rows.gateClassByFamily[family]
+}
+
+/** Metal and crystal: the catalogue families on the kernel's own cell codes. */
+function isKernelFamily(family: string): boolean {
+  const row = oreFamilies().find((candidate) => candidate.id === family)
+  return row !== undefined && row.cellCode <= RESOURCE_FAMILY.crystal
 }
 
 function endlessActOf(planetIndex: number, rows: ThemeRows): OreAct {

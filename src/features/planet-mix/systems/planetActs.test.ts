@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { oreFamilies } from '../../ores'
+import { MAX_RESOURCE_FAMILY } from '../../../systems/world/worldCell'
+import { familyOfCellCode, oreFamilies } from '../../ores'
 import { planetParamsFor } from '../../../systems/world/planetParams'
 import { familyRows } from './familyRows'
-import { mixSeedOf } from './oreMix'
-import { accentPoolOf, actOf, familiesOfAct, gateClassOf, planetMixPlanOf } from './planetActs'
+import { mixSeedOf, oreMixFor } from './oreMix'
+import {
+  accentPoolOf,
+  actOf,
+  familiesOfAct,
+  firstPlanetOfFamily,
+  gateClassOf,
+  planetMixPlanOf,
+} from './planetActs'
 import { THEME_ROWS } from './themeRows'
 
 const PLANETS = Array.from({ length: 200 }, (_, at) => at + 1)
@@ -89,4 +97,68 @@ describe('planet acts', () => {
       gateClass: 'induction',
     })
   })
+
+  it('changes act at every boundary and in the endless cycle (#141 acceptance 8, GD lock)', () => {
+    const planets = [7, 8, 16, 17, 24, 25, 30, 32, 33, 40, 41, 45]
+    expect(planets.map((planet) => [planet, oreMixFor(planet, 83921).themeId])).toEqual([
+      [7, 'foothold.heavy'],
+      [8, 'fire'],
+      [16, 'fire'],
+      [17, 'frost'],
+      [24, 'frost'],
+      [25, 'lodestone'],
+      [30, 'lodestone'],
+      [32, 'lodestone'],
+      [33, 'hollow'],
+      [40, 'hollow'],
+      [41, 'fire'],
+      [45, 'foothold.heavy'],
+    ])
+    expect(actOf(30).rare).toBe('relic')
+  })
+
+  it('never places a family before its act, P1 to P200 (GD lock, Horizontal Scaler)', () => {
+    for (const planet of PLANETS) {
+      for (const seed of SEEDS) {
+        const families = oreMixFor(planet, seed)
+          .bands.flat()
+          .map((entry) => entry.family)
+        const early = families.filter((family) => planet < firstPlanetOfFamily(family))
+        expect(early).toEqual([])
+      }
+    }
+    expect(
+      ['fossil', 'volcanic', 'cryo', 'energy', 'exotic'].map((family) =>
+        firstPlanetOfFamily(family),
+      ),
+    ).toEqual([3, 8, 17, 25, 33])
+  })
+
+  it('places no family code without a gate class, from the last catalogue code up to 15', () => {
+    const lastCode = Math.max(...oreFamilies().map((family) => family.cellCode))
+    const placed = new Set(
+      PLANETS.flatMap((planet) =>
+        SEEDS.flatMap((seed) =>
+          oreMixFor(planet, seed)
+            .bands.flat()
+            .map((entry) => familyRows().find((row) => row.id === entry.family)),
+        ),
+      ).map((row) => oreFamilies().find((family) => family.id === row?.id)?.cellCode),
+    )
+    const codes = Array.from(
+      { length: MAX_RESOURCE_FAMILY - lastCode + 1 },
+      (_, at) => lastCode + at,
+    )
+    const ungated = codes.filter((code) => gateClassOfCode(code) === undefined)
+    expect(lastCode).toBe(12)
+    expect(gateClassOfCode(lastCode)).toBe('tether')
+    expect(ungated).toEqual([13, 14, 15])
+    expect(ungated.filter((code) => placed.has(code))).toEqual([])
+    expect(placed.has(undefined)).toBe(false)
+  })
 })
+
+function gateClassOfCode(code: number): string | undefined {
+  const family = familyOfCellCode(code)
+  return family === null ? undefined : familyRows().find((row) => row.id === family.id)?.gateClass
+}
