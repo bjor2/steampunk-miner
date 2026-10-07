@@ -2,6 +2,7 @@
   "$comment": "Registry of the metric ids in history.ndjson: how /status/ labels, groups and judges each one. A new id in history.ndjson gets its own chart even before it is listed here (with a build warning); add it here to give it a label, unit, group, direction and budget. See docs/perf/README.md.",
   "groups": [
     "CPU benches",
+    "CPU benches (CI runner)",
     "Memory soak",
     "Memory soak (Electron)",
     "Frame time",
@@ -535,6 +536,83 @@
       "group": "Main-thread profile",
       "better": "lower",
       "source": "throwaway bench on src, 20,000 builds, vite-node (#121)"
+    },
+    "ci.buildChunkTileBatch.p1.medianUs": {
+      "label": "Render buildChunkTileBatch median · planet 1 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:render -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.buildChunkTileBatch.p2.medianUs": {
+      "label": "Render buildChunkTileBatch median · planet 2 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:render -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.combatTick.p1.medianUs": {
+      "label": "Combat tick median · planet 1 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:combat -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.generateChunk.p1.medianUs": {
+      "label": "World generateChunk median · planet 1 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:world -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.generateChunk.p2.medianUs": {
+      "label": "World generateChunk median · planet 2 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:world -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.groundDrilling.carve.p1.medianUs": {
+      "label": "Ground carve median · planet 1 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:ground -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.groundDrilling.carveAndRemesh.p1.medianUs": {
+      "label": "Ground carve + remesh median · planet 1 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:ground -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.groundDrilling.colliderBlocks.p1.medianUs": {
+      "label": "Ground collider blocks median · planet 1 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:ground -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.groundDrilling.remeshChunk.p1.medianUs": {
+      "label": "Ground remesh chunk median · planet 1 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:ground -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.groundDrilling.terrainFrame.p1.medianUs": {
+      "label": "Ground terrain frame median · planet 1 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:ground -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "ci.overlayFrame.p1.medianUs": {
+      "label": "HUD overlay frame median · planet 1 · CI runner",
+      "unit": "µs",
+      "group": "CPU benches (CI runner)",
+      "better": "lower",
+      "source": "CI bench job, npm run bench:render -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
     }
   }
 }
