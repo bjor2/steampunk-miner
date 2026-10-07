@@ -45,3 +45,9 @@ export const MUSIC_DUCK_DB = 6
 export const PLANET_TUNING_SEMITONES = -3
 /** The settings overlay steps the music volume from full to silence in this many steps (#49). */
 export const MUSIC_VOLUME_STEPS = 4
+
+/**
+ * A slice's sound cue past its voice budget steals its oldest voice, which fades out over this
+ * long so the steal never clicks (#180 section 5, G&V: "a 5th steals the oldest with a 15 ms fade").
+ */
+export const CUE_VOICE_STEAL_FADE_SECONDS = 0.015

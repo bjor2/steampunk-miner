@@ -33,6 +33,7 @@ import type { OreLookProvider } from '../systems/registries/oreLook'
 import type { OreTypeProvider } from '../systems/registries/oreTypes'
 import type { PartMotionRequestSource } from '../systems/registries/partMotionRequests'
 import type { SaveSection } from '../systems/registries/saveSections'
+import type { SoundCue } from '../systems/registries/soundCues'
 import type { AttachUse } from '../systems/registries/vehicleAttach'
 import type { VehicleStagingProvider } from '../systems/registries/vehicleStaging'
 import type { SceneLayer } from '../scene/registries/sceneLayers'
@@ -107,6 +108,8 @@ export interface SliceRegistrar {
   botPurchase(purchase: BotPurchase): void
   /** A full screen the kernel shell draws while the store holds it open. */
   screen(panel: ScreenPanel): void
+  /** A synthesised sound with its voice budget, played on `requestSoundCue` (#180). */
+  soundCue(cue: SoundCue): void
   /** One provider across all slices: a charge's shake, flash and thump delay (#213). */
   chargeBlastCue(provider: ChargeBlastCueProvider): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */

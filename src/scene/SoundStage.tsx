@@ -2,8 +2,9 @@
  * The game's sound (#13 audio direction): one-shots for each feedback cue (the pickup chime by
  * tier, the dock and upgrade clanks, a hit's thud, the core and travel stingers, casing's hiss and
  * pop, a charge's blast, its thump delayed by the blast cue with distance, #213), the music
- * stingers (#49) and, every frame, the drill, engine and steam loops and the crossfaded music
- * layers. What each voice plays comes from the pure rules in `systems/audio` and the audio view
+ * stingers (#49), the slices' sound cues within their voice budgets (#180, `soundCuePlayer.ts`)
+ * and, every frame, the drill, engine and steam loops and the crossfaded music layers. What each
+ * voice plays comes from the pure rules in `systems/audio` and the audio view
  * model; this only hands it to the shell's sound output. Presentation only: it never writes the
  * store or submits.
  */
@@ -14,6 +15,7 @@ import { getSoundOut, type SoundOut } from '../shell/soundOut'
 import { listenForFeedback } from '../store/feedbackBroadcast'
 import { useGameStore } from '../store/gameStore'
 import { listenForStingers } from '../store/musicStingerRecord'
+import { listenForSoundCues } from '../store/soundCueRequests'
 import { readAudioModel, readDrillVoice, readHudModel } from '../store/screenReads'
 import type { DrillVoice } from '../systems/audio/drillVoice'
 import {
@@ -42,6 +44,7 @@ import {
 } from '../systems/audio/delayedThumps'
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
+import { createSoundCuePlayer } from './soundCuePlayer'
 
 /** The drill's load and the music's targets are re-read as often as the HUD re-reads. */
 const LOAD_REFRESH_SECONDS = SCREEN_REFRESH_MS / 1000
@@ -77,12 +80,15 @@ export function SoundStage() {
     [],
   )
   const thumps = useMemo(createDelayedThumps, [])
+  const cues = useMemo(() => createSoundCuePlayer(sound), [sound])
   useEffect(() => listenForFeedback((cue) => playOrDelayCue(sound, thumps, cue)), [sound, thumps])
+  useEffect(() => listenForSoundCues(cues.play), [cues])
   useEffect(
     () => listenForStingers((stingerId) => sound.playMusicStinger(stingerId, planetTuning())),
     [sound],
   )
   useFrame((_, delta) => {
+    cues.advance(delta)
     playDueThumps(sound, thumps, delta)
     refreshDrillLoad(drill, delta)
     playLoops(sound, drill)

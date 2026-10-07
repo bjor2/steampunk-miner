@@ -50,6 +50,7 @@ import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
 import { ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
 import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRequests'
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
+import { SOUND_CUE_REGISTRY } from '../systems/registries/soundCues'
 import {
   addToRegistry,
   RegistrationRefusedError,
@@ -105,6 +106,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
     botPurchase: (purchase) => add(BOT_PURCHASE_REGISTRY, purchase),
     screen: (panel) => add(SCREEN_REGISTRY, panel),
+    soundCue: (cue) => add(SOUND_CUE_REGISTRY, cue),
     chargeBlastCue: (provider) => add(CHARGE_BLAST_CUE_REGISTRY, provider),
     debugActions: (actions) =>
       addToRegistry(DEBUG_ACTION_REGISTRY, sliceId, { id: sliceId, actions }),

@@ -8,10 +8,16 @@
  */
 import type { StingerId } from '../systems/audio/musicBook'
 import type { MusicLayers } from '../systems/audio/musicLayers'
+import type { CueTone, SoundCuePlay } from '../systems/registries/soundCues'
 import { createWebAudioGraph, type WebAudioGraph } from './webAudioGraph'
 
 export type ClankWeight = 'light' | 'heavy'
 export type StingerKind = 'core' | 'travel'
+
+/** One sounding voice of a slice's cue, which the voice budget may fade out early. */
+export interface CueVoice {
+  fadeOut(seconds: number): void
+}
 
 export interface SoundOut {
   playChime(frequency: number): void
@@ -35,6 +41,8 @@ export interface SoundOut {
   setMusic(layers: MusicLayers, tuningSemitones: number, busGain: number): void
   /** One of the #49 music stingers; the layers duck for its length. */
   playMusicStinger(stingerId: StingerId, tuningSemitones: number): void
+  /** A slice's sound cue (#180), or null while audio waits for the first gesture. */
+  playCueTone(tone: CueTone, play: SoundCuePlay): CueVoice | null
 }
 
 const UNLOCK_EVENTS = ['keydown', 'pointerdown'] as const
@@ -63,6 +71,7 @@ const SOUND_OUT: SoundOut = {
   setSteam: (gain) => graph?.setSteam(gain),
   setMusic: (layers, tuning, busGain) => graph?.setMusic(layers, tuning, busGain),
   playMusicStinger: (stingerId, tuning) => graph?.playMusicStinger(stingerId, tuning),
+  playCueTone: (tone, play) => graph?.playCueTone(tone, play) ?? null,
 }
 
 function waitForGesture(): void {

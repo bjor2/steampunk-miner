@@ -2,13 +2,14 @@
  * The synthesised placeholder sounds (#13: "synthesised in the browser audio engine"): three
  * loops (drill, engine chug, steam hiss), the music's step sequencer (#49) and the one-shots
  * (chime, clank, thud, stingers, casing's hiss and pop, collapse's rumble and crash, the wrecker's
- * scrape), all from
+ * scrape) and the slices' sound cues (#180, `cueTones.ts`), all from
  * oscillators and one noise buffer. Built once per audio
  * context; the sound loops run from the start and are only ever re-levelled, so a frame never
  * builds a node for them, and a level that has not moved is not rescheduled.
  */
 import { MUSIC_BOOK } from '../systems/audio/musicBook'
 import { gainOf, glide, SILENCE } from './audioNodes'
+import { playCueTone } from './cueTones'
 import { createMusicSequencer } from './musicSequencer'
 import type { ClankWeight, SoundOut, StingerKind } from './soundOut'
 
@@ -44,6 +45,7 @@ export function createWebAudioGraph(context: AudioContext): WebAudioGraph {
     setSteam: (gain) => glide(context, steam.gain, gain),
     setMusic: (layers, tuning, busGain) => music.setMusic(layers, tuning, busGain),
     playMusicStinger: (stingerId, tuning) => music.playStinger(stingerId, tuning),
+    playCueTone: (tone, play) => playCueTone(context, master, noise, tone, play),
   }
 }
 
