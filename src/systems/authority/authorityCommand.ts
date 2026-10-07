@@ -80,8 +80,11 @@ import type { BayId } from '../world/dockBays'
  *    `dynamite.detonator_locked` and `dynamite.no_live_charge`, and `dynamite.DetonateRefused`.
  * 33: the planet-mix slice (#147): from planet 3 `CargoAdded` names the planet mix's families, a
  *    signature unit carries `signature: true` and is held and sold one tier up (#232 `saleTier`).
+ * 34: the mobility lane (#204): `power-up-core.PowerUpRefused` for a use with nothing to act on,
+ *    `mobility.GrappleHooked`, `mobility.HullPatched` and `mobility.PatchCancelled`, its
+ *    `mobility` player section v1, and the four Schedule C rows it ships logged as unlocked.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 33
+export const AUTHORITY_PROTOCOL_VERSION = 34
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
