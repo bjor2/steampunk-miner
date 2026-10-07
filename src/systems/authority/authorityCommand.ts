@@ -76,8 +76,10 @@ import type { BayId } from '../world/dockBays'
  *    `debug.setCharges` names its size, `size_locked` and `no_charge_of_size` replace
  *    `no_charges`, `ChargePlanted` and `ChargesRestocked` carry the size, `ChargeDetonated` its
  *    trigger `by`, and `ChargeDisarmed` joins.
+ * 32: the dynamite slice (#149): the plunger `dynamite.detonate_charge {}` with its rejections
+ *    `dynamite.detonator_locked` and `dynamite.no_live_charge`, and `dynamite.DetonateRefused`.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 31
+export const AUTHORITY_PROTOCOL_VERSION = 32
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
