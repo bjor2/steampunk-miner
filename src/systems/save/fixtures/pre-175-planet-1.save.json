@@ -1,10 +1,10 @@
 {
   "formatVersion": 1,
-  "snapshotVersion": 16,
+  "snapshotVersion": 17,
   "generatorVersion": 5,
   "saveEpoch": 3,
   "tick": 1203,
-  "digest": "3e61b29a98498ce0",
+  "digest": "6bb359d778112da7",
   "world": {
     "saveEpoch": 3,
     "worldSeed": 83921,
@@ -26,10 +26,7 @@
       "archetypeId": "archetype.base",
       "gravityMultiplier": 1,
       "paletteId": "palette.planet_1",
-      "familyWeights": {
-        "metal": 3,
-        "crystal": 1
-      },
+      "familyWeights": { "metal": 3, "crystal": 1 },
       "hasStarterVein": true,
       "artefactCacheBand": 3
     },
@@ -75,16 +72,8 @@
         "version": 4
       }
     },
-    "platform": {
-      "coreBay": 12,
-      "visualState": "outpost",
-      "refinerySlots": [null]
-    },
-    "core": {
-      "reachedTick": null,
-      "harvestedTiles": 0,
-      "isCompleted": false
-    },
+    "platform": { "coreBay": 12, "visualState": "outpost", "refinerySlots": [null] },
+    "core": { "reachedTick": null, "harvestedTiles": 0, "isCompleted": false },
     "combat": {
       "isFrozen": false,
       "nextEnemyNumber": 1,
@@ -104,13 +93,8 @@
       },
       "routes": {}
     },
-    "collapse": {
-      "blocks": []
-    },
-    "lava": {
-      "loose": [],
-      "nextStepTick": null
-    },
+    "collapse": { "blocks": [] },
+    "lava": { "loose": [], "nextStepTick": null },
     "debugApplied": true
   },
   "profile": {
@@ -132,53 +116,35 @@
           },
           "casingGrade": 2,
           "casingShortBand": null,
-          "casingTrail": {
-            "lastAxisPoint": {
-              "xMm": 40500,
-              "yMm": 297000
-            },
-            "unlined": []
-          },
-          "lining": {
-            "active": "standard",
-            "owned": ["standard"]
-          },
-          "gun": {
-            "level": 0,
-            "mode": "auto"
-          },
+          "casingTrail": { "lastAxisPoint": { "xMm": 40500, "yMm": 297000 }, "unlined": [] },
+          "lining": { "active": "standard", "owned": ["standard"] },
+          "gun": { "level": 0, "mode": "auto" },
           "liningBill": "4e-2",
           "liningPaidThisVisit": null,
-          "charges": {
-            "isRackMounted": false,
-            "slotLevel": 0,
-            "carried": 0,
-            "planted": null
+          "charges": { "isRackMounted": false, "slotLevel": 0, "carried": 0, "planted": null },
+          "loadout": {
+            "version": 1,
+            "body": {
+              "slots": {
+                "powerup.1": null,
+                "powerup.2": null,
+                "powerup.3": null,
+                "powerup.4": null,
+                "powerup.5": null,
+                "drill.head": null,
+                "drill.flank": null,
+                "drill.collar": null
+              },
+              "owned": []
+            }
           },
           "energy": 35360,
           "hull": "1e+2",
-          "cargo": {
-            "ore": {
-              "1": 3
-            },
-            "coreFragments": 0
-          },
-          "pose": {
-            "x": 4000,
-            "y": 300500,
-            "vx": 0,
-            "vy": 0,
-            "upx": 0,
-            "upy": 1024,
-            "facing": 1
-          },
+          "cargo": { "ore": { "1": 3 }, "coreFragments": 0 },
+          "pose": { "x": 4000, "y": 300500, "vx": 0, "vy": 0, "upx": 0, "upy": 1024, "facing": 1 },
           "accountedTick": 1200,
           "energyLowLogged": [],
-          "heat": {
-            "level": 0,
-            "settledTick": 1200,
-            "lavaTouchTick": null
-          }
+          "heat": { "level": 0, "settledTick": 1200, "lavaTouchTick": null }
         },
         "artefact": null
       }

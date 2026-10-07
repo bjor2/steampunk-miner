@@ -1,10 +1,10 @@
 {
   "formatVersion": 1,
-  "snapshotVersion": 16,
+  "snapshotVersion": 17,
   "generatorVersion": 5,
   "saveEpoch": 5,
   "tick": 1000,
-  "digest": "e880dbd3c2a86e44",
+  "digest": "ce3412ca4d9f9c79",
   "world": {
     "saveEpoch": 5,
     "worldSeed": 83921,
@@ -26,10 +26,7 @@
       "archetypeId": "archetype.heat",
       "gravityMultiplier": 1.25,
       "paletteId": "palette.heat",
-      "familyWeights": {
-        "metal": 1,
-        "crystal": 2
-      },
+      "familyWeights": { "metal": 1, "crystal": 2 },
       "hasStarterVein": false,
       "artefactCacheBand": 2
     },
@@ -72,16 +69,8 @@
         "version": 2
       }
     },
-    "platform": {
-      "coreBay": 0,
-      "visualState": "outpost",
-      "refinerySlots": [null]
-    },
-    "core": {
-      "reachedTick": null,
-      "harvestedTiles": 0,
-      "isCompleted": false
-    },
+    "platform": { "coreBay": 0, "visualState": "outpost", "refinerySlots": [null] },
+    "core": { "reachedTick": null, "harvestedTiles": 0, "isCompleted": false },
     "combat": {
       "isFrozen": false,
       "nextEnemyNumber": 1,
@@ -100,25 +89,11 @@
         }
       },
       "routes": {
-        "p1": {
-          "rings": [
-            {
-              "xMm": 16500,
-              "yMm": 720000,
-              "lengthMm": 500
-            }
-          ],
-          "nextWreckerTick": 0
-        }
+        "p1": { "rings": [{ "xMm": 16500, "yMm": 720000, "lengthMm": 500 }], "nextWreckerTick": 0 }
       }
     },
-    "collapse": {
-      "blocks": []
-    },
-    "lava": {
-      "loose": [],
-      "nextStepTick": null
-    },
+    "collapse": { "blocks": [] },
+    "lava": { "loose": [], "nextStepTick": null },
     "debugApplied": true
   },
   "profile": {
@@ -141,58 +116,37 @@
           "casingGrade": 1,
           "casingShortBand": null,
           "casingTrail": {
-            "lastAxisPoint": {
-              "xMm": 40500,
-              "yMm": 719000
-            },
-            "unlined": [
-              {
-                "xMm": 40500,
-                "yMm": 719000,
-                "lengthMm": 500
-              }
-            ]
+            "lastAxisPoint": { "xMm": 40500, "yMm": 719000 },
+            "unlined": [{ "xMm": 40500, "yMm": 719000, "lengthMm": 500 }]
           },
-          "lining": {
-            "active": "standard",
-            "owned": ["standard"]
-          },
-          "gun": {
-            "level": 0,
-            "mode": "auto"
-          },
+          "lining": { "active": "standard", "owned": ["standard"] },
+          "gun": { "level": 0, "mode": "auto" },
           "liningBill": "5.68152e+2",
           "liningPaidThisVisit": null,
-          "charges": {
-            "isRackMounted": false,
-            "slotLevel": 0,
-            "carried": 0,
-            "planted": null
+          "charges": { "isRackMounted": false, "slotLevel": 0, "carried": 0, "planted": null },
+          "loadout": {
+            "version": 1,
+            "body": {
+              "slots": {
+                "powerup.1": null,
+                "powerup.2": null,
+                "powerup.3": null,
+                "powerup.4": null,
+                "powerup.5": null,
+                "drill.head": null,
+                "drill.flank": null,
+                "drill.collar": null
+              },
+              "owned": []
+            }
           },
           "energy": 35808,
           "hull": "1e+2",
-          "cargo": {
-            "ore": {
-              "28": 1
-            },
-            "coreFragments": 0
-          },
-          "pose": {
-            "x": 40500,
-            "y": 719500,
-            "vx": 0,
-            "vy": 0,
-            "upx": 0,
-            "upy": 1024,
-            "facing": 2
-          },
+          "cargo": { "ore": { "28": 1 }, "coreFragments": 0 },
+          "pose": { "x": 40500, "y": 719500, "vx": 0, "vy": 0, "upx": 0, "upy": 1024, "facing": 2 },
           "accountedTick": 1000,
           "energyLowLogged": [],
-          "heat": {
-            "level": 0,
-            "settledTick": 1000,
-            "lavaTouchTick": null
-          }
+          "heat": { "level": 0, "settledTick": 1000, "lavaTouchTick": null }
         },
         "artefact": null
       }
