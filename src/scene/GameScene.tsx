@@ -15,7 +15,6 @@ import { LightRig } from './LightRig'
 import { PerfSampler } from './PerfSampler'
 import { PlanetCamera } from './PlanetCamera'
 import { PlanetTerrain } from './PlanetTerrain'
-import { PlantedCharges } from './PlantedCharges'
 import { PlatformYard } from './PlatformYard'
 import { RenderPipeline } from './RenderPipeline'
 import { SceneLayers } from './SceneLayers'
@@ -55,7 +54,6 @@ export function GameScene() {
       <CementSpray />
       <CollapseTelegraph />
       <BlastScorches />
-      <PlantedCharges />
       <SceneLayers />
       <SoundStage />
       <PerfSampler />

@@ -90,7 +90,7 @@ tints for horizontal unlocks, orange left to heat.
 - The drill heads are sized for the tier-2 bit; #180 makes `drill_tip` a finish on whichever
   head is equipped, so the head gear will want a size per visual tier when that lands.
 - The consumable crates share the charge rack's point as shelves above it rather than editing the
-  kernel's `vehicle-blasting-charges` source (one session, one slice); the wiring may fold them
-  into that asset as the TD's table intends.
+  rack's source (one session, one slice). The rack is the dynamite-visuals slice's
+  `vehicle-dynamite-rack` since #215, and `render_tech_gear.py` stages it at `hull.rear`.
 - The slot housings and the gauge dials have no lit state yet: a toggle's pilot lamp is a part
   the wiring can add when it has the toggled state to show.

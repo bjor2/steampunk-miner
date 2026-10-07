@@ -12,7 +12,7 @@ import { ENEMY_IDS, PLATFORM_BAY_IDS, PLATFORM_VISUAL_STATES } from '../register
 import { LOCKED_SCHEDULE } from '../unlocks/unlockSchedule'
 import { kebabOf } from './artNaming'
 import { iconFileIds } from './icons/iconSet'
-import { BLASTING_CHARGES_ROW_ID, HEAT_LAVA_ROW_ID, REFRACTORY_LINING_TYPE } from './moduleRowIds'
+import { HEAT_LAVA_ROW_ID, REFRACTORY_LINING_TYPE } from './moduleRowIds'
 import {
   SHOP_BUILDING_BAY_IDS,
   shopBuildingAssetIds,
@@ -104,8 +104,6 @@ export function kernelBlenderAssetIds(): string[] {
     'prop-artefact-cache',
     ...numbered('ground-band', BAND_COUNT),
     ...numbered('casing-grade', CASING_GRADE_COUNT),
-    CHARGE_RACK_ASSET_ID,
-    PLANTED_CHARGE_ASSET_ID,
     LAVA_TILE_ASSET_ID,
     ...refractoryCasingTileIds(),
   ]
@@ -156,9 +154,8 @@ export {
 } from './icons/iconSet'
 
 /**
- * The art of the `blasting_charges` schedule row (#109 "Visibility", #110): a charge rack mounted
- * on the vehicle, a planted charge with its fuse lamp, and an icon for its Upgrade bay rows and HUD
- * count. The ids take the #52 kebab form of the row id.
+ * The `blasting_charges` row's icon for its Upgrade bay rows and HUD count (#110). Its rack and
+ * planted charges are the `dynamite-visuals` slice's art since #215 (`r.artAssets`).
  */
 export {
   BLASTING_CHARGES_ROW_ID,
@@ -166,24 +163,6 @@ export {
   REFRACTORY_LINING_ROW_ID,
   REFRACTORY_LINING_TYPE,
 } from './moduleRowIds'
-
-const BLASTING_CHARGES = kebabOf(BLASTING_CHARGES_ROW_ID)
-
-/** Drawn at the vehicle's origin, in the vehicle's frame, once the rack is bought. */
-export const CHARGE_RACK_ASSET_ID = `vehicle-${BLASTING_CHARGES}`
-
-/** One charge planted on the wall; its `fuse-lamp` is its own part so it can blink. */
-export const PLANTED_CHARGE_ASSET_ID = 'prop-blasting-charge'
-
-export const FUSE_LAMP_PART_ID = 'fuse-lamp'
-
-/**
- * The rack's frame, then `charge-<n>` for each of its `chargeRackSlots` (#109 `rackMax`); the rack
- * shows `charge-1` to `charge-<count>` for the count carried.
- */
-export function chargeRackPartIds(): string[] {
-  return ['charge-rack', ...numbered('charge', ART_RULES.chargeRackSlots)]
-}
 
 /**
  * The art of the `heat_lava` and `refractory_lining` schedule rows (#113 "Visibility", #114): the
@@ -236,8 +215,6 @@ export function registryPartIds(): string[] {
     ...blenderAssetIds(),
     ...PLATFORM_VISUAL_STATES.map(kebabOf),
     ...REFINERY_BAY_LOOKS.map(refineryLookPartIdOf),
-    ...chargeRackPartIds(),
-    FUSE_LAMP_PART_ID,
     ...shopBuildingMovingPartIds(),
     ...workshopShowcasePartIds(),
     ...registeredArtAssets().flatMap((asset) => asset.parts ?? []),

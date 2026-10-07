@@ -29,6 +29,5 @@
   "tilePx": 1024,
   "tileSamples": 16,
   "backdropPx": [2048, 1024],
-  "backdropSamples": 128,
-  "chargeRackSlots": 8
+  "backdropSamples": 128
 }

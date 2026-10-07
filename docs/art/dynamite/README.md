@@ -8,11 +8,11 @@ and the ten sizes of
 [Spec: Dynamite in ~10 sizes (#143)](https://github.com/bjor2/steampunk-miner/issues/143).
 Authored in Blender 4.2.9 on the shared box headlessly (`scripts/art/author_dynamite_sizes.py`
 wrote the first version; the `.blend` files under `art/blender/vehicle-dynamite-rack/` and
-`art/blender/prop-dynamite-charge/` are the sources from now on, Git LFS). Nothing is exported,
-listed in the manifest or registered yet: the wiring
-([#215](https://github.com/bjor2/steampunk-miner/issues/215)) exports them through the art-id
-registry, swaps them in for the kernel's `vehicle-blasting-charges` and `prop-blasting-charge`,
-and shows each size as it unlocks.
+`art/blender/prop-dynamite-charge/` are the sources from now on, Git LFS). The wiring
+([#215](https://github.com/bjor2/steampunk-miner/issues/215)) exports them, registers them through
+the art-id registry, puts them in place of the kernel's old `vehicle-blasting-charges` and
+`prop-blasting-charge`, and shows each size as it unlocks (`docs/art-pipeline.md`, "Dynamite
+sizes").
 
 ## What is here
 

@@ -39,7 +39,6 @@ import {
 } from '../systems/vehicle/vehicleStatsView'
 import { statsOfVehicle } from '../systems/vehicle/vehicleState'
 import type { PartPose } from '../systems/render/partMotion'
-import { chargeRackQuadsOf } from '../systems/render/chargeLook'
 import { gunPartIdsOf } from '../systems/render/gunLook'
 import { vehiclePartIdsOf, vehiclePartPosesOf } from '../systems/render/vehicleLook'
 import { isEnemyKind } from '../systems/authority/combat/combatDebugRules'
@@ -114,9 +113,9 @@ export type { ArtefactReport }
 /**
  * `vehicleParts()`: the art part ids the run vehicle draws at its visual tier (#52 acc. 6), and
  * each part's pose now (#48 acceptance 1-2: wheel and drill angles, lifts, squash, glow). Mounted
- * guns add their turret's part ids at the look of their level (#107, #81 acceptance 3), and a
- * bolted-on charge rack its frame and one part per rack slot its charges fill (#109, #218). The
- * slices' vehicle pieces report what they hang at attach points under `mounted` (#235).
+ * guns add their turret's part ids at the look of their level (#107, #81 acceptance 3). The
+ * slices' vehicle pieces report what they hang at attach points under `mounted` (#235): the
+ * dynamite rack among them since #215. `rackCharges` is the rack slots the charges fill (#109).
  */
 export interface VehiclePartsReport {
   visualTier: number
@@ -302,7 +301,6 @@ function vehiclePartsReport(): VehiclePartsReport {
     partIds: [
       ...vehiclePartIdsOf(SHIPPED_ART, vehicle.visualTier, partMotion.requested.shownPartIds),
       ...gunPartIdsOf(SHIPPED_ART, vehicle.gunLevel),
-      ...chargeRackQuadsOf(SHIPPED_ART, vehicle.rackCharges).map((quad) => quad.partId),
     ],
     poses: vehiclePartPosesOf(SHIPPED_ART, partMotion, vehicle.visualTier, !prefs.shake),
     requestedAttach: [...partMotion.requested.attach],

@@ -374,13 +374,7 @@ describe('debug api: vehicle', () => {
     const debug = createDebugApi()
     expect(debug.vehicleParts()).toMatchObject({ rackCharges: null })
     expect(debug.setCharges(2, 1)).toEqual({ ok: true })
-    expect(debug.vehicleParts()).toMatchObject({
-      rackCharges: 2,
-      partIds: expect.arrayContaining(['charge-rack', 'charge-1', 'charge-2']),
-    })
-    expect(debug.vehicleParts()).not.toMatchObject({
-      partIds: expect.arrayContaining(['charge-3']),
-    })
+    expect(debug.vehicleParts()).toMatchObject({ rackCharges: 2 })
     expect(sink.events.map((event) => event.event)).toEqual(['debug_command_applied'])
   })
 

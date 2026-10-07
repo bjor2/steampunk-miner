@@ -1,8 +1,9 @@
 /**
  * Slice layers of the world scene (#213, from the TD's #145 seam lock, after the HUD panels of
  * feature-slices.md 3.14): `GameScene` draws every registered layer, sorted by id, after the
- * planted charges and before the sound stage, so a slice adds blast effects and other world
- * visuals without editing the scene. With none registered the scene is today's.
+ * blast scorches and before the sound stage, so a slice adds blast effects and other world
+ * visuals without editing the scene (the planted charges are a layer since #215). With none
+ * registered the scene draws no slice layer.
  *
  * A `Layer` takes no props. It reads domain events (`listenForDomainEvents`), the kernel's
  * read-only store reads (`src/store/*Reads`) and its own slice store; it places objects from fixed

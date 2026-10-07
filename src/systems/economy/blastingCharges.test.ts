@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { ART_RULES } from '../art/artIds'
 import {
   ceilMilli,
   cmp,
@@ -55,10 +54,9 @@ describe('blasting charges economy', () => {
     expect(isInChargeRadius(1, 0, -2501)).toBe(false)
   })
 
-  it('racks 3 slots and one more per bought slot, up to the 8 slots the art draws', () => {
+  it('racks 3 slots and one more per bought slot, up to 8', () => {
     expect(rackCapacity(0)).toBe(3)
     expect(rackCapacity(rackMaxSlotLevel())).toBe(8)
-    expect(rackCapacity(rackMaxSlotLevel())).toBe(ART_RULES.chargeRackSlots)
   })
 
   it('prices a charge at 2 band-5 ore units of the planet it is bought on', () => {

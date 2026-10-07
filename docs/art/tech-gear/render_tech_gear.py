@@ -35,7 +35,9 @@ GEAR_TABLE = os.path.join(REPO_ROOT, 'src', 'features', 'tech-tree', 'techGear.j
 VEHICLE_SIDECAR = os.path.join(REPO_ROOT, 'public', 'assets', 'vehicle', 'vehicle', 'vehicle.parts.json')
 VEHICLE = 'vehicle'
 TURRET = 'vehicle-auto-guns'
-RACK = 'vehicle-blasting-charges'
+# The dynamite rack (#145a, wired in #215), authored with its origin at its attach point.
+RACK = 'vehicle-dynamite-rack'
+RACK_ATTACH = 'hull.rear'
 VEHICLE_TIER = 3
 GUN_LOOK = 3
 # What the loaded rig carries: one item per exclusive socket, five slot housings, everything else.
@@ -108,7 +110,7 @@ def render_each_alone(table):
 
 def render_rig(table, attach):
     for look, fraction, kinds in RIG_LOOKS:
-        stage_vehicle()
+        stage_vehicle(attach)
         if fraction is not None:
             mount_everything(table, attach, fraction, kinds)
         settle()
@@ -118,12 +120,15 @@ def render_rig(table, attach):
         stage.render_to(output_path('rig.%s.raw.png' % look))
 
 
-def stage_vehicle():
-    """The tier-3 vehicle, the look-3 turret and the full charge rack, as the game draws them."""
+def stage_vehicle(attach):
+    """The tier-3 vehicle, the look-3 turret and the full dynamite rack, as the game draws them."""
     bpy.ops.wm.read_factory_settings(use_empty=True)
     keep_tiered(stage.append_parts_of(VEHICLE), VEHICLE_TIER)
     keep_tiered(stage.append_parts_of(TURRET), GUN_LOOK)
-    stage.append_parts_of(RACK)
+    rack_x, rack_z = attach[RACK_ATTACH]['atM']
+    for obj in stage.append_parts_of(RACK):
+        obj.location.x += rack_x
+        obj.location.z += rack_z
     settle()
     HULL_FRONT['y'] = nearest_y_of_meshes()
 
@@ -226,7 +231,7 @@ def render_clips(table, attach):
         os.makedirs(folder, exist_ok=True)
         point = attach[item['attach']]
         for frame in range(CLIP_FRAMES):
-            stage_vehicle()
+            stage_vehicle(attach)
             mount(item, attach, None, min(1.0, frame / deploy['unfoldTicks']))
             settle()
             stage.stage_lights_and_world()

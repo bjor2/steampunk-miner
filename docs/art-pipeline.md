@@ -336,49 +336,42 @@ so the maps tile with no seam. From then on the `.blend` files are the sources.
 
 ## Blasting charges
 
-The art of the `blasting_charges` schedule row ([#110](https://github.com/bjor2/steampunk-miner/issues/110),
+The kernel art of the `blasting_charges` schedule row ([#110](https://github.com/bjor2/steampunk-miner/issues/110),
 for the spec [#109](https://github.com/bjor2/steampunk-miner/issues/109) "Visibility"). The ids take
-the #52 kebab form of the row id (`src/systems/art/artIds.ts`).
+the #52 kebab form of the row id (`src/systems/art/artIds.ts`). The rack and the planted charge
+were the kernel's `vehicle-blasting-charges` and `prop-blasting-charge` until the dynamite sizes
+replaced them ([#215](https://github.com/bjor2/steampunk-miner/issues/215), below).
 
-| Id                         | Source         | What the build draws                                                                   |
-| -------------------------- | -------------- | -------------------------------------------------------------------------------------- |
-| `vehicle-blasting-charges` | Blender, parts | the rack on the vehicle once it is bought: `charge-rack` plus `charge-1` to `charge-8` |
-| `prop-blasting-charge`     | Blender, parts | a planted charge: `prop-blasting-charge`, and `fuse-lamp`, the only part that glows    |
-| `icon-blasting-charges`    | vector, SVG    | the rack-slot and restock rows in the Upgrade bay and the HUD charge count             |
-| `fx-blast-scorch`          | shader, code   | scorch on the tunnel edge after a blast (`src/scene/blastScorchShader.ts`, #95)        |
-
-- The rack is authored in the **vehicle's frame**: draw its parts at the vehicle's origin, rolled
-  with it, under the vehicle's own parts. It sits behind the chassis at the rear, bolted on by one
-  arm.
-- `charge-<n>` is drawn while the count carried is at least `n`, so the rack shows exactly the
-  charges on board. The slots fill the bottom row first, left to right. Their number is
-  `chargeRackSlots` in `art/asset-rules.json`, #109's `rackMax` of 8; a rack that grows past it
-  needs new slots in the `.blend`.
-- The planted charge's pivot is its centre. `fuse-lamp` is a separate part so the fuse light can
-  blink by showing and hiding it (or by its emissive map once the lit render lands).
-- `scripts/art/author_blasting_charges.py` wrote the first version of both `.blend` files. From then
-  on the `.blend` files are the sources.
+| Id                      | Source       | What the build draws                                                            |
+| ----------------------- | ------------ | ------------------------------------------------------------------------------- |
+| `icon-blasting-charges` | vector, SVG  | the rack-slot and restock rows in the Upgrade bay and the HUD charge count      |
+| `fx-blast-scorch`       | shader, code | scorch on the tunnel edge after a blast (`src/scene/blastScorchShader.ts`, #95) |
 
 ## Dynamite sizes
 
 The art of the ten dynamite sizes ([#145](https://github.com/bjor2/steampunk-miner/issues/145),
 for the design [#153](https://github.com/bjor2/steampunk-miner/issues/153) and the ladder on
 [#143](https://github.com/bjor2/steampunk-miner/issues/143)), owned by the `dynamite-visuals`
-slice. Only the Blender sources and the review renders exist so far; the export, the manifest
-entries through the slice art-id registry (#214) and the swap for the two blasting-charge assets
-above are the wiring's ([#215](https://github.com/bjor2/steampunk-miner/issues/215)).
+slice, which registers both ids through `r.artAssets` (#214) and draws them
+([#215](https://github.com/bjor2/steampunk-miner/issues/215)). Their part ids follow the kernel's
+`blastingCharges.sizes`, so a size the economy table doesn't list is never registered, and a new
+rung fails the asset lint until it is modelled.
 
-| Id                      | Source         | What the build will draw                                                                        |
-| ----------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
-| `vehicle-dynamite-rack` | Blender, parts | the rack at `hull.rear`: `rack-frame`, `stick-1` to `stick-10` (shown as unlocked), `wire-reel` |
-| `prop-dynamite-charge`  | Blender, parts | the planted size: `planted-<n>` at the charge's tile, with `lamp-<n>` blinking                  |
+| Id                      | Source         | What the build draws                                                                       |
+| ----------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `vehicle-dynamite-rack` | Blender, parts | the rack at `hull.rear`: `rack-frame`, `stick-1` to `stick-10` as they open, `wire-reel`   |
+| `prop-dynamite-charge`  | Blender, parts | the planted size: `planted-<n>` at the charge's tile, with `lamp-<n>` blinking on its fuse |
 
 - The rack is authored in its own frame with the attach point at the origin, like the other gear
-  (K5), and holds one model per size on five shelves; the reel is its own part so it can show
+  (K5), and holds one model per size on five shelves. The slice registers the attach use
+  `dynamite-visuals.rack` (`blasting_charges` on `hull.rear`) and hangs the rack there as a
+  vehicle piece (#235), behind the body's parts. Once the rack is bolted on it shows its frame and
+  a stick for every size open on the planet, so a new size shows the day it opens; the reel shows
   from the remote detonator's unlock (#153 amendment 2: no new attach point).
-- Every planted size sits at the origin with its pivot at its centre, as today's charge does, so
-  the build draws one of them where the charge is. The lamp is apart from the body, as `fuse-lamp`
-  is today.
+  `steampunkDebug.features['dynamite-visuals'].getRack()` lists the parts it shows.
+- Every planted size sits at the origin with its pivot at its centre, so the slice's planted layer
+  draws the charge's size where the charge is. The lamp is apart from the body so it blinks by
+  showing and hiding, faster in the fuse's last second; a remote charge's never hurries.
 - `scripts/art/author_dynamite_sizes.py` wrote the first version of both `.blend` files. From
   then on the `.blend` files are the sources. The review renders are in
   [docs/art/dynamite/](art/dynamite/README.md).

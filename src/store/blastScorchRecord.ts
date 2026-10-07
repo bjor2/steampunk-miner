@@ -6,7 +6,7 @@
  * clears it (`scorchesAfter`).
  */
 import type { DomainEvent } from '../systems/authority/domainEvent'
-import { scorchesAfter, type ChargePlacement } from '../systems/render/chargeLook'
+import { scorchesAfter, type ChargePlacement } from '../systems/render/chargePlacement'
 
 let scorches: readonly ChargePlacement[] = []
 
