@@ -140,6 +140,10 @@ export const UI_ID_TEMPLATES = {
   upgradebayChargeSizeCost: (size: number) => `upgradebay-charges-${size}-cost`,
   upgradebayChargeSizeEffect: (size: number) => `upgradebay-charges-${size}-effect`,
   upgradebayChargeSizeRestock: (size: number) => `upgradebay-charges-${size}-restock`,
+  // A tech-unlocked vehicle item on sale (ticket 248), by its bare catalogue id.
+  upgradebayItem: (itemId: string) => `upgradebay-item-${itemId}`,
+  upgradebayItemCost: (itemId: string) => `upgradebay-item-${itemId}-cost`,
+  upgradebayItemBuy: (itemId: string) => `upgradebay-item-${itemId}-buy`,
   artefactCard: (optionId: string) => `artefact-card-${optionId}`,
   artefactChoose: (optionId: string) => `artefact-choose-${optionId}`,
   settingsToggle: (name: string) => `settings-toggle-${name}`,

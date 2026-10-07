@@ -2,8 +2,8 @@
  * The Upgrade bay's six vehicle tracks (#7 order), each with its icon, level, next cost and
  * "before -> after", then the Casing row, which is not a track (#41, #58), then the Lining row once a
  * lining type is offered (#113), then the Guns row once `auto_guns` is offered (#107), then the
- * Charges and Rack rows once `blasting_charges` is (#109), then hull and repair, and the vehicle's
- * visual tier (#33 section 6, #37).
+ * Charges and Rack rows once `blasting_charges` is (#109), then the researched vehicle items on sale
+ * (ticket 248), then hull and repair, and the vehicle's visual tier (#33 section 6, #37).
  */
 import type { UpgradeBayModel } from '../../systems/views/upgradeBayModel'
 import { panelIconIdOf } from '../../systems/art/icons/iconSet'
@@ -13,7 +13,13 @@ import { UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
 import { ChargeRowsView } from './ChargeRowsView'
 import { Field } from './BayHeader'
-import { CasingRowView, GunRowView, LiningRowView, UpgradeRow } from './ShopRowViews'
+import {
+  CasingRowView,
+  GunRowView,
+  LiningRowView,
+  UpgradeRow,
+  VehicleItemRowView,
+} from './ShopRowViews'
 import styles from './Platform.module.css'
 import rowStyles from './TracksPanel.module.css'
 
@@ -28,6 +34,9 @@ export function TracksPanel({ model, focusedId }: { model: UpgradeBayModel; focu
       {model.lining !== null && <LiningRowView lining={model.lining} focusedId={focusedId} />}
       {model.guns !== null && <GunRowView guns={model.guns} focusedId={focusedId} />}
       {model.charges !== null && <ChargeRowsView rows={model.charges} focusedId={focusedId} />}
+      {model.items.map((row) => (
+        <VehicleItemRowView key={row.itemId} row={row} focusedId={focusedId} />
+      ))}
       <Field label="Hull">
         <span data-testid={UI_IDS.workshopHull}>{model.repair.hullText}</span>
       </Field>

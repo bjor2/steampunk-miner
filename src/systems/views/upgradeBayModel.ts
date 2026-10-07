@@ -4,7 +4,8 @@
  * (#41, Game Director's scope review on #54), which is not a vehicle track: its grade "G -> G+1",
  * next cost and Buy; then the Lining row once a lining type is offered (#113); then the Guns row
  * once `auto_guns` is offered (#107); then the Charges and Rack rows once `blasting_charges` is
- * (#109); then Repair with its
+ * (#109); then one row per vehicle item the tech tree unlocked and a slice sells (ticket 248);
+ * then Repair with its
  * cost; and the live preview hook, under the shared header and footer.
  *
  * The preview is presentation only (#37, `upgradePreview`): focus and the install animation are UI
@@ -38,6 +39,7 @@ import {
 import { chargeButtonsOf, chargeRowsOf, type ChargeRows } from './chargeRows'
 import { gunRowOf, type GunRow } from './gunRow'
 import { liningRowOf, type LiningRow } from './liningRow'
+import { vehicleItemRowsOf, type VehicleItemRow } from './vehicleItemRows'
 import { KERNEL_ITEMS } from '../registries/kernelItems'
 import { itemCardOf, serviceCardOf, SHOP_SOURCE, type ItemCardModel } from './itemCardModel'
 import { focusOnScreen, type FocusStop } from './menuFocus'
@@ -94,6 +96,8 @@ export interface UpgradeBayModel {
   guns: GunRow | null
   /** Null until `blasting_charges` is open here or the rack is bolted on (#109). */
   charges: ChargeRows | null
+  /** The researched vehicle items on sale here, none before research (ticket 248). */
+  items: VehicleItemRow[]
   repair: RepairReading
   visualTier: number
   /** The preview's tier gauge glyph (#158). */
@@ -119,9 +123,10 @@ export function selectUpgradeBayModel(
   const lining = liningRowOf(state, playerId)
   const guns = gunRowOf(state, playerId)
   const charges = chargeRowsOf(state, playerId)
+  const items = vehicleItemRowsOf(state, playerId)
   const repair = repairReadingOf(state, playerId)
   const footer = bayFooterOf(state, playerId, ui)
-  const rows: ShopRows = { tracks, casing, lining, guns, charges, repair }
+  const rows: ShopRows = { tracks, casing, lining, guns, charges, items, repair }
   const focusStops = upgradeBayFocusStops(rows, footer)
   const quickService = quickServiceOf(state, playerId)
   return {
@@ -131,6 +136,7 @@ export function selectUpgradeBayModel(
     lining,
     guns,
     charges,
+    items,
     repair,
     visualTier: visualTier(levels),
     tierIconId: PREVIEW_TIER_ICON_ID,
@@ -223,6 +229,7 @@ interface ShopRows {
   lining: LiningRow | null
   guns: GunRow | null
   charges: ChargeRows | null
+  items: readonly VehicleItemRow[]
   repair: RepairReading
 }
 
@@ -233,6 +240,7 @@ function focusedButtonsOf(rows: ShopRows, footer: BayFooter): ScreenButton[] {
     ...liningButtonsOf(rows.lining),
     ...gunButtonsOf(rows.guns),
     ...chargeButtonsOf(rows.charges),
+    ...rows.items.map((row) => row.buy),
     rows.repair.button,
     ...footerButtonsOf(footer),
   ]
@@ -245,6 +253,7 @@ function upgradeBayFocusStops(rows: ShopRows, footer: BayFooter): FocusStop[] {
     ...liningButtonsOf(rows.lining).map(stopIn('lining')),
     ...gunButtonsOf(rows.guns).map(stopIn('guns')),
     ...chargeButtonsOf(rows.charges).map(stopIn('charges')),
+    ...rows.items.map((row) => row.buy).map(stopIn('items')),
     stopIn('repair')(rows.repair.button),
     ...footerButtonsOf(footer).map(stopIn('footer')),
   ]

@@ -1,12 +1,13 @@
 /**
  * The Upgrade bay's buy rows in the track grid (#33 section 6, #37): the six tracks, then Casing
- * (#41, #58), Lining (#113) and Guns (#107). Each draws as the kernel item card's compact shop row
+ * (#41, #58), Lining (#113), Guns (#107) and the tech-unlocked vehicle items (ticket 248). Each draws as the kernel item card's compact shop row
  * once a describer answers, and as the row below until then (K7 #199). Markup only.
  */
 import type { StatPreview, WorkshopRow } from '../../systems/views/workshopRows'
 import type { GunRow } from '../../systems/views/gunRow'
 import type { LiningRow } from '../../systems/views/liningRow'
 import type { CasingRow } from '../../systems/views/upgradeBayModel'
+import type { VehicleItemRow } from '../../systems/views/vehicleItemRows'
 import { ItemCard } from '../kit/ItemCard'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
@@ -129,6 +130,32 @@ export function GunRowView({ guns, focusedId }: { guns: GunRow; focusedId: strin
           {guns.effectText}
         </span>
         <ScreenButtonView button={guns.buy} focusedId={focusedId} state={guns.buyState} />
+      </div>
+    </ItemCard>
+  )
+}
+
+/** One item the tech tree unlocked, before it is bought: no level and no effect column. */
+export function VehicleItemRowView({ row, focusedId }: { row: VehicleItemRow; focusedId: string }) {
+  return (
+    <ItemCard variant="compact" card={row.card} buy={row.buy} focusedId={focusedId}>
+      <div
+        className={rowStyles.trackRow}
+        data-testid={UI_ID_TEMPLATES.upgradebayItem(row.itemId)}
+        data-buy-state={row.buyState}
+      >
+        <VectorIcon iconId={row.iconId} badge={null} hasGlint={row.isBuyOpen} />
+        <span>{row.label}</span>
+        <span />
+        <span
+          className={rowStyles.cost}
+          data-testid={UI_ID_TEMPLATES.upgradebayItemCost(row.itemId)}
+          data-exact={row.cost.exact}
+        >
+          {row.cost.text}
+        </span>
+        <span />
+        <ScreenButtonView button={row.buy} focusedId={focusedId} state={row.buyState} />
       </div>
     </ItemCard>
   )
