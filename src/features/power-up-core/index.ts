@@ -18,7 +18,8 @@ export {
   type PowerUpUse,
   type SlotHold,
 } from './systems/powerUpKind'
-export { chargesLeftOf } from './systems/chargeState'
+export { chargesLeftOf, type FollowUpPattern } from './systems/chargeState'
+export { FOLLOW_UP_WINDOW_TICKS } from './systems/followUps'
 export { powerUpAtMarkOf, type MarkedPowerUp } from './systems/powerUpMarks'
 export { returnCharge } from './systems/useResolution'
 export { toggleDrawQuantaOf } from './systems/toggleDraw'
@@ -29,5 +30,5 @@ export {
   type PowerUpSlot,
   type PressableSlot,
 } from './systems/powerUpSlots'
-export { intentToUseSlot } from './systems/slotUse'
+export { intentToHoldSlot, intentToUseSlot } from './systems/slotUse'
 export { isToggleEngaged } from './systems/toggleRead'

@@ -11,7 +11,7 @@ import { submitSliceDebugCommand } from '../../debug/sliceDebugCommands'
 import { readAuthorityState } from '../../store/authorityLink'
 import { useGameStore } from '../../store/gameStore'
 import { chargesLeftOf } from './systems/chargeState'
-import { isPowerUpSlot } from './systems/powerUpSlots'
+import { isPressableSlot } from './systems/powerUpSlots'
 import { slotButtonsOf } from './systems/slotColumn'
 import { intentToHoldSlot } from './systems/slotUse'
 
@@ -30,7 +30,7 @@ export const powerUpCoreDebugActions: Readonly<Record<string, DebugAction>> = {
 }
 
 function submitHold(slot: string): DebugResult {
-  if (!isPowerUpSlot(slot)) return { ok: false, problems: [`"${slot}" is not a power-up slot`] }
+  if (!isPressableSlot(slot)) return { ok: false, problems: [`no press reaches "${slot}"`] }
   useGameStore.getState().submitPlayerIntent(intentToHoldSlot(slot))
   return { ok: true }
 }

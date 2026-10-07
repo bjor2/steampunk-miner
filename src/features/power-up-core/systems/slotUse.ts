@@ -28,7 +28,7 @@ export function intentToUseSlot(slot: PressableSlot): CommandIntent {
  * yet: slot keys react on the press only, so the debug API's `holdSlot` stands in for the held key
  * until the kernel's input routes a slot release.
  */
-export function intentToHoldSlot(slot: PowerUpSlot): CommandIntent {
+export function intentToHoldSlot(slot: PressableSlot): CommandIntent {
   return { type: 'power-up-core.hold_power_up', payload: { slot } }
 }
 
