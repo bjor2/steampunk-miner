@@ -7,6 +7,7 @@ import { energyMaxQuantaOf } from '../../../systems/vehicle/vehicleState'
 import { FAKE, FAKE_DRAW_PER_MILLE, inField } from '../fakeItems'
 import { isToggledOn, powerUpStateOf } from './chargeState'
 import { intentToUseSlot } from './slotUse'
+import { toggleDrawQuantaOf } from './toggleDraw'
 
 // A toggle's energy draw (#162 section 4.4, the GD lock on #204 Q3 a, ticket 233): a share of
 // energyMax a second while on, an empty tank strands the vehicle as thrust does, and switches
@@ -46,6 +47,17 @@ describe('toggle energy draw', () => {
       session.advanceTo(ON_TICK + 60)
       expect(drawPerTick(session)).toBe(9)
       expect(full - energyOf(session)).toBe(60 * 9)
+    })
+  })
+
+  it('names the quanta the next draw takes, and none once the toggle is off', () => {
+    withDrawingToggleOn((session) => {
+      expect(toggleDrawQuantaOf(session.state(), 'p1')).toBe(drawPerTick(session))
+      const before = energyOf(session)
+      session.advanceTo(ON_TICK + 1)
+      expect(before - energyOf(session)).toBe(toggleDrawQuantaOf(session.state(), 'p1'))
+      session.submit(ON_TICK + 1, press)
+      expect(toggleDrawQuantaOf(session.state(), 'p1')).toBe(0)
     })
   })
 

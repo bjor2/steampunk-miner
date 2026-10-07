@@ -81,6 +81,17 @@ function drawingToggleOf(vehicle: VehicleState, itemId: string): DrawingToggle |
   return { powerUp, slot }
 }
 
+/**
+ * The quanta the toggles take from the player's tank on this tick's draw, before the tank's floor
+ * at zero: what a rule watching the tank for the player's own spending leaves out (ticket 204:
+ * the rivet patch's hold).
+ */
+export function toggleDrawQuantaOf(state: AuthorityState, playerId: string): number {
+  const drawing = drawingTogglesOf(state, playerId)
+  if (drawing.length === 0) return 0
+  return drawQuantaPerTickOf(vehicleOf(state, playerId), drawing)
+}
+
 function drainTank(
   state: AuthorityState,
   playerId: string,
