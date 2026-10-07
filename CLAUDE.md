@@ -30,6 +30,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run balance:charges`                 | trade, size + payoff guards, P7-P40 bot runs (#109, #218) |
 | `npm run balance:refinery`                | P1-P8 bot with vs without the Refinery bay (#105, logged) |
 | `npm run balance:heat`                    | 3 seeds to P10: heat vs C4 (#113), P8-P10 deaths (#198)   |
+| `npm run ore:mix -- --planets 1..60`      | each planet's ore histogram per band vs its mix (#141)    |
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
 | `npm run bench:render`                    | chunk mesh batch p50/p95 per planet (logged, not gated)   |
 | `npm run bench:summary`                   | check + tabulate `bench:* -- --log` run folders (#124)    |

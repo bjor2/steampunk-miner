@@ -12,3 +12,7 @@ export { bandValueMultiplierOf, signatureValueShareOf } from './systems/mixValue
 export type { OreAct } from './systems/themeRows'
 export { actOf, gateClassOf } from './systems/planetActs'
 export { familyRows, type FamilyRow } from './systems/familyRows'
+export type { BandHistogram, ObservedType, PlanetHistogram } from './mixHistogram'
+/** #141's `oreMixHistogram(planetIndex, seed)`: the planet generated, its ore tiles per band. */
+export { planetHistogramOf as oreMixHistogram } from './mixHistogram'
+export { isSignatureOre } from './systems/signatureTag'
