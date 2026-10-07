@@ -475,6 +475,7 @@ export type GateOutcome = 'cut' | 'refused' | 'blocked' | 'lost'
 export interface GateQuery {
   state: AuthorityState; playerId: string; tile: TilePoint; cell: number; ore: OreType
   blast: BlastEvent | null                                     // K2: null when the drill asks
+  tool?: string                                                // #236: a power-up edit's source
 }
 export interface GateVerdict { outcome: GateOutcome; gateKind: string; required: string; have: string }
 export interface GateCheck { id: string; check(query: GateQuery): GateVerdict | null }   // null: no gate on this cell
@@ -717,7 +718,7 @@ A power-up that changes the terrain never edits the world in its command. Its co
 2. the live blasts' slice, always in full;
 3. the queued edits: first in first out per player, round-robin across players, 32 density cells or 64 swaps and at most 2 chunks a tick (lowest `chunkKey` first), the rest carried over (`terrainEditPlan.ts`).
 
-The queue is in the snapshot and the digest. An edit credits no ore, so a slice queues only cells it may change, and it changes the ground as plain `GroundChanged`.
+The queue is in the snapshot and the digest. An edit credits no ore, so a slice queues only cells it may change, and it changes the ground as plain `GroundChanged`. Its ore cells still go through `canMine` (#236, `terrain/terrainEditGates.ts`): each is asked with the edit's `source` as `query.tool` and no blast, and only a cell with no verdict or a `cut` one changes; any other stands as solid ground while the rest of the edit goes on.
 
 ### 3.17 Bot purchases (#211)
 

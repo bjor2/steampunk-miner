@@ -24,6 +24,11 @@ export interface GateQuery {
   ore: OreType
   /** The blast asking; null when the drill asks. */
   blast: BlastEvent | null
+  /**
+   * The power-up asking, by its terrain edit's `source` (#142 "Constraints on other systems");
+   * absent when the drill or a blast asks. A tool never clears, drains or moves a gated cell.
+   */
+  tool?: string
 }
 
 /** What the gate needs and what the player has, as #142's `gate_hit` logs them. */

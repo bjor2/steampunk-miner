@@ -2,7 +2,8 @@
  * The power-up share of the world's terrain edits on a tick (K6 #189): the cells the plan gives
  * this tick (`terrainEditPlan.ts`) change, density edits first, then swaps, and every chunk they
  * changed says so in one `GroundChanged`. The rest of the queue waits for the next tick. It runs on
- * the clock after the live blasts' slice, so a power-up never takes a blast's tiles.
+ * the clock after the live blasts' slice, so a power-up never takes a blast's tiles, and a gated
+ * ore cell stands as solid ground (`terrainEditGates.ts`, #142).
  */
 import type { GroundChange } from '../../world/groundEditSession'
 import type { PlanetParams } from '../../world/planetParams'
@@ -14,6 +15,7 @@ import type { TickOutcome } from '../combat/combatTick'
 import type { DomainEvent } from '../domainEvent'
 import { groundChangedEventsOf } from '../groundChangedEvents'
 import { planetParamsOf } from '../planetOfState'
+import { cellsToolMayChange } from './terrainEditGates'
 import { planTerrainEditTick } from './terrainEditPlan'
 import { NO_TERRAIN_EDITS, type TerrainCellEdit } from './terrainEdits'
 
@@ -25,7 +27,7 @@ export function applyQueuedTerrainEdits(state: AuthorityState, tick: number): Ti
   const edited = editedWorldOf(
     state.world,
     params,
-    plan.applied.flatMap(({ cells }) => cells),
+    plan.applied.flatMap((edit) => cellsToolMayChange(state, params, edit)),
   )
   return {
     state: { ...state, world: edited.world, terrainEdits: plan.queue },
