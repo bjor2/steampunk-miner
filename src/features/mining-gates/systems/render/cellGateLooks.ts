@@ -15,6 +15,7 @@ import { resourceTierOf } from '../../../../systems/authority/minedOre'
 import { oreTypeOf, type OreType } from '../../../../systems/registries/oreTypes'
 import { GATE_STATE, type CellGateLook } from '../../../../systems/render/cellGateBits'
 import { rgbOfHex, type Rgb } from '../../../../systems/render/colour'
+import { bandOfTile } from '../../../../systems/world/planetGeometry'
 import type { PlanetParams } from '../../../../systems/world/planetParams'
 import type { TilePoint } from '../../../../systems/world/tileGrid'
 import { CELL_KIND, familyOfCell, kindOfCell } from '../../../../systems/world/worldCell'
@@ -29,6 +30,19 @@ export const TERRAIN_KINDS: Readonly<Record<string, number>> = LOCK_MARKERS_FILE
 
 export const CELL_GATE_LOOK_ID = 'mining-gates.cell-gate-look'
 
+/** Above the highest band, so a cell and its band make one key. */
+const BAND_SLOTS = 8
+
+/**
+ * The looks the last planet asked has answered, by cell and band: a gate is a pure function of
+ * the two (#142), and a chunk repeats a handful of ore cells, so a rebuild asks the gate table
+ * once per kind of cell, not once per tile, and allocates nothing for the rest.
+ */
+const kept: { params: PlanetParams | null; looks: Map<number, CellGateLook | null> } = {
+  params: null,
+  looks: new Map(),
+}
+
 /** The gate the ore at `tile` shows in the ground, or null for rock, air or an ungated cell. */
 export function cellGateLookOf(
   params: PlanetParams,
@@ -36,9 +50,13 @@ export function cellGateLookOf(
   tile: TilePoint,
 ): CellGateLook | null {
   if (kindOfCell(cell) !== CELL_KIND.ore) return null
-  const gate = cellGateOf(params, tile, oreOfCell(params, cell))
-  if (gate.kind === 'none') return null
-  return { kind: terrainKindOf(gate), state: GATE_STATE.locked }
+  const key = cell * BAND_SLOTS + bandOfTile(params, tile.tx, tile.ty)
+  const looks = keptLooksOf(params)
+  const known = looks.get(key)
+  if (known !== undefined) return known
+  const look = lookOfOreCell(params, cell, tile)
+  looks.set(key, look)
+  return look
 }
 
 /** The planet's marker tint, or null for an act the palette does not name. */
@@ -65,6 +83,19 @@ function patternOf(gate: CellGate): string {
   if (gate.kind === 'dynamite') return 'cracked_shell'
   if (gate.kind === 'rig') return motionSignatureOf(gate.rig.id) ?? gate.rig.id
   return 'hard_rim'
+}
+
+function keptLooksOf(params: PlanetParams): Map<number, CellGateLook | null> {
+  if (kept.params === params) return kept.looks
+  kept.params = params
+  kept.looks = new Map()
+  return kept.looks
+}
+
+function lookOfOreCell(params: PlanetParams, cell: number, tile: TilePoint): CellGateLook | null {
+  const gate = cellGateOf(params, tile, oreOfCell(params, cell))
+  if (gate.kind === 'none') return null
+  return { kind: terrainKindOf(gate), state: GATE_STATE.locked }
 }
 
 function oreOfCell(params: PlanetParams, cell: number): OreType {
