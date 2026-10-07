@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T01:16:10+02:00",
+  "updated_at": "2026-10-08T01:19:00+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -27,11 +27,11 @@
         },
         {
           "slot": "C2",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 322,
+          "grok_slot": 8,
+          "kind": "dev",
+          "since": "2026-10-08T01:18:00+02:00"
         },
         {
           "slot": "C3",
@@ -51,9 +51,9 @@
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
-      "claims_last_hour": 9,
+      "used": 4,
+      "free": 0,
+      "claims_last_hour": 10,
       "name": "Claude Max 1"
     },
     {
@@ -99,7 +99,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 5,
+      "claims_last_hour": 4,
       "name": "Claude Max 2"
     }
   ],
@@ -231,9 +231,10 @@
     },
     {
       "slot": 8,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 322,
+      "since": "2026-10-08T01:18:00+02:00",
+      "claude_slot": 2
     },
     {
       "slot": 9,
@@ -271,10 +272,10 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 322,
+      "grok_slot": 8,
+      "since": "2026-10-08T01:18:00+02:00",
       "account": 1
     },
     {
@@ -336,8 +337,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 7,
-      "dev": 7,
+      "used": 8,
+      "dev": 8,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -345,8 +346,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 7,
-      "free": 1,
+      "used": 8,
+      "free": 0,
       "external": 1
     }
   }
