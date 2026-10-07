@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T21:29:18+02:00",
+  "updated_at": "2026-10-07T21:41:46+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 8,
+      "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
     {
@@ -65,11 +65,11 @@
       "slots": [
         {
           "slot": "C5",
-          "state": "busy",
-          "ticket": 247,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-07T21:20:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C6",
@@ -97,14 +97,14 @@
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
-      "claims_last_hour": 5,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 4,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -172,16 +172,6 @@
         "since": "2026-10-07T17:48:33+02:00"
       },
       {
-        "feature": 143,
-        "kind": "spec",
-        "title": "Spec: Dynamite in ~10 sizes with realistic explosions and exponential cost",
-        "tickets": [
-          149,
-          218
-        ],
-        "since": "2026-10-07T18:03:28+02:00"
-      },
-      {
         "feature": 145,
         "kind": "spec",
         "title": "Art/VFX: Dynamite sizes and explosion effects",
@@ -229,16 +219,26 @@
           232
         ],
         "since": "2026-10-07T19:14:37+02:00"
+      },
+      {
+        "feature": 143,
+        "kind": "spec",
+        "title": "Spec: Dynamite in ~10 sizes with realistic explosions and exponential cost",
+        "tickets": [
+          149,
+          218,
+          247
+        ],
+        "since": "2026-10-07T21:39:12+02:00"
       }
     ]
   },
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 247,
-      "since": "2026-10-07T21:20:00+02:00",
-      "claude_slot": 5
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -349,10 +349,10 @@
     },
     {
       "slot": 5,
-      "state": "busy",
-      "ticket": 247,
-      "grok_slot": 1,
-      "since": "2026-10-07T21:20:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 2
     },
     {
@@ -381,17 +381,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-07 21:22 CEST",
-    "mode": "recheck",
-    "triggers": "#203 #250 claude-run:fable",
-    "started": "#250->C2/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-07 21:41 CEST",
+    "mode": "refill-dev",
+    "triggers": "#247",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 8,
-      "dev": 8,
+      "used": 7,
+      "dev": 7,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -399,8 +399,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 8,
-      "free": 0,
+      "used": 7,
+      "free": 1,
       "external": 0
     }
   }
