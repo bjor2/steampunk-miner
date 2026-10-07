@@ -112,7 +112,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/visionRows.test.ts` | 5 | 5 |
 
-### `mining-gates`: 8 files, 50 tests
+### `mining-gates`: 9 files, 53 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -122,6 +122,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-gates/systems/canMine.test.ts` | 16 | 16 |
 | `src/features/mining-gates/systems/gateLedger.test.ts` | 6 | 6 |
 | `src/features/mining-gates/systems/gateTable.test.ts` | 6 | 6 |
+| `src/features/mining-gates/systems/rigSales.test.ts` | 3 | 3 |
 | `src/features/mining-gates/systems/rigs.test.ts` | 7 | 7 |
 | `src/features/mining-gates/systems/toolsAndGear.test.ts` | 3 | 3 |
 
@@ -138,7 +139,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-popup/systems/render/chipPlacement.test.ts` | 8 | 8 |
 | `src/features/mining-popup/systems/render/plaqueFit.test.ts` | 11 | 4 |
 
-### `mobility`: 10 files, 95 tests
+### `mobility`: 11 files, 100 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -148,6 +149,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mobility/systems/marksInPlay.test.ts` | 4 | 4 |
 | `src/features/mobility/systems/mobilityCatalogue.test.ts` | 8 | 8 |
 | `src/features/mobility/systems/mobilityMotion.test.ts` | 8 | 7 |
+| `src/features/mobility/systems/mobilitySales.test.ts` | 5 | 5 |
 | `src/features/mobility/systems/mobilitySection.test.ts` | 5 | 5 |
 | `src/features/mobility/systems/rivetPatch.test.ts` | 8 | 8 |
 | `src/features/mobility/systems/statPreview.test.ts` | 15 | 6 |
@@ -189,13 +191,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
-### `power-up-core`: 12 files, 63 tests
+### `power-up-core`: 13 files, 66 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/power-up-core/logging.test.ts` | 4 | 4 |
 | `src/features/power-up-core/markReportRows.test.ts` | 6 | 6 |
 | `src/features/power-up-core/systems/chargeState.test.ts` | 3 | 3 |
+| `src/features/power-up-core/systems/cradleSales.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/cradles.test.ts` | 5 | 5 |
 | `src/features/power-up-core/systems/dockRefill.test.ts` | 4 | 4 |
 | `src/features/power-up-core/systems/powerUpKind.test.ts` | 3 | 3 |
@@ -227,7 +230,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/statPreview.test.ts` | 9 | 9 |
 | `src/features/sensing/visionRows.test.ts` | 5 | 5 |
 
-### `tech-tree`: 24 files, 174 tests
+### `tech-tree`: 25 files, 181 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -235,6 +238,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 3 | 3 |
+| `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/markLadder.test.ts` | 12 | 12 |
 | `src/features/tech-tree/systems/nodeCost.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/nodePress.test.ts` | 2 | 2 |
@@ -396,6 +400,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/terrain/terrainEditQueue.test.ts` | 5 | 5 |
 | `src/systems/authority/travelRules.test.ts` | 12 | 12 |
 | `src/systems/authority/vehicleCommands.test.ts` | 23 | 23 |
+| `src/systems/authority/vehicleItemRules.test.ts` | 10 | 10 |
 
 ### `bot`
 
@@ -855,6 +860,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/sellBayModel.test.ts` | 13 | 13 |
 | `src/systems/views/upgradeBayModel.test.ts` | 19 | 19 |
 | `src/systems/views/upgradePreview.test.ts` | 15 | 15 |
+| `src/systems/views/vehicleItemRows.test.ts` | 5 | 5 |
 
 ### `world`
 

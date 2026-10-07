@@ -87,8 +87,11 @@ import type { BayId } from '../world/dockBays'
  *    gates (dense cells, extractor gates, dynamite shells), `DrillGated` may be `blocked`, power-up
  *    terrain edits leave gated cells standing, and `mining-gates.GateCleared` and
  *    `mining-gates.GateOreLost` join.
+ * 36: the store's buy path (ticket 248): `buyVehicleItem {itemId}` at the Upgrade bay, answered by
+ *    `VehicleItemPurchased`, with the rejections `unknown_vehicle_item`, `vehicle_item_owned`,
+ *    `not_researched` and `not_for_sale`.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 35
+export const AUTHORITY_PROTOCOL_VERSION = 36
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
