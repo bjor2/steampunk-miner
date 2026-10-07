@@ -7,11 +7,11 @@ and its lining tag. Recorded headless on the preview build with software WebGL, 
 frame rate is low and uneven; the burst itself runs on authority ticks, so its timing in a real
 browser is the 1.5 s of `sellBurst.json`.
 
-| Clip | Sale | What to look for |
-| --- | --- | --- |
-| `*-small.webm` | 1 tile of planet 1 ore, 3 coins | the floor of 3 coins, one peeled to the tag |
-| `*-big-flare.webm` | 4 tiles of planet 8 ore, 40 coins | the cap of 40 coins and the gold flare over the stack |
-| `*-merged.webm` | tier 1, then tier 4 30 ticks later | the second sale merging into the running burst |
+| Clip                 | Sale                                       | What to look for                                                     |
+| -------------------- | ------------------------------------------ | -------------------------------------------------------------------- |
+| `*-small.webm`       | 1 tile of planet 1 ore, 3 coins            | the floor of 3 coins, one peeled to the tag                          |
+| `*-big-flare.webm`   | 4 tiles of planet 8 ore, 40 coins          | the cap of 40 coins and the gold flare over the stack                |
+| `*-merged.webm`      | tier 1, then tier 4 30 ticks later         | the second sale merging into the running burst                       |
 | `*-lining-bill.webm` | 4 tiles of planet 4 ore with a lining bill | peeled coins flying to `Lining −X`, the counter ending on the wallet |
 
 Sizes: `desktop` 1920 x 1080, `phone-landscape` 844 x 390, `tv` 3840 x 2160 (recorded at
