@@ -6,7 +6,10 @@
  * outside the target is a balance finding whose one lever is the `bandHeat` scale (0.8 to 1.2
  * times), never `k_casing`. The run is played on each pacing seed (#84): the heat table is the
  * first seed's, and the attrition table (#198) prints every seed's core time and deaths per trip
- * on planets 8 to 10 with their medians. Takes an hour or more; run it with `npm run balance:heat`.
+ * on planets 8 to 10 with their medians. The rows slices register (`reportRows`, #223) follow for
+ * every seed and planet, so each P3-P10 core time stands beside its Marks-off time and the Mark
+ * spend and effect (#249, the Vertical Scaler on the #157 gap review). Takes an hour or more; run
+ * it with `npm run balance:heat`.
  */
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { PACING_WORLD_SEEDS } from '../src/constants/pacingSeeds'
@@ -20,6 +23,7 @@ import {
 } from '../src/logging/attritionReport'
 import { formatHeatPlanetLines, heatPlanetLines } from '../src/logging/heatReport'
 import { derivePacingReport } from '../src/logging/pacingReport'
+import { reportRowLines } from '../src/logging/reportRows'
 import { playLoggedSliceOnSeeds } from '../src/logging/sliceRunLog'
 import type { Scenario } from '../src/systems/scenario'
 
@@ -68,6 +72,11 @@ const text = [
   `### Deaths per trip, planets ${FIRST_HEAT_PLANET} to ${LAST_PLANET}, per seed (#198)\n\n${formatAttritionTables(attrition, attritionMedianRows)}`,
   `### Attrition findings (#198)\n\n${
     attritionMisses.length === 0 ? 'none' : attritionMisses.map((miss) => `- ${miss}`).join('\n')
+  }`,
+  `### Slice report rows, every seed and planet (reported only, #223, #249)\n\n${
+    reportRowLines(runs)
+      .map((row) => `- ${row}`)
+      .join('\n') || 'none'
   }`,
 ].join('\n\n')
 
