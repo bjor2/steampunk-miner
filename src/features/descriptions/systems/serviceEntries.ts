@@ -12,19 +12,24 @@ import {
   refineSeconds,
   refinerySlotsStart,
 } from '../../../systems/economy/refineryEconomy'
-import { cargoCapacity, energyMax, hullMax } from '../../../systems/economy/vehicleStats'
+import { vehicleStatsAt, type VehicleStats } from '../../../systems/economy/vehicleStats'
 import type { ItemCtx } from '../../../systems/registries/itemDescriber'
+import type { ItemSnapshotView } from '../../../systems/registries/itemSnapshotView'
 import { bayItemOf, KERNEL_ITEMS } from '../../../systems/registries/kernelItems'
 import type { DescribedStatLineSpec } from './describedLineSpec'
 import { fixedLine, kernelEntryOf, type DescribedEntry } from './kernelEntry'
 
 const NEXT_PLANET_STEP = 1
 
-const REPAIRED_HULL = fixedLine('Hull restored to', 'geometric', ({ view }) =>
-  hullMax(view.levels.hull),
+const REPAIRED_HULL = fixedLine(
+  'Hull restored to',
+  'geometric',
+  ({ view }) => vehicleStatsOf(view).hullMax,
 )
-const RECHARGED_ENERGY = fixedLine('Energy filled to', 'linearInt', ({ view }) =>
-  energyMax(view.levels.boiler),
+const RECHARGED_ENERGY = fixedLine(
+  'Energy filled to',
+  'linearInt',
+  ({ view }) => vehicleStatsOf(view).energyMax,
 )
 const REFINE_TIME = fixedLine('Refine time in seconds', 'linearInt', refineSeconds)
 
@@ -80,8 +85,13 @@ export function bayEntries(): readonly DescribedEntry[] {
 
 function refineBatchLine(): DescribedStatLineSpec {
   return fixedLine('Batch cap in units', 'linearInt', ({ view }) =>
-    refineBatchCap(cargoCapacity(view.levels.cargo_hold)),
+    refineBatchCap(vehicleStatsOf(view).cargoCapacity),
   )
+}
+
+/** The vehicle's stats at its stored steps, as `statsOfVehicle` reads them for the authority. */
+function vehicleStatsOf(view: ItemSnapshotView): VehicleStats {
+  return vehicleStatsAt(view.levels)
 }
 
 function nextPlanetOf({ planetIndex }: ItemCtx): number {

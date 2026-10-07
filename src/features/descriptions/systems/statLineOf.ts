@@ -1,6 +1,7 @@
 /**
  * One stat line of the card from its raw values (Vertical Scaler's line shape on #164): now, the
- * next value, the change and its share, and the cap headroom of a saturating line. Every figure is
+ * next value, the change and its share, the next major of a two-tier line (#181) and the cap
+ * headroom of a saturating line. Every figure is
  * computed in Money from the spec's raw kernel values and only then formatted, so nothing subtracts
  * formatted strings and nothing passes through a double. A stat reads as the screens read it
  * (`statReading`): cut to the formatter's three decimals, then `formatAmount`; shares go through
@@ -31,14 +32,32 @@ export const TINY_CHANGE_TEXT = '<0.001'
 const SHOWN_AS_ZERO = /^-?0$/
 
 export function statLineOf(spec: DescribedStatLineSpec, ref: ItemRef, ctx: ItemCtx): StatLine {
+  if (spec.textOf !== undefined) return textLineOf(spec, spec.textOf, ref, ctx)
+  return amountLineOf(spec, ref, ctx)
+}
+
+function amountLineOf(spec: DescribedStatLineSpec, ref: ItemRef, ctx: ItemCtx): StatLine {
   const now = valueAt(spec, ref, ctx, ctx.level)
   return {
     label: spec.label,
     kind: spec.kind,
     now: formatStat(now),
     ...changeFieldsOf(now, nextValueOf(spec, ref, ctx)),
+    ...majorFieldsOf(spec, ref, ctx),
     ...capFieldsOf(spec, ref, ctx, now),
   }
+}
+
+/** A line of words: the text at the owned level and at the next, nothing computed between them. */
+function textLineOf(
+  spec: DescribedStatLineSpec,
+  textOf: (level: number) => string,
+  ref: ItemRef,
+  ctx: ItemCtx,
+): StatLine {
+  const next = nextLevelOf(spec, ref, ctx)
+  const line = { label: spec.label, kind: spec.kind, now: textOf(ctx.level) }
+  return next === null ? line : { ...line, next: textOf(next) }
 }
 
 /** A raw stat as Money: counts exactly, fractional bounded stats (engine, fire rate) as decimals. */
@@ -57,8 +76,20 @@ function valueAt(spec: DescribedStatLineSpec, ref: ItemRef, ctx: ItemCtx, level:
 }
 
 function nextValueOf(spec: DescribedStatLineSpec, ref: ItemRef, ctx: ItemCtx): Money | null {
-  const level = spec.nextLevel === undefined ? ctx.level + 1 : spec.nextLevel(ref, ctx)
+  const level = nextLevelOf(spec, ref, ctx)
   return level === null ? null : valueAt(spec, ref, ctx, level)
+}
+
+function nextLevelOf(spec: DescribedStatLineSpec, ref: ItemRef, ctx: ItemCtx): number | null {
+  return spec.nextLevel === undefined ? ctx.level + 1 : spec.nextLevel(ref, ctx)
+}
+
+/** The steps to the next major and the stat there, on a line that names its next major. */
+function majorFieldsOf(spec: DescribedStatLineSpec, ref: ItemRef, ctx: ItemCtx): Partial<StatLine> {
+  const level = spec.nextMajorLevel?.(ref, ctx) ?? null
+  if (level === null) return {}
+  const value = formatStat(valueAt(spec, ref, ctx, level))
+  return { major: { levelsTo: level - ctx.level, value } }
 }
 
 function changeFieldsOf(now: Money, next: Money | null): Partial<StatLine> {

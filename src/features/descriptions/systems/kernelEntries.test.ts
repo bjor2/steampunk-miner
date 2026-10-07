@@ -5,9 +5,11 @@ import { createAuthorityState } from '../../../systems/authority/authorityState'
 import { formatPercent } from '../../../systems/displayAmount'
 import { casingHardness } from '../../../systems/economy/casingGrades'
 import { UPGRADE_IDS, type UpgradeId } from '../../../systems/economy/economyDefinition'
-import { gunMaxLevel, gunShotsPerSecond } from '../../../systems/economy/gunStats'
+import { gunMountStep, gunShotsPerSecond, gunTopStep } from '../../../systems/economy/gunStats'
+import { trackKindOf } from '../../../systems/economy/trackKind'
 import { refinerySlotsStart } from '../../../systems/economy/refineryEconomy'
-import { hullMax, startLevels, vehicleStatsAt } from '../../../systems/economy/vehicleStats'
+import { majorOf, stepOfMajor } from '../../../systems/economy/upgradeSteps'
+import { startLevels, vehicleStatsAt } from '../../../systems/economy/vehicleStats'
 import { div, fromCanonical, sub, toCanonical, type Money } from '../../../systems/money'
 import type { ItemCtx, ItemRef, StatLine } from '../../../systems/registries/itemDescriber'
 import { itemSnapshotViewOf } from '../../../systems/registries/itemSnapshotView'
@@ -23,8 +25,10 @@ import { statsOfTrack } from '../../../systems/views/workshopRows'
 import { describeItemCard } from './describeItemCard'
 import { TINY_CHANGE_TEXT } from './statLineOf'
 
-const PINNED_LEVELS = [0, 1, 20, 247, 607, 6007]
-const HIGH_LEVELS = [607, 6007]
+/** Majors pinned (VS on #164), each read at its major, mid-major and the buy landing the next. */
+const PINNED_MAJORS = [0, 1, 20, 247, 607, 6007]
+const HIGH_MAJORS = [607, 6007]
+const PINNED_PIPS = [0, 4, 9]
 const PLANET = 4
 
 const view = itemSnapshotViewOf(
@@ -40,9 +44,18 @@ function linesOf(ref: ItemRef, level: number): readonly StatLine[] {
   return describeItemCard(ref, ctxAt(level))?.statLines ?? []
 }
 
+/** The track's stat lines, without the closing level line. */
+function statLinesOf(upgradeId: UpgradeId, step: number): readonly StatLine[] {
+  return linesOf(trackItemOf(upgradeId), step).slice(0, statsOfTrack(upgradeId).length)
+}
+
+function stepsOf(majors: readonly number[]): number[] {
+  return majors.flatMap((major) => PINNED_PIPS.map((pip) => stepOfMajor(major) + pip))
+}
+
 /** The track's stats as the Upgrade bay's own preview reads them (`statsAfter` names). */
-function kernelStatsOf(upgradeId: UpgradeId, level: number): Money[] {
-  const canonical = canonicalStatsOf(vehicleStatsAt({ ...startLevels(), [upgradeId]: level }))
+function kernelStatsOf(upgradeId: UpgradeId, step: number): Money[] {
+  const canonical = canonicalStatsOf(vehicleStatsAt({ ...startLevels(), [upgradeId]: step }))
   return statsOfTrack(upgradeId).map((stat) => fromCanonical(canonical[stat]))
 }
 
@@ -50,58 +63,101 @@ function shownStat(amount: Money): string {
   return statReading(toCanonical(amount)).text
 }
 
-function expectedLine(upgradeId: UpgradeId, level: number, index: number) {
-  const now = kernelStatsOf(upgradeId, level)[index]
-  const next = kernelStatsOf(upgradeId, level + 1)[index]
+function expectedLine(upgradeId: UpgradeId, step: number, index: number) {
+  const now = kernelStatsOf(upgradeId, step)[index]
+  const next = kernelStatsOf(upgradeId, step + 1)[index]
+  const majorStep = stepOfMajor(majorOf(step) + 1)
   return {
     now: shownStat(now),
     next: shownStat(next),
     deltaPct: formatPercent(div(sub(next, now), now)),
+    major: {
+      levelsTo: majorStep - step,
+      value: shownStat(kernelStatsOf(upgradeId, majorStep)[index]),
+    },
   }
 }
 
+function isKernelStatMoving(upgradeId: UpgradeId, step: number, index: number): boolean {
+  const [now, next] = [step, step + 1].map((at) => kernelStatsOf(upgradeId, at)[index])
+  return toCanonical(now) !== toCanonical(next)
+}
+
+/** Tracks whose every step moves the stat: the integer tracks gain a whole unit only on some pips. */
+const GROWING_TRACKS = UPGRADE_IDS.filter((id) => trackKindOf(id) !== 'linearInt')
+
 describe('descriptions side table: the six tracks', () => {
-  it.each(UPGRADE_IDS)('pins every %s line to the kernel stat at the pinned levels', (id) => {
-    for (const level of PINNED_LEVELS) {
-      const lines = linesOf(trackItemOf(id), level)
+  it.each(UPGRADE_IDS)('pins every %s line to the kernel stat at the pinned steps', (id) => {
+    for (const step of stepsOf(PINNED_MAJORS)) {
+      const lines = statLinesOf(id, step)
       expect(lines).toHaveLength(statsOfTrack(id).length)
-      lines.forEach((line, index) => expect(line).toMatchObject(expectedLine(id, level, index)))
+      lines.forEach((line, index) => expect(line).toMatchObject(expectedLine(id, step, index)))
     }
   })
 
-  it.each(UPGRADE_IDS)('shows a change and its share on every %s line at L 607 and 6007', (id) => {
-    for (const level of HIGH_LEVELS) {
-      for (const line of linesOf(trackItemOf(id), level)) {
-        expect([line.delta, line.deltaPct]).not.toContain(undefined)
-        expect([line.delta, line.deltaPct]).not.toContain('0')
-        expect(line.deltaPct).not.toBe('0%')
+  it.each(GROWING_TRACKS)(
+    'shows a change and its share on every %s line at majors 607 and 6007',
+    (id) => {
+      for (const step of stepsOf(HIGH_MAJORS)) {
+        for (const line of statLinesOf(id, step)) {
+          expect([line.delta, line.deltaPct]).not.toContain(undefined)
+          expect([line.delta, line.deltaPct]).not.toContain('0')
+          expect(line.deltaPct).not.toBe('0%')
+        }
       }
+    },
+  )
+
+  it.each(UPGRADE_IDS)('never shows a change of 0 where the %s stat moves', (id) => {
+    for (const step of stepsOf(PINNED_MAJORS)) {
+      statLinesOf(id, step).forEach((line, index) => {
+        if (!isKernelStatMoving(id, step, index)) return
+        expect(line.delta).not.toBe('0')
+        expect(line.deltaPct).not.toBe('0%')
+      })
     }
   })
 
-  it('shows the cargo line at L 607 rising by four, with its share', () => {
-    const [cargo] = linesOf(trackItemOf('cargo_hold'), 607)
-    expect(cargo).toMatchObject({ now: '2,438', next: '2,442', delta: '4' })
-    expect(cargo.deltaPct).toBe(formatPercent(div(fromCanonical('4'), fromCanonical('2438'))))
+  it('shows the cargo line at major 607 rising by two on the buy that lands the next major', () => {
+    const [cargo] = statLinesOf('cargo_hold', stepOfMajor(607) + 9)
+    expect(cargo).toMatchObject({ now: '2,440', next: '2,442', delta: '2' })
+    expect(cargo.deltaPct).toBe(formatPercent(div(fromCanonical('2'), fromCanonical('2440'))))
+    expect(cargo.major).toEqual({ levelsTo: 1, value: '2,442' })
+  })
+
+  it('counts the steps to the next major on a track mid-level', () => {
+    const [power] = statLinesOf('drill_power', stepOfMajor(20) + 4)
+    expect(power.major?.levelsTo).toBe(6)
   })
 
   it('shows an engine line near its cap with the headroom left', () => {
-    const [speed] = linesOf(trackItemOf('engine'), 247)
-    const now = kernelStatsOf('engine', 247)[0]
+    const step = stepOfMajor(247)
+    const [speed] = statLinesOf('engine', step)
+    const now = kernelStatsOf('engine', step)[0]
     const cap = fromCanonical('14')
     expect(speed.cap).toEqual({ value: '14', headroomPct: formatPercent(div(sub(cap, now), cap)) })
   })
 
   it('reads a sub-milli engine change as a tiny change, never as zero', () => {
-    const [speed] = linesOf(trackItemOf('engine'), 6007)
+    const [speed] = statLinesOf('engine', stepOfMajor(6007))
     expect(speed.now).toBe(speed.next)
     expect(speed.delta).toBe(TINY_CHANGE_TEXT)
+  })
+
+  it('closes every track card with the step as the Upgrade bay prints it', () => {
+    const lines = linesOf(trackItemOf('hull'), stepOfMajor(13) + 4)
+    expect(lines.at(-1)).toEqual({
+      label: 'Level',
+      kind: 'linearInt',
+      now: '13 · 4/9',
+      next: '13 · 5/9',
+    })
   })
 
   it('names each line’s kind from the track’s curve family', () => {
     expect(linesOf(trackItemOf('drill_power'), 1)[0].kind).toBe('geometric')
     expect(linesOf(trackItemOf('boiler'), 1)[0].kind).toBe('linearInt')
-    expect(linesOf(trackItemOf('engine'), 1).map((line) => line.kind)).toEqual([
+    expect(statLinesOf('engine', 1).map((line) => line.kind)).toEqual([
       'saturating',
       'saturating',
       'saturating',
@@ -110,17 +166,34 @@ describe('descriptions side table: the six tracks', () => {
 })
 
 describe('descriptions side table: gear, services, bays and artefacts', () => {
-  it('shows the guns one level below the top with the top rate as the cap', () => {
-    const [rate] = linesOf(KERNEL_ITEMS.guns, gunMaxLevel() - 1)
-    const top = statReading(String(gunShotsPerSecond(gunMaxLevel()))).text
+  it('shows the guns one step below the top with the top rate as the next, major and cap', () => {
+    const [rate] = linesOf(KERNEL_ITEMS.guns, gunTopStep() - 1)
+    const top = statReading(String(gunShotsPerSecond(gunTopStep()))).text
     expect(rate.next).toBe(top)
+    expect(rate.major).toEqual({ levelsTo: 1, value: top })
     expect(rate.cap?.value).toBe(top)
   })
 
-  it('shows no next rate at the guns’ top level', () => {
-    const [rate] = linesOf(KERNEL_ITEMS.guns, gunMaxLevel())
+  it('shows no next rate and no next major at the guns’ top step', () => {
+    const [rate] = linesOf(KERNEL_ITEMS.guns, gunTopStep())
     expect(rate.next).toBeUndefined()
+    expect(rate.major).toBeUndefined()
     expect(rate.cap?.headroomPct).toBe(formatPercent(fromCanonical('0')))
+  })
+
+  it('offers the mount as the guns’ next step and next major before they are mounted', () => {
+    const lines = linesOf(KERNEL_ITEMS.guns, 0)
+    const mounted = statReading(String(gunShotsPerSecond(gunMountStep()))).text
+    expect(lines[0]).toMatchObject({ now: '0', next: mounted })
+    expect(lines[0].major).toEqual({ levelsTo: gunMountStep(), value: mounted })
+    expect(lines.at(-1)).toMatchObject({ label: 'Level', now: '0', next: '1' })
+  })
+
+  it('says how many charges the vehicle carries on the restock card', () => {
+    expect(linesOf(KERNEL_ITEMS.charges, 3).at(-1)).toMatchObject({
+      label: 'Charges carried',
+      now: '3',
+    })
   })
 
   it('pins the casing’s lining hardness to the kernel at this planet', () => {
@@ -134,7 +207,7 @@ describe('descriptions side table: gear, services, bays and artefacts', () => {
     expect(hull).toEqual({
       label: 'Hull restored to',
       kind: 'geometric',
-      now: shownStat(hullMax(view.levels.hull)),
+      now: shownStat(vehicleStatsAt(view.levels).hullMax),
     })
   })
 

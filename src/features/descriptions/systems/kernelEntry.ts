@@ -4,13 +4,30 @@
  * id, so no entry of this slice can overlap another slice's.
  */
 import type { TrackKind } from '../../../systems/economy/trackKind'
+import { majorOf, stepOfMajor } from '../../../systems/economy/upgradeSteps'
 import type { Money } from '../../../systems/money'
 import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
+import { stepLevelText } from '../../../systems/views/stepLevelText'
 import { hasNoNextLevel, type DescribedStatLineSpec } from './describedLineSpec'
 
 export interface DescribedEntry extends ItemDescriptionEntry {
   statLines: readonly DescribedStatLineSpec[]
+}
+
+/**
+ * How a two-tier item climbs (#181): the step one buy reaches from a stored step, and the step of
+ * the next major; null where the item has none ahead.
+ */
+export interface StepLadder {
+  nextStepOf(step: number): number | null
+  nextMajorStepOf(step: number): number | null
+}
+
+/** An upgrade track: every buy is one step, and there is always a next major. */
+export const TRACK_STEPS: StepLadder = {
+  nextStepOf: (step) => step + 1,
+  nextMajorStepOf: (step) => stepOfMajor(majorOf(step) + 1),
 }
 
 export function kernelEntryOf(
@@ -53,4 +70,31 @@ export function levelledLine(
 function nextLevelBelow(level: number, topLevel: (() => number) | undefined): number | null {
   if (topLevel !== undefined && level >= topLevel()) return null
   return level + 1
+}
+
+/** A two-tier figure (#181) read at the stored step, a buy on, and at the next major. */
+export function steppedLine(
+  label: string,
+  kind: TrackKind,
+  value: (step: number) => number | Money,
+  steps: StepLadder = TRACK_STEPS,
+): DescribedStatLineSpec {
+  return {
+    label,
+    kind,
+    value: (_ref, ctx) => value(ctx.level),
+    nextLevel: (_ref, ctx) => steps.nextStepOf(ctx.level),
+    nextMajorLevel: (_ref, ctx) => steps.nextMajorStepOf(ctx.level),
+  }
+}
+
+/** The stored step as the Upgrade bay prints it, "13 · 4/9", and where one buy takes it. */
+export function stepLevelLine(steps: StepLadder = TRACK_STEPS): DescribedStatLineSpec {
+  return {
+    label: 'Level',
+    kind: 'linearInt',
+    value: (_ref, ctx) => ctx.level,
+    nextLevel: (_ref, ctx) => steps.nextStepOf(ctx.level),
+    textOf: stepLevelText,
+  }
 }

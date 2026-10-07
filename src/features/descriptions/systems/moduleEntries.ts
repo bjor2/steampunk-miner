@@ -4,6 +4,8 @@
  * charges and their rack (#109), refinery slots (#105). Every figure is a kernel stat function at
  * the level the card is drawn for: the casing grade, the gun level, the rack's slot level, the
  * platform's slot count. Guns and the rack stop at their top level, where the line has no next.
+ * The guns are two-tier since #181: their step climbs like a track's from the mount, the first
+ * major, so their lines show the next major and the step as the bay prints it.
  */
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../../constants/physics'
 import {
@@ -13,19 +15,37 @@ import {
   rackMaxSlotLevel,
 } from '../../../systems/economy/blastingCharges'
 import { casingHardness } from '../../../systems/economy/casingGrades'
-import { gunMaxLevel, gunRangeTiles, gunShotsPerSecond } from '../../../systems/economy/gunStats'
+import {
+  gunMountStep,
+  gunRangeTiles,
+  gunShotsPerSecond,
+  gunTopStep,
+} from '../../../systems/economy/gunStats'
 import { liningTypePriceMultiplier } from '../../../systems/economy/heatEconomy'
 import { refineSeconds, refinerySlotsMax } from '../../../systems/economy/refineryEconomy'
+import { majorOf, stepOfMajor } from '../../../systems/economy/upgradeSteps'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
 import { KERNEL_ITEMS, liningItemOf } from '../../../systems/registries/kernelItems'
-import { fixedLine, kernelEntryOf, levelledLine, type DescribedEntry } from './kernelEntry'
+import {
+  fixedLine,
+  kernelEntryOf,
+  levelledLine,
+  stepLevelLine,
+  steppedLine,
+  type DescribedEntry,
+  type StepLadder,
+} from './kernelEntry'
 
 /** One flavour per buyable lining type; a type without one fails the coverage spec. */
 const LINING_FLAVOURS: Readonly<Record<string, string>> = {
   refractory: 'Firebrick casing that keeps lava out and your tunnel cool.',
 }
 
-const NO_GUNS = 0
+/** The guns' climb (#181): nothing to the mount step, then a step a buy up to the top step. */
+const GUN_STEPS: StepLadder = {
+  nextStepOf: (step) => gunStepAfter(step, step + 1),
+  nextMajorStepOf: (step) => gunStepAfter(step, stepOfMajor(majorOf(step) + 1)),
+}
 
 export function moduleEntries(): readonly DescribedEntry[] {
   return [
@@ -45,10 +65,11 @@ export function moduleEntries(): readonly DescribedEntry[] {
       'Swivel-mounted brass barrels that fire at whatever bites the miner.',
       [
         {
-          ...levelledLine('Shots per second', 'saturating', shotsPerSecondAt, gunMaxLevel),
-          cap: () => gunShotsPerSecond(gunMaxLevel()),
+          ...steppedLine('Shots per second', 'saturating', shotsPerSecondAt, GUN_STEPS),
+          cap: () => gunShotsPerSecond(gunTopStep()),
         },
         fixedLine('Range in tiles', 'linearInt', gunRangeTiles),
+        stepLevelLine(GUN_STEPS),
       ],
     ),
     kernelEntryOf(
@@ -57,6 +78,7 @@ export function moduleEntries(): readonly DescribedEntry[] {
       [
         fixedLine('Blast radius in metres', 'linearInt', blastRadiusMetres),
         fixedLine('Fuse in seconds', 'linearInt', fuseSeconds),
+        fixedLine('Charges carried', 'linearInt', ({ level }) => level),
       ],
     ),
     kernelEntryOf(
@@ -93,8 +115,14 @@ function liningEntries(): readonly DescribedEntry[] {
 }
 
 /** No guns before the mount: the card's next line is the mount's rate. */
-function shotsPerSecondAt(gunLevel: number): number {
-  return gunLevel === NO_GUNS ? 0 : gunShotsPerSecond(gunLevel)
+function shotsPerSecondAt(gunStep: number): number {
+  return gunStep < gunMountStep() ? 0 : gunShotsPerSecond(gunStep)
+}
+
+/** Where a gun buy from `step` lands for a climb toward `onward`: the mount first, none at the top. */
+function gunStepAfter(step: number, onward: number): number | null {
+  if (step >= gunTopStep()) return null
+  return step < gunMountStep() ? gunMountStep() : onward
 }
 
 function blastRadiusMetres(): Money {
