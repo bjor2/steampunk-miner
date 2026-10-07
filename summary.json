@@ -1,25 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-07T00:09:38.469Z",
+ "updatedAt": "2026-10-07T00:10:20.205Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37511964964,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37511964964",
-   "event": "push",
-   "mode": "full-legacy",
-   "sha": "5987e0922bf0584a42e364ee033d6e65fc57b27e",
-   "branch": "main",
-   "startedAt": "2026-10-06T18:31:29Z",
-   "jobConclusion": "cancelled",
-   "timedOut": true,
-   "jobDurationSec": 614,
-   "reportFound": true,
-   "files": 244,
-   "tests": 2160,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37513787849,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37513787849",
@@ -852,17 +835,33 @@
    "tests": 0,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 37550401656,
+   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37550401656",
+   "event": "push",
+   "mode": "scoped",
+   "sha": "01f6e05f7ab18310b5608f101a7a73efafe03b59",
+   "branch": "main",
+   "startedAt": "2026-10-07T00:08:52Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 76,
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "full-legacy": 7,
+   "full-legacy": 6,
    "full": 10,
    "nightly": 2,
-   "scoped": 31
+   "scoped": 32
   },
   "timedOut": [
-   37511964964,
    37513787849,
    37514212192,
    37514292074,
@@ -884,9 +883,9 @@
  "features": {
   "tooling-metrics": {
    "files": 7,
-   "p50Ms": 60,
-   "p95Ms": 99,
-   "fileRuns": 136,
+   "p50Ms": 61,
+   "p95Ms": 116,
+   "fileRuns": 129,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -895,7 +894,7 @@
    "files": 1,
    "p50Ms": 10,
    "p95Ms": 12,
-   "fileRuns": 19,
+   "fileRuns": 18,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -904,7 +903,7 @@
    "files": 4,
    "p50Ms": 30,
    "p95Ms": 50,
-   "fileRuns": 76,
+   "fileRuns": 72,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -913,52 +912,43 @@
    "files": 14,
    "p50Ms": 165,
    "p95Ms": 261,
-   "fileRuns": 205,
+   "fileRuns": 196,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "debug": {
    "files": 5,
-   "p50Ms": 1001,
+   "p50Ms": 988,
    "p95Ms": 2041,
-   "fileRuns": 122,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "pacing-bot": {
-   "files": 3,
-   "p50Ms": 702624,
-   "p95Ms": 871258,
-   "fileRuns": 15,
+   "fileRuns": 118,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "logging": {
    "files": 24,
-   "p50Ms": 762,
-   "p95Ms": 971,
-   "fileRuns": 398,
+   "p50Ms": 772,
+   "p95Ms": 1053,
+   "fileRuns": 379,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "golden-replay": {
    "files": 3,
-   "p50Ms": 6226,
+   "p50Ms": 6197,
    "p95Ms": 11364,
-   "fileRuns": 83,
+   "fileRuns": 80,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "physics": {
    "files": 3,
-   "p50Ms": 2516,
+   "p50Ms": 2505,
    "p95Ms": 3474,
-   "fileRuns": 81,
+   "fileRuns": 78,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -967,16 +957,16 @@
    "files": 1,
    "p50Ms": 63,
    "p95Ms": 75,
-   "fileRuns": 29,
+   "fileRuns": 28,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "store": {
    "files": 11,
-   "p50Ms": 4490,
+   "p50Ms": 4434,
    "p95Ms": 10086,
-   "fileRuns": 295,
+   "fileRuns": 285,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -985,7 +975,7 @@
    "files": 19,
    "p50Ms": 504,
    "p95Ms": 749,
-   "fileRuns": 402,
+   "fileRuns": 390,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -994,52 +984,61 @@
    "files": 1,
    "p50Ms": 8,
    "p95Ms": 17,
-   "fileRuns": 19,
+   "fileRuns": 18,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "audio": {
    "files": 6,
-   "p50Ms": 117,
-   "p95Ms": 184,
-   "fileRuns": 128,
+   "p50Ms": 118,
+   "p95Ms": 189,
+   "fileRuns": 122,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "authority": {
    "files": 48,
-   "p50Ms": 90992,
-   "p95Ms": 429997,
-   "fileRuns": 1211,
+   "p50Ms": 89696,
+   "p95Ms": 429999,
+   "fileRuns": 1169,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "bot": {
    "files": 11,
-   "p50Ms": 51450,
+   "p50Ms": 51140,
    "p95Ms": 232553,
-   "fileRuns": 311,
+   "fileRuns": 301,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "pacing-bot": {
+   "files": 3,
+   "p50Ms": 371534,
+   "p95Ms": 729230,
+   "fileRuns": 12,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "systems-core": {
    "files": 11,
-   "p50Ms": 661,
-   "p95Ms": 908,
-   "fileRuns": 229,
+   "p50Ms": 654,
+   "p95Ms": 913,
+   "fileRuns": 218,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "economy": {
    "files": 17,
-   "p50Ms": 736,
-   "p95Ms": 1044,
-   "fileRuns": 347,
+   "p50Ms": 754,
+   "p95Ms": 1075,
+   "fileRuns": 330,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1047,53 +1046,53 @@
   "feedback": {
    "files": 3,
    "p50Ms": 22,
-   "p95Ms": 41,
-   "fileRuns": 59,
+   "p95Ms": 47,
+   "fileRuns": 56,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "hints": {
    "files": 4,
-   "p50Ms": 2908,
+   "p50Ms": 2904,
    "p95Ms": 16424,
-   "fileRuns": 112,
+   "fileRuns": 108,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "input": {
    "files": 4,
-   "p50Ms": 45,
-   "p95Ms": 66,
-   "fileRuns": 86,
+   "p50Ms": 46,
+   "p95Ms": 72,
+   "fileRuns": 82,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "render": {
    "files": 31,
-   "p50Ms": 856,
-   "p95Ms": 1195,
-   "fileRuns": 622,
+   "p50Ms": 860,
+   "p95Ms": 1226,
+   "fileRuns": 595,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "replay": {
    "files": 1,
-   "p50Ms": 1929,
+   "p50Ms": 1922,
    "p95Ms": 5177,
-   "fileRuns": 29,
+   "fileRuns": 28,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "save": {
    "files": 2,
-   "p50Ms": 431,
+   "p50Ms": 424,
    "p95Ms": 1033,
-   "fileRuns": 34,
+   "fileRuns": 33,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1102,43 +1101,43 @@
    "files": 4,
    "p50Ms": 57,
    "p95Ms": 125,
-   "fileRuns": 82,
+   "fileRuns": 78,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "vehicle": {
    "files": 8,
-   "p50Ms": 112,
-   "p95Ms": 171,
-   "fileRuns": 167,
+   "p50Ms": 118,
+   "p95Ms": 178,
+   "fileRuns": 159,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "views": {
    "files": 11,
-   "p50Ms": 3815,
+   "p50Ms": 3755,
    "p95Ms": 10091,
-   "fileRuns": 295,
+   "fileRuns": 285,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "world": {
    "files": 20,
-   "p50Ms": 30148,
+   "p50Ms": 30131,
    "p95Ms": 35069,
-   "fileRuns": 397,
+   "fileRuns": 379,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
   },
   "ui": {
    "files": 3,
-   "p50Ms": 1052,
+   "p50Ms": 1051,
    "p95Ms": 2402,
-   "fileRuns": 39,
+   "fileRuns": 38,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1192,10 +1191,10 @@
  "files": {
   "scripts/metrics/claimedWindow.test.mjs": {
    "feature": "tooling-metrics",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 4,
    "p50Ms": 5,
-   "p95Ms": 12,
+   "p95Ms": 17,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1205,7 +1204,7 @@
   },
   "scripts/metrics/classifyToolCall.test.mjs": {
    "feature": "tooling-metrics",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 10,
    "p50Ms": 11,
    "p95Ms": 21,
@@ -1218,7 +1217,7 @@
   },
   "scripts/metrics/githubWindows.test.mjs": {
    "feature": "tooling-metrics",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 4,
    "p50Ms": 4,
    "p95Ms": 8,
@@ -1231,7 +1230,7 @@
   },
   "scripts/metrics/loopLog.test.mjs": {
    "feature": "tooling-metrics",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 5,
    "p50Ms": 6,
    "p95Ms": 10,
@@ -1244,7 +1243,7 @@
   },
   "scripts/metrics/sessionSegments.test.mjs": {
    "feature": "tooling-metrics",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 11,
    "p50Ms": 13,
    "p95Ms": 21,
@@ -1257,10 +1256,10 @@
   },
   "scripts/metrics/ticketFile.test.mjs": {
    "feature": "tooling-metrics",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 15,
    "p50Ms": 6,
-   "p95Ms": 9,
+   "p95Ms": 15,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1270,10 +1269,10 @@
   },
   "scripts/metrics/ticketRecord.test.mjs": {
    "feature": "tooling-metrics",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 16,
-   "p50Ms": 15,
-   "p95Ms": 18,
+   "p50Ms": 16,
+   "p95Ms": 24,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1283,7 +1282,7 @@
   },
   "scripts/perf/perfMetrics.test.mjs": {
    "feature": "tooling-perf",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 9,
    "p50Ms": 10,
    "p95Ms": 12,
@@ -1296,7 +1295,7 @@
   },
   "scripts/soak/soakChart.test.mjs": {
    "feature": "tooling-soak",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 8,
    "p50Ms": 10,
    "p95Ms": 13,
@@ -1309,7 +1308,7 @@
   },
   "scripts/soak/soakGate.test.mjs": {
    "feature": "tooling-soak",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 5,
    "p50Ms": 7,
    "p95Ms": 9,
@@ -1322,7 +1321,7 @@
   },
   "scripts/soak/soakJobSummary.test.mjs": {
    "feature": "tooling-soak",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 7,
    "p50Ms": 6,
    "p95Ms": 13,
@@ -1335,7 +1334,7 @@
   },
   "scripts/soak/soakSummary.test.mjs": {
    "feature": "tooling-soak",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 7,
    "p50Ms": 7,
    "p95Ms": 15,
@@ -1348,7 +1347,7 @@
   },
   "scripts/status/features.test.mjs": {
    "feature": "tooling-status",
-   "runs": 22,
+   "runs": 21,
    "lastMs": 13,
    "p50Ms": 14,
    "p95Ms": 21,
@@ -1361,7 +1360,7 @@
   },
   "scripts/status/featureTime.test.mjs": {
    "feature": "tooling-status",
-   "runs": 22,
+   "runs": 21,
    "lastMs": 16,
    "p50Ms": 13,
    "p95Ms": 22,
@@ -1374,7 +1373,7 @@
   },
   "scripts/status/featureTimeHtml.test.mjs": {
    "feature": "tooling-status",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 10,
    "p50Ms": 11,
    "p95Ms": 16,
@@ -1387,7 +1386,7 @@
   },
   "scripts/status/perfOverview.test.mjs": {
    "feature": "tooling-status",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 11,
    "p50Ms": 17,
    "p95Ms": 22,
@@ -1400,7 +1399,7 @@
   },
   "scripts/status/perfOverviewHtml.test.mjs": {
    "feature": "tooling-status",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 14,
    "p50Ms": 21,
    "p95Ms": 41,
@@ -1413,7 +1412,7 @@
   },
   "scripts/status/ticketsClosed.test.mjs": {
    "feature": "tooling-status",
-   "runs": 22,
+   "runs": 21,
    "lastMs": 7,
    "p50Ms": 8,
    "p95Ms": 12,
@@ -1426,7 +1425,7 @@
   },
   "scripts/status/ticketsClosedHtml.test.mjs": {
    "feature": "tooling-status",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 9,
    "p50Ms": 9,
    "p95Ms": 15,
@@ -1439,7 +1438,7 @@
   },
   "scripts/status/ticketTimeOverview.test.mjs": {
    "feature": "tooling-status",
-   "runs": 22,
+   "runs": 21,
    "lastMs": 20,
    "p50Ms": 13,
    "p95Ms": 20,
@@ -1452,7 +1451,7 @@
   },
   "scripts/status/ticketTimeOverviewHtml.test.mjs": {
    "feature": "tooling-status",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 21,
    "p50Ms": 15,
    "p95Ms": 21,
@@ -1465,9 +1464,9 @@
   },
   "src/debug/debugApi.test.ts": {
    "feature": "debug",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 230,
-   "p50Ms": 356,
+   "p50Ms": 354,
    "p95Ms": 676,
    "passRate": 1,
    "lastStatus": "passed",
@@ -1478,7 +1477,7 @@
   },
   "src/debug/debugArtefact.test.ts": {
    "feature": "debug",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 13,
    "p50Ms": 28,
    "p95Ms": 44,
@@ -1491,7 +1490,7 @@
   },
   "src/debug/debugMemory.test.ts": {
    "feature": "debug",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 6,
    "p50Ms": 5,
    "p95Ms": 6,
@@ -1504,9 +1503,9 @@
   },
   "src/debug/debugScreens.test.ts": {
    "feature": "debug",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 379,
-   "p50Ms": 601,
+   "p50Ms": 590,
    "p95Ms": 1299,
    "passRate": 1,
    "lastStatus": "passed",
@@ -1515,34 +1514,12 @@
    "flaky": false,
    "slowest": []
   },
-  "src/logging/assayPacingGate.test.ts": {
-   "feature": "pacing-bot",
-   "runs": 3,
-   "lastMs": 30603,
-   "p50Ms": 151117,
-   "p95Ms": 204020,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37522278869,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "balance regression: the pacing bot holding assay_beacon (#46, S11) passes the first-ten-minutes, planet 1 core and slice gates on the seed median",
-     30601
-    ],
-    [
-     "balance regression: the pacing bot holding assay_beacon (#46, S11) plays the scenario's own world seed first, then two fixed others",
-     2
-    ]
-   ]
-  },
   "src/logging/bandDigReport.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 4,
    "p50Ms": 6,
-   "p95Ms": 9,
+   "p95Ms": 11,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1552,10 +1529,10 @@
   },
   "src/logging/compareRuns.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 26,
-   "p50Ms": 26,
-   "p95Ms": 34,
+   "p50Ms": 27,
+   "p95Ms": 58,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1565,7 +1542,7 @@
   },
   "src/logging/diveCasing.test.ts": {
    "feature": "logging",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 7,
    "p50Ms": 5,
    "p95Ms": 12,
@@ -1578,7 +1555,7 @@
   },
   "src/logging/diveSummaries.test.ts": {
    "feature": "logging",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 5,
    "p50Ms": 6,
    "p95Ms": 9,
@@ -1591,9 +1568,9 @@
   },
   "src/logging/domainEventLog.test.ts": {
    "feature": "logging",
-   "runs": 22,
+   "runs": 21,
    "lastMs": 13,
-   "p50Ms": 11,
+   "p50Ms": 12,
    "p95Ms": 13,
    "passRate": 1,
    "lastStatus": "passed",
@@ -1604,7 +1581,7 @@
   },
   "src/logging/eventNames.test.ts": {
    "feature": "logging",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 8,
    "p50Ms": 10,
    "p95Ms": 19,
@@ -1617,10 +1594,10 @@
   },
   "src/logging/eventSink.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 10,
    "p50Ms": 9,
-   "p95Ms": 18,
+   "p95Ms": 27,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1630,9 +1607,9 @@
   },
   "src/logging/goldenRun.test.ts": {
    "feature": "golden-replay",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 1256,
-   "p50Ms": 2028,
+   "p50Ms": 2002,
    "p95Ms": 5987,
    "passRate": 1,
    "lastStatus": "passed",
@@ -1656,10 +1633,10 @@
   },
   "src/logging/heatReport.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 6,
    "p50Ms": 5,
-   "p95Ms": 8,
+   "p95Ms": 13,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1669,7 +1646,7 @@
   },
   "src/logging/ndjson.test.ts": {
    "feature": "logging",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 13,
    "p50Ms": 16,
    "p95Ms": 27,
@@ -1680,46 +1657,12 @@
    "flaky": false,
    "slowest": []
   },
-  "src/logging/pacingGate.test.ts": {
-   "feature": "pacing-bot",
-   "runs": 3,
-   "lastMs": 55755,
-   "p50Ms": 266331,
-   "p95Ms": 355456,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37522278869,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": [
-    [
-     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median",
-     42324
-    ],
-    [
-     "balance regression: the pacing bot on the slice (#29, S11) derives the same summary from a second run of the same scenario",
-     13279
-    ],
-    [
-     "balance regression: the pacing bot on the slice (#29, S11) emits only registered events, with registered fields and kinds",
-     92
-    ],
-    [
-     "balance regression: the pacing bot on the slice (#29, S11) keeps the first hour of core events and commands under the 4 MB budget",
-     25
-    ],
-    [
-     "balance regression: the pacing bot on the slice (#29, S11) lays casing on every drill dive through the player placement code, and pays for it (#115)",
-     24
-    ]
-   ]
-  },
   "src/logging/pacingMedian.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 6,
-   "p50Ms": 7,
-   "p95Ms": 8,
+   "p50Ms": 8,
+   "p95Ms": 9,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1729,9 +1672,9 @@
   },
   "src/logging/pacingReport.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 11,
-   "p50Ms": 11,
+   "p50Ms": 12,
    "p95Ms": 14,
    "passRate": 1,
    "lastStatus": "passed",
@@ -1742,10 +1685,10 @@
   },
   "src/logging/refineryReport.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 8,
    "p50Ms": 8,
-   "p95Ms": 13,
+   "p95Ms": 15,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1755,7 +1698,7 @@
   },
   "src/logging/runEventSchema.test.ts": {
    "feature": "logging",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 22,
    "p50Ms": 19,
    "p95Ms": 28,
@@ -1768,7 +1711,7 @@
   },
   "src/logging/runLayout.test.ts": {
    "feature": "logging",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 3,
    "p50Ms": 5,
    "p95Ms": 11,
@@ -1781,10 +1724,10 @@
   },
   "src/logging/runLog.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 4,
    "p50Ms": 4,
-   "p95Ms": 5,
+   "p95Ms": 6,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1794,7 +1737,7 @@
   },
   "src/logging/runMetadata.test.ts": {
    "feature": "logging",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 11,
    "p50Ms": 11,
    "p95Ms": 20,
@@ -1807,10 +1750,10 @@
   },
   "src/logging/runSummary.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 368,
-   "p50Ms": 354,
-   "p95Ms": 429,
+   "p50Ms": 360,
+   "p95Ms": 459,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1825,10 +1768,10 @@
   },
   "src/logging/sawtoothMedian.test.ts": {
    "feature": "logging",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 9,
    "p50Ms": 9,
-   "p95Ms": 12,
+   "p95Ms": 20,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -1838,9 +1781,9 @@
   },
   "src/logging/secondSliceGolden.test.ts": {
    "feature": "golden-replay",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 454,
-   "p50Ms": 706,
+   "p50Ms": 703,
    "p95Ms": 1300,
    "passRate": 1,
    "lastStatus": "passed",
@@ -1860,7 +1803,7 @@
   },
   "src/logging/wreckerDiveReport.test.ts": {
    "feature": "logging",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 6,
    "p50Ms": 7,
    "p95Ms": 14,
@@ -1873,7 +1816,7 @@
   },
   "src/physics/physicsStats.test.ts": {
    "feature": "physics",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 248,
    "p50Ms": 300,
    "p95Ms": 355,
@@ -1891,9 +1834,9 @@
   },
   "src/physics/vehicleLoop.test.ts": {
    "feature": "physics",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 892,
-   "p50Ms": 1588,
+   "p50Ms": 1577,
    "p95Ms": 2423,
    "passRate": 1,
    "lastStatus": "passed",
@@ -1917,7 +1860,7 @@
   },
   "src/physics/vehiclePhysics.test.ts": {
    "feature": "physics",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 678,
    "p50Ms": 628,
    "p95Ms": 696,
@@ -1939,7 +1882,7 @@
   },
   "src/scene/sceneDisposal.test.ts": {
    "feature": "scene",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 45,
    "p50Ms": 63,
    "p95Ms": 75,
@@ -1952,7 +1895,7 @@
   },
   "src/store/artefactChoice.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 64,
    "p50Ms": 85,
    "p95Ms": 119,
@@ -1965,7 +1908,7 @@
   },
   "src/store/authorityReads.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 11,
    "p50Ms": 19,
    "p95Ms": 30,
@@ -1978,7 +1921,7 @@
   },
   "src/store/checkpoint.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 56,
    "p50Ms": 73,
    "p95Ms": 116,
@@ -1991,9 +1934,9 @@
   },
   "src/store/gameStore.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 73,
-   "p50Ms": 71,
+   "p50Ms": 69,
    "p95Ms": 138,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2004,9 +1947,9 @@
   },
   "src/store/hintSlice.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 206,
-   "p50Ms": 257,
+   "p50Ms": 245,
    "p95Ms": 413,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2017,9 +1960,9 @@
   },
   "src/store/inputRuntime.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 166,
-   "p50Ms": 210,
+   "p50Ms": 209,
    "p95Ms": 322,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2030,9 +1973,9 @@
   },
   "src/store/partInstall.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 69,
-   "p50Ms": 79,
+   "p50Ms": 78,
    "p95Ms": 125,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2043,7 +1986,7 @@
   },
   "src/store/perfLog.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 6,
    "p50Ms": 7,
    "p95Ms": 11,
@@ -2056,9 +1999,9 @@
   },
   "src/store/platformLoop.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 174,
-   "p50Ms": 302,
+   "p50Ms": 292,
    "p95Ms": 590,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2074,9 +2017,9 @@
   },
   "src/store/sliceRun.test.ts": {
    "feature": "store",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 1954,
-   "p50Ms": 3369,
+   "p50Ms": 3339,
    "p95Ms": 8203,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2100,7 +2043,7 @@
   },
   "src/systems/art/assetLint.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 76,
    "p50Ms": 90,
    "p95Ms": 156,
@@ -2113,7 +2056,7 @@
   },
   "src/systems/art/assetLook.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 5,
    "p50Ms": 9,
    "p95Ms": 12,
@@ -2126,7 +2069,7 @@
   },
   "src/systems/art/assetManifest.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 23,
    "p50Ms": 19,
    "p95Ms": 41,
@@ -2139,7 +2082,7 @@
   },
   "src/systems/art/autoGunsArt.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 5,
    "p50Ms": 8,
    "p95Ms": 14,
@@ -2152,7 +2095,7 @@
   },
   "src/systems/art/blastingChargesArt.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 5,
    "p50Ms": 8,
    "p95Ms": 10,
@@ -2165,7 +2108,7 @@
   },
   "src/systems/art/heatLavaArt.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 4,
    "p50Ms": 7,
    "p95Ms": 11,
@@ -2178,7 +2121,7 @@
   },
   "src/systems/art/ktx2Header.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 3,
    "p50Ms": 7,
    "p95Ms": 10,
@@ -2191,7 +2134,7 @@
   },
   "src/systems/art/partsSidecar.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 8,
    "p50Ms": 11,
    "p95Ms": 22,
@@ -2204,7 +2147,7 @@
   },
   "src/systems/art/placeholderLook.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 3,
    "p50Ms": 8,
    "p95Ms": 11,
@@ -2217,7 +2160,7 @@
   },
   "src/systems/art/refineryBayArt.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 4,
    "p50Ms": 6,
    "p95Ms": 7,
@@ -2230,7 +2173,7 @@
   },
   "src/systems/art/tileLook.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 2,
    "p50Ms": 5,
    "p95Ms": 7,
@@ -2243,7 +2186,7 @@
   },
   "src/systems/art/tunnelWreckerArt.test.ts": {
    "feature": "art",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 3,
    "p50Ms": 7,
    "p95Ms": 11,
@@ -2256,7 +2199,7 @@
   },
   "src/systems/artefacts/uniquenessGate.test.ts": {
    "feature": "artefacts",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 7,
    "p50Ms": 8,
    "p95Ms": 17,
@@ -2269,7 +2212,7 @@
   },
   "src/systems/audio/drillVoice.test.ts": {
    "feature": "audio",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 42,
    "p50Ms": 76,
    "p95Ms": 112,
@@ -2282,7 +2225,7 @@
   },
   "src/systems/audio/musicBook.test.ts": {
    "feature": "audio",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 8,
    "p50Ms": 9,
    "p95Ms": 18,
@@ -2295,10 +2238,10 @@
   },
   "src/systems/audio/musicLayers.test.ts": {
    "feature": "audio",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 10,
-   "p50Ms": 9,
-   "p95Ms": 13,
+   "p50Ms": 10,
+   "p95Ms": 18,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -2308,7 +2251,7 @@
   },
   "src/systems/audio/musicScore.test.ts": {
    "feature": "audio",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 7,
    "p50Ms": 9,
    "p95Ms": 12,
@@ -2321,7 +2264,7 @@
   },
   "src/systems/audio/musicStingers.test.ts": {
    "feature": "audio",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 5,
    "p50Ms": 6,
    "p95Ms": 15,
@@ -2334,7 +2277,7 @@
   },
   "src/systems/audio/soundRules.test.ts": {
    "feature": "audio",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 8,
    "p50Ms": 8,
    "p95Ms": 14,
@@ -2347,7 +2290,7 @@
   },
   "src/systems/authority/advanceTicks.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 27,
    "p50Ms": 38,
    "p95Ms": 51,
@@ -2360,9 +2303,9 @@
   },
   "src/systems/authority/applyCommand.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 57,
-   "p50Ms": 90,
+   "p50Ms": 82,
    "p95Ms": 184,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2373,9 +2316,9 @@
   },
   "src/systems/authority/artefactRules.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 87,
-   "p50Ms": 142,
+   "p50Ms": 140,
    "p95Ms": 241,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2386,9 +2329,9 @@
   },
   "src/systems/authority/assaySale.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 152,
-   "p50Ms": 199,
+   "p50Ms": 190,
    "p95Ms": 346,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2399,9 +2342,9 @@
   },
   "src/systems/authority/casingDrill.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 76,
-   "p50Ms": 144,
+   "p50Ms": 142,
    "p95Ms": 281,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2412,9 +2355,9 @@
   },
   "src/systems/authority/casingGnaw.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 1512,
-   "p50Ms": 2610,
+   "p50Ms": 2608,
    "p95Ms": 13084,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2438,9 +2381,9 @@
   },
   "src/systems/authority/casingPlacement.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 3171,
-   "p50Ms": 5082,
+   "p50Ms": 4591,
    "p95Ms": 29679,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2464,9 +2407,9 @@
   },
   "src/systems/authority/casingRules.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 58,
-   "p50Ms": 92,
+   "p50Ms": 91,
    "p95Ms": 170,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2477,9 +2420,9 @@
   },
   "src/systems/authority/casingSupport.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 52,
-   "p50Ms": 65,
+   "p50Ms": 64,
    "p95Ms": 90,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2490,9 +2433,9 @@
   },
   "src/systems/authority/charges/chargeBlast.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 364,
-   "p50Ms": 568,
+   "p50Ms": 538,
    "p95Ms": 1515,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2508,9 +2451,9 @@
   },
   "src/systems/authority/charges/chargeShop.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 33,
-   "p50Ms": 61,
+   "p50Ms": 57,
    "p95Ms": 110,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2521,9 +2464,9 @@
   },
   "src/systems/authority/collapse/collapseRun.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 3539,
-   "p50Ms": 5852,
+   "p50Ms": 5843,
    "p95Ms": 24695,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2547,7 +2490,7 @@
   },
   "src/systems/authority/combat/burrower.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 56,
    "p50Ms": 84,
    "p95Ms": 129,
@@ -2560,9 +2503,9 @@
   },
   "src/systems/authority/combat/combatRun.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 983,
-   "p50Ms": 1573,
+   "p50Ms": 1514,
    "p95Ms": 6420,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2586,9 +2529,9 @@
   },
   "src/systems/authority/combat/contactRule.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 348,
-   "p50Ms": 619,
+   "p50Ms": 600,
    "p95Ms": 2287,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2599,9 +2542,9 @@
   },
   "src/systems/authority/combat/enemyRoster.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 152,
-   "p50Ms": 279,
+   "p50Ms": 275,
    "p95Ms": 467,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2612,9 +2555,9 @@
   },
   "src/systems/authority/combat/gunFire.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 757,
-   "p50Ms": 1245,
+   "p50Ms": 1194,
    "p95Ms": 4310,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2630,10 +2573,10 @@
   },
   "src/systems/authority/combat/hitArc.test.ts": {
    "feature": "authority",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 13,
-   "p50Ms": 16,
-   "p95Ms": 28,
+   "p50Ms": 17,
+   "p95Ms": 30,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -2643,7 +2586,7 @@
   },
   "src/systems/authority/combat/spawnPoints.test.ts": {
    "feature": "authority",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 1414,
    "p50Ms": 1156,
    "p95Ms": 1441,
@@ -2669,9 +2612,9 @@
   },
   "src/systems/authority/combat/wreckerGuns.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 5951,
-   "p50Ms": 10647,
+   "p50Ms": 10630,
    "p95Ms": 50880,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2695,9 +2638,9 @@
   },
   "src/systems/authority/combat/wreckerRun.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 7534,
-   "p50Ms": 13380,
+   "p50Ms": 13254,
    "p95Ms": 66157,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2721,9 +2664,9 @@
   },
   "src/systems/authority/coreHarvest.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 641,
-   "p50Ms": 1003,
+   "p50Ms": 998,
    "p95Ms": 1938,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2743,7 +2686,7 @@
   },
   "src/systems/authority/exactMathLint.test.ts": {
    "feature": "authority",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 1754,
    "p50Ms": 1526,
    "p95Ms": 1816,
@@ -2761,9 +2704,9 @@
   },
   "src/systems/authority/featureUnlocks.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 72,
-   "p50Ms": 126,
+   "p50Ms": 124,
    "p95Ms": 252,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2774,9 +2717,9 @@
   },
   "src/systems/authority/groundDrill.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 2632,
-   "p50Ms": 4439,
+   "p50Ms": 4393,
    "p95Ms": 23256,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2792,7 +2735,7 @@
   },
   "src/systems/authority/gunRules.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 60,
    "p50Ms": 82,
    "p95Ms": 162,
@@ -2805,9 +2748,9 @@
   },
   "src/systems/authority/heatRun.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 2640,
-   "p50Ms": 4251,
+   "p50Ms": 4239,
    "p95Ms": 19896,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2831,7 +2774,7 @@
   },
   "src/systems/authority/lava/lavaRun.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 78,
    "p50Ms": 128,
    "p95Ms": 214,
@@ -2844,9 +2787,9 @@
   },
   "src/systems/authority/liningBill.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 1017,
-   "p50Ms": 1829,
+   "p50Ms": 1794,
    "p95Ms": 8086,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2870,9 +2813,9 @@
   },
   "src/systems/authority/liningTypes.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 834,
-   "p50Ms": 1450,
+   "p50Ms": 1413,
    "p95Ms": 7410,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2896,7 +2839,7 @@
   },
   "src/systems/authority/loopbackAuthority.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 10,
    "p50Ms": 16,
    "p95Ms": 31,
@@ -2909,7 +2852,7 @@
   },
   "src/systems/authority/moneyRounding.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 3,
    "p50Ms": 4,
    "p95Ms": 10,
@@ -2922,9 +2865,9 @@
   },
   "src/systems/authority/platformCommands.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 545,
-   "p50Ms": 795,
+   "p50Ms": 794,
    "p95Ms": 2493,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2940,9 +2883,9 @@
   },
   "src/systems/authority/refinery/refineryDock.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 22,
-   "p50Ms": 36,
+   "p50Ms": 35,
    "p95Ms": 69,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2953,7 +2896,7 @@
   },
   "src/systems/authority/refinery/refineryFacility.test.ts": {
    "feature": "authority",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 5,
    "p50Ms": 5,
    "p95Ms": 6,
@@ -2966,9 +2909,9 @@
   },
   "src/systems/authority/refinery/refineryRules.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 432,
-   "p50Ms": 629,
+   "p50Ms": 626,
    "p95Ms": 1599,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2984,9 +2927,9 @@
   },
   "src/systems/authority/refinery/refinerySlots.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 129,
-   "p50Ms": 188,
+   "p50Ms": 187,
    "p95Ms": 342,
    "passRate": 1,
    "lastStatus": "passed",
@@ -2997,7 +2940,7 @@
   },
   "src/systems/authority/sessionSnapshot.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 175,
    "p50Ms": 265,
    "p95Ms": 443,
@@ -3010,7 +2953,7 @@
   },
   "src/systems/authority/stateDigest.test.ts": {
    "feature": "authority",
-   "runs": 25,
+   "runs": 24,
    "lastMs": 18,
    "p50Ms": 21,
    "p95Ms": 29,
@@ -3023,9 +2966,9 @@
   },
   "src/systems/authority/teleportDebugRules.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 25,
-   "p50Ms": 52,
+   "p50Ms": 51,
    "p95Ms": 72,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3036,9 +2979,9 @@
   },
   "src/systems/authority/travelRules.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 69,
-   "p50Ms": 118,
+   "p50Ms": 115,
    "p95Ms": 218,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3049,9 +2992,9 @@
   },
   "src/systems/authority/vehicleCommands.test.ts": {
    "feature": "authority",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 15281,
-   "p50Ms": 29579,
+   "p50Ms": 29264,
    "p95Ms": 158417,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3067,7 +3010,7 @@
   },
   "src/systems/bot/blastTrade.test.ts": {
    "feature": "bot",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 6,
    "p50Ms": 8,
    "p95Ms": 13,
@@ -3080,9 +3023,9 @@
   },
   "src/systems/bot/botBlasting.test.ts": {
    "feature": "bot",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 3438,
-   "p50Ms": 6430,
+   "p50Ms": 6417,
    "p95Ms": 33530,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3106,9 +3049,9 @@
   },
   "src/systems/bot/botChargeNeed.test.ts": {
    "feature": "bot",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 8273,
-   "p50Ms": 14091,
+   "p50Ms": 13949,
    "p95Ms": 65442,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3128,9 +3071,9 @@
   },
   "src/systems/bot/botCharges.test.ts": {
    "feature": "bot",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 123,
-   "p50Ms": 152,
+   "p50Ms": 150,
    "p95Ms": 279,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3141,9 +3084,9 @@
   },
   "src/systems/bot/botCombat.test.ts": {
    "feature": "bot",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 266,
-   "p50Ms": 386,
+   "p50Ms": 379,
    "p95Ms": 875,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3159,7 +3102,7 @@
   },
   "src/systems/bot/botCoreRule.test.ts": {
    "feature": "bot",
-   "runs": 25,
+   "runs": 24,
    "lastMs": 3,
    "p50Ms": 7,
    "p95Ms": 8,
@@ -3172,9 +3115,9 @@
   },
   "src/systems/bot/botGuns.test.ts": {
    "feature": "bot",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 23,
-   "p50Ms": 40,
+   "p50Ms": 39,
    "p95Ms": 83,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3185,9 +3128,9 @@
   },
   "src/systems/bot/botHeat.test.ts": {
    "feature": "bot",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 428,
-   "p50Ms": 706,
+   "p50Ms": 669,
    "p95Ms": 1349,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3207,9 +3150,9 @@
   },
   "src/systems/bot/botRefining.test.ts": {
    "feature": "bot",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 8782,
-   "p50Ms": 18357,
+   "p50Ms": 18279,
    "p95Ms": 97055,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3233,9 +3176,9 @@
   },
   "src/systems/bot/botShopping.test.ts": {
    "feature": "bot",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 2297,
-   "p50Ms": 3986,
+   "p50Ms": 3956,
    "p95Ms": 7110,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3259,7 +3202,7 @@
   },
   "src/systems/bot/playSlice.test.ts": {
    "feature": "pacing-bot",
-   "runs": 9,
+   "runs": 8,
    "lastMs": 30037,
    "p50Ms": 285176,
    "p95Ms": 311782,
@@ -3293,7 +3236,7 @@
   },
   "src/systems/cellRandom.test.ts": {
    "feature": "systems-core",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 207,
    "p50Ms": 187,
    "p95Ms": 233,
@@ -3311,7 +3254,7 @@
   },
   "src/systems/displayAmount.test.ts": {
    "feature": "systems-core",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 17,
    "p50Ms": 21,
    "p95Ms": 39,
@@ -3324,7 +3267,7 @@
   },
   "src/systems/economy/assayPricing.test.ts": {
    "feature": "economy",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 7,
    "p50Ms": 6,
    "p95Ms": 8,
@@ -3337,7 +3280,7 @@
   },
   "src/systems/economy/blastingCharges.test.ts": {
    "feature": "economy",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 9,
    "p50Ms": 14,
    "p95Ms": 19,
@@ -3350,10 +3293,10 @@
   },
   "src/systems/economy/casingGrades.test.ts": {
    "feature": "economy",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 5,
-   "p50Ms": 5,
-   "p95Ms": 8,
+   "p50Ms": 6,
+   "p95Ms": 9,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3363,7 +3306,7 @@
   },
   "src/systems/economy/casingPrices.test.ts": {
    "feature": "economy",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 10,
    "p50Ms": 11,
    "p95Ms": 17,
@@ -3376,7 +3319,7 @@
   },
   "src/systems/economy/collapseCrush.test.ts": {
    "feature": "economy",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 4,
    "p50Ms": 4,
    "p95Ms": 13,
@@ -3389,10 +3332,10 @@
   },
   "src/systems/economy/economyGrowth.test.ts": {
    "feature": "economy",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 234,
-   "p50Ms": 192,
-   "p95Ms": 251,
+   "p50Ms": 196,
+   "p95Ms": 252,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3407,7 +3350,7 @@
   },
   "src/systems/economy/economySourceScan.test.ts": {
    "feature": "economy",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 58,
    "p50Ms": 92,
    "p95Ms": 128,
@@ -3420,10 +3363,10 @@
   },
   "src/systems/economy/economyTables.test.ts": {
    "feature": "economy",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 129,
-   "p50Ms": 121,
-   "p95Ms": 159,
+   "p50Ms": 124,
+   "p95Ms": 190,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3433,10 +3376,10 @@
   },
   "src/systems/economy/enemyStats.test.ts": {
    "feature": "economy",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 125,
-   "p50Ms": 105,
-   "p95Ms": 137,
+   "p50Ms": 110,
+   "p95Ms": 138,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3446,10 +3389,10 @@
   },
   "src/systems/economy/gunStats.test.ts": {
    "feature": "economy",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 28,
-   "p50Ms": 20,
-   "p95Ms": 36,
+   "p50Ms": 24,
+   "p95Ms": 37,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3459,9 +3402,9 @@
   },
   "src/systems/economy/heatEconomy.test.ts": {
    "feature": "economy",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 12,
-   "p50Ms": 11,
+   "p50Ms": 12,
    "p95Ms": 16,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3472,7 +3415,7 @@
   },
   "src/systems/economy/oreEconomy.test.ts": {
    "feature": "economy",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 66,
    "p50Ms": 64,
    "p95Ms": 108,
@@ -3485,10 +3428,10 @@
   },
   "src/systems/economy/planetCharges.test.ts": {
    "feature": "economy",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 12,
    "p50Ms": 11,
-   "p95Ms": 18,
+   "p95Ms": 14,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3498,7 +3441,7 @@
   },
   "src/systems/economy/readEconomy.test.ts": {
    "feature": "economy",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 35,
    "p50Ms": 34,
    "p95Ms": 54,
@@ -3511,7 +3454,7 @@
   },
   "src/systems/economy/refineryEconomy.test.ts": {
    "feature": "economy",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 9,
    "p50Ms": 8,
    "p95Ms": 10,
@@ -3524,7 +3467,7 @@
   },
   "src/systems/economy/upgradePrices.test.ts": {
    "feature": "economy",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 16,
    "p50Ms": 13,
    "p95Ms": 26,
@@ -3537,7 +3480,7 @@
   },
   "src/systems/economy/vehicleStats.test.ts": {
    "feature": "economy",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 27,
    "p50Ms": 25,
    "p95Ms": 36,
@@ -3550,7 +3493,7 @@
   },
   "src/systems/fastForward.test.ts": {
    "feature": "systems-core",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 6,
    "p50Ms": 6,
    "p95Ms": 17,
@@ -3563,10 +3506,10 @@
   },
   "src/systems/feedback/accents.test.ts": {
    "feature": "feedback",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 7,
    "p50Ms": 7,
-   "p95Ms": 13,
+   "p95Ms": 18,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3576,7 +3519,7 @@
   },
   "src/systems/feedback/feedbackCues.test.ts": {
    "feature": "feedback",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 7,
    "p50Ms": 6,
    "p95Ms": 11,
@@ -3589,10 +3532,10 @@
   },
   "src/systems/feedback/screenEffects.test.ts": {
    "feature": "feedback",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 8,
    "p50Ms": 9,
-   "p95Ms": 17,
+   "p95Ms": 18,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3602,9 +3545,9 @@
   },
   "src/systems/fixedStepClock.test.ts": {
    "feature": "systems-core",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 104,
-   "p50Ms": 187,
+   "p50Ms": 180,
    "p95Ms": 281,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3620,10 +3563,10 @@
   },
   "src/systems/globalSheetGuard.test.ts": {
    "feature": "systems-core",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 6,
    "p50Ms": 6,
-   "p95Ms": 11,
+   "p95Ms": 12,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3633,9 +3576,9 @@
   },
   "src/systems/hints/hintAcceptance.test.ts": {
    "feature": "hints",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 1517,
-   "p50Ms": 2697,
+   "p50Ms": 2695,
    "p95Ms": 16046,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3651,9 +3594,9 @@
   },
   "src/systems/hints/hintBoard.test.ts": {
    "feature": "hints",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 128,
-   "p50Ms": 198,
+   "p50Ms": 196,
    "p95Ms": 362,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3664,7 +3607,7 @@
   },
   "src/systems/hints/hintTable.test.ts": {
    "feature": "hints",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 3,
    "p50Ms": 7,
    "p95Ms": 9,
@@ -3677,7 +3620,7 @@
   },
   "src/systems/hints/transmissionBoard.test.ts": {
    "feature": "hints",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 3,
    "p50Ms": 6,
    "p95Ms": 7,
@@ -3690,7 +3633,7 @@
   },
   "src/systems/input/actionMap.test.ts": {
    "feature": "input",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 13,
    "p50Ms": 14,
    "p95Ms": 20,
@@ -3703,10 +3646,10 @@
   },
   "src/systems/input/buildIntent.test.ts": {
    "feature": "input",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 15,
    "p50Ms": 11,
-   "p95Ms": 20,
+   "p95Ms": 21,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3716,10 +3659,10 @@
   },
   "src/systems/input/inputRouting.test.ts": {
    "feature": "input",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 7,
-   "p50Ms": 7,
-   "p95Ms": 10,
+   "p50Ms": 8,
+   "p95Ms": 15,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3729,7 +3672,7 @@
   },
   "src/systems/input/preferences.test.ts": {
    "feature": "input",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 9,
    "p50Ms": 13,
    "p95Ms": 16,
@@ -3742,7 +3685,7 @@
   },
   "src/systems/money.test.ts": {
    "feature": "systems-core",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 84,
    "p50Ms": 94,
    "p95Ms": 121,
@@ -3755,10 +3698,10 @@
   },
   "src/systems/render/artefactLook.test.ts": {
    "feature": "render",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 3,
    "p50Ms": 4,
-   "p95Ms": 10,
+   "p95Ms": 12,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3768,10 +3711,10 @@
   },
   "src/systems/render/bandPalette.test.ts": {
    "feature": "render",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 8,
    "p50Ms": 8,
-   "p95Ms": 10,
+   "p95Ms": 11,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3780,58 +3723,6 @@
    "slowest": []
   },
   "src/systems/render/cameraTurn.test.ts": {
-   "feature": "render",
-   "runs": 21,
-   "lastMs": 7,
-   "p50Ms": 8,
-   "p95Ms": 15,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37544958279,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/chargeLook.test.ts": {
-   "feature": "render",
-   "runs": 27,
-   "lastMs": 3,
-   "p50Ms": 9,
-   "p95Ms": 11,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37550251693,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/chunkTileBatch.test.ts": {
-   "feature": "render",
-   "runs": 23,
-   "lastMs": 215,
-   "p50Ms": 210,
-   "p95Ms": 270,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37544958279,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/collapseTelegraph.test.ts": {
-   "feature": "render",
-   "runs": 20,
-   "lastMs": 9,
-   "p50Ms": 9,
-   "p95Ms": 17,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 37544958279,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/render/drillHeadPose.test.ts": {
    "feature": "render",
    "runs": 20,
    "lastMs": 7,
@@ -3844,9 +3735,61 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/render/chargeLook.test.ts": {
+   "feature": "render",
+   "runs": 26,
+   "lastMs": 3,
+   "p50Ms": 9,
+   "p95Ms": 11,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37550251693,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/render/chunkTileBatch.test.ts": {
+   "feature": "render",
+   "runs": 22,
+   "lastMs": 215,
+   "p50Ms": 210,
+   "p95Ms": 270,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37544958279,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/render/collapseTelegraph.test.ts": {
+   "feature": "render",
+   "runs": 19,
+   "lastMs": 9,
+   "p50Ms": 9,
+   "p95Ms": 23,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37544958279,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/render/drillHeadPose.test.ts": {
+   "feature": "render",
+   "runs": 19,
+   "lastMs": 7,
+   "p50Ms": 7,
+   "p95Ms": 15,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37544958279,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/render/enemyArt.test.ts": {
    "feature": "render",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 4,
    "p50Ms": 6,
    "p95Ms": 12,
@@ -3859,7 +3802,7 @@
   },
   "src/systems/render/enemyPlaceholder.test.ts": {
    "feature": "render",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 10,
    "p50Ms": 10,
    "p95Ms": 21,
@@ -3872,7 +3815,7 @@
   },
   "src/systems/render/enemyTint.test.ts": {
    "feature": "render",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 5,
    "p50Ms": 6,
    "p95Ms": 23,
@@ -3885,7 +3828,7 @@
   },
   "src/systems/render/groundBlocks.test.ts": {
    "feature": "render",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 245,
    "p50Ms": 224,
    "p95Ms": 256,
@@ -3903,7 +3846,7 @@
   },
   "src/systems/render/groundStrata.test.ts": {
    "feature": "render",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 3,
    "p50Ms": 7,
    "p95Ms": 9,
@@ -3916,9 +3859,9 @@
   },
   "src/systems/render/gunLook.test.ts": {
    "feature": "render",
-   "runs": 28,
+   "runs": 27,
    "lastMs": 6,
-   "p50Ms": 8,
+   "p50Ms": 9,
    "p95Ms": 12,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3929,10 +3872,10 @@
   },
   "src/systems/render/headlamp.test.ts": {
    "feature": "render",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 4,
-   "p50Ms": 4,
-   "p95Ms": 9,
+   "p50Ms": 5,
+   "p95Ms": 12,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3942,7 +3885,7 @@
   },
   "src/systems/render/heatShimmer.test.ts": {
    "feature": "render",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 4,
    "p50Ms": 4,
    "p95Ms": 5,
@@ -3955,9 +3898,9 @@
   },
   "src/systems/render/heatTiles.test.ts": {
    "feature": "render",
-   "runs": 28,
+   "runs": 27,
    "lastMs": 112,
-   "p50Ms": 145,
+   "p50Ms": 147,
    "p95Ms": 206,
    "passRate": 1,
    "lastStatus": "passed",
@@ -3968,10 +3911,10 @@
   },
   "src/systems/render/oreLook.test.ts": {
    "feature": "render",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 29,
-   "p50Ms": 18,
-   "p95Ms": 44,
+   "p50Ms": 19,
+   "p95Ms": 58,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -3981,7 +3924,7 @@
   },
   "src/systems/render/particles.test.ts": {
    "feature": "render",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 5,
    "p50Ms": 7,
    "p95Ms": 16,
@@ -3994,10 +3937,10 @@
   },
   "src/systems/render/partMotion.test.ts": {
    "feature": "render",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 12,
    "p50Ms": 10,
-   "p95Ms": 19,
+   "p95Ms": 22,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -4007,7 +3950,7 @@
   },
   "src/systems/render/platformPlaceholder.test.ts": {
    "feature": "render",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 7,
    "p50Ms": 7,
    "p95Ms": 9,
@@ -4020,7 +3963,7 @@
   },
   "src/systems/render/refineryBayLook.test.ts": {
    "feature": "render",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 4,
    "p50Ms": 5,
    "p95Ms": 7,
@@ -4033,10 +3976,10 @@
   },
   "src/systems/render/renderScale.test.ts": {
    "feature": "render",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 11,
    "p50Ms": 8,
-   "p95Ms": 17,
+   "p95Ms": 19,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -4046,7 +3989,7 @@
   },
   "src/systems/render/sceneLights.test.ts": {
    "feature": "render",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 8,
    "p50Ms": 8,
    "p95Ms": 8,
@@ -4059,7 +4002,7 @@
   },
   "src/systems/render/vehicleLook.test.ts": {
    "feature": "render",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 6,
    "p50Ms": 11,
    "p95Ms": 17,
@@ -4072,7 +4015,7 @@
   },
   "src/systems/render/vehiclePreviewLook.test.ts": {
    "feature": "render",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 9,
    "p50Ms": 12,
    "p95Ms": 15,
@@ -4085,7 +4028,7 @@
   },
   "src/systems/render/viewZoom.test.ts": {
    "feature": "render",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 7,
    "p50Ms": 9,
    "p95Ms": 22,
@@ -4098,7 +4041,7 @@
   },
   "src/systems/render/visibleChunks.test.ts": {
    "feature": "render",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 103,
    "p50Ms": 50,
    "p95Ms": 72,
@@ -4111,9 +4054,9 @@
   },
   "src/systems/replay/replayRun.test.ts": {
    "feature": "replay",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 1068,
-   "p50Ms": 1929,
+   "p50Ms": 1922,
    "p95Ms": 5177,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4129,9 +4072,9 @@
   },
   "src/systems/save/saveSlot.test.ts": {
    "feature": "save",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 313,
-   "p50Ms": 409,
+   "p50Ms": 402,
    "p95Ms": 1011,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4147,10 +4090,10 @@
   },
   "src/systems/scenario.test.ts": {
    "feature": "systems-core",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 19,
    "p50Ms": 16,
-   "p95Ms": 19,
+   "p95Ms": 23,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -4160,7 +4103,7 @@
   },
   "src/systems/seededRandom.test.ts": {
    "feature": "systems-core",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 155,
    "p50Ms": 127,
    "p95Ms": 157,
@@ -4173,7 +4116,7 @@
   },
   "src/systems/sliceProgress.test.ts": {
    "feature": "systems-core",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 3,
    "p50Ms": 4,
    "p95Ms": 12,
@@ -4186,7 +4129,7 @@
   },
   "src/systems/startScenario.test.ts": {
    "feature": "systems-core",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 3,
    "p50Ms": 7,
    "p95Ms": 11,
@@ -4199,7 +4142,7 @@
   },
   "src/systems/startScenarioCommands.test.ts": {
    "feature": "systems-core",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 6,
    "p50Ms": 6,
    "p95Ms": 7,
@@ -4212,7 +4155,7 @@
   },
   "src/systems/unlocks/readUnlockSchedule.test.ts": {
    "feature": "unlocks",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 8,
    "p50Ms": 10,
    "p95Ms": 14,
@@ -4225,7 +4168,7 @@
   },
   "src/systems/unlocks/scheduleCadence.test.ts": {
    "feature": "unlocks",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 3,
    "p50Ms": 4,
    "p95Ms": 6,
@@ -4238,7 +4181,7 @@
   },
   "src/systems/unlocks/travelUnlocks.test.ts": {
    "feature": "unlocks",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 18,
    "p50Ms": 17,
    "p95Ms": 20,
@@ -4251,7 +4194,7 @@
   },
   "src/systems/unlocks/unlockSchedule.test.ts": {
    "feature": "unlocks",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 72,
    "p50Ms": 26,
    "p95Ms": 85,
@@ -4264,10 +4207,10 @@
   },
   "src/systems/vehicle/bandDig.test.ts": {
    "feature": "vehicle",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 9,
    "p50Ms": 8,
-   "p95Ms": 17,
+   "p95Ms": 18,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -4277,7 +4220,7 @@
   },
   "src/systems/vehicle/casingTrail.test.ts": {
    "feature": "vehicle",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 14,
    "p50Ms": 10,
    "p95Ms": 19,
@@ -4290,10 +4233,10 @@
   },
   "src/systems/vehicle/drillRule.test.ts": {
    "feature": "vehicle",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 48,
-   "p50Ms": 32,
-   "p95Ms": 45,
+   "p50Ms": 35,
+   "p95Ms": 48,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -4303,10 +4246,10 @@
   },
   "src/systems/vehicle/poseReport.test.ts": {
    "feature": "vehicle",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 12,
    "p50Ms": 20,
-   "p95Ms": 28,
+   "p95Ms": 29,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -4316,10 +4259,10 @@
   },
   "src/systems/vehicle/returnReserve.test.ts": {
    "feature": "vehicle",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 3,
-   "p50Ms": 3,
-   "p95Ms": 7,
+   "p50Ms": 4,
+   "p95Ms": 8,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -4329,10 +4272,10 @@
   },
   "src/systems/vehicle/vehicleControls.test.ts": {
    "feature": "vehicle",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 18,
-   "p50Ms": 15,
-   "p95Ms": 20,
+   "p50Ms": 17,
+   "p95Ms": 21,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 37544958279,
@@ -4342,7 +4285,7 @@
   },
   "src/systems/vehicle/vehicleReadout.test.ts": {
    "feature": "vehicle",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 3,
    "p50Ms": 5,
    "p95Ms": 10,
@@ -4355,7 +4298,7 @@
   },
   "src/systems/vehicle/vehicleStats.test.ts": {
    "feature": "vehicle",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 13,
    "p50Ms": 19,
    "p95Ms": 25,
@@ -4368,7 +4311,7 @@
   },
   "src/systems/views/bayPresentation.test.ts": {
    "feature": "views",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 44,
    "p50Ms": 68,
    "p95Ms": 96,
@@ -4381,9 +4324,9 @@
   },
   "src/systems/views/chargeViews.test.ts": {
    "feature": "views",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 110,
-   "p50Ms": 166,
+   "p50Ms": 150,
    "p95Ms": 261,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4394,9 +4337,9 @@
   },
   "src/systems/views/heatViews.test.ts": {
    "feature": "views",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 45,
-   "p50Ms": 71,
+   "p50Ms": 70,
    "p95Ms": 104,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4407,9 +4350,9 @@
   },
   "src/systems/views/hudModel.test.ts": {
    "feature": "views",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 1130,
-   "p50Ms": 1835,
+   "p50Ms": 1818,
    "p95Ms": 6235,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4429,7 +4372,7 @@
   },
   "src/systems/views/menuFocus.test.ts": {
    "feature": "views",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 2,
    "p50Ms": 3,
    "p95Ms": 7,
@@ -4442,7 +4385,7 @@
   },
   "src/systems/views/plaqueModel.test.ts": {
    "feature": "views",
-   "runs": 27,
+   "runs": 26,
    "lastMs": 3,
    "p50Ms": 6,
    "p95Ms": 8,
@@ -4455,7 +4398,7 @@
   },
   "src/systems/views/refineryBayModel.test.ts": {
    "feature": "views",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 154,
    "p50Ms": 236,
    "p95Ms": 408,
@@ -4468,9 +4411,9 @@
   },
   "src/systems/views/sellBayModel.test.ts": {
    "feature": "views",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 384,
-   "p50Ms": 641,
+   "p50Ms": 624,
    "p95Ms": 1825,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4486,9 +4429,9 @@
   },
   "src/systems/views/upgradeBayModel.test.ts": {
    "feature": "views",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 118,
-   "p50Ms": 185,
+   "p50Ms": 179,
    "p95Ms": 304,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4499,9 +4442,9 @@
   },
   "src/systems/views/upgradePreview.test.ts": {
    "feature": "views",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 109,
-   "p50Ms": 160,
+   "p50Ms": 157,
    "p95Ms": 265,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4512,7 +4455,7 @@
   },
   "src/systems/world/artefactCache.test.ts": {
    "feature": "world",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 916,
    "p50Ms": 848,
    "p95Ms": 1018,
@@ -4530,7 +4473,7 @@
   },
   "src/systems/world/casingBand.test.ts": {
    "feature": "world",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 3,
    "p50Ms": 3,
    "p95Ms": 4,
@@ -4543,7 +4486,7 @@
   },
   "src/systems/world/casingBreach.test.ts": {
    "feature": "world",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 476,
    "p50Ms": 396,
    "p95Ms": 489,
@@ -4556,7 +4499,7 @@
   },
   "src/systems/world/casingLining.test.ts": {
    "feature": "world",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 100,
    "p50Ms": 97,
    "p95Ms": 117,
@@ -4569,7 +4512,7 @@
   },
   "src/systems/world/chunkCache.test.ts": {
    "feature": "world",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 239,
    "p50Ms": 209,
    "p95Ms": 275,
@@ -4587,7 +4530,7 @@
   },
   "src/systems/world/chunkDelta.test.ts": {
    "feature": "world",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 232,
    "p50Ms": 173,
    "p95Ms": 232,
@@ -4605,7 +4548,7 @@
   },
   "src/systems/world/chunkRepair.test.ts": {
    "feature": "world",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 305,
    "p50Ms": 224,
    "p95Ms": 306,
@@ -4623,7 +4566,7 @@
   },
   "src/systems/world/collapseRefill.test.ts": {
    "feature": "world",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 350,
    "p50Ms": 275,
    "p95Ms": 350,
@@ -4641,7 +4584,7 @@
   },
   "src/systems/world/collapseWeakness.test.ts": {
    "feature": "world",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 389,
    "p50Ms": 338,
    "p95Ms": 443,
@@ -4654,9 +4597,9 @@
   },
   "src/systems/world/dockBays.test.ts": {
    "feature": "world",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 8,
-   "p50Ms": 6,
+   "p50Ms": 7,
    "p95Ms": 8,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4667,7 +4610,7 @@
   },
   "src/systems/world/generateChunk.test.ts": {
    "feature": "world",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 12016,
    "p50Ms": 10847,
    "p95Ms": 12275,
@@ -4693,7 +4636,7 @@
   },
   "src/systems/world/generateDensity.test.ts": {
    "feature": "world",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 367,
    "p50Ms": 307,
    "p95Ms": 390,
@@ -4715,7 +4658,7 @@
   },
   "src/systems/world/generatorGolden.test.ts": {
    "feature": "golden-replay",
-   "runs": 25,
+   "runs": 24,
    "lastMs": 4077,
    "p50Ms": 3492,
    "p95Ms": 4077,
@@ -4737,7 +4680,7 @@
   },
   "src/systems/world/groundEdit.test.ts": {
    "feature": "world",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 236,
    "p50Ms": 229,
    "p95Ms": 292,
@@ -4750,7 +4693,7 @@
   },
   "src/systems/world/lavaFlow.test.ts": {
    "feature": "world",
-   "runs": 23,
+   "runs": 22,
    "lastMs": 54,
    "p50Ms": 50,
    "p95Ms": 66,
@@ -4763,9 +4706,9 @@
   },
   "src/systems/world/lavaPockets.test.ts": {
    "feature": "world",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 1709,
-   "p50Ms": 1387,
+   "p50Ms": 1369,
    "p95Ms": 1803,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4781,7 +4724,7 @@
   },
   "src/systems/world/orePatches.test.ts": {
    "feature": "world",
-   "runs": 21,
+   "runs": 20,
    "lastMs": 14301,
    "p50Ms": 13138,
    "p95Ms": 14981,
@@ -4807,7 +4750,7 @@
   },
   "src/systems/world/planetParams.test.ts": {
    "feature": "world",
-   "runs": 20,
+   "runs": 19,
    "lastMs": 12,
    "p50Ms": 12,
    "p95Ms": 14,
@@ -4820,7 +4763,7 @@
   },
   "src/systems/world/worldExactMathLint.test.ts": {
    "feature": "world",
-   "runs": 19,
+   "runs": 18,
    "lastMs": 1873,
    "p50Ms": 1495,
    "p95Ms": 1873,
@@ -4838,9 +4781,9 @@
   },
   "src/ui/screenIds.test.ts": {
    "feature": "ui",
-   "runs": 29,
+   "runs": 28,
    "lastMs": 605,
-   "p50Ms": 934,
+   "p50Ms": 933,
    "p95Ms": 2265,
    "passRate": 1,
    "lastStatus": "passed",
@@ -4869,6 +4812,62 @@
     [
      "pacing bot core galleries from an off-centre shaft (#136) completes the core of seed 27182 planet 9, whose shaft jogs across the core middle",
      4515
+    ]
+   ]
+  },
+  "src/logging/assayPacingGate.test.ts": {
+   "feature": "pacing-bot",
+   "runs": 2,
+   "lastMs": 30603,
+   "p50Ms": 30603,
+   "p95Ms": 151117,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37522278869,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "balance regression: the pacing bot holding assay_beacon (#46, S11) passes the first-ten-minutes, planet 1 core and slice gates on the seed median",
+     30601
+    ],
+    [
+     "balance regression: the pacing bot holding assay_beacon (#46, S11) plays the scenario's own world seed first, then two fixed others",
+     2
+    ]
+   ]
+  },
+  "src/logging/pacingGate.test.ts": {
+   "feature": "pacing-bot",
+   "runs": 2,
+   "lastMs": 55755,
+   "p50Ms": 55755,
+   "p95Ms": 266331,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 37522278869,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": [
+    [
+     "balance regression: the pacing bot on the slice (#29, S11) meets the first-sale, first-upgrade, ten-minute, core and slice targets on the seed median",
+     42324
+    ],
+    [
+     "balance regression: the pacing bot on the slice (#29, S11) derives the same summary from a second run of the same scenario",
+     13279
+    ],
+    [
+     "balance regression: the pacing bot on the slice (#29, S11) emits only registered events, with registered fields and kinds",
+     92
+    ],
+    [
+     "balance regression: the pacing bot on the slice (#29, S11) keeps the first hour of core events and commands under the 4 MB budget",
+     25
+    ],
+    [
+     "balance regression: the pacing bot on the slice (#29, S11) lays casing on every drill dive through the player placement code, and pays for it (#115)",
+     24
     ]
    ]
   },
