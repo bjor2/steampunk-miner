@@ -114,7 +114,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 
-### `extraction`: 10 files, 58 tests
+### `extraction`: 11 files, 61 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -126,6 +126,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/drainTake.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/extractionEconomy.test.ts` | 4 | 4 |
 | `src/features/extraction/systems/extractionItems.test.ts` | 8 | 8 |
+| `src/features/extraction/systems/extractionSales.test.ts` | 3 | 3 |
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 

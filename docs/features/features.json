@@ -1035,7 +1035,7 @@
             },
             {
               "title": "Extraction power-ups",
-              "description": "Mineral drain: hold still for a moment and the nearest ore around the miner fades to plain ground, half of it into the hold, more cells a use at higher Marks. Gated, too-hard and core cells are left alone, and the income items share a trip cap of 15% of a full hold of the band's ore, reset at the dock. The lane's tree holds the five extractor nodes and the drain's. The slurry siphon waits for a planet with ore in fluid ground; the store buy comes later.",
+              "description": "Mineral drain: hold still for a moment and the nearest ore around the miner fades to plain ground, half of it into the hold, more cells a use at higher Marks. Gated, too-hard and core cells are left alone, and the income items share a trip cap of 15% of a full hold of the band's ore, reset at the dock. The lane's tree holds the five extractor nodes and the drain's. The drain is bought at the Upgrade bay once researched. The slurry siphon waits for a planet with ore in fluid ground.",
               "status": "partial",
               "issues": [201, 239]
             }
