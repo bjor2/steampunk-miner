@@ -1,5 +1,5 @@
 {
-  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 one-off price (k 15 band-5 ore at the unlock planet) and consumable unit price (k 2 band-5 ore at the current planet), 4.2 charged items, 4.3 consumables, 4.4 the passives' base magnitudes (set by Content on 7 Oct, gap S3 of the #157 review, comment on #203). A slice's numbers live beside it (feature-slices.md 1.1).",
+  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 one-off price (k 15 band-5 ore at the unlock planet) and consumable unit price (k 2 band-5 ore at the current planet), 4.2 charged items, 4.3 consumables, 4.4 the passives' base magnitudes (set by Content on 7 Oct, gap S3 of the #157 review, comment on #203; the barometer amended from 4 to 5 cells on 7 Oct so it first hits its cap at Mark 6 like the other two). A slice's numbers live beside it (feature-slices.md 1.1).",
   "items": {
     "price": {
       "band": 5,
@@ -50,7 +50,7 @@
         "radiusTiles": 6
       },
       "passive.hazard_barometer": {
-        "lookaheadCells": 4
+        "lookaheadCells": 5
       }
     }
   }

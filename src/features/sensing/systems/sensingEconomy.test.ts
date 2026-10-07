@@ -42,11 +42,11 @@ describe('sensing economy', () => {
     })
   })
 
-  it("reads the passives' base magnitudes of #162 4.4: periscope 10 and lens 6 tiles, barometer 4 cells", () => {
+  it("reads the passives' base magnitudes of #162 4.4: periscope 10 and lens 6 tiles, barometer 5 cells (amended 7 Oct)", () => {
     expect(SENSING_ECONOMY.passive).toEqual({
       'passive.threat_periscope': { reach: 'radius', magnitude: 10 },
       'passive.assay_lens': { reach: 'radius', magnitude: 6 },
-      'passive.hazard_barometer': { reach: 'lookahead', magnitude: 4 },
+      'passive.hazard_barometer': { reach: 'lookahead', magnitude: 5 },
     })
   })
 

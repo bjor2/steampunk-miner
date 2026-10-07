@@ -4,6 +4,7 @@
  * the tree's Mark rotation. Values only; the descriptions slice formats them (#164).
  */
 import { markStepOf, type MarkStatName, type MarkStats } from '../../tech-tree'
+import { passiveReachOf } from './passiveReach'
 import { sensingItemOf, type SensingItem } from './sensingCatalogue'
 import {
   chargedBalanceOf,
@@ -54,14 +55,14 @@ function previewOf(item: SensingItem, mark: number): SensingStatPreview {
     mark,
     stepped: step.stepped,
     isMastered: step.isMastered,
-    lines: linesOf(item, step.stats),
+    lines: linesOf(item, mark, step.stats),
   }
 }
 
-function linesOf(item: SensingItem, stats: MarkStats): readonly SensingStatLine[] {
+function linesOf(item: SensingItem, mark: number, stats: MarkStats): readonly SensingStatLine[] {
   if (item.powerUpClass === 'charged') return chargedLinesOf(item, stats)
   if (item.powerUpClass === 'consumable') return consumableLinesOf(item, stats)
-  return passiveLinesOf(item, stats)
+  return passiveLinesOf(item, mark)
 }
 
 function chargedLinesOf(item: SensingItem, stats: MarkStats): readonly SensingStatLine[] {
@@ -84,11 +85,13 @@ function consumableLinesOf(item: SensingItem, stats: MarkStats): readonly Sensin
   ]
 }
 
-/** A ring around the miner in tiles (periscope, lens), or cells ahead of the drill (barometer). */
-function passiveLinesOf(item: SensingItem, stats: MarkStats): readonly SensingStatLine[] {
-  const balance = passiveBalanceOf(item)
-  const magnitude = stats.magnitude ?? balance.magnitude
-  return balance.reach === 'radius'
+/**
+ * A ring around the miner in tiles (periscope, lens), or cells ahead of the drill (barometer), at
+ * the GD's rounding rule, so every Mark adds reach.
+ */
+function passiveLinesOf(item: SensingItem, mark: number): readonly SensingStatLine[] {
+  const magnitude = passiveReachOf(item, mark)
+  return passiveBalanceOf(item).reach === 'radius'
     ? [line('radius', 'Radius', magnitude, 'tiles')]
     : [line('lookahead', 'Lookahead', magnitude, 'cells')]
 }

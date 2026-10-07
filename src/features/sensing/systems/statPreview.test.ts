@@ -78,10 +78,10 @@ describe('sensing stat preview', () => {
     })
   })
 
-  it('shows each passive as bought: periscope radius 10, lens radius 6, barometer lookahead 4', () => {
+  it('shows each passive as bought: periscope radius 10, lens radius 6, barometer lookahead 5', () => {
     expect(valuesOf(statPreview('passive.threat_periscope', 1, PLANET))).toEqual({ radius: 10 })
     expect(valuesOf(statPreview('passive.assay_lens', 1, PLANET))).toEqual({ radius: 6 })
-    expect(valuesOf(statPreview('passive.hazard_barometer', 1, PLANET))).toEqual({ lookahead: 4 })
+    expect(valuesOf(statPreview('passive.hazard_barometer', 1, PLANET))).toEqual({ lookahead: 5 })
   })
 
   it('steps a passive magnitude only, and masters it at twice its base (#162 4.4)', () => {
@@ -94,7 +94,7 @@ describe('sensing stat preview', () => {
     ]
       .map((itemId) => statPreview(itemId, lastMarkOf(itemId), PLANET))
       .map(valuesOf)
-    expect(masteredValues).toEqual([{ radius: 20 }, { radius: 12 }, { lookahead: 8 }])
+    expect(masteredValues).toEqual([{ radius: 20 }, { radius: 12 }, { lookahead: 10 }])
   })
 
   it('reads the same on every planet', () => {
