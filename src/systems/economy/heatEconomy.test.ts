@@ -26,6 +26,7 @@ import {
   throttleFactor,
 } from './heatEconomy'
 import { oreTier, oreValue } from './oreEconomy'
+import { paceScale } from './planetEconomy'
 
 describe('heat archetype numbers (#113)', () => {
   it('makes the Fire act, planets 8 to 16, the heat planets and no other', () => {
@@ -91,8 +92,9 @@ describe('heat archetype numbers (#113)', () => {
     expect(liningTypePriceMultiplier('standard')).toEqual(fromCanonical('1'))
   })
 
-  it('unlocks refractory for 40 band-5 ore units at the purchase planet', () => {
-    const expected = ceilMilli(mul(fromSafeInteger(40), oreValue(oreTier(8, 5))))
+  it('unlocks refractory for 40 band-5 ore units at the purchase planet, times its pace scale', () => {
+    const oreWorth = mul(fromSafeInteger(40), oreValue(oreTier(8, 5)))
+    const expected = ceilMilli(mul(oreWorth, paceScale(8)))
     expect(liningTypeUnlockPrice('refractory', 8)).toEqual(expected)
     expect(cmp(liningTypeUnlockPrice('refractory', 8), gunMountPrice(8))).toBe(1)
     expect(liningTypeUnlockPrice('standard', 8)).toEqual(fromCanonical('0'))
