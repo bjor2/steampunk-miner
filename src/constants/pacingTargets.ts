@@ -24,16 +24,23 @@ export const PACING_TARGETS = {
   /**
    * Report only (vertical audit #75 section 3.1, campaign build plan #90, C4 #91): the
    * `pacing_targets_min` per-planet campaign entry, 45 to 60 minutes from arrival to core on every
-   * planet. The pacing bot and the 0.7x dig-time check of #81 are held to it after the curve
-   * changes land (C1, C2, C3); until then it never fails a build.
+   * planet. R1 (#89) keeps it reported: a miss is a Systems & Economy finding, printed with its
+   * dial (`campaignPacingFindings`), and never fails a build.
    */
   campaignPlanetMinutes: { min: 45, max: 60 },
   /**
-   * Report only (#81 acceptance 1, C3 #86 as the Game Director restated it): on every planet the
-   * pacing bot reaches, the drill time per metre of band 5 at departure is at most this multiple
-   * of its time on arrival, on the median of the pacing seeds (`npm run balance:planets`).
+   * #81 acceptance 1, C3 #86 as the Game Director restated it: the drill time per metre of band 5
+   * at departure is at most this multiple of its time on arrival, on the median of the pacing
+   * seeds. Gated by R1 (#89) on the planets before `campaignGateLastPlanet`; reported on every
+   * planet the bot leaves in `npm run balance:planets`.
    */
   sawtoothDepartureRatioMax: 0.7,
+  /**
+   * The campaign scaling gate (R1 #89) plays each pacing seed to this planet's core: the sawtooth
+   * is judged on planets 1 to 7 and no seed may stall before planet 8's core, the range Systems
+   * set and the Game Director confirmed for C3 (#86: "P2-P7 median, no stalled seed through P8").
+   */
+  campaignGateLastPlanet: 8,
   /**
    * Report only (spec #111, Systems & Economy numbers): on planets 6 to 9 the median dive has 2 to 8
    * rings breached by tunnel wreckers, and at most 5 dives in 100 set off a collapse on the way home.
