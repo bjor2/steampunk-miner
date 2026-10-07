@@ -27,6 +27,7 @@
     "metrics:ticket": "node scripts/metrics/ticketPhases.mjs",
     "metrics:backfill": "node scripts/metrics/ticketPhases.mjs --backfill",
     "metrics:tests": "node scripts/ci/queryTestMetrics.mjs",
+    "tests:move-guard": "node scripts/tests/checkMovePr.mjs",
     "soak:memory": "npm run build && node scripts/soak/soakMemory.mjs --minutes 10 --out test-results/soak",
     "golden:update": "vite-node scripts/updateGoldenRuns.ts",
     "balance:report": "vite-node scripts/balanceReport.ts",

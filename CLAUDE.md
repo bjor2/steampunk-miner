@@ -38,6 +38,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run metrics:ticket -- <n>`           | where a closed ticket's time went, on the box (#134)      |
 | `npm run metrics:backfill`                | the same for closed #90 / perf tickets since 2026-10-05   |
 | `npm run metrics:tests`                   | CI test timings and results per feature (test-metrics)    |
+| `npm run tests:move-guard`                | a test-move PR keeps count, IDs, goldens, tables (#230)   |
 | `npm run art:export -- <asset-id>`        | headless Blender bake + KTX2 encode (art-pipeline.md)     |
 | `npm run lint` / `npm run format`         | ESLint (enforces the layer rules) / Prettier              |
 | `npm run build`                           | typecheck `src/` + Vite production build into `dist/`     |

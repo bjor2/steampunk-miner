@@ -239,6 +239,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   lead above those bounds is a bot bug, not a balance finding. Band 1 already digs at the
   24-tick cap on arrival, so it is printed, never judged. Reported, never gated.
 
+- **Move-PR guard** (#230, Vertical direction of the #191 lock): tests move into
+  `src/features/<slice>/` with their slice's migration, and `npm run tests:move-guard` (against
+  `origin/main`, or `-- --base <ref>`) checks that such a move changed nothing it should not. It
+  checks the base out detached in a temporary worktree, lists both trees with `vitest list`, and fails
+  when the count drops (or falls under 2,163, main at #191), when a test ID (the describe/it names,
+  file left out) is gone or renamed, or when a golden, a scenario or `pacingSeeds.ts`, the balance
+  baseline or one of the Vertical Scaler's tables (`docs/scaling/vertical/source_hash.mjs`) changed,
+  appeared or went missing. Goldens and scenarios are matched by file name, so they may move; the
+  tables and `pacingSeeds.ts` by path. `-- --balance report` (repeatable, any `balance:<name>`) also
+  runs the report in both trees and requires byte-identical output; that is the box Tester's run.
+  The rules are pure in `scripts/tests/movePrGuard.mjs`.
+
 ## 5. Browser and packaged end-to-end (Playwright)
 
 - Specs drive the game only through `window.steampunkDebug`, `window.steampunkRunLog()` and the
