@@ -83,6 +83,7 @@ export const slice: SliceDefinition = {
 | `hudPanel(panel)` | `src/ui/registries/hudPanels.ts` | The panel reads the slice's own store and takes no props. |
 | `worldPiece(piece)` | `src/scene/registries/worldPieces.ts` | An R3F piece drawn in its world layer (`platform`), no props (#175). |
 | `vehicleStaging(provider)` | `src/systems/registries/vehicleStaging.ts` | One provider (`dock-buildings`): where the local car is drawn, the camera looks and input waits; presentation only (#170). |
+| `dockFacility(facility)` | `src/systems/registries/dockFacilities.ts` | A dock building on a `facility` row of the schedule, which it claims (`scheduleRowId`): the row joins `builtFacilityRowIdsOn` from its `planetIndex` on, so travel logs its `FeatureUnlocked` once the row is shipped (#221). Delete the row from the deferred `dock-building` list in the same commit. |
 | `artAssets(assets)` | `src/systems/registries/artAssets.ts` | Blender assets the slice ships: bare #52 ids (`prop-dynamite-charge`), kebab-case, starting with `<category>-`, never a kernel or another slice's id. They join `blenderAssetIds()`, which the manifest lint and `npm run art:export` read; `parts` joins the asset's valid part ids (#214). |
 | `sceneLayer(layer)` | `src/scene/registries/sceneLayers.ts` | An R3F layer of the world scene with its draw budget, no props, drawn after the planted charges; it places pooled objects in `useFrame` and never writes state, camera or sound (#213). |
 | `chargeBlastCue(provider)` | `src/systems/registries/chargeBlastCue.ts` | One provider (`dynamite-visuals`): a blast's shake, flash and thump delay from the detonation and the listener's distance; the kernel clamps it (#213). |
@@ -102,7 +103,7 @@ Registries are read only after `loadFeatures()` has sealed them, so no slice mod
 - `ui/` with CSS Modules
 - `icons/`
 - commands, domain events and rejection reasons, as below
-- a `scheduleRowId` on the content entry that ships a row of `docs/scaling/horizontal/stats.json`, with the row deleted from the deferred list in `src/systems/registries/scheduleRows.ts` in the same commit
+- a `scheduleRowId` on the content entry (or dock facility) that ships a row of `docs/scaling/horizontal/stats.json`, with the row deleted from the deferred list in `src/systems/registries/scheduleRows.ts` in the same commit
 
 ## Commands, events and debug commands (K1)
 

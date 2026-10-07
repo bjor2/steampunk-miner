@@ -7,7 +7,8 @@
  * Both lists only shrink. A slice that ships a row registers the entry that claims it and deletes
  * the row here in the same commit. The registry kinds the review names (`enemy-kind`,
  * `planet-archetype`, `dock-building`, `artefact`, `wagon`) are not built ahead of their rows:
- * each opens as a kernel ticket with the first slice that ships a row of that kind.
+ * each opens as a kernel ticket with the first slice that ships a row of that kind. `dock-building`
+ * is open: `dockFacilities.ts` (#221).
  */
 
 /** What a deferred row waits for: the registry kind that will hold it, or none named yet. */
