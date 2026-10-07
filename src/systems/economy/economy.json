@@ -265,5 +265,9 @@
     "damageFloorBp": 5000,
     "detectionFloorBp": 5000,
     "heatFloorBp": 5000
+  },
+  "drillGearCaps": {
+    "aheadCellsMax": 1,
+    "sideEnergyShareFloorBp": 10000
   }
 }
