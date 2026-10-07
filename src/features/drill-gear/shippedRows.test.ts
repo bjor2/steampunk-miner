@@ -14,8 +14,8 @@ import { cardLinesOf } from './systems/cardLines'
 import { DRILL_GEAR_ITEMS, markLadderOf, SHIPPED_DRILL_GEAR } from './systems/drillGearItems'
 
 // #205 on the loaded slices: six drill-gear rows ship as vehicle items, power-ups, tree nodes and
-// item cards (#162 acceptance 1), while the twin-bit head and the dielectric bit stay held back
-// with no trace in the game (GD lock on #205 Q3 a).
+// item cards (#162 acceptance 1), the twin-bit head a seventh with its effect (ticket 280), while
+// the dielectric bit stays held back with no trace in the game (GD lock on #205 Q3 a).
 
 const PLAYER = 'p1'
 
@@ -47,13 +47,23 @@ function researchablePayloads() {
 }
 
 describe('drill-gear shipped rows', () => {
-  it('registers six items as vehicle items and power-ups, and six drill-gear nodes', () => {
+  it('registers seven items as vehicle items and power-ups, and seven drill-gear nodes', () => {
     const vehicleItems = ofIds(contentOf('vehicle-item'))
     const powerUps = contentOf('power-up').map((powerUp) => powerUp.itemId)
     expect(SHIPPED_IDS.filter((id) => !vehicleItems.includes(id))).toEqual([])
     expect(SHIPPED_IDS.filter((id) => !powerUps.includes(id))).toEqual([])
     const lane = contentOf('tech-node').filter((node) => node.lane === 'drill-gear')
     expect(lane.map((node) => node.unlocks).sort()).toEqual([...SHIPPED_IDS].sort())
+  })
+
+  it('registers the twin-bit node on P19 after the vibratory bit, the dielectric bit still not', () => {
+    const nodes = contentOf('tech-node')
+    expect(nodes.find((node) => node.id === 'tech.drill_gear.twin_bit')).toMatchObject({
+      unlockTier: 19,
+      prereqs: ['tech.drill_gear.vibratory_bit'],
+      unlocks: 'gear.twin_bit',
+    })
+    expect(nodes.filter(mentionsAny(['gear.dielectric_bit']))).toEqual([])
   })
 
   it('takes each item in its one drill socket at the attach point of that name', () => {
@@ -99,15 +109,15 @@ describe('drill-gear shipped rows', () => {
     expect(researchablePayloads().filter(mentionsAny(shippedNodeIds))).not.toEqual([])
   })
 
-  it('leaves no trace of the held-back twin-bit head and dielectric bit', () => {
-    expect(HELD_BACK.map((item) => item.itemId)).toEqual(['gear.twin_bit', 'gear.dielectric_bit'])
+  it('leaves no trace of the held-back dielectric bit', () => {
+    expect(HELD_BACK.map((item) => item.itemId)).toEqual(['gear.dielectric_bit'])
     const isHeldBack = mentionsAny(HELD_BACK_IDS)
     expect(contentOf('vehicle-item').filter(isHeldBack)).toEqual([])
     expect(contentOf('power-up').filter(isHeldBack)).toEqual([])
     expect(contentOf('tech-node').filter(isHeldBack)).toEqual([])
     expect(listBuyableRefs(LAST_SCHEDULED_PLANET).filter(isHeldBack)).toEqual([])
     const refs = HELD_BACK.map((item) => ({ kind: 'vehicle-item' as const, id: item.itemId }))
-    expect(refs.map(itemDescriptionEntryOf)).toEqual([null, null])
+    expect(refs.map(itemDescriptionEntryOf)).toEqual([null])
     expect(researchablePayloads().filter(isHeldBack)).toEqual([])
   })
 })

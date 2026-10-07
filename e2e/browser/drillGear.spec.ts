@@ -1,9 +1,10 @@
 /**
  * The drill-gear lane in the preview build (#205): read through `steampunkDebug`, never pixels.
- * The build registers six drill-gear items by their bare ids, so the loadout takes them in the
+ * The build registers seven drill-gear items by their bare ids, so the loadout takes them in the
  * drill sockets; the flank key (KeyF, `use_drill_flank`) switches the side cutters on and off; the
- * collar key (KeyC, `use_drill_collar`) uses the sampling corer, which spends one charge; and the
- * card's raw stat lines read from `statPreview`.
+ * collar key (KeyC, `use_drill_collar`) uses the sampling corer, which spends one charge; the card's
+ * raw stat lines read from `statPreview`; and `getTwinBit` reads the twin-bit head in `drill.head`
+ * (ticket 280) with no bearing latched before it cuts.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -16,6 +17,7 @@ declare global {
 
 const CUTTERS = 'gear.side_cutters'
 const CORER = 'gear.sampling_corer'
+const TWIN_BIT = 'gear.twin_bit'
 
 async function openGameWithCuttersAndCorer(page: Page): Promise<string[]> {
   const errors: string[] = []
@@ -83,6 +85,29 @@ test('the corer card reads its raw stat lines from statPreview', async ({ page }
         { stat: 'reachTiles', value: 6 },
       ],
     },
+  })
+  expect(errors).toEqual([])
+})
+
+test('the twin-bit head mounts in drill.head and previews its one diagonal cell', async ({
+  page,
+}) => {
+  const errors = await openGameWithCuttersAndCorer(page)
+  const slotted = await page.evaluate(
+    (head) => window.steampunkDebug!.setVehicleLoadout({ 'drill.head': head }).ok,
+    TWIN_BIT,
+  )
+  expect(slotted).toBe(true)
+  await expect
+    .poll(() => page.evaluate(() => window.steampunkDebug!.features['drill-gear'].getTwinBit()))
+    .toEqual({ ok: true, isMounted: true, aheadLatch: null })
+  const preview = await page.evaluate(
+    (head) => window.steampunkDebug!.features['drill-gear'].statPreview(head, 1, 19),
+    TWIN_BIT,
+  )
+  expect(preview).toMatchObject({
+    ok: true,
+    preview: { itemId: TWIN_BIT, lines: [{ stat: 'aheadCells', value: 1 }] },
   })
   expect(errors).toEqual([])
 })

@@ -17,7 +17,7 @@ import {
 } from './rigGear'
 import { mountedGearQuadsOf, type GearQuad, type MountedItem } from './techGearQuads'
 
-// The loaded slices register the mobility and sensing lanes' items; the twin-bit head (#205) and
+// The loaded slices register the mobility and sensing lanes' items; the dielectric bit (#205) and
 // the galvanic probe (#203 Q3) are still held vision rows, so they are invisible.
 const vehicle = vehicleWithPoints([
   { id: 'hull.powerup.1', atM: [-0.3, -0.02], z: 6 },
@@ -86,7 +86,7 @@ describe('rig gear', () => {
 
   it('never mounts an item that is still a vision row, whatever the loadout holds', () => {
     const loadout = loadoutOf({
-      'drill.head': 'gear.twin_bit',
+      'drill.head': 'gear.dielectric_bit',
       'powerup.1': 'power.galvanic_probe',
     })
     expect(rigItemsOf(loadout)).toEqual([])

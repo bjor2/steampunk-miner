@@ -80,18 +80,26 @@ describe('drill-gear stat preview', () => {
     expect(valuesOf(statPreview('gear.vibratory_bit', last, PLANET)).crumbleAheadCells).toBe(2)
   })
 
-  it('masters on purchase the gear with nothing to step: the thaw crown and the boom', () => {
+  it('masters on purchase the gear with nothing to step: the thaw crown, twin bit and boom', () => {
     const atPurchase = SHIPPED_DRILL_GEAR.filter((item) => masteringMarkOf(item.itemId) === 1)
-    expect(atPurchase.map((item) => item.itemId)).toEqual(['gear.thaw_crown', 'gear.reach_boom'])
+    expect(atPurchase.map((item) => item.itemId)).toEqual([
+      'gear.thaw_crown',
+      'gear.twin_bit',
+      'gear.reach_boom',
+    ])
     expect(valuesOf(statPreview('gear.reach_boom', 1, PLANET))).toEqual({
       aheadCells: 1,
       drawBpPerSecond: 0,
     })
   })
 
-  it('previews nothing for the held-back twin-bit head and dielectric bit', () => {
+  it('previews nothing for the held-back dielectric bit', () => {
     const unseen = DRILL_GEAR_ITEMS.filter((item) => statPreview(item.itemId, 1, PLANET) === null)
-    expect(unseen.map((item) => item.itemId)).toEqual(['gear.twin_bit', 'gear.dielectric_bit'])
+    expect(unseen.map((item) => item.itemId)).toEqual(['gear.dielectric_bit'])
+  })
+
+  it('previews the twin-bit head as its one diagonal cell (ticket 280)', () => {
+    expect(valuesOf(statPreview('gear.twin_bit', 1, PLANET))).toEqual({ aheadCells: 1 })
   })
 
   it('reads the same on every planet: a one-off item never rescales', () => {

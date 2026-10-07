@@ -125,9 +125,9 @@ describe('drill-gear items', () => {
     )
   })
 
-  it('holds back the twin-bit head and the dielectric bit, with no price (#205 GD lock Q3)', () => {
+  it('holds back only the dielectric bit, with no price (#205 GD lock Q3, ticket 280)', () => {
     const heldBack = DRILL_GEAR_ITEMS.filter((item) => item.isHeldBack)
-    expect(heldBack.map((item) => item.itemId)).toEqual(['gear.twin_bit', 'gear.dielectric_bit'])
-    expect(heldBack.map(itemPriceOf)).toEqual([null, null])
+    expect(heldBack.map((item) => item.itemId)).toEqual(['gear.dielectric_bit'])
+    expect(heldBack.map(itemPriceOf)).toEqual([null])
   })
 })

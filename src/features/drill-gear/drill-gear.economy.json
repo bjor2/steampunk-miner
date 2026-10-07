@@ -1,5 +1,5 @@
 {
-  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 one-off price (k 15 band-5 ore at the unlock planet), 4.2 the corer, 4.4 toggle draw and the side-cell and crumble rules; drillPathCaps from the Vertical Scaler on the #205 GD lock (7 Oct). Shares and draws are whole basis points. A slice's numbers live beside it (feature-slices.md 1.1).",
+  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): 4.1 one-off price (k 15 band-5 ore at the unlock planet), 4.2 the corer, 4.4 toggle draw and the side-cell and crumble rules; drillPathCaps from the Vertical Scaler on the #205 GD lock (7 Oct); the twin bit's one diagonal cell from the #257 GD lock (7 Oct). Shares and draws are whole basis points. A slice's numbers live beside it (feature-slices.md 1.1).",
   "items": {
     "price": { "band": 5, "oreUnits": "15" },
     "drillPathCaps": { "sideEnergyShareBpMin": 10000, "aheadCellsMax": 1 },
@@ -8,7 +8,7 @@
       "gear.spoil_auger": { "drawBpPerSecond": 30, "fillBehindM": 2, "vehicleClearanceM": 1 },
       "gear.side_cutters": { "sideCells": 1, "sideEnergyShareBp": 10000 },
       "gear.thaw_crown": {},
-      "gear.twin_bit": {},
+      "gear.twin_bit": { "aheadCells": 1 },
       "gear.sampling_corer": {
         "charges": 4,
         "cooldownTicks": 300,

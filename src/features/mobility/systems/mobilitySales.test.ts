@@ -19,8 +19,8 @@ import { statPreview } from './statPreview'
 
 const GRAPPLE_PLANET = 3
 const GRAPPLE_NODE = 'tech.mobility.grapple_winch'
-/** A #162 row no slice registers on main: the twin-bit head stays held back (#205 GD lock). */
-const VISION_ROW = 'gear.twin_bit'
+/** A #162 row no slice registers on main: the dielectric bit stays held back (#205 GD lock). */
+const VISION_ROW = 'gear.dielectric_bit'
 
 /** On the grapple's planet, docked at the Upgrade bay with plenty to spend. */
 function dockedOnGrapplePlanet(): ScriptedSession {

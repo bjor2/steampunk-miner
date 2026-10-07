@@ -4,9 +4,9 @@
  * `vehicle-item` rows, tech nodes and prices made from them. Node ids are `tech.drill_gear.*`
  * (#205 GD lock: the #224 bare-id rule refuses the hyphen of `tech.drill-gear.*`).
  *
- * #205 registers six of them with their effects (`drillGearContent.ts`). The twin-bit head and the
- * dielectric bit are held back (GD lock on #205 Q3 a): unregistered, unseen and unpriced until the
- * mechanic the twin bit removes exists, and the dielectric bit's prereq is the twin bit.
+ * #205 registers six of them with their effects (`drillGearContent.ts`), ticket 280 the twin-bit
+ * head (its 45-degree diagonal cut, GD lock on #257). The dielectric bit is held back (GD lock on
+ * #205 Q3 a): unregistered, unseen and unpriced until the magnetic-planet spec gives its effect.
  */
 import type { Money } from '../../../systems/money'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
@@ -188,10 +188,11 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'passive',
     isToggle: false,
-    isHeldBack: true,
+    isHeldBack: false,
     slot: 'drill.head',
     attach: 'drill.head',
-    stats: [],
+    // The diagonal replaces the ahead cell, so its reach is clamped and never steps (#257 GD lock).
+    stats: [{ stat: 'aheadCells', label: 'Diagonal cut', unit: 'cells' }],
     node: {
       id: 'tech.drill_gear.twin_bit',
       iconId: 'node-drill-gear-twin-bit',
@@ -266,7 +267,7 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
   },
 ]
 
-/** The items #205 registers: every row but the held-back ones. */
+/** The items the slice registers: every row but the held-back one. */
 export const SHIPPED_DRILL_GEAR: readonly DrillGearItem[] = DRILL_GEAR_ITEMS.filter(
   (item) => !item.isHeldBack,
 )

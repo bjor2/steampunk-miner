@@ -36,8 +36,15 @@ describe('drill-gear card lines', () => {
     expect(readingsOf('gear.thaw_crown', 1)).toEqual([['Price', priceOf('gear.thaw_crown')]])
   })
 
+  it('gives the twin-bit head its one diagonal cell and its price (ticket 280)', () => {
+    expect(readingsOf('gear.twin_bit', 1)).toEqual([
+      ['Diagonal cut (cells)', '1e+0'],
+      ['Price', priceOf('gear.twin_bit')],
+    ])
+  })
+
   it('has no lines for a held-back item or one of another lane', () => {
-    expect(cardLinesOf('gear.twin_bit', 1)).toEqual([])
+    expect(cardLinesOf('gear.dielectric_bit', 1)).toEqual([])
     expect(cardLinesOf('power.echo_sounder', 1)).toEqual([])
   })
 })

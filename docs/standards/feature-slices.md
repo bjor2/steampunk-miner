@@ -858,7 +858,7 @@ The `drill-gear` slice (#205) is the lane on this seam: the side cutters and rea
 - `power-up-core.use_power_up` also accepts `drill.flank` and `drill.collar` (`isPressableSlot`, one refusal rule; `drill.head` still refuses). Charges, cooldown, wind-up, gates and the toggle draw are unchanged.
 - Two kernel actions, `use_drill_flank` (KeyF) and `use_drill_collar` (KeyC), rebindable like `use_slot_n`, which only the drill-gear slice's input reactions answer. No touch tile yet (#244).
 
-The lane registers a `vehicleItemSeller` (ticket 248's buy path) for its six shipped items at their card price; the held-back two have no price and are not sold. The spoil auger's draw goes to the core in bp as it is in the file (30 bp/s, ticket 295), and its ladder falls at every Mark to 15 at mastery.
+The lane registers a `vehicleItemSeller` (ticket 248's buy path) for its seven shipped items at their card price; the held-back dielectric bit has no price and is not sold. The twin-bit head (ticket 280, P19 after the vibratory bit) is a passive in `drill.head` whose source asks `{ aheadCells: 1, aheadAim: 'drive' }` while it is mounted; an authority reaction logs each finished diagonal cell as `drill-gear.diagonal_cell_cut` (tile and side), and `features['drill-gear'].getTwinBit()` reads whether it is mounted and the latch its last cut left. The spoil auger's draw goes to the core in bp as it is in the file (30 bp/s, ticket 295), and its ladder falls at every Mark to 15 at mastery.
 
 ### 3.29 Ore drill classes (#236)
 
