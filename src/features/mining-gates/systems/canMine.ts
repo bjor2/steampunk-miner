@@ -28,6 +28,7 @@ import type { GateQuery, GateVerdict } from '../../../systems/registries/gateChe
 import { carriedSizesOf } from '../../../systems/vehicle/vehicleCharges'
 import { canScratch } from '../../../systems/vehicle/drillRule'
 import type { PlanetParams } from '../../../systems/world/planetParams'
+import type { TilePoint } from '../../../systems/world/tileGrid'
 import { cellGateOf } from './cellGates'
 import {
   extractorDrillVerdictOf,
@@ -84,7 +85,7 @@ function shellVerdictOf(minCharge: number, size: number): GateVerdict {
 }
 
 function tipVerdictOf(outcome: 'refused' | 'blocked', params: PlanetParams, query: GateQuery) {
-  const needed = minTipLevelOf(hardnessOf(params, query), scratchFloorOf(params, query))
+  const needed = minTipMajorOfCell(params, query.tile, query.cell)
   return {
     outcome,
     gateKind: 'drill',
@@ -111,7 +112,13 @@ export function minTipLevelOf(hardness: BigStat, floor: BigStat): number {
   return low
 }
 
-function hasGateContent(params: PlanetParams): boolean {
+/** The smallest major whose tip scratches the cell at `tile`: where its drill gate opens. */
+export function minTipMajorOfCell(params: PlanetParams, tile: TilePoint, cell: number): number {
+  return minTipLevelOf(hardnessOfTile(params, tile, cell), scratchFloorOfCell(params, tile, cell))
+}
+
+/** From `gateContentFromPlanet` (P7) an ordinary ore cell the tip cannot scratch is refused too. */
+export function hasGateContent(params: PlanetParams): boolean {
   return params.planetIndex >= GATE_ROWS.gateContentFromPlanet
 }
 

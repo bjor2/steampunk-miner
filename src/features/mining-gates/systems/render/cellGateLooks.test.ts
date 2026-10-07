@@ -8,6 +8,7 @@ import {
 } from '../../../../systems/render/cellGateBits'
 import { buildChunkTileBatch } from '../../../../systems/render/chunkTileBatch'
 import { rgbOfHex } from '../../../../systems/render/colour'
+import { drawnGateOf, gateKindOfPattern } from '../../../../systems/render/gatePatterns'
 import { chunkDensityHaloOf } from '../../../../systems/render/densityHalo'
 import { CHUNK_SIZE, chunkOfTile, firstTileOfChunk } from '../../../../systems/world/tileGrid'
 import {
@@ -16,28 +17,31 @@ import {
   EMPTY_WORLD,
   materialCellsOfChunk,
 } from '../../../../systems/world/worldState'
-import { paramsOn, sessionOn, worldCellOfGate } from '../gateFixtures'
+import { canMine } from '../canMine'
+import { paramsOn, sessionOn, setTipMajor, worldCellOfGate } from '../gateFixtures'
 import { GATE_ROWS } from '../gateRows'
 import type { CellGateKind } from '../gateTable'
-import {
-  CELL_GATE_LOOK_ID,
-  cellGateLookOf,
-  markerTintOf,
-  TERRAIN_KINDS,
-  terrainKindOf,
-} from './cellGateLooks'
-import { motionSignatureOf } from './lockMarkers'
+import { CELL_GATE_LOOK_ID, cellGateLookOf, gatePatternOf, markerTintOf } from './cellGateLooks'
+import { lockMarkerOf, motionSignatureOf } from './lockMarkers'
 import { actTintOf } from './markerTints'
 
-// Ticket 298: the gate each ore cell shows to the kernel's terrain gate channel.
+// Tickets 298 and 299: the gate each ore cell shows to the kernel's terrain gate channel.
 
 const FIRE = 8
 const FROST = 17
 
 function gatedCellOn(planet: number, kind: CellGateKind) {
-  const params = paramsOn(sessionOn(planet))
+  const session = sessionOn(planet)
+  const params = paramsOn(session)
   const found = worldCellOfGate(params, (gate) => gate.kind === kind)
-  return { params, ...found, cell: cellAt(EMPTY_WORLD, params, found.tile) }
+  return { session, params, ...found, cell: cellAt(EMPTY_WORLD, params, found.tile) }
+}
+
+/** The tip major `canMine` names as the one a drill-gated cell needs, at tip 0. */
+function requiredMajorOf(fixture: ReturnType<typeof gatedCellOn>): number {
+  const { session, tile, cell, ore } = fixture
+  const verdict = canMine({ state: session.state(), playerId: 'p1', tile, cell, ore, blast: null })
+  return Number(verdict?.required.split(':')[1])
 }
 
 /** The look the chunk mesh writes for `tile`, read back from its per-cell bits. */
@@ -64,47 +68,93 @@ function drawnLookAt(planet: number, tile: { tx: number; ty: number }) {
   throw new Error(`tile ${tile.tx},${tile.ty} is not drawn (chunk side ${CHUNK_SIZE})`)
 }
 
+/** Every pattern the slice writes, by name: the shell, the rims and the extractor motions. */
+const GATE_PATTERNS_BY_NAME: Readonly<Record<string, number>> = Object.fromEntries([
+  ...(['hard_rim', 'bare_rim', 'cracked_shell'] as const).map((pattern) => [
+    pattern,
+    gateKindOfPattern(pattern),
+  ]),
+  ...GATE_ROWS.rigs.map((rig) => [
+    motionSignatureOf(rig.id) ?? '',
+    gateKindOfPattern(gatePatternOf({ kind: 'rig', rig })),
+  ]),
+])
+
 describe('gate looks in the ground', () => {
-  it('shows a dynamite cell as the cracked shell, locked', () => {
+  it('shows a dynamite cell as the cracked shell, locked, which no tip opens', () => {
     const { params, tile, cell } = gatedCellOn(7, 'dynamite')
     expect(cellGateLookOf(params, cell, tile)).toEqual({
-      kind: TERRAIN_KINDS.cracked_shell,
+      kind: gateKindOfPattern('cracked_shell'),
       state: GATE_STATE.locked,
     })
   })
 
-  it('shows a dense cell as the hard rim', () => {
-    const { params, tile, cell } = gatedCellOn(7, 'dense')
-    expect(cellGateLookOf(params, cell, tile)?.kind).toBe(TERRAIN_KINDS.hard_rim)
+  it('shows a dense cell as the hard rim, opening at the tip major the gate asks for', () => {
+    const dense = gatedCellOn(7, 'dense')
+    expect(cellGateLookOf(dense.params, dense.cell, dense.tile)).toEqual({
+      kind: gateKindOfPattern('hard_rim'),
+      state: GATE_STATE.locked,
+      opensAtTipMajor: requiredMajorOf(dense),
+    })
+  })
+
+  it('opens the rim in the ground on the major where the lock marker opens', () => {
+    const dense = gatedCellOn(7, 'dense')
+    const { session, params, tile, cell } = dense
+    const opensAt = requiredMajorOf(dense)
+    const bits = gateBitsOf(cellGateLookOf(params, cell, tile))
+    for (const tipMajor of [opensAt - 1, opensAt]) {
+      setTipMajor(session, tipMajor)
+      const isMarkerOpen = lockMarkerOf(session.state(), 'p1', tile).kind === 'hard_rim_open'
+      const viewer = { tipMajor, isMotionReduced: false }
+      expect(drawnGateOf(bits, viewer)?.isOpen).toBe(isMarkerOpen)
+    }
   })
 
   it("shows an extractor cell as its extractor's surface motion, owned or not", () => {
     const { params, tile, cell, gate } = gatedCellOn(FIRE, 'rig')
     const motion = gate.kind === 'rig' ? motionSignatureOf(gate.rig.id) : null
-    expect(cellGateLookOf(params, cell, tile)?.kind).toBe(TERRAIN_KINDS[motion ?? ''])
+    expect(cellGateLookOf(params, cell, tile)).toEqual({
+      kind: GATE_PATTERNS_BY_NAME[motion ?? ''],
+      state: GATE_STATE.locked,
+    })
   })
 
-  it('leaves rock, air and an ungated ore cell bare', () => {
-    const { params, tile } = gatedCellOn(7, 'none')
+  it('rims an ordinary ore cell from P7 until its tip major, as the lock marker does', () => {
+    const ordinary = gatedCellOn(7, 'none')
+    const { session, params, tile, cell } = ordinary
+    const opensAt = requiredMajorOf(ordinary)
+    const look = cellGateLookOf(params, cell, tile)
+    expect(look).toEqual({
+      kind: gateKindOfPattern('bare_rim'),
+      state: GATE_STATE.locked,
+      opensAtTipMajor: opensAt,
+    })
+    setTipMajor(session, opensAt)
+    expect(lockMarkerOf(session.state(), 'p1', tile).kind).toBe('none')
+    expect(drawnGateOf(gateBitsOf(look), { tipMajor: opensAt, isMotionReduced: false })).toBeNull()
+  })
+
+  it('leaves rock, air and an ungated ore cell before P7 bare', () => {
+    const { params, tile } = gatedCellOn(5, 'none')
     expect(cellGateLookOf(params, cellAt(EMPTY_WORLD, params, tile), tile)).toBeNull()
     expect(cellGateLookOf(params, 0, { tx: 0, ty: 0 })).toBeNull()
   })
 
-  it('numbers every marker pattern apart, inside the channel, with room for later acts', () => {
-    const kinds = Object.values(TERRAIN_KINDS)
-    expect(new Set(kinds).size).toBe(kinds.length)
+  it('keeps every pattern it writes inside the channel', () => {
+    const kinds = Object.values(GATE_PATTERNS_BY_NAME)
     kinds.forEach((kind) => expect(() => gateBitsOf({ kind, state: 0 })).not.toThrow())
     expect(Math.max(...kinds)).toBeLessThan(MAX_GATE_KIND)
   })
 
   it("gives each extractor's cells a pattern of their own, apart from the drill's and dynamite's", () => {
-    const rigKinds = GATE_ROWS.rigs.map((rig) => terrainKindOf({ kind: 'rig', rig }))
+    const rigPatterns = GATE_ROWS.rigs.map((rig) => gatePatternOf({ kind: 'rig', rig }))
     const others = [
-      terrainKindOf({ kind: 'dense' }),
-      terrainKindOf({ kind: 'dynamite', minCharge: 1 }),
+      gatePatternOf({ kind: 'dense' }),
+      gatePatternOf({ kind: 'dynamite', minCharge: 1 }),
     ]
-    expect(new Set([...rigKinds, ...others]).size).toBe(GATE_ROWS.rigs.length + 2)
-    expect(terrainKindOf({ kind: 'drillSignature' })).toBe(terrainKindOf({ kind: 'dense' }))
+    expect(new Set([...rigPatterns, ...others]).size).toBe(GATE_ROWS.rigs.length + 2)
+    expect(gatePatternOf({ kind: 'drillSignature' })).toBe(gatePatternOf({ kind: 'dense' }))
   })
 
   it("tints the planet's markers with its act, Fire in its secondary out of the heat hues", () => {
