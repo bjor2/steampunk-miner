@@ -434,7 +434,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/authorityReactions.test.ts` | 7 | 7 |
 | `src/systems/authority/bore/boreAim.test.ts` | 10 | 10 |
 | `src/systems/authority/bore/boreWalk.test.ts` | 6 | 6 |
-| `src/systems/authority/bore/groundGun.test.ts` | 26 | 26 |
+| `src/systems/authority/bore/groundGun.test.ts` | 32 | 32 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
