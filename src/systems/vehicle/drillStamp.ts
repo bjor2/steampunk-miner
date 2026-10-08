@@ -18,6 +18,7 @@ import {
   DRILL_STAMP_RADIUS_MM,
 } from '../../constants/balance'
 import { UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
+import { centreDistanceFloorMmOf } from '../world/exactSquares'
 import type { DiscStamp } from '../world/stampShape'
 import { MM_PER_SAMPLE } from '../world/sampleGrid'
 import { FACING, facingVectorOf, type VehiclePose } from './vehiclePose'
@@ -48,7 +49,7 @@ function isSideways(pose: VehiclePose): boolean {
  * the wheels, so the floor never leaves a lip the drill may not cut.
  */
 function wheelFloorRadiusOf(pose: VehiclePose): number {
-  const wheels = Math.floor(Math.sqrt(pose.x * pose.x + pose.y * pose.y)) - HALF_BODY_MM
+  const wheels = centreDistanceFloorMmOf(pose.x, pose.y) - HALF_BODY_MM
   return Math.floor((wheels + FLOOR_JITTER_MM) / MM_PER_SAMPLE) * MM_PER_SAMPLE
 }
 

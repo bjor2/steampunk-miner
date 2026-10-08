@@ -12,6 +12,7 @@
  * - A cell **beside a disc** (slice drill gear, ticket 234) covers the cell's samples the disc does
  *   not reach, at full weight, kept above the disc's level floor, so a widened bore keeps its floor.
  */
+import { circleExcessMm2Of } from './exactSquares'
 import { MM_PER_SAMPLE, SAMPLES_PER_TILE, SOLID_DENSITY, ISO_DENSITY } from './sampleGrid'
 import type { TilePoint } from './tileGrid'
 
@@ -101,9 +102,7 @@ function isWithinDisc(disc: DiscStamp, { sx, sy }: WeightedSample): boolean {
 /** The level floor's ramp at a sample: 128 on the floor circle, 255 a sample below it. */
 function levelFloorAt(floorRadiusMm: number | null, sx: number, sy: number): number {
   if (floorRadiusMm === null) return 0
-  const x = sx * MM_PER_SAMPLE
-  const y = sy * MM_PER_SAMPLE
-  const excess = floorRadiusMm * floorRadiusMm - (x * x + y * y)
+  const excess = circleExcessMm2Of(floorRadiusMm, sx * MM_PER_SAMPLE, sy * MM_PER_SAMPLE)
   const ramp =
     ISO_DENSITY + Math.floor((excess * SOLID_DENSITY) / (2 * floorRadiusMm * MM_PER_SAMPLE))
   return Math.max(0, Math.min(SOLID_DENSITY, ramp))
