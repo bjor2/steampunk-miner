@@ -3,11 +3,13 @@
  * the repulsor coil (repel, a slot tap) and the lode clamp (anchor, a slot hold). The lodestone
  * beacon stays the attract member exactly as `terrainItems.ts` lists it.
  *
- * Build 1 of the lock: the rows are ticket 282's and stay unregistered, so no store, item card or
- * bot sees the items. Ticket 300 registers their nodes (`terrainContent.ts`), both rooted at the
- * beacon's; the effects are builds 2-4. A separate list from `TERRAIN_ITEMS`, so registering the
- * lane's items does not ship them.
+ * Build 1 of the lock: the rows are ticket 282's. Ticket 300 registers their nodes
+ * (`terrainContent.ts`), both rooted at the beacon's; each item registers with its effect
+ * (`SHIPPED_MAGNET_ITEMS`: the repulsor coil since ticket 284). A separate list from
+ * `TERRAIN_ITEMS`, so registering the lane's items does not ship them.
  */
+import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
+import type { Money } from '../../../systems/money'
 import type { ItemAttach } from '../../../systems/registries/vehicleAttach'
 import type { LoadoutSlotId, VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import { POWER_UP_SLOTS } from '../../power-up-core'
@@ -130,6 +132,12 @@ export function magnetBalanceOf(item: MagnetItem): TerrainBalance {
 
 export function magnetVehicleItemOf(item: MagnetItem): VehicleItem {
   return { id: item.itemId, iconId: item.iconId, slots: item.slots, attach: item.attach }
+}
+
+/** A one-off at the lane's price (#162 4.1): 15 band-5 ore units at its node's unlock planet. */
+export function magnetPriceOf(item: MagnetItem): Money {
+  const planet = item.node.unlockTier
+  return bandOrePriceAt(TERRAIN_ECONOMY.oneOffPrice, planet, planet)
 }
 
 /** The member's capability node; it unlocks the item row, whose effect a later build registers. */

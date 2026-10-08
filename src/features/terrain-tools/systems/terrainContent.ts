@@ -1,10 +1,11 @@
 /**
  * The shipped terrain tools as the kernel and `tech-tree` take them: one `vehicle-item` per tool
  * (slot acceptance and one attach point, #162 acceptance 1), one `tech.terrain.*` node each plus
- * the fourth cradle's (ticket 251) and the two new terrain magnets' (ticket 300), and their item cards (#159, the K7 `itemDescriptionEntries`
- * seam): the #162 flavour line, one line per `statPreview` line read at the Mark the card's level
- * names, and the price last. A card at level 0 reads Mark 1, the item as bought; its next value is
- * the next Mark until it is Mastered.
+ * the fourth cradle's (ticket 251) and the two new terrain magnets' (ticket 300), and their item
+ * cards (#159, the K7 `itemDescriptionEntries` seam): the #162 flavour line, one line per
+ * `statPreview` line read at the Mark the card's level names, and the price last. A card at level 0 reads Mark 1, the item as bought; its next value is
+ * the next Mark until it is Mastered. A shipped terrain magnet (ticket 284) registers its item and
+ * Content's card (`magnetCards.ts`) the same way.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
@@ -13,8 +14,9 @@ import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescr
 import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { isMasteredAt, type TechNode } from '../../tech-tree'
-import { SHIPPED_TERRAIN_ITEMS } from './shippedTools'
-import { MAGNET_ITEMS, magnetTechNodeOf } from './magnetItems'
+import { SHIPPED_MAGNET_ITEMS, SHIPPED_TERRAIN_ITEMS } from './shippedTools'
+import { magnetCardOf } from './magnetCards'
+import { MAGNET_ITEMS, magnetTechNodeOf, magnetVehicleItemOf } from './magnetItems'
 import { FOURTH_CRADLE_NODE } from './terrainCradle'
 import { statPreview, type TerrainStatLine, type TerrainStatUnit } from './statPreview'
 import {
@@ -41,8 +43,10 @@ const UNIT_SUFFIX: Readonly<Record<TerrainStatUnit, string>> = {
   swaps: '',
 }
 
-export const TERRAIN_VEHICLE_ITEMS: readonly VehicleItem[] =
-  SHIPPED_TERRAIN_ITEMS.map(vehicleItemOf)
+export const TERRAIN_VEHICLE_ITEMS: readonly VehicleItem[] = [
+  ...SHIPPED_TERRAIN_ITEMS.map(vehicleItemOf),
+  ...SHIPPED_MAGNET_ITEMS.map(magnetVehicleItemOf),
+]
 
 /** The tools' nodes, the fourth cradle's (ticket 251) and the magnets' (ticket 300). */
 export const TERRAIN_TECH_NODES: readonly TechNode[] = [
@@ -51,7 +55,10 @@ export const TERRAIN_TECH_NODES: readonly TechNode[] = [
   ...MAGNET_ITEMS.map(magnetTechNodeOf),
 ]
 
-export const TERRAIN_ITEM_CARDS: readonly ItemDescriptionEntry[] = SHIPPED_TERRAIN_ITEMS.map(cardOf)
+export const TERRAIN_ITEM_CARDS: readonly ItemDescriptionEntry[] = [
+  ...SHIPPED_TERRAIN_ITEMS.map(cardOf),
+  ...SHIPPED_MAGNET_ITEMS.map(magnetCardOf),
+]
 
 /** The Mark a card's level names: Mark 1 before any Mark is researched. */
 export function markOfLevel(level: number): number {

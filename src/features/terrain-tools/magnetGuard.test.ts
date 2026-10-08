@@ -18,7 +18,9 @@ import { techNodeOf, terrainItemOf } from './systems/terrainItems'
 // at P25 with the magnetic planet, never as a tease at P24. Ticket 289 shipped `magnetic_planets`
 // (spec #258 Q4) and released the vision-row pin: the effect builds may now register the family,
 // and it shows from P25. Ticket 300 registers the two nodes, rooted at the beacon's, which stays
-// the attract member exactly as #202 ships it.
+// the attract member exactly as #202 ships it. Ticket 284 registers the repulsor coil's item,
+// power-up and card: a registered row is no trace before its node's planet, where the tree opens
+// it, while the store and the bot are asked on the planet itself.
 
 const PLAYER = 'p1'
 
@@ -35,17 +37,31 @@ const BEACON_ITEM_ID = 'consumable.lodestone_beacon'
 const mentionsTheFamily = (value: unknown) =>
   FAMILY_IDS.some((id) => JSON.stringify(value).includes(id))
 
+/** The members whose node the tree shows by `lastPlanet`. */
+const membersShownBy = (lastPlanet: number) =>
+  MAGNET_ITEMS.filter((item) => item.node.unlockTier <= lastPlanet)
+
+/** A registered row or card of a member the tree shows by `lastPlanet`. */
+function mentionsMemberShownBy(lastPlanet: number) {
+  const ids = membersShownBy(lastPlanet).flatMap((item) => [item.itemId, item.iconId])
+  return (value: unknown) => ids.some((id) => JSON.stringify(value).includes(id))
+}
+
 /** A node shows in the tree from its unlock planet, so one later than `lastPlanet` is no trace. */
 const isNodeOnOrBefore = (lastPlanet: number) => (node: TechNode) => node.unlockTier <= lastPlanet
 
-/** A node's icon shows with its node; any other icon shows wherever its content does. */
+/** A node's icon shows with its node, and a member's item icon with the member's node. */
 function isIconShownBy(lastPlanet: number) {
   const laterNodeIds = new Set(
     contentOf('tech-node')
       .filter((node) => !isNodeOnOrBefore(lastPlanet)(node))
       .map((node) => node.id),
   )
-  return (icon: ContentIconUse) => icon.kind !== 'tech-node' || !laterNodeIds.has(icon.id)
+  const laterItemIcons = new Set(
+    MAGNET_ITEMS.filter((item) => item.node.unlockTier > lastPlanet).map((item) => item.iconId),
+  )
+  return (icon: ContentIconUse) =>
+    !laterItemIcons.has(icon.iconId) && (icon.kind !== 'tech-node' || !laterNodeIds.has(icon.id))
 }
 
 function magneticPlanetsRow() {
@@ -77,11 +93,13 @@ function richStateOn(planetIndex: number) {
 function familyTracesThrough(lastPlanet: number): unknown[] {
   const state = richStateOn(lastPlanet)
   const payloads = botPurchases().flatMap((purchase) => purchase.payloadsToTry(state, PLAYER))
-  const refs = ITEM_IDS.map((id) => ({ kind: 'vehicle-item' as const, id }))
+  const shownIds = membersShownBy(lastPlanet).map((item) => item.itemId)
+  const refs = shownIds.map((id) => ({ kind: 'vehicle-item' as const, id }))
+  const isShownRow = mentionsMemberShownBy(lastPlanet)
   return [
-    ...ITEM_IDS.filter(isVehicleItemId),
-    ...contentOf('vehicle-item').filter(mentionsTheFamily),
-    ...contentOf('power-up').filter(mentionsTheFamily),
+    ...shownIds.filter(isVehicleItemId),
+    ...contentOf('vehicle-item').filter(isShownRow),
+    ...contentOf('power-up').filter(isShownRow),
     ...contentOf('tech-node').filter(isNodeOnOrBefore(lastPlanet)).filter(mentionsTheFamily),
     ...contentIconIds().filter(isIconShownBy(lastPlanet)).filter(mentionsTheFamily),
     ...listBuyableRefs(lastPlanet).filter(mentionsTheFamily),

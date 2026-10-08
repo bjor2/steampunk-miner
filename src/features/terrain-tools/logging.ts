@@ -2,7 +2,8 @@
  * The terrain lane's lines (#162 section 2.4: the envelope carries planet, depth and tick). Every
  * use is already `power-up-core.power_up_used`; these add what it did to the ground:
  * `terrain_edit {itemId, mark, origin, cellsChanged, chunksTouched, editHash}` for each queued edit
- * (with the TD's `chunksTouched`, #162 section 3 rule 7), and where a lodestone beacon was planted.
+ * (with the TD's `chunksTouched`, #162 section 3 rule 7), where a lodestone beacon was planted, and
+ * `magnet_used {itemId, verb, cellsMoved, energy}` for each terrain magnet use (GD lock on #246).
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
@@ -24,6 +25,10 @@ export const TERRAIN_PROJECTIONS: SliceEventProjections = {
     event: 'terrain-tools.beacon_planted',
     data: { at: { tx, ty }, plantedTick },
   }),
+  'terrain-tools.MagnetUsed': ({ itemId, verb, cellsMoved, energy }) => ({
+    event: 'terrain-tools.magnet_used',
+    data: { itemId, verb, cellsMoved, energy },
+  }),
 }
 
 export const TERRAIN_RUN_EVENTS: SliceRunEvents = {
@@ -43,5 +48,10 @@ export const TERRAIN_RUN_EVENTS: SliceRunEvents = {
     group: 'vehicle_and_combat',
     level: 'core',
     payload: { at: { mapOf: 'integer' }, plantedTick: 'integer' },
+  },
+  'terrain-tools.magnet_used': {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', verb: 'text', cellsMoved: 'integer', energy: 'integer' },
   },
 }

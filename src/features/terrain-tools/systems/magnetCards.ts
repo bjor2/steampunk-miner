@@ -5,7 +5,7 @@
  * the kernel `magnets` block; the wave radius and the clamp's duration read the Mark the card's
  * level names, and show the next Mark's value until the item is Mastered.
  *
- * Unregistered (ticket 282): the effect builds file these entries when the family ships.
+ * Each member's entry registers with its effect (`SHIPPED_MAGNET_ITEMS`, ticket 284 onwards).
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { ECONOMY } from '../../../systems/economy/economy'
@@ -27,9 +27,9 @@ const FIRST_MARK = 1
 /** Tenths of a second: a stepped duration reads 3.5 s, not 3.45 s. */
 const TENTHS_PER_SECOND = 10
 
-export const MAGNET_ITEM_CARDS: readonly ItemDescriptionEntry[] = MAGNET_ITEMS.map(cardOf)
+export const MAGNET_ITEM_CARDS: readonly ItemDescriptionEntry[] = MAGNET_ITEMS.map(magnetCardOf)
 
-function cardOf(item: MagnetItem): ItemDescriptionEntry {
+export function magnetCardOf(item: MagnetItem): ItemDescriptionEntry {
   return {
     id: `terrain-tools.${item.itemId.slice('power.'.length)}`,
     matches: { kind: 'vehicle-item', id: item.itemId },

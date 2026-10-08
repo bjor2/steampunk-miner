@@ -16,11 +16,12 @@ import {
   type ScriptedSession,
 } from '../../systems/authority/scriptedSession'
 import { planetParamsOf } from '../../systems/authority/planetOfState'
+import { queueTerrainEdit } from '../../systems/authority/terrain/terrainEdits'
 import { FACING, type Facing } from '../../systems/vehicle/vehiclePose'
 import type { PlanetParams } from '../../systems/world/planetParams'
 import { SOLID_DENSITY } from '../../systems/world/sampleGrid'
 import { surfaceRowOfColumn, type TilePoint } from '../../systems/world/tileGrid'
-import { CELL_KIND, kindOfCell } from '../../systems/world/worldCell'
+import { AIR_CELL, CELL_KIND, kindOfCell } from '../../systems/world/worldCell'
 import { cellAt, materialCellAt } from '../../systems/world/worldState'
 import { intentToUseSlot, type PowerUpSlot } from '../power-up-core'
 
@@ -71,6 +72,34 @@ export function standAt(
   )
   const { payload } = poseAbove(GROUND, facing)
   session.submit(tick, { type: 'reportPose', payload: { ...payload, ...centre } }, playerId)
+}
+
+/**
+ * The session with `tiles` hollowed into open cave air, as generation leaves a cave: a K6 swap to
+ * air on `tick`, then density 0 on the next tick, so no tile yields (air is not removable). A new
+ * session over the same state, its event list starting empty.
+ */
+export function hollowCaves(
+  session: ScriptedSession,
+  tick: number,
+  tiles: readonly TilePoint[],
+): ScriptedSession {
+  const toAir = queueTerrainEdit(session.state(), {
+    playerId: 'p1',
+    source: 'terrain-tools.test-hollow',
+    cells: tiles.map((tile) => ({ kind: 'swap', ...tile, cell: AIR_CELL })),
+  })
+  const swapped = continueScriptedSession(toAir)
+  swapped.advanceTo(tick)
+  const opened = continueScriptedSession(
+    queueTerrainEdit(swapped.state(), {
+      playerId: 'p1',
+      source: 'terrain-tools.test-hollow',
+      cells: tiles.map((tile) => ({ kind: 'density', ...tile, density: 0 })),
+    }),
+  )
+  opened.advanceTo(tick + 1)
+  return opened
 }
 
 /** The ore tiles whose centre lies within `radius` tiles of `centre`, with their material. */

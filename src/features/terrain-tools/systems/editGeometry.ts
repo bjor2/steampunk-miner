@@ -98,10 +98,37 @@ export function stepsToward(tile: TilePoint, target: TilePoint, seed: number): T
   return dx === 0 || dy === 0 ? legs.slice(0, 1) : legs
 }
 
+/**
+ * The touching tiles one cell further out from `centre` than `tile`: every step that heads away
+ * from it, the step nearest the line from `centre` through `tile` first (ties in turning order).
+ * None for the centre itself.
+ */
+export function tilesOutwardOf(tile: TilePoint, centre: TilePoint): TilePoint[] {
+  const out = { x: tile.tx - centre.tx, y: tile.ty - centre.ty }
+  return STEP_RING.filter((step) => dotOf(step, out) > 0)
+    .sort((a, b) => alignmentOrder(out, a, b))
+    .map((step) => stepped(tile, step))
+}
+
 /** One grid step from `tile` away from `centre`, along the longer leg; seeded on a diagonal. */
 export function stepAway(tile: TilePoint, centre: TilePoint, seed: number): TilePoint {
   const mirrored = { tx: 2 * tile.tx - centre.tx, ty: 2 * tile.ty - centre.ty }
   return stepToward(tile, mirrored, seed)
+}
+
+/** Negative when `a` points nearer `out` than `b`: the squared cosines, cross-multiplied. */
+function alignmentOrder(out: IntegerVector, a: GridStep, b: GridStep): number {
+  const towardA = dotOf(a, out)
+  const towardB = dotOf(b, out)
+  return towardB * towardB * lengthSqOf(a) - towardA * towardA * lengthSqOf(b)
+}
+
+function dotOf(a: IntegerVector, b: IntegerVector): number {
+  return a.x * b.x + a.y * b.y
+}
+
+function lengthSqOf(step: GridStep): number {
+  return step.x * step.x + step.y * step.y
 }
 
 function isAlongX(dx: number, dy: number, seed: number, tile: TilePoint): boolean {

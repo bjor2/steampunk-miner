@@ -5,6 +5,8 @@
  * their seeded edits on the K6 terrain-edit queue. The lodestone's live beacon waits in the
  * `terrain-tools` section and gathers at its owner's dock; combo item hooks hear it through the
  * kernel `liveBeacon` provider, and the shifter's drag consults the `dragTarget` hook (ticket 326).
+ * The repulsor coil (ticket 284), the first terrain magnet with its effect, pushes cells through
+ * the kernel's magnet shift and metal enemies one cell out, and logs `magnet_used`.
  * Stabiliser foam, the cryo binder, shoring props and the strata press stay vision rows
  * (`systems/shippedTools.ts`). No side effects at import; the loader calls `register`.
  */

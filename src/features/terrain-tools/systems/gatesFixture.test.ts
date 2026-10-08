@@ -13,6 +13,7 @@ import { openGroundView } from './groundView'
 import { LODESTONE_BEACON_ID, planLodestoneGather } from './lodestoneBeacon'
 import { ORE_SHIFTER_ID } from './oreShifter'
 import { PRESSURE_POCKET_ID } from './pressurePocket'
+import { REPULSOR_COIL_ID } from './repulsorCoil'
 import { SEAM_SPLITTER_ID } from './seamSplitter'
 import { TERRAIN_POWER_UPS } from './terrainPowerUps'
 import { editSourceOf } from './terrainOutcome'
@@ -25,7 +26,7 @@ import { editSourceOf } from './terrainOutcome'
 //
 // The probe gates every ore cell of planet 1 (#142's `canMine` gates nothing before planet 7), so
 // the shifter has only gated nodules in reach. The splitter's face and the pocket lance's centre
-// are the target cell itself.
+// are the target cell itself; the repulsor coil's wave reaches it two tiles out.
 
 const TARGET_ORE = buriedOreTile()
 const TARGET_CORE: TilePoint = { tx: 0, ty: 0 }
@@ -54,6 +55,7 @@ const STAND_OFFSET: Readonly<Record<string, number>> = {
   [SEAM_SPLITTER_ID]: 2,
   [PRESSURE_POCKET_ID]: 3,
   [LODESTONE_BEACON_ID]: 2,
+  [REPULSOR_COIL_ID]: 2,
 }
 
 const BLOCKED_TOOLS = [ORE_SHIFTER_ID, SEAM_SPLITTER_ID, PRESSURE_POCKET_ID]

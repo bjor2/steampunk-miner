@@ -1,13 +1,14 @@
 /**
  * The domain events the terrain lane adds (feature-slices.md 3.15), by augmentation, never by
  * editing the kernel's lists. `power-up-core` already logs every use; these say what the use did to
- * the ground: the edit it queued (#162 section 2.4 `terrain_edit`), and where a lodestone beacon
- * was planted.
+ * the ground: the edit it queued (#162 section 2.4 `terrain_edit`), where a lodestone beacon
+ * was planted, and what a terrain magnet's use moved (GD lock on #246, `magnet_used`).
  *
  * Every event names its player: a use acts on the authority clock, and the lodestone's gather on a
  * dock reaction, so neither carries a command stamp of its own.
  */
 import type { DomainEventBodies } from '../../../systems/authority/domainEvent'
+import type { MagnetVerb } from './magnetItems'
 
 declare module '../../../systems/authority/domainEvent' {
   interface DomainEventBodies {
@@ -31,6 +32,17 @@ declare module '../../../systems/authority/domainEvent' {
       ty: number
       plantedTick: number
     }
+    /**
+     * A terrain magnet acted: the cells it moved through the kernel's magnet shift (#283) and the
+     * energy those moves cost, in quanta. A repulsor wave that pushed only enemies moved no cell.
+     */
+    'terrain-tools.MagnetUsed': {
+      playerId: string
+      itemId: string
+      verb: MagnetVerb
+      cellsMoved: number
+      energy: number
+    }
   }
 }
 
@@ -40,6 +52,7 @@ export const TERRAIN_REFUSAL = {
   noGrain: 'terrain-tools.no_grain',
   nothingToOpen: 'terrain-tools.nothing_to_open',
   beaconLive: 'terrain-tools.beacon_live',
+  nothingToPush: 'terrain-tools.nothing_to_push',
   outOfPlay: 'terrain-tools.out_of_play',
 } as const
 
@@ -51,4 +64,10 @@ export function terrainEditedOf(body: TerrainEditedBody) {
 
 export function beaconPlantedOf(playerId: string, tx: number, ty: number, plantedTick: number) {
   return { type: 'terrain-tools.BeaconPlanted' as const, playerId, tx, ty, plantedTick }
+}
+
+export type MagnetUsedBody = DomainEventBodies['terrain-tools.MagnetUsed']
+
+export function magnetUsedOf(body: MagnetUsedBody) {
+  return { type: 'terrain-tools.MagnetUsed' as const, ...body }
 }
