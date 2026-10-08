@@ -15,7 +15,11 @@ import type RAPIER from '@dimforge/rapier3d-compat'
 import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
 import type { RenderOrigin } from '../systems/render/renderOrigin'
 import { blockOfPoint } from '../systems/vehicle/colliderHalo'
-import { drillContactOf, type DrillContact } from '../systems/vehicle/drillContact'
+import {
+  drillContactOf,
+  type DrillContact,
+  type DrillContactRule,
+} from '../systems/vehicle/drillContact'
 import { drillStampOf } from '../systems/vehicle/drillStamp'
 import type { EngineStats } from '../systems/economy/vehicleStats'
 import {
@@ -77,6 +81,8 @@ export interface VehicleStepInput {
   motion?: VehicleMotion
   /** A magnetic field's tug in m/s (#258, ticket 290); none when absent. */
   tug?: Vector2
+  /** What the drill bites on: `drillContactOf` when absent, wider with the swept cut (ticket 330). */
+  drillContactRule?: DrillContactRule
 }
 
 export interface VehicleStepResult {
@@ -166,7 +172,7 @@ export function createVehicleController(
       const pose = quantisePose(position, velocity, up, settledFacingOf(head))
       const isLifting = input.canAct && input.intent.lift
       const contact = input.canAct
-        ? drillContactFor(input.intent, head, pose, isLifting, planet)
+        ? drillContactFor(input, head, { pose, isLifting }, planet)
         : 'none'
       const isDrilling = contact !== 'none'
       const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)
@@ -209,15 +215,15 @@ export function createVehicleController(
  * aim matches the facing and the drill's stamp has ground to cut (#36, `drillContact`).
  */
 function drillContactFor(
-  intent: VehicleIntent,
+  input: VehicleStepInput,
   head: DrillHead,
-  pose: VehiclePose,
-  isLifting: boolean,
+  { pose, isLifting }: { pose: VehiclePose; isLifting: boolean },
   planet: PlanetView,
 ): DrillContact {
-  if (intent.facing !== pose.facing || !isHeadSettled(head)) return 'none'
+  if (input.intent.facing !== pose.facing || !isHeadSettled(head)) return 'none'
   const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
-  return drillContactOf(planet.ground, {
+  const contactOf = input.drillContactRule ?? drillContactOf
+  return contactOf(planet.ground, {
     centreMm: pose,
     facing,
     stamp: drillStampOf(pose, isLifting),

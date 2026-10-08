@@ -5,6 +5,11 @@
  * stamp can still lower count, so pushing along the vehicle's own tunnel never drills (and drains
  * nothing), and nothing seen here is ground the drill may not cut: a wall, a floor below or the
  * lip of a shaft's round bottom. The dock pad and lava (#113) are never cut.
+ *
+ * With the swept cut on (ticket 330) the body reaches part-cut ground sooner, and a lip it rests on
+ * can sit past the face's reach and outside the stamp's full-weight core: the drill would stop and
+ * the body would stay on it. `sweptDrillContactOf` therefore also bites on any ground the stamp can
+ * still cut past the body's face. The authority charges only the ticks that removed something.
  */
 import { VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { ISO_DENSITY, MM_PER_SAMPLE, SAMPLES_PER_TILE } from '../world/sampleGrid'
@@ -24,6 +29,9 @@ const IN_THE_WAY_MM = 250
 
 /** Nothing to cut, ground to cut ahead of the body, or ground in its way. */
 export type DrillContact = 'none' | 'ahead' | 'inTheWay'
+
+/** A rule for what the drill meets: `drillContactOf`, or the swept cut's wider bite. */
+export type DrillContactRule = (ground: DrillableGround, aim: DrillAim) => DrillContact
 
 export interface DrillableGround {
   densityAt(sx: number, sy: number): number
@@ -48,6 +56,15 @@ export function drillContactOf(ground: DrillableGround, aim: DrillAim): DrillCon
   return contact
 }
 
+/** `drillContactOf`, also biting on any ground the stamp can cut past the face (ticket 330). */
+export function sweptDrillContactOf(ground: DrillableGround, aim: DrillAim): DrillContact {
+  const contact = drillContactOf(ground, aim)
+  if (contact !== 'none') return contact
+  const isBiting = (sample: WeightedSample) =>
+    isCuttable(ground, sample) && aheadOf(aim, sample) >= HALF_BODY_MM
+  return discSamplesOf(aim.stamp).some(isBiting) ? 'ahead' : 'none'
+}
+
 function isCuttable(ground: DrillableGround, sample: WeightedSample): boolean {
   const density = ground.densityAt(sample.sx, sample.sy)
   if (density < ISO_DENSITY || density <= sample.floor || sample.weight === 0) return false
@@ -61,12 +78,29 @@ function isCuttable(ground: DrillableGround, sample: WeightedSample): boolean {
 
 /** Within reach of the face across the body, else in the stamp's core ahead of the centre. */
 function placeOf(aim: DrillAim, sample: WeightedSample): DrillContact {
-  const scale = Math.sqrt(aim.facing.x * aim.facing.x + aim.facing.y * aim.facing.y)
-  const dx = sample.sx * MM_PER_SAMPLE - aim.centreMm.x
-  const dy = sample.sy * MM_PER_SAMPLE - aim.centreMm.y
-  const ahead = (dx * aim.facing.x + dy * aim.facing.y) / scale
-  const across = (dy * aim.facing.x - dx * aim.facing.y) / scale
+  const ahead = aheadOf(aim, sample)
+  const across = acrossOf(aim, sample)
   const isPastFace = ahead >= HALF_BODY_MM && ahead <= HALF_BODY_MM + IN_THE_WAY_MM
   if (isPastFace && Math.abs(across) <= HALF_BODY_MM) return 'inTheWay'
   return sample.weight === FULL_WEIGHT && ahead > 0 ? 'ahead' : 'none'
+}
+
+/** mm from the body's centre to the sample along the facing. */
+function aheadOf(aim: DrillAim, sample: WeightedSample): number {
+  const { dx, dy, scale } = offsetOf(aim, sample)
+  return (dx * aim.facing.x + dy * aim.facing.y) / scale
+}
+
+/** mm from the body's centre to the sample across the facing. */
+function acrossOf(aim: DrillAim, sample: WeightedSample): number {
+  const { dx, dy, scale } = offsetOf(aim, sample)
+  return (dy * aim.facing.x - dx * aim.facing.y) / scale
+}
+
+function offsetOf(aim: DrillAim, sample: WeightedSample) {
+  return {
+    dx: sample.sx * MM_PER_SAMPLE - aim.centreMm.x,
+    dy: sample.sy * MM_PER_SAMPLE - aim.centreMm.y,
+    scale: Math.sqrt(aim.facing.x * aim.facing.x + aim.facing.y * aim.facing.y),
+  }
 }

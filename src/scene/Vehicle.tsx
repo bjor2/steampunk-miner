@@ -19,7 +19,7 @@ import { vehiclePresence } from './vehiclePresence'
 import { vehicleStagePresence } from './vehicleStage'
 
 export function Vehicle() {
-  const loop = useMemo(createVehicleLoop, [])
+  const loop = useMemo(() => createVehicleLoop(), [])
   const startPose = useMemo(() => readLocalVehicle().pose, [])
   const stepVehicle = (controller: VehicleController) => loop.step(controller, readVehicleIntent())
 

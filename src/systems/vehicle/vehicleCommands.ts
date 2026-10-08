@@ -4,11 +4,18 @@
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import { fromCanonical, toCanonical } from '../money'
+import type { DriveSigns } from './driveSigns'
 import type { PosePayload } from './poseReport'
+import type { VehiclePose } from './vehiclePose'
 import type { BayId } from '../world/dockBays'
 
 export function reportPoseCommand(payload: PosePayload): CommandIntent<'reportPose'> {
   return { type: 'reportPose', payload }
+}
+
+/** The swept cut's step (ticket 330): where the body is at a fixed step its drill is engaged. */
+export function drillStepCommand(pose: VehiclePose, drive: DriveSigns): CommandIntent<'drillStep'> {
+  return { type: 'drillStep', payload: { x: pose.x, y: pose.y, drive } }
 }
 
 export function requestRescueCommand(): CommandIntent<'requestRescue'> {

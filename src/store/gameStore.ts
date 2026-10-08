@@ -164,6 +164,8 @@ export interface GameState
   teleportToDock(bay: BayId): void
   /** The local vehicle's 5 Hz pose report (#11), built by the fixed-step loop. */
   reportPose(pose: PosePayload): void
+  /** The swept cut's step (ticket 330), every fixed step the drill is engaged with the flag on. */
+  stepDrill(step: CommandIntent<'drillStep'>): void
   requestRescue(): void
   /** The platform (#8, #37): dock when stationary in that bay's pad zone, then its facilities. */
   dock(bay: BayId): void
@@ -312,6 +314,8 @@ export const useGameStore = create<GameState>()((set, get) => ({
     submitCommand(get().playerId, reportPoseCommand(pose))
     set({ depthTiles: depthTilesOfPose(readPlanetWorld().params, pose) })
   },
+
+  stepDrill: (step) => submitCommand(get().playerId, step),
 
   requestRescue: () => submitCommand(get().playerId, requestRescueCommand()),
 

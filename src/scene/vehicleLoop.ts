@@ -8,7 +8,10 @@
  * first (#170 auto-roll, `vehicleStage.ts`): the drawn car and the camera move, the body does not.
  * On a magnetic planet the field the body stood in at the last step tugs it (#258, ticket 290),
  * unless that step's drill was cutting behind a shield (the dielectric bit, ticket 292).
+ * With the dev flag `drill.sweptCut` on (ticket 330) every step the drill is engaged also sends a
+ * `drillStep`, before the step's report, so the authority cuts every tick; off, nothing changes.
  */
+import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
 import type { PlanetView, VehicleController, VehicleStepResult } from '../physics/vehicleController'
 import {
@@ -31,6 +34,12 @@ import {
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import { driveSignsOfIntent } from '../systems/vehicle/driveSigns'
+import { drillStepCommand } from '../systems/vehicle/vehicleCommands'
+import {
+  drillContactOf,
+  sweptDrillContactOf,
+  type DrillContactRule,
+} from '../systems/vehicle/drillContact'
 import { noseTileOf } from '../systems/vehicle/vehiclePose'
 import type { VehicleState } from '../systems/vehicle/vehicleState'
 import type { PlanetParams } from '../systems/world/planetParams'
@@ -73,7 +82,7 @@ interface TugMemo {
   tug: Vector2 | undefined
 }
 
-export function createVehicleLoop(): VehicleLoop {
+export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
   const loop: LoopState = {
     stage: createVehicleStage(),
     reporter: NEW_POSE_REPORTER,
@@ -99,10 +108,12 @@ export function createVehicleLoop(): VehicleLoop {
           canAct: canVehicleAct(vehicle),
           motion: readLocalMotion(),
           tug: readLocalTug(loop),
+          drillContactRule: drillContactRuleOf(flags),
         },
         planetViewOf(loop, params, world),
       )
       noteBodyStep(loop, result)
+      stepDrillWhenSwept(flags, result, stagedIntent)
       reportWhenDue(loop, result, stagedIntent)
       showDrill(result)
       showMotion(result)
@@ -218,6 +229,17 @@ function showMotion(result: VehicleStepResult): void {
   const { vx, vy } = result.pose
   motionPresence.speedMetresPerSecond = Math.sqrt(vx * vx + vy * vy) / MM_PER_METRE
   motionPresence.isLifting = result.flags.isThrusting
+}
+
+/** With the swept cut on, the drill also bites on part-cut ground past the face (ticket 330). */
+function drillContactRuleOf(flags: DevFlags): DrillContactRule {
+  return flags['drill.sweptCut'] ? sweptDrillContactOf : drillContactOf
+}
+
+/** The swept cut's step: the body's position at every step its drill is engaged (ticket 330). */
+function stepDrillWhenSwept(flags: DevFlags, result: VehicleStepResult, intent: VehicleIntent) {
+  if (!flags['drill.sweptCut'] || !result.flags.isDrilling) return
+  useGameStore.getState().stepDrill(drillStepCommand(result.pose, driveSignsOfIntent(intent)))
 }
 
 function reportWhenDue(loop: LoopState, result: VehicleStepResult, intent: VehicleIntent): void {
