@@ -84,6 +84,14 @@ export interface SlotHold {
   finishTick: number
 }
 
+/** The slot let go during the item's hold (ticket 332): who, from which slot, on which tick. */
+export interface SlotRelease {
+  playerId: string
+  slot: LoadoutSlotId
+  /** The tick the hold ends, so the slice's cooldown can count from it (Vertical Scaler, #285). */
+  tick: number
+}
+
 export interface PowerUp extends ContentEntry {
   /** `<slice>.<name>`: the registering slice's id for this entry. */
   id: string
@@ -112,6 +120,12 @@ export interface PowerUp extends ContentEntry {
   /** The player's hold running now, read from the slice's section; absent for an item with none. */
   holdOf?(state: AuthorityState, playerId: string): SlotHold | null
   /**
+   * The slot let go while its hold is live (ticket 332, the TD ruling on #285): an item used by
+   * holding it ends its hold here. Absent for every other item, whose slot sends nothing on its
+   * way up. Only an `acted` outcome changes anything; the others leave the hold as it is.
+   */
+  release?(state: AuthorityState, release: SlotRelease): PowerUpOutcome
+  /**
    * When the item's sibling-link fires (ticket 274): on its act (`'act'`, also when left out), or
    * at a later moment its own slice names through `fireSiblingLinkAt` (`'own'`), as the steam
    * shield's break fires its smoke puff (the GD lock on #256).
@@ -139,6 +153,11 @@ export function hasCharges(powerUp: PowerUp): boolean {
 export function isUsableFromSlot(powerUp: PowerUp): boolean {
   if (powerUp.powerUpClass === 'passive') return powerUp.isToggle
   return powerUp.powerUpClass !== 'extractor'
+}
+
+/** An item used by holding its slot: letting go of it sends `release_power_up` (ticket 332). */
+export function isUsedByHolding(powerUp: PowerUp): boolean {
+  return powerUp.release !== undefined
 }
 
 /** The ticks from the press to the act: the channel's hold, or the wind-up. */

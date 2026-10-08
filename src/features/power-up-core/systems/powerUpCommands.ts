@@ -7,6 +7,9 @@
  *   milestone (#256, `followUps.ts`).
  * - `power-up-core.hold_power_up {slot}`: the slot is still held past the wind-up of the use it
  *   made; once the item's Mark has reached the hold, it follows that use as one more action.
+ * - `power-up-core.release_power_up {slot}`: the slot is let go (ticket 332, `slotRelease.ts`). It
+ *   ends the live hold of an item used by holding it, or waits for the act during the wind-up;
+ *   refused only for a slot no press reaches, and otherwise a silent no-op.
  * - `power-up-core.toggle_link {itemId}`: the item card's switch for the item's sibling-link
  *   (ticket 274), refused for an item whose Mark has reached none (`linkToggle.ts`).
  * - `debug.power-up-core.setCharges {itemId, chargesLeft}`: a scenario's charges left for one
@@ -23,7 +26,8 @@ import { linkToggleRefusalOf, toggleSiblingLink } from './linkToggle'
 import './powerUpEvents'
 import { hasCharges, type PowerUp } from './powerUpKind'
 import { atResearchedMark, powerUpAtMarkOf } from './powerUpMarks'
-import { refusalOfHold, refusalOfUse, slottedPowerUpOf } from './useRefusals'
+import { releaseSlot } from './slotRelease'
+import { refusalOfHold, refusalOfRelease, refusalOfUse, slottedPowerUpOf } from './useRefusals'
 import { startUse, type UseStart } from './useResolution'
 
 export const POWER_UP_RULES: SliceCommandRules = {
@@ -43,6 +47,12 @@ export const POWER_UP_RULES: SliceCommandRules = {
         ...pressOf(state, playerId, payload.slot, tick),
         milestone: 'hold',
       }),
+  },
+  'power-up-core.release_power_up': {
+    fields: { slot: 'text' },
+    reject: (_state, { payload }) => refusalOfRelease(payload.slot),
+    apply: (state, { playerId, tick, payload }) =>
+      releaseSlot(state, playerId, payload.slot as LoadoutSlotId, tick),
   },
   'power-up-core.toggle_link': {
     fields: { itemId: 'text' },

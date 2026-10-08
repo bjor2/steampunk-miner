@@ -3,7 +3,8 @@
  * import from this folder. Item slices register `power-up` entries of these types beside their
  * `vehicle-item` rows, and read charges through `chargesLeftOf` (#162 "Slice and contract"). An
  * effect that outlasts its use, or a passive's, reads the item at the player's Mark through
- * `powerUpAtMarkOf` (#249).
+ * `powerUpAtMarkOf` (#249). An item used by holding its slot declares `release` and restarts its
+ * cooldown from its hold's end with `startCooldownAt` (ticket 332).
  */
 export const POWER_UP_CORE_SLICE_ID = 'power-up-core'
 export {
@@ -17,6 +18,7 @@ export {
   type PowerUpOutcome,
   type PowerUpUse,
   type SlotHold,
+  type SlotRelease,
 } from './systems/powerUpKind'
 export { chargesLeftOf, type FollowUpPattern } from './systems/chargeState'
 export { FOLLOW_UP_WINDOW_TICKS } from './systems/followUps'
@@ -31,5 +33,6 @@ export {
   type PowerUpSlot,
   type PressableSlot,
 } from './systems/powerUpSlots'
-export { intentToHoldSlot, intentToUseSlot } from './systems/slotUse'
+export { intentToHoldSlot, intentToReleaseSlot, intentToUseSlot } from './systems/slotUse'
+export { startCooldownAt } from './systems/slotRelease'
 export { isToggleEngaged } from './systems/toggleRead'

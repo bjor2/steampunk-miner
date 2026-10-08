@@ -39,6 +39,11 @@ export interface PendingUse {
   originTy: number
   /** A Mark milestone's follow-up (#256); absent for a plain use. */
   milestone?: FollowUpPattern
+  /**
+   * The tick the slot was let go before the act (ticket 332): the item's `release` then runs on
+   * the act tick, right after `activate`. Absent until a release lands, so no save changes.
+   */
+  releasedTick?: number
 }
 
 /**
@@ -264,7 +269,8 @@ function isPendingUse(value: unknown): boolean {
     isWholeNumber(value.actTick) &&
     Number.isSafeInteger(value.originTx) &&
     Number.isSafeInteger(value.originTy) &&
-    isFollowUpPattern(value.milestone)
+    isFollowUpPattern(value.milestone) &&
+    (value.releasedTick === undefined || isWholeNumber(value.releasedTick))
   )
 }
 

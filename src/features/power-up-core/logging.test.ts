@@ -8,9 +8,10 @@ import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { dockInBay } from '../../systems/authority/scriptedSession'
 import { FACING } from '../../systems/vehicle/vehiclePose'
 import { FAKE, FAKE_ITEMS, FAKE_REFUSAL, inField } from './fakeItems'
+import { CLAMP, inHoldField } from './fakeHoldItem'
 import { DASHER, inMarkedField } from './fakeMilestoneItems'
 import { slice } from './register'
-import { intentToUseSlot } from './systems/slotUse'
+import { intentToReleaseSlot, intentToUseSlot } from './systems/slotUse'
 
 // The power-up lines (#162 section 2.4, Systems on #200) as the run log records them, each
 // checked against its registered schema.
@@ -123,6 +124,23 @@ describe('power-up log lines', () => {
       },
     ])
     expect(lines[0].data).not.toHaveProperty('milestone')
+    expect(withRegistrations([slice, FAKE_ITEMS], () => lines.flatMap(runEventProblems))).toEqual(
+      [],
+    )
+  })
+
+  it('logs a slot let go during a hold with the item and the slot (ticket 332)', () => {
+    const events = inHoldField((field) => {
+      field.submit(10, intentToUseSlot('powerup.1'))
+      field.advanceTo(20)
+      field.submit(40, intentToReleaseSlot('powerup.1'))
+      return field.events()
+    })
+    const lines = linesOf(events)
+    expect(dataOf(lines).at(-1)).toEqual({
+      event: 'power-up-core.power_up_released',
+      data: { itemId: CLAMP, slot: 'powerup.1' },
+    })
     expect(withRegistrations([slice, FAKE_ITEMS], () => lines.flatMap(runEventProblems))).toEqual(
       [],
     )

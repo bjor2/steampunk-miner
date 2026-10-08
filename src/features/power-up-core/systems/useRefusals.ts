@@ -60,6 +60,14 @@ export function refusalOfHold(
   ])
 }
 
+/**
+ * Why `power-up-core.release_power_up` is refused: only a slot no press reaches (ticket 332).
+ * Every other release is accepted, and changes nothing unless it ends a live hold.
+ */
+export function refusalOfRelease(slot: string): Rejection | null {
+  return slotRefusalOf(slot)
+}
+
 /** The power-up in the slot, or null when it is empty or holds an item that is not one. */
 export function slottedPowerUpOf(vehicle: VehicleState, slot: LoadoutSlotId): PowerUp | null {
   const itemId = itemInSlot(vehicle.loadout, slot)

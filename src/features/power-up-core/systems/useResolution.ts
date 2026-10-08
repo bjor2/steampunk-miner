@@ -51,6 +51,7 @@ import {
 } from './powerUpKind'
 import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
 import { withSiblingLink } from './siblingLink'
+import { releaseKeptAtAct } from './slotRelease'
 
 /** One press, or a milestone's follow-up of the use before it (null for a plain use). */
 export interface UseStart {
@@ -70,7 +71,10 @@ export function startUse(state: AuthorityState, playerId: string, start: UseStar
   return resolvePendingUse(started, playerId, tick)
 }
 
-/** The pending use's act at `tick`: it acts, or a gate refuses it. */
+/**
+ * The pending use's act at `tick`: it acts, or a gate refuses it; a slot let go during the
+ * wind-up then ends the hold the act started (ticket 332).
+ */
 export function resolvePendingUse(
   state: AuthorityState,
   playerId: string,
@@ -83,7 +87,8 @@ export function resolvePendingUse(
   if (isToggleSwitchingOff(value, powerUp, pending))
     return switchToggleOff(cleared, playerId, pending, powerUp)
   const outcome = powerUp.activate(cleared, powerUpUseOf(playerId, pending, tick, powerUp))
-  return effectOfOutcome(cleared, playerId, powerUp, pending, outcome, tick)
+  const acted = effectOfOutcome(cleared, playerId, powerUp, pending, outcome, tick)
+  return releaseKeptAtAct(acted, playerId, pending, tick)
 }
 
 /**

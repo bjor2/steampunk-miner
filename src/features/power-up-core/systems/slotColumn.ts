@@ -20,7 +20,13 @@ import {
   powerUpStateOf,
   type PowerUpState,
 } from './chargeState'
-import { hasCharges, powerUpOfItem, type PowerUp, type SlotHold } from './powerUpKind'
+import {
+  hasCharges,
+  isUsedByHolding,
+  powerUpOfItem,
+  type PowerUp,
+  type SlotHold,
+} from './powerUpKind'
 import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
 import { actionOfTile, PRESSABLE_SLOTS, type PressableSlot } from './powerUpSlots'
 import { reachedSiblingLinkOf } from './siblingLink'
@@ -41,6 +47,11 @@ export interface SlotButton {
   holdPercent: number
   /** Winding up or channelling now. */
   isActing: boolean
+  /**
+   * Used by holding the slot (ticket 332): the tile presses on finger-down and lets go on the
+   * lift, and a press that started the use never opens the item card.
+   */
+  isUsedByHolding: boolean
   isOn: boolean
   /** The Mark researched, 0 for none: the cradle's brass plate. */
   mark: number
@@ -92,6 +103,7 @@ function slotButtonOf(
     cooldownPercent: cooldownPercentOf(value, powerUp, tick),
     holdPercent: holdPercentOf(state, playerId, powerUp),
     isActing: value.pending?.itemId === itemId,
+    isUsedByHolding: isUsedByHolding(powerUp),
     isOn: isToggledOn(value, itemId),
     mark,
     isMastered,

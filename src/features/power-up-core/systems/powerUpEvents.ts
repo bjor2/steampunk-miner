@@ -20,6 +20,11 @@ declare module '../../../systems/authority/authorityCommand' {
      * the hold follows that use as one more action.
      */
     'power-up-core.hold_power_up': { slot: string }
+    /**
+     * The slot is let go (ticket 332): it ends the hold of an item used by holding it, or is kept
+     * for the act when it lands during the wind-up. Anything else is accepted and changes nothing.
+     */
+    'power-up-core.release_power_up': { slot: string }
     /** A scenario's charges left for one owned power-up. */
     'debug.power-up-core.setCharges': { itemId: string; chargesLeft: number }
   }
@@ -76,6 +81,8 @@ declare module '../../../systems/authority/domainEvent' {
       slot: LoadoutSlotId
     }
     'power-up-core.LinkToggled': { playerId: string; itemId: string; isOn: boolean }
+    /** The slot was let go and the item's live hold ended on this tick (ticket 332). */
+    'power-up-core.PowerUpReleased': { playerId: string; itemId: string; slot: LoadoutSlotId }
   }
   interface RejectionReasons {
     'power-up-core.not_a_power_up_slot': true
@@ -142,4 +149,8 @@ export function linkFiredOf(
 
 export function linkToggledOf(playerId: string, itemId: string, isOn: boolean) {
   return { type: 'power-up-core.LinkToggled' as const, playerId, itemId, isOn }
+}
+
+export function powerUpReleasedOf(subject: UseSubject) {
+  return { type: 'power-up-core.PowerUpReleased' as const, ...subject }
 }

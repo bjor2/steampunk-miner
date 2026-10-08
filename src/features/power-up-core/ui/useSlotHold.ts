@@ -1,13 +1,16 @@
 /**
  * A slot button's press (#217 input lock, G&V on #200): the touch runtime decides tap or hold from
  * the pointer times, so a tap uses the slot at once; this hook only shows the #164 item card once
- * the press has been held `ITEM_CARD_LONG_PRESS_MS`, and hides it on release. A card that carries
+ * the press has been held `ITEM_CARD_LONG_PRESS_MS`, and hides it on release. An item used by
+ * holding its slot is pressed on finger-down, and a press that started its use shows no card
+ * (ticket 332, the GD call on #285). A card that carries
  * the item's sibling-link switch (ticket 274) stays open after the release, so the switch can be
  * tapped, until the card or the slot is tapped. UI state only.
  */
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { ITEM_CARD_LONG_PRESS_MS } from '../../../constants/itemCard'
-import { cancelSlotButton, pressSlotButton, releaseSlotButton } from '../../../store/touchRuntime'
+import { cancelSlotButton, releaseSlotButton } from '../../../store/touchRuntime'
+import { pressSlotTile } from '../store/slotPress'
 import type { SlotButton } from '../systems/slotColumn'
 
 export interface SlotHold {
@@ -37,8 +40,8 @@ export function useSlotHold(button: SlotButton): SlotHold {
     isCardPinned: card === 'pinned',
     press: (event) => {
       showCardAs(() => 'hidden')
-      pressSlotButton(button.action, event.timeStamp)
-      showCardAfterHold(timer, () => setCard('held'))
+      const press = pressSlotTile(button, event.timeStamp)
+      if (press.mayShowCard) showCardAfterHold(timer, () => setCard('held'))
     },
     release: (event) => {
       showCardAs((now) => (now === 'held' && isPinnable ? 'pinned' : 'hidden'))

@@ -3,6 +3,8 @@ import { reactionToPress, type InputSituation } from '../../../systems/input/inp
 import { SLOT_ACTION_IDS } from '../../../systems/input/touchControls'
 import { ACTION_MAP, actionDefOf } from '../../../systems/input/actionMap'
 import { FAKE, inField } from '../fakeItems'
+import { inHoldField } from '../fakeHoldItem'
+import { sliceIntentOfRelease } from '../../../systems/registries/inputReactions'
 import type { ScriptedSession } from '../../../systems/authority/scriptedSession'
 
 // The slot keys (#162 G&V E1, the #217 input lock): Digit1-5 use what the slot holds at once; an
@@ -52,5 +54,27 @@ describe('power-up slot keys', () => {
       },
       { slots: { 'powerup.1': FAKE.extractor, 'powerup.4': FAKE.charged } },
     )
+  })
+})
+
+describe('power-up slot keys: release (ticket 332)', () => {
+  it('sends release_power_up on key-up only for a slot holding an item used by holding it', () => {
+    inHoldField((field) => {
+      expect(sliceIntentOfRelease('use_slot_1', drivingIn(field))).toEqual({
+        type: 'power-up-core.release_power_up',
+        payload: { slot: 'powerup.1' },
+      })
+      expect(sliceIntentOfRelease('use_slot_2', drivingIn(field))).toBeNull()
+      expect(sliceIntentOfRelease('use_slot_3', drivingIn(field))).toBeNull()
+    })
+  })
+
+  it('sends the release whatever the layer is, so a key let go on the dock screen still releases', () => {
+    inHoldField((field) => {
+      const docked = { ...drivingIn(field), layer: 'platform' as const }
+      expect(sliceIntentOfRelease('use_slot_1', docked)).toMatchObject({
+        type: 'power-up-core.release_power_up',
+      })
+    })
   })
 })

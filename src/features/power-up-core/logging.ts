@@ -5,7 +5,8 @@
  * `charges_refilled` for each free dock refill. The envelope already carries planet, depth and
  * tick. The sibling-link milestone (the GD lock on #256, ticket 274) adds `link_fired {itemId,
  * siblingId, slot}`, the sibling's slot, and `link_toggled {itemId, isOn}` for the item card's
- * switch.
+ * switch. Letting go of a hold-to-use slot (ticket 332) logs `power_up_released {itemId, slot}`
+ * on the tick the hold ended.
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
@@ -47,6 +48,10 @@ export const POWER_UP_PROJECTIONS: SliceEventProjections = {
   'power-up-core.LinkToggled': ({ itemId, isOn }) => ({
     event: 'power-up-core.link_toggled',
     data: { itemId, isOn },
+  }),
+  'power-up-core.PowerUpReleased': ({ itemId, slot }) => ({
+    event: 'power-up-core.power_up_released',
+    data: { itemId, slot },
   }),
 }
 
@@ -99,5 +104,10 @@ export const POWER_UP_RUN_EVENTS: SliceRunEvents = {
     group: 'vehicle_and_combat',
     level: 'core',
     payload: { itemId: 'text', isOn: 'flag' },
+  },
+  'power-up-core.power_up_released': {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', slot: 'text' },
   },
 }
