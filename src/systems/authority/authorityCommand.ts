@@ -119,8 +119,11 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `no_bore_gun`, `recovering` and `energy_short`, `BoreFired` and `BoreEnded`, bored cells'
  *    `TileDestroyed {cause: 'bore'}`, the pending bores in state with their `nextShotTick`, and
  *    their bore-disturbance collapse checks. With no shot fired no digest or mined order changes.
+ * 46: the repulsor coil (ticket 284, #246): its push-wave acts through the kernel magnet shift and
+ *    pushes metal enemies one cell out, and `terrain-tools.MagnetUsed` joins. With no magnet owned
+ *    no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 45
+export const AUTHORITY_PROTOCOL_VERSION = 46
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
