@@ -1237,8 +1237,8 @@
           "children": [
             {
               "title": "Bore shot",
-              "description": "Aim into the ground (never straight down the shaft); a line of cells opens two ticks apart at a share of the drill's power, and unlined rock around it caves in afterwards.",
-              "status": "built",
+              "description": "Aim into the ground (never straight down the shaft); a line of cells opens two ticks apart at a share of the drill's power, and unlined rock around it caves in afterwards. Players reach it once the Upgrade bay sells the mount.",
+              "status": "partial",
               "issues": [309, 313, 314],
               "planet": 1
             },
