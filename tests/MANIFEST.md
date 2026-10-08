@@ -440,7 +440,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/artefactRules.test.ts` | 16 | 16 |
 | `src/systems/authority/assaySale.test.ts` | 4 | 4 |
 | `src/systems/authority/authorityReactions.test.ts` | 7 | 7 |
+| `src/systems/authority/autoMode/autoMode.test.ts` | 4 | 4 |
 | `src/systems/authority/bore/boreAim.test.ts` | 10 | 10 |
+| `src/systems/authority/bore/boreAuto.test.ts` | 30 | 21 |
+| `src/systems/authority/bore/boreAutoAim.test.ts` | 7 | 7 |
 | `src/systems/authority/bore/boreWalk.test.ts` | 6 | 6 |
 | `src/systems/authority/bore/groundGun.test.ts` | 32 | 32 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
@@ -587,7 +590,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/systems/feedback/accents.test.ts` | 18 | 2 |
-| `src/systems/feedback/feedbackCues.test.ts` | 15 | 15 |
+| `src/systems/feedback/feedbackCues.test.ts` | 16 | 16 |
 | `src/systems/feedback/haptics.test.ts` | 2 | 2 |
 | `src/systems/feedback/screenEffects.test.ts` | 9 | 9 |
 
@@ -614,7 +617,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/input/actionMap.test.ts` | 16 | 16 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
-| `src/systems/input/inputRouting.test.ts` | 23 | 23 |
+| `src/systems/input/inputRouting.test.ts` | 24 | 24 |
 | `src/systems/input/preferences.test.ts` | 19 | 19 |
 | `src/systems/input/touchControls.test.ts` | 22 | 15 |
 
