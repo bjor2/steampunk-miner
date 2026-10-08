@@ -7,9 +7,10 @@
  * 60-tick warning, the 30-tick refill of all the block's carved air, the crush and the vehicle
  * clearance stay #43's.
  *
- * Its warning holds to the refill as a forced one does: the check was made once, at the bore's
- * end, so driving more than 16 m away never dodges it (Systems' question on #322), and a block
- * lined at the required grade was never warned at all.
+ * Its warning is a forced one (the TD's ruling on #313), reported as `forcedWeaknessOf` reports
+ * one: the check was made once, at the bore's end, and #57's watch would cancel it the next tick
+ * (no vehicle within 16 m, or unlined walls it ignores), so it holds to the refill wherever the
+ * rig goes. A block lined at the required grade was never warned at all.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
 import { BLAST_COLLAPSE_CHECKS_PER_TICK } from '../../../constants/terrainBudget'
@@ -25,7 +26,7 @@ import type { PlanetParams } from '../../world/planetParams'
 import type { TilePoint } from '../../world/tileGrid'
 import type { AuthorityState } from '../authorityState'
 import { entryOfBlock } from '../collapse/collapseState'
-import { startWarning, type WeakBlock } from '../collapse/collapseWatch'
+import { forcedWeaknessOf, startWarning, type WeakBlock } from '../collapse/collapseWatch'
 import { chainEffects, type RuleEffect } from '../commandRule'
 import type { PendingBore } from './boreState'
 import { boreWeaknessOf } from './boreWeakness'
@@ -82,11 +83,20 @@ function freshWeakBlocksAmong(
   params: PlanetParams,
   due: readonly DisturbedBlock[],
 ): WeakBlock[] {
-  return due.flatMap(({ block, tiles }) => {
-    const weakness = boreWeaknessOf(state.world, params, tiles)
-    const isCollapsing = entryOfBlock(state.collapse, blockIdOf(block)) !== null
-    return weakness === null || isCollapsing ? [] : [{ block, weakness }]
-  })
+  return due
+    .filter(({ block, tiles }) => isFreshWeakBlock(state, params, block, tiles))
+    .map(({ block }) => ({ block, weakness: forcedWeaknessOf(state, params, block) }))
+}
+
+/** The bore's own rule finds the block weak, and it is not collapsing already. */
+function isFreshWeakBlock(
+  state: AuthorityState,
+  params: PlanetParams,
+  block: CollapseBlock,
+  tiles: readonly TilePoint[],
+): boolean {
+  const isCollapsing = entryOfBlock(state.collapse, blockIdOf(block)) !== null
+  return !isCollapsing && boreWeaknessOf(state.world, params, tiles) !== null
 }
 
 function compareNearest(origin: IntegerVector, a: CollapseBlock, b: CollapseBlock): number {

@@ -98,10 +98,10 @@ export interface RejectionReasons {
   vehicle_item_owned: true
   not_researched: true
   not_for_sale: true
-  // Registered by the bore gun (ticket 313, #309): the player has no gun, its last shot's cooldown
-  // still runs, or the tank cannot pay for the first cell the line would open.
+  // Registered by the bore gun (ticket 313, #309): the player has no gun, its last shot's recovery
+  // (`nextShotTick`) still runs, or the tank cannot pay for the first cell the line would open.
   no_bore_gun: true
-  bore_cooling: true
+  recovering: true
   energy_short: true
 }
 

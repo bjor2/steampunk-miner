@@ -1,7 +1,8 @@
 /**
  * The bore gun's shots in authority state (ticket 313, TD architecture point 1 on #309): each
  * shot stays as a pending bore while its cells open one by one, while its bored line stands
- * before the collapse check, and until its player may fire again. Plain JSON of safe integers,
+ * before the collapse check, and until its `nextShotTick`, the one clock its player's next shot
+ * waits on (the TD's recovery ruling on #313). Plain JSON of safe integers,
  * so it is saved, restored and digested with the rest; emptied on every planet.
  *
  * A session that never fired holds no `bores` key at all, so its digests and saves are the ones
@@ -18,10 +19,15 @@ export interface BoreShot {
   energyPerCellBp: number
   openIntervalTicks: number
   collapseHoldTicks: number
+  boreBudgetTicks: number
+  /** The rate level's numbers when the shot fired: a level bought later waits for the next shot. */
+  cooldownTicks: number
+  kGunPct: number
 }
 
 export interface PendingBore {
   playerId: string
+  firedTick: number
   /** The rig's centre when it fired, in mm: the collapse checks go nearest first from it. */
   origin: IntegerVector
   shot: BoreShot
@@ -37,8 +43,11 @@ export interface PendingBore {
   checkTick: number | null
   /** How many of its disturbed blocks, nearest first, have been checked. */
   blocksChecked: number
-  /** The first tick its player may fire again. */
-  readyTick: number
+  /**
+   * The first tick its player may fire again: the fire tick plus `gunRecoveryTicks` of the dig
+   * ticks its cells have taken so far, so it is final once the line ends.
+   */
+  nextShotTick: number
 }
 
 export const NO_BORES: readonly PendingBore[] = []
@@ -88,17 +97,32 @@ function isPendingBore(bore: unknown): boolean {
     isBoreShot(bore.shot) &&
     isTileList(bore.cells) &&
     isTileList(bore.bored) &&
-    [bore.nextOpenTick, bore.budgetLeft, bore.blocksChecked, bore.readyTick].every(isWholeNumber) &&
+    [
+      bore.firedTick,
+      bore.nextOpenTick,
+      bore.budgetLeft,
+      bore.blocksChecked,
+      bore.nextShotTick,
+    ].every(isWholeNumber) &&
     (bore.checkTick === null || isWholeNumber(bore.checkTick))
   )
 }
 
+const SHOT_FIELDS: readonly (keyof BoreShot)[] = [
+  'gunFactorBp',
+  'energyPerCellBp',
+  'openIntervalTicks',
+  'collapseHoldTicks',
+  'boreBudgetTicks',
+  'cooldownTicks',
+  'kGunPct',
+]
+
 function isBoreShot(shot: unknown): boolean {
   return (
     isJsonObject(shot) &&
-    [shot.gunFactorBp, shot.energyPerCellBp, shot.openIntervalTicks, shot.collapseHoldTicks].every(
-      isWholeNumber,
-    )
+    SHOT_FIELDS.every((field) => isWholeNumber(shot[field])) &&
+    shot.kGunPct !== 0
   )
 }
 

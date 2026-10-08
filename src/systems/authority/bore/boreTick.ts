@@ -5,7 +5,9 @@
  *   cell every `openIntervalTicks`, so a 4-cell line opens at fire +2, +4, +6 and +8;
  * - when its line ends (its range walked, or a stop) it says so in `BoreEnded`, and if it opened
  *   anything its blocks are checked `collapseHoldTicks` later (`boreCollapse.ts`);
- * - once checked and past its cooldown it leaves the state.
+ * - each cell it opens moves its `nextShotTick` to the fire tick plus the recovery of the dig
+ *   ticks spent so far, at the rate the shot fired with;
+ * - once checked and past its `nextShotTick` it leaves the state.
  *
  * Cell events carry the bore's player in their stamp; collapse warnings, like every collapse
  * event, carry only the tick.
@@ -16,6 +18,7 @@ import type { AuthorityState } from '../authorityState'
 import type { TickOutcome } from '../combat/combatTick'
 import type { RuleEffect } from '../commandRule'
 import type { BoreStop, DomainEvent, DomainEventBody } from '../domainEvent'
+import { gunRecoveryTicks } from '../../registries/boreGun'
 import { planetParamsOf } from '../planetOfState'
 import { openBoreCell, type CellOpening } from './boreCell'
 import { checkBoreBlocks } from './boreCollapse'
@@ -42,7 +45,7 @@ export function runBoreTick(state: AuthorityState, tick: number): TickOutcome {
 
 function dueTickOf(bore: PendingBore): number {
   if (isBoreOpening(bore)) return bore.nextOpenTick
-  return bore.checkTick ?? bore.readyTick
+  return bore.checkTick ?? bore.nextShotTick
 }
 
 function stepBore(
@@ -101,10 +104,20 @@ function movedBore(
   return rest.length === 0 ? endedBore(advanced, tick) : advanced
 }
 
-/** An opened cell spends its dig ticks and joins the bored line; an open one passes free. */
+/**
+ * An opened cell spends its dig ticks, joins the bored line and moves the recovery on; an open
+ * one passes free.
+ */
 function spentOn(bore: PendingBore, tile: TilePoint, opening: CellOpening): PendingBore {
   if (opening.kind !== 'opened') return bore
-  return { ...bore, budgetLeft: bore.budgetLeft - opening.ticks, bored: [...bore.bored, tile] }
+  const budgetLeft = bore.budgetLeft - opening.ticks
+  const spentDigTicks = bore.shot.boreBudgetTicks - budgetLeft
+  return {
+    ...bore,
+    budgetLeft,
+    bored: [...bore.bored, tile],
+    nextShotTick: bore.firedTick + gunRecoveryTicks(spentDigTicks, bore.shot),
+  }
 }
 
 function endedBore(bore: PendingBore, tick: number): PendingBore {
@@ -145,7 +158,7 @@ function withBoreAt(state: AuthorityState, index: number, bore: PendingBore): Au
   )
 }
 
-/** A bore whose line ended, whose blocks are checked and whose cooldown ran out is gone. */
+/** A bore whose line ended, whose blocks are checked and whose recovery ran out is gone. */
 function withoutDoneBores(state: AuthorityState, tick: number): AuthorityState {
   return withBores(
     state,
@@ -154,7 +167,7 @@ function withoutDoneBores(state: AuthorityState, tick: number): AuthorityState {
 }
 
 function isBoreDone(bore: PendingBore, tick: number): boolean {
-  return !isBoreOpening(bore) && bore.checkTick === null && tick >= bore.readyTick
+  return !isBoreOpening(bore) && bore.checkTick === null && tick >= bore.nextShotTick
 }
 
 function stampedFor(playerId: string, bodies: DomainEventBody[], tick: number): DomainEvent[] {

@@ -5,15 +5,17 @@
  * hold-to-repeat is the client sending the command again at the cadence.
  *
  * Refused, with nothing spent, when the vehicle cannot act or has no pose to aim from, before
- * `FeatureUnlocked(bore_gun)`, when the player has no gun (`boreGun` provider), inside the last
- * shot's cooldown, or when the tank cannot pay for the first cell the line would open.
+ * `FeatureUnlocked(bore_gun)`, when the player has no gun (`boreGun` provider), before the last
+ * shot's `nextShotTick` (`recovering`), or when the tank cannot pay for the first cell the line
+ * would open. The shot keeps the rate level's numbers it fired with, so a level bought while it
+ * recovers applies from the next shot.
  */
 import type { UnlockSchedule } from '../../unlocks/readUnlockSchedule'
 import { LOCKED_SCHEDULE } from '../../unlocks/unlockSchedule'
 import { tileOfPose, type VehiclePose } from '../../vehicle/vehiclePose'
 import { isVehicleActive, type VehicleState } from '../../vehicle/vehicleState'
 import type { PlanetParams } from '../../world/planetParams'
-import { boreGunOf, type BoreGunStats } from '../../registries/boreGun'
+import { boreGunOf, gunRecoveryTicks, type BoreGunStats } from '../../registries/boreGun'
 import type { AuthorityCommand } from '../authorityCommand'
 import { vehicleOf, type AuthorityState } from '../authorityState'
 import {
@@ -61,7 +63,7 @@ function boreFireRefusal(
     () => noPoseRejection(vehicle.pose),
     () => lockedRowRejection(state, schedule),
     () => noGunRejection(state, playerId),
-    () => coolingRejection(state, playerId, tick),
+    () => recoveringRejection(state, playerId, tick),
     () => firstCellEnergyRejection(state, playerId, payload.bearing),
   ])
 }
@@ -92,6 +94,7 @@ function pendingBoreOf(
   const pose = vehicleOf(state, playerId).pose as VehiclePose
   return {
     playerId,
+    firedTick: tick,
     origin: { x: pose.x, y: pose.y },
     shot: shotOf(stats),
     cells: lineOf(pose, aimed, stats.rangeCells),
@@ -100,7 +103,7 @@ function pendingBoreOf(
     bored: [],
     checkTick: null,
     blocksChecked: 0,
-    readyTick: tick + stats.cooldownTicks,
+    nextShotTick: tick + gunRecoveryTicks(0, stats),
   }
 }
 
@@ -110,6 +113,9 @@ function shotOf(stats: BoreGunStats): BoreShot {
     energyPerCellBp: stats.energyPerCellBp,
     openIntervalTicks: stats.openIntervalTicks,
     collapseHoldTicks: stats.collapseHoldTicks,
+    boreBudgetTicks: stats.boreBudgetTicks,
+    cooldownTicks: stats.cooldownTicks,
+    kGunPct: stats.kGunPct,
   }
 }
 
@@ -147,17 +153,21 @@ function noGunRejection(state: AuthorityState, playerId: string): Rejection | nu
   return rejectionOf('no_bore_gun', 'the vehicle has no bore gun')
 }
 
-function coolingRejection(state: AuthorityState, playerId: string, tick: number): Rejection | null {
-  const readyTick = readyTickOf(state, playerId)
-  if (tick >= readyTick) return null
-  return rejectionOf('bore_cooling', `the bore gun fires again at tick ${readyTick}`)
+function recoveringRejection(
+  state: AuthorityState,
+  playerId: string,
+  tick: number,
+): Rejection | null {
+  const nextShotTick = nextShotTickOf(state, playerId)
+  if (tick >= nextShotTick) return null
+  return rejectionOf('recovering', `the bore gun fires again at tick ${nextShotTick}`)
 }
 
 /** The first tick the player may fire again: after every shot of theirs still pending. */
-function readyTickOf(state: AuthorityState, playerId: string): number {
+export function nextShotTickOf(state: AuthorityState, playerId: string): number {
   return boresOf(state)
     .filter((bore) => bore.playerId === playerId)
-    .reduce((latest, bore) => Math.max(latest, bore.readyTick), 0)
+    .reduce((latest, bore) => Math.max(latest, bore.nextShotTick), 0)
 }
 
 /** The tank cannot pay for the first cell the line would open; open air or a clank still fires. */

@@ -116,9 +116,9 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    shock's ticks longer to drill, and the vehicle may carry `shockHullBp`. Off the magnetic
  *    planets no digest or mined order changes.
  * 45: the bore gun (ticket 313, #309): `ground_gun.fire {bearing}` with the rejections
- *    `no_bore_gun`, `bore_cooling` and `energy_short`, `BoreFired` and `BoreEnded`, bored cells'
- *    `TileDestroyed {cause: 'bore'}`, the pending bores in state and their bore-disturbance
- *    collapse checks. With no shot fired no digest or mined order changes.
+ *    `no_bore_gun`, `recovering` and `energy_short`, `BoreFired` and `BoreEnded`, bored cells'
+ *    `TileDestroyed {cause: 'bore'}`, the pending bores in state with their `nextShotTick`, and
+ *    their bore-disturbance collapse checks. With no shot fired no digest or mined order changes.
  */
 export const AUTHORITY_PROTOCOL_VERSION = 45
 

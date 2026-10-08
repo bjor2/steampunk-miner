@@ -15,11 +15,15 @@ import type { CommandIntent } from '../authorityCommand'
 import { poseOnTile } from '../charges/chargeFixtures'
 import { FREEZE_ENEMIES, type ScriptedSession } from '../scriptedSession'
 
-/** The #309 L1 gun: range 4, a cell every 2 ticks, 45 between shots, half the drill's power. */
+/**
+ * The #309 L1 gun: range 4, a cell every 2 ticks, the rate level 1 wait (45 ticks at least, a
+ * shot through rock its dig ticks × 100 / 25, #322), half the drill's power.
+ */
 export const BORE_STATS: BoreGunStats = {
   rangeCells: 4,
   openIntervalTicks: 2,
   cooldownTicks: 45,
+  kGunPct: 25,
   gunFactorBp: 5000,
   boreBudgetTicks: 1000,
   energyPerCellBp: 20000,
