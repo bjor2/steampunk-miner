@@ -19,6 +19,7 @@ import { EnemyFigures } from './EnemyFigures'
 import { LightRig } from './LightRig'
 import { PerfSampler } from './PerfSampler'
 import { PlanetCamera } from './PlanetCamera'
+import { PlanetSkyBand } from './PlanetSkyBand'
 import { PlanetTerrain } from './PlanetTerrain'
 import { PlatformYard } from './PlatformYard'
 import { RenderPipeline } from './RenderPipeline'
@@ -52,6 +53,7 @@ export function GameScene() {
       camera={{ position: [...CAMERA_POSITION] }}
     >
       <SkyBackground />
+      <PlanetSkyBand />
       <ScreenFeedback />
       <PlanetCamera />
       <WorldRoot>

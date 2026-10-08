@@ -43,6 +43,7 @@ import type { ItemDescriptionEntry } from '../systems/registries/itemDescription
 import type { OreLookProvider } from '../systems/registries/oreLook'
 import type { CellGateLookProvider } from '../systems/registries/cellGateLook'
 import type { MagneticGroundProvider } from '../systems/registries/magneticGround'
+import type { PlanetSkyBandProvider } from '../systems/registries/planetSkyBand'
 import type { ShockShield } from '../systems/registries/shockShields'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
 import type { OreSignatureTag, OreTypeProvider } from '../systems/registries/oreTypes'
@@ -185,6 +186,8 @@ export interface SliceRegistrar {
   soundCue(cue: SoundCue): void
   /** One provider across all slices: a charge's shake, flash and thump delay (#213). */
   chargeBlastCue(provider: ChargeBlastCueProvider): void
+  /** One provider across all slices: a band of light in a planet's sky, the aurora (#293). */
+  planetSkyBand(provider: PlanetSkyBandProvider): void
   /** One provider across all slices: a player's bore gun numbers (ticket 313, #309). */
   boreGun(provider: BoreGunProvider): void
   /** An item that acts on its own while switched to auto, keyed by its item id (ticket 317). */

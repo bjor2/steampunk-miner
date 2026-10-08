@@ -364,3 +364,13 @@ export const HEAT_SHIMMER_Z = 0.2
  * where the provider names none, so an untinted marker still reads on every band's ground.
  */
 export const GATE_MARKER_UNTINTED = '#d8d2c4'
+
+/**
+ * The planet sky band (GD ruling on #293 Q1, `PlanetSkyBand`): one ring mesh round the planet, cut
+ * into steps about this many metres long, so a step's chord strays under 2 mm from the circle on the
+ * smallest planet (300 m). It is drawn just behind the ground and the platform (z 0, 0.02), in front of the sky.
+ */
+export const SKY_BAND_STEP_M = 2
+export const SKY_BAND_Z = -0.05
+/** With no ribbon art the kernel's procedural curtains repeat every this many metres round. */
+export const SKY_BAND_CURTAIN_REPEAT_M = 24
