@@ -5,6 +5,7 @@
  * the dielectric bit.
  */
 export const DRILL_GEAR_SLICE_ID = 'drill-gear'
+export { DIELECTRIC_BIT_ID } from './systems/dielectricBit'
 export type { DrillPathCaps } from './systems/drillGearEconomy'
 export type {
   DrillGearItem,

@@ -285,6 +285,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   down-right and a down-left bore of six cells from the surface east of the pad. The eye check in
   `npm run dev` plays it from the console: take `s` from `twinBitDiagonal()`, then call
   `steampunkDebug.fastForward(s.ticks, s.commands)`.
+- **Magnetic planet** (GD lock on #258 Q7, ticket 294): `npm run balance:magnetic-planet` runs
+  `features/planet-mix/magneticBandValue.test.ts` and `magneticPlanetPace.test.ts`. The class
+  switches off at the same planet index with `withMagneticClassOff` (`magneticClassOff.ts`): the
+  loaded registrations without planet-mix's `magneticGround` provider, all else equal. Value: each
+  band's generated ore value on P25, P28 and P32 stays within #141's +4% of the class-off planet,
+  on every pacing seed. Pace: the bot arrives on-curve and plays each planet to the core on each
+  seed with the class off, on with a bare head, and on with the dielectric bit; on the median of
+  the per-seed ratios to the class-off run, the bare run takes 1.00x to 1.10x the time, the bit run
+  at least 0.98x, and income per minute on the magnetic run is at most +15%. The bot's pilot sets
+  its pose, so the field's tug never reaches it; the runs measure shock ticks and hull. A slow
+  planet's first lever is `magnetic.electrifiedShareBp`, never the shock time. The slice and P1
+  core pins stay `logging/pacingGate.test.ts`'s.
 - **No free cell from item hooks** (GD lock on #206, Vertical pin 1, ticket 323):
   `bot/noFreeCellRuns.ts` is #281's exact check as a harness: the bot arrives on planets 7 and 10
   on-curve and plays to the core on each pacing seed with a bare setup and with items owned, none

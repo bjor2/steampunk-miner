@@ -228,11 +228,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/oreRows.test.ts` | 3 | 3 |
 | `src/features/ores/systems/oreTypeProvider.test.ts` | 6 | 6 |
 
-### `planet-mix`: 11 files, 70 tests
+### `planet-mix`: 14 files, 85 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/planet-mix/histogramCheck.test.ts` | 5 | 5 |
+| `src/features/planet-mix/magneticBandValue.test.ts` | 3 | 1 |
+| `src/features/planet-mix/magneticClassOff.test.ts` | 3 | 3 |
+| `src/features/planet-mix/magneticPlanetPace.test.ts` | 9 | 3 |
 | `src/features/planet-mix/mixHistogram.test.ts` | 7 | 3 |
 | `src/features/planet-mix/mixReportRows.test.ts` | 5 | 5 |
 | `src/features/planet-mix/systems/electrifiedCells.test.ts` | 3 | 3 |
