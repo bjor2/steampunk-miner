@@ -54,11 +54,12 @@ describe('item hook caps', () => {
       { tx: 2, ty: 0 },
     ]
     expect(rankedBySummedScore(tiles, [])).toEqual(tiles)
-    expect(rankedBySummedScore(tiles, [[0, 1, 0], [0, 0, 1]])).toEqual([
-      tiles[1],
-      tiles[2],
-      tiles[0],
-    ])
+    expect(
+      rankedBySummedScore(tiles, [
+        [0, 1, 0],
+        [0, 0, 1],
+      ]),
+    ).toEqual([tiles[1], tiles[2], tiles[0]])
     expect(rankedBySummedScore(tiles, [[0, 0, 3], [2]])).toEqual([tiles[2], tiles[0], tiles[1]])
   })
 
