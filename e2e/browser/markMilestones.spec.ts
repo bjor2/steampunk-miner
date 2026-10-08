@@ -9,7 +9,8 @@
  * - consumable: the lodestone beacon's second tap throws the beacon ahead, where Mark 2 has none left;
  * - channel: the mineral drain's second tap starts a second channel, where Mark 2 waits;
  * - toggle: the spoil auger's hold packs a plug three rows deep, where Mark 2 packs one row;
- * - always-on: the vibratory bit's crumble fires the corer's charge, where Mark 2 fires nothing.
+ * - always-on: the vibratory bit's cut of soft ground fires the corer's charge once, where Mark 2
+ *   fires nothing (the link re-keyed off the crumble by the GD ruling on #276).
  *
  * The tiles are seed 83921's, as the unit specs find them (`drillGearInPlay.test.ts`,
  * `drainTestSession.ts`); Mark N of an item is researched from planet `unlockTier + 3 (N - 1)`.
@@ -281,11 +282,11 @@ test.describe('Mark milestones (#256): Mark 3 against Mark 2, one item per class
     expect(errors).toEqual([])
   })
 
-  test("always-on: the vibratory bit's crumble fires the corer's charge only at Mark 3", async ({
+  test("always-on: the vibratory bit's soft-ground cut fires the corer's charge only at Mark 3", async ({
     page,
   }) => {
     const errors = await openStartScenario(page)
-    const crumbled = async (planetIndex: number) => {
+    const cutSoftGround = async (planetIndex: number) => {
       await play(
         page,
         { slots: { 'drill.head': BIT, 'drill.collar': CORER } },
@@ -306,9 +307,9 @@ test.describe('Mark milestones (#256): Mark 3 against Mark 2, one item per class
       )
       return chargesOf(page, CORER)
     }
-    expect(await crumbled(10)).toBe(3)
+    expect(await cutSoftGround(10)).toBe(3)
     await openStartScenario(page)
-    expect(await crumbled(7)).toBe(4)
+    expect(await cutSoftGround(7)).toBe(4)
     expect(errors).toEqual([])
   })
 })

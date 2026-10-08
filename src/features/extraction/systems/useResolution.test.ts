@@ -131,7 +131,7 @@ describe('mineral drain Mark milestones (#256)', () => {
         { kind: 'vehicle-item', id: DRAIN_ID },
         { playerId: 'p1', planetIndex: 1, level, view: itemSnapshotViewOf(state, 'p1') },
       )?.statLines.find((line) => line.label === 'Next milestone')?.now
-    expect(lineAt(1)).toBe('Mk III, tap twice: drains from the rim of its reach inward')
+    expect(lineAt(1)).toBe('Mk III, tap twice: drains the farthest ore in reach first')
     expect(lineAt(3)).toBe('All reached')
   })
 })
