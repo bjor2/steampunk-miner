@@ -6,7 +6,9 @@
  * splitter's ends at Mark 6 and the lodestone beacon's at Mark 7.
  *
  * The ore-shifter's verbs are the lock's worked example; the others are this ticket's picks, each
- * a where or a how of the same edit.
+ * a where or a how of the same edit, worded and placed by Content's check on #276: "the side you're
+ * steering toward" is the kernel's `facedSideOf`, so with the miner facing down a Mark 6 hold
+ * lands where its Mark 3 tap does not.
  */
 import { milestonesOf, type MarkMilestone, type MilestoneVerbs } from '../../tech-tree'
 
@@ -18,27 +20,27 @@ const LODESTONE_BEACON = 'consumable.lodestone_beacon'
 const VERBS: Readonly<Record<string, MilestoneVerbs>> = {
   [ORE_SHIFTER]: {
     secondTap: 'pushes the same nodules away from the hull',
-    hold: 'drags only from the side you face',
+    hold: "drags only from the side you're steering toward",
     siblingLink: {
-      verb: 'plants a lodestone beacon at half its swap cap',
+      verb: 'plants a lodestone beacon that draws in half as much ore',
       siblingId: LODESTONE_BEACON,
     },
   },
   [SEAM_SPLITTER]: {
-    secondTap: 'splits across the face, a quarter turn from the facing',
-    hold: 'splits straight along the facing, ignoring the grain',
+    secondTap: "splits sideways, on the side you're steering toward",
+    hold: 'splits straight ahead of the drill, ignoring the grain',
   },
   [PRESSURE_POCKET]: {
-    secondTap: 'blows the pocket behind you',
-    hold: 'blows the pocket above you',
+    secondTap: 'blows the pocket behind you, away from the drill',
+    hold: "blows the pocket on the side you're steering toward",
     siblingLink: {
       verb: 'opens a seam splitter fissure at half length',
       siblingId: SEAM_SPLITTER,
     },
   },
   [LODESTONE_BEACON]: {
-    secondTap: 'throws the beacon one gather radius ahead',
-    hold: 'sinks the beacon one gather radius below you',
+    secondTap: 'throws the beacon one gather radius ahead of the drill',
+    hold: "sets the beacon one gather radius out on the side you're steering toward",
   },
 }
 

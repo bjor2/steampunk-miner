@@ -12,8 +12,10 @@
  *
  * Mark milestones (#256, an income item's where and how): the Mark 3 second tap reverses the pull,
  * pushing the same count of nodules away from the hull to the rim of its reach; the Mark 6 hold
- * aims the same count at the side the miner faces, dragging only nodules on that side.
+ * drags the same count only from the side the miner steers toward (`facedSideOf`, the TD lock on
+ * #276: the side cutters' side).
  */
+import { sideVectorOf } from '../../../systems/vehicle/facedSide'
 import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
@@ -29,7 +31,7 @@ import {
 import { oreInDragOrder } from './dragHooks'
 import {
   distanceSqOf,
-  facingStepOf,
+  stepNearest,
   stepsAwayFrom,
   stepsToward,
   tilesNearestFirst,
@@ -47,7 +49,7 @@ export const ORE_SHIFTER_ID = 'power.ore_shifter'
 
 /**
  * Where the drag pulls to and how far it reaches: toward the hull, or away from it (the second
- * tap's push); from all round, or only the side the miner faces (the hold's aim).
+ * tap's push); from all round, or only the side the miner steers toward (the hold's aim).
  */
 interface DragPull {
   hull: TilePoint
@@ -79,7 +81,7 @@ function dragPullOf(view: GroundView, key: EditKey, pose: VehiclePose, verb: Too
     seed: editSeedOf(view.params, key),
     reach: balance.reachTiles ?? balance.magnitude,
     isPush: isSecondTap(verb),
-    aim: isHold(verb) ? facingStepOf(pose) : null,
+    aim: isHold(verb) ? stepNearest(sideVectorOf(pose, verb.facedSide)) : null,
   }
 }
 
@@ -92,7 +94,7 @@ function dragOre(draft: EditDraft, pull: DragPull, nodules: readonly TilePoint[]
   }
 }
 
-/** The tiles in reach, nearest first; with an aim, only those on the side the miner faces. */
+/** The tiles in reach, nearest first; with an aim, only those on the side it points to. */
 function tilesInPull(pull: DragPull): TilePoint[] {
   const tiles = tilesNearestFirst(pull.hull, pull.reach, pull.seed)
   const { aim } = pull

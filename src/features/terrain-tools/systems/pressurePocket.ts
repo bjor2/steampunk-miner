@@ -10,7 +10,8 @@
  * refused at no cost.
  *
  * Mark milestones (#256, an income item's where and how): the Mark 3 second tap blows the same
- * pocket behind the miner, the Mark 6 hold above it, each at the same distance from the hull.
+ * pocket behind the miner, away from the drill, the Mark 6 hold on the side it steers toward
+ * (Content's where-fix on #276), each at the same distance from the hull.
  */
 import { MM_PER_METRE, VEHICLE_COLLIDER_SIZE } from '../../../constants/physics'
 import {
@@ -29,8 +30,8 @@ import {
   openDraft,
   type EditDraft,
 } from './editDraft'
+import { sideVectorOf } from '../../../systems/vehicle/facedSide'
 import {
-  aboveVectorOf,
   behindVectorOf,
   distanceSqOf,
   stepAway,
@@ -86,10 +87,10 @@ export function planPressurePocket(
   return { kind: 'refused', reason: TERRAIN_REFUSAL.nothingToOpen }
 }
 
-/** Ahead along the facing; behind the miner for a second tap; above it for a hold. */
+/** Ahead along the facing; behind the miner for a second tap; its faced side for a hold. */
 function blowDirectionOf(pose: VehiclePose, verb: ToolVerb): IntegerVector {
   if (isSecondTap(verb)) return behindVectorOf(pose)
-  if (isHold(verb)) return aboveVectorOf(pose)
+  if (isHold(verb)) return sideVectorOf(pose, verb.facedSide)
   return facingVectorOf(pose.upx, pose.upy, pose.facing)
 }
 

@@ -33,10 +33,13 @@ const PLANNERS: Readonly<Record<string, Planner>> = {
 }
 
 const DEPTHS = [6, 9, 13, 18, 24, 31]
+/** Every verb, a one-sided one on either side of the miner (the faced side, #276). */
 const VERBS: readonly ToolVerb[] = [
   PLAIN_VERB,
-  { milestone: 'second-tap', linkedSize: null },
-  { milestone: 'hold', linkedSize: null },
+  ...(['left', 'right'] as const).flatMap((facedSide): ToolVerb[] => [
+    { milestone: 'second-tap', linkedSize: null, facedSide },
+    { milestone: 'hold', linkedSize: null, facedSide },
+  ]),
 ]
 const PLANETS = [1, 60, 100]
 

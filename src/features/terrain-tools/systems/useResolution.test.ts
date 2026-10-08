@@ -4,7 +4,7 @@ import {
   type AuthorityState,
 } from '../../../systems/authority/authorityState'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
-import { FACING } from '../../../systems/vehicle/vehiclePose'
+import { FACING, type Facing } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { chargesLeftOf, intentToHoldSlot } from '../../power-up-core'
 import {
@@ -39,6 +39,8 @@ const PRESS_TICK = 10
 const FOLLOW_GAP = 20
 const END_TICK = 120
 const STAND_DEPTH = 8
+/** A depth whose rock past the splitter's face runs nine workable cells down. */
+const SPLIT_DEPTH = 6
 /** A depth with ore left on the faced side after the plain drag (23 nodules within 6 tiles). */
 const ORE_RICH_DEPTH = 14
 
@@ -73,21 +75,26 @@ function followIntent(follow: Follow) {
   return follow === 'hold' ? intentToHoldSlot('powerup.1') : press()
 }
 
-/** The tool used, then followed up 20 ticks after it acted, at Mark `mark`. */
+/**
+ * The tool used, then followed up 20 ticks after it acted, at Mark `mark`. The miner faces right
+ * unless told otherwise; facing right with no drive or latch, the side it steers toward is the
+ * facing's right, below it (`facedSideOf`).
+ */
 function playTool(
   itemId: string,
   mark: number,
   follow: Follow,
   slots: Readonly<Record<string, string>> = {},
   depth = STAND_DEPTH,
+  facing: Facing = FACING.right,
 ): ToolRun {
   const stand = buriedTile(depth)
   const followTick = PRESS_TICK + WINDUP_TICKS[itemId] + FOLLOW_GAP
   const setup: TimedIntent[] = [
     [0, setVehicleLoadoutCommand({ 'powerup.1': itemId, ...slots })],
     [0, researchThrough(PLANET_OF_MARK[itemId][mark])],
-    [1, poseAbove(GROUND, FACING.right)],
-    ...standIntents(5, stand, FACING.right),
+    [1, poseAbove(GROUND, facing)],
+    ...standIntents(5, stand, facing),
     [PRESS_TICK, press()],
   ]
   const [beforeUse] = replayedAtEveryRate(commandsOf(setup.slice(0, -1)), PRESS_TICK - 1)
@@ -151,18 +158,23 @@ describe('terrain-tools Mark milestones (#256): Mark 3 second tap, at 30 and 144
     )
   })
 
-  it('seam splitter: at M3 the second tap splits across the face and at M2 along the grain', () => {
+  it("seam splitter: at M3 the second tap splits sideways toward the side you're steering toward and at M2 along the grain", () => {
     const openedBy = (mark: number) => {
-      const run = playTool(SEAM_SPLITTER_ID, mark, 'second-tap')
+      const run = playTool(SEAM_SPLITTER_ID, mark, 'second-tap', {}, SPLIT_DEPTH)
       sameAtEveryRate(run, (_state, events) => usedLinesOf(events))
-      return sameAtEveryRate(run, (state) =>
-        tilesOpenedBetween(run.beforeFollow, state, run.stand, 12),
-      )
+      return {
+        stand: run.stand,
+        opened: sameAtEveryRate(run, (state) =>
+          tilesOpenedBetween(run.beforeFollow, state, run.stand, 12),
+        ),
+      }
     }
     const isColumn = (tiles: readonly TilePoint[]) =>
       tiles.length > 1 && new Set(tiles.map((tile) => tile.tx)).size === 1
-    expect(isColumn(openedBy(3))).toBe(true)
-    expect(isColumn(openedBy(2))).toBe(false)
+    const atMark3 = openedBy(3)
+    expect(isColumn(atMark3.opened)).toBe(true)
+    expect(atMark3.opened.every((tile) => tile.ty <= atMark3.stand.ty)).toBe(true)
+    expect(isColumn(openedBy(2).opened)).toBe(false)
   })
 
   it('pressure pocket: at M3 the second tap blows the pocket behind and at M2 it waits', () => {
@@ -203,35 +215,60 @@ describe('terrain-tools Mark milestones (#256): Mark 3 second tap, at 30 and 144
 })
 
 describe('terrain-tools Mark milestones (#256): Mark 6 hold', () => {
-  it('ore-shifter: the hold drags only nodules on the side the miner faces', () => {
+  it("ore-shifter: the hold drags only nodules on the side you're steering toward", () => {
     const run = playTool(ORE_SHIFTER_ID, 6, 'hold', {}, ORE_RICH_DEPTH)
     expect(usedLinesOf(run.events[0])).toEqual(['plain', 'hold'])
     const before = oreAround(run.beforeFollow, run.stand, 7)
     const after = oreAround(run.states[0], run.stand, 7)
-    const behind = (ore: typeof before) =>
-      ore.filter(({ tile }) => tile.tx < run.stand.tx).map(({ tile }) => `${tile.tx},${tile.ty}`)
-    expect(behind(after)).toEqual(behind(before))
+    const unfaced = (ore: typeof before) =>
+      ore.filter(({ tile }) => tile.ty > run.stand.ty).map(({ tile }) => `${tile.tx},${tile.ty}`)
+    expect(unfaced(after)).toEqual(unfaced(before))
+    expect(after).not.toEqual(before)
   })
 
-  it('seam splitter: the hold splits straight along the facing', () => {
+  it('seam splitter: the hold splits straight ahead of the drill', () => {
     const run = playTool(SEAM_SPLITTER_ID, 6, 'hold')
     const opened = tilesOpenedBetween(run.beforeFollow, run.states[0], run.stand, 12)
     expect(opened.length).toBeGreaterThan(1)
     expect(opened.every((tile) => tile.ty === run.stand.ty && tile.tx > run.stand.tx)).toBe(true)
   })
 
-  it('pressure pocket: the hold blows the pocket above the miner', () => {
+  it("pressure pocket: the hold blows the pocket on the side you're steering toward", () => {
     const run = playTool(PRESSURE_POCKET_ID, 6, 'hold')
     const opened = tilesOpenedBetween(run.beforeFollow, run.states[0], run.stand, 8)
     expect(opened.length).toBeGreaterThan(0)
-    expect(opened.every((tile) => tile.ty > run.stand.ty)).toBe(true)
+    expect(opened.every((tile) => tile.ty < run.stand.ty)).toBe(true)
   })
 
-  it('lodestone beacon: the hold sinks the beacon below the miner', () => {
+  it("lodestone beacon: the hold sets the beacon out on the side you're steering toward", () => {
     const run = playTool(LODESTONE_BEACON_ID, 6, 'hold')
     const beacon = terrainToolsOf(run.states[0], 'p1').beacon
     expect(beacon?.tx).toBe(run.stand.tx)
     expect(beacon?.ty).toBeLessThan(run.stand.ty)
+  })
+
+  it('facing down, the pocket and the beacon each land the tap and the hold on different tiles', () => {
+    const pocketTiles = (follow: Follow) => {
+      const run = playTool(PRESSURE_POCKET_ID, 6, follow, {}, STAND_DEPTH, FACING.down)
+      return tilesOpenedBetween(run.beforeFollow, run.states[0], run.stand, 8).map(
+        (tile) => `${tile.tx},${tile.ty}`,
+      )
+    }
+    const tapped = pocketTiles('second-tap')
+    const held = pocketTiles('hold')
+    expect(tapped.length).toBeGreaterThan(0)
+    expect(held.length).toBeGreaterThan(0)
+    expect(held.filter((tile) => !tapped.includes(tile)).length).toBeGreaterThan(held.length / 2)
+
+    const beaconOf = (follow: Follow) => {
+      const run = playTool(LODESTONE_BEACON_ID, 6, follow, {}, STAND_DEPTH, FACING.down)
+      return terrainToolsOf(run.states[0], 'p1').beacon
+    }
+    const thrown = beaconOf('second-tap')
+    const set = beaconOf('hold')
+    expect(thrown).not.toBeNull()
+    expect(set).not.toBeNull()
+    expect([set?.tx, set?.ty]).not.toEqual([thrown?.tx, thrown?.ty])
   })
 
   it('is two actions and two charges, never a discount', () => {
@@ -287,7 +324,7 @@ describe('terrain-tools Mark milestones (#256): the card line', () => {
       'Mk III, tap twice: pushes the same nodules away from the hull',
     )
     expect(lineAt(ORE_SHIFTER_ID, 6)).toBe(
-      'Mk IX, link: plants a lodestone beacon at half its swap cap',
+      'Mk IX, link: plants a lodestone beacon that draws in half as much ore',
     )
     expect(lineAt(SEAM_SPLITTER_ID, 6)).toBe('All reached')
   })

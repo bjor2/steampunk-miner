@@ -78,11 +78,6 @@ export function behindVectorOf(pose: VehiclePose): IntegerVector {
   return { x: -facing.x, y: -facing.y }
 }
 
-/** The miner's local up: what lies above it, away from the planet's centre. */
-export function aboveVectorOf(pose: VehiclePose): IntegerVector {
-  return { x: pose.upx, y: pose.upy }
-}
-
 export function distanceSqOf(a: TilePoint, b: TilePoint): number {
   const dx = a.tx - b.tx
   const dy = a.ty - b.ty

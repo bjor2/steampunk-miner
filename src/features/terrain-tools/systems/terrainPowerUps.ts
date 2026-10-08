@@ -97,7 +97,8 @@ function magnetPowerUpOf(item: MagnetItem): PowerUp {
 function editWith(plan: Planner): Activate {
   return (state, use) => {
     const view = openGroundView(state, use.playerId, editSourceOf(use.itemId))
-    const pose = vehicleOf(state, use.playerId).pose
+    const miner = vehicleOf(state, use.playerId)
+    const { pose } = miner
     if (view === null || pose === null)
       return { kind: 'refused', reason: TERRAIN_REFUSAL.outOfPlay }
     const key = { origin: use.origin, tick: use.tick, itemId: use.itemId, mark: use.mark }
@@ -107,6 +108,6 @@ function editWith(plan: Planner): Activate {
       mark: key.mark,
       origin: use.origin,
     }
-    return outcomeOfPlan(state, author, plan(view, key, pose, toolVerbOf(use)))
+    return outcomeOfPlan(state, author, plan(view, key, pose, toolVerbOf(use, miner)))
   }
 }

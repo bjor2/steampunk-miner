@@ -39,10 +39,13 @@ const TEAMMATE_OFFSETS: readonly TilePoint[] = [
   { tx: 6, ty: 0 },
 ]
 
+/** Every verb, a one-sided one on either side of the miner (the faced side, #276). */
 const VERBS: readonly ToolVerb[] = [
   PLAIN_VERB,
-  { milestone: 'second-tap', linkedSize: null },
-  { milestone: 'hold', linkedSize: null },
+  ...(['left', 'right'] as const).flatMap((facedSide): ToolVerb[] => [
+    { milestone: 'second-tap', linkedSize: null, facedSide },
+    { milestone: 'hold', linkedSize: null, facedSide },
+  ]),
 ]
 
 const ANCHOR_REACH_MM = (VEHICLE_COLLIDER_SIZE * MM_PER_METRE) / 2 + MM_PER_METRE

@@ -13,8 +13,9 @@
  * `liveBeacon` provider, for `lodestone_drain` (TD ruling on #206, ticket 326): no slice imports it.
  *
  * Mark milestones (#256, an income item's where and how): the Mark 3 second tap throws the beacon
- * its gather radius ahead along the facing, the Mark 6 hold sinks it its gather radius below the
- * miner; each re-plants the live beacon there, at the same radius and cap. A beacon an ore-shifter's
+ * its gather radius ahead of the drill, the Mark 6 hold sets it its gather radius out on the side
+ * the miner steers toward (Content's where-fix on #276); each re-plants the live beacon there, at
+ * the same radius and cap. A beacon an ore-shifter's
  * sibling-link plants gathers at the link's half of its 256-swap cap (the lock's worked example).
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
@@ -23,6 +24,7 @@ import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import type { AuthorityReaction } from '../../../systems/registries/authorityReactions'
 import type { LiveBeacon, LiveBeaconProvider } from '../../../systems/registries/liveBeacon'
 import { vehicleOf } from '../../../systems/authority/authorityState'
+import { sideVectorOf } from '../../../systems/vehicle/facedSide'
 import { UP_VECTOR_SCALE } from '../../../constants/physics'
 import {
   facingVectorOf,
@@ -66,10 +68,11 @@ export const LIVE_LODESTONE_PROVIDER: LiveBeaconProvider = {
  */
 export function plantLodestone(state: AuthorityState, use: PowerUpUse): PowerUpOutcome {
   const planetIndex = planetParamsOf(state.planet)?.planetIndex ?? null
-  const pose = vehicleOf(state, use.playerId).pose
+  const miner = vehicleOf(state, use.playerId)
+  const { pose } = miner
   if (planetIndex === null || pose === null)
     return { kind: 'refused', reason: TERRAIN_REFUSAL.outOfPlay }
-  const verb = toolVerbOf(use)
+  const verb = toolVerbOf(use, miner)
   if (verb.milestone === null && isBeaconLiveOn(state, use.playerId, planetIndex))
     return { kind: 'refused', reason: TERRAIN_REFUSAL.beaconLive }
   const beacon = beaconOf(use, verb, pose, planetIndex)
@@ -93,12 +96,15 @@ function beaconOf(
   return verb.linkedSize === null ? beacon : { ...beacon, swapCap: atLinkStrength(fullSwapCap()) }
 }
 
-/** The miner's tile; a gather radius along the facing for a second tap, below it for a hold. */
+/**
+ * The miner's tile; a gather radius ahead of the drill for a second tap, out on the side the miner
+ * steers toward for a hold.
+ */
 function plantingTileOf(use: PowerUpUse, verb: ToolVerb, pose: VehiclePose): TilePoint {
   const radius = magnitudeAt(terrainItemNamed(LODESTONE_BEACON_ID), use.mark)
   if (isSecondTap(verb))
     return tilesAlong(use.origin, facingVectorOf(pose.upx, pose.upy, pose.facing), radius)
-  if (isHold(verb)) return tilesAlong(use.origin, { x: -pose.upx, y: -pose.upy }, radius)
+  if (isHold(verb)) return tilesAlong(use.origin, sideVectorOf(pose, verb.facedSide), radius)
   return use.origin
 }
 
