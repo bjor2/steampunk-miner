@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T02:26:23+02:00",
+  "updated_at": "2026-10-08T02:30:23+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -44,10 +44,10 @@
         {
           "slot": "C4",
           "state": "busy",
-          "ticket": 283,
+          "ticket": 284,
           "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-08T01:57:00+02:00"
+          "since": "2026-10-08T02:30:00+02:00"
         }
       ],
       "size": 4,
@@ -224,8 +224,8 @@
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 283,
-      "since": "2026-10-08T01:57:00+02:00",
+      "ticket": 284,
+      "since": "2026-10-08T02:30:00+02:00",
       "claude_slot": 4
     },
     {
@@ -323,9 +323,9 @@
     {
       "slot": 4,
       "state": "busy",
-      "ticket": 283,
+      "ticket": 284,
       "grok_slot": 2,
-      "since": "2026-10-08T01:57:00+02:00",
+      "since": "2026-10-08T02:30:00+02:00",
       "account": 1
     },
     {
@@ -362,11 +362,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 02:26 CEST",
+    "at": "2026-10-08 02:30 CEST",
     "mode": "refill-dev",
-    "triggers": "#276 #291",
-    "started": "#326->C1/A1 #327->C3/A1",
-    "note": "spawned 2 worker(s)"
+    "triggers": "#283",
+    "started": "#284->C4/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
