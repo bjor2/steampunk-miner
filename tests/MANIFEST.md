@@ -228,7 +228,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/oreRows.test.ts` | 3 | 3 |
 | `src/features/ores/systems/oreTypeProvider.test.ts` | 6 | 6 |
 
-### `planet-mix`: 14 files, 88 tests
+### `planet-mix`: 15 files, 92 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -243,6 +243,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/mixRoll.test.ts` | 5 | 5 |
 | `src/features/planet-mix/systems/oreMix.test.ts` | 13 | 13 |
 | `src/features/planet-mix/systems/planetActs.test.ts` | 13 | 13 |
+| `src/features/planet-mix/systems/planetCard.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/planetClass.test.ts` | 6 | 6 |
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
