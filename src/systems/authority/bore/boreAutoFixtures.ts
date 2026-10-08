@@ -36,21 +36,22 @@ export interface SearProbe {
   /** The sear's numbers; null answers that the gun has no auto mode. */
   sear?: BoreAutoShootStats | null
   stats?: BoreGunStats
-  /** Whether the sear's node is researched; it is unless a spec says not. */
-  isResearched?: boolean
+  /** The items whose nodes are researched: the sear unless a spec says otherwise. */
+  researched?: readonly string[]
   extra?: (r: Parameters<SliceDefinition['register']>[0]) => void
 }
 
 /** A fake slice with the gun, the sear's numbers, and the sear researched for every player. */
 export function searSlice(probe: SearProbe = {}): SliceDefinition {
-  const { sear = SEAR_STATS, stats = BORE_STATS, isResearched = true, extra = () => {} } = probe
+  const { sear = SEAR_STATS, stats = BORE_STATS, extra = () => {} } = probe
+  const researched = probe.researched ?? [STEAM_SEAR_ITEM_ID]
   return {
     id: 'probe',
     register(r) {
       r.boreGun({ id: 'probe.bore-gun', boreGunOf: () => stats, autoShootOf: () => sear })
       r.vehicleItemResearch({
         id: 'probe.research',
-        isResearched: (_state, _playerId, itemId) => isResearched && itemId === STEAM_SEAR_ITEM_ID,
+        isResearched: (_state, _playerId, itemId) => researched.includes(itemId),
       })
       extra(r)
     },

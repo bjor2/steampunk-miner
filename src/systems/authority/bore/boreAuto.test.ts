@@ -61,7 +61,7 @@ function advanceInFrames(session: ScriptedSession, toTick: number, stepsPerSecon
 
 describe('bore gun auto: the toggle (ticket 317)', () => {
   it('is refused without the steam sear researched, and nothing changes', () =>
-    withRegistrations([searSlice({ isResearched: false })], () => {
+    withRegistrations([searSlice({ researched: [] })], () => {
       const session = createScriptedSession()
       standInPocket(session, AUTO_RIG, 0)
       const before = session.state()
