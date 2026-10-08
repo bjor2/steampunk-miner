@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T03:46:02+02:00",
+  "updated_at": "2026-10-08T03:50:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -20,10 +20,10 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 293,
+          "ticket": 276,
           "grok_slot": 2,
           "kind": "dev",
-          "since": "2026-10-08T03:46:00+02:00"
+          "since": "2026-10-08T03:48:00+02:00"
         },
         {
           "slot": "C2",
@@ -36,10 +36,10 @@
         {
           "slot": "C3",
           "state": "busy",
-          "ticket": 332,
+          "ticket": 293,
           "grok_slot": 4,
           "kind": "dev",
-          "since": "2026-10-08T03:05:00+02:00"
+          "since": "2026-10-08T03:49:00+02:00"
         },
         {
           "slot": "C4",
@@ -104,7 +104,7 @@
     }
   ],
   "gate": {
-    "busy": 3,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -224,8 +224,8 @@
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 293,
-      "since": "2026-10-08T03:46:00+02:00",
+      "ticket": 276,
+      "since": "2026-10-08T03:48:00+02:00",
       "claude_slot": 1
     },
     {
@@ -238,8 +238,8 @@
     {
       "slot": 4,
       "state": "dev",
-      "ticket": 332,
-      "since": "2026-10-08T03:05:00+02:00",
+      "ticket": 293,
+      "since": "2026-10-08T03:49:00+02:00",
       "claude_slot": 3
     },
     {
@@ -298,9 +298,9 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 293,
+      "ticket": 276,
       "grok_slot": 2,
-      "since": "2026-10-08T03:46:00+02:00",
+      "since": "2026-10-08T03:48:00+02:00",
       "account": 1
     },
     {
@@ -314,9 +314,9 @@
     {
       "slot": 3,
       "state": "busy",
-      "ticket": 332,
+      "ticket": 293,
       "grok_slot": 4,
-      "since": "2026-10-08T03:05:00+02:00",
+      "since": "2026-10-08T03:49:00+02:00",
       "account": 1
     },
     {
@@ -362,11 +362,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 03:46 CEST",
-    "mode": "refill-dev",
-    "triggers": "#331",
-    "started": "#293->C1/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-08 03:49 CEST",
+    "mode": "recheck",
+    "triggers": "#332",
+    "started": "",
+    "note": "dev slots full"
   },
   "totals": {
     "grok": {
