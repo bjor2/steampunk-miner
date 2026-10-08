@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T02:10:04+02:00",
+  "updated_at": "2026-10-08T02:10:16+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -104,32 +104,23 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 3,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "c9e49e10a90dafea836c1593d0cd5816fbc52464",
-    "since": "2026-10-08T00:09:51Z",
-    "holds_gate": false,
+    "sha": "8eea675260bca9b2e70bedff1ee2de25ab744c18",
+    "since": "2026-10-08T00:10:13Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-07T22:41:46Z",
+    "last_run": "2026-10-08T00:10:11Z",
     "last_nightly": null,
     "last_nightly_result": null,
     "main_red_sha": null,
-    "feature": 143,
-    "feature_title": "Spec: Dynamite in ~10 sizes with realistic explosions and exponential cost",
+    "feature": 123,
+    "feature_title": "Perf 14 (logging 3): Debug-flag snapshot writers (checkpoints, heap threshold, screenshots)",
     "queue": [
-      {
-        "feature": 123,
-        "kind": "ticket",
-        "title": "Perf 14 (logging 3): Debug-flag snapshot writers (checkpoints, heap threshold, screenshots)",
-        "tickets": [
-          123
-        ],
-        "since": "2026-10-07T22:09:45+02:00"
-      },
       {
         "feature": 145,
         "kind": "spec",
