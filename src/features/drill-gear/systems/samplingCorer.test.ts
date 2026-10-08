@@ -16,6 +16,8 @@ import { cellAt, EMPTY_WORLD } from '../../../systems/world/worldState'
 /** Planet-1 ground whose next cell down is an ore cell. */
 const ABOVE_ORE: TilePoint = { tx: 30, ty: 280 }
 const ORE: TilePoint = { tx: 30, ty: 279 }
+/** Column 30 holds ore from ty 279 down to 275, all within the corer's six-cell reach. */
+const DEEPEST_ORE_IN_REACH: TilePoint = { tx: 30, ty: 275 }
 /** Ground with only ground for more than the corer's reach below it. */
 const ABOVE_GROUND: TilePoint = { tx: 30, ty: 288 }
 
@@ -32,6 +34,31 @@ function gateOn(tile: TilePoint, gateKind: string, outcome: 'refused' | 'cut'): 
             : null,
       }),
   }
+}
+
+/**
+ * A fixture `aim` hook on the corer (ticket 327) that scores the farthest candidate highest and
+ * keeps every candidate it was shown in `seen`.
+ */
+function aimFarthest(seen: TilePoint[][] = []): SliceDefinition {
+  return {
+    id: 'aim-probe',
+    register: (r) =>
+      r.itemHook({
+        id: 'aim-probe.farthest',
+        hook: 'aim',
+        laneId: 'drill-gear',
+        parentItemId: SAMPLING_CORER_ID,
+        answer: (_state, _playerId, ctx) => {
+          seen.push([...ctx.candidates])
+          return ctx.candidates.map((_tile, index) => index)
+        },
+      }),
+  }
+}
+
+function sampledTileOf(outcome: ReturnType<typeof sampleOreAhead>) {
+  return outcome.kind === 'acted' ? outcome.effect.events : outcome
 }
 
 /** The corer's act with the vehicle above `tile` facing down, under `slices`. */
@@ -103,5 +130,40 @@ describe('sampling corer', () => {
       kind: 'blocked',
       block: { cellTier: tierAt(core), gateKind: CORE_GATE_KIND, ...core },
     })
+  })
+
+  it('plugs the cell an aim hook scores highest among the ore cells in reach', () => {
+    const { outcome } = coreDownFrom(ABOVE_ORE, [aimFarthest()])
+    expect(sampledTileOf(outcome)).toEqual([
+      expect.objectContaining({ type: 'OreSampled', ...DEEPEST_ORE_IN_REACH }),
+    ])
+  })
+
+  it('shows an aim hook only the sampleable ore cells before a gate that refuses the tube', () => {
+    const seen: TilePoint[][] = []
+    const gated = { tx: 30, ty: 277 }
+    const { outcome } = coreDownFrom(ABOVE_ORE, [
+      aimFarthest(seen),
+      gateOn(gated, 'rig', 'refused'),
+    ])
+    expect(seen).toEqual([[ORE, { tx: 30, ty: 278 }]])
+    expect(sampledTileOf(outcome)).toEqual([
+      expect.objectContaining({ type: 'OreSampled', tx: 30, ty: 278 }),
+    ])
+  })
+
+  it('is still refused by a gate on the nearest ore cell when an aim hook is registered', () => {
+    const seen: TilePoint[][] = []
+    const { outcome } = coreDownFrom(ABOVE_ORE, [aimFarthest(seen), gateOn(ORE, 'rig', 'refused')])
+    expect(seen).toEqual([])
+    expect(outcome).toEqual({
+      kind: 'blocked',
+      block: { cellTier: tierAt(ORE), gateKind: 'rig', ...ORE },
+    })
+  })
+
+  it('leaves the world exactly as it was when an aim hook picks the cell', () => {
+    const { state, outcome } = coreDownFrom(ABOVE_ORE, [aimFarthest()])
+    expect(outcome.kind === 'acted' && outcome.effect.state).toBe(state)
   })
 })
