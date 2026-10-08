@@ -642,6 +642,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/goldenSliceSections.test.ts` | 4 | 4 |
 | `src/logging/heatReport.test.ts` | 2 | 2 |
 | `src/logging/memorySample.test.ts` | 2 | 2 |
+| `src/logging/moneyLaneLines.test.ts` | 7 | 7 |
+| `src/logging/moneyPastP200.lane.test.ts` | 1 | 1 |
 | `src/logging/ndjson.test.ts` | 6 | 6 |
 | `src/logging/pacingMedian.test.ts` | 7 | 7 |
 | `src/logging/pacingReport.test.ts` | 12 | 12 |
@@ -804,7 +806,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/doubleConversionLint.test.ts` | 8 | 4 |
+| `src/features/doubleConversionLint.test.ts` | 8 | 5 |
 | `src/features/loadFeatures.test.ts` | 3 | 3 |
 | `src/features/sliceBoundaries.test.ts` | 5 | 5 |
 
@@ -845,7 +847,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/fastForward.test.ts` | 4 | 4 |
 | `src/systems/fixedStepClock.test.ts` | 10 | 6 |
 | `src/systems/globalSheetGuard.test.ts` | 5 | 5 |
-| `src/systems/money.test.ts` | 47 | 35 |
+| `src/systems/money.test.ts` | 61 | 43 |
+| `src/systems/moneyAsDoubleLint.test.ts` | 6 | 3 |
 | `src/systems/scenario.test.ts` | 18 | 18 |
 | `src/systems/seededRandom.test.ts` | 6 | 6 |
 | `src/systems/sliceProgress.test.ts` | 3 | 3 |
@@ -956,7 +959,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/casingTrail.test.ts` | 8 | 8 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 9 | 9 |
-| `src/systems/vehicle/drillRule.test.ts` | 12 | 12 |
+| `src/systems/vehicle/drillRule.test.ts` | 14 | 14 |
 | `src/systems/vehicle/driveSigns.test.ts` | 5 | 5 |
 | `src/systems/vehicle/heatPauseSteps.test.ts` | 7 | 7 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |

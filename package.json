@@ -41,6 +41,7 @@
     "balance:heat": "vite-node scripts/balanceHeat.ts",
     "balance:twin-bit": "vitest run src/features/drill-gear/twinBitPace.test.ts",
     "balance:magnetic-planet": "vitest run src/features/planet-mix/magneticBandValue.test.ts src/features/planet-mix/magneticPlanetPace.test.ts",
+    "balance:money-p200": "vitest run src/logging/moneyPastP200.lane.test.ts",
     "ore:mix": "vite-node scripts/oreMix.ts",
     "art:export": "scripts/art/export.sh",
     "art:merge-check": "scripts/art/merge_check.sh",

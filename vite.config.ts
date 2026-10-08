@@ -32,6 +32,16 @@ const NIGHTLY_ONLY_TESTS = [
 ]
 const skipsNightlyOnlyTests = process.env.SKIP_NIGHTLY_ONLY_TESTS === '1'
 
+// Lanes (ticket 340): bot runs of hours, such as the P200 money lane, too long for the suite and
+// the nightly. A `*.lane.test.ts` runs only when a CLI filter names it, as
+// `npx vitest run src/logging/moneyPastP200.lane.test.ts` does.
+const LANE_TESTS = '**/*.lane.test.ts'
+const namesALane = process.argv.some((arg) => arg.includes('.lane'))
+// The bot session keeps every command and domain event it played, about 14 MB a game hour (measured
+// on the P8 run for ticket 340), so the P200 lane holds about 3 GB by its end: a named lane run
+// gets a worker heap above Node's default.
+const LANE_HEAP_MEGABYTES = 6144
+
 export default defineConfig({
   plugins: [react()],
   define: {
@@ -52,12 +62,16 @@ export default defineConfig({
     // Rapier world, see docs/TESTING_INSTRUCTIONS.md).
     include: ['src/**/*.test.ts', 'scripts/**/*.test.mjs'],
     setupFiles: ['src/testSetup.ts'],
+    ...(namesALane
+      ? { poolOptions: { forks: { execArgv: [`--max-old-space-size=${LANE_HEAP_MEGABYTES}`] } } }
+      : {}),
     exclude: [
       '**/node_modules/**',
       'dist/**',
       'dist-electron/**',
       '.claude/**',
       ...(skipsNightlyOnlyTests ? NIGHTLY_ONLY_TESTS : []),
+      ...(namesALane ? [] : [LANE_TESTS]),
     ],
   },
 })

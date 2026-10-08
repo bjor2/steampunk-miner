@@ -18,7 +18,7 @@ import { startScenarioCommands } from '../systems/startScenarioCommands'
 import { depthTilesAt } from '../systems/world/planetGeometry'
 import { tileOfPose } from '../systems/vehicle/vehiclePose'
 import { recordDomainEventsTo } from './domainEventLog'
-import { createMemorySink } from './eventSink'
+import { createMemorySink, type RunEventSink } from './eventSink'
 import type { RunEvent, RunEventPlace } from './runEvent'
 import { createRunLog, type RunLog } from './runLog'
 import { recordStartingPlanet } from './startingPlanetLines'
@@ -72,10 +72,24 @@ export function playLoggedSlice(
   scenario: Scenario,
   options: LoggedRunOptions = {},
 ): LoggedSliceRun {
+  const sink = createMemorySink()
+  const run = playSliceIntoSink(scenario, sink, options)
+  return { run, events: sink.events, commands: sink.commands }
+}
+
+/**
+ * The same run with its events and commands handed to `sink` as they happen, so a lane that folds
+ * them (the P200 money lane, ticket 340) keeps no run log in memory; the bot session still keeps
+ * its own commands and domain events.
+ */
+export function playSliceIntoSink(
+  scenario: Scenario,
+  sink: RunEventSink,
+  options: LoggedRunOptions = {},
+): SliceRun {
   refuseBotScenario(scenario)
   const start = startingState(scenario)
   let tick = 0
-  const sink = createMemorySink()
   const runLog = createRunLog({
     runId: `run_bot_${scenario.name}`,
     sink,
@@ -100,7 +114,7 @@ export function playLoggedSlice(
     },
   })
   recordRunEnd(runLog, run)
-  return { run, events: sink.events, commands: sink.commands }
+  return run
 }
 
 /** Refused, never trimmed: a broken file, or a script the bot would have to ignore. */

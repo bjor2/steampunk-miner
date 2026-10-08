@@ -297,6 +297,19 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   its pose, so the field's tug never reaches it; the runs measure shock ticks and hull. A slow
   planet's first lever is `magnetic.electrifiedShareBp`, never the shock time. The slice and P1
   core pins stay `logging/pacingGate.test.ts`'s.
+- **Money to planet 200** (#316 TD scope f, TD pin on #123, ticket 340): `npm run balance:money-p200`
+  runs the lane `logging/moneyPastP200.lane.test.ts`. The bot plays the bot scenario on the first
+  pacing seed to planet 200's core (prices near 1e104), headless, keeping no run log
+  (`playSliceIntoSink`), and folds each event into `moneyLaneLines.ts` as it arrives. It writes
+  `balance-report/money-p200.ndjson`: a first line with the run and its largest price, income and
+  amount, then one line a planet (arrival and departure `drill_power`/`drill_tip`, felt speed as
+  drill ticks per metre of bands 1 to 5, time on the planet, docked and cutting ticks, the trip
+  share in basis points, the largest Money and its significant digits). It fails on any logged
+  event the schema refuses (every money field canonical text, #5), on a run that does not finish
+  and on a log over 1 MB, apart from the first-hour 4 MB gate. A `*.lane.test.ts` file runs only
+  when a CLI filter names it (`vite.config.ts`): it takes hours, so neither `npm test` nor the
+  nightly picks it up. Its rounding rule is unit-tested in `systems/money.test.ts` (charges never
+  round down, income never up, at 1e36, 1e37 and 1e40).
 - **No free cell from item hooks** (GD lock on #206, Vertical pin 1, ticket 323):
   `bot/noFreeCellRuns.ts` is #281's exact check as a harness: the bot arrives on planets 7 and 10
   on-curve and plays to the core on each pacing seed with a bare setup and with items owned, none
