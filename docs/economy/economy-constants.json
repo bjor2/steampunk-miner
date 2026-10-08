@@ -69,6 +69,7 @@
   "moneyQuantum": {
     "unit": "0.001",
     "charges": "ceilMilli",
-    "income": "floorMilli"
+    "income": "floorMilli",
+    "totals": "exact to 40 significant digits, deterministic: past about 1e37 the step is the 40th significant digit, charges round up and income down (#316 scope f, ticket 340)"
   }
 }

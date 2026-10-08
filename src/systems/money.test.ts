@@ -188,6 +188,55 @@ describe('money: the one rounding rule for charges and income', () => {
   })
 })
 
+/** 1 at this power of ten with `tail` as its 40th and 41st significant digits: past 40 digits. */
+function longAmount(exponent: number, tail: string): Money {
+  return m(`1.${'0'.repeat(38)}${tail}e+${exponent}`)
+}
+
+describe('money: the rounding rule past 1e37 (40 significant digits, ticket 340)', () => {
+  const MAGNITUDES = [36, 37, 40]
+
+  it.each(MAGNITUDES)('never rounds a charge down at 1e%i', (exponent) => {
+    for (const tail of ['01', '45', '50', '55', '99']) {
+      const charge = longAmount(exponent, tail)
+      expect(cmp(ceilMilli(charge), charge)).toBeGreaterThanOrEqual(0)
+    }
+  })
+
+  it.each(MAGNITUDES)('never rounds income up at 1e%i', (exponent) => {
+    for (const tail of ['01', '45', '50', '55', '99']) {
+      const income = longAmount(exponent, tail)
+      expect(cmp(floorMilli(income), income)).toBeLessThanOrEqual(0)
+    }
+  })
+
+  it.each(MAGNITUDES)('keeps a rounded amount to 40 significant digits at 1e%i', (exponent) => {
+    const rounded = [ceilMilli(longAmount(exponent, '45')), floorMilli(longAmount(exponent, '45'))]
+    for (const amount of rounded) {
+      const mantissa = toCanonical(amount).split('e')[0].replace('.', '')
+      expect(mantissa.length).toBeLessThanOrEqual(40)
+    }
+  })
+
+  it('rounds at the 40th significant digit once it is coarser than 0.001', () => {
+    expect(ceilMilli(longAmount(40, '01'))).toEqual(m(`1.${'0'.repeat(38)}1e+40`))
+    expect(floorMilli(longAmount(40, '99'))).toEqual(m(`1.${'0'.repeat(38)}9e+40`))
+    expect(floorMilli(longAmount(40, '01'))).toEqual(m('1e+40'))
+  })
+
+  it('still rounds at 0.001 at 1e36, where it is the 40th significant digit', () => {
+    const charge = longAmount(36, '01')
+    expect(ceilMilli(charge)).toEqual(add(m('1e36'), m('1e-3')))
+    expect(floorMilli(charge)).toEqual(m('1e36'))
+  })
+
+  it('leaves an amount already on its step unchanged at 1e40', () => {
+    const onStep = m('1.234567890123456789012345678901234567891e+40')
+    expect(ceilMilli(onStep)).toEqual(onStep)
+    expect(floorMilli(onStep)).toEqual(onStep)
+  })
+})
+
 describe('money: whole counts', () => {
   it('turns a safe integer such as a level or a unit count into money', () => {
     expect(toCanonical(fromSafeInteger(156))).toBe('1.56e+2')

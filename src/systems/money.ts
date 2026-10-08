@@ -16,7 +16,12 @@ import Decimal from 'decimal.js'
 /** Bump when the canonical string format or the backend changes; saves and logs record it. */
 export const NUMBER_FORMAT_VERSION = 1
 
-const MoneyDecimal = Decimal.clone({ precision: 40, rounding: Decimal.ROUND_HALF_EVEN })
+/** Every Money value and result keeps at most this many significant digits (#5). */
+const MONEY_SIGNIFICANT_DIGITS = 40
+const MoneyDecimal = Decimal.clone({
+  precision: MONEY_SIGNIFICANT_DIGITS,
+  rounding: Decimal.ROUND_HALF_EVEN,
+})
 
 declare const moneyBrand: unique symbol
 
@@ -128,18 +133,38 @@ export function roundToWhole(amount: Money): Money {
 /**
  * The money quantum (#20, Systems & Economy addition 2): every charge (recharge, repair, rescue
  * fee, travel fee) is rounded up to it and every per-unit sale price down, so totals are exact
- * sums and the money shown always adds up. `economy-constants.json` records the same rule.
+ * sums and the money shown always adds up. Past about 1e37 the 0.001 step is finer than the 40th
+ * significant digit, so the step becomes that digit (#316 TD scope f, ticket 340): totals are
+ * exact to 40 significant digits and deterministic, and the rounding still goes up for a charge
+ * and down for income. `economy-constants.json` records the same rule.
  */
 const MONEY_QUANTUM_DECIMALS = 3
 
-/** Rounds a charge up to the next multiple of 0.001. */
+/** Rounds a charge up to the next 0.001, or the next 40th significant digit when coarser. */
 export function ceilMilli(amount: Money): Money {
-  return wrap(unwrap(amount).toDecimalPlaces(MONEY_QUANTUM_DECIMALS, Decimal.ROUND_CEIL))
+  return wrap(roundToMoneyStep(unwrap(amount), Decimal.ROUND_CEIL))
 }
 
-/** Rounds income (the per-unit ore sale price) down to a multiple of 0.001. */
+/** Rounds income (the per-unit ore sale price) down to 0.001, or the 40th significant digit. */
 export function floorMilli(amount: Money): Money {
-  return wrap(unwrap(amount).toDecimalPlaces(MONEY_QUANTUM_DECIMALS, Decimal.ROUND_FLOOR))
+  return wrap(roundToMoneyStep(unwrap(amount), Decimal.ROUND_FLOOR))
+}
+
+/**
+ * `toDecimalPlaces(3)` alone keeps 41 digits and more past 1e37, which the next operation rounds
+ * half-to-even at the 40th: a charge could end up rounded down. Rounding at the coarser of the
+ * two steps leaves an amount no later operation re-rounds.
+ */
+function roundToMoneyStep(value: Decimal, rounding: Decimal.Rounding): Decimal {
+  if (isMilliFinerThanPrecision(value)) {
+    return value.toSignificantDigits(MONEY_SIGNIFICANT_DIGITS, rounding)
+  }
+  return value.toDecimalPlaces(MONEY_QUANTUM_DECIMALS, rounding)
+}
+
+/** The digit of 0.001 sits past the 40th significant digit of `value`. */
+function isMilliFinerThanPrecision(value: Decimal): boolean {
+  return !value.isZero() && value.e + 1 + MONEY_QUANTUM_DECIMALS > MONEY_SIGNIFICANT_DIGITS
 }
 
 /** A bounded count (level, units, tiles) as money, so it can scale a price. */
