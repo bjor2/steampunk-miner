@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-08T00:10:11Z",
+  "updated_at": "2026-10-08T00:10:13Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -282,9 +282,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #143 (Spec: Dynamite in ~10 sizes with realistic explosions and exponential cost) on c9e49e1",
+      "note": "testing spec #123 (Perf 14 (logging 3): Debug-flag snapshot writers (checkpoints, heap threshold, screenshots)) on 8eea675",
       "stale_after_min": 420,
-      "updated_at": "2026-10-07T23:19:02Z",
+      "updated_at": "2026-10-08T00:10:13Z",
       "host": "grok-bot-vm-452660841"
     }
   },
