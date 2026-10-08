@@ -1,0 +1,11 @@
+{
+  "id": "prop-magnetic-field",
+  "source": "blender",
+  "form": "parts",
+  "status": "placeholder",
+  "color": "#5fb4ff",
+  "partColors": {
+    "aurora-ribbon": "#5fb4ff",
+    "field-dash": "#8fd0ff"
+  }
+}

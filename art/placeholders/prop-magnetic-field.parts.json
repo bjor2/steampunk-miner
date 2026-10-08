@@ -1,0 +1,36 @@
+{
+  "assetId": "prop-magnetic-field",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/prop-magnetic-field/prop-magnetic-field.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [2048, 1024],
+  "maps": {
+    "albedo": "prop-magnetic-field.albedo.ktx2",
+    "normal": "prop-magnetic-field.normal.ktx2",
+    "emissive": "prop-magnetic-field.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "aurora-ribbon",
+      "tier": 1,
+      "rect": [8, 8, 1920, 640],
+      "sizeM": [3.75, 1.25],
+      "pivotM": [1.875, 0.625],
+      "atM": [0.0, 0.0],
+      "z": 1
+    },
+    {
+      "id": "field-dash",
+      "tier": 1,
+      "rect": [8, 664, 256, 32],
+      "sizeM": [0.5, 0.0625],
+      "pivotM": [0.25, 0.0312],
+      "atM": [0.0, -1.0],
+      "z": 1
+    }
+  ]
+}

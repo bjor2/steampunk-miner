@@ -1,11 +1,15 @@
 /**
  * Read-only debug actions (feature-slices.md 3.14), so e2e specs, balance probes and
  * `npm run ore:mix` can read a planet's mix without the slice's internals:
- * `steampunkDebug.features['planet-mix'].mixOf(8, 83921)`, `.histogramOf(8, [83921, 31415])`.
+ * `steampunkDebug.features['planet-mix'].mixOf(8, 83921)`, `.histogramOf(8, [83921, 31415])`;
+ * `.getMagneticLooks()` reads what a magnetic planet draws now (ticket 293), for the e2e state
+ * assert: the sky band the kernel shows and the field lines the slice's layer last picked.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
+import { drawnSkyBand } from '../../scene/skyBandPresence'
 import { histogramLines, histogramProblems } from './histogramCheck'
 import { planetHistogramOf } from './mixHistogram'
+import { drawnFieldArcs } from './scene/fieldArcPresence'
 import { familyRows } from './systems/familyRows'
 import { oreMixFor } from './systems/oreMix'
 
@@ -39,6 +43,16 @@ function histogramOf(planetIndex: unknown, worldSeeds: unknown) {
   }
 }
 
+/** The sky band drawn now (null for none) and the field lines (null with the layer unmounted). */
+function getMagneticLooks() {
+  const band = drawnSkyBand()
+  return {
+    ok: true as const,
+    skyBand: band === null ? null : { colour: band.look.colour, isRibbonDrawn: band.isRibbonDrawn },
+    fieldLines: drawnFieldArcs(),
+  }
+}
+
 function isPlanetIndex(value: unknown): value is number {
   return Number.isSafeInteger(value) && (value as number) >= 1
 }
@@ -51,4 +65,5 @@ export const planetMixDebugActions: Readonly<Record<string, DebugAction>> = {
   describe,
   mixOf,
   histogramOf,
+  getMagneticLooks,
 }

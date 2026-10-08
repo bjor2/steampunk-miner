@@ -1,0 +1,19 @@
+{
+  "source": "GD lock on spec #258 Q1 'On screen' (a thin blue aurora band along the surface horizon; blue field lines as faint dashed arcs bending between ferrous veins) and the GD ruling on #293 Q1 (the aurora on the kernel's planet sky band; field lines faint on every magnetic planet). Look numbers, tuned by eye in npm run dev (ticket 293); shares are of a field's radius or of the span between two veins.",
+  "aurora": {
+    "colour": "#5fb4ff",
+    "heightM": 2,
+    "thicknessM": 5,
+    "flicker": 0.35
+  },
+  "fieldLines": {
+    "colour": "#8fd0ff",
+    "opacity": 0.45,
+    "dashM": 0.5,
+    "flowMPerSecond": 0.4,
+    "segmentsPerArc": 16,
+    "lobeReachShare": 0.8,
+    "lobeBendShares": [0.4, 0.8],
+    "pairBendShare": 0.25
+  }
+}
