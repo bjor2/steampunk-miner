@@ -285,6 +285,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   down-right and a down-left bore of six cells from the surface east of the pad. The eye check in
   `npm run dev` plays it from the console: take `s` from `twinBitDiagonal()`, then call
   `steampunkDebug.fastForward(s.ticks, s.commands)`.
+- **No free cell from item hooks** (GD lock on #206, Vertical pin 1, ticket 323):
+  `bot/noFreeCellRuns.ts` is #281's exact check as a harness: the bot arrives on planets 7 and 10
+  on-curve and plays to the core on each pacing seed with a bare setup and with items owned, none
+  slotted and no slot pressed, and the cells dug, their ticks, the ore value and the core tick must
+  match exactly. `bot/itemHookNoFreeCell.test.ts` runs it with every registered `combo.*` item
+  owned and skips while none is registered; the lane consults and the combo and twist builds call
+  `noFreeCellRunsOn` with their own setups (both lists the same length, so the `seq`s line up).
 - **Bot combat** (#130): the bot meets a hunting enemy with the drill head between bores (#29), and
   on the move too once its vehicle was destroyed on that planet; travel resets that. A run with no
   death plays as before, and a fatal dive no longer replays after every tow (`bot/botCombat.test.ts`,

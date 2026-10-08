@@ -266,7 +266,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
-### `sensing`: 19 files, 120 tests
+### `sensing`: 20 files, 122 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -278,6 +278,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/echoPing.test.ts` | 7 | 7 |
 | `src/features/sensing/systems/gatesFixture.test.ts` | 22 | 3 |
 | `src/features/sensing/systems/hazardBarometer.test.ts` | 5 | 5 |
+| `src/features/sensing/systems/itemHookReach.test.ts` | 2 | 2 |
 | `src/features/sensing/systems/passiveReach.test.ts` | 3 | 3 |
 | `src/features/sensing/systems/passiveReads.test.ts` | 4 | 4 |
 | `src/features/sensing/systems/render/revealLook.test.ts` | 3 | 3 |
@@ -468,6 +469,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/refinery/refineryRules.test.ts` | 15 | 15 |
 | `src/systems/authority/refinery/refinerySlots.test.ts` | 4 | 4 |
 | `src/systems/authority/sellCoins.test.ts` | 8 | 8 |
+| `src/systems/authority/sensingQueries.test.ts` | 10 | 10 |
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
 | `src/systems/authority/sessionSnapshot.test.ts` | 19 | 19 |
 | `src/systems/authority/signatureCells.test.ts` | 9 | 9 |
@@ -506,7 +508,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/bot/chargeSharePayoff.test.ts` | 6 | 6 |
 | `src/systems/bot/chargeSizeTrade.test.ts` | 4 | 4 |
 | `src/systems/bot/endlessPlanning.test.ts` | 6 | 3 |
+| `src/systems/bot/itemHookNoFreeCell.test.ts` | 0 | 1 |
 | `src/systems/bot/leadCellHardness.test.ts` | 3 | 3 |
+| `src/systems/bot/noFreeCellRuns.test.ts` | 2 | 2 |
 | `src/systems/bot/spreeTargets.test.ts` | 10 | 10 |
 
 ### `debug`
@@ -541,6 +545,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/gunStats.test.ts` | 9 | 9 |
 | `src/systems/economy/heatEconomy.test.ts` | 11 | 11 |
 | `src/systems/economy/itemEffectCaps.test.ts` | 6 | 6 |
+| `src/systems/economy/itemHookCaps.test.ts` | 8 | 8 |
 | `src/systems/economy/magnetCaps.test.ts` | 5 | 5 |
 | `src/systems/economy/oreEconomy.test.ts` | 7 | 7 |
 | `src/systems/economy/planetCharges.test.ts` | 16 | 12 |
@@ -681,6 +686,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/hullDamageIntercepts.test.ts` | 5 | 5 |
 | `src/systems/registries/itemDescriber.test.ts` | 7 | 7 |
 | `src/systems/registries/itemDescriptionEntries.test.ts` | 5 | 5 |
+| `src/systems/registries/itemHooks.test.ts` | 11 | 11 |
 | `src/systems/registries/oreLook.test.ts` | 2 | 2 |
 | `src/systems/registries/oreTypes.test.ts` | 12 | 12 |
 | `src/systems/registries/saveSections.test.ts` | 3 | 3 |
