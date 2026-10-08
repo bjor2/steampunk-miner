@@ -5,7 +5,11 @@ import { PHYSICS_TIMESTEP } from '../constants/physics'
 import { MAX_GROUND_COLLIDERS } from '../constants/scene'
 import { createMemorySink, type MemorySink } from '../logging/eventSink'
 import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
-import { createVehicleBody, createVehicleController } from './vehicleController'
+import {
+  createVehicleBody,
+  createVehicleController,
+  type VehicleControllerOptions,
+} from './vehicleController'
 import { readLocalVehicle, readPlanetWorld, resetGameStore } from '../store/gameStore'
 import { buildIntent } from '../systems/input/buildIntent'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
@@ -31,24 +35,35 @@ beforeEach(() => {
 
 afterEach(() => uninstallRunLog())
 
-function createLiveVehicle() {
+function createLiveVehicle(options: VehicleControllerOptions = {}) {
   const world = new RAPIER.World({ x: 0, y: 0, z: 0 })
   world.timestep = PHYSICS_TIMESTEP
   const start = readLocalVehicle().pose
   if (start === null) throw new Error('the starting planet has no dock')
-  const body = createVehicleBody(RAPIER, world, start)
-  const controller = createVehicleController(RAPIER, world, body)
+  const placed = createVehicleBody(RAPIER, world, start)
+  const controller = createVehicleController(RAPIER, world, placed, options)
   const loop = createVehicleLoop()
+  const origins = new Set<string>()
   return {
-    body,
     controller,
+    origins,
     hold(intent: VehicleIntent, seconds: number) {
       for (let step = 0; step < seconds / PHYSICS_TIMESTEP; step++) {
         loop.step(controller, intent)
         world.step()
+        const { xMm, yMm } = controller.renderOrigin()
+        origins.add(`${xMm},${yMm}`)
       }
     },
   }
+}
+
+/** A fresh store and run log, for a second run in the same test. */
+function restartRun(): void {
+  uninstallRunLog()
+  resetGameStore()
+  sink = createMemorySink()
+  installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
 }
 
 const lastPose = () => {
@@ -65,7 +80,7 @@ describe('vehicle loop', () => {
     // The Sell bay is the pad's west end (#170), so off the pad is to the left.
     vehicle.hold(buildIntent(['aim_left']), 2)
     vehicle.hold(buildIntent(['aim_down']), 5)
-    const { x, y } = vehicle.body.translation()
+    const { x, y } = vehicle.controller.planetPosition()
     const { params } = readPlanetWorld()
     expect(destroyedTiles().length).toBeGreaterThanOrEqual(3)
     expect(Math.floor(y)).toBeLessThan(surfaceRowOfColumn(Math.floor(x), params?.radiusTiles ?? 0))
@@ -78,15 +93,15 @@ describe('vehicle loop', () => {
     vehicle.hold(buildIntent(['aim_right']), 2)
     vehicle.hold(buildIntent(['aim_down']), 6)
     vehicle.hold(IDLE_INTENT, 0.5)
-    const start = vehicle.body.translation()
+    const start = vehicle.controller.planetPosition()
     const startRadius = Math.hypot(start.x, start.y)
     const radii: number[] = []
     for (let second = 0; second < 12; second++) {
       vehicle.hold(buildIntent(['aim_right']), 1)
-      const { x, y } = vehicle.body.translation()
+      const { x, y } = vehicle.controller.planetPosition()
       radii.push(Math.hypot(x, y))
     }
-    expect(vehicle.body.translation().x - start.x).toBeGreaterThan(8)
+    expect(vehicle.controller.planetPosition().x - start.x).toBeGreaterThan(8)
     expect(vehicle.controller.colliderCount()).toBeGreaterThan(0)
     expect(vehicle.controller.colliderCount()).toBeLessThanOrEqual(MAX_GROUND_COLLIDERS)
     for (const radius of radii) expect(Math.abs(radius - startRadius)).toBeLessThan(0.4)
@@ -96,18 +111,18 @@ describe('vehicle loop', () => {
     const vehicle = createLiveVehicle()
     vehicle.hold(buildIntent(['aim_right']), 2)
     vehicle.hold(buildIntent(['aim_down']), 4)
-    const bottom = vehicle.body.translation().y
+    const bottom = vehicle.controller.planetPosition().y
     vehicle.hold({ ...IDLE_INTENT, lift: true }, 1.5)
-    expect(vehicle.body.translation().y).toBeGreaterThan(bottom + 3)
+    expect(vehicle.controller.planetPosition().y).toBeGreaterThan(bottom + 3)
   })
 
   it('climbs on W alone, and S pressed after W stops the thrust at the next pose report (#40)', () => {
     const vehicle = createLiveVehicle()
     vehicle.hold(buildIntent(['aim_right']), 2)
     vehicle.hold(buildIntent(['aim_down']), 4)
-    const bottom = vehicle.body.translation().y
+    const bottom = vehicle.controller.planetPosition().y
     vehicle.hold(buildIntent(['lift']), 1.5)
-    expect(vehicle.body.translation().y).toBeGreaterThan(bottom + 3)
+    expect(vehicle.controller.planetPosition().y).toBeGreaterThan(bottom + 3)
     expect(lastPose()).toMatchObject({ thrusting: true, facing: FACING.up })
     vehicle.hold(buildIntent(['lift', 'aim_down']), 0.25)
     expect(lastPose().thrusting).toBe(false)
@@ -122,5 +137,25 @@ describe('vehicle loop', () => {
     const spent = before - readLocalVehicle().energy
     expect(spent).toBeGreaterThan(0)
     expect(spent).toBeLessThanOrEqual(SWIVEL_TICKS * ENERGY_QUANTA_PER_TICK.thrust)
+  })
+
+  it('drills on through a moved render origin as if it had never moved (ticket 339)', () => {
+    const digAndTunnel = (options: VehicleControllerOptions) => {
+      restartRun()
+      const vehicle = createLiveVehicle(options)
+      vehicle.hold(buildIntent(['aim_left']), 2)
+      vehicle.hold(buildIntent(['aim_down']), 5)
+      vehicle.hold(buildIntent(['aim_left']), 4)
+      const tiles = destroyedTiles().map((event) => JSON.stringify(event.data))
+      return { tiles, at: vehicle.controller.planetPosition(), origins: vehicle.origins }
+    }
+    const steady = digAndTunnel({})
+    const moving = digAndTunnel({ originReachMm: 0 })
+    expect(steady.origins.size).toBe(1)
+    expect(moving.origins.size).toBeGreaterThan(1)
+    expect(steady.tiles.length).toBeGreaterThan(10)
+    expect(moving.tiles).toEqual(steady.tiles)
+    expect(Math.abs(moving.at.x - steady.at.x)).toBeLessThanOrEqual(0.001)
+    expect(Math.abs(moving.at.y - steady.at.y)).toBeLessThanOrEqual(0.001)
   })
 })

@@ -14,6 +14,7 @@ import { VehicleGuns } from './VehicleGuns'
 import { VehiclePieces } from './VehiclePieces'
 import { VehiclePlaceholder } from './VehiclePlaceholder'
 import { createVehicleLoop } from './vehicleLoop'
+import { renderOriginPresence } from './renderOriginPresence'
 import { vehiclePresence } from './vehiclePresence'
 import { vehicleStagePresence } from './vehicleStage'
 
@@ -28,6 +29,7 @@ export function Vehicle() {
       startPose={startPose}
       onFixedStep={stepVehicle}
       presence={vehiclePresence}
+      origin={renderOriginPresence}
       stage={vehicleStagePresence}
     >
       {(controller) => (

@@ -4,14 +4,16 @@
  * the last step by the step blend, so it glides on every frame instead of jumping on the frames
  * that complete a step (presentation only; nothing per-frame reaches React state). The drawn car
  * is shifted by the dock building's staging (#170 auto-roll) and turned about its own up axis on a
- * turntable (#180), which never moves or turns the body.
+ * turntable (#180), which never moves or turns the body. The body is measured from the render origin
+ * (ticket 339); the car is drawn in planet metres under the scene's world root, and the origin it was
+ * drawn from is published with it, so the root, the camera and the particles move the same frame.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { useFrame } from '@react-three/fiber'
 import { useBeforePhysicsStep, useRapier } from '@react-three/rapier'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Quaternion, Vector3, type Group } from 'three'
-import { BODY_DRAW_FRAME_PRIORITY } from '../constants/physics'
+import { BODY_DRAW_FRAME_PRIORITY, MM_PER_METRE } from '../constants/physics'
 import { turnedWidthShareOf } from '../systems/render/stagedTurn'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
 import { stepBlend } from './stepBlend'
@@ -27,6 +29,8 @@ interface VehicleBodyProps {
   onFixedStep: (controller: VehicleController) => void
   /** Written every frame with where the car is drawn, for the camera, terrain and lighting. */
   presence: { x: number; y: number }
+  /** Written every frame with the render origin in metres, for the world root and the camera. */
+  origin: { x: number; y: number }
   /** Where the car is drawn from the body, and its turn; none unless a dock building stages it. */
   stage: DrawStaging
   children: (controller: VehicleController) => ReactNode
@@ -59,6 +63,7 @@ export function VehicleBody({
   startPose,
   onFixedStep,
   presence,
+  origin,
   stage,
   children,
 }: VehicleBodyProps) {
@@ -68,8 +73,9 @@ export function VehicleBody({
   const poses = useMemo(createStepPoses, [])
 
   useEffect(() => {
-    const body = createVehicleBody(rapier, world, startPose)
-    const controller = createVehicleController(rapier, world, body)
+    const placed = createVehicleBody(rapier, world, startPose)
+    const controller = createVehicleController(rapier, world, placed)
+    const { body } = placed
     readBodyPose(body, poses.stepStart)
     setMounted({ body, controller })
     return () => {
@@ -89,7 +95,7 @@ export function VehicleBody({
 
   useFrame(() => {
     if (mounted !== null && group.current !== null)
-      drawBetweenSteps(mounted.body, poses, group.current, presence, stage)
+      drawBetweenSteps(mounted, poses, group.current, { presence, origin }, stage)
   }, BODY_DRAW_FRAME_PRIORITY)
 
   return <group ref={group}>{mounted === null ? null : children(mounted.controller)}</group>
@@ -110,18 +116,38 @@ function readBodyPose(body: RAPIER.RigidBody, into: DrawnPose): void {
   into.quaternion.set(rotation.x, rotation.y, rotation.z, rotation.w)
 }
 
+/** Where the drawn car and the origin it was measured from are published each frame. */
+interface DrawnPresence {
+  presence: { x: number; y: number }
+  origin: { x: number; y: number }
+}
+
 function drawBetweenSteps(
-  body: RAPIER.RigidBody,
+  mounted: MountedVehicle,
   poses: StepPoses,
   group: Group,
-  presence: { x: number; y: number },
+  drawn: DrawnPresence,
   stage: DrawStaging,
 ): void {
-  readBodyPose(body, poses.latest)
+  readBodyPose(mounted.body, poses.latest)
   blendStepPoses(poses.stepStart, poses.latest, group)
+  measureFromPlanetCentre(group, mounted.controller, drawn.origin)
   stageDrawnCar(group, stage)
-  presence.x = group.position.x
-  presence.y = group.position.y
+  drawn.presence.x = group.position.x
+  drawn.presence.y = group.position.y
+}
+
+/** Both step poses are read after the step's re-centring, so they share the origin added here. */
+function measureFromPlanetCentre(
+  group: Group,
+  controller: VehicleController,
+  origin: { x: number; y: number },
+): void {
+  const { xMm, yMm } = controller.renderOrigin()
+  origin.x = xMm / MM_PER_METRE
+  origin.y = yMm / MM_PER_METRE
+  group.position.x += origin.x
+  group.position.y += origin.y
 }
 
 /** The body's place and turn `stepBlend.share` of the way through the last step. */

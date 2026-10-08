@@ -7,9 +7,26 @@
  *
  * The world here is 3D Rapier used as 2D (CLAUDE.md): Z translation is locked, only rotation
  * about Z is free, and world gravity is zero because gravity is radial (#7).
+ *
+ * Rapier is f32, so it measures from a floating render origin near the rig (ticket 339,
+ * `renderOrigin`), never from the planet's centre: every rule here still reads planet metres (the
+ * body's translation plus the origin, in doubles). When the rig gets more than 1 km from the origin,
+ * the origin moves to the nearest chunk corner before the step, and the body and the halo's
+ * colliders are moved by the same whole metres in the other direction: the rig stays where it is on
+ * the planet, with its velocity and contacts, so nothing jumps and no wall goes missing.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
-import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
+import {
+  MM_PER_METRE,
+  PHYSICS_TIMESTEP,
+  RENDER_ORIGIN_REACH_MM,
+  VEHICLE_COLLIDER_SIZE,
+} from '../constants/physics'
+import {
+  isPastOriginReach,
+  renderOriginNear,
+  type RenderOrigin,
+} from '../systems/render/renderOrigin'
 import { blockOfPoint } from '../systems/vehicle/colliderHalo'
 import { drillContactOf, type DrillContact } from '../systems/vehicle/drillContact'
 import { drillStampOf } from '../systems/vehicle/drillStamp'
@@ -42,7 +59,7 @@ import {
 } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
 import { ISO_DENSITY } from '../systems/world/sampleGrid'
-import { createGroundHalo } from './groundHalo'
+import { createGroundHalo, type GroundHalo } from './groundHalo'
 
 type Rapier = typeof RAPIER
 
@@ -78,9 +95,24 @@ export interface VehicleController {
   step(input: VehicleStepInput, planet: PlanetView): VehicleStepResult
   /** A respawn on the dock after the tow or a planet change: the one time the body is placed. */
   placeAt(pose: VehiclePose): void
+  /** Where the body is, in planet metres. */
+  planetPosition(): Vector2
+  /** The point the body's Rapier translation is measured from. */
+  renderOrigin(): RenderOrigin
   drillHead(): DrillHead
   colliderCount(): number
   dispose(): void
+}
+
+/** A vehicle body and the render origin its translation is measured from. */
+export interface PlacedVehicleBody {
+  body: RAPIER.RigidBody
+  origin: RenderOrigin
+}
+
+export interface VehicleControllerOptions {
+  /** How far the rig may get from the render origin before it moves; 1 km unless a spec says. */
+  originReachMm?: number
 }
 
 /** Collision blocks of halo round the vehicle's block; at 0.27 m per step it never outruns one. */
@@ -89,20 +121,22 @@ export const HALO_RADIUS_BLOCKS = 1
 /** Share of the remaining tilt removed per step; under 1 so contact pushes settle smoothly. */
 const RIGHTING_GAIN = 0.5
 
-const MM = 1000
+const MM = MM_PER_METRE
 
 // Reused every physics step: setLinvel and setAngvel copy what they are given.
 const scratchVelocity = { x: 0, y: 0, z: 0 }
 const scratchSpin = { x: 0, y: 0, z: 0 }
 
+/** The body at a pose, measured from the chunk corner nearest it. */
 export function createVehicleBody(
   rapier: Rapier,
   world: RAPIER.World,
   pose: VehiclePose,
-): RAPIER.RigidBody {
+): PlacedVehicleBody {
+  const origin = renderOriginNear(pose.x, pose.y)
   const body = world.createRigidBody(
     rapier.RigidBodyDesc.dynamic()
-      .setTranslation(pose.x / MM, pose.y / MM, 0)
+      .setTranslation((pose.x - origin.xMm) / MM, (pose.y - origin.yMm) / MM, 0)
       .enabledTranslations(true, true, false)
       .enabledRotations(false, false, true)
       .setGravityScale(0)
@@ -110,21 +144,34 @@ export function createVehicleBody(
   )
   const half = VEHICLE_COLLIDER_SIZE / 2
   world.createCollider(rapier.ColliderDesc.cuboid(half, half, half).setFriction(0), body)
-  return body
+  return { body, origin }
+}
+
+/** The render origin the body and the halo are measured from; one object, moved in place. */
+interface BodyFrame {
+  origin: RenderOrigin
+  reachMm: number
 }
 
 export function createVehicleController(
   rapier: Rapier,
   world: RAPIER.World,
-  body: RAPIER.RigidBody,
+  placed: PlacedVehicleBody,
+  options: VehicleControllerOptions = {},
 ): VehicleController {
-  const halo = createGroundHalo(rapier, world, HALO_RADIUS_BLOCKS)
+  const { body } = placed
+  const frame: BodyFrame = {
+    origin: placed.origin,
+    reachMm: options.originReachMm ?? RENDER_ORIGIN_REACH_MM,
+  }
+  const halo = createGroundHalo(rapier, world, HALO_RADIUS_BLOCKS, frame.origin)
   let head = newDrillHead(FACING.right)
   let up: Vector2 = { x: 0, y: 1 }
 
   return {
     step(input, planet) {
-      const position = vectorOf(body.translation())
+      recentreWhenFar(body, halo, frame)
+      const position = planetPositionOf(body, frame.origin)
       const velocity = vectorOf(body.linvel())
       up = localUpOf(position, up)
       halo.syncAround(blockOfPoint(position), planet.worldVersion, {
@@ -162,14 +209,51 @@ export function createVehicleController(
       }
     },
     placeAt(pose) {
-      body.setTranslation({ x: pose.x / MM, y: pose.y / MM, z: 0 }, true)
+      moveOrigin(halo, frame, renderOriginNear(pose.x, pose.y))
+      body.setTranslation(fromOrigin(pose, frame.origin), true)
       body.setLinvel({ x: 0, y: 0, z: 0 }, true)
       head = newDrillHead(pose.facing)
     },
+    planetPosition: () => planetPositionOf(body, frame.origin),
+    renderOrigin: () => frame.origin,
     drillHead: () => head,
     colliderCount: () => halo.colliderCount(),
     dispose: () => halo.dispose(),
   }
+}
+
+/**
+ * Past the reach the origin moves to the chunk corner nearest the rig. Moving the body with it is
+ * no teleport: it changes only what Rapier measures from, by whole metres, so the body keeps its
+ * place on the planet, its velocity and, with the walls moved alike, every contact.
+ */
+function recentreWhenFar(body: RAPIER.RigidBody, halo: GroundHalo, frame: BodyFrame): void {
+  const { x, y } = planetPositionOf(body, frame.origin)
+  if (!isPastOriginReach(frame.origin, x * MM, y * MM, frame.reachMm)) return
+  const was = frame.origin
+  moveOrigin(halo, frame, renderOriginNear(x * MM, y * MM))
+  shiftBody(body, was, frame.origin)
+}
+
+function moveOrigin(halo: GroundHalo, frame: BodyFrame, next: RenderOrigin): void {
+  frame.origin = next
+  halo.moveOrigin(next)
+}
+
+/** Both origins are chunk corners, so the shift is whole metres and f32 adds it exactly. */
+function shiftBody(body: RAPIER.RigidBody, was: RenderOrigin, now: RenderOrigin): void {
+  const at = body.translation()
+  const shift = { x: (was.xMm - now.xMm) / MM, y: (was.yMm - now.yMm) / MM }
+  body.setTranslation({ x: at.x + shift.x, y: at.y + shift.y, z: 0 }, true)
+}
+
+function planetPositionOf(body: RAPIER.RigidBody, origin: RenderOrigin): Vector2 {
+  const at = body.translation()
+  return { x: at.x + origin.xMm / MM, y: at.y + origin.yMm / MM }
+}
+
+function fromOrigin(pose: VehiclePose, origin: RenderOrigin): { x: number; y: number; z: number } {
+  return { x: (pose.x - origin.xMm) / MM, y: (pose.y - origin.yMm) / MM, z: 0 }
 }
 
 /**

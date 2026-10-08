@@ -5,7 +5,8 @@
  * colliders; which blocks belong in it, and their segments, are the pure rules in `colliderHalo`.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
-import { WALL_HALF_DEPTH } from '../constants/physics'
+import { COLLISION_BLOCK_METRES, MM_PER_METRE, WALL_HALF_DEPTH } from '../constants/physics'
+import type { RenderOrigin } from '../systems/render/renderOrigin'
 import {
   blocksAround,
   chunksUnderBlock,
@@ -25,22 +26,32 @@ export interface HaloGround {
 export interface GroundHalo {
   /** Keeps the blocks round `centre` current; cheap when nothing moved or changed. */
   syncAround(centre: BlockPoint, worldVersion: unknown, ground: HaloGround): void
+  /** Measures every collider from another render origin: they stay where they are on the planet. */
+  moveOrigin(origin: RenderOrigin): void
   /** How many ground colliders exist now (the #4 budget counts them). */
   colliderCount(): number
   dispose(): void
 }
 
 interface BlockCollider {
+  block: BlockPoint
   versions: unknown[]
   collider: RAPIER.Collider | null
+}
+
+/** The render origin the halo's colliders are measured from; one object, moved in place. */
+interface HaloFrame {
+  origin: RenderOrigin
 }
 
 export function createGroundHalo(
   rapier: Rapier,
   world: RAPIER.World,
   radiusBlocks: number,
+  origin: RenderOrigin,
 ): GroundHalo {
   const blocks = new Map<string, BlockCollider>()
+  const frame: HaloFrame = { origin }
   let last: { bx: number; by: number; worldVersion: unknown } | null = null
 
   return {
@@ -51,7 +62,11 @@ export function createGroundHalo(
       last = { ...centre, worldVersion }
       const wanted = new Map(blocksAround(centre, radiusBlocks).map((b) => [keyOf(b), b]))
       removeUnwanted(world, blocks, wanted)
-      refreshWanted(rapier, world, blocks, wanted, ground)
+      refreshWanted(rapier, world, blocks, wanted, ground, frame)
+    },
+    moveOrigin(next) {
+      frame.origin = next
+      for (const block of blocks.values()) placeAtCorner(block, next)
     },
     colliderCount: () => countColliders(blocks),
     dispose() {
@@ -90,13 +105,15 @@ function refreshWanted(
   blocks: Map<string, BlockCollider>,
   wanted: ReadonlyMap<string, BlockPoint>,
   ground: HaloGround,
+  frame: HaloFrame,
 ): void {
   for (const [key, block] of wanted) {
     const versions = chunksUnderBlock(block).map(({ cx, cy }) => ground.chunkVersion(cx, cy))
     const current = blocks.get(key)
     if (current !== undefined && isSameVersions(current.versions, versions)) continue
     if (current !== undefined) removeCollider(world, current)
-    blocks.set(key, { versions, collider: createWalls(rapier, world, block, ground.densityAt) })
+    const collider = createWalls(rapier, world, block, ground.densityAt, frame.origin)
+    blocks.set(key, { block, versions, collider })
   }
 }
 
@@ -114,14 +131,39 @@ function createWalls(
   world: RAPIER.World,
   block: BlockPoint,
   densityAt: DensityAt,
+  origin: RenderOrigin,
 ): RAPIER.Collider | null {
   const segments = wallSegmentsOf(block, densityAt)
   if (segments.length === 0) return null
   const count = segments.length / 4
   const vertices = new Float32Array(count * 12)
   const indices = new Uint32Array(count * 6)
-  for (let at = 0; at < count; at++) writeWall(vertices, indices, segments, at)
-  return world.createCollider(rapier.ColliderDesc.trimesh(vertices, indices))
+  const corner = cornerOf(block)
+  for (let at = 0; at < count; at++) writeWall(vertices, indices, segments, at, corner)
+  const offset = cornerFromOrigin(block, origin)
+  return world.createCollider(
+    rapier.ColliderDesc.trimesh(vertices, indices).setTranslation(offset.x, offset.y, 0),
+  )
+}
+
+function placeAtCorner(block: BlockCollider, origin: RenderOrigin): void {
+  if (block.collider === null) return
+  const offset = cornerFromOrigin(block.block, origin)
+  block.collider.setTranslation({ x: offset.x, y: offset.y, z: 0 })
+}
+
+/** A block's corner in planet metres: whole metres, so exact in a double. */
+function cornerOf(block: BlockPoint): { x: number; y: number } {
+  return { x: block.bx * COLLISION_BLOCK_METRES, y: block.by * COLLISION_BLOCK_METRES }
+}
+
+/** Whole metres both, so the difference is exact before f32 sees it. */
+function cornerFromOrigin(block: BlockPoint, origin: RenderOrigin): { x: number; y: number } {
+  const corner = cornerOf(block)
+  return {
+    x: corner.x - origin.xMm / MM_PER_METRE,
+    y: corner.y - origin.yMm / MM_PER_METRE,
+  }
 }
 
 function writeWall(
@@ -129,8 +171,9 @@ function writeWall(
   indices: Uint32Array,
   segments: readonly number[],
   at: number,
+  corner: { x: number; y: number },
 ): void {
-  const [ax, ay, bx, by] = segments.slice(at * 4, at * 4 + 4)
+  const [ax, ay, bx, by] = cornerRelative(segments.slice(at * 4, at * 4 + 4), corner)
   vertices.set(
     [
       ax,
@@ -150,4 +193,14 @@ function writeWall(
   )
   const first = at * 4
   indices.set([first, first + 1, first + 2, first, first + 2, first + 3], at * 6)
+}
+
+/** A segment's ends from the block's corner: under 4 m, where f32 holds them to a micrometre. */
+function cornerRelative(segment: number[], corner: { x: number; y: number }): number[] {
+  return [
+    segment[0] - corner.x,
+    segment[1] - corner.y,
+    segment[2] - corner.x,
+    segment[3] - corner.y,
+  ]
 }

@@ -47,8 +47,8 @@ function settleVehicleOnSurface(world: RAPIER.World, steps: number) {
     upy: 1024,
     facing: FACING.right,
   }
-  const body = createVehicleBody(RAPIER, world, pose)
-  const controller = createVehicleController(RAPIER, world, body)
+  const placed = createVehicleBody(RAPIER, world, pose)
+  const controller = createVehicleController(RAPIER, world, placed)
   const planet = {
     radiusTiles: PARAMS.radiusTiles,
     gravityMultiplier: 1,
@@ -60,7 +60,7 @@ function settleVehicleOnSurface(world: RAPIER.World, steps: number) {
     controller.step({ intent: IDLE_INTENT, engine: engineStats(0), canAct: true }, planet)
     world.step()
   }
-  return { body, controller }
+  return { body: placed.body, controller }
 }
 
 describe('debug api: physics stats (#119)', () => {

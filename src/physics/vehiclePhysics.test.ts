@@ -58,8 +58,8 @@ function createHarness(world: WorldState, start: { x: number; y: number }) {
     upy: 1024,
     facing: FACING.right,
   }
-  const body = createVehicleBody(RAPIER, rapierWorld, pose)
-  const controller = createVehicleController(RAPIER, rapierWorld, body)
+  const placed = createVehicleBody(RAPIER, rapierWorld, pose)
+  const controller = createVehicleController(RAPIER, rapierWorld, placed)
   const ground = groundReaderOf(world, PARAMS)
   const planet = {
     radiusTiles: PARAMS.radiusTiles,
@@ -70,12 +70,13 @@ function createHarness(world: WorldState, start: { x: number; y: number }) {
   }
   const insideSolid: { x: number; y: number }[] = []
   return {
-    body,
+    body: placed.body,
+    position: () => controller.planetPosition(),
     run(intent: VehicleIntent, steps: number) {
       for (let step = 0; step < steps; step++) {
         controller.step({ intent, engine: engineStats(0), canAct: true }, planet)
         rapierWorld.step()
-        const { x, y } = body.translation()
+        const { x, y } = controller.planetPosition()
         if (ground.densityAtPoint(x, y) >= ISO_DENSITY) insideSolid.push({ x, y })
       }
     },
@@ -84,7 +85,7 @@ function createHarness(world: WorldState, start: { x: number; y: number }) {
   }
 
   function tileOfBody(): TilePoint {
-    const { x, y } = body.translation()
+    const { x, y } = controller.planetPosition()
     return { tx: Math.floor(x), ty: Math.floor(y) }
   }
 }
@@ -128,7 +129,7 @@ describe('vehicle physics', () => {
     harness.body.setLinvel({ x: -16 * up.x, y: -16 * up.y, z: 0 }, true)
     harness.run(IDLE_INTENT, 180)
     expect(harness.insideSolid).toEqual([])
-    const { x, y } = harness.body.translation()
+    const { x, y } = harness.position()
     expect(Math.sqrt(x * x + y * y)).toBeGreaterThan(radius)
   })
 
@@ -152,7 +153,7 @@ describe('vehicle physics', () => {
 
       harness.run(LIFT, 150)
       const out = localTile(turns, 0, -1)
-      const { x, y } = harness.body.translation()
+      const { x, y } = harness.position()
       const outCentre = centreOf(out)
       expect(Math.sqrt(x * x + y * y)).toBeGreaterThan(
         Math.sqrt(outCentre.x ** 2 + outCentre.y ** 2) - 0.5,
