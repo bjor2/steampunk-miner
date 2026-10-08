@@ -1,6 +1,6 @@
 /**
  * Tile geometry the terrain tools share: whole-tile directions from the miner's facing, discs of
- * tiles nearest first with seeded ties, and single grid steps toward or away from a tile. Integer
+ * tiles nearest first with seeded or placed ties, and single grid steps toward or away from a tile. Integer
  * only, so every machine walks the same tiles.
  */
 import { UP_VECTOR_SCALE } from '../../../constants/physics'
@@ -73,6 +73,11 @@ export function distanceSqOf(a: TilePoint, b: TilePoint): number {
 /** Every tile whose centre lies within `radius` tiles of the centre's, nearest first, seeded ties. */
 export function tilesNearestFirst(centre: TilePoint, radius: number, seed: number): TilePoint[] {
   return tilesWithin(centre, radius).sort((a, b) => compareNearest(centre, seed, a, b))
+}
+
+/** The same tiles, nearest first, ties by `tx` and then `ty`: an order with no seed in it. */
+export function tilesNearestFirstByPlace(centre: TilePoint, radius: number): TilePoint[] {
+  return tilesWithin(centre, radius).sort((a, b) => compareNearestByPlace(centre, a, b))
 }
 
 /** The same tiles, farthest first, seeded ties. */
@@ -150,6 +155,12 @@ function tilesWithin(centre: TilePoint, radius: number): TilePoint[] {
 function compareNearest(centre: TilePoint, seed: number, a: TilePoint, b: TilePoint): number {
   const byDistance = distanceSqOf(a, centre) - distanceSqOf(b, centre)
   return byDistance !== 0 ? byDistance : tieBreakOf(seed, a) - tieBreakOf(seed, b)
+}
+
+function compareNearestByPlace(centre: TilePoint, a: TilePoint, b: TilePoint): number {
+  const byDistance = distanceSqOf(a, centre) - distanceSqOf(b, centre)
+  if (byDistance !== 0) return byDistance
+  return a.tx !== b.tx ? a.tx - b.tx : a.ty - b.ty
 }
 
 function snappedOf(component: number, larger: number): number {

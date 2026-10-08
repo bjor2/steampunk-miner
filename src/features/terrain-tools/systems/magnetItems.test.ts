@@ -95,8 +95,10 @@ describe('terrain magnet cards', () => {
       'Wave radius: 2 cells',
     ])
     expect(linesAt('power.lode_clamp', 0)).toEqual([
-      `Hold: pins loose rubble and up to ${cap} diggable cells against collapse and moves nothing`,
+      `Hold: braces the rock around up to ${cap} nearby cells, so the roof over and beside you holds; moves nothing`,
       'Lasts up to: 3 s',
+      'Drains: energy like drilling while held',
+      'When you let go,: the roof warns again before it falls',
     ])
   })
 
@@ -105,12 +107,13 @@ describe('terrain magnet cards', () => {
     expect(linesAt('power.lode_clamp', 30)[1]).toBe('Lasts up to: 6 s')
   })
 
-  it('gives the stepped lines a next Mark until the item is Mastered, and the cap line none', () => {
-    const [capLine, steppedLine] = cardOf('power.lode_clamp')
+  it('gives the stepped lines a next Mark until the item is Mastered, and the fixed lines none', () => {
+    const [capLine, steppedLine, ...wordLines] = cardOf('power.lode_clamp')
       .statLines as readonly DescribedStatLineSpec[]
     const ref = { kind: 'vehicle-item' as const, id: 'power.lode_clamp' }
     const lastMark = lastMarkOf(magnetMarkLadderOf(CLAMP))
     expect(capLine.nextLevel?.(ref, ctxAt(1))).toBeNull()
+    expect(wordLines.map((line) => line.nextLevel?.(ref, ctxAt(1)))).toEqual([null, null])
     expect(steppedLine.nextLevel?.(ref, ctxAt(1))).toBe(2)
     expect(steppedLine.nextLevel?.(ref, ctxAt(lastMark))).toBeNull()
     expect(steppedLine.value(ref, ctxAt(1))).toBe(180)

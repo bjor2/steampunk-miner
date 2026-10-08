@@ -34,7 +34,8 @@ declare module '../../../systems/authority/domainEvent' {
     }
     /**
      * A terrain magnet acted: the cells it moved through the kernel's magnet shift (#283) and the
-     * energy those moves cost, in quanta. A repulsor wave that pushed only enemies moved no cell.
+     * energy those moves cost, in quanta. A repulsor wave that pushed only enemies moved no cell;
+     * a lode clamp moves none and logs once as its field ends, with the energy the hold drew.
      */
     'terrain-tools.MagnetUsed': {
       playerId: string
@@ -53,6 +54,7 @@ export const TERRAIN_REFUSAL = {
   nothingToOpen: 'terrain-tools.nothing_to_open',
   beaconLive: 'terrain-tools.beacon_live',
   nothingToPush: 'terrain-tools.nothing_to_push',
+  nothingToPin: 'terrain-tools.nothing_to_pin',
   outOfPlay: 'terrain-tools.out_of_play',
 } as const
 

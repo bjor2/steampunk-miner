@@ -53,18 +53,23 @@ function markOfLevel(level: number): number {
   return Math.max(FIRST_MARK, level)
 }
 
-/** The cells-moved cap is the same at every Mark; the radius and the duration are Mark-stepped. */
+/**
+ * The cells-moved cap and a line of words are the same at every Mark; the radius and the duration
+ * are Mark-stepped.
+ */
 function isMarkStepped(line: MagnetCardLine): boolean {
-  return line.reading !== 'maxCellsMoved'
+  return line.reading === 'radius' || line.reading === 'duration'
 }
 
 function lineTextAt(item: MagnetItem, line: MagnetCardLine, mark: number): string {
+  if (line.reading === null) return line.template
   const shown = shownReadingOf(line.reading, readingAt(item, line.reading, mark))
   return line.template.replace(`{${line.reading}}`, shown)
 }
 
-/** The raw value: whole cells, or the hold's whole ticks. */
-function readingAt(item: MagnetItem, reading: MagnetReading, mark: number): number {
+/** The raw value: whole cells, the hold's whole ticks, or none for a line of words. */
+function readingAt(item: MagnetItem, reading: MagnetReading | null, mark: number): number {
+  if (reading === null) return 0
   if (reading === 'maxCellsMoved') return ECONOMY.magnets.maxCellsMoved
   return markStepOf(magnetMarkLadderOf(item), mark).stats.magnitude ?? 0
 }

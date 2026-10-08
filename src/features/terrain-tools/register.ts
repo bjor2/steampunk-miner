@@ -6,7 +6,10 @@
  * `terrain-tools` section and gathers at its owner's dock; combo item hooks hear it through the
  * kernel `liveBeacon` provider, and the shifter's drag consults the `dragTarget` hook (ticket 326).
  * The repulsor coil (ticket 284), the first terrain magnet with its effect, pushes cells through
- * the kernel's magnet shift and metal enemies one cell out, and logs `magnet_used`.
+ * the kernel's magnet shift and metal enemies one cell out, and logs `magnet_used`. The lode clamp
+ * (ticket 285) is held from its slot: its field braces the collapse blocks round the cells it pins
+ * through the kernel's `collapseBraces` seam, draws the drill's rate a tick in its clock step, and
+ * ends on release, at its length or on a dry tank.
  * Stabiliser foam, the cryo binder, shoring props and the strata press stay vision rows
  * (`systems/shippedTools.ts`). No side effects at import; the loader calls `register`.
  */
@@ -14,6 +17,7 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { terrainToolsDebugActions } from './debug'
 import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
 import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
+import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
 import {
   TERRAIN_ITEM_CARDS,
   TERRAIN_TECH_NODES,
@@ -34,6 +38,8 @@ export const slice: SliceDefinition = {
     r.saveSection(TERRAIN_TOOLS_SECTION)
     r.authorityReaction(LODESTONE_DOCK_REACTION)
     r.liveBeacon(LIVE_LODESTONE_PROVIDER)
+    r.clockStep(HOLD_LODE_CLAMPS_STEP)
+    r.collapseBrace(LODE_CLAMP_BRACES)
     r.eventProjections(TERRAIN_PROJECTIONS)
     r.runEvents(TERRAIN_RUN_EVENTS)
     // steampunkDebug.features['terrain-tools'].getBeacon() / .statPreview(itemId, mark, planet)

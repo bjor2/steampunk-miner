@@ -4,7 +4,8 @@
  * as a stack. When the wind-up ends the tool plans its whole edit on the state the act sees, at the
  * Mark the player researched (#249), and the edit joins the K6 queue on that tick
  * (`terrainOutcome.ts`). The repulsor coil (ticket 284), a charged magnet, releases its push-wave
- * through the kernel's magnet shift instead (`repulsorCoil.ts`).
+ * through the kernel's magnet shift instead (`repulsorCoil.ts`). The lode clamp (ticket 285) is
+ * used by holding its slot: its act locks a field, and letting go ends it (`lodeClamp.ts`).
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
@@ -12,6 +13,7 @@ import type { PowerUp, PowerUpOutcome, PowerUpUse } from '../../power-up-core'
 import type { EditKey } from './editSeed'
 import { openGroundView, type GroundView } from './groundView'
 import { LODESTONE_BEACON_ID, plantLodestone } from './lodestoneBeacon'
+import { clampHoldOf, LODE_CLAMP_ID, lockClampField, releaseClampField } from './lodeClamp'
 import { magnetBalanceOf, type MagnetItem } from './magnetItems'
 import { ORE_SHIFTER_ID, planOreDrag } from './oreShifter'
 import { planPressurePocket, PRESSURE_POCKET_ID } from './pressurePocket'
@@ -32,6 +34,14 @@ const ACTIVATIONS: Readonly<Record<string, Activate>> = {
   [PRESSURE_POCKET_ID]: editWith(planPressurePocket),
   [LODESTONE_BEACON_ID]: plantLodestone,
   [REPULSOR_COIL_ID]: releasePushWave,
+  [LODE_CLAMP_ID]: lockClampField,
+}
+
+/** A magnet used by holding its slot (#164 `hold`): its hold for the slot's ring, and its release. */
+type HoldHooks = Required<Pick<PowerUp, 'holdOf' | 'release'>>
+
+const HOLD_HOOKS: Readonly<Record<string, HoldHooks>> = {
+  [LODE_CLAMP_ID]: { holdOf: clampHoldOf, release: releaseClampField },
 }
 
 export const TERRAIN_POWER_UPS: readonly PowerUp[] = [
@@ -57,7 +67,10 @@ function powerUpOf(item: TerrainItem): PowerUp {
   }
 }
 
-/** A terrain magnet is a charged item: its charges refill at the dock, its cooldown runs per use. */
+/**
+ * A terrain magnet is a charged item: its charges refill at the dock, its cooldown runs per use (a
+ * held one's again from the hold's end).
+ */
 function magnetPowerUpOf(item: MagnetItem): PowerUp {
   const balance = magnetBalanceOf(item)
   return {
@@ -73,6 +86,7 @@ function magnetPowerUpOf(item: MagnetItem): PowerUp {
     isToggle: false,
     energyDrawBpPerSecond: 0,
     activate: ACTIVATIONS[item.itemId],
+    ...HOLD_HOOKS[item.itemId],
   }
 }
 

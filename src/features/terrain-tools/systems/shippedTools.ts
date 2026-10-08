@@ -28,8 +28,8 @@ export const SHIPPED_TERRAIN_ITEMS: readonly TerrainItem[] = TERRAIN_ITEMS.filte
   (item) => !isHeldBack(item.itemId),
 )
 
-/** The terrain magnets that ship with their effect: the repulsor coil (ticket 284). */
-export const SHIPPED_MAGNET_IDS: readonly string[] = ['power.repulsor_coil']
+/** The terrain magnets that ship with their effect: the repulsor coil (284), the lode clamp (285). */
+export const SHIPPED_MAGNET_IDS: readonly string[] = ['power.repulsor_coil', 'power.lode_clamp']
 
 export const SHIPPED_MAGNET_ITEMS: readonly MagnetItem[] = MAGNET_ITEMS.filter((item) =>
   SHIPPED_MAGNET_IDS.includes(item.itemId),

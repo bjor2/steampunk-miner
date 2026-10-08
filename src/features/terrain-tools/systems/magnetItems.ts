@@ -1,12 +1,13 @@
 /**
- * The terrain magnets family's new members (GD lock on #246; card copy from Content on #282):
- * the repulsor coil (repel, a slot tap) and the lode clamp (anchor, a slot hold). The lodestone
- * beacon stays the attract member exactly as `terrainItems.ts` lists it.
+ * The terrain magnets family's new members (GD lock on #246; card copy from Content on #282, the
+ * clamp's rewritten on #285 to match its braces): the repulsor coil (repel, a slot tap) and the
+ * lode clamp (anchor, a slot hold). The lodestone beacon stays the attract member exactly as
+ * `terrainItems.ts` lists it.
  *
  * Build 1 of the lock: the rows are ticket 282's. Ticket 300 registers their nodes
  * (`terrainContent.ts`), both rooted at the beacon's; each item registers with its effect
- * (`SHIPPED_MAGNET_ITEMS`: the repulsor coil since ticket 284). A separate list from
- * `TERRAIN_ITEMS`, so registering the lane's items does not ship them.
+ * (`SHIPPED_MAGNET_ITEMS`: the repulsor coil since ticket 284, the lode clamp since 285). A
+ * separate list from `TERRAIN_ITEMS`, so registering the lane's items does not ship them.
  */
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import type { Money } from '../../../systems/money'
@@ -31,12 +32,16 @@ export type MagnetInput = 'tap' | 'hold'
 /** The value a card line prints; its template names it as `{<reading>}`. */
 export type MagnetReading = 'maxCellsMoved' | 'radius' | 'duration'
 
-/** One stat line of the card, as Content wrote it, with its number left as a placeholder. */
+/**
+ * One stat line of the card, as Content wrote it, with its number left as a placeholder. The card
+ * shows the label, a space, then the text.
+ */
 export interface MagnetCardLine {
   label: string
   /** The text after the label, holding `{<reading>}` where the number goes. */
   template: string
-  reading: MagnetReading
+  /** The number the line prints; null for a line of words alone (Content on #285). */
+  reading: MagnetReading | null
 }
 
 export interface MagnetItem {
@@ -104,10 +109,16 @@ export const MAGNET_ITEMS: readonly MagnetItem[] = [
       {
         label: 'Hold',
         template:
-          'pins loose rubble and up to {maxCellsMoved} diggable cells against collapse and moves nothing',
+          'braces the rock around up to {maxCellsMoved} nearby cells, so the roof over and beside you holds; moves nothing',
         reading: 'maxCellsMoved',
       },
       { label: 'Lasts up to', template: '{duration}', reading: 'duration' },
+      { label: 'Drains', template: 'energy like drilling while held', reading: null },
+      {
+        label: 'When you let go,',
+        template: 'the roof warns again before it falls',
+        reading: null,
+      },
     ],
     node: {
       id: 'tech.terrain.lode_clamp',
