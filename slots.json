@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T05:15:27+02:00",
+  "updated_at": "2026-10-08T05:21:18+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -99,7 +99,7 @@
       "size": 4,
       "used": 0,
       "free": 4,
-      "claims_last_hour": 2,
+      "claims_last_hour": 1,
       "name": "Claude Max 2"
     }
   ],
@@ -109,9 +109,9 @@
   },
   "tester": {
     "state": "running",
-    "phase": "nightly-balance-guns",
+    "phase": "nightly-balance-charges",
     "sha": "129bcbd3ab0272abd1d25887d52aecbe55f2b2d9",
-    "since": "2026-10-08T03:15:21Z",
+    "since": "2026-10-08T03:21:16Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-08T00:44:41Z",
