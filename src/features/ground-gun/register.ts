@@ -2,12 +2,13 @@
  * The ground-gun slice (ticket 322's numbers, built out by ticket 314 from #309 build 2): the
  * player's gun levels (`ground-gun` section v1), the mount and the three brass tracks bought at
  * the Upgrade bay with their `bore-gun` content entries (claiming the `bore_gun` row, tagged
- * `armoury`), the gun the kernel's `ground_gun.fire` reads through the `boreGun` provider, and
+ * `armoury`, with their #159 cards), the gun the kernel's `ground_gun.fire` reads through the `boreGun` provider, and
  * the pickup of the ore its bores free, inside the trip's income cap.
  * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { GROUND_GUN_PROJECTIONS, GROUND_GUN_RUN_EVENTS } from './logging'
+import { boreGunCards } from './systems/boreGunCards'
 import { BORE_GUN_KIND, boreGunParts } from './systems/boreGunContent'
 import { BORE_PICKUP_REACTION } from './systems/borePickup'
 import { GROUND_GUN_PROVIDER } from './systems/boreGunProvider'
@@ -19,6 +20,7 @@ export const slice: SliceDefinition = {
   register(r) {
     r.saveSection(GROUND_GUN_SECTION)
     r.content(BORE_GUN_KIND, boreGunParts())
+    r.itemDescriptionEntries(boreGunCards())
     r.commandRules(GUN_PURCHASE_RULES)
     r.boreGun(GROUND_GUN_PROVIDER)
     r.authorityReaction(BORE_PICKUP_REACTION)

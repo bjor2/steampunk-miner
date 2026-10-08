@@ -155,11 +155,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
-### `ground-gun`: 9 files, 78 tests
+### `ground-gun`: 10 files, 83 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/ground-gun/systems/armouryModules.test.ts` | 13 | 13 |
+| `src/features/ground-gun/systems/boreGunCards.test.ts` | 5 | 5 |
 | `src/features/ground-gun/systems/boreGunLaw.test.ts` | 8 | 6 |
 | `src/features/ground-gun/systems/boreLadders.test.ts` | 8 | 8 |
 | `src/features/ground-gun/systems/borePickup.test.ts` | 4 | 4 |
