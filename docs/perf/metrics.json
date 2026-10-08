@@ -7,7 +7,8 @@
     "Memory soak (Electron)",
     "Frame time",
     "Main-thread profile",
-    "Stack"
+    "Stack",
+    "Run log"
   ],
   "metrics": {
     "generateChunk.p1.p50Ms": {
@@ -613,6 +614,28 @@
       "group": "CPU benches (CI runner)",
       "better": "lower",
       "source": "CI bench job, npm run bench:render -- --log, benchmark_result medianUs (#124), collected by the perf analysis pass; GitHub runners differ in CPU model, so a single point can swing about 2x with no code change"
+    },
+    "runLog.firstHourBytes": {
+      "label": "First-hour log · core events + commands · seed 83921",
+      "unit": "bytes",
+      "group": "Run log",
+      "better": "lower",
+      "budget": 4194304,
+      "source": "one-seed probe of the pacingGate first hour (playLoggedSlice on seed 83921, ticks <= 1 h), counted as pacingGate.test.ts counts them (ticket 342); deterministic, so one run gives the number; budget #11 amendment 2"
+    },
+    "runLog.firstHourCommandBytes": {
+      "label": "First-hour commands.ndjson · seed 83921",
+      "unit": "bytes",
+      "group": "Run log",
+      "better": "lower",
+      "source": "one-seed probe of the pacingGate first hour (playLoggedSlice on seed 83921, ticks <= 1 h), counted as pacingGate.test.ts counts them (ticket 342); deterministic, so one run gives the number"
+    },
+    "runLog.commandLogEncodeHourMs": {
+      "label": "Encode one first hour of commands for the log (median of 21)",
+      "unit": "ms",
+      "group": "Run log",
+      "better": "lower",
+      "source": "loggedCommandsOf over the first hour's 14,630 commands in the same probe (ticket 342)"
     }
   }
 }
