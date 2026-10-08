@@ -341,15 +341,18 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 20 files, 171 tests
+### `terrain-tools`: 23 files, 194 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetGuard.test.ts` | 6 | 6 |
 | `src/features/terrain-tools/shippedRows.test.ts` | 7 | 7 |
+| `src/features/terrain-tools/store/clampRelease.test.ts` | 2 | 2 |
+| `src/features/terrain-tools/systems/clampLattice.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/dragHooks.test.ts` | 35 | 8 |
 | `src/features/terrain-tools/systems/gatesFixture.test.ts` | 22 | 5 |
+| `src/features/terrain-tools/systems/lodeClamp.test.ts` | 16 | 12 |
 | `src/features/terrain-tools/systems/lodestoneBeacon.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/magnetItems.test.ts` | 9 | 9 |
 | `src/features/terrain-tools/systems/marksInPlay.test.ts` | 1 | 1 |
@@ -362,7 +365,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/terrainEditCaps.test.ts` | 13 | 3 |
 | `src/features/terrain-tools/systems/terrainItems.test.ts` | 11 | 11 |
 | `src/features/terrain-tools/systems/terrainSales.test.ts` | 2 | 2 |
-| `src/features/terrain-tools/systems/terrainSection.test.ts` | 3 | 3 |
+| `src/features/terrain-tools/systems/terrainSection.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 
