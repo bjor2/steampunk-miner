@@ -69,6 +69,7 @@ export function kernelCommandBuys(maxPlanet: number = FIRST_PLANET): {
     equipItem: NOT_A_BUY,
     buyVehicleItem: soldVehicleItemRefsUpTo(maxPlanet),
     'ground_gun.fire': NOT_A_BUY,
+    'ground_gun.set_auto': NOT_A_BUY,
   }
 }
 

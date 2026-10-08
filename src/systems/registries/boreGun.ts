@@ -12,6 +12,10 @@
  *
  * The recovery wait after a shot is one pure function, `gunRecoveryTicks`, here at the seam so the
  * authority and the slice's store card read the same formula (the TD on #313 and #322).
+ *
+ * Auto mode (ticket 317, #310) reads the steam sear's numbers from the same provider: the preview,
+ * the wait after a manual shot, the energy reserve (#322's `autoShoot`) and whether the trip's
+ * income cap is used up (the slice's `roomUnderCapOf`, which the kernel cannot read).
  */
 import type { AuthorityState } from '../authority/authorityState'
 import { defineOneProviderRegistry, entriesOf } from './seal'
@@ -35,10 +39,22 @@ export interface BoreGunStats {
   collapseHoldTicks: number
 }
 
+/** The steam sear's numbers for auto mode (ticket 317), from #322's `autoShoot` and the sear's Mark. */
+export interface BoreAutoShootStats {
+  previewTicks: number
+  /** Ticks auto waits after a manual shot (60, the sear's Mark stat, floor 20). */
+  manualWaitTicks: number
+  reserveAboveRescueBp: number
+  /** `roomUnderCapOf` is 0 for the gun's ore this trip: auto aim scores ore 0 and holds. */
+  isIncomeCapUsed: boolean
+}
+
 export interface BoreGunProvider {
   id: string
   /** The gun this player fires now, or null when it has none. */
   boreGunOf(state: AuthorityState, playerId: string): BoreGunStats | null
+  /** The sear's numbers for this player, or null (or left out) when auto mode has none. */
+  autoShootOf?(state: AuthorityState, playerId: string): BoreAutoShootStats | null
 }
 
 export const BORE_GUN_REGISTRY = defineOneProviderRegistry<BoreGunProvider>('boreGun')
@@ -65,6 +81,25 @@ export function boreGunOf(state: AuthorityState, playerId: string): BoreGunStats
   const [provider] = entriesOf(BORE_GUN_REGISTRY)
   const stats = provider?.boreGunOf(state, playerId) ?? null
   return stats === null ? null : heldToDrillLaw(stats)
+}
+
+/** The provider's sear numbers, whole and not negative; null with no provider or no answer. */
+export function boreAutoShootOf(
+  state: AuthorityState,
+  playerId: string,
+): BoreAutoShootStats | null {
+  const [provider] = entriesOf(BORE_GUN_REGISTRY)
+  const stats = provider?.autoShootOf?.(state, playerId) ?? null
+  return stats === null ? null : wholeAutoShootOf(stats)
+}
+
+function wholeAutoShootOf(stats: BoreAutoShootStats): BoreAutoShootStats {
+  return {
+    previewTicks: wholeAtLeast(stats.previewTicks, 0),
+    manualWaitTicks: wholeAtLeast(stats.manualWaitTicks, 0),
+    reserveAboveRescueBp: wholeAtLeast(stats.reserveAboveRescueBp, 0),
+    isIncomeCapUsed: stats.isIncomeCapUsed,
+  }
 }
 
 function heldToDrillLaw(stats: BoreGunStats): BoreGunStats {

@@ -113,6 +113,16 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'bore_ended',
     data: { stop, tx, ty, cellsOpened },
   }),
+  AutoModeSet: ({ itemId, isOn }) => ({ event: 'auto_mode_set', data: { itemId, isOn } }),
+  AutoTargetLocked: ({ itemId, aim, tx, ty, actTick }) => ({
+    event: 'auto_target_locked',
+    data: { itemId, aim, tx, ty, actTick },
+  }),
+  AutoActed: ({ itemId, aim }) => ({ event: 'auto_acted', data: { itemId, aim } }),
+  AutoActOverridden: ({ itemId, aim }) => ({
+    event: 'auto_act_overridden',
+    data: { itemId, aim },
+  }),
   CargoAdded: (added) => ({ event: 'resource_collected', data: resourceCollectedDataOf(added) }),
   StorageFull: ({ lostUnits }) => ({ event: 'storage_full', data: { lostUnits } }),
   EnergyLow: ({ threshold }) => ({ event: 'energy_low', data: { threshold } }),

@@ -268,6 +268,20 @@ export interface KernelDomainEventBodies {
    * its last cell; `cellsOpened` the cells it opened.
    */
   BoreEnded: { stop: BoreStop; tx: number; ty: number; cellsOpened: number }
+  /** The player switched an item's auto mode on or off (ticket 317): the lamp and its valve click. */
+  AutoModeSet: { itemId: string; isOn: boolean }
+  /**
+   * An item on auto locked its target (ticket 317, #310): it acts along `aim` at `actTick`, for
+   * the tile `tx, ty`, and every client shows that until then.
+   */
+  AutoTargetLocked: { itemId: string; aim: number; tx: number; ty: number; actTick: number }
+  /** An item on auto acted along its locked aim; its own events follow (a gun's `BoreFired`). */
+  AutoActed: { itemId: string; aim: number }
+  /**
+   * A manual use in the tick an item acted on auto took its place (ticket 317: the manual fire
+   * wins): the auto act is withdrawn before it changed anything.
+   */
+  AutoActOverridden: { itemId: string; aim: number }
   /**
    * One ore unit reached the hold: its tier and sale value, and which ore it was (#122): the
    * `oreId` #155 names, whole tiles below the surface of the cell's column, and the cell's chunk

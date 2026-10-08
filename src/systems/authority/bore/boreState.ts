@@ -48,6 +48,11 @@ export interface PendingBore {
    * ticks its cells have taken so far, so it is final once the line ends.
    */
   nextShotTick: number
+  /**
+   * The bearing, when auto mode fired the shot (ticket 317); absent for a manual shot, so a
+   * session that never used auto saves and digests as before.
+   */
+  autoAim?: number
 }
 
 export const NO_BORES: readonly PendingBore[] = []
@@ -104,7 +109,8 @@ function isPendingBore(bore: unknown): boolean {
       bore.blocksChecked,
       bore.nextShotTick,
     ].every(isWholeNumber) &&
-    (bore.checkTick === null || isWholeNumber(bore.checkTick))
+    (bore.checkTick === null || isWholeNumber(bore.checkTick)) &&
+    (bore.autoAim === undefined || isWholeNumber(bore.autoAim))
   )
 }
 

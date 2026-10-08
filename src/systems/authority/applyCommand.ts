@@ -25,6 +25,7 @@ import {
 } from './authorityCommand'
 import { ARTEFACT_RULES } from './artefactRules'
 import { BORE_FIRE_RULES } from './bore/boreFire'
+import { BORE_AUTO_RULES } from './bore/boreAuto'
 import { settleClockTo } from './authorityClock'
 import type { AuthorityState } from './authorityState'
 import {
@@ -102,6 +103,7 @@ const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...LOADOUT_RULES,
   ...VEHICLE_ITEM_RULES,
   ...BORE_FIRE_RULES,
+  ...BORE_AUTO_RULES,
 }
 
 /** Every kernel command type: the keys of the kernel's own rule table. */

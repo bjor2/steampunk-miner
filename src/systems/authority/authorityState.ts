@@ -14,6 +14,7 @@ import { EMPTY_WORLD, type WorldState } from '../world/worldState'
 import { NO_LIVE_BLASTS, type LiveBlast } from './charges/liveBlast'
 import { NO_TERRAIN_EDITS, type QueuedTerrainEdit } from './terrain/terrainEdits'
 import type { PendingBore } from './bore/boreState'
+import type { AutoMode } from './autoMode/autoModeState'
 import { NO_COLLAPSE, type CollapseState } from './collapse/collapseState'
 import { NO_LOOSE_LAVA, type LavaState } from './lava/lavaState'
 import { NEW_COMBAT, type CombatState } from './combat/combatState'
@@ -29,6 +30,11 @@ export interface PlayerState {
   vehicle: VehicleState
   /** At most one artefact in the slice (#46); null until a cache is chosen from. */
   artefact: HeldArtefact | null
+  /**
+   * The items the player switched to auto, in item id order, with their holds and previews
+   * (ticket 317); absent while none is on, so a save that never used auto digests as before.
+   */
+  autoModes?: readonly AutoMode[]
   /** The slices' player sections away from their initial value (feature-slices.md 3.13). */
   slices?: SliceSections
 }

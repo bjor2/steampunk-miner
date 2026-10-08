@@ -14,6 +14,7 @@ import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
 import type { BotPurchase } from '../systems/registries/botPurchases'
 import type { BoreGunProvider } from '../systems/registries/boreGun'
+import type { AutoActor } from '../systems/registries/autoActors'
 import type { ChargeBlastCueProvider } from '../systems/registries/chargeBlastCue'
 import type { ClockStep } from '../systems/registries/clockSteps'
 import type { CollapseBraceProvider } from '../systems/registries/collapseBraces'
@@ -186,6 +187,8 @@ export interface SliceRegistrar {
   chargeBlastCue(provider: ChargeBlastCueProvider): void
   /** One provider across all slices: a player's bore gun numbers (ticket 313, #309). */
   boreGun(provider: BoreGunProvider): void
+  /** An item that acts on its own while switched to auto, keyed by its item id (ticket 317). */
+  autoActor(actor: AutoActor): void
   /** Names the slice's events that end a slot hold: cancelled clanks, finished chimes (253). */
   slotHoldCue(source: SlotHoldCueSource): void
   /** Filed under the slice id: `steampunkDebug.features['<slice>']`. */

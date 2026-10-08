@@ -610,6 +610,36 @@ export const RUN_EVENT_REGISTRY = {
       cellsOpened: 'integer',
     },
   },
+  // Ticket 317 (#310): an item switched to auto or off (the bore gun's steam sear first); the
+  // target its mode locked `previewTicks` before acting, with the tick it acts; the act itself,
+  // followed by the item's own lines (`bore_fired`); and an auto act a manual use in the same tick
+  // replaced before it changed anything.
+  auto_mode_set: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', isOn: 'flag' },
+  },
+  auto_target_locked: {
+    group: 'vehicle_and_combat',
+    level: 'detail',
+    payload: {
+      itemId: 'text',
+      aim: 'integer',
+      tx: 'integer',
+      ty: 'integer',
+      actTick: 'integer',
+    },
+  },
+  auto_acted: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', aim: 'integer' },
+  },
+  auto_act_overridden: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', aim: 'integer' },
+  },
   // One line per drilling command (a pose report's interval or a `drillTile`), #7: `damage` is
   // `ticks * drillPower * eff / 60` in hardness units.
   drill_damage_dealt: {

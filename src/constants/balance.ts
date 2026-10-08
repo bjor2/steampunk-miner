@@ -187,3 +187,18 @@ export const LAVA_CONTACT_REACH_MM = 450 + 150
 
 /** A whole share in basis points: the unit of the item effect caps (ticket 233, `itemEffectCaps`). */
 export const BASIS_POINTS = 10000
+
+/**
+ * The fewest ticks an item on auto shows its locked target before it acts (the #310 GD decision,
+ * #322's `previewTicks`): "the 10-tick preview never shortens", so a provider answering fewer is
+ * held to it (ticket 317). The #206 lock asks the same floor of every self-acting item.
+ */
+export const AUTO_PREVIEW_TICKS_FLOOR = 10
+
+/**
+ * How often an item on auto looks for a target again while the last look found none it could act
+ * on (no target, the energy reserve, a shot that would warn the rig's block): the TD on #310 bounds
+ * the bore gun's pick to "at most every 15 ticks", its 15-tick cooldown floor (ticket 317). A look
+ * after the item's clock runs out is never held back.
+ */
+export const AUTO_RETARGET_TICKS = 15

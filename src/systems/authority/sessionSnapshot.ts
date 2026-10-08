@@ -27,6 +27,11 @@ import {
 } from './terrain/terrainEdits'
 import { portableBoresOf, portableBoresProblems, type PendingBore } from './bore/boreState'
 import {
+  portableAutoModesOf,
+  portableAutoModesProblems,
+  type AutoMode,
+} from './autoMode/autoModeState'
+import {
   combatOfPortable,
   portableCombatOf,
   portableCombatProblems,
@@ -110,6 +115,8 @@ export interface PortablePlayer {
   lastSeq: number
   vehicle: PortableVehicle
   artefact: HeldArtefact | null
+  /** The items on auto (ticket 317); omitted while none is. */
+  autoModes?: AutoMode[]
   /** The player sections; omitted while none is registered. */
   slices?: PortableSections
 }
@@ -136,6 +143,7 @@ function portableStateOf(state: AuthorityState): PortableState {
           lastSeq: player.lastSeq,
           vehicle: portableVehicleOf(player.vehicle),
           artefact: player.artefact === null ? null : { ...player.artefact },
+          ...portableAutoModesField(player.autoModes),
           ...portableSectionsOf(player.slices, 'player'),
         },
       ]),
@@ -225,6 +233,7 @@ function playerStateOf(player: PortablePlayer): PlayerState {
     lastSeq: player.lastSeq,
     vehicle: vehicleOfPortable(player.vehicle),
     artefact: player.artefact === null ? null : { ...player.artefact },
+    ...portableAutoModesField(player.autoModes),
     ...sectionsOfPortable(player.slices, 'player'),
   }
 }
@@ -268,6 +277,13 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
   ]
 }
 
+/** A copy of the player's auto modes under their key, or no key at all while none is on. */
+function portableAutoModesField(modes: readonly AutoMode[] | undefined): {
+  autoModes?: AutoMode[]
+} {
+  return modes === undefined ? {} : { autoModes: portableAutoModesOf(modes) }
+}
+
 /** A copy of the bores under their key, or no key at all while there are none. */
 function portableBoresField(bores: readonly PendingBore[] | undefined): { bores?: PendingBore[] } {
   return bores === undefined ? {} : { bores: portableBoresOf(bores) }
@@ -303,6 +319,7 @@ function portablePlayerProblems(id: string, player: unknown): string[] {
   return [
     ...portableVehicleProblems(player.vehicle, `${path}.vehicle`),
     ...heldArtefactProblems(player.artefact, `${path}.artefact`),
+    ...portableAutoModesProblems(player.autoModes, `${path}.autoModes`),
     ...portableSectionsProblems(player.slices, 'player', path),
   ]
 }

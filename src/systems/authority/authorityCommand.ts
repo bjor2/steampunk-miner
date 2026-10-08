@@ -129,8 +129,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    optional `release` hook and `power-up-core.PowerUpReleased`, and a release during the
  *    wind-up kept as the pending use's `releasedTick`. With no item declaring `release` no
  *    digest or mined order changes.
+ * 49: auto mode (ticket 317, #310): `ground_gun.set_auto {on}`, refused `not_researched` without
+ *    the steam sear, each player's items on auto with their hold and locked preview, the clock's
+ *    auto acts, a manual shot's wait folded into its `nextShotTick` while auto is on, and
+ *    `AutoModeSet`, `AutoTargetLocked`, `AutoActed` and `AutoActOverridden`. With auto off no
+ *    digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 48
+export const AUTHORITY_PROTOCOL_VERSION = 49
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -227,6 +232,11 @@ export interface KernelCommandPayloads {
    * of the rig's frame, clamped to the arc; its cells open on the authority's clock.
    */
   'ground_gun.fire': { bearing: number }
+  /**
+   * The bore gun's auto mode (ticket 317, #310): on, the authority picks and fires the shots
+   * itself, holding where the rules say; refused until the steam sear is researched.
+   */
+  'ground_gun.set_auto': { on: boolean }
   'debug.setUpgrade': { upgradeId: string; level: number }
   /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
   'debug.setEnergy': { energy: string }

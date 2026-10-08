@@ -36,7 +36,7 @@ import type { BoreShot } from './boreState'
 
 export type CellOpening =
   | { kind: 'passed' }
-  | { kind: 'opened'; effect: RuleEffect; ticks: number }
+  | { kind: 'opened'; effect: RuleEffect; ticks: number; energy: number }
   | { kind: 'stopped'; stop: BoreStop; events: DomainEventBody[] }
 
 /** What one cell of a bore asks: whose gun, the shot's numbers, and the budget left. */
@@ -104,6 +104,7 @@ function cutCell(
     kind: 'opened',
     effect: boredEffectOf(state, params, ask, cut, gates, energy),
     ticks: cut.ticksUsed,
+    energy,
   }
 }
 
