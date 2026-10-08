@@ -71,6 +71,7 @@ export function VehicleBody({
   const group = useRef<Group>(null)
   const [mounted, setMounted] = useState<MountedVehicle | null>(null)
   const poses = useMemo(createStepPoses, [])
+  const drawn = useMemo<DrawnPresence>(() => ({ presence, origin }), [presence, origin])
 
   useEffect(() => {
     const placed = createVehicleBody(rapier, world, startPose)
@@ -95,7 +96,7 @@ export function VehicleBody({
 
   useFrame(() => {
     if (mounted !== null && group.current !== null)
-      drawBetweenSteps(mounted, poses, group.current, { presence, origin }, stage)
+      drawBetweenSteps(mounted, poses, group.current, drawn, stage)
   }, BODY_DRAW_FRAME_PRIORITY)
 
   return <group ref={group}>{mounted === null ? null : children(mounted.controller)}</group>

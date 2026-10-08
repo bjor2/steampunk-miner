@@ -8,25 +8,12 @@
  * The world here is 3D Rapier used as 2D (CLAUDE.md): Z translation is locked, only rotation
  * about Z is free, and world gravity is zero because gravity is radial (#7).
  *
- * Rapier is f32, so it measures from a floating render origin near the rig (ticket 339,
- * `renderOrigin`), never from the planet's centre: every rule here still reads planet metres (the
- * body's translation plus the origin, in doubles). When the rig gets more than 1 km from the origin,
- * the origin moves to the nearest chunk corner before the step, and the body and the halo's
- * colliders are moved by the same whole metres in the other direction: the rig stays where it is on
- * the planet, with its velocity and contacts, so nothing jumps and no wall goes missing.
+ * Rapier is f32, so the body is measured from a floating render origin near the rig (ticket 339,
+ * `bodyFrame`); every rule here reads planet metres.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
-import {
-  MM_PER_METRE,
-  PHYSICS_TIMESTEP,
-  RENDER_ORIGIN_REACH_MM,
-  VEHICLE_COLLIDER_SIZE,
-} from '../constants/physics'
-import {
-  isPastOriginReach,
-  renderOriginNear,
-  type RenderOrigin,
-} from '../systems/render/renderOrigin'
+import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
+import type { RenderOrigin } from '../systems/render/renderOrigin'
 import { blockOfPoint } from '../systems/vehicle/colliderHalo'
 import { drillContactOf, type DrillContact } from '../systems/vehicle/drillContact'
 import { drillStampOf } from '../systems/vehicle/drillStamp'
@@ -59,7 +46,14 @@ import {
 } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
 import { ISO_DENSITY } from '../systems/world/sampleGrid'
-import { createGroundHalo, type GroundHalo } from './groundHalo'
+import {
+  createBodyFrame,
+  placeBodyAt,
+  placementNear,
+  planetPositionOf,
+  recentreWhenFar,
+} from './bodyFrame'
+import { createGroundHalo } from './groundHalo'
 
 type Rapier = typeof RAPIER
 
@@ -121,8 +115,6 @@ export const HALO_RADIUS_BLOCKS = 1
 /** Share of the remaining tilt removed per step; under 1 so contact pushes settle smoothly. */
 const RIGHTING_GAIN = 0.5
 
-const MM = MM_PER_METRE
-
 // Reused every physics step: setLinvel and setAngvel copy what they are given.
 const scratchVelocity = { x: 0, y: 0, z: 0 }
 const scratchSpin = { x: 0, y: 0, z: 0 }
@@ -133,10 +125,10 @@ export function createVehicleBody(
   world: RAPIER.World,
   pose: VehiclePose,
 ): PlacedVehicleBody {
-  const origin = renderOriginNear(pose.x, pose.y)
+  const { origin, at } = placementNear(pose)
   const body = world.createRigidBody(
     rapier.RigidBodyDesc.dynamic()
-      .setTranslation((pose.x - origin.xMm) / MM, (pose.y - origin.yMm) / MM, 0)
+      .setTranslation(at.x, at.y, 0)
       .enabledTranslations(true, true, false)
       .enabledRotations(false, false, true)
       .setGravityScale(0)
@@ -147,12 +139,6 @@ export function createVehicleBody(
   return { body, origin }
 }
 
-/** The render origin the body and the halo are measured from; one object, moved in place. */
-interface BodyFrame {
-  origin: RenderOrigin
-  reachMm: number
-}
-
 export function createVehicleController(
   rapier: Rapier,
   world: RAPIER.World,
@@ -160,18 +146,15 @@ export function createVehicleController(
   options: VehicleControllerOptions = {},
 ): VehicleController {
   const { body } = placed
-  const frame: BodyFrame = {
-    origin: placed.origin,
-    reachMm: options.originReachMm ?? RENDER_ORIGIN_REACH_MM,
-  }
+  const frame = createBodyFrame(placed.origin, options.originReachMm)
   const halo = createGroundHalo(rapier, world, HALO_RADIUS_BLOCKS, frame.origin)
   let head = newDrillHead(FACING.right)
   let up: Vector2 = { x: 0, y: 1 }
 
   return {
     step(input, planet) {
-      recentreWhenFar(body, halo, frame)
       const position = planetPositionOf(body, frame.origin)
+      recentreWhenFar(body, halo, frame, position)
       const velocity = vectorOf(body.linvel())
       up = localUpOf(position, up)
       halo.syncAround(blockOfPoint(position), planet.worldVersion, {
@@ -209,8 +192,7 @@ export function createVehicleController(
       }
     },
     placeAt(pose) {
-      moveOrigin(halo, frame, renderOriginNear(pose.x, pose.y))
-      body.setTranslation(fromOrigin(pose, frame.origin), true)
+      placeBodyAt(body, halo, frame, pose)
       body.setLinvel({ x: 0, y: 0, z: 0 }, true)
       head = newDrillHead(pose.facing)
     },
@@ -220,40 +202,6 @@ export function createVehicleController(
     colliderCount: () => halo.colliderCount(),
     dispose: () => halo.dispose(),
   }
-}
-
-/**
- * Past the reach the origin moves to the chunk corner nearest the rig. Moving the body with it is
- * no teleport: it changes only what Rapier measures from, by whole metres, so the body keeps its
- * place on the planet, its velocity and, with the walls moved alike, every contact.
- */
-function recentreWhenFar(body: RAPIER.RigidBody, halo: GroundHalo, frame: BodyFrame): void {
-  const { x, y } = planetPositionOf(body, frame.origin)
-  if (!isPastOriginReach(frame.origin, x * MM, y * MM, frame.reachMm)) return
-  const was = frame.origin
-  moveOrigin(halo, frame, renderOriginNear(x * MM, y * MM))
-  shiftBody(body, was, frame.origin)
-}
-
-function moveOrigin(halo: GroundHalo, frame: BodyFrame, next: RenderOrigin): void {
-  frame.origin = next
-  halo.moveOrigin(next)
-}
-
-/** Both origins are chunk corners, so the shift is whole metres and f32 adds it exactly. */
-function shiftBody(body: RAPIER.RigidBody, was: RenderOrigin, now: RenderOrigin): void {
-  const at = body.translation()
-  const shift = { x: (was.xMm - now.xMm) / MM, y: (was.yMm - now.yMm) / MM }
-  body.setTranslation({ x: at.x + shift.x, y: at.y + shift.y, z: 0 }, true)
-}
-
-function planetPositionOf(body: RAPIER.RigidBody, origin: RenderOrigin): Vector2 {
-  const at = body.translation()
-  return { x: at.x + origin.xMm / MM, y: at.y + origin.yMm / MM }
-}
-
-function fromOrigin(pose: VehiclePose, origin: RenderOrigin): { x: number; y: number; z: number } {
-  return { x: (pose.x - origin.xMm) / MM, y: (pose.y - origin.yMm) / MM, z: 0 }
 }
 
 /**
