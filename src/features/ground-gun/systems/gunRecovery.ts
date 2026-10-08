@@ -8,13 +8,17 @@
  * `gunFactor * drillPower`, and both `cooldownTicks` and `kGunPct` come from the rate level at the
  * moment the shot fires. The card shows `floor(3600 / recovery)` shots a minute on the ground the
  * rig is on, from the same formula, so it cannot drift from the game. On rock the shots a minute
- * follow `kGunPct`; in open ground they follow the cooldown. Integers only.
+ * follow `kGunPct`; in open ground they follow the cooldown. Integers only. The wait itself is the
+ * kernel's one `gunRecoveryTicks` on the `boreGun` seam (ticket 313), which the authority reads.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
+import { gunRecoveryTicks } from '../../../systems/registries/boreGun'
 import { div, fromSafeInteger, mul, type BigStat } from '../../../systems/money'
 import { ticksPerTile, type DrillStats } from '../../../systems/vehicle/drillRule'
 import { GROUND_GUN } from './groundGunEconomy'
-import { rateStatsAt, type RateStats } from './gunTracks'
+import { rateStatsAt } from './gunTracks'
+
+export { gunRecoveryTicks }
 
 const PERCENT = 100
 const SECONDS_PER_MINUTE = 60
@@ -36,11 +40,6 @@ export interface RateCard {
   shotsPerMinute: number
   cellsPerMinute: number
   isBlocked: boolean
-}
-
-/** The ticks from a shot until the next is accepted, at the rate stats the shot fired with. */
-export function gunRecoveryTicks(spentDigTicks: number, rate: RateStats): number {
-  return Math.max(rate.cooldownTicks, ceilDiv(spentDigTicks * PERCENT, rate.kGunPct))
 }
 
 /** The drill at the gun's share of its power; the tip and the gate tip read unchanged. */
@@ -86,9 +85,4 @@ export function rateCardOf(rateLevel: number, shot: BoreShot): RateCard {
     cellsPerMinute: shot.cells * shotsPerMinute,
     isBlocked: shot.isBlocked,
   }
-}
-
-/** `ceil(numerator / denominator)` for whole numbers >= 0, with no float on the way. */
-function ceilDiv(numerator: number, denominator: number): number {
-  return Math.floor((numerator + denominator - 1) / denominator)
 }
