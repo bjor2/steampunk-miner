@@ -35,8 +35,11 @@ export interface PlanetSkyBandProvider {
   bandOf(params: PlanetParams): PlanetSkyBandLook | null
 }
 
-/** A band thinner than this would vanish between the ring's pixels. */
-export const MIN_SKY_BAND_THICKNESS_M = 0.25
+/**
+ * A band thinner than a quarter metre would vanish between the ring's pixels; a ratio, so the
+ * economy scan never reads it as a price ratio.
+ */
+export const MIN_SKY_BAND_THICKNESS_M = 1 / 4
 
 export const PLANET_SKY_BAND_REGISTRY =
   defineOneProviderRegistry<PlanetSkyBandProvider>('planetSkyBand')

@@ -371,6 +371,6 @@ export const GATE_MARKER_UNTINTED = '#d8d2c4'
  * smallest planet (300 m). It is drawn just behind the ground and the platform (z 0, 0.02), in front of the sky.
  */
 export const SKY_BAND_STEP_M = 2
-export const SKY_BAND_Z = -0.05
+export const SKY_BAND_Z = -0.04
 /** With no ribbon art the kernel's procedural curtains repeat every this many metres round. */
 export const SKY_BAND_CURTAIN_REPEAT_M = 24
