@@ -682,9 +682,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/liveFixedStep.test.ts` | 4 | 4 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
-| `src/physics/vehicleLoop.test.ts` | 5 | 5 |
+| `src/physics/vehicleLoop.test.ts` | 6 | 6 |
 | `src/physics/vehiclePhysics.test.ts` | 8 | 2 |
 
 ### `registries`
@@ -746,7 +747,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/frameWindow.test.ts` | 4 | 4 |
 | `src/systems/render/gatePatterns.test.ts` | 10 | 10 |
 | `src/systems/render/groundBlocks.test.ts` | 7 | 7 |
-| `src/systems/render/groundStrata.test.ts` | 4 | 4 |
+| `src/systems/render/groundStrata.test.ts` | 6 | 6 |
 | `src/systems/render/gunLook.test.ts` | 7 | 7 |
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
@@ -755,9 +756,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
 | `src/systems/render/oreLook.test.ts` | 11 | 9 |
 | `src/systems/render/partMotion.test.ts` | 11 | 9 |
-| `src/systems/render/particles.test.ts` | 5 | 5 |
+| `src/systems/render/particles.test.ts` | 6 | 6 |
 | `src/systems/render/platformYard.test.ts` | 6 | 6 |
 | `src/systems/render/refineryBayLook.test.ts` | 3 | 3 |
+| `src/systems/render/renderOrigin.test.ts` | 3 | 3 |
 | `src/systems/render/renderScale.test.ts` | 13 | 13 |
 | `src/systems/render/requestedParts.test.ts` | 3 | 3 |
 | `src/systems/render/sampleClock.test.ts` | 3 | 3 |
@@ -963,6 +965,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 9 | 9 |
 | `src/systems/vehicle/drillRule.test.ts` | 14 | 14 |
+| `src/systems/vehicle/drillStamp.test.ts` | 1 | 1 |
 | `src/systems/vehicle/driveSigns.test.ts` | 5 | 5 |
 | `src/systems/vehicle/heatPauseSteps.test.ts` | 7 | 7 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
@@ -1010,6 +1013,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/collapseWeakness.test.ts` | 14 | 14 |
 | `src/systems/world/dockBays.test.ts` | 9 | 9 |
 | `src/systems/world/dockSite.test.ts` | 6 | 6 |
+| `src/systems/world/exactSquares.test.ts` | 5 | 5 |
 | `src/systems/world/generateChunk.test.ts` | 26 | 14 |
 | `src/systems/world/generateChunkHooks.test.ts` | 4 | 4 |
 | `src/systems/world/generateDensity.test.ts` | 7 | 5 |
@@ -1018,6 +1022,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/lavaPockets.test.ts` | 7 | 7 |
 | `src/systems/world/orePatches.test.ts` | 31 | 8 |
 | `src/systems/world/planetParams.test.ts` | 21 | 16 |
+| `src/systems/world/stampShape.test.ts` | 1 | 1 |
 | `src/systems/world/worldCell.test.ts` | 3 | 3 |
 | `src/systems/world/worldExactMathLint.test.ts` | 15 | 3 |
 | `src/systems/world/worldState.test.ts` | 1 | 1 |
