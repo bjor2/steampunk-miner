@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T04:37:50+02:00",
+  "updated_at": "2026-10-08T04:38:05+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -356,9 +356,9 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 04:36 CEST",
+    "at": "2026-10-08 04:38 CEST",
     "mode": "refill-dev",
-    "triggers": "#285",
+    "triggers": "claude-run:tester-triage",
     "started": "",
     "note": "paused: main red (nightly full suite)"
   },
