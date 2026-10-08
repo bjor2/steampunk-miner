@@ -134,6 +134,16 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 
+### `ground-gun`: 5 files, 50 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/ground-gun/systems/armouryModules.test.ts` | 13 | 13 |
+| `src/features/ground-gun/systems/boreLadders.test.ts` | 8 | 8 |
+| `src/features/ground-gun/systems/groundGunEconomy.test.ts` | 7 | 7 |
+| `src/features/ground-gun/systems/gunRecovery.test.ts` | 11 | 9 |
+| `src/features/ground-gun/systems/gunTracks.test.ts` | 11 | 11 |
+
 ### `mining-gates`: 23 files, 148 tests
 
 | File | Tests | Sites |
