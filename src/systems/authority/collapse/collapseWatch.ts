@@ -1,6 +1,7 @@
 /**
  * Which blocks warn (decision #43 Rule and Sequence 1, Technical Director's build notes 1-2):
- * after every accepted command, against the ground and the vehicles as they now stand,
+ * after every accepted command (`collapseFollow.ts`), against the ground and the vehicles as they
+ * now stand,
  *
  * 1. a warning whose block is no longer weak (relined, or its weak lining drilled away) or has no
  *    vehicle's body centre within 16 m any more is cancelled (`CollapseCancelled`); coming back
@@ -27,8 +28,7 @@ import { weaknessOfBlock, type BlockWeakness } from '../../world/collapseWeaknes
 import type { BodyCentre } from '../../world/collapseRefill'
 import type { PlanetParams } from '../../world/planetParams'
 import { withCollapse, type AuthorityState } from '../authorityState'
-import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
-import { planetParamsOf } from '../planetOfState'
+import { chainEffects, type RuleEffect } from '../commandRule'
 import {
   blockOfEntry,
   entryOfBlock,
@@ -47,15 +47,6 @@ export interface VehicleBody {
 export interface WeakBlock {
   block: CollapseBlock
   weakness: BlockWeakness
-}
-
-export function followCollapse(state: AuthorityState): RuleEffect {
-  const params = planetParamsOf(state.planet)
-  if (params === null) return unchanged(state)
-  return chainEffects(state, [
-    (current) => cancelUnheldWarnings(current, params),
-    (current) => warnWeakBlocksNearVehicles(current, params),
-  ])
 }
 
 /** A forced block always holds; any other only while weak with a vehicle within 16 m. */
@@ -125,7 +116,8 @@ export function vehicleBodiesOf(state: AuthorityState): VehicleBody[] {
     })
 }
 
-function cancelUnheldWarnings(state: AuthorityState, params: PlanetParams): RuleEffect {
+/** Sequence 1: every warning whose block no longer holds is cancelled. */
+export function cancelUnheldWarnings(state: AuthorityState, params: PlanetParams): RuleEffect {
   const dropped = state.collapse.blocks.filter(
     (entry) => isWarningAt(entry, state.tick) && !isCollapseHeld(state, params, entry),
   )
@@ -135,7 +127,11 @@ function cancelUnheldWarnings(state: AuthorityState, params: PlanetParams): Rule
   )
 }
 
-function warnWeakBlocksNearVehicles(state: AuthorityState, params: PlanetParams): RuleEffect {
+/** Sequence 2: every weak block near a vehicle not already collapsing starts its telegraph. */
+export function warnWeakBlocksNearVehicles(
+  state: AuthorityState,
+  params: PlanetParams,
+): RuleEffect {
   const fresh = weakBlocksNearVehicles(state, params).filter(
     ({ block }) => entryOfBlock(state.collapse, blockIdOf(block)) === null,
   )

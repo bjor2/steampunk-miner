@@ -23,6 +23,7 @@ import { BOT_PURCHASE_REGISTRY } from '../systems/registries/botPurchases'
 import { BORE_GUN_REGISTRY } from '../systems/registries/boreGun'
 import { CHARGE_BLAST_CUE_REGISTRY } from '../systems/registries/chargeBlastCue'
 import { CLOCK_STEP_REGISTRY } from '../systems/registries/clockSteps'
+import { COLLAPSE_BRACE_REGISTRY } from '../systems/registries/collapseBraces'
 import {
   COMMAND_RULE_REGISTRY,
   commandRuleRegistrationsOf,
@@ -102,6 +103,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     gateCheck: (check) => add(GATE_CHECK_REGISTRY, check),
     blastEffect: (effect) => add(BLAST_EFFECT_REGISTRY, effect),
     clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),
+    collapseBrace: (provider) => add(COLLAPSE_BRACE_REGISTRY, provider),
     dockService: (service) => add(DOCK_SERVICE_REGISTRY, service),
     dockFacility: (facility) => add(DOCK_FACILITY_REGISTRY, facility),
     artefactOption: (option) => add(ARTEFACT_OPTION_REGISTRY, option),

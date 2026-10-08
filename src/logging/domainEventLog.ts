@@ -96,6 +96,10 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'collapse_warning',
     data: { block, band, weakestGrade, required },
   }),
+  CollapseBraced: ({ block, by }) => ({
+    event: 'collapse_braced',
+    data: { block, by: by.map((provider) => ({ provider })) },
+  }),
   CollapseCancelled: ({ block }) => ({ event: 'collapse_cancelled', data: { block } }),
   CollapseStarted: ({ block, samplesFilled, vehiclesHit }) => ({
     event: 'collapse',

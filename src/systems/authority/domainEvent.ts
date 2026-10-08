@@ -246,6 +246,12 @@ export interface KernelDomainEventBodies {
    * refill's ordinary `GroundChanged`.
    */
   CollapseWarned: { block: string; band: number; weakestGrade: number; required: number }
+  /**
+   * A slice braced a warning block (ticket 331): it holds in its warning and never refills while
+   * braced; `by` names the bracing providers, sorted. When the brace ends the block warns afresh
+   * (`CollapseWarned`) or, no longer held, is cancelled.
+   */
+  CollapseBraced: { block: string; by: readonly string[] }
   /** The block stopped being weak, or no vehicle is within 16 m any more, before its refill. */
   CollapseCancelled: { block: string }
   /** The refill starts: the samples it will fill and the vehicles it crushes. */

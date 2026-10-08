@@ -7,7 +7,9 @@
  *   cancelled, else the refill starts: `CollapseStarted {block, samplesFilled, vehiclesHit}`, the
  *   crush for every vehicle caught in it, and the first layer;
  * - on each of the next 29 ticks one more refill step, after the last of which the block leaves the
- *   list.
+ *   list;
+ * - first of all, the braces are brought in line (ticket 331): a braced block is skipped and never
+ *   begins its refill, and one whose brace ended warns afresh from this tick.
  *
  * Collapse events concern no one player, so they carry only the tick; a crush carries the player
  * whose vehicle it hit. The ground changes as ordinary `GroundChanged`.
@@ -32,22 +34,40 @@ import {
   withoutCollapsingBlock,
   type CollapsingBlock,
 } from './collapseState'
+import { syncCollapseBracesAt } from './collapseBraceSync'
 import { cancelCollapse, isCollapseHeld, vehicleBodiesOf, type VehicleBody } from './collapseWatch'
 
 type TickStep = (state: AuthorityState) => TickOutcome
 
 export function runCollapseTick(state: AuthorityState, tick: number): TickOutcome {
   const params = planetParamsOf(state.planet)
-  const ran = params === null ? { state, events: [] } : advanceDueBlocks(state, params, tick)
+  const ran = params === null ? { state, events: [] } : bracedThenAdvanced(state, params, tick)
   return { state: { ...ran.state, tick }, events: ran.events }
 }
 
+/** The braces first (ticket 331), so a block braced on its refill tick holds. */
+function bracedThenAdvanced(
+  state: AuthorityState,
+  params: PlanetParams,
+  tick: number,
+): TickOutcome {
+  return runSteps(state, [
+    (current) => syncCollapseBracesAt(current, tick, 'beforeCollapseStep'),
+    (current) => advanceDueBlocks(current, params, tick),
+  ])
+}
+
 function advanceDueBlocks(state: AuthorityState, params: PlanetParams, tick: number): TickOutcome {
-  const due = state.collapse.blocks.filter((entry) => tick >= refillTickOf(entry))
+  const due = state.collapse.blocks.filter((entry) => isDueAt(entry, tick))
   return runSteps(
     state,
     due.map((entry) => (current) => advanceBlock(current, params, entry.block, tick)),
   )
+}
+
+/** At or past its refill tick and not braced: a braced block holds in its warning. */
+function isDueAt(entry: CollapsingBlock, tick: number): boolean {
+  return entry.isBraced !== true && tick >= refillTickOf(entry)
 }
 
 function advanceBlock(
@@ -68,6 +88,7 @@ function beginRefill(
   entry: CollapsingBlock,
   tick: number,
 ): TickOutcome {
+  if (entry.isBraced === true) return { state, events: [] }
   if (!isCollapseHeld(state, params, entry)) {
     return stamped(cancelCollapse(state, entry.block), tick)
   }

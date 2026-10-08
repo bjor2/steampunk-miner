@@ -580,6 +580,12 @@ export const RUN_EVENT_REGISTRY = {
     payload: { block: 'text', band: 'integer', weakestGrade: 'integer', required: 'integer' },
   },
   collapse_cancelled: { group: 'mining', level: 'detail', payload: { block: 'text' } },
+  // Ticket 331: a slice's brace holds a warning block; its end logs a fresh `collapse_warning`.
+  collapse_braced: {
+    group: 'mining',
+    level: 'detail',
+    payload: { block: 'text', by: { listOf: { provider: 'text' } } },
+  },
   collapse: {
     group: 'mining',
     level: 'core',

@@ -7,10 +7,12 @@
  *   unfired (K8 #218), then the world's terrain edits (K6 #189:
  *   the live blasts' slice, then the queued power-up edits' share), then the bore gun's cells and
  *   collapse checks (ticket 313), then any collapse due at that tick (#43), then the slices' clock
- *   steps in id order (#217);
+ *   steps in id order (#217), then the collapse braces, so a brace a step ended is seen on its
+ *   tick (ticket 331);
  * - otherwise nothing can change between ticks but a blast, a collapse, a refinery batch or flowing
  *   lava, so the clock jumps to the next tick a charge blows or times out or a terrain edit moves,
- *   a bore opens a cell, checks its blocks or cools down, a block warns into its refill or refills, a batch is ready (#105), loose lava steps (#113) or a
+ *   a bore opens a cell, checks its blocks or cools down, a block warns into its refill or refills
+ *   or its brace ends, a batch is ready (#105), loose lava steps (#113) or a
  *   slice's clock step has work due (#217), or to the end (tows due by then first); tows happen at
  *   their due tick (#7 strand grace, destroy delay).
  *
@@ -27,6 +29,7 @@ import { applyQueuedTerrainEdits } from './terrain/terrainEditTick'
 import { nextBoreTick, runBoreTick } from './bore/boreTick'
 import { detonateChargesDue, nextDetonationTick } from './charges/chargeDetonation'
 import { disarmExpiredCharges, nextDisarmTick } from './charges/chargeDisarm'
+import { syncCollapseBracesAt } from './collapse/collapseBraceSync'
 import { nextCollapseTick } from './collapse/collapseState'
 import { runCollapseTick } from './collapse/collapseTick'
 import { isCombatLive, runCombatTick, type TickOutcome } from './combat/combatTick'
@@ -66,6 +69,7 @@ function runLiveTick(state: AuthorityState, tick: number): TickOutcome {
     (current) => announceReadyBatches(current, tick),
     (current) => runLavaTick(current, tick),
     (current) => runSliceClockSteps(current, tick),
+    (current) => syncCollapseBracesAt(current, tick, 'afterCollapseStep'),
   ])
 }
 
@@ -86,6 +90,7 @@ function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
     (current) => announceReadyBatches(current, stopTick),
     (current) => runLavaTick(current, stopTick),
     (current) => runSliceClockSteps(current, stopTick),
+    (current) => syncCollapseBracesAt(current, stopTick, 'afterCollapseStep'),
   ])
 }
 
@@ -96,7 +101,7 @@ function nextScheduledTick(state: AuthorityState): number | null {
     nextBlastSliceTick(state),
     nextTerrainEditTick(state),
     nextBoreTick(state),
-    nextCollapseTick(state.collapse, state.tick),
+    nextCollapseTick(state, state.tick),
     nextRefineReadyTick(state.platform.refinerySlots, state.tick),
     nextLavaTick(state),
     nextSliceClockTick(state),

@@ -16,6 +16,7 @@ import type { BotPurchase } from '../systems/registries/botPurchases'
 import type { BoreGunProvider } from '../systems/registries/boreGun'
 import type { ChargeBlastCueProvider } from '../systems/registries/chargeBlastCue'
 import type { ClockStep } from '../systems/registries/clockSteps'
+import type { CollapseBraceProvider } from '../systems/registries/collapseBraces'
 import type { SliceCommandRules } from '../systems/registries/commandRules'
 import type { ContentKind, ContentKinds } from '../systems/registries/content'
 import type {
@@ -82,6 +83,11 @@ export interface SliceRegistrar {
   blastEffect(effect: BlastEffect): void
   /** Runs on the authority clock after the kernel's steps, in id order (#217). */
   clockStep(step: ClockStep): void
+  /**
+   * Holds warning collapse blocks up while the slice's own section says so: a braced block never
+   * refills, and warns afresh for 60 ticks when the brace ends (ticket 331).
+   */
+  collapseBrace(provider: CollapseBraceProvider): void
   /** A free refill at the end of every paid recharge; the bill never changes (#217). */
   dockService(service: DockService): void
   /**
