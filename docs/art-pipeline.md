@@ -459,6 +459,26 @@ They ship as one `parts` asset, `ground-ore-atlas` (registered by the slice thro
 `public/assets/ground/ground-ore-atlas/`, written by `assemble_atlas.py` rather than `export.sh`,
 since the source is twelve family files. Nothing draws it yet; the kernel ore renderer will.
 
+## Magnetic planets
+
+The art of the magnetic planet class ([#293](https://github.com/bjor2/steampunk-miner/issues/293),
+for the GD lock on spec [#258](https://github.com/bjor2/steampunk-miner/issues/258) "On screen").
+The `planet-mix` slice registers the one asset through `r.artAssets` (#214).
+
+| Id                    | Source         | What the build draws                                                                                            |
+| --------------------- | -------------- | --------------------------------------------------------------------------------------------------------------- |
+| `prop-magnetic-field` | Blender, parts | `aurora-ribbon`, repeated round the planet by the kernel's planet sky band; `field-dash`, along each field line |
+| `arc-flicker`         | shader, code   | the electrified cells' blue arc, on bit 21 of the terrain gate channel (`src/scene/terrainShader.ts`)           |
+
+- Both parts are emissive planes whose light alone reaches the game: the shaders take a texel's
+  brightest channel and tint it with the look's colour (`src/features/planet-mix/magneticLooks.json`).
+  Each pattern is whole periods across its width, so it repeats with no seam.
+- The sky band (`src/scene/PlanetSkyBand.tsx`) repeats the ribbon at its own aspect over the band's
+  thickness; the field-line layer samples the dash along each arc. Until the asset is final both
+  draw procedural stand-ins, so neither waits on art.
+- `scripts/art/author_magnetic_field.py` wrote the first version of the `.blend`. From then on it
+  is the source. The review renders are in [docs/art/magnetic/](art/magnetic/README.md).
+
 ## The `parts.json` sidecar, schema 1
 
 ```json

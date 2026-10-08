@@ -2,7 +2,7 @@
   "id": "prop-magnetic-field",
   "source": "blender",
   "form": "parts",
-  "status": "placeholder",
+  "status": "final",
   "color": "#5fb4ff",
   "partColors": {
     "aurora-ribbon": "#5fb4ff",
