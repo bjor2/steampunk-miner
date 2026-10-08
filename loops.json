@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-08T01:02:43Z",
+  "updated_at": "2026-10-08T01:02:44Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -297,9 +297,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #123 (Perf 14 (logging 3): Debug-flag snapshot writers (checkpoints, heap threshold, screenshots)) on 8eea675",
+      "note": "nightly run on 129bcbd (nightly)",
       "stale_after_min": 420,
-      "updated_at": "2026-10-08T00:10:13Z",
+      "updated_at": "2026-10-08T01:02:44Z",
       "host": "grok-bot-vm-452660841"
     }
   },
