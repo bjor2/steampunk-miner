@@ -122,8 +122,11 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  * 46: the repulsor coil (ticket 284, #246): its push-wave acts through the kernel magnet shift and
  *    pushes metal enemies one cell out, and `terrain-tools.MagnetUsed` joins. With no magnet owned
  *    no digest or mined order changes.
+ * 47: collapse braces (ticket 331, the TD ruling on #285): `CollapseBraced {block, by}` joins, a
+ *    braced collapse entry carries `isBraced: true` and warns afresh for 60 ticks when its brace
+ *    ends. With no brace registered no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 46
+export const AUTHORITY_PROTOCOL_VERSION = 47
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
