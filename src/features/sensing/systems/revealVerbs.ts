@@ -6,7 +6,9 @@
  * - The echo sounder's second tap centres its ping one radius ahead along the facing; its hold
  *   keeps the ping twice as long.
  * - The flare mortar's second tap lobs the shell behind the miner; its hold lobs it twice as far.
- * - The signal buoy's second tap drops it one ring ahead along the facing; its hold one ring below.
+ * - The signal buoy's second tap drops it one ring ahead along the facing; its hold one ring behind,
+ *   away from the drill (Content's where-fix on #276, so facing down the hold never lands on the
+ *   tap's tile). It reads no drive.
  * - Fired by a sibling-link, each reveals at the link's reduced strength: the echo's radius, the
  *   flare's mapped radius and the buoy's ring (the lock's "at half radius").
  */
@@ -61,7 +63,7 @@ export function buoyTileOf(use: SensingUse, state: AuthorityState): TilePoint {
   const ring = buoyRingTilesAt(use.mark)
   if (use.milestone === 'second-tap')
     return tilesAlong(use.origin, facingOf(state, use.playerId), ring)
-  if (use.milestone === 'hold') return tilesAlong(use.origin, belowOf(state, use.playerId), ring)
+  if (use.milestone === 'hold') return tilesAlong(use.origin, behindOf(state, use.playerId), ring)
   return use.origin
 }
 
@@ -85,9 +87,10 @@ function facingOf(state: AuthorityState, playerId: string): IntegerVector {
   return pose === null ? { x: 0, y: 0 } : facingVectorOf(pose.upx, pose.upy, pose.facing)
 }
 
-function belowOf(state: AuthorityState, playerId: string): IntegerVector {
-  const pose = state.players[playerId]?.vehicle.pose ?? null
-  return pose === null ? { x: 0, y: 0 } : { x: -pose.upx, y: -pose.upy }
+/** The facing turned round: away from the drill. */
+function behindOf(state: AuthorityState, playerId: string): IntegerVector {
+  const facing = facingOf(state, playerId)
+  return { x: -facing.x, y: -facing.y }
 }
 
 /** `tiles` whole tiles from `origin` along `direction`. */

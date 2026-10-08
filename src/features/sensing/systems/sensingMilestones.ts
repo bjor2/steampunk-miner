@@ -6,7 +6,9 @@
  * at their own moment (`passiveLinks.ts`).
  *
  * The threat periscope's link is the lock's worked example; the other verbs are this ticket's
- * picks. The galvanic probe and the void sounder stay held, with none.
+ * picks, worded by Content's check on #276. The assay lens links to the signal buoy (the GD ruling
+ * on #276), so it never overlaps the periscope's echo. The galvanic probe and the void sounder stay
+ * held, with none.
  */
 import { milestonesOf, type MarkMilestone, type MilestoneVerbs } from '../../tech-tree'
 import type { SensingItem } from './sensingCatalogue'
@@ -17,18 +19,18 @@ const SIGNAL_BUOY = 'consumable.signal_buoy'
 
 const VERBS: Readonly<Record<string, MilestoneVerbs>> = {
   [ECHO_SOUNDER]: {
-    secondTap: 'pings one radius ahead of you',
-    hold: 'a ping that lingers twice as long',
+    secondTap: 'pings one radius ahead of the drill',
+    hold: 'the ping lingers longer',
     siblingLink: { verb: 'drops a signal buoy with half its ring', siblingId: SIGNAL_BUOY },
   },
   [FLARE_MORTAR]: {
-    secondTap: 'lobs the shell behind you',
-    hold: 'lobs the shell twice as far',
+    secondTap: 'lobs the shell backward, away from the drill',
+    hold: 'lobs the shell farther',
     siblingLink: { verb: 'pings the echo sounder at half radius', siblingId: ECHO_SOUNDER },
   },
   [SIGNAL_BUOY]: {
-    secondTap: 'drops the buoy one ring ahead',
-    hold: 'drops the buoy one ring below you',
+    secondTap: 'drops the buoy one ring ahead of the drill',
+    hold: 'drops the buoy one ring behind you, away from the drill',
     siblingLink: { verb: 'lobs a flare that maps half as wide', siblingId: FLARE_MORTAR },
   },
   'passive.threat_periscope': {
@@ -39,13 +41,13 @@ const VERBS: Readonly<Record<string, MilestoneVerbs>> = {
   },
   'passive.assay_lens': {
     siblingLink: {
-      verb: 'breaking into ore pings the echo sounder at half radius',
-      siblingId: ECHO_SOUNDER,
+      verb: 'breaking into ore drops a signal buoy with half its ring',
+      siblingId: SIGNAL_BUOY,
     },
   },
   'passive.hazard_barometer': {
     siblingLink: {
-      verb: 'a fresh hazard ahead lobs a flare that maps half as wide',
+      verb: 'a new hazard ahead of the drill lobs a flare that maps half as wide',
       siblingId: FLARE_MORTAR,
     },
   },

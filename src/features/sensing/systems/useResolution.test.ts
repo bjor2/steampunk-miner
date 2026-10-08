@@ -20,7 +20,7 @@ import { isLavaCell } from '../../../systems/world/worldCell'
 import { cellAt } from '../../../systems/world/worldState'
 import { describeItem } from '../../../systems/registries/itemDescriber'
 import { itemSnapshotViewOf } from '../../../systems/registries/itemSnapshotView'
-import { FACING } from '../../../systems/vehicle/vehiclePose'
+import { FACING, type Facing } from '../../../systems/vehicle/vehiclePose'
 import { chargesLeftOf, intentToHoldSlot, powerUpAtMarkOf } from '../../power-up-core'
 import {
   commandsOf,
@@ -65,23 +65,29 @@ interface SensingRun {
   events: DomainEvent[][]
 }
 
-function setupOf(itemId: string, mark: number, slots: Readonly<Record<string, string>>) {
+function setupOf(
+  itemId: string,
+  mark: number,
+  slots: Readonly<Record<string, string>>,
+  facing: Facing,
+) {
   return [
     [0, researchThrough(PLANET_OF_MARK[itemId][mark])],
     ...ownedLoadoutIntents({ 'powerup.1': itemId, ...slots }),
-    ...pocketIntents(2, UNDERGROUND, FACING.right),
+    ...pocketIntents(2, UNDERGROUND, facing),
     [PRESS_TICK, press('powerup.1')],
   ] as TimedIntent[]
 }
 
-/** The item used, then followed up 20 ticks after it acted, at Mark `mark`. */
+/** The item used facing right (unless told), then followed up 20 ticks after it acted. */
 function playItem(
   itemId: string,
   mark: number,
   follow: Follow,
   slots: Readonly<Record<string, string>> = {},
+  facing: Facing = FACING.right,
 ): SensingRun {
-  const setup = setupOf(itemId, mark, slots)
+  const setup = setupOf(itemId, mark, slots, facing)
   const [first] = replayedAtEveryRate(commandsOf(setup), PRESS_TICK + 10)
   const followTick = actTickOf(first.events) + FOLLOW_GAP
   const followIntent = follow === 'hold' ? intentToHoldSlot('powerup.1') : press('powerup.1')
@@ -199,10 +205,21 @@ describe('sensing Mark milestones (#256): Mark 6 hold', () => {
     expect(held).toBe(2 * plain)
   })
 
-  it('signal buoy: the hold drops the buoy one ring below the miner', () => {
+  it('signal buoy: the hold drops the buoy one ring behind the miner, away from the drill', () => {
     const run = playItem(SIGNAL_BUOY, 6, 'hold')
     const pins = boardAfterUses(EMPTY_REVEAL_BOARD, run.events[0], run.states[0], 'p1').pins
-    expect(pins[1].tile).toEqual({ tx: UNDERGROUND.tx, ty: UNDERGROUND.ty - pins[1].ringTiles })
+    expect(pins[1].tile).toEqual({ tx: UNDERGROUND.tx - pins[1].ringTiles, ty: UNDERGROUND.ty })
+  })
+
+  it('signal buoy: facing down, the tap and the hold drop the buoy on different tiles', () => {
+    const secondPinOf = (follow: Follow) => {
+      const run = playItem(SIGNAL_BUOY, 6, follow, {}, FACING.down)
+      return boardAfterUses(EMPTY_REVEAL_BOARD, run.events[0], run.states[0], 'p1').pins[1]
+    }
+    const tapped = secondPinOf('second-tap')
+    const held = secondPinOf('hold')
+    expect(tapped.tile).toEqual({ tx: UNDERGROUND.tx, ty: UNDERGROUND.ty - tapped.ringTiles })
+    expect(held.tile).toEqual({ tx: UNDERGROUND.tx, ty: UNDERGROUND.ty + held.ringTiles })
   })
 })
 
@@ -302,15 +319,22 @@ describe('sensing Mark milestones (#256): the lens and the barometer link on the
       ...(cause !== undefined && { cause }),
     }) as DomainEvent
 
-  it("the assay lens's drill breaking into ore pings a slotted echo sounder", () => {
-    const session = standingState({ 'powerup.1': ECHO_SOUNDER }, PASSIVE_MARK_3_PLANET)
+  it("the assay lens's drill breaking into ore drops a slotted signal buoy", () => {
+    const session = standingState({ 'powerup.1': SIGNAL_BUOY }, PASSIVE_MARK_3_PLANET)
     session.submit(2, poseIn(UNDERGROUND, FACING.right))
     const state = session.state()
     const fired = LENS_LINK_REACTION.react(state, state, [oreBroken()])
     expect(fired.events).toMatchObject([
-      { type: 'power-up-core.LinkFired', itemId: ASSAY_LENS, siblingId: ECHO_SOUNDER },
+      { type: 'power-up-core.LinkFired', itemId: ASSAY_LENS, siblingId: SIGNAL_BUOY },
     ])
     expect(LENS_LINK_REACTION.react(state, state, [oreBroken('blast')]).events).toEqual([])
+  })
+
+  it('the assay lens never fires the echo sounder, which the periscope links to', () => {
+    const session = standingState({ 'powerup.1': ECHO_SOUNDER }, PASSIVE_MARK_3_PLANET)
+    session.submit(2, poseIn(UNDERGROUND, FACING.right))
+    const state = session.state()
+    expect(LENS_LINK_REACTION.react(state, state, [oreBroken()]).events).toEqual([])
   })
 
   it("the hazard barometer's fresh warning lobs a slotted flare, and a standing one does not", () => {
@@ -340,7 +364,10 @@ describe('sensing Mark milestones (#256): the card line', () => {
         { kind: 'vehicle-item', id: itemId },
         { playerId: 'p1', planetIndex: 1, level, view: itemSnapshotViewOf(state, 'p1') },
       )?.statLines.find((line) => line.label === 'Next milestone')?.now
-    expect(lineAt(ECHO_SOUNDER, 1)).toBe('Mk III, tap twice: pings one radius ahead of you')
+    expect(lineAt(ECHO_SOUNDER, 1)).toBe('Mk III, tap twice: pings one radius ahead of the drill')
+    expect(lineAt(ASSAY_LENS, 1)).toBe(
+      'Mk III, link: breaking into ore drops a signal buoy with half its ring',
+    )
     expect(lineAt(THREAT_PERISCOPE, 1)).toBe(
       'Mk III, link: a lunge warning pings the echo sounder at half radius',
     )
