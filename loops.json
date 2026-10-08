@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-08T01:48:36Z",
+  "updated_at": "2026-10-08T01:49:48Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "working",
       "issue": 276,
-      "note": "tier hard, attempt 1/2",
-      "updated_at": "2026-10-08T01:48:36Z",
+      "note": "started 2026-10-08 03:48 CEST",
+      "updated_at": "2026-10-08T01:49:48Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -16,17 +16,17 @@
       "slot": "2",
       "state": "working",
       "issue": 317,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-08T01:48:03Z",
+      "note": "started 2026-10-08 02:47 CEST",
+      "updated_at": "2026-10-08T01:49:48Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
       "loop": "steampunk-loop",
       "slot": "3",
-      "state": "idle",
-      "issue": null,
-      "note": "free; #332 not accepted (needs-fix), will retry",
-      "updated_at": "2026-10-08T01:48:27Z",
+      "state": "working",
+      "issue": 293,
+      "note": "started 2026-10-08 03:49 CEST",
+      "updated_at": "2026-10-08T01:49:48Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -34,8 +34,8 @@
       "slot": "4",
       "state": "working",
       "issue": 340,
-      "note": "tier easy, attempt 1/2 (session running)",
-      "updated_at": "2026-10-08T01:42:24Z",
+      "note": "started 2026-10-08 03:22 CEST",
+      "updated_at": "2026-10-08T01:49:48Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -212,7 +212,7 @@
           "312": 1,
           "206": 0,
           "251": 1,
-          "276": 0,
+          "276": 1,
           "281": 1,
           "300": 1,
           "313": 1,
@@ -234,7 +234,7 @@
           "317": 1,
           "330": 1,
           "331": 1,
-          "332": 1,
+          "332": 0,
           "339": 1,
           "340": 1
         },
@@ -248,7 +248,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-08T01:42:03Z",
+      "updated_at": "2026-10-08T01:49:48Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -265,8 +265,8 @@
       "slot": "5",
       "state": "working",
       "issue": 330,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-08T01:46:13Z",
+      "note": "started 2026-10-08 02:55 CEST",
+      "updated_at": "2026-10-08T01:49:48Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -274,8 +274,8 @@
       "slot": "6",
       "state": "working",
       "issue": 314,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-08T01:45:22Z",
+      "note": "started 2026-10-08 02:45 CEST",
+      "updated_at": "2026-10-08T01:49:48Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -284,7 +284,7 @@
       "state": "idle",
       "issue": null,
       "note": "free",
-      "updated_at": "2026-10-08T01:42:03Z",
+      "updated_at": "2026-10-08T01:49:48Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -292,8 +292,8 @@
       "slot": "8",
       "state": "working",
       "issue": 339,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-08T01:42:23Z",
+      "note": "started 2026-10-08 03:22 CEST",
+      "updated_at": "2026-10-08T01:49:48Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
@@ -308,6 +308,13 @@
     }
   },
   "events": [
+    {
+      "at": "2026-10-08T01:49:48Z",
+      "key": "steampunk-loop/3",
+      "state": "working",
+      "issue": 293,
+      "note": "started 2026-10-08 03:49 CEST"
+    },
     {
       "at": "2026-10-08T01:48:36Z",
       "key": "steampunk-loop/1",
@@ -720,13 +727,6 @@
       "state": "idle",
       "issue": null,
       "note": "free; #300 landed on main and closed"
-    },
-    {
-      "at": "2026-10-07T23:27:18Z",
-      "key": "steampunk-loop/2",
-      "state": "working",
-      "issue": 322,
-      "note": "tier fable, attempt 1/2"
     }
   ]
 }
