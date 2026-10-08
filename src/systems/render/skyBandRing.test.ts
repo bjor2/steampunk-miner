@@ -45,6 +45,19 @@ describe('sky band ring', () => {
     expect(across.slice(0, 4)).toEqual(new Float32Array([0, 1, 0, 1]))
   })
 
+  it('winds every triangle counter-clockwise towards the camera, so none is culled', () => {
+    const { positions, indices } = skyBandRingOf(RADIUS, LOOK, 24)
+    const signedAreas = Array.from({ length: indices.length / 3 }, (_, at) => {
+      const [a, b, c] = [0, 1, 2].map((corner) => indices[at * 3 + corner] * 3)
+      const abx = positions[b] - positions[a]
+      const aby = positions[b + 1] - positions[a + 1]
+      const acx = positions[c] - positions[a]
+      const acy = positions[c + 1] - positions[a + 1]
+      return abx * acy - aby * acx
+    })
+    expect(signedAreas.filter((area) => area <= 0)).toEqual([])
+  })
+
   it('draws at least one ribbon round, however long the ribbon', () => {
     expect(skyBandRingOf(RADIUS, LOOK, 1e6).ribbonsRound).toBe(1)
   })

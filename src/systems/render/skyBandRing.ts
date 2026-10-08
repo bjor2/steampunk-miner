@@ -13,7 +13,7 @@ export interface SkyBandRing {
   positions: Float32Array
   /** Along (in ribbons, 0 to `ribbonsRound`) and across (0 to 1) the band, per vertex. */
   bandCoords: Float32Array
-  /** Two triangles a step. */
+  /** Two triangles a step, counter-clockwise as the camera sees them, so neither is culled. */
   indices: Uint32Array
   /** Whole ribbons round the planet. */
   ribbonsRound: number
@@ -67,7 +67,7 @@ function ringIndicesOf(steps: number): Uint32Array {
   const indices = new Uint32Array(steps * 6)
   for (let step = 0; step < steps; step++) {
     const lower = step * 2
-    indices.set([lower, lower + 2, lower + 1, lower + 1, lower + 2, lower + 3], step * 6)
+    indices.set([lower, lower + 1, lower + 2, lower + 1, lower + 3, lower + 2], step * 6)
   }
   return indices
 }
