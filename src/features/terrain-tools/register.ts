@@ -42,7 +42,8 @@ export const slice: SliceDefinition = {
     r.collapseBrace(LODE_CLAMP_BRACES)
     r.eventProjections(TERRAIN_PROJECTIONS)
     r.runEvents(TERRAIN_RUN_EVENTS)
-    // steampunkDebug.features['terrain-tools'].getBeacon() / .statPreview(itemId, mark, planet)
+    // steampunkDebug.features['terrain-tools'].getBeacon() / .getClampLattice()
+    //   / .statPreview(itemId, mark, planet)
     r.debugActions(terrainToolsDebugActions)
   },
 }
