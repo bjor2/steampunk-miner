@@ -9,6 +9,7 @@ import { createStartingAuthority, resetGameStore, useGameStore } from './gameSto
 import { readActionStream, readVehicleIntent, resetInput, routeKeyChange } from './inputRuntime'
 import {
   cancelSlotButton,
+  holdSlotButton,
   isSlotCardShown,
   landStick,
   leaveScreen,
@@ -213,5 +214,75 @@ describe('touch controls: power-up slot buttons (#217)', () => {
     expect(empty.commands).toEqual([])
     expect(cancelled.commands).toEqual([])
     expect(isSlotCardShown('use_slot_1', 1000)).toBe(false)
+  })
+})
+
+// A hold-to-use item's tile (ticket 332, the GD call on #285): pressed on finger-down, released
+// on every lift or slide-off however long the finger was down, as its key would be. The fake
+// slice answers slot 1's press and release with kernel commands.
+const HOLD_PROBE: SliceDefinition = {
+  id: 'hold-probe',
+  register: (r) =>
+    r.inputReaction({
+      id: 'hold-probe.use_1',
+      actionId: 'use_slot_1',
+      contexts: ['vehicle'],
+      toIntent: () => ({ type: 'requestRescue', payload: {} }),
+      toReleaseIntent: () => ({ type: 'quickService', payload: {} }),
+    }),
+}
+
+const runWithHeldSlot = (play: () => void) => withRegistrations([HOLD_PROBE], () => runFresh(play))
+
+describe('touch controls: hold-to-use slot buttons (ticket 332)', () => {
+  it.each([100, 600])('press on finger-down and release on a lift after %i ms', (heldMs) => {
+    let pressedFirst: string[] = []
+    const onTouch = runWithHeldSlot(() => {
+      holdSlotButton('use_slot_1')
+      pressedFirst = submitted.map((command) => command.type)
+      releaseSlotButton('use_slot_1', 1000 + heldMs)
+    })
+    expect(pressedFirst).toEqual(['requestRescue'])
+    expect(onTouch.commands).toEqual(['requestRescue', 'quickService'])
+  })
+
+  it('release when the finger slides off, and only once when the pointer then leaves', () => {
+    const slid = runWithHeldSlot(() => {
+      holdSlotButton('use_slot_1')
+      cancelSlotButton('use_slot_1')
+      releaseSlotButton('use_slot_1', 100)
+    })
+    const lifted = runWithHeldSlot(() => {
+      holdSlotButton('use_slot_1')
+      releaseSlotButton('use_slot_1', 100)
+      cancelSlotButton('use_slot_1')
+    })
+    expect(slid.commands).toEqual(['requestRescue', 'quickService'])
+    expect(lifted.commands).toEqual(['requestRescue', 'quickService'])
+  })
+
+  it('press the same action stream and commands as Digit1 down and up (#173)', () => {
+    const onTouch = runWithHeldSlot(() => {
+      holdSlotButton('use_slot_1')
+      releaseSlotButton('use_slot_1', 700)
+    })
+    const onKeys = runWithHeldSlot(() => {
+      routeKeyChange(key('Digit1', true))
+      routeKeyChange(key('Digit1', false))
+    })
+    expect(onTouch).toEqual(onKeys)
+    expect(onTouch.stream).toEqual([
+      { actionId: 'use_slot_1', isDown: true },
+      { actionId: 'use_slot_1', isDown: false },
+    ])
+  })
+
+  it('never shows the timed card for a held tile, whose panel decides the card itself', () => {
+    let isCardShown = true
+    runWithHeldSlot(() => {
+      holdSlotButton('use_slot_1')
+      isCardShown = isSlotCardShown('use_slot_1', 2000)
+    })
+    expect(isCardShown).toBe(false)
   })
 })

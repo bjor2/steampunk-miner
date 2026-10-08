@@ -6,7 +6,10 @@
  * actions here, so a scripted tap travels the same path as a real key.
  *
  * Which keys pressed which actions is remembered per key, so a key released after the layer
- * changed (docking with D held) still releases what it pressed and nothing sticks.
+ * changed (docking with D held) still releases what it pressed and nothing sticks. A pressed
+ * action coming up sends what a slice's release reaction gives (ticket 332: a hold-to-use slot's
+ * `release_power_up`), on any layer, and records its up edge only then; with no such reaction it
+ * sends and records nothing, as before.
  */
 import type { KeyChange, ScrollNotch } from '../shell/shell'
 import { ACTION_MAP, actionDefOf, actionsOfChord, type ActionId } from '../systems/input/actionMap'
@@ -17,6 +20,7 @@ import {
   type InputSituation,
 } from '../systems/input/inputRouting'
 import { chordOf } from '../systems/input/keyCodes'
+import { sliceIntentOfRelease } from '../systems/registries/inputReactions'
 import { canOpenArtefactCache } from '../systems/authority/artefactRules'
 import { dockableBayOf, dockedBayOf } from '../systems/authority/dockRules'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
@@ -81,11 +85,10 @@ export function pressAction(action: ActionId): void {
   applyReaction(reactionToPress(action, situationNow()))
 }
 
+/** An action comes up: a held one leaves the intent, a pressed one sends its release, if any. */
 export function releaseAction(action: ActionId): void {
-  const index = heldActions.indexOf(action)
-  if (index < 0) return
-  heldActions.splice(index, 1)
-  recordEdge(action, false)
+  if (actionDefOf(ACTION_MAP, action).kind === 'hold') return letGoOfAction(action)
+  sendReleaseOf(action)
 }
 
 /**
@@ -125,6 +128,20 @@ function holdAction(action: ActionId): void {
   const index = heldActions.indexOf(action)
   if (index >= 0) heldActions.splice(index, 1)
   heldActions.push(action)
+}
+
+function letGoOfAction(action: ActionId): void {
+  const index = heldActions.indexOf(action)
+  if (index < 0) return
+  heldActions.splice(index, 1)
+  recordEdge(action, false)
+}
+
+function sendReleaseOf(action: ActionId): void {
+  const intent = sliceIntentOfRelease(action, situationNow())
+  if (intent === null) return
+  recordEdge(action, false)
+  useGameStore.getState().submitPlayerIntent(intent)
 }
 
 function recordEdge(actionId: ActionId, isDown: boolean): void {

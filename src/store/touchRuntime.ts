@@ -1,6 +1,7 @@
 /**
  * Touch in, actions out (#173): the floating stick, the cluster's buttons, the power-up slot
- * buttons (#217), a pinch and a double tap press actions through `pressAction` and
+ * buttons (#217; a hold-to-use item's held from finger-down to lift, ticket 332), a pinch and a
+ * double tap press actions through `pressAction` and
  * `releaseAction`, the path the keys take, so a touch run submits exactly the commands of the
  * matching key run and replays alike. Which pointer does what lives here, in module state, never
  * in React or the store; the stick's drawing reads it.
@@ -40,6 +41,8 @@ let pinchStepsTaken = 0
 let lastTap: TapPoint | null = null
 /** When each slot button now under a finger went down, in ms. */
 const slotPressedAtMs = new Map<SlotTileActionId, number>()
+/** The tiles of items used by holding them that a finger is down on now (ticket 332). */
+const heldSlotTiles = new Set<SlotTileActionId>()
 
 /** A thumb lands in the stick zone: the stick appears under it, holding nothing yet. */
 export function landStick(pointerId: number, x: number, y: number): void {
@@ -80,17 +83,29 @@ export function pressSlotButton(action: SlotTileActionId, atMs: number): void {
   slotPressedAtMs.set(action, atMs)
 }
 
-/** The finger lifts: a tap uses the slot as its digit key would; after a hold nothing fires. */
-export function releaseSlotButton(action: SlotTileActionId, atMs: number): void {
-  const pressedAtMs = slotPressedAtMs.get(action)
-  slotPressedAtMs.delete(action)
-  if (pressedAtMs === undefined || isSlotHeldForCard(pressedAtMs, atMs)) return
-  tapAction(action)
+/**
+ * A finger lands on the tile of an item used by holding it (ticket 332, the GD call on #285): the
+ * slot is pressed at once, as its key goes down, and the lift or a slide-off releases it however
+ * long the finger was down. The slice's panel decides whether the item card may still open.
+ */
+export function holdSlotButton(action: SlotTileActionId): void {
+  heldSlotTiles.add(action)
+  pressAction(action)
 }
 
-/** The finger slid off or the browser took the touch: the press ends with no use. */
+/**
+ * The finger lifts: a held tile releases its slot; a tap uses the slot as its digit key would;
+ * after a hold of a tap tile nothing fires.
+ */
+export function releaseSlotButton(action: SlotTileActionId, atMs: number): void {
+  if (heldSlotTiles.has(action)) return letGoOfHeldSlot(action)
+  tapSlotUnlessHeldForCard(action, atMs)
+}
+
+/** The finger slid off or the browser took the touch: a tap press ends with no use, a held one releases. */
 export function cancelSlotButton(action: SlotTileActionId): void {
   slotPressedAtMs.delete(action)
+  letGoOfHeldSlot(action)
 }
 
 /** Whether the slot's button has been held long enough to show its item card (#164). */
@@ -123,7 +138,21 @@ export function resetTouch(): void {
   pinchPoints.clear()
   lastTap = null
   slotPressedAtMs.clear()
+  heldSlotTiles.clear()
   placeStick(null, 0, 0)
+}
+
+function tapSlotUnlessHeldForCard(action: SlotTileActionId, atMs: number): void {
+  const pressedAtMs = slotPressedAtMs.get(action)
+  slotPressedAtMs.delete(action)
+  if (pressedAtMs === undefined || isSlotHeldForCard(pressedAtMs, atMs)) return
+  tapAction(action)
+}
+
+/** Only once: the pointer leaving after the lift finds the tile already let go. */
+function letGoOfHeldSlot(action: SlotTileActionId): void {
+  if (!heldSlotTiles.delete(action)) return
+  releaseAction(action)
 }
 
 /** The stick under a thumb (or none), centred where it landed. */

@@ -17,6 +17,7 @@ import {
 } from './gameStore'
 import {
   pressAction,
+  readActionStream,
   readVehicleIntent,
   releaseAction,
   resetInput,
@@ -502,5 +503,75 @@ describe('input runtime: power-up slot keys', () => {
     }
     expect(withRegistrations([SLOT_PROBE], () => submittedDuring(pressDigit('Digit2')))).toEqual([])
     expect(withRegistrations([], () => submittedDuring(pressDigit('Digit1')))).toEqual([])
+  })
+})
+
+// A hold-to-use slot sends a release when its key comes up (ticket 332): slot 3's fake reaction
+// answers the release with a kernel command, slot 1's answers none, as a tap item's does.
+const RELEASE_PROBE: SliceDefinition = {
+  id: 'release-probe',
+  register: (r) => {
+    r.inputReaction({
+      id: 'release-probe.use_1',
+      actionId: 'use_slot_1',
+      contexts: ['vehicle'],
+      toIntent: () => ({ type: 'requestRescue', payload: {} }),
+      toReleaseIntent: () => null,
+    })
+    r.inputReaction({
+      id: 'release-probe.use_3',
+      actionId: 'use_slot_3',
+      contexts: ['vehicle'],
+      toIntent: () => ({ type: 'requestRescue', payload: {} }),
+      toReleaseIntent: () => ({ type: 'quickService', payload: {} }),
+    })
+  },
+}
+
+const edgesOf = () => readActionStream().map((edge) => `${edge.actionId}${edge.isDown ? '+' : '-'}`)
+
+describe('input runtime: slot release (ticket 332)', () => {
+  it('sends the release a reaction gives when the key comes up, and records the up edge', () => {
+    const types = withRegistrations([RELEASE_PROBE], () =>
+      submittedDuring(() => {
+        routeKeyChange(key('Digit3', true))
+        routeKeyChange(key('Digit3', false))
+      }),
+    )
+    expect(types).toEqual(['requestRescue', 'quickService'])
+    expect(edgesOf()).toEqual(['use_slot_3+', 'use_slot_3-'])
+  })
+
+  it('sends and records nothing on key-up for a slot whose reaction gives no release', () => {
+    const types = withRegistrations([RELEASE_PROBE], () =>
+      submittedDuring(() => {
+        routeKeyChange(key('Digit1', true))
+        routeKeyChange(key('Digit1', false))
+      }),
+    )
+    expect(types).toEqual(['requestRescue'])
+    expect(edgesOf()).toEqual(['use_slot_1+'])
+  })
+
+  it('still sends the release when the key comes up after the layer changed (docked while held)', () => {
+    const types = withRegistrations([RELEASE_PROBE], () =>
+      submittedDuring(() => {
+        routeKeyChange(key('Digit3', true))
+        tap('interact')
+        expect(game().vehicle.mode).toBe('docked')
+        routeKeyChange(key('Digit3', false))
+      }),
+    )
+    expect(types).toEqual(['requestRescue', 'dock', 'quickService'])
+  })
+
+  it('sends the same release from an action-layer press and release, as any device makes them', () => {
+    const types = withRegistrations([RELEASE_PROBE], () =>
+      submittedDuring(() => {
+        pressAction('use_slot_3')
+        releaseAction('use_slot_3')
+      }),
+    )
+    expect(types).toEqual(['requestRescue', 'quickService'])
   })
 })
