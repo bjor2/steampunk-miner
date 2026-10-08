@@ -61,7 +61,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 20 files, 137 tests
+### `drill-gear`: 21 files, 146 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -83,6 +83,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/statPreview.test.ts` | 12 | 12 |
 | `src/features/drill-gear/systems/twinBit.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/twinBitDiagonal.test.ts` | 5 | 5 |
+| `src/features/drill-gear/systems/useResolution.test.ts` | 9 | 9 |
 | `src/features/drill-gear/systems/vibratoryCrumble.test.ts` | 4 | 4 |
 | `src/features/drill-gear/twinBitPace.test.ts` | 4 | 2 |
 
@@ -119,7 +120,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 
-### `extraction`: 12 files, 67 tests
+### `extraction`: 13 files, 71 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -135,6 +136,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/extractionSales.test.ts` | 3 | 3 |
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
+| `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
 ### `ground-gun`: 5 files, 50 tests
 
@@ -290,7 +292,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
-### `sensing`: 20 files, 122 tests
+### `sensing`: 21 files, 137 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -309,11 +311,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/revealBoard.test.ts` | 11 | 11 |
 | `src/features/sensing/systems/revealPing.test.ts` | 3 | 3 |
 | `src/features/sensing/systems/sensingEconomy.test.ts` | 5 | 5 |
-| `src/features/sensing/systems/sensingItems.test.ts` | 13 | 13 |
+| `src/features/sensing/systems/sensingItems.test.ts` | 14 | 14 |
 | `src/features/sensing/systems/sensingSales.test.ts` | 2 | 2 |
 | `src/features/sensing/systems/sensingView.test.ts` | 2 | 2 |
 | `src/features/sensing/systems/statPreview.test.ts` | 11 | 11 |
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
+| `src/features/sensing/systems/useResolution.test.ts` | 14 | 14 |
 
 ### `tech-tree`: 28 files, 209 tests
 
@@ -348,7 +351,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 23 files, 194 tests
+### `terrain-tools`: 24 files, 207 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -373,6 +376,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/terrainItems.test.ts` | 11 | 11 |
 | `src/features/terrain-tools/systems/terrainSales.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/terrainSection.test.ts` | 4 | 4 |
+| `src/features/terrain-tools/systems/useResolution.test.ts` | 13 | 13 |
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 

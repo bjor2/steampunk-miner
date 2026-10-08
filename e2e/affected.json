@@ -247,6 +247,18 @@
         "e2e/browser/screens/touchControls.spec.ts",
         "e2e/browser/screens/reviewShots.spec.ts"
       ]
+    },
+    {
+      "why": "Mark milestone verbs (#256, ticket 276): the core's follow-ups and links, and the corer, beacon, drain, auger and bit cases.",
+      "paths": [
+        "src/features/power-up-core/**",
+        "src/features/tech-tree/**",
+        "src/features/terrain-tools/**",
+        "src/features/extraction/**",
+        "src/features/drill-gear/**",
+        "src/features/sensing/**"
+      ],
+      "specs": ["e2e/browser/markMilestones.spec.ts"]
     }
   ]
 }
