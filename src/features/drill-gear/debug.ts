@@ -3,8 +3,9 @@
  * state, never pixels: `getEngaged()` is the local player's drill gear that is switched on and
  * slotted, `getTwinBit()` whether the twin-bit head is mounted and the ahead bearing its last cut
  * latched (`facing`, `left` or `right`, with that cell), `getDielectricBit()` whether the
- * dielectric bit is mounted and the kernel finds the drill shielded (ticket 292), and
- * `statPreview(itemId, mark, planet)`
+ * dielectric bit is mounted and the kernel finds the drill shielded (ticket 292),
+ * `getSideCutters()` whether the cutters' Mark 3 hold is answered and the faced side the drill
+ * cut last latched (ticket 276), and `statPreview(itemId, mark, planet)`
  * the item card's raw lines. `twinBitDiagonal()` writes the scenario `drill-gear.twin-bit-diagonal`
  * (ticket 281) from the next tick as a script, read-only like the haul script (#176): play it with
  * `fastForward(ticks, commands)`, so it replays and logs like any scenario. Equipping goes
@@ -15,6 +16,8 @@ import { readAuthorityState } from '../../store/authorityLink'
 import { useGameStore } from '../../store/gameStore'
 import { isDrillShielded } from '../../systems/registries/shockShields'
 import { isToggleEngaged } from '../power-up-core'
+import { SIDE_CUTTERS_ID } from './systems/cuttersAndBoom'
+import { facedHoldOf } from './systems/cuttersHold'
 import { isDielectricBitMounted } from './systems/dielectricBit'
 import { SHIPPED_DRILL_GEAR } from './systems/drillGearItems'
 import { statPreview } from './systems/statPreview'
@@ -25,6 +28,7 @@ export const drillGearDebugActions: Readonly<Record<string, DebugAction>> = {
   getEngaged: () => ({ ok: true, itemIds: engagedItemIds() }),
   getTwinBit: () => ({ ok: true, ...twinBitOfLocalPlayer() }),
   getDielectricBit: () => ({ ok: true, ...dielectricBitOfLocalPlayer() }),
+  getSideCutters: () => ({ ok: true, ...sideCuttersOfLocalPlayer() }),
   twinBitDiagonal: () => ({ ok: true, ...twinBitDiagonalFromNow() }),
   statPreview: (itemId, mark, planet) => ({
     ok: true,
@@ -62,5 +66,15 @@ function dielectricBitOfLocalPlayer() {
   return {
     isMounted: isDielectricBitMounted(state, playerId),
     isShielded: isDrillShielded(state, playerId),
+  }
+}
+
+function sideCuttersOfLocalPlayer() {
+  const state = readAuthorityState()
+  const { playerId } = useGameStore.getState()
+  return {
+    isEngaged: isToggleEngaged(state, playerId, SIDE_CUTTERS_ID),
+    facedHold: facedHoldOf(state, playerId, SIDE_CUTTERS_ID),
+    sideLatch: state.players[playerId]?.vehicle.sideLatch ?? null,
   }
 }

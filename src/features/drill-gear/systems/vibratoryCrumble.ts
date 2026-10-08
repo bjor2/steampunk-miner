@@ -11,9 +11,9 @@
  * rim (`drillGearCellsAt`), at the level cut's stamp, so the crumble and the reach boom name the
  * same cell. It only opens the ground the bit would cut next, so it never traps or moves a vehicle.
  *
- * Its Mark 3 sibling-link (#256, an always-on item's one milestone) fires at each crumble: the
- * crumble cores ahead with a slotted sampling corer at half reach, on the corer's own charge and
- * cooldown (power-up-core's `fireSiblingLinkAt`).
+ * Ground soft enough to crumble is the bit's soft ground: its Mark 3 sibling-link fires on a cut
+ * of it (`softGroundLink.ts`, re-keyed off the crumble by the GD ruling on #276, since #308 retires
+ * the crumble into the bit's soft-ground affinity).
  */
 import { BASIS_POINTS } from '../../../constants/balance'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
@@ -31,12 +31,11 @@ import type { AuthorityReaction } from '../../../systems/registries/authorityRea
 import { drillGearCellsAt } from '../../../systems/vehicle/drillGearCells'
 import { drillStampOf } from '../../../systems/vehicle/drillStamp'
 import { itemInSlot } from '../../../systems/vehicle/loadoutState'
-import { tileOfPose, type VehiclePose } from '../../../systems/vehicle/vehiclePose'
+import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../../../systems/world/worldCell'
 import { cellAt } from '../../../systems/world/worldState'
-import { fireSiblingLinkAt } from '../../power-up-core'
 import { gearValueOf } from './drillGearItems'
 import './drillGearEvents'
 
@@ -50,8 +49,8 @@ export const VIBRATORY_CRUMBLE_REACTION: AuthorityReaction = {
   react: crumbleAheadOfBit,
 }
 
-/** What the crumble needs to know of one player's drill. */
-interface WorkingBit {
+/** What the crumble and the link need to know of one player's drill. */
+export interface WorkingBit {
   playerId: string
   params: PlanetParams
   pose: VehiclePose
@@ -67,25 +66,14 @@ function crumbleAheadOfBit(
 ): RuleEffect {
   const bit = workingBitOf(after, heard)
   if (bit === null) return unchanged(after)
-  const tiles = crumblingCellsOf(after, bit)
-  if (tiles.length === 0) return unchanged(after)
-  return withCrumbleLink(queueCrumble(after, bit.playerId, tiles), bit)
-}
-
-/** The crumble's sibling-link, once its Mark is researched: the corer fires from the bit. */
-function withCrumbleLink(crumbled: RuleEffect, bit: WorkingBit): RuleEffect {
-  const moment = {
-    playerId: bit.playerId,
-    itemId: VIBRATORY_BIT_ID,
-    tick: bit.tick,
-    origin: tileOfPose(bit.pose),
-  }
-  const fired = fireSiblingLinkAt(crumbled.state, moment)
-  return { state: fired.state, events: [...crumbled.events, ...fired.events] }
+  return queueCrumble(after, bit.playerId, crumblingCellsOf(after, bit))
 }
 
 /** The player whose vibratory bit just drilled, with its pose and tip; null for anyone else. */
-function workingBitOf(state: AuthorityState, heard: readonly DomainEvent[]): WorkingBit | null {
+export function workingBitOf(
+  state: AuthorityState,
+  heard: readonly DomainEvent[],
+): WorkingBit | null {
   const drilled = heard.find((event) => event.type === 'DrillDamageDealt')
   const params = planetParamsOf(state.planet)
   if (drilled?.playerId === undefined || params === null) return null
@@ -103,12 +91,12 @@ function crumblingCellsOf(state: AuthorityState, bit: WorkingBit): TilePoint[] {
   const aheadCells = gearValueOf(VIBRATORY_BIT_ID, 'crumbleAheadCells')
   const stamp = drillStampOf(bit.pose, false)
   return drillGearCellsAt(bit.pose, stamp, { aheadCells, sideCells: 0 }).ahead.filter(
-    (tile) => isCrumblingCell(state, bit, tile) && !isCrumbleQueued(state, tile),
+    (tile) => isSoftGroundCell(state, bit, tile) && !isCrumbleQueued(state, tile),
   )
 }
 
-/** Intact plain ground no harder than the bit's share of the tip. */
-function isCrumblingCell(state: AuthorityState, bit: WorkingBit, tile: TilePoint): boolean {
+/** The bit's soft ground: intact plain ground no harder than its share of the tip. */
+export function isSoftGroundCell(state: AuthorityState, bit: WorkingBit, tile: TilePoint): boolean {
   const cell = cellAt(state.world, bit.params, tile)
   if (kindOfCell(cell) !== CELL_KIND.ground) return false
   return isSoftForTip(hardnessOfTile(bit.params, tile, cell), bit.drillTip)

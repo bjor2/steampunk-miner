@@ -13,6 +13,7 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { drillGearDebugActions } from './debug'
 import { DRILL_GEAR_PROJECTIONS, DRILL_GEAR_RUN_EVENTS } from './logging'
 import { CUTTERS_AND_BOOM_SOURCE } from './systems/cuttersAndBoom'
+import { DRILL_GEAR_SECTION } from './systems/cuttersHold'
 import { DIELECTRIC_BIT_SHIELD } from './systems/dielectricBit'
 import {
   DRILL_GEAR_POWER_UPS,
@@ -24,6 +25,7 @@ import { DRILL_GEAR_SELLER } from './systems/drillGearSales'
 import { DRILL_GEAR_ITEM_CARDS } from './systems/itemCards'
 import { SPOIL_AUGER_STEP } from './systems/spoilAuger'
 import { DIAGONAL_CUT_REACTION, TWIN_BIT_SOURCE } from './systems/twinBit'
+import { SOFT_GROUND_LINK_REACTION } from './systems/softGroundLink'
 import { VIBRATORY_CRUMBLE_REACTION } from './systems/vibratoryCrumble'
 
 export const slice: SliceDefinition = {
@@ -34,7 +36,9 @@ export const slice: SliceDefinition = {
     r.content('tech-node', DRILL_GEAR_TECH_NODES)
     r.itemDescriptionEntries(DRILL_GEAR_ITEM_CARDS)
     r.vehicleItemSeller(DRILL_GEAR_SELLER)
+    r.saveSection(DRILL_GEAR_SECTION)
     r.authorityReaction(VIBRATORY_CRUMBLE_REACTION)
+    r.authorityReaction(SOFT_GROUND_LINK_REACTION)
     r.authorityReaction(DIAGONAL_CUT_REACTION)
     r.drillGear(CUTTERS_AND_BOOM_SOURCE)
     r.drillGear(TWIN_BIT_SOURCE)

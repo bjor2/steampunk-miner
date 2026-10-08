@@ -24,6 +24,7 @@ import {
 } from '../../power-up-core'
 import { ofType, press } from '../drillGearTestSession'
 import { backfillRowOf } from './backfillRow'
+import { CUTTERS_AND_BOOM_SOURCE } from './cuttersAndBoom'
 
 // The drill gear's Mark milestones (the GD lock on #256, build 5) through the real power-up path on
 // the loaded slices: the spoil auger's Mark 3 hold and Mark 6 second tap, the sampling corer's Mark 3
@@ -34,6 +35,7 @@ import { backfillRowOf } from './backfillRow'
 const AUGER = 'gear.spoil_auger'
 const CORER = 'gear.sampling_corer'
 const BIT = 'gear.vibratory_bit'
+const CUTTERS = 'gear.side_cutters'
 /** Planet-1 ground whose next cell down is an ore cell (`drillGearInPlay.test.ts`). */
 const ABOVE_ORE: TilePoint = { tx: 30, ty: 280 }
 /** Band-1 ground six rows under the surface, with ground below it (`vibratoryCrumble.test.ts`). */
@@ -205,7 +207,7 @@ describe('drill-gear Mark milestones (#256): the sampling corer, a charged part'
   })
 })
 
-describe('drill-gear Mark milestones (#256): the vibratory bit links to the corer', () => {
+describe('drill-gear Mark milestones (#256): the vibratory bit links to the corer on soft ground', () => {
   /** One drill command down soft ground with the bit and the corer slotted, researched to `planet`. */
   function crumbledAt(planetIndex: number, slots: Readonly<Record<string, string>>) {
     const session = createScriptedSession()
@@ -225,22 +227,112 @@ describe('drill-gear Mark milestones (#256): the vibratory bit links to the core
 
   const BOTH = { 'drill.head': BIT, 'drill.collar': CORER }
 
-  it("at M3 each crumble fires the slotted corer from the collar, on the corer's own charge", () => {
+  it("at M3 a cut of soft ground fires the slotted corer from the collar once, on the corer's own charge", () => {
     const session = crumbledAt(10, BOTH)
-    expect(ofType(session.events(), 'drill-gear.GroundCrumbled').length).toBeGreaterThan(0)
+    const cutGround = ofType(session.events(), 'TileDestroyed')
+    expect(cutGround.length).toBeGreaterThan(1)
     expect(ofType(session.events(), 'power-up-core.LinkFired')).toMatchObject([
       { itemId: BIT, siblingId: CORER, slot: 'drill.collar' },
     ])
     expect(chargesLeftOf(session.state(), 'p1', CORER)).toBe(3)
   })
 
-  it('at M2, or with the corer unslotted, the crumble fires nothing and spends nothing', () => {
+  it('at M2, or with the corer unslotted, a cut of soft ground fires nothing and spends nothing', () => {
     const atMark2 = crumbledAt(7, BOTH)
-    expect(ofType(atMark2.events(), 'drill-gear.GroundCrumbled').length).toBeGreaterThan(0)
+    expect(ofType(atMark2.events(), 'TileDestroyed').length).toBeGreaterThan(0)
     expect(ofType(atMark2.events(), 'power-up-core.LinkFired')).toEqual([])
     expect(chargesLeftOf(atMark2.state(), 'p1', CORER)).toBe(4)
     const unslotted = crumbledAt(10, { 'drill.head': BIT })
     expect(ofType(unslotted.events(), 'power-up-core.LinkFired')).toEqual([])
+  })
+})
+
+describe("drill-gear Mark milestones (#276): the side cutters' hold, a toggle", () => {
+  /** `side_drills` opens on planet 13; the cutters' Mark 3 is researched from planet 19. */
+  const SIDE_DRILLS_PLANET = 13
+  const MARK_3_PLANET = 19
+  const MARK_2_PLANET = 16
+
+  interface CuttersSetup {
+    researchedThrough: number
+    onPlanet?: number
+    slots?: Readonly<Record<string, string>>
+  }
+
+  /** On `onPlanet`, the miner faced right, switched the cutters on and then followed up. */
+  function cuttersFollowedUp(setup: CuttersSetup, follow: CommandIntent): RecordedSession {
+    const session = recordedSession()
+    const planetIndex = setup.onPlanet ?? SIDE_DRILLS_PLANET
+    session.submit(0, { type: 'debug.setPlanet', payload: { planetIndex } } as CommandIntent)
+    session.submit(0, researchThrough(setup.researchedThrough))
+    session.submit(0, setVehicleLoadoutCommand(setup.slots ?? { 'drill.flank': CUTTERS }))
+    session.submit(1, poseAbove(GROUND, FACING.right))
+    session.submit(2, press('drill.flank'))
+    session.submit(3, follow)
+    return session
+  }
+
+  const askOf = (state: ReturnType<RecordedSession['state']>) =>
+    CUTTERS_AND_BOOM_SOURCE.gearOf(state, 'p1')
+
+  it('at M3 the hold asks for the faced side only and at M2 it is refused, at 30 and 144 steps/s', () => {
+    const atMark3 = cuttersFollowedUp(
+      { researchedThrough: MARK_3_PLANET },
+      intentToHoldSlot('drill.flank'),
+    )
+    const runs3 = replayedAtEveryRate(atMark3, 4)
+    expect(runs3.map((run) => usedLinesOf(run.events).slice(-1))).toEqual(
+      runs3.map(() => [{ milestone: 'hold', toggledOn: true }]),
+    )
+    // The miner faced right before the hold: that push seeds the faced side.
+    for (const run of runs3) {
+      expect(askOf(run.state)).toMatchObject({
+        sideCells: 1,
+        sideAim: 'drive',
+        sideSeed: { x: 1, y: 0 },
+      })
+    }
+
+    const atMark2 = cuttersFollowedUp(
+      { researchedThrough: MARK_2_PLANET },
+      intentToHoldSlot('drill.flank'),
+    )
+    const runs2 = replayedAtEveryRate(atMark2, 4)
+    expect(runs2.map((run) => rejectionsOf(run.events))).toEqual(
+      runs2.map(() => ['power-up-core.no_milestone']),
+    )
+    for (const run of runs2) expect(askOf(run.state)).toEqual(askOf(runs2[0].state))
+    expect(askOf(runs2[0].state)).not.toHaveProperty('sideAim')
+    expect(askOf(runs2[0].state)?.sideCells).toBeGreaterThan(0)
+  })
+
+  it('stays switched on after its hold, and a plain switch-on afterwards cuts both sides again', () => {
+    const held = cuttersFollowedUp(
+      { researchedThrough: MARK_3_PLANET },
+      intentToHoldSlot('drill.flank'),
+    )
+    expect(isToggleEngaged(held.state(), 'p1', CUTTERS)).toBe(true)
+    held.submit(40, press('drill.flank'))
+    expect(askOf(held.state())).toBeNull()
+    held.submit(41, press('drill.flank'))
+    expect(askOf(held.state())).not.toHaveProperty('sideAim')
+  })
+
+  it('cuts both sides as before until side_drills is open, even held at M3', () => {
+    const early = cuttersFollowedUp(
+      { researchedThrough: MARK_3_PLANET, onPlanet: SIDE_DRILLS_PLANET - 1 },
+      intentToHoldSlot('drill.flank'),
+    )
+    expect(usedLinesOf(early.events()).slice(-1)).toEqual([{ milestone: 'hold', toggledOn: true }])
+    expect(askOf(early.state())).not.toHaveProperty('sideAim')
+  })
+
+  it('asks nothing for a hold without the cutters owned', () => {
+    const unowned = cuttersFollowedUp(
+      { researchedThrough: MARK_3_PLANET, slots: {} },
+      intentToHoldSlot('drill.flank'),
+    )
+    expect(askOf(unowned.state())).toBeNull()
   })
 })
 
@@ -252,8 +344,11 @@ describe('drill-gear Mark milestones (#256): the card line', () => {
         { kind: 'vehicle-item', id: itemId },
         { playerId: 'p1', planetIndex: 1, level, view: itemSnapshotViewOf(state, 'p1') },
       )?.statLines.find((line) => line.label === 'Next milestone')?.now
-    expect(lineAt(AUGER, 1)).toBe('Mk III, hold: packs a plug three rows deep behind you at once')
-    expect(lineAt(BIT, 1)).toBe('Mk III, link: each crumble cores ahead at half reach')
+    expect(lineAt(AUGER, 1)).toBe('Mk III, hold: packs a deep plug behind you in one go')
+    expect(lineAt(BIT, 1)).toBe(
+      'Mk III, link: cutting soft ground fires the sampling corer at half reach',
+    )
+    expect(lineAt(CUTTERS, 1)).toBe("Mk III, hold: cuts only the side you're steering toward")
     expect(lineAt('gear.reach_boom', 1)).toBeUndefined()
   })
 })
