@@ -150,7 +150,8 @@
         "e2e/browser/dynamiteVisuals.spec.ts",
         "e2e/browser/miningGates.spec.ts",
         "e2e/browser/screens/screenLayout.spec.ts",
-        "e2e/browser/screens/reviewShots.spec.ts"
+        "e2e/browser/screens/reviewShots.spec.ts",
+        "e2e/browser/magneticPlanet.spec.ts"
       ]
     },
     {
@@ -223,6 +224,19 @@
       "why": "The mining gates' looks in the ground and the debug reads that check them (ticket 299).",
       "paths": ["src/features/mining-gates/**"],
       "specs": ["e2e/browser/miningGates.spec.ts"]
+    },
+    {
+      "why": "The magnetic planet's aurora on the kernel sky band and planet-mix's field-line layer and asset (#293).",
+      "paths": [
+        "src/features/planet-mix/scene/**",
+        "src/features/planet-mix/systems/render/**",
+        "src/features/planet-mix/magneticLooks.json",
+        "src/scene/PlanetSkyBand.tsx",
+        "src/scene/skyBandPresence.ts",
+        "src/systems/registries/planetSkyBand.ts",
+        "public/assets/prop/prop-magnetic-field/**"
+      ],
+      "specs": ["e2e/browser/magneticPlanet.spec.ts", "e2e/browser/render.spec.ts"]
     },
     {
       "why": "The game stage fits every screen cell and shows the portrait card.",

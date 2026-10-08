@@ -3,6 +3,7 @@ import { MAX_SPEED_MM_PER_SECOND } from '../../../../constants/balance'
 import { MM_PER_METRE } from '../../../../constants/physics'
 import { PACING_WORLD_SEEDS } from '../../../../constants/pacingSeeds'
 import { planetParamsFor, type PlanetParams } from '../../../../systems/world/planetParams'
+import { dockSiteOf } from '../../../../systems/world/dockSite'
 import { CHUNK_SIZE } from '../../../../systems/world/tileGrid'
 import { magneticFieldsInBox } from '../magneticFields'
 import { FIELD_ARC_CAP } from './fieldArcBudget'
@@ -19,6 +20,10 @@ const SEED = PACING_WORLD_SEEDS['bot-slice'][0]
 /** Endless Lodestone: magnetic, and past P40, at the top speed the ruling's gate names. */
 const MAGNETIC_PLANET = 43
 const RELIC_PLANET = 30
+/** A new game's world seed (`gameStore`'s starting planet), which `setPlanet` keeps. */
+const STARTING_WORLD_SEED = 1
+/** Its band-1 veins lie by the dock; P25's lie past the view on seed 1. */
+const DOCK_ARCS_PLANET = 28
 const TOP_SPEED_M_PER_S = MAX_SPEED_MM_PER_SECOND / MM_PER_METRE
 
 /** A pose standing on the planet's surface over its centre, `depthM` down. */
@@ -55,6 +60,18 @@ describe('field arc buffer', () => {
     expect(onMagnetic.arcCount).toBeGreaterThan(0)
     expect(onMagnetic.arcCount).toBeLessThanOrEqual(FIELD_ARC_CAP)
     expect(onRelic.arcCount).toBe(0)
+  })
+
+  it('draws arcs round the dock of P28 on the game’s starting seed, where the e2e reads them', () => {
+    const params = planetParamsFor(STARTING_WORLD_SEED, DOCK_ARCS_PLANET)
+    const { dockPoint } = dockSiteOf(params)
+    // The docked rig stands either side of the pad's middle column, in chunk -1 or chunk 0.
+    const arcCounts = [-5, 0.5].map((x) => {
+      const buffer = createFieldArcBuffer()
+      refreshFieldArcs(buffer, params, { x, y: dockPoint.ty + 0.5, vx: 0, vy: 0 })
+      return buffer.arcCount
+    })
+    expect(Math.min(...arcCounts)).toBeGreaterThan(0)
   })
 
   it('keeps one buffer at P40+ top speed, rewriting it only as the window reaches new chunks', () => {
