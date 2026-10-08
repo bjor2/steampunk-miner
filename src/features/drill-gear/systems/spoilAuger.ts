@@ -9,6 +9,10 @@
  * pad, lava or core; never a tile with any lining in it, so a lined or cased section stays open;
  * and never a tile within `vehicleClearanceM` of any vehicle, so it cannot trap a teammate or move
  * anyone. A yielded tile never yields again, so the spoil holds no ore.
+ *
+ * Its Mark milestones (#256, a toggle's hold at Mark 3 and second tap at Mark 6) each pack a plug
+ * at once as they act, under the same rules, and leave it switched on: the hold three rows deep
+ * from the usual row back, the second tap one row five tiles wide a metre past the usual row.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -32,7 +36,7 @@ import {
   materialCellAt,
 } from '../../../systems/world/worldState'
 import { MM_PER_METRE } from '../../../constants/physics'
-import { isToggleEngaged } from '../../power-up-core'
+import { isToggleEngaged, type PowerUpOutcome, type PowerUpUse } from '../../power-up-core'
 import { backfillRowOf, isTileClearOfHull } from './backfillRow'
 import { gearValueOf } from './drillGearItems'
 import './drillGearEvents'
@@ -49,6 +53,38 @@ export const SPOIL_AUGER_STEP: ClockStep = {
 }
 
 const FULL_TILE_DENSITY = SAMPLES_PER_TILE * SAMPLES_PER_TILE * SOLID_DENSITY
+
+/** The hold's plug: the usual row and the two behind it. */
+const PLUG_ROWS = 3
+/** The second tap's row: two tiles each side of the middle, five wide. */
+const WIDE_ROW_SIDE_TILES = 2
+
+/** No open tunnel tile where the plug would go. */
+export const NOTHING_TO_PACK = 'drill-gear.nothing_to_pack'
+
+/**
+ * The auger's act: switching on changes nothing by itself (the clock step fills while it is on);
+ * a Mark milestone's hold or second tap packs its plug at once.
+ */
+export function actAuger(state: AuthorityState, use: PowerUpUse): PowerUpOutcome {
+  const params = planetParamsOf(state.planet)
+  const pose = vehicleOf(state, use.playerId).pose
+  if (use.milestone === undefined || params === null || pose === null)
+    return { kind: 'acted', effect: unchanged(state) }
+  const tiles = fillableOf(state, params, plugTilesOf(use, pose))
+  if (tiles.length === 0) return { kind: 'refused', reason: NOTHING_TO_PACK }
+  return { kind: 'acted', effect: queueBackfill(state, use.playerId, tiles) }
+}
+
+/** The hold's rows three deep; the second tap's one row five wide, a metre further back. */
+function plugTilesOf(use: PowerUpUse, pose: VehiclePose): TilePoint[] {
+  const fillBehindM = gearValueOf(SPOIL_AUGER_ID, 'fillBehindM')
+  if (use.milestone === 'second-tap')
+    return backfillRowOf(pose, fillBehindM + 1, WIDE_ROW_SIDE_TILES)
+  return Array.from({ length: PLUG_ROWS }, (_, row) =>
+    backfillRowOf(pose, fillBehindM + row),
+  ).flat()
+}
 
 /** The material a tunnel tile may hold to be filled: plain ground or mined-out ore. */
 const FILLED_KINDS: readonly number[] = [CELL_KIND.ground, CELL_KIND.ore]
@@ -89,7 +125,16 @@ function backfillTilesOf(
   params: PlanetParams,
   pose: VehiclePose,
 ): TilePoint[] {
-  return backfillRowOf(pose, gearValueOf(SPOIL_AUGER_ID, 'fillBehindM')).filter(
+  return fillableOf(state, params, backfillRowOf(pose, gearValueOf(SPOIL_AUGER_ID, 'fillBehindM')))
+}
+
+/** The tiles the auger may fill now: open tunnel, clear of every vehicle, not queued already. */
+function fillableOf(
+  state: AuthorityState,
+  params: PlanetParams,
+  tiles: readonly TilePoint[],
+): TilePoint[] {
+  return tiles.filter(
     (tile) =>
       isOpenTunnel(state, params, tile) && isClearOfVehicles(state, tile) && !isQueued(state, tile),
   )

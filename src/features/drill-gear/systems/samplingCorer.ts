@@ -16,6 +16,10 @@
  * hook only reorders cells the corer could already sample, nearest first by default, and never a
  * gated or core cell. The world is never changed, so no hook alters what a dig cuts. With no hook
  * answering the nearest cell is plugged, as before.
+ *
+ * Mark milestones (#256): the Mark 3 second tap punches the tube beside the bit instead of ahead,
+ * the Mark 6 hold draws the plug from the farthest ore in reach, not the nearest. Fired by a
+ * sibling-link, the tube reaches the link's reduced share of the corer's Mark reach.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged } from '../../../systems/authority/commandRule'
@@ -53,25 +57,42 @@ export function sampleOreAhead(state: AuthorityState, use: PowerUpUse): PowerUpO
   const params = planetParamsOf(state.planet)
   const pose = vehicleOf(state, use.playerId).pose
   if (params === null || pose === null) return { kind: 'acted', effect: unchanged(state) }
-  const cored = aimedCoredCellOf(state, use, coredCellsOf(state, params, pose))
+  const cored = aimedCoredCellOf(state, use, coredCellsOf(state, params, tubeCellsOf(pose, use)))
   return cored === null
     ? { kind: 'acted', effect: unchanged(state) }
     : outcomeOfCoring(state, params, use.playerId, cored)
 }
 
-/** The tube's cells past the bit, nearest first, up to the corer's reach. */
-function tubeCellsOf(pose: VehiclePose): TilePoint[] {
-  return drillGearCellsAt(pose, drillStampOf(pose, false), { aheadCells: reachOf(), sideCells: 0 })
-    .ahead
+/**
+ * The tube's cells in the order it meets them: past the bit, nearest first, up to its reach; beside
+ * the bit for a second tap; farthest first for a hold.
+ */
+function tubeCellsOf(pose: VehiclePose, use: PowerUpUse): TilePoint[] {
+  const reach = tubeReachOf(use)
+  const stamp = drillStampOf(pose, false)
+  if (use.milestone === 'second-tap')
+    return drillGearCellsAt(pose, stamp, { aheadCells: 0, sideCells: reach }).side
+  const ahead = drillGearCellsAt(pose, stamp, { aheadCells: reach, sideCells: 0 }).ahead
+  return use.milestone === 'hold' ? [...ahead].reverse() : ahead
+}
+
+/** The bought reach; a sibling-link's reduced share of the Mark's reach when one fired it. */
+function tubeReachOf(use: PowerUpUse): number {
+  if (use.linkedFrom === undefined) return reachOf()
+  return use.magnitude ?? 0
 }
 
 function reachOf(): number {
   return gearValueOf(SAMPLING_CORER_ID, 'reachTiles')
 }
 
-/** Every ore or core cell in the tube, nearest first. */
-function coredCellsOf(state: AuthorityState, params: PlanetParams, pose: VehiclePose): CoredCell[] {
-  return tubeCellsOf(pose)
+/** Every ore or core cell in the tube, in the tube's order. */
+function coredCellsOf(
+  state: AuthorityState,
+  params: PlanetParams,
+  tube: readonly TilePoint[],
+): CoredCell[] {
+  return tube
     .map((tile) => ({ tile, cell: cellAt(state.world, params, tile) }))
     .filter(({ cell }) => isCoredKind(cell))
     .map(({ tile, cell }) => ({ tile, cell, ore: oreTypeAtTile(state, tile) }))

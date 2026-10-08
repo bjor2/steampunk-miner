@@ -18,18 +18,28 @@ import type { TilePoint } from '../../../systems/world/tileGrid'
 /** Half the hull, in mm: the clearances below are measured from its edge. */
 export const HALF_HULL_MM = (VEHICLE_COLLIDER_SIZE * MM_PER_METRE) / 2
 
-/** The tile straight behind the hull at `fillBehindM` plus half a tile, then its two neighbours. */
-export function backfillRowOf(pose: VehiclePose, fillBehindM: number): TilePoint[] {
+/**
+ * The tile straight behind the hull at `fillBehindM` plus half a tile, then its neighbours out to
+ * `sideTiles` on each side (one: the bore's three).
+ */
+export function backfillRowOf(pose: VehiclePose, fillBehindM: number, sideTiles = 1): TilePoint[] {
   const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
   const reachMm = HALF_HULL_MM + fillBehindM * MM_PER_METRE + MM_PER_METRE / 2
   const centre = { x: pose.x - scaled(ahead.x, reachMm), y: pose.y - scaled(ahead.y, reachMm) }
   const across = { x: -ahead.y, y: ahead.x }
-  return [0, 1, -1].map((side) =>
+  return sidesOutTo(sideTiles).map((side) =>
     tileOfMillimetres(
       centre.x + scaled(across.x, side * MM_PER_METRE),
       centre.y + scaled(across.y, side * MM_PER_METRE),
     ),
   )
+}
+
+/** 0, then 1 and -1, out to `sideTiles` and its mirror. */
+function sidesOutTo(sideTiles: number): number[] {
+  const sides = [0]
+  for (let side = 1; side <= sideTiles; side += 1) sides.push(side, -side)
+  return sides
 }
 
 /** Whether the nearest point of `tile` lies at least `clearanceMm` beyond the hull's edge. */

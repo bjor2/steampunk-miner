@@ -4,8 +4,8 @@
  * names, at reduced strength, from the sibling's own slot.
  *
  * - The link fires only while the player has it on, and only if the sibling is in an open power-up
- *   slot and ready: a charge left, its cooldown run, not acting. A sibling that is still a vision
- *   row is never registered, so never slotted, and never fires.
+ *   slot or drill socket and ready: a charge left, its cooldown run, not acting. A sibling that is
+ *   still a vision row is never registered, so never slotted, and never fires.
  * - It spends the sibling's own charge and starts its own cooldown; a sibling that counts no
  *   charges never fires, so a milestone never yields a use without spending a charge.
  * - A link that does not fire, or whose sibling finds nothing to act on or is refused by a gate,
@@ -32,7 +32,7 @@ import { linkFiredOf } from './powerUpEvents'
 import { POWER_UP_CORE_ECONOMY } from './powerUpEconomy'
 import { hasCharges, type PowerUp, type PowerUpUse } from './powerUpKind'
 import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
-import { POWER_UP_SLOTS, type PowerUpSlot } from './powerUpSlots'
+import { PRESSABLE_SLOTS, type PressableSlot } from './powerUpSlots'
 import { pressablePowerUpOf } from './useRefusals'
 
 /** An item's sibling-link: its act fires `siblingId`. */
@@ -45,13 +45,13 @@ export interface SiblingLink {
 export type LinkMoment = Pick<PowerUpUse, 'playerId' | 'itemId' | 'tick' | 'origin'>
 
 interface SlottedPowerUp {
-  slot: PowerUpSlot
+  slot: PressableSlot
   powerUp: PowerUp
 }
 
 interface ReadySibling {
   powerUp: MarkedPowerUp
-  slot: PowerUpSlot
+  slot: PressableSlot
 }
 
 const BASIS_POINTS = 10_000
@@ -127,9 +127,12 @@ function readySiblingOf(
   return isReadyToLink(value, powerUp, moment.tick) ? { powerUp, slot: slotted.slot } : null
 }
 
-/** The open power-up slot a press uses that holds the item, first slot first; null for none. */
+/**
+ * The open slot a press uses that holds the item: the power-up slots first, then the drill
+ * sockets, where a drill-gear sibling sits (ticket 276); null for none.
+ */
 function slottedSiblingOf(vehicle: VehicleState, itemId: string): SlottedPowerUp | null {
-  const slotted = POWER_UP_SLOTS.map((slot) => ({
+  const slotted = PRESSABLE_SLOTS.map((slot) => ({
     slot,
     powerUp: pressablePowerUpOf(vehicle, slot),
   }))

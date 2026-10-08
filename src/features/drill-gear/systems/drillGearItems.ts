@@ -20,6 +20,7 @@ import {
   type DrillGearBalance,
   type DrillGearStatName,
 } from './drillGearEconomy'
+import { drillGearMilestonesOf } from './drillGearMilestones'
 
 export type DrillGearStatUnit =
   'charges' | 'ticks' | 'tiles' | 'cells' | 'm' | 'bp' | 'bp_per_second'
@@ -307,17 +308,20 @@ export function vehicleItemOf(item: DrillGearItem): VehicleItem {
 
 /**
  * The Mark 1 ladder from the stats that carry a Mark role (#162 4.6, the #165 rotation): cooldown
- * or a toggle's draw, then the magnitude, then charges. No drill gear moves ore.
+ * or a toggle's draw, then the magnitude, then charges. No drill gear moves ore. Marks 3, 6 and 9
+ * bring the item's milestones (#256, `drillGearMilestones.ts`).
  */
 export function markLadderOf(item: DrillGearItem): MarkLadder {
   const cooldown = steppedValueOf(item, 'cooldown')
   const magnitude = steppedValueOf(item, 'magnitude')
   const charges = steppedValueOf(item, 'charges')
+  const milestones = drillGearMilestonesOf(item)
   return {
     isIncomeItem: false,
     ...(cooldown !== null && { cooldown }),
     ...(magnitude !== null && { magnitude: { base: magnitude } }),
     ...(charges !== null && { charges }),
+    ...(milestones.length > 0 && { milestones }),
   }
 }
 

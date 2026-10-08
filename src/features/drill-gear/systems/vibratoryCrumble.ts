@@ -10,6 +10,10 @@
  * is ever crumbled. The cells are the ones the kernel's drill gear geometry lists past the stamp's
  * rim (`drillGearCellsAt`), at the level cut's stamp, so the crumble and the reach boom name the
  * same cell. It only opens the ground the bit would cut next, so it never traps or moves a vehicle.
+ *
+ * Its Mark 3 sibling-link (#256, an always-on item's one milestone) fires at each crumble: the
+ * crumble cores ahead with a slotted sampling corer at half reach, on the corer's own charge and
+ * cooldown (power-up-core's `fireSiblingLinkAt`).
  */
 import { BASIS_POINTS } from '../../../constants/balance'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
@@ -27,11 +31,12 @@ import type { AuthorityReaction } from '../../../systems/registries/authorityRea
 import { drillGearCellsAt } from '../../../systems/vehicle/drillGearCells'
 import { drillStampOf } from '../../../systems/vehicle/drillStamp'
 import { itemInSlot } from '../../../systems/vehicle/loadoutState'
-import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
+import { tileOfPose, type VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../../../systems/world/worldCell'
 import { cellAt } from '../../../systems/world/worldState'
+import { fireSiblingLinkAt } from '../../power-up-core'
 import { gearValueOf } from './drillGearItems'
 import './drillGearEvents'
 
@@ -51,6 +56,8 @@ interface WorkingBit {
   params: PlanetParams
   pose: VehiclePose
   drillTip: BigStat
+  /** The drill command's tick. */
+  tick: number
 }
 
 function crumbleAheadOfBit(
@@ -60,7 +67,21 @@ function crumbleAheadOfBit(
 ): RuleEffect {
   const bit = workingBitOf(after, heard)
   if (bit === null) return unchanged(after)
-  return queueCrumble(after, bit.playerId, crumblingCellsOf(after, bit))
+  const tiles = crumblingCellsOf(after, bit)
+  if (tiles.length === 0) return unchanged(after)
+  return withCrumbleLink(queueCrumble(after, bit.playerId, tiles), bit)
+}
+
+/** The crumble's sibling-link, once its Mark is researched: the corer fires from the bit. */
+function withCrumbleLink(crumbled: RuleEffect, bit: WorkingBit): RuleEffect {
+  const moment = {
+    playerId: bit.playerId,
+    itemId: VIBRATORY_BIT_ID,
+    tick: bit.tick,
+    origin: tileOfPose(bit.pose),
+  }
+  const fired = fireSiblingLinkAt(crumbled.state, moment)
+  return { state: fired.state, events: [...crumbled.events, ...fired.events] }
 }
 
 /** The player whose vibratory bit just drilled, with its pose and tip; null for anyone else. */
@@ -74,7 +95,7 @@ function workingBitOf(state: AuthorityState, heard: readonly DomainEvent[]): Wor
     return null
   }
   const { drillTip } = heatThrottledDrill(params.planetIndex, vehicle)
-  return { playerId: drilled.playerId, params, pose: vehicle.pose, drillTip }
+  return { playerId: drilled.playerId, params, pose: vehicle.pose, drillTip, tick: drilled.tick }
 }
 
 /** The cells ahead of the bit that crumble now, nearest first. */
