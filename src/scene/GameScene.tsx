@@ -53,10 +53,10 @@ export function GameScene() {
       camera={{ position: [...CAMERA_POSITION] }}
     >
       <SkyBackground />
-      <PlanetSkyBand />
       <ScreenFeedback />
       <PlanetCamera />
       <WorldRoot>
+        <PlanetSkyBand />
         <LightRig />
         <PlanetTerrain />
         <PlatformYard />
