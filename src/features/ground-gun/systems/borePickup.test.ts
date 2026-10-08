@@ -112,8 +112,10 @@ describe('ground-gun: picking up the ore a bore frees', () => {
       incomeItemValue: toCanonical(roomForOne),
     })
     const effect = BORE_PICKUP_REACTION.react(nearCap, nearCap, boreHeardOn(nearCap))
-    expect(ofType(effect.events, 'CargoAdded' as never)).toHaveLength(1)
-    expect(effect.events.map((event) => event.type)).toContain('ground-gun.BoredOreCapped')
+    expect(effect.events.map((event) => event.type)).toEqual([
+      'CargoAdded',
+      'ground-gun.BoredOreCapped',
+    ])
     expect(fromCanonical(tripValueOf(effect.state))).toEqual(cap)
   })
 
