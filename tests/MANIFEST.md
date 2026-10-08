@@ -228,16 +228,18 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/oreRows.test.ts` | 3 | 3 |
 | `src/features/ores/systems/oreTypeProvider.test.ts` | 6 | 6 |
 
-### `planet-mix`: 15 files, 92 tests
+### `planet-mix`: 21 files, 118 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/planet-mix/fieldArcsBench.test.ts` | 2 | 2 |
 | `src/features/planet-mix/histogramCheck.test.ts` | 5 | 5 |
 | `src/features/planet-mix/magneticBandValue.test.ts` | 3 | 1 |
 | `src/features/planet-mix/magneticClassOff.test.ts` | 3 | 3 |
 | `src/features/planet-mix/magneticPlanetPace.test.ts` | 9 | 3 |
 | `src/features/planet-mix/mixHistogram.test.ts` | 7 | 3 |
 | `src/features/planet-mix/mixReportRows.test.ts` | 5 | 5 |
+| `src/features/planet-mix/sceneBudget.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/electrifiedCells.test.ts` | 6 | 6 |
 | `src/features/planet-mix/systems/magneticFields.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/mixRoll.test.ts` | 5 | 5 |
@@ -245,6 +247,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/planetActs.test.ts` | 13 | 13 |
 | `src/features/planet-mix/systems/planetCard.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/planetClass.test.ts` | 6 | 6 |
+| `src/features/planet-mix/systems/render/auroraBand.test.ts` | 3 | 3 |
+| `src/features/planet-mix/systems/render/fieldArcBuffer.test.ts` | 7 | 7 |
+| `src/features/planet-mix/systems/render/fieldArcs.test.ts` | 6 | 6 |
+| `src/features/planet-mix/systems/render/magneticArt.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
@@ -725,6 +731,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/itemHooks.test.ts` | 13 | 13 |
 | `src/systems/registries/oreLook.test.ts` | 2 | 2 |
 | `src/systems/registries/oreTypes.test.ts` | 12 | 12 |
+| `src/systems/registries/planetSkyBand.test.ts` | 5 | 5 |
 | `src/systems/registries/saveSections.test.ts` | 3 | 3 |
 | `src/systems/registries/scheduleRows.test.ts` | 4 | 4 |
 | `src/systems/registries/seal.test.ts` | 12 | 12 |
@@ -769,6 +776,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/sampleClock.test.ts` | 3 | 3 |
 | `src/systems/render/sceneLights.test.ts` | 6 | 6 |
 | `src/systems/render/screenProjection.test.ts` | 5 | 5 |
+| `src/systems/render/skyBandLook.test.ts` | 3 | 3 |
+| `src/systems/render/skyBandRing.test.ts` | 6 | 6 |
 | `src/systems/render/stagedTurn.test.ts` | 2 | 2 |
 | `src/systems/render/vehicleLook.test.ts` | 10 | 8 |
 | `src/systems/render/vehiclePreviewLook.test.ts` | 5 | 5 |
