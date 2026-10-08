@@ -1232,6 +1232,50 @@
         },
         {
           "group": true,
+          "title": "Bore gun",
+          "description": "A brass gun on the rig from planet 1 that bores a short line of rock open, cell by cell: a reach tool and a reason to case, not a second drill.",
+          "children": [
+            {
+              "title": "Bore shot",
+              "description": "Aim into the ground (never straight down the shaft); a line of cells opens two ticks apart at a share of the drill's power, and unlined rock around it caves in afterwards.",
+              "status": "built",
+              "issues": [309, 313, 314],
+              "planet": 1
+            },
+            {
+              "title": "Gun mount and brass tracks",
+              "description": "Mount the gun, then raise its rate, penetration and energy tracks, each level priced by its planet. The rules and cards are in; the Upgrade bay rows to buy them from are still to come.",
+              "status": "partial",
+              "issues": [314, 322]
+            },
+            {
+              "title": "Recovery ring and hold-fire",
+              "description": "Hold fire and the gun shoots the moment it may; an early tap waits a moment; a brass ring on the fire tile fills as the gun recovers.",
+              "status": "partial",
+              "issues": [314]
+            },
+            {
+              "title": "Fire tile and aim",
+              "description": "On touch, tap the fire tile to shoot along your facing or drag it to aim, with a reticle showing the line. Mouse, gamepad and keyboard firing are still to come.",
+              "status": "partial",
+              "issues": [314]
+            },
+            {
+              "title": "Bored ore pickup",
+              "description": "Ore a bore frees is picked up at its normal price, inside the trip's income cap.",
+              "status": "built",
+              "issues": [314]
+            },
+            {
+              "title": "Tracer and debris",
+              "description": "A tracer and rock debris along the bored line.",
+              "status": "planned",
+              "issues": [314]
+            }
+          ]
+        },
+        {
+          "group": true,
           "title": "Heat & lava",
           "description": "The hazards of the Fire act (planets 8-16).",
           "children": [
