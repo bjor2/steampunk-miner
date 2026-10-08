@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T04:23:52+02:00",
+  "updated_at": "2026-10-08T04:26:56+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -89,22 +89,22 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
-          "ticket": 339,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-08T04:15:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
+      "used": 1,
+      "free": 3,
       "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 0,
     "max": 3
   },
   "tester": {
@@ -216,10 +216,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 339,
-      "since": "2026-10-08T04:15:00+02:00",
-      "claude_slot": 8
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -351,25 +350,25 @@
     },
     {
       "slot": 8,
-      "state": "busy",
-      "ticket": 339,
-      "grok_slot": 1,
-      "since": "2026-10-08T04:15:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 2
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 04:23 CEST",
+    "at": "2026-10-08 04:26 CEST",
     "mode": "refill-dev",
-    "triggers": "#317 #342",
+    "triggers": "#339",
     "started": "",
     "note": "paused: main red (nightly full suite)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -377,8 +376,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 5,
-      "free": 3,
+      "used": 4,
+      "free": 4,
       "external": 1
     }
   }
