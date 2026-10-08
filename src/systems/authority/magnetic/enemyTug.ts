@@ -41,7 +41,7 @@ function tuggableEnemiesOf(combat: CombatState, tags: MetalEnemyTags): Enemy[] {
 }
 
 /** The tiles of the rigs out on a trip, where they stand at the tick. */
-function rigTilesAt(state: AuthorityState, tick: number): TilePoint[] {
+export function rigTilesAt(state: AuthorityState, tick: number): TilePoint[] {
   return Object.keys(state.players)
     .map((playerId) => vehicleTargetOf(state, playerId, tick))
     .filter((target) => target !== null)
@@ -69,7 +69,7 @@ function canEndTugAt(
   return canEnter(terrain, enemy.kind, point) && !isRigTile(rigTiles, point)
 }
 
-function isRigTile(rigTiles: readonly TilePoint[], point: MillimetrePoint): boolean {
+export function isRigTile(rigTiles: readonly TilePoint[], point: MillimetrePoint): boolean {
   const tile = tileOfMillimetres(point.x, point.y)
   return rigTiles.some((rig) => rig.tx === tile.tx && rig.ty === tile.ty)
 }

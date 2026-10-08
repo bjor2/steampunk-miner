@@ -24,11 +24,13 @@ import {
 import type { Enemy } from '../combat/combatState'
 import { walkStepMmOf } from '../combat/enemyMovement'
 import { createScriptedSession, WORLD_SEED } from '../scriptedSession'
+import { pushMetalEnemies } from '../magnet/enemyPush'
 import { tugMetalEnemies } from './enemyTug'
 
 // The metal enemy tag (GD lock on spec #258 Q5, ticket 291): every enemy spec states `metal`,
 // emp_mite is the first metal family, and only metal enemies feel a field's tug: toward the vein,
-// at most 10% of their own speed, never into the rig's cell. The push-wave half is #284's.
+// at most 10% of their own speed, never into the rig's cell. The repulsor coil's push-wave hits
+// only metal enemies too, one cell outward from the rig (moved to ticket 284 by GD, 7 Oct).
 
 const PLANET_2 = planetParamsFor(WORLD_SEED, 2)
 const PLANET_INDEX = 2
@@ -81,6 +83,17 @@ function terrainOf(state: AuthorityState) {
 
 function tuggedOnce(state: AuthorityState, tags: MetalEnemyTags): AuthorityState {
   return tugMetalEnemies(state, terrainOf(state), SPAWN_TICK, tags)
+}
+
+/** The repulsor's base wave, fired from the rig at SPOT on the spawn tick. */
+const WAVE = {
+  centre: { x: SPOT.tx * 1000 + 500, y: SPOT.ty * 1000 + 500 },
+  radiusTiles: 2,
+  tick: SPAWN_TICK,
+}
+
+function pushedOnce(state: AuthorityState, tags: MetalEnemyTags): AuthorityState {
+  return pushMetalEnemies(state, terrainOf(state), WAVE, tags).state
 }
 
 function distanceMm(from: { x: number; y: number }, to: { x: number; y: number }): number {
@@ -170,5 +183,33 @@ describe('enemies: the metal tag (#258 Q5, ticket 291)', () => {
       const state = session.state()
       expect(burrowerOf(tuggedOnce(state, METAL_BURROWERS))).toEqual(burrowerOf(state))
     })
+  })
+
+  it('only metal enemies are pushed', () => {
+    const state = sessionWithBurrower(2, 0).state()
+    expect(burrowerOf(pushedOnce(state, ECONOMY.enemies.metal))).toEqual(burrowerOf(state))
+    const pushed = burrowerOf(pushedOnce(state, METAL_BURROWERS))
+    expect(distanceMm(WAVE.centre, pushed)).toBeGreaterThan(
+      distanceMm(WAVE.centre, burrowerOf(state)),
+    )
+  })
+
+  it('pushes a metal enemy one cell straight out from the rig', () => {
+    const state = sessionWithBurrower(2, 0).state()
+    const before = burrowerOf(state)
+    const after = burrowerOf(pushedOnce(state, METAL_BURROWERS))
+    expect(after).toMatchObject({ x: before.x + 1000, y: before.y, phase: before.phase })
+  })
+
+  it('leaves a metal enemy past the wave radius where it is', () => {
+    const state = sessionWithBurrower(3, 0).state()
+    expect(burrowerOf(pushedOnce(state, METAL_BURROWERS))).toEqual(burrowerOf(state))
+  })
+
+  it('does not push a frozen enemy', () => {
+    const session = sessionWithBurrower(2, 0)
+    session.submit(SPAWN_TICK, freezeEnemies(true))
+    const state = session.state()
+    expect(burrowerOf(pushedOnce(state, METAL_BURROWERS))).toEqual(burrowerOf(state))
   })
 })
