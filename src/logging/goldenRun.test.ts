@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import { GOLDEN_SCRIPTS, stampScript } from '../systems/replay/goldenScripts'
+import { expandCommandLog, loggedCommandsOf } from './commandLog'
 import {
   currentGoldenVersions,
   goldenRunProblems,
@@ -82,17 +83,27 @@ describe('golden run gate', () => {
   it.each(committedGoldenRuns().map((golden) => [golden.name, golden] as const))(
     'replays %s to its committed digests and mined order whatever drive its reports push (ticket 279)',
     (_name, golden) => {
-      const pushed = { ...golden, commands: golden.commands.map(withDrivePushedDownRight) }
+      const commands = expandCommandLog(golden.commands)
+      const pushed = {
+        ...golden,
+        commands: loggedCommandsOf(commands.map(withDrivePushedDownRight)),
+      }
       expect(pushed.commands).not.toEqual(golden.commands)
       expect(goldenRunProblems(pushed)).toEqual([])
     },
   )
 
+  it('writes the committed command lists as the log does, a drive only when it changed (ticket 342)', () => {
+    for (const golden of committedGoldenRuns()) {
+      expect(loggedCommandsOf(expandCommandLog(golden.commands))).toEqual(golden.commands)
+    }
+  })
+
   it('keeps the committed command lists in step with the scripts that made them', () => {
     const committed = committedGoldenRuns()
     for (const script of GOLDEN_SCRIPTS) {
       const golden = committed.find((candidate) => candidate.name === script.name)
-      expect(golden?.commands).toEqual(stampScript(script))
+      expect(golden?.commands).toEqual(loggedCommandsOf(stampScript(script)))
     }
   })
 })

@@ -3,7 +3,7 @@
   "description": "Grade 2 digs 8 m into band 2 and parks beside its lining: no collapse; then debug.forceCollapse refills a lined block anyway (#41, #43).",
   "generatorVersion": 8,
   "authorityProtocolVersion": 49,
-  "logSchemaVersion": 4,
+  "logSchemaVersion": 5,
   "numberFormatVersion": 1,
   "sliceSections": {
     "codex": 1,
@@ -98,11 +98,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -123,11 +119,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -148,11 +140,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -173,11 +161,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -198,11 +182,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -223,11 +203,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -248,11 +224,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -273,11 +245,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -298,11 +266,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -323,11 +287,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -348,11 +308,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -373,11 +329,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -398,11 +350,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -423,11 +371,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -448,11 +392,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -473,11 +413,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -498,11 +434,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -523,11 +455,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -548,11 +476,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -573,11 +497,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -598,11 +518,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -623,11 +539,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -648,11 +560,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -673,11 +581,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -698,11 +602,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -723,11 +623,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -748,11 +644,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -773,11 +665,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -798,11 +686,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -823,11 +707,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -848,11 +728,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -873,11 +749,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -898,11 +770,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -923,11 +791,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -948,11 +812,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -973,11 +833,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -998,11 +854,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1023,11 +875,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1048,11 +896,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1073,11 +917,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1098,11 +938,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1123,11 +959,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1148,11 +980,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1173,11 +1001,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1198,11 +1022,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1223,11 +1043,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1248,11 +1064,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1273,11 +1085,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1298,11 +1106,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1323,11 +1127,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1348,11 +1148,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1373,11 +1169,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1398,11 +1190,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1423,11 +1211,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1448,11 +1232,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1473,11 +1253,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1498,11 +1274,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1523,11 +1295,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1548,11 +1316,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1573,11 +1337,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1598,11 +1358,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1623,11 +1379,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1648,11 +1400,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1673,11 +1421,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1698,11 +1442,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1723,11 +1463,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1748,11 +1484,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1773,11 +1505,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1798,11 +1526,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1823,11 +1547,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1848,11 +1568,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1873,11 +1589,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1898,11 +1610,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1923,11 +1631,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1948,11 +1652,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1973,11 +1673,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -1998,11 +1694,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -2023,11 +1715,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -2048,11 +1736,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -2073,11 +1757,7 @@
         "drilling": true,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 12,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 12
       }
     },
     {
@@ -2098,11 +1778,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2123,11 +1799,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2148,11 +1820,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2173,11 +1841,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2198,11 +1862,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2223,11 +1883,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2248,11 +1904,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2273,11 +1925,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2298,11 +1946,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2323,11 +1967,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2348,11 +1988,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2373,11 +2009,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2398,11 +2030,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2423,11 +2051,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2448,11 +2072,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2473,11 +2093,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2498,11 +2114,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2523,11 +2135,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2548,11 +2156,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2573,11 +2177,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2598,11 +2198,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2623,11 +2219,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2648,11 +2240,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2673,11 +2261,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2698,11 +2282,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2723,11 +2303,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2748,11 +2324,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2773,11 +2345,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2798,11 +2366,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2823,11 +2387,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2848,11 +2408,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2873,11 +2429,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2898,11 +2450,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2923,11 +2471,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2948,11 +2492,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2973,11 +2513,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -2998,11 +2534,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3023,11 +2555,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3048,11 +2576,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3073,11 +2597,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3098,11 +2618,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3123,11 +2639,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3148,11 +2660,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3173,11 +2681,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3198,11 +2702,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3223,11 +2723,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3248,11 +2744,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3273,11 +2765,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3298,11 +2786,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3323,11 +2807,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {
@@ -3348,11 +2828,7 @@
         "drilling": false,
         "thrustTicks": 0,
         "driveTicks": 0,
-        "drillTicks": 0,
-        "drive": {
-          "x": 0,
-          "y": 0
-        }
+        "drillTicks": 0
       }
     },
     {

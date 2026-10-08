@@ -16,8 +16,10 @@ import type { RunEventData, RunEventName } from './eventNames'
  * 3: `charge_detonated` keeps only `tx, ty`: a blast's totals moved to its `blast_resolved` line,
  *    and its tiles log no `tile_destroyed` lines (K6, #189).
  * 4: `resource_sold` gains the required `coinsShown`, the sell burst's coin count (ticket 220).
+ * 5: `commands.ndjson` writes a `reportPose`'s `drive` only when it changed since that player's
+ *    previous logged report; a reader carries the last one forward (`commandLog.ts`, ticket 342).
  */
-export const LOG_SCHEMA_VERSION = 4
+export const LOG_SCHEMA_VERSION = 5
 
 /** Where the player is: the store supplies it, the log stamps it. */
 export interface RunEventPlace {

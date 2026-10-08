@@ -4,6 +4,7 @@ import { PACING_WORLD_SEEDS } from '../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../constants/physics'
 import { cmp, fromCanonical, fromSafeInteger, mul } from '../systems/money'
 import type { Scenario } from '../systems/scenario'
+import { loggedCommandsOf } from './commandLog'
 import { countDrillDives, diveTicksWithoutCasing } from './diveCasing'
 import { registeredEventOf } from './eventNames'
 import { formatNdjsonLine } from './ndjson'
@@ -31,7 +32,11 @@ const SCENARIO = JSON.parse(
   readFileSync(new URL('../../scenarios/bot-slice.scenario.json', import.meta.url), 'utf8'),
 ) as Scenario
 
-/** #11 amendment 2: core events plus commands stay under 4 MB per player-hour. */
+/**
+ * #11 amendment 2: core events plus commands stay under 4 MB per player-hour, the commands as
+ * `commands.ndjson` writes them (a pose's `drive` only when it changed, ticket 342). The pose rate
+ * stays 5 Hz: the #123 rulings retired #11's 4 Hz fallback, and the budget does not grow with speed.
+ */
 const BYTES_PER_HOUR_BUDGET = 4 * 1024 * 1024
 const HOUR_TICKS = 60 * 60 * TICKS_PER_SECOND
 
@@ -127,7 +132,8 @@ describe('balance regression: the pacing bot on the slice (#29, S11)', () => {
   it('keeps the first hour of core events and commands under the 4 MB budget', () => {
     const { events, commands } = botRun()
     const coreEvents = events.filter((event) => event.tick <= HOUR_TICKS && isCoreLevel(event))
-    const bytes = bytesOf(coreEvents) + bytesOf(commands.filter((c) => c.tick <= HOUR_TICKS))
+    const loggedCommands = loggedCommandsOf(commands.filter((c) => c.tick <= HOUR_TICKS))
+    const bytes = bytesOf(coreEvents) + bytesOf(loggedCommands)
     console.log(`first hour: ${(bytes / 1024 / 1024).toFixed(2)} MB of core events and commands`)
     expect(bytes).toBeLessThan(BYTES_PER_HOUR_BUDGET)
   })

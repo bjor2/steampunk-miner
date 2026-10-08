@@ -17,6 +17,7 @@ import { loadFeatures } from '../src/features'
 import { compareRuns, formatComparisonTable } from '../src/logging/compareRuns'
 import { bandDigAlerts } from '../src/logging/bandDigReport'
 import { formatNdjsonLine } from '../src/logging/ndjson'
+import { loggedCommandsOf } from '../src/logging/commandLog'
 import { reportRowLines } from '../src/logging/reportRows'
 import {
   formatSeedPacingTable,
@@ -61,7 +62,10 @@ const median = medianPacingReport(seeds.map((seed) => seed.report))
 
 mkdirSync(REPORT_FOLDER, { recursive: true })
 writeFileSync(new URL('events.ndjson', REPORT_FOLDER), events.map(formatNdjsonLine).join(''))
-writeFileSync(new URL('commands.ndjson', REPORT_FOLDER), commands.map(formatNdjsonLine).join(''))
+writeFileSync(
+  new URL('commands.ndjson', REPORT_FOLDER),
+  loggedCommandsOf(commands).map(formatNdjsonLine).join(''),
+)
 writeFileSync(new URL('summary.json', REPORT_FOLDER), formatRunSummary(summary))
 
 const report = [

@@ -608,7 +608,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/logging/goldenRun.test.ts` | 24 | 8 |
+| `src/logging/goldenRun.test.ts` | 25 | 9 |
 | `src/logging/secondSliceGolden.test.ts` | 6 | 6 |
 | `src/systems/world/generatorGolden.test.ts` | 5 | 5 |
 
@@ -641,13 +641,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/campaignScalingGate.test.ts` | 9 | 9 |
 | `src/logging/chargeDetonationLine.test.ts` | 4 | 4 |
 | `src/logging/chargeSharePayoffReport.test.ts` | 3 | 3 |
+| `src/logging/commandLog.test.ts` | 9 | 9 |
 | `src/logging/compareRuns.test.ts` | 11 | 11 |
 | `src/logging/diveCasing.test.ts` | 3 | 3 |
 | `src/logging/diveSummaries.test.ts` | 4 | 4 |
 | `src/logging/domainEventLog.test.ts` | 19 | 19 |
 | `src/logging/dynamiteDryRuns.test.ts` | 4 | 4 |
 | `src/logging/eventNames.test.ts` | 6 | 6 |
-| `src/logging/eventSink.test.ts` | 7 | 7 |
+| `src/logging/eventSink.test.ts` | 9 | 9 |
 | `src/logging/extractorPurchaseTrips.test.ts` | 3 | 3 |
 | `src/logging/gateClearTables.test.ts` | 7 | 7 |
 | `src/logging/gateClearTally.test.ts` | 3 | 3 |

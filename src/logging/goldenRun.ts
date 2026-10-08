@@ -9,19 +9,22 @@
  * - A version differs: the file is stale. Fail with "regenerate the golden file", so a digest
  *   change always arrives as a version bump plus a visible diff of the file in the same commit.
  *
+ * `commands` are written as `commands.ndjson` holds them (`commandLog.ts`, ticket 342), so the
+ * file pins the log encoding too; the replay expands them first.
+ *
  * `sliceSections` records each registered save section's version (feature-slices.md 5.4), written
  * only while one is registered, so a build without sections writes the files byte for byte as
  * before. It is compared exactly both ways: a slice section change needs that section's version
  * bump and a regenerated golden, never `SNAPSHOT_VERSION`.
  */
 import { AUTHORITY_PROTOCOL_VERSION } from '../systems/authority/authorityCommand'
-import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { GENERATOR_VERSION } from '../systems/generatorVersion'
 import { NUMBER_FORMAT_VERSION } from '../systems/money'
 import { saveSectionsOf } from '../systems/registries/saveSections'
 import { stampScript, type GoldenScript } from '../systems/replay/goldenScripts'
 import { firstDigestMismatch, replayRun, type DigestRecord } from '../systems/replay/replayRun'
+import { expandCommandLog, loggedCommandsOf, type LoggedCommand } from './commandLog'
 import { minedOrderOf, type MinedOre, type MinedRun } from './minedOrder'
 import { LOG_SCHEMA_VERSION } from './runEvent'
 
@@ -48,7 +51,8 @@ export interface GoldenRun extends GoldenVersions {
   description: string
   worldSeed: number
   endTick: number
-  commands: AuthorityCommand[]
+  /** As logged: a pose report's `drive` only when it changed. */
+  commands: LoggedCommand[]
   digests: DigestRecord[]
   /** The ore the run mined, in order, as `summary.json` keeps it (#122). */
   minedOrder: MinedRun[]
@@ -91,7 +95,7 @@ export function recordGoldenRun(script: GoldenScript): GoldenRun {
     ...currentGoldenVersions(),
     worldSeed,
     endTick,
-    commands,
+    commands: loggedCommandsOf(commands),
     digests,
     minedOrder,
   }
@@ -134,7 +138,7 @@ function staleSliceSectionProblems(golden: GoldenRun, current: GoldenVersions): 
 }
 
 function replayProblems(golden: GoldenRun, framesPerSecond: number | undefined): string[] {
-  const { digests, events } = replayRun(golden.worldSeed, golden.commands, {
+  const { digests, events } = replayRun(golden.worldSeed, expandCommandLog(golden.commands), {
     endTick: golden.endTick,
     framesPerSecond,
   })

@@ -9,6 +9,7 @@ import { chunkDigest } from '../systems/world/chunkDigest'
 import { planetParamsFor } from '../systems/world/planetParams'
 import { chunkOfTile } from '../systems/world/tileGrid'
 import { currentCellsOfChunk, currentDensityOfChunk } from '../systems/world/worldState'
+import { expandCommandLog } from './commandLog'
 import type { GoldenRun } from './goldenRun'
 
 // S11 (#65): the committed second-slice golden runs pin digests (goldenRun.test.ts); these specs
@@ -18,7 +19,9 @@ import type { GoldenRun } from './goldenRun'
 function replayedGolden(name: string): { golden: GoldenRun; events: readonly DomainEvent[] } {
   const file = new URL(`../../tests/golden/${name}.golden.json`, import.meta.url)
   const golden = JSON.parse(readFileSync(file, 'utf8')) as GoldenRun
-  const { events } = replayRun(golden.worldSeed, golden.commands, { endTick: golden.endTick })
+  const { events } = replayRun(golden.worldSeed, expandCommandLog(golden.commands), {
+    endTick: golden.endTick,
+  })
   return { golden, events }
 }
 
@@ -81,7 +84,9 @@ describe('second-slice golden runs (S11)', () => {
 
   it('keeps the husk cache chunk digest player-independent', () => {
     const { golden } = replayedGolden('artefact-live-and-husk')
-    const husk = replayRun(golden.worldSeed, golden.commands, { endTick: golden.endTick }).state
+    const husk = replayRun(golden.worldSeed, expandCommandLog(golden.commands), {
+      endTick: golden.endTick,
+    }).state
     const live = replayRun(WORLD_SEED, [
       { playerId: 'p1', tick: 1, seq: 1, type: 'debug.setPlanet', payload: { planetIndex: 2 } },
     ]).state

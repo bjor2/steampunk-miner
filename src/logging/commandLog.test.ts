@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { POSE_REPORT_INTERVAL_TICKS } from '../constants/balance'
+import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
 import type { DriveSigns } from '../systems/vehicle/driveSigns'
 import { createCommandLogWriter, expandCommandLog, loggedCommandsOf } from './commandLog'
@@ -84,6 +86,10 @@ describe('command log (ticket 342)', () => {
     const before = structuredClone(commands)
     loggedCommandsOf(commands)
     expect(commands).toEqual(before)
+  })
+
+  it('meets the log budget with poses still reported 5 times a second (the #123 rulings)', () => {
+    expect(TICKS_PER_SECOND / POSE_REPORT_INTERVAL_TICKS).toBe(5)
   })
 
   it('refuses a pose line with no drive and nothing to carry forward', () => {

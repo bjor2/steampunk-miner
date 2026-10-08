@@ -1,6 +1,6 @@
 {
   "runId": "run_bot_bot-slice",
-  "logSchemaVersion": 4,
+  "logSchemaVersion": 5,
   "outcome": "ended",
   "endReason": "slice_completed",
   "durationTicks": 329578,
