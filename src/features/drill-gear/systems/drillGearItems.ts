@@ -5,8 +5,8 @@
  * (#205 GD lock: the #224 bare-id rule refuses the hyphen of `tech.drill-gear.*`).
  *
  * #205 registers six of them with their effects (`drillGearContent.ts`), ticket 280 the twin-bit
- * head (its 45-degree diagonal cut, GD lock on #257). The dielectric bit is held back (GD lock on
- * #205 Q3 a): unregistered, unseen and unpriced until the magnetic-planet spec gives its effect.
+ * head (its 45-degree diagonal cut, GD lock on #257), ticket 292 the dielectric bit (its during-cut
+ * shield on magnetic planets, GD lock on spec #258 Q6), which #205 Q3 a held back until then.
  */
 import type { Money } from '../../../systems/money'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
@@ -232,10 +232,10 @@ export const DRILL_GEAR_ITEMS: readonly DrillGearItem[] = [
     label: 'horizontal',
     powerUpClass: 'passive',
     isToggle: false,
-    isHeldBack: true,
+    isHeldBack: false,
     slot: 'drill.head',
     attach: 'drill.head',
-    // No numbers until the magnetic-planet spec gives the shock it removes.
+    // Pure negation of the shock and the mid-cut tug (#258 Q6): nothing to count, nothing to step.
     stats: [],
     node: {
       id: 'tech.drill_gear.dielectric_bit',

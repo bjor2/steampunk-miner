@@ -1,8 +1,7 @@
 /**
  * The lane's rows as the kernel, `power-up-core` and `tech-tree` take them (#205): one
  * `vehicle-item` (its one socket and attach point, #162 acceptance 1), one `power-up` and one
- * `tech-node` per shipped item. The dielectric bit is held back, so none of its rows is here (GD
- * lock on #205 Q3 a).
+ * `tech-node` per shipped item: all eight since the dielectric bit's effect landed (ticket 292).
  */
 import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import type { PowerUp } from '../../power-up-core'

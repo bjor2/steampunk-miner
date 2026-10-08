@@ -43,8 +43,13 @@ describe('drill-gear card lines', () => {
     ])
   })
 
-  it('has no lines for a held-back item or one of another lane', () => {
-    expect(cardLinesOf('gear.dielectric_bit', 1)).toEqual([])
+  it('gives the dielectric bit, a shield with nothing to count, its price as its one line', () => {
+    expect(readingsOf('gear.dielectric_bit', 1)).toEqual([
+      ['Price', priceOf('gear.dielectric_bit')],
+    ])
+  })
+
+  it('has no lines for an item of another lane', () => {
     expect(cardLinesOf('power.echo_sounder', 1)).toEqual([])
   })
 })

@@ -420,7 +420,7 @@
             },
             {
               "title": "Magnetic / electrified planets",
-              "description": "The Lodestone act's planet class (P25 to P32, P30 stays the relic planet; in endless every Lodestone planet, P43, P48 and every fifth): each ferrous vein throws a field and some of its cells are electrified, both from the planet seed so every player sees the same. Inside a field the rig is tugged toward the vein at a tenth of its planet's on-curve speed, never into lava, a gated cell or an open drop, and sensing reaches half as far; driving into a field the first time records hazard:magnetic in the codex. Drilling an electrified cell takes half a second longer and costs 2% of the on-curve hull, at most 25% a dive. The look, the planet card and the dielectric bit come with their builds.",
+              "description": "The Lodestone act's planet class (P25 to P32, P30 stays the relic planet; in endless every Lodestone planet, P43, P48 and every fifth): each ferrous vein throws a field and some of its cells are electrified, both from the planet seed so every player sees the same. Inside a field the rig is tugged toward the vein at a tenth of its planet's on-curve speed, never into lava, a gated cell or an open drop, and sensing reaches half as far; driving into a field the first time records hazard:magnetic in the codex. Drilling an electrified cell takes half a second longer and costs 2% of the on-curve hull, at most 25% a dive. The dielectric bit in the drill head cancels the shock and the tug while the drill cuts. The look and the planet card come with their builds.",
               "status": "partial",
               "issues": [80, 258, 289, 290],
               "planet": 25
@@ -1062,7 +1062,7 @@
           "children": [
             {
               "title": "Drill gear",
-              "description": "Vibratory bit (soft ground ahead crumbles), spoil auger (fills the tunnel behind you, C to switch), side cutters, thaw crown, sampling corer (C: draws a plug from the first ore ahead, refused at no cost by a gated or core cell) and reach boom, each in its drill socket with its tech node, Marks and item card, sold at the Upgrade bay once researched. The twin-bit head and dielectric bit wait for the mechanics they answer. Their models on the miner come later.",
+              "description": "Vibratory bit (soft ground ahead crumbles), spoil auger (fills the tunnel behind you, C to switch), side cutters, thaw crown, sampling corer (C: draws a plug from the first ore ahead, refused at no cost by a gated or core cell), twin-bit head (drive down and to a side to cut diagonally), dielectric bit (no shock or tug from electrified ground while the drill cuts) and reach boom, each in its drill socket with its tech node, Marks and item card, sold at the Upgrade bay once researched. Their models on the miner come later.",
               "status": "partial",
               "issues": [205, 242, 248, 295]
             },

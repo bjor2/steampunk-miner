@@ -15,8 +15,8 @@ import {
 import { DRILL_GEAR_SELLER } from './drillGearSales'
 
 // Ticket 248's buy path for the drill-gear lane, on the loaded slices: each shipped item sells as
-// a one-off at 15 band-5 units at its unlock planet, the price its card shows; the held-back
-// dielectric bit is not sold.
+// a one-off at 15 band-5 units at its unlock planet, the price its card shows. Since ticket 292
+// that is all eight, the dielectric bit included.
 
 const BIT_PLANET = 4
 
@@ -44,7 +44,7 @@ describe('drill-gear: the store sells a researched one-off (ticket 248)', () => 
     expect(walletOf(session)).toBe(toCanonical(sub(before, price)))
   })
 
-  it('offers the seven shipped items and never a held-back one', () => {
+  it('offers all eight shipped items', () => {
     const offered = DRILL_GEAR_ITEMS.map((item) => item.itemId).filter(
       (itemId) => DRILL_GEAR_SELLER.offerOf(itemId, 40) !== null,
     )
@@ -55,6 +55,7 @@ describe('drill-gear: the store sells a researched one-off (ticket 248)', () => 
       'gear.thaw_crown',
       'gear.twin_bit',
       'gear.sampling_corer',
+      'gear.dielectric_bit',
       'gear.reach_boom',
     ])
   })

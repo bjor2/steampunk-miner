@@ -1,17 +1,19 @@
 /**
  * The drill-gear lane (#205, spec #162 sections 1 and 4; data half in ticket 242): the vibratory
- * bit, spoil auger, side cutters, thaw crown, twin-bit head (ticket 280), sampling corer and reach
- * boom as vehicle items in the drill sockets and as power-ups, their `tech.drill_gear.*` nodes and
- * item cards, and their effects: the bit's crumble as an authority reaction, the cutters, boom and
- * twin bit's diagonal on the kernel's drill gear read (the diagonal cell logged by a reaction), the
- * auger as a clock step and the corer as a charged act. KeyF and KeyC press the flank and collar
- * sockets, and the Upgrade bay sells each item (ticket 248's seller). The dielectric bit stays held
- * back (GD lock on #205, Q3). No side effects at import; the loader calls `register`.
+ * bit, spoil auger, side cutters, thaw crown, twin-bit head (ticket 280), sampling corer, dielectric
+ * bit (ticket 292) and reach boom as vehicle items in the drill sockets and as power-ups, their
+ * `tech.drill_gear.*` nodes and item cards, and their effects: the bit's crumble as an authority
+ * reaction, the cutters, boom and twin bit's diagonal on the kernel's drill gear read (the diagonal
+ * cell logged by a reaction), the auger as a clock step, the corer as a charged act and the
+ * dielectric bit as a shock shield. KeyF and KeyC press the flank and collar sockets, and the
+ * Upgrade bay sells each item (ticket 248's seller). No side effects at import; the loader calls
+ * `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { drillGearDebugActions } from './debug'
 import { DRILL_GEAR_PROJECTIONS, DRILL_GEAR_RUN_EVENTS } from './logging'
 import { CUTTERS_AND_BOOM_SOURCE } from './systems/cuttersAndBoom'
+import { DIELECTRIC_BIT_SHIELD } from './systems/dielectricBit'
 import {
   DRILL_GEAR_POWER_UPS,
   DRILL_GEAR_TECH_NODES,
@@ -36,11 +38,12 @@ export const slice: SliceDefinition = {
     r.authorityReaction(DIAGONAL_CUT_REACTION)
     r.drillGear(CUTTERS_AND_BOOM_SOURCE)
     r.drillGear(TWIN_BIT_SOURCE)
+    r.shockShield(DIELECTRIC_BIT_SHIELD)
     r.clockStep(SPOIL_AUGER_STEP)
     DRILL_SOCKET_REACTIONS.forEach((reaction) => r.inputReaction(reaction))
     r.eventProjections(DRILL_GEAR_PROJECTIONS)
     r.runEvents(DRILL_GEAR_RUN_EVENTS)
-    // steampunkDebug.features['drill-gear'].getEngaged() / .getTwinBit() /
+    // steampunkDebug.features['drill-gear'].getEngaged() / .getTwinBit() / .getDielectricBit() /
     // .statPreview(itemId, mark, planet)
     r.debugActions(drillGearDebugActions)
   },

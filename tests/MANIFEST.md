@@ -61,7 +61,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 19 files, 126 tests
+### `drill-gear`: 20 files, 133 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -69,10 +69,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/drillGearPace.test.ts` | 2 | 1 |
 | `src/features/drill-gear/drillGearTouch.test.ts` | 2 | 2 |
 | `src/features/drill-gear/logging.test.ts` | 2 | 2 |
-| `src/features/drill-gear/shippedRows.test.ts` | 9 | 9 |
+| `src/features/drill-gear/shippedRows.test.ts` | 10 | 10 |
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
-| `src/features/drill-gear/systems/cardLines.test.ts` | 6 | 6 |
+| `src/features/drill-gear/systems/cardLines.test.ts` | 7 | 7 |
 | `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
+| `src/features/drill-gear/systems/dielectricBit.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/drillGearEconomy.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/drillGearItems.test.ts` | 12 | 12 |
 | `src/features/drill-gear/systems/drillGearPowerUps.test.ts` | 4 | 4 |
@@ -471,7 +472,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/loopbackAuthority.test.ts` | 5 | 5 |
 | `src/systems/authority/magnet/magnetCaps.test.ts` | 10 | 5 |
 | `src/systems/authority/magnet/magnetGates.test.ts` | 3 | 3 |
-| `src/systems/authority/magnetic/magneticHazard.test.ts` | 7 | 7 |
+| `src/systems/authority/magnetic/magneticHazard.test.ts` | 8 | 8 |
 | `src/systems/authority/magnetic/metalTag.test.ts` | 8 | 8 |
 | `src/systems/authority/minedOre.test.ts` | 7 | 7 |
 | `src/systems/authority/moneyRounding.test.ts` | 3 | 3 |

@@ -125,9 +125,7 @@ describe('drill-gear items', () => {
     )
   })
 
-  it('holds back only the dielectric bit, with no price (#205 GD lock Q3, ticket 280)', () => {
-    const heldBack = DRILL_GEAR_ITEMS.filter((item) => item.isHeldBack)
-    expect(heldBack.map((item) => item.itemId)).toEqual(['gear.dielectric_bit'])
-    expect(heldBack.map(itemPriceOf)).toEqual([null])
+  it('holds back nothing once the dielectric bit has its effect (#258 Q6, ticket 292)', () => {
+    expect(DRILL_GEAR_ITEMS.filter((item) => item.isHeldBack)).toEqual([])
   })
 })

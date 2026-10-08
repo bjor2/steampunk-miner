@@ -1,11 +1,13 @@
 /**
  * The drill-gear lane in the preview build (#205): read through `steampunkDebug`, never pixels.
- * The build registers seven drill-gear items by their bare ids, so the loadout takes them in the
+ * The build registers eight drill-gear items by their bare ids, so the loadout takes them in the
  * drill sockets; the flank key (KeyF, `use_drill_flank`) switches the side cutters on and off; the
  * collar key (KeyC, `use_drill_collar`) uses the sampling corer, which spends one charge; the card's
  * raw stat lines read from `statPreview`; and `getTwinBit` reads the twin-bit head in `drill.head`
  * (ticket 280) with no bearing latched before it cuts. The scenario `drill-gear.twin-bit-diagonal`
  * (ticket 281), played through `fastForward`, logs one `diagonal_cell_cut` per cell of its two bores.
+ * `getDielectricBit` reads the dielectric bit in `drill.head` and the drill shield it gives
+ * (ticket 292).
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -20,6 +22,7 @@ declare global {
 const CUTTERS = 'gear.side_cutters'
 const CORER = 'gear.sampling_corer'
 const TWIN_BIT = 'gear.twin_bit'
+const DIELECTRIC_BIT = 'gear.dielectric_bit'
 /** Two bores of six cells each (`twinBitDiagonal.ts`). */
 const DIAGONAL_CELLS = 12
 
@@ -113,6 +116,28 @@ test('the twin-bit head mounts in drill.head and previews its one diagonal cell'
     ok: true,
     preview: { itemId: TWIN_BIT, lines: [{ stat: 'aheadCells', value: 1 }] },
   })
+  expect(errors).toEqual([])
+})
+
+test('the dielectric bit mounts in drill.head and shields the drill until it is swapped out', async ({
+  page,
+}) => {
+  const errors = await openGameWithCuttersAndCorer(page)
+  const readBit = () =>
+    page.evaluate(() => window.steampunkDebug!.features['drill-gear'].getDielectricBit())
+  await expect.poll(readBit).toEqual({ ok: true, isMounted: false, isShielded: false })
+  const slotted = await page.evaluate(
+    (head) => window.steampunkDebug!.setVehicleLoadout({ 'drill.head': head }).ok,
+    DIELECTRIC_BIT,
+  )
+  expect(slotted).toBe(true)
+  await expect.poll(readBit).toEqual({ ok: true, isMounted: true, isShielded: true })
+  const swapped = await page.evaluate(
+    (head) => window.steampunkDebug!.setVehicleLoadout({ 'drill.head': head }).ok,
+    TWIN_BIT,
+  )
+  expect(swapped).toBe(true)
+  await expect.poll(readBit).toEqual({ ok: true, isMounted: false, isShielded: false })
   expect(errors).toEqual([])
 })
 

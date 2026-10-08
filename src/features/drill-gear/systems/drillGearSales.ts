@@ -1,7 +1,7 @@
 /**
  * What the Upgrade bay sells of this lane (ticket 248, kernel `vehicleItemSellers`): each shipped
  * drill-gear item is a one-off at 15 band-5 units at its unlock planet (#162 4.1), the price its
- * card shows. The lane has no consumable; a held-back item has no price, so it is not sold.
+ * card shows. The lane has no consumable; a held-back item would have no price, so it is not sold.
  */
 import type {
   VehicleItemOffer,
