@@ -10,7 +10,8 @@
  * (#173). A held chain's steps leave the clank to the workshop's ratchet (#180 section 5), so only a
  * click clanks. A slot's hold that a slice names (`slotHoldCues`, ticket 253) clanks lightly when
  * cancelled and chimes when it runs to the end. A bore gun line stopped at a cell the drill cannot
- * dig, the core or lava clanks lightly (ticket 313, #309). Presentation only: cues are read from the events, never written back, so they
+ * dig, the core or lava clanks lightly (ticket 313, #309), and switching an item's auto mode clicks
+ * a soft valve, never the clank (ticket 317). Presentation only: cues are read from the events, never written back, so they
  * cannot touch state or the digest (#33).
  *
  * A batch gives at most one cue of each kind (the highest tier, the hardest hit), so a fast-forward
@@ -51,6 +52,7 @@ export type FeedbackCue =
   | { kind: 'holdCancelled' }
   | { kind: 'holdFinished' }
   | { kind: 'boreClank' }
+  | { kind: 'autoValveClick' }
 
 type CueKind = FeedbackCue['kind']
 
@@ -72,6 +74,7 @@ const CUE_ORDER: readonly CueKind[] = [
   'holdCancelled',
   'holdFinished',
   'boreClank',
+  'autoValveClick',
 ]
 
 /** The player's vehicle's last reported pose, or null before it reported one or with no player. */
@@ -135,6 +138,8 @@ function cueOfEvent(event: DomainEvent, listener: ListenerPoint | null): Feedbac
       return { kind: 'drillContact' }
     case 'BoreEnded':
       return isClankStop(event.stop) ? { kind: 'boreClank' } : null
+    case 'AutoModeSet':
+      return { kind: 'autoValveClick' }
     default:
       return slotHoldCueOf(event)
   }

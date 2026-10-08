@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
+import { applyCommand } from '../authority/applyCommand'
 import { createAuthorityState } from '../authority/authorityState'
+import { AUTO_ON, searSlice } from '../authority/bore/boreAutoFixtures'
 import { reactionToPress, topLayerOf, type InputSituation } from './inputRouting'
 
 const START = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
@@ -74,6 +76,22 @@ describe('input routing', () => {
       submitted('setGunMode', { mode: 'auto' }),
     )
     expect(reactionToPress('toggle_guns', DRIVING)).toEqual({ kind: 'none' })
+  })
+
+  it('switches the bore gun to auto and back once the steam sear is researched (ticket 317)', () => {
+    withRegistrations([searSlice()], () => {
+      expect(reactionToPress('toggle_auto_fire', DRIVING)).toEqual(
+        submitted('ground_gun.set_auto', { on: true }),
+      )
+      const command = { playerId: 'p1', tick: 1, seq: 1, ...AUTO_ON }
+      const switchedOn = applyCommand(START, command).state
+      expect(reactionToPress('toggle_auto_fire', { ...DRIVING, state: switchedOn })).toEqual(
+        submitted('ground_gun.set_auto', { on: false }),
+      )
+    })
+    withRegistrations([searSlice({ researched: [] })], () => {
+      expect(reactionToPress('toggle_auto_fire', DRIVING)).toEqual({ kind: 'none' })
+    })
   })
 
   it('plants a charge only when the authority would take it, and never from the pad screen (#109)', () => {

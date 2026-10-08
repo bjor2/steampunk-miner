@@ -32,6 +32,8 @@ export const ACTION_IDS = [
   'quick_service',
   'request_rescue',
   'toggle_guns',
+  // The bore gun's auto mode (ticket 317, #310): answered once the steam sear is researched.
+  'toggle_auto_fire',
   'plant_charge',
   'next_charge_size',
   'ui_up',

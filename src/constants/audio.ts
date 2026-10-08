@@ -51,3 +51,13 @@ export const MUSIC_VOLUME_STEPS = 4
  * long so the steal never clicks (#180 section 5, G&V: "a 5th steals the oldest with a 15 ms fade").
  */
 export const CUE_VOICE_STEAL_FADE_SECONDS = 0.015
+
+/**
+ * The bore gun's auto toggle (ticket 317, Gameplay on #310): a soft valve click, a short bright
+ * tick over a little hiss, never the clank, which still means a blocked shot.
+ */
+export const VALVE_CLICK_HZ = 1600
+export const VALVE_CLICK_GAIN = 0.12
+export const VALVE_CLICK_HISS_HZ = 3200
+export const VALVE_CLICK_HISS_GAIN = 0.08
+export const VALVE_CLICK_SECONDS = 0.06

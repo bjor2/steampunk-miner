@@ -62,6 +62,7 @@ const KICKS: Readonly<Record<Exclude<FeedbackCue['kind'], 'chargeBlast'>, Screen
   holdFinished: { shake: 0, flash: 0 },
   // The bore's clank at the far end of its line is heard, not felt (#309).
   boreClank: { shake: 0, flash: 0 },
+  autoValveClick: { shake: 0, flash: 0 },
 }
 
 export function createScreenEffects(): ScreenEffects {

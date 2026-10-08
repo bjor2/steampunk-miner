@@ -22,6 +22,7 @@ const CUES: FeedbackCue[] = [
   { kind: 'holdCancelled' },
   { kind: 'holdFinished' },
   { kind: 'boreClank' },
+  { kind: 'autoValveClick' },
 ]
 
 describe('accents', () => {

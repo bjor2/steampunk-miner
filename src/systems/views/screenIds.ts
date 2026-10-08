@@ -22,6 +22,7 @@ export const UI_IDS = {
   hudCasing: 'hud-casing',
   hudGuns: 'hud-guns',
   hudGunsIdle: 'hud-guns-idle',
+  hudBoreAuto: 'hud-bore-auto',
   hudCharges: 'hud-charges',
   hudChargeFuse: 'hud-charge-fuse',
   hudHeatGauge: 'hud-heat-gauge',

@@ -257,6 +257,19 @@ describe('feedback cues', () => {
     expect(feedbackCuesOf([ended('refused')], 'p2')).toEqual([])
   })
 
+  it('clicks a soft valve when an auto mode is switched, and never clanks (ticket 317)', () => {
+    const switched = (isOn: boolean, playerId = 'p1'): DomainEvent => ({
+      tick: 5,
+      playerId,
+      type: 'AutoModeSet',
+      itemId: 'weapon.steam_sear',
+      isOn,
+    })
+    expect(feedbackCuesOf([switched(true)], 'p1')).toEqual([{ kind: 'autoValveClick' }])
+    expect(feedbackCuesOf([switched(false)], 'p1')).toEqual([{ kind: 'autoValveClick' }])
+    expect(feedbackCuesOf([switched(true, 'p2')], 'p1')).toEqual([])
+  })
+
   it("ignores another player's pickups", () => {
     expect(feedbackCuesOf([cargo(4, 'p2')], 'p1')).toEqual([])
   })

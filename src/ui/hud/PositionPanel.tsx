@@ -1,6 +1,7 @@
 /**
  * Top right (#33 section 5): depth (or ALT) and band, the casing grade badge (#41), the guns' mode
- * and their low-steam badge (#107), the charges carried with the plant key (#109), the dock arrow
+ * and their low-steam badge (#107), the bore gun's auto lamp once the steam sear is researched
+ * (ticket 317), the charges carried with the plant key (#109), the dock arrow
  * with its distance, tiles to the core's edge, and the time per tile in front of the drill. Each
  * line's label wears its glyph of the icon set (#158).
  */
@@ -13,7 +14,7 @@ import { CompassArrow } from './CompassArrow'
 import styles from './Hud.module.css'
 
 export function PositionPanel({ model }: { model: HudModel }) {
-  const { depth, casing, guns, charges, dockArrow, coreDistance, tileTime } = model
+  const { depth, casing, guns, boreAuto, charges, dockArrow, coreDistance, tileTime } = model
   return (
     <div className={styles.position}>
       <Line label="Depth" icon="depth">
@@ -44,6 +45,18 @@ export function PositionPanel({ model }: { model: HudModel }) {
         <span className={styles.gunsIdle} data-testid={UI_IDS.hudGunsIdle}>
           {guns.idleText}
         </span>
+      )}
+      {boreAuto !== null && (
+        <Line label="Bore" icon="guns">
+          <span
+            className={styles.autoLamp}
+            data-testid={UI_IDS.hudBoreAuto}
+            data-lamp={boreAuto.colour}
+            data-hold={boreAuto.hold ?? ''}
+          >
+            {boreAuto.text}
+          </span>
+        </Line>
       )}
       {charges !== null && (
         <Line label="Charges" icon="charges">

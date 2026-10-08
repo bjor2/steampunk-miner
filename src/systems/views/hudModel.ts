@@ -45,6 +45,7 @@ import {
   type VehicleStateReading,
 } from './hudReadings'
 import { gunReadingOf, type GunReading } from './gunReading'
+import { boreAutoReadingOf, type BoreAutoReading } from './boreAutoReading'
 import {
   chargeReadingOf,
   fuseWarningOf,
@@ -110,6 +111,8 @@ export interface HudModel {
   casing: CasingBadge | null
   /** Null with no guns mounted (#107). */
   guns: GunReading | null
+  /** The bore gun's auto lamp; null until the steam sear is researched (ticket 317). */
+  boreAuto: BoreAutoReading | null
   /** Null until the charge rack is bolted on (#109). */
   charges: ChargeReading | null
   /** A live charge within warning reach, the vehicle's own or another's (#109); else null. */
@@ -163,6 +166,7 @@ export function selectHudModel(sources: HudSources): HudModel {
     depth: depthReadingOf(state, playerId, sources.depthTiles),
     casing: casingBadgeOf(state, playerId),
     guns: gunReadingOf(vehicle, sources.bindings),
+    boreAuto: boreAutoReadingOf(state, playerId, sources.bindings),
     charges: chargeReadingOf(vehicle.charges, sources.bindings),
     chargeFuse,
     heat,

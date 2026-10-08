@@ -10,7 +10,8 @@
  * `Undock`), and in `vehicle` it opens settings. `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
  * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
- * still move, the guns' toggle with no guns mounted (#107), a charge the authority would not
+ * still move, the guns' toggle with no guns mounted (#107), the bore gun's auto toggle before the
+ * steam sear is researched (ticket 317), a charge the authority would not
  * plant (#109: none carried, one live, no wall ahead) and a size step with fewer than two sizes in
  * the rack (K8 #218) do nothing and are not buffered.
  *
@@ -32,6 +33,7 @@ import {
 } from '../vehicle/vehicleCommands'
 import { toggledGunMode, type GunMode } from '../vehicle/vehicleGun'
 import { sliceIntentOfPress } from '../registries/inputReactions'
+import { boreAutoToggleIntentOf } from '../authority/bore/boreAuto'
 import type { ZoomChange } from '../render/viewZoom'
 import type { VehicleMode } from '../vehicle/vehicleState'
 import type { BayId } from '../world/dockBays'
@@ -100,6 +102,8 @@ const REACTIONS_BY_LAYER: Readonly<
       isWaitingForTow(vehicleMode) ? submit(requestRescueCommand()) : NONE,
     toggle_guns: ({ gunMode }) =>
       gunMode === null ? NONE : submit(setGunModeCommand(toggledGunMode(gunMode))),
+    toggle_auto_fire: ({ state, playerId }) =>
+      submitOrNone(boreAutoToggleIntentOf(state, playerId)),
     plant_charge: (situation) =>
       situation.plantableChargeSize === null
         ? sliceReactionToPress('plant_charge', situation)
@@ -143,7 +147,10 @@ export function topLayerOf(vehicleMode: VehicleMode, overlays: OpenOverlays): In
 }
 
 function sliceReactionToPress(action: ActionId, situation: InputSituation): InputReaction {
-  const intent = sliceIntentOfPress(action, situation)
+  return submitOrNone(sliceIntentOfPress(action, situation))
+}
+
+function submitOrNone(intent: CommandIntent | null): InputReaction {
   return intent === null ? NONE : submit(intent)
 }
 

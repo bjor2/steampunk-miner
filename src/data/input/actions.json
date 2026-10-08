@@ -60,6 +60,13 @@
       "keyboard": ["KeyG"]
     },
     {
+      "id": "toggle_auto_fire",
+      "displayName": "Bore gun auto/off",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["KeyT"]
+    },
+    {
       "id": "plant_charge",
       "displayName": "Plant charge",
       "contexts": ["vehicle"],

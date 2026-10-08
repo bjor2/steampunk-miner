@@ -30,6 +30,7 @@ import { plantOnWall, prepareBlaster } from '../systems/authority/charges/charge
 import { ArtefactChoiceView } from './artefact/ArtefactChoiceView'
 import { SliceScreenView } from './screens/SliceScreen'
 import { withRegistrations } from '../registries/registrar'
+import { AUTO_ON, searSlice } from '../systems/authority/bore/boreAutoFixtures'
 import type { SliceDefinition } from '../registries/sliceDefinition'
 import {
   setEnergyCommand,
@@ -117,6 +118,7 @@ function hudTexts(model: HudModel): Partial<Record<UiId, string | null>> {
     ...(model.casing === null ? {} : { [UI_IDS.hudCasing]: model.casing.text }),
     ...(model.guns === null ? {} : { [UI_IDS.hudGuns]: model.guns.text }),
     ...(model.guns?.isIdle === true ? { [UI_IDS.hudGunsIdle]: model.guns.idleText } : {}),
+    ...(model.boreAuto === null ? {} : { [UI_IDS.hudBoreAuto]: model.boreAuto.text }),
     ...(model.charges === null ? {} : { [UI_IDS.hudCharges]: model.charges.text }),
     ...(model.chargeFuse === null ? {} : { [UI_IDS.hudChargeFuse]: model.chargeFuse.text }),
     ...(model.heat === null
@@ -517,6 +519,22 @@ function renderWithHeat(): string[] {
   ]
 }
 
+/** The bore gun's auto lamp, which shows once the steam sear is researched (ticket 317). */
+function renderWithBoreAuto(): string[] {
+  return withRegistrations([searSlice()], () => {
+    const session = createScriptedSession()
+    session.submit(1, AUTO_ON)
+    const hud = selectHudModel({
+      state: session.state(),
+      playerId: 'p1',
+      depthTiles: 0,
+      bindings: game().bindings,
+    })
+    expect(hud.boreAuto?.colour).toBe('green')
+    return checkScreen(createElement(HudView, { model: hud, isFlashing: false }), hudTexts(hud))
+  })
+}
+
 function upgradeBayOn(planetIndex: number): UpgradeBayModel {
   const session = createScriptedSession()
   session.submit(1, { type: 'debug.setPlanet', payload: { planetIndex } })
@@ -587,6 +605,7 @@ function expectEveryIdRendered(): void {
   keep(renderWithGuns())
   keep(renderWithCharges())
   keep(renderWithHeat())
+  keep(renderWithBoreAuto())
   keep(renderRefineryScreens())
   keep(renderLiningVisit())
   keep(renderSliceScreen())

@@ -20,7 +20,9 @@ import { blockContaining, blockIdOf } from '../../world/collapseBlock'
 import type { PlanetParams } from '../../world/planetParams'
 import type { TilePoint } from '../../world/tileGrid'
 import { vehicleOf, type AuthorityState } from '../authorityState'
+import { isAutoModeOn } from '../autoMode/autoModeState'
 import { autoToggleRefusal, switchAutoModeOff, switchAutoModeOn } from '../autoMode/autoToggle'
+import type { CommandIntent } from '../authorityCommand'
 import type { CommandRule, RuleEffect } from '../commandRule'
 import { planetParamsOf } from '../planetOfState'
 import { bestBoreShotOf, boreShotAlong, type BoreAimAsk, type PlannedShot } from './boreAutoAim'
@@ -46,6 +48,19 @@ export const BORE_AUTO_RULES: {
         ? switchAutoModeOn(state, playerId, STEAM_SEAR_ITEM_ID)
         : switchAutoModeOff(state, playerId, STEAM_SEAR_ITEM_ID),
   },
+}
+
+/**
+ * What the toggle key sends: the mode flipped, or null before the sear is researched, so the
+ * press does nothing and is not buffered.
+ */
+export function boreAutoToggleIntentOf(
+  state: AuthorityState,
+  playerId: string,
+): CommandIntent<'ground_gun.set_auto'> | null {
+  if (autoToggleRefusal(state, playerId, STEAM_SEAR_ITEM_ID) !== null) return null
+  const on = !isAutoModeOn(state, playerId, STEAM_SEAR_ITEM_ID)
+  return { type: 'ground_gun.set_auto', payload: { on } }
 }
 
 export const BORE_AUTO_ACTOR: AutoActor = {

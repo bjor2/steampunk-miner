@@ -35,6 +35,7 @@ import {
   steamGainOf,
 } from '../systems/audio/soundRules'
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
+import { VALVE_CLICK_PLAY, VALVE_CLICK_TONE } from '../systems/audio/valveClick'
 import {
   createDelayedThumps,
   delayThump,
@@ -121,6 +122,10 @@ const CUE_SOUNDS: Readonly<Record<FeedbackCue['kind'], CuePlayer>> = {
   holdFinished: (sound) => sound.playChime(chimeFrequencyOf(1)),
   // G&V on #309: the cell the bore could not open gives `playClank('light')` (ticket 313).
   boreClank: (sound) => sound.playClank('light'),
+  // G&V on #310: switching auto clicks a soft valve, never the clank (ticket 317).
+  autoValveClick: (sound) => {
+    sound.playCueTone(VALVE_CLICK_TONE, VALVE_CLICK_PLAY)
+  },
 }
 
 /** Rock breaking all at once: the collapse's crash, until the blast has its own sound. */

@@ -74,6 +74,30 @@
   text-align: right;
 }
 
+/* The bore gun's brass auto lamp (ticket 317): dark off, green firing, amber holding. */
+.autoLamp::before {
+  content: '';
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  margin-right: 0.3em;
+  border: 1px solid var(--color-brass);
+  border-radius: 50%;
+  background: var(--color-bg);
+}
+
+.autoLamp[data-lamp='green']::before {
+  background: var(--color-teal);
+}
+
+.autoLamp[data-lamp='amber'] {
+  color: var(--color-amber);
+}
+
+.autoLamp[data-lamp='amber']::before {
+  background: var(--color-amber);
+}
+
 @keyframes casing-flash {
   to {
     opacity: 0.4;
