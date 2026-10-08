@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T03:52:51+02:00",
+  "updated_at": "2026-10-08T03:59:18+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -19,11 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 276,
-          "grok_slot": 2,
-          "kind": "dev",
-          "since": "2026-10-08T03:48:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -51,9 +51,9 @@
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
-      "claims_last_hour": 8,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 6,
       "name": "Claude Max 1"
     },
     {
@@ -81,11 +81,11 @@
         },
         {
           "slot": "C7",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 342,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-08T03:58:00+02:00"
         },
         {
           "slot": "C8",
@@ -97,14 +97,14 @@
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
+      "used": 4,
+      "free": 0,
       "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -224,9 +224,9 @@
     {
       "slot": 2,
       "state": "dev",
-      "ticket": 276,
-      "since": "2026-10-08T03:48:00+02:00",
-      "claude_slot": 1
+      "ticket": 342,
+      "since": "2026-10-08T03:58:00+02:00",
+      "claude_slot": 7
     },
     {
       "slot": 3,
@@ -297,10 +297,10 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 276,
-      "grok_slot": 2,
-      "since": "2026-10-08T03:48:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -345,10 +345,10 @@
     },
     {
       "slot": 7,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 342,
+      "grok_slot": 2,
+      "since": "2026-10-08T03:58:00+02:00",
       "account": 2
     },
     {
