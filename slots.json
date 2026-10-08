@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T04:40:58+02:00",
+  "updated_at": "2026-10-08T04:42:02+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -104,14 +104,14 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "nightly-bench",
+    "phase": "nightly-balance-planets",
     "sha": "129bcbd3ab0272abd1d25887d52aecbe55f2b2d9",
-    "since": "2026-10-08T02:40:52Z",
+    "since": "2026-10-08T02:42:01Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-08T00:44:41Z",
