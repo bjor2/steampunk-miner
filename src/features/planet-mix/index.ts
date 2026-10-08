@@ -14,6 +14,8 @@ export { actOf, gateClassOf } from './systems/planetActs'
 /** The planet classes (spec #258): magnetic on the Lodestone act, its fields and electrified cells. */
 export type { PlanetClass } from './systems/planetClassRows'
 export { isMagneticPlanet, planetClassOf } from './systems/planetClass'
+/** The class tag and arrival line a planet's card shows (#258 "On screen", ticket 293). */
+export { planetClassCardOf, type PlanetClassCard } from './systems/planetCard'
 export type { MagneticField, TileBox } from './systems/magneticFields'
 export {
   magneticFieldAt,

@@ -1,0 +1,9 @@
+{
+  "source": "GD lock on spec #258 (Magnetic planet, 7 Oct 2026), Q1 'On screen': a \"Magnetic\" tag on the planet card and the arrival line in the #159 ledger voice, both verbatim from the lock (ticket 293). A class with no entry shows no tag: the frozen and hollow specs add theirs, and P30's relic row has its own spec.",
+  "byClass": {
+    "magnetic": {
+      "tag": "Magnetic",
+      "arrivalLine": "Magnetic. Ferrous veins throw fields; the probe reads them."
+    }
+  }
+}
