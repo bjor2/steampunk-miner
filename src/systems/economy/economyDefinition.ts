@@ -142,6 +142,13 @@ export interface EnemyDef {
   recoilTicks: number
 }
 
+/**
+ * Whether each enemy is metal (GD lock on spec #258 Q5, ticket 291): metal enemies feel a magnetic
+ * field's tug and are what the repulsor's push-wave hits. Every built kind states it; an enemy row
+ * not built yet may state it ahead of its spec (`emp_mite`, the first metal family).
+ */
+export type MetalEnemyTags = Readonly<Record<string, boolean>>
+
 /** How many wreckers may hunt one vehicle's route from planet `from` on (#111 `maxAliveByPlanet`). */
 export interface WreckerCap {
   from: number
@@ -414,6 +421,7 @@ export interface Economy {
     growth: BigStat
     saturationTier: number
     kinds: readonly EnemyDef[]
+    metal: MetalEnemyTags
     tunnelWrecker: TunnelWreckerRules
     combat: CombatRules
   }

@@ -240,6 +240,12 @@
         "recoilTicks": 30
       }
     ],
+    "metal": {
+      "crawler": false,
+      "burrower": false,
+      "tunnel_wrecker": false,
+      "emp_mite": true
+    },
     "tunnelWrecker": {
       "gnawTicksPerRing": 300,
       "fleeTiles": 12,

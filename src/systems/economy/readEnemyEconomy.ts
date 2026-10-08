@@ -6,6 +6,7 @@ import {
   type DensityByRadius,
   type Economy,
   type EnemyDef,
+  type MetalEnemyTags,
   type TunnelWreckerRules,
   type WreckerCap,
 } from './economyDefinition'
@@ -26,12 +27,29 @@ export function readEnemies(
     kinds: reader
       .list('enemies.kinds', enemies.kinds)
       .map((kind, index) => readEnemyDef(reader, `enemies.kinds[${index}]`, kind)),
+    metal: readMetalTags(reader, reader.object('enemies.metal', enemies.metal)),
     tunnelWrecker: readTunnelWrecker(
       reader,
       reader.object('enemies.tunnelWrecker', enemies.tunnelWrecker),
     ),
     combat: readCombat(reader, reader.object('enemies.combat', enemies.combat)),
   }
+}
+
+/** Each tag is true or false, and every built kind states one (#258 Q5). */
+function readMetalTags(reader: FieldReader, tags: Record<string, unknown>): MetalEnemyTags {
+  ENEMY_KINDS.filter((kind) => !(kind in tags)).forEach((kind) =>
+    reader.record(`enemies.metal.${kind} must state true or false`),
+  )
+  return Object.fromEntries(
+    Object.entries(tags).map(([id, tag]) => [id, readMetalTag(reader, id, tag)]),
+  )
+}
+
+function readMetalTag(reader: FieldReader, id: string, tag: unknown): boolean {
+  if (typeof tag === 'boolean') return tag
+  reader.record(`enemies.metal.${id} must state true or false`)
+  return false
 }
 
 function readTunnelWrecker(
