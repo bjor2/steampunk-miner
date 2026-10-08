@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T02:22:46+02:00",
+  "updated_at": "2026-10-08T02:26:23+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -20,10 +20,10 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 291,
+          "ticket": 326,
           "grok_slot": 3,
           "kind": "dev",
-          "since": "2026-10-08T02:07:00+02:00"
+          "since": "2026-10-08T02:26:00+02:00"
         },
         {
           "slot": "C2",
@@ -36,10 +36,10 @@
         {
           "slot": "C3",
           "state": "busy",
-          "ticket": 276,
+          "ticket": 327,
           "grok_slot": 5,
           "kind": "dev",
-          "since": "2026-10-08T01:04:00+02:00"
+          "since": "2026-10-08T02:26:00+02:00"
         },
         {
           "slot": "C4",
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 5,
+      "claims_last_hour": 7,
       "name": "Claude Max 1"
     },
     {
@@ -231,8 +231,8 @@
     {
       "slot": 3,
       "state": "dev",
-      "ticket": 291,
-      "since": "2026-10-08T02:07:00+02:00",
+      "ticket": 326,
+      "since": "2026-10-08T02:26:00+02:00",
       "claude_slot": 1
     },
     {
@@ -245,8 +245,8 @@
     {
       "slot": 5,
       "state": "dev",
-      "ticket": 276,
-      "since": "2026-10-08T01:04:00+02:00",
+      "ticket": 327,
+      "since": "2026-10-08T02:26:00+02:00",
       "claude_slot": 3
     },
     {
@@ -299,9 +299,9 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 291,
+      "ticket": 326,
       "grok_slot": 3,
-      "since": "2026-10-08T02:07:00+02:00",
+      "since": "2026-10-08T02:26:00+02:00",
       "account": 1
     },
     {
@@ -315,9 +315,9 @@
     {
       "slot": 3,
       "state": "busy",
-      "ticket": 276,
+      "ticket": 327,
       "grok_slot": 5,
-      "since": "2026-10-08T01:04:00+02:00",
+      "since": "2026-10-08T02:26:00+02:00",
       "account": 1
     },
     {
@@ -362,11 +362,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 02:22 CEST",
+    "at": "2026-10-08 02:26 CEST",
     "mode": "refill-dev",
-    "triggers": "#323",
-    "started": "#325->C7/A2",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#276 #291",
+    "started": "#326->C1/A1 #327->C3/A1",
+    "note": "spawned 2 worker(s)"
   },
   "totals": {
     "grok": {
