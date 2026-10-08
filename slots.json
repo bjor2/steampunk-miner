@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T04:37:31+02:00",
+  "updated_at": "2026-10-08T04:37:50+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -65,12 +65,11 @@
       "slots": [
         {
           "slot": "C5",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "aux",
-          "since": "2026-10-08T04:37:00+02:00",
-          "label": "tester-triage"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C6",
@@ -98,23 +97,23 @@
         }
       ],
       "size": 4,
-      "used": 1,
-      "free": 3,
+      "used": 0,
+      "free": 4,
       "claims_last_hour": 4,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-full",
+    "phase": "nightly-balance-report",
     "sha": "129bcbd3ab0272abd1d25887d52aecbe55f2b2d9",
-    "since": "2026-10-08T02:37:24Z",
-    "holds_gate": false,
-    "claude_slot": 5,
+    "since": "2026-10-08T02:37:47Z",
+    "holds_gate": true,
+    "claude_slot": null,
     "last_run": "2026-10-08T00:44:41Z",
     "last_nightly": null,
     "last_nightly_result": null,
@@ -325,12 +324,10 @@
     },
     {
       "slot": 5,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-08T04:37:00+02:00",
-      "kind": "aux",
-      "label": "tester-triage",
+      "since": null,
       "account": 2
     },
     {
@@ -377,8 +374,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 3,
-      "free": 5,
+      "used": 2,
+      "free": 6,
       "external": 0
     }
   }
