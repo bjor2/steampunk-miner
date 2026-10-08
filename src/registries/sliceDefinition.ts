@@ -28,6 +28,7 @@ import type { DockFacility } from '../systems/registries/dockFacilities'
 import type { DockService } from '../systems/registries/dockServices'
 import type { DrillGearSource } from '../systems/registries/drillGear'
 import type { ItemHook } from '../systems/registries/itemHooks'
+import type { LiveBeaconProvider } from '../systems/registries/liveBeacon'
 import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectionModifiers'
 import type { GateCheck } from '../systems/registries/gateChecks'
@@ -114,6 +115,8 @@ export interface SliceRegistrar {
    * reach of at most 12 cells, and an id that names no unlock row.
    */
   itemHook(hook: ItemHook): void
+  /** One provider across all slices: a player's live lodestone beacon, handed to item hooks (326). */
+  liveBeacon(provider: LiveBeaconProvider): void
   /** Answers a pressed action the kernel's routing table leaves open, such as `use_slot_1`. */
   inputReaction(reaction: InputReactionEntry): void
   generationHook(hook: GenerationHook): void

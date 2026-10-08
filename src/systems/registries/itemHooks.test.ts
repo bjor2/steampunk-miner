@@ -14,6 +14,7 @@ import {
   type ScalarHookPoint,
   type SelectionHookPoint,
 } from './itemHooks'
+import type { LiveBeacon, LiveBeaconProvider } from './liveBeacon'
 import { RegistrationRefusedError } from './seal'
 
 // Slice hooks on how a lane item plays (GD lock on #206, ticket 323). Fake slices register through
@@ -96,6 +97,45 @@ function rankedWith(hooks: readonly ItemHook[], point: SelectionHookPoint): Tile
   )
 }
 
+const BEACON: LiveBeacon = { tile: { tx: 4, ty: -9 }, gatherRadiusTiles: 5 }
+
+/** A fake terrain slice whose player `p1` has `BEACON` waiting. */
+const BEACON_SLICE: SliceDefinition = {
+  id: 'beacon-a',
+  register: (r) => r.liveBeacon(beaconProvider()),
+}
+
+function beaconProvider(): LiveBeaconProvider {
+  return {
+    id: 'beacon-a.live',
+    liveBeaconOf: (_state, playerId) => (playerId === 'p1' ? BEACON : null),
+  }
+}
+
+/** The contexts a reach hook and a drag hook heard for player `playerId`. */
+function contextsHeard(slices: readonly SliceDefinition[], playerId: string) {
+  const heard: ItemHookContext[] = []
+  const listen = (ctx: ItemHookContext) => {
+    heard.push(ctx)
+    return null
+  }
+  const hooks: ItemHook[] = [
+    {
+      ...scalarHook('reach', 'combo-a.reach', 'extraction', null),
+      answer: (_s, _p, c) => listen(c),
+    },
+    {
+      ...selectionHook('dragTarget', 'combo-a.drag', 'terrain-tools', []),
+      answer: (_s, _p, c) => listen(c),
+    },
+  ]
+  withRegistrations([...slicesOf(hooks), ...slices], () => {
+    scalarHookValueOf(STATE, playerId, scalarAsk('reach', 3))
+    rankedCandidatesOf(STATE, playerId, { point: 'dragTarget', parentItemId: PARENT, ctx: CONTEXT })
+  })
+  return heard
+}
+
 /** Every ordering of `values`. */
 function permutationsOf<T>(values: readonly T[]): T[][] {
   if (values.length <= 1) return [[...values]]
@@ -176,6 +216,19 @@ describe('item hooks', () => {
     }
   })
 
+  it('hands every answer the player’s live beacon on top of the lane’s context', () => {
+    const heard = contextsHeard([BEACON_SLICE], 'p1')
+    expect(heard).toEqual([
+      { ...CONTEXT, beacon: BEACON },
+      { ...CONTEXT, beacon: BEACON },
+    ])
+  })
+
+  it('leaves the beacon out for a player with none, or with no provider', () => {
+    expect(contextsHeard([BEACON_SLICE], 'p2')).toEqual([CONTEXT, CONTEXT])
+    expect(contextsHeard([], 'p1')).toEqual([CONTEXT, CONTEXT])
+  })
+
   it('refuses a hook whose id names a row of the unlock schedule', () => {
     const naming = scalarHook('reach', 'combo-a.auto_guns', 'extraction', 1)
     expect(() => scalarWith([naming], scalarAsk('reach', 1))).toThrow(RegistrationRefusedError)
@@ -194,9 +247,10 @@ describe('item hooks', () => {
     type DigField = 'ticksPerCell' | 'hardness' | 'digBudget' | 'feltCps' | 'boreAdvance'
     expectTypeOf<Extract<ItemHookPoint, DigNamed>>().toBeNever()
     expectTypeOf<Extract<keyof ItemHookContext, DigField | DigNamed>>().toBeNever()
-    expectTypeOf<ItemHookContext[keyof ItemHookContext]>().toMatchTypeOf<
-      number | TilePoint | readonly TilePoint[]
+    expectTypeOf<NonNullable<ItemHookContext[keyof ItemHookContext]>>().toMatchTypeOf<
+      number | TilePoint | readonly TilePoint[] | LiveBeacon
     >()
+    expectTypeOf<LiveBeacon[keyof LiveBeacon]>().toMatchTypeOf<number | TilePoint>()
     expect(ITEM_HOOK_POINTS.filter((point) => /dig|bore|drill/i.test(point))).toEqual([])
     expect(
       Object.keys(CONTEXT).filter((field) => /dig|bore|tick.*cell|hard|cps/i.test(field)),

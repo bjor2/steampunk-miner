@@ -19,6 +19,8 @@
  *   eligibility rules already left out.
  * - **Income.** A hook that adds yield names its `incomeItemId`; the lane sums such claims per item
  *   before its trip cap clamps them (`incomeUnderRoomOf`).
+ * - **Beacon.** Only `terrain-tools` knows where a lodestone beacon waits, so it provides it
+ *   (`liveBeacon.ts`) and every answer hears it in `ctx.beacon` (ticket 326), never by an import.
  * - **No unlocks.** A hook never registers an unlock id: the seal refuses an id naming a row of the
  *   locked schedule, as report rows are refused (#146).
  *
@@ -29,6 +31,7 @@ import { ECONOMY } from '../economy/economy'
 import { cappedScalarOf, rankedBySummedScore } from '../economy/itemHookCaps'
 import { LOCKED_SCHEDULE, unlockIdNamedIn } from '../unlocks/unlockSchedule'
 import type { TilePoint } from '../world/tileGrid'
+import { liveBeaconOf, type LiveBeacon } from './liveBeacon'
 import { defineRegistry, entriesOf, type SealedRegistration } from './seal'
 
 export type SelectionHookPoint = 'targetOrder' | 'dragTarget' | 'aim'
@@ -47,7 +50,8 @@ export const ITEM_HOOK_POINTS: readonly ItemHookPoint[] = [
 
 /**
  * What a lane tells a hook at its decision point: integers and tiles only, no float, no dig
- * number. A lane that needs another field adds it here as an integer or a tile.
+ * number. A lane that needs another field adds it here as an integer or a tile; `beacon` is the
+ * one field the registry adds itself.
  */
 export interface ItemHookContext {
   tick: number
@@ -58,6 +62,8 @@ export interface ItemHookContext {
   origin: TilePoint
   /** The tiles a selection point ranks, in the lane's own order; empty at a scalar point. */
   candidates: readonly TilePoint[]
+  /** The player's live lodestone beacon on this planet, set by the registry; absent with none. */
+  beacon?: LiveBeacon
 }
 
 interface ItemHookFields {
@@ -128,9 +134,10 @@ export function rankedCandidatesOf(
 }
 
 function scalarAnswersOf(state: AuthorityState, playerId: string, ask: ScalarHookAsk): number[] {
-  return hooksAt(ask.point, ask.parentItemId)
-    .filter(isScalarHook)
-    .map((hook) => hook.answer(state, playerId, ask.ctx))
+  const hooks = hooksAt(ask.point, ask.parentItemId).filter(isScalarHook)
+  const ctx = heardContextOf(state, playerId, ask.ctx, hooks)
+  return hooks
+    .map((hook) => hook.answer(state, playerId, ctx))
     .filter((answer): answer is number => answer !== null)
 }
 
@@ -139,10 +146,22 @@ function selectionAnswersOf(
   playerId: string,
   ask: SelectionHookAsk,
 ): (readonly number[])[] {
-  return hooksAt(ask.point, ask.parentItemId)
-    .filter(isSelectionHook)
-    .map((hook) => hook.answer(state, playerId, ask.ctx))
+  const hooks = hooksAt(ask.point, ask.parentItemId).filter(isSelectionHook)
+  const ctx = heardContextOf(state, playerId, ask.ctx, hooks)
+  return hooks
+    .map((hook) => hook.answer(state, playerId, ctx))
     .filter((answer): answer is readonly number[] => answer !== null)
+}
+
+/** The lane's context plus the player's live beacon; the beacon is read only when a hook listens. */
+function heardContextOf(
+  state: AuthorityState,
+  playerId: string,
+  ctx: ItemHookContext,
+  hooks: readonly ItemHook[],
+): ItemHookContext {
+  const beacon = hooks.length === 0 ? null : liveBeaconOf(state, playerId)
+  return beacon === null ? ctx : { ...ctx, beacon }
 }
 
 function scalarCapOf(ask: ScalarHookAsk): number {

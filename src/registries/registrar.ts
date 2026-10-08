@@ -54,6 +54,7 @@ import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamage
 import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
 import { ITEM_DESCRIBER_REGISTRY } from '../systems/registries/itemDescriber'
 import { ITEM_HOOK_REGISTRY } from '../systems/registries/itemHooks'
+import { LIVE_BEACON_REGISTRY } from '../systems/registries/liveBeacon'
 import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../systems/registries/itemDescriptionEntries'
 import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
 import { ORE_DRILL_CLASS_REGISTRY } from '../systems/registries/oreDrillClasses'
@@ -106,6 +107,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     artefactOption: (option) => add(ARTEFACT_OPTION_REGISTRY, option),
     drillGear: (source) => add(DRILL_GEAR_REGISTRY, source),
     itemHook: (hook) => add(ITEM_HOOK_REGISTRY, hook),
+    liveBeacon: (provider) => add(LIVE_BEACON_REGISTRY, provider),
     hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),
     enemyDetectionModifier: (modifier) => add(ENEMY_DETECTION_MODIFIER_REGISTRY, modifier),
     heatPause: (pause) => add(HEAT_PAUSE_REGISTRY, pause),
