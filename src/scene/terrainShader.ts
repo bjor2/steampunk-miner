@@ -43,6 +43,11 @@
  * `gl_Position` never sees more than about 1.5 km. Lights, heat tiles and bricks read the lo half
  * (the origin is a whole number of their tiles); hashes add the hi half as whole cells; directions
  * and radii read the sum; the strata rings add their change from the origin's own ring coordinates.
+ *
+ * An electrified cell (spec #258, ticket 293) sets its own bit in the same slot, which is no gate:
+ * its arc-flicker draws over whatever gate the cell shows, blue arcs striking across it a few times
+ * a second, each at its own place, lighting the ore rather than covering it, in their own blue
+ * rather than the act tint. With reduce motion one arc holds steady.
  */
 
 export const TERRAIN_VERTEX_SHADER = /* glsl */ `
@@ -255,8 +260,12 @@ bool isGatedCell(float bits) {
 
 // 1 once the local player's tip major reaches the cell's opening major; a field of 0 never opens.
 float gateOpenness(float bits) {
-  float opening = floor(bits / float(GATE_OPENING_UNIT));
+  float opening = mod(floor(bits / float(GATE_OPENING_UNIT)), float(GATE_OPENING_COUNT));
   return step(0.5, opening) * step(opening - 1.0, uGateTipMajor);
+}
+
+bool isElectrifiedCell(float bits) {
+  return mod(floor(bits / float(ELECTRIFIED_BIT)), 2.0) > 0.5;
 }
 
 bool isGateKind(float kind, int pattern) {
@@ -395,6 +404,39 @@ vec3 gateMarkerInState(vec3 marker, float state, vec2 local) {
 // A bare rim is gone once open; every other marker draws, the hard rim glinting.
 bool isGateDrawn(float kind, float openness) {
   return !(isGateKind(kind, GATE_BARE_RIM) && openness > 0.5);
+}
+
+// The electrified cell's arcs (ticket 293): a pale electric blue, apart from every act tint.
+const vec3 ARC_BLUE = vec3(0.45, 0.72, 1.0);
+const float ARC_GLOW = 1.3;
+// The cell's faint standing glow between strikes, so an electrified cell reads at a glance.
+const float ARC_STANDING_GLOW = 0.06;
+// How often an arc strikes anew, and the share of strikes that light (the rest are the flicker).
+const float ARC_STRIKES_PER_SECOND = 7.0;
+const float ARC_LIT_SHARE = 0.55;
+
+// A jagged offset along an arc: straight runs between nodes placed by the strike.
+float arcJag(float along, float strike) {
+  float node = floor(along);
+  float here = hash12(vec2(node, strike) + vTile * 3.7) - 0.5;
+  float next = hash12(vec2(node + 1.0, strike) + vTile * 3.7) - 0.5;
+  return mix(here, next, fract(along));
+}
+
+// 1 on the strike's arc, 0 off it: a jagged strand across the cell at the strike's own angle.
+float arcStrand(vec2 fromCentre, float strike, float soft) {
+  vec2 across = rotation(hash12(vec2(strike, 3.3) + vTile) * 3.14159265) * fromCentre;
+  float jag = 0.18 * arcJag(across.x * 6.0, strike);
+  float line = 1.0 - smoothstep(0.012, 0.03 + soft, abs(across.y - jag));
+  return line * (1.0 - smoothstep(0.3, 0.42, abs(across.x)));
+}
+
+// The arc lit now: each cell strikes on its own beat; reduce motion holds one strike, lit.
+float electrifiedArc(vec2 local, float soft) {
+  float beat = mix(uTime, GATE_STILL_TIME, uGateStill) * ARC_STRIKES_PER_SECOND;
+  float strike = floor(beat + 8.0 * hash12(vTile));
+  float lit = max(step(1.0 - ARC_LIT_SHARE, hash12(vec2(strike, 9.1) + vTile)), uGateStill);
+  return arcStrand(local - 0.5, strike, soft) * lit;
 }
 
 // The tile's depth band by the integer rule of bandOfTile: exact below 2^24, so for any planet.
@@ -564,6 +606,12 @@ void main() {
     colour = mix(colour, GATE_GLINT, marker.z);
     emissive *= 1.0 - max(marker.x, max(marker.y, marker.z));
     emissive += uGateTint * GATE_TINT_GLOW * marker.y + GATE_GLINT * marker.z;
+  }
+  if (isElectrifiedCell(gateBits)) {
+    // Over the gate and the ore, never covering them.
+    float arc = electrifiedArc(vLocal, gateSoft);
+    colour = mix(colour, ARC_BLUE, 0.6 * arc);
+    emissive += ARC_BLUE * (ARC_GLOW * arc + ARC_STANDING_GLOW);
   }
 
   gl_FragColor = vec4(displayToLinear(colour * light + emissive), 1.0);

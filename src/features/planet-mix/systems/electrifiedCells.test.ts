@@ -16,12 +16,23 @@ import { stepOfMajor } from '../../../systems/economy/upgradeSteps'
 import { onCurveSteps, vehicleStatsAt } from '../../../systems/economy/vehicleStats'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { gateVerdictOf } from '../../../systems/registries/gateChecks'
+import { isElectrifiedBits } from '../../../systems/render/cellGateBits'
+import { buildChunkTileBatch } from '../../../systems/render/chunkTileBatch'
+import { chunkDensityHaloOf } from '../../../systems/render/densityHalo'
+import { ELECTRIFIED_MARKER, GATE_PATTERNS } from '../../../systems/render/gatePatterns'
 import { oreTypeOf } from '../../../systems/registries/oreTypes'
 import { generateChunkCells } from '../../../systems/world/generateChunk'
+import {
+  currentDensityOfChunk,
+  EMPTY_WORLD,
+  materialCellsOfChunk,
+} from '../../../systems/world/worldState'
+import { GATE_ROWS, motionSignatureOf, type LockMarkerKind } from '../../mining-gates'
 import { bandOfTile } from '../../../systems/world/planetGeometry'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import {
   CHUNK_SIZE,
+  chunkOfTile,
   chunkRangeOfDisc,
   firstTileOfChunk,
   type TilePoint,
@@ -41,6 +52,14 @@ import { PLANET_CLASS_ROWS } from './planetClassRows'
 
 const SEED = PACING_WORLD_SEEDS['bot-slice'][0]
 const MAGNETIC_PLANET = 25
+const RELIC_PLANET = 30
+/** #142's lock markers (mining-gates `lockMarkerOf`), the extractors' motions apart. */
+const LOCK_MARKER_KINDS: readonly LockMarkerKind[] = [
+  'hard_rim',
+  'hard_rim_open',
+  'cracked_shell',
+  'motion',
+]
 /** Tips from below the ordinary quarter floor (tier - 7) to past the drill signature's (tier + 4). */
 const TIPS_BELOW_TIER = 8
 const TIPS_ABOVE_TIER = 4
@@ -174,4 +193,59 @@ describe('electrified cells', () => {
     )
     expect(electrifiedOthers).toEqual([])
   })
+
+  it('the marker id differs from every #142 marker', () => {
+    const motions = GATE_ROWS.rigs.map((rig) => motionSignatureOf(rig.id))
+    const markers = new Set<string | null>([...LOCK_MARKER_KINDS, ...motions, ...GATE_PATTERNS])
+    expect(motions).not.toContain(null)
+    expect(markers.has(ELECTRIFIED_MARKER)).toBe(false)
+  })
+
+  it("draws the arcs in the ground on exactly a magnetic planet's electrified cells", () => {
+    const params = planetParamsOf(sessionOn(MAGNETIC_PLANET).state().planet) as PlanetParams
+    const chunk = chunkHolding(ferrousCellsOf(params).find((one) => one.isElectrified)!)
+    expect(arcsDrawnIn(params, chunk)).toEqual(electrifiedTilesIn(params, chunk))
+    expect(arcsDrawnIn(params, chunk).length).toBeGreaterThan(0)
+  })
+
+  it('draws no arcs on the relic planet', () => {
+    const params = planetParamsOf(sessionOn(RELIC_PLANET).state().planet) as PlanetParams
+    const chunk = chunkHolding(ferrousCellsOf(params)[0])
+    expect(arcsDrawnIn(params, chunk)).toEqual([])
+  })
 })
+
+interface ChunkAt {
+  cx: number
+  cy: number
+}
+
+function chunkHolding({ tile }: FerrousCell): ChunkAt {
+  return { cx: chunkOfTile(tile.tx), cy: chunkOfTile(tile.ty) }
+}
+
+/** The tiles the chunk mesh flags electrified, as sorted `tx,ty` keys. */
+function arcsDrawnIn(params: PlanetParams, { cx, cy }: ChunkAt): string[] {
+  const cells = materialCellsOfChunk(EMPTY_WORLD, params, cx, cy)
+  const density = (x: number, y: number) => currentDensityOfChunk(EMPTY_WORLD, params, x, y)
+  const batch = buildChunkTileBatch(params, cx, cy, cells, chunkDensityHaloOf(density, cx, cy))
+  const drawn: string[] = []
+  for (let at = 0; at < batch.count; at++) {
+    if (!isElectrifiedBits(batch.gates[at])) continue
+    const tx = firstTileOfChunk(cx) + batch.tiles[at * 2]
+    drawn.push(`${tx},${firstTileOfChunk(cy) + batch.tiles[at * 2 + 1]}`)
+  }
+  return drawn.sort()
+}
+
+function electrifiedTilesIn(params: PlanetParams, { cx, cy }: ChunkAt): string[] {
+  const cells = materialCellsOfChunk(EMPTY_WORLD, params, cx, cy)
+  return Array.from(cells, (cell, index) => ({
+    tx: firstTileOfChunk(cx) + (index % CHUNK_SIZE),
+    ty: firstTileOfChunk(cy) + Math.floor(index / CHUNK_SIZE),
+    cell,
+  }))
+    .filter(({ tx, ty, cell }) => isElectrifiedCell(params, { tx, ty }, cell))
+    .map(({ tx, ty }) => `${tx},${ty}`)
+    .sort()
+}

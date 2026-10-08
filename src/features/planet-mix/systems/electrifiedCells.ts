@@ -21,11 +21,14 @@ import { PLANET_CLASS_ROWS } from './planetClassRows'
 
 const BASIS_POINTS = 10000
 
-/** Whether `cell` at `tile` is an electrified ferrous cell; false off the magnetic planets. */
+/**
+ * Whether `cell` at `tile` is an electrified ferrous cell; false off the magnetic planets. The cell
+ * is read first: the chunk mesh asks for every tile it draws (ticket 293), and most are not ore.
+ */
 export function isElectrifiedCell(params: PlanetParams, tile: TilePoint, cell: number): boolean {
   return (
-    isMagneticPlanet(params.planetIndex) &&
     isFerrousCell(cell) &&
+    isMagneticPlanet(params.planetIndex) &&
     electrifiedRollOf(params, tile) < PLANET_CLASS_ROWS.magnetic.electrifiedShareBp
   )
 }

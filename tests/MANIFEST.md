@@ -228,7 +228,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/oreRows.test.ts` | 3 | 3 |
 | `src/features/ores/systems/oreTypeProvider.test.ts` | 6 | 6 |
 
-### `planet-mix`: 14 files, 85 tests
+### `planet-mix`: 14 files, 88 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -238,7 +238,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/magneticPlanetPace.test.ts` | 9 | 3 |
 | `src/features/planet-mix/mixHistogram.test.ts` | 7 | 3 |
 | `src/features/planet-mix/mixReportRows.test.ts` | 5 | 5 |
-| `src/features/planet-mix/systems/electrifiedCells.test.ts` | 3 | 3 |
+| `src/features/planet-mix/systems/electrifiedCells.test.ts` | 6 | 6 |
 | `src/features/planet-mix/systems/magneticFields.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/mixRoll.test.ts` | 5 | 5 |
 | `src/features/planet-mix/systems/oreMix.test.ts` | 13 | 13 |
@@ -737,10 +737,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/artefactLook.test.ts` | 2 | 2 |
 | `src/systems/render/bandPalette.test.ts` | 6 | 6 |
 | `src/systems/render/cameraTurn.test.ts` | 7 | 7 |
-| `src/systems/render/cellGateBits.test.ts` | 10 | 10 |
+| `src/systems/render/cellGateBits.test.ts` | 11 | 11 |
 | `src/systems/render/chargePlacement.test.ts` | 2 | 2 |
 | `src/systems/render/chunkTileBatch.test.ts` | 8 | 8 |
-| `src/systems/render/chunkTileBatchGates.test.ts` | 10 | 3 |
+| `src/systems/render/chunkTileBatchGates.test.ts` | 12 | 5 |
 | `src/systems/render/chunkTileBatchOreLook.test.ts` | 1 | 1 |
 | `src/systems/render/collapseTelegraph.test.ts` | 5 | 5 |
 | `src/systems/render/drillHeadPose.test.ts` | 7 | 4 |

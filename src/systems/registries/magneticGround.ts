@@ -26,6 +26,12 @@ export interface MagneticGroundProvider {
 export const MAGNETIC_GROUND_REGISTRY =
   defineOneProviderRegistry<MagneticGroundProvider>('magneticGround')
 
+/** The registered provider, or null: no planet has a field or an electrified cell. */
+export function magneticGroundProvider(): MagneticGroundProvider | null {
+  const [provider] = entriesOf(MAGNETIC_GROUND_REGISTRY)
+  return provider ?? null
+}
+
 /** The field holding `tile`; null off every field, or with no provider. */
 export function magneticFieldHolding(params: PlanetParams, tile: TilePoint): MagneticField | null {
   const [provider] = entriesOf(MAGNETIC_GROUND_REGISTRY)

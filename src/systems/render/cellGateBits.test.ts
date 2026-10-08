@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  cellMarkerBitsOf,
   gateBitsOf,
   gateLookOfBits,
+  isElectrifiedBits,
   MAX_GATE_KIND,
   MAX_GATE_OPENING_MAJOR,
   MAX_GATE_STATE,
@@ -71,4 +73,19 @@ describe('cell gate bits', () => {
     expect(() => gateBitsOf({ kind: -1, state: 0 })).toThrow(RangeError)
     expect(() => gateBitsOf({ kind: 1.5, state: 0 })).toThrow(RangeError)
   })
+
+  it("keeps an electrified cell's bit apart from the gate it shows, exact in a float", () => {
+    const looks = [null, ...EVERY_LOOK, ...OPENING_MAJORS.map((major) => openingAt(major))]
+    for (const look of looks) {
+      const bits = cellMarkerBitsOf(look, true)
+      expect(gateLookOfBits(bits)).toEqual(look)
+      expect(isElectrifiedBits(bits)).toBe(true)
+      expect(isElectrifiedBits(cellMarkerBitsOf(look, false))).toBe(false)
+      expect(Math.fround(bits)).toBe(bits)
+    }
+  })
 })
+
+function openingAt(opensAtTipMajor: number): CellGateLook {
+  return { kind: MAX_GATE_KIND, state: MAX_GATE_STATE, opensAtTipMajor }
+}

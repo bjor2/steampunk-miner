@@ -18,7 +18,9 @@
  *
  * Gated cells (ticket 298): the `cellGateLook` provider names the gate a cell shows, and its bits
  * (`cellGateBits.ts`) ride in the tile's gate slot, which the shader draws as the cell's top layer.
- * With no provider the slot stays 0 and the provider is never asked.
+ * With no provider the slot stays 0 and the provider is never asked. An electrified cell
+ * (`magneticGround`, spec #258) sets its own bit in the same slot (ticket 293), so its arcs draw
+ * over whatever gate the cell shows.
  */
 import { GROUND_BLOCK_SIZE, ORE_WHISPER_ROCK_TILES } from '../../constants/scene'
 import type { PlanetParams } from '../world/planetParams'
@@ -32,8 +34,9 @@ import { ART_DIRECTION, type BandPalette } from './artDirection'
 import { bandColourOf, paletteOf, tileShadeOf } from './bandPalette'
 import type { Rgb } from './colour'
 import { cellGateLookProvider, type CellGateLookProvider } from '../registries/cellGateLook'
+import { magneticGroundProvider, type MagneticGroundProvider } from '../registries/magneticGround'
 import { oreLookProvider, type OreLookProvider } from '../registries/oreLook'
-import { gateBitsOf, NO_GATE_BITS } from './cellGateBits'
+import { cellMarkerBitsOf, NO_GATE_BITS } from './cellGateBits'
 import type { OreLook } from './oreLook'
 
 /** How the shader draws a tile. */
@@ -61,7 +64,9 @@ interface BatchContext {
   oreLook: OreLookProvider
   /** The `mining-gates` slice's gate look (feature-slices.md 3.33), or null, read per chunk. */
   cellGateLook: CellGateLookProvider | null
-  /** Reused for every tile the provider is asked about, so a rebuild allocates no points. */
+  /** The `planet-mix` slice's fields and electrified cells (ticket 290), or null, read per chunk. */
+  magneticGround: MagneticGroundProvider | null
+  /** Reused for every tile the providers are asked about, so a rebuild allocates no points. */
   gateTile: { tx: number; ty: number }
   /** 1 per cell holding refractory lining (#113), in cell order. */
   refractoryCells: Uint8Array
@@ -157,6 +162,7 @@ function batchContextOf(
     oreLooks: new Map(),
     oreLook: oreLookProvider(),
     cellGateLook: cellGateLookProvider(),
+    magneticGround: magneticGroundProvider(),
     gateTile: { tx: 0, ty: 0 },
   }
 }
@@ -235,10 +241,13 @@ function tileFlagOf(
 }
 
 function gateBitsOfTile(context: BatchContext, cell: number, lx: number, ly: number): number {
-  if (context.cellGateLook === null) return NO_GATE_BITS
+  if (context.cellGateLook === null && context.magneticGround === null) return NO_GATE_BITS
   context.gateTile.tx = context.firstTx + lx
   context.gateTile.ty = context.firstTy + ly
-  return gateBitsOf(context.cellGateLook.cellGateLookOf(context.params, cell, context.gateTile))
+  return cellMarkerBitsOf(
+    context.cellGateLook?.cellGateLookOf(context.params, cell, context.gateTile) ?? null,
+    context.magneticGround?.isElectrified(context.params, context.gateTile, cell) === true,
+  )
 }
 
 function oreLookOf(context: BatchContext, cell: number): OreLook {

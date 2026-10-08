@@ -3,10 +3,17 @@ import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { PARAMS, surfaceOreTiles } from '../authority/scriptedSession'
 import type { CellGateLookProvider } from '../registries/cellGateLook'
+import type { MagneticGroundProvider } from '../registries/magneticGround'
 import { chunkOfTile, type TilePoint } from '../world/tileGrid'
 import { CELL_KIND, kindOfCell } from '../world/worldCell'
 import { currentDensityOfChunk, EMPTY_WORLD, materialCellsOfChunk } from '../world/worldState'
-import { gateLookOfBits, MAX_GATE_KIND, MAX_GATE_STATE, type CellGateLook } from './cellGateBits'
+import {
+  gateLookOfBits,
+  isElectrifiedBits,
+  MAX_GATE_KIND,
+  MAX_GATE_STATE,
+  type CellGateLook,
+} from './cellGateBits'
 import { buildChunkTileBatch, SILHOUETTE_CODE, type ChunkTileBatch } from './chunkTileBatch'
 import { chunkDensityHaloOf } from './densityHalo'
 
@@ -28,6 +35,16 @@ function gateEveryOreSlice(look: CellGateLook, asked: TilePoint[] = []): SliceDe
     markerTintOf: () => null,
   }
   return { id: 'gate-probe', register: (r) => r.cellGateLook(provider) }
+}
+
+/** A magnetic ground electrifying every ore cell (ticket 293), with no field anywhere. */
+function electrifyEveryOreSlice(): SliceDefinition {
+  const provider: MagneticGroundProvider = {
+    id: 'electrified-probe.every-ore',
+    fieldAt: () => null,
+    isElectrified: (_params, _tile, cell) => kindOfCell(cell) === CELL_KIND.ore,
+  }
+  return { id: 'electrified-probe', register: (r) => r.magneticGround(provider) }
 }
 
 function batchWith(slices: readonly SliceDefinition[]): ChunkTileBatch {
@@ -54,6 +71,15 @@ function gateLooksOf(batch: ChunkTileBatch): { ore: string[]; rest: string[] } {
     looks[isOreTile(batch, at) ? 'ore' : 'rest'].push(look)
   }
   return looks
+}
+
+/** Whether each drawn tile carries the electrified bit, ore tiles and the rest apart. */
+function electrifiedFlagsOf(batch: ChunkTileBatch): { ore: boolean[]; rest: boolean[] } {
+  const flags = { ore: [] as boolean[], rest: [] as boolean[] }
+  for (let at = 0; at < batch.count; at++) {
+    flags[isOreTile(batch, at) ? 'ore' : 'rest'].push(isElectrifiedBits(batch.gates[at]))
+  }
+  return flags
 }
 
 /** Everything the shader read before the gate channel: tiles, colours, styles, block starts. */
@@ -87,5 +113,21 @@ describe('gate channel at the chunk mesh', () => {
     expect(Array.from(plain.gates.subarray(0, plain.count)).every((bits) => bits === 0)).toBe(true)
     expect(plain.count).toBe(gated.count)
     expect(lookBeforeGatesOf(plain)).toEqual(lookBeforeGatesOf(gated))
+  })
+
+  it("sets the electrified bit on exactly the provider's electrified cells", () => {
+    const batch = batchWith([electrifyEveryOreSlice()])
+    const flags = electrifiedFlagsOf(batch)
+    expect(flags.ore.length).toBeGreaterThan(0)
+    expect(new Set(flags.ore)).toEqual(new Set([true]))
+    expect(new Set(flags.rest)).toEqual(new Set([false]))
+    expect(new Set(gateLooksOf(batch).ore)).toEqual(new Set(['null']))
+  })
+
+  it('keeps the gate a cell shows when it is electrified too', () => {
+    const look = { kind: MAX_GATE_KIND, state: MAX_GATE_STATE, opensAtTipMajor: 34 }
+    const batch = batchWith([gateEveryOreSlice(look), electrifyEveryOreSlice()])
+    expect(new Set(gateLooksOf(batch).ore)).toEqual(new Set([JSON.stringify(look)]))
+    expect(new Set(electrifiedFlagsOf(batch).ore)).toEqual(new Set([true]))
   })
 })

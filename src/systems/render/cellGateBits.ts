@@ -9,11 +9,16 @@
  * | 4-6  | gate state, 0 to 7: locked, revealed, cleared, then five spare           |
  * | 7    | set on every gated cell; 0 is a cell with no gate                        |
  * | 8-20 | the drill tip major that opens a rim, plus one; 0 for a gate no tip opens |
+ * | 21   | set on an electrified cell (spec #258, ticket 293), with a gate or none   |
  *
  * The act tint never rides here: the shader takes it from the planet (#151 theme tint). Nor does
  * the player's tip: the shader compares the cell's opening major with the local player's
  * (`uGateTipMajor`, ticket 299), so a tip buy rebuilds no chunk (the TD's "tip-major uniform"). The
  * highest bits stay below 2^24, so the value is exact in a float attribute.
+ *
+ * The electrified bit is no gate: an electrified cell is a hazard `canMine` never refuses (GD lock
+ * on #258), so it rides its own bit and draws its own marker over whatever gate the cell shows,
+ * the bare rim of an ordinary cell from P7 included.
  */
 
 /** What a gated cell shows: its kind and state, each a small integer the shader decodes. */
@@ -49,6 +54,9 @@ export const GATED_BIT = 1 << (GATE_KIND_BITS + GATE_STATE_BITS)
 /** The opening field's place value: the bits above the gated bit. */
 export const GATE_OPENING_UNIT = GATED_BIT * 2
 
+/** Set on an electrified cell, above the opening field (bit 21). */
+export const ELECTRIFIED_BIT = GATE_OPENING_UNIT * (1 << GATE_OPENING_BITS)
+
 /** The bits for `look`; a kind or state outside the channel is refused, never trimmed. */
 export function gateBitsOf(look: CellGateLook | null): number {
   if (look === null) return NO_GATE_BITS
@@ -56,12 +64,22 @@ export function gateBitsOf(look: CellGateLook | null): number {
   return openingFieldOf(look) * GATE_OPENING_UNIT + lowBitsOf(look)
 }
 
+/** The bits for a cell showing `look` that is electrified or not. */
+export function cellMarkerBitsOf(look: CellGateLook | null, isElectrified: boolean): number {
+  return gateBitsOf(look) + (isElectrified ? ELECTRIFIED_BIT : 0)
+}
+
 /** The look the bits carry, or null for a cell with no gate. */
 export function gateLookOfBits(bits: number): CellGateLook | null {
   if ((bits & GATED_BIT) === 0) return null
   const look = { kind: bits & MAX_GATE_KIND, state: (bits >> GATE_KIND_BITS) & MAX_GATE_STATE }
-  const opening = Math.floor(bits / GATE_OPENING_UNIT)
+  const opening = Math.floor(bits / GATE_OPENING_UNIT) % (1 << GATE_OPENING_BITS)
   return opening === 0 ? look : { ...look, opensAtTipMajor: opening - 1 }
+}
+
+/** Whether the bits are an electrified cell's. */
+export function isElectrifiedBits(bits: number): boolean {
+  return (bits & ELECTRIFIED_BIT) !== 0
 }
 
 function lowBitsOf({ kind, state }: CellGateLook): number {

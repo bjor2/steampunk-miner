@@ -26,6 +26,11 @@
  * cleared leaves a faint trace; the spare states draw as locked.
  *
  * `drawnGateOf` is the shader's rule in TypeScript, for the debug reads that check the ground.
+ *
+ * Beside the catalogue the shader draws one marker that is no gate: `arc-flicker`, the electrified
+ * cell's (GD lock on spec #258, ticket 293), on its own bit (`cellGateBits.ts`) over any gate.
+ * Blue arcs strike and flicker across the cell, apart from every #142 marker in look and colour;
+ * with reduce motion one arc holds steady.
  */
 import { vehicleOf, type AuthorityState } from '../authority/authorityState'
 import { majorOf } from '../economy/upgradeSteps'
@@ -54,6 +59,9 @@ const MOVING_PATTERNS: ReadonlySet<GatePattern> = new Set([
 
 /** The one pattern still drawn once open, glinting; any other opened marker is no longer drawn. */
 const GLINTING_PATTERN: GatePattern = 'hard_rim'
+
+/** The electrified cell's marker: no gate, so it is never a kind and never opens. */
+export const ELECTRIFIED_MARKER = 'arc-flicker'
 
 /** Who the ground is drawn for: the local player's tip major and their reduce-motion choice. */
 export interface GateViewer {

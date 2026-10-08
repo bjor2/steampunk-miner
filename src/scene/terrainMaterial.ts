@@ -17,7 +17,9 @@ import {
   ORE_WHISPER_RANGE_TILES,
 } from '../constants/scene'
 import {
+  ELECTRIFIED_BIT,
   GATED_BIT,
+  GATE_OPENING_BITS,
   GATE_OPENING_UNIT,
   GATE_STATE,
   MAX_GATE_KIND,
@@ -59,6 +61,8 @@ export function createTerrainMaterial(): ShaderMaterial {
       GATE_KIND_COUNT: MAX_GATE_KIND + 1,
       GATE_STATE_COUNT: MAX_GATE_STATE + 1,
       GATE_OPENING_UNIT,
+      GATE_OPENING_COUNT: 1 << GATE_OPENING_BITS,
+      ELECTRIFIED_BIT,
       GATE_STATE_REVEALED: GATE_STATE.revealed,
       GATE_STATE_CLEARED: GATE_STATE.cleared,
       // The pattern catalogue (gatePatterns.ts), so the shader names the kind it draws.
