@@ -3,9 +3,10 @@ import { createAuthorityState } from '../../../systems/authority/authorityState'
 import { describeItem, type ItemRef } from '../../../systems/registries/itemDescriber'
 import { itemSnapshotViewOf } from '../../../systems/registries/itemSnapshotView'
 import { flavourProblemsOf } from '../../descriptions'
-import { boreGunCards } from './boreGunCards'
+import { boreGunCards, cardPriceOf } from './boreGunCards'
 import { BORE_GUN_KIND, MOUNT_PART_ID, trackPartIdOf } from './boreGunContent'
-import { mountedLevels, withGunLevels } from './gunLevels'
+import { mountedLevels, UNMOUNTED_GUN, withGunLevels } from './gunLevels'
+import { mountPrice, nextLevelPrice } from './gunPurchase'
 import { wallLevelOf } from './gunTracks'
 
 const state = withGunLevels(
@@ -43,8 +44,18 @@ describe('ground-gun: the cards (#159)', () => {
     )
   })
 
-  it('shows the mount price on the mount card and the next level on each track', () => {
-    expect(lineOf(MOUNT_PART_ID, 0, 'Price').now).toBeDefined()
+  it('prices each part at the debit its buy takes: the mount until bought, then each next level', () => {
+    expect(cardPriceOf(UNMOUNTED_GUN, MOUNT_PART_ID)).toEqual(mountPrice())
+    expect(cardPriceOf(UNMOUNTED_GUN, trackPartIdOf('rate'))).toBeNull()
+    expect(cardPriceOf(mountedLevels(), MOUNT_PART_ID)).toBeNull()
+    expect(cardPriceOf(mountedLevels(), trackPartIdOf('energy'))).toEqual(
+      nextLevelPrice(mountedLevels(), 'energy'),
+    )
+    const atWall = { ...mountedLevels(), rate: wallLevelOf('rate') }
+    expect(cardPriceOf(atWall, trackPartIdOf('rate'))).toBeNull()
+  })
+
+  it('shows the next level on each track', () => {
     const penetration = lineOf(trackPartIdOf('penetration'), 1, 'Bore power (% of the drill)')
     expect([penetration.now, penetration.next]).toEqual(['49', '52'])
   })

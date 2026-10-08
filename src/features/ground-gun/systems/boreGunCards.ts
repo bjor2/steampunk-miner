@@ -10,18 +10,20 @@
  * - Penetration and energy: their stat as a share of the drill's.
  *
  * A track line reads the level the card names, or level 1 before the mount; its next value is one
- * level on, none at the wall. The price line is the next level's debit.
+ * level on, none at the wall. The cost is not a stat line: #159 draws it as the card's own line,
+ * from `cardPriceOf`, the very price the buy commands debit.
  */
 import { blockHardness } from '../../../systems/economy/oreEconomy'
 import { vehicleStatsAt } from '../../../systems/economy/vehicleStats'
 import type { Money } from '../../../systems/money'
+import { contentOf } from '../../../systems/registries/content'
 import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { BORE_GUN_KIND, MOUNT_PART_ID, trackPartIdOf } from './boreGunContent'
 import { GROUND_GUN, type GunTrackId } from './groundGunEconomy'
-import { GROUND_GUN_SECTION, MOUNTED_LEVEL } from './gunLevels'
-import { mountPrice } from './gunPurchase'
+import { GROUND_GUN_SECTION, isGunMounted, MOUNTED_LEVEL, type GunLevels } from './gunLevels'
+import { mountPrice, nextLevelPrice } from './gunPurchase'
 import {
   boreShotOnGround,
   gunTicksPerCell,
@@ -29,7 +31,7 @@ import {
   rateCardOf,
   type BoreShot,
 } from './gunRecovery'
-import { energyStatsAt, isTrackMaxed, penetrationStatsAt, trackLevelPrice } from './gunTracks'
+import { energyStatsAt, isTrackMaxed, penetrationStatsAt } from './gunTracks'
 
 /** The planet's median ground (#322's rate test): band 3. */
 const MEDIAN_BAND = 3
@@ -50,7 +52,6 @@ function mountCard(): ItemDescriptionEntry {
   return partCard(MOUNT_PART_ID, MOUNT_FLAVOUR, [
     fixedLine('Bore reach (cells)', () => GROUND_GUN.bore.boreRangeBase),
     fixedLine('Shots a minute in rock', (ctx) => rockCardAt(MOUNTED_LEVEL, ctx).shotsPerMinute),
-    fixedLine('Price', () => mountPrice()),
   ])
 }
 
@@ -90,10 +91,7 @@ function energyCard(): ItemDescriptionEntry {
 }
 
 function trackCard(trackId: GunTrackId, lines: DescribedStatLineSpec[]): ItemDescriptionEntry {
-  return partCard(trackPartIdOf(trackId), TRACK_FLAVOURS[trackId], [
-    ...lines,
-    fixedLine('Price', (ctx) => trackLevelPrice(trackId, shownLevelOf(ctx.level) + 1)),
-  ])
+  return partCard(trackPartIdOf(trackId), TRACK_FLAVOURS[trackId], lines)
 }
 
 function partCard(
@@ -126,10 +124,15 @@ function trackLine(
   }
 }
 
-function fixedLine(
-  label: string,
-  valueOf: (ctx: ItemCtx) => number | Money,
-): DescribedStatLineSpec {
+/** What the part costs these levels now, the buy's own debit; null when it is not for sale. */
+export function cardPriceOf(levels: GunLevels, partId: string): Money | null {
+  if (partId === MOUNT_PART_ID) return isGunMounted(levels) ? null : mountPrice()
+  const part = contentOf(BORE_GUN_KIND).find((candidate) => candidate.id === partId)
+  if (part?.track == null || !isGunMounted(levels)) return null
+  return nextLevelPrice(levels, part.track)
+}
+
+function fixedLine(label: string, valueOf: (ctx: ItemCtx) => number): DescribedStatLineSpec {
   return {
     label,
     kind: 'linearInt',
