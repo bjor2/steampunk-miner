@@ -155,10 +155,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
-### `ground-gun`: 15 files, 115 tests
+### `ground-gun`: 16 files, 119 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/ground-gun/debug.test.ts` | 4 | 4 |
 | `src/features/ground-gun/systems/armouryModules.test.ts` | 13 | 13 |
 | `src/features/ground-gun/systems/boreGunCards.test.ts` | 6 | 6 |
 | `src/features/ground-gun/systems/boreGunLaw.test.ts` | 8 | 6 |
@@ -969,7 +970,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `scripts/e2e/affectedSpecs.test.mjs` | 21 | 12 |
+| `scripts/e2e/affectedSpecs.test.mjs` | 22 | 13 |
 | `scripts/e2e/e2eTimings.test.mjs` | 3 | 3 |
 | `scripts/e2e/previewBuild.test.mjs` | 4 | 4 |
 

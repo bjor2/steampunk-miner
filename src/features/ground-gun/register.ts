@@ -10,6 +10,7 @@
  * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
+import { groundGunDebugActions } from './debug'
 import { GROUND_GUN_PROJECTIONS, GROUND_GUN_RUN_EVENTS } from './logging'
 import { boreGunCards } from './systems/boreGunCards'
 import { BORE_GUN_KIND, boreGunParts } from './systems/boreGunContent'
@@ -43,5 +44,7 @@ export const slice: SliceDefinition = {
       Panel: FireReticle,
     })
     r.soundCue(FIRE_TILE_FEEL.refusalClank)
+    // steampunkDebug.features['ground-gun'].setLevels(1, 1, 1), .getGun()
+    r.debugActions(groundGunDebugActions)
   },
 }

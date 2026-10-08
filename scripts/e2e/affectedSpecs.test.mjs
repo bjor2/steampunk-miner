@@ -76,6 +76,13 @@ describe('e2e: affected-spec map', () => {
     ])
   })
 
+  it('runs the fire tile and the screen layout specs when the ground gun changes', () => {
+    expect(select('src/features/ground-gun/ui/FireTile.tsx').specs).toEqual([
+      'e2e/browser/screens/fireTile.spec.ts',
+      'e2e/browser/screens/screenLayout.spec.ts',
+    ])
+  })
+
   it('joins the specs of every changed path once, sorted', () => {
     const choice = select('src/features/sell-burst/burst.ts', 'src/features/example/register.ts')
     expect(choice.specs).toEqual([
