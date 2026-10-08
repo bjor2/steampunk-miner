@@ -3,9 +3,11 @@
  * shell is reached through RunLogTransport, so logging never imports src/shell.
  *
  * Commands go to their own file, `commands.ndjson`: with the world seed they are the replay input
- * of a run (#11 section 3), so they are written in every run.
+ * of a run (#11 section 3), so they are written in every run, `drive` only when it changed
+ * (`commandLog.ts`, ticket 342).
  */
 import type { AuthorityCommand } from '../systems/authority/authorityCommand'
+import { createCommandLogWriter, type CommandLogWriter } from './commandLog'
 import { formatNdjsonLine } from './ndjson'
 import type { RunEvent } from './runEvent'
 import { startRunSummaryFold, type RunSummary } from './runSummary'
@@ -71,13 +73,25 @@ export function createFanOutSink(...sinks: readonly RunEventSink[]): RunEventSin
 export function createNdjsonSink(transport: RunLogTransport): FlushableSink {
   const events = createLineBuffer((runId, text) => transport.appendRunEvents(runId, text))
   const commands = createLineBuffer((runId, text) => transport.appendRunCommands(runId, text))
+  const commandLogWriterOf = createCommandLogWriters()
   return {
     append: (event) => events.add(event.runId, formatNdjsonLine(event)),
-    appendCommand: (runId, command) => commands.add(runId, formatNdjsonLine(command)),
+    appendCommand: (runId, command) =>
+      commands.add(runId, formatNdjsonLine(commandLogWriterOf(runId).toLoggedCommand(command))),
     flush: async () => {
       await events.flush()
       await commands.flush()
     },
+  }
+}
+
+/** One command log writer per run: each run's file starts with every player's `drive` written. */
+function createCommandLogWriters(): (runId: string) => CommandLogWriter {
+  const writers = new Map<string, CommandLogWriter>()
+  return (runId) => {
+    const writer = writers.get(runId) ?? createCommandLogWriter()
+    writers.set(runId, writer)
+    return writer
   }
 }
 

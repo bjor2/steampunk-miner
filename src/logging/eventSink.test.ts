@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import type { AuthorityCommand } from '../systems/authority/authorityCommand'
+import { expandCommandLog, type LoggedCommand } from './commandLog'
 import {
   createFanOutSink,
   createMemorySink,
@@ -99,6 +101,48 @@ describe('ndjson sink: commands', () => {
     await sink.flush()
     expect(sent).toEqual([])
     expect(commandsSent).toEqual([{ runId: 'run_a', text: `${JSON.stringify(command)}\n` }])
+  })
+
+  function poseAt(seq: number, drive: { x: -1 | 0 | 1; y: -1 | 0 | 1 }): AuthorityCommand {
+    const flags = { driving: false, thrusting: false, drilling: false }
+    const ticks = { thrustTicks: 0, driveTicks: 0, drillTicks: 0 }
+    const pose = { x: 0, y: 0, vx: 0, vy: 0, upx: 0, upy: 1024, facing: 1 }
+    const payload = { ...pose, ...flags, ...ticks, drive }
+    return { playerId: 'player_1', tick: 12 * seq, seq, type: 'reportPose', payload }
+  }
+
+  const linesOf = (text: string) =>
+    text
+      .split('\n')
+      .filter((line) => line !== '')
+      .map((line) => JSON.parse(line) as LoggedCommand)
+
+  it('writes a pose report drive only when it changed, and the file expands back (ticket 342)', async () => {
+    const { transport, commandsSent } = recordingTransport()
+    const sink = createNdjsonSink(transport)
+    const poses = [
+      poseAt(1, { x: 0, y: -1 }),
+      poseAt(2, { x: 0, y: -1 }),
+      poseAt(3, { x: 1, y: 0 }),
+    ]
+    poses.forEach((pose) => sink.appendCommand('run_a', pose))
+    await sink.flush()
+    const lines = linesOf(commandsSent[0].text)
+    expect(lines.map((line) => line.type === 'reportPose' && 'drive' in line.payload)).toEqual([
+      true,
+      false,
+      true,
+    ])
+    expect(expandCommandLog(lines)).toEqual(poses)
+  })
+
+  it("starts each run's file with the drive written", async () => {
+    const { transport, commandsSent } = recordingTransport()
+    const sink = createNdjsonSink(transport)
+    sink.appendCommand('run_a', poseAt(1, { x: 0, y: -1 }))
+    sink.appendCommand('run_b', poseAt(1, { x: 0, y: -1 }))
+    await sink.flush()
+    expect(commandsSent.map(({ text }) => expandCommandLog(linesOf(text)))).toHaveLength(2)
   })
 
   it('hands events and commands to every fanned-out sink', () => {
