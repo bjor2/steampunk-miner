@@ -10,7 +10,6 @@ import { NEW_FIXED_STEP_CLOCK, stepsForFrame } from '../../fixedStepClock'
 import { fromSafeInteger } from '../../money'
 import { gateVerdictOf, type GateVerdict } from '../../registries/gateChecks'
 import { oreTypeOf, saleTierOf } from '../../registries/oreTypes'
-import { replayRun } from '../../replay/replayRun'
 import { ticksPerTile } from '../../vehicle/drillRule'
 import { ENERGY_QUANTA_PER_TICK } from '../../vehicle/energyQuanta'
 import { statsOfVehicle } from '../../vehicle/vehicleState'
@@ -27,17 +26,14 @@ import { resourceTierOf } from '../minedOre'
 import { coreTiles, PARAMS, WORLD_SEED } from '../scriptedSession'
 import {
   bandEdgeWall,
-  cavesOf,
   groundWalls,
-  hollowThenPushCommands,
   isDiggableBy,
   isDiggableByStartingDrill,
   magnetProbeSlice,
   oreWalls,
+  playMagnetRun,
+  probeOf,
   PUSH_TICK,
-  pushesInto,
-  SETTLED_TICK,
-  type MagnetProbe,
   type WallAndCave,
 } from './magnetFixtures'
 
@@ -54,25 +50,6 @@ const COOLDOWN_STEP = 0.92
 const MARKS_CHECKED = 64
 const DEEP_DRILL_TRACKS = ['drill_power', 'drill_tip']
 const DEEP_DRILL_LEVEL = 400
-
-/** Plays the fixture run with `slices` registered; ends `endTick` (the clock settled by default). */
-function playRun(
-  rate: number,
-  slices: readonly SliceDefinition[],
-  { lead = [], endTick = SETTLED_TICK }: { lead?: AuthorityCommand[]; endTick?: number } = {},
-): AuthorityState {
-  const commands = [...lead, ...hollowThenPushCommands()].map((command, index) => ({
-    ...command,
-    seq: index + 1,
-  }))
-  return withRegistrations(slices, () =>
-    replayRun(WORLD_SEED, commands, { endTick, framesPerSecond: rate }),
-  ).state
-}
-
-function probeOf(pairs: readonly WallAndCave[], askedQuantaPerCell = 0): MagnetProbe {
-  return { caves: cavesOf(pairs), pushes: pushesInto(pairs), askedQuantaPerCell }
-}
 
 function onPlanet(planetIndex: number): AuthorityCommand[] {
   return [
@@ -182,7 +159,7 @@ function secondsToStep(ticks: number, rate: number): number {
 describe('magnet shift caps', () => {
   it.each(STEP_RATES)('a use moves at most 8 cells, at %i steps/s', (rate) => {
     const pairs = groundWalls(CAPS.maxCellsMoved + 4)
-    const state = playRun(rate, [magnetProbeSlice(probeOf(pairs))])
+    const state = playMagnetRun([magnetProbeSlice(probeOf(pairs))], { rate })
     const moved = pairs.filter((pair) => hasMoved(state, PARAMS, pair))
     expect(moved).toHaveLength(CAPS.maxCellsMoved)
     expect(pairs.slice(0, CAPS.maxCellsMoved).every((pair) => hasMoved(state, PARAMS, pair))).toBe(
@@ -197,13 +174,14 @@ describe('magnet shift caps', () => {
     'a moved cell keeps tier, gate and bandOrePriceAt and the cell count is conserved, at %i steps/s',
     (rate) => {
       const pairs = oreWalls(4)
-      const before = playRun(rate, [magnetProbeSlice(probeOf(pairs)), BAND_GATE], {
+      const before = playMagnetRun([magnetProbeSlice(probeOf(pairs)), BAND_GATE], {
+        rate,
         endTick: PUSH_TICK - 1,
       })
-      const after = playRun(rate, [magnetProbeSlice(probeOf(pairs)), BAND_GATE])
+      const after = playMagnetRun([magnetProbeSlice(probeOf(pairs)), BAND_GATE], { rate })
       expect(pairs.every((pair) => hasMoved(after, PARAMS, pair))).toBe(true)
       const edge = bandEdgeWall()
-      const across = playRun(rate, [magnetProbeSlice(probeOf([edge])), BAND_GATE])
+      const across = playMagnetRun([magnetProbeSlice(probeOf([edge])), BAND_GATE], { rate })
       expect(hasStayed(across, PARAMS, edge)).toBe(true)
       expect(solidCellsOf(after, pairs)).toEqual(solidCellsOf(before, pairs))
       withRegistrations([BAND_GATE], () => {
@@ -231,7 +209,7 @@ describe('magnet shift caps', () => {
         [HEAT_PARAMS, withDeepDrill(onPlanet(HEAT_PLANET)), { wall: FLOOR, cave: BELOW_FLOOR }],
       ]
       for (const [params, lead, pair] of cases) {
-        const state = playRun(rate, [magnetProbeSlice(probeOf([pair]))], { lead })
+        const state = playMagnetRun([magnetProbeSlice(probeOf([pair]))], { rate, lead })
         expect(hasStayed(state, params, pair)).toBe(true)
         if (params !== deepPlanet) expect(isDiggableBy(state, params, pair.wall)).toBe(true)
       }
@@ -240,7 +218,7 @@ describe('magnet shift caps', () => {
 
   it.each(STEP_RATES)('energy per moved cell is at least its dig energy, at %i steps/s', (rate) => {
     const pairs = groundWalls(3)
-    const start = playRun(rate, [magnetProbeSlice(probeOf([]))], { endTick: PUSH_TICK })
+    const start = playMagnetRun([magnetProbeSlice(probeOf([]))], { rate, endTick: PUSH_TICK })
     const digQuanta = pairs.map(({ wall }) => digQuantaOf(start, wall))
     const askedOver = Math.max(...digQuanta) + 1
     const cases = [
@@ -249,7 +227,7 @@ describe('magnet shift caps', () => {
     ]
     for (const { asked, owed } of cases) {
       const slices = [magnetProbeSlice(probeOf(pairs, asked))]
-      const used = playRun(rate, slices, { endTick: PUSH_TICK })
+      const used = playMagnetRun(slices, { rate, endTick: PUSH_TICK })
       expect(digQuanta.every((quanta) => quanta > 0)).toBe(true)
       expect(vehicleOf(start, 'p1').energy - vehicleOf(used, 'p1').energy).toBe(owed)
     }

@@ -6,7 +6,9 @@
  * Hollowing is two K6 edits on two ticks, the swap to air first: air is not removable, so opening
  * it afterwards leaves the tile unyielded, the open air of a generated cave.
  */
+import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
+import { replayRun } from '../../replay/replayRun'
 import { statsOfVehicle } from '../../vehicle/vehicleState'
 import { ticksPerTile } from '../../vehicle/drillRule'
 import { bandOfTile } from '../../world/planetGeometry'
@@ -93,8 +95,7 @@ export function magnetProbeSlice(probe: MagnetProbe): SliceDefinition {
   }
 }
 
-/** The tick the fixture's caves stand open by, and the tick the magnet is used at. */
-export const CAVES_OPEN_TICK = 8
+/** The tick the magnet is used at, once the caves stand open. */
 export const PUSH_TICK = 10
 /** Late enough for every queued move to land, at two chunks a tick. */
 export const SETTLED_TICK = 40
@@ -112,6 +113,34 @@ export function hollowThenPushCommands(): AuthorityCommand[] {
     seq: index + 1,
     ...intent,
   }))
+}
+
+export interface MagnetRunOptions {
+  /** Render frames a second the clock runs in; absent, it jumps to each command. */
+  rate?: number
+  /** Commands before the fixture's own, all at tick 0 (a planet, upgrades). */
+  lead?: readonly AuthorityCommand[]
+  /** The run's last tick; the moves have settled by default. */
+  endTick?: number
+}
+
+/** Replays the hollow-then-push run with `slices` registered, and answers the state it ends in. */
+export function playMagnetRun(
+  slices: readonly SliceDefinition[],
+  { rate, lead = [], endTick = SETTLED_TICK }: MagnetRunOptions = {},
+): AuthorityState {
+  const commands = [...lead, ...hollowThenPushCommands()].map((command, index) => ({
+    ...command,
+    seq: index + 1,
+  }))
+  return withRegistrations(slices, () =>
+    replayRun(WORLD_SEED, commands, { endTick, framesPerSecond: rate }),
+  ).state
+}
+
+/** The caves of `pairs` hollowed, and each wall pushed into its own. */
+export function probeOf(pairs: readonly WallAndCave[], askedQuantaPerCell = 0): MagnetProbe {
+  return { caves: cavesOf(pairs), pushes: pushesInto(pairs), askedQuantaPerCell }
 }
 
 /** Each wall pushed into its own cave, and nowhere else. */
