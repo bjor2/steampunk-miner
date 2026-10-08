@@ -3,10 +3,12 @@
  * `npm run ore:mix` can read a planet's mix without the slice's internals:
  * `steampunkDebug.features['planet-mix'].mixOf(8, 83921)`, `.histogramOf(8, [83921, 31415])`;
  * `.getMagneticLooks()` reads what a magnetic planet draws now (ticket 293), for the e2e state
- * assert: the sky band the kernel shows and the field lines the slice's layer last picked.
+ * assert: the sky band the kernel shows and the field lines the slice's layer last picked;
+ * `.timeFieldArcFrames(seed, now)` is the field lines' slice bench for `npm run bench:render`.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import { drawnSkyBand } from '../../scene/skyBandPresence'
+import { timeFieldArcFrames } from './fieldArcsBench'
 import { histogramLines, histogramProblems } from './histogramCheck'
 import { planetHistogramOf } from './mixHistogram'
 import { drawnFieldArcs } from './scene/fieldArcPresence'
@@ -53,6 +55,14 @@ function getMagneticLooks() {
   }
 }
 
+/** The slice bench of #293's line raise, timed on the caller's clock. */
+function timeFieldArcFramesOn(worldSeed: unknown, nowMs: unknown) {
+  if (!isWorldSeed(worldSeed) || typeof nowMs !== 'function') {
+    return { ok: false as const, problems: ['timeFieldArcFrames takes a world seed and a clock'] }
+  }
+  return { ok: true as const, ...timeFieldArcFrames(worldSeed, nowMs as () => number) }
+}
+
 function isPlanetIndex(value: unknown): value is number {
   return Number.isSafeInteger(value) && (value as number) >= 1
 }
@@ -66,4 +76,5 @@ export const planetMixDebugActions: Readonly<Record<string, DebugAction>> = {
   mixOf,
   histogramOf,
   getMagneticLooks,
+  timeFieldArcFrames: timeFieldArcFramesOn,
 }

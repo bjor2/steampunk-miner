@@ -4,7 +4,9 @@
  * generated) must fit the budget. Measured and logged here, not gated in CI, because CI machines vary.
  * Run with `npm run bench:render`; it prints one JSON line per planet, then the rebuild on gated
  * planets with the gate channel's provider registered and with none (ticket 298,
- * `bench/gateChannelRebuild.ts`), then the overlay's frame cost (#208, `bench/overlayFrame.ts`).
+ * `bench/gateChannelRebuild.ts`), then the overlay's frame cost (#208, `bench/overlayFrame.ts`),
+ * then the magnetic field lines' frame cost before and after their layer on P43 (#293,
+ * `bench/fieldArcsFrame.ts`).
  * With `-- --log` it also writes `benchmark_result` lines to `logs/<runId>/events.ndjson` (#124).
  */
 import { loadFeatures } from '../src/features'
@@ -19,6 +21,7 @@ import {
   materialCellsOfChunk,
 } from '../src/systems/world/worldState'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
+import { benchFieldArcsFrame } from './bench/fieldArcsFrame'
 import { benchGateChannelRebuild } from './bench/gateChannelRebuild'
 import { benchOverlayFrame } from './bench/overlayFrame'
 
@@ -80,4 +83,5 @@ logBenchmarkSeriesWhenAsked('render', [
   ...PLANETS.map(benchPlanet),
   ...benchGateChannelRebuild(WORLD_SEED),
   benchOverlayFrame(),
+  ...benchFieldArcsFrame(WORLD_SEED),
 ])
