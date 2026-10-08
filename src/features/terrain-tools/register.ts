@@ -3,14 +3,15 @@
  * splitter, the pressure pocket lance and the lodestone beacon as vehicle items and power-ups, their
  * `tech.terrain.*` nodes and item cards, the one-offs' sale at the Upgrade bay (ticket 248), and
  * their seeded edits on the K6 terrain-edit queue. The lodestone's live beacon waits in the
- * `terrain-tools` section and gathers at its owner's dock.
+ * `terrain-tools` section and gathers at its owner's dock; combo item hooks hear it through the
+ * kernel `liveBeacon` provider, and the shifter's drag consults the `dragTarget` hook (ticket 326).
  * Stabiliser foam, the cryo binder, shoring props and the strata press stay vision rows
  * (`systems/shippedTools.ts`). No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { terrainToolsDebugActions } from './debug'
 import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
-import { LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
+import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
 import {
   TERRAIN_ITEM_CARDS,
   TERRAIN_TECH_NODES,
@@ -30,6 +31,7 @@ export const slice: SliceDefinition = {
     r.vehicleItemSeller(TERRAIN_SELLER)
     r.saveSection(TERRAIN_TOOLS_SECTION)
     r.authorityReaction(LODESTONE_DOCK_REACTION)
+    r.liveBeacon(LIVE_LODESTONE_PROVIDER)
     r.eventProjections(TERRAIN_PROJECTIONS)
     r.runEvents(TERRAIN_RUN_EVENTS)
     // steampunkDebug.features['terrain-tools'].getBeacon() / .statPreview(itemId, mark, planet)

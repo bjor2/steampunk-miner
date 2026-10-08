@@ -6,7 +6,9 @@
  * edit lands whole on the activation tick and collects nothing: you still drill the ore.
  *
  * Gated and core cells are fixed and block paths. A use whose only ore in reach is fixed is
- * blocked by the nearest such cell and costs nothing; one with no ore in reach is refused.
+ * blocked by the nearest such cell and costs nothing; one with no ore in reach is refused. A combo
+ * may choose which loose nodules go first through the `dragTarget` item hook (`dragHooks.ts`,
+ * ticket 326), never how many.
  */
 import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
@@ -20,11 +22,12 @@ import {
   openDraft,
   type EditDraft,
 } from './editDraft'
+import { oreInDragOrder } from './dragHooks'
 import { stepsToward, tilesNearestFirst } from './editGeometry'
 import { editSeedOf, type EditKey } from './editSeed'
 import { canHoldOre, fixedBlockOf, isLooseOre, materialNow, type GroundView } from './groundView'
 import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
-import { balanceOf } from './terrainItems'
+import { balanceOf, type TerrainItem } from './terrainItems'
 import { TERRAIN_REFUSAL } from './terrainEvents'
 import type { TerrainPlan } from './terrainOutcome'
 
@@ -39,27 +42,24 @@ interface DragPull {
 export function planOreDrag(view: GroundView, key: EditKey, pose: VehiclePose): TerrainPlan {
   const item = terrainItemNamed(ORE_SHIFTER_ID)
   const pull = { hull: tileOfPose(pose), seed: editSeedOf(view.params, key) }
-  const reach = balanceOf(item).reachTiles ?? balanceOf(item).magnitude
+  const count = magnitudeAt(item, key.mark)
+  const tiles = tilesNearestFirst(pull.hull, reachOf(item), pull.seed)
   const draft = openDraft(view, ACTIVATION_UNIT_CAP)
-  const firstBlock = dragNearestOre(draft, pull, reach, magnitudeAt(item, key.mark))
-  return planOfDrag(draft, firstBlock)
+  dragOre(draft, pull, oreInDragOrder(view, key, count, tiles), count)
+  return planOfDrag(draft, tiles)
 }
 
-/** Drags up to `count` nodules, nearest first; the nearest fixed cell met on the way, if any. */
-function dragNearestOre(
-  draft: EditDraft,
-  pull: DragPull,
-  reach: number,
-  count: number,
-): GateBlock | null {
-  let firstBlock: GateBlock | null = null
+function reachOf(item: TerrainItem): number {
+  return balanceOf(item).reachTiles ?? balanceOf(item).magnitude
+}
+
+/** Drags up to `count` of the nodules, in the order given, while the cap can pay a move. */
+function dragOre(draft: EditDraft, pull: DragPull, nodules: readonly TilePoint[], count: number) {
   let dragged = 0
-  for (const tile of tilesNearestFirst(pull.hull, reach, pull.seed)) {
-    if (dragged === count || !canAfford(draft, MOVE_UNITS)) break
-    firstBlock ??= fixedBlockOf(draft.view, tile)
+  for (const tile of nodules) {
+    if (dragged === count || !canAfford(draft, MOVE_UNITS)) return
     if (dragOne(draft, pull, tile)) dragged += 1
   }
-  return firstBlock
 }
 
 /** Moves the nodule at `tile` as far toward the hull as the ground lets it; false if it stays. */
@@ -90,8 +90,18 @@ function nextStepOf(view: GroundView, at: TilePoint, pull: DragPull, ore: number
   return stepsToward(at, pull.hull, pull.seed).find((step) => canHoldOre(view, step, ore)) ?? null
 }
 
-function planOfDrag(draft: EditDraft, firstBlock: GateBlock | null): TerrainPlan {
+/** The edit; with nothing dragged, the nearest fixed cell in reach blocks it, if there is one. */
+function planOfDrag(draft: EditDraft, tilesInReach: readonly TilePoint[]): TerrainPlan {
   if (draft.cells.length > 0) return { kind: 'edit', cells: draft.cells }
-  if (firstBlock !== null) return { kind: 'blocked', block: firstBlock }
+  const block = nearestFixedBlockOf(draft.view, tilesInReach)
+  if (block !== null) return { kind: 'blocked', block }
   return { kind: 'refused', reason: TERRAIN_REFUSAL.nothingToDrag }
+}
+
+function nearestFixedBlockOf(view: GroundView, tiles: readonly TilePoint[]): GateBlock | null {
+  for (const tile of tiles) {
+    const block = fixedBlockOf(view, tile)
+    if (block !== null) return block
+  }
+  return null
 }

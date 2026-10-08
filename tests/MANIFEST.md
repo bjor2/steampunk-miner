@@ -336,13 +336,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 18 files, 127 tests
+### `terrain-tools`: 19 files, 162 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetGuard.test.ts` | 6 | 6 |
 | `src/features/terrain-tools/shippedRows.test.ts` | 7 | 7 |
+| `src/features/terrain-tools/systems/dragHooks.test.ts` | 35 | 8 |
 | `src/features/terrain-tools/systems/gatesFixture.test.ts` | 22 | 5 |
 | `src/features/terrain-tools/systems/lodestoneBeacon.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/magnetItems.test.ts` | 9 | 9 |
@@ -704,7 +705,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/hullDamageIntercepts.test.ts` | 5 | 5 |
 | `src/systems/registries/itemDescriber.test.ts` | 7 | 7 |
 | `src/systems/registries/itemDescriptionEntries.test.ts` | 5 | 5 |
-| `src/systems/registries/itemHooks.test.ts` | 11 | 11 |
+| `src/systems/registries/itemHooks.test.ts` | 13 | 13 |
 | `src/systems/registries/oreLook.test.ts` | 2 | 2 |
 | `src/systems/registries/oreTypes.test.ts` | 12 | 12 |
 | `src/systems/registries/saveSections.test.ts` | 3 | 3 |

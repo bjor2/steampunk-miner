@@ -8,11 +8,15 @@
  *
  * One live beacon per planet: planting a second while one waits is refused at no cost. Planting
  * changes no cell, so no gate ever blocks it; gated and core cells never move in the gather.
+ *
+ * A live beacon (its tile and gather radius) is told to every combo item hook through the kernel
+ * `liveBeacon` provider, for `lodestone_drain` (TD ruling on #206, ticket 326): no slice imports it.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import type { AuthorityReaction } from '../../../systems/registries/authorityReactions'
+import type { LiveBeacon, LiveBeaconProvider } from '../../../systems/registries/liveBeacon'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
 import { canAfford, draftMove, MOVE_UNITS, openDraft, type EditDraft } from './editDraft'
@@ -35,6 +39,12 @@ export const LODESTONE_DOCK_REACTION: AuthorityReaction = {
     if (docked?.playerId === undefined) return unchanged(after)
     return gatherAtDock(after, docked.playerId)
   },
+}
+
+/** The owner's beacon waiting on the planet they stand on, as the item hooks hear it. */
+export const LIVE_LODESTONE_PROVIDER: LiveBeaconProvider = {
+  id: 'terrain-tools.live-lodestone',
+  liveBeaconOf: liveLodestoneOf,
 }
 
 /** Plants the beacon at the miner's tile; a second live beacon on this planet is refused. */
@@ -73,7 +83,7 @@ export function gatherAtDock(state: AuthorityState, playerId: string): RuleEffec
 export function planLodestoneGather(view: GroundView, beacon: LodestoneBeacon) {
   const item = terrainItemNamed(LODESTONE_BEACON_ID)
   const centre = { tx: beacon.tx, ty: beacon.ty }
-  const radius = magnitudeAt(item, beacon.mark)
+  const radius = gatherRadiusOf(beacon)
   const key = { origin: centre, tick: beacon.plantedTick, itemId: item.itemId, mark: beacon.mark }
   const seed = editSeedOf(view.params, key)
   const draft = openDraft(view, balanceOf(item).swapCap ?? 0)
@@ -106,4 +116,15 @@ function isCloser(centre: TilePoint, slot: TilePoint, nodule: TilePoint): boolea
 
 function isBeaconLiveOn(state: AuthorityState, playerId: string, planetIndex: number): boolean {
   return terrainToolsOf(state, playerId).beacon?.planetIndex === planetIndex
+}
+
+function liveLodestoneOf(state: AuthorityState, playerId: string): LiveBeacon | null {
+  const { beacon } = terrainToolsOf(state, playerId)
+  const planetIndex = planetParamsOf(state.planet)?.planetIndex ?? null
+  if (beacon === null || beacon.planetIndex !== planetIndex) return null
+  return { tile: { tx: beacon.tx, ty: beacon.ty }, gatherRadiusTiles: gatherRadiusOf(beacon) }
+}
+
+function gatherRadiusOf(beacon: LodestoneBeacon): number {
+  return magnitudeAt(terrainItemNamed(LODESTONE_BEACON_ID), beacon.mark)
 }
