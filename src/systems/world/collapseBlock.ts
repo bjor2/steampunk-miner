@@ -5,8 +5,9 @@
  * same sequence. Integer arithmetic only: positions in mm, distances squared.
  */
 import { COLLAPSE_BLOCK_SAMPLES } from '../../constants/balance'
+import { MM_PER_METRE } from '../../constants/physics'
 import { CHUNK_SAMPLE_SIDE, MM_PER_SAMPLE } from './sampleGrid'
-import { chunkKey } from './tileGrid'
+import { chunkKey, type TilePoint } from './tileGrid'
 
 export interface CollapseBlock {
   cx: number
@@ -95,6 +96,20 @@ export function blockContaining(point: { xMm: number; yMm: number }): CollapseBl
   return blockOfWorldBlock(blockColumnOf(point.xMm), blockColumnOf(point.yMm))
 }
 
+/**
+ * The blocks a tile touches, in processing order (TD ruling on #285, ticket 331): ring 0 is the
+ * block holding the tile, ring 1 adds every block holding one of its 8 neighbours, so a brace on
+ * a cell reaches the roof over and beside it.
+ */
+export function blocksTouchingTile(tile: TilePoint, ring: 0 | 1): CollapseBlock[] {
+  const blocks = new Map<string, CollapseBlock>()
+  for (const touched of tilesWithinRing(tile, ring)) {
+    const block = blockContaining(tileCentreMm(touched))
+    blocks.set(blockIdOf(block), block)
+  }
+  return sortBlocks([...blocks.values()])
+}
+
 /** Blocks in processing order: `chunkKey`, then block index (#43 Sequence). */
 export function sortBlocks(blocks: readonly CollapseBlock[]): CollapseBlock[] {
   return [...blocks].sort(compareBlocks)
@@ -108,6 +123,20 @@ export function compareBlocks(a: CollapseBlock, b: CollapseBlock): number {
 
 export function isSameBlock(a: CollapseBlock, b: CollapseBlock): boolean {
   return a.cx === b.cx && a.cy === b.cy && a.index === b.index
+}
+
+/** The tile and, at ring 1, its 8 neighbours. */
+function tilesWithinRing(tile: TilePoint, ring: 0 | 1): TilePoint[] {
+  const tiles: TilePoint[] = []
+  for (let dy = -ring; dy <= ring; dy++) {
+    for (let dx = -ring; dx <= ring; dx++) tiles.push({ tx: tile.tx + dx, ty: tile.ty + dy })
+  }
+  return tiles
+}
+
+function tileCentreMm(tile: TilePoint): { xMm: number; yMm: number } {
+  const half = MM_PER_METRE / 2
+  return { xMm: tile.tx * MM_PER_METRE + half, yMm: tile.ty * MM_PER_METRE + half }
 }
 
 function blockColumnOf(mm: number): number {
