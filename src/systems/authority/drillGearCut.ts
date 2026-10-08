@@ -12,6 +12,11 @@
  * gear cuts ahead only on a diagonal: with no side pushed the twin bit cuts as the bare drill (TD
  * lock on #280), and only facing-aimed gear (the reach boom) cuts past the bit along the facing.
  *
+ * The side cutters' Mark 3 hold (TD lock on #276) aims the side cells by the drive: the read
+ * latches the faced side per cell (`facedSide.ts`), cuts that side's cells and only the both-sided
+ * asks' on the other, and hands the latch back for the vehicle to keep. Each side cell still runs
+ * `canMine` and pays its own share, so one flank costs half the cells.
+ *
  * Energy: the disc charges its ticks as before. Each listed cell charges its own ticks at the
  * drill's rate, an ahead cell at `aheadEnergyShareBp` (a whole share along the facing, the side
  * floor on a diagonal) and a side cell at `sideEnergyShareBp` (never under a whole share), rounded
@@ -26,6 +31,7 @@ import { aheadEnergyShareOf, type AheadBearing, type DrillGear } from '../econom
 import { drillGearOf } from '../registries/drillGear'
 import { latchAheadBearing, type AheadLatch, type DrillBit } from '../vehicle/aheadBearingLatch'
 import { drillGearCellsAt } from '../vehicle/drillGearCells'
+import { latchFacedSide, type SideLatch } from '../vehicle/facedSide'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import {
   carveDisc,
@@ -56,6 +62,8 @@ export interface DrillCarve extends Carve {
   gearQuanta: number
   /** The ahead bearing this cut latched, or null when no gear is aimed by the drive. */
   aheadLatch: AheadLatch | null
+  /** The faced side this cut latched, or null when no side ask is aimed by the drive. */
+  sideLatch: SideLatch | null
 }
 
 /** The drill gear's cells for one drill command, after `canMine`. */
@@ -65,11 +73,12 @@ export interface DrillGearRead {
   sideCells: TilePoint[]
   sideEnergyShareBp: number
   aheadLatch: AheadLatch | null
+  sideLatch: SideLatch | null
 }
 
 /** A carve with no drill gear: nothing beyond the disc's ticks. */
 export function withoutGear(carve: Carve): DrillCarve {
-  return { ...carve, gearQuanta: 0, aheadLatch: null }
+  return { ...carve, gearQuanta: 0, aheadLatch: null, sideLatch: null }
 }
 
 export function carveStampWithGear(
@@ -103,13 +112,17 @@ export function drillGearReadAt(
   const aheadLatch = aheadLatchOf(state, playerId, gear, bit, isUncut)
   const aheadBearing = aheadLatch?.bearing ?? 'facing'
   const aheadCells = aheadCellsOn(gear, aheadBearing)
-  const cells = drillGearCellsAt(bit.pose, bit.disc, { ...gear, aheadCells, aheadBearing })
+  const sideLatch = sideLatchOf(state, playerId, gear, bit, isUncut)
+  const facedSide = sideLatch?.side
+  const reach = { ...gear, aheadCells, aheadBearing, facedSide }
+  const cells = drillGearCellsAt(bit.pose, bit.disc, reach)
   return {
     aheadCells: cells.ahead.filter(canMine),
     aheadEnergyShareBp: aheadEnergyShareOf(gear, aheadBearing),
     sideCells: cells.side.filter(canMine),
     sideEnergyShareBp: gear.sideEnergyShareBp,
     aheadLatch,
+    sideLatch,
   }
 }
 
@@ -128,6 +141,18 @@ function aheadLatchOf(
 ): AheadLatch | null {
   if (gear.aheadAim !== 'drive' || gear.aheadCells === 0) return null
   return latchAheadBearing(vehicleOf(state, playerId).aheadLatch ?? null, bit, isUncut)
+}
+
+/** The faced side latched for this cut when the drive aims the side cells; else none. */
+function sideLatchOf(
+  state: AuthorityState,
+  playerId: string,
+  gear: DrillGear,
+  bit: DrillBit,
+  isUncut: (tile: TilePoint) => boolean,
+): SideLatch | null {
+  if (gear.sideAim !== 'drive' || gear.sideCells === 0) return null
+  return latchFacedSide(vehicleOf(state, playerId), bit, gear.sideSeed, isUncut)
 }
 
 /** Solid ground a drill may remove that no gate holds. */
@@ -158,7 +183,8 @@ function carveDiscAndGear(
     windows,
     request.gates.drillTicksOf,
   )
-  return { ...carved, gearQuanta: gearQuantaOf(carved, shares), aheadLatch: read.aheadLatch }
+  const latches = { aheadLatch: read.aheadLatch, sideLatch: read.sideLatch }
+  return { ...carved, gearQuanta: gearQuantaOf(carved, shares), ...latches }
 }
 
 /** Each listed cell's energy share in basis points, in carve order: ahead cells, then side. */

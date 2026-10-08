@@ -32,10 +32,10 @@ import { stateDigest } from './stateDigest'
 const TARGET: TilePoint = { tx: 30, ty: 285 }
 const DRILL_TICKS = 60
 
-function gearSlice(ask: DrillGearAsk | null): SliceDefinition {
+function gearSlice(ask: DrillGearAsk | null, id = 'gear-probe'): SliceDefinition {
   return {
-    id: 'gear-probe',
-    register: (r) => r.drillGear({ id: 'gear-probe.gear', gearOf: () => ask }),
+    id,
+    register: (r) => r.drillGear({ id: `${id}.gear`, gearOf: () => ask }),
   }
 }
 
@@ -371,4 +371,69 @@ describe('drill gear cut', () => {
   it('cuts the same with any drive when no gear is registered', () => {
     expect(drillWith([], TARGET, FACING.down, [], pushingSide(1)).digest).toBe(drillWith([]).digest)
   })
+
+  it("cuts only the side the drive steers toward for the side cutters' hold (ticket 276)", () => {
+    const plain = drillWith([]).world
+    const steeringRight = drillWith([SIDE_HOLD], TARGET, FACING.down, [], pushingSide(1)).world
+    expect(densityOf(steeringRight, cellBesideBore(1))).toBeLessThan(
+      densityOf(plain, cellBesideBore(1)),
+    )
+    expect(densityOf(steeringRight, cellBesideBore(-1))).toBe(densityOf(plain, cellBesideBore(-1)))
+    const steeringLeft = drillWith([SIDE_HOLD], TARGET, FACING.down, [], pushingSide(-1)).world
+    expect(densityOf(steeringLeft, cellBesideBore(-1))).toBeLessThan(
+      densityOf(plain, cellBesideBore(-1)),
+    )
+    expect(densityOf(steeringLeft, cellBesideBore(1))).toBe(densityOf(plain, cellBesideBore(1)))
+  })
+
+  it('charges one flank half the side cells of both', () => {
+    const plain = drillWith([]).spent
+    const both = drillWith([gearSlice({ sideCells: 1 })]).spent
+    const oneFlank = drillWith([SIDE_HOLD], TARGET, FACING.down, [], pushingSide(1)).spent
+    expect(oneFlank - plain).toBe((both - plain) / 2)
+  })
+
+  it('cuts exactly one flank with no drive: the seed, else the facing right', () => {
+    const plain = drillWith([]).world
+    const unseeded = drillWith([SIDE_HOLD]).world
+    expect(densityOf(unseeded, cellBesideBore(-1))).toBeLessThan(
+      densityOf(plain, cellBesideBore(-1)),
+    )
+    expect(densityOf(unseeded, cellBesideBore(1))).toBe(densityOf(plain, cellBesideBore(1)))
+    const seeded = drillWith([gearSlice({ ...SIDE_HOLD_ASK, sideSeed: { x: 1, y: 0 } })]).world
+    expect(densityOf(seeded, cellBesideBore(1))).toBeLessThan(densityOf(plain, cellBesideBore(1)))
+    expect(densityOf(seeded, cellBesideBore(-1))).toBe(densityOf(plain, cellBesideBore(-1)))
+  })
+
+  it('cuts the plain ask on the other flank when the hold and a both-sided ask are on', () => {
+    const both = drillWith([gearSlice({ sideCells: 1 })])
+    const withPlain = [SIDE_HOLD, gearSlice({ sideCells: 1 }, 'gear-plain')]
+    expect(drillWith(withPlain, TARGET, FACING.down, [], pushingSide(1)).world).toEqual(both.world)
+  })
+
+  it('keeps the latched side on the vehicle, and none without a drive-aimed side ask', () => {
+    const latchAfter = (slice: SliceDefinition) =>
+      withRegistrations([slice], () => {
+        const session = createScriptedSession()
+        session.submit(1, poseAbove(TARGET, FACING.down))
+        const report = { drillTicks: 12, drive: pushingSide(1) }
+        session.submit(13, poseAbove(TARGET, FACING.down, report))
+        return session.vehicle().sideLatch
+      })
+    expect(latchAfter(SIDE_HOLD)).toEqual({ side: 'left', tile: { tx: 30, ty: 284 } })
+    expect(latchAfter(gearSlice({ sideCells: 1 }))).toBeUndefined()
+  })
 })
+
+/** The side cutters' Mark 3 hold (TD lock on #276): one side cell, on the side the drive faces. */
+const SIDE_HOLD_ASK: DrillGearAsk = { sideCells: 1, sideAim: 'drive' }
+const SIDE_HOLD = gearSlice(SIDE_HOLD_ASK)
+
+/** The cell beside the bore level with the stamp, `dx` 1 the screen right. */
+function cellBesideBore(dx: number): TilePoint {
+  const [screenRight, screenLeft] = gearCellsOver(TARGET, FACING.down, {
+    aheadCells: 0,
+    sideCells: 1,
+  }).side
+  return dx === 1 ? screenRight : screenLeft
+}

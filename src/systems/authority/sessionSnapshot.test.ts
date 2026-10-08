@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { FACING } from '../vehicle/vehiclePose'
 import type { PlantedCharge } from '../vehicle/vehicleCharges'
 import type { AheadLatch } from '../vehicle/aheadBearingLatch'
+import type { SideLatch } from '../vehicle/facedSide'
 import { applyCommand } from './applyCommand'
 import { createAuthorityState, type AuthorityState } from './authorityState'
 import { CASING_BREACHED, decodeCasing } from '../world/chunkDelta'
@@ -155,6 +156,22 @@ describe('session snapshot: guns (#93)', () => {
     expect(readSnapshot(throughJson(takeSnapshot(state)))).toEqual({ state, problems: [] })
   })
 
+  it("keeps the side cutters' latched faced side through save and load (ticket 276)", () => {
+    const state = withSideLatch(richState(), { side: 'left', tile: { tx: 30, ty: 284 } })
+    expect(readSnapshot(throughJson(takeSnapshot(state)))).toEqual({ state, problems: [] })
+  })
+
+  it('refuses a faced side off the two, and keeps a vehicle with none as it was', () => {
+    const snapshot = throughJson(takeSnapshot(richState()))
+    expect(snapshot.state.players.p1.vehicle).not.toHaveProperty('sideLatch')
+    const vehicle = snapshot.state.players.p1.vehicle
+    const sideLatch = { side: 'facing' as 'left', tile: { tx: 30, ty: 284 } }
+    snapshot.state.players.p1.vehicle = { ...vehicle, sideLatch }
+    expect(readSnapshot(snapshot).problems).toEqual([
+      'snapshot.state.players.p1.vehicle.sideLatch must hold a side and a tile, or be left out',
+    ])
+  })
+
   it('refuses a latched bearing off the three, and keeps a vehicle with none as it was', () => {
     const snapshot = throughJson(takeSnapshot(richState()))
     expect(snapshot.state.players.p1.vehicle).not.toHaveProperty('aheadLatch')
@@ -179,6 +196,12 @@ describe('session snapshot: guns (#93)', () => {
 /** The state with the twin bit's bearing latched for player p1. */
 function withAheadLatch(state: AuthorityState, aheadLatch: AheadLatch): AuthorityState {
   const vehicle = { ...state.players.p1.vehicle, aheadLatch }
+  return { ...state, players: { p1: { ...state.players.p1, vehicle } } }
+}
+
+/** The state with the side cutters' faced side latched for player p1. */
+function withSideLatch(state: AuthorityState, sideLatch: SideLatch): AuthorityState {
+  const vehicle = { ...state.players.p1.vehicle, sideLatch }
   return { ...state, players: { p1: { ...state.players.p1, vehicle } } }
 }
 

@@ -11,11 +11,15 @@
  * and one row down on the tile grid. It replaces the facing's cell; it never adds one. Which bearing
  * a cut takes is the drive's, latched per cell (`aheadBearingLatch.ts`).
  *
+ * The side cutters' Mark 3 hold (TD lock on #276) names a faced side: that side cuts `sideCells`,
+ * the other only `offSideCells`, so the hold alone cuts one flank. With no faced side both cut
+ * `sideCells`, as before.
+ *
  * Order: the ahead cells nearest first, then the side cells nearest first, the facing's left side
  * before its right. A tile met twice is listed once.
  */
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
-import type { AheadBearing, DrillGear } from '../economy/drillGearCaps'
+import type { AheadBearing, BoreSide, DrillGear } from '../economy/drillGearCaps'
 import type { DiscStamp } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
 import {
@@ -30,9 +34,20 @@ export interface DrillGearCells {
   side: TilePoint[]
 }
 
-/** The gear's cell counts, and where the ahead cells point (along the facing when left out). */
+/**
+ * The gear's cell counts, where the ahead cells point (along the facing when left out), and the
+ * faced side with the other side's count (both sides cut `sideCells` when left out).
+ */
 export type DrillGearReach = Pick<DrillGear, 'aheadCells' | 'sideCells'> & {
   aheadBearing?: AheadBearing
+  facedSide?: BoreSide
+  offSideCells?: number
+}
+
+/** A direction from the rim and how many cells it reaches. */
+interface CellLine {
+  direction: IntegerVector
+  count: number
 }
 
 const NO_SHIFT: IntegerVector = { x: 0, y: 0 }
@@ -46,9 +61,26 @@ export function drillGearCellsAt(
   const left = { x: -ahead.y, y: ahead.x }
   const right = { x: ahead.y, y: -ahead.x }
   const shift = bearingShiftOf({ left, right }, gear.aheadBearing ?? 'facing')
-  const aheadTiles = cellsAlong(stamp, [ahead], gear.aheadCells, shift)
-  const sideTiles = cellsAlong(stamp, [left, right], gear.sideCells, NO_SHIFT)
+  const aheadTiles = cellsAlong(stamp, [{ direction: ahead, count: gear.aheadCells }], shift)
+  const sideTiles = cellsAlong(stamp, sideLinesOf({ left, right }, gear), NO_SHIFT)
   return { ahead: aheadTiles, side: withoutTiles(sideTiles, aheadTiles) }
+}
+
+/** The left side's line, then the right's: the faced one at `sideCells`, the other at its own. */
+function sideLinesOf(
+  sides: { left: IntegerVector; right: IntegerVector },
+  gear: DrillGearReach,
+): CellLine[] {
+  const countOf = (side: BoreSide) => sideCountOf(gear, side)
+  return [
+    { direction: sides.left, count: countOf('left') },
+    { direction: sides.right, count: countOf('right') },
+  ]
+}
+
+function sideCountOf(gear: DrillGearReach, side: BoreSide): number {
+  if (gear.facedSide === undefined || gear.facedSide === side) return gear.sideCells
+  return Math.min(gear.sideCells, gear.offSideCells ?? 0)
 }
 
 /** The side a diagonal bearing shifts the ahead cells toward; none along the facing. */
@@ -60,18 +92,20 @@ function bearingShiftOf(
 }
 
 /**
- * `count` cells out from the rim along each direction, nearest first, each tile once, each
+ * Each line's cells out from the rim, nearest first across the lines, each tile once, each
  * shifted one more metre along the 1024-scaled `shift` per step: a 45-degree line for a diagonal.
  */
 function cellsAlong(
   stamp: DiscStamp,
-  directions: readonly IntegerVector[],
-  count: number,
+  lines: readonly CellLine[],
   shift: IntegerVector,
 ): TilePoint[] {
   const tiles: TilePoint[] = []
-  for (let step = 0; step < count; step++) {
-    for (const direction of directions) tiles.push(cellPastRim(stamp, direction, step, shift))
+  const steps = Math.max(0, ...lines.map((line) => line.count))
+  for (let step = 0; step < steps; step++) {
+    for (const line of lines.filter((candidate) => step < candidate.count)) {
+      tiles.push(cellPastRim(stamp, line.direction, step, shift))
+    }
   }
   return withoutTiles(tiles, [])
 }

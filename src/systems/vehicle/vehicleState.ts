@@ -22,6 +22,7 @@ import { coldHeatAt, type VehicleHeat } from './vehicleHeat'
 import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
 import type { AheadLatch } from './aheadBearingLatch'
+import type { SideLatch } from './facedSide'
 
 /** The #7 state machine; `docked` is entered by the rescue tow here and by docking in #23. */
 export const VEHICLE_MODES = ['docked', 'active', 'stranded', 'destroyed'] as const
@@ -84,6 +85,11 @@ export interface VehicleState {
    * aimed by the drive first cuts, so with none registered the state and its digest are unchanged.
    */
   aheadLatch?: AheadLatch
+  /**
+   * The faced side the side cutters' Mark 3 hold latched (TD lock on #276), written only by the
+   * drill cut. Absent until a drive-aimed side ask first cuts, so the digest is unchanged till then.
+   */
+  sideLatch?: SideLatch
   /**
    * The on-curve hull share, in basis points, that electrified cells' shocks took this dive (spec
    * #258, ticket 290), held to the dive cap. Absent until the first shock and again from the dock,

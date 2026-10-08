@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { AheadBearing } from '../economy/drillGearCaps'
+import type { AheadBearing, BoreSide } from '../economy/drillGearCaps'
 import { drillGearCellsAt } from './drillGearCells'
 import { drillStampOf } from './drillStamp'
+import { sideVectorOf } from './facedSide'
 import { FACING, type Facing, type VehiclePose } from './vehiclePose'
 
 // Where slice drill gear cuts, from the drill's stamp (ticket 234): just past the rim ahead and on
@@ -99,4 +100,51 @@ describe('drill gear cells', () => {
       }
     }
   })
+
+  it("cuts only the faced side for the side cutters' hold, the facing's left first", () => {
+    const pose = poseOver(FACING.down)
+    const stamp = drillStampOf(pose, false)
+    const faced = (facedSide: BoreSide) =>
+      drillGearCellsAt(pose, stamp, { aheadCells: 0, sideCells: 1, facedSide, offSideCells: 0 })
+    expect(faced('left').side).toEqual([{ tx: 31, ty: 286 }])
+    expect(faced('right').side).toEqual([{ tx: 29, ty: 286 }])
+  })
+
+  it('never cuts a cell on the side not faced while the hold cuts alone, at any pose', () => {
+    for (const up of UP_VECTORS) {
+      for (const facing of FACINGS) {
+        for (const facedSide of ['left', 'right'] as const) {
+          const pose = { ...poseOver(facing), ...up }
+          const stamp = drillStampOf(pose, false)
+          const hold = { aheadCells: 0, sideCells: 2, facedSide, offSideCells: 0 }
+          const held = drillGearCellsAt(pose, stamp, hold).side
+          const both = drillGearCellsAt(pose, stamp, { aheadCells: 0, sideCells: 2 }).side
+          expect(held.length).toBeGreaterThan(0)
+          expect(held.length).toBeLessThanOrEqual(2)
+          expect(both).toEqual(expect.arrayContaining(held))
+          for (const tile of held) expect(isOnSide(pose, facedSide, tile)).toBe(true)
+        }
+      }
+    }
+  })
+
+  it('cuts the faced side no wider than its own cells with a wider both-sided ask fitted', () => {
+    const pose = poseOver(FACING.down)
+    const stamp = drillStampOf(pose, false)
+    const wide = { aheadCells: 0, sideCells: 3, facedSide: 'left' as const, offSideCells: 3 }
+    const cells = drillGearCellsAt(pose, stamp, wide).side
+    expect(cells.filter((tile) => tile.tx > 30)).toHaveLength(3)
+    expect(cells.filter((tile) => tile.tx < 30)).toHaveLength(3)
+    const narrowOther = drillGearCellsAt(pose, stamp, { ...wide, offSideCells: 1 }).side
+    expect(narrowOther.filter((tile) => tile.tx > 30)).toHaveLength(3)
+    expect(narrowOther.filter((tile) => tile.tx < 30)).toHaveLength(1)
+  })
 })
+
+/** Whether the tile's centre lies across the bore toward `side` of the pose's facing. */
+function isOnSide(pose: VehiclePose, side: BoreSide, tile: { tx: number; ty: number }): boolean {
+  const toward = sideVectorOf(pose, side)
+  const dx = tile.tx * 1000 + 500 - pose.x
+  const dy = tile.ty * 1000 + 500 - pose.y
+  return dx * toward.x + dy * toward.y > 0
+}

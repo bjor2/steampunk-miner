@@ -24,6 +24,7 @@ import { drillStampOf } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import type { AheadLatch } from '../vehicle/aheadBearingLatch'
 import type { DriveSigns } from '../vehicle/driveSigns'
+import type { SideLatch } from '../vehicle/facedSide'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { hasCargoRoom, withOreUnit, type VehicleState } from '../vehicle/vehicleState'
 import { carveCell, type Carve, type CellDrillTicks } from '../world/groundEdit'
@@ -156,7 +157,7 @@ function drillGround(
   const carved = target.carve({ world: state.world, window, gates, energy: vehicle.energy })
   if (carved.ticksUsed === 0) return { state, events: gates.refusedEvents() }
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
-    ...withAheadLatch(vehicle, carved.aheadLatch),
+    ...withLatches(vehicle, carved),
     energy: vehicle.energy - carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill - carved.gearQuanta,
   })
   const collected = chainEffects(charged, [
@@ -175,9 +176,17 @@ function drillGround(
   }
 }
 
-/** The vehicle keeps the cut's latch; a cut with no gear aimed by the drive leaves it as it was. */
+/** The vehicle keeps the cut's latches; a cut with no gear aimed by the drive leaves them be. */
+function withLatches(vehicle: VehicleState, carved: DrillCarve): VehicleState {
+  return withSideLatch(withAheadLatch(vehicle, carved.aheadLatch), carved.sideLatch)
+}
+
 function withAheadLatch(vehicle: VehicleState, latch: AheadLatch | null): VehicleState {
   return latch === null ? vehicle : { ...vehicle, aheadLatch: latch }
+}
+
+function withSideLatch(vehicle: VehicleState, latch: SideLatch | null): VehicleState {
+  return latch === null ? vehicle : { ...vehicle, sideLatch: latch }
 }
 
 function affordableTicksOf(vehicle: VehicleState): number {

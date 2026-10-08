@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { ECONOMY } from './economy'
 import { createFieldReader } from './economyFieldReader'
-import { aheadEnergyShareOf, foldDrillGear, readDrillGearCaps } from './drillGearCaps'
+import {
+  aheadEnergyShareOf,
+  foldDrillGear,
+  readDrillGearCaps,
+  type DrillGearAsk,
+} from './drillGearCaps'
 
 // The kernel's caps on slice drill gear (GD lock on #205, ticket 234).
 
@@ -43,6 +48,9 @@ describe('drill gear caps', () => {
       facingAheadCells: 1,
       aheadAim: 'facing',
       sideCells: 1,
+      offSideCells: 1,
+      sideAim: 'both',
+      sideSeed: { x: 0, y: 0 },
       sideEnergyShareBp: 12000,
       diagonalEnergyShareBp: 10000,
     })
@@ -104,6 +112,48 @@ describe('drill gear caps', () => {
     const floored = foldDrillGear([{ aheadCells: 1, aheadAim: 'drive' }], floor)!
     expect(aheadEnergyShareOf(floored, 'facing')).toBe(10000)
     expect(aheadEnergyShareOf(floored, 'right')).toBe(15000)
+  })
+
+  it("gives the side cutters' hold alone its cells on the faced side and none on the other", () => {
+    const hold = { sideCells: 1, sideAim: 'drive', sideSeed: { x: 1, y: 0 } } as const
+    const gear = foldDrillGear([hold], CAPS)!
+    expect([gear.sideCells, gear.offSideCells, gear.sideAim]).toEqual([1, 0, 'drive'])
+    expect(gear.sideSeed).toEqual({ x: 1, y: 0 })
+  })
+
+  it('cuts the plain ask on the other side when the hold and a both-sided ask are on together', () => {
+    const hold = { sideCells: 1, sideAim: 'drive' } as const
+    const gear = foldDrillGear([hold, { sideCells: 1 }], CAPS)!
+    expect([gear.sideCells, gear.offSideCells, gear.sideAim]).toEqual([1, 1, 'drive'])
+    const wide = foldDrillGear([hold, { sideCells: 3 }], CAPS)!
+    expect([wide.sideCells, wide.offSideCells]).toEqual([3, 3])
+  })
+
+  it('cuts both sides alike with no ask aimed by the drive, as before the hold', () => {
+    for (const asks of [
+      [{ sideCells: 1 }],
+      [{ sideCells: 2, sideAim: 'both' }, { sideCells: 1 }],
+    ]) {
+      const gear = foldDrillGear(asks as readonly DrillGearAsk[], CAPS)!
+      expect(gear.offSideCells).toBe(gear.sideCells)
+      expect(gear.sideAim).toBe('both')
+      expect(gear.sideSeed).toEqual({ x: 0, y: 0 })
+    }
+  })
+
+  it('never cuts the faced side wider than the widest single ask, nor the other side wider', () => {
+    const asks: readonly (readonly DrillGearAsk[])[] = [
+      [{ sideCells: 1, sideAim: 'drive' }],
+      [{ sideCells: 1, sideAim: 'drive' }, { sideCells: 1 }],
+      [{ sideCells: 2, sideAim: 'drive' }, { sideCells: 3 }],
+      [{ sideCells: 3, sideAim: 'drive' }, { sideCells: 1 }, { aheadCells: 1 }],
+    ]
+    for (const ask of asks) {
+      const gear = foldDrillGear(ask, CAPS)!
+      const widest = Math.max(...ask.map((one) => one.sideCells ?? 0))
+      expect(gear.sideCells).toBe(widest)
+      expect(gear.offSideCells).toBeLessThanOrEqual(gear.sideCells)
+    }
   })
 
   it('refuses a side share floor under a whole share and a negative ahead cap', () => {

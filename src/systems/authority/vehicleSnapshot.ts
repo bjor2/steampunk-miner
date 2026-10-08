@@ -5,9 +5,10 @@
  * anything is built from it; the digest check in `sessionSnapshot.ts` then catches any value that does not match.
  */
 import { isChargeSize } from '../economy/chargeSizes'
-import type { AheadBearing } from '../economy/drillGearCaps'
+import type { AheadBearing, BoreSide } from '../economy/drillGearCaps'
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { fromCanonical, isNonNegativeMoneyText, toCanonical, type Money } from '../money'
+import { BORE_SIDES } from '../vehicle/facedSide'
 import { isFacing, type VehiclePose } from '../vehicle/vehiclePose'
 import { isGunMode } from '../vehicle/vehicleGun'
 import { isLiningType } from '../vehicle/liningType'
@@ -123,6 +124,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.aheadLatch === undefined || isPortableAheadLatch(vehicle.aheadLatch)
       ? []
       : [`${path}.aheadLatch must hold a bearing and a tile, or be left out`]),
+    ...(vehicle.sideLatch === undefined || isPortableSideLatch(vehicle.sideLatch)
+      ? []
+      : [`${path}.sideLatch must hold a side and a tile, or be left out`]),
     ...(vehicle.shockHullBp === undefined || isWholeNumber(vehicle.shockHullBp)
       ? []
       : [`${path}.shockHullBp must be a whole number of basis points, or be left out`]),
@@ -219,10 +223,19 @@ function isPortableAheadLatch(latch: unknown): boolean {
   return (
     isJsonObject(latch) &&
     AHEAD_BEARINGS.includes(latch.bearing as AheadBearing) &&
-    isJsonObject(latch.tile) &&
-    Number.isSafeInteger(latch.tile.tx) &&
-    Number.isSafeInteger(latch.tile.ty)
+    isPortableTile(latch.tile)
   )
+}
+
+/** The faced side the side cutters' hold latched (TD lock on #276): a side and its cell. */
+function isPortableSideLatch(latch: unknown): boolean {
+  return (
+    isJsonObject(latch) && BORE_SIDES.includes(latch.side as BoreSide) && isPortableTile(latch.tile)
+  )
+}
+
+function isPortableTile(tile: unknown): boolean {
+  return isJsonObject(tile) && Number.isSafeInteger(tile.tx) && Number.isSafeInteger(tile.ty)
 }
 
 /** The active type is one the vehicle owns, and it owns the standard lining (#113). */
