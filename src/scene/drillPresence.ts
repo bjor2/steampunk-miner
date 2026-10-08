@@ -11,11 +11,14 @@ export const drillPresence: {
   isDrilling: boolean
   /** The vehicle's local up, a unit vector. */
   up: { x: number; y: number }
+  /** The drill's facing, a unit vector: the terrain builds chunks this way first (ticket 330). */
+  ahead: { x: number; y: number }
   /** Centre of the tile at the drill's nose, metres. */
   nose: { x: number; y: number }
 } = {
   facing: FACING.right,
   isDrilling: false,
   up: { x: 0, y: 1 },
+  ahead: { x: 1, y: 0 },
   nose: { x: 0, y: 0 },
 }

@@ -158,6 +158,20 @@ export const MAX_GROUND_COLLIDERS = 600
  */
 export const CHUNK_BUILDS_PER_FRAME = 1
 
+/**
+ * A chunk already built is rebuilt at most once in this many frames (TD scope on #316, ticket
+ * 330): with the drill cutting every tick the drilled chunk is stale every frame, and nearest
+ * first it would take every build; capped, it takes 15 a second and newly visible chunks the rest.
+ */
+export const CHUNK_REBUILD_MIN_FRAMES = 4
+
+/**
+ * Chunks are built ahead of the view (TD scope on #316, ticket 330): the view circle moved this
+ * far along the drill's facing, one chunk, so a rig drilling at speed meets chunks already built.
+ * They are built only with the frame's builds left over, and drawn once they come into view.
+ */
+export const CHUNK_PREFETCH_AHEAD_M = 32
+
 /** The background fades from sky to the underground dark over this many tiles of depth. */
 export const SKY_FADE_DEPTH_TILES = 12
 

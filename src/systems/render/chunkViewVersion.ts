@@ -22,3 +22,12 @@ export function chunkViewVersionOf(world: WorldState, cx: number, cy: number): C
 export function isSameChunkView(a: ChunkViewVersion, b: ChunkViewVersion): boolean {
   return a.every((delta, index) => delta === b[index])
 }
+
+/**
+ * Only the neighbours changed, not the chunk itself (ticket 330): its mesh is then still current
+ * if their edge samples in its halo are (`isHaloEdgeCurrent`), so a cut inside a chunk rebuilds
+ * that chunk alone, not the three whose views read it.
+ */
+export function isOwnChunkSame(built: ChunkViewVersion, now: ChunkViewVersion): boolean {
+  return built[0] === now[0]
+}

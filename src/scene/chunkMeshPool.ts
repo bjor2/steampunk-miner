@@ -7,22 +7,28 @@
  *
  * Work happens only when something changed: the visible set is recomputed when the camera enters
  * another tile or the screen is resized (a changed block set only copies instance runs), chunk versions are checked when the world changes, and
- * at most `CHUNK_BUILDS_PER_FRAME` stale chunks are rebuilt per frame, nearest first (#4: terrain
- * updates under 2 ms per frame). A frame where nothing changed allocates nothing.
+ * at most `CHUNK_BUILDS_PER_FRAME` chunks are built per frame (#4: terrain updates under 2 ms per
+ * frame), in `chunksToBuild`'s order: chunks coming into view first, then stale ones, each rebuilt
+ * at most once in 4 frames, then the chunks ahead along the drill's facing (ticket 330). A chunk
+ * whose neighbours changed only away from its halo's edge keeps its mesh. A frame where nothing
+ * changed allocates nothing.
  */
 import {
-  DataTexture,
-  InstancedBufferAttribute,
-  InstancedBufferGeometry,
-  LinearFilter,
   Mesh,
-  PlaneGeometry,
-  RedFormat,
-  UnsignedByteType,
+  type DataTexture,
   type Group,
+  type InstancedBufferGeometry,
   type ShaderMaterial,
 } from 'three'
 import { CHUNK_BUILDS_PER_FRAME } from '../constants/scene'
+import { chunksToBuild } from '../systems/render/chunkBuilds'
+import { aheadChunksOf, chunkNeedsOf, type ChunkNeed } from './chunkBuildNeeds'
+import {
+  densityTextureOf,
+  emptyInstances,
+  geometryOf,
+  INSTANCE_ATTRIBUTES,
+} from './chunkMeshGeometry'
 import {
   buildChunkTileBatch,
   NO_REFRACTORY_CELLS,
@@ -30,12 +36,8 @@ import {
 } from '../systems/render/chunkTileBatch'
 import { refractoryCellsOf } from '../systems/render/refractoryCells'
 import { NO_CASING } from '../systems/world/chunkDelta'
-import { chunkDensityHaloOf, DENSITY_HALO_SIDE } from '../systems/render/densityHalo'
-import {
-  chunkViewVersionOf,
-  isSameChunkView,
-  type ChunkViewVersion,
-} from '../systems/render/chunkViewVersion'
+import { chunkDensityHaloOf } from '../systems/render/densityHalo'
+import type { ChunkViewVersion } from '../systems/render/chunkViewVersion'
 import {
   copyShownBlocks,
   drawnBlockCountOf,
@@ -47,13 +49,7 @@ import {
 } from '../systems/render/groundBlocks'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { PlanetParams } from '../systems/world/planetParams'
-import {
-  CHUNK_CELLS,
-  chunkKey,
-  chunkOfTile,
-  firstTileOfChunk,
-  type TilePoint,
-} from '../systems/world/tileGrid'
+import { chunkKey, chunkOfTile, firstTileOfChunk, type TilePoint } from '../systems/world/tileGrid'
 import {
   currentCasingOfChunk,
   currentDensityOfChunk,
@@ -67,6 +63,8 @@ export interface TerrainView {
   world: WorldState
   centre: Vector2
   viewRadius: number
+  /** The drill's facing as a unit vector: chunks this way are built ahead of the view. */
+  ahead: Vector2
 }
 
 export interface ChunkMeshPool {
@@ -83,8 +81,14 @@ export interface ChunkMeshPool {
 }
 
 interface ChunkMesh {
+  cx: number
+  cy: number
   mesh: Mesh
   density: DataTexture
+  /** The density halo the texture shows, kept to check its neighbours' edges. */
+  halo: Uint8Array
+  /** The pool frame it was built in. */
+  builtFrame: number
   version: ChunkViewVersion
   batch: ChunkTileBatch
   /** The instances the mesh draws: the tiles of the shown blocks, bound to its geometry. */
@@ -95,6 +99,10 @@ interface ChunkMesh {
 interface PoolState {
   meshes: Map<string, ChunkMesh>
   visible: ShownChunk[]
+  /** Chunks ahead of the view, built with the builds left over (no block shown). */
+  ahead: ShownChunk[]
+  /** Frames synced so far: the clock of the rebuild cap. */
+  frame: number
   tileX: number
   tileY: number
   viewRadius: number
@@ -107,6 +115,8 @@ export function createChunkMeshPool(parent: Group, material: ShaderMaterial): Ch
   const pool: PoolState = {
     meshes: new Map(),
     visible: [],
+    ahead: [],
+    frame: 0,
     tileX: Number.NaN,
     tileY: Number.NaN,
     viewRadius: Number.NaN,
@@ -116,6 +126,7 @@ export function createChunkMeshPool(parent: Group, material: ShaderMaterial): Ch
   }
   return {
     sync(view) {
+      pool.frame++
       if (pool.isUpToDate && isSameView(pool, view)) return
       if (pool.params !== view.params) dropAll(pool, parent)
       if (!isSameVisibleSet(pool, view)) chooseVisible(pool, parent, view)
@@ -166,6 +177,7 @@ function chooseVisible(pool: PoolState, parent: Group, view: TerrainView): void 
   pool.params = view.params
   const blocks = visibleGroundBlocksAround(view.centre, view.viewRadius, view.params.radiusTiles)
   pool.visible = shownChunksOf(blocks)
+  pool.ahead = aheadChunksOf(view)
   dropHidden(pool, parent)
   showVisibleBlocks(pool)
 }
@@ -189,7 +201,7 @@ function showBlocks(chunk: ChunkMesh, blockMask: number): void {
 }
 
 function dropHidden(pool: PoolState, parent: Group): void {
-  const wanted = new Set(pool.visible.map(({ cx, cy }) => chunkKey(cx, cy)))
+  const wanted = new Set([...pool.visible, ...pool.ahead].map(({ cx, cy }) => chunkKey(cx, cy)))
   for (const [key, chunk] of pool.meshes) {
     if (wanted.has(key)) continue
     disposeChunkMesh(parent, chunk)
@@ -203,25 +215,20 @@ function dropAll(pool: PoolState, parent: Group): void {
   pool.isUpToDate = false
 }
 
-/** Rebuilds up to the per-frame budget; true when every visible chunk is current. */
+/** Builds what the frame's budget allows; true when every visible and ahead chunk is current. */
 function rebuildStale(
   pool: PoolState,
   parent: Group,
   material: ShaderMaterial,
   view: TerrainView,
 ): boolean {
-  let builds = 0
-  for (const { cx, cy, blockMask } of pool.visible) {
-    const key = chunkKey(cx, cy)
-    const version = chunkViewVersionOf(view.world, cx, cy)
-    const current = pool.meshes.get(key)
-    if (current !== undefined && isSameChunkView(current.version, version)) continue
-    if (builds === CHUNK_BUILDS_PER_FRAME) return false
-    const built = buildChunkMesh(material, view, { cx, cy, blockMask }, version)
-    replaceChunkMesh(pool, parent, key, built)
-    builds++
+  const needs = chunkNeedsOf(pool, view)
+  const builds = chunksToBuild(needs, pool.frame, CHUNK_BUILDS_PER_FRAME)
+  for (const need of builds) {
+    const built = buildChunkMesh(material, view, need, pool.frame)
+    replaceChunkMesh(pool, parent, need.key, built)
   }
-  return true
+  return builds.length === needs.length
 }
 
 function replaceChunkMesh(pool: PoolState, parent: Group, key: string, next: ChunkMesh): void {
@@ -234,9 +241,10 @@ function replaceChunkMesh(pool: PoolState, parent: Group, key: string, next: Chu
 function buildChunkMesh(
   material: ShaderMaterial,
   view: TerrainView,
-  { cx, cy, blockMask }: ShownChunk,
-  version: ChunkViewVersion,
+  { shown, version }: ChunkNeed,
+  builtFrame: number,
 ): ChunkMesh {
+  const { cx, cy, blockMask } = shown
   const { params, world } = view
   const halo = chunkDensityHaloOf((x, y) => currentDensityOfChunk(world, params, x, y), cx, cy)
   const batch = buildChunkTileBatch(
@@ -258,7 +266,18 @@ function buildChunkMesh(
     material.uniforms.uDensity.value = density
     material.uniformsNeedUpdate = true
   }
-  const chunk: ChunkMesh = { mesh, density, version, batch, drawn, blockMask: Number.NaN }
+  const chunk: ChunkMesh = {
+    cx,
+    cy,
+    mesh,
+    density,
+    halo,
+    builtFrame,
+    version,
+    batch,
+    drawn,
+    blockMask: Number.NaN,
+  }
   showBlocks(chunk, blockMask)
   return chunk
 }
@@ -267,52 +286,6 @@ function buildChunkMesh(
 function refractoryCellsOfChunk(world: WorldState, cx: number, cy: number): Uint8Array {
   const casing = currentCasingOfChunk(world, cx, cy)
   return casing === NO_CASING ? NO_REFRACTORY_CELLS : refractoryCellsOf(casing)
-}
-
-const INSTANCE_ATTRIBUTES = ['aTile', 'aBase', 'aOre', 'aStyle', 'aGate'] as const
-
-/** Sized for a whole chunk, so showing more blocks never reallocates. */
-function emptyInstances(): TileInstances {
-  return {
-    count: 0,
-    tiles: new Float32Array(CHUNK_CELLS * 2),
-    baseColours: new Float32Array(CHUNK_CELLS * 3),
-    oreColours: new Float32Array(CHUNK_CELLS * 4),
-    styles: new Float32Array(CHUNK_CELLS * 4),
-    gates: new Float32Array(CHUNK_CELLS),
-  }
-}
-
-/** The halo as a one-channel texture, blended linearly between samples like the contour. */
-function densityTextureOf(halo: Uint8Array<ArrayBuffer>): DataTexture {
-  const texture = new DataTexture(
-    halo,
-    DENSITY_HALO_SIDE,
-    DENSITY_HALO_SIDE,
-    RedFormat,
-    UnsignedByteType,
-  )
-  texture.minFilter = LinearFilter
-  texture.magFilter = LinearFilter
-  // 129-byte rows: tell WebGL they are packed, not padded to 4 bytes.
-  texture.unpackAlignment = 1
-  texture.needsUpdate = true
-  return texture
-}
-
-/** A unit quad drawn once per tile; each chunk owns its copy, so disposing it is local. */
-function geometryOf(batch: TileInstances): InstancedBufferGeometry {
-  const quad = new PlaneGeometry(1, 1)
-  const geometry = new InstancedBufferGeometry()
-  geometry.index = quad.index
-  geometry.setAttribute('position', quad.getAttribute('position'))
-  geometry.setAttribute('aTile', new InstancedBufferAttribute(batch.tiles, 2))
-  geometry.setAttribute('aBase', new InstancedBufferAttribute(batch.baseColours, 3))
-  geometry.setAttribute('aOre', new InstancedBufferAttribute(batch.oreColours, 4))
-  geometry.setAttribute('aStyle', new InstancedBufferAttribute(batch.styles, 4))
-  geometry.setAttribute('aGate', new InstancedBufferAttribute(batch.gates, 1))
-  geometry.instanceCount = batch.count
-  return geometry
 }
 
 function disposeChunkMesh(parent: Group, chunk: ChunkMesh): void {

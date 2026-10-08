@@ -97,6 +97,7 @@ function createTerrainViewScratch(): TerrainView {
     world: EMPTY_WORLD,
     centre: vehiclePresence,
     viewRadius: 0,
+    ahead: drillPresence.ahead,
   }
 }
 
