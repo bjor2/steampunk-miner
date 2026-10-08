@@ -14,7 +14,7 @@
  * - Extractor clears: the bar of 148d (#296), a median of 1.5 or more a run on every planet the
  *   table reads, now that the bot buys each extractor on its planet.
  */
-import { add, cmp, div, fromSafeInteger, toCanonical, type Money } from '../systems/money'
+import { add, cmp, div, fromSafeInteger, toFixedText, type Money } from '../systems/money'
 import { dynamitePaybackOf, gateClearsOn, type PlanetGateClears } from './gateClearTally'
 
 export const DYNAMITE_CLEAR_FLOOR = 1.5
@@ -183,5 +183,5 @@ function clearsText(clears: number | null): string {
 
 /** Two places, as the report prints its multiples; a report line, never a rule. */
 function paybackText(payback: Money | null): string {
-  return payback === null ? '-' : `${Number(toCanonical(payback)).toFixed(2)}x`
+  return payback === null ? '-' : `${toFixedText(payback, 2)}x`
 }

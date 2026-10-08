@@ -113,6 +113,53 @@ const DOUBLE_CONVERSIONS = [
   'CallExpression[callee.object.name="Number"][callee.property.name="parseFloat"]',
 ].map((selector) => ({ selector, message: DOUBLE_CONVERSION_MESSAGE }))
 
+// Ticket 340 (#316 TD scope f): money past 1e308 is Infinity as a double, and past 1e37 a double
+// already drops digits, so no rule, view or script reads money text back as a number. Its own
+// rule name, so it never replaces a layer's no-restricted-syntax. Run logs and reports in
+// src/logging may still parse a share they print.
+const MONEY_TEXT_CALLS = new Set(['toCanonical', 'exactAmount'])
+const NO_MONEY_AS_DOUBLE = {
+  meta: {
+    type: 'problem',
+    messages: {
+      moneyAsDouble:
+        'Money never becomes a double (ticket 340): use cmp, toFixedText or formatAmount on the Money.',
+      parseFloat:
+        'parseFloat reads money text as a double (ticket 340): parse it with fromCanonical.',
+    },
+  },
+  create(context) {
+    return {
+      CallExpression(node) {
+        if (isParseFloatCall(node.callee)) context.report({ node, messageId: 'parseFloat' })
+        else if (isNumberOfMoneyText(node)) context.report({ node, messageId: 'moneyAsDouble' })
+      },
+    }
+  },
+}
+
+function isParseFloatCall(callee) {
+  if (callee.type === 'Identifier') return callee.name === 'parseFloat'
+  return (
+    callee.type === 'MemberExpression' &&
+    callee.object.type === 'Identifier' &&
+    callee.object.name === 'Number' &&
+    callee.property.type === 'Identifier' &&
+    callee.property.name === 'parseFloat'
+  )
+}
+
+function isNumberOfMoneyText(node) {
+  const [argument] = node.arguments
+  return (
+    node.callee.type === 'Identifier' &&
+    node.callee.name === 'Number' &&
+    argument?.type === 'CallExpression' &&
+    argument.callee.type === 'Identifier' &&
+    MONEY_TEXT_CALLS.has(argument.callee.name)
+  )
+}
+
 const DECIMAL_ONLY_IN_MONEY = {
   group: ['decimal.js', 'decimal.js/*'],
   message: 'Only src/systems/money.ts constructs a Decimal (#5); use the Money functions.',
@@ -270,6 +317,12 @@ export default tseslint.config(
     files: ['src/systems/bot/**/*.ts'],
     ignores: ['src/systems/bot/**/*.test.ts'],
     rules: { 'no-restricted-syntax': ['error', NO_IMPORT_META, ...MONEY_STAYS_MONEY] },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}', 'scripts/**/*.ts'],
+    ignores: ['src/logging/**', 'src/**/*.test.ts', 'scripts/**/*.test.ts'],
+    plugins: { money: { rules: { 'no-money-as-double': NO_MONEY_AS_DOUBLE } } },
+    rules: { 'money/no-money-as-double': 'error' },
   },
   {
     // Scene/UI/store must not reach the platform directly; src/shell is the one bridge.

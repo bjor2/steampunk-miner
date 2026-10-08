@@ -18,6 +18,7 @@ import {
   roundToWhole,
   sub,
   toCanonical,
+  toFixedText,
   toSafeInteger,
   ZERO_MONEY,
   type Money,
@@ -254,6 +255,18 @@ describe('money: whole counts', () => {
   it('refuses to read a fraction or a huge amount as a count', () => {
     expect(() => toSafeInteger(m('62.4'))).toThrow(/integer/)
     expect(() => toSafeInteger(m('1e30'))).toThrow(/integer/)
+  })
+})
+
+describe('money: report text', () => {
+  it('prints a multiple to two places, ties away from zero as toFixed does', () => {
+    expect(toFixedText(m('2.125'), 2)).toBe('2.13')
+    expect(toFixedText(m('-2.125'), 2)).toBe('-2.13')
+    expect(toFixedText(m('1.5'), 0)).toBe('2')
+  })
+
+  it('prints the digits of an amount a double would read as Infinity', () => {
+    expect(toFixedText(m('1e400'), 2)).toBe(`1${'0'.repeat(400)}.00`)
   })
 })
 

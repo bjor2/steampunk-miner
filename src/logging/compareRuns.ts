@@ -19,7 +19,7 @@ import {
   fromSafeInteger,
   mul,
   sub,
-  toCanonical,
+  toFixedText,
   ZERO_MONEY,
   type Money,
 } from '../systems/money'
@@ -236,8 +236,8 @@ function moneyChange(before: Money, after: Money): string {
 /** Display only: a ratio of two Money values, as a whole percent. */
 function moneyPercentText(difference: Money, before: Money): string {
   if (cmp(before, ZERO_MONEY) === 0) return ''
-  const percent = Number.parseFloat(toCanonical(mul(div(difference, before), fromSafeInteger(100))))
-  return ` (${percent >= 0 ? '+' : ''}${percent.toFixed(0)}%)`
+  const percent = mul(div(difference, before), fromSafeInteger(100))
+  return ` (${cmp(percent, ZERO_MONEY) >= 0 ? '+' : ''}${toFixedText(percent, 0)}%)`
 }
 
 function percentText(difference: number, before: number): string {

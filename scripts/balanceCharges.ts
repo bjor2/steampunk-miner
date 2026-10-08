@@ -120,7 +120,7 @@ import {
   fromSafeInteger,
   mul,
   roundToWhole,
-  toCanonical,
+  toFixedText,
   type Money,
 } from '../src/systems/money'
 import type { Scenario } from '../src/systems/scenario'
@@ -521,7 +521,7 @@ function ratio(a: Money, b: Money): string {
 }
 
 function times(multiple: Money): string {
-  return `${Number(toCanonical(multiple)).toFixed(2)}x`
+  return `${toFixedText(multiple, 2)}x`
 }
 
 function seconds(ticks: number): string {

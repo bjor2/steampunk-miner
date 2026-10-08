@@ -24,16 +24,22 @@ describe('descriptions double-conversion lint', { timeout: LINT_TIMEOUT_MS }, ()
     expect(ruleIds).toEqual(['no-restricted-syntax'])
   })
 
-  it.each([
-    'x.toPrecision(3)',
-    'x.toLocaleString()',
-    'Number(x)',
-    'parseFloat(x)',
-    'Number.parseFloat(x)',
-  ])('fails on %s anywhere in the slice', async (call) => {
-    const ruleIds = await ruleIdsOf(UI_FILE, `export const shown = (x: unknown) => ${call}\n`)
-    expect(ruleIds).toEqual(['no-restricted-syntax'])
-  })
+  it.each(['x.toPrecision(3)', 'x.toLocaleString()', 'Number(x)'])(
+    'fails on %s anywhere in the slice',
+    async (call) => {
+      const ruleIds = await ruleIdsOf(UI_FILE, `export const shown = (x: unknown) => ${call}\n`)
+      expect(ruleIds).toEqual(['no-restricted-syntax'])
+    },
+  )
+
+  // parseFloat is also the kernel's money-as-double ban outside src/logging (ticket 340).
+  it.each(['parseFloat(x)', 'Number.parseFloat(x)'])(
+    'fails on %s anywhere in the slice, under both bans',
+    async (call) => {
+      const ruleIds = await ruleIdsOf(UI_FILE, `export const shown = (x: unknown) => ${call}\n`)
+      expect([...ruleIds].sort()).toEqual(['money/no-money-as-double', 'no-restricted-syntax'])
+    },
+  )
 
   it('keeps the pure-rule bans in the slice systems folder', async () => {
     const ruleIds = await ruleIdsOf(SYSTEMS_FILE, 'export const grown = (x: number) => x ** 2\n')

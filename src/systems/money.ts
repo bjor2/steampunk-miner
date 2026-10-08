@@ -167,6 +167,16 @@ function isMilliFinerThanPrecision(value: Decimal): boolean {
   return !value.isZero() && value.e + 1 + MONEY_QUANTUM_DECIMALS > MONEY_SIGNIFICANT_DIGITS
 }
 
+/**
+ * Fixed-point text with `places` decimals, ties away from zero as `Number#toFixed` rounds, for
+ * report lines (a payoff multiple, a percent). It reads the decimal itself, so 1e400 prints its
+ * digits where a double would print Infinity (ticket 340: no `Number(toCanonical(...))`).
+ */
+export function toFixedText(amount: Money, places: number): string {
+  assertSafeInteger(places)
+  return unwrap(amount).toFixed(places, Decimal.ROUND_HALF_UP)
+}
+
 /** A bounded count (level, units, tiles) as money, so it can scale a price. */
 export function fromSafeInteger(count: number): Money {
   assertSafeInteger(count)

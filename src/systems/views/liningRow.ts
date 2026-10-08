@@ -8,12 +8,13 @@
 import { REFRACTORY_LINING_ICON_ID } from '../art/artIds'
 import type { AuthorityState } from '../authority/authorityState'
 import { isLiningTypeOffered, liningOf, liningPriceOf } from '../authority/liningRules'
+import { formatAmount } from '../displayAmount'
 import {
   liningTypePriceMultiplier,
   liningTypes,
   STANDARD_LINING_TYPE,
 } from '../economy/heatEconomy'
-import { toCanonical, ZERO_MONEY } from '../money'
+import { ZERO_MONEY } from '../money'
 import { buyLiningTypeCommand, selectLiningTypeCommand } from '../platform/platformCommands'
 import { isLiningTypeOwned, type VehicleLining } from '../vehicle/liningType'
 import { liningItemOf } from '../registries/kernelItems'
@@ -99,7 +100,7 @@ function liningButtonOf(
 
 /** "Refractory: seals lava out, cools the tunnel; 1.5× lining charge". */
 function effectTextOf(liningType: string): string {
-  const multiplier = Number(toCanonical(liningTypePriceMultiplier(liningType)))
+  const multiplier = formatAmount(liningTypePriceMultiplier(liningType))
   return `${nameOf(liningType)}: ${TYPE_EFFECTS[liningType] ?? ''}; ${multiplier}× lining charge`
 }
 

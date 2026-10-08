@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { blockHardness } from '../economy/oreEconomy'
-import { drillPower, drillTip } from '../economy/vehicleStats'
+import { drillPower, drillTip, onCurveLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { add, cmp, fromCanonical, mul, ZERO_MONEY, type BigStat } from '../money'
 import {
   canScratch,
@@ -106,5 +106,28 @@ describe('energy quanta', () => {
     expect(quantaOfUnitText('37.5')).toBe(9000)
     expect(quantaOfUnitText('0.001')).toBeNull()
     expect(quantaOfUnitText('-1')).toBeNull()
+  })
+})
+
+// #316 TD scope f (ticket 340): ticksPerTile leaves Money through toSafeInteger, which throws only
+// when one cell would take more than 2^53 ticks. Asserted rather than retyped (#330 turns it into
+// sub-steps).
+describe('drill rule: whole ticks per tile stay a safe integer', () => {
+  const LAST_PLANET = 200
+  const BANDS = [1, 2, 3, 4, 5]
+
+  it('gives every band of planets 1 to 200 a safe tick count with the on-curve drill', () => {
+    for (let planet = 1; planet <= LAST_PLANET; planet++) {
+      const drill = vehicleStatsAt(onCurveLevels(planet))
+      for (const band of BANDS) {
+        const ticks = ticksPerTile(drill, blockHardness(planet, band))
+        if (ticks !== null) expect(Number.isSafeInteger(ticks)).toBe(true)
+      }
+    }
+  })
+
+  it('throws, never rounds, when one cell would take more than 2^53 ticks', () => {
+    const crawling = drillOf(m('1e-30'), m('1'))
+    expect(() => ticksPerTile(crawling, m('1'))).toThrow(RangeError)
   })
 })
