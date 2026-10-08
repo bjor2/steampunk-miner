@@ -336,7 +336,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 19 files, 162 tests
+### `terrain-tools`: 20 files, 171 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -350,6 +350,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/marksInPlay.test.ts` | 1 | 1 |
 | `src/features/terrain-tools/systems/oreShifter.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/systems/pressurePocket.test.ts` | 3 | 3 |
+| `src/features/terrain-tools/systems/repulsorCoil.test.ts` | 9 | 8 |
 | `src/features/terrain-tools/systems/seamSplitter.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/statPreview.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/terrainEconomy.test.ts` | 4 | 4 |
@@ -478,7 +479,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/magnet/magnetCaps.test.ts` | 10 | 5 |
 | `src/systems/authority/magnet/magnetGates.test.ts` | 3 | 3 |
 | `src/systems/authority/magnetic/magneticHazard.test.ts` | 8 | 8 |
-| `src/systems/authority/magnetic/metalTag.test.ts` | 8 | 8 |
+| `src/systems/authority/magnetic/metalTag.test.ts` | 12 | 12 |
 | `src/systems/authority/minedOre.test.ts` | 7 | 7 |
 | `src/systems/authority/moneyRounding.test.ts` | 3 | 3 |
 | `src/systems/authority/platformCommands.test.ts` | 43 | 43 |
