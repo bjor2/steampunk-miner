@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T04:44:41+02:00",
+  "updated_at": "2026-10-08T05:15:27+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 0,
       "free": 4,
-      "claims_last_hour": 6,
+      "claims_last_hour": 0,
       "name": "Claude Max 1"
     },
     {
@@ -99,7 +99,7 @@
       "size": 4,
       "used": 0,
       "free": 4,
-      "claims_last_hour": 4,
+      "claims_last_hour": 2,
       "name": "Claude Max 2"
     }
   ],
@@ -109,9 +109,9 @@
   },
   "tester": {
     "state": "running",
-    "phase": "nightly-balance-planets",
+    "phase": "nightly-balance-guns",
     "sha": "129bcbd3ab0272abd1d25887d52aecbe55f2b2d9",
-    "since": "2026-10-08T02:42:01Z",
+    "since": "2026-10-08T03:15:21Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-08T00:44:41Z",
