@@ -247,12 +247,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
-### `power-up-core`: 17 files, 112 tests
+### `power-up-core`: 19 files, 134 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/power-up-core/logging.test.ts` | 5 | 5 |
+| `src/features/power-up-core/logging.test.ts` | 6 | 6 |
 | `src/features/power-up-core/markReportRows.test.ts` | 6 | 6 |
+| `src/features/power-up-core/store/slotPress.test.ts` | 8 | 7 |
 | `src/features/power-up-core/systems/chargeState.test.ts` | 5 | 5 |
 | `src/features/power-up-core/systems/cradleNodes.test.ts` | 5 | 3 |
 | `src/features/power-up-core/systems/cradleSales.test.ts` | 3 | 3 |
@@ -263,7 +264,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/systems/powerUpUse.test.ts` | 17 | 17 |
 | `src/features/power-up-core/systems/siblingLink.test.ts` | 12 | 12 |
 | `src/features/power-up-core/systems/slotColumn.test.ts` | 9 | 9 |
-| `src/features/power-up-core/systems/slotUse.test.ts` | 3 | 3 |
+| `src/features/power-up-core/systems/slotRelease.test.ts` | 11 | 11 |
+| `src/features/power-up-core/systems/slotUse.test.ts` | 5 | 5 |
 | `src/features/power-up-core/systems/toggleDraw.test.ts` | 9 | 9 |
 | `src/features/power-up-core/systems/toggleRead.test.ts` | 2 | 2 |
 | `src/features/power-up-core/systems/useRefusals.test.ts` | 3 | 3 |
@@ -825,14 +827,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/domainEventBroadcast.test.ts` | 3 | 3 |
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 9 | 9 |
-| `src/store/inputRuntime.test.ts` | 40 | 40 |
+| `src/store/inputRuntime.test.ts` | 44 | 44 |
 | `src/store/liveStepSlice.test.ts` | 13 | 13 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
 | `src/store/perfLog.test.ts` | 6 | 6 |
 | `src/store/platformLoop.test.ts` | 4 | 4 |
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
-| `src/store/touchRuntime.test.ts` | 9 | 9 |
+| `src/store/touchRuntime.test.ts` | 14 | 13 |
 
 ### `systems-core`
 
