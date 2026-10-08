@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T03:50:17+02:00",
+  "updated_at": "2026-10-08T03:52:51+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -74,18 +74,18 @@
         {
           "slot": "C6",
           "state": "busy",
-          "ticket": 314,
+          "ticket": 332,
           "grok_slot": 6,
           "kind": "dev",
-          "since": "2026-10-08T02:45:00+02:00"
+          "since": "2026-10-08T03:52:00+02:00"
         },
         {
           "slot": "C7",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "external",
-          "since": "2026-10-08T02:56:05+02:00"
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C8",
@@ -97,9 +97,9 @@
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
-      "claims_last_hour": 2,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 3,
       "name": "Claude Max 2"
     }
   ],
@@ -252,8 +252,8 @@
     {
       "slot": 6,
       "state": "dev",
-      "ticket": 314,
-      "since": "2026-10-08T02:45:00+02:00",
+      "ticket": 332,
+      "since": "2026-10-08T03:52:00+02:00",
       "claude_slot": 6
     },
     {
@@ -338,18 +338,17 @@
     {
       "slot": 6,
       "state": "busy",
-      "ticket": 314,
+      "ticket": 332,
       "grok_slot": 6,
-      "since": "2026-10-08T02:45:00+02:00",
+      "since": "2026-10-08T03:52:00+02:00",
       "account": 2
     },
     {
       "slot": 7,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-08T02:56:05+02:00",
-      "kind": "external",
+      "since": null,
       "account": 2
     },
     {
@@ -362,11 +361,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-08 03:49 CEST",
-    "mode": "recheck",
-    "triggers": "#332",
-    "started": "",
-    "note": "dev slots full"
+    "at": "2026-10-08 03:52 CEST",
+    "mode": "refill-dev",
+    "triggers": "#314",
+    "started": "#332->C6/A2",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
@@ -380,9 +379,9 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 8,
-      "free": 0,
-      "external": 1
+      "used": 7,
+      "free": 1,
+      "external": 0
     }
   }
 }
