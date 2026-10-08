@@ -21,7 +21,7 @@ import { ticksPerCell } from '../groundDrill'
 import { HEAT_PARAMS, HEAT_PLANET } from '../lava/lavaFixtures'
 import { createScriptedSession, drill, PARAMS, poseAbove, WORLD_SEED } from '../scriptedSession'
 import { onCurveSessionOn, type RecordedSession } from './magneticFixtures'
-import { magneticTugAt } from './magneticTug'
+import { magneticTugAt, magneticTugOnCutAt } from './magneticTug'
 import { sensingReachAt } from './sensingReach'
 
 // hazard:magnetic (GD lock on spec #258 Q2, ticket 290): a field tugs the rig toward its vein at
@@ -408,6 +408,27 @@ describe('hazard:magnetic (spec #258, ticket 290)', () => {
       expect(recorded.session.vehicle().hull).toEqual(hullBefore)
       expect(recorded.session.vehicle().shockHullBp).toBeUndefined()
     })
+  })
+
+  it('holds a shielded drill still while it cuts, and tugs it as any rig outside a cut', () => {
+    const field = deepFieldOn(MAGNETIC_PLANET)
+    const tile = { tx: field.vein.tx + 2, ty: field.vein.ty }
+    const state = stateOn(MAGNETIC_PLANET)
+    const shield: SliceDefinition = {
+      id: 'drill-gear',
+      register: (r) => r.shockShield({ id: 'drill-gear.test-bit', isShielding: () => true }),
+    }
+    const bare = withRegistrations([groundSlice(field)], () => ({
+      driving: magneticTugAt(state, 'p1', tile),
+      cutting: magneticTugOnCutAt(state, 'p1', tile),
+    }))
+    const shielded = withRegistrations([groundSlice(field), shield], () => ({
+      driving: magneticTugAt(state, 'p1', tile),
+      cutting: magneticTugOnCutAt(state, 'p1', tile),
+    }))
+    expect(bare.driving).not.toBeNull()
+    expect(bare.cutting).toEqual(bare.driving)
+    expect(shielded).toEqual({ driving: bare.driving, cutting: null })
   })
 
   it('starts the next dive with a fresh count once the vehicle docks', () => {

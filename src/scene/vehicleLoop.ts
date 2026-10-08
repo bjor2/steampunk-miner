@@ -6,7 +6,8 @@
  * sparks, the speed and lift to the sounds, and the tick's motion to the part animation (#48). After the tow or a planet change the body
  * is placed on the dock the authority put the vehicle on. A dock building may stage the vehicle
  * first (#170 auto-roll, `vehicleStage.ts`): the drawn car and the camera move, the body does not.
- * On a magnetic planet the field the body stood in at the last step tugs it (#258, ticket 290).
+ * On a magnetic planet the field the body stood in at the last step tugs it (#258, ticket 290),
+ * unless that step's drill was cutting behind a shield (the dielectric bit, ticket 292).
  */
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
 import type { PlanetView, VehicleController, VehicleStepResult } from '../physics/vehicleController'
@@ -18,7 +19,7 @@ import {
 } from '../store/gameStore'
 import { readAuthorityState } from '../store/authorityLink'
 import type { AuthorityState } from '../systems/authority/authorityState'
-import { magneticTugAt } from '../systems/authority/magnetic/magneticTug'
+import { magneticTugAt, magneticTugOnCutAt } from '../systems/authority/magnetic/magneticTug'
 import { engineStatsAtStep } from '../systems/economy/vehicleStats'
 import { vehicleMotionAt, type VehicleMotion } from '../systems/registries/vehicleMotionEffects'
 import {
@@ -55,6 +56,8 @@ interface LoopState {
   view: { world: WorldState; params: PlanetParams; planet: PlanetView } | null
   /** The tile the body stood on after the last step (scratch, rewritten each step). */
   tile: TilePoint
+  /** Whether the drill cut on the last step. */
+  isCutting: boolean
   hasStepped: boolean
   tug: TugMemo | null
 }
@@ -65,6 +68,7 @@ interface TugMemo {
   planet: AuthorityState['planet']
   vehicle: VehicleState
   tile: TilePoint
+  isCutting: boolean
   /** Absent where no field pulls. */
   tug: Vector2 | undefined
 }
@@ -76,6 +80,7 @@ export function createVehicleLoop(): VehicleLoop {
     placement: '',
     view: null,
     tile: { tx: 0, ty: 0 },
+    isCutting: false,
     hasStepped: false,
     tug: null,
   }
@@ -97,7 +102,7 @@ export function createVehicleLoop(): VehicleLoop {
         },
         planetViewOf(loop, params, world),
       )
-      noteBodyTile(loop, result)
+      noteBodyStep(loop, result)
       reportWhenDue(loop, result, stagedIntent)
       showDrill(result)
       showMotion(result)
@@ -113,22 +118,31 @@ function readLocalMotion(): VehicleMotion {
   return vehicleMotionAt(state, useGameStore.getState().playerId, state.tick)
 }
 
-/** The field's tug on the local vehicle where the body stood after the last step. */
+/** The field's tug on the local vehicle where the body stood, and as it cut, after the last step. */
 function readLocalTug(loop: LoopState): Vector2 | undefined {
   const state = readAuthorityState()
   const playerId = useGameStore.getState().playerId
   if (!loop.hasStepped) return undefined
-  if (isTugMemoFresh(loop.tug, state, playerId, loop.tile)) return loop.tug.tug
+  if (isTugMemoFresh(loop.tug, state, playerId, loop)) return loop.tug.tug
   const tile = { tx: loop.tile.tx, ty: loop.tile.ty }
-  const tug = magneticTugAt(state, playerId, tile) ?? undefined
+  const readTug = loop.isCutting ? magneticTugOnCutAt : magneticTugAt
+  const tug = readTug(state, playerId, tile) ?? undefined
   const vehicle = state.players[playerId].vehicle
-  loop.tug = { world: state.world, planet: state.planet, vehicle, tile, tug }
+  loop.tug = {
+    world: state.world,
+    planet: state.planet,
+    vehicle,
+    tile,
+    isCutting: loop.isCutting,
+    tug,
+  }
   return tug
 }
 
-function noteBodyTile(loop: LoopState, result: VehicleStepResult): void {
+function noteBodyStep(loop: LoopState, result: VehicleStepResult): void {
   loop.tile.tx = Math.floor(result.pose.x / MM_PER_METRE)
   loop.tile.ty = Math.floor(result.pose.y / MM_PER_METRE)
+  loop.isCutting = result.flags.isDrilling
   loop.hasStepped = true
 }
 
@@ -136,15 +150,16 @@ function isTugMemoFresh(
   memo: TugMemo | null,
   state: AuthorityState,
   playerId: string,
-  tile: TilePoint,
+  loop: LoopState,
 ): memo is TugMemo {
   if (memo === null) return false
   return (
     memo.world === state.world &&
     memo.planet === state.planet &&
     memo.vehicle === state.players[playerId].vehicle &&
-    memo.tile.tx === tile.tx &&
-    memo.tile.ty === tile.ty
+    memo.tile.tx === loop.tile.tx &&
+    memo.tile.ty === loop.tile.ty &&
+    memo.isCutting === loop.isCutting
   )
 }
 

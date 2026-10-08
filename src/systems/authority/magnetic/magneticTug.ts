@@ -9,10 +9,14 @@
  * The tug is a read of the rig's tile: from the tile's centre toward the vein's. Fields come from
  * the planet seed and the danger tiles from the world every player shares, so each machine tugs a
  * rig on a tile the same way (#258 Q8).
+ *
+ * While the drill cuts, a shielded drill (`shockShields`, the dielectric bit, #258 Q6) feels no
+ * tug; outside a cut the field tugs a shielded rig as any other, which is the lining's job.
  */
 import { gateOfTile } from '../cellGates'
 import { tugSpeedAt } from '../../economy/magneticHazard'
 import { magneticFieldHolding, type MagneticField } from '../../registries/magneticGround'
+import { isDrillShielded } from '../../registries/shockShields'
 import type { Vector2 } from '../../vehicle/localFrame'
 import { isVehicleActive } from '../../vehicle/vehicleState'
 import { isLavaAt } from '../../world/lavaFlow'
@@ -41,6 +45,15 @@ export function magneticTugAt(
   const pull = fieldPullAt(params, tile)
   if (pull === null) return null
   return leansIntoDanger(state, playerId, params, tile, pull) ? null : pull
+}
+
+/** The tug on the player's rig while its drill cuts on `tile`: none on a shielded drill. */
+export function magneticTugOnCutAt(
+  state: AuthorityState,
+  playerId: string,
+  tile: TilePoint,
+): Vector2 | null {
+  return isDrillShielded(state, playerId) ? null : magneticTugAt(state, playerId, tile)
 }
 
 /** The pull toward the vein of the field holding `tile`; null outside one or on its vein. */
