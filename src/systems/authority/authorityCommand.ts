@@ -125,8 +125,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  * 47: collapse braces (ticket 331, the TD ruling on #285): `CollapseBraced {block, by}` joins, a
  *    braced collapse entry carries `isBraced: true` and warns afresh for 60 ticks when its brace
  *    ends. With no brace registered no digest or mined order changes.
+ * 48: the slot release (ticket 332, #285): `power-up-core.release_power_up {slot}`, an item's
+ *    optional `release` hook and `power-up-core.PowerUpReleased`, and a release during the
+ *    wind-up kept as the pending use's `releasedTick`. With no item declaring `release` no
+ *    digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 47
+export const AUTHORITY_PROTOCOL_VERSION = 48
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
