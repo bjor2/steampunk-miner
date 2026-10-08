@@ -3,6 +3,7 @@ import { createSeededRandom } from '../seededRandom'
 import {
   createParticlePool,
   particlesDue,
+  shiftParticles,
   sprayParticles,
   stepParticles,
   type Spray,
@@ -71,5 +72,18 @@ describe('particles', () => {
     expect(emitted(30)).toBe(70)
     expect(emitted(144)).toBeGreaterThanOrEqual(69)
     expect(emitted(144)).toBeLessThanOrEqual(70)
+  })
+
+  it('move by whole metres with the render origin and fly on unchanged', () => {
+    const still = sprayed(10)
+    const shifted = sprayed(10)
+    shiftParticles(shifted, -32, 64)
+    stepFor(still, 10, 60)
+    stepFor(shifted, 10, 60)
+    for (let at = 0; at < still.count; at++) {
+      expect(shifted.x[at] + 32).toBeCloseTo(still.x[at], 4)
+      expect(shifted.y[at] - 64).toBeCloseTo(still.y[at], 4)
+    }
+    expect(shifted.count).toBe(still.count)
   })
 })

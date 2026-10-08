@@ -4,7 +4,7 @@
  * points down the screen, or stays upright in the fixed-camera mode, offset by the screen shake
  * (zero with shake off). It frames the player's zoom in metres across the short axis (#39), so
  * every resolution shows the same world, capped on wide screens (#173). The turn and the zoom ease on the render delta, which is
- * presentation only.
+ * presentation only. It sits relative to the render origin, like the world root (ticket 339).
  */
 import { useFrame, type Size } from '@react-three/fiber'
 import { useMemo } from 'react'
@@ -22,6 +22,7 @@ import {
   shownViewShortAxisOf,
 } from '../systems/render/viewZoom'
 import { cameraPresence } from './cameraPresence'
+import { renderOriginPresence } from './renderOriginPresence'
 import { screenEffects } from './screenEffectsPresence'
 import { vehiclePresence } from './vehiclePresence'
 import { vehicleStagePresence } from './vehicleStage'
@@ -38,10 +39,10 @@ export function PlanetCamera() {
 }
 
 function placeCamera(camera: Camera, turn: CameraTurn): void {
-  camera.position.x =
-    lookAtOf(vehiclePresence.x, vehicleStagePresence.cameraX) + screenEffects.offsetX
-  camera.position.y =
-    lookAtOf(vehiclePresence.y, vehicleStagePresence.cameraY) + screenEffects.offsetY
+  const lookAtX = lookAtOf(vehiclePresence.x, vehicleStagePresence.cameraX)
+  const lookAtY = lookAtOf(vehiclePresence.y, vehicleStagePresence.cameraY)
+  camera.position.x = lookAtX - renderOriginPresence.x + screenEffects.offsetX
+  camera.position.y = lookAtY - renderOriginPresence.y + screenEffects.offsetY
   camera.rotation.z = turn.angle
   cameraPresence.localUpScreenAngle = angleOfUp(turn.up) - turn.angle
 }

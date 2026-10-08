@@ -1,6 +1,8 @@
 /**
  * The planet's tiles: the chunk meshes under the camera, lit by the vehicle's headlamp. Per-frame
  * work stays out of React: the pool and the material are created once and updated in `useFrame`.
+ * The meshes sit at their chunk corners under the world root; the shader learns the render origin
+ * (ticket 339), so a moved origin rebuilds none of them.
  */
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
@@ -18,6 +20,8 @@ import { GroundStrata } from './GroundStrata'
 import { HeatTiles } from './HeatTiles'
 import { isHeatPlanet } from '../systems/economy/heatEconomy'
 import { createTerrainMaterial, lightTerrain, type TerrainLight } from './terrainMaterial'
+import { fitTerrainToOrigin } from './terrainOrigin'
+import { renderOriginPresence } from './renderOriginPresence'
 import { fitGateTintToPlanet } from './terrainGateTint'
 import { fitGateToViewer } from './terrainGateViewer'
 import { groundGatePresence, NO_DRAWN_GROUND } from './groundGatePresence'
@@ -59,6 +63,7 @@ export function PlanetTerrain() {
     writeArtefactLook(light, useGameStore.getState().playerId)
     lightTerrain(material, light)
     fitStrataToPlanet(material, params)
+    fitTerrainToOrigin(material, params, renderOriginPresence)
     fitGateTintToPlanet(material, params)
     fitGateToViewer(material)
   })
@@ -97,6 +102,7 @@ function createTerrainViewScratch(): TerrainView {
 
 function createTerrainLightScratch(): TerrainLight {
   return {
+    renderOrigin: renderOriginPresence,
     lampPosition: vehiclePresence,
     vehicleUp: drillPresence.up,
     facing: drillPresence.facing,

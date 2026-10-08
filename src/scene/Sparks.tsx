@@ -2,7 +2,8 @@
  * Drill sparks (#13 VFX): while the drill bites, sparks spray back from the tile at its nose,
  * denser and paler while it cuts lining (#41 casing feel).
  * One fixed pool drawn as points; stepping, emitting and uploading never allocate. Presentation
- * only, so the spray steps on the render delta with its own fixed seed.
+ * only, so the spray steps on the render delta with its own fixed seed. The pool is render-local
+ * (ticket 339, `localParticles`): drawn outside the world root, in metres from the render origin.
  */
 import { useFrame } from '@react-three/fiber'
 import { useMemo } from 'react'
@@ -35,6 +36,8 @@ import {
 import { createSeededRandom, type SeededRandom } from '../systems/seededRandom'
 import { useDisposeOnRelease } from './disposeOnRelease'
 import { drillPresence } from './drillPresence'
+import { createPoolOrigin, followRenderOrigin } from './localParticles'
+import { renderOriginPresence } from './renderOriginPresence'
 
 /** Sparks draw just in front of the tiles and the vehicle. */
 const SPARK_Z = 0.3
@@ -44,6 +47,7 @@ const drillDirection = { x: 0, y: 0 }
 
 export function Sparks() {
   const pool = useMemo(() => createParticlePool(SPARK_CAPACITY), [])
+  const poolOrigin = useMemo(createPoolOrigin, [])
   const random = useMemo(() => createSeededRandom(SPARK_SEED), [])
   const carry = useMemo<EmissionCarry>(() => ({ owed: 0 }), [])
   const spray = useMemo(createSprayScratch, [])
@@ -55,6 +59,7 @@ export function Sparks() {
   const voice = useMemo<VoiceRead>(() => ({ voice: 'rock', sinceRead: VOICE_REFRESH_SECONDS }), [])
 
   useFrame((_, delta) => {
+    followRenderOrigin(pool, poolOrigin)
     stepParticles(pool, delta)
     refreshVoice(voice, material, delta)
     if (drillPresence.isDrilling)
@@ -123,8 +128,8 @@ function sprayFromNose(
   count: number,
 ): void {
   writeHeadlampDirection(drillPresence.up, drillPresence.facing, drillDirection)
-  spray.x = drillPresence.nose.x
-  spray.y = drillPresence.nose.y
+  spray.x = drillPresence.nose.x - renderOriginPresence.x
+  spray.y = drillPresence.nose.y - renderOriginPresence.y
   spray.dirX = -drillDirection.x
   spray.dirY = -drillDirection.y
   sprayParticles(pool, random, spray, count)

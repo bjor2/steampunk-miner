@@ -1,7 +1,8 @@
 /**
  * The shared terrain material: one ShaderMaterial for every chunk mesh, so the lamp and the clock
  * are set once per frame for the whole planet. Uniform values are updated in place; nothing here
- * allocates per frame.
+ * allocates per frame. Light positions reach the shader in render-local metres (ticket 339): the
+ * planet point less the render origin, taken in doubles, so f32 keeps them exact at any radius.
  */
 import { ShaderMaterial, Vector2 as ThreeVector2, Vector3 } from 'three'
 import {
@@ -33,10 +34,13 @@ import { TERRAIN_FRAGMENT_SHADER, TERRAIN_VERTEX_SHADER } from './terrainShader'
 import { createGateTintUniforms } from './terrainGateTint'
 import { createGateViewerUniforms } from './terrainGateViewer'
 import { createHeatTileUniforms } from './terrainHeatTiles'
+import { createTerrainOriginUniforms } from './terrainOrigin'
 import { createStrataUniforms } from './terrainStrata'
 
 /** What lights the terrain this frame. */
 export interface TerrainLight extends ArtefactLook {
+  /** The render origin the shader measures from, in planet metres. */
+  renderOrigin: Vector2
   lampPosition: Vector2
   vehicleUp: Vector2
   facing: Facing
@@ -86,6 +90,7 @@ export function createTerrainMaterial(): ShaderMaterial {
       ...createHeatTileUniforms(),
       ...createGateTintUniforms(),
       ...createGateViewerUniforms(),
+      ...createTerrainOriginUniforms(),
     },
   })
 }
@@ -93,27 +98,30 @@ export function createTerrainMaterial(): ShaderMaterial {
 export function lightTerrain(material: ShaderMaterial, light: TerrainLight): void {
   const { uniforms } = material
   uniforms.uTime.value += light.dt
-  uniforms.uLampPosition.value.set(light.lampPosition.x, light.lampPosition.y)
+  const { lampPosition, renderOrigin } = light
+  uniforms.uLampPosition.value.set(lampPosition.x - renderOrigin.x, lampPosition.y - renderOrigin.y)
   writeHeadlampDirection(light.vehicleUp, light.facing, uniforms.uLampDirection.value)
   uniforms.uPlanetRadius.value = light.planetRadiusTiles
-  writePointLights(uniforms.uPointLights.value, uniforms.uPointColours.value, light.pointLights)
+  writePointLights(uniforms, light.pointLights, renderOrigin)
   uniforms.uWhisper.value = light.isOreWhispering ? 1 : 0
   uniforms.uCacheLive.value = light.isCacheLive ? 1 : 0
 }
 
 /** Display colours like the lamp's; an unused slot is black, so it adds nothing. */
 function writePointLights(
-  positions: Vector3[],
-  colours: Vector3[],
+  uniforms: ShaderMaterial['uniforms'],
   lights: readonly PointLightSource[],
+  renderOrigin: Vector2,
 ): void {
+  const positions: Vector3[] = uniforms.uPointLights.value
+  const colours: Vector3[] = uniforms.uPointColours.value
   for (let at = 0; at < MAX_POINT_LIGHTS; at++) {
     const light = lights[at]
     if (light === undefined) {
       colours[at].set(0, 0, 0)
       continue
     }
-    positions[at].set(light.x, light.y, light.rangeM)
+    positions[at].set(light.x - renderOrigin.x, light.y - renderOrigin.y, light.rangeM)
     const [red, green, blue] = cachedRgbOf(light.colour)
     colours[at].set(red, green, blue).multiplyScalar(light.strength)
   }

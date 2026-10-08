@@ -2,7 +2,8 @@
  * The cement spray (#41 casing feel): as a casing ring is laid, a brief grey puff all round its
  * place behind the vehicle. Keyed to the `casingHiss` feedback cue, so it shows exactly when the
  * hiss plays. One fixed pool drawn as points, like the sparks; stepping, puffing and uploading
- * never allocate. Presentation only, on the render delta with its own fixed seed.
+ * never allocate. Presentation only, on the render delta with its own fixed seed. Render-local, like
+ * the sparks (ticket 339, `localParticles`).
  */
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo } from 'react'
@@ -30,6 +31,8 @@ import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import { createSeededRandom, type SeededRandom } from '../systems/seededRandom'
 import { useDisposeOnRelease } from './disposeOnRelease'
 import { drillPresence } from './drillPresence'
+import { createPoolOrigin, followRenderOrigin } from './localParticles'
+import { renderOriginPresence } from './renderOriginPresence'
 import { vehiclePresence } from './vehiclePresence'
 
 /** The puff draws just behind the sparks, in front of the tiles and the vehicle. */
@@ -45,6 +48,7 @@ interface PuffQueue {
 
 export function CementSpray() {
   const pool = useMemo(() => createParticlePool(CEMENT_CAPACITY), [])
+  const poolOrigin = useMemo(createPoolOrigin, [])
   const random = useMemo(() => createSeededRandom(CEMENT_SEED), [])
   const spray = useMemo(createSprayScratch, [])
   const queue = useMemo<PuffQueue>(() => ({ owed: 0 }), [])
@@ -55,6 +59,7 @@ export function CementSpray() {
   useEffect(() => listenForFeedback((cue) => owePuffOn(queue, cue)), [queue])
 
   useFrame((_, delta) => {
+    followRenderOrigin(pool, poolOrigin)
     stepParticles(pool, delta)
     puffBehindVehicle(pool, random, spray, queue)
     uploadPositions(pool, geometry)
@@ -106,8 +111,8 @@ function puffBehindVehicle(
 ): void {
   if (queue.owed === 0) return
   writeHeadlampDirection(drillPresence.up, drillPresence.facing, drillDirection)
-  spray.x = vehiclePresence.x - drillDirection.x * CEMENT_SPRAY_BEHIND_M
-  spray.y = vehiclePresence.y - drillDirection.y * CEMENT_SPRAY_BEHIND_M
+  spray.x = vehiclePresence.x - renderOriginPresence.x - drillDirection.x * CEMENT_SPRAY_BEHIND_M
+  spray.y = vehiclePresence.y - renderOriginPresence.y - drillDirection.y * CEMENT_SPRAY_BEHIND_M
   sprayParticles(pool, random, spray, queue.owed * CEMENT_PUFF_COUNT)
   queue.owed = 0
 }

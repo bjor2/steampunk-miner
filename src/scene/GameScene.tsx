@@ -2,6 +2,9 @@
  * The 2D world: an orthographic camera looking down -Z at the XY plane, rolling with the planet
  * (#13). Frames go through `RenderPipeline` (#38: bloom, tone curve, vignette, adaptive render
  * scale); `flat` leaves three's own tone mapping off, because the composite pass does it.
+ * Whatever is placed in planet metres hangs under the world root, measured with the camera from the
+ * floating render origin (ticket 339); the particle pools are render-local, and the flash veil
+ * follows the camera.
  */
 import { Canvas } from '@react-three/fiber'
 import { CAMERA_POSITION, CANVAS_DPR_RANGE } from '../constants/scene'
@@ -27,6 +30,7 @@ import { SoundStage } from './SoundStage'
 import { Sparks } from './Sparks'
 import { Vehicle } from './Vehicle'
 import { WorldPieces } from './WorldPieces'
+import { WorldRoot } from './WorldRoot'
 
 /**
  * One human player in the slice, so settings pause the local game (#33), and a scenario waits for
@@ -50,19 +54,21 @@ export function GameScene() {
       <SkyBackground />
       <ScreenFeedback />
       <PlanetCamera />
-      <LightRig />
-      <PlanetTerrain />
-      <PlatformYard />
-      <WorldPieces layer="platform" />
-      <EnemyFigures />
-      <PhysicsWorld isHeld={isGameHeld}>
-        <Vehicle />
-      </PhysicsWorld>
+      <WorldRoot>
+        <LightRig />
+        <PlanetTerrain />
+        <PlatformYard />
+        <WorldPieces layer="platform" />
+        <EnemyFigures />
+        <PhysicsWorld isHeld={isGameHeld}>
+          <Vehicle />
+        </PhysicsWorld>
+        <CollapseTelegraph />
+        <BlastScorches />
+        <SceneLayers />
+      </WorldRoot>
       <Sparks />
       <CementSpray />
-      <CollapseTelegraph />
-      <BlastScorches />
-      <SceneLayers />
       <SoundStage />
       <PerfSampler />
       <ScreenProjectorFeed />

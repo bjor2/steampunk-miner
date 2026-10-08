@@ -36,6 +36,13 @@
  * (`uGateStill`, the shake switch) time stops at one moment for the markers: a surface motion is
  * cut as its engraved glyph, a groove with a lit lip, and the rim's glint holds still. A kind with
  * no pattern yet draws the placeholder. A cell with no gate skips it all.
+ *
+ * Positions are split (ticket 339, #316 scope e): chunk meshes hang under the world root, so
+ * `vWorld` is render-local, the lo half of a fragment's planet position, and the render origin
+ * `uWorldOffset`, a chunk corner, is the hi half. f32 holds both exactly at any planet radius and
+ * `gl_Position` never sees more than about 1.5 km. Lights, heat tiles and bricks read the lo half
+ * (the origin is a whole number of their tiles); hashes add the hi half as whole cells; directions
+ * and radii read the sum; the strata rings add their change from the origin's own ring coordinates.
  */
 
 export const TERRAIN_VERTEX_SHADER = /* glsl */ `
@@ -54,12 +61,14 @@ varying vec4 vOre;
 varying vec4 vStyle;
 varying float vGate;
 
+uniform vec2 uWorldOffset;
+
 void main() {
   vLocal = position.xy + 0.5;
   vChunk = position.xy + aTile + 0.5;
   vec4 world = modelMatrix * vec4(position.xy + aTile + 0.5, 0.0, 1.0);
   vWorld = world.xy;
-  vTile = floor((modelMatrix * vec4(aTile + 0.5, 0.0, 1.0)).xy);
+  vTile = floor((modelMatrix * vec4(aTile + 0.5, 0.0, 1.0)).xy) + uWorldOffset;
   vBase = aBase;
   vOre = aOre;
   vStyle = aStyle;
@@ -107,6 +116,11 @@ uniform vec3 uGateTint;
 // The local player's drill tip major and reduce motion, 1 or 0 (terrainGateViewer.ts).
 uniform float uGateTipMajor;
 uniform float uGateStill;
+// The render origin in planet metres, the hi half of every position (terrainOrigin.ts), and its
+// strata ring coordinates wrapped to one tile: u per band, v shared.
+uniform vec2 uWorldOffset;
+uniform float uStrataOriginU[5];
+uniform float uStrataOriginV;
 
 varying vec2 vLocal;
 varying vec2 vChunk;
@@ -151,6 +165,17 @@ vec3 linearToDisplay(vec3 colour) {
   vec3 low = colour * 12.92;
   vec3 high = 1.055 * pow(colour, vec3(1.0 / 2.4)) - 0.055;
   return mix(low, high, step(vec3(0.0031308), colour));
+}
+
+// A render-local point's planet position. Past about 65 km the sum drops the lo half's
+// millimetres, so it serves directions and radii only.
+vec2 planetPointOf(vec2 lo) {
+  return uWorldOffset + lo;
+}
+
+// floor(planet position x perMetre), exact: the origin is a chunk corner, so a whole number of cells.
+vec2 planetCellOf(vec2 lo, vec2 perMetre) {
+  return floor(lo * perMetre) + uWorldOffset * perMetre;
 }
 
 float densityAt(vec2 chunkLocal) {
@@ -383,8 +408,14 @@ int bandOfTile(vec2 tile) {
 
 // Ring coordinates in strata tiles: u runs clockwise along the band and v outward, so the map's
 // right and up are the ground's wherever the camera rolls (the maps upload unflipped, v down).
-vec2 strataUv(vec2 world, float turns) {
-  return vec2(-atan(world.y, world.x) / TAU * turns, -length(world) / uStrataTileM);
+// They run from the render origin's own (baseU, uStrataOriginV), adding the small turn and outward
+// step from the origin to the render-local point, so they keep texel precision at any radius.
+vec2 strataUv(vec2 lo, float turns, float baseU) {
+  vec2 hi = uWorldOffset;
+  if (dot(hi, hi) < 0.5) return vec2(-atan(lo.y, lo.x) / TAU * turns, -length(lo) / uStrataTileM);
+  float turn = atan(hi.x * lo.y - hi.y * lo.x, dot(hi, hi) + dot(hi, lo));
+  float outward = (2.0 * dot(hi, lo) + dot(lo, lo)) / (length(hi + lo) + length(hi));
+  return vec2(baseU - turn / TAU * turns, uStrataOriginV - outward / uStrataTileM);
 }
 
 // The change of strataUv for a change of world position: continuous across atan's wrap, so the
@@ -425,8 +456,9 @@ float reliefToward(vec2 from, vec2 world, vec3 normal) {
   return max(0.0, 1.0 + RELIEF * dot(normal.xy, toLight / max(length(toLight), 0.0001)));
 }
 
-vec3 lightAt(vec2 world, vec3 normal) {
-  float depth = uPlanetRadius - length(world);
+// world: render-local, like the lamp and the point lights; radius: from the planet's centre.
+vec3 lightAt(vec2 world, float radius, vec3 normal) {
+  float depth = uPlanetRadius - radius;
   float ambient = mix(uAmbientSurface, uAmbientDeep, clamp(depth / uAmbientFade, 0.0, 1.0));
   vec2 toPoint = world - uLampPosition;
   float distance = length(toPoint);
@@ -446,6 +478,8 @@ vec3 lightAt(vec2 world, vec3 normal) {
 void main() {
   float density = densityAt(vChunk);
   if (density < ISO) discard;
+  vec2 planet = planetPointOf(vWorld);
+  float radius = length(planet);
   float style = vStyle.x;
   vec3 colour = vBase * (0.94 + 0.08 * hash12(floor(vLocal * 6.0) + vTile * 7.0));
   vec3 normal = vec3(0.0, 0.0, 1.0);
@@ -457,23 +491,23 @@ void main() {
   if (uHasStrata > 0.5 && style < 1.5) {
     int band = bandOfTile(vTile);
     float turns = uStrataTurns[band - 1];
-    vec2 uv = strataUv(vWorld, turns);
-    vec2 dx = strataUvChange(vWorld, worldDx, turns);
-    vec2 dy = strataUvChange(vWorld, worldDy, turns);
+    vec2 uv = strataUv(vWorld, turns, uStrataOriginU[band - 1]);
+    vec2 dx = strataUvChange(planet, worldDx, turns);
+    vec2 dy = strataUvChange(planet, worldDy, turns);
     colour = linearToDisplay(strataAlbedo(band, uv, dx, dy).rgb) * uStrataTint[band - 1];
-    normal = groundNormalOf(strataNormal(band, uv, dx, dy).xyz * 2.0 - 1.0, vWorld);
+    normal = groundNormalOf(strataNormal(band, uv, dx, dy).xyz * 2.0 - 1.0, planet);
   }
   if (style < 0.5 && vStyle.y > 0.5) {
     // Refractory lining (#113): firebrick, its joints glowing.
     vec2 uv = vWorld / HEAT_TILE_M;
     colour = uHasHeatTiles > 0.5
       ? linearToDisplay(texture2D(uRefractoryAlbedo, uv).rgb)
-      : FIREBRICK * (0.85 + 0.15 * hash12(floor(vWorld / vec2(0.5, 0.25))));
+      : FIREBRICK * (0.85 + 0.15 * hash12(planetCellOf(vWorld, vec2(2.0, 4.0))));
   }
   colour = mix(colour, colour * 1.5 + vec3(0.06, 0.05, 0.03), 0.55 * edgeHighlight(density));
-  vec3 light = lightAt(vWorld, normal);
+  vec3 light = lightAt(vWorld, radius, normal);
   vec3 emissive = vec3(0.0);
-  float ember = 0.75 + 0.25 * sin(uTime * 1.3 + length(vWorld) * 0.6);
+  float ember = 0.75 + 0.25 * sin(uTime * 1.3 + radius * 0.6);
   if (style < 0.5 && vStyle.y > 0.5) {
     vec2 uv = vWorld / HEAT_TILE_M;
     vec3 seams = uHasHeatTiles > 0.5
@@ -487,9 +521,9 @@ void main() {
     vec2 uv = vWorld / HEAT_TILE_M + vec2(uTime * 0.015, 0.0);
     vec3 glow = uHasHeatTiles > 0.5
       ? linearToDisplay(texture2D(uLavaEmissive, uv).rgb)
-      : MOLTEN * (0.55 + 0.45 * hash12(floor(vWorld * 3.0) + floor(uTime * 0.5)));
+      : MOLTEN * (0.55 + 0.45 * hash12(planetCellOf(vWorld, vec2(3.0)) + floor(uTime * 0.5)));
     colour = uHasHeatTiles > 0.5 ? linearToDisplay(texture2D(uLavaAlbedo, uv).rgb) : vBase * 0.35;
-    emissive += glow * (0.8 + 0.2 * sin(uTime * 2.1 + length(vWorld) * 0.9));
+    emissive += glow * (0.8 + 0.2 * sin(uTime * 2.1 + radius * 0.9));
   } else if (style > 3.5) {
     // The artefact cache: a banded casket with a rune ring, live or a dull husk.
     vec2 fromCentre = vLocal - 0.5;
@@ -505,7 +539,7 @@ void main() {
     light = max(light, vec3(uAmbientSurface));
   } else if (style > 1.5) {
     // The core: a slow emissive pulse rippling out from the centre.
-    emissive += colour * 0.6 * (0.55 + 0.25 * sin(uTime * 1.7 - length(vWorld) * 0.8));
+    emissive += colour * 0.6 * (0.55 + 0.25 * sin(uTime * 1.7 - radius * 0.8));
   } else if (style > 0.5) {
     float shape = vStyle.z < 1.5 ? flecks(vLocal, vTile) : shards(vLocal, vTile);
     colour = mix(colour, vOre.rgb * max(shape, 0.65), step(0.01, shape));
@@ -523,7 +557,7 @@ void main() {
   float gateOpen = gateOpenness(gateBits);
   if (isGatedCell(gateBits) && isGateDrawn(gateKind, gateOpen)) {
     // The top layer: it covers the ore and its glow beneath it.
-    vec3 marker = gatePatternOf(gateKind, vLocal, normalize(vWorld), gateOpen, gateSoft);
+    vec3 marker = gatePatternOf(gateKind, vLocal, normalize(planet), gateOpen, gateSoft);
     marker = gateMarkerInState(marker, gateStateOf(gateBits), vLocal);
     colour = mix(colour, GATE_DARK, marker.x);
     colour = mix(colour, uGateTint, marker.y);

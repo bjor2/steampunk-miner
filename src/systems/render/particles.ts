@@ -78,6 +78,17 @@ export function stepParticles(pool: ParticlePool, dt: number): void {
   }
 }
 
+/**
+ * Moves every live particle by whole metres: a pool measured from the render origin follows it to
+ * a new chunk corner (ticket 339), so the particles stay where they were on the planet.
+ */
+export function shiftParticles(pool: ParticlePool, dx: number, dy: number): void {
+  for (let at = 0; at < pool.count; at++) {
+    pool.x[at] += dx
+    pool.y[at] += dy
+  }
+}
+
 function addParticle(pool: ParticlePool, random: SeededRandom, spray: Spray): void {
   const turn = (2 * random.nextFloat() - 1) * spray.spreadRadians
   const speed = spray.speed * (0.5 + 0.5 * random.nextFloat())
