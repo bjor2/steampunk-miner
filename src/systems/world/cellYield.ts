@@ -30,7 +30,8 @@ export interface YieldedCell {
   cell: number
 }
 
-const YIELD_SUM = (SAMPLES_PER_CELL * SOLID_DENSITY) >> 1
+/** The density sum at or below which a cell counts as removed: half of full. */
+export const YIELD_SUM = (SAMPLES_PER_CELL * SOLID_DENSITY) >> 1
 
 /** Touched, removable, not yet yielded cells whose 16 samples now sum to half or less. */
 export function cellsNowYielding(
