@@ -155,7 +155,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
-### `ground-gun`: 12 files, 100 tests
+### `ground-gun`: 15 files, 115 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -166,11 +166,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/systems/borePickup.test.ts` | 4 | 4 |
 | `src/features/ground-gun/systems/fireAim.test.ts` | 7 | 7 |
 | `src/features/ground-gun/systems/fireHold.test.ts` | 9 | 8 |
+| `src/features/ground-gun/systems/fireTile.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/groundGunEconomy.test.ts` | 7 | 7 |
 | `src/features/ground-gun/systems/gunLevels.test.ts` | 6 | 6 |
 | `src/features/ground-gun/systems/gunPurchase.test.ts` | 10 | 10 |
 | `src/features/ground-gun/systems/gunRecovery.test.ts` | 11 | 9 |
 | `src/features/ground-gun/systems/gunTracks.test.ts` | 11 | 11 |
+| `src/features/ground-gun/systems/render/aimOnScreen.test.ts` | 5 | 5 |
+| `src/features/ground-gun/systems/tilePress.test.ts` | 7 | 7 |
 
 ### `mining-gates`: 23 files, 148 tests
 

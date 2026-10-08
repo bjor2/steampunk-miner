@@ -1,0 +1,15 @@
+/* The reticle covers the overlay, which covers the canvas, so projected pixels land in place. */
+.reticle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.line {
+  stroke: var(--color-brass);
+  stroke-width: 3px;
+  stroke-dasharray: 6px 4px;
+  stroke-linecap: round;
+}

@@ -1,0 +1,14 @@
+{
+  "$comment": "The fire tile's feel (ticket 314; #309 Gameplay touch input, the TD on #314): a press that neither drags nor lets go within holdFireTicks (a quarter second) becomes a held gun that fires on each tick the recovery allows; a drag of dragAimPixels from the press aims instead, and fires on release; a quick tap fires along the facing on release. A refused shot clanks with refusalClank, a single voice shaped like the kernel's light clank (square at 140 Hz, a band of noise at 1200 Hz), since the clank means a blocked shot; the recovery never clanks. Starting values for G&V, checked by ear in npm run dev.",
+  "dragAimPixels": 12,
+  "holdFireTicks": 15,
+  "refusalClank": {
+    "id": "ground-gun.refusal-clank",
+    "voices": 1,
+    "tone": {
+      "partials": [{ "wave": "square", "frequency": 140, "gain": 0.22 }],
+      "noise": { "frequency": 1200, "q": 4, "gain": 0.4 },
+      "seconds": 0.35
+    }
+  }
+}
