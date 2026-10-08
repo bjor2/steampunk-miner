@@ -3,7 +3,8 @@
  * channel ends with the miner still, the nearest drainable ore cells within its radius fade to
  * plain ground, half of their ore goes to the hold, and the trip counter moves by what it paid.
  * The cells per use are the use's magnitude, the drain's ladder at the Mark researched (#249); a
- * use that carries none takes the #162 base.
+ * use that carries none takes the #162 base. A combo may widen the radius and reorder the
+ * drainable cells through the kernel item hooks (`drainHooks.ts`, ticket 325).
  *
  * Nothing changes and nothing is spent (power-up-core returns the charge) when:
  * - the trip is at its cap, or the first cell would pay past it: `extraction.drain_capped`;
@@ -23,6 +24,7 @@ import { bandOfTile } from '../../../systems/world/planetGeometry'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { GROUND_CELL } from '../../../systems/world/worldCell'
 import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
+import { cellsInHookOrder, hookedReachOf } from './drainHooks'
 import { drainReachOf, type DrainReach } from './drainReach'
 import { paidCountOf, takeDrainCells, type DrainTake } from './drainTake'
 import { drainYieldedOf } from './extractionEvents'
@@ -70,9 +72,9 @@ function drainSceneOf(state: AuthorityState, params: PlanetParams, use: PowerUpU
     playerId: use.playerId,
     tool: toolOf(item),
     origin: use.origin,
-    reachTiles: balanceOf(item).reachTiles,
+    reachTiles: hookedReachOf(state, use, item),
   })
-  const take = takeDrainCells(reach.drainable, {
+  const take = takeDrainCells(cellsInHookOrder(state, use, item, reach.drainable), {
     maxCells: use.magnitude ?? balanceOf(item).cellsPerUse,
     room: roomUnderCapOf(trip.incomeItemValue, cap),
     holdRoom: statsOfVehicle(vehicle).cargoCapacity - cargoUnitsOf(vehicle.cargo),
