@@ -78,3 +78,10 @@ export const COLLISION_BLOCK_METRES = 4
  * so a box meets them as vertical walls (the game is 2D, Z is locked).
  */
 export const WALL_HALF_DEPTH = 1
+
+/**
+ * The client's floating origin re-centres when the rig is farther than this from it (ticket 339,
+ * #316 scope e, locked with both Scalers): f32 Rapier and GPU coordinates then stay within about
+ * 1.5 km of zero, where a step is at most 0.12 mm, at any planet radius.
+ */
+export const RENDER_ORIGIN_REACH_MM = 1_000_000

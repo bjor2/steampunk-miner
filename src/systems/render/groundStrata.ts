@@ -6,6 +6,10 @@
  * drifts a little toward the band's inner and outer edges. Bands change texture at their edges
  * anyway, so the turn count may change there too.
  *
+ * Far from the planet's centre f32 cannot hold those coordinates to a texel, so the shader measures
+ * them from the render origin (ticket 339): the origin's own ring coordinates, wrapped to one tile
+ * here in doubles (`strataRingBaseOf`), plus the small change from there to the fragment.
+ *
  * The maps are authored at planet 1's band colours (scripts/art/author_tiles.py); another planet
  * tints them by the ratio of its band colour to planet 1's (#51 "planet 2 tints them").
  */
@@ -28,6 +32,21 @@ export function strataTurnsOf(params: PlanetParams): number[] {
   return BANDS.map((band) => turnsAround(middleRadiusOfBand(params, band)))
 }
 
+/** The render origin's ring coordinates, wrapped to one strata tile: `u` per band, `v` shared. */
+export interface StrataRingBase {
+  u: number[]
+  v: number
+}
+
+/** Where a point in metres lies in each band's rings, wrapped to [0, 1): the shader's `uv` there. */
+export function strataRingBaseOf(x: number, y: number, turns: readonly number[]): StrataRingBase {
+  const turnShare = -Math.atan2(y, x) / (2 * Math.PI)
+  return {
+    u: turns.map((bandTurns) => wrapToOneTile(turnShare * bandTurns)),
+    v: wrapToOneTile(-Math.hypot(x, y) / STRATA_TILE_M),
+  }
+}
+
 /** Per channel, the planet's band colour over planet 1's: all ones on planet 1. */
 export function strataTintsOf(paletteId: string): Rgb[] {
   const palette = paletteOf(paletteId)
@@ -48,6 +67,11 @@ function outerRadiusOfBand(params: PlanetParams, band: number): number {
 
 function turnsAround(radius: number): number {
   return Math.max(1, Math.round((2 * Math.PI * radius) / STRATA_TILE_M))
+}
+
+/** `+ 0` keeps a whole tile from reading as -0. */
+function wrapToOneTile(coordinate: number): number {
+  return coordinate - Math.floor(coordinate) + 0
 }
 
 function ratioOf(colour: Rgb, authored: Rgb): Rgb {

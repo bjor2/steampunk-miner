@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { planetParamsFor } from '../world/planetParams'
 import { bandColourOf, paletteOf } from './bandPalette'
-import { STRATA_TILE_M, strataTintsOf, strataTurnsOf } from './groundStrata'
+import { STRATA_TILE_M, strataRingBaseOf, strataTintsOf, strataTurnsOf } from './groundStrata'
 
 const planet1 = planetParamsFor(83921, 1)
 const planet2 = planetParamsFor(83921, 2)
@@ -34,5 +34,23 @@ describe('ground strata', () => {
       const tinted = authored.map((channel, at) => channel * tints[band - 1][at])
       tinted.forEach((channel, at) => expect(channel).toBeCloseTo(wanted[at], 10))
     }
+  })
+
+  it('starts the rings at the planet’s centre, where the render origin begins', () => {
+    expect(strataRingBaseOf(0, 0, [3, 5])).toEqual({ u: [0, 0], v: 0 })
+  })
+
+  it('wraps the render origin’s ring coordinates to one tile, matching the whole ones', () => {
+    const turns = [785_398, 700_001]
+    const [x, y] = [-307_200, 409_600]
+    const base = strataRingBaseOf(x, y, turns)
+    const radiusTiles = Math.hypot(x, y) / STRATA_TILE_M
+    expect(base.v).toBeCloseTo(-radiusTiles - Math.floor(-radiusTiles), 6)
+    turns.forEach((bandTurns, band) => {
+      const u = (-Math.atan2(y, x) / (2 * Math.PI)) * bandTurns
+      expect(base.u[band]).toBeCloseTo(u - Math.floor(u), 6)
+      expect(base.u[band]).toBeGreaterThanOrEqual(0)
+      expect(base.u[band]).toBeLessThan(1)
+    })
   })
 })
