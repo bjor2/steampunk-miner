@@ -15,11 +15,15 @@
  * drill's cut (`drillGearCut.ts`); with none registered the cut is the disc alone. On a magnetic
  * planet an electrified cell takes its shock's ticks longer, and shocks the vehicle as it breaks
  * (`magnetic/electrifiedShock.ts`, spec #258).
+ *
+ * The swept cut (`drillStep`, ticket 330, `sweptDrill.ts`) goes through the same path one tick at a
+ * time, counting drill time in sub-steps (`SUB_STEP_CLOCK`); every other drill counts whole ticks.
  */
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { casingHardness } from '../economy/casingGrades'
 import { coreHardness, blockHardness, oreSalePrice } from '../economy/oreEconomy'
 import { toCanonical, type BigStat } from '../money'
-import { drillDamage, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
+import { drillDamage, subStepsPerTile, ticksPerTile, type DrillStats } from '../vehicle/drillRule'
 import { drillStampOf } from '../vehicle/drillStamp'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import type { AheadLatch } from '../vehicle/aheadBearingLatch'
@@ -27,7 +31,7 @@ import type { DriveSigns } from '../vehicle/driveSigns'
 import type { SideLatch } from '../vehicle/facedSide'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { hasCargoRoom, withOreUnit, type VehicleState } from '../vehicle/vehicleState'
-import { carveCell, type Carve, type CellDrillTicks } from '../world/groundEdit'
+import { carveCell, type Carve, type CarveWindow, type CellDrillTicks } from '../world/groundEdit'
 import type { YieldedCell } from '../world/cellYield'
 import { bandOfTile } from '../world/planetGeometry'
 import type { PlanetParams } from '../world/planetParams'
@@ -57,7 +61,27 @@ import {
   type ShockTicksAt,
 } from './magnetic/electrifiedShock'
 
-type CarveIn = (request: DrillCarveRequest) => DrillCarve
+type CarveIn<C extends DrillCarve = DrillCarve> = (request: DrillCarveRequest) => C
+
+/**
+ * How a drill command counts drill time: in whole ticks, or in the swept cut's sub-steps of a
+ * tick (ticket 330), with the cell times read in the same unit.
+ */
+export interface DrillClock {
+  subStepsPerTick: number
+  cellTimesOf: (
+    params: PlanetParams,
+    drill: DrillStats,
+    shockTicksAt: ShockTicksAt,
+  ) => CellDrillTicks
+}
+
+export const WHOLE_TICK_CLOCK: DrillClock = { subStepsPerTick: 1, cellTimesOf: drillTicksOfCells }
+
+export const SUB_STEP_CLOCK: DrillClock = {
+  subStepsPerTick: DRILL_SUBSTEPS_PER_TICK,
+  cellTimesOf: drillSubStepsOfCells,
+}
 
 /** Scripted mining: one cell's samples; call with a planet that has params. */
 export function drillCell(
@@ -134,10 +158,16 @@ function shockedTicksPerCell(
   return cut === null ? null : cut + shockTicksAt(params, tile, cell)
 }
 
-interface DrillTarget {
+export interface DrillTarget<C extends DrillCarve = DrillCarve> {
   /** The cell the drill is said to work on, for `drill_damage_dealt` and burrowers. */
   tile: TilePoint
-  carve: CarveIn
+  carve: CarveIn<C>
+}
+
+/** A drill command's effect, and its carve, or null when the tank paid for no tick. */
+export interface DrillOutcome<C extends DrillCarve> {
+  effect: RuleEffect
+  carved: C | null
 }
 
 function drillGround(
@@ -147,14 +177,50 @@ function drillGround(
   target: DrillTarget,
   requestedTicks: number,
 ): RuleEffect {
+  return drillGroundBy(state, params, playerId, target, requestedTicks, WHOLE_TICK_CLOCK).effect
+}
+
+/** The one drill path, counting drill time on `clock`. */
+export function drillGroundBy<C extends DrillCarve>(
+  state: AuthorityState,
+  params: PlanetParams,
+  playerId: string,
+  target: DrillTarget<C>,
+  requestedTicks: number,
+  clock: DrillClock,
+): DrillOutcome<C> {
   const vehicle = vehicleOf(state, playerId)
   const drill = heatThrottledDrill(params.planetIndex, vehicle)
   const ticks = Math.min(requestedTicks, affordableTicksOf(vehicle))
-  if (ticks === 0) return unchanged(state)
-  const window = { firstTick: Math.max(0, state.tick - ticks), ticks }
-  const cellTicks = drillTicksOfCells(params, drill, shockTicksFor(state, playerId))
+  if (ticks === 0) return { effect: unchanged(state), carved: null }
+  const window = windowOf(state.tick, ticks, clock)
+  const cellTicks = clock.cellTimesOf(params, drill, shockTicksFor(state, playerId))
   const gates = openDrillGates(state, playerId, params, cellTicks)
   const carved = target.carve({ world: state.world, window, gates, energy: vehicle.energy })
+  const effect = chargeAndCollect(state, params, playerId, { target, drill, gates, carved })
+  return { effect, carved }
+}
+
+/** The last `ticks` fixed steps before `tick`, counted on the clock's sub-steps. */
+function windowOf(tick: number, ticks: number, clock: DrillClock): CarveWindow {
+  return { firstTick: Math.max(0, tick - ticks), ticks, subStepsPerTick: clock.subStepsPerTick }
+}
+
+/** What a carve did, ready to be charged and collected. */
+interface CarvedDrill {
+  target: DrillTarget<DrillCarve>
+  drill: DrillStats
+  gates: DrillGates
+  carved: DrillCarve
+}
+
+function chargeAndCollect(
+  state: AuthorityState,
+  params: PlanetParams,
+  playerId: string,
+  { target, drill, gates, carved }: CarvedDrill,
+): RuleEffect {
+  const vehicle = vehicleOf(state, playerId)
   if (carved.ticksUsed === 0) return { state, events: gates.refusedEvents() }
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
     ...withLatches(vehicle, carved),
@@ -191,6 +257,30 @@ function withSideLatch(vehicle: VehicleState, latch: SideLatch | null): VehicleS
 
 function affordableTicksOf(vehicle: VehicleState): number {
   return Math.floor(vehicle.energy / ENERGY_QUANTA_PER_TICK.drill)
+}
+
+/** `drillTicksOfCells` in the swept cut's sub-steps (ticket 330): the same cells, never rounded to a tick. */
+export function drillSubStepsOfCells(
+  params: PlanetParams,
+  drill: DrillStats,
+  shockTicksAt: ShockTicksAt,
+): CellDrillTicks {
+  return (tile, material, casingGrade) =>
+    casingGrade === 0
+      ? shockedSubStepsPerCell(drill, params, tile, material, shockTicksAt)
+      : subStepsPerTile(drill, casingHardness(params.planetIndex, casingGrade))
+}
+
+function shockedSubStepsPerCell(
+  drill: DrillStats,
+  params: PlanetParams,
+  tile: TilePoint,
+  cell: number,
+  shockTicksAt: ShockTicksAt,
+): number | null {
+  const floor = scratchFloorOfCell(params, tile, cell)
+  const cut = subStepsPerTile(drill, hardnessOfTile(params, tile, cell), floor)
+  return cut === null ? null : cut + shockTicksAt(params, tile, cell) * DRILL_SUBSTEPS_PER_TICK
 }
 
 /**

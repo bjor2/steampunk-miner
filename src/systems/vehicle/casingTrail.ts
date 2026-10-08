@@ -12,6 +12,10 @@
  * charge is per metre of tunnel, not per ring (#76, #115): the distance from the previous point, or
  * one ring spacing when it starts a new cut (no previous point, or one further than the ring lag,
  * whose ring was already due). A dig recorded every 0.5 m and one recorded every 1 m charge the same.
+ *
+ * The swept cut (ticket 330) records along its cut instead (`followCasingTrailAlongCut`): a point
+ * every `CASING_RING_SPACING_MM` on the line from the last recorded point to the centre the cut
+ * reached, each standing for one spacing, so the rings keep their spacing at any step length.
  */
 import {
   CASING_RING_LAG_MM,
@@ -53,6 +57,47 @@ export function followCasingTrail(
 ): TrailStep {
   const recorded = isCutting ? recordAxisPoint(trail, stampCentre) : trail
   return splitDuePoints(recorded, stampCentre)
+}
+
+/** The trail after the swept cut's stamp centre reached `stampCentre`, recording at fixed spacing. */
+export function followCasingTrailAlongCut(
+  trail: CasingTrail,
+  stampCentre: RingPoint,
+  isCutting: boolean,
+): TrailStep {
+  const recorded = isCutting ? recordAxisPointsAlong(trail, stampCentre) : trail
+  return splitDuePoints(recorded, stampCentre)
+}
+
+/** One point per whole spacing from the last point toward the centre; a new cut starts as before. */
+function recordAxisPointsAlong(trail: CasingTrail, stampCentre: RingPoint): CasingTrail {
+  const last = trail.lastAxisPoint
+  if (last === null || squaredDistance(last, stampCentre) > squared(CASING_RING_LAG_MM)) {
+    return recordAxisPoint(trail, stampCentre)
+  }
+  const points = spacedPointsBetween(last, stampCentre)
+  if (points.length === 0) return trail
+  return {
+    lastAxisPoint: pointOnly(points[points.length - 1]),
+    unlined: [...trail.unlined, ...points],
+  }
+}
+
+function spacedPointsBetween(from: RingPoint, to: RingPoint): AxisPoint[] {
+  const length = Math.floor(Math.sqrt(squaredDistance(from, to)))
+  const count = Math.floor(length / CASING_RING_SPACING_MM)
+  return Array.from({ length: count }, (_, index) => {
+    const along = (index + 1) * CASING_RING_SPACING_MM
+    return {
+      xMm: from.xMm + Math.floor(((to.xMm - from.xMm) * along) / length),
+      yMm: from.yMm + Math.floor(((to.yMm - from.yMm) * along) / length),
+      lengthMm: CASING_RING_SPACING_MM,
+    }
+  })
+}
+
+function pointOnly({ xMm, yMm }: RingPoint): RingPoint {
+  return { xMm, yMm }
 }
 
 function recordAxisPoint(trail: CasingTrail, stampCentre: RingPoint): CasingTrail {

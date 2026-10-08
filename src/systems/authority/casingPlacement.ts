@@ -12,6 +12,7 @@
  */
 import {
   followCasingTrail,
+  followCasingTrailAlongCut,
   type AxisPoint,
   type RingPoint,
   type TrailStep,
@@ -47,6 +48,35 @@ export function layCasingAtPose(
   return layCasingAlongTrail(state, playerId, motion)
 }
 
+/**
+ * A report whose drill ticks the swept cut's steps already cut (ticket 330): the steps recorded
+ * the axis, so the report only lays the rings now due.
+ */
+export function layDueCasingAtPose(
+  state: AuthorityState,
+  playerId: string,
+  payload: PosePayload,
+): RuleEffect {
+  return layCasingAlongTrail(state, playerId, { isLifting: payload.thrusting, isCutting: false })
+}
+
+/**
+ * The swept cut's rings (ticket 330): axis points at fixed spacing along the line to where the
+ * step's stamp centre cut, so no step length leaves a gap.
+ */
+export function layCasingAlongCut(
+  state: AuthorityState,
+  playerId: string,
+  reached: RingPoint,
+  isCutting: boolean,
+): RuleEffect {
+  const params = planetParamsOf(state.planet)
+  const vehicle = vehicleOf(state, playerId)
+  if (params === null || !isVehicleActive(vehicle)) return unchanged(state)
+  const step = followCasingTrailAlongCut(vehicle.casingTrail, reached, isCutting)
+  return layTrailStep(state, playerId, params, step)
+}
+
 /** Scripted mining cuts from the last reported pose, which never lifts (`drillTile`, #115). */
 export function layCasingAfterScriptedDrill(
   state: AuthorityState,
@@ -62,9 +92,19 @@ function layCasingAlongTrail(
   motion: DrillMotion,
 ): RuleEffect {
   const params = planetParamsOf(state.planet)
-  const vehicle = vehicleOf(state, playerId)
-  const step = trailStepOf(vehicle, motion)
+  const step = trailStepOf(vehicleOf(state, playerId), motion)
   if (params === null || step === null) return unchanged(state)
+  return layTrailStep(state, playerId, params, step)
+}
+
+/** The vehicle keeps the trail's rest and lays the rings now due. */
+function layTrailStep(
+  state: AuthorityState,
+  playerId: string,
+  params: PlanetParams,
+  step: TrailStep,
+): RuleEffect {
+  const vehicle = vehicleOf(state, playerId)
   const moved = withVehicle(state, playerId, { ...vehicle, casingTrail: step.trail })
   const lining = { grade: vehicle.casingGrade, liningType: vehicle.lining.active }
   return layRings(moved, playerId, params, step.due, lining)

@@ -13,6 +13,7 @@
  *
  * After an accepted command the collapse watch looks at the ground and the vehicles as they now
  * stand (#43): new weak blocks near a vehicle start warning, and warnings no longer held cancel.
+ * A `drillStep` (ticket 330) is the exception: sent every tick, it leaves the watch to the reports.
  * Then the slices' authority reactions fold its events into their sections (#219), reading the
  * state from before the command.
  */
@@ -31,6 +32,7 @@ import type { AuthorityState } from './authorityState'
 import {
   chainEffects,
   rejectionOf,
+  unchanged,
   type CommandRule,
   type Rejection,
   type RuleEffect,
@@ -42,6 +44,7 @@ import { sliceCommandRuleOf } from '../registries/commandRules'
 import { followCollapse } from './collapse/collapseFollow'
 import { DEBUG_COMMAND_RULES } from './debugCommandRules'
 import { DOCK_COMMAND_RULES } from './dockRules'
+import { DRILL_STEP_RULES } from './drillStepRules'
 import { GUN_RULES } from './gunRules'
 import { LINING_RULES } from './liningRules'
 import { LOADOUT_RULES } from './loadoutRules'
@@ -88,6 +91,7 @@ export function refusalOfIntent(
 const COMMAND_RULES: Readonly<Record<string, CommandRule<CommandType>>> = {
   ...DEBUG_COMMAND_RULES,
   ...VEHICLE_COMMAND_RULES,
+  ...DRILL_STEP_RULES,
   ...DOCK_COMMAND_RULES,
   ...PLATFORM_SERVICE_RULES,
   ...WORKSHOP_RULES,
@@ -194,7 +198,10 @@ function ruleRejection(state: AuthorityState, command: unknown): Rejection | nul
 
 function acceptCommand(state: AuthorityState, command: AuthorityCommand): CommandOutcome {
   const receipted = recordReceipt(state, command)
-  const effect = chainEffects(receipted, [(current) => applyRule(current, command), followCollapse])
+  const effect = chainEffects(receipted, [
+    (current) => applyRule(current, command),
+    (current) => followCollapseAfter(current, command),
+  ])
   return reactToStep(state, {
     state: effect.state,
     events: stampEvents(command, [...effect.events, ...debugTrailOf(command)]),
@@ -210,6 +217,11 @@ function recordReceipt(state: AuthorityState, command: AuthorityCommand): Author
     players: { ...state.players, [command.playerId]: { ...player, lastSeq: command.seq } },
     debugApplied: state.debugApplied || isDebugCommandType(command.type),
   }
+}
+
+/** The collapse watch, except after a `drillStep`: it stays on the 5 Hz reports (ticket 330). */
+function followCollapseAfter(state: AuthorityState, command: AuthorityCommand): RuleEffect {
+  return command.type === 'drillStep' ? unchanged(state) : followCollapse(state)
 }
 
 function applyRule(state: AuthorityState, command: AuthorityCommand): RuleEffect {

@@ -89,6 +89,16 @@ export function carveStampWithGear(
   request: DrillCarveRequest,
 ): DrillCarve {
   const read = drillGearReadAt(state, params, playerId, bit, request.gates)
+  return carveStampWithRead(params, bit, read, request)
+}
+
+/** The cut at the bit with its gear read already taken: the swept cut counts its cells first. */
+export function carveStampWithRead(
+  params: PlanetParams,
+  bit: DrillBit,
+  read: DrillGearRead | null,
+  request: DrillCarveRequest,
+): DrillCarve {
   if (read === null) {
     return withoutGear(
       carveDisc(request.world, params, bit.disc, request.window, request.gates.drillTicksOf),

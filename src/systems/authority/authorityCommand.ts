@@ -134,8 +134,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    auto acts, a manual shot's wait folded into its `nextShotTick` while auto is on, and
  *    `AutoModeSet`, `AutoTargetLocked`, `AutoActed` and `AutoActOverridden`. With auto off no
  *    digest or mined order changes.
+ * 50: the swept cut (ticket 330, dev flag `drill.sweptCut`): `drillStep {x, y, drive}` every tick
+ *    the drill is engaged cuts the stamp's path since the last step in sub-step drill time, gated
+ *    on every crossed cell and held to the terrain budget, and the vehicle may carry `sweptCut`;
+ *    a report whose ticks the steps cut no longer cuts them. The pose bound is 300 mm a tick (18
+ *    m/s). With no step sent no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 49
+export const AUTHORITY_PROTOCOL_VERSION = 50
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
@@ -163,6 +168,11 @@ export interface KernelCommandPayloads {
   }
   /** Scripted mining (#3, #11 section 5): `ticks` fixed steps of drilling on one tile. */
   drillTile: { tx: number; ty: number; ticks: number }
+  /**
+   * The swept cut (ticket 330, dev flag `drill.sweptCut`): the body's position in mm at a fixed
+   * step its drill is engaged, and the push as signs (`drive.y` 1 lifting), sent every such step.
+   */
+  drillStep: { x: number; y: number; drive: DriveSigns }
   /** Calls the tow for a stranded or destroyed vehicle (#7, #8). */
   requestRescue: Record<string, never>
   /** The platform (#8, #23, #37): dock when stationary in that bay's pad zone, and leave again. */

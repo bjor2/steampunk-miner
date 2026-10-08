@@ -14,6 +14,10 @@
  *   (#115), so a scripted dig pays the lining a player's dig pays.
  * - `requestRescue`: calls the tow for a stranded or destroyed vehicle.
  *
+ * With the dev flag `drill.sweptCut` on, `drillStep` (`drillStepRules.ts`, ticket 330) cuts every
+ * tick the drill is engaged; a report whose drill ticks those steps already cut charges and lays
+ * only the rest: movement, heat, lava and the rings now due.
+ *
  * Action tick counts may not exceed the ticks since the last charged command plus one report
  * interval of slack; more is refused (never trimmed), so a tap is charged exactly once.
  */
@@ -44,7 +48,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
-import { layCasingAfterScriptedDrill, layCasingAtPose } from './casingPlacement'
+import { layCasingAfterScriptedDrill, layCasingAtPose, layDueCasingAtPose } from './casingPlacement'
 import { followCasingSupport } from './casingSupport'
 import { drillBurrowersOnTile } from './combat/enemyDamage'
 import { flushGunHits } from './combat/gunHits'
@@ -55,6 +59,7 @@ import { touchLavaAtPose } from './lava/lavaRules'
 import { enterMagneticField } from './magnetic/fieldEntry'
 import type { DomainEventBody } from './domainEvent'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
+import { isCutBySteps } from './sweptDrill'
 import { followEnergyChange, rescueCauseOf, towVehicle } from './vehicleTransitions'
 
 type PosePayload = CommandPayloads['reportPose']
@@ -101,7 +106,7 @@ export const VEHICLE_COMMAND_RULES: {
         (current) => noteReportForCombat(current, command.playerId, command.tick),
         (current) => flushGunHits(current, command.playerId),
         (current) => chargeReportedActions(current, command),
-        (current) => layCasingAtPose(current, command.playerId, command.payload),
+        (current) => layReportedCasing(current, command),
         (current) =>
           followHeat(
             current,
@@ -233,9 +238,30 @@ function chargeReportedActions(
   if (!isVehicleActive(vehicle) || params === null || vehicle.pose === null) {
     return unchanged(markChargedState(state, playerId, tick))
   }
-  const drilled = drillAtPoseAndBurrowers(state, playerId, vehicle.pose, payload)
+  const drilled = drillReportedTicks(state, playerId, vehicle, payload)
   const moved = chargeMovement(drilled.state, playerId, payload)
   return { state: markChargedState(moved, playerId, tick), events: drilled.events }
+}
+
+/** The report's drill ticks at its pose, unless the swept cut's steps already cut them. */
+function drillReportedTicks(
+  state: AuthorityState,
+  playerId: string,
+  vehicle: VehicleState,
+  payload: PosePayload,
+): RuleEffect {
+  if (isCutBySteps(vehicle) || vehicle.pose === null) return unchanged(state)
+  return drillAtPoseAndBurrowers(state, playerId, vehicle.pose, payload)
+}
+
+/** Rings behind the drill: the report's own cut records its axis; the steps' cut recorded theirs. */
+function layReportedCasing(
+  state: AuthorityState,
+  command: AuthorityCommand<'reportPose'>,
+): RuleEffect {
+  const { playerId, payload } = command
+  if (isCutBySteps(vehicleOf(state, playerId))) return layDueCasingAtPose(state, playerId, payload)
+  return layCasingAtPose(state, playerId, payload)
 }
 
 function chargeMovement(state: AuthorityState, playerId: string, payload: PosePayload) {
@@ -270,7 +296,11 @@ function drillAtPoseAndBurrowers(
 }
 
 /** A burrower swimming in the drilled tile is cut for the ticks the drill worked (#9). */
-function withBurrowersCut(drilled: RuleEffect, playerId: string, tile: TilePoint): RuleEffect {
+export function withBurrowersCut(
+  drilled: RuleEffect,
+  playerId: string,
+  tile: TilePoint,
+): RuleEffect {
   const ticks = drilledTicksOf(drilled.events)
   const cut = drillBurrowersOnTile(drilled.state, playerId, tile, ticks, drilled.state.tick)
   return { state: cut.state, events: [...drilled.events, ...cut.events] }

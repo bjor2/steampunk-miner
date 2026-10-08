@@ -44,6 +44,7 @@ export function kernelCommandBuys(maxPlanet: number = FIRST_PLANET): {
   return {
     reportPose: NOT_A_BUY,
     drillTile: NOT_A_BUY,
+    drillStep: NOT_A_BUY,
     requestRescue: NOT_A_BUY,
     dock: NOT_A_BUY,
     undock: NOT_A_BUY,

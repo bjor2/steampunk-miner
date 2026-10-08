@@ -23,6 +23,7 @@ import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
 import type { AheadLatch } from './aheadBearingLatch'
 import type { SideLatch } from './facedSide'
+import type { SweptCut } from './sweptCut'
 
 /** The #7 state machine; `docked` is entered by the rescue tow here and by docking in #23. */
 export const VEHICLE_MODES = ['docked', 'active', 'stranded', 'destroyed'] as const
@@ -96,6 +97,11 @@ export interface VehicleState {
    * so off the magnetic planets the state and its digest are unchanged.
    */
   shockHullBp?: number
+  /**
+   * The swept cut's cursor (ticket 330, `drill.sweptCut`). Absent until the first `drillStep`, so
+   * with the flag off the state and its digest are unchanged.
+   */
+  sweptCut?: SweptCut
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

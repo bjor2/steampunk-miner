@@ -130,6 +130,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.shockHullBp === undefined || isWholeNumber(vehicle.shockHullBp)
       ? []
       : [`${path}.shockHullBp must be a whole number of basis points, or be left out`]),
+    ...(vehicle.sweptCut === undefined || isPortableSweptCut(vehicle.sweptCut)
+      ? []
+      : [`${path}.sweptCut must hold safe-integer mm points, a facing and a tick, or be left out`]),
   ]
 }
 
@@ -219,6 +222,17 @@ function isPortableHeat(heat: unknown): boolean {
 }
 
 /** The twin bit's latch (ticket 279): a bearing and the cell it was latched on. */
+function isPortableSweptCut(cursor: unknown): boolean {
+  return (
+    isJsonObject(cursor) &&
+    isRingPoint(cursor) &&
+    Number.isSafeInteger(cursor.poseXMm) &&
+    Number.isSafeInteger(cursor.poseYMm) &&
+    isFacing(cursor.facing as number) &&
+    isWholeNumber(cursor.tick)
+  )
+}
+
 function isPortableAheadLatch(latch: unknown): boolean {
   return (
     isJsonObject(latch) &&

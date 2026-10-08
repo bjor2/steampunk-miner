@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { EMPTY_CASING_TRAIL, followCasingTrail, type CasingTrail } from './casingTrail'
+import {
+  EMPTY_CASING_TRAIL,
+  followCasingTrail,
+  followCasingTrailAlongCut,
+  type CasingTrail,
+} from './casingTrail'
 
 /** The stamp's centre moved through `xs` (mm, at y 0), collecting the x of each ring due. */
 function followAlongX(xs: readonly number[], isCutting = true, start = EMPTY_CASING_TRAIL) {
@@ -66,5 +71,41 @@ describe('casing trail', () => {
     const travelled = followAlongX([10000, 10500], false, cut.trail)
     const resumed = followAlongX([20000], true, travelled.trail)
     expect(resumed.trail.unlined.map((point) => point.lengthMm)).toEqual([500])
+  })
+})
+
+describe('casing trail along the swept cut (ticket 330)', () => {
+  function followCutAlongX(stepMm: number, toMm: number) {
+    let trail: CasingTrail = EMPTY_CASING_TRAIL
+    for (const x of stepsTo(toMm, stepMm)) {
+      trail = followCasingTrailAlongCut(trail, { xMm: x, yMm: 0 }, true).trail
+    }
+    return trail
+  }
+
+  it.each([60, 300, 290])('records a point every half metre at %i mm a step', (stepMm) => {
+    const trail = followCutAlongX(stepMm, 2000)
+    const xs = [...trail.unlined.map((point) => point.xMm)]
+    expect(xs.slice(0, 4)).toEqual([0, 500, 1000, 1500])
+    for (const point of trail.unlined.slice(1)) expect(point.lengthMm).toBe(500)
+  })
+
+  it('leaves no gap and charges no lag at 18 m/s, 300 mm a tick', () => {
+    let trail: CasingTrail = EMPTY_CASING_TRAIL
+    const due: number[] = []
+    for (const x of stepsTo(30000, 300)) {
+      const step = followCasingTrailAlongCut(trail, { xMm: x, yMm: 0 }, true)
+      trail = step.trail
+      due.push(...step.due.map((point) => point.xMm))
+    }
+    const gaps = due.slice(1).map((x, index) => x - due[index])
+    expect(due.length).toBeGreaterThan(50)
+    expect(new Set(gaps)).toEqual(new Set([500]))
+  })
+
+  it('starts a new cut where the last point is past the ring lag', () => {
+    const start = followCasingTrailAlongCut(EMPTY_CASING_TRAIL, { xMm: 0, yMm: 0 }, true).trail
+    const far = followCasingTrailAlongCut(start, { xMm: 9000, yMm: 0 }, true).trail
+    expect(far.lastAxisPoint).toEqual({ xMm: 9000, yMm: 0 })
   })
 })
