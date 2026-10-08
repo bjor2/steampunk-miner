@@ -3,6 +3,7 @@
  * live in `src/systems/economy/economy.json`; change a number here when the design does, never to
  * satisfy a test.
  */
+import { TICKS_PER_SECOND } from './physics'
 
 /**
  * Energy is stored as an integer count of quanta, 240 per unit (decision #11 amendment 2), so
@@ -22,10 +23,18 @@ export const DESTROY_DELAY_TICKS = 120
 export const ENERGY_LOW_PERCENTS: readonly number[] = [25, 10]
 
 /**
- * The speed bound of #7: at most 16 m/s, under 0.3 m per 1/60 s tick, so the exposed-tile halo
- * never tunnels. Pose reports above it are refused (#3 host sanity check), in mm/s.
+ * The pose bound per fixed step (TD on #316, raised from #7's 16 m/s by the GD there, ticket 330):
+ * at most 300 mm a tick, 18 m/s at 60 ticks a second. The 0.9 m body first tunnels a contour at
+ * 0.45 m a tick (measured on #316), so the halo never tunnels. A `drillStep` further than this from
+ * the last accepted pose, per tick since it, is refused.
  */
-export const MAX_SPEED_MM_PER_SECOND = 16000
+export const MAX_STEP_MM_PER_TICK = 300
+
+/**
+ * The speed bound of #7, derived from `MAX_STEP_MM_PER_TICK`: pose reports above it are refused
+ * (#3 host sanity check), and the body's speed is clamped to it, in mm/s.
+ */
+export const MAX_SPEED_MM_PER_SECOND = MAX_STEP_MM_PER_TICK * TICKS_PER_SECOND
 
 /**
  * How far from the reported pose `DrillTile` may reach, in mm: the drill works the tile next to
@@ -73,6 +82,14 @@ export const CASING_RING_LAG_MM =
  * Dithering back and forth inside the lag lays the oldest past this many, so the save stays small.
  */
 export const MAX_CASING_TRAIL_POINTS = 6
+
+/**
+ * Fractional drill time (TD scope on #316, ticket 330): the swept cut (`drillStep`) counts a cell's
+ * drill time in this many integer sub-steps of a fixed tick, so a cell may take 24.5 ticks, or less
+ * than one, with no float and no carried state (the densities are the progress). The carve's
+ * largest product is `255 * 256 * Q * T`, exact below 2^53 for T up to about 2.3e9 ticks (~440 days).
+ */
+export const DRILL_SUBSTEPS_PER_TICK = 60
 
 /**
  * Pose reports go out at most 5 times a second (#11 amendment), every 12 ticks; the authority

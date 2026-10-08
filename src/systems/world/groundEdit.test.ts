@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { cellDensitySum } from './cellYield'
 import { generateChunk } from './generateChunk'
 import { contourSegmentsOf } from './groundContour'
+import { FULL_WEIGHT } from './stampShape'
 import { carveCell, carveDisc, clearDisc, fillDisc, type CellDrillTicks } from './groundEdit'
 import { planetParamsFor } from './planetParams'
 import {
   CHUNK_SAMPLES,
   SAMPLES_PER_TILE,
+  SOLID_DENSITY,
   chunkOfSample,
   localSampleOf,
   sampleIndexOf,
@@ -170,5 +173,88 @@ describe('carving the density field (#36)', () => {
     )
     expect(edit.changes).toEqual([{ cx: 0, cy: 8, x0: 124, y0: 116, x1: 127, y1: 119 }])
     expect(Object.keys(edit.world.chunks)).toEqual([chunkKey(0, 8)])
+  })
+})
+
+describe('fractional drill time in the carve (ticket 330)', () => {
+  const Q = DRILL_SUBSTEPS_PER_TICK
+  const tile = { tx: 3, ty: 285 }
+  const subSteps = (window: { firstTick: number; ticks: number }) => ({
+    ...window,
+    subStepsPerTick: Q,
+  })
+
+  it('carves the same bytes in sub-steps as in whole ticks when the drill time is whole', () => {
+    const whole = carveCell(EMPTY_WORLD, params, tile, { firstTick: 7, ticks: 30 }, () => 37)
+    const fine = carveCell(
+      EMPTY_WORLD,
+      params,
+      tile,
+      subSteps({ firstTick: 7, ticks: 30 }),
+      () => 37 * Q,
+    )
+    expect(fine.world).toEqual(whole.world)
+    expect(fine.ticksUsed).toBe(whole.ticksUsed)
+  })
+
+  it('clears a cell of 24.5 ticks on its 25th tick, not its 24th', () => {
+    const halfTick = () => 24 * Q + Q / 2
+    const short = carveCell(
+      EMPTY_WORLD,
+      params,
+      tile,
+      subSteps({ firstTick: 0, ticks: 24 }),
+      halfTick,
+    )
+    expect(cellDensitySum(short.world, params, tile)).toBeGreaterThan(0)
+    const full = carveCell(
+      EMPTY_WORLD,
+      params,
+      tile,
+      subSteps({ firstTick: 0, ticks: 25 }),
+      halfTick,
+    )
+    expect(cellDensitySum(full.world, params, tile)).toBe(0)
+    expect(full.ticksUsed).toBe(25)
+  })
+
+  it('clears a cell faster than one tick inside a single tick', () => {
+    const carve = carveCell(
+      EMPTY_WORLD,
+      params,
+      tile,
+      subSteps({ firstTick: 40, ticks: 1 }),
+      () => Q / 3,
+    )
+    expect(cellDensitySum(carve.world, params, tile)).toBe(0)
+    expect(carve.ticksUsed).toBe(1)
+  })
+
+  it('carries a part-dug cell over through its densities, tick by tick', () => {
+    const time = () => 3 * Q + 7
+    const once = carveCell(EMPTY_WORLD, params, tile, subSteps({ firstTick: 100, ticks: 3 }), time)
+    let stepped = EMPTY_WORLD
+    for (let tick = 100; tick < 103; tick++) {
+      stepped = carveCell(
+        stepped,
+        params,
+        tile,
+        subSteps({ firstTick: tick, ticks: 1 }),
+        time,
+      ).world
+    }
+    expect(currentDensityOfChunk(stepped, params, 0, 8)).toEqual(
+      currentDensityOfChunk(once.world, params, 0, 8),
+    )
+    expect(cellDensitySum(stepped, params, tile)).toBeGreaterThan(0)
+  })
+
+  it('stays exact to about 2.3e9 ticks (~440 days): 255 * 256 * Q * T stays under 2^53', () => {
+    const lastExactTick = Math.floor(Number.MAX_SAFE_INTEGER / (SOLID_DENSITY * FULL_WEIGHT * Q))
+    expect(lastExactTick).toBeGreaterThan(2.29e9)
+    const window = subSteps({ firstTick: lastExactTick - 24, ticks: 24 })
+    const late = carveCell(EMPTY_WORLD, params, tile, window, () => 24 * Q)
+    expect(cellDensitySum(late.world, params, tile)).toBe(0)
+    expect(late.ticksUsed).toBe(24)
   })
 })

@@ -14,7 +14,12 @@
  * 2): a cell opens on a big level-up, never on a pip. The efficiency reads the live tip. A cell may
  * bring its own floor (#142: a drill-gated signature's is 1, so `P >= H`); every rule here takes
  * it last and falls back to the global `drill.scratchFloor`.
+ *
+ * The swept cut (ticket 330) reads the same rule in `DRILL_SUBSTEPS_PER_TICK` sub-steps instead of
+ * whole ticks (`subStepsPerTile`): the floor still binds at `minTicksPerTile` ticks, but a cell is
+ * no longer rounded up to the next whole tick.
  */
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { ECONOMY } from '../economy/economy'
 import {
@@ -38,6 +43,7 @@ export interface DrillStats {
 const TICKS = fromSafeInteger(TICKS_PER_SECOND)
 const MIN_TICKS = fromSafeInteger(ECONOMY.drill.minTicksPerTile)
 const SCRATCH_FLOOR = ECONOMY.drill.scratchFloor
+const SUBSTEPS = fromSafeInteger(DRILL_SUBSTEPS_PER_TICK)
 
 /** `P >= H/4`: below that the tip only skids, with no damage and no energy drain (#7). */
 export function canScratch(
@@ -85,6 +91,20 @@ export function ticksPerTile(
   const work = drillWorkPerTick(drill, hardness, scratchFloor)
   if (cmp(work, ZERO_MONEY) === 0) return null
   return toSafeInteger(ceil(div(tileWorkToBreak(hardness), work)))
+}
+
+/**
+ * `ticksPerTile` in `DRILL_SUBSTEPS_PER_TICK` sub-steps of a tick, rounded up once to a whole
+ * sub-step, or null when the tip cannot scratch the tile.
+ */
+export function subStepsPerTile(
+  drill: DrillStats,
+  hardness: BigStat,
+  scratchFloor: BigStat = SCRATCH_FLOOR,
+): number | null {
+  const work = drillWorkPerTick(drill, hardness, scratchFloor)
+  if (cmp(work, ZERO_MONEY) === 0) return null
+  return toSafeInteger(ceil(div(mul(tileWorkToBreak(hardness), SUBSTEPS), work)))
 }
 
 /**

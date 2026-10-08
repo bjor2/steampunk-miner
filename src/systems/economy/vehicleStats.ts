@@ -28,7 +28,7 @@ import {
 export type UpgradeLevels = TrackNumbers
 
 export interface EngineStats {
-  /** m/s; always under the 16 m/s tunnelling limit of #7. */
+  /** m/s; always under the 18 m/s pose bound (`MAX_SPEED_MM_PER_SECOND`, #7 and ticket 330). */
   speedMax: number
   accel: number
   thrustToWeight: number

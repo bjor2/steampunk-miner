@@ -2,7 +2,7 @@
  * One fixed step of the vehicle's motion (decision #7 "Movement on the round world"), as a pure
  * rule the physics motor applies by velocity: wheels drive along the tangent toward the intent's
  * speed, the steam lift pushes along `localUp`, radial gravity pulls, and the speed never exceeds
- * 16 m/s (under 0.3 m per tick, so the tile halo cannot be tunnelled). Rapier then resolves the
+ * 18 m/s (`MAX_STEP_MM_PER_TICK`, 0.3 m per tick, so the tile halo cannot be tunnelled). Rapier then resolves the
  * contacts. The engine stats are the bounded numbers from `computeVehicleStats` (#5 rule 5).
  *
  * A slice's motion effects (ticket 233, `motionEffects.ts`) boost the engine, hold the body against

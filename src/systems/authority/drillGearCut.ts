@@ -200,9 +200,9 @@ function cellsWindowOf(request: DrillCarveRequest, shares: readonly number[]): C
   const { window, energy } = request
   const perTick = ENERGY_QUANTA_PER_TICK.drill * shares.reduce((sum, share) => sum + share, 0)
   const left = energy - window.ticks * ENERGY_QUANTA_PER_TICK.drill
-  if (perTick === 0 || left <= 0) return { firstTick: window.firstTick, ticks: 0 }
+  if (perTick === 0 || left <= 0) return { ...window, ticks: 0 }
   const ticks = Math.min(window.ticks, Math.floor((left * BASIS_POINTS) / perTick))
-  return { firstTick: window.firstTick, ticks }
+  return { ...window, ticks }
 }
 
 /** Every cell's ticks at the drill's rate times its share, rounded up once. */

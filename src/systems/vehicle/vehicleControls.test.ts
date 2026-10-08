@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { SWIVEL_TICKS } from '../../constants/balance'
-import { PHYSICS_TIMESTEP } from '../../constants/physics'
+import { MAX_SPEED_MM_PER_SECOND, SWIVEL_TICKS } from '../../constants/balance'
+import { MM_PER_METRE, PHYSICS_TIMESTEP } from '../../constants/physics'
 import { engineStats } from '../economy/vehicleStats'
 import { newDrillHead, settledFacingOf, stepDrillHead, type DrillHead } from './drillHead'
 import { dot, localUpOf, tangentOf, type Vector2 } from './localFrame'
@@ -137,11 +137,12 @@ describe('vehicle gravity', () => {
     }
   })
 
-  it('never lets the speed exceed 16 m/s, however long the fall or the lift', () => {
-    expect(speedOf(runMotion(PLANET_ANGLES[2], IDLE_INTENT, 600, 1.4, false).velocity)).toBe(16)
+  it('never lets the speed exceed the pose bound, however long the fall or the lift', () => {
+    const bound = MAX_SPEED_MM_PER_SECOND / MM_PER_METRE
+    expect(speedOf(runMotion(PLANET_ANGLES[2], IDLE_INTENT, 600, 1.4, false).velocity)).toBe(bound)
     const lift = { moveX: 1, facing: null, lift: true } as const
     expect(speedOf(runMotion(PLANET_ANGLES[0], lift, 600, 1, false).velocity)).toBeLessThanOrEqual(
-      16,
+      bound,
     )
   })
 })

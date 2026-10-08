@@ -7,6 +7,10 @@
  *   never below the sample's floor (0 except under a level cut). Over any `n` consecutive ticks at full weight that is exactly 255,
  *   so a cell clears in its #7 drill time whatever the stamp's path (hard rock carves slower inside
  *   the same stamp), and replaying the same ticks removes the same bytes on every machine.
+ * - The swept cut (ticket 330) counts drill times in `Q` sub-steps of a tick (`subStepsPerTick`):
+ *   `n` is then in sub-steps and a tick removes `255 w Q / (W n)`, the same formula with `T0` and
+ *   `ticks` scaled by `Q`, so a cell may clear in a fraction of a tick and a part-dug one carries
+ *   over through its densities. With `Q = 1` it is the whole-tick carve above, unchanged.
  * - A material cell yields once, at the moment the sum of its 16 samples falls to half or below
  *   (`cellYield`).
  *
@@ -51,11 +55,16 @@ export type { CasingCleared, GroundChange, GroundEdit } from './groundEditSessio
 export interface CarveWindow {
   firstTick: number
   ticks: number
+  /**
+   * How many sub-steps of a tick the drill times are counted in: absent for whole ticks, or
+   * `DRILL_SUBSTEPS_PER_TICK` for the swept cut (ticket 330).
+   */
+  subStepsPerTick?: number
 }
 
 /**
- * Whole ticks a full-weight stamp needs to clear a sample of this cell's material, or of casing
- * of `casingGrade` when it is above 0 (#41), or null if the drill cannot.
+ * Ticks (or the window's sub-steps) a full-weight stamp needs to clear a sample of this cell's
+ * material, or of casing of `casingGrade` when it is above 0 (#41), or null if the drill cannot.
  */
 export type CellDrillTicks = (
   tile: TilePoint,
@@ -199,7 +208,10 @@ function carveOneSample(
   if (!isCarvable(session, sample)) return 0
   const drillTicks = drillTicksOfSample(session, sample, drillTicksOf)
   if (drillTicks === null) return 0
-  const rate = { perTick: SOLID_DENSITY * sample.weight, per: FULL_WEIGHT * drillTicks }
+  const rate = {
+    perTick: SOLID_DENSITY * sample.weight * (window.subStepsPerTick ?? 1),
+    per: FULL_WEIGHT * drillTicks,
+  }
   const density = densityOf(session, sample)
   const removal = Math.min(Math.max(0, density - sample.floor), removalOver(rate, window))
   if (removal === 0) return 0

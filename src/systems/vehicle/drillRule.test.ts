@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { blockHardness } from '../economy/oreEconomy'
 import { drillPower, drillTip, onCurveLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { add, cmp, fromCanonical, mul, ZERO_MONEY, type BigStat } from '../money'
@@ -6,6 +7,7 @@ import {
   canScratch,
   drillDamage,
   drillWorkPerTick,
+  subStepsPerTile,
   ticksPerTile,
   tileWorkToBreak,
   type DrillStats,
@@ -90,6 +92,38 @@ describe('drill rule', () => {
   it('deals ticks * drillPower * eff / 60 of damage', () => {
     expect(drillDamage(LEVEL_0, m('1'), 40)).toEqual(m('1'))
     expect(drillDamage(LEVEL_0, m('2'), 60)).toEqual(m('0.375'))
+  })
+})
+
+describe('fractional drill time (ticket 330)', () => {
+  const Q = DRILL_SUBSTEPS_PER_TICK
+
+  it('keeps the floor at 24 whole ticks, counted in sub-steps', () => {
+    expect(subStepsPerTile(drillOf(drillPower(20), drillTip(0)), m('1'))).toBe(24 * Q)
+  })
+
+  it('rounds a cell up to its next sub-step, never to the next whole tick', () => {
+    for (const band of [1, 2, 3, 4, 5]) {
+      const hardness = blockHardness(1, band)
+      const subSteps = subStepsPerTile(LEVEL_0, hardness) ?? 0
+      const ticks = ticksPerTile(LEVEL_0, hardness) ?? 0
+      expect(subSteps).toBeLessThanOrEqual(ticks * Q)
+      expect(subSteps).toBeGreaterThan((ticks - 1) * Q)
+    }
+  })
+
+  it('answers a fraction of a tick where the whole-tick rule rounds up', () => {
+    // 1.5 power at a full tip: 60 * 2 / 1.5 = 80 ticks on hardness 2, 81.2 on hardness 2.03.
+    const drill = drillOf(m('1.5'), m('3'))
+    expect(subStepsPerTile(drill, m('2'))).toBe(80 * Q)
+    expect(subStepsPerTile(drill, m('2.03'))).toBe(4872)
+    expect(ticksPerTile(drill, m('2.03'))).toBe(82)
+  })
+
+  it('cannot scratch where the whole-tick rule cannot', () => {
+    const drill = drillOf(m('1e9'), m('1'))
+    expect(subStepsPerTile(drill, m('4.0001'))).toBeNull()
+    expect(subStepsPerTile(drill, m('1.0001'), m('1'))).toBeNull()
   })
 })
 

@@ -1,6 +1,7 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { PHYSICS_TIMESTEP } from '../constants/physics'
+import { MAX_SPEED_MM_PER_SECOND } from '../constants/balance'
+import { MM_PER_METRE, PHYSICS_TIMESTEP } from '../constants/physics'
 import { engineStats } from '../systems/economy/vehicleStats'
 import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { FACING } from '../systems/vehicle/vehiclePose'
@@ -121,17 +122,24 @@ const ANGLES = [0, 1, 2, 3]
 const LIFT: VehicleIntent = { ...IDLE_INTENT, lift: true }
 
 describe('vehicle physics', () => {
-  it.each(ANGLES)('never tunnels through intact ground at 16 m/s (quarter turn %i)', (turns) => {
-    const surface = centreOf(localTile(turns, 0, 0))
-    const radius = Math.sqrt(surface.x * surface.x + surface.y * surface.y)
-    const up = { x: surface.x / radius, y: surface.y / radius }
-    const harness = createHarness(EMPTY_WORLD, { x: surface.x + 4 * up.x, y: surface.y + 4 * up.y })
-    harness.body.setLinvel({ x: -16 * up.x, y: -16 * up.y, z: 0 }, true)
-    harness.run(IDLE_INTENT, 180)
-    expect(harness.insideSolid).toEqual([])
-    const { x, y } = harness.position()
-    expect(Math.sqrt(x * x + y * y)).toBeGreaterThan(radius)
-  })
+  it.each(ANGLES)(
+    'never tunnels through intact ground at the pose bound (quarter turn %i)',
+    (turns) => {
+      const surface = centreOf(localTile(turns, 0, 0))
+      const radius = Math.sqrt(surface.x * surface.x + surface.y * surface.y)
+      const up = { x: surface.x / radius, y: surface.y / radius }
+      const harness = createHarness(EMPTY_WORLD, {
+        x: surface.x + 4 * up.x,
+        y: surface.y + 4 * up.y,
+      })
+      const bound = MAX_SPEED_MM_PER_SECOND / MM_PER_METRE
+      harness.body.setLinvel({ x: -bound * up.x, y: -bound * up.y, z: 0 }, true)
+      harness.run(IDLE_INTENT, 180)
+      expect(harness.insideSolid).toEqual([])
+      const { x, y } = harness.position()
+      expect(Math.sqrt(x * x + y * y)).toBeGreaterThan(radius)
+    },
+  )
 
   it.each(ANGLES)(
     'enters, drives along and leaves a stamp-wide bore (quarter turn %i)',
