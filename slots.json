@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T02:13:47+02:00",
+  "updated_at": "2026-10-08T02:18:28+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -89,22 +89,22 @@
         },
         {
           "slot": "C8",
-          "state": "busy",
+          "state": "free",
           "ticket": null,
           "grok_slot": null,
-          "kind": "external",
-          "since": "2026-10-08T02:13:13+02:00"
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "claims_last_hour": 5,
       "name": "Claude Max 2"
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -353,11 +353,10 @@
     },
     {
       "slot": 8,
-      "state": "busy",
+      "state": "free",
       "ticket": null,
       "grok_slot": null,
-      "since": "2026-10-08T02:13:13+02:00",
-      "kind": "external",
+      "since": null,
       "account": 2
     }
   ],
@@ -380,9 +379,9 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 8,
-      "free": 0,
-      "external": 1
+      "used": 7,
+      "free": 1,
+      "external": 0
     }
   }
 }
