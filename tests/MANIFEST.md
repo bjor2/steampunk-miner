@@ -61,7 +61,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 21 files, 146 tests
+### `drill-gear`: 22 files, 156 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -80,10 +80,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/drillGearSales.test.ts` | 2 | 2 |
 | `src/features/drill-gear/systems/gatesFixture.test.ts` | 22 | 3 |
 | `src/features/drill-gear/systems/samplingCorer.test.ts` | 11 | 10 |
+| `src/features/drill-gear/systems/softGroundLink.test.ts` | 6 | 6 |
 | `src/features/drill-gear/systems/statPreview.test.ts` | 12 | 12 |
 | `src/features/drill-gear/systems/twinBit.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/twinBitDiagonal.test.ts` | 5 | 5 |
-| `src/features/drill-gear/systems/useResolution.test.ts` | 9 | 9 |
+| `src/features/drill-gear/systems/useResolution.test.ts` | 13 | 13 |
 | `src/features/drill-gear/systems/vibratoryCrumble.test.ts` | 4 | 4 |
 | `src/features/drill-gear/twinBitPace.test.ts` | 4 | 2 |
 
@@ -292,7 +293,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
-### `sensing`: 21 files, 137 tests
+### `sensing`: 21 files, 139 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -316,7 +317,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/sensingView.test.ts` | 2 | 2 |
 | `src/features/sensing/systems/statPreview.test.ts` | 11 | 11 |
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
-| `src/features/sensing/systems/useResolution.test.ts` | 14 | 14 |
+| `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
 ### `tech-tree`: 28 files, 209 tests
 
@@ -351,7 +352,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 24 files, 207 tests
+### `terrain-tools`: 25 files, 210 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -376,7 +377,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/terrainItems.test.ts` | 11 | 11 |
 | `src/features/terrain-tools/systems/terrainSales.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/terrainSection.test.ts` | 4 | 4 |
-| `src/features/terrain-tools/systems/useResolution.test.ts` | 13 | 13 |
+| `src/features/terrain-tools/systems/toolVerb.test.ts` | 2 | 2 |
+| `src/features/terrain-tools/systems/useResolution.test.ts` | 14 | 14 |
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 
@@ -487,7 +489,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/combat/wreckerRun.test.ts` | 16 | 16 |
 | `src/systems/authority/coreHarvest.test.ts` | 10 | 10 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
-| `src/systems/authority/drillGearCut.test.ts` | 18 | 16 |
+| `src/systems/authority/drillGearCut.test.ts` | 23 | 21 |
 | `src/systems/authority/exactMathLint.test.ts` | 11 | 3 |
 | `src/systems/authority/featureUnlocks.test.ts` | 11 | 11 |
 | `src/systems/authority/groundDrill.test.ts` | 3 | 3 |
@@ -514,7 +516,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sellCoins.test.ts` | 8 | 8 |
 | `src/systems/authority/sensingQueries.test.ts` | 10 | 10 |
 | `src/systems/authority/serviceReserve.test.ts` | 4 | 4 |
-| `src/systems/authority/sessionSnapshot.test.ts` | 19 | 19 |
+| `src/systems/authority/sessionSnapshot.test.ts` | 21 | 21 |
 | `src/systems/authority/signatureCells.test.ts` | 9 | 9 |
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
@@ -580,7 +582,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/casingPrices.test.ts` | 8 | 8 |
 | `src/systems/economy/chargeSizes.test.ts` | 23 | 23 |
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
-| `src/systems/economy/drillGearCaps.test.ts` | 13 | 13 |
+| `src/systems/economy/drillGearCaps.test.ts` | 17 | 17 |
 | `src/systems/economy/economyGrowth.test.ts` | 5 | 5 |
 | `src/systems/economy/economySourceScan.test.ts` | 6 | 6 |
 | `src/systems/economy/economyTables.test.ts` | 10 | 5 |
@@ -981,10 +983,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
 | `src/systems/vehicle/casingTrail.test.ts` | 8 | 8 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
-| `src/systems/vehicle/drillGearCells.test.ts` | 9 | 9 |
+| `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
 | `src/systems/vehicle/drillRule.test.ts` | 14 | 14 |
 | `src/systems/vehicle/drillStamp.test.ts` | 1 | 1 |
 | `src/systems/vehicle/driveSigns.test.ts` | 5 | 5 |
+| `src/systems/vehicle/facedSide.test.ts` | 10 | 10 |
 | `src/systems/vehicle/heatPauseSteps.test.ts` | 7 | 7 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
 | `src/systems/vehicle/poseReport.test.ts` | 7 | 7 |
