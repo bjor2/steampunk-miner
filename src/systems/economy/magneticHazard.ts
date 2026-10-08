@@ -11,11 +11,20 @@ import { onCurveSteps, vehicleStatsAt } from './vehicleStats'
 
 /** m/s: a field's tug at the planet, its share of the on-curve top speed under the #233 cap. */
 export function tugSpeedAt(planetIndex: number): number {
-  const shareBp = Math.min(
+  return (vehicleStatsAt(onCurveSteps(planetIndex)).engine.speedMax * tugShareBp()) / BASIS_POINTS
+}
+
+/** Whole mm a tick a field tugs a metal enemy walking `walkStepMm` a tick: the same share (#291). */
+export function enemyTugStepMmOf(walkStepMm: number): number {
+  return Math.floor((walkStepMm * tugShareBp()) / BASIS_POINTS)
+}
+
+/** The tug's share of the speed it is measured against, never past the #233 motion cap. */
+function tugShareBp(): number {
+  return Math.min(
     ECONOMY.magneticHazard.tugShareOfEngineBp,
     ECONOMY.itemEffectCaps.motionBoostCapBp,
   )
-  return (vehicleStatsAt(onCurveSteps(planetIndex)).engine.speedMax * shareBp) / BASIS_POINTS
 }
 
 /** Whole tiles a sensing reach of `baseTiles` keeps inside a field, rounded up. */

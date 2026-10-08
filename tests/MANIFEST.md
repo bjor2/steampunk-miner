@@ -460,6 +460,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/loadoutSection.test.ts` | 5 | 5 |
 | `src/systems/authority/loopbackAuthority.test.ts` | 5 | 5 |
 | `src/systems/authority/magnetic/magneticHazard.test.ts` | 7 | 7 |
+| `src/systems/authority/magnetic/metalTag.test.ts` | 8 | 8 |
 | `src/systems/authority/minedOre.test.ts` | 7 | 7 |
 | `src/systems/authority/moneyRounding.test.ts` | 3 | 3 |
 | `src/systems/authority/platformCommands.test.ts` | 43 | 43 |

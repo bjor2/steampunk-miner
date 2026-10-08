@@ -1,18 +1,21 @@
 /**
  * One tick of the enemy simulation (decision #9), run by the authority's clock for every tick
  * while combat is live: strays leave, spawn points near each vehicle out on a trip come alive, a
- * lined route may call a tunnel wrecker (#111), every enemy acts in spawn order, then each
- * vehicle's guns fire if due (#107). Events are stamped with the tick and the player whose
- * enemy or vehicle they concern, with no `seq`: the clock caused them, not a command.
+ * lined route may call a tunnel wrecker (#111), every enemy acts in spawn order, a magnetic field
+ * tugs the metal ones (#258, ticket 291), then each vehicle's guns fire if due (#107). Events are
+ * stamped with the tick and the player whose enemy or vehicle they concern, with no `seq`: the
+ * clock caused them, not a command.
  *
  * Combat is live while an enemy is active or a vehicle's position is still being carried on from
  * its last report. Outside those ticks nothing can change, so the clock jumps over them and a run
  * gives the same state and events however its ticks are batched (30 or 144 render fps).
  */
 import { COMBAT_EXTRAPOLATION_TICKS } from '../../../constants/balance'
+import { ECONOMY } from '../../economy/economy'
 import { vehicleOf, type AuthorityState } from '../authorityState'
 import type { RuleEffect } from '../commandRule'
 import type { DomainEvent } from '../domainEvent'
+import { tugMetalEnemies } from '../magnetic/enemyTug'
 import { planetParamsOf } from '../planetOfState'
 import { combatVehicleOf } from './combatState'
 import { stepEnemy } from './enemyBehaviour'
@@ -55,6 +58,7 @@ function tickSteps(terrain: Terrain, tick: number, isFrozen: boolean): TickStep[
   return [
     ...(isFrozen ? [] : roster),
     (state) => stepEveryEnemy(state, terrain, tick),
+    (state) => tugEveryMetalEnemy(state, terrain, tick),
     (state) => fireEveryGun(state, terrain, tick),
   ]
 }
@@ -101,6 +105,11 @@ function stepEveryEnemy(state: AuthorityState, terrain: Terrain, tick: number): 
         stampedFor(stepEnemy(current, enemy.id, terrain, tick), enemy.ownerId, tick),
     ),
   )
+}
+
+/** A field's tug moves metal enemies and says nothing (#258 Q5). */
+function tugEveryMetalEnemy(state: AuthorityState, terrain: Terrain, tick: number): TickOutcome {
+  return { state: tugMetalEnemies(state, terrain, tick, ECONOMY.enemies.metal), events: [] }
 }
 
 /** Frozen enemies still take fire, as they still take the drill. */
