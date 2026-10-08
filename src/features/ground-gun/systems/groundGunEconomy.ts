@@ -84,6 +84,12 @@ export interface BotNumbers {
   minShots: number
 }
 
+/** The client's fire input (ticket 314, Gameplay on #313): never the authority's. */
+export interface InputNumbers {
+  /** An early tap waits this many ticks for the recovery to end, then is dropped silently. */
+  tapBufferTicks: number
+}
+
 export interface TurretNumbers {
   /** The auto_guns range cap in tiles (TD): extended barrels stop here. */
   gunRangeCap: number
@@ -111,6 +117,7 @@ export interface GroundGunEconomy {
   longBarrel: LongBarrelNumbers
   autoShoot: AutoShootNumbers
   bot: BotNumbers
+  input: InputNumbers
   turret: TurretNumbers
   modules: Readonly<Record<string, ArmouryModule>>
   combos: Readonly<Record<string, Readonly<Record<string, number>>>>
@@ -140,6 +147,7 @@ export function readGroundGunEconomy(
     longBarrel: readLongBarrel(reader, file.longBarrel),
     autoShoot: readAutoShoot(reader, file.autoShoot),
     bot: { minShots: reader.safeInteger('bot.minShots', reader.object('bot', file.bot).minShots) },
+    input: readInput(reader, file.input),
     turret: readTurret(reader, file.turret),
     modules: readRows(reader, 'modules', file.modules, readModule),
     combos: readRows(reader, 'combos', file.combos, readWholeStats),
@@ -164,6 +172,11 @@ function readBore(reader: FieldReader, raw: unknown): BoreNumbers {
     collapseHoldTicks: reader.safeInteger('bore.collapseHoldTicks', bore.collapseHoldTicks),
     shotDigTicks: reader.safeInteger('bore.shotDigTicks', bore.shotDigTicks),
   }
+}
+
+function readInput(reader: FieldReader, raw: unknown): InputNumbers {
+  const input = reader.object('input', raw)
+  return { tapBufferTicks: reader.safeInteger('input.tapBufferTicks', input.tapBufferTicks) }
 }
 
 function readTrack<Stat extends string>(
