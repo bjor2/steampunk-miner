@@ -1,5 +1,6 @@
 /**
- * `selectArtefactChoiceModel` (#46 Choice UI): the cache's three mutually exclusive cards as data,
+ * `selectArtefactChoiceModel` (#46 Choice UI): the cache's mutually exclusive cards as data (the
+ * kernel's three, then any slice option offered to this player now, K2 #324),
  * each with the option's name, its one line and a Choose button that carries `ChooseArtefact`
  * with the authority's refusal reason now, plus "Leave it", which closes the cards and sends
  * nothing, so the cache stays live.
@@ -10,11 +11,11 @@
  * `isChoiceOpenAfter` is the cards' open state over the authority's answers: they open on
  * this player's `artefact_open` and close on their `artefact_chosen`.
  */
-import { ARTEFACT_OPTIONS, type ArtefactOption } from '../artefacts/artefactOptions'
-import { artefactIconIdOf, panelIconIdOf } from '../art/icons/iconSet'
+import { panelIconIdOf } from '../art/icons/iconSet'
 import { chooseArtefactCommand } from '../artefacts/artefactCommands'
 import type { AuthorityState } from '../authority/authorityState'
 import type { DomainEvent } from '../authority/domainEvent'
+import { artefactOptionsOfferedTo, type OfferedArtefactOption } from '../registries/artefactOptions'
 import { artefactItemOf } from '../registries/kernelItems'
 import { itemCardOf, type ItemCardModel } from './itemCardModel'
 import type { FocusStop } from './menuFocus'
@@ -48,7 +49,9 @@ export function selectArtefactChoiceModel(
   state: AuthorityState,
   playerId: string,
 ): ArtefactChoiceModel {
-  const cards = ARTEFACT_OPTIONS.map((option) => cardOf(state, playerId, option))
+  const cards = artefactOptionsOfferedTo(state, playerId).map((option) =>
+    cardOf(state, playerId, option),
+  )
   const leave = uiButton(UI_IDS.artefactLeave, 'Leave it', { kind: 'closeArtefactChoice' })
   return {
     title: 'Ancient cache: take one, the others are lost',
@@ -79,8 +82,12 @@ function openStateAfterEvent(event: DomainEvent, isOpen: boolean): boolean {
   return isOpen
 }
 
-function cardOf(state: AuthorityState, playerId: string, option: ArtefactOption): ArtefactCard {
-  const iconId = artefactIconIdOf(option.id)
+function cardOf(
+  state: AuthorityState,
+  playerId: string,
+  option: OfferedArtefactOption,
+): ArtefactCard {
+  const { iconId } = option
   const choose = commandButton(
     state,
     playerId,

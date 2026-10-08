@@ -4,11 +4,12 @@
  * none or exactly this. Whether a planet's cache is live is never stored: it is read from this at
  * interact time (Technical Director's amendment on #46), so the ground never records a choice.
  */
-import { isArtefactId, type ArtefactId } from '../artefacts/artefactOptions'
+import { isKnownArtefactId } from '../registries/artefactOptions'
 import { isJsonObject, isWholeNumber } from './payloadFields'
 
 export interface HeldArtefact {
-  id: ArtefactId
+  /** A kernel option or a slice one (K2 #324): one pick either way. */
+  id: string
   /** The planet whose cache it was taken from: that cache reads `chosen`, every other `inert`. */
   fromPlanet: number
   /** `breathing_room`'s brace: 1 while ready this dock cycle, 0 once spent; 0 for the others. */
@@ -29,7 +30,7 @@ export function heldArtefactProblems(value: unknown, path: string): string[] {
   if (value === null) return []
   const isValid =
     isJsonObject(value) &&
-    isArtefactId(value.id) &&
+    isKnownArtefactId(value.id) &&
     isWholeNumber(value.fromPlanet) &&
     (value.breathingRoomCharges === 0 || value.breathingRoomCharges === 1)
   return isValid ? [] : [`${path} must be null or an artefact id, fromPlanet and 0 or 1 charges`]
@@ -37,7 +38,7 @@ export function heldArtefactProblems(value: unknown, path: string): string[] {
 
 /** `debug.artefact()` (#46 Logs/debug API, amendment 4): what the player holds and the cache here. */
 export interface ArtefactReport {
-  artefactId: ArtefactId | null
+  artefactId: string | null
   breathingRoomCharges: number
   cacheState: ArtefactCacheState
 }

@@ -14,6 +14,7 @@ import { REPORT_ROW_REGISTRY } from '../logging/registries/reportRows'
 import { RUN_EVENT_REGISTRATIONS, runEventRegistrationsOf } from '../logging/registries/runEvents'
 import { artAssetIdProblems } from '../systems/art/artAssetRules'
 import { ART_ASSET_REGISTRY, type ArtAsset } from '../systems/registries/artAssets'
+import { ARTEFACT_OPTION_REGISTRY } from '../systems/registries/artefactOptions'
 import { AUTHORITY_REACTION_REGISTRY } from '../systems/registries/authorityReactions'
 import { BLAST_EFFECT_REGISTRY } from '../systems/registries/blastEffects'
 import { BUILDING_ATTACH_USE_REGISTRY } from '../systems/registries/buildingAttach'
@@ -100,6 +101,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),
     dockService: (service) => add(DOCK_SERVICE_REGISTRY, service),
     dockFacility: (facility) => add(DOCK_FACILITY_REGISTRY, facility),
+    artefactOption: (option) => add(ARTEFACT_OPTION_REGISTRY, option),
     drillGear: (source) => add(DRILL_GEAR_REGISTRY, source),
     hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),
     enemyDetectionModifier: (modifier) => add(ENEMY_DETECTION_MODIFIER_REGISTRY, modifier),

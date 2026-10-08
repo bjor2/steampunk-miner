@@ -4,7 +4,9 @@
  *
  *   OpenArtefactCache        undocked, active, overlapping the planet's cache, holding nothing
  *                            -> artefact_open; the three cards are client UI
- *   ChooseArtefact {optionId} the same checks, then the pick is held for good -> artefact_chosen
+ *   ChooseArtefact {optionId} the same checks and a card the cache offers this player now, then
+ *                            the pick is held for good -> artefact_chosen, then one
+ *                            feature_unlocked per schedule row of this cache it opens (K2 #324)
  *
  * The slice holds at most one artefact, so a player who holds one finds every cache inert: both
  * commands are refused with `artefact_unavailable` and nothing is logged as an open. Closing the
@@ -14,7 +16,8 @@
  */
 import { ARTEFACT_CACHE_OVERLAP_MM } from '../../constants/balance'
 import { MM_PER_METRE } from '../../constants/physics'
-import { ARTEFACT_ID, isArtefactId, type ArtefactId } from '../artefacts/artefactOptions'
+import { ARTEFACT_ID } from '../artefacts/artefactOptions'
+import { isArtefactOfferedTo, isKnownArtefactId } from '../registries/artefactOptions'
 import type { VehiclePose } from '../vehicle/vehiclePose'
 import { artefactCacheTile } from '../world/artefactCache'
 import type { TilePoint } from '../world/tileGrid'
@@ -27,6 +30,7 @@ import {
   type Rejection,
   type RuleEffect,
 } from './commandRule'
+import { featureUnlocksOfPick } from './featureUnlocks'
 import type { HeldArtefact } from './heldArtefact'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 
@@ -45,9 +49,9 @@ export const ARTEFACT_RULES: {
       firstRejection([
         () => unknownArtefactRejection(payload.optionId),
         () => cacheOpenRefusal(state, playerId),
+        () => notOfferedRejection(state, playerId, payload.optionId),
       ]),
-    apply: (state, { playerId, payload }) =>
-      takeArtefact(state, playerId, payload.optionId as ArtefactId),
+    apply: (state, { playerId, payload }) => takeArtefact(state, playerId, payload.optionId),
   },
 }
 
@@ -63,7 +67,7 @@ export const ARTEFACT_DEBUG_RULES: {
         () => unknownArtefactRejection(payload.optionId),
       ]),
     apply: (state, { playerId, payload }) => ({
-      state: withArtefact(state, playerId, heldArtefactOf(payload.optionId as ArtefactId, state)),
+      state: withArtefact(state, playerId, heldArtefactOf(payload.optionId, state)),
       events: [],
     }),
   },
@@ -108,8 +112,18 @@ function heldArtefactRejection(held: HeldArtefact | null): Rejection | null {
 }
 
 function unknownArtefactRejection(optionId: string): Rejection | null {
-  if (isArtefactId(optionId)) return null
+  if (isKnownArtefactId(optionId)) return null
   return rejectionOf('unknown_artefact', `${JSON.stringify(optionId)} is not an artefact option`)
+}
+
+/** A registered option the cache does not show this player now, such as a twist on an unowned item. */
+function notOfferedRejection(
+  state: AuthorityState,
+  playerId: string,
+  optionId: string,
+): Rejection | null {
+  if (isArtefactOfferedTo(state, playerId, optionId)) return null
+  return rejectionOf('artefact_unavailable', `the cache does not offer ${optionId} now`)
 }
 
 /** Body centre within the overlap distance of the cell centre on both axes. */
@@ -130,15 +144,17 @@ function openCache(state: AuthorityState): RuleEffect {
   return { state, events: [{ type: 'ArtefactCacheOpened', ...cacheTileOf(state) }] }
 }
 
-function takeArtefact(state: AuthorityState, playerId: string, id: ArtefactId): RuleEffect {
+/** Any card opens the cache's rows the same way, so the ruler never depends on the choice. */
+function takeArtefact(state: AuthorityState, playerId: string, id: string): RuleEffect {
+  const after = withArtefact(state, playerId, heldArtefactOf(id, state))
   return {
-    state: withArtefact(state, playerId, heldArtefactOf(id, state)),
-    events: [{ type: 'ArtefactChosen', optionId: id }],
+    state: after,
+    events: [{ type: 'ArtefactChosen', optionId: id }, ...featureUnlocksOfPick(state, after)],
   }
 }
 
 /** A fresh pick: `breathing_room` starts with its brace ready. */
-function heldArtefactOf(id: ArtefactId, state: AuthorityState): HeldArtefact {
+function heldArtefactOf(id: string, state: AuthorityState): HeldArtefact {
   return {
     id,
     fromPlanet: state.planet.index,

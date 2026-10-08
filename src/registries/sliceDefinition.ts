@@ -8,6 +8,7 @@ import type { SliceEventProjections } from '../logging/registries/eventProjectio
 import type { ReportRowSource } from '../logging/registries/reportRows'
 import type { SliceRunEvents } from '../logging/registries/runEvents'
 import type { ArtAsset } from '../systems/registries/artAssets'
+import type { ArtefactOptionEntry } from '../systems/registries/artefactOptions'
 import type { AuthorityReaction } from '../systems/registries/authorityReactions'
 import type { BlastEffect } from '../systems/registries/blastEffects'
 import type { BuildingAttachUse } from '../systems/registries/buildingAttach'
@@ -96,6 +97,11 @@ export interface SliceRegistrar {
   vehicleMotionEffect(source: VehicleMotionEffectSource): void
   /** A dock building that opens its `facility` schedule row from that row's planet on (#221). */
   dockFacility(facility: DockFacility): void
+  /**
+   * One more card at the artefact cache while `isOfferedTo` says so: the same one pick, and it
+   * never claims a schedule row (K2 #324).
+   */
+  artefactOption(option: ArtefactOptionEntry): void
   /**
    * Cells the player's drill cuts past the bit and beside the bore, listed only after `canMine`; a
    * side cell costs at least the drill's own energy for it (ticket 234).

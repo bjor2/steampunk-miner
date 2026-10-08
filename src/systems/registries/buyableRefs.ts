@@ -9,12 +9,12 @@
  * `buyableRefs.test.ts`) until it is placed here. `buyVehicleItem` buys every registered vehicle
  * item a slice sells on one of the planets walked (ticket 248).
  */
-import { ARTEFACT_OPTIONS } from '../artefacts/artefactOptions'
 import type { KernelCommandType } from '../authority/authorityCommand'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { liningTypes, STANDARD_LINING_TYPE } from '../economy/heatEconomy'
 import { BAY_IDS } from '../world/dockBays'
 import { contentOf } from './content'
+import { everyArtefactOption } from './artefactOptions'
 import type { ItemRef } from './itemDescriber'
 import { generatedItemRefsOn } from './itemDescriptionEntries'
 import {
@@ -62,7 +62,7 @@ export function kernelCommandBuys(maxPlanet: number = FIRST_PLANET): {
     collectRefined: NOT_A_BUY,
     travel: [KERNEL_ITEMS.travel],
     openArtefactCache: NOT_A_BUY,
-    chooseArtefact: ARTEFACT_OPTIONS.map((option) => artefactItemOf(option.id)),
+    chooseArtefact: everyArtefactOption().map((option) => artefactItemOf(option.id)),
     plantCharge: NOT_A_BUY,
     restockCharges: [KERNEL_ITEMS.charges],
     buyChargeRackSlot: [KERNEL_ITEMS.chargeRack],

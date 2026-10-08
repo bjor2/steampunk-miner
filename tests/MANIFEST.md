@@ -416,6 +416,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/authority/advanceTicks.test.ts` | 7 | 7 |
 | `src/systems/authority/applyCommand.test.ts` | 18 | 18 |
+| `src/systems/authority/artefactPicks.test.ts` | 10 | 10 |
 | `src/systems/authority/artefactRules.test.ts` | 16 | 16 |
 | `src/systems/authority/assaySale.test.ts` | 4 | 4 |
 | `src/systems/authority/authorityReactions.test.ts` | 7 | 7 |
@@ -564,7 +565,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/logging/goldenRun.test.ts` | 24 | 8 |
-| `src/logging/secondSliceGolden.test.ts` | 5 | 5 |
+| `src/logging/secondSliceGolden.test.ts` | 6 | 6 |
 | `src/systems/world/generatorGolden.test.ts` | 5 | 5 |
 
 ### `hints`

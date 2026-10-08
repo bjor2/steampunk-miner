@@ -69,6 +69,16 @@ describe('second-slice golden runs (S11)', () => {
     expect(rejectionsOf(events)).toEqual(['openArtefactCache:artefact_unavailable'])
   })
 
+  it('opens the planet 1 cache rows with the pick, and nothing at the husk (K2 #324)', () => {
+    const { events } = replayedGolden('artefact-live-and-husk')
+    expect(ofType(events, 'FeatureUnlocked').map((event) => event.featureId)).toEqual([
+      'artefacts',
+      'ore_whisper',
+      'breathing_room',
+      'assay_beacon',
+    ])
+  })
+
   it('keeps the husk cache chunk digest player-independent', () => {
     const { golden } = replayedGolden('artefact-live-and-husk')
     const husk = replayRun(golden.worldSeed, golden.commands, { endTick: golden.endTick }).state

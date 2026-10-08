@@ -117,9 +117,11 @@ describe('choosing an artefact (#46)', () => {
   it('holds the pick, logs artefact_chosen once and makes the cache inert to that player', () => {
     const session = sessionAtCache()
     session.submit(3, open)
-    expect(session.submit(4, choose('artefact.assay_beacon'))).toMatchObject([
-      { type: 'ArtefactChosen', optionId: 'artefact.assay_beacon' },
-    ])
+    // The rows the pick opens follow it (K2 #324, artefactPicks.test.ts).
+    expect(session.submit(4, choose('artefact.assay_beacon'))[0]).toMatchObject({
+      type: 'ArtefactChosen',
+      optionId: 'artefact.assay_beacon',
+    })
     expect(heldOf(session)).toEqual({
       id: 'artefact.assay_beacon',
       fromPlanet: 1,
