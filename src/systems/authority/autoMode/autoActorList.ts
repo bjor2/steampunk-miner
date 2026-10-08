@@ -10,6 +10,8 @@ import { BORE_AUTO_ACTOR } from '../bore/boreAuto'
 const KERNEL_AUTO_ACTORS: readonly AutoActor[] = [BORE_AUTO_ACTOR]
 
 export function autoActorOf(itemId: string): AutoActor | null {
-  const isItems = (actor: AutoActor) => actor.itemId === itemId
-  return KERNEL_AUTO_ACTORS.find(isItems) ?? entriesOf(AUTO_ACTOR_REGISTRY).find(isItems) ?? null
+  const isForItem = (actor: AutoActor) => actor.itemId === itemId
+  return (
+    KERNEL_AUTO_ACTORS.find(isForItem) ?? entriesOf(AUTO_ACTOR_REGISTRY).find(isForItem) ?? null
+  )
 }
