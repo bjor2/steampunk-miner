@@ -154,6 +154,15 @@ only". The Tester keeps running `tester.sh --full` while the flag is set. A gree
 the flag, and the next refill goes back to normal picking. Before this change a red main also
 blocked the needs-fix tickets, so main could never get green again (Oct 8 to 13).
 
+**Auto-filed fix tickets (since 2026-10-13):** when a `--full` or nightly full suite is red and no
+open `needs-fix` issue exists, `tester.sh` (`auto_file_needs_fix`) files one itself, labelled
+`build`, `needs-fix` and `tier:hard`, with the run tag, SHA, failed files and the exact FAIL and
+assertion lines. It forbids loosening tests or locked limits and says to pause at `needs-planner`
+for the Systems & Economy Designer (with the Horizontal and Vertical Scalers) if a new economy
+decision is needed. While main is red, `pick_tickets` also picks any open `build` + `needs-fix`
+issue (`red_fix_tickets`), even if it is not under #90 or in `EXTRA_TICKETS`. Together these stop
+the idle state of 13 Oct, when main was red with no open fix ticket and all 8 slots sat empty.
+
 A session that pauses its ticket at `needs-planner` (a planner question, not a failed build) gets
 its attempt refunded in `state.json` (`attempts`, floor 0), so it never runs out of tries while
 waiting on planners. Needs attention shows it as "needs-planner (attempt refunded)". Real failures
