@@ -12,7 +12,7 @@
  * A buy the wallet cannot pay is refused with `money_short`, never trimmed (#8). A refused command
  * changes nothing.
  */
-import { BLASTING_CHARGES_ROW_ID } from '../../art/artIds'
+import { BLASTING_CHARGES_ROW_ID } from '../../art/moduleRowIds'
 import { rackMaxSlotLevel, rackSlotPrice } from '../../economy/blastingCharges'
 import { chargePrice, rackSlotsOf } from '../../economy/chargeSizes'
 import { sub, toCanonical, type Money } from '../../money'

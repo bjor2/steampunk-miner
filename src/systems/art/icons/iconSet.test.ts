@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { isKebabId } from '../artNaming'
 import { glyphOf } from './iconGlyphs'
+import { artefactIconIdOf } from './artefactIconId'
 import {
-  artefactIconIdOf,
   COMBAT_STATUS_IDS,
   combatStatusIconIdOf,
   enemyIconIdOf,

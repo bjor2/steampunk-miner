@@ -9,7 +9,7 @@
  * here, for the rules, the held artefact and the save alike. An option never claims a schedule row
  * (the Horizontal Scaler's condition on #206): picking it opens the cache's rows, never its own.
  */
-import { artefactIconIdOf } from '../art/icons/iconSet'
+import { artefactIconIdOf } from '../art/icons/artefactIconId'
 import { ARTEFACT_IDS, ARTEFACT_OPTIONS, type ArtefactOption } from '../artefacts/artefactOptions'
 import { uniquenessGateProblems } from '../artefacts/uniquenessGate'
 import type { AuthorityState } from '../authority/authorityState'

@@ -17,6 +17,7 @@ import { PREFERENCE_NAMES, type PreferenceName } from '../../input/preferences'
 import { ARTEFACT_IDS, ENEMY_IDS, PLATFORM_BAY_IDS, UPGRADE_IDS } from '../../registeredIds'
 import { VEHICLE_MODES, type VehicleMode } from '../../vehicle/vehicleState'
 import { kebabOf, kebabOfCamel } from '../artNaming'
+import { artefactIconIdOf } from './artefactIconId'
 import {
   BLASTING_CHARGES_ROW_ID,
   HEAT_LAVA_ROW_ID,
@@ -162,11 +163,6 @@ export function combatStatusIconIdOf(status: CombatStatusId | SecondaryStatusId)
 /** The threat arrows carry the enemy family's icon (#158). */
 export function enemyIconIdOf(kind: string): string {
   return `icon-enemy-${kebabOf(kind)}`
-}
-
-/** `artefact.ore_whisper` draws as `icon-artefact-ore-whisper`. */
-export function artefactIconIdOf(artefactId: string): string {
-  return `icon-artefact-${kebabOf(artefactId.replace(/^artefact\./, ''))}`
 }
 
 export function bayEmblemIdOf(bay: string): string {
