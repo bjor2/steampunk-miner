@@ -1,0 +1,27 @@
+{
+  "assetId": "vehicle-item-power-repulsor-coil",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-repulsor-coil/vehicle-item-power-repulsor-coil.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [128, 128],
+  "maps": {
+    "albedo": "vehicle-item-power-repulsor-coil.albedo.ktx2",
+    "normal": "vehicle-item-power-repulsor-coil.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "coil-housing",
+      "tier": 1,
+      "rect": [8, 8, 68, 68],
+      "sizeM": [0.132, 0.132],
+      "pivotM": [0.066, 0.066],
+      "atM": [0.0, 0.0],
+      "z": 6
+    }
+  ]
+}

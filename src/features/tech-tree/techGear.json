@@ -277,6 +277,13 @@
       "parts": [{ "id": "bladder-housing" }]
     },
     {
+      "itemId": "power.repulsor_coil",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-repulsor-coil",
+      "parts": [{ "id": "coil-housing" }]
+    },
+    {
       "itemId": "consumable.flare_mortar",
       "kind": "crate",
       "attach": "hull.rear",

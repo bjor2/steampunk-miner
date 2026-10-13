@@ -23,6 +23,12 @@ halfway toward the plate gilt, Mark 6 doubles the strands, Mark 9 doubles the mo
 stand-ins on the procedural plate and motes; the Blender pass may replace them. An item without an
 `fx` row shows its milestones on the plate alone.
 
+Since ticket 284 the repulsor coil (`power.repulsor_coil`, the first shipped terrain magnet) has
+its slot housing too: `vehicle-item-power-repulsor-coil`, part `coil-housing`, a brass ring on a
+copper-wound core with eight copper prongs flaring out past the frame, the magnet family's look
+from the #246 lock (`vehicle-item-power-repulsor-coil.front.png`). It was authored by the same
+`author_tech_gear.py` and is the twelfth slot housing; its push-wave's field is build 5's.
+
 ## What is here
 
 Everything is placed by the data the game reads: a part sits at its attach point's `atM` from

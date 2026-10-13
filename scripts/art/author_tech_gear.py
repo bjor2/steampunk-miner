@@ -642,6 +642,20 @@ def author_buoyancy_tanks(table, items):
     ])
 
 
+def author_repulsor_coil(table, items):
+    """The magnet family's look (#246 lock): a brass ring on a wound iron core, prongs flaring out."""
+    detail = [
+        torus('brass', 0.036, 0.007, (0, -0.04, 0)),
+        cylinder('dark-iron', 0.016, 0.03, (0, -0.04, 0), 'Y'),
+        torus('copper', 0.021, 0.005, (0, -0.045, 0)),
+        sphere('brass', 0.007, (0, -0.058, 0)),
+    ]
+    detail += [cone('copper', 0.005, 0.0015, 0.024, (0.054 * math.cos(turn), -0.04, 0.054 * math.sin(turn)),
+                    (math.cos(turn), 0, math.sin(turn)))
+               for turn in (index * math.pi / 4 for index in range(8))]
+    return slot_housing('coil-housing', detail)
+
+
 # --- the consumable crates on the charge rack's shelves (`hull.rear`) ------------------------------
 
 CRATE_LOOKS = {
@@ -736,6 +750,7 @@ BUILDERS = {
     'vehicle-item-power-steam-shield': author_steam_shield,
     'vehicle-item-power-grav-anchor': author_grav_anchor,
     'vehicle-item-power-buoyancy-tanks': author_buoyancy_tanks,
+    'vehicle-item-power-repulsor-coil': author_repulsor_coil,
     'vehicle-rack-crates': author_rack_crates,
 }
 
