@@ -145,6 +145,15 @@ reopens with `needs-fix` gets one attempt back in the loop's `state.json` (`test
 loop retries it even after `MAX_ATTEMPTS`; the Loops tab's Needs attention list says "Tester red
 (phase): retry granted" until it closes green.
 
+**Red main (since 2026-10-13):** while `tester/main-red` is set (a red nightly or `--full` suite;
+it holds the commit SHA), the driver doesn't stop all dev spawns any more. `fill_dev_slots` still
+refills, but `pick_tickets` skips every ticket without the `needs-fix` label, so only the fixes
+that turn main green get workers (the reopened culprits, plus fix-main tickets such as #350 for the
+#324 import cycle). Tier routing is unchanged. The driver log says "spawning needs-fix tickets
+only". The Tester keeps running `tester.sh --full` while the flag is set. A green full run clears
+the flag, and the next refill goes back to normal picking. Before this change a red main also
+blocked the needs-fix tickets, so main could never get green again (Oct 8 to 13).
+
 A session that pauses its ticket at `needs-planner` (a planner question, not a failed build) gets
 its attempt refunded in `state.json` (`attempts`, floor 0), so it never runs out of tries while
 waiting on planners. Needs attention shows it as "needs-planner (attempt refunded)". Real failures
