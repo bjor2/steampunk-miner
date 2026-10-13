@@ -1,30 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-13T14:57:31.012Z",
+ "updatedAt": "2026-10-13T15:48:25.017Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37574249172,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37574249172",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "d83a6188a2581311aa0655dbca6eb7098805b2d0",
-   "branch": "main",
-   "startedAt": "2026-10-07T05:01:10Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 58,
-   "source": "actions",
-   "phase": null,
-   "job": "verify",
-   "feature": null,
-   "tickets": [],
-   "reportFound": false,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37575819938,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37575819938",
@@ -1182,13 +1160,35 @@
    "tests": 0,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 1791906500773,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/10cc21daae437b1c72943c3490d643aeaca94f19",
+   "event": "nightly",
+   "mode": "nightly",
+   "sha": "10cc21daae437b1c72943c3490d643aeaca94f19",
+   "branch": "main",
+   "startedAt": "2026-10-13T14:57:39Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 3041,
+   "source": "box",
+   "phase": "nightly",
+   "job": "balance-planets",
+   "feature": null,
+   "tickets": [],
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 15,
    "full": 12,
-   "nightly": 15,
+   "scoped": 14,
+   "nightly": 16,
    "nightly-only": 8
   },
   "timedOut": [],
