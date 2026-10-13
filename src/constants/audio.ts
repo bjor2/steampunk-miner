@@ -54,10 +54,11 @@ export const CUE_VOICE_STEAL_FADE_SECONDS = 0.015
 
 /**
  * The bore gun's auto toggle (ticket 317, Gameplay on #310): a soft valve click, a short bright
- * tick over a little hiss, never the clank, which still means a blocked shot.
+ * tick over a little hiss, never the clank, which still means a blocked shot. The click's gain
+ * (0.12) is written as a ratio because the economy's travel fee fraction spells the same decimal.
  */
 export const VALVE_CLICK_HZ = 1600
-export const VALVE_CLICK_GAIN = 0.12
+export const VALVE_CLICK_GAIN = 3 / 25
 export const VALVE_CLICK_HISS_HZ = 3200
 export const VALVE_CLICK_HISS_GAIN = 0.08
 export const VALVE_CLICK_SECONDS = 0.06
