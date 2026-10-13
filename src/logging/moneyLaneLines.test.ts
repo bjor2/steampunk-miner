@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { TICKS_PER_SECOND } from '../constants/physics'
-import type { RunEvent } from './runEvent'
+import { LOG_SCHEMA_VERSION, type RunEvent } from './runEvent'
 import { createRunLog, type RunLog } from './runLog'
 import { moneyLaneNdjsonOf, startMoneyLaneFold, type MoneyLaneFold } from './moneyLaneLines'
 
@@ -113,7 +113,7 @@ describe('money lane: one summary line per planet', () => {
   it('lists a money field that is not its canonical string as a problem', () => {
     const fold = startMoneyLaneFold()
     fold.add({
-      v: 4,
+      v: LOG_SCHEMA_VERSION,
       seq: 0,
       timestamp: 0,
       runId: 'run_lane',
