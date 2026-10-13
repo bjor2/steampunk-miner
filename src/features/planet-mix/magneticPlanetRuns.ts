@@ -1,9 +1,10 @@
 /**
  * The runs behind `balance:magnetic-planet` (GD lock on spec #258 Q7, ticket 294): the pacing bot
- * arrives on a magnetic planet with the on-curve levels and a little money, then plays to the core
- * three ways on each pacing seed, all else equal: the class off at the same index, the class on with
- * a bare drill head, and the class on with the dielectric bit in `drill.head`. One loadout command
- * goes first in all three, so every run stamps the same `seq`s. Only specs use it.
+ * arrives on a magnetic planet with the on-curve levels, the hull whole and a little money, then
+ * plays to the core three ways on each pacing seed, all else equal: the class off at the same
+ * index, the class on with a bare drill head, and the class on with the dielectric bit in
+ * `drill.head`. One loadout command goes first in all three, so every run stamps the same `seq`s.
+ * Only specs use it.
  *
  * The bot's pilot sets its pose, so the field's tug (felt in the scene's motion step) never reaches
  * it; the runs measure the shock ticks and the hull the hazard costs, mended at the repair price.
@@ -17,7 +18,7 @@ import { setVehicleLoadoutCommand } from '../../systems/authority/loadoutCommand
 import { playSlice, type SliceRun } from '../../systems/bot/playSlice'
 import { UPGRADE_IDS } from '../../systems/economy/economyDefinition'
 import { stepOfMajor } from '../../systems/economy/upgradeSteps'
-import { onCurveLevel } from '../../systems/economy/vehicleStats'
+import { onCurveLevel, onCurveSteps, vehicleStatsAt } from '../../systems/economy/vehicleStats'
 import {
   add,
   div,
@@ -25,6 +26,7 @@ import {
   fromCanonical,
   fromSafeInteger,
   mul,
+  toCanonical,
   toSafeInteger,
   ZERO_MONEY,
   type Money,
@@ -110,14 +112,25 @@ export function describeRuns(runs: MagneticPlanetRuns): string {
   return `P${planet} seed ${seed}: off ${minutes(off)} min, on ${minutes(bare)} min (${timeRatioBp(bare, off)} bp, income ${incomeRatioBp(bare, off)} bp), with the bit ${minutes(withBit)} min (${timeRatioBp(withBit, off)} bp)`
 }
 
-/** On `planet` with the on-curve levels and a little money, as a bot arriving there. */
-function arrivalOn(planet: number, worldSeed: number): CommandIntent[] {
+/** On `planet` with the on-curve levels, the hull whole and a little money, as a bot arriving. */
+export function arrivalOn(planet: number, worldSeed: number): CommandIntent[] {
   return [
     setPlanetCommand(planet),
     setPlanetSeedCommand(worldSeed),
     { type: 'debug.setMoney', payload: { amount: ARRIVAL_MONEY } },
     ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, planet)))),
+    wholeHullOn(planet),
   ]
+}
+
+/**
+ * The on-curve hull mended whole. `debug.setUpgrade` keeps the planet-1 hull, which the first
+ * shock (2% of the on-curve hull) wrecked, so the bare run lost its cargo and played a different
+ * planet from the class-off run (ticket 354). The tank stays as the levels leave it, as before.
+ */
+function wholeHullOn(planet: number): CommandIntent {
+  const { hullMax } = vehicleStatsAt(onCurveSteps(planet))
+  return { type: 'debug.setHull', payload: { hull: toCanonical(hullMax) } }
 }
 
 /** The bot from arrival on `planet` to its core, with `head` sent before the first trip. */
