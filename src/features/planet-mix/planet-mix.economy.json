@@ -5,6 +5,6 @@
   },
   "magnetic": {
     "fieldMarginTiles": 3,
-    "electrifiedShareBp": 2000
+    "electrifiedShareBp": 500
   }
 }
