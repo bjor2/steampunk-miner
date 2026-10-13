@@ -1,30 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-13T14:04:57.262Z",
+ "updatedAt": "2026-10-13T14:55:43.248Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37573138083,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37573138083",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "4db1372dc4217cc6ec05b78ff9dce634f3080a49",
-   "branch": "main",
-   "startedAt": "2026-10-07T04:47:24Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 106,
-   "source": "actions",
-   "phase": null,
-   "job": "verify",
-   "feature": null,
-   "tickets": [],
-   "reportFound": false,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37574144042,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37574144042",
@@ -1182,56 +1160,42 @@
    "tests": 5689,
    "failed": 9,
    "failedFiles": 7
+  },
+  {
+   "id": 1791903339706,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/10cc21daae437b1c72943c3490d643aeaca94f19",
+   "event": "nightly",
+   "mode": "nightly",
+   "sha": "10cc21daae437b1c72943c3490d643aeaca94f19",
+   "branch": "main",
+   "startedAt": "2026-10-13T14:51:14Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 265,
+   "source": "box",
+   "phase": "nightly",
+   "job": "balance-report",
+   "feature": null,
+   "tickets": [],
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 17,
+   "scoped": 16,
    "full": 12,
-   "nightly": 13,
+   "nightly": 14,
    "nightly-only": 8
   },
   "timedOut": [],
   "withoutReport": [
    1791436229533
   ],
-  "scopingSuspects": [
-   {
-    "file": "src/features/planet-mix/magneticPlanetPace.test.ts",
-    "nightlyRunId": 1791900294586,
-    "lastPerPushStatus": null
-   },
-   {
-    "file": "src/logging/campaignPacingGate.test.ts",
-    "nightlyRunId": 1791900294586,
-    "lastPerPushStatus": null
-   },
-   {
-    "file": "src/logging/pacingGate.test.ts",
-    "nightlyRunId": 1791900294586,
-    "lastPerPushStatus": null
-   },
-   {
-    "file": "src/scene/sceneDisposal.test.ts",
-    "nightlyRunId": 1791900294586,
-    "lastPerPushStatus": null
-   },
-   {
-    "file": "src/store/authorityReads.test.ts",
-    "nightlyRunId": 1791900294586,
-    "lastPerPushStatus": null
-   },
-   {
-    "file": "src/systems/art/assetLint.test.ts",
-    "nightlyRunId": 1791900294586,
-    "lastPerPushStatus": null
-   },
-   {
-    "file": "src/systems/economy/economySourceScan.test.ts",
-    "nightlyRunId": 1791900294586,
-    "lastPerPushStatus": null
-   }
-  ]
+  "scopingSuspects": []
  },
  "features": {
   "unmapped": {
