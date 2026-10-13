@@ -263,6 +263,13 @@
       "parts": [{ "id": "shield-housing" }]
     },
     {
+      "itemId": "power.lode_clamp",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-lode-clamp",
+      "parts": [{ "id": "clamp-housing" }]
+    },
+    {
       "itemId": "power.grav_anchor",
       "kind": "slot",
       "attach": "slot",

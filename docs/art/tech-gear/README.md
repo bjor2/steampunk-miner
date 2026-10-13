@@ -99,6 +99,10 @@ tints for horizontal unlocks, orange left to heat.
 - Not looked over live in the MCP Blender: the shared instance was not listening on the box
   during this session (`ss -ltn` showed nothing on 9876, no display for the MCP add-on), so the
   review is the headless renders above, the same way #145 and #197 were reviewed.
+- **The lode clamp has its housing** (ticket 350, 13 Oct 2026): `vehicle-item-power-lode-clamp`,
+  a brass lattice over a lodestone puck with a steel jaw either side, authored by
+  `author_tech_gear.py` and exported like the eleven; the slot-model lint had flagged it once
+  ticket 285 shipped the clamp without one. Looked over in a headless workbench render only.
 
 ## Known limits, for the wiring and the Game Director
 

@@ -59,6 +59,7 @@ const PHYSICAL_ITEM_IDS = [
   'power.void_sounder',
   'power.steam_boost',
   'power.steam_shield',
+  'power.lode_clamp',
   'power.grav_anchor',
   'power.buoyancy_tanks',
   'power.repulsor_coil',

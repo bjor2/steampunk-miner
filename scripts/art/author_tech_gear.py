@@ -625,6 +625,17 @@ def author_steam_shield(table, items):
     return slot_housing('shield-housing', detail)
 
 
+def author_lode_clamp(table, items):
+    """A brass lattice over a lodestone puck, a steel jaw either side (ticket 285's anchor verb)."""
+    lattice = [box('brass', (0.1, 0.006, 0.006), (0, -0.034, 0), turn_y=turn) for turn in (0.785, -0.785)]
+    lattice += [box('brass', (0.09, 0.006, 0.006), (0, -0.034, z)) for z in (-0.035, 0.035)]
+    jaws = [box('steel', (0.014, 0.02, 0.07), (x, -0.035, 0)) for x in (-0.05, 0.05)]
+    return slot_housing('clamp-housing', lattice + jaws + [
+        cylinder('dark-iron', 0.018, 0.012, (0, -0.036, 0), 'Y'),
+        torus('copper', 0.019, 0.004, (0, -0.043, 0)),
+    ])
+
+
 def author_grav_anchor(table, items):
     return slot_housing('anchor-housing', [
         sphere('dark-iron', 0.03, (0, -0.04, 0)),
@@ -748,6 +759,7 @@ BUILDERS = {
     'vehicle-item-power-void-sounder': author_void_sounder,
     'vehicle-item-power-steam-boost': author_steam_boost,
     'vehicle-item-power-steam-shield': author_steam_shield,
+    'vehicle-item-power-lode-clamp': author_lode_clamp,
     'vehicle-item-power-grav-anchor': author_grav_anchor,
     'vehicle-item-power-buoyancy-tanks': author_buoyancy_tanks,
     'vehicle-item-power-repulsor-coil': author_repulsor_coil,
