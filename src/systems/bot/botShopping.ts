@@ -49,9 +49,9 @@ import { wouldAccept } from './botDryRun'
 import {
   buyDueSlicePurchases,
   buySlicePurchases,
+  hasDueSlicePurchaseAtBay,
+  hasSlicePurchaseAtBay,
   isSavingForDuePurchase,
-  nextDueSlicePurchase,
-  nextSlicePurchase,
 } from './botSlicePurchases'
 import { canPay, canPayForBrass, walletOf } from './botWallet'
 import type { ShopSpend } from './shopSpend'
@@ -102,10 +102,10 @@ function serviceIntents(session: BotSession): CommandIntent[] {
   ]
 }
 
-/** Whether the bot would buy anything now, wherever it is docked. */
+/** Whether the bot would buy anything at the Upgrade bay now, wherever it is docked. */
 export function hasPurchase(session: BotSession, situation: ShoppingSituation): boolean {
   return (
-    nextDueSlicePurchase(session) !== null ||
+    hasDueSlicePurchaseAtBay(session) ||
     nextPurchase(session, situation) !== null ||
     hasUnsavedSlicePurchase(session)
   )
@@ -127,7 +127,7 @@ export function buyUpgrades(session: BotSession, situation: ShoppingSituation): 
 
 /** A slice purchase pays, and no due one keeps the money back for itself. */
 function hasUnsavedSlicePurchase(session: BotSession): boolean {
-  return !isSavingForDuePurchase(session) && nextSlicePurchase(session) !== null
+  return !isSavingForDuePurchase(session) && hasSlicePurchaseAtBay(session)
 }
 
 /** The kernel's buys in one visit, and whether a refused held step ended them. */

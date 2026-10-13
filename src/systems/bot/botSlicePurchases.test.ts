@@ -5,6 +5,7 @@ import type { CommandRule } from '../authority/commandRule'
 import { rejectionOf } from '../authority/commandRule'
 import { createAuthorityState, type AuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
+import { atBayRejection } from '../authority/dockRules'
 import { cmp, fromCanonical, sub, toCanonical, ZERO_MONEY } from '../money'
 import type { BotPurchase } from '../registries/botPurchases'
 import { readSection, withSection, type SaveSection } from '../registries/saveSections'
@@ -19,6 +20,7 @@ import { spendShareByPlanet } from './shopSpend'
 declare module '../authority/authorityCommand' {
   interface CommandPayloads {
     'botprobe.buyBadge': { grade: number }
+    'botprobe.buyBayBadge': { grade: number }
   }
 }
 
@@ -37,14 +39,16 @@ const BADGES: SaveSection<number> = {
 
 const BUY_BADGE: CommandRule<'botprobe.buyBadge'> = {
   fields: { grade: 'wholeNumber' },
-  reject: (state, { playerId, payload }) => {
-    if (payload.grade !== readSection(state, playerId, BADGES) + 1) {
-      return rejectionOf('invalid_payload', 'not the next badge grade')
-    }
-    const isShort = cmp(state.players[playerId].wallet, BADGE_PRICE) < 0
-    return isShort ? rejectionOf('money_short', 'badge costs more than the wallet') : null
-  },
+  reject: (state, { playerId, payload }) => badgeRejection(state, playerId, payload.grade),
   apply: (state, { playerId, payload }) => chargeForBadge(state, playerId, payload.grade),
+}
+
+function badgeRejection(state: AuthorityState, playerId: string, grade: number) {
+  if (grade !== readSection(state, playerId, BADGES) + 1) {
+    return rejectionOf('invalid_payload', 'not the next badge grade')
+  }
+  const isShort = cmp(state.players[playerId].wallet, BADGE_PRICE) < 0
+  return isShort ? rejectionOf('money_short', 'badge costs more than the wallet') : null
 }
 
 function chargeForBadge(state: AuthorityState, playerId: string, grade: number) {
@@ -105,14 +109,62 @@ const DEAR_MEDAL_SLICE: SliceDefinition = {
   },
 }
 
+/**
+ * The badge sold only at the Upgrade bay, as the kernel's `buyVehicleItem` is (ticket 248): the
+ * Sell bay refuses it with `wrong_bay`, where the bot decides whether to drive over.
+ */
+const BUY_BAY_BADGE: CommandRule<'botprobe.buyBayBadge'> = {
+  fields: { grade: 'wholeNumber' },
+  reject: (state, { playerId, payload }) =>
+    atBayRejection(state, playerId, 'upgrade') ?? badgeRejection(state, playerId, payload.grade),
+  apply: (state, { playerId, payload }) => chargeForBadge(state, playerId, payload.grade),
+}
+
+const BAY_BADGE_PURCHASE: BotPurchase = { ...BADGE_PURCHASE, command: 'botprobe.buyBayBadge' }
+
+/** The Upgrade bay's badges, bought when they pay (ticket 248's items). */
+const BAY_BADGE_SLICE: SliceDefinition = {
+  id: 'botprobe',
+  register: (r) => {
+    r.saveSection(BADGES)
+    r.commandRules({ 'botprobe.buyBayBadge': BUY_BAY_BADGE })
+    r.botPurchase(BAY_BADGE_PURCHASE)
+  },
+}
+
+/** The Upgrade bay's badges, due ahead of the tracks (ticket 296's extractors). */
+const DUE_BAY_BADGE_SLICE: SliceDefinition = {
+  id: 'botprobe',
+  register: (r) => {
+    r.saveSection(BADGES)
+    r.commandRules({ 'botprobe.buyBayBadge': BUY_BAY_BADGE })
+    r.botPurchase({ ...BAY_BADGE_PURCHASE, duePayloadsOf: BADGE_PURCHASE.payloadsToTry })
+  },
+}
+
 /** The bot docked at planet 2's Upgrade bay with `wallet` to spend. */
 function botAtUpgradeBay(wallet: string): BotSession {
+  return botDockedAt('upgrade', wallet)
+}
+
+/** The bot docked at planet 2's Sell bay, back from a trip, with `wallet` to spend. */
+function botAtSellBay(wallet: string): BotSession {
+  return botDockedAt('sell', wallet)
+}
+
+function botDockedAt(bay: 'sell' | 'upgrade', wallet: string): BotSession {
   const start = createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] })
   const session = createBotSession(start, 'p1')
   session.submit({ type: 'debug.setPlanet', payload: { planetIndex: 2 } })
   session.submit({ type: 'debug.setMoney', payload: { amount: wallet } })
-  session.submit({ type: 'debug.teleportToDock', payload: { bay: 'upgrade' } })
+  session.submit({ type: 'debug.teleportToDock', payload: { bay } })
   return session
+}
+
+/** Undocks and docks again at `bay`, as the bot drives along the pad between bays. */
+function redockAt(session: BotSession, bay: 'sell' | 'upgrade'): void {
+  session.submit({ type: 'undock', payload: {} })
+  session.submit({ type: 'debug.teleportToDock', payload: { bay } })
 }
 
 function situationOf(session: BotSession): ShoppingSituation {
@@ -182,6 +234,15 @@ describe('bot: slice purchases', () => {
     expect(withRegistrations([BADGE_SLICE], () => hasPurchase(session, situation))).toBe(true)
   })
 
+  it('makes the Upgrade bay worth a visit from the Sell bay when only its slice purchase pays', () => {
+    const session = botAtUpgradeBay('1e9')
+    const situation = situationOf(session)
+    withRegistrations([], () => buyUpgrades(session, situation))
+    redockAt(session, 'sell')
+    expect(withRegistrations([], () => hasPurchase(session, situation))).toBe(false)
+    expect(withRegistrations([BAY_BADGE_SLICE], () => hasPurchase(session, situation))).toBe(true)
+  })
+
   it('buys nothing beyond the kernel purchases while no slice registered one', () => {
     withRegistrations([], () => {
       const session = botAtUpgradeBay('1e9')
@@ -212,6 +273,16 @@ describe('bot: slice purchases due ahead of the tracks (ticket 296)', () => {
       expect(commandTypesOf(session)).not.toContain('buyUpgrade')
       expect(commandTypesOf(session)).not.toContain('botprobe.buyBadge')
       expect(session.state().players.p1.wallet).toEqual(before)
+    })
+  })
+
+  it('drives from the Sell bay to the Upgrade bay for a due purchase only that bay sells', () => {
+    withRegistrations([DUE_BAY_BADGE_SLICE], () => {
+      const session = botAtSellBay('1e9')
+      expect(hasPurchase(session, situationOf(session))).toBe(true)
+      redockAt(session, 'upgrade')
+      buyUpgrades(session, situationOf(session))
+      expect(readSection(session.state(), 'p1', BADGES)).toBe(TOP_GRADE)
     })
   })
 

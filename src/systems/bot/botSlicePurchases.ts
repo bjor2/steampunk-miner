@@ -6,6 +6,12 @@
  *
  * A purchase's due payloads (ticket 296, an extractor on its planet) come first instead, before
  * the kernel's own, and while one is due the bot saves for it (`isSavingForDuePurchase`).
+ *
+ * Whether a purchase makes the Upgrade bay worth the drive is asked at the Sell bay, where the
+ * authority refuses the Upgrade bay's commands (`buyVehicleItem`: `wrong_bay`), so that question
+ * skips the dry run and trusts the purchase's own `isAvailable` and the wallet; the buy at the bay
+ * still dry-runs every pick. Asking the dry run there left the bot saving for a due extractor it
+ * never drove over to buy (ticket 352: seeds 31415 and 27182 stalled on planet 5).
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import type { Money } from '../money'
@@ -24,13 +30,26 @@ export interface SlicePurchasePick {
 /** Which of a purchase's payloads a pick is drawn from: all it would try, or its due ones. */
 type PayloadsOf = (purchase: BotPurchase, session: BotSession) => readonly unknown[]
 
-export function nextSlicePurchase(session: BotSession): SlicePurchasePick | null {
-  return nextPickOf(session, payloadsToTryOf)
+/** Whether the bot takes a pick: at the bay the authority must accept it, from afar it must pay. */
+type PickTest = (session: BotSession, pick: SlicePurchasePick) => boolean
+
+function nextSlicePurchase(session: BotSession): SlicePurchasePick | null {
+  return nextPickOf(session, payloadsToTryOf, isAcceptedHere)
 }
 
 /** The first due payload the wallet pays, as `nextSlicePurchase` picks; null when none does. */
-export function nextDueSlicePurchase(session: BotSession): SlicePurchasePick | null {
-  return nextPickOf(session, duePayloadsOf)
+function nextDueSlicePurchase(session: BotSession): SlicePurchasePick | null {
+  return nextPickOf(session, duePayloadsOf, isAcceptedHere)
+}
+
+/** A slice purchase the wallet pays, wherever the bot is docked: worth a drive to the bay. */
+export function hasSlicePurchaseAtBay(session: BotSession): boolean {
+  return nextPickOf(session, payloadsToTryOf, isPaidFor) !== null
+}
+
+/** A due payload the wallet pays, wherever the bot is docked: worth a drive to the bay. */
+export function hasDueSlicePurchaseAtBay(session: BotSession): boolean {
+  return nextPickOf(session, duePayloadsOf, isPaidFor) !== null
 }
 
 /** Buys slice purchases while one pays; answers what each was estimated to cost. */
@@ -60,9 +79,13 @@ function buyEachPick(
   return spends
 }
 
-function nextPickOf(session: BotSession, payloadsOf: PayloadsOf): SlicePurchasePick | null {
+function nextPickOf(
+  session: BotSession,
+  payloadsOf: PayloadsOf,
+  isTaken: PickTest,
+): SlicePurchasePick | null {
   for (const purchase of botPurchases()) {
-    const pick = firstPayablePick(session, purchase, payloadsOf(purchase, session))
+    const pick = firstTakenPick(session, purchase, payloadsOf(purchase, session), isTaken)
     if (pick !== null) return pick
   }
   return null
@@ -76,19 +99,20 @@ function duePayloadsOf(purchase: BotPurchase, session: BotSession): readonly unk
   return purchase.duePayloadsOf?.(session.state(), session.playerId) ?? []
 }
 
-function firstPayablePick(
+function firstTakenPick(
   session: BotSession,
   purchase: BotPurchase,
   payloads: readonly unknown[],
+  isTaken: PickTest,
 ): SlicePurchasePick | null {
   for (const args of payloads) {
-    const pick = payablePickOf(session, purchase, args)
-    if (pick !== null) return pick
+    const pick = availablePickOf(session, purchase, args)
+    if (pick !== null && isTaken(session, pick)) return pick
   }
   return null
 }
 
-function payablePickOf(
+function availablePickOf(
   session: BotSession,
   purchase: BotPurchase,
   args: unknown,
@@ -97,8 +121,15 @@ function payablePickOf(
   if (!purchase.isAvailable(state, session.playerId, args)) return null
   const estimatedCost = purchase.estimateCost(state, session.playerId, args)
   const intent = { type: purchase.command, payload: args } as CommandIntent
-  const isPayable = canPay(session, estimatedCost) && wouldAccept(session, intent)
-  return isPayable ? { purchase, intent, estimatedCost } : null
+  return { purchase, intent, estimatedCost }
+}
+
+function isPaidFor(session: BotSession, pick: SlicePurchasePick): boolean {
+  return canPay(session, pick.estimatedCost)
+}
+
+function isAcceptedHere(session: BotSession, pick: SlicePurchasePick): boolean {
+  return isPaidFor(session, pick) && wouldAccept(session, pick.intent)
 }
 
 function spendOf(session: BotSession, pick: SlicePurchasePick): ShopSpend {
