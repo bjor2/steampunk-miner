@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { cellDensitySum } from './cellYield'
-import { casingRingAround, lineRing } from './casingLining'
+import { casingRingAround, cellWallSamplesOf, lineRing } from './casingLining'
 import { carveDisc, clearDisc, type CellDrillTicks } from './groundEdit'
 import { planetParamsFor } from './planetParams'
 import { MM_PER_SAMPLE, chunkOfSample, localSampleOf, sampleIndexOf } from './sampleGrid'
@@ -221,5 +221,19 @@ describe('re-drilling casing', () => {
     expect(through.casingCleared).toEqual({ samples: lined.placed, grade: 3 })
     expect(casingAt(through.world, linedSample.sx, linedSample.sy)).toBe(0)
     expect(densityAt(through.world, linedSample.sx, linedSample.sy)).toBe(0)
+  })
+})
+
+describe("casing lining: an opened cell's walls (ticket 377)", () => {
+  it('names the 16 samples one step outside the four sides of the cell, none inside or at a corner', () => {
+    const walls = cellWallSamplesOf({ tx: 2, ty: -3 })
+    const inCell = (s: number, first: number) => s >= first && s < first + 4
+    expect(walls).toHaveLength(16)
+    expect(new Set(walls.map(({ sx, sy }) => `${sx},${sy}`)).size).toBe(16)
+    for (const { sx, sy } of walls) {
+      const isBesideSide =
+        (inCell(sx, 8) && (sy === -13 || sy === -8)) || (inCell(sy, -12) && (sx === 7 || sx === 12))
+      expect(isBesideSide).toBe(true)
+    }
   })
 })
