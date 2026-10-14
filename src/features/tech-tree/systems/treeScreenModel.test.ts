@@ -113,6 +113,8 @@ describe('tech tree screen: lanes', () => {
         'drill-gear',
         'aetheric',
         'combo',
+        'armoury.bore_gun',
+        'armoury.auto_guns',
       ])
       const aetheric = model.lanes.find((lane) => lane.lane === 'aetheric')!
       expect(aetheric.title).toBe('Aetheric science')
