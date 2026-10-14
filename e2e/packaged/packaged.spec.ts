@@ -204,6 +204,24 @@ test.describe('packaged build (#29 packaged-smoke)', () => {
     await app.close()
   })
 
+  test("meshes the terrain in the chunk worker, loaded from the package's file:// assets (ticket 337)", async () => {
+    // The terrain draws only on drawn frames, so WebGL must start (#102, as below).
+    const { app } = await launchGame(['--debug-api', ...SOFTWARE_GL_SWITCHES])
+    const page = await app.firstWindow()
+    await page.waitForFunction(() => window.steampunkDebug !== undefined)
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => {
+            const stats = window.steampunkDebug!.ui.getRenderStats()
+            return stats.ok && stats.stats.isTerrainWorkerMeshing && stats.stats.drawnChunks > 0
+          }),
+        { timeout: 60_000 },
+      )
+      .toBe(true)
+    await app.close()
+  })
+
   test('fits its window as the browser fits the same window: UI scale, zoom cap, render floor (#173)', async () => {
     // The zoom cap and the render floor are read from drawn frames, so WebGL must start: under
     // Xvfb only SwiftShader gives it one (#102), and the switches are harmless elsewhere.
