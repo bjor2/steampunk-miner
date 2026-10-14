@@ -178,7 +178,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 
-### `extraction`: 14 files, 72 tests
+### `extraction`: 15 files, 80 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -191,6 +191,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/drainPerMinute.test.ts` | 2 | 2 |
 | `src/features/extraction/systems/drainTake.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/extractionEconomy.test.ts` | 4 | 4 |
+| `src/features/extraction/systems/extractionFork.test.ts` | 8 | 8 |
 | `src/features/extraction/systems/extractionItems.test.ts` | 8 | 8 |
 | `src/features/extraction/systems/extractionSales.test.ts` | 3 | 3 |
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
@@ -389,7 +390,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
-### `sensing`: 22 files, 143 tests
+### `sensing`: 23 files, 151 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -409,6 +410,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/revealBoard.test.ts` | 11 | 11 |
 | `src/features/sensing/systems/revealPing.test.ts` | 3 | 3 |
 | `src/features/sensing/systems/sensingEconomy.test.ts` | 5 | 5 |
+| `src/features/sensing/systems/sensingFork.test.ts` | 8 | 8 |
 | `src/features/sensing/systems/sensingItems.test.ts` | 14 | 14 |
 | `src/features/sensing/systems/sensingSales.test.ts` | 2 | 2 |
 | `src/features/sensing/systems/sensingView.test.ts` | 2 | 2 |
@@ -467,7 +469,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 
-### `terrain-tools`: 35 files, 275 tests
+### `terrain-tools`: 36 files, 285 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -499,6 +501,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/statPreview.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/terrainEconomy.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/terrainEditCaps.test.ts` | 13 | 3 |
+| `src/features/terrain-tools/systems/terrainFork.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/terrainItems.test.ts` | 11 | 11 |
 | `src/features/terrain-tools/systems/terrainSales.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/terrainSection.test.ts` | 4 | 4 |
