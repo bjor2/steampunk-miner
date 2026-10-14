@@ -56,6 +56,7 @@ const CATALOGUE: readonly AttachedItem[] = [
   powerUp('power.ore_shifter', 'slot'),
   powerUp('power.steam_shield', 'slot'),
   powerUp('power.grav_anchor', 'slot'),
+  powerUp('power.resonance_whistle', 'slot'),
 ]
 
 function catalogueWith(id: string, change: Partial<AttachedItem>): AttachedItem[] {

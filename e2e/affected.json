@@ -90,6 +90,15 @@
       ]
     },
     {
+      "why": "The aetheric lane's resonance whistle in the slots, its lure section, its card lines and on the rig (ticket 262).",
+      "paths": ["src/features/aetheric/**"],
+      "specs": [
+        "e2e/browser/aetheric.spec.ts",
+        "e2e/browser/powerUpCore.spec.ts",
+        "e2e/browser/rigGear.spec.ts"
+      ]
+    },
+    {
       "why": "The tech gear on the rig, the Mark plates and the power-up effects (ticket 250).",
       "paths": [
         "src/features/tech-tree/scene/**",
