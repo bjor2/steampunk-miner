@@ -3,9 +3,15 @@
  * what the pacing bot spent researching nodes against everything it bought at the Upgrade bay,
  * travel excluded (#161 section 3). Reported, never failed on: a planet from P2 to P20 above the
  * watched share says to pull `kCapability` / `kCombo` before the #212 spend guard.
+ *
+ * Beside it, each of the six lanes' share of a planet's spend on the seed median (ticket 266, the
+ * sixth lane's row in the #212 guard): its nodes, Marks and items, as `laneSpend.ts` files them.
+ * Report-only, like the family rows: there are no per-lane bands, only the tree total is gated
+ * (GD ruling Q4 on #212), so the sixth row takes its share from the tree's total, never a stretched
+ * band.
  */
 import type { ShopSpend } from '../../../systems/bot/shopSpend'
-import { formatAmount } from '../../../systems/displayAmount'
+import { formatAmount, formatPercent } from '../../../systems/displayAmount'
 import {
   add,
   cmp,
@@ -16,8 +22,12 @@ import {
   ZERO_MONEY,
   type Money,
 } from '../../../systems/money'
+import { laneSpendRowsOf, type LaneSpendRow } from './laneSpend'
 import { RESEARCH_BOT_PURCHASE } from './researchBotPurchase'
+import { TECH_LANES, type TechLane } from './techNode'
+import { registeredTechTree, type TechTree } from './techTree'
 import { TREE_ECONOMY, type NodeShareWatch } from './treeEconomy'
+import { medianShareOf, treeSpendRowsOf, type TreeSpendRow } from './treeSpendGuard'
 
 export interface NodeSpendRow {
   planetIndex: number
@@ -55,6 +65,83 @@ export function nodeSpendTableOf(rows: readonly NodeSpendRow[]): string {
         `${percentOf(row.nodeShare)}% | ${row.isOverWatch ? 'above the watch' : ''} |`,
     ),
   ].join('\n')
+}
+
+/** One lane's share of a planet's spend: each seed that bought there, and their median. */
+export interface LaneShareRow {
+  planetIndex: number
+  lane: TechLane
+  /** In seed order, over the seeds that bought anything on the planet. */
+  seedShares: readonly Money[]
+  medianShare: Money
+}
+
+/** What one seed's run spent: per planet in all, and per planet and lane on the tree. */
+interface LaneLedger {
+  totals: readonly TreeSpendRow[]
+  lanes: readonly LaneSpendRow[]
+}
+
+/**
+ * On every planet any seed bought on, one row for each of the six lanes in screen order, at zero
+ * where the lane took nothing.
+ */
+export function laneShareRowsOf(
+  seedRuns: readonly (readonly ShopSpend[])[],
+  tree: TechTree = registeredTechTree(),
+): LaneShareRow[] {
+  const ledgers = seedRuns.map((spends) => laneLedgerOf(spends, tree))
+  return planetsBoughtOnOf(ledgers).flatMap((planetIndex) =>
+    TECH_LANES.map((lane) => laneShareRowOf(planetIndex, lane, ledgers)),
+  )
+}
+
+/** The lane rows as a Markdown table, each seed's share beside the median. */
+export function laneShareTableOf(rows: readonly LaneShareRow[]): string {
+  return [
+    '| planet | lane | seed shares | median |',
+    '|---|---|---|---|',
+    ...rows.map(laneShareLineOf),
+  ].join('\n')
+}
+
+function laneLedgerOf(spends: readonly ShopSpend[], tree: TechTree): LaneLedger {
+  return { totals: treeSpendRowsOf(spends), lanes: laneSpendRowsOf(spends, tree) }
+}
+
+function planetsBoughtOnOf(ledgers: readonly LaneLedger[]): number[] {
+  const planets = ledgers.flatMap((ledger) => ledger.totals.filter(isPaidFor))
+  return [...new Set(planets.map((row) => row.planetIndex))].sort((a, b) => a - b)
+}
+
+function laneShareRowOf(
+  planetIndex: number,
+  lane: TechLane,
+  ledgers: readonly LaneLedger[],
+): LaneShareRow {
+  const seedShares = ledgers.flatMap((ledger) => seedLaneShareOf(ledger, planetIndex, lane))
+  return { planetIndex, lane, seedShares, medianShare: medianShareOf(seedShares) }
+}
+
+/** The lane's share of the seed's planet spend; none when the seed bought nothing there. */
+function seedLaneShareOf(ledger: LaneLedger, planetIndex: number, lane: TechLane): Money[] {
+  const total = ledger.totals.find((row) => row.planetIndex === planetIndex)
+  if (total === undefined || !isPaidFor(total)) return []
+  return [div(laneSpendOn(ledger, planetIndex, lane), total.totalSpend)]
+}
+
+function laneSpendOn(ledger: LaneLedger, planetIndex: number, lane: TechLane): Money {
+  const row = ledger.lanes.find((each) => each.planetIndex === planetIndex && each.lane === lane)
+  return row === undefined ? ZERO_MONEY : add(row.nodeSpend, row.itemSpend)
+}
+
+function isPaidFor(row: TreeSpendRow): boolean {
+  return cmp(row.totalSpend, ZERO_MONEY) > 0
+}
+
+function laneShareLineOf(row: LaneShareRow): string {
+  const seeds = row.seedShares.map(formatPercent).join(' / ')
+  return `| P${row.planetIndex} | ${row.lane} | ${seeds} | ${formatPercent(row.medianShare)} |`
 }
 
 function rowOf(planetIndex: number, spends: readonly ShopSpend[], watch: NodeShareWatch) {

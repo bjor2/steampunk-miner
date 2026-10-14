@@ -16,6 +16,14 @@ import {
 } from './systems/familySharePins'
 import { familyShareRowsOf, familyShareTableOf, type SeedSpends } from './systems/familySpendShares'
 import {
+  loadoutYieldsOf,
+  loadoutYieldTableOf,
+  overCapLoadoutsOf,
+  type LoadoutYield,
+} from './systems/loadoutYieldCap'
+import { laneShareRowsOf, laneShareTableOf } from './systems/nodeSpendShare'
+import { registeredCatalogue } from './systems/techTree'
+import {
   missedPlanetsOf,
   treeShareTableOf,
   treeShareVerdictsOf,
@@ -28,7 +36,10 @@ import {
 // the seeds; the kernel turret mount counts in it once (ticket 371). Each family's share pin is
 // gated beside it on every planet: the armoury's recurring gun-track spend stays at or under 5%
 // (GD ruling on #371). Report-only, each spend family's share from the kernel registry (GD ruling
-// Q3, Q4 on #212), the one armoury row among them, printed on P2/P10/P20/P40 at zero too.
+// Q3, Q4 on #212), the one armoury row among them, printed on P2/P10/P20/P40 at zero too, and
+// each of the six lanes' share (ticket 266, the sixth lane's row; no per-lane band, GD Q4). Beside
+// the runs, the loadout yield cap (GD lock on #245, ticket 266): a full loadout at max Mark yields
+// no more than the five lanes' maximum on P10/P20/P40/P60, the Aetheric lane adding zero.
 // Headless, with no run log kept: the guard reads the bot's spend records and which family
 // anchors the run opened. The runs take hours, so this is a lane (vite.config.ts leaves it out
 // unless it is named):
@@ -77,6 +88,14 @@ describe('tech tree: spend guard of the pacing bot to planet 60', () => {
   })
 })
 
+describe('tech tree: the loadout yield cap beside the spend guard', () => {
+  it('holds a full loadout at max Mark to the five-lane maximum, the aetheric lane adding zero', () => {
+    const yields = loadoutYieldsOf(registeredCatalogue())
+    console.log(loadoutYieldTableOf(yields))
+    expect(overCapLoadoutsOf(yields).map(loadoutMissOf)).toEqual([])
+  })
+})
+
 function playSeedToLastPlanet(worldSeed: number): SeedRun {
   const scenario = JSON.parse(readFileSync(SCENARIO_FILE, 'utf8')) as Scenario
   const run = playSliceIntoSink(
@@ -114,12 +133,17 @@ function reportOf(
     treeShareTableOf(verdicts),
     sharePinTableOf(pinVerdicts),
     familyTableOf(seedRuns),
+    laneShareTableOf(laneShareRowsOf(seedRuns.map((seedRun) => seedRun.shopSpend))),
   ].join('\n')
 }
 
 /** Report-only: no family row fails the lane (GD ruling Q4 on #212). */
 function familyTableOf(seedRuns: readonly SeedRun[]): string {
   return familyShareTableOf(familyShareRowsOf(seedRuns.map(seedSpendsOf), REPORT_PLANETS))
+}
+
+function loadoutMissOf({ planetIndex }: LoadoutYield): string {
+  return `P${planetIndex}`
 }
 
 function pinMissOf({ planetIndex, familyId }: SharePinVerdict): string {
