@@ -123,6 +123,12 @@
               "description": "Bought modules show on the vehicle: the gun turret swings its barrel toward targets and the charge rack sits on the hull.",
               "status": "built",
               "issues": [108, 110]
+            },
+            {
+              "title": "Fork branch parts",
+              "description": "Each lane's P16 fork branch hangs its own part on the rig, so a co-op partner can read the build: side cutters for Wide, the resonance fork for Deep, the grapple winch for Agile, the ballast crate for Armoured, and so on for all twelve. Only the active branch shows. A re-choice at the Works plays the turntable beat: the new part turns to face the camera, holds, then the turntable goes back. The parts are existing gear art; the branches themselves arrive with their lanes.",
+              "status": "built",
+              "issues": [270, 255]
             }
           ]
         },

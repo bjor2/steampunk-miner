@@ -6,6 +6,7 @@ import { techTreeDebugActions } from './debug'
 import { researchedMarkOf } from './systems/itemMarks'
 import { markTierOf } from './systems/markNodes'
 import { markBearerOfItem, registeredTechTree } from './systems/techTree'
+import { FORK_FIXTURE_SLICE } from './treeFixtureSlice'
 import { withFixtureTree } from './treeTestSession'
 
 const actions = techTreeDebugActions
@@ -132,6 +133,23 @@ describe('tech tree: the rig debug read (ticket 250)', () => {
     expect(actions.previewPowerUpFx('power.steam_boost', 6)).toEqual({ ok: true })
     expect(actions.previewPowerUpFx('power.steam_boost', 'six')).toMatchObject({ ok: false })
     expect(actions.previewPowerUpFx('power.grav_anchor')).toMatchObject({ ok: false })
+  })
+
+  it('lists every registered fork branch, none active before a choice, with the parts it hangs', () => {
+    const read = withFixtureTree(() => actions.getForks(), [FORK_FIXTURE_SLICE]) as {
+      ok: true
+      branches: { lane: string; branch: string; isActive: boolean; mounts: unknown[] }[]
+    }
+    const wide = read.branches.find(({ branch }) => branch === 'wide')
+
+    expect(read.branches).toHaveLength(12)
+    expect(read.branches.some(({ isActive }) => isActive)).toBe(false)
+    expect(wide).toEqual({
+      lane: 'drill-gear',
+      branch: 'wide',
+      isActive: false,
+      mounts: [{ assetId: 'vehicle-item-gear-side-cutters', attachId: 'drill.flank' }],
+    })
   })
 })
 

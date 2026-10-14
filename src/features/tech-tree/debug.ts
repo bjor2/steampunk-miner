@@ -7,7 +7,9 @@
  * the mounted items, each asset at its point, each cradle's Mark plate with its milestone studs,
  * and the power-up effects running with their looks (ticket 277); `previewPowerUpFx(itemId, mark?)`
  * plays an item's effects at the vehicle through the real layer, at the Mark the item acts at
- * unless `mark` says otherwise, presentation only: no command and no log line.
+ * unless `mark` says otherwise, presentation only: no command and no log line. `getForks()` reads
+ * every registered fork branch, whether the local player has it active and the parts it hangs on
+ * the rig (ticket 270).
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import type { DebugResult } from '../../debug/debugScreens'
@@ -19,12 +21,15 @@ import { iconUrlOf } from '../../ui/vectorIcons'
 import { powerUpFxPresence } from './scene/powerUpFxPresence'
 import { previewFxAtVehicle } from './store/powerUpFxFeed'
 import { readCarriedRig, rigSightOfCarried } from './store/rigReads'
+import { forkChoicesOf } from './systems/forkSection'
+import { activeBranchOf } from './systems/forkNode'
 import { researchedMarkOf } from './systems/itemMarks'
+import { forkMountsOf } from './systems/render/forkPieces'
 import type { MarkPlate } from './systems/render/markPlate'
 import { activeFxIdsOf, activeFxLooksOf } from './systems/render/powerUpFxFeed'
 import type { RigMount } from './systems/render/rigGear'
 import { powerUpFxOfItem } from './systems/render/techGear'
-import { registeredTechTree, unlockAllPlanetOf } from './systems/techTree'
+import { registeredTechTree, unlockAllPlanetOf, type ForkBranchNode } from './systems/techTree'
 import { unlockedNodeIdsOf } from './systems/techTreeSection'
 import { registeredTreeShapeProblems } from './systems/treeShape'
 
@@ -40,6 +45,7 @@ export const techTreeDebugActions: Readonly<Record<string, DebugAction>> = {
     unlocked: unlockedNodeIdsOf(readAuthorityState(), useGameStore.getState().playerId),
   }),
   getRig: () => readRig(),
+  getForks: () => ({ ok: true, branches: registeredTechTree().forkBranches.map(listedBranch) }),
   previewPowerUpFx: (itemId, mark) => previewItemFx(itemId, mark),
 }
 
@@ -53,6 +59,12 @@ function readRig() {
     plates: sight.plates.map(listedPlate),
     fx: readFx(),
   }
+}
+
+function listedBranch({ lane, branch }: ForkBranchNode) {
+  const choices = forkChoicesOf(readAuthorityState(), useGameStore.getState().playerId)
+  const isActive = activeBranchOf(choices, lane) === branch
+  return { lane, branch, isActive, mounts: forkMountsOf(lane, branch) }
 }
 
 function listedMount(mount: RigMount) {

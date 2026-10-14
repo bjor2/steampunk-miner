@@ -99,18 +99,20 @@
       ]
     },
     {
-      "why": "The tech gear on the rig, the Mark plates and the power-up effects (ticket 250), and the aetheric parts on their own points (ticket 265).",
+      "why": "The tech gear on the rig, the Mark plates and the power-up effects (ticket 250), the aetheric parts on their own points (ticket 265), and the fork branches' parts with the re-choice's turntable beat (ticket 270).",
       "paths": [
         "src/features/tech-tree/scene/**",
         "src/features/tech-tree/store/rigReads.ts",
         "src/features/tech-tree/store/powerUpFxFeed.ts",
         "src/features/tech-tree/systems/render/**",
-        "src/features/tech-tree/techGear.json"
+        "src/features/tech-tree/techGear.json",
+        "src/features/tech-tree/forkPieces.json"
       ],
       "specs": [
         "e2e/browser/rigGear.spec.ts",
         "e2e/browser/vehiclePieces.spec.ts",
-        "e2e/browser/aetheric.spec.ts"
+        "e2e/browser/aetheric.spec.ts",
+        "e2e/browser/forkPieces.spec.ts"
       ]
     },
     {
@@ -150,6 +152,7 @@
         "e2e/browser/itemCards.spec.ts",
         "e2e/browser/shops.spec.ts",
         "e2e/browser/dockBuildings.spec.ts",
+        "e2e/browser/forkPieces.spec.ts",
         "e2e/browser/screens/reviewShots.spec.ts",
         "e2e/browser/screens/screenLayout.spec.ts"
       ]

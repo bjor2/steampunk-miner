@@ -405,11 +405,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 39 files, 290 tests
+### `tech-tree`: 40 files, 296 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/tech-tree/debug.test.ts` | 11 | 11 |
+| `src/features/tech-tree/debug.test.ts` | 12 | 12 |
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
@@ -431,6 +431,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts` | 0 | 1 |
 | `src/features/tech-tree/systems/nodeSpendShare.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/render/extractorPose.test.ts` | 6 | 6 |
+| `src/features/tech-tree/systems/render/forkPieces.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/render/markPlate.test.ts` | 8 | 8 |
 | `src/features/tech-tree/systems/render/milestoneLook.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/render/powerUpFx.test.ts` | 9 | 9 |
@@ -489,13 +490,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/vehicleAnchors.test.ts` | 20 | 2 |
 | `src/features/terrain-tools/terrainReplay.test.ts` | 2 | 1 |
 
-### `workshop`: 12 files, 86 tests
+### `workshop`: 13 files, 91 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/features/workshop/debug.test.ts` | 5 | 5 |
+| `src/features/workshop/debug.test.ts` | 6 | 6 |
 | `src/features/workshop/scene/showcaseParts.test.ts` | 5 | 5 |
-| `src/features/workshop/store/workshopStore.test.ts` | 15 | 15 |
+| `src/features/workshop/store/workshopStore.test.ts` | 17 | 17 |
 | `src/features/workshop/systems/chainCues.test.ts` | 6 | 6 |
 | `src/features/workshop/systems/chainPreview.test.ts` | 6 | 6 |
 | `src/features/workshop/systems/holdChain.test.ts` | 15 | 15 |
@@ -504,6 +505,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/workshop/systems/plaqueReading.test.ts` | 5 | 5 |
 | `src/features/workshop/systems/render/purchaseSound.test.ts` | 9 | 9 |
 | `src/features/workshop/systems/render/showcaseReactions.test.ts` | 8 | 8 |
+| `src/features/workshop/systems/render/turntableBeat.test.ts` | 2 | 2 |
 | `src/features/workshop/ui/showcaseCards.test.ts` | 2 | 2 |
 
 ## Kernel

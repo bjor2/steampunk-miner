@@ -7,6 +7,8 @@
  *   hold would. It adds no authority command and no log line of its own: the steps are the
  *   ordinary `buyUpgrade` commands a hold sends.
  * - `getChain()`: read-only, the selected track, the latest hold and its tally.
+ * - `getTurntable()`: read-only, the turntable's turn now in radians and the beat a fork
+ *   re-choice asked for (ticket 270), null before one.
  */
 import type { DebugAction } from '../../debug/debugActionRegistry'
 import { readAuthorityState } from '../../store/authorityLink'
@@ -15,6 +17,7 @@ import { toCanonical } from '../../systems/money'
 import { isUpgradeId } from '../../systems/vehicle/vehicleStats'
 import { useWorkshopStore } from './store/workshopStore'
 import { chainPreviewOf } from './systems/chainPreview'
+import { showcaseTurnRadiansAt } from './systems/render/turntableBeat'
 
 export const workshopDebugActions: Readonly<Record<string, DebugAction>> = {
   chainPreview: (track) => {
@@ -40,6 +43,10 @@ export const workshopDebugActions: Readonly<Record<string, DebugAction>> = {
       hold === null ? null : { upgradeId: hold.upgradeId, chainId: hold.chainId, ...hold.chain }
     const shownTally = tally === null ? null : { ...tally, spent: toCanonical(tally.spent) }
     return { ok: true, selected, hold: chain, tally: shownTally }
+  },
+  getTurntable: () => {
+    const { turn, beat } = useWorkshopStore.getState()
+    return { ok: true, radians: showcaseTurnRadiansAt(turn, beat, readAuthorityState().tick), beat }
   },
 }
 

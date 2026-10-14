@@ -65,4 +65,8 @@ describe('workshop: debug actions', () => {
     expect(workshopDebugActions.holdBuy('engine', 0)).toMatchObject({ ok: false })
     expect(workshopDebugActions.holdBuy('engine', 2.5)).toMatchObject({ ok: false })
   })
+
+  it('reads the turntable at rest, with no beat before a fork re-choice asks for one', () => {
+    expect(workshopDebugActions.getTurntable()).toEqual({ ok: true, radians: 0, beat: null })
+  })
 })
