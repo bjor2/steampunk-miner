@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T14:53:19+02:00",
+  "updated_at": "2026-10-14T15:01:34+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -20,18 +20,18 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 261,
-          "grok_slot": 2,
+          "ticket": 321,
+          "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-14T13:14:00+02:00"
+          "since": "2026-10-14T15:00:00+02:00"
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 268,
-          "grok_slot": 4,
-          "kind": "dev",
-          "since": "2026-10-14T13:14:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -43,17 +43,17 @@
         },
         {
           "slot": "C4",
-          "state": "busy",
-          "ticket": 267,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-14T13:24:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
-      "claims_last_hour": 0,
+      "used": 2,
+      "free": 2,
+      "claims_last_hour": 1,
       "name": "Claude Max 1"
     },
     {
@@ -104,15 +104,15 @@
     }
   ],
   "gate": {
-    "busy": 3,
+    "busy": 0,
     "max": 3
   },
   "tester": {
     "state": "running",
     "phase": "fast",
     "sha": "8d1eab48c54e8eb72d570b68b00c46ed6bcae40a",
-    "since": "2026-10-14T09:15:07Z",
-    "holds_gate": true,
+    "since": "2026-10-14T13:01:27Z",
+    "holds_gate": false,
     "claude_slot": null,
     "last_run": "2026-10-08T00:44:41Z",
     "last_nightly": "2026-10-08T05:23:05Z",
@@ -410,16 +410,15 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 267,
-      "since": "2026-10-14T13:24:00+02:00",
-      "claude_slot": 4
+      "ticket": 321,
+      "since": "2026-10-14T15:00:00+02:00",
+      "claude_slot": 1
     },
     {
       "slot": 2,
-      "state": "dev",
-      "ticket": 261,
-      "since": "2026-10-14T13:14:00+02:00",
-      "claude_slot": 1
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 3,
@@ -430,10 +429,9 @@
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 268,
-      "since": "2026-10-14T13:14:00+02:00",
-      "claude_slot": 2
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -488,17 +486,17 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 261,
-      "grok_slot": 2,
-      "since": "2026-10-14T13:14:00+02:00",
+      "ticket": 321,
+      "grok_slot": 1,
+      "since": "2026-10-14T15:00:00+02:00",
       "account": 1
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 268,
-      "grok_slot": 4,
-      "since": "2026-10-14T13:14:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -511,10 +509,10 @@
     },
     {
       "slot": 4,
-      "state": "busy",
-      "ticket": 267,
-      "grok_slot": 1,
-      "since": "2026-10-14T13:24:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -555,17 +553,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-14 13:51 CEST",
+    "at": "2026-10-14 15:00 CEST",
     "mode": "refill-dev",
-    "triggers": "#270",
-    "started": "#269->C3/A1",
+    "triggers": "#267",
+    "started": "#321->C1/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 2,
+      "dev": 2,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -573,8 +571,8 @@
     "claude": {
       "size": 8,
       "enabled": 4,
-      "used": 4,
-      "free": 0,
+      "used": 2,
+      "free": 2,
       "external": 0
     }
   }
