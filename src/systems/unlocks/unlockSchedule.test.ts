@@ -18,7 +18,23 @@ import {
  * The bytes of the locked file. Any edit to the schedule, even one that keeps its `source_hash`,
  * fails here until this pin is updated on purpose with the Horizontal Scaler's refresh.
  */
-const LOCKED_FILE_SHA256 = '00994a897eb096b768046a780b7d04d7d0840b9361c3a18e64531b0513365206'
+const LOCKED_FILE_SHA256 = '99a6771ed1a264a3065c55b47927399638df41c4c8cfbc7286cafa7c13024876'
+
+/** The pin before ticket 367 gave `casing_cement` its scopeNote, Content's copy on #367 (ruling B). */
+const PIN_BEFORE_CEMENT_SCOPE_NOTE =
+  '00994a897eb096b768046a780b7d04d7d0840b9361c3a18e64531b0513365206'
+
+/** What ticket 367 wrote into the casing_cement row, `[before, after]`. */
+const CEMENT_SCOPE_NOTE_EDIT: readonly [string, string] = [
+  '      "slice": 2\n',
+  '      "slice": 2,\n      "scopeNote": "Permanent ground reinforcement starts at P8 with refractory lining; earlier linings hold the bore but don\'t stop collapse (#367 ruling B)."\n',
+]
+
+/** The file's text as it stood before ticket 367. */
+function textBeforeCementScopeNote(text: string): string {
+  const [before, after] = CEMENT_SCOPE_NOTE_EDIT
+  return text.replace(after, before)
+}
 
 /** The pin before ticket 289 flipped `magnetic_planets` to shipped, its one named re-pin (#258 Q4). */
 const PIN_BEFORE_MAGNETIC_FLIP = '88ddb93162fa86883c8b3903d1a2588e3f23e6f41fdd98949c911ba4e93c9fc0'
@@ -307,7 +323,7 @@ describe('locked unlock schedule', () => {
   })
 
   it('changed only magnetic_planets.status in the flip, leaving grounded_lining a vision row', () => {
-    const text = textBeforeBoreGunRow(lockedFileText())
+    const text = textBeforeBoreGunRow(textBeforeCementScopeNote(lockedFileText()))
     const row = text.indexOf('"id": "magnetic_planets"')
     const rowEnd = text.indexOf('}', row)
     const unflipped =
@@ -322,8 +338,17 @@ describe('locked unlock schedule', () => {
   })
 
   it('added only the bore_gun row, the counts it moves and its provenance in ticket 313 (#309)', () => {
-    const before = textBeforeBoreGunRow(lockedFileText())
+    const before = textBeforeBoreGunRow(textBeforeCementScopeNote(lockedFileText()))
     expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(PIN_BEFORE_BORE_GUN_ROW)
+  })
+
+  it('added only the casing_cement scopeNote in ticket 367 (#367 ruling B)', () => {
+    const text = lockedFileText()
+    expect(text).toContain(CEMENT_SCOPE_NOTE_EDIT[1])
+    const before = textBeforeCementScopeNote(text)
+    expect(createHash('sha256').update(before, 'utf8').digest('hex')).toBe(
+      PIN_BEFORE_CEMENT_SCOPE_NOTE,
+    )
   })
 
   it('opens the planned bore_gun row on planet 1, in the Upgrade lane, pushing no other P1 row (#309)', () => {

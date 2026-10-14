@@ -104,7 +104,8 @@
       "status": "planned",
       "bind": "planet_gate",
       "name": "Auto casing & cement tiers",
-      "slice": 2
+      "slice": 2,
+      "scopeNote": "Permanent ground reinforcement starts at P8 with refractory lining; earlier linings hold the bore but don't stop collapse (#367 ruling B)."
     },
     {
       "id": "collapse_vacuum",
