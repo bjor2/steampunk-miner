@@ -230,6 +230,12 @@
               "issues": [41, 56]
             },
             {
+              "title": "Visible lining",
+              "description": "Lined tunnel walls show a brass plate on their open face, ribbed across with a line of rivets, readable even on a phone; refractory lining keeps its firebrick.",
+              "status": "built",
+              "issues": [309, 315]
+            },
+            {
               "title": "Lining bill",
               "description": "Lining fresh rock costs a little per metre; the bill is paid out of your next payout at the Sell bay, and whatever that visit can't cover is forgiven. Never debt.",
               "status": "built",
@@ -1266,6 +1272,12 @@
               "description": "Left mouse or X fires at the cursor, RT at the right stick; on touch, tap the fire tile to shoot along your facing or drag it to aim, with a reticle showing the line. A long press on the tile's lamp, or a click on the desktop lamp, switches auto-shoot once the steam sear is researched.",
               "status": "built",
               "issues": [314]
+            },
+            {
+              "title": "Gun on the rig",
+              "description": "Once mounted, the brass bore gun hangs under the drill nose, its barrel swinging to wherever you aim.",
+              "status": "built",
+              "issues": [315, 362]
             },
             {
               "title": "Bored ore pickup",

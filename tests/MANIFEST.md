@@ -170,7 +170,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
-### `ground-gun`: 24 files, 148 tests
+### `ground-gun`: 25 files, 155 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -195,6 +195,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/systems/gunTracks.test.ts` | 11 | 11 |
 | `src/features/ground-gun/systems/lampPress.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/render/aimOnScreen.test.ts` | 5 | 5 |
+| `src/features/ground-gun/systems/render/boreGunLook.test.ts` | 7 | 7 |
 | `src/features/ground-gun/systems/render/boreSpray.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/tilePress.test.ts` | 7 | 7 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
@@ -646,6 +647,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/debug/debugApi.test.ts` | 52 | 51 |
 | `src/debug/debugArtefact.test.ts` | 5 | 5 |
+| `src/debug/debugLining.test.ts` | 4 | 4 |
 | `src/debug/debugLiveTime.test.ts` | 3 | 3 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
@@ -849,7 +851,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/artefactLook.test.ts` | 2 | 2 |
 | `src/systems/render/bandPalette.test.ts` | 6 | 6 |
 | `src/systems/render/cameraTurn.test.ts` | 7 | 7 |
-| `src/systems/render/cellGateBits.test.ts` | 11 | 11 |
+| `src/systems/render/casingLiningLook.test.ts` | 7 | 7 |
+| `src/systems/render/cellGateBits.test.ts` | 12 | 12 |
 | `src/systems/render/chargePlacement.test.ts` | 2 | 2 |
 | `src/systems/render/chunkBuildBudget.test.ts` | 11 | 11 |
 | `src/systems/render/chunkFrameWork.test.ts` | 6 | 6 |
@@ -859,6 +862,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/chunkStreaming.test.ts` | 25 | 7 |
 | `src/systems/render/chunkTileBatch.test.ts` | 8 | 8 |
 | `src/systems/render/chunkTileBatchGates.test.ts` | 12 | 5 |
+| `src/systems/render/chunkTileBatchLining.test.ts` | 4 | 4 |
 | `src/systems/render/chunkTileBatchOreLook.test.ts` | 1 | 1 |
 | `src/systems/render/chunkWorkerStreaming.test.ts` | 8 | 2 |
 | `src/systems/render/collapseTelegraph.test.ts` | 8 | 8 |
