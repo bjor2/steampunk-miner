@@ -1,7 +1,7 @@
 /**
  * The no-free-cell check as a reusable harness (GD lock on #206, VS pin 1; ticket 323): #281's
  * exact test, which the twin bit passed, for every combo and twist. The pacing bot arrives on
- * planets 7 and 10 with the on-curve levels and plays to the core on each pacing seed twice: once
+ * planets 7 and 10 with the on-curve levels and the hull whole (`paceArrival.ts`) and plays to the core on each pacing seed twice: once
  * with a bare setup and once with the items owned, none slotted and no slot pressed. It drives
  * straight down (drive 0), so an item that only changes how a lane item plays must leave the run
  * exactly as it was: the same cells dug on the same ticks, the same ore banked for the same value,
@@ -14,14 +14,9 @@
 import { PACING_WORLD_SEEDS } from '../../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { CommandIntent } from '../authority/authorityCommand'
-import { createAuthorityState } from '../authority/authorityState'
 import type { DomainEvent } from '../authority/domainEvent'
-import { UPGRADE_IDS } from '../economy/economyDefinition'
-import { stepOfMajor } from '../economy/upgradeSteps'
-import { onCurveLevel } from '../economy/vehicleStats'
-import { setPlanetCommand, setPlanetSeedCommand } from '../startScenarioCommands'
-import { setUpgradeCommand } from '../vehicle/vehicleCommands'
-import { playSlice, type SliceRun } from './playSlice'
+import { arrivedPaceSessionOn, playToCoreFrom } from './paceArrival'
+import type { SliceRun } from './playSlice'
 
 export const NO_FREE_CELL_PLANETS = [7, 10] as const
 /** 83921, 31415 and 27182. */
@@ -29,7 +24,6 @@ export const NO_FREE_CELL_SEEDS = PACING_WORLD_SEEDS['bot-slice']
 
 /** Two hours on one planet: room for a slow core on either run. */
 const BUDGET_TICKS = 2 * 60 * 60 * TICKS_PER_SECOND
-const ARRIVAL_MONEY = '20000'
 
 /**
  * What each run sends after the arrival, before the first trip. Both lists hold as many commands,
@@ -91,22 +85,7 @@ function refuseUnevenSetups({ bare, owned }: NoFreeCellSetups): void {
 
 /** The bot from arrival on `planet` to its core, with `setup` sent before the first trip. */
 function coreRunOn(planet: number, worldSeed: number, setup: readonly CommandIntent[]): SliceRun {
-  const start = createAuthorityState({ planetIndex: 1, planetSeed: worldSeed, playerIds: ['p1'] })
-  return playSlice(start, {
-    maxTicks: BUDGET_TICKS,
-    lastPlanet: planet,
-    startCommands: [...arrivalOn(planet, worldSeed), ...setup],
-  })
-}
-
-/** On `planet` with the on-curve levels and a little money, as a bot arriving there. */
-function arrivalOn(planet: number, worldSeed: number): CommandIntent[] {
-  return [
-    setPlanetCommand(planet),
-    setPlanetSeedCommand(worldSeed),
-    { type: 'debug.setMoney', payload: { amount: ARRIVAL_MONEY } },
-    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, planet)))),
-  ]
+  return playToCoreFrom(arrivedPaceSessionOn(planet, worldSeed, setup), planet, BUDGET_TICKS)
 }
 
 /** Ticks from arrival to the planet's core; the whole budget when the core is never reached. */

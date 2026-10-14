@@ -285,6 +285,11 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (`lavaFlow.test.ts`, `lava/lavaRun.test.ts`) and build refractory rings with `debug.lineCasing`;
   breach specs find a generated pocket lying against an open cave cell and gnaw a ring lined in
   plain ground near it (#133: a breach frees only lava a refractory lining kept out).
+- **Pace arrival** (tickets 354 and 356): every pace harness (drill gear, twin bit, magnetic planet,
+  terrain magnets, no free cell) arrives through `bot/paceArrival.ts`: the on-curve levels, a little
+  money and the on-curve hull mended whole, since `debug.setUpgrade` keeps the planet-1 hull of
+  100 HP. `arrivedPaceSessionOn` refuses an arrival whose hull is neither whole nor a `NamedHull`
+  the spec passes on purpose (`paceArrival.test.ts`). A new pace harness starts there.
 - **Twin-bit head** (GD lock on #257, ticket 281): `npm run balance:twin-bit` runs
   `features/drill-gear/twinBitPace.test.ts`: the bot arrives on planets 7 and 10 on-curve and plays
   to the core on each pacing seed with the head in `drill.head` and with the same loadout command
