@@ -61,6 +61,21 @@ describe('tech tree screen', () => {
     })
   })
 
+  it('draws the Aetheric science swimlane with the nodes its slice registers', () => {
+    openTreeOnPlanet(3)
+    const html = shellMarkup()
+    const lane = html.slice(
+      html.indexOf('data-testid="tech-tree-lane-aetheric"'),
+      html.indexOf('data-testid="tech-tree-lane-combo"'),
+    )
+    expect(lane).toContain('Aetheric science')
+    ;[
+      'tech.aetheric.resonance_whistle',
+      'tech.aetheric.chronometric_governor',
+      'tech.aetheric.aether_condenser',
+    ].forEach((id) => expect(lane).toContain(`data-testid="tech-tree-node-${id}"`))
+  })
+
   it("focuses one lane's cards, then one node's card with its Research button", () => {
     withFixtureTree(() => {
       openTreeOnPlanet(3)

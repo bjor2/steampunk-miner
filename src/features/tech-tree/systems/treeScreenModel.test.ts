@@ -7,6 +7,8 @@ import {
   withNoLanes,
 } from '../treeTestSession'
 import { ANCHORED_NODE_ID, ANCHORED_NODE_SLICE } from '../treeFixtureSlice'
+import type { SliceDefinition } from '../../../registries/sliceDefinition'
+import { forkPairOf, type ForkBranchSpec } from './forkNode'
 import { romanNumeralOf } from './nodeCardModel'
 import { registeredTechTree } from './techTree'
 import {
@@ -25,6 +27,33 @@ function modelOn(planetIndex: number, query = EVERYTHING, money = '1e30'): TreeS
 
 function laneIds(model: TreeScreenModel, lane: string): string[] {
   return model.lanes.find((candidate) => candidate.lane === lane)!.nodes.map((node) => node.id)
+}
+
+const AETHERIC_ENTRY = 'tech.aetheric.resonance_whistle'
+
+/** The #245 Phase/Arc pair as #261 will author it; a stand-in until that build registers it. */
+function aethericBranch(branch: string, itemId: string): ForkBranchSpec {
+  return {
+    branch,
+    iconId: 'node-aetheric-resonance-whistle',
+    name: `Stand-in ${branch} branch`,
+    prereqs: [AETHERIC_ENTRY],
+    unlocks: itemId,
+    description: 'A stand-in branch of the aetheric fork.',
+    label: 'horizontal',
+  }
+}
+
+const AETHERIC_FORK_PROBE: SliceDefinition = {
+  id: 'aetheric-fork-probe',
+  register: (r) =>
+    r.content(
+      'tech-node',
+      forkPairOf('aetheric', [
+        aethericBranch('phase', 'power.phase_lantern'),
+        aethericBranch('arc', 'power.arc_coil'),
+      ]).branches,
+    ),
 }
 
 describe('tech tree screen: lanes', () => {
@@ -52,6 +81,41 @@ describe('tech tree screen: lanes', () => {
       expect(model.rulerMarks).toEqual([1, 5, 10, 15, 20, 25, 30, 35])
       expect(model.lastPlanet).toBe(37)
     })
+  })
+
+  it('draws Aetheric science as the sixth lane, after drill gear and before the combos', () => {
+    withFixtureTree(() => {
+      const model = modelOn(3)
+      expect(model.lanes.map((lane) => lane.lane)).toEqual([
+        'extraction',
+        'terrain',
+        'sensing',
+        'mobility',
+        'drill-gear',
+        'aetheric',
+        'combo',
+      ])
+      const aetheric = model.lanes.find((lane) => lane.lane === 'aetheric')!
+      expect(aetheric.title).toBe('Aetheric science')
+      expect(aetheric.nodes.map((node) => [node.id, node.tier, node.stack])).toEqual([
+        [AETHERIC_ENTRY, 15, 0],
+        ['tech.aetheric.chronometric_governor', 24, 0],
+        ['tech.aetheric.aether_condenser', 29, 0],
+      ])
+    })
+  })
+
+  it('stacks the aetheric P16 fork pair on one planet, as a shared planet stacks on any lane', () => {
+    withFixtureTree(() => {
+      const aetheric = modelOn(3).lanes.find((lane) => lane.lane === 'aetheric')!.nodes
+      expect(aetheric.map((node) => node.tier)).toEqual([15, 16, 16, 24, 29])
+      const fork = aetheric.filter((node) => node.tier === 16)
+      expect(fork.map((node) => node.id).sort()).toEqual([
+        'tech.aetheric.fork.arc',
+        'tech.aetheric.fork.phase',
+      ])
+      expect(fork.map((node) => node.stack)).toEqual([0, 1])
+    }, [AETHERIC_FORK_PROBE])
   })
 
   it('stretches the ruler past planet 40 to show the endless combos coming', () => {

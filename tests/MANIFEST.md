@@ -376,7 +376,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 32 files, 231 tests
+### `tech-tree`: 33 files, 236 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -384,6 +384,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
+| `src/features/tech-tree/systems/aethericCards.vision.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/aethericLane.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/forkCost.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/forkNode.test.ts` | 7 | 7 |
@@ -407,11 +408,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/researchBotPurchase.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/techTree.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
-| `src/features/tech-tree/systems/treeScreenModel.test.ts` | 11 | 11 |
+| `src/features/tech-tree/systems/treeScreenModel.test.ts` | 13 | 13 |
 | `src/features/tech-tree/systems/treeShape.test.ts` | 16 | 16 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 20 | 20 |
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
-| `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
+| `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 
 ### `terrain-tools`: 35 files, 273 tests
 
