@@ -640,7 +640,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/spanBudget.test.ts` | 4 | 4 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
-| `src/systems/authority/sweptCutAtSpeed.test.ts` | 7 | 7 |
+| `src/systems/authority/sweptCutAtSpeed.test.ts` | 8 | 8 |
 | `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
 | `src/systems/authority/sweptSpanDrill.test.ts` | 17 | 13 |
 | `src/systems/authority/teleportDebugRules.test.ts` | 5 | 5 |

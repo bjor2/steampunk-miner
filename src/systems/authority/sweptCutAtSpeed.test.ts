@@ -1,16 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { DRILL_STAMP_AHEAD_MM, DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import {
+  DRILL_STAMP_AHEAD_MM,
+  DRILL_SUBSTEPS_PER_TICK,
+  STEP_BOUND_TOLERANCE_MM,
+} from '../../constants/balance'
 import { CLOSED_CUT_GATE } from '../vehicle/cutGate'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { sweptDrillStampOf } from '../vehicle/drillStamp'
 import { pointAtStep, sweepPathOf, sweptStampOf, type SweptCut } from '../vehicle/sweptCut'
-import { FACING, type VehiclePose } from '../vehicle/vehiclePose'
+import { FACING, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
 import { carveDisc, walkStampInRows } from '../world/groundEdit'
 import { stampCellsUpTo, walkStampPerChunk } from '../world/sweptSpan'
 import type { StampPoint } from '../world/stampShape'
 import type { PlanetParams } from '../world/planetParams'
 import { CHUNK_SIZE, chunkOfTile, surfaceRowOfColumn } from '../world/tileGrid'
-import { EMPTY_WORLD, isGeneratedChunkHeld, type WorldState } from '../world/worldState'
+import {
+  EMPTY_WORLD,
+  isGeneratedChunkHeld,
+  materialCellAt,
+  type WorldState,
+} from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { cellDigEnergyOf } from './cellDigEnergy'
 import type { RuleEffect } from './commandRule'
@@ -19,7 +28,17 @@ import { drillAlongStep } from './drillStepCut'
 import { DRILL_CELLS_PER_TICK } from './cutShare'
 import { AWAY, onHeatPlanet } from './lava/lavaFixtures'
 import { planetParamsOf } from './planetOfState'
-import { createScriptedSession, PARAMS, poseAbove, type ScriptedSession } from './scriptedSession'
+import { drillSubStepsOfCells } from './groundDrill'
+import { heatThrottledDrill } from './heatRules'
+import { shockTicksFor } from './magnetic/electrifiedShock'
+import {
+  createScriptedSession,
+  FREEZE_ENEMIES,
+  PARAMS,
+  poseAbove,
+  type ScriptedSession,
+} from './scriptedSession'
+import { stepBoundsAt } from './stepBoundRead'
 import { columnSweep, sweepWith } from './sweptSpanFixtures'
 
 // The cut budget at any speed (ticket 335, TD scope b on #316 and the TD lock on #374): the same
@@ -202,5 +221,50 @@ describe('authority prefetch along the drive (ticket 335)', () => {
     const reach = session.vehicle().sweptCut?.yMm ?? 0
     const ahead = chunkOfTile(Math.floor((reach - CHUNK_SIZE * 1000) / 1000))
     expect(isGeneratedChunkHeld(params, cx, ahead)).toBe(true)
+  })
+})
+
+/** A strong rig on planet 40 over column 20, facing down, its enemies frozen. */
+function onPlanet40(): { state: AuthorityState; params: PlanetParams; top: VehiclePose } {
+  const session = createScriptedSession()
+  session.submit(0, { type: 'debug.setPlanet', payload: { planetIndex: 40 } })
+  session.submit(0, FREEZE_ENEMIES)
+  for (const upgradeId of ['drill_tip', 'drill_power']) {
+    session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId, level: 3000 } })
+  }
+  session.submit(0, { type: 'debug.setEnergy', payload: { energy: '100000000' } })
+  const params = planetParamsOf(session.state().planet) as PlanetParams
+  const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
+  const y = (surfaceRowOfColumn(20, params.radiusTiles) - 2) * 1000 + 500
+  session.submit(0, { type: 'reportPose', payload: { ...payload, x: 20_500, y } })
+  return {
+    state: session.state(),
+    params,
+    top: vehicleOf(session.state(), 'p1').pose as VehiclePose,
+  }
+}
+
+describe('energy per cell on planet 40 at the rig cut speed (ticket 335, Vertical Scaler)', () => {
+  it('charges within 1% of each broken cell at its own dig time', () => {
+    const start = onPlanet40()
+    const stepMm = stepBoundsAt(start.state, 'p1').cuttingMm - STEP_BOUND_TOLERANCE_MM
+    let state = start.state
+    const broken: { tx: number; ty: number }[] = []
+    for (let tick = 1; tick <= 240; tick++) {
+      const pose = { ...start.top, y: start.top.y - stepMm * tick }
+      const step = { pose, drive: NO_DRIVE, isLifting: false }
+      const effect = drillAlongStep({ ...state, tick }, start.params, 'p1', noseTileOf(pose), step)
+      effect.events.forEach((event) => event.type === 'TileDestroyed' && broken.push(event))
+      state = effect.state
+    }
+    const drill = heatThrottledDrill(start.params.planetIndex, vehicleOf(state, 'p1'))
+    const subStepsOf = drillSubStepsOfCells(start.params, drill, shockTicksFor(state, 'p1'))
+    const reference = broken.reduce((sum, tile) => {
+      const cell = materialCellAt(EMPTY_WORLD, start.params, tile)
+      return sum + cellDigEnergyOf(subStepsOf(tile, cell, 0) ?? 0)
+    }, 0)
+    const spent = vehicleOf(start.state, 'p1').energy - vehicleOf(state, 'p1').energy
+    expect(broken.length).toBeGreaterThanOrEqual(10)
+    expect(Math.abs(spent / reference - 1)).toBeLessThanOrEqual(0.01)
   })
 })
