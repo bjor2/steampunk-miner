@@ -301,6 +301,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   down-right and a down-left bore of six cells from the surface east of the pad. The eye check in
   `npm run dev` plays it from the console: take `s` from `twinBitDiagonal()`, then call
   `steampunkDebug.fastForward(s.ticks, s.commands)`.
+- **Drill-gear fork, Deep** (GD lock on #255, ticket 268): `features/drill-gear/forkDeep.pace.test.ts`
+  plays the bot from on-curve arrival to the core of planets 16 and 20 on the three pacing seeds,
+  once with the drill-gear fork unchosen and once with Deep chosen (both pass through the same
+  rich wallet and back to the arrival money). Gated on the median of the per-seed speed-ups: at
+  most one drill step (x1.225) faster than unchosen. A quick case checks the plunge crown inside
+  the `aheadCells` = 1 clamp. Wide's flank cells are judged by the 15% income cap through its
+  registered income rate (`drill-gear.gallery_reamers`, anchored on `side_drills`), which #385's
+  check reads. Long: for the box Tester.
 - **Magnetic planet** (GD lock on #258 Q7, ticket 294): `npm run balance:magnetic-planet` runs
   `features/planet-mix/magneticBandValue.test.ts` and `magneticPlanetPace.test.ts`. The class
   switches off at the same planet index with `withMagneticClassOff` (`magneticClassOff.ts`): the

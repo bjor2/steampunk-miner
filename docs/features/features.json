@@ -1035,9 +1035,9 @@
           "children": [
             {
               "title": "Mobility and survival power-ups",
-              "description": "Grapple winch (reel up to a wall or ceiling, refused at no cost with nothing to hook), emergency ballast, heat sink flask (once you own refractory lining), steam boost, rivet patch kit (hold still to plate the hull; moving gives the kit back), steam shield, smoke canister, grav anchor, buoyancy tanks and escape thruster, each with its tech node, Marks and item card. The five one-offs are bought at the Upgrade bay once researched; buying the consumables by the unit, and the models and effects on the rig, come later.",
+              "description": "Grapple winch (reel up to a wall or ceiling, refused at no cost with nothing to hook), emergency ballast, heat sink flask (once you own refractory lining), steam boost, rivet patch kit (hold still to plate the hull; moving gives the kit back), steam shield, smoke canister, grav anchor, buoyancy tanks and escape thruster, each with its tech node, Marks and item card. The five one-offs are bought at the Upgrade bay once researched. At the P16 fork the lane picks one branch: Agile's air trim vanes add lift and drive while the miner is off the ground, and Armoured's plated skirts take a quarter off enemy hits and collapse crush on solid ground and, once the steam shield's planet is reached, keep a raised curtain up a second longer. Buying the consumables by the unit, the models and effects on the rig, and picking a branch on the tree screen come later.",
               "status": "partial",
-              "issues": [204, 166, 248]
+              "issues": [204, 166, 248, 268]
             },
             {
               "title": "Sensing power-ups",
@@ -1074,9 +1074,9 @@
           "children": [
             {
               "title": "Drill gear",
-              "description": "Vibratory bit (soft ground ahead crumbles), spoil auger (fills the tunnel behind you, C to switch), side cutters, thaw crown, sampling corer (C: draws a plug from the first ore ahead, refused at no cost by a gated or core cell), twin-bit head (drive down and to a side to cut diagonally), dielectric bit (no shock or tug from electrified ground while the drill cuts) and reach boom, each in its drill socket with its tech node, Marks and item card, sold at the Upgrade bay once researched. Their models on the miner come later.",
+              "description": "Vibratory bit (soft ground ahead crumbles), spoil auger (fills the tunnel behind you, C to switch), side cutters, thaw crown, sampling corer (C: draws a plug from the first ore ahead, refused at no cost by a gated or core cell), twin-bit head (drive down and to a side to cut diagonally), dielectric bit (no shock or tug from electrified ground while the drill cuts) and reach boom, each in its drill socket with its tech node, Marks and item card, sold at the Upgrade bay once researched. At the P16 fork the lane picks one branch: Wide's gallery reamers cut one more cell on each flank of every cut, on top of the side cutters, and Deep's plunge crown cuts the cell below the bit while drilling down. Their models on the miner, and picking a branch on the tree screen, come later.",
               "status": "partial",
-              "issues": [205, 242, 248, 295]
+              "issues": [205, 242, 248, 295, 268]
             },
             {
               "title": "Aetheric science",

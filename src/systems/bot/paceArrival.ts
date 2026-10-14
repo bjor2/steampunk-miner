@@ -22,7 +22,8 @@ import { createBotSession, type BotSession } from './botSession'
 import { botPlanetOf } from './botTravel'
 import { playSliceFrom, type SliceRun } from './playSlice'
 
-const ARRIVAL_MONEY = '20000'
+/** What a pace run arrives with: a little money (ticket 356). */
+export const ARRIVAL_MONEY = '20000'
 
 /** A hull a spec arrives with on purpose, named so the run says why it is not whole. */
 export interface NamedHull {
