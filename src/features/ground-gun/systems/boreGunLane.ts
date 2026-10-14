@@ -9,7 +9,8 @@
  * (the fire input, the provider's auto-shoot answer and its range and hold). The five signature
  * modules need a shot to split, turn, line, ground or stop at a hollow inside the kernel's bore
  * walk, which no seam reaches yet, so they are held back: never registered, so no store, tree,
- * card or bot sees them (the #205 GD lock's held-back rule).
+ * card or bot sees them (the #205 GD lock's held-back rule). The GD ruling on #318 moved them to
+ * #380, behind #377's `shotShapeOf` seam, #378 (grounding) and #379 (the strut).
  *
  * The flavour lines are Content's, except the sight's "nearest" glint, which the GD's value rule
  * replaced ("richest").
