@@ -17,14 +17,27 @@
  *
  * A tunnel wrecker (#111) never hunts: its free phases seek, gnaw and flee (`wreckerBehaviour.ts`),
  * and only a wrecker cornered on the drill strikes, through the same pin.
+ *
+ * With the dev flag `enemy.lureRetarget` on (ticket 361), a hunter that would hunt walks to a live
+ * lure in reach instead (`enemyLures`), and hunts the vehicle again once it ends. A wind-up, lunge
+ * or recoil under way goes on, and a wrecker never hears a lure.
  */
+import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../../constants/devFlags'
 import { MM_PER_METRE } from '../../../constants/physics'
 import type { EnemyKind } from '../../economy/economyDefinition'
 import { enemyBoundedStats, type EnemyBoundedStats } from '../../economy/enemyStats'
 import { detectionReachMm } from '../../registries/enemyDetectionModifiers'
+import { lureGoalOf } from '../../registries/enemyLures'
 import type { AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
-import { isOnTheNose, isTouching, isWithinMm, stepAwayFrom, stepToward } from './combatGeometry'
+import {
+  isOnTheNose,
+  isTouching,
+  isWithinMm,
+  stepAwayFrom,
+  stepToward,
+  type MillimetrePoint,
+} from './combatGeometry'
 import { enemyById, inPhase, type Enemy, type EnemyPhase } from './combatState'
 import { drillPinnedEnemy, flushDrillDamage } from './enemyDamage'
 import { contactArcOf, strikeVehicle } from './enemyHits'
@@ -59,9 +72,27 @@ const WRECKER_PHASE_STEPS: FreePhaseSteps = {
   flee: fleeIntoRock,
 }
 
-const FREE_PHASE_STEPS_OF_KIND: Readonly<Record<EnemyKind, FreePhaseSteps>> = {
+/** With `enemy.lureRetarget` on, a hunter on the hunt follows a live lure first (ticket 361). */
+const LURED_HUNTER_PHASE_STEPS: FreePhaseSteps = {
+  ...HUNTER_PHASE_STEPS,
+  idle: followLureOrHunt,
+  approach: followLureOrHunt,
+  seek: followLureOrHunt,
+  gnaw: followLureOrHunt,
+  flee: followLureOrHunt,
+}
+
+type FreePhaseStepsOfKind = Readonly<Record<EnemyKind, FreePhaseSteps>>
+
+const FREE_PHASE_STEPS_OF_KIND: FreePhaseStepsOfKind = {
   crawler: HUNTER_PHASE_STEPS,
   burrower: HUNTER_PHASE_STEPS,
+  tunnel_wrecker: WRECKER_PHASE_STEPS,
+}
+
+const LURED_FREE_PHASE_STEPS_OF_KIND: FreePhaseStepsOfKind = {
+  crawler: LURED_HUNTER_PHASE_STEPS,
+  burrower: LURED_HUNTER_PHASE_STEPS,
   tunnel_wrecker: WRECKER_PHASE_STEPS,
 }
 
@@ -70,6 +101,7 @@ export function stepEnemy(
   enemyId: string,
   terrain: Terrain,
   tick: number,
+  flags: AuthorityDevFlags = AUTHORITY_DEV_FLAGS,
 ): RuleEffect {
   const enemy = enemyById(state.combat, enemyId)
   if (enemy === undefined) return unchanged(state)
@@ -81,7 +113,24 @@ export function stepEnemy(
     return updated(state, inPhase(enemy, 'pinned', tick))
   }
   if (state.combat.isFrozen) return unchanged(state)
-  return FREE_PHASE_STEPS_OF_KIND[enemy.kind][enemy.phase](turn)
+  return freePhaseStepsOf(enemy.kind, flags)[enemy.phase](turn)
+}
+
+function freePhaseStepsOf(kind: EnemyKind, flags: AuthorityDevFlags): FreePhaseSteps {
+  const stepsOfKind = flags['enemy.lureRetarget']
+    ? LURED_FREE_PHASE_STEPS_OF_KIND
+    : FREE_PHASE_STEPS_OF_KIND
+  return stepsOfKind[kind]
+}
+
+/** A live lure in reach is the path goal; with none the hunter hunts the vehicle (ticket 361). */
+function followLureOrHunt(turn: EnemyTurn): RuleEffect {
+  const lure = lureGoalOf(turn.state, turn.enemy, turn.tick)
+  return lure === null ? hunt(turn) : walkToLure(turn, lure)
+}
+
+function walkToLure({ state, enemy, terrain }: EnemyTurn, lure: MillimetrePoint): RuleEffect {
+  return updated(state, { ...walkToward(terrain, enemy, lure), phase: 'approach' })
 }
 
 function hunt({ state, enemy, target, terrain, tick }: EnemyTurn): RuleEffect {

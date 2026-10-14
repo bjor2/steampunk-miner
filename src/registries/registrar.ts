@@ -49,6 +49,7 @@ import { DOCK_SERVICE_REGISTRY } from '../systems/registries/dockServices'
 import { DRILL_GEAR_REGISTRY } from '../systems/registries/drillGear'
 import { INPUT_REACTION_REGISTRY } from '../systems/registries/inputReactions'
 import { ENEMY_DETECTION_MODIFIER_REGISTRY } from '../systems/registries/enemyDetectionModifiers'
+import { ENEMY_LURE_REGISTRY } from '../systems/registries/enemyLures'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
 import { REINFORCEMENT_REGISTRY } from '../systems/registries/groundReinforcement'
@@ -118,6 +119,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     liveBeacon: (provider) => add(LIVE_BEACON_REGISTRY, provider),
     hullDamageIntercept: (intercept) => add(HULL_DAMAGE_INTERCEPT_REGISTRY, intercept),
     enemyDetectionModifier: (modifier) => add(ENEMY_DETECTION_MODIFIER_REGISTRY, modifier),
+    enemyLure: (source) => add(ENEMY_LURE_REGISTRY, source),
     heatPause: (pause) => add(HEAT_PAUSE_REGISTRY, pause),
     vehicleMotionEffect: (source) => add(VEHICLE_MOTION_EFFECT_REGISTRY, source),
     inputReaction: (reaction) => add(INPUT_REACTION_REGISTRY, reaction),

@@ -16,3 +16,17 @@ export interface DevFlags {
 }
 
 export const DEV_FLAGS: DevFlags = { 'drill.sweptCut': false }
+
+/**
+ * Dev flags the authority's rules read, apart from the client loop's `DevFlags` above:
+ *
+ * - `enemy.lureRetarget` (ticket 361, the #262 split): the hunters' step reads the `enemyLures`
+ *   registry, so a crawler or burrower within a live lure's reach paths to its cell instead of the
+ *   vehicle until the lure ends. Off until the resonance whistle (#262) ships; with it off the
+ *   registry is never read, and every hunt and golden is as before.
+ */
+export interface AuthorityDevFlags {
+  readonly 'enemy.lureRetarget': boolean
+}
+
+export const AUTHORITY_DEV_FLAGS: AuthorityDevFlags = { 'enemy.lureRetarget': false }

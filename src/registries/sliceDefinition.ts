@@ -33,6 +33,7 @@ import type { ItemHook } from '../systems/registries/itemHooks'
 import type { LiveBeaconProvider } from '../systems/registries/liveBeacon'
 import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectionModifiers'
+import type { EnemyLureSource } from '../systems/registries/enemyLures'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { ReinforcementProvider } from '../systems/registries/groundReinforcement'
@@ -108,6 +109,11 @@ export interface SliceRegistrar {
   hullDamageIntercept(intercept: HullDamageIntercept): void
   /** Shrinks how far a hunting enemy notices the vehicle, never below half (ticket 233). */
   enemyDetectionModifier(modifier: EnemyDetectionModifier): void
+  /**
+   * Lists the slice's live lures; with the dev flag `enemy.lureRetarget` on, a hunter within one's
+   * reach paths to its cell until it ends (ticket 361).
+   */
+  enemyLure(source: EnemyLureSource): void
   /** Vents the heat gauge and pauses heat gain for windows the slice keeps (ticket 233). */
   heatPause(pause: HeatPause): void
   /**
