@@ -113,6 +113,10 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     event: 'bore_ended',
     data: { stop, tx, ty, cellsOpened },
   }),
+  StrutPlaced: ({ tx, ty, untilTick }) => ({
+    event: 'strut_placed',
+    data: { tx, ty, untilTick },
+  }),
   AutoModeSet: ({ itemId, isOn }) => ({ event: 'auto_mode_set', data: { itemId, isOn } }),
   AutoTargetLocked: ({ itemId, aim, tx, ty, actTick }) => ({
     event: 'auto_target_locked',

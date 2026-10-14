@@ -616,11 +616,18 @@ export const RUN_EVENT_REGISTRY = {
     group: 'mining',
     level: 'core',
     payload: {
-      stop: { oneOf: ['range', 'budget', 'energy', 'refused', 'core', 'lava'] },
+      stop: { oneOf: ['range', 'budget', 'energy', 'refused', 'core', 'lava', 'strut'] },
       tx: 'integer',
       ty: 'integer',
       cellsOpened: 'integer',
     },
+  },
+  // Ticket 379 (#318): a strut-bore line stopped at a hollow's edge (`bore_ended` stop `strut`)
+  // and wedged a strut in the mouth cell it broke through, standing until `untilTick`.
+  strut_placed: {
+    group: 'mining',
+    level: 'core',
+    payload: { tx: 'integer', ty: 'integer', untilTick: 'integer' },
   },
   // Ticket 317 (#310): an item switched to auto or off (the bore gun's steam sear first); the
   // target its mode locked `previewTicks` before acting, with the tick it acts; the act itself,

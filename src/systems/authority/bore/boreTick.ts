@@ -13,7 +13,8 @@
  * player. They share the shot's budget and recovery: each cell any line opens spends from all of
  * them, so the shot's dig ticks summed over every line and turn stay within `boreBudgetTicks`, and
  * `nextShotTick` stays the recovery of that sum. Each line stops on its own, and a line whose shot
- * names a lining type lines its opened cells as it ends (`boreLining.ts`).
+ * names a lining type lines its opened cells as it ends (`boreLining.ts`). A line whose shot wedges
+ * struts stops at a hollow's edge and leaves a strut in its mouth (`boreStrut.ts`, ticket 379).
  *
  * Cell events carry the bore's player in their stamp; collapse warnings, like every collapse
  * event, carry only the tick.
@@ -29,7 +30,15 @@ import { planetParamsOf } from '../planetOfState'
 import { openBoreCell, type CellOpening } from './boreCell'
 import { checkBoreBlocks } from './boreCollapse'
 import { lineEndedBore } from './boreLining'
-import { boresOf, isBoreOpening, NO_BORES, withBores, type PendingBore } from './boreState'
+import {
+  boresOf,
+  isBoreOpening,
+  isSameShot,
+  NO_BORES,
+  withBores,
+  type PendingBore,
+} from './boreState'
+import { strutOnStop, strutStopOr } from './boreStrut'
 
 type BoreStep = (state: AuthorityState) => TickOutcome
 
@@ -84,21 +93,34 @@ function openNextCell(
   const bore = boresOf(state)[index]
   const [tile, ...rest] = bore.cells
   const ask = { playerId: bore.playerId, tick, shot: bore.shot, budgetLeft: bore.budgetLeft, tile }
-  const opening = openBoreCell(state, params, ask)
+  const opening = strutStopOr(state, bore, tile, openBoreCell(state, params, ask))
   const moved = movedBore(bore, tile, rest, opening, tick)
   const effect = effectOf(state, opening)
   const ended = endEventsOf(moved, tile, opening)
-  const lined = liningOnEnd(effect.state, params, moved)
+  const left = leftOnEnd(effect.state, params, { bore: moved, tile, opening, tick })
   return {
-    state: withShotSpent(withBoreAt(lined.state, index, moved), moved),
-    events: stampedFor(bore.playerId, [...effect.events, ...ended, ...lined.events], tick),
+    state: withShotSpent(withBoreAt(left.state, index, moved), moved),
+    events: stampedFor(bore.playerId, [...effect.events, ...ended, ...left.events], tick),
   }
 }
 
-/** The ended line's walls lined when its shot lines them; unchanged while it still opens. */
-function liningOnEnd(state: AuthorityState, params: PlanetParams, bore: PendingBore): RuleEffect {
-  if (isBoreOpening(bore)) return { state, events: [] }
-  return lineEndedBore(state, params, bore)
+/** The cell a line just worked on, what it found there, and when. */
+interface LineCell {
+  bore: PendingBore
+  tile: TilePoint
+  opening: CellOpening
+  tick: number
+}
+
+/**
+ * What an ended line leaves: its walls lined when its shot lines them, then its strut when it
+ * stopped at a hollow's edge; unchanged while it still opens.
+ */
+function leftOnEnd(state: AuthorityState, params: PlanetParams, cell: LineCell): RuleEffect {
+  if (isBoreOpening(cell.bore)) return { state, events: [] }
+  const lined = lineEndedBore(state, params, cell.bore)
+  const strut = strutOnStop(lined.state, cell.bore, cell.tile, cell.opening, cell.tick)
+  return { state: strut.state, events: [...lined.events, ...strut.events] }
 }
 
 /** Every line of `spent`'s shot takes its budget left and recovery: the shot spends as one. */
@@ -107,10 +129,6 @@ function withShotSpent(state: AuthorityState, spent: PendingBore): AuthorityStat
     state,
     boresOf(state).map((bore) => (isSameShot(bore, spent) ? sharedSpendOf(bore, spent) : bore)),
   )
-}
-
-function isSameShot(bore: PendingBore, other: PendingBore): boolean {
-  return bore.playerId === other.playerId && bore.firedTick === other.firedTick
 }
 
 function sharedSpendOf(bore: PendingBore, spent: PendingBore): PendingBore {

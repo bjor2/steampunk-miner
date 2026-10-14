@@ -5,6 +5,7 @@ import type { ShotShape } from '../../registries/boreGun'
 import { createScriptedSession } from '../scriptedSession'
 import { BORE_STATS } from './boreFixtures'
 import BORE_BEARINGS from './boreBearings.json'
+import { strutReinforces } from './boreStrut'
 import {
   checkedShotShape,
   foldShotShapes,
@@ -22,6 +23,12 @@ const ONE_LINE: ShotShape = {
   strutTicks: null,
 }
 
+/** A slice registering the kernel's strut answer, as a strut shape needs (ticket 379). */
+const STRUT_REGISTERED: SliceDefinition = {
+  id: 'probe',
+  register: (r) => r.reinforcement({ id: 'probe.strut', reinforces: strutReinforces }),
+}
+
 function shapeWith(fields: Partial<ShotShape>): ShotShape {
   return { ...ONE_LINE, ...fields }
 }
@@ -32,17 +39,25 @@ describe('shot shape: the caps (ticket 377, the TD lock on #318)', () => {
     expect(SHOT_SHAPE_CAPS).toEqual({ maxLines: 5, maxSeamTurns: 4 })
   })
 
-  it('accepts a shape with every field whole and inside its cap', () => {
-    const full = shapeWith({
-      lineOffsets: [-16, -8, 8, 16],
-      seamTurns: 4,
-      liningGrade: 'refractory_lining',
-      extraEnergyPerCellBp: 10000,
-      groundTicks: 600,
-      strutTicks: 840,
-    })
-    expect(checkedShotShape(full)).toBe(full)
-  })
+  it('accepts a shape with every field whole and inside its cap, its strut registered', () =>
+    withRegistrations([STRUT_REGISTERED], () => {
+      const full = shapeWith({
+        lineOffsets: [-16, -8, 8, 16],
+        seamTurns: 4,
+        liningGrade: 'refractory_lining',
+        extraEnergyPerCellBp: 10000,
+        groundTicks: 600,
+        strutTicks: 840,
+      })
+      expect(checkedShotShape(full)).toBe(full)
+    }))
+
+  it('throws for strut ticks while no reinforcement provider answers for struts (ticket 379)', () =>
+    withRegistrations([], () => {
+      expect(() => checkedShotShape(shapeWith({ strutTicks: 600 }))).toThrow(
+        /strutTicks is set, but no groundReinforcement provider answers with strutReinforces/,
+      )
+    }))
 
   it('throws for more lines than the cap, the aimed line counted', () => {
     expect(() => checkedShotShape(shapeWith({ lineOffsets: [-16, -8, 8, 16, 24] }))).toThrow(

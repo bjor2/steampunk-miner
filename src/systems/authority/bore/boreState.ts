@@ -28,6 +28,12 @@ export interface BoreShot {
    * absent for every other shot, so a session with no shape saves and digests as before.
    */
   liningType?: string
+  /**
+   * How long a strut this shot wedges at a hollow's mouth stands (ticket 379, a shape's
+   * `strutTicks`); absent for every other shot, so a session with no strut shape saves and
+   * digests as before.
+   */
+  strutTicks?: number
 }
 
 export interface PendingBore {
@@ -70,6 +76,11 @@ export function boresOf(state: AuthorityState): readonly PendingBore[] {
 export function withBores(state: AuthorityState, bores: readonly PendingBore[]): AuthorityState {
   const { bores: _dropped, ...rest } = state
   return bores.length === 0 ? rest : { ...rest, bores }
+}
+
+/** Lines of one shot: the same player's, fired in the same tick (ticket 377). */
+export function isSameShot(bore: PendingBore, other: PendingBore): boolean {
+  return bore.playerId === other.playerId && bore.firedTick === other.firedTick
 }
 
 export function isBoreOpening(bore: PendingBore): boolean {
@@ -119,7 +130,7 @@ function isPendingBore(bore: unknown): boolean {
   )
 }
 
-const SHOT_FIELDS: readonly Exclude<keyof BoreShot, 'liningType'>[] = [
+const SHOT_FIELDS: readonly Exclude<keyof BoreShot, 'liningType' | 'strutTicks'>[] = [
   'gunFactorBp',
   'energyPerCellBp',
   'openIntervalTicks',
@@ -134,7 +145,8 @@ function isBoreShot(shot: unknown): boolean {
     isJsonObject(shot) &&
     SHOT_FIELDS.every((field) => isWholeNumber(shot[field])) &&
     shot.kGunPct !== 0 &&
-    (shot.liningType === undefined || typeof shot.liningType === 'string')
+    (shot.liningType === undefined || typeof shot.liningType === 'string') &&
+    (shot.strutTicks === undefined || isWholeNumber(shot.strutTicks))
   )
 }
 

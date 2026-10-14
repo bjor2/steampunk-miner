@@ -6,12 +6,13 @@
  *   then any charge whose fuse blows at that tick (#109), then any remote charge that times out
  *   unfired (K8 #218), then the world's terrain edits (K6 #189:
  *   the live blasts' slice, then the queued power-up edits' share), then the bore gun's cells and
- *   collapse checks (ticket 313), then the items on auto (ticket 317), then any collapse due at
+ *   collapse checks (ticket 313), then the struts whose time is up (ticket 379), then the items on
+ *   auto (ticket 317), then any collapse due at
  *   that tick (#43), then the slices' clock steps in id order (#217), then the collapse braces, so
  *   a brace a step ended is seen on its tick (ticket 331);
  * - otherwise nothing can change between ticks but a blast, a collapse, a refinery batch or flowing
  *   lava, so the clock jumps to the next tick a charge blows or times out or a terrain edit moves,
- *   a bore opens a cell, checks its blocks or cools down, an item on auto looks again, a block
+ *   a bore opens a cell, checks its blocks or cools down, a strut falls, an item on auto looks again, a block
  *   warns into its refill or refills or its brace ends, a batch is ready (#105), loose lava steps
  *   (#113) or a
  *   slice's clock step has work due (#217), or to the end (tows due by then first); tows happen at
@@ -28,6 +29,7 @@ import { nextBlastSliceTick, sliceLiveBlasts } from './charges/blastSlice'
 import { nextTerrainEditTick } from './terrain/terrainEdits'
 import { applyQueuedTerrainEdits } from './terrain/terrainEditTick'
 import { nextBoreTick, runBoreTick } from './bore/boreTick'
+import { nextStrutTick, takeFallenStruts } from './bore/strutClock'
 import { nextAutoModeTick, runAutoModeTick } from './autoMode/autoModeTick'
 import { detonateChargesDue, nextDetonationTick } from './charges/chargeDetonation'
 import { disarmExpiredCharges, nextDisarmTick } from './charges/chargeDisarm'
@@ -67,6 +69,7 @@ function runLiveTick(state: AuthorityState, tick: number): TickOutcome {
     (current) => sliceLiveBlasts(current, tick),
     (current) => applyQueuedTerrainEdits(current, tick),
     (current) => runBoreTick(current, tick),
+    (current) => takeFallenStruts(current, tick),
     (current) => runAutoModeTick(current, tick),
     (current) => runCollapseTick(current, tick),
     (current) => announceReadyBatches(current, tick),
@@ -89,6 +92,7 @@ function skipQuietTicks(state: AuthorityState, toTick: number): TickOutcome {
     (current) => sliceLiveBlasts(current, stopTick),
     (current) => applyQueuedTerrainEdits(current, stopTick),
     (current) => runBoreTick(current, stopTick),
+    (current) => takeFallenStruts(current, stopTick),
     (current) => runAutoModeTick(current, stopTick),
     (current) => runCollapseTick(current, stopTick),
     (current) => announceReadyBatches(current, stopTick),
@@ -105,6 +109,7 @@ function nextScheduledTick(state: AuthorityState): number | null {
     nextBlastSliceTick(state),
     nextTerrainEditTick(state),
     nextBoreTick(state),
+    nextStrutTick(state),
     nextAutoModeTick(state),
     nextCollapseTick(state, state.tick),
     nextRefineReadyTick(state.platform.refinerySlots, state.tick),

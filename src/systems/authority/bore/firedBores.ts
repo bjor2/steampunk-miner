@@ -2,7 +2,8 @@
  * The pending bores a fired shot leaves (ticket 313, #309; shapes from ticket 377): one per line,
  * each holding the numbers the shot fired with and the shot's whole dig budget, which the lines
  * then share on the clock (`boreTick.ts`). A shape adds its extra energy to every cell and names
- * the lining type its walls are laid in; with no shape a shot is exactly the gun's.
+ * the lining type its walls are laid in and how long its struts stand (ticket 379); with no
+ * shape a shot is exactly the gun's.
  */
 import type { VehiclePose } from '../../vehicle/vehiclePose'
 import type { PlanetParams } from '../../world/planetParams'
@@ -76,14 +77,27 @@ export function shotOf(stats: BoreGunStats): BoreShot {
 }
 
 /**
- * The shot as its shape bores it: the shape's extra energy on every cell, and the lining type its
- * grade lays; the shot itself with no shape.
+ * The shot as its shape bores it: the shape's extra energy on every cell, the lining type its
+ * grade lays and how long its struts stand; the shot itself with no shape.
  */
 export function shapedShotOf(shot: BoreShot, shape: ShotShape | null): BoreShot {
   if (shape === null) return shot
   const energyPerCellBp = shot.energyPerCellBp + shape.extraEnergyPerCellBp
+  return {
+    ...shot,
+    energyPerCellBp,
+    ...liningTypeFieldOf(shape),
+    ...strutTicksFieldOf(shape),
+  }
+}
+
+/** The lining type under its key, or no key for a shape that lines nothing. */
+function liningTypeFieldOf(shape: ShotShape): Pick<BoreShot, 'liningType'> {
   const liningType = shape.liningGrade === null ? null : liningTypeOfGrade(shape.liningGrade)
-  return liningType === null
-    ? { ...shot, energyPerCellBp }
-    : { ...shot, energyPerCellBp, liningType }
+  return liningType === null ? {} : { liningType }
+}
+
+/** The strut's standing ticks under their key, or no key for a shape that wedges none. */
+function strutTicksFieldOf(shape: ShotShape): Pick<BoreShot, 'strutTicks'> {
+  return shape.strutTicks === null ? {} : { strutTicks: shape.strutTicks }
 }

@@ -27,6 +27,12 @@ import {
 } from './terrain/terrainEdits'
 import { portableBoresOf, portableBoresProblems, type PendingBore } from './bore/boreState'
 import {
+  portableStrutsOf,
+  portableStrutsProblems,
+  type BoreStrut,
+  type StandingStruts,
+} from './bore/strutState'
+import {
   portableAutoModesOf,
   portableAutoModesProblems,
   type AutoMode,
@@ -105,6 +111,8 @@ export interface PortableState {
   terrainEdits: QueuedTerrainEdit[]
   /** The bore gun's pending shots (ticket 313); omitted while there are none. */
   bores?: PendingBore[]
+  /** The standing struts by mouth cell (ticket 379); omitted while there are none. */
+  struts?: Record<string, BoreStrut>
   debugApplied: boolean
   /** The session sections; omitted while none is registered. */
   slices?: PortableSections
@@ -157,6 +165,7 @@ function portableStateOf(state: AuthorityState): PortableState {
     liveBlasts: portableLiveBlastsOf(state.liveBlasts),
     terrainEdits: portableTerrainEditsOf(state.terrainEdits),
     ...portableBoresField(state.bores),
+    ...portableStrutsField(state.struts),
     debugApplied: state.debugApplied,
     ...portableSectionsOf(state.slices, 'session'),
   }
@@ -222,6 +231,7 @@ function authorityStateOf(portable: PortableState): AuthorityState {
     liveBlasts: portableLiveBlastsOf(portable.liveBlasts),
     terrainEdits: portableTerrainEditsOf(portable.terrainEdits),
     ...portableBoresField(portable.bores),
+    ...portableStrutsField(portable.struts),
     debugApplied: portable.debugApplied,
     ...sectionsOfPortable(portable.slices, 'session'),
   }
@@ -270,6 +280,7 @@ function portableStateProblems(state: unknown, tick: unknown): string[] {
     ...portableLiveBlastsProblems(state.liveBlasts, 'snapshot.state.liveBlasts'),
     ...portableTerrainEditsProblems(state.terrainEdits, 'snapshot.state.terrainEdits'),
     ...portableBoresProblems(state.bores, 'snapshot.state.bores'),
+    ...portableStrutsProblems(state.struts, 'snapshot.state.struts'),
     ...(typeof state.debugApplied === 'boolean'
       ? []
       : ['snapshot.state.debugApplied must be a boolean']),
@@ -287,6 +298,13 @@ function portableAutoModesField(modes: readonly AutoMode[] | undefined): {
 /** A copy of the bores under their key, or no key at all while there are none. */
 function portableBoresField(bores: readonly PendingBore[] | undefined): { bores?: PendingBore[] } {
   return bores === undefined ? {} : { bores: portableBoresOf(bores) }
+}
+
+/** A copy of the struts under their key, or no key at all while none stands. */
+function portableStrutsField(struts: StandingStruts | undefined): {
+  struts?: Record<string, BoreStrut>
+} {
+  return struts === undefined ? {} : { struts: portableStrutsOf(struts) }
 }
 
 function planetProblems(planet: unknown): string[] {

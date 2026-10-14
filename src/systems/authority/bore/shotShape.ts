@@ -7,6 +7,9 @@
  *
  * Fold (one provider): offsets are unioned, de-duplicated and sorted; turns, extra energy and the
  * tick fields take the largest, never a sum; the lining takes the highest casing_cement grade.
+ *
+ * A shape with `strutTicks` also needs the strut's reinforcement registered (ticket 379,
+ * `boreStrut.ts`), so a strut always reaches collapse through the #157 registry.
  */
 import { cementGradeOf } from '../../economy/casingPrices'
 import { ECONOMY } from '../../economy/economy'
@@ -14,6 +17,7 @@ import { liningTypes } from '../../economy/heatEconomy'
 import { providedShotShapeOf, type ShotShape } from '../../registries/boreGun'
 import { liningRowIdOf } from '../../vehicle/liningType'
 import type { AuthorityState } from '../authorityState'
+import { isStrutReinforcementRegistered } from './boreStrut'
 import BORE_BEARINGS from './boreBearings.json'
 
 export interface ShotShapeCaps {
@@ -63,6 +67,7 @@ function shotShapeProblems(shape: ShotShape): string[] {
     ...wholeWithinProblems('extraEnergyPerCellBp', shape.extraEnergyPerCellBp),
     ...optionalTicksProblems('groundTicks', shape.groundTicks),
     ...optionalTicksProblems('strutTicks', shape.strutTicks),
+    ...strutReinforcementProblems(shape.strutTicks),
     ...liningGradeProblems(shape.liningGrade),
   ]
 }
@@ -91,6 +96,12 @@ function wholeWithinProblems(
 
 function optionalTicksProblems(field: string, ticks: number | null): string[] {
   return ticks === null ? [] : wholeWithinProblems(field, ticks)
+}
+
+/** Struts reach collapse only through the #157 registry, so a strut shape needs it answering. */
+function strutReinforcementProblems(strutTicks: number | null): string[] {
+  if (strutTicks === null || isStrutReinforcementRegistered()) return []
+  return ['strutTicks is set, but no groundReinforcement provider answers with strutReinforces']
 }
 
 function liningGradeProblems(gradeRowId: string | null): string[] {

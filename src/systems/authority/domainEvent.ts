@@ -264,10 +264,16 @@ export interface KernelDomainEventBodies {
   BoreFired: { aimed: number; bearing: number; rangeCells: number }
   /**
    * A bore stopped: at its range, its budget or the tank (quietly), or with the clank at a cell
-   * the drill cannot dig, the core or lava (`isClankStop`). `tx, ty` is the cell it stopped at, or
-   * its last cell; `cellsOpened` the cells it opened.
+   * the drill cannot dig, the core or lava (`isClankStop`), or quietly at a hollow's edge where its
+   * shot wedges a strut (ticket 379). `tx, ty` is the cell it stopped at, or its last cell;
+   * `cellsOpened` the cells it opened.
    */
   BoreEnded: { stop: BoreStop; tx: number; ty: number; cellsOpened: number }
+  /**
+   * A strut-bore line wedged a strut in the mouth it broke into a hollow through (ticket 379):
+   * `tx, ty` is that mouth cell, and the strut stands until `untilTick`.
+   */
+  StrutPlaced: { tx: number; ty: number; untilTick: number }
   /** The player switched an item's auto mode on or off (ticket 317): the lamp and its valve click. */
   AutoModeSet: { itemId: string; isOn: boolean }
   /**
@@ -529,9 +535,10 @@ export type SampleRoute = 'corer' | 'lens'
 
 /**
  * Why a bore stopped (ticket 313): its last cell, its dig budget, the tank, or with the clank a
- * cell the drill cannot dig (scratch floor, gate, dock pad), the core or lava.
+ * cell the drill cannot dig (scratch floor, gate, dock pad), the core or lava; or at a hollow's
+ * edge, where a strut-bore shot wedges its strut (ticket 379).
  */
-export type BoreStop = 'range' | 'budget' | 'energy' | 'refused' | 'core' | 'lava'
+export type BoreStop = 'range' | 'budget' | 'energy' | 'refused' | 'core' | 'lava' | 'strut'
 
 /** The stops that clank (#309: the drill could not, a gate, the core or lava). */
 export function isClankStop(stop: BoreStop): boolean {
