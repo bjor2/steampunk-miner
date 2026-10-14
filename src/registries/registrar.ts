@@ -51,6 +51,7 @@ import { INPUT_REACTION_REGISTRY } from '../systems/registries/inputReactions'
 import { ENEMY_DETECTION_MODIFIER_REGISTRY } from '../systems/registries/enemyDetectionModifiers'
 import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
+import { REINFORCEMENT_REGISTRY } from '../systems/registries/groundReinforcement'
 import { HEAT_PAUSE_REGISTRY } from '../systems/registries/heatPauses'
 import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
 import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
@@ -108,6 +109,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     blastEffect: (effect) => add(BLAST_EFFECT_REGISTRY, effect),
     clockStep: (step) => add(CLOCK_STEP_REGISTRY, step),
     collapseBrace: (provider) => add(COLLAPSE_BRACE_REGISTRY, provider),
+    reinforcement: (provider) => add(REINFORCEMENT_REGISTRY, provider),
     dockService: (service) => add(DOCK_SERVICE_REGISTRY, service),
     dockFacility: (facility) => add(DOCK_FACILITY_REGISTRY, facility),
     artefactOption: (option) => add(ARTEFACT_OPTION_REGISTRY, option),

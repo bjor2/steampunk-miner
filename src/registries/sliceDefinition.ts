@@ -35,6 +35,7 @@ import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectionModifiers'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
+import type { ReinforcementProvider } from '../systems/registries/groundReinforcement'
 import type { HeatPause } from '../systems/registries/heatPauses'
 import type { SlotHoldCueSource } from '../systems/registries/slotHoldCues'
 import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
@@ -92,6 +93,12 @@ export interface SliceRegistrar {
    * refills, and warns afresh for 60 ticks when the brace ends (ticket 331).
    */
   collapseBrace(provider: CollapseBraceProvider): void
+  /**
+   * Makes cells permanent ground: a reinforced cell never refills and never makes its block warn.
+   * Answered from the slice's own section, O(1) a cell; the kernel's guards bar gated cells, the
+   * core and lava first (ticket 365).
+   */
+  reinforcement(provider: ReinforcementProvider): void
   /** A free refill at the end of every paid recharge; the bill never changes (#217). */
   dockService(service: DockService): void
   /**
