@@ -3,10 +3,12 @@
  *
  *   header   formatVersion, slot (name and wall time, #401), snapshotVersion, generatorVersion,
  *            saveEpoch, tick, digest, and the open unlock ids (`savedUnlocks.ts`, #401)
- *   world    the planet as seed + params + chunk deltas, the platform, the core, combat, the
- *            blocks warning or refilling (#43), loose lava (#113), live blasts and queued power-up terrain edits (K6 #189),
- *            and the bore gun's pending shots, standing struts and grounded lines while there are any
- *            (tickets 313, 379, 378; carried since ticket 405, so a save taken mid-bore restores)
+ *   world    the planet as seed + params + the deltas of the chunks play changed, packed into one
+ *            table (`packedChunks.ts`, #401 VS2), the platform, the core, combat, the blocks
+ *            warning or refilling (#43), loose lava (#113), live blasts and queued power-up terrain
+ *            edits (K6 #189), and the bore gun's pending shots, standing struts and grounded lines
+ *            while there are any (tickets 313, 379, 378; carried since ticket 405, so a save taken
+ *            mid-bore restores)
  *   profile  per player the wallet, the last seq and the vehicle (integer levels, never stats)
  *
  * The slices' save sections ride inside these two parts (feature-slices.md 3.13): the session
@@ -17,6 +19,9 @@
  * from another write; they stay separately addressable so co-op can split them into two files.
  * The sections are cut from the session snapshot (#11 section 5) and joined back into one before
  * `readSnapshot`, so the debug API, the save and the co-op join share one serialiser.
+ *
+ * The sections are packed only on the file: `SaveSections` is what every format holds, with the
+ * deltas as they stand in the state, and `sectionsOfSaveSlot` unpacks a file back into them.
  *
  * Reading refuses, never migrates: another format, snapshot or generator version, a mismatched
  * epoch, planet params this build would not generate, or anything `readSnapshot` refuses is a
@@ -36,14 +41,16 @@ import {
 } from '../authority/sessionSnapshot'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import type { PlanetParams } from '../world/planetParams'
+import { packChunkDeltas, unpackChunkDeltas, type PackedChunks } from './packedChunks'
 import { slotMetaProblems, UNTIMED_AUTOSAVE, type SaveSlotMeta } from './saveSlotIndex'
 import { unlocksOnLoad, unlocksToSave } from './savedUnlocks'
 
 /**
  * 1: the first checkpoint layout (#26), one slot.
  * 2: slots (#401): the header adds the slot's name and wall time and the open unlock ids.
+ * 3: the chunk deltas packed into one table (#401 VS2).
  */
-export const SAVE_FORMAT_VERSION = 2
+export const SAVE_FORMAT_VERSION = 3
 
 /** What every format version holds: the session cut into its world and profile (all of v1). */
 export interface SaveSections {
@@ -57,11 +64,17 @@ export interface SaveSections {
   profile: SaveProfileSection
 }
 
-export interface SaveSlotFile extends SaveSections {
+export interface SaveSlotFile extends Omit<SaveSections, 'world'> {
   formatVersion: number
   slot: SaveSlotMeta
   /** The ids of the schedule rows open when it was written: the host world's (#401). */
   unlocked: string[]
+  world: SavedWorldSection
+}
+
+/** The world section as the file holds it: its chunk deltas packed (#401 VS2). */
+export interface SavedWorldSection extends Omit<SaveWorldSection, 'chunks'> {
+  chunks: PackedChunks
 }
 
 export interface SaveWorldSection {
@@ -105,7 +118,19 @@ export function saveSlotOf(
 ): SaveSlotFile {
   const { world, profile, ...header } = saveSectionsOf(snapshot, saveEpoch)
   const unlocked = unlocksToSave(snapshot.state)
-  return { formatVersion: SAVE_FORMAT_VERSION, slot, ...header, unlocked, world, profile }
+  return {
+    formatVersion: SAVE_FORMAT_VERSION,
+    slot,
+    ...header,
+    unlocked,
+    world: packedWorldOf(world),
+    profile,
+  }
+}
+
+/** The world section with its chunk deltas packed, every other field as it is. */
+export function packedWorldOf(world: SaveWorldSection): SavedWorldSection {
+  return { ...world, chunks: packChunkDeltas(world.chunks) }
 }
 
 /** The sections alone: what a migration step re-cuts, keeping the rest of the file's header. */
@@ -163,11 +188,38 @@ export function readSaveSlot(file: unknown): SaveSlotReading {
 }
 
 function restoreSections(file: SaveSlotFile): SaveSlotReading {
-  const restored = readSnapshot(snapshotOfSaveSlot(file))
-  const problems = [...paramsProblems(file.world), ...restored.problems]
+  const unpacked = sectionsOfSaveSlot(file)
+  if (!('sections' in unpacked)) return unpacked
+  return restoreUnpackedSections(file, unpacked.sections)
+}
+
+function restoreUnpackedSections(file: SaveSlotFile, sections: SaveSections): SaveSlotReading {
+  const restored = readSnapshot(snapshotOfSaveSlot(sections))
+  const problems = [...paramsProblems(sections.world), ...restored.problems]
   if (problems.length > 0 || !('state' in restored)) return { problems }
   const unlocked = unlocksOnLoad(file.unlocked, restored.state)
   return { state: restored.state, saveEpoch: file.saveEpoch, unlocked, problems: [] }
+}
+
+/** The sections of a file of this format, its chunk deltas unpacked, or why they cannot be. */
+export function sectionsOfSaveSlot(
+  file: SaveSlotFile,
+): { sections: SaveSections; problems: [] } | { problems: string[] } {
+  const unpacking = unpackChunkDeltas(file.world.chunks)
+  if (!('chunks' in unpacking)) return unpacking
+  return { sections: sectionsWithChunks(file, unpacking.chunks), problems: [] }
+}
+
+function sectionsWithChunks(file: SaveSlotFile, chunks: SaveWorldSection['chunks']): SaveSections {
+  return {
+    snapshotVersion: file.snapshotVersion,
+    generatorVersion: file.generatorVersion,
+    saveEpoch: file.saveEpoch,
+    tick: file.tick,
+    digest: file.digest,
+    world: { ...file.world, chunks },
+    profile: file.profile,
+  }
 }
 
 /** The session snapshot the sections were cut from, joined back into one. */

@@ -34,9 +34,13 @@
  * (`savedUnlocks.ts`). Its sections are kept byte for byte: money, levels and everything else.
  * The shell moves the file itself into the autosave slot (`store/saveSlotLayout.ts`).
  *
+ * Format 2 -> 3 (#401 VS2): the chunk deltas packed into one table (`packedChunks.ts`). Every delta
+ * is kept as it is, in its order, so the digest holds and every other field is untouched.
+ *
  * A save from before every bump reads at snapshot 18 and generator 5: the snapshot steps run
  * first, as the TD's save chain orders them, so the generator steps restore the state with this
- * build's reader, and the format step, last, reads it whole. A step that re-cuts the sections
+ * build's reader, and the format steps, last, read it whole. A step that meets a packed file (a
+ * later bump on a format-3 save) reads its deltas unpacked and packs them again when it re-cuts. A step that re-cuts the sections
  * keeps the rest of the file's header (`withSectionsOf`), whatever its format.
  *
  * A registered slice section the save lacks is no step: `readSnapshot` restores it at its initial
@@ -60,9 +64,12 @@ import { dockSiteOf, type DockSite } from '../world/dockSite'
 import { planetParamsFor, type PlanetParams } from '../world/planetParams'
 import { chunkKey, chunkOfTile, surfaceRowOfColumn } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
+import { portableWorldProblems } from '../authority/vehicleSnapshot'
 import {
+  packedWorldOf,
   readSaveSlot,
   saveSectionsOf,
+  sectionsOfSaveSlot,
   snapshotOfSaveSlot,
   type SaveSections,
   type SaveSlotFile,
@@ -75,8 +82,17 @@ import { withSizedChargeRacks } from './sizedChargeRacks'
 /** The header version a step moves on. */
 export type MigratedVersion = 'snapshotVersion' | 'generatorVersion' | 'formatVersion'
 
-/** A file at any format version: the sections every version holds, the rest of its header kept. */
-type MigratingFile = SaveSections & { formatVersion: number }
+/** A file before format 3: the sections every version holds, the chunk deltas as they stand. */
+type UnpackedFile = SaveSections & { formatVersion: number }
+
+/** A file at any format version, the rest of its header kept. */
+type MigratingFile = UnpackedFile | SaveSlotFile
+
+/** A format-2 file: the slot header around the sections, the chunk deltas as they stand. */
+type SlottedFile = UnpackedFile & Pick<SaveSlotFile, 'slot' | 'unlocked'>
+
+/** The first format whose chunk deltas are packed (#401 VS2). */
+const FIRST_PACKED_FORMAT = 3
 
 /** One step that ran: `save_migrated {version, from, to}`. */
 export interface HeaderVersionStep {
@@ -105,6 +121,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
   { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
+  { version: 'formatVersion', from: 2, to: 3, migrate: packChunkTable },
 ]
 
 export type MigratedSaveSlotReading = SaveSlotReading & { migrations: readonly SaveMigration[] }
@@ -148,15 +165,38 @@ function isAtStepStart(file: unknown, step: SaveMigrationStep): file is Migratin
   return typeof file === 'object' && file !== null && Reflect.get(file, step.version) === step.from
 }
 
-/** The file with its sections cut again from `snapshot`, every other header field kept. */
+function isPackedFile(file: MigratingFile): file is SaveSlotFile {
+  return file.formatVersion >= FIRST_PACKED_FORMAT
+}
+
+/** The file's session snapshot, a packed table unpacked first; null when it does not unpack. */
+function snapshotOfFile(file: MigratingFile): SessionSnapshot | null {
+  if (!isPackedFile(file)) return snapshotOfSaveSlot(file)
+  const unpacked = sectionsOfSaveSlot(file)
+  return 'sections' in unpacked ? snapshotOfSaveSlot(unpacked.sections) : null
+}
+
+/** The file with its sections cut again from `snapshot`, packed as it was, every other header field kept. */
 function withSectionsOf(file: MigratingFile, snapshot: SessionSnapshot): MigratingFile {
-  return { ...file, ...saveSectionsOf(snapshot, file.saveEpoch) }
+  const sections = saveSectionsOf(snapshot, file.saveEpoch)
+  if (!isPackedFile(file)) return { ...file, ...sections }
+  return { ...file, ...sections, world: packedWorldOf(sections.world) }
+}
+
+/** The file with its state reshaped into snapshot `toVersion`, or null when the old digest fails. */
+function reshapedFile(
+  file: MigratingFile,
+  toVersion: number,
+  reshape: (state: PortableState) => PortableState,
+): MigratingFile | null {
+  const snapshot = snapshotOfFile(file)
+  const reshaped = snapshot === null ? null : reshapedSnapshot(snapshot, toVersion, reshape)
+  return reshaped === null ? null : withSectionsOf(file, reshaped)
 }
 
 /** Snapshot 18 -> 19: the levels x10; the generator version is kept for its own step. */
 function levelsToSteps(file: MigratingFile): MigratingFile | null {
-  const reshaped = reshapedSnapshot(snapshotOfSaveSlot(file), 19, withLevelsAsSteps)
-  return reshaped === null ? null : withSectionsOf(file, reshaped)
+  return reshapedFile(file, 19, withLevelsAsSteps)
 }
 
 function withLevelsAsSteps(state: PortableState): PortableState {
@@ -172,8 +212,7 @@ function playerWithSteps(player: PortablePlayer): PortablePlayer {
 
 /** Snapshot 19 -> 20: the racks by size; the generator version is kept for its own step. */
 function sizeChargeRacks(file: MigratingFile): MigratingFile | null {
-  const reshaped = reshapedSnapshot(snapshotOfSaveSlot(file), 20, withSizedChargeRacks)
-  return reshaped === null ? null : withSectionsOf(file, reshaped)
+  return reshapedFile(file, 20, withSizedChargeRacks)
 }
 
 /** Generator 5 -> 6: the state is read as saved (the digest must hold), then moved off the pad. */
@@ -204,23 +243,33 @@ function keptUnderGenerator(file: MigratingFile, generatorVersion: number): Migr
  * Format 1 -> 2: the autosave's header around the sections as saved. The state must read whole
  * under this build (the digest holds), so the unlock ids are those of the state that loads.
  */
-function addSlotHeader(file: MigratingFile): SaveSlotFile | null {
-  const restored = readSnapshot(snapshotOfSaveSlot(file))
-  if (!('state' in restored)) return null
-  return {
-    ...file,
-    formatVersion: 2,
-    slot: UNTIMED_AUTOSAVE,
-    unlocked: unlocksToSave(restored.state),
+function addSlotHeader(file: MigratingFile): MigratingFile | null {
+  const state = restoredStateOf(file, file.generatorVersion)
+  if (state === null) return null
+  return { ...file, formatVersion: 2, slot: UNTIMED_AUTOSAVE, unlocked: unlocksToSave(state) }
+}
+
+/**
+ * Format 2 -> 3: the deltas packed, every other field as saved. A table that does not hold chunk
+ * deltas would not pack, so the file is left at 2 and refused on its version.
+ */
+function packChunkTable(file: MigratingFile): SaveSlotFile | null {
+  if (isPackedFile(file) || portableWorldProblems({ chunks: file.world.chunks }).length > 0) {
+    return null
   }
+  return { ...(file as SlottedFile), formatVersion: 3, world: packedWorldOf(file.world) }
 }
 
 /** A generator bump never changes the state's shape, so the old state restores as it is. */
 function restoreUnderThisGenerator(file: MigratingFile): AuthorityState | null {
-  const restored = readSnapshot({
-    ...snapshotOfSaveSlot(file),
-    generatorVersion: GENERATOR_VERSION,
-  })
+  return restoredStateOf(file, GENERATOR_VERSION)
+}
+
+/** The state the file holds, read as written under `generatorVersion`, or null if it is refused. */
+function restoredStateOf(file: MigratingFile, generatorVersion: number): AuthorityState | null {
+  const snapshot = snapshotOfFile(file)
+  if (snapshot === null) return null
+  const restored = readSnapshot({ ...snapshot, generatorVersion })
   return 'state' in restored ? restored.state : null
 }
 

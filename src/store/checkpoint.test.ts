@@ -156,6 +156,7 @@ describe('checkpoint', () => {
       { version: 'generatorVersion', from: 6, to: 7 },
       { version: 'generatorVersion', from: 7, to: 8 },
       { version: 'formatVersion', from: 1, to: 2 },
+      { version: 'formatVersion', from: 2, to: 3 },
       ...restoredSectionLines(),
     ])
     expect(sink.events.flatMap(runEventProblems)).toEqual([])

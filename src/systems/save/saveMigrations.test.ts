@@ -37,6 +37,7 @@ const ORE_MIX_STEP = { version: 'generatorVersion', from: 7, to: 8 }
 const CHARGE_RACK_STEP = { version: 'snapshotVersion', from: 19, to: 20 }
 /** #401: every fixture was written in the one-slot layout, format 1. */
 const SLOT_FORMAT_STEP = { version: 'formatVersion', from: 1, to: 2 }
+const PACKED_CHUNKS_STEP = { version: 'formatVersion', from: 2, to: 3 }
 const FORMAT_1_PROBLEM = `save.formatVersion is 1, this build reads ${SAVE_FORMAT_VERSION}`
 
 const NOTES: SaveSection<readonly string[]> = {
@@ -88,6 +89,7 @@ describe('save migration chain', () => {
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
       SLOT_FORMAT_STEP,
+      PACKED_CHUNKS_STEP,
     ])
     expect(reading.saveEpoch).toBe(3)
   })
@@ -104,6 +106,7 @@ describe('save migration chain', () => {
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
       SLOT_FORMAT_STEP,
+      PACKED_CHUNKS_STEP,
       { restoredSections: [{ section: 'save-probe.notes' }] },
     ])
     expect(notes).toEqual([])
@@ -205,6 +208,7 @@ describe('save migration chain: levels to steps (#181)', () => {
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
       SLOT_FORMAT_STEP,
+      PACKED_CHUNKS_STEP,
     ])
   })
 

@@ -15,7 +15,13 @@ import { vehicleStatsAt } from '../economy/vehicleStats'
 import { fromCanonical, toCanonical } from '../money'
 import PRE_181_SAVE from './fixtures/pre-181-planet-5.save.json'
 import { migrateSaveSlot, readMigratedSaveSlot } from './saveMigrations'
-import { saveSectionsOf, saveSlotOf, SAVE_FORMAT_VERSION, type SaveSlotFile } from './saveSlot'
+import {
+  saveSectionsOf,
+  saveSlotOf,
+  sectionsOfSaveSlot,
+  SAVE_FORMAT_VERSION,
+  type SaveSlotFile,
+} from './saveSlot'
 import { UNTIMED_AUTOSAVE } from './saveSlotIndex'
 
 /** Forty significant digits, as the Vertical Scaler's money check asks (#401 VS1, VS3). */
@@ -38,15 +44,25 @@ function v1FileOf(state: AuthorityState) {
   return { formatVersion: 1, ...saveSectionsOf(takeSnapshot(state), 4) }
 }
 
+/** The v1 file through the slot step and the packed-chunks step (#401 VS2) after it. */
 function migratedV2(v1: unknown): SaveSlotFile {
   return migrateSaveSlot(v1).migrated as SaveSlotFile
 }
 
+function unpackedWorldOf(file: SaveSlotFile) {
+  const unpacked = sectionsOfSaveSlot(file)
+  if (!('sections' in unpacked)) throw new Error(unpacked.problems.join('; '))
+  return unpacked.sections.world
+}
+
 describe('save format 1 -> 2 (slot layout)', () => {
-  it('runs one format step and writes a file this build reads', () => {
+  it('runs the slot step, then the packed-chunks step, and writes a file this build reads', () => {
     const v1 = v1FileOf(richState())
     const { migrated, migrations } = migrateSaveSlot(v1)
-    expect(migrations).toEqual([{ version: 'formatVersion', from: 1, to: 2 }])
+    expect(migrations).toEqual([
+      { version: 'formatVersion', from: 1, to: 2 },
+      { version: 'formatVersion', from: 2, to: 3 },
+    ])
     expect((migrated as SaveSlotFile).formatVersion).toBe(SAVE_FORMAT_VERSION)
     expect(readMigratedSaveSlot(v1).problems).toEqual([])
   })
@@ -59,7 +75,7 @@ describe('save format 1 -> 2 (slot layout)', () => {
     const v1 = v1FileOf(richState())
     const v2 = migratedV2(v1)
     expect(JSON.stringify(v2.profile)).toBe(JSON.stringify(v1.profile))
-    expect(JSON.stringify(v2.world)).toBe(JSON.stringify(v1.world))
+    expect(JSON.stringify(unpackedWorldOf(v2))).toBe(JSON.stringify(v1.world))
     expect(v2.profile.players.p1.wallet).toBe(toCanonical(fromCanonical(FORTY_DIGIT_WALLET)))
     expect(v2.profile.players.p1.vehicle.levels.drill_power).toBe(DRILL_STEP)
     expect(v2.digest).toBe(v1.digest)
@@ -85,7 +101,7 @@ describe('save format 1 -> 2 (slot layout)', () => {
     const tampered = { ...v1FileOf(richState()), digest: '0000000000000000' }
     const reading = readMigratedSaveSlot(tampered)
     expect(reading.migrations).toEqual([])
-    expect(reading.problems).toContain(`save.formatVersion is 1, this build reads 2`)
+    expect(reading.problems).toContain(`save.formatVersion is 1, this build reads 3`)
   })
 })
 
