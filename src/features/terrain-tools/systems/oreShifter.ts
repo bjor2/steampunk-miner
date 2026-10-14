@@ -10,6 +10,9 @@
  * may choose which loose nodules go first through the `dragTarget` item hook (`dragHooks.ts`,
  * ticket 326), never how many.
  *
+ * With the Ore Lure twist held the pull goes toward the plate left on the tunnel wall instead of
+ * the hull (`planOreDragTo`, `oreLure.ts`, ticket 329).
+ *
  * Mark milestones (#256, an income item's where and how): the Mark 3 second tap reverses the pull,
  * pushing the same count of nodules away from the hull to the rim of its reach; the Mark 6 hold
  * drags the same count only from the side the miner steers toward (`facedSideOf`, the TD lock on
@@ -48,11 +51,14 @@ import { isHold, isSecondTap, PLAIN_VERB, sizeOf, type ToolVerb } from './toolVe
 export const ORE_SHIFTER_ID = 'power.ore_shifter'
 
 /**
- * Where the drag pulls to and how far it reaches: toward the hull, or away from it (the second
- * tap's push); from all round, or only the side the miner steers toward (the hold's aim).
+ * Where the drag pulls to and how far it reaches: toward the hull (or the Ore Lure's plate), or
+ * away from the hull (the second tap's push); from all round the hull, or only the side the miner
+ * steers toward (the hold's aim).
  */
 interface DragPull {
   hull: TilePoint
+  /** Where a pull drags to: the hull's tile, or the Ore Lure's plate (`oreLure.ts`). */
+  target: TilePoint
   seed: number
   reach: number
   isPush: boolean
@@ -65,8 +71,22 @@ export function planOreDrag(
   pose: VehiclePose,
   verb: ToolVerb = PLAIN_VERB,
 ): TerrainPlan {
+  return planOreDragTo(view, key, pose, verb, tileOfPose(pose))
+}
+
+/**
+ * The same drag, the nodules in reach of the hull pulled toward `target` instead: where the Ore
+ * Lure's plate sits (ticket 329). The count, the cap, the swaps and the fixed cells are the same.
+ */
+export function planOreDragTo(
+  view: GroundView,
+  key: EditKey,
+  pose: VehiclePose,
+  verb: ToolVerb,
+  target: TilePoint,
+): TerrainPlan {
   const item = terrainItemNamed(ORE_SHIFTER_ID)
-  const pull = dragPullOf(view, key, pose, verb)
+  const pull = dragPullOf(view, key, pose, verb, target)
   const count = sizeOf(item, key, verb)
   const tiles = tilesInPull(pull)
   const draft = openDraft(view, ACTIVATION_UNIT_CAP)
@@ -74,15 +94,27 @@ export function planOreDrag(
   return planOfDrag(draft, tiles)
 }
 
-function dragPullOf(view: GroundView, key: EditKey, pose: VehiclePose, verb: ToolVerb): DragPull {
-  const balance = balanceOf(terrainItemNamed(ORE_SHIFTER_ID))
+function dragPullOf(
+  view: GroundView,
+  key: EditKey,
+  pose: VehiclePose,
+  verb: ToolVerb,
+  target: TilePoint,
+): DragPull {
   return {
     hull: tileOfPose(pose),
+    target,
     seed: editSeedOf(view.params, key),
-    reach: balance.reachTiles ?? balance.magnitude,
+    reach: shifterReachTiles(),
     isPush: isSecondTap(verb),
     aim: isHold(verb) ? stepNearest(sideVectorOf(pose, verb.facedSide)) : null,
   }
+}
+
+/** How far round the hull the shifter finds its nodules, in whole tiles. */
+export function shifterReachTiles(): number {
+  const balance = balanceOf(terrainItemNamed(ORE_SHIFTER_ID))
+  return balance.reachTiles ?? balance.magnitude
 }
 
 /** Drags up to `count` of the nodules, in the order given, while the cap can pay a move. */
@@ -116,8 +148,8 @@ function dragOne(draft: EditDraft, pull: DragPull, tile: TilePoint): boolean {
 
 /**
  * The last tile of the nodule's path that can hold it, or null when it cannot take one step. Each
- * step goes along the longer leg toward the hull (or away from it), or the other leg where that
- * one is blocked; a push stops at the rim of the reach.
+ * step goes along the longer leg toward the pull's target (or away from the hull), or the other
+ * leg where that one is blocked; a push stops at the rim of the reach.
  */
 function restingTileOf(view: GroundView, from: TilePoint, pull: DragPull): TilePoint | null {
   const ore = materialNow(view, from)
@@ -135,7 +167,7 @@ function nextStepOf(view: GroundView, at: TilePoint, pull: DragPull, ore: number
 }
 
 function stepsOf(at: TilePoint, pull: DragPull): TilePoint[] {
-  if (!pull.isPush) return stepsToward(at, pull.hull, pull.seed)
+  if (!pull.isPush) return stepsToward(at, pull.target, pull.seed)
   const withinReach = pull.reach * pull.reach
   return stepsAwayFrom(at, pull.hull, pull.seed).filter(
     (step) => distanceSqOf(step, pull.hull) <= withinReach,

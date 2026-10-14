@@ -11,7 +11,9 @@
  * through the kernel's `collapseBraces` seam, draws the drill's rate a tick in its clock step, and
  * ends on release, at its length or on a dry tank. The three verbs' fields show as brass outlines
  * on a scene layer of their own (ticket 286): the beacon's converging arcs, the coil's ring and
- * flares, the clamp's lattice.
+ * flares, the clamp's lattice. With the Ore Lure twist held (ticket 329, through the kernel
+ * `twist` hook), the shifter leaves a magnet plate in the section and drags toward it; the owner's
+ * dock takes the plate back.
  * Stabiliser foam, the cryo binder, shoring props and the strata press stay vision rows
  * (`systems/shippedTools.ts`). No side effects at import; the loader calls `register`.
  */
@@ -21,6 +23,7 @@ import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
 import { MAGNET_FIELD_LAYER_ID, MagnetFieldLayer } from './scene/MagnetFieldLayer'
 import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
 import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
+import { ORE_LURE_DOCK_REACTION } from './systems/oreLure'
 import { MAGNET_FIELD_LAYER_BUDGET } from './systems/render/magnetFieldBudget'
 import {
   TERRAIN_ITEM_CARDS,
@@ -41,6 +44,7 @@ export const slice: SliceDefinition = {
     r.vehicleItemSeller(TERRAIN_SELLER)
     r.saveSection(TERRAIN_TOOLS_SECTION)
     r.authorityReaction(LODESTONE_DOCK_REACTION)
+    r.authorityReaction(ORE_LURE_DOCK_REACTION)
     r.liveBeacon(LIVE_LODESTONE_PROVIDER)
     r.clockStep(HOLD_LODE_CLAMPS_STEP)
     r.collapseBrace(LODE_CLAMP_BRACES)

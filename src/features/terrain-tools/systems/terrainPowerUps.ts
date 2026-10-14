@@ -5,34 +5,27 @@
  * Mark the player researched (#249), and the edit joins the K6 queue on that tick
  * (`terrainOutcome.ts`). The repulsor coil (ticket 284), a charged magnet, releases its push-wave
  * through the kernel's magnet shift instead (`repulsorCoil.ts`). The lode clamp (ticket 285) is
- * used by holding its slot: its act locks a field, and letting go ends it (`lodeClamp.ts`). A Mark
- * milestone's second tap or
- * hold, and a sibling-link's reduced size, reach the planner as its verb (`toolVerb.ts`, #256).
+ * used by holding its slot: its act locks a field, and letting go ends it (`lodeClamp.ts`). With
+ * the Ore Lure twist held, the shifter leaves its plate or drags toward it (`oreLure.ts`, ticket
+ * 329). A Mark milestone's second tap or hold, and a sibling-link's reduced size, reach the planner
+ * as its verb (`toolVerb.ts`, #256).
  */
-import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
-import type { VehiclePose } from '../../../systems/vehicle/vehiclePose'
-import type { PowerUp, PowerUpOutcome, PowerUpUse } from '../../power-up-core'
-import type { EditKey } from './editSeed'
-import { openGroundView, type GroundView } from './groundView'
+import type { PowerUp } from '../../power-up-core'
+import { editWith, type Activate } from './editActivation'
 import { LODESTONE_BEACON_ID, plantLodestone } from './lodestoneBeacon'
 import { clampHoldOf, LODE_CLAMP_ID, lockClampField, releaseClampField } from './lodeClamp'
 import { magnetBalanceOf, type MagnetItem } from './magnetItems'
-import { ORE_SHIFTER_ID, planOreDrag } from './oreShifter'
+import { dragOrLureOre } from './oreLure'
+import { ORE_SHIFTER_ID } from './oreShifter'
 import { planPressurePocket, PRESSURE_POCKET_ID } from './pressurePocket'
 import { releasePushWave, REPULSOR_COIL_ID } from './repulsorCoil'
 import { planSeamSplit, SEAM_SPLITTER_ID } from './seamSplitter'
 import { SHIPPED_MAGNET_ITEMS, SHIPPED_TERRAIN_ITEMS } from './shippedTools'
-import { TERRAIN_REFUSAL } from './terrainEvents'
 import { balanceOf, isConsumable, type TerrainItem } from './terrainItems'
-import { editSourceOf, outcomeOfPlan, type TerrainPlan } from './terrainOutcome'
-import { toolVerbOf, type ToolVerb } from './toolVerb'
-
-type Planner = (view: GroundView, key: EditKey, pose: VehiclePose, verb: ToolVerb) => TerrainPlan
-
-type Activate = (state: AuthorityState, use: PowerUpUse) => PowerUpOutcome
+import { editSourceOf } from './terrainOutcome'
 
 const ACTIVATIONS: Readonly<Record<string, Activate>> = {
-  [ORE_SHIFTER_ID]: editWith(planOreDrag),
+  [ORE_SHIFTER_ID]: dragOrLureOre,
   [SEAM_SPLITTER_ID]: editWith(planSeamSplit),
   [PRESSURE_POCKET_ID]: editWith(planPressurePocket),
   [LODESTONE_BEACON_ID]: plantLodestone,
@@ -90,24 +83,5 @@ function magnetPowerUpOf(item: MagnetItem): PowerUp {
     energyDrawBpPerSecond: 0,
     activate: ACTIVATIONS[item.itemId],
     ...HOLD_HOOKS[item.itemId],
-  }
-}
-
-/** The tool plans its edit at the miner's pose; a miner out of play has nothing to act from. */
-function editWith(plan: Planner): Activate {
-  return (state, use) => {
-    const view = openGroundView(state, use.playerId, editSourceOf(use.itemId))
-    const miner = vehicleOf(state, use.playerId)
-    const { pose } = miner
-    if (view === null || pose === null)
-      return { kind: 'refused', reason: TERRAIN_REFUSAL.outOfPlay }
-    const key = { origin: use.origin, tick: use.tick, itemId: use.itemId, mark: use.mark }
-    const author = {
-      playerId: use.playerId,
-      itemId: use.itemId,
-      mark: key.mark,
-      origin: use.origin,
-    }
-    return outcomeOfPlan(state, author, plan(view, key, pose, toolVerbOf(use, miner)))
   }
 }

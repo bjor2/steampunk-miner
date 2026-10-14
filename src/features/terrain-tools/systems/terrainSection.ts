@@ -8,7 +8,8 @@
  * A held lode clamp field (ticket 285, the GD ruling on #285 Q4) is saved here too, its pinned set
  * fixed at the act, so the braces it claims are derived from the save alone. The field is absent
  * while no clamp is held, so a save, a digest or a golden with no clamp is unchanged and the
- * section needs no new version.
+ * section needs no new version. The Ore Lure twist's magnet plate (ticket 329) is one more such
+ * field, absent while no plate is left.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { isJsonObject, isWholeNumber } from '../../../systems/authority/payloadFields'
@@ -44,11 +45,20 @@ export interface ClampField {
   energy: number
 }
 
+/** The Ore Lure's magnet plate, left on the tunnel wall at a tile of a planet (ticket 329). */
+export interface LurePlate {
+  tx: number
+  ty: number
+  planetIndex: number
+}
+
 export interface TerrainToolsState {
   /** One live beacon per planet (#162 row); null with none planted. */
   beacon: LodestoneBeacon | null
   /** Absent while no clamp is held. */
   clamp?: ClampField
+  /** Absent while no Ore Lure plate is left. */
+  plate?: LurePlate
 }
 
 export const NO_TERRAIN_TOOLS_STATE: TerrainToolsState = { beacon: null }
@@ -72,8 +82,7 @@ export function withBeacon(
   playerId: string,
   beacon: LodestoneBeacon | null,
 ): AuthorityState {
-  const { clamp } = terrainToolsOf(state, playerId)
-  return withSection(state, playerId, TERRAIN_TOOLS_SECTION, { beacon, ...clampKeyOf(clamp) })
+  return withTerrainTools(state, playerId, { ...terrainToolsOf(state, playerId), beacon })
 }
 
 /** The player's clamp field set, or taken away with null. */
@@ -82,14 +91,40 @@ export function withClampField(
   playerId: string,
   clamp: ClampField | null,
 ): AuthorityState {
-  const { beacon } = terrainToolsOf(state, playerId)
-  return withSection(state, playerId, TERRAIN_TOOLS_SECTION, { beacon, ...clampKeyOf(clamp) })
+  const { clamp: _held, ...unclamped } = terrainToolsOf(state, playerId)
+  return withTerrainTools(state, playerId, { ...unclamped, ...clampKeyOf(clamp) })
+}
+
+/** The player's Ore Lure plate left, moved, or taken away with null. */
+export function withLurePlate(
+  state: AuthorityState,
+  playerId: string,
+  plate: LurePlate | null,
+): AuthorityState {
+  const { plate: _left, ...withoutPlate } = terrainToolsOf(state, playerId)
+  return withTerrainTools(
+    state,
+    playerId,
+    plate === null ? withoutPlate : { ...withoutPlate, plate },
+  )
+}
+
+function withTerrainTools(
+  state: AuthorityState,
+  playerId: string,
+  value: TerrainToolsState,
+): AuthorityState {
+  return withSection(state, playerId, TERRAIN_TOOLS_SECTION, value)
 }
 
 /** Why a saved body is not a terrain-tools section; empty when it is one. */
 export function terrainToolsStateProblems(body: unknown): string[] {
   if (!isJsonObject(body)) return ['the terrain-tools section must be an object']
-  return [...beaconProblems(body.beacon), ...clampProblems(body.clamp)]
+  return [
+    ...beaconProblems(body.beacon),
+    ...clampProblems(body.clamp),
+    ...plateProblems(body.plate),
+  ]
 }
 
 /** The `clamp` key to spread: none while no field is held, so the section stays at initial. */
@@ -103,6 +138,14 @@ function beaconProblems(beacon: unknown): string[] {
 
 function clampProblems(clamp: unknown): string[] {
   return clamp === undefined || isClampField(clamp) ? [] : ['terrain-tools.clamp is malformed']
+}
+
+function plateProblems(plate: unknown): string[] {
+  return plate === undefined || isLurePlate(plate) ? [] : ['terrain-tools.plate is malformed']
+}
+
+function isLurePlate(plate: unknown): boolean {
+  return isTile(plate) && isJsonObject(plate) && isWholeNumber(plate.planetIndex)
 }
 
 function isClampField(clamp: unknown): boolean {
