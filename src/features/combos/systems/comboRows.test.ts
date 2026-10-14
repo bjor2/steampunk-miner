@@ -68,7 +68,7 @@ describe('combo rows', () => {
 
   it('makes nodes only for the authored combos', () => {
     expect(authoredComboNodesOf(COMBO_ITEMS).map((node) => node.unlockTier)).toEqual([
-      15, 18, 21, 24, 28,
+      15, 18, 21, 24, 28, 36,
     ])
   })
 

@@ -60,9 +60,13 @@ function cardCtxOf(session: BotSession, level = 0): ItemCtx {
   }
 }
 
-/** Each combo's grades and the planet each is researched on, by item id, up to `through`. */
+/**
+ * Each combo's generated grades and the planet each is researched on, by item id, up to `through`.
+ * The authored grades (P15-P36) are granted first, so none is booked as a planet-41 grade.
+ */
 function gradePlanetsOf(through: number): Map<string, number[]> {
   const session = sessionOn(41)
+  grantThrough(session, 40)
   const planets = new Map<string, number[]>()
   for (let planet = 41; planet <= through; planet += 3) {
     session.submit({ type: 'debug.setPlanet', payload: { planetIndex: planet } })
@@ -137,7 +141,7 @@ describe('combos in play: later grades', () => {
   })
 
   it('debits a grade the price the tree card shows, once both parents are owned', () => {
-    const [planet] = (gradePlanets.get('combo.assay_drain') ?? []).slice(1)
+    const [planet] = gradePlanets.get('combo.assay_drain') ?? []
     const nodeId = `tech.combo.gen.${planet}`
     const session = sessionOn(planet)
     grantThrough(session, planet - 1)

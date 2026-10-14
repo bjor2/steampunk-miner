@@ -8,12 +8,7 @@ import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import type { Money } from '../../../systems/money'
 import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import type { TechComboTemplate, TechNode } from '../../tech-tree'
-import {
-  CEILING_ANCHOR_TEMPLATE_ROW,
-  COMBO_ITEMS,
-  type ComboItem,
-  type ComboNode,
-} from './comboCatalogue'
+import { COMBO_ITEMS, type ComboItem, type ComboNode } from './comboCatalogue'
 import { COMBOS_ECONOMY } from './combosEconomy'
 
 const COMBO_ID_PREFIX = 'combo.'
@@ -64,10 +59,7 @@ export function comboTemplateOf(
 }
 
 /** The ten templates, one per lane pair (#161 section 2; ticket 206 "Combo templates"). */
-export const COMBO_TEMPLATES: readonly TechComboTemplate[] = [
-  ...COMBO_ITEMS,
-  CEILING_ANCHOR_TEMPLATE_ROW,
-].map(comboTemplateOf)
+export const COMBO_TEMPLATES: readonly TechComboTemplate[] = COMBO_ITEMS.map(comboTemplateOf)
 
 /**
  * The one-off price (#162 4.1): `k` band-5 ore priced at the planet the combo unlocks on, with

@@ -57,21 +57,25 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
 
-### `combos`: 11 files, 67 tests
+### `combos`: 15 files, 87 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/combos/alarmShield.test.ts` | 2 | 2 |
+| `src/features/combos/ceilingAnchor.test.ts` | 7 | 7 |
+| `src/features/combos/ceilingAnchorBounds.test.ts` | 3 | 3 |
 | `src/features/combos/comboHand.test.ts` | 2 | 2 |
 | `src/features/combos/comboPace.test.ts` | 6 | 5 |
 | `src/features/combos/combosInPlay.test.ts` | 9 | 9 |
 | `src/features/combos/gatesFixture.test.ts` | 3 | 3 |
+| `src/features/combos/scene/ceilingAnchorParts.test.ts` | 3 | 3 |
 | `src/features/combos/shippedRows.test.ts` | 6 | 6 |
 | `src/features/combos/systems/comboCatalogue.test.ts` | 9 | 9 |
 | `src/features/combos/systems/comboGrades.test.ts` | 4 | 4 |
 | `src/features/combos/systems/comboHooks.test.ts` | 14 | 14 |
 | `src/features/combos/systems/comboRows.test.ts` | 8 | 8 |
 | `src/features/combos/systems/combosEconomy.test.ts` | 4 | 4 |
+| `src/features/combos/systems/render/anchorTilt.test.ts` | 7 | 7 |
 
 ### `descriptions`: 4 files, 49 tests
 

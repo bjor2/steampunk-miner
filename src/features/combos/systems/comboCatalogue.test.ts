@@ -3,15 +3,16 @@ import { contentOf } from '../../../systems/registries/content'
 import { iconUrlOf } from '../../../ui/vectorIcons'
 import { flavourProblemsOf } from '../../descriptions'
 import { TECH_LANES, type TechNode } from '../../tech-tree'
-import { CEILING_ANCHOR_TEMPLATE_ROW, COMBO_ITEMS, comboItemOf } from './comboCatalogue'
+import { COMBO_ITEMS, comboItemOf } from './comboCatalogue'
 
-/** #162 milestone combos table (the ceiling anchor moved to #288). */
+/** #162 milestone combos table; the ceiling anchor at P36 or later (#288, after #279). */
 const AUTHORED = [
   ['combo.assay_drain', 15],
   ['combo.magnetic_survey', 18],
   ['combo.foam_cutters', 21],
   ['combo.alarm_shield', 24],
   ['combo.cored_drain', 28],
+  ['combo.ceiling_anchor', 36],
 ] as const
 
 /** The four templates Content wrote on 7 Oct: endless only, no authored node (ticket 206). */
@@ -52,7 +53,7 @@ describe('combo catalogue', () => {
     })
   })
 
-  it('researches the five authored combos at the research lab from P15', () => {
+  it('researches the six authored combos at the research lab from P15', () => {
     const authored = COMBO_ITEMS.filter((item) => item.node !== null)
     expect(authored.map((item) => [item.itemId, item.node?.unlockTier])).toEqual(AUTHORED)
     authored.forEach((item) => expect(item.node?.id).toBe(`tech.${item.itemId}`))
@@ -69,7 +70,7 @@ describe('combo catalogue', () => {
   })
 
   it('takes one parent from each of its two different lanes', () => {
-    ;[...COMBO_ITEMS, CEILING_ANCHOR_TEMPLATE_ROW].forEach((item) => {
+    COMBO_ITEMS.forEach((item) => {
       expect(item.lanes[0]).not.toBe(item.lanes[1])
       expect(item.lanes.every((lane) => TECH_LANES.includes(lane))).toBe(true)
       expect(item.parents.map(laneOfNode), item.itemId).toEqual(item.lanes)
@@ -78,7 +79,7 @@ describe('combo catalogue', () => {
 
   it('names parents the loaded lane slices register, but the foam #202 holds back', () => {
     const loaded = new Set(contentOf('tech-node').map((node) => (node as TechNode).id))
-    const parents = [...COMBO_ITEMS, CEILING_ANCHOR_TEMPLATE_ROW].flatMap((item) => item.parents)
+    const parents = COMBO_ITEMS.flatMap((item) => item.parents)
     const missing = [...new Set(parents.filter((parent) => !loaded.has(parent)))]
     expect(missing).toEqual([HELD_PARENT])
   })
@@ -87,7 +88,7 @@ describe('combo catalogue', () => {
     const unlocksOf = new Map(
       contentOf('tech-node').map((node) => [node.id, (node as TechNode).unlocks]),
     )
-    ;[...COMBO_ITEMS, CEILING_ANCHOR_TEMPLATE_ROW].forEach((item) =>
+    COMBO_ITEMS.forEach((item) =>
       item.parents.forEach((parent, index) => {
         const unlocks = unlocksOf.get(parent)
         if (unlocks !== undefined) expect(item.parentItemIds[index], parent).toBe(unlocks)

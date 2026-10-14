@@ -7,9 +7,9 @@ import { ITEM_HOOK_REGISTRY } from '../../systems/registries/itemHooks'
 import { COMBO_HOLDS, COMBO_ITEMS, COMBO_TEMPLATES, authoredComboNodesOf } from '.'
 
 // Ticket 206 as 206b (GD lock on #206): the combos whose parents' lanes answer through the kernel
-// item hooks ship, with their store item, authored node, template, card and hooks; the foam combos
-// (#202), the aether reel (tow, decision 10) and the ceiling anchor (#288) stay vision rows. The
-// folder imports no lane slice (the combos acceptance).
+// item hooks ship, with their store item, authored node, template, card and hooks, and the ceiling
+// anchor (ticket 288) on the kernel's drill gear read; the foam combos (#202) and the aether reel
+// (tow, decision 10) stay vision rows. The folder imports no lane slice (the combos acceptance).
 
 const SLICE_DIR = new URL('./', import.meta.url)
 const LANE_SLICES = ['extraction', 'terrain-tools', 'sensing', 'mobility', 'drill-gear']
@@ -41,12 +41,13 @@ const shipped = COMBO_ITEMS.filter((item) => !isHeld(item.itemId))
 const held = COMBO_ITEMS.filter((item) => isHeld(item.itemId))
 
 describe('combos shipped and held', () => {
-  it('ships the four authored combos the hooks reach and the lodestone drain and lens corer', () => {
+  it('ships the authored combos the hooks and drill gear reach and two endless-only ones', () => {
     expect(shipped.map((item) => item.itemId)).toEqual([
       'combo.assay_drain',
       'combo.magnetic_survey',
       'combo.alarm_shield',
       'combo.cored_drain',
+      'combo.ceiling_anchor',
       'combo.lodestone_drain',
       'combo.lens_corer',
     ])
@@ -75,10 +76,9 @@ describe('combos shipped and held', () => {
     )
   })
 
-  it('holds exactly the foam combos, the aether reel and the ceiling anchor, each with a reason', () => {
+  it('holds exactly the foam combos and the aether reel, each with a reason', () => {
     expect(Object.keys(COMBO_HOLDS).sort()).toEqual([
       'combo.aether_reel',
-      'combo.ceiling_anchor',
       'combo.foam_cutters',
       'combo.foam_grapple',
     ])

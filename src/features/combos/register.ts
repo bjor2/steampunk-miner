@@ -3,13 +3,18 @@
  * effects at import; the loader calls `register`.
  *
  * The shipped combos (`systems/comboContent.ts`): each one's `vehicle-item` row, its authored
- * grade-1 node (P15-P28, researched at the `research_lab` with both parents owned), its pair's
+ * grade-1 node (P15-P36, researched at the `research_lab` with both parents owned), its pair's
  * template the tree grades it on from (P41 on), its card and its sale at the Upgrade bay; their
  * item hooks on the drain, the ore-shifter, the corer and the steam shield; and the `combos`
  * section the cored drain keeps the corer's last plug in, with the reaction that writes it. The
- * held combos (`systems/comboHolds.ts`) stay vision rows. No lane slice is imported.
+ * ceiling anchor (ticket 288) asks the drill gear read for the up-diagonal while its player clings,
+ * tilts the drill head on the car and plays the kernel's light clank when the anchor lets go
+ * mid up-cut. The held combos (`systems/comboHolds.ts`) stay vision rows. No lane slice is
+ * imported.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
+import { CEILING_ANCHOR_PARTS } from './scene/ceilingAnchorParts'
+import { ANCHOR_DROP_CLANK, CEILING_ANCHOR_GEAR } from './systems/ceilingAnchor'
 import { comboCardOf } from './systems/comboCards'
 import {
   COMBO_TECH_NODES,
@@ -32,5 +37,8 @@ export const slice: SliceDefinition = {
     COMBO_HOOKS.forEach((hook) => r.itemHook(hook))
     r.saveSection(COMBO_SECTION)
     r.authorityReaction(SAMPLED_VEIN_REACTION)
+    r.drillGear(CEILING_ANCHOR_GEAR)
+    r.oneShot(ANCHOR_DROP_CLANK)
+    r.partMotionRequests(CEILING_ANCHOR_PARTS)
   },
 }

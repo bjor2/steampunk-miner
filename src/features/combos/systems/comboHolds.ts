@@ -9,7 +9,6 @@ export const COMBO_HOLDS: Readonly<Record<string, string>> = {
   'combo.foam_cutters': 'stabiliser foam is held back (#202), so the combo has no parent node',
   'combo.foam_grapple': 'stabiliser foam is held back (#202), so the combo has no parent node',
   'combo.aether_reel': 'the tow hook waits until Gameplay defines tow (GD lock on #206, 10)',
-  'combo.ceiling_anchor': 'item and node moved to #288, after the twin-bit diagonal',
 }
 
 /** Whether the combo store item ships now. */

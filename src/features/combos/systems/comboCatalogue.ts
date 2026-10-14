@@ -1,10 +1,10 @@
 /**
  * The milestone combos (spec #162 section 1, the milestone combos table; #161 sections 1 and 2;
  * ticket 206 "Combo templates"): one row per combo store item and one `tech-combo-template` row
- * per lane pair. Five combos are authored nodes researched at the `research_lab` (P15 onward);
+ * per lane pair. Six combos are authored nodes researched at the `research_lab` (P15 onward);
  * the four templates Content added on 7 Oct are endless only, first seen as a generated combo
- * from P41. The ceiling anchor's item and node moved to #288; its template row stays here, so the
- * template line is ten (#245 lock).
+ * from P41. The ceiling anchor (#288) is the last authored one, at P36, once the twin bit's
+ * diagonal (#279) is in the game.
  *
  * Combos have no Marks and mount nothing new: they read their parents' current values (#162 4.6).
  * Parents are named by node id only, so this slice imports no lane slice.
@@ -106,6 +106,17 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     node: { id: 'tech.combo.cored_drain', iconId: 'node-combo-cored-drain', unlockTier: 28 },
   },
   {
+    itemId: 'combo.ceiling_anchor',
+    name: 'Ceiling anchor',
+    iconId: 'item-combo-ceiling-anchor',
+    description: 'Pinned to the roof, the twin bits bite upward at a slant without a wobble.',
+    lanes: ['mobility', 'drill-gear'],
+    parents: ['tech.mobility.grav_anchor', 'tech.drill_gear.twin_bit'],
+    parentItemIds: ['power.grav_anchor', 'gear.twin_bit'],
+    isIncomeCombo: false,
+    node: { id: 'tech.combo.ceiling_anchor', iconId: 'node-combo-ceiling-anchor', unlockTier: 36 },
+  },
+  {
     itemId: 'combo.lodestone_drain',
     name: 'Lodestone drain',
     iconId: 'item-combo-lodestone-drain',
@@ -150,22 +161,6 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     node: null,
   },
 ]
-
-/**
- * The ceiling anchor's template (mobility × drill-gear): its store item and authored node are
- * #288's, after the twin-bit diagonal (#279); the row is here because the template line is ten.
- */
-export const CEILING_ANCHOR_TEMPLATE_ROW: Pick<
-  ComboItem,
-  'itemId' | 'name' | 'description' | 'lanes' | 'parents' | 'parentItemIds'
-> = {
-  itemId: 'combo.ceiling_anchor',
-  name: 'Ceiling anchor',
-  description: 'Pinned to the roof, the twin bits bite upward at a slant without a wobble.',
-  lanes: ['mobility', 'drill-gear'],
-  parents: ['tech.mobility.grav_anchor', 'tech.drill_gear.twin_bit'],
-  parentItemIds: ['power.grav_anchor', 'gear.twin_bit'],
-}
 
 /** The catalogue row of `itemId`, or null for an item that is not a combo of this slice. */
 export function comboItemOf(itemId: string): ComboItem | null {
