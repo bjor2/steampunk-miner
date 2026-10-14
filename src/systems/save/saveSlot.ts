@@ -9,14 +9,18 @@
  *            edits (K6 #189), and the bore gun's pending shots, standing struts and grounded lines
  *            while there are any (tickets 313, 379, 378; carried since ticket 405, so a save taken
  *            mid-bore restores)
- *   profile  per player the wallet, the last seq and the vehicle (integer levels, never stats)
+ *   profile  per player the wallet, the last seq and the vehicle (integer levels, never stats):
+ *            the world's progress for each of its players, owned by the host (#401, ticket 407).
+ *            The key keeps its format 1 name; the player's own profile, which carries only
+ *            settings and cosmetics between worlds, is `playerProfile.ts` and never in a save.
  *
  * The slices' save sections ride inside these two parts (feature-slices.md 3.13): the session
  * sections as `world.slices`, the player sections in each profile player, both omitted while none
  * is registered, so neither the header nor `SAVE_FORMAT_VERSION` changes for them.
  *
- * Both sections carry the header's `saveEpoch`, so a world can never be paired with a profile
- * from another write; they stay separately addressable so co-op can split them into two files.
+ * Both sections carry the header's `saveEpoch`, so a world can never be paired with players from
+ * another write. #3 and #12 kept them apart for a co-op split into two files; since #401 both are
+ * the host's world save, so they stay in one file (`worldSaveOwnership.ts`).
  * The sections are cut from the session snapshot (#11 section 5) and joined back into one before
  * `readSnapshot`, so the debug API, the save and the co-op join share one serialiser.
  *
@@ -61,7 +65,7 @@ export interface SaveSections {
   /** The state digest of the snapshot the sections were cut from (#11 section 3). */
   digest: string
   world: SaveWorldSection
-  profile: SaveProfileSection
+  profile: SavePlayersSection
 }
 
 export interface SaveSlotFile extends Omit<SaveSections, 'world'> {
@@ -102,7 +106,8 @@ export interface SaveWorldSection {
   slices?: PortableState['slices']
 }
 
-export interface SaveProfileSection {
+/** The world's players and their progress: the host's, never a player profile (ticket 407). */
+export interface SavePlayersSection {
   saveEpoch: number
   players: Record<string, PortablePlayer>
 }

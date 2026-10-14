@@ -1018,6 +1018,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/save/byteCodecs.test.ts` | 20 | 12 |
 | `src/systems/save/chunkDiffSave.test.ts` | 11 | 11 |
+| `src/systems/save/playerProfile.test.ts` | 4 | 4 |
 | `src/systems/save/saveDeterminism.test.ts` | 7 | 7 |
 | `src/systems/save/saveExactRoundTrip.test.ts` | 9 | 9 |
 | `src/systems/save/saveMigrations.test.ts` | 19 | 19 |
@@ -1027,6 +1028,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/save/savedUnlocks.test.ts` | 7 | 7 |
 | `src/systems/save/sizedChargeRacks.test.ts` | 3 | 3 |
 | `src/systems/save/slotFormatMigration.test.ts` | 8 | 8 |
+| `src/systems/save/worldSaveOwnership.test.ts` | 2 | 2 |
 
 ### `scene`
 
@@ -1095,6 +1097,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/sliceRun.test.ts` | 7 | 7 |
 | `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/touchRuntime.test.ts` | 14 | 13 |
+| `src/store/worldSaveOwnership.test.ts` | 7 | 7 |
 
 ### `systems-core`
 

@@ -13,6 +13,10 @@
  * the index (`listSaveSlots`, `latestSaveSlot`, `deleteSaveSlot`) answers the slot menus. The
  * folder is moved to the v2 slot layout before any of them reads it (`saveFolder.ts`).
  *
+ * The host owns the world save (ticket 407): a player who joins a host's world resumes the host's
+ * save (`joinHostWorld`) as a guest, and while a guest neither the checkpoint nor a manual save
+ * writes anything. Loading one of their own slots makes them the host of that world again.
+ *
  * A debug run also keeps each slot save as a snapshot file (#123), which `checkpoint_saved` names.
  */
 import { getRunLog } from '../logging/runLog'
@@ -38,6 +42,12 @@ import {
   type SaveSlotKey,
   type SaveSlotMeta,
 } from '../systems/save/saveSlotIndex'
+import {
+  canWriteWorldSave,
+  HOST_WORLD_SAVE,
+  worldSaveWriteProblems,
+  type SaveRole,
+} from '../systems/save/worldSaveOwnership'
 import { readAuthorityState } from './authorityLink'
 import { keepSlotSaveSnapshot } from './runSnapshots'
 import { adoptV1SlotLayout, parsedJson, readSlotEntries, type SaveFolder } from './saveFolder'
@@ -49,7 +59,8 @@ export interface SaveFolderInstall {
 }
 
 export interface Checkpoint {
-  slot: SaveSlotKey
+  /** The player's slot, or the host's save for a joined world. */
+  slot: SaveSlotKey | typeof HOST_WORLD_SAVE
   state: AuthorityState
   saveEpoch: number
   /** The open unlock ids the save shows (`savedUnlocks.ts`, #401). */
@@ -65,11 +76,13 @@ let installed: SaveFolderInstall | null = null
 let lastEpoch = 0
 let writes: Promise<void> = Promise.resolve()
 let layoutAdopted: Promise<boolean> = Promise.resolve(false)
+let role: SaveRole = 'host'
 
 /** Before this (and in tests that do not care) nothing is written. */
 export function installSaveFolder(next: SaveFolderInstall | null): void {
   installed = next
   lastEpoch = 0
+  role = 'host'
   writes = Promise.resolve()
   layoutAdopted = next === null ? Promise.resolve(false) : adoptLayoutOrReport(next.folder)
 }
@@ -83,8 +96,12 @@ function adoptLayoutOrReport(folder: SaveFolder): Promise<boolean> {
 }
 
 export function writeCheckpointAfter(events: readonly DomainEvent[], place: RunEventPlace): void {
-  if (installed === null || !isCheckpointMoment(events)) return
+  if (installed === null || !isWorldSaveDue(events)) return
   queueWrite(installed, AUTOSAVE_SLOT, nextSaveFile(installed, AUTOSAVE_NAME), place)
+}
+
+function isWorldSaveDue(events: readonly DomainEvent[]): boolean {
+  return canWriteWorldSave(role) && isCheckpointMoment(events)
 }
 
 /** The player's save into a manual slot under `name`; an existing save there is replaced. */
@@ -95,9 +112,13 @@ export function saveToManualSlot(slot: SaveSlotKey, name: string, place: RunEven
   return []
 }
 
-/** The autosave is the checkpoint's alone. */
+/** The autosave is the checkpoint's alone, and a guest saves no world. */
 function manualSaveProblems(slot: SaveSlotKey): string[] {
   if (installed === null) return ['this run has no save folder']
+  return [...worldSaveWriteProblems(role), ...manualSlotProblems(slot)]
+}
+
+function manualSlotProblems(slot: SaveSlotKey): string[] {
   return isManualSlotKey(slot) ? [] : [`${slot} is not a manual slot`]
 }
 
@@ -158,6 +179,18 @@ export async function loadSaveSlot(slot: SaveSlotKey): Promise<CheckpointLoad> {
   return text === null ? null : adoptOrSetAside(folder, slot, readSaveSlotText(text))
 }
 
+/**
+ * The host's save of the world this player joins, as the host sent it: resumed like a slot, and
+ * from then on this player is the host's guest and writes no world save. A save this build refuses
+ * leaves them the host of their own world, with nothing set aside, since the file is not theirs.
+ */
+export function joinHostWorld(hostSaveText: string): Checkpoint | { problems: string[] } {
+  const reading = readSaveSlotText(hostSaveText)
+  if (!('state' in reading)) return { problems: reading.problems }
+  role = 'guest'
+  return checkpointOfReading(HOST_WORLD_SAVE, reading)
+}
+
 /** The folder once its layout is adopted and the queued writes have landed. */
 async function settledFolder(target: SaveFolderInstall): Promise<SaveFolder> {
   await layoutAdopted
@@ -172,12 +205,20 @@ async function adoptOrSetAside(
   reading: MigratedSaveSlotReading,
 ): Promise<Checkpoint | { problems: string[] }> {
   if ('state' in reading) {
-    lastEpoch = reading.saveEpoch
-    const { state, saveEpoch, unlocked, migrations } = reading
-    return { slot, state, saveEpoch, unlocked, migrations }
+    role = 'host'
+    return checkpointOfReading(slot, reading)
   }
   await folder.setAside(slot)
   return { problems: reading.problems }
+}
+
+function checkpointOfReading(
+  slot: Checkpoint['slot'],
+  reading: Extract<MigratedSaveSlotReading, { state: AuthorityState }>,
+): Checkpoint {
+  lastEpoch = reading.saveEpoch
+  const { state, saveEpoch, unlocked, migrations } = reading
+  return { slot, state, saveEpoch, unlocked, migrations }
 }
 
 /** Logged by the store once the resumed session is connected: each migration step, then the load. */
