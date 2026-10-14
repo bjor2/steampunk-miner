@@ -16,6 +16,11 @@
  * report, never in the authority, so there is no command, event, save section or protocol bump.
  * A sibling of `spendFamilies` with the same rules; they share no code paths (one reads what the
  * bot spent, this what the items earn).
+ *
+ * Mark milestones (GD lock on #256, ticket 278): an income item's one yield milestone is its
+ * sibling-link, and the 15% covers the item's levels and its milestones together. A rate whose
+ * full stack reaches a sibling-link says what the link adds a minute; the milestone rows judge the
+ * item with it, the plain rows without it, so the #385 check reads as before.
  */
 import { add, cmp, mul, ZERO_MONEY, type Money } from '../money'
 import { defineOneProviderRegistry, defineRegistry, entriesOf } from './seal'
@@ -50,6 +55,12 @@ export interface IncomeRate {
   isTripCappedInPlay: boolean
   /** Ore value a minute reaching the hold at the last Mark, all charges, 100% uptime. */
   valuePerMinuteAtFullStack(at: IncomeAt): Money
+  /**
+   * What the item's sibling-link adds a minute at full stack: the link on, the sibling slotted
+   * and ready at every act it can be, firing at the link's strength on the sibling's own charges
+   * and cooldown (#256). Absent for an item whose ladder reaches no sibling-link.
+   */
+  linkValuePerMinuteAtFullStack?(at: IncomeAt): Money
 }
 
 /** The per-trip clamp on income items (#162 4.5); one provider, the extraction slice. */
@@ -95,6 +106,15 @@ export function incomeCapRowsOf(at: IncomeAt, anchors: IncomeAnchors): IncomeCap
   return liveRatesOf(anchors).map((rate) => incomeCapRowOf(rate, at, tripCap))
 }
 
+/**
+ * The same rows with each item's sibling-link added to its own rate (ticket 278): the item at full
+ * stack with every Mark milestone, as `balance:tree --milestones` judges it.
+ */
+export function milestoneIncomeCapRowsOf(at: IncomeAt, anchors: IncomeAnchors): IncomeCapRow[] {
+  const tripCap = tripCapOf(at)
+  return liveRatesOf(anchors).map((rate) => incomeCapRowOf(withLinkValue(rate), at, tripCap))
+}
+
 /** Every row together, report-only: the cap judges items one at a time and never this sum. */
 export function stackedIncomeOf(rows: readonly IncomeCapRow[]): Money {
   return rows.map((row) => row.valuePerTrip).reduce(add, ZERO_MONEY)
@@ -127,6 +147,16 @@ function incomeCapRowOf(rate: IncomeRate, at: IncomeAt, tripCap: Money | null): 
     isTripCappedInPlay: rate.isTripCappedInPlay,
     unclampedValuePerTrip: unclamped,
     valuePerTrip: clampedTo(unclamped, tripCap),
+  }
+}
+
+/** The rate with its sibling-link's minute added; a rate with no link is left as it is. */
+function withLinkValue(rate: IncomeRate): IncomeRate {
+  const { linkValuePerMinuteAtFullStack: linkValueOf } = rate
+  if (linkValueOf === undefined) return rate
+  return {
+    ...rate,
+    valuePerMinuteAtFullStack: (at) => add(rate.valuePerMinuteAtFullStack(at), linkValueOf(at)),
   }
 }
 

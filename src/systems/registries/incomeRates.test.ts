@@ -4,6 +4,7 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { fromCanonical, fromSafeInteger, mul, toCanonical } from '../money'
 import {
   incomeCapRowsOf,
+  milestoneIncomeCapRowsOf,
   stackedIncomeOf,
   type IncomeAnchors,
   type IncomeAt,
@@ -68,9 +69,13 @@ function rowsLive(...liveRowIds: string[]): IncomeAnchors {
   return { isRowLive: (rowId) => liveRowIds.includes(rowId), isItemOwned: () => false }
 }
 
-function rowsAsText(slices: readonly SliceDefinition[], anchors = EVERY_ANCHOR_LIVE) {
+function rowsAsText(
+  slices: readonly SliceDefinition[],
+  anchors = EVERY_ANCHOR_LIVE,
+  rowsOf = incomeCapRowsOf,
+) {
   return withRegistrations(slices, () =>
-    incomeCapRowsOf(AT, anchors).map((row) => ({
+    rowsOf(AT, anchors).map((row) => ({
       rateId: row.rateId,
       itemId: row.itemId,
       unclampedValuePerTrip: toCanonical(row.unclampedValuePerTrip),
@@ -148,6 +153,51 @@ describe('income rates', () => {
       stackedIncomeOf(incomeCapRowsOf(AT, EVERY_ANCHOR_LIVE)),
     )
     expect(toCanonical(stacked)).toBe(canonical('200'))
+  })
+})
+
+/** The shifter with a sibling-link adding `perMinute` a minute at full stack. */
+function linkedShifterOf(perMinute: string): IncomeRate {
+  return { ...SHIFTER, linkValuePerMinuteAtFullStack: () => fromCanonical(perMinute) }
+}
+
+describe('income rates with Mark milestones (ticket 278)', () => {
+  it("adds an item's sibling-link to its own trip in the milestone rows", () => {
+    // Two minutes a trip: the shifter's 300 and its link's 50 a minute are 700 a trip.
+    const rows = rowsAsText(
+      [sliceOf('fake', [DRAIN, linkedShifterOf('50')])],
+      EVERY_ANCHOR_LIVE,
+      milestoneIncomeCapRowsOf,
+    )
+    expect(rows.map((row) => [row.rateId, row.unclampedValuePerTrip])).toEqual([
+      ['fake.drain', canonical('80')],
+      ['fake.shifter', canonical('700')],
+    ])
+  })
+
+  it('leaves the plain rows without the sibling-link, as the #385 check reads them', () => {
+    const rows = rowsAsText([sliceOf('fake', [linkedShifterOf('50')])])
+    expect(rows.map((row) => row.unclampedValuePerTrip)).toEqual([canonical('600')])
+  })
+
+  it('clamps the item and its link together to one trip cap', () => {
+    const rows = rowsAsText(
+      [sliceOf('fake', [linkedShifterOf('50')], tripCapOf('5'))],
+      EVERY_ANCHOR_LIVE,
+      milestoneIncomeCapRowsOf,
+    )
+    expect(rows.map((row) => [row.unclampedValuePerTrip, row.valuePerTrip])).toEqual([
+      [canonical('700'), canonical('120')],
+    ])
+  })
+
+  it('counts a linked rate only while its anchor is live, as the plain rows do', () => {
+    const rows = rowsAsText(
+      [sliceOf('fake', [DRAIN, linkedShifterOf('50')])],
+      rowsLive('side_drills'),
+      milestoneIncomeCapRowsOf,
+    )
+    expect(rows.map((row) => row.rateId)).toEqual(['fake.drain'])
   })
 })
 
