@@ -11,6 +11,10 @@
  *
  * Only blocks near a vehicle are ever looked at, so far tunnels stay frozen in the save. Blocks are
  * visited in `chunkKey`, then block-index order, so every machine logs the same sequence.
+ *
+ * A block whose open cells are all reinforced (ticket 365, `collapseReinforcement.ts`) is not weak:
+ * it never warns, forced or not, and a warning it is in no longer holds. Reinforcement is read
+ * before the braces (#331) ever are.
  */
 import { COLLAPSE_ACTIVE_RADIUS_MM } from '../../../constants/balance'
 import { requiredCasingGrade } from '../../economy/casingGrades'
@@ -28,6 +32,7 @@ import { weaknessOfBlock, type BlockWeakness } from '../../world/collapseWeaknes
 import type { BodyCentre } from '../../world/collapseRefill'
 import type { PlanetParams } from '../../world/planetParams'
 import { withCollapse, type AuthorityState } from '../authorityState'
+import { isBlockReinforced } from './collapseReinforcement'
 import { chainEffects, type RuleEffect } from '../commandRule'
 import {
   blockOfEntry,
@@ -49,15 +54,29 @@ export interface WeakBlock {
   weakness: BlockWeakness
 }
 
-/** A forced block always holds; any other only while weak with a vehicle within 16 m. */
+/**
+ * A reinforced block never holds; else a forced block always does, any other only while weak with
+ * a vehicle within 16 m.
+ */
 export function isCollapseHeld(
   state: AuthorityState,
   params: PlanetParams,
   entry: CollapsingBlock,
 ): boolean {
-  if (entry.isForced) return true
   const block = blockOfEntry(entry)
+  if (isBlockReinforced(state, params, block)) return false
+  if (entry.isForced) return true
   return isNearAnyVehicle(state, block) && weaknessOfBlock(state.world, params, block) !== null
+}
+
+/** The block's weakness as the collapse rules read it: none while it is reinforced. */
+export function weaknessOf(
+  state: AuthorityState,
+  params: PlanetParams,
+  block: CollapseBlock,
+): BlockWeakness | null {
+  const weakness = weaknessOfBlock(state.world, params, block)
+  return weakness === null || isBlockReinforced(state, params, block) ? null : weakness
 }
 
 export function cancelCollapse(state: AuthorityState, id: string): RuleEffect {
@@ -84,20 +103,21 @@ export function startWarning(
 /** Every weak block within 16 m of some vehicle, in processing order. */
 export function weakBlocksNearVehicles(state: AuthorityState, params: PlanetParams): WeakBlock[] {
   return blocksNearVehicles(state).flatMap((block) => {
-    const weakness = weaknessOfBlock(state.world, params, block)
+    const weakness = weaknessOf(state, params, block)
     return weakness === null ? [] : [{ block, weakness }]
   })
 }
 
 /**
  * What a forced block's warning reports: its real weakness, or, when its lining holds, the band at
- * its centre with grade 0.
+ * its centre with grade 0. Null while it is reinforced: a reinforced block is never forced to warn.
  */
 export function forcedWeaknessOf(
   state: AuthorityState,
   params: PlanetParams,
   block: CollapseBlock,
-): BlockWeakness {
+): BlockWeakness | null {
+  if (isBlockReinforced(state, params, block)) return null
   const weakness = weaknessOfBlock(state.world, params, block)
   if (weakness !== null) return weakness
   const centre = blockCentreMm(block)

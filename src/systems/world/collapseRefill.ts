@@ -12,6 +12,8 @@
  *   until it is re-dug (#43 build note 3).
  * - A vehicle is never embedded: samples within `COLLAPSE_VEHICLE_CLEARANCE_MM` of a body centre are
  *   skipped at every step and stay air, a pocket the vehicle can dig out of.
+ * - A reinforced cell never collapses (ticket 365, the TD lock on #157): its samples are never
+ *   filled and its lining is never destroyed, so it stays open and stays reinforced.
  */
 import { COLLAPSE_FILL_TICKS, COLLAPSE_VEHICLE_CLEARANCE_MM } from '../../constants/balance'
 import { samplesOfBlock, isSampleInBlock, type CollapseBlock } from './collapseBlock'
@@ -26,7 +28,7 @@ import {
   type GroundEdit,
 } from './groundEditSession'
 import type { PlanetParams } from './planetParams'
-import { MM_PER_SAMPLE, SOLID_DENSITY } from './sampleGrid'
+import { MM_PER_SAMPLE, SAMPLES_PER_TILE, SOLID_DENSITY } from './sampleGrid'
 import { isCarvedAirAt, isSolidAt, openSampleLayers, type SampleLayers } from './sampleLayers'
 import { FULL_WEIGHT, type WeightedSample } from './stampShape'
 import type { WorldState } from './worldState'
@@ -42,6 +44,11 @@ export interface RefillStep extends GroundEdit {
   filled: number
 }
 
+/** Whether the cell at (tx, ty) is reinforced (`authority/collapse/collapseReinforcement.ts`). */
+export type CellReinforced = (tx: number, ty: number) => boolean
+
+const NOTHING_REINFORCED: CellReinforced = () => false
+
 /** What a refill is about to do when it starts: what it will fill and whom it catches. */
 export interface RefillPlan {
   samples: number
@@ -54,8 +61,11 @@ export function planRefill(
   params: PlanetParams,
   block: CollapseBlock,
   bodies: readonly BodyCentre[],
+  isReinforced: CellReinforced = NOTHING_REINFORCED,
 ): RefillPlan {
-  const air = carvedAirOfBlock(openSampleLayers(world, params), block)
+  const air = carvedAirOfBlock(openSampleLayers(world, params), block).filter(
+    (sample) => !isInReinforcedCell(sample, isReinforced),
+  )
   return {
     samples: air.filter((sample) => !isNearAnyBody(sample, bodies)).length,
     caught: bodies.map((body) => air.some((sample) => isNearBody(sample, body))),
@@ -69,11 +79,14 @@ export function refillBlockStep(
   block: CollapseBlock,
   step: number,
   bodies: readonly BodyCentre[],
+  isReinforced: CellReinforced = NOTHING_REINFORCED,
 ): RefillStep {
   const layers = openSampleLayers(world, params)
-  const due = samplesDueAt(layers, block, step).filter((sample) => !isNearAnyBody(sample, bodies))
+  const due = samplesDueAt(layers, block, step).filter((sample) =>
+    isFillable(sample, bodies, isReinforced),
+  )
   const session = openSession(world, params)
-  if (step === 0) destroyLining(session, layers, block)
+  if (step === 0) destroyLining(session, layers, block, isReinforced)
   due.forEach((sample) => fillSample(session, sample))
   return { ...closeSession(session), filled: due.length }
 }
@@ -131,9 +144,15 @@ function carvedAirOfBlock(layers: SampleLayers, block: CollapseBlock): SamplePoi
   return samplesOfBlock(block).filter((sample) => isCarvedAirAt(layers, sample.sx, sample.sy))
 }
 
-/** Lining in the block and on the walls round its carved air goes with the collapse. */
-function destroyLining(session: EditSession, layers: SampleLayers, block: CollapseBlock): void {
+/** Lining in the block and on the walls round its carved air goes, but a reinforced cell's stays. */
+function destroyLining(
+  session: EditSession,
+  layers: SampleLayers,
+  block: CollapseBlock,
+  isReinforced: CellReinforced,
+): void {
   ;[...samplesOfBlock(block), ...linedWallsOfBlock(layers, block)]
+    .filter((sample) => !isInReinforcedCell(sample, isReinforced))
     .map(weightedOf)
     .filter((sample) => casingGradeOf(session, sample) > 0)
     .forEach((sample) => markSampleCasing(session, sample, 0))
@@ -143,6 +162,23 @@ function fillSample(session: EditSession, sample: SamplePoint): void {
   const weighted = weightedOf(sample)
   editSample(session, weighted, () => SOLID_DENSITY)
   if (casingGradeOf(session, weighted) > 0) markSampleCasing(session, weighted, 0)
+}
+
+/** Neither within a body's clearance nor in a reinforced cell. */
+function isFillable(
+  sample: SamplePoint,
+  bodies: readonly BodyCentre[],
+  isReinforced: CellReinforced,
+): boolean {
+  return !isNearAnyBody(sample, bodies) && !isInReinforcedCell(sample, isReinforced)
+}
+
+function isInReinforcedCell(sample: SamplePoint, isReinforced: CellReinforced): boolean {
+  return isReinforced(tileOf(sample.sx), tileOf(sample.sy))
+}
+
+function tileOf(sample: number): number {
+  return Math.floor(sample / SAMPLES_PER_TILE)
 }
 
 function isNearAnyBody(sample: SamplePoint, bodies: readonly BodyCentre[]): boolean {

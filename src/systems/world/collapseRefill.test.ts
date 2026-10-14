@@ -2,11 +2,17 @@ import { describe, expect, it } from 'vitest'
 import { COLLAPSE_FILL_TICKS } from '../../constants/balance'
 import { casingRingAround, lineRing } from './casingLining'
 import { blockContaining, samplesOfBlock, type CollapseBlock } from './collapseBlock'
-import { planRefill, refillBlockStep, type BodyCentre } from './collapseRefill'
+import { planRefill, refillBlockStep, type BodyCentre, type CellReinforced } from './collapseRefill'
 import { weaknessOfBlock } from './collapseWeakness'
 import { clearDisc } from './groundEdit'
 import { planetParamsFor } from './planetParams'
-import { chunkOfSample, localSampleOf, MM_PER_SAMPLE, sampleIndexOf } from './sampleGrid'
+import {
+  chunkOfSample,
+  localSampleOf,
+  MM_PER_SAMPLE,
+  SAMPLES_PER_TILE,
+  sampleIndexOf,
+} from './sampleGrid'
 import { isCarvedAirAt, openSampleLayers } from './sampleLayers'
 import { cellIndexOfTile, chunkOfTile } from './tileGrid'
 import { currentCasingOfChunk, deltaOfChunk, EMPTY_WORLD, type WorldState } from './worldState'
@@ -42,18 +48,26 @@ function carvedAirIn(world: WorldState, block: CollapseBlock) {
 }
 
 function liningIn(world: WorldState, block: CollapseBlock): number {
+  return linedSamplesIn(world, block).length
+}
+
+function linedSamplesIn(world: WorldState, block: CollapseBlock) {
   return samplesOfBlock(block).filter(({ sx, sy }) => {
     const casing = currentCasingOfChunk(world, chunkOfSample(sx), chunkOfSample(sy))
     return casing[sampleIndexOf(localSampleOf(sx), localSampleOf(sy))] > 0
-  }).length
+  })
 }
 
 /** Every refill step in turn; answers the world after each. */
-function refillAll(world: WorldState, bodies: readonly BodyCentre[] = []): WorldState[] {
+function refillAll(
+  world: WorldState,
+  bodies: readonly BodyCentre[] = [],
+  isReinforced?: CellReinforced,
+): WorldState[] {
   const after: WorldState[] = []
   let current = world
   for (let step = 0; step < COLLAPSE_FILL_TICKS; step++) {
-    current = refillBlockStep(current, params, BLOCK, step, bodies).world
+    current = refillBlockStep(current, params, BLOCK, step, bodies, isReinforced).world
     after.push(current)
   }
   return after
@@ -115,5 +129,53 @@ describe('collapse refill', () => {
         return dx * dx + dy * dy <= reach
       }),
     ).toBe(true)
+  })
+})
+
+const tileOfSample = (sample: number) => Math.floor(sample / SAMPLES_PER_TILE)
+
+/** A refill view reinforcing only the tile holding `sample`, by default the first carved air. */
+function oneReinforcedTile(world: WorldState, sample = carvedAirIn(world, BLOCK)[0]) {
+  const { sx, sy } = sample
+  const tile = { tx: tileOfSample(sx), ty: tileOfSample(sy) }
+  const isReinforced: CellReinforced = (tx, ty) => tx === tile.tx && ty === tile.ty
+  const isInTile = ({ sx: x, sy: y }: { sx: number; sy: number }) =>
+    tileOfSample(x) === tile.tx && tileOfSample(y) === tile.ty
+  return { isReinforced, isInTile }
+}
+
+describe('collapse refill: reinforced cells (ticket 365)', () => {
+  it('never fills a reinforced cell, and fills the rest of the block', () => {
+    const world = weakTunnel()
+    const { isReinforced, isInTile } = oneReinforcedTile(world)
+    const reinforcedAir = carvedAirIn(world, BLOCK).filter(isInTile)
+    expect(reinforcedAir.length).toBeGreaterThan(0)
+    const last = refillAll(world, [], isReinforced)[COLLAPSE_FILL_TICKS - 1]
+    expect(carvedAirIn(last, BLOCK)).toEqual(reinforcedAir)
+  })
+
+  it("keeps a reinforced cell's lining while the rest of the block's goes", () => {
+    const world = weakTunnel()
+    const { isReinforced, isInTile } = oneReinforcedTile(world, linedSamplesIn(world, BLOCK)[0])
+    const linedIn = (at: WorldState) => linedSamplesIn(at, BLOCK).filter(isInTile).length
+    expect(linedIn(world)).toBeGreaterThan(0)
+    const first = refillBlockStep(world, params, BLOCK, 0, [], isReinforced).world
+    expect(linedIn(first)).toBe(linedIn(world))
+    expect(liningIn(first, BLOCK)).toBe(linedIn(world))
+  })
+
+  it('plans only the samples it will fill, and catches no vehicle standing in reinforced air', () => {
+    const world = weakTunnel()
+    const everywhere: CellReinforced = () => true
+    const body = { xMm: -22000, yMm: Y }
+    expect(planRefill(world, params, BLOCK, [body], everywhere)).toEqual({
+      samples: 0,
+      caught: [false],
+    })
+    const { isReinforced, isInTile } = oneReinforcedTile(world)
+    const air = carvedAirIn(world, BLOCK)
+    expect(planRefill(world, params, BLOCK, [], isReinforced).samples).toBe(
+      air.length - air.filter(isInTile).length,
+    )
   })
 })

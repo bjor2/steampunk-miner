@@ -9,7 +9,8 @@
  * - on each of the next 29 ticks one more refill step, after the last of which the block leaves the
  *   list;
  * - first of all, the braces are brought in line (ticket 331): a braced block is skipped and never
- *   begins its refill, and one whose brace ended warns afresh from this tick.
+ *   begins its refill, and one whose brace ended warns afresh from this tick;
+ * - a reinforced cell (ticket 365) is never filled: its samples stay open and its lining stays.
  *
  * Collapse events concern no one player, so they carry only the tick; a crush carries the player
  * whose vehicle it hit. The ground changes as ordinary `GroundChanged`.
@@ -35,6 +36,7 @@ import {
   type CollapsingBlock,
 } from './collapseState'
 import { syncCollapseBracesAt } from './collapseBraceSync'
+import { reinforcedCellsOf } from './collapseReinforcement'
 import { cancelCollapse, isCollapseHeld, vehicleBodiesOf, type VehicleBody } from './collapseWatch'
 
 type TickStep = (state: AuthorityState) => TickOutcome
@@ -112,6 +114,7 @@ function crushAndAnnounce(
     params,
     block,
     bodies.map(({ centre }) => centre),
+    reinforcedCellsOf(state),
   )
   const caught = bodies.filter(
     ({ playerId }, at) => plan.caught[at] && isCrushable(state.players[playerId].vehicle),
@@ -154,7 +157,14 @@ function refillStep(
 ): TickOutcome {
   const step = tick - refillTickOf(entry)
   const bodies = vehicleBodiesOf(state).map(({ centre }) => centre)
-  const refilled = refillBlockStep(state.world, params, blockOfEntry(entry), step, bodies)
+  const refilled = refillBlockStep(
+    state.world,
+    params,
+    blockOfEntry(entry),
+    step,
+    bodies,
+    reinforcedCellsOf(state),
+  )
   const isLast = step >= COLLAPSE_FILL_TICKS - 1
   const collapse = isLast ? withoutCollapsingBlock(state.collapse, entry.block) : state.collapse
   return stamped(

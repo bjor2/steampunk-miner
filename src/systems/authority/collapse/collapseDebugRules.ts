@@ -2,7 +2,8 @@
  * Collapse's `debug.*` command (#43 Debug API): `forceCollapse(block)` starts the named block's
  * collapse now, as if its lining were weak, and holds it whatever the lining or the vehicles do,
  * so a scenario can show the full 60-tick telegraph and the refill. A block already collapsing is
- * held as it is, on its own clock. Like play it goes through `applyCommand`, replays from
+ * held as it is, on its own clock. A reinforced block (ticket 365) is never forced: the command
+ * applies and nothing warns. Like play it goes through `applyCommand`, replays from
  * `commands.ndjson` and logs `debug_command_applied`.
  */
 import { blockOfId, type CollapseBlock } from '../../world/collapseBlock'
@@ -48,5 +49,7 @@ function forceCollapse(state: AuthorityState, id: string): RuleEffect {
       withCollapse(state, withCollapsingBlock(state.collapse, { ...known, isForced: true })),
     )
   }
-  return startWarning(state, { block, weakness: forcedWeaknessOf(state, params, block) }, true)
+  const weakness = forcedWeaknessOf(state, params, block)
+  if (weakness === null) return unchanged(state)
+  return startWarning(state, { block, weakness }, true)
 }

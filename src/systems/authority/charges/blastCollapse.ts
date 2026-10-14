@@ -3,7 +3,7 @@
  * disturbance check runs on the crater rim): every collapse block whose centre lies within one
  * block of the blast's radius is checked once, and each weak one not already collapsing starts its
  * telegraph, as the watch starts any other. Lining is never blasted away, so blocks whose lining
- * holds stay quiet as usual.
+ * holds stay quiet as usual, and so do reinforced ones (ticket 365).
  *
  * A live blast checks a block once its front is a block past the block's centre, so the block's
  * ground and its border are broken as they will stay, nearest blocks first, at most
@@ -14,12 +14,11 @@ import { COLLAPSE_BLOCK_SAMPLES } from '../../../constants/balance'
 import { BLAST_COLLAPSE_CHECKS_PER_TICK } from '../../../constants/terrainBudget'
 import { chargeCentreMm } from '../../vehicle/vehicleCharges'
 import { blockCentreMm, blockIdOf, blocksNear, type CollapseBlock } from '../../world/collapseBlock'
-import { weaknessOfBlock } from '../../world/collapseWeakness'
 import type { PlanetParams } from '../../world/planetParams'
 import { MM_PER_SAMPLE } from '../../world/sampleGrid'
 import type { AuthorityState } from '../authorityState'
 import { entryOfBlock } from '../collapse/collapseState'
-import { startWarning, type WeakBlock } from '../collapse/collapseWatch'
+import { startWarning, weaknessOf, type WeakBlock } from '../collapse/collapseWatch'
 import { chainEffects, type RuleEffect } from '../commandRule'
 import type { BlastEvent } from '../../registries/blastEffects'
 import type { LiveBlast } from './liveBlast'
@@ -116,7 +115,7 @@ function freshWeakBlocksAmong(
   blocks: readonly CollapseBlock[],
 ): WeakBlock[] {
   return blocks.flatMap((block) => {
-    const weakness = weaknessOfBlock(state.world, params, block)
+    const weakness = weaknessOf(state, params, block)
     const isCollapsing = entryOfBlock(state.collapse, blockIdOf(block)) !== null
     return weakness === null || isCollapsing ? [] : [{ block, weakness }]
   })

@@ -85,7 +85,17 @@ function freshWeakBlocksAmong(
 ): WeakBlock[] {
   return due
     .filter(({ block, tiles }) => isFreshWeakBlock(state, params, block, tiles))
-    .map(({ block }) => ({ block, weakness: forcedWeaknessOf(state, params, block) }))
+    .flatMap(({ block }) => forcedWeakBlockOf(state, params, block))
+}
+
+/** The block and what its forced warning reports; none while it is reinforced (ticket 365). */
+function forcedWeakBlockOf(
+  state: AuthorityState,
+  params: PlanetParams,
+  block: CollapseBlock,
+): WeakBlock[] {
+  const weakness = forcedWeaknessOf(state, params, block)
+  return weakness === null ? [] : [{ block, weakness }]
 }
 
 /** The bore's own rule finds the block weak, and it is not collapsing already. */

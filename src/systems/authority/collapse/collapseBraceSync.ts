@@ -21,7 +21,7 @@
 import type { CollapseBrace } from '../../registries/collapseBraces'
 import { bracesAt } from '../../registries/collapseBraces'
 import type { PlanetParams } from '../../world/planetParams'
-import { weaknessOfBlock, type BlockWeakness } from '../../world/collapseWeakness'
+import type { BlockWeakness } from '../../world/collapseWeakness'
 import { withCollapse, type AuthorityState } from '../authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../commandRule'
 import type { TickOutcome } from '../combat/combatTick'
@@ -33,7 +33,7 @@ import {
   withCollapsingBlock,
   type CollapsingBlock,
 } from './collapseState'
-import { cancelCollapse, forcedWeaknessOf, isCollapseHeld } from './collapseWatch'
+import { cancelCollapse, forcedWeaknessOf, isCollapseHeld, weaknessOf } from './collapseWatch'
 
 /** Where the sync runs in a tick: before the collapse step moves blocks, or after it. */
 export type BraceSyncPoint = 'beforeCollapseStep' | 'afterCollapseStep'
@@ -112,31 +112,34 @@ function endBrace(
   tick: number,
 ): RuleEffect {
   const { isBraced: _ended, ...unbraced } = entry
-  if (!isCollapseHeld(state, params, unbraced)) return cancelCollapse(state, entry.block)
-  return warnAfresh(state, params, { ...unbraced, startTick: tick })
+  const weakness = heldWeaknessOf(state, params, unbraced)
+  if (weakness === null) return cancelCollapse(state, entry.block)
+  return warnAfresh(state, { ...unbraced, startTick: tick }, weakness)
 }
 
 /** The block's warning restarted from its new `startTick`, said as a new warning says it. */
 function warnAfresh(
   state: AuthorityState,
-  params: PlanetParams,
   entry: CollapsingBlock,
+  weakness: BlockWeakness,
 ): RuleEffect {
   return {
     state: withCollapse(state, withCollapsingBlock(state.collapse, entry)),
-    events: [
-      { type: 'CollapseWarned', block: entry.block, ...weaknessOfEntry(state, params, entry) },
-    ],
+    events: [{ type: 'CollapseWarned', block: entry.block, ...weakness }],
   }
 }
 
-/** A held unforced block is weak; a forced one reports as the bore's warning did. */
-function weaknessOfEntry(
+/**
+ * What a held block's fresh warning reports, null when it no longer holds: a held unforced block
+ * is weak; a forced one reports as the bore's warning did.
+ */
+function heldWeaknessOf(
   state: AuthorityState,
   params: PlanetParams,
   entry: CollapsingBlock,
-): BlockWeakness {
+): BlockWeakness | null {
+  if (!isCollapseHeld(state, params, entry)) return null
   const block = blockOfEntry(entry)
-  const weakness = entry.isForced ? null : weaknessOfBlock(state.world, params, block)
+  const weakness = entry.isForced ? null : weaknessOf(state, params, block)
   return weakness ?? forcedWeaknessOf(state, params, block)
 }
