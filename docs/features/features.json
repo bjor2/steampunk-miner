@@ -1314,8 +1314,8 @@
             },
             {
               "title": "Signature bore modules",
-              "description": "The splay choke, cementing round, earthing spike, rifled bore and strut bore, from planet 18 on; they wait on the gun's bore walk learning to split, turn, line, ground and stop.",
-              "status": "planned",
+              "description": "From planet 18 on: the splay choke splits a shot into lines, the cementing round lines the walls it opens, the earthing spike quiets live rock along its line, the rifled bore follows a seam, and the strut bore wedges a ledge across a hollow's mouth. One shot's dig still shared by every line.",
+              "status": "built",
               "issues": [310, 377, 378, 379, 380]
             }
           ]
