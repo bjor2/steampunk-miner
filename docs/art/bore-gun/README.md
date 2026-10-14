@@ -9,10 +9,11 @@ the art half of [#315](https://github.com/bjor2/steampunk-miner/issues/315), for
 (`scripts/art/author_bore_gun.py` wrote the first version; the `.blend` under
 `art/blender/vehicle-bore-gun/` is the source from now on, Git LFS).
 
-Nothing is exported, listed in `art/assets/`, registered or drawn: the attach id, the export and
-the registration through `r.artAssets` are the wiring's (#315, with the TD's attach ids from #314,
-#250 and #235), so the asset lint and the game are unchanged. The casing lining, the other half
-of #315, is not here: it goes through the #298 terrain channel.
+#362 exported, listed and registered nothing. The wiring (#315) did: the `ground-gun` slice
+registers the asset through `r.artAssets`, hangs it at `hull.front` and turns the barrel to the
+aim (`src/features/ground-gun/systems/render/boreGunLook.ts`), and the export ships in
+`public/assets/vehicle/vehicle-bore-gun/`. The casing lining, the other half of #315, is in
+[../casing-lining/](../casing-lining/README.md): it goes through the #298 terrain channel.
 
 ## What is here
 

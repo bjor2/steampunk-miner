@@ -483,9 +483,10 @@ The `planet-mix` slice registers the one asset through `r.artAssets` (#214).
 
 The art of the bore gun on the rig ([#362](https://github.com/bjor2/steampunk-miner/issues/362),
 the art half of [#315](https://github.com/bjor2/steampunk-miner/issues/315), for the GD decision
-on [#309](https://github.com/bjor2/steampunk-miner/issues/309)). Sources and review renders only:
-nothing exports, lists or registers it yet. The wiring (#315) gives it the TD's attach id (#314,
-#250, #235), exports it and registers it through `r.artAssets` (#214) for the `ground-gun` slice.
+on [#309](https://github.com/bjor2/steampunk-miner/issues/309)). The wiring (#315) exports it and
+registers it through `r.artAssets` (#214) for the `ground-gun` slice, which hangs it at `hull.front`
+once the gun is mounted (`BoreGunPiece`) and turns the barrel each frame to the bearing the gun
+would fire along: the finger's aim, else the cursor's, else the facing.
 
 | Id                 | Source         | What the build will draw                                                                 |
 | ------------------ | -------------- | ---------------------------------------------------------------------------------------- |
@@ -497,6 +498,27 @@ nothing exports, lists or registers it yet. The wiring (#315) gives it the TD's 
   modules' `bore.*` mounts go.
 - `scripts/art/author_bore_gun.py` wrote the first version of the `.blend`. From then on it is
   the source. The review renders are in [docs/art/bore-gun/](art/bore-gun/README.md).
+
+## The casing lining
+
+A cased cell shows a brass plate on its open face, ribbed across by dark grooves every 0.25 m, with
+a rivet in the middle of each rib 0.2 m in and a dark seam where the plate meets the rock, 0.42 m
+deep ([#315](https://github.com/bjor2/steampunk-miner/issues/315), #309 GD decision 3). It is
+drawn by the terrain shader, not baked: the mesher sets bit 22 of the gate channel (`LINED_BIT`,
+`src/systems/render/cellGateBits.ts`) on a cell holding intact standard lining, and the shader
+finds the open face from the density's slope, so the plate follows the bore's curve with zero added
+draws. The numbers are `CASING_LINING_LOOK` in `src/constants/scene.ts`;
+`src/systems/render/casingLiningLook.ts` is the same rule in TS, which the phone-size check reads.
+
+| Id                    | Source         | What the build draws                                              |
+| --------------------- | -------------- | ----------------------------------------------------------------- |
+| `casing-lining` (ref) | Blender, shots | nothing: the reference the shader matches, and its review renders |
+
+- `art/blender/casing-lining/casing-lining.blend` is a reference scene built from the same numbers,
+  not an asset: it has no manifest entry and is never exported. The review renders and the script
+  that wrote it are in [docs/art/casing-lining/](art/casing-lining/README.md).
+- The `casing-grade-1` to `-5` tiles (above) are still not drawn: the grade does not show in the
+  ground yet. A refractory ring keeps its firebrick (#113) and takes no brass plate.
 
 ## Armoury module mounts
 
