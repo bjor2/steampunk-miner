@@ -79,7 +79,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
 
-### `combos`: 16 files, 92 tests
+### `combos`: 16 files, 95 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -93,10 +93,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/combos/gatesFixture.test.ts` | 3 | 3 |
 | `src/features/combos/scene/ceilingAnchorParts.test.ts` | 3 | 3 |
 | `src/features/combos/shippedRows.test.ts` | 6 | 6 |
-| `src/features/combos/systems/comboCatalogue.test.ts` | 10 | 10 |
+| `src/features/combos/systems/comboCatalogue.test.ts` | 11 | 11 |
 | `src/features/combos/systems/comboGrades.test.ts` | 4 | 4 |
 | `src/features/combos/systems/comboHooks.test.ts` | 14 | 14 |
-| `src/features/combos/systems/comboRows.test.ts` | 8 | 8 |
+| `src/features/combos/systems/comboRows.test.ts` | 10 | 10 |
 | `src/features/combos/systems/combosEconomy.test.ts` | 4 | 4 |
 | `src/features/combos/systems/render/anchorTilt.test.ts` | 7 | 7 |
 
@@ -445,7 +445,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 60 files, 415 tests
+### `tech-tree`: 60 files, 419 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -476,7 +476,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/forkNode.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/forkPace.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/forkRechoice.spend.test.ts` | 3 | 3 |
-| `src/features/tech-tree/systems/generatedCombos.test.ts` | 10 | 10 |
+| `src/features/tech-tree/systems/generatedCombos.test.ts` | 14 | 14 |
 | `src/features/tech-tree/systems/incomeCapCheck.test.ts` | 18 | 18 |
 | `src/features/tech-tree/systems/itemDescriber.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 4 | 4 |

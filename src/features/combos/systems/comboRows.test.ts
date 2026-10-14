@@ -3,7 +3,7 @@ import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import { fromCanonical, toCanonical } from '../../../systems/money'
 import { iconUrlOf } from '../../../ui/vectorIcons'
 import { flavourProblemsOf } from '../../descriptions'
-import { TECH_LANES } from '../../tech-tree'
+import { isArmouryLane, RESEARCH_LAB_ROW_ID, TECH_LANES } from '../../tech-tree'
 import { COMBO_ITEMS, comboItemOf } from './comboCatalogue'
 import {
   authoredComboNodesOf,
@@ -14,8 +14,9 @@ import {
 } from './comboRows'
 
 /**
- * The ids `COMBO_TEMPLATES_FIXTURE` in tech-tree's spec fixtures has (ticket 206), and the five
- * aetheric pairs Content wrote on ticket 373, which stand in the fixture as `aetheric_pair_1..5`.
+ * The ids `COMBO_TEMPLATES_FIXTURE` in tech-tree's spec fixtures has (ticket 206), the five
+ * aetheric pairs Content wrote on ticket 373, which stand in the fixture as `aetheric_pair_1..5`,
+ * and the three weapon x lane templates of ticket 320.
  */
 const TEMPLATE_IDS = [
   'tech.template.aether_reel',
@@ -31,8 +32,11 @@ const TEMPLATE_IDS = [
   'tech.template.magnetic_survey',
   'tech.template.pendulum_anchor',
   'tech.template.quench_cutters',
+  'tech.template.sounding_bore',
+  'tech.template.spotter_guns',
   'tech.template.still_foam',
   'tech.template.warning_chime',
+  'tech.template.winch_bore',
 ]
 
 const pairKeyOf = (lanes: readonly string[]) => [...lanes].sort().join('×')
@@ -74,8 +78,24 @@ describe('combo rows', () => {
 
   it('makes nodes only for the authored combos', () => {
     expect(authoredComboNodesOf(COMBO_ITEMS).map((node) => node.unlockTier)).toEqual([
-      15, 18, 21, 24, 28, 36,
+      15, 18, 21, 24, 28, 36, 20, 25, 27,
     ])
+  })
+
+  it('hides a weapon combo behind the research lab and its anchor row, no other combo', () => {
+    const nodeOfItem = (itemId: string) => {
+      const item = comboItemOf(itemId)!
+      return techNodeOf(item, item.node!)
+    }
+    expect(nodeOfItem('combo.sounding_bore').requiresFeature).toEqual([
+      RESEARCH_LAB_ROW_ID,
+      'bore_gun',
+    ])
+    expect(nodeOfItem('combo.spotter_guns').requiresFeature).toEqual([
+      RESEARCH_LAB_ROW_ID,
+      'auto_guns',
+    ])
+    expect(nodeOfItem('combo.assay_drain').requiresFeature).toBeUndefined()
   })
 
   it('prices a combo at 15 band-5 ore on the planet it unlocks on (#162 4.1)', () => {
@@ -89,13 +109,23 @@ describe('combo rows', () => {
 })
 
 describe('combo templates', () => {
-  it('lists the fifteen templates with the ids of the tree fixture and the aetheric pairs', () => {
+  it('lists the fifteen pair templates and the three weapon templates by their ids', () => {
     expect(COMBO_TEMPLATES.map((template) => template.id).sort()).toEqual(TEMPLATE_IDS)
   })
 
   it('gives every pair of the six lanes exactly one template', () => {
-    const pairs = COMBO_TEMPLATES.map((template) => pairKeyOf(template.lanes))
+    const pairTemplates = COMBO_TEMPLATES.filter((template) => !template.lanes.some(isArmouryLane))
+    const pairs = pairTemplates.map((template) => pairKeyOf(template.lanes))
     expect(pairs.sort()).toEqual(everyLanePair().sort())
+  })
+
+  it('pairs each weapon template with one of the six lanes, behind the lab and its anchor', () => {
+    const weapon = COMBO_TEMPLATES.filter((template) => template.lanes.some(isArmouryLane))
+    expect(weapon.map((template) => template.lanes.filter(isArmouryLane).length)).toEqual([1, 1, 1])
+    weapon.forEach((template) => {
+      const item = comboItemOf(template.unlocks)!
+      expect(template.requiresFeature).toEqual([RESEARCH_LAB_ROW_ID, ...item.anchorRowIds!])
+    })
   })
 
   it('grades the combo item of its row, from the same two parents, both owned', () => {

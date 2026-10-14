@@ -10,7 +10,9 @@ import { COMBO_HOLDS, COMBO_ITEMS, COMBO_TEMPLATES, authoredComboNodesOf } from 
 // item hooks ship, with their store item, authored node, template, card and hooks, and the ceiling
 // anchor (ticket 288) on the kernel's drill gear read, and four of the aetheric pairs on their
 // aetheric parent's own rules (ticket 373); the foam combos (#202), the aether reel (tow, decision
-// 10) and the lull line (the tow's lump has no cell) stay vision rows. The folder imports no lane
+// 10), the lull line (the tow's lump has no cell) and the three weapon x lane combos (ticket 320:
+// no bore line reaches the reveal board or the grapple, no pre-train reaches the turret) stay
+// vision rows. The folder imports no lane
 // slice (the combos acceptance).
 
 const SLICE_DIR = new URL('./', import.meta.url)
@@ -82,12 +84,15 @@ describe('combos shipped and held', () => {
     )
   })
 
-  it('holds exactly the foam combos, the aether reel and the lull line, each with a reason', () => {
+  it('holds exactly the foam combos, the aether reel, the lull line and the weapon combos', () => {
     expect(Object.keys(COMBO_HOLDS).sort()).toEqual([
       'combo.aether_reel',
       'combo.foam_cutters',
       'combo.foam_grapple',
       'combo.lull_line',
+      'combo.sounding_bore',
+      'combo.spotter_guns',
+      'combo.winch_bore',
     ])
     Object.values(COMBO_HOLDS).forEach((reason) => expect(reason).not.toBe(''))
   })

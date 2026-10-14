@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { contentOf } from '../../../systems/registries/content'
 import { iconUrlOf } from '../../../ui/vectorIcons'
 import { flavourProblemsOf } from '../../descriptions'
-import { TECH_LANES, type TechNode } from '../../tech-tree'
+import {
+  ARMOURY_LANES,
+  isArmouryLane,
+  TECH_LANES,
+  type ComboLane,
+  type TechNode,
+} from '../../tech-tree'
 import { COMBO_ITEMS, comboItemOf } from './comboCatalogue'
 
 /** #162 milestone combos table; the ceiling anchor at P36 or later (#288, after #279). */
@@ -13,6 +19,16 @@ const AUTHORED = [
   ['combo.alarm_shield', 24],
   ['combo.cored_drain', 28],
   ['combo.ceiling_anchor', 36],
+  ['combo.sounding_bore', 20],
+  ['combo.winch_bore', 25],
+  ['combo.spotter_guns', 27],
+] as const
+
+/** Content's weapon x lane combos on #310 as the GD locked them (ticket 320), by anchor row. */
+const WEAPON_COMBOS = [
+  ['combo.sounding_bore', 'bore_gun'],
+  ['combo.winch_bore', 'bore_gun'],
+  ['combo.spotter_guns', 'auto_guns'],
 ] as const
 
 /** The four templates Content wrote on 7 Oct: endless only, no authored node (ticket 206). */
@@ -40,7 +56,14 @@ const INCOME_COMBOS = [
   'combo.lens_corer',
 ]
 
-const laneOfNode = (nodeId: string) => nodeId.split('.')[1].replace('_', '-')
+/** `tech.<lane>.<name>`: the lane with dashes, or the weapon's armoury lane. */
+function laneOfNode(nodeId: string): string {
+  const name = nodeId.split('.')[1]
+  const armoury = `armoury.${name}`
+  return ARMOURY_LANES.some((lane) => lane === armoury) ? armoury : name.replace('_', '-')
+}
+
+const COMBO_LANES: readonly ComboLane[] = [...TECH_LANES, ...ARMOURY_LANES]
 
 describe('combo catalogue', () => {
   it('gives every combo an icon that resolves and a flavour line within the copy rules', () => {
@@ -59,7 +82,7 @@ describe('combo catalogue', () => {
     })
   })
 
-  it('researches the six authored combos at the research lab from P15', () => {
+  it('researches the nine authored combos at the research lab from P15', () => {
     const authored = COMBO_ITEMS.filter((item) => item.node !== null)
     expect(authored.map((item) => [item.itemId, item.node?.unlockTier])).toEqual(AUTHORED)
     authored.forEach((item) => expect(item.node?.id).toBe(`tech.${item.itemId}`))
@@ -82,6 +105,14 @@ describe('combo catalogue', () => {
     ])
   })
 
+  it('anchors each weapon combo on its weapon row, one armoury lane beside one of the six', () => {
+    const weapon = COMBO_ITEMS.filter((item) => item.lanes.some(isArmouryLane))
+    expect(weapon.map((item) => [item.itemId, ...(item.anchorRowIds ?? [])])).toEqual(WEAPON_COMBOS)
+    weapon.forEach((item) => expect(isArmouryLane(item.lanes[1])).toBe(false))
+    const others = COMBO_ITEMS.filter((item) => !weapon.includes(item))
+    expect(others.every((item) => item.anchorRowIds === undefined)).toBe(true)
+  })
+
   it('counts the drain combos, the lodestone drain and the lens corer under the 15% cap', () => {
     const income = COMBO_ITEMS.filter((item) => item.isIncomeCombo).map((item) => item.itemId)
     expect(income).toEqual(INCOME_COMBOS)
@@ -90,7 +121,7 @@ describe('combo catalogue', () => {
   it('takes one parent from each of its two different lanes', () => {
     COMBO_ITEMS.forEach((item) => {
       expect(item.lanes[0]).not.toBe(item.lanes[1])
-      expect(item.lanes.every((lane) => TECH_LANES.includes(lane))).toBe(true)
+      expect(item.lanes.every((lane) => COMBO_LANES.includes(lane))).toBe(true)
       expect(item.parents.map(laneOfNode), item.itemId).toEqual(item.lanes)
     })
   })

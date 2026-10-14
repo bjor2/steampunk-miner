@@ -3,14 +3,25 @@
  * `p = 41 + K j`. Its lane pair is `PAIRS[perm(j mod 15)]`, where `perm` is a fixed permutation
  * seeded by a constant, never the world seed, so every player in a world sees the same offers.
  * Six lanes make fifteen pairs (GD lock on #245), so every pair has had its first turn by P86.
+ * The armoury lanes join no pair: each registered weapon x lane template takes one turn of its
+ * own after the fifteen, in id order (GD decision on #310, ticket 320), so a lap is fifteen turns
+ * plus one per weapon template and the pairs' first lap stays where it was.
  * Each is the next grade of its pair's template: the template's first appearance is labelled
  * horizontal, each re-grade both. It needs its template's two parents and the grade before it,
- * and the items the template requires owned (a combo's two parent items, GD lock on #206).
+ * and the items the template requires owned (a combo's two parent items, GD lock on #206), and
+ * stays behind the rows the template requires unlocked (a weapon template's lab and anchor).
  * Generated, never registered; `tech.combo.gen.<p>` is stable because it is a formula of `p`.
  */
 import { hashCell } from '../../../systems/cellRandom'
 import { comboDepthOf } from './authoredNodes'
-import { TECH_LANES, type TechComboTemplate, type TechLane, type TreeNode } from './techNode'
+import {
+  isArmouryLane,
+  TECH_LANES,
+  type ComboLane,
+  type TechComboTemplate,
+  type TechLane,
+  type TreeNode,
+} from './techNode'
 import { TREE_ECONOMY } from './treeEconomy'
 
 const GENERATED_COMBO_PREFIX = 'tech.combo.gen.'
@@ -29,6 +40,8 @@ export const PAIR_ORDER: readonly number[] = permutationOf(LANE_PAIRS.length)
 /** What grading a pair's combos needs to know about the authored tree. */
 export interface ComboGrading {
   templateOfPair(pairIndex: number): TechComboTemplate | null
+  /** The weapon x lane templates, in the order their turns come after the fifteen pairs'. */
+  weaponTemplates: readonly TechComboTemplate[]
   /** The authored combo node that is grade 1 of this combo item, if there is one. */
   authoredComboOf(itemId: string): TreeNode | null
   slots: ReadonlyMap<string, number>
@@ -45,14 +58,34 @@ export function planetOfGeneratedComboId(nodeId: string): number | null {
   return /^[1-9]\d*$/.test(planetText) ? Number.parseInt(planetText, 10) : null
 }
 
-/** Which pair's turn a generated combo planet is; null on a planet that has none. */
-export function pairIndexAt(planetIndex: number): number | null {
-  const step = comboStepOf(planetIndex)
-  return step === null ? null : PAIR_ORDER[step % LANE_PAIRS.length]
+/**
+ * Which pair's turn a generated combo planet is, in a lap with `weaponTurns` weapon templates;
+ * null on a planet that has none, or on a weapon template's turn.
+ */
+export function pairIndexAt(planetIndex: number, weaponTurns = 0): number | null {
+  const slot = rotationSlotAt(planetIndex, LANE_PAIRS.length + weaponTurns)
+  return slot === null || slot >= LANE_PAIRS.length ? null : PAIR_ORDER[slot]
+}
+
+/** Turns in one lap of the rotation: the fifteen pairs, then each weapon x lane template. */
+export function rotationLengthOf(grading: ComboGrading): number {
+  return LANE_PAIRS.length + grading.weaponTemplates.length
+}
+
+/** A template with a weapon's lane on one side (ticket 320): it never stands for a lane pair. */
+export function isWeaponTemplate(template: TechComboTemplate): boolean {
+  return template.lanes.some(isArmouryLane)
+}
+
+/** The weapon x lane templates among `templates`, in turn order: by id, never by registration. */
+export function weaponTemplatesOf(
+  templates: readonly TechComboTemplate[],
+): readonly TechComboTemplate[] {
+  return templates.filter(isWeaponTemplate).sort((a, b) => (a.id < b.id ? -1 : 1))
 }
 
 /** The index of the pair holding these two lanes, in either order; -1 for no such pair. */
-export function pairIndexOf(lanes: readonly [TechLane, TechLane]): number {
+export function pairIndexOf(lanes: readonly [ComboLane, ComboLane]): number {
   return LANE_PAIRS.findIndex(
     ([first, second]) =>
       (first === lanes[0] && second === lanes[1]) || (first === lanes[1] && second === lanes[0]),
@@ -61,10 +94,16 @@ export function pairIndexOf(lanes: readonly [TechLane, TechLane]): number {
 
 /** The combo generated on `planetIndex`, or null when none is (off-step, or no template yet). */
 export function generatedComboAt(planetIndex: number, grading: ComboGrading): TreeNode | null {
-  const pairIndex = pairIndexAt(planetIndex)
-  const template = pairIndex === null ? null : grading.templateOfPair(pairIndex)
-  if (template === null) return null
-  return comboNodeOf(planetIndex, template, grading)
+  const template = templateOfTurnAt(planetIndex, grading)
+  return template === null ? null : comboNodeOf(planetIndex, template, grading)
+}
+
+/** The template whose turn it is on `planetIndex`: a lane pair's, or a weapon template's. */
+function templateOfTurnAt(planetIndex: number, grading: ComboGrading): TechComboTemplate | null {
+  const slot = rotationSlotAt(planetIndex, rotationLengthOf(grading))
+  if (slot === null) return null
+  if (slot < LANE_PAIRS.length) return grading.templateOfPair(PAIR_ORDER[slot])
+  return grading.weaponTemplates[slot - LANE_PAIRS.length]
 }
 
 /** The planet of the `step`-th generated combo, `41 + K j` with `j = step`. */
@@ -127,6 +166,7 @@ function comboNodeOf(
     unlockTier: planetIndex,
     prereqs: previous === null ? template.parents : [...template.parents, previous],
     ...(template.requiresOwned !== undefined && { requiresOwned: template.requiresOwned }),
+    ...(template.requiresFeature !== undefined && { requiresFeature: template.requiresFeature }),
     unlocks: { itemId: template.unlocks, mark: grade },
     iconId: template.iconId,
     description: template.description,
@@ -139,7 +179,7 @@ function comboNodeOf(
 /** One past the authored grade, if any, and every earlier turn of the same pair. */
 function gradeAt(planetIndex: number, template: TechComboTemplate, grading: ComboGrading) {
   const authoredGrades = grading.authoredComboOf(template.unlocks) === null ? 0 : 1
-  return authoredGrades + earlierTurnsOf(planetIndex) + 1
+  return authoredGrades + earlierTurnsOf(planetIndex, rotationLengthOf(grading)) + 1
 }
 
 /** The node of the grade before: the pair's previous turn, else its authored combo. */
@@ -148,16 +188,25 @@ function previousGradeOf(
   template: TechComboTemplate,
   grading: ComboGrading,
 ): string | null {
-  if (earlierTurnsOf(planetIndex) > 0) return generatedComboIdOf(previousTurnPlanetOf(planetIndex))
+  const lap = rotationLengthOf(grading)
+  if (earlierTurnsOf(planetIndex, lap) > 0) {
+    return generatedComboIdOf(previousTurnPlanetOf(planetIndex, lap))
+  }
   return grading.authoredComboOf(template.unlocks)?.id ?? null
 }
 
-function earlierTurnsOf(planetIndex: number): number {
-  return Math.floor((comboStepOf(planetIndex) ?? 0) / LANE_PAIRS.length)
+function earlierTurnsOf(planetIndex: number, lap: number): number {
+  return Math.floor((comboStepOf(planetIndex) ?? 0) / lap)
 }
 
-function previousTurnPlanetOf(planetIndex: number): number {
-  return planetIndex - LANE_PAIRS.length * TREE_ECONOMY.cadence.comboEvery
+function previousTurnPlanetOf(planetIndex: number, lap: number): number {
+  return planetIndex - lap * TREE_ECONOMY.cadence.comboEvery
+}
+
+/** The turn's place in a lap of `lap` turns, or null when no combo is generated on the planet. */
+function rotationSlotAt(planetIndex: number, lap: number): number | null {
+  const step = comboStepOf(planetIndex)
+  return step === null ? null : step % lap
 }
 
 /** `j` of `p = 41 + K j`, or null when no combo is generated on `planetIndex`. */

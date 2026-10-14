@@ -41,6 +41,12 @@ export type ArmouryLane = (typeof ARMOURY_LANES)[number]
 /** A combo sits between two lanes, so it has a row of its own. */
 export type TechNodeLane = TechLane | ArmouryLane | 'combo'
 
+/**
+ * A lane a combo template takes a parent from: one of the six, or a weapon's own lane in a
+ * weapon x lane template (GD decision on #310, ticket 320).
+ */
+export type ComboLane = TechLane | ArmouryLane
+
 const ARMOURY_LANE_PREFIX = 'armoury.'
 
 export function isArmouryLane(lane: TechNodeLane): lane is ArmouryLane {
@@ -161,10 +167,11 @@ export interface TechNode extends ContentEntry {
 /**
  * One lane pair's combo (#161 section 2): from planet 41 each generated combo is the next grade of
  * its pair's template, researched at the `research_lab`. The six authored combos are grade 1 of
- * theirs; the other four templates first appear as generated combos.
+ * theirs; the other four templates first appear as generated combos. A weapon x lane template
+ * (one armoury lane, ticket 320) takes its own turn in the rotation, never a lane pair's.
  */
 export interface TechComboTemplate extends ContentEntry {
-  lanes: readonly [TechLane, TechLane]
+  lanes: readonly [ComboLane, ComboLane]
   name: string
   /** The combo store item every grade upgrades. */
   unlocks: string
@@ -176,6 +183,11 @@ export interface TechComboTemplate extends ContentEntry {
    * a combo's two parent items (GD lock on #206, decision 7).
    */
   requiresOwned?: readonly string[]
+  /**
+   * The schedule rows every grade stays hidden and refused behind, as `TechNode.requiresFeature`:
+   * a weapon x lane template's `research_lab` and its weapon's row (GD decision on #310).
+   */
+  requiresFeature?: readonly string[]
 }
 
 /** What researching a node gives: the store item, at this Mark or grade. */

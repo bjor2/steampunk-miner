@@ -1,18 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../../registries/registrar'
 import { contentOf } from '../../../systems/registries/content'
-import { COMBO_HOLDS, COMBO_TEMPLATES } from '../../combos'
+import type { SliceDefinition } from '../../../registries/sliceDefinition'
+import { authoredComboNodesOf, COMBO_HOLDS, COMBO_ITEMS, COMBO_TEMPLATES } from '../../combos'
 import { TREE_FIXTURE_SLICE } from '../treeFixtureSlice'
 import {
   generatedComboAt,
+  isWeaponTemplate,
   LANE_PAIRS,
   PAIR_ORDER,
   pairIndexAt,
   pairIndexOf,
+  rotationLengthOf,
 } from './generatedCombos'
 import { itemUnlockTierOf, registeredTechTree, treeNodeOf, treeNodesThrough } from './techTree'
 import type { TechTree } from './techTree'
-import type { TechComboTemplate, TreeNode } from './techNode'
+import { isArmouryLane, type TechComboTemplate, type TreeNode } from './techNode'
 
 /** One combo every 3 planets from P41: each of the fifteen pairs takes its first turn by P83. */
 const FIRST_TURNS = [41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83]
@@ -112,6 +115,7 @@ describe('tech tree: generated combos', () => {
     }
     const grading = {
       templateOfPair: (pairIndex: number) => (pairIndex === pairIndexAt(41) ? owning : null),
+      weaponTemplates: [],
       authoredComboOf: () => null,
       slots: new Map<string, number>(),
     }
@@ -119,11 +123,12 @@ describe('tech tree: generated combos', () => {
     graded.forEach((node) => expect(node?.requiresOwned).toEqual(owning.requiresOwned))
   })
 
-  it('has fifteen real templates, one a pair, and keeps the aetheric stand-ins fixture-only', () => {
+  it('has fifteen real pair templates, one a pair, and keeps the aetheric stand-ins fixture-only', () => {
+    const pairTemplates = COMBO_TEMPLATES.filter((template) => !isWeaponTemplate(template))
     const pairsOf = (templates: readonly TechComboTemplate[]) =>
       new Set(templates.map((template) => pairIndexOf(template.lanes)))
-    expect(COMBO_TEMPLATES).toHaveLength(15)
-    expect([...pairsOf(COMBO_TEMPLATES)].sort((a, b) => a - b)).toEqual([...LANE_PAIRS.keys()])
+    expect(pairTemplates).toHaveLength(15)
+    expect([...pairsOf(pairTemplates)].sort((a, b) => a - b)).toEqual([...LANE_PAIRS.keys()])
     const registered = contentOf('tech-combo-template')
     const shipped = COMBO_TEMPLATES.filter(
       (template) => !Object.hasOwn(COMBO_HOLDS, template.unlocks),
@@ -137,5 +142,71 @@ describe('tech tree: generated combos', () => {
   it('generates nothing for a pair with no template registered', () => {
     const empty = withRegistrations([], () => treeNodesThrough(registeredTechTree(), 100))
     expect(empty).toEqual([])
+  })
+})
+
+/** The weapon x lane combos' templates and authored nodes (ticket 320), as a slice would register them. */
+const WEAPON_COMBO_SLICE: SliceDefinition = {
+  id: 'combos',
+  register(r) {
+    r.content('tech-combo-template', COMBO_TEMPLATES.filter(isWeaponTemplate))
+    r.content(
+      'tech-node',
+      authoredComboNodesOf(COMBO_ITEMS.filter((item) => item.lanes.some(isArmouryLane))),
+    )
+  },
+}
+
+function withWeaponTemplates<T>(run: (tree: TechTree) => T): T {
+  return withRegistrations([TREE_FIXTURE_SLICE, WEAPON_COMBO_SLICE], () =>
+    run(registeredTechTree()),
+  )
+}
+
+describe('tech tree: weapon x lane templates in the endless rotation', () => {
+  it('never makes a lane pair of an armoury lane, so a weapon template stands for no pair', () => {
+    expect(LANE_PAIRS.some((pair) => pair.some(isArmouryLane))).toBe(false)
+    COMBO_TEMPLATES.filter(isWeaponTemplate).forEach((template) =>
+      expect(pairIndexOf(template.lanes), template.id).toBe(-1),
+    )
+  })
+
+  it("keeps the pairs' first lap, then gives each weapon template one turn in id order", () => {
+    const pairsOnly = withFixtureTree((tree) => generatedThrough(tree, 83))
+    withWeaponTemplates((tree) => {
+      expect(rotationLengthOf(tree.grading)).toBe(18)
+      expect(generatedThrough(tree, 83)).toEqual(pairsOnly)
+      expect([86, 89, 92].map((p) => nodeOf(tree, `tech.combo.gen.${p}`).unlocks.itemId)).toEqual([
+        'combo.sounding_bore',
+        'combo.spotter_guns',
+        'combo.winch_bore',
+      ])
+      expect([86, 89, 92].map((p) => pairIndexAt(p, 3))).toEqual([null, null, null])
+    })
+  })
+
+  it('starts the next lap after the weapon turns, each pair one grade on', () => {
+    withWeaponTemplates((tree) => {
+      const first = nodeOf(tree, 'tech.combo.gen.41')
+      const again = nodeOf(tree, 'tech.combo.gen.95')
+      expect(again.unlocks).toEqual({ itemId: first.unlocks.itemId, mark: first.unlocks.mark + 1 })
+      expect(again.prereqs).toContain('tech.combo.gen.41')
+      expect(pairIndexAt(95, 3)).toBe(pairIndexAt(41))
+    })
+  })
+
+  it('grades a weapon combo on from its authored node, behind the lab and its anchor', () => {
+    withWeaponTemplates((tree) => {
+      const sounding = nodeOf(tree, 'tech.combo.gen.86')
+      expect(sounding.unlocks.mark).toBe(2)
+      expect(sounding.label).toBe('both')
+      expect(sounding.prereqs).toContain('tech.combo.sounding_bore')
+      expect(sounding.requiresFeature).toEqual(['research_lab', 'bore_gun'])
+      expect(nodeOf(tree, 'tech.combo.gen.89').requiresFeature).toEqual([
+        'research_lab',
+        'auto_guns',
+      ])
+      expect(nodeOf(tree, 'tech.combo.gen.41').requiresFeature).toBeUndefined()
+    })
   })
 })

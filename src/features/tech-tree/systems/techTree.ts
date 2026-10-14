@@ -11,10 +11,11 @@ import {
   generatedComboAt,
   generatedComboPlanetOfStep,
   generatedComboPlanetsThrough,
-  LANE_PAIRS,
   nextGeneratedCombosOf,
   pairIndexOf,
   planetOfGeneratedComboId,
+  rotationLengthOf,
+  weaponTemplatesOf,
   type ComboGrading,
 } from './generatedCombos'
 import {
@@ -161,6 +162,7 @@ function comboGradingOf(
   return {
     templateOfPair: (pairIndex) =>
       templates.find((template) => pairIndexOf(template.lanes) === pairIndex) ?? null,
+    weaponTemplates: weaponTemplatesOf(templates),
     authoredComboOf: (itemId) =>
       authored.find((node) => node.kind === 'combo' && node.unlocks.itemId === itemId) ?? null,
     slots,
@@ -179,10 +181,10 @@ function generatedComboOfId(tree: TechTree, nodeId: string): TreeNode | null {
   return planetIndex === null ? null : generatedComboAt(planetIndex, tree.grading)
 }
 
-/** The planet of the item's first generated combo: every pair takes its first turn by then. */
+/** The planet of the item's first generated combo: every template takes its first turn by then. */
 function firstGeneratedGradePlanetOf(tree: TechTree, itemId: string): number | null {
-  const firstTurnOfLastPair = generatedComboPlanetOfStep(LANE_PAIRS.length - 1)
-  const first = generatedCombosThrough(tree, firstTurnOfLastPair).find(
+  const lastFirstTurn = generatedComboPlanetOfStep(rotationLengthOf(tree.grading) - 1)
+  const first = generatedCombosThrough(tree, lastFirstTurn).find(
     (node) => node.unlocks.itemId === itemId,
   )
   return first?.unlockTier ?? null

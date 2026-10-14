@@ -5,12 +5,15 @@
  * the four templates Content added on 7 Oct are endless only, first seen as a generated combo
  * from P41, and so are the five aetheric pairs Content wrote on ticket 373 (the GD ruling of 14
  * Oct: one per other lane, the aetheric parent first). The ceiling anchor (#288) is the last
- * authored one, at P36, once the twin bit's diagonal (#279) is in the game.
+ * authored one, at P36, once the twin bit's diagonal (#279) is in the game. The three weapon x
+ * lane combos (Content's table on #310 as the GD locked it, ticket 320) are authored at P20, P25
+ * and P27, each between one armoury lane and one of the six, and their templates are the only
+ * way the armoury joins the endless rotation.
  *
  * Combos have no Marks and mount nothing new: they read their parents' current values (#162 4.6).
  * Parents are named by node id only, so this slice imports no lane slice.
  */
-import type { TechLane } from '../../tech-tree'
+import type { ComboLane } from '../../tech-tree'
 
 /** One combo store item, as #162 and the ticket 206 table write it. */
 export interface ComboItem {
@@ -21,7 +24,7 @@ export interface ComboItem {
   iconId: string
   /** The flavour line: no digits, at most 80 characters, never "rig" (#162 acceptance 1, 2). */
   description: string
-  lanes: readonly [TechLane, TechLane]
+  lanes: readonly [ComboLane, ComboLane]
   /** The two capability nodes it combines, one in each lane. */
   parents: readonly [string, string]
   /**
@@ -36,6 +39,12 @@ export interface ComboItem {
   isIncomeCombo: boolean
   /** The authored grade-1 node; null for an endless-only template's combo (from P41). */
   node: ComboNode | null
+  /**
+   * The schedule rows its lanes anchor on: a weapon x lane combo's weapon row (GD decision on
+   * #310). With them, every grade also waits on the `research_lab` row and stays off the screen
+   * until all are unlocked, so it never previews a locked anchor. Absent for the six lanes'.
+   */
+  anchorRowIds?: readonly string[]
 }
 
 /** An authored combo's node (#161 section 1, the combo rows). */
@@ -215,6 +224,42 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     parentItemIds: ['power.aether_condenser', 'gear.side_cutters'],
     isIncomeCombo: false,
     node: null,
+  },
+  {
+    itemId: 'combo.sounding_bore',
+    name: 'Sounding bore',
+    iconId: 'item-combo-sounding-bore',
+    description: 'Each bore rings the stone like a sounder and the ore beside it answers back.',
+    lanes: ['armoury.bore_gun', 'sensing'],
+    parents: ['tech.bore_gun.long_barrel', 'tech.sensing.echo_sounder'],
+    parentItemIds: ['weapon.long_barrel', 'power.echo_sounder'],
+    isIncomeCombo: false,
+    node: { id: 'tech.combo.sounding_bore', iconId: 'node-combo-sounding-bore', unlockTier: 20 },
+    anchorRowIds: ['bore_gun'],
+  },
+  {
+    itemId: 'combo.winch_bore',
+    name: 'Winch bore',
+    iconId: 'item-combo-winch-bore',
+    description: 'The iron grapple hook flies down the fresh bore and bites at its far end.',
+    lanes: ['armoury.bore_gun', 'mobility'],
+    parents: ['tech.bore_gun.long_barrel', 'tech.mobility.grapple_winch'],
+    parentItemIds: ['weapon.long_barrel', 'power.grapple_winch'],
+    isIncomeCombo: false,
+    node: { id: 'tech.combo.winch_bore', iconId: 'node-combo-winch-bore', unlockTier: 25 },
+    anchorRowIds: ['bore_gun'],
+  },
+  {
+    itemId: 'combo.spotter_guns',
+    name: 'Spotter guns',
+    iconId: 'item-combo-spotter-guns',
+    description: 'The periscope reads the dust and the brass turrets wait on the first crack.',
+    lanes: ['armoury.auto_guns', 'sensing'],
+    parents: ['tech.auto_guns.fire_director', 'tech.sensing.threat_periscope'],
+    parentItemIds: ['weapon.fire_director', 'passive.threat_periscope'],
+    isIncomeCombo: false,
+    node: { id: 'tech.combo.spotter_guns', iconId: 'node-combo-spotter-guns', unlockTier: 27 },
+    anchorRowIds: ['auto_guns'],
   },
 ]
 

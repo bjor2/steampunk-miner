@@ -7,7 +7,7 @@
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import type { Money } from '../../../systems/money'
 import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
-import type { TechComboTemplate, TechNode } from '../../tech-tree'
+import { RESEARCH_LAB_ROW_ID, type TechComboTemplate, type TechNode } from '../../tech-tree'
 import { COMBO_ITEMS, type ComboItem, type ComboNode } from './comboCatalogue'
 import { COMBOS_ECONOMY } from './combosEconomy'
 
@@ -29,6 +29,7 @@ export function techNodeOf(item: ComboItem, node: ComboNode): TechNode {
     unlockTier: node.unlockTier,
     prereqs: item.parents,
     requiresOwned: item.parentItemIds,
+    ...anchorGateOf(item),
     unlocks: item.itemId,
     description: item.description,
     label: 'horizontal',
@@ -43,7 +44,10 @@ export function authoredComboNodesOf(items: readonly ComboItem[]): TechNode[] {
 
 /** The lane pair's template: `tech.template.<name>`, ids as `COMBO_TEMPLATES_FIXTURE` has them. */
 export function comboTemplateOf(
-  row: Pick<ComboItem, 'itemId' | 'name' | 'description' | 'lanes' | 'parents' | 'parentItemIds'>,
+  row: Pick<
+    ComboItem,
+    'itemId' | 'name' | 'description' | 'lanes' | 'parents' | 'parentItemIds' | 'anchorRowIds'
+  >,
 ): TechComboTemplate {
   const name = row.itemId.slice(COMBO_ID_PREFIX.length)
   return {
@@ -55,12 +59,24 @@ export function comboTemplateOf(
     parents: row.parents,
     description: row.description,
     requiresOwned: row.parentItemIds,
+    ...anchorGateOf(row),
   }
 }
 
 /**
+ * A weapon x lane combo's `requiresFeature`: the `research_lab` row and its anchors (GD decision
+ * on #310), so the node and every grade stay hidden and refused until all are unlocked; nothing
+ * for a combo of the six lanes, which the lab gates through its `no_lab` refusal alone.
+ */
+function anchorGateOf(row: Pick<ComboItem, 'anchorRowIds'>): { requiresFeature?: string[] } {
+  if (row.anchorRowIds === undefined) return {}
+  return { requiresFeature: [RESEARCH_LAB_ROW_ID, ...row.anchorRowIds] }
+}
+
+/**
  * The fifteen templates, one per lane pair of the six lanes (#161 section 2; ticket 206 "Combo
- * templates"; the GD lock on #245 and the aetheric pairs of ticket 373).
+ * templates"; the GD lock on #245 and the aetheric pairs of ticket 373), then the three weapon x
+ * lane templates (ticket 320).
  */
 export const COMBO_TEMPLATES: readonly TechComboTemplate[] = COMBO_ITEMS.map(comboTemplateOf)
 
