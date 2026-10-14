@@ -14,6 +14,8 @@
  * flares, the clamp's lattice. With the Ore Lure twist held (ticket 329, through the kernel
  * `twist` hook), the shifter leaves a magnet plate in the section and drags toward it; the owner's
  * dock takes the plate back.
+ * The ore-shifter, the pocket lance and the lodestone register their relocated ore value for the
+ * kernel's 15% income-cap check (#385).
  * Stabiliser foam (ticket 381) sets on a forward cone and holds the collapse blocks under it for
  * 600 ticks through a timed `collapseBraces` provider of its own; its clock step drops each cell as
  * it lapses; researching its node owns it with a full stack, its only charge source (a reaction to
@@ -37,6 +39,7 @@ import { FOAM_RESEARCH_REACTION } from './systems/foamResearch'
 import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
 import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
 import { TERRAIN_MAGNETS_SPEND_FAMILY } from './systems/magnetSpend'
+import { MOVER_INCOME_RATES } from './systems/moverIncomeRates'
 import { ORE_LURE_DOCK_REACTION } from './systems/oreLure'
 import { MAGNET_FIELD_LAYER_BUDGET } from './systems/render/magnetFieldBudget'
 import { LAPSE_FOAM_STEP, STABILISER_FOAM_BRACES } from './systems/stabiliserFoam'
@@ -58,6 +61,7 @@ export const slice: SliceDefinition = {
     r.itemDescriptionEntries(TERRAIN_ITEM_CARDS)
     r.vehicleItemSeller(TERRAIN_SELLER)
     r.spendFamily(TERRAIN_MAGNETS_SPEND_FAMILY)
+    MOVER_INCOME_RATES.forEach((rate) => r.incomeRate(rate))
     r.saveSection(TERRAIN_TOOLS_SECTION)
     r.authorityReaction(LODESTONE_DOCK_REACTION)
     r.authorityReaction(ORE_LURE_DOCK_REACTION)
