@@ -244,3 +244,7 @@ The build-loop driver (`/workspace/claude-sessions/steampunk-loop/next-ticket.sh
 slot (`working` on claim, `idle` when freed, `blocked` on needs-planner or exhausted attempts),
 re-sends a heartbeat every 10 minutes while a session runs, and publishes a full snapshot of its
 `--status` (all slots, push_pending) on every coordinator run.
+
+## Priority list (14 Oct 2026)
+
+`PRIORITY_TICKETS` in `next-ticket.sh` now starts with **#393** (new player vehicle, casing driller art), so the next free dev slot claims it first.
