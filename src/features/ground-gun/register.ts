@@ -17,6 +17,7 @@ import { BORE_GUN_KIND, boreGunParts } from './systems/boreGunContent'
 import { BORE_PICKUP_REACTION } from './systems/borePickup'
 import { GROUND_GUN_PROVIDER } from './systems/boreGunProvider'
 import { FIRE_TILE_FEEL } from './systems/render/fireTileFeel'
+import { GUN_BAY_ENTRIES } from './systems/gunBayEntries'
 import { GROUND_GUN_SECTION } from './systems/gunLevels'
 import { GUN_PURCHASE_RULES } from './systems/gunPurchase'
 import { FireReticle } from './ui/FireReticle'
@@ -32,6 +33,7 @@ export const slice: SliceDefinition = {
     r.content(BORE_GUN_KIND, boreGunParts())
     r.itemDescriptionEntries(boreGunCards())
     r.commandRules(GUN_PURCHASE_RULES)
+    r.bayEntry(GUN_BAY_ENTRIES)
     r.boreGun(GROUND_GUN_PROVIDER)
     r.authorityReaction(BORE_PICKUP_REACTION)
     r.eventProjections(GROUND_GUN_PROJECTIONS)
