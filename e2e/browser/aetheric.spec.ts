@@ -1,10 +1,15 @@
 /**
- * The resonance whistle in the preview build (#262, the GD lock on #245): read through
- * `steampunkDebug`, never pixels. The build registers the whistle by its bare id, so the loadout
- * slots it and the rig hangs its part on the boiler stack's own point, `hull.stack.side` (ticket
- * 265), not at the slot's housing; the Digit1 key sounds it, its
- * lure lands in the `aetheric` section and a charge is spent; and the item card's stat lines read
- * from `statPreview`.
+ * The aetheric items in the preview build (the GD lock on #245): read through `steampunkDebug`,
+ * never pixels.
+ *
+ * - The resonance whistle (#262): the build registers it by its bare id, so the loadout slots it
+ *   and the rig hangs its part on the boiler stack's own point, `hull.stack.side` (ticket 265),
+ *   not at the slot's housing; the Digit1 key sounds it, its lure lands in the `aetheric` section
+ *   and a charge is spent; and the item card's stat lines read from `statPreview`.
+ * - The chronometric governor and the aether condenser (#263): the rig hangs them at their own
+ *   points, `hull.tail` and `hull.flank`; Digit1 opens the governor's pocket in the
+ *   `aetheric.pocket` section and puts heat on the item gauge the HUD shows, and Digit2 then burns
+ *   it (a refused burn would spend no charge).
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -17,6 +22,8 @@ declare global {
 
 const WHISTLE = 'power.resonance_whistle'
 const WHISTLE_ASSET = 'vehicle-item-power-resonance-whistle'
+const GOVERNOR = 'power.chronometric_governor'
+const CONDENSER = 'power.aether_condenser'
 
 interface WhistleRead {
   ok: boolean
@@ -83,6 +90,112 @@ test('the whistle card reads its stat lines and price from statPreview', async (
       { label: 'Charges', value: '2e+0' },
       { label: 'Reach (tiles)', value: '8e+0' },
       { label: 'Energy a blow', value: '1e+0' },
+      { label: 'Price' },
+    ],
+  })
+  expect(errors).toEqual([])
+})
+
+interface PocketRead {
+  ok: boolean
+  pocket: { tx: number; ty: number; reachMm: number; lastTick: number } | null
+}
+
+interface ItemHeatRead {
+  ok: boolean
+  gauge: { text: string; exact: string; permille: number } | null
+}
+
+async function openGameWithGovernorAndCondenser(page: Page): Promise<string[]> {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(String(error)))
+  await page.goto('/?debug')
+  await page.waitForFunction(() => window.steampunkDebug !== undefined)
+  const slotted = await page.evaluate(
+    ([governor, condenser]) =>
+      window.steampunkDebug!.setVehicleLoadout({ 'powerup.1': governor, 'powerup.2': condenser })
+        .ok,
+    [GOVERNOR, CONDENSER],
+  )
+  expect(slotted).toBe(true)
+  return errors
+}
+
+function readPocket(page: Page): Promise<PocketRead> {
+  return page.evaluate(() => window.steampunkDebug!.features.aetheric.getPocket() as PocketRead)
+}
+
+function readItemHeat(page: Page): Promise<ItemHeatRead> {
+  return page.evaluate(() => window.steampunkDebug!.features.aetheric.getItemHeat() as ItemHeatRead)
+}
+
+function chargesOf(page: Page, itemId: string) {
+  return page.evaluate(
+    (id) => window.steampunkDebug!.features['power-up-core'].getCharges(id),
+    itemId,
+  )
+}
+
+test('the rig hangs the governor and the condenser at their own points', async ({ page }) => {
+  const errors = await openGameWithGovernorAndCondenser(page)
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const result = window.steampunkDebug!.vehicleParts()
+        return result.ok ? result.mounted.map((mount) => [mount.assetId, mount.attachId]) : []
+      }),
+    )
+    .toEqual(
+      expect.arrayContaining([
+        ['vehicle-item-power-chronometric-governor', 'hull.tail'],
+        ['vehicle-item-power-aether-condenser', 'hull.flank'],
+      ]),
+    )
+  expect(errors).toEqual([])
+})
+
+test('Digit1 opens a slow pocket and heats the item gauge; Digit2 condenses it', async ({
+  page,
+}) => {
+  const errors = await openGameWithGovernorAndCondenser(page)
+  expect((await readPocket(page)).pocket).toBeNull()
+  expect((await readItemHeat(page)).gauge).toMatchObject({ permille: 0 })
+  await page.keyboard.press('Digit1')
+  await expect.poll(async () => (await readPocket(page)).pocket).not.toBeNull()
+  await expect.poll(async () => (await readItemHeat(page)).gauge?.permille ?? 0).toBeGreaterThan(0)
+  expect(await chargesOf(page, GOVERNOR)).toEqual({ ok: true, chargesLeft: 1 })
+  await page.keyboard.press('Digit2')
+  await expect.poll(() => chargesOf(page, CONDENSER)).toEqual({ ok: true, chargesLeft: 1 })
+  expect(errors).toEqual([])
+})
+
+test('the governor and condenser cards read their lines from statPreview', async ({ page }) => {
+  const errors = await openGameWithGovernorAndCondenser(page)
+  const [governor, condenser] = await page.evaluate(
+    ([governorId, condenserId]) => [
+      window.steampunkDebug!.features.aetheric.statPreview(governorId, 1, 24),
+      window.steampunkDebug!.features.aetheric.statPreview(condenserId, 1, 29),
+    ],
+    [GOVERNOR, CONDENSER],
+  )
+  expect(governor).toMatchObject({
+    ok: true,
+    lines: [
+      { label: 'Cooldown (s)', value: '1.5e+1' },
+      { label: 'Pocket lasts (s)', value: '4e+0' },
+      { label: 'Charges', value: '2e+0' },
+      { label: 'Range (tiles)', value: '6e+0' },
+      { label: 'Energy a second', value: '1e+0' },
+      { label: 'Heat a pocket (%)', value: '2.5e+1' },
+      { label: 'Price' },
+    ],
+  })
+  expect(condenser).toMatchObject({
+    ok: true,
+    lines: [
+      { label: 'Cooldown (s)', value: '1e+1' },
+      { label: 'Charges', value: '2e+0' },
+      { label: 'Energy a full gauge', value: '1e+1' },
       { label: 'Price' },
     ],
   })
