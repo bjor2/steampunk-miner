@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import LOCKED_SCHEDULE_FILE from '../../../../docs/scaling/horizontal/stats.json'
+import { contentOf } from '../../../systems/registries/content'
 import { iconUrlOf } from '../../../ui/vectorIcons'
 import { ABSORBED_SCHEDULE_ROWS, researchLabPlanet, unlocksOnPlanet } from './scheduleAbsorber'
 import type { TechNode } from './techNode'
@@ -30,6 +31,18 @@ describe('tech tree: shape test', () => {
 
   it('passes whatever the lane slices have registered, so it turns on as they land', () => {
     expect(registeredTreeShapeProblems((iconId) => iconUrlOf(iconId) !== null)).toEqual([])
+  })
+
+  it('passes the Aetheric science nodes on P15, P24 and P29, the sixth lane (#245)', () => {
+    const registered = contentOf('tech-node').filter((node) => node.lane === 'aetheric')
+    const fixture = AUTHORED_TREE_FIXTURE.filter((node) => node.lane === 'aetheric')
+    ;[registered, fixture].forEach((lane) =>
+      expect(lane.map((node) => node.unlockTier).sort((a, b) => a - b)).toEqual([15, 24, 29]),
+    )
+    const early = treeWith('tech.aetheric.chronometric_governor', { unlockTier: 14 })
+    expect(shapeOf(early)).toEqual([
+      'tech.aetheric.chronometric_governor (P14) needs tech.aetheric.resonance_whistle, which opens later',
+    ])
   })
 
   it('takes the first combo planet from the research lab row of Schedule C', () => {

@@ -27,6 +27,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
+### `aetheric`: 1 file, 5 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/aetheric/systems/aethericNodes.test.ts` | 5 | 5 |
+
 ### `artefact`: 4 files, 31 tests
 
 | File | Tests | Sites |
@@ -369,7 +375,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 30 files, 224 tests
+### `tech-tree`: 32 files, 231 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -377,8 +383,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
+| `src/features/tech-tree/systems/aethericLane.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/forkCost.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/forkNode.test.ts` | 7 | 7 |
+| `src/features/tech-tree/systems/generatedCombos.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/itemDescriber.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
@@ -396,10 +404,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/render/techGear.test.ts` | 12 | 12 |
 | `src/features/tech-tree/systems/render/techGearQuads.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/researchBotPurchase.test.ts` | 5 | 5 |
-| `src/features/tech-tree/systems/techTree.test.ts` | 17 | 17 |
+| `src/features/tech-tree/systems/techTree.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/treeScreenModel.test.ts` | 11 | 11 |
-| `src/features/tech-tree/systems/treeShape.test.ts` | 15 | 15 |
+| `src/features/tech-tree/systems/treeShape.test.ts` | 16 | 16 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 20 | 20 |
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |

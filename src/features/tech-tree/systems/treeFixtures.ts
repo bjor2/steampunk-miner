@@ -5,11 +5,19 @@
  * section 4.2 and 4.3 numbers where they exist; the rest are stand-ins of the same shape.
  *
  * The extraction lane's nodes are not copied: they are the `extraction` slice's own, so each has
- * one registrar (TD lock on #201 Q2). The slurry siphon's node is held with the siphon, so the
- * tree has 49 nodes.
+ * one registrar (TD lock on #201 Q2), and so are the Aetheric science lane's three (#245), here
+ * with the stand-in ladder until their items bring theirs. The slurry siphon's node is held with
+ * the siphon, so the tree has 52 nodes.
  */
+import { AETHERIC_TECH_NODES } from '../../aetheric'
 import { extractionTechNodes } from '../../extraction'
-import type { DiscoveryRequirement, MarkLadder, TechComboTemplate, TechNode } from './techNode'
+import type {
+  DiscoveryRequirement,
+  MarkLadder,
+  TechComboTemplate,
+  TechLane,
+  TechNode,
+} from './techNode'
 
 type Row = readonly [
   lane: TechNode['lane'],
@@ -364,6 +372,15 @@ const ROWS: readonly Row[] = [
   ],
 ]
 
+/** The other lane's parent of each stand-in Aetheric pair template: a node every lane has by P15. */
+const AETHERIC_PAIR_PARENTS: readonly (readonly [TechLane, string])[] = [
+  ['extraction', 'extraction.mineral_drain'],
+  ['terrain', 'terrain.ore_shifter'],
+  ['sensing', 'sensing.echo_sounder'],
+  ['mobility', 'mobility.grapple_winch'],
+  ['drill-gear', 'drill-gear.side_cutters'],
+]
+
 /** #162 section 4.2 and 4.3 ladders (cooldown ticks, magnitude, charges or stack). */
 const KNOWN_LADDERS: Readonly<Record<string, MarkLadder>> = {
   'power.echo_sounder': {
@@ -414,13 +431,17 @@ const STAND_IN_LADDER: MarkLadder = { isIncomeItem: false, cooldown: 300, magnit
 
 const MARK_BEARING_ITEM = /^(power|consumable|passive|gear)\./
 
-/** The 49 authored nodes, ids `tech.<lane>.<name>` as #161 writes them (lane in snake case, #224). */
+/** The 52 authored nodes, ids `tech.<lane>.<name>` as #161 writes them (lane in snake case, #224). */
 export const AUTHORED_TREE_FIXTURE: readonly TechNode[] = [
   ...extractionTechNodes(),
   ...ROWS.map(nodeOfRow),
+  ...AETHERIC_TECH_NODES.map((node) => ({ ...node, marks: STAND_IN_LADDER })),
 ]
 
-/** The ten lane-pair templates: the six authored combos and the four #161 adds. */
+/**
+ * The fifteen lane-pair templates: the six authored combos, the four #161 adds, and the five
+ * Aetheric pairs (#245) as stand-ins on the lane's entry node until Content writes them.
+ */
 export const COMBO_TEMPLATES_FIXTURE: readonly TechComboTemplate[] = [
   template(
     'assay_drain',
@@ -481,6 +502,14 @@ export const COMBO_TEMPLATES_FIXTURE: readonly TechComboTemplate[] = [
     ['extraction', 'mobility'],
     'extraction.aether_tether',
     'mobility.grapple_winch',
+  ),
+  ...AETHERIC_PAIR_PARENTS.map(([lane, parent], index) =>
+    template(
+      `aetheric_pair_${index + 1}`,
+      [lane, 'aetheric'],
+      'aetheric.resonance_whistle',
+      parent,
+    ),
   ),
 ]
 

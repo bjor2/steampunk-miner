@@ -29,9 +29,11 @@ const TEMPLATE_IDS = [
 
 const pairKeyOf = (lanes: readonly string[]) => [...lanes].sort().join('×')
 
-function everyLanePair(): string[] {
-  return TECH_LANES.flatMap((lane, index) =>
-    TECH_LANES.slice(index + 1).map((other) => pairKeyOf([lane, other])),
+/** The Aetheric science pairs' five templates are the lane's own (ticket 260), not this slice's. */
+function everyFirstFiveLanePair(): string[] {
+  const lanes = TECH_LANES.filter((lane) => lane !== 'aetheric')
+  return lanes.flatMap((lane, index) =>
+    lanes.slice(index + 1).map((other) => pairKeyOf([lane, other])),
   )
 }
 
@@ -85,9 +87,9 @@ describe('combo templates', () => {
     expect(COMBO_TEMPLATES.map((template) => template.id).sort()).toEqual(TEMPLATE_IDS)
   })
 
-  it('gives every lane pair exactly one template', () => {
+  it('gives every pair of the first five lanes exactly one template', () => {
     const pairs = COMBO_TEMPLATES.map((template) => pairKeyOf(template.lanes))
-    expect(pairs.sort()).toEqual(everyLanePair().sort())
+    expect(pairs.sort()).toEqual(everyFirstFiveLanePair().sort())
   })
 
   it('grades the combo item of its row, from the same two parents, both owned', () => {

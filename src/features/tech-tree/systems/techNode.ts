@@ -14,8 +14,18 @@ declare module '../../../systems/registries/content' {
   }
 }
 
-/** The five swimlanes, in the order the screen draws them and the lane pairs are listed (#161). */
-export const TECH_LANES = ['extraction', 'terrain', 'sensing', 'mobility', 'drill-gear'] as const
+/**
+ * The six swimlanes, in the order the screen draws them and the lane pairs are listed (#161); the
+ * sixth, Aetheric science, is the GD lock on #245.
+ */
+export const TECH_LANES = [
+  'extraction',
+  'terrain',
+  'sensing',
+  'mobility',
+  'drill-gear',
+  'aetheric',
+] as const
 
 export type TechLane = (typeof TECH_LANES)[number]
 
@@ -92,6 +102,11 @@ export interface TechNode extends ContentEntry {
    * screen and refused until every row has had its `FeatureUnlocked` (`isFeatureUnlocked`).
    */
   requiresFeature?: readonly string[]
+  /**
+   * Researched only once the `research_lab` stands, refused `no_lab` before, as every combo is:
+   * the Aetheric lane's entry node (GD lock on #245).
+   */
+  researchedAt?: 'research_lab'
   /** The store item it unlocks. */
   unlocks: string
   /** The flavour line, no digits: stat and cost lines are generated (#159). */
@@ -139,6 +154,7 @@ export interface TreeNode {
   requiresDiscovery?: DiscoveryRequirement
   requiresOwned?: readonly string[]
   requiresFeature?: readonly string[]
+  researchedAt?: 'research_lab'
   unlocks: ItemUnlock
   iconId: string
   description: string

@@ -8,7 +8,7 @@
  * node `requiresFeature` is a row of the locked schedule (ticket 358).
  *
  * It runs over whatever the lane slices have registered, so it turns on as they land; the
- * cadence check (no gap longer than two planets on P2-P37) waits until all five lanes are in.
+ * cadence check (no gap longer than two planets on P2-P37) waits until all six lanes are in.
  */
 import { contentOf } from '../../../systems/registries/content'
 import { LOCKED_SCHEDULE } from '../../../systems/unlocks/unlockSchedule'

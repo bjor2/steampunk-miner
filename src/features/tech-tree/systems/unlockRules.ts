@@ -3,8 +3,8 @@
  * no node has the id, it is already researched, its tier is not reached or a schedule row it
  * `requiresFeature` is still shut (`locked_tier`, ticket 358), it waits on a discovery
  * (`locked_tier` / `undiscovered`), a prerequisite is missing, the player does not own what it
- * `requiresOwned` (`not_owned`, ticket 233), it is a combo and the `research_lab` is not built,
- * or the wallet is short.
+ * `requiresOwned` (`not_owned`, ticket 233), it is a combo or a node researched at the lab (the
+ * Aetheric entry node, #245) and the `research_lab` is not built, or the wallet is short.
  *
  * The tier is the furthest planet the session has travelled to: the one it is on. A node with a
  * discovery key opens at its tier once the key is met and at tier + `discoveryGrace` regardless,
@@ -62,7 +62,7 @@ export function researchRefusalOf(
   if (isWaitingOnDiscovery(state, playerId, node)) return 'undiscovered'
   if (node.prereqs.some((prereq) => !unlocked.has(prereq))) return 'missing_prereq'
   if (!ownsEveryRequirement(state, playerId, node.requiresOwned ?? [])) return 'not_owned'
-  if (node.kind === 'combo' && !isFeatureUnlocked(state, RESEARCH_LAB_ROW_ID)) return 'no_lab'
+  if (isResearchedAtLab(node) && !isFeatureUnlocked(state, RESEARCH_LAB_ROW_ID)) return 'no_lab'
   return null
 }
 
@@ -117,6 +117,10 @@ export function isItemResearched(
  */
 export function isAnchorUnlocked(state: AuthorityState, node: TreeNode): boolean {
   return (node.requiresFeature ?? []).every((rowId) => isFeatureUnlocked(state, rowId))
+}
+
+function isResearchedAtLab(node: TreeNode): boolean {
+  return node.kind === 'combo' || node.researchedAt === 'research_lab'
 }
 
 /** Its own tier, and the planet of the Schedule C row it absorbs, if it absorbs one. */

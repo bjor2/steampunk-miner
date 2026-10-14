@@ -1,7 +1,8 @@
 /**
  * Endless combos (spec #161 section 2): from planet 41, one combo every K planets, at
- * `p = 41 + K j`. Its lane pair is `PAIRS[perm(j mod 10)]`, where `perm` is a fixed permutation
+ * `p = 41 + K j`. Its lane pair is `PAIRS[perm(j mod 15)]`, where `perm` is a fixed permutation
  * seeded by a constant, never the world seed, so every player in a world sees the same offers.
+ * Six lanes make fifteen pairs (GD lock on #245), so every pair has had its first turn by P86.
  * Each is the next grade of its pair's template: the template's first appearance is labelled
  * horizontal, each re-grade both. It needs its template's two parents and the grade before it,
  * and the items the template requires owned (a combo's two parent items, GD lock on #206).
@@ -17,12 +18,12 @@ const GENERATED_COMBO_PREFIX = 'tech.combo.gen.'
 /** The permutation's seed: a constant (#161), named for the spec that fixed it. */
 const PAIR_PERMUTATION_SEED = 161
 
-/** The ten lane pairs, each lane before the later ones in `TECH_LANES`. */
+/** The fifteen lane pairs, each lane before the later ones in `TECH_LANES`. */
 export const LANE_PAIRS: readonly (readonly [TechLane, TechLane])[] = TECH_LANES.flatMap(
   (first, index) => TECH_LANES.slice(index + 1).map((second) => [first, second] as const),
 )
 
-/** `perm`: the pair of the j-th generated combo is `LANE_PAIRS[PAIR_ORDER[j mod 10]]`. */
+/** `perm`: the pair of the j-th generated combo is `LANE_PAIRS[PAIR_ORDER[j mod 15]]`. */
 export const PAIR_ORDER: readonly number[] = permutationOf(LANE_PAIRS.length)
 
 /** What grading a pair's combos needs to know about the authored tree. */

@@ -1,5 +1,5 @@
 /**
- * The tree screen's model (spec #161 section 4): five swimlanes and the combo row on a planet
+ * The tree screen's model (spec #161 section 4): six swimlanes and the combo row on a planet
  * ruler, the x-axis being `unlockTier`, so a node's place says when and its lane says what kind.
  * A lane no slice has registered yet shows "coming soon". The "next up" strip holds each lane's
  * first node the player can research; search matches a node's name, item or flavour line; the
@@ -57,6 +57,7 @@ export const LANE_TITLES: Readonly<Record<TechNodeLane, string>> = {
   sensing: 'Sensing',
   mobility: 'Mobility',
   'drill-gear': 'Drill gear',
+  aetheric: 'Aetheric science',
   combo: 'Combos',
 }
 

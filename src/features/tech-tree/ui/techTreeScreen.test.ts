@@ -47,7 +47,7 @@ describe('tech tree screen', () => {
       openTreeOnPlanet(3)
       return shellMarkup()
     })
-    expect(html.match(/Coming soon/g)).toHaveLength(6)
+    expect(html.match(/Coming soon/g)).toHaveLength(7)
     expect(html).toContain('data-testid="tech-tree-lane-extraction"')
   })
 

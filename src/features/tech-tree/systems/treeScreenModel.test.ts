@@ -36,6 +36,7 @@ describe('tech tree screen: lanes', () => {
       ['Sensing', true],
       ['Mobility', true],
       ['Drill gear', true],
+      ['Aetheric science', true],
       ['Combos', true],
     ])
     const withLanes = withFixtureTree(() => modelOn(3))
@@ -139,7 +140,7 @@ describe('tech tree screen: next up, search and filters', () => {
         modelOn(3, { search, filters: [] }).lanes.flatMap((lane) => lane.nodes.map((n) => n.id))
       expect(found('grapple')).toEqual(['tech.mobility.grapple_winch'])
       expect(found('POWER.ECHO')).toEqual(['tech.sensing.echo_sounder'])
-      expect(found('  ')).toHaveLength(49)
+      expect(found('  ')).toHaveLength(52)
     })
   })
 
@@ -152,8 +153,8 @@ describe('tech tree screen: next up, search and filters', () => {
         'tech.sensing.echo_sounder',
         'tech.mobility.grapple_winch',
       ])
-      expect(kept(['locked'])).toHaveLength(46)
-      expect(kept(['affordable', 'locked'])).toHaveLength(49)
+      expect(kept(['locked'])).toHaveLength(49)
+      expect(kept(['affordable', 'locked'])).toHaveLength(52)
       expect(kept(['marks'])).toEqual([])
     })
   })
