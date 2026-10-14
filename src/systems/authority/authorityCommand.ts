@@ -144,8 +144,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    pending use's `autoPressTick`, a use by hand cooling down for auto's override gap while
  *    the item is on auto, and a press by hand withdrawing a same-tick auto press. With auto off
  *    no digest or mined order changes.
+ * 52: the ground-gun slice (ticket 314, #309 build 2): the `ground-gun` player section v1 with
+ *    the three track levels, `ground-gun.mount` and `ground-gun.buy_level {track}` with
+ *    `ground-gun.GunMounted` and `ground-gun.TrackLevelBought`, `debug.ground-gun.setLevels`, the
+ *    `boreGun` provider built from the tracks, and the pickup of bored ore on the trip's income
+ *    cap with `ground-gun.BoredOreCapped`. With no gun mounted no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 51
+export const AUTHORITY_PROTOCOL_VERSION = 52
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
