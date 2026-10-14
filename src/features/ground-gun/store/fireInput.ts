@@ -101,6 +101,14 @@ export function hearFireRefusals(events: readonly DomainEvent[], playerId: strin
   }
 }
 
+/**
+ * The bearing the barrel on the rig points along now (ticket 315): the finger's aim while it aims,
+ * else the key's, which follows the cursor or, with no mouse, the facing.
+ */
+export function readBarrelBearing(): number {
+  return input.press.aimBearing ?? keyBearingOf(readAuthorityState())
+}
+
 /** The bearing the reticle draws while the finger aims; null otherwise. */
 export function readAimBearing(): number | null {
   return input.press.aimBearing

@@ -2,7 +2,8 @@
  * The bore gun on a desktop in the preview build (ticket 314, the TD lock on #314 section 2): the
  * gauge panel shows once the gun is mounted, a held fire key fires at each `nextShotTick` and stops
  * when it comes up, and a canvas click fires through the same press. The tracer asks the kernel's
- * spray pool. State through `steampunkDebug`, the run log and the DOM's test ids, never pixels.
+ * spray pool. The bought gun hangs on the rig at `hull.front` (ticket 315). State through
+ * `steampunkDebug`, the run log and the DOM's test ids, never pixels.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -25,6 +26,24 @@ test.describe('the bore gun on a desktop (ticket 314)', () => {
     await mountGun(page)
     await expect(page.getByTestId(FIRE_GAUGE)).toBeVisible()
     await expect(page.getByTestId(FIRE_GAUGE)).toContainText('Fire (Left Mouse)')
+    expect(errors).toEqual([])
+  })
+
+  test('hangs the gun on the rig once it is mounted, and nothing before (ticket 315)', async ({
+    page,
+  }) => {
+    const errors = await openDrawnGame(page)
+    expect(await boreGunOnRig(page)).toEqual([])
+    await mountGun(page)
+    await expect
+      .poll(() => boreGunOnRig(page))
+      .toEqual([
+        {
+          assetId: 'vehicle-bore-gun',
+          attachId: 'hull.front',
+          partIds: ['t1-bore-mount', 't1-bore-barrel'],
+        },
+      ])
     expect(errors).toEqual([])
   })
 
@@ -68,6 +87,15 @@ function mountGun(page: Page): Promise<void> {
   return page.evaluate(() => {
     const result = window.steampunkDebug!.features['ground-gun'].setLevels(1, 1, 1)
     if (!result.ok) throw new Error(result.problems.join('; '))
+  })
+}
+
+/** The bore gun's entry in what the vehicle's pieces hang at attach points now. */
+function boreGunOnRig(page: Page) {
+  return page.evaluate(() => {
+    const parts = window.steampunkDebug!.vehicleParts()
+    if (!parts.ok) throw new Error(parts.problems.join('; '))
+    return parts.mounted.filter((mount) => mount.assetId === 'vehicle-bore-gun')
   })
 }
 

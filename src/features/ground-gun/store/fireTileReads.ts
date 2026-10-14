@@ -7,13 +7,18 @@ import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
 import { boreGunStatsOf } from '../systems/boreGunProvider'
 import { fireTileOf, type FireTileModel } from '../systems/fireTile'
-import { gunLevelsOf } from '../systems/gunLevels'
+import { gunLevelsOf, isGunMounted } from '../systems/gunLevels'
 import { boundLabel } from '../../../systems/input/actionMap'
 import { boreAutoReadingOf, type BoreAutoReading } from '../../../systems/views/boreAutoReading'
 import { FIRE_ACTION } from './fireInput'
 
 export function readFireTile(): FireTileModel | null {
   return fireTileOf(readAuthorityState(), useGameStore.getState().playerId)
+}
+
+/** Whether the local player's gun is on the rig, so its mount shows there (ticket 315). */
+export function readIsGunMounted(): boolean {
+  return isGunMounted(gunLevelsOf(readAuthorityState(), useGameStore.getState().playerId))
 }
 
 /** How far the local player's gun reaches now, in cells; 0 with no gun. */

@@ -6,17 +6,20 @@
  * the pickup of the ore its bores free, inside the trip's income cap. On the touch controls a fire
  * tile with its recovery ring fires, holds and aims (the reticle on the overlay); hold-fire and
  * the tap buffer live only in that client input, and a refused shot clanks unless it was only
- * the recovery.
+ * the recovery. The bought gun shows on the rig: `vehicle-bore-gun` (#362's art) hangs at
+ * `hull.front` as a vehicle piece, its barrel turned to the aim (ticket 315).
  * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { groundGunDebugActions } from './debug'
 import { GROUND_GUN_PROJECTIONS, GROUND_GUN_RUN_EVENTS } from './logging'
+import { BORE_GUN_PIECE_ID, BoreGunPiece } from './scene/BoreGunPiece'
 import { FIRE_KEY_REACTION } from './store/fireKeyReaction'
 import { boreGunCards } from './systems/boreGunCards'
 import { BORE_GUN_KIND, boreGunParts } from './systems/boreGunContent'
 import { BORE_PICKUP_REACTION } from './systems/borePickup'
 import { GROUND_GUN_PROVIDER } from './systems/boreGunProvider'
+import { BORE_GUN_ATTACH_USE, boreGunArtAssets } from './systems/render/boreGunLook'
 import { FIRE_TILE_FEEL } from './systems/render/fireTileFeel'
 import { GUN_BAY_ENTRIES } from './systems/gunBayEntries'
 import { GROUND_GUN_SECTION } from './systems/gunLevels'
@@ -50,6 +53,10 @@ export const slice: SliceDefinition = {
       Panel: FireReticle,
     })
     r.soundCue(FIRE_TILE_FEEL.refusalClank)
+    // The mount and barrel under public/assets/vehicle/ (#214), drawn once the gun is bought.
+    r.artAssets(boreGunArtAssets())
+    r.attachUse(BORE_GUN_ATTACH_USE)
+    r.vehiclePiece({ id: BORE_GUN_PIECE_ID, Piece: BoreGunPiece })
     // steampunkDebug.features['ground-gun'].setLevels(1, 1, 1), .getGun()
     r.debugActions(groundGunDebugActions)
   },

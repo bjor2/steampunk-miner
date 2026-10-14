@@ -1,0 +1,36 @@
+{
+  "assetId": "vehicle-bore-gun",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-bore-gun/vehicle-bore-gun.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [256, 256],
+  "maps": {
+    "albedo": "vehicle-bore-gun.albedo.ktx2",
+    "normal": "vehicle-bore-gun.normal.ktx2",
+    "emissive": "vehicle-bore-gun.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "t1-bore-barrel",
+      "tier": 1,
+      "rect": [8, 8, 236, 113],
+      "sizeM": [0.46, 0.22],
+      "pivotM": [0.1, 0.11],
+      "atM": [0.0, -0.108],
+      "z": 9
+    },
+    {
+      "id": "t1-bore-mount",
+      "tier": 1,
+      "rect": [8, 137, 103, 93],
+      "sizeM": [0.2, 0.18],
+      "pivotM": [0.1, 0.14],
+      "atM": [0.0, 0.0],
+      "z": 8
+    }
+  ]
+}
