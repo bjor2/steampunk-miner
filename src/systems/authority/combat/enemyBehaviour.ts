@@ -41,7 +41,15 @@ import {
 import { enemyById, inPhase, type Enemy, type EnemyPhase } from './combatState'
 import { drillPinnedEnemy, flushDrillDamage } from './enemyDamage'
 import { contactArcOf, strikeVehicle } from './enemyHits'
-import { lungeStepMmOf, stepAlong, walkStepMmOf, walkToward, type Terrain } from './enemyMovement'
+import {
+  lungeStepMmOf,
+  slowedLungeStepMmOf,
+  slowedWalkStepMmOf,
+  stepAlong,
+  walkToward,
+  type StepGround,
+  type Terrain,
+} from './enemyMovement'
 import { ticksInPhase, updated, type EnemyTurn, type PhaseStep } from './enemyTurn'
 import { vehicleTargetOf, type VehicleTarget } from './vehicleTarget'
 import { fleeIntoRock, gnawRing, seekRing } from './wreckerBehaviour'
@@ -129,16 +137,17 @@ function followLureOrHunt(turn: EnemyTurn): RuleEffect {
   return lure === null ? hunt(turn) : walkToLure(turn, lure)
 }
 
-function walkToLure({ state, enemy, terrain }: EnemyTurn, lure: MillimetrePoint): RuleEffect {
-  return updated(state, { ...walkToward(terrain, enemy, lure), phase: 'approach' })
+function walkToLure(turn: EnemyTurn, lure: MillimetrePoint): RuleEffect {
+  return updated(turn.state, { ...walkToward(turn, turn.enemy, lure), phase: 'approach' })
 }
 
-function hunt({ state, enemy, target, terrain, tick }: EnemyTurn): RuleEffect {
+function hunt(turn: EnemyTurn): RuleEffect {
+  const { state, enemy, target, tick } = turn
   if (!isWithinMm(target.position, enemy, detectionReachOf(state, enemy, tick))) {
     return updated(state, enemy.phase === 'idle' ? enemy : inPhase(enemy, 'idle', tick))
   }
   if (!isWithinMm(target.position, enemy, lungeReachMm(enemy))) {
-    return updated(state, { ...walkToward(terrain, enemy, target.position), phase: 'approach' })
+    return updated(state, { ...walkToward(turn, enemy, target.position), phase: 'approach' })
   }
   if (tick < enemy.readyTick) return updated(state, { ...enemy, phase: 'approach' })
   return updated(state, inPhase(enemy, 'windup', tick))
@@ -149,9 +158,10 @@ function detectionReachOf(state: AuthorityState, enemy: Enemy, tick: number): nu
   return detectionReachMm(state, enemy, tick, statsOf(enemy).detectionTiles * MM_PER_METRE)
 }
 
-function windUp({ state, enemy, target, tick }: EnemyTurn): RuleEffect {
+function windUp(turn: EnemyTurn): RuleEffect {
+  const { state, enemy, target, tick } = turn
   if (ticksInPhase(enemy, tick) < statsOf(enemy).windupTicks) return unchanged(state)
-  const step = stepToward(enemy, target.position, lungeStepMmOf(enemy))
+  const step = stepToward(enemy, target.position, slowedLungeStepMmOf(turn, enemy))
   return updated(state, { ...inPhase(enemy, 'lunge', tick), step })
 }
 
@@ -172,10 +182,11 @@ function recoil({ state, enemy, terrain, tick }: EnemyTurn): RuleEffect {
 }
 
 /** The lunge lands: front pins it on the head, side or rear sends it back (#9). */
-function hitOnContact({ state, enemy, target, tick }: EnemyTurn): RuleEffect {
+function hitOnContact(turn: EnemyTurn): RuleEffect {
+  const { state, enemy, target, tick } = turn
   const arc = contactArcOf(state, target, enemy, tick)
   const after =
-    arc === 'front' ? inPhase(enemy, 'pinned', tick) : recoilingFrom(enemy, target, tick)
+    arc === 'front' ? inPhase(enemy, 'pinned', tick) : recoilingFrom(turn, enemy, target)
   return chainEffects(updated(state, after).state, [
     (current) => strikeVehicle(current, after, arc, tick),
   ])
@@ -186,7 +197,7 @@ function holdOnTheDrill(turn: EnemyTurn): RuleEffect {
   if (!isOnTheNose(target.pose, target.position, enemy)) {
     return chainEffects(state, [
       (current) => flushDrillDamage(current, enemy.id, 'front'),
-      (current) => updated(current, recoilingFrom(latest(current, enemy), target, tick)),
+      (current) => updated(current, recoilingIn(current, turn)),
     ])
   }
   return chainEffects(state, [
@@ -217,11 +228,19 @@ function waitIdle(state: AuthorityState, enemy: Enemy, tick: number): RuleEffect
   ])
 }
 
-function recoilingFrom(enemy: Enemy, target: VehicleTarget, tick: number): Enemy {
+/** The enemy as it stands in `current`, recoiling off the drill it slipped from. */
+function recoilingIn(current: AuthorityState, turn: EnemyTurn): Enemy {
+  const ground = { ...turn, state: current }
+  return recoilingFrom(ground, latest(current, turn.enemy), turn.target)
+}
+
+/** The recoil's step is fixed here, after the strongest slice slow at its start (ticket 375). */
+function recoilingFrom(ground: StepGround, enemy: Enemy, target: VehicleTarget): Enemy {
+  const { tick } = ground
   const { recoilTicks, attackCooldownTicks } = statsOf(enemy)
   return {
     ...inPhase(enemy, 'recoil', tick),
-    step: stepAwayFrom(enemy, target.position, walkStepMmOf(enemy)),
+    step: stepAwayFrom(enemy, target.position, slowedWalkStepMmOf(ground, enemy)),
     readyTick: tick + recoilTicks + attackCooldownTicks,
   }
 }

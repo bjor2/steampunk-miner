@@ -1,6 +1,7 @@
 {
-  "$comment": "Aetheric lane effect numbers (#263, kernel half #360). Placeholders for Systems to set, not tuned: heatUnitsPerEnergyQuantum is how many heat units (HEAT_UNITS_PER_POINT per gauge point) the aether condenser burns into one energy quantum (1/240 unit); enemySlowBp is the share of its step an enemy keeps inside the chronometric governor's pocket, in basis points (5000 = half speed, the #263 goal). Kept apart from economy.json so nothing is shared with #333. liveLureCap is how many live lures (#262 resonance whistle, kernel seam ticket 361) the enemy step hears at once, the first listed in registry id order; 4 is a stand-in, one whistle per vehicle of a small co-op.",
+  "$comment": "Aetheric lane effect numbers (#263, kernel half #360). Placeholders for Systems to set, not tuned: heatUnitsPerEnergyQuantum is how many heat units (HEAT_UNITS_PER_POINT per gauge point) the aether condenser burns into one energy quantum (1/240 unit); enemySlowBp is the share of its step an enemy keeps inside the chronometric governor's pocket, in basis points (5000 = half speed, the #263 goal). Kept apart from economy.json so nothing is shared with #333. liveLureCap is how many live lures (#262 resonance whistle, kernel seam ticket 361) the enemy step hears at once, the first listed in registry id order; 4 is a stand-in, one whistle per vehicle of a small co-op. enemyStepModifierCap is how many enemy step slows (kernel seam ticket 375: the #263 governor, then #373) may register; 4 is a stand-in for Systems.",
   "heatUnitsPerEnergyQuantum": 4,
   "enemySlowBp": 5000,
-  "liveLureCap": 4
+  "liveLureCap": 4,
+  "enemyStepModifierCap": 4
 }

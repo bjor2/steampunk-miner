@@ -24,7 +24,13 @@ import { gnawCasingRing } from '../casingGnaw'
 import { chainEffects, type RuleEffect } from '../commandRule'
 import { distanceSq, isWithinMm, stepAwayFrom, type MillimetrePoint } from './combatGeometry'
 import { inPhase, type Enemy } from './combatState'
-import { stepAlong, walkStepMmOf, walkToward, type Terrain } from './enemyMovement'
+import {
+  slowedWalkStepMmOf,
+  stepAlong,
+  walkStepMmOf,
+  walkToward,
+  type StepGround,
+} from './enemyMovement'
 import { despawnEnemies } from './enemyRoster'
 import { ticksInPhase, updated, type EnemyTurn } from './enemyTurn'
 import {
@@ -41,12 +47,12 @@ const MM_PER_TILE = MM_PER_METRE
 
 export function seekRing(turn: EnemyTurn): RuleEffect {
   if (isVehicleWithinFleeReach(turn)) return startFleeing(turn)
-  const { state, enemy, terrain, tick } = turn
+  const { state, enemy, tick } = turn
   const ring = ringToSeek(turn)
   const seeking = { ...stayingIn(enemy, 'seek', tick), ring }
   if (ring === null) return updated(state, seeking)
   if (isAtRing(enemy, ring)) return updated(state, { ...inPhase(enemy, 'gnaw', tick), ring })
-  return updated(state, walkToward(terrain, seeking, millimetresOf(ring)))
+  return updated(state, walkToward(turn, seeking, millimetresOf(ring)))
 }
 
 export function gnawRing(turn: EnemyTurn): RuleEffect {
@@ -60,10 +66,10 @@ export function gnawRing(turn: EnemyTurn): RuleEffect {
 }
 
 export function fleeIntoRock(turn: EnemyTurn): RuleEffect {
-  const { state, enemy, terrain, tick } = turn
+  const { state, enemy, tick } = turn
   const chaser = nearestVehicleInSight(state, enemy, tick)
   if (chaser === null) return fleeAway(state, enemy, tick)
-  return updated(state, runningFrom(terrain, enemy, chaser))
+  return updated(state, runningFrom(turn, enemy, chaser))
 }
 
 function isVehicleWithinFleeReach({ state, enemy, tick }: EnemyTurn): boolean {
@@ -101,10 +107,11 @@ function fleeAway(state: AuthorityState, enemy: Enemy, tick: number): RuleEffect
   }
 }
 
-/** One walking step straight away from the chasing vehicle, or none where the edge stops it. */
-function runningFrom(terrain: Terrain, enemy: Enemy, chaser: MillimetrePoint): Enemy {
-  const running = { ...enemy, step: stepAwayFrom(enemy, chaser, walkStepMmOf(enemy)) }
-  return stepAlong(terrain, running) ?? running
+/** One slowed walking step straight away from the chaser, or none where the edge stops it. */
+function runningFrom(ground: StepGround, enemy: Enemy, chaser: MillimetrePoint): Enemy {
+  const step = stepAwayFrom(enemy, chaser, slowedWalkStepMmOf(ground, enemy))
+  const running = { ...enemy, step }
+  return stepAlong(ground.terrain, running) ?? running
 }
 
 /** The nearest vehicle within `ignoreVehicleTiles`; vehicles at the same distance keep id order. */

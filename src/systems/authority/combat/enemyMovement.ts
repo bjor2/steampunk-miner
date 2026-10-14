@@ -8,16 +8,19 @@
  *
  * Walking is greedy: straight at the target, or along one axis when the straight step is blocked.
  * Lunges and recoils keep the step fixed when they start and stop at the first blocked cell.
- * Speeds are the #6 bounded stats as whole mm per tick.
+ * Speeds are the #6 bounded stats as whole mm per tick; a slice's slow (`enemyStepModifiers`,
+ * ticket 375) shortens a walking step each tick, and a lunge or recoil step when it starts.
  */
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../../constants/physics'
 import type { EnemyKind } from '../../economy/economyDefinition'
 import { enemyBoundedStats } from '../../economy/enemyStats'
+import { modifiedEnemyStepMm } from '../../registries/enemyStepModifiers'
 import { tileOfMillimetres } from '../../vehicle/vehiclePose'
 import { isInsidePlanet } from '../../world/planetGeometry'
 import type { PlanetParams } from '../../world/planetParams'
 import { CELL_KIND, kindOfCell } from '../../world/worldCell'
 import { cellAt, type WorldState } from '../../world/worldState'
+import type { AuthorityState } from '../authorityState'
 import type { MillimetrePoint } from './combatGeometry'
 import { stepToward } from './combatGeometry'
 import type { Enemy, MillimetreStep } from './combatState'
@@ -25,6 +28,13 @@ import type { Enemy, MillimetreStep } from './combatState'
 export interface Terrain {
   world: WorldState
   params: PlanetParams
+}
+
+/** What a step reads beyond the enemy: the state its slows answer from, the ground, the tick. */
+export interface StepGround {
+  state: AuthorityState
+  terrain: Terrain
+  tick: number
 }
 
 export function walkStepMmOf(enemy: Enemy): number {
@@ -37,9 +47,20 @@ export function lungeStepMmOf(enemy: Enemy): number {
   return Math.floor((lungeTiles * MM_PER_METRE) / lungeTicks)
 }
 
-/** One walking step toward `target`, or the enemy unmoved when every greedy step is blocked. */
-export function walkToward(terrain: Terrain, enemy: Enemy, target: MillimetrePoint): Enemy {
-  const step = stepToward(enemy, target, walkStepMmOf(enemy))
+/** This tick's walking step after the strongest slice slow (ticket 375). */
+export function slowedWalkStepMmOf({ state, tick }: StepGround, enemy: Enemy): number {
+  return modifiedEnemyStepMm(state, enemy, tick, walkStepMmOf(enemy))
+}
+
+/** The lunge step, after the strongest slice slow when the lunge starts (ticket 375). */
+export function slowedLungeStepMmOf({ state, tick }: StepGround, enemy: Enemy): number {
+  return modifiedEnemyStepMm(state, enemy, tick, lungeStepMmOf(enemy))
+}
+
+/** One slowed walking step toward `target`, or the enemy unmoved when every greedy step blocks. */
+export function walkToward(ground: StepGround, enemy: Enemy, target: MillimetrePoint): Enemy {
+  const { terrain } = ground
+  const step = stepToward(enemy, target, slowedWalkStepMmOf(ground, enemy))
   const tries: MillimetreStep[] = [step, ...axisStepsOf(step)]
   const open = tries.find((candidate) => canEnter(terrain, enemy.kind, movedBy(enemy, candidate)))
   return open === undefined ? enemy : { ...enemy, ...movedBy(enemy, open) }

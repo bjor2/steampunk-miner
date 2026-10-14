@@ -34,6 +34,7 @@ import type { LiveBeaconProvider } from '../systems/registries/liveBeacon'
 import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectionModifiers'
 import type { EnemyLureSource } from '../systems/registries/enemyLures'
+import type { EnemyStepModifier } from '../systems/registries/enemyStepModifiers'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { ReinforcementProvider } from '../systems/registries/groundReinforcement'
@@ -116,6 +117,11 @@ export interface SliceRegistrar {
    * reach paths to its cell until it ends (ticket 361).
    */
   enemyLure(source: EnemyLureSource): void
+  /**
+   * Slows an enemy's walk, lunge or recoil step; the strongest slow wins, never stacked
+   * (ticket 375).
+   */
+  enemyStepModifier(modifier: EnemyStepModifier): void
   /** Vents the heat gauge and pauses heat gain for windows the slice keeps (ticket 233). */
   heatPause(pause: HeatPause): void
   /**
