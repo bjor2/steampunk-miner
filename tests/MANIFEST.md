@@ -232,7 +232,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ores/systems/oreRows.test.ts` | 3 | 3 |
 | `src/features/ores/systems/oreTypeProvider.test.ts` | 6 | 6 |
 
-### `planet-mix`: 22 files, 121 tests
+### `planet-mix`: 23 files, 124 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -251,6 +251,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/oreMix.test.ts` | 13 | 13 |
 | `src/features/planet-mix/systems/planetActs.test.ts` | 13 | 13 |
 | `src/features/planet-mix/systems/planetCard.test.ts` | 4 | 4 |
+| `src/features/planet-mix/systems/planetCardSources.test.ts` | 3 | 3 |
 | `src/features/planet-mix/systems/planetClass.test.ts` | 6 | 6 |
 | `src/features/planet-mix/systems/render/auroraBand.test.ts` | 3 | 3 |
 | `src/features/planet-mix/systems/render/fieldArcBuffer.test.ts` | 7 | 7 |
@@ -749,6 +750,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/itemHooks.test.ts` | 13 | 13 |
 | `src/systems/registries/oreLook.test.ts` | 2 | 2 |
 | `src/systems/registries/oreTypes.test.ts` | 12 | 12 |
+| `src/systems/registries/planetCardLines.test.ts` | 9 | 9 |
 | `src/systems/registries/planetSkyBand.test.ts` | 5 | 5 |
 | `src/systems/registries/saveSections.test.ts` | 3 | 3 |
 | `src/systems/registries/scheduleRows.test.ts` | 4 | 4 |
@@ -873,6 +875,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/padRuntime.test.ts` | 16 | 14 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
 | `src/store/perfLog.test.ts` | 6 | 6 |
+| `src/store/planetCardSlice.test.ts` | 5 | 5 |
 | `src/store/platformLoop.test.ts` | 4 | 4 |
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
@@ -1029,6 +1032,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/itemCardText.test.ts` | 4 | 4 |
 | `src/systems/views/menuFocus.test.ts` | 2 | 2 |
 | `src/systems/views/overlaySeats.test.ts` | 5 | 5 |
+| `src/systems/views/planetCardView.test.ts` | 1 | 1 |
 | `src/systems/views/plaqueModel.test.ts` | 6 | 6 |
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |
 | `src/systems/views/screenLayout.test.ts` | 14 | 14 |
