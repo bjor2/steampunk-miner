@@ -375,7 +375,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   movers until their ledger ticket (#408) lands, printed and not gated. A band the tip only skids on is not
   judged. The lane also fails an item over 15% of what the bot earned on any planet of the run
   (`systems/deliveredIncomeShares.ts`, the Vertical Scaler's guard), and `incomeCapGolden.test.ts`
-  pins the shares on the on-curve vehicle. Also
+  pins the shares on the on-curve vehicle. The **Mark milestone cap** (GD lock on #256, ticket 278) judges the same runs the same way with each item's sibling-link added to it
+  (`milestoneIncomeCapVerdictsOf`): every income item at Mark 9 and past, fully stacked, the link
+  on and the sibling slotted and ready, owned whatever the bot bought; a rate whose last Mark
+  reaches its link says what the link adds (`linkValuePerMinuteAtFullStack`, today only the
+  ore-shifter's half-cap lodestone beacon; the pocket lance's splitter fissure moves no ore).
+  `npm run balance:tree -- --milestones` (`scripts/balanceTree.mjs`) runs only that check; the
+  golden pins its shares too and guards that every item reaching a link declares it. Its
+  non-yield checks are unit specs on the three pacing seeds: the drain's second tap takes the
+  same cells and ore as a plain use (`extraction/systems/nonYieldVerbs.test.ts`), and no terrain
+  tool's hold or second tap moves more ore or edits more cells in a use than a plain use may
+  (`terrain-tools/systems/nonYieldVerbs.test.ts`). Also
   report-only, each of the six lanes' median share of every planet's spend, zero included
   (`laneShareRowsOf` in `systems/nodeSpendShare.ts`, ticket 266): lanes carry no bands of their own
   (GD ruling Q4 on #212), so the sixth lane's share comes out of the gated tree total. Gated beside

@@ -187,7 +187,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 
-### `extraction`: 17 files, 87 tests
+### `extraction`: 18 files, 90 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -205,6 +205,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/extractionFork.test.ts` | 8 | 8 |
 | `src/features/extraction/systems/extractionItems.test.ts` | 8 | 8 |
 | `src/features/extraction/systems/extractionSales.test.ts` | 3 | 3 |
+| `src/features/extraction/systems/nonYieldVerbs.test.ts` | 3 | 1 |
 | `src/features/extraction/systems/statPreview.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
@@ -437,7 +438,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 54 files, 386 tests
+### `tech-tree`: 54 files, 392 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -446,7 +447,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/forkBranches.vision.test.ts` | 3 | 3 |
 | `src/features/tech-tree/forkMix.lane.test.ts` | 5 | 5 |
 | `src/features/tech-tree/forkMixRuns.test.ts` | 7 | 7 |
-| `src/features/tech-tree/incomeCapGolden.test.ts` | 3 | 3 |
+| `src/features/tech-tree/incomeCapGolden.test.ts` | 6 | 6 |
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
@@ -465,7 +466,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/forkPace.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/forkRechoice.spend.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/generatedCombos.test.ts` | 10 | 10 |
-| `src/features/tech-tree/systems/incomeCapCheck.test.ts` | 16 | 16 |
+| `src/features/tech-tree/systems/incomeCapCheck.test.ts` | 18 | 18 |
 | `src/features/tech-tree/systems/itemDescriber.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
@@ -492,11 +493,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/treeShape.test.ts` | 18 | 18 |
 | `src/features/tech-tree/systems/treeSpendGuard.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 20 | 20 |
-| `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 6 | 6 |
+| `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 7 | 7 |
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 
-### `terrain-tools`: 43 files, 351 tests
+### `terrain-tools`: 44 files, 358 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -507,7 +508,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/magnetGuard.test.ts` | 6 | 6 |
 | `src/features/terrain-tools/magnetHand.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/magnetPace.test.ts` | 6 | 3 |
-| `src/features/terrain-tools/moverIncomeRates.test.ts` | 5 | 5 |
+| `src/features/terrain-tools/moverIncomeRates.test.ts` | 8 | 8 |
 | `src/features/terrain-tools/sceneBudget.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/shippedRows.test.ts` | 8 | 8 |
 | `src/features/terrain-tools/store/clampRelease.test.ts` | 2 | 2 |
@@ -524,6 +525,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/magnetItems.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/magnetSpend.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/marksInPlay.test.ts` | 1 | 1 |
+| `src/features/terrain-tools/systems/nonYieldVerbs.test.ts` | 4 | 1 |
 | `src/features/terrain-tools/systems/oreLure.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/oreShifter.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/systems/pressurePocket.test.ts` | 3 | 3 |
@@ -947,7 +949,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/heatPauses.test.ts` | 4 | 4 |
 | `src/systems/registries/hookSeed.test.ts` | 4 | 4 |
 | `src/systems/registries/hullDamageIntercepts.test.ts` | 5 | 5 |
-| `src/systems/registries/incomeRates.test.ts` | 16 | 16 |
+| `src/systems/registries/incomeRates.test.ts` | 20 | 20 |
 | `src/systems/registries/itemDescriber.test.ts` | 7 | 7 |
 | `src/systems/registries/itemDescriptionEntries.test.ts` | 5 | 5 |
 | `src/systems/registries/itemHooks.test.ts` | 13 | 13 |
