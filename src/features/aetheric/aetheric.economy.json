@@ -1,0 +1,19 @@
+{
+  "source": "The GD lock on #245 (Aetheric science lane): every aetheric item spends energy or heat, never yield, and its range, duration, chain count, condense ratio and cooldowns live here under tech.aetheric. Prices are spec #162 4.1's one-off (k 15 band-5 ore at the unlock planet), charges and cooldown 4.2's charged-item shape. The resonance whistle (#262) is a stand-in for Systems to set, not tuned: two charges a dock and the steam shield's 900-tick cooldown; a 3-tick wind-up (2.3 allows 6) so a hunter turns within the lock's 6 ticks of the press, the act landing after the enemies' step; an 8-tile reach from the whistle's cell, the grapple's range; 300 ticks (5 s) of lure, the smoke canister's window, which the Mark magnitude step grows; one energy unit (240 quanta) a blow, two auto-gun shots.",
+  "tech": {
+    "aetheric": {
+      "price": {
+        "band": 5,
+        "oreUnits": "15"
+      },
+      "resonanceWhistle": {
+        "charges": 2,
+        "cooldownTicks": 900,
+        "windupTicks": 3,
+        "reachTiles": 8,
+        "durationTicks": 300,
+        "energyQuanta": 240
+      }
+    }
+  }
+}

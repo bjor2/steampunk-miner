@@ -17,10 +17,11 @@ import type { Lure } from '../enemies/lureTarget'
 import { FACING } from '../vehicle/vehiclePose'
 
 // A slice's lure draws hunters off the vehicle while it sounds (ticket 361, the #262 split), only
-// with the dev flag `enemy.lureRetarget` on. Fake slices register through withRegistrations, so no
-// real slice is imported.
+// with the dev flag `enemy.lureRetarget` on, as it is since the resonance whistle shipped (#262).
+// Fake slices register through withRegistrations, so no real slice is imported.
 
 const LURE_ON: AuthorityDevFlags = { ...AUTHORITY_DEV_FLAGS, 'enemy.lureRetarget': true }
+const LURE_OFF: AuthorityDevFlags = { ...AUTHORITY_DEV_FLAGS, 'enemy.lureRetarget': false }
 
 /** Five tiles left of the vehicle: past a crawler's 4-tile lunge, so it walks to the vehicle. */
 const SPAWN_DX = -5
@@ -43,6 +44,12 @@ function whistleSlice(fromTick: number, untilTick: number, reachMm = LURE_REACH_
     id: 'whistle',
     register: (r) => r.enemyLure({ id: 'whistle.lure', luresAt: (_, tick) => luresAt(tick) }),
   } satisfies SliceDefinition
+}
+
+/** A slice that never sounds a lure. */
+const silentSlice: SliceDefinition = {
+  id: 'silent',
+  register: (r) => r.enemyLure({ id: 'silent.lure', luresAt: () => [] }),
 }
 
 /** A slice whose lures may never be asked for. */
@@ -123,11 +130,19 @@ describe('enemy lures', () => {
   })
 
   it('steps exactly as with nothing registered while the flag is off', () => {
-    const flagOff = crawlerXsWith([whistleSlice(SOUNDS_FROM, SOUNDS_UNTIL)], AUTHORITY_DEV_FLAGS)
-    expect(flagOff).toEqual(crawlerXsWith([], AUTHORITY_DEV_FLAGS))
+    const flagOff = crawlerXsWith([whistleSlice(SOUNDS_FROM, SOUNDS_UNTIL)], LURE_OFF)
+    expect(flagOff).toEqual(crawlerXsWith([], LURE_OFF))
   })
 
-  it('never asks a lure source while the flag is off, so a session plays as before', () => {
+  it('never asks a lure source while the flag is off', () => {
+    expect(crawlerXsWith([unaskedSlice], LURE_OFF)).toEqual(crawlerXsWith([], LURE_OFF))
+  })
+
+  it('turns the flag on by default since the whistle shipped (#262)', () => {
+    expect(AUTHORITY_DEV_FLAGS['enemy.lureRetarget']).toBe(true)
+  })
+
+  it('plays a session with no lure sounding as it plays with no lure source', () => {
     const fightWith = (slices: readonly SliceDefinition[]) =>
       withRegistrations(slices, () => {
         const session = createScriptedSession()
@@ -136,6 +151,6 @@ describe('enemy lures', () => {
         session.advanceTo(start + 120)
         return stateDigest(session.state())
       })
-    expect(fightWith([unaskedSlice])).toBe(fightWith([]))
+    expect(fightWith([silentSlice])).toBe(fightWith([]))
   })
 })

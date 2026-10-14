@@ -3,9 +3,17 @@
  * researched at the `research_lab` and refused `no_lab` before it stands, and two shared lane
  * nodes on P24 and P29 that need only the entry node, so a P16 fork re-choice (#255) strands
  * neither. Every item adds a verb and spends energy or heat, never yield; the items, their Mark
- * ladders and their numbers come with their own builds (#262, #263), the P16 fork pair with #261.
+ * ladders and their numbers come with their own builds: the whistle's with #262, the later two
+ * with #263, the P16 fork pair with #261.
  */
 import type { TechNode } from '../../tech-tree'
+import {
+  WHISTLE_DESCRIPTION,
+  WHISTLE_ID,
+  WHISTLE_NAME,
+  WHISTLE_UNLOCK_PLANET,
+  whistleMarkLadder,
+} from './whistleItem'
 
 const ENTRY_NODE_ID = 'tech.aetheric.resonance_whistle'
 
@@ -14,14 +22,15 @@ export const AETHERIC_TECH_NODES: readonly TechNode[] = [
     id: ENTRY_NODE_ID,
     iconId: 'node-aetheric-resonance-whistle',
     lane: 'aetheric',
-    name: 'Resonance whistle',
-    unlockTier: 15,
+    name: WHISTLE_NAME,
+    unlockTier: WHISTLE_UNLOCK_PLANET,
     prereqs: [],
     researchedAt: 'research_lab',
-    unlocks: 'power.resonance_whistle',
-    description: 'A brass whistle on the boiler stack sings a note that calls enemies away.',
+    unlocks: WHISTLE_ID,
+    description: WHISTLE_DESCRIPTION,
     label: 'horizontal',
     costKind: 'capability',
+    marks: whistleMarkLadder(),
   },
   {
     id: 'tech.aetheric.chronometric_governor',
