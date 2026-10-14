@@ -81,5 +81,10 @@
       "spellBoostBp": 2000,
       "linkedStrengthBp": 5000
     }
+  },
+  "forks": {
+    "source": "The P16 fork's branches (GD lock on #255, ticket 268), this slice's readings: Agile's lift and drive off the ground at half the kernel's +2000 bp motion cap, so a boost or a dropped ballast keeps room under it; Armoured's grounded hits at three quarters, above the kernel's 50% damage floor; and, once the shields row is open, its steam curtain standing one second longer.",
+    "agile": { "airBoostBp": 1000 },
+    "armoured": { "groundedDamageScaleBp": 7500, "curtainExtraTicks": 60 }
   }
 }

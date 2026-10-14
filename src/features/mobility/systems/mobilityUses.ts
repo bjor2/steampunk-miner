@@ -27,6 +27,7 @@ import { belayLineOf, isGrappleTwisted } from './belayLine'
 import { grappleHookOf, type GrappleHook } from './grappleHook'
 import { grappleHookedOf, NO_HOOK } from './mobilityEvents'
 import { MOBILITY_ECONOMY, type BurstNumbers } from './mobilityEconomy'
+import { armouredCurtainTicksOf } from './mobilityFork'
 import {
   mobilityOf,
   unsettledHeatSinksOf,
@@ -150,14 +151,17 @@ export const fireEscapeThruster: Activate = (state, use) =>
 
 /**
  * A steam curtain for a short window: enemy hits and collapse crush are turned aside. A curtain
- * already standing longer (a linked half curtain's, or a held one) is never cut short.
+ * already standing longer (a linked half curtain's, or a held one) is never cut short. An
+ * Armoured miner's stands longer once the shields row is open (the P16 fork, ticket 268).
  */
 export const raiseSteamShield: Activate = (state, use) =>
   actedWith(state, use, (value) => ({
     ...value,
     shieldUntilTick: Math.max(
       value.shieldUntilTick,
-      use.tick + magnitudeOf(use, NUMBERS.steamShield.windowTicks),
+      use.tick +
+        magnitudeOf(use, NUMBERS.steamShield.windowTicks) +
+        armouredCurtainTicksOf(state, use.playerId),
     ),
   }))
 

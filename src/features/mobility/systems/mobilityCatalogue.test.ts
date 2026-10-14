@@ -24,7 +24,10 @@ describe('mobility catalogue', () => {
     const powerUps = contentOf('power-up').map((powerUp) => powerUp.itemId)
     expect(ITEM_IDS.filter((id) => !vehicleItems.includes(id))).toEqual([])
     expect(ITEM_IDS.filter((id) => !powerUps.includes(id))).toEqual([])
-    const lane = contentOf('tech-node').filter((node) => node.lane === 'mobility')
+    // The P16 fork's two branches (ticket 268) are lane nodes too, with no store item.
+    const lane = contentOf('tech-node').filter(
+      (node) => node.lane === 'mobility' && !node.id.startsWith('tech.mobility.fork.'),
+    )
     expect(lane.map((node) => node.id)).toHaveLength(11)
     expect(nodeOf(THIRD_CRADLE)).toMatchObject({ id: 'tech.mobility.cradle_3', label: 'both' })
   })

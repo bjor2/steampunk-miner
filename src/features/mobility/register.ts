@@ -7,7 +7,9 @@
  * patch's hold cues (ticket 253), and their Mark milestone verbs (ticket 275), and the steam
  * shield acting on its own through the `autoFire` hook on #317's auto core, switched with the
  * sear's toggle (ticket 328), and the Belay Line twist's standing line through the kernel `twist`
- * hook (ticket 329). No side effects at import; the loader calls `register`.
+ * hook (ticket 329), and the lane's P16 fork (ticket 268): the Agile and Armoured branches, Agile's
+ * lift and drive off the ground and Armoured's grounded hits. No side effects at import; the
+ * loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { mobilityDebugActions } from './debug'
@@ -17,6 +19,7 @@ import { MOBILITY_EFFECTS_STEP } from './systems/effectClock'
 import { MOBILITY_ITEM_CARDS } from './systems/itemCards'
 import { MILESTONE_MOTION } from './systems/milestoneMoves'
 import { MOBILITY_TECH_NODES, MOBILITY_VEHICLE_ITEMS } from './systems/mobilityContent'
+import { AGILE_AIR_MOTION, ARMOURED_GROUNDED_INTERCEPT } from './systems/mobilityFork'
 import {
   ANCHOR_MOTION,
   BALLAST_MOTION,
@@ -53,8 +56,10 @@ export const slice: SliceDefinition = {
       ESCAPE_MOTION,
       REEL_MOTION,
       MILESTONE_MOTION,
+      AGILE_AIR_MOTION,
     ].forEach((source) => r.vehicleMotionEffect(source))
     r.hullDamageIntercept(STEAM_SHIELD_INTERCEPT)
+    r.hullDamageIntercept(ARMOURED_GROUNDED_INTERCEPT)
     r.enemyDetectionModifier(SMOKE_DETECTION)
     r.heatPause(HEAT_SINK_PAUSE)
     r.slotHoldCue(RIVET_HOLD_CUES)
