@@ -1,12 +1,13 @@
 /**
  * Which chunk meshes a frame builds (#4: terrain updates under 2 ms a frame, at most
- * `CHUNK_BUILDS_PER_FRAME`; TD scope on #316, ticket 330). Of the chunks that need a build,
+ * `chunkBuildsPerFrame`; TD scope on #316, tickets 330 and 336). Of the chunks that need a build,
  * nearest first within each group:
  *
  * 1. visible chunks with no mesh yet, so a chunk coming into view waits only on other new ones;
  * 2. visible chunks whose mesh is stale, each at most once in `CHUNK_REBUILD_MIN_FRAMES` frames,
  *    so a chunk the drill cuts every tick cannot take every build;
- * 3. chunks ahead of the view (`chunkPrefetch`), built early on the same terms.
+ * 3. chunks ahead of the view (`chunkPrefetch`), in the order the view reaches them, built early on
+ *    the same terms.
  *
  * A chunk left out keeps its need and is asked again next frame.
  */
@@ -15,6 +16,8 @@ import { CHUNK_REBUILD_MIN_FRAMES } from '../../constants/scene'
 /** A chunk that needs a build, as the frame sees it. */
 export interface ChunkBuildNeed {
   key: string
+  cx: number
+  cy: number
   isVisible: boolean
   /** It has a mesh now (a stale one). */
   isBuilt: boolean
@@ -22,7 +25,7 @@ export interface ChunkBuildNeed {
   builtFrame: number
 }
 
-/** The needs this frame builds, at most `budget`, in build order; `needs` come nearest first. */
+/** The needs this frame builds, at most `budget`, in build order; `needs` come in their order. */
 export function chunksToBuild<N extends ChunkBuildNeed>(
   needs: readonly N[],
   frame: number,

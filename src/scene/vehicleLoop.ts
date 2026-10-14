@@ -227,10 +227,12 @@ function showDrill(result: VehicleStepResult): void {
   drillPresence.nose.y = nose.ty + HALF_TILE
 }
 
-/** Hands the step's speed and lift to the sound stage. */
+/** Hands the step's speed and lift to the sound stage, its velocity to the terrain's streaming. */
 function showMotion(result: VehicleStepResult): void {
   const { vx, vy } = result.pose
   motionPresence.speedMetresPerSecond = Math.sqrt(vx * vx + vy * vy) / MM_PER_METRE
+  motionPresence.velocity.x = vx / MM_PER_METRE
+  motionPresence.velocity.y = vy / MM_PER_METRE
   motionPresence.isLifting = result.flags.isThrusting
 }
 

@@ -30,7 +30,7 @@ export interface WorldState {
 export const EMPTY_WORLD: WorldState = { chunks: {} }
 
 /** Generated chunks held for the authority's lookups; touched chunks stay (see chunkCache). */
-const CACHED_CHUNKS = 64
+export const CACHED_CHUNKS = 64
 
 let cacheOfPlanet: { params: PlanetParams; cache: ChunkCache } | null = null
 

@@ -152,11 +152,16 @@ export const SCENE_LAYER_LINE = { drawCalls: 27, instances: 1088 } as const
 /** At most this many live ground colliders (#4, #22 acceptance, #36 acceptance 7). */
 export const MAX_GROUND_COLLIDERS = 600
 
+/** The terrain's main-thread work per frame (#4 "terrain updates under 2 ms per frame"). */
+export const TERRAIN_FRAME_BUDGET_MS = 2
+
 /**
- * Chunk meshes rebuilt per frame, nearest first: one chunk's batch is well under the 2 ms
- * terrain budget of #4, and a full screen refills in 16 frames.
+ * Chunk meshes built per frame, scaled with speed (TD scope c1 on #316, ticket 336):
+ * `clamp(ceil(newChunksPerSecond / 45), 1, 4)`, all under `TERRAIN_FRAME_BUDGET_MS`. One build a
+ * frame streams new chunks up to about 480 m/s at the 20 m zoom-out; four, about 1,920 m/s.
  */
-export const CHUNK_BUILDS_PER_FRAME = 1
+export const CHUNK_BUILDS_PER_FRAME_MIN = 1
+export const CHUNK_BUILDS_PER_FRAME_MAX = 4
 
 /**
  * A chunk already built is rebuilt at most once in this many frames (TD scope on #316, ticket
@@ -165,12 +170,30 @@ export const CHUNK_BUILDS_PER_FRAME = 1
  */
 export const CHUNK_REBUILD_MIN_FRAMES = 4
 
+/** The frame rate the streaming numbers of TD scope c1 on #316 are worked at (ticket 336). */
+export const CHUNK_STREAM_FRAMES_PER_SECOND = 60
+
+/**
+ * New chunks a second one build a frame keeps up with (TD scope c1 on #316, ticket 336): 60 builds
+ * a second less the drilled chunk's 15 (one in `CHUNK_REBUILD_MIN_FRAMES`), the 45 of
+ * `buildsPerFrame = ceil(newChunksPerSecond / 45)`.
+ */
+export const NEW_CHUNKS_PER_SECOND_PER_BUILD =
+  CHUNK_STREAM_FRAMES_PER_SECOND - CHUNK_STREAM_FRAMES_PER_SECOND / CHUNK_REBUILD_MIN_FRAMES
+
 /**
  * Chunks are built ahead of the view (TD scope on #316, ticket 330): the view circle moved this
  * far along the drill's facing, one chunk, so a rig drilling at speed meets chunks already built.
  * They are built only with the frame's builds left over, and drawn once they come into view.
  */
 export const CHUNK_PREFETCH_AHEAD_M = 32
+
+/**
+ * At speed, chunks are also built along the velocity out to `speed x lead`, the lead at least this
+ * long (TD scope c1 on #316, ticket 336: `T_lead = max(2 s, queue latency)`, the hazard strip's 2 s
+ * window and the Vertical Scaler's "at least v x 2 s").
+ */
+export const CHUNK_PREFETCH_LEAD_MIN_SECONDS = 2
 
 /** The background fades from sky to the underground dark over this many tiles of depth. */
 export const SKY_FADE_DEPTH_TILES = 12

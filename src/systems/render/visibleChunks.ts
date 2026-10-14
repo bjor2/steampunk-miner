@@ -66,15 +66,21 @@ function isSquareWorthDrawing(
   planetRadiusTiles: number,
 ): boolean {
   const isInView = squareDistanceSq(square, side, centre) <= viewRadius * viewRadius
+  return isInView && isSquareOnPlanet(square, side, planetRadiusTiles)
+}
+
+/** Whether the square holds a tile of the planet's disc. */
+export function isSquareOnPlanet(
+  square: GridSquare,
+  side: number,
+  planetRadiusTiles: number,
+): boolean {
   const planetCentre = { x: 0, y: 0 }
-  return (
-    isInView &&
-    squareDistanceSq(square, side, planetCentre) <= planetRadiusTiles * planetRadiusTiles
-  )
+  return squareDistanceSq(square, side, planetCentre) <= planetRadiusTiles * planetRadiusTiles
 }
 
 /** Squared distance from a point to the nearest point of the square. */
-function squareDistanceSq(square: GridSquare, side: number, point: Vector2): number {
+export function squareDistanceSq(square: GridSquare, side: number, point: Vector2): number {
   const dx = gapToSpan(point.x, square.column * side, side)
   const dy = gapToSpan(point.y, square.row * side, side)
   return dx * dx + dy * dy

@@ -15,6 +15,7 @@ import { EMPTY_WORLD } from '../systems/world/worldState'
 import { createChunkMeshPool, type ChunkMeshPool, type TerrainView } from './chunkMeshPool'
 import { drillPresence } from './drillPresence'
 import { lightPresence } from './lightPresence'
+import { motionPresence } from './motionPresence'
 import { renderPresence } from './renderPresence'
 import { GroundStrata } from './GroundStrata'
 import { HeatTiles } from './HeatTiles'
@@ -98,6 +99,7 @@ function createTerrainViewScratch(): TerrainView {
     centre: vehiclePresence,
     viewRadius: 0,
     ahead: drillPresence.ahead,
+    velocity: motionPresence.velocity,
   }
 }
 

@@ -1,6 +1,7 @@
 /**
- * Which chunk meshes need a build (#4 Rendering; TD scope on #316, ticket 330): the visible chunks,
- * then those ahead along the drill's facing, each missing its mesh or showing a stale view. A mesh
+ * Which chunk meshes need a build (#4 Rendering; TD scope on #316, tickets 330 and 336): the visible
+ * chunks, then those ahead along the velocity and the drill's facing, each missing its mesh or
+ * showing a stale view. A mesh
  * whose neighbours changed only away from its halo's edge is still current: it takes the new
  * version and is not rebuilt, so a cut inside a chunk rebuilds that chunk alone. Split from
  * `chunkMeshPool.ts`, which builds what `chunksToBuild` picks of these.
@@ -47,7 +48,10 @@ export interface AheadView {
   params: PlanetParams
   centre: Vector2
   viewRadius: number
+  /** The drill's facing, a unit vector. */
   ahead: Vector2
+  /** The rig's velocity, metres a second. */
+  velocity: Vector2
 }
 
 /** A chunk that needs a build, with what building it takes. */
@@ -56,13 +60,23 @@ export interface ChunkNeed extends ChunkBuildNeed {
   version: ChunkViewVersion
 }
 
-/** The chunks ahead along the drill's facing, built with no block shown until they come into view. */
-export function aheadChunksOf(view: AheadView): ShownChunk[] {
-  const ahead = chunksAheadOf(view.centre, view.viewRadius, view.ahead, view.params.radiusTiles)
+/**
+ * The chunks ahead along the velocity, `leadSeconds` of it, and the drill's facing, built with no
+ * block shown until they come into view.
+ */
+export function aheadChunksOf(view: AheadView, leadSeconds: number): ShownChunk[] {
+  const ahead = chunksAheadOf({
+    centre: view.centre,
+    viewRadius: view.viewRadius,
+    velocity: view.velocity,
+    facing: view.ahead,
+    leadSeconds,
+    planetRadiusTiles: view.params.radiusTiles,
+  })
   return ahead.map(({ cx, cy }) => ({ cx, cy, blockMask: 0 }))
 }
 
-/** The visible chunks, then the ahead ones, nearest first, whose mesh is missing or stale. */
+/** The visible chunks nearest first, then the ahead ones in order, whose mesh is missing or stale. */
 export function chunkNeedsOf(chunks: ChunksToKeep, view: NeedView): ChunkNeed[] {
   return [
     ...chunks.visible.flatMap((shown) => needOf(chunks.meshes, view, shown, true)),
@@ -81,7 +95,8 @@ function needOf(
   const current = meshes.get(key)
   if (current !== undefined && isCurrentAfterAdopting(current, version, view)) return []
   const builtFrame = current?.builtFrame ?? 0
-  return [{ key, isVisible, isBuilt: current !== undefined, builtFrame, shown, version }]
+  const { cx, cy } = shown
+  return [{ key, cx, cy, isVisible, isBuilt: current !== undefined, builtFrame, shown, version }]
 }
 
 /**

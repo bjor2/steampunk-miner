@@ -5,6 +5,7 @@
  * Row-major, `DENSITY_HALO_SIDE` wide; the shader samples it as a texture.
  */
 import { CHUNK_SAMPLE_SIDE, sampleIndexOf } from '../world/sampleGrid'
+import type { ChunkPoint } from './visibleChunks'
 
 export const DENSITY_HALO_SIDE = CHUNK_SAMPLE_SIDE + 1
 
@@ -30,6 +31,19 @@ export function isHaloEdgeCurrent(
     if (halo[top + lsx] !== above[lsx]) return false
   }
   return halo[top + CHUNK_SAMPLE_SIDE] === densityOf(cx + 1, cy + 1)[0]
+}
+
+/**
+ * The chunks whose density a halo reads: its own, the right, the upper and the upper-right one.
+ * Generating them ahead keeps a cold chunk's generation out of its mesh build (ticket 336).
+ */
+export function haloChunksOf(cx: number, cy: number): ChunkPoint[] {
+  return [
+    { cx, cy },
+    { cx: cx + 1, cy },
+    { cx, cy: cy + 1 },
+    { cx: cx + 1, cy: cy + 1 },
+  ]
 }
 
 /** The current density of any chunk; callers only read it. */

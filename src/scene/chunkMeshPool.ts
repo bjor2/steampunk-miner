@@ -6,12 +6,14 @@
  * rules in `systems/render`; this module turns them into three objects.
  *
  * Work happens only when something changed: the visible set is recomputed when the camera enters
- * another tile or the screen is resized (a changed block set only copies instance runs), chunk versions are checked when the world changes, and
- * at most `CHUNK_BUILDS_PER_FRAME` chunks are built per frame (#4: terrain updates under 2 ms per
- * frame), in `chunksToBuild`'s order: chunks coming into view first, then stale ones, each rebuilt
- * at most once in 4 frames, then the chunks ahead along the drill's facing (ticket 330). A chunk
- * whose neighbours changed only away from its halo's edge keeps its mesh. A frame where nothing
- * changed allocates nothing.
+ * another tile or the screen is resized (a changed block set only copies instance runs), chunk
+ * versions are checked when the world changes, and a frame's chunk work runs under the 2 ms of #4
+ * (`chunkFrameWorkOf`, ticket 336): the generation the picked builds' halos lack, then at most
+ * `chunkBuildsPerFrame` builds, more the faster the rig goes, in `chunksToBuild`'s order: chunks
+ * coming into view first, then stale ones, each rebuilt at most once in 4 frames, then the chunks
+ * ahead along the velocity and the drill's facing (tickets 330 and 336). A chunk whose neighbours
+ * changed only away from its halo's edge keeps its mesh. A frame where nothing changed allocates
+ * nothing.
  */
 import {
   Mesh,
@@ -20,9 +22,9 @@ import {
   type InstancedBufferGeometry,
   type ShaderMaterial,
 } from 'three'
-import { CHUNK_BUILDS_PER_FRAME } from '../constants/scene'
-import { chunksToBuild } from '../systems/render/chunkBuilds'
+import { prefetchLeadSeconds } from '../systems/render/chunkBuildBudget'
 import { aheadChunksOf, chunkNeedsOf, type ChunkNeed } from './chunkBuildNeeds'
+import { buildsPerFrameOf, streamChunkFrame } from './chunkStreamFrame'
 import {
   densityTextureOf,
   emptyInstances,
@@ -65,6 +67,8 @@ export interface TerrainView {
   viewRadius: number
   /** The drill's facing as a unit vector: chunks this way are built ahead of the view. */
   ahead: Vector2
+  /** The rig's velocity, metres a second: chunks along it are built ahead too (ticket 336). */
+  velocity: Vector2
 }
 
 export interface ChunkMeshPool {
@@ -103,6 +107,8 @@ interface PoolState {
   ahead: ShownChunk[]
   /** Frames synced so far: the clock of the rebuild cap. */
   frame: number
+  /** Chunks that needed a build last frame: the queue the prefetch lead outruns. */
+  queueLength: number
   tileX: number
   tileY: number
   viewRadius: number
@@ -117,6 +123,7 @@ export function createChunkMeshPool(parent: Group, material: ShaderMaterial): Ch
     visible: [],
     ahead: [],
     frame: 0,
+    queueLength: 0,
     tileX: Number.NaN,
     tileY: Number.NaN,
     viewRadius: Number.NaN,
@@ -177,7 +184,7 @@ function chooseVisible(pool: PoolState, parent: Group, view: TerrainView): void 
   pool.params = view.params
   const blocks = visibleGroundBlocksAround(view.centre, view.viewRadius, view.params.radiusTiles)
   pool.visible = shownChunksOf(blocks)
-  pool.ahead = aheadChunksOf(view)
+  pool.ahead = aheadChunksOf(view, prefetchLeadSeconds(pool.queueLength, buildsPerFrameOf(view)))
   dropHidden(pool, parent)
   showVisibleBlocks(pool)
 }
@@ -215,7 +222,7 @@ function dropAll(pool: PoolState, parent: Group): void {
   pool.isUpToDate = false
 }
 
-/** Builds what the frame's budget allows; true when every visible and ahead chunk is current. */
+/** Runs the frame's chunk work under its budget; true when every visible and ahead chunk is current. */
 function rebuildStale(
   pool: PoolState,
   parent: Group,
@@ -223,12 +230,10 @@ function rebuildStale(
   view: TerrainView,
 ): boolean {
   const needs = chunkNeedsOf(pool, view)
-  const builds = chunksToBuild(needs, pool.frame, CHUNK_BUILDS_PER_FRAME)
-  for (const need of builds) {
-    const built = buildChunkMesh(material, view, need, pool.frame)
-    replaceChunkMesh(pool, parent, need.key, built)
-  }
-  return builds.length === needs.length
+  pool.queueLength = needs.length
+  const build = (need: ChunkNeed) =>
+    replaceChunkMesh(pool, parent, need.key, buildChunkMesh(material, view, need, pool.frame))
+  return streamChunkFrame(needs, pool.frame, view, build)
 }
 
 function replaceChunkMesh(pool: PoolState, parent: Group, key: string, next: ChunkMesh): void {
