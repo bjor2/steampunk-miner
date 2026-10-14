@@ -9,7 +9,9 @@
  * idle only the boiler's slow breath and the headlamp's flicker move. Each part's pose is read
  * from the motion by its slot, so the same rule poses the placeholder quads and the S7a art. A
  * slice's requested pose for a slot (`partMotionRequests`, #180) adds to it, its movement skipped
- * like the squash when motion is reduced. Presentation only: it reads the vehicle, never writes it.
+ * like the squash when motion is reduced. The service station's idle parts (ticket 398), drawn
+ * by the same quads, take their pose from `stationIdleMotion.ts` on the same running seconds.
+ * Presentation only: it reads the vehicle, never writes it.
  */
 import {
   BOILER_BOB_HZ,
@@ -30,9 +32,11 @@ import {
   LOAD_EASE_SECONDS,
   PISTON_HZ,
   PISTON_TRAVEL_M,
+  STATION_GLOW_COLOUR,
   THRUSTER_GLOW_COLOUR,
 } from '../../constants/scene'
 import { createRequestedParts, type RequestedPartPose, type RequestedParts } from './requestedParts'
+import { isStationIdlePart, writeStationIdlePose } from './stationIdleMotion'
 
 const TURN = 2 * Math.PI
 const HIT_SECONDS = HIT_SNAP_SECONDS + HIT_SETTLE_SECONDS
@@ -123,9 +127,11 @@ export function layCasingRing(motion: PartMotion): void {
 
 /**
  * The colour a part glows in: the drill nose its sparks', a thruster white so its emissive map's
- * blue core and orange lip show, a lamp its own.
+ * blue core and orange lip show, a lamp its own, the station's arcs and welds white so their maps'
+ * blue and white-hot show (ticket 398).
  */
 export function glowColourOf(slot: string, partColour: string): string {
+  if (isStationIdlePart(slot)) return STATION_GLOW_COLOUR
   const kind = kindOfSlot(slot)
   if (kind.startsWith('drill-')) return DRILL_SPARK_LIGHT.colour
   return kind === 'thruster' ? THRUSTER_GLOW_COLOUR : partColour
@@ -161,6 +167,8 @@ export function writePartPose(
   isMotionReduced: boolean,
   pose: PartPose,
 ): void {
+  if (isStationIdlePart(slot))
+    return writeStationIdlePose(slot, motion.seconds, isMotionReduced, pose)
   const kind = kindOfSlot(slot)
   pose.angle = angleOf(motion, kind, radius)
   pose.x = isMotionReduced ? 0 : recoilOf(motion)

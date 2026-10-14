@@ -288,6 +288,25 @@ export const HIT_SETTLE_SECONDS = 0.2
 export const CASING_ARM_SECONDS = 0.5
 export const CASING_ARM_SWING_RADIANS = 0.6
 export const THRUSTER_GLOW_COLOUR = '#ffffff'
+/**
+ * The service station's idle motion (ticket 398). The coil arcs strike 12 times a second, lit at
+ * about half the strikes; the welds burn 1.3 s of every 2 s, flickering 20 times a second; the
+ * ore climbs the conveyor at 0.3 m/s and starts over each 0.2 m cleat pitch. The belt's run and
+ * rise are the art's (docs/art/service-station/author_service_station.py, BELT_LOW to BELT_HIGH).
+ * The glow is white so the emissive maps' own blue arcs and white-hot sparks show. Tuned by eye.
+ */
+export const STATION_ARC_STRIKES_PER_SECOND = 12
+export const STATION_ARC_LIT_SHARE = 1 / 2
+export const STATION_ARC_GLOW = 3 / 2
+export const STATION_WELD_CYCLE_SECONDS = 2
+export const STATION_WELD_BURN_SECONDS = 13 / 10
+export const STATION_WELD_FLICKERS_PER_SECOND = 20
+export const STATION_WELD_GLOW = 3 / 2
+export const STATION_CONVEYOR_MPS = 3 / 10
+export const STATION_CONVEYOR_PITCH_M = 1 / 5
+export const STATION_CONVEYOR_RUN_M = 91 / 100
+export const STATION_CONVEYOR_RISE_M = 146 / 100
+export const STATION_GLOW_COLOUR = '#ffffff'
 
 /**
  * Drill sparks (#13 VFX, from a small particle set). Placeholders, tuned by eye; the pool is
