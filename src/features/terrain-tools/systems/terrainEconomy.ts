@@ -27,6 +27,8 @@ export interface TerrainBalance {
   magnitudeLimit?: number
   /** The lodestone's swaps per beacon (TD cap 256), whatever its radius. */
   swapCap?: number
+  /** How long a timed brace holds, in ticks: stabiliser foam's 600 (ticket 381). */
+  braceTicks?: number
 }
 
 export interface TerrainEconomy {
@@ -83,6 +85,7 @@ function readBalance(reader: FieldReader, path: string, raw: unknown): TerrainBa
     ...withDefined('reachTiles', optional('reachTiles')),
     ...withDefined('magnitudeLimit', optional('magnitudeLimit')),
     ...withDefined('swapCap', optional('swapCap')),
+    ...withDefined('braceTicks', optional('braceTicks')),
   }
 }
 

@@ -124,11 +124,11 @@ export function clampFrozenTicksLeftAt(state: AuthorityState, block: string): nu
 
 /**
  * The kernel keeps only an `isBraced` bit per collapsing entry, so the tick a brace caught a block
- * is derived from the save: the later of the field's act and the block's warning, as the brace
- * sync runs on the act's tick and on every warning's.
+ * is derived from the save: the later of the brace's start (the field's act, or foam's first
+ * spray) and the block's warning, as the brace sync runs on both ticks.
  */
-export function frozenTicksLeftOf(entry: CollapsingBlock, clamp: ClampField): number {
-  const caughtTick = Math.max(clamp.startTick, entry.startTick)
+export function frozenTicksLeftOf(entry: CollapsingBlock, brace: { startTick: number }): number {
+  const caughtTick = Math.max(brace.startTick, entry.startTick)
   const warned = Math.min(COLLAPSE_WARN_TICKS, caughtTick - entry.startTick)
   return COLLAPSE_WARN_TICKS - warned
 }

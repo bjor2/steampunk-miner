@@ -15,6 +15,7 @@ import { ORE_SHIFTER_ID, planOreDrag } from './oreShifter'
 import { planPressurePocket, PRESSURE_POCKET_ID } from './pressurePocket'
 import { planSeamSplit, SEAM_SPLITTER_ID } from './seamSplitter'
 import { SHIPPED_TERRAIN_ITEMS } from './shippedTools'
+import { STABILISER_FOAM_ID } from './stabiliserFoam'
 import { editSourceOf, type TerrainPlan } from './terrainOutcome'
 import { terrainItemOf } from './terrainItems'
 import { PLAIN_VERB, type ToolVerb } from './toolVerb'
@@ -103,7 +104,8 @@ describe('terrain edit caps', () => {
   )
 
   it('covers every shipped terrain tool', () => {
-    const covered = [...Object.keys(PLANNERS), LODESTONE_BEACON_ID].sort()
+    // Stabiliser foam queues no edit at any Mark: it changes no cell (`stabiliserFoam.test.ts`).
+    const covered = [...Object.keys(PLANNERS), LODESTONE_BEACON_ID, STABILISER_FOAM_ID].sort()
     expect(covered).toEqual(SHIPPED_TERRAIN_ITEMS.map((item) => item.itemId).sort())
   })
 })

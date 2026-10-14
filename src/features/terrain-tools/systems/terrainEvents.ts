@@ -2,7 +2,8 @@
  * The domain events the terrain lane adds (feature-slices.md 3.15), by augmentation, never by
  * editing the kernel's lists. `power-up-core` already logs every use; these say what the use did to
  * the ground: the edit it queued (#162 section 2.4 `terrain_edit`), where a lodestone beacon
- * was planted, and what a terrain magnet's use moved (GD lock on #246, `magnet_used`).
+ * was planted, what a terrain magnet's use moved (GD lock on #246, `magnet_used`), and the cells
+ * a spray of stabiliser foam set (ticket 381, `foam_set`).
  *
  * Every event names its player: a use acts on the authority clock, and the lodestone's gather on a
  * dock reaction, so neither carries a command stamp of its own.
@@ -44,6 +45,18 @@ declare module '../../../systems/authority/domainEvent' {
       cellsMoved: number
       energy: number
     }
+    /**
+     * Stabiliser foam set on these many cells of its cone (ticket 381), each holding until
+     * `untilTick`; a cell already foamed has its time moved on, never added to.
+     */
+    'terrain-tools.FoamSet': {
+      playerId: string
+      mark: number
+      originTx: number
+      originTy: number
+      cellsSet: number
+      untilTick: number
+    }
   }
 }
 
@@ -55,6 +68,8 @@ export const TERRAIN_REFUSAL = {
   beaconLive: 'terrain-tools.beacon_live',
   nothingToPush: 'terrain-tools.nothing_to_push',
   nothingToPin: 'terrain-tools.nothing_to_pin',
+  nothingToFoam: 'terrain-tools.nothing_to_foam',
+  notOwned: 'terrain-tools.not_owned',
   outOfPlay: 'terrain-tools.out_of_play',
 } as const
 
@@ -72,4 +87,10 @@ export type MagnetUsedBody = DomainEventBodies['terrain-tools.MagnetUsed']
 
 export function magnetUsedOf(body: MagnetUsedBody) {
   return { type: 'terrain-tools.MagnetUsed' as const, ...body }
+}
+
+export type FoamSetBody = DomainEventBodies['terrain-tools.FoamSet']
+
+export function foamSetOf(body: FoamSetBody) {
+  return { type: 'terrain-tools.FoamSet' as const, ...body }
 }

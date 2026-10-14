@@ -8,7 +8,8 @@
  * used by holding its slot: its act locks a field, and letting go ends it (`lodeClamp.ts`). With
  * the Ore Lure twist held, the shifter leaves its plate or drags toward it (`oreLure.ts`, ticket
  * 329). A Mark milestone's second tap or hold, and a sibling-link's reduced size, reach the planner
- * as its verb (`toolVerb.ts`, #256).
+ * as its verb (`toolVerb.ts`, #256). Stabiliser foam (ticket 381) sets on a forward cone and holds
+ * its blocks for a while through the kernel's collapse braces (`stabiliserFoam.ts`).
  */
 import type { PowerUp } from '../../power-up-core'
 import { editWith, type Activate } from './editActivation'
@@ -21,10 +22,12 @@ import { planPressurePocket, PRESSURE_POCKET_ID } from './pressurePocket'
 import { releasePushWave, REPULSOR_COIL_ID } from './repulsorCoil'
 import { planSeamSplit, SEAM_SPLITTER_ID } from './seamSplitter'
 import { SHIPPED_MAGNET_ITEMS, SHIPPED_TERRAIN_ITEMS } from './shippedTools'
+import { sprayFoam, STABILISER_FOAM_ID } from './stabiliserFoam'
 import { balanceOf, isConsumable, type TerrainItem } from './terrainItems'
 import { editSourceOf } from './terrainOutcome'
 
 const ACTIVATIONS: Readonly<Record<string, Activate>> = {
+  [STABILISER_FOAM_ID]: sprayFoam,
   [ORE_SHIFTER_ID]: dragOrLureOre,
   [SEAM_SPLITTER_ID]: editWith(planSeamSplit),
   [PRESSURE_POCKET_ID]: editWith(planPressurePocket),

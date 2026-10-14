@@ -31,9 +31,6 @@ const INCOME_COMBOS = [
   'combo.lens_corer',
 ]
 
-/** #202 holds stabiliser foam back, so its node is not in the loaded tree. */
-const HELD_PARENT = 'tech.terrain.stabiliser_foam'
-
 const laneOfNode = (nodeId: string) => nodeId.split('.')[1].replace('_', '-')
 
 describe('combo catalogue', () => {
@@ -77,11 +74,11 @@ describe('combo catalogue', () => {
     })
   })
 
-  it('names parents the loaded lane slices register, but the foam #202 holds back', () => {
+  it('names parents the loaded lane slices register, stabiliser foam among them (ticket 381)', () => {
     const loaded = new Set(contentOf('tech-node').map((node) => (node as TechNode).id))
     const parents = COMBO_ITEMS.flatMap((item) => item.parents)
     const missing = [...new Set(parents.filter((parent) => !loaded.has(parent)))]
-    expect(missing).toEqual([HELD_PARENT])
+    expect(missing).toEqual([])
   })
 
   it('names as parent items the store items its parent nodes unlock', () => {

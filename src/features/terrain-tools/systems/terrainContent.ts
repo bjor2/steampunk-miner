@@ -5,7 +5,8 @@
  * cards (#159, the K7 `itemDescriptionEntries` seam): the #162 flavour line, one line per
  * `statPreview` line read at the Mark the card's level names, and the price last. A card at level 0 reads Mark 1, the item as bought; its next value is
  * the next Mark until it is Mastered. A shipped terrain magnet (ticket 284) registers its item and
- * Content's card (`magnetCards.ts`) the same way.
+ * Content's card (`magnetCards.ts`) the same way. Stabiliser foam's card (ticket 381) carries
+ * Content's lines in place of the stat lines, then its stack and price as every tool's does.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
@@ -15,9 +16,11 @@ import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { isMasteredAt, milestoneLineSpecsOf, type TechNode } from '../../tech-tree'
 import { SHIPPED_MAGNET_ITEMS, SHIPPED_TERRAIN_ITEMS } from './shippedTools'
+import { foamLineSpecs } from './foamCards'
 import { magnetCardOf } from './magnetCards'
 import { MAGNET_ITEMS, magnetTechNodeOf, magnetVehicleItemOf } from './magnetItems'
 import { FOURTH_CRADLE_NODE } from './terrainCradle'
+import { STABILISER_FOAM_ID } from './stabiliserFoam'
 import { TERRAIN_FORK } from './terrainFork'
 import { statPreview, type TerrainStatLine, type TerrainStatUnit } from './statPreview'
 import {
@@ -42,6 +45,11 @@ const UNIT_SUFFIX: Readonly<Record<TerrainStatUnit, string>> = {
   charges: '',
   units: '',
   swaps: '',
+}
+
+/** A tool whose card carries Content's own lines in place of its stat lines. */
+const AUTHORED_LINES: Readonly<Record<string, () => DescribedStatLineSpec[]>> = {
+  [STABILISER_FOAM_ID]: foamLineSpecs,
 }
 
 export const TERRAIN_VEHICLE_ITEMS: readonly VehicleItem[] = [
@@ -71,17 +79,25 @@ export function markOfLevel(level: number): number {
 }
 
 function cardOf(item: TerrainItem): ItemDescriptionEntry {
-  const lines = statPreview(item.itemId, FIRST_MARK, LABEL_PLANET)?.lines ?? []
   return {
     id: `terrain-tools.${item.itemId.slice(item.itemId.indexOf('.') + 1)}`,
     matches: { kind: 'vehicle-item', id: item.itemId },
     flavour: item.description,
     statLines: [
-      ...lines.map(markLineSpecOf),
+      ...statLineSpecsOf(item),
       ...milestoneLineSpecsOf(markLadderOf(item)),
       priceLineSpecOf(item),
     ],
   }
+}
+
+/** One line per stat preview line; an authored card keeps only its stack from them. */
+function statLineSpecsOf(item: TerrainItem): DescribedStatLineSpec[] {
+  const lines = statPreview(item.itemId, FIRST_MARK, LABEL_PLANET)?.lines ?? []
+  const specs = lines.map(markLineSpecOf)
+  const authored = AUTHORED_LINES[item.itemId]
+  if (authored === undefined) return specs
+  return [...authored(), ...specs.filter((_spec, at) => lines[at].stat === 'charges')]
 }
 
 /** A stat the Marks step, in player units: its next value is the next Mark's. */

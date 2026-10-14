@@ -19,9 +19,10 @@ import { HELD_BACK_ITEM_IDS, SHIPPED_TERRAIN_ITEMS } from './systems/shippedTool
 import { isConsumable, markLadderOf, TERRAIN_ITEMS } from './systems/terrainItems'
 
 // #202 on the loaded slices: the ore-shifter, seam splitter, pressure pocket lance and lodestone
-// beacon ship as vehicle items, power-ups, tree nodes and item cards (#162 acceptance 1). Stabiliser
-// foam, the cryo binder, shoring props and the strata press stay vision rows with no trace in the
-// game, as the GD lock on #205 Q2 and Q3 holds back an item whose mechanic or prerequisite is absent.
+// beacon ship as vehicle items, power-ups, tree nodes and item cards (#162 acceptance 1), and
+// stabiliser foam joins them with its timed brace (ticket 381). The cryo binder, shoring props and
+// the strata press stay vision rows with no trace in the game, as the GD lock on #205 Q2 and Q3
+// holds back an item whose mechanic or prerequisite is absent.
 
 const PLAYER = 'p1'
 
@@ -61,8 +62,9 @@ function describedAt(itemId: string, mark: number, planetIndex: number) {
 }
 
 describe('terrain-tools shipped rows', () => {
-  it('registers four tools as vehicle items and power-ups, their nodes, the cradle, the magnets and the fork', () => {
+  it('registers five tools as vehicle items and power-ups, their nodes, the cradle, the magnets and the fork', () => {
     expect(SHIPPED_IDS).toEqual([
+      'consumable.stabiliser_foam',
       'power.ore_shifter',
       'consumable.seam_splitter',
       'power.pressure_pocket',
@@ -125,14 +127,19 @@ describe('terrain-tools shipped rows', () => {
     expect(researchablePayloads().filter(mentionsAny(soldNodeIds))).not.toEqual([])
   })
 
-  it('leaves no trace of foam, the cryo binder, shoring props or the strata press', () => {
+  it('leaves no trace of the cryo binder, shoring props or the strata press', () => {
     const isHeldBack = mentionsAny(HELD_BACK_IDS)
     expect(contentOf('vehicle-item').filter(isHeldBack)).toEqual([])
     expect(contentOf('power-up').filter(isHeldBack)).toEqual([])
     expect(contentOf('tech-node').filter(isHeldBack)).toEqual([])
     expect(listBuyableRefs(LAST_SCHEDULED_PLANET).filter(isHeldBack)).toEqual([])
     const refs = HELD_BACK.map((item) => ({ kind: 'vehicle-item' as const, id: item.itemId }))
-    expect(refs.map(itemDescriptionEntryOf)).toEqual([null, null, null, null])
+    expect(refs.map(itemDescriptionEntryOf)).toEqual([null, null, null])
     expect(researchablePayloads().filter(isHeldBack)).toEqual([])
+  })
+
+  it('keeps stabiliser foam in its tree slot: terrain tier 3, no prerequisite', () => {
+    const node = contentOf('tech-node').find((entry) => entry.id === 'tech.terrain.stabiliser_foam')
+    expect(node).toMatchObject({ lane: 'terrain', unlockTier: 3, prereqs: [] })
   })
 })

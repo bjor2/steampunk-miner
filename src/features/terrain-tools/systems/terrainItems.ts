@@ -6,7 +6,9 @@
  * cradle on this lane is `power-up-core`'s; the spoil auger is drill gear.
  *
  * Vision rows (ticket 240, the data half of #202): nothing here is registered, so no store, tree,
- * item card or bot sees them; #202 registers them with the effect.
+ * item card or bot sees them; #202 registers them with the effect. Stabiliser foam's flavour line is
+ * Content's (#381), and its size is its cone's radius: foam "sets" and "hardens", never "braces",
+ * so it never reads like the lode clamp.
  */
 import type { Money } from '../../../systems/money'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
@@ -61,14 +63,14 @@ export const TERRAIN_ITEMS: readonly TerrainItem[] = [
     itemId: 'consumable.stabiliser_foam',
     name: 'Stabiliser foam',
     iconId: 'item-consumable-stabiliser-foam',
-    description: 'Setting foam that cures into a ceramic crust along the tunnel wall.',
+    description: 'Sprays a quick-setting aether foam that hardens loose rock in place.',
     label: 'horizontal',
     powerUpClass: 'consumable',
     isIncomeItem: false,
     slots: POWER_UP_SLOTS,
     attach: RACK_CRATE,
-    reachLabel: 'Cone',
-    sizeLabel: 'Cells braced',
+    reachLabel: null,
+    sizeLabel: 'Cone',
     sizeUnit: 'cells',
     node: {
       id: 'tech.terrain.stabiliser_foam',

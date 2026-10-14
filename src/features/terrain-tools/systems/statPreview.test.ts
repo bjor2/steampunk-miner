@@ -44,10 +44,9 @@ describe('terrain stat preview', () => {
   it('shows a consumable as a stack and its size, with no cooldown or wind-up line', () => {
     expect(valuesOf(statPreview('consumable.stabiliser_foam', 1, PLANET))).toEqual({
       charges: 4,
-      reach: 4,
-      size: 16,
+      size: 2,
     })
-    expect(labelsOf('consumable.stabiliser_foam')).toEqual(['Stack', 'Cone', 'Cells braced'])
+    expect(labelsOf('consumable.stabiliser_foam')).toEqual(['Stack', 'Cone'])
   })
 
   it("prints the lodestone's 256 swaps per beacon beside its gather radius", () => {

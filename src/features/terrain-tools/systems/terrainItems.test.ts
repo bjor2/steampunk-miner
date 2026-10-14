@@ -111,7 +111,7 @@ describe('terrain items', () => {
 
   it('gives consumables a stack and no cooldown in their Mark ladder (#162 4.6)', () => {
     const foam = techNodeOf(terrainItemOf('consumable.stabiliser_foam')!).marks
-    expect(foam).toEqual({ isIncomeItem: false, magnitude: { base: 16, limit: 32 }, charges: 4 })
+    expect(foam).toEqual({ isIncomeItem: false, magnitude: { base: 2, limit: 4 }, charges: 4 })
   })
 
   it('prices a charged item at 15 band-5 ore on its unlock planet, on every planet', () => {

@@ -15,6 +15,7 @@ import { ORE_SHIFTER_ID } from './oreShifter'
 import { PRESSURE_POCKET_ID } from './pressurePocket'
 import { REPULSOR_COIL_ID } from './repulsorCoil'
 import { SEAM_SPLITTER_ID } from './seamSplitter'
+import { STABILISER_FOAM_ID } from './stabiliserFoam'
 import { TERRAIN_POWER_UPS } from './terrainPowerUps'
 import { editSourceOf } from './terrainOutcome'
 
@@ -51,6 +52,7 @@ const TARGETS: readonly (readonly [string, TilePoint, string])[] = [
 
 /** How far left of the target each tool's miner stands, facing it. */
 const STAND_OFFSET: Readonly<Record<string, number>> = {
+  [STABILISER_FOAM_ID]: 2,
   [ORE_SHIFTER_ID]: 2,
   [SEAM_SPLITTER_ID]: 2,
   [PRESSURE_POCKET_ID]: 3,

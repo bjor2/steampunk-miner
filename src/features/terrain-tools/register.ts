@@ -14,7 +14,9 @@
  * flares, the clamp's lattice. With the Ore Lure twist held (ticket 329, through the kernel
  * `twist` hook), the shifter leaves a magnet plate in the section and drags toward it; the owner's
  * dock takes the plate back.
- * Stabiliser foam, the cryo binder, shoring props and the strata press stay vision rows
+ * Stabiliser foam (ticket 381) sets on a forward cone and holds the collapse blocks under it for
+ * 600 ticks through a timed `collapseBraces` provider of its own; its clock step drops each cell as
+ * it lapses. The cryo binder, shoring props and the strata press stay vision rows
  * (`systems/shippedTools.ts`). The lane's P16 fork (ticket 269), built on no magnet: the Bracer
  * props warning collapse blocks round its rig through the same `collapseBraces` seam, fed by a
  * reaction to `CollapseWarned`; the Breaker fractures the plain ground past each charge it blasts,
@@ -31,6 +33,7 @@ import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
 import { TERRAIN_MAGNETS_SPEND_FAMILY } from './systems/magnetSpend'
 import { ORE_LURE_DOCK_REACTION } from './systems/oreLure'
 import { MAGNET_FIELD_LAYER_BUDGET } from './systems/render/magnetFieldBudget'
+import { LAPSE_FOAM_STEP, STABILISER_FOAM_BRACES } from './systems/stabiliserFoam'
 import {
   TERRAIN_ITEM_CARDS,
   TERRAIN_TECH_NODES,
@@ -58,6 +61,8 @@ export const slice: SliceDefinition = {
     r.collapseBrace(LODE_CLAMP_BRACES)
     r.collapseBrace(BRACER_PROP_BRACES)
     r.blastEffect(BREAKER_FRACTURE)
+    r.clockStep(LAPSE_FOAM_STEP)
+    r.collapseBrace(STABILISER_FOAM_BRACES)
     r.sceneLayer({
       id: MAGNET_FIELD_LAYER_ID,
       Layer: MagnetFieldLayer,
@@ -65,7 +70,7 @@ export const slice: SliceDefinition = {
     })
     r.eventProjections(TERRAIN_PROJECTIONS)
     r.runEvents(TERRAIN_RUN_EVENTS)
-    // steampunkDebug.features['terrain-tools'].getBeacon() / .getClampLattice()
+    // steampunkDebug.features['terrain-tools'].getBeacon() / .getClampLattice() / .getFoam()
     //   / .statPreview(itemId, mark, planet) / .getMagnetFields()
     r.debugActions(terrainToolsDebugActions)
   },
