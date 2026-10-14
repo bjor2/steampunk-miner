@@ -1,7 +1,8 @@
 /**
- * The rig as the local player's replica holds it now (ticket 250): the mounted items the vehicle
- * piece draws and the debug read reports, each at the Mark it acts at (#249), from the same rule
- * on the same state, and how far each extractor stands deployed from its work (ticket 297).
+ * The rig as the local player's replica holds it now (ticket 250): the mounted items, with each
+ * active fork branch's piece (ticket 270), that the vehicle piece draws and the debug read
+ * reports, each at the Mark it acts at (#249), from the same rule on the same state, and how far
+ * each extractor stands deployed from its work (ticket 297).
  */
 import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
@@ -10,9 +11,10 @@ import type { ArtCatalogue } from '../../../systems/art/artCatalogue'
 import { extractorWorkOf } from '../../mining-gates'
 import { deployFractionOf } from '../systems/render/extractorPose'
 import { actingMarksOf, BOUGHT_MARK } from '../systems/render/markPlate'
-import { rigItemsOf } from '../systems/render/rigGear'
+import { rigItemsWithForksOf } from '../systems/render/rigGear'
 import { rigSightOf, type RigSight } from '../systems/render/rigSight'
 import type { MountedItem } from '../systems/render/techGearQuads'
+import { forkChoicesOf } from '../systems/forkSection'
 import { registeredTechTree } from '../systems/techTree'
 import { unlockedItems } from '../systems/unlockRules'
 
@@ -23,9 +25,13 @@ export interface CarriedRig {
 }
 
 export function readCarriedRig(): CarriedRig {
-  const state = readAuthorityState()
-  const { playerId } = useGameStore.getState()
-  const items = rigItemsOf(vehicleOf(state, playerId).loadout)
+  return carriedRigOf(readAuthorityState(), useGameStore.getState().playerId)
+}
+
+/** The loadout's gear and each active fork branch's piece (ticket 270), with their Marks. */
+export function carriedRigOf(state: AuthorityState, playerId: string): CarriedRig {
+  const loadout = vehicleOf(state, playerId).loadout
+  const items = rigItemsWithForksOf(loadout, forkChoicesOf(state, playerId))
   return { items, marks: actingMarksOfRig(state, playerId, items) }
 }
 

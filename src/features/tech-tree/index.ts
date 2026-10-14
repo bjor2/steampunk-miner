@@ -3,7 +3,8 @@
  * the content types the lane slices register, the reads the store and the item slices use, and
  * the Mark rotation each item's `statPreview` steps through, with its milestones and their card
  * line (#256), and the P16 fork each lane registers a pair for, with the branch it has active
- * (#255). The only file another slice may import from this folder. The mounted gear and
+ * (#255), with the part each branch hangs and the turntable beat a re-choice asks of the Works
+ * (ticket 270). The only file another slice may import from this folder. The mounted gear and
  * power-up effect looks (#166) are read-only presentation rules the wiring draws from.
  */
 export const TECH_TREE_SLICE_ID = 'tech-tree'
@@ -58,6 +59,8 @@ export {
 export { activeForkBranchOf } from './systems/forkSection'
 export { CHOOSE_FORK_COMMAND, RECHOOSE_FORK_COMMAND, type ForkPick } from './systems/forkCommands'
 export { forkRechoicePriceOf, type ForkRefusal } from './systems/forkRules'
+export { forkMountsOf, type ForkPiece } from './systems/render/forkPieces'
+export { forkTurntableRequestsOf, type ForkTurntableRequest } from './systems/render/forkTurntable'
 export type {
   CrateRack,
   DeployTiming,

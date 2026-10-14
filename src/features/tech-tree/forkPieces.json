@@ -1,0 +1,77 @@
+{
+  "$comment": "The vehicle part each P16 fork branch hangs on the rig (#255 G&V feel rule, adopted by the GD lock: picking a branch changes at least one visible part, through the #235 piece registry, so another player can read the build in co-op; ticket 270). Each branch names #166 gear rows from techGear.json: no new art (the GD's Q3 call on #177), each at the fixed point its row carries: never a power-up slot, and never a drill socket another row shares, so a piece never draws over gear the player equipped. Rows unlock by P16 or are the branch's own item (phase lantern, arc coil), so no part shows ahead of its act. The two branches of a lane hang different parts. faceTurnRadians is the Works turntable's turn that faces the piece to the camera when a re-choice plays the #177 turntable beat, in the showcase's convention (showcase.json): front parts turn toward the camera (0.5), rear parts away (-0.5), the roof's middle a little (-0.3). Starting values for G&V to tune.",
+  "branches": [
+    {
+      "lane": "drill-gear",
+      "branch": "wide",
+      "gear": ["gear.side_cutters"],
+      "faceTurnRadians": 0.5
+    },
+    {
+      "lane": "drill-gear",
+      "branch": "deep",
+      "gear": ["rig.resonance"],
+      "faceTurnRadians": 0.5
+    },
+    {
+      "lane": "mobility",
+      "branch": "agile",
+      "gear": ["power.grapple_winch"],
+      "faceTurnRadians": 0.5
+    },
+    {
+      "lane": "mobility",
+      "branch": "armoured",
+      "gear": ["consumable.emergency_ballast"],
+      "faceTurnRadians": -0.5
+    },
+    {
+      "lane": "extraction",
+      "branch": "hauler",
+      "gear": ["rig.containment"],
+      "faceTurnRadians": 0.5
+    },
+    {
+      "lane": "extraction",
+      "branch": "prospector",
+      "gear": ["passive.assay_lens"],
+      "faceTurnRadians": 0.5
+    },
+    {
+      "lane": "sensing",
+      "branch": "scout",
+      "gear": ["power.echo_sounder"],
+      "faceTurnRadians": -0.5
+    },
+    {
+      "lane": "sensing",
+      "branch": "diviner",
+      "gear": ["passive.threat_periscope"],
+      "faceTurnRadians": 0.5
+    },
+    {
+      "lane": "terrain",
+      "branch": "bracer",
+      "gear": ["consumable.shoring_props"],
+      "faceTurnRadians": -0.5
+    },
+    {
+      "lane": "terrain",
+      "branch": "breaker",
+      "gear": ["consumable.seam_splitter"],
+      "faceTurnRadians": -0.5
+    },
+    {
+      "lane": "aetheric",
+      "branch": "phase",
+      "gear": ["power.phase_lantern"],
+      "faceTurnRadians": 0.5
+    },
+    {
+      "lane": "aetheric",
+      "branch": "arc",
+      "gear": ["power.arc_coil"],
+      "faceTurnRadians": -0.3
+    }
+  ]
+}

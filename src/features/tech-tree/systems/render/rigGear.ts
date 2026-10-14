@@ -1,9 +1,10 @@
 /**
  * What the rig carries on the run vehicle (ticket 250, the #166 gear drawn through the #235 seam):
- * every mounted item of the loadout that a slice has registered, its quads at the base vehicle's
- * attach points, grouped by asset and point so the debug read lists what hangs where. An item
- * still a vision row (no registered `vehicle-item`) never draws, whatever the loadout says.
- * Render-only: nothing here reaches the authority, a snapshot or a digest.
+ * every mounted item of the loadout that a slice has registered, and each active fork branch's
+ * piece (ticket 270), its quads at the base vehicle's attach points, grouped by asset and point so
+ * the debug read lists what hangs where. An item still a vision row (no registered
+ * `vehicle-item`) never draws, whatever the loadout says. Render-only: nothing here reaches the
+ * authority, a snapshot or a digest.
  */
 import {
   exportedSidecarOf,
@@ -16,7 +17,9 @@ import { ATTACH_ASSET_ID } from '../../../../systems/art/sidecarAttach'
 import type { AttachId } from '../../../../systems/registries/vehicleAttach'
 import { isVehicleItemId } from '../../../../systems/registries/vehicleLoadout'
 import type { VehicleLoadout } from '../../../../systems/vehicle/loadoutState'
+import type { ForkChoices } from '../forkNode'
 import { isMovingPart, partPoseAt } from './extractorPose'
+import { forkPieceItemsOf } from './forkPieces'
 import { mountedGearOf, type GearPart } from './techGear'
 import {
   gearAttachIdOf,
@@ -54,6 +57,18 @@ export interface PivotedQuad {
 /** The loadout's mounted items that a slice has registered, in `mountedItemsOf` order. */
 export function rigItemsOf(loadout: VehicleLoadout): MountedItem[] {
   return mountedItemsOf(loadout).filter((item) => isVehicleItemId(item.itemId))
+}
+
+/**
+ * The rig's items with each active fork branch's piece (ticket 270), an item the loadout already
+ * mounts drawn once. A piece shows its branch, not an owned item, so it needs no registration.
+ */
+export function rigItemsWithForksOf(loadout: VehicleLoadout, choices: ForkChoices): MountedItem[] {
+  const items = rigItemsOf(loadout)
+  const pieces = forkPieceItemsOf(choices).filter(
+    (piece) => !items.some((item) => item.itemId === piece.itemId),
+  )
+  return [...items, ...pieces]
 }
 
 /**
