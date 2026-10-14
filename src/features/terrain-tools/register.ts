@@ -23,6 +23,7 @@ import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
 import { MAGNET_FIELD_LAYER_ID, MagnetFieldLayer } from './scene/MagnetFieldLayer'
 import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
 import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
+import { TERRAIN_MAGNETS_SPEND_FAMILY } from './systems/magnetSpend'
 import { ORE_LURE_DOCK_REACTION } from './systems/oreLure'
 import { MAGNET_FIELD_LAYER_BUDGET } from './systems/render/magnetFieldBudget'
 import {
@@ -42,6 +43,7 @@ export const slice: SliceDefinition = {
     r.content('tech-node', TERRAIN_TECH_NODES)
     r.itemDescriptionEntries(TERRAIN_ITEM_CARDS)
     r.vehicleItemSeller(TERRAIN_SELLER)
+    r.spendFamily(TERRAIN_MAGNETS_SPEND_FAMILY)
     r.saveSection(TERRAIN_TOOLS_SECTION)
     r.authorityReaction(LODESTONE_DOCK_REACTION)
     r.authorityReaction(ORE_LURE_DOCK_REACTION)

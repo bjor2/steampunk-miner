@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { ShopSpend } from '../../../systems/bot/shopSpend'
 import { fromCanonical, toCanonical } from '../../../systems/money'
+import { familySpendRowsOf } from '../../../systems/registries/spendFamilies'
 import { LODESTONE_BEACON_NODE_ID, TERRAIN_MAGNETS_FAMILY } from './magnetItems'
 import { magnetFamilySpendRowsOf } from './magnetSpend'
 
@@ -47,5 +48,27 @@ describe('terrain magnets spend row', () => {
       { planetIndex: 25, source: 'kernel', purchaseId: 'buyUpgrade', cost: fromCanonical('500') },
     ])
     expect(rows).toEqual([])
+  })
+})
+
+describe('terrain magnets spend family', () => {
+  const spends = [
+    sliceSpend(25, 'tech.terrain.repulsor_coil', '100'),
+    sliceSpend(25, 'power.repulsor_coil', '40'),
+    sliceSpend(25, LODESTONE_BEACON_NODE_ID, '100'),
+    sliceSpend(28, 'tech.terrain.lode_clamp', '200'),
+    sliceSpend(28, 'power.ore_shifter', '30'),
+  ]
+
+  it('reports the rows magnetFamilySpendRowsOf gives once magnetic_planets is live', () => {
+    const familyRows = familySpendRowsOf(spends, (rowId) => rowId === 'magnetic_planets')
+      .filter((row) => row.familyId === `terrain-tools.${TERRAIN_MAGNETS_FAMILY}`)
+      .map((row) => ({ planetIndex: row.planetIndex, spend: toCanonical(row.spend) }))
+    const sliceRows = rowsAsText(spends).map(({ planetIndex, spend }) => ({ planetIndex, spend }))
+    expect(familyRows).toEqual(sliceRows)
+  })
+
+  it('reports nothing before magnetic_planets is live', () => {
+    expect(familySpendRowsOf(spends, (rowId) => rowId !== 'magnetic_planets')).toEqual([])
   })
 })

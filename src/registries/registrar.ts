@@ -54,6 +54,11 @@ import { GATE_CHECK_REGISTRY } from '../systems/registries/gateChecks'
 import { GENERATION_HOOK_REGISTRY } from '../systems/registries/generationHooks'
 import { REINFORCEMENT_REGISTRY } from '../systems/registries/groundReinforcement'
 import { HEAT_PAUSE_REGISTRY } from '../systems/registries/heatPauses'
+import {
+  anchorRowProblemOf,
+  SPEND_FAMILY_REGISTRY,
+  type SpendFamily,
+} from '../systems/registries/spendFamilies'
 import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
 import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
 import { PLANET_CARD_LINE_REGISTRY } from '../systems/registries/planetCardLines'
@@ -153,6 +158,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     partMotionRequests: (source) => add(PART_MOTION_REQUEST_REGISTRY, source),
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
     botPurchase: (purchase) => add(BOT_PURCHASE_REGISTRY, purchase),
+    spendFamily: (family) => addSpendFamily(sliceId, family),
     screen: (panel) => add(SCREEN_REGISTRY, panel),
     soundCue: (cue) => add(SOUND_CUE_REGISTRY, cue),
     chargeBlastCue: (provider) => add(CHARGE_BLAST_CUE_REGISTRY, provider),
@@ -258,6 +264,19 @@ function addArtAsset(sliceId: string, asset: ArtAsset) {
 function refuseArtAsset(sliceId: string, id: string, problems: readonly string[]): never {
   throw new RegistrationRefusedError(
     `slice "${sliceId}" registered art asset "${id}", which ${problems.join(' and ')}`,
+  )
+}
+
+/** A family's anchor must be a locked schedule row, so a typo fails at registration (#370). */
+function addSpendFamily(sliceId: string, family: SpendFamily) {
+  const problem = anchorRowProblemOf(family)
+  if (problem !== null) refuseSpendFamily(sliceId, family.id, problem)
+  addPrefixed(SPEND_FAMILY_REGISTRY, sliceId, family)
+}
+
+function refuseSpendFamily(sliceId: string, id: string, problem: string): never {
+  throw new RegistrationRefusedError(
+    `slice "${sliceId}" registered spend family "${id}": ${problem}`,
   )
 }
 

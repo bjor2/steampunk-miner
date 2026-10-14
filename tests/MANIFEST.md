@@ -418,7 +418,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 
-### `terrain-tools`: 35 files, 273 tests
+### `terrain-tools`: 35 files, 275 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -438,7 +438,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/lodestoneBeacon.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/magnetFeel.test.ts` | 15 | 3 |
 | `src/features/terrain-tools/systems/magnetItems.test.ts` | 10 | 10 |
-| `src/features/terrain-tools/systems/magnetSpend.test.ts` | 2 | 2 |
+| `src/features/terrain-tools/systems/magnetSpend.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/marksInPlay.test.ts` | 1 | 1 |
 | `src/features/terrain-tools/systems/oreLure.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/oreShifter.test.ts` | 3 | 3 |
@@ -852,6 +852,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/scheduleRows.test.ts` | 4 | 4 |
 | `src/systems/registries/seal.test.ts` | 12 | 12 |
 | `src/systems/registries/soundCues.test.ts` | 2 | 2 |
+| `src/systems/registries/spendFamilies.test.ts` | 11 | 11 |
 | `src/systems/registries/vehicleLoadout.test.ts` | 10 | 10 |
 
 ### `render`
@@ -963,6 +964,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/doubleConversionLint.test.ts` | 8 | 5 |
 | `src/features/loadFeatures.test.ts` | 3 | 3 |
 | `src/features/sliceBoundaries.test.ts` | 5 | 5 |
+| `src/features/spendFamilyImports.test.ts` | 1 | 1 |
 
 ### `snapshots`
 

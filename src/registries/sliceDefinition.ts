@@ -38,6 +38,7 @@ import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { ReinforcementProvider } from '../systems/registries/groundReinforcement'
 import type { HeatPause } from '../systems/registries/heatPauses'
+import type { SpendFamily } from '../systems/registries/spendFamilies'
 import type { SlotHoldCueSource } from '../systems/registries/slotHoldCues'
 import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
@@ -200,6 +201,11 @@ export interface SliceRegistrar {
   artAssets(assets: readonly ArtAsset[]): void
   /** A slice command the pacing bot may buy after the kernel's own purchases. */
   botPurchase(purchase: BotPurchase): void
+  /**
+   * A family of bot spend the #212 guard reports as one row, counted only while its anchor
+   * `stats.json` row is owned or unlocked (ticket 370).
+   */
+  spendFamily(family: SpendFamily): void
   /** A full screen the kernel shell draws while the store holds it open. */
   screen(panel: ScreenPanel): void
   /** A synthesised sound with its voice budget, played on `requestSoundCue` (#180). */

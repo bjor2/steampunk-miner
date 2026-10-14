@@ -4,10 +4,12 @@
  * Marks and the items themselves, folded into one `terrain_magnets` row, never one row per item.
  * The members are read from their family tag (`MagnetItem.familyId`, set in #282). The beacon
  * carries no tag and keeps its spend in its own lane row. Reported, never failed on: the guard's
- * bands are #212's.
+ * bands are #212's. The family registers as a kernel spend family (ticket 370), so the tech-tree
+ * reads it without importing this slice; `magnetFamilySpendRowsOf` goes once #212 reads that.
  */
 import type { ShopSpend } from '../../../systems/bot/shopSpend'
 import { add, ZERO_MONEY, type Money } from '../../../systems/money'
+import type { SpendFamily } from '../../../systems/registries/spendFamilies'
 import { MAGNET_ITEMS, TERRAIN_MAGNETS_FAMILY, type MagnetItem } from './magnetItems'
 
 export interface MagnetFamilySpendRow {
@@ -15,6 +17,18 @@ export interface MagnetFamilySpendRow {
   familyId: typeof TERRAIN_MAGNETS_FAMILY
   /** Node research, Marks and item buys of every member on the planet. */
   spend: Money
+}
+
+const MAGNET_FAMILY_BOUGHT_IDS = familyBoughtIdsOf(MAGNET_ITEMS)
+
+/**
+ * The family as the kernel spend guard reads it, anchored to the `magnetic_planets` row: the
+ * members research only on P25 on, after the magnetic hazard (`requiresDiscovery`).
+ */
+export const TERRAIN_MAGNETS_SPEND_FAMILY: SpendFamily = {
+  id: `terrain-tools.${TERRAIN_MAGNETS_FAMILY}`,
+  anchorRowId: 'magnetic_planets',
+  isMember: isMagnetFamilySpend,
 }
 
 /** One row per planet with any spend on the family, ascending. */
@@ -31,6 +45,10 @@ export function magnetFamilySpendRowsOf(
 function familyBoughtIdsOf(items: readonly MagnetItem[]): ReadonlySet<string> {
   const members = items.filter((item) => item.familyId === TERRAIN_MAGNETS_FAMILY)
   return new Set(members.flatMap((item) => [item.itemId, item.node.id]))
+}
+
+function isMagnetFamilySpend(spend: ShopSpend): boolean {
+  return isFamilySpend(spend, MAGNET_FAMILY_BOUGHT_IDS)
 }
 
 function isFamilySpend(spend: ShopSpend, familyIds: ReadonlySet<string>): boolean {
