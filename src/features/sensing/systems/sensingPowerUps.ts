@@ -12,12 +12,17 @@
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import type { PowerUp, PowerUpOutcome } from '../../power-up-core'
 import type { SensingItem } from './sensingCatalogue'
+import { SENSING_FORK_POWER_UPS } from './forkItems'
 import { SHIPPED_SENSING_ITEMS } from './sensingContent'
 import { chargedBalanceOf, consumableBalanceOf } from './sensingItems'
 
 type PowerUpRules = Pick<PowerUp, 'powerUpClass' | 'charges' | 'cooldownTicks' | 'windupTicks'>
 
-export const SENSING_POWER_UPS: readonly PowerUp[] = SHIPPED_SENSING_ITEMS.map(powerUpOf)
+/** The shipped rows, then the fork's two items (ticket 269, `forkItems.ts`). */
+export const SENSING_POWER_UPS: readonly PowerUp[] = [
+  ...SHIPPED_SENSING_ITEMS.map(powerUpOf),
+  ...SENSING_FORK_POWER_UPS,
+]
 
 function powerUpOf(item: SensingItem): PowerUp {
   return {

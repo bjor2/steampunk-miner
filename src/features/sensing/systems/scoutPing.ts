@@ -1,47 +1,38 @@
 /**
- * The Scout branch's ping (GD lock on #255, ticket 269): big, vague and on its own clock. Out of
- * the dock, each time the authority clock passes a multiple of `pingEveryTicks` the rig pings
- * round itself at the Scout's radius, and the ping marks one cell per block of `blockTiles`
- * square: lava if the block holds any, else ore, else open cave. It never shows which cell of the
- * block, an ore's tier or a gate badge. Its marks stay until the dock, so the map fills in over a
- * trip. A pure read of the state on each client, like every ping (#203); a magnetic field cuts its
- * radius as it cuts the others (spec #258).
+ * The Scout branch's ping (GD lock on #255, ticket 269): big and vague. Each use pings round where
+ * it was pressed at the Scout's radius, its Mark magnitude, and marks one cell per block of
+ * `blockTiles` square: lava if the block holds any, else ore, else open cave. It never shows which
+ * cell of the block, an ore's tier or a gate badge. Its marks stay until the dock, so the map
+ * fills in over a trip. A pure read of the state on each client, like every ping (#203); a
+ * magnetic field cuts its radius as it cuts the others (spec #258).
  */
-import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
+import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { sensingReachAt } from '../../../systems/authority/magnetic/sensingReach'
-import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { echoMarksOf, type EchoMark, type EchoMarkKind } from './echoPing'
 import type { RevealPing } from './revealPing'
-import { scoutRadiusOf, SENSING_FORK_BALANCE, type ScoutBalance } from './sensingFork'
+import {
+  forkMagnitudeAt,
+  SCOUT_PINGER,
+  SENSING_FORK_BALANCE,
+  type ScoutBalance,
+} from './sensingFork'
+import type { SensingUse } from './sensingUses'
 
 /** Lava outranks ore, ore outranks open cave: the block shows the gravest thing in it. */
 const KIND_RANK: Readonly<Record<EchoMarkKind, number>> = { lava: 3, ore: 2, gate: 2, cave: 1 }
 
-/**
- * Which ping the clock is on at `tick`: the Scout pings each time this number grows, so a frame
- * that skips ticks still pings once, and a trip of `n` intervals pings `n` times.
- */
-export function scoutSlotOf(tick: number, balance: ScoutBalance = SENSING_FORK_BALANCE.scout) {
-  return Math.floor(tick / balance.pingEveryTicks)
-}
-
-/** The player's Scout ping at `tick`; null without the Scout active, a pose, or out of the dock. */
+/** The Scout use's ping round where it was pressed: vague marks, kept until the dock. */
 export function scoutPingOf(
+  use: SensingUse,
   state: AuthorityState,
-  playerId: string,
-  tick: number,
   balance: ScoutBalance = SENSING_FORK_BALANCE.scout,
-): RevealPing | null {
-  const radius = scoutRadiusOf(state, playerId)
-  const vehicle = vehicleOf(state, playerId)
-  if (radius === null || vehicle.pose === null || vehicle.mode === 'docked') return null
-  const centre = tileOfPose(vehicle.pose)
-  const marks = echoMarksOf(state, centre, sensingReachAt(state, centre, radius))
+): RevealPing {
+  const radius = sensingReachAt(state, use.origin, forkMagnitudeAt(SCOUT_PINGER, use.mark))
   return {
-    centre,
-    marks: vagueMarksOf(marks, balance.blockTiles),
-    bornTick: tick,
+    centre: use.origin,
+    marks: vagueMarksOf(echoMarksOf(state, use.origin, radius), balance.blockTiles),
+    bornTick: use.tick,
     untilTick: null,
   }
 }

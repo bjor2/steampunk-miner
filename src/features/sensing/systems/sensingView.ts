@@ -4,13 +4,11 @@
  * not every frame, since a lens read walks a sight line to every cell in its ring. A new planet or
  * a clock that went back (a restored or restarted session) starts from nothing and reads at once.
  * An unchanged board or reading keeps its object, so a panel renders only when what it shows
- * changed. The Scout branch pings each time its clock slot moves on (ticket 269); a fresh view
- * starts on the slot it is in, so a reload never pings at once.
+ * changed.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { NO_PASSIVE_READS, passiveReadsOf, type PassiveReads } from './passiveReads'
-import { boardAt, boardWithPing, EMPTY_REVEAL_BOARD, type RevealBoard } from './revealBoard'
-import { scoutPingOf, scoutSlotOf } from './scoutPing'
+import { boardAt, EMPTY_REVEAL_BOARD, type RevealBoard } from './revealBoard'
 
 export interface SensingView {
   board: RevealBoard
@@ -18,8 +16,6 @@ export interface SensingView {
   /** The tick the passives were last read on. */
   readTick: number
   planetIndex: number
-  /** The Scout clock's slot the board last pinged on, or started on (`scoutSlotOf`). */
-  scoutSlot: number
 }
 
 /** Six reads a second at 60 ticks a second. */
@@ -30,7 +26,6 @@ export const EMPTY_SENSING_VIEW: SensingView = {
   passives: NO_PASSIVE_READS,
   readTick: 0,
   planetIndex: 0,
-  scoutSlot: 0,
 }
 
 export function sensingViewAt(
@@ -40,8 +35,7 @@ export function sensingViewAt(
   tick: number,
 ): SensingView {
   const kept = isStale(view, state, tick) ? freshViewOn(state, tick) : view
-  const pinged = withScoutPing(withBoardAt(kept, state, tick), state, playerId, tick)
-  return withPassivesRead(pinged, state, playerId, tick)
+  return withPassivesRead(withBoardAt(kept, state, tick), state, playerId, tick)
 }
 
 function isStale(view: SensingView, state: AuthorityState, tick: number): boolean {
@@ -50,25 +44,7 @@ function isStale(view: SensingView, state: AuthorityState, tick: number): boolea
 
 function freshViewOn(state: AuthorityState, tick: number): SensingView {
   const readTick = tick - PASSIVE_READ_EVERY_TICKS
-  return {
-    ...EMPTY_SENSING_VIEW,
-    planetIndex: state.planet.index,
-    readTick,
-    scoutSlot: scoutSlotOf(tick),
-  }
-}
-
-/** A new slot pings once, if the Scout is active and the rig out of the dock. */
-function withScoutPing(
-  view: SensingView,
-  state: AuthorityState,
-  playerId: string,
-  tick: number,
-): SensingView {
-  const scoutSlot = scoutSlotOf(tick)
-  if (scoutSlot === view.scoutSlot) return view
-  const ping = scoutPingOf(state, playerId, tick)
-  return { ...view, scoutSlot, board: ping === null ? view.board : boardWithPing(view.board, ping) }
+  return { ...EMPTY_SENSING_VIEW, planetIndex: state.planet.index, readTick }
 }
 
 function withBoardAt(view: SensingView, state: AuthorityState, tick: number): SensingView {

@@ -4,13 +4,14 @@
  * The two held rows stay unregistered and unseen until their planets exist: the probe at P25 or
  * later after #258's kernel `hazard:magnetic` build, the void sounder at P33 or later after the
  * hollow-planet spec. The void sounder's prereq is the probe, so holding one holds both. The
- * lane's P16 fork, Scout and Diviner, joins the nodes (ticket 269); its branches are researched
- * passives, so they add no vehicle item.
+ * lane's P16 fork, Scout and Diviner, joins them (ticket 269): its two nodes and their charged
+ * items (`forkItems.ts`).
  */
 import type { VehicleItem } from '../../../systems/registries/vehicleLoadout'
 import type { TechNode } from '../../tech-tree'
 import { SENSING_ITEMS, type SensingItem } from './sensingCatalogue'
 import { FIFTH_CRADLE_NODE } from './sensingCradle'
+import { SENSING_FORK_VEHICLE_ITEMS } from './forkItems'
 import { SENSING_FORK } from './sensingFork'
 import { techNodeOf, vehicleItemOf } from './sensingItems'
 
@@ -22,8 +23,10 @@ export const HELD_SENSING_ITEM_IDS: readonly string[] = [
 
 export const SHIPPED_SENSING_ITEMS: readonly SensingItem[] = SENSING_ITEMS.filter(isShipped)
 
-export const SENSING_VEHICLE_ITEMS: readonly VehicleItem[] =
-  SHIPPED_SENSING_ITEMS.map(vehicleItemOf)
+export const SENSING_VEHICLE_ITEMS: readonly VehicleItem[] = [
+  ...SHIPPED_SENSING_ITEMS.map(vehicleItemOf),
+  ...SENSING_FORK_VEHICLE_ITEMS,
+]
 
 /** The items' nodes, the fifth cradle's (ticket 251) and the fork's two branches (ticket 269). */
 export const SENSING_TECH_NODES: readonly TechNode[] = [

@@ -1,14 +1,20 @@
 /**
  * The sensing lane's P16 fork (GD lock on #255, ticket 269): Scout, wide but vague, and Diviner,
- * narrow but exact. Each branch is a passive the research itself fits: it plays while its branch
- * is the lane's active one, at the Mark researched, with nothing to buy, slot or press. An
- * inactive branch's item is not unlocked (`researchedMarkOf` answers 0), so it reads null here.
+ * narrow but exact. Each branch unlocks a charged item of its own, pressed from a power-up slot
+ * like the echo sounder, so every ping and every cone read is a use (`PowerUpUsed`): what the
+ * lock's metric counts, wide pings per trip against cone reads per cut. Both are reveal only
+ * (Vertical Scaler on #157): a use changes nothing in the authority state, and each client draws
+ * it from the use (`scoutPing.ts`, `divinerCone.ts`).
  *
- * Both branches take the same tier and lane slot through `forkPairOf`, so they cost the same on
- * every planet and Mark step for step. Their Marks grow one number each: the Scout's ping radius
- * and the Diviner's cone length, up to twice the base like the other sensing passives. Neither
- * card or effect names a schedule row or an ore family; both reveal only (Vertical Scaler on
- * #157), as every sensing item does. Their numbers live in `sensing.economy.json` under `forks`.
+ * Only the active branch's item plays: the tree hides an inactive branch's item from the store,
+ * and an item still owned from a branch the player switched away from is refused
+ * (`sensing.branch_inactive`). The Diviner also warns, while it is the active branch, of what
+ * waits in its cone (`passiveReads.ts`).
+ *
+ * Both branches take the same tier and lane slot through `forkPairOf`, and their items the same
+ * one-off price at that tier, so they cost the same on every planet and Mark step for step. Their
+ * Marks step cooldown, magnitude (the Scout's radius, the Diviner's cone length) and charges, as
+ * the echo sounder's do. Their numbers live in `sensing.economy.json` under `forks`.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { createFieldReader, type FieldReader } from '../../../systems/economy/economyFieldReader'
@@ -22,24 +28,33 @@ import {
 } from '../../tech-tree'
 import SENSING_ECONOMY_FILE from '../sensing.economy.json'
 
-export const SCOUT_PINGER = 'passive.scout_pinger'
-export const DIVINER_ROD = 'passive.diviner_rod'
+export const SCOUT_PINGER = 'power.scout_pinger'
+export const DIVINER_ROD = 'power.diviner_rod'
 
-export interface ScoutBalance {
-  /** The ping's radius at Mark 1: the stat its Marks grow. */
+export type SensingForkItemId = typeof SCOUT_PINGER | typeof DIVINER_ROD
+
+export const SENSING_FORK_ITEM_IDS: readonly SensingForkItemId[] = [SCOUT_PINGER, DIVINER_ROD]
+
+/** A charged branch item's Mark 1 numbers, in whole ticks. */
+export interface ForkChargeBalance {
+  charges: number
+  cooldownTicks: number
+  windupTicks: number
+}
+
+export interface ScoutBalance extends ForkChargeBalance {
+  /** The ping's radius at Mark 1: the magnitude its Marks grow. */
   radiusTiles: number
-  /** One ping each time the authority clock passes a multiple of this, out of the dock. */
-  pingEveryTicks: number
   /** The vague grain: one mark per block of this many tiles square. */
   blockTiles: number
 }
 
-export interface DivinerBalance {
-  /** The cone's length at Mark 1: the stat its Marks grow. */
+export interface DivinerBalance extends ForkChargeBalance {
+  /** The cone's length at Mark 1: the magnitude its Marks grow. */
   lengthTiles: number
   /** The tangent of the cone's half-angle, in thousandths. */
   halfAngleTanPerMille: number
-  /** How long one cut's cone read stays marked. */
+  /** How long one cone read stays marked. */
   revealTicks: number
 }
 
@@ -50,9 +65,15 @@ export interface SensingForkBalance {
 
 export const SENSING_FORK_BALANCE: SensingForkBalance = loadForkBalance(SENSING_ECONOMY_FILE)
 
-const BRANCH_LADDERS: Readonly<Record<string, MarkLadder>> = {
-  [SCOUT_PINGER]: ladderOf(SENSING_FORK_BALANCE.scout.radiusTiles),
-  [DIVINER_ROD]: ladderOf(SENSING_FORK_BALANCE.diviner.lengthTiles),
+const BRANCH_LADDERS: Readonly<Record<SensingForkItemId, MarkLadder>> = {
+  [SCOUT_PINGER]: chargedLadderOf(
+    SENSING_FORK_BALANCE.scout,
+    SENSING_FORK_BALANCE.scout.radiusTiles,
+  ),
+  [DIVINER_ROD]: chargedLadderOf(
+    SENSING_FORK_BALANCE.diviner,
+    SENSING_FORK_BALANCE.diviner.lengthTiles,
+  ),
 }
 
 export const SENSING_FORK: ForkPair = forkPairOf('sensing', [
@@ -62,7 +83,7 @@ export const SENSING_FORK: ForkPair = forkPairOf('sensing', [
     iconId: 'node-sensing-echo-sounder',
     prereqs: [],
     unlocks: SCOUT_PINGER,
-    description: 'A wide pinger on its own clock: rough shapes far around you fill the map.',
+    description: 'A wide pinger: rough shapes far around you, filling the map as you go.',
     label: 'horizontal',
     marks: BRANCH_LADDERS[SCOUT_PINGER],
   },
@@ -72,41 +93,61 @@ export const SENSING_FORK: ForkPair = forkPairOf('sensing', [
     iconId: 'node-sensing-threat-periscope',
     prereqs: [],
     unlocks: DIVINER_ROD,
-    description: 'A narrow rod read with each cut: the exact cells ahead, and what waits there.',
+    description: 'A narrow rod read: the exact cells ahead, and what is about to strike there.',
     label: 'horizontal',
     marks: BRANCH_LADDERS[DIVINER_ROD],
   },
 ] satisfies [ForkBranchSpec, ForkBranchSpec])
 
-/** The Scout's ping radius now; null unless the Scout is the player's active branch. */
-export function scoutRadiusOf(state: AuthorityState, playerId: string): number | null {
-  return branchMagnitudeOf(state, playerId, SCOUT_PINGER)
+export function isSensingForkItem(itemId: string): itemId is SensingForkItemId {
+  return (SENSING_FORK_ITEM_IDS as readonly string[]).includes(itemId)
+}
+
+/** Whether the item's branch is the player's active one: only then does the item play. */
+export function isBranchActive(state: AuthorityState, playerId: string, itemId: string): boolean {
+  return state.players[playerId] !== undefined && researchedMarkOf(state, playerId, itemId) > 0
+}
+
+/** The item's magnitude at `mark`; Mark 0, none researched, acts as bought (#249). */
+export function forkMagnitudeAt(itemId: SensingForkItemId, mark: number): number {
+  return markStepOf(BRANCH_LADDERS[itemId], Math.max(mark, 1)).stats.magnitude ?? 0
 }
 
 /** The Diviner's cone length now; null unless the Diviner is the player's active branch. */
 export function divinerLengthOf(state: AuthorityState, playerId: string): number | null {
-  return branchMagnitudeOf(state, playerId, DIVINER_ROD)
+  if (!isBranchActive(state, playerId, DIVINER_ROD)) return null
+  return forkMagnitudeAt(DIVINER_ROD, researchedMarkOf(state, playerId, DIVINER_ROD))
 }
 
-/** The branch item's magnitude at the Mark researched; null while the branch is not active. */
-function branchMagnitudeOf(state: AuthorityState, playerId: string, itemId: string) {
-  if (state.players[playerId] === undefined) return null
-  const mark = researchedMarkOf(state, playerId, itemId)
-  if (mark === 0) return null
-  return markStepOf(BRANCH_LADDERS[itemId], mark).stats.magnitude ?? null
-}
-
-/** A reveal-only passive: one magnitude, grown to twice its base by the rotation. */
-function ladderOf(base: number): MarkLadder {
-  return { isIncomeItem: false, magnitude: { base } }
+function chargedLadderOf(balance: ForkChargeBalance, magnitude: number): MarkLadder {
+  return {
+    isIncomeItem: false,
+    cooldown: balance.cooldownTicks,
+    magnitude: { base: magnitude },
+    charges: balance.charges,
+  }
 }
 
 function loadForkBalance(raw: unknown): SensingForkBalance {
   const reader = createFieldReader()
   const forks = reader.object('forks', reader.object('file', raw).forks)
+  const scout = reader.object('forks.scout', forks.scout)
+  const diviner = reader.object('forks.diviner', forks.diviner)
   const balance = {
-    scout: readScout(reader, reader.object('forks.scout', forks.scout)),
-    diviner: readDiviner(reader, reader.object('forks.diviner', forks.diviner)),
+    scout: {
+      ...readCharge(reader, 'forks.scout', scout),
+      radiusTiles: reader.safeInteger('forks.scout.radiusTiles', scout.radiusTiles),
+      blockTiles: reader.safeInteger('forks.scout.blockTiles', scout.blockTiles),
+    },
+    diviner: {
+      ...readCharge(reader, 'forks.diviner', diviner),
+      lengthTiles: reader.safeInteger('forks.diviner.lengthTiles', diviner.lengthTiles),
+      halfAngleTanPerMille: reader.safeInteger(
+        'forks.diviner.halfAngleTanPerMille',
+        diviner.halfAngleTanPerMille,
+      ),
+      revealTicks: reader.safeInteger('forks.diviner.revealTicks', diviner.revealTicks),
+    },
   }
   if (reader.problems.length > 0) {
     throw new Error(`sensing.economy.json forks are refused:\n${reader.problems.join('\n')}`)
@@ -114,21 +155,14 @@ function loadForkBalance(raw: unknown): SensingForkBalance {
   return balance
 }
 
-function readScout(reader: FieldReader, row: Record<string, unknown>): ScoutBalance {
+function readCharge(
+  reader: FieldReader,
+  path: string,
+  row: Record<string, unknown>,
+): ForkChargeBalance {
   return {
-    radiusTiles: reader.safeInteger('forks.scout.radiusTiles', row.radiusTiles),
-    pingEveryTicks: reader.safeInteger('forks.scout.pingEveryTicks', row.pingEveryTicks),
-    blockTiles: reader.safeInteger('forks.scout.blockTiles', row.blockTiles),
-  }
-}
-
-function readDiviner(reader: FieldReader, row: Record<string, unknown>): DivinerBalance {
-  return {
-    lengthTiles: reader.safeInteger('forks.diviner.lengthTiles', row.lengthTiles),
-    halfAngleTanPerMille: reader.safeInteger(
-      'forks.diviner.halfAngleTanPerMille',
-      row.halfAngleTanPerMille,
-    ),
-    revealTicks: reader.safeInteger('forks.diviner.revealTicks', row.revealTicks),
+    charges: reader.safeInteger(`${path}.charges`, row.charges),
+    cooldownTicks: reader.safeInteger(`${path}.cooldownTicks`, row.cooldownTicks),
+    windupTicks: reader.safeInteger(`${path}.windupTicks`, row.windupTicks),
   }
 }

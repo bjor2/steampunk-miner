@@ -5,7 +5,8 @@
  * where its player stands then, at its researched Mark. Everything a client draws for a use comes
  * from these lines (the TD lock on #203 Q1), so the authority keeps no reveal state. A held item's
  * use, were one ever logged, is no sensing use (the Horizontal guard on #203: no markers for the
- * galvanic probe or the void sounder).
+ * galvanic probe or the void sounder). The sensing fork's two items (ticket 269) are reveal items
+ * too: a Scout ping or a Diviner cone read is a use like the echo sounder's.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
@@ -13,14 +14,21 @@ import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import type { FollowUpPattern } from '../../power-up-core'
 import { researchedMarkOf } from '../../tech-tree'
+import { SENSING_FORK_ITEM_IDS, type SensingForkItemId } from './sensingFork'
 
 export const ECHO_SOUNDER = 'power.echo_sounder'
 export const FLARE_MORTAR = 'consumable.flare_mortar'
 export const SIGNAL_BUOY = 'consumable.signal_buoy'
 
-export type RevealItemId = typeof ECHO_SOUNDER | typeof FLARE_MORTAR | typeof SIGNAL_BUOY
+export type RevealItemId =
+  typeof ECHO_SOUNDER | typeof FLARE_MORTAR | typeof SIGNAL_BUOY | SensingForkItemId
 
-const REVEAL_ITEM_IDS: readonly string[] = [ECHO_SOUNDER, FLARE_MORTAR, SIGNAL_BUOY]
+const REVEAL_ITEM_IDS: readonly string[] = [
+  ECHO_SOUNDER,
+  FLARE_MORTAR,
+  SIGNAL_BUOY,
+  ...SENSING_FORK_ITEM_IDS,
+]
 
 export interface SensingUse {
   itemId: RevealItemId

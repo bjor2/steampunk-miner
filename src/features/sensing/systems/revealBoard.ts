@@ -14,6 +14,8 @@ import { sensingReachAt } from '../../../systems/authority/magnetic/sensingReach
 import { droppedPinOf, pinAfterPasses, pinsWithBuoy, type BuoyPin } from './buoyPins'
 import { echoConeTilesOf, twistedDownOf } from './deepStriker'
 import { divinerPingOf } from './divinerCone'
+import { scoutPingOf } from './scoutPing'
+import { DIVINER_ROD, SCOUT_PINGER } from './sensingFork'
 import { echoMarksOf, echoMarksOn } from './echoPing'
 import { BUOY_PIN_CAP, REVEAL_MARK_CAP } from './revealBudget'
 import { buoyRepingTicks } from './revealReach'
@@ -43,10 +45,7 @@ export interface RevealBoard {
 
 export const EMPTY_REVEAL_BOARD: RevealBoard = { marks: [], pins: [] }
 
-/**
- * The board after a batch of events: its uses, the Diviner's read if the local drill cut (ticket
- * 269), then the trip's flare maps and Scout pings gone if it docked.
- */
+/** The board after a batch of events: its uses, then the trip's flare maps gone if it docked. */
 export function boardAfterHeard(
   board: RevealBoard,
   events: readonly DomainEvent[],
@@ -54,28 +53,7 @@ export function boardAfterHeard(
   localPlayerId: string,
 ): RevealBoard {
   const used = boardAfterUses(board, events, state, localPlayerId)
-  const read = boardAfterCut(used, events, state, localPlayerId)
-  return hasDockedIn(events, localPlayerId) ? boardAfterDock(read) : read
-}
-
-/**
- * The Diviner reads its cone once for the batch's last cell the local drill broke: every cut in a
- * batch reads the one state the batch left, so one read marks what each would.
- */
-function boardAfterCut(
-  board: RevealBoard,
-  events: readonly DomainEvent[],
-  state: AuthorityState,
-  localPlayerId: string,
-): RevealBoard {
-  const cut = events.filter((event) => isCutBy(event, localPlayerId)).at(-1)
-  const ping = cut === undefined ? null : divinerPingOf(state, localPlayerId, cut.tick)
-  return ping === null ? board : boardWithPing(board, ping)
-}
-
-/** A cell the player's own drill broke: a blast, bore or edit names its cause. */
-function isCutBy(event: DomainEvent, playerId: string): boolean {
-  return event.type === 'TileDestroyed' && event.playerId === playerId && event.cause === undefined
+  return hasDockedIn(events, localPlayerId) ? boardAfterDock(used) : used
 }
 
 /** The board after a batch's uses: the local player's pings, and anyone's buoy. */
@@ -117,7 +95,10 @@ function boardAfterUse(
   return boardWithPing(board, pingOfUse(use, state))
 }
 
+/** The fork branches' items (ticket 269) ping their own way: the Scout vague, the Diviner a cone. */
 function pingOfUse(use: SensingUse, state: AuthorityState): RevealPing {
+  if (use.itemId === SCOUT_PINGER) return scoutPingOf(use, state)
+  if (use.itemId === DIVINER_ROD) return divinerPingOf(use, state)
   return use.itemId === ECHO_SOUNDER ? echoPingOf(use, state) : flareMapOf(use, state)
 }
 
@@ -175,7 +156,7 @@ function ringPingOf(pin: BuoyPin, state: AuthorityState, tick: number): RevealPi
   }
 }
 
-export function boardWithPing(board: RevealBoard, ping: RevealPing): RevealBoard {
+function boardWithPing(board: RevealBoard, ping: RevealPing): RevealBoard {
   return { ...board, marks: marksAfterPing(board.marks, ping, REVEAL_MARK_CAP) }
 }
 

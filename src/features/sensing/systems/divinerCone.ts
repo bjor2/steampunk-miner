@@ -1,10 +1,9 @@
 /**
  * The Diviner branch's cone (GD lock on #255, ticket 269): narrow but exact. Along the drill's
- * facing it reads every cell within its length and 15° of the axis (`halfAngleTanPerMille`) and
- * marks them as the echo sounder does, cell by cell, gate badges included; it warns of each
- * collapse block still warning over a cell of the cone, with the ticks left, and of each enemy
- * standing in it. The board takes one read for every cell the player's drill breaks, so the reads
- * follow the cut. A pure read of the state on each client: reveal only, like every ping (#203); a
+ * facing it reads every cell within its length and 15° of the axis (`halfAngleTanPerMille`). Each
+ * use marks them as the echo sounder does, cell by cell, gate badges included, for `revealTicks`;
+ * while the Diviner is the active branch the cone also warns of each collapse block still warning
+ * over one of its cells, with the ticks left, and of each enemy standing in it. A pure read of the state on each client: reveal only, like every ping (#203); a
  * magnetic field cuts its length as it cuts every reach (spec #258).
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
@@ -27,7 +26,14 @@ import { blockContaining, blockIdOf } from '../../../systems/world/collapseBlock
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { echoMarksOn, type EchoMark } from './echoPing'
 import type { RevealPing } from './revealPing'
-import { divinerLengthOf, SENSING_FORK_BALANCE, type DivinerBalance } from './sensingFork'
+import {
+  DIVINER_ROD,
+  divinerLengthOf,
+  forkMagnitudeAt,
+  SENSING_FORK_BALANCE,
+  type DivinerBalance,
+} from './sensingFork'
+import type { SensingUse } from './sensingUses'
 
 export type DivinerWarning =
   | { kind: 'collapse'; block: string; tile: TilePoint; ticksLeft: number | null }
@@ -53,7 +59,13 @@ export function divinerReadOf(
   const length = divinerLengthOf(state, playerId)
   const pose = vehicleOf(state, playerId).pose
   if (length === null || pose === null) return null
-  const tiles = divinerConeTilesOf(pose, sensingReachAt(state, tileOfPose(pose), length), balance)
+  const origin = tileOfPose(pose)
+  const tiles = divinerConeTilesOf(
+    origin,
+    axisOf(pose),
+    sensingReachAt(state, origin, length),
+    balance,
+  )
   return {
     tiles,
     marks: echoMarksOn(state, tiles),
@@ -61,32 +73,30 @@ export function divinerReadOf(
   }
 }
 
-/** One cut's read, marked from `tick` for `revealTicks`; null without the Diviner active. */
+/** The Diviner use's read, marked from its tick for `revealTicks`: the cone's cells, exactly. */
 export function divinerPingOf(
+  use: SensingUse,
   state: AuthorityState,
-  playerId: string,
-  tick: number,
   balance: DivinerBalance = SENSING_FORK_BALANCE.diviner,
-): RevealPing | null {
-  const read = divinerReadOf(state, playerId, balance)
-  const pose = vehicleOf(state, playerId).pose
-  if (read === null || pose === null) return null
+): RevealPing {
+  const pose = state.players[use.playerId]?.vehicle.pose ?? null
+  const length = sensingReachAt(state, use.origin, forkMagnitudeAt(DIVINER_ROD, use.mark))
+  const tiles = pose === null ? [] : divinerConeTilesOf(use.origin, axisOf(pose), length, balance)
   return {
-    centre: tileOfPose(pose),
-    marks: read.marks,
-    bornTick: tick,
-    untilTick: tick + balance.revealTicks,
+    centre: use.origin,
+    marks: echoMarksOn(state, tiles),
+    bornTick: use.tick,
+    untilTick: use.tick + balance.revealTicks,
   }
 }
 
-/** Every tile centre within `lengthTiles` of the rig's tile, ahead along the facing, in the cone. */
+/** Every tile centre within `lengthTiles` of `origin`, ahead along `axis`, in the cone. */
 export function divinerConeTilesOf(
-  pose: VehiclePose,
+  origin: TilePoint,
+  axis: IntegerVector,
   lengthTiles: number,
   balance: DivinerBalance = SENSING_FORK_BALANCE.diviner,
 ): TilePoint[] {
-  const origin = tileOfPose(pose)
-  const axis = facingVectorOf(pose.upx, pose.upy, pose.facing)
   const tiles: TilePoint[] = []
   for (let dy = -lengthTiles; dy <= lengthTiles; dy++) {
     for (let dx = -lengthTiles; dx <= lengthTiles; dx++) {
@@ -96,6 +106,11 @@ export function divinerConeTilesOf(
     }
   }
   return tiles
+}
+
+/** The drill's facing: the way the cone points. */
+function axisOf(pose: VehiclePose): IntegerVector {
+  return facingVectorOf(pose.upx, pose.upy, pose.facing)
 }
 
 /** Within the length, ahead along the axis, and off it by at most the half-angle's tangent. */

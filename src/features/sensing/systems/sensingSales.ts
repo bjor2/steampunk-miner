@@ -3,18 +3,20 @@
  * sounder and the three passives, each a one-off at 15 band-5 units at its unlock planet (#162
  * 4.1), the price its card shows. The flare mortar and the signal buoy are bought by the unit and
  * their stacks restocked, which is the restock's path, not a one-off buy; a held row is not sold.
+ * The fork's two items (ticket 269) sell alike at the fork's planet, once their branch is chosen.
  */
 import type {
   VehicleItemOffer,
   VehicleItemSeller,
 } from '../../../systems/registries/vehicleItemSales'
 import type { SensingItem } from './sensingCatalogue'
+import { forkItemOfferOf } from './forkItems'
 import { SHIPPED_SENSING_ITEMS } from './sensingContent'
 import { itemPriceOf } from './sensingItems'
 
 export const SENSING_SELLER: VehicleItemSeller = {
   id: 'sensing.seller',
-  offerOf: (itemId) => oneOffOfferOf(itemId),
+  offerOf: (itemId) => oneOffOfferOf(itemId) ?? forkItemOfferOf(itemId),
 }
 
 function oneOffOfferOf(itemId: string): VehicleItemOffer | null {
