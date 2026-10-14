@@ -1,0 +1,89 @@
+/*
+ * The hazard strip (ticket 341): a zero-size anchor at the screen's middle, where the camera holds
+ * the rig, turned to the drive; the track runs out from it toward the leading edge. Its length is a
+ * fixed share of the screen whatever the speed (the GD lock's fixed pixel budget). Placeholder look,
+ * tuned by eye in `npm run dev`.
+ */
+.strip {
+  --strip-inner: 14vmin;
+  --strip-length: 30vmin;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--strip-turn, 0deg));
+}
+
+.track {
+  position: absolute;
+  bottom: var(--strip-inner);
+  left: -2px;
+  width: 4px;
+  height: var(--strip-length);
+  border-radius: 2px;
+  background: linear-gradient(to top, var(--color-brass), transparent);
+  opacity: 0.85;
+}
+
+/* A pip sits at its time to arrival along the track; its label reads upright on screen. */
+.pip {
+  position: absolute;
+  bottom: calc(var(--pip-place, 0) * 100%);
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  color: var(--color-parchment);
+  transform: translate(-0.5em, 50%) rotate(calc(-1 * var(--strip-turn, 0deg)));
+  transform-origin: 0.5em 50%;
+}
+
+.pip[hidden] {
+  display: none;
+}
+
+.pip::before {
+  content: '';
+  width: 1em;
+  height: 1em;
+  border: 2px solid var(--pip-colour, var(--color-brass));
+  border-radius: 50%;
+  background: var(--pip-colour, var(--color-brass));
+}
+
+.pip[data-coarse='true']::before {
+  background: transparent;
+  border-style: dashed;
+}
+
+.pip[data-kind='lava'] {
+  --pip-colour: var(--color-ember);
+}
+
+.pip[data-kind='void'] {
+  --pip-colour: var(--color-bg);
+}
+
+.pip[data-kind='collapse'] {
+  --pip-colour: var(--color-amber);
+}
+
+.pip[data-kind='core'] {
+  --pip-colour: var(--color-copper);
+}
+
+.pip[data-kind='cache'] {
+  --pip-colour: var(--color-teal);
+}
+
+.pip[data-kind='gate']::before {
+  border-radius: 2px;
+}
+
+.pip[data-kind='ore'] {
+  --pip-colour: var(--color-parchment);
+}

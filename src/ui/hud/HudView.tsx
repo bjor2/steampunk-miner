@@ -5,6 +5,7 @@
  */
 import type { HudModel } from '../../systems/views/hudModel'
 import { GaugeCluster } from './GaugeCluster'
+import { HazardStrip } from './HazardStrip'
 import { HudBanner } from './HudBanner'
 import { OverlayLayer } from '../overlay/OverlayLayer'
 import { HudPrompts } from './HudPrompts'
@@ -27,6 +28,7 @@ export function HudView({ model, isFlashing }: { model: HudModel; isFlashing: bo
       <SlicePanels slot="prompts" />
       <ThreatMarkers threats={model.threats} />
       <SlicePanels slot="threats" />
+      <HazardStrip />
     </div>
   )
 }

@@ -16,6 +16,7 @@ import { BlastScorches } from './BlastScorches'
 import { CanvasScreenshots } from './CanvasScreenshots'
 import { CollapseTelegraph } from './CollapseTelegraph'
 import { EnemyFigures } from './EnemyFigures'
+import { HazardStripSampler } from './HazardStripSampler'
 import { LightRig } from './LightRig'
 import { PerfSampler } from './PerfSampler'
 import { PlanetCamera } from './PlanetCamera'
@@ -74,6 +75,7 @@ export function GameScene() {
       <SprayLayer />
       <CementSpray />
       <SoundStage />
+      <HazardStripSampler />
       <PerfSampler />
       <ScreenProjectorFeed />
       <RenderPipeline />
