@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T15:01:34+02:00",
+  "updated_at": "2026-10-14T15:23:24+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -27,11 +27,11 @@
         },
         {
           "slot": "C2",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 261,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-14T15:21:00+02:00"
         },
         {
           "slot": "C3",
@@ -51,9 +51,9 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
-      "claims_last_hour": 1,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
     {
@@ -109,9 +109,9 @@
   },
   "tester": {
     "state": "running",
-    "phase": "fast",
+    "phase": "triage-fast",
     "sha": "8d1eab48c54e8eb72d570b68b00c46ed6bcae40a",
-    "since": "2026-10-14T13:01:27Z",
+    "since": "2026-10-14T13:23:16Z",
     "holds_gate": false,
     "claude_slot": null,
     "last_run": "2026-10-08T00:44:41Z",
@@ -416,9 +416,10 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 261,
+      "since": "2026-10-14T15:21:00+02:00",
+      "claude_slot": 2
     },
     {
       "slot": 3,
@@ -493,10 +494,10 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 261,
+      "grok_slot": 2,
+      "since": "2026-10-14T15:21:00+02:00",
       "account": 1
     },
     {
@@ -553,17 +554,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-14 15:00 CEST",
-    "mode": "refill-dev",
-    "triggers": "#267",
-    "started": "#321->C1/A1",
+    "at": "2026-10-14 15:21 CEST",
+    "mode": "recheck",
+    "triggers": "#261",
+    "started": "#261->C2/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 2,
-      "dev": 2,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -571,8 +572,8 @@
     "claude": {
       "size": 8,
       "enabled": 4,
-      "used": 2,
-      "free": 2,
+      "used": 3,
+      "free": 1,
       "external": 0
     }
   }
