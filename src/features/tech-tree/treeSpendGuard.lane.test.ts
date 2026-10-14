@@ -3,7 +3,8 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { PACING_WORLD_SEEDS } from '../../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { LoggedLevels } from '../../logging/bandDigReport'
-import { startRunSummaryFold, type RunSummary } from '../../logging/runSummary'
+import type { RunEvent } from '../../logging/runEvent'
+import { startRunSummaryFold, type RunSummary, type RunSummaryFold } from '../../logging/runSummary'
 import { playSliceIntoSink } from '../../logging/sliceRunLog'
 import { isFeatureUnlocked } from '../../systems/authority/featureUnlocks'
 import type { AuthorityState } from '../../systems/authority/authorityState'
@@ -15,6 +16,16 @@ import { INCOME_RATE_REGISTRY } from '../../systems/registries/incomeRates'
 import { entriesOf } from '../../systems/registries/seal'
 import { spendFamiliesOf } from '../../systems/registries/spendFamilies'
 import type { Scenario } from '../../systems/scenario'
+import {
+  startDeliveredIncomeFold,
+  type DeliveredIncomeFold,
+  type PlanetIncome,
+} from '../extraction'
+import {
+  deliveredShareTableOf,
+  deliveredShareVerdictsOf,
+  type DeliveredShareVerdict,
+} from './systems/deliveredIncomeShares'
 import {
   brokenPinsOf,
   sharePinTableOf,
@@ -58,8 +69,12 @@ import {
 // most 15% of a full hold of the band's ore in a trip on P10, P20, P40 and P60, at the levels the
 // bot arrived with and left with, on the median of the seeds, and an item over it before the trip
 // cap is held by the ledger in play (the movers are known-red until their ledger ticket lands).
-// Beside the runs, the loadout yield cap (GD lock on #245, ticket 266): a full loadout at max Mark
-// yields no more than the five lanes' maximum on P10/P20/P40/P60, the Aetheric lane adding zero.
+// Beside it, the Vertical Scaler's guard (amendment 6167249318): each income item's share of what
+// the bot earned on every planet of the run, over the planet's whole stay, at most 15% on the
+// median of the seeds; the bot presses no power-up yet, so until it does the table reads that
+// items delivered nothing. Beside the runs, the loadout yield cap (GD lock on #245, ticket 266): a
+// full loadout at max Mark yields no more than the five lanes' maximum on P10/P20/P40/P60, the
+// Aetheric lane adding zero.
 // Headless, with no run log kept: the lane reads the bot's spend records, a summary fold's track
 // levels per planet, and which anchors the run opened or owns. The runs take hours, so this is a
 // lane (vite.config.ts leaves it out unless it is named):
@@ -82,6 +97,8 @@ interface SeedRun {
   liveAnchorRowIds: ReadonlySet<string>
   /** The self-anchored income items a player owned when the run ended. */
   ownedIncomeItemIds: ReadonlySet<string>
+  /** Each planet's money earned and what the income items delivered there. */
+  deliveredOn: readonly PlanetIncome[]
   /** The judged planets' track levels on arrival and on leaving. */
   levelsOn: ReadonlyMap<number, Readonly<Record<PlanetVisit, UpgradeLevels>>>
   endedOnPlanet: number
@@ -93,13 +110,15 @@ describe('tech tree: spend guard of the pacing bot to planet 60', () => {
   let verdicts: TreeShareVerdict[] = []
   let pinVerdicts: SharePinVerdict[] = []
   let incomeVerdicts: IncomeCapVerdict[] = []
+  let deliveredVerdicts: DeliveredShareVerdict[] = []
 
   beforeAll(() => {
     seedRuns = PACING_WORLD_SEEDS['bot-slice'].map(playSeedToLastPlanet)
     verdicts = treeShareVerdictsOf(seedRuns.map((seedRun) => seedRun.shopSpend))
     pinVerdicts = sharePinVerdictsOf(seedRuns.map(seedSpendsOf))
     incomeVerdicts = incomeCapVerdictsOf(seedRuns.map(seedIncomeOf))
-    console.log(reportOf(seedRuns, verdicts, pinVerdicts, incomeVerdicts))
+    deliveredVerdicts = deliveredShareVerdictsOf(seedRuns.map((seedRun) => seedRun.deliveredOn))
+    console.log(reportOf(seedRuns, verdicts, pinVerdicts, incomeVerdicts, deliveredVerdicts))
   }, RUN_TIMEOUT_MS)
 
   it('plays every seed to the core of planet 60', () => {
@@ -117,6 +136,11 @@ describe('tech tree: spend guard of the pacing bot to planet 60', () => {
   it('keeps every income item within 15% of a full hold a trip on P10, P20, P40 and P60', () => {
     expect(failingVerdictsOf(incomeVerdicts).map(incomeMissOf)).toEqual([])
   })
+
+  it('keeps every income item within 15% of what the bot earned on each planet', () => {
+    const misses = deliveredVerdicts.filter((verdict) => verdict.isOverCap)
+    expect(misses.map((verdict) => `P${verdict.planetIndex} ${verdict.itemId}`)).toEqual([])
+  })
 })
 
 describe('tech tree: the loadout yield cap beside the spend guard', () => {
@@ -130,9 +154,10 @@ describe('tech tree: the loadout yield cap beside the spend guard', () => {
 function playSeedToLastPlanet(worldSeed: number): SeedRun {
   const scenario = JSON.parse(readFileSync(SCENARIO_FILE, 'utf8')) as Scenario
   const summary = startRunSummaryFold()
+  const delivered = startDeliveredIncomeFold()
   const run = playSliceIntoSink(
     { ...scenario, worldSeed },
-    { append: (event) => summary.add(event), appendCommand: () => undefined },
+    { append: (event) => foldLine(event, summary, delivered), appendCommand: () => undefined },
     { lastPlanet: LAST_PLANET, maxTicks: BUDGET_TICKS },
   )
   const { shopSpend, isFinished } = run
@@ -141,10 +166,16 @@ function playSeedToLastPlanet(worldSeed: number): SeedRun {
     shopSpend,
     liveAnchorRowIds: liveAnchorRowIdsOf(run.state),
     ownedIncomeItemIds: ownedIncomeItemIdsOf(run.state),
+    deliveredOn: delivered.planets(),
     levelsOn: judgedLevelsOf(summary.summarize()),
     endedOnPlanet: run.state.planet.index,
     isFinished,
   }
+}
+
+function foldLine(event: RunEvent, summary: RunSummaryFold, delivered: DeliveredIncomeFold) {
+  summary.add(event)
+  delivered.add(event)
 }
 
 /** The schedule rows the families and rates anchor on that are unlocked or owned. */
@@ -214,6 +245,7 @@ function reportOf(
   verdicts: readonly TreeShareVerdict[],
   pinVerdicts: readonly SharePinVerdict[],
   incomeVerdicts: readonly IncomeCapVerdict[],
+  deliveredVerdicts: readonly DeliveredShareVerdict[],
 ): string {
   return [
     seedLinesOf(seedRuns),
@@ -222,6 +254,7 @@ function reportOf(
     familyTableOf(seedRuns),
     laneShareTableOf(laneShareRowsOf(seedRuns.map((seedRun) => seedRun.shopSpend))),
     incomeCapTableOf(incomeVerdicts),
+    deliveredShareTableOf(deliveredVerdicts),
   ].join('\n')
 }
 

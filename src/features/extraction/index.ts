@@ -4,7 +4,8 @@
  * prices and `statPreview`, and the income trip every income item shares (#162 4.5): the
  * `extraction` section the #164 card line reads (`incomeItemValue`, `tripCap`), the cap formula
  * and the percent the card prints. The drain combos (#206) read and move the same counter. The
- * lane's P16 fork (ticket 269): Prospector ships, Hauler is held until #385.
+ * lane's P16 fork (ticket 269): Prospector ships, Hauler is held until #385. A run's delivered
+ * income per planet folds from its lines for the #385 lane.
  */
 export const EXTRACTION_SLICE_ID = 'extraction'
 export type { ExtractionItem, ExtractionNode } from './systems/extractionItems'
@@ -35,3 +36,5 @@ export {
   PROSPECTOR_SIEVE,
   SHIPPED_EXTRACTION_FORK_NODES,
 } from './systems/extractionFork'
+export type { DeliveredIncomeFold, PlanetIncome } from './deliveredIncome'
+export { startDeliveredIncomeFold } from './deliveredIncome'
