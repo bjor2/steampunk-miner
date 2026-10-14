@@ -17,8 +17,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | Check | Decided in | Where | Tests |
 | --- | --- | --- | --- |
-| Pacing gates: slice band, planet 1 core and assay gate, median of the gate seeds | #84 | `src/logging/pacingGate.test.ts`, `src/logging/assayPacingGate.test.ts` | 9 |
-| Campaign scaling gate (R1): band 5 sawtooth on planets 1-7 and the schedule cadence, with the C1-C4 and H1-H2 probes | #81, #89 | `src/logging/campaignScalingGate.test.ts`, `src/logging/campaignPacingGate.test.ts`, `src/systems/economy/upgradePrices.test.ts`, `src/systems/economy/economyGrowth.test.ts`, `src/systems/economy/casingPrices.test.ts`, `src/systems/authority/casingPlacement.test.ts`, `src/systems/vehicle/bandDig.test.ts`, `src/logging/sawtoothMedian.test.ts`, `src/systems/bot/botCoreRule.test.ts`, `src/logging/pacingReport.test.ts`, `src/systems/unlocks/readUnlockSchedule.test.ts`, `src/systems/unlocks/travelUnlocks.test.ts`, `src/systems/unlocks/scheduleCadence.test.ts`, `src/systems/authority/featureUnlocks.test.ts`, `npm run balance:planets` | 110 |
+| Pacing gates: slice band, planet 1 core and assay gate, median of the gate seeds | #84 | `src/logging/pacingGate.test.ts`, `src/logging/assayPacingGate.test.ts` | 10 |
+| Campaign scaling gate (R1): band 5 sawtooth on planets 1-7 and the schedule cadence, with the C1-C4 and H1-H2 probes | #81, #89 | `src/logging/campaignScalingGate.test.ts`, `src/logging/campaignPacingGate.test.ts`, `src/systems/economy/upgradePrices.test.ts`, `src/systems/economy/economyGrowth.test.ts`, `src/systems/economy/casingPrices.test.ts`, `src/systems/authority/casingPlacement.test.ts`, `src/systems/vehicle/bandDig.test.ts`, `src/logging/sawtoothMedian.test.ts`, `src/systems/bot/botCoreRule.test.ts`, `src/logging/pacingReport.test.ts`, `src/systems/unlocks/readUnlockSchedule.test.ts`, `src/systems/unlocks/travelUnlocks.test.ts`, `src/systems/unlocks/scheduleCadence.test.ts`, `src/systems/authority/featureUnlocks.test.ts`, `npm run balance:planets` | 113 |
 | Balance guards, reported against the committed baseline or a control run | #84, #105, #107, #109, #113, #198, #347 | `npm run balance:report`, `npm run balance:planets`, `npm run balance:guns`, `npm run balance:bore`, `npm run balance:charges`, `npm run balance:refinery`, `npm run balance:heat` | - |
 | Every buyable has a description | #159 | `src/systems/registries/buyableRefs.test.ts`, `src/features/descriptions/systems/descriptionCoverage.test.ts` | 10 |
 | Every ore family has a gateClass row | #141, #142 | `src/features/planet-mix/systems/themeRows.test.ts`, `src/features/mining-gates/systems/rigs.test.ts`, `src/features/mining-gates/systems/gateTable.test.ts` | 19 |
@@ -781,7 +781,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
 | `src/systems/economy/costCurveLookup.test.ts` | 4 | 4 |
 | `src/systems/economy/drillGearCaps.test.ts` | 18 | 18 |
-| `src/systems/economy/economyGrowth.test.ts` | 5 | 5 |
+| `src/systems/economy/economyGrowth.test.ts` | 4 | 4 |
 | `src/systems/economy/economySourceScan.test.ts` | 6 | 6 |
 | `src/systems/economy/economyTables.test.ts` | 10 | 5 |
 | `src/systems/economy/enemyStats.test.ts` | 24 | 20 |
@@ -795,7 +795,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/readEconomy.test.ts` | 21 | 21 |
 | `src/systems/economy/refineryEconomy.test.ts` | 6 | 6 |
 | `src/systems/economy/trackKind.test.ts` | 1 | 1 |
-| `src/systems/economy/upgradePrices.test.ts` | 10 | 10 |
+| `src/systems/economy/upgradePrices.test.ts` | 14 | 14 |
 | `src/systems/economy/upgradeSteps.test.ts` | 24 | 14 |
 | `src/systems/economy/vehicleStats.test.ts` | 21 | 13 |
 
@@ -875,6 +875,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/logging/ndjson.test.ts` | 6 | 6 |
 | `src/logging/pacingMedian.test.ts` | 7 | 7 |
 | `src/logging/pacingReport.test.ts` | 12 | 12 |
+| `src/logging/planetOneDrillPace.test.ts` | 5 | 5 |
 | `src/logging/purchaseChains.test.ts` | 7 | 7 |
 | `src/logging/refineryReport.test.ts` | 5 | 5 |
 | `src/logging/registries/runEvents.test.ts` | 4 | 4 |
@@ -900,7 +901,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/logging/assayPacingGate.test.ts` | 2 | 2 |
 | `src/logging/campaignPacingGate.test.ts` | 1 | 1 |
-| `src/logging/pacingGate.test.ts` | 7 | 7 |
+| `src/logging/pacingGate.test.ts` | 8 | 8 |
 | `src/systems/bot/playSlice.test.ts` | 8 | 8 |
 
 ### `physics`

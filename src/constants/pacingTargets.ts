@@ -13,6 +13,12 @@ export const PACING_TARGETS = {
   earlyTracks: 2,
   earlyBand: 2,
   planet1CoreMinutes: { min: 30, max: 60 },
+  /**
+   * Ticket 396 (GD ruling and VS amendment 4, on Bjor's 8 Oct no-cap ruling): the bot's band-1 drill
+   * speed on planet 1 is at least 3x its start by the time it reaches band 3, and at least 10 cells
+   * a second when it leaves. Systems' front-loaded drill rows are priced to meet both.
+   */
+  planet1Drill: { bandThreeSpeedupMin: 3, departureCellsPerSecondMin: 10 },
   sliceMinutes: { min: 90, max: 130 },
   /** Report only (#29 Systems & Economy note 4): alert when a planet takes fewer or more trips. */
   tripsPerPlanet: { min: 3, max: 12 },

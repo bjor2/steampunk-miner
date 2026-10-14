@@ -202,7 +202,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   Sell bay visit (#115, #128); the pacing specs fail a drill dive with no `casing_placed` and a slice that
   forgives more than a tenth of the lining it charged. `src/logging/pacingGate.test.ts` fails on a
   missed pacing target (`src/constants/pacingTargets.ts`), an unregistered event or field, a broken
-  #2 sequence or more than 4 MB of core events and commands in the first hour.
+  #2 sequence or more than 4 MB of core events and commands in the first hour; it also fails a
+  seed-median planet 1 drill under 3x its start band-1 speed when it first breaks a band-3 tile, or
+  under 10 band-1 cells/s on arriving at planet 2 (`planetOneDrillPace.ts`, ticket 396).
   `src/logging/assayPacingGate.test.ts` holds the bot holding `assay_beacon`
   (`bot-slice-assay.scenario.json`) to the same three gates: the #16 first ten minutes, the planet 1
   core in 30 to 60 minutes and the slice in 90 to 130 (`pacingVerdicts` prints pass or fail for each). Trips per planet

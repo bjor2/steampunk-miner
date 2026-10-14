@@ -17,6 +17,11 @@ import {
   pacingProblems,
   pacingVerdicts,
 } from './pacingReport'
+import {
+  derivePlanetOneDrillPace,
+  medianPlanetOneDrillPace,
+  planetOneDrillPaceProblems,
+} from './planetOneDrillPace'
 import type { RunEvent } from './runEvent'
 import { runEventProblems } from './runEventSchema'
 import { deriveSummary } from './runSummary'
@@ -102,6 +107,12 @@ describe('balance regression: the pacing bot on the slice (#29, S11)', () => {
         [...pacingAlerts(median), ...wrecker].join('\n'),
     )
     expect(pacingProblems(median)).toEqual([])
+  })
+
+  // Ticket 396 (GD ruling, VS amendment 4): planet 1 drilling must feel fast, on the seed median.
+  it('cuts band 1 at 3x its start speed by planet 1 band 3 and at 10 cells/s on leaving planet 1', () => {
+    const paces = seededRuns().map((run) => derivePlanetOneDrillPace(run.events, run.worldSeed))
+    expect(planetOneDrillPaceProblems(medianPlanetOneDrillPace(paces))).toEqual([])
   })
 
   it('lays casing on every drill dive through the player placement code, and pays for it (#115)', () => {
