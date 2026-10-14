@@ -16,6 +16,8 @@ const NO_CAPACITY = Object.fromEntries(UPGRADE_IDS.map((id) => [id, 0])) as Reco
 >
 
 const NO_STEPS = NO_CAPACITY
+/** A planet 3 wallet that pays for some steps of every track and ten majors of none. */
+const UNCAPPED_WALLET = '300'
 
 /** A visit that bought `steps` on each track named, in order. */
 function visit(
@@ -42,8 +44,10 @@ function botOnPlanet3(money: string) {
 
 describe('bot: the spree measure (#180 section 4)', () => {
   it('counts the steps in a row that the wallet above the service reserve pays for', () => {
-    const session = botOnPlanet3('400')
-    const budget = sub(m('400'), serviceReserveOf(session.state(), 'p1'))
+    // Short of the cap on every track: on ticket 396's cheap early drill rows a wallet of 400
+    // pays for all ten majors of drill_power.
+    const session = botOnPlanet3(UNCAPPED_WALLET)
+    const budget = sub(m(UNCAPPED_WALLET), serviceReserveOf(session.state(), 'p1'))
     const { capacity } = measureSpree(session, [])
     for (const track of UPGRADE_IDS) {
       const prices = Array.from({ length: capacity[track] + 1 }, (_, at) => stepPrice(track, at, 3))
