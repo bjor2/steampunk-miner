@@ -20,6 +20,11 @@ export function NodeCardView({ card }: { card: NodeCardModel | null }) {
         <span className={styles.label}>{card.label}</span>
       </header>
       <p className={styles.flavour}>{card.description}</p>
+      {card.notes.map((note) => (
+        <p key={note} className={styles.note}>
+          {note}
+        </p>
+      ))}
       <dl className={styles.facts}>
         <dt>Unlocks</dt>
         <dd>{card.itemId}</dd>

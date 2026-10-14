@@ -8,6 +8,7 @@ import {
 } from '../treeTestSession'
 import { ANCHORED_NODE_ID, ANCHORED_NODE_SLICE, LAB_FIXTURE_SLICE } from '../treeFixtureSlice'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
+import { forkNodeIdOf } from './forkIds'
 import { forkPairOf, type ForkBranchSpec } from './forkNode'
 import { romanNumeralOf } from './nodeCardModel'
 import { isArmouryLane } from './techNode'
@@ -209,6 +210,25 @@ describe('tech tree screen: node cards', () => {
       expect(card.refusalText).toBe(`Price: ${card.costText}`)
       expect(card.prereqNames).toEqual([])
     })
+  })
+
+  it("shows a node's card notes under the flavour, each with the Note label (#351)", () => {
+    const card = nodeCardModelOf(
+      sessionOnPlanet(16).state(),
+      PLAYER,
+      registeredTechTree(),
+      forkNodeIdOf('drill-gear', 'deep'),
+    )!
+    expect(card.notes).toEqual([
+      "Note: doesn't stack with the reach boom; the longer cut ahead wins",
+    ])
+    const plain = nodeCardModelOf(
+      sessionOnPlanet(16).state(),
+      PLAYER,
+      registeredTechTree(),
+      forkNodeIdOf('drill-gear', 'wide'),
+    )!
+    expect(plain.notes).toEqual([])
   })
 
   it('writes Marks in Roman numerals', () => {

@@ -125,7 +125,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/worksSteam.test.ts` | 4 | 4 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 27 files, 194 tests
+### `drill-gear`: 28 files, 196 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -136,6 +136,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/forkDeepP40.lane.test.ts` | 1 | 1 |
 | `src/features/drill-gear/logging.test.ts` | 2 | 2 |
 | `src/features/drill-gear/shippedRows.test.ts` | 10 | 10 |
+| `src/features/drill-gear/systems/aheadCutNotes.test.ts` | 2 | 2 |
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
 | `src/features/drill-gear/systems/cardLines.test.ts` | 7 | 7 |
 | `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
@@ -442,7 +443,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 60 files, 414 tests
+### `tech-tree`: 60 files, 415 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -499,7 +500,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/rushPace.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/techTree.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
-| `src/features/tech-tree/systems/treeScreenModel.test.ts` | 15 | 15 |
+| `src/features/tech-tree/systems/treeScreenModel.test.ts` | 16 | 16 |
 | `src/features/tech-tree/systems/treeShape.test.ts` | 18 | 18 |
 | `src/features/tech-tree/systems/treeSpendGuard.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 14 | 14 |

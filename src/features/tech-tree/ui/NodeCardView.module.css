@@ -53,6 +53,10 @@
   color: var(--color-ember);
 }
 
+.note {
+  margin: 0;
+}
+
 .refusal,
 .done,
 .empty {

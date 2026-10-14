@@ -23,6 +23,7 @@ import type { DrillGearSource } from '../../../systems/registries/drillGear'
 import { FACING } from '../../../systems/vehicle/vehiclePose'
 import { isToggleEngaged } from '../../power-up-core'
 import { activeForkBranchOf, forkPairOf, type ForkPair, type TechLane } from '../../tech-tree'
+import { plungeCrownNotes } from './aheadCutNotes'
 import { drillGearAskOf, SIDE_CUTTERS_ID } from './cuttersAndBoom'
 import { facedHoldOf } from './cuttersHold'
 import { DRILL_GEAR_ECONOMY, type DrillGearStatName } from './drillGearEconomy'
@@ -55,6 +56,7 @@ export const DRILL_GEAR_FORK: ForkPair = forkPairOf(LANE, [
     unlocks: PLUNGE_CROWN_ID,
     description: 'A hardened crown bites the next cell down before the bit arrives.',
     label: 'horizontal',
+    cardNotes: plungeCrownNotes(),
     isPacingBotPick: true,
   },
 ])

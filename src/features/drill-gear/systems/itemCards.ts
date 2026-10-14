@@ -10,7 +10,10 @@ import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { isMasteredAt, milestoneLineSpecsOf } from '../../tech-tree'
+import { reachBoomNotesOf } from './aheadCutNotes'
 import { cardLinesOf, type CardLine } from './cardLines'
+import { REACH_BOOM_ID } from './cuttersAndBoom'
+import { DRILL_GEAR_FORK, PLUNGE_CROWN_ID } from './drillGearFork'
 import {
   drillGearItemOf,
   markLadderOf,
@@ -34,8 +37,25 @@ function cardOf(item: DrillGearItem): ItemDescriptionEntry {
     flavour: item.description,
     statLines: [
       ...cardLinesOf(item.itemId, FIRST_MARK).map(lineSpecOf),
+      ...notesOf(item).map(noteLineSpecOf),
       ...milestoneLineSpecsOf(markLadderOf(item)),
     ],
+  }
+}
+
+/** The card's "Note" lines (Content on #392); none for most items. */
+function notesOf(item: DrillGearItem): string[] {
+  return item.itemId === REACH_BOOM_ID ? reachBoomNotesOf(DRILL_GEAR_FORK, PLUNGE_CROWN_ID) : []
+}
+
+/** A line of words labelled "Note", the same at every Mark (#351: no comma before the colon). */
+function noteLineSpecOf(note: string): DescribedStatLineSpec {
+  return {
+    label: 'Note',
+    kind: 'linearInt',
+    value: () => 0,
+    textOf: () => note,
+    nextLevel: hasNoNextLevel,
   }
 }
 

@@ -142,6 +142,11 @@ export interface TechNode extends ContentEntry {
   unlocks: string
   /** The flavour line, no digits: stat and cost lines are generated (#159). */
   description: string
+  /**
+   * Lines the card shows after "Note:", no digits: what the flavour cannot say, such as gear that
+   * does not stack with this one (Content on #392).
+   */
+  cardNotes?: readonly string[]
   label: ProgressionLabel
   costKind: Exclude<TechCostKind, 'mark'>
   /** Present on every Mark-bearing item: power-ups, consumables, passives and drill gear. */
@@ -196,6 +201,7 @@ export interface TreeNode {
   familyId?: string
   iconId: string
   description: string
+  cardNotes?: readonly string[]
   label: ProgressionLabel
   costKind: TechCostKind
   /** The exponent of `g` in the node's cost (#161 section 3, Definitions). */

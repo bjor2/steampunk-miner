@@ -46,6 +46,8 @@ export interface NodeCardModel {
   kind: TreeNode['kind']
   label: TreeNode['label']
   description: string
+  /** Each "Note: ..." line under the flavour, in order; none for most nodes. */
+  notes: readonly string[]
   itemId: string
   status: NodeStatus
   /** Why it cannot be researched now; null when it can or already is. */
@@ -115,6 +117,7 @@ export function nodeCardOf(node: TreeNode, context: CardContext): NodeCardModel 
     kind: node.kind,
     label: node.label,
     description: node.description,
+    notes: noteLinesOf(node),
     itemId: node.unlocks.itemId,
     status: statusOf(answer),
     refusal,
@@ -124,6 +127,11 @@ export function nodeCardOf(node: TreeNode, context: CardContext): NodeCardModel 
     prereqText: prereqNamesOf(node, context).join(', ') || 'Nothing',
     markChip: markChipOf(node, context),
   }
+}
+
+/** A note reads with its "Note" label and no comma before the colon (#351). */
+function noteLinesOf(node: TreeNode): string[] {
+  return (node.cardNotes ?? []).map((note) => `Note: ${note}`)
 }
 
 /** Mark 7 as "VII". */

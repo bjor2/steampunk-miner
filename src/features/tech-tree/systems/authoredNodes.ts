@@ -36,6 +36,7 @@ export function authoredTreeNodeOf(node: TechNode, slots: ReadonlyMap<string, nu
     ...(node.familyId !== undefined && { familyId: node.familyId }),
     iconId: node.iconId,
     description: node.description,
+    ...(node.cardNotes !== undefined && { cardNotes: node.cardNotes }),
     label: node.label,
     costKind: node.costKind,
     depthTerm: isCombo ? comboDepthOf(node.prereqs, slots) : (slots.get(node.id) ?? 0),
