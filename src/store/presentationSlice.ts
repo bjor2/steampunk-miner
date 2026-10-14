@@ -11,11 +11,13 @@ import {
   ACTION_MAP,
   bindingsWithOverrides,
   defaultBindings,
+  defaultPadBindings,
   type ActionId,
   type BindingOverrides,
   type Bindings,
   type InputContext,
 } from '../systems/input/actionMap'
+import type { BindingField } from '../systems/input/bindingDevices'
 import type { CommandIntent } from '../systems/authority/authorityCommand'
 import type { DomainEvent } from '../systems/authority/domainEvent'
 import { isChoiceOpenAfter } from '../systems/views/artefactChoiceModel'
@@ -52,6 +54,8 @@ export interface PresentationValues {
   prefs: Preferences
   /** The keys in force: the overrides in `prefs.bindings` on the shipped defaults. */
   bindings: Bindings
+  /** The pad chords in force, from the same overrides (ticket 346). */
+  padBindings: Bindings
   /**
    * The problems of the last refused rebinding, or why the preferences file's bindings were reset
    * at start (#40); empty once a rebinding is accepted.
@@ -99,8 +103,10 @@ export interface PresentationActions {
   setBindings(overrides: unknown): string[]
   resetBindings(): void
   startRebinding(actionId: ActionId): void
-  /** The key pressed while an action waits; refused like `setBindings`. */
+  /** The key pressed while an action waits; refused like `setBindings`. Its pad binding stays. */
   rebindToChord(chord: string): string[]
+  /** The pad chord pressed while an action waits (ticket 346); its keys stay. */
+  rebindToPadChord(chord: string): string[]
   cancelRebinding(): void
   openSettings(): void
   closeSettings(): void
@@ -151,6 +157,7 @@ type SetSlice = (partial: Partial<PresentationValues>) => void
 export const STARTING_PRESENTATION: PresentationValues = {
   prefs: DEFAULT_PREFERENCES,
   bindings: defaultBindings(ACTION_MAP),
+  padBindings: defaultPadBindings(ACTION_MAP),
   bindingProblems: [],
   isSettingsOpen: false,
   isArtefactChoiceOpen: false,
@@ -162,6 +169,36 @@ export const STARTING_PRESENTATION: PresentationValues = {
   installingUpgradeId: null,
   isTouchControlsShown: false,
   chosenChargeSize: 1,
+}
+
+/** The waiting action takes the chord on one device; its other device's binding stays. */
+function rebindWaitingAction(
+  set: SetSlice,
+  get: () => SliceHost,
+  field: BindingField,
+  chord: string,
+): string[] {
+  const actionId = get().rebindingActionId
+  set({ rebindingActionId: null })
+  if (actionId === null) return []
+  return get().setBindings(withReboundChord(get().prefs.bindings, actionId, field, chord))
+}
+
+function withReboundChord(
+  overrides: BindingOverrides,
+  actionId: ActionId,
+  field: BindingField,
+  chord: string,
+): BindingOverrides {
+  return { ...overrides, [actionId]: { ...overrides[actionId], [field]: [chord] } }
+}
+
+/** The keys and pad chords a preferences file's overrides put in force. */
+function bindingsInForceOf(
+  overrides: BindingOverrides,
+): Pick<PresentationValues, 'bindings' | 'padBindings'> {
+  const { bindings, padBindings } = bindingsWithOverrides(ACTION_MAP, overrides)
+  return { bindings, padBindings }
 }
 
 export function inputLayerOf(state: SliceHost): InputContext {
@@ -192,7 +229,7 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
     adoptPreferences: ({ prefs, bindingsReset }) =>
       set({
         prefs,
-        bindings: bindingsWithOverrides(ACTION_MAP, prefs.bindings).bindings,
+        ...bindingsInForceOf(prefs.bindings),
         bindingProblems: bindingsReset,
       }),
     rememberSeenHints: (seenHints) => savePrefs({ ...get().prefs, seenHints }),
@@ -200,18 +237,14 @@ export function presentationActionsOf(set: SetSlice, get: () => SliceHost): Pres
       const outcome = bindingsWithOverrides(ACTION_MAP, overrides)
       set({ bindingProblems: outcome.problems })
       if (outcome.problems.length > 0) return outcome.problems
-      set({ bindings: outcome.bindings })
+      set({ bindings: outcome.bindings, padBindings: outcome.padBindings })
       savePrefs({ ...get().prefs, bindings: overrides as BindingOverrides })
       return []
     },
     resetBindings: () => void get().setBindings({}),
     startRebinding: (actionId) => set({ rebindingActionId: actionId }),
-    rebindToChord: (chord) => {
-      const actionId = get().rebindingActionId
-      set({ rebindingActionId: null })
-      if (actionId === null) return []
-      return get().setBindings({ ...get().prefs.bindings, [actionId]: { keyboard: [chord] } })
-    },
+    rebindToChord: (chord) => rebindWaitingAction(set, get, 'keyboard', chord),
+    rebindToPadChord: (chord) => rebindWaitingAction(set, get, 'gamepad', chord),
     cancelRebinding: () => set({ rebindingActionId: null }),
     openSettings: () => set({ isSettingsOpen: true, focusedControlId: null, isTravelArmed: false }),
     closeSettings: () =>

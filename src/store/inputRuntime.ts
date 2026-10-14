@@ -10,6 +10,10 @@
  * action coming up sends what a slice's release reaction gives (ticket 332: a hold-to-use slot's
  * `release_power_up`), on any layer, and records its up edge only then; with no such reaction it
  * sends and records nothing, as before.
+ *
+ * A gamepad (ticket 346) takes the same path under its own codes: `padRuntime` turns each polled
+ * frame into pad changes, and a pad change presses through the pad bindings exactly as a key does
+ * through the keys, so rebinding, Start cancelling a capture and the any-layer release hold alike.
  */
 import type { KeyChange, ScrollNotch } from '../shell/shell'
 import { ACTION_MAP, actionDefOf, actionsOfChord, type ActionId } from '../systems/input/actionMap'
@@ -20,6 +24,7 @@ import {
   type InputSituation,
 } from '../systems/input/inputRouting'
 import { chordOf } from '../systems/input/keyCodes'
+import { padChordOf } from '../systems/input/padCodes'
 import { sliceIntentOfRelease } from '../systems/registries/inputReactions'
 import { canOpenArtefactCache } from '../systems/authority/artefactRules'
 import { dockableBayOf, dockedBayOf } from '../systems/authority/dockRules'
@@ -32,13 +37,21 @@ import { useGameStore } from './gameStore'
 import { inputLayerOf } from './presentationSlice'
 
 const CANCEL_REBINDING_KEY = 'Escape'
+const CANCEL_REBINDING_PAD_CODE = 'PadStart'
 
 const heldActions: ActionId[] = []
 const actionsOfKey = new Map<string, ActionId[]>()
-/** Every key down now, whatever layer it pressed in: a drive key held on a dock screen counts. */
+/** Every key and pad code down now, whatever layer it pressed in: a held drive counts on a dock screen. */
 const keysDown = new Set<string>()
 /** The vehicle's held drive actions (#170: holding one leaves the Workshop showcase). */
 const DRIVE_ACTIONS: readonly ActionId[] = ['aim_left', 'aim_right', 'aim_down', 'lift']
+
+/** One pad input going down or up, with whether the pad modifier (LB) was held as it went. */
+export interface PadChange {
+  code: string
+  isDown: boolean
+  isModifierHeld: boolean
+}
 
 /** One action going down (accepted in its layer) or a held one coming up, in order (#173). */
 export interface ActionEdge {
@@ -57,14 +70,21 @@ const actionStream: ActionEdge[] = []
  * bound to.
  */
 export function routeKeyChange(key: KeyChange): void {
-  rememberKey(key)
+  rememberCode(key.code, key.isDown)
   if (!key.isDown) return releaseKey(key.code)
-  useGameStore.getState().releaseHoldUntilPlay()
-  useGameStore.getState().dismissTransmission()
-  useGameStore.getState().hideTouchControls()
+  noticePlayFromDevice()
   if (useGameStore.getState().rebindingActionId !== null) return captureRebinding(key)
   if (key.isRepeat) return
   pressKey(key.code, actionsOfKeyNow(key))
+}
+
+/** One pad input from `padRuntime`, as a key: a rebinding capture, or the actions its chord has. */
+export function routePadChange(pad: PadChange): void {
+  rememberCode(pad.code, pad.isDown)
+  if (!pad.isDown) return releaseKey(pad.code)
+  noticePlayFromDevice()
+  if (useGameStore.getState().rebindingActionId !== null) return capturePadRebinding(pad)
+  pressKey(pad.code, actionsOfPadNow(pad))
 }
 
 /** The wheel zooms like `zoom_in`/`zoom_out` (#39), so it does nothing on a menu layer. */
@@ -107,8 +127,10 @@ export function readVehicleIntent(): VehicleIntent {
 
 /** Whether a key bound to a drive action is down, on any layer (the Workshop's leave, #170). */
 export function isDriveKeyHeld(): boolean {
-  const { bindings } = useGameStore.getState()
-  return DRIVE_ACTIONS.some((action) => bindings[action].some((chord) => keysDown.has(chord)))
+  const { bindings, padBindings } = useGameStore.getState()
+  return DRIVE_ACTIONS.some((action) =>
+    [...bindings[action], ...padBindings[action]].some((chord) => keysDown.has(chord)),
+  )
 }
 
 /** Nothing held; tests and a fresh store start here. */
@@ -119,9 +141,16 @@ export function resetInput(): void {
   keysDown.clear()
 }
 
-function rememberKey(key: KeyChange): void {
-  if (key.isDown) keysDown.add(key.code)
-  else keysDown.delete(key.code)
+function rememberCode(code: string, isDown: boolean): void {
+  if (isDown) keysDown.add(code)
+  else keysDown.delete(code)
+}
+
+/** Any key or pad press takes a transmission down, hides the touch controls and starts play. */
+function noticePlayFromDevice(): void {
+  useGameStore.getState().releaseHoldUntilPlay()
+  useGameStore.getState().dismissTransmission()
+  useGameStore.getState().hideTouchControls()
 }
 
 function holdAction(action: ActionId): void {
@@ -173,10 +202,27 @@ function actionsOfKeyNow(key: KeyChange): ActionId[] {
   return chorded.length > 0 ? chorded : actionsOfChord(ACTION_MAP, game.bindings, layer, key.code)
 }
 
+/** The LB chord when bound, else the plain code, as `actionsOfKeyNow` does for Shift. */
+function actionsOfPadNow(pad: PadChange): ActionId[] {
+  const game = useGameStore.getState()
+  const layer = inputLayerOf(game)
+  const chord = padChordOf(pad.code, pad.isModifierHeld)
+  const chorded = actionsOfChord(ACTION_MAP, game.padBindings, layer, chord)
+  return chorded.length > 0
+    ? chorded
+    : actionsOfChord(ACTION_MAP, game.padBindings, layer, pad.code)
+}
+
 function captureRebinding(key: KeyChange): void {
   const game = useGameStore.getState()
   if (key.code === CANCEL_REBINDING_KEY) return game.cancelRebinding()
   game.rebindToChord(chordOf(key.code, key.isShiftHeld))
+}
+
+function capturePadRebinding(pad: PadChange): void {
+  const game = useGameStore.getState()
+  if (pad.code === CANCEL_REBINDING_PAD_CODE) return game.cancelRebinding()
+  game.rebindToPadChord(padChordOf(pad.code, pad.isModifierHeld))
 }
 
 function situationNow(): InputSituation {
