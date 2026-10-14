@@ -10,7 +10,8 @@
  *   refused and costs nothing.
  * - **The brace.** One `collapseBraces` provider claims every block that contains or borders a
  *   pinned cell (ring 1), open-ended, while the clamp is owned and its field held. When the field
- *   ends the kernel gives each braced block a fresh 60-tick warning (#331).
+ *   ends the kernel gives each braced block a fresh 60-tick warning (#331). While braced, a
+ *   block's drawn countdown stands at what it had left when the brace caught it (ticket 357).
  * - **Three ends, one path.** Letting go of the slot (`release`, #332), the duration running out
  *   and the tank running dry all end the field the same way, on the tick they happen: the cooldown
  *   counts from that tick (never under 600, the family floor) and `magnet_used` is logged once,
@@ -31,7 +32,10 @@ import {
 import { chainEffects, unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
 import { ownsItem } from '../../../systems/authority/loadoutRules'
 import { cellsMagnetMayHold } from '../../../systems/authority/magnet/shiftCellsByMagnet'
+import type { CollapsingBlock } from '../../../systems/authority/collapse/collapseState'
+import { entryOfBlock } from '../../../systems/authority/collapse/collapseState'
 import { followEnergyChange } from '../../../systems/authority/vehicleTransitions'
+import { COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import type { ClockStep } from '../../../systems/registries/clockSteps'
 import type {
   CollapseBraceClaim,
@@ -68,6 +72,7 @@ const BRACE_RING = 1
 export const LODE_CLAMP_BRACES: CollapseBraceProvider = {
   id: 'terrain-tools.lode-clamp',
   bracesAt: clampBracesAt,
+  frozenTicksLeftAt: clampFrozenTicksLeftAt,
 }
 
 export const HOLD_LODE_CLAMPS_STEP: ClockStep = {
@@ -104,6 +109,39 @@ export function clampHoldOf(state: AuthorityState, playerId: string): SlotHold |
 export function clampBracesAt(state: AuthorityState): CollapseBraceClaim[] {
   const blocks = new Set(playerIdsOf(state).flatMap((playerId) => bracedBlocksOf(state, playerId)))
   return [...blocks].sort().map((block) => ({ block, untilTick: null }))
+}
+
+/**
+ * The warning ticks left a block braced by some held field is drawn frozen at: the most any
+ * player's field froze it at; null when no field braces it.
+ */
+export function clampFrozenTicksLeftAt(state: AuthorityState, block: string): number | null {
+  const entry = entryOfBlock(state.collapse, block)
+  if (entry?.isBraced !== true) return null
+  const frozen = playerIdsOf(state).flatMap((playerId) => frozenUnderField(state, playerId, entry))
+  return frozen.length === 0 ? null : Math.max(...frozen)
+}
+
+/**
+ * The kernel keeps only an `isBraced` bit per collapsing entry, so the tick a brace caught a block
+ * is derived from the save: the later of the field's act and the block's warning, as the brace
+ * sync runs on the act's tick and on every warning's.
+ */
+export function frozenTicksLeftOf(entry: CollapsingBlock, clamp: ClampField): number {
+  const caughtTick = Math.max(clamp.startTick, entry.startTick)
+  const warned = Math.min(COLLAPSE_WARN_TICKS, caughtTick - entry.startTick)
+  return COLLAPSE_WARN_TICKS - warned
+}
+
+/** The player's field's frozen countdown on `entry`, or none when it does not brace it. */
+function frozenUnderField(
+  state: AuthorityState,
+  playerId: string,
+  entry: CollapsingBlock,
+): number[] {
+  const { clamp } = terrainToolsOf(state, playerId)
+  if (clamp === undefined || !bracedBlocksOf(state, playerId).includes(entry.block)) return []
+  return [frozenTicksLeftOf(entry, clamp)]
 }
 
 /** The block ids the player's field braces; none without a field or without owning the clamp. */
