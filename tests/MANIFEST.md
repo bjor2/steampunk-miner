@@ -171,12 +171,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/example/debug.test.ts` | 2 | 2 |
 | `src/features/example/systems/describeExample.test.ts` | 1 | 1 |
 
-### `extraction`: 13 files, 71 tests
+### `extraction`: 14 files, 72 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/extraction/gatesFixture.test.ts` | 3 | 2 |
 | `src/features/extraction/incomeLines.test.ts` | 4 | 4 |
+| `src/features/extraction/incomeRateClamp.test.ts` | 1 | 1 |
 | `src/features/extraction/laneRows.test.ts` | 13 | 13 |
 | `src/features/extraction/mineralDrain.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/drainHooks.test.ts` | 6 | 6 |
@@ -870,6 +871,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/heatPauses.test.ts` | 4 | 4 |
 | `src/systems/registries/hookSeed.test.ts` | 4 | 4 |
 | `src/systems/registries/hullDamageIntercepts.test.ts` | 5 | 5 |
+| `src/systems/registries/incomeRates.test.ts` | 12 | 12 |
 | `src/systems/registries/itemDescriber.test.ts` | 7 | 7 |
 | `src/systems/registries/itemDescriptionEntries.test.ts` | 5 | 5 |
 | `src/systems/registries/itemHooks.test.ts` | 13 | 13 |

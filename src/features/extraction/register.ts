@@ -5,8 +5,9 @@
  * The mineral drain ships: its `vehicle-item` row and `power-up` entry, its item card, the
  * `extraction` section holding the trip counter every income item shares, the dock reset of that
  * counter, the `drain_yield` line, the income row of the reports and the drain's sale at the
- * Upgrade bay; with it the lane's tree nodes, the five extractors' and the drain's. The slurry
- * siphon and its node stay held (see `systems/extractionContent.ts`).
+ * Upgrade bay; with it the lane's tree nodes, the five extractors' and the drain's, and the trip
+ * cap as the kernel's income-cap clamp (ticket 384). The slurry siphon and its node stay held (see
+ * `systems/extractionContent.ts`).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { extractionDebugActions } from './debug'
@@ -20,6 +21,7 @@ import {
 } from './systems/extractionContent'
 import { EXTRACTION_SELLER } from './systems/extractionSales'
 import { EXTRACTION_TRIP_SECTION } from './systems/incomeTrip'
+import { EXTRACTION_TRIP_CAP_SOURCE } from './systems/tripCap'
 import { TRIP_RESET } from './systems/tripReset'
 
 export const slice: SliceDefinition = {
@@ -35,6 +37,7 @@ export const slice: SliceDefinition = {
     r.eventProjections(EXTRACTION_PROJECTIONS)
     r.runEvents(EXTRACTION_RUN_EVENTS)
     r.reportRows(incomeReportRows)
+    r.tripCapSource(EXTRACTION_TRIP_CAP_SOURCE)
     // steampunkDebug.features.extraction.getTrip() / .statPreview(itemId, mark, planet)
     r.debugActions(extractionDebugActions)
   },

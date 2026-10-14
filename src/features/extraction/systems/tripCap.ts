@@ -8,6 +8,7 @@
  * hold of that band's ore (#162 acceptance 4). The share is data (`items.income.tripCapShare`).
  */
 import { oreTier, oreValue } from '../../../systems/economy/oreEconomy'
+import type { TripCapSource } from '../../../systems/registries/incomeRates'
 import {
   cmp,
   div,
@@ -29,6 +30,9 @@ export function tripCapAt(planetIndex: number, band: number, cargoCapacity: numb
   const fullHold = mul(fromSafeInteger(cargoCapacity), oreValue(oreTier(planetIndex, band)))
   return floorMilli(mul(EXTRACTION_ECONOMY.income.tripCapShare, fullHold))
 }
+
+/** The clamp as the kernel's income-cap check applies it to every income rate (ticket 384). */
+export const EXTRACTION_TRIP_CAP_SOURCE: TripCapSource = { id: 'extraction.trip_cap', tripCapAt }
 
 /** What the trip may still move under `cap`; none once it is at or past it. */
 export function roomUnderCapOf(incomeItemValue: Money, cap: Money): Money {
