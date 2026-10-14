@@ -12,14 +12,14 @@
  * than half a sample changes nothing. With the lift on (`W` + `D`, #40) the whole disc follows the path, so climbing while
  * drilling still cuts a smooth diagonal.
  *
- * The swept cut's stamp (ticket 333) is the same disc one pose step further ahead
- * (`SWEPT_STAMP_AHEAD_MM`), so its nose reach grows with the step.
+ * The swept cut's stamp (ticket 333) is the same disc further ahead by the step the rig may take
+ * while it cuts (`aheadMm`, from the stats-derived bound of ticket 334), so its nose reach grows
+ * with the step.
  */
 import {
   DRILL_STAMP_AHEAD_MM,
   DRILL_STAMP_LIFT_MM,
   DRILL_STAMP_RADIUS_MM,
-  SWEPT_STAMP_AHEAD_MM,
 } from '../../constants/balance'
 import { UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { centreDistanceFloorMmOf } from '../world/exactSquares'
@@ -35,9 +35,13 @@ export function drillStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
   return stampAheadBy(pose, isLifting, DRILL_STAMP_AHEAD_MM)
 }
 
-/** The swept cut's stamp: the report's disc with the front one pose step further ahead. */
-export function sweptDrillStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
-  return stampAheadBy(pose, isLifting, SWEPT_STAMP_AHEAD_MM)
+/** The swept cut's stamp: the report's disc with its centre `aheadMm` ahead of the pose. */
+export function sweptDrillStampOf(
+  pose: VehiclePose,
+  isLifting: boolean,
+  aheadMm: number,
+): DiscStamp {
+  return stampAheadBy(pose, isLifting, aheadMm)
 }
 
 function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): DiscStamp {

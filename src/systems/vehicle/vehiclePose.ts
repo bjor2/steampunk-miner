@@ -7,7 +7,6 @@
 import {
   DOCK_STATIONARY_MM_PER_SECOND,
   DRILL_REACH_MM,
-  MAX_SPEED_MM_PER_SECOND,
   ZONE_TEST_MAX_MM,
 } from '../../constants/balance'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../constants/physics'
@@ -39,7 +38,6 @@ export interface IntegerVector {
 /** A unit vector rounded at 1024 is within 1 of 1024 long; the check leaves that much play. */
 const UP_LENGTH_SQ_MIN = (UP_VECTOR_SCALE - 1) * (UP_VECTOR_SCALE - 1)
 const UP_LENGTH_SQ_MAX = (UP_VECTOR_SCALE + 1) * (UP_VECTOR_SCALE + 1)
-const MAX_SPEED_SQ = MAX_SPEED_MM_PER_SECOND * MAX_SPEED_MM_PER_SECOND
 const DRILL_REACH_SQ = DRILL_REACH_MM * DRILL_REACH_MM
 
 export function isFacing(value: unknown): value is Facing {
@@ -136,21 +134,23 @@ export function bayPoseAt(site: DockSite, bay: BayId): VehiclePose {
   return { x, y, vx: 0, vy: 0, upx: 0, upy: UP_VECTOR_SCALE, facing: FACING.right }
 }
 
-/** Why a reported pose cannot be true (#3 host sanity check): too fast, or a bent up vector. */
-export function poseProblems(pose: VehiclePose): string[] {
+/**
+ * Why a reported pose cannot be true (#3 host sanity check): faster than `maxSpeed` mm/s (the
+ * rig's stats-derived bound, ticket 334), or a bent up vector.
+ */
+export function poseProblems(pose: VehiclePose, maxSpeed: number): string[] {
   return [
     ...(isFacing(pose.facing) ? [] : [`facing must be 0 to 3, got ${pose.facing}`]),
-    ...(isWithinSpeedBound(pose.vx, pose.vy)
+    ...(isWithinSpeedBound(pose.vx, pose.vy, maxSpeed)
       ? []
-      : [`speed must be at most ${MAX_SPEED_MM_PER_SECOND} mm/s`]),
+      : [`speed must be at most ${maxSpeed} mm/s`]),
     ...(isUnitUpVector(pose.upx, pose.upy) ? [] : [`up vector must be ${UP_VECTOR_SCALE} long`]),
   ]
 }
 
-function isWithinSpeedBound(vx: number, vy: number): boolean {
-  const isEachAxisBounded =
-    Math.abs(vx) <= MAX_SPEED_MM_PER_SECOND && Math.abs(vy) <= MAX_SPEED_MM_PER_SECOND
-  return isEachAxisBounded && vx * vx + vy * vy <= MAX_SPEED_SQ
+function isWithinSpeedBound(vx: number, vy: number, maxSpeed: number): boolean {
+  const isEachAxisBounded = Math.abs(vx) <= maxSpeed && Math.abs(vy) <= maxSpeed
+  return isEachAxisBounded && vx * vx + vy * vy <= maxSpeed * maxSpeed
 }
 
 function isUnitUpVector(upx: number, upy: number): boolean {

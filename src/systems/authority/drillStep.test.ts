@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  DRILL_STAMP_AHEAD_MM,
-  MAX_STEP_MM_PER_TICK,
-  SWEPT_STAMP_AHEAD_MM,
-} from '../../constants/balance'
+import { DRILL_STAMP_AHEAD_MM, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import type { GateOutcome } from '../registries/gateChecks'
@@ -25,6 +21,7 @@ import {
 } from './scriptedSession'
 import { readSnapshot, takeSnapshot } from './sessionSnapshot'
 import { stateDigest } from './stateDigest'
+import { stepBoundsAt } from './stepBoundRead'
 import { DRILL_CELLS_PER_TICK } from './sweptDrill'
 
 // The swept cut (ticket 330): `drillStep` cuts every tick the drill is engaged, behind the dev
@@ -53,6 +50,13 @@ function stepDown(session: ScriptedSession, mmPerTick: number, ticks: number, fr
     session.submit(tick, stepTo(from.x, from.y - mmPerTick * tick))
   }
 }
+
+/** The level-0 rig's stats-derived bounds on band-1 ground (ticket 334). */
+const BOUNDS = stepBoundsAt(sessionFacingDownAt().state(), 'p1')
+/** The longest step a cutting rig may take: every scripted descent here keeps to it. */
+const CUT_STEP_MM = BOUNDS.cuttingMm
+/** The swept stamp's centre sits this far ahead of the pose: a report's, plus the cutting bound. */
+const SWEPT_AHEAD_MM = DRILL_STAMP_AHEAD_MM + CUT_STEP_MM
 
 const rejectionsOf = (events: readonly DomainEvent[]) =>
   events.filter((event) => event.type === 'CommandRejected')
@@ -93,15 +97,31 @@ describe('drill step (ticket 330)', () => {
     expect(answer).toMatchObject({ type: 'CommandRejected', reason: 'too_many_ticks' })
   })
 
-  it('refuses a step further than the pose bound from the last accepted position', () => {
+  it('refuses a travelling step past the bound from the last accepted position', () => {
     const session = sessionFacingDownAt()
-    expect(session.submit(1, stepTo(START.x, START.y - MAX_STEP_MM_PER_TICK))).not.toContainEqual(
-      expect.objectContaining({ type: 'CommandRejected' }),
-    )
-    const [answer] = session.submit(2, stepTo(START.x, START.y - 2 * MAX_STEP_MM_PER_TICK - 1))
+    const travel = BOUNDS.travellingMm
+    expect(rejectionsOf(session.submit(1, stepTo(START.x, START.y - travel)))).toEqual([])
+    const [answer] = session.submit(2, stepTo(START.x, START.y - 2 * travel - 1))
     expect(answer).toMatchObject({ type: 'CommandRejected', reason: 'invalid_pose' })
-    const later = session.submit(3, stepTo(START.x, START.y - 3 * MAX_STEP_MM_PER_TICK))
+    const later = session.submit(3, stepTo(START.x, START.y - 3 * travel))
     expect(rejectionsOf(later)).toEqual([])
+  })
+
+  it('accepts a cutting step at the bound and refuses one a sample past it', () => {
+    const near = { x: START.x, y: (SURFACE_TY + 1) * 1000 + 400 }
+    const run = (stepMm: number) => {
+      const session = sessionFacingDownAt(near)
+      session.submit(1, stepTo(near.x, near.y))
+      expect(session.vehicle().sweptCut?.cutGate).toBe(1)
+      return session.submit(2, stepTo(near.x, near.y - stepMm))
+    }
+    expect(BOUNDS.cuttingMm).toBeLessThan(BOUNDS.travellingMm)
+    expect(rejectionsOf(run(BOUNDS.cuttingMm))).toEqual([])
+    for (const past of [1, STEP_BOUND_TOLERANCE_MM]) {
+      expect(run(BOUNDS.cuttingMm + past)).toContainEqual(
+        expect.objectContaining({ type: 'CommandRejected', reason: 'invalid_pose' }),
+      )
+    }
   })
 
   it('refuses a step from a docked vehicle', () => {
@@ -149,7 +169,7 @@ describe('drill step (ticket 330)', () => {
 
   it('lays casing rings half a metre apart along a fast cut', () => {
     const session = sessionFacingDownAt()
-    stepDown(session, MAX_STEP_MM_PER_TICK, 50)
+    stepDown(session, CUT_STEP_MM, 50)
     const rings = session.events().filter((event) => event.type === 'CasingPlaced')
     const trail = session.vehicle().casingTrail
     expect(rings.length).toBeGreaterThanOrEqual(20)
@@ -184,12 +204,12 @@ describe('drill step gates (ticket 330, Horizontal Scaler)', () => {
   function sweepThroughGateAtTheBound(outcome: GateOutcome = 'refused') {
     return withRegistrations([gateSliceOf(outcome)], () => {
       const session = sessionFacingDownAt(above)
-      stepDown(session, MAX_STEP_MM_PER_TICK, 30, above)
+      stepDown(session, CUT_STEP_MM, 30, above)
       return session
     })
   }
 
-  it('refuses a gated cell inside the capsule at 18 m/s and stops the sweep before it', () => {
+  it('refuses a gated cell inside the capsule at the cutting bound and stops the sweep before it', () => {
     const session = sweepThroughGateAtTheBound()
     expect(gatedTilesOf(session.events())).toContain(`${gated.tx},${gated.ty}`)
     const world = session.state().world
@@ -217,8 +237,8 @@ describe('drill step gates (ticket 330, Horizontal Scaler)', () => {
 describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
   const top = { x: START.x, y: (SURFACE_TY + 1) * 1000 + 600 }
   const METRES = 8
-  /** The swept stamp's front leads a report's by one pose step (ticket 333). */
-  const REACH_GAIN_MM = SWEPT_STAMP_AHEAD_MM - DRILL_STAMP_AHEAD_MM
+  /** The swept stamp's front leads a report's by the cutting bound (tickets 333, 334). */
+  const REACH_GAIN_MM = SWEPT_AHEAD_MM - DRILL_STAMP_AHEAD_MM
 
   /**
    * The same scripted descent of the stamp cut by 5 Hz reports alone, or by a step every tick
@@ -273,8 +293,9 @@ describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
 describe('drill step terrain budget (ticket 330)', () => {
   const [gated] = surfaceOreTiles(1)
   const above = { x: gated.tx * 1000 + 500, y: (gated.ty + 4) * 1000 + 500 }
-  const OPENS_AT_TICK = 40
-  const TICKS = 70
+  /** Late enough that the cursor falls more metres behind than one tick's budget sweeps. */
+  const OPENS_AT_TICK = 60
+  const TICKS = 100
 
   /** A gate that holds every ore cell until `OPENS_AT_TICK`, so the cursor falls metres behind. */
   const lateGate: SliceDefinition = {
@@ -297,7 +318,7 @@ describe('drill step terrain budget (ticket 330)', () => {
       const session = sessionFacingDownAt(above)
       const cursors: { xMm: number; yMm: number }[] = []
       for (let tick = 1; tick <= TICKS; tick++) {
-        session.submit(tick, stepTo(above.x, above.y - MAX_STEP_MM_PER_TICK * tick))
+        session.submit(tick, stepTo(above.x, above.y - CUT_STEP_MM * tick))
         const cursor = session.vehicle().sweptCut
         if (tick >= OPENS_AT_TICK - 1 && cursor !== undefined) cursors.push(cursor)
       }
@@ -322,11 +343,9 @@ describe('drill step terrain budget (ticket 330)', () => {
 
   it('stops a sweep over the budget and resumes it next tick until it reaches the stamp', () => {
     const { session, cursors } = catchUpAfterTheGate()
-    const headAtOpening = above.y - MAX_STEP_MM_PER_TICK * OPENS_AT_TICK - SWEPT_STAMP_AHEAD_MM
+    const headAtOpening = above.y - CUT_STEP_MM * OPENS_AT_TICK - SWEPT_AHEAD_MM
     expect(cursors[1].yMm).toBeGreaterThan(headAtOpening)
-    expect(session.vehicle().sweptCut?.yMm).toBe(
-      above.y - MAX_STEP_MM_PER_TICK * TICKS - SWEPT_STAMP_AHEAD_MM,
-    )
+    expect(session.vehicle().sweptCut?.yMm).toBe(above.y - CUT_STEP_MM * TICKS - SWEPT_AHEAD_MM)
     const world = session.state().world
     for (let ty = gated.ty - 1; ty > gated.ty - 12; ty--) {
       const tile = { tx: gated.tx, ty }

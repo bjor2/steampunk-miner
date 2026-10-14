@@ -8,13 +8,12 @@
  *   collapse, combat, heat and lava keep reading the reports.
  * - Refused, cutting nothing, with no planet, an inactive vehicle or no reported pose, a second
  *   step in one tick (`too_many_ticks`), or a step further from the last accepted position (the
- *   last step's, or else the report's) than `MAX_STEP_MM_PER_TICK` for each tick since it
- *   (`invalid_pose`).
+ *   last step's, or else the report's) than the rig's stats allow in the ticks since it
+ *   (`invalid_pose`, the stats-derived bound of ticket 334, `stepBoundRead.ts`).
  * - Energy is the drill's for the tick it cut; burrowers in the nose's tile are cut as by a report.
  * - The collapse watch does not run after it (`applyCommand.ts`): it stays on `reportPose`, so it
  *   lags a step by at most one report interval, well inside a block's 60-tick warning.
  */
-import { MAX_STEP_MM_PER_TICK } from '../../constants/balance'
 import type { SweptCut } from '../vehicle/sweptCut'
 import { noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
@@ -30,6 +29,7 @@ import {
   type RuleEffect,
 } from './commandRule'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
+import { cutGateLeftAt, stepBoundsAt, stepReachMmOf } from './stepBoundRead'
 import { drillAlongSweep } from './sweptDrill'
 import { withBurrowersCut } from './vehicleCommandRules'
 import { followEnergyChange } from './vehicleTransitions'
@@ -44,7 +44,7 @@ export const DRILL_STEP_RULES: { readonly drillStep: CommandRule<'drillStep'> } 
         () => noPlanetRejection(state.planet),
         () => steppingVehicleRejection(vehicleOf(state, command.playerId)),
         () => repeatedStepRejection(vehicleOf(state, command.playerId), command.tick),
-        () => stepLengthRejection(vehicleOf(state, command.playerId), command),
+        () => stepLengthRejection(state, command),
       ]),
     apply: (state, command) =>
       chainEffects(state, [
@@ -64,9 +64,14 @@ function repeatedStepRejection(vehicle: VehicleState, tick: number): Rejection |
   return rejectionOf('too_many_ticks', 'one drill step per tick')
 }
 
-function stepLengthRejection(vehicle: VehicleState, command: StepCommand): Rejection | null {
+function stepLengthRejection(state: AuthorityState, command: StepCommand): Rejection | null {
+  const vehicle = vehicleOf(state, command.playerId)
   const from = lastAcceptedPositionOf(vehicle)
-  const boundMm = MAX_STEP_MM_PER_TICK * Math.max(1, command.tick - from.tick)
+  const boundMm = stepReachMmOf(
+    stepBoundsAt(state, command.playerId),
+    cutGateLeftAt(vehicle.sweptCut, from.tick),
+    command.tick - from.tick,
+  )
   const dx = command.payload.x - from.x
   const dy = command.payload.y - from.y
   if (dx * dx + dy * dy <= boundMm * boundMm) return null

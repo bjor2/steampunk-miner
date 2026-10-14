@@ -4,10 +4,11 @@
  * the codex records as `hazard:magnetic` the first time. Only a drive in counts. A report further
  * from the last than the vehicle could travel in the ticks between is a move nobody drove: a debug
  * teleport or a scenario's start depth, which log `debug_command_applied` and never count as play.
+ * How far it could travel is the rig's travelling step bound (ticket 334) a tick.
  */
-import { MAX_SPEED_MM_PER_SECOND, POSE_REPORT_INTERVAL_TICKS } from '../../../constants/balance'
-import { TICKS_PER_SECOND } from '../../../constants/physics'
+import { POSE_REPORT_INTERVAL_TICKS } from '../../../constants/balance'
 import { magneticFieldHolding } from '../../registries/magneticGround'
+import { stepBoundsOf } from '../../vehicle/stepBound'
 import { tileOfPose, type VehiclePose } from '../../vehicle/vehiclePose'
 import { isVehicleActive, type VehicleState } from '../../vehicle/vehicleState'
 import type { PlanetParams } from '../../world/planetParams'
@@ -37,17 +38,22 @@ function isDrivenEntry(
 ): boolean {
   if (before.pose === null || after.pose === null || !isVehicleActive(after)) return false
   return (
-    isWithinTravel(before, after.pose, tick) &&
+    isWithinTravel(params, before, after.pose, tick) &&
     !isInField(params, before.pose) &&
     isInField(params, after.pose)
   )
 }
 
-/** Whether the vehicle could have driven to `pose` at top speed since its last report. */
-function isWithinTravel(before: VehicleState, pose: VehiclePose, tick: number): boolean {
+/** Whether the vehicle could have driven to `pose` at its step bound since its last report. */
+function isWithinTravel(
+  params: PlanetParams,
+  before: VehicleState,
+  pose: VehiclePose,
+  tick: number,
+): boolean {
   const from = before.pose as VehiclePose
   const ticks = tick - before.accountedTick + POSE_REPORT_INTERVAL_TICKS
-  const reachMm = (MAX_SPEED_MM_PER_SECOND * ticks) / TICKS_PER_SECOND
+  const reachMm = stepBoundsOf(before, params).travellingMm * ticks
   const dx = pose.x - from.x
   const dy = pose.y - from.y
   return dx * dx + dy * dy <= reachMm * reachMm

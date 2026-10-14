@@ -38,6 +38,7 @@ import { SUB_STEP_CLOCK } from './groundDrill'
 import { heatThrottledDrill } from './heatRules'
 import { shockTicksFor } from './magnetic/electrifiedShock'
 import { planetParamsOf } from './planetOfState'
+import { sweptStampAheadMmAt } from './stepBoundRead'
 
 /** A tick's step as the client sends it: its position in mm, its lift, whether the drill bit. */
 export interface CutFollowStep {
@@ -84,7 +85,7 @@ function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep
   const aim = {
     centreMm: pose,
     facing: facingVectorOf(pose.upx, pose.upy, pose.facing),
-    stamp: sweptDrillStampOf(pose, step.isLifting),
+    stamp: sweptDrillStampOf(pose, step.isLifting, sweptStampAheadMmAt(state, playerId)),
   }
   return { params, slab: leadingSlabOf(groundReaderOf(state.world, params), aim) }
 }

@@ -31,6 +31,7 @@ import {
   type Facing,
   type VehiclePose,
 } from '../vehicle/vehiclePose'
+import { reportSpeedOfStepBound } from '../vehicle/stepBound'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { isRemovableCell } from '../world/worldCell'
@@ -59,6 +60,7 @@ import { touchLavaAtPose } from './lava/lavaRules'
 import { enterMagneticField } from './magnetic/fieldEntry'
 import type { DomainEventBody } from './domainEvent'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
+import { stepBoundsAt } from './stepBoundRead'
 import { isCutBySteps } from './sweptDrill'
 import { followEnergyChange, rescueCauseOf, towVehicle } from './vehicleTransitions'
 
@@ -89,7 +91,7 @@ export const VEHICLE_COMMAND_RULES: {
     reject: (state, command) =>
       firstRejection([
         () => noPlanetRejection(state.planet),
-        () => poseRejection(command.payload),
+        () => poseRejection(state, command),
         () => tickBudgetRejection(state, command, actionTicksOf(command.payload)),
       ]),
     apply: (state, command) =>
@@ -156,8 +158,13 @@ export const VEHICLE_COMMAND_RULES: {
   },
 }
 
-function poseRejection(payload: PosePayload): Rejection | null {
-  const problems = poseProblems(poseOf(payload))
+/** A report carries the body's speed from the tick before, so the travelling bound checks it. */
+function poseRejection(
+  state: AuthorityState,
+  { playerId, payload }: AuthorityCommand<'reportPose'>,
+): Rejection | null {
+  const maxSpeed = reportSpeedOfStepBound(stepBoundsAt(state, playerId).travellingMm)
+  const problems = poseProblems(poseOf(payload), maxSpeed)
   return problems.length > 0 ? { reason: 'invalid_pose', problems } : null
 }
 

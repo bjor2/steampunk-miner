@@ -97,13 +97,6 @@ export const MAX_CASING_TRAIL_POINTS = 6
 export const DRILL_SUBSTEPS_PER_TICK = 60
 
 /**
- * The swept stamp's reach (TD scope 0 on #316, ticket 333): with the swept cut the stamp's front
- * sits one pose step further ahead than a report's, so this tick's cut always clears the step the
- * body may take next tick (`MAX_STEP_MM_PER_TICK`, the step bound until #334 derives it).
- */
-export const SWEPT_STAMP_AHEAD_MM = DRILL_STAMP_AHEAD_MM + MAX_STEP_MM_PER_TICK
-
-/**
  * The cut-follow (TD scope 0 on #316, ticket 333): while the rig actively cuts, the drill sets its
  * speed along the facing, and the body reaches that speed, or stops when the drive lets go, within
  * this many ticks, whatever the engine's `accel`. Gameplay's locked stop time on #316.

@@ -11,7 +11,7 @@ const POSE: VehiclePose = { x: 500, y: 500, vx: 0, vy: 0, upx: 0, upy: 1024, fac
 const AIM = {
   centreMm: { x: POSE.x, y: POSE.y },
   facing: facingVectorOf(POSE.upx, POSE.upy, POSE.facing),
-  stamp: sweptDrillStampOf(POSE, false),
+  stamp: sweptDrillStampOf(POSE, false, 800),
 }
 
 /** Ground that is solid where `isSolid(tx, ty)` says, open elsewhere. */

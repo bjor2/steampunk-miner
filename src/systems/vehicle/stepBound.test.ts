@@ -13,12 +13,7 @@ import { planetParamsFor } from '../world/planetParams'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { cutStepMmOf } from './cutSpeed'
 import { subStepsPerTile } from './drillRule'
-import {
-  guestPoseToleranceMm,
-  speedOfStepBound,
-  stepBoundMmOf,
-  stepBoundsOf,
-} from './stepBound'
+import { guestPoseToleranceMm, speedOfStepBound, stepBoundMmOf, stepBoundsOf } from './stepBound'
 import { FACING } from './vehiclePose'
 import { newVehicleState, type VehicleState } from './vehicleState'
 

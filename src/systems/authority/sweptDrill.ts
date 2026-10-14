@@ -18,8 +18,9 @@
  * - The cursor moves to where the cut reached, keeping the step's own position, from which the
  *   next step's bound is measured, and the cut gate read before the cut (`cutFollowRead.ts`,
  *   ticket 333). Casing rings follow the cut at fixed spacing (`layCasingAlongCut`).
- * - The stamp's front sits one pose step further ahead than a report's (`sweptDrillStampOf`,
- *   ticket 333), so this tick's cut always clears the step the body may take next tick.
+ * - The stamp's front sits further ahead than a report's by the step the rig may take while it
+ *   cuts (`sweptStampAheadMmAt`, tickets 333 and 334), so this tick's cut always clears the step
+ *   the body may take next tick.
  */
 import { DENSITY_CELL_UNITS, TERRAIN_EDIT_UNITS_PER_TICK } from '../../constants/terrainBudget'
 import type { DrillBit } from '../vehicle/aheadBearingLatch'
@@ -56,6 +57,7 @@ import {
 } from './drillGearCut'
 import type { DrillGates } from './drillGates'
 import { drillGroundBy, SUB_STEP_CLOCK, type DrillOutcome } from './groundDrill'
+import { sweptStampAheadMmAt } from './stepBoundRead'
 
 /** Density cells one drill step may touch: the whole per-tick terrain budget. */
 export const DRILL_CELLS_PER_TICK = TERRAIN_EDIT_UNITS_PER_TICK / DENSITY_CELL_UNITS
@@ -103,13 +105,14 @@ export function drillAlongSweep(
 }
 
 function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Sweep {
-  const stamp = sweptDrillStampOf(step.pose, step.isLifting)
+  const aheadMm = sweptStampAheadMmAt(state, playerId)
+  const stamp = sweptDrillStampOf(step.pose, step.isLifting, aheadMm)
   const cursor = vehicleOf(state, playerId).sweptCut
   const { x, y } = step.pose
   return {
     step,
     stamp,
-    path: sweepPathOf(cursor, step.pose, stamp, state.tick),
+    path: sweepPathOf(cursor, step.pose, { stamp, aheadMm }, state.tick),
     gate: cutGateAt(state, playerId, { x, y, isLifting: step.isLifting, isDrilling: true }),
   }
 }

@@ -5,8 +5,8 @@
  *
  * - A step continues the cursor's sweep only when the cursor was cut on the tick before, with the
  *   same facing. Otherwise it is fresh: its path runs from the body (the stamp pulled back along
- *   the facing by `SWEPT_STAMP_AHEAD_MM`) to the stamp, and it cuts a bare disc where it stops:
- *   with nothing in the way, a report's disc one pose step further ahead (ticket 333).
+ *   the facing by as far as it sits ahead) to the stamp, and it cuts a bare disc where it stops:
+ *   with nothing in the way, a report's disc one cutting step further ahead (tickets 333, 334).
  * - The stamp's centre is walked along the path, and the sweep stops at the last sub-step before
  *   the centre would enter a cell the drill cannot cut (a gate that refuses or blocks it, or one
  *   past its scratch floor). Cells are 1 m and the stamp's radius 0.95 m, so a centre that never
@@ -14,7 +14,6 @@
  *   the stamp still cuts every other cell up to its face. A fresh path whose body point is already
  *   in such a cell cuts nothing.
  */
-import { SWEPT_STAMP_AHEAD_MM } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
 import type { CutGate } from './cutGate'
@@ -46,15 +45,22 @@ export interface SweepPath {
   steps: number
 }
 
-/** The path of a step at `tick` whose stamp at the new pose is `stamp`. */
+/** The stamp a step cuts with at its pose, sitting `aheadMm` ahead of it along the facing. */
+export interface StepStamp {
+  stamp: DiscStamp
+  aheadMm: number
+}
+
+/** The path of a step at `tick` whose stamp at the new pose is `stepStamp`. */
 export function sweepPathOf(
   cursor: SweptCut | undefined,
   pose: VehiclePose,
-  stamp: DiscStamp,
+  stepStamp: StepStamp,
   tick: number,
 ): SweepPath {
+  const { stamp } = stepStamp
   const isFresh = !isContinuing(cursor, pose, tick)
-  const from = isFresh || cursor === undefined ? bodyPointOf(stamp, pose) : pointOf(cursor)
+  const from = isFresh || cursor === undefined ? bodyPointOf(stepStamp, pose) : pointOf(cursor)
   const to = pointOf(stamp)
   return { from, to, isFresh, steps: stepsBetween(from, to) }
 }
@@ -64,11 +70,11 @@ function isContinuing(cursor: SweptCut | undefined, pose: VehiclePose, tick: num
 }
 
 /** The stamp pulled back along the facing to the body: where a fresh step's walk starts. */
-function bodyPointOf(stamp: DiscStamp, pose: VehiclePose): StampPoint {
+function bodyPointOf({ stamp, aheadMm }: StepStamp, pose: VehiclePose): StampPoint {
   const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
   return {
-    xMm: stamp.xMm - scaled(ahead.x, SWEPT_STAMP_AHEAD_MM),
-    yMm: stamp.yMm - scaled(ahead.y, SWEPT_STAMP_AHEAD_MM),
+    xMm: stamp.xMm - scaled(ahead.x, aheadMm),
+    yMm: stamp.yMm - scaled(ahead.y, aheadMm),
   }
 }
 

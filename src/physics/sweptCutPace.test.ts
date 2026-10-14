@@ -32,7 +32,7 @@ const MAX_WAIT_TICKS = 12
 /**
  * What held the body back on a drilling tick (TD ruling on #330, VS pin 2): the swept cut's 32-cell
  * budget stopping the sweep short (nothing on P1 refuses this drill, so a short sweep is the
- * budget), the pose bound (the 18 m/s clamp, or a refused step), the engine's top speed along the
+ * budget), the pose bound (the 18 m/s clamp, the stats-derived bound swept, or a refused step), the engine's top speed along the
  * ground, the wheels waiting on ground in a level cut's way, else the cut front itself. A tick the
  * drill does not bite (the body falling or rolling through ground already cut) is `undrilled`.
  */
@@ -48,6 +48,10 @@ interface TickRead {
   reportedPose: VehiclePose | null
   cursor: SweptCut | undefined
   tick: number
+  /** How far ahead of the pose the swept stamp sat (ticket 334). */
+  stampAheadMm: number
+  /** The pose bound the body was clamped to, mm/s. */
+  poseBoundMmPerSecond: number
 }
 
 interface Leg {
@@ -74,6 +78,9 @@ async function playFloorBound(minTicksPerTile: number, isSwept: boolean): Promis
   const { createVehicleBody, createVehicleController } = await import('./vehicleController')
   const { buildIntent } = await import('../systems/input/buildIntent')
   const { engineStatsAtStep } = await import('../systems/economy/vehicleStats')
+  const { readAuthorityState } = await import('../store/authorityLink')
+  const bounds = await import('../systems/authority/stepBoundRead')
+  const { reportSpeedOfStepBound, stepBoundMmOf } = await import('../systems/vehicle/stepBound')
   store.resetGameStore()
   const log = { runId: 'run_test', sink: createMemorySink(), secondsSinceStart: () => 0 }
   runLog.installRunLog(runLog.createRunLog(log))
@@ -92,11 +99,25 @@ async function playFloorBound(minTicksPerTile: number, isSwept: boolean): Promis
     for (let step = 0; step < Math.round(seconds / PHYSICS_TIMESTEP); step++) {
       if (step % 60 === 0) store.useGameStore.getState().setEnergy('150')
       const reportedPose = store.readLocalVehicle().pose
+      const playerId = store.useGameStore.getState().playerId
+      const stampAheadMm = bounds.sweptStampAheadMmAt(readAuthorityState(), playerId)
       loop.step(watched.controller, intent)
       world.step()
       const cursor = store.readLocalVehicle().sweptCut
       const tick = store.readAuthorityTick()
-      each?.({ result: watched.last(), reportedPose, cursor, tick })
+      const isCutting = cursor?.tick === tick && cursor.cutGate === 1
+      const boundMm = stepBoundMmOf(bounds.stepBoundsAt(readAuthorityState(), playerId), isCutting)
+      const poseBoundMmPerSecond = isSwept
+        ? reportSpeedOfStepBound(boundMm)
+        : MAX_SPEED_MM_PER_SECOND
+      each?.({
+        result: watched.last(),
+        reportedPose,
+        cursor,
+        tick,
+        stampAheadMm,
+        poseBoundMmPerSecond,
+      })
     }
   }
   const playLeg = (intent: VehicleIntent, along: () => number): Leg => {
@@ -153,16 +174,18 @@ function limiterOf(read: TickRead, isSwept: boolean, speedMaxMm: number): Limite
 }
 
 /** The tick's sweep stopped before the stamp at the step's position (`sweptDrill.ts`). */
-function isSweepShort({ result, reportedPose, cursor, tick }: TickRead): boolean {
+function isSweepShort(read: TickRead): boolean {
+  const { result, reportedPose, cursor, tick } = read
   if (cursor === undefined || cursor.tick !== tick || reportedPose === null) return false
-  const stamp = sweptDrillStampOf({ ...reportedPose, x: result.pose.x, y: result.pose.y }, false)
+  const pose = { ...reportedPose, x: result.pose.x, y: result.pose.y }
+  const stamp = sweptDrillStampOf(pose, false, read.stampAheadMm)
   return cursor.xMm !== stamp.xMm || cursor.yMm !== stamp.yMm
 }
 
 /** At the pose bound's speed, or (swept) the tick's step was refused. */
-function isPoseBound({ result, cursor, tick }: TickRead, isSwept: boolean): boolean {
-  if (isSwept && cursor?.tick !== tick) return true
-  return speedOf(result.pose) >= MAX_SPEED_MM_PER_SECOND * NEAR_BOUND
+function isPoseBound(read: TickRead, isSwept: boolean): boolean {
+  if (isSwept && read.cursor?.tick !== read.tick) return true
+  return speedOf(read.result.pose) >= read.poseBoundMmPerSecond * NEAR_BOUND
 }
 
 function speedOf({ vx, vy }: VehiclePose): number {
