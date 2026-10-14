@@ -84,6 +84,7 @@ const AUTO_ON: CommandIntent<'auto-probe.set_auto'> = {
 }
 
 const PRESS = intentToUseSlot('powerup.1')
+const AUTO_FIRED_LINE = 'power-up-core.power_up_auto_fired'
 
 function inAutoField<T>(isOn: boolean, body: (session: ScriptedSession) => T): T {
   return withRegistrations([slice, FAKE_ITEMS, AUTO_PROBE], () => {
@@ -127,14 +128,14 @@ describe('power-up auto press', () => {
       ])
     }))
 
-  it('logs power_up_auto_fired on the press tick, to its schema', () =>
+  it('logs power_up_auto_fired for the press, to its schema', () =>
     inAutoField(true, (session) => {
       session.advanceTo(FIRST_ACT)
       const sink = createMemorySink()
       const runLog = createRunLog({ runId: 'run_328', sink, secondsSinceStart: () => 0 })
       const stamp = { playerId: 'p1', planet: 1, depthTiles: 0 }
       recordDomainEventsTo(runLog, stamp, session.events())
-      const fired = sink.events.filter(({ event }) => event === 'power-up-core.power_up_auto_fired')
+      const fired = sink.events.filter(({ event }) => String(event) === AUTO_FIRED_LINE)
       expect(fired.map(({ data }) => data)).toEqual([{ itemId: ITEM, slot: 'powerup.1' }])
       expect(fired.flatMap(runEventProblems)).toEqual([])
     }))
