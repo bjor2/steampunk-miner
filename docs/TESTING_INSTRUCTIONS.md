@@ -371,8 +371,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   `tech.incomeCap.maxShareBp` of a full hold of the band's ore after `tripCapAt`, on P10, P20, P40
   and P60, every band, at the levels the bot arrived with and left with, on the median of the seeds
   that own the item when their run ends, in whole basis points. An item over the cap before the
-  clamp fails unless play pays it through the trip ledger; `tech.incomeCap.knownRed` lists the
-  movers until their ledger ticket (#408) lands, printed and not gated. A band the tip only skids on is not
+  clamp fails unless play pays it through the trip ledger; `tech.incomeCap.knownRed` lists items
+  known to fail until their ledger work lands, printed and not gated, and is empty since the movers'
+  ledger (ticket 408, `terrain-tools/moverLedger.test.ts`). A band the tip only skids on is not
   judged. The lane also fails an item over 15% of what the bot earned on any planet of the run
   (`systems/deliveredIncomeShares.ts`, the Vertical Scaler's guard), and `incomeCapGolden.test.ts`
   pins the shares on the on-curve vehicle. The **Mark milestone cap** (GD lock on #256, ticket 278) judges the same runs the same way with each item's sibling-link added to it

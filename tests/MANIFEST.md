@@ -438,7 +438,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 54 files, 392 tests
+### `tech-tree`: 54 files, 393 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -447,7 +447,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/forkBranches.vision.test.ts` | 3 | 3 |
 | `src/features/tech-tree/forkMix.lane.test.ts` | 5 | 5 |
 | `src/features/tech-tree/forkMixRuns.test.ts` | 7 | 7 |
-| `src/features/tech-tree/incomeCapGolden.test.ts` | 6 | 6 |
+| `src/features/tech-tree/incomeCapGolden.test.ts` | 7 | 7 |
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
@@ -497,7 +497,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 
-### `terrain-tools`: 44 files, 358 tests
+### `terrain-tools`: 45 files, 366 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -508,7 +508,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/magnetGuard.test.ts` | 6 | 6 |
 | `src/features/terrain-tools/magnetHand.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/magnetPace.test.ts` | 6 | 3 |
-| `src/features/terrain-tools/moverIncomeRates.test.ts` | 8 | 8 |
+| `src/features/terrain-tools/moverIncomeRates.test.ts` | 9 | 9 |
+| `src/features/terrain-tools/moverLedger.test.ts` | 7 | 7 |
 | `src/features/terrain-tools/sceneBudget.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/shippedRows.test.ts` | 8 | 8 |
 | `src/features/terrain-tools/store/clampRelease.test.ts` | 2 | 2 |
