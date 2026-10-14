@@ -4,7 +4,8 @@
  * `vehicle-item` rows, and read charges through `chargesLeftOf` (#162 "Slice and contract"). An
  * effect that outlasts its use, or a passive's, reads the item at the player's Mark through
  * `powerUpAtMarkOf` (#249). An item used by holding its slot declares `release` and restarts its
- * cooldown from its hold's end with `startCooldownAt` (ticket 332).
+ * cooldown from its hold's end with `startCooldownAt` (ticket 332). A self-acting item's auto
+ * actor presses through `pressItemOnAuto` and waits on `autoUseReadyTickOf` (ticket 328).
  */
 export const POWER_UP_CORE_SLICE_ID = 'power-up-core'
 export {
@@ -20,6 +21,7 @@ export {
   type SlotHold,
   type SlotRelease,
 } from './systems/powerUpKind'
+export { autoUseReadyTickOf, POWER_UP_AUTO_AIM, pressItemOnAuto } from './systems/autoPress'
 export { chargesLeftOf, type FollowUpPattern } from './systems/chargeState'
 export { FOLLOW_UP_WINDOW_TICKS } from './systems/followUps'
 export { powerUpAtMarkOf, type MarkedPowerUp } from './systems/powerUpMarks'

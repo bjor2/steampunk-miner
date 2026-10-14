@@ -44,6 +44,11 @@ export interface PendingUse {
    * the act tick, right after `activate`. Absent until a release lands, so no save changes.
    */
   releasedTick?: number
+  /**
+   * The tick the kernel's auto mode pressed it (ticket 328, `autoPress.ts`): a manual press of
+   * the same slot in that tick takes its place. Absent for a press by hand, so no save changes.
+   */
+  autoPressTick?: number
 }
 
 /**
@@ -270,7 +275,8 @@ function isPendingUse(value: unknown): boolean {
     Number.isSafeInteger(value.originTx) &&
     Number.isSafeInteger(value.originTy) &&
     isFollowUpPattern(value.milestone) &&
-    (value.releasedTick === undefined || isWholeNumber(value.releasedTick))
+    (value.releasedTick === undefined || isWholeNumber(value.releasedTick)) &&
+    (value.autoPressTick === undefined || isWholeNumber(value.autoPressTick))
   )
 }
 

@@ -83,6 +83,11 @@ declare module '../../../systems/authority/domainEvent' {
     'power-up-core.LinkToggled': { playerId: string; itemId: string; isOn: boolean }
     /** The slot was let go and the item's live hold ended on this tick (ticket 332). */
     'power-up-core.PowerUpReleased': { playerId: string; itemId: string; slot: LoadoutSlotId }
+    /**
+     * The kernel's auto mode pressed the item's slot on its own (ticket 328), through the press
+     * path a key takes: the use's own events follow on its act.
+     */
+    'power-up-core.PowerUpAutoFired': { playerId: string; itemId: string; slot: LoadoutSlotId }
   }
   interface RejectionReasons {
     'power-up-core.not_a_power_up_slot': true
@@ -153,4 +158,8 @@ export function linkToggledOf(playerId: string, itemId: string, isOn: boolean) {
 
 export function powerUpReleasedOf(subject: UseSubject) {
   return { type: 'power-up-core.PowerUpReleased' as const, ...subject }
+}
+
+export function powerUpAutoFiredOf(subject: UseSubject) {
+  return { type: 'power-up-core.PowerUpAutoFired' as const, ...subject }
 }

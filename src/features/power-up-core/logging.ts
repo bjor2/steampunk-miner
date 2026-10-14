@@ -6,7 +6,8 @@
  * tick. The sibling-link milestone (the GD lock on #256, ticket 274) adds `link_fired {itemId,
  * siblingId, slot}`, the sibling's slot, and `link_toggled {itemId, isOn}` for the item card's
  * switch. Letting go of a hold-to-use slot (ticket 332) logs `power_up_released {itemId, slot}`
- * on the tick the hold ended.
+ * on the tick the hold ended. A press the kernel's auto mode made (ticket 328) logs
+ * `power_up_auto_fired {itemId, slot}` on its press tick; its use logs as any other.
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
@@ -51,6 +52,10 @@ export const POWER_UP_PROJECTIONS: SliceEventProjections = {
   }),
   'power-up-core.PowerUpReleased': ({ itemId, slot }) => ({
     event: 'power-up-core.power_up_released',
+    data: { itemId, slot },
+  }),
+  'power-up-core.PowerUpAutoFired': ({ itemId, slot }) => ({
+    event: 'power-up-core.power_up_auto_fired',
     data: { itemId, slot },
   }),
 }
@@ -106,6 +111,11 @@ export const POWER_UP_RUN_EVENTS: SliceRunEvents = {
     payload: { itemId: 'text', isOn: 'flag' },
   },
   'power-up-core.power_up_released': {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', slot: 'text' },
+  },
+  'power-up-core.power_up_auto_fired': {
     group: 'vehicle_and_combat',
     level: 'core',
     payload: { itemId: 'text', slot: 'text' },

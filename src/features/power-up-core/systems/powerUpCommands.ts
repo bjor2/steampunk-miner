@@ -4,7 +4,8 @@
  * - `power-up-core.use_power_up {slot}`: press the power-up in a slot. Refused, at no cost, for the
  *   reasons in `useRefusals.ts`; accepted, it reserves a charge and winds up or channels. A press
  *   within the window of the item's last use, once its Mark has reached the second tap, is that
- *   milestone (#256, `followUps.ts`).
+ *   milestone (#256, `followUps.ts`). A press in the tick auto pressed the same slot wins: the
+ *   auto press is withdrawn first (ticket 328, `autoPress.ts`).
  * - `power-up-core.hold_power_up {slot}`: the slot is still held past the wind-up of the use it
  *   made; once the item's Mark has reached the hold, it follows that use as one more action.
  * - `power-up-core.release_power_up {slot}`: the slot is let go (ticket 332, `slotRelease.ts`). It
@@ -15,11 +16,12 @@
  * - `debug.power-up-core.setCharges {itemId, chargesLeft}`: a scenario's charges left for one
  *   power-up that counts charges, at most the count at the player's Mark (#249).
  */
-import { rejectionOf, type Rejection } from '../../../systems/authority/commandRule'
+import { chainEffects, rejectionOf, type Rejection } from '../../../systems/authority/commandRule'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { vehicleOf } from '../../../systems/authority/authorityState'
 import type { SliceCommandRules } from '../../../systems/registries/commandRules'
 import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
+import { withdrawSameTickAutoPress } from './autoPress'
 import { itemChargesOf, powerUpStateOf, withItemCharges, withPowerUpState } from './chargeState'
 import { followUpOfPress } from './followUps'
 import { linkToggleRefusalOf, toggleSiblingLink } from './linkToggle'
@@ -34,9 +36,17 @@ export const POWER_UP_RULES: SliceCommandRules = {
   'power-up-core.use_power_up': {
     fields: { slot: 'text' },
     reject: (state, { playerId, tick, payload }) =>
-      refusalOfUse(state, playerId, payload.slot, tick),
+      refusalOfUse(
+        withdrawSameTickAutoPress(state, playerId, payload.slot, tick).state,
+        playerId,
+        payload.slot,
+        tick,
+      ),
     apply: (state, { playerId, tick, payload }) =>
-      startUse(state, playerId, pressOf(state, playerId, payload.slot, tick)),
+      chainEffects(state, [
+        (current) => withdrawSameTickAutoPress(current, playerId, payload.slot, tick),
+        (current) => startUse(current, playerId, pressOf(current, playerId, payload.slot, tick)),
+      ]),
   },
   'power-up-core.hold_power_up': {
     fields: { slot: 'text' },

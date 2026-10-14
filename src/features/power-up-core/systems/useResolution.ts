@@ -51,6 +51,7 @@ import {
 } from './powerUpKind'
 import { atResearchedMark, type MarkedPowerUp } from './powerUpMarks'
 import { withSiblingLink } from './siblingLink'
+import { cooldownTicksAfterActOf } from './manualWait'
 import { releaseKeptAtAct } from './slotRelease'
 
 /** One press, or a milestone's follow-up of the use before it (null for a plain use). */
@@ -59,6 +60,8 @@ export interface UseStart {
   slot: LoadoutSlotId
   tick: number
   milestone: FollowUpPattern | null
+  /** The kernel's auto mode pressed it (ticket 328); absent for a press by hand. */
+  pressedBy?: 'auto'
 }
 
 /** The press: reserve the charge and wait, or act at once for an item with no wind-up. */
@@ -122,7 +125,7 @@ export function isChannelBroken(vehicle: VehicleState, pending: PendingUse): boo
 
 function pendingUseOf(
   vehicle: VehicleState,
-  { powerUp, slot, tick, milestone }: UseStart,
+  { powerUp, slot, tick, milestone, pressedBy }: UseStart,
 ): PendingUse {
   const origin = tileOfPose(vehicle.pose as NonNullable<VehicleState['pose']>)
   return {
@@ -133,6 +136,7 @@ function pendingUseOf(
     originTx: origin.tx,
     originTy: origin.ty,
     ...(milestone !== null && { milestone }),
+    ...(pressedBy === 'auto' && { autoPressTick: tick }),
   }
 }
 
@@ -232,8 +236,9 @@ function refuseByGate(
 }
 
 /**
- * The item's own effect first, then its cooldown at its Mark, its toggle, the follow-up it opens
- * or closes, and the used line.
+ * The item's own effect first, then its cooldown at its Mark (with auto's wait after a use by
+ * hand folded in, `manualWait.ts`), its toggle, the follow-up it opens or closes, and the used
+ * line.
  */
 function finishActed(
   effect: RuleEffect,
@@ -242,7 +247,9 @@ function finishActed(
   pending: PendingUse,
   tick: number,
 ): RuleEffect {
-  const after = actedPowerUpState(powerUpStateOf(effect.state, playerId), powerUp, pending, tick)
+  const cooldownTicks = cooldownTicksAfterActOf(effect.state, playerId, powerUp, pending)
+  const value = powerUpStateOf(effect.state, playerId)
+  const after = actedPowerUpState(value, powerUp, pending, tick, tick + cooldownTicks)
   return {
     state: withPowerUpState(effect.state, playerId, after),
     events: [
@@ -257,8 +264,9 @@ function actedPowerUpState(
   powerUp: MarkedPowerUp,
   pending: PendingUse,
   tick: number,
+  readyAtTick: number,
 ): PowerUpState {
-  const cooled = cooledDown(value, powerUp, tick)
+  const cooled = cooledDown(value, powerUp, readyAtTick)
   const toggled = powerUp.isToggle ? withToggle(cooled, powerUp.itemId, true) : cooled
   return withOpenerAfterAct(toggled, powerUp, pending, tick)
 }
@@ -282,12 +290,9 @@ function usedLineOf(
   }
 }
 
-function cooledDown(value: PowerUpState, powerUp: PowerUp, tick: number): PowerUpState {
+function cooledDown(value: PowerUpState, powerUp: PowerUp, readyAtTick: number): PowerUpState {
   const charges = itemChargesOf(value, powerUp.itemId)
-  return withItemCharges(value, powerUp.itemId, {
-    ...charges,
-    readyAtTick: tick + powerUp.cooldownTicks,
-  })
+  return withItemCharges(value, powerUp.itemId, { ...charges, readyAtTick })
 }
 
 function powerUpUseOf(
