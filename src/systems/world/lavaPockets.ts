@@ -40,6 +40,23 @@ export function paintLavaPockets(params: PlanetParams, cells: Uint32Array, cx: n
 }
 
 /**
+ * Whether a tile's pocket block is lava, as `paintLavaPockets` asks it of plain ground, with the
+ * planet's chances and seed worked out once: the hazard strip asks it tile by tile (ticket 341).
+ * Always false off the heat planets.
+ */
+export function lavaPocketTestOf(params: PlanetParams): (tile: TilePoint) => boolean {
+  const chances = pocketChancesOf(params)
+  if (chances.every((chance) => chance === 0)) return () => false
+  const seed = subSeedFor(params, SEED_PURPOSE.lavaPocket)
+  return (tile) => isPocketBlock(params, seed, chances, tile)
+}
+
+/** Whether band `band` of the planet holds lava pockets at all (the strip's band warning, ticket 341). */
+export function isLavaPocketBand(params: PlanetParams, band: number): boolean {
+  return pocketChancesOf(params)[band - 1] > 0
+}
+
+/**
  * Whether a tile of the pocket lattice lies within `radiusTiles` of `tile`, centre to centre (#141
  * "signature near lava", #232). It asks the lattice, not the cells: ore patches paint before the
  * pockets, so a generation hook asks before any lava is in the chunk, and a pocket tile counts

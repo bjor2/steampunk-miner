@@ -44,8 +44,11 @@ export function generateChunkCells(params: PlanetParams, cx: number, cy: number)
   return cells
 }
 
-/** The lattice patches in painting order, with the dock guarantee right after band 1's. */
-function patchesForChunk(params: PlanetParams, cx: number, cy: number): OrePatch[] {
+/**
+ * The lattice patches in painting order, with the dock guarantee right after band 1's; the hazard
+ * strip's seeded read (ticket 341) paints a tile from the same list.
+ */
+export function patchesForChunk(params: PlanetParams, cx: number, cy: number): OrePatch[] {
   const patches = orePatchesNearChunk(params, cx, cy)
   const guarantee = dockGuaranteePatch(params)
   if (guarantee === null) return patches
@@ -77,7 +80,7 @@ function paintOrePatches(
 }
 
 /** The lattice's roll (its family, tier offset band - 1) after the slices' patch hooks. */
-function patchCellOf(params: PlanetParams, patch: OrePatch): number {
+export function patchCellOf(params: PlanetParams, patch: OrePatch): number {
   const rolled = { family: patch.family, tierOffset: patch.band - 1 }
   const content = foldPatchContent(params, patch, rolled)
   return oreCell(content.family, content.tierOffset)
