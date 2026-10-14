@@ -38,4 +38,5 @@ export {
   magnetVehicleItemOf,
 } from './systems/magnetItems'
 export { MAGNET_ITEM_CARDS } from './systems/magnetCards'
+export { magnetFamilySpendRowsOf, type MagnetFamilySpendRow } from './systems/magnetSpend'
 export { HELD_BACK_ITEM_IDS, isHeldBack, SHIPPED_TERRAIN_ITEMS } from './systems/shippedTools'

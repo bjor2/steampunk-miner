@@ -353,12 +353,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 25 files, 210 tests
+### `terrain-tools`: 28 files, 222 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetGuard.test.ts` | 6 | 6 |
+| `src/features/terrain-tools/magnetHand.test.ts` | 4 | 4 |
+| `src/features/terrain-tools/magnetPace.test.ts` | 6 | 3 |
 | `src/features/terrain-tools/shippedRows.test.ts` | 7 | 7 |
 | `src/features/terrain-tools/store/clampRelease.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/clampLattice.test.ts` | 4 | 4 |
@@ -367,6 +369,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/lodeClamp.test.ts` | 16 | 12 |
 | `src/features/terrain-tools/systems/lodestoneBeacon.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/magnetItems.test.ts` | 9 | 9 |
+| `src/features/terrain-tools/systems/magnetSpend.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/marksInPlay.test.ts` | 1 | 1 |
 | `src/features/terrain-tools/systems/oreShifter.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/systems/pressurePocket.test.ts` | 3 | 3 |
