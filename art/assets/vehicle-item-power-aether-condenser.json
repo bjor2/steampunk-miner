@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-power-aether-condenser",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#b87333",
+  "partColors": {
+    "condenser-tank": "#b87333",
+    "condenser-needle": "#8c1410"
+  }
+}

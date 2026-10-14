@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-power-phase-lantern",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "lantern-frame": "#c9a24b",
+    "lantern-shutter": "#c9a24b"
+  }
+}

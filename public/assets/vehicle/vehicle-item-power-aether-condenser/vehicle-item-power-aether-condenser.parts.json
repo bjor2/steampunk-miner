@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-power-aether-condenser",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-aether-condenser/vehicle-item-power-aether-condenser.blend",
+    "sha256": "7cace1360ac55078d4c3257bf1356593f4df2cc88dd44e17e751d0a576a582aa",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-aether-condenser.albedo.ktx2",
+    "normal": "vehicle-item-power-aether-condenser.normal.ktx2",
+    "emissive": "vehicle-item-power-aether-condenser.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "condenser-needle",
+      "tier": 1,
+      "rect": [
+        179,
+        8,
+        11,
+        4
+      ],
+      "sizeM": [
+        0.0201,
+        0.0078
+      ],
+      "pivotM": [
+        0.0039,
+        0.0039
+      ],
+      "atM": [
+        0.078,
+        0.0156
+      ],
+      "z": 6
+    },
+    {
+      "id": "condenser-tank",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        155,
+        101
+      ],
+      "sizeM": [
+        0.3016,
+        0.1968
+      ],
+      "pivotM": [
+        0.1508,
+        0.0767
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    }
+  ]
+}

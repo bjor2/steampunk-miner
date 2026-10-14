@@ -1,0 +1,36 @@
+{
+  "assetId": "vehicle-item-power-phase-lantern",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-phase-lantern/vehicle-item-power-phase-lantern.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [128, 256],
+  "maps": {
+    "albedo": "vehicle-item-power-phase-lantern.albedo.ktx2",
+    "normal": "vehicle-item-power-phase-lantern.normal.ktx2",
+    "emissive": "vehicle-item-power-phase-lantern.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "lantern-frame",
+      "tier": 1,
+      "rect": [8, 8, 57, 140],
+      "sizeM": [0.1095, 0.2726],
+      "pivotM": [0.0506, 0.0032],
+      "atM": [0.0, 0.0],
+      "z": 9
+    },
+    {
+      "id": "lantern-shutter",
+      "tier": 1,
+      "rect": [81, 8, 38, 28],
+      "sizeM": [0.0736, 0.0528],
+      "pivotM": [0.0368, 0.032],
+      "atM": [0.0, 0.152],
+      "z": 9
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-power-chronometric-governor",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "escapement-cage": "#c9a24b",
+    "escapement-wheel": "#c9a24b"
+  }
+}

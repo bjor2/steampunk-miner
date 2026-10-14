@@ -292,10 +292,38 @@
     },
     {
       "itemId": "power.resonance_whistle",
-      "kind": "slot",
-      "attach": "slot",
+      "kind": "signature",
+      "attach": "hull.stack.side",
       "assetId": "vehicle-item-power-resonance-whistle",
       "parts": [{ "id": "whistle-body" }, { "id": "whistle-lever" }]
+    },
+    {
+      "itemId": "power.phase_lantern",
+      "kind": "signature",
+      "attach": "hull.nose",
+      "assetId": "vehicle-item-power-phase-lantern",
+      "parts": [{ "id": "lantern-frame" }, { "id": "lantern-shutter" }]
+    },
+    {
+      "itemId": "power.arc_coil",
+      "kind": "signature",
+      "attach": "hull.roof.coils",
+      "assetId": "vehicle-item-power-arc-coil",
+      "parts": [{ "id": "coil-plinth" }, { "id": "coil-aft" }, { "id": "coil-fore" }]
+    },
+    {
+      "itemId": "power.chronometric_governor",
+      "kind": "signature",
+      "attach": "hull.tail",
+      "assetId": "vehicle-item-power-chronometric-governor",
+      "parts": [{ "id": "escapement-cage" }, { "id": "escapement-wheel" }]
+    },
+    {
+      "itemId": "power.aether_condenser",
+      "kind": "signature",
+      "attach": "hull.flank",
+      "assetId": "vehicle-item-power-aether-condenser",
+      "parts": [{ "id": "condenser-tank" }, { "id": "condenser-needle" }]
     },
     {
       "itemId": "consumable.flare_mortar",

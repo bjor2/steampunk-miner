@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-power-chronometric-governor",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-chronometric-governor/vehicle-item-power-chronometric-governor.blend",
+    "sha256": "56a12b6b6137ea0cb74f5fcd6370ee47fdf89ab16c9884c2834098bf90de0c55",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-chronometric-governor.albedo.ktx2",
+    "normal": "vehicle-item-power-chronometric-governor.normal.ktx2",
+    "emissive": "vehicle-item-power-chronometric-governor.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "escapement-cage",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        100,
+        113
+      ],
+      "sizeM": [
+        0.195,
+        0.2197
+      ],
+      "pivotM": [
+        0.0975,
+        0.0026
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 6
+    },
+    {
+      "id": "escapement-wheel",
+      "tier": 1,
+      "rect": [
+        8,
+        137,
+        48,
+        48
+      ],
+      "sizeM": [
+        0.0929,
+        0.0925
+      ],
+      "pivotM": [
+        0.0464,
+        0.0467
+      ],
+      "atM": [
+        0.0,
+        0.1105
+      ],
+      "z": 6
+    }
+  ]
+}

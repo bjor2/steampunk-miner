@@ -1,0 +1,45 @@
+{
+  "assetId": "vehicle-item-power-arc-coil",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-arc-coil/vehicle-item-power-arc-coil.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [256, 128],
+  "maps": {
+    "albedo": "vehicle-item-power-arc-coil.albedo.ktx2",
+    "normal": "vehicle-item-power-arc-coil.normal.ktx2",
+    "emissive": "vehicle-item-power-arc-coil.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "coil-aft",
+      "tier": 1,
+      "rect": [8, 8, 34, 83],
+      "sizeM": [0.0646, 0.1612],
+      "pivotM": [0.0323, 0.0013],
+      "atM": [-0.0715, 0.0182],
+      "z": 6
+    },
+    {
+      "id": "coil-fore",
+      "tier": 1,
+      "rect": [58, 8, 34, 83],
+      "sizeM": [0.0646, 0.1612],
+      "pivotM": [0.0323, 0.0013],
+      "atM": [0.0715, 0.0182],
+      "z": 6
+    },
+    {
+      "id": "coil-plinth",
+      "tier": 1,
+      "rect": [108, 8, 140, 18],
+      "sizeM": [0.273, 0.0351],
+      "pivotM": [0.1365, 0.0026],
+      "atM": [0.0, 0.0],
+      "z": 6
+    }
+  ]
+}
