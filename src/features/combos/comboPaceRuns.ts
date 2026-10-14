@@ -1,8 +1,8 @@
 /**
  * The runs behind the combos' pin-6 gate (GD lock on #206 with the Vertical Scaler's conditions;
  * ticket 206): the pacing bot arrives on a planet with the on-curve levels, the hull whole and a
- * little money, then plays to its core three times on each pacing seed, one loadout command sent
- * first in each, all else equal:
+ * little money (`paceArrival.ts`, checked), then plays to its core three times on each pacing
+ * seed, one loadout command sent first in each, all else equal:
  *
  * - **bare:** nothing owned;
  * - **parents:** every shipped combo's parent items owned, the drain, the ore-shifter and the corer
@@ -17,15 +17,11 @@
 import { PACING_WORLD_SEEDS } from '../../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { CommandIntent } from '../../systems/authority/authorityCommand'
-import { createAuthorityState } from '../../systems/authority/authorityState'
 import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { setVehicleLoadoutCommand } from '../../systems/authority/loadoutCommands'
-import { createBotSession, type BotSession } from '../../systems/bot/botSession'
-import { botPlanetOf } from '../../systems/bot/botTravel'
-import { playSliceFrom, type SliceRun } from '../../systems/bot/playSlice'
-import { UPGRADE_IDS } from '../../systems/economy/economyDefinition'
-import { stepOfMajor } from '../../systems/economy/upgradeSteps'
-import { onCurveLevel, onCurveSteps, vehicleStatsAt } from '../../systems/economy/vehicleStats'
+import type { BotSession } from '../../systems/bot/botSession'
+import { arrivedPaceSessionOn, playToCoreFrom } from '../../systems/bot/paceArrival'
+import type { SliceRun } from '../../systems/bot/playSlice'
 import {
   add,
   div,
@@ -33,13 +29,10 @@ import {
   fromCanonical,
   fromSafeInteger,
   mul,
-  toCanonical,
   toSafeInteger,
   ZERO_MONEY,
   type Money,
 } from '../../systems/money'
-import { setPlanetCommand, setPlanetSeedCommand } from '../../systems/startScenarioCommands'
-import { setUpgradeCommand } from '../../systems/vehicle/vehicleCommands'
 import { STEAM_SEAR_ITEM_ID } from '../../systems/authority/bore/boreFire'
 import { contentOf } from '../../systems/registries/content'
 import { COMBO_HAND_LOADOUT, SHIELD_HAND_LOADOUT, withComboHand, withShieldHand } from './comboHand'
@@ -58,7 +51,6 @@ export const MAX_INCOME_BP = 11500
 /** Two hours on one planet: room for a slow core on any run. */
 const BUDGET_TICKS = 2 * 60 * 60 * TICKS_PER_SECOND
 const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
-const ARRIVAL_MONEY = '20000'
 
 const SHIELD_ID = 'power.steam_shield'
 const ALARM_SHIELD_ID = 'combo.alarm_shield'
@@ -156,23 +148,6 @@ export function describeRuns({ planet, seed, bare, parents, combos }: ComboPaceR
   return `P${planet} seed ${seed}: ${runs} (${time}, ${income}; ${partnerUsesOf(combos)} uses)`
 }
 
-/** On `planet` with the on-curve levels, the hull whole and a little money, as a bot arriving. */
-function arrivalOn(planet: number, worldSeed: number): CommandIntent[] {
-  return [
-    setPlanetCommand(planet),
-    setPlanetSeedCommand(worldSeed),
-    { type: 'debug.setMoney', payload: { amount: ARRIVAL_MONEY } },
-    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, planet)))),
-    wholeHullOn(planet),
-  ]
-}
-
-/** `debug.setUpgrade` keeps the planet-1 hull; the on-curve one is mended whole (ticket 354). */
-function wholeHullOn(planet: number): CommandIntent {
-  const { hullMax } = vehicleStatsAt(onCurveSteps(planet))
-  return { type: 'debug.setHull', payload: { hull: toCanonical(hullMax) } }
-}
-
 function shieldRunOn(
   planet: number,
   worldSeed: number,
@@ -187,21 +162,15 @@ function shieldRunOn(
   return coreRunOn(planet, worldSeed, setup, hand)
 }
 
-/** The bot from arrival on `planet` to its core, `setup` sent first, through `hand`. */
+/** The bot from a checked arrival on `planet` to its core, `setup` sent first, through `hand`. */
 function coreRunOn(
   planet: number,
   worldSeed: number,
   setup: CommandIntent | readonly CommandIntent[],
   hand: (session: BotSession) => BotSession,
 ): SliceRun {
-  const start = createAuthorityState({ planetIndex: 1, planetSeed: worldSeed, playerIds: ['p1'] })
-  const session = createBotSession(start, 'p1')
-  for (const intent of [...arrivalOn(planet, worldSeed), setup].flat()) session.submit(intent)
-  const played = hand(session)
-  return playSliceFrom(played, botPlanetOf(played, 'blast'), {
-    maxTicks: BUDGET_TICKS,
-    lastPlanet: planet,
-  })
+  const arrived = arrivedPaceSessionOn(planet, worldSeed, [setup].flat())
+  return playToCoreFrom(hand(arrived), planet, BUDGET_TICKS)
 }
 
 /** `value` over `baseline` in whole basis points, rounded down. */
