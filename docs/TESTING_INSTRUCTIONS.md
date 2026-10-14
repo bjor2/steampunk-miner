@@ -297,6 +297,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   its pose, so the field's tug never reaches it; the runs measure shock ticks and hull. A slow
   planet's first lever is `magnetic.electrifiedShareBp`, never the shock time. The slice and P1
   core pins stay `logging/pacingGate.test.ts`'s.
+- **Terrain magnets** (GD lock on #246, build 6, ticket 287): `npm run balance:magnets` runs
+  `features/terrain-tools/magnetPace.test.ts`: the bot arrives on planets 7 and 10 on-curve with
+  the hull whole and plays to the core on each pacing seed with an empty loadout and with the
+  repulsor coil and lode clamp granted through the debug loadout. The kernel bot presses no slot,
+  so the family run plays the unchanged bot through `withMagnetHand` (`terrain-tools/magnetHand.ts`),
+  a session that taps the coil and presses the clamp before each wait out of the dock whenever a
+  dry run accepts it, the slots taking turns once a second (`magnetHand.test.ts`). Gated on the
+  median of the per-seed ratios: time to core at least 0.98x the bare run, income per minute at
+  most +15% (`magnets.incomeCapBp`), and both members act on every seed. A fast family's first
+  lever is the magnets' energy draw, never ore price. The family's one #212 row is
+  `magnetFamilySpendRowsOf` (`terrain-tools/systems/magnetSpend.ts`), for the spend guard to read.
 - **Money to planet 200** (#316 TD scope f, TD pin on #123, ticket 340): `npm run balance:money-p200`
   runs the lane `logging/moneyPastP200.lane.test.ts`. The bot plays the bot scenario on the first
   pacing seed to planet 200's core (prices near 1e104), headless, keeping no run log
