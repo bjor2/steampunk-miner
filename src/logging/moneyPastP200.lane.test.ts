@@ -2,6 +2,8 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { PACING_WORLD_SEEDS } from '../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../constants/physics'
+import { SWEPT_SPAN_CHUNKS_PER_TICK } from '../constants/terrainBudget'
+import { topCuttingStepMmAt, worstSpanChunksAtStep } from '../systems/authority/spanBudget'
 import type { Scenario } from '../systems/scenario'
 import { moneyLaneNdjsonOf, startMoneyLaneFold } from './moneyLaneLines'
 import { playSliceIntoSink } from './sliceRunLog'
@@ -13,7 +15,10 @@ import { playSliceIntoSink } from './sliceRunLog'
 // against the schema as each event arrives. Its largest price and income are printed. It also
 // holds the per-tick authority cost budget at P200 (ticket 334, replacing the P100 acceptance of
 // #316 scope b): the process's CPU time over game ticks, bot planning included, so an upper bound
-// on what the authority spends a tick, stays inside the TD's 2 ms slice. The run
+// on what the authority spends a tick, stays inside the TD's 2 ms slice. And it holds the swept
+// span's chunks-touched budget (ticket 335): one tick's span at the rig's top cutting step on its
+// last planet, at its worst placement, crosses no more than `SWEPT_SPAN_CHUNKS_PER_TICK` chunks;
+// the figure is printed so the budget can be re-set from it. The run
 // takes hours, so it is a lane: vite.config.ts leaves it out unless it is named,
 //   npx vitest run src/logging/moneyPastP200.lane.test.ts   (or npm run balance:money-p200)
 const LANE = 'money-p200'
@@ -30,7 +35,7 @@ const REPORT_FOLDER = new URL('../../balance-report/', import.meta.url)
 
 describe('money lane: the pacing bot to planet 200', () => {
   it(
-    'logs only canonical money to planet 200 in a summary log of about 1 MB, inside the tick budget',
+    'logs only canonical money to planet 200 in a summary log of about 1 MB, inside the tick and span budgets',
     () => {
       const scenario = JSON.parse(readFileSync(SCENARIO_FILE, 'utf8')) as Scenario
       const [worldSeed] = PACING_WORLD_SEEDS['bot-slice']
@@ -42,6 +47,8 @@ describe('money lane: the pacing bot to planet 200', () => {
         { lastPlanet: LAST_PLANET, maxTicks: BUDGET_TICKS },
       )
       const microsPerTick = cpuMicrosSince(cpuBefore) / Math.max(1, run.state.tick)
+      const topStepMm = topCuttingStepMmAt(run.state, 'p1')
+      const spanChunks = worstSpanChunksAtStep(topStepMm)
       const summary = fold.summarize()
       const text = moneyLaneNdjsonOf(
         {
@@ -57,12 +64,13 @@ describe('money lane: the pacing bot to planet 200', () => {
       mkdirSync(REPORT_FOLDER, { recursive: true })
       writeFileSync(new URL(`${LANE}.ndjson`, REPORT_FOLDER), text)
       console.log(
-        `${LANE}: seed ${worldSeed}, ended on planet ${run.state.planet.index} (finished: ${run.isFinished}); largest price ${summary.largestPrice}, largest income ${summary.largestIncome}, largest amount ${summary.largestMoney}; ${Buffer.byteLength(text)} bytes; ${Math.round(microsPerTick)} µs CPU a tick`,
+        `${LANE}: seed ${worldSeed}, ended on planet ${run.state.planet.index} (finished: ${run.isFinished}); largest price ${summary.largestPrice}, largest income ${summary.largestIncome}, largest amount ${summary.largestMoney}; ${Buffer.byteLength(text)} bytes; ${Math.round(microsPerTick)} µs CPU a tick; top cutting step ${topStepMm} mm a tick, its span ${spanChunks} chunks (budget ${SWEPT_SPAN_CHUNKS_PER_TICK})`,
       )
       expect(summary.problems).toEqual([])
       expect(run.isFinished).toBe(true)
       expect(Buffer.byteLength(text)).toBeLessThanOrEqual(SUMMARY_BUDGET_BYTES)
       expect(microsPerTick).toBeLessThanOrEqual(AUTHORITY_TICK_BUDGET_MICROS)
+      expect(spanChunks).toBeLessThanOrEqual(SWEPT_SPAN_CHUNKS_PER_TICK)
     },
     RUN_TIMEOUT_MS,
   )

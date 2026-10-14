@@ -18,6 +18,17 @@ export const BLAST_TILES_PER_TICK = 64
 export const TERRAIN_EDIT_UNITS_PER_TICK = 64
 export const DENSITY_CELL_UNITS = 2
 export const SWAP_CELL_UNITS = 1
+/**
+ * The swept span's budget (ticket 335, TD scope b on #316 as the Producer rewrote it): chunks one
+ * drill step's span may touch a tick, the span costing per chunk it crosses. It never trims or
+ * slows a cut: a step past it is a perf bug, and the P200 lane (`moneyPastP200.lane.test.ts`)
+ * checks the rig's top cutting step there against it. Set from the TD's P200 figure (6050644115):
+ * about 430 m of bore a tick, which a bare stamp's span crosses in at most 31 chunks (a diagonal
+ * through chunk corners, `authority/spanBudget.ts`); 40 leaves room for drill-gear cells beside the
+ * bore. Re-set it from the figure the lane prints once the #304/#307 re-baseline has run it.
+ */
+export const SWEPT_SPAN_CHUNKS_PER_TICK = 40
+
 /** At most 2 chunks touched per tick: at most 6 render rebuilds, final within 6 frames (#162). */
 export const TERRAIN_EDIT_CHUNKS_PER_TICK = 2
 

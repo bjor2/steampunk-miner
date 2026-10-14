@@ -9,16 +9,23 @@
  * step bound (ticket 334: the drill law's step plus one 250 mm sample) with the drill far past the floor, so every sample it reaches clears. W comes
  * from a bench-only drill-gear source, as the TD's runs did. Each step is timed through
  * `applyCommand`; the cells it touched are counted afterwards from the densities.
+ *
+ * Ticket 335: one tick's cut at the per-cell budget and past it, p50 2 ms or less. A step 8 m
+ * long touches about 19 cells (the per-cell walk) and one 16 m long about 35 (over the 32-cell
+ * budget, so the swept span), as the TD's #316 table has them; neither speed is reachable through
+ * `drillStep` under today's 24-tick floor, so these cut the same line through `drillAlongStep`.
  */
 import { loadFeatures } from '../src/features'
 import { DENSITY_CELL_UNITS, TERRAIN_EDIT_UNITS_PER_TICK } from '../src/constants/terrainBudget'
 import { withRegistrations } from '../src/registries/registrar'
 import type { SliceDefinition } from '../src/registries/sliceDefinition'
 import type { AuthorityState } from '../src/systems/authority/authorityState'
+import { vehicleOf } from '../src/systems/authority/authorityState'
+import { drillAlongStep } from '../src/systems/authority/drillStepCut'
 import { createScriptedSession, PARAMS, poseAbove } from '../src/systems/authority/scriptedSession'
 import { stepBoundsAt } from '../src/systems/authority/stepBoundRead'
 import { NO_DRIVE } from '../src/systems/vehicle/driveSigns'
-import { FACING } from '../src/systems/vehicle/vehiclePose'
+import { FACING, noseTileOf, type VehiclePose } from '../src/systems/vehicle/vehiclePose'
 import { cellDensitySum } from '../src/systems/world/cellYield'
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 
@@ -26,7 +33,13 @@ loadFeatures()
 
 const REPS = 3
 const STEPS = 60
-const BUDGET = { stepP50Ms: 0.7, cellsPerTick: TERRAIN_EDIT_UNITS_PER_TICK / DENSITY_CELL_UNITS }
+const BUDGET = {
+  stepP50Ms: 0.7,
+  cellsPerTick: TERRAIN_EDIT_UNITS_PER_TICK / DENSITY_CELL_UNITS,
+  atBudgetP50Ms: 2,
+}
+/** At the per-cell budget (about 19 cells, the walk) and past it (about 35, the span), mm a tick. */
+const AT_BUDGET_STEPS_MM = [8_000, 16_000]
 const START = { x: -10_000, y: 279_500 }
 const FLOOR_BOUND = [
   { upgradeId: 'drill_power', level: 2000 },
@@ -110,18 +123,57 @@ function reportOf(width: number, run: StepRun) {
   }
 }
 
+/** `STEPS` ticks of a level cut `strideMm` a tick long, each timed through `drillAlongStep`. */
+function cutAtStride(strideMm: number): number[] {
+  const session = createScriptedSession()
+  for (const payload of FLOOR_BOUND) session.submit(0, { type: 'debug.setUpgrade', payload })
+  session.submit(0, { type: 'debug.setEnergy', payload: { energy: '1000000' } })
+  const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.right)
+  session.submit(0, { type: 'reportPose', payload: { ...payload, ...START } })
+  let state = session.state()
+  const timesMs: number[] = []
+  for (let tick = 1; tick <= STEPS; tick++) {
+    const reported = vehicleOf(state, 'p1').pose as VehiclePose
+    const pose = { ...reported, x: START.x + strideMm * tick }
+    const step = { pose, drive: NO_DRIVE, isLifting: false }
+    const started = performance.now()
+    state = drillAlongStep({ ...state, tick }, PARAMS, 'p1', noseTileOf(pose), step).state
+    timesMs.push(performance.now() - started)
+  }
+  return timesMs
+}
+
+function benchAtStride(strideMm: number): number[] {
+  cutAtStride(strideMm)
+  return Array.from({ length: REPS }, () => cutAtStride(strideMm)).flat()
+}
+
 const bare = benchAtWidth(0)
 const wide = benchAtWidth(5)
+const atBudget = AT_BUDGET_STEPS_MM.map((strideMm) => ({
+  strideMm,
+  timesMs: benchAtStride(strideMm),
+}))
 console.log(
   JSON.stringify({
     bench: 'drillStep',
     stepMm: bare.stepMm,
     bare: reportOf(2, bare),
     wide: reportOf(7, wide),
+    atBudget: atBudget.map(({ strideMm, timesMs }) => ({
+      strideMm,
+      stepP50Ms: round(percentile(timesMs, 0.5)),
+      stepP95Ms: round(percentile(timesMs, 0.95)),
+    })),
     budget: BUDGET,
   }),
 )
 logBenchmarkSeriesWhenAsked('drill-step', [
   { name: 'drillStep.bare', planet: 1, timesMs: bare.timesMs },
   { name: 'drillStep.w7', planet: 1, timesMs: wide.timesMs },
+  ...atBudget.map(({ strideMm, timesMs }) => ({
+    name: `drillStep.stride${strideMm}`,
+    planet: 1,
+    timesMs,
+  })),
 ])
