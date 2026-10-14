@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
+import { forkPairsToWalk, type WalkedForkBranch } from '../forkBranchWalk'
 import { FORK_FIXTURE_SLICE, FORK_PAIRS_FIXTURE } from '../treeFixtureSlice'
 import { withFixtureTree } from '../treeTestSession'
 import { forkPairOf, forkTreeNodesOf, type ForkBranchSpec, type ForkPair } from './forkNode'
@@ -53,6 +54,14 @@ function registeredMarkStepsOf(tree: TechTree, branches: readonly TreeNode[]): T
   )
 }
 
+/** Every Mark step the walked pair both have; none when neither branch carries a ladder. */
+function walkedMarkStepsOf(pair: readonly WalkedForkBranch[]): TreeNode[][] {
+  const ladders = pair.flatMap((walked) => (walked.authored.marks === undefined ? [] : [walked]))
+  if (ladders.length === 0) return pair.map(() => [])
+  const steps = Math.min(...ladders.map((walked) => lastMarkOf(walked.authored.marks!)))
+  return pair.map((walked) => markNodesOf(walked.node, walked.authored.marks!, steps))
+}
+
 describe('tech tree: fork cost', () => {
   it('prices the two branches of every lane the same with bandOrePriceAt on P16-P60', () => {
     for (const lane of TECH_LANES) {
@@ -92,6 +101,20 @@ describe('tech tree: fork cost', () => {
         expect(secondMarks.map(priceRowOf)).toEqual(firstMarks.map(priceRowOf))
       }
     }, [FORK_FIXTURE_SLICE])
+  })
+
+  it('the two branches of every lane cost the same on P16-P60, for the fork node and every Mark step', () => {
+    const pairs = forkPairsToWalk(registeredTechTree())
+    expect([...pairs.keys()].sort()).toEqual([...TECH_LANES].sort())
+    for (const pair of pairs.values()) {
+      expect(pair).toHaveLength(2)
+      const [first, second] = pair
+      expect(second.node.depthTerm).toBe(first.node.depthTerm)
+      expect(priceRowOf(second.node)).toEqual(priceRowOf(first.node))
+      expect(second.authored.marks === undefined).toBe(first.authored.marks === undefined)
+      const [firstMarks, secondMarks] = walkedMarkStepsOf(pair)
+      expect(secondMarks.map(priceRowOf)).toEqual(firstMarks.map(priceRowOf))
+    }
   })
 
   it('gives a pair one lane slot, so the lane after the fork sits one deeper, not two', () => {
