@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T23:24:34+02:00",
+  "updated_at": "2026-10-14T23:25:03+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -19,11 +19,11 @@
       "slots": [
         {
           "slot": "C1",
-          "state": "busy",
-          "ticket": 388,
-          "grok_slot": 1,
-          "kind": "dev",
-          "since": "2026-10-14T21:55:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C2",
@@ -51,8 +51,8 @@
         }
       ],
       "size": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "claims_last_hour": 2,
       "name": "Claude Max 1"
     },
@@ -104,39 +104,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "slow",
-    "sha": "753bf01c96f03868faf55013bebd60cb8e8eb101",
-    "since": "2026-10-14T19:44:13Z",
+    "phase": "fast",
+    "sha": "df0c1f011bb11e120c501dfb0e910ee11d40ec2c",
+    "since": "2026-10-14T21:24:59Z",
     "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-14T19:44:11Z",
     "last_nightly": "2026-10-08T05:23:05Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=ok balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=ok packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 311,
-    "feature_title": "Spec: Faster hold-to-buy from the start",
+    "feature": 142,
+    "feature_title": "Spec: Mining gates: drill tier, skill, and dynamite-only ores",
     "queue": [
-      {
-        "feature": 142,
-        "kind": "spec",
-        "title": "Spec: Mining gates: drill tier, skill, and dynamite-only ores",
-        "tickets": [
-          148,
-          236,
-          237,
-          238,
-          296,
-          297,
-          298,
-          299
-        ],
-        "since": "2026-10-08T01:37:35+02:00"
-      },
       {
         "feature": 139,
         "kind": "spec",
@@ -423,10 +407,9 @@
   "grok": [
     {
       "slot": 1,
-      "state": "dev",
-      "ticket": 388,
-      "since": "2026-10-14T21:55:00+02:00",
-      "claude_slot": 1
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 2,
@@ -501,10 +484,10 @@
   "claude": [
     {
       "slot": 1,
-      "state": "busy",
-      "ticket": 388,
-      "grok_slot": 1,
-      "since": "2026-10-14T21:55:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -578,8 +561,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 3,
+      "dev": 3,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -587,8 +570,8 @@
     "claude": {
       "size": 8,
       "enabled": 4,
-      "used": 4,
-      "free": 0,
+      "used": 3,
+      "free": 1,
       "external": 0
     }
   }
