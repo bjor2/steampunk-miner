@@ -171,8 +171,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `groundTicks` rides on the pending shot, each ended line grounds the cells it opened in
  *    `groundedLines` until `BoreEnded`'s `groundedUntilTick`, and the electrified shock skips a
  *    grounded cell. With no grounding shape no digest or mined order changes.
+ * 58: the lanes' P16 forks (ticket 259, the GD lock on #255): the `tech-tree.forks` player section
+ *    v1 with each lane's active branch, `tech-tree.choose_fork` and `tech-tree.rechoose_fork
+ *    {lane, branch}` with `tech-tree.ForkChosen`, `ForkRechosen` and `ForkRefused`, and
+ *    `unlock_node` refusing a branch or an inactive branch's Marks as `fork_branch`. With no fork
+ *    chosen no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 57
+export const AUTHORITY_PROTOCOL_VERSION = 58
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
