@@ -28,6 +28,13 @@
       "comboEvery": 3,
       "discoveryGrace": 1
     },
+    "spendGuard": {
+      "source": "#161 section 3 Definitions and acceptance 6, the GD steer of 6 Oct as #212 restates it: tree nodes (Marks and combos included) and tree-unlocked store items are 10-30% of a planet's spend on P2-P20 and 10-25% from P21 on, endless included, on the median of the pacing seeds. A band holds from its planet until the next band's; planet 1 is not judged. Levers if a planet misses, in order: kMark 4 -> 3, items 15 -> 12 u, kCapability 12 -> 10, then (endless only) M = 6 from P41.",
+      "bands": [
+        { "fromPlanet": 2, "minShare": "0.100", "maxShare": "0.300" },
+        { "fromPlanet": 21, "minShare": "0.100", "maxShare": "0.250" }
+      ]
+    },
     "nodeShareWatch": {
       "source": "#165 (Vertical Scaler, GD split): a diagnostic, never a gate; above it on P2-P20, pull kCapability / kCombo before #212.",
       "firstPlanet": 2,

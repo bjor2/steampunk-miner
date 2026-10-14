@@ -59,10 +59,22 @@ export interface NodeShareWatch {
   share: Money
 }
 
+/**
+ * One band of the #212 spend guard: the tree's share of a planet's spend, from `fromPlanet` until
+ * the next band's planet.
+ */
+export interface SpendGuardBand {
+  fromPlanet: number
+  minShare: Money
+  maxShare: Money
+}
+
 export interface TreeEconomy {
   costs: TreeCosts
   markAbsorb: MarkAbsorb
   cadence: TreeCadence
+  /** By `fromPlanet`, ascending; a planet before the first band is not judged. */
+  spendGuard: readonly SpendGuardBand[]
   nodeShareWatch: NodeShareWatch
 }
 
@@ -76,6 +88,7 @@ export function readTreeEconomy(raw: unknown): { economy: TreeEconomy } | { prob
     costs: readCosts(reader, tech.costs),
     markAbsorb: readMarkAbsorb(reader, tech.markAbsorb),
     cadence: readCadence(reader, tech.cadence),
+    spendGuard: readSpendGuard(reader, tech.spendGuard),
     nodeShareWatch: readNodeShareWatch(reader, tech.nodeShareWatch),
   }
   return reader.problems.length > 0 ? { problems: reader.problems } : { economy }
@@ -144,6 +157,30 @@ function readCadence(reader: FieldReader, raw: unknown): TreeCadence {
     comboEvery: reader.safeInteger('tech.cadence.comboEvery', cadence.comboEvery),
     discoveryGrace: reader.safeInteger('tech.cadence.discoveryGrace', cadence.discoveryGrace),
   }
+}
+
+function readSpendGuard(reader: FieldReader, raw: unknown): SpendGuardBand[] {
+  const guard = reader.object('tech.spendGuard', raw)
+  const bands = reader
+    .list('tech.spendGuard.bands', guard.bands)
+    .map((band, index) => readSpendGuardBand(reader, `tech.spendGuard.bands[${index}]`, band))
+  if (!isAscendingByPlanet(bands)) {
+    reader.record('tech.spendGuard.bands must ascend by fromPlanet')
+  }
+  return bands
+}
+
+function readSpendGuardBand(reader: FieldReader, path: string, raw: unknown): SpendGuardBand {
+  const band = reader.object(path, raw)
+  return {
+    fromPlanet: reader.safeInteger(`${path}.fromPlanet`, band.fromPlanet),
+    minShare: reader.money(`${path}.minShare`, band.minShare),
+    maxShare: reader.money(`${path}.maxShare`, band.maxShare),
+  }
+}
+
+function isAscendingByPlanet(bands: readonly SpendGuardBand[]): boolean {
+  return bands.every((band, index) => index === 0 || band.fromPlanet > bands[index - 1].fromPlanet)
 }
 
 function readNodeShareWatch(reader: FieldReader, raw: unknown): NodeShareWatch {
