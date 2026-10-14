@@ -13,8 +13,8 @@
     "capacity": 120,
     "seed": 395,
     "colour": "#d8d2c6",
-    "sizePixels": 9,
-    "opacity": 0.5,
+    "sizePixels": 12,
+    "opacity": 0.6,
     "vents": [
       {
         "offsetM": [0, 0],
