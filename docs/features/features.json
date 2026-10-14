@@ -1237,27 +1237,27 @@
           "children": [
             {
               "title": "Bore shot",
-              "description": "Aim into the ground (never straight down the shaft); a line of cells opens two ticks apart at a share of the drill's power, and unlined rock around it caves in afterwards. Players reach it once the Upgrade bay sells the mount.",
-              "status": "partial",
+              "description": "Aim into the ground (never straight down the shaft); a line of cells opens two ticks apart at a share of the drill's power, and unlined rock around it caves in afterwards.",
+              "status": "built",
               "issues": [309, 313, 314],
               "planet": 1
             },
             {
               "title": "Gun mount and brass tracks",
-              "description": "Mount the gun, then raise its rate, penetration and energy tracks, each level priced by its planet. The rules and cards are in; the Upgrade bay rows to buy them from are still to come.",
-              "status": "partial",
+              "description": "Mount the gun at the Upgrade bay for one band-5 ore unit, then raise its rate, penetration and energy tracks, each level priced by its planet; a track at its wall reads Mastered.",
+              "status": "built",
               "issues": [314, 322]
             },
             {
               "title": "Recovery ring and hold-fire",
-              "description": "Hold fire and the gun shoots the moment it may; an early tap waits a moment; a brass ring on the fire tile fills as the gun recovers.",
-              "status": "partial",
+              "description": "Hold fire and the gun shoots the moment it may; an early tap waits a moment; a brass ring on the fire tile and the desktop gauge fills as the gun recovers.",
+              "status": "built",
               "issues": [314]
             },
             {
               "title": "Fire tile and aim",
-              "description": "On touch, tap the fire tile to shoot along your facing or drag it to aim, with a reticle showing the line. Mouse, gamepad and keyboard firing are still to come.",
-              "status": "partial",
+              "description": "Left mouse or X fires at the cursor, RT at the right stick; on touch, tap the fire tile to shoot along your facing or drag it to aim, with a reticle showing the line. A long press on the tile's lamp, or a click on the desktop lamp, switches auto-shoot once the steam sear is researched.",
+              "status": "built",
               "issues": [314]
             },
             {
@@ -1268,8 +1268,8 @@
             },
             {
               "title": "Tracer and debris",
-              "description": "A tracer and rock debris along the bored line.",
-              "status": "planned",
+              "description": "Sparks from the rig and rock debris and dust from each bored cell, drawn with no dynamite needed; a full spray pool drops the tracer before a blast's debris.",
+              "status": "built",
               "issues": [314]
             }
           ]
@@ -1951,7 +1951,7 @@
             },
             {
               "title": "Gamepad",
-              "description": "Any standard controller reaches every action: left stick drives and moves menu focus, A docks and confirms, B backs out, Start opens settings, LB with the d-pad zooms, the right-stick click switches the bore gun's auto mode; pad buttons rebind in settings beside the keys. The right stick's bore-gun aim is read once the gun's fire input lands.",
+              "description": "Any standard controller reaches every action: left stick drives and moves menu focus, A docks and confirms, B backs out, Start opens settings, LB with the d-pad zooms, the right-stick click switches the bore gun's auto mode; pad buttons rebind in settings beside the keys, and the right stick aims the bore gun.",
               "status": "partial",
               "issues": [346, 314]
             },
