@@ -54,6 +54,28 @@ function hit(amount: string): DomainEvent {
   return at({ type: 'EnemyDamaged', amount, ...enemy })
 }
 
+function phaseStarted(cellTy: number, toTy: number): DomainEvent {
+  const move = { playerId: 'p1', itemId: 'power.phase_item', ticks: 20, energy: 60, heat: 1200 }
+  return at({ type: 'aetheric.PhaseStarted', cellTx: 10, cellTy, toTx: 10, toTy, ...move })
+}
+
+function phaseLanded(tx: number, ty: number): DomainEvent {
+  return at({ type: 'aetheric.PhaseLanded', playerId: 'p1', tx, ty })
+}
+
+function phaseReversed(): DomainEvent {
+  return at({ type: 'aetheric.PhaseReversed', playerId: 'p1', tx: 10, ty: 47, ticks: 8 })
+}
+
+function arcFired(targets: number, damage: string): DomainEvent {
+  const bolt = { playerId: 'p1', itemId: 'power.arc_item', energy: 240, heat: 1200 }
+  return at({ type: 'aetheric.ArcFired', targets, damage, ...bolt })
+}
+
+function gunHit(damage: string): DomainEvent {
+  return at({ type: 'GunHit', damage } as DomainEventBody)
+}
+
 function dockLeft(): DomainEvent {
   return at({ type: 'DockLeft', bay: 'sell', durationTicks: 10 })
 }
@@ -104,11 +126,30 @@ describe('tech tree: fork action-mix metrics', () => {
     expect(valuesOf('terrain', [{ events }])).toEqual([5000])
   })
 
-  it('counts phases against descent cells, and the enemy damage of a step with an arc as the arc', () => {
-    const phase = [{ events: [cut(10, 49), cut(10, 48), cut(11, 50), used('power.phase_item')] }]
+  it('counts a landed downward phase as a descent cell crossed by phasing', () => {
+    const phase = [
+      { events: [cut(10, 49), cut(10, 48), cut(11, 50)] },
+      { events: [used('power.phase_item'), phaseStarted(46, 45)] },
+      { events: [phaseLanded(10, 45)] },
+    ]
     expect(valuesOf('aetheric', phase)).toEqual([3333, 0])
-    const arc = [{ events: [hit('30')] }, { events: [used('power.arc_item'), hit('10')] }]
-    expect(valuesOf('aetheric', arc)).toEqual([0, 2500])
+  })
+
+  it('leaves out a phase that crossed sideways or reversed to its start', () => {
+    const sideways = [{ events: [phaseStarted(50, 50)] }, { events: [phaseLanded(12, 50)] }]
+    const reversed = [
+      { events: [phaseStarted(46, 45)] },
+      { events: [phaseReversed()] },
+      { events: [at({ type: 'aetheric.PhaseReturned', playerId: 'p1', tx: 10, ty: 47 })] },
+    ]
+    expect(valuesOf('aetheric', [{ events: [cut(10, 49)] }, ...sideways, ...reversed])).toEqual([
+      0, 0,
+    ])
+  })
+
+  it("counts an arc's logged hits as its share of the enemy damage, not the guns' hits beside it", () => {
+    const bolt = [used('power.arc_item'), hit('10'), hit('10'), arcFired(2, '10'), gunHit('20')]
+    expect(valuesOf('aetheric', [{ events: [hit('20')] }, { events: bolt }])).toEqual([0, 3333])
   })
 
   it('ignores the uses of an item no branch role names', () => {

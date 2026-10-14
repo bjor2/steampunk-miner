@@ -5,9 +5,9 @@
  * differ in at least one part. A pair whose branches differ only in stats moves none of them and
  * fails (the lock's drive-differently rule).
  *
- * The sensing and aetheric metrics count branch item uses, so they name the branch whose item
- * plays each role, as the lock's table does: Scout's pings, Diviner's cone reads, Phase's phasing
- * and Arc's arcs.
+ * The sensing metric counts branch item uses, so it names the branch whose item plays each role,
+ * as the lock's table does: Scout's pings and Diviner's cone reads. The aetheric one reads what the
+ * verbs logged (ticket 391): the descent cells phases crossed and landed past, and the arcs' hits.
  */
 import {
   cmp,
@@ -75,7 +75,10 @@ export const FORK_MIX_METRICS: readonly ForkMixMetric[] = [
   {
     lane: 'aetheric',
     parts: [
-      bpPart('phased cells of descent cells', (t) => [t.uses.phase, t.uses.phase + t.descentCells]),
+      bpPart('phased cells of descent cells', (t) => [
+        t.phasedDescentCells,
+        t.phasedDescentCells + t.descentCells,
+      ]),
       {
         label: 'arc damage of enemy damage',
         unit: 'bp',

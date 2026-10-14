@@ -14,14 +14,24 @@
  * - an opened cell is any `TileDestroyed`, a blast's those with the `blast` cause;
  * - a trip is a dock left, as the pacing report counts them;
  * - a branch item's use is its `PowerUpUsed`, under the role the lock gives its branch (a wide
- *   ping, a cone read, a phase, an arc), and an arc's damage is the enemy damage of the step the
- *   arc was used in.
+ *   ping, a cone read, a phase, an arc);
+ * - a descent cell crossed by phasing is a phase started downward (its landing below the cell it
+ *   crosses) that landed (`aetheric.PhaseLanded`); a reversed phase crossed nothing (ticket 391);
+ * - an arc's damage is what its bolt logged, `targets` hits of `damage` each (`aetheric.ArcFired`),
+ *   so the guns' hits in the same wait are never the arc's (ticket 391).
  *
  * Pure: the lane hands it the bot session's commands and events.
  */
 import type { AuthorityCommand } from '../../../systems/authority/authorityCommand'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
-import { add, fromCanonical, ZERO_MONEY, type Money } from '../../../systems/money'
+import {
+  add,
+  fromCanonical,
+  fromSafeInteger,
+  mul,
+  ZERO_MONEY,
+  type Money,
+} from '../../../systems/money'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 
 /** What a branch item's use stands for in its lane's metric (GD lock on #255, the table). */
@@ -34,6 +44,9 @@ export interface ForkMixTally {
   bitCells: number
   flankCells: number
   descentCells: number
+  phasedDescentCells: number
+  /** Whether the phase under way is crossing downward; it counts once it lands. */
+  isPhaseDescending: boolean
   actionTicks: number
   airborneTicks: number
   bitUnits: number
@@ -59,6 +72,8 @@ export function emptyForkMixTally(): ForkMixTally {
     bitCells: 0,
     flankCells: 0,
     descentCells: 0,
+    phasedDescentCells: 0,
+    isPhaseDescending: false,
     actionTicks: 0,
     airborneTicks: 0,
     bitUnits: 0,
@@ -80,7 +95,6 @@ export function tallyForkMixStep(
 ): void {
   tallyPoseTicks(tally, step.command)
   step.events.forEach((event, at) => tallyEvent(tally, step, event, step.events[at - 1]))
-  tallyArcDamage(tally, step.events, roles)
   tallyUses(tally, step.events, roles)
 }
 
@@ -102,6 +116,25 @@ function tallyEvent(
   if (event.type === 'DockLeft') tally.trips += 1
   if (event.type === 'EnemyDamaged') tally.enemyDamage = add(tally.enemyDamage, damageOf(event))
   if (event.type === 'GunHit') tally.enemyDamage = add(tally.enemyDamage, damageOf(event))
+  tallyAethericEvent(tally, event)
+}
+
+/** The aetheric verbs: a phase's crossing once it lands, a bolt's hits as it logged them. */
+function tallyAethericEvent(tally: ForkMixTally, event: DomainEvent): void {
+  if (event.type === 'aetheric.PhaseStarted') tally.isPhaseDescending = event.toTy < event.cellTy
+  if (event.type === 'aetheric.PhaseReversed') tally.isPhaseDescending = false
+  if (event.type === 'aetheric.PhaseLanded') tallyPhaseLanded(tally)
+  if (event.type === 'aetheric.ArcFired')
+    tally.arcDamage = add(tally.arcDamage, boltDamageOf(event))
+}
+
+function tallyPhaseLanded(tally: ForkMixTally): void {
+  if (tally.isPhaseDescending) tally.phasedDescentCells += 1
+  tally.isPhaseDescending = false
+}
+
+function boltDamageOf(bolt: Extract<DomainEvent, { type: 'aetheric.ArcFired' }>): Money {
+  return mul(fromCanonical(bolt.damage), fromSafeInteger(bolt.targets))
 }
 
 type TileDestroyed = Extract<DomainEvent, { type: 'TileDestroyed' }>
@@ -131,16 +164,6 @@ function tallyCargo(tally: ForkMixTally, units: number, previous: DomainEvent | 
 function damageOf(event: DomainEvent): Money {
   if (event.type === 'EnemyDamaged') return fromCanonical(event.amount)
   return event.type === 'GunHit' ? fromCanonical(event.damage) : ZERO_MONEY
-}
-
-/** Every enemy hit of a step an arc was used in is the arc's. */
-function tallyArcDamage(
-  tally: ForkMixTally,
-  events: readonly DomainEvent[],
-  roles: ForkMixRoles,
-): void {
-  if (!events.some((event) => roleOfUse(event, roles) === 'arc')) return
-  tally.arcDamage = events.map(damageOf).reduce(add, tally.arcDamage)
 }
 
 function tallyUses(tally: ForkMixTally, events: readonly DomainEvent[], roles: ForkMixRoles): void {

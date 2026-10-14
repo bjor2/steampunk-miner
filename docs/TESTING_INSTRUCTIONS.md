@@ -396,7 +396,10 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   slice medians within 10%, and the lane's action-mix metric apart between the branches
   (`systems/forkMixMetrics.ts`: flank share of cut cells, airborne share of action ticks, reach
   share of cargo, wide pings per trip and cone reads per cut, blast share of opened cells, phased
-  share of descent cells and arc share of enemy damage). A pair that differs only in stats fails.
+  share of descent cells and arc share of enemy damage). The aetheric parts read the verbs' own
+  events (ticket 391): a downward phase counts once `aetheric.PhaseLanded` follows it, and an arc's
+  damage is its `aetheric.ArcFired` hits. A pair that differs only in stats fails, and a run that
+  leaves out the aetheric pair fails.
   It refuses to run with no pair registered and prints a row per run (slice, P3-P10, the action
   mix), a median row per branch and the lanes with no pair. The verdicts are unit-tested in
   `forkMixReport.test.ts`; a short forced run in `forkMixRuns.test.ts`.

@@ -431,15 +431,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 54 files, 382 tests
+### `tech-tree`: 54 files, 386 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/tech-tree/aethericPace.lane.test.ts` | 1 | 1 |
 | `src/features/tech-tree/debug.test.ts` | 12 | 12 |
 | `src/features/tech-tree/forkBranches.vision.test.ts` | 3 | 3 |
-| `src/features/tech-tree/forkMix.lane.test.ts` | 4 | 4 |
-| `src/features/tech-tree/forkMixRuns.test.ts` | 6 | 6 |
+| `src/features/tech-tree/forkMix.lane.test.ts` | 5 | 5 |
+| `src/features/tech-tree/forkMixRuns.test.ts` | 7 | 7 |
 | `src/features/tech-tree/incomeCapGolden.test.ts` | 3 | 3 |
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
@@ -453,7 +453,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/forkChoice.test.ts` | 13 | 13 |
 | `src/features/tech-tree/systems/forkCost.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/forkForce.test.ts` | 3 | 3 |
-| `src/features/tech-tree/systems/forkMixMetrics.test.ts` | 12 | 12 |
+| `src/features/tech-tree/systems/forkMixMetrics.test.ts` | 14 | 14 |
 | `src/features/tech-tree/systems/forkMixReport.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/forkNode.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/forkPace.test.ts` | 6 | 6 |

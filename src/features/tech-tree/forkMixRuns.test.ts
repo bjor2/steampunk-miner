@@ -50,6 +50,20 @@ describe('tech tree: a forced fork run', () => {
   })
 })
 
+// Ticket 391: balance:forks presses each aetheric branch's own item, so the phases and the arcs it
+// tallies are the bot's, not a passive grant's.
+describe('tech tree: the aetheric pair forced in balance:forks', () => {
+  it("slots each branch's item, the lantern or the coil, where the hand presses it", () => {
+    const hands = (['phase', 'arc'] as const).map((branch) =>
+      forkHandsOf([branchOf('aetheric', branch).node.unlocks.itemId]),
+    )
+    expect(hands).toEqual([
+      [{ itemId: 'power.phase_lantern', slot: 'powerup.1' }],
+      [{ itemId: 'power.arc_coil', slot: 'powerup.1' }],
+    ])
+  })
+})
+
 // The Aetheric pace re-run's start (ticket 266) on the registered lane: the whole lane forced, the
 // hours-long pins are `aethericPace.lane.test.ts`.
 describe('tech tree: a run forced onto a whole lane', () => {

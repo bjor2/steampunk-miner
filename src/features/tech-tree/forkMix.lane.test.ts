@@ -56,6 +56,12 @@ describe('tech tree: balance:forks, the pacing bot forced onto each fork branch'
     expect(sliceSpreadMissesOf(verdicts)).toEqual([])
   })
 
+  // Ticket 391: the aetheric pair is pinned, so a lane run that left it out fails rather than passes.
+  it('plays the aetheric pair, the bot forced onto the phase branch and the arc branch', () => {
+    const aetheric = verdicts.find((pair) => pair.lane === 'aetheric')
+    expect(aetheric?.branches.map((branch) => branch.branch)).toEqual(['phase', 'arc'])
+  })
+
   it("moves each pair's action-mix metric between its branches on the median seed", () => {
     expect(sameMixPairsOf(verdicts)).toEqual([])
   })
