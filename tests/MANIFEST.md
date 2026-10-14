@@ -170,7 +170,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
-### `ground-gun`: 25 files, 155 tests
+### `ground-gun`: 29 files, 184 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -180,7 +180,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/store/fireLamp.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/armouryModules.test.ts` | 13 | 13 |
 | `src/features/ground-gun/systems/boreGunCards.test.ts` | 6 | 6 |
+| `src/features/ground-gun/systems/boreGunLane.test.ts` | 8 | 8 |
+| `src/features/ground-gun/systems/boreGunLaneLaw.test.ts` | 10 | 2 |
 | `src/features/ground-gun/systems/boreGunLaw.test.ts` | 8 | 7 |
+| `src/features/ground-gun/systems/boreGunModules.test.ts` | 8 | 8 |
 | `src/features/ground-gun/systems/boreGunProvider.test.ts` | 2 | 2 |
 | `src/features/ground-gun/systems/boreLadders.test.ts` | 8 | 8 |
 | `src/features/ground-gun/systems/borePickup.test.ts` | 4 | 4 |
@@ -197,6 +200,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/systems/render/aimOnScreen.test.ts` | 5 | 5 |
 | `src/features/ground-gun/systems/render/boreGunLook.test.ts` | 7 | 7 |
 | `src/features/ground-gun/systems/render/boreSpray.test.ts` | 3 | 3 |
+| `src/features/ground-gun/systems/sightAim.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/tilePress.test.ts` | 7 | 7 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
@@ -376,7 +380,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 33 files, 236 tests
+### `tech-tree`: 33 files, 241 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -392,8 +396,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/itemDescriber.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
-| `src/features/tech-tree/systems/markLadder.test.ts` | 19 | 19 |
-| `src/features/tech-tree/systems/nodeCost.test.ts` | 6 | 6 |
+| `src/features/tech-tree/systems/markLadder.test.ts` | 21 | 21 |
+| `src/features/tech-tree/systems/nodeCost.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/nodePress.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts` | 0 | 1 |
 | `src/features/tech-tree/systems/nodeSpendShare.test.ts` | 3 | 3 |
@@ -408,8 +412,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/researchBotPurchase.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/techTree.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
-| `src/features/tech-tree/systems/treeScreenModel.test.ts` | 13 | 13 |
-| `src/features/tech-tree/systems/treeShape.test.ts` | 16 | 16 |
+| `src/features/tech-tree/systems/treeScreenModel.test.ts` | 14 | 14 |
+| `src/features/tech-tree/systems/treeShape.test.ts` | 17 | 17 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 20 | 20 |
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
@@ -618,7 +622,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/bot/blastTrade.test.ts` | 2 | 2 |
 | `src/systems/bot/botBlasting.test.ts` | 4 | 4 |
-| `src/systems/bot/botBore.test.ts` | 8 | 8 |
+| `src/systems/bot/botBore.test.ts` | 10 | 10 |
 | `src/systems/bot/botChains.test.ts` | 4 | 4 |
 | `src/systems/bot/botChargeNeed.test.ts` | 2 | 2 |
 | `src/systems/bot/botCharges.test.ts` | 9 | 9 |

@@ -1290,6 +1290,33 @@
               "description": "Sparks from the rig and rock debris and dust from each bored cell, drawn with no dynamite needed; a full spray pool drops the tracer before a blast's debris.",
               "status": "built",
               "issues": [314]
+            },
+            {
+              "title": "Gimbal sight",
+              "description": "The bore gun's lane on the tech tree, under Armoury: with the sight bought, a tap or a shot with no aim fires at the richest ore in reach instead of along your facing.",
+              "status": "built",
+              "issues": [310, 318],
+              "planet": 2
+            },
+            {
+              "title": "Steam sear",
+              "description": "Bought after its research, the sear lets the gun fire on its own: the lamp's auto mode picks the richest ore, shows it a moment first, and waits after a shot of yours.",
+              "status": "built",
+              "issues": [310, 317, 318],
+              "planet": 6
+            },
+            {
+              "title": "Long barrel",
+              "description": "Each Mark throws the bore one cell further, up to ten; past that each Mark holds a fresh bore open a little longer before unlined rock caves in, which it always still does.",
+              "status": "built",
+              "issues": [310, 318],
+              "planet": 12
+            },
+            {
+              "title": "Signature bore modules",
+              "description": "The splay choke, cementing round, earthing spike, rifled bore and strut bore, from planet 18 on; they wait on the gun's bore walk learning to split, turn, line, ground and stop.",
+              "status": "planned",
+              "issues": [310, 318]
             }
           ]
         },
