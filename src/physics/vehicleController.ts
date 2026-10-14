@@ -13,17 +13,12 @@
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
+import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRead'
 import type { RenderOrigin } from '../systems/render/renderOrigin'
 import { blockOfPoint } from '../systems/vehicle/colliderHalo'
-import {
-  drillContactOf,
-  type DrillContact,
-  type DrillContactRule,
-} from '../systems/vehicle/drillContact'
-import { drillStampOf } from '../systems/vehicle/drillStamp'
+import type { DrillContactRule } from '../systems/vehicle/drillContact'
 import type { EngineStats } from '../systems/economy/vehicleStats'
 import {
-  isHeadSettled,
   newDrillHead,
   settledFacingOf,
   stepDrillHead,
@@ -42,12 +37,7 @@ import {
   surfaceProbesOf,
   type MotionEffectInput,
 } from '../systems/vehicle/vehicleMotion'
-import {
-  FACING,
-  facingVectorOf,
-  type Facing,
-  type VehiclePose,
-} from '../systems/vehicle/vehiclePose'
+import { FACING, type Facing, type VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
 import { ISO_DENSITY } from '../systems/world/sampleGrid'
 import {
@@ -57,6 +47,7 @@ import {
   planetPositionOf,
   recentreWhenFar,
 } from './bodyFrame'
+import { cutFollowFor, drillContactFor } from './drillEngagement'
 import { createGroundHalo } from './groundHalo'
 
 type Rapier = typeof RAPIER
@@ -83,6 +74,11 @@ export interface VehicleStepInput {
   tug?: Vector2
   /** What the drill bites on: `drillContactOf` when absent, wider with the swept cut (ticket 330). */
   drillContactRule?: DrillContactRule
+  /**
+   * The cut gate and the drill's cut speed at this step's pose, read before the step's cut (ticket
+   * 333, `cutFollowRead.ts`); absent with the swept cut off, so the engine alone drives.
+   */
+  cutFollowOf?: (step: CutFollowStep) => CutFollow
 }
 
 export interface VehicleStepResult {
@@ -90,6 +86,8 @@ export interface VehicleStepResult {
   pose: VehiclePose
   /** The wheels held this step for ground in a level cut's way (the swept cut's limiter tag). */
   isWaitingForCut: boolean
+  /** The cut gate was open: the drill set the speed along the facing (ticket 333). */
+  isCutting: boolean
 }
 
 export interface VehicleController {
@@ -174,11 +172,12 @@ export function createVehicleController(
       const pose = quantisePose(position, velocity, up, settledFacingOf(head))
       const isLifting = input.canAct && input.intent.lift
       const contact = input.canAct
-        ? drillContactFor(input, head, { pose, isLifting }, planet)
+        ? drillContactFor(input, head, { pose, isLifting }, planet.ground)
         : 'none'
       const isDrilling = contact !== 'none'
       const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)
       const isWaitingForCut = isCuttingLevel && contact === 'inTheWay'
+      const cutFollow = cutFollowFor(input, { pose, isLifting }, isDrilling)
       const motion = stepVehicleMotion({
         velocity,
         up,
@@ -193,12 +192,14 @@ export function createVehicleController(
         dt: PHYSICS_TIMESTEP,
         effect: motionEffectInputOf(input.motion, position, up, planet.ground),
         tug: input.tug,
+        cutFollow,
       })
       driveBody(body, motion.velocity, up)
       return {
         flags: { isDriving: motion.isDriving, isThrusting: motion.isThrusting, isDrilling },
         pose,
         isWaitingForCut,
+        isCutting: cutFollow !== undefined,
       }
     },
     placeAt(pose) {
@@ -212,26 +213,6 @@ export function createVehicleController(
     colliderCount: () => halo.colliderCount(),
     dispose: () => halo.dispose(),
   }
-}
-
-/**
- * Drilling auto-engages when the player pushes into ground the settled head faces (#7): the held
- * aim matches the facing and the drill's stamp has ground to cut (#36, `drillContact`).
- */
-function drillContactFor(
-  input: VehicleStepInput,
-  head: DrillHead,
-  { pose, isLifting }: { pose: VehiclePose; isLifting: boolean },
-  planet: PlanetView,
-): DrillContact {
-  if (input.intent.facing !== pose.facing || !isHeadSettled(head)) return 'none'
-  const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
-  const contactOf = input.drillContactRule ?? drillContactOf
-  return contactOf(planet.ground, {
-    centreMm: pose,
-    facing,
-    stamp: drillStampOf(pose, isLifting),
-  })
 }
 
 /** The effect for the motion rule, or nothing for no effect; ground is probed only to cling. */

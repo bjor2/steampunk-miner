@@ -3,7 +3,8 @@
  *
  * - the cut gate (`vehicle/cutGate.ts`) on the uncut share of the leading slab
  *   (`vehicle/leadingSlab.ts`) of the swept stamp at the step's position;
- * - while it is open, `vCut`: the drill law's speed through the slowest uncut cell of that slab,
+ * - while it is open, `vCut`: the drill law's speed through the slowest uncut cell of that slab
+ *   (read on idle ticks too, so a rig that lets go of the drive brakes from it),
  *   `floor(1000 * Q / nLead)` mm a tick with `nLead` its sub-step drill time as the swept cut
  *   counts it (heat, gates and shocks included). A slab with nothing left to cut leaves travel to
  *   set the speed; one whose uncut cells the drill may not cut gives 0, so the body waits.
@@ -65,20 +66,20 @@ export function cutFollowAt(
   step: CutFollowStep,
 ): CutFollow {
   const read = slabReadOf(state, playerId, step)
-  const gate = gateAfter(state, playerId, read)
+  const gate = gateAfter(state, playerId, step.isDrilling ? read : null)
   if (!isCutGateOpen(gate) || read === null) return { gate, cutSpeed: 0 }
   return { gate, cutSpeed: cutSpeedOf(state, playerId, read) }
 }
 
 /** The gate a `drillStep` at `step` leaves on the cursor. */
 export function cutGateAt(state: AuthorityState, playerId: string, step: CutFollowStep): CutGate {
-  return gateAfter(state, playerId, slabReadOf(state, playerId, step))
+  return gateAfter(state, playerId, step.isDrilling ? slabReadOf(state, playerId, step) : null)
 }
 
 function slabReadOf(state: AuthorityState, playerId: string, step: CutFollowStep): SlabRead | null {
   const params = planetParamsOf(state.planet)
   const reported = vehicleOf(state, playerId).pose
-  if (!step.isDrilling || params === null || reported === null) return null
+  if (params === null || reported === null) return null
   const pose: VehiclePose = { ...reported, x: step.x, y: step.y }
   const aim = {
     centreMm: pose,

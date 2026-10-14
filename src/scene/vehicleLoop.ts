@@ -9,7 +9,9 @@
  * On a magnetic planet the field the body stood in at the last step tugs it (#258, ticket 290),
  * unless that step's drill was cutting behind a shield (the dielectric bit, ticket 292).
  * With the dev flag `drill.sweptCut` on (ticket 330) every step the drill is engaged also sends a
- * `drillStep`, before the step's report, so the authority cuts every tick; off, nothing changes.
+ * `drillStep`, before the step's report, so the authority cuts every tick, and (ticket 333) the
+ * motor reads the cut gate and the drill's speed from the authority before the step's cut and
+ * drives on an engine whose top speed is travel parity's; off, nothing changes.
  */
 import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
@@ -22,8 +24,10 @@ import {
 } from '../store/gameStore'
 import { readAuthorityState } from '../store/authorityLink'
 import type { AuthorityState } from '../systems/authority/authorityState'
+import { cutFollowAt, type CutFollow, type CutFollowStep } from '../systems/authority/cutFollowRead'
+import { travelEngineAt } from '../systems/authority/travelSpeed'
 import { magneticTugAt, magneticTugOnCutAt } from '../systems/authority/magnetic/magneticTug'
-import { engineStatsAtStep } from '../systems/economy/vehicleStats'
+import { engineStatsAtStep, type EngineStats } from '../systems/economy/vehicleStats'
 import { vehicleMotionAt, type VehicleMotion } from '../systems/registries/vehicleMotionEffects'
 import {
   countActionStep,
@@ -104,11 +108,12 @@ export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
       const result = controller.step(
         {
           intent: stagedIntent,
-          engine: engineStatsAtStep(vehicle.levels.engine),
+          engine: engineOf(flags, vehicle),
           canAct: canVehicleAct(vehicle),
           motion: readLocalMotion(),
           tug: readLocalTug(loop),
           drillContactRule: drillContactRuleOf(flags),
+          cutFollowOf: cutFollowRuleOf(flags),
         },
         planetViewOf(loop, params, world),
       )
@@ -239,6 +244,21 @@ function showMotion(result: VehicleStepResult): void {
 /** With the swept cut on, the drill also bites on part-cut ground past the face (ticket 330). */
 function drillContactRuleOf(flags: DevFlags): DrillContactRule {
   return flags['drill.sweptCut'] ? sweptDrillContactOf : drillContactOf
+}
+
+/** With the swept cut on, travel parity's top speed (ticket 333); else the engine's own. */
+function engineOf(flags: DevFlags, vehicle: VehicleState): EngineStats {
+  if (!flags['drill.sweptCut']) return engineStatsAtStep(vehicle.levels.engine)
+  return travelEngineAt(readAuthorityState(), useGameStore.getState().playerId)
+}
+
+/** With the swept cut on, the motor reads the cut gate and `vCut` before the cut (ticket 333). */
+function cutFollowRuleOf(flags: DevFlags): ((step: CutFollowStep) => CutFollow) | undefined {
+  return flags['drill.sweptCut'] ? readLocalCutFollow : undefined
+}
+
+function readLocalCutFollow(step: CutFollowStep): CutFollow {
+  return cutFollowAt(readAuthorityState(), useGameStore.getState().playerId, step)
 }
 
 /** The swept cut's step: the body's position at every step its drill is engaged (ticket 330). */

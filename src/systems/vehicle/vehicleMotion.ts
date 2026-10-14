@@ -10,6 +10,11 @@
  * act, the step is exactly the plain one. A magnetic field's tug (#258, ticket 290) moves the
  * wheels' target along the ground by its share along it, so the rig drifts at the tug's speed and
  * drives at its own plus that; the axis along `localUp` stays gravity's and the lift's.
+ *
+ * While the rig actively cuts (ticket 333, `cutFollowMotion.ts`) the drill sets the speed along its
+ * facing instead: the wheels' target on a level cut, or the speed along `localUp` with no gravity
+ * on a cut down or up. Otherwise the engine passed in drives as above; the live loop passes one
+ * whose `speedMax` is travel parity's cap (`travelParity.ts`).
  */
 import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
 import {
@@ -20,6 +25,7 @@ import {
   VEHICLE_COLLIDER_SIZE,
 } from '../../constants/physics'
 import type { EngineStats } from '../economy/vehicleStats'
+import { cutFollowSpeedOf, isCutFollowAlongGround, type CutFollowMotion } from './cutFollowMotion'
 import { dot, fromLocalFrame, tangentOf, type Vector2 } from './localFrame'
 import {
   boostedEngineOf,
@@ -57,6 +63,8 @@ export interface MotionStepInput {
   effect?: MotionEffectInput
   /** A magnetic field's tug in m/s (`magneticTug.ts`); absent outside a field. */
   tug?: Vector2
+  /** The cut-follow while the rig actively cuts (ticket 333); absent otherwise. */
+  cutFollow?: CutFollowMotion
 }
 
 export interface MotionEffectInput {
@@ -100,18 +108,35 @@ function effectStep(input: MotionStepInput, effect: MotionEffectInput): MotionSt
 function drivenStep(input: MotionStepInput, frame: DriveFrame): MotionStep {
   const isThrusting = input.canAct && input.intent.lift
   const along = nextAlongSpeed(input, frame.engine)
-  const upward =
-    frame.upward + (isThrusting ? liftAcceleration(frame.engine.thrustToWeight) : 0) * input.dt
+  const upward = nextUpwardSpeed(input, frame, isThrusting)
   const local = fromLocalFrame(input.up, along, upward)
-  const pulled = {
-    x: local.x + frame.gravity.x * input.dt,
-    y: local.y + frame.gravity.y * input.dt,
-  }
   return {
-    velocity: withinSpeedBound(pulled),
+    velocity: withinSpeedBound(pulledByGravity(input, frame, local)),
     isDriving: input.canAct && input.intent.moveX !== 0 && input.isGrounded,
     isThrusting,
   }
+}
+
+/** The lift pushes along `localUp`; a cut down or up follows the drill there instead. */
+function nextUpwardSpeed(input: MotionStepInput, frame: DriveFrame, isThrusting: boolean): number {
+  if (isCutFollowUpward(input.cutFollow)) {
+    return cutFollowSpeedOf(frame.upward, input.cutFollow, false)
+  }
+  return frame.upward + (isThrusting ? liftAcceleration(frame.engine.thrustToWeight) : 0) * input.dt
+}
+
+/** Gravity pulls, except along a cut down or up, where the drill sets the speed. */
+function pulledByGravity(input: MotionStepInput, frame: DriveFrame, local: Vector2): Vector2 {
+  if (isCutFollowUpward(input.cutFollow)) return local
+  return { x: local.x + frame.gravity.x * input.dt, y: local.y + frame.gravity.y * input.dt }
+}
+
+function isCutFollowUpward(cut: CutFollowMotion | undefined): cut is CutFollowMotion {
+  return cut !== undefined && !isCutFollowAlongGround(cut)
+}
+
+function isCutFollowAlong(cut: CutFollowMotion | undefined): cut is CutFollowMotion {
+  return cut !== undefined && isCutFollowAlongGround(cut)
 }
 
 /** A burst or reel is the item's own motion: no wheels, no thrust billed. */
@@ -149,10 +174,17 @@ function upwardSpeedOf(input: MotionStepInput): number {
 
 /**
  * Wheels steer the tangential speed toward `moveX * speedMax`; with no sideways input they centre
- * the body on the bore it is drilling, or brake.
+ * the body on the bore it is drilling, or brake. A level cut follows the drill instead.
  */
 function nextAlongSpeed(input: MotionStepInput, engine: EngineStats): number {
   const current = dot(input.velocity, tangentOf(input.up))
+  if (isCutFollowAlong(input.cutFollow)) {
+    return cutFollowSpeedOf(current, input.cutFollow, input.isWaitingForCut) + tugAlongOf(input)
+  }
+  return wheelSpeedToward(input, engine, current)
+}
+
+function wheelSpeedToward(input: MotionStepInput, engine: EngineStats, current: number): number {
   const target = (input.canAct ? targetAlongSpeed(input, engine) : 0) + tugAlongOf(input)
   const maxChange = BASE_DRIVE_ACCELERATION * engine.accel * input.dt
   const gap = target - current

@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CUT_GATE_HOLD_TICKS } from '../../constants/balance'
 import { createSeededRandom } from '../seededRandom'
-import {
-  CLOSED_CUT_GATE,
-  idledCutGate,
-  isCutGateOpen,
-  nextCutGate,
-  type CutGate,
-} from './cutGate'
+import { CLOSED_CUT_GATE, idledCutGate, isCutGateOpen, nextCutGate, type CutGate } from './cutGate'
 
 /** The gate after each tick of `uncutBps`, from closed. */
 function gatesAlong(uncutBps: readonly number[], from: CutGate = CLOSED_CUT_GATE): CutGate[] {
@@ -64,7 +58,9 @@ describe('cut gate (ticket 333)', () => {
 
   it('flips at most once in any six ticks along a mixed cave and rock line', () => {
     const open = openTicks(gatesAlong(mixedLineOf(333, 3000)))
-    const flips = open.flatMap((value, tick) => (tick > 0 && value !== open[tick - 1] ? [tick] : []))
+    const flips = open.flatMap((value, tick) =>
+      tick > 0 && value !== open[tick - 1] ? [tick] : [],
+    )
     const gaps = flips.slice(1).map((tick, index) => tick - flips[index])
     expect(flips.length).toBeGreaterThan(10)
     expect(Math.min(...gaps)).toBeGreaterThanOrEqual(CUT_GATE_HOLD_TICKS)

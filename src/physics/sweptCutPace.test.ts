@@ -4,7 +4,7 @@ import { MAX_SPEED_MM_PER_SECOND } from '../constants/balance'
 import { MM_PER_METRE, PHYSICS_TIMESTEP, UP_VECTOR_SCALE } from '../constants/physics'
 import { createMemorySink } from '../logging/eventSink'
 import { ECONOMY } from '../systems/economy/economy'
-import { drillStampOf } from '../systems/vehicle/drillStamp'
+import { sweptDrillStampOf } from '../systems/vehicle/drillStamp'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { SweptCut } from '../systems/vehicle/sweptCut'
@@ -155,7 +155,7 @@ function limiterOf(read: TickRead, isSwept: boolean, speedMaxMm: number): Limite
 /** The tick's sweep stopped before the stamp at the step's position (`sweptDrill.ts`). */
 function isSweepShort({ result, reportedPose, cursor, tick }: TickRead): boolean {
   if (cursor === undefined || cursor.tick !== tick || reportedPose === null) return false
-  const stamp = drillStampOf({ ...reportedPose, x: result.pose.x, y: result.pose.y }, false)
+  const stamp = sweptDrillStampOf({ ...reportedPose, x: result.pose.x, y: result.pose.y }, false)
   return cursor.xMm !== stamp.xMm || cursor.yMm !== stamp.yMm
 }
 
