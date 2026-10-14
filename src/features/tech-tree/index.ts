@@ -57,6 +57,7 @@ export {
   type ForkPair,
 } from './systems/forkNode'
 export { activeForkBranchOf } from './systems/forkSection'
+export { withoutPacingBotForkPicks } from './forkPicksOff'
 export { CHOOSE_FORK_COMMAND, RECHOOSE_FORK_COMMAND, type ForkPick } from './systems/forkCommands'
 export { forkRechoicePriceOf, type ForkRefusal } from './systems/forkRules'
 export { forkMountsOf, type ForkPiece } from './systems/render/forkPieces'

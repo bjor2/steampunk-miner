@@ -22,12 +22,16 @@ export interface ForkNode extends TechNode {
   pairId: string
   /** The branch's own name in the id, such as `wide` or `deep`. */
   branch: string
+  /**
+   * The branch the pacing bot chooses once its wallet pays (GD ruling on #392: it buys gear when
+   * affordable on its income curve); a lane marks at most one, and none leaves the bot unchosen.
+   */
+  isPacingBotPick?: true
 }
 
 /** What a lane authors for one branch; the pair fills in the id, lane, tier and cost kind. */
-export type ForkBranchSpec = Omit<TechNode, 'id' | 'lane' | 'unlockTier' | 'costKind'> & {
-  branch: string
-}
+export type ForkBranchSpec = Omit<TechNode, 'id' | 'lane' | 'unlockTier' | 'costKind'> &
+  Pick<ForkNode, 'branch' | 'isPacingBotPick'>
 
 export interface ForkPair {
   id: string
@@ -61,6 +65,11 @@ export function forkTreeNodesOf(pair: ForkPair, depthTerm: number): readonly [Tr
   return [authoredTreeNodeOf(first, slots), authoredTreeNodeOf(second, slots)]
 }
 
+/** Whether a registered tech node is a fork branch: only a pair's branches carry their pair. */
+export function isForkNode(node: TechNode): node is ForkNode {
+  return 'pairId' in node && 'branch' in node
+}
+
 /** The branch the lane has active, or null before it chooses. */
 export function activeBranchOf(choices: ForkChoices, lane: TechLane): string | null {
   return choices[lane] ?? null
@@ -88,6 +97,9 @@ function refuseUnreadablePair(
 ): void {
   if (first.branch === second.branch) {
     throw new Error(`fork ${forkPairIdOf(lane)} names branch ${first.branch} twice`)
+  }
+  if (first.isPacingBotPick === true && second.isPacingBotPick === true) {
+    throw new Error(`fork ${forkPairIdOf(lane)} marks both branches as the pacing bot's pick`)
   }
   refuseUnreadableBranch(lane, first)
   refuseUnreadableBranch(lane, second)

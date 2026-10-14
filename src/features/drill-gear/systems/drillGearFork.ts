@@ -11,7 +11,8 @@
  *   ever sees the gap).
  * - **Deep** (plunge crown): the bit commits downward. Facing down, every cut also takes the cell
  *   past the bit along the facing, inside the kernel's `aheadCellsMax` of 1, which the slice's
- *   economy file is refused past. It never cuts a flank cell.
+ *   economy file is refused past. It never cuts a flank cell. It is the pacing bot's pick: the bot
+ *   bores straight down, and its scripted bore cuts with the gear (GD ruling on #392).
  *
  * The cards name neither the leaned row nor its item, and no ore family (the #255 guard).
  */
@@ -54,6 +55,7 @@ export const DRILL_GEAR_FORK: ForkPair = forkPairOf(LANE, [
     unlocks: PLUNGE_CROWN_ID,
     description: 'A hardened crown bites the next cell down before the bit arrives.',
     label: 'horizontal',
+    isPacingBotPick: true,
   },
 ])
 
