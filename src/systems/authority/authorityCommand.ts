@@ -248,8 +248,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    planet; `buyGun` mounts and `buyLiningType` unlocks once the row ships, at the row planet's
  *    price. A command log that bought ahead of its anchor, or past it at the later planet's
  *    price, now answers differently; a run that buys none of these moves no digest or mined order.
+ * 73: the consumable restock (ticket 394, X2; the GD ruling on #381, option c):
+ *    `power-up-core.restock_consumable {itemId}` fills the player's own stack of a consumable a
+ *    slice registered a `consumable-restock` for, at the Upgrade bay, each charge at its band-ore
+ *    price on the current planet, and answers `power-up-core.ConsumableRestocked`. Foam is the
+ *    first. With no restock sent no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 72
+export const AUTHORITY_PROTOCOL_VERSION = 73
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
