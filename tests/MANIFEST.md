@@ -27,11 +27,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
-### `aetheric`: 4 files, 24 tests
+### `aetheric`: 8 files, 57 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/aetheric/aetherCondenser.test.ts` | 7 | 7 |
 | `src/features/aetheric/aethericCards.vision.test.ts` | 4 | 4 |
+| `src/features/aetheric/chronometricGovernor.test.ts` | 10 | 10 |
+| `src/features/aetheric/governorCondenserRows.test.ts` | 12 | 6 |
+| `src/features/aetheric/itemHeat.test.ts` | 4 | 4 |
 | `src/features/aetheric/resonanceWhistle.test.ts` | 8 | 8 |
 | `src/features/aetheric/systems/aethericNodes.test.ts` | 5 | 5 |
 | `src/features/aetheric/whistleRows.test.ts` | 7 | 7 |
