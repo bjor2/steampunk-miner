@@ -8,8 +8,10 @@ import { COMBO_HOLDS, COMBO_ITEMS, COMBO_TEMPLATES, authoredComboNodesOf } from 
 
 // Ticket 206 as 206b (GD lock on #206): the combos whose parents' lanes answer through the kernel
 // item hooks ship, with their store item, authored node, template, card and hooks, and the ceiling
-// anchor (ticket 288) on the kernel's drill gear read; the foam combos (#202) and the aether reel
-// (tow, decision 10) stay vision rows. The folder imports no lane slice (the combos acceptance).
+// anchor (ticket 288) on the kernel's drill gear read, and four of the aetheric pairs on their
+// aetheric parent's own rules (ticket 373); the foam combos (#202), the aether reel (tow, decision
+// 10) and the lull line (the tow's lump has no cell) stay vision rows. The folder imports no lane
+// slice (the combos acceptance).
 
 const SLICE_DIR = new URL('./', import.meta.url)
 const LANE_SLICES = ['extraction', 'terrain-tools', 'sensing', 'mobility', 'drill-gear']
@@ -41,7 +43,7 @@ const shipped = COMBO_ITEMS.filter((item) => !isHeld(item.itemId))
 const held = COMBO_ITEMS.filter((item) => isHeld(item.itemId))
 
 describe('combos shipped and held', () => {
-  it('ships the authored combos the hooks and drill gear reach and two endless-only ones', () => {
+  it('ships the authored combos, two endless-only ones and four aetheric pairs', () => {
     expect(shipped.map((item) => item.itemId)).toEqual([
       'combo.assay_drain',
       'combo.magnetic_survey',
@@ -50,6 +52,10 @@ describe('combos shipped and held', () => {
       'combo.ceiling_anchor',
       'combo.lodestone_drain',
       'combo.lens_corer',
+      'combo.still_foam',
+      'combo.warning_chime',
+      'combo.pendulum_anchor',
+      'combo.quench_cutters',
     ])
   })
 
@@ -76,17 +82,14 @@ describe('combos shipped and held', () => {
     )
   })
 
-  it('holds exactly the foam combos, the aether reel and the unbuilt aetheric pairs', () => {
+  it('holds exactly the foam combos, the aether reel and the lull line, each with a reason', () => {
     expect(Object.keys(COMBO_HOLDS).sort()).toEqual([
       'combo.aether_reel',
       'combo.foam_cutters',
       'combo.foam_grapple',
       'combo.lull_line',
-      'combo.pendulum_anchor',
-      'combo.quench_cutters',
-      'combo.still_foam',
-      'combo.warning_chime',
     ])
+    Object.values(COMBO_HOLDS).forEach((reason) => expect(reason).not.toBe(''))
   })
 
   it('registers hooks for shipped combos only, every id under the slice', () => {

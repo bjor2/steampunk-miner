@@ -99,9 +99,9 @@ describe('combos in play: grade 1, the one-off buy', () => {
     })
   })
 
-  it('first offers the endless-only combos on a generated combo planet past 40', () => {
+  it('first offers the six endless-only combos on a generated combo planet past 40', () => {
     const endless = SHIPPED.filter((item) => item.node === null)
-    expect(endless.length).toBe(2)
+    expect(endless.length).toBe(6)
     endless.forEach((item) => {
       const planet = unlockTierOfItem(item.itemId) as number
       expect(planet).toBeGreaterThanOrEqual(41)

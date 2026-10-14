@@ -1,8 +1,9 @@
 /**
  * The governor's pockets as the kernel hears them (#263 on ticket 375's seam): an enemy standing
- * within any player's open, paid-for pocket steps at `slowedEnemyStep` (#360, half speed); the
- * kernel takes the strongest slow, so two pockets never compound. The step is the only input from
- * the enemy's side; the vehicle is never read.
+ * within any player's open, paid-for pocket, or on foam the pocket's still foam combo carries it
+ * onto (ticket 373, `stillFoam.ts`), steps at `slowedEnemyStep` (#360, half speed); the kernel takes
+ * the strongest slow, so two pockets never compound. The step is the only input from the enemy's
+ * side; the vehicle is never read.
  *
  * The pocket clock (`clockSteps`) runs after the tick's enemies have stepped: it pays the next
  * tick's energy from each open pocket's tank, closing a pocket the tank cannot pay, and clears a
@@ -22,8 +23,10 @@ import { isWithinMm, type MillimetrePoint } from '../../../systems/authority/com
 import { unchanged } from '../../../systems/authority/commandRule'
 import type { ClockStep } from '../../../systems/registries/clockSteps'
 import type { EnemyStepModifier } from '../../../systems/registries/enemyStepModifiers'
+import type { TilePoint } from '../../../systems/world/tileGrid'
 import { governorBalance } from './governorItem'
 import { CLOSED, pocketOf, withPocket, type SlowPocket } from './pocketSection'
+import { isOnStilledFoam } from './stilledBlocks'
 
 const HALF_TILE_MM = MM_PER_METRE / 2
 
@@ -44,17 +47,31 @@ export function isInHeldPocket(state: AuthorityState, enemy: Enemy, tick: number
 }
 
 function isHeldOver(pocket: SlowPocket, enemy: Enemy, tick: number): boolean {
-  return isHeldAt(pocket, tick) && isWithinMm(enemy, pocketCentreMm(pocket), pocket.reachMm)
+  return isHeldAt(pocket, tick) && isCoveredBy(pocket, enemy)
 }
 
-function isHeldAt(pocket: SlowPocket, tick: number): boolean {
+function isCoveredBy(pocket: SlowPocket, enemy: Enemy): boolean {
+  return isWithinMm(enemy, pocketCentreMm(pocket), pocket.reachMm) || isOnStilledFoam(pocket, enemy)
+}
+
+/** Whether the pocket slows enemies at `tick`: opened, paid for and not yet ended. */
+export function isHeldAt(pocket: SlowPocket, tick: number): boolean {
   return tick <= pocket.paidThroughTick && tick <= pocket.lastTick
 }
 
+/** Whether the pocket is centred within its own reach of `tile`'s centre: the tile is inside it. */
+export function isTileInPocket(pocket: SlowPocket, tile: TilePoint): boolean {
+  return isWithinMm(tileCentreMmOf(tile), pocketCentreMm(pocket), pocket.reachMm)
+}
+
 function pocketCentreMm(pocket: SlowPocket): MillimetrePoint {
+  return tileCentreMmOf({ tx: pocket.tx, ty: pocket.ty })
+}
+
+function tileCentreMmOf(tile: TilePoint): MillimetrePoint {
   return {
-    x: pocket.tx * MM_PER_METRE + HALF_TILE_MM,
-    y: pocket.ty * MM_PER_METRE + HALF_TILE_MM,
+    x: tile.tx * MM_PER_METRE + HALF_TILE_MM,
+    y: tile.ty * MM_PER_METRE + HALF_TILE_MM,
   }
 }
 

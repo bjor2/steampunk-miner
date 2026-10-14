@@ -91,6 +91,32 @@ declare module '../../../systems/authority/domainEvent' {
       energy: number
       heat: number
     }
+    /**
+     * Still foam (ticket 373): foam laid inside the player's open pocket carries it, so enemies on
+     * the `blocks` collapse blocks it set step at the pocket's slow until its `lastTick`.
+     */
+    'aetheric.FoamStilled': { playerId: string; itemId: string; blocks: number; lastTick: number }
+    /**
+     * Warning chime (ticket 373): the periscope sighted enemy `enemyId` winding up on tile (`tx`,
+     * `ty`), and the whistle was pressed on its own to sound there.
+     */
+    'aetheric.WarningChimed': {
+      playerId: string
+      itemId: string
+      enemyId: string
+      tx: number
+      ty: number
+    }
+    /**
+     * Pendulum anchor (ticket 373): the grav anchor pinned the vehicle in open air on tile (`tx`,
+     * `ty`), and the governor was pressed on its own to open its pocket round it.
+     */
+    'aetheric.PendulumSwung': { playerId: string; itemId: string; tx: number; ty: number }
+    /**
+     * Quench cutters (ticket 373): the condenser ran while the side cutters were engaged, burning
+     * the item gauge, cutter heat and all, `heat` units into `energy` quanta.
+     */
+    'aetheric.CuttersQuenched': { playerId: string; itemId: string; heat: number; energy: number }
   }
 }
 
@@ -102,6 +128,10 @@ export type PhaseLanded = DomainEventBodies['aetheric.PhaseLanded']
 export type PhaseReversed = DomainEventBodies['aetheric.PhaseReversed']
 export type PhaseReturned = DomainEventBodies['aetheric.PhaseReturned']
 export type ArcFired = DomainEventBodies['aetheric.ArcFired']
+export type FoamStilled = DomainEventBodies['aetheric.FoamStilled']
+export type WarningChimed = DomainEventBodies['aetheric.WarningChimed']
+export type PendulumSwung = DomainEventBodies['aetheric.PendulumSwung']
+export type CuttersQuenched = DomainEventBodies['aetheric.CuttersQuenched']
 
 /**
  * Why a whistle or governor press did not act (`power_up_refused.reason`): the tank cannot pay
@@ -175,4 +205,20 @@ export function phaseReturnedOf(body: PhaseReturned) {
 
 export function arcFiredOf(body: ArcFired) {
   return { type: 'aetheric.ArcFired' as const, ...body }
+}
+
+export function foamStilledOf(body: FoamStilled) {
+  return { type: 'aetheric.FoamStilled' as const, ...body }
+}
+
+export function warningChimedOf(body: WarningChimed) {
+  return { type: 'aetheric.WarningChimed' as const, ...body }
+}
+
+export function pendulumSwungOf(body: PendulumSwung) {
+  return { type: 'aetheric.PendulumSwung' as const, ...body }
+}
+
+export function cuttersQuenchedOf(body: CuttersQuenched) {
+  return { type: 'aetheric.CuttersQuenched' as const, ...body }
 }

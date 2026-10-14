@@ -13,7 +13,7 @@ import { unchanged } from '../../../systems/authority/commandRule'
 import type { Lure } from '../../../systems/enemies/lureTarget'
 import type { ClockStep } from '../../../systems/registries/clockSteps'
 import type { EnemyLureSource } from '../../../systems/registries/enemyLures'
-import { SILENT, whistleOf, withWhistle, type SoundingWhistle } from './whistleSection'
+import { whistleOf, withoutSounding, withWhistle, type SoundingWhistle } from './whistleSection'
 
 export const WHISTLE_LURES: EnemyLureSource = {
   id: 'aetheric.resonance_whistle',
@@ -49,7 +49,11 @@ function nextSilenceTick(state: AuthorityState): number | null {
 function withSilencedWhistles(state: AuthorityState, tick: number): AuthorityState {
   return playerIdsOf(state)
     .filter((playerId) => hasFallenSilent(state, playerId, tick))
-    .reduce((current, playerId) => withWhistle(current, playerId, SILENT), state)
+    .reduce(
+      (current, playerId) =>
+        withWhistle(current, playerId, withoutSounding(whistleOf(current, playerId))),
+      state,
+    )
 }
 
 function hasFallenSilent(state: AuthorityState, playerId: string, tick: number): boolean {

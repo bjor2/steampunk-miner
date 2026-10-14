@@ -17,3 +17,4 @@ export {
   vehicleItemOf,
 } from './systems/comboRows'
 export { COMBO_HOLDS } from './systems/comboHolds'
+export { parentMarkOf, passiveReachAt } from './systems/parentValues'

@@ -8,6 +8,9 @@
  * A blow costs its energy from the tank and nothing else (the lock: energy or heat, no new
  * resource). A tank that cannot pay refuses the use, and a refused use costs nothing. A new blow
  * while one sounds replaces it. The lure lasts the use's Mark magnitude (#249) in ticks.
+ *
+ * A blow the warning chime pressed (ticket 373, `warningChime.ts`) sounds on the tile of the enemy
+ * the periscope sighted instead, at the same reach and duration; the act clears that target.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
 import {
@@ -15,11 +18,17 @@ import {
   withVehicle,
   type AuthorityState,
 } from '../../../systems/authority/authorityState'
-import type { PowerUp, PowerUpOutcome, PowerUpUse } from '../../power-up-core'
+import type { TilePoint } from '../../../systems/world/tileGrid'
+import {
+  MAX_WINDUP_TICKS,
+  type PowerUp,
+  type PowerUpOutcome,
+  type PowerUpUse,
+} from '../../power-up-core'
 import type { WhistleBalance } from './aethericEconomy'
 import { ENERGY_SHORT, whistleSoundedOf } from './aethericEvents'
 import { WHISTLE_ICON_ID, WHISTLE_ID, WHISTLE_NAME, whistleBalance } from './whistleItem'
-import { withWhistle, type SoundingWhistle } from './whistleSection'
+import { whistleOf, withWhistle, type ChimeTarget, type SoundingWhistle } from './whistleSection'
 
 /**
  * The whistle as `power-up-core` runs it (#162 2.1, 4.2): a charged item whose charges refill at
@@ -48,7 +57,7 @@ export function whistlePowerUp(): PowerUp {
 export function soundWhistle(state: AuthorityState, use: PowerUpUse): PowerUpOutcome {
   const balance = whistleBalance()
   if (!canPayBlow(state, use.playerId, balance)) return { kind: 'refused', reason: ENERGY_SHORT }
-  const sounding = soundingOf(use, balance)
+  const sounding = soundingOf(soundingTileOf(state, use), use, balance)
   const paid = withBlowPaid(state, use.playerId, balance)
   return {
     kind: 'acted',
@@ -75,10 +84,21 @@ function withBlowPaid(
   })
 }
 
-function soundingOf(use: PowerUpUse, balance: WhistleBalance): SoundingWhistle {
+/** The chime's tile for the blow it pressed, else the tile the vehicle stood on at the press. */
+function soundingTileOf(state: AuthorityState, use: PowerUpUse): TilePoint {
+  const chime = whistleOf(state, use.playerId).chime
+  return chime !== undefined && isChimeOfUse(chime, use) ? chime : use.origin
+}
+
+/** A chime target is the blow's when the blow acts within a wind-up of the chime's press. */
+function isChimeOfUse(chime: ChimeTarget, use: PowerUpUse): boolean {
+  return use.tick >= chime.pressTick && use.tick <= chime.pressTick + MAX_WINDUP_TICKS
+}
+
+function soundingOf(tile: TilePoint, use: PowerUpUse, balance: WhistleBalance): SoundingWhistle {
   return {
-    tx: use.origin.tx,
-    ty: use.origin.ty,
+    tx: tile.tx,
+    ty: tile.ty,
     reachMm: balance.reachTiles * MM_PER_METRE,
     untilTick: use.tick + durationOf(use, balance),
   }

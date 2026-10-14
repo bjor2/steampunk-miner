@@ -20,6 +20,14 @@
  *   damage each took (one auto-gun shot, canonical), the energy quanta and the heat units. The
  *   #267 action mix reads enemy damage from arcs as `targets` times `damage`.
  *
+ * - The aetheric pair combos (ticket 373), each beside the `power_up_used` of the use it rides or
+ *   presses: `foam_stilled {itemId, blocks, lastTick}`, the foam blocks a still foam carried the
+ *   pocket onto and the pocket's last tick; `warning_chimed {itemId, enemyId, tx, ty}`, the enemy
+ *   the periscope sighted and the tile the whistle was pressed to sound on; `pendulum_swung
+ *   {itemId, tx, ty}`, the tile the anchor pinned the vehicle on in open air as the governor was
+ *   pressed; `cutters_quenched {itemId, heat, energy}`, a condenser burn with the side cutters
+ *   engaged.
+ *
  * A press that cannot act is `power-up-core.power_up_refused` with an `aetheric.*` reason: the tank
  * cannot pay (`energy_short`), it is full (`tank_full`), the gauge holds no heat (`no_heat`), the
  * lantern finds no cell to phase or no landing (`nothing_ahead`, `cell_locked`, `cell_dense`,
@@ -37,6 +45,10 @@ export const PHASE_LANDED_EVENT = 'aetheric.phase_landed'
 export const PHASE_REVERSED_EVENT = 'aetheric.phase_reversed'
 export const PHASE_RETURNED_EVENT = 'aetheric.phase_returned'
 export const ARC_FIRED_EVENT = 'aetheric.arc_fired'
+export const FOAM_STILLED_EVENT = 'aetheric.foam_stilled'
+export const WARNING_CHIMED_EVENT = 'aetheric.warning_chimed'
+export const PENDULUM_SWUNG_EVENT = 'aetheric.pendulum_swung'
+export const CUTTERS_QUENCHED_EVENT = 'aetheric.cutters_quenched'
 
 export const AETHERIC_PROJECTIONS: SliceEventProjections = {
   'aetheric.WhistleSounded': ({ itemId, tx, ty, reachTiles, durationTicks, energy }) => ({
@@ -72,6 +84,22 @@ export const AETHERIC_PROJECTIONS: SliceEventProjections = {
   'aetheric.ArcFired': ({ itemId, targets, damage, energy, heat }) => ({
     event: ARC_FIRED_EVENT,
     data: { itemId, targets, damage, energy, heat },
+  }),
+  'aetheric.FoamStilled': ({ itemId, blocks, lastTick }) => ({
+    event: FOAM_STILLED_EVENT,
+    data: { itemId, blocks, lastTick },
+  }),
+  'aetheric.WarningChimed': ({ itemId, enemyId, tx, ty }) => ({
+    event: WARNING_CHIMED_EVENT,
+    data: { itemId, enemyId, tx, ty },
+  }),
+  'aetheric.PendulumSwung': ({ itemId, tx, ty }) => ({
+    event: PENDULUM_SWUNG_EVENT,
+    data: { itemId, tx, ty },
+  }),
+  'aetheric.CuttersQuenched': ({ itemId, heat, energy }) => ({
+    event: CUTTERS_QUENCHED_EVENT,
+    data: { itemId, heat, energy },
   }),
 }
 
@@ -145,5 +173,25 @@ export const AETHERIC_RUN_EVENTS: SliceRunEvents = {
       energy: 'integer',
       heat: 'integer',
     },
+  },
+  [FOAM_STILLED_EVENT]: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', blocks: 'integer', lastTick: 'integer' },
+  },
+  [WARNING_CHIMED_EVENT]: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', enemyId: 'text', tx: 'integer', ty: 'integer' },
+  },
+  [PENDULUM_SWUNG_EVENT]: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', tx: 'integer', ty: 'integer' },
+  },
+  [CUTTERS_QUENCHED_EVENT]: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { itemId: 'text', heat: 'integer', energy: 'integer' },
   },
 }

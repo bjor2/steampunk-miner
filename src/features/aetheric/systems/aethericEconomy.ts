@@ -3,8 +3,9 @@
  * #245: range, duration, chain count, condense ratio and cooldowns live there, never in code): the
  * one-off price every item pays (#162 4.1), the resonance whistle's row (#262), the P16 fork pair's
  * rows, the phase lantern's and the galvanic arc coil's (#261), the chronometric governor's and the
- * aether condenser's rows and the off-act item heat gauge (#263). The file is refused whole on any
- * problem, like the kernel's economy file, so a stand-in never reaches a rule.
+ * aether condenser's rows and the off-act item heat gauge (#263), and the aetheric pair combos'
+ * own numbers under `tech.aetheric.combo` (ticket 373). The file is refused whole on any problem,
+ * like the kernel's economy file, so a stand-in never reaches a rule.
  */
 import {
   createFieldReader,
@@ -91,6 +92,19 @@ export interface ItemHeatBalance {
   coolingUnitsPerTick: number
 }
 
+/**
+ * Quench cutters' side-cutter heat (ticket 373, the GD ruling: gauge-only item heat, counted per
+ * second the drill digs, never per cell), in heat units on the item gauge.
+ */
+export interface QuenchCuttersBalance {
+  heatUnitsPerDigSecond: number
+}
+
+/** The aetheric pair combos' own numbers; the rest of each combo plays at its parents'. */
+export interface AethericComboBalance {
+  quenchCutters: QuenchCuttersBalance
+}
+
 export interface AethericEconomy {
   /** `k` band-5 ore units, paid at the item's unlock planet (#162 4.1). */
   price: BandOreCost
@@ -100,6 +114,7 @@ export interface AethericEconomy {
   chronometricGovernor: GovernorBalance
   aetherCondenser: CondenserBalance
   itemHeat: ItemHeatBalance
+  combo: AethericComboBalance
 }
 
 export const AETHERIC_ECONOMY: AethericEconomy = loadAethericEconomy(AETHERIC_ECONOMY_FILE)
@@ -123,6 +138,7 @@ export function readAethericEconomy(
     ),
     aetherCondenser: readCondenser(reader, 'tech.aetheric.aetherCondenser', lane.aetherCondenser),
     itemHeat: readItemHeat(reader, 'tech.aetheric.itemHeat', lane.itemHeat),
+    combo: readCombo(reader, 'tech.aetheric.combo', lane.combo),
   }
   return reader.problems.length > 0 ? { problems: reader.problems } : { economy }
 }
@@ -199,5 +215,18 @@ function readItemHeat(reader: FieldReader, path: string, raw: unknown): ItemHeat
   return {
     gaugeMaxUnits: reader.safeInteger(`${path}.gaugeMaxUnits`, row.gaugeMaxUnits),
     coolingUnitsPerTick: reader.safeInteger(`${path}.coolingUnitsPerTick`, row.coolingUnitsPerTick),
+  }
+}
+
+function readCombo(reader: FieldReader, path: string, raw: unknown): AethericComboBalance {
+  const row = reader.object(path, raw)
+  const quench = reader.object(`${path}.quenchCutters`, row.quenchCutters)
+  return {
+    quenchCutters: {
+      heatUnitsPerDigSecond: reader.safeInteger(
+        `${path}.quenchCutters.heatUnitsPerDigSecond`,
+        quench.heatUnitsPerDigSecond,
+      ),
+    },
   }
 }

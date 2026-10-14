@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../../registries/registrar'
+import { contentOf } from '../../../systems/registries/content'
+import { COMBO_HOLDS, COMBO_TEMPLATES } from '../../combos'
 import { TREE_FIXTURE_SLICE } from '../treeFixtureSlice'
-import { generatedComboAt, LANE_PAIRS, PAIR_ORDER, pairIndexAt } from './generatedCombos'
+import {
+  generatedComboAt,
+  LANE_PAIRS,
+  PAIR_ORDER,
+  pairIndexAt,
+  pairIndexOf,
+} from './generatedCombos'
 import { itemUnlockTierOf, registeredTechTree, treeNodeOf, treeNodesThrough } from './techTree'
 import type { TechTree } from './techTree'
 import type { TechComboTemplate, TreeNode } from './techNode'
@@ -109,6 +117,21 @@ describe('tech tree: generated combos', () => {
     }
     const graded = [41, 86].map((planet) => generatedComboAt(planet, grading))
     graded.forEach((node) => expect(node?.requiresOwned).toEqual(owning.requiresOwned))
+  })
+
+  it('has fifteen real templates, one a pair, and keeps the aetheric stand-ins fixture-only', () => {
+    const pairsOf = (templates: readonly TechComboTemplate[]) =>
+      new Set(templates.map((template) => pairIndexOf(template.lanes)))
+    expect(COMBO_TEMPLATES).toHaveLength(15)
+    expect([...pairsOf(COMBO_TEMPLATES)].sort((a, b) => a - b)).toEqual([...LANE_PAIRS.keys()])
+    const registered = contentOf('tech-combo-template')
+    const shipped = COMBO_TEMPLATES.filter(
+      (template) => !Object.hasOwn(COMBO_HOLDS, template.unlocks),
+    )
+    expect(registered.map((template) => template.id).sort()).toEqual(
+      shipped.map((template) => template.id).sort(),
+    )
+    expect(registered.some((template) => template.id.includes('aetheric_pair'))).toBe(false)
   })
 
   it('generates nothing for a pair with no template registered', () => {

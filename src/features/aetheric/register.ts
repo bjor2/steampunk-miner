@@ -15,7 +15,14 @@
  *   pocket, the slow every enemy's step hears (`enemyStepModifiers`, ticket 375) and the clock that
  *   pays for and closes it;
  * - the aether condenser (#263), burning the `aetheric.heat` section's off-act item heat gauge
- *   (the GD ruling on #263 Q1 a), drawn on the HUD while its items are owned.
+ *   (the GD ruling on #263 Q1 a), drawn on the HUD while its items are owned;
+ * - the aetheric pair combos' play (ticket 373; the combos slice registers their rows): still foam
+ *   (a reaction carrying the pocket onto foam laid in it, slowed through the governor's own step
+ *   modifier), the warning chime (a clock step pressing the whistle at a periscope sighting, and a
+ *   reaction dropping a spent target), the pendulum anchor (a reaction pressing the governor when
+ *   the anchor pins the vehicle in open air) and quench cutters (a reaction putting the side
+ *   cutters' heat on the item gauge and naming a condenser run with them engaged), each with its
+ *   flash on the vehicle and its tone.
  *
  * No side effects at import; the loader calls `register`.
  */
@@ -36,9 +43,15 @@ import { ITEM_HEAT_SECTION } from './systems/itemHeat'
 import { createPhaseLook } from './systems/phaseLook'
 import { PHASE_CLOCK, PHASE_HOLD_CUES, PHASE_MOTION } from './systems/phaseMoves'
 import { PHASE_SECTION } from './systems/phaseSection'
+import { PENDULUM_ANCHOR_REACTION } from './systems/pendulumAnchor'
+import { QUENCH_CUTTERS_REACTION } from './systems/quenchCutters'
+import { COMBO_SOUND_CUES, createComboLook } from './systems/render/comboCues'
+import { STILL_FOAM_REACTION } from './systems/stillFoam'
+import { CHIME_TARGET_REACTION, WARNING_CHIME_STEP } from './systems/warningChime'
 import { POCKET_SECTION } from './systems/pocketSection'
 import { WHISTLE_LURE_CLOCK, WHISTLE_LURES } from './systems/whistleLures'
 import { AETHERIC_SECTION } from './systems/whistleSection'
+import { ComboSoundFeed } from './ui/ComboSoundFeed'
 import { ItemHeatGauge } from './ui/ItemHeatGauge'
 
 export const slice: SliceDefinition = {
@@ -63,8 +76,16 @@ export const slice: SliceDefinition = {
     r.clockStep(WHISTLE_LURE_CLOCK)
     r.clockStep(POCKET_CLOCK)
     r.clockStep(PHASE_CLOCK)
+    r.clockStep(WARNING_CHIME_STEP)
+    r.authorityReaction(STILL_FOAM_REACTION)
+    r.authorityReaction(CHIME_TARGET_REACTION)
+    r.authorityReaction(PENDULUM_ANCHOR_REACTION)
+    r.authorityReaction(QUENCH_CUTTERS_REACTION)
+    r.vehicleLook(createComboLook())
+    COMBO_SOUND_CUES.forEach((cue) => r.soundCue(cue))
     r.commandRules(AETHERIC_RULES)
     r.hudPanel({ id: 'aetheric.item-heat', slot: 'gauges', Panel: ItemHeatGauge })
+    r.hudPanel({ id: 'aetheric.combo-sounds', slot: 'gauges', Panel: ComboSoundFeed })
     r.eventProjections(AETHERIC_PROJECTIONS)
     r.runEvents(AETHERIC_RUN_EVENTS)
     // steampunkDebug.features.aetheric.getWhistle() / .getPocket() / .getPhase() /
