@@ -8,7 +8,8 @@ import type { LoadoutSlotId } from './vehicleLoadout'
 
 // The 13 points the TD locked on #162, then `drill.fork` and `hull.powerup.1`-`5` (TD socket
 // amendments), the six #180 showcase points, `drill.housing` (#180, GD call) and `hull.hitch`
-// (TD after the Horizontal Scaler review): 27 ids, K5 #188.
+// (TD after the Horizontal Scaler review): 27 ids, K5 #188. Then the five aetheric points, one
+// owner each (TD lock on #265, ticket 376): 32 ids.
 export const ATTACH_IDS = [
   'drill.head',
   'drill.flank',
@@ -37,6 +38,11 @@ export const ATTACH_IDS = [
   'hull.powerup.5',
   'chassis.drive',
   'cab.gauge',
+  'hull.stack.side',
+  'hull.nose',
+  'hull.roof.coils',
+  'hull.tail',
+  'hull.flank',
 ] as const
 
 export type AttachId = (typeof ATTACH_IDS)[number]

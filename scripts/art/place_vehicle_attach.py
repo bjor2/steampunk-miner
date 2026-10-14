@@ -1,5 +1,6 @@
 """
-Places the vehicle's attach points (#162 "vehicle sockets", K5 #188) as `attach.<id>` empties in
+Places the vehicle's attach points (#162 "vehicle sockets", K5 #188; the five aetheric points of
+ticket 376) as `attach.<id>` empties in
 the base vehicle .blend, in an `attach` collection, then saves the file. The export writes them to
 the sidecar's `attach` array. Re-running replaces the empties with the table below.
 
@@ -44,6 +45,15 @@ POINTS = {
     'hull.powerup.5': (0.3, -0.02, 6),
     'chassis.drive': (0.0, -0.36, 2),  # the middle wheel's hub (#180)
     'cab.gauge': (0.3, 0.08, 5),  # beside the headlamp
+    # The five aetheric parts (#245 GD places, TD lock on #265, ticket 376), each clear of every
+    # part that can be on the vehicle with it: the extractors folded and deployed, the echo
+    # sounder, the slot housings, the side cutters, the rack and crates, the turret and the bore
+    # gun, and of the hull.stack and hull.liner showcase points.
+    'hull.stack.side': (-0.15, 0.29, 3),  # the whistle on the second stack's fore side
+    'hull.nose': (0.28, 0.12, 6),  # the lantern on the fore deck; the nose tip is the hood's and cutters'
+    'hull.roof.coils': (-0.18, 0.1, 6),  # the twin coils on the roof plate, before the aft boiler
+    'hull.tail': (-0.31, 0.35, 6),  # the escapement cage on the aft stack, beside the echo sounder
+    'hull.flank': (0.06, -0.23, 6),  # the condenser tank low on the flank, over the track
 }
 
 

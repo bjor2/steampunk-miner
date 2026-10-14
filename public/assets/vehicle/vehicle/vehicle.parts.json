@@ -3,7 +3,7 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/vehicle/vehicle.blend",
-    "sha256": "4bfc940d3bd7b39420f3a45087cf44ec289a114eb792075e2ff22846dad60dff",
+    "sha256": "97fcd0a4ececb99ba741b9bb4891c02a1ad8cf0b1c37762667861b70018bb31d",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 512,
@@ -806,6 +806,14 @@
       "z": 3
     },
     {
+      "id": "hull.flank",
+      "atM": [
+        0.06,
+        -0.23
+      ],
+      "z": 6
+    },
+    {
       "id": "hull.front",
       "atM": [
         0.48,
@@ -828,6 +836,14 @@
         -0.08
       ],
       "z": 4
+    },
+    {
+      "id": "hull.nose",
+      "atM": [
+        0.28,
+        0.12
+      ],
+      "z": 6
     },
     {
       "id": "hull.plates",
@@ -894,6 +910,14 @@
       "z": 6
     },
     {
+      "id": "hull.roof.coils",
+      "atM": [
+        -0.18,
+        0.1
+      ],
+      "z": 6
+    },
+    {
       "id": "hull.roof.fore",
       "atM": [
         0.36,
@@ -916,6 +940,22 @@
         0.46
       ],
       "z": 2
+    },
+    {
+      "id": "hull.stack.side",
+      "atM": [
+        -0.15,
+        0.29
+      ],
+      "z": 3
+    },
+    {
+      "id": "hull.tail",
+      "atM": [
+        -0.31,
+        0.35
+      ],
+      "z": 6
     },
     {
       "id": "hull.turret",

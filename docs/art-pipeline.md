@@ -584,7 +584,7 @@ it is present, and the schema stays 1.
 The base `vehicle` sidecar's `attach` array places the render-only `vehicle-attach` points of
 `src/systems/registries/vehicleAttach.ts` (K5 #188, the #162 sockets), for example
 `{ "id": "drill.fork", "atM": [0.42, 0], "z": 7 }`. The lint requires the array on `vehicle` with
-all 27 ids and nothing else (`src/systems/art/sidecarAttach.ts`).
+all 32 ids and nothing else (`src/systems/art/sidecarAttach.ts`).
 `scripts/art/place_vehicle_attach.py` placed the first empties in `vehicle.blend` from the existing
 parts; move them in Blender as gear is modelled (#166) and re-export. Gear is authored with its pivot
 at its own origin and drawn at its point's `atM`, nothing baked into the vehicle frame. The

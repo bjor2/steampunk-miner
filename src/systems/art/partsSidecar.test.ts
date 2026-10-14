@@ -146,6 +146,17 @@ describe("parts sidecar: the base vehicle's attach points", () => {
     ])
   })
 
+  // The five aetheric points (ticket 376) are required like drill.fork.
+  it.each(['hull.stack.side', 'hull.nose', 'hull.roof.coils', 'hull.tail', 'hull.flank'])(
+    'refuses a base vehicle that does not place %s',
+    (id) => {
+      const without = VEHICLE_ATTACH.filter((point) => point.id !== id)
+      expect(sidecarProblems('vehicle', { ...sidecar, attach: without })).toEqual([
+        `vehicle.parts.json: attach "${id}" is missing`,
+      ])
+    },
+  )
+
   it('refuses a point on the base vehicle that is not a vehicle attach id', () => {
     const attach = [...VEHICLE_ATTACH, { id: 'hull.keel', atM: [0, 0] as const, z: 1 }]
     expect(sidecarProblems('vehicle', { ...sidecar, attach })).toEqual([

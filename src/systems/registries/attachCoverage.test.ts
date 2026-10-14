@@ -59,8 +59,35 @@ const CATALOGUE: readonly AttachedItem[] = [
   powerUp('power.resonance_whistle', 'slot'),
 ]
 
+// The five aetheric power-ups on their own points (TD lock on #265, ticket 376), as #265 will
+// register them: each can be slotted with any other power-up, so each point has one owner.
+const AETHERIC: readonly AttachedItem[] = [
+  powerUp('power.resonance_whistle', 'hull.stack.side'),
+  powerUp('power.phase_lantern', 'hull.nose'),
+  powerUp('power.arc_coil', 'hull.roof.coils'),
+  powerUp('power.chronometric_governor', 'hull.tail'),
+  powerUp('power.aether_condenser', 'hull.flank'),
+]
+
+// Where the five parts would have gone without their own points (#265 pause): two showcase points
+// the vehicle holds, and the points of the tether (always mounted) and the echo sounder.
+const NEIGHBOUR_POINTS: readonly AttachId[] = [
+  'hull.stack',
+  'hull.liner',
+  'hull.roof.mid',
+  'hull.roof.aft',
+]
+
 function catalogueWith(id: string, change: Partial<AttachedItem>): AttachedItem[] {
   return CATALOGUE.map((item) => (item.id === id ? { ...item, ...change } : item))
+}
+
+function aethericWith(id: string, attach: AttachId): AttachedItem[] {
+  return [...CATALOGUE, ...AETHERIC.map((item) => (item.id === id ? { ...item, attach } : item))]
+}
+
+function ownersOf(items: readonly AttachedItem[], point: AttachId): string[] {
+  return items.filter((item) => item.attach === point).map((item) => item.id)
 }
 
 describe('attach coverage', () => {
@@ -134,5 +161,65 @@ describe('attach coverage', () => {
 
   it('ignores items with no physical part', () => {
     expect(attachCoverageProblems([extractor('passive.ledger', null)], [])).toEqual([])
+  })
+})
+
+describe('attach coverage: the five aetheric points (ticket 376)', () => {
+  it('finds no problem with the five aetheric parts on their points beside the whole catalogue', () => {
+    expect(attachCoverageProblems([...CATALOGUE, ...AETHERIC], ATTACH_IDS)).toEqual([])
+  })
+
+  it('gives each aetheric point exactly one owner', () => {
+    const items = [...CATALOGUE, ...AETHERIC]
+    expect(AETHERIC.map((item) => ownersOf(items, item.attach as AttachId))).toEqual(
+      AETHERIC.map((item) => [item.id]),
+    )
+  })
+
+  it.each(AETHERIC.flatMap((item) => NEIGHBOUR_POINTS.map((point) => [item.id, point])))(
+    'fails when %s moves onto %s',
+    (id, point) => {
+      expect(attachCoverageProblems(aethericWith(id, point as AttachId), ATTACH_IDS)).not.toEqual(
+        [],
+      )
+    },
+  )
+
+  it('names the held point or the item it would clash with', () => {
+    const lantern = 'power.phase_lantern'
+    expect(attachCoverageProblems(aethericWith(lantern, 'hull.stack'), ATTACH_IDS)).toEqual([
+      'item "power.phase_lantern" names "hull.stack", which the vehicle holds',
+    ])
+    expect(attachCoverageProblems(aethericWith(lantern, 'hull.liner'), ATTACH_IDS)).toEqual([
+      'item "power.phase_lantern" names "hull.liner", which the vehicle holds',
+    ])
+    expect(attachCoverageProblems(aethericWith(lantern, 'hull.roof.mid'), ATTACH_IDS)).toEqual([
+      'items "rig.aether_tether" and "power.phase_lantern" can be on the vehicle together but share "hull.roof.mid"',
+    ])
+    expect(attachCoverageProblems(aethericWith(lantern, 'hull.roof.aft'), ATTACH_IDS)).toEqual([
+      'items "power.echo_sounder" and "power.phase_lantern" can be on the vehicle together but share "hull.roof.aft"',
+    ])
+  })
+
+  it('fails when a second item that can be on the vehicle with the owner takes its point', () => {
+    const items = [...CATALOGUE, ...AETHERIC, powerUp('power.second_lantern', 'hull.nose')]
+    expect(attachCoverageProblems(items, ATTACH_IDS)).toEqual([
+      'items "power.phase_lantern" and "power.second_lantern" can be on the vehicle together but share "hull.nose"',
+    ])
+  })
+
+  it('lets two items that can never be on the vehicle together share an aetheric point', () => {
+    const forkSiblings = [
+      { id: 'gear.lantern_left', slots: ['drill.head'], attach: 'hull.nose' },
+      { id: 'gear.lantern_right', slots: ['drill.head'], attach: 'hull.nose' },
+    ] satisfies AttachedItem[]
+    expect(attachCoverageProblems(forkSiblings, ATTACH_IDS)).toEqual([])
+  })
+
+  it('fails when the vehicle sidecar lacks an aetheric point', () => {
+    const sidecarIds = ATTACH_IDS.filter((id) => id !== 'hull.flank')
+    expect(attachCoverageProblems([...CATALOGUE, ...AETHERIC], sidecarIds)).toEqual([
+      'item "power.aether_condenser" names "hull.flank", which the sidecar lacks',
+    ])
   })
 })

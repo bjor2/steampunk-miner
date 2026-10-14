@@ -347,6 +347,11 @@
       "z": 3
     },
     {
+      "id": "hull.flank",
+      "atM": [0.06, -0.23],
+      "z": 6
+    },
+    {
       "id": "hull.front",
       "atM": [0.48, -0.08],
       "z": 6
@@ -360,6 +365,11 @@
       "id": "hull.liner",
       "atM": [-0.2, -0.08],
       "z": 4
+    },
+    {
+      "id": "hull.nose",
+      "atM": [0.28, 0.12],
+      "z": 6
     },
     {
       "id": "hull.plates",
@@ -402,6 +412,11 @@
       "z": 6
     },
     {
+      "id": "hull.roof.coils",
+      "atM": [-0.18, 0.1],
+      "z": 6
+    },
+    {
       "id": "hull.roof.fore",
       "atM": [0.36, 0.28],
       "z": 6
@@ -415,6 +430,16 @@
       "id": "hull.stack",
       "atM": [-0.16, 0.46],
       "z": 2
+    },
+    {
+      "id": "hull.stack.side",
+      "atM": [-0.15, 0.29],
+      "z": 3
+    },
+    {
+      "id": "hull.tail",
+      "atM": [-0.31, 0.35],
+      "z": 6
     },
     {
       "id": "hull.turret",
