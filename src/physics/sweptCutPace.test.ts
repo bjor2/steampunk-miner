@@ -30,13 +30,13 @@ const NEAR_BOUND = 0.98
 const MAX_WAIT_TICKS = 12
 
 /**
- * What held the body back on a drilling tick (TD ruling on #330, VS pin 2): the swept cut's 32-cell
- * budget stopping the sweep short (nothing on P1 refuses this drill, so a short sweep is the
- * budget), the pose bound (the 18 m/s clamp, the stats-derived bound swept, or a refused step), the engine's top speed along the
+ * What held the body back on a drilling tick (TD ruling on #330, VS pin 2): the sweep stopping short
+ * of the stamp (since ticket 335 the per-cell budget never does, so only a gated or tip-locked cell
+ * can, and nothing on P1 refuses this drill), the pose bound (the 18 m/s clamp, the stats-derived bound swept, or a refused step), the engine's top speed along the
  * ground, the wheels waiting on ground in a level cut's way, else the cut front itself. A tick the
  * drill does not bite (the body falling or rolling through ground already cut) is `undrilled`.
  */
-type Limiter = 'budget' | 'pose' | 'speedMax' | 'wait' | 'cut'
+type Limiter = 'short' | 'pose' | 'speedMax' | 'wait' | 'cut'
 type LimiterCounts = Record<Limiter | 'undrilled', number>
 
 /**
@@ -154,7 +154,7 @@ function watchSteps(controller: VehicleController) {
 
 /** Counts each tick's limiter and the longest run of ticks the wheels waited on the cut. */
 function createTally(isSwept: boolean, speedMaxMm: number) {
-  const limiters: LimiterCounts = { budget: 0, pose: 0, speedMax: 0, wait: 0, cut: 0, undrilled: 0 }
+  const limiters: LimiterCounts = { short: 0, pose: 0, speedMax: 0, wait: 0, cut: 0, undrilled: 0 }
   const wait = { current: 0, longest: 0 }
   const note = (read: TickRead) => {
     limiters[limiterOf(read, isSwept, speedMaxMm)] += 1
@@ -166,7 +166,7 @@ function createTally(isSwept: boolean, speedMaxMm: number) {
 
 function limiterOf(read: TickRead, isSwept: boolean, speedMaxMm: number): Limiter | 'undrilled' {
   if (!read.result.flags.isDrilling) return 'undrilled'
-  if (isSwept && isSweepShort(read)) return 'budget'
+  if (isSwept && isSweepShort(read)) return 'short'
   if (isPoseBound(read, isSwept)) return 'pose'
   if (alongSpeedOf(read.result.pose) >= speedMaxMm * NEAR_BOUND) return 'speedMax'
   if (read.result.isWaitingForCut) return 'wait'
@@ -202,8 +202,8 @@ beforeAll(async () => {
 })
 
 describe('swept cut in the live loop (ticket 330)', () => {
-  // The gate is that the cut keeps up: it digs faster than the 5 Hz per-report cut and never holds
-  // the wheels past a report interval. The rates and each leg's limiter counts are logged for #316's
+  // The gate is that the cut keeps up: it digs faster than the 5 Hz per-report cut, never holds
+  // the wheels past a report interval and reaches the stamp every tick (ticket 335). The rates and each leg's limiter counts are logged for #316's
   // break order and the #304/#307 re-baseline.
   it.each([24, 12, 8, 4])(
     'digs faster than the per-report cut and never stalls at the %i-tick floor',
@@ -215,6 +215,9 @@ describe('swept cut in the live loop (ticket 330)', () => {
       expect(swept.level.rate).toBeGreaterThan(reported.level.rate)
       expect(swept.level.longestWaitTicks).toBeLessThanOrEqual(MAX_WAIT_TICKS)
       expect(swept.down.longestWaitTicks).toBeLessThanOrEqual(MAX_WAIT_TICKS)
+      // Ticket 335: the authority's cut is complete every tick; the budget never stops a sweep.
+      expect(swept.level.limiters.short).toBe(0)
+      expect(swept.down.limiters.short).toBe(0)
     },
     180_000,
   )

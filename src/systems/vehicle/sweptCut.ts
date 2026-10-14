@@ -26,13 +26,15 @@ export const SWEEP_STEP_MM = 125
 /**
  * The vehicle's cursor: where the last drill step's cut reached (the next step's start), the
  * position that step reported (the next step's bound is measured from it), its facing and tick,
- * and the cut gate as that step left it (ticket 333).
+ * the cut gate as that step left it (ticket 333), and what it left of its per-cell share for the
+ * next player that tick (ticket 335, `cutShare.ts`).
  */
 export interface SweptCut extends StampPoint, CutGate {
   poseXMm: number
   poseYMm: number
   facing: Facing
   tick: number
+  cutSharePassed: number
 }
 
 /** One step's path for the stamp's centre. */

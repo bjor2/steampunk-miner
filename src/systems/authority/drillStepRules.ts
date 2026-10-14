@@ -10,7 +10,9 @@
  *   step in one tick (`too_many_ticks`), or a step further from the last accepted position (the
  *   last step's, or else the report's) than the rig's stats allow in the ticks since it
  *   (`invalid_pose`, the stats-derived bound of ticket 334, `stepBoundRead.ts`).
- * - Energy is the drill's for the tick it cut; burrowers in the nose's tile are cut as by a report.
+ * - It cuts the whole clear sweep, by the per-cell walk or the span as the per-cell budget picks
+ *   (`drillStepCut.ts`, ticket 335). Energy is the drill's for the tick it cut; burrowers in the
+ *   nose's tile are cut as by a report.
  * - The collapse watch does not run after it (`applyCommand.ts`): it stays on `reportPose`, so it
  *   lags a step by at most one report interval, well inside a block's 60-tick warning.
  */
@@ -30,7 +32,7 @@ import {
 } from './commandRule'
 import { noPlanetRejection, planetParamsOf } from './planetOfState'
 import { cutGateLeftAt, stepBoundsAt, stepReachMmOf } from './stepBoundRead'
-import { drillAlongSweep } from './sweptDrill'
+import { drillAlongStep } from './drillStepCut'
 import { withBurrowersCut } from './vehicleCommandRules'
 import { followEnergyChange } from './vehicleTransitions'
 
@@ -97,6 +99,6 @@ function cutStep(state: AuthorityState, { playerId, payload }: StepCommand): Rul
   const pose = { ...reported, x: payload.x, y: payload.y }
   const nose = noseTileOf(pose)
   const step = { pose, drive: payload.drive, isLifting: payload.drive.y === 1 }
-  const drilled = drillAlongSweep(state, params, playerId, nose, step)
+  const drilled = drillAlongStep(state, params, playerId, nose, step)
   return withBurrowersCut(drilled, playerId, nose)
 }

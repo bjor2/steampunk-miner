@@ -2,7 +2,9 @@
  * The authority's terrain-edit budget per tick (Technical Director, #154 and its K6 amendments on
  * #189; docs/perf/blast-frame-budget.md). One shared queue for the whole world, in priority order:
  *
- * 1. drill breaks, at most 4 cells per player, always on their tick;
+ * 1. drill breaks, at most 4 cells per player, always on their tick; the swept cut's per-cell walk
+ *    takes its players' shares of the same 32 density cells and goes to the span per chunk over
+ *    them, never carrying a cell to a later tick (ticket 335, `authority/cutShare.ts`);
  * 2. the live blasts' slice: `BLAST_TILES_PER_TICK` tiles, nearest first, always taken in full and
  *    never thinned (2 ms / 26-30 us per tile measured, rounded down to 64);
  * 3. power-up edits, first in first out and round-robin across players, taking what is left of

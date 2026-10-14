@@ -35,6 +35,7 @@ const CURSOR: SweptCut = {
   facing: FACING.down,
   tick: 9,
   ...CLOSED_CUT_GATE,
+  cutSharePassed: 0,
 }
 
 describe('swept cut path (ticket 330)', () => {

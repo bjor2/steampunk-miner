@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { carveDisc, type CarveWindow, type CellDrillTicks } from './groundEdit'
 import { planetParamsFor } from './planetParams'
-import { chunkOfSample } from './sampleGrid'
+import { chunkOfSample, SAMPLES_PER_TILE } from './sampleGrid'
 import { discSamplesOf, type DiscStamp } from './stampShape'
-import { spanRunsOf, walkStampPerChunk } from './sweptSpan'
+import { spanRunsOf, stampCellsUpTo, walkStampPerChunk } from './sweptSpan'
 import type { TilePoint } from './tileGrid'
 import { EMPTY_WORLD } from './worldState'
 
@@ -100,5 +100,28 @@ describe('swept span per chunk (ticket 374)', () => {
       changedChunks = Math.max(changedChunks, rows.changes.length)
     }
     expect(changedChunks).toBeGreaterThanOrEqual(4)
+  })
+})
+
+/** The distinct cells of a stamp's samples, as `discSamplesOf` lists them. */
+function cellsOfSamples(disc: DiscStamp): Set<string> {
+  const tileOf = (sample: number) => Math.floor(sample / SAMPLES_PER_TILE)
+  return new Set(discSamplesOf(disc).map(({ sx, sy }) => `${tileOf(sx)},${tileOf(sy)}`))
+}
+
+describe('stamp cells up to a cap (ticket 335)', () => {
+  it('counts the cells of the row walk with the seeded cells, while it stays within the cap', () => {
+    const seeded = new Set(['0,0', '128,1024'])
+    for (const capsule of CAPSULES) {
+      const all = new Set([...seeded, ...cellsOfSamples(capsule)])
+      expect(stampCellsUpTo(capsule, seeded, 10_000)).toBe(all.size)
+    }
+  })
+
+  it('answers one past the cap for any stamp over it', () => {
+    for (const capsule of CAPSULES) {
+      const count = cellsOfSamples(capsule).size
+      expect(stampCellsUpTo(capsule, new Set(), 32)).toBe(Math.min(count, 33))
+    }
   })
 })

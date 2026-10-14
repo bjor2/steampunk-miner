@@ -16,7 +16,7 @@
  *   deterministic on every machine, as the row walk is.
  */
 import { carveEachSample, type StampWalk } from './groundEdit'
-import { chunkOfSample, MM_PER_SAMPLE } from './sampleGrid'
+import { chunkOfSample, MM_PER_SAMPLE, SAMPLES_PER_TILE } from './sampleGrid'
 import {
   isWithinStampAt,
   stampRowsOf,
@@ -52,6 +52,30 @@ export function spanRunsOf(disc: DiscStamp): SpanRun[] {
 function chunkRunsOfRow(disc: DiscStamp, sy: number): SpanRun[] {
   const extent = rowExtentOf(disc, sy)
   return extent === null ? [] : runsAcrossChunks(disc, sy, extent)
+}
+
+/**
+ * The cells a stamp's samples lie in, beside the `seeded` cells (keys `tx,ty`), counted row by row
+ * and stopping once past `cap` (ticket 335): `cap + 1` then stands for any count over it, so a long
+ * span never pays for the whole count. The same samples `discSamplesOf` lists, so the same cells.
+ */
+export function stampCellsUpTo(disc: DiscStamp, seeded: ReadonlySet<string>, cap: number): number {
+  const cells = new Set(seeded)
+  const rows = stampRowsOf(disc)
+  for (let sy = rows.first; sy <= rows.last && cells.size <= cap; sy++) {
+    addCellsOfRow(cells, disc, sy)
+  }
+  return Math.min(cells.size, cap + 1)
+}
+
+function addCellsOfRow(cells: Set<string>, disc: DiscStamp, sy: number): void {
+  const extent = rowExtentOf(disc, sy)
+  if (extent === null) return
+  const ty = Math.floor(sy / SAMPLES_PER_TILE)
+  for (let sx = extent.first; sx <= extent.last; sx++) {
+    if (stampSampleAt(disc, sx, sy) !== null)
+      cells.add(`${Math.floor(sx / SAMPLES_PER_TILE)},${ty}`)
+  }
 }
 
 /** The row's samples within the stamp's radius, or null when it holds none. */

@@ -223,7 +223,7 @@ function isPortableHeat(heat: unknown): boolean {
   )
 }
 
-/** The twin bit's latch (ticket 279): a bearing and the cell it was latched on. */
+/** The swept cut's cursor (tickets 330, 333 and 335): its reach, step, cut gate and passed share. */
 function isPortableSweptCut(cursor: unknown): boolean {
   return (
     isJsonObject(cursor) &&
@@ -233,7 +233,8 @@ function isPortableSweptCut(cursor: unknown): boolean {
     isFacing(cursor.facing as number) &&
     isWholeNumber(cursor.tick) &&
     (cursor.cutGate === 0 || cursor.cutGate === 1) &&
-    isWholeNumber(cursor.cutGateLowTicks)
+    isWholeNumber(cursor.cutGateLowTicks) &&
+    isWholeNumber(cursor.cutSharePassed)
   )
 }
 

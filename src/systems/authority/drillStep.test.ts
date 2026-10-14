@@ -8,7 +8,6 @@ import { NO_DRIVE, type DriveSigns } from '../vehicle/driveSigns'
 import { FACING } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
-import { discSamplesOf } from '../world/stampShape'
 import { EMPTY_WORLD } from '../world/worldState'
 import type { DomainEvent } from './domainEvent'
 import {
@@ -22,7 +21,7 @@ import {
 import { readSnapshot, takeSnapshot } from './sessionSnapshot'
 import { stateDigest } from './stateDigest'
 import { stepBoundsAt } from './stepBoundRead'
-import { DRILL_CELLS_PER_TICK } from './sweptDrill'
+import { DRILL_CELLS_PER_TICK } from './cutShare'
 
 // The swept cut (ticket 330): `drillStep` cuts every tick the drill is engaged, behind the dev
 // flag `drill.sweptCut`, which only decides whether a client sends it.
@@ -290,12 +289,12 @@ describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
   })
 })
 
-describe('drill step terrain budget (ticket 330)', () => {
+describe('drill step per-cell budget (tickets 330, 335)', () => {
   const [gated] = surfaceOreTiles(1)
   const above = { x: gated.tx * 1000 + 500, y: (gated.ty + 4) * 1000 + 500 }
-  /** Late enough that the cursor falls more metres behind than one tick's budget sweeps. */
+  /** Late enough that the cursor falls metres behind, far more than 32 cells of sweep. */
   const OPENS_AT_TICK = 60
-  const TICKS = 100
+  const TICKS = 70
 
   /** A gate that holds every ore cell until `OPENS_AT_TICK`, so the cursor falls metres behind. */
   const lateGate: SliceDefinition = {
@@ -312,11 +311,11 @@ describe('drill step terrain budget (ticket 330)', () => {
       }),
   }
 
-  /** The cursor after each step, from the tick the gate opens. */
+  /** The cursor after each step, from the tick before the gate opens. */
   function catchUpAfterTheGate() {
     return withRegistrations([lateGate], () => {
       const session = sessionFacingDownAt(above)
-      const cursors: { xMm: number; yMm: number }[] = []
+      const cursors: NonNullable<ReturnType<ScriptedSession['vehicle']>['sweptCut']>[] = []
       for (let tick = 1; tick <= TICKS; tick++) {
         session.submit(tick, stepTo(above.x, above.y - CUT_STEP_MM * tick))
         const cursor = session.vehicle().sweptCut
@@ -326,26 +325,18 @@ describe('drill step terrain budget (ticket 330)', () => {
     })
   }
 
-  function cellsBetween(from: { xMm: number; yMm: number }, to: { xMm: number; yMm: number }) {
-    const capsule = { ...to, radiusMm: 950, floorRadiusMm: null, tail: from }
-    return new Set(discSamplesOf(capsule).map(({ sx, sy }) => `${sx >> 2},${sy >> 2}`)).size
-  }
+  const stampAt = (tick: number) => above.y - CUT_STEP_MM * tick - SWEPT_AHEAD_MM
 
-  it('touches at most 32 density cells a tick, however far the cursor fell behind', () => {
-    const { cursors } = catchUpAfterTheGate()
+  it('keeps the budget the terrain slice holds: 32 density cells a tick', () => {
     expect(DRILL_CELLS_PER_TICK).toBe(32)
-    const lag = cursors[0].yMm - cursors[1].yMm
-    expect(lag).toBeGreaterThan(0)
-    for (let index = 1; index < cursors.length; index++) {
-      expect(cellsBetween(cursors[index - 1], cursors[index])).toBeLessThanOrEqual(32)
-    }
   })
 
-  it('stops a sweep over the budget and resumes it next tick until it reaches the stamp', () => {
+  it('cuts the whole sweep in the tick the gate opens, however far the cursor fell behind', () => {
     const { session, cursors } = catchUpAfterTheGate()
-    const headAtOpening = above.y - CUT_STEP_MM * OPENS_AT_TICK - SWEPT_AHEAD_MM
-    expect(cursors[1].yMm).toBeGreaterThan(headAtOpening)
-    expect(session.vehicle().sweptCut?.yMm).toBe(above.y - CUT_STEP_MM * TICKS - SWEPT_AHEAD_MM)
+    expect(cursors[0].yMm).toBeGreaterThan(stampAt(OPENS_AT_TICK - 1) + 10_000)
+    cursors.slice(1).forEach((cursor, index) => {
+      expect(cursor.yMm).toBe(stampAt(OPENS_AT_TICK + index))
+    })
     const world = session.state().world
     for (let ty = gated.ty - 1; ty > gated.ty - 12; ty--) {
       const tile = { tx: gated.tx, ty }
@@ -353,5 +344,13 @@ describe('drill step terrain budget (ticket 330)', () => {
         cellDensitySum(EMPTY_WORLD, PARAMS, tile),
       )
     }
+  })
+
+  it('passes none of its share on from a tick over it, and the rest from one within it', () => {
+    const { cursors } = catchUpAfterTheGate()
+    const [, opening, next] = cursors
+    expect(opening.cutSharePassed).toBe(0)
+    expect(next.cutSharePassed).toBeGreaterThan(0)
+    expect(next.cutSharePassed).toBeLessThan(DRILL_CELLS_PER_TICK)
   })
 })
