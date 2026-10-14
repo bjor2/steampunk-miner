@@ -46,9 +46,9 @@
       "maxShareBp": 1500,
       "planets": [10, 20, 40, 60],
       "knownRed": {
-        "consumable.lodestone_beacon": "the terrain-tools ticket that routes mover hold-arrival value into the trip ledger (ruling 6167240683 on #385; Producer to file)",
-        "power.ore_shifter": "the terrain-tools ticket that routes mover hold-arrival value into the trip ledger (ruling 6167240683 on #385; Producer to file)",
-        "power.pressure_pocket": "the terrain-tools ticket that routes mover hold-arrival value into the trip ledger (ruling 6167240683 on #385; Producer to file)"
+        "consumable.lodestone_beacon": "the terrain-tools ticket that routes mover hold-arrival value into the trip ledger (#408, ruling 6167240683 on #385)",
+        "power.ore_shifter": "the terrain-tools ticket that routes mover hold-arrival value into the trip ledger (#408, ruling 6167240683 on #385)",
+        "power.pressure_pocket": "the terrain-tools ticket that routes mover hold-arrival value into the trip ledger (#408, ruling 6167240683 on #385)"
       }
     }
   }

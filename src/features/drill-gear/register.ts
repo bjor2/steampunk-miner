@@ -7,8 +7,9 @@
  * cell logged by a reaction), the auger as a clock step, the corer as a charged act and the
  * dielectric bit as a shock shield. KeyF and KeyC press the flank and collar sockets, and the
  * Upgrade bay sells each item (ticket 248's seller). The lane's P16 fork (ticket 268) registers
- * its Wide and Deep branches, their cut on the same drill gear read and Wide's income rate. No
- * side effects at import; the loader calls `register`.
+ * its Wide and Deep branches and their cut on the same drill gear read. Wide is drill throughput,
+ * not income, so it registers no income rate (GD ruling on #385). No side effects at import; the
+ * loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { drillGearDebugActions } from './debug'
@@ -29,7 +30,6 @@ import { SPOIL_AUGER_STEP } from './systems/spoilAuger'
 import { DIAGONAL_CUT_REACTION, TWIN_BIT_SOURCE } from './systems/twinBit'
 import { SOFT_GROUND_LINK_REACTION } from './systems/softGroundLink'
 import { VIBRATORY_CRUMBLE_REACTION } from './systems/vibratoryCrumble'
-import { WIDE_INCOME_RATE } from './systems/wideIncomeRate'
 
 export const slice: SliceDefinition = {
   id: 'drill-gear',
@@ -46,7 +46,6 @@ export const slice: SliceDefinition = {
     r.drillGear(CUTTERS_AND_BOOM_SOURCE)
     r.drillGear(TWIN_BIT_SOURCE)
     r.drillGear(DRILL_GEAR_FORK_SOURCE)
-    r.incomeRate(WIDE_INCOME_RATE)
     r.shockShield(DIELECTRIC_BIT_SHIELD)
     r.clockStep(SPOIL_AUGER_STEP)
     DRILL_SOCKET_REACTIONS.forEach((reaction) => r.inputReaction(reaction))

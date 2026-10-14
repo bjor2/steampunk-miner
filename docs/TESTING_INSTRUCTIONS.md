@@ -319,9 +319,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   once with the drill-gear fork unchosen and once with Deep chosen (both pass through the same
   rich wallet and back to the arrival money). Gated on the median of the per-seed speed-ups: at
   most one drill step (x1.225) faster than unchosen. A quick case checks the plunge crown inside
-  the `aheadCells` = 1 clamp. Wide's flank cells are judged by the 15% income cap through its
-  registered income rate (`drill-gear.gallery_reamers`, anchored on `side_drills`), which #385's
-  check reads. Long: for the box Tester.
+  the `aheadCells` = 1 clamp. Wide's flank cells are drill throughput, not income, so they register
+  no income rate and the 15% cap never judges them (GD ruling on #385); `incomeCapGolden.test.ts`
+  keeps every `gear.*` item out of `incomeRates`. Long: for the box Tester.
 - **Magnetic planet** (GD lock on #258 Q7, ticket 294): `npm run balance:magnetic-planet` runs
   `features/planet-mix/magneticBandValue.test.ts` and `magneticPlanetPace.test.ts`. The class
   switches off at the same planet index with `withMagneticClassOff` (`magneticClassOff.ts`): the
@@ -372,7 +372,7 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   and P60, every band, at the levels the bot arrived with and left with, on the median of the seeds
   that own the item when their run ends, in whole basis points. An item over the cap before the
   clamp fails unless play pays it through the trip ledger; `tech.incomeCap.knownRed` lists the
-  movers until their ledger ticket lands, printed and not gated. A band the tip only skids on is not
+  movers until their ledger ticket (#408) lands, printed and not gated. A band the tip only skids on is not
   judged. The lane also fails an item over 15% of what the bot earned on any planet of the run
   (`systems/deliveredIncomeShares.ts`, the Vertical Scaler's guard), and `incomeCapGolden.test.ts`
   pins the shares on the on-curve vehicle. Also
