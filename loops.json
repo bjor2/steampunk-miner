@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-14T21:25:00Z",
+  "updated_at": "2026-10-14T21:25:05Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -405,9 +405,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "queue run on df0c1f0 (close-#388)",
+      "note": "testing spec #142 (Spec: Mining gates: drill tier, skill, and dynamite-only ores) on df0c1f0",
       "stale_after_min": 420,
-      "updated_at": "2026-10-14T21:25:00Z",
+      "updated_at": "2026-10-14T21:25:05Z",
       "host": "grok-bot-vm-452660841"
     }
   },
