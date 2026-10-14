@@ -7,8 +7,9 @@
  * Every module changes how the kernel's turret picks, reaches, times or lands a shot
  * (`authority/combat/gunTargets.ts`, `gunFire.ts`), and no seam reaches either yet, so all eight
  * are held back: never registered, so no store, tree, card or bot sees them (the #205 GD lock's
- * held-back rule, as #318 held back the bore's signature modules). Mounts are the `turret.*`
- * groups of #364's art (`docs/art/armoury/armouryMounts.json`).
+ * held-back rule, as #318 held back the bore's signature modules). #388 registers them once the
+ * kernel turret seams it is blocked by land (the #319 GD split). Mounts are the `turret.*` groups
+ * of #364's art (`docs/art/armoury/armouryMounts.json`).
  */
 import type { DiscoveryKey } from '../../../systems/registries/discovery'
 import type { ProgressionLabel } from '../../tech-tree'
@@ -31,7 +32,7 @@ export interface AutoGunsModule {
   description: string
   label: ProgressionLabel
   mount: TurretMountZone
-  /** Never registered until a kernel seam reaches its effect. */
+  /** Never registered until a kernel seam reaches its effect (#388). */
   isHeldBack: boolean
   node: AutoGunsNode
 }
