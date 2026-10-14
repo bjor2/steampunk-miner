@@ -14,7 +14,8 @@ import { markLadderOf } from './terrainItems'
 // Stabiliser foam's card (Content on #381, matched to the GD default ruling): Content's flavour
 // and lines with their numbers read from the data, a cone Mark capped at +2 (radius 4), and no
 // line that says "brace", so foam never reads like the lode clamp. The Charges line (Content's
-// addendum) says where the stack comes from; its live count waits for the restock (#394).
+// addendum) says where the stack comes from; its live count waits for the restock (#394). The
+// Cure line names the Mark foam sets for good at, the one that masters it (ticket 368).
 
 const FOAM = terrainItemNamed(STABILISER_FOAM_ID)
 const LAST_MARK = lastMarkOf(markLadderOf(FOAM))
@@ -36,6 +37,7 @@ describe('stabiliser foam card', () => {
       'the roof warns again before it can fall',
       'foamed rock keeps its hardness and price',
       '+0 cells, up to +2',
+      `from Mark ${LAST_MARK} foamed rock sets for good, billed as lining at its band`,
       'research grants 4, restock comes later',
     ])
   })
@@ -64,6 +66,7 @@ describe('stabiliser foam card', () => {
       'When it crumbles',
       'Note',
       'Cone',
+      'Cure',
       'Charges',
       'Price per unit',
     ])

@@ -17,7 +17,9 @@
  * Stabiliser foam (ticket 381) sets on a forward cone and holds the collapse blocks under it for
  * 600 ticks through a timed `collapseBraces` provider of its own; its clock step drops each cell as
  * it lapses; researching its node owns it with a full stack, its only charge source (a reaction to
- * `TechNodeUnlocked`). The cryo binder, shoring props and the strata press stay vision rows
+ * `TechNodeUnlocked`). At the Mark that masters foam its cells cure for good (ticket 368): a session
+ * section of cured cells read by a `groundReinforcement` provider, billed at each cell's band, cut
+ * cells and other planets dropped by a reaction. The cryo binder, shoring props and the strata press stay vision rows
  * (`systems/shippedTools.ts`). The lane's P16 fork (ticket 269), built on no magnet: the Bracer
  * props warning collapse blocks round its rig through the same `collapseBraces` seam, fed by a
  * reaction to `CollapseWarned`; the Breaker fractures the plain ground past each charge it blasts,
@@ -29,6 +31,8 @@ import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
 import { MAGNET_FIELD_LAYER_ID, MagnetFieldLayer } from './scene/MagnetFieldLayer'
 import { BRACER_PROP_BRACES, BRACER_PROPS_REACTION } from './systems/bracerProps'
 import { BREAKER_FRACTURE } from './systems/breakerFracture'
+import { CURED_FOAM_REINFORCEMENT, CURED_FOAM_SECTION } from './systems/curedFoam'
+import { CURED_FOAM_GROUND_REACTION } from './systems/foamCure'
 import { FOAM_RESEARCH_REACTION } from './systems/foamResearch'
 import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
 import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
@@ -66,6 +70,9 @@ export const slice: SliceDefinition = {
     r.blastEffect(BREAKER_FRACTURE)
     r.clockStep(LAPSE_FOAM_STEP)
     r.collapseBrace(STABILISER_FOAM_BRACES)
+    r.saveSection(CURED_FOAM_SECTION)
+    r.reinforcement(CURED_FOAM_REINFORCEMENT)
+    r.authorityReaction(CURED_FOAM_GROUND_REACTION)
     r.sceneLayer({
       id: MAGNET_FIELD_LAYER_ID,
       Layer: MagnetFieldLayer,

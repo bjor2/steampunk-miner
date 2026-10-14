@@ -3,8 +3,8 @@
  * editing the kernel's lists. `power-up-core` already logs every use; these say what the use did to
  * the ground: the edit it queued (#162 section 2.4 `terrain_edit`), where a lodestone beacon
  * was planted, what a terrain magnet's use moved (GD lock on #246, `magnet_used`), the cells a
- * spray of stabiliser foam set (ticket 381, `foam_set`), and the stack its research stocked
- * (`foam_stocked`).
+ * spray of stabiliser foam set (ticket 381, `foam_set`), the stack its research stocked
+ * (`foam_stocked`), and the cells a spray at its cure Mark cured for good (ticket 368, `foam_cured`).
  *
  * Every event names its player: a use acts on the authority clock, and the lodestone's gather on a
  * dock reaction, so neither carries a command stamp of its own.
@@ -63,6 +63,11 @@ declare module '../../../systems/authority/domainEvent' {
      * on #381, option c): before the consumable restock this is foam's only charge source.
      */
     'terrain-tools.FoamStocked': { playerId: string; charges: number }
+    /**
+     * A spray at foam's cure Mark cured these many new cells for good (ticket 368), billed
+     * `price` in total onto the lining bill, each cell at its own band.
+     */
+    'terrain-tools.FoamCured': { playerId: string; cellsCured: number; price: string }
   }
 }
 
@@ -105,4 +110,10 @@ export type FoamStockedBody = DomainEventBodies['terrain-tools.FoamStocked']
 
 export function foamStockedOf(body: FoamStockedBody) {
   return { type: 'terrain-tools.FoamStocked' as const, ...body }
+}
+
+export type FoamCuredBody = DomainEventBodies['terrain-tools.FoamCured']
+
+export function foamCuredOf(body: FoamCuredBody) {
+  return { type: 'terrain-tools.FoamCured' as const, ...body }
 }

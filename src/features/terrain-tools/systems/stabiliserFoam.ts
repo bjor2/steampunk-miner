@@ -19,6 +19,8 @@
  * - **The lapse.** A clock step drops each cell on the tick it lapses, so the brace sync sees the
  *   end on that tick and the section goes back to initial once nothing holds. When a player's last
  *   cell lapses their cooldown counts from that tick (VS pin; a consumable has none today).
+ * - **The cure.** At the Mark that masters foam, a spray's set cells also cure for good through
+ *   the `groundReinforcement` registry (ticket 368, `foamCure.ts`); below it foam only holds.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -34,13 +36,15 @@ import { blockIdOf, blocksTouchingTile } from '../../../systems/world/collapseBl
 import { isLavaAt } from '../../../systems/world/lavaFlow'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { startCooldownAt, type PowerUpOutcome, type PowerUpUse } from '../../power-up-core'
+import { lastMarkOf } from '../../tech-tree'
 import { facingStepOf } from './editGeometry'
+import { cureFoamOn } from './foamCure'
 import { tilesInForwardCone } from './foamCone'
 import { fixedBlockOf, openGroundView, type GroundView } from './groundView'
 import { magnitudeAt, terrainItemNamed } from './itemMagnitude'
 import { frozenTicksLeftOf } from './lodeClamp'
 import { foamSetOf, TERRAIN_REFUSAL } from './terrainEvents'
-import { balanceOf } from './terrainItems'
+import { balanceOf, markLadderOf } from './terrainItems'
 import { editSourceOf } from './terrainOutcome'
 import { terrainToolsOf, withFoamedCells, type FoamedCell } from './terrainSection'
 
@@ -112,7 +116,23 @@ function sprayFromPose(state: AuthorityState, use: PowerUpUse): PowerUpOutcome {
   if (pose === null || view === null) return { kind: 'refused', reason: TERRAIN_REFUSAL.outOfPlay }
   const cells = foamableCellsOf(view, foamConeOf(pose, coneRadiusOf(use)))
   if (cells.length === 0) return { kind: 'refused', reason: TERRAIN_REFUSAL.nothingToFoam }
-  return { kind: 'acted', effect: setFoamOn(state, use, cells) }
+  return { kind: 'acted', effect: chainEffects(state, sprayStepsOf(use, cells)) }
+}
+
+/** Foam sets on the cells; at the cure Mark they also cure for good (ticket 368). */
+function sprayStepsOf(use: PowerUpUse, cells: readonly TilePoint[]) {
+  const set = (current: AuthorityState) => setFoamOn(current, use, cells)
+  if (!isCureMark(use.mark)) return [set]
+  return [set, (current: AuthorityState) => cureFoamOn(current, use.playerId, cells)]
+}
+
+/** The Mark that masters foam is its cure Mark (#157 iv): a spray there sets for good. */
+export function foamCureMark(): number {
+  return lastMarkOf(markLadderOf(terrainItemNamed(STABILISER_FOAM_ID)))
+}
+
+function isCureMark(mark: number): boolean {
+  return mark >= foamCureMark()
 }
 
 /** The cone's radius at the use's Mark: Mark 0 sprays as bought. */

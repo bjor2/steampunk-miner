@@ -5,7 +5,8 @@
  * (with the TD's `chunksTouched`, #162 section 3 rule 7), where a lodestone beacon was planted, and
  * `magnet_used {itemId, verb, cellsMoved, energy}` for each terrain magnet use (GD lock on #246),
  * `foam_set {mark, origin, cellsSet, untilTick}` for each spray of stabiliser foam (ticket 381), and
- * `foam_stocked {charges}` when researching foam's node stocks its first stack.
+ * `foam_stocked {charges}` when researching foam's node stocks its first stack, and
+ * `foam_cured {cellsCured, price}` when a spray at foam's cure Mark cures cells for good (ticket 368).
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
@@ -38,6 +39,10 @@ export const TERRAIN_PROJECTIONS: SliceEventProjections = {
   'terrain-tools.FoamStocked': ({ charges }) => ({
     event: 'terrain-tools.foam_stocked',
     data: { charges },
+  }),
+  'terrain-tools.FoamCured': ({ cellsCured, price }) => ({
+    event: 'terrain-tools.foam_cured',
+    data: { cellsCured, price },
   }),
 }
 
@@ -78,5 +83,10 @@ export const TERRAIN_RUN_EVENTS: SliceRunEvents = {
     group: 'vehicle_and_combat',
     level: 'core',
     payload: { charges: 'integer' },
+  },
+  'terrain-tools.foam_cured': {
+    group: 'mining',
+    level: 'core',
+    payload: { cellsCured: 'integer', price: 'money' },
   },
 }

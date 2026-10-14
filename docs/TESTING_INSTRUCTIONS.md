@@ -396,6 +396,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   open on a new vehicle and pressed in turn (`withForkHands`). Gated per branch on the seed median
   (`systems/lanePace.ts`): P1 core within 58 minutes of the start, the slice at 100-110 and P8 at
   45 or more (#146's pins). Run it by name; a miss is a balance finding for the lane's items.
+- **Foam cure pace** (the bot gate of the #157 GD ruling and TD lock, ticket 368): the lane
+  `features/terrain-tools/foamCurePace.lane.test.ts` plays the pacing bot to the core of P1-P10
+  and headless P40 on each pacing seed, twice, both runs with foam's every Mark researched: bare,
+  and with stabiliser foam slotted at its cure Mark and pressed by the magnet hand, so each spray
+  cures its cells for good. Gated on the seed median: time to core at least 0.98x the bare time.
+  Run it by name; a miss is a balance finding for the cure.
 - **Money to planet 200** (#316 TD scope f, TD pin on #123, ticket 340): `npm run balance:money-p200`
   runs the lane `logging/moneyPastP200.lane.test.ts`. The bot plays the bot scenario on the first
   pacing seed to planet 200's core (prices near 1e104), headless, keeping no run log
