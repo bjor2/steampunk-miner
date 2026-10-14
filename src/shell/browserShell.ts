@@ -1,8 +1,8 @@
 /**
  * The shell in a plain browser: no filesystem, so the newest run-log lines are kept in memory (a
  * bot can read them back through the debug handle) and a debug run's snapshots in IndexedDB. A real download/OPFS writer can replace this
- * later. Save slots go to localStorage, so quit and resume works in the browser too; one `setItem`
- * is all-or-nothing, which is the browser's atomic write.
+ * later. Save slots go to localStorage (`storedSaveSlots.ts`), so quit and resume works in the
+ * browser too.
  */
 import { keepNewestLines } from '../logging/ndjson'
 import { createBrowserSnapshots } from './browserSnapshots'
@@ -10,6 +10,7 @@ import { readBrowserLaunchParameters } from './launchParameters'
 import { watchPageListeners } from './listenerCount'
 import { trackCanvasPointer } from './mouseHooks'
 import { readPageMemory } from './pageMemory'
+import { createStoredSaveFolder } from './storedSaveSlots'
 import { listenForGamepad } from './gamepadHooks'
 import {
   exposeOnWindow,
@@ -35,7 +36,10 @@ const KEPT_RUN_LOG_CHARS = 1_000_000
 
 export function createBrowserShell(): Shell {
   const launch = readBrowserLaunchParameters()
-  const slotKey = (slot: number) => `steampunk-miner/${saveFolderOf(launch)}/slot-${slot}.json`
+  const saves = createStoredSaveFolder(
+    window.localStorage,
+    `steampunk-miner/${saveFolderOf(launch)}`,
+  )
   const preferencesKey = `steampunk-miner/${preferencesFileOf(launch)}.json`
   const eventLinesByRun = new Map<string, string>()
   const commandLinesByRun = new Map<string, string>()
@@ -58,9 +62,11 @@ export function createBrowserShell(): Shell {
     writeRunDocument: async (runId, document, json) => {
       documentsByRun.set(`${runId}/${document}`, json)
     },
-    writeSaveSlot: async (slot, json) => window.localStorage.setItem(slotKey(slot), json),
-    readSaveSlot: async (slot) => window.localStorage.getItem(slotKey(slot)),
-    setAsideSaveSlot: async (slot) => setAsideStoredSlot(slotKey(slot)),
+    writeSaveSlot: async (slot, json, entryJson) => saves.write(slot, json, entryJson),
+    readSaveSlot: async (slot) => saves.read(slot),
+    listSaveSlots: async () => saves.list(),
+    deleteSaveSlot: async (slot) => saves.remove(slot),
+    setAsideSaveSlot: async (slot) => saves.setAside(slot),
     readPreferences: async () => window.localStorage.getItem(preferencesKey),
     writePreferences: async (json) => window.localStorage.setItem(preferencesKey, json),
     readBufferedRunEvents: (runId) => eventLinesByRun.get(runId) ?? '',
@@ -90,11 +96,4 @@ function appendKeepingNewestLines(
   lines: string,
 ): void {
   linesByRun.set(runId, keepNewestLines((linesByRun.get(runId) ?? '') + lines, KEPT_RUN_LOG_CHARS))
-}
-
-function setAsideStoredSlot(key: string): void {
-  const refused = window.localStorage.getItem(key)
-  if (refused === null) return
-  window.localStorage.setItem(key.replace(/\.json$/, '.refused.json'), refused)
-  window.localStorage.removeItem(key)
 }

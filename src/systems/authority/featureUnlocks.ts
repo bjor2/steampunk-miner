@@ -14,6 +14,16 @@ import { isUnlocked, LOCKED_SCHEDULE, type UnlockProgress } from '../unlocks/unl
 import type { AuthorityState } from './authorityState'
 import type { DomainEventBody } from './domainEvent'
 import { builtFacilityRowIdsOn } from './builtFacilities'
+import type { HeldArtefact } from './heldArtefact'
+
+/**
+ * What a session's open rows follow from: its planet and the artefacts its players hold. A live
+ * state and a saved one (`PortableState`) both are one, so a save can list its open rows (#401).
+ */
+export interface UnlockStanding {
+  planet: { index: number }
+  players: Readonly<Record<string, { artefact: HeldArtefact | null }>>
+}
 
 /** Whether the schedule row `featureId` is open on the session's planet; false for an unknown id. */
 export function isFeatureUnlocked(state: AuthorityState, featureId: string): boolean {
@@ -27,7 +37,17 @@ export function isFeatureUnlockedIn(
   featureId: string,
 ): boolean {
   const row = schedule.rows.find((candidate) => candidate.id === featureId)
-  return row !== undefined && isOpenIn(row, state)
+  return row !== undefined && isOpenIn(schedule, row, state)
+}
+
+/** The ids of every schedule row open for `standing`, in schedule order. */
+export function openFeatureIdsOf(standing: UnlockStanding): string[] {
+  return openFeatureIdsIn(LOCKED_SCHEDULE, standing)
+}
+
+/** The same against `schedule`: the spec seam for a row the lock has not shipped yet. */
+export function openFeatureIdsIn(schedule: UnlockSchedule, standing: UnlockStanding): string[] {
+  return schedule.rows.filter((row) => isOpenIn(schedule, row, standing)).map((row) => row.id)
 }
 
 /** One `FeatureUnlocked` per `artefact` row a pick opened: in `after`, not yet in `before`. */
@@ -36,7 +56,7 @@ export function featureUnlocksOfPick(
   after: AuthorityState,
 ): DomainEventBody[] {
   return LOCKED_SCHEDULE.rows
-    .filter((row) => row.bind === 'artefact' && isOpenIn(row, after) && !isOpenIn(row, before))
+    .filter((row) => row.bind === 'artefact' && isOpenAfterPick(row, before, after))
     .map((row) => ({ type: 'FeatureUnlocked', featureId: row.id }))
 }
 
@@ -56,6 +76,10 @@ export function featureUnlocksOfTravelIn(
     .map((row) => ({ type: 'FeatureUnlocked', featureId: row.id }))
 }
 
+function isOpenAfterPick(row: UnlockRow, before: AuthorityState, after: AuthorityState): boolean {
+  return isOpenIn(LOCKED_SCHEDULE, row, after) && !isOpenIn(LOCKED_SCHEDULE, row, before)
+}
+
 function isOpenedBetween(row: UnlockRow, fromPlanet: number, toPlanet: number): boolean {
   return isOpenOn(row, toPlanet) && !isOpenOn(row, fromPlanet)
 }
@@ -65,18 +89,22 @@ function isOpenOn(row: UnlockRow, planetIndex: number): boolean {
 }
 
 /** Only an `artefact` row reads the held artefacts: the other checks run every tick. */
-function isOpenIn(row: UnlockRow, state: AuthorityState): boolean {
-  if (row.bind !== 'artefact') return isOpenOn(row, state.planet.index)
-  const progress = progressOnPlanet(state.planet.index)
-  return isUnlocked(row, { ...progress, collectedArtefactRowIds: collectedArtefactRowIdsOf(state) })
+function isOpenIn(schedule: UnlockSchedule, row: UnlockRow, standing: UnlockStanding): boolean {
+  if (row.bind !== 'artefact') return isOpenOn(row, standing.planet.index)
+  const progress = progressOnPlanet(standing.planet.index)
+  const collectedArtefactRowIds = collectedArtefactRowIdsOf(schedule, standing)
+  return isUnlocked(row, { ...progress, collectedArtefactRowIds })
 }
 
 /** The rows of every cache a player in the session took their artefact from. */
-function collectedArtefactRowIdsOf(state: AuthorityState): ReadonlySet<string> {
-  const cachePlanets = Object.values(state.players).flatMap((player) =>
+function collectedArtefactRowIdsOf(
+  schedule: UnlockSchedule,
+  standing: UnlockStanding,
+): ReadonlySet<string> {
+  const cachePlanets = Object.values(standing.players).flatMap((player) =>
     player.artefact === null ? [] : [player.artefact.fromPlanet],
   )
-  return artefactRowIdsOfCaches(LOCKED_SCHEDULE, cachePlanets)
+  return artefactRowIdsOfCaches(schedule, cachePlanets)
 }
 
 /** What a session standing on `planetIndex` has met: its travel and its platform's bays. */

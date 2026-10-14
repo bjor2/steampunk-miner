@@ -6,7 +6,13 @@ import { SHELL_CHANNELS } from './channels.cjs'
 import { readShellLaunch } from './launchOptions.cjs'
 import { appendRunCommands, appendRunEvents, writeRunDocument } from './runLogFiles.cjs'
 import { readPreferences, writePreferences } from './preferencesFiles.cjs'
-import { readSaveSlot, setAsideSaveSlot, writeSaveSlot } from './saveFiles.cjs'
+import {
+  deleteSaveSlot,
+  listSaveSlots,
+  readSaveSlot,
+  setAsideSaveSlot,
+  writeSaveSlot,
+} from './saveFiles.cjs'
 import { writeHeapSnapshot, writeRunSnapshot } from './snapshotFiles.cjs'
 
 export function registerShellHandlers(): void {
@@ -28,11 +34,15 @@ export function registerShellHandlers(): void {
   ipcMain.handle(SHELL_CHANNELS.writeRunDocument, (_event, runId, document, json) =>
     writeRunDocument(logsRoot, runId, document, json),
   )
-  ipcMain.handle(SHELL_CHANNELS.writeSaveSlot, (_event, folder, slot, json) =>
-    writeSaveSlot(userData, folder, slot, json),
+  ipcMain.handle(SHELL_CHANNELS.writeSaveSlot, (_event, folder, slot, json, entryJson) =>
+    writeSaveSlot(userData, folder, slot, json, entryJson),
   )
   ipcMain.handle(SHELL_CHANNELS.readSaveSlot, (_event, folder, slot) =>
     readSaveSlot(userData, folder, slot),
+  )
+  ipcMain.handle(SHELL_CHANNELS.listSaveSlots, (_event, folder) => listSaveSlots(userData, folder))
+  ipcMain.handle(SHELL_CHANNELS.deleteSaveSlot, (_event, folder, slot) =>
+    deleteSaveSlot(userData, folder, slot),
   )
   ipcMain.handle(SHELL_CHANNELS.setAsideSaveSlot, (_event, folder, slot) =>
     setAsideSaveSlot(userData, folder, slot),

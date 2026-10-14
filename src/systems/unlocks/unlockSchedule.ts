@@ -64,7 +64,8 @@ function wordsOf(text: string): string[] {
   return text.split(/[^A-Za-z0-9_]+/).filter((word) => word.length > 0)
 }
 
-function hasModule(row: UnlockRow): boolean {
+/** A row that can open and show: neither cut nor a vision row with no module built (#90). */
+export function hasModule(row: UnlockRow): boolean {
   return row.status !== 'vision' && row.status !== 'cut'
 }
 

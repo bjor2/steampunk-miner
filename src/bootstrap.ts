@@ -22,13 +22,13 @@ import { watchRapierWasmMemory } from './physics/rapierWasmMemory'
 import { requestCanvasScreenshot } from './scene/canvasScreenshots'
 import { getShell, type Shell } from './shell/shell'
 import {
-  installSaveSlots,
+  installSaveFolder,
   loadCheckpoint,
   saveFileNow,
   type CheckpointLoad,
-  type SaveSlots,
 } from './store/checkpoint'
 import { runEventPlaceOf, useGameStore } from './store/gameStore'
+import type { SaveFolder } from './store/saveFolder'
 import { listenForDomainEvents } from './store/domainEventBroadcast'
 import { routeKeyChange, routeScrollNotch } from './store/inputRuntime'
 import { routePadFrame } from './store/padRuntime'
@@ -67,7 +67,7 @@ export async function startGame(): Promise<void> {
   logPerfOnTestRuns(shell, run)
   keepSnapshotsOnDebugRuns(shell, run.runId)
   recordGameStarted(shell)
-  installSaveSlots(saveSlotsOf(shell))
+  installSaveFolder({ folder: saveFolderOf(shell), readWallClockMs: () => Date.now() })
   await adoptLocalPreferences(shell)
   keepScreenFitted(shell)
   showTouchControlsOnTouch(shell)
@@ -127,10 +127,12 @@ function keepRunFilesWritten(shell: Shell, run: RunFiles): void {
   })
 }
 
-function saveSlotsOf(shell: Shell): SaveSlots {
+function saveFolderOf(shell: Shell): SaveFolder {
   return {
-    write: (slot, json) => shell.writeSaveSlot(slot, json),
+    list: () => shell.listSaveSlots(),
     read: (slot) => shell.readSaveSlot(slot),
+    write: (slot, json, entryJson) => shell.writeSaveSlot(slot, json, entryJson),
+    remove: (slot) => shell.deleteSaveSlot(slot),
     setAside: (slot) => shell.setAsideSaveSlot(slot),
   }
 }

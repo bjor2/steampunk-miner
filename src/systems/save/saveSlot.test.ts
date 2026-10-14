@@ -106,7 +106,7 @@ describe('save slot', () => {
 
   it('holds the world as seed, params and touched-chunk deltas under the shared epoch', () => {
     const file = JSON.parse(savedText(dockedAfterATrip().state(), 3)) as SaveSlotFile
-    expect(file).toMatchObject({ formatVersion: 1, generatorVersion: 8, saveEpoch: 3 })
+    expect(file).toMatchObject({ formatVersion: 2, generatorVersion: 8, saveEpoch: 3 })
     expect(file.world).toMatchObject({ saveEpoch: 3, worldSeed: 83921, planetIndex: 1 })
     expect(file.world.params).toMatchObject({ worldSeed: 83921, planetIndex: 1, radiusTiles: 300 })
     expect(Object.keys(file.world.chunks).length).toBeGreaterThan(0)
@@ -214,7 +214,7 @@ describe('save slot: refusals', () => {
       'save.generatorVersion is 1, this build reads 8',
     ])
     expect(readSaveSlot({ ...file(), formatVersion: 9, snapshotVersion: 4 }).problems).toEqual([
-      'save.formatVersion is 9, this build reads 1',
+      'save.formatVersion is 9, this build reads 2',
       `save.snapshotVersion is 4, this build reads ${SNAPSHOT_VERSION}`,
     ])
   })

@@ -1,7 +1,8 @@
 /**
  * The checkpoint save file (decisions #4 and #12, amended by #12 to one file per slot; #26):
  *
- *   header   formatVersion, snapshotVersion, generatorVersion, saveEpoch, tick, digest
+ *   header   formatVersion, slot (name and wall time, #401), snapshotVersion, generatorVersion,
+ *            saveEpoch, tick, digest, and the open unlock ids (`savedUnlocks.ts`, #401)
  *   world    the planet as seed + params + chunk deltas, the platform, the core, combat, the
  *            blocks warning or refilling (#43), loose lava (#113), live blasts and queued power-up terrain edits (K6 #189)
  *   profile  per player the wallet, the last seq and the vehicle (integer levels, never stats)
@@ -18,7 +19,8 @@
  * Reading refuses, never migrates: another format, snapshot or generator version, a mismatched
  * epoch, planet params this build would not generate, or anything `readSnapshot` refuses is a
  * listed problem, and nothing is restored. Older saves reach this reader through the migration
- * chain first (`saveMigrations.ts`, #170).
+ * chain first (`saveMigrations.ts`, #170). Which slot a file sits in is the shell's; the slot
+ * index (`saveSlotIndex.ts`) reads its entry off this header.
  */
 import type { AuthorityState } from '../authority/authorityState'
 import { isJsonObject, isWholeNumber } from '../authority/payloadFields'
@@ -32,15 +34,17 @@ import {
 } from '../authority/sessionSnapshot'
 import { GENERATOR_VERSION } from '../generatorVersion'
 import type { PlanetParams } from '../world/planetParams'
+import { slotMetaProblems, UNTIMED_AUTOSAVE, type SaveSlotMeta } from './saveSlotIndex'
+import { unlocksOnLoad, unlocksToSave } from './savedUnlocks'
 
-/** 1: the first checkpoint layout (#26). */
-export const SAVE_FORMAT_VERSION = 1
+/**
+ * 1: the first checkpoint layout (#26), one slot.
+ * 2: slots (#401): the header adds the slot's name and wall time and the open unlock ids.
+ */
+export const SAVE_FORMAT_VERSION = 2
 
-/** The slice has one slot and no slot picker (#12: one file per slot). */
-export const CHECKPOINT_SLOT = 1
-
-export interface SaveSlotFile {
-  formatVersion: number
+/** What every format version holds: the session cut into its world and profile (all of v1). */
+export interface SaveSections {
   snapshotVersion: number
   generatorVersion: number
   saveEpoch: number
@@ -49,6 +53,13 @@ export interface SaveSlotFile {
   digest: string
   world: SaveWorldSection
   profile: SaveProfileSection
+}
+
+export interface SaveSlotFile extends SaveSections {
+  formatVersion: number
+  slot: SaveSlotMeta
+  /** The ids of the schedule rows open when it was written: the host world's (#401). */
+  unlocked: string[]
 }
 
 export interface SaveWorldSection {
@@ -76,11 +87,22 @@ export interface SaveProfileSection {
 }
 
 export type SaveSlotReading =
-  { state: AuthorityState; saveEpoch: number; problems: [] } | { problems: string[] }
+  | { state: AuthorityState; saveEpoch: number; unlocked: string[]; problems: [] }
+  | { problems: string[] }
 
-export function saveSlotOf(snapshot: SessionSnapshot, saveEpoch: number): SaveSlotFile {
+export function saveSlotOf(
+  snapshot: SessionSnapshot,
+  saveEpoch: number,
+  slot: SaveSlotMeta = UNTIMED_AUTOSAVE,
+): SaveSlotFile {
+  const { world, profile, ...header } = saveSectionsOf(snapshot, saveEpoch)
+  const unlocked = unlocksToSave(snapshot.state)
+  return { formatVersion: SAVE_FORMAT_VERSION, slot, ...header, unlocked, world, profile }
+}
+
+/** The sections alone: what a migration step re-cuts, keeping the rest of the file's header. */
+export function saveSectionsOf(snapshot: SessionSnapshot, saveEpoch: number): SaveSections {
   return {
-    formatVersion: SAVE_FORMAT_VERSION,
     snapshotVersion: snapshot.snapshotVersion,
     generatorVersion: snapshot.generatorVersion,
     saveEpoch,
@@ -124,11 +146,12 @@ function restoreSections(file: SaveSlotFile): SaveSlotReading {
   const restored = readSnapshot(snapshotOfSaveSlot(file))
   const problems = [...paramsProblems(file.world), ...restored.problems]
   if (problems.length > 0 || !('state' in restored)) return { problems }
-  return { state: restored.state, saveEpoch: file.saveEpoch, problems: [] }
+  const unlocked = unlocksOnLoad(file.unlocked, restored.state)
+  return { state: restored.state, saveEpoch: file.saveEpoch, unlocked, problems: [] }
 }
 
 /** The session snapshot the sections were cut from, joined back into one. */
-export function snapshotOfSaveSlot(file: SaveSlotFile): SessionSnapshot {
+export function snapshotOfSaveSlot(file: SaveSections): SessionSnapshot {
   const { world, profile } = file
   return {
     snapshotVersion: file.snapshotVersion,
@@ -159,10 +182,22 @@ function headerProblems(file: unknown): string[] {
     ...versionProblems('formatVersion', file.formatVersion, SAVE_FORMAT_VERSION),
     ...versionProblems('snapshotVersion', file.snapshotVersion, SNAPSHOT_VERSION),
     ...versionProblems('generatorVersion', file.generatorVersion, GENERATOR_VERSION),
+    ...slotHeaderProblems(file),
     ...(isWholeNumber(file.saveEpoch) ? [] : ['save.saveEpoch must be a whole number']),
     ...sectionProblems('world', file.world, file.saveEpoch),
     ...sectionProblems('profile', file.profile, file.saveEpoch),
   ]
+}
+
+/** Only a file of this format is held to its fields: another one is refused on its version. */
+function slotHeaderProblems(file: Record<string, unknown>): string[] {
+  if (file.formatVersion !== SAVE_FORMAT_VERSION) return []
+  return [...slotMetaProblems(file.slot), ...unlockedProblems(file.unlocked)]
+}
+
+function unlockedProblems(unlocked: unknown): string[] {
+  const isTextList = Array.isArray(unlocked) && unlocked.every((id) => typeof id === 'string')
+  return isTextList ? [] : ['save.unlocked must be a list of row ids']
 }
 
 function versionProblems(name: string, version: unknown, expected: number): string[] {

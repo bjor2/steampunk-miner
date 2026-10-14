@@ -21,7 +21,7 @@ import PLANET_1_SAVE from './fixtures/pre-175-planet-1.save.json'
 import PLANET_10_SAVE from './fixtures/pre-175-planet-10.save.json'
 import PLANET_5_SAVE from './fixtures/pre-181-planet-5.save.json'
 import { migrateSaveSlot, readMigratedSaveSlot, type SaveMigration } from './saveMigrations'
-import { readSaveSlot } from './saveSlot'
+import { readSaveSlot, SAVE_FORMAT_VERSION } from './saveSlot'
 
 /**
  * Both fixtures were written by the build before #175 (generator 5, pad -6..+5, or -6..+13 with
@@ -35,6 +35,9 @@ const ORE_LEAD_STEP = { version: 'generatorVersion', from: 6, to: 7 }
 const ORE_MIX_STEP = { version: 'generatorVersion', from: 7, to: 8 }
 /** K8 #218: every fixture was written before the charge racks went by size. */
 const CHARGE_RACK_STEP = { version: 'snapshotVersion', from: 19, to: 20 }
+/** #401: every fixture was written in the one-slot layout, format 1. */
+const SLOT_FORMAT_STEP = { version: 'formatVersion', from: 1, to: 2 }
+const FORMAT_1_PROBLEM = `save.formatVersion is 1, this build reads ${SAVE_FORMAT_VERSION}`
 
 const NOTES: SaveSection<readonly string[]> = {
   id: 'save-probe.notes',
@@ -70,6 +73,7 @@ function restored(file: unknown) {
 describe('save migration chain', () => {
   it('refuses a pre-#175 save without the chain, on its snapshot and generator versions alone', () => {
     expect(readSaveSlot(PLANET_1_SAVE).problems).toEqual([
+      FORMAT_1_PROBLEM,
       `save.snapshotVersion is 18, this build reads ${SNAPSHOT_VERSION}`,
       `save.generatorVersion is 5, this build reads ${GENERATOR_VERSION}`,
     ])
@@ -83,6 +87,7 @@ describe('save migration chain', () => {
       GENERATOR_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
+      SLOT_FORMAT_STEP,
     ])
     expect(reading.saveEpoch).toBe(3)
   })
@@ -98,6 +103,7 @@ describe('save migration chain', () => {
       GENERATOR_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
+      SLOT_FORMAT_STEP,
       { restoredSections: [{ section: 'save-probe.notes' }] },
     ])
     expect(notes).toEqual([])
@@ -198,6 +204,7 @@ describe('save migration chain: levels to steps (#181)', () => {
       CHARGE_RACK_STEP,
       ORE_LEAD_STEP,
       ORE_MIX_STEP,
+      SLOT_FORMAT_STEP,
     ])
   })
 
@@ -251,6 +258,7 @@ describe('save migration chain: levels to steps (#181)', () => {
     const reading = readMigratedSaveSlot({ ...PLANET_5_SAVE, digest: '0000000000000000' })
     expect(reading.migrations).toEqual([])
     expect(reading.problems).toEqual([
+      FORMAT_1_PROBLEM,
       `save.snapshotVersion is 18, this build reads ${SNAPSHOT_VERSION}`,
       `save.generatorVersion is 6, this build reads ${GENERATOR_VERSION}`,
     ])

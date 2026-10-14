@@ -17,6 +17,8 @@ const channels = {
   writeRunDocument: 'shell:writeRunDocument',
   writeSaveSlot: 'shell:writeSaveSlot',
   readSaveSlot: 'shell:readSaveSlot',
+  listSaveSlots: 'shell:listSaveSlots',
+  deleteSaveSlot: 'shell:deleteSaveSlot',
   setAsideSaveSlot: 'shell:setAsideSaveSlot',
   readPreferences: 'shell:readPreferences',
   writePreferences: 'shell:writePreferences',
@@ -33,9 +35,11 @@ const bridge: ShellBridge = {
     ipcRenderer.invoke(channels.appendRunCommands, runId, ndjsonLines),
   writeRunDocument: (runId, document, json) =>
     ipcRenderer.invoke(channels.writeRunDocument, runId, document, json),
-  writeSaveSlot: (folder, slot, json) =>
-    ipcRenderer.invoke(channels.writeSaveSlot, folder, slot, json),
+  writeSaveSlot: (folder, slot, json, entryJson) =>
+    ipcRenderer.invoke(channels.writeSaveSlot, folder, slot, json, entryJson),
   readSaveSlot: (folder, slot) => ipcRenderer.invoke(channels.readSaveSlot, folder, slot),
+  listSaveSlots: (folder) => ipcRenderer.invoke(channels.listSaveSlots, folder),
+  deleteSaveSlot: (folder, slot) => ipcRenderer.invoke(channels.deleteSaveSlot, folder, slot),
   setAsideSaveSlot: (folder, slot) => ipcRenderer.invoke(channels.setAsideSaveSlot, folder, slot),
   readPreferences: (file) => ipcRenderer.invoke(channels.readPreferences, file),
   writePreferences: (file, json) => ipcRenderer.invoke(channels.writePreferences, file, json),

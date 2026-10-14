@@ -9,6 +9,7 @@ import type {
   PreferencesFileName,
   RunDocumentName,
   SaveFolderName,
+  StoredSaveSlot,
 } from '../../electron/bridgeContract.cts'
 import type { PadReading } from '../systems/input/padFrame'
 import type { ScreenReading } from '../systems/views/screenLayout'
@@ -16,7 +17,7 @@ import { createBrowserShell } from './browserShell'
 import { createElectronShell } from './electronShell'
 import type { PageMemory } from './pageMemory'
 
-export type { AppInfo, PageMemory, RunDocumentName }
+export type { AppInfo, PageMemory, RunDocumentName, StoredSaveSlot }
 
 export interface LaunchParameters {
   /** The debug/scenario API is exposed: the dev build, `?debug` in a browser, `--debug-api` in Electron. */
@@ -61,12 +62,19 @@ export interface Shell {
   readBufferedRunEvents(runId: string): string
   /** Browser only: the newest command NDJSON lines, up to a cap (Electron writes files and returns ''). */
   readBufferedRunCommands(runId: string): string
-  /** Replaces a save slot atomically, in the folder this run's saves belong to (`saveFolderOf`). */
-  writeSaveSlot(slot: number, json: string): Promise<void>
+  /**
+   * Replaces a save slot (`autosave`, `slot-1` .. `slot-9`, #401) atomically, then its index
+   * entry, in the folder this run's saves belong to (`saveFolderOf`).
+   */
+  writeSaveSlot(slot: string, json: string, entryJson: string): Promise<void>
   /** The slot's text, or null when it holds no save. */
-  readSaveSlot(slot: number): Promise<string | null>
-  /** Moves a save this build refused out of the way, so the next checkpoint cannot overwrite it. */
-  setAsideSaveSlot(slot: number): Promise<void>
+  readSaveSlot(slot: string): Promise<string | null>
+  /** Every slot holding a save, with its index entry's text (null when none was kept). */
+  listSaveSlots(): Promise<StoredSaveSlot[]>
+  /** Empties a slot: its save and its entry. */
+  deleteSaveSlot(slot: string): Promise<void>
+  /** Moves a save this build refused out of the way, so the next write cannot overwrite it. */
+  setAsideSaveSlot(slot: string): Promise<void>
   /** Puts a handle on `window` for bots and the dev console (Playwright, design doc section 20). */
   exposeGlobalHandle(name: string, handle: unknown): void
   /** The local preferences file's text (#33), or null when none was written yet. */

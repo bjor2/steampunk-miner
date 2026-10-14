@@ -7,7 +7,8 @@ import { createRunLog, installRunLog, uninstallRunLog } from '../logging/runLog'
 import { runEventProblems } from '../logging/runEventSchema'
 import { toCanonical, ZERO_MONEY } from '../systems/money'
 import { readSaveSlot } from '../systems/save/saveSlot'
-import { checkpointWrites, installSaveSlots, saveFileNow, type SaveSlots } from './checkpoint'
+import { checkpointWrites, installSaveFolder, saveFileNow } from './checkpoint'
+import type { SaveFolder } from './saveFolder'
 import { listenForDomainEvents } from './domainEventBroadcast'
 import { resetGameStore, useGameStore } from './gameStore'
 import { recordMemorySample, recordPerfSample, turnOffPerfLog, turnOnPerfLog } from './perfLog'
@@ -73,9 +74,11 @@ function memorySnapshotFiles(shell: Shell) {
   return { files, sources }
 }
 
-const noSaveSlots: SaveSlots = {
-  write: async () => undefined,
+const noSaveFolder: SaveFolder = {
+  list: async () => [],
   read: async () => null,
+  write: async () => undefined,
+  remove: async () => undefined,
   setAside: async () => undefined,
 }
 
@@ -88,7 +91,7 @@ beforeEach(() => {
   resetGameStore()
   sink = createMemorySink()
   installRunLog(createRunLog({ runId: 'run_test', sink, secondsSinceStart: () => 0 }))
-  installSaveSlots(noSaveSlots)
+  installSaveFolder({ folder: noSaveFolder, readWallClockMs: () => 0 })
   heapUsedMiB = 60
   isCanvasDrawing = true
   turnOnPerfLog({
@@ -112,7 +115,7 @@ afterEach(() => {
   stopListening()
   turnOffSnapshots()
   turnOffPerfLog()
-  installSaveSlots(null)
+  installSaveFolder(null)
   uninstallRunLog()
 })
 
@@ -190,7 +193,7 @@ describe('debug run snapshots (#123)', () => {
     await checkpointWrites()
     const [saved] = linesNamed('checkpoint_saved')
     expect(saved.data).toMatchObject({
-      slot: 'slot-1',
+      slot: 'autosave',
       epoch: 1,
       file: `snapshots/save-${saved.tick}.json`,
     })

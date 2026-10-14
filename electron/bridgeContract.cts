@@ -21,6 +21,12 @@ export type RunDocumentName = 'metadata' | 'summary'
  */
 export type SaveFolderName = 'saves' | 'saves-debug'
 
+/** A slot file the save folder holds (#401), with its index entry's text when one was kept. */
+export interface StoredSaveSlot {
+  slot: string
+  entry: string | null
+}
+
 /**
  * What the main process was launched with (#11 section 6): the debug API only with
  * `--debug-api`, and a `--scenario=<path>` file's text only then.
@@ -46,12 +52,24 @@ export interface ShellBridge {
   appendRunCommands(runId: string, ndjsonLines: string): Promise<void>
   /** Replaces the run's metadata.json or summary.json. */
   writeRunDocument(runId: string, document: RunDocumentName, json: string): Promise<void>
-  /** Replaces `<userData>/<folder>/slot-<slot>.json` atomically (temp file, then rename). */
-  writeSaveSlot(folder: SaveFolderName, slot: number, json: string): Promise<void>
+  /**
+   * Replaces `<userData>/<folder>/<slot>.json` atomically (temp file, then rename), then its
+   * `<slot>.entry.json`; `slot` is `autosave` or `slot-1` .. `slot-9` (#401).
+   */
+  writeSaveSlot(
+    folder: SaveFolderName,
+    slot: string,
+    json: string,
+    entryJson: string,
+  ): Promise<void>
   /** The slot's text, or null when it holds no save. */
-  readSaveSlot(folder: SaveFolderName, slot: number): Promise<string | null>
-  /** Keeps a save this build refused as `slot-<slot>.refused.json`, out of the next write's way. */
-  setAsideSaveSlot(folder: SaveFolderName, slot: number): Promise<void>
+  readSaveSlot(folder: SaveFolderName, slot: string): Promise<string | null>
+  /** Every slot file in the folder, with its entry's text. */
+  listSaveSlots(folder: SaveFolderName): Promise<StoredSaveSlot[]>
+  /** Removes the slot's file and entry; nothing when it is empty. */
+  deleteSaveSlot(folder: SaveFolderName, slot: string): Promise<void>
+  /** Keeps a save this build refused as `<slot>.refused.json`, out of the next write's way. */
+  setAsideSaveSlot(folder: SaveFolderName, slot: string): Promise<void>
   /** `<userData>/<file>.json`, or null when it was never written. */
   readPreferences(file: PreferencesFileName): Promise<string | null>
   /** Replaces `<userData>/<file>.json` atomically (temp file, then rename). */

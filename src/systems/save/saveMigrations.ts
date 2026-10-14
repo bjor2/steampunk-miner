@@ -29,9 +29,15 @@
  * signature, which changes only the family of generated ore cells; as for 6 -> 7, every edit and
  * the whole state are kept.
  *
+ * Format 1 -> 2 (#401): the slot layout. A v1 file was the checkpoint of the single slot, so it
+ * becomes the autosave with no wall time, and its header gains the ids of the rows its state opens
+ * (`savedUnlocks.ts`). Its sections are kept byte for byte: money, levels and everything else.
+ * The shell moves the file itself into the autosave slot (`store/saveSlotLayout.ts`).
+ *
  * A save from before every bump reads at snapshot 18 and generator 5: the snapshot steps run
  * first, as the TD's save chain orders them, so the generator steps restore the state with this
- * build's reader.
+ * build's reader, and the format step, last, reads it whole. A step that re-cuts the sections
+ * keeps the rest of the file's header (`withSectionsOf`), whatever its format.
  *
  * A registered slice section the save lacks is no step: `readSnapshot` restores it at its initial
  * value, and the reading reports it after the steps as one `save_migrated {restoredSections}` (#224).
@@ -44,6 +50,7 @@ import {
   takeSnapshot,
   type PortablePlayer,
   type PortableState,
+  type SessionSnapshot,
 } from '../authority/sessionSnapshot'
 import { refineryUnlockPlanet } from '../economy/refineryEconomy'
 import { stepsOfMajors, stepOfMajor } from '../economy/upgradeSteps'
@@ -55,15 +62,21 @@ import { chunkKey, chunkOfTile, surfaceRowOfColumn } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
 import {
   readSaveSlot,
-  saveSlotOf,
+  saveSectionsOf,
   snapshotOfSaveSlot,
+  type SaveSections,
   type SaveSlotFile,
   type SaveSlotReading,
 } from './saveSlot'
+import { UNTIMED_AUTOSAVE } from './saveSlotIndex'
+import { unlocksToSave } from './savedUnlocks'
 import { withSizedChargeRacks } from './sizedChargeRacks'
 
 /** The header version a step moves on. */
-export type MigratedVersion = 'snapshotVersion' | 'generatorVersion'
+export type MigratedVersion = 'snapshotVersion' | 'generatorVersion' | 'formatVersion'
+
+/** A file at any format version: the sections every version holds, the rest of its header kept. */
+type MigratingFile = SaveSections & { formatVersion: number }
 
 /** One step that ran: `save_migrated {version, from, to}`. */
 export interface HeaderVersionStep {
@@ -81,7 +94,7 @@ export type SaveMigration = HeaderVersionStep | SectionRestore
 
 interface SaveMigrationStep extends HeaderVersionStep {
   /** The migrated file, or null when the file cannot be read at `from` (then nothing more runs). */
-  migrate(file: SaveSlotFile): SaveSlotFile | null
+  migrate(file: MigratingFile): MigratingFile | null
 }
 
 /** The chain in the order a save written before every bump needs them (see the module comment). */
@@ -91,6 +104,7 @@ const SAVE_MIGRATION_STEPS: readonly SaveMigrationStep[] = [
   { version: 'generatorVersion', from: 5, to: 6, migrate: regeneratePadArea },
   { version: 'generatorVersion', from: 6, to: 7, migrate: keepEditsUnderOreLeads },
   { version: 'generatorVersion', from: 7, to: 8, migrate: keepEditsUnderOreMix },
+  { version: 'formatVersion', from: 1, to: 2, migrate: addSlotHeader },
 ]
 
 export type MigratedSaveSlotReading = SaveSlotReading & { migrations: readonly SaveMigration[] }
@@ -124,20 +138,25 @@ export function migrateSaveSlot(file: unknown): {
  */
 function sectionRestoresOf(file: unknown, reading: SaveSlotReading): SectionRestore[] {
   if (!('state' in reading)) return []
-  const restored = sectionsRestoredBy(snapshotOfSaveSlot(file as SaveSlotFile))
+  const restored = sectionsRestoredBy(snapshotOfSaveSlot(file as SaveSections))
   return restored.length === 0
     ? []
     : [{ restoredSections: restored.map((section) => ({ section })) }]
 }
 
-function isAtStepStart(file: unknown, step: SaveMigrationStep): file is SaveSlotFile {
+function isAtStepStart(file: unknown, step: SaveMigrationStep): file is MigratingFile {
   return typeof file === 'object' && file !== null && Reflect.get(file, step.version) === step.from
 }
 
+/** The file with its sections cut again from `snapshot`, every other header field kept. */
+function withSectionsOf(file: MigratingFile, snapshot: SessionSnapshot): MigratingFile {
+  return { ...file, ...saveSectionsOf(snapshot, file.saveEpoch) }
+}
+
 /** Snapshot 18 -> 19: the levels x10; the generator version is kept for its own step. */
-function levelsToSteps(file: SaveSlotFile): SaveSlotFile | null {
+function levelsToSteps(file: MigratingFile): MigratingFile | null {
   const reshaped = reshapedSnapshot(snapshotOfSaveSlot(file), 19, withLevelsAsSteps)
-  return reshaped === null ? null : saveSlotOf(reshaped, file.saveEpoch)
+  return reshaped === null ? null : withSectionsOf(file, reshaped)
 }
 
 function withLevelsAsSteps(state: PortableState): PortableState {
@@ -152,37 +171,52 @@ function playerWithSteps(player: PortablePlayer): PortablePlayer {
 }
 
 /** Snapshot 19 -> 20: the racks by size; the generator version is kept for its own step. */
-function sizeChargeRacks(file: SaveSlotFile): SaveSlotFile | null {
+function sizeChargeRacks(file: MigratingFile): MigratingFile | null {
   const reshaped = reshapedSnapshot(snapshotOfSaveSlot(file), 20, withSizedChargeRacks)
-  return reshaped === null ? null : saveSlotOf(reshaped, file.saveEpoch)
+  return reshaped === null ? null : withSectionsOf(file, reshaped)
 }
 
 /** Generator 5 -> 6: the state is read as saved (the digest must hold), then moved off the pad. */
-function regeneratePadArea(file: SaveSlotFile): SaveSlotFile | null {
+function regeneratePadArea(file: MigratingFile): MigratingFile | null {
   const restored = restoreUnderThisGenerator(file)
   if (restored === null) return null
   const moved = placeVehiclesAtSellBay(withoutPadAreaChunks(restored))
-  return { ...saveSlotOf(takeSnapshot(moved), file.saveEpoch), generatorVersion: 6 }
+  return { ...withSectionsOf(file, takeSnapshot(moved)), generatorVersion: 6 }
 }
 
 /** Generator 6 -> 7: the state is read as saved and written again under this generator. */
-function keepEditsUnderOreLeads(file: SaveSlotFile): SaveSlotFile | null {
+function keepEditsUnderOreLeads(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 7)
 }
 
 /** Generator 7 -> 8: as 6 -> 7, since the mix too moves only cells no one has dug. */
-function keepEditsUnderOreMix(file: SaveSlotFile): SaveSlotFile | null {
+function keepEditsUnderOreMix(file: MigratingFile): MigratingFile | null {
   return keptUnderGenerator(file, 8)
 }
 
-function keptUnderGenerator(file: SaveSlotFile, generatorVersion: number): SaveSlotFile | null {
+function keptUnderGenerator(file: MigratingFile, generatorVersion: number): MigratingFile | null {
   const restored = restoreUnderThisGenerator(file)
   if (restored === null) return null
-  return { ...saveSlotOf(takeSnapshot(restored), file.saveEpoch), generatorVersion }
+  return { ...withSectionsOf(file, takeSnapshot(restored)), generatorVersion }
+}
+
+/**
+ * Format 1 -> 2: the autosave's header around the sections as saved. The state must read whole
+ * under this build (the digest holds), so the unlock ids are those of the state that loads.
+ */
+function addSlotHeader(file: MigratingFile): SaveSlotFile | null {
+  const restored = readSnapshot(snapshotOfSaveSlot(file))
+  if (!('state' in restored)) return null
+  return {
+    ...file,
+    formatVersion: 2,
+    slot: UNTIMED_AUTOSAVE,
+    unlocked: unlocksToSave(restored.state),
+  }
 }
 
 /** A generator bump never changes the state's shape, so the old state restores as it is. */
-function restoreUnderThisGenerator(file: SaveSlotFile): AuthorityState | null {
+function restoreUnderThisGenerator(file: MigratingFile): AuthorityState | null {
   const restored = readSnapshot({
     ...snapshotOfSaveSlot(file),
     generatorVersion: GENERATOR_VERSION,

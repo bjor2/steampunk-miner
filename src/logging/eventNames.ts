@@ -369,12 +369,12 @@ export const RUN_EVENT_REGISTRY = {
   // per step just before checkpoint_loaded; #181 added the snapshot step (levels to steps). #224:
   // one more line names the registered slice sections the save lacked, restored at their initial
   // values; it has no version step, so the step fields became optional (every line written before
-  // still reads the same).
+  // still reads the same). #401 added the format step (1 -> 2, the slot layout).
   save_migrated: {
     group: 'platform',
     level: 'core',
     payload: {
-      version: { optional: { oneOf: ['snapshotVersion', 'generatorVersion'] } },
+      version: { optional: { oneOf: ['snapshotVersion', 'generatorVersion', 'formatVersion'] } },
       from: { optional: 'integer' },
       to: { optional: 'integer' },
       restoredSections: { optional: { listOf: { section: 'text' } } },

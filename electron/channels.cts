@@ -11,6 +11,8 @@ export const SHELL_CHANNELS = {
   writeRunDocument: 'shell:writeRunDocument',
   writeSaveSlot: 'shell:writeSaveSlot',
   readSaveSlot: 'shell:readSaveSlot',
+  listSaveSlots: 'shell:listSaveSlots',
+  deleteSaveSlot: 'shell:deleteSaveSlot',
   setAsideSaveSlot: 'shell:setAsideSaveSlot',
   readPreferences: 'shell:readPreferences',
   writePreferences: 'shell:writePreferences',

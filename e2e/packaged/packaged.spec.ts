@@ -148,7 +148,10 @@ test.describe('packaged build (#29 packaged-smoke)', () => {
     expect(await page.evaluate(() => window.steampunkDebug!.teleportToDock())).toEqual({
       ok: true,
     })
-    await expect.poll(() => savesIn(userData, 'saves-debug').length).toBeGreaterThan(0)
+    // The checkpoint lands in the autosave slot with its index entry beside it (#401).
+    await expect
+      .poll(() => savesIn(userData, 'saves-debug').sort())
+      .toEqual(['autosave.entry.json', 'autosave.json'])
     expect(savesIn(userData, 'saves')).toEqual([])
     await app.close()
   })
