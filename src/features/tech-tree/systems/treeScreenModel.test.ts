@@ -10,6 +10,7 @@ import { ANCHORED_NODE_ID, ANCHORED_NODE_SLICE } from '../treeFixtureSlice'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { forkPairOf, type ForkBranchSpec } from './forkNode'
 import { romanNumeralOf } from './nodeCardModel'
+import { isArmouryLane } from './techNode'
 import { registeredTechTree } from './techTree'
 import {
   nodeCardModelOf,
@@ -67,9 +68,27 @@ describe('tech tree screen: lanes', () => {
       ['Drill gear', true],
       ['Aetheric science', true],
       ['Combos', true],
+      ['Bore gun', true],
+      ['Auto guns', true],
     ])
     const withLanes = withFixtureTree(() => modelOn(3))
-    expect(withLanes.lanes.every((lane) => !lane.isComingSoon)).toBe(true)
+    const swimlanes = withLanes.lanes.filter((lane) => !isArmouryLane(lane.lane))
+    expect(swimlanes.every((lane) => !lane.isComingSoon)).toBe(true)
+  })
+
+  it('draws the weapon lanes under one Armoury heading, below the combos (#310)', () => {
+    const model = withNoLanes(() => modelOn(3))
+    expect(model.lanes.map((lane) => [lane.lane, lane.groupHeading])).toEqual([
+      ['extraction', null],
+      ['terrain', null],
+      ['sensing', null],
+      ['mobility', null],
+      ['drill-gear', null],
+      ['aetheric', null],
+      ['combo', null],
+      ['armoury.bore_gun', 'Armoury'],
+      ['armoury.auto_guns', null],
+    ])
   })
 
   it('lays each lane out on the planet ruler in tier order, stacking a shared planet', () => {

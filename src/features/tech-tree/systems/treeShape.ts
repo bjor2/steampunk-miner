@@ -5,7 +5,8 @@
  * have none; at most two capabilities share a planet; every node has an icon that resolves, a
  * flavour line with no digits and a label; the absorbed Schedule C rows agree; every Mark
  * milestone sits at Mark 3, 6 or 9 of its ladder, each pattern at most once (#256); every row a
- * node `requiresFeature` is a row of the locked schedule (ticket 358).
+ * node `requiresFeature` is a row of the locked schedule (ticket 358); the Armoury lanes bring at
+ * most one capability a planet on P2-P8 between them (the Horizontal Scaler on #310, ticket 318).
  *
  * It runs over whatever the lane slices have registered, so it turns on as they land; the
  * cadence check (no gap longer than two planets on P2-P37) waits until all six lanes are in.
@@ -14,7 +15,7 @@ import { contentOf } from '../../../systems/registries/content'
 import { LOCKED_SCHEDULE } from '../../../systems/unlocks/unlockSchedule'
 import { milestoneProblemsOf } from './markMilestones'
 import { absorbedRowProblems, researchLabPlanet } from './scheduleAbsorber'
-import { TECH_LANES, type TechNode } from './techNode'
+import { isArmouryLane, TECH_LANES, type TechNode } from './techNode'
 
 export interface ShapeRules {
   isIconKnown(iconId: string): boolean
@@ -23,6 +24,8 @@ export interface ShapeRules {
 }
 
 const MOST_CAPABILITIES_PER_PLANET = 2
+const MOST_ARMOURY_CAPABILITIES_EARLY = 1
+const ARMOURY_EARLY_PLANETS = { first: 2, last: 8 } as const
 const LONGEST_EMPTY_RUN = 2
 const CADENCE_PLANETS = { first: 2, last: 37 } as const
 const EXTRACTOR_ITEM = /^rig\./
@@ -37,6 +40,7 @@ export function treeShapeProblems(nodes: readonly TechNode[], rules: ShapeRules)
     ...crossLaneProblems(nodes),
     ...extractorProblems(nodes),
     ...crowdedPlanetProblems(nodes),
+    ...crowdedEarlyArmouryProblems(nodes),
     ...cadenceProblems(nodes),
     ...presentationProblems(nodes, rules),
     ...absorbedRowProblems(nodes),
@@ -131,6 +135,18 @@ function crowdedPlanetProblems(nodes: readonly TechNode[]): string[] {
   return [...counts.entries()]
     .filter(([, count]) => count > MOST_CAPABILITIES_PER_PLANET)
     .map(([planet, count]) => `P${planet} brings ${count} capabilities, more than two`)
+}
+
+function crowdedEarlyArmouryProblems(nodes: readonly TechNode[]): string[] {
+  const counts = capabilityCountsByPlanet(nodes.filter((node) => isArmouryLane(node.lane)))
+  return [...counts.entries()]
+    .filter(([planet]) => isEarlyArmouryPlanet(planet))
+    .filter(([, count]) => count > MOST_ARMOURY_CAPABILITIES_EARLY)
+    .map(([planet, count]) => `P${planet} brings ${count} armoury capabilities, more than one`)
+}
+
+function isEarlyArmouryPlanet(planet: number): boolean {
+  return planet >= ARMOURY_EARLY_PLANETS.first && planet <= ARMOURY_EARLY_PLANETS.last
 }
 
 function cadenceProblems(nodes: readonly TechNode[]): string[] {

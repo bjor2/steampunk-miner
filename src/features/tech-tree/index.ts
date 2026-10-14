@@ -7,6 +7,7 @@
  */
 export const TECH_TREE_SLICE_ID = 'tech-tree'
 export type {
+  ArmouryLane,
   DiscoveryRequirement,
   ItemUnlock,
   MarkLadder,
@@ -21,7 +22,7 @@ export type {
   TechNodeLane,
   TreeNode,
 } from './systems/techNode'
-export { TECH_LANES } from './systems/techNode'
+export { ARMOURY_LANES, isArmouryLane, TECH_LANES } from './systems/techNode'
 export { isMasteredAt, lastMarkOf, markStepOf } from './systems/markLadder'
 export { markLadderOfItem, researchedMarkInViewOf, researchedMarkOf } from './systems/itemMarks'
 export {

@@ -29,8 +29,28 @@ export const TECH_LANES = [
 
 export type TechLane = (typeof TECH_LANES)[number]
 
+/**
+ * The Armoury group's lanes (GD decision on #310, ticket 318): one per weapon with a stats.json
+ * row, namespaced so a lane id never collides with a feature id (#200). They join no lane pair:
+ * the armoury enters the combo rotation only through its own weapon x lane templates.
+ */
+export const ARMOURY_LANES = ['armoury.bore_gun', 'armoury.auto_guns'] as const
+
+export type ArmouryLane = (typeof ARMOURY_LANES)[number]
+
 /** A combo sits between two lanes, so it has a row of its own. */
-export type TechNodeLane = TechLane | 'combo'
+export type TechNodeLane = TechLane | ArmouryLane | 'combo'
+
+const ARMOURY_LANE_PREFIX = 'armoury.'
+
+export function isArmouryLane(lane: TechNodeLane): lane is ArmouryLane {
+  return lane.startsWith(ARMOURY_LANE_PREFIX)
+}
+
+/** The lane's `laneBias` key: the weapon for an armoury lane (`bore_gun`), else the lane itself. */
+export function laneBiasKeyOf(lane: TechNodeLane): string {
+  return isArmouryLane(lane) ? lane.slice(ARMOURY_LANE_PREFIX.length) : lane
+}
 
 export type ProgressionLabel = 'vertical' | 'horizontal' | 'both'
 
@@ -65,6 +85,11 @@ export interface MarkLadder {
    * any Mark. Absent until the item's lane authors its verbs (`milestonesOf`).
    */
   milestones?: readonly MarkMilestone[]
+  /**
+   * A bespoke ladder the item's own slice steps (the long barrel's range then hold, #310): its
+   * Marks run to here and the rotation steps nothing, so the stats above stay as bought.
+   */
+  lastMark?: number
 }
 
 /**
@@ -115,6 +140,11 @@ export interface TechNode extends ContentEntry {
   costKind: Exclude<TechCostKind, 'mark'>
   /** Present on every Mark-bearing item: power-ups, consumables, passives and drill gear. */
   marks?: MarkLadder
+  /**
+   * The spend-guard family its research, its item and its Marks are filed under (#212's one
+   * `armoury` row, GD decision on #310); absent for a node no family row reads.
+   */
+  familyId?: string
 }
 
 /**
@@ -156,6 +186,7 @@ export interface TreeNode {
   requiresFeature?: readonly string[]
   researchedAt?: 'research_lab'
   unlocks: ItemUnlock
+  familyId?: string
   iconId: string
   description: string
   label: ProgressionLabel

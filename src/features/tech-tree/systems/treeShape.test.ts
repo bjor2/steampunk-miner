@@ -104,6 +104,25 @@ describe('tech tree: shape test', () => {
     expect(shapeOf(gapped)).toContain('P28-P31 bring no new capability, more than two planets')
   })
 
+  it('lets the armoury lanes bring at most one capability a planet on P2-P8 between them', () => {
+    const boreAt = (planet: number): TechNode => ({
+      ...nodeOf('tech.sensing.echo_sounder'),
+      id: `tech.bore_gun.probe_${planet}`,
+      lane: 'armoury.bore_gun',
+      unlockTier: planet,
+      prereqs: [],
+    })
+    const autoAt = (planet: number): TechNode => ({
+      ...boreAt(planet),
+      id: `tech.auto_guns.probe_${planet}`,
+      lane: 'armoury.auto_guns',
+    })
+    expect(shapeOf([boreAt(8), autoAt(8)])).toEqual([
+      'P8 brings 2 armoury capabilities, more than one',
+    ])
+    expect(shapeOf([boreAt(2), autoAt(9), boreAt(11), autoAt(11)])).toEqual([])
+  })
+
   it('leaves the cadence alone while a lane has not landed', () => {
     const noMobility = AUTHORED_TREE_FIXTURE.filter(
       (node) =>

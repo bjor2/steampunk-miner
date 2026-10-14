@@ -47,15 +47,18 @@ describe('tech tree screen', () => {
       openTreeOnPlanet(3)
       return shellMarkup()
     })
-    expect(html.match(/Coming soon/g)).toHaveLength(7)
+    expect(html.match(/Coming soon/g)).toHaveLength(9)
     expect(html).toContain('data-testid="tech-tree-lane-extraction"')
+    expect(html).toContain('data-testid="tech-tree-lane-armoury.bore_gun"')
+    expect(html).toContain('Armoury')
   })
 
   it('draws the registered nodes on their lanes, with the next-up strip', () => {
     withFixtureTree(() => {
       openTreeOnPlanet(3)
       const html = shellMarkup()
-      expect(html).not.toContain('Coming soon')
+      // Only the weapon lanes, which the #161 fixture has no node for, wait for their slices.
+      expect(html.match(/Coming soon/g)).toHaveLength(2)
       expect(html).toContain('data-testid="tech-tree-node-tech.sensing.echo_sounder"')
       expect(html).toContain('data-testid="tech-tree-next-up"')
     })

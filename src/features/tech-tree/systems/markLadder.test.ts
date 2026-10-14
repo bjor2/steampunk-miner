@@ -133,6 +133,18 @@ describe('tech tree: Mark ladder', () => {
   it('masters a ladder with no stats at once', () => {
     expect(lastMarkOf({ isIncomeItem: false })).toBe(1)
   })
+
+  it('runs a bespoke ladder to its own last Mark, stepping none of its stats (#310 long barrel)', () => {
+    const bespoke: MarkLadder = { isIncomeItem: true, cooldown: 30, lastMark: 11 }
+    expect(lastMarkOf(bespoke)).toBe(11)
+    expect(isMasteredAt(bespoke, 10)).toBe(false)
+    expect(markStepOf(bespoke, 11)).toEqual({
+      mark: 11,
+      stats: { cooldown: 30 },
+      stepped: null,
+      isMastered: true,
+    })
+  })
 })
 
 // Milestones (the GD lock on #256), with every pattern's verb authored so the class mapping alone
@@ -209,6 +221,13 @@ describe('tech tree: Mark milestones', () => {
   it('leaves out a pattern its lane has not authored a verb for yet', () => {
     const patterns = milestonesOf('charged', { hold: 'a longer burn' }).map((m) => m.pattern)
     expect(patterns).toEqual(['hold'])
+  })
+
+  it("files every Mark under its capability's lane and spend-guard family (#310 armoury)", () => {
+    const weapon = { ...CAPABILITY, lane: 'armoury.bore_gun' as const, familyId: 'armoury' }
+    const mark = markNodeOf(markBearerOf(weapon, ECHO_SOUNDER), 2)
+    expect([mark.lane, mark.familyId]).toEqual(['armoury.bore_gun', 'armoury'])
+    expect(markNodeOf(markBearerOf(CAPABILITY, ECHO_SOUNDER), 2).familyId).toBeUndefined()
   })
 
   it('puts milestone Marks on the existing ladder with no premium step', () => {

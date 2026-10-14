@@ -7,7 +7,7 @@
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import type { BandOreCost } from '../../../systems/economy/economyDefinition'
 import { fromSafeInteger, mul, powInt, type Money } from '../../../systems/money'
-import type { TechCostKind, TreeNode } from './techNode'
+import { laneBiasKeyOf, type TechCostKind, type TreeNode } from './techNode'
 import { registeredTechTree, treeNodeOf, type TechTree } from './techTree'
 import { TREE_ECONOMY, type TreeCosts } from './treeEconomy'
 
@@ -43,5 +43,5 @@ function kindCoefficientOf(kind: TechCostKind, costs: TreeCosts): Money {
 }
 
 function laneBiasOf(node: TreeNode, costs: TreeCosts): Money {
-  return costs.laneBias[node.lane] ?? fromSafeInteger(1)
+  return costs.laneBias[laneBiasKeyOf(node.lane)] ?? fromSafeInteger(1)
 }

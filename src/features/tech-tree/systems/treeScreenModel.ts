@@ -5,13 +5,14 @@
  * first node the player can research; search matches a node's name, item or flavour line; the
  * filters keep available, affordable, locked or Mark-ready nodes. Marks stay on their item's chip.
  * A node whose anchor row is still shut (`requiresFeature`, ticket 358) is not on the screen.
+ * Under the combos sits the Armoury group (#310, ticket 318), one lane per weapon.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { formatAmount } from '../../../systems/displayAmount'
 import { generatedComboAt, generatedComboPlanetsThrough } from './generatedCombos'
 import { cardContextOf, nodeCardOf, type NodeCardModel } from './nodeCardModel'
 import { treeNodeOf, unlockAllPlanetOf, type TechTree } from './techTree'
-import { TECH_LANES, type TechNodeLane, type TreeNode } from './techNode'
+import { ARMOURY_LANES, TECH_LANES, type TechNodeLane, type TreeNode } from './techNode'
 import { TREE_ECONOMY } from './treeEconomy'
 import { isAnchorUnlocked } from './unlockRules'
 
@@ -33,6 +34,8 @@ export interface PlacedNode extends NodeCardModel {
 export interface LaneModel {
   lane: TechNodeLane
   title: string
+  /** The heading of the group this lane opens, drawn above it; null inside a group. */
+  groupHeading: string | null
   /** No slice has registered a node for it yet. */
   isComingSoon: boolean
   nodes: readonly PlacedNode[]
@@ -48,7 +51,9 @@ export interface TreeScreenModel {
   nextUp: readonly NodeCardModel[]
 }
 
-export const SCREEN_LANES: readonly TechNodeLane[] = [...TECH_LANES, 'combo']
+export const SCREEN_LANES: readonly TechNodeLane[] = [...TECH_LANES, 'combo', ...ARMOURY_LANES]
+
+export const ARMOURY_GROUP_HEADING = 'Armoury'
 
 /** "Extractors", never "rig": the Guild calls the vehicle the rig (#161). */
 export const LANE_TITLES: Readonly<Record<TechNodeLane, string>> = {
@@ -59,6 +64,8 @@ export const LANE_TITLES: Readonly<Record<TechNodeLane, string>> = {
   'drill-gear': 'Drill gear',
   aetheric: 'Aetheric science',
   combo: 'Combos',
+  'armoury.bore_gun': 'Bore gun',
+  'armoury.auto_guns': 'Auto guns',
 }
 
 const RULER_MARK_EVERY = 5
@@ -140,9 +147,14 @@ function laneModelOf(
   return {
     lane,
     title: LANE_TITLES[lane],
+    groupHeading: groupHeadingOf(lane),
     isComingSoon: laneCards.length === 0,
     nodes: stackedOnPlanets(laneCards.filter((card) => isKeptByQuery(card, query))),
   }
+}
+
+function groupHeadingOf(lane: TechNodeLane): string | null {
+  return lane === ARMOURY_LANES[0] ? ARMOURY_GROUP_HEADING : null
 }
 
 function stackedOnPlanets(cards: readonly NodeCardModel[]): PlacedNode[] {

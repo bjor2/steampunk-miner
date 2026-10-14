@@ -3,7 +3,7 @@
  * for N >= 2, researchable from `markTier = unlockTier + M(N - 1)`, needing Mark N - 1 (the
  * capability itself for Mark 2). Its depth is the item's lane slot plus `min(N, markDepthCap)`,
  * so past Mark 10 its price grows only with the ore value. A ladder ends at mastery: no Mark
- * exists past it.
+ * exists past it. A Mark keeps its capability's lane and spend-guard family (#310: `armoury`).
  */
 import { lastMarkOf } from './markLadder'
 import type { MarkLadder, TreeNode } from './techNode'
@@ -57,6 +57,7 @@ export function markNodeOf(bearer: MarkBearer, mark: number): TreeNode {
     unlockTier: markTierOf(bearer, mark),
     prereqs: [mark === FIRST_MARK ? capability.id : markNodeIdOf(itemId, mark - 1)],
     unlocks: { itemId, mark },
+    ...(capability.familyId !== undefined && { familyId: capability.familyId }),
     iconId: capability.iconId,
     description: capability.description,
     label: 'both',

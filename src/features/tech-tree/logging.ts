@@ -6,7 +6,7 @@
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
-import { TECH_LANES } from './systems/techNode'
+import { ARMOURY_LANES, TECH_LANES } from './systems/techNode'
 import { TECH_NODE_REFUSALS } from './systems/unlockRules'
 
 export const TECH_TREE_PROJECTIONS: SliceEventProjections = {
@@ -27,7 +27,7 @@ export const TECH_TREE_RUN_EVENTS: SliceRunEvents = {
     level: 'core',
     payload: {
       nodeId: 'text',
-      lane: { oneOf: [...TECH_LANES, 'combo'] },
+      lane: { oneOf: [...TECH_LANES, 'combo', ...ARMOURY_LANES] },
       kind: { oneOf: ['capability', 'mark', 'combo'] },
       mark: 'integer',
       cost: 'money',

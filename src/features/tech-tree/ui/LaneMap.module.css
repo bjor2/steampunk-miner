@@ -57,6 +57,18 @@
   border-bottom: 1px dotted rgb(201 162 75 / 0.4);
 }
 
+.groupHeading {
+  position: sticky;
+  left: 0;
+  justify-self: start;
+  margin: var(--space-2) 0 0;
+  padding: 0 var(--space-1);
+  color: var(--color-amber);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .laneTitle {
   position: sticky;
   left: 0;

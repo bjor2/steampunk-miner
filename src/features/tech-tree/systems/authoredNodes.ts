@@ -31,6 +31,7 @@ export function authoredTreeNodeOf(node: TechNode, slots: ReadonlyMap<string, nu
     ...(node.requiresFeature !== undefined && { requiresFeature: node.requiresFeature }),
     ...(node.researchedAt !== undefined && { researchedAt: node.researchedAt }),
     unlocks: { itemId: node.unlocks, mark: 1 },
+    ...(node.familyId !== undefined && { familyId: node.familyId }),
     iconId: node.iconId,
     description: node.description,
     label: node.label,

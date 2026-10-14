@@ -7,6 +7,9 @@
  *
  * Mark 1 is the item as bought. Factors are `powInt` of the step (TD build rule on #161), rounded
  * to whole units before the floor or cap is applied, so a seed and version give the same ticks.
+ *
+ * A bespoke ladder (`lastMark`, the long barrel's range then hold on #310) is stepped by its own
+ * slice: the rotation leaves its stats as bought, and it is Mastered at its last Mark.
  */
 import { fromSafeInteger, mul, powInt, roundToWhole, toSafeInteger } from '../../../systems/money'
 import type { Money } from '../../../systems/money'
@@ -46,12 +49,12 @@ export function markStepOf(
   mark: number,
   absorb: MarkAbsorb = TREE_ECONOMY.markAbsorb,
 ): MarkStep {
-  const walk = walkLadder(ladder, mark - 1, absorb)
+  const walk = isBespoke(ladder) ? NO_STEPS : walkLadder(ladder, mark - 1, absorb)
   return {
     mark,
     stats: statsAfter(ladder, walk.counts, absorb),
     stepped: walk.stepped,
-    isMastered: isEveryStatCapped(ladder, walk.counts, absorb),
+    isMastered: isMasteredAt(ladder, mark, absorb),
   }
 }
 
@@ -60,6 +63,7 @@ export function isMasteredAt(
   mark: number,
   absorb: MarkAbsorb = TREE_ECONOMY.markAbsorb,
 ): boolean {
+  if (ladder.lastMark !== undefined) return mark >= ladder.lastMark
   return isEveryStatCapped(ladder, walkLadder(ladder, mark - 1, absorb).counts, absorb)
 }
 
@@ -68,6 +72,7 @@ export function lastMarkOf(
   ladder: MarkLadder,
   absorb: MarkAbsorb = TREE_ECONOMY.markAbsorb,
 ): number {
+  if (ladder.lastMark !== undefined) return ladder.lastMark
   let walk = NO_STEPS
   let mark = 1
   for (let next = nextStatToStep(ladder, walk, absorb); next !== null; mark += 1) {
@@ -75,6 +80,10 @@ export function lastMarkOf(
     next = nextStatToStep(ladder, walk, absorb)
   }
   return mark
+}
+
+function isBespoke(ladder: MarkLadder): boolean {
+  return ladder.lastMark !== undefined
 }
 
 /** The step counts after `steps` Marks of rotation; it stops early once everything is capped. */

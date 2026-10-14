@@ -6,6 +6,7 @@ import { TREE_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { markNodeIdOf } from './markNodes'
 import { nodeCost, nodeOreCostOf } from './nodeCost'
 import { registeredTechTree, treeNodeOf, type TechTree } from './techTree'
+import { TREE_ECONOMY } from './treeEconomy'
 import type { TechCostKind, TreeNode } from './techNode'
 
 // Spec #161 section 3, final: k_kind, g and the band, written out here so the table checks the
@@ -103,6 +104,24 @@ describe('tech tree: node cost', () => {
       expect(unitsOf(14)).toEqual(unitsOf(10))
       expect(unitsOf(18)).toEqual(unitsOf(10))
       expect(cmp(unitsOf(10).oreUnits, unitsOf(9).oreUnits)).toBe(1)
+    })
+  })
+
+  it("prices an armoury lane by its weapon's own laneBias key, 1 on day one (#310)", () => {
+    withFixtureTree((tree) => {
+      const node = {
+        ...nodeOf(tree, 'tech.sensing.echo_sounder'),
+        lane: 'armoury.bore_gun' as const,
+      }
+      const doubled = { ...TREE_ECONOMY.costs, laneBias: { bore_gun: fromCanonical('2') } }
+      expect(TREE_ECONOMY.costs.laneBias).toEqual({
+        bore_gun: fromCanonical('1'),
+        auto_guns: fromCanonical('1'),
+      })
+      expect(nodeOreCostOf(node).oreUnits).toEqual(specOreUnitsOf(node))
+      expect(nodeOreCostOf(node, doubled).oreUnits).toEqual(
+        mul(specOreUnitsOf(node), fromCanonical('2')),
+      )
     })
   })
 })

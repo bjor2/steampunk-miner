@@ -7,7 +7,6 @@
 import { createFieldReader, type FieldReader } from '../../../systems/economy/economyFieldReader'
 import type { Money } from '../../../systems/money'
 import TREE_ECONOMY_FILE from '../tech-tree.economy.json'
-import type { TechNodeLane } from './techNode'
 
 export interface TreeCosts {
   /** The ore band a node is priced in. */
@@ -20,8 +19,11 @@ export interface TreeCosts {
   g: Money
   /** A Mark's depth stops growing here; past it the price grows only with the ore value. */
   markDepthCap: number
-  /** `b_lane`, the branch knob: 1 for a lane not listed. */
-  laneBias: Readonly<Partial<Record<TechNodeLane, Money>>>
+  /**
+   * `b_lane`, the branch knob, by `laneBiasKeyOf` (an armoury lane by its weapon, `bore_gun`): 1 for
+   * a lane not listed.
+   */
+  laneBias: Readonly<Record<string, Money>>
 }
 
 /** Floor and cap of the Mark rotation, as fractions of the item's Mark 1 value. */

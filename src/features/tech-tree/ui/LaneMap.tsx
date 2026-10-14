@@ -1,6 +1,7 @@
 /**
  * The campaign overview (#161 section 4, zoom 1): every lane as a strip of icons on the planet
- * ruler, so a node's place says when and its lane what kind; dashed combos sit on their own row.
+ * ruler, so a node's place says when and its lane what kind; dashed combos sit on their own row,
+ * and the Armoury group's weapon lanes under its heading.
  * Drag or the arrow keys pan it. On a narrow screen it becomes the shown lane's list.
  */
 import type { LaneModel, TreeScreenModel } from '../systems/treeScreenModel'
@@ -59,6 +60,7 @@ function LaneStrip({ lane }: { lane: LaneModel }) {
       data-testid={`tech-tree-lane-${lane.lane}`}
       data-shown-tab={isShownTab}
     >
+      {lane.groupHeading !== null && <h3 className={styles.groupHeading}>{lane.groupHeading}</h3>}
       <button type="button" className={styles.laneTitle} onClick={() => focusLane(lane.lane)}>
         {lane.title}
       </button>
