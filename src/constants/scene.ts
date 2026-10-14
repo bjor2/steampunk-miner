@@ -166,9 +166,11 @@ export const MAX_PLATFORM_PARTS = 48
  * platform 48, post 6) and one co-op vehicle's 30; a pooled `InstancedMesh` counts as one. 1024
  * instances, about 10x #145a's debris pool, held until a measurement; the GD ruling on #293 raised
  * it by 64 to 1088 for the magnetic field lines (63 arcs), its first measured raise: the slice bench
- * in `npm run bench:render` (`fieldArcsFrame`), its numbers recorded on #213.
+ * in `npm run bench:render` (`fieldArcsFrame`), its numbers recorded on #213. The GD and TD rulings
+ * on #286 raised it by 40 to 1128 for the terrain magnets' field outlines (40 pieces), its second
+ * measured raise: the slice bench `magnetFieldsFrame` in the same run, recorded on #213.
  */
-export const SCENE_LAYER_LINE = { drawCalls: 27, instances: 1088 } as const
+export const SCENE_LAYER_LINE = { drawCalls: 27, instances: 1128 } as const
 
 /** At most this many live ground colliders (#4, #22 acceptance, #36 acceptance 7). */
 export const MAX_GROUND_COLLIDERS = 600

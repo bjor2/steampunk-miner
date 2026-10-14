@@ -12,8 +12,8 @@ import { planetParamsFor } from '../../systems/world/planetParams'
 import { slice } from './register'
 
 // The field lines as the GD ruling on #293 Q1 sizes them: one LineSegments, one draw call, at most
-// 63 arcs, inside #213's line once it is raised by 64 to 1088; the aurora on the kernel's sky band,
-// outside that line.
+// 63 arcs, inside #213's line once it is raised by 64 to 1088 (since #286's raise, 1128); the
+// aurora on the kernel's sky band, outside that line.
 
 const RULED_MOST_ARCS = 63
 const RAISED_LINE_INSTANCES = 1088
@@ -26,7 +26,7 @@ describe('planet-mix scene layer', () => {
   })
 
   it('fits the line, raised to 1088 for it, with every loaded slice’s layers', () => {
-    expect(SCENE_LAYER_LINE.instances).toBe(RAISED_LINE_INSTANCES)
+    expect(SCENE_LAYER_LINE.instances).toBeGreaterThanOrEqual(RAISED_LINE_INSTANCES)
     expect(isWithinSceneLayerLine(sceneLayers())).toBe(true)
     expect(sceneLayers().map((layer) => layer.id)).toContain('planet-mix.field-lines')
     expect(sceneLayerLineUseOf(sceneLayers()).instances).toBeGreaterThan(1024)

@@ -9,15 +9,19 @@
  * the kernel's magnet shift and metal enemies one cell out, and logs `magnet_used`. The lode clamp
  * (ticket 285) is held from its slot: its field braces the collapse blocks round the cells it pins
  * through the kernel's `collapseBraces` seam, draws the drill's rate a tick in its clock step, and
- * ends on release, at its length or on a dry tank.
+ * ends on release, at its length or on a dry tank. The three verbs' fields show as brass outlines
+ * on a scene layer of their own (ticket 286): the beacon's converging arcs, the coil's ring and
+ * flares, the clamp's lattice.
  * Stabiliser foam, the cryo binder, shoring props and the strata press stay vision rows
  * (`systems/shippedTools.ts`). No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { terrainToolsDebugActions } from './debug'
 import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
+import { MAGNET_FIELD_LAYER_ID, MagnetFieldLayer } from './scene/MagnetFieldLayer'
 import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
 import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
+import { MAGNET_FIELD_LAYER_BUDGET } from './systems/render/magnetFieldBudget'
 import {
   TERRAIN_ITEM_CARDS,
   TERRAIN_TECH_NODES,
@@ -40,10 +44,15 @@ export const slice: SliceDefinition = {
     r.liveBeacon(LIVE_LODESTONE_PROVIDER)
     r.clockStep(HOLD_LODE_CLAMPS_STEP)
     r.collapseBrace(LODE_CLAMP_BRACES)
+    r.sceneLayer({
+      id: MAGNET_FIELD_LAYER_ID,
+      Layer: MagnetFieldLayer,
+      budget: MAGNET_FIELD_LAYER_BUDGET,
+    })
     r.eventProjections(TERRAIN_PROJECTIONS)
     r.runEvents(TERRAIN_RUN_EVENTS)
     // steampunkDebug.features['terrain-tools'].getBeacon() / .getClampLattice()
-    //   / .statPreview(itemId, mark, planet)
+    //   / .statPreview(itemId, mark, planet) / .getMagnetFields()
     r.debugActions(terrainToolsDebugActions)
   },
 }

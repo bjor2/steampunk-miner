@@ -38,8 +38,8 @@ describe('scene layer budget', () => {
     expect(isWithinLineWith([])).toBe(true)
   })
 
-  it('keeps the line at 27 calls and 1088 pieces, the kernel spray holding one call and 96 of them', () => {
-    expect(SCENE_LAYER_LINE).toEqual({ drawCalls: 27, instances: 1088 })
+  it('keeps the line at 27 calls and 1128 pieces, the kernel spray holding one call and 96 of them', () => {
+    expect(SCENE_LAYER_LINE).toEqual({ drawCalls: 27, instances: 1128 })
     expect(KERNEL_SCENE_LAYER_BUDGET).toEqual({ drawCalls: 1, instances: 96 })
   })
 

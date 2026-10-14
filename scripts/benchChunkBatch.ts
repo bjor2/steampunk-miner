@@ -6,7 +6,8 @@
  * planets with the gate channel's provider registered and with none (ticket 298,
  * `bench/gateChannelRebuild.ts`), then the overlay's frame cost (#208, `bench/overlayFrame.ts`),
  * then the magnetic field lines' frame cost before and after their layer on P43 (#293,
- * `bench/fieldArcsFrame.ts`), then the terrain's streaming frame at 120 m/s on P10 (ticket 336,
+ * `bench/fieldArcsFrame.ts`), then the terrain magnets' field outlines on the same descent (#286,
+ * `bench/magnetFieldsFrame.ts`), then the terrain's streaming frame at 120 m/s on P10 (ticket 336,
  * `bench/streamAtSpeed.ts`), then its main-thread part at 480 m/s with the chunk worker (ticket
  * 337, `bench/streamThroughWorker.ts`).
  * With `-- --log` it also writes `benchmark_result` lines to `logs/<runId>/events.ndjson` (#124).
@@ -25,6 +26,7 @@ import {
 import { logBenchmarkSeriesWhenAsked } from './bench/benchRunLog'
 import { benchFieldArcsFrame } from './bench/fieldArcsFrame'
 import { benchGateChannelRebuild } from './bench/gateChannelRebuild'
+import { benchMagnetFieldsFrame } from './bench/magnetFieldsFrame'
 import { benchOverlayFrame } from './bench/overlayFrame'
 import { benchStreamAtSpeed } from './bench/streamAtSpeed'
 import { benchStreamThroughWorker } from './bench/streamThroughWorker'
@@ -88,6 +90,7 @@ logBenchmarkSeriesWhenAsked('render', [
   ...benchGateChannelRebuild(WORLD_SEED),
   benchOverlayFrame(),
   ...benchFieldArcsFrame(WORLD_SEED),
+  ...benchMagnetFieldsFrame(WORLD_SEED),
   ...benchStreamAtSpeed(WORLD_SEED),
   ...benchStreamThroughWorker(WORLD_SEED),
 ])
