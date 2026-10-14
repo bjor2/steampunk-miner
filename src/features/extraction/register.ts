@@ -6,14 +6,15 @@
  * `extraction` section holding the trip counter every income item shares, the dock reset of that
  * counter, the `drain_yield` line, the income row of the reports and the drain's sale at the
  * Upgrade bay; with it the lane's tree nodes, the five extractors' and the drain's, and the trip
- * cap as the kernel's income-cap clamp (ticket 384). The slurry siphon and its node stay held (see
- * `systems/extractionContent.ts`). The lane's P16 fork (ticket 269) registers its Prospector
- * branch; the Hauler, an income mover, stays unregistered until the 15% income-cap check (#385)
- * merges (`systems/extractionFork.ts`).
+ * cap as the kernel's income-cap clamp (ticket 384) and the drain's rate for the 15% check (#385).
+ * The slurry siphon and its node stay held (see `systems/extractionContent.ts`). The lane's P16 fork
+ * (ticket 269) registers its Prospector branch; the Hauler, an income mover, stays unregistered until
+ * the 15% income-cap check (#385) merges (`systems/extractionFork.ts`).
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { extractionDebugActions } from './debug'
 import { incomeReportRows } from './incomeReportRows'
+import { DRAIN_INCOME_RATE } from './systems/drainIncomeRate'
 import { EXTRACTION_PROJECTIONS, EXTRACTION_RUN_EVENTS } from './logging'
 import {
   EXTRACTION_ITEM_CARDS,
@@ -42,6 +43,7 @@ export const slice: SliceDefinition = {
     r.runEvents(EXTRACTION_RUN_EVENTS)
     r.reportRows(incomeReportRows)
     r.tripCapSource(EXTRACTION_TRIP_CAP_SOURCE)
+    r.incomeRate(DRAIN_INCOME_RATE)
     // steampunkDebug.features.extraction.getTrip() / .statPreview(itemId, mark, planet)
     r.debugActions(extractionDebugActions)
   },

@@ -31,7 +31,9 @@ const FLOOD: SliceDefinition = {
 
 describe('extraction trip cap source', () => {
   it('clamps a registered income rate to the trip cap of the planet, band and hold', () => {
-    const rows = withRegistrations([slice, FLOOD], () => incomeCapRowsOf(AT, () => true))
+    const rows = withRegistrations([slice, FLOOD], () =>
+      incomeCapRowsOf(AT, (rowId) => rowId === 'side_drills'),
+    )
     const cap = tripCapAt(AT.planetIndex, AT.band, AT.cargoCapacity)
     expect(rows.map((row) => toCanonical(row.valuePerMinute))).toEqual([toCanonical(cap)])
   })
