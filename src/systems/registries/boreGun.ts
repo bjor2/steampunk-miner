@@ -62,7 +62,10 @@ export interface BoreAutoShootStats {
  * turn spends the one `boreBudgetTicks`, so a shape only redistributes the shot's cells.
  */
 export interface ShotShape {
-  /** Extra lines as bearing offsets from the aimed bearing, in `boreBearings.json` steps; the aimed line is implicit. */
+  /**
+   * Extra lines as bearing offsets from the aimed bearing, in `boreBearings.json` steps; the aimed
+   * line is implicit.
+   */
   lineOffsets: readonly number[]
   /** Same-ore seam turns each line may take after its first ore cell. */
   seamTurns: number
@@ -82,7 +85,10 @@ export interface BoreGunProvider {
   boreGunOf(state: AuthorityState, playerId: string): BoreGunStats | null
   /** The sear's numbers for this player, or null (or left out) when auto mode has none. */
   autoShootOf?(state: AuthorityState, playerId: string): BoreAutoShootStats | null
-  /** The shape this player's next shot bores, folded over its modules; null (or left out) for one line. */
+  /**
+   * The shape this player's next shot bores, folded over its modules; null (or left out) for one
+   * line. Read once per shot, as it fires.
+   */
   shotShapeOf?(state: AuthorityState, playerId: string): ShotShape | null
   /**
    * The debug command that mounts the gun with every track at its wall, free (the slice's

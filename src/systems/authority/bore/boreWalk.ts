@@ -131,7 +131,7 @@ const NEIGHBOUR_STEPS: readonly IntegerVector[] = [
   { x: 0, y: -1 },
 ]
 
-/** The 4-neighbour steps that never go back against `direction`, most forward first, ties in table order. */
+/** The 4-neighbour steps not against `direction`, most forward first, ties in table order. */
 function jogStepsAlong(direction: IntegerVector): IntegerVector[] {
   return NEIGHBOUR_STEPS.filter((step) => dotOf(step, direction) >= 0).sort(
     (a, b) => dotOf(b, direction) - dotOf(a, direction),
