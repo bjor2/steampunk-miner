@@ -5,7 +5,8 @@
  * ends at the first solid cell above the miner, and drilling that cell does not start it again. A heat sink window stays until the gauge has settled
  * past it (its vent lands only then); it never wakes the clock. With nothing running it names no
  * tick, so a quiet clock never stops for it. The tick a steam shield's curtain comes down, its
- * Mark 9 link fires (`shieldBreak.ts`), and the milestone verbs' pushes clear as they end.
+ * Mark 9 link fires (`shieldBreak.ts`), and the milestone verbs' pushes and the Belay Line's
+ * standing line clear as they end.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { chainEffects, unchanged, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -14,6 +15,7 @@ import {
   mobilityOf,
   unsettledHeatSinksOf,
   withMobility,
+  type BelayLine,
   type MobilityState,
 } from './mobilitySection'
 import { moveEndsOf, withEndedMovesCleared } from './milestoneMoves'
@@ -50,6 +52,7 @@ function windowEndsOf(value: MobilityState): number[] {
     value.smoke?.untilTick,
     value.ballastUntilTick,
     value.shieldUntilTick,
+    value.belay?.untilTick,
     ...moveEndsOf(value),
   ].filter((tick): tick is number => tick !== undefined && tick > 0)
 }
@@ -87,7 +90,7 @@ function withEndedWindowsCleared(
 
 function clearedWindowsOf(value: MobilityState, tick: number, settledTick: number): MobilityState {
   return {
-    ...withEndedMovesCleared(value, tick),
+    ...withEndedBelayCleared(withEndedMovesCleared(value, tick), tick),
     reel: runningOrNull(value.reel, tick),
     boost: runningOrNull(value.boost, tick),
     escape: runningOrNull(value.escape, tick),
@@ -96,6 +99,16 @@ function clearedWindowsOf(value: MobilityState, tick: number, settledTick: numbe
     shieldUntilTick: tick < value.shieldUntilTick ? value.shieldUntilTick : 0,
     heatSinks: unsettledHeatSinksOf(value, settledTick),
   }
+}
+
+/** The Belay Line's planted hook goes once its window ends, leaving the field absent. */
+function withEndedBelayCleared(value: MobilityState, tick: number): MobilityState {
+  const { belay, ...withoutBelay } = value
+  return isStanding(belay, tick) ? value : withoutBelay
+}
+
+function isStanding(belay: BelayLine | undefined, tick: number): boolean {
+  return belay !== undefined && tick < belay.untilTick
 }
 
 function runningOrNull<T extends { untilTick: number }>(window: T | null, tick: number): T | null {

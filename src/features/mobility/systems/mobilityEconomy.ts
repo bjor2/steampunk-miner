@@ -41,6 +41,15 @@ export interface GrappleNumbers {
   reelTicksMax: number
 }
 
+/**
+ * The Belay Line twist (#162 twist row, ticket 329): how long a planted line stands, and the fall
+ * it catches, faster than any cut down (the 24-tick drill floor cuts at 2.5 m/s).
+ */
+export interface BelayNumbers {
+  windowTicks: number
+  catchSpeedMmPerS: number
+}
+
 export interface BallastNumbers {
   stack: number
   windupTicks: number
@@ -131,6 +140,7 @@ export interface MilestoneNumbers {
 export interface MobilityEconomy {
   prices: MobilityPrices
   grapple: GrappleNumbers
+  belay: BelayNumbers
   ballast: BallastNumbers
   heatSink: HeatSinkNumbers
   steamBoost: SteamBoostNumbers
@@ -166,6 +176,7 @@ export function readMobilityEconomy(
       'reelHoldTicks',
       'reelTicksMax',
     ]),
+    belay: integers('belay', ['windowTicks', 'catchSpeedMmPerS']),
     ballast: integers('ballast', ['stack', 'windupTicks', 'windowTicks', 'massShareBp']),
     heatSink: integers('heatSink', ['stack', 'windupTicks', 'pauseTicks', 'ventBp', 'gainBp']),
     steamBoost: integers('steamBoost', [

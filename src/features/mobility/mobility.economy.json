@@ -1,5 +1,5 @@
 {
-  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): prices 4.1, charged items 4.2, consumables 4.3, toggle draw 4.4; the G&V feel pass (grapple aim) and the GD lock and G&V comment on #204 (rivet patch); milestones are ticket 275's readings of the GD lock on #256 (a kick at the boost's speed share, half a second; a pin, rise or drift of a second at the +2000 bp cap; the shield's cooling at half heat gain; a linked ballast's lift and smoke puff's reach at the lock's half). Times are 60 Hz ticks, shares basis points, draws thousandths of energyMax a second.",
+  "source": "Spec #162 section 4 (Systems & Economy, locked 6 Oct 2026): prices 4.1, charged items 4.2, consumables 4.3, toggle draw 4.4; the G&V feel pass (grapple aim) and the GD lock and G&V comment on #204 (rivet patch); milestones are ticket 275's readings of the GD lock on #256 (a kick at the boost's speed share, half a second; a pin, rise or drift of a second at the +2000 bp cap; the shield's cooling at half heat gain; a linked ballast's lift and smoke puff's reach at the lock's half); the Belay Line twist's standing line and its catch are ticket 329's readings of the #162 twist row (a minute's line; a fall faster than the 24-tick drill floor's 2.5 m/s cut, so a cut down is never caught). Times are 60 Hz ticks, shares basis points, draws thousandths of energyMax a second.",
   "mobility": {
     "prices": {
       "band": 5,
@@ -14,6 +14,10 @@
       "aimConeTanPerMille": 364,
       "reelHoldTicks": 30,
       "reelTicksMax": 240
+    },
+    "belay": {
+      "windowTicks": 3600,
+      "catchSpeedMmPerS": 4000
     },
     "ballast": {
       "stack": 2,

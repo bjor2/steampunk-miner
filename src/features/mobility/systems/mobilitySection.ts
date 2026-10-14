@@ -6,7 +6,8 @@
  * the section goes back to its initial value (out of the state and the digest) once nothing runs.
  *
  * The Mark milestone verbs (ticket 275, the GD lock on #256) add optional fields, each absent until
- * a verb sets it, so a run without milestone Marks keeps the section and its digest as before.
+ * a verb sets it, so a run without milestone Marks keeps the section and its digest as before; the
+ * Belay Line twist's planted hook (ticket 329) is one more.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { isJsonObject, isWholeNumber } from '../../../systems/authority/payloadFields'
@@ -27,6 +28,18 @@ export interface ReelWindow {
   untilTick: number
   /** The hold's faster reel (Mark 6): the drive boost the winch hauls at; absent at normal speed. */
   driveBp?: number
+}
+
+/**
+ * The Belay Line twist's standing line (ticket 329): the hook planted on `planetIndex`, the reach
+ * within which it catches a fall, in whole tiles, until `untilTick`.
+ */
+export interface BelayLine {
+  hookTx: number
+  hookTy: number
+  planetIndex: number
+  reachTiles: number
+  untilTick: number
 }
 
 /** A burst along a world direction (any length but zero), until `untilTick`. */
@@ -90,6 +103,8 @@ export interface MobilityState {
   ballastGainBp?: number
   /** The milestone verbs' pushes still running; absent with none. */
   moves?: readonly MoveWindow[]
+  /** The Belay Line's planted hook; absent with none, so a run without the twist saves as before. */
+  belay?: BelayLine
 }
 
 export const NO_MOBILITY_EFFECTS: MobilityState = {
@@ -168,7 +183,13 @@ function optionalFieldProblems(body: Record<string, unknown>): string[] {
     ...optionalIntegerProblems('patch.plateShareBp', fieldOf(body.patch, 'plateShareBp')),
     ...optionalIntegerProblems('ballastGainBp', body.ballastGainBp),
     ...moveProblems(body.moves),
+    ...belayProblems(body.belay),
   ]
+}
+
+function belayProblems(value: unknown): string[] {
+  if (value === undefined || hasIntegerFields(value, BELAY_FIELDS)) return []
+  return [`mobility.belay must be absent or {${BELAY_FIELDS.join(', ')}} integers`]
 }
 
 function fieldOf(value: unknown, field: string): unknown {
@@ -212,6 +233,7 @@ const BURST_FIELDS = ['dirX', 'dirY', 'speedMmPerS', 'untilTick'] as const
 const SMOKE_FIELDS = ['x', 'y', 'untilTick'] as const
 const HEAT_SINK_FIELDS = ['fromTick', 'untilTick', 'ventBp', 'gainBp'] as const
 const MOVE_BURST_FIELDS = ['dirX', 'dirY', 'speedMmPerS'] as const
+const BELAY_FIELDS = ['hookTx', 'hookTy', 'planetIndex', 'reachTiles', 'untilTick'] as const
 
 function nullableProblems(name: string, value: unknown, fields: readonly string[]): string[] {
   if (value === null || hasIntegerFields(value, fields)) return []

@@ -6,11 +6,13 @@
  * 233's seams, kept in the `mobility` section and cleared on the authority clock, and the rivet
  * patch's hold cues (ticket 253), and their Mark milestone verbs (ticket 275), and the steam
  * shield acting on its own through the `autoFire` hook on #317's auto core, switched with the
- * sear's toggle (ticket 328). No side effects at import; the loader calls `register`.
+ * sear's toggle (ticket 328), and the Belay Line twist's standing line through the kernel `twist`
+ * hook (ticket 329). No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { mobilityDebugActions } from './debug'
 import { MOBILITY_PROJECTIONS, MOBILITY_RUN_EVENTS } from './logging'
+import { BELAY_MOTION } from './systems/belayLine'
 import { MOBILITY_EFFECTS_STEP } from './systems/effectClock'
 import { MOBILITY_ITEM_CARDS } from './systems/itemCards'
 import { MILESTONE_MOTION } from './systems/milestoneMoves'
@@ -45,6 +47,7 @@ export const slice: SliceDefinition = {
     ;[
       ANCHOR_MOTION,
       BALLAST_MOTION,
+      BELAY_MOTION,
       BOOST_MOTION,
       BUOYANCY_MOTION,
       ESCAPE_MOTION,

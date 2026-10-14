@@ -23,6 +23,7 @@ import {
 } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
+import { belayLineOf, isGrappleTwisted } from './belayLine'
 import { grappleHookOf, type GrappleHook } from './grappleHook'
 import { grappleHookedOf, NO_HOOK } from './mobilityEvents'
 import { MOBILITY_ECONOMY, type BurstNumbers } from './mobilityEconomy'
@@ -44,7 +45,10 @@ const NUMBERS = MOBILITY_ECONOMY
 
 export type Activate = (state: AuthorityState, use: PowerUpUse) => PowerUpOutcome
 
-/** Fire at a wall or ceiling in range and reel the miner to it. */
+/**
+ * Fire at a wall or ceiling in range and reel the miner to it; with the Belay Line held, plant a
+ * standing line there instead, moving the one already planted (`belayLine.ts`).
+ */
 export const fireGrapple: Activate = (state, use) => fireGrappleShot(state, use, PLAIN_SHOT)
 
 /**
@@ -68,10 +72,32 @@ export function fireGrappleShot(
   const reach = { ...NUMBERS.grapple, rangeTiles: magnitudeOf(use, NUMBERS.grapple.rangeTiles) }
   const hook = grappleHookOf(state, pose, reach, shot.pastTile)
   if (hook === null) return { kind: 'refused', reason: NO_HOOK }
-  const reel = reelOf(state, use, hook, shot.reelDriveBp)
-  return actedWith(state, use, (value) => ({ ...value, reel }), [
-    grappleHookedOf(use.playerId, hook.hook, hook.to),
-  ])
+  const winch = isGrappleTwisted(state, use, reach.rangeTiles)
+    ? withBelayPlanted(state, use, hook, reach.rangeTiles)
+    : withReelRunning(state, use, hook, shot.reelDriveBp)
+  return actedWith(state, use, winch, [grappleHookedOf(use.playerId, hook.hook, hook.to)])
+}
+
+/** The winch reels the miner to the hook. */
+function withReelRunning(
+  state: AuthorityState,
+  use: PowerUpUse,
+  hook: GrappleHook,
+  driveBp: number | undefined,
+): (value: MobilityState) => MobilityState {
+  const reel = reelOf(state, use, hook, driveBp)
+  return (value) => ({ ...value, reel })
+}
+
+/** The Belay Line held: the hook stays planted as the one standing line. */
+function withBelayPlanted(
+  state: AuthorityState,
+  use: PowerUpUse,
+  hook: GrappleHook,
+  rangeTiles: number,
+): (value: MobilityState) => MobilityState {
+  const belay = belayLineOf(state, use, hook, rangeTiles)
+  return (value) => ({ ...value, belay })
 }
 
 /** Lighter for a short time, so thrust climbs even on low energy. */
