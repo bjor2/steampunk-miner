@@ -247,4 +247,4 @@ re-sends a heartbeat every 10 minutes while a session runs, and publishes a full
 
 ## Priority list (14 Oct 2026)
 
-`PRIORITY_TICKETS` in `next-ticket.sh` now starts `393 397 396 395 398`: #393 (new player vehicle, casing driller art), #397 and #396, #395 (upgrade workshop building art), then #398 (service station art: charge, repair and sell). The next free dev slot claims them in that order.
+`PRIORITY_TICKETS` in `next-ticket.sh` now starts `396 402 405 406 403 404 407 399 400 397 395 398`: #396 (drill law), then the save/load set from spec #401 (#402 slots + v2 format, #405 round-trip test, #406 save size/load time, then #403 title menu, #404 pause-menu save, #407 co-op ownership), then the cut-follow chain (#399, #400, #397), then the art tickets #395 (workshop) and #398 (service station). #393 has closed. The next free dev slot claims them in that order, skipping blocked tickets.
