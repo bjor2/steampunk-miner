@@ -4,6 +4,7 @@ import { createFieldReader } from './economyFieldReader'
 import {
   aheadEnergyShareOf,
   foldDrillGear,
+  isAheadBearingAllowed,
   readDrillGearCaps,
   type DrillGearAsk,
 } from './drillGearCaps'
@@ -53,6 +54,7 @@ describe('drill gear caps', () => {
       sideSeed: { x: 0, y: 0 },
       sideEnergyShareBp: 12000,
       diagonalEnergyShareBp: 10000,
+      extraBearings: new Set(),
     })
   })
 
@@ -154,6 +156,15 @@ describe('drill gear caps', () => {
       expect(gear.sideCells).toBe(widest)
       expect(gear.offSideCells).toBeLessThanOrEqual(gear.sideCells)
     }
+  })
+
+  it('allows an extra bearing when any ask lets it, and adds no cell for bearings alone', () => {
+    const twinBit = { aheadCells: 1, aheadAim: 'drive' } as const
+    expect(foldDrillGear([{ extraBearings: ['up'] }], CAPS)).toBeNull()
+    expect(isAheadBearingAllowed(foldDrillGear([twinBit], CAPS)!, 'up')).toBe(false)
+    const anchored = foldDrillGear([twinBit, { extraBearings: ['up'] }], CAPS)!
+    expect(isAheadBearingAllowed(anchored, 'up')).toBe(true)
+    expect(anchored.aheadCells).toBe(1)
   })
 
   it('refuses a side share floor under a whole share and a negative ahead cap', () => {

@@ -12,6 +12,12 @@
  * gear cuts ahead only on a diagonal: with no side pushed the twin bit cuts as the bare drill (TD
  * lock on #280), and only facing-aimed gear (the reach boom) cuts past the bit along the facing.
  *
+ * Gear may allow the up-diagonal (TD lock on #288, ticket 372): facing up, lifting with a side
+ * pushed, the latch turns the ahead cell 45 degrees up toward that side. The diagonal crosses the
+ * ceiling cell along the facing on its way to the cell it cuts, so both must pass: a standing
+ * cell on either that the drill may not remove refuses the turn, and the cut stays along the
+ * facing. A gated ceiling is never opened sideways. One latch per cut, no new per-tick loop.
+ *
  * The side cutters' Mark 3 hold (TD lock on #276) aims the side cells by the drive: the read
  * latches the faced side per cell (`facedSide.ts`), cuts that side's cells and only the both-sided
  * asks' on the other, and hands the latch back for the vehicle to keep. Each side cell still runs
@@ -27,9 +33,20 @@
  * charged.
  */
 import { BASIS_POINTS } from '../../constants/balance'
-import { aheadEnergyShareOf, type AheadBearing, type DrillGear } from '../economy/drillGearCaps'
+import {
+  aheadEnergyShareOf,
+  isAheadBearingAllowed,
+  type AheadBearing,
+  type DrillGear,
+} from '../economy/drillGearCaps'
 import { drillGearOf } from '../registries/drillGear'
-import { latchAheadBearing, type AheadLatch, type DrillBit } from '../vehicle/aheadBearingLatch'
+import {
+  extraBearingOf,
+  latchAheadBearing,
+  type AheadLatch,
+  type AheadLatchRules,
+  type DrillBit,
+} from '../vehicle/aheadBearingLatch'
 import { drillGearCellsAt } from '../vehicle/drillGearCells'
 import { latchFacedSide, type SideLatch } from '../vehicle/facedSide'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
@@ -43,7 +60,7 @@ import {
 import type { PlanetParams } from '../world/planetParams'
 import type { DiscStamp } from '../world/stampShape'
 import type { TilePoint } from '../world/tileGrid'
-import { isRemovableCell } from '../world/worldCell'
+import { isRemovableCell, isSolidCell } from '../world/worldCell'
 import { isTileYielded, materialCellAt, type WorldState } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import type { DrillGates } from './drillGates'
@@ -119,7 +136,9 @@ export function drillGearReadAt(
   if (gear === null) return null
   const canMine = (tile: TilePoint) => isMineableCell(state.world, params, gates, tile)
   const isUncut = (tile: TilePoint) => canMine(tile) && !isTileYielded(state.world, tile)
-  const aheadLatch = aheadLatchOf(state, playerId, gear, bit, isUncut)
+  const isStanding = (tile: TilePoint) => isStandingCell(state.world, params, tile)
+  const crossing = { isMineable: canMine, isStanding }
+  const aheadLatch = aheadLatchOf(state, playerId, gear, bit, { isUncut, crossing })
   const aheadBearing = aheadLatch?.bearing ?? 'facing'
   const aheadCells = aheadCellsOn(gear, aheadBearing)
   const sideLatch = sideLatchOf(state, playerId, gear, bit, isUncut)
@@ -141,16 +160,49 @@ function aheadCellsOn(gear: DrillGear, bearing: AheadBearing): number {
   return bearing === 'facing' ? gear.facingAheadCells : gear.aheadCells
 }
 
-/** The bearing latched for this cut when the drive aims the ahead cells; else none. */
+/** How the cells an extra bearing crosses are judged: open ground, or ground the drill may cut. */
+interface CrossingRules {
+  isMineable: (tile: TilePoint) => boolean
+  isStanding: (tile: TilePoint) => boolean
+}
+
+interface AheadLatchReads {
+  isUncut: (tile: TilePoint) => boolean
+  crossing: CrossingRules
+}
+
+/**
+ * The bearing latched for this cut when the drive aims the ahead cells; else none. An extra
+ * bearing whose crossed cells refuse it gives way to the facing's latch.
+ */
 function aheadLatchOf(
   state: AuthorityState,
   playerId: string,
   gear: DrillGear,
   bit: DrillBit,
-  isUncut: (tile: TilePoint) => boolean,
+  reads: AheadLatchReads,
 ): AheadLatch | null {
   if (gear.aheadAim !== 'drive' || gear.aheadCells === 0) return null
-  return latchAheadBearing(vehicleOf(state, playerId).aheadLatch ?? null, bit, isUncut)
+  const rules: AheadLatchRules = {
+    isUncut: reads.isUncut,
+    allows: (bearing) => isAheadBearingAllowed(gear, bearing),
+  }
+  const latch = latchAheadBearing(vehicleOf(state, playerId).aheadLatch ?? null, bit, rules)
+  if (isCrossingClear(bit, latch, reads.crossing)) return latch
+  return latchAheadBearing(null, bit, { ...rules, allows: () => false })
+}
+
+/** Every cell an extra bearing's diagonal crosses is open or one the drill may cut; else refused. */
+function isCrossingClear(bit: DrillBit, latch: AheadLatch, crossing: CrossingRules): boolean {
+  if (extraBearingOf(bit.pose.facing, latch.bearing) === null) return true
+  const isPassable = (tile: TilePoint) => !crossing.isStanding(tile) || crossing.isMineable(tile)
+  return crossedCellsOf(bit, latch).every(isPassable)
+}
+
+/** The ceiling cell along the facing the diagonal turns from, then the cell it cuts. */
+function crossedCellsOf(bit: DrillBit, latch: AheadLatch): TilePoint[] {
+  const alongFacing = { aheadCells: 1, sideCells: 0, aheadBearing: 'facing' as const }
+  return [drillGearCellsAt(bit.pose, bit.disc, alongFacing).ahead[0], latch.tile]
 }
 
 /** The faced side latched for this cut when the drive aims the side cells; else none. */
@@ -163,6 +215,11 @@ function sideLatchOf(
 ): SideLatch | null {
   if (gear.sideAim !== 'drive' || gear.sideCells === 0) return null
   return latchFacedSide(vehicleOf(state, playerId), bit, gear.sideSeed, isUncut)
+}
+
+/** Ground still in the way: solid and not yet opened. */
+function isStandingCell(world: WorldState, params: PlanetParams, tile: TilePoint): boolean {
+  return isSolidCell(materialCellAt(world, params, tile)) && !isTileYielded(world, tile)
 }
 
 /** Solid ground a drill may remove that no gate holds. */

@@ -41,6 +41,12 @@ export type BoreSide = Exclude<AheadBearing, 'facing'>
  */
 export type SideAim = 'both' | 'drive'
 
+/**
+ * A bearing the drive may turn the ahead cells to beyond the kernel's own (TD lock on #288, ticket
+ * 372): `up`, the 45-degree diagonal while facing up. Only asked for, never folded into the cells.
+ */
+export type ExtraBearing = 'up'
+
 /** What one slice asks of the drill; a field left out asks nothing. */
 export interface DrillGearAsk {
   /** Whole cells cut past the bit, along the bearing `aheadAim` gives. */
@@ -55,6 +61,8 @@ export interface DrillGearAsk {
   sideSeed?: DriveSigns
   /** Each side cell's energy as a share of the drill's for that cell, in basis points. */
   sideEnergyShareBp?: number
+  /** Bearings this ask lets the drive turn the ahead cells to; alone, adds no cell. */
+  extraBearings?: readonly ExtraBearing[]
 }
 
 /** The drill gear one player's drill cuts with, after the caps. */
@@ -80,6 +88,8 @@ export interface DrillGear {
   sideEnergyShareBp: number
   /** An ahead cell's energy share on a diagonal bearing: the side floor. */
   diagonalEnergyShareBp: number
+  /** Every ask's extra bearings; rebuilt from the asks each tick, never saved. */
+  extraBearings: ReadonlySet<ExtraBearing>
 }
 
 /**
@@ -87,8 +97,8 @@ export interface DrillGear {
  * side share never under the floor. One ask aiming by the drive aims every ahead cell by it, but a
  * drive-aimed ask cuts ahead only on a diagonal. One side ask aimed by the drive makes the widest
  * side ask the faced side's, and the other side cuts only what the both-sided asks ask (TD lock on
- * #276), so neither side ever cuts more than one ask's cells. null when no ask adds a cell: the
- * drill cuts as before.
+ * #276), so neither side ever cuts more than one ask's cells. Extra bearings are every ask's
+ * (#288). null when no ask adds a cell, whatever bearings they allow: the drill cuts as before.
  */
 export function foldDrillGear(
   asks: readonly DrillGearAsk[],
@@ -107,7 +117,13 @@ export function foldDrillGear(
     sideSeed: asks.find(isDriveSided)?.sideSeed ?? NO_DRIVE,
     sideEnergyShareBp: sideEnergyShareOf(asks, caps),
     diagonalEnergyShareBp: caps.sideEnergyShareFloorBp,
+    extraBearings: new Set(asks.flatMap((ask) => ask.extraBearings ?? [])),
   }
+}
+
+/** Whether some ask lets the drive turn the ahead cells to `bearing` (TD lock on #288). */
+export function isAheadBearingAllowed(gear: DrillGear, bearing: ExtraBearing): boolean {
+  return gear.extraBearings.has(bearing)
 }
 
 export function readDrillGearCaps(reader: FieldReader, value: unknown): DrillGearCaps {

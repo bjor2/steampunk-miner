@@ -153,6 +153,34 @@ function drillGatedOf(events: readonly DomainEvent[]) {
 /** The twin bit (#257): one cell ahead, turned by the drive. */
 const TWIN_BIT = gearSlice({ aheadCells: 1, aheadAim: 'drive' })
 
+/** The twin bit with the up-diagonal allowed, as the ceiling anchor asks while clinging (#288). */
+const UP_TWIN_BIT = gearSlice({ aheadCells: 1, aheadAim: 'drive', extraBearings: ['up'] })
+
+/** Drilling up while lifting and pushing to one side: 1 the vehicle's right. */
+const lifting = (x: DriveSign): DriveSigns => ({ x, y: 1 })
+
+/** The cell past the bit over `TARGET` facing up, along `bearing`. */
+function upCellOf(bearing: AheadBearing): TilePoint {
+  const ask = { aheadCells: 1, sideCells: 0, aheadBearing: bearing }
+  return gearCellsOver(TARGET, FACING.up, ask).ahead[0]
+}
+
+/** `cell` (found over `TARGET`) as seen from `target` instead. */
+function shiftedBy(cell: TilePoint, target: TilePoint): TilePoint {
+  return { tx: cell.tx + target.tx - TARGET.tx, ty: cell.ty + target.ty - TARGET.ty }
+}
+
+/** A surface ore cell standing where `crossed` sits over a plain ground target, and that target. */
+function groundTargetCrossing(crossed: TilePoint) {
+  const targetUnder = (ore: TilePoint) => ({
+    tx: ore.tx + TARGET.tx - crossed.tx,
+    ty: ore.ty + TARGET.ty - crossed.ty,
+  })
+  const ore = surfaceOreTiles(40).find((tile) => kindAt(targetUnder(tile)) === CELL_KIND.ground)
+  if (ore === undefined) throw new Error('no ore cell over a ground target')
+  return { cell: ore, target: targetUnder(ore) }
+}
+
 /** Drilling down while pushing to one side: 1 the vehicle's right, -1 its left. */
 const pushingSide = (x: DriveSign): DriveSigns => ({ x, y: -1 })
 
@@ -358,6 +386,68 @@ describe('drill gear cut', () => {
       expect(densityOf(session.state().world, right)).toBe(FULL_CELL)
       report(37, 1)
       expect(densityOf(session.state().world, right)).toBeLessThan(FULL_CELL)
+    })
+  })
+
+  it('cuts the up-diagonal on the pushed side facing up only with up allowed (ticket 372)', () => {
+    const plain = drillWith([], TARGET, FACING.up)
+    for (const [x, bearing] of [
+      [1, 'right'],
+      [-1, 'left'],
+    ] as const) {
+      const diagonal = upCellOf(bearing)
+      const anchored = drillWith([UP_TWIN_BIT], TARGET, FACING.up, [], lifting(x))
+      expect(densityOf(anchored.world, diagonal)).toBeLessThan(densityOf(plain.world, diagonal))
+      const bare = drillWith([TWIN_BIT], TARGET, FACING.up, [], lifting(x))
+      expect(bare.digest).toBe(drillWith([TWIN_BIT], TARGET, FACING.up).digest)
+      expect(densityOf(bare.world, diagonal)).toBe(densityOf(plain.world, diagonal))
+    }
+  })
+
+  it('cuts as the bare drill facing up with up allowed and no side pushed', () => {
+    const still = drillWith([UP_TWIN_BIT], TARGET, FACING.up, [], lifting(0))
+    expect(still.digest).toBe(drillWith([TWIN_BIT], TARGET, FACING.up, [], lifting(0)).digest)
+  })
+
+  it('refuses the up-diagonal through canMine when a gate holds a cell it crosses', () => {
+    const offsets = { ceiling: upCellOf('facing'), diagonal: upCellOf('right') }
+    for (const crossed of [offsets.diagonal, offsets.ceiling]) {
+      const { cell: ore, target } = groundTargetCrossing(crossed)
+      const diagonal = shiftedBy(offsets.diagonal, target)
+      const open = drillWith([UP_TWIN_BIT], target, FACING.up, [], lifting(1))
+      expect(densityOf(open.world, diagonal)).toBeLessThan(densityOf(EMPTY_WORLD, diagonal))
+      const slices = [UP_TWIN_BIT, shellSlice(ore, 'refused')]
+      const cut = drillWith(slices, target, FACING.up, [], lifting(1))
+      expect(densityOf(cut.world, diagonal)).toBe(densityOf(EMPTY_WORLD, diagonal))
+      expect(kindOfCell(cellAt(cut.world, PARAMS, ore))).toBe(CELL_KIND.ore)
+    }
+  })
+
+  it('stops the up-cut on the tick up drops and turns the next read to the facing', () => {
+    const diagonal = upCellOf('right')
+    let isAnchored = true
+    const anchor: SliceDefinition = {
+      id: 'anchor-probe',
+      register: (r) =>
+        r.drillGear({
+          id: 'anchor-probe.gear',
+          gearOf: () => (isAnchored ? { extraBearings: ['up'] } : null),
+        }),
+    }
+    withRegistrations([TWIN_BIT, anchor], () => {
+      const session = createScriptedSession()
+      const report = (tick: number) =>
+        session.submit(tick, poseAbove(TARGET, FACING.up, { drillTicks: 4, drive: lifting(1) }))
+      session.submit(1, poseAbove(TARGET, FACING.up))
+      report(5)
+      const started = densityOf(session.state().world, diagonal)
+      expect(started).toBeLessThan(densityOf(EMPTY_WORLD, diagonal))
+      expect(started).toBeGreaterThan(0)
+      expect(session.vehicle().aheadLatch).toEqual({ bearing: 'right', tile: diagonal })
+      isAnchored = false
+      report(9)
+      expect(densityOf(session.state().world, diagonal)).toBe(started)
+      expect(session.vehicle().aheadLatch?.bearing).toBe('facing')
     })
   })
 
