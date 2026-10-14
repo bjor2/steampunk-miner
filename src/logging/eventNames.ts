@@ -775,6 +775,12 @@ export const RUN_EVENT_REGISTRY = {
     level: 'core',
     payload: { mode: { oneOf: ['auto', 'off'] } },
   },
+  // Ticket 383 (#319): Overpressure's toggle switched on or off.
+  turret_burst_set: {
+    group: 'vehicle_and_combat',
+    level: 'core',
+    payload: { isOn: 'flag' },
+  },
   weapon_fired: { group: 'vehicle_and_combat', level: 'detail', payload: 'unspecified' },
   player_killed: { group: 'vehicle_and_combat', payload: 'reserved' },
 

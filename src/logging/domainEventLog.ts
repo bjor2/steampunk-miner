@@ -198,6 +198,7 @@ const PROJECTIONS: { readonly [K in KernelDomainEventType]: Projection<K> } = {
     data: { from, to, price, ...heldStepFieldsOf(held) },
   }),
   GunModeChanged: ({ mode }) => ({ event: 'gun_mode', data: { mode } }),
+  TurretBurstSet: ({ isOn }) => ({ event: 'turret_burst_set', data: { isOn } }),
   LiningTypeUnlocked: ({ liningType, price }) => ({
     event: 'lining_type_unlocked',
     data: { type: liningType, price },

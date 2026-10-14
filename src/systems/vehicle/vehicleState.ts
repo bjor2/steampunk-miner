@@ -19,6 +19,7 @@ import { quantaOfUnits } from './energyQuanta'
 import { STANDARD_LINING, type VehicleLining } from './liningType'
 import { EMPTY_LOADOUT, type VehicleLoadout } from './loadoutState'
 import { coldHeatAt, type VehicleHeat } from './vehicleHeat'
+import type { GunBurst } from './gunBurst'
 import { NO_GUN, type VehicleGun } from './vehicleGun'
 import { dockedPoseAt, type VehiclePose } from './vehiclePose'
 import type { AheadLatch } from './aheadBearingLatch'
@@ -108,6 +109,11 @@ export interface VehicleState {
    * only while a slice provides turret shapes, so with none the state and its digest are unchanged.
    */
   stillSinceTick?: number
+  /**
+   * Overpressure's toggle and the cycle it runs (K-burst, ticket 383). Absent until the first
+   * switch, so with no Overpressure the state and its digest are unchanged.
+   */
+  gunBurst?: GunBurst
 }
 
 export const EMPTY_CARGO: Cargo = { ore: {}, coreFragments: 0 }

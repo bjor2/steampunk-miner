@@ -26,10 +26,17 @@ export interface TurretGrape {
   coneDeg: number
 }
 
-/** Overpressure: `burstTicks` at the faster cadence, then `ventTicks` idle (K-burst, #383). */
+/**
+ * Overpressure: while its toggle is on, `burstTicks` at the faster cadence, then `ventTicks` idle,
+ * round and round (K-burst, ticket 383). The burst's interval is the gun track's times
+ * `intervalNumerator / intervalDenominator` (Content's `burstInterval*` stats on #319), and the
+ * kernel refuses a burst whose cycle would fire more shots than the track does in the same ticks.
+ */
 export interface TurretBurst {
   burstTicks: number
   ventTicks: number
+  intervalNumerator: number
+  intervalDenominator: number
 }
 
 export interface TurretShape {

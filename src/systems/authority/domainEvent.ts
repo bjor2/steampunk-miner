@@ -103,6 +103,8 @@ export interface RejectionReasons {
   no_bore_gun: true
   recovering: true
   energy_short: true
+  // Registered by Overpressure's toggle (ticket 383): the turret's shape has no burst.
+  no_burst: true
 }
 
 export type RejectionReason = keyof RejectionReasons
@@ -369,6 +371,8 @@ export interface KernelDomainEventBodies {
   GunUpgraded: PurchaseChainStamp & { from: number; to: number; price: string }
   /** The HUD toggle (#107). */
   GunModeChanged: { mode: GunMode }
+  /** Overpressure's toggle went on or off (ticket 383): the guns burst and vent while it is on. */
+  TurretBurstSet: { isOn: boolean }
   /** A lining type unlocked at the Upgrade bay (#113); `price` as a canonical string. */
   LiningTypeUnlocked: { liningType: string; price: string }
   /** The rings laid from now on use this lining type (#113 `lining_type_selected`). */

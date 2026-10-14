@@ -133,6 +133,11 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
     ...(vehicle.stillSinceTick === undefined || isWholeNumber(vehicle.stillSinceTick)
       ? []
       : [`${path}.stillSinceTick must be a whole tick, or be left out`]),
+    ...(vehicle.gunBurst === undefined || isPortableGunBurst(vehicle.gunBurst)
+      ? []
+      : [
+          `${path}.gunBurst must be Overpressure's toggle and cycle in whole ticks, or be left out`,
+        ]),
     ...(vehicle.sweptCut === undefined || isPortableSweptCut(vehicle.sweptCut)
       ? []
       : [
@@ -180,6 +185,25 @@ function isRingPoint(point: unknown): boolean {
 
 function isPortableGun(gun: unknown): boolean {
   return isJsonObject(gun) && isWholeNumber(gun.level) && isGunMode(gun.mode)
+}
+
+function isPortableGunBurst(burst: unknown): boolean {
+  return (
+    isJsonObject(burst) &&
+    (burst.onSinceTick === null || isWholeNumber(burst.onSinceTick)) &&
+    isWholeNumber(burst.ventUntilTick) &&
+    isPortableBurstCycle(burst.cycle)
+  )
+}
+
+function isPortableBurstCycle(cycle: unknown): boolean {
+  return (
+    isJsonObject(cycle) &&
+    isWholeNumber(cycle.burstTicks) &&
+    isWholeNumber(cycle.ventTicks) &&
+    isWholeNumber(cycle.intervalNumerator) &&
+    isWholeNumber(cycle.intervalDenominator)
+  )
 }
 
 function isPortableCharges(charges: unknown): boolean {

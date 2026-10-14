@@ -635,8 +635,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/combat/hitArc.test.ts` | 15 | 4 |
 | `src/systems/authority/combat/spawnPoints.test.ts` | 5 | 5 |
 | `src/systems/authority/combat/turretAim.test.ts` | 9 | 9 |
+| `src/systems/authority/combat/turretBurst.test.ts` | 7 | 7 |
 | `src/systems/authority/combat/turretFire.test.ts` | 14 | 14 |
-| `src/systems/authority/combat/turretShape.test.ts` | 13 | 13 |
+| `src/systems/authority/combat/turretShape.test.ts` | 14 | 14 |
 | `src/systems/authority/combat/vehicleTarget.test.ts` | 2 | 2 |
 | `src/systems/authority/combat/wreckerGuns.test.ts` | 10 | 4 |
 | `src/systems/authority/combat/wreckerRun.test.ts` | 16 | 16 |
@@ -1205,6 +1206,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/drillStamp.test.ts` | 1 | 1 |
 | `src/systems/vehicle/driveSigns.test.ts` | 5 | 5 |
 | `src/systems/vehicle/facedSide.test.ts` | 10 | 10 |
+| `src/systems/vehicle/gunBurst.test.ts` | 6 | 6 |
 | `src/systems/vehicle/heatPauseSteps.test.ts` | 7 | 7 |
 | `src/systems/vehicle/kinematicSweep.test.ts` | 6 | 6 |
 | `src/systems/vehicle/leadingSlab.test.ts` | 5 | 5 |

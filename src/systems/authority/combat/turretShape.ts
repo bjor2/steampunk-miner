@@ -109,10 +109,29 @@ function grapeProblems(grape: TurretGrape | null): string[] {
 
 function burstProblems(burst: TurretBurst | null): string[] {
   if (burst === null) return []
-  return [
+  const fields = [
     ...wholeWithinProblems('burst.burstTicks', burst.burstTicks, 1),
     ...wholeWithinProblems('burst.ventTicks', burst.ventTicks, 0),
+    ...wholeWithinProblems('burst.intervalDenominator', burst.intervalDenominator, 1),
+    ...wholeWithinProblems(
+      'burst.intervalNumerator',
+      burst.intervalNumerator,
+      1,
+      burst.intervalDenominator,
+    ),
   ]
+  return fields.length > 0 ? fields : burstNetRateProblems(burst)
+}
+
+/**
+ * A burst cycle fires `denominator / numerator` times the track's shots over `burstTicks` and none
+ * over `ventTicks`, so it never beats the track while `denominator * burst <= numerator * cycle`
+ * (Content's check on #319, `isOverpressureNetRateHeld` in the ground-gun slice).
+ */
+function burstNetRateProblems(burst: TurretBurst): string[] {
+  const { burstTicks, ventTicks, intervalNumerator, intervalDenominator } = burst
+  if (intervalDenominator * burstTicks <= intervalNumerator * (burstTicks + ventTicks)) return []
+  return [`burst fires more shots a cycle than the gun track: ${JSON.stringify(burst)}`]
 }
 
 /** A whole number from `least` to `cap` (no cap when left out). */
@@ -159,6 +178,8 @@ function foldedBurstOf(bursts: readonly (TurretBurst | null)[]): TurretBurst | n
   return {
     burstTicks: largestOf(present.map((burst) => burst.burstTicks)),
     ventTicks: largestOf(present.map((burst) => burst.ventTicks)),
+    intervalNumerator: largestOf(present.map((burst) => burst.intervalNumerator)),
+    intervalDenominator: largestOf(present.map((burst) => burst.intervalDenominator)),
   }
 }
 

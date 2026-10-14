@@ -3,7 +3,7 @@ import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { ECONOMY } from '../../economy/economy'
 import { gunRangeTiles } from '../../economy/gunStats'
-import type { TurretShape } from '../../registries/autoGuns'
+import type { TurretBurst, TurretShape } from '../../registries/autoGuns'
 import { GUN_SHOT_FLOOR_QUANTA, GUN_SHOT_QUANTA } from '../../vehicle/energyQuanta'
 import { createScriptedSession } from '../scriptedSession'
 import {
@@ -12,6 +12,14 @@ import {
   foldTurretShapes,
   turretShapeOf,
 } from './turretShape'
+
+/** Content's Overpressure on #319: 2 s at two thirds of the interval, then a 5 s vent. */
+const OVERPRESSURE: TurretBurst = {
+  burstTicks: 120,
+  ventTicks: 300,
+  intervalNumerator: 2,
+  intervalDenominator: 3,
+}
 
 function shapeWith(fields: Partial<TurretShape>): TurretShape {
   return { ...BASE_TURRET_SHAPE, ...fields }
@@ -61,7 +69,7 @@ describe("turret shape: the caps (ticket 382, Systems' auto_guns table on #322)"
       forwardConeAfterTicks: 30,
       knock: { cells: 4, cooldownTicks: 90 },
       grape: { targets: 5, coneDeg: 30 },
-      burst: { burstTicks: 240, ventTicks: 150 },
+      burst: { burstTicks: 240, ventTicks: 150, intervalNumerator: 2, intervalDenominator: 3 },
       bounceLegCells: 6,
     })
     expect(checkedTurretShape(full)).toBe(full)
@@ -92,12 +100,25 @@ describe("turret shape: the caps (ticket 382, Systems' auto_guns table on #322)"
       { retargetTicks: -1 },
       { forwardConeAfterTicks: 30.5 },
       { knock: { cells: 2, cooldownTicks: -90 } },
-      { burst: { burstTicks: 0, ventTicks: 300 } },
+      { burst: { ...OVERPRESSURE, burstTicks: 0 } },
+      { burst: { ...OVERPRESSURE, intervalNumerator: 0 } },
       { targetOrder: 'loudest' as TurretShape['targetOrder'] },
     ]
     for (const fields of notWhole) {
       expect(() => checkedTurretShape(shapeWith(fields))).toThrow(RangeError)
     }
+  })
+
+  it('throws for a burst that would fire more shots a cycle than the gun track (ticket 383)', () => {
+    const overRate: TurretBurst[] = [
+      { ...OVERPRESSURE, ventTicks: 50 },
+      { ...OVERPRESSURE, intervalNumerator: 4 },
+    ]
+    for (const burst of overRate) {
+      expect(() => checkedTurretShape(shapeWith({ burst }))).toThrow(RangeError)
+    }
+    const evenRate = { ...OVERPRESSURE, burstTicks: 120, ventTicks: 60 }
+    expect(checkedTurretShape(shapeWith({ burst: evenRate })).burst).toBe(evenRate)
   })
 
   it("throws from the kernel's read when the provider answers a shape over its caps", () => {
@@ -147,13 +168,13 @@ describe("turret shape: the fold of the turret's modules (ticket 382)", () => {
     const folded = foldTurretShapes([
       shapeWith({ knock: { cells: 2, cooldownTicks: 180 }, forwardConeAfterTicks: 60 }),
       shapeWith({ knock: { cells: 4, cooldownTicks: 90 }, grape: { targets: 2, coneDeg: 30 } }),
-      shapeWith({ burst: { burstTicks: 120, ventTicks: 300 }, bounceLegCells: 3 }),
+      shapeWith({ burst: OVERPRESSURE, bounceLegCells: 3 }),
     ])
     expect(folded).toMatchObject({
       forwardConeAfterTicks: 60,
       knock: { cells: 4, cooldownTicks: 180 },
       grape: { targets: 2, coneDeg: 30 },
-      burst: { burstTicks: 120, ventTicks: 300 },
+      burst: OVERPRESSURE,
       bounceLegCells: 3,
     })
     expect(foldTurretShapes([BASE_TURRET_SHAPE])).toEqual(BASE_TURRET_SHAPE)

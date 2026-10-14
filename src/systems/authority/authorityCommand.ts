@@ -312,6 +312,11 @@ export interface KernelCommandPayloads {
    * itself, holding where the rules say; refused until the steam sear is researched.
    */
   'ground_gun.set_auto': { on: boolean }
+  /**
+   * Overpressure's held toggle (ticket 383, the TD lock on #319): on, the turret runs its shape's
+   * burst cycle, a burst at the faster cadence then a vent; off, it vents out what is due.
+   */
+  'turret.burst': { on: boolean }
   'debug.setUpgrade': { upgradeId: string; level: number }
   /** Energy in units as a decimal string, a whole number of 1/240 quanta (#11 amendment 2). */
   'debug.setEnergy': { energy: string }

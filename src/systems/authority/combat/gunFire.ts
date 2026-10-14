@@ -12,13 +12,15 @@
  * The turret's modules (ticket 382, the TD lock on #319) shape a shot through the `autoGuns`
  * provider, read once per due shot (`turretShape.ts`): its range, its energy, the fire director's
  * order, the sentry cam's open cone (`rigStillness.ts`), grapeshot's split (`grapeShot.ts`),
- * concussion's knock (`turretKnock.ts`) and the ricochet (`ricochet.ts`). Overpressure's `burst`
- * is carried and checked here, and its held toggle and cadence are K-burst's (#383). With no
- * provider the shape is #107's guns and every shot is as before.
+ * concussion's knock (`turretKnock.ts`) and the ricochet (`ricochet.ts`). Overpressure's toggle
+ * (K-burst, ticket 383, `turretBurst.ts`) keeps the shape's `burst` cycle on the vehicle: a shot
+ * in a burst waits the faster interval, and the guns hold fire through a vent without reading the
+ * shape. With no provider the shape is #107's guns and every shot is as before.
  */
 import { gunFireIntervalTicks, gunShotDamage } from '../../economy/gunStats'
 import { cmp, sub, ZERO_MONEY, type BigStat } from '../../money'
 import type { TurretShape } from '../../registries/autoGuns'
+import { burstPhaseOf, gunIntervalAt } from '../../vehicle/gunBurst'
 import { hasSteamForShot, isGunOnAuto } from '../../vehicle/vehicleGun'
 import { isVehicleActive } from '../../vehicle/vehicleState'
 import { vehicleOf, withCombat, withVehicle, type AuthorityState } from '../authorityState'
@@ -105,7 +107,8 @@ function isGunDue(state: AuthorityState, playerId: string, tick: number): boolea
     isVehicleActive(vehicle) &&
     isGunOnAuto(vehicle.gun) &&
     hasSteamForShot(vehicle) &&
-    tick >= combatVehicleOf(state.combat, playerId).gunReadyTick
+    tick >= combatVehicleOf(state.combat, playerId).gunReadyTick &&
+    burstPhaseOf(vehicle.gunBurst, tick) !== 'vent'
   )
 }
 
@@ -115,7 +118,8 @@ function spendShot(state: AuthorityState, { playerId, tick, shape }: TurretShot)
     ...vehicle,
     energy: vehicle.energy - shape.energyPerShotQuanta,
   })
-  const gunReadyTick = tick + gunFireIntervalTicks(vehicle.gun.level)
+  const interval = gunIntervalAt(vehicle.gunBurst, gunFireIntervalTicks(vehicle.gun.level), tick)
+  const gunReadyTick = tick + interval
   return unchanged(withCombat(fired, withCombatVehicle(fired.combat, playerId, { gunReadyTick })))
 }
 
