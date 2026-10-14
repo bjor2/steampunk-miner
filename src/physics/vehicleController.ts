@@ -88,6 +88,8 @@ export interface VehicleStepInput {
 export interface VehicleStepResult {
   flags: ActionFlags
   pose: VehiclePose
+  /** The wheels held this step for ground in a level cut's way (the swept cut's limiter tag). */
+  isWaitingForCut: boolean
 }
 
 export interface VehicleController {
@@ -176,6 +178,7 @@ export function createVehicleController(
         : 'none'
       const isDrilling = contact !== 'none'
       const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)
+      const isWaitingForCut = isCuttingLevel && contact === 'inTheWay'
       const motion = stepVehicleMotion({
         velocity,
         up,
@@ -186,7 +189,7 @@ export function createVehicleController(
         isGrounded: isSolidAt(planet.ground, groundProbeOf(position, up)),
         boreOffset: isAimingAlongUp(input.intent) ? offsetToTileCentre(position, up) : null,
         isCuttingLevel: isCuttingLevel,
-        isWaitingForCut: isCuttingLevel && contact === 'inTheWay',
+        isWaitingForCut,
         dt: PHYSICS_TIMESTEP,
         effect: motionEffectInputOf(input.motion, position, up, planet.ground),
         tug: input.tug,
@@ -195,6 +198,7 @@ export function createVehicleController(
       return {
         flags: { isDriving: motion.isDriving, isThrusting: motion.isThrusting, isDrilling },
         pose,
+        isWaitingForCut,
       }
     },
     placeAt(pose) {
