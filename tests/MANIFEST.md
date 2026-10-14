@@ -358,7 +358,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 28 files, 215 tests
+### `tech-tree`: 30 files, 224 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -366,6 +366,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
+| `src/features/tech-tree/systems/forkCost.test.ts` | 2 | 2 |
+| `src/features/tech-tree/systems/forkNode.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/itemDescriber.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
