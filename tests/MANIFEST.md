@@ -495,6 +495,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/combat/wreckerGuns.test.ts` | 10 | 4 |
 | `src/systems/authority/combat/wreckerRun.test.ts` | 16 | 16 |
 | `src/systems/authority/coreHarvest.test.ts` | 10 | 10 |
+| `src/systems/authority/cutFollowRead.test.ts` | 7 | 7 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
 | `src/systems/authority/drillGearCut.test.ts` | 23 | 21 |
 | `src/systems/authority/drillStep.test.ts` | 19 | 17 |
@@ -712,6 +713,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/physics/cutFollow.test.ts` | 5 | 3 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/liveFixedStep.test.ts` | 4 | 4 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
@@ -1011,6 +1013,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
 | `src/systems/vehicle/casingTrail.test.ts` | 13 | 11 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
+| `src/systems/vehicle/cutFollowMotion.test.ts` | 6 | 6 |
+| `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
 | `src/systems/vehicle/drillContact.test.ts` | 3 | 3 |
 | `src/systems/vehicle/drillGearCells.test.ts` | 12 | 12 |
 | `src/systems/vehicle/drillRule.test.ts` | 18 | 18 |
@@ -1018,10 +1022,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/driveSigns.test.ts` | 5 | 5 |
 | `src/systems/vehicle/facedSide.test.ts` | 10 | 10 |
 | `src/systems/vehicle/heatPauseSteps.test.ts` | 7 | 7 |
+| `src/systems/vehicle/leadingSlab.test.ts` | 5 | 5 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
 | `src/systems/vehicle/poseReport.test.ts` | 7 | 7 |
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/sweptCut.test.ts` | 6 | 6 |
+| `src/systems/vehicle/travelParity.test.ts` | 7 | 7 |
 | `src/systems/vehicle/vehicleCharges.test.ts` | 4 | 4 |
 | `src/systems/vehicle/vehicleControls.test.ts` | 14 | 14 |
 | `src/systems/vehicle/vehicleReadout.test.ts` | 3 | 3 |
@@ -1036,6 +1042,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
+| `src/systems/views/engineTrackMaxed.test.ts` | 4 | 4 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
 | `src/systems/views/hudModel.test.ts` | 27 | 27 |
 | `src/systems/views/itemCardText.test.ts` | 4 | 4 |
