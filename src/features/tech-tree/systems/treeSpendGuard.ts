@@ -4,7 +4,10 @@
  * of the pacing seeds against the band of that planet (`tech.spendGuard`).
  *
  * - Numerator: node research (capabilities, slots, combos and Marks) and the tree-unlocked items
- *   bought, the tree's two bot purchases (`tech-tree.research`, `tech-tree.buy-item`).
+ *   bought, the tree's two bot purchases (`tech-tree.research`, `tech-tree.buy-item`), and the
+ *   kernel turret mount (`buyGun`): the armoury's share counts inside the tree's (#310 Systems
+ *   point 2), and the turret is its only weapon buy outside the tree (TD, GD accepted 14 Oct;
+ *   ticket 371). The bot buys no bore gun level (#347), so no other weapon brass reaches here.
  * - Denominator: everything the bot bought on the planet. The spend records hold no travel, so
  *   travel never counts; a restock (charges, consumables) is a purchase but not tree spend, so it
  *   counts in the denominator only (Vertical on the #157 gap review).
@@ -14,6 +17,7 @@
 import type { ShopSpend } from '../../../systems/bot/shopSpend'
 import { formatPercent } from '../../../systems/displayAmount'
 import { add, cmp, div, fromSafeInteger, ZERO_MONEY, type Money } from '../../../systems/money'
+import { BUY_GUN_SPEND_FAMILY } from '../../../systems/registries/spendFamilies'
 import { ITEM_BOT_PURCHASE } from './itemShop'
 import { RESEARCH_BOT_PURCHASE } from './researchBotPurchase'
 import { TREE_ECONOMY, type SpendGuardBand } from './treeEconomy'
@@ -82,6 +86,10 @@ function treeSpendRowOf(planetIndex: number, spends: readonly ShopSpend[]): Tree
 }
 
 function isTreePurchase(spend: ShopSpend): boolean {
+  return isTreeSliceBuy(spend) || BUY_GUN_SPEND_FAMILY.isMember(spend)
+}
+
+function isTreeSliceBuy(spend: ShopSpend): boolean {
   return spend.source === 'slice' && TREE_PURCHASE_IDS.includes(spend.purchaseId)
 }
 

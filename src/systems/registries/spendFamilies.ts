@@ -30,8 +30,9 @@ export interface FamilySpendRow {
 export const SPEND_FAMILY_REGISTRY = defineRegistry<SpendFamily>('spendFamilies')
 
 /**
- * The kernel's gun mount at the Upgrade bay (`buyGun`), anchored to its `auto_guns` row: reported
- * now, joining the gated tree numerator in #371 (GD ruling Q2 on #212).
+ * The kernel's gun mount at the Upgrade bay (`buyGun`), anchored to its `auto_guns` row. Once the
+ * ground-gun slice loads, its `armoury` family sorts first and files the buy there (ticket 371);
+ * the buy also counts in the gated tree total (GD ruling Q2 on #212).
  */
 export const BUY_GUN_SPEND_FAMILY: SpendFamily = {
   id: 'kernel.buy_gun',

@@ -24,6 +24,7 @@ export type {
 } from './systems/techNode'
 export { ARMOURY_LANES, isArmouryLane, TECH_LANES } from './systems/techNode'
 export { isMasteredAt, lastMarkOf, markStepOf } from './systems/markLadder'
+export { markOfNodeId } from './systems/markNodes'
 export { markLadderOfItem, researchedMarkInViewOf, researchedMarkOf } from './systems/itemMarks'
 export {
   isYieldMilestone,

@@ -10,11 +10,13 @@
  * `hull.front` as a vehicle piece, its barrel turned to the aim (ticket 315). The
  * `armoury.bore_gun` lane (ticket 318) adds the shipped modules as store items with their tech
  * nodes, cards and seller: the gimbal sight aims an unaimed shot, the steam sear answers auto mode
- * and the long barrel sets the reach and the hold.
+ * and the long barrel sets the reach and the hold. Every weapon buy, the kernel turret's too, files
+ * under the spend guard's one `armoury` family row (ticket 371).
  * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { groundGunDebugActions } from './debug'
+import { ARMOURY_SPEND_FAMILY } from './systems/armourySpend'
 import { GROUND_GUN_PROJECTIONS, GROUND_GUN_RUN_EVENTS } from './logging'
 import { BORE_GUN_PIECE_ID, BoreGunPiece } from './scene/BoreGunPiece'
 import { FIRE_KEY_REACTION } from './store/fireKeyReaction'
@@ -49,6 +51,7 @@ export const slice: SliceDefinition = {
     r.vehicleItemSeller(BORE_GUN_MODULE_SELLER)
     r.commandRules(GUN_PURCHASE_RULES)
     r.bayEntry(GUN_BAY_ENTRIES)
+    r.spendFamily(ARMOURY_SPEND_FAMILY)
     r.boreGun(GROUND_GUN_PROVIDER)
     r.authorityReaction(BORE_PICKUP_REACTION)
     r.inputReaction(FIRE_KEY_REACTION)

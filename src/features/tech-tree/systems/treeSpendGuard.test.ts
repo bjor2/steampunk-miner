@@ -42,6 +42,15 @@ describe('tech tree: spend guard', () => {
     expect(shareTexts(spends)).toEqual([[5, '0.1']])
   })
 
+  it('counts the kernel turret mount in the tree share, as weapon brass', () => {
+    const spends = [
+      spend(4, 'slice', 'tech-tree.research', '100'),
+      spend(4, 'kernel', 'buyGun', '200'),
+      spend(4, 'kernel', 'buyUpgrade', '700'),
+    ]
+    expect(shareTexts(spends)).toEqual([[4, '0.3']])
+  })
+
   it('judges each planet on the median of the seeds', () => {
     const seeds = [planetSpends(3, 50), planetSpends(3, 350), planetSpends(3, 200)]
     const [verdict] = treeShareVerdictsOf(seeds)
