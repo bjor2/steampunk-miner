@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T00:59:21+02:00",
+  "updated_at": "2026-10-15T01:01:57+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -27,27 +27,27 @@
         },
         {
           "slot": "C2",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 399,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-15T01:01:00+02:00"
         },
         {
           "slot": "C3",
-          "state": "busy",
-          "ticket": 390,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-14T23:42:00+02:00"
-        },
-        {
-          "slot": "C4",
           "state": "free",
           "ticket": null,
           "grok_slot": null,
           "kind": null,
           "since": null
+        },
+        {
+          "slot": "C4",
+          "state": "busy",
+          "ticket": 411,
+          "grok_slot": 4,
+          "kind": "dev",
+          "since": "2026-10-15T01:01:00+02:00"
         },
         {
           "slot": "C5",
@@ -67,9 +67,9 @@
         }
       ],
       "size": 6,
-      "used": 4,
-      "free": 2,
-      "claims_last_hour": 3,
+      "used": 5,
+      "free": 1,
+      "claims_last_hour": 5,
       "name": "Claude Max 1"
     },
     {
@@ -120,7 +120,7 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 1,
     "max": 3
   },
   "tester": {
@@ -403,6 +403,29 @@
           396
         ],
         "since": "2026-10-15T00:44:07+02:00"
+      },
+      {
+        "feature": 245,
+        "kind": "spec",
+        "title": "Grilling: Sixth \"Aetheric science\" lane or fold steampunk-scientific power-ups into existing lanes?",
+        "tickets": [
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          360,
+          361,
+          363,
+          373,
+          375,
+          376,
+          389,
+          390
+        ],
+        "since": "2026-10-15T01:01:21+02:00"
       }
     ]
   },
@@ -416,22 +439,23 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 399,
+      "since": "2026-10-15T01:01:00+02:00",
+      "claude_slot": 2
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 390,
-      "since": "2026-10-14T23:42:00+02:00",
-      "claude_slot": 3
-    },
-    {
-      "slot": 4,
       "state": "free",
       "ticket": null,
       "since": null
+    },
+    {
+      "slot": 4,
+      "state": "dev",
+      "ticket": 411,
+      "since": "2026-10-15T01:01:00+02:00",
+      "claude_slot": 4
     },
     {
       "slot": 5,
@@ -495,26 +519,26 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 399,
+      "grok_slot": 2,
+      "since": "2026-10-15T01:01:00+02:00",
       "account": 1
     },
     {
       "slot": 3,
-      "state": "busy",
-      "ticket": 390,
-      "grok_slot": 3,
-      "since": "2026-10-14T23:42:00+02:00",
-      "account": 1
-    },
-    {
-      "slot": 4,
       "state": "free",
       "ticket": null,
       "grok_slot": null,
       "since": null,
+      "account": 1
+    },
+    {
+      "slot": 4,
+      "state": "busy",
+      "ticket": 411,
+      "grok_slot": 4,
+      "since": "2026-10-15T01:01:00+02:00",
       "account": 1
     },
     {
@@ -580,8 +604,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 5,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -589,8 +613,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 4,
-      "free": 2,
+      "used": 5,
+      "free": 1,
       "external": 0
     }
   }
