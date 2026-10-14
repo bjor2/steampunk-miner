@@ -1,30 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-14T07:42:25.959Z",
+ "updatedAt": "2026-10-14T07:57:10.844Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 1791360647956,
-   "url": "https://github.com/bjor2/steampunk-miner/commit/ec394b9c212a8db5c4adda88cd82a0edd192790e",
-   "event": "pass",
-   "mode": "scoped",
-   "sha": "ec394b9c212a8db5c4adda88cd82a0edd192790e",
-   "branch": "main",
-   "startedAt": "2026-10-07T08:10:39Z",
-   "jobConclusion": "failure",
-   "timedOut": false,
-   "jobDurationSec": 8,
-   "source": "box",
-   "phase": "fast",
-   "job": "fast",
-   "feature": null,
-   "tickets": [],
-   "reportFound": true,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 1791361893090,
    "url": "https://github.com/bjor2/steampunk-miner/commit/e8d776b6afdbe7cb411fcea37d2753ba1dae2ddf",
@@ -1182,14 +1160,36 @@
    "tests": 0,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 1791964627543,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/6df895b28d6353eb27a9696b44518a73ac97c309",
+   "event": "nightly",
+   "mode": "nightly",
+   "sha": "6df895b28d6353eb27a9696b44518a73ac97c309",
+   "branch": "main",
+   "startedAt": "2026-10-14T07:42:33Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 874,
+   "source": "box",
+   "phase": "nightly",
+   "job": "balance-refinery",
+   "feature": null,
+   "tickets": [],
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 6,
    "full": 9,
    "nightly-only": 8,
-   "nightly": 27
+   "scoped": 5,
+   "nightly": 28
   },
   "timedOut": [],
   "withoutReport": [
