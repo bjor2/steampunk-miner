@@ -80,7 +80,7 @@ export const MAGNET_ITEMS: readonly MagnetItem[] = [
       {
         label: 'Tap',
         template:
-          'pushes loose rubble, metal-part enemies and up to {maxCellsMoved} diggable cells one cell outward into open space',
+          'pushes metal-part enemies and up to {maxCellsMoved} diggable cells one cell outward into open space',
         reading: 'maxCellsMoved',
       },
       { label: 'Wave radius', template: '{radius} cells', reading: 'radius' },
@@ -115,7 +115,7 @@ export const MAGNET_ITEMS: readonly MagnetItem[] = [
       { label: 'Lasts up to', template: '{duration}', reading: 'duration' },
       { label: 'Drains', template: 'energy like drilling while held', reading: null },
       {
-        label: 'When you let go,',
+        label: 'On release',
         template: 'the roof warns again before it falls',
         reading: null,
       },

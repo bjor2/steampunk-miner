@@ -11,8 +11,9 @@
  * - Metal enemies (#291's tag) move one cell out on the act's tick (`pushMetalEnemies`).
  * - The vehicle itself is never pushed, so the #233 motion cap is never reached.
  *
- * "Loose rubble" is ground the drill can dig: a collapse refills its block as plain ground, and no
- * other loose body exists. A wave that moves nothing is refused and costs nothing.
+ * There is no rubble to push: a collapse refills its block as plain ground the drill can dig, and no
+ * other loose body exists, so the card names only enemies and cells (ticket 351). A wave that moves
+ * nothing is refused and costs nothing.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { pushMetalEnemies, type PushWave } from '../../../systems/authority/magnet/enemyPush'

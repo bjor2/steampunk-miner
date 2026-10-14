@@ -91,15 +91,20 @@ describe('terrain magnet cards', () => {
   it("prints Content's copy at Mark 1 with every number read, not written", () => {
     const cap = ECONOMY.magnets.maxCellsMoved
     expect(linesAt('power.repulsor_coil', 0)).toEqual([
-      `Tap: pushes loose rubble, metal-part enemies and up to ${cap} diggable cells one cell outward into open space`,
+      `Tap: pushes metal-part enemies and up to ${cap} diggable cells one cell outward into open space`,
       'Wave radius: 2 cells',
     ])
     expect(linesAt('power.lode_clamp', 0)).toEqual([
       `Hold: braces the rock around up to ${cap} nearby cells, so the roof over and beside you holds; moves nothing`,
       'Lasts up to: 3 s',
       'Drains: energy like drilling while held',
-      'When you let go,: the roof warns again before it falls',
+      'On release: the roof warns again before it falls',
     ])
+  })
+
+  it('never doubles punctuation where a label meets its text', () => {
+    const lines = MAGNET_ITEMS.flatMap((item) => linesAt(item.itemId, 0))
+    expect(lines.filter((line) => line.includes(',:'))).toEqual([])
   })
 
   it('reads the stepped radius and duration at the Mark the card names', () => {

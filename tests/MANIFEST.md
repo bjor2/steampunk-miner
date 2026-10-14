@@ -356,7 +356,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 28 files, 222 tests
+### `terrain-tools`: 28 files, 223 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -371,7 +371,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/gatesFixture.test.ts` | 22 | 5 |
 | `src/features/terrain-tools/systems/lodeClamp.test.ts` | 16 | 12 |
 | `src/features/terrain-tools/systems/lodestoneBeacon.test.ts` | 5 | 5 |
-| `src/features/terrain-tools/systems/magnetItems.test.ts` | 9 | 9 |
+| `src/features/terrain-tools/systems/magnetItems.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/magnetSpend.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/marksInPlay.test.ts` | 1 | 1 |
 | `src/features/terrain-tools/systems/oreShifter.test.ts` | 3 | 3 |
