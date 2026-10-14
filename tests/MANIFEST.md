@@ -992,6 +992,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/speedFraming.test.ts` | 20 | 8 |
 | `src/systems/render/sprayPool.test.ts` | 10 | 10 |
 | `src/systems/render/stagedTurn.test.ts` | 2 | 2 |
+| `src/systems/render/stationIdleMotion.test.ts` | 9 | 9 |
 | `src/systems/render/vehicleLook.test.ts` | 10 | 8 |
 | `src/systems/render/vehicleLookFold.test.ts` | 9 | 9 |
 | `src/systems/render/vehiclePreviewLook.test.ts` | 5 | 5 |
