@@ -1,10 +1,9 @@
 /**
  * Which chunk meshes need a build (#4 Rendering; TD scope on #316, tickets 330 and 336): the visible
  * chunks, then those ahead along the velocity and the drill's facing, each missing its mesh or
- * showing a stale view. A mesh
- * whose neighbours changed only away from its halo's edge is still current: it takes the new
- * version and is not rebuilt, so a cut inside a chunk rebuilds that chunk alone. Split from
- * `chunkMeshPool.ts`, which builds what `chunksToBuild` picks of these.
+ * showing a stale view. A mesh whose neighbours changed only away from its halo's edge is still
+ * current: it takes the new version and is not rebuilt, so a cut inside a chunk rebuilds that chunk
+ * alone. Split from `chunkMeshPool.ts`, which builds what `chunksToBuild` picks of these.
  */
 import type { ChunkBuildNeed } from '../systems/render/chunkBuilds'
 import { chunksAheadOf } from '../systems/render/chunkPrefetch'
