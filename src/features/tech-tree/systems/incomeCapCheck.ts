@@ -18,6 +18,8 @@
  * - Shares are whole basis points, rounded up (HS condition 1). A band the tip only skids on is
  *   not judged at those levels. Items are judged one at a time (#161); one share for every planet,
  *   so the check is economic only and never caps play, upgrade depth or drill speed.
+ * - `balance:tree --milestones` (GD lock on #256, ticket 278) judges the same way with each item's
+ *   sibling-link added to it: the item at Mark 9 and past, link on, sibling slotted and ready.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { oreTier, oreValue } from '../../../systems/economy/oreEconomy'
@@ -36,6 +38,7 @@ import {
 } from '../../../systems/money'
 import {
   incomeCapRowsOf,
+  milestoneIncomeCapRowsOf,
   type IncomeAnchors,
   type IncomeAt,
   type IncomeCapRow,
@@ -88,6 +91,9 @@ export interface IncomeCapVerdict {
   knownRedBecause: string | null
 }
 
+/** The rows an item is judged on: alone, or with its Mark milestones. */
+type IncomeRowsOf = (at: IncomeAt, anchors: IncomeAnchors) => IncomeCapRow[]
+
 /** One band of a judged planet, with one of its two vehicles. */
 interface JudgedPatch {
   planetIndex: number
@@ -116,8 +122,15 @@ export function incomeCapVerdictsOf(
   seeds: readonly SeedIncome[],
   cap: IncomeCap = TREE_ECONOMY.incomeCap,
 ): IncomeCapVerdict[] {
-  const shares = cap.planets.flatMap((planetIndex) => sharesOnPlanet(planetIndex, seeds))
-  return groupByKey(shares).map((group) => verdictOf(group, cap))
+  return verdictsOf(seeds, cap, incomeCapRowsOf)
+}
+
+/** The same verdicts with each item's sibling-link added to it (ticket 278). */
+export function milestoneIncomeCapVerdictsOf(
+  seeds: readonly SeedIncome[],
+  cap: IncomeCap = TREE_ECONOMY.incomeCap,
+): IncomeCapVerdict[] {
+  return verdictsOf(seeds, cap, milestoneIncomeCapRowsOf)
 }
 
 /** The verdicts that fail the gate: over the cap, or unheld in play, and not known-red. */
@@ -169,19 +182,32 @@ export function medianBasisPointsOf(shares: readonly number[]): number {
   return Math.ceil((sorted[middle - 1] + sorted[middle]) / 2)
 }
 
-function sharesOnPlanet(planetIndex: number, seeds: readonly SeedIncome[]): SeedShare[] {
+function verdictsOf(
+  seeds: readonly SeedIncome[],
+  cap: IncomeCap,
+  rowsOf: IncomeRowsOf,
+): IncomeCapVerdict[] {
+  const shares = cap.planets.flatMap((planetIndex) => sharesOnPlanet(planetIndex, seeds, rowsOf))
+  return groupByKey(shares).map((group) => verdictOf(group, cap))
+}
+
+function sharesOnPlanet(
+  planetIndex: number,
+  seeds: readonly SeedIncome[],
+  rowsOf: IncomeRowsOf,
+): SeedShare[] {
   return VISITS.flatMap((visit) =>
     BANDS.flatMap((band) =>
-      seeds.flatMap((seed) => seedSharesAt(seed, { planetIndex, visit, band })),
+      seeds.flatMap((seed) => seedSharesAt(seed, { planetIndex, visit, band }, rowsOf)),
     ),
   )
 }
 
-function seedSharesAt(seed: SeedIncome, where: JudgedPatch): SeedShare[] {
+function seedSharesAt(seed: SeedIncome, where: JudgedPatch, rowsOf: IncomeRowsOf): SeedShare[] {
   const standing = standingOf(seed, where)
   if (standing === null) return []
   const at = incomeAtOf(where, standing)
-  return incomeCapRowsOf(at, seed.anchors).map((row) => seedShareOf(where, row, standing.trip))
+  return rowsOf(at, seed.anchors).map((row) => seedShareOf(where, row, standing.trip))
 }
 
 /** The seed's vehicle on the patch and its drill trip; null when it never stood there or skids. */

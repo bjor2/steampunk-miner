@@ -22,6 +22,7 @@ import {
   incomeCapVerdictsOf,
   knownRedVerdictsOf,
   medianBasisPointsOf,
+  milestoneIncomeCapVerdictsOf,
   type PlanetVisit,
   type SeedIncome,
 } from './incomeCapCheck'
@@ -232,5 +233,36 @@ describe('income cap table', () => {
   it('prints a share past a whole hold', () => {
     const table = tableOf([rateAtShareOf('lodestone', '1.23456789', false)], CAP)
     expect(table).toContain('| P10 | power.lodestone | 15.00% | 123.46% |')
+  })
+})
+
+/** A rate at `share` whose sibling-link adds `linkShare` of the drill's minute (ticket 278). */
+function linkedRateOf(itemId: string, share: string, linkShare: string): IncomeRate {
+  return {
+    ...rateAtShareOf(itemId, share),
+    linkValuePerMinuteAtFullStack: (at: IncomeAt) =>
+      mul(at.drillOrePerMinute, fromCanonical(linkShare)),
+  }
+}
+
+function milestoneVerdictsOf(rates: readonly IncomeRate[], seeds: readonly SeedIncome[]) {
+  return withRegistrations([sliceOf(rates)], () => milestoneIncomeCapVerdictsOf(seeds, CAP))
+}
+
+describe('income cap check with Mark milestones (ticket 278)', () => {
+  it("judges an item with its sibling-link's yield added to its own", () => {
+    const rates = [linkedRateOf('shifter', '0.1', '0.04'), rateAtShareOf('drain', '0.1')]
+    const verdicts = milestoneVerdictsOf(rates, [seedOf(ON_CURVE)])
+    const shareOf = (itemId: string) =>
+      verdicts.find((v) => v.itemId === itemId && v.band === 5)?.medianShareBp
+    expect([shareOf('power.shifter'), shareOf('power.drain')]).toEqual([1400, 1000])
+  })
+
+  it('fails an item its sibling-link carries past the cap that passes without it', () => {
+    const rates = [linkedRateOf('shifter', '0.1', '0.0501')]
+    expect(failingItemsOf(verdictsOf(rates, [seedOf(ON_CURVE)]))).toEqual([])
+    expect(failingItemsOf(milestoneVerdictsOf(rates, [seedOf(ON_CURVE)]))).toEqual([
+      'power.shifter',
+    ])
   })
 })
