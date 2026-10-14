@@ -7,7 +7,8 @@
  * `bench/gateChannelRebuild.ts`), then the overlay's frame cost (#208, `bench/overlayFrame.ts`),
  * then the magnetic field lines' frame cost before and after their layer on P43 (#293,
  * `bench/fieldArcsFrame.ts`), then the terrain's streaming frame at 120 m/s on P10 (ticket 336,
- * `bench/streamAtSpeed.ts`).
+ * `bench/streamAtSpeed.ts`), then its main-thread part at 480 m/s with the chunk worker (ticket
+ * 337, `bench/streamThroughWorker.ts`).
  * With `-- --log` it also writes `benchmark_result` lines to `logs/<runId>/events.ndjson` (#124).
  */
 import { loadFeatures } from '../src/features'
@@ -26,6 +27,7 @@ import { benchFieldArcsFrame } from './bench/fieldArcsFrame'
 import { benchGateChannelRebuild } from './bench/gateChannelRebuild'
 import { benchOverlayFrame } from './bench/overlayFrame'
 import { benchStreamAtSpeed } from './bench/streamAtSpeed'
+import { benchStreamThroughWorker } from './bench/streamThroughWorker'
 
 loadFeatures()
 
@@ -87,4 +89,5 @@ logBenchmarkSeriesWhenAsked('render', [
   benchOverlayFrame(),
   ...benchFieldArcsFrame(WORLD_SEED),
   ...benchStreamAtSpeed(WORLD_SEED),
+  ...benchStreamThroughWorker(WORLD_SEED),
 ])

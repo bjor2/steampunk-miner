@@ -26,7 +26,7 @@ import type { ChunkMeshParts } from '../systems/render/chunkMeshParts'
 import { chunkKey } from '../systems/world/tileGrid'
 import type { WorldState } from '../systems/world/worldState'
 import type { ChunkNeed } from './chunkBuildNeeds'
-import { buildsPerFrameOf, timedMs, type StreamView } from './chunkStreamFrame'
+import { timedMs, type StreamView } from './chunkStreamFrame'
 
 /** The worker and the book of the jobs posted to it. */
 export interface ChunkJobs {
@@ -60,7 +60,11 @@ export function readChunkResults(jobs: ChunkJobs, sink: MeshPartsSink): void {
   spendFrameBudgetOn(() => jobs.port.nextResult(), runTimed, TERRAIN_FRAME_BUDGET_MS)
 }
 
-/** Posts the needs whose job is due, in build order, as many as the speed asks and the worker has room for. */
+/**
+ * Posts the needs whose job is due, in build order, as many as the worker has room for: posting
+ * costs the main thread little, so the worker's own pace bounds the stream, not c1's builds a
+ * frame, and the room keeps a chunk coming into view near the front of its queue.
+ */
 export function postChunkJobs(
   jobs: ChunkJobs,
   needs: readonly ChunkNeed[],
@@ -68,8 +72,8 @@ export function postChunkJobs(
   view: JobStreamView,
 ): void {
   const due = needs.filter((need) => isJobDue(jobs.book, need, frame))
-  const count = Math.min(buildsPerFrameOf(view), roomForJobs(jobs.book))
-  for (const need of chunksToBuild(due, frame, count)) postJob(jobs, need, frame, view)
+  for (const need of chunksToBuild(due, frame, roomForJobs(jobs.book)))
+    postJob(jobs, need, frame, view)
 }
 
 /** Nothing is left to post and no result is still to come. */
