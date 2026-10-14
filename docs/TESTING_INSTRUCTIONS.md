@@ -364,13 +364,18 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   share pins are (`systems/familySharePins.ts`): the armoury's recurring gun-track spend (track
   levels, lane nodes, modules and Marks; never a one-time mount) stays at or under 5% of every
   planet's spend on the seed median (Vertical Scaler on #322, GD ruling on #371), and the lane fails
-  on a planet over it. On the same runs the lane gates the 15% income cap (#385,
+  on a planet over it. On the same runs the lane gates the 15% income cap (#385 ruling 6167240683,
   `systems/incomeCapCheck.ts`): every income item registered in the kernel `incomeRates` registry
   (the drain; the ore-shifter, pocket lance and lodestone as the ore value they relocate), at full
-  stack and after `tripCapAt`, brings at most `tech.incomeCap.maxShare` of the drill's own ore value
-  a minute on the same band, on P10, P20, P40 and P60, every band, at the levels the bot arrived with
-  and left with, on the median of the seeds that own the item when their run ends. A band the tip
-  only skids on is not judged. Also
+  stack, brings in one trip (the drill's minutes to fill the hold) at most
+  `tech.incomeCap.maxShareBp` of a full hold of the band's ore after `tripCapAt`, on P10, P20, P40
+  and P60, every band, at the levels the bot arrived with and left with, on the median of the seeds
+  that own the item when their run ends, in whole basis points. An item over the cap before the
+  clamp fails unless play pays it through the trip ledger; `tech.incomeCap.knownRed` lists the
+  movers until their ledger ticket lands, printed and not gated. A band the tip only skids on is not
+  judged. The lane also fails an item over 15% of what the bot earned on any planet of the run
+  (`systems/deliveredIncomeShares.ts`, the Vertical Scaler's guard), and `incomeCapGolden.test.ts`
+  pins the shares on the on-curve vehicle. Also
   report-only, each of the six lanes' median share of every planet's spend, zero included
   (`laneShareRowsOf` in `systems/nodeSpendShare.ts`, ticket 266): lanes carry no bands of their own
   (GD ruling Q4 on #212), so the sixth lane's share comes out of the gated tree total. Gated beside
