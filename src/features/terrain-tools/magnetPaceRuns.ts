@@ -8,16 +8,12 @@
 import { PACING_WORLD_SEEDS } from '../../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { CommandIntent } from '../../systems/authority/authorityCommand'
-import { createAuthorityState } from '../../systems/authority/authorityState'
 import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { setVehicleLoadoutCommand } from '../../systems/authority/loadoutCommands'
-import { createBotSession, type BotSession } from '../../systems/bot/botSession'
-import { botPlanetOf } from '../../systems/bot/botTravel'
-import { playSliceFrom, type SliceRun } from '../../systems/bot/playSlice'
-import { UPGRADE_IDS } from '../../systems/economy/economyDefinition'
-import { stepOfMajor } from '../../systems/economy/upgradeSteps'
+import type { BotSession } from '../../systems/bot/botSession'
+import { arrivedPaceSessionOn, playToCoreFrom } from '../../systems/bot/paceArrival'
+import type { SliceRun } from '../../systems/bot/playSlice'
 import { ECONOMY } from '../../systems/economy/economy'
-import { onCurveLevel, onCurveSteps, vehicleStatsAt } from '../../systems/economy/vehicleStats'
 import {
   add,
   div,
@@ -25,13 +21,10 @@ import {
   fromCanonical,
   fromSafeInteger,
   mul,
-  toCanonical,
   toSafeInteger,
   ZERO_MONEY,
   type Money,
 } from '../../systems/money'
-import { setPlanetCommand, setPlanetSeedCommand } from '../../systems/startScenarioCommands'
-import { setUpgradeCommand } from '../../systems/vehicle/vehicleCommands'
 import { MAGNET_HAND_LOADOUT, withMagnetHand } from './magnetHand'
 import type { MagnetVerb } from './systems/magnetItems'
 
@@ -50,7 +43,6 @@ export const MAX_INCOME_BP = BASIS_POINTS + ECONOMY.magnets.incomeCapBp
 /** Two hours on one planet: room for a slow core on either run. */
 const BUDGET_TICKS = 2 * 60 * 60 * TICKS_PER_SECOND
 const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
-const ARRIVAL_MONEY = '20000'
 
 const BARE_LOADOUT = setVehicleLoadoutCommand({})
 const MAGNET_LOADOUT = setVehicleLoadoutCommand(MAGNET_HAND_LOADOUT)
@@ -105,38 +97,15 @@ export function describeRuns({ planet, seed, bare, withMagnets }: MagnetPaceRuns
   return `P${planet} seed ${seed}: bare ${minutes(bare)} min, magnets ${minutes(withMagnets)} min (${ratios}; ${uses})`
 }
 
-/** On `planet` with the on-curve levels, the hull whole and a little money, as a bot arriving. */
-function arrivalOn(planet: number, worldSeed: number): CommandIntent[] {
-  return [
-    setPlanetCommand(planet),
-    setPlanetSeedCommand(worldSeed),
-    { type: 'debug.setMoney', payload: { amount: ARRIVAL_MONEY } },
-    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, planet)))),
-    wholeHullOn(planet),
-  ]
-}
-
-/** `debug.setUpgrade` keeps the planet-1 hull; the on-curve one is mended whole (ticket 354). */
-function wholeHullOn(planet: number): CommandIntent {
-  const { hullMax } = vehicleStatsAt(onCurveSteps(planet))
-  return { type: 'debug.setHull', payload: { hull: toCanonical(hullMax) } }
-}
-
-/** The bot from arrival on `planet` to its core, `loadout` sent first, through `hand`. */
+/** The bot from arrival on `planet` (`paceArrival.ts`) to its core, `loadout` first, via `hand`. */
 function coreRunOn(
   planet: number,
   worldSeed: number,
   loadout: CommandIntent,
   hand: (session: BotSession) => BotSession,
 ): SliceRun {
-  const start = createAuthorityState({ planetIndex: 1, planetSeed: worldSeed, playerIds: ['p1'] })
-  const session = createBotSession(start, 'p1')
-  for (const intent of [...arrivalOn(planet, worldSeed), loadout]) session.submit(intent)
-  const played = hand(session)
-  return playSliceFrom(played, botPlanetOf(played, 'blast'), {
-    maxTicks: BUDGET_TICKS,
-    lastPlanet: planet,
-  })
+  const arrived = arrivedPaceSessionOn(planet, worldSeed, [loadout])
+  return playToCoreFrom(hand(arrived), planet, BUDGET_TICKS)
 }
 
 /** `value` over `baseline` in whole basis points, rounded down. */

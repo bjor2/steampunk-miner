@@ -12,13 +12,10 @@
 import { PACING_WORLD_SEEDS } from '../../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { CommandIntent } from '../../systems/authority/authorityCommand'
-import { createAuthorityState } from '../../systems/authority/authorityState'
 import type { DomainEvent } from '../../systems/authority/domainEvent'
 import { setVehicleLoadoutCommand } from '../../systems/authority/loadoutCommands'
-import { playSlice, type SliceRun } from '../../systems/bot/playSlice'
-import { UPGRADE_IDS } from '../../systems/economy/economyDefinition'
-import { stepOfMajor } from '../../systems/economy/upgradeSteps'
-import { onCurveLevel, onCurveSteps, vehicleStatsAt } from '../../systems/economy/vehicleStats'
+import { arrivedPaceSessionOn, playToCoreFrom } from '../../systems/bot/paceArrival'
+import type { SliceRun } from '../../systems/bot/playSlice'
 import {
   add,
   div,
@@ -26,13 +23,10 @@ import {
   fromCanonical,
   fromSafeInteger,
   mul,
-  toCanonical,
   toSafeInteger,
   ZERO_MONEY,
   type Money,
 } from '../../systems/money'
-import { setPlanetCommand, setPlanetSeedCommand } from '../../systems/startScenarioCommands'
-import { setUpgradeCommand } from '../../systems/vehicle/vehicleCommands'
 import { DIELECTRIC_BIT_ID } from '../drill-gear'
 import { withMagneticClassOff } from './magneticClassOff'
 
@@ -55,7 +49,6 @@ export const BAND_VALUE_TOLERANCE_BP = 400
 /** Two hours on one planet: room for a slow core on any run. */
 const BUDGET_TICKS = 2 * 60 * 60 * TICKS_PER_SECOND
 const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
-const ARRIVAL_MONEY = '20000'
 
 const BARE_HEAD = setVehicleLoadoutCommand({})
 const BIT_HEAD = setVehicleLoadoutCommand({ 'drill.head': DIELECTRIC_BIT_ID })
@@ -112,35 +105,13 @@ export function describeRuns(runs: MagneticPlanetRuns): string {
   return `P${planet} seed ${seed}: off ${minutes(off)} min, on ${minutes(bare)} min (${timeRatioBp(bare, off)} bp, income ${incomeRatioBp(bare, off)} bp), with the bit ${minutes(withBit)} min (${timeRatioBp(withBit, off)} bp)`
 }
 
-/** On `planet` with the on-curve levels, the hull whole and a little money, as a bot arriving. */
-export function arrivalOn(planet: number, worldSeed: number): CommandIntent[] {
-  return [
-    setPlanetCommand(planet),
-    setPlanetSeedCommand(worldSeed),
-    { type: 'debug.setMoney', payload: { amount: ARRIVAL_MONEY } },
-    ...UPGRADE_IDS.map((id) => setUpgradeCommand(id, stepOfMajor(onCurveLevel(id, planet)))),
-    wholeHullOn(planet),
-  ]
-}
-
 /**
- * The on-curve hull mended whole. `debug.setUpgrade` keeps the planet-1 hull, which the first
- * shock (2% of the on-curve hull) wrecked, so the bare run lost its cargo and played a different
- * planet from the class-off run (ticket 354). The tank stays as the levels leave it, as before.
+ * The bot from arrival on `planet` to its core, with `head` sent before the first trip. The arrival
+ * mends the hull whole (`paceArrival.ts`): the planet-1 hull it kept before wrecked the bare run on
+ * the first shock, so it played a different planet from the class-off run (ticket 354).
  */
-function wholeHullOn(planet: number): CommandIntent {
-  const { hullMax } = vehicleStatsAt(onCurveSteps(planet))
-  return { type: 'debug.setHull', payload: { hull: toCanonical(hullMax) } }
-}
-
-/** The bot from arrival on `planet` to its core, with `head` sent before the first trip. */
 function coreRunOn(planet: number, worldSeed: number, head: CommandIntent): SliceRun {
-  const start = createAuthorityState({ planetIndex: 1, planetSeed: worldSeed, playerIds: ['p1'] })
-  return playSlice(start, {
-    maxTicks: BUDGET_TICKS,
-    lastPlanet: planet,
-    startCommands: [...arrivalOn(planet, worldSeed), head],
-  })
+  return playToCoreFrom(arrivedPaceSessionOn(planet, worldSeed, [head]), planet, BUDGET_TICKS)
 }
 
 /** Money from every sale of the run over its minutes. */
