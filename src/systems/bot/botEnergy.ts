@@ -9,7 +9,7 @@ import { statsOfVehicle } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import type { BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
-import { boreQuanta, moveQuanta, moveTicks } from './botWorld'
+import { boreQuanta, botTravelSpeedOf, moveQuanta, moveTicks } from './botWorld'
 import { shaftColumnAt, shaftJogLengthAbove, type MineLayout } from './mineLayout'
 import { nextRow, type TripGoal } from './tripGoal'
 
@@ -45,7 +45,7 @@ export function canAffordMoveTo(
   target: TilePoint,
 ): boolean {
   const { position } = planet.pilot
-  const speed = statsOfVehicle(session.vehicle()).engine.speedMax
+  const speed = botTravelSpeedOf(session.state(), session.playerId)
   const along =
     Math.abs(target.tx - position.tx) +
     Math.abs(position.tx - shaftColumnAt(planet.layout, position.ty))
@@ -66,7 +66,7 @@ function reserveQuanta(session: BotSession, layout: MineLayout, from: TilePoint)
  * (#113), over to the pad.
  */
 export function returnQuanta(session: BotSession, layout: MineLayout, from: TilePoint): number {
-  const speed = statsOfVehicle(session.vehicle()).engine.speedMax
+  const speed = botTravelSpeedOf(session.state(), session.playerId)
   const along =
     Math.abs(from.tx - shaftColumnAt(layout, from.ty)) +
     shaftJogLengthAbove(layout, from.ty) +

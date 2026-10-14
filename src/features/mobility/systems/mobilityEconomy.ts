@@ -62,7 +62,10 @@ export interface HeatSinkNumbers {
 export interface BurstNumbers {
   windupTicks: number
   burstTicks: number
-  /** The burst's speed as a share of the engine's top speed. */
+  /**
+   * The burst's speed as a share of the effective travel speed: the engine's top speed until the
+   * drill sets travel (ticket 333).
+   */
   speedShareBp: number
 }
 

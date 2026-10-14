@@ -1,11 +1,15 @@
 /**
  * What the bot reads of the world and how long things take it (#29 Systems & Economy note 3, the
  * movement-time model of the #6 simulation, not physics): driving and falling along a bored tunnel
- * at the engine's top speed for `drive` energy, climbing at the same speed for `thrust` energy,
- * and boring a tile in exactly the ticks the #7 drill rule gives. Tiles are 1 m.
+ * at the travel speed for `drive` energy, climbing at the same speed for `thrust` energy, and
+ * boring a tile in exactly the ticks the #7 drill rule gives. Tiles are 1 m. The travel speed is
+ * the rig's effective one (travel parity, ticket 333): the engine's top speed until k times the
+ * drill's cut speed passes it.
  */
-import { TICKS_PER_SECOND } from '../../constants/physics'
+import { MAX_SPEED_MM_PER_SECOND } from '../../constants/balance'
+import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'
 import { planetParamsOf } from '../authority/planetOfState'
+import { effectiveTravelSpeedOf } from '../authority/travelSpeed'
 import type { AuthorityState } from '../authority/authorityState'
 import { hardnessOfTile, ticksPerCell } from '../authority/groundDrill'
 import { scratchFloorOfCell } from '../authority/signatureCells'
@@ -102,6 +106,14 @@ function isScratchableCell(
 /** Ticks to cover `tiles` metres at `speedMax` m/s, whole steps rounded up. */
 export function moveTicks(tiles: number, speedMax: number): number {
   return Math.ceil((tiles * TICKS_PER_SECOND) / speedMax)
+}
+
+/**
+ * m/s the bot moves at where its rig stands: the effective travel speed, held to the pose bound
+ * its reports must keep (until #334 derives that bound from the rig's stats).
+ */
+export function botTravelSpeedOf(state: AuthorityState, playerId: string): number {
+  return Math.min(effectiveTravelSpeedOf(state, playerId), MAX_SPEED_MM_PER_SECOND / MM_PER_METRE)
 }
 
 /** The quanta a move costs: driving and falling at the drive rate, climbing at the thrust rate. */

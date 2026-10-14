@@ -10,7 +10,7 @@
  * sales settle. Positions are tile centres, upright (up = (0, 1024)), velocity 0 at each report.
  */
 import { POSE_REPORT_INTERVAL_TICKS } from '../../constants/balance'
-import { isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
+import { isVehicleActive } from '../vehicle/vehicleState'
 import type { Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
 import { waitFiring, type BorePolicy } from './botBore'
@@ -21,7 +21,7 @@ import { setGunsForEnergy } from './botGuns'
 import { facingTowards, NO_TICKS, reportPoseIntent } from './botPose'
 import type { BotSession } from './botSession'
 import type { GateRouteBlock } from './gateRouteBlocks'
-import { moveTicks } from './botWorld'
+import { botTravelSpeedOf, moveTicks } from './botWorld'
 import type { MineLayout } from './mineLayout'
 
 /** A bore reports at least this often, like the client's 5 Hz pose reports. */
@@ -118,7 +118,7 @@ export function enterBoredTile(pilot: BotPilot, tile: TilePoint): void {
 export function moveStraight(session: BotSession, planet: BotPlanet, to: TilePoint): void {
   const { pilot } = planet
   const tiles = straightPath(pilot.position, to)
-  const speed = statsOfVehicle(session.vehicle()).engine.speedMax
+  const speed = botTravelSpeedOf(session.state(), session.playerId)
   const facing = facingTowards(pilot.position, to)
   const isClimb = to.ty > pilot.position.ty
   let reportedTicks = 0

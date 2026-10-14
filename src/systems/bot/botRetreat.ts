@@ -8,12 +8,12 @@
  * has nothing left to try.
  */
 import { rescueFloorQuanta } from '../vehicle/energyQuanta'
-import { isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
+import { isVehicleActive } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { moveStraight, type BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
 import { leavePad, waitForTow } from './botTrip'
-import { moveQuanta, moveTicks } from './botWorld'
+import { botTravelSpeedOf, moveQuanta, moveTicks } from './botWorld'
 import { shaftTileAt } from './mineLayout'
 
 /** Shuttle legs past the movement model's count before a vehicle still running is a bot bug. */
@@ -57,6 +57,6 @@ function shuttleUntilStranded(session: BotSession, planet: BotPlanet): void {
 }
 
 function shuttleLegsToEmpty(session: BotSession): number {
-  const speed = statsOfVehicle(session.vehicle()).engine.speedMax
+  const speed = botTravelSpeedOf(session.state(), session.playerId)
   return Math.ceil(session.vehicle().energy / moveQuanta(moveTicks(1, speed), 0))
 }

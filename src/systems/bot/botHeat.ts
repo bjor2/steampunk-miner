@@ -11,10 +11,10 @@ import { bandHeatPerSecond, hazardArchetypeOn, heatCoolingPerSecond } from '../e
 import type { Money } from '../money'
 import { isLiningTypeOwned } from '../vehicle/liningType'
 import { heatUnitsOfPoints, heatUnitsPerTickOf } from '../vehicle/vehicleHeat'
-import { statsOfVehicle } from '../vehicle/vehicleState'
 import { bandOfTile } from '../world/planetGeometry'
 import type { BotPlanet } from './botPilot'
 import type { BotSession } from './botSession'
+import { botTravelSpeedOf } from './botWorld'
 import { shaftColumnAt } from './mineLayout'
 
 /** The gauge, the way home's heat included, the bot never lets past this many points. */
@@ -47,12 +47,12 @@ export function isTooHotToDig(session: BotSession, planet: BotPlanet): boolean {
   return heat >= heatUnitsOfPoints(TURN_BACK_HEAT_POINTS)
 }
 
-/** Band heat for every row from the pilot up to the pad, at the engine's top speed (#6 model). */
+/** Band heat for every row from the pilot up to the pad, at the bot's travel speed (#6 model). */
 function heatOfClimbHome(session: BotSession, planet: BotPlanet): number {
   const { layout, pilot } = planet
   const planetIndex = session.state().planet.index
   if (hazardArchetypeOn(planetIndex) === null) return 0
-  const ticksPerRow = TICKS_PER_SECOND / statsOfVehicle(session.vehicle()).engine.speedMax
+  const ticksPerRow = TICKS_PER_SECOND / botTravelSpeedOf(session.state(), session.playerId)
   let units = 0
   for (let row = pilot.position.ty; row < layout.travelRow; row++) {
     const band = bandOfTile(layout.params, shaftColumnAt(layout, row), row)

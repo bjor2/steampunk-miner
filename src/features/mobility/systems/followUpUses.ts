@@ -10,13 +10,13 @@
  */
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../../../constants/physics'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
+import { effectiveTravelSpeedOf } from '../../../systems/authority/travelSpeed'
 import {
   facingVectorOf,
   FACING,
   type IntegerVector,
   type VehiclePose,
 } from '../../../systems/vehicle/vehiclePose'
-import { statsOfVehicle } from '../../../systems/vehicle/vehicleState'
 import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
 import { withMove } from './milestoneMoves'
 import { MOBILITY_ECONOMY } from './mobilityEconomy'
@@ -190,7 +190,8 @@ function kickedWith(
   const vehicle = vehicleOf(state, use.playerId)
   if (vehicle.pose === null) return { kind: 'refused', reason: OUT_OF_PLAY }
   const direction = directionOf(vehicle.pose)
-  const speedMmPerS = shareOfTopSpeedMm(statsOfVehicle(vehicle).engine.speedMax, M.kickSpeedShareBp)
+  const travelSpeed = effectiveTravelSpeedOf(state, use.playerId)
+  const speedMmPerS = shareOfTopSpeedMm(travelSpeed, M.kickSpeedShareBp)
   const kick = {
     untilTick: use.tick + M.kickTicks,
     burst: { dirX: direction.x, dirY: direction.y, speedMmPerS },

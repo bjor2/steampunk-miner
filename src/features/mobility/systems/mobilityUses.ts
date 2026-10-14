@@ -14,13 +14,13 @@ import { BASIS_POINTS } from '../../../constants/balance'
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../../constants/physics'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { unchanged } from '../../../systems/authority/commandRule'
+import { effectiveTravelSpeedOf } from '../../../systems/authority/travelSpeed'
 import {
   facingVectorOf,
   FACING,
   type IntegerVector,
   type VehiclePose,
 } from '../../../systems/vehicle/vehiclePose'
-import { statsOfVehicle } from '../../../systems/vehicle/vehicleState'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
 import { grappleHookOf, type GrappleHook } from './grappleHook'
@@ -201,7 +201,10 @@ export function burstWith(
   const burst = {
     dirX: direction.x,
     dirY: direction.y,
-    speedMmPerS: shareOfTopSpeedMm(statsOfVehicle(vehicle).engine.speedMax, numbers.speedShareBp),
+    speedMmPerS: shareOfTopSpeedMm(
+      effectiveTravelSpeedOf(state, use.playerId),
+      numbers.speedShareBp,
+    ),
     untilTick: use.tick + magnitudeOf(use, numbers.burstTicks),
   }
   return actedWith(state, use, (value) => change(value, burst, pose))
@@ -229,7 +232,7 @@ export function shareOfTopSpeedMm(speedMaxMetresPerSecond: number, shareBp: numb
 }
 
 /**
- * Hauled at the engine's top speed (the kernel's reel), the winch holds the miner at the hook for
+ * Hauled at the effective travel speed (the kernel's reel, ticket 333), the winch holds the miner at the hook for
  * a moment, and lets go after `reelTicksMax` whatever happens.
  */
 function reelOf(
@@ -239,8 +242,8 @@ function reelOf(
   driveBp: number | undefined,
 ): ReelWindow {
   const { reelHoldTicks, reelTicksMax } = NUMBERS.grapple
-  const speedMax = statsOfVehicle(vehicleOf(state, use.playerId)).engine.speedMax
-  const travelTicks = Math.ceil((hook.distanceMm * TICKS_PER_SECOND) / (speedMax * MM_PER_METRE))
+  const travelSpeed = effectiveTravelSpeedOf(state, use.playerId)
+  const travelTicks = Math.ceil((hook.distanceMm * TICKS_PER_SECOND) / (travelSpeed * MM_PER_METRE))
   return {
     hookTx: hook.hook.tx,
     hookTy: hook.hook.ty,
