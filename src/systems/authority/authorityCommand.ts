@@ -227,8 +227,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    cutters' side-cutter heat on the `aetheric.heat` gauge per dig second; and
  *    `aetheric.FoamStilled`, `WarningChimed`, `PendulumSwung` and `CuttersQuenched`. With no combo
  *    owned no digest or mined order changes.
+ * 69: the auto_guns modules (ticket 388, the #319 GD split): the ground-gun slice registers the
+ *    `autoGuns` provider and the Flushing shell's `enemyFlushes` entry, so every pose report and
+ *    cut now writes the vehicle's `stillSinceTick` (ticket 382's sentry fact) and owned turret
+ *    modules shape the turret's shots. Only that field moves the digests; mined orders are unchanged.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 68
+export const AUTHORITY_PROTOCOL_VERSION = 69
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

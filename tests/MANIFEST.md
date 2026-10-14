@@ -209,7 +209,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
-### `ground-gun`: 38 files, 249 tests
+### `ground-gun`: 43 files, 278 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -220,7 +220,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/store/fireLamp.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/armouryModules.test.ts` | 13 | 13 |
 | `src/features/ground-gun/systems/armourySpend.test.ts` | 7 | 7 |
-| `src/features/ground-gun/systems/autoGunsLane.test.ts` | 5 | 5 |
+| `src/features/ground-gun/systems/autoGunsLane.test.ts` | 11 | 11 |
 | `src/features/ground-gun/systems/boreGunCards.test.ts` | 6 | 6 |
 | `src/features/ground-gun/systems/boreGunLane.test.ts` | 12 | 12 |
 | `src/features/ground-gun/systems/boreGunLaneLaw.test.ts` | 10 | 2 |
@@ -230,9 +230,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/systems/boreLadders.test.ts` | 8 | 8 |
 | `src/features/ground-gun/systems/borePickup.test.ts` | 4 | 4 |
 | `src/features/ground-gun/systems/boughtModules.test.ts` | 3 | 3 |
+| `src/features/ground-gun/systems/burstToggle.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/fireAim.test.ts` | 7 | 7 |
 | `src/features/ground-gun/systems/fireHold.test.ts` | 9 | 8 |
 | `src/features/ground-gun/systems/fireTile.test.ts` | 3 | 3 |
+| `src/features/ground-gun/systems/flushingShell.test.ts` | 4 | 4 |
 | `src/features/ground-gun/systems/groundGunEconomy.test.ts` | 8 | 8 |
 | `src/features/ground-gun/systems/gunBayEntries.test.ts` | 5 | 5 |
 | `src/features/ground-gun/systems/gunLevels.test.ts` | 6 | 6 |
@@ -250,6 +252,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/systems/signatureGround.test.ts` | 6 | 6 |
 | `src/features/ground-gun/systems/signatureShapes.test.ts` | 14 | 14 |
 | `src/features/ground-gun/systems/tilePress.test.ts` | 7 | 7 |
+| `src/features/ground-gun/systems/turretModules.test.ts` | 5 | 5 |
+| `src/features/ground-gun/systems/turretShapes.test.ts` | 10 | 10 |
+| `src/features/ground-gun/turretPace.lane.test.ts` | 1 | 1 |
 | `src/features/ground-gun/ui/fireGauge.test.ts` | 3 | 3 |
 
 ### `mining-gates`: 23 files, 148 tests
