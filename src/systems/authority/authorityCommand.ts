@@ -198,8 +198,14 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    through the `groundReinforcement` registry, each billed onto the lining bill at its band and
  *    logged as `ground-gun.ShotCellsReinforced`. With no cementing round fired no digest or mined
  *    order changes.
+ * 64: the turret shape (ticket 382, K-turret of the TD lock on #319): the `autoGuns` provider's
+ *    `TurretShape`, read once per due shot, sets the guns' range, shot energy, the fire director's
+ *    order (the combat vehicle's optional `directorPick`), the sentry cam's open cone (the
+ *    vehicle's optional `stillSinceTick`), grapeshot's split (a gun tally's optional `energy`),
+ *    concussion's knock (the enemy's optional `knockedTick`) and a one-bounce ricochet. With no
+ *    provider no field is written and no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 63
+export const AUTHORITY_PROTOCOL_VERSION = 64
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
