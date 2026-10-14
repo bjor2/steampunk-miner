@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T00:57:21+02:00",
+  "updated_at": "2026-10-15T00:59:21+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -120,7 +120,7 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -571,11 +571,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-15 00:48 CEST",
-    "mode": "pass",
-    "triggers": "#396",
-    "started": "#399->C2/A1",
-    "note": "spawned 1 worker(s)"
+    "at": "2026-10-15 00:58 CEST",
+    "mode": "recheck",
+    "triggers": "#399",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
