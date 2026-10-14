@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T11:15:01+02:00",
+  "updated_at": "2026-10-14T11:15:14+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -104,32 +104,23 @@
     }
   ],
   "gate": {
-    "busy": 2,
+    "busy": 3,
     "max": 3
   },
   "tester": {
-    "state": "idle",
-    "phase": null,
-    "sha": null,
-    "since": "2026-10-14T09:13:08Z",
-    "holds_gate": false,
+    "state": "running",
+    "phase": "fast",
+    "sha": "8d1eab48c54e8eb72d570b68b00c46ed6bcae40a",
+    "since": "2026-10-14T09:15:07Z",
+    "holds_gate": true,
     "claude_slot": null,
     "last_run": "2026-10-08T00:44:41Z",
     "last_nightly": "2026-10-08T05:23:05Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=ok balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=ok packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": null,
-    "feature_title": null,
+    "feature": 145,
+    "feature_title": "Art/VFX: Dynamite sizes and explosion effects",
     "queue": [
-      {
-        "feature": 145,
-        "kind": "spec",
-        "title": "Art/VFX: Dynamite sizes and explosion effects",
-        "tickets": [
-          215
-        ],
-        "since": "2026-10-07T22:13:01+02:00"
-      },
       {
         "feature": 190,
         "kind": "ticket",
