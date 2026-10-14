@@ -58,7 +58,7 @@ function settleVehicleOnSurface(world: RAPIER.World, steps: number) {
   }
   for (let step = 0; step < steps; step++) {
     controller.step({ intent: IDLE_INTENT, engine: engineStats(0), canAct: true }, planet)
-    world.step()
+    controller.stepWorld()
   }
   return { body: placed.body, controller }
 }

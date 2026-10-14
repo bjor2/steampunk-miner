@@ -97,7 +97,7 @@ function dropDownTheShaft(radiusKm: number, options: VehicleControllerOptions = 
   const trace: Trace = { places: [], origins: new Set() }
   for (let step = 1; step <= STEPS; step++) {
     controller.step({ intent: IDLE_INTENT, engine: engineStats(0), canAct: true }, planet)
-    world.step()
+    controller.stepWorld()
     const { xMm, yMm } = controller.renderOrigin()
     trace.origins.add(`${xMm},${yMm}`)
     if (step % 10 === 0) trace.places.push(placeFromMouth(controller.planetPosition(), mouth))

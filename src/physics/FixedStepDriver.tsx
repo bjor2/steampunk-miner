@@ -3,16 +3,20 @@
  * render frame runs the whole 1/60 s steps it completes, then publishes how far the frame sits
  * toward the next step (`stepBlend`). `@react-three/rapier` keeps that share private and only
  * applies it to its own `<RigidBody>` meshes, while the game's bodies are plain Rapier bodies, so
- * the world is left paused there and stepped here through its sanctioned manual `step`. The steps
- * per second are unchanged; only where bodies are drawn between steps is new.
+ * the world is left paused there and stepped here. Each fixed step is the mounted vehicle's tick,
+ * which runs its motion rule and steps the world through the tick in substeps (ticket 334,
+ * `runFixedTick`); with no vehicle mounted the world steps once. The steps per second are
+ * unchanged; only where bodies are drawn between steps is new.
  */
 import { useFrame } from '@react-three/fiber'
+import type RAPIER from '@dimforge/rapier3d-compat'
 import { useRapier } from '@react-three/rapier'
 import { useEffect, useMemo } from 'react'
-import { FIXED_STEP_FRAME_PRIORITY } from '../constants/physics'
+import { FIXED_STEP_FRAME_PRIORITY, PHYSICS_TIMESTEP } from '../constants/physics'
 import {
   exposeLiveStepper,
   runFixedStepFrame,
+  runFixedTick,
   runLiveSteps,
   type FrameClock,
   type LiveWorld,
@@ -23,10 +27,18 @@ import {
  * next frame: no step, and bodies stay drawn where they were.
  */
 export function FixedStepDriver({ isHeld }: { isHeld: () => boolean }) {
-  const { step } = useRapier()
+  const { world: rapierWorld } = useRapier()
   const clock = useMemo<FrameClock>(() => ({ carried: 0 }), [])
-  const world = useMemo<LiveWorld>(() => ({ isHeld, stepWorld: step }), [isHeld, step])
+  const world = useMemo<LiveWorld>(
+    () => ({ isHeld, stepWorld: () => runFixedTick(() => stepBareWorld(rapierWorld)) }),
+    [isHeld, rapierWorld],
+  )
   useEffect(() => exposeLiveStepper((ticks) => runLiveSteps(ticks, world)), [world])
   useFrame((_, delta) => runFixedStepFrame(clock, delta, world), FIXED_STEP_FRAME_PRIORITY)
   return null
+}
+
+function stepBareWorld(world: RAPIER.World): void {
+  world.timestep = PHYSICS_TIMESTEP
+  world.step()
 }

@@ -11,7 +11,9 @@
  * With the dev flag `drill.sweptCut` on (ticket 330) every step the drill is engaged also sends a
  * `drillStep`, before the step's report, so the authority cuts every tick, and (ticket 333) the
  * motor reads the cut gate and the drill's speed from the authority before the step's cut and
- * drives on an engine whose top speed is travel parity's; off, nothing changes.
+ * drives on an engine whose top speed is travel parity's, and (ticket 334) clamps the body to the
+ * rig's stats-derived step bound and widens the wheels' wait-for-cut window to it; off, nothing
+ * changes.
  */
 import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
@@ -25,6 +27,7 @@ import {
 import { readAuthorityState } from '../store/authorityLink'
 import type { AuthorityState } from '../systems/authority/authorityState'
 import { cutFollowAt, type CutFollow, type CutFollowStep } from '../systems/authority/cutFollowRead'
+import { stepBoundsAt } from '../systems/authority/stepBoundRead'
 import { travelEngineAt } from '../systems/authority/travelSpeed'
 import { magneticTugAt, magneticTugOnCutAt } from '../systems/authority/magnetic/magneticTug'
 import { engineStatsAtStep, type EngineStats } from '../systems/economy/vehicleStats'
@@ -35,6 +38,7 @@ import {
   takePoseReport,
   type PoseReporter,
 } from '../systems/vehicle/poseReport'
+import type { StepBounds } from '../systems/vehicle/stepBound'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import { driveSignsOfIntent } from '../systems/vehicle/driveSigns'
@@ -114,6 +118,7 @@ export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
           tug: readLocalTug(loop),
           drillContactRule: drillContactRuleOf(flags),
           cutFollowOf: cutFollowRuleOf(flags),
+          stepBounds: stepBoundsOfFlag(flags),
         },
         planetViewOf(loop, params, world),
       )
@@ -255,6 +260,12 @@ function engineOf(flags: DevFlags, vehicle: VehicleState): EngineStats {
 /** With the swept cut on, the motor reads the cut gate and `vCut` before the cut (ticket 333). */
 function cutFollowRuleOf(flags: DevFlags): ((step: CutFollowStep) => CutFollow) | undefined {
   return flags['drill.sweptCut'] ? readLocalCutFollow : undefined
+}
+
+/** With the swept cut on, the rig's step bounds as the authority checks its steps (ticket 334). */
+function stepBoundsOfFlag(flags: DevFlags): StepBounds | undefined {
+  if (!flags['drill.sweptCut']) return undefined
+  return stepBoundsAt(readAuthorityState(), useGameStore.getState().playerId)
 }
 
 function readLocalCutFollow(step: CutFollowStep): CutFollow {

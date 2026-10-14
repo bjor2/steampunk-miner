@@ -76,7 +76,7 @@ function createHarness(world: WorldState, start: { x: number; y: number }) {
     run(intent: VehicleIntent, steps: number) {
       for (let step = 0; step < steps; step++) {
         controller.step({ intent, engine: engineStats(0), canAct: true }, planet)
-        rapierWorld.step()
+        controller.stepWorld()
         const { x, y } = controller.planetPosition()
         if (ground.densityAtPoint(x, y) >= ISO_DENSITY) insideSolid.push({ x, y })
       }

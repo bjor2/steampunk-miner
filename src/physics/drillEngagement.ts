@@ -1,18 +1,22 @@
 /**
  * What the drill does at a step's pose, for the vehicle's motor (`vehicleController.ts`): whether
  * it bites (#7, #36) and, with the swept cut on, whether the drill sets the speed along the
- * facing (ticket 333). Pure reads of the ground and the authority, no Rapier.
+ * facing (ticket 333). With the swept cut on, the rig's step bounds (ticket 334) widen the wait-for-cut
+ * window and pick the speed the body is clamped to. Pure reads of the ground and the authority, no
+ * Rapier.
  */
 import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRead'
 import type { CutFollowMotion } from '../systems/vehicle/cutFollowMotion'
 import { isCutGateOpen } from '../systems/vehicle/cutGate'
 import {
   drillContactOf,
+  inTheWayMmOf,
   type DrillContact,
   type DrillContactRule,
 } from '../systems/vehicle/drillContact'
 import { isHeadSettled, type DrillHead } from '../systems/vehicle/drillHead'
 import { drillStampOf } from '../systems/vehicle/drillStamp'
+import { speedOfStepBound, stepBoundMmOf, type StepBounds } from '../systems/vehicle/stepBound'
 import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
 import { facingVectorOf, type VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
@@ -23,6 +27,7 @@ export interface DrillEngagementInput {
   canAct: boolean
   drillContactRule?: DrillContactRule
   cutFollowOf?: (step: CutFollowStep) => CutFollow
+  stepBounds?: StepBounds
 }
 
 /** The step's pose and whether its lift is on. */
@@ -44,7 +49,24 @@ export function drillContactFor(
   if (input.intent.facing !== pose.facing || !isHeadSettled(head)) return 'none'
   const facing = facingVectorOf(pose.upx, pose.upy, pose.facing)
   const contactOf = input.drillContactRule ?? drillContactOf
-  return contactOf(ground, { centreMm: pose, facing, stamp: drillStampOf(pose, isLifting) })
+  return contactOf(ground, {
+    centreMm: pose,
+    facing,
+    stamp: drillStampOf(pose, isLifting),
+    inTheWayMm: input.stepBounds && inTheWayMmOf(input.stepBounds.cuttingMm),
+  })
+}
+
+/**
+ * The cut gate and the drill's speed at this step's pose, read before the step's cut (ticket 333),
+ * whether or not the rig can act: the step bound reads the gate too. Nothing with the swept cut off.
+ */
+export function cutFollowReadFor(
+  input: DrillEngagementInput,
+  { pose, isLifting }: DrillPose,
+  isDrilling: boolean,
+): CutFollow | undefined {
+  return input.cutFollowOf?.({ x: pose.x, y: pose.y, isLifting, isDrilling })
 }
 
 /**
@@ -53,15 +75,26 @@ export function drillContactFor(
  */
 export function cutFollowFor(
   input: DrillEngagementInput,
-  { pose, isLifting }: DrillPose,
-  isDrilling: boolean,
+  pose: VehiclePose,
+  read: CutFollow | undefined,
 ): CutFollowMotion | undefined {
-  if (input.cutFollowOf === undefined || !input.canAct) return undefined
-  const read = input.cutFollowOf({ x: pose.x, y: pose.y, isLifting, isDrilling })
-  if (!isCutGateOpen(read.gate)) return undefined
+  if (read === undefined || !input.canAct || !isCutGateOpen(read.gate)) return undefined
   return {
     speed: read.cutSpeed,
     facing: pose.facing,
     isPushing: input.intent.facing === pose.facing,
   }
+}
+
+/**
+ * The speed the body is clamped to (ticket 334): the rig's step bound for the cut gate it reads,
+ * as m/s; undefined with the swept cut off, so the motion rule keeps its 18 m/s.
+ */
+export function maxSpeedFor(
+  input: DrillEngagementInput,
+  read: CutFollow | undefined,
+): number | undefined {
+  if (input.stepBounds === undefined) return undefined
+  const isCutting = read !== undefined && isCutGateOpen(read.gate)
+  return speedOfStepBound(stepBoundMmOf(input.stepBounds, isCutting))
 }

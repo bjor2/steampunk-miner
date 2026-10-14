@@ -79,7 +79,7 @@ function playScript(levels: Record<string, number>): Run {
   const hold = (intent: VehicleIntent, seconds: number) =>
     holdIntent(controller, intent, Math.round(seconds / PHYSICS_TIMESTEP), (stepped) => {
       loop.step(stepped, intent)
-      world.step()
+      stepped.stepWorld()
     })
   // The Sell bay is the pad's west end (#170), so off the pad is to the left.
   return {

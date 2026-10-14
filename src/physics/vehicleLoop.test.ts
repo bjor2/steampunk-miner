@@ -50,7 +50,7 @@ function createLiveVehicle(options: VehicleControllerOptions = {}) {
     hold(intent: VehicleIntent, seconds: number) {
       for (let step = 0; step < seconds / PHYSICS_TIMESTEP; step++) {
         loop.step(controller, intent)
-        world.step()
+        controller.stepWorld()
         const { xMm, yMm } = controller.renderOrigin()
         origins.add(`${xMm},${yMm}`)
       }

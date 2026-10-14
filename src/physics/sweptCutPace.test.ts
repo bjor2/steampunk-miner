@@ -102,7 +102,7 @@ async function playFloorBound(minTicksPerTile: number, isSwept: boolean): Promis
       const playerId = store.useGameStore.getState().playerId
       const stampAheadMm = bounds.sweptStampAheadMmAt(readAuthorityState(), playerId)
       loop.step(watched.controller, intent)
-      world.step()
+      watched.controller.stepWorld()
       const cursor = store.readLocalVehicle().sweptCut
       const tick = store.readAuthorityTick()
       const isCutting = cursor?.tick === tick && cursor.cutGate === 1

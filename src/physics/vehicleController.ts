@@ -10,6 +10,11 @@
  *
  * Rapier is f32, so the body is measured from a floating render origin near the rig (ticket 339,
  * `bodyFrame`); every rule here reads planet metres.
+ *
+ * The motor also steps the world through its tick (ticket 334, `tickStepping.ts`): `step` runs the
+ * motion rule once and plans the tick from the speed it set, `stepWorld` then steps the world in
+ * as many substeps as that speed needs, the halo synced round the body before each, or past the
+ * substep budget sweeps the body against the ground with no contact solve.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
@@ -17,6 +22,8 @@ import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRea
 import type { RenderOrigin } from '../systems/render/renderOrigin'
 import { blockOfPoint } from '../systems/vehicle/colliderHalo'
 import type { DrillContactRule } from '../systems/vehicle/drillContact'
+import type { StepBounds } from '../systems/vehicle/stepBound'
+import { plannedTickOf, tickPlanOf, type TickPlan } from '../systems/vehicle/tickPlan'
 import type { EngineStats } from '../systems/economy/vehicleStats'
 import {
   newDrillHead,
@@ -47,8 +54,9 @@ import {
   planetPositionOf,
   recentreWhenFar,
 } from './bodyFrame'
-import { cutFollowFor, drillContactFor } from './drillEngagement'
-import { createGroundHalo } from './groundHalo'
+import { cutFollowFor, cutFollowReadFor, drillContactFor, maxSpeedFor } from './drillEngagement'
+import { createGroundHalo, type HaloGround } from './groundHalo'
+import { stepWorldThroughTick, sweepGroundOf } from './tickStepping'
 
 type Rapier = typeof RAPIER
 
@@ -79,6 +87,11 @@ export interface VehicleStepInput {
    * 333, `cutFollowRead.ts`); absent with the swept cut off, so the engine alone drives.
    */
   cutFollowOf?: (step: CutFollowStep) => CutFollow
+  /**
+   * The rig's stats-derived step bounds (ticket 334, `stepBound.ts`): the speed the body is clamped
+   * to and the wheels' wait-for-cut window; absent with the swept cut off (18 m/s, 250 mm).
+   */
+  stepBounds?: StepBounds
 }
 
 export interface VehicleStepResult {
@@ -91,8 +104,10 @@ export interface VehicleStepResult {
 }
 
 export interface VehicleController {
-  /** Call once per fixed step, before the world steps. */
+  /** Call once per fixed step: the motion rule, and the plan for stepping the world through it. */
   step(input: VehicleStepInput, planet: PlanetView): VehicleStepResult
+  /** Then steps the world through the tick `step` planned (ticket 334); never call `world.step`. */
+  stepWorld(): void
   /** A respawn on the dock after the tow or a planet change: the one time the body is placed. */
   placeAt(pose: VehiclePose): void
   /** Where the body is, in planet metres. */
@@ -115,7 +130,7 @@ export interface VehicleControllerOptions {
   originReachMm?: number
 }
 
-/** Collision blocks of halo round the vehicle's block; at 0.27 m per step it never outruns one. */
+/** Collision blocks of halo round the vehicle's block; at 0.4 m a substep it never outruns one. */
 export const HALO_RADIUS_BLOCKS = 1
 
 /** Share of the remaining tilt removed per step; under 1 so contact pushes settle smoothly. */
@@ -156,6 +171,17 @@ export function createVehicleController(
   const halo = createGroundHalo(rapier, world, HALO_RADIUS_BLOCKS, frame.origin)
   let head = newDrillHead(FACING.right)
   let up: Vector2 = { x: 0, y: 1 }
+  let plan: TickPlan = tickPlanOf(0)
+  let lastPlanet: { view: PlanetView; ground: HaloGround } | null = null
+  const syncHaloAt = (position: Vector2) => {
+    if (lastPlanet === null) return
+    halo.syncAround(blockOfPoint(position), lastPlanet.view.worldVersion, lastPlanet.ground)
+  }
+  const tick = {
+    world,
+    body,
+    syncHalo: () => syncHaloAt(planetPositionOf(body, frame.origin)),
+  }
 
   return {
     step(input, planet) {
@@ -163,10 +189,8 @@ export function createVehicleController(
       recentreWhenFar(body, halo, frame, position)
       const velocity = vectorOf(body.linvel())
       up = localUpOf(position, up)
-      halo.syncAround(blockOfPoint(position), planet.worldVersion, {
-        densityAt: planet.ground.densityAt,
-        chunkVersion: planet.chunkVersion,
-      })
+      lastPlanet = lastPlanet?.view === planet ? lastPlanet : haloPlanetOf(planet)
+      syncHaloAt(position)
       head = stepDrillHead(head, input.intent.facing)
       // The velocity the body actually had, after contacts, so a resting vehicle reports 0.
       const pose = quantisePose(position, velocity, up, settledFacingOf(head))
@@ -177,7 +201,8 @@ export function createVehicleController(
       const isDrilling = contact !== 'none'
       const isCuttingLevel = isDrilling && !isLifting && isSidewaysFacing(pose.facing)
       const isWaitingForCut = isCuttingLevel && contact === 'inTheWay'
-      const cutFollow = cutFollowFor(input, { pose, isLifting }, isDrilling)
+      const cutRead = cutFollowReadFor(input, { pose, isLifting }, isDrilling)
+      const cutFollow = cutFollowFor(input, pose, cutRead)
       const motion = stepVehicleMotion({
         velocity,
         up,
@@ -193,8 +218,12 @@ export function createVehicleController(
         effect: motionEffectInputOf(input.motion, position, up, planet.ground),
         tug: input.tug,
         cutFollow,
+        maxSpeed: maxSpeedFor(input, cutRead),
       })
-      driveBody(body, motion.velocity, up)
+      const sweep = sweepGroundOf(planet.ground, position, cutFollow === undefined ? null : pose)
+      const planned = plannedTickOf(motion.velocity, PHYSICS_TIMESTEP, sweep)
+      plan = planned.plan
+      driveBody(body, planned.velocity, up)
       return {
         flags: { isDriving: motion.isDriving, isThrusting: motion.isThrusting, isDrilling },
         pose,
@@ -202,6 +231,7 @@ export function createVehicleController(
         isCutting: cutFollow !== undefined,
       }
     },
+    stepWorld: () => stepWorldThroughTick(tick, plan),
     placeAt(pose) {
       placeBodyAt(body, halo, frame, pose)
       body.setLinvel({ x: 0, y: 0, z: 0 }, true)
@@ -213,6 +243,11 @@ export function createVehicleController(
     colliderCount: () => halo.colliderCount(),
     dispose: () => halo.dispose(),
   }
+}
+
+/** What the halo reads of a planet view, built once per view. */
+function haloPlanetOf(view: PlanetView): { view: PlanetView; ground: HaloGround } {
+  return { view, ground: { densityAt: view.ground.densityAt, chunkVersion: view.chunkVersion } }
 }
 
 /** The effect for the motion rule, or nothing for no effect; ground is probed only to cling. */

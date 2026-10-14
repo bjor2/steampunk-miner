@@ -6,6 +6,10 @@
  *
  * A held step (the settings pause, a scenario waiting for play, the debug `pause()`) runs no step
  * and carries no time, however long the frame, so the authority's tick stands still (ticket 301).
+ *
+ * The mounted vehicle owns its whole tick (ticket 334): its motion rule, then the world stepped
+ * through the tick in the substeps its speed needs (`vehicleController.stepWorld`). With none
+ * mounted the world steps once, bare.
  */
 import { MAX_STEPS_PER_FRAME, PHYSICS_TIMESTEP } from '../constants/physics'
 import { carryPastFrameSteps, countFrameSteps, stepBlendOf } from '../systems/fixedStepClock'
@@ -21,7 +25,10 @@ export interface LiveWorld {
   stepWorld(dt: number): void
 }
 
-const mounted: { stepTicks: ((ticks: number) => void) | null } = { stepTicks: null }
+const mounted: {
+  stepTicks: ((ticks: number) => void) | null
+  runTick: (() => void) | null
+} = { stepTicks: null, runTick: null }
 
 /** One render frame: the whole steps it completes, then the share bodies are drawn through. */
 export function runFixedStepFrame(clock: FrameClock, frameSeconds: number, world: LiveWorld): void {
@@ -42,6 +49,20 @@ export function exposeLiveStepper(stepTicks: (ticks: number) => void): () => voi
   return () => {
     if (mounted.stepTicks === stepTicks) mounted.stepTicks = null
   }
+}
+
+/** Mounts the vehicle's whole fixed tick; the returned call unmounts it when the vehicle goes. */
+export function mountFixedTick(runTick: () => void): () => void {
+  mounted.runTick = runTick
+  return () => {
+    if (mounted.runTick === runTick) mounted.runTick = null
+  }
+}
+
+/** One fixed tick: the mounted vehicle's, or the bare world's one step when none is mounted. */
+export function runFixedTick(stepBareWorld: () => void): void {
+  if (mounted.runTick === null) stepBareWorld()
+  else mounted.runTick()
 }
 
 /** Why the debug `step(ticks)` cannot run now; the debug API lists it. */

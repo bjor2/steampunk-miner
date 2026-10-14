@@ -1,6 +1,7 @@
 /**
  * The vehicle's Rapier body under React: created once in the R3F physics world, driven once per
- * fixed step by the vehicle controller, and drawn each frame between its pose before and after
+ * fixed step by the vehicle controller, which then steps the world through the tick (its mounted
+ * fixed tick, ticket 334), and drawn each frame between its pose before and after
  * the last step by the step blend, so it glides on every frame instead of jumping on the frames
  * that complete a step (presentation only; nothing per-frame reaches React state). The drawn car
  * is shifted by the dock building's staging (#170 auto-roll) and turned about its own up axis on a
@@ -10,12 +11,13 @@
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { useFrame } from '@react-three/fiber'
-import { useBeforePhysicsStep, useRapier } from '@react-three/rapier'
+import { useRapier } from '@react-three/rapier'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Quaternion, Vector3, type Group } from 'three'
 import { BODY_DRAW_FRAME_PRIORITY, MM_PER_METRE } from '../constants/physics'
 import { turnedWidthShareOf } from '../systems/render/stagedTurn'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
+import { mountFixedTick } from './liveFixedStep'
 import { stepBlend } from './stepBlend'
 import {
   createVehicleBody,
@@ -25,7 +27,7 @@ import {
 
 interface VehicleBodyProps {
   startPose: VehiclePose
-  /** Called once per fixed step, before the world steps, with the one writer of the motion. */
+  /** Called once per fixed step, before the world steps through it, with the one writer of the motion. */
   onFixedStep: (controller: VehicleController) => void
   /** Written every frame with where the car is drawn, for the camera, terrain and lighting. */
   presence: { x: number; y: number }
@@ -87,12 +89,14 @@ export function VehicleBody({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [world, rapier])
 
-  // Read after the controller, so a tow or travel placement starts the step where it lands.
-  useBeforePhysicsStep(() => {
-    if (mounted === null) return
-    onFixedStep(mounted.controller)
-    readBodyPose(mounted.body, poses.stepStart)
-  })
+  const fixedStep = useRef(onFixedStep)
+  useEffect(() => {
+    fixedStep.current = onFixedStep
+  }, [onFixedStep])
+  useEffect(() => {
+    if (mounted === null) return undefined
+    return mountFixedTick(() => runVehicleTick(mounted, fixedStep.current, poses))
+  }, [mounted, poses])
 
   useFrame(() => {
     if (mounted !== null && group.current !== null)
@@ -100,6 +104,17 @@ export function VehicleBody({
   }, BODY_DRAW_FRAME_PRIORITY)
 
   return <group ref={group}>{mounted === null ? null : children(mounted.controller)}</group>
+}
+
+/** The step's start pose is read after the controller, so a tow or travel placement starts there. */
+function runVehicleTick(
+  mounted: MountedVehicle,
+  onFixedStep: (controller: VehicleController) => void,
+  poses: StepPoses,
+): void {
+  onFixedStep(mounted.controller)
+  readBodyPose(mounted.body, poses.stepStart)
+  mounted.controller.stepWorld()
 }
 
 function createStepPoses(): StepPoses {
