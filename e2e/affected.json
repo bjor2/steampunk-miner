@@ -101,9 +101,14 @@
       ]
     },
     {
-      "why": "The terrain lane's tools in the slots, the planted lodestone beacon and the card lines.",
+      "why": "The terrain lane's tools in the slots, the planted lodestone beacon and the card lines; the magnet fields' layer (ticket 286).",
       "paths": ["src/features/terrain-tools/**"],
-      "specs": ["e2e/browser/terrainTools.spec.ts", "e2e/browser/powerUpCore.spec.ts"]
+      "specs": [
+        "e2e/browser/terrainTools.spec.ts",
+        "e2e/browser/powerUpCore.spec.ts",
+        "e2e/browser/magnetFields.spec.ts",
+        "e2e/browser/render.spec.ts"
+      ]
     },
     {
       "why": "The sell burst on the bay header.",
