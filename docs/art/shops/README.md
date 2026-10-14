@@ -11,6 +11,11 @@ Authored in Blender 4.2.9 on the shared box through the Blender MCP
 ([#175](https://github.com/bjor2/steampunk-miner/issues/175)) draws them at the zone centres from
 the `dock-buildings` slice; its in-game dock screenshots are at the end of this page.
 
+**The Assay & Exchange tower below is retired.** Ticket 398 replaced it with the three-bay service
+station under the same asset id (see [../service-station/](../service-station/README.md)); its
+own front and three-quarter renders are removed, and the pair, phone and dock sheets here still
+show the old tower as the #174 record.
+
 ## The two buildings
 
 | Asset                       | Building                     | Parts                                                                        | Attach points                                                                     |

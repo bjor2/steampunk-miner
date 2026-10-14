@@ -204,9 +204,10 @@ a placeholder like the other two bays' emblems.
 ## The shop buildings
 
 The two buildings of [#170](https://github.com/bjor2/steampunk-miner/issues/170) (art
-[#174](https://github.com/bjor2/steampunk-miner/issues/174)): `platform-building-sell`, the tall
-"Assay & Exchange" over the Sell zone, and `platform-building-upgrade`, the wide, low "Engineering
-Works" over the Workshop zone. The ids derive from the slice bays (`src/systems/art/shopBuildingArt.ts`);
+[#174](https://github.com/bjor2/steampunk-miner/issues/174)): `platform-building-sell`, the
+"Assay & Exchange" over the Sell zone (since ticket 398 a service station with charging, repair
+and selling bays, see [docs/art/service-station/](art/service-station/README.md)), and
+`platform-building-upgrade`, the wide, low "Engineering Works" over the Workshop zone. The ids derive from the slice bays (`src/systems/art/shopBuildingArt.ts`);
 the Refinery keeps `platform-bay-refinery`. Each building's origin is its zone's centre column on
 the pad, where `bayRestPointOf` puts the vehicle, so the build (#175) places the asset at the rest
 point. The static detail of each is one part, the asset's own id; only the parts that move are
@@ -214,7 +215,7 @@ parts of their own:
 
 | Asset                       | Moving parts                                                                                          | Attach points                                                                     |
 | --------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `platform-building-sell`    | `sell-ticker` (pivot at its centre)                                                                   | `sell.chute`, `sell.ticker`, `sell.stack`                                         |
+| `platform-building-sell`    | `sell-arc`, `sell-arc-2`, `sell-conveyor`, `sell-spark`, `sell-spark-2` (idle motion)                 | `sell.chute`, `sell.ticker`, `sell.stack`                                         |
 | `platform-building-upgrade` | `workshop-gantry` (pivot at its root bearing), `workshop-turntable` (pivot at its centre, the origin) | `workshop.gantry`, `workshop.platform`, `workshop.stack`, `workshop.showcase_cam` |
 
 An **attach point** is an empty named `attach.<id>` in the `.blend`. The export writes its X and Z

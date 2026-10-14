@@ -6,9 +6,11 @@ dock camera read.
 
     blender -b --factory-startup --python-exit-code 1 -P scripts/art/author_shop_buildings.py [-- <id> ...]
 
-It writes art/blender/<id>/<id>.blend for platform-building-sell and platform-building-upgrade.
+It wrote art/blender/<id>/<id>.blend for platform-building-sell and platform-building-upgrade.
 From then on those files are the sources (#52): change the art in Blender (through the MCP or by
 hand) and re-export, rather than editing this script. Nothing here is rigged (#51 acceptance 2).
+The Assay & Exchange tower is retired: the service station replaced it (ticket 398, written by
+docs/art/service-station/author_service_station.py), so this script now writes only the Works.
 
 Conventions are author_platform.py's (#52, docs/art-pipeline.md): 1 unit = 1 m, game right +X,
 up +Z, the camera looks along +Y so details stand out towards -Y, z = 0 is the top of the pad.
@@ -48,17 +50,6 @@ platform.PALETTE.update({
     'gunmetal': ((0.16, 0.17, 0.19), 0.45, 0.0),
 })
 
-# The Sell building's static shell (metres, the asset frame).
-SELL_WIDTH = 6.0
-SELL_BODY_HALF = 1.9
-SELL_BODY_TOP = 6.3
-SELL_FUNNEL_TOP = 8.6
-SELL_STACK_X = -2.5
-SELL_STACK_TOP = 10.0
-SELL_FACE_Y = -0.7
-SELL_TICKER_AT = (0.0, -0.8, 5.65)
-SELL_CHUTE_MOUTH = (-1.6, -0.95, 1.4)
-
 # The Workshop's static shell.
 WORKS_WIDTH = 10.0
 WORKS_EAVE = 4.0
@@ -83,101 +74,7 @@ def requested_asset_ids():
     return requested or list(AUTHORS)
 
 
-# --- Assay & Exchange (Sell) ----------------------------------------------------------------------
-
-
-def author_sell_building():
-    platform.reset_scene()
-    platform.build_part('platform-building-sell', sell_shell_pieces(), at=(0.0, 0.0, 0.0), z_order=0)
-    platform.build_part('sell-ticker', ticker_pieces(), at=SELL_TICKER_AT, z_order=1)
-    add_attach_point('sell.chute', (SELL_CHUTE_MOUTH[0], SELL_CHUTE_MOUTH[2] - 0.1), z_order=2)
-    add_attach_point('sell.ticker', (SELL_TICKER_AT[0], SELL_TICKER_AT[2]), z_order=2)
-    add_attach_point('sell.stack', (SELL_STACK_X, SELL_STACK_TOP), z_order=-1)
-    platform.save_as('platform-building-sell')
-
-
-def sell_shell_pieces():
-    return (sell_plinth_pieces() + sell_tower_pieces() + sell_window_pieces() + sell_crown_pieces()
-            + sell_stack_pieces() + sell_chute_pieces() + sell_scale_pieces()
-            + sign_plaque_pieces('emblem-bay-sell', centre=(0.0, SELL_FACE_Y - 0.06, 4.55), radius=0.72))
-
-
-def sell_plinth_pieces():
-    pieces = [
-        platform.box('dark-iron', (SELL_WIDTH, 1.6, 0.3), (0.0, 0.2, 0.15)),
-        platform.box('brass', (SELL_WIDTH - 0.3, 1.5, 0.05), (0.0, 0.2, 0.325)),
-    ]
-    pieces += platform.rivet_row(-2.75, 2.75, 0.5, y=-0.61, z=0.15)
-    return pieces
-
-
-def sell_tower_pieces():
-    """A tall iron tower in riveted plates, brass-banded at each storey, with a cornice on top."""
-    body_height = SELL_BODY_TOP - 0.35
-    pieces = [
-        platform.box('iron', (2 * SELL_BODY_HALF, 1.4, body_height), (0.0, 0.0, 0.35 + body_height / 2)),
-        platform.box('iron-plate', (1.5, 0.05, 2.3), (-0.95, SELL_FACE_Y - 0.02, 2.35)),
-        platform.box('iron-plate', (1.5, 0.05, 2.3), (0.95, SELL_FACE_Y - 0.02, 2.35)),
-        platform.box('brass', (2 * SELL_BODY_HALF + 0.1, 1.5, 0.12), (0.0, 0.0, 3.65)),
-        platform.box('brass', (2 * SELL_BODY_HALF + 0.1, 1.5, 0.12), (0.0, 0.0, 6.1)),
-        platform.box('dark-iron', (2 * SELL_BODY_HALF + 0.3, 1.7, 0.2), (0.0, 0.0, SELL_BODY_TOP + 0.1)),
-        platform.box('iron-plate', (3.3, 0.05, 1.4), (0.0, SELL_FACE_Y - 0.02, 5.3)),
-    ]
-    pieces += platform.rivet_frame(-0.95, 2.35, 1.5, 2.3, y=SELL_FACE_Y - 0.05)
-    pieces += platform.rivet_frame(0.95, 2.35, 1.5, 2.3, y=SELL_FACE_Y - 0.05)
-    pieces += platform.rivet_row(-1.5, 1.5, 0.5, y=SELL_FACE_Y - 0.06, z=3.65)
-    pieces += platform.rivet_row(-1.5, 1.5, 0.5, y=SELL_FACE_Y - 0.06, z=6.1)
-    for x in (-1.75, 1.75):
-        pieces += [platform.rivet((x, SELL_FACE_Y - 0.02, z)) for z in platform.stepped(0.7, 5.9, 0.4)]
-    return pieces
-
-
-def sell_window_pieces():
-    """Two storeys of arched windows and two brass lanterns, the only light on the building."""
-    pieces = []
-    for z in (1.5, 3.0):
-        for x in (-0.95, 0.95):
-            pieces += arched_window((x, SELL_FACE_Y - 0.03, z), width=0.5, height=0.85)
-    pieces += [
-        platform.cylinder('brass', 0.36, 0.08, (0.0, SELL_FACE_Y - 0.04, 2.3), 'Y'),
-        platform.cylinder('window-glow', 0.28, 0.1, (0.0, SELL_FACE_Y - 0.05, 2.3), 'Y'),
-    ]
-    for x in (-1.6, 1.6):
-        pieces += lantern((x, SELL_FACE_Y - 0.2, 1.05))
-    return pieces
-
-
-def arched_window(centre, width, height):
-    x, y, z = centre
-    return [
-        platform.box('brass', (width + 0.12, 0.06, height + 0.06), (x, y + 0.01, z)),
-        platform.cylinder('brass', width / 2 + 0.06, 0.06, (x, y + 0.01, z + height / 2), 'Y'),
-        platform.box('window-glow', (width, 0.08, height), (x, y, z)),
-        platform.cylinder('window-glow', width / 2, 0.08, (x, y, z + height / 2), 'Y'),
-        platform.box('dark-iron', (0.04, 0.1, height + 0.1), (x, y - 0.02, z + 0.05)),
-    ]
-
-
-def lantern(centre):
-    x, y, z = centre
-    return [
-        platform.box('dark-iron', (0.1, 0.4, 0.06), (x, y + 0.15, z + 0.3)),
-        platform.frustum('brass', 0.14, 0.1, 0.36, (x, y, z)),
-        platform.box('lamp-glow', (0.16, 0.16, 0.26), (x, y, z - 0.02)),
-        platform.frustum('dark-iron', 0.02, 0.17, 0.08, (x, y, z + 0.22)),
-    ]
-
-
-def sell_crown_pieces():
-    """The hopper funnel: a wide copper funnel on a short brass throat, the tower's crown."""
-    throat_top = SELL_BODY_TOP + 0.5
-    pieces = [
-        platform.cylinder('brass', 0.75, throat_top - SELL_BODY_TOP, (0.0, 0.0, (SELL_BODY_TOP + throat_top) / 2), 'Z'),
-        funnel('copper', 2.0, 0.7, SELL_FUNNEL_TOP - throat_top, (0.0, 0.0, (throat_top + SELL_FUNNEL_TOP) / 2)),
-        ring('brass', 2.0, 0.1, (0.0, 0.0, SELL_FUNNEL_TOP)),
-        ring('brass', 1.5, 0.06, (0.0, 0.0, throat_top + 1.05)),
-    ]
-    return pieces
+# --- shared shapes ----------------------------------------------------------------------------
 
 
 def ring(material, major, minor, centre):
@@ -185,75 +82,6 @@ def ring(material, major, minor, centre):
     bpy.ops.mesh.primitive_torus_add(major_radius=major, minor_radius=minor, major_segments=48,
                                      minor_segments=10, location=centre)
     return platform.finish_piece(material, smooth=True)
-
-
-def funnel(material, top_radius, bottom_radius, height, centre):
-    bpy.ops.mesh.primitive_cone_add(vertices=32, radius1=bottom_radius, radius2=top_radius, depth=height,
-                                    location=centre)
-    return platform.finish_piece(material, smooth=True)
-
-
-def sell_stack_pieces():
-    """The smokestack up the tower's left flank, banded in brass, with a crown cap."""
-    bottom = 0.35
-    pieces = [
-        platform.cylinder('soot', 0.3, SELL_STACK_TOP - bottom, (SELL_STACK_X, -0.1, (bottom + SELL_STACK_TOP) / 2), 'Z'),
-        platform.cylinder('dark-iron', 0.42, 0.8, (SELL_STACK_X, -0.1, bottom + 0.4), 'Z'),
-        platform.cylinder('brass', 0.36, 0.1, (SELL_STACK_X, -0.1, SELL_STACK_TOP - 0.05), 'Z'),
-        platform.box('dark-iron', (0.5, 0.3, 0.08), (SELL_STACK_X + 0.35, -0.1, 4.0)),
-        platform.box('dark-iron', (0.5, 0.3, 0.08), (SELL_STACK_X + 0.35, -0.1, 7.0)),
-    ]
-    pieces += [platform.cylinder('brass', 0.34, 0.08, (SELL_STACK_X, -0.1, z), 'Z') for z in (2.6, 4.6, 6.6, 8.6)]
-    return pieces
-
-
-def sell_chute_pieces():
-    """The intake chute: a duct out of the tower face sloping down to a flared mouth over the vehicle's rear."""
-    mouth_x, mouth_y, mouth_z = SELL_CHUTE_MOUTH
-    start = (-0.7, mouth_y + 0.2, 3.1)
-    duct_turn = math.atan2(start[2] - (mouth_z + 0.5), start[0] - mouth_x)
-    length = math.hypot(start[0] - mouth_x, start[2] - (mouth_z + 0.5))
-    mid = ((start[0] + mouth_x) / 2, mouth_y + 0.1, (start[2] + mouth_z + 0.5) / 2)
-    return [
-        platform.box('copper', (length, 0.5, 0.42), mid, turn_y=-duct_turn),
-        platform.box('brass', (0.6, 0.6, 0.5), (start[0] + 0.1, start[1], start[2] - 0.1)),
-        platform.frustum('copper', 0.26, 0.42, 0.5, (mouth_x, mouth_y, mouth_z + 0.25)),
-        ring('brass', 0.44, 0.04, (mouth_x, mouth_y, mouth_z)),
-    ]
-
-
-def sell_scale_pieces():
-    """A brass beam balance out front, right of the door, the assayer's sign of trade."""
-    post_x, post_y = 2.2, -0.75
-    beam_z = 2.4
-    pieces = [
-        platform.box('dark-iron', (0.7, 0.7, 0.18), (post_x, post_y, 0.42)),
-        platform.cylinder('brass', 0.09, 1.9, (post_x, post_y, 1.45), 'Z'),
-        platform.box('brass', (1.5, 0.1, 0.12), (post_x, post_y - 0.1, beam_z)),
-        platform.sphere('brass', 0.14, (post_x, post_y - 0.12, beam_z)),
-        platform.box('brass', (0.06, 0.08, 0.4), (post_x, post_y - 0.15, beam_z + 0.24)),
-    ]
-    for pan_x in (post_x - 0.55, post_x + 0.55):
-        pieces += [
-            platform.cylinder('brass', 0.02, 0.62, (pan_x - 0.16, post_y - 0.1, beam_z - 0.35), 'Z'),
-            platform.cylinder('brass', 0.02, 0.62, (pan_x + 0.16, post_y - 0.1, beam_z - 0.35), 'Z'),
-            platform.cylinder('brass', 0.26, 0.07, (pan_x, post_y - 0.1, beam_z - 0.68), 'Z'),
-        ]
-    pieces.append(platform.box('gunmetal', (0.1, 0.1, 0.1), (post_x + 0.55, post_y - 0.1, beam_z - 0.6)))
-    return pieces
-
-
-def ticker_pieces():
-    """The mechanical ticker: a soot board in a brass frame, a row of split flaps and a glowing strip."""
-    pieces = [
-        platform.box('brass', (2.2, 0.08, 0.6), (0.0, 0.0, 0.0)),
-        platform.box('enamel', (2.06, 0.1, 0.46), (0.0, -0.01, 0.0)),
-        platform.box('ticker-glow', (1.9, 0.1, 0.04), (0.0, -0.02, -0.17)),
-    ]
-    pieces += [platform.box('gunmetal', (0.17, 0.1, 0.26), (x, -0.03, 0.04)) for x in platform.stepped(-0.9, 0.9, 0.225)]
-    pieces += [platform.box('soot', (0.17, 0.11, 0.015), (x, -0.035, 0.04)) for x in platform.stepped(-0.9, 0.9, 0.225)]
-    pieces += [platform.rivet((x, -0.04, z)) for x in (-1.02, 1.02) for z in (-0.22, 0.22)]
-    return pieces
 
 
 # --- Engineering Works (Workshop) ---------------------------------------------------------------
@@ -509,7 +337,6 @@ def add_attach_point(attach_id, at_xz, z_order):
 
 
 AUTHORS = {
-    'platform-building-sell': author_sell_building,
     'platform-building-upgrade': author_workshop_building,
 }
 
