@@ -167,8 +167,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    mouth (`StrutPlaced`, `AuthorityState.struts`), which collapse reads through the #157
  *    reinforcement registry until the clock takes it away. With no strut shape no digest or mined
  *    order changes.
+ * 57: grounded bore lines (ticket 378, K-ground in the TD lock on #318): a shot shape's
+ *    `groundTicks` rides on the pending shot, each ended line grounds the cells it opened in
+ *    `groundedLines` until `BoreEnded`'s `groundedUntilTick`, and the electrified shock skips a
+ *    grounded cell. With no grounding shape no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 56
+export const AUTHORITY_PROTOCOL_VERSION = 57
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
