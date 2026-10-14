@@ -13,6 +13,7 @@ const AT = {
   band: 1,
   cargoCapacity: 100,
   drillOrePerMinute: fromSafeInteger(3000),
+  tripMinutes: fromSafeInteger(1),
 }
 
 describe('drill-gear fork: the Wide income rate', () => {
@@ -34,7 +35,7 @@ describe('drill-gear fork: the Wide income rate', () => {
 
   it('prints a row only while side_drills is live', () => {
     const rowIds = (isLive: boolean) =>
-      incomeCapRowsOf(AT, () => isLive)
+      incomeCapRowsOf(AT, { isRowLive: () => isLive, isItemOwned: () => false })
         .map((row) => row.rateId)
         .filter((id) => id === WIDE_INCOME_RATE.id)
     expect(rowIds(false)).toEqual([])

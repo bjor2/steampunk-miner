@@ -29,6 +29,7 @@ const WHISTLE_RATE: SliceDefinition = {
       id: 'yield-probe.whistle',
       itemId: WHISTLE,
       anchorRowId: 'research_lab',
+      isTripCappedInPlay: false,
       valuePerMinuteAtFullStack: () => fromSafeInteger(500),
     }),
 }

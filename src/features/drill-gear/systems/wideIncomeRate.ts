@@ -20,6 +20,8 @@ export const WIDE_INCOME_RATE: IncomeRate = {
   id: 'drill-gear.gallery_reamers',
   itemId: GALLERY_REAMERS_ID,
   anchorRowId: WIDE_LEANED_ROW,
+  // The flank cells land in the hold as the drill's own cargo, never through the trip ledger.
+  isTripCappedInPlay: false,
   valuePerMinuteAtFullStack: (at) => flankOrePerMinuteOf(at),
 }
 

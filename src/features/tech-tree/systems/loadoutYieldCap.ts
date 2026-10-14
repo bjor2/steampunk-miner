@@ -6,8 +6,8 @@
  * on them.
  *
  * - **Yield** is what the kernel `incomeRates` registry holds (ticket 384): each income item's ore
- *   value a minute reaching the hold at its last Mark, all charges, 100% uptime, clamped to the
- *   trip cap there. A full loadout owns every registered item at once, so its sum bounds every
+ *   value reaching the hold in one trip at its last Mark, all charges, 100% uptime, clamped to the
+ *   trip cap there (measured per trip by the Systems ruling 6167240683 on #385). A full loadout owns every registered item at once, so its sum bounds every
  *   five-slot pick.
  * - **Today's five-lane maximum** is the same sum over the items outside the Aetheric lane.
  * - **The aetheric contribution** is the rates of the lane's items and of every combo whose
@@ -19,27 +19,17 @@
  * the band the tree is priced in and the richest ore. Pure arithmetic per report: never in the
  * authority, so there is no command, event, save section or protocol change.
  */
-import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { formatAmount } from '../../../systems/displayAmount'
-import { oreTier, oreValue } from '../../../systems/economy/oreEconomy'
 import { onCurveSteps, vehicleStatsAt } from '../../../systems/economy/vehicleStats'
-import {
-  add,
-  ceilMilli,
-  cmp,
-  div,
-  fromSafeInteger,
-  mul,
-  ZERO_MONEY,
-  type Money,
-} from '../../../systems/money'
+import { add, ceilMilli, cmp, ZERO_MONEY, type Money } from '../../../systems/money'
 import {
   incomeCapRowsOf,
+  type IncomeAnchors,
   type IncomeAt,
   type IncomeCapRow,
 } from '../../../systems/registries/incomeRates'
 import type { ItemHook } from '../../../systems/registries/itemHooks'
-import { bandDigTicks } from '../../../systems/vehicle/bandDig'
+import { drillTripOf } from './incomeCapCheck'
 import type { TechLane } from './techNode'
 import type { TreeCatalogue } from './techTree'
 
@@ -49,7 +39,8 @@ export const LOADOUT_YIELD_PLANETS: readonly number[] = [10, 20, 40, 60]
 const LOADOUT_YIELD_BAND = 5
 const AETHERIC: TechLane = 'aetheric'
 const AETHERIC_SLICE_ID = 'aetheric'
-const MINUTE_TICKS = fromSafeInteger(60 * TICKS_PER_SECOND)
+/** A full loadout owns every item, so every anchor is live. */
+const EVERY_ANCHOR_LIVE: IncomeAnchors = { isRowLive: () => true, isItemOwned: () => true }
 
 export interface LoadoutYield {
   planetIndex: number
@@ -63,18 +54,18 @@ export interface LoadoutYield {
   isWithinCap: boolean
 }
 
-/** The on-curve vehicle's patch on `planetIndex`'s band 5: its hold and the drill's ore minute. */
+/** The on-curve vehicle's patch on `planetIndex`'s band 5: its hold and the drill's trip. */
 export function onCurveIncomeAtOf(planetIndex: number): IncomeAt {
   const levels = onCurveSteps(planetIndex)
   const band = LOADOUT_YIELD_BAND
-  const ticksPerCell = bandDigTicks(planetIndex, levels, band)
-  if (ticksPerCell === null) throw refusedPatch(planetIndex, band)
-  const cellsPerMinute = div(MINUTE_TICKS, fromSafeInteger(ticksPerCell))
+  const trip = drillTripOf(planetIndex, band, levels)
+  if (trip === null) throw refusedPatch(planetIndex, band)
   return {
     planetIndex,
     band,
     cargoCapacity: vehicleStatsAt(levels).cargoCapacity,
-    drillOrePerMinute: mul(cellsPerMinute, oreValue(oreTier(planetIndex, band))),
+    drillOrePerMinute: trip.drillOrePerMinute,
+    tripMinutes: trip.tripMinutes,
   }
 }
 
@@ -87,7 +78,7 @@ export function loadoutYieldsOf(catalogue: TreeCatalogue): LoadoutYield[] {
 
 /** The full loadout against today's five-lane maximum at `at`, every registered item owned. */
 export function loadoutYieldOf(at: IncomeAt, catalogue: TreeCatalogue): LoadoutYield {
-  const rows = incomeCapRowsOf(at, isEveryAnchorLive)
+  const rows = incomeCapRowsOf(at, EVERY_ANCHOR_LIVE)
   return loadoutYieldFrom(at.planetIndex, splitRowsOf(rows, aethericItemIdsOf(catalogue)))
 }
 
@@ -186,13 +177,8 @@ function isAethericIncomeHook(hook: ItemHook, aethericItemIds: ReadonlySet<strin
   return isOnAethericItem || hook.laneId === AETHERIC_SLICE_ID
 }
 
-/** A full loadout owns every item, so every anchor is live. */
-function isEveryAnchorLive(): boolean {
-  return true
-}
-
 function yieldOf(rows: readonly IncomeCapRow[]): Money {
-  return rows.map((row) => row.valuePerMinute).reduce(add, ZERO_MONEY)
+  return rows.map((row) => row.valuePerTrip).reduce(add, ZERO_MONEY)
 }
 
 function isWithinCap(full: Money, fiveLane: Money, aetheric: Money): boolean {
