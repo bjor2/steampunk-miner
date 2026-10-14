@@ -10,6 +10,7 @@
  * logs `debug_command_applied`, because it moves the authority's clock as no play did.
  */
 import { getRunLog } from '../logging/runLog'
+import type { TitleMenu } from '../systems/views/titleMenuModel'
 import { readAuthorityState } from './authorityLink'
 
 /** `awaitingPlay`: set up by a scenario or a restore, waiting for play to start it. */
@@ -58,9 +59,14 @@ export function liveStepActionsOf(set: SetSlice, get: () => SliceHost): LiveStep
   }
 }
 
-/** The fixed step stands still: held here, or paused by the settings overlay (#33 section 1). */
-export function isLiveStepHeld(state: LiveStepValues & { isSettingsOpen: boolean }): boolean {
-  return state.isSettingsOpen || state.liveStepHold !== 'running'
+/**
+ * The fixed step stands still: held here, paused by the settings overlay (#33 section 1), or
+ * behind the title menu until the player picks a game (ticket 403).
+ */
+export function isLiveStepHeld(
+  state: LiveStepValues & { isSettingsOpen: boolean; titleMenu: TitleMenu | null },
+): boolean {
+  return state.isSettingsOpen || state.titleMenu !== null || state.liveStepHold !== 'running'
 }
 
 /** Stamped with the tick the steps start from, like `fastForward`. */

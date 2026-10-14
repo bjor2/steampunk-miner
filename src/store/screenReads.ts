@@ -13,6 +13,7 @@ import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
+import type { TitleMenuModel } from '../systems/views/titleMenuModel'
 import { dockedBayOf } from '../systems/authority/dockRules'
 import { chargesOf } from '../systems/authority/charges/chargeRules'
 import type { TouchSituation } from '../systems/input/touchControls'
@@ -32,6 +33,7 @@ import {
   refineryBayModelOf,
   sellBayModelOf,
   settingsModelOf,
+  titleMenuModelOf,
   upgradeBayModelOf,
   type BayScreen,
 } from './screenModels'
@@ -75,6 +77,11 @@ export function readRefineryBayModel(): RefineryBayModel {
 
 export function readSettingsModel(): SettingsModel {
   return settingsModelOf(useGameStore.getState())
+}
+
+/** The title menu (ticket 403) as it draws now; null once play started. */
+export function readTitleMenuModel(): TitleMenuModel | null {
+  return titleMenuModelOf(useGameStore.getState())
 }
 
 /** The hint and transmission plaques (#16) as they are drawn. */

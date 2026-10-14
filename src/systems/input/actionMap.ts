@@ -16,12 +16,19 @@ import { BINDING_DEVICES, deviceBindingProblems, type BindingField } from './bin
 import { keyLabelOf } from './keyCodes'
 import { padLabelOf } from './padCodes'
 
-export const INPUT_CONTEXTS = ['vehicle', 'platform', 'artefact', 'settings', 'screen'] as const
+export const INPUT_CONTEXTS = [
+  'vehicle',
+  'platform',
+  'artefact',
+  'settings',
+  'screen',
+  'title',
+] as const
 
 /**
  * `vehicle` while driving, `platform` on the dock screen, `settings` on the overlay (#33),
  * `artefact` while the cache's three cards are open (#46), `screen` while a slice's full screen is
- * (ticket 211).
+ * (ticket 211), `title` while the title menu is (ticket 403).
  */
 export type InputContext = (typeof INPUT_CONTEXTS)[number]
 

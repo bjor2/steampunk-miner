@@ -55,6 +55,9 @@ export const RUN_EVENT_REGISTRY = {
     },
   },
   game_ended: { group: 'run', level: 'core', payload: { reason: 'text' } },
+  // Ticket 403: the title menu's New Game replaced the session with the P1 baseline; the lines
+  // after it start again at tick 0.
+  new_game_started: { group: 'run', level: 'core', payload: {} },
   state_digest: {
     group: 'run',
     level: 'core',

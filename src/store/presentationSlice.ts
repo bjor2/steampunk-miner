@@ -48,6 +48,7 @@ import { refuseProblems, submitCommand } from './authorityLink'
 import { writePreferences } from './preferencesFile'
 import { menuScreenOf, type ScreenSources } from './screenModels'
 import { screenIdProblems, winningScreenId } from '../ui/registries/screens'
+import type { TitleMenuActions } from './titleMenuSlice'
 import type { VehicleReplica } from './vehicleReplica'
 
 export interface PresentationValues {
@@ -150,6 +151,7 @@ export interface PresentationActions {
 
 type SliceHost = PresentationValues &
   PresentationActions &
+  TitleMenuActions &
   ScreenSources & { vehicle: VehicleReplica }
 
 type SetSlice = (partial: Partial<PresentationValues>) => void
@@ -304,6 +306,16 @@ function runButtonAction(state: SliceHost, action: ButtonAction): void {
   else if (action.kind === 'togglePreference') state.togglePreference(action.name)
   else if (action.kind === 'rebind') state.startRebinding(action.actionId)
   else if (action.kind === 'resetBindings') state.resetBindings()
+  else runTitleMenuAction(state, action)
+}
+
+/** The title menu's buttons (ticket 403); a load settles later and reports its own refusal. */
+function runTitleMenuAction(state: SliceHost, action: ButtonAction): void {
+  if (action.kind === 'pressNewGame') state.pressNewGame()
+  else if (action.kind === 'confirmNewGame') state.confirmNewGame()
+  else if (action.kind === 'continueGame') void state.continueGame()
+  else if (action.kind === 'loadSlot') void state.loadGameFromSlot(action.slot)
+  else if (action.kind === 'showTitlePage') state.showTitlePage(action.page)
 }
 
 function zoomedViewOf(viewShortAxisMetres: number, change: ZoomChange): number {

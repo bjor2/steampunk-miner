@@ -11,6 +11,8 @@ import { exactAmount, formatAmount } from '../displayAmount'
 import type { ActionId } from '../input/actionMap'
 import type { PreferenceName } from '../input/preferences'
 import { floorMilli, fromCanonical, type Money } from '../money'
+import type { SaveSlotKey } from '../save/saveSlotIndex'
+import type { TitleMenuPage } from './titleMenuModel'
 
 export interface AmountReading {
   text: string
@@ -27,13 +29,26 @@ export type ButtonAction =
   | { kind: 'togglePreference'; name: PreferenceName }
   | { kind: 'rebind'; actionId: ActionId }
   | { kind: 'resetBindings' }
+  // The title menu (ticket 403): New Game (asking first when a save exists), its confirm,
+  // Continue, one slot's Load, and a page change.
+  | { kind: 'pressNewGame' }
+  | { kind: 'confirmNewGame' }
+  | { kind: 'continueGame' }
+  | { kind: 'loadSlot'; slot: SaveSlotKey }
+  | { kind: 'showTitlePage'; page: TitleMenuPage }
+
+/**
+ * Why a button is disabled: the authority's refusal of its command, or a menu's own (`no_save`:
+ * the title menu's Continue and Load with no slot to read, ticket 403).
+ */
+export type ButtonRefusal = RejectionReason | 'no_save'
 
 export interface ScreenButton {
   id: string
   label: string
   action: ButtonAction
-  /** The authority's refusal reason now; null when the command would be accepted. */
-  reason: RejectionReason | null
+  /** The authority's refusal reason now, or a menu's own; null when the press would be accepted. */
+  reason: ButtonRefusal | null
   /** A glyph of the icon set beside the label (#158); absent on a plain text button. */
   iconId?: string
 }

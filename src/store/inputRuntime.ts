@@ -283,4 +283,5 @@ function applyReaction(reaction: InputReaction): void {
   else if (reaction.kind === 'activateFocused') game.activateFocusedControl()
   else if (reaction.kind === 'zoom') game.zoom(reaction.change)
   else if (reaction.kind === 'chooseChargeSize') game.chooseChargeSize(reaction.size)
+  else if (reaction.kind === 'showTitlePage') game.showTitlePage(reaction.page)
 }

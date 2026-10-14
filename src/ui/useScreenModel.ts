@@ -44,6 +44,7 @@ function isScreenSourceChanged(state: GameState, previous: GameState): boolean {
     state.hintBoard !== previous.hintBoard ||
     state.transmissionBoard !== previous.transmissionBoard ||
     state.arePlaquesAllowed !== previous.arePlaquesAllowed ||
-    state.liveStepHold !== previous.liveStepHold
+    state.liveStepHold !== previous.liveStepHold ||
+    state.titleMenu !== previous.titleMenu
   )
 }

@@ -1,7 +1,7 @@
 /**
  * The screens as their view models, read from the authority replica and the store's presentation
  * state (#33, #37): the HUD, the Sell, Upgrade and Refinery bay screens (#105), the settings overlay and the
- * artefact cache's cards (#46). The debug API's `ui.get*Model()` reads and the DOM components read
+ * artefact cache's cards (#46) and the title menu (ticket 403). The debug API's `ui.get*Model()` reads and the DOM components read
  * the same functions, so what a spec asserts is what the screen draws. Read on demand, never
  * stored per tick.
  */
@@ -46,6 +46,11 @@ import {
   selectArtefactChoiceModel,
   type ArtefactChoiceModel,
 } from '../systems/views/artefactChoiceModel'
+import {
+  selectTitleMenuModel,
+  type TitleMenu,
+  type TitleMenuModel,
+} from '../systems/views/titleMenuModel'
 import { readAuthorityState } from './authorityLink'
 import type { LiveStepHold } from './liveStepSlice'
 
@@ -65,6 +70,7 @@ export interface ScreenSources {
   hintBoard: HintBoard
   transmissionBoard: TransmissionBoard
   arePlaquesAllowed: boolean
+  titleMenu: TitleMenu | null
 }
 
 export interface MenuScreen {
@@ -142,8 +148,20 @@ export function artefactChoiceModelOf(sources: ScreenSources): ArtefactChoiceMod
   return selectArtefactChoiceModel(readAuthorityState(), sources.playerId)
 }
 
+/** The title menu as it draws now; null once play started. */
+export function titleMenuModelOf(sources: ScreenSources): TitleMenuModel | null {
+  if (sources.titleMenu === null) return null
+  return selectTitleMenuModel({ titleMenu: sources.titleMenu, utcOffsetMinutesAt })
+}
+
+/** The zone's offset at that wall time, so a save from before a clock change reads as it was. */
+function utcOffsetMinutesAt(savedAtMs: number): number {
+  return -new Date(savedAtMs).getTimezoneOffset()
+}
+
 /** The focusable buttons of a menu layer; the vehicle layer has none. */
 export function menuScreenOf(layer: InputContext, sources: ScreenSources): MenuScreen {
+  if (layer === 'title') return titleMenu(titleMenuModelOf(sources))
   if (layer === 'platform') return bayMenu(bayScreenOf(sources))
   if (layer === 'settings') return settingsMenu(settingsModelOf(sources))
   if (layer === 'artefact') return artefactMenu(artefactChoiceModelOf(sources))
@@ -175,6 +193,12 @@ function settingsMenu(model: SettingsModel): MenuScreen {
       model.close,
     ],
   }
+}
+
+function titleMenu(model: TitleMenuModel | null): MenuScreen {
+  if (model === null) return NO_MENU
+  const { focusStops, startFocus, buttons } = model
+  return { focusStops, startFocus, buttons }
 }
 
 function artefactMenu(model: ArtefactChoiceModel): MenuScreen {

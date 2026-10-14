@@ -3,7 +3,8 @@
  * actions, `buildIntent`) or, on a press, one reaction from this table. A reaction that changes
  * the world is an ordinary authority command; the rest move UI state. Nothing here mutates state.
  *
- * Contexts are layers: `settings` over everything, then the artefact cache's cards while open
+ * Contexts are layers: the title menu over everything while it is open (ticket 403: nothing
+ * reaches the game behind it), then `settings`, then the artefact cache's cards while open
  * (#46), then a slice's full screen while one is open (ticket 211), then `platform` while docked
  * (the screen is open exactly then), else `vehicle`. Escape closes the top layer: settings, the
  * cards (no pick, the cache stays live), the slice screen, then the platform screen (that is
@@ -36,6 +37,7 @@ import { sliceIntentOfPress } from '../registries/inputReactions'
 import { boreAutoToggleIntentOf } from '../authority/bore/boreAuto'
 import type { ZoomChange } from '../render/viewZoom'
 import type { VehicleMode } from '../vehicle/vehicleState'
+import type { TitleMenu, TitleMenuPage } from '../views/titleMenuModel'
 import type { BayId } from '../world/dockBays'
 import type { ActionId, InputContext } from './actionMap'
 
@@ -50,6 +52,8 @@ export type InputReaction =
   | { kind: 'zoom'; change: ZoomChange }
   /** `next_charge_size` (#153, K8 #218): the size `plant_charge` plants next. */
   | { kind: 'chooseChargeSize'; size: number }
+  /** Escape on the title menu (ticket 403): back to its main page. */
+  | { kind: 'showTitlePage'; page: TitleMenuPage }
   | { kind: 'none' }
 
 /** What the routing needs to know about the session; read from the authority replica. */
@@ -75,6 +79,8 @@ export interface InputSituation {
 
 /** The overlays that sit above the vehicle or platform layer when open. */
 export interface OpenOverlays {
+  /** The title menu (ticket 403); null once play started. */
+  titleMenu: TitleMenu | null
   isSettingsOpen: boolean
   isArtefactChoiceOpen: boolean
   /** The slice screen drawn (ticket 211); null while none is. */
@@ -131,6 +137,10 @@ const REACTIONS_BY_LAYER: Readonly<
   screen: {
     ui_cancel: () => ({ kind: 'dismissScreen' }),
   },
+  title: {
+    ...MENU_REACTIONS,
+    ui_cancel: () => ({ kind: 'showTitlePage', page: 'main' }),
+  },
 }
 
 export function reactionToPress(action: ActionId, situation: InputSituation): InputReaction {
@@ -138,8 +148,12 @@ export function reactionToPress(action: ActionId, situation: InputSituation): In
   return kernelRule === undefined ? sliceReactionToPress(action, situation) : kernelRule(situation)
 }
 
-/** The layer input goes to: settings, the cache's cards, a slice screen, else the dock screen. */
+/**
+ * The layer input goes to: the title menu, settings, the cache's cards, a slice screen, else the
+ * dock screen.
+ */
 export function topLayerOf(vehicleMode: VehicleMode, overlays: OpenOverlays): InputContext {
+  if (overlays.titleMenu !== null) return 'title'
   if (overlays.isSettingsOpen) return 'settings'
   if (overlays.isArtefactChoiceOpen) return 'artefact'
   if (overlays.openScreenId !== null) return 'screen'

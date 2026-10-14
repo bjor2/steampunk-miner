@@ -106,6 +106,12 @@ import {
   type PresentationValues,
 } from './presentationSlice'
 import { runFastForwardSteps, runScenarioScript, submitEach } from './scenarioSteps'
+import {
+  STARTING_TITLE_MENU,
+  titleMenuActionsOf,
+  type TitleMenuActions,
+  type TitleMenuValues,
+} from './titleMenuSlice'
 import { vehicleReplicaOf, type VehicleReplica } from './vehicleReplica'
 
 type DebugActions = CombatDebugActions &
@@ -127,7 +133,9 @@ export interface GameState
     PlanetCardValues,
     PlanetCardActions,
     LiveStepValues,
-    LiveStepActions {
+    LiveStepActions,
+    TitleMenuValues,
+    TitleMenuActions {
   playerId: string
   planetTier: number
   planetSeed: number
@@ -162,6 +170,11 @@ export interface GameState
   restoreSnapshot(snapshot: unknown): void
   /** Quit and resume (#26): play goes on from the checkpoint, docked; not a debug command. */
   resumeCheckpoint(checkpoint: Checkpoint): void
+  /**
+   * New Game (ticket 403, HS1/VS4): the session replaced by the P1 baseline, so no unlock, owned
+   * item, artefact pick, first or planet carries over; logs `new_game_started`.
+   */
+  startNewGame(): void
   /** Debug: one upgrade track to an integer level (#7); the stats follow from the levels. */
   setUpgrade(upgradeId: string, level: number): void
   /** Debug: energy in units as a decimal string, a whole number of 1/240 quanta. */
@@ -210,6 +223,7 @@ type GameValues = Pick<
   | keyof HintValues
   | keyof PlanetCardValues
   | keyof LiveStepValues
+  | keyof TitleMenuValues
   | 'travelTransition'
 >
 
@@ -231,6 +245,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_HINTS,
   ...STARTING_PLANET_CARD,
   ...STARTING_LIVE_STEP,
+  ...STARTING_TITLE_MENU,
   travelTransition: null,
 }
 
@@ -248,6 +263,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...hintActionsOf(set, get),
   ...planetCardActionsOf(set, get),
   ...liveStepActionsOf(set, get),
+  ...titleMenuActionsOf(set, get),
 
   setPlanet: (planetTier) => {
     refuseProblems(startScenarioProblems({ planetTier }))
@@ -307,6 +323,12 @@ export const useGameStore = create<GameState>()((set, get) => ({
     set({ depthTiles: 0, travelTransition: null, planetCard: null })
     replaceSession(checkpoint.state)
     recordCheckpointLoaded(runEventPlaceOf(get()), checkpoint)
+  },
+
+  startNewGame: () => {
+    set({ depthTiles: 0, travelTransition: null, planetCard: null })
+    replaceSession(freshSessionAfter(readAuthorityState()))
+    recordNewGameStarted(get())
   },
 
   setUpgrade: (upgradeId, level) =>
@@ -391,9 +413,9 @@ export function createStartingAuthority(): Authority {
 }
 
 /**
- * A scenario's session (#11 section 4: its commands at tick 0): the starting state, so live ticks
- * played before it change neither its end tick nor its digest. `debugApplied` is kept, since it is
- * never reset within a run.
+ * A scenario's session (#11 section 4: its commands at tick 0), and a new game's (ticket 403): the
+ * starting state, so live ticks played before it change neither its end tick nor its digest.
+ * `debugApplied` is kept, since it is never reset within a run.
  */
 function freshSessionAfter(state: AuthorityState): AuthorityState {
   return { ...startingAuthorityState(), debugApplied: state.debugApplied }
@@ -467,6 +489,12 @@ function replicaOf(state: AuthorityState, playerId: string): Partial<GameValues>
 
 function placeAtScenarioDepth(scenario: StartScenario): void {
   if (scenario.depthTiles !== undefined) useGameStore.setState({ depthTiles: scenario.depthTiles })
+}
+
+/** At the new session's tick 0, so the lines after it read as a fresh run's. */
+function recordNewGameStarted(state: GameValues): void {
+  const stamp = { ...runEventPlaceOf(state), tick: readAuthorityState().tick }
+  getRunLog().record(stamp, 'new_game_started', {})
 }
 
 /**

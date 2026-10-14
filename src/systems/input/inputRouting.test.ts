@@ -38,7 +38,14 @@ const AT_UPGRADE_BAY: InputSituation = { ...DOCKED, dockedBay: 'upgrade' }
 const SETTINGS: InputSituation = { ...DRIVING, layer: 'settings' }
 const CARDS: InputSituation = { ...DRIVING, layer: 'artefact' }
 const SLICE_SCREEN: InputSituation = { ...DOCKED, layer: 'screen' }
-const NO_OVERLAY = { isSettingsOpen: false, isArtefactChoiceOpen: false, openScreenId: null }
+const NO_OVERLAY = {
+  titleMenu: null,
+  isSettingsOpen: false,
+  isArtefactChoiceOpen: false,
+  openScreenId: null,
+}
+
+const TITLE_OPEN = { ...NO_OVERLAY, titleMenu: { page: 'load' as const, slots: [], problems: [] } }
 
 const submitted = (type: string, payload: object = {}) => ({
   kind: 'submit',
@@ -179,6 +186,18 @@ describe('input routing', () => {
     expect(topLayerOf('docked', screenOpen)).toBe('screen')
     expect(topLayerOf('active', screenOpen)).toBe('screen')
     expect(topLayerOf('active', { ...screenOpen, isArtefactChoiceOpen: true })).toBe('artefact')
+  })
+
+  it('puts the title menu over every other layer', () => {
+    expect(topLayerOf('docked', { ...TITLE_OPEN, isSettingsOpen: true })).toBe('title')
+    expect(topLayerOf('active', { ...TITLE_OPEN, openScreenId: 'example.screen' })).toBe('title')
+  })
+
+  it('goes back to the title main page on Escape and drives nothing behind the title', () => {
+    const onTitle = { ...DRIVING, layer: 'title' as const }
+    expect(reactionToPress('ui_cancel', onTitle)).toEqual({ kind: 'showTitlePage', page: 'main' })
+    expect(reactionToPress('ui_down', onTitle)).toEqual({ kind: 'moveFocus', step: 1 })
+    expect(reactionToPress('interact', onTitle)).toEqual({ kind: 'none' })
   })
 
   it('dismisses a slice screen on Back without undocking, and drives nothing under it', () => {
