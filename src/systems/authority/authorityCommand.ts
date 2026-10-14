@@ -188,8 +188,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    takes Wide, Deep, Agile and Armoured, and an active branch acts: Wide's flank cells and
  *    Deep's cell below on the drill gear read, Agile's lift and drive off the ground, Armoured's
  *    grounded hits and longer steam curtain. With no fork chosen no digest or mined order changes.
+ * 62: the extraction, terrain and sensing P16 fork branches (ticket 269, #255 build 4): the
+ *    Prospector's choice in the mineral drain, the Bracer's props (a reaction to `CollapseWarned`
+ *    into the `terrain-tools` section's optional `props`, claimed through `collapseBraces`), the
+ *    Breaker's fracture as a blast effect on the K6 queue, and the Scout pinger and Diviner rod as
+ *    charged items. With no branch chosen no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 61
+export const AUTHORITY_PROTOCOL_VERSION = 62
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
