@@ -32,13 +32,12 @@ function entryIdsOf(bay: UpgradeBayModel): string[] {
 }
 
 describe('the Upgrade bay entries (ticket 344)', () => {
-  it('neither lists nor asks a source before its anchor row opens', () => {
+  it("lists a source anchored on a shipped row on planet 1 too: its row's planet only prices it (#411)", () => {
     const charges = probeSourceOf('entry-probe.charges', 'blasting_charges', [
       { entryId: 'entry-probe.rack' },
     ])
     withRegistrations([entryProbeSlice([charges.source])], () => {
-      expect(entryIdsOf(bayOf(dockedOn(6)))).toEqual([])
-      expect(charges.asks()).toBe(0)
+      expect(entryIdsOf(bayOf(dockedOn(1)))).toEqual(['entry-probe.rack'])
       expect(entryIdsOf(bayOf(dockedOn(7)))).toEqual(['entry-probe.rack'])
     })
   })

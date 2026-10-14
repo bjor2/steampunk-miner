@@ -59,9 +59,13 @@ function atUpgradeBayOn(planetIndex: number, money = '1e30'): Session {
 }
 
 describe('upgrade bay model: the Guns row (#107)', () => {
-  it('shows no Guns row before auto_guns unlocks on planet 4 (#90: nothing before)', () => {
-    expect(upgradeBayOf(atUpgradeBayOn(3)).guns).toBeNull()
-    expect(upgradeBayOf(atUpgradeBay()).guns).toBeNull()
+  it('offers the mount on planet 1 too, at its planet 4 price: the price is the only gate (#411)', () => {
+    const guns = upgradeBayOf(atUpgradeBay()).guns
+    expect(guns).toMatchObject({
+      levelText: 'Mount',
+      cost: { exact: toCanonical(gunMountPrice(4)) },
+      buy: { label: 'Mount' },
+    })
   })
 
   it('offers the mount on planet 4 at its price, with the rate it gives', () => {
@@ -106,6 +110,7 @@ describe('upgrade bay model: the Guns row (#107)', () => {
       expect([...new Set(model.focusStops.map((stop) => stop.panel))]).toEqual([
         'tracks',
         'casing',
+        'lining',
         'guns',
         'repair',
         'footer',
@@ -218,13 +223,16 @@ describe('upgrade bay model', () => {
     expect(model.focusStops.map((stop) => stop.id)).not.toContain(UI_IDS.upgradebayQuickService)
   })
 
-  it('orders focus tracks, casing, repair, footer and starts on the first track', () => {
-    // The kernel's own rows: a slice's bay entries (ticket 344) join before Repair.
+  it('orders focus tracks, casing, lining, guns, repair, footer and starts on the first track', () => {
+    // The kernel's own rows: a slice's bay entries (ticket 344) join before Repair. The lining and
+    // the guns are on sale from planet 1 (#411).
     withRegistrations([], () => {
       const model = upgradeBayOf(atUpgradeBay())
       expect([...new Set(model.focusStops.map((stop) => stop.panel))]).toEqual([
         'tracks',
         'casing',
+        'lining',
+        'guns',
         'repair',
         'footer',
       ])
