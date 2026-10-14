@@ -34,6 +34,7 @@ import type { LiveBeaconProvider } from '../systems/registries/liveBeacon'
 import type { InputReactionEntry } from '../systems/registries/inputReactions'
 import type { EnemyDetectionModifier } from '../systems/registries/enemyDetectionModifiers'
 import type { EnemyLureSource } from '../systems/registries/enemyLures'
+import type { EnemyFlush } from '../systems/registries/enemyFlushes'
 import type { EnemyStepModifier } from '../systems/registries/enemyStepModifiers'
 import type { GateCheck } from '../systems/registries/gateChecks'
 import type { GenerationHook } from '../systems/registries/generationHooks'
@@ -123,6 +124,11 @@ export interface SliceRegistrar {
    * (ticket 375).
    */
   enemyStepModifier(modifier: EnemyStepModifier): void
+  /**
+   * Flushes a burrower near an exposed face out into it within the largest `flushTicks` answered
+   * (ticket 386).
+   */
+  enemyFlush(flush: EnemyFlush): void
   /** Vents the heat gauge and pauses heat gain for windows the slice keeps (ticket 233). */
   heatPause(pause: HeatPause): void
   /**

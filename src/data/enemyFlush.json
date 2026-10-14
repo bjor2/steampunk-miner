@@ -1,0 +1,5 @@
+{
+  "$comment": "Kernel caps of the burrower flush hook (ticket 386, K-flush for #388's Flushing shell; TD lock 6163443399 on #319). Stand-ins for Systems, not tuned. enemyFlushCap is how many flush providers may register; flushReachCapTiles bounds the square of cells, in whole tiles each way from the burrower's tile, searched for the exposed face it surfaces into, so a flush reads at most (2 * 4 + 1)^2 = 81 cells per burrower per tick whatever flushTicks a provider answers.",
+  "enemyFlushCap": 4,
+  "flushReachCapTiles": 4
+}

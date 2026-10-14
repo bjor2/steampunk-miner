@@ -10,6 +10,7 @@
  * Lunges and recoils keep the step fixed when they start and stop at the first blocked cell.
  * Speeds are the #6 bounded stats as whole mm per tick; a slice's slow (`enemyStepModifiers`,
  * ticket 375) shortens a walking step each tick, and a lunge or recoil step when it starts.
+ * A flushed burrower out in the open walks like a crawler (`walkOpenToward`, ticket 386).
  */
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../../constants/physics'
 import type { EnemyKind } from '../../economy/economyDefinition'
@@ -59,10 +60,25 @@ export function slowedLungeStepMmOf({ state, tick }: StepGround, enemy: Enemy): 
 
 /** One slowed walking step toward `target`, or the enemy unmoved when every greedy step blocks. */
 export function walkToward(ground: StepGround, enemy: Enemy, target: MillimetrePoint): Enemy {
+  return walkAs(ground, enemy, target, enemy.kind)
+}
+
+/** `walkToward` through open cells only, whatever the kind swims through (ticket 386). */
+export function walkOpenToward(ground: StepGround, enemy: Enemy, target: MillimetrePoint): Enemy {
+  return walkAs(ground, enemy, target, 'crawler')
+}
+
+/** The greedy step, entering only the cells `mover` may enter. */
+function walkAs(
+  ground: StepGround,
+  enemy: Enemy,
+  target: MillimetrePoint,
+  mover: EnemyKind,
+): Enemy {
   const { terrain } = ground
   const step = stepToward(enemy, target, slowedWalkStepMmOf(ground, enemy))
   const tries: MillimetreStep[] = [step, ...axisStepsOf(step)]
-  const open = tries.find((candidate) => canEnter(terrain, enemy.kind, movedBy(enemy, candidate)))
+  const open = tries.find((candidate) => canEnter(terrain, mover, movedBy(enemy, candidate)))
   return open === undefined ? enemy : { ...enemy, ...movedBy(enemy, open) }
 }
 

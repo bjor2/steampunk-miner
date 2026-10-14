@@ -21,6 +21,10 @@
  * With the dev flag `enemy.lureRetarget` on (ticket 361), a hunter that would hunt walks to a live
  * lure in reach instead (`enemyLures`), and hunts the vehicle again once it ends. A wind-up, lunge
  * or recoil under way goes on, and a wrecker never hears a lure.
+ *
+ * A burrower a slice flushes (`enemyFlushes`, ticket 386) leaves the hunt for the nearest exposed
+ * face instead, and once out hunts through open cells only while the flush lasts
+ * (`burrowerFlush.ts`); a wind-up, lunge or recoil under way goes on.
  */
 import { AUTHORITY_DEV_FLAGS, type AuthorityDevFlags } from '../../../constants/devFlags'
 import { MM_PER_METRE } from '../../../constants/physics'
@@ -46,26 +50,34 @@ import {
   slowedLungeStepMmOf,
   slowedWalkStepMmOf,
   stepAlong,
+  walkOpenToward,
   walkToward,
   type StepGround,
   type Terrain,
 } from './enemyMovement'
+import { flushMoveOf } from './burrowerFlush'
 import { ticksInPhase, updated, type EnemyTurn, type PhaseStep } from './enemyTurn'
 import { vehicleTargetOf, type VehicleTarget } from './vehicleTarget'
 import { fleeIntoRock, gnawRing, seekRing } from './wreckerBehaviour'
 
 type FreePhaseSteps = Readonly<Record<Exclude<EnemyPhase, 'pinned'>, PhaseStep>>
 
-/** Crawlers and burrowers hunt the vehicle; they never take a wrecker's phases. */
+/** How a hunter takes one walking step toward its goal. */
+type Walk = (ground: StepGround, enemy: Enemy, target: MillimetrePoint) => Enemy
+
+/**
+ * Crawlers and burrowers hunt the vehicle, unless a slice flushes the burrower out (ticket 386);
+ * they never take a wrecker's phases.
+ */
 const HUNTER_PHASE_STEPS: FreePhaseSteps = {
-  idle: hunt,
-  approach: hunt,
+  idle: flushOrHunt,
+  approach: flushOrHunt,
   windup: windUp,
   lunge: lunge,
   recoil: recoil,
-  seek: hunt,
-  gnaw: hunt,
-  flee: hunt,
+  seek: flushOrHunt,
+  gnaw: flushOrHunt,
+  flee: flushOrHunt,
 }
 
 /** A wrecker goes for the route, never the vehicle; after a released pin it backs off, then seeks. */
@@ -83,11 +95,11 @@ const WRECKER_PHASE_STEPS: FreePhaseSteps = {
 /** With `enemy.lureRetarget` on, a hunter on the hunt follows a live lure first (ticket 361). */
 const LURED_HUNTER_PHASE_STEPS: FreePhaseSteps = {
   ...HUNTER_PHASE_STEPS,
-  idle: followLureOrHunt,
-  approach: followLureOrHunt,
-  seek: followLureOrHunt,
-  gnaw: followLureOrHunt,
-  flee: followLureOrHunt,
+  idle: flushOrFollowLure,
+  approach: flushOrFollowLure,
+  seek: flushOrFollowLure,
+  gnaw: flushOrFollowLure,
+  flee: flushOrFollowLure,
 }
 
 type FreePhaseStepsOfKind = Readonly<Record<EnemyKind, FreePhaseSteps>>
@@ -131,23 +143,48 @@ function freePhaseStepsOf(kind: EnemyKind, flags: AuthorityDevFlags): FreePhaseS
   return stepsOfKind[kind]
 }
 
+function flushOrHunt(turn: EnemyTurn): RuleEffect {
+  return flushOr(turn, hunt)
+}
+
+function flushOrFollowLure(turn: EnemyTurn): RuleEffect {
+  return flushOr(turn, followLureOrHunt)
+}
+
+/** A flushed burrower heads out to its face or hunts in the open; anything else steps as it would. */
+function flushOr(turn: EnemyTurn, otherwise: PhaseStep): RuleEffect {
+  const move = flushMoveOf(turn)
+  if (move === null) return otherwise(turn)
+  return move.kind === 'surface' ? walkToGoal(turn, move.face) : huntInTheOpen(turn)
+}
+
 /** A live lure in reach is the path goal; with none the hunter hunts the vehicle (ticket 361). */
 function followLureOrHunt(turn: EnemyTurn): RuleEffect {
   const lure = lureGoalOf(turn.state, turn.enemy, turn.tick)
-  return lure === null ? hunt(turn) : walkToLure(turn, lure)
+  return lure === null ? hunt(turn) : walkToGoal(turn, lure)
 }
 
-function walkToLure(turn: EnemyTurn, lure: MillimetrePoint): RuleEffect {
-  return updated(turn.state, { ...walkToward(turn, turn.enemy, lure), phase: 'approach' })
+/** One walking step toward a goal other than the vehicle: a lure or a flushed burrower's face. */
+function walkToGoal(turn: EnemyTurn, goal: MillimetrePoint): RuleEffect {
+  return updated(turn.state, { ...walkToward(turn, turn.enemy, goal), phase: 'approach' })
 }
 
 function hunt(turn: EnemyTurn): RuleEffect {
+  return huntWalking(turn, walkToward)
+}
+
+/** A flushed burrower's hunt: it keeps to open cells, so it does not dive back in (ticket 386). */
+function huntInTheOpen(turn: EnemyTurn): RuleEffect {
+  return huntWalking(turn, walkOpenToward)
+}
+
+function huntWalking(turn: EnemyTurn, walk: Walk): RuleEffect {
   const { state, enemy, target, tick } = turn
   if (!isWithinMm(target.position, enemy, detectionReachOf(state, enemy, tick))) {
     return updated(state, enemy.phase === 'idle' ? enemy : inPhase(enemy, 'idle', tick))
   }
   if (!isWithinMm(target.position, enemy, lungeReachMm(enemy))) {
-    return updated(state, { ...walkToward(turn, enemy, target.position), phase: 'approach' })
+    return updated(state, { ...walk(turn, enemy, target.position), phase: 'approach' })
   }
   if (tick < enemy.readyTick) return updated(state, { ...enemy, phase: 'approach' })
   return updated(state, inPhase(enemy, 'windup', tick))
