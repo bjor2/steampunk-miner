@@ -13,30 +13,62 @@
  * worst case for the 0.98x guard because value shots turn into drill buys fastest; with no ore in
  * reach it fires the 60° edge on the side it faces. A shot the gun would refuse is never sent:
  * the wait then runs out without firing.
+ *
+ * The auto run (ticket 318, the GD's Vertical pin on #310: the forced-gun bot runs with auto-shoot
+ * on) starts and fires as the forced one until the steam sear is on its gun, which it researches
+ * and buys as any store item; then it switches auto mode on through the same `set_auto` a player
+ * sends, only once the toggle would be accepted, and lets the authority fire while it waits.
  */
 import { ARC_EDGE_BEARINGS } from '../authority/bore/boreAim'
 import { bestBoreBearingOf } from '../authority/bore/boreAuto'
-import { boreShotRefusal, nextShotTickOf } from '../authority/bore/boreFire'
-import { boreGunWallsMountIntent } from '../registries/boreGun'
+import { boreShotRefusal, nextShotTickOf, STEAM_SEAR_ITEM_ID } from '../authority/bore/boreFire'
+import { isAutoModeOn } from '../authority/autoMode/autoModeState'
+import { autoToggleRefusal } from '../authority/autoMode/autoToggle'
+import { boreAutoShootOf, boreGunWallsMountIntent } from '../registries/boreGun'
 import { FACING, type Facing } from '../vehicle/vehiclePose'
 import type { BotPilot } from './botPilot'
 import type { BotSession } from './botSession'
 
-/** Whether the bot fires the bore gun: never (the default), or at every `nextShotTick`. */
-export type BorePolicy = 'never' | 'forced'
+/**
+ * Whether the bot fires the bore gun: never (the default), at every `nextShotTick`, or so until
+ * the sear lets the authority fire on auto.
+ */
+export type BorePolicy = 'never' | 'forced' | 'auto'
 
 export const DEFAULT_BORE_POLICY: BorePolicy = 'never'
 
-/** The forced run's start: the gun mounted at its walls, when the provider names how. */
+/** The forced and auto runs' start: the gun mounted at its walls, when the provider names how. */
 export function mountBoreGunWhenForced(session: BotSession, policy: BorePolicy): void {
   const intent = boreGunWallsMountIntent()
-  if (policy === 'forced' && intent !== null) session.submit(intent)
+  if (policy !== 'never' && intent !== null) session.submit(intent)
 }
 
-/** Waits `ticks`; a forced pilot fires the gun on each `nextShotTick` inside the wait. */
+/**
+ * Waits `ticks`; a forced pilot fires the gun on each `nextShotTick` inside the wait, and an auto
+ * pilot whose gun is on auto leaves the firing to the authority.
+ */
 export function waitFiring(session: BotSession, pilot: BotPilot, ticks: number): void {
-  if ((pilot.borePolicy ?? DEFAULT_BORE_POLICY) === 'never') return session.wait(ticks)
+  const policy = pilot.borePolicy ?? DEFAULT_BORE_POLICY
+  if (policy === 'auto') switchAutoOnWhenReady(session)
+  if (policy === 'never' || isOnAuto(session)) return session.wait(ticks)
   fireUntil(session, pilot, session.tick() + ticks)
+}
+
+/** Sends `set_auto {on}` once the sear is on the gun and the toggle would be accepted. */
+function switchAutoOnWhenReady(session: BotSession): void {
+  if (isOnAuto(session) || !isSearOnGun(session)) return
+  session.submit({ type: 'ground_gun.set_auto', payload: { on: true } })
+}
+
+function isOnAuto(session: BotSession): boolean {
+  return isAutoModeOn(session.state(), session.playerId, STEAM_SEAR_ITEM_ID)
+}
+
+/** Researched, so `set_auto` is accepted, and on the gun, so the mode has numbers to fire with. */
+function isSearOnGun(session: BotSession): boolean {
+  const state = session.state()
+  if (autoToggleRefusal(state, session.playerId, STEAM_SEAR_ITEM_ID) !== null) return false
+  return boreAutoShootOf(state, session.playerId) !== null
 }
 
 /**

@@ -1,7 +1,8 @@
 /**
  * The bore gun against the pacing bot (ticket 347, the TD's seam 3 on #314, ruled by the GD): the
  * bot plays the bot scenario to planet 10's core on each pacing seed (#84) twice, never firing and
- * forced to fire at every `nextShotTick` with the gun at its walls, and `boreReport.ts` holds the
+ * forced to fire at every `nextShotTick` with the gun at its walls, with auto-shoot on once the
+ * steam sear is on its gun (ticket 318, the GD's Vertical pin on #310), and `boreReport.ts` holds the
  * forced run to the Vertical Scaler's pins: time to core at least 0.98x the never run's on every
  * planet, departure `drill_power` within 1 level, at least 60 shots, and the campaign scaling gate.
  * It exits 1 on any miss, and refuses to play with no gun to mount (no `boreGun` provider naming
@@ -34,7 +35,7 @@ const lastPlanet = lastPlanetOf(process.argv.slice(2))
 const scenario = JSON.parse(readFileSync(SCENARIO_FILE, 'utf8')) as Scenario
 const seeds = PACING_WORLD_SEEDS['bot-slice']
 const never = playOnSeeds('never')
-const forced = playOnSeeds('forced')
+const forced = playOnSeeds('auto')
 const report = deriveBoreReport(pairedRuns(never, forced), LOCKED_SCHEDULE, lastPlanet)
 const text = [
   `## The bore gun against the pacing bot, planets 1 to ${lastPlanet}, never vs forced (gated)`,

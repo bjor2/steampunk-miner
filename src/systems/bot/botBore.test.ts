@@ -3,6 +3,7 @@ import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import type { AuthorityCommand, CommandIntent } from '../authority/authorityCommand'
 import { createAuthorityState } from '../authority/authorityState'
+import { searSlice } from '../authority/bore/boreAutoFixtures'
 import { BORE_STATS, PLAIN_RIG, standInPocket } from '../authority/bore/boreFixtures'
 import { createScriptedSession, WORLD_SEED } from '../authority/scriptedSession'
 import { stateDigest } from '../authority/stateDigest'
@@ -137,6 +138,28 @@ describe('bot: the bore gun policy (ticket 347)', () => {
     withRegistrations([gunSlice()], () => {
       expect(fireTicksOf(shortRun('forced').commands).length).toBeGreaterThan(0)
       expect(fireTicksOf(shortRun('never').commands)).toEqual([])
+    })
+  })
+})
+
+describe('bot: the auto bore policy (ticket 318, the forced-gun run with auto-shoot on)', () => {
+  it('fires as the forced run does until the sear is on its gun', () => {
+    const noSear = searSlice({ stats: FLOOR_GUN, sear: null })
+    const forced = withRegistrations([noSear], () =>
+      firesOf(waitInChunks('forced', REPORT_CHUNK_TICKS).commands()),
+    )
+    const auto = withRegistrations([noSear], () => waitInChunks('auto', REPORT_CHUNK_TICKS))
+    expect(firesOf(auto.commands())).toEqual(forced)
+    expect(auto.commands().filter((command) => command.type === 'ground_gun.set_auto')).toEqual([])
+  })
+
+  it('switches auto on once, through set_auto, and then leaves the firing to the authority', () => {
+    withRegistrations([searSlice({ stats: FLOOR_GUN })], () => {
+      const session = waitInChunks('auto', REPORT_CHUNK_TICKS)
+      expect(session.commands().map(({ type, payload }) => ({ type, payload }))).toEqual([
+        { type: 'ground_gun.set_auto', payload: { on: true } },
+      ])
+      expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
     })
   })
 })
