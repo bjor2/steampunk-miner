@@ -478,21 +478,23 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 
-### `terrain-tools`: 36 files, 286 tests
+### `terrain-tools`: 39 files, 315 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/terrain-tools/foamPace.test.ts` | 3 | 1 |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetFieldsBench.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetGuard.test.ts` | 6 | 6 |
 | `src/features/terrain-tools/magnetHand.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/magnetPace.test.ts` | 6 | 3 |
 | `src/features/terrain-tools/sceneBudget.test.ts` | 3 | 3 |
-| `src/features/terrain-tools/shippedRows.test.ts` | 7 | 7 |
+| `src/features/terrain-tools/shippedRows.test.ts` | 8 | 8 |
 | `src/features/terrain-tools/store/clampRelease.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/clampCountdown.test.ts` | 4 | 3 |
 | `src/features/terrain-tools/systems/clampLattice.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/dragHooks.test.ts` | 35 | 8 |
+| `src/features/terrain-tools/systems/foamCards.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/gatesFixture.test.ts` | 22 | 5 |
 | `src/features/terrain-tools/systems/lodeClamp.test.ts` | 16 | 12 |
 | `src/features/terrain-tools/systems/lodestoneBeacon.test.ts` | 5 | 5 |
@@ -507,6 +509,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/render/magnetFields.test.ts` | 11 | 10 |
 | `src/features/terrain-tools/systems/repulsorCoil.test.ts` | 9 | 8 |
 | `src/features/terrain-tools/systems/seamSplitter.test.ts` | 4 | 4 |
+| `src/features/terrain-tools/systems/stabiliserFoam.test.ts` | 21 | 20 |
 | `src/features/terrain-tools/systems/statPreview.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/terrainEconomy.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/terrainEditCaps.test.ts` | 13 | 3 |
