@@ -241,8 +241,15 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    travel parity passes the engine, and a cell at the floor takes exactly the floor (a 40-digit
  *    rounding once read some hardnesses one tick or sub-step longer). Goldens that dig past the
  *    old floor change.
+ * 72: price-only purchases (ticket 411, Bjor's ruling of 14 Oct): no buy reads the session's
+ *    planet. `tech-tree.unlock_node` and `choose_fork` drop the tier, discovery-grace, absorbed-row
+ *    and lab-planet locks and charge each node its anchor's price on every planet (a held row's
+ *    node refused `held_feature`); `buyVehicleItem` sells a researched extractor or magnet on any
+ *    planet; `buyGun` mounts and `buyLiningType` unlocks once the row ships, at the row planet's
+ *    price. A command log that bought ahead of its anchor, or past it at the later planet's
+ *    price, now answers differently; a run that buys none of these moves no digest or mined order.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 71
+export const AUTHORITY_PROTOCOL_VERSION = 72
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
