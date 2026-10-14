@@ -40,6 +40,8 @@ export interface TrackReaction {
 
 export interface Showcase {
   turnTicks: number
+  /** How long the turntable beat holds a changed part facing the camera. */
+  beatHoldTicks: number
   /** The glow on the selected plaque's part while no step's reaction plays on it. */
   selectedGlow: number
   momentTicks: Readonly<Record<StepMoment, number>>
@@ -138,8 +140,8 @@ function showcaseOf(file: typeof SHOWCASE_FILE): Showcase {
   const tracks = Object.fromEntries(
     Object.entries(file.tracks).map(([track, reaction]) => [track, reactionOf(reaction)]),
   ) as Record<UpgradeId, TrackReaction>
-  const { turnTicks, selectedGlow, momentTicks } = file
-  return { turnTicks, selectedGlow, momentTicks, tracks }
+  const { turnTicks, beatHoldTicks, selectedGlow, momentTicks } = file
+  return { turnTicks, beatHoldTicks, selectedGlow, momentTicks, tracks }
 }
 
 function reactionOf(raw: (typeof SHOWCASE_FILE.tracks)[UpgradeId]): TrackReaction {

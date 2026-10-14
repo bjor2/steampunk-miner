@@ -1,7 +1,8 @@
 /**
  * The Workshop's hold-to-buy controller and showcase state (#180 sections 1, 2 and 5; the TD's
  * `store/` chain controller): which plaque is selected, the live hold on G&V's curve, the tally
- * its plaque shows, the reaction each track's part is playing and the turntable's turn.
+ * its plaque shows, the reaction each track's part is playing and the turntable's turn, with the
+ * beat a fork re-choice plays on it (ticket 270).
  *
  * The frames advance it with the authority tick; every due step is predicted on the replica, then
  * submitted as its own `buyUpgrade {upgradeId, chain}`, so a chain replays from its commands
@@ -18,6 +19,7 @@ import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import type { UpgradeId } from '../../../systems/economy/economyDefinition'
 import { UI_ID_TEMPLATES } from '../../../systems/views/screenIds'
 import { add, ZERO_MONEY, type Money } from '../../../systems/money'
+import { forkTurntableRequestsOf, type ForkTurntableRequest } from '../../tech-tree'
 import { stopCueOf, type ChainStopCue } from '../systems/chainCues'
 import {
   chainOfNextStep,
@@ -44,6 +46,7 @@ import {
   turnTowardTrack,
   type TurntableTurn,
 } from '../systems/render/showcaseReactions'
+import { beatOfRequest, type TurntableBeat } from '../systems/render/turntableBeat'
 import {
   heldAfterStep,
   reactionsAfterPurchases,
@@ -71,6 +74,8 @@ interface WorkshopValues {
   /** At most one per track: a new step restarts its track's reaction. */
   reactions: readonly StepReaction[]
   turn: TurntableTurn
+  /** The last turntable beat a fork re-choice asked for; it hands back once played. */
+  beat: TurntableBeat | null
   nextChainId: number
 }
 
@@ -88,6 +93,8 @@ interface WorkshopState extends WorkshopValues {
   advanceHoldTo(tick: number): void
   /** A `listenForDomainEvents` listener: reactions and sounds for every local purchase. */
   hearPurchases(events: readonly DomainEvent[], playerId: string): void
+  /** A `listenForDomainEvents` listener: the turntable beat for the local player's re-choice. */
+  hearForkRechoices(events: readonly DomainEvent[], playerId: string): void
   /** The bay screen closed: a live hold is let go, and the turntable comes back to rest. */
   leaveShowcase(): void
 }
@@ -101,6 +108,7 @@ const STARTING_VALUES: WorkshopValues = {
   tally: null,
   reactions: [],
   turn: RESTING_TURN,
+  beat: null,
   nextChainId: FIRST_CHAIN_ID,
 }
 
@@ -135,9 +143,13 @@ export const useWorkshopStore = create<WorkshopState>()((set, get) => ({
     if (purchases.length > 0) hearOwnPurchases(purchases)
     endHoldsRefusedIn(events, playerId)
   },
+  hearForkRechoices: (events, playerId) => {
+    const requests = forkTurntableRequestsOf(events, playerId)
+    if (requests.length > 0) playTurntableBeats(requests)
+  },
   leaveShowcase: () => {
     get().releaseHold()
-    set({ selected: null, turn: RESTING_TURN, reactions: [] })
+    set({ selected: null, turn: RESTING_TURN, beat: null, reactions: [] })
   },
 }))
 
@@ -242,6 +254,13 @@ function hearOwnPurchases(purchases: readonly HeardPurchase[]): void {
   const { reactions, hold } = useWorkshopStore.getState()
   useWorkshopStore.setState({ reactions: reactionsAfterPurchases(reactions, purchases, hold) })
   playCues(soundsOfPurchases(purchases, hold))
+}
+
+/** Each request starts its beat where the last stands; the latest one plays. */
+function playTurntableBeats(requests: readonly ForkTurntableRequest[]): void {
+  const { turn, beat } = useWorkshopStore.getState()
+  const played = requests.reduce((last, request) => beatOfRequest(turn, last, request), beat)
+  useWorkshopStore.setState({ beat: played })
 }
 
 function playCues(plays: readonly CuePlay[]): void {

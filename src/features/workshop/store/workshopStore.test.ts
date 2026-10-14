@@ -13,6 +13,7 @@ import {
   soundingCountOf,
   takeVoiceToSteal,
 } from '../../../systems/audio/voicePool'
+import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { serviceReserveOf } from '../../../systems/authority/serviceReserve'
 import type { UpgradeId } from '../../../systems/economy/economyDefinition'
 import { stepPrice } from '../../../systems/economy/upgradePrices'
@@ -34,6 +35,7 @@ import {
   PURCHASE_SOUND,
   RATCHET_CUE_ID,
 } from '../systems/render/purchaseSound'
+import { RESTING_TURN } from '../systems/render/showcaseReactions'
 import { resetWorkshopStore, useWorkshopStore } from './workshopStore'
 
 const game = () => useGameStore.getState()
@@ -348,3 +350,29 @@ function stolenRatchetVoicesOf(heard: typeof cues): number {
       return stolen + taken
     }, 0)
 }
+
+/** A fork re-choice as the authority answers it, by `playerId` on `onTick`. */
+function rechoiceBy(playerId: string, onTick: number): DomainEvent[] {
+  const body = { lane: 'drill-gear', from: 'wide', to: 'deep', cost: '1' } as const
+  return [{ type: 'tech-tree.ForkRechosen', ...body, playerId, tick: onTick, seq: 1 }]
+}
+
+describe('workshop turntable beat on a fork re-choice (ticket 270)', () => {
+  it("plays the beat toward the new branch's part for the local player's re-choice only", () => {
+    const local = game().playerId
+    workshop().hearForkRechoices(rechoiceBy('p2', 40), local)
+    expect(workshop().beat).toBeNull()
+
+    workshop().hearForkRechoices(rechoiceBy(local, 40), local)
+    expect(workshop().beat).toEqual({ fromRadians: 0, faceRadians: 0.5, startTick: 40 })
+  })
+
+  it('rests the turntable and drops the beat when the showcase closes', () => {
+    const local = game().playerId
+    workshop().hearForkRechoices(rechoiceBy(local, 40), local)
+    workshop().leaveShowcase()
+
+    expect(workshop().beat).toBeNull()
+    expect(workshop().turn).toEqual(RESTING_TURN)
+  })
+})
