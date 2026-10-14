@@ -85,3 +85,18 @@ export const WALL_HALF_DEPTH = 1
  * 1.5 km of zero, where a step is at most 0.12 mm, at any planet radius.
  */
 export const RENDER_ORIGIN_REACH_MM = 1_000_000
+
+/**
+ * Speed-adaptive substeps (TD scope a on #316, locked with both Scalers, ticket 334): a fixed step
+ * whose motion is longer than this is stepped as `n = ceil(step / SUBSTEP_REACH_MM)` world steps
+ * of `dt / n` (24 m/s a substep; measured on #316 to stay clean on surface falls and ribs from 0.5
+ * to 2.25 m thick up to 384 m/s), the collider halo synced round the body before each.
+ */
+export const SUBSTEP_REACH_MM = 400
+
+/**
+ * The substep budget (the TD's lock on #316 scope a): a step that would need more substeps than
+ * this (over 96 m/s) is a kinematic grid sweep instead, with no contact solve, so the physics cost
+ * per tick does not grow with speed past it.
+ */
+export const MAX_PHYSICS_SUBSTEPS = 4

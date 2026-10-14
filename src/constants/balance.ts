@@ -23,18 +23,23 @@ export const DESTROY_DELAY_TICKS = 120
 export const ENERGY_LOW_PERCENTS: readonly number[] = [25, 10]
 
 /**
- * The pose bound per fixed step (TD on #316, raised from #7's 16 m/s by the GD there, ticket 330):
- * at most 300 mm a tick, 18 m/s at 60 ticks a second. The 0.9 m body first tunnels a contour at
- * 0.45 m a tick (measured on #316), so the halo never tunnels. A `drillStep` further than this from
- * the last accepted pose, per tick since it, is refused.
+ * The client's speed clamp per fixed step while the swept cut is off (TD on #316, raised from #7's
+ * 16 m/s by the GD there, ticket 330): at most 300 mm a tick, 18 m/s at 60 ticks a second. The
+ * 0.9 m body first tunnels a contour at 0.45 m a tick (measured on #316), so one world step a tick
+ * never tunnels. The authority's bound is derived from the rig's stats instead (ticket 334,
+ * `vehicle/stepBound.ts`); away from a cut it is never below this one.
  */
 export const MAX_STEP_MM_PER_TICK = 300
 
-/**
- * The speed bound of #7, derived from `MAX_STEP_MM_PER_TICK`: pose reports above it are refused
- * (#3 host sanity check), and the body's speed is clamped to it, in mm/s.
- */
+/** `MAX_STEP_MM_PER_TICK` in mm/s: what the body and the pacing bot's reports keep to. */
 export const MAX_SPEED_MM_PER_SECOND = MAX_STEP_MM_PER_TICK * TICKS_PER_SECOND
+
+/**
+ * The stats-derived pose bound's tolerance (TD scope a on #316, ticket 334): one 250 mm density
+ * sample on top of the step the rig's stats allow, so rounding and a contact's push never refuse
+ * an honest step.
+ */
+export const STEP_BOUND_TOLERANCE_MM = 250
 
 /**
  * How far from the reported pose `DrillTile` may reach, in mm: the drill works the tile next to

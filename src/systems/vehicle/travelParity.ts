@@ -51,12 +51,18 @@ function drillTravelStepOf(
   vehicle: VehicleState,
   params: PlanetParams | null,
 ): number {
-  if (params === null || vehicle.pose === null) return 0
+  const hardness = bandRockHardnessOf(vehicle, params)
+  return hardness === null ? 0 : travelStepThrough(drill, hardness)
+}
+
+/** The nominal ground: the rock of the band the vehicle stands in; null off a planet or posed nowhere. */
+export function bandRockHardnessOf(
+  vehicle: VehicleState,
+  params: PlanetParams | null,
+): BigStat | null {
+  if (params === null || vehicle.pose === null) return null
   const tile = tileOfMillimetres(vehicle.pose.x, vehicle.pose.y)
-  return travelStepThrough(
-    drill,
-    blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty)),
-  )
+  return blockHardness(params.planetIndex, bandOfTile(params, tile.tx, tile.ty))
 }
 
 /** `floor(k * cutStep)` through ground of `hardness`; 0 where the tip cannot scratch it. */
