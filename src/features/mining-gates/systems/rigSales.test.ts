@@ -11,9 +11,9 @@ import { slice as MINING_GATES_SLICE } from '../register'
 import { rigNamed, rigPriceOf, ownsRig } from './rigs'
 import { RIG_SELLER } from './rigSales'
 
-// The extractors at the Upgrade bay (ticket 248): on sale from their own planet at 40 band-5 ore
-// there (`rigPriceOf`), owned once bought. No lane registers the extractor nodes on main yet, so
-// a probe answers "researched" for every item.
+// The extractors at the Upgrade bay (ticket 248): on sale on every planet at 40 band-5 ore of
+// their own planet (`rigPriceOf`; the price is the only gate, #411), owned once bought. A probe
+// answers "researched" for every item, so the specs read the store alone.
 
 const RESONANCE = 'rig.resonance'
 
@@ -33,22 +33,19 @@ function dockedOnPlanet(planetIndex: number): ScriptedSession {
 }
 
 describe('extractors on sale (ticket 248)', () => {
-  it('are not sold before their own planet', () => {
-    expect(RIG_SELLER.offerOf(RESONANCE, 4)).toBeNull()
+  it('sell at the price fixed on their own planet, under their extractor name', () => {
+    const offer = RIG_SELLER.offerOf(RESONANCE)
+    expect(offer && toCanonical(offer.price)).toBe(resonancePrice())
+    expect(offer?.name).toBe(rigNamed(RESONANCE)!.name)
   })
 
-  it('sell from their planet on at the price fixed there, under their extractor name', () => {
-    const offers = [5, 9].map((planet) => RIG_SELLER.offerOf(RESONANCE, planet))
-    expect(offers.map((offer) => offer && toCanonical(offer.price))).toEqual([
-      resonancePrice(),
-      resonancePrice(),
-    ])
-    expect(offers[0]?.name).toBe(rigNamed(RESONANCE)!.name)
+  it('ask the pacing bot to buy them ahead of its tracks from their own planet', () => {
+    expect(RIG_SELLER.offerOf(RESONANCE)?.boughtBeforeTracksFrom).toBe(5)
   })
 
-  it('debit that price and leave the extractor owned', () =>
+  it('debit that price on planet 1 too and leave the extractor owned', () =>
     withRegistrations([MINING_GATES_SLICE, RESEARCH_PROBE], () => {
-      const session = dockedOnPlanet(5)
+      const session = dockedOnPlanet(1)
       const [bought] = session.submit(1, buyVehicleItemCommand(RESONANCE))
       expect(bought).toMatchObject({ type: 'VehicleItemPurchased', price: resonancePrice() })
       expect(ownsRig(session.state(), 'p1', RESONANCE)).toBe(true)

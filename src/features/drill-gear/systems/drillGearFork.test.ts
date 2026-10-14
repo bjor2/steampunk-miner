@@ -106,13 +106,9 @@ describe('drill-gear fork: Wide and Deep', () => {
     expect(nodes.filter((node) => storeItems.has(node.unlocks))).toEqual([])
   })
 
-  it('prices both branches the same on P16-P60', () => {
+  it('prices both branches the same, on every planet', () => {
     const [wide, deep] = DRILL_GEAR_FORK.branches
-    const planets = Array.from({ length: 45 }, (_, index) => FORK_TIER + index)
-    const unequal = planets.filter(
-      (planet) => cmp(nodeCostOf(wide.id, planet)!, nodeCostOf(deep.id, planet)!) !== 0,
-    )
-    expect(unequal).toEqual([])
+    expect(cmp(nodeCostOf(wide.id)!, nodeCostOf(deep.id)!)).toBe(0)
   })
 
   it('asks nothing of the drill before the lane chooses', () => {

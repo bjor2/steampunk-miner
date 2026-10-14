@@ -3,10 +3,10 @@ import {
   PLAYER,
   researchAll,
   sessionOnPlanet,
-  withFixtureTree,
+  withFixtureTree as withLanesOnly,
   withNoLanes,
 } from '../treeTestSession'
-import { ANCHORED_NODE_ID, ANCHORED_NODE_SLICE } from '../treeFixtureSlice'
+import { ANCHORED_NODE_ID, ANCHORED_NODE_SLICE, LAB_FIXTURE_SLICE } from '../treeFixtureSlice'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import { forkPairOf, type ForkBranchSpec } from './forkNode'
 import { romanNumeralOf } from './nodeCardModel'
@@ -18,6 +18,11 @@ import {
   type TreeQuery,
   type TreeScreenModel,
 } from './treeScreenModel'
+
+/** The fixture tree with the research lab's building standing, as the shipped game has it. */
+function withFixtureTree<T>(run: () => T, extra: readonly SliceDefinition[] = []): T {
+  return withLanesOnly(run, [LAB_FIXTURE_SLICE, ...extra])
+}
 
 const EVERYTHING: TreeQuery = { search: '', filters: [] }
 
@@ -97,8 +102,10 @@ describe('tech tree screen: lanes', () => {
       const sensing = model.lanes.find((lane) => lane.lane === 'sensing')!.nodes
       expect(sensing.map((node) => node.tier)).toEqual([2, 5, 7, 7, 13, 21, 26, 30, 33])
       expect(sensing.filter((node) => node.tier === 7).map((node) => node.stack)).toEqual([0, 1])
-      expect(model.rulerMarks).toEqual([1, 5, 10, 15, 20, 25, 30, 35])
-      expect(model.lastPlanet).toBe(37)
+      expect(model.rulerMarks).toEqual([
+        1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80,
+      ])
+      expect(model.lastPlanet).toBe(83)
     })
   })
 
@@ -139,13 +146,21 @@ describe('tech tree screen: lanes', () => {
     }, [AETHERIC_FORK_PROBE])
   })
 
-  it('stretches the ruler past planet 40 to show the endless combos coming', () => {
+  it("shows each lane pair's next endless grade from planet 1, the same map on any planet (#411)", () => {
     withFixtureTree(() => {
-      const model = modelOn(44)
-      expect(model.lastPlanet).toBe(47)
-      expect(laneIds(model, 'combo')).toEqual(
-        expect.arrayContaining(['tech.combo.gen.41', 'tech.combo.gen.44', 'tech.combo.gen.47']),
+      const combos = laneIds(modelOn(1), 'combo')
+      expect(combos).toEqual(
+        expect.arrayContaining(['tech.combo.gen.41', 'tech.combo.gen.44', 'tech.combo.gen.83']),
       )
+      expect(laneIds(modelOn(44), 'combo')).toEqual(combos)
+      expect(laneIds(modelOn(200), 'combo')).toEqual(combos)
+    })
+  })
+
+  it("runs the ruler on to the player's planet past the map, as information only", () => {
+    withFixtureTree(() => {
+      expect(modelOn(3).lastPlanet).toBe(83)
+      expect(modelOn(120).lastPlanet).toBe(120)
     })
   })
 })
@@ -182,15 +197,16 @@ describe('tech tree screen: node cards', () => {
     })
   })
 
-  it('names the discovery that opens a node a planet early', () => {
+  it('names no discovery: a node keyed to one waits only on its price (#411)', () => {
     withFixtureTree(() => {
       const card = nodeCardModelOf(
-        sessionOnPlanet(3).state(),
+        sessionOnPlanet(1, '0').state(),
         PLAYER,
         registeredTechTree(),
         'tech.extraction.resonance_fork',
       )!
-      expect(card.discoveryHint).toBe('Find crystal ore to research it a planet early.')
+      expect(card.refusal).toBe('money_short')
+      expect(card.refusalText).toBe(`Price: ${card.costText}`)
       expect(card.prereqNames).toEqual([])
     })
   })
@@ -212,9 +228,12 @@ describe('tech tree screen: next up, search and filters', () => {
   it("pins each lane's first researchable node in the next-up strip", () => {
     withFixtureTree(() => {
       expect(modelOn(3).nextUp.map((card) => card.id)).toEqual([
+        'tech.extraction.resonance_fork',
         'tech.terrain.stabiliser_foam',
         'tech.sensing.echo_sounder',
         'tech.mobility.grapple_winch',
+        'tech.drill_gear.vibratory_bit',
+        'tech.aetheric.resonance_whistle',
       ])
     })
   })
@@ -223,9 +242,9 @@ describe('tech tree screen: next up, search and filters', () => {
     withFixtureTree(() => {
       const found = (search: string) =>
         modelOn(3, { search, filters: [] }).lanes.flatMap((lane) => lane.nodes.map((n) => n.id))
-      expect(found('grapple')).toEqual(['tech.mobility.grapple_winch'])
+      expect(found('grapple')).toEqual(['tech.mobility.grapple_winch', 'tech.combo.gen.53'])
       expect(found('POWER.ECHO')).toEqual(['tech.sensing.echo_sounder'])
-      expect(found('  ')).toHaveLength(52)
+      expect(found('  ')).toHaveLength(67)
     })
   })
 
@@ -234,31 +253,33 @@ describe('tech tree screen: next up, search and filters', () => {
       const kept = (filters: TreeQuery['filters']) =>
         modelOn(3, { search: '', filters }).lanes.flatMap((lane) => lane.nodes.map((n) => n.id))
       expect(kept(['affordable'])).toEqual([
+        'tech.extraction.resonance_fork',
+        'tech.extraction.containment_hood',
+        'tech.extraction.acid_etcher',
+        'tech.extraction.induction_coil',
+        'tech.extraction.aether_tether',
         'tech.terrain.stabiliser_foam',
+        'tech.terrain.ore_shifter',
         'tech.sensing.echo_sounder',
         'tech.mobility.grapple_winch',
+        'tech.drill_gear.vibratory_bit',
+        'tech.aetheric.resonance_whistle',
       ])
-      expect(kept(['locked'])).toHaveLength(49)
-      expect(kept(['affordable', 'locked'])).toHaveLength(52)
+      expect(kept(['locked'])).toHaveLength(56)
+      expect(kept(['affordable', 'locked'])).toHaveLength(67)
       expect(kept(['marks'])).toEqual([])
     })
   })
 })
 
 describe('tech tree screen: anchored nodes (ticket 358)', () => {
-  it('leaves a node off the screen until its anchor row is unlocked, then shows it', () => {
+  it('leaves a node anchored on a vision row off the screen on every planet', () => {
     withFixtureTree(() => {
-      const cardOn = (planet: number) =>
-        nodeCardModelOf(
-          sessionOnPlanet(planet).state(),
-          PLAYER,
-          registeredTechTree(),
-          ANCHORED_NODE_ID,
-        )
-      expect(laneIds(modelOn(7), 'sensing')).not.toContain(ANCHORED_NODE_ID)
-      expect(cardOn(7)).toBeNull()
-      expect(laneIds(modelOn(8), 'sensing')).toContain(ANCHORED_NODE_ID)
-      expect(cardOn(8)?.status).toBe('affordable')
+      for (const planet of [1, 17, 60]) {
+        const state = sessionOnPlanet(planet).state()
+        expect(laneIds(modelOn(planet), 'sensing')).not.toContain(ANCHORED_NODE_ID)
+        expect(nodeCardModelOf(state, PLAYER, registeredTechTree(), ANCHORED_NODE_ID)).toBeNull()
+      }
     }, [ANCHORED_NODE_SLICE])
   })
 })

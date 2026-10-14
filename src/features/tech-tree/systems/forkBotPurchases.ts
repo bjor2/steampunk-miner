@@ -7,9 +7,8 @@
  *
  * Both offer nothing: the on-curve bot picks no branch and never switches. `balance:forks` (#255
  * build 2, ticket 267) forces its branch at the run's start with `debug.tech-tree.forceFork`, since
- * its runs end at planet 10, before any fork's tier.
+ * its runs end at planet 10, before the forks' price anchor (P16).
  */
-import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { ZERO_MONEY, type Money } from '../../../systems/money'
 import type { BotPurchase } from '../../../systems/registries/botPurchases'
 import { forkBranchNodeOf } from './forkBranches'
@@ -29,7 +28,7 @@ export const FORK_CHOICE_BOT_PURCHASE: BotPurchase = {
   id: 'tech-tree.choose-fork',
   command: CHOOSE_FORK_COMMAND,
   payloadsToTry: () => NO_PICKS,
-  estimateCost: (state, _playerId, args) => choiceCostOf(state, args as ForkPick),
+  estimateCost: (_state, _playerId, args) => choiceCostOf(args as ForkPick),
   isAvailable: (state, playerId, args) => {
     const { lane, branch } = args as ForkPick
     return chooseForkRefusalOf(state, playerId, lane, branch) === null
@@ -50,9 +49,9 @@ export const FORK_RECHOICE_BOT_PURCHASE: BotPurchase = {
   boughtIdOf: (args) => branchNodeIdOf(args as ForkPick),
 }
 
-function choiceCostOf(state: AuthorityState, { lane, branch }: ForkPick): Money {
+function choiceCostOf({ lane, branch }: ForkPick): Money {
   const fork = forkBranchNodeOf(registeredTechTree(), lane, branch)
-  return fork === null ? ZERO_MONEY : forkChoiceCostOf(state, fork)
+  return fork === null ? ZERO_MONEY : forkChoiceCostOf(fork)
 }
 
 /** The branch node the pick names: what the spend record says was bought. */

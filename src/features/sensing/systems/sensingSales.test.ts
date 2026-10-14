@@ -50,7 +50,7 @@ describe('sensing: the store sells a researched one-off (ticket 248)', () => {
       'consumable.signal_buoy',
       'power.galvanic_probe',
       'power.void_sounder',
-    ].filter((itemId) => SENSING_SELLER.offerOf(itemId, 40) !== null)
+    ].filter((itemId) => SENSING_SELLER.offerOf(itemId) !== null)
     expect(offered).toEqual([
       'power.echo_sounder',
       'passive.threat_periscope',

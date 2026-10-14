@@ -22,7 +22,6 @@ import { WHISTLE_DESCRIPTION, WHISTLE_ICON_ID, WHISTLE_ID } from './systems/whis
 
 const WHISTLE = AETHERIC_ECONOMY.resonanceWhistle
 const UNLOCK_PLANET = 15
-const LATE_PLANET = 40
 
 const view = itemSnapshotViewOf(
   createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] }),
@@ -66,21 +65,16 @@ describe('resonance whistle rows', () => {
 
   it('sells for 15 band-5 ore units at P15 through bandOrePriceAt, on every planet', () => {
     const price = bandOrePriceAt(AETHERIC_ECONOMY.price, UNLOCK_PLANET, UNLOCK_PLANET)
-    ;[UNLOCK_PLANET, LATE_PLANET].forEach((planet) =>
-      expect(AETHERIC_SELLER.offerOf(WHISTLE_ID, planet)).toEqual({
-        name: 'Resonance whistle',
-        price,
-      }),
-    )
-    expect(AETHERIC_SELLER.offerOf('power.not_aetheric', LATE_PLANET)).toBeNull()
+    expect(AETHERIC_SELLER.offerOf(WHISTLE_ID)).toEqual({ name: 'Resonance whistle', price })
+    expect(AETHERIC_SELLER.offerOf('power.not_aetheric')).toBeNull()
   })
 
   it('prices a tech.mark node for every Mark from 2 to its last, and none past it', () => {
     const markId = (mark: number) => `tech.mark.${WHISTLE_ID}.${mark}`
     const marks = Array.from({ length: lastMark() - 1 }, (_, at) => at + 2)
     expect(marks.length).toBeGreaterThan(0)
-    expect(marks.filter((mark) => nodeCostOf(markId(mark), LATE_PLANET) === null)).toEqual([])
-    expect(nodeCostOf(markId(lastMark() + 1), LATE_PLANET)).toBeNull()
+    expect(marks.filter((mark) => nodeCostOf(markId(mark)) === null)).toEqual([])
+    expect(nodeCostOf(markId(lastMark() + 1))).toBeNull()
   })
 
   it('previews its Mark 1 numbers from the economy file', () => {

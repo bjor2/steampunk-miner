@@ -77,18 +77,16 @@ describe('sensing fork', () => {
       [DIVINER, FORK_PLANET, DIVINER_ROD],
       [SCOUT, FORK_PLANET, SCOUT_PINGER],
     ])
-    for (const planet of [16, 30, 60]) {
-      expect(nodeCostOf(SCOUT, planet)).toEqual(nodeCostOf(DIVINER, planet))
-    }
+    expect(nodeCostOf(SCOUT)).toEqual(nodeCostOf(DIVINER))
   })
 
   it('sells both items as charged slot items at one price', () => {
     for (const itemId of [SCOUT_PINGER, DIVINER_ROD]) {
       expect(powerUpOfItem(itemId)?.powerUpClass).toBe('charged')
     }
-    const scoutPrice = vehicleItemOfferOf(SCOUT_PINGER, FORK_PLANET)?.price
+    const scoutPrice = vehicleItemOfferOf(SCOUT_PINGER)?.price
     expect(scoutPrice).toBeDefined()
-    expect(vehicleItemOfferOf(DIVINER_ROD, FORK_PLANET)?.price).toEqual(scoutPrice)
+    expect(vehicleItemOfferOf(DIVINER_ROD)?.price).toEqual(scoutPrice)
   })
 
   it('plays the chosen branch’s item and refuses the other branch’s, at no cost', () => {

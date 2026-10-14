@@ -153,12 +153,10 @@ describe('purchase chains: the service reserve (#180 amendment 2, ticket 226)', 
 })
 
 describe('purchase chains: the unlock gate (TD lock on #177, ticket 226)', () => {
-  it.each([
-    ['guns', 3, buyGun],
-    ['rack', 6, buyRackSlot],
-  ])('refuses a held %s step before its feature unlocks', (_row, planetIndex, buy) => {
-    const session = upgradeBayOn(planetIndex, '1e30')
-    expect(rejectionOf(session.submit(1, buy(HOLD)))).toMatchObject({
+  // The guns lost their planet lock to their price (#411); the charge rack keeps its act gate.
+  it('refuses a held rack step before its feature unlocks', () => {
+    const session = upgradeBayOn(6, '1e30')
+    expect(rejectionOf(session.submit(1, buyRackSlot(HOLD)))).toMatchObject({
       reason: 'feature_locked',
       chain: HOLD,
     })

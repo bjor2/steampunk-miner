@@ -93,9 +93,7 @@ describe('terrain fork', () => {
       [BRACER, FORK_PLANET, BRACER_FRAME],
       [BREAKER, FORK_PLANET, BREAKER_FUSE],
     ])
-    for (const planet of [16, 30, 60]) {
-      expect(nodeCostOf(BRACER, planet)).toEqual(nodeCostOf(BREAKER, planet))
-    }
+    expect(nodeCostOf(BRACER)).toEqual(nodeCostOf(BREAKER))
   })
 
   it('names no magnet on either branch (terrain magnets are their own family, #246)', () => {

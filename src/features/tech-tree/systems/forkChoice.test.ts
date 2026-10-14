@@ -79,7 +79,7 @@ describe('tech tree: fork choice', () => {
       const session = sessionOnPlanet(16)
       const before = walletOf(session)
       const events = choose(session, 'wide')
-      const cost = nodeCostOf(WIDE, 16)!
+      const cost = nodeCostOf(WIDE)!
       expect(events).toMatchObject([
         { type: 'tech-tree.ForkChosen', lane: 'drill-gear', branch: 'wide' },
         { type: 'MoneyChanged' },
@@ -115,10 +115,12 @@ describe('tech tree: fork choice', () => {
     })
   })
 
-  it('refuses a choice before P16 and on a short wallet', () => {
+  it('chooses a branch on planet 1 at its P16 price, and refuses a short wallet (#411)', () => {
     withForks(() => {
-      expect(choose(sessionOnPlanet(15), 'wide')).toMatchObject([{ reason: 'locked_tier' }])
       expect(choose(sessionOnPlanet(16, '1'), 'wide')).toMatchObject([{ reason: 'money_short' }])
+      const early = sessionOnPlanet(1)
+      expect(choose(early, 'wide')[0]).toMatchObject({ type: 'tech-tree.ForkChosen' })
+      expect(activeDrillBranch(early)).toBe('wide')
     })
   })
 
@@ -146,7 +148,7 @@ describe('tech tree: fork choice', () => {
       const session = wideAtMarkTwo()
       dockAtPlatform(session)
       const before = walletOf(session)
-      const step = nodeCostOf(markNodeIdOf(WIDE_ITEM, 3), 22)!
+      const step = nodeCostOf(markNodeIdOf(WIDE_ITEM, 3))!
       const events = rechoose(session, 'deep')
       expect(events).toMatchObject([
         {
@@ -179,8 +181,8 @@ describe('tech tree: fork choice', () => {
       rechoose(session, 'deep')
       const before = walletOf(session)
       const events = rechoose(session, 'wide')
-      const step = nodeCostOf(markNodeIdOf(DEEP_ITEM, 3), 22)!
-      expect(step).toEqual(nodeCostOf(markNodeIdOf(WIDE_ITEM, 3), 22))
+      const step = nodeCostOf(markNodeIdOf(DEEP_ITEM, 3))!
+      expect(step).toEqual(nodeCostOf(markNodeIdOf(WIDE_ITEM, 3)))
       expect(events[0]).toMatchObject({ from: 'deep', to: 'wide', cost: toCanonical(step) })
       expect(walletOf(session)).toEqual(sub(before, step))
       expect(researchedMarkOf(session.state(), PLAYER, WIDE_ITEM)).toBe(2)
@@ -222,7 +224,7 @@ describe('tech tree: fork choice', () => {
       expect(lines.map((line) => [line.event, line.data])).toEqual([
         [
           'tech-tree.fork_chosen',
-          { lane: 'drill-gear', branch: 'wide', cost: toCanonical(nodeCostOf(WIDE, 16)!) },
+          { lane: 'drill-gear', branch: 'wide', cost: toCanonical(nodeCostOf(WIDE)!) },
         ],
         [
           'tech-tree.fork_refused',
@@ -234,7 +236,7 @@ describe('tech tree: fork choice', () => {
             lane: 'drill-gear',
             from: 'wide',
             to: 'deep',
-            cost: toCanonical(nodeCostOf(markNodeIdOf(WIDE_ITEM, 2), 16)!),
+            cost: toCanonical(nodeCostOf(markNodeIdOf(WIDE_ITEM, 2))!),
           },
         ],
       ])

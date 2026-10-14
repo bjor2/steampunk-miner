@@ -54,7 +54,7 @@ describe('aetheric pair templates', () => {
         expect(isRegisteredItem(parent), parent).toBe(true)
         expect(powerUpOfItem(parent), parent).not.toBeNull()
         expect(itemDescriptionEntryOf({ kind: 'vehicle-item', id: parent }), parent).not.toBeNull()
-        const isSold = vehicleItemOfferOf(parent, FIRST_ENDLESS_PLANET) !== null
+        const isSold = vehicleItemOfferOf(parent) !== null
         expect(isSold || GRANTED_BY_RESEARCH.includes(parent), parent).toBe(true)
       }),
     )

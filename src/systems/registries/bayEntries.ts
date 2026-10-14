@@ -8,9 +8,9 @@
  *   `commandButton` over the slice's own command, so the price shown is the price debited and a
  *   refusal is the authority's. A track at its wall (a physical limit, never a planet cap) stays
  *   listed with `buy: null` and shows as Mastered (HS on #314).
- * - **`anchorFeatureId`** is the schedule row (stats.json) the source waits on: the bay asks
- *   `entriesOf` only once `FeatureUnlocked` holds for it (`views/bayEntryRows.ts`), so a vision
- *   row never shows an entry.
+ * - **`anchorFeatureId`** is the schedule row (stats.json) the source hangs on: the bay asks
+ *   `entriesOf` only while the row ships (`views/bayEntryRows.ts`, `isFeatureForSale`), so a
+ *   vision row never shows an entry; its planet is no lock (#411).
  *
  * The seal refuses an anchor that is no row of the locked schedule and a source id naming an
  * unlock id; an entry id naming one is refused when the bay reads it, since only `entriesOf`
@@ -39,7 +39,7 @@ export interface BayEntry {
 export interface BayEntrySource {
   id: string
   bay: 'upgrade'
-  /** The `LOCKED_SCHEDULE` row that must be open before the source is asked. */
+  /** The `LOCKED_SCHEDULE` row that must ship before the source is asked. */
   anchorFeatureId: string
   entriesOf(state: AuthorityState, playerId: string): readonly BayEntry[]
 }

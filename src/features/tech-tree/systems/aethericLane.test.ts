@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { SliceDefinition } from '../../../registries/sliceDefinition'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import { sub, toCanonical } from '../../../systems/money'
+import { LAB_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { PLAYER, research, researchAll, sessionOnPlanet, withFixtureTree } from '../treeTestSession'
 import { markNodeIdOf } from './markNodes'
 import { nodeCost, nodeCostOf, nodeOreCostOf } from './nodeCost'
@@ -16,12 +16,6 @@ import { availableNodes } from './unlockRules'
 const ENTRY = 'tech.aetheric.resonance_whistle'
 const GOVERNOR = 'tech.aetheric.chronometric_governor'
 const CONDENSER = 'tech.aetheric.aether_condenser'
-
-/** The research lab standing from its schedule row's planet, P15, as the dock buildings stamp it. */
-const LAB_PROBE: SliceDefinition = {
-  id: 'lab-probe',
-  register: (r) => r.dockFacility({ id: 'lab-probe.lab', scheduleRowId: 'research_lab' }),
-}
 
 function refusalIn(events: readonly DomainEvent[]): string | null {
   const refused = events.find((event) => event.type === 'tech-tree.TechNodeRefused')
@@ -39,10 +33,10 @@ function aethericNodesOf(tree: TechTree): TreeNode[] {
 }
 
 describe('tech tree: the Aetheric science lane', () => {
-  it('the entry node is refused no_lab before the research lab stands', () => {
+  it('the entry node is held while no building stands for the research lab', () => {
     withFixtureTree(() => {
       const session = sessionOnPlanet(15)
-      expect(refusalIn(research(session, ENTRY))).toBe('no_lab')
+      expect(refusalIn(research(session, ENTRY))).toBe('held_feature')
       expect(unlockedNodeIdsOf(session.state(), PLAYER)).toEqual([])
     })
   })
@@ -51,7 +45,7 @@ describe('tech tree: the Aetheric science lane', () => {
     withFixtureTree(() => {
       const session = sessionOnPlanet(15)
       const before = session.state().players[PLAYER].wallet
-      const cost = nodeCostOf(ENTRY, 15)!
+      const cost = nodeCostOf(ENTRY)!
       const events = research(session, ENTRY)
       expect(events[0]).toMatchObject({
         type: 'tech-tree.TechNodeUnlocked',
@@ -60,19 +54,21 @@ describe('tech tree: the Aetheric science lane', () => {
         cost: toCanonical(cost),
       })
       expect(session.state().players[PLAYER].wallet).toEqual(sub(before, cost))
-    }, [LAB_PROBE])
+    }, [LAB_FIXTURE_SLICE])
   })
 
-  it('the lane is closed before P15', () => {
+  it('researches the entry node on planet 1 at its P15 price, the lab standing (#411)', () => {
     withFixtureTree(() => {
-      const session = sessionOnPlanet(14)
-      session.submit({ type: 'debug.tech-tree.unlockThrough', payload: { planetIndex: 14 } })
-      expect(refusalIn(research(session, ENTRY))).toBe('locked_tier')
-      const researched = unlockedNodeIdsOf(session.state(), PLAYER)
-      expect(researched.filter((id) => id.startsWith('tech.aetheric.'))).toEqual([])
+      const session = sessionOnPlanet(1)
+      const before = session.state().players[PLAYER].wallet
       const open = availableNodes(session.state(), PLAYER)
-      expect(open.filter((node) => node.lane === 'aetheric')).toEqual([])
-    }, [LAB_PROBE])
+      expect(open.filter((node) => node.lane === 'aetheric').map((node) => node.id)).toEqual([
+        ENTRY,
+      ])
+      research(session, ENTRY)
+      expect(unlockedNodeIdsOf(session.state(), PLAYER)).toEqual([ENTRY])
+      expect(session.state().players[PLAYER].wallet).toEqual(sub(before, nodeCostOf(ENTRY)!))
+    }, [LAB_FIXTURE_SLICE])
   })
 
   it('opens P24 and P29 on the entry node alone, so a P16 fork re-choice strands neither', () => {
@@ -87,7 +83,7 @@ describe('tech tree: the Aetheric science lane', () => {
       )
       const session = sessionOnPlanet(29)
       researchAll(session, [ENTRY, GOVERNOR, CONDENSER])
-    }, [LAB_PROBE])
+    }, [LAB_FIXTURE_SLICE])
   })
 
   it('every aetheric node prices through bandOrePriceAt and the Mark ladder', () => {
@@ -96,10 +92,8 @@ describe('tech tree: the Aetheric science lane', () => {
       const sensing = tree.authored.filter((node) => node.lane === 'sensing')
       aethericNodesOf(tree).forEach((node, slot) => {
         expect(nodeOreCostOf(node), node.id).toEqual(nodeOreCostOf(sensing[slot]))
-        ;[node.unlockTier, 40, 86].forEach((planet) =>
-          expect(nodeCost(node, planet)).toEqual(
-            bandOrePriceAt(nodeOreCostOf(node), planet, node.unlockTier),
-          ),
+        expect(nodeCost(node)).toEqual(
+          bandOrePriceAt(nodeOreCostOf(node), node.unlockTier, node.unlockTier),
         )
         const itemId = node.unlocks.itemId
         const markThree = nodeOf(tree, markNodeIdOf(itemId, 3))
@@ -110,8 +104,8 @@ describe('tech tree: the Aetheric science lane', () => {
           prereqs: [markNodeIdOf(itemId, 2)],
           unlocks: { itemId, mark: 3 },
         })
-        expect(nodeCost(markThree, 40)).toEqual(
-          bandOrePriceAt(nodeOreCostOf(markThree), 40, markThree.unlockTier),
+        expect(nodeCost(markThree)).toEqual(
+          bandOrePriceAt(nodeOreCostOf(markThree), markThree.unlockTier, markThree.unlockTier),
         )
       })
     })

@@ -12,6 +12,7 @@ import {
   generatedComboPlanetOfStep,
   generatedComboPlanetsThrough,
   LANE_PAIRS,
+  nextGeneratedCombosOf,
   pairIndexOf,
   planetOfGeneratedComboId,
   type ComboGrading,
@@ -22,6 +23,7 @@ import {
   markNodeOf,
   markNodesThrough,
   markOfNodeId,
+  nextMarkNodeOf,
   type MarkBearer,
 } from './markNodes'
 import type { TechComboTemplate, TechNode, TreeNode } from './techNode'
@@ -75,7 +77,21 @@ export function treeNodeOf(tree: TechTree, nodeId: string): TreeNode | null {
   )
 }
 
-/** Every node researchable by `planetIndex` (its tier reached), earliest first. */
+/**
+ * Every node the player could research next, earliest anchor first: the authored ones, each
+ * Mark-bearing item's next Mark and each lane pair's next endless grade, as later ones need the
+ * one before. Read off what is researched, never off a planet (#411), and finite, so the screen,
+ * the bot and the rules can walk it.
+ */
+export function researchFrontierOf(tree: TechTree, researched: ReadonlySet<string>): TreeNode[] {
+  return [
+    ...tree.authored,
+    ...tree.markBearers.flatMap((bearer) => nextMarkNodeOf(bearer, researched) ?? []),
+    ...nextGeneratedCombosOf(tree.grading, researched),
+  ].sort(compareByTier)
+}
+
+/** Every node anchored by `planetIndex` (the debug grant's reach), earliest first. */
 export function treeNodesThrough(tree: TechTree, planetIndex: number): TreeNode[] {
   return [
     ...tree.authored.filter((node) => node.unlockTier <= planetIndex),
@@ -86,17 +102,17 @@ export function treeNodesThrough(tree: TechTree, planetIndex: number): TreeNode[
 
 /**
  * The planet "unlock all" grants through: the deepest authored node, or the planet the session is
- * on when that is further, so every Mark and endless combo reached so far comes with it.
+ * on when that is further, so every Mark and endless combo anchored so far comes with it.
  */
 export function unlockAllPlanetOf(tree: TechTree, planetIndex: number): number {
   return Math.max(planetIndex, ...tree.authored.map((node) => node.unlockTier))
 }
 
 /**
- * The planet the item unlocks on: the tier of the earliest authored node that unlocks it, the
- * planet a one-off's price is fixed at (#162 4.1). An endless-only combo has no authored node, so
- * it unlocks with its template's first generated grade (`41 + 3j`, GD lock on #206 decision 7).
- * Null when no node unlocks it.
+ * The item's price anchor: the tier of the earliest authored node that unlocks it, the planet a
+ * one-off's price is fixed at (#162 4.1), never a lock (#411). An endless-only combo has no
+ * authored node, so it is priced at its template's first generated grade (`41 + 3j`, GD lock on
+ * #206 decision 7). Null when no node unlocks it.
  */
 export function itemUnlockTierOf(tree: TechTree, itemId: string): number | null {
   const tiers = tree.authored

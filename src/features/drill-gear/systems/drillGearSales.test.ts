@@ -46,7 +46,7 @@ describe('drill-gear: the store sells a researched one-off (ticket 248)', () => 
 
   it('offers all eight shipped items', () => {
     const offered = DRILL_GEAR_ITEMS.map((item) => item.itemId).filter(
-      (itemId) => DRILL_GEAR_SELLER.offerOf(itemId, 40) !== null,
+      (itemId) => DRILL_GEAR_SELLER.offerOf(itemId) !== null,
     )
     expect(offered).toEqual([
       'gear.vibratory_bit',

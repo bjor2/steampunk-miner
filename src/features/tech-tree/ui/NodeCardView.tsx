@@ -1,7 +1,7 @@
 /**
- * The node card (#161 section 4, zoom 3): the flavour line, the store item it unlocks, its price
- * on this planet, what it builds on, how to research it early, and the Research button; for an
- * item with Marks, the ladder chip and the next Mark's button. Stat lines arrive with each item's
+ * The node card (#161 section 4, zoom 3): the flavour line, the store item it unlocks, its price,
+ * what it builds on and the Research button; for an item with Marks, the ladder chip and the next
+ * Mark's button. No line names a planet: the price is the only gate (Content's copy on #411). Stat lines arrive with each item's
  * `statPreview` from its lane slice (#159).
  */
 import { Button } from '../../../ui/kit/Button'
@@ -23,14 +23,11 @@ export function NodeCardView({ card }: { card: NodeCardModel | null }) {
       <dl className={styles.facts}>
         <dt>Unlocks</dt>
         <dd>{card.itemId}</dd>
-        <dt>Planet</dt>
-        <dd>P{card.tier}</dd>
-        <dt>Price here</dt>
+        <dt>Price</dt>
         <dd data-status={card.status}>{card.costText}</dd>
         <dt>Builds on</dt>
         <dd>{card.prereqText}</dd>
       </dl>
-      {card.discoveryHint !== null && <p className={styles.hint}>{card.discoveryHint}</p>}
       <ResearchAction card={card} />
       {card.markChip !== null && <MarkLadder chip={card.markChip} />}
     </article>

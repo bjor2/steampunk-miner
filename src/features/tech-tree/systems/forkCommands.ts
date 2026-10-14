@@ -113,7 +113,7 @@ function forceFork(state: AuthorityState, playerId: string, pick: ForkPick): Rul
 }
 
 function chooseFork(state: AuthorityState, playerId: string, fork: ForkBranchNode): RuleEffect {
-  const cost = forkChoiceCostOf(state, fork)
+  const cost = forkChoiceCostOf(fork)
   const chosen = { type: 'tech-tree.ForkChosen' as const, lane: fork.lane, branch: fork.branch }
   return {
     state: withBranchActive(paidState(state, playerId, cost), playerId, fork, [fork.node.id]),

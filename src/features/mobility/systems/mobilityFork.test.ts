@@ -105,13 +105,9 @@ describe('mobility fork: Agile and Armoured', () => {
     expect(nodes.filter((node) => storeItems.has(node.unlocks))).toEqual([])
   })
 
-  it('prices both branches the same on P16-P60', () => {
+  it('prices both branches the same, on every planet', () => {
     const [agile, armoured] = MOBILITY_FORK.branches
-    const planets = Array.from({ length: 45 }, (_, index) => FORK_TIER + index)
-    const unequal = planets.filter(
-      (planet) => cmp(nodeCostOf(agile.id, planet)!, nodeCostOf(armoured.id, planet)!) !== 0,
-    )
-    expect(unequal).toEqual([])
+    expect(cmp(nodeCostOf(agile.id)!, nodeCostOf(armoured.id)!)).toBe(0)
   })
 
   it('reads the miner on the surface as grounded and four tiles over it as airborne', () => {

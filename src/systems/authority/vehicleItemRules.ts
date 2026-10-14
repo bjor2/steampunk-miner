@@ -6,9 +6,10 @@
  * In order it is refused when the item is no registered `vehicle-item` (`unknown_vehicle_item`:
  * a vision row is invisible), the vehicle is not docked at the Upgrade bay, it already owns the
  * item (`vehicle_item_owned`), the item's node is not researched (`not_researched`), no slice sells
- * it on this planet (`not_for_sale`), or the wallet is short. It debits the seller's offer, the
- * price the item's card shows (#162 4.1: `bandOrePriceAt` at the unlock planet), and is answered
- * by `VehicleItemPurchased`. A refused command changes nothing.
+ * it (`not_for_sale`), or the wallet is short. It debits the seller's offer, the price the item's
+ * card shows (#162 4.1: `bandOrePriceAt` at its price anchor), and is answered by
+ * `VehicleItemPurchased`. Nothing here reads the planet the session is on (#411), so the host
+ * answers every player alike. A refused command changes nothing.
  */
 import { sub, toCanonical } from '../money'
 import { contentOf } from '../registries/content'
@@ -31,7 +32,7 @@ import { atBayRejection } from './dockRules'
 import { ownsItem } from './loadoutRules'
 import { moneyShortRejection } from './platformServices'
 
-/** An item the player may buy now, wallet aside: researched, not owned, sold on this planet. */
+/** An item the player may buy now, wallet aside: researched, not owned, sold. */
 export interface VehicleItemOnSale {
   item: VehicleItem
   offer: VehicleItemOffer
@@ -57,14 +58,14 @@ export function vehicleItemBuyRefusal(
     () => atBayRejection(state, playerId, 'upgrade'),
     () => ownedItemRejection(state, playerId, itemId),
     () => unresearchedItemRejection(state, playerId, itemId),
-    () => notForSaleRejection(state, itemId),
-    () => moneyShortRejection(state.players[playerId].wallet, offerHereOf(state, itemId).price),
+    () => notForSaleRejection(itemId),
+    () => moneyShortRejection(state.players[playerId].wallet, offerOf(itemId).price),
   ])
 }
 
 /**
- * The registered items the player could buy on this planet if the wallet allowed, in item id
- * order: what the Upgrade bay lists and the pacing bot picks from.
+ * The registered items the player could buy if the wallet allowed, in item id order: what the
+ * Upgrade bay lists and the pacing bot picks from.
  */
 export function vehicleItemsOnSale(state: AuthorityState, playerId: string): VehicleItemOnSale[] {
   return contentOf('vehicle-item').flatMap((item) => onSaleEntriesOf(state, playerId, item))
@@ -75,7 +76,7 @@ function onSaleEntriesOf(
   playerId: string,
   item: VehicleItem,
 ): VehicleItemOnSale[] {
-  const offer = vehicleItemOfferOf(item.id, state.planet.index)
+  const offer = vehicleItemOfferOf(item.id)
   return offer !== null && isOpenToBuy(state, playerId, item.id) ? [{ item, offer }] : []
 }
 
@@ -84,7 +85,7 @@ function isOpenToBuy(state: AuthorityState, playerId: string, itemId: string): b
 }
 
 function buyVehicleItem(state: AuthorityState, playerId: string, itemId: string): RuleEffect {
-  const { price } = offerHereOf(state, itemId)
+  const { price } = offerOf(itemId)
   const owning = withItemOwned(state, playerId, itemId)
   return {
     state: withWallet(owning, playerId, sub(state.players[playerId].wallet, price)),
@@ -101,8 +102,8 @@ function withItemOwned(state: AuthorityState, playerId: string, itemId: string):
 }
 
 /** Only called once `notForSaleRejection` passed, so a seller answers. */
-function offerHereOf(state: AuthorityState, itemId: string): VehicleItemOffer {
-  return vehicleItemOfferOf(itemId, state.planet.index) as VehicleItemOffer
+function offerOf(itemId: string): VehicleItemOffer {
+  return vehicleItemOfferOf(itemId) as VehicleItemOffer
 }
 
 function unknownItemRejection(itemId: string): Rejection | null {
@@ -120,7 +121,7 @@ function unresearchedItemRejection(state: AuthorityState, playerId: string, item
   return rejectionOf('not_researched', `the node that unlocks ${itemId} is not researched`)
 }
 
-function notForSaleRejection(state: AuthorityState, itemId: string): Rejection | null {
-  if (vehicleItemOfferOf(itemId, state.planet.index) !== null) return null
-  return rejectionOf('not_for_sale', `${itemId} is not sold on planet ${state.planet.index}`)
+function notForSaleRejection(itemId: string): Rejection | null {
+  if (vehicleItemOfferOf(itemId) !== null) return null
+  return rejectionOf('not_for_sale', `no slice sells ${itemId}`)
 }

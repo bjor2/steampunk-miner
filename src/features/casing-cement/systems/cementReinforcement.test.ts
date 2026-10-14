@@ -129,7 +129,7 @@ describe('casing-cement: cement lining reinforces the ground (ticket 367)', () =
 })
 
 describe('casing-cement: ownership is checked on apply (ticket 367)', () => {
-  /** On planet 1, where `refractory_lining` is not open, docked at the Upgrade bay with money. */
+  /** On planet 1, docked at the Upgrade bay with money, owning no cement grade. */
   function unownedAtUpgradeBay(): ScriptedSession {
     const session = createScriptedSession()
     session.submit(0, { type: 'debug.setMoney', payload: { amount: '1e30' } })
@@ -139,12 +139,10 @@ describe('casing-cement: ownership is checked on apply (ticket 367)', () => {
 
   it('refuses an unowned player the cement lining, so nothing it lines reinforces', () => {
     const session = unownedAtUpgradeBay()
-    const buy = session.submit(1, { type: 'buyLiningType', payload: { liningType: 'refractory' } })
     const select = session.submit(2, {
       type: 'selectLiningType',
       payload: { liningType: 'refractory' },
     })
-    expect(rejectionOf(buy)).toMatchObject({ reason: 'feature_locked' })
     expect(rejectionOf(select)).toMatchObject({ reason: 'lining_type_not_owned' })
     buildTunnel(session)
     session.advanceTo(DONE_TICK)

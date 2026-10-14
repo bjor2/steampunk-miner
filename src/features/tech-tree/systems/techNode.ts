@@ -113,9 +113,14 @@ export interface TechNode extends ContentEntry {
   lane: TechNodeLane
   /** Player-facing name. */
   name: string
-  /** The earliest planet it can be researched on (the snapped `laneSlotPlanet`). */
+  /**
+   * The price anchor (the snapped `laneSlotPlanet`): the planet whose band ore prices it, so it
+   * arrives around there. Never a lock: research waits only on money, prerequisites and what it
+   * `requiresOwned` (Bjor's ruling on #411).
+   */
   unlockTier: number
   prereqs: readonly string[]
+  /** The discovery its lane keys it to (#161 light D); research never waits on it (#411). */
   requiresDiscovery?: DiscoveryRequirement
   /**
    * What the player must own before it can be researched (#162 acceptance 8, ticket 233): vehicle
@@ -123,13 +128,14 @@ export interface TechNode extends ContentEntry {
    */
   requiresOwned?: readonly string[]
   /**
-   * The locked-schedule rows that anchor it (#318, ticket 358): the node stays hidden from the
-   * screen and refused until every row has had its `FeatureUnlocked` (`isFeatureUnlocked`).
+   * The locked-schedule rows it hangs on (#318, ticket 358): while one ships nothing (a vision
+   * row) the node is a held item, hidden from the screen and refused; a row's planet is only its
+   * price anchor, never a lock (#411, `isFeatureForSale`).
    */
   requiresFeature?: readonly string[]
   /**
-   * Researched only once the `research_lab` stands, refused `no_lab` before, as every combo is:
-   * the Aetheric lane's entry node (GD lock on #245).
+   * Researched at the `research_lab`, as every combo is: the Aetheric lane's entry node (GD lock
+   * on #245). The lab's planet is no lock either (#411).
    */
   researchedAt?: 'research_lab'
   /** The store item it unlocks. */
@@ -179,6 +185,7 @@ export interface TreeNode {
   kind: TechNodeKind
   lane: TechNodeLane
   name: string
+  /** The price anchor (`TechNode.unlockTier`), never a lock. */
   unlockTier: number
   prereqs: readonly string[]
   requiresDiscovery?: DiscoveryRequirement

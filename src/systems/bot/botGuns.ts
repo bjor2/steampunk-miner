@@ -1,10 +1,13 @@
 /**
  * The pacing bot and `auto_guns` (#107 "Bot policy"): it mounts the guns at the Upgrade bay as
- * soon as they are offered (planet 4) and it can pay, and keeps them on Auto, switching them Off
- * while the tank is under 40% so the rest goes to drilling and the way home. It buys no gun levels
+ * soon as its schedule reaches their row (planet 4, the mount's price anchor: the store sells them
+ * on every planet since #411, the bot keeps the campaign's order) and it can pay, and keeps them
+ * on Auto, switching them Off while the tank is under 40% so the rest goes to drilling and the way
+ * home. It buys no gun levels
  * past the mount; the policy names none.
  */
-import { gunOf, isGunOffered, nextGunPriceOf } from '../authority/gunRules'
+import { AUTO_GUNS_ROW_ID, gunOf, nextGunPriceOf } from '../authority/gunRules'
+import { isFeatureUnlocked } from '../authority/featureUnlocks'
 import type { Money } from '../money'
 import { setGunModeCommand } from '../vehicle/vehicleCommands'
 import { mountedGunModeOf, type GunMode } from '../vehicle/vehicleGun'
@@ -16,11 +19,11 @@ export type GunPolicy = 'mount' | 'never'
 
 const GUNS_OFF_BELOW_PERCENT = 40
 
-/** The mount, while it is offered here and not yet bought; null otherwise. */
+/** The mount, once the bot's schedule reached its row and it is not yet bought; null otherwise. */
 export function gunMountPriceFor(session: BotSession, policy: GunPolicy): Money | null {
   const state = session.state()
   const isWanted = policy === 'mount' && gunOf(state, session.playerId).level === 0
-  if (!isWanted || !isGunOffered(state, session.playerId)) return null
+  if (!isWanted || !isFeatureUnlocked(state, AUTO_GUNS_ROW_ID)) return null
   return nextGunPriceOf(state, session.playerId)
 }
 

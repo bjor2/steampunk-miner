@@ -1,7 +1,7 @@
 /**
  * The `armoury.bore_gun` lane (Content's node table on #310 as the GD locked it, ticket 318): the
  * bore gun's eight modules as store items, each with its capability node, anchored on the
- * `bore_gun` row so the lane stays hidden until that row's `FeatureUnlocked`. Every node, item and
+ * `bore_gun` row, which ships, so the lane shows on every planet: its tiers only price it (#411). Every node, item and
  * Mark is filed under the `armoury` spend-guard family. Gun modules take the income absorb limits;
  * the long barrel's Marks are its own range-then-hold ladder (`boreLadders.ts`), not the rotation.
  *
@@ -10,8 +10,9 @@
  * modules (ticket 380, the GD ruling on #318) shape the shot itself through the provider's
  * `shotShapeOf` (#377): the splay choke and the rifled bore on every shot, the cementing round,
  * the earthing spike and the strut bore while their per-dock charges and cooldowns allow
- * (`signatureShapes.ts`, `moduleUse.ts`). The earthing spike also waits on `grounded_lining`
- * (P25), so nothing magnetic or electrified previews before that row (HS on #318).
+ * (`signatureShapes.ts`, `moduleUse.ts`). The earthing spike also hangs on `grounded_lining`, a
+ * vision row, so nothing magnetic or electrified previews while that lining is held (HS on #318
+ * and #411).
  *
  * The flavour lines are Content's, except the sight's "nearest" glint, which the GD's value rule
  * replaced ("richest").
@@ -37,7 +38,7 @@ export const EARTHING_SPIKE_ITEM_ID = 'weapon.earthing_spike'
 export const RIFLED_BORE_ITEM_ID = 'weapon.rifled_bore'
 export const STRUT_BORE_ITEM_ID = 'weapon.strut_bore'
 
-/** The row the grounded lining opens on (P25): the earthing spike stays hidden until it. */
+/** The grounded lining's row (P25, vision): the earthing spike stays hidden while it is held. */
 const GROUNDED_LINING_ROW = 'grounded_lining'
 
 /** The P1 Feature row the cementing round needs (Content's node table on #310, point 4). */

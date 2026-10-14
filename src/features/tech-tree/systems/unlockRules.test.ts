@@ -4,13 +4,20 @@ import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { readSnapshot, takeSnapshot } from '../../../systems/authority/sessionSnapshot'
 import { sub, toCanonical } from '../../../systems/money'
 import type { DiscoveryKey } from '../../../systems/registries/discovery'
-import { ANCHORED_NODE_ID, ANCHORED_NODE_SLICE } from '../treeFixtureSlice'
+import { ANCHORED_NODE_ID, ANCHORED_NODE_SLICE, LAB_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { PLAYER, research, researchAll, sessionOnPlanet, withFixtureTree } from '../treeTestSession'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
 import { nodeCostOf } from './nodeCost'
 import type { TechNode } from './techNode'
 import { unlockedNodeIdsOf } from './techTreeSection'
 import { availableNodes, isUnlocked, unlockedItems } from './unlockRules'
+
+const ASSAY_DRAIN_PARENTS = [
+  'tech.sensing.echo_sounder',
+  'tech.sensing.assay_lens',
+  'tech.extraction.resonance_fork',
+  'tech.extraction.mineral_drain',
+]
 
 function refusalIn(events: readonly DomainEvent[]): string | null {
   const refused = events.find((event) => event.type === 'tech-tree.TechNodeRefused')
@@ -27,11 +34,11 @@ function codexWhoMet(met: readonly DiscoveryKey[]): SliceDefinition {
 }
 
 describe('tech tree: researching a node', () => {
-  it('researches a reached node, paying its cost on the current planet', () => {
+  it('researches a node, paying its price', () => {
     withFixtureTree(() => {
       const session = sessionOnPlanet(3)
       const before = session.state().players[PLAYER].wallet
-      const cost = nodeCostOf('tech.sensing.echo_sounder', 3)!
+      const cost = nodeCostOf('tech.sensing.echo_sounder')!
       const events = research(session, 'tech.sensing.echo_sounder')
       expect(events.map((event) => event.type)).toEqual([
         'tech-tree.TechNodeUnlocked',
@@ -49,11 +56,11 @@ describe('tech tree: researching a node', () => {
     })
   })
 
-  it('refuses a node whose tier is not reached, changing nothing', () => {
+  it('refuses a node the wallet is short for, changing nothing but the sequence', () => {
     withFixtureTree(() => {
-      const session = sessionOnPlanet(1)
+      const session = sessionOnPlanet(1, '1')
       const before = session.state()
-      expect(refusalIn(research(session, 'tech.sensing.echo_sounder'))).toBe('locked_tier')
+      expect(refusalIn(research(session, 'tech.sensing.echo_sounder'))).toBe('money_short')
       expect(session.state().players).toEqual({
         ...before.players,
         [PLAYER]: { ...before.players[PLAYER], lastSeq: before.players[PLAYER].lastSeq + 1 },
@@ -69,14 +76,6 @@ describe('tech tree: researching a node', () => {
     })
   })
 
-  it('refuses a node the wallet cannot pay for', () => {
-    withFixtureTree(() => {
-      const session = sessionOnPlanet(3, '1')
-      expect(refusalIn(research(session, 'tech.sensing.echo_sounder'))).toBe('money_short')
-      expect(unlockedNodeIdsOf(session.state(), PLAYER)).toEqual([])
-    })
-  })
-
   it('refuses an unknown id and a node already researched', () => {
     withFixtureTree(() => {
       const session = sessionOnPlanet(3)
@@ -86,84 +85,47 @@ describe('tech tree: researching a node', () => {
     })
   })
 
-  it('researches Marks in order from their tier, each needing the one before', () => {
+  it('researches Marks in order on any planet, each needing the one before', () => {
     withFixtureTree(() => {
-      const session = sessionOnPlanet(8)
+      const session = sessionOnPlanet(1)
       researchAll(session, ['tech.sensing.echo_sounder'])
       expect(refusalIn(research(session, 'tech.mark.power.echo_sounder.3'))).toBe('missing_prereq')
-      expect(refusalIn(research(session, 'tech.mark.power.echo_sounder.4'))).toBe('locked_tier')
-      researchAll(session, ['tech.mark.power.echo_sounder.2', 'tech.mark.power.echo_sounder.3'])
+      researchAll(session, [
+        'tech.mark.power.echo_sounder.2',
+        'tech.mark.power.echo_sounder.3',
+        'tech.mark.power.echo_sounder.4',
+      ])
       expect(unlockedItems(session.state(), PLAYER)).toEqual([
-        { itemId: 'power.echo_sounder', mark: 3 },
+        { itemId: 'power.echo_sounder', mark: 4 },
       ])
     })
   })
 })
 
 describe('tech tree: anchored nodes (ticket 358)', () => {
-  it('refuses a node before its anchor row is unlocked and researches it after', () => {
+  it('holds a node anchored on a vision row on every planet: a held item is never sold', () => {
     withFixtureTree(() => {
-      const before = sessionOnPlanet(7)
-      expect(refusalIn(research(before, ANCHORED_NODE_ID))).toBe('locked_tier')
-      expect(availableNodes(before.state(), PLAYER).map((node) => node.id)).not.toContain(
-        ANCHORED_NODE_ID,
-      )
-      const after = sessionOnPlanet(8)
-      expect(availableNodes(after.state(), PLAYER).map((node) => node.id)).toContain(
-        ANCHORED_NODE_ID,
-      )
-      researchAll(after, [ANCHORED_NODE_ID])
-      expect(isUnlocked(after.state(), PLAYER, ANCHORED_NODE_ID)).toBe(true)
+      for (const planet of [1, 17, 60]) {
+        const session = sessionOnPlanet(planet)
+        expect(refusalIn(research(session, ANCHORED_NODE_ID))).toBe('held_feature')
+        expect(availableNodes(session.state(), PLAYER).map((node) => node.id)).not.toContain(
+          ANCHORED_NODE_ID,
+        )
+      }
     }, [ANCHORED_NODE_SLICE])
   })
 })
 
 describe('tech tree: discovery', () => {
-  it('opens a discovery node at its tier while no codex is registered', () => {
+  it('researches a node keyed to a discovery on planet 1, the key unmet (#411)', () => {
     withFixtureTree(() => {
-      const session = sessionOnPlanet(5)
-      researchAll(session, ['tech.sensing.echo_sounder', 'tech.sensing.threat_periscope'])
-    })
-  })
-
-  it('opens it at its tier once the key is met, with the codex present', () => {
-    withFixtureTree(() => {
-      const session = sessionOnPlanet(5)
-      researchAll(session, ['tech.sensing.echo_sounder', 'tech.sensing.threat_periscope'])
-    }, [codexWhoMet(['enemy:tunnel_wrecker'])])
-  })
-
-  it('opens a hazard node at its tier once its hazard is met (ticket 252)', () => {
-    withFixtureTree(() => {
-      const atTier = sessionOnPlanet(7)
-      researchAll(atTier, ['tech.sensing.echo_sounder', 'tech.sensing.assay_lens'])
-      researchAll(atTier, ['tech.sensing.hazard_barometer'])
-    }, [codexWhoMet(['hazard:heat_lava'])])
-  })
-
-  it('waits one planet past its tier while the key is not met, then opens anyway', () => {
-    withFixtureTree(() => {
-      const atTier = sessionOnPlanet(5)
-      researchAll(atTier, ['tech.sensing.echo_sounder'])
-      expect(refusalIn(research(atTier, 'tech.sensing.threat_periscope'))).toBe('undiscovered')
-      const pastGrace = sessionOnPlanet(6)
-      researchAll(pastGrace, ['tech.sensing.echo_sounder', 'tech.sensing.threat_periscope'])
+      const session = sessionOnPlanet(1)
+      researchAll(session, [
+        'tech.sensing.echo_sounder',
+        'tech.sensing.threat_periscope',
+        'tech.extraction.resonance_fork',
+      ])
     }, [codexWhoMet([])])
-  })
-
-  it('opens an extractor node by its availableFromPlanet, discovered or not', () => {
-    withFixtureTree(() => {
-      expect(refusalIn(research(sessionOnPlanet(4), 'tech.extraction.resonance_fork'))).toBe(
-        'undiscovered',
-      )
-      researchAll(sessionOnPlanet(5), ['tech.extraction.resonance_fork'])
-    }, [codexWhoMet([])])
-  })
-
-  it('counts any key of an anyOf requirement', () => {
-    withFixtureTree(() => {
-      researchAll(sessionOnPlanet(11), ['tech.extraction.containment_hood'])
-    }, [codexWhoMet(['ore:organic'])])
   })
 })
 
@@ -224,39 +186,38 @@ describe('tech tree: owned requirements (ticket 233, #162 acceptance 8)', () => 
 })
 
 describe('tech tree: combos', () => {
-  it('refuses a combo with no_lab while the research lab is not built', () => {
+  it('holds a combo while no building stands for the research lab', () => {
     withFixtureTree(() => {
       const session = sessionOnPlanet(15)
-      researchAll(session, [
-        'tech.sensing.echo_sounder',
-        'tech.sensing.assay_lens',
-        'tech.extraction.resonance_fork',
-        'tech.extraction.mineral_drain',
-      ])
-      expect(refusalIn(research(session, 'tech.combo.assay_drain'))).toBe('no_lab')
+      researchAll(session, ASSAY_DRAIN_PARENTS)
+      expect(refusalIn(research(session, 'tech.combo.assay_drain'))).toBe('held_feature')
     })
   })
 
-  it('has no combo before planet 15, even with every earlier node researched', () => {
+  it('researches a combo on planet 1 once its parents are, the lab standing (#411)', () => {
     withFixtureTree(() => {
-      const session = sessionOnPlanet(14)
-      session.submit({ type: 'debug.tech-tree.unlockThrough', payload: { planetIndex: 14 } })
-      const researched = unlockedNodeIdsOf(session.state(), PLAYER)
-      expect(researched.length).toBeGreaterThan(20)
-      expect(researched.filter((id) => id.startsWith('tech.combo.'))).toEqual([])
-      expect(availableNodes(session.state(), PLAYER)).toEqual([])
-    })
+      const session = sessionOnPlanet(1)
+      expect(refusalIn(research(session, 'tech.combo.assay_drain'))).toBe('missing_prereq')
+      researchAll(session, [...ASSAY_DRAIN_PARENTS, 'tech.combo.assay_drain'])
+    }, [LAB_FIXTURE_SLICE])
   })
 })
 
 describe('tech tree: available nodes and save', () => {
-  it('lists what the player could research now, wallet aside', () => {
+  it('lists what the player could research now, wallet aside: every root node, any planet', () => {
     withFixtureTree(() => {
-      const session = sessionOnPlanet(3, '0')
+      const session = sessionOnPlanet(1, '0')
       expect(availableNodes(session.state(), PLAYER).map((node) => node.id)).toEqual([
         'tech.sensing.echo_sounder',
         'tech.mobility.grapple_winch',
         'tech.terrain.stabiliser_foam',
+        'tech.drill_gear.vibratory_bit',
+        'tech.extraction.resonance_fork',
+        'tech.terrain.ore_shifter',
+        'tech.extraction.containment_hood',
+        'tech.extraction.acid_etcher',
+        'tech.extraction.induction_coil',
+        'tech.extraction.aether_tether',
       ])
     })
   })

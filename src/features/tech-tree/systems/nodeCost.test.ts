@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../../registries/registrar'
-import { bandOrePrice, bandOrePriceAt, bandOreWorthAt } from '../../../systems/economy/bandOreCost'
+import { bandOrePriceAt, bandOreWorthAt } from '../../../systems/economy/bandOreCost'
 import { ceilMilli, cmp, fromCanonical, mul, powInt, type Money } from '../../../systems/money'
 import { TREE_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { markNodeIdOf } from './markNodes'
@@ -31,8 +31,6 @@ const SAMPLE_IDS = [
   'tech.combo.gen.71',
 ]
 
-const PLANETS = [...Array.from({ length: 60 }, (_, index) => index + 1), 247, 607, 6007]
-
 function specOreUnitsOf(node: TreeNode): Money {
   return mul(fromCanonical(K_KIND[node.costKind]), powInt(G, node.depthTerm))
 }
@@ -48,13 +46,11 @@ function nodeOf(tree: TechTree, id: string): TreeNode {
 }
 
 describe('tech tree: node cost', () => {
-  it('charges bandOrePriceAt of k g^depth band-5 units, paced at the unlock planet, for every kind', () => {
+  it('charges bandOrePriceAt of k g^depth band-5 units at its price anchor, for every kind', () => {
     withFixtureTree((tree) => {
       for (const node of SAMPLE_IDS.map((id) => nodeOf(tree, id))) {
         const cost = { band: BAND, oreUnits: specOreUnitsOf(node) }
-        for (const planet of PLANETS) {
-          expect(nodeCost(node, planet)).toEqual(bandOrePriceAt(cost, planet, node.unlockTier))
-        }
+        expect(nodeCost(node)).toEqual(bandOrePriceAt(cost, node.unlockTier, node.unlockTier))
       }
     })
   })
@@ -62,8 +58,8 @@ describe('tech tree: node cost', () => {
   it('is the ceilMilli of the worth, never the raw worth', () => {
     withFixtureTree((tree) => {
       const node = nodeOf(tree, 'tech.drill_gear.reach_boom')
-      const worth = bandOreWorthAt(nodeOreCostOf(node), 6007, node.unlockTier)
-      expect(nodeCost(node, 6007)).toEqual(ceilMilli(worth))
+      const worth = bandOreWorthAt(nodeOreCostOf(node), node.unlockTier, node.unlockTier)
+      expect(nodeCost(node)).toEqual(ceilMilli(worth))
     })
   })
 
@@ -74,26 +70,21 @@ describe('tech tree: node cost', () => {
     })
   })
 
-  it('pins the capability price at L 247, 607 and 6007', () => {
+  it('pins the capability price at its planet 2 anchor (#411: the price the node used to open at)', () => {
     withFixtureTree((tree) => {
-      const echo = nodeOf(tree, 'tech.sensing.echo_sounder')
-      const prices = [247, 607, 6007].map((planet) => nodeCost(echo, planet))
       const units = { band: BAND, oreUnits: fromCanonical('12') }
-      expect(prices).toEqual([247, 607, 6007].map((p) => bandOrePriceAt(units, p, 2)))
-      expect(cmp(prices[1], prices[0])).toBe(1)
-      expect(cmp(prices[2], prices[1])).toBe(1)
+      expect(nodeCost(nodeOf(tree, 'tech.sensing.echo_sounder'))).toEqual(
+        bandOrePriceAt(units, 2, 2),
+      )
     })
   })
 
-  it('never makes a node from planets 3 to 7 cheaper in pace by waiting for planet 8', () => {
+  it('prices a later Mark of an item above an earlier one, as its anchor is further on', () => {
     withFixtureTree((tree) => {
-      const early = tree.authored.filter((node) => node.unlockTier >= 3 && node.unlockTier <= 7)
-      expect(early.length).toBeGreaterThan(0)
-      for (const node of early) {
-        const cost = nodeOreCostOf(node)
-        expect(cmp(nodeCost(node, 8), bandOrePrice(cost, 8))).toBe(1)
-        expect(cmp(nodeCost(node, 8), nodeCost(node, node.unlockTier))).toBe(1)
-      }
+      const priceOf = (mark: number) =>
+        nodeCost(nodeOf(tree, markNodeIdOf('power.echo_sounder', mark)))
+      expect(cmp(priceOf(3), priceOf(2))).toBe(1)
+      expect(cmp(priceOf(14), priceOf(10))).toBe(1)
     })
   })
 

@@ -28,7 +28,7 @@ export function liningUnlockFor(session: BotSession): { liningType: string; pric
   const { liningType } = archetype
   const isOwned = isLiningTypeOwned(liningOf(state, session.playerId), liningType)
   if (isOwned || !isLiningTypeOffered(state, session.playerId, liningType)) return null
-  return { liningType, price: liningPriceOf(state, liningType) }
+  return { liningType, price: liningPriceOf(liningType) }
 }
 
 /** Docked on a heat planet with heat on the gauge: waits the time the platform takes to cool it. */

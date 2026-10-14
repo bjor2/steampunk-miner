@@ -73,6 +73,35 @@ export function generatedComboPlanetOfStep(step: number): number {
   return firstGeneratedCombo + comboEvery * step
 }
 
+/**
+ * Each pair's next grade to research, by the grades researched: its first turn whose node is not
+ * among them, since every grade needs the one before. A pair with no template has none. Read off
+ * the research alone, so the frontier is the same on every planet (#411).
+ */
+export function nextGeneratedCombosOf(
+  grading: ComboGrading,
+  researched: ReadonlySet<string>,
+): TreeNode[] {
+  return LANE_PAIRS.flatMap((_, pairIndex) => {
+    const planet = firstOpenTurnPlanetOf(pairIndex, researched)
+    return generatedComboAt(planet, grading) ?? []
+  })
+}
+
+/** The planet of the pair's first turn whose combo is not researched. */
+function firstOpenTurnPlanetOf(pairIndex: number, researched: ReadonlySet<string>): number {
+  let planet = pairTurnPlanetOf(pairIndex, 0)
+  for (let turn = 1; researched.has(generatedComboIdOf(planet)); turn += 1) {
+    planet = pairTurnPlanetOf(pairIndex, turn)
+  }
+  return planet
+}
+
+/** The planet of the pair's `turn`-th combo: its place in `PAIR_ORDER`, once every fifteen. */
+function pairTurnPlanetOf(pairIndex: number, turn: number): number {
+  return generatedComboPlanetOfStep(turn * LANE_PAIRS.length + PAIR_ORDER.indexOf(pairIndex))
+}
+
 /** Every planet up to `planetIndex` a combo is generated on, ascending. */
 export function generatedComboPlanetsThrough(planetIndex: number): number[] {
   const { firstGeneratedCombo, comboEvery } = TREE_ECONOMY.cadence

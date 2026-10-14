@@ -7,7 +7,9 @@ import { readAuthorityState } from '../../../store/authorityLink'
 import { resetTreeScreenStore, type TreeZoom } from '../store/treeScreenStore'
 import { registeredTechTree } from '../systems/techTree'
 import { nodeCardModelOf, treeScreenModelOf } from '../systems/treeScreenModel'
+import { LAB_FIXTURE_SLICE } from '../treeFixtureSlice'
 import { withFixtureTree, withNoLanes } from '../treeTestSession'
+import { NodeCardView } from './NodeCardView'
 import { TechTreeButton } from './TechTreeButton'
 import { TECH_TREE_SCREEN_ID, TechTreeScreenView } from './TechTreeScreen'
 
@@ -61,7 +63,7 @@ describe('tech tree screen', () => {
       expect(html.match(/Coming soon/g)).toHaveLength(2)
       expect(html).toContain('data-testid="tech-tree-node-tech.sensing.echo_sounder"')
       expect(html).toContain('data-testid="tech-tree-next-up"')
-    })
+    }, [LAB_FIXTURE_SLICE])
   })
 
   it('draws the Aetheric science swimlane with the nodes its slice registers', () => {
@@ -105,4 +107,31 @@ describe('tech tree screen', () => {
       expect(viewAt('card')).toContain('Research for')
     })
   })
+
+  it('renders no node card line that names a planet: a locked card shows its price (#411)', () => {
+    openTreeOnPlanet(1)
+    const playerId = game().playerId
+    const tree = registeredTechTree()
+    const model = treeScreenModelOf(readAuthorityState(), playerId, tree, EVERYTHING)
+    const cards = model.lanes.flatMap((lane) => lane.nodes)
+    const lines = cards.map((placed) =>
+      textOf(
+        renderToString(
+          createElement(NodeCardView, {
+            card: nodeCardModelOf(readAuthorityState(), playerId, tree, placed.id),
+          }),
+        ),
+      ),
+    )
+    expect(cards.length).toBeGreaterThan(40)
+    expect(lines.filter((line) => /planet \d+|P\d+/i.test(line))).toEqual([])
+    expect(lines.some((line) => /Price: /.test(line))).toBe(true)
+  })
 })
+
+const EVERYTHING = { search: '', filters: [] } as const
+
+/** The card's words as a player reads them: every tag dropped. */
+function textOf(html: string): string {
+  return html.replace(/<[^>]*>/g, ' ')
+}

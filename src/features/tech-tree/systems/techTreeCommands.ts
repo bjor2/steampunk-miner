@@ -1,11 +1,11 @@
 /**
  * The tree's commands and events (spec #161 section 5, through K1's open lists):
  *
- * - `tech-tree.unlock_node {nodeId}`: researches the node, paying `nodeCost` on the planet the
- *   session is on, answered by `TechNodeUnlocked` and the wallet's `MoneyChanged`. A refusal
+ * - `tech-tree.unlock_node {nodeId}`: researches the node, paying its `nodeCost` (the same on every
+ *   planet, #411), answered by `TechNodeUnlocked` and the wallet's `MoneyChanged`. A refusal
  *   changes nothing and is answered as `TechNodeRefused {nodeId, reason}`, the first of the
  *   `unlockRules` order, like the loadout's `EquipRefused`.
- * - `debug.tech-tree.unlockThrough {planetIndex}`: grants, free, every node whose tier is at most
+ * - `debug.tech-tree.unlockThrough {planetIndex}`: grants, free, every node anchored at most at
  *   `planetIndex` (the debug "jump to depth N"; "unlock all" passes the deepest authored tier).
  *   Prerequisites never sit deeper than their nodes, so the grant leaves no hole. A fork branch is
  *   a choice, not research (#255): the grant opens none, only the active branch's Marks.
@@ -74,7 +74,7 @@ function refuseUnlock(state: AuthorityState, nodeId: string, reason: TechNodeRef
 }
 
 function researchNode(state: AuthorityState, playerId: string, node: TreeNode): RuleEffect {
-  const cost = nodeCost(node, state.planet.index)
+  const cost = nodeCost(node)
   const wallet = state.players[playerId].wallet
   const paid = withWallet(state, playerId, sub(wallet, cost))
   return {

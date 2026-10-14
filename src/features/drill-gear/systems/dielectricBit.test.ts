@@ -208,7 +208,7 @@ describe('dielectric bit (spec #258 Q6, ticket 292)', () => {
     expect(bit.node.unlockTier).toBe(BIT_PLANET)
     expect(DRILL_GEAR_ECONOMY.price).toEqual({ band: 5, oreUnits: fromCanonical('15') })
     expect(itemPriceOf(bit)).toEqual(price)
-    expect(vehicleItemOfferOf(DIELECTRIC_BIT_ID, BIT_PLANET)?.price).toEqual(price)
+    expect(vehicleItemOfferOf(DIELECTRIC_BIT_ID)?.price).toEqual(price)
     expect(cardLinesOf(DIELECTRIC_BIT_ID, 1).map((line) => [line.label, line.value])).toEqual([
       ['Price', price],
     ])

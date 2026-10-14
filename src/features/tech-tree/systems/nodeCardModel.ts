@@ -1,16 +1,18 @@
 /**
  * One node as the tree screen shows it (spec #161 section 4): where it sits, whether it can be
- * researched now, its price on this planet, what it needs, the discovery hint, and for a
- * Mark-bearing item the ladder chip ("Mk VII -> VIII") that stands for all its Marks, which
- * never spread into separate nodes on the map.
+ * researched now, its price, what it needs, and for a Mark-bearing item the ladder chip ("Mk VII
+ * -> VIII") that stands for all its Marks, which never spread into separate nodes on the map.
+ *
+ * No line names a planet (Content's copy on #411): a node the wallet is short for reads
+ * "Price: {price}", one waiting on a prerequisite "Needs: {prereqName}". The tier only places the
+ * card on the map's planet ruler.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
-import type { DiscoveryKey } from '../../../systems/registries/discovery'
 import { formatAmount } from '../../../systems/displayAmount'
 import { markNodeIdOf, markNodeOf, type MarkBearer } from './markNodes'
 import { nodeCost } from './nodeCost'
 import { markBearerOfItem, treeNodeOf, type TechTree } from './techTree'
-import type { DiscoveryRequirement, TreeNode } from './techNode'
+import type { TreeNode } from './techNode'
 import { unlockedNodeIdsOf } from './techTreeSection'
 import { unlockRefusalOf, type TechNodeRefusal } from './unlockRules'
 
@@ -54,8 +56,6 @@ export interface NodeCardModel {
   prereqNames: readonly string[]
   /** The prerequisites as one line: "Nothing" for none. */
   prereqText: string
-  /** How to research it early, such as "Find crystal ore to research it a planet early." */
-  discoveryHint: string | null
   markChip: MarkChipModel | null
 }
 
@@ -67,16 +67,16 @@ export interface CardContext {
   unlocked: ReadonlySet<string>
 }
 
-const REFUSAL_TEXT: Readonly<Record<TechNodeRefusal, (node: TreeNode) => string>> = {
+type RefusalText = (node: TreeNode, context: CardContext) => string
+
+const REFUSAL_TEXT: Readonly<Record<TechNodeRefusal, RefusalText>> = {
   unknown_node: () => 'Not on the tree',
   already_unlocked: () => 'Researched',
   fork_branch: () => 'One branch of a fork: choose it, or switch at the platform',
-  locked_tier: (node) => `Opens on planet ${node.unlockTier}`,
-  undiscovered: () => 'Waits on a discovery, or one more planet',
-  missing_prereq: () => 'Research what it builds on first',
+  held_feature: () => 'Not in the game yet',
+  missing_prereq: (node, context) => `Needs: ${missingPrereqNamesOf(node, context).join(', ')}`,
   not_owned: () => 'Own the gear it works with first',
-  no_lab: () => 'Needs the research lab',
-  money_short: () => 'Not enough money yet',
+  money_short: (node) => `Price: ${formatAmount(nodeCost(node))}`,
 }
 
 const ROMAN_NUMERALS: readonly (readonly [number, string])[] = [
@@ -95,7 +95,11 @@ const ROMAN_NUMERALS: readonly (readonly [number, string])[] = [
   [1, 'I'],
 ]
 
-export function cardContextOf(state: AuthorityState, playerId: string, tree: TechTree) {
+export function cardContextOf(
+  state: AuthorityState,
+  playerId: string,
+  tree: TechTree,
+): CardContext {
   return { state, playerId, tree, unlocked: new Set(unlockedNodeIdsOf(state, playerId)) }
 }
 
@@ -114,11 +118,10 @@ export function nodeCardOf(node: TreeNode, context: CardContext): NodeCardModel 
     itemId: node.unlocks.itemId,
     status: statusOf(answer),
     refusal,
-    refusalText: refusal === null ? null : REFUSAL_TEXT[refusal](node),
-    costText: formatAmount(nodeCost(node, context.state.planet.index)),
+    refusalText: refusal === null ? null : REFUSAL_TEXT[refusal](node, context),
+    costText: formatAmount(nodeCost(node)),
     prereqNames: prereqNamesOf(node, context),
     prereqText: prereqNamesOf(node, context).join(', ') || 'Nothing',
-    discoveryHint: discoveryHintOf(node, context),
     markChip: markChipOf(node, context),
   }
 }
@@ -134,7 +137,15 @@ export function romanNumeralOf(value: number): string {
 }
 
 function prereqNamesOf(node: TreeNode, context: CardContext): string[] {
-  return node.prereqs.map((id) => treeNodeOf(context.tree, id)?.name ?? id)
+  return node.prereqs.map((id) => nodeNameOf(id, context))
+}
+
+function missingPrereqNamesOf(node: TreeNode, context: CardContext): string[] {
+  return node.prereqs.filter((id) => !context.unlocked.has(id)).map((id) => nodeNameOf(id, context))
+}
+
+function nodeNameOf(nodeId: string, context: CardContext): string {
+  return treeNodeOf(context.tree, nodeId)?.name ?? nodeId
 }
 
 function refusalOf(node: TreeNode, context: CardContext): TechNodeRefusal | null {
@@ -150,24 +161,6 @@ function statusOf(refusal: TechNodeRefusal | null): NodeStatus {
   if (refusal === null) return 'affordable'
   if (refusal === 'already_unlocked') return 'researched'
   return refusal === 'money_short' ? 'available' : 'locked'
-}
-
-function discoveryHintOf(node: TreeNode, context: CardContext): string | null {
-  if (node.requiresDiscovery === undefined || context.unlocked.has(node.id)) return null
-  return `Find ${requirementText(node.requiresDiscovery)} to research it a planet early.`
-}
-
-function requirementText(requirement: DiscoveryRequirement): string {
-  const keys = typeof requirement === 'string' ? [requirement] : requirement.anyOf
-  return keys.map(discoveryKeyText).join(' or ')
-}
-
-function discoveryKeyText(key: DiscoveryKey): string {
-  const [kind, id] = key.split(':') as [string, string]
-  const words = id.replaceAll('_', ' ')
-  if (kind === 'ore') return `${words} ore`
-  if (kind === 'enemy') return `a ${words}`
-  return `${words} ground`
 }
 
 function markChipOf(node: TreeNode, context: CardContext): MarkChipModel | null {
@@ -203,6 +196,6 @@ function nextMarkOf(bearer: MarkBearer, mark: number, context: CardContext): Nex
   return {
     nodeId: node.id,
     status: statusOf(refusalOf(node, context)),
-    costText: formatAmount(nodeCost(node, context.state.planet.index)),
+    costText: formatAmount(nodeCost(node)),
   }
 }

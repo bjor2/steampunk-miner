@@ -63,10 +63,18 @@ describe('guns: buying (#107)', () => {
     expect(session.vehicle().gun.level).toBe(11)
   })
 
-  it('refuses the guns before planet 4, where auto_guns is not unlocked yet', () => {
-    const session = dockedOn(3)
-    expect(rejectionOf(session.submit(1, buyGun))).toMatchObject({ reason: 'feature_locked' })
-    expect(session.vehicle().gun.level).toBe(0)
+  it('mounts the guns on planet 1 at their planet 4 price: the price is the only gate (#411)', () => {
+    const session = dockedOn(1)
+    expect(session.submit(1, buyGun)[0]).toMatchObject({
+      type: 'GunMounted',
+      price: toCanonical(gunMountPrice(4)),
+    })
+    expect(session.vehicle().gun.level).toBe(10)
+  })
+
+  it('charges the mount its planet 4 price on a later planet too', () => {
+    const [mounted] = dockedOn(9).submit(1, buyGun)
+    expect(mounted).toMatchObject({ type: 'GunMounted', price: toCanonical(gunMountPrice(4)) })
   })
 
   it('sells the guns at the Upgrade bay only', () => {

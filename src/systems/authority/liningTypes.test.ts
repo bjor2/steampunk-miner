@@ -60,12 +60,14 @@ describe('lining types at the Upgrade bay (#113)', () => {
     expect(session.state().players.p1.wallet).toEqual(sub(before, price))
   })
 
-  it('refuses refractory before planet 8, where refractory_lining is not open', () => {
-    const session = dockedOn(7)
-    expect(rejectionOf(session.submit(1, buy('refractory')))).toMatchObject({
-      reason: 'feature_locked',
+  it('unlocks refractory on planet 1 at its planet 8 price: the price is the only gate (#411)', () => {
+    const session = dockedOn(1)
+    const [unlocked] = session.submit(1, buy('refractory'))
+    expect(unlocked).toMatchObject({
+      type: 'LiningTypeUnlocked',
+      price: toCanonical(liningTypeUnlockPrice('refractory', 8)),
     })
-    expect(session.vehicle().lining.owned).toEqual(['standard'])
+    expect(session.vehicle().lining.owned).toEqual(['standard', 'refractory'])
   })
 
   it('sells the lining type at the Upgrade bay only', () => {

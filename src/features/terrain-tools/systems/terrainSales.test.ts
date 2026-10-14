@@ -50,7 +50,7 @@ describe('terrain-tools: the store sells a researched one-off (ticket 248)', () 
       'consumable.cryo_binder',
       'consumable.shoring_props',
       'power.strata_press',
-    ].filter((itemId) => TERRAIN_SELLER.offerOf(itemId, 40) !== null)
+    ].filter((itemId) => TERRAIN_SELLER.offerOf(itemId) !== null)
     expect(offered).toEqual(['power.ore_shifter', 'power.pressure_pocket'])
   })
 })

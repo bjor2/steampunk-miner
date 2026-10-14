@@ -2,9 +2,11 @@
  * The Upgrade bay's Lining row (spec #113 design, built by #96): the lining type is a choice on
  * top of the casing grade, never a second grade.
  *
- * - `BuyLiningType {liningType}`: at the Upgrade bay only, once the type's schedule row is open
- *   (`refractory_lining` from planet 8, #80). Unlocks the type for its casing_cement grade's price
- *   (ticket 366), logs `lining_type_unlocked`, and makes it the active type (`lining_type_selected`).
+ * - `BuyLiningType {liningType}`: at the Upgrade bay only, on any planet once the type's schedule
+ *   row ships (Bjor's price-only ruling on #411: `refractory_lining`'s planet 8 is where its
+ *   price is read, never a lock; `insulated_lining` and `grounded_lining` are vision rows, held).
+ *   Unlocks the type for its casing_cement grade's price at that planet (ticket 366), logs
+ *   `lining_type_unlocked`, and makes it the active type (`lining_type_selected`).
  * - `SelectLiningType {liningType}`: at the Upgrade bay, any type the vehicle owns; rings laid
  *   from then on use it. Free: the price is in the lining laid (#76, #113).
  * - `debug.setLiningType`: a scenario's lining, owned and selected, with no unlock or price.
@@ -13,7 +15,7 @@
  */
 import { liningTypeUnlockPrice } from '../economy/casingPrices'
 import { STANDARD_LINING_TYPE } from '../economy/heatEconomy'
-import { sub, toCanonical, type Money } from '../money'
+import { sub, toCanonical, ZERO_MONEY, type Money } from '../money'
 import {
   isLiningType,
   isLiningTypeOwned,
@@ -31,7 +33,7 @@ import {
   type RuleEffect,
 } from './commandRule'
 import { atBayRejection } from './dockRules'
-import { isFeatureUnlocked } from './featureUnlocks'
+import { featurePricePlanetOf, isFeatureForSale } from './featureSales'
 import { moneyShortRejection } from './platformServices'
 
 export const LINING_RULES: {
@@ -82,7 +84,7 @@ export function liningBuyRefusal(
     () => atBayRejection(state, playerId, 'upgrade'),
     () => lockedLiningRejection(state, liningType),
     () => ownedLiningRejection(liningOf(state, playerId), liningType),
-    () => moneyShortRejection(state.players[playerId].wallet, liningPriceOf(state, liningType)),
+    () => moneyShortRejection(state.players[playerId].wallet, liningPriceOf(liningType)),
   ])
 }
 
@@ -99,12 +101,16 @@ export function liningSelectRefusal(
   ])
 }
 
-/** What unlocking `liningType` costs on the session's planet. */
-export function liningPriceOf(state: AuthorityState, liningType: string): Money {
-  return liningTypeUnlockPrice(liningType, state.planet.index)
+/**
+ * What unlocking `liningType` costs, the same on every planet: its grade's price on its row's
+ * planet; a type with no row (the standard lining) is free.
+ */
+export function liningPriceOf(liningType: string): Money {
+  const planet = featurePricePlanetOf(liningRowIdOf(liningType))
+  return planet === null ? ZERO_MONEY : liningTypeUnlockPrice(liningType, planet)
 }
 
-/** Whether the Upgrade bay shows the type: its row is open here, or the vehicle already owns it. */
+/** Whether the Upgrade bay shows the type: its row ships, or the vehicle already owns it. */
 export function isLiningTypeOffered(
   state: AuthorityState,
   playerId: string,
@@ -112,7 +118,7 @@ export function isLiningTypeOffered(
 ): boolean {
   return (
     isLiningTypeOwned(liningOf(state, playerId), liningType) ||
-    isFeatureUnlocked(state, liningRowIdOf(liningType))
+    isFeatureForSale(state, liningRowIdOf(liningType))
   )
 }
 
@@ -127,8 +133,8 @@ function unknownLiningRejection(liningType: string): Rejection | null {
 
 function lockedLiningRejection(state: AuthorityState, liningType: string): Rejection | null {
   const rowId = liningRowIdOf(liningType)
-  if (liningType === STANDARD_LINING_TYPE || isFeatureUnlocked(state, rowId)) return null
-  return rejectionOf('feature_locked', `${rowId} is not open on this planet`)
+  if (liningType === STANDARD_LINING_TYPE || isFeatureForSale(state, rowId)) return null
+  return rejectionOf('feature_locked', `${rowId} ships nothing yet`)
 }
 
 function ownedLiningRejection(lining: VehicleLining, liningType: string): Rejection | null {
@@ -142,7 +148,7 @@ function notOwnedLiningRejection(lining: VehicleLining, liningType: string): Rej
 }
 
 function unlockLiningType(state: AuthorityState, playerId: string, liningType: string): RuleEffect {
-  const price = liningPriceOf(state, liningType)
+  const price = liningPriceOf(liningType)
   const owned = withLining(
     state,
     playerId,

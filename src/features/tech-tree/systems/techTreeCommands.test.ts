@@ -60,7 +60,7 @@ describe('tech tree: commands and logs', () => {
         ['tech-tree.tech_node_refused', 'tech.terrain.cradle_4'],
       ])
       expect(treeLines[1].data).toMatchObject({ lane: 'sensing', kind: 'mark', mark: 2 })
-      expect(treeLines[2].data.reason).toBe('locked_tier')
+      expect(treeLines[2].data.reason).toBe('missing_prereq')
       expect(lines.flatMap(runEventProblems)).toEqual([])
     })
   })

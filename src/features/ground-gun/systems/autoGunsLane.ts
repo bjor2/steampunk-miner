@@ -1,8 +1,8 @@
 /**
  * The `armoury.auto_guns` lane (Content's node table on #310 as the GD locked it, ticket 319): the
  * `auto_guns` turret's eight modules as store items, each with its capability node, anchored on the
- * shipped `auto_guns` row (P4) so the lane stays hidden until that row's `FeatureUnlocked`. The
- * lane is re-based on P11 (Content's bend note: P5-P10 are full or held for #308). Every node, item
+ * shipped `auto_guns` row (P4), which ships, so the lane shows on every planet: its tiers only
+ * price it (#411). The lane is re-based on P11 (Content's bend note: P5-P10 are full or held for #308). Every node, item
  * and Mark is filed under the `armoury` spend-guard family; turret modules take the general Mark
  * limits, and Extended barrels' Marks are its own range-then-energy ladder (`boreLadders.ts`).
  *

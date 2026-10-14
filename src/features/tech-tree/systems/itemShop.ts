@@ -10,8 +10,9 @@
  * track level, so the "track level" half of that rule has nothing to match yet.
  *
  * An item whose offer is bought before the tracks (ticket 296: an extractor on its planet, #142
- * acceptance 7) is due: its node and then the item come ahead of the bot's track levels, and the
- * bot saves for them while the wallet is short.
+ * acceptance 7) is due from that planet on: its node and then the item come ahead of the bot's
+ * track levels, and the bot saves for them while the wallet is short. Before that planet the bot
+ * leaves it be, keeping to its schedule though the store sells it on any planet (#411).
  */
 import { ownsItem } from '../../../systems/authority/loadoutRules'
 import type { AuthorityState } from '../../../systems/authority/authorityState'
@@ -25,6 +26,7 @@ import type { BotPurchase } from '../../../systems/registries/botPurchases'
 import { contentOf } from '../../../systems/registries/content'
 import {
   vehicleItemOfferOf,
+  type VehicleItemOffer,
   type VehicleItemResearch,
 } from '../../../systems/registries/vehicleItemSales'
 import { isVehicleItemId } from '../../../systems/registries/vehicleLoadout'
@@ -51,16 +53,22 @@ export const ITEM_BOT_PURCHASE: BotPurchase = {
   isAvailable: (state, playerId, args) => isOnSale(state, playerId, args as ItemPayload),
   boughtIdOf: (args) => (args as ItemPayload).itemId,
   duePayloadsOf: (state, playerId) =>
-    vehicleItemsOnSale(state, playerId).filter(isDueOnSale).sort(compareByPrice).map(payloadOf),
+    vehicleItemsOnSale(state, playerId)
+      .filter((onSale) => isDueOnSale(state, onSale))
+      .sort(compareByPrice)
+      .map(payloadOf),
 }
 
-/** The unowned items whose offer here is bought before the tracks, by id (ticket 296). */
+/** The unowned items the bot buys before the tracks on this planet, by id (ticket 296). */
 export function dueItemIdsOf(state: AuthorityState, playerId: string): Set<string> {
   const due = contentOf('vehicle-item').filter((item) => isItemDue(state, playerId, item.id))
   return new Set(due.map((item) => item.id))
 }
 
-/** The bot's research filter: the node's item is one it could buy here and does not own. */
+/**
+ * The bot's research filter: the node's item is one it could buy and does not own, and not one it
+ * keeps for a later planet of its schedule.
+ */
 export function unlocksSomethingToBuy(
   state: AuthorityState,
   playerId: string,
@@ -68,16 +76,28 @@ export function unlocksSomethingToBuy(
 ): boolean {
   const { itemId } = node.unlocks
   if (!isVehicleItemId(itemId) || ownsItem(state, playerId, itemId)) return false
-  return vehicleItemOfferOf(itemId, state.planet.index) !== null
+  const offer = vehicleItemOfferOf(itemId)
+  return offer !== null && !isKeptForLater(offer, state.planet.index)
 }
 
 function isItemDue(state: AuthorityState, playerId: string, itemId: string): boolean {
   if (ownsItem(state, playerId, itemId)) return false
-  return vehicleItemOfferOf(itemId, state.planet.index)?.isBoughtBeforeTracks === true
+  const offer = vehicleItemOfferOf(itemId)
+  return offer !== null && isDueOn(offer, state.planet.index)
 }
 
-function isDueOnSale({ offer }: VehicleItemOnSale): boolean {
-  return offer.isBoughtBeforeTracks === true
+function isDueOnSale(state: AuthorityState, { offer }: VehicleItemOnSale): boolean {
+  return isDueOn(offer, state.planet.index)
+}
+
+/** Bought before the tracks, and the bot stands on that offer's planet or past it. */
+function isDueOn(offer: VehicleItemOffer, planetIndex: number): boolean {
+  return offer.boughtBeforeTracksFrom !== undefined && offer.boughtBeforeTracksFrom <= planetIndex
+}
+
+/** An offer the bot buys before the tracks from a planet it has not reached. */
+function isKeptForLater(offer: VehicleItemOffer, planetIndex: number): boolean {
+  return offer.boughtBeforeTracksFrom !== undefined && offer.boughtBeforeTracksFrom > planetIndex
 }
 
 function compareByPrice(a: VehicleItemOnSale, b: VehicleItemOnSale): number {

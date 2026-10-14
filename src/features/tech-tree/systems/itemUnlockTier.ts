@@ -1,7 +1,7 @@
 /**
- * The planet a store item unlocks on, for the slices that price it there (#162 4.1: one-offs,
- * cradles and extractors at their unlock planet, ticket 248): the tier of the earliest authored
- * node that unlocks it in the registered tree; null while no registered node unlocks it.
+ * A store item's price anchor, for the slices that price it there (#162 4.1: one-offs, cradles
+ * and extractors at their unlock planet, ticket 248; never a lock, #411): the tier of the earliest
+ * authored node that unlocks it in the registered tree; null while no registered node unlocks it.
  */
 import { itemUnlockTierOf, registeredTechTree } from './techTree'
 

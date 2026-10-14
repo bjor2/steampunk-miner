@@ -36,8 +36,9 @@ describe('heat gauge on the HUD (#113)', () => {
 })
 
 describe('the Upgrade bay lining row (#113)', () => {
-  it('is not offered before planet 8', () => {
-    expect(liningRowOf(onPlanet(7).state(), 'p1')).toBeNull()
+  it('offers refractory on planet 1 too, at its planet 8 price: the price is the only gate (#411)', () => {
+    const row = liningRowOf(onPlanet(1).state(), 'p1')
+    expect(row?.cost.exact).toBe(toCanonical(liningTypeUnlockPrice('refractory', 8)))
   })
 
   it('offers refractory for its unlock price while standard lining is in use', () => {

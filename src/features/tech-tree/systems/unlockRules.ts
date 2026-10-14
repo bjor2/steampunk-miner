@@ -1,43 +1,44 @@
 /**
- * When a node can be researched (spec #161 sections 1 and 5). In order, a node is refused when
- * no node has the id, it is already researched, it is a lane's fork branch or a Mark of a branch
- * the lane does not have active (`fork_branch`: the fork commands open a branch, #255), its tier is not reached or a schedule row it
- * `requiresFeature` is still shut (`locked_tier`, ticket 358), it waits on a discovery
- * (`locked_tier` / `undiscovered`), a prerequisite is missing, the player does not own what it
- * `requiresOwned` (`not_owned`, ticket 233), it is a combo or a node researched at the lab (the
- * Aetheric entry node, #245) and the `research_lab` is not built, or the wallet is short.
+ * When a node can be researched (spec #161 sections 1 and 5; price-only, Bjor's ruling on #411).
+ * In order, a node is refused when no node has the id, it is already researched, it is a lane's
+ * fork branch or a Mark of a branch the lane does not have active (`fork_branch`: the fork
+ * commands open a branch, #255), a schedule row it `requiresFeature` or the `research_lab` it is
+ * researched at ships nothing yet (`held_feature`: a vision row is never previewed), a
+ * prerequisite is missing, the player does not own what it `requiresOwned` (`not_owned`, ticket
+ * 233), or the wallet is short.
  *
- * The tier is the furthest planet the session has travelled to: the one it is on. A node with a
- * discovery key opens at its tier once the key is met and at tier + `discoveryGrace` regardless,
- * so the tree never stalls on the RNG; with no discovery provider the kernel answers "met at the
- * unlock tier" (TD). Discovery is read through the kernel query, never the codex.
+ * Nothing here reads the planet the session is on: a node's `unlockTier` is only the anchor its
+ * price is read from (`nodeCost`), so a player on planet 1 with the money researches any node whose
+ * prerequisites are met, and the host answers every player alike. Discovery keys no longer wait
+ * research: they shifted a planet lock that is gone.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
-import { isFeatureUnlocked } from '../../../systems/authority/featureUnlocks'
+import { isFeatureForSale } from '../../../systems/authority/featureSales'
 import { cmp } from '../../../systems/money'
-import { hasDiscovered } from '../../../systems/registries/discovery'
-import { progressFromTravel } from '../../../systems/unlocks/travelUnlocks'
 import { activeItemsOf, isLeftToForkChoice } from './forkBranches'
 import { forkChoicesOf } from './forkSection'
 import { nodeCost } from './nodeCost'
 import { ownsEveryRequirement } from './ownedRequirement'
-import { isAbsorbedRowReached, RESEARCH_LAB_ROW_ID } from './scheduleAbsorber'
-import { registeredTechTree, treeNodeOf, treeNodesThrough, type TechTree } from './techTree'
-import type { DiscoveryRequirement, ItemUnlock, TreeNode } from './techNode'
+import { RESEARCH_LAB_ROW_ID } from './scheduleAbsorber'
+import { registeredTechTree, researchFrontierOf, treeNodeOf, type TechTree } from './techTree'
+import type { ItemUnlock, TreeNode } from './techNode'
 import { unlockedNodeIdsOf } from './techTreeSection'
-import { TREE_ECONOMY } from './treeEconomy'
 
 export const TECH_NODE_REFUSALS = [
   'unknown_node',
   'already_unlocked',
   'fork_branch',
-  'locked_tier',
-  'undiscovered',
+  'held_feature',
   'missing_prereq',
   'not_owned',
-  'no_lab',
   'money_short',
 ] as const
+
+/**
+ * The planet and lab locks #411 retired: logs written before it carry them, so the log schema
+ * still reads them; no rule answers them any more.
+ */
+export const RETIRED_TECH_NODE_REFUSALS = ['locked_tier', 'undiscovered', 'no_lab'] as const
 
 export type TechNodeRefusal = (typeof TECH_NODE_REFUSALS)[number]
 
@@ -66,30 +67,28 @@ export function researchRefusalOf(
 }
 
 /**
- * Why the tier, discoveries, prerequisites, owned items or lab stop `node` now: the gates a fork
- * branch is opened through too, by `choose_fork` and `rechoose_fork`.
+ * Why a held feature, prerequisites or owned items stop `node` now: the gates a fork branch is
+ * opened through too, by `choose_fork` and `rechoose_fork`.
  */
 export function researchGateRefusalOf(
   state: AuthorityState,
   playerId: string,
   node: TreeNode,
 ): TechNodeRefusal | null {
-  if (!isTierReached(state.planet.index, node)) return 'locked_tier'
-  if (!isAnchorUnlocked(state, node)) return 'locked_tier'
-  if (isWaitingOnDiscovery(state, playerId, node)) return 'undiscovered'
+  if (!isAnchorForSale(state, node)) return 'held_feature'
   if (!hasEveryPrereq(state, playerId, node)) return 'missing_prereq'
   if (!ownsEveryRequirement(state, playerId, node.requiresOwned ?? [])) return 'not_owned'
-  if (isResearchedAtLab(node) && !isFeatureUnlocked(state, RESEARCH_LAB_ROW_ID)) return 'no_lab'
   return null
 }
 
-/** The nodes the player could research now if the wallet allowed, earliest first. */
+/** The nodes the player could research now if the wallet allowed, cheapest anchor first. */
 export function availableNodes(
   state: AuthorityState,
   playerId: string,
   tree: TechTree = registeredTechTree(),
 ): TreeNode[] {
-  return treeNodesThrough(tree, state.planet.index).filter(
+  const researched = new Set(unlockedNodeIdsOf(state, playerId))
+  return researchFrontierOf(tree, researched).filter(
     (node) => researchRefusalOf(state, playerId, node, tree) === null,
   )
 }
@@ -133,11 +132,17 @@ export function isItemResearched(
 }
 
 /**
- * Whether every schedule row the node `requiresFeature` has had its `FeatureUnlocked`; until then
- * the node is hidden from the tree screen and refused (#318, ticket 358).
+ * Whether every schedule row the node `requiresFeature`, and the `research_lab` it is researched
+ * at, ships: a node anchored on a vision row is a held item, hidden from the screen and refused
+ * (#318, ticket 358; HS on #411). A row's planet is never a lock.
  */
-export function isAnchorUnlocked(state: AuthorityState, node: TreeNode): boolean {
-  return (node.requiresFeature ?? []).every((rowId) => isFeatureUnlocked(state, rowId))
+export function isAnchorForSale(state: AuthorityState, node: TreeNode): boolean {
+  return anchorRowIdsOf(node).every((rowId) => isFeatureForSale(state, rowId))
+}
+
+function anchorRowIdsOf(node: TreeNode): readonly string[] {
+  const features = node.requiresFeature ?? []
+  return isResearchedAtLab(node) ? [...features, RESEARCH_LAB_ROW_ID] : features
 }
 
 function hasEveryPrereq(state: AuthorityState, playerId: string, node: TreeNode): boolean {
@@ -149,36 +154,10 @@ function isResearchedAtLab(node: TreeNode): boolean {
   return node.kind === 'combo' || node.researchedAt === 'research_lab'
 }
 
-/** Its own tier, and the planet of the Schedule C row it absorbs, if it absorbs one. */
-function isTierReached(planetIndex: number, node: TreeNode): boolean {
-  return planetIndex >= node.unlockTier && isAbsorbedRowReached(planetIndex, node.id)
-}
-
-function isWaitingOnDiscovery(state: AuthorityState, playerId: string, node: TreeNode): boolean {
-  if (node.requiresDiscovery === undefined) return false
-  if (state.planet.index >= node.unlockTier + TREE_ECONOMY.cadence.discoveryGrace) return false
-  return !isRequirementMet(state, playerId, node, node.requiresDiscovery)
-}
-
-function isRequirementMet(
-  state: AuthorityState,
-  playerId: string,
-  node: TreeNode,
-  requirement: DiscoveryRequirement,
-): boolean {
-  const keys = typeof requirement === 'string' ? [requirement] : requirement.anyOf
-  const fallback = {
-    progress: progressFromTravel(state.planet.index),
-    unlockPlanetIndex: node.unlockTier,
-  }
-  return keys.some((key) => hasDiscovered(state, playerId, key, fallback))
-}
-
 function moneyRefusalOf(
   state: AuthorityState,
   playerId: string,
   node: TreeNode,
 ): TechNodeRefusal | null {
-  const cost = nodeCost(node, state.planet.index)
-  return cmp(state.players[playerId].wallet, cost) >= 0 ? null : 'money_short'
+  return cmp(state.players[playerId].wallet, nodeCost(node)) >= 0 ? null : 'money_short'
 }

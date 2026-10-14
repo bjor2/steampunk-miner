@@ -4,13 +4,14 @@
  * derived from the log; every refusal is `tech-tree.tech_node_refused`. A lane's fork choice is
  * `tech-tree.fork_chosen`, a switch at the platform `tech-tree.fork_rechosen`, each with its cost,
  * and a refused one `tech-tree.fork_refused` (#255). The debug grant logs only the kernel's
- * `debug_command_applied`, so it never counts as play.
+ * `debug_command_applied`, so it never counts as play. A refusal's reason may still be one #411
+ * retired (the planet, discovery and lab locks): logs written before it carry them.
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
 import { FORK_REFUSALS } from './systems/forkRules'
 import { ARMOURY_LANES, TECH_LANES } from './systems/techNode'
-import { TECH_NODE_REFUSALS } from './systems/unlockRules'
+import { RETIRED_TECH_NODE_REFUSALS, TECH_NODE_REFUSALS } from './systems/unlockRules'
 
 export const TECH_TREE_PROJECTIONS: SliceEventProjections = {
   'tech-tree.TechNodeUnlocked': ({ nodeId, lane, kind, mark, cost }) => ({
@@ -51,7 +52,10 @@ export const TECH_TREE_RUN_EVENTS: SliceRunEvents = {
   'tech-tree.tech_node_refused': {
     group: 'progression',
     level: 'core',
-    payload: { nodeId: 'text', reason: { oneOf: TECH_NODE_REFUSALS } },
+    payload: {
+      nodeId: 'text',
+      reason: { oneOf: [...TECH_NODE_REFUSALS, ...RETIRED_TECH_NODE_REFUSALS] },
+    },
   },
   'tech-tree.fork_chosen': {
     group: 'progression',
@@ -66,6 +70,10 @@ export const TECH_TREE_RUN_EVENTS: SliceRunEvents = {
   'tech-tree.fork_refused': {
     group: 'progression',
     level: 'core',
-    payload: { lane: 'text', branch: 'text', reason: { oneOf: FORK_REFUSALS } },
+    payload: {
+      lane: 'text',
+      branch: 'text',
+      reason: { oneOf: [...FORK_REFUSALS, ...RETIRED_TECH_NODE_REFUSALS] },
+    },
   },
 }

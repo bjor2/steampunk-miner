@@ -18,12 +18,13 @@ export const TREE_FIXTURE_SLICE: SliceDefinition = {
   },
 }
 
-/** The one node `ANCHORED_NODE_SLICE` registers, hidden until `heat_lava` opens on P8. */
-export const ANCHORED_NODE_ID = 'anchor-probe.lava_sight'
+/** The one node `ANCHORED_NODE_SLICE` registers, held while `frozen_planets` is a vision row. */
+export const ANCHORED_NODE_ID = 'anchor-probe.frost_sight'
 
 /**
- * A lane node anchored on a schedule row (`requiresFeature`, ticket 358), reachable by tier from
- * P2 but shown and researchable only once the row's `FeatureUnlocked` came. Only specs use it.
+ * A lane node anchored on a schedule row (`requiresFeature`, ticket 358): `frozen_planets` ships
+ * nothing yet, so the node is a held item, never shown and refused on any planet (#411). Only
+ * specs use it.
  */
 export const ANCHORED_NODE_SLICE: SliceDefinition = {
   id: 'anchor-probe',
@@ -33,17 +34,27 @@ export const ANCHORED_NODE_SLICE: SliceDefinition = {
         id: ANCHORED_NODE_ID,
         iconId: 'icon-panel-slots',
         lane: 'sensing',
-        name: 'Lava sight',
+        name: 'Frost sight',
         unlockTier: 2,
         prereqs: [],
-        requiresFeature: ['heat_lava'],
-        unlocks: 'passive.lava_sight',
-        description: 'Reads the glow behind the rock.',
+        requiresFeature: ['frozen_planets'],
+        unlocks: 'passive.frost_sight',
+        description: 'Reads the rime behind the rock.',
         label: 'horizontal',
         costKind: 'capability',
       },
     ])
   },
+}
+
+/**
+ * The research lab's building, standing from its schedule row's planet (P15) as the dock buildings
+ * slice stamps it: combos and the Aetheric entry node are held while no building stands for the
+ * lab (#411). Only specs use it.
+ */
+export const LAB_FIXTURE_SLICE: SliceDefinition = {
+  id: 'lab-fixture',
+  register: (r) => r.dockFacility({ id: 'lab-fixture.lab', scheduleRowId: 'research_lab' }),
 }
 
 /** What the shop fixture asks for every item it sells. */

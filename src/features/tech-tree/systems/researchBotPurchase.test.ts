@@ -43,10 +43,23 @@ describe('tech tree: the pacing bot researches', () => {
       const types = session.commands().map((command) => command.type)
       expect(types.lastIndexOf('buyUpgrade')).toBeLessThan(types.indexOf('tech-tree.unlock_node'))
       expect(unlockedNodeIdsOf(session.state(), PLAYER)).toContain('tech.sensing.echo_sounder')
-      const left = availableNodes(session.state(), PLAYER)
+      const left = availableNodes(session.state(), PLAYER).filter((node) => node.unlockTier <= 6)
       expect(left.filter((node) => unlocksSomethingToBuy(session.state(), PLAYER, node))).toEqual(
         [],
       )
+    })
+  })
+
+  it('keeps to the campaign schedule: no node anchored past its planet, though the tree sells it', () => {
+    withShop(() => {
+      const session = botAtUpgradeBay(6, '1e12')
+      buyUpgrades(session, situationOf(session))
+      const tree = registeredTechTree()
+      const anchors = unlockedNodeIdsOf(session.state(), PLAYER).map(
+        (nodeId) => tree.authored.find((node) => node.id === nodeId)?.unlockTier ?? 0,
+      )
+      expect(anchors.filter((anchor) => anchor > 6)).toEqual([])
+      expect(availableNodes(session.state(), PLAYER).some((node) => node.unlockTier > 6)).toBe(true)
     })
   })
 
@@ -73,7 +86,7 @@ describe('tech tree: the pacing bot researches', () => {
     withFixtureTree(() => {
       const session = sessionOnPlanet(9)
       session.submit({ type: 'debug.tech-tree.unlockThrough', payload: { planetIndex: 4 } })
-      const order = researchOrderOf(availableNodes(session.state(), PLAYER), 9)
+      const order = researchOrderOf(availableNodes(session.state(), PLAYER))
       const firstMark = order.findIndex((node) => node.kind === 'mark')
       expect(firstMark).toBeGreaterThan(0)
       expect(order.slice(firstMark).every((node) => node.kind === 'mark')).toBe(true)

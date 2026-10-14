@@ -4,17 +4,24 @@
  * A lane no slice has registered yet shows "coming soon". The "next up" strip holds each lane's
  * first node the player can research; search matches a node's name, item or flavour line; the
  * filters keep available, affordable, locked or Mark-ready nodes. Marks stay on their item's chip.
- * A node whose anchor row is still shut (`requiresFeature`, ticket 358) is not on the screen.
- * Under the combos sits the Armoury group (#310, ticket 318), one lane per weapon.
+ * A node anchored on a row that ships nothing yet (`requiresFeature`, ticket 358) is not on the
+ * screen. Under the combos sits the Armoury group (#310, ticket 318), one lane per weapon.
+ *
+ * Which nodes show reads only the tree and what is researched, never the planet the player is on
+ * (#411): the map runs to the deepest authored node or each lane pair's next endless grade. The
+ * ruler runs on to the player's planet too, as information only.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { formatAmount } from '../../../systems/displayAmount'
-import { generatedComboAt, generatedComboPlanetsThrough } from './generatedCombos'
-import { cardContextOf, nodeCardOf, type NodeCardModel } from './nodeCardModel'
-import { treeNodeOf, unlockAllPlanetOf, type TechTree } from './techTree'
+import {
+  generatedComboAt,
+  generatedComboPlanetsThrough,
+  nextGeneratedCombosOf,
+} from './generatedCombos'
+import { cardContextOf, nodeCardOf, type CardContext, type NodeCardModel } from './nodeCardModel'
+import { treeNodeOf, type TechTree } from './techTree'
 import { ARMOURY_LANES, TECH_LANES, type TechNodeLane, type TreeNode } from './techNode'
-import { TREE_ECONOMY } from './treeEconomy'
-import { isAnchorUnlocked } from './unlockRules'
+import { isAnchorForSale } from './unlockRules'
 
 export const TREE_FILTERS = ['available', 'affordable', 'locked', 'marks'] as const
 
@@ -44,7 +51,7 @@ export interface LaneModel {
 export interface TreeScreenModel {
   planetIndex: number
   walletText: string
-  /** The ruler runs from planet 1 to here. */
+  /** The ruler runs from planet 1 to here: the map's last node, or the player's planet past it. */
   lastPlanet: number
   rulerMarks: readonly number[]
   lanes: readonly LaneModel[]
@@ -77,8 +84,8 @@ export function treeScreenModelOf(
   query: TreeQuery,
 ): TreeScreenModel {
   const context = cardContextOf(state, playerId, tree)
-  const lastPlanet = rulerEndOf(tree, state.planet.index)
-  const cards = shownNodesOf(state, tree, lastPlanet).map((node) => nodeCardOf(node, context))
+  const cards = shownNodesOf(context).map((node) => nodeCardOf(node, context))
+  const lastPlanet = Math.max(mapEndOf(context), state.planet.index)
   return {
     planetIndex: state.planet.index,
     walletText: formatAmount(state.players[playerId].wallet),
@@ -97,7 +104,7 @@ export function nodeCardModelOf(
   nodeId: string,
 ): NodeCardModel | null {
   const node = treeNodeOf(tree, nodeId)
-  if (node === null || !isAnchorUnlocked(state, node)) return null
+  if (node === null || !isAnchorForSale(state, node)) return null
   return nodeCardOf(node, cardContextOf(state, playerId, tree))
 }
 
@@ -110,12 +117,11 @@ export function isKeptByQuery(card: NodeCardModel, query: TreeQuery): boolean {
   return matchesSearch(card, query.search) && passesFilters(card, query.filters)
 }
 
-/** The deepest authored node, or a combo turn past the session's planet, whichever is further. */
-function rulerEndOf(tree: TechTree, planetIndex: number): number {
-  return Math.max(
-    unlockAllPlanetOf(tree, planetIndex),
-    planetIndex + TREE_ECONOMY.cadence.comboEvery,
-  )
+/** The deepest authored node or next endless grade: the same on every planet. */
+function mapEndOf(context: CardContext): number {
+  const { tree, unlocked } = context
+  const next = nextGeneratedCombosOf(tree.grading, unlocked)
+  return Math.max(1, ...[...tree.authored, ...next].map((node) => node.unlockTier))
 }
 
 function rulerMarksThrough(lastPlanet: number): number[] {
@@ -126,16 +132,16 @@ function rulerMarksThrough(lastPlanet: number): number[] {
   return marks
 }
 
-function shownNodesOf(state: AuthorityState, tree: TechTree, lastPlanet: number): TreeNode[] {
-  return mapNodesOf(tree, lastPlanet).filter((node) => isAnchorUnlocked(state, node))
+function shownNodesOf(context: CardContext): TreeNode[] {
+  return mapNodesOf(context).filter((node) => isAnchorForSale(context.state, node))
 }
 
 /** The nodes drawn on the map: authored ones and the endless combos; Marks ride on chips. */
-function mapNodesOf(tree: TechTree, lastPlanet: number): TreeNode[] {
-  const generated = generatedComboPlanetsThrough(lastPlanet).flatMap(
-    (planet) => generatedComboAt(planet, tree.grading) ?? [],
+function mapNodesOf(context: CardContext): TreeNode[] {
+  const generated = generatedComboPlanetsThrough(mapEndOf(context)).flatMap(
+    (planet) => generatedComboAt(planet, context.tree.grading) ?? [],
   )
-  return [...tree.authored, ...generated]
+  return [...context.tree.authored, ...generated]
 }
 
 function laneModelOf(

@@ -1,14 +1,15 @@
 /**
  * The Upgrade bay's bay entries (ticket 344, TD lock on #314 section 1): each registered source
- * whose anchor row has `FeatureUnlocked` is asked for its entries, and nothing before (the
- * `bayScreens` rule: a vision row never opens, so it never shows). Entries sort by the anchor's
+ * whose anchor row ships is asked for its entries, on every planet (Bjor's price-only ruling on
+ * #411: the row's planet only prices what it sells), and a vision row's never (the `bayScreens`
+ * rule: it never opens, so it never shows). Entries sort by the anchor's
  * index in the locked schedule, then by entry id. An entry whose card names a vehicle item no
  * slice registered is a held item (siphon, probe, sounder, magnets) and is never previewed.
  *
  * A track at its wall keeps its row with no buy: it reads Mastered with the maxed badge.
  */
 import type { AuthorityState } from '../authority/authorityState'
-import { isFeatureUnlocked } from '../authority/featureUnlocks'
+import { isFeatureForSale } from '../authority/featureSales'
 import {
   BAY_ENTRY_REGISTRY,
   refuseUnlockIdEntries,
@@ -49,7 +50,7 @@ export function bayEntryButtonsOf(rows: readonly BayEntryRow[]): ScreenButton[] 
 
 function openSourcesOf(state: AuthorityState): BayEntrySource[] {
   return entriesOf(BAY_ENTRY_REGISTRY).filter(
-    (source) => source.bay === 'upgrade' && isFeatureUnlocked(state, source.anchorFeatureId),
+    (source) => source.bay === 'upgrade' && isFeatureForSale(state, source.anchorFeatureId),
   )
 }
 

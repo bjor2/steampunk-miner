@@ -1,7 +1,7 @@
 /**
  * Mark N of an item (spec #161 section 2, generated, never registered): `tech.mark.<itemId>.<N>`
- * for N >= 2, researchable from `markTier = unlockTier + M(N - 1)`, needing Mark N - 1 (the
- * capability itself for Mark 2). Its depth is the item's lane slot plus `min(N, markDepthCap)`,
+ * for N >= 2, priced at `markTier = unlockTier + M(N - 1)` (its anchor, never a lock: #411),
+ * needing Mark N - 1 (the capability itself for Mark 2). Its depth is the item's lane slot plus `min(N, markDepthCap)`,
  * so past Mark 10 its price grows only with the ore value. A ladder ends at mastery: no Mark
  * exists past it. A Mark keeps its capability's lane and spend-guard family (#310: `armoury`).
  */
@@ -66,7 +66,18 @@ export function markNodeOf(bearer: MarkBearer, mark: number): TreeNode {
   }
 }
 
-/** Every Mark of the item researchable by `planetIndex`, lowest first. */
+/** The item's lowest Mark not researched yet; null once the ladder is mastered. */
+export function nextMarkNodeOf(
+  bearer: MarkBearer,
+  researched: ReadonlySet<string>,
+): TreeNode | null {
+  const itemId = bearer.capability.unlocks.itemId
+  let mark = FIRST_MARK
+  while (isMarkOnLadder(bearer, mark) && researched.has(markNodeIdOf(itemId, mark))) mark += 1
+  return isMarkOnLadder(bearer, mark) ? markNodeOf(bearer, mark) : null
+}
+
+/** Every Mark of the item anchored by `planetIndex`, lowest first (the debug grant's reach). */
 export function markNodesThrough(bearer: MarkBearer, planetIndex: number): TreeNode[] {
   const marks: TreeNode[] = []
   for (let mark = FIRST_MARK; isMarkOnLadder(bearer, mark); mark += 1) {

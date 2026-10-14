@@ -32,7 +32,6 @@ import { statPreview } from './systems/statPreview'
 
 const GOVERNOR = AETHERIC_ECONOMY.chronometricGovernor
 const CONDENSER = AETHERIC_ECONOMY.aetherCondenser
-const LATE_PLANET = 40
 
 const ITEMS = [
   {
@@ -99,17 +98,15 @@ describe('chronometric governor and aether condenser rows', () => {
 
   it.each(ITEMS)('sells $name for 15 band-5 ore units at its planet, on every planet', (item) => {
     const price = bandOrePriceAt(AETHERIC_ECONOMY.price, item.planet, item.planet)
-    ;[item.planet, LATE_PLANET].forEach((planet) =>
-      expect(AETHERIC_SELLER.offerOf(item.itemId, planet)).toEqual({ name: item.name, price }),
-    )
+    expect(AETHERIC_SELLER.offerOf(item.itemId)).toEqual({ name: item.name, price })
   })
 
   it.each(ITEMS)('prices a tech.mark node for every Mark of $name, and none past it', (item) => {
     const markId = (mark: number) => `tech.mark.${item.itemId}.${mark}`
     const marks = Array.from({ length: lastMark(item.itemId) - 1 }, (_, at) => at + 2)
     expect(marks.length).toBeGreaterThan(0)
-    expect(marks.filter((mark) => nodeCostOf(markId(mark), LATE_PLANET) === null)).toEqual([])
-    expect(nodeCostOf(markId(lastMark(item.itemId) + 1), LATE_PLANET)).toBeNull()
+    expect(marks.filter((mark) => nodeCostOf(markId(mark)) === null)).toEqual([])
+    expect(nodeCostOf(markId(lastMark(item.itemId) + 1))).toBeNull()
   })
 
   it.each(ITEMS)('cards $name with its flavour and stat lines, as bought and Mastered', (item) => {

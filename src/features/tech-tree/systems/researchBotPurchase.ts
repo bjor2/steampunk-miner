@@ -5,6 +5,10 @@
  * new capabilities before Marks, cheapest first. `isAvailable` is the authority's own refusal
  * check, so the bot never sends a node the tree would refuse. A node whose item is due ahead of
  * the tracks (ticket 296, an extractor on its planet) is due too, once the tree would open it.
+ *
+ * The tree gates by price alone (#411), but the pacing bot keeps to the campaign schedule: it
+ * researches a node only once it stands on the node's price anchor, so its curve stays the one
+ * the pace gates were set on. Buying ahead of the anchor is the greedy rush hand's run.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { cmp, ZERO_MONEY, type Money } from '../../../systems/money'
@@ -24,8 +28,8 @@ export const RESEARCH_BOT_PURCHASE: BotPurchase = {
   id: 'tech-tree.research',
   command: UNLOCK_NODE_COMMAND,
   payloadsToTry: (state, playerId) =>
-    researchOrderOf(nodesWorthResearching(state, playerId), state.planet.index).map(payloadOf),
-  estimateCost: (state, _playerId, args) => estimatedCostOf(state, args as ResearchPayload),
+    researchOrderOf(nodesWorthResearching(state, playerId)).map(payloadOf),
+  estimateCost: (_state, _playerId, args) => estimatedCostOf(args as ResearchPayload),
   isAvailable: (state, playerId, args) =>
     unlockRefusalOf(state, playerId, (args as ResearchPayload).nodeId) === null,
   boughtIdOf: (args) => (args as ResearchPayload).nodeId,
@@ -46,16 +50,21 @@ function unresearchedDueItemIdsOf(state: AuthorityState, playerId: string): Set<
   return new Set(due.filter((itemId) => !isItemResearched(state, playerId, itemId)))
 }
 
-/** The nodes open to research now whose item the bot could then buy. */
+/** The nodes open to research now, anchored by this planet, whose item the bot could then buy. */
 function nodesWorthResearching(state: AuthorityState, playerId: string): TreeNode[] {
-  return availableNodes(state, playerId).filter((node) =>
-    unlocksSomethingToBuy(state, playerId, node),
+  return availableNodes(state, playerId).filter(
+    (node) => isAnchorReached(state, node) && unlocksSomethingToBuy(state, playerId, node),
   )
 }
 
+/** The bot's schedule, never the tree's rule: it stands on the node's price anchor or past it. */
+function isAnchorReached(state: AuthorityState, node: TreeNode): boolean {
+  return node.unlockTier <= state.planet.index
+}
+
 /** New capabilities and combos first, then Marks; each group cheapest first, then by id. */
-export function researchOrderOf(nodes: readonly TreeNode[], planetIndex: number): TreeNode[] {
-  const priced = nodes.map((node) => ({ node, cost: nodeCost(node, planetIndex) }))
+export function researchOrderOf(nodes: readonly TreeNode[]): TreeNode[] {
+  const priced = nodes.map((node) => ({ node, cost: nodeCost(node) }))
   return priced.sort(compareResearchPriority).map(({ node }) => node)
 }
 
@@ -77,6 +86,6 @@ function payloadOf(node: TreeNode): ResearchPayload {
   return { nodeId: node.id }
 }
 
-function estimatedCostOf(state: AuthorityState, { nodeId }: ResearchPayload): Money {
-  return nodeCostOf(nodeId, state.planet.index) ?? ZERO_MONEY
+function estimatedCostOf({ nodeId }: ResearchPayload): Money {
+  return nodeCostOf(nodeId) ?? ZERO_MONEY
 }

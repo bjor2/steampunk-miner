@@ -10,7 +10,8 @@
  *   priced by `trackLevelPrice` at that level's target planet. A track at its wall is never sold
  *   again.
  *
- * Both open with the `bore_gun` schedule row (P1). A refusal changes nothing and is answered by
+ * Both are on sale once the `bore_gun` schedule row ships (its planet, P1, only prices the mount:
+ * #411). A refusal changes nothing and is answered by
  * the kernel's `CommandRejected`; a buy is answered by its own event and the wallet's
  * `MoneyChanged`.
  *
@@ -27,7 +28,7 @@ import {
   type RuleEffect,
 } from '../../../systems/authority/commandRule'
 import { atBayRejection } from '../../../systems/authority/dockRules'
-import { isFeatureUnlocked } from '../../../systems/authority/featureUnlocks'
+import { isFeatureForSale } from '../../../systems/authority/featureSales'
 import { moneyShortRejection } from '../../../systems/authority/platformServices'
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import { sub, toCanonical, type Money } from '../../../systems/money'
@@ -181,8 +182,8 @@ function walletChangeOf(state: AuthorityState, playerId: string, price: Money) {
 }
 
 function lockedGunRejection(state: AuthorityState): Rejection | null {
-  if (isFeatureUnlocked(state, BORE_GUN_ROW_ID)) return null
-  return rejectionOf('feature_locked', `${BORE_GUN_ROW_ID} is not unlocked on this planet`)
+  if (isFeatureForSale(state, BORE_GUN_ROW_ID)) return null
+  return rejectionOf('feature_locked', `${BORE_GUN_ROW_ID} ships nothing yet`)
 }
 
 function alreadyMountedRejection(levels: GunLevels): Rejection | null {

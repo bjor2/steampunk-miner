@@ -1,10 +1,11 @@
 /**
  * Buying and switching the `auto_guns` turret (#107 design and numbers, built by #93):
  *
- * - `BuyGun`: at the Upgrade bay only, once `auto_guns` is unlocked (planet 4, #80). The first buy
- *   mounts the guns, their first major (step 10, #180), for 30 band-5 ore units and logs
- *   `gun_mounted`; each later buy raises the gun track one step, up to its cap of 16 majors, and
- *   logs `gun_upgraded`. The guns are not a vehicle track, so they never move the visual tier.
+ * - `BuyGun`: at the Upgrade bay only, on any planet (Bjor's price-only ruling on #411). The first
+ *   buy mounts the guns, their first major (step 10, #180), for 30 band-5 ore units of the
+ *   `auto_guns` row's planet (4, #80: its price anchor, never a lock) and logs `gun_mounted`; each
+ *   later buy raises the gun track one step on the session's planet, as any track, up to its cap
+ *   of 16 majors, and logs `gun_upgraded`. The guns are not a vehicle track, so they never move the visual tier.
  *   A held step (`chain` not 0) is also refused under the service reserve (`purchaseChain.ts`).
  * - `SetGunMode {auto | off}`: the HUD toggle, any time the vehicle has guns; logs `gun_mode`.
  * - `debug.setGunLevel`: a scenario's guns as a step, 0 (none) or the mount to the cap, with no
@@ -26,7 +27,7 @@ import {
 } from './commandRule'
 import { atBayRejection } from './dockRules'
 import type { DomainEventBody, PurchaseChainStamp } from './domainEvent'
-import { isFeatureUnlocked } from './featureUnlocks'
+import { featurePricePlanetOf, isFeatureForSale } from './featureSales'
 import { moneyShortRejection } from './platformServices'
 import { chainStampOf, serviceReserveRejection } from './purchaseChain'
 
@@ -76,14 +77,24 @@ export function gunBuyRefusal(
   ])
 }
 
-/** What the next gun buy costs this player here: the mount, or the next level. */
+/**
+ * What the next gun buy costs this player: the mount at its anchor's price on every planet, or the
+ * next level on the session's planet.
+ */
 export function nextGunPriceOf(state: AuthorityState, playerId: string): Money {
-  return nextGunPrice(gunOf(state, playerId).level, state.planet.index)
+  const gun = gunOf(state, playerId)
+  const planet = isGunMounted(gun) ? state.planet.index : gunMountPricePlanet()
+  return nextGunPrice(gun.level, planet)
 }
 
-/** Whether the Upgrade bay shows the Guns row: unlocked here, or already bolted on. */
+/** Whether the Upgrade bay shows the Guns row: the row ships, or the guns are bolted on already. */
 export function isGunOffered(state: AuthorityState, playerId: string): boolean {
-  return isFeatureUnlocked(state, AUTO_GUNS_ROW_ID) || isGunMounted(gunOf(state, playerId))
+  return isFeatureForSale(state, AUTO_GUNS_ROW_ID) || isGunMounted(gunOf(state, playerId))
+}
+
+/** The `auto_guns` row's planet, the mount's price anchor. */
+export function gunMountPricePlanet(): number {
+  return featurePricePlanetOf(AUTO_GUNS_ROW_ID) as number
 }
 
 export function gunOf(state: AuthorityState, playerId: string): VehicleGun {
@@ -91,8 +102,8 @@ export function gunOf(state: AuthorityState, playerId: string): VehicleGun {
 }
 
 function lockedGunRejection(state: AuthorityState): Rejection | null {
-  if (isFeatureUnlocked(state, AUTO_GUNS_ROW_ID)) return null
-  return rejectionOf('feature_locked', `${AUTO_GUNS_ROW_ID} opens on planet 4`)
+  if (isFeatureForSale(state, AUTO_GUNS_ROW_ID)) return null
+  return rejectionOf('feature_locked', `${AUTO_GUNS_ROW_ID} ships nothing yet`)
 }
 
 function maxGunLevelRejection(gun: VehicleGun): Rejection | null {

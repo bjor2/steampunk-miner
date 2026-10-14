@@ -3,8 +3,9 @@
  * `shields`, `grav_anchor`, `buoyancy_tanks` and `escape_thrusters` carry `unlockVia: tech_tree`
  * on the locked schedule, so each is one tech node at its own planet, not a second unlock beside
  * it. The fixed map below ties each row to its node; the node claims the row (`scheduleRowId`),
- * opens no earlier than the row's planet, and counts once on the planet's unlock cadence. The
- * `research_lab` row is read here too: combos are researched there, never before its planet.
+ * is priced at the row's planet, and counts once on the planet's unlock cadence. The
+ * `research_lab` row is read here too: combos are researched there and anchored no earlier than
+ * its planet. Neither planet is a lock (#411).
  */
 import type { UnlockRow } from '../../../systems/unlocks/readUnlockSchedule'
 import { LOCKED_SCHEDULE } from '../../../systems/unlocks/unlockSchedule'
@@ -22,28 +23,11 @@ export const ABSORBED_SCHEDULE_ROWS: Readonly<Record<string, string>> = {
 /** The Schedule C facility where combos are researched (moved to P15 by the Game Director, #162). */
 export const RESEARCH_LAB_ROW_ID = 'research_lab'
 
-/** The research lab's planet on the locked schedule: no combo comes before it. */
+/** The research lab's planet on the locked schedule: no combo is anchored before it. */
 export function researchLabPlanet(rows: readonly UnlockRow[] = LOCKED_SCHEDULE.rows): number {
   const lab = rows.find((row) => row.id === RESEARCH_LAB_ROW_ID)
   if (lab === undefined) throw new Error(`the locked schedule has no ${RESEARCH_LAB_ROW_ID} row`)
   return lab.planetIndex
-}
-
-/** The schedule row a node absorbs; null for every other node. */
-export function absorbedRowOf(
-  nodeId: string,
-  rows: readonly UnlockRow[] = LOCKED_SCHEDULE.rows,
-): UnlockRow | null {
-  const rowId = Object.keys(ABSORBED_SCHEDULE_ROWS).find(
-    (id) => ABSORBED_SCHEDULE_ROWS[id] === nodeId,
-  )
-  return rows.find((row) => row.id === rowId) ?? null
-}
-
-/** Whether the session has reached the planet of the row a node absorbs (true for other nodes). */
-export function isAbsorbedRowReached(planetIndex: number, nodeId: string): boolean {
-  const row = absorbedRowOf(nodeId)
-  return row === null || planetIndex >= row.planetIndex
 }
 
 /** Every way the registered nodes disagree with the map and the locked schedule. */

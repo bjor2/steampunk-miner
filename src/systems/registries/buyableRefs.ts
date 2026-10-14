@@ -7,7 +7,7 @@
  *
  * Each kernel player command says what it buys, so a new kernel command fails the typecheck (and
  * `buyableRefs.test.ts`) until it is placed here. `buyVehicleItem` buys every registered vehicle
- * item a slice sells on one of the planets walked (ticket 248).
+ * item a slice sells (ticket 248), the same on every planet (#411).
  */
 import type { KernelCommandType } from '../authority/authorityCommand'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
@@ -34,11 +34,8 @@ export const NOT_A_BUY = 'not-a-buy'
 
 const FIRST_PLANET = 1
 
-/**
- * What each kernel player command buys on planets 1 to `maxPlanet`; picked artefacts use the same
- * card (#159).
- */
-export function kernelCommandBuys(maxPlanet: number = FIRST_PLANET): {
+/** What each kernel player command buys, on every planet alike; picked artefacts use the same card (#159). */
+export function kernelCommandBuys(): {
   readonly [K in KernelPlayerCommandType]: readonly ItemRef[] | typeof NOT_A_BUY
 } {
   return {
@@ -68,7 +65,7 @@ export function kernelCommandBuys(maxPlanet: number = FIRST_PLANET): {
     restockCharges: [KERNEL_ITEMS.charges],
     buyChargeRackSlot: [KERNEL_ITEMS.chargeRack],
     equipItem: NOT_A_BUY,
-    buyVehicleItem: soldVehicleItemRefsUpTo(maxPlanet),
+    buyVehicleItem: soldVehicleItemRefs(),
     'ground_gun.fire': NOT_A_BUY,
     'ground_gun.set_auto': NOT_A_BUY,
     'turret.burst': NOT_A_BUY,
@@ -80,12 +77,12 @@ export function kernelCommandBuys(maxPlanet: number = FIRST_PLANET): {
  * sorted by kind, id and grade in code-unit order.
  */
 export function listBuyableRefs(maxPlanet: number = FIRST_PLANET): readonly ItemRef[] {
-  const refs = [...kernelBuyableRefs(maxPlanet), ...generatedRefsUpTo(maxPlanet)]
+  const refs = [...kernelBuyableRefs(), ...generatedRefsUpTo(maxPlanet)]
   return uniqueRefsOf(refs).sort(compareRefs)
 }
 
-function kernelBuyableRefs(maxPlanet: number): readonly ItemRef[] {
-  const bought = Object.values(kernelCommandBuys(maxPlanet)).flatMap((buys) =>
+function kernelBuyableRefs(): readonly ItemRef[] {
+  const bought = Object.values(kernelCommandBuys()).flatMap((buys) =>
     buys === NOT_A_BUY ? [] : buys,
   )
   return [...bought, ...BAY_IDS.map(bayItemOf)]
@@ -95,16 +92,11 @@ function generatedRefsUpTo(maxPlanet: number): readonly ItemRef[] {
   return planetsUpTo(maxPlanet).flatMap(generatedItemRefsOn)
 }
 
-/** Each registered vehicle item some slice sells on a planet up to `maxPlanet`. */
-function soldVehicleItemRefsUpTo(maxPlanet: number): readonly ItemRef[] {
-  const planets = planetsUpTo(maxPlanet)
+/** Each registered vehicle item some slice sells. */
+function soldVehicleItemRefs(): readonly ItemRef[] {
   return contentOf('vehicle-item')
-    .filter((item) => isSoldOnAnyOf(item.id, planets))
+    .filter((item) => vehicleItemOfferOf(item.id) !== null)
     .map((item) => vehicleItemRefOf(item.id))
-}
-
-function isSoldOnAnyOf(itemId: string, planets: readonly number[]): boolean {
-  return planets.some((planet) => vehicleItemOfferOf(itemId, planet) !== null)
 }
 
 function planetsUpTo(maxPlanet: number): number[] {

@@ -53,8 +53,8 @@ describe('extraction fork', () => {
       .filter((node) => node.id.startsWith('tech.extraction.fork.'))
       .map((node) => node.id)
     expect(ids).toEqual([PROSPECTOR])
-    expect(nodeCostOf(HAULER, 16)).toBeNull()
-    expect(nodeCostOf(PROSPECTOR, 16)).not.toBeNull()
+    expect(nodeCostOf(HAULER)).toBeNull()
+    expect(nodeCostOf(PROSPECTOR)).not.toBeNull()
   })
 
   it('refuses the Hauler as an unknown branch while it is held', () => {

@@ -53,11 +53,6 @@
   color: var(--color-ember);
 }
 
-.hint {
-  margin: 0;
-  color: var(--color-teal);
-}
-
 .refusal,
 .done,
 .empty {

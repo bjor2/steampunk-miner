@@ -93,7 +93,7 @@ describe('combos in play: grade 1, the one-off buy', () => {
       const unlockPlanet = unlockTierOfItem(item.itemId)
       const expected = item.node?.unlockTier ?? unlockPlanet
       expect(unlockPlanet, item.itemId).toBe(expected)
-      const offer = vehicleItemOfferOf(item.itemId, 1)
+      const offer = vehicleItemOfferOf(item.itemId)
       expect(offer?.name).toBe(item.name)
       expect(toCanonical(offer!.price)).toBe(toCanonical(comboPriceAt(unlockPlanet as number)))
     })
@@ -118,7 +118,7 @@ describe('combos in play: grade 1, the one-off buy', () => {
     const debit = debitOf(session, () => session.submit(buyVehicleItemCommand(drain.itemId)))
     expect(ownsItem(session.state(), PLAYER, drain.itemId)).toBe(true)
     expect(card?.statLines.find((line) => line.label === 'Price')?.now).toBe(formatAmount(debit))
-    expect(toCanonical(debit)).toBe(toCanonical(vehicleItemOfferOf(drain.itemId, 28)!.price))
+    expect(toCanonical(debit)).toBe(toCanonical(vehicleItemOfferOf(drain.itemId)!.price))
   })
 })
 
@@ -133,8 +133,8 @@ describe('combos in play: later grades', () => {
   it('prices every grade strictly above the grade before it', () => {
     SHIPPED.forEach((item) => {
       const costs = [
-        ...(item.node === null ? [] : [nodeCostOf(item.node.id, item.node.unlockTier)]),
-        ...(gradePlanets.get(item.itemId) ?? []).map((p) => nodeCostOf(`tech.combo.gen.${p}`, p)),
+        ...(item.node === null ? [] : [nodeCostOf(item.node.id)]),
+        ...(gradePlanets.get(item.itemId) ?? []).map((p) => nodeCostOf(`tech.combo.gen.${p}`)),
       ] as Money[]
       costs.slice(1).forEach((cost, index) => expect(cmp(cost, costs[index])).toBe(1))
     })
@@ -150,7 +150,7 @@ describe('combos in play: later grades', () => {
       reason: 'not_owned',
     })
     session.submit(setVehicleLoadoutCommand({}, ['combo.assay_drain', ...ALL_PARENTS]))
-    const cardCost = nodeCostOf(nodeId, planet) as Money
+    const cardCost = nodeCostOf(nodeId) as Money
     session.submit({ type: 'debug.setMoney', payload: { amount: toCanonical(cardCost) } })
     const debit = debitOf(session, () =>
       session.submit({ type: 'tech-tree.unlock_node', payload: { nodeId } }),

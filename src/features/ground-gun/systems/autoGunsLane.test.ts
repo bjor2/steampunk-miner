@@ -111,7 +111,7 @@ describe('ground-gun: the armoury.auto_guns lane (ticket 319, Content on #310)',
   it('registers every module as a store item with an offer and a card', () => {
     const itemIds = contentOf('vehicle-item').map((item) => item.id)
     expect(ALL_EIGHT_IDS.filter((itemId) => !itemIds.includes(itemId))).toEqual([])
-    expect(ALL_EIGHT_IDS.filter((itemId) => vehicleItemOfferOf(itemId, 40) === null)).toEqual([])
+    expect(ALL_EIGHT_IDS.filter((itemId) => vehicleItemOfferOf(itemId) === null)).toEqual([])
     expect(ALL_EIGHT_IDS.filter((itemId) => cardLines(itemId, 0).length < 2)).toEqual([])
   })
 
@@ -119,7 +119,7 @@ describe('ground-gun: the armoury.auto_guns lane (ticket 319, Content on #310)',
     for (const module of AUTO_GUNS_MODULES) {
       const planet = module.node.unlockTier
       const price = bandOrePriceAt({ band: 5, oreUnits: fromCanonical('15') }, planet, planet)
-      expect(vehicleItemOfferOf(module.itemId, planet)).toEqual({ name: module.name, price })
+      expect(vehicleItemOfferOf(module.itemId)).toEqual({ name: module.name, price })
     }
   })
 

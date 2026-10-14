@@ -48,8 +48,6 @@ export interface TreeCadence {
   firstGeneratedCombo: number
   /** `K`: planets between generated combos. */
   comboEvery: number
-  /** Planets an undiscovered node waits past its tier. */
-  discoveryGrace: number
 }
 
 /** The nodes-only spend share the #165 diagnostic watches: reported, never failed on. */
@@ -172,7 +170,6 @@ function readCadence(reader: FieldReader, raw: unknown): TreeCadence {
       cadence.firstGeneratedCombo,
     ),
     comboEvery: reader.safeInteger('tech.cadence.comboEvery', cadence.comboEvery),
-    discoveryGrace: reader.safeInteger('tech.cadence.discoveryGrace', cadence.discoveryGrace),
   }
 }
 

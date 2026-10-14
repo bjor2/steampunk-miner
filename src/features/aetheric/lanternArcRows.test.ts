@@ -43,8 +43,6 @@ import { statPreview } from './systems/statPreview'
 
 const LANTERN = AETHERIC_ECONOMY.phaseLantern
 const ARC_COIL = AETHERIC_ECONOMY.arcCoil
-const LATE_PLANET = 40
-const COST_PLANETS = Array.from({ length: 60 - FORK_TIER + 1 }, (_, at) => FORK_TIER + at)
 
 const ITEMS = [
   {
@@ -129,37 +127,28 @@ describe('phase lantern and galvanic arc coil rows', () => {
     },
   )
 
-  it('prices the two branches the same on P16-P60, for the node and for every Mark step', () => {
+  it('prices the two branches the same, for the node and for every Mark step', () => {
     const [phase, arc] = AETHERIC_FORK_NODES
     const sharedMarks = Math.min(lastMark(LANTERN_ID), lastMark(ARC_COIL_ID))
     expect(sharedMarks).toBeGreaterThan(1)
-    COST_PLANETS.forEach((planet) => {
-      expect(toCanonical(nodeCostOf(phase.id, planet)!), `P${planet}`).toBe(
-        toCanonical(nodeCostOf(arc.id, planet)!),
+    expect(toCanonical(nodeCostOf(phase.id)!)).toBe(toCanonical(nodeCostOf(arc.id)!))
+    for (let mark = 2; mark <= sharedMarks; mark += 1) {
+      expect(toCanonical(nodeCostOf(markId(LANTERN_ID, mark))!), `Mk${mark}`).toBe(
+        toCanonical(nodeCostOf(markId(ARC_COIL_ID, mark))!),
       )
-      for (let mark = 2; mark <= sharedMarks; mark += 1) {
-        expect(
-          toCanonical(nodeCostOf(markId(LANTERN_ID, mark), planet)!),
-          `P${planet} Mk${mark}`,
-        ).toBe(toCanonical(nodeCostOf(markId(ARC_COIL_ID, mark), planet)!))
-      }
-    })
+    }
   })
 
   it.each(ITEMS)('sells $name for 15 band-5 ore units at P16, on every planet', (item) => {
     const price = bandOrePriceAt(AETHERIC_ECONOMY.price, FORK_TIER, FORK_TIER)
-    ;[FORK_TIER, LATE_PLANET].forEach((planet) =>
-      expect(AETHERIC_SELLER.offerOf(item.itemId, planet)).toEqual({ name: item.name, price }),
-    )
+    expect(AETHERIC_SELLER.offerOf(item.itemId)).toEqual({ name: item.name, price })
   })
 
   it.each(ITEMS)('prices a tech.mark node for every Mark of $name, and none past it', (item) => {
     const marks = Array.from({ length: lastMark(item.itemId) - 1 }, (_, at) => at + 2)
     expect(marks.length).toBeGreaterThan(0)
-    expect(
-      marks.filter((mark) => nodeCostOf(markId(item.itemId, mark), LATE_PLANET) === null),
-    ).toEqual([])
-    expect(nodeCostOf(markId(item.itemId, lastMark(item.itemId) + 1), LATE_PLANET)).toBeNull()
+    expect(marks.filter((mark) => nodeCostOf(markId(item.itemId, mark)) === null)).toEqual([])
+    expect(nodeCostOf(markId(item.itemId, lastMark(item.itemId) + 1))).toBeNull()
   })
 
   it.each(ITEMS)('cards $name with its flavour and stat lines, as bought and Mastered', (item) => {

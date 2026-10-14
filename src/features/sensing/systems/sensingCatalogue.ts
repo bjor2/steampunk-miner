@@ -38,7 +38,7 @@ export interface SensingNode {
   /** The unlock planet; the item's one-off price is read there too (#162 4.1). */
   unlockTier: number
   prereqs: readonly string[]
-  /** Researchable at `unlockTier` once met, else one planet later (#161 `discoveryGrace`). */
+  /** The discovery the node is keyed to (#161 light D); research never waits on it (#411). */
   requiresDiscovery: DiscoveryRequirement | null
 }
 

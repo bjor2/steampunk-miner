@@ -14,7 +14,6 @@ import { markBearerOfItem, registeredTechTree, treeNodeOf, type TechTree } from 
 const LONG_LADDER: MarkLadder = { isIncomeItem: false, cooldown: 300, magnitude: { base: 600 } }
 const SHORT_LADDER: MarkLadder = { isIncomeItem: true, cooldown: 600, charges: 2 }
 
-const PLANETS = Array.from({ length: 45 }, (_, index) => index + 16)
 const DEPTHS = [0, 3, 7]
 
 function branchSpecOf(branch: string, marks: MarkLadder): ForkBranchSpec {
@@ -31,7 +30,7 @@ function branchSpecOf(branch: string, marks: MarkLadder): ForkBranchSpec {
 }
 
 function priceRowOf(node: TreeNode) {
-  return PLANETS.map((planet) => nodeCost(node, planet))
+  return nodeCost(node)
 }
 
 function markNodesOf(node: TreeNode, ladder: MarkLadder, lastMark: number): TreeNode[] {
@@ -63,7 +62,7 @@ function walkedMarkStepsOf(pair: readonly WalkedForkBranch[]): TreeNode[][] {
 }
 
 describe('tech tree: fork cost', () => {
-  it('prices the two branches of every lane the same with bandOrePriceAt on P16-P60', () => {
+  it('prices the two branches of every lane the same with bandOrePriceAt at their P16 anchor', () => {
     for (const lane of TECH_LANES) {
       const pair = forkPairOf(lane, [
         branchSpecOf('wide', LONG_LADDER),
@@ -72,12 +71,12 @@ describe('tech tree: fork cost', () => {
       for (const depth of DEPTHS) {
         const [first, second] = forkTreeNodesOf(pair, depth)
         expect(priceRowOf(second)).toEqual(priceRowOf(first))
-        expect(nodeCost(first, 30)).toEqual(bandOrePriceAt(nodeOreCostOf(first), 30, 16))
+        expect(nodeCost(first)).toEqual(bandOrePriceAt(nodeOreCostOf(first), 16, 16))
       }
     }
   })
 
-  it('prices every Mark step of the two branches the same on P16-P60', () => {
+  it('prices every Mark step of the two branches the same', () => {
     const pair = forkPairOf('drill-gear', [
       branchSpecOf('wide', LONG_LADDER),
       branchSpecOf('deep', SHORT_LADDER),
@@ -90,7 +89,7 @@ describe('tech tree: fork cost', () => {
     expect(secondMarks.map(priceRowOf)).toEqual(firstMarks.map(priceRowOf))
   })
 
-  it('the two branches of every lane cost the same on P16-P60, in the registered tree', () => {
+  it('the two branches of every lane cost the same, in the registered tree', () => {
     withFixtureTree(() => {
       const tree = registeredTechTree()
       for (const pair of FORK_PAIRS_FIXTURE) {
@@ -103,7 +102,7 @@ describe('tech tree: fork cost', () => {
     }, [FORK_FIXTURE_SLICE])
   })
 
-  it('the two branches of every lane cost the same on P16-P60, for the fork node and every Mark step', () => {
+  it('the two branches of every lane cost the same, for the fork node and every Mark step', () => {
     const pairs = forkPairsToWalk(registeredTechTree())
     expect([...pairs.keys()].sort()).toEqual([...TECH_LANES].sort())
     for (const pair of pairs.values()) {

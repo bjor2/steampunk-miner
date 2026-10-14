@@ -11,6 +11,7 @@ import {
   setCharges,
   setTipMajor,
 } from './gateFixtures'
+import { GATE_ROWS } from './gateRows'
 import type { CellGateKind, GatedEntry } from './gateTable'
 import { VERB_ROWS } from './verbRows'
 
@@ -168,5 +169,26 @@ describe('canMine: dense cells and tools', () => {
   it('lets a tool take a common cell', () => {
     const { session, fixture } = gatedOn(7, 'none')
     expect(canMine(queryOf(session, fixture, { tool: 'probe.drain' }))).toBeNull()
+  })
+})
+
+describe('canMine: an early buy (#411)', () => {
+  const EVERY_RIG = GATE_ROWS.rigs.map((rig) => rig.id)
+
+  it('keeps a tip-locked dense cell shut with every extractor bought: the tip still keys it', () => {
+    const { session, fixture } = gatedOn(7, 'dense')
+    setTipMajor(session, fixture.entry.tier)
+    grantItems(session, EVERY_RIG)
+    expect(canMine(queryOf(session, fixture))?.outcome).toBe('refused')
+  })
+
+  it('keeps a sealed shell and a drill-gated signature shut with every extractor bought', () => {
+    const shell = gatedOn(7, 'dynamite')
+    grantItems(shell.session, EVERY_RIG)
+    expect(canMine(queryOf(shell.session, shell.fixture))?.outcome).toBe('refused')
+    const signature = gatedOn(4, 'drillSignature')
+    setTipMajor(signature.session, signature.fixture.entry.tier)
+    grantItems(signature.session, EVERY_RIG)
+    expect(canMine(queryOf(signature.session, signature.fixture))?.outcome).toBe('blocked')
   })
 })

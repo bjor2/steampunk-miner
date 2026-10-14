@@ -4,7 +4,6 @@ import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { createAuthorityState } from '../../systems/authority/authorityState'
 import { createBotSession } from '../../systems/bot/botSession'
 import { botPurchases } from '../../systems/registries/botPurchases'
-import { listBuyableRefs } from '../../systems/registries/buyableRefs'
 import { contentIconIds, contentOf, type ContentIconUse } from '../../systems/registries/content'
 import { itemDescriptionEntryOf } from '../../systems/registries/itemDescriptionEntries'
 import { isVehicleItemId } from '../../systems/registries/vehicleLoadout'
@@ -19,8 +18,9 @@ import { techNodeOf, terrainItemOf } from './systems/terrainItems'
 // (spec #258 Q4) and released the vision-row pin: the effect builds may now register the family,
 // and it shows from P25. Ticket 300 registers the two nodes, rooted at the beacon's, which stays
 // the attract member exactly as #202 ships it. Ticket 284 registers the repulsor coil's item,
-// power-up and card: a registered row is no trace before its node's planet, where the tree opens
-// it, while the store and the bot are asked on the planet itself.
+// power-up and card: a registered row is no trace before its node's planet. Since #411 the price
+// is the only gate, so the tree and the store offer a magnet on any planet at its P25+ anchor's
+// price; what stays planet-bound is the anchor itself and the pacing bot's schedule.
 
 const PLAYER = 'p1'
 
@@ -102,7 +102,6 @@ function familyTracesThrough(lastPlanet: number): unknown[] {
     ...contentOf('power-up').filter(isShownRow),
     ...contentOf('tech-node').filter(isNodeOnOrBefore(lastPlanet)).filter(mentionsTheFamily),
     ...contentIconIds().filter(isIconShownBy(lastPlanet)).filter(mentionsTheFamily),
-    ...listBuyableRefs(lastPlanet).filter(mentionsTheFamily),
     ...refs.map(itemDescriptionEntryOf).filter((entry) => entry !== null),
     ...payloads.filter(mentionsTheFamily),
   ]
@@ -118,7 +117,7 @@ const SHIPPED_PROBE: SliceDefinition = {
 }
 
 describe('terrain magnets guard', () => {
-  it('no magnet item, node or icon appears before P25', () => {
+  it('no magnet item, node or icon is anchored before P25, and the bot buys none there', () => {
     expect(MAGNET_ITEMS.filter((item) => item.node.unlockTier < FAMILY_ENTRY_PLANET)).toEqual([])
     expect(familyTracesThrough(FAMILY_ENTRY_PLANET - 1)).toEqual([])
   })

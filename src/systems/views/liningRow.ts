@@ -1,7 +1,7 @@
 /**
  * The Upgrade bay's Lining row (#113 design: the type is a choice on top of the grade): shown on
- * a planet whose lining type is offered (refractory from planet 8) or once the vehicle owns it,
- * and nothing before (#90 vision stub rule). It names the active type; before the unlock its button
+ * every planet once a lining type's row ships (refractory, priced at planet 8: the price is the
+ * only gate, #411) or the vehicle owns one, and nothing for a vision row (#90 vision stub rule). It names the active type; before the unlock its button
  * unlocks the type at its price, after it the button switches the rings laid from now on to the
  * other type, for free.
  */
@@ -59,7 +59,7 @@ export function liningRowOf(state: AuthorityState, playerId: string): LiningRow 
   const lining = liningOf(state, playerId)
   const button = liningButtonOf(state, playerId, lining, offered)
   const isOwned = isLiningTypeOwned(lining, offered)
-  const cost = amountReading(isOwned ? ZERO_MONEY : liningPriceOf(state, offered))
+  const cost = amountReading(isOwned ? ZERO_MONEY : liningPriceOf(offered))
   return {
     iconId: REFRACTORY_LINING_ICON_ID,
     label: 'Lining',

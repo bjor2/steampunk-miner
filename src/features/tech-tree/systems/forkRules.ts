@@ -2,10 +2,10 @@
  * Choosing and re-choosing a lane's P16 fork (GD lock on #255, ticket 259).
  *
  * - **Choice** (`choose_fork`): the lane's first branch, researched like any capability: the same
- *   tier, discovery, prerequisite, owned-item and lab gates, at the branch node's `nodeCost`.
+ *   held-feature, prerequisite and owned-item gates, at the branch node's `nodeCost`.
  * - **Re-choice** (`rechoose_fork`): only at the platform (docked at either bay). The price is one
- *   Mark step: the active branch's next Mark, priced by `nodeCost` (`bandOrePriceAt`) on the planet
- *   the session is on, so it scales and never goes stale. Nothing is refunded and nothing is taken
+ *   Mark step: the active branch's next Mark, priced by `nodeCost` (`bandOrePriceAt`) at that
+ *   Mark's anchor, so it grows with the branch and reads no planet (#411). Nothing is refunded and nothing is taken
  *   back: the old branch stays researched but inactive. The new branch opens with the old one's
  *   Mark, up to its own last Mark; a branch held before keeps its own higher Marks. No unlock tier
  *   or schedule row moves.
@@ -72,7 +72,7 @@ export function chooseForkRefusalOf(
   if (fork === null) return 'unknown_branch'
   if (activeBranchOf(forkChoicesOf(state, playerId), fork.lane) !== null) return 'already_chosen'
   const gate = researchGateRefusalOf(state, playerId, fork.node)
-  return gate ?? walletRefusalOf(state, playerId, forkChoiceCostOf(state, fork))
+  return gate ?? walletRefusalOf(state, playerId, forkChoiceCostOf(fork))
 }
 
 /** Why `rechoose_fork` would be refused now; null when it would switch the lane to `branch`. */
@@ -93,9 +93,9 @@ export function rechooseForkRefusalOf(
   return gate ?? walletRefusalOf(state, playerId, forkRechoiceOf(state, playerId, fork, tree).cost)
 }
 
-/** The first choice's price: the branch node bought on the planet the session is on. */
-export function forkChoiceCostOf(state: AuthorityState, fork: ForkBranchNode): Money {
-  return nodeCost(fork.node, state.planet.index)
+/** The first choice's price: the branch node's, the same on every planet. */
+export function forkChoiceCostOf(fork: ForkBranchNode): Money {
+  return nodeCost(fork.node)
 }
 
 /** The re-choice to `to`, which must be the other branch of a lane that has chosen. */
@@ -109,7 +109,7 @@ export function forkRechoiceOf(
   const mark = branchMarkOf(state, playerId, from, tree)
   return {
     from,
-    cost: nextMarkPriceOf(state, tree, from, mark),
+    cost: nextMarkPriceOf(tree, from, mark),
     openedNodeIds: [to.node.id, ...carriedMarkIdsOf(markBearerOfBranch(tree, to), mark)],
   }
 }
@@ -123,7 +123,7 @@ export function forkRechoicePriceOf(
 ): Money | null {
   const active = activeForkBranchNodeOf(tree, forkChoicesOf(state, playerId), lane)
   if (active === null) return null
-  return nextMarkPriceOf(state, tree, active, branchMarkOf(state, playerId, active, tree))
+  return nextMarkPriceOf(tree, active, branchMarkOf(state, playerId, active, tree))
 }
 
 /** The researched Mark of the branch's item, active or not: 1 for the capability alone. */
@@ -152,14 +152,9 @@ function walletRefusalOf(state: AuthorityState, playerId: string, cost: Money): 
   return cmp(state.players[playerId].wallet, cost) >= 0 ? null : 'money_short'
 }
 
-/** One Mark step: the branch's Mark after `mark`, bought on the planet the session is on. */
-function nextMarkPriceOf(
-  state: AuthorityState,
-  tree: TechTree,
-  fork: ForkBranchNode,
-  mark: number,
-): Money {
-  return nodeCost(markNodeOf(markBearerOfBranch(tree, fork), mark + 1), state.planet.index)
+/** One Mark step: the price of the branch's Mark after `mark`. */
+function nextMarkPriceOf(tree: TechTree, fork: ForkBranchNode, mark: number): Money {
+  return nodeCost(markNodeOf(markBearerOfBranch(tree, fork), mark + 1))
 }
 
 function markBearerOfBranch(tree: TechTree, fork: ForkBranchNode): MarkBearer {
