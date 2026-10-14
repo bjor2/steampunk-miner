@@ -322,8 +322,8 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   dry run accepts it, the slots taking turns once a second (`magnetHand.test.ts`). Gated on the
   median of the per-seed ratios: time to core at least 0.98x the bare run, income per minute at
   most +15% (`magnets.incomeCapBp`), and both members act on every seed. A fast family's first
-  lever is the magnets' energy draw, never ore price. The family's one #212 row is
-  `magnetFamilySpendRowsOf` (`terrain-tools/systems/magnetSpend.ts`), for the spend guard to read.
+  lever is the magnets' energy draw, never ore price. The family's one #212 row is the registered
+  spend family `terrain-tools.terrain_magnets` (ticket 370), which `balance:tree` prints.
 - **Tech-tree spend guard** (spec #161 acceptance 6, ticket 212): `npm run balance:tree` runs the
   lane `features/tech-tree/treeSpendGuard.lane.test.ts`. The bot plays the bot scenario to planet
   60's core on each pacing seed, headless and keeping only its spend records, so the guard sees
@@ -334,7 +334,12 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   is not judged. It fails on a planet outside its band and on a seed short of planet 60's core,
   and prints each seed's share beside the median. The rule is `systems/treeSpendGuard.ts`, with its
   spec. A miss is a balance finding; the levers are #161's, in order: `kMark` 4 to 3, items 15 to
-  12 u, `kCapability` 12 to 10, then (endless only) M = 6 from P41.
+  12 u, `kCapability` 12 to 10, then (endless only) M = 6 from P41. Beside it, report-only, each
+  spend family's median share per planet from the kernel `spendFamilies` registry
+  (`systems/familySpendShares.ts`): `terrain-tools.terrain_magnets` and the kernel gun mount
+  `kernel.buy_gun`, which joins the gated numerator in #371. A family counts on a seed only when
+  that run ended with its anchor row unlocked. Only the tree total is gated (GD ruling Q4); the 15%
+  income cap per minute is #385's check, not this lane's.
 - **Money to planet 200** (#316 TD scope f, TD pin on #123, ticket 340): `npm run balance:money-p200`
   runs the lane `logging/moneyPastP200.lane.test.ts`. The bot plays the bot scenario on the first
   pacing seed to planet 200's core (prices near 1e104), headless, keeping no run log
