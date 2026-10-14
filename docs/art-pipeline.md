@@ -497,6 +497,16 @@ nothing exports, lists or registers it yet. The wiring (#315) gives it the TD's 
   modules' `bore.*` mounts go.
 - `scripts/art/author_bore_gun.py` wrote the first version of the `.blend`. From then on it is
   the source. The review renders are in [docs/art/bore-gun/](art/bore-gun/README.md).
+## Armoury module mounts
+
+The art half of [#321](https://github.com/bjor2/steampunk-miner/issues/321), built by
+[#364](https://github.com/bjor2/steampunk-miner/issues/364): a Blender source for each of the 16
+modules of the two Armoury lanes (#310), `art/blender/vehicle-item-weapon-<module>/`, each with
+a `gilded-plate` part for Mastered. They are sources only: not in the manifest, not registered and
+not exported. The attach points on #362's bore gun and the auto guns' turret, the placeholder
+sidecars and the piece that draws them come with the #321 wiring. `docs/art/armoury/author_armoury.py`
+wrote the first version of every `.blend`; from then on the `.blend` files are the sources. The
+module table and the review renders are in [docs/art/armoury/](art/armoury/README.md).
 
 ## The `parts.json` sidecar, schema 1
 

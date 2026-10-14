@@ -1,0 +1,124 @@
+{
+  "about": "The armoury module mounts (ticket 364, art half of #321): one Blender asset per #310 module, grouped by Content's mount (#310 node table). The mount names are review groups, not attach-point ids: those are the TD's and come with the wiring (#321, #314, #250, #235). Each asset's origin is where its mount will sit; the mount positions place it on the review stand-ins only.",
+  "boreGun": {
+    "standIn": "a stand-in bore gun body for the review renders only; the real mount is #362's",
+    "mounts": {
+      "bore.sight": [0.02, 0.042],
+      "bore.breech": [-0.11, 0.0],
+      "bore.barrel": [-0.04, 0.0],
+      "bore.muzzle": [0.5, 0.0],
+      "bore.magazine": [-0.05, -0.05]
+    }
+  },
+  "turret": {
+    "standIn": "vehicle-auto-guns at look 3, its trunnion at the origin of the review stage",
+    "mounts": {
+      "turret.sight": [0.0, 0.09],
+      "turret.cam": [0.12, -0.02],
+      "turret.barrel": [-0.4, 0.0],
+      "turret.breech": [-0.14, 0.0],
+      "turret.magazine": [-0.08, -0.14],
+      "turret.cradle": [0.1, 0.08],
+      "turret.boiler": [0.19, -0.06],
+      "turret.hopper": [-0.22, 0.05]
+    }
+  },
+  "modules": [
+    {
+      "itemId": "weapon.gimbal_sight",
+      "assetId": "vehicle-item-weapon-gimbal-sight",
+      "mount": "bore.sight",
+      "parts": ["gilded-plate", "sight-gimbal", "sight-scope"]
+    },
+    {
+      "itemId": "weapon.steam_sear",
+      "assetId": "vehicle-item-weapon-steam-sear",
+      "mount": "bore.breech",
+      "parts": ["gilded-plate", "sear-block", "sear-lever"]
+    },
+    {
+      "itemId": "weapon.long_barrel",
+      "assetId": "vehicle-item-weapon-long-barrel",
+      "mount": "bore.barrel",
+      "parts": ["barrel-sleeve", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.rifled_bore",
+      "assetId": "vehicle-item-weapon-rifled-bore",
+      "mount": "bore.barrel",
+      "parts": ["gilded-plate", "rifled-jacket"]
+    },
+    {
+      "itemId": "weapon.splay_choke",
+      "assetId": "vehicle-item-weapon-splay-choke",
+      "mount": "bore.muzzle",
+      "parts": ["gilded-plate", "splay-choke"]
+    },
+    {
+      "itemId": "weapon.earthing_spike",
+      "assetId": "vehicle-item-weapon-earthing-spike",
+      "mount": "bore.muzzle",
+      "parts": ["earthing-spike", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.cementing_round",
+      "assetId": "vehicle-item-weapon-cementing-round",
+      "mount": "bore.magazine",
+      "parts": ["cement-magazine", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.strut_bore",
+      "assetId": "vehicle-item-weapon-strut-bore",
+      "mount": "bore.magazine",
+      "parts": ["gilded-plate", "strut-rack"]
+    },
+    {
+      "itemId": "weapon.fire_director",
+      "assetId": "vehicle-item-weapon-fire-director",
+      "mount": "turret.sight",
+      "parts": ["director-box", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.sentry_cam",
+      "assetId": "vehicle-item-weapon-sentry-cam",
+      "mount": "turret.cam",
+      "parts": ["cam-follower", "cam-wheel", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.extended_barrels",
+      "assetId": "vehicle-item-weapon-extended-barrels",
+      "mount": "turret.barrel",
+      "parts": ["barrel-extension", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.grapeshot_breech",
+      "assetId": "vehicle-item-weapon-grapeshot-breech",
+      "mount": "turret.breech",
+      "parts": ["gilded-plate", "grapeshot-breech"]
+    },
+    {
+      "itemId": "weapon.concussion_shells",
+      "assetId": "vehicle-item-weapon-concussion-shells",
+      "mount": "turret.magazine",
+      "parts": ["concussion-box", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.flushing_shell",
+      "assetId": "vehicle-item-weapon-flushing-shell",
+      "mount": "turret.cradle",
+      "parts": ["flushing-cradle", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.overpressure_burst",
+      "assetId": "vehicle-item-weapon-overpressure-burst",
+      "mount": "turret.boiler",
+      "parts": ["gilded-plate", "overpressure-tank"]
+    },
+    {
+      "itemId": "weapon.ricochet_shot",
+      "assetId": "vehicle-item-weapon-ricochet-shot",
+      "mount": "turret.hopper",
+      "parts": ["gilded-plate", "ricochet-hopper"]
+    }
+  ]
+}
