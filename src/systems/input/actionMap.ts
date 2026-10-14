@@ -1,17 +1,20 @@
 /**
- * The rebindable action map (decision #33 sections 2 and 3, the version 2 table of #40, gamepad
- * ruled out of the slice on #33): the defaults ship as data in `src/data/input/actions.json`, the player's overrides are a
- * sparse `{ actionId: { keyboard } }` map in the local preferences file. Device-agnostic: every
- * rule here speaks of action ids, and a key is only one device's way to press one, so a gamepad
- * table can be added beside `keyboard` later.
+ * The rebindable action map (decision #33 sections 2 and 3, the version 2 table of #40): the
+ * defaults ship as data in `src/data/input/actions.json`, the player's overrides are a sparse
+ * `{ actionId: { keyboard?, gamepad? } }` map in the local preferences file. Device-agnostic:
+ * every rule here speaks of action ids, and a key or a pad button (ticket 346, beside `keyboard`
+ * as #33 left room for) is only one device's way to press one. The pad table is optional in an
+ * override, so a version 2 file written before it reads unchanged and `inputMapVersion` stays 2.
  *
  * Overrides are refused, never trimmed (the #11 rule): the whole override is checked, every
- * problem is listed, and any problem leaves the defaults in force. A reserved key (`Escape`)
- * cannot be bound by an override, and an action that has it by default keeps it, so Escape always
- * closes the top layer.
+ * problem is listed, and any problem leaves the defaults in force. A reserved code (`Escape`, and
+ * the pad's `PadStart`) cannot be bound by an override, and an action that has it by default
+ * keeps it, so Escape and Start always close the top layer.
  */
 import SHIPPED_ACTION_MAP from '../../data/input/actions.json'
-import { isKnownKeyChord, keyLabelOf } from './keyCodes'
+import { BINDING_DEVICES, deviceBindingProblems, type BindingField } from './bindingDevices'
+import { keyLabelOf } from './keyCodes'
+import { padLabelOf } from './padCodes'
 
 export const INPUT_CONTEXTS = ['vehicle', 'platform', 'artefact', 'settings', 'screen'] as const
 
@@ -68,6 +71,8 @@ export interface ActionDef {
   contexts: readonly InputContext[]
   kind: ActionKind
   keyboard: readonly string[]
+  /** Pad codes and `PadLB+` chords (`padCodes.ts`), ticket 346. */
+  gamepad: readonly string[]
 }
 
 export interface ActionMap {
@@ -76,24 +81,25 @@ export interface ActionMap {
   actions: readonly ActionDef[]
 }
 
-/** The keyboard chords in force for each action. */
+/** One device's chords in force for each action: the keys, or the pad's buttons. */
 export type Bindings = Readonly<Record<ActionId, readonly string[]>>
 
-export interface ActionOverride {
-  keyboard?: readonly string[]
-}
+export type ActionOverride = Partial<Record<BindingField, readonly string[]>>
 
 /** The player's sparse rebinding (#33 section 3), as the preferences file holds it. */
 export type BindingOverrides = Readonly<Partial<Record<ActionId, ActionOverride>>>
 
 export interface BindingsOutcome {
   bindings: Bindings
+  padBindings: Bindings
   /** Empty when the overrides are in force; otherwise every problem, and the defaults rule. */
   problems: string[]
 }
 
 /** 2 since #40: `W` lifts, `Space` docks, `aim_up` and the panel jumps are gone. */
 export const INPUT_MAP_VERSION = 2
+
+const BINDING_FIELDS: readonly BindingField[] = BINDING_DEVICES.map((device) => device.field)
 
 export const ACTION_MAP: ActionMap = loadShippedActionMap()
 
@@ -113,15 +119,26 @@ export function actionMapProblems(raw: unknown): string[] {
   ]
 }
 
+/** The keys each action has in the map. */
 export function defaultBindings(map: ActionMap): Bindings {
-  return Object.fromEntries(map.actions.map((action) => [action.id, action.keyboard])) as Bindings
+  return bindingsOfField(map.actions, 'keyboard')
+}
+
+/** The pad chords each action has in the map. */
+export function defaultPadBindings(map: ActionMap): Bindings {
+  return bindingsOfField(map.actions, 'gamepad')
 }
 
 /** The bindings an override gives, or the defaults and every problem when it is refused. */
 export function bindingsWithOverrides(map: ActionMap, overrides: unknown): BindingsOutcome {
   const problems = overrideProblems(map, overrides)
-  if (problems.length > 0) return { bindings: defaultBindings(map), problems }
-  return { bindings: mergedBindings(map, overrides as BindingOverrides), problems: [] }
+  const actions =
+    problems.length > 0 ? map.actions : withOverrides(map, overrides as BindingOverrides)
+  return {
+    bindings: bindingsOfField(actions, 'keyboard'),
+    padBindings: bindingsOfField(actions, 'gamepad'),
+    problems,
+  }
 }
 
 /** Every problem with an override: its shape, its ids and keys, then the bindings it would give. */
@@ -152,6 +169,12 @@ export function boundLabel(bindings: Bindings, actionId: ActionId): string {
   return first === undefined ? 'unbound' : keyLabelOf(first)
 }
 
+/** The first pad chord bound to an action, as the player reads it. */
+export function boundPadLabel(padBindings: Bindings, actionId: ActionId): string {
+  const first = padBindings[actionId][0]
+  return first === undefined ? 'unbound' : padLabelOf(first)
+}
+
 export function actionDefOf(map: ActionMap, actionId: ActionId): ActionDef {
   const action = map.actions.find((candidate) => candidate.id === actionId)
   if (action === undefined) throw new Error(`the action map has no ${actionId}`)
@@ -168,69 +191,59 @@ function loadShippedActionMap(): ActionMap {
   return SHIPPED_ACTION_MAP as unknown as ActionMap
 }
 
-function mergedBindings(map: ActionMap, overrides: BindingOverrides): Bindings {
-  return defaultBindings({ ...map, actions: withOverrides(map, overrides) })
+function bindingsOfField(actions: readonly ActionDef[], field: BindingField): Bindings {
+  return Object.fromEntries(actions.map((action) => [action.id, action[field]])) as Bindings
 }
 
 function withOverrides(map: ActionMap, overrides: BindingOverrides): ActionDef[] {
   return map.actions.map((action) => {
-    const keyboard = overrides[action.id]?.keyboard
-    if (keyboard === undefined) return action
-    return { ...action, keyboard: [...keyboard, ...reservedKeysOf(map, action)] }
+    const override = overrides[action.id]
+    if (override === undefined) return action
+    return { ...action, ...overriddenFields(map, action, override) }
   })
 }
 
-function reservedKeysOf(map: ActionMap, action: ActionDef): string[] {
-  return action.keyboard.filter((chord) => map.reservedKeys.includes(chord))
+/** Each device the override names gets its chords, plus the reserved ones the action had. */
+function overriddenFields(map: ActionMap, action: ActionDef, override: ActionOverride) {
+  return Object.fromEntries(
+    BINDING_DEVICES.filter(({ field }) => override[field] !== undefined).map(({ field }) => [
+      field,
+      [...(override[field] ?? []), ...reservedCodesOf(map, action[field])],
+    ]),
+  )
 }
 
-/** Unknown keys, an empty action, and the same key on two actions live in one context. */
+function reservedCodesOf(map: ActionMap, chords: readonly string[]): string[] {
+  return chords.filter((chord) => map.reservedKeys.includes(chord))
+}
+
+/** Every device's unknown codes, empty actions and same-context duplicates, keys first. */
 function bindingProblems(map: ActionMap): string[] {
-  return [
-    ...map.actions.flatMap((action) => unknownKeyProblems(action.id, action.keyboard)),
-    ...map.actions
-      .filter((action) => action.keyboard.length === 0)
-      .map((action) => `${action.id} has no key bound`),
-    ...INPUT_CONTEXTS.flatMap((context) => duplicateKeyProblems(map, context)),
-  ]
-}
-
-function unknownKeyProblems(actionId: string, keys: readonly unknown[]): string[] {
-  return keys
-    .filter((key) => !isKnownKeyChord(key))
-    .map((key) => `${actionId}: ${JSON.stringify(key)} is not a known key code`)
-}
-
-function duplicateKeyProblems(map: ActionMap, context: InputContext): string[] {
-  const ownerOfKey = new Map<string, string>()
-  const problems: string[] = []
-  for (const action of map.actions.filter((candidate) => candidate.contexts.includes(context))) {
-    for (const key of new Set(action.keyboard)) {
-      const owner = ownerOfKey.get(key)
-      if (owner !== undefined) problems.push(duplicateKeyProblem(key, owner, action.id, context))
-      else ownerOfKey.set(key, action.id)
-    }
-  }
-  return problems
-}
-
-function duplicateKeyProblem(key: string, first: string, second: string, context: string): string {
-  return `${key} is bound to both ${first} and ${second} in the ${context} context`
+  return BINDING_DEVICES.flatMap((device) =>
+    deviceBindingProblems(map.actions, INPUT_CONTEXTS, device),
+  )
 }
 
 function overrideEntryProblems(map: ActionMap, id: string, override: unknown): string[] {
   if (!isActionId(id)) return [`${JSON.stringify(id)} is not an action id`]
-  if (!isRecord(override) || !isStringList(override.keyboard ?? [])) {
-    return [`${id}: an override is { keyboard: [key codes] }`]
+  if (
+    !isRecord(override) ||
+    !BINDING_FIELDS.every((field) => isStringList(override[field] ?? []))
+  ) {
+    return [`${id}: an override is { keyboard?: [key codes], gamepad?: [pad codes] }`]
   }
-  const extraFields = Object.keys(override).filter((field) => field !== 'keyboard')
-  const keyboard = (override.keyboard ?? []) as readonly string[]
+  const extraFields = Object.keys(override).filter((field) => !isBindingField(field))
+  const chords = BINDING_FIELDS.flatMap((field) => (override[field] ?? []) as readonly string[])
   return [
     ...extraFields.map((field) => `${id}: unknown override field ${JSON.stringify(field)}`),
-    ...keyboard
-      .filter((key) => map.reservedKeys.includes(key))
-      .map((key) => `${id}: ${key} is reserved and cannot be rebound`),
+    ...chords
+      .filter((chord) => map.reservedKeys.includes(chord))
+      .map((chord) => `${id}: ${chord} is reserved and cannot be rebound`),
   ]
+}
+
+function isBindingField(field: string): boolean {
+  return (BINDING_FIELDS as readonly string[]).includes(field)
 }
 
 function actionDefProblems(action: unknown, path: string): string[] {
@@ -245,6 +258,7 @@ function actionDefProblems(action: unknown, path: string): string[] {
       ? []
       : [`${path}.kind must be hold or press`]),
     ...(isStringList(action.keyboard) ? [] : [`${path}.keyboard must be a list of key codes`]),
+    ...(isStringList(action.gamepad) ? [] : [`${path}.gamepad must be a list of pad codes`]),
   ]
 }
 

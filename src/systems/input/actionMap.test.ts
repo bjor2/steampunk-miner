@@ -7,8 +7,12 @@ import {
   actionsOfChord,
   bindingsWithOverrides,
   boundLabel,
+  boundPadLabel,
   defaultBindings,
+  defaultPadBindings,
+  INPUT_CONTEXTS,
 } from './actionMap'
+import { padChordOf } from './padCodes'
 
 describe('action map', () => {
   it('ships an actions.json with zero problems', () => {
@@ -154,6 +158,99 @@ describe('rebinding', () => {
   it('refuses an override that is not an object of action ids', () => {
     expect(bindingsWithOverrides(ACTION_MAP, ['KeyA']).problems).toEqual([
       'binding overrides must be an object of action ids',
+    ])
+  })
+})
+
+describe('pad bindings', () => {
+  it('reaches every action from the pad (ticket 346)', () => {
+    const padBindings = defaultPadBindings(ACTION_MAP)
+    for (const id of ACTION_IDS) expect(padBindings[id].length, id).toBeGreaterThan(0)
+  })
+
+  it("toggles the bore gun's auto mode with the right-stick click (#317)", () => {
+    const padBindings = defaultPadBindings(ACTION_MAP)
+    expect(actionsOfChord(ACTION_MAP, padBindings, 'vehicle', 'PadRS')).toEqual([
+      'toggle_auto_fire',
+    ])
+  })
+
+  it('drives with the left stick and moves menu focus with it or the d-pad', () => {
+    const padBindings = defaultPadBindings(ACTION_MAP)
+    expect(actionsOfChord(ACTION_MAP, padBindings, 'vehicle', 'PadLStickUp')).toEqual(['lift'])
+    expect(actionsOfChord(ACTION_MAP, padBindings, 'platform', 'PadLStickUp')).toEqual(['ui_up'])
+    expect(actionsOfChord(ACTION_MAP, padBindings, 'settings', 'PadUp')).toEqual(['ui_up'])
+  })
+
+  it('reaches the zoom steps through the LB chord, and the d-pad alone uses a slot', () => {
+    const padBindings = defaultPadBindings(ACTION_MAP)
+    const zoomIn = padChordOf('PadUp', true)
+    expect(actionsOfChord(ACTION_MAP, padBindings, 'vehicle', zoomIn)).toEqual(['zoom_in'])
+    expect(actionsOfChord(ACTION_MAP, padBindings, 'vehicle', 'PadUp')).toEqual(['use_slot_1'])
+  })
+
+  it('closes every menu layer with B or Start, and Start opens settings while driving', () => {
+    const padBindings = defaultPadBindings(ACTION_MAP)
+    for (const context of INPUT_CONTEXTS.filter((layer) => layer !== 'vehicle')) {
+      expect(actionsOfChord(ACTION_MAP, padBindings, context, 'PadStart')).toEqual(['ui_cancel'])
+    }
+    expect(actionsOfChord(ACTION_MAP, padBindings, 'vehicle', 'PadStart')).toEqual([
+      'open_settings',
+    ])
+  })
+
+  it('labels an action with the pad chord bound to it', () => {
+    const padBindings = defaultPadBindings(ACTION_MAP)
+    expect(boundPadLabel(padBindings, 'interact')).toBe('A')
+    expect(boundPadLabel(padBindings, 'toggle_auto_fire')).toBe('R-stick click')
+    expect(boundPadLabel(padBindings, 'zoom_in')).toBe('LB+D-pad up')
+  })
+})
+
+describe('pad rebinding', () => {
+  it('rebinds the pad alone and leaves the keys as they were', () => {
+    const outcome = bindingsWithOverrides(ACTION_MAP, { interact: { gamepad: ['PadY'] } })
+    expect(outcome.problems).toEqual([
+      'PadY is bound to both interact and request_rescue in the vehicle context',
+    ])
+    const rebound = bindingsWithOverrides(ACTION_MAP, {
+      interact: { gamepad: ['PadY'] },
+      request_rescue: { gamepad: ['PadA'] },
+    })
+    expect(rebound.problems).toEqual([])
+    expect(rebound.padBindings.interact).toEqual(['PadY'])
+    expect(rebound.bindings.interact).toEqual(['Space', 'KeyE'])
+  })
+
+  it('rebinds the keys alone and leaves the pad as it was', () => {
+    const outcome = bindingsWithOverrides(ACTION_MAP, { aim_left: { keyboard: ['KeyJ'] } })
+    expect(outcome.padBindings).toEqual(defaultPadBindings(ACTION_MAP))
+  })
+
+  it('keeps Start on the actions that close a layer when their pad binding is rebound', () => {
+    const { padBindings } = bindingsWithOverrides(ACTION_MAP, { ui_cancel: { gamepad: ['PadY'] } })
+    expect(padBindings.ui_cancel).toEqual(['PadY', 'PadStart'])
+  })
+
+  it('refuses unknown pad codes, Start, an empty pad binding and an unknown field, listing each', () => {
+    const outcome = bindingsWithOverrides(ACTION_MAP, {
+      aim_left: { gamepad: ['PadNope'] },
+      lift: { gamepad: [] },
+      zoom_reset: { gamepad: ['PadStart'] },
+      zoom_out: { mouse: ['MouseLeft'] },
+    })
+    expect(outcome.padBindings).toEqual(defaultPadBindings(ACTION_MAP))
+    expect(outcome.problems).toEqual([
+      'zoom_reset: PadStart is reserved and cannot be rebound',
+      'zoom_out: unknown override field "mouse"',
+    ])
+    const sound = bindingsWithOverrides(ACTION_MAP, {
+      aim_left: { gamepad: ['PadNope'] },
+      lift: { gamepad: [] },
+    })
+    expect(sound.problems).toEqual([
+      'aim_left: "PadNope" is not a known pad code',
+      'lift has no pad button bound',
     ])
   })
 })

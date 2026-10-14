@@ -1,203 +1,231 @@
 {
   "inputMapVersion": 2,
   "contexts": ["vehicle", "platform", "artefact", "settings", "screen"],
-  "reservedKeys": ["Escape"],
+  "reservedKeys": ["Escape", "PadStart"],
   "actions": [
     {
       "id": "aim_left",
       "displayName": "Drive left",
       "contexts": ["vehicle"],
       "kind": "hold",
-      "keyboard": ["KeyA", "ArrowLeft"]
+      "keyboard": ["KeyA", "ArrowLeft"],
+      "gamepad": ["PadLStickLeft"]
     },
     {
       "id": "aim_right",
       "displayName": "Drive right",
       "contexts": ["vehicle"],
       "kind": "hold",
-      "keyboard": ["KeyD", "ArrowRight"]
+      "keyboard": ["KeyD", "ArrowRight"],
+      "gamepad": ["PadLStickRight"]
     },
     {
       "id": "aim_down",
       "displayName": "Drill down",
       "contexts": ["vehicle"],
       "kind": "hold",
-      "keyboard": ["KeyS", "ArrowDown"]
+      "keyboard": ["KeyS", "ArrowDown"],
+      "gamepad": ["PadLStickDown"]
     },
     {
       "id": "lift",
       "displayName": "Lift",
       "contexts": ["vehicle"],
       "kind": "hold",
-      "keyboard": ["KeyW", "ArrowUp"]
+      "keyboard": ["KeyW", "ArrowUp"],
+      "gamepad": ["PadLStickUp"]
     },
     {
       "id": "interact",
       "displayName": "Dock",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Space", "KeyE"]
+      "keyboard": ["Space", "KeyE"],
+      "gamepad": ["PadA"]
     },
     {
       "id": "quick_service",
       "displayName": "Sell, repair and recharge",
       "contexts": ["platform"],
       "kind": "press",
-      "keyboard": ["KeyQ"]
+      "keyboard": ["KeyQ"],
+      "gamepad": ["PadX"]
     },
     {
       "id": "request_rescue",
       "displayName": "Call the tow",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyR"]
+      "keyboard": ["KeyR"],
+      "gamepad": ["PadY"]
     },
     {
       "id": "toggle_guns",
       "displayName": "Guns auto/off",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyG"]
+      "keyboard": ["KeyG"],
+      "gamepad": ["PadBack"]
     },
     {
       "id": "toggle_auto_fire",
       "displayName": "Bore gun auto/off",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyT"]
+      "keyboard": ["KeyT"],
+      "gamepad": ["PadRS"]
     },
     {
       "id": "plant_charge",
       "displayName": "Plant charge",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyB"]
+      "keyboard": ["KeyB"],
+      "gamepad": ["PadB"]
     },
     {
       "id": "next_charge_size",
       "displayName": "Next charge size",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyV"]
+      "keyboard": ["KeyV"],
+      "gamepad": ["PadLB+PadB"]
     },
     {
       "id": "ui_up",
       "displayName": "Focus up",
       "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
-      "keyboard": ["ArrowUp", "KeyW"]
+      "keyboard": ["ArrowUp", "KeyW"],
+      "gamepad": ["PadUp", "PadLStickUp"]
     },
     {
       "id": "ui_down",
       "displayName": "Focus down",
       "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
-      "keyboard": ["ArrowDown", "KeyS"]
+      "keyboard": ["ArrowDown", "KeyS"],
+      "gamepad": ["PadDown", "PadLStickDown"]
     },
     {
       "id": "ui_left",
       "displayName": "Focus left",
       "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
-      "keyboard": ["ArrowLeft", "KeyA"]
+      "keyboard": ["ArrowLeft", "KeyA"],
+      "gamepad": ["PadLeft", "PadLStickLeft"]
     },
     {
       "id": "ui_right",
       "displayName": "Focus right",
       "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
-      "keyboard": ["ArrowRight", "KeyD"]
+      "keyboard": ["ArrowRight", "KeyD"],
+      "gamepad": ["PadRight", "PadLStickRight"]
     },
     {
       "id": "ui_confirm",
       "displayName": "Confirm",
       "contexts": ["platform", "artefact", "settings"],
       "kind": "press",
-      "keyboard": ["Enter", "Space", "KeyE"]
+      "keyboard": ["Enter", "Space", "KeyE"],
+      "gamepad": ["PadA"]
     },
     {
       "id": "ui_cancel",
       "displayName": "Back",
       "contexts": ["platform", "artefact", "settings", "screen"],
       "kind": "press",
-      "keyboard": ["Escape", "Backspace"]
+      "keyboard": ["Escape", "Backspace"],
+      "gamepad": ["PadB", "PadStart"]
     },
     {
       "id": "zoom_in",
       "displayName": "Zoom in",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Equal"]
+      "keyboard": ["Equal"],
+      "gamepad": ["PadLB+PadUp"]
     },
     {
       "id": "zoom_out",
       "displayName": "Zoom out",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Minus"]
+      "keyboard": ["Minus"],
+      "gamepad": ["PadLB+PadDown"]
     },
     {
       "id": "zoom_reset",
       "displayName": "Reset zoom",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Digit0"]
+      "keyboard": ["Digit0"],
+      "gamepad": ["PadLS"]
     },
     {
       "id": "open_settings",
       "displayName": "Settings",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Escape"]
+      "keyboard": ["Escape"],
+      "gamepad": ["PadStart"]
     },
     {
       "id": "use_slot_1",
       "displayName": "Use slot 1",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Digit1"]
+      "keyboard": ["Digit1"],
+      "gamepad": ["PadUp"]
     },
     {
       "id": "use_slot_2",
       "displayName": "Use slot 2",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Digit2"]
+      "keyboard": ["Digit2"],
+      "gamepad": ["PadRight"]
     },
     {
       "id": "use_slot_3",
       "displayName": "Use slot 3",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Digit3"]
+      "keyboard": ["Digit3"],
+      "gamepad": ["PadDown"]
     },
     {
       "id": "use_slot_4",
       "displayName": "Use slot 4",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Digit4"]
+      "keyboard": ["Digit4"],
+      "gamepad": ["PadLeft"]
     },
     {
       "id": "use_slot_5",
       "displayName": "Use slot 5",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["Digit5"]
+      "keyboard": ["Digit5"],
+      "gamepad": ["PadRB"]
     },
     {
       "id": "use_drill_flank",
       "displayName": "Use flank gear",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyF"]
+      "keyboard": ["KeyF"],
+      "gamepad": ["PadX"]
     },
     {
       "id": "use_drill_collar",
       "displayName": "Use collar gear",
       "contexts": ["vehicle"],
       "kind": "press",
-      "keyboard": ["KeyC"]
+      "keyboard": ["KeyC"],
+      "gamepad": ["PadLT"]
     }
   ]
 }
