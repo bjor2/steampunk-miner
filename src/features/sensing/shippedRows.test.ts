@@ -12,6 +12,7 @@ import { powerUpOfItem } from '../power-up-core'
 import { lastMarkOf } from '../tech-tree'
 import { SENSING_ITEMS } from './systems/sensingCatalogue'
 import { HELD_SENSING_ITEM_IDS } from './systems/sensingContent'
+import { SENSING_FORK } from './systems/sensingFork'
 import { markLadderOf } from './systems/sensingItems'
 import { statPreview } from './systems/statPreview'
 
@@ -50,12 +51,13 @@ const cardOf = (itemId: string, level: number, planetIndex: number) =>
   describeItem({ kind: 'vehicle-item', id: itemId }, { playerId: 'p1', planetIndex, level, view })
 
 describe('sensing shipped rows', () => {
-  it('registers six items as vehicle items and power-ups, each with its node, and the fifth cradle', () => {
+  it('registers six items as vehicle items and power-ups, each with its node, the fifth cradle and the fork', () => {
     expect(SHIPPED_IDS.filter((id) => !isVehicleItemId(id))).toEqual([])
     expect(SHIPPED_IDS.filter((id) => powerUpOfItem(id) === null)).toEqual([])
     const cradleNode = 'tech.sensing.cradle_5'
+    const forkNodes = SENSING_FORK.branches.map((branch) => branch.id)
     expect(laneNodeIds().sort()).toEqual(
-      [...SHIPPED.map((item) => item.node.id), cradleNode].sort(),
+      [...SHIPPED.map((item) => item.node.id), cradleNode, ...forkNodes].sort(),
     )
   })
 
@@ -76,9 +78,9 @@ describe('sensing shipped rows', () => {
   })
 
   it('keeps every flavour line to the copy rules: no digits, at most 80 characters, no "rig"', () => {
-    const problems = SHIPPED.flatMap((item) => flavourProblemsOf(item.description))
-    expect(problems).toEqual([])
-    expect(SHIPPED.filter((item) => item.description.length > 80)).toEqual([])
+    const lines = [...SHIPPED, ...SENSING_FORK.branches].map((row) => row.description)
+    expect(lines.flatMap((line) => flavourProblemsOf(line))).toEqual([])
+    expect(lines.filter((line) => line.length > 80)).toEqual([])
   })
 
   it('labels every row horizontal, item and node alike; the cradle is both (#162 "Labels")', () => {

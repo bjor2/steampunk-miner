@@ -12,6 +12,8 @@ export interface RevealCounts {
   periscope: number | null
   lens: number | null
   barometer: number | null
+  /** The Diviner fork branch's warnings; null while it is not the active branch. */
+  diviner: number | null
 }
 
 export function revealCountsOf(view: SensingView): RevealCounts {
@@ -23,6 +25,7 @@ export function revealCountsOf(view: SensingView): RevealCounts {
     periscope: passives.periscope?.length ?? null,
     lens: passives.lens?.length ?? null,
     barometer: passives.barometer?.length ?? null,
+    diviner: passives.diviner?.length ?? null,
   }
 }
 

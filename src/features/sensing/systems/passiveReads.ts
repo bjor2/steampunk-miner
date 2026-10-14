@@ -4,7 +4,9 @@
  * as bought. A passive the player does not own reads null, so its panel draws nothing. The lens's
  * cards are its readings nearest the miner first, up to the cap its overlay cards hold seats with.
  * Inside a magnetic field the reach is cut to the kernel's field share at the vehicle's tile (spec
- * #258, ticket 290). Pure reads of the authority state: reveal only (Vertical Scaler on #157).
+ * #258, ticket 290). The Diviner fork branch (ticket 269) reads with them: its cone's warnings,
+ * while the Diviner is the lane's active branch. Pure reads of the authority state: reveal only
+ * (Vertical Scaler on #157).
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { ownsItem } from '../../../systems/authority/loadoutRules'
@@ -13,6 +15,7 @@ import { tileOfPose } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import { researchedMarkOf } from '../../tech-tree'
 import { assayReadingsOf, type AssayReading } from './assayLens'
+import { divinerReadOf, type DivinerWarning } from './divinerCone'
 import { barometerWarningsOf, type BarometerWarning } from './hazardBarometer'
 import { passiveReachOf } from './passiveReach'
 import { sensingItemOf } from './sensingCatalogue'
@@ -29,15 +32,22 @@ export interface PassiveReads {
   periscope: readonly PeriscopeWarning[] | null
   lens: readonly AssayReading[] | null
   barometer: readonly BarometerWarning[] | null
+  diviner: readonly DivinerWarning[] | null
 }
 
-export const NO_PASSIVE_READS: PassiveReads = { periscope: null, lens: null, barometer: null }
+export const NO_PASSIVE_READS: PassiveReads = {
+  periscope: null,
+  lens: null,
+  barometer: null,
+  diviner: null,
+}
 
 export function passiveReadsOf(state: AuthorityState, playerId: string): PassiveReads {
   return {
     periscope: periscopeOf(state, playerId),
     lens: lensOf(state, playerId),
     barometer: barometerOf(state, playerId),
+    diviner: divinerReadOf(state, playerId)?.warnings ?? null,
   }
 }
 

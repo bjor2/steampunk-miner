@@ -55,5 +55,18 @@
         "lookaheadCells": 5
       }
     }
+  },
+  "forks": {
+    "source": "GD lock on #255 (ticket 269): the sensing fork at P16. Scout pings wide and vague on its own clock while out of the dock, one mark per block of blockTiles square, kept until the dock so the map fills in; its Marks grow the radius. Diviner reads a narrow exact cone ahead of the drill on every cut, kept revealTicks, and warns of a collapse block or an enemy inside it; its Marks grow the cone's length. The cone's half-angle is 15 degrees (tangent 268 per mille), half the Deep Striker's. Starting values for G&V to tune; both branches share one tier and slot, so they cost the same.",
+    "scout": {
+      "radiusTiles": 20,
+      "pingEveryTicks": 600,
+      "blockTiles": 4
+    },
+    "diviner": {
+      "lengthTiles": 8,
+      "halfAngleTanPerMille": 268,
+      "revealTicks": 120
+    }
   }
 }

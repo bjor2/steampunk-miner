@@ -3,4 +3,5 @@ export const SENSING_TEST_IDS = {
   periscope: 'sensing-periscope',
   assayCard: 'sensing-assay-card',
   barometer: 'sensing-barometer',
+  diviner: 'sensing-diviner',
 } as const

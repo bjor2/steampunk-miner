@@ -6,8 +6,10 @@
  * periscope's arrows in the threats slot and the lens's and barometer's overlay cards. Render-only:
  * no section, no command, no log line of its own. The passives' Mark 3 sibling-links (#256) fire
  * at their own moments, a clock step and two reactions that hand power-up-core the moment. The
- * galvanic probe and the void sounder stay held (GD ruling on #203 Q3). No side effects at
- * import; the loader calls `register`.
+ * galvanic probe and the void sounder stay held (GD ruling on #203 Q3). The lane's P16 fork
+ * (ticket 269): the Scout's wide vague pings fill the board on their own clock, the Diviner's
+ * cone reads with each cut and warns on its own overlay chip. No side effects at import; the
+ * loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { sensingDebugActions } from './debug'
@@ -24,11 +26,14 @@ import { SENSING_POWER_UPS } from './systems/sensingPowerUps'
 import { SENSING_SELLER } from './systems/sensingSales'
 import { AssayCards } from './ui/AssayCards'
 import { BarometerChip } from './ui/BarometerChip'
+import { DivinerChip } from './ui/DivinerChip'
 import { PeriscopeArrows } from './ui/PeriscopeArrows'
 
 /** A hazard ahead outranks the mining chips (10); the lens's cards give way to them. */
 const BAROMETER_OVERLAY_PRIORITY = 20
 const LENS_OVERLAY_PRIORITY = 5
+/** The Diviner's warning sits just under the barometer's: both warn of what lies ahead. */
+const DIVINER_OVERLAY_PRIORITY = 19
 
 export const slice: SliceDefinition = {
   id: 'sensing',
@@ -48,6 +53,12 @@ export const slice: SliceDefinition = {
       slot: 'overlay',
       priority: BAROMETER_OVERLAY_PRIORITY,
       Panel: BarometerChip,
+    })
+    r.hudPanel({
+      id: 'sensing.diviner',
+      slot: 'overlay',
+      priority: DIVINER_OVERLAY_PRIORITY,
+      Panel: DivinerChip,
     })
     r.hudPanel({
       id: 'sensing.lens',

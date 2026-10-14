@@ -14,6 +14,7 @@ describe('sensing debug reads', () => {
       periscope: null,
       lens: null,
       barometer: null,
+      diviner: null,
       drawnQuads: null,
     })
   })

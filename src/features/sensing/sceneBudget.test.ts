@@ -26,11 +26,12 @@ describe('sensing scene layer', () => {
     expect(sceneLayersBudget(sceneLayers()).instances).toBeGreaterThan(0)
   })
 
-  it('puts the periscope in the threats slot and the lens and barometer on the overlay', () => {
+  it('puts the periscope in the threats slot and the barometer, Diviner and lens on the overlay', () => {
     withRegistrations([slice], () => {
       expect(hudPanelsOf('threats').map((panel) => panel.id)).toEqual(['sensing.periscope'])
       expect(overlayPanels().map((panel) => panel.id)).toEqual([
         'sensing.barometer',
+        'sensing.diviner',
         'sensing.lens',
       ])
     })
