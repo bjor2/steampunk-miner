@@ -15,18 +15,18 @@
  * it (the sear's `manualWaitTicks`) into its own `nextShotTick`, the one clock (the TD on #313), so
  * auto waits on it; and an auto shot fired in the very tick of a manual one is withdrawn before
  * its first cell opens (`AutoActOverridden`), so the manual bearing is the one bored.
+ *
+ * A shot's shape (ticket 377, the TD lock on #318) is read once, as the shot fires: each of its
+ * lines is a pending bore of its own, fired in the same tick, that shares the shot's one dig budget
+ * and recovery with the others (`boreTick.ts`), and every cell of every line opens through the
+ * same gates. The first-cell energy check reads the aimed line at the gun's own energy share.
  */
 import type { UnlockSchedule } from '../../unlocks/readUnlockSchedule'
 import { LOCKED_SCHEDULE } from '../../unlocks/unlockSchedule'
-import { tileOfPose, type VehiclePose } from '../../vehicle/vehiclePose'
+import type { VehiclePose } from '../../vehicle/vehiclePose'
 import { isVehicleActive, type VehicleState } from '../../vehicle/vehicleState'
 import type { PlanetParams } from '../../world/planetParams'
-import {
-  boreAutoShootOf,
-  boreGunOf,
-  gunRecoveryTicks,
-  type BoreGunStats,
-} from '../../registries/boreGun'
+import { boreAutoShootOf, boreGunOf, type BoreGunStats } from '../../registries/boreGun'
 import { isAutoModeOn } from '../autoMode/autoModeState'
 import type { AuthorityCommand } from '../authorityCommand'
 import { vehicleOf, type AuthorityState } from '../authorityState'
@@ -39,10 +39,12 @@ import {
 } from '../commandRule'
 import { isFeatureUnlockedIn } from '../featureUnlocks'
 import { noPlanetRejection, planetParamsOf } from '../planetOfState'
-import { BORE_BEARING_COUNT, boreDirectionOf, clampedBearing } from './boreAim'
+import { BORE_BEARING_COUNT, clampedBearing } from './boreAim'
 import { openBoreCell, type CellOpening } from './boreCell'
+import { lineOf } from './boreShotLines'
 import { boresOf, withBores, type BoreShot, type PendingBore } from './boreState'
-import { boreCellsFrom } from './boreWalk'
+import { autoAimedBores, pendingBoresOf, shapedShotOf, shotOf, type ShotAsk } from './firedBores'
+import { shotShapeOf } from './shotShape'
 
 /** The schedule row the gun opens with (#309: planet 1, Upgrade lane). */
 export const BORE_GUN_ROW_ID = 'bore_gun'
@@ -64,13 +66,6 @@ export function boreFireRule(schedule: UnlockSchedule): CommandRule<'ground_gun.
 
 export const BORE_FIRE_RULES: { readonly 'ground_gun.fire': CommandRule<'ground_gun.fire'> } = {
   'ground_gun.fire': boreFireRule(LOCKED_SCHEDULE),
-}
-
-/** One shot asked of the gun: by a command, or by auto mode on the clock. */
-export interface ShotAsk {
-  playerId: string
-  tick: number
-  bearing: number
 }
 
 /** Why the gun would not fire this shot now, or null; an auto shot asks it as a command does. */
@@ -98,28 +93,32 @@ function fireManualBore(
   { playerId, tick, payload }: FireCommand,
 ): RuleEffect {
   const overridden = withoutAutoBoreOf(state, playerId, tick)
+  const ask = { playerId, tick, bearing: payload.bearing }
   const stats = boreGunOf(overridden.state, playerId) as BoreGunStats
-  const shot = manualShotOf(overridden.state, playerId, stats)
-  const bore = pendingBoreOf(overridden.state, playerId, payload.bearing, tick, stats, shot)
-  const fired = withFiredBore(overridden.state, bore, payload.bearing, stats)
+  const shape = shotShapeOf(overridden.state, playerId)
+  const shot = shapedShotOf(manualShotOf(overridden.state, playerId, stats), shape)
+  const bores = pendingBoresOf(overridden.state, ask, stats, shot, shape)
+  const fired = withFiredBores(overridden.state, bores, payload.bearing, stats)
   return { state: fired.state, events: [...overridden.events, ...fired.events] }
 }
 
-/** Auto mode's shot along `bearing` (ticket 317): the same fire, marked with its aim. */
+/** Auto mode's shot along `bearing` (ticket 317): the same fire, each line marked with its aim. */
 export function fireAutoBore(state: AuthorityState, ask: ShotAsk): RuleEffect {
   const stats = boreGunOf(state, ask.playerId) as BoreGunStats
-  const bore = pendingBoreOf(state, ask.playerId, ask.bearing, ask.tick, stats, shotOf(stats))
-  return withFiredBore(state, { ...bore, autoAim: ask.bearing }, ask.bearing, stats)
+  const shape = shotShapeOf(state, ask.playerId)
+  const shot = shapedShotOf(shotOf(stats), shape)
+  const bores = pendingBoresOf(state, ask, stats, shot, shape)
+  return withFiredBores(state, autoAimedBores(bores, ask.bearing), ask.bearing, stats)
 }
 
-function withFiredBore(
+function withFiredBores(
   state: AuthorityState,
-  bore: PendingBore,
+  bores: readonly PendingBore[],
   aimed: number,
   stats: BoreGunStats,
 ): RuleEffect {
   return {
-    state: withBores(state, [...boresOf(state), bore]),
+    state: withBores(state, [...boresOf(state), ...bores]),
     events: [
       {
         type: 'BoreFired',
@@ -142,75 +141,29 @@ function manualShotOf(state: AuthorityState, playerId: string, stats: BoreGunSta
   return { ...shot, cooldownTicks: Math.max(shot.cooldownTicks, sear.manualWaitTicks) }
 }
 
-/** The state without the player's auto shot of this tick, with its withdrawal, when there is one. */
+/**
+ * The state without the player's auto shot of this tick, every line of it, with its withdrawal,
+ * when there is one.
+ */
 function withoutAutoBoreOf(state: AuthorityState, playerId: string, tick: number): RuleEffect {
-  const auto = autoBoreFiredAt(state, playerId, tick)
-  if (auto === null) return { state, events: [] }
+  const auto = autoBoresFiredAt(state, playerId, tick)
+  if (auto.length === 0) return { state, events: [] }
   return {
     state: withBores(
       state,
-      boresOf(state).filter((bore) => bore !== auto),
+      boresOf(state).filter((bore) => !auto.includes(bore)),
     ),
     events: [
-      { type: 'AutoActOverridden', itemId: STEAM_SEAR_ITEM_ID, aim: auto.autoAim as number },
+      { type: 'AutoActOverridden', itemId: STEAM_SEAR_ITEM_ID, aim: auto[0].autoAim as number },
     ],
   }
 }
 
 /** An auto shot fired at `tick` has opened nothing yet: its first cell is due a tick later at least. */
-function autoBoreFiredAt(
-  state: AuthorityState,
-  playerId: string,
-  tick: number,
-): PendingBore | null {
-  return (
-    boresOf(state).find(
-      (bore) => bore.playerId === playerId && bore.autoAim !== undefined && bore.firedTick === tick,
-    ) ?? null
+function autoBoresFiredAt(state: AuthorityState, playerId: string, tick: number): PendingBore[] {
+  return boresOf(state).filter(
+    (bore) => bore.playerId === playerId && bore.autoAim !== undefined && bore.firedTick === tick,
   )
-}
-
-function pendingBoreOf(
-  state: AuthorityState,
-  playerId: string,
-  aimed: number,
-  tick: number,
-  stats: BoreGunStats,
-  shot: BoreShot,
-): PendingBore {
-  const pose = vehicleOf(state, playerId).pose as VehiclePose
-  return {
-    playerId,
-    firedTick: tick,
-    origin: { x: pose.x, y: pose.y },
-    shot,
-    cells: lineOf(pose, aimed, stats.rangeCells),
-    nextOpenTick: tick + stats.openIntervalTicks,
-    budgetLeft: stats.boreBudgetTicks,
-    bored: [],
-    checkTick: null,
-    blocksChecked: 0,
-    nextShotTick: tick + gunRecoveryTicks(0, shot),
-  }
-}
-
-/** The rate level's numbers and the gun's, as the shot fires with them. */
-export function shotOf(stats: BoreGunStats): BoreShot {
-  return {
-    gunFactorBp: stats.gunFactorBp,
-    energyPerCellBp: stats.energyPerCellBp,
-    openIntervalTicks: stats.openIntervalTicks,
-    collapseHoldTicks: stats.collapseHoldTicks,
-    boreBudgetTicks: stats.boreBudgetTicks,
-    cooldownTicks: stats.cooldownTicks,
-    kGunPct: stats.kGunPct,
-  }
-}
-
-/** The cells the clamped bearing crosses from the rig's tile, in walk order. */
-function lineOf(pose: VehiclePose, aimed: number, rangeCells: number) {
-  const up = { x: pose.upx, y: pose.upy }
-  return boreCellsFrom(tileOfPose(pose), boreDirectionOf(up, clampedBearing(aimed)), rangeCells)
 }
 
 function bearingRejection(bearing: number): Rejection | null {

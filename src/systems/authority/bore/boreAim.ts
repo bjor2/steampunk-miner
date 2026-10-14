@@ -26,6 +26,29 @@ export function clampedBearing(bearing: number): number {
   return isLeftOfStraightDown(bearing) ? LEFT_EDGE : RIGHT_EDGE
 }
 
+/**
+ * A shape's line `offset` bearing steps from the aimed one (ticket 377): kept on the table, then
+ * clamped to the arc like any bearing, so two offsets past the same edge bore the same line.
+ */
+export function offsetBearingOf(aimed: number, offset: number): number {
+  const onTable = Math.min(BORE_BEARING_COUNT - 1, Math.max(0, clampedBearing(aimed) + offset))
+  return clampedBearing(onTable)
+}
+
+/**
+ * Whether a tile `offset` from the rig's tile lies inside the arc, for a rig whose up vector is
+ * `up` (ticket 377: a seam turn stays inside it). In the rig frame the offset must not point
+ * upward, and its slope below horizontal must not pass the 60° edge on its side; the rig's own
+ * tile and straight down are outside.
+ */
+export function isTileOffsetInArc(up: IntegerVector, offset: IntegerVector): boolean {
+  const along = offset.x * up.y - offset.y * up.x
+  const down = -(offset.x * up.x + offset.y * up.y)
+  if (down < 0 || along === 0) return false
+  const [edgeAlong, edgeDown] = BORE_BEARINGS.bearings[along < 0 ? LEFT_EDGE : RIGHT_EDGE]
+  return down * Math.abs(edgeAlong) <= edgeDown * Math.abs(along)
+}
+
 /** Whether a bearing lies inside the arc the gun may bore. */
 export function isBearingInArc(bearing: number): boolean {
   return clampedBearing(bearing) === bearing

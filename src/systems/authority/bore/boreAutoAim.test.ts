@@ -10,7 +10,7 @@ import { createScriptedSession, PARAMS } from '../scriptedSession'
 import { BORE_BEARING_COUNT } from './boreAim'
 import { AUTO_RIG, searSlice } from './boreAutoFixtures'
 import { ARC_BEARINGS, bestBoreShotOf, cellReadsOf, type BoreAimAsk } from './boreAutoAim'
-import { shotOf } from './boreFire'
+import { shotOf } from './firedBores'
 import { BORE_STATS, standInPocket } from './boreFixtures'
 
 const LOW_ORE = oreCell(RESOURCE_FAMILY.metal, 0)

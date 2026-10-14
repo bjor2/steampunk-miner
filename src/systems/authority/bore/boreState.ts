@@ -23,6 +23,11 @@ export interface BoreShot {
   /** The rate level's numbers when the shot fired: a level bought later waits for the next shot. */
   cooldownTicks: number
   kGunPct: number
+  /**
+   * The lining type a shaped shot lines its opened walls in (ticket 377, a shape's `liningGrade`);
+   * absent for every other shot, so a session with no shape saves and digests as before.
+   */
+  liningType?: string
 }
 
 export interface PendingBore {
@@ -114,7 +119,7 @@ function isPendingBore(bore: unknown): boolean {
   )
 }
 
-const SHOT_FIELDS: readonly (keyof BoreShot)[] = [
+const SHOT_FIELDS: readonly Exclude<keyof BoreShot, 'liningType'>[] = [
   'gunFactorBp',
   'energyPerCellBp',
   'openIntervalTicks',
@@ -128,7 +133,8 @@ function isBoreShot(shot: unknown): boolean {
   return (
     isJsonObject(shot) &&
     SHOT_FIELDS.every((field) => isWholeNumber(shot[field])) &&
-    shot.kGunPct !== 0
+    shot.kGunPct !== 0 &&
+    (shot.liningType === undefined || typeof shot.liningType === 'string')
   )
 }
 

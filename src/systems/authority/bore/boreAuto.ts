@@ -32,9 +32,9 @@ import {
   fireAutoBore,
   isShotOpening,
   nextShotTickOf,
-  shotOf,
   STEAM_SEAR_ITEM_ID,
 } from './boreFire'
+import { shotOf } from './firedBores'
 import { boreWeaknessOf } from './boreWeakness'
 
 export const BORE_AUTO_RULES: {

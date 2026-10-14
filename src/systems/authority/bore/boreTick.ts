@@ -9,6 +9,12 @@
  *   ticks spent so far, at the rate the shot fired with;
  * - once checked and past its `nextShotTick` it leaves the state.
  *
+ * A shaped shot (ticket 377) is one pending bore per line, all fired in the same tick by the same
+ * player. They share the shot's budget and recovery: each cell any line opens spends from all of
+ * them, so the shot's dig ticks summed over every line and turn stay within `boreBudgetTicks`, and
+ * `nextShotTick` stays the recovery of that sum. Each line stops on its own, and a line whose shot
+ * names a lining type lines its opened cells as it ends (`boreLining.ts`).
+ *
  * Cell events carry the bore's player in their stamp; collapse warnings, like every collapse
  * event, carry only the tick.
  */
@@ -22,6 +28,7 @@ import { gunRecoveryTicks } from '../../registries/boreGun'
 import { planetParamsOf } from '../planetOfState'
 import { openBoreCell, type CellOpening } from './boreCell'
 import { checkBoreBlocks } from './boreCollapse'
+import { lineEndedBore } from './boreLining'
 import { boresOf, isBoreOpening, NO_BORES, withBores, type PendingBore } from './boreState'
 
 type BoreStep = (state: AuthorityState) => TickOutcome
@@ -81,10 +88,34 @@ function openNextCell(
   const moved = movedBore(bore, tile, rest, opening, tick)
   const effect = effectOf(state, opening)
   const ended = endEventsOf(moved, tile, opening)
+  const lined = liningOnEnd(effect.state, params, moved)
   return {
-    state: withBoreAt(effect.state, index, moved),
-    events: stampedFor(bore.playerId, [...effect.events, ...ended], tick),
+    state: withShotSpent(withBoreAt(lined.state, index, moved), moved),
+    events: stampedFor(bore.playerId, [...effect.events, ...ended, ...lined.events], tick),
   }
+}
+
+/** The ended line's walls lined when its shot lines them; unchanged while it still opens. */
+function liningOnEnd(state: AuthorityState, params: PlanetParams, bore: PendingBore): RuleEffect {
+  if (isBoreOpening(bore)) return { state, events: [] }
+  return lineEndedBore(state, params, bore)
+}
+
+/** Every line of `spent`'s shot takes its budget left and recovery: the shot spends as one. */
+function withShotSpent(state: AuthorityState, spent: PendingBore): AuthorityState {
+  return withBores(
+    state,
+    boresOf(state).map((bore) => (isSameShot(bore, spent) ? sharedSpendOf(bore, spent) : bore)),
+  )
+}
+
+function isSameShot(bore: PendingBore, other: PendingBore): boolean {
+  return bore.playerId === other.playerId && bore.firedTick === other.firedTick
+}
+
+function sharedSpendOf(bore: PendingBore, spent: PendingBore): PendingBore {
+  if (bore === spent) return bore
+  return { ...bore, budgetLeft: spent.budgetLeft, nextShotTick: spent.nextShotTick }
 }
 
 /** The bore after this cell: on to the next cell, or ended with its blocks due after the hold. */

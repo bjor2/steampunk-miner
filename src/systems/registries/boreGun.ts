@@ -19,6 +19,10 @@
  *
  * The forced-gun bot run (ticket 347, the TD's seam 3 on #314) starts with the gun at its walls:
  * the provider names the debug command that sets it there, as only the slice knows its tracks.
+ *
+ * A shot's shape (ticket 377, the TD lock on #318) is the provider's too: the slice folds its
+ * signature modules into one `ShotShape`, which the kernel reads once per shot and holds to the
+ * caps in `authority/bore/shotShape.ts`.
  */
 import type { CommandIntent } from '../authority/authorityCommand'
 import type { AuthorityState } from '../authority/authorityState'
@@ -53,12 +57,33 @@ export interface BoreAutoShootStats {
   isIncomeCapUsed: boolean
 }
 
+/**
+ * How a shot bores beyond its one aimed line (ticket 377, the TD lock on #318): every line and
+ * turn spends the one `boreBudgetTicks`, so a shape only redistributes the shot's cells.
+ */
+export interface ShotShape {
+  /** Extra lines as bearing offsets from the aimed bearing, in `boreBearings.json` steps; the aimed line is implicit. */
+  lineOffsets: readonly number[]
+  /** Same-ore seam turns each line may take after its first ore cell. */
+  seamTurns: number
+  /** The casing_cement grade's row id the shot lines the walls it opens in, or null. */
+  liningGrade: string | null
+  /** Energy per opened cell on top of the gun's, as basis points of the drill's dig energy. */
+  extraEnergyPerCellBp: number
+  /** Ticks a bored line stays grounded (#378); null for none. */
+  groundTicks: number | null
+  /** Ticks a strut stands at a hollow's mouth (#379); null for none. */
+  strutTicks: number | null
+}
+
 export interface BoreGunProvider {
   id: string
   /** The gun this player fires now, or null when it has none. */
   boreGunOf(state: AuthorityState, playerId: string): BoreGunStats | null
   /** The sear's numbers for this player, or null (or left out) when auto mode has none. */
   autoShootOf?(state: AuthorityState, playerId: string): BoreAutoShootStats | null
+  /** The shape this player's next shot bores, folded over its modules; null (or left out) for one line. */
+  shotShapeOf?(state: AuthorityState, playerId: string): ShotShape | null
   /**
    * The debug command that mounts the gun with every track at its wall, free (the slice's
    * `debug.ground-gun.setLevels`): the forced bot run's start. Left out, that run has no gun.
@@ -100,6 +125,12 @@ export function boreAutoShootOf(
   const [provider] = entriesOf(BORE_GUN_REGISTRY)
   const stats = provider?.autoShootOf?.(state, playerId) ?? null
   return stats === null ? null : wholeAutoShootOf(stats)
+}
+
+/** The provider's shot shape as it answered, unchecked; null with no provider or no answer. */
+export function providedShotShapeOf(state: AuthorityState, playerId: string): ShotShape | null {
+  const [provider] = entriesOf(BORE_GUN_REGISTRY)
+  return provider?.shotShapeOf?.(state, playerId) ?? null
 }
 
 /** The provider's debug command for a gun at its walls, or null with no provider or none named. */

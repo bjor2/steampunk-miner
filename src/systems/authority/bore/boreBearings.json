@@ -2,6 +2,8 @@
   "source": "Ticket 313 (#309 GD decision): bearing b points pi*b/255 round the lower half-plane in the rig frame, from horizontal left (0) through straight down to horizontal right (255); [along the tangent, down along -up] rounded at scale. arcEdges are 60 degrees below horizontal on each side.",
   "scale": 1024,
   "arcEdges": [85, 170],
+  "shotShapeCapsSource": "Ticket 377 (TD lock on #318): the most lines a shot shape bores (the aimed line included) and the most same-ore seam turns per line. Systems on #322 section 5: the splay choke's lines run 2 to 5 by charges, the rifled bore's turns 1 to 4.",
+  "shotShapeCaps": { "maxLines": 5, "maxSeamTurns": 4 },
   "bearings": [
     [-1024, 0],
     [-1024, 13],

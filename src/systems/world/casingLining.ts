@@ -41,7 +41,7 @@ import {
   type GroundEdit,
 } from './groundEditSession'
 import type { PlanetParams } from './planetParams'
-import { ISO_DENSITY, MM_PER_SAMPLE } from './sampleGrid'
+import { ISO_DENSITY, MM_PER_SAMPLE, SAMPLES_PER_TILE } from './sampleGrid'
 import { FULL_WEIGHT, type WeightedSample } from './stampShape'
 import { chunkOfTile, type TilePoint } from './tileGrid'
 import { currentCasingOfChunk, currentDensityOfChunk, type WorldState } from './worldState'
@@ -89,9 +89,52 @@ export function lineRing(
   grade: number,
   typeIndex: number = STANDARD_CASING_TYPE_INDEX,
 ): Lining {
+  return lineSamples(world, params, ringSamplesOf(ring), grade, typeIndex)
+}
+
+/**
+ * Lines the walls of one opened cell (ticket 377, the bore's lining): the samples just outside its
+ * four sides, laid as a ring lays them, so only rock beside the cell's air is lined.
+ */
+export function lineCellWalls(
+  world: WorldState,
+  params: PlanetParams,
+  tile: TilePoint,
+  grade: number,
+  typeIndex: number,
+): Lining {
+  return lineSamples(world, params, cellWallSamplesOf(tile), grade, typeIndex)
+}
+
+/** The samples one step outside each side of a cell, as full-weight stamp samples. */
+export function cellWallSamplesOf(tile: TilePoint): WeightedSample[] {
+  const first = { sx: tile.tx * SAMPLES_PER_TILE, sy: tile.ty * SAMPLES_PER_TILE }
+  const samples: WeightedSample[] = []
+  for (let along = 0; along < SAMPLES_PER_TILE; along++) {
+    samples.push(
+      wallSample(first.sx + along, first.sy - 1),
+      wallSample(first.sx - 1, first.sy + along),
+      wallSample(first.sx + SAMPLES_PER_TILE, first.sy + along),
+      wallSample(first.sx + along, first.sy + SAMPLES_PER_TILE),
+    )
+  }
+  return samples
+}
+
+function wallSample(sx: number, sy: number): WeightedSample {
+  return { sx, sy, weight: FULL_WEIGHT, floor: 0 }
+}
+
+function lineSamples(
+  world: WorldState,
+  params: PlanetParams,
+  samples: readonly WeightedSample[],
+  grade: number,
+  typeIndex: number,
+): Lining {
   const session = openSession(world, params)
   const ringLining = { grade: Math.min(grade, MAX_SAMPLE_CASING_GRADE), typeIndex }
-  const steps = ringSamplesOf(ring).map((sample) => ({
+  const steps = samples.map((sample) => ({
     sample,
     step: ringStepOf(session, sample, ringLining),
   }))

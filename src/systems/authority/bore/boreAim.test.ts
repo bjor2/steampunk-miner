@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { UP_VECTOR_SCALE } from '../../../constants/physics'
 import { boreCellsFrom } from './boreWalk'
-import { BORE_BEARING_COUNT, boreDirectionOf, clampedBearing, isBearingInArc } from './boreAim'
+import {
+  BORE_BEARING_COUNT,
+  boreDirectionOf,
+  clampedBearing,
+  isBearingInArc,
+  isTileOffsetInArc,
+  offsetBearingOf,
+} from './boreAim'
 import BORE_BEARINGS from './boreBearings.json'
 
 const UP = { x: 0, y: UP_VECTOR_SCALE }
@@ -82,5 +89,36 @@ describe('bore aim: the world direction (ticket 313)', () => {
     const right = boreDirectionOf(tilted, RIGHT_EDGE)
     expect(left.x * tilted.x + left.y * tilted.y).toBeLessThan(0)
     expect(right.x * tilted.x + right.y * tilted.y).toBeLessThan(0)
+  })
+})
+
+describe("bore aim: a shape's lines and turns (ticket 377)", () => {
+  it('offsets a line from the clamped aim and keeps it on the table and in the arc', () => {
+    expect(offsetBearingOf(200, -8)).toBe(192)
+    expect(offsetBearingOf(250, 8)).toBe(255)
+    expect(offsetBearingOf(4, -8)).toBe(0)
+    expect(offsetBearingOf(80, 8)).toBe(LEFT_EDGE)
+    expect(offsetBearingOf(127, -8)).toBe(LEFT_EDGE - 8)
+  })
+
+  it('takes a tile beside or below the rig into the arc, up to the 60 degree edge', () => {
+    expect(isTileOffsetInArc(UP, { x: 5, y: 0 })).toBe(true)
+    expect(isTileOffsetInArc(UP, { x: -5, y: -2 })).toBe(true)
+    expect(isTileOffsetInArc(UP, { x: 1, y: -1 })).toBe(true)
+    expect(isTileOffsetInArc(UP, { x: 1, y: -2 })).toBe(false)
+    expect(isTileOffsetInArc(UP, { x: -1, y: -2 })).toBe(false)
+  })
+
+  it('leaves out tiles above the rig, straight below it and its own tile', () => {
+    expect(isTileOffsetInArc(UP, { x: 3, y: 1 })).toBe(false)
+    expect(isTileOffsetInArc(UP, { x: 0, y: -3 })).toBe(false)
+    expect(isTileOffsetInArc(UP, { x: 0, y: 0 })).toBe(false)
+  })
+
+  it('reads the arc in the rig frame on a tilted rig', () => {
+    const sideways = { x: UP_VECTOR_SCALE, y: 0 }
+    expect(isTileOffsetInArc(sideways, { x: 0, y: -4 })).toBe(true)
+    expect(isTileOffsetInArc(sideways, { x: -4, y: 0 })).toBe(false)
+    expect(isTileOffsetInArc(sideways, { x: 1, y: 0 })).toBe(false)
   })
 })
