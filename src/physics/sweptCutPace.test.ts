@@ -31,8 +31,6 @@ async function playFloorBound(minTicksPerTile: number, isSwept: boolean): Promis
   vi.doMock('../systems/economy/economy', () => ({
     ECONOMY: { ...ECONOMY, drill: { ...ECONOMY.drill, minTicksPerTile } },
   }))
-  // The artefact offers first: on a fresh graph the icon set otherwise meets them half-loaded.
-  await import('../systems/registries/artefactOptions')
   ;(await import('../registries/registrar')).loadSlices([])
   const runLog = await import('../logging/runLog')
   const store = await import('../store/gameStore')
@@ -48,8 +46,7 @@ async function playFloorBound(minTicksPerTile: number, isSwept: boolean): Promis
   world.timestep = PHYSICS_TIMESTEP
   const start = store.readLocalVehicle().pose
   if (start === null) throw new Error('the starting planet has no dock')
-  const body = createVehicleBody(RAPIER, world, start)
-  const controller = createVehicleController(RAPIER, world, body)
+  const controller = createVehicleController(RAPIER, world, createVehicleBody(RAPIER, world, start))
   const loop = createVehicleLoop({ 'drill.sweptCut': isSwept })
   const hold = (intent: VehicleIntent, seconds: number, each?: () => void) => {
     for (let step = 0; step < Math.round(seconds / PHYSICS_TIMESTEP); step++) {
@@ -67,15 +64,15 @@ async function playFloorBound(minTicksPerTile: number, isSwept: boolean): Promis
   }
   // The Sell bay is the pad's west end (#170), so off the pad is to the left.
   hold(buildIntent(['aim_left']), 2)
-  const down = rateWhile(buildIntent(['aim_down']), () => -body.translation().y)
-  const waits = { current: 0, longest: 0, lastX: body.translation().x }
+  const down = rateWhile(buildIntent(['aim_down']), () => -controller.planetPosition().y)
+  const waits = { current: 0, longest: 0, lastX: controller.planetPosition().x }
   const noteWait = () => {
-    const x = body.translation().x
+    const x = controller.planetPosition().x
     waits.current = Math.abs(x - waits.lastX) < 0.001 ? waits.current + 1 : 0
     waits.longest = Math.max(waits.longest, waits.current)
     waits.lastX = x
   }
-  const level = rateWhile(buildIntent(['aim_left']), () => -body.translation().x)
+  const level = rateWhile(buildIntent(['aim_left']), () => -controller.planetPosition().x)
   hold(buildIntent(['aim_left']), 1, noteWait)
   runLog.uninstallRunLog()
   return { down, level, longestLevelWaitTicks: waits.longest }
