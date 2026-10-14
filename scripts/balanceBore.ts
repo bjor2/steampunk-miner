@@ -4,8 +4,10 @@
  * forced to fire at every `nextShotTick` with the gun at its walls, and `boreReport.ts` holds the
  * forced run to the Vertical Scaler's pins: time to core at least 0.98x the never run's on every
  * planet, departure `drill_power` within 1 level, at least 60 shots, and the campaign scaling gate.
- * It exits 1 on any miss. `--last-planet <n>` plays on (P40 on the headless lane at the #304/#330
- * re-baseline). Takes hours; run it with `npm run balance:bore`.
+ * It exits 1 on any miss, and refuses to play with no gun to mount (no `boreGun` provider naming
+ * its `wallsMountIntent`, which the ground-gun slice answers from #314 on). `--last-planet <n>`
+ * plays on (P40 on the headless lane at the #304/#330 re-baseline). Takes hours; run it with
+ * `npm run balance:bore`.
  */
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { PACING_WORLD_SEEDS } from '../src/constants/pacingSeeds'
@@ -14,10 +16,12 @@ import { loadFeatures } from '../src/features'
 import { deriveBoreReport, formatBoreReport, type BoreSeedRuns } from '../src/logging/boreReport'
 import { playLoggedSliceOnSeeds, type SeededSliceRun } from '../src/logging/sliceRunLog'
 import type { BorePolicy } from '../src/systems/bot/botBore'
+import { boreGunWallsMountIntent } from '../src/systems/registries/boreGun'
 import type { Scenario } from '../src/systems/scenario'
 import { LOCKED_SCHEDULE } from '../src/systems/unlocks/unlockSchedule'
 
 loadFeatures()
+refuseWithoutGun()
 
 const STANDARD_LAST_PLANET = 10
 /** Two hours a planet, with room to see a slow one. */
@@ -42,6 +46,13 @@ writeFileSync(new URL('bore.md', REPORT_FOLDER), `${text}\n`)
 console.log(text)
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${text}\n`)
 if (report.problems.length > 0) process.exitCode = 1
+
+function refuseWithoutGun(): void {
+  if (boreGunWallsMountIntent() !== null) return
+  throw new Error(
+    'balance:bore refused: no boreGun provider names wallsMountIntent, so the forced run would have no gun',
+  )
+}
 
 function lastPlanetOf(args: readonly string[]): number {
   const at = args.indexOf('--last-planet')
