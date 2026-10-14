@@ -716,6 +716,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/registries/sliceCommands.test.ts` | 6 | 6 |
 | `src/registries/sliceModules.test.ts` | 3 | 3 |
 | `src/systems/registries/attachCoverage.test.ts` | 9 | 9 |
+| `src/systems/registries/bayEntries.test.ts` | 3 | 3 |
 | `src/systems/registries/blastEffects.test.ts` | 2 | 2 |
 | `src/systems/registries/buildingAttach.test.ts` | 3 | 3 |
 | `src/systems/registries/buyableRefs.test.ts` | 4 | 4 |
@@ -851,6 +852,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/store/artefactChoice.test.ts` | 5 | 5 |
 | `src/store/authorityReads.test.ts` | 3 | 3 |
+| `src/store/bayEntryPress.test.ts` | 2 | 2 |
 | `src/store/checkpoint.test.ts` | 11 | 11 |
 | `src/store/domainEventBroadcast.test.ts` | 3 | 3 |
 | `src/store/gameStore.test.ts` | 26 | 26 |
@@ -960,6 +962,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/ui/hud/hudPanels.test.ts` | 6 | 6 |
 | `src/ui/iconCoverage.test.ts` | 9 | 9 |
 | `src/ui/kit/itemCard.test.ts` | 12 | 12 |
+| `src/ui/platform/bayEntryRowView.test.ts` | 2 | 2 |
 | `src/ui/platform/bayPanels.test.ts` | 8 | 8 |
 | `src/ui/platform/bayScreens.test.ts` | 6 | 6 |
 | `src/ui/projection/worldToScreen.test.ts` | 7 | 5 |
@@ -1003,6 +1006,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/systems/views/bayEntryRows.test.ts` | 8 | 8 |
 | `src/systems/views/bayPresentation.test.ts` | 6 | 6 |
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
