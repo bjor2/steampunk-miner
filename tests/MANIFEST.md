@@ -567,9 +567,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/bore/boreAuto.test.ts` | 30 | 21 |
 | `src/systems/authority/bore/boreAutoAim.test.ts` | 7 | 7 |
 | `src/systems/authority/bore/boreShape.test.ts` | 16 | 16 |
+| `src/systems/authority/bore/boreStrut.test.ts` | 12 | 12 |
 | `src/systems/authority/bore/boreWalk.test.ts` | 14 | 14 |
 | `src/systems/authority/bore/groundGun.test.ts` | 32 | 32 |
-| `src/systems/authority/bore/shotShape.test.ts` | 13 | 13 |
+| `src/systems/authority/bore/shotShape.test.ts` | 14 | 14 |
 | `src/systems/authority/builtFacilities.test.ts` | 6 | 6 |
 | `src/systems/authority/casingDrill.test.ts` | 5 | 5 |
 | `src/systems/authority/casingGnaw.test.ts` | 4 | 4 |
@@ -831,6 +832,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
 | `src/physics/liveFixedStep.test.ts` | 4 | 4 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
+| `src/physics/strutColliders.test.ts` | 4 | 4 |
 | `src/physics/sweptCutPace.test.ts` | 2 | 1 |
 | `src/physics/tunnelling.test.ts` | 10 | 2 |
 | `src/physics/vehicleLoop.test.ts` | 6 | 6 |
@@ -1161,6 +1163,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/poseReport.test.ts` | 7 | 7 |
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/stepBound.test.ts` | 9 | 9 |
+| `src/systems/vehicle/strutPlank.test.ts` | 4 | 4 |
 | `src/systems/vehicle/sweptCut.test.ts` | 6 | 6 |
 | `src/systems/vehicle/tickPlan.test.ts` | 10 | 6 |
 | `src/systems/vehicle/travelParity.test.ts` | 7 | 7 |
