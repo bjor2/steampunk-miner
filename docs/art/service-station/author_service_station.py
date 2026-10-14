@@ -251,14 +251,14 @@ def facade_pieces():
 
 
 def sign_pieces():
-    """The game's own name in brass letters on a soot board across the facade."""
+    """The game's own name in brass letters on a soot board hung across the facade, over the pillars."""
     pieces = [
-        kit.box('soot', (4.5, 0.06, 0.42), (0.0, -0.76, 3.42)),
-        kit.box('brass', (4.62, 0.05, 0.05), (0.0, -0.77, 3.65)),
-        kit.box('brass', (4.62, 0.05, 0.05), (0.0, -0.77, 3.19)),
-        sign_text('ASSAY & EXCHANGE', (0.0, -0.8, 3.42), height=0.27, width=4.2),
+        kit.box('soot', (4.5, 0.06, 0.42), (0.0, -0.93, 3.42)),
+        kit.box('brass', (4.62, 0.05, 0.05), (0.0, -0.94, 3.65)),
+        kit.box('brass', (4.62, 0.05, 0.05), (0.0, -0.94, 3.19)),
+        sign_text('ASSAY & EXCHANGE', (0.0, -0.97, 3.42), height=0.27, width=4.2),
     ]
-    pieces += [kit.rivet((x, -0.8, 3.42)) for x in (-2.15, 2.15)]
+    pieces += [kit.rivet((x, -0.97, 3.42)) for x in (-2.15, 2.15)]
     return pieces
 
 
@@ -579,6 +579,8 @@ def right_block_pieces():
         kit.box('brass', (right - left + 0.06, 1.1, 0.06), (middle - 0.03, -0.2, RIGHT_BLOCK_TOP - 0.17)),
         kit.box('window-glow', (0.42, 0.05, 0.34), (2.55, -0.75, FACADE_TOP + 0.95)),
         kit.box('brass', (0.5, 0.04, 0.42), (2.55, -0.74, FACADE_TOP + 0.95)),
+        kit.box('dark-iron', (0.03, 0.04, 0.36), (2.55, -0.79, FACADE_TOP + 0.95)),
+        kit.box('dark-iron', (0.44, 0.04, 0.03), (2.55, -0.79, FACADE_TOP + 0.95)),
     ]
     pieces += kit.rivet_frame(middle, FACADE_TOP + height / 2, right - left - 0.2, height - 0.25, y=-0.75)
     pieces += emblem_plaque((1.55, -0.76, FACADE_TOP + 0.95), 0.36)
