@@ -69,6 +69,15 @@ export interface SpendGuardBand {
   maxShare: Money
 }
 
+/**
+ * The #385 income cap: no income item at full stack brings more than `maxShare` of the drill's ore
+ * value a minute, judged on `planets`. One share for every planet (economic only, never per planet).
+ */
+export interface IncomeCap {
+  maxShare: Money
+  planets: readonly number[]
+}
+
 export interface TreeEconomy {
   costs: TreeCosts
   markAbsorb: MarkAbsorb
@@ -76,6 +85,7 @@ export interface TreeEconomy {
   /** By `fromPlanet`, ascending; a planet before the first band is not judged. */
   spendGuard: readonly SpendGuardBand[]
   nodeShareWatch: NodeShareWatch
+  incomeCap: IncomeCap
 }
 
 export const TREE_ECONOMY: TreeEconomy = loadTreeEconomy(TREE_ECONOMY_FILE)
@@ -90,6 +100,7 @@ export function readTreeEconomy(raw: unknown): { economy: TreeEconomy } | { prob
     cadence: readCadence(reader, tech.cadence),
     spendGuard: readSpendGuard(reader, tech.spendGuard),
     nodeShareWatch: readNodeShareWatch(reader, tech.nodeShareWatch),
+    incomeCap: readIncomeCap(reader, tech.incomeCap),
   }
   return reader.problems.length > 0 ? { problems: reader.problems } : { economy }
 }
@@ -189,5 +200,15 @@ function readNodeShareWatch(reader: FieldReader, raw: unknown): NodeShareWatch {
     firstPlanet: reader.safeInteger('tech.nodeShareWatch.firstPlanet', watch.firstPlanet),
     lastPlanet: reader.safeInteger('tech.nodeShareWatch.lastPlanet', watch.lastPlanet),
     share: reader.money('tech.nodeShareWatch.share', watch.share),
+  }
+}
+
+function readIncomeCap(reader: FieldReader, raw: unknown): IncomeCap {
+  const cap = reader.object('tech.incomeCap', raw)
+  return {
+    maxShare: reader.money('tech.incomeCap.maxShare', cap.maxShare),
+    planets: reader
+      .list('tech.incomeCap.planets', cap.planets)
+      .map((planet, index) => reader.safeInteger(`tech.incomeCap.planets[${index}]`, planet)),
   }
 }
