@@ -27,15 +27,19 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
-### `aetheric`: 8 files, 57 tests
+### `aetheric`: 12 files, 97 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/aetheric/aetherCondenser.test.ts` | 7 | 7 |
 | `src/features/aetheric/aethericCards.vision.test.ts` | 4 | 4 |
+| `src/features/aetheric/arcCoil.test.ts` | 9 | 9 |
 | `src/features/aetheric/chronometricGovernor.test.ts` | 10 | 10 |
 | `src/features/aetheric/governorCondenserRows.test.ts` | 12 | 6 |
 | `src/features/aetheric/itemHeat.test.ts` | 4 | 4 |
+| `src/features/aetheric/lanternArcRows.test.ts` | 15 | 9 |
+| `src/features/aetheric/phaseLantern.pace.test.ts` | 2 | 1 |
+| `src/features/aetheric/phaseLantern.test.ts` | 14 | 11 |
 | `src/features/aetheric/resonanceWhistle.test.ts` | 8 | 8 |
 | `src/features/aetheric/systems/aethericNodes.test.ts` | 5 | 5 |
 | `src/features/aetheric/whistleRows.test.ts` | 7 | 7 |
@@ -449,7 +453,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/techTree.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/techTreeCommands.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/treeScreenModel.test.ts` | 14 | 14 |
-| `src/features/tech-tree/systems/treeShape.test.ts` | 17 | 17 |
+| `src/features/tech-tree/systems/treeShape.test.ts` | 18 | 18 |
 | `src/features/tech-tree/systems/treeSpendGuard.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 20 | 20 |
 | `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 3 | 3 |

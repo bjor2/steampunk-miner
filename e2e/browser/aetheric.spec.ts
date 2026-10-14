@@ -10,6 +10,11 @@
  *   points, `hull.tail` and `hull.flank`; Digit1 opens the governor's pocket in the
  *   `aetheric.pocket` section and puts heat on the item gauge the HUD shows, and Digit2 then burns
  *   it (a refused burn would spend no charge).
+ * - The P16 fork pair (#261): the rig hangs the phase lantern on the nose, `hull.nose`, and the
+ *   twin coils on the roof, `hull.roof.coils`; Digit1 on the coil with no enemy about is refused
+ *   `no_target` and spends no charge, Digit2 on the lantern facing open air is refused
+ *   `nothing_ahead` and leaves the `aetheric.phase` section empty; and both cards read from
+ *   `statPreview`.
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -196,6 +201,100 @@ test('the governor and condenser cards read their lines from statPreview', async
       { label: 'Cooldown (s)', value: '1e+1' },
       { label: 'Charges', value: '2e+0' },
       { label: 'Energy a full gauge', value: '1e+1' },
+      { label: 'Price' },
+    ],
+  })
+  expect(errors).toEqual([])
+})
+
+const LANTERN = 'power.phase_lantern'
+const ARC_COIL = 'power.arc_coil'
+
+interface PhaseRead {
+  ok: boolean
+  phase: { cellTx: number; cellTy: number; toTx: number; toTy: number; endTick: number } | null
+}
+
+async function openGameWithForkItems(page: Page): Promise<string[]> {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(String(error)))
+  await page.goto('/?debug')
+  await page.waitForFunction(() => window.steampunkDebug !== undefined)
+  const slotted = await page.evaluate(
+    ([coil, lantern]) =>
+      window.steampunkDebug!.setVehicleLoadout({ 'powerup.1': coil, 'powerup.2': lantern }).ok,
+    [ARC_COIL, LANTERN],
+  )
+  expect(slotted).toBe(true)
+  return errors
+}
+
+function readPhase(page: Page): Promise<PhaseRead> {
+  return page.evaluate(() => window.steampunkDebug!.features.aetheric.getPhase() as PhaseRead)
+}
+
+test('the rig hangs the phase lantern on the nose and the arc coils on the roof', async ({
+  page,
+}) => {
+  const errors = await openGameWithForkItems(page)
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const result = window.steampunkDebug!.vehicleParts()
+        return result.ok ? result.mounted.map((mount) => [mount.assetId, mount.attachId]) : []
+      }),
+    )
+    .toEqual(
+      expect.arrayContaining([
+        ['vehicle-item-power-phase-lantern', 'hull.nose'],
+        ['vehicle-item-power-arc-coil', 'hull.roof.coils'],
+      ]),
+    )
+  expect(errors).toEqual([])
+})
+
+test('Digit1 on the coil with no enemy, and Digit2 on the lantern facing air, refuse and spend nothing', async ({
+  page,
+}) => {
+  const errors = await openGameWithForkItems(page)
+  await page.keyboard.press('Digit1')
+  await page.keyboard.press('Digit2')
+  // A refusal resolves after the wind-up; the charges stay whole once the acts have been judged.
+  await page.waitForTimeout(500)
+  expect(await chargesOf(page, ARC_COIL)).toEqual({ ok: true, chargesLeft: 3 })
+  expect(await chargesOf(page, LANTERN)).toEqual({ ok: true, chargesLeft: 2 })
+  expect((await readPhase(page)).phase).toBeNull()
+  expect(errors).toEqual([])
+})
+
+test('the lantern and coil cards read their lines from statPreview', async ({ page }) => {
+  const errors = await openGameWithForkItems(page)
+  const [lantern, coil] = await page.evaluate(
+    ([lanternId, coilId]) => [
+      window.steampunkDebug!.features.aetheric.statPreview(lanternId, 1, 16),
+      window.steampunkDebug!.features.aetheric.statPreview(coilId, 1, 16),
+    ],
+    [LANTERN, ARC_COIL],
+  )
+  expect(lantern).toMatchObject({
+    ok: true,
+    lines: [
+      { label: 'Cooldown (s)', value: '1e+1' },
+      { label: 'Charges', value: '2e+0' },
+      { label: 'Extra energy a phase', value: '2.5e-1' },
+      { label: 'Heat a phase (%)', value: '1.25e+1' },
+      { label: 'Price' },
+    ],
+  })
+  expect(coil).toMatchObject({
+    ok: true,
+    lines: [
+      { label: 'Cooldown (s)', value: '1.5e+1' },
+      { label: 'Reach (tiles)', value: '8e+0' },
+      { label: 'Charges', value: '3e+0' },
+      { label: 'Enemies a bolt', value: '3e+0' },
+      { label: 'Energy a bolt', value: '1e+0' },
+      { label: 'Heat a bolt (%)', value: '1.25e+1' },
       { label: 'Price' },
     ],
   })
