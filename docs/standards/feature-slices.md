@@ -1093,7 +1093,7 @@ Piece (i) of the GD ruling and TD lock on #157, both Scalers signed off: one per
 
 ### 3.48 Enemy lures (ticket 361)
 
-The retarget seam of #262's resonance whistle (GD lock on #245, "lure"), split out as a kernel ticket. Behind the authority dev flag `enemy.lureRetarget` (`AUTHORITY_DEV_FLAGS` in `src/constants/devFlags.ts`), **off**: with it off the registry is never read, so every hunt, golden and `balance:*` run is as before. No protocol, snapshot, save, log or golden change; a live lure is the slice's state, saved in its own section (#262).
+The retarget seam of #262's resonance whistle (GD lock on #245, "lure"), split out as a kernel ticket. Behind the authority dev flag `enemy.lureRetarget` (`AUTHORITY_DEV_FLAGS` in `src/constants/devFlags.ts`), landed **off**: with it off the registry is never read, so every hunt, golden and `balance:*` run is as before. No protocol, snapshot, save, log or golden change; a live lure is the slice's state, saved in its own section (#262). The whistle turned it **on** (3.50): with no lure sounding the step hunts the vehicle exactly as with it off.
 
 - **`enemyLures`** (`src/systems/registries/enemyLures.ts`, registrar `enemyLure`, many sources): `{ id, luresAt(state, tick) → readonly Lure[] }`, each `Lure` `{ cell: TilePoint, reachMm, untilTick }`, oldest first; an ended lure may stay listed.
 - **The rule** (`src/systems/enemies/lureTarget.ts`): `lureTargetOf(enemy, lures, tick)` hears only the first `liveLureCap` lures still live (`tick < untilTick`, `src/data/aetheric.json`), in source id order, and answers the centre of the nearest lure cell whose reach takes in the enemy (the first listed wins a tie), else null for the vehicle. A tick is O(enemies x live lures).
@@ -1106,6 +1106,14 @@ The kernel seam of the #212 spend guard's family rows (GD ruling Q3 (a) and TD l
 - **`spendFamilies`** (`src/systems/registries/spendFamilies.ts`, registrar `spendFamily`, many families): `{ id, anchorRowId, isMember(spend: ShopSpend) → boolean }`. The id is `<slice>.<family>`; the kernel's own are `kernel.<family>`, read beside the registered ones. The registrar refuses an `anchorRowId` that is no `docs/scaling/horizontal/stats.json` row.
 - **The report** `familySpendRowsOf(spends, isAnchorLive)`: one `{ planetIndex, familyId, spend: Money }` row per planet per family with live spend, by planet then family id. A spend counts once, under the first family by sorted id that claims it, live or not, so the rows never count a buy twice. The anchor gate is asked here once, through `isAnchorLive(anchorRowId)` (owned or `FeatureUnlocked`, as the caller knows it); `isMember` never re-checks it. A held or unbuilt anchor reports zero and prints no row.
 - **Families today:** `kernel.buy_gun` (`buyGun` at the Upgrade bay, anchor `auto_guns`; joins the gated tree numerator in #371) and `terrain-tools.terrain_magnets` (anchor `magnetic_planets`). Tech-tree nodes, Mark milestones, combo and twist grades (#206), bay entries (#314) and `armoury.*` (#310, #371) register as their tickets land.
+
+### 3.50 The resonance whistle (ticket 262)
+
+Build 2 of the GD lock on #245: the aetheric lane's first item, `power.resonance_whistle` (P15, sound, the lure verb), on 3.48's seam, all in `src/features/aetheric/`. Protocol 53.
+
+- **Item.** A charged power-up in the five power-up slots, `attach: 'slot'` (a `slot` row of the tech-tree's `techGear.json`, the #363 model exported; the lock's boiler-stack place waits on the TD's points for #265). Its numbers (charges, cooldown, wind-up, reach, duration, energy, price) are `tech.aetheric.resonanceWhistle` and `tech.aetheric.price` in `aetheric.economy.json`; the P15 entry node carries its Mark ladder (cooldown, duration as the magnitude, charges). The Upgrade bay sells it at 15 band-5 units at P15 (`aetheric.seller`); its card reads `statPreview`.
+- **Act.** After its wind-up the whistle sounds on the use's origin tile: it pays `energyQuanta` from the tank (refused `aetheric.energy_short` with nothing spent when the tank cannot pay) and sets the player's `aetheric` section v1 `{ sounding: { tx, ty, reachMm, untilTick } | null }`; a new blow replaces the old. `aetheric.WhistleSounded` → `aetheric.whistle_sounded {itemId, tx, ty, reachTiles, durationTicks, energy}` beside `power_up_used`.
+- **Lure.** `r.enemyLure` lists each player's sounding whistle (players in id order) as a `Lure`, and the `aetheric.lures` clock step clears it on its `untilTick`, so a spent whistle leaves the section, the save and the digest. With no whistle blown every digest and mined order is unchanged.
 
 ## 4. Cross-slice contracts
 

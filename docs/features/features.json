@@ -1074,7 +1074,7 @@
             },
             {
               "title": "Aetheric science",
-              "description": "The sixth lane: steampunk-scientific power-ups that each add a new verb and spend energy or heat, never yield. Its nodes are on the tree: the resonance whistle on P15, researched at the research lab, then the chronometric governor (P24) and aether condenser (P29). The items themselves, the P16 phase lantern and arc coil fork, their parts on the rig and the lane's combos come later.",
+              "description": "The sixth lane: steampunk-scientific power-ups that each add a new verb and spend energy or heat, never yield. Its nodes are on the tree: the resonance whistle on P15, researched at the research lab, then the chronometric governor (P24) and aether condenser (P29). The resonance whistle ships: a slot tap sounds it where the rig stands and draws crawlers and burrowers in reach to that spot for a few seconds while the rig gets away, for a little energy; it hangs at its power-up slot until the aetheric parts get their own places. The governor and condenser, the P16 phase lantern and arc coil fork and the lane's combos come later.",
               "status": "partial",
               "issues": [260, 261, 262, 263, 264, 265, 266],
               "planet": 15
