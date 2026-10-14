@@ -2,7 +2,7 @@
   "name": "strand-and-rescue",
   "description": "Energy set to 0.05, drive off the pad until it runs out, stranded, towed after the grace (#7).",
   "generatorVersion": 8,
-  "authorityProtocolVersion": 62,
+  "authorityProtocolVersion": 63,
   "logSchemaVersion": 5,
   "numberFormatVersion": 1,
   "sliceSections": {
@@ -16,6 +16,7 @@
     "extraction": 1,
     "ground-gun": 1,
     "ground-gun.module-use": 1,
+    "ground-gun.shot-cells": 1,
     "mining-gates": 1,
     "mobility": 1,
     "power-up-core": 1,

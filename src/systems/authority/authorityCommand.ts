@@ -193,8 +193,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    into the `terrain-tools` section's optional `props`, claimed through `collapseBraces`), the
  *    Breaker's fracture as a blast effect on the K6 queue, and the Scout pinger and Diviner rod as
  *    charged items. With no branch chosen no digest or mined order changes.
+ * 63: the shoring shot (ticket 369, piece iii of the #157 seam): the `ground-gun.shot-cells`
+ *    session section v1 holds every cell a cementing round's line opened as permanent ground
+ *    through the `groundReinforcement` registry, each billed onto the lining bill at its band and
+ *    logged as `ground-gun.ShotCellsReinforced`. With no cementing round fired no digest or mined
+ *    order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 62
+export const AUTHORITY_PROTOCOL_VERSION = 63
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
