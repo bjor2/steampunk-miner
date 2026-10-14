@@ -41,13 +41,18 @@ on its arbor, and the condenser needle turns on its gauge pin.
 | `<id>.front.png`                 | the asset alone in the game's front view at 768 px/m                        |
 | `rig.bare.png`, `rig.fitted.png` | the tier-3 rig (look-3 turret, dynamite rack) bare and with all five fitted |
 | `rig.bare.ingame.png`, `-fitted` | the same at 90 px/m, about what a 1080p screen shows at the default zoom    |
-| `aethericParts.json`             | the items, their assets and parts, the GD's place and the review positions  |
+| `rig.clearance.folded.png`       | the loaded rig and the five parts at their points, every extractor folded   |
+| `rig.clearance.deployed.png`     | the same with every extractor deployed                                      |
+| `clearance.json`                 | each part's overlaps with what can be drawn with it: none (ticket 376)      |
+| `aethericParts.json`             | the items, their assets, parts and attach points, the GD's place            |
 | `author_aetheric.py`             | wrote the first version of the sources (Blender)                            |
 | `render_aetheric.py`             | the renders above (Blender), on the tech gear review's rig and frame        |
+| `check_clearance.py`             | writes `clearance.json` (Blender); exits 1 on any overlap                   |
 
 ```
 blender -b --factory-startup --python-exit-code 1 -P docs/art/aetheric/author_aetheric.py [-- <id> ...]
-blender -b --factory-startup --python-exit-code 1 -P docs/art/aetheric/render_aetheric.py [-- alone|rig]
+blender -b --factory-startup --python-exit-code 1 -P docs/art/aetheric/render_aetheric.py [-- alone|rig|bare|fitted|clearance]
+blender -b --factory-startup --python-exit-code 1 -P docs/art/aetheric/check_clearance.py
 ```
 
 ## Hand checks (14 Oct 2026)
@@ -63,18 +68,43 @@ blender -b --factory-startup --python-exit-code 1 -P docs/art/aetheric/render_ae
 - Not looked over live in the MCP Blender: the review is the headless renders above, the same way
   #362 and #364 were reviewed.
 
+## Attach points (ticket 376, 14 Oct 2026)
+
+Each part has its own point (TD lock on #265), placed in `vehicle.blend` by
+`scripts/art/place_vehicle_attach.py`. `rig.fitted.png` and both clearance renders now stand the
+parts there. `stageAtM` in the table is where the first renders put them, and it overlapped the
+tether reel, the echo sounder, a slot housing and the acid etcher.
+
+| Point             | Part                  | `atM`         | `z` | Where it sits                                               |
+| ----------------- | --------------------- | ------------- | --- | ----------------------------------------------------------- |
+| `hull.stack.side` | resonance whistle     | (-0.15, 0.29) | 3   | teed off the foot of the second stack, on its fore side     |
+| `hull.nose`       | phase lantern         | (0.28, 0.12)  | 6   | on the fore deck behind the periscope                       |
+| `hull.roof.coils` | arc coil              | (-0.18, 0.10) | 6   | on the hull's roof plate, before the aft boiler             |
+| `hull.tail`       | chronometric governor | (-0.31, 0.35) | 6   | on the aft stack, beside the echo sounder and over the rack |
+| `hull.flank`      | aether condenser      | (0.06, -0.23) | 6   | low on the flank, over the track, below the slot housings   |
+
+These are as near the GD's places as clearance allows. `check_clearance.py` finds every one of
+them clear, in the front view, of every gear row folded and deployed, every slot housing in each
+cradle, the turret at every look, the rack, the bore gun, the `hull.stack` showcase stack, the
+`hull.liner` point and the other four parts. Even so, three of them sit away from the place the GD
+named:
+
+- **The nose tip is taken.** The hood extractor and the side cutters cover the hull's nose
+  whenever they are owned, so the lantern stands on the fore deck.
+- **The roof over the boilers is taken.** The tether reel, the turret pillar and the stacks leave
+  no 0.27 m span, so the coils stand on the roof plate the boilers sit on.
+- **The rear is taken.** The rack, its crates, the echo sounder and the acid etcher fill it, so the
+  escapement cage rides the aft stack.
+
 ## Known limits, for the wiring (#265)
 
-- **No attach points.** The TD picks the ids and their `atM`; `stageAtM` and `nearPoint` only
-  stage the renders. The whistle stands next to `hull.stack`, not at it, since the turret's
-  barrels pass over the stack's top.
 - **No export yet.** `npm run art:export` needs each id registered (`r.artAssets`) and a
   placeholder sidecar listing its part ids; both come with the wiring. The part ids are in
   `aethericParts.json`.
-- The draw order is a suggestion: `z` 3 for the whistle (over the stack's 2), 9 for the lantern
-  (with the drill hood), 6 for the rest (with the slot items).
+- The draw order is the point's `z`: 3 for the whistle (over the stack's 2) and 6 for the rest,
+  with the slot items. The lantern's 9 belonged to the hood place it no longer takes.
 - The rig parts are drawn for the tier-3 hull; on tier 1 and 2 the stack and boilers sit a little
-  differently and the TD's attach points absorb that.
+  differently. On tier 1 there is no second stack, so the whistle stands on the boiler's crown.
 
 ## The whistle ships first (#262)
 

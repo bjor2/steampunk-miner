@@ -1,11 +1,12 @@
 {
-  "about": "The aetheric vehicle parts (ticket 363, art half of #265; GD lock on #245): one Blender asset per aetheric item, named by slotItemAssetIdOf. `place` is the GD's words for where the part sits; `nearPoint` is the vehicle sidecar point nearest that place, and `stageAtM` is where the review renders put the asset's origin on the tier-3 rig. Neither is an attach id: those are the TD's and come with the wiring (#265, with #314, #250 and #235).",
+  "about": "The aetheric vehicle parts (ticket 363, art half of #265; GD lock on #245): one Blender asset per aetheric item, named by slotItemAssetIdOf. `place` is the GD's words for where the part sits and `nearPoint` the sidecar point nearest that place before the part had its own. `attach` is the part's own point (TD lock on #265, ticket 376); the renders read its atM from the vehicle sidecar. `stageAtM` was the review position of the first renders, kept for the record.",
   "parts": [
     {
       "itemId": "power.resonance_whistle",
       "assetId": "vehicle-item-power-resonance-whistle",
       "place": "brass whistle on the boiler stack",
       "nearPoint": "hull.stack",
+      "attach": "hull.stack.side",
       "stageAtM": [-0.125, 0.33],
       "z": 3,
       "parts": ["whistle-body", "whistle-lever"]
@@ -15,6 +16,7 @@
       "assetId": "vehicle-item-power-phase-lantern",
       "place": "aether lantern on the nose",
       "nearPoint": "drill.hood",
+      "attach": "hull.nose",
       "stageAtM": [0.43, 0.15],
       "z": 9,
       "parts": ["lantern-frame", "lantern-shutter"]
@@ -24,6 +26,7 @@
       "assetId": "vehicle-item-power-arc-coil",
       "place": "twin Tesla coils on the roof",
       "nearPoint": "hull.roof.mid",
+      "attach": "hull.roof.coils",
       "stageAtM": [0.19, 0.385],
       "z": 6,
       "parts": ["coil-aft", "coil-fore", "coil-plinth"]
@@ -33,6 +36,7 @@
       "assetId": "vehicle-item-power-chronometric-governor",
       "place": "escapement (gyro) cage at the rear",
       "nearPoint": "hull.roof.aft",
+      "attach": "hull.tail",
       "stageAtM": [-0.45, 0.15],
       "z": 6,
       "parts": ["escapement-cage", "escapement-wheel"]
@@ -42,6 +46,7 @@
       "assetId": "vehicle-item-power-aether-condenser",
       "place": "condenser tank on the flank",
       "nearPoint": "hull.liner",
+      "attach": "hull.flank",
       "stageAtM": [-0.28, -0.1],
       "z": 6,
       "parts": ["condenser-needle", "condenser-tank"]

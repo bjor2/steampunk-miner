@@ -1,0 +1,40 @@
+{
+  "about": "Ticket 376: silhouette overlaps of each aetheric part at its attach point, on a 4 mm grid; written by check_clearance.py. `overlaps` must be empty; `unfold` lists the 8-tick extractor unfold sweep for the record.",
+  "points": {
+    "hull.stack.side": {
+      "atM": [-0.15, 0.29],
+      "z": 3,
+      "overlaps": [],
+      "unfold": [],
+      "checked": 144
+    },
+    "hull.nose": {
+      "atM": [0.28, 0.12],
+      "z": 6,
+      "overlaps": [],
+      "unfold": [],
+      "checked": 144
+    },
+    "hull.roof.coils": {
+      "atM": [-0.18, 0.1],
+      "z": 6,
+      "overlaps": [],
+      "unfold": [],
+      "checked": 144
+    },
+    "hull.tail": {
+      "atM": [-0.31, 0.35],
+      "z": 6,
+      "overlaps": [],
+      "unfold": [],
+      "checked": 144
+    },
+    "hull.flank": {
+      "atM": [0.06, -0.23],
+      "z": 6,
+      "overlaps": [],
+      "unfold": [],
+      "checked": 144
+    }
+  }
+}
