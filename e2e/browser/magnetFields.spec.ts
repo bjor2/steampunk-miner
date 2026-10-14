@@ -32,9 +32,10 @@ async function openGame(page: Page): Promise<string[]> {
 async function readMagnetFields(page: Page): Promise<DrawnFields | null> {
   return page.evaluate(() => {
     const result = window.steampunkDebug!.features['terrain-tools'].getMagnetFields() as {
-      fields: DrawnFields | null
+      ok: boolean
+      fields?: DrawnFields | null
     }
-    return result.fields
+    return result.fields ?? null
   })
 }
 
@@ -42,9 +43,10 @@ test('the magnet field layer draws nothing while no magnet is owned', async ({ p
   const errors = await openGame(page)
   await page.waitForFunction(() => {
     const result = window.steampunkDebug!.features['terrain-tools'].getMagnetFields() as {
-      fields: unknown
+      ok: boolean
+      fields?: unknown
     }
-    return result.fields !== null
+    return (result.fields ?? null) !== null
   })
   expect(await readMagnetFields(page)).toMatchObject({ pieces: 0, fields: [] })
   expect(errors).toEqual([])
@@ -60,7 +62,8 @@ test('a planted beacon draws its converging arcs faint while it waits', async ({
   await page.evaluate(() => window.steampunkDebug!.input.tap('use_slot_1'))
   await page.waitForFunction(() => {
     const result = window.steampunkDebug!.features['terrain-tools'].getMagnetFields() as {
-      fields: { pieces: number } | null
+      ok: boolean
+      fields?: { pieces: number } | null
     }
     return (result.fields?.pieces ?? 0) > 0
   })
