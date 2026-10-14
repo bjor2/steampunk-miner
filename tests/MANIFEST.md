@@ -27,11 +27,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
-### `aetheric`: 1 file, 5 tests
+### `aetheric`: 4 files, 24 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/aetheric/aethericCards.vision.test.ts` | 4 | 4 |
+| `src/features/aetheric/resonanceWhistle.test.ts` | 8 | 8 |
 | `src/features/aetheric/systems/aethericNodes.test.ts` | 5 | 5 |
+| `src/features/aetheric/whistleRows.test.ts` | 7 | 7 |
 
 ### `artefact`: 4 files, 31 tests
 
@@ -834,7 +837,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/dockFacilities.test.ts` | 5 | 5 |
 | `src/systems/registries/dockServices.test.ts` | 4 | 4 |
 | `src/systems/registries/enemyDetectionModifiers.test.ts` | 4 | 4 |
-| `src/systems/registries/enemyLures.test.ts` | 7 | 7 |
+| `src/systems/registries/enemyLures.test.ts` | 9 | 9 |
 | `src/systems/registries/gateChecks.test.ts` | 5 | 5 |
 | `src/systems/registries/generationHooks.test.ts` | 4 | 4 |
 | `src/systems/registries/groundReinforcement.test.ts` | 6 | 6 |
