@@ -140,6 +140,16 @@ describe('terrain fork', () => {
     expect(fractured.events.map((event) => event.type)).toEqual(['terrain-tools.TerrainEdited'])
   })
 
+  it('fractures nothing before the blasting_charges row opens, Breaker or not', () => {
+    const session = minerOnForkPlanet('breaker')
+    session.submit(2, { type: 'debug.setPlanet', payload: { planetIndex: 1 } })
+    const state = session.state()
+    expect(breakerFractureCellsOf(state, 'p1')).toBe(breaker.fractureCells)
+    const fractured = fractureAfterBlast(state, blastAt({ tx: 20, ty: 100 }))
+    expect(fractured.state).toBe(state)
+    expect(fractured.events).toEqual([])
+  })
+
   it('fractures nothing for a blaster without the Breaker', () => {
     const state = minerOnForkPlanet('bracer').state()
     const fractured = fractureAfterBlast(state, blastAt({ tx: RIG.tx + 6, ty: RIG.ty - 6 }))

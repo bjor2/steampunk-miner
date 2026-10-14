@@ -418,7 +418,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 46 files, 329 tests
+### `tech-tree`: 47 files, 330 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -432,6 +432,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/aethericLane.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/familySharePins.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/familySpendShares.test.ts` | 8 | 8 |
+| `src/features/tech-tree/systems/forkBranchCards.vision.test.ts` | 1 | 1 |
 | `src/features/tech-tree/systems/forkChoice.test.ts` | 13 | 13 |
 | `src/features/tech-tree/systems/forkCost.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/forkForce.test.ts` | 3 | 3 |
@@ -469,7 +470,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 
-### `terrain-tools`: 36 files, 285 tests
+### `terrain-tools`: 36 files, 286 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -501,7 +502,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/statPreview.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/terrainEconomy.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/terrainEditCaps.test.ts` | 13 | 3 |
-| `src/features/terrain-tools/systems/terrainFork.test.ts` | 10 | 10 |
+| `src/features/terrain-tools/systems/terrainFork.test.ts` | 11 | 11 |
 | `src/features/terrain-tools/systems/terrainItems.test.ts` | 11 | 11 |
 | `src/features/terrain-tools/systems/terrainSales.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/terrainSection.test.ts` | 4 | 4 |
