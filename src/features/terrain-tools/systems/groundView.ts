@@ -11,7 +11,9 @@
  * - ore only ever moves onto plain ground where no gate would hold it, so a drag never turns a
  *   common nodule into a gated one across a band edge, and never makes or loses ore.
  */
-import type { AuthorityState } from '../../../systems/authority/authorityState'
+import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
+import { ticksPerCell } from '../../../systems/authority/groundDrill'
+import { heatThrottledDrill } from '../../../systems/authority/heatRules'
 import { resourceTierOf } from '../../../systems/authority/minedOre'
 import { planetParamsOf } from '../../../systems/authority/planetOfState'
 import { gateVerdictOf, type GateVerdict } from '../../../systems/registries/gateChecks'
@@ -101,6 +103,11 @@ export function isWorkableGround(view: GroundView, tile: TilePoint): boolean {
   return kindNow(view, tile) === CELL_KIND.ground && isFreeOfAnchorAndCasing(view, tile)
 }
 
+/** Workable plain ground that the planning player's drill could cut: what a fissure opens. */
+export function isDrillableGround(view: GroundView, tile: TilePoint): boolean {
+  return isWorkableGround(view, tile) && !isTooHardForDrill(view, tile)
+}
+
 /** An ore cell no gate holds against the tool, off every anchor and casing: a tool may move it. */
 export function isLooseOre(view: GroundView, tile: TilePoint): boolean {
   if (kindNow(view, tile) !== CELL_KIND.ore || !isFreeOfAnchorAndCasing(view, tile)) return false
@@ -122,6 +129,11 @@ export function markOpened(view: GroundView, tile: TilePoint): void {
 
 export function markMoved(view: GroundView, tile: TilePoint, material: number): void {
   view.moved.set(keyOf(tile), material)
+}
+
+function isTooHardForDrill(view: GroundView, tile: TilePoint): boolean {
+  const drill = heatThrottledDrill(view.params.planetIndex, vehicleOf(view.state, view.playerId))
+  return ticksPerCell(drill, view.params, tile, cellNow(view, tile)) === null
 }
 
 function isEmptied(view: GroundView, tile: TilePoint): boolean {

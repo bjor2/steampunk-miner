@@ -18,6 +18,7 @@ import { SHIPPED_MAGNET_ITEMS, SHIPPED_TERRAIN_ITEMS } from './shippedTools'
 import { magnetCardOf } from './magnetCards'
 import { MAGNET_ITEMS, magnetTechNodeOf, magnetVehicleItemOf } from './magnetItems'
 import { FOURTH_CRADLE_NODE } from './terrainCradle'
+import { TERRAIN_FORK } from './terrainFork'
 import { statPreview, type TerrainStatLine, type TerrainStatUnit } from './statPreview'
 import {
   isConsumable,
@@ -48,11 +49,15 @@ export const TERRAIN_VEHICLE_ITEMS: readonly VehicleItem[] = [
   ...SHIPPED_MAGNET_ITEMS.map(magnetVehicleItemOf),
 ]
 
-/** The tools' nodes, the fourth cradle's (ticket 251) and the magnets' (ticket 300). */
+/**
+ * The tools' nodes, the fourth cradle's (ticket 251), the magnets' (ticket 300) and the P16 fork's
+ * two branches (ticket 269), researched passives that add no vehicle item.
+ */
 export const TERRAIN_TECH_NODES: readonly TechNode[] = [
   ...SHIPPED_TERRAIN_ITEMS.map(techNodeOf),
   FOURTH_CRADLE_NODE,
   ...MAGNET_ITEMS.map(magnetTechNodeOf),
+  ...TERRAIN_FORK.branches,
 ]
 
 export const TERRAIN_ITEM_CARDS: readonly ItemDescriptionEntry[] = [

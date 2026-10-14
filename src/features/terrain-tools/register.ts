@@ -15,12 +15,17 @@
  * `twist` hook), the shifter leaves a magnet plate in the section and drags toward it; the owner's
  * dock takes the plate back.
  * Stabiliser foam, the cryo binder, shoring props and the strata press stay vision rows
- * (`systems/shippedTools.ts`). No side effects at import; the loader calls `register`.
+ * (`systems/shippedTools.ts`). The lane's P16 fork (ticket 269), built on no magnet: the Bracer
+ * props warning collapse blocks round its rig through the same `collapseBraces` seam, fed by a
+ * reaction to `CollapseWarned`; the Breaker fractures the plain ground past each charge it blasts,
+ * as a blast effect on the K6 queue. No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { terrainToolsDebugActions } from './debug'
 import { TERRAIN_PROJECTIONS, TERRAIN_RUN_EVENTS } from './logging'
 import { MAGNET_FIELD_LAYER_ID, MagnetFieldLayer } from './scene/MagnetFieldLayer'
+import { BRACER_PROP_BRACES, BRACER_PROPS_REACTION } from './systems/bracerProps'
+import { BREAKER_FRACTURE } from './systems/breakerFracture'
 import { LIVE_LODESTONE_PROVIDER, LODESTONE_DOCK_REACTION } from './systems/lodestoneBeacon'
 import { HOLD_LODE_CLAMPS_STEP, LODE_CLAMP_BRACES } from './systems/lodeClamp'
 import { TERRAIN_MAGNETS_SPEND_FAMILY } from './systems/magnetSpend'
@@ -47,9 +52,12 @@ export const slice: SliceDefinition = {
     r.saveSection(TERRAIN_TOOLS_SECTION)
     r.authorityReaction(LODESTONE_DOCK_REACTION)
     r.authorityReaction(ORE_LURE_DOCK_REACTION)
+    r.authorityReaction(BRACER_PROPS_REACTION)
     r.liveBeacon(LIVE_LODESTONE_PROVIDER)
     r.clockStep(HOLD_LODE_CLAMPS_STEP)
     r.collapseBrace(LODE_CLAMP_BRACES)
+    r.collapseBrace(BRACER_PROP_BRACES)
+    r.blastEffect(BREAKER_FRACTURE)
     r.sceneLayer({
       id: MAGNET_FIELD_LAYER_ID,
       Layer: MagnetFieldLayer,

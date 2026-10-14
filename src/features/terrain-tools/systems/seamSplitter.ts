@@ -13,10 +13,7 @@
  * toward the side the miner steers toward (Content's where-fix on #276); the Mark 6 hold splits
  * straight ahead of the drill, ignoring the grain. Each opens the same length from the same face.
  */
-import { vehicleOf } from '../../../systems/authority/authorityState'
 import type { TerrainCellEdit } from '../../../systems/authority/terrain/terrainEdits'
-import { ticksPerCell } from '../../../systems/authority/groundDrill'
-import { heatThrottledDrill } from '../../../systems/authority/heatRules'
 import { sideVectorOf } from '../../../systems/vehicle/facedSide'
 import { tileOfPose, type VehiclePose } from '../../../systems/vehicle/vehiclePose'
 import type { TilePoint } from '../../../systems/world/tileGrid'
@@ -24,11 +21,10 @@ import { ACTIVATION_UNIT_CAP, canAfford, draftOpen, OPEN_UNITS, openDraft } from
 import { facingStepOf, stepNearest, stepped, turnedStep, type GridStep } from './editGeometry'
 import { editSeedOf, tieBreakOf, type EditKey } from './editSeed'
 import {
-  cellNow,
   fixedBlockOf,
   isAnchored,
+  isDrillableGround,
   isOpenAir,
-  isWorkableGround,
   type GroundView,
 } from './groundView'
 import { terrainItemNamed } from './itemMagnitude'
@@ -86,20 +82,10 @@ function splitAlong(view: GroundView, face: TilePoint, grain: GridStep, length: 
   const draft = openDraft(view, ACTIVATION_UNIT_CAP)
   for (let step = 0; step < length && canAfford(draft, OPEN_UNITS); step += 1) {
     const tile = stepped(face, grain, step)
-    if (!isSplittable(view, tile)) break
+    if (!isDrillableGround(view, tile)) break
     draftOpen(draft, tile)
   }
   return draft.cells
-}
-
-/** Plain ground off the anchors and casing that the miner's drill could cut. */
-function isSplittable(view: GroundView, tile: TilePoint): boolean {
-  return isWorkableGround(view, tile) && !isTooHardForDrill(view, tile)
-}
-
-function isTooHardForDrill(view: GroundView, tile: TilePoint): boolean {
-  const drill = heatThrottledDrill(view.params.planetIndex, vehicleOf(view.state, view.playerId))
-  return ticksPerCell(drill, view.params, tile, cellNow(view, tile)) === null
 }
 
 function planOfFissure(cells: readonly TerrainCellEdit[]): TerrainPlan {

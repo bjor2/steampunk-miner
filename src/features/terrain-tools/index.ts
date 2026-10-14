@@ -4,7 +4,7 @@
  * and `statPreview`. #202 ships four with their effect (`SHIPPED_TERRAIN_ITEMS`); the other four
  * stay vision rows (`HELD_BACK_ITEM_IDS`). The terrain magnets (#246): their rows, family tag and
  * card entries; the repulsor coil ships with its push-wave (ticket 284), the lode clamp with its
- * held brace (ticket 285).
+ * held brace (ticket 285). The lane's P16 fork (ticket 269): Bracer and Breaker.
  */
 export const TERRAIN_TOOLS_SLICE_ID = 'terrain-tools'
 export type { TerrainItem, TerrainNode, TerrainSizeUnit } from './systems/terrainItems'
@@ -39,3 +39,9 @@ export {
 } from './systems/magnetItems'
 export { MAGNET_ITEM_CARDS } from './systems/magnetCards'
 export { HELD_BACK_ITEM_IDS, isHeldBack, SHIPPED_TERRAIN_ITEMS } from './systems/shippedTools'
+export {
+  BRACER_FRAME,
+  BREAKER_FUSE,
+  TERRAIN_FORK,
+  TERRAIN_FORK_BALANCE,
+} from './systems/terrainFork'

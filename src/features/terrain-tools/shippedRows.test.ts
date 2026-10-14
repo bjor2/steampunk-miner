@@ -14,6 +14,7 @@ import { flavourProblemsOf } from '../descriptions'
 import { POWER_UP_SLOTS } from '../power-up-core'
 import { lastMarkOf } from '../tech-tree'
 import { MAGNET_ITEMS } from './systems/magnetItems'
+import { TERRAIN_FORK } from './systems/terrainFork'
 import { HELD_BACK_ITEM_IDS, SHIPPED_TERRAIN_ITEMS } from './systems/shippedTools'
 import { isConsumable, markLadderOf, TERRAIN_ITEMS } from './systems/terrainItems'
 
@@ -60,7 +61,7 @@ function describedAt(itemId: string, mark: number, planetIndex: number) {
 }
 
 describe('terrain-tools shipped rows', () => {
-  it('registers four tools as vehicle items and power-ups, their nodes, the cradle and the magnets', () => {
+  it('registers four tools as vehicle items and power-ups, their nodes, the cradle, the magnets and the fork', () => {
     expect(SHIPPED_IDS).toEqual([
       'power.ore_shifter',
       'consumable.seam_splitter',
@@ -73,7 +74,12 @@ describe('terrain-tools shipped rows', () => {
     expect(SHIPPED_IDS.filter((id) => !powerUps.includes(id))).toEqual([])
     const lane = contentOf('tech-node').filter((node) => node.lane === 'terrain')
     expect(lane.map((node) => node.unlocks).sort()).toEqual(
-      [...SHIPPED_IDS, 'slot.powerup_4', ...MAGNET_ITEMS.map((item) => item.itemId)].sort(),
+      [
+        ...SHIPPED_IDS,
+        'slot.powerup_4',
+        ...MAGNET_ITEMS.map((item) => item.itemId),
+        ...TERRAIN_FORK.branches.map((branch) => branch.unlocks),
+      ].sort(),
     )
   })
 

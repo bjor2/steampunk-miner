@@ -9,7 +9,8 @@
  * fixed at the act, so the braces it claims are derived from the save alone. The field is absent
  * while no clamp is held, so a save, a digest or a golden with no clamp is unchanged and the
  * section needs no new version. The Ore Lure twist's magnet plate (ticket 329) is one more such
- * field, absent while no plate is left.
+ * field, absent while no plate is left, and so are the Bracer fork branch's props (ticket 269),
+ * absent while none holds.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { isJsonObject, isWholeNumber } from '../../../systems/authority/payloadFields'
@@ -52,6 +53,15 @@ export interface LurePlate {
   planetIndex: number
 }
 
+/** A Bracer prop holding one warning collapse block of a planet until a tick (ticket 269). */
+export interface BracerProp {
+  /** `cx,cy#index` (`collapseBlock.blockIdOf`). */
+  block: string
+  planetIndex: number
+  /** The first tick it no longer holds. */
+  untilTick: number
+}
+
 export interface TerrainToolsState {
   /** One live beacon per planet (#162 row); null with none planted. */
   beacon: LodestoneBeacon | null
@@ -59,6 +69,8 @@ export interface TerrainToolsState {
   clamp?: ClampField
   /** Absent while no Ore Lure plate is left. */
   plate?: LurePlate
+  /** Absent while no Bracer prop holds. */
+  props?: readonly BracerProp[]
 }
 
 export const NO_TERRAIN_TOOLS_STATE: TerrainToolsState = { beacon: null }
@@ -109,6 +121,16 @@ export function withLurePlate(
   )
 }
 
+/** The player's Bracer props, or none with an empty list. */
+export function withBracerProps(
+  state: AuthorityState,
+  playerId: string,
+  props: readonly BracerProp[],
+): AuthorityState {
+  const { props: _held, ...unpropped } = terrainToolsOf(state, playerId)
+  return withTerrainTools(state, playerId, props.length === 0 ? unpropped : { ...unpropped, props })
+}
+
 function withTerrainTools(
   state: AuthorityState,
   playerId: string,
@@ -124,6 +146,7 @@ export function terrainToolsStateProblems(body: unknown): string[] {
     ...beaconProblems(body.beacon),
     ...clampProblems(body.clamp),
     ...plateProblems(body.plate),
+    ...propProblems(body.props),
   ]
 }
 
@@ -142,6 +165,20 @@ function clampProblems(clamp: unknown): string[] {
 
 function plateProblems(plate: unknown): string[] {
   return plate === undefined || isLurePlate(plate) ? [] : ['terrain-tools.plate is malformed']
+}
+
+function propProblems(props: unknown): string[] {
+  const isPropList = Array.isArray(props) && props.length > 0 && props.every(isBracerProp)
+  return props === undefined || isPropList ? [] : ['terrain-tools.props is malformed']
+}
+
+function isBracerProp(prop: unknown): boolean {
+  return (
+    isJsonObject(prop) &&
+    typeof prop.block === 'string' &&
+    isWholeNumber(prop.planetIndex) &&
+    isWholeNumber(prop.untilTick)
+  )
 }
 
 function isLurePlate(plate: unknown): boolean {

@@ -72,5 +72,16 @@
         "magnitude": 180
       }
     }
+  },
+  "forks": {
+    "source": "GD lock on #255 (ticket 269): the terrain fork at P16, neither branch built on or naming a magnet. Bracer props every collapse block that starts to warn round the rig (ring 1 of its tile) for propTicks, its Mark magnitude; a prop that ends warns the block afresh, so a rig that stays props it again. Breaker fractures the plain ground just past each charge it blasts, nearest the blast first, out to ringTiles beyond the charge's radius: fractureCells density cells a blast, its Mark magnitude, up to the TD's 32-cell activation cap. Starting values for G&V to tune; both branches share one tier and slot, so they cost the same.",
+    "bracer": {
+      "propTicks": 600
+    },
+    "breaker": {
+      "fractureCells": 12,
+      "fractureCellsLimit": 32,
+      "ringTiles": 2
+    }
   }
 }
