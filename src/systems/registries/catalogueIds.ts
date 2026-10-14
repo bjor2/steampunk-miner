@@ -2,10 +2,11 @@
  * The bare catalogue id rule (#224, from the GD and TD locks on #200): a store item or tech node
  * keeps one id across the store, the tree and the descriptions (`slot.powerup_4`,
  * `tech.terrain.cradle_4`), so a slice may register its content under `<category>.<name>` instead
- * of its own prefix. The category is one of the #162 store categories or `tech` (the #165 lane
- * nodes). An id with no category, or any other one, is refused, so a bare id never equals a flat
- * snake_case stats.json row id (`remote_detonator`). Each bare id has one owning slice: a second
- * slice registering it is the content registry's duplicate refusal.
+ * of its own prefix. The category is one of the #162 store categories (`combo` for the milestone
+ * combos, 206b) or `tech` (the #165 lane nodes). An id with no category, or any other one, is
+ * refused, so a bare id never equals a flat snake_case stats.json row id (`remote_detonator`).
+ * Each bare id has one owning slice: a second slice registering it is the content registry's
+ * duplicate refusal.
  */
 
 /** The categories a bare catalogue id may start with, in #162 order. */
@@ -16,6 +17,7 @@ export const BARE_CATALOGUE_CATEGORIES = [
   'gear',
   'rig',
   'slot',
+  'combo',
   'tech',
 ] as const
 

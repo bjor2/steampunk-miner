@@ -26,6 +26,7 @@ describe('bare catalogue ids', () => {
       'gear.twin_bit',
       'rig.resonance',
       'slot.powerup_4',
+      'combo.assay_drain',
       'tech.terrain.cradle_4',
       'tech.combo.gen.41',
     ]
@@ -39,7 +40,7 @@ describe('bare catalogue ids', () => {
 
   it('refuses an id under any other category', () => {
     expect(bareCatalogueIdProblems('mobility.cradle_3')).toEqual([
-      'has category "mobility", not one of power, consumable, passive, gear, rig, slot, tech',
+      'has category "mobility", not one of power, consumable, passive, gear, rig, slot, combo, tech',
     ])
   })
 
