@@ -8,11 +8,15 @@
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import type { Group, MeshStandardMaterial } from 'three'
-import { DRILL_SPARK_LIGHT } from '../constants/scene'
 import { useGameStore } from '../store/gameStore'
 import { slotOfPartId } from '../systems/art/artIds'
 import type { AssetQuad, AtlasMaps, AtlasUv } from '../systems/art/assetLook'
-import { createPartPose, writePartPose, type PartPose } from '../systems/render/partMotion'
+import {
+  createPartPose,
+  glowColourOf,
+  writePartPose,
+  type PartPose,
+} from '../systems/render/partMotion'
 import { createAtlasQuad } from './atlasQuadGeometry'
 import { useAtlasAlbedo, useAtlasEmissive, useAtlasNormal } from './atlasTextures'
 import { useDisposeOnRelease } from './disposeOnRelease'
@@ -24,8 +28,6 @@ const Z_PER_DRAW_ORDER = 0.01
 const MASK_CUTOFF = 0.5
 /** Placeholders, tuned by eye until the S7a maps bring their own. */
 const PART_ROUGHNESS = 0.55
-/** The drill tip glows the colour of its sparks; a lamp glows its own colour. */
-const DRILL_TIP_GLOW = DRILL_SPARK_LIGHT.colour
 
 interface AtlasQuadMeshProps {
   quad: AssetQuad & { uv: AtlasUv }
@@ -80,7 +82,7 @@ function AtlasQuadMeshLit({
   const slot = slotOfPartId(quad.partId)
   const [pivotX, pivotY] = quad.pivot
   const z = baseZ + quad.z * Z_PER_DRAW_ORDER
-  const glowColour = slot.startsWith('drill-bit') ? DRILL_TIP_GLOW : quad.colour
+  const glowColour = glowColourOf(slot, quad.colour)
   useFrame(() => {
     writePartPose(partMotion, slot, quad.size[1] / 2, isMotionReduced(), pose)
     placePart(group.current, quad, z, pose)

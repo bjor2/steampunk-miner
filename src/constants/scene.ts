@@ -278,6 +278,14 @@ export const LANDING_SPEED_MPS = 2
 export const HIT_RECOIL_M = 0.04
 export const HIT_SNAP_SECONDS = 0.06
 export const HIT_SETTLE_SECONDS = 0.2
+/**
+ * The casing driller's rear arms (ticket 393): as a casing ring is laid they swing down and back
+ * once to set it, out over the first half of the swing and home over the second. The thrusters'
+ * glow is white so the emissive map's own blue core and orange lip show. Tuned by eye.
+ */
+export const CASING_ARM_SECONDS = 0.5
+export const CASING_ARM_SWING_RADIANS = 0.6
+export const THRUSTER_GLOW_COLOUR = '#ffffff'
 
 /**
  * Drill sparks (#13 VFX, from a small particle set). Placeholders, tuned by eye; the pool is

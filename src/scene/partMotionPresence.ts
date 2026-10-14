@@ -1,7 +1,7 @@
 /**
  * The run vehicle's part motion (#48): stepped once per physics tick by the vehicle loop from the
  * tick's pose and flags, kicked by a hit cue, read by the parts each frame and by the debug API.
- * Each tick it also asks the `partMotionRequests` sources what the slices want of the parts (#180
+ * The casing hiss swings the rear arms (ticket 393). Each tick it also asks the `partMotionRequests` sources what the slices want of the parts (#180
  * showcase reactions and model swaps). A mutable registry, because it changes every tick and never
  * goes through React or the store; this module is its only writer.
  */
@@ -12,6 +12,7 @@ import { foldPartRequests } from '../systems/render/requestedParts'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
 import {
   createPartMotion,
+  layCasingRing,
   recoilFromHit,
   stepPartMotion,
   type PartMotionStep,
@@ -42,4 +43,8 @@ export function stepVehicleParts(pose: VehiclePose, flags: ActionFlags): void {
 
 export function recoilVehicleParts(): void {
   recoilFromHit(partMotion)
+}
+
+export function swingCasingArms(): void {
+  layCasingRing(partMotion)
 }

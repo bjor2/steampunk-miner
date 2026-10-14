@@ -2,7 +2,9 @@
  * Vehicle part motion (#48 "State drives motion", #38 animation technique: procedural transforms
  * on layered parts, no rigs, no flipbooks). The motion steps once per physics tick from what the
  * vehicle did that tick: wheels roll with the signed ground speed, the drill turns a fixed angle
- * per drilling tick, pistons pump with thrust, the boiler bobs with the energy draw. A landing
+ * per drilling tick and the nose glows with the load, pistons pump and the thrusters glow with
+ * thrust, the boiler bobs with the energy draw, and the casing arms (ticket 393) swing once each
+ * time a casing ring is laid. A landing
  * squashes the chassis and a hit recoils it, unless the player turned motion effects off. While
  * idle only the boiler's slow breath and the headlamp's flicker move. Each part's pose is read
  * from the motion by its slot, so the same rule poses the placeholder quads and the S7a art. A
@@ -14,7 +16,10 @@ import {
   BOILER_BOB_M,
   BOILER_BREATH_HZ,
   BOILER_BREATH_M,
+  CASING_ARM_SECONDS,
+  CASING_ARM_SWING_RADIANS,
   DRILL_RADIANS_PER_TICK,
+  DRILL_SPARK_LIGHT,
   HEADLAMP_FLICKER_SHARE,
   HIT_RECOIL_M,
   HIT_SETTLE_SECONDS,
@@ -25,6 +30,7 @@ import {
   LOAD_EASE_SECONDS,
   PISTON_HZ,
   PISTON_TRAVEL_M,
+  THRUSTER_GLOW_COLOUR,
 } from '../../constants/scene'
 import { createRequestedParts, type RequestedPartPose, type RequestedParts } from './requestedParts'
 
@@ -49,11 +55,15 @@ export interface PartMotion {
   pistonTurns: number
   /** The energy draw, 0 to 1, eased. */
   load: number
+  /** The thrusters' firing, 0 to 1, eased like the load. */
+  thrust: number
   /** Seconds of motion, for the breath, the bob and the flicker. */
   seconds: number
   wasFalling: boolean
   squashSeconds: number
   hitSeconds: number
+  /** Seconds left of the casing arms' swing. */
+  casingSeconds: number
   /** What slices ask of the parts this step (`partMotionRequests`); nothing by default. */
   requested: RequestedParts
 }
@@ -73,10 +83,12 @@ export function createPartMotion(): PartMotion {
     drillTicks: 0,
     pistonTurns: 0,
     load: 0,
+    thrust: 0,
     seconds: 0,
     wasFalling: false,
     squashSeconds: 0,
     hitSeconds: 0,
+    casingSeconds: 0,
     requested: createRequestedParts(),
   }
 }
@@ -90,16 +102,38 @@ export function stepPartMotion(motion: PartMotion, step: PartMotionStep, dt: num
   motion.rolledMetres += step.alongMetresPerSecond * dt
   if (step.isDrilling) motion.drillTicks++
   if (step.isThrusting) motion.pistonTurns += PISTON_HZ * dt
-  motion.load += (loadOf(step) - motion.load) * (1 - Math.exp(-dt / LOAD_EASE_SECONDS))
+  motion.load = easedTowards(motion.load, loadOf(step), dt)
+  motion.thrust = easedTowards(motion.thrust, step.isThrusting ? 1 : 0, dt)
   motion.seconds += dt
   squashOnLanding(motion, step.upMetresPerSecond)
   motion.squashSeconds = Math.max(0, motion.squashSeconds - dt)
   motion.hitSeconds = Math.max(0, motion.hitSeconds - dt)
+  motion.casingSeconds = Math.max(0, motion.casingSeconds - dt)
 }
 
 /** A hit on the vehicle (#48: a short 60 ms snap, then it settles). */
 export function recoilFromHit(motion: PartMotion): void {
   motion.hitSeconds = HIT_SECONDS
+}
+
+/** A casing ring laid behind the vehicle (#41 casing feel): the rear arms swing once to set it. */
+export function layCasingRing(motion: PartMotion): void {
+  motion.casingSeconds = CASING_ARM_SECONDS
+}
+
+/**
+ * The colour a part glows in: the drill nose its sparks', a thruster white so its emissive map's
+ * blue core and orange lip show, a lamp its own.
+ */
+export function glowColourOf(slot: string, partColour: string): string {
+  const kind = kindOfSlot(slot)
+  if (kind.startsWith('drill-')) return DRILL_SPARK_LIGHT.colour
+  return kind === 'thruster' ? THRUSTER_GLOW_COLOUR : partColour
+}
+
+/** Starts and stops ease over `LOAD_EASE_SECONDS` (#48: 80-120 ms). */
+function easedTowards(value: number, target: number, dt: number): number {
+  return value + (target - value) * (1 - Math.exp(-dt / LOAD_EASE_SECONDS))
 }
 
 /** Drilling draws the most, then thrust, then driving (#7 energy use order). */
@@ -159,7 +193,14 @@ function kindOfSlot(slot: string): string {
 function angleOf(motion: PartMotion, kind: string, radius: number): number {
   if (kind === 'wheel') return radius > 0 ? -motion.rolledMetres / radius : 0
   if (kind === 'drill-bit') return -motion.drillTicks * DRILL_RADIANS_PER_TICK
-  return 0
+  return kind === 'casing-arm' ? casingSwingOf(motion) : 0
+}
+
+/** Out and home on half a sine; positive turns the backward-reaching arms down to the bore wall. */
+function casingSwingOf(motion: PartMotion): number {
+  if (motion.casingSeconds <= 0) return 0
+  const share = 1 - motion.casingSeconds / CASING_ARM_SECONDS
+  return CASING_ARM_SWING_RADIANS * Math.sin(Math.PI * share)
 }
 
 function liftOf(motion: PartMotion, kind: string): number {
@@ -169,9 +210,10 @@ function liftOf(motion: PartMotion, kind: string): number {
   return breath + BOILER_BOB_M * motion.load * Math.sin(TURN * BOILER_BOB_HZ * motion.seconds)
 }
 
-/** The drill's tip glows with the load while it bites; the lamp flickers a little. */
+/** The drill's nose glows with the load while it bites, the thrusters as they fire; the lamp flickers a little. */
 function glowOf(motion: PartMotion, kind: string): number {
-  if (kind === 'drill-bit') return motion.load
+  if (kind === 'drill-bit' || kind === 'drill-head') return motion.load
+  if (kind === 'thruster') return motion.thrust
   if (kind !== 'headlamp') return 0
   const flicker = Math.sin(TURN * 7.3 * motion.seconds) * Math.sin(TURN * 2.9 * motion.seconds)
   return 1 - HEADLAMP_FLICKER_SHARE * Math.max(0, flicker)

@@ -3,14 +3,15 @@
  * authority replica's visual tier (#7: derived from the levels, never decided here), so an upgrade
  * threshold shows on the vehicle (37.7), with the parts a slice swaps in (#180). Drawn inside the
  * vehicle's body group, so it turns with the body; the drill head's parts are `DrillHeadView`'s.
- * Each part moves as the game state drives it (#48); a hit recoils the body.
+ * Each part moves as the game state drives it (#48); a hit recoils the body, and a casing ring
+ * laid behind it swings the rear arms (ticket 393).
  */
 import { useEffect, useMemo } from 'react'
 import { listenForFeedback } from '../store/feedbackBroadcast'
 import { useGameStore } from '../store/gameStore'
 import type { FeedbackCue } from '../systems/feedback/feedbackCues'
 import { vehicleAtlasMaps, vehicleBodyQuadsOf } from '../systems/render/vehicleLook'
-import { recoilVehicleParts } from './partMotionPresence'
+import { recoilVehicleParts, swingCasingArms } from './partMotionPresence'
 import { PartQuadMesh } from './PartQuadMesh'
 import { SHIPPED_ART } from './shippedArt'
 import { useSwappedPartIds } from './useSwappedPartIds'
@@ -26,7 +27,7 @@ export function VehiclePlaceholder() {
     () => vehicleBodyQuadsOf(SHIPPED_ART, visualTier, swapped),
     [visualTier, swapped],
   )
-  useEffect(() => listenForFeedback(recoilOnHit), [])
+  useEffect(() => listenForFeedback(movePartsOnCue), [])
   return (
     <>
       {quads.map((quad) => (
@@ -36,7 +37,8 @@ export function VehiclePlaceholder() {
   )
 }
 
-/** #48: the chassis recoils on hits. */
-function recoilOnHit(cue: FeedbackCue): void {
+/** #48: the chassis recoils on hits; the arms set each casing ring as its hiss plays. */
+function movePartsOnCue(cue: FeedbackCue): void {
   if (cue.kind === 'hit') recoilVehicleParts()
+  if (cue.kind === 'casingHiss') swingCasingArms()
 }

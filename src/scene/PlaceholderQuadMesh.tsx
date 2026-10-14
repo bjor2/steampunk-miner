@@ -3,18 +3,22 @@
  * step a hair nearer the camera than the last. Lit like the final art will be (#38 lit 2.5D, #48
  * lit brass): a matte surface the ambient, the headlamp and the point lights shade. It sits in a
  * group at its pivot, so its motion (#48: wheels roll, the drill turns, pistons pump, the boiler
- * bobs, the lamp and the drill tip glow) turns and lifts it about the point the art names. The
- * quad renders through React because it changes only with the visual tier; its pose is written
- * on refs each frame.
+ * bobs, the casing arms swing, the lamp, the drill nose and the thrusters glow) turns and lifts
+ * it about the point the art names. The quad renders through React because it changes only with
+ * the visual tier; its pose is written on refs each frame.
  */
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import type { Group, MeshStandardMaterial } from 'three'
-import { DRILL_SPARK_LIGHT } from '../constants/scene'
 import { useGameStore } from '../store/gameStore'
 import { slotOfPartId } from '../systems/art/artIds'
 import type { PlaceholderQuad } from '../systems/art/placeholderLook'
-import { createPartPose, writePartPose, type PartPose } from '../systems/render/partMotion'
+import {
+  createPartPose,
+  glowColourOf,
+  writePartPose,
+  type PartPose,
+} from '../systems/render/partMotion'
 import { partMotion } from './partMotionPresence'
 
 /** Small enough that ten draw-order steps stay inside the gap to the next layer of the scene. */
@@ -22,8 +26,6 @@ const Z_PER_DRAW_ORDER = 0.01
 
 /** Placeholders, tuned by eye until the S7a maps bring their own. */
 const PART_ROUGHNESS = 0.55
-/** The drill tip glows the colour of its sparks; a lamp glows its own colour. */
-const DRILL_TIP_GLOW = DRILL_SPARK_LIGHT.colour
 
 export function PlaceholderQuadMesh({ quad, baseZ }: { quad: PlaceholderQuad; baseZ: number }) {
   const group = useRef<Group>(null)
@@ -32,7 +34,7 @@ export function PlaceholderQuadMesh({ quad, baseZ }: { quad: PlaceholderQuad; ba
   const slot = slotOfPartId(quad.partId)
   const [pivotX, pivotY] = quad.pivot
   const z = baseZ + quad.z * Z_PER_DRAW_ORDER
-  const glowColour = slot.startsWith('drill-bit') ? DRILL_TIP_GLOW : quad.colour
+  const glowColour = glowColourOf(slot, quad.colour)
   useFrame(() => {
     writePartPose(partMotion, slot, quad.size[1] / 2, isMotionReduced(), pose)
     placePart(group.current, quad, z, pose)

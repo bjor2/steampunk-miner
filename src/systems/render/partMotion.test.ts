@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { DRILL_RADIANS_PER_TICK, LANDING_SQUASH_SHARE } from '../../constants/scene'
+import {
+  CASING_ARM_SECONDS,
+  CASING_ARM_SWING_RADIANS,
+  DRILL_RADIANS_PER_TICK,
+  DRILL_SPARK_LIGHT,
+  LANDING_SQUASH_SHARE,
+  THRUSTER_GLOW_COLOUR,
+} from '../../constants/scene'
 import {
   createPartMotion,
   createPartPose,
+  glowColourOf,
+  layCasingRing,
   recoilFromHit,
   stepPartMotion,
   writePartPose,
@@ -36,6 +45,10 @@ const SLOTS = [
   'armour-plate',
   'headlamp',
   'headlamp-2',
+  'thruster',
+  'thruster-2',
+  'casing-arm',
+  'casing-arm-2',
 ]
 
 function run(motion: PartMotion, step: PartMotionStep, seconds: number, ticksPerSecond = 60) {
@@ -92,6 +105,44 @@ describe('part motion', () => {
     expect(poseOf(motion, 'drill-bit').glow).toBeGreaterThan(0.95)
     run(motion, IDLE, 1)
     expect(poseOf(motion, 'drill-bit').glow).toBeLessThan(0.01)
+  })
+
+  it('lights the drill nose with the bit while it bites (ticket 393: the glowing nose)', () => {
+    const motion = createPartMotion()
+    run(motion, { ...IDLE, isDrilling: true }, 0.5)
+    expect(poseOf(motion, 'drill-head').glow).toBeGreaterThan(0.95)
+    run(motion, IDLE, 1)
+    expect(poseOf(motion, 'drill-head').glow).toBeLessThan(0.01)
+  })
+
+  it('lights the thrusters only while they fire, and lets them fade after (ticket 393)', () => {
+    const motion = createPartMotion()
+    run(motion, { ...IDLE, alongMetresPerSecond: 2, isDriving: true, isDrilling: true }, 0.5)
+    expect(poseOf(motion, 'thruster').glow).toBe(0)
+    run(motion, { ...IDLE, isThrusting: true }, 0.5)
+    expect(poseOf(motion, 'thruster-2').glow).toBeGreaterThan(0.95)
+    run(motion, IDLE, 1)
+    expect(poseOf(motion, 'thruster').glow).toBeLessThan(0.01)
+  })
+
+  it.each([30, 144])(
+    'swings the casing arms out once as a ring is laid, and home after the swing, at %i ticks a second',
+    (ticksPerSecond) => {
+      const motion = createPartMotion()
+      layCasingRing(motion)
+      run(motion, IDLE, CASING_ARM_SECONDS / 2, ticksPerSecond)
+      expect(poseOf(motion, 'casing-arm').angle).toBeGreaterThan(CASING_ARM_SWING_RADIANS * 0.95)
+      expect(poseOf(motion, 'casing-arm-2').angle).toBe(poseOf(motion, 'casing-arm').angle)
+      run(motion, IDLE, CASING_ARM_SECONDS / 2 + 0.05, ticksPerSecond)
+      expect(poseOf(motion, 'casing-arm').angle).toBe(0)
+    },
+  )
+
+  it('glows the nose in its sparks’ colour, the thrusters in their exhaust’s and the lamps in their own', () => {
+    expect(glowColourOf('drill-bit', '#5b3a1e')).toBe(DRILL_SPARK_LIGHT.colour)
+    expect(glowColourOf('drill-head', '#5b3a1e')).toBe(DRILL_SPARK_LIGHT.colour)
+    expect(glowColourOf('thruster-2', '#c9a24b')).toBe(THRUSTER_GLOW_COLOUR)
+    expect(glowColourOf('headlamp', '#ffd9a0')).toBe('#ffd9a0')
   })
 
   it('pumps the pistons only under thrust', () => {

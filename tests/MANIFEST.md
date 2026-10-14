@@ -976,7 +976,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
 | `src/systems/render/oreLook.test.ts` | 11 | 9 |
-| `src/systems/render/partMotion.test.ts` | 11 | 9 |
+| `src/systems/render/partMotion.test.ts` | 16 | 13 |
 | `src/systems/render/particles.test.ts` | 6 | 6 |
 | `src/systems/render/platformYard.test.ts` | 6 | 6 |
 | `src/systems/render/refineryBayLook.test.ts` | 3 | 3 |
