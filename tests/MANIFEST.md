@@ -807,7 +807,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/input/actionMap.test.ts` | 28 | 28 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
-| `src/systems/input/inputRouting.test.ts` | 24 | 24 |
+| `src/systems/input/inputRouting.test.ts` | 26 | 26 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 20 | 20 |
@@ -1085,6 +1085,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/platformLoop.test.ts` | 4 | 4 |
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
 | `src/store/sliceRun.test.ts` | 7 | 7 |
+| `src/store/titleMenu.test.ts` | 9 | 9 |
 | `src/store/touchRuntime.test.ts` | 14 | 13 |
 
 ### `systems-core`
@@ -1255,6 +1256,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/screenLayout.test.ts` | 14 | 14 |
 | `src/systems/views/sellBayModel.test.ts` | 13 | 13 |
 | `src/systems/views/settingsModel.test.ts` | 3 | 3 |
+| `src/systems/views/titleMenuModel.test.ts` | 7 | 7 |
 | `src/systems/views/upgradeBayModel.test.ts` | 19 | 19 |
 | `src/systems/views/upgradePreview.test.ts` | 15 | 15 |
 | `src/systems/views/vehicleItemRows.test.ts` | 5 | 5 |

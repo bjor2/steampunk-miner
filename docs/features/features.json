@@ -2113,6 +2113,12 @@
               "issues": [26]
             },
             {
+              "title": "Title menu",
+              "description": "The game opens on a title menu: New Game starts over from planet 1 with nothing carried over (asking first when a save exists), Continue picks up the newest save, and Load lists every save with its name, planet, playtime and time saved.",
+              "status": "built",
+              "issues": [403]
+            },
+            {
               "title": "Safe save handling",
               "description": "A save from an incompatible build is set aside, never overwritten, and a fresh run starts.",
               "status": "built",

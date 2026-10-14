@@ -27,6 +27,7 @@ import {
   readHudModel,
   readRefineryBayModel,
   readSellBayModel,
+  readTitleMenuModel,
   readUpgradeBayModel,
 } from '../store/screenReads'
 import type { AudioModel } from '../systems/audio/audioModel'
@@ -50,6 +51,7 @@ import type { HudModel } from '../systems/views/hudModel'
 import { planetCardViewOf, type PlanetCardView } from '../systems/views/planetCardView'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
+import type { TitleMenuModel } from '../systems/views/titleMenuModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import { readOverlayStats, type OverlayStats } from '../ui/overlay/overlaySeatTable'
 import { bayScreenPresence } from '../ui/platform/bayScreenPresence'
@@ -108,6 +110,11 @@ export interface DebugUi {
   getOpenScreen(): DebugResult<{ screenId: string | null }>
   /** The planet card drawn now (ticket 343), or null: none, dismissed, or behind the travel card. */
   getPlanetCard(): DebugResult<{ card: PlanetCardView | null }>
+  /**
+   * The title menu as it draws now (ticket 403: `?debug&title` opens it), or null once a game was
+   * picked; `input.tap('ui_confirm')` presses its focused choice like Enter.
+   */
+  getTitleMenuModel(): DebugResult<{ model: TitleMenuModel | null }>
   /**
    * Whether the drawn tile shows casing lining, and how it reads at `pixelsPerCell` over its band
    * rock (ticket 315); null where no tile is drawn now.
@@ -180,6 +187,7 @@ export function createDebugUi(): DebugUi {
     openScreen: openScreenUnlessRefused,
     getOpenScreen: () => ({ ok: true, screenId: game().openScreenId }),
     getPlanetCard: () => ({ ok: true, card: planetCardViewNow() }),
+    getTitleMenuModel: () => ({ ok: true, model: readTitleMenuModel() }),
     getDrawnLiningAt: drawnLiningAt,
   }
 }

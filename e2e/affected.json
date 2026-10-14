@@ -224,6 +224,19 @@
       "specs": ["e2e/browser/snapshots.spec.ts"]
     },
     {
+      "why": "The title menu (ticket 403): its model, slice and screen, the launch rule that opens it, and the slot index Continue reads.",
+      "paths": [
+        "src/ui/title/**",
+        "src/store/titleMenuSlice.ts",
+        "src/systems/views/titleMenuModel.ts",
+        "src/shell/launchParameters.ts",
+        "src/store/checkpoint.ts",
+        "src/store/saveFolder.ts",
+        "src/systems/save/**"
+      ],
+      "specs": ["e2e/browser/titleMenu.spec.ts"]
+    },
+    {
       "why": "Replay and snapshots give smoke's digests; the camera gives its framing checks.",
       "paths": [
         "src/systems/replay/**",

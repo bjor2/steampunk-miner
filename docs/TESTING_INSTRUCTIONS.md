@@ -97,6 +97,12 @@ file turns it on, so scenario and bot runs never see hints.
 - Browser: `?scenario=<json>` at launch (parsed by `parseScenario`); `?debug` (or the dev build) exposes
   `window.steampunkDebug` (the `DebugApi`), `window.steampunkRunLog()` and `window.steampunkRunCommands()`
   (the newest NDJSON lines, up to a million characters per file, browser shell only, #117).
+- The title menu (ticket 403) opens on a player's launch and holds the live step until a game is
+  picked. A `?debug` or `--debug-api` launch and any scenario start straight into play, resuming the
+  autosave as before, so specs never see it; `?debug&title` brings it back, and
+  `ui.getTitleMenuModel()` reads it (null once a game is picked) while `input.tap('ui_confirm')`
+  presses its focused choice. Store specs open it with `openTitleMenu()` over an installed save
+  folder (`src/store/titleMenu.test.ts`).
 - Every wired debug method answers `{ ok: true, ... }` or `{ ok: false, problems }`: `setPlanet`,
   `setPlanetSeed`, `teleportToDepthTiles`, `teleportToDepth(depthBp)` (basis points of the radius),
   `teleportToDock(bay?)` (the `debug.teleportToDock {bay}` command: docked at rest in the Sell bay, or the Upgrade bay when named, no tow, no fee),

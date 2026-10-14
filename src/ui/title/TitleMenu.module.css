@@ -1,0 +1,76 @@
+/* The title covers the whole stage: the held world shows dimly behind it (ticket 403). */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: calc(var(--tv-safe-y) + var(--space-3)) calc(var(--tv-safe-x) + var(--space-3));
+  background: rgb(27 22 19 / 0.82);
+  font-family: var(--font-body);
+  pointer-events: auto;
+}
+
+.gameTitle {
+  margin: 0;
+  color: var(--color-brass);
+  font-size: calc(2.6rem * var(--ui-scale));
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 var(--color-copper);
+}
+
+.plate {
+  min-width: min(28rem, 90vw);
+  max-height: 70vh;
+  overflow: auto;
+  padding: var(--space-3);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-panel);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.summary {
+  margin: 0;
+  color: var(--color-parchment);
+  font-size: 0.85rem;
+}
+
+.slotList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slot {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto auto;
+  gap: var(--space-2);
+  align-items: center;
+  font-family: var(--font-mono);
+}
+
+.slotName {
+  color: var(--color-brass);
+}
+
+.problems {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-3);
+  color: var(--color-ember);
+}
+
+.problems li::before {
+  content: '! ';
+}

@@ -24,6 +24,12 @@ export interface LaunchParameters {
   debugEnabled: boolean
   /** A scenario's raw JSON text: `?scenario=` in a browser, a `--scenario=<path>` file in Electron. */
   scenarioText: string | null
+  /**
+   * The launch opens on the title menu (ticket 403): a player's launch does, and a debug one only
+   * with `?title`, so specs and tools keep starting straight into play. Never with a scenario,
+   * which sets its own start.
+   */
+  isTitleMenuShown: boolean
 }
 
 /** One key going down or up (`KeyboardEvent.code`, e.g. "KeyA"), as the input layer reads it. */

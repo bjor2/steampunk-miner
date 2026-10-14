@@ -10,6 +10,7 @@ import { SettingsPanel } from './ui/settings/SettingsPanel'
 import { GameStage } from './ui/stage/GameStage'
 import { PortraitCard } from './ui/stage/PortraitCard'
 import { SliceScreen } from './ui/screens/SliceScreen'
+import { TitleMenu } from './ui/title/TitleMenu'
 import { TouchControls } from './ui/touch/TouchControls'
 import { TravelTransitionCard } from './ui/TravelTransitionCard'
 
@@ -27,6 +28,7 @@ export default function App() {
       <SliceScreen />
       <ArtefactChoice />
       <SettingsPanel />
+      <TitleMenu />
       <PortraitCard />
     </GameStage>
   )

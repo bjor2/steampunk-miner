@@ -51,7 +51,11 @@ type SliceHost = TitleMenuValues &
     startPlaques(): void
   }
 
-type SetSlice = (partial: Partial<TitleMenuValues> & { focusedControlId?: null }) => void
+/**
+ * Only the title menu: menu focus stays the presentation slice's, and an id that is not on the
+ * page shown falls back to the page's own start (`focusOnScreen`).
+ */
+type SetSlice = (partial: Partial<TitleMenuValues>) => void
 
 export const STARTING_TITLE_MENU: TitleMenuValues = { titleMenu: null }
 
@@ -67,10 +71,8 @@ export function titleMenuActionsOf(set: SetSlice, get: () => SliceHost): TitleMe
     }
   }
   return {
-    openTitleMenu: async () =>
-      set({ titleMenu: titleMenuOf(await listSaveSlots()), focusedControlId: null }),
-    showTitlePage: (page) =>
-      set({ titleMenu: onPage(get().titleMenu, page), focusedControlId: null }),
+    openTitleMenu: async () => set({ titleMenu: titleMenuOf(await listSaveSlots()) }),
+    showTitlePage: (page) => set({ titleMenu: onPage(get().titleMenu, page) }),
     pressNewGame: () => {
       if (isNewGameConfirmNeeded(slotsOf(get()))) get().showTitlePage('confirmNewGame')
       else get().confirmNewGame()
@@ -97,7 +99,7 @@ async function resumeOrReport(
   if (isResumable(checkpoint)) return resumeFromTitle(set, get, checkpoint)
   const page = get().titleMenu?.page ?? 'main'
   const titleMenu = { page, slots: await listSaveSlots(), problems: problemsOf(slot, checkpoint) }
-  set({ titleMenu, focusedControlId: null })
+  set({ titleMenu })
 }
 
 function isResumable(checkpoint: CheckpointLoad): checkpoint is Checkpoint {
@@ -111,7 +113,7 @@ function resumeFromTitle(set: SetSlice, get: () => SliceHost, checkpoint: Checkp
 
 /** As a launch without the title starts play: the planet's lines, its card, then the hints. */
 function startPlayFromTitle(set: SetSlice, get: () => SliceHost): void {
-  set({ titleMenu: null, focusedControlId: null })
+  set({ titleMenu: null })
   recordPlanetEntered(get())
   get().openPlanetCard()
   get().startPlaques()

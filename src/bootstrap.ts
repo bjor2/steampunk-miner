@@ -59,7 +59,10 @@ interface RunFiles {
   progress: RunProgressSink
 }
 
-/** Settles once the session is settled: fresh, resumed from the checkpoint, or a scenario's. */
+/**
+ * Settles once the session is settled: fresh, resumed from the checkpoint, or a scenario's; or
+ * once the title menu is open over a held game, which starts play itself (ticket 403).
+ */
 export async function startGame(): Promise<void> {
   loadFeatures()
   const shell = getShell()
@@ -75,13 +78,11 @@ export async function startGame(): Promise<void> {
   shell.onKeyChange(routeKeyChange)
   shell.onScrollNotch(routeScrollNotch)
   shell.onPadFrame(routePadFrame)
-  await resumeLastCheckpoint(shell)
-  recordStartingPlanetEntered()
-  showStartingPlanetCard()
+  await openTitleOrResume(shell)
   keepRunFilesWritten(shell, run)
   exposeDebugHandles(shell, run.runId)
   applyLaunchScenario(shell)
-  startHints()
+  startHintsUnlessOnTitle()
   writeMetadata(shell, run)
 }
 
@@ -99,6 +100,17 @@ function startRunLogging(shell: Shell, startedAt: Date): RunFiles {
     }),
   )
   return { ...run, sink, summary, progress }
+}
+
+/**
+ * The title menu, which starts play once the player picks a game (ticket 403); else, as before
+ * it, the autosave resumes and the starting planet's lines and card follow.
+ */
+async function openTitleOrResume(shell: Shell): Promise<void> {
+  if (shell.launch.isTitleMenuShown) return useGameStore.getState().openTitleMenu()
+  await resumeLastCheckpoint(shell)
+  recordStartingPlanetEntered()
+  showStartingPlanetCard()
 }
 
 /** The card of the planet the run starts on, opened with its `planet_entered` (ticket 343). */
@@ -216,8 +228,12 @@ function applyLaunchScenario(shell: Shell): void {
   useGameStore.getState().applyScenario(scenario as Scenario)
 }
 
-/** The run has started (#16): the opening transmission and `hint_move` go up unless seen. */
-function startHints(): void {
+/**
+ * The run has started (#16): the opening transmission and `hint_move` go up unless seen. Behind
+ * the title menu they wait for the game it starts.
+ */
+function startHintsUnlessOnTitle(): void {
+  if (useGameStore.getState().titleMenu !== null) return
   useGameStore.getState().startPlaques()
 }
 
