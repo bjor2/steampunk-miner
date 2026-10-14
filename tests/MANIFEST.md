@@ -384,7 +384,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 35 files, 251 tests
+### `tech-tree`: 36 files, 257 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -394,6 +394,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/aethericCards.vision.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/aethericLane.test.ts` | 5 | 5 |
+| `src/features/tech-tree/systems/familySpendShares.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/forkCost.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/forkNode.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/generatedCombos.test.ts` | 9 | 9 |

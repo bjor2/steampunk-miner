@@ -5,7 +5,8 @@
  * The members are read from their family tag (`MagnetItem.familyId`, set in #282). The beacon
  * carries no tag and keeps its spend in its own lane row. Reported, never failed on: the guard's
  * bands are #212's. The family registers as a kernel spend family (ticket 370), so the tech-tree
- * reads it without importing this slice; `magnetFamilySpendRowsOf` goes once #212 reads that.
+ * reads it without importing this slice; `magnetFamilySpendRowsOf` stays only as the parity check
+ * of the registered family (ticket 370 acceptance 2).
  */
 import type { ShopSpend } from '../../../systems/bot/shopSpend'
 import { add, ZERO_MONEY, type Money } from '../../../systems/money'

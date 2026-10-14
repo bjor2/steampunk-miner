@@ -101,7 +101,7 @@ function verdictOf(
   seedShares: readonly Money[],
   band: SpendGuardBand | null,
 ): TreeShareVerdict {
-  const medianShare = medianOf(seedShares)
+  const medianShare = medianShareOf(seedShares)
   const isOutsideBand = band !== null && !isInside(medianShare, band)
   return { planetIndex, seedShares, medianShare, band, isOutsideBand }
 }
@@ -110,8 +110,8 @@ function isInside(share: Money, band: SpendGuardBand): boolean {
   return cmp(share, band.minShare) >= 0 && cmp(share, band.maxShare) <= 0
 }
 
-/** The middle share, or the mean of the two middle ones for an even count. */
-function medianOf(shares: readonly Money[]): Money {
+/** The middle share, or the mean of the two middle ones for an even count; `shares` is not empty. */
+export function medianShareOf(shares: readonly Money[]): Money {
   const sorted = [...shares].sort(cmp)
   const middle = Math.floor(sorted.length / 2)
   if (sorted.length % 2 === 1) return sorted[middle]

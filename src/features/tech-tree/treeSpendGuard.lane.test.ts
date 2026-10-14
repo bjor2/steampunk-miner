@@ -3,8 +3,12 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { PACING_WORLD_SEEDS } from '../../constants/pacingSeeds'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import { playSliceIntoSink } from '../../logging/sliceRunLog'
+import { isFeatureUnlocked } from '../../systems/authority/featureUnlocks'
+import type { AuthorityState } from '../../systems/authority/authorityState'
 import type { ShopSpend } from '../../systems/bot/shopSpend'
+import { spendFamiliesOf } from '../../systems/registries/spendFamilies'
 import type { Scenario } from '../../systems/scenario'
+import { familyShareRowsOf, familyShareTableOf } from './systems/familySpendShares'
 import {
   missedPlanetsOf,
   treeShareTableOf,
@@ -15,7 +19,9 @@ import {
 // The #212 spend guard (spec #161 acceptance 6): the pacing bot plays the bot scenario to the core
 // of planet 60 on each pacing seed, so the guard sees P2-P20, P21-P40 and the P41-P60 endless
 // sample, and the tree's share of each planet's spend must sit inside its band on the median of
-// the seeds. Headless, with no run log kept: the guard reads the bot's spend records. The runs
+// the seeds. Beside it, report-only, each spend family's share from the kernel registry (GD ruling
+// Q3, Q4 on #212), the kernel gun mount among them. Headless, with no run log kept: the guard
+// reads the bot's spend records and which family anchors the run opened. The runs
 // take hours, so this is a lane (vite.config.ts leaves it out unless it is named):
 //   npx vitest run src/features/tech-tree/treeSpendGuard.lane.test.ts   (or npm run balance:tree)
 // A miss is a balance finding; the levers are #161's, in order (tech-tree.economy.json).
@@ -29,6 +35,8 @@ const SCENARIO_FILE = new URL('../../../scenarios/bot-slice.scenario.json', impo
 interface SeedRun {
   worldSeed: number
   shopSpend: readonly ShopSpend[]
+  /** The spend families' anchor rows owned or unlocked when the run ended. */
+  liveAnchorRowIds: ReadonlySet<string>
   endedOnPlanet: number
   isFinished: boolean
 }
@@ -40,7 +48,9 @@ describe('tech tree: spend guard of the pacing bot to planet 60', () => {
   beforeAll(() => {
     seedRuns = PACING_WORLD_SEEDS['bot-slice'].map(playSeedToLastPlanet)
     verdicts = treeShareVerdictsOf(seedRuns.map((seedRun) => seedRun.shopSpend))
-    console.log(`${seedLinesOf(seedRuns)}\n${treeShareTableOf(verdicts)}`)
+    console.log(
+      `${seedLinesOf(seedRuns)}\n${treeShareTableOf(verdicts)}\n${familyTableOf(seedRuns)}`,
+    )
   }, RUN_TIMEOUT_MS)
 
   it('plays every seed to the core of planet 60', () => {
@@ -60,7 +70,28 @@ function playSeedToLastPlanet(worldSeed: number): SeedRun {
     { lastPlanet: LAST_PLANET, maxTicks: BUDGET_TICKS },
   )
   const { shopSpend, isFinished } = run
-  return { worldSeed, shopSpend, endedOnPlanet: run.state.planet.index, isFinished }
+  const liveAnchorRowIds = liveAnchorRowIdsOf(run.state)
+  return {
+    worldSeed,
+    shopSpend,
+    liveAnchorRowIds,
+    endedOnPlanet: run.state.planet.index,
+    isFinished,
+  }
+}
+
+function liveAnchorRowIdsOf(state: AuthorityState): ReadonlySet<string> {
+  const anchorRowIds = spendFamiliesOf().map((family) => family.anchorRowId)
+  return new Set(anchorRowIds.filter((rowId) => isFeatureUnlocked(state, rowId)))
+}
+
+/** Report-only: no family row fails the lane (GD ruling Q4 on #212). */
+function familyTableOf(seedRuns: readonly SeedRun[]): string {
+  const seeds = seedRuns.map(({ shopSpend, liveAnchorRowIds }) => ({
+    shopSpend,
+    isAnchorLive: (rowId: string) => liveAnchorRowIds.has(rowId),
+  }))
+  return familyShareTableOf(familyShareRowsOf(seeds))
 }
 
 function seedLinesOf(seedRuns: readonly SeedRun[]): string {
