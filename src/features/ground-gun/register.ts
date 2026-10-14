@@ -21,6 +21,7 @@ import { FIRE_TILE_FEEL } from './systems/render/fireTileFeel'
 import { GUN_BAY_ENTRIES } from './systems/gunBayEntries'
 import { GROUND_GUN_SECTION } from './systems/gunLevels'
 import { GUN_PURCHASE_RULES } from './systems/gunPurchase'
+import { FireGauge } from './ui/FireGauge'
 import { FireReticle } from './ui/FireReticle'
 import { FireTile } from './ui/FireTile'
 
@@ -40,6 +41,7 @@ export const slice: SliceDefinition = {
     r.inputReaction(FIRE_KEY_REACTION)
     r.eventProjections(GROUND_GUN_PROJECTIONS)
     r.runEvents(GROUND_GUN_RUN_EVENTS)
+    r.hudPanel({ id: 'ground-gun.fire-gauge', slot: 'gauges', Panel: FireGauge })
     r.hudPanel({ id: 'ground-gun.fire-tile', slot: 'slots', Panel: FireTile })
     r.hudPanel({
       id: 'ground-gun.reticle',

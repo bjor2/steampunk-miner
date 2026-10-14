@@ -1,0 +1,19 @@
+/* The brass lamp (ticket 317's colours): a 28 px button, dark off, teal firing, amber holding. */
+.lamp {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid var(--color-brass);
+  border-radius: 50%;
+  background: var(--color-bg);
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.lamp[data-lamp='green'] {
+  background: var(--color-teal);
+}
+
+.lamp[data-lamp='amber'] {
+  background: var(--color-amber);
+}

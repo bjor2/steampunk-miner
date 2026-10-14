@@ -10,6 +10,13 @@
   pointer-events: none;
 }
 
+/* The lamp's 28 px target sits on the tile's top-right corner, half outside it (GD 3b on #314). */
+.lampCorner {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+}
+
 .dock[data-hand='left'] {
   right: auto;
   left: calc(var(--space-3) + 56px + 8px);

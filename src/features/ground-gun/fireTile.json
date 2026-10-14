@@ -1,7 +1,9 @@
 {
-  "$comment": "The fire tile's feel (ticket 314; #309 Gameplay touch input, the TD on #314): a press that neither drags nor lets go within holdFireTicks (a quarter second) becomes a held gun that fires on each tick the recovery allows; a drag of dragAimPixels from the press aims instead, and fires on release; a quick tap fires along the facing on release. A refused shot clanks with refusalClank, a single voice shaped like the kernel's light clank (square at 140 Hz, a band of noise at 1200 Hz), since the clank means a blocked shot; the recovery never clanks. Starting values for G&V, checked by ear in npm run dev.",
+  "$comment": "The fire tile's feel (ticket 314; #309 Gameplay touch input, the TD on #314): a press that neither drags nor lets go within holdFireTicks (a quarter second) becomes a held gun that fires on each tick the recovery allows; a drag of dragAimPixels from the press aims instead, and fires on release; a quick tap fires along the facing on release. A press held lampLongPressTicks (30, the GD's 3b ruling on #314) on the tile's lamp toggles auto-shoot; the lamp is its own target, so it never fires or aims. The tracer (#314 section 4 of the TD lock, the kernel SprayLayer of ticket 348) throws sparksPerShot from the rig along the shot and debrisPerCell plus dustPerCell from each opened cell, all at low priority, so a full pool drops tracer first and never a cell. A refused shot clanks with refusalClank, a single voice shaped like the kernel's light clank (square at 140 Hz, a band of noise at 1200 Hz), since the clank means a blocked shot; the recovery never clanks. Starting values for G&V, checked by ear in npm run dev.",
   "dragAimPixels": 12,
   "holdFireTicks": 15,
+  "lampLongPressTicks": 30,
+  "tracer": { "sparksPerShot": 6, "debrisPerCell": 3, "dustPerCell": 2 },
   "refusalClank": {
     "id": "ground-gun.refusal-clank",
     "voices": 1,

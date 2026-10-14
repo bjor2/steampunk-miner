@@ -3,27 +3,36 @@
  * 56 px brass button beside the power-up slots, mirrored for the left hand. A tap fires along the
  * facing; a press held a moment repeats on each tick the recovery allows; a drag aims (the
  * reticle shows the snapped line) and fires on release. Its brass ring fills as the recovery
- * runs, so a long wait in rock is visible. Nothing until the gun is mounted.
+ * runs, so a long wait in rock is visible. Once the steam sear is researched its lamp sits on the
+ * top-right corner, half outside: a 30-tick press there toggles auto-shoot and never fires or aims
+ * (the GD's 3b ruling). Nothing until the gun is mounted. The gauge panel runs the gun's clock.
  */
-import type { CSSProperties } from 'react'
+import type { CSSProperties, PointerEvent } from 'react'
 import { useGameStore } from '../../../store/gameStore'
 import { VectorIcon } from '../../../ui/VectorIcon'
 import { useScreenModel } from '../../../ui/useScreenModel'
-import { readFireTile } from '../store/fireTileReads'
+import type { BoreAutoReading } from '../../../systems/views/boreAutoReading'
+import { readGunPanel } from '../store/fireTileReads'
+import { pressFireLamp, releaseFireLamp } from '../store/lampInput'
+import { FireLamp } from './FireLamp'
 import styles from './FireTile.module.css'
-import { useFireClock } from './useFireClock'
 import { useFireTilePointer } from './useFireTilePointer'
 
 export const FIRE_TILE_TEST_ID = 'ground-gun-fire-tile'
 
 export function FireTile() {
-  const tile = useScreenModel(readFireTile)
-  if (tile === null) return null
-  return <ArmedFireTile recoveryFilledPercent={tile.recoveryFilledPercent} />
+  const panel = useScreenModel(readGunPanel)
+  if (panel === null) return null
+  return <ArmedFireTile recoveryFilledPercent={panel.recoveryFilledPercent} lamp={panel.lamp} />
 }
 
-function ArmedFireTile({ recoveryFilledPercent }: { recoveryFilledPercent: number }) {
-  useFireClock()
+function ArmedFireTile({
+  recoveryFilledPercent,
+  lamp,
+}: {
+  recoveryFilledPercent: number
+  lamp: BoreAutoReading | null
+}) {
   const pointer = useFireTilePointer()
   const isLeftHanded = useGameStore((state) => state.prefs.leftHanded)
   const ring = { '--recovery': `${recoveryFilledPercent}%` } as CSSProperties
@@ -45,6 +54,21 @@ function ArmedFireTile({ recoveryFilledPercent }: { recoveryFilledPercent: numbe
       >
         <VectorIcon iconId="bore-gun-mount" size="menu" />
       </button>
+      {lamp !== null && (
+        <span className={styles.lampCorner}>
+          <FireLamp lamp={lamp} handlers={LAMP_LONG_PRESS} />
+        </span>
+      )}
     </div>
   )
+}
+
+/** The pointer is captured, so a finger sliding off still lets go of the lamp. */
+const LAMP_LONG_PRESS = {
+  onPointerDown: (event: PointerEvent<HTMLButtonElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId)
+    pressFireLamp()
+  },
+  onPointerUp: releaseFireLamp,
+  onPointerCancel: releaseFireLamp,
 }
