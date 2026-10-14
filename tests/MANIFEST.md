@@ -504,7 +504,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/art/icons/iconSvg.test.ts` | 6 | 6 |
 | `src/systems/art/icons/oreIcon.test.ts` | 3 | 3 |
 | `src/systems/art/ktx2Header.test.ts` | 8 | 8 |
-| `src/systems/art/partsSidecar.test.ts` | 17 | 17 |
+| `src/systems/art/partsSidecar.test.ts` | 22 | 18 |
 | `src/systems/art/placeholderLook.test.ts` | 10 | 9 |
 | `src/systems/art/refineryBayArt.test.ts` | 2 | 2 |
 | `src/systems/art/shopBuildingArt.test.ts` | 6 | 6 |
@@ -822,7 +822,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/registries/registrar.test.ts` | 20 | 20 |
 | `src/registries/sliceCommands.test.ts` | 6 | 6 |
 | `src/registries/sliceModules.test.ts` | 3 | 3 |
-| `src/systems/registries/attachCoverage.test.ts` | 9 | 9 |
+| `src/systems/registries/attachCoverage.test.ts` | 35 | 16 |
 | `src/systems/registries/bayEntries.test.ts` | 3 | 3 |
 | `src/systems/registries/blastEffects.test.ts` | 2 | 2 |
 | `src/systems/registries/buildingAttach.test.ts` | 3 | 3 |
@@ -857,7 +857,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/seal.test.ts` | 12 | 12 |
 | `src/systems/registries/soundCues.test.ts` | 2 | 2 |
 | `src/systems/registries/spendFamilies.test.ts` | 11 | 11 |
-| `src/systems/registries/vehicleLoadout.test.ts` | 10 | 10 |
+| `src/systems/registries/vehicleLoadout.test.ts` | 14 | 14 |
 
 ### `render`
 
@@ -899,7 +899,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
-| `src/systems/render/mountedPartLook.test.ts` | 3 | 3 |
+| `src/systems/render/mountedPartLook.test.ts` | 8 | 4 |
 | `src/systems/render/oreGrade.test.ts` | 2 | 2 |
 | `src/systems/render/oreLook.test.ts` | 11 | 9 |
 | `src/systems/render/partMotion.test.ts` | 11 | 9 |
