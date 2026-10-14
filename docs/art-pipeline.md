@@ -509,6 +509,17 @@ sidecars and the piece that draws them come with the #321 wiring. `docs/art/armo
 wrote the first version of every `.blend`; from then on the `.blend` files are the sources. The
 module table and the review renders are in [docs/art/armoury/](art/armoury/README.md).
 
+## Aetheric parts
+
+The art half of [#265](https://github.com/bjor2/steampunk-miner/issues/265), built by
+[#363](https://github.com/bjor2/steampunk-miner/issues/363): a Blender source for each of the five
+aetheric items of the #245 lock, `art/blender/vehicle-item-power-<item>/` (whistle, lantern, twin
+coils, escapement cage, condenser tank). They are sources only: not in the manifest, not registered
+and not exported. The attach points, placeholder sidecars and the piece that draws them come with
+the #265 wiring. `docs/art/aetheric/author_aetheric.py` wrote the first version of every `.blend`;
+from then on the `.blend` files are the sources. The part table and the review renders are in
+[docs/art/aetheric/](art/aetheric/README.md).
+
 ## The `parts.json` sidecar, schema 1
 
 ```json
