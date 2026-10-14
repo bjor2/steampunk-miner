@@ -87,6 +87,11 @@ export interface TechNode extends ContentEntry {
    * item ids, or a lining's module id such as `refractory_lining`.
    */
   requiresOwned?: readonly string[]
+  /**
+   * The locked-schedule rows that anchor it (#318, ticket 358): the node stays hidden from the
+   * screen and refused until every row has had its `FeatureUnlocked` (`isFeatureUnlocked`).
+   */
+  requiresFeature?: readonly string[]
   /** The store item it unlocks. */
   unlocks: string
   /** The flavour line, no digits: stat and cost lines are generated (#159). */
@@ -133,6 +138,7 @@ export interface TreeNode {
   prereqs: readonly string[]
   requiresDiscovery?: DiscoveryRequirement
   requiresOwned?: readonly string[]
+  requiresFeature?: readonly string[]
   unlocks: ItemUnlock
   iconId: string
   description: string

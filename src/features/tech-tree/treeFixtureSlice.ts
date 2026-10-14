@@ -16,6 +16,34 @@ export const TREE_FIXTURE_SLICE: SliceDefinition = {
   },
 }
 
+/** The one node `ANCHORED_NODE_SLICE` registers, hidden until `heat_lava` opens on P8. */
+export const ANCHORED_NODE_ID = 'anchor-probe.lava_sight'
+
+/**
+ * A lane node anchored on a schedule row (`requiresFeature`, ticket 358), reachable by tier from
+ * P2 but shown and researchable only once the row's `FeatureUnlocked` came. Only specs use it.
+ */
+export const ANCHORED_NODE_SLICE: SliceDefinition = {
+  id: 'anchor-probe',
+  register(r) {
+    r.content('tech-node', [
+      {
+        id: ANCHORED_NODE_ID,
+        iconId: 'icon-panel-slots',
+        lane: 'sensing',
+        name: 'Lava sight',
+        unlockTier: 2,
+        prereqs: [],
+        requiresFeature: ['heat_lava'],
+        unlocks: 'passive.lava_sight',
+        description: 'Reads the glow behind the rock.',
+        label: 'horizontal',
+        costKind: 'capability',
+      },
+    ])
+  },
+}
+
 /** What the shop fixture asks for every item it sells. */
 export const FIXTURE_ITEM_PRICE = fromSafeInteger(1000)
 

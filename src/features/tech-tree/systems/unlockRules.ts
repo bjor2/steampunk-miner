@@ -1,6 +1,7 @@
 /**
  * When a node can be researched (spec #161 sections 1 and 5). In order, a node is refused when
- * no node has the id, it is already researched, its tier is not reached, it waits on a discovery
+ * no node has the id, it is already researched, its tier is not reached or a schedule row it
+ * `requiresFeature` is still shut (`locked_tier`, ticket 358), it waits on a discovery
  * (`locked_tier` / `undiscovered`), a prerequisite is missing, the player does not own what it
  * `requiresOwned` (`not_owned`, ticket 233), it is a combo and the `research_lab` is not built,
  * or the wallet is short.
@@ -57,6 +58,7 @@ export function researchRefusalOf(
   const unlocked = new Set(unlockedNodeIdsOf(state, playerId))
   if (unlocked.has(node.id)) return 'already_unlocked'
   if (!isTierReached(state.planet.index, node)) return 'locked_tier'
+  if (!isAnchorUnlocked(state, node)) return 'locked_tier'
   if (isWaitingOnDiscovery(state, playerId, node)) return 'undiscovered'
   if (node.prereqs.some((prereq) => !unlocked.has(prereq))) return 'missing_prereq'
   if (!ownsEveryRequirement(state, playerId, node.requiresOwned ?? [])) return 'not_owned'
@@ -107,6 +109,14 @@ export function isItemResearched(
   tree: TechTree = registeredTechTree(),
 ): boolean {
   return unlockedItems(state, playerId, tree).some((unlock) => unlock.itemId === itemId)
+}
+
+/**
+ * Whether every schedule row the node `requiresFeature` has had its `FeatureUnlocked`; until then
+ * the node is hidden from the tree screen and refused (#318, ticket 358).
+ */
+export function isAnchorUnlocked(state: AuthorityState, node: TreeNode): boolean {
+  return (node.requiresFeature ?? []).every((rowId) => isFeatureUnlocked(state, rowId))
 }
 
 /** Its own tier, and the planet of the Schedule C row it absorbs, if it absorbs one. */

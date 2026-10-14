@@ -4,12 +4,14 @@
  * or later with prerequisites in exactly two lanes, and only combos cross lanes; extractor nodes
  * have none; at most two capabilities share a planet; every node has an icon that resolves, a
  * flavour line with no digits and a label; the absorbed Schedule C rows agree; every Mark
- * milestone sits at Mark 3, 6 or 9 of its ladder, each pattern at most once (#256).
+ * milestone sits at Mark 3, 6 or 9 of its ladder, each pattern at most once (#256); every row a
+ * node `requiresFeature` is a row of the locked schedule (ticket 358).
  *
  * It runs over whatever the lane slices have registered, so it turns on as they land; the
  * cadence check (no gap longer than two planets on P2-P37) waits until all five lanes are in.
  */
 import { contentOf } from '../../../systems/registries/content'
+import { LOCKED_SCHEDULE } from '../../../systems/unlocks/unlockSchedule'
 import { milestoneProblemsOf } from './markMilestones'
 import { absorbedRowProblems, researchLabPlanet } from './scheduleAbsorber'
 import { TECH_LANES, type TechNode } from './techNode'
@@ -39,6 +41,7 @@ export function treeShapeProblems(nodes: readonly TechNode[], rules: ShapeRules)
     ...presentationProblems(nodes, rules),
     ...absorbedRowProblems(nodes),
     ...milestoneShapeProblems(nodes),
+    ...unscheduledFeatureProblems(nodes),
   ]
 }
 
@@ -171,6 +174,16 @@ function milestoneShapeProblems(nodes: readonly TechNode[]): string[] {
     node.marks === undefined
       ? []
       : milestoneProblemsOf(node.marks).map((problem) => `${node.id}: ${problem}`),
+  )
+}
+
+/** A node's anchor is a locked-schedule row, so its `FeatureUnlocked` can ever come. */
+function unscheduledFeatureProblems(nodes: readonly TechNode[]): string[] {
+  const rowIds = new Set(LOCKED_SCHEDULE.rows.map((row) => row.id))
+  return nodes.flatMap((node) =>
+    (node.requiresFeature ?? [])
+      .filter((rowId) => !rowIds.has(rowId))
+      .map((rowId) => `${node.id} requires feature ${rowId}, which is no locked-schedule row`),
   )
 }
 

@@ -4,6 +4,7 @@ import type { DomainEvent } from '../../../systems/authority/domainEvent'
 import { readSnapshot, takeSnapshot } from '../../../systems/authority/sessionSnapshot'
 import { sub, toCanonical } from '../../../systems/money'
 import type { DiscoveryKey } from '../../../systems/registries/discovery'
+import { ANCHORED_NODE_ID, ANCHORED_NODE_SLICE } from '../treeFixtureSlice'
 import { PLAYER, research, researchAll, sessionOnPlanet, withFixtureTree } from '../treeTestSession'
 import { setVehicleLoadoutCommand } from '../../../systems/authority/loadoutCommands'
 import { nodeCostOf } from './nodeCost'
@@ -96,6 +97,24 @@ describe('tech tree: researching a node', () => {
         { itemId: 'power.echo_sounder', mark: 3 },
       ])
     })
+  })
+})
+
+describe('tech tree: anchored nodes (ticket 358)', () => {
+  it('refuses a node before its anchor row is unlocked and researches it after', () => {
+    withFixtureTree(() => {
+      const before = sessionOnPlanet(7)
+      expect(refusalIn(research(before, ANCHORED_NODE_ID))).toBe('locked_tier')
+      expect(availableNodes(before.state(), PLAYER).map((node) => node.id)).not.toContain(
+        ANCHORED_NODE_ID,
+      )
+      const after = sessionOnPlanet(8)
+      expect(availableNodes(after.state(), PLAYER).map((node) => node.id)).toContain(
+        ANCHORED_NODE_ID,
+      )
+      researchAll(after, [ANCHORED_NODE_ID])
+      expect(isUnlocked(after.state(), PLAYER, ANCHORED_NODE_ID)).toBe(true)
+    }, [ANCHORED_NODE_SLICE])
   })
 })
 

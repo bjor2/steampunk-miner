@@ -6,6 +6,7 @@ import {
   withFixtureTree,
   withNoLanes,
 } from '../treeTestSession'
+import { ANCHORED_NODE_ID, ANCHORED_NODE_SLICE } from '../treeFixtureSlice'
 import { romanNumeralOf } from './nodeCardModel'
 import { registeredTechTree } from './techTree'
 import {
@@ -155,5 +156,23 @@ describe('tech tree screen: next up, search and filters', () => {
       expect(kept(['affordable', 'locked'])).toHaveLength(49)
       expect(kept(['marks'])).toEqual([])
     })
+  })
+})
+
+describe('tech tree screen: anchored nodes (ticket 358)', () => {
+  it('leaves a node off the screen until its anchor row is unlocked, then shows it', () => {
+    withFixtureTree(() => {
+      const cardOn = (planet: number) =>
+        nodeCardModelOf(
+          sessionOnPlanet(planet).state(),
+          PLAYER,
+          registeredTechTree(),
+          ANCHORED_NODE_ID,
+        )
+      expect(laneIds(modelOn(7), 'sensing')).not.toContain(ANCHORED_NODE_ID)
+      expect(cardOn(7)).toBeNull()
+      expect(laneIds(modelOn(8), 'sensing')).toContain(ANCHORED_NODE_ID)
+      expect(cardOn(8)?.status).toBe('affordable')
+    }, [ANCHORED_NODE_SLICE])
   })
 })

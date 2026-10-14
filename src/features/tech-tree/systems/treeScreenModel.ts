@@ -4,6 +4,7 @@
  * A lane no slice has registered yet shows "coming soon". The "next up" strip holds each lane's
  * first node the player can research; search matches a node's name, item or flavour line; the
  * filters keep available, affordable, locked or Mark-ready nodes. Marks stay on their item's chip.
+ * A node whose anchor row is still shut (`requiresFeature`, ticket 358) is not on the screen.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { formatAmount } from '../../../systems/displayAmount'
@@ -12,6 +13,7 @@ import { cardContextOf, nodeCardOf, type NodeCardModel } from './nodeCardModel'
 import { treeNodeOf, unlockAllPlanetOf, type TechTree } from './techTree'
 import { TECH_LANES, type TechNodeLane, type TreeNode } from './techNode'
 import { TREE_ECONOMY } from './treeEconomy'
+import { isAnchorUnlocked } from './unlockRules'
 
 export const TREE_FILTERS = ['available', 'affordable', 'locked', 'marks'] as const
 
@@ -68,7 +70,7 @@ export function treeScreenModelOf(
 ): TreeScreenModel {
   const context = cardContextOf(state, playerId, tree)
   const lastPlanet = rulerEndOf(tree, state.planet.index)
-  const cards = mapNodesOf(tree, lastPlanet).map((node) => nodeCardOf(node, context))
+  const cards = shownNodesOf(state, tree, lastPlanet).map((node) => nodeCardOf(node, context))
   return {
     planetIndex: state.planet.index,
     walletText: formatAmount(state.players[playerId].wallet),
@@ -79,7 +81,7 @@ export function treeScreenModelOf(
   }
 }
 
-/** One node's card, for the card zoom; null for an id no node has. */
+/** One node's card, for the card zoom; null for an id no node has or a node still hidden. */
 export function nodeCardModelOf(
   state: AuthorityState,
   playerId: string,
@@ -87,7 +89,8 @@ export function nodeCardModelOf(
   nodeId: string,
 ): NodeCardModel | null {
   const node = treeNodeOf(tree, nodeId)
-  return node === null ? null : nodeCardOf(node, cardContextOf(state, playerId, tree))
+  if (node === null || !isAnchorUnlocked(state, node)) return null
+  return nodeCardOf(node, cardContextOf(state, playerId, tree))
 }
 
 /** The lane's model; the first lane for a lane the screen does not draw. */
@@ -113,6 +116,10 @@ function rulerMarksThrough(lastPlanet: number): number[] {
     marks.push(planet)
   }
   return marks
+}
+
+function shownNodesOf(state: AuthorityState, tree: TechTree, lastPlanet: number): TreeNode[] {
+  return mapNodesOf(tree, lastPlanet).filter((node) => isAnchorUnlocked(state, node))
 }
 
 /** The nodes drawn on the map: authored ones and the endless combos; Marks ride on chips. */

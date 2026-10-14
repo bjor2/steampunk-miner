@@ -112,6 +112,15 @@ describe('tech tree: shape test', () => {
       'tech.extraction.resonance_fork: icon node-extraction-resonance-fork does not resolve',
     ])
   })
+
+  it('refuses a node anchored on a row the locked schedule does not have', () => {
+    const anchored = treeWith('tech.sensing.echo_sounder', {
+      requiresFeature: ['heat_lava', 'armoury.bore_gun'],
+    })
+    expect(shapeOf(anchored)).toEqual([
+      'tech.sensing.echo_sounder requires feature armoury.bore_gun, which is no locked-schedule row',
+    ])
+  })
 })
 
 describe('tech tree: Schedule C absorber', () => {
