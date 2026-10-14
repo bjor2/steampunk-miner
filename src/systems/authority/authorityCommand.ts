@@ -162,8 +162,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    step in its pocket (`enemyStepModifiers`) and its `aetheric.pockets` clock step,
  *    `aetheric.PocketOpened`, `aetheric.HeatCondensed` and `debug.aetheric.setItemHeat`. With no
  *    pocket opened and no heat condensed no digest or mined order changes.
+ * 56: bore struts (ticket 379, K-strut of the TD lock on #318): a line whose shot carries
+ *    `strutTicks` stops at a hollow's edge (`BoreEnded` stop `strut`) and wedges a strut in its
+ *    mouth (`StrutPlaced`, `AuthorityState.struts`), which collapse reads through the #157
+ *    reinforcement registry until the clock takes it away. With no strut shape no digest or mined
+ *    order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 55
+export const AUTHORITY_PROTOCOL_VERSION = 56
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
