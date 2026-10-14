@@ -614,7 +614,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/signatureCells.test.ts` | 9 | 9 |
 | `src/systems/authority/sliceSectionSnapshot.test.ts` | 12 | 12 |
 | `src/systems/authority/stateDigest.test.ts` | 17 | 12 |
-| `src/systems/authority/sweptGateSpeeds.test.ts` | 12 | 2 |
+| `src/systems/authority/sweptGateSpeeds.test.ts` | 24 | 2 |
+| `src/systems/authority/sweptSpanDrill.test.ts` | 17 | 13 |
 | `src/systems/authority/teleportDebugRules.test.ts` | 5 | 5 |
 | `src/systems/authority/terrain/terrainEditGates.test.ts` | 6 | 4 |
 | `src/systems/authority/terrain/terrainEditPlan.test.ts` | 5 | 5 |
@@ -1202,6 +1203,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/orePatches.test.ts` | 31 | 8 |
 | `src/systems/world/planetParams.test.ts` | 21 | 16 |
 | `src/systems/world/stampShape.test.ts` | 8 | 5 |
+| `src/systems/world/sweptSpan.test.ts` | 4 | 4 |
 | `src/systems/world/worldCell.test.ts` | 3 | 3 |
 | `src/systems/world/worldExactMathLint.test.ts` | 15 | 3 |
 | `src/systems/world/worldState.test.ts` | 1 | 1 |

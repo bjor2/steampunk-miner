@@ -11,14 +11,30 @@ import { EMPTY_WORLD } from '../world/worldState'
 import type { AuthorityState } from './authorityState'
 import { vehicleOf } from './authorityState'
 import { createScriptedSession, PARAMS, poseAbove, surfaceOreTiles } from './scriptedSession'
-import { drillAlongSweep } from './sweptDrill'
+import type { RuleEffect } from './commandRule'
+import { drillAlongSweep, type SweptStep } from './sweptDrill'
+import { drillAlongSpan } from './sweptSpanDrill'
 
 // The Horizontal Scaler's pin (TD scope a on #316, ticket 334): the swept cut checks the gates
 // on every cell it crosses at any speed, so a fast tick never cuts past a gated cell. The
 // sweeps run at 18, 100 and 1,000 m/s, past what any stats bound allows today, so the spec drives
-// the sweep (`drillAlongSweep`) directly, one tick at a time, rather than through `drillStep`.
+// the sweep (`drillAlongSweep`) directly, one tick at a time, rather than through `drillStep`. The
+// swept span (ticket 374) checks every crossed cell the same way, so it runs the same sweeps.
 
 const SPEEDS_M_PER_S = [18, 100, 1000]
+
+type SweepCut = (
+  state: AuthorityState,
+  params: typeof PARAMS,
+  playerId: string,
+  target: TilePoint,
+  step: SweptStep,
+) => RuleEffect
+
+const CUTS: readonly [string, SweepCut][] = [
+  ['the per-cell walk', drillAlongSweep],
+  ['the swept span', (...cut) => drillAlongSpan(...cut).effect],
+]
 
 /** A slice whose gate check answers `outcome` for every ore cell, as a rig or a charge gate does. */
 function gateSliceOf(outcome: GateOutcome): SliceDefinition {
@@ -51,30 +67,30 @@ const BELOW: TilePoint = { tx: GATED.tx, ty: GATED.ty - 1 }
 const DESCENT_MM = 30_000
 
 /** The rig reported at `ABOVE` facing down, then swept down at `speed` m/s, a tick at a time. */
-function sweepDownAt(speed: number): AuthorityState {
+function sweepDownAt(cut: SweepCut, speed: number): AuthorityState {
   const session = createScriptedSession()
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '150' } })
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down)
   session.submit(0, { type: 'reportPose', payload: { ...payload, ...ABOVE } })
   const stepMm = Math.round((speed * MM_PER_METRE) / TICKS_PER_SECOND)
   // The first step rests at the start, so every later one continues its cursor's sweep.
-  let state = sweepOneTick({ ...session.state(), tick: 1 }, ABOVE.y)
+  let state = sweepOneTick(cut, { ...session.state(), tick: 1 }, ABOVE.y)
   for (let moved = 1; moved * stepMm <= DESCENT_MM; moved++) {
-    state = sweepOneTick({ ...state, tick: 1 + moved }, ABOVE.y - stepMm * moved)
+    state = sweepOneTick(cut, { ...state, tick: 1 + moved }, ABOVE.y - stepMm * moved)
   }
   return state
 }
 
-function sweepOneTick(state: AuthorityState, y: number): AuthorityState {
+function sweepOneTick(cut: SweepCut, state: AuthorityState, y: number): AuthorityState {
   const pose: VehiclePose = { ...(vehicleOf(state, 'p1').pose as VehiclePose), y }
   const step = { pose, drive: NO_DRIVE, isLifting: false }
-  return drillAlongSweep(state, PARAMS, 'p1', noseTileOf(pose), step).state
+  return cut(state, PARAMS, 'p1', noseTileOf(pose), step).state
 }
 
-describe('swept cut gates at any speed (ticket 334)', () => {
+describe.each(CUTS)('swept cut gates at any speed through %s (tickets 334, 374)', (_cut, cut) => {
   describe.each(GATED_KINDS)('a cell %s', (_kind, slice) => {
     it.each(SPEEDS_M_PER_S)('is never cut, nor the cell past it, at %i m/s', (speed) => {
-      const state = withRegistrations([slice], () => sweepDownAt(speed))
+      const state = withRegistrations([slice], () => sweepDownAt(cut, speed))
       const untouched = (tile: TilePoint) => cellDensitySum(EMPTY_WORLD, PARAMS, tile)
       expect(cellDensitySum(state.world, PARAMS, GATED)).toBe(untouched(GATED))
       expect(cellDensitySum(state.world, PARAMS, BELOW)).toBe(untouched(BELOW))
@@ -84,7 +100,7 @@ describe('swept cut gates at any speed (ticket 334)', () => {
   })
 
   it.each(SPEEDS_M_PER_S)('cuts past the same cell at %i m/s when nothing gates it', (speed) => {
-    const state = sweepDownAt(speed)
+    const state = sweepDownAt(cut, speed)
     expect(cellDensitySum(state.world, PARAMS, BELOW)).toBeLessThan(
       cellDensitySum(EMPTY_WORLD, PARAMS, BELOW),
     )
