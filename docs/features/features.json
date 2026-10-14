@@ -101,10 +101,16 @@
           "description": "How the rig shows what it is doing and how far it has grown.",
           "children": [
             {
-              "title": "Animated machinery",
-              "description": "Wheels roll with speed, the drill spins as it bites, pistons pump with thrust, the boiler breathes and landings squash the chassis.",
+              "title": "The casing driller",
+              "description": "The player vehicle is a compact riveted bronze pod on three articulated tracked legs, with a brass pressure dome, a swivelling stepped drill nose on a gimbal, two brass thrusters under the belly and two rear arms that set casing rings and spray cement.",
               "status": "built",
-              "issues": [48, 66]
+              "issues": [393]
+            },
+            {
+              "title": "Animated machinery",
+              "description": "Track rollers roll with speed, the drill crown spins and the nose glows as it bites, pistons pump and the thrusters glow blue-orange with thrust, the rear arms swing as each casing ring is laid, the dome breathes and landings squash the chassis.",
+              "status": "built",
+              "issues": [48, 66, 393]
             },
             {
               "title": "Headlamp",
@@ -114,9 +120,9 @@
             },
             {
               "title": "Three visual tiers",
-              "description": "The rig visibly grows: tier 2 adds side armour and a second stack, tier 3 a bore-collar drill, a second boiler and a second lamp, as your total upgrade levels rise.",
+              "description": "The rig visibly grows: tier 2 adds bow and stern shields, a bigger drill nose and lamp and a second stack, tier 3 a heavier hull and tracks, a reamer ring round the drill, a second pressure tank, a belly skirt and a rear lamp, as your total upgrade levels rise.",
               "status": "built",
-              "issues": [7, 66]
+              "issues": [7, 66, 393]
             },
             {
               "title": "Mounted modules on the rig",

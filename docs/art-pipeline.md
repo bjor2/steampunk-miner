@@ -130,6 +130,17 @@ sorts its parts by id, rounds metres to 4 decimals, and records the Blender vers
 - Draw order: an integer custom property `z` on the object if set, otherwise the depth rank.
 - The hub has collections `outpost` and `core-drive`, one part each.
 
+## The vehicle: the casing driller
+
+The `vehicle` asset is the casing driller (ticket 393): a riveted bronze pod on three articulated
+tracked legs, a brass pressure dome, a swivelling stepped drill nose on a gimbal, two brass
+thrusters under the belly and two rear arms that set casing rings. It replaced the S7a machine in
+the same file and under the same part ids and tiers, so nothing that names a part changed; the
+part names `thruster` and `casing-arm` joined `vehiclePartNames`, with their motion in
+`partMotion.ts` (the thrusters glow while thrusting, the arms swing as each casing ring is laid).
+The attach points did not move. The part table, the review renders and the scripts that wrote the
+first version are in [docs/art/casing-driller/](art/casing-driller/README.md).
+
 ## Vehicle modules
 
 A schedule row whose unlock shows on the vehicle (#81 acceptance 3) gets its own tiered part
