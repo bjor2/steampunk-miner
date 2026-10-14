@@ -351,7 +351,15 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   share pins are (`systems/familySharePins.ts`): the armoury's recurring gun-track spend (track
   levels, lane nodes, modules and Marks; never a one-time mount) stays at or under 5% of every
   planet's spend on the seed median (Vertical Scaler on #322, GD ruling on #371), and the lane fails
-  on a planet over it. The 15% income cap per minute is #385's check, not this lane's.
+  on a planet over it. The 15% income cap per minute is #385's check, not this lane's. Also
+  report-only, each of the six lanes' median share of every planet's spend, zero included
+  (`laneShareRowsOf` in `systems/nodeSpendShare.ts`, ticket 266): lanes carry no bands of their own
+  (GD ruling Q4 on #212), so the sixth lane's share comes out of the gated tree total. Gated beside
+  the runs, the **loadout yield cap** (GD lock on #245, ticket 266; `systems/loadoutYieldCap.ts`,
+  unit-tested in `loadoutYieldCap.test.ts`): every income rate registered in `incomeRates`, all
+  items owned at their last Mark, sums to no more than the same rates outside the Aetheric lane at
+  the on-curve vehicle of P10/P20/P40/P60, band 5; the lane's items and its combos add zero and
+  carry no income ladder or income item hook.
 - **Lane forks** (GD lock on #255, build 2; ticket 267): `npm run balance:forks` runs the lane
   `features/tech-tree/forkMix.lane.test.ts`. For every registered fork branch, the bot plays the bot
   scenario to planet 10's core on each pacing seed, forced onto the branch from the start: the
@@ -368,6 +376,13 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   It refuses to run with no pair registered and prints a row per run (slice, P3-P10, the action
   mix), a median row per branch and the lanes with no pair. The verdicts are unit-tested in
   `forkMixReport.test.ts`; a short forced run in `forkMixRuns.test.ts`.
+- **Aetheric pace re-run** (Systems on #245, ticket 266): the lane
+  `features/tech-tree/aethericPace.lane.test.ts` plays the same forced run with the bot forced onto
+  the whole Aetheric lane, once per P16 branch, on each pacing seed to planet 10's core: the branch
+  forced, the lane's other capabilities owned (`laneSeedRunOf`), the earliest two in the slots
+  open on a new vehicle and pressed in turn (`withForkHands`). Gated per branch on the seed median
+  (`systems/lanePace.ts`): P1 core within 58 minutes of the start, the slice at 100-110 and P8 at
+  45 or more (#146's pins). Run it by name; a miss is a balance finding for the lane's items.
 - **Money to planet 200** (#316 TD scope f, TD pin on #123, ticket 340): `npm run balance:money-p200`
   runs the lane `logging/moneyPastP200.lane.test.ts`. The bot plays the bot scenario on the first
   pacing seed to planet 200's core (prices near 1e104), headless, keeping no run log

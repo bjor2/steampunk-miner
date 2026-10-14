@@ -418,13 +418,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 47 files, 330 tests
+### `tech-tree`: 50 files, 351 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/tech-tree/aethericPace.lane.test.ts` | 1 | 1 |
 | `src/features/tech-tree/debug.test.ts` | 12 | 12 |
 | `src/features/tech-tree/forkMix.lane.test.ts` | 4 | 4 |
-| `src/features/tech-tree/forkMixRuns.test.ts` | 2 | 2 |
+| `src/features/tech-tree/forkMixRuns.test.ts` | 6 | 6 |
 | `src/features/tech-tree/rigPieces.test.ts` | 3 | 3 |
 | `src/features/tech-tree/scene/extractorDeploy.test.ts` | 3 | 3 |
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
@@ -445,11 +446,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/itemDescriber.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/itemShop.test.ts` | 7 | 7 |
+| `src/features/tech-tree/systems/lanePace.test.ts` | 4 | 4 |
+| `src/features/tech-tree/systems/loadoutYieldCap.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/markLadder.test.ts` | 21 | 21 |
 | `src/features/tech-tree/systems/nodeCost.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/nodePress.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/nodeSpendShare.diagnostic.test.ts` | 0 | 1 |
-| `src/features/tech-tree/systems/nodeSpendShare.test.ts` | 3 | 3 |
+| `src/features/tech-tree/systems/nodeSpendShare.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/render/extractorPose.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/render/forkPieces.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/render/markPlate.test.ts` | 8 | 8 |
@@ -466,7 +469,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/treeShape.test.ts` | 18 | 18 |
 | `src/features/tech-tree/systems/treeSpendGuard.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 20 | 20 |
-| `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 3 | 3 |
+| `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 
