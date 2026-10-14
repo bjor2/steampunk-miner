@@ -2,12 +2,14 @@
  * `auto_guns` as numbers (#107 numbers, Systems & Economy):
  *   shot damage   = damageFractionOfDrill * drillPower(L) * kDrillVsEnemy     (BigStat)
  *   fire interval = 30 + (12 - 30) * (x - 1) / ((x - 1) + 8)  ticks, rounded half up
- *   mount price   = ceilMilli(30 * V(t(p, 5)) * paceScale(p))
+ *   mount price   = ceilMilli(1 * V(t(p, 5)) * paceScale(p))
  *   level price   = ceilMilli(8 * 1.25^(g - 1) * V(t(p, 5)) * paceScale(p))  to go from g to g + 1
  * Damage follows the drill, and enemy health and drill power both grow 1.12^6 a planet, so an
  * on-curve kill takes the same number of shots on every planet; the gun track buys rate only.
  * The prices are the `bandOre` family of the travel fee and the refinery slots (#105): ore units
- * of band 5 at the planet the guns are bought on.
+ * of band 5 at the planet the guns are bought on. The mount was 30 units until the GD ruling on
+ * #371 (14 Oct) aligned it with the bore gun's 1-unit mount (GD Q2 on #314): a one-time feature
+ * unlock, counted once in the tree total.
  *
  * Two-tier since #180 (TD on the migration rows): the gun stores a step like the tracks. The mount
  * is the first major, one buy from step 0 to step 10; major g (1..16, the cap counts majors) is

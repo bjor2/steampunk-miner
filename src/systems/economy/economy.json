@@ -172,7 +172,7 @@
     "maxLevel": 16,
     "rangeTiles": 8,
     "frontDeadConeDeg": 60,
-    "mountCost": { "band": 5, "oreUnits": "30" },
+    "mountCost": { "band": 5, "oreUnits": "1" },
     "levelCost": { "id": "cost.vehicle.gun", "band": 5, "oreUnits": "8", "ratio": "1.250" }
   },
   "archetypes": [

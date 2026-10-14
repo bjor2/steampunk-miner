@@ -37,7 +37,7 @@ const rejectionOf = (events: readonly DomainEvent[]) =>
   events.find((event) => event.type === 'CommandRejected')
 
 describe('guns: buying (#107)', () => {
-  it('mounts the guns, their first major at step 10, on planet 4 for 30 band-5 ore units', () => {
+  it('mounts the guns, their first major at step 10, on planet 4 for 1 band-5 ore unit', () => {
     const session = dockedOn(4)
     const before = session.state().players.p1.wallet
     const events = session.submit(1, buyGun)

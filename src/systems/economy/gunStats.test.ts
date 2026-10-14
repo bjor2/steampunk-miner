@@ -75,9 +75,9 @@ describe('gun stats (#107 numbers)', () => {
     expect(GUN_SHOT_QUANTA).toBe(120)
   })
 
-  it('prices the mount at 30 band-5 ore units of the purchase planet', () => {
+  it('prices the mount at 1 band-5 ore unit of the purchase planet (GD ruling on #371)', () => {
     for (const planet of [4, 5, 9]) {
-      expect(gunMountPrice(planet)).toEqual(bandFiveOre('30', planet))
+      expect(gunMountPrice(planet)).toEqual(bandFiveOre('1', planet))
       expect(nextGunPrice(0, planet)).toEqual(gunMountPrice(planet))
     }
   })
