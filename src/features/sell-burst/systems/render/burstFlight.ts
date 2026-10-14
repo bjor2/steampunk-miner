@@ -1,6 +1,6 @@
 /**
  * Where the burst's pieces are at a tick (#171 section 1), pure look maths: the ore chunks arc
- * from `sell.chute` up into the hopper crown, where the `sell.ticker` sign sits; the coins burst up
+ * from `sell.chute` up into the hopper's mouth at `sell.ticker`; the coins burst up
  * out of `sell.stack` and hang; then they ride in screen space to the money counter, or to the
  * `Lining −X` tag when the bill peels them off. Each function writes into the caller's point and
  * answers whether the piece shows, so a frame allocates nothing.

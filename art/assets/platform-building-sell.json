@@ -3,8 +3,12 @@
   "source": "blender",
   "form": "parts",
   "status": "final",
-  "color": "#8a6a3a",
+  "color": "#6a5238",
   "partColors": {
-    "sell-ticker": "#1b1613"
+    "sell-arc": "#80bdff",
+    "sell-arc-2": "#80bdff",
+    "sell-conveyor": "#2b2622",
+    "sell-spark": "#fff4c8",
+    "sell-spark-2": "#fff4c8"
   }
 }

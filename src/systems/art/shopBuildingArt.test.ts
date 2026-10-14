@@ -25,7 +25,13 @@ describe('shop building art', () => {
   })
 
   it('gives each building one shell part and only the parts that move (#170 budget)', () => {
-    expect(shopBuildingMovingPartIdsOf('sell')).toEqual(['sell-ticker'])
+    expect(shopBuildingMovingPartIdsOf('sell')).toEqual([
+      'sell-arc',
+      'sell-arc-2',
+      'sell-conveyor',
+      'sell-spark',
+      'sell-spark-2',
+    ])
     expect(shopBuildingMovingPartIdsOf('upgrade')).toEqual([
       'workshop-gantry',
       'workshop-turntable',

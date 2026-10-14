@@ -1,11 +1,12 @@
 /**
- * The two shop buildings of #170 (art #174): the tall "Assay & Exchange" over the Sell zone and
- * the wide "Engineering Works" over the Workshop zone. Their art ids take the #52 form
+ * The two shop buildings of #170 (art #174): the "Assay & Exchange" over the Sell zone, since
+ * ticket 398 a service station with charging, repair and selling bays, and the wide "Engineering
+ * Works" over the Workshop zone. Their art ids take the #52 form
  * `platform-building-<bay>`, derived from the slice bays as the bay art is; the Refinery keeps
  * `platform-bay-refinery` until its art moves behind the yard (#170 TD decision).
  *
- * Each building is one static shell baked into one part plus the parts that move (#170 budget:
- * "only the ticker, gantry and turntable move"), and carries the attach points the sell burst
+ * Each building is one static shell baked into one part plus the parts that move (#170 budget;
+ * the station's idle arcs, sparks and conveyor replaced the ticker in ticket 398), and carries the attach points the sell burst
  * (#171), the workshop showcase (#180) and the dock camera read, as `attach.<id>` empties in the
  * `.blend` exported into the sidecar's `attach` array (#162 K5 shape). The ids are the kernel
  * `building-attach` registry's (#175); this module finds them in the art.
@@ -36,9 +37,12 @@ export const SHOP_BUILDING_ATTACH_IDS: Readonly<Record<ShopBuildingBayId, readon
   upgrade: attachIdsOfBuilding('upgrade'),
 }
 
-/** The parts drawn over each shell that the code animates: the ticker; the gantry and turntable. */
+/**
+ * The parts drawn over each shell that the code animates: the station's coil arcs, conveyor load
+ * and weld sparks (`stationIdleMotion.ts`); the gantry and turntable.
+ */
 const SHOP_BUILDING_MOVING_PARTS: Readonly<Record<ShopBuildingBayId, readonly string[]>> = {
-  sell: ['sell-ticker'],
+  sell: ['sell-arc', 'sell-arc-2', 'sell-conveyor', 'sell-spark', 'sell-spark-2'],
   upgrade: ['workshop-gantry', 'workshop-turntable'],
 }
 

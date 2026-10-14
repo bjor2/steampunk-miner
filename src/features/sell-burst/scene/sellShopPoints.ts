@@ -1,7 +1,8 @@
 /**
  * The Assay & Exchange's three points the burst uses (#170 attach points, the kernel
- * `building-attach` ids): chunks leave `sell.chute` and drop into the hopper crown behind the
- * `sell.ticker` sign, and coins burst out of `sell.stack`. World metres, from the building's origin
+ * `building-attach` ids): chunks leave `sell.chute` at the conveyor's intake and drop into the
+ * hopper's mouth at `sell.ticker` (the service station of ticket 398), and coins burst out of
+ * `sell.stack`. World metres, from the building's origin
  * (its zone's centre column on the pad top, #174) plus each point's offset in the shipped art.
  */
 import type { BuildingAttachUse } from '../../../systems/registries/buildingAttach'
