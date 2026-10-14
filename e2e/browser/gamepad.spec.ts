@@ -1,7 +1,7 @@
 /**
  * The gamepad device adapter in the preview build (ticket 346): a pad frame goes in through
  * `steampunkDebug.input.padFrame`, the same entry the shell's poll uses, and the action stream, the
- * settings flag and the aim read come back through `steampunkDebug`, never pixels. A held button
+ * pause menu, the settings flag and the aim read come back through `steampunkDebug`, never pixels. A held button
  * presses once, the right-stick click is `toggle_auto_fire`, the stick aims without pressing, and a
  * pad rebinding lands in the bindings.
  */
@@ -16,7 +16,7 @@ declare global {
 }
 
 /** The standard mapping's indices for the buttons these cases press. */
-const BUTTON_INDEX = { PadA: 0, PadX: 2, PadLB: 4, PadStart: 9, PadRS: 11 } as const
+const BUTTON_INDEX = { PadA: 0, PadX: 2, PadLB: 4, PadStart: 9, PadRS: 11, PadDown: 13 } as const
 type Button = keyof typeof BUTTON_INDEX
 
 interface PadFrame {
@@ -72,11 +72,17 @@ test('a held right-stick click presses toggle_auto_fire once, and the stick aims
   expect(errors).toEqual([])
 })
 
-test('Start opens settings from the pad, and a pad press while one waits rebinds it', async ({
+test('Start opens the pause menu, its Settings opens from the pad, and a pad press while one waits rebinds it', async ({
   page,
 }) => {
   const errors = await openGame(page)
   await feedFrames(page, padFrame(['PadStart']), 1)
+  await expect(page.getByTestId(UI_IDS.pauseMenu)).toBeVisible()
+  // Resume is focused first (ticket 404): down twice to Settings, then A.
+  for (const button of ['PadDown', 'PadDown', 'PadA'] as const) {
+    await feedFrames(page, padFrame([]), 1)
+    await feedFrames(page, padFrame([button]), 1)
+  }
   await expect(page.getByTestId(UI_IDS.settingsPanel)).toBeVisible()
   await feedFrames(page, padFrame([]), 1)
   // Every plain vehicle button is bound (RT fires the bore gun, ticket 345), so the free one is a

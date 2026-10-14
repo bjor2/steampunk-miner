@@ -2016,7 +2016,7 @@
           "children": [
             {
               "title": "Keyboard layout",
-              "description": "WASD or arrows to drive, drill and lift; Space/E dock; Q quick service; R tow; G guns; B charge; = - 0 zoom; Esc settings.",
+              "description": "WASD or arrows to drive, drill and lift; Space/E dock; Q quick service; R tow; G guns; B charge; = - 0 zoom; Esc pause menu.",
               "status": "built",
               "issues": [33, 53]
             },
@@ -2034,7 +2034,7 @@
             },
             {
               "title": "Gamepad",
-              "description": "Any standard controller reaches every action: left stick drives and moves menu focus, A docks and confirms, B backs out, Start opens settings, LB with the d-pad zooms, the right-stick click switches the bore gun's auto mode; pad buttons rebind in settings beside the keys, and the right stick aims the bore gun.",
+              "description": "Any standard controller reaches every action: left stick drives and moves menu focus, A docks and confirms, B backs out, Start opens the pause menu, LB with the d-pad zooms, the right-stick click switches the bore gun's auto mode; pad buttons rebind in settings beside the keys, and the right stick aims the bore gun.",
               "status": "partial",
               "issues": [346, 314]
             },
@@ -2125,10 +2125,16 @@
               "issues": [26]
             },
             {
+              "title": "Pause menu",
+              "description": "Esc or Start pauses play and opens a menu: Resume, Save game and Settings.",
+              "status": "built",
+              "issues": [404]
+            },
+            {
               "title": "Multiple save slots",
-              "description": "More than one slot; the slice has a single slot.",
-              "status": "planned",
-              "issues": [12]
+              "description": "An autosave plus nine named slots; save into one from the pause menu, a filled slot asking before it is overwritten. Loading a slot from a title menu is still to come.",
+              "status": "partial",
+              "issues": [12, 402, 403, 404]
             }
           ]
         }

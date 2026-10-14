@@ -734,6 +734,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugLiveTime.test.ts` | 3 | 3 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
+| `src/debug/debugSaves.test.ts` | 3 | 3 |
 | `src/debug/debugScreens.test.ts` | 30 | 29 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
 
@@ -807,7 +808,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | --- | --- | --- |
 | `src/systems/input/actionMap.test.ts` | 28 | 28 |
 | `src/systems/input/buildIntent.test.ts` | 11 | 11 |
-| `src/systems/input/inputRouting.test.ts` | 26 | 26 |
+| `src/systems/input/inputRouting.test.ts` | 29 | 29 |
 | `src/systems/input/padCodes.test.ts` | 4 | 4 |
 | `src/systems/input/padFrame.test.ts` | 7 | 7 |
 | `src/systems/input/preferences.test.ts` | 20 | 20 |
@@ -1082,6 +1083,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/liveStepSlice.test.ts` | 13 | 13 |
 | `src/store/padRuntime.test.ts` | 16 | 14 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
+| `src/store/pauseMenuSlice.test.ts` | 11 | 11 |
 | `src/store/perfLog.test.ts` | 8 | 8 |
 | `src/store/planetCardSlice.test.ts` | 5 | 5 |
 | `src/store/platformLoop.test.ts` | 4 | 4 |
@@ -1252,6 +1254,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/itemCardText.test.ts` | 4 | 4 |
 | `src/systems/views/menuFocus.test.ts` | 2 | 2 |
 | `src/systems/views/overlaySeats.test.ts` | 5 | 5 |
+| `src/systems/views/pauseMenuModel.test.ts` | 7 | 7 |
 | `src/systems/views/planetCardView.test.ts` | 1 | 1 |
 | `src/systems/views/plaqueModel.test.ts` | 6 | 6 |
 | `src/systems/views/refineryBayModel.test.ts` | 4 | 4 |

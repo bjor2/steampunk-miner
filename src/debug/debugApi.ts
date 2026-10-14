@@ -86,6 +86,7 @@ import {
   type DebugUi,
 } from './debugScreens'
 import { debugActionsBySlice, type SliceDebugActions } from './debugActionRegistry'
+import { createDebugSaves, type DebugSaves } from './debugSaves'
 import {
   pauseLiveGame,
   resumeLiveGame,
@@ -254,6 +255,8 @@ export interface DebugApi {
   exportSnapshots(): Promise<DebugResult<SnapshotExport>>
   /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
   ui: DebugUi
+  /** The save slots (ticket 404): the index as the menus read it, and a slot loaded back. */
+  saves: DebugSaves
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
   input: DebugInput
   /** Slice debug actions, `features['<slice>'].<action>()` (docs/standards/feature-slices.md 3.14). */
@@ -456,6 +459,7 @@ export function createDebugApi(): DebugApi {
     getPhysicsStats: readPhysicsStats,
     exportSnapshots: exportSnapshotZip,
     ui: createDebugUi(),
+    saves: createDebugSaves(),
     input: createDebugInput(),
     features: debugActionsBySlice(),
     teleportToCore: notImplemented('teleportToCore'),

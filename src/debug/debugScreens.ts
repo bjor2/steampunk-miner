@@ -25,6 +25,7 @@ import { readPadAim, routePadFrame } from '../store/padRuntime'
 import {
   readAudioModel,
   readHudModel,
+  readPauseMenuModel,
   readRefineryBayModel,
   readSellBayModel,
   readTitleMenuModel,
@@ -48,6 +49,7 @@ import { speedViewOf, type SpeedView } from '../systems/render/speedFraming'
 import { cameraViewOf, viewShortAxisProblems, type CameraView } from '../systems/render/viewZoom'
 import { shopTypeOf, type ShopType } from '../systems/views/bayPresentation'
 import type { HudModel } from '../systems/views/hudModel'
+import type { PauseMenuModel } from '../systems/views/pauseMenuModel'
 import { planetCardViewOf, type PlanetCardView } from '../systems/views/planetCardView'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SellBayModel } from '../systems/views/sellBayModel'
@@ -93,6 +95,10 @@ export interface DebugUi {
   getSellBayModel(): DebugResult<{ model: SellBayModel }>
   getUpgradeBayModel(): DebugResult<{ model: UpgradeBayModel }>
   getRefineryBayModel(): DebugResult<{ model: RefineryBayModel }>
+  /** The pause menu (ticket 404) as it draws now; null while it is closed. */
+  getPauseMenuModel(): DebugResult<{ model: PauseMenuModel | null }>
+  /** The name the pause menu's next save takes, as if typed into its field; refused when closed. */
+  setPauseSaveName(name: unknown): DebugResult
   /**
    * How the bay screen presents now (#45, #44, #39): its shutter, the smallest text against the
    * short axis, and the share of the preview panel's height the vehicle fills (0 when closed).
@@ -180,6 +186,8 @@ export function createDebugUi(): DebugUi {
     getSellBayModel: () => ({ ok: true, model: readSellBayModel() }),
     getUpgradeBayModel: () => ({ ok: true, model: readUpgradeBayModel() }),
     getRefineryBayModel: () => ({ ok: true, model: readRefineryBayModel() }),
+    getPauseMenuModel: () => ({ ok: true, model: readPauseMenuModel() }),
+    setPauseSaveName: setPauseSaveNameUnlessRefused,
     getBayPresentation: () => ({ ok: true, presentation: bayPresentationNow() }),
     getAudioModel: () => ({ ok: true, model: readAudioModel() }),
     getScreenLayout: screenLayoutNow,
@@ -236,6 +244,17 @@ function pinRenderScaleUnlessRefused(scale: unknown): DebugResult {
   const problems = renderScalePinProblems(scale)
   if (problems.length === 0) game().pinRenderScale(scale)
   return resultOf(problems)
+}
+
+function setPauseSaveNameUnlessRefused(name: unknown): DebugResult {
+  const problems = pauseSaveNameProblems(name)
+  if (problems.length === 0) game().setPauseSaveName(name as string)
+  return resultOf(problems)
+}
+
+function pauseSaveNameProblems(name: unknown): string[] {
+  if (game().pauseMenu === null) return ['the pause menu is closed']
+  return typeof name === 'string' ? [] : ['the save name must be text']
 }
 
 function openScreenUnlessRefused(screenId: unknown): DebugResult {

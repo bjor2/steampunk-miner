@@ -262,6 +262,20 @@
       "specs": ["e2e/browser/smoke.spec.ts", "e2e/browser/miningPopup.spec.ts"]
     },
     {
+      "why": "The pause menu's manual save (ticket 404): its slice, view, model, debug reads and the slot writer.",
+      "paths": [
+        "src/store/pauseMenuSlice.ts",
+        "src/store/checkpoint.ts",
+        "src/systems/views/pauseMenuModel.ts",
+        "src/ui/pause/**",
+        "src/debug/debugSaves.ts",
+        "src/data/input/actions.json",
+        "src/systems/input/inputRouting.ts",
+        "src/shell/sharedBrowserHooks.ts"
+      ],
+      "specs": ["e2e/browser/pauseSave.spec.ts"]
+    },
+    {
       "why": "The gamepad adapter (ticket 346): the shell's poll, pad codes and frames, the pad runtime.",
       "paths": [
         "src/shell/gamepadHooks.ts",
