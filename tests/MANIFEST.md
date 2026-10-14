@@ -27,6 +27,15 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
+### `artefact`: 4 files, 31 tests
+
+| File | Tests | Sites |
+| --- | --- | --- |
+| `src/features/artefact/systems/twistCards.test.ts` | 14 | 12 |
+| `src/features/artefact/systems/twistHooks.test.ts` | 5 | 3 |
+| `src/features/artefact/twistNoFreeCell.test.ts` | 6 | 1 |
+| `src/features/artefact/twistPace.test.ts` | 6 | 3 |
+
 ### `codex`: 7 files, 36 tests
 
 | File | Tests | Sites |
@@ -225,11 +234,12 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-popup/systems/render/chipPlacement.test.ts` | 8 | 8 |
 | `src/features/mining-popup/systems/render/plaqueFit.test.ts` | 11 | 4 |
 
-### `mobility`: 14 files, 144 tests
+### `mobility`: 15 files, 152 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/mobility/logging.test.ts` | 2 | 2 |
+| `src/features/mobility/systems/belayLine.test.ts` | 8 | 8 |
 | `src/features/mobility/systems/gatesFixture.test.ts` | 34 | 3 |
 | `src/features/mobility/systems/grappleWinch.test.ts` | 6 | 6 |
 | `src/features/mobility/systems/marksInPlay.test.ts` | 4 | 4 |
@@ -332,7 +342,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sell-burst/systems/salesOfBatch.test.ts` | 3 | 3 |
 | `src/features/sell-burst/systems/sellBurst.test.ts` | 12 | 12 |
 
-### `sensing`: 21 files, 139 tests
+### `sensing`: 22 files, 143 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -341,6 +351,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/sceneBudget.test.ts` | 4 | 4 |
 | `src/features/sensing/shippedRows.test.ts` | 9 | 9 |
 | `src/features/sensing/systems/assayLens.test.ts` | 6 | 6 |
+| `src/features/sensing/systems/deepStriker.test.ts` | 4 | 4 |
 | `src/features/sensing/systems/echoPing.test.ts` | 7 | 7 |
 | `src/features/sensing/systems/gatesFixture.test.ts` | 22 | 3 |
 | `src/features/sensing/systems/hazardBarometer.test.ts` | 5 | 5 |
@@ -393,7 +404,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 34 files, 268 tests
+### `terrain-tools`: 35 files, 273 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -415,6 +426,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/magnetItems.test.ts` | 10 | 10 |
 | `src/features/terrain-tools/systems/magnetSpend.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/systems/marksInPlay.test.ts` | 1 | 1 |
+| `src/features/terrain-tools/systems/oreLure.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/oreShifter.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/systems/pressurePocket.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/systems/render/magnetFieldBuffer.test.ts` | 10 | 10 |

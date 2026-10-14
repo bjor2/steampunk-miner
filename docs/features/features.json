@@ -1369,6 +1369,31 @@
         },
         {
           "group": true,
+          "title": "Artefact twists",
+          "description": "A fourth card at the cache once you own its base item: taking it is your one artefact, and it changes how that item plays.",
+          "children": [
+            {
+              "title": "Deep Striker",
+              "description": "The echo sounder's ping becomes a downward cone into the band below, as many cells as the ring but reaching deeper. Its cone effect is not drawn yet.",
+              "status": "partial",
+              "issues": [329]
+            },
+            {
+              "title": "Belay Line",
+              "description": "The grapple hook stays planted as a standing line for a minute: it catches you if you fall within its reach, and firing again moves it. The line is not drawn yet.",
+              "status": "partial",
+              "issues": [329]
+            },
+            {
+              "title": "Ore Lure",
+              "description": "The ore-shifter leaves a magnet plate on the tunnel wall and, from beyond its reach, drags ore toward the plate instead of the hull; the dock takes the plate back. The plate is not drawn yet.",
+              "status": "partial",
+              "issues": [329]
+            }
+          ]
+        },
+        {
+          "group": true,
           "title": "Planned artefact sets",
           "description": "More artefact picks in the campaign schedule.",
           "children": [

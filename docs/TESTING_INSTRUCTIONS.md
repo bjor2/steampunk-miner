@@ -346,6 +346,15 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   income per minute over bare. The alarm shield's runs (on its own vs pressed by hand on every lunge
   warning, at least 0.98x, and the auto run replaying to the same digest) skip until a tech node
   researches the steam sear (#318), whose toggle is the one auto switch. Long: for the box Tester.
+- **Twists pace** (pin 6 of the GD lock on #206, ticket 329): `features/artefact/twistPace.test.ts`
+  plays the bot from on-curve arrival to the core of planets 7 and 10 on the three pacing seeds
+  bare, with the three twists' base items owned (echo sounder, grapple winch, ore-shifter, the
+  third cradle opening their third slot) and pressed by `withTwistHand`, and once per twist with
+  that twist held too, the twist being the run's one artefact. Gated on the median of the per-seed
+  ratios: the bot's best card (its fastest twisted run) at least 0.98x the base run's core time,
+  and each twist with its base item at most +15% income per minute over bare.
+  `features/artefact/twistNoFreeCell.test.ts` runs #281's exact check once per twist (the twist
+  held, its base item owned, no slot pressed). Long: for the box Tester.
 - **No free cell from item hooks** (GD lock on #206, Vertical pin 1, ticket 323):
   `bot/noFreeCellRuns.ts` is #281's exact check as a harness: the bot arrives on planets 7 and 10
   on-curve and plays to the core on each pacing seed with a bare setup and with items owned, none
