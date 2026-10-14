@@ -10,6 +10,9 @@
  * node `requiresFeature` is a row of the locked schedule (ticket 358); the Armoury lanes bring at
  * most one capability a planet on P2-P8 between them (the Horizontal Scaler on #310, ticket 318).
  *
+ * The lanes' P16 fork branches never count toward a crowded planet: the GD lock on #255 puts
+ * every lane's fork in the P16 schedule gap, one exclusive choice per lane.
+ *
  * It runs over whatever the lane slices have registered, so it turns on as they land; the
  * cadence check (no gap longer than two planets on P2-P37) waits until all six lanes are in.
  */
