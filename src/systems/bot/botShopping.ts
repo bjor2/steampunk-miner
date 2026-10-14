@@ -33,6 +33,7 @@ import type { CommandIntent } from '../authority/authorityCommand'
 import { CLICK_CHAIN } from '../authority/purchaseChain'
 import { nextUpgradePrice } from '../authority/workshopRules'
 import { nextCasingPrice } from '../authority/casingRules'
+import { isTravelSetByDrill } from '../authority/travelSpeed'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { stepPrice } from '../economy/upgradePrices'
 import { minorsPerMajor, pipOf, stepOfMajor } from '../economy/upgradeSteps'
@@ -294,11 +295,25 @@ function betterOffer(best: MarginalOffer | null, offer: MarginalOffer): Marginal
   return best === null || cmp(offer.gainPerPrice, best.gainPerPrice) > 0 ? offer : best
 }
 
-/** The marginal tracks the bot has not capped on this planet. */
+/** The marginal tracks the bot has not capped on this planet and the bay still sells. */
 function openMarginalTracks(session: BotSession): UpgradeId[] {
-  const { levels } = session.vehicle()
+  return MARGINAL_TRACKS.filter((track) => isMarginalTrackOpen(session, track))
+}
+
+function isMarginalTrackOpen(session: BotSession, track: UpgradeId): boolean {
   const planetIndex = session.state().planet.index
-  return MARGINAL_TRACKS.filter((track) => isUnderLeadCap(levels, track, planetIndex))
+  return (
+    isUnderLeadCap(session.vehicle().levels, track, planetIndex) && !isEngineMaxed(session, track)
+  )
+}
+
+/**
+ * The engine track is maxed while the drill sets travel speed (ticket 333), which the 4-tick floor
+ * of ticket 396 reaches from planet 2: offering the refused step again would never end the visit.
+ * Asked of the rig, not the bay, so a Sell-bay `hasPurchase` still sees the other tracks (#352).
+ */
+function isEngineMaxed(session: BotSession, track: UpgradeId): boolean {
+  return track === 'engine' && isTravelSetByDrill(session.state(), session.playerId)
 }
 
 function plannedMoneyPerTick(layout: MineLayout, levels: UpgradeLevels): Money {

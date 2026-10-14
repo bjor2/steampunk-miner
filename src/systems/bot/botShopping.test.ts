@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createAuthorityState } from '../authority/authorityState'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
+import { isTravelSetByDrill } from '../authority/travelSpeed'
 import { UPGRADE_IDS } from '../economy/economyDefinition'
 import { stepOfMajor } from '../economy/upgradeSteps'
 import { onCurveLevel } from '../economy/vehicleStats'
@@ -49,6 +50,13 @@ describe('bot: shopping at the Upgrade bay', () => {
     expect(stepsBought).toBeGreaterThan(stepOfMajor(1))
   })
 
+  it('sends no track buy the Upgrade bay refuses, the engine maxed by a drill that sets travel (ticket 396)', () => {
+    const session = botAtUpgradeBayOn(2)
+    shopForTheCore(session)
+    expect(isTravelSetByDrill(session.state(), session.playerId)).toBe(true)
+    expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
+  })
+
   it('holds drill power to one major past the planet on-curve level (#86, caps count majors)', () => {
     expect(leadCeiling('drill_power', 1)).toBe(stepOfMajor(onCurveLevel('drill_power', 1) + 1))
     expect(leadCeiling('drill_power', 3)).toBe(stepOfMajor(onCurveLevel('drill_power', 3) + 1))
@@ -60,12 +68,12 @@ describe('bot: shopping at the Upgrade bay', () => {
     expect(session.vehicle().levels.drill_power).toBe(leadCeiling('drill_power', 2))
   })
 
-  it('spends what the drill power ceiling saves on the other tracks', () => {
+  it('spends what the drill power ceiling saves on the other tracks the bay sells', () => {
     const session = botAtUpgradeBayOn(3)
     shopForTheCore(session)
-    const { drill_power, engine, boiler, cargo_hold } = session.vehicle().levels
+    const { drill_power, boiler, cargo_hold } = session.vehicle().levels
     expect(drill_power).toBe(leadCeiling('drill_power', 3))
-    expect(Math.min(engine, boiler, cargo_hold)).toBeGreaterThan(0)
+    expect(Math.min(boiler, cargo_hold)).toBeGreaterThan(0)
   })
 
   it('buys drill_tip past its on-curve level for the core once drill power is at its cap', () => {
