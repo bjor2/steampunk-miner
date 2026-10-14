@@ -17,7 +17,7 @@ import {
   type ItemDescriptionEntry,
 } from '../../../systems/registries/itemDescriptionEntries'
 import { ZERO_MONEY } from '../../../systems/money'
-import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
+import { hasNoNextLevel, isAmountLine, type DescribedStatLineSpec } from '../../descriptions'
 import { researchedMarkInViewOf } from '../../tech-tree'
 import type { ComboItem } from './comboCatalogue'
 import { comboPriceOf } from './comboSales'
@@ -64,7 +64,7 @@ function parentLineSpecsOf(item: ComboItem): DescribedStatLineSpec[] {
 function parentAmountSpecsOf(parentItemId: string): DescribedStatLineSpec[] {
   const entry = itemDescriptionEntryOf(parentRefOf(parentItemId))
   const specs = (entry?.statLines ?? []) as readonly DescribedStatLineSpec[]
-  return specs.filter((spec) => spec.textOf === undefined)
+  return specs.filter(isAmountLine)
 }
 
 /** The parent's line, read at the parent's Mark: the same value its own card shows now. */

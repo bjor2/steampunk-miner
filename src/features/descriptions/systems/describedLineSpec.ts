@@ -26,6 +26,16 @@ export interface DescribedStatLineSpec extends StatLineSpec {
    * now and next are this text at the level, with no change, share or cap.
    */
   textOf?(level: number): string
+  /**
+   * A line of words that quotes the player's snapshot (a consumable's charges left, ticket 394):
+   * read as `textOf`, at the card's ctx with its level, or the next level's for the next text.
+   */
+  textIn?(ctx: ItemCtx): string
+}
+
+/** A line that reads an amount: neither `textOf` nor `textIn` words. */
+export function isAmountLine(spec: DescribedStatLineSpec): boolean {
+  return spec.textOf === undefined && spec.textIn === undefined
 }
 
 /** A line that never changes with the item's level: no next value. */

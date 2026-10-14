@@ -6,7 +6,9 @@
  * `powerUpAtMarkOf` (#249). An item used by holding its slot declares `release` and restarts its
  * cooldown from its hold's end with `startCooldownAt` (ticket 332). A self-acting item's auto
  * actor presses through `pressItemOnAuto` and waits on `autoUseReadyTickOf` (ticket 328); its
- * specs run the press path with this slice registered through `withPowerUpCore`.
+ * specs run the press path with this slice registered through `withPowerUpCore`. A consumable is
+ * restocked at the Upgrade bay once its slice registers a `consumable-restock` entry (ticket 394);
+ * its card reads the charges left through `chargesLeftInViewOf`.
  */
 export const POWER_UP_CORE_SLICE_ID = 'power-up-core'
 export {
@@ -24,6 +26,13 @@ export {
 } from './systems/powerUpKind'
 export { autoUseReadyTickOf, POWER_UP_AUTO_AIM, pressItemOnAuto } from './systems/autoPress'
 export { chargesLeftOf, type FollowUpPattern } from './systems/chargeState'
+export { chargesLeftInViewOf } from './systems/chargesInView'
+export {
+  restockUnitPriceAt,
+  type ConsumableRestock,
+  type RestockBill,
+} from './systems/consumableRestock'
+export { restockConsumableIntent } from './systems/restockRules'
 export { FOLLOW_UP_WINDOW_TICKS } from './systems/followUps'
 export { powerUpAtMarkOf, type MarkedPowerUp } from './systems/powerUpMarks'
 export { returnCharge } from './systems/useResolution'

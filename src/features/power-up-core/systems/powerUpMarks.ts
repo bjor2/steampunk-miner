@@ -49,7 +49,11 @@ export function atResearchedMark(
   playerId: string,
   powerUp: PowerUp,
 ): MarkedPowerUp {
-  const mark = researchedMarkOf(state, playerId, powerUp.itemId)
+  return atMarkOf(powerUp, researchedMarkOf(state, playerId, powerUp.itemId))
+}
+
+/** The power-up at `mark`, the highest researched (0 for none), wherever that Mark was read. */
+export function atMarkOf(powerUp: PowerUp, mark: number): MarkedPowerUp {
   const ladder = markLadderOfItem(powerUp.itemId)
   if (ladder === null) {
     return { ...powerUp, mark, magnitude: null, isMastered: false, reachedMilestones: [] }

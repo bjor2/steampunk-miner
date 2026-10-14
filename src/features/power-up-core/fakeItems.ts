@@ -3,11 +3,14 @@
  * consumable items"): one of each class, registered by a fixture slice beside the real one, the
  * way an item slice will. Each pays its user one coin when it acts, so a spec sees the effect in
  * the wallet; each is refused by a gate when the vehicle faces down, as if the cell below were
- * gated, and finds nothing to act on when it faces up. Spec-only: no register.ts imports this.
+ * gated, and finds nothing to act on when it faces up. The fake consumable is restocked at 2
+ * band-5 units a charge (ticket 394), the charged one is not. Spec-only: no register.ts imports
+ * this.
  */
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { add, fromSafeInteger } from '../../systems/money'
+import type { BandOreCost } from '../../systems/economy/economyDefinition'
 import { withWallet, type AuthorityState } from '../../systems/authority/authorityState'
 import { setVehicleLoadoutCommand } from '../../systems/authority/loadoutCommands'
 import {
@@ -19,6 +22,7 @@ import {
 import { FACING, type Facing } from '../../systems/vehicle/vehiclePose'
 import { slice } from './register'
 import type { VehicleItem } from '../../systems/registries/vehicleLoadout'
+import type { ConsumableRestock } from './systems/consumableRestock'
 import type {
   PowerUp,
   PowerUpClass,
@@ -45,6 +49,9 @@ export const FAKE_GATE = { cellTier: 9, gateKind: 'drill_tier' } as const
 
 /** The fake consumable's hold, on the clock alone: the slot ring fills over these ticks. */
 export const FAKE_HOLD: Readonly<SlotHold> = { startTick: 100, finishTick: 190 }
+
+/** The fake consumable's restock price a charge: #162 4.1's 2 band-5 units. */
+export const FAKE_UNIT_PRICE: Readonly<BandOreCost> = { band: 5, oreUnits: fromSafeInteger(2) }
 
 /** Why an upward-facing fake is refused: nothing above it to act on. */
 export const FAKE_REFUSAL = 'fake-items.nothing_above'
@@ -76,7 +83,16 @@ export const FAKE_ITEMS: SliceDefinition = {
   register(r) {
     r.content('vehicle-item', Object.keys(FAKE_NUMBERS).map(fakeItemOf))
     r.content('power-up', Object.keys(FAKE_NUMBERS).map(fakePowerUpOf))
+    r.content('consumable-restock', [FAKE_RESTOCK])
   },
+}
+
+const FAKE_RESTOCK: ConsumableRestock = {
+  id: `${FAKE.consumable}.restock`,
+  itemId: FAKE.consumable,
+  iconId: 'icon-panel-slots',
+  name: FAKE.consumable,
+  unitPrice: FAKE_UNIT_PRICE,
 }
 
 export interface FieldSetup {

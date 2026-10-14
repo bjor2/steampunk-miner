@@ -5,8 +5,10 @@
  * Every event names its player: the wind-up and channel resolve on the authority clock, whose
  * events carry no command stamp.
  */
+import { toCanonical } from '../../../systems/money'
 import type { LoadoutSlotId } from '../../../systems/registries/vehicleLoadout'
 import type { FollowUpPattern } from './chargeState'
+import type { ConsumableRestock, RestockBill } from './consumableRestock'
 import type { GateBlock } from './powerUpKind'
 
 declare module '../../../systems/authority/authorityCommand' {
@@ -25,6 +27,11 @@ declare module '../../../systems/authority/authorityCommand' {
      * for the act when it lands during the wind-up. Anything else is accepted and changes nothing.
      */
     'power-up-core.release_power_up': { slot: string }
+    /**
+     * Fill the player's own stack of a restocked consumable at the Upgrade bay, each missing
+     * charge at the unit price here (ticket 394).
+     */
+    'power-up-core.restock_consumable': { itemId: string }
     /** A scenario's charges left for one owned power-up. */
     'debug.power-up-core.setCharges': { itemId: string; chargesLeft: number }
   }
@@ -71,6 +78,18 @@ declare module '../../../systems/authority/domainEvent' {
     }
     'power-up-core.ChargesRefilled': { playerId: string; itemId: string; chargesLeft: number }
     /**
+     * A consumable's stack bought back to full at the Upgrade bay (ticket 394): `count` charges at
+     * `unitPrice` each, `price` in all (canonical Money), `chargesLeft` after.
+     */
+    'power-up-core.ConsumableRestocked': {
+      playerId: string
+      itemId: string
+      count: number
+      unitPrice: string
+      price: string
+      chargesLeft: number
+    }
+    /**
      * The item's act fired its sibling-link (the GD lock on #256): `siblingId` acted from `slot`,
      * its own, and spent its charge and cooldown.
      */
@@ -103,6 +122,9 @@ declare module '../../../systems/authority/domainEvent' {
     'power-up-core.no_sibling_link': true
     'power-up-core.no_milestone': true
     'power-up-core.nothing_to_hold': true
+    'power-up-core.not_restocked': true
+    'power-up-core.not_owned': true
+    'power-up-core.stack_full': true
   }
 }
 
@@ -142,6 +164,23 @@ export function channelCancelledOf(subject: UseSubject, chargesLeft: number) {
 
 export function chargesRefilledOf(playerId: string, itemId: string, chargesLeft: number) {
   return { type: 'power-up-core.ChargesRefilled' as const, playerId, itemId, chargesLeft }
+}
+
+export function consumableRestockedOf(
+  playerId: string,
+  { itemId }: ConsumableRestock,
+  { count, unitPrice, price }: RestockBill,
+  chargesLeft: number,
+) {
+  return {
+    type: 'power-up-core.ConsumableRestocked' as const,
+    playerId,
+    itemId,
+    count,
+    unitPrice: toCanonical(unitPrice),
+    price: toCanonical(price),
+    chargesLeft,
+  }
 }
 
 export function linkFiredOf(

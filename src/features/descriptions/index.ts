@@ -5,5 +5,5 @@
  */
 export const DESCRIPTIONS_SLICE_ID = 'descriptions'
 export type { DescribedStatLineSpec } from './systems/describedLineSpec'
-export { hasNoNextLevel } from './systems/describedLineSpec'
+export { hasNoNextLevel, isAmountLine } from './systems/describedLineSpec'
 export { flavourProblemsOf } from './systems/flavourRules'

@@ -13,7 +13,7 @@ import {
   type ItemDescriptionEntry,
 } from '../../../systems/registries/itemDescriptionEntries'
 import { artefactItemOf } from '../../../systems/registries/kernelItems'
-import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
+import { hasNoNextLevel, isAmountLine, type DescribedStatLineSpec } from '../../descriptions'
 import { researchedMarkInViewOf } from '../../tech-tree'
 import { TWISTS, type Twist } from './twistCatalogue'
 
@@ -35,7 +35,7 @@ function twistCardOf(twist: Twist): ItemDescriptionEntry {
 function baseAmountSpecsOf(baseItemId: string): DescribedStatLineSpec[] {
   const entry = itemDescriptionEntryOf(baseRefOf(baseItemId))
   const specs = (entry?.statLines ?? []) as readonly DescribedStatLineSpec[]
-  return specs.filter((spec) => spec.textOf === undefined)
+  return specs.filter(isAmountLine)
 }
 
 /** The base item's line at its researched Mark: the value its own card shows now. */

@@ -3,7 +3,9 @@
  * charge classes, `use_power_up` with its wind-up and channel on the authority clock, the free
  * dock refill, the toggles' energy draw (ticket 233), the three slot cradles with their price and
  * card (ticket 248), the slot keys and the touch slot column, the power-up log lines, and the Mark
- * spend and effect report rows (#249). It does not own the loadout (TD, #162). No side effects at
+ * spend and effect report rows (#249). A consumable another slice registers a `consumable-restock`
+ * for is bought back by the charge at the Upgrade bay (ticket 394): the restock command and its
+ * bay entries. It does not own the loadout (TD, #162). No side effects at
  * import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -15,6 +17,8 @@ import { CRADLE_CARDS, CRADLE_SELLER } from './systems/cradleSales'
 import { CRADLES } from './systems/cradles'
 import { REFILL_CHARGES_SERVICE } from './systems/dockRefill'
 import { POWER_UP_RULES } from './systems/powerUpCommands'
+import { RESTOCK_BAY_ENTRIES } from './systems/restockBayEntries'
+import { RESTOCK_RULES } from './systems/restockRules'
 import { SLOT_USE_REACTIONS } from './systems/slotUse'
 import { DRAW_TOGGLES_STEP } from './systems/toggleDraw'
 import { RESOLVE_USES_STEP } from './systems/useClock'
@@ -29,6 +33,8 @@ export const slice: SliceDefinition = {
     r.itemDescriptionEntries(CRADLE_CARDS)
     r.saveSection(POWER_UP_SECTION)
     r.commandRules(POWER_UP_RULES)
+    r.commandRules(RESTOCK_RULES)
+    r.bayEntry(RESTOCK_BAY_ENTRIES)
     r.clockStep(DRAW_TOGGLES_STEP)
     r.clockStep(RESOLVE_USES_STEP)
     r.dockService(REFILL_CHARGES_SERVICE)

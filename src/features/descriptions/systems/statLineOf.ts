@@ -32,7 +32,8 @@ export const TINY_CHANGE_TEXT = '<0.001'
 const SHOWN_AS_ZERO = /^-?0$/
 
 export function statLineOf(spec: DescribedStatLineSpec, ref: ItemRef, ctx: ItemCtx): StatLine {
-  if (spec.textOf !== undefined) return textLineOf(spec, spec.textOf, ref, ctx)
+  const textIn = textInOf(spec)
+  if (textIn !== undefined) return textLineOf(spec, textIn, ref, ctx)
   return amountLineOf(spec, ref, ctx)
 }
 
@@ -51,13 +52,20 @@ function amountLineOf(spec: DescribedStatLineSpec, ref: ItemRef, ctx: ItemCtx): 
 /** A line of words: the text at the owned level and at the next, nothing computed between them. */
 function textLineOf(
   spec: DescribedStatLineSpec,
-  textOf: (level: number) => string,
+  textIn: (ctx: ItemCtx) => string,
   ref: ItemRef,
   ctx: ItemCtx,
 ): StatLine {
   const next = nextLevelOf(spec, ref, ctx)
-  const line = { label: spec.label, kind: spec.kind, now: textOf(ctx.level) }
-  return next === null ? line : { ...line, next: textOf(next) }
+  const line = { label: spec.label, kind: spec.kind, now: textIn(ctx) }
+  return next === null ? line : { ...line, next: textIn({ ...ctx, level: next }) }
+}
+
+/** The line's words at a ctx: its snapshot reading, or its text at the ctx's level; none for an amount. */
+function textInOf(spec: DescribedStatLineSpec): ((ctx: ItemCtx) => string) | undefined {
+  if (spec.textIn !== undefined) return spec.textIn
+  const { textOf } = spec
+  return textOf === undefined ? undefined : (ctx) => textOf(ctx.level)
 }
 
 /** A raw stat as Money: counts exactly, fractional bounded stats (engine, fire rate) as decimals. */

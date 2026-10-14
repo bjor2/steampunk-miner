@@ -7,7 +7,9 @@
  * siblingId, slot}`, the sibling's slot, and `link_toggled {itemId, isOn}` for the item card's
  * switch. Letting go of a hold-to-use slot (ticket 332) logs `power_up_released {itemId, slot}`
  * on the tick the hold ended. A press the kernel's auto mode made (ticket 328) logs
- * `power_up_auto_fired {itemId, slot}` on its press tick; its use logs as any other.
+ * `power_up_auto_fired {itemId, slot}` on its press tick; its use logs as any other. A
+ * consumable's paid restock (ticket 394) logs `consumable_restocked {itemId, count, unitPrice,
+ * price, to}`, so the spend-share read tells it from a free `charges_refilled`.
  */
 import type { SliceEventProjections } from '../../logging/registries/eventProjections'
 import type { SliceRunEvents } from '../../logging/registries/runEvents'
@@ -41,6 +43,10 @@ export const POWER_UP_PROJECTIONS: SliceEventProjections = {
   'power-up-core.ChargesRefilled': ({ itemId, chargesLeft }) => ({
     event: 'power-up-core.charges_refilled',
     data: { itemId, to: chargesLeft },
+  }),
+  'power-up-core.ConsumableRestocked': ({ itemId, count, unitPrice, price, chargesLeft }) => ({
+    event: 'power-up-core.consumable_restocked',
+    data: { itemId, count, unitPrice, price, to: chargesLeft },
   }),
   'power-up-core.LinkFired': ({ itemId, siblingId, slot }) => ({
     event: 'power-up-core.link_fired',
@@ -99,6 +105,17 @@ export const POWER_UP_RUN_EVENTS: SliceRunEvents = {
     group: 'platform',
     level: 'core',
     payload: { itemId: 'text', to: 'integer' },
+  },
+  'power-up-core.consumable_restocked': {
+    group: 'platform',
+    level: 'core',
+    payload: {
+      itemId: 'text',
+      count: 'integer',
+      unitPrice: 'money',
+      price: 'money',
+      to: 'integer',
+    },
   },
   'power-up-core.link_fired': {
     group: 'vehicle_and_combat',
