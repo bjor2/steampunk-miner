@@ -40,12 +40,13 @@ export const CROSS_SLICE_CHECKS = [
   },
   {
     check: 'Balance guards, reported against the committed baseline or a control run',
-    decidedIn: '#84, #105, #107, #109, #113, #198',
+    decidedIn: '#84, #105, #107, #109, #113, #198, #347',
     files: [],
     commands: [
       'npm run balance:report',
       'npm run balance:planets',
       'npm run balance:guns',
+      'npm run balance:bore',
       'npm run balance:charges',
       'npm run balance:refinery',
       'npm run balance:heat',

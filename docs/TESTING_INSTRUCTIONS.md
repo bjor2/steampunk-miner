@@ -204,6 +204,15 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   a planet that moves by more than 10% is a balance finding whose one lever is
   `gun.damageFractionOfDrill`. Gun combat specs fight in the band-1 corridor with `debug.setGunLevel`
   and the planet 4 on-curve levels (`combat/gunFire.test.ts`).
+- **Bore gun** (ticket 347, the TD's seam 3 on #314): `npm run balance:bore` plays the bot scenario
+  to planet 10's core on each pacing seed twice, never firing the bore gun (`borePolicy: 'never'`,
+  the default) and forced (`'forced'`: the gun mounted at its walls through the provider's
+  `wallsMountIntent`, a shot at every `nextShotTick` aimed by `bestBoreBearingOf`), and
+  `logging/boreReport.ts` gates the forced run: time to core at least 0.98x the never run's on
+  every planet and seed, departure `drill_power` within 1 level, at least 60 shots, and the
+  campaign scaling gate. It exits 1 on a miss; `-- --last-planet 40` plays the headless lane at
+  the #304/#330 re-baseline. The bot's cadence (`waitFiring` splits its 60-tick waits at
+  `nextShotTick`) is pinned in `systems/bot/botBore.test.ts`.
 - **Refinery** (#105 acceptance 7): `npm run balance:refinery` plays the bot scenario from planet 1
   to planet 8's core twice, refining from planet 3 (`refinery: 'used'`, the bot's default) and
   ignoring the refinery, and prints both core times per planet, the single-lever findings
