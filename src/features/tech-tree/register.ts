@@ -11,7 +11,7 @@ import { techTreeDebugActions } from './debug'
 import { POWER_UP_FX_LAYER_ID, PowerUpFxLayer } from './scene/PowerUpFxLayer'
 import { POWER_UP_FX_BUDGET } from './scene/powerUpFxPools'
 import { RIG_GEAR_PIECE_ID, RigGearPiece } from './scene/RigGearPiece'
-import { techGearArtAssets } from './systems/render/techGear'
+import { signatureAttachUses, techGearArtAssets } from './systems/render/techGear'
 import { TECH_TREE_PROJECTIONS, TECH_TREE_RUN_EVENTS } from './logging'
 import { ITEM_BOT_PURCHASE, ITEM_RESEARCH } from './systems/itemShop'
 import { RESEARCH_BOT_PURCHASE } from './systems/researchBotPurchase'
@@ -28,6 +28,8 @@ export const slice: SliceDefinition = {
     r.artAssets(techGearArtAssets())
     // That gear on the car, each cradle's Mark plate, and the power-up effects (ticket 250).
     r.vehiclePiece({ id: RIG_GEAR_PIECE_ID, Piece: RigGearPiece })
+    // Where each signature part sits, named by its gear row alone (TD lock on #265).
+    signatureAttachUses().forEach((use) => r.attachUse(use))
     r.sceneLayer({ id: POWER_UP_FX_LAYER_ID, Layer: PowerUpFxLayer, budget: POWER_UP_FX_BUDGET })
     r.commandRules(TECH_TREE_RULES)
     r.eventProjections(TECH_TREE_PROJECTIONS)

@@ -536,9 +536,10 @@ module table and the review renders are in [docs/art/armoury/](art/armoury/READM
 The art half of [#265](https://github.com/bjor2/steampunk-miner/issues/265), built by
 [#363](https://github.com/bjor2/steampunk-miner/issues/363): a Blender source for each of the five
 aetheric items of the #245 lock, `art/blender/vehicle-item-power-<item>/` (whistle, lantern, twin
-coils, escapement cage, condenser tank). They are sources only: not in the manifest, not registered
-and not exported. The attach points, placeholder sidecars and the piece that draws them come with
-the #265 wiring. `docs/art/aetheric/author_aetheric.py` wrote the first version of every `.blend`;
+coils, escapement cage, condenser tank). Ticket 265 wired them: each is a `signature` row of the
+tech-tree's `techGear.json` on its own attach point (ticket 376), registered by the tech-tree's
+`r.artAssets`, with a manifest entry and a placeholder sidecar laid out from its export, and
+exported unchanged with `art:export`. `docs/art/aetheric/author_aetheric.py` wrote the first version of every `.blend`;
 from then on the `.blend` files are the sources. The part table and the review renders are in
 [docs/art/aetheric/](art/aetheric/README.md).
 

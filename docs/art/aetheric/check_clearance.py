@@ -92,8 +92,8 @@ def obstacle_silhouettes(attach):
 
 
 def is_aetheric(item):
-    """A gear row of one of the five parts themselves: #262 ships the whistle as a slot row until
-    #265 moves it to its point."""
+    """A gear row of one of the five parts themselves (ticket 265): each is checked as a part, never
+    as an obstacle to itself."""
     return any(entry['itemId'] == item['itemId'] for entry in aetheric.read_table()['parts'])
 
 

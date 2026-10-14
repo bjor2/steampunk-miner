@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { attachCoverageProblems, type AttachedItem } from './attachCoverage'
-import { ATTACH_IDS, type AttachId } from './vehicleAttach'
+import { ATTACH_IDS, attachOf, type AttachId } from './vehicleAttach'
 import type { LoadoutSlotId } from './vehicleLoadout'
 
 const POWER_UP_SLOTS: readonly LoadoutSlotId[] = [
@@ -56,11 +56,10 @@ const CATALOGUE: readonly AttachedItem[] = [
   powerUp('power.ore_shifter', 'slot'),
   powerUp('power.steam_shield', 'slot'),
   powerUp('power.grav_anchor', 'slot'),
-  powerUp('power.resonance_whistle', 'slot'),
 ]
 
-// The five aetheric power-ups on their own points (TD lock on #265, ticket 376), as #265 will
-// register them: each can be slotted with any other power-up, so each point has one owner.
+// The five aetheric power-ups on their own points (TD lock on #265, ticket 376), as #265 registers
+// them: each can be slotted with any other power-up, so each point has one owner.
 const AETHERIC: readonly AttachedItem[] = [
   powerUp('power.resonance_whistle', 'hull.stack.side'),
   powerUp('power.phase_lantern', 'hull.nose'),
@@ -82,10 +81,9 @@ function catalogueWith(id: string, change: Partial<AttachedItem>): AttachedItem[
   return CATALOGUE.map((item) => (item.id === id ? { ...item, ...change } : item))
 }
 
-/** The catalogue with #265's rows: the whistle leaves its slot (#262) for its own point. */
+/** The catalogue with the five aetheric parts on their own points. */
 function catalogueWithAetheric(): AttachedItem[] {
-  const isAetheric = (item: AttachedItem) => AETHERIC.some((other) => other.id === item.id)
-  return [...CATALOGUE.filter((item) => !isAetheric(item)), ...AETHERIC]
+  return [...CATALOGUE, ...AETHERIC]
 }
 
 function aethericWith(id: string, attach: AttachId): AttachedItem[] {
@@ -227,5 +225,13 @@ describe('attach coverage: the five aetheric points (ticket 376)', () => {
     expect(attachCoverageProblems(catalogueWithAetheric(), sidecarIds)).toEqual([
       'item "power.aether_condenser" names "hull.flank", which the sidecar lacks',
     ])
+  })
+})
+
+// The tech-tree's gear rows name the five points as attach uses (ticket 265), so each item
+// resolves its point on the loaded slices whether or not its own slice has shipped it yet.
+describe('attach coverage: the five aetheric parts on the loaded slices (ticket 265)', () => {
+  it('resolves an attach use for each of the five aetheric items at its own point', () => {
+    expect(AETHERIC.map((item) => attachOf(item.id))).toEqual(AETHERIC.map((item) => item.attach))
   })
 })

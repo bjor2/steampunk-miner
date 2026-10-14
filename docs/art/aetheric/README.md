@@ -7,9 +7,8 @@ the art half of [#265](https://github.com/bjor2/steampunk-miner/issues/265) (bui
 Each of the five aetheric items mounts a visible part, as the lock requires ("it shows on the
 vehicle"), and this folder holds those parts' Blender sources and how they look on the rig.
 
-**Art only.** Nothing here is wired: no attach-point ids, placeholder sidecars, manifest entries,
-`r.artAssets` registration or vehicle piece. Those are the TD's and the wiring's (#265, with #314,
-#250 and #235). The asset ids follow the slot-item rule in `src/systems/art/artIds.ts`
+The wiring is ticket 265: each part is a `signature` row of the tech-tree's `techGear.json` on its
+own point (ticket 376), so the #250 rig draws it once its item is owned. The asset ids follow the slot-item rule in `src/systems/art/artIds.ts`
 (`power.arc_coil` is `vehicle-item-power-arc-coil`), so the wiring registers them as they are.
 
 Authored in Blender 4.2.9 on the shared box headlessly: `author_aetheric.py` wrote the first
@@ -96,21 +95,20 @@ named:
 - **The rear is taken.** The rack, its crates, the echo sounder and the acid etcher fill it, so the
   escapement cage rides the aft stack.
 
-## Known limits, for the wiring (#265)
+## Known limits
 
-- **No export yet.** `npm run art:export` needs each id registered (`r.artAssets`) and a
-  placeholder sidecar listing its part ids; both come with the wiring. The part ids are in
-  `aethericParts.json`.
-- The draw order is the point's `z`: 3 for the whistle (over the stack's 2) and 6 for the rest,
-  with the slot items. The lantern's 9 belonged to the hood place it no longer takes.
+- The draw order is each part's `z` in its `.blend`: 3 for the whistle (over the stack's 2), 6 for
+  the coils, the cage and the condenser, and 9 for the lantern, left from the hood place it no
+  longer takes. Nothing overlaps it at `hull.nose` (`clearance.json`), so the 9 stays.
 - The rig parts are drawn for the tier-3 hull; on tier 1 and 2 the stack and boilers sit a little
   differently. On tier 1 there is no second stack, so the whistle stands on the boiler's crown.
 
-## The whistle ships first (#262)
+## The whistle ships first (#262), then the wiring (ticket 265)
 
-The resonance whistle is exported ahead of the wiring: its item shipped in #262, and the TD on
-#162 wants every item drawn at a power-up slot to ship a model (`assetLint.test.ts`). It is a
-`slot` row of the tech-tree's `techGear.json`, so the rig draws it at its slot's `hull.powerup.n`
-until #265 gives the five parts their own points; the placeholder sidecar was laid out from the
-`.blend` as `author_tech_gear.py` lays out a slot housing, and `art:export` left the source
-unchanged. The other four stay unexported until their items ship.
+The resonance whistle was exported ahead of the wiring: its item shipped in #262, and the TD on
+#162 wants every item drawn at a power-up slot to ship a model (`assetLint.test.ts`). It was a
+`slot` row, drawn at its slot's `hull.powerup.n`, until ticket 265 moved it to `hull.stack.side`
+with the other four. Each of the four was exported with `art:export` from the `.blend` unchanged;
+its placeholder sidecar is the export's own layout with no source hash, as the whistle's is. The
+rig draws only registered items, so the lantern, coils, cage and condenser stay off the car until
+#261 and #263 ship their items; the tech-tree's attach use names their points already.

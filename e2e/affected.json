@@ -99,7 +99,7 @@
       ]
     },
     {
-      "why": "The tech gear on the rig, the Mark plates and the power-up effects (ticket 250).",
+      "why": "The tech gear on the rig, the Mark plates and the power-up effects (ticket 250), and the aetheric parts on their own points (ticket 265).",
       "paths": [
         "src/features/tech-tree/scene/**",
         "src/features/tech-tree/store/rigReads.ts",
@@ -107,7 +107,11 @@
         "src/features/tech-tree/systems/render/**",
         "src/features/tech-tree/techGear.json"
       ],
-      "specs": ["e2e/browser/rigGear.spec.ts", "e2e/browser/vehiclePieces.spec.ts"]
+      "specs": [
+        "e2e/browser/rigGear.spec.ts",
+        "e2e/browser/vehiclePieces.spec.ts",
+        "e2e/browser/aetheric.spec.ts"
+      ]
     },
     {
       "why": "The sized charge rack hangs as a vehicle piece; the blast front and planted charges are scene layers inside the frame budget.",

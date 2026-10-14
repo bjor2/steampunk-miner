@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { withRegistrations } from '../../../../registries/registrar'
+import type { SliceDefinition } from '../../../../registries/sliceDefinition'
+import type { VehicleItem } from '../../../../systems/registries/vehicleLoadout'
 import {
   EMPTY_LOADOUT,
   withItemsOwned,
@@ -155,6 +158,103 @@ describe('rig gear', () => {
         .map((quad) => quad.partId)
     expect(partsOf({ itemId: 'rig.resonance', slot: null })).toEqual(['fork-prongs'])
     expect(partsOf({ itemId: 'gear.side_cutters', slot: 'drill.flank' })).toEqual([])
+  })
+})
+
+// The five aetheric parts on their own points (TD lock on #265, ticket 376). Only the whistle has
+// shipped (#262), so a fixture slice registers the five items as #261 and #263 will.
+const AETHERIC_PARTS = [
+  {
+    itemId: 'power.resonance_whistle',
+    attachId: 'hull.stack.side',
+    partIds: ['whistle-body', 'whistle-lever'],
+  },
+  {
+    itemId: 'power.phase_lantern',
+    attachId: 'hull.nose',
+    partIds: ['lantern-frame', 'lantern-shutter'],
+  },
+  {
+    itemId: 'power.arc_coil',
+    attachId: 'hull.roof.coils',
+    partIds: ['coil-aft', 'coil-fore', 'coil-plinth'],
+  },
+  {
+    itemId: 'power.chronometric_governor',
+    attachId: 'hull.tail',
+    partIds: ['escapement-cage', 'escapement-wheel'],
+  },
+  {
+    itemId: 'power.aether_condenser',
+    attachId: 'hull.flank',
+    partIds: ['condenser-needle', 'condenser-tank'],
+  },
+]
+
+const aethericVehicle = vehicleWithPoints([
+  { id: 'hull.powerup.1', atM: [-0.3, -0.02], z: 6 },
+  { id: 'hull.stack.side', atM: [-0.15, 0.29], z: 3 },
+  { id: 'hull.nose', atM: [0.28, 0.12], z: 6 },
+  { id: 'hull.roof.coils', atM: [-0.18, 0.1], z: 6 },
+  { id: 'hull.tail', atM: [-0.31, 0.35], z: 6 },
+  { id: 'hull.flank', atM: [0.06, -0.23], z: 6 },
+])
+
+const aethericFixtureSlice: SliceDefinition = {
+  id: 'aetheric-fixture',
+  register: (r) => r.content('vehicle-item', AETHERIC_PARTS.map(aethericItemOf)),
+}
+
+function aethericItemOf({ itemId }: { itemId: string }): VehicleItem {
+  return { id: itemId, iconId: 'icon-panel-slots', slots: ['powerup.1'], attach: null }
+}
+
+function aethericMountsOf(loadout: VehicleLoadout, slices = [aethericFixtureSlice]) {
+  return withRegistrations(slices, () =>
+    rigMountsOf(GEAR_ART, aethericVehicle, rigItemsOf(loadout)).map(listed),
+  )
+}
+
+function aethericAssetOf(itemId: string): string {
+  return `vehicle-item-${itemId.replace('.', '-').replace(/_/g, '-')}`
+}
+
+function aethericMountOf(part: (typeof AETHERIC_PARTS)[number]) {
+  return { assetId: aethericAssetOf(part.itemId), attachId: part.attachId, partIds: part.partIds }
+}
+
+describe('rig gear: the five aetheric parts (ticket 265)', () => {
+  it('draws each owned aetheric part at its own point, with every part of its asset', () => {
+    const loadout = loadoutOf(
+      {},
+      AETHERIC_PARTS.map((part) => part.itemId),
+    )
+    expect(aethericMountsOf(loadout)).toEqual(
+      AETHERIC_PARTS.map(aethericMountOf).sort((a, b) => a.attachId.localeCompare(b.attachId)),
+    )
+  })
+
+  it('draws a slotted aetheric part at its own point, never in the cradle that holds it', () => {
+    for (const part of AETHERIC_PARTS) {
+      expect(aethericMountsOf(loadoutOf({ 'powerup.1': part.itemId }))).toEqual([
+        aethericMountOf(part),
+      ])
+    }
+  })
+
+  it('draws no aetheric part, not even a ghost, while its item is not owned', () => {
+    expect(aethericMountsOf(EMPTY_LOADOUT)).toEqual([])
+    for (const owned of AETHERIC_PARTS) {
+      expect(aethericMountsOf(loadoutOf({}, [owned.itemId]))).toEqual([aethericMountOf(owned)])
+    }
+  })
+
+  it('draws no aetheric part whose item no slice has registered, owned or not', () => {
+    const loadout = loadoutOf(
+      {},
+      AETHERIC_PARTS.map((part) => part.itemId),
+    )
+    expect(aethericMountsOf(loadout, [])).toEqual([])
   })
 })
 

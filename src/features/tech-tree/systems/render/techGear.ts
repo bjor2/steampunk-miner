@@ -6,7 +6,7 @@
  */
 import { slotItemAssetIdOf } from '../../../../systems/art/artIds'
 import type { ArtAsset } from '../../../../systems/registries/artAssets'
-import type { ItemAttach } from '../../../../systems/registries/vehicleAttach'
+import type { AttachUse, ItemAttach } from '../../../../systems/registries/vehicleAttach'
 import TECH_GEAR_FILE from '../../techGear.json'
 
 /**
@@ -115,6 +115,15 @@ export function powerUpFxOfItem(itemId: string): PowerUpFx[] {
   return POWER_UP_FX.filter((fx) => fx.itemId === itemId)
 }
 
+/**
+ * Each signature part's point as an attach use (TD lock on #265): its row is the one place a
+ * power-up with its own part names that point, so the coverage rule reads the point the rig draws
+ * at, and an item slice (the aetheric items of #261-#263) never names it on its own.
+ */
+export function signatureAttachUses(): AttachUse[] {
+  return MOUNTED_GEAR.filter((gear) => gear.kind === 'signature').map(attachUseOfGear)
+}
+
 /** An item's own asset follows the kernel's slot-model name; a shared cluster has its own. */
 export function isOwnGearAsset(gear: MountedGear): boolean {
   return gear.assetId === slotItemAssetIdOf(gear.itemId)
@@ -146,4 +155,8 @@ export function crateOfRow(column: number, row: number): readonly [number, numbe
   const [firstX, firstZ] = CRATE_RACK.firstM
   const [pitchX, pitchZ] = CRATE_RACK.pitchM
   return [firstX + column * pitchX, firstZ + row * pitchZ]
+}
+
+function attachUseOfGear(gear: MountedGear): AttachUse {
+  return { id: `tech-tree.${gear.itemId}`, itemId: gear.itemId, attach: gear.attach }
 }

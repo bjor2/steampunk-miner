@@ -11,7 +11,8 @@ import {
   attachCoverageProblems,
   type AttachedItem,
 } from '../../../../systems/registries/attachCoverage'
-import { isAttachId } from '../../../../systems/registries/vehicleAttach'
+import { attachOf, isAttachId } from '../../../../systems/registries/vehicleAttach'
+import { slice as techTreeSlice } from '../../register'
 import type { LoadoutSlotId } from '../../../../systems/registries/vehicleLoadout'
 import { isMovingPart } from './extractorPose'
 import { mountedGearQuadsOf } from './techGearQuads'
@@ -24,6 +25,7 @@ import {
   gearPartIdsOf,
   isOwnGearAsset,
   mountedGearOf,
+  signatureAttachUses,
   techGearArtAssets,
   type GearKind,
   type MountedGear,
@@ -80,6 +82,15 @@ const PHYSICAL_ITEM_IDS = [
   'consumable.rivet_patch',
   'consumable.smoke_canister',
   'consumable.escape_thruster',
+]
+
+// The five aetheric items (GD lock on #245), in the lock's order.
+const AETHERIC_ITEM_IDS = [
+  'power.resonance_whistle',
+  'power.phase_lantern',
+  'power.arc_coil',
+  'power.chronometric_governor',
+  'power.aether_condenser',
 ]
 
 /** The loadout slots each kind can sit in (#162 TD lock and amendments). */
@@ -194,6 +205,28 @@ describe('tech gear: the mounted gear table', () => {
         }
       }
     })
+  })
+
+  it('turns every signature row into a tech-tree attach use at the point of that row', () => {
+    const signatures = MOUNTED_GEAR.filter((gear) => gear.kind === 'signature')
+    expect(signatureAttachUses()).toEqual(
+      signatures.map((gear) => ({
+        id: `tech-tree.${gear.itemId}`,
+        itemId: gear.itemId,
+        attach: gear.attach,
+      })),
+    )
+  })
+
+  it('resolves the five aetheric parts to their own points before their item slices register them', () => {
+    const points = withRegistrations([techTreeSlice], () => AETHERIC_ITEM_IDS.map(attachOf))
+    expect(points).toEqual([
+      'hull.stack.side',
+      'hull.nose',
+      'hull.roof.coils',
+      'hull.tail',
+      'hull.flank',
+    ])
   })
 
   it('looks an item up by id', () => {

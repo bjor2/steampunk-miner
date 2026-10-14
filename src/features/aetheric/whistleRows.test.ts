@@ -17,7 +17,7 @@ import { statPreview } from './systems/statPreview'
 import { WHISTLE_DESCRIPTION, WHISTLE_ICON_ID, WHISTLE_ID } from './systems/whistleItem'
 
 // The resonance whistle's rows on the loaded slices (#262, the GD lock on #245; #162 acceptance 1):
-// a power-up in the five slots with one attach point, its P15 node carrying its Mark ladder, a
+// a power-up in the five slots with its own attach point, its P15 node carrying its Mark ladder, a
 // one-off price through bandOrePriceAt with `tech.mark.<itemId>.<N>` nodes after it, and a card.
 
 const WHISTLE = AETHERIC_ECONOMY.resonanceWhistle
@@ -41,10 +41,10 @@ const canonicalSeconds = (ticks: number) => toCanonical(fromSafeInteger(ticks / 
 const lastMark = () => lastMarkOf(markLadderOfItem(WHISTLE_ID) ?? { isIncomeItem: false })
 
 describe('resonance whistle rows', () => {
-  it('registers a charged power-up in the five power-up slots, drawn at its slot', () => {
+  it('registers a charged power-up in the five power-up slots, drawn on the boiler stack', () => {
     expect(isVehicleItemId(WHISTLE_ID)).toBe(true)
     expect(acceptedSlotsOf(WHISTLE_ID)).toEqual(POWER_UP_SLOTS)
-    expect(attachOf(WHISTLE_ID)).toBe('slot')
+    expect(attachOf(WHISTLE_ID)).toBe('hull.stack.side')
     expect(powerUpOfItem(WHISTLE_ID)).toMatchObject({
       powerUpClass: 'charged',
       charges: WHISTLE.charges,

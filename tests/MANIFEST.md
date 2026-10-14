@@ -396,7 +396,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 36 files, 257 tests
+### `tech-tree`: 36 files, 263 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -423,8 +423,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/render/milestoneLook.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/render/powerUpFx.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/render/powerUpFxFeed.test.ts` | 13 | 13 |
-| `src/features/tech-tree/systems/render/rigGear.test.ts` | 9 | 9 |
-| `src/features/tech-tree/systems/render/techGear.test.ts` | 12 | 12 |
+| `src/features/tech-tree/systems/render/rigGear.test.ts` | 13 | 13 |
+| `src/features/tech-tree/systems/render/techGear.test.ts` | 14 | 14 |
 | `src/features/tech-tree/systems/render/techGearQuads.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/researchBotPurchase.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/techTree.test.ts` | 9 | 9 |
@@ -841,7 +841,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/registries/registrar.test.ts` | 20 | 20 |
 | `src/registries/sliceCommands.test.ts` | 6 | 6 |
 | `src/registries/sliceModules.test.ts` | 3 | 3 |
-| `src/systems/registries/attachCoverage.test.ts` | 35 | 16 |
+| `src/systems/registries/attachCoverage.test.ts` | 36 | 17 |
 | `src/systems/registries/bayEntries.test.ts` | 3 | 3 |
 | `src/systems/registries/blastEffects.test.ts` | 2 | 2 |
 | `src/systems/registries/buildingAttach.test.ts` | 3 | 3 |

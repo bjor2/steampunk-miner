@@ -1,7 +1,8 @@
 /**
  * The resonance whistle in the preview build (#262, the GD lock on #245): read through
  * `steampunkDebug`, never pixels. The build registers the whistle by its bare id, so the loadout
- * slots it and the rig hangs its part at the slot's housing point; the Digit1 key sounds it, its
+ * slots it and the rig hangs its part on the boiler stack's own point, `hull.stack.side` (ticket
+ * 265), not at the slot's housing; the Digit1 key sounds it, its
  * lure lands in the `aetheric` section and a charge is spent; and the item card's stat lines read
  * from `statPreview`.
  */
@@ -15,6 +16,7 @@ declare global {
 }
 
 const WHISTLE = 'power.resonance_whistle'
+const WHISTLE_ASSET = 'vehicle-item-power-resonance-whistle'
 
 interface WhistleRead {
   ok: boolean
@@ -38,16 +40,17 @@ function readWhistle(page: Page): Promise<WhistleRead> {
   return page.evaluate(() => window.steampunkDebug!.features.aetheric.getWhistle() as WhistleRead)
 }
 
-test('the build slots the whistle and the rig hangs it at its slot', async ({ page }) => {
+test('the build slots the whistle and the rig hangs it on the boiler stack, not in its cradle', async ({
+  page,
+}) => {
   const errors = await openGameWithWhistle(page)
-  await expect
-    .poll(() =>
-      page.evaluate(() => {
-        const result = window.steampunkDebug!.vehicleParts()
-        return result.ok ? result.mounted.map((mount) => [mount.assetId, mount.attachId]) : []
-      }),
-    )
-    .toContainEqual(['vehicle-item-power-resonance-whistle', 'hull.powerup.1'])
+  const whistleMountsOf = () =>
+    page.evaluate((assetId) => {
+      const result = window.steampunkDebug!.vehicleParts()
+      const mounts = result.ok ? result.mounted : []
+      return mounts.filter((mount) => mount.assetId === assetId).map((mount) => mount.attachId)
+    }, WHISTLE_ASSET)
+  await expect.poll(whistleMountsOf).toEqual(['hull.stack.side'])
   expect(errors).toEqual([])
 })
 

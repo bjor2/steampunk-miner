@@ -2,9 +2,9 @@
  * The resonance whistle as a store item (#262, the GD lock on #245: P15, sound, the lure verb): its
  * `vehicle-item` row, its Mark ladder on the lane's entry node, and its one-off price.
  *
- * It goes in the power-up slots and draws at its slot's `hull.powerup.n` (`attach: 'slot'`). The
- * lock puts the brass whistle on the boiler stack, a point the vehicle holds (#180); the five
- * aetheric parts' own points wait on the TD's answer on #265, which moves this attach with them.
+ * It goes in the power-up slots. Its part, the brass whistle on the boiler stack, draws at
+ * `hull.stack.side` once owned: that point is named by the tech-tree's gear row alone, as an attach
+ * use (TD lock on #265), so the item names none of its own (`attach: null`).
  */
 import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
 import type { Money } from '../../../systems/money'
@@ -27,7 +27,7 @@ export const WHISTLE_VEHICLE_ITEM: VehicleItem = {
   id: WHISTLE_ID,
   iconId: WHISTLE_ICON_ID,
   slots: POWER_UP_SLOTS,
-  attach: 'slot',
+  attach: null,
 }
 
 export function whistleBalance(): WhistleBalance {
