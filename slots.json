@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T00:46:00+02:00",
+  "updated_at": "2026-10-15T00:49:17+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -27,11 +27,11 @@
         },
         {
           "slot": "C2",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 399,
+          "grok_slot": 2,
+          "kind": "dev",
+          "since": "2026-10-15T00:48:00+02:00"
         },
         {
           "slot": "C3",
@@ -67,8 +67,8 @@
         }
       ],
       "size": 6,
-      "used": 4,
-      "free": 2,
+      "used": 5,
+      "free": 1,
       "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
@@ -416,9 +416,10 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 399,
+      "since": "2026-10-15T00:48:00+02:00",
+      "claude_slot": 2
     },
     {
       "slot": 3,
@@ -495,10 +496,10 @@
     },
     {
       "slot": 2,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 399,
+      "grok_slot": 2,
+      "since": "2026-10-15T00:48:00+02:00",
       "account": 1
     },
     {
@@ -571,17 +572,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-15 00:43 CEST",
-    "mode": "refill-dev",
-    "triggers": "#411",
-    "started": "",
-    "note": "no pickable build ticket"
+    "at": "2026-10-15 00:48 CEST",
+    "mode": "pass",
+    "triggers": "#396",
+    "started": "#399->C2/A1",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 4,
-      "dev": 4,
+      "used": 5,
+      "dev": 5,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -589,8 +590,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 4,
-      "free": 2,
+      "used": 5,
+      "free": 1,
       "external": 0
     }
   }
