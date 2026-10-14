@@ -115,13 +115,14 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
-### `drill-gear`: 22 files, 156 tests
+### `drill-gear`: 25 files, 174 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/drill-gear/drillGearInPlay.test.ts` | 11 | 11 |
 | `src/features/drill-gear/drillGearPace.test.ts` | 2 | 1 |
 | `src/features/drill-gear/drillGearTouch.test.ts` | 2 | 2 |
+| `src/features/drill-gear/forkDeep.pace.test.ts` | 4 | 3 |
 | `src/features/drill-gear/logging.test.ts` | 2 | 2 |
 | `src/features/drill-gear/shippedRows.test.ts` | 10 | 10 |
 | `src/features/drill-gear/systems/backfillRow.test.ts` | 4 | 4 |
@@ -129,6 +130,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/cuttersAndBoom.test.ts` | 7 | 6 |
 | `src/features/drill-gear/systems/dielectricBit.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/drillGearEconomy.test.ts` | 6 | 6 |
+| `src/features/drill-gear/systems/drillGearFork.test.ts` | 10 | 10 |
 | `src/features/drill-gear/systems/drillGearItems.test.ts` | 12 | 12 |
 | `src/features/drill-gear/systems/drillGearPowerUps.test.ts` | 4 | 4 |
 | `src/features/drill-gear/systems/drillGearSales.test.ts` | 2 | 2 |
@@ -140,6 +142,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/drill-gear/systems/twinBitDiagonal.test.ts` | 5 | 5 |
 | `src/features/drill-gear/systems/useResolution.test.ts` | 13 | 13 |
 | `src/features/drill-gear/systems/vibratoryCrumble.test.ts` | 4 | 4 |
+| `src/features/drill-gear/systems/wideIncomeRate.test.ts` | 4 | 4 |
 | `src/features/drill-gear/twinBitPace.test.ts` | 4 | 2 |
 
 ### `dynamite`: 5 files, 20 tests
@@ -274,7 +277,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mining-popup/systems/render/chipPlacement.test.ts` | 8 | 8 |
 | `src/features/mining-popup/systems/render/plaqueFit.test.ts` | 11 | 4 |
 
-### `mobility`: 15 files, 152 tests
+### `mobility`: 17 files, 162 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -285,6 +288,8 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/mobility/systems/marksInPlay.test.ts` | 4 | 4 |
 | `src/features/mobility/systems/milestoneVerbs.test.ts` | 19 | 11 |
 | `src/features/mobility/systems/mobilityCatalogue.test.ts` | 8 | 8 |
+| `src/features/mobility/systems/mobilityFork.test.ts` | 8 | 8 |
+| `src/features/mobility/systems/mobilityForkEconomy.test.ts` | 2 | 2 |
 | `src/features/mobility/systems/mobilityMotion.test.ts` | 8 | 7 |
 | `src/features/mobility/systems/mobilitySales.test.ts` | 5 | 5 |
 | `src/features/mobility/systems/mobilitySection.test.ts` | 5 | 5 |
