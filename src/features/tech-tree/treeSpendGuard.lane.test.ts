@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { PACING_WORLD_SEEDS } from '../../constants/pacingSeeds'
+import { toCanonical } from '../../systems/money'
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { LoggedLevels } from '../../logging/bandDigReport'
 import type { RunEvent } from '../../logging/runEvent'
@@ -49,7 +50,8 @@ import {
   type LoadoutYield,
 } from './systems/loadoutYieldCap'
 import { laneShareRowsOf, laneShareTableOf } from './systems/nodeSpendShare'
-import { registeredCatalogue } from './systems/techTree'
+import { earlyAffordableNodesOf, type EarlyAffordableNode } from './systems/anchorAffordability'
+import { registeredCatalogue, registeredTechTree, treeNodesThrough } from './systems/techTree'
 import { TREE_ECONOMY } from './systems/treeEconomy'
 import {
   missedPlanetsOf,
@@ -75,7 +77,9 @@ import {
 // median of the seeds; the bot presses no power-up yet, so until it does the table reads that
 // items delivered nothing. Beside the runs, the loadout yield cap (GD lock on #245, ticket 266): a
 // full loadout at max Mark yields no more than the five lanes' maximum on P10/P20/P40/P60, the
-// Aetheric lane adding zero.
+// Aetheric lane adding zero. With money the only gate (Bjor's ruling on #411), every node anchored
+// on P2-P60 must also cost more than the bot earned over its whole stay on the planet before its
+// anchor, on the median of the seeds (the Horizontal Scaler's point 2).
 // `npm run balance:tree -- --milestones` runs only the Mark milestone cap (GD lock on #256, ticket
 // 278) on the same runs: every income item at Mark 9 and past, fully stacked, its sibling-link on
 // and the sibling slotted and ready, owned whether or not the bot bought it, is held to the same
@@ -156,6 +160,16 @@ describe('tech tree: spend guard of the pacing bot to planet 60', () => {
   it('keeps every income item within 15% of what the bot earned on each planet', () => {
     const misses = deliveredVerdicts.filter((verdict) => verdict.isOverCap)
     expect(misses.map((verdict) => `P${verdict.planetIndex} ${verdict.itemId}`)).toEqual([])
+  })
+
+  it('prices every node above what the bot earned on the planet before its anchor (#411)', () => {
+    const nodes = treeNodesThrough(registeredTechTree(), LAST_PLANET)
+    const early = earlyAffordableNodesOf(
+      nodes,
+      seedRuns.map((seedRun) => seedRun.deliveredOn),
+    )
+    console.log(earlyAffordableTableOf(early))
+    expect(early.map((node) => `P${node.anchor} ${node.nodeId}`)).toEqual([])
   })
 })
 
@@ -312,4 +326,17 @@ function seedLinesOf(seedRuns: readonly SeedRun[]): string {
 
 function seedLineOf({ worldSeed, endedOnPlanet, isFinished }: SeedRun): string {
   return `seed ${worldSeed}: ended on planet ${endedOnPlanet}, finished: ${isFinished}`
+}
+
+function earlyAffordableTableOf(early: readonly EarlyAffordableNode[]): string {
+  if (early.length === 0)
+    return 'every node anchored on P2-P60 costs more than the planet before earned'
+  return [
+    '| anchor | node | price | earned on the planet before |',
+    '|---|---|---|---|',
+    ...early.map(
+      (node) =>
+        `| P${node.anchor} | ${node.nodeId} | ${toCanonical(node.price)} | ${toCanonical(node.earnedBefore)} |`,
+    ),
+  ].join('\n')
 }
