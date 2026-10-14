@@ -138,14 +138,14 @@ describe('income rate registration', () => {
     )
   })
 
-  it('accepts the rate\'s own item as its anchor, live once the item is owned', () => {
+  it("accepts the rate's own item as its anchor, live once the item is owned", () => {
     const drain = rateOf('fake.drain', 'power.drain', '40')
     const owned = new Set(['power.drain'])
     const rows = rowsAsText([sliceOf('fake', [drain])], (rowId) => owned.has(rowId))
     expect(rows.map((row) => row.rateId)).toEqual(['fake.drain'])
   })
 
-  it('refuses an anchor that is neither a stats.json row nor the rate\'s own item', () => {
+  it("refuses an anchor that is neither a stats.json row nor the rate's own item", () => {
     const other = rateOf('fake.drain', 'power.shifter', '1')
     expect(() => withRegistrations([sliceOf('fake', [other])], () => undefined)).toThrow(
       /income rate "fake.drain": its anchor row "power.shifter" is no row/,
