@@ -554,6 +554,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/charges/chargeShop.test.ts` | 10 | 10 |
 | `src/systems/authority/charges/chargeSizeRules.test.ts` | 14 | 14 |
 | `src/systems/authority/collapse/collapseBraces.test.ts` | 23 | 22 |
+| `src/systems/authority/collapse/collapseReinforcement.test.ts` | 7 | 7 |
 | `src/systems/authority/collapse/collapseRun.test.ts` | 19 | 19 |
 | `src/systems/authority/combat/burrower.test.ts` | 5 | 5 |
 | `src/systems/authority/combat/combatRun.test.ts` | 8 | 7 |
@@ -817,6 +818,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/enemyDetectionModifiers.test.ts` | 4 | 4 |
 | `src/systems/registries/gateChecks.test.ts` | 5 | 5 |
 | `src/systems/registries/generationHooks.test.ts` | 4 | 4 |
+| `src/systems/registries/groundReinforcement.test.ts` | 6 | 6 |
 | `src/systems/registries/heatPauses.test.ts` | 4 | 4 |
 | `src/systems/registries/hookSeed.test.ts` | 4 | 4 |
 | `src/systems/registries/hullDamageIntercepts.test.ts` | 5 | 5 |
@@ -1151,7 +1153,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/world/chunkDelta.test.ts` | 9 | 9 |
 | `src/systems/world/chunkRepair.test.ts` | 4 | 4 |
 | `src/systems/world/collapseBlock.test.ts` | 5 | 5 |
-| `src/systems/world/collapseRefill.test.ts` | 5 | 5 |
+| `src/systems/world/collapseRefill.test.ts` | 8 | 8 |
 | `src/systems/world/collapseWeakness.test.ts` | 14 | 14 |
 | `src/systems/world/dockBays.test.ts` | 9 | 9 |
 | `src/systems/world/dockSite.test.ts` | 6 | 6 |
