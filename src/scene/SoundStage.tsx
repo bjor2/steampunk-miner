@@ -3,7 +3,8 @@
  * tier, the dock and upgrade clanks, a hit's thud, the core and travel stingers, casing's hiss and
  * pop, a charge's blast, its thump delayed by the blast cue with distance, #213, a slot hold's
  * cancel clank and finish chime, ticket 253), the music stingers (#49), the slices' sound cues
- * within their voice budgets (#180, `soundCuePlayer.ts`) and, every frame, the drill, engine and
+ * within their voice budgets (#180, `soundCuePlayer.ts`), the kernel one-shots slices ask for by
+ * name (ticket 372, `oneShotPlayer.ts`) and, every frame, the drill, engine and
  * steam loops and the crossfaded music layers. What each voice plays comes from the pure rules in
  * `systems/audio` and the audio view model; this only hands it to the shell's sound output.
  * Presentation only: it never writes the store or submits.
@@ -15,6 +16,7 @@ import { getSoundOut, type SoundOut } from '../shell/soundOut'
 import { listenForFeedback } from '../store/feedbackBroadcast'
 import { useGameStore } from '../store/gameStore'
 import { listenForStingers } from '../store/musicStingerRecord'
+import { listenForOneShots } from '../store/oneShotRequests'
 import { listenForSoundCues } from '../store/soundCueRequests'
 import { readAudioModel, readDrillVoice, readHudModel } from '../store/screenReads'
 import type { DrillVoice } from '../systems/audio/drillVoice'
@@ -45,6 +47,7 @@ import {
 } from '../systems/audio/delayedThumps'
 import { drillPresence } from './drillPresence'
 import { motionPresence } from './motionPresence'
+import { createOneShotPlayer } from './oneShotPlayer'
 import { createSoundCuePlayer } from './soundCuePlayer'
 
 /** The drill's load and the music's targets are re-read as often as the HUD re-reads. */
@@ -82,14 +85,17 @@ export function SoundStage() {
   )
   const thumps = useMemo(createDelayedThumps, [])
   const cues = useMemo(() => createSoundCuePlayer(sound), [sound])
+  const oneShots = useMemo(() => createOneShotPlayer(sound), [sound])
   useEffect(() => listenForFeedback((cue) => playOrDelayCue(sound, thumps, cue)), [sound, thumps])
   useEffect(() => listenForSoundCues(cues.play), [cues])
+  useEffect(() => listenForOneShots(oneShots.play), [oneShots])
   useEffect(
     () => listenForStingers((stingerId) => sound.playMusicStinger(stingerId, planetTuning())),
     [sound],
   )
   useFrame((_, delta) => {
     cues.advance(delta)
+    oneShots.advance()
     playDueThumps(sound, thumps, delta)
     refreshDrillLoad(drill, delta)
     playLoops(sound, drill)

@@ -86,6 +86,7 @@ export const slice: SliceDefinition = {
 | `moneyCounter(provider)` | `src/ui/registries/moneyCounter.ts` | One provider (`sell-burst`): the hook `useShownMoney(wallet)` returns the Money the bay header shows. |
 | `bayScreen(screen)` | `src/ui/registries/bayScreens.ts` | One screen per bay, drawn instead of the kernel's as a transparent, pointer-taking layer; with a `featureId` it shows only once that schedule row is open; no props (feature-slices.md 3.24). |
 | `soundCue(cue)` | `src/systems/registries/soundCues.ts` | A synthesised tone with its voice budget; play it with `requestSoundCue(id, { pitchSemitones, gain })` from `src/store/soundCueRequests.ts` (3.24). |
+| `oneShot(oneShot)` | `src/systems/registries/oneShots.ts` | A name for one of the kernel's own sounds (`voice: 'clankLight'`); play it with `requestOneShot(id)` from `src/store/oneShotRequests.ts`, at most once a frame per id (3.49). |
 | `partMotionRequests(source)` | `src/systems/registries/partMotionRequests.ts` | Asked once per fixed step: poses added to part slots and parts swapped in, each at a vehicle-attach point; render-only (3.24). |
 | `worldPiece(piece)` | `src/scene/registries/worldPieces.ts` | An R3F piece drawn in its world layer (`platform`), no props (#175). |
 | `vehiclePiece(piece)` | `src/scene/registries/vehiclePieces.ts` | An R3F piece drawn in the local vehicle's body frame, no props; it hangs art at attach points with `<MountedParts assetId attachId />`, never at an offset of its own (feature-slices.md 3.25). |

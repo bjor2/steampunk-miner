@@ -578,7 +578,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/coreHarvest.test.ts` | 10 | 10 |
 | `src/systems/authority/cutFollowRead.test.ts` | 7 | 7 |
 | `src/systems/authority/drillGates.test.ts` | 11 | 11 |
-| `src/systems/authority/drillGearCut.test.ts` | 23 | 21 |
+| `src/systems/authority/drillGearCut.test.ts` | 27 | 25 |
 | `src/systems/authority/drillStep.test.ts` | 20 | 18 |
 | `src/systems/authority/exactMathLint.test.ts` | 11 | 3 |
 | `src/systems/authority/featureUnlocks.test.ts` | 11 | 11 |
@@ -677,7 +677,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/economy/casingPrices.test.ts` | 8 | 8 |
 | `src/systems/economy/chargeSizes.test.ts` | 23 | 23 |
 | `src/systems/economy/collapseCrush.test.ts` | 2 | 2 |
-| `src/systems/economy/drillGearCaps.test.ts` | 17 | 17 |
+| `src/systems/economy/drillGearCaps.test.ts` | 18 | 18 |
 | `src/systems/economy/economyGrowth.test.ts` | 5 | 5 |
 | `src/systems/economy/economySourceScan.test.ts` | 6 | 6 |
 | `src/systems/economy/economyTables.test.ts` | 10 | 5 |
@@ -944,6 +944,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/VehiclePieces.test.ts` | 2 | 2 |
 | `src/scene/chunkJobStream.test.ts` | 3 | 3 |
 | `src/scene/mountedPartsPresence.test.ts` | 3 | 3 |
+| `src/scene/oneShotPlayer.test.ts` | 5 | 5 |
 | `src/scene/partMotionPresence.test.ts` | 4 | 4 |
 | `src/scene/registries/sceneLayerBudget.test.ts` | 7 | 7 |
 | `src/scene/registries/worldPieces.test.ts` | 3 | 3 |
@@ -1117,7 +1118,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 | File | Tests | Sites |
 | --- | --- | --- |
-| `src/systems/vehicle/aheadBearingLatch.test.ts` | 6 | 6 |
+| `src/systems/vehicle/aheadBearingLatch.test.ts` | 11 | 11 |
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
 | `src/systems/vehicle/casingTrail.test.ts` | 13 | 11 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |

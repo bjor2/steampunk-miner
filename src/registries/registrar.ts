@@ -74,6 +74,7 @@ import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRe
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
 import { SHOCK_SHIELD_REGISTRY } from '../systems/registries/shockShields'
 import { SLOT_HOLD_CUE_REGISTRY } from '../systems/registries/slotHoldCues'
+import { ONE_SHOT_REGISTRY } from '../systems/registries/oneShots'
 import { SOUND_CUE_REGISTRY } from '../systems/registries/soundCues'
 import {
   addToRegistry,
@@ -161,6 +162,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     spendFamily: (family) => addSpendFamily(sliceId, family),
     screen: (panel) => add(SCREEN_REGISTRY, panel),
     soundCue: (cue) => add(SOUND_CUE_REGISTRY, cue),
+    oneShot: (oneShot) => add(ONE_SHOT_REGISTRY, oneShot),
     chargeBlastCue: (provider) => add(CHARGE_BLAST_CUE_REGISTRY, provider),
     planetSkyBand: (provider) => add(PLANET_SKY_BAND_REGISTRY, provider),
     planetCardLine: (source) => addPrefixed(PLANET_CARD_LINE_REGISTRY, sliceId, source),

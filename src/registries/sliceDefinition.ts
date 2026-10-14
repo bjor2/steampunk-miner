@@ -53,6 +53,7 @@ import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasse
 import type { OreSignatureTag, OreTypeProvider } from '../systems/registries/oreTypes'
 import type { PartMotionRequestSource } from '../systems/registries/partMotionRequests'
 import type { SaveSection } from '../systems/registries/saveSections'
+import type { OneShot } from '../systems/registries/oneShots'
 import type { SoundCue } from '../systems/registries/soundCues'
 import type { AttachUse } from '../systems/registries/vehicleAttach'
 import type { VehicleItemResearch, VehicleItemSeller } from '../systems/registries/vehicleItemSales'
@@ -210,6 +211,8 @@ export interface SliceRegistrar {
   screen(panel: ScreenPanel): void
   /** A synthesised sound with its voice budget, played on `requestSoundCue` (#180). */
   soundCue(cue: SoundCue): void
+  /** A name for one of the kernel's own sounds, played on `requestOneShot` (ticket 372). */
+  oneShot(oneShot: OneShot): void
   /** One provider across all slices: a charge's shake, flash and thump delay (#213). */
   chargeBlastCue(provider: ChargeBlastCueProvider): void
   /** One provider across all slices: a band of light in a planet's sky, the aurora (#293). */
