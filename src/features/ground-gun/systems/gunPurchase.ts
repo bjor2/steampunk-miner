@@ -67,6 +67,7 @@ declare module '../../../systems/authority/domainEvent' {
 
 export const MOUNT_COMMAND = 'ground-gun.mount'
 export const BUY_LEVEL_COMMAND = 'ground-gun.buy_level'
+export const SET_LEVELS_COMMAND = 'debug.ground-gun.setLevels'
 
 export const GUN_PURCHASE_RULES: SliceCommandRules = {
   'ground-gun.mount': {
