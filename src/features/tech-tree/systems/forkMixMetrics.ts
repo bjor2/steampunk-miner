@@ -18,8 +18,9 @@ import {
   toSafeInteger,
   type Money,
 } from '../../../systems/money'
-import type { ForkMixRole, ForkMixTally } from './forkMixTally'
+import type { ForkMixRole, ForkMixRoles, ForkMixTally } from './forkMixTally'
 import type { TechLane } from './techNode'
+import type { ForkBranchNode } from './techTree'
 
 export type ForkMixUnit = 'bp' | 'milli'
 
@@ -83,6 +84,16 @@ export const FORK_MIX_METRICS: readonly ForkMixMetric[] = [
     ],
   },
 ]
+
+/** Each registered branch item the lock gives a role, under that role. */
+export function forkMixRolesOf(branches: readonly ForkBranchNode[]): ForkMixRoles {
+  return new Map(branches.flatMap(roleEntryOf))
+}
+
+function roleEntryOf({ lane, branch, node }: ForkBranchNode): [string, ForkMixRole][] {
+  const role = FORK_MIX_ROLES[lane]?.[branch]
+  return role === undefined ? [] : [[node.unlocks.itemId, role]]
+}
 
 /** The lane's metric; a lane the lock gives none (none of the six) has none. */
 export function forkMixMetricOf(lane: TechLane): ForkMixMetric | null {

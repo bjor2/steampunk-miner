@@ -8,6 +8,7 @@ import {
   doBranchesDiffer,
   forkMixMetricOf,
   forkMixValuesOf,
+  forkMixRolesOf,
   formatForkMixValue,
 } from './forkMixMetrics'
 import {
@@ -17,7 +18,10 @@ import {
   type ForkMixStep,
   type ForkMixTally,
 } from './forkMixTally'
+import { FORK_FIXTURE_SLICE, forkItemIdOf } from '../treeFixtureSlice'
+import { withFixtureTree } from '../treeTestSession'
 import type { TechLane } from './techNode'
+import { registeredTechTree } from './techTree'
 
 const VEHICLE: TilePoint = { tx: 10, ty: 50 }
 const ROLES: ForkMixRoles = new Map([
@@ -140,5 +144,19 @@ describe('tech tree: fork action-mix metrics', () => {
       'aetheric',
     ] as const
     expect(lanes.filter((lane) => forkMixMetricOf(lane) === null)).toEqual([])
+  })
+})
+
+describe('tech tree: fork action-mix roles', () => {
+  it('gives the Scout, Diviner, Phase and Arc branch items their roles, and no other branch one', () => {
+    withFixtureTree(() => {
+      const roles = forkMixRolesOf(registeredTechTree().forkBranches)
+      expect(Object.fromEntries(roles)).toEqual({
+        [forkItemIdOf('scout')]: 'ping',
+        [forkItemIdOf('diviner')]: 'cone',
+        [forkItemIdOf('phase')]: 'phase',
+        [forkItemIdOf('arc')]: 'arc',
+      })
+    }, [FORK_FIXTURE_SLICE])
   })
 })

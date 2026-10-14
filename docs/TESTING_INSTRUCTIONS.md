@@ -344,6 +344,22 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   levels, lane nodes, modules and Marks; never a one-time mount) stays at or under 5% of every
   planet's spend on the seed median (Vertical Scaler on #322, GD ruling on #371), and the lane fails
   on a planet over it. The 15% income cap per minute is #385's check, not this lane's.
+- **Lane forks** (GD lock on #255, build 2; ticket 267): `npm run balance:forks` runs the lane
+  `features/tech-tree/forkMix.lane.test.ts`. For every registered fork branch, the bot plays the bot
+  scenario to planet 10's core on each pacing seed, forced onto the branch from the start: the
+  debug command `debug.tech-tree.forceFork` makes it the lane's active branch outside its P16 tier,
+  the debug loadout slots its item, and `withForkHand` (`features/tech-tree/forkHand.ts`) presses
+  that slot once a second out of the dock whenever a dry run accepts it, as the magnet hand does.
+  The run is folded step by step into a pace tally and an action-mix tally
+  (`systems/forkPace.ts`, `systems/forkMixTally.ts`); only those are kept. Gated per branch on the
+  seed median: P8 at 45 minutes or more and the slice at 100-110 (#146's pins); per pair, the two
+  slice medians within 10%, and the lane's action-mix metric apart between the branches
+  (`systems/forkMixMetrics.ts`: flank share of cut cells, airborne share of action ticks, reach
+  share of cargo, wide pings per trip and cone reads per cut, blast share of opened cells, phased
+  share of descent cells and arc share of enemy damage). A pair that differs only in stats fails.
+  It refuses to run with no pair registered and prints a row per run (slice, P3-P10, the action
+  mix), a median row per branch and the lanes with no pair. The verdicts are unit-tested in
+  `forkMixReport.test.ts`; a short forced run in `forkMixRuns.test.ts`.
 - **Money to planet 200** (#316 TD scope f, TD pin on #123, ticket 340): `npm run balance:money-p200`
   runs the lane `logging/moneyPastP200.lane.test.ts`. The bot plays the bot scenario on the first
   pacing seed to planet 200's core (prices near 1e104), headless, keeping no run log

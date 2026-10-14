@@ -5,8 +5,9 @@
  * - a first choice is research, so it counts in the tree's numerator (`treeSpendGuard.ts`);
  * - a re-choice is a service cost, like a restock: in the denominator, never the numerator.
  *
- * The bot picks no branch and never switches yet: its forced-branch mode is build 2 of #255
- * (`balance:forks`), which fills `payloadsToTry`. Until then both purchases offer nothing.
+ * Both offer nothing: the on-curve bot picks no branch and never switches. `balance:forks` (#255
+ * build 2, ticket 267) forces its branch at the run's start with `debug.tech-tree.forceFork`, since
+ * its runs end at planet 10, before any fork's tier.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { ZERO_MONEY, type Money } from '../../../systems/money'

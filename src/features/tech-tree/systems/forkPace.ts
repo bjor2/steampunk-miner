@@ -63,7 +63,7 @@ export function tallyForkPaceStep(
 export function forkPaceOf(tally: ForkPaceTally): ForkPace {
   return {
     sliceTicks: tally.coreTick.get(SLICE_LAST_PLANET) ?? null,
-    planetTicks: planetTicksOf(tally, FORK_PACE_PINS.planet),
+    planetTicks: planetCoreTicksOf(tally, FORK_PACE_PINS.planet),
   }
 }
 
@@ -96,7 +96,8 @@ export function minutesOfTicks(ticks: number | null): string {
   return ticks === null ? 'never' : (ticks / TICKS_PER_MINUTE).toFixed(1)
 }
 
-function planetTicksOf(tally: ForkPaceTally, planet: number): number | null {
+/** Arrival to core on `planet`; null for a planet not reached or a core not completed. */
+export function planetCoreTicksOf(tally: ForkPaceTally, planet: number): number | null {
   const arrival = tally.arrivalTick.get(planet)
   const core = tally.coreTick.get(planet)
   return arrival === undefined || core === undefined ? null : core - arrival
