@@ -26,7 +26,7 @@ export interface StripPath {
 /** Below this an outward share is a level path: the log form would divide by nothing. */
 const LEVEL_SHARE = 1e-9
 /** A heading this far from the path's, in shares of a metre, is a turn (#279 diagonals are 0.7 off). */
-const TURN_SHARE = 0.05
+const TURN_SHARE = 1 / 20
 /** A path inward stops this short of the centre, where its angle stops meaning anything. */
 const CENTRE_STOP_M = 0.5
 
