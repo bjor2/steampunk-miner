@@ -231,6 +231,13 @@ iron and soot, and the only light is warm window, lamp and skylight glass on the
 sheets are in [docs/art/shops/](art/shops/README.md). `scripts/art/author_shop_buildings.py` wrote
 the first version of both files. From then on the `.blend` files are the sources.
 
+The Engineering Works is now the upgrade workshop hangar (ticket 395), redrawn in place under the
+same ids and attach points: a towering brass-and-iron hangar with a huge arched door, two
+smokestacks, cogwheels, amber glass, an "ENGINEERING WORKS" plaque and racks of spare drill
+heads, thrusters and armour inside. The dock-buildings slice gives it idle life: the turntable
+turns on the flat art by a cylinder remap of its periodic rim, the gantry arm sways, and the
+stacks vent steam off `workshop.stack`. See [docs/art/upgrade-workshop/](art/upgrade-workshop/README.md).
+
 ## The dock add-ons
 
 The three in-place add-ons of the [#170](https://github.com/bjor2/steampunk-miner/issues/170)
@@ -247,11 +254,11 @@ top) from `src/features/dock-buildings/dockAddOns.json`, which the review render
 at most two parts (#170 amendment "Parts": the base set at most 30, an add-on 2, a counter building
 4, 48 in all): the shell, named for the asset, and the one part the code can move.
 
-| Asset                      | Host, `atM`          | Moving part (pivot)                   | Draw order against the host         |
-| -------------------------- | -------------------- | ------------------------------------- | ----------------------------------- |
-| `platform-scanner-station` | Sell, (2.4, 5.3)     | `scanner-dish` (its bearing)          | over the shell and the ticker       |
-| `platform-research-lab`    | Workshop, (−2.9, 0)  | `lab-orrery` (the rings' centre)      | behind the shell, above the roof    |
-| `platform-drone-bay`       | Workshop, (1.9, 5.6) | `hangar-drone` (its centre, hovering) | over the shell and the gantry's jib |
+| Asset                      | Host, `atM`            | Moving part (pivot)                   | Draw order against the host             |
+| -------------------------- | ---------------------- | ------------------------------------- | --------------------------------------- |
+| `platform-scanner-station` | Sell, (2.4, 5.3)       | `scanner-dish` (its bearing)          | over the shell and the ticker           |
+| `platform-research-lab`    | Workshop, (−2.9, 0)    | `lab-orrery` (the rings' centre)      | behind the shell, above the roof        |
+| `platform-drone-bay`       | Workshop, (3.75, 7.22) | `hangar-drone` (its centre, hovering) | over the shell, on the hangar's terrace |
 
 - **The scanner mast** is a 7 m gunmetal lattice up the tower's right flank, bracketed into the
   wall under the funnel's rim, brass-banded, with a railed crow's nest and a lantern. The dish is
@@ -262,7 +269,8 @@ at most two parts (#170 amendment "Parts": the base set at most 30, an add-on 2,
   observatory dome ribbed in brass, a glass condenser column with a warm core and a copper cap,
   piped into the dome, and a short stack. The armillary orrery on the dome's finial is the moving
   part.
-- **The drone hangar** is a riveted deck on short legs down to the roof's slope, an arched iron
+- **The drone hangar** is a riveted deck on short legs (since ticket 395 standing on the
+  hangar's stepped terrace right of its plaque), an arched iron
   shed open to the camera (a dark mouth under a lit lintel, rimmed in brass) with a beacon, and a
   railed landing ring on the deck's left. The hauler drone, a small gas bag with a brass gondola, a
   stern screw and a hook, hovers over the ring; the code can bob it or fly it.

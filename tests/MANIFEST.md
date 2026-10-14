@@ -102,7 +102,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/descriptions/systems/liningCards.test.ts` | 3 | 3 |
 | `src/features/descriptions/ui/upgradeBayCards.test.ts` | 4 | 4 |
 
-### `dock-buildings`: 8 files, 34 tests
+### `dock-buildings`: 10 files, 46 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -112,7 +112,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dock-buildings/systems/dockAddOns.test.ts` | 6 | 6 |
 | `src/features/dock-buildings/systems/render/dockAddOnPlacement.test.ts` | 3 | 3 |
 | `src/features/dock-buildings/systems/render/dockUnlockPan.test.ts` | 3 | 3 |
+| `src/features/dock-buildings/systems/render/turntableSpin.test.ts` | 8 | 8 |
 | `src/features/dock-buildings/systems/render/unlockPan.test.ts` | 3 | 3 |
+| `src/features/dock-buildings/systems/render/worksSteam.test.ts` | 4 | 4 |
 | `src/features/dock-buildings/systems/render/workshopStaging.test.ts` | 6 | 6 |
 
 ### `drill-gear`: 25 files, 174 tests

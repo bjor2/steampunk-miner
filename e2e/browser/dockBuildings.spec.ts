@@ -6,7 +6,8 @@
  * add-ons of #222 standing), the frame stays within the #38 budget of 150 draw calls (TD acceptance
  * 7 and the 48-part amendment). Travelling onto planet 14 builds the scanner mast and, once the
  * travel card is gone and the player has left the bay, pans the camera to it once (TD lock on #197
- * Q4).
+ * Q4). At idle the Works' turntable turns and its stacks vent steam, and the turntable stops
+ * under a docked car (ticket 395).
  */
 import { expect, test, type Page } from '@playwright/test'
 import type { DebugApi } from '../../src/debug/debugApi'
@@ -30,6 +31,13 @@ interface UnlockPanReport {
   armedRowId: string | null
   shown: { rowId: string; planetIndex: number; pan: { startTick: number } } | null
   cameraWeight: number
+}
+
+interface WorksIdleReport {
+  seconds: number
+  turntableRadians: number
+  turntableSpeed: number
+  steamParticles: number
 }
 
 interface WorkshopRoll {
@@ -78,6 +86,13 @@ function workshopRoll(page: Page): Promise<WorkshopRoll> {
     const result = read() as { ok: boolean; problems?: string[] } & WorkshopRoll
     if (!result.ok) throw new Error(result.problems?.join('; '))
     return result
+  })
+}
+
+function worksIdle(page: Page): Promise<WorksIdleReport> {
+  return page.evaluate(() => {
+    const read = window.steampunkDebug!.features['dock-buildings'].getWorksIdle
+    return read() as { ok: true } & WorksIdleReport
   })
 }
 
@@ -172,6 +187,28 @@ test.describe('dock buildings (#175)', () => {
       .toBeGreaterThanOrEqual(ROLL_TICKS)
     const roll = await workshopRoll(page)
     expect(Math.abs(roll.presenceX - roll.platformX)).toBeLessThan(0.001)
+    expect(errors).toEqual([])
+  })
+
+  test('turns the Works turntable and vents its stacks at idle, and stops the turntable under a docked car', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000)
+    const errors = await openGame(page)
+    // The idle runs on frames, which software GL under load makes slow: wait for a few seconds of them.
+    await expect
+      .poll(async () => (await worksIdle(page)).seconds, { timeout: 60_000 })
+      .toBeGreaterThan(3)
+    const idle = await worksIdle(page)
+    expect(idle.turntableSpeed).toBeGreaterThan(0)
+    expect(idle.steamParticles).toBeGreaterThan(0)
+    await expect
+      .poll(async () => (await worksIdle(page)).turntableRadians, { timeout: 30_000 })
+      .not.toBe(idle.turntableRadians)
+    await teleportToDock(page, 'upgrade')
+    await expect
+      .poll(async () => (await worksIdle(page)).turntableSpeed, { timeout: 60_000 })
+      .toBeLessThan(0.001)
     expect(errors).toEqual([])
   })
 

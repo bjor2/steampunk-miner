@@ -41,6 +41,10 @@ the vehicle, so the build places the asset at the rest point and nothing else.
   `workshop.gantry`) reaches up and right over the roof with a hook block on its cable. The
   turntable (`workshop-turntable`) is a riveted iron disc with a brass rim, flush with the pad, its
   centre at `workshop.platform` (the origin). `workshop.showcase_cam` is 1.8 m above it.
+- **Since ticket 395** the Engineering Works is the upgrade workshop hangar, redrawn in place under
+  the same ids and attach points. Its turnaround renders moved to
+  [docs/art/upgrade-workshop/](../upgrade-workshop/README.md); the pair sheets and the dock
+  screenshots on this page still show the #174 hall described above.
 
 The palette is brass, iron and soot; the only light is warm window, lamp, skylight and ticker glass,
 on the emissive maps, so orange stays reserved for heat (#170). With the hub and the Sell and Upgrade
