@@ -98,13 +98,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/dynamite/systems/plunger.test.ts` | 6 | 6 |
 | `src/features/dynamite/systems/rackPanel.test.ts` | 5 | 5 |
 
-### `dynamite-visuals`: 11 files, 56 tests
+### `dynamite-visuals`: 11 files, 57 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/dynamite-visuals/debug.test.ts` | 3 | 3 |
 | `src/features/dynamite-visuals/sceneBudget.test.ts` | 3 | 3 |
-| `src/features/dynamite-visuals/sliceRemoved.test.ts` | 5 | 5 |
+| `src/features/dynamite-visuals/sliceRemoved.test.ts` | 6 | 6 |
 | `src/features/dynamite-visuals/systems/render/blastCue.test.ts` | 8 | 8 |
 | `src/features/dynamite-visuals/systems/render/blastCueProvider.test.ts` | 5 | 5 |
 | `src/features/dynamite-visuals/systems/render/blastEventQueue.test.ts` | 3 | 3 |
@@ -806,6 +806,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/screenProjection.test.ts` | 5 | 5 |
 | `src/systems/render/skyBandLook.test.ts` | 3 | 3 |
 | `src/systems/render/skyBandRing.test.ts` | 6 | 6 |
+| `src/systems/render/sprayPool.test.ts` | 10 | 10 |
 | `src/systems/render/stagedTurn.test.ts` | 2 | 2 |
 | `src/systems/render/vehicleLook.test.ts` | 10 | 8 |
 | `src/systems/render/vehiclePreviewLook.test.ts` | 5 | 5 |
@@ -835,10 +836,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/scene/VehiclePieces.test.ts` | 2 | 2 |
 | `src/scene/mountedPartsPresence.test.ts` | 3 | 3 |
 | `src/scene/partMotionPresence.test.ts` | 4 | 4 |
-| `src/scene/registries/sceneLayerBudget.test.ts` | 5 | 5 |
+| `src/scene/registries/sceneLayerBudget.test.ts` | 7 | 7 |
 | `src/scene/registries/worldPieces.test.ts` | 3 | 3 |
 | `src/scene/sceneDisposal.test.ts` | 8 | 3 |
 | `src/scene/soundCuePlayer.test.ts` | 4 | 4 |
+| `src/scene/sprayIntake.test.ts` | 3 | 3 |
 | `src/scene/vehicleStage.test.ts` | 7 | 7 |
 
 ### `shell`
