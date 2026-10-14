@@ -44,6 +44,13 @@
  * (the origin is a whole number of their tiles); hashes add the hi half as whole cells; directions
  * and radii read the sum; the strata rings add their change from the origin's own ring coordinates.
  *
+ * A cell holding standard casing lining (#309 GD decision 3, ticket 315) sets the slot's lined
+ * bit and draws a brass plate on its open face, ribbed across by dark grooves, with a rivet line
+ * along it and a dark seam where it meets the rock (`casingLiningLook.ts` is the rule in TS). The
+ * face is found from the density's slope across a sample, so the plate follows the bore's curve;
+ * the ribs run on the tile axis nearest the face, so they stay pixel-straight and meet across
+ * cells. Over the ore beneath, under any gate marker.
+ *
  * An electrified cell (spec #258, ticket 293) sets its own bit in the same slot, which is no gate:
  * its arc-flicker draws over whatever gate the cell shows, blue arcs striking across it a few times
  * a second, each at its own place, lighting the ore rather than covering it, in their own blue
@@ -268,6 +275,10 @@ bool isElectrifiedCell(float bits) {
   return mod(floor(bits / float(ELECTRIFIED_BIT)), 2.0) > 0.5;
 }
 
+bool isLinedCell(float bits) {
+  return mod(floor(bits / float(LINED_BIT)), 2.0) > 0.5;
+}
+
 bool isGateKind(float kind, int pattern) {
   return abs(kind - float(pattern)) < 0.5;
 }
@@ -439,6 +450,39 @@ float electrifiedArc(vec2 local, float soft) {
   return arcStrand(local - 0.5, strike, soft) * lit;
 }
 
+// A lined cell's open face (ticket 315): x the tiles in from it, by the density's slope across one
+// sample; y the tiles along it, on the tile axis nearest the face. Flat density is no face.
+vec2 liningFrameOf(float density) {
+  float sampleStep = 1.0 / SAMPLES_PER_TILE;
+  vec2 across = vec2(sampleStep, 0.0);
+  vec2 up = vec2(0.0, sampleStep);
+  vec2 slope = vec2(
+    densityAt(vChunk + across) - densityAt(vChunk - across),
+    densityAt(vChunk + up) - densityAt(vChunk - up)
+  ) / (2.0 * sampleStep);
+  float steepness = length(slope);
+  float depth = steepness < 0.0001 ? LINING_PLATE_DEPTH + 1.0 : (density - ISO) / steepness;
+  return vec2(depth, abs(slope.x) > abs(slope.y) ? vChunk.y : vChunk.x);
+}
+
+// The lining drawn over colour; shares.x is the plate's share, shares.y the rivets'.
+vec3 liningOver(vec3 colour, vec2 frame, float soft, out vec2 shares) {
+  float depth = frame.x;
+  float ribs = frame.y * LINING_RIBS_PER_TILE;
+  float plate = 1.0 - smoothstep(LINING_PLATE_DEPTH - soft, LINING_PLATE_DEPTH + soft, depth);
+  float seamStart = LINING_PLATE_DEPTH - LINING_SEAM;
+  float seam = smoothstep(seamStart - soft, seamStart + soft, depth);
+  float ribSoft = soft * LINING_RIBS_PER_TILE;
+  float groove = 1.0 - smoothstep(
+    LINING_GROOVE_HALF - ribSoft, LINING_GROOVE_HALF + ribSoft, abs(fract(ribs + 0.5) - 0.5)
+  );
+  vec2 offRivet = vec2(abs(fract(ribs) - 0.5) / LINING_RIBS_PER_TILE, depth - LINING_RIVET_DEPTH);
+  float rivet = 1.0 - smoothstep(LINING_RIVET_RADIUS - soft, LINING_RIVET_RADIUS + soft, length(offRivet));
+  vec3 lined = mix(mix(LINING_BRASS, LINING_GROOVE, max(groove, seam)), LINING_RIVET, rivet);
+  shares = vec2(plate, rivet * plate);
+  return mix(colour, lined, plate);
+}
+
 // The tile's depth band by the integer rule of bandOfTile: exact below 2^24, so for any planet.
 int bandOfTile(vec2 tile) {
   vec2 halfTile = 2.0 * tile + 1.0;
@@ -595,6 +639,13 @@ void main() {
   }
 
   float gateBits = floor(vGate + 0.5);
+  if (style < 1.5 && isLinedCell(gateBits)) {
+    // Casing lining (ticket 315): over the rock and ore, its rivets glinting in the dark.
+    vec2 shares;
+    colour = liningOver(colour, liningFrameOf(density), gateSoft, shares);
+    emissive *= 1.0 - shares.x;
+    emissive += LINING_RIVET * LINING_RIVET_GLOW * shares.y;
+  }
   float gateKind = gateKindOf(gateBits);
   float gateOpen = gateOpenness(gateBits);
   if (isGatedCell(gateBits) && isGateDrawn(gateKind, gateOpen)) {

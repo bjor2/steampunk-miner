@@ -13,9 +13,9 @@ import {
   materialCellsOfChunk,
   type WorldState,
 } from '../world/worldState'
-import { buildChunkTileBatch, NO_REFRACTORY_CELLS, type ChunkTileBatch } from './chunkTileBatch'
+import { buildChunkTileBatch, type ChunkTileBatch } from './chunkTileBatch'
 import { chunkDensityHaloOf } from './densityHalo'
-import { refractoryCellsOf } from './refractoryCells'
+import { liningCellsOf, UNLINED_CHUNK, type ChunkLining } from './liningCells'
 
 export interface ChunkMeshParts {
   batch: ChunkTileBatch
@@ -36,7 +36,7 @@ export function buildChunkMeshParts(
     cy,
     materialCellsOfChunk(world, params, cx, cy),
     halo,
-    refractoryCellsOfChunk(world, cx, cy),
+    liningCellsOfChunk(world, cx, cy),
   )
   return { batch, halo }
 }
@@ -54,8 +54,8 @@ export function buffersOfMeshParts({ batch, halo }: ChunkMeshParts): ArrayBuffer
   ]
 }
 
-/** The cells to draw as refractory lining (#113); none, without a copy, for an unlined chunk. */
-function refractoryCellsOfChunk(world: WorldState, cx: number, cy: number): Uint8Array {
+/** The cells to draw as lining (#113, ticket 315); none, without a copy, for an unlined chunk. */
+function liningCellsOfChunk(world: WorldState, cx: number, cy: number): ChunkLining {
   const casing = currentCasingOfChunk(world, cx, cy)
-  return casing === NO_CASING ? NO_REFRACTORY_CELLS : refractoryCellsOf(casing)
+  return casing === NO_CASING ? UNLINED_CHUNK : liningCellsOf(casing)
 }

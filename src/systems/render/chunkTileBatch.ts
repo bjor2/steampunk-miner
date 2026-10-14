@@ -16,6 +16,10 @@
  * tile holding refractory lining is flagged in the same slot as the whisper flag, so the shader
  * draws it as firebrick with glowing joints.
  *
+ * Standard casing lining (#309 GD decision 3, ticket 315) rides the gate slot's lined bit, set
+ * from the chunk's casing layer with no provider, so the shader draws its brass plate and rivet
+ * line in the same draw.
+ *
  * Gated cells (ticket 298): the `cellGateLook` provider names the gate a cell shows, and its bits
  * (`cellGateBits.ts`) ride in the tile's gate slot, which the shader draws as the cell's top layer.
  * With no provider the slot stays 0 and the provider is never asked. An electrified cell
@@ -36,7 +40,8 @@ import type { Rgb } from './colour'
 import { cellGateLookProvider, type CellGateLookProvider } from '../registries/cellGateLook'
 import { magneticGroundProvider, type MagneticGroundProvider } from '../registries/magneticGround'
 import { oreLookProvider, type OreLookProvider } from '../registries/oreLook'
-import { cellMarkerBitsOf, NO_GATE_BITS } from './cellGateBits'
+import { cellMarkerBitsOf, LINED_BIT, NO_GATE_BITS } from './cellGateBits'
+import { UNLINED_CHUNK, type ChunkLining } from './liningCells'
 import type { OreLook } from './oreLook'
 
 /** How the shader draws a tile. */
@@ -68,18 +73,16 @@ interface BatchContext {
   magneticGround: MagneticGroundProvider | null
   /** Reused for every tile the providers are asked about, so a rebuild allocates no points. */
   gateTile: { tx: number; ty: number }
-  /** 1 per cell holding refractory lining (#113), in cell order. */
-  refractoryCells: Uint8Array
+  /** The cells holding standard (ticket 315) and refractory (#113) lining, in cell order. */
+  lining: ChunkLining
 }
 
 const NO_ORE: Rgb = [0, 0, 0]
-/** No cell lined with refractory: what a chunk without the lining passes. */
-export const NO_REFRACTORY_CELLS: Uint8Array = new Uint8Array(CHUNK_CELLS)
 const BANDS = [1, 2, 3, 4, 5]
 
 /**
- * `cells` are the chunk's material cells; `halo` its density halo; `refractoryCells` marks the
- * cells holding refractory lining.
+ * `cells` are the chunk's material cells; `halo` its density halo; `lining` marks the cells
+ * holding each type of lining (`liningCells.ts`).
  */
 export function buildChunkTileBatch(
   params: PlanetParams,
@@ -87,9 +90,9 @@ export function buildChunkTileBatch(
   cy: number,
   cells: Uint32Array,
   halo: Uint8Array,
-  refractoryCells: Uint8Array = NO_REFRACTORY_CELLS,
+  lining: ChunkLining = UNLINED_CHUNK,
 ): ChunkTileBatch {
-  const context = { ...batchContextOf(params, cx, cy, cells), refractoryCells }
+  const context = { ...batchContextOf(params, cx, cy, cells), lining }
   const batch = emptyBatch()
   for (let block = 0; block < BLOCKS_PER_CHUNK; block++) {
     batch.blockStarts[block] = batch.count
@@ -150,7 +153,7 @@ function batchContextOf(
   cx: number,
   cy: number,
   cells: Uint32Array,
-): Omit<BatchContext, 'refractoryCells'> {
+): Omit<BatchContext, 'lining'> {
   const palette = paletteOf(params.paletteId)
   return {
     params,
@@ -237,10 +240,19 @@ function tileFlagOf(
   ly: number,
 ): number {
   if (ore !== null) return isNearAir(halo, lx, ly) ? 1 : 0
-  return styleOf(cell) === TILE_STYLE.ground ? context.refractoryCells[ly * CHUNK_SIZE + lx] : 0
+  return styleOf(cell) === TILE_STYLE.ground ? context.lining.refractory[ly * CHUNK_SIZE + lx] : 0
 }
 
 function gateBitsOfTile(context: BatchContext, cell: number, lx: number, ly: number): number {
+  return markerBitsOfTile(context, cell, lx, ly) + linedBitOfTile(context, lx, ly)
+}
+
+/** Standard lining's bit (ticket 315): the kernel's casing, so no provider is asked. */
+function linedBitOfTile(context: BatchContext, lx: number, ly: number): number {
+  return context.lining.standard[ly * CHUNK_SIZE + lx] === 1 ? LINED_BIT : 0
+}
+
+function markerBitsOfTile(context: BatchContext, cell: number, lx: number, ly: number): number {
   if (context.cellGateLook === null && context.magneticGround === null) return NO_GATE_BITS
   context.gateTile.tx = context.firstTx + lx
   context.gateTile.ty = context.firstTy + ly

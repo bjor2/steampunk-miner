@@ -4,6 +4,8 @@ import {
   gateBitsOf,
   gateLookOfBits,
   isElectrifiedBits,
+  isLinedBits,
+  LINED_BIT,
   MAX_GATE_KIND,
   MAX_GATE_OPENING_MAJOR,
   MAX_GATE_STATE,
@@ -83,6 +85,19 @@ describe('cell gate bits', () => {
       expect(isElectrifiedBits(cellMarkerBitsOf(look, false))).toBe(false)
       expect(Math.fround(bits)).toBe(bits)
     }
+  })
+
+  it("keeps a lined cell's bit apart from its gate and its arcs, exact in a float", () => {
+    const looks = [null, ...EVERY_LOOK, ...OPENING_MAJORS.map((major) => openingAt(major))]
+    for (const look of looks) {
+      const bits = cellMarkerBitsOf(look, true) + LINED_BIT
+      expect(gateLookOfBits(bits)).toEqual(look)
+      expect(isElectrifiedBits(bits)).toBe(true)
+      expect(isLinedBits(bits)).toBe(true)
+      expect(isLinedBits(cellMarkerBitsOf(look, true))).toBe(false)
+      expect(Math.fround(bits)).toBe(bits)
+    }
+    expect(LINED_BIT).toBeLessThan(2 ** 24)
   })
 })
 

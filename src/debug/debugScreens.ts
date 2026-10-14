@@ -56,6 +56,7 @@ import { bayScreenPresence } from '../ui/platform/bayScreenPresence'
 import { screenIdProblems } from '../ui/registries/screens'
 import { readFittedScreen } from '../ui/stage/screenFit'
 import type { ScreenLayout } from '../systems/views/screenLayout'
+import { drawnLiningAt, type DrawnLining } from './debugLining'
 import { readRendererMemory, type RendererMemory } from './debugMemory'
 
 export type DebugResult<T extends object = object> =
@@ -107,6 +108,15 @@ export interface DebugUi {
   getOpenScreen(): DebugResult<{ screenId: string | null }>
   /** The planet card drawn now (ticket 343), or null: none, dismissed, or behind the travel card. */
   getPlanetCard(): DebugResult<{ card: PlanetCardView | null }>
+  /**
+   * Whether the drawn tile shows casing lining, and how it reads at `pixelsPerCell` over its band
+   * rock (ticket 315); null where no tile is drawn now.
+   */
+  getDrawnLiningAt(
+    tx: unknown,
+    ty: unknown,
+    pixelsPerCell: unknown,
+  ): DebugResult<{ lining: DrawnLining | null }>
 }
 
 export interface BayPresentation {
@@ -170,6 +180,7 @@ export function createDebugUi(): DebugUi {
     openScreen: openScreenUnlessRefused,
     getOpenScreen: () => ({ ok: true, screenId: game().openScreenId }),
     getPlanetCard: () => ({ ok: true, card: planetCardViewNow() }),
+    getDrawnLiningAt: drawnLiningAt,
   }
 }
 

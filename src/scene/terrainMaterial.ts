@@ -22,10 +22,12 @@ import {
   GATE_OPENING_BITS,
   GATE_OPENING_UNIT,
   GATE_STATE,
+  LINED_BIT,
   MAX_GATE_KIND,
   MAX_GATE_STATE,
 } from '../systems/render/cellGateBits'
 import { gatePatternDefines } from '../systems/render/gatePatterns'
+import { liningShaderDefines } from '../systems/render/casingLiningLook'
 import { rgbOfHex, type Rgb } from '../systems/render/colour'
 import { writeHeadlampDirection } from '../systems/render/headlamp'
 import type { ArtefactLook } from '../systems/render/artefactLook'
@@ -63,10 +65,13 @@ export function createTerrainMaterial(): ShaderMaterial {
       GATE_OPENING_UNIT,
       GATE_OPENING_COUNT: 1 << GATE_OPENING_BITS,
       ELECTRIFIED_BIT,
+      LINED_BIT,
       GATE_STATE_REVEALED: GATE_STATE.revealed,
       GATE_STATE_CLEARED: GATE_STATE.cleared,
       // The pattern catalogue (gatePatterns.ts), so the shader names the kind it draws.
       ...gatePatternDefines(),
+      // The casing lining's look (casingLiningLook.ts), so the shader draws the rule the TS reads.
+      ...liningShaderDefines(),
     },
     vertexShader: TERRAIN_VERTEX_SHADER,
     fragmentShader: TERRAIN_FRAGMENT_SHADER,

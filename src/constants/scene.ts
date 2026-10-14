@@ -441,6 +441,39 @@ export const HEAT_SHIMMER_Z = 0.2
 export const GATE_MARKER_UNTINTED = '#d8d2c4'
 
 /**
+ * The casing lining in the ground (#309 GD decision 3, ticket 315): a cased cell shows a brass
+ * plate ribbed across its open face, with a rivet line along it, drawn by the terrain shader on
+ * bit 22 of the gate channel (`casingLiningLook.ts` is the same rule in TS). Depths are tiles in
+ * from the open face; ribs and rivets repeat along it. Polished brass a step brighter than the
+ * hull's, so it parts from the light surface rock of band 1; the grooves are near-black for the
+ * ribs to read at phone size. My picks, checked by `casingLiningLook.test.ts`.
+ */
+export const CASING_LINING_LOOK = {
+  brass: '#dcb35a',
+  groove: '#3e2c14',
+  rivet: '#fff0c4',
+  plateDepthTiles: 0.42,
+  seamTiles: 0.07,
+  ribsPerTile: 4,
+  /** Half a groove's width, as a share of one rib. */
+  grooveHalfShare: 0.13,
+  rivetDepthTiles: 0.2,
+  rivetRadiusTiles: 0.06,
+  /** The rivets' faint glint, so the line still reads in the dark of band 5. */
+  rivetGlow: 0.14,
+} as const
+
+/**
+ * A lined cell reads at phone size (#309 GD decision 3, Gameplay's test 8): one cell is about 24
+ * px there. At that scale the plate's median pixel luma (Rec. 601, #13's greyscale bar) stands this far
+ * from its rock's, and its grooves and rivets this far apart, so the ribs and the rivet line show
+ * as texels rather than a smear. My picks for #315.
+ */
+export const CASING_LINING_PHONE_CELL_PX = 24
+export const CASING_LINING_MIN_PLATE_LUMA_STEP = 0.15
+export const CASING_LINING_MIN_DETAIL_LUMA_STEP = 0.3
+
+/**
  * The planet sky band (GD ruling on #293 Q1, `PlanetSkyBand`): one ring mesh round the planet, cut
  * into steps about this many metres long, so a step's chord strays under 2 mm from the circle on the
  * smallest planet (300 m). It is drawn just behind the ground and the platform (z 0, 0.02), in front of the sky.

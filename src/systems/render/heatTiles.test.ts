@@ -13,7 +13,7 @@ import {
 } from '../world/worldState'
 import { buildChunkTileBatch, TILE_STYLE, type ChunkTileBatch } from './chunkTileBatch'
 import { chunkDensityHaloOf } from './densityHalo'
-import { refractoryCellsOf } from './refractoryCells'
+import { liningCellsOf, refractoryCellsOf } from './liningCells'
 
 const params = planetParamsFor(83921, 8)
 const REFRACTORY = 1
@@ -21,8 +21,8 @@ const REFRACTORY = 1
 function batchOf(world: WorldState, cx: number, cy: number): ChunkTileBatch {
   const halo = chunkDensityHaloOf((x, y) => currentDensityOfChunk(world, params, x, y), cx, cy)
   const cells = materialCellsOfChunk(world, params, cx, cy)
-  const refractory = refractoryCellsOf(currentCasingOfChunk(world, cx, cy))
-  return buildChunkTileBatch(params, cx, cy, cells, halo, refractory)
+  const lining = liningCellsOf(currentCasingOfChunk(world, cx, cy))
+  return buildChunkTileBatch(params, cx, cy, cells, halo, lining)
 }
 
 function stylesAt(world: WorldState, tx: number, ty: number): number[] {

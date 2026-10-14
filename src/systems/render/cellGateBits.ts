@@ -10,6 +10,7 @@
  * | 7    | set on every gated cell; 0 is a cell with no gate                        |
  * | 8-20 | the drill tip major that opens a rim, plus one; 0 for a gate no tip opens |
  * | 21   | set on an electrified cell (spec #258, ticket 293), with a gate or none   |
+| 22   | set on a cell holding standard casing lining (#309, ticket 315)            |
  *
  * The act tint never rides here: the shader takes it from the planet (#151 theme tint). Nor does
  * the player's tip: the shader compares the cell's opening major with the local player's
@@ -19,6 +20,10 @@
  * The electrified bit is no gate: an electrified cell is a hazard `canMine` never refuses (GD lock
  * on #258), so it rides its own bit and draws its own marker over whatever gate the cell shows,
  * the bare rim of an ordinary cell from P7 included.
+ *
+ * The lined bit is no gate either: casing is the kernel's (#41), so the mesher sets it from the
+ * chunk's casing layer with no provider, and the shader draws the brass lining under any marker
+ * (#309 GD decision 3: "through #298's terrain channel with zero added draws").
  */
 
 /** What a gated cell shows: its kind and state, each a small integer the shader decodes. */
@@ -57,6 +62,9 @@ export const GATE_OPENING_UNIT = GATED_BIT * 2
 /** Set on an electrified cell, above the opening field (bit 21). */
 export const ELECTRIFIED_BIT = GATE_OPENING_UNIT * (1 << GATE_OPENING_BITS)
 
+/** Set on a cell holding standard casing lining, above the electrified bit (bit 22). */
+export const LINED_BIT = ELECTRIFIED_BIT * 2
+
 /** The bits for `look`; a kind or state outside the channel is refused, never trimmed. */
 export function gateBitsOf(look: CellGateLook | null): number {
   if (look === null) return NO_GATE_BITS
@@ -80,6 +88,11 @@ export function gateLookOfBits(bits: number): CellGateLook | null {
 /** Whether the bits are an electrified cell's. */
 export function isElectrifiedBits(bits: number): boolean {
   return (bits & ELECTRIFIED_BIT) !== 0
+}
+
+/** Whether the bits are a lined cell's. */
+export function isLinedBits(bits: number): boolean {
+  return (bits & LINED_BIT) !== 0
 }
 
 function lowBitsOf({ kind, state }: CellGateLook): number {
