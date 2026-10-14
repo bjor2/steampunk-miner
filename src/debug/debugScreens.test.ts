@@ -416,6 +416,22 @@ describe('debug api: zoom framing (#39)', () => {
     if (!result.ok) throw new Error(result.problems.join('; '))
     expect(result.view.maxViewShortAxisMetres).toBeCloseTo(15.86, 2)
   })
+
+  it('reports the felt speed, the lean and the ground visible ahead at speed (ticket 338)', () => {
+    // As `PlanetCamera` writes it each frame at a felt 16 cells/s, pulled back to the 20 m cap.
+    Object.assign(cameraPresence, {
+      widthPixels: 1920,
+      heightPixels: 1080,
+      viewShortAxisMetres: 20,
+      feltSpeedCellsPerSecond: 16,
+      leadShare: 0.6,
+    })
+    const result = createDebugApi().ui.getCameraView()
+    Object.assign(cameraPresence, { feltSpeedCellsPerSecond: 0, leadShare: 0 })
+    if (!result.ok) throw new Error(result.problems.join('; '))
+    expect(result.view).toMatchObject({ feltSpeedCellsPerSecond: 16, leadShare: 0.6 })
+    expect(result.view.groundAheadMetres).toBeCloseTo(16, 9)
+  })
 })
 
 describe('debug api: render scale and stats (#38)', () => {

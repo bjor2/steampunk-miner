@@ -43,6 +43,7 @@ import {
   type Preferences,
 } from '../systems/input/preferences'
 import { renderScalePinProblems } from '../systems/render/renderScale'
+import { speedViewOf, type SpeedView } from '../systems/render/speedFraming'
 import { cameraViewOf, viewShortAxisProblems, type CameraView } from '../systems/render/viewZoom'
 import { shopTypeOf, type ShopType } from '../systems/views/bayPresentation'
 import type { HudModel } from '../systems/views/hudModel'
@@ -68,8 +69,11 @@ export interface DebugUi {
   getPrefs(): DebugResult<{ prefs: Preferences }>
   /** The player's zoom, metres across the short axis from 8 to 20 (#39); refused outside it. */
   setZoom(viewShortAxisMetres: unknown): DebugResult
-  /** The framing on screen now: the eased zoom, pixels per metre and the collider's share (#39). */
-  getCameraView(): DebugResult<{ view: CameraView }>
+  /**
+   * The framing on screen now: the eased zoom, pixels per metre and the collider's share (#39),
+   * and at speed the felt speed, the lean and the ground visible ahead (ticket 338).
+   */
+  getCameraView(): DebugResult<{ view: CameraView & SpeedView }>
   /** What the last frame drew and cost (#38 acceptance 1-3): draw calls, blocks, lights, scale. */
   getRenderStats(): DebugResult<{ stats: RenderStats }>
   /**
@@ -253,9 +257,14 @@ function screenLayoutNow(): DebugResult<{ layout: ScreenLayout }> {
   return { ok: true, layout }
 }
 
-function cameraViewOnScreen(): CameraView {
+/** The framing the player sees, with the speed lean and the ground it shows ahead (ticket 338). */
+function cameraViewOnScreen(): CameraView & SpeedView {
   const { widthPixels, heightPixels, viewShortAxisMetres } = cameraPresence
-  return cameraViewOf(widthPixels, heightPixels, viewShortAxisMetres)
+  const { feltSpeedCellsPerSecond, leadShare } = cameraPresence
+  return {
+    ...cameraViewOf(widthPixels, heightPixels, viewShortAxisMetres),
+    ...speedViewOf(viewShortAxisMetres, feltSpeedCellsPerSecond, leadShare),
+  }
 }
 
 function runWithAction(actionId: unknown, run: (action: ActionId) => void): DebugResult {
