@@ -3,10 +3,12 @@
  * locked re-pricing). Two commands, each paid in money with no ammo and no new currency, the card
  * price being the debit:
  *
- * - `ground-gun.mount {}`: bolts the gun on, buying the first level of all three tracks at once,
- *   at the sum of their level-1 prices (one band-5 unit each at P1).
- * - `ground-gun.buy_level {track}`: one more level of `rate`, `penetration` or `energy`, priced
- *   by `trackLevelPrice` at that level's target planet. A track at its wall is never sold again.
+ * - `ground-gun.mount {}`: bolts the gun on with the first level of all three tracks, for one
+ *   band-5 unit at its target planet (the GD's Q2 ruling on #314: the mount is the visible step,
+ *   affordable on the second dock visit).
+ * - `ground-gun.buy_level {track}`: one more level of `rate`, `penetration` or `energy` from L2,
+ *   priced by `trackLevelPrice` at that level's target planet. A track at its wall is never sold
+ *   again.
  *
  * Both open with the `bore_gun` schedule row (P1). A refusal changes nothing and is answered by
  * the kernel's `CommandRejected`; a buy is answered by its own event and the wallet's
@@ -27,9 +29,10 @@ import {
 import { atBayRejection } from '../../../systems/authority/dockRules'
 import { isFeatureUnlocked } from '../../../systems/authority/featureUnlocks'
 import { moneyShortRejection } from '../../../systems/authority/platformServices'
-import { add, sub, toCanonical, ZERO_MONEY, type Money } from '../../../systems/money'
+import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
+import { sub, toCanonical, type Money } from '../../../systems/money'
 import type { SliceCommandRules } from '../../../systems/registries/commandRules'
-import { GUN_TRACK_IDS, type GunTrackId } from './groundGunEconomy'
+import { GROUND_GUN, GUN_TRACK_IDS, type GunTrackId } from './groundGunEconomy'
 import {
   gunLevelsOf,
   isGunMounted,
@@ -87,12 +90,10 @@ export const GUN_PURCHASE_RULES: SliceCommandRules = {
   },
 }
 
-/** What the mount costs: every track's first level. */
+/** What the mount costs: `groundGun.json`'s `mount`, priced as a tree node is. */
 export function mountPrice(): Money {
-  return GUN_TRACK_IDS.reduce<Money>(
-    (total, trackId) => add(total, trackLevelPrice(trackId, MOUNTED_LEVEL)),
-    ZERO_MONEY,
-  )
+  const { band, oreUnits, targetPlanet } = GROUND_GUN.mount
+  return bandOrePriceAt({ band, oreUnits }, targetPlanet, targetPlanet)
 }
 
 /** What the next level of `trackId` costs these levels; null at the wall. */

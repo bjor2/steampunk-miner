@@ -41,6 +41,13 @@ export interface TrackPrice {
   samePlanetRatio: Money
 }
 
+/** The mount (GD Q2 on #314): `oreUnits` of band-`band` ore at `targetPlanet`, L1 on every track. */
+export interface MountPrice {
+  band: number
+  oreUnits: Money
+  targetPlanet: number
+}
+
 export interface GunTrack<Stat extends string> {
   /** The gap at L1; L1's stats are the walls plus `perGap * gap0`. */
   gap0: number
@@ -113,6 +120,7 @@ export interface ArmouryModule {
 
 export interface GroundGunEconomy {
   bore: BoreNumbers
+  mount: MountPrice
   tracks: GunTracks
   longBarrel: LongBarrelNumbers
   autoShoot: AutoShootNumbers
@@ -139,6 +147,7 @@ export function readGroundGunEconomy(
   const tracks = reader.object('tracks', file.tracks)
   const economy: GroundGunEconomy = {
     bore: readBore(reader, file.bore),
+    mount: readMountPrice(reader, file.mount),
     tracks: {
       rate: readTrack(reader, 'tracks.rate', tracks.rate, RATE_STATS),
       penetration: readTrack(reader, 'tracks.penetration', tracks.penetration, PENETRATION_STATS),
@@ -171,6 +180,15 @@ function readBore(reader: FieldReader, raw: unknown): BoreNumbers {
     openIntervalTicks: reader.safeInteger('bore.openIntervalTicks', bore.openIntervalTicks),
     collapseHoldTicks: reader.safeInteger('bore.collapseHoldTicks', bore.collapseHoldTicks),
     shotDigTicks: reader.safeInteger('bore.shotDigTicks', bore.shotDigTicks),
+  }
+}
+
+function readMountPrice(reader: FieldReader, raw: unknown): MountPrice {
+  const mount = reader.object('mount', raw)
+  return {
+    band: reader.safeInteger('mount.band', mount.band),
+    oreUnits: reader.money('mount.oreUnits', mount.oreUnits),
+    targetPlanet: reader.safeInteger('mount.targetPlanet', mount.targetPlanet),
   }
 }
 

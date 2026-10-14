@@ -6,7 +6,8 @@ import {
   type ScriptedSession,
 } from '../../../systems/authority/scriptedSession'
 import { stateDigest } from '../../../systems/authority/stateDigest'
-import { add, sub, toCanonical } from '../../../systems/money'
+import { bandOrePriceAt } from '../../../systems/economy/bandOreCost'
+import { fromSafeInteger, sub, toCanonical } from '../../../systems/money'
 import { gunLevelsOf, UNMOUNTED_GUN } from './gunLevels'
 import { BUY_LEVEL_COMMAND, mountPrice, MOUNT_COMMAND, nextLevelPrice } from './gunPurchase'
 import { trackLevelPrice, wallLevelOf } from './gunTracks'
@@ -37,7 +38,7 @@ const rejectionOf = (events: readonly DomainEvent[]) =>
   events.find((event) => event.type === 'CommandRejected')
 
 describe('ground-gun: buying the gun and its tracks', () => {
-  it('mounts the gun at the sum of the three level-1 prices, every track at level 1', () => {
+  it('mounts the gun for the mount price, every track at level 1', () => {
     const session = dockedWith('1e6')
     const before = session.state().players.p1.wallet
     const events = session.submit(1, mount)
@@ -49,11 +50,18 @@ describe('ground-gun: buying the gun and its tracks', () => {
     expect(session.state().players.p1.wallet).toEqual(sub(before, mountPrice()))
   })
 
-  it('prices the mount as one band-5 unit of P1 ore per track, about 152 in all', () => {
-    const levelOne = trackLevelPrice('rate', 1)
-    expect(mountPrice()).toEqual(add(add(levelOne, levelOne), levelOne))
-    expect(Number(toCanonical(mountPrice()))).toBeGreaterThan(150)
-    expect(Number(toCanonical(mountPrice()))).toBeLessThan(155)
+  it('prices the mount as one band-5 unit of P1 ore, about 51, the price of one level 1', () => {
+    expect(mountPrice()).toEqual(bandOrePriceAt({ band: 5, oreUnits: fromSafeInteger(1) }, 1, 1))
+    expect(mountPrice()).toEqual(trackLevelPrice('rate', 1))
+    expect(Number(toCanonical(mountPrice()))).toBeGreaterThan(50)
+    expect(Number(toCanonical(mountPrice()))).toBeLessThan(52)
+  })
+
+  it('sells the first track level as level 2, the mount having bought level 1', () => {
+    const session = dockedWith('1e6')
+    session.submit(1, mount)
+    const events = session.submit(2, buyLevel('rate'))
+    expect(events[0]).toMatchObject({ type: 'ground-gun.TrackLevelBought', from: 1, to: 2 })
   })
 
   it('raises one track a level per buy, debiting exactly the card price', () => {
