@@ -179,8 +179,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  * 59: the forced fork branch (ticket 267, #255 build 2): `debug.tech-tree.forceFork {lane,
  *    branch}` makes the branch its lane's active one, free and outside its tier, for the
  *    `balance:forks` bot. With no branch forced no digest or mined order changes.
+ * 60: the aetheric lane's P16 fork pair (ticket 261, #245 build 3 and #255 build 5): the
+ *    `aetheric.phase` player section v1 with each player's phase under way, the lantern's move on
+ *    the motion seam and its `aetheric.phases` clock step, `aetheric.PhaseStarted`,
+ *    `PhaseLanded`, `PhaseReversed` and `PhaseReturned`, and the arc coil's `aetheric.ArcFired`.
+ *    With no fork item used no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 59
+export const AUTHORITY_PROTOCOL_VERSION = 60
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
