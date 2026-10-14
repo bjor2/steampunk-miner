@@ -2132,8 +2132,8 @@
             },
             {
               "title": "Multiple save slots",
-              "description": "An autosave plus nine named slots; save into one from the pause menu, a filled slot asking before it is overwritten. Loading a slot from a title menu is still to come.",
-              "status": "partial",
+              "description": "An autosave plus nine named slots: save into one from the pause menu (a filled slot asks before it is overwritten) and load any of them from the title menu.",
+              "status": "built",
               "issues": [12, 402, 403, 404]
             }
           ]

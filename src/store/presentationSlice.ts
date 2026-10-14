@@ -319,7 +319,6 @@ function runMenuAction(state: SliceHost, action: ButtonAction): void {
 }
 
 /** The pause menu's buttons (ticket 404); a save settles later and notes its own refusal. */
-
 function runPauseMenuAction(state: SliceHost, action: ButtonAction): void {
   if (action.kind === 'closePauseMenu') state.closePauseMenu()
   else if (action.kind === 'openSaveSlots') void state.openSaveSlots()
