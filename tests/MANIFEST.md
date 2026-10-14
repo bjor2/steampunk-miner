@@ -866,6 +866,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/registries/dockFacilities.test.ts` | 5 | 5 |
 | `src/systems/registries/dockServices.test.ts` | 4 | 4 |
 | `src/systems/registries/enemyDetectionModifiers.test.ts` | 4 | 4 |
+| `src/systems/registries/enemyFlushes.test.ts` | 16 | 14 |
 | `src/systems/registries/enemyLures.test.ts` | 9 | 9 |
 | `src/systems/registries/enemyStepModifiers.test.ts` | 18 | 16 |
 | `src/systems/registries/gateChecks.test.ts` | 5 | 5 |
