@@ -769,7 +769,10 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/cameraTurn.test.ts` | 7 | 7 |
 | `src/systems/render/cellGateBits.test.ts` | 11 | 11 |
 | `src/systems/render/chargePlacement.test.ts` | 2 | 2 |
-| `src/systems/render/chunkStreaming.test.ts` | 4 | 4 |
+| `src/systems/render/chunkBuildBudget.test.ts` | 11 | 11 |
+| `src/systems/render/chunkFrameWork.test.ts` | 6 | 6 |
+| `src/systems/render/chunkPrefetch.test.ts` | 7 | 7 |
+| `src/systems/render/chunkStreaming.test.ts` | 25 | 7 |
 | `src/systems/render/chunkTileBatch.test.ts` | 8 | 8 |
 | `src/systems/render/chunkTileBatchGates.test.ts` | 12 | 5 |
 | `src/systems/render/chunkTileBatchOreLook.test.ts` | 1 | 1 |
