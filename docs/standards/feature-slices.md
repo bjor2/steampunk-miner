@@ -345,7 +345,7 @@ export interface SliceRegistrar {
   planetSkyBand(provider: PlanetSkyBandProvider): void  // one provider, ticket 293, section 3.41
   planetCardLine(source: PlanetCardLineSource): void  // ticket 343, section 3.43
   boreGun(provider: BoreGunProvider): void             // one provider, ticket 313, section 3.37
-  autoGuns(provider: AutoGunsProvider): void           // one provider, ticket 382, section 3.56
+  autoGuns(provider: AutoGunsProvider): void           // one provider, ticket 382, section 3.57
   autoActor(actor: AutoActor): void                    // ticket 317, section 3.40
   slotHoldCue(source: SlotHoldCueSource): void             // ticket 253, section 3.30
   debugActions(actions: Readonly<Record<string, DebugAction>>): void
