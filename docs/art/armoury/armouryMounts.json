@@ -1,28 +1,5 @@
 {
-  "about": "The armoury module mounts (ticket 364, art half of #321): one Blender asset per #310 module, grouped by Content's mount (#310 node table). The mount names are review groups, not attach-point ids: those are the TD's and come with the wiring (#321, #314, #250, #235). Each asset's origin is where its mount will sit; the mount positions place it on the review stand-ins only.",
-  "boreGun": {
-    "standIn": "a stand-in bore gun body for the review renders only; the real mount is #362's",
-    "mounts": {
-      "bore.sight": [0.02, 0.042],
-      "bore.breech": [-0.11, 0.0],
-      "bore.barrel": [-0.04, 0.0],
-      "bore.muzzle": [0.5, 0.0],
-      "bore.magazine": [-0.05, -0.05]
-    }
-  },
-  "turret": {
-    "standIn": "vehicle-auto-guns at look 3, its trunnion at the origin of the review stage",
-    "mounts": {
-      "turret.sight": [0.0, 0.09],
-      "turret.cam": [0.12, -0.02],
-      "turret.barrel": [-0.4, 0.0],
-      "turret.breech": [-0.14, 0.0],
-      "turret.magazine": [-0.08, -0.14],
-      "turret.cradle": [0.1, 0.08],
-      "turret.boiler": [0.19, -0.06],
-      "turret.hopper": [-0.22, 0.05]
-    }
-  },
+  "about": "The armoury module mounts (ticket 364, art half of #321): one Blender asset per #310 module, grouped by Content's mount (#310 node table), with its part ids; author_armoury.py and render_armoury.py read it. Where each mount sits on its gun is the game's table, src/features/ground-gun/armouryMounts.json (ticket 321), which the review renders read too.",
   "modules": [
     {
       "itemId": "weapon.gimbal_sight",

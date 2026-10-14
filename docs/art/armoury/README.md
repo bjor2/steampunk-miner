@@ -7,15 +7,17 @@ decision on [Spec: Per-weapon tech trees (#310)](https://github.com/bjor2/steamp
 Every module of the two Armoury lanes (builds 2 and 3) has a Blender source, so each can be mounted
 visibly on its gun once bought, and each carries the gilded plate a Mastered module shows.
 
-**Art only.** Nothing here is wired: no attach-point ids, placeholder sidecars, manifest entries,
-`r.artAssets` registration or vehicle piece. Those are the TD's and the wiring's (#321, with #314,
-#250 and #235). The asset ids follow the vehicle-item rule in `src/systems/art/artIds.ts`
-(`weapon.gimbal_sight` is `vehicle-item-weapon-gimbal-sight`), so the wiring registers them as they
-are.
+**Wired by #321.** The ground-gun slice registers the sixteen assets (`r.artAssets`), ships their
+export, and hangs each bought module on its gun: the bore gun piece and a turret piece draw them
+at the points of `src/features/ground-gun/armouryMounts.json`, the one table of where each mount
+sits, in the gun's barrel frame with the trunnion at the origin. The asset ids follow the
+vehicle-item rule in `src/systems/art/artIds.ts` (`weapon.gimbal_sight` is
+`vehicle-item-weapon-gimbal-sight`).
 
 Authored in Blender 4.2.9 on the shared box headlessly: `author_armoury.py` wrote the first version
 of every file, and the `.blend` files under `art/blender/<id>/` are the sources from now on (Git
-LFS). `armouryMounts.json` is the one table both scripts read.
+LFS). `armouryMounts.json` here lists the modules and their parts for both scripts; the review
+renders place them at the game's points.
 
 ## The modules
 
@@ -61,7 +63,7 @@ positions on the turret, not ids.
 | `bore.bought.png`, `turret.bought.png` | the gun with every module of its lane mounted, no plates                           |
 | `bore.mastered.png`, `-mastered`       | the same with every module Mastered, the gilded plates shown                       |
 | `<gun>.<look>.ingame.png`              | each look at 90 px/m, about what a 1080p screen shows at the default 12 m zoom     |
-| `armouryMounts.json`                   | the modules, their parts and Content's mount, and the review positions of each     |
+| `armouryMounts.json`                   | the modules, their parts and Content's mount (the points are the game's table)     |
 | `author_armoury.py`                    | wrote the first version of the sources (Blender)                                   |
 | `render_armoury.py`                    | the renders above (Blender), reusing the dynamite review's stage, lights and frame |
 
@@ -82,14 +84,19 @@ blender -b --factory-startup --python-exit-code 1 -P docs/art/armoury/render_arm
 - Not looked over live in the MCP Blender: the review is the headless renders above, the same way
   #145, #166 and #197 were reviewed.
 
-## Known limits, for the wiring (#321)
+## The wiring (#321, 14 Oct 2026)
 
-- **The bore gun is a stand-in.** The real mount is #362's, not merged when these were drawn. The
-  module sizes match the stand-in's 3 cm barrel and 12 x 9 cm breech; if #362's gun differs, the
-  wiring scales or re-seats the modules in Blender, not in code.
-- **No attach points.** The TD picks the ids and their `atM` on #362's mount and on the auto guns'
-  turret; `armouryMounts.json`'s positions only stage the renders.
-- **No export yet.** `npm run art:export` needs each id registered (`r.artAssets`) and a placeholder
-  sidecar listing its part ids; both come with the wiring. The part ids are in `armouryMounts.json`.
-- The draw order is a suggestion: the parts carry `z` 13 and the plates 14, one over the auto guns'
-  head (12).
+- **On the real gun.** The renders now stage #362's `vehicle-bore-gun` (trunnion at the origin)
+  instead of #364's stand-in. Its tube is about 8 cm across against the stand-in's 6 cm, and its
+  crown ends 36 cm ahead of the trunnion against the stand-in's 50 cm, so the modules keep their authored size and only their points moved: the
+  sight rides ahead of the stock ring sight, the sear on the breech block, the rifled jacket at the
+  tube's root, the magazine under the trunnion. The long barrel's sleeve runs 21 cm past the crown,
+  so a muzzle module rides out to its end once the long barrel is bought (`extends` in the table).
+- **Points are mine.** The TD named no ids on #310; the mount names are Content's (`bore.sight` ..
+  `bore.magazine`, `turret.*`), and the turret's are #364's review positions, a `turret.barrel`
+  module counted from the barrel look's tip.
+- **Drawn over the gun.** The game draws by draw order (`z` 13, plates 14), so the renders stand
+  every module 12 cm in front of the gun along -Y.
+- **Turret modules wait on #388.** The turret piece draws a bought turret module, but the eight
+  are held back until #388 registers them.
+- Not looked over live in the MCP Blender or `npm run dev`: the review is the headless renders.
