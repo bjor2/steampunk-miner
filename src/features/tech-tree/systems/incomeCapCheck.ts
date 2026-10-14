@@ -19,7 +19,15 @@ import { formatPercent } from '../../../systems/displayAmount'
 import { oreTier, oreValue } from '../../../systems/economy/oreEconomy'
 import type { UpgradeLevels } from '../../../systems/economy/vehicleStats'
 import { vehicleStatsAt } from '../../../systems/economy/vehicleStats'
-import { cmp, div, fromSafeInteger, mul, ZERO_MONEY, type Money } from '../../../systems/money'
+import {
+  ceilMilli,
+  cmp,
+  div,
+  fromSafeInteger,
+  mul,
+  ZERO_MONEY,
+  type Money,
+} from '../../../systems/money'
 import { incomeCapRowsOf, type IncomeAt } from '../../../systems/registries/incomeRates'
 import { bandDigTicks } from '../../../systems/vehicle/bandDig'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
@@ -175,10 +183,15 @@ function worstOf(verdicts: readonly IncomeCapVerdict[]): IncomeCapVerdict {
 }
 
 function worstLineOf(verdict: IncomeCapVerdict, cap: IncomeCap): string {
-  const seeds = verdict.seedShares.map(formatPercent).join(' / ')
+  const seeds = verdict.seedShares.map(shownShareOf).join(' / ')
   const mark = verdict.isOverCap ? 'over the cap' : ''
   return (
-    `| P${verdict.planetIndex} | ${verdict.itemId} | ${formatPercent(verdict.medianShare)} | ` +
+    `| P${verdict.planetIndex} | ${verdict.itemId} | ${shownShareOf(verdict.medianShare)} | ` +
     `${verdict.visit}, band ${verdict.band} | ${seeds} | ${formatPercent(cap.maxShare)} | ${mark} |`
   )
+}
+
+/** Rounded up to the money quantum: a share past 100% prints as an amount, which allows 3 decimals. */
+function shownShareOf(share: Money): string {
+  return formatPercent(ceilMilli(share))
 }

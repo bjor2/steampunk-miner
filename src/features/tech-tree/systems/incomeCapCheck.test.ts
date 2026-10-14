@@ -141,4 +141,12 @@ describe('income cap check', () => {
     expect(table).toContain('over the cap')
     expect(table).toContain('| P20 | no live income item |')
   })
+
+  it('prints a share past the whole drill minute', () => {
+    const rates = [rateAtShareOf('lodestone', '1.23456789')]
+    const table = withRegistrations([sliceOf(rates)], () =>
+      incomeCapTableOf(incomeCapVerdictsOf([seedOf(ON_CURVE)], CAP), CAP),
+    )
+    expect(table).toContain('| P10 | power.lodestone | 123.5% |')
+  })
 })
