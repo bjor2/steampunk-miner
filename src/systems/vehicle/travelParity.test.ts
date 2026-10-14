@@ -28,7 +28,7 @@ function rigWith(levels: Partial<VehicleState['levels']> = {}): VehicleState {
   return { ...fresh, pose, levels: { ...fresh.levels, ...levels } }
 }
 
-/** Steps that cut band-1 rock at the tile floor (#7's 24-tick cap). */
+/** Steps that cut band-1 rock at the tile floor (ticket 396's 4-tick stopgap). */
 const FLOOR_BOUND = { drill_power: 2000, drill_tip: 600 }
 
 describe('travel parity (ticket 333)', () => {
@@ -47,12 +47,23 @@ describe('travel parity (ticket 333)', () => {
     expect(travelStepThrough(drill, blockHardness(40, 5))).toBe(0)
   })
 
-  it('stays the engine top speed exactly while k times the floor-bound cut is under it', () => {
+  it('stays the engine top speed exactly while k times the cut is under it', () => {
     for (const engine of [0, 50, 400]) {
-      const rig = rigWith({ ...FLOOR_BOUND, engine })
+      const rig = rigWith({ engine })
       expect(travelSpeedOf(rig, PARAMS)).toBe(vehicleStatsAt(rig.levels).engine.speedMax)
       expect(travelEngineOf(rig, PARAMS)).toEqual(vehicleStatsAt(rig.levels).engine)
       expect(doesDrillSetTravel(rig, PARAMS)).toBe(false)
+    }
+  })
+
+  // Ticket 396: at the 4-tick floor the cut is 15 m/s, so k times it passes every engine.
+  it('lets a floor-bound drill set travel at k times its cut, past every engine top speed', () => {
+    const floorStep = cutStepMmOf(ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK)
+    const drillSpeed = (Math.floor(floorStep * 1.5) * 60) / 1000
+    for (const engine of [0, 50, 400]) {
+      const rig = rigWith({ ...FLOOR_BOUND, engine })
+      expect(travelSpeedOf(rig, PARAMS)).toBe(drillSpeed)
+      expect(doesDrillSetTravel(rig, PARAMS)).toBe(true)
     }
   })
 

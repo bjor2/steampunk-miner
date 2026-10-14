@@ -3,7 +3,10 @@
  *
  *   r   = min(1, P / H)                     P = drill tip, H = tile hardness
  *   eff = (r < 1/4) ? 0 : r * r
- *   ticksPerTile = max(24, ceil(60 * H / (D * eff)))     D = drill power; 24 is the 2.5 tiles/s cap
+ *   ticksPerTile = max(m, ceil(60 * H / (D * eff)))     D = drill power, m = minTicksPerTile
+ *
+ * `m` is a stopgap floor of 4 ticks, 15 tiles/s (ticket 396, lifted from #7's 24-tick, 2.5 tiles/s
+ * cap): Bjor ruled on 8 Oct that drill speed has no cap, and #397 removes the floor from this law.
  *
  * The authority accumulates drill work on a tile one tick at a time (#3, #4), so the rule is kept
  * exact by working in units scaled by `H^2 * minTicks`: one tick adds `min(D * min(P, H)^2 * m,
@@ -43,7 +46,6 @@ export interface DrillStats {
 const TICKS = fromSafeInteger(TICKS_PER_SECOND)
 const MIN_TICKS = fromSafeInteger(ECONOMY.drill.minTicksPerTile)
 const SCRATCH_FLOOR = ECONOMY.drill.scratchFloor
-const SUBSTEPS = fromSafeInteger(DRILL_SUBSTEPS_PER_TICK)
 
 /** `P >= H/4`: below that the tip only skids, with no damage and no energy drain (#7). */
 export function canScratch(
@@ -88,9 +90,7 @@ export function ticksPerTile(
   hardness: BigStat,
   scratchFloor: BigStat = SCRATCH_FLOOR,
 ): number | null {
-  const work = drillWorkPerTick(drill, hardness, scratchFloor)
-  if (cmp(work, ZERO_MONEY) === 0) return null
-  return toSafeInteger(ceil(div(tileWorkToBreak(hardness), work)))
+  return tileTimeIn(1, drill, hardness, scratchFloor)
 }
 
 /**
@@ -102,9 +102,25 @@ export function subStepsPerTile(
   hardness: BigStat,
   scratchFloor: BigStat = SCRATCH_FLOOR,
 ): number | null {
+  return tileTimeIn(DRILL_SUBSTEPS_PER_TICK, drill, hardness, scratchFloor)
+}
+
+/**
+ * A tile's drill time in `unitsPerTick` units of a tick. A tick whose work is held to the cap
+ * takes exactly the floor: `60 * m * H^3` over `60 * H^3` rounded to 40 digits can land a hair
+ * over `m` and round up to a whole extra unit (ticket 396).
+ */
+function tileTimeIn(
+  unitsPerTick: number,
+  drill: DrillStats,
+  hardness: BigStat,
+  scratchFloor: BigStat,
+): number | null {
   const work = drillWorkPerTick(drill, hardness, scratchFloor)
   if (cmp(work, ZERO_MONEY) === 0) return null
-  return toSafeInteger(ceil(div(mul(tileWorkToBreak(hardness), SUBSTEPS), work)))
+  if (cmp(work, capPerTick(hardness)) === 0) return ECONOMY.drill.minTicksPerTile * unitsPerTick
+  const units = mul(tileWorkToBreak(hardness), fromSafeInteger(unitsPerTick))
+  return toSafeInteger(ceil(div(units, work)))
 }
 
 /**

@@ -273,7 +273,7 @@ export interface BlastingChargeRules {
   rackSlotCostCurveId: string
   /** No tile harder than this band's rock of the current planet breaks; core tiles never do. */
   hardnessCapBand: number
-  /** The bot blasts a tile whose drill time would be over this many ticks (4x `minTicksPerTile`). */
+  /** The bot blasts a tile whose drill time would be over this many ticks (4x the old 24-tick floor). */
   botBlastThresholdTicks: number
   sizes: ChargeSizeLadder
 }
@@ -391,7 +391,11 @@ export interface Economy {
      * every other cell keeps `scratchFloor`.
      */
     gateScratchFloor: BigStat
-    /** The tile speed cap: 2.5 tiles/s at 60 ticks/s is 24 ticks per tile. */
+    /**
+     * The tile speed floor, a stopgap only (GD ruling and VS amendment on ticket 396): 4 ticks, 15
+     * tiles/s at 60 ticks/s, under the 16 m/s pose bound. Not a design value: #397 removes it from
+     * the drill law (the multi-cell carry of #399 and the lifted `aheadCellsMax`).
+     */
     minTicksPerTile: number
     /**
      * Travel parity's k (GD lock on #316 scope 0, ticket 333): away from fresh ground the rig moves

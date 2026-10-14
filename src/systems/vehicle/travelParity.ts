@@ -7,9 +7,9 @@
  * so a cleared tunnel, a cave or the shaft is never slower than cutting, and never slower than the
  * engine. k is `drill.travelParityK` in `economy.json` (1.5; Systems may tune 1 to 2). The nominal
  * ground is the rock of the band the rig stands in (`blockHardness`), cut by its drill as bought,
- * in integer mm a tick. Derived from stats and the band, never a client value. With today's
- * 24-tick floor `k * cutSpeed` stays under the engine's lowest top speed, so `travelCap` is
- * `speedMax` exactly until the #304 drill law lands.
+ * in integer mm a tick. Derived from stats and the band, never a client value. Under the 4-tick
+ * stopgap floor (ticket 396) a floor-bound drill cuts 15 m/s, so `k * cutSpeed` passes every
+ * engine's top speed once the drill is strong enough.
  *
  * Every effect that scales with the engine's top speed reads `travelSpeedOf` instead, so it keeps
  * growing once the drill sets travel (GD lock point 3).

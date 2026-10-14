@@ -9,8 +9,8 @@
  *
  * The engine track stays finite (GD lock on #316 scope 0, ticket 333): once k times the drill's
  * cut speed in the rig's band reaches the engine's top speed, the drill sets travel and an engine
- * step would buy no travel speed, so it is refused `max_level`. With today's 24-tick floor that
- * never happens.
+ * step would buy no travel speed, so it is refused `max_level`. Under ticket 396's 4-tick floor a
+ * floor-bound drill cuts 15 m/s, so a strong drill reaches it.
  */
 import { costCurveIdOf, stepPrice } from '../economy/upgradePrices'
 import { isMajorStep, majorOf } from '../economy/upgradeSteps'

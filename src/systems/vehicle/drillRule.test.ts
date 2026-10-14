@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { TICKS_PER_SECOND } from '../../constants/physics'
+import { ECONOMY } from '../economy/economy'
 import { blockHardness } from '../economy/oreEconomy'
 import { drillPower, drillTip, onCurveLevels, vehicleStatsAt } from '../economy/vehicleStats'
 import { add, cmp, fromCanonical, mul, ZERO_MONEY, type BigStat } from '../money'
@@ -53,8 +55,8 @@ describe('drill rule', () => {
     expect(blockHardness(1, 3)).toEqual(mul(m('1.2544'), m('1.2544')))
   })
 
-  it('caps the tile speed at 24 ticks with drill_power level 20 on hardness 1', () => {
-    expect(ticksPerTile(drillOf(drillPower(20), drillTip(0)), m('1'))).toBe(24)
+  it('holds the tile speed at the 4-tick floor with drill_power level 40 on hardness 1', () => {
+    expect(ticksPerTile(drillOf(drillPower(40), drillTip(0)), m('1'))).toBe(4)
   })
 
   it('breaks a tile after exactly ticksPerTile ticks of accumulated work', () => {
@@ -98,8 +100,8 @@ describe('drill rule', () => {
 describe('fractional drill time (ticket 330)', () => {
   const Q = DRILL_SUBSTEPS_PER_TICK
 
-  it('keeps the floor at 24 whole ticks, counted in sub-steps', () => {
-    expect(subStepsPerTile(drillOf(drillPower(20), drillTip(0)), m('1'))).toBe(24 * Q)
+  it('keeps the floor at 4 whole ticks, counted in sub-steps', () => {
+    expect(subStepsPerTile(drillOf(drillPower(40), drillTip(0)), m('1'))).toBe(4 * Q)
   })
 
   it('rounds a cell up to its next sub-step, never to the next whole tick', () => {
@@ -126,6 +128,60 @@ describe('fractional drill time (ticket 330)', () => {
     expect(subStepsPerTile(drill, m('1.0001'), m('1'))).toBeNull()
   })
 })
+
+// The VS amendment and the GD ruling on ticket 396: the 4-tick floor is a stopgap, never a design
+// value. #397 takes `minTicksPerTile` out of the drill law and deletes this block.
+describe('stopgap tile floor (ticket 396)', () => {
+  it('holds the floor at 4 ticks, 15 tiles/s (todo: removed by #397/#335)', () => {
+    expect(ECONOMY.drill.minTicksPerTile).toBe(4)
+  })
+
+  it.todo('cuts with no constant floor at any drill level (#397/#335 remove minTicksPerTile)')
+
+  // Planet 8 band rock under a capped drill: 60 * m * H^3 over 60 * H^3 at 40 digits landed a
+  // hair over m, so the cell read 5 ticks and 241 sub-steps.
+  it('breaks a capped cell in exactly the floor whatever its hardness', () => {
+    const strong = drillOf(m('1e10'), m('1e4'))
+    const hardnesses = [m('183.6661163355495043607009944010986059235'), m('1'), m('7.31')]
+    for (const hardness of hardnesses) {
+      expect(ticksPerTile(strong, hardness)).toBe(ECONOMY.drill.minTicksPerTile)
+      expect(subStepsPerTile(strong, hardness)).toBe(
+        ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK,
+      )
+    }
+  })
+})
+
+/** Band-1 cells a second on planet 1 (hardness 1, tip at least 1) at a drill_power major. */
+function bandOneCellsPerSecond(level: number): number {
+  const subSteps = subStepsPerTile(drillOf(drillPower(level), drillTip(0)), m('1')) ?? 0
+  return (DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND) / subSteps
+}
+
+// The GD ruling on ticket 396: "every level adds speed" is a ratio, each drill major worth 1.12x
+// +-5% with no dips, asserted on planet 1 here (Systems' rows take the bot to L17.2 on P1).
+describe('felt speed per drill level (ticket 396)', () => {
+  const P1_LEVELS = Array.from({ length: 18 }, (_, level) => level)
+
+  it('makes each drill major from 0 to 18 cut band 1 of planet 1 1.12x +-5% faster', () => {
+    const ratios = P1_LEVELS.map((level) => ({
+      level,
+      isWorth112: isWithinFivePercentOf112(
+        bandOneCellsPerSecond(level + 1) / bandOneCellsPerSecond(level),
+      ),
+    }))
+    expect(ratios).toEqual(P1_LEVELS.map((level) => ({ level, isWorth112: true })))
+  })
+
+  it('cuts band 1 at 1.5 cells/s at level 0 and past 10 cells/s at level 17', () => {
+    expect(bandOneCellsPerSecond(0)).toBe(1.5)
+    expect(bandOneCellsPerSecond(17)).toBeGreaterThanOrEqual(10)
+  })
+})
+
+function isWithinFivePercentOf112(ratio: number): boolean {
+  return ratio >= 1.12 * 0.95 && ratio <= 1.12 * 1.05
+}
 
 describe('energy quanta', () => {
   it('drains 4, 6 and 1 quanta of 1/240 unit per tick for drilling, thrust and driving', () => {

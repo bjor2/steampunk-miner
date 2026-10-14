@@ -17,7 +17,7 @@ import { stepOfMajor } from '../../economy/upgradeSteps'
 export const CORRIDOR_ROW = 297
 export const CORRIDOR_MIDDLE: TilePoint = { tx: 20, ty: CORRIDOR_ROW }
 const CORRIDOR_HALF_LENGTH = 6
-/** Band 1 ground breaks in the drill's minimum 24 ticks a tile (#6). */
+/** More than the major-60 drill the corridor is bored with needs for a band 1 tile (#6). */
 const BORE_TICKS = 30
 
 export interface PoseOptions {

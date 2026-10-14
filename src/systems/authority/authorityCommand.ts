@@ -236,8 +236,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `extraction` trip counter under `tripCapAt`, a nodule past the cap stays where it is, and a
  *    use that moved nothing for the cap is refused `terrain-tools.trip_capped`. With no mover used
  *    no digest or mined order changes.
+ * 71: the 4-tick tile floor (ticket 396, a stopgap the #397 law removes): `drill.minTicksPerTile`
+ *    goes from 24 ticks to 4, so a strong drill breaks a cell in as little as 4 ticks and its
+ *    travel parity passes the engine, and a cell at the floor takes exactly the floor (a 40-digit
+ *    rounding once read some hardnesses one tick or sub-step longer). Goldens that dig past the
+ *    old floor change.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 70
+export const AUTHORITY_PROTOCOL_VERSION = 71
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

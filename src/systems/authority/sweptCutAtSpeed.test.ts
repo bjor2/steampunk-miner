@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { DRILL_SUBSTEPS_PER_TICK, STEP_BOUND_TOLERANCE_MM } from '../../constants/balance'
+import { ECONOMY } from '../economy/economy'
 import { NO_DRIVE } from '../vehicle/driveSigns'
 import { FACING, noseTileOf, type VehiclePose } from '../vehicle/vehiclePose'
 import type { PlanetParams } from '../world/planetParams'
@@ -30,11 +31,14 @@ import { columnSweep, sweepWith } from './sweptSpanFixtures'
 // the same energy per cell, and lays its rings half a metre apart; the report after the steps heats
 // for their summed dig time.
 //
-// Today's drill takes at least 24 ticks a cell (the #7 floor), so no drill moves 16 m a tick: the
+// Today's drill takes at least 4 ticks a cell (ticket 396's stopgap floor), so no drill moves 16 m a tick: the
 // authority runs here cut ground softened to just over its yield, where a sample's dwell under the
 // stamp still decides the rim cells. Cells per metre are compared where the #304 law takes the rig,
 // a drill that clears every swept sample in its tick, at the world seam through the step's own path
 // and the budget's walk.
+
+/** A cell's drill time at the tile floor, in sub-steps. */
+const FLOOR_SUB_STEPS = ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK
 
 /** 1, 4 and 16 m a tick. */
 const SPEEDS_M_PER_S = [60, 240, 960]
@@ -70,8 +74,8 @@ describe('swept cut at any speed (ticket 335)', () => {
   const runs = SPEEDS_M_PER_S.map(cutColumnAt)
 
   it('charges each opened cell its own dig energy at 1, 4 and 16 m a tick', () => {
-    // The strong drill breaks every cell at the 24-tick floor, so each costs the same.
-    const perCell = cellDigEnergyOf(24 * DRILL_SUBSTEPS_PER_TICK)
+    // The strong drill breaks every cell at the tile floor, so each costs the same.
+    const perCell = cellDigEnergyOf(FLOOR_SUB_STEPS)
     for (const run of runs) {
       expect(openedCellsOf(run).length).toBeGreaterThanOrEqual(PATH_METRES)
       expect(energySpentBy(run)).toBe(perCell * openedCellsOf(run).length)
@@ -98,20 +102,30 @@ describe('swept cut at any speed (ticket 335)', () => {
   })
 })
 
+/** A drill that breaks planet 8's rock at the tile floor. */
+const FLOOR_DRILL_STEP = 1000
+
 /**
- * On planet 8 at `AWAY`, facing down with a strong drill: the stamp rests for `steps` drill steps,
- * then a report at `reportTick` says it drilled `reportedDrillTicks`.
+ * A drill that takes about 23 ticks a cell of planet 8's rock, so the cells under a resting stamp
+ * keep it digging through a 40-tick report interval: the report is never left idle time to cool.
+ */
+const SLOW_DRILL_STEP = 510
+
+/**
+ * On planet 8 at `AWAY`, facing down with a drill at `drillStep`: the stamp rests for `steps` drill
+ * steps, then a report at `reportTick` says it drilled `reportedDrillTicks`.
  */
 function restAndReport(
   steps: number,
   reportedDrillTicks: number,
   reportTick = steps,
+  drillStep = FLOOR_DRILL_STEP,
 ): ScriptedSession {
   const session = onHeatPlanet()
   session.submit(0, { type: 'debug.setUpgrade', payload: { upgradeId: 'drill_tip', level: 400 } })
   session.submit(0, {
     type: 'debug.setUpgrade',
-    payload: { upgradeId: 'drill_power', level: 1000 },
+    payload: { upgradeId: 'drill_power', level: drillStep },
   })
   session.submit(0, { type: 'debug.setEnergy', payload: { energy: '100000' } })
   session.submit(0, reportDownAt(0))
@@ -134,13 +148,15 @@ describe('heat from the steps summed dig time (ticket 335, TD lock on #374)', ()
     const session = restAndReport(STEPS, 0)
     const broken = session.events().filter(({ type }) => type === 'TileDestroyed').length
     expect(broken).toBeGreaterThan(0)
-    expect(session.vehicle().sweptCut?.digSubSteps).toBe(broken * 24 * DRILL_SUBSTEPS_PER_TICK)
+    expect(session.vehicle().sweptCut?.digSubSteps).toBe(broken * FLOOR_SUB_STEPS)
   })
 
   it('heats a report for the steps dig time, whatever drill ticks it reports', () => {
-    const fromSteps = restAndReport(STEPS, 0).vehicle().heat.level
-    expect(restAndReport(STEPS, STEPS).vehicle().heat.level).toBe(fromSteps)
-    expect(fromSteps).toBeGreaterThan(restAndReport(0, 0, STEPS).vehicle().heat.level)
+    const fromSteps = restAndReport(STEPS, 0, STEPS, SLOW_DRILL_STEP).vehicle().heat.level
+    const reported = restAndReport(STEPS, STEPS, STEPS, SLOW_DRILL_STEP).vehicle().heat.level
+    expect(reported).toBe(fromSteps)
+    const unstepped = restAndReport(0, 0, STEPS, SLOW_DRILL_STEP).vehicle().heat.level
+    expect(fromSteps).toBeGreaterThan(unstepped)
   })
 })
 

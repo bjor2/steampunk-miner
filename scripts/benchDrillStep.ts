@@ -13,7 +13,8 @@
  * Ticket 335: one tick's cut at the per-cell budget and past it, p50 2 ms or less. A step 8 m
  * long touches about 19 cells (the per-cell walk) and one 16 m long about 35 (over the 32-cell
  * budget, so the swept span), as the TD's #316 table has them; neither speed is reachable through
- * `drillStep` under today's 24-tick floor, so these cut the same line through `drillAlongStep`.
+ * `drillStep` under the 4-tick tile floor (ticket 396), so these cut the same line through
+ * `drillAlongStep`.
  */
 import { loadFeatures } from '../src/features'
 import { DENSITY_CELL_UNITS, TERRAIN_EDIT_UNITS_PER_TICK } from '../src/constants/terrainBudget'

@@ -29,7 +29,7 @@ function rigWith(levels: Partial<VehicleState['levels']> = {}): VehicleState {
   return { ...fresh, pose, levels: { ...fresh.levels, ...levels } }
 }
 
-/** Steps that cut band-1 rock at the tile floor (#7's 24-tick cap). */
+/** Steps that cut band-1 rock at the tile floor (ticket 396's 4-tick stopgap). */
 const FLOOR_BOUND = { drill_power: 2000, drill_tip: 600 }
 
 describe('step bound (ticket 334)', () => {
@@ -43,12 +43,18 @@ describe('step bound (ticket 334)', () => {
 
   it('bounds a travelling step by the engine top speed rounded up to whole mm, plus one sample', () => {
     for (const engine of [0, 50, 400]) {
-      const rig = rigWith({ ...FLOOR_BOUND, engine })
+      const rig = rigWith({ engine })
       const speedMax = vehicleStatsAt(rig.levels).engine.speedMax
       const travelling = stepBoundsOf(rig, PARAMS).travellingMm - STEP_BOUND_TOLERANCE_MM
       expect(travelling).toBeGreaterThanOrEqual((speedMax * 1000) / 60)
       expect(travelling - 1).toBeLessThan((speedMax * 1000) / 60)
     }
+  })
+
+  it('bounds a travelling step by k times a floor-bound cut once it passes the engine', () => {
+    const floorStep = cutStepMmOf(ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK)
+    const bounds = stepBoundsOf(rigWith({ ...FLOOR_BOUND, engine: 400 }), PARAMS)
+    expect(bounds.travellingMm).toBe(Math.floor(floorStep * 1.5) + STEP_BOUND_TOLERANCE_MM)
   })
 
   it('picks the cutting bound with the cut gate open and the travelling one with it shut', () => {

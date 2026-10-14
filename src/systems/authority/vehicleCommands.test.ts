@@ -51,18 +51,17 @@ describe('vehicle drilling', () => {
     expect(FULL_TANK - session.vehicle().energy).toBe(40 * 4)
   })
 
-  it('clears the same cell in exactly 24 ticks with drill_power at level 20', () => {
+  it('clears the same cell in exactly the 4-tick floor with drill_power at level 40', () => {
     const session = createSession()
     session.submit(0, {
       type: 'debug.setUpgrade',
-      payload: { upgradeId: 'drill_power', level: 200 },
+      payload: { upgradeId: 'drill_power', level: 400 },
     })
     session.submit(0, poseAbove(GROUND, FACING.down))
-    expect(typesOf(session.submit(12, drill(GROUND, 12)))).not.toContain('TileDestroyed')
-    expect(typesOf(session.submit(13, drill(GROUND, 1)))).toContain('TileDestroyed')
-    session.submit(23, drill(GROUND, 10))
+    expect(typesOf(session.submit(2, drill(GROUND, 2)))).not.toContain('TileDestroyed')
+    expect(typesOf(session.submit(3, drill(GROUND, 1)))).toContain('TileDestroyed')
     expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBeGreaterThan(0)
-    session.submit(24, drill(GROUND, 1))
+    session.submit(4, drill(GROUND, 1))
     expect(cellDensitySum(session.state().world, PARAMS, GROUND)).toBe(0)
   })
 

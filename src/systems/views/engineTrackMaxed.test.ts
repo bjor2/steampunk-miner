@@ -7,9 +7,10 @@ import { workshopRowsOf } from './workshopRows'
 
 // The engine track stays finite (GD lock on #316 scope 0, ticket 333): the card reads "maxed,
 // drill sets travel" exactly when k times the drill's cut speed reaches the engine's top speed,
-// and then offers no buy. With today's 24-tick floor that never happens; a one-tick floor, as a
-// fast #304 law would allow, is swapped into `economy.json` on a fresh module graph with no
-// slices registered (a kernel spec never imports one), as `physics/sweptCutPace.test.ts` does.
+// and then offers no buy. Under ticket 396's 4-tick stopgap floor a floor-bound drill already
+// passes every engine; a one-tick floor, as the #304 law with no floor allows, is swapped into
+// `economy.json` on a fresh module graph with no slices registered (a kernel spec never imports
+// one), as `physics/sweptCutPace.test.ts` does.
 
 /** Steps that cut band-1 rock at the tile floor. */
 const STRONG_DRILL = { drill_power: 2000, drill_tip: 600 }
@@ -48,12 +49,20 @@ async function modulesWithFloor(minTicksPerTile: number) {
   return { createScriptedSession, dockInBay, workshopRowsOf: rows.workshopRowsOf, rows }
 }
 
-describe('engine track at the 24-tick floor (ticket 333)', () => {
-  it('offers its buy whatever the drill, as k times the floor cut stays under any top speed', () => {
-    const row = engineRowOf({ createScriptedSession, dockInBay, workshopRowsOf }, STRONG_DRILL)
+describe('engine track at the 4-tick floor (ticket 396)', () => {
+  const modules = { createScriptedSession, dockInBay, workshopRowsOf }
+
+  it('offers its buy with a starting drill, whose k times cut stays under the top speed', () => {
+    const row = engineRowOf(modules, {})
     expect(row.badge).toBeNull()
     expect(row.buy.reason).toBeNull()
     expect(row.levelText).not.toContain('drill sets travel')
+  })
+
+  it('reads maxed once a floor-bound drill sets travel, k times 15 m/s', () => {
+    const row = engineRowOf(modules, STRONG_DRILL)
+    expect(row.badge).toBe('maxed')
+    expect(row.buy.reason).toBe('max_level')
   })
 })
 

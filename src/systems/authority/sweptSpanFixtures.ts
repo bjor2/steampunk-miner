@@ -1,6 +1,6 @@
 /**
  * The swept span's reference fixtures (ticket 374): sweeps a tick at a time through ground
- * softened to just over its yield, so cells at the 24-tick dig floor break in the one tick a fast
+ * softened to just over its yield, so cells at the tile dig floor break in the one tick a fast
  * stamp spends on them, run through either carve from the same start. Only specs use them.
  */
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../constants/physics'

@@ -1,6 +1,6 @@
 /**
  * The pacing bot and `blasting_charges` (#109 "Bot policy"): it blasts a tile whose drill time
- * would be over `botBlastThresholdTicks` (96, 4x `minTicksPerTile`) when a charge is in the rack,
+ * would be over `botBlastThresholdTicks` (96, 4x #7's 24-tick floor) when a charge is in the rack,
  * as a player would: plant facing the tile, back off along the open way it came until it is out of
  * the blast, wait out the fuse, and drive back. With no open way back, or a tile the blast cannot
  * break (core), it bores as before. It buys the rack or restocks it only once it has met, on this

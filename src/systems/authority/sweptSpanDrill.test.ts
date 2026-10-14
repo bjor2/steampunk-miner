@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../registries/registrar'
 import { add, fromCanonical, toCanonical, ZERO_MONEY } from '../money'
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { ECONOMY } from '../economy/economy'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { cellDensitySum } from '../world/cellYield'
 import type { TilePoint } from '../world/tileGrid'
@@ -111,9 +112,10 @@ describe('swept span per chunk against the per-cell carve (ticket 374)', () => {
   })
 
   // The cache sits in a 3x3 of plain ground (#46), so a 100 m/s tick never reaches from where the
-  // cache breaks to the nearest ore: 150 m/s (2.5 m a tick) is the slowest that does here.
-  it('cuts the same bytes crossing the cache and a gate in one tick at 150 m/s', () => {
-    const reference = expectSpanMatchesPerCell(cacheSweep(150))
+  // cache breaks to the nearest ore. At the 4-tick floor (ticket 396) the cache breaks a tick
+  // sooner: 270 m/s (4.5 m a tick) is the slowest that still reaches the ore in that tick here.
+  it('cuts the same bytes crossing the cache and a gate in one tick at 300 m/s', () => {
+    const reference = expectSpanMatchesPerCell(cacheSweep(300))
     const isCacheAndGate = ({ events }: TickRecord) =>
       events.some((event) => isDestroyedAt(event, CACHE)) &&
       events.some((event) => event.type === 'DrillGated')
@@ -158,8 +160,8 @@ describe('swept span per chunk against the per-cell carve (ticket 374)', () => {
     const states = [fixture.start(), ...cuts.map(({ effect }) => effect.state)]
     const tanks = states.map((state) => vehicleOf(state, 'p1').energy)
     const charges = tanks.slice(1).map((tank, index) => tanks[index] - tank)
-    // The strong drill breaks every cell at the 24-tick floor, so each costs the same.
-    const perCell = cellDigEnergyOf(24 * DRILL_SUBSTEPS_PER_TICK)
+    // The strong drill breaks every cell at the tile floor, so each costs the same.
+    const perCell = cellDigEnergyOf(ECONOMY.drill.minTicksPerTile * DRILL_SUBSTEPS_PER_TICK)
     expect(charges).toEqual(cuts.map(({ tally }) => tally.cells * perCell))
     expect(Math.max(...charges)).toBeGreaterThan(ENERGY_QUANTA_PER_TICK.drill)
   })

@@ -11,7 +11,7 @@ import { ticksPerTile } from './drillRule'
 
 /**
  * The band #81's sawtooth is judged on (Game Director on #86): band 5, the "home band" right above
- * the core, the rock that feels slow on arrival. Band 1 already digs at the 24-tick cap by then.
+ * the core, the rock that feels slow on arrival.
  */
 export const SAWTOOTH_BAND = 5
 

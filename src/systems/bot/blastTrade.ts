@@ -8,7 +8,6 @@
  */
 import { blastTilesAround } from '../authority/charges/blastOre'
 import { chargePrice, chargeReachTiles, fuseTicksOf, keptFractionOf } from '../economy/chargeSizes'
-import { ECONOMY } from '../economy/economy'
 import { blockHardness, oreSalePrice, oreTier } from '../economy/oreEconomy'
 import type { VehicleStats } from '../economy/vehicleStats'
 import { div, fromSafeInteger, mul, sub, type Money } from '../money'
@@ -19,7 +18,7 @@ import { moveTicks } from './botWorld'
 export interface BlastTrade {
   band: number
   drillTicksPerTile: number
-  /** The drill time per tile over the `minTicksPerTile` floor. */
+  /** The drill time per tile over `BLAST_TRADE_FLOOR_TICKS`, the floor #109 was judged on. */
   floorMultiple: number
   drillMoneyPerTick: Money
   blastMoneyPerTick: Money
@@ -27,6 +26,13 @@ export interface BlastTrade {
   drillAdvanceTicks: number
   blastAdvanceTicks: number
 }
+
+/**
+ * The tile floor #109's numbers acceptance 3 was set against: #7's 24 ticks, the floor the bot's
+ * `botBlastThresholdTicks` (96) is 4x of. Ticket 396 lowered the drill law's floor to a 4-tick
+ * stopgap; the trade keeps judging its 2x and 4x lines on the floor they were decided on.
+ */
+export const BLAST_TRADE_FLOOR_TICKS = 24
 
 const BASIS_POINTS = 10000
 const ONE_CHARGE = 1
@@ -47,7 +53,7 @@ export function blastTradeOf(
   return {
     band,
     drillTicksPerTile: drillTicks,
-    floorMultiple: drillTicks / ECONOMY.drill.minTicksPerTile,
+    floorMultiple: drillTicks / BLAST_TRADE_FLOOR_TICKS,
     drillMoneyPerTick: div(tileMoney, fromSafeInteger(drillTicks)),
     blastMoneyPerTick: div(blastMoney(params, tileMoney), fromSafeInteger(cycleTicks)),
     drillAdvanceTicks: advanceTiles * drillTicks,

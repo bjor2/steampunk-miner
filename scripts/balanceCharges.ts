@@ -4,7 +4,7 @@
  * `balance:guns`.
  *
  * 1. The shipped charge's trade (`blastTrade.ts`): for planets 7 to 10, the on-curve vehicle and one
- *    12 drill levels behind it, each band's drill time per tile over the `minTicksPerTile` floor,
+ *    12 drill levels behind it, each band's drill time per tile over #109's 24-tick floor,
  *    ore money a minute drilling against blasting, and the time to push a shaft 3 tiles deeper
  *    either way. Acceptance 3 wants blasting to earn less a minute wherever a tile takes at most 2x
  *    the floor, and to reach the next band faster at 4x or more.
