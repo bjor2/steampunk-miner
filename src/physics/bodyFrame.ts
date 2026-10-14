@@ -16,7 +16,11 @@ import {
 } from '../systems/render/renderOrigin'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { VehiclePose } from '../systems/vehicle/vehiclePose'
-import type { GroundHalo } from './groundHalo'
+
+/** The colliders measured from the origin: the ground halo's, and the struts' (ticket 379). */
+export interface OriginFollower {
+  moveOrigin(origin: RenderOrigin): void
+}
 
 /** The render origin the body and the halo are measured from; one object, moved in place. */
 export interface BodyFrame {
@@ -47,7 +51,7 @@ export function planetPositionOf(body: RAPIER.RigidBody, origin: RenderOrigin): 
  */
 export function recentreWhenFar(
   body: RAPIER.RigidBody,
-  halo: GroundHalo,
+  colliders: OriginFollower,
   frame: BodyFrame,
   position: Vector2,
 ): void {
@@ -55,25 +59,25 @@ export function recentreWhenFar(
   const yMm = position.y * MM_PER_METRE
   if (!isPastOriginReach(frame.origin, xMm, yMm, frame.reachMm)) return
   const was = frame.origin
-  moveOrigin(halo, frame, renderOriginNear(xMm, yMm))
+  moveOrigin(colliders, frame, renderOriginNear(xMm, yMm))
   shiftBody(body, was, frame.origin)
 }
 
 /** A respawn: the body lands on the pose, measured from the chunk corner nearest it. */
 export function placeBodyAt(
   body: RAPIER.RigidBody,
-  halo: GroundHalo,
+  colliders: OriginFollower,
   frame: BodyFrame,
   pose: VehiclePose,
 ): void {
   const placement = placementNear(pose)
-  moveOrigin(halo, frame, placement.origin)
+  moveOrigin(colliders, frame, placement.origin)
   body.setTranslation({ x: placement.at.x, y: placement.at.y, z: 0 }, true)
 }
 
-function moveOrigin(halo: GroundHalo, frame: BodyFrame, next: RenderOrigin): void {
+function moveOrigin(colliders: OriginFollower, frame: BodyFrame, next: RenderOrigin): void {
   frame.origin = next
-  halo.moveOrigin(next)
+  colliders.moveOrigin(next)
 }
 
 /** Both origins are chunk corners, so the shift is whole metres and f32 adds it exactly. */

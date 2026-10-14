@@ -13,7 +13,8 @@
  * motor reads the cut gate and the drill's speed from the authority before the step's cut and
  * drives on an engine whose top speed is travel parity's, and (ticket 334) clamps the body to the
  * rig's stats-derived step bound and widens the wheels' wait-for-cut window to it; off, nothing
- * changes.
+ * changes. The bore struts standing in the authority's state go to the motor, which lands the body
+ * on their planks (ticket 379).
  */
 import { DEV_FLAGS, type DevFlags } from '../constants/devFlags'
 import { MM_PER_METRE, UP_VECTOR_SCALE } from '../constants/physics'
@@ -26,6 +27,7 @@ import {
 } from '../store/gameStore'
 import { readAuthorityState } from '../store/authorityLink'
 import type { AuthorityState } from '../systems/authority/authorityState'
+import { strutsOf } from '../systems/authority/bore/strutState'
 import { cutFollowAt, type CutFollow, type CutFollowStep } from '../systems/authority/cutFollowRead'
 import { stepBoundsAt } from '../systems/authority/stepBoundRead'
 import { travelEngineAt } from '../systems/authority/travelSpeed'
@@ -119,6 +121,7 @@ export function createVehicleLoop(flags: DevFlags = DEV_FLAGS): VehicleLoop {
           drillContactRule: drillContactRuleOf(flags),
           cutFollowOf: cutFollowRuleOf(flags),
           stepBounds: stepBoundsOfFlag(flags),
+          struts: strutsOf(readAuthorityState()),
         },
         planetViewOf(loop, params, world),
       )

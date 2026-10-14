@@ -112,3 +112,14 @@ export const KINEMATIC_SWEEP_PROBE_M = 0.25
  * a bore's wall slides along it instead of stopping on it.
  */
 export const KINEMATIC_SWEEP_INSET_M = 0.05
+
+/**
+ * The bore strut's plank (ticket 379, Content's strut bore on #310: "a ledge the miner can land
+ * on"): two tiles long, centred on the edge between the mouth and the hollow, so it spans a 1 m
+ * bore's mouth with half a tile into the rock either side and reaches a tile into the hollow from a
+ * level bore. Its top lies on the mouth cell's floor. My pick, by hand in no feel test yet.
+ */
+export const STRUT_PLANK_LENGTH = 2
+
+/** The plank's thickness, m: more than `GROUND_PROBE_DEPTH`, so a rig resting on it is grounded. */
+export const STRUT_PLANK_THICKNESS = 0.25

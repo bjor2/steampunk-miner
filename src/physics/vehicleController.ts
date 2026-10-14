@@ -11,6 +11,9 @@
  * Rapier is f32, so the body is measured from a floating render origin near the rig (ticket 339,
  * `bodyFrame`); every rule here reads planet metres.
  *
+ * It keeps the bore struts' planks too (ticket 379, `strutColliders.ts`): the rig lands on one, and
+ * its wheels count it as ground.
+ *
  * The motor also steps the world through its tick (ticket 334, `tickStepping.ts`): `step` runs the
  * motion rule once and plans the tick from the speed it set, `stepWorld` then steps the world in
  * as many substeps as that speed needs, the halo synced round the body before each, or past the
@@ -18,6 +21,7 @@
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { PHYSICS_TIMESTEP, VEHICLE_COLLIDER_SIZE } from '../constants/physics'
+import { NO_STRUTS, type StandingStruts } from '../systems/authority/bore/strutState'
 import type { CutFollow, CutFollowStep } from '../systems/authority/cutFollowRead'
 import type { RenderOrigin } from '../systems/render/renderOrigin'
 import { blockOfPoint } from '../systems/vehicle/colliderHalo'
@@ -50,12 +54,14 @@ import { ISO_DENSITY } from '../systems/world/sampleGrid'
 import {
   createBodyFrame,
   placeBodyAt,
+  type OriginFollower,
   placementNear,
   planetPositionOf,
   recentreWhenFar,
 } from './bodyFrame'
 import { cutFollowFor, cutFollowReadFor, drillContactFor, maxSpeedFor } from './drillEngagement'
-import { createGroundHalo, type HaloGround } from './groundHalo'
+import { createGroundHalo, type GroundHalo, type HaloGround } from './groundHalo'
+import { createStrutColliders, type StrutColliders } from './strutColliders'
 import { stepWorldThroughTick, sweepGroundOf } from './tickStepping'
 
 type Rapier = typeof RAPIER
@@ -92,6 +98,8 @@ export interface VehicleStepInput {
    * to and the wheels' wait-for-cut window; absent with the swept cut off (18 m/s, 250 mm).
    */
   stepBounds?: StepBounds
+  /** The bore struts standing now (ticket 379), the rig lands on their planks; none when absent. */
+  struts?: StandingStruts
 }
 
 export interface VehicleStepResult {
@@ -169,6 +177,8 @@ export function createVehicleController(
   const { body } = placed
   const frame = createBodyFrame(placed.origin, options.originReachMm)
   const halo = createGroundHalo(rapier, world, HALO_RADIUS_BLOCKS, frame.origin)
+  const struts = createStrutColliders(rapier, world, frame.origin)
+  const colliders = followersOf(halo, struts)
   let head = newDrillHead(FACING.right)
   let up: Vector2 = { x: 0, y: 1 }
   let plan: TickPlan = tickPlanOf(0)
@@ -186,11 +196,12 @@ export function createVehicleController(
   return {
     step(input, planet) {
       const position = planetPositionOf(body, frame.origin)
-      recentreWhenFar(body, halo, frame, position)
+      recentreWhenFar(body, colliders, frame, position)
       const velocity = vectorOf(body.linvel())
       up = localUpOf(position, up)
       lastPlanet = lastPlanet?.view === planet ? lastPlanet : haloPlanetOf(planet)
       syncHaloAt(position)
+      struts.sync(input.struts ?? NO_STRUTS)
       head = stepDrillHead(head, input.intent.facing)
       // The velocity the body actually had, after contacts, so a resting vehicle reports 0.
       const pose = quantisePose(position, velocity, up, settledFacingOf(head))
@@ -210,7 +221,7 @@ export function createVehicleController(
         intent: input.intent,
         engine: input.engine,
         canAct: input.canAct,
-        isGrounded: isSolidAt(planet.ground, groundProbeOf(position, up)),
+        isGrounded: isGroundedAt(planet.ground, struts, groundProbeOf(position, up)),
         boreOffset: isAimingAlongUp(input.intent) ? offsetToTileCentre(position, up) : null,
         isCuttingLevel: isCuttingLevel,
         isWaitingForCut,
@@ -233,7 +244,7 @@ export function createVehicleController(
     },
     stepWorld: () => stepWorldThroughTick(tick, plan),
     placeAt(pose) {
-      placeBodyAt(body, halo, frame, pose)
+      placeBodyAt(body, colliders, frame, pose)
       body.setLinvel({ x: 0, y: 0, z: 0 }, true)
       head = newDrillHead(pose.facing)
     },
@@ -241,8 +252,26 @@ export function createVehicleController(
     renderOrigin: () => frame.origin,
     drillHead: () => head,
     colliderCount: () => halo.colliderCount(),
-    dispose: () => halo.dispose(),
+    dispose() {
+      halo.dispose()
+      struts.dispose()
+    },
   }
+}
+
+/** The halo's and the struts' colliders, moved together when the origin moves. */
+function followersOf(halo: GroundHalo, struts: StrutColliders): OriginFollower {
+  return {
+    moveOrigin(next) {
+      halo.moveOrigin(next)
+      struts.moveOrigin(next)
+    },
+  }
+}
+
+/** Ground under the wheels: solid ground, or a strut's plank (ticket 379). */
+function isGroundedAt(ground: GroundReader, struts: StrutColliders, probe: Vector2): boolean {
+  return isSolidAt(ground, probe) || struts.isOnPlank(probe)
 }
 
 /** What the halo reads of a planet view, built once per view. */
