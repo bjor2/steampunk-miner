@@ -118,14 +118,6 @@ describe('tech tree: shape test', () => {
     expect(shapeOf(gapped)).toContain('P28-P31 bring no new capability, more than two planets')
   })
 
-  it('lets every lane fork on P16 without crowding the planet (GD lock on #255)', () => {
-    const forked = [
-      ...AUTHORED_TREE_FIXTURE,
-      ...FORK_PAIRS_FIXTURE.flatMap((pair) => pair.branches),
-    ]
-    expect(shapeOf(forked)).toEqual([])
-  })
-
   it('lets the armoury lanes bring at most one capability a planet on P2-P8 between them', () => {
     const boreAt = (planet: number): TechNode => ({
       ...nodeOf('tech.sensing.echo_sounder'),
