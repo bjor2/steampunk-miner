@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-14T21:57:38Z",
+  "updated_at": "2026-10-14T22:11:59Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -412,9 +412,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "testing spec #142 (Spec: Mining gates: drill tier, skill, and dynamite-only ores) on df0c1f0",
+      "note": "testing spec #139 (Wayfinder: Materials expansion (ore variety, depth and planet distribution, gates, dynamite, visual progression)) on 9f249c8",
       "stale_after_min": 420,
-      "updated_at": "2026-10-14T21:25:05Z",
+      "updated_at": "2026-10-14T22:11:59Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/10": {
