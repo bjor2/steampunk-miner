@@ -12,6 +12,12 @@ import { SHIPPED_ART } from '../../scene/shippedArt'
 
 const idsOf = (quads: { partId: string }[]) => quads.map((quad) => quad.partId)
 
+/** A part's half-height, the radius a wheel rolls on. */
+function radiusOf(visualTier: number, partId: string): number {
+  const quad = vehicleBodyQuadsOf(SHIPPED_ART, visualTier).find((each) => each.partId === partId)
+  return (quad?.size[1] ?? 0) / 2
+}
+
 describe('vehicle look', () => {
   it('shows the inventory parts of #51 on the run vehicle at tier 1', () => {
     expect(vehiclePartIdsOf(SHIPPED_ART, 1).sort()).toEqual(
@@ -25,6 +31,10 @@ describe('vehicle look', () => {
         't1-motor-housing',
         't1-piston',
         't1-stack',
+        't1-thruster',
+        't1-thruster-2',
+        't1-casing-arm',
+        't1-casing-arm-2',
         't1-wheel',
         't1-wheel-2',
         't1-wheel-3',
@@ -77,9 +87,9 @@ describe('vehicle look', () => {
     const tier1 = vehiclePartPosesOf(SHIPPED_ART, motion, 1, false)
     const tier3 = vehiclePartPosesOf(SHIPPED_ART, motion, 3, false)
     expect(Object.keys(tier3).sort()).toEqual(vehiclePartIdsOf(SHIPPED_ART, 3).sort())
-    // Tier 1 wheels are 0.24 m, tier 3 wheels 0.26 m across.
-    expect(tier1['t1-wheel-2'].angle).toBeCloseTo(-2 / 0.12, 6)
-    expect(tier3['t3-wheel-2'].angle).toBeCloseTo(-2 / 0.13, 6)
+    expect(radiusOf(3, 't3-wheel-2')).toBeGreaterThan(radiusOf(1, 't1-wheel-2'))
+    expect(tier1['t1-wheel-2'].angle).toBeCloseTo(-2 / radiusOf(1, 't1-wheel-2'), 6)
+    expect(tier3['t3-wheel-2'].angle).toBeCloseTo(-2 / radiusOf(3, 't3-wheel-2'), 6)
     expect(tier1['t1-chassis'].angle).toBe(0)
   })
 

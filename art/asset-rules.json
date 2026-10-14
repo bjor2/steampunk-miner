@@ -11,7 +11,9 @@
     "hopper",
     "armour-plate",
     "piston",
-    "headlamp"
+    "headlamp",
+    "thruster",
+    "casing-arm"
   ],
   "vehicleModuleParts": {
     "auto_guns": ["turret-mount", "turret-head", "gun-barrel"]

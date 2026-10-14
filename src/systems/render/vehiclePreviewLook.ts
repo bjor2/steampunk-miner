@@ -30,7 +30,7 @@ export interface PreviewPanelSize {
 const PARTS_OF_TRACK: Readonly<Record<UpgradeId, readonly string[]>> = {
   drill_power: ['motor-housing'],
   drill_tip: ['drill-bit'],
-  engine: ['wheel', 'piston'],
+  engine: ['wheel', 'piston', 'thruster'],
   boiler: ['boiler', 'stack'],
   cargo_hold: ['hopper'],
   hull: ['armour-plate', 'chassis'],
