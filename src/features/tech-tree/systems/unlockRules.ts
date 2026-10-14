@@ -1,6 +1,7 @@
 /**
  * When a node can be researched (spec #161 sections 1 and 5). In order, a node is refused when
- * no node has the id, it is already researched, its tier is not reached or a schedule row it
+ * no node has the id, it is already researched, it is a lane's fork branch or a Mark of a branch
+ * the lane does not have active (`fork_branch`: the fork commands open a branch, #255), its tier is not reached or a schedule row it
  * `requiresFeature` is still shut (`locked_tier`, ticket 358), it waits on a discovery
  * (`locked_tier` / `undiscovered`), a prerequisite is missing, the player does not own what it
  * `requiresOwned` (`not_owned`, ticket 233), it is a combo or a node researched at the lab (the
@@ -16,6 +17,8 @@ import { isFeatureUnlocked } from '../../../systems/authority/featureUnlocks'
 import { cmp } from '../../../systems/money'
 import { hasDiscovered } from '../../../systems/registries/discovery'
 import { progressFromTravel } from '../../../systems/unlocks/travelUnlocks'
+import { activeItemsOf, isLeftToForkChoice } from './forkBranches'
+import { forkChoicesOf } from './forkSection'
 import { nodeCost } from './nodeCost'
 import { ownsEveryRequirement } from './ownedRequirement'
 import { isAbsorbedRowReached, RESEARCH_LAB_ROW_ID } from './scheduleAbsorber'
@@ -27,6 +30,7 @@ import { TREE_ECONOMY } from './treeEconomy'
 export const TECH_NODE_REFUSALS = [
   'unknown_node',
   'already_unlocked',
+  'fork_branch',
   'locked_tier',
   'undiscovered',
   'missing_prereq',
@@ -46,7 +50,7 @@ export function unlockRefusalOf(
 ): TechNodeRefusal | null {
   const node = treeNodeOf(tree, nodeId)
   if (node === null) return 'unknown_node'
-  return researchRefusalOf(state, playerId, node) ?? moneyRefusalOf(state, playerId, node)
+  return researchRefusalOf(state, playerId, node, tree) ?? moneyRefusalOf(state, playerId, node)
 }
 
 /** Why `node` cannot be researched now, the wallet aside; null when only money could stop it. */
@@ -54,13 +58,26 @@ export function researchRefusalOf(
   state: AuthorityState,
   playerId: string,
   node: TreeNode,
+  tree: TechTree = registeredTechTree(),
 ): TechNodeRefusal | null {
-  const unlocked = new Set(unlockedNodeIdsOf(state, playerId))
-  if (unlocked.has(node.id)) return 'already_unlocked'
+  if (isUnlocked(state, playerId, node.id)) return 'already_unlocked'
+  if (isLeftToForkChoice(tree, forkChoicesOf(state, playerId), node)) return 'fork_branch'
+  return researchGateRefusalOf(state, playerId, node)
+}
+
+/**
+ * Why the tier, discoveries, prerequisites, owned items or lab stop `node` now: the gates a fork
+ * branch is opened through too, by `choose_fork` and `rechoose_fork`.
+ */
+export function researchGateRefusalOf(
+  state: AuthorityState,
+  playerId: string,
+  node: TreeNode,
+): TechNodeRefusal | null {
   if (!isTierReached(state.planet.index, node)) return 'locked_tier'
   if (!isAnchorUnlocked(state, node)) return 'locked_tier'
   if (isWaitingOnDiscovery(state, playerId, node)) return 'undiscovered'
-  if (node.prereqs.some((prereq) => !unlocked.has(prereq))) return 'missing_prereq'
+  if (!hasEveryPrereq(state, playerId, node)) return 'missing_prereq'
   if (!ownsEveryRequirement(state, playerId, node.requiresOwned ?? [])) return 'not_owned'
   if (isResearchedAtLab(node) && !isFeatureUnlocked(state, RESEARCH_LAB_ROW_ID)) return 'no_lab'
   return null
@@ -73,7 +90,7 @@ export function availableNodes(
   tree: TechTree = registeredTechTree(),
 ): TreeNode[] {
   return treeNodesThrough(tree, state.planet.index).filter(
-    (node) => researchRefusalOf(state, playerId, node) === null,
+    (node) => researchRefusalOf(state, playerId, node, tree) === null,
   )
 }
 
@@ -81,13 +98,17 @@ export function isUnlocked(state: AuthorityState, playerId: string, nodeId: stri
   return unlockedNodeIdsOf(state, playerId).includes(nodeId)
 }
 
-/** Each store item the player researched, at its highest Mark or grade, by item id. */
+/**
+ * Each store item the player researched, at its highest Mark or grade, by item id; an inactive
+ * fork branch's item is not among them.
+ */
 export function unlockedItems(
   state: AuthorityState,
   playerId: string,
   tree: TechTree = registeredTechTree(),
 ): ItemUnlock[] {
-  return itemsUnlockedBy(unlockedNodeIdsOf(state, playerId), tree)
+  const researched = itemsUnlockedBy(unlockedNodeIdsOf(state, playerId), tree)
+  return activeItemsOf(researched, tree, forkChoicesOf(state, playerId))
 }
 
 /** Each store item the researched `nodeIds` unlock, at its highest Mark or grade, by item id. */
@@ -117,6 +138,11 @@ export function isItemResearched(
  */
 export function isAnchorUnlocked(state: AuthorityState, node: TreeNode): boolean {
   return (node.requiresFeature ?? []).every((rowId) => isFeatureUnlocked(state, rowId))
+}
+
+function hasEveryPrereq(state: AuthorityState, playerId: string, node: TreeNode): boolean {
+  const unlocked = new Set(unlockedNodeIdsOf(state, playerId))
+  return node.prereqs.every((prereq) => unlocked.has(prereq))
 }
 
 function isResearchedAtLab(node: TreeNode): boolean {

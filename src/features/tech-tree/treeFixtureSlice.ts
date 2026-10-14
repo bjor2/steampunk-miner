@@ -6,6 +6,8 @@
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import { fromSafeInteger } from '../../systems/money'
 import type { VehicleItem } from '../../systems/registries/vehicleLoadout'
+import { forkPairOf, type ForkBranchSpec, type ForkPair } from './systems/forkNode'
+import type { MarkLadder, TechLane } from './systems/techNode'
 import { AUTHORED_TREE_FIXTURE, COMBO_TEMPLATES_FIXTURE } from './systems/treeFixtures'
 
 export const TREE_FIXTURE_SLICE: SliceDefinition = {
@@ -74,4 +76,62 @@ function fixtureItemOf(itemId: string): VehicleItem {
 
 function isConsumable(itemId: string): boolean {
   return itemId.startsWith('consumable.')
+}
+
+/**
+ * Two ladders of different lengths, so a re-choice carries Marks onto a shorter ladder and a
+ * Mark step is priced alike on both.
+ */
+export const LONG_FORK_LADDER: MarkLadder = {
+  isIncomeItem: false,
+  cooldown: 300,
+  magnitude: { base: 600 },
+}
+export const SHORT_FORK_LADDER: MarkLadder = { isIncomeItem: true, cooldown: 600, charges: 2 }
+
+/** The #255 lock's six pairs, the first branch on the long ladder and the second on the short. */
+const FORK_BRANCH_NAMES: Readonly<Record<TechLane, readonly [string, string]>> = {
+  extraction: ['hauler', 'prospector'],
+  terrain: ['bracer', 'breaker'],
+  sensing: ['scout', 'diviner'],
+  mobility: ['agile', 'armoured'],
+  'drill-gear': ['wide', 'deep'],
+  aetheric: ['phase', 'arc'],
+}
+
+export const FORK_PAIRS_FIXTURE: readonly ForkPair[] = Object.entries(FORK_BRANCH_NAMES).map(
+  ([lane, [first, second]]) =>
+    forkPairOf(lane as TechLane, [
+      forkBranchSpecOf(first, LONG_FORK_LADDER),
+      forkBranchSpecOf(second, SHORT_FORK_LADDER),
+    ]),
+)
+
+/** The fork item a fixture branch unlocks. */
+export function forkItemIdOf(branch: string): string {
+  return `power.fork_${branch}`
+}
+
+/** A stand-in for the lane slices' fork builds: a pair in every lane, no prerequisite. */
+export const FORK_FIXTURE_SLICE: SliceDefinition = {
+  id: 'fork-probe',
+  register(r) {
+    r.content(
+      'tech-node',
+      FORK_PAIRS_FIXTURE.flatMap((pair) => pair.branches),
+    )
+  },
+}
+
+function forkBranchSpecOf(branch: string, marks: MarkLadder): ForkBranchSpec {
+  return {
+    branch,
+    name: `Stand-in ${branch}`,
+    iconId: 'icon-panel-slots',
+    prereqs: [],
+    unlocks: forkItemIdOf(branch),
+    description: `A stand-in for the ${branch} branch.`,
+    label: 'horizontal',
+    marks,
+  }
 }

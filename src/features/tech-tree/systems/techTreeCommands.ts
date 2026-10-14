@@ -7,13 +7,16 @@
  *   `unlockRules` order, like the loadout's `EquipRefused`.
  * - `debug.tech-tree.unlockThrough {planetIndex}`: grants, free, every node whose tier is at most
  *   `planetIndex` (the debug "jump to depth N"; "unlock all" passes the deepest authored tier).
- *   Prerequisites never sit deeper than their nodes, so the grant leaves no hole.
+ *   Prerequisites never sit deeper than their nodes, so the grant leaves no hole. A fork branch is
+ *   a choice, not research (#255): the grant opens none, only the active branch's Marks.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { withWallet } from '../../../systems/authority/authorityState'
 import type { RuleEffect } from '../../../systems/authority/commandRule'
 import { sub, toCanonical } from '../../../systems/money'
 import type { SliceCommandRules } from '../../../systems/registries/commandRules'
+import { isLeftToForkChoice } from './forkBranches'
+import { forkChoicesOf } from './forkSection'
 import { nodeCost } from './nodeCost'
 import { registeredTechTree, treeNodeOf, treeNodesThrough } from './techTree'
 import type { TechNodeKind, TechNodeLane, TreeNode } from './techNode'
@@ -95,10 +98,22 @@ function grantNodesThrough(
   playerId: string,
   planetIndex: number,
 ): RuleEffect {
-  const nodeIds = treeNodesThrough(registeredTechTree(), planetIndex).map((node) => node.id)
+  const nodeIds = grantableNodesThrough(state, playerId, planetIndex).map((node) => node.id)
   const granted = { throughPlanet: planetIndex, nodeCount: nodeIds.length }
   return {
     state: withNodesUnlocked(state, playerId, nodeIds),
     events: [{ type: 'tech-tree.TechNodesGranted', ...granted }],
   }
+}
+
+function grantableNodesThrough(
+  state: AuthorityState,
+  playerId: string,
+  planetIndex: number,
+): TreeNode[] {
+  const tree = registeredTechTree()
+  const choices = forkChoicesOf(state, playerId)
+  return treeNodesThrough(tree, planetIndex).filter(
+    (node) => !isLeftToForkChoice(tree, choices, node),
+  )
 }

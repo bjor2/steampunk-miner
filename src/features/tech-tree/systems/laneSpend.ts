@@ -2,14 +2,18 @@
  * The pacing bot's tree spend by lane (ticket 248, for the #212 spend guard's numerator): per
  * planet and lane, what researching the lane's nodes and buying its items cost, read off the
  * bot's spend records (`ShopSpend.boughtId`). An item counts in the lane of the node that unlocks
- * it; a Mark or combo in its own node's lane. Reported, never failed on.
+ * it; a Mark, combo or fork choice in its own node's lane; a fork re-choice is a service, no lane
+ * spend. Reported, never failed on.
  */
 import type { ShopSpend } from '../../../systems/bot/shopSpend'
 import { add, ZERO_MONEY, type Money } from '../../../systems/money'
+import { FORK_CHOICE_BOT_PURCHASE } from './forkBotPurchases'
 import { ITEM_BOT_PURCHASE } from './itemShop'
 import { RESEARCH_BOT_PURCHASE } from './researchBotPurchase'
 import { registeredTechTree, treeNodeOf, type TechTree } from './techTree'
 import type { TechNodeLane } from './techNode'
+
+const NODE_PURCHASE_IDS: readonly string[] = [RESEARCH_BOT_PURCHASE.id, FORK_CHOICE_BOT_PURCHASE.id]
 
 export interface LaneSpendRow {
   planetIndex: number
@@ -43,7 +47,7 @@ function laneSpendOf(spend: ShopSpend, tree: TechTree): LaneSpend[] {
 
 function kindOf(spend: ShopSpend): LaneSpend['kind'] | null {
   if (spend.source !== 'slice') return null
-  if (spend.purchaseId === RESEARCH_BOT_PURCHASE.id) return 'node'
+  if (NODE_PURCHASE_IDS.includes(spend.purchaseId)) return 'node'
   return spend.purchaseId === ITEM_BOT_PURCHASE.id ? 'item' : null
 }
 

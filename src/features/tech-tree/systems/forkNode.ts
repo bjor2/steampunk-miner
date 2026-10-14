@@ -3,9 +3,11 @@
  * `tech.<lane>.fork.<branch>`, capabilities on tier 16, one pair per lane. The pair is built here so
  * both branches share one `unlockTier` and, once in the tree, one `depthTerm`: `bandOrePriceAt`
  * then prices them alike on every planet, and their Mark ladders step for step. Only one branch of
- * a lane is active at a time. Nothing registers a pair yet; #259 brings the commands and the save.
+ * a lane is active at a time: `tech-tree.choose_fork` picks it and `rechoose_fork` swaps it (#259).
+ * The lane slices register their pairs' branches as `tech-node` content with their own items.
  */
 import { authoredTreeNodeOf } from './authoredNodes'
+import { forkBranchOfNode, forkNodeIdOf, forkPairIdOf } from './forkIds'
 import type { TechLane, TechNode, TreeNode } from './techNode'
 
 /** The schedule gap every lane forks at (#255 lock: "the fork goes at P16"). */
@@ -38,22 +40,13 @@ export type ForkChoices = Readonly<Partial<Record<TechLane, string>>>
 
 export const NO_FORK_CHOICES: ForkChoices = {}
 
-export function forkPairIdOf(lane: TechLane): string {
-  return `tech.${lane.replace('-', '_')}.fork`
-}
-
-export function forkNodeIdOf(lane: TechLane, branch: string): string {
-  return `${forkPairIdOf(lane)}.${branch}`
-}
-
-/** The lane's fork pair; a second branch with the first one's name is refused. */
+/** The lane's fork pair; a branch named twice, or named with a dot, is refused. */
 export function forkPairOf(
   lane: TechLane,
-  [first, second]: readonly [ForkBranchSpec, ForkBranchSpec],
+  specs: readonly [ForkBranchSpec, ForkBranchSpec],
 ): ForkPair {
-  if (first.branch === second.branch) {
-    throw new Error(`fork ${forkPairIdOf(lane)} names branch ${first.branch} twice`)
-  }
+  refuseUnreadablePair(lane, specs)
+  const [first, second] = specs
   return {
     id: forkPairIdOf(lane),
     lane,
@@ -86,5 +79,23 @@ function forkNodeOf(lane: TechLane, spec: ForkBranchSpec): ForkNode {
     unlockTier: FORK_TIER,
     costKind: 'capability',
     pairId: forkPairIdOf(lane),
+  }
+}
+
+function refuseUnreadablePair(
+  lane: TechLane,
+  [first, second]: readonly [ForkBranchSpec, ForkBranchSpec],
+): void {
+  if (first.branch === second.branch) {
+    throw new Error(`fork ${forkPairIdOf(lane)} names branch ${first.branch} twice`)
+  }
+  refuseUnreadableBranch(lane, first)
+  refuseUnreadableBranch(lane, second)
+}
+
+/** A branch whose id does not read back as a branch (a dot in its name) would never be chosen. */
+function refuseUnreadableBranch(lane: TechLane, spec: ForkBranchSpec): void {
+  if (forkBranchOfNode({ id: forkNodeIdOf(lane, spec.branch), lane }) === null) {
+    throw new Error(`fork ${forkPairIdOf(lane)} branch "${spec.branch}" is not one word`)
   }
 }

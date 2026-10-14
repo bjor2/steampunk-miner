@@ -3,15 +3,16 @@
  * restates it): per planet, the tree's share of what the pacing bot spent, judged on the median
  * of the pacing seeds against the band of that planet (`tech.spendGuard`).
  *
- * - Numerator: node research (capabilities, slots, combos and Marks) and the tree-unlocked items
- *   bought, the tree's two bot purchases (`tech-tree.research`, `tech-tree.buy-item`), and the
- *   kernel turret mount (`buyGun`, the `kernel.buy_gun` family): the armoury's share counts inside
- *   the tree's (#310 Systems point 2), and the mount, a one-time unlock, counts here once (TD, GD
- *   accepted 14 Oct; GD ruling on #371). The bot buys no bore gun level (#347), so no other weapon
- *   brass reaches here.
+ * - Numerator: node research (capabilities, slots, combos and Marks), a lane's first fork choice,
+ *   and the tree-unlocked items bought, the tree's bot purchases (`tech-tree.research`,
+ *   `tech-tree.choose-fork`, `tech-tree.buy-item`), and the kernel turret mount (`buyGun`, the
+ *   `kernel.buy_gun` family): the armoury's share counts inside the tree's (#310 Systems point 2),
+ *   and the mount, a one-time unlock, counts here once (TD, GD accepted 14 Oct; GD ruling on #371).
+ *   The bot buys no bore gun level (#347), so no other weapon brass reaches here.
  * - Denominator: everything the bot bought on the planet. The spend records hold no travel, so
  *   travel never counts; a restock (charges, consumables) is a purchase but not tree spend, so it
- *   counts in the denominator only (Vertical on the #157 gap review).
+ *   counts in the denominator only (Vertical on the #157 gap review). A fork re-choice at the
+ *   platform (`tech-tree.rechoose-fork`) is a service cost the same way (GD lock on #255).
  *
  * A seed counts on a planet when it bought anything there.
  */
@@ -19,11 +20,16 @@ import type { ShopSpend } from '../../../systems/bot/shopSpend'
 import { formatPercent } from '../../../systems/displayAmount'
 import { add, cmp, div, fromSafeInteger, ZERO_MONEY, type Money } from '../../../systems/money'
 import { BUY_GUN_SPEND_FAMILY } from '../../../systems/registries/spendFamilies'
+import { FORK_CHOICE_BOT_PURCHASE } from './forkBotPurchases'
 import { ITEM_BOT_PURCHASE } from './itemShop'
 import { RESEARCH_BOT_PURCHASE } from './researchBotPurchase'
 import { TREE_ECONOMY, type SpendGuardBand } from './treeEconomy'
 
-const TREE_PURCHASE_IDS: readonly string[] = [RESEARCH_BOT_PURCHASE.id, ITEM_BOT_PURCHASE.id]
+const TREE_PURCHASE_IDS: readonly string[] = [
+  RESEARCH_BOT_PURCHASE.id,
+  FORK_CHOICE_BOT_PURCHASE.id,
+  ITEM_BOT_PURCHASE.id,
+]
 const TWO = fromSafeInteger(2)
 
 export interface TreeSpendRow {

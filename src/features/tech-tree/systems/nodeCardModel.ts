@@ -70,6 +70,7 @@ export interface CardContext {
 const REFUSAL_TEXT: Readonly<Record<TechNodeRefusal, (node: TreeNode) => string>> = {
   unknown_node: () => 'Not on the tree',
   already_unlocked: () => 'Researched',
+  fork_branch: () => 'One branch of a fork: choose it, or switch at the platform',
   locked_tier: (node) => `Opens on planet ${node.unlockTier}`,
   undiscovered: () => 'Waits on a discovery, or one more planet',
   missing_prereq: () => 'Research what it builds on first',

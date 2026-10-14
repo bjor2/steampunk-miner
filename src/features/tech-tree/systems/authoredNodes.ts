@@ -1,14 +1,16 @@
 /**
  * The authored nodes as the tree reads them (spec #161 section 3, Definitions): a capability's
  * depth is its lane slot, 0 to n - 1 in `unlockTier` order (ties by id, the registry's order);
- * a combo's depth is one past its deeper parent's slot.
+ * a combo's depth is one past its deeper parent's slot. Both branches of a lane's P16 fork take
+ * one slot (GD lock on #255, equal cost), so the lane's later nodes sit one deeper, not two.
  */
+import { forkBranchOfNode, forkPairIdOf } from './forkIds'
 import type { TechNode, TreeNode } from './techNode'
 
 /** Each capability's slot in its lane. */
 export function laneSlotsOf(nodes: readonly TechNode[]): ReadonlyMap<string, number> {
   const slots = new Map<string, number>()
-  capabilityLanesOf(nodes).forEach((lane) => lane.forEach((node, slot) => slots.set(node.id, slot)))
+  capabilityLanesOf(nodes).forEach((lane) => setLaneSlots(lane, slots))
   return slots
 }
 
@@ -44,6 +46,17 @@ export function authoredTreeNodeOf(node: TechNode, slots: ReadonlyMap<string, nu
 export function compareByTier(a: TreeNode, b: TreeNode): number {
   if (a.unlockTier !== b.unlockTier) return a.unlockTier - b.unlockTier
   return a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+}
+
+/** A slot is a place in the lane's order: one per node, one for a fork pair's two branches. */
+function setLaneSlots(lane: readonly TechNode[], slots: Map<string, number>): void {
+  const places = [...new Set(lane.map(slotPlaceOf))]
+  lane.forEach((node) => slots.set(node.id, places.indexOf(slotPlaceOf(node))))
+}
+
+function slotPlaceOf(node: TechNode): string {
+  const fork = forkBranchOfNode(node)
+  return fork === null ? node.id : forkPairIdOf(fork.lane)
 }
 
 function capabilityLanesOf(nodes: readonly TechNode[]): TechNode[][] {

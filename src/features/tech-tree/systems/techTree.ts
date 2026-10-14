@@ -6,6 +6,7 @@
  */
 import { contentOf } from '../../../systems/registries/content'
 import { authoredTreeNodeOf, compareByTier, laneSlotsOf } from './authoredNodes'
+import { forkBranchOfNode, type ForkBranchRef } from './forkIds'
 import {
   generatedComboAt,
   generatedComboPlanetOfStep,
@@ -36,7 +37,14 @@ export interface TechTree {
   authored: readonly TreeNode[]
   /** Every Mark-bearing item, by the id of its capability. */
   markBearers: readonly MarkBearer[]
+  /** The branches of the lanes' P16 forks among the capabilities (#255), earliest first. */
+  forkBranches: readonly ForkBranchNode[]
   grading: ComboGrading
+}
+
+/** A fork branch's capability, with the lane and branch its id names. */
+export interface ForkBranchNode extends ForkBranchRef {
+  node: TreeNode
 }
 
 let built: { catalogue: TreeCatalogue; tree: TechTree } | null = null
@@ -105,9 +113,11 @@ export function markBearerOfItem(tree: TechTree, itemId: string): MarkBearer | n
 function buildTechTree(catalogue: TreeCatalogue): TechTree {
   const slots = laneSlotsOf(catalogue.nodes)
   const authored = catalogue.nodes.map((node) => authoredTreeNodeOf(node, slots))
+  const byTier = [...authored].sort(compareByTier)
   return {
-    authored: [...authored].sort(compareByTier),
+    authored: byTier,
     markBearers: markBearersOf(catalogue.nodes, authored),
+    forkBranches: forkBranchesOf(byTier),
     grading: comboGradingOf(catalogue.templates, authored, slots),
   }
 }
@@ -118,6 +128,13 @@ function markBearersOf(nodes: readonly TechNode[], authored: readonly TreeNode[]
       ? []
       : [markBearerOf(authored[index], node.marks)],
   )
+}
+
+function forkBranchesOf(authored: readonly TreeNode[]): ForkBranchNode[] {
+  return authored.flatMap((node) => {
+    const fork = node.kind === 'capability' ? forkBranchOfNode(node) : null
+    return fork === null ? [] : [{ ...fork, node }]
+  })
 }
 
 function comboGradingOf(

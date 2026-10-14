@@ -5,6 +5,8 @@
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import type { ItemSnapshotView } from '../../../systems/registries/itemSnapshotView'
+import { activeItemsOf } from './forkBranches'
+import { FORK_SECTION } from './forkSection'
 import type { MarkLadder } from './techNode'
 import { markBearerOfItem, registeredTechTree, type TechTree } from './techTree'
 import { TECH_TREE_SECTION } from './techTreeSection'
@@ -31,7 +33,8 @@ export function researchedMarkInViewOf(
   tree: TechTree = registeredTechTree(),
 ): number {
   const { unlocked } = view.section(TECH_TREE_SECTION)
-  return itemsUnlockedBy(unlocked, tree).find((unlock) => unlock.itemId === itemId)?.mark ?? 0
+  const items = activeItemsOf(itemsUnlockedBy(unlocked, tree), tree, view.section(FORK_SECTION))
+  return items.find((unlock) => unlock.itemId === itemId)?.mark ?? 0
 }
 
 /** The Mark ladder of the item's capability; null for an item that has no Marks. */
