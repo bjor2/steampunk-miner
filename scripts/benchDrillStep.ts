@@ -5,18 +5,18 @@
  * and logged here, not gated: p95 is judged on the reference machine. Run with
  * `npm run bench:drill-step` (`-- --log` writes `benchmark_result` lines, #124).
  *
- * A level cut on planet 1 at about 279.5 m from the centre, as the #316 bench, at the pose bound
- * (300 mm a tick) with the drill far past the floor, so every sample it reaches clears. W comes
+ * A level cut on planet 1 at about 279.5 m from the centre, as the #316 bench, at the rig's cutting
+ * step bound (ticket 334: the drill law's step plus one 250 mm sample) with the drill far past the floor, so every sample it reaches clears. W comes
  * from a bench-only drill-gear source, as the TD's runs did. Each step is timed through
  * `applyCommand`; the cells it touched are counted afterwards from the densities.
  */
 import { loadFeatures } from '../src/features'
-import { MAX_STEP_MM_PER_TICK } from '../src/constants/balance'
 import { DENSITY_CELL_UNITS, TERRAIN_EDIT_UNITS_PER_TICK } from '../src/constants/terrainBudget'
 import { withRegistrations } from '../src/registries/registrar'
 import type { SliceDefinition } from '../src/registries/sliceDefinition'
 import type { AuthorityState } from '../src/systems/authority/authorityState'
 import { createScriptedSession, PARAMS, poseAbove } from '../src/systems/authority/scriptedSession'
+import { stepBoundsAt } from '../src/systems/authority/stepBoundRead'
 import { NO_DRIVE } from '../src/systems/vehicle/driveSigns'
 import { FACING } from '../src/systems/vehicle/vehiclePose'
 import { cellDensitySum } from '../src/systems/world/cellYield'
@@ -44,6 +44,7 @@ function sideCellsSlice(sideCells: number): SliceDefinition {
 interface StepRun {
   timesMs: number[]
   cellsPerTick: number[]
+  stepMm: number
 }
 
 function cutLevel(): StepRun {
@@ -51,10 +52,11 @@ function cutLevel(): StepRun {
   for (const payload of FLOOR_BOUND) session.submit(0, { type: 'debug.setUpgrade', payload })
   const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.right)
   session.submit(0, { type: 'reportPose', payload: { ...payload, ...START } })
-  const run: StepRun = { timesMs: [], cellsPerTick: [] }
+  const stepMm = stepBoundsAt(session.state(), 'p1').cuttingMm
+  const run: StepRun = { timesMs: [], cellsPerTick: [], stepMm }
   for (let tick = 1; tick <= STEPS; tick++) {
     session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
-    const x = START.x + MAX_STEP_MM_PER_TICK * tick
+    const x = START.x + stepMm * tick
     const before = session.state()
     const started = performance.now()
     session.submit(tick, { type: 'drillStep', payload: { x, y: START.y, drive: NO_DRIVE } })
@@ -87,6 +89,7 @@ function benchAtWidth(sideCells: number): StepRun {
     return {
       timesMs: runs.flatMap((run) => run.timesMs),
       cellsPerTick: runs.flatMap((run) => run.cellsPerTick),
+      stepMm: runs[0].stepMm,
     }
   })
 }
@@ -112,7 +115,7 @@ const wide = benchAtWidth(5)
 console.log(
   JSON.stringify({
     bench: 'drillStep',
-    stepMm: MAX_STEP_MM_PER_TICK,
+    stepMm: bare.stepMm,
     bare: reportOf(2, bare),
     wide: reportOf(7, wide),
     budget: BUDGET,
