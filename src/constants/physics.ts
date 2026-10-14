@@ -105,13 +105,13 @@ export const MAX_PHYSICS_SUBSTEPS = 4
  * The kinematic grid sweep (TD scope a on #316, ticket 334) walks the body's leading face forward
  * this far at a time, one density sample, so no solid sample's contour fits between two probes.
  */
-export const KINEMATIC_SWEEP_PROBE_M = 0.25
+export const KINEMATIC_SWEEP_PROBE_M = 1 / 4
 
 /**
  * The sweep's probes sit this far inside the body's sides, so a body resting on a floor or rubbing
  * a bore's wall slides along it instead of stopping on it.
  */
-export const KINEMATIC_SWEEP_INSET_M = 0.05
+export const KINEMATIC_SWEEP_INSET_M = 1 / 20
 
 /**
  * The bore strut's plank (ticket 379, Content's strut bore on #310: "a ledge the miner can land
@@ -122,4 +122,4 @@ export const KINEMATIC_SWEEP_INSET_M = 0.05
 export const STRUT_PLANK_LENGTH = 2
 
 /** The plank's thickness, m: more than `GROUND_PROBE_DEPTH`, so a rig resting on it is grounded. */
-export const STRUT_PLANK_THICKNESS = 0.25
+export const STRUT_PLANK_THICKNESS = 1 / 4

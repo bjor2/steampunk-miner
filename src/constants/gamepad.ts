@@ -11,4 +11,4 @@ export const PAD_PRESS_VALUE = 0.5
  */
 export const PAD_RELEASE_VALUE = 0.35
 /** Inside this share of its travel the right stick is idle and the gun fires along the facing. */
-export const PAD_AIM_DEADZONE = 0.25
+export const PAD_AIM_DEADZONE = 1 / 4
