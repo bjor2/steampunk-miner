@@ -14,50 +14,40 @@
  * ahead along the velocity and the drill's facing (tickets 330 and 336). A chunk whose neighbours
  * changed only away from its halo's edge keeps its mesh. A frame where nothing changed allocates
  * nothing.
+ *
+ * With the chunk worker up (TD scope c2 on #316, ticket 337) the same picks become worker jobs and
+ * the frame only turns fresh results into meshes (`chunkJobStream.ts`); the generation and the tile
+ * batches leave the main thread. Without it (node, the dev server, a failed worker) they are built
+ * here, from the same pure `buildChunkMeshParts`.
  */
-import {
-  Mesh,
-  type DataTexture,
-  type Group,
-  type InstancedBufferGeometry,
-  type ShaderMaterial,
-} from 'three'
+import type { Group, ShaderMaterial } from 'three'
+import type { ChunkWorkerPort } from '../shell/chunkWorkerPort'
 import { prefetchLeadSeconds } from '../systems/render/chunkBuildBudget'
 import { aheadChunksOf, chunkNeedsOf, type ChunkNeed } from './chunkBuildNeeds'
+import {
+  chunkJobsOf,
+  forgetChunkJobs,
+  isJobStreamDone,
+  isWorkerMeshing,
+  postChunkJobs,
+  readChunkResults,
+  type ChunkJobs,
+  type MeshPartsSink,
+} from './chunkJobStream'
 import { buildsPerFrameOf, streamChunkFrame } from './chunkStreamFrame'
+import { chunkMeshOf, disposeChunkMesh, showBlocks, type ChunkMesh } from './chunkMeshGeometry'
+import { buildChunkMeshParts } from '../systems/render/chunkMeshParts'
 import {
-  densityTextureOf,
-  emptyInstances,
-  geometryOf,
-  INSTANCE_ATTRIBUTES,
-} from './chunkMeshGeometry'
-import {
-  buildChunkTileBatch,
-  NO_REFRACTORY_CELLS,
-  type ChunkTileBatch,
-} from '../systems/render/chunkTileBatch'
-import { refractoryCellsOf } from '../systems/render/refractoryCells'
-import { NO_CASING } from '../systems/world/chunkDelta'
-import { chunkDensityHaloOf } from '../systems/render/densityHalo'
-import type { ChunkViewVersion } from '../systems/render/chunkViewVersion'
-import {
-  copyShownBlocks,
   drawnBlockCountOf,
   gateBitsOfDrawnTile,
   shownChunksOf,
   visibleGroundBlocksAround,
   type ShownChunk,
-  type TileInstances,
 } from '../systems/render/groundBlocks'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { PlanetParams } from '../systems/world/planetParams'
 import { chunkKey, chunkOfTile, firstTileOfChunk, type TilePoint } from '../systems/world/tileGrid'
-import {
-  currentCasingOfChunk,
-  currentDensityOfChunk,
-  materialCellsOfChunk,
-  type WorldState,
-} from '../systems/world/worldState'
+import type { WorldState } from '../systems/world/worldState'
 
 /** What the terrain should show this frame; the caller reuses one object across frames. */
 export interface TerrainView {
@@ -81,23 +71,9 @@ export interface ChunkMeshPool {
   builtChunkCount(): number
   /** A drawn tile's gate bits, or null where no tile is drawn now (ticket 299 debug reads). */
   gateBitsAt(tile: TilePoint): number | null
+  /** The chunk worker builds the meshes now (ticket 337), not the main thread. */
+  isWorkerMeshing(): boolean
   dispose(): void
-}
-
-interface ChunkMesh {
-  cx: number
-  cy: number
-  mesh: Mesh
-  density: DataTexture
-  /** The density halo the texture shows, kept to check its neighbours' edges. */
-  halo: Uint8Array
-  /** The pool frame it was built in. */
-  builtFrame: number
-  version: ChunkViewVersion
-  batch: ChunkTileBatch
-  /** The instances the mesh draws: the tiles of the shown blocks, bound to its geometry. */
-  drawn: TileInstances
-  blockMask: number
 }
 
 interface PoolState {
@@ -105,6 +81,10 @@ interface PoolState {
   visible: ShownChunk[]
   /** Chunks ahead of the view, built with the builds left over (no block shown). */
   ahead: ShownChunk[]
+  /** The visible and ahead chunks by key: the ones the pool keeps a mesh for. */
+  kept: Map<string, ShownChunk>
+  /** The chunk worker and its jobs, or null where meshes are built on the main thread. */
+  jobs: ChunkJobs | null
   /** Frames synced so far: the clock of the rebuild cap. */
   frame: number
   /** Chunks that needed a build last frame: the queue the prefetch lead outruns. */
@@ -117,11 +97,18 @@ interface PoolState {
   isUpToDate: boolean
 }
 
-export function createChunkMeshPool(parent: Group, material: ShaderMaterial): ChunkMeshPool {
+/** `worker` builds the meshes off the main thread once it is ready; null builds them here. */
+export function createChunkMeshPool(
+  parent: Group,
+  material: ShaderMaterial,
+  worker: ChunkWorkerPort | null,
+): ChunkMeshPool {
   const pool: PoolState = {
     meshes: new Map(),
     visible: [],
     ahead: [],
+    kept: new Map(),
+    jobs: worker === null ? null : chunkJobsOf(worker),
     frame: 0,
     queueLength: 0,
     tileX: Number.NaN,
@@ -144,6 +131,7 @@ export function createChunkMeshPool(parent: Group, material: ShaderMaterial): Ch
     drawnBlockCount: () => countDrawnBlocks(pool),
     builtChunkCount: () => pool.meshes.size,
     gateBitsAt: (tile) => gateBitsOfTile(pool, tile),
+    isWorkerMeshing: () => isWorkerMeshing(pool.jobs),
     dispose: () => dropAll(pool, parent),
   }
 }
@@ -185,6 +173,7 @@ function chooseVisible(pool: PoolState, parent: Group, view: TerrainView): void 
   const blocks = visibleGroundBlocksAround(view.centre, view.viewRadius, view.params.radiusTiles)
   pool.visible = shownChunksOf(blocks)
   pool.ahead = aheadChunksOf(view, prefetchLeadSeconds(pool.queueLength, buildsPerFrameOf(view)))
+  pool.kept = keptChunksOf(pool.visible, pool.ahead)
   dropHidden(pool, parent)
   showVisibleBlocks(pool)
 }
@@ -197,20 +186,19 @@ function showVisibleBlocks(pool: PoolState): void {
   }
 }
 
-function showBlocks(chunk: ChunkMesh, blockMask: number): void {
-  chunk.blockMask = blockMask
-  copyShownBlocks(chunk.batch, blockMask, chunk.drawn)
-  const geometry = chunk.mesh.geometry as InstancedBufferGeometry
-  for (const name of INSTANCE_ATTRIBUTES) geometry.getAttribute(name).needsUpdate = true
-  geometry.instanceCount = chunk.drawn.count
-  // A chunk with no ground in view (space, a cave) keeps its version but issues no draw call.
-  chunk.mesh.visible = chunk.drawn.count > 0
+/** Visible chunks win over ahead ones: theirs is the block mask that shows. */
+function keptChunksOf(
+  visible: readonly ShownChunk[],
+  ahead: readonly ShownChunk[],
+): Map<string, ShownChunk> {
+  const kept = new Map<string, ShownChunk>()
+  for (const shown of [...ahead, ...visible]) kept.set(chunkKey(shown.cx, shown.cy), shown)
+  return kept
 }
 
 function dropHidden(pool: PoolState, parent: Group): void {
-  const wanted = new Set([...pool.visible, ...pool.ahead].map(({ cx, cy }) => chunkKey(cx, cy)))
   for (const [key, chunk] of pool.meshes) {
-    if (wanted.has(key)) continue
+    if (pool.kept.has(key)) continue
     disposeChunkMesh(parent, chunk)
     pool.meshes.delete(key)
   }
@@ -219,6 +207,7 @@ function dropHidden(pool: PoolState, parent: Group): void {
 function dropAll(pool: PoolState, parent: Group): void {
   for (const chunk of pool.meshes.values()) disposeChunkMesh(parent, chunk)
   pool.meshes.clear()
+  forgetChunkJobs(pool.jobs)
   pool.isUpToDate = false
 }
 
@@ -229,11 +218,40 @@ function rebuildStale(
   material: ShaderMaterial,
   view: TerrainView,
 ): boolean {
+  const sink = meshPartsSinkOf(pool, parent, material)
+  if (isWorkerMeshing(pool.jobs)) return streamThroughWorker(pool, pool.jobs, view, sink)
+  return streamOnMainThread(pool, view, sink)
+}
+
+/** The worker's results first, so the needs see the meshes they made; then the frame's jobs. */
+function streamThroughWorker(
+  pool: PoolState,
+  jobs: ChunkJobs,
+  view: TerrainView,
+  sink: MeshPartsSink,
+): boolean {
+  readChunkResults(jobs, sink)
   const needs = chunkNeedsOf(pool, view)
   pool.queueLength = needs.length
-  const build = (need: ChunkNeed) =>
-    replaceChunkMesh(pool, parent, need.key, buildChunkMesh(material, view, need, pool.frame))
+  postChunkJobs(jobs, needs, pool.frame, view)
+  return isJobStreamDone(jobs, needs)
+}
+
+function streamOnMainThread(pool: PoolState, view: TerrainView, sink: MeshPartsSink): boolean {
+  const needs = chunkNeedsOf(pool, view)
+  pool.queueLength = needs.length
+  const build = ({ key, cx, cy, version }: ChunkNeed) =>
+    sink(key, { version, frame: pool.frame }, buildChunkMeshParts(view.params, view.world, cx, cy))
   return streamChunkFrame(needs, pool.frame, view, build)
+}
+
+/** A chunk the view stopped keeping while its parts were built gets no mesh. */
+function meshPartsSinkOf(pool: PoolState, parent: Group, material: ShaderMaterial): MeshPartsSink {
+  return (key, built, parts) => {
+    const shown = pool.kept.get(key)
+    if (shown === undefined) return
+    replaceChunkMesh(pool, parent, key, chunkMeshOf(material, shown, built, parts))
+  }
 }
 
 function replaceChunkMesh(pool: PoolState, parent: Group, key: string, next: ChunkMesh): void {
@@ -241,60 +259,4 @@ function replaceChunkMesh(pool: PoolState, parent: Group, key: string, next: Chu
   if (current !== undefined) disposeChunkMesh(parent, current)
   pool.meshes.set(key, next)
   parent.add(next.mesh)
-}
-
-function buildChunkMesh(
-  material: ShaderMaterial,
-  view: TerrainView,
-  { shown, version }: ChunkNeed,
-  builtFrame: number,
-): ChunkMesh {
-  const { cx, cy, blockMask } = shown
-  const { params, world } = view
-  const halo = chunkDensityHaloOf((x, y) => currentDensityOfChunk(world, params, x, y), cx, cy)
-  const batch = buildChunkTileBatch(
-    params,
-    cx,
-    cy,
-    materialCellsOfChunk(world, params, cx, cy),
-    halo,
-    refractoryCellsOfChunk(world, cx, cy),
-  )
-  const density = densityTextureOf(halo)
-  const drawn = emptyInstances()
-  const mesh = new Mesh(geometryOf(drawn), material)
-  mesh.position.set(firstTileOfChunk(cx), firstTileOfChunk(cy), 0)
-  // Culled by the view circle above; three's own test would use the unit quad's bounds.
-  mesh.frustumCulled = false
-  // One material draws every chunk; each hands it its own density just before drawing.
-  mesh.onBeforeRender = () => {
-    material.uniforms.uDensity.value = density
-    material.uniformsNeedUpdate = true
-  }
-  const chunk: ChunkMesh = {
-    cx,
-    cy,
-    mesh,
-    density,
-    halo,
-    builtFrame,
-    version,
-    batch,
-    drawn,
-    blockMask: Number.NaN,
-  }
-  showBlocks(chunk, blockMask)
-  return chunk
-}
-
-/** The cells to draw as refractory lining (#113); none, without a copy, for an unlined chunk. */
-function refractoryCellsOfChunk(world: WorldState, cx: number, cy: number): Uint8Array {
-  const casing = currentCasingOfChunk(world, cx, cy)
-  return casing === NO_CASING ? NO_REFRACTORY_CELLS : refractoryCellsOf(casing)
-}
-
-function disposeChunkMesh(parent: Group, chunk: ChunkMesh): void {
-  parent.remove(chunk.mesh)
-  chunk.mesh.geometry.dispose()
-  chunk.density.dispose()
 }

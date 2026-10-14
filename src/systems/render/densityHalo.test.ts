@@ -3,7 +3,12 @@ import { clearDisc } from '../world/groundEdit'
 import { planetParamsFor } from '../world/planetParams'
 import { CHUNK_SIZE } from '../world/tileGrid'
 import { currentDensityOfChunk, EMPTY_WORLD, type WorldState } from '../world/worldState'
-import { chunkViewVersionOf, isOwnChunkSame, isSameChunkView } from './chunkViewVersion'
+import {
+  chunkViewVersionOf,
+  isHaloEdgeCurrentSince,
+  isOwnChunkSame,
+  isSameChunkView,
+} from './chunkViewVersion'
 import { chunkDensityHaloOf, isHaloEdgeCurrent } from './densityHalo'
 
 // Edge-aware chunk views (TD scope on #316, ticket 330): a chunk's mesh reads its right, upper and
@@ -41,5 +46,26 @@ describe('edge-aware chunk view (ticket 330)', () => {
   it('makes it stale when the cut reaches the first row of the chunk above', () => {
     const world = cutAt(16_000, rowMm + CHUNK_SIZE * 1000 + 300)
     expect(isHaloEdgeCurrent(halo, densityIn(world), CHUNK.cx, CHUNK.cy)).toBe(false)
+  })
+
+  it('reads only the neighbours whose delta changed since the halo was built (ticket 337)', () => {
+    const world = cutAt(neighbourLeft + 16_000, rowMm + 16_000)
+    const read: string[] = []
+    const densityOf = (cx: number, cy: number) => {
+      read.push(`${cx},${cy}`)
+      return densityIn(world)(cx, cy)
+    }
+    const built = chunkViewVersionOf(EMPTY_WORLD, CHUNK.cx, CHUNK.cy)
+    const now = chunkViewVersionOf(world, CHUNK.cx, CHUNK.cy)
+    expect(isHaloEdgeCurrentSince(halo, densityOf, CHUNK.cx, CHUNK.cy, built, now)).toBe(true)
+    expect(read).toEqual([`${CHUNK.cx + 1},${CHUNK.cy}`])
+  })
+
+  it('finds the edge stale through the neighbour that changed (ticket 337)', () => {
+    const world = cutAt(neighbourLeft + 300, rowMm + 16_000)
+    const built = chunkViewVersionOf(EMPTY_WORLD, CHUNK.cx, CHUNK.cy)
+    const now = chunkViewVersionOf(world, CHUNK.cx, CHUNK.cy)
+    const isCurrent = isHaloEdgeCurrentSince(halo, densityIn(world), CHUNK.cx, CHUNK.cy, built, now)
+    expect(isCurrent).toBe(false)
   })
 })

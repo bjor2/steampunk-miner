@@ -52,11 +52,25 @@ export function spendFrameBudget<W>(
   runTimed: (item: W) => number,
   budgetMs: number,
 ): number {
+  let next = 0
+  return spendFrameBudgetOn(() => (next < work.length ? work[next++] : null), runTimed, budgetMs)
+}
+
+/**
+ * The same budget over work taken one item at a time (results arriving from the chunk worker,
+ * ticket 337): `takeNext` is only asked while the frame still has room, and null ends the frame.
+ */
+export function spendFrameBudgetOn<W>(
+  takeNext: () => W | null,
+  runTimed: (item: W) => number,
+  budgetMs: number,
+): number {
   let spentMs = 0
   let largestMs = 0
   let ran = 0
-  for (const item of work) {
-    if (ran > 0 && spentMs + largestMs > budgetMs) break
+  while (ran === 0 || spentMs + largestMs <= budgetMs) {
+    const item = takeNext()
+    if (item === null) break
     const costMs = runTimed(item)
     spentMs += costMs
     largestMs = Math.max(largestMs, costMs)

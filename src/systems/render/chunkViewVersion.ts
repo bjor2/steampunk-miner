@@ -7,6 +7,12 @@
 import type { ChunkDelta } from '../world/chunkDelta'
 import { chunkKey } from '../world/tileGrid'
 import type { WorldState } from '../world/worldState'
+import {
+  isCornerCurrent,
+  isRightEdgeCurrent,
+  isTopEdgeCurrent,
+  type ChunkDensity,
+} from './densityHalo'
 
 export type ChunkViewVersion = readonly (ChunkDelta | undefined)[]
 
@@ -30,4 +36,25 @@ export function isSameChunkView(a: ChunkViewVersion, b: ChunkViewVersion): boole
  */
 export function isOwnChunkSame(built: ChunkViewVersion, now: ChunkViewVersion): boolean {
   return built[0] === now[0]
+}
+
+/**
+ * `isHaloEdgeCurrent`, reading only the neighbours whose delta changed since the halo was built
+ * (ticket 337): an unchanged delta is an unchanged density, and reading an untouched neighbour
+ * would generate it on the main thread, which is the chunk worker's job now.
+ */
+export function isHaloEdgeCurrentSince(
+  halo: Uint8Array,
+  densityOf: ChunkDensity,
+  cx: number,
+  cy: number,
+  built: ChunkViewVersion,
+  now: ChunkViewVersion,
+): boolean {
+  const isKept = (neighbour: number) => built[neighbour] === now[neighbour]
+  return (
+    (isKept(1) || isRightEdgeCurrent(halo, densityOf(cx + 1, cy))) &&
+    (isKept(2) || isTopEdgeCurrent(halo, densityOf(cx, cy + 1))) &&
+    (isKept(3) || isCornerCurrent(halo, densityOf(cx + 1, cy + 1)))
+  )
 }

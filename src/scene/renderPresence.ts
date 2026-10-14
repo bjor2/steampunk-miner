@@ -18,6 +18,8 @@ export const renderPresence = {
   strataBands: 0,
   /** Milliseconds the terrain's sync took this frame. */
   terrainMs: 0,
+  /** The chunk worker builds the terrain's meshes (ticket 337); false while they are built here. */
+  isTerrainWorkerMeshing: false,
   groundColliders: 0,
   renderScale: 1,
   /** The lowest scale the adaptive rule may step to on this output (#173 tiers). */

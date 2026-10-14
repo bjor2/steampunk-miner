@@ -43,7 +43,7 @@ function isGeneratedOn(params: PlanetParams): (cx: number, cy: number) => boolea
 }
 
 /** The milliseconds `run` took: the budget is spent on the main thread's own clock. */
-function timedMs(run: () => void): number {
+export function timedMs(run: () => void): number {
   const started = performance.now()
   run()
   return performance.now() - started

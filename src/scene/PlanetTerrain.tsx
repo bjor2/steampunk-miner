@@ -2,13 +2,15 @@
  * The planet's tiles: the chunk meshes under the camera, lit by the vehicle's headlamp. Per-frame
  * work stays out of React: the pool and the material are created once and updated in `useFrame`.
  * The meshes sit at their chunk corners under the world root; the shader learns the render origin
- * (ticket 339), so a moved origin rebuilds none of them.
+ * (ticket 339), so a moved origin rebuilds none of them. The chunk worker (ticket 337) lives as long
+ * as the pool and builds its meshes' parts off the main thread.
  */
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import type { Group, OrthographicCamera } from 'three'
 import { writeArtefactLook } from '../store/artefactActions'
 import { readPlanetWorld, useGameStore } from '../store/gameStore'
+import { startChunkWorker } from '../shell/chunkWorkerPort'
 import { viewRadiusOf } from '../systems/render/visibleChunks'
 import { planetParamsFor } from '../systems/world/planetParams'
 import { EMPTY_WORLD } from '../systems/world/worldState'
@@ -40,12 +42,14 @@ export function PlanetTerrain() {
 
   useEffect(() => {
     if (group.current === null) return
-    const created = createChunkMeshPool(group.current, material)
+    const worker = startChunkWorker()
+    const created = createChunkMeshPool(group.current, material, worker)
     pool.current = created
     groundGatePresence.gateBitsAt = created.gateBitsAt
     return () => {
       groundGatePresence.gateBitsAt = NO_DRAWN_GROUND
       created.dispose()
+      worker?.terminate()
       material.dispose()
     }
   }, [material])
@@ -84,11 +88,15 @@ function syncTimed(pool: ChunkMeshPool, view: TerrainView): void {
   renderPresence.terrainMs = performance.now() - started
 }
 
-/** The #38 visible-block budget, read by the render stats and the perf log; built meshes (#121). */
+/**
+ * The #38 visible-block budget, read by the render stats and the perf log; built meshes (#121);
+ * whether the chunk worker builds them (ticket 337).
+ */
 function recordGroundDrawn(pool: ChunkMeshPool): void {
   renderPresence.groundBlocks = pool.drawnBlockCount()
   renderPresence.drawnChunks = pool.drawnChunkCount()
   renderPresence.builtChunks = pool.builtChunkCount()
+  renderPresence.isTerrainWorkerMeshing = pool.isWorkerMeshing()
 }
 
 /** Its planet and world are placeholders, replaced before the pool first reads them. */

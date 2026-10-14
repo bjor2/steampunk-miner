@@ -9,11 +9,11 @@ import type { ChunkBuildNeed } from '../systems/render/chunkBuilds'
 import { chunksAheadOf } from '../systems/render/chunkPrefetch'
 import {
   chunkViewVersionOf,
+  isHaloEdgeCurrentSince,
   isOwnChunkSame,
   isSameChunkView,
   type ChunkViewVersion,
 } from '../systems/render/chunkViewVersion'
-import { isHaloEdgeCurrent } from '../systems/render/densityHalo'
 import type { ShownChunk } from '../systems/render/groundBlocks'
 import type { Vector2 } from '../systems/vehicle/localFrame'
 import type { PlanetParams } from '../systems/world/planetParams'
@@ -110,7 +110,8 @@ function isCurrentAfterAdopting(
   if (isSameChunkView(chunk.version, version)) return true
   if (!isOwnChunkSame(chunk.version, version)) return false
   const densityOf = (x: number, y: number) => currentDensityOfChunk(view.world, view.params, x, y)
-  if (!isHaloEdgeCurrent(chunk.halo, densityOf, chunk.cx, chunk.cy)) return false
+  const { halo, cx, cy } = chunk
+  if (!isHaloEdgeCurrentSince(halo, densityOf, cx, cy, chunk.version, version)) return false
   chunk.version = version
   return true
 }

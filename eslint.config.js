@@ -174,7 +174,12 @@ const SLICES = readdirSync('src/features', { withFileTypes: true })
 const KERNEL_DIRS = readdirSync('src', { withFileTypes: true })
   .filter((entry) => entry.isDirectory() && entry.name !== 'features')
   .map((entry) => `./src/${entry.name}`)
-const COMPOSITION_ROOTS = ['./src/bootstrap.ts', './src/testSetup.ts', './scripts']
+const COMPOSITION_ROOTS = [
+  './src/bootstrap.ts',
+  './src/chunkWorker.ts',
+  './src/testSetup.ts',
+  './scripts',
+]
 const SLICE_ZONES = SLICES.map((slice) => ({
   target: `./src/features/!(${slice})/**/*`,
   from: `./src/features/${slice}`,

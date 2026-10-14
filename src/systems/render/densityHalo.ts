@@ -20,17 +20,34 @@ export function isHaloEdgeCurrent(
   cx: number,
   cy: number,
 ): boolean {
-  const right = densityOf(cx + 1, cy)
-  const above = densityOf(cx, cy + 1)
-  const top = CHUNK_SAMPLE_SIDE * DENSITY_HALO_SIDE
+  return (
+    isRightEdgeCurrent(halo, densityOf(cx + 1, cy)) &&
+    isTopEdgeCurrent(halo, densityOf(cx, cy + 1)) &&
+    isCornerCurrent(halo, densityOf(cx + 1, cy + 1))
+  )
+}
+
+/** The halo's last column still holds the right neighbour's first one. */
+export function isRightEdgeCurrent(halo: Uint8Array, right: Uint8Array): boolean {
   for (let lsy = 0; lsy < CHUNK_SAMPLE_SIDE; lsy++) {
     if (halo[lsy * DENSITY_HALO_SIDE + CHUNK_SAMPLE_SIDE] !== right[sampleIndexOf(0, lsy)])
       return false
   }
+  return true
+}
+
+/** The halo's top row still holds the upper neighbour's first one. */
+export function isTopEdgeCurrent(halo: Uint8Array, above: Uint8Array): boolean {
+  const top = CHUNK_SAMPLE_SIDE * DENSITY_HALO_SIDE
   for (let lsx = 0; lsx < CHUNK_SAMPLE_SIDE; lsx++) {
     if (halo[top + lsx] !== above[lsx]) return false
   }
-  return halo[top + CHUNK_SAMPLE_SIDE] === densityOf(cx + 1, cy + 1)[0]
+  return true
+}
+
+/** The halo's corner still holds the upper-right neighbour's first sample. */
+export function isCornerCurrent(halo: Uint8Array, corner: Uint8Array): boolean {
+  return halo[CHUNK_SAMPLE_SIDE * DENSITY_HALO_SIDE + CHUNK_SAMPLE_SIDE] === corner[0]
 }
 
 /**

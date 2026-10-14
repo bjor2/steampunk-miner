@@ -51,6 +51,9 @@ export default defineConfig({
   // Relative asset URLs: Electron loads dist/index.html from file://, where "/assets/..." would
   // point at the filesystem root. The browser build is unaffected.
   base: './',
+  // The chunk worker (ticket 337) is a module worker: its graph loads every slice, and only the ES
+  // format can split that the way the page's own bundle does.
+  worker: { format: 'es' },
   server: {
     port: 5173,
     // electron:dev waits on this exact port.

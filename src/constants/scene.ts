@@ -191,6 +191,13 @@ export const CHUNK_BUILDS_PER_FRAME_MAX = 4
  */
 export const CHUNK_REBUILD_MIN_FRAMES = 4
 
+/**
+ * Chunk-worker jobs out at once (TD scope c2 on #316, ticket 337): two frames of the most builds
+ * a frame asks for. A cold chunk costs the worker about 2.5-3.5 ms (generation plus mesh, the TD's
+ * measurements), so a chunk coming into view queues behind at most about 2 frames of others.
+ */
+export const CHUNK_WORKER_JOBS_MAX = 2 * CHUNK_BUILDS_PER_FRAME_MAX
+
 /** The frame rate the streaming numbers of TD scope c1 on #316 are worked at (ticket 336). */
 export const CHUNK_STREAM_FRAMES_PER_SECOND = 60
 
