@@ -9,7 +9,10 @@
  *   With it on the motor also follows the drill (TD scope 0, ticket 333): while the cut gate is
  *   open the drill law's speed sets the speed along the facing, and otherwise the engine drives at
  *   travel parity's top speed. The cut gate rides on the swept cut's cursor, so it is saved and
- *   digested only once a step has been sent.
+ *   digested only once a step has been sent. With it on the body is also clamped to the rig's
+ *   stats-derived step bound and its wait-for-cut window widens to it (TD scope a, ticket 334);
+ *   the authority checks steps and reports against that bound whatever the flag, and the world
+ *   steps in substeps at any speed, which stays one a tick at the 18 m/s clamp it keeps off.
  */
 export interface DevFlags {
   readonly 'drill.sweptCut': boolean

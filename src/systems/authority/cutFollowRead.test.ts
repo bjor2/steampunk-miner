@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CUT_GATE_HOLD_TICKS, MAX_STEP_MM_PER_TICK } from '../../constants/balance'
+import { CUT_GATE_HOLD_TICKS } from '../../constants/balance'
 import { blockHardness } from '../economy/oreEconomy'
 import { cutStepMmOf, metresPerSecondOfStep } from '../vehicle/cutSpeed'
 import { NO_DRIVE } from '../vehicle/driveSigns'
@@ -9,6 +9,7 @@ import { statsOfVehicle } from '../vehicle/vehicleState'
 import { surfaceRowOfColumn } from '../world/tileGrid'
 import { cutFollowAt, type CutFollowStep } from './cutFollowRead'
 import { createScriptedSession, PARAMS, poseAbove, type ScriptedSession } from './scriptedSession'
+import { stepBoundsAt } from './stepBoundRead'
 
 // The cut-follow's reads (ticket 333): the gate a drill step leaves on the cursor, and `vCut`.
 
@@ -100,14 +101,15 @@ describe('cut-follow reads (ticket 333)', () => {
     expect(idleAt(1 + CUT_GATE_HOLD_TICKS).cutGate).toBe(0)
   })
 
-  it('stays closed while the stamp grazes fresh rock beside a carved bore, at the pose bound', () => {
+  it('stays closed while the stamp grazes fresh rock beside a carved bore, at the travelling bound', () => {
     // A shaft 1.6 m wide down the column: the 1.9 m stamp's rim grazes fresh rock every tick.
     const session = sessionFacingDown()
     for (let metre = 0; metre <= 12; metre++) {
       const carve = { x: REST.x, y: REST.y - metre * 1000, radius: 800, amount: 255 }
       session.submit(0, { type: 'debug.carveCircle', payload: carve })
     }
-    const reads = descendReadingTheGate(session, MAX_STEP_MM_PER_TICK, 30)
+    const travelMm = stepBoundsAt(session.state(), 'p1').travellingMm
+    const reads = descendReadingTheGate(session, travelMm, 30)
     const cutTicks = session.events().filter((event) => event.type === 'DrillDamageDealt')
     expect(reads.every((read) => read.client === 0 && read.authority === 0)).toBe(true)
     expect(cutTicks.length).toBeGreaterThan(20)
