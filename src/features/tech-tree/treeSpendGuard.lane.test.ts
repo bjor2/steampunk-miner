@@ -12,7 +12,7 @@ import { ownsItem } from '../../systems/authority/loadoutRules'
 import type { ShopSpend } from '../../systems/bot/shopSpend'
 import { UPGRADE_IDS } from '../../systems/economy/economyDefinition'
 import type { UpgradeLevels } from '../../systems/economy/vehicleStats'
-import { INCOME_RATE_REGISTRY } from '../../systems/registries/incomeRates'
+import { INCOME_RATE_REGISTRY, type IncomeAnchors } from '../../systems/registries/incomeRates'
 import { entriesOf } from '../../systems/registries/seal'
 import { spendFamiliesOf } from '../../systems/registries/spendFamilies'
 import type { Scenario } from '../../systems/scenario'
@@ -36,6 +36,7 @@ import { familyShareRowsOf, familyShareTableOf, type SeedSpends } from './system
 import {
   failingVerdictsOf,
   incomeCapVerdictsOf,
+  milestoneIncomeCapVerdictsOf,
   type IncomeCapVerdict,
   type PlanetVisit,
   type SeedIncome,
@@ -75,6 +76,10 @@ import {
 // items delivered nothing. Beside the runs, the loadout yield cap (GD lock on #245, ticket 266): a
 // full loadout at max Mark yields no more than the five lanes' maximum on P10/P20/P40/P60, the
 // Aetheric lane adding zero.
+// `npm run balance:tree -- --milestones` runs only the Mark milestone cap (GD lock on #256, ticket
+// 278) on the same runs: every income item at Mark 9 and past, fully stacked, its sibling-link on
+// and the sibling slotted and ready, owned whether or not the bot bought it, is held to the same
+// 15% of a full hold a trip on P10, P20, P40 and P60 at the bot's levels, on the median of the seeds.
 // Headless, with no run log kept: the lane reads the bot's spend records, a summary fold's track
 // levels per planet, and which anchors the run opened or owns. The runs take hours, so this is a
 // lane (vite.config.ts leaves it out unless it is named):
@@ -105,6 +110,17 @@ interface SeedRun {
   isFinished: boolean
 }
 
+/** Each item at full stack whatever the run bought: the milestone cap's premise (#256). */
+const EVERY_INCOME_ITEM_OWNED: IncomeAnchors = { isRowLive: () => true, isItemOwned: () => true }
+
+let playedSeedRuns: SeedRun[] | null = null
+
+/** The seeds' runs, played once for every describe that reads them. */
+function seedRunsOnce(): SeedRun[] {
+  playedSeedRuns ??= PACING_WORLD_SEEDS['bot-slice'].map(playSeedToLastPlanet)
+  return playedSeedRuns
+}
+
 describe('tech tree: spend guard of the pacing bot to planet 60', () => {
   let seedRuns: SeedRun[] = []
   let verdicts: TreeShareVerdict[] = []
@@ -113,7 +129,7 @@ describe('tech tree: spend guard of the pacing bot to planet 60', () => {
   let deliveredVerdicts: DeliveredShareVerdict[] = []
 
   beforeAll(() => {
-    seedRuns = PACING_WORLD_SEEDS['bot-slice'].map(playSeedToLastPlanet)
+    seedRuns = seedRunsOnce()
     verdicts = treeShareVerdictsOf(seedRuns.map((seedRun) => seedRun.shopSpend))
     pinVerdicts = sharePinVerdictsOf(seedRuns.map(seedSpendsOf))
     incomeVerdicts = incomeCapVerdictsOf(seedRuns.map(seedIncomeOf))
@@ -140,6 +156,25 @@ describe('tech tree: spend guard of the pacing bot to planet 60', () => {
   it('keeps every income item within 15% of what the bot earned on each planet', () => {
     const misses = deliveredVerdicts.filter((verdict) => verdict.isOverCap)
     expect(misses.map((verdict) => `P${verdict.planetIndex} ${verdict.itemId}`)).toEqual([])
+  })
+})
+
+describe('tech tree: Mark milestones in the income cap of the pacing bot to planet 60', () => {
+  let milestoneVerdicts: IncomeCapVerdict[] = []
+
+  beforeAll(() => {
+    const seeds = seedRunsOnce().map((seedRun) => ({
+      ...seedIncomeOf(seedRun),
+      anchors: EVERY_INCOME_ITEM_OWNED,
+    }))
+    milestoneVerdicts = milestoneIncomeCapVerdictsOf(seeds)
+    console.log(
+      ['At Mark 9 with the sibling-links:', incomeCapTableOf(milestoneVerdicts)].join('\n'),
+    )
+  }, RUN_TIMEOUT_MS)
+
+  it('keeps every income item at Mark 9 with its sibling-link within 15% of a full hold a trip', () => {
+    expect(failingVerdictsOf(milestoneVerdicts).map(incomeMissOf)).toEqual([])
   })
 })
 
