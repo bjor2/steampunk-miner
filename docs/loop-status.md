@@ -247,4 +247,4 @@ re-sends a heartbeat every 10 minutes while a session runs, and publishes a full
 
 ## Priority list (14 Oct 2026)
 
-`PRIORITY_TICKETS` in `next-ticket.sh` now starts with **#393** (new player vehicle, casing driller art), then **#395** (upgrade workshop building art), so the next free dev slot claims it first.
+`PRIORITY_TICKETS` in `next-ticket.sh` now starts `393 397 396 395 398`: #393 (new player vehicle, casing driller art), #397 and #396, #395 (upgrade workshop building art), then #398 (service station art: charge, repair and sell). The next free dev slot claims them in that order.
