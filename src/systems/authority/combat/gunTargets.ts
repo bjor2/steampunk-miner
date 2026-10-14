@@ -16,6 +16,7 @@
  * and the line of fire is sampled every quarter tile with truncating integer steps.
  */
 import { MM_PER_METRE } from '../../../constants/physics'
+import { ECONOMY } from '../../economy/economy'
 import { gunFrontDeadConeDegrees } from '../../economy/gunStats'
 import type { TurretShape } from '../../registries/autoGuns'
 import { facingVectorOf, tileOfMillimetres } from '../../vehicle/vehiclePose'
@@ -44,6 +45,7 @@ const HALF_CONE_COS_SQ: Readonly<Record<number, Fraction>> = {
 }
 
 const DEAD_CONE: Fraction = halfConeCosSqOf(gunFrontDeadConeDegrees())
+const RANGE_CAP_MM = ECONOMY.gun.turretCaps.gunRangeCap * MM_PER_METRE
 /** A quarter tile: no cell the shot crosses is skipped by more than a corner. */
 const LINE_STEP_MM = MM_PER_METRE / 4
 
@@ -62,6 +64,11 @@ export function turretSightOf(
   isForwardConeOpen: boolean,
 ): TurretSight {
   return { terrain, target, rangeMm: shape.rangeTiles * MM_PER_METRE, isForwardConeOpen }
+}
+
+/** Some enemy within the turret's longest range: only then is a shot's shape worth reading. */
+export function isAnyEnemyWithinRangeCap(target: VehicleTarget, enemies: readonly Enemy[]) {
+  return enemies.some((enemy) => isWithinMm(target.position, enemy, RANGE_CAP_MM))
 }
 
 /** In reach and outside a closed forward cone, whatever lies between: a bounce may still find it. */

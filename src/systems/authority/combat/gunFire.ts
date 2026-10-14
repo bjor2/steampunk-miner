@@ -31,7 +31,7 @@ import { killEnemy } from './enemyDamage'
 import type { Terrain } from './enemyMovement'
 import { splitShotDamage } from './grapeShot'
 import { flushGunHitsOn, tallyGunHit } from './gunHits'
-import { turretSightOf } from './gunTargets'
+import { isAnyEnemyWithinRangeCap, turretSightOf } from './gunTargets'
 import { turretAimOf, type TurretAim } from './turretAim'
 import { knockedEnemy } from './turretKnock'
 import { turretShapeOf } from './turretShape'
@@ -79,10 +79,11 @@ function dueShotOf(
 ): TurretShot | null {
   if (!isGunDue(state, playerId, tick)) return null
   const target = vehicleTargetOf(state, playerId, tick)
-  return target === null ? null : aimedShotOf(state, terrain, target, tick)
+  if (target === null || !isAnyEnemyWithinRangeCap(target, state.combat.enemies)) return null
+  return aimedShotOf(state, terrain, target, tick)
 }
 
-/** The shape is read here, once per due shot, and nowhere else. */
+/** The shape is read here, once per due shot with an enemy in reach, and nowhere else. */
 function aimedShotOf(
   state: AuthorityState,
   terrain: Terrain,
