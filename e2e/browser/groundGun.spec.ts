@@ -2,7 +2,8 @@
  * The bore gun on a desktop in the preview build (ticket 314, the TD lock on #314 section 2): the
  * gauge panel shows once the gun is mounted, a held fire key fires at each `nextShotTick` and stops
  * when it comes up, and a canvas click fires through the same press. The tracer asks the kernel's
- * spray pool. The bought gun hangs on the rig at `hull.front` (ticket 315). State through
+ * spray pool. The bought gun hangs on the rig at `hull.front` (ticket 315), and each bought Armoury
+ * module rides it, its gilded plate shown once Mastered (ticket 321). State through
  * `steampunkDebug`, the run log and the DOM's test ids, never pixels.
  */
 import { expect, test, type Page } from '@playwright/test'
@@ -16,6 +17,10 @@ declare global {
 }
 
 const FIRE_GAUGE = 'ground-gun-fire-gauge'
+const LONG_BARREL = 'weapon.long_barrel'
+const LONG_BARREL_ASSET = 'vehicle-item-weapon-long-barrel'
+/** The long barrel's Mastered Mark 11 is researched by planet 42 (ticket 318's ladder). */
+const LONG_BARREL_MASTERED_PLANET = 42
 /** Long enough for a shot at the 45-tick cadence floor or a recovery in surface rock, at 60 ticks/s. */
 const HOLD_MS = 2500
 
@@ -44,6 +49,31 @@ test.describe('the bore gun on a desktop (ticket 314)', () => {
           partIds: ['t1-bore-mount', 't1-bore-barrel'],
         },
       ])
+    expect(errors).toEqual([])
+  })
+
+  test('hangs each bought module on the gun, its gilded plate only once Mastered (ticket 321)', async ({
+    page,
+  }) => {
+    const errors = await openDrawnGame(page)
+    await mountGun(page)
+    await ownModules(page, [LONG_BARREL, 'weapon.steam_sear'])
+    await expect
+      .poll(() => modulesOnGun(page))
+      .toEqual([
+        { assetId: LONG_BARREL_ASSET, attachId: 'hull.front', partIds: ['barrel-sleeve'] },
+        {
+          assetId: 'vehicle-item-weapon-steam-sear',
+          attachId: 'hull.front',
+          partIds: ['sear-block', 'sear-lever'],
+        },
+      ])
+    await researchThrough(page, LONG_BARREL_MASTERED_PLANET)
+    await expect
+      .poll(async () =>
+        (await modulesOnGun(page)).find((mount) => mount.assetId === LONG_BARREL_ASSET),
+      )
+      .toMatchObject({ partIds: ['barrel-sleeve', 'gilded-plate'] })
     expect(errors).toEqual([])
   })
 
@@ -96,6 +126,34 @@ function boreGunOnRig(page: Page) {
     const parts = window.steampunkDebug!.vehicleParts()
     if (!parts.ok) throw new Error(parts.problems.join('; '))
     return parts.mounted.filter((mount) => mount.assetId === 'vehicle-bore-gun')
+  })
+}
+
+function ownModules(page: Page, itemIds: readonly string[]): Promise<void> {
+  return page.evaluate((owned) => {
+    const result = window.steampunkDebug!.setVehicleLoadout({}, owned)
+    if (!result.ok) throw new Error(result.problems.join('; '))
+  }, itemIds)
+}
+
+function researchThrough(page: Page, planet: number): Promise<void> {
+  return page.evaluate((tier) => {
+    const result = window.steampunkDebug!.features['tech-tree'].jumpToDepth(tier) as {
+      ok: boolean
+      problems?: string[]
+    }
+    if (!result.ok) throw new Error((result.problems ?? []).join('; '))
+  }, planet)
+}
+
+/** The Armoury modules hung on the rig now, each with its part ids sorted. */
+function modulesOnGun(page: Page) {
+  return page.evaluate(() => {
+    const parts = window.steampunkDebug!.vehicleParts()
+    if (!parts.ok) throw new Error(parts.problems.join('; '))
+    return parts.mounted
+      .filter((mount) => mount.assetId.startsWith('vehicle-item-weapon-'))
+      .map((mount) => ({ ...mount, partIds: [...mount.partIds].sort() }))
   })
 }
 

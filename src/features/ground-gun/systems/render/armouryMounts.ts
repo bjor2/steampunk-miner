@@ -43,10 +43,11 @@ export interface BoughtModule {
   isMastered: boolean
 }
 
-/** The bought modules' quads in the barrel frame, split by what carries them. */
-export interface ModuleQuads {
-  barrel: AssetQuad[]
-  head: AssetQuad[]
+/** One bought module's asset at its mount, in the barrel frame. */
+export interface PlacedModule {
+  assetId: string
+  rides: MountRide
+  quads: AssetQuad[]
 }
 
 /** Mounted gear is authored untiered (#166): its one look. */
@@ -87,27 +88,23 @@ export function moduleItemIdsOn(gun: ArmouryGun): string[] {
  * The bought modules on `gun`, each at its mount in the barrel frame. `muzzleX` is the barrel's tip
  * from the trunnion, where a `muzzle` mount counts from.
  */
-export function moduleQuadsOf(
+export function placedModulesOf(
   art: ArtCatalogue,
   gun: ArmouryGun,
   bought: readonly BoughtModule[],
   muzzleX = 0,
-): ModuleQuads {
-  const quads = bought.flatMap((module) => placedOnGunOf(art, gun, module, bought, muzzleX))
-  return {
-    barrel: quads.filter((placed) => placed.rides === 'barrel').flatMap((placed) => placed.quads),
-    head: quads.filter((placed) => placed.rides === 'head').flatMap((placed) => placed.quads),
-  }
+): PlacedModule[] {
+  return bought.flatMap((module) => placedOnGunOf(art, gun, module, bought, muzzleX))
+}
+
+/** The modules a group carries: the turning barrel or the still head. */
+export function modulesRiding(placed: readonly PlacedModule[], rides: MountRide): PlacedModule[] {
+  return placed.filter((module) => module.rides === rides)
 }
 
 /** The far end of a barrel that rests along -X (the turret's): its leftmost edge. */
 export function barrelTipOf(barrel: readonly AssetQuad[]): number {
   return Math.min(...barrel.map((quad) => quad.centre[0] - quad.size[0] / 2))
-}
-
-interface PlacedModule {
-  rides: MountRide
-  quads: AssetQuad[]
 }
 
 /** The module at its point, or nothing when it has no mount on `gun`. */
@@ -123,7 +120,7 @@ function placedOnGunOf(
   if (mountId === undefined || mount?.gun !== gun) return []
   const point = mountPointOf(mountId, bought, muzzleX)
   const quads = shownQuadsOf(art, module).map((quad) => movedBy(quad, point))
-  return [{ rides: mount.rides, quads }]
+  return [{ assetId: slotItemAssetIdOf(module.itemId), rides: mount.rides, quads }]
 }
 
 /** The mount's point, moved out by every bought module that lengthens the gun past it. */

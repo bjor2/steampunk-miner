@@ -3,7 +3,8 @@
  * hangs `vehicle-bore-gun` at its attach use's point once the gun is mounted, so buying it shows
  * on the vehicle. The saddle renders through React, as it changes only when the gun is bolted on;
  * the barrel swings each frame towards the bearing the gun would fire along now, its turn on a ref
- * that never goes through React or the store. Listed in `steampunkDebug.vehicleParts().mounted`
+ * that never goes through React or the store. Every bought Armoury module rides the barrel at its
+ * mount (ticket 321), gilded once Mastered. Listed in `steampunkDebug.vehicleParts().mounted`
  * while on the car.
  */
 import { useFrame } from '@react-three/fiber'
@@ -14,6 +15,7 @@ import { showMountedParts } from '../../../scene/mountedPartsPresence'
 import { SHIPPED_ART } from '../../../scene/shippedArt'
 import { useGameStore } from '../../../store/gameStore'
 import type { PartMount } from '../../../systems/render/mountedPartLook'
+import { boughtModulesOfKey, readBoughtBoreModulesKey } from '../store/armouryReads'
 import { readBarrelBearing } from '../store/fireInput'
 import { readIsGunMounted } from '../store/fireTileReads'
 import {
@@ -24,6 +26,8 @@ import {
   stepBarrelTurn,
   type BoreGunQuads,
 } from '../systems/render/boreGunLook'
+import { modulesRiding, placedModulesOf } from '../systems/render/armouryMounts'
+import { ArmouryModules } from './ArmouryModules'
 
 export const BORE_GUN_PIECE_ID = 'ground-gun.bore-gun'
 
@@ -41,6 +45,13 @@ export function BoreGunPiece() {
 
 function MountedBoreGun({ mount }: { mount: PartMount }) {
   const quads = useMemo(() => boreGunQuadsOf(SHIPPED_ART, mount), [mount])
+  const modulesKey = useGameStore(readBoughtBoreModulesKey)
+  // Every bore mount rides the barrel (armouryMounts.json), so all of them turn with it.
+  const modules = useMemo(
+    () =>
+      modulesRiding(placedModulesOf(SHIPPED_ART, 'bore', boughtModulesOfKey(modulesKey)), 'barrel'),
+    [modulesKey],
+  )
   const barrel = useRef<Group>(null)
   const turn = useRef(REST_TURN)
   useEffect(() => showGunParts(mount, quads), [mount, quads])
@@ -57,6 +68,7 @@ function MountedBoreGun({ mount }: { mount: PartMount }) {
         {quads.barrel.map((quad) => (
           <PartQuadMesh key={quad.partId} quad={quad} maps={maps} baseZ={GUN_Z} />
         ))}
+        <ArmouryModules modules={modules} attachId={mount.attachId} baseZ={GUN_Z} />
       </group>
     </>
   )

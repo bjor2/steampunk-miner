@@ -15,8 +15,11 @@ import {
   barrelTipOf,
   GILDED_PLATE_PART_ID,
   moduleItemIdsOn,
-  moduleQuadsOf,
+  modulesRiding,
+  placedModulesOf,
+  type ArmouryGun,
   type BoughtModule,
+  type MountRide,
 } from './armouryMounts'
 
 const FIRE_DIRECTOR = 'weapon.fire_director'
@@ -27,6 +30,19 @@ const SLEEVE_REACH_M = 0.23
 
 function bought(itemId: string, isMastered = false): BoughtModule {
   return { itemId, isMastered }
+}
+
+/** The parts `gun`'s bought modules hang on the barrel and on the head, the way the pieces split them. */
+function moduleQuadsOf(
+  art: typeof SHIPPED_ART,
+  gun: ArmouryGun,
+  modules: BoughtModule[],
+  muzzleX = 0,
+) {
+  const placed = placedModulesOf(art, gun, modules, muzzleX)
+  const riding = (rides: MountRide) =>
+    modulesRiding(placed, rides).flatMap((module) => module.quads)
+  return { barrel: riding('barrel'), head: riding('head') }
 }
 
 function partIdsOf(quads: readonly AssetQuad[]): string[] {
@@ -58,6 +74,14 @@ describe('armoury module mounts (ticket 321)', () => {
     expect(withRegistrations([slice], blenderAssetIds)).toEqual(
       expect.arrayContaining(armouryArtAssets().map((asset) => asset.id)),
     )
+  })
+
+  it('turns every bore module with the barrel, since the bore piece hangs them all on it', () => {
+    const everyBoreModule = moduleItemIdsOn('bore').map((itemId) => bought(itemId, true))
+    const placed = placedModulesOf(SHIPPED_ART, 'bore', everyBoreModule)
+    expect(placed).toHaveLength(BORE_GUN_MODULES.length)
+    expect(modulesRiding(placed, 'barrel')).toEqual(placed)
+    expect(placed.map((module) => module.assetId)).toContain('vehicle-item-weapon-steam-sear')
   })
 
   it('draws nothing for a gun with no module bought', () => {

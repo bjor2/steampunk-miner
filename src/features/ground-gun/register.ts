@@ -7,7 +7,9 @@
  * tile with its recovery ring fires, holds and aims (the reticle on the overlay); hold-fire and
  * the tap buffer live only in that client input, and a refused shot clanks unless it was only
  * the recovery. The bought gun shows on the rig: `vehicle-bore-gun` (#362's art) hangs at
- * `hull.front` as a vehicle piece, its barrel turned to the aim (ticket 315). The
+ * `hull.front` as a vehicle piece, its barrel turned to the aim (ticket 315), and every bought
+ * Armoury module rides its gun at its mount, the auto guns' through a turret piece, gilded once
+ * Mastered (ticket 321). The
  * `armoury.bore_gun` lane (ticket 318) adds the shipped modules as store items with their tech
  * nodes, cards and seller: the gimbal sight aims an unaimed shot, the steam sear answers auto mode
  * and the long barrel sets the reach and the hold. The five signature modules (ticket 380) shape the
@@ -23,6 +25,7 @@ import { groundGunDebugActions } from './debug'
 import { ARMOURY_SPEND_FAMILY } from './systems/armourySpend'
 import { GROUND_GUN_PROJECTIONS, GROUND_GUN_RUN_EVENTS } from './logging'
 import { BORE_GUN_PIECE_ID, BoreGunPiece } from './scene/BoreGunPiece'
+import { TURRET_MODULES_PIECE_ID, TurretModulesPiece } from './scene/TurretModulesPiece'
 import { FIRE_KEY_REACTION } from './store/fireKeyReaction'
 import { boreGunCards } from './systems/boreGunCards'
 import { BORE_GUN_KIND, boreGunParts } from './systems/boreGunContent'
@@ -84,6 +87,7 @@ export const slice: SliceDefinition = {
     r.artAssets(armouryArtAssets())
     r.attachUse(BORE_GUN_ATTACH_USE)
     r.vehiclePiece({ id: BORE_GUN_PIECE_ID, Piece: BoreGunPiece })
+    r.vehiclePiece({ id: TURRET_MODULES_PIECE_ID, Piece: TurretModulesPiece })
     // steampunkDebug.features['ground-gun'].setLevels(1, 1, 1), .getGun()
     r.debugActions(groundGunDebugActions)
   },
