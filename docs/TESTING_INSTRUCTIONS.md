@@ -410,6 +410,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   open on a new vehicle and pressed in turn (`withForkHands`). Gated per branch on the seed median
   (`systems/lanePace.ts`): P1 core within 58 minutes of the start, the slice at 100-110 and P8 at
   45 or more (#146's pins). Run it by name; a miss is a balance finding for the lane's items.
+- **Turret module pace** (the GD ruling on #319 with the VS conditions, ticket 388): the lane
+  `features/ground-gun/turretPace.lane.test.ts` plays the bot scenario to planet 40's core on each
+  pacing seed once never firing, then forced to fire the bore gun at its walls with the bot
+  mounting the turret when offered, once bare and once per auto_guns module owned from the start
+  (`gunPaceRuns.ts`, shared with ticket 380's `shapePace.lane.test.ts`). Each run is held to
+  `balance:bore`'s pins (time to core at least 0.98x on every planet, departure drill_power within 1
+  level, the campaign scaling gate) and the worst module gates. Run it by name; a miss is a balance
+  finding for the module.
 - **Foam cure pace** (the bot gate of the #157 GD ruling and TD lock, ticket 368): the lane
   `features/terrain-tools/foamCurePace.lane.test.ts` plays the pacing bot to the core of P1-P10
   and headless P40 on each pacing seed, twice, both runs with foam's every Mark researched: bare,
