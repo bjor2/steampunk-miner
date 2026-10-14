@@ -24,6 +24,7 @@ import {
   type Money,
 } from '../money'
 import { quantaOfUnits } from '../vehicle/energyQuanta'
+import { doesDrillSetTravel } from '../vehicle/travelParity'
 import type { PlanetParams } from '../world/planetParams'
 import { blastTradeOf, type BlastTrade } from './blastTrade'
 import { isUnderLeadCap } from './botCoreRule'
@@ -46,6 +47,8 @@ const BANDS = [1, 2, 3, 4, 5]
 const TANK_SHARES = [1, 0.6, 0.3]
 const DRILL_LEVELS_BEHIND = [0, 6, 9, 12]
 const BASIS_POINTS = 10000
+const TANK_AHEAD_MULTIPLE = 2
+const PICKS_DONE = new Error('the compared picks are bought')
 
 /** log10 of a positive amount from its canonical text: no double ever holds the amount. */
 function log10Of(amount: Money): number {
@@ -58,11 +61,16 @@ function log10Difference(a: number, b: number): number {
   return b === Number.NEGATIVE_INFINITY ? a : a + Math.log10(1 - 10 ** (b - a))
 }
 
-/** The on-curve steps with each marginal track in turn 4 majors behind, so each can lead. */
+/**
+ * The on-curve steps with each marginal track in turn 4 majors behind, so each can lead, and a
+ * tank twice the curve's: since ticket 396's 4-tick floor the on-curve tank ends every trip out
+ * here and the boiler leads all the others; with the tank ahead the hold limits instead.
+ */
 function levelVariants(planetIndex: number): UpgradeLevels[] {
   const onCurve = stepsOfMajors(onCurveLevels(planetIndex))
   const behind = (track: UpgradeId) => ({ ...onCurve, [track]: onCurve[track] - stepOfMajor(4) })
-  return [onCurve, ...MARGINAL_TRACKS.map(behind)]
+  const tankAhead = { ...onCurve, boiler: onCurve.boiler * TANK_AHEAD_MULTIPLE }
+  return [onCurve, ...MARGINAL_TRACKS.map(behind), tankAhead]
 }
 
 function layoutOn(session: BotSession): MineLayout {
@@ -91,20 +99,43 @@ function walletFor(planetIndex: number, levels: UpgradeLevels): string {
   return toCanonical(mul(dearest, fromSafeInteger(WALLET_PRICES)))
 }
 
+/** The first `PICKS_COMPARED` track buys of one visit; the visit ends there. */
 function upgradesBought(session: BotSession, layout: MineLayout): string[] {
   const before = session.commands().length
-  buyUpgrades(session, {
-    layout,
-    isCoreTheGoal: false,
-    gunPolicy: 'never',
-    hasMetBlastTile: false,
-    restockSize: 1,
-    chainPolicy: 'click',
-  })
+  try {
+    buyUpgrades(sessionEndingAfterPicks(session), {
+      layout,
+      isCoreTheGoal: false,
+      gunPolicy: 'never',
+      hasMetBlastTile: false,
+      restockSize: 1,
+      chainPolicy: 'click',
+    })
+  } catch (error) {
+    if (error !== PICKS_DONE) throw error
+  }
   return session
     .commands()
     .slice(before)
     .flatMap((command) => (command.type === 'buyUpgrade' ? [command.payload.upgradeId] : []))
+}
+
+/**
+ * The session, ending the visit once the compared picks are bought: the wallet affords the
+ * dearest track's picks, and since ticket 396's 4-tick floor every pip of a track ~10^300 cheaper
+ * still raises the planned money, so the visit would buy on for tens of thousands of steps.
+ */
+function sessionEndingAfterPicks(session: BotSession): BotSession {
+  let picks = 0
+  return {
+    ...session,
+    submit(intent) {
+      const events = session.submit(intent)
+      if (intent.type === 'buyUpgrade') picks += 1
+      if (picks === PICKS_COMPARED) throw PICKS_DONE
+      return events
+    },
+  }
 }
 
 function plannedLog(layout: MineLayout, levels: UpgradeLevels): number {
@@ -120,10 +151,11 @@ function referencePick(
   layout: MineLayout,
   levels: UpgradeLevels,
   planetIndex: number,
+  tracks: readonly UpgradeId[],
 ): UpgradeId | null {
   const now = plannedLog(layout, levels)
   let best: { track: UpgradeId; logGainPerPrice: number } | null = null
-  for (const track of MARGINAL_TRACKS.filter((t) => isUnderLeadCap(levels, t, planetIndex))) {
+  for (const track of tracks) {
     const logGainPerPrice = referenceLogGainPerPrice(layout, levels, planetIndex, track, now)
     if (logGainPerPrice === null) continue
     if (best === null || logGainPerPrice > best.logGainPerPrice) best = { track, logGainPerPrice }
@@ -147,11 +179,25 @@ function referenceLogGainPerPrice(
   return null
 }
 
-function referencePicks(layout: MineLayout, start: UpgradeLevels, planetIndex: number) {
+/**
+ * The tracks under their lead cap the bay sells: the engine is maxed while the drill sets travel
+ * speed (ticket 333), which the 4-tick floor of ticket 396 reaches on these planets.
+ */
+function referenceTracks(session: BotSession, levels: UpgradeLevels): UpgradeId[] {
+  const planetIndex = session.state().planet.index
+  const rig = { ...session.vehicle(), levels }
+  const isEngineMaxed = doesDrillSetTravel(rig, paramsOfSession(session.state()))
+  return MARGINAL_TRACKS.filter(
+    (track) => isUnderLeadCap(levels, track, planetIndex) && !(track === 'engine' && isEngineMaxed),
+  )
+}
+
+function referencePicks(session: BotSession, layout: MineLayout, start: UpgradeLevels) {
+  const planetIndex = session.state().planet.index
   const picks: UpgradeId[] = []
   let levels = start
   for (let pick = 0; pick < PICKS_COMPARED; pick += 1) {
-    const track = referencePick(layout, levels, planetIndex)
+    const track = referencePick(layout, levels, planetIndex, referenceTracks(session, levels))
     if (track === null) break
     picks.push(track)
     levels = { ...levels, [track]: levels[track] + 1 }
@@ -227,7 +273,7 @@ describe('bot: planning past planet 582 (#196)', () => {
       const firstPicks = levelVariants(planetIndex).map((levels) => {
         const session = botShoppingOn(planetIndex, levels)
         const layout = layoutOn(session)
-        const expected = referencePicks(layout, levels, planetIndex)
+        const expected = referencePicks(session, layout, levels)
         const bought = upgradesBought(session, layout).slice(0, PICKS_COMPARED)
         expect(expected.length).toBeGreaterThan(0)
         expect(bought).toEqual(expected)
