@@ -40,6 +40,7 @@ import type { GenerationHook } from '../systems/registries/generationHooks'
 import type { ReinforcementProvider } from '../systems/registries/groundReinforcement'
 import type { HeatPause } from '../systems/registries/heatPauses'
 import type { SpendFamily } from '../systems/registries/spendFamilies'
+import type { IncomeRate, TripCapSource } from '../systems/registries/incomeRates'
 import type { SlotHoldCueSource } from '../systems/registries/slotHoldCues'
 import type { HullDamageIntercept } from '../systems/registries/hullDamageIntercepts'
 import type { ItemDescriberProvider } from '../systems/registries/itemDescriber'
@@ -213,6 +214,13 @@ export interface SliceRegistrar {
    * `stats.json` row is owned or unlocked (ticket 370).
    */
   spendFamily(family: SpendFamily): void
+  /**
+   * An income item's ore value a minute at full stack for the 15% income-cap check, counted only
+   * while its anchor `stats.json` row is owned or unlocked (ticket 384).
+   */
+  incomeRate(rate: IncomeRate): void
+  /** One provider across all slices: the per-trip clamp on income items (ticket 384). */
+  tripCapSource(source: TripCapSource): void
   /** A full screen the kernel shell draws while the store holds it open. */
   screen(panel: ScreenPanel): void
   /** A synthesised sound with its voice budget, played on `requestSoundCue` (#180). */

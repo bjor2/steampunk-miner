@@ -61,11 +61,14 @@ export function spendFamiliesOf(): readonly SpendFamily[] {
   return [...KERNEL_SPEND_FAMILIES, ...entriesOf(SPEND_FAMILY_REGISTRY)].sort(compareIds)
 }
 
-/** Why `family` cannot register, or null: its anchor must be a row of the locked schedule. */
-export function anchorRowProblemOf(family: SpendFamily): string | null {
-  const isScheduleRow = LOCKED_SCHEDULE.rows.some((row) => row.id === family.anchorRowId)
+/**
+ * Why an anchored entry (a spend family, an income rate) cannot register, or null: its anchor must
+ * be a row of the locked schedule.
+ */
+export function anchorRowProblemOf(entry: Pick<SpendFamily, 'anchorRowId'>): string | null {
+  const isScheduleRow = LOCKED_SCHEDULE.rows.some((row) => row.id === entry.anchorRowId)
   if (isScheduleRow) return null
-  return `its anchor row "${family.anchorRowId}" is no row of docs/scaling/horizontal/stats.json`
+  return `its anchor row "${entry.anchorRowId}" is no row of docs/scaling/horizontal/stats.json`
 }
 
 interface FamilyClaim {

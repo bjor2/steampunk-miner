@@ -60,6 +60,11 @@ import {
   SPEND_FAMILY_REGISTRY,
   type SpendFamily,
 } from '../systems/registries/spendFamilies'
+import {
+  INCOME_RATE_REGISTRY,
+  TRIP_CAP_SOURCE_REGISTRY,
+  type IncomeRate,
+} from '../systems/registries/incomeRates'
 import { HULL_DAMAGE_INTERCEPT_REGISTRY } from '../systems/registries/hullDamageIntercepts'
 import { MAGNETIC_GROUND_REGISTRY } from '../systems/registries/magneticGround'
 import { PLANET_CARD_LINE_REGISTRY } from '../systems/registries/planetCardLines'
@@ -162,6 +167,8 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
     botPurchase: (purchase) => add(BOT_PURCHASE_REGISTRY, purchase),
     spendFamily: (family) => addSpendFamily(sliceId, family),
+    incomeRate: (rate) => addIncomeRate(sliceId, rate),
+    tripCapSource: (source) => add(TRIP_CAP_SOURCE_REGISTRY, source),
     screen: (panel) => add(SCREEN_REGISTRY, panel),
     soundCue: (cue) => add(SOUND_CUE_REGISTRY, cue),
     oneShot: (oneShot) => add(ONE_SHOT_REGISTRY, oneShot),
@@ -274,14 +281,19 @@ function refuseArtAsset(sliceId: string, id: string, problems: readonly string[]
 /** A family's anchor must be a locked schedule row, so a typo fails at registration (#370). */
 function addSpendFamily(sliceId: string, family: SpendFamily) {
   const problem = anchorRowProblemOf(family)
-  if (problem !== null) refuseSpendFamily(sliceId, family.id, problem)
+  if (problem !== null) refuseAnchoredEntry(sliceId, `spend family "${family.id}"`, problem)
   addPrefixed(SPEND_FAMILY_REGISTRY, sliceId, family)
 }
 
-function refuseSpendFamily(sliceId: string, id: string, problem: string): never {
-  throw new RegistrationRefusedError(
-    `slice "${sliceId}" registered spend family "${id}": ${problem}`,
-  )
+/** An income rate's anchor is a locked schedule row too (ticket 384). */
+function addIncomeRate(sliceId: string, rate: IncomeRate) {
+  const problem = anchorRowProblemOf(rate)
+  if (problem !== null) refuseAnchoredEntry(sliceId, `income rate "${rate.id}"`, problem)
+  addPrefixed(INCOME_RATE_REGISTRY, sliceId, rate)
+}
+
+function refuseAnchoredEntry(sliceId: string, entryName: string, problem: string): never {
+  throw new RegistrationRefusedError(`slice "${sliceId}" registered ${entryName}: ${problem}`)
 }
 
 /** A slice's debug commands live under `debug.<slice>.`, so they are `debug.*` commands too. */
