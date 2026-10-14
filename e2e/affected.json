@@ -57,9 +57,13 @@
       ]
     },
     {
-      "why": "The bore gun's fire tile beside the power-up slots, its recovery ring and the reticle on the overlay.",
+      "why": "The bore gun's fire tile beside the power-up slots, its recovery ring and the reticle on the overlay; the desktop gauge, the held fire key and the canvas click.",
       "paths": ["src/features/ground-gun/**"],
-      "specs": ["e2e/browser/screens/fireTile.spec.ts", "e2e/browser/screens/screenLayout.spec.ts"]
+      "specs": [
+        "e2e/browser/groundGun.spec.ts",
+        "e2e/browser/screens/fireTile.spec.ts",
+        "e2e/browser/screens/screenLayout.spec.ts"
+      ]
     },
     {
       "why": "The sensing lane's items in the slots, the reveal layer and board, the passives' HUD panels, and on the rig.",
