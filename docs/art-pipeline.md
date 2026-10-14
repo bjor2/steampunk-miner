@@ -497,6 +497,7 @@ nothing exports, lists or registers it yet. The wiring (#315) gives it the TD's 
   modules' `bore.*` mounts go.
 - `scripts/art/author_bore_gun.py` wrote the first version of the `.blend`. From then on it is
   the source. The review renders are in [docs/art/bore-gun/](art/bore-gun/README.md).
+
 ## Armoury module mounts
 
 The art half of [#321](https://github.com/bjor2/steampunk-miner/issues/321), built by
