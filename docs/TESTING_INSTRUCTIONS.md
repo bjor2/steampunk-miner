@@ -324,6 +324,17 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   most +15% (`magnets.incomeCapBp`), and both members act on every seed. A fast family's first
   lever is the magnets' energy draw, never ore price. The family's one #212 row is
   `magnetFamilySpendRowsOf` (`terrain-tools/systems/magnetSpend.ts`), for the spend guard to read.
+- **Tech-tree spend guard** (spec #161 acceptance 6, ticket 212): `npm run balance:tree` runs the
+  lane `features/tech-tree/treeSpendGuard.lane.test.ts`. The bot plays the bot scenario to planet
+  60's core on each pacing seed, headless and keeping only its spend records, so the guard sees
+  P2-P20, P21-P40 and the P41-P60 endless sample. On each planet the tree's share of what the bot
+  bought (node research, Marks and combos included, plus the tree-unlocked items; travel never
+  counted, a restock in the denominator only) is judged on the median of the seeds against its
+  band in `tech-tree.economy.json` (`tech.spendGuard`: 10-30% from P2, 10-25% from P21); planet 1
+  is not judged. It fails on a planet outside its band and on a seed short of planet 60's core,
+  and prints each seed's share beside the median. The rule is `systems/treeSpendGuard.ts`, with its
+  spec. A miss is a balance finding; the levers are #161's, in order: `kMark` 4 to 3, items 15 to
+  12 u, `kCapability` 12 to 10, then (endless only) M = 6 from P41.
 - **Money to planet 200** (#316 TD scope f, TD pin on #123, ticket 340): `npm run balance:money-p200`
   runs the lane `logging/moneyPastP200.lane.test.ts`. The bot plays the bot scenario on the first
   pacing seed to planet 200's core (prices near 1e104), headless, keeping no run log
