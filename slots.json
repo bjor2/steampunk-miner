@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T08:32:15+02:00",
+  "updated_at": "2026-10-14T08:33:58+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -27,11 +27,11 @@
         },
         {
           "slot": "C2",
-          "state": "busy",
-          "ticket": 318,
-          "grok_slot": 3,
-          "kind": "dev",
-          "since": "2026-10-14T07:21:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C3",
@@ -51,8 +51,8 @@
         }
       ],
       "size": 4,
-      "used": 3,
-      "free": 1,
+      "used": 2,
+      "free": 2,
       "claims_last_hour": 4,
       "name": "Claude Max 1"
     },
@@ -66,10 +66,10 @@
         {
           "slot": "C5",
           "state": "busy",
-          "ticket": 315,
-          "grok_slot": 4,
+          "ticket": 368,
+          "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-14T07:27:00+02:00"
+          "since": "2026-10-14T08:32:00+02:00"
         },
         {
           "slot": "C6",
@@ -99,7 +99,7 @@
       "size": 4,
       "used": 2,
       "free": 2,
-      "claims_last_hour": 6,
+      "claims_last_hour": 5,
       "name": "Claude Max 2"
     }
   ],
@@ -362,15 +362,33 @@
           329
         ],
         "since": "2026-10-14T07:33:36+02:00"
+      },
+      {
+        "feature": 309,
+        "kind": "spec",
+        "title": "Spec: Planet-1 ground weapon (penetrating shot, collapse without casing, visible casing)",
+        "tickets": [
+          313,
+          314,
+          315,
+          344,
+          345,
+          346,
+          347,
+          348,
+          362
+        ],
+        "since": "2026-10-14T08:32:18+02:00"
       }
     ]
   },
   "grok": [
     {
       "slot": 1,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 368,
+      "since": "2026-10-14T08:32:00+02:00",
+      "claude_slot": 5
     },
     {
       "slot": 2,
@@ -381,17 +399,15 @@
     },
     {
       "slot": 3,
-      "state": "dev",
-      "ticket": 318,
-      "since": "2026-10-14T07:21:00+02:00",
-      "claude_slot": 2
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 315,
-      "since": "2026-10-14T07:27:00+02:00",
-      "claude_slot": 5
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -455,10 +471,10 @@
     },
     {
       "slot": 2,
-      "state": "busy",
-      "ticket": 318,
-      "grok_slot": 3,
-      "since": "2026-10-14T07:21:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -480,9 +496,9 @@
     {
       "slot": 5,
       "state": "busy",
-      "ticket": 315,
-      "grok_slot": 4,
-      "since": "2026-10-14T07:27:00+02:00",
+      "ticket": 368,
+      "grok_slot": 1,
+      "since": "2026-10-14T08:32:00+02:00",
       "account": 2
     },
     {
@@ -511,17 +527,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-14 08:27 CEST",
+    "at": "2026-10-14 08:32 CEST",
     "mode": "recheck",
-    "triggers": "#363 #365",
-    "started": "#262->C7/A2 #334->C3/A1",
-    "note": "spawned 2 worker(s)"
+    "triggers": "#361",
+    "started": "#368->C5/A2",
+    "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 5,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -529,8 +545,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 5,
-      "free": 3,
+      "used": 4,
+      "free": 4,
       "external": 0
     }
   }
