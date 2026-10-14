@@ -262,9 +262,10 @@
       "specs": ["e2e/browser/smoke.spec.ts", "e2e/browser/miningPopup.spec.ts"]
     },
     {
-      "why": "The pause menu's manual save (ticket 404): its slice, view, model, debug reads and the slot writer.",
+      "why": "The pause menu's manual save (ticket 404): its slice, view, model, debug reads, the slot writer and the title menu's Continue that loads it back.",
       "paths": [
         "src/store/pauseMenuSlice.ts",
+        "src/store/titleMenuSlice.ts",
         "src/store/checkpoint.ts",
         "src/systems/views/pauseMenuModel.ts",
         "src/ui/pause/**",

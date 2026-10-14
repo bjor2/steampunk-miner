@@ -255,7 +255,7 @@ export interface DebugApi {
   exportSnapshots(): Promise<DebugResult<SnapshotExport>>
   /** Screens and presentation settings (#33): no command, no log line, never `debugApplied`. */
   ui: DebugUi
-  /** The save slots (ticket 404): the index as the menus read it, and a slot loaded back. */
+  /** The save slots (ticket 404): the index as the menus read it; an unlogged read. */
   saves: DebugSaves
   /** Actions pressed at the action layer (#33): their commands are ordinary play. */
   input: DebugInput

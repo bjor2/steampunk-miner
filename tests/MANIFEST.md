@@ -734,7 +734,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/debug/debugLiveTime.test.ts` | 3 | 3 |
 | `src/debug/debugMemory.test.ts` | 4 | 4 |
 | `src/debug/debugOverlay.test.ts` | 2 | 2 |
-| `src/debug/debugSaves.test.ts` | 3 | 3 |
+| `src/debug/debugSaves.test.ts` | 2 | 2 |
 | `src/debug/debugScreens.test.ts` | 30 | 29 |
 | `src/debug/sliceDebugCommands.test.ts` | 3 | 3 |
 
