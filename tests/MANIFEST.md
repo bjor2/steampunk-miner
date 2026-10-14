@@ -190,7 +190,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/extraction/systems/tripCap.test.ts` | 6 | 6 |
 | `src/features/extraction/systems/useResolution.test.ts` | 4 | 4 |
 
-### `ground-gun`: 31 files, 193 tests
+### `ground-gun`: 31 files, 197 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -199,7 +199,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/store/fireKey.test.ts` | 7 | 6 |
 | `src/features/ground-gun/store/fireLamp.test.ts` | 3 | 3 |
 | `src/features/ground-gun/systems/armouryModules.test.ts` | 13 | 13 |
-| `src/features/ground-gun/systems/armourySpend.test.ts` | 4 | 4 |
+| `src/features/ground-gun/systems/armourySpend.test.ts` | 7 | 7 |
 | `src/features/ground-gun/systems/autoGunsLane.test.ts` | 5 | 5 |
 | `src/features/ground-gun/systems/boreGunCards.test.ts` | 6 | 6 |
 | `src/features/ground-gun/systems/boreGunLane.test.ts` | 8 | 8 |
@@ -212,7 +212,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/ground-gun/systems/fireAim.test.ts` | 7 | 7 |
 | `src/features/ground-gun/systems/fireHold.test.ts` | 9 | 8 |
 | `src/features/ground-gun/systems/fireTile.test.ts` | 3 | 3 |
-| `src/features/ground-gun/systems/groundGunEconomy.test.ts` | 7 | 7 |
+| `src/features/ground-gun/systems/groundGunEconomy.test.ts` | 8 | 8 |
 | `src/features/ground-gun/systems/gunBayEntries.test.ts` | 5 | 5 |
 | `src/features/ground-gun/systems/gunLevels.test.ts` | 6 | 6 |
 | `src/features/ground-gun/systems/gunPurchase.test.ts` | 11 | 11 |
@@ -402,7 +402,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 36 files, 266 tests
+### `tech-tree`: 37 files, 272 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -412,6 +412,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/store/treeScreenStore.test.ts` | 4 | 4 |
 | `src/features/tech-tree/systems/aethericCards.vision.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/aethericLane.test.ts` | 5 | 5 |
+| `src/features/tech-tree/systems/familySharePins.test.ts` | 5 | 5 |
 | `src/features/tech-tree/systems/familySpendShares.test.ts` | 8 | 8 |
 | `src/features/tech-tree/systems/forkCost.test.ts` | 2 | 2 |
 | `src/features/tech-tree/systems/forkNode.test.ts` | 7 | 7 |
@@ -439,7 +440,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/treeShape.test.ts` | 17 | 17 |
 | `src/features/tech-tree/systems/treeSpendGuard.test.ts` | 9 | 9 |
 | `src/features/tech-tree/systems/unlockRules.test.ts` | 20 | 20 |
-| `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 2 | 2 |
+| `src/features/tech-tree/treeSpendGuard.lane.test.ts` | 3 | 3 |
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 5 | 5 |
 

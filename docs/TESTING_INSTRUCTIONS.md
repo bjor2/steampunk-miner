@@ -336,10 +336,14 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   spec. A miss is a balance finding; the levers are #161's, in order: `kMark` 4 to 3, items 15 to
   12 u, `kCapability` 12 to 10, then (endless only) M = 6 from P41. Beside it, report-only, each
   spend family's median share per planet from the kernel `spendFamilies` registry
-  (`systems/familySpendShares.ts`): `terrain-tools.terrain_magnets` and the kernel gun mount
-  `kernel.buy_gun`, which joins the gated numerator in #371. A family counts on a seed only when
-  that run ended with its anchor row unlocked. Only the tree total is gated (GD ruling Q4); the 15%
-  income cap per minute is #385's check, not this lane's.
+  (`systems/familySpendShares.ts`): `terrain-tools.terrain_magnets`, `ground-gun.armoury` and the
+  kernel turret mount `kernel.buy_gun`, which also counts once in the gated numerator (ticket 371).
+  Every live family prints on P2/P10/P20/P40 even at zero. A family counts on a seed only when
+  that run ended with its anchor row unlocked. The family rows are not gated (GD ruling Q4); their
+  share pins are (`systems/familySharePins.ts`): the armoury's recurring gun-track spend (track
+  levels, lane nodes, modules and Marks; never a one-time mount) stays at or under 5% of every
+  planet's spend on the seed median (Vertical Scaler on #322, GD ruling on #371), and the lane fails
+  on a planet over it. The 15% income cap per minute is #385's check, not this lane's.
 - **Money to planet 200** (#316 TD scope f, TD pin on #123, ticket 340): `npm run balance:money-p200`
   runs the lane `logging/moneyPastP200.lane.test.ts`. The bot plays the bot scenario on the first
   pacing seed to planet 200's core (prices near 1e104), headless, keeping no run log
