@@ -2,7 +2,9 @@
  * The authored tree's shape test (spec #161 section 1, run in CI): ids are unique and the graph
  * is acyclic; no prerequisite sits deeper than its node; combos come at the research lab's planet
  * or later with prerequisites in exactly two lanes, and only combos cross lanes; extractor nodes
- * have none; at most two capabilities share a planet; every node has an icon that resolves, a
+ * have none; at most two capabilities share a planet, a lane's P16 fork pair left out of the
+ * count (the GD lock on #255 puts one pair per lane on P16, and a player takes one branch of each,
+ * ticket 261); every node has an icon that resolves, a
  * flavour line with no digits and a label; the absorbed Schedule C rows agree; every Mark
  * milestone sits at Mark 3, 6 or 9 of its ladder, each pattern at most once (#256); every row a
  * node `requiresFeature` is a row of the locked schedule (ticket 358); the Armoury lanes bring at
@@ -13,6 +15,7 @@
  */
 import { contentOf } from '../../../systems/registries/content'
 import { LOCKED_SCHEDULE } from '../../../systems/unlocks/unlockSchedule'
+import { forkBranchOfNode } from './forkIds'
 import { milestoneProblemsOf } from './markMilestones'
 import { absorbedRowProblems, researchLabPlanet } from './scheduleAbsorber'
 import { isArmouryLane, TECH_LANES, type TechNode } from './techNode'
@@ -130,8 +133,9 @@ function extractorProblems(nodes: readonly TechNode[]): string[] {
     .map((node) => `extractor node ${node.id} has prerequisites`)
 }
 
+/** The P16 fork pairs sit outside the count: six lanes' pairs could never fit under two. */
 function crowdedPlanetProblems(nodes: readonly TechNode[]): string[] {
-  const counts = capabilityCountsByPlanet(nodes)
+  const counts = capabilityCountsByPlanet(nodes.filter((node) => forkBranchOfNode(node) === null))
   return [...counts.entries()]
     .filter(([, count]) => count > MOST_CAPABILITIES_PER_PLANET)
     .map(([planet, count]) => `P${planet} brings ${count} capabilities, more than two`)

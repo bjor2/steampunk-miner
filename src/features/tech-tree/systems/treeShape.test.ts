@@ -5,6 +5,7 @@ import { iconUrlOf } from '../../../ui/vectorIcons'
 import { ABSORBED_SCHEDULE_ROWS, researchLabPlanet, unlocksOnPlanet } from './scheduleAbsorber'
 import type { TechNode } from './techNode'
 import { AUTHORED_TREE_FIXTURE } from './treeFixtures'
+import { FORK_PAIRS_FIXTURE } from '../treeFixtureSlice'
 import { registeredTreeShapeProblems, treeShapeProblems } from './treeShape'
 
 const RULES = { isIconKnown: () => true, firstComboPlanet: 15 }
@@ -36,13 +37,26 @@ describe('tech tree: shape test', () => {
   it('passes the Aetheric science nodes on P15, P24 and P29, the sixth lane (#245)', () => {
     const registered = contentOf('tech-node').filter((node) => node.lane === 'aetheric')
     const fixture = AUTHORED_TREE_FIXTURE.filter((node) => node.lane === 'aetheric')
-    ;[registered, fixture].forEach((lane) =>
-      expect(lane.map((node) => node.unlockTier).sort((a, b) => a - b)).toEqual([15, 24, 29]),
-    )
+    // The registered lane also carries its P16 fork pair (#261); the fixture has no forks.
+    expect(registered.map((node) => node.unlockTier).sort((a, b) => a - b)).toEqual([
+      15, 16, 16, 24, 29,
+    ])
+    expect(fixture.map((node) => node.unlockTier).sort((a, b) => a - b)).toEqual([15, 24, 29])
     const early = treeWith('tech.aetheric.chronometric_governor', { unlockTier: 14 })
     expect(shapeOf(early)).toEqual([
       'tech.aetheric.chronometric_governor (P14) needs tech.aetheric.resonance_whistle, which opens later',
     ])
+  })
+
+  it('leaves the lanes’ P16 fork pairs out of the two-capabilities-a-planet count (#255)', () => {
+    const branches = FORK_PAIRS_FIXTURE.flatMap((pair) => pair.branches)
+    expect(branches.length).toBeGreaterThan(2)
+    expect(shapeOf([...AUTHORED_TREE_FIXTURE, ...branches])).toEqual([])
+    // The same nodes under plain ids are ordinary capabilities, and P16 is then crowded.
+    const plain = branches.map((node, at) => ({ ...node, id: `tech.${node.lane}.plain_${at}` }))
+    expect(shapeOf([...AUTHORED_TREE_FIXTURE, ...plain])).toContainEqual(
+      expect.stringMatching(/^P16 brings \d+ capabilities, more than two$/),
+    )
   })
 
   it('takes the first combo planet from the research lab row of Schedule C', () => {
