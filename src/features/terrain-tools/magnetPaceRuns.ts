@@ -97,14 +97,14 @@ export function describeRuns({ planet, seed, bare, withMagnets }: MagnetPaceRuns
   return `P${planet} seed ${seed}: bare ${minutes(bare)} min, magnets ${minutes(withMagnets)} min (${ratios}; ${uses})`
 }
 
-/** The bot from arrival on `planet` (`paceArrival.ts`) to its core, `loadout` first, via `hand`. */
-function coreRunOn(
+/** The bot from arrival on `planet` (`paceArrival.ts`) to its core, `setup` first, via `hand`. */
+export function coreRunOn(
   planet: number,
   worldSeed: number,
-  loadout: CommandIntent,
+  setup: CommandIntent | readonly CommandIntent[],
   hand: (session: BotSession) => BotSession,
 ): SliceRun {
-  const arrived = arrivedPaceSessionOn(planet, worldSeed, [loadout])
+  const arrived = arrivedPaceSessionOn(planet, worldSeed, [setup].flat())
   return playToCoreFrom(hand(arrived), planet, BUDGET_TICKS)
 }
 
