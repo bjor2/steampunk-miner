@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-10-14T23:47:25+02:00",
+  "updated_at": "2026-10-15T00:12:14+02:00",
   "caps": {
     "grok": 12,
-    "claude": 12,
-    "claude_enabled": 8,
+    "claude": 10,
+    "claude_enabled": 6,
     "dev": 8,
     "planner": 4,
     "gate": 3,
@@ -51,11 +51,11 @@
         },
         {
           "slot": "C5",
-          "state": "busy",
-          "ticket": 392,
-          "grok_slot": 5,
-          "kind": "dev",
-          "since": "2026-10-14T23:42:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C6",
@@ -64,26 +64,10 @@
           "grok_slot": 6,
           "kind": "dev",
           "since": "2026-10-14T23:42:00+02:00"
-        },
-        {
-          "slot": "C7",
-          "state": "busy",
-          "ticket": 408,
-          "grok_slot": 7,
-          "kind": "dev",
-          "since": "2026-10-14T23:46:00+02:00"
-        },
-        {
-          "slot": "C8",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
         }
       ],
-      "size": 8,
-      "used": 7,
+      "size": 6,
+      "used": 5,
       "free": 1,
       "claims_last_hour": 8,
       "name": "Claude Max 1"
@@ -95,6 +79,22 @@
       "enabled": false,
       "reason": "signed in, but the claude -p ping failed",
       "slots": [
+        {
+          "slot": "C7",
+          "state": "busy",
+          "ticket": 408,
+          "grok_slot": 7,
+          "kind": "dev",
+          "since": "2026-10-14T23:46:00+02:00"
+        },
+        {
+          "slot": "C8",
+          "state": "disabled",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
+        },
         {
           "slot": "C9",
           "state": "disabled",
@@ -110,26 +110,10 @@
           "grok_slot": null,
           "kind": null,
           "since": null
-        },
-        {
-          "slot": "C11",
-          "state": "disabled",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
-        },
-        {
-          "slot": "C12",
-          "state": "disabled",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
         }
       ],
       "size": 4,
-      "used": 0,
+      "used": 1,
       "free": 0,
       "claims_last_hour": 0,
       "name": "Claude Max 2"
@@ -142,55 +126,17 @@
   "tester": {
     "state": "running",
     "phase": "fast",
-    "sha": "df0c1f011bb11e120c501dfb0e910ee11d40ec2c",
-    "since": "2026-10-14T21:24:59Z",
+    "sha": "9f249c80b3bbf1771481a01a76ce4c5864e48dc7",
+    "since": "2026-10-14T22:12:01Z",
     "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-14T19:44:11Z",
+    "last_run": "2026-10-14T22:11:54Z",
     "last_nightly": "2026-10-08T05:23:05Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=ok balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=ok packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 142,
-    "feature_title": "Spec: Mining gates: drill tier, skill, and dynamite-only ores",
+    "feature": 139,
+    "feature_title": "Wayfinder: Materials expansion (ore variety, depth and planet distribution, gates, dynamite, visual progression)",
     "queue": [
-      {
-        "feature": 139,
-        "kind": "spec",
-        "title": "Wayfinder: Materials expansion (ore variety, depth and planet distribution, gates, dynamite, visual progression)",
-        "tickets": [
-          144,
-          145,
-          146,
-          147,
-          148,
-          149,
-          150,
-          156,
-          183,
-          184,
-          185,
-          186,
-          187,
-          188,
-          189,
-          192,
-          218,
-          223,
-          229,
-          230,
-          231,
-          232,
-          236,
-          237,
-          238,
-          247,
-          296,
-          297,
-          298,
-          299
-        ],
-        "since": "2026-10-08T01:37:35+02:00"
-      },
       {
         "feature": 350,
         "kind": "ticket",
@@ -482,10 +428,9 @@
     },
     {
       "slot": 5,
-      "state": "dev",
-      "ticket": 392,
-      "since": "2026-10-14T23:42:00+02:00",
-      "claude_slot": 5
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 6,
@@ -567,10 +512,10 @@
     },
     {
       "slot": 5,
-      "state": "busy",
-      "ticket": 392,
-      "grok_slot": 5,
-      "since": "2026-10-14T23:42:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -587,15 +532,16 @@
       "ticket": 408,
       "grok_slot": 7,
       "since": "2026-10-14T23:46:00+02:00",
-      "account": 1
+      "account": 2
     },
     {
       "slot": 8,
-      "state": "free",
+      "state": "disabled",
       "ticket": null,
       "grok_slot": null,
       "since": null,
-      "account": 1
+      "reason": "signed in, but the claude -p ping failed",
+      "account": 2
     },
     {
       "slot": 9,
@@ -614,46 +560,28 @@
       "since": null,
       "reason": "signed in, but the claude -p ping failed",
       "account": 2
-    },
-    {
-      "slot": 11,
-      "state": "disabled",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "reason": "signed in, but the claude -p ping failed",
-      "account": 2
-    },
-    {
-      "slot": 12,
-      "state": "disabled",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
-      "reason": "signed in, but the claude -p ping failed",
-      "account": 2
     }
   ],
   "last_refill": {
-    "at": "2026-10-14 23:46 CEST",
+    "at": "2026-10-15 00:02 CEST",
     "mode": "recheck",
-    "triggers": "#278 #410",
-    "started": "#408->C7/A1",
-    "note": "spawned 1 worker(s)"
+    "triggers": "#392",
+    "started": "",
+    "note": "no pickable build ticket"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 7,
-      "dev": 7,
+      "used": 6,
+      "dev": 6,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
     },
     "claude": {
-      "size": 12,
-      "enabled": 8,
-      "used": 7,
+      "size": 10,
+      "enabled": 6,
+      "used": 6,
       "free": 1,
       "external": 0
     }
