@@ -184,8 +184,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    the motion seam and its `aetheric.phases` clock step, `aetheric.PhaseStarted`,
  *    `PhaseLanded`, `PhaseReversed` and `PhaseReturned`, and the arc coil's `aetheric.ArcFired`.
  *    With no fork item used no digest or mined order changes.
+ * 61: the drill-gear and mobility forks' branches (ticket 268, #255 build 3): `choose_fork` now
+ *    takes Wide, Deep, Agile and Armoured, and an active branch acts: Wide's flank cells and
+ *    Deep's cell below on the drill gear read, Agile's lift and drive off the ground, Armoured's
+ *    grounded hits and longer steam curtain. With no fork chosen no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 60
+export const AUTHORITY_PROTOCOL_VERSION = 61
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
