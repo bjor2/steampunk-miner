@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T00:43:31+02:00",
+  "updated_at": "2026-10-15T00:46:00+02:00",
   "caps": {
     "grok": 12,
     "claude": 10,
@@ -43,11 +43,11 @@
         },
         {
           "slot": "C4",
-          "state": "busy",
-          "ticket": 396,
-          "grok_slot": 4,
-          "kind": "dev",
-          "since": "2026-10-15T00:34:00+02:00"
+          "state": "free",
+          "ticket": null,
+          "grok_slot": null,
+          "kind": null,
+          "since": null
         },
         {
           "slot": "C5",
@@ -67,8 +67,8 @@
         }
       ],
       "size": 6,
-      "used": 5,
-      "free": 1,
+      "used": 4,
+      "free": 2,
       "claims_last_hour": 3,
       "name": "Claude Max 1"
     },
@@ -394,6 +394,15 @@
           278
         ],
         "since": "2026-10-14T23:40:41+02:00"
+      },
+      {
+        "feature": 304,
+        "kind": "spec",
+        "title": "Grilling: Exponential drill speed law (never capped, carries across planets)",
+        "tickets": [
+          396
+        ],
+        "since": "2026-10-15T00:44:07+02:00"
       }
     ]
   },
@@ -420,10 +429,9 @@
     },
     {
       "slot": 4,
-      "state": "dev",
-      "ticket": 396,
-      "since": "2026-10-15T00:34:00+02:00",
-      "claude_slot": 4
+      "state": "free",
+      "ticket": null,
+      "since": null
     },
     {
       "slot": 5,
@@ -503,10 +511,10 @@
     },
     {
       "slot": 4,
-      "state": "busy",
-      "ticket": 396,
-      "grok_slot": 4,
-      "since": "2026-10-15T00:34:00+02:00",
+      "state": "free",
+      "ticket": null,
+      "grok_slot": null,
+      "since": null,
       "account": 1
     },
     {
@@ -572,8 +580,8 @@
   "totals": {
     "grok": {
       "size": 12,
-      "used": 5,
-      "dev": 5,
+      "used": 4,
+      "dev": 4,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -581,8 +589,8 @@
     "claude": {
       "size": 10,
       "enabled": 6,
-      "used": 5,
-      "free": 1,
+      "used": 4,
+      "free": 2,
       "external": 0
     }
   }
