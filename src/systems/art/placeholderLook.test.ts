@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { MISSING_ART_COLOUR, partsShownAtTier, placeholderQuadsOf } from './placeholderLook'
+import { placeholderSidecarOf } from './artCatalogue'
 import type { SidecarPart } from './partsSidecar'
 import { SHIPPED_ART } from '../../scene/shippedArt'
 
@@ -40,8 +41,15 @@ describe('placeholder look', () => {
     const [gantry] = placeholderQuadsOf(SHIPPED_ART, 'platform-building-upgrade', 1).filter(
       (quad) => quad.partId === 'workshop-gantry',
     )
-    expect(gantry.centre[0]).toBeCloseTo(-0.15)
-    expect(gantry.centre[1]).toBeCloseTo(4.9)
+    const authored = placeholderSidecarOf(SHIPPED_ART, 'platform-building-upgrade')?.parts.find(
+      (sidecarPart) => sidecarPart.id === 'workshop-gantry',
+    )
+    if (authored === undefined) throw new Error('the Works placeholder has no gantry')
+    expect(gantry.pivot).toEqual(authored.atM)
+    for (const axis of [0, 1]) {
+      const left = authored.atM[axis] - authored.pivotM[axis]
+      expect(gantry.centre[axis]).toBeCloseTo(left + authored.sizeM[axis] / 2)
+    }
   })
 
   it('keeps the tier-1 parts a higher tier does not replace, and swaps the ones it does', () => {

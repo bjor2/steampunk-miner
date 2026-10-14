@@ -7,7 +7,7 @@
     "blender": null
   },
   "pxPerMetre": 256,
-  "atlasPx": [4096, 2048],
+  "atlasPx": [4096, 4096],
   "maps": {
     "albedo": "platform-building-upgrade.albedo.ktx2",
     "normal": "platform-building-upgrade.normal.ktx2",
@@ -17,27 +17,27 @@
     {
       "id": "platform-building-upgrade",
       "tier": 1,
-      "rect": [8, 8, 2560, 1332],
-      "sizeM": [10.0, 5.2],
-      "pivotM": [5.0, 0.0],
+      "rect": [8, 8, 2663, 2473],
+      "sizeM": [10.4, 9.66],
+      "pivotM": [5.2, 0.0],
       "atM": [0.0, 0.0],
       "z": 0
     },
     {
       "id": "workshop-gantry",
       "tier": 1,
-      "rect": [2584, 8, 1152, 359],
-      "sizeM": [4.5, 1.4],
-      "pivotM": [0.4, 0.4],
-      "atM": [-2.0, 4.6],
+      "rect": [2687, 8, 544, 263],
+      "sizeM": [2.1213, 1.0251],
+      "pivotM": [0.25, 0.7451],
+      "atM": [-2.45, 4.85],
       "z": 1
     },
     {
       "id": "workshop-turntable",
       "tier": 1,
-      "rect": [8, 1356, 820, 77],
-      "sizeM": [3.2, 0.3],
-      "pivotM": [1.6, 0.2],
+      "rect": [8, 2497, 924, 81],
+      "sizeM": [3.6064, 0.3133],
+      "pivotM": [1.8032, 0.13],
       "atM": [0.0, 0.0],
       "z": 1
     }
@@ -45,7 +45,7 @@
   "attach": [
     {
       "id": "workshop.gantry",
-      "atM": [-2.0, 4.6],
+      "atM": [-2.45, 4.85],
       "z": 2
     },
     {
@@ -60,7 +60,7 @@
     },
     {
       "id": "workshop.stack",
-      "atM": [3.6, 5.2],
+      "atM": [-4.6, 9.65],
       "z": -1
     }
   ]

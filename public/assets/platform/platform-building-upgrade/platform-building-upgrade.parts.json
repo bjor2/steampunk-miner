@@ -3,13 +3,13 @@
   "schema": 1,
   "source": {
     "blend": "art/blender/platform-building-upgrade/platform-building-upgrade.blend",
-    "sha256": "90ca527d3c3092c6dada471fc451157426eb6c672653d830f918e3e105e1c2a6",
+    "sha256": "d2dc3df3e2d37705a039884169c1697f80b067f834c3998a5b42128e13771250",
     "blender": "4.2.9 LTS"
   },
   "pxPerMetre": 256,
   "atlasPx": [
     4096,
-    2048
+    4096
   ],
   "maps": {
     "albedo": "platform-building-upgrade.albedo.ktx2",
@@ -23,15 +23,15 @@
       "rect": [
         8,
         8,
-        2612,
-        1741
+        2663,
+        2473
       ],
       "sizeM": [
-        10.2,
-        6.8
+        10.4,
+        9.66
       ],
       "pivotM": [
-        5.1,
+        5.2,
         0.0
       ],
       "atM": [
@@ -44,22 +44,22 @@
       "id": "workshop-gantry",
       "tier": 1,
       "rect": [
-        2636,
+        2687,
         8,
-        1037,
-        537
+        544,
+        263
       ],
       "sizeM": [
-        4.0476,
-        2.0938
+        2.1213,
+        1.0251
       ],
       "pivotM": [
-        0.3,
-        0.3
+        0.25,
+        0.7451
       ],
       "atM": [
-        -3.4,
-        4.9
+        -2.45,
+        4.85
       ],
       "z": 1
     },
@@ -68,17 +68,17 @@
       "tier": 1,
       "rect": [
         8,
-        1765,
-        844,
-        61
+        2497,
+        924,
+        81
       ],
       "sizeM": [
-        3.2946,
-        0.2376
+        3.6064,
+        0.3133
       ],
       "pivotM": [
-        1.6473,
-        0.12
+        1.8032,
+        0.13
       ],
       "atM": [
         0.0,
@@ -91,8 +91,8 @@
     {
       "id": "workshop.gantry",
       "atM": [
-        -3.4,
-        4.9
+        -2.45,
+        4.85
       ],
       "z": 2
     },
@@ -115,8 +115,8 @@
     {
       "id": "workshop.stack",
       "atM": [
-        3.6,
-        6.8
+        -4.6,
+        9.65
       ],
       "z": -1
     }
