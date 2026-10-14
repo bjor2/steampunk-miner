@@ -57,55 +57,72 @@ const FALLOFF: readonly number[] = Array.from({ length: FALLOFF_STEPS + 1 }, (_,
     : Math.floor((FULL_WEIGHT * (FALLOFF_STEPS - step)) / (FALLOFF_STEPS - FULL_WEIGHT_UP_TO_STEP)),
 )
 
-/** A capsule sample's step when it lies past the radius. */
+/** A sample's step when it lies past the radius. */
 const OUTSIDE = FALLOFF_STEPS + 1
 
 /** The samples a disc (or a capsule) can carve, with their falloff weights and floors, in row order. */
 export function discSamplesOf(disc: DiscStamp): WeightedSample[] {
-  return isCapsule(disc) ? capsuleSamplesOf(disc, disc.tail) : roundDiscSamplesOf(disc)
+  const samples: WeightedSample[] = []
+  const rows = stampRowsOf(disc)
+  const columns = stampColumnsOf(disc)
+  for (let sy = rows.first; sy <= rows.last; sy++) {
+    for (let sx = columns.first; sx <= columns.last; sx++) {
+      const sample = stampSampleAt(disc, sx, sy)
+      if (sample !== null) samples.push(sample)
+    }
+  }
+  return samples
+}
+
+/** Sample rows or columns, both ends included. */
+export interface SampleRange {
+  first: number
+  last: number
+}
+
+/** The sample rows the stamp's bounding square covers. */
+export function stampRowsOf(disc: DiscStamp): SampleRange {
+  const tail = tailOf(disc)
+  return {
+    first: Math.ceil((Math.min(disc.yMm, tail.yMm) - disc.radiusMm) / MM_PER_SAMPLE),
+    last: Math.floor((Math.max(disc.yMm, tail.yMm) + disc.radiusMm) / MM_PER_SAMPLE),
+  }
+}
+
+function stampColumnsOf(disc: DiscStamp): SampleRange {
+  const tail = tailOf(disc)
+  return {
+    first: Math.ceil((Math.min(disc.xMm, tail.xMm) - disc.radiusMm) / MM_PER_SAMPLE),
+    last: Math.floor((Math.max(disc.xMm, tail.xMm) + disc.radiusMm) / MM_PER_SAMPLE),
+  }
+}
+
+/** Where the stamp's path starts: a capsule's tail, else its centre. */
+export function tailOf(disc: DiscStamp): StampPoint {
+  return isCapsule(disc) ? disc.tail : { xMm: disc.xMm, yMm: disc.yMm }
 }
 
 function isCapsule(disc: DiscStamp): disc is DiscStamp & { tail: StampPoint } {
   return disc.tail !== undefined && (disc.tail.xMm !== disc.xMm || disc.tail.yMm !== disc.yMm)
 }
 
-function roundDiscSamplesOf(disc: DiscStamp): WeightedSample[] {
-  const samples: WeightedSample[] = []
-  const radiusSq = disc.radiusMm * disc.radiusMm
-  const sy0 = Math.ceil((disc.yMm - disc.radiusMm) / MM_PER_SAMPLE)
-  const sy1 = Math.floor((disc.yMm + disc.radiusMm) / MM_PER_SAMPLE)
-  const sx0 = Math.ceil((disc.xMm - disc.radiusMm) / MM_PER_SAMPLE)
-  const sx1 = Math.floor((disc.xMm + disc.radiusMm) / MM_PER_SAMPLE)
-  for (let sy = sy0; sy <= sy1; sy++) {
-    for (let sx = sx0; sx <= sx1; sx++) {
-      const dx = sx * MM_PER_SAMPLE - disc.xMm
-      const dy = sy * MM_PER_SAMPLE - disc.yMm
-      const distanceSq = dx * dx + dy * dy
-      const floor = levelFloorAt(disc.floorRadiusMm, sx, sy)
-      if (distanceSq > radiusSq || floor === SOLID_DENSITY) continue
-      const weight = FALLOFF[Math.floor((FALLOFF_STEPS * distanceSq) / radiusSq)]
-      samples.push({ sx, sy, weight, floor })
-    }
-  }
-  return samples
+/** The stamp's sample at `(sx, sy)`, or null past its radius or where its level floor keeps it. */
+export function stampSampleAt(disc: DiscStamp, sx: number, sy: number): WeightedSample | null {
+  const step = falloffStepAt(disc, sx, sy)
+  const floor = levelFloorAt(disc.floorRadiusMm, sx, sy)
+  if (step === OUTSIDE || floor === SOLID_DENSITY) return null
+  return { sx, sy, weight: FALLOFF[step], floor }
 }
 
-function capsuleSamplesOf(disc: DiscStamp, tail: StampPoint): WeightedSample[] {
-  const samples: WeightedSample[] = []
-  const r = disc.radiusMm
-  const sy0 = Math.ceil((Math.min(disc.yMm, tail.yMm) - r) / MM_PER_SAMPLE)
-  const sy1 = Math.floor((Math.max(disc.yMm, tail.yMm) + r) / MM_PER_SAMPLE)
-  const sx0 = Math.ceil((Math.min(disc.xMm, tail.xMm) - r) / MM_PER_SAMPLE)
-  const sx1 = Math.floor((Math.max(disc.xMm, tail.xMm) + r) / MM_PER_SAMPLE)
-  for (let sy = sy0; sy <= sy1; sy++) {
-    for (let sx = sx0; sx <= sx1; sx++) {
-      const step = falloffStepFromSegment(disc, tail, sx, sy)
-      const floor = levelFloorAt(disc.floorRadiusMm, sx, sy)
-      if (step === OUTSIDE || floor === SOLID_DENSITY) continue
-      samples.push({ sx, sy, weight: FALLOFF[step], floor })
-    }
-  }
-  return samples
+/** Whether `(sx, sy)` lies within the stamp's radius of its path, whatever its level floor. */
+export function isWithinStampAt(disc: DiscStamp, sx: number, sy: number): boolean {
+  return falloffStepAt(disc, sx, sy) !== OUTSIDE
+}
+
+function falloffStepAt(disc: DiscStamp, sx: number, sy: number): number {
+  if (isCapsule(disc)) return falloffStepFromSegment(disc, disc.tail, sx, sy)
+  const radiusSq = disc.radiusMm * disc.radiusMm
+  return stepOfDistanceSq(sx * MM_PER_SAMPLE - disc.xMm, sy * MM_PER_SAMPLE - disc.yMm, radiusSq)
 }
 
 /**
@@ -158,20 +175,9 @@ export function cellSamplesOf(tile: TilePoint): WeightedSample[] {
  */
 export function cellSamplesBesideDisc(tile: TilePoint, disc: DiscStamp): WeightedSample[] {
   return cellSamplesOf(tile)
-    .filter((sample) => !isWithinStamp(disc, sample))
+    .filter(({ sx, sy }) => !isWithinStampAt(disc, sx, sy))
     .map((sample) => ({ ...sample, floor: levelFloorAt(disc.floorRadiusMm, sample.sx, sample.sy) }))
     .filter((sample) => sample.floor !== SOLID_DENSITY)
-}
-
-function isWithinStamp(disc: DiscStamp, sample: WeightedSample): boolean {
-  if (!isCapsule(disc)) return isWithinDisc(disc, sample)
-  return falloffStepFromSegment(disc, disc.tail, sample.sx, sample.sy) !== OUTSIDE
-}
-
-function isWithinDisc(disc: DiscStamp, { sx, sy }: WeightedSample): boolean {
-  const dx = sx * MM_PER_SAMPLE - disc.xMm
-  const dy = sy * MM_PER_SAMPLE - disc.yMm
-  return dx * dx + dy * dy <= disc.radiusMm * disc.radiusMm
 }
 
 /** The level floor's ramp at a sample: 128 on the floor circle, 255 a sample below it. */

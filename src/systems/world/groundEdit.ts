@@ -78,14 +78,32 @@ export interface Carve extends GroundEdit {
   casingCleared: CasingCleared
 }
 
+/**
+ * How a carve walks a stamp's samples in its edit, answering the most ticks any of them took: in
+ * rows over the stamp's bounding square (`walkStampInRows`), or the swept span's runs cut at chunk
+ * borders (`sweptSpan.ts`, ticket 374), which visit the same samples in the same order.
+ */
+export type StampWalk = (
+  session: EditSession,
+  disc: DiscStamp,
+  window: CarveWindow,
+  drillTicksOf: CellDrillTicks,
+) => number
+
+export const walkStampInRows: StampWalk = (session, disc, window, drillTicksOf) =>
+  carveEachSample(session, discSamplesOf(disc), window, drillTicksOf)
+
 export function carveDisc(
   world: WorldState,
   params: PlanetParams,
   disc: DiscStamp,
   window: CarveWindow,
   drillTicksOf: CellDrillTicks,
+  walk: StampWalk = walkStampInRows,
 ): Carve {
-  return carveSamples(world, params, discSamplesOf(disc), window, drillTicksOf)
+  const session = openSession(world, params)
+  const ticksUsed = walk(session, disc, window, drillTicksOf)
+  return { ...closeSession(session), ticksUsed, casingCleared: session.casingCleared }
 }
 
 /** A disc carve with cells beside it (slice drill gear, ticket 234). */
@@ -112,9 +130,10 @@ export function carveDiscWithCells(
   cells: readonly TilePoint[],
   windows: CarveWindows,
   drillTicksOf: CellDrillTicks,
+  walk: StampWalk = walkStampInRows,
 ): CarveBesideDisc {
   const session = openSession(world, params)
-  const ticksUsed = carveEachSample(session, discSamplesOf(disc), windows.disc, drillTicksOf)
+  const ticksUsed = walk(session, disc, windows.disc, drillTicksOf)
   const cellTicksUsed = cells.map((tile) =>
     ticksUsed === 0
       ? 0
@@ -184,7 +203,7 @@ function carveSamples(
 }
 
 /** Carves the samples in order; answers the most ticks any of them took. */
-function carveEachSample(
+export function carveEachSample(
   session: EditSession,
   samples: readonly WeightedSample[],
   window: CarveWindow,
