@@ -67,15 +67,18 @@ export function sprayParticles(
 export function stepParticles(pool: ParticlePool, dt: number): void {
   let at = 0
   while (at < pool.count) {
-    pool.age[at] += dt
-    if (pool.age[at] >= pool.life[at]) {
-      moveLastInto(pool, at)
-      continue
-    }
-    pool.x[at] += pool.vx[at] * dt
-    pool.y[at] += pool.vy[at] * dt
-    at++
+    if (advanceParticle(pool, at, dt)) at++
+    else removeParticleAt(pool, at)
   }
+}
+
+/** Ages and moves one particle; false once its life has run out, leaving it for the caller. */
+export function advanceParticle(pool: ParticlePool, at: number, dt: number): boolean {
+  pool.age[at] += dt
+  if (pool.age[at] >= pool.life[at]) return false
+  pool.x[at] += pool.vx[at] * dt
+  pool.y[at] += pool.vy[at] * dt
+  return true
 }
 
 /**
@@ -104,7 +107,8 @@ function addParticle(pool: ParticlePool, random: SeededRandom, spray: Spray): vo
   pool.count = at + 1
 }
 
-function moveLastInto(pool: ParticlePool, at: number): void {
+/** Frees a particle's slot: the last live particle moves into it. */
+export function removeParticleAt(pool: ParticlePool, at: number): void {
   const last = pool.count - 1
   pool.x[at] = pool.x[last]
   pool.y[at] = pool.y[last]
