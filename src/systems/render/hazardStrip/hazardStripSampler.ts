@@ -110,12 +110,12 @@ export function createHazardStrip(): HazardStrip {
 
 export function sampleHazardStrip(strip: HazardStrip, ground: StripGround, frame: StripFrame) {
   followGround(strip, ground)
-  followPath(strip, frame)
-  measureWindow(strip, frame)
-  forgetStaleSegments(strip)
+  const path = followPath(strip, frame)
+  measureWindow(strip, path, ground, frame)
+  forgetStaleSegments(strip, ground)
   coverWindow(strip)
   refineWithBudgetLeft(strip)
-  writeFramePips(strip, frame)
+  writeFramePips(strip, path, frame)
 }
 
 function followGround(strip: HazardStrip, ground: StripGround): void {
@@ -125,39 +125,43 @@ function followGround(strip: HazardStrip, ground: StripGround): void {
 }
 
 /** A turn, or a rig moved off the path (a teleport, a fall), starts the path again. */
-function followPath(strip: HazardStrip, frame: StripFrame): void {
-  if (isOnPath(strip, frame)) return
-  restartPath(strip, stripPathFrom(frame.nose, frame.facing))
+function followPath(strip: HazardStrip, frame: StripFrame): StripPath {
+  if (strip.path !== null && isOnPath(strip.path, frame, strip.point)) return strip.path
+  return restartPath(strip, stripPathFrom(frame.nose, frame.facing))
 }
 
-function isOnPath(strip: HazardStrip, frame: StripFrame): boolean {
-  const { path } = strip
-  if (path === null || !isSameHeading(path, frame.nose, frame.facing)) return false
-  return distanceOffPath(path, frame.nose, strip.point) <= STRIP_PATH_DRIFT_M
+function isOnPath(path: StripPath, frame: StripFrame, scratch: Vector2): boolean {
+  if (!isSameHeading(path, frame.nose, frame.facing)) return false
+  return distanceOffPath(path, frame.nose, scratch) <= STRIP_PATH_DRIFT_M
 }
 
-function restartPath(strip: HazardStrip, path: StripPath | null): void {
+function restartPath<P extends StripPath | null>(strip: HazardStrip, path: P): P {
   strip.path = path
   strip.segments.length = 0
+  return path
 }
 
 /** The window: `max(speed x seconds, 16 m)` ahead of the rig, cut where the path leaves the disc. */
-function measureWindow(strip: HazardStrip, frame: StripFrame): void {
-  const path = strip.path as StripPath
+function measureWindow(
+  strip: HazardStrip,
+  path: StripPath,
+  ground: StripGround,
+  frame: StripFrame,
+): void {
   const seconds = Math.max(STRIP_WINDOW_SECONDS, frame.windowSeconds)
   const window = strip.window
   window.at = progressAlongPath(path, frame.nose)
   window.speed = frame.feltSpeed
   window.reach = Math.max(frame.feltSpeed * seconds, STRIP_MIN_REACH_M)
-  const end = pathEndOf(path, (strip.ground as StripGround).radiusMetres)
+  const end = pathEndOf(path, ground.radiusMetres)
   strip.fromStep = Math.floor(window.at)
   strip.toStep = Math.max(strip.fromStep, Math.ceil(Math.min(window.at + window.reach, end)) + 1)
   strip.spentUs = 0
 }
 
-function forgetStaleSegments(strip: HazardStrip): void {
+function forgetStaleSegments(strip: HazardStrip, ground: StripGround): void {
   dropPassedSegments(strip.segments, strip.fromStep)
-  dropEditedSegments(strip.segments, strip.ground as StripGround)
+  dropEditedSegments(strip.segments, ground)
 }
 
 /** Every uncovered step of the window, at the finest tier the budget pays for. */
@@ -183,8 +187,7 @@ function refineWithBudgetLeft(strip: HazardStrip): void {
   strip.tier = coarsestTierWithin(strip.segments, window)
 }
 
-function writeFramePips(strip: HazardStrip, frame: StripFrame): void {
-  const path = strip.path as StripPath
+function writeFramePips(strip: HazardStrip, path: StripPath, frame: StripFrame): void {
   const { collapse, tick, viewer } = frame
   writeCollapseSteps(strip.collapseSteps, collapse, tick, path, strip.window, strip.point)
   strip.pipCount = writeStripPips(
@@ -196,6 +199,7 @@ function writeFramePips(strip: HazardStrip, frame: StripFrame): void {
   )
 }
 
+/** Scans run only inside a frame, after the ground and the path are set. */
 function scanStretchOf(strip: HazardStrip, from: number, to: number, tier: StripTier) {
   const ground = strip.ground as StripGround
   return scanSegment(ground, strip.path as StripPath, { from, to, tier }, strip.scratch)

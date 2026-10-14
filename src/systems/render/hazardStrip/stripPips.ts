@@ -15,9 +15,15 @@
 import { STRIP_MAX_PIPS } from '../../../constants/hazardStrip'
 import { BAND_COUNT } from '../../world/planetGeometry'
 import { MAX_ORE_TIER_OFFSET } from '../../world/worldCell'
-import { NEVER_BY_TIP, NO_GATE, STRIP_KIND, type StepHit, type StripKindName } from './stripHits'
+import {
+  isSameHit,
+  NEVER_BY_TIP,
+  NO_GATE,
+  STRIP_KIND,
+  type StepHit,
+  type StripKindName,
+} from './stripHits'
 import type { StripSegment } from './stripScan'
-import { isSameHit } from './stripHits'
 import { STRIP_TIER } from './stripTiers'
 
 export type StripPipKind = StripKindName | 'collapse'

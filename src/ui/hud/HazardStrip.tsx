@@ -7,7 +7,7 @@
 import { useEffect, useRef } from 'react'
 import { STRIP_MAX_PIPS } from '../../constants/hazardStrip'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
-import { drawHazardStrip } from './hazardStripDraw'
+import { drawHazardStrip, pipSlotsOf } from './hazardStripDraw'
 import styles from './HazardStrip.module.css'
 
 const PIP_SLOTS = Array.from({ length: STRIP_MAX_PIPS }, (_, index) => index)
@@ -15,9 +15,12 @@ const PIP_SLOTS = Array.from({ length: STRIP_MAX_PIPS }, (_, index) => index)
 export function HazardStrip() {
   const strip = useRef<HTMLDivElement>(null)
   useEffect(() => {
+    const element = strip.current
+    if (element === null) return
+    const slots = pipSlotsOf(element)
     let frame = 0
     const draw = () => {
-      if (strip.current !== null) drawHazardStrip(strip.current)
+      drawHazardStrip(element, slots)
       frame = window.requestAnimationFrame(draw)
     }
     draw()

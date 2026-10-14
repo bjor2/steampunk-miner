@@ -16,12 +16,16 @@ import {
 
 const DEGREES_PER_RADIAN = 180 / Math.PI
 
-export function drawHazardStrip(strip: HTMLElement): void {
+/** The strip's pip slots, found once when it mounts. */
+export function pipSlotsOf(strip: HTMLElement): HTMLElement[] {
+  return Array.from(strip.querySelectorAll<HTMLElement>('[data-slot]'))
+}
+
+export function drawHazardStrip(strip: HTMLElement, slots: readonly HTMLElement[]): void {
   const { pips, pipCount, tier, isSampling } = hazardStripPresence
   strip.hidden = !isSampling
   strip.dataset.tier = String(tier)
   strip.style.setProperty('--strip-turn', `${stripTurnDegrees()}deg`)
-  const slots = strip.querySelectorAll<HTMLElement>('[data-slot]')
   slots.forEach((slot, index) => drawPipSlot(slot, index < pipCount ? pips[index] : null))
 }
 

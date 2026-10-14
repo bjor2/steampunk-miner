@@ -71,7 +71,6 @@ interface SeededReads {
   stamps: Map<number, number>
   lattice: LatticeKinds
   readings: Map<number, ChunkReading>
-  ground: SeededStripGround
 }
 
 const EVERY_KIND = 0xff
@@ -83,28 +82,29 @@ export function createSeededStripGround(
   params: PlanetParams,
   world: WorldState,
 ): SeededStripGround {
-  const reads = {
+  const reads: SeededReads = {
     params,
     stamps: stampedCellsOf(params),
     lattice: latticeKindsOf(params, artefactCacheTile(params)),
     readings: new Map<number, ChunkReading>(),
-  } as SeededReads
-  reads.ground = {
+  }
+  const ground: SeededStripGround = {
     params,
     world,
     radiusMetres: params.radiusTiles,
-    chunkVersionOf: (cx, cy) => deltaOfChunk(reads.ground.world, cx, cy).version,
-    readTile: (tile, out) => readTileInto(reads, out, tile),
-    blockKindsAt: (tile) => blockKindsOf(reads.lattice, tile) | readingAt(reads, tile).editKinds,
+    chunkVersionOf: (cx, cy) => deltaOfChunk(ground.world, cx, cy).version,
+    readTile: (tile, out) => readTileInto(reads, ground.world, out, tile),
+    blockKindsAt: (tile) =>
+      blockKindsOf(reads.lattice, tile) | readingAt(reads, ground.world, tile).editKinds,
     bandKindsAt: (tile) => bandKindsAt(reads.lattice, tile),
-    generatedCellAt: (tile) => generatedCellIn(reads, readingAt(reads, tile), tile),
+    generatedCellAt: (tile) => generatedCellIn(reads, readingAt(reads, ground.world, tile), tile),
   }
-  return reads.ground
+  return ground
 }
 
-function readTileInto(reads: SeededReads, out: StripHit, tile: TilePoint): void {
+function readTileInto(reads: SeededReads, world: WorldState, out: StripHit, tile: TilePoint): void {
   clearStripHit(out)
-  const reading = readingAt(reads, tile)
+  const reading = readingAt(reads, world, tile)
   if (summedKindsOf(reads, reading) === 0) return
   const index = cellIndexOfTile(tile.tx, tile.ty)
   const material = materialCellOf(generatedCellIn(reads, reading, tile), reading.delta, index)
@@ -142,13 +142,10 @@ function writeOreHit(out: StripHit, params: PlanetParams, cell: number, tile: Ti
   out.gateOpensAtTipMajor = look.opensAtTipMajor ?? -1
 }
 
-function readingAt(reads: SeededReads, tile: TilePoint): ChunkReading {
-  return readingOf(reads, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
-}
-
-function readingOf(reads: SeededReads, cx: number, cy: number): ChunkReading {
-  const reading = heldReadingOf(reads.readings, cx, cy)
-  if (reading.world !== reads.ground.world) refreshEdits(reading, reads.ground.world)
+/** The tile's chunk reading, its edits brought up to `world`. */
+function readingAt(reads: SeededReads, world: WorldState, tile: TilePoint): ChunkReading {
+  const reading = heldReadingOf(reads.readings, chunkOfTile(tile.tx), chunkOfTile(tile.ty))
+  if (reading.world !== world) refreshEdits(reading, world)
   return reading
 }
 
