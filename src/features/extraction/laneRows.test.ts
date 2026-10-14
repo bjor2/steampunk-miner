@@ -13,6 +13,7 @@ import { GATE_ROWS } from '../mining-gates'
 import { POWER_UP_SLOTS, powerUpOfItem } from '../power-up-core'
 import { lastMarkOf, type TechNode } from '../tech-tree'
 import { EXTRACTION_ITEMS, markLadderOf, techNodeOf } from './systems/extractionItems'
+import { SHIPPED_EXTRACTION_FORK_NODES } from './systems/extractionFork'
 import { statPreview } from './systems/statPreview'
 
 // #201 ships the mineral drain (#162 acceptance 1 on the loaded slices: an icon that resolves, a
@@ -57,6 +58,9 @@ function richStateOnLastPlanet() {
 const mentionsAHeldRow = (value: unknown) =>
   HELD_IDS.some((id) => JSON.stringify(value).includes(id))
 
+/** The Hauler stays held until #385 (ticket 269), so only the Prospector branch registers. */
+const [{ id: PROSPECTOR_NODE_ID }] = SHIPPED_EXTRACTION_FORK_NODES
+
 describe('extraction shipped rows', () => {
   it('registers the mineral drain as a vehicle item, a channel power-up and an item card', () => {
     expect(isVehicleItemId(DRAIN.itemId)).toBe(true)
@@ -91,9 +95,9 @@ describe('extraction shipped rows', () => {
 })
 
 describe('extraction tree nodes', () => {
-  it('registers the five extractor nodes and the drain node, and no other of the lane', () => {
+  it('registers the five extractor nodes, the drain node and the shipped fork branch, and no other of the lane', () => {
     expect(laneNodes().map((node) => node.id)).toEqual(
-      [...EXTRACTOR_NODES.map(([id]) => id), DRAIN.node.id].sort(),
+      [...EXTRACTOR_NODES.map(([id]) => id), DRAIN.node.id, PROSPECTOR_NODE_ID].sort(),
     )
   })
 

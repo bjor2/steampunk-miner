@@ -25,5 +25,14 @@
       "yieldShare": "0.5",
       "tripCapShare": "0.150"
     }
+  },
+  "forks": {
+    "source": "GD lock on #255 (ticket 269): the extraction fork at P16, both branches on the mineral drain. Hauler (volume): the drain reaches reachBonusTiles further and takes as many more cells a use, its Mark magnitude; an income mover, so it stays unregistered until the 15% income-cap check (#385) merges (GD ruling on #212). Prospector (selection): the drain reads reachBonusTiles further, its Mark magnitude, and takes only the cells of the best grade in reach, best value first. Starting values for G&V to tune; both branches share one tier and slot, so they cost the same.",
+    "hauler": {
+      "reachBonusTiles": 2
+    },
+    "prospector": {
+      "reachBonusTiles": 1
+    }
   }
 }

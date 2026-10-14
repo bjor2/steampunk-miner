@@ -3,8 +3,9 @@
  * pins; ticket 325): a combo answers the drain's `reach` and `targetOrder` points through the
  * kernel registry, so this lane imports no other slice.
  *
- * - **Reach** is counted in whole cells, the drain's own radius plus the answers, held to
- *   `itemHookCaps.reachCellsMax` (12) by the registry's one clamp.
+ * - **Reach** is counted in whole cells, the drain's own radius (with the extraction fork
+ *   branch's bonus, ticket 269) plus the answers, held to `itemHookCaps.reachCellsMax` (12) by the
+ *   registry's one clamp.
  * - **Order** ranks only the cells `drainReachOf` found drainable: a hook never adds a cell, so it
  *   never makes air and never takes a gated, too-hard or core cell, which `canMine` and the read
  *   already left out. Ties keep the drain's nearest-first order.
@@ -22,6 +23,7 @@ import {
 import type { TilePoint } from '../../../systems/world/tileGrid'
 import type { PowerUpUse } from '../../power-up-core'
 import type { DrainableCell } from './drainReach'
+import { forkReachBonusOf } from './drainFork'
 import { balanceOf, type ExtractionItem } from './extractionItems'
 
 /** The drain's radius in whole cells after every `reach` hook, never past `reachCellsMax`. */
@@ -30,7 +32,7 @@ export function hookedReachOf(state: AuthorityState, use: PowerUpUse, item: Extr
     point: 'reach',
     parentItemId: item.itemId,
     ctx: hookContextOf(use, item, []),
-    base: balanceOf(item).reachTiles,
+    base: balanceOf(item).reachTiles + forkReachBonusOf(state, use.playerId),
   })
 }
 

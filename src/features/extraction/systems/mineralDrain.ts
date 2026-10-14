@@ -14,6 +14,10 @@
  *
  * Its Mark 3 second tap (#256) drains from the rim of its reach inward: the farthest drainable
  * cells first, at the same cells per use, cap and cooldown, so only where it drains changes.
+ *
+ * The lane's P16 fork plays here (ticket 269, `drainFork.ts`): the Hauler reaches further and
+ * takes more cells a use; the Prospector reads further and takes only the best grade in reach.
+ * Neither moves the trip cap, which still clamps what the taken cells pay.
  */
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import { chainEffects, type RuleEffect } from '../../../systems/authority/commandRule'
@@ -27,6 +31,7 @@ import { bandOfTile } from '../../../systems/world/planetGeometry'
 import type { PlanetParams } from '../../../systems/world/planetParams'
 import { GROUND_CELL } from '../../../systems/world/worldCell'
 import type { PowerUpOutcome, PowerUpUse } from '../../power-up-core'
+import { forkCellsPerUseOf, forkChosenCellsOf } from './drainFork'
 import { cellsInHookOrder, hookedReachOf } from './drainHooks'
 import { drainReachOf, type DrainableCell, type DrainReach } from './drainReach'
 import { paidCountOf, takeDrainCells, type DrainTake } from './drainTake'
@@ -77,8 +82,9 @@ function drainSceneOf(state: AuthorityState, params: PlanetParams, use: PowerUpU
     origin: use.origin,
     reachTiles: hookedReachOf(state, use, item),
   })
-  const take = takeDrainCells(cellsInHookOrder(state, use, item, drainOrderOf(reach, use)), {
-    maxCells: use.magnitude ?? balanceOf(item).cellsPerUse,
+  const ordered = cellsInHookOrder(state, use, item, drainOrderOf(reach, use))
+  const take = takeDrainCells(forkChosenCellsOf(state, use.playerId, ordered), {
+    maxCells: forkCellsPerUseOf(state, use.playerId, use.magnitude ?? balanceOf(item).cellsPerUse),
     room: roomUnderCapOf(trip.incomeItemValue, cap),
     holdRoom: statsOfVehicle(vehicle).cargoCapacity - cargoUnitsOf(vehicle.cargo),
     yieldShare: EXTRACTION_ECONOMY.income.yieldShare,
