@@ -13,6 +13,7 @@ import { POSE_REPORT_INTERVAL_TICKS } from '../../constants/balance'
 import { isVehicleActive, statsOfVehicle } from '../vehicle/vehicleState'
 import type { Facing } from '../vehicle/vehiclePose'
 import type { TilePoint } from '../world/tileGrid'
+import { waitFiring, type BorePolicy } from './botBore'
 import { faceThreats } from './botCombat'
 import type { ChargePolicy } from './botCharges'
 import type { RouteDeaths } from './botDeathReplay'
@@ -30,6 +31,8 @@ const BORE_REPORT_TICKS = 60
 export interface BotPilot {
   position: TilePoint
   facing: Facing
+  /** Whether it fires the bore gun while it bores or stands by (ticket 347); absent is `never`. */
+  borePolicy?: BorePolicy
 }
 
 /** The bot on one planet: its mine, where its vehicle is, and whether it blasts (#109). */
@@ -58,7 +61,8 @@ export interface BotPlanet {
 /**
  * Bores the neighbouring tile for `ticks`, reporting facing it every few ticks; between reports the
  * bot turns to meet any enemy closing in (`faceThreats`), so a long core bore is not a free hit,
- * and sets its guns for the tank it has (`setGunsForEnergy`).
+ * and sets its guns for the tank it has (`setGunsForEnergy`). A forced pilot fires the bore gun at
+ * its cadence through the wait (`waitFiring`).
  */
 export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, ticks: number) {
   const facing = facingTowards(pilot.position, tile)
@@ -67,7 +71,7 @@ export function boreTile(session: BotSession, pilot: BotPilot, tile: TilePoint, 
     setGunsForEnergy(session)
     const chunk = Math.min(left, BORE_REPORT_TICKS)
     session.submit(reportPoseIntent(pilot.position, facing, NO_TICKS))
-    session.wait(chunk)
+    waitFiring(session, pilot, chunk)
     // An enemy can destroy the vehicle while it waits; the drill then has nothing to drive.
     if (!isVehicleActive(session.vehicle())) return
     session.submit({ type: 'drillTile', payload: { ...tile, ticks: chunk } })
@@ -88,13 +92,13 @@ export function touchTile(session: BotSession, pilot: BotPilot, tile: TilePoint)
   pilot.facing = facing
 }
 
-/** Waits where it stands for `ticks`, meeting threats and setting its guns as a bore does. */
+/** Waits where it stands for `ticks`, meeting threats, setting its guns and firing as a bore does. */
 export function standBy(session: BotSession, pilot: BotPilot, ticks: number): void {
   for (let left = ticks; left > 0 && isVehicleActive(session.vehicle());) {
     faceThreats(session, pilot)
     setGunsForEnergy(session)
     const chunk = Math.min(left, BORE_REPORT_TICKS)
-    session.wait(chunk)
+    waitFiring(session, pilot, chunk)
     left -= chunk
   }
 }

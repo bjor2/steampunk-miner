@@ -8,6 +8,7 @@ import { TICKS_PER_SECOND } from '../constants/physics'
 import type { AuthorityCommand, CommandIntent } from '../systems/authority/authorityCommand'
 import { createAuthorityState, type AuthorityState } from '../systems/authority/authorityState'
 import { planetParamsOf } from '../systems/authority/planetOfState'
+import type { BorePolicy } from '../systems/bot/botBore'
 import type { ChainPolicy } from '../systems/bot/botChains'
 import type { ChargePolicy } from '../systems/bot/botCharges'
 import type { GunPolicy } from '../systems/bot/botGuns'
@@ -46,6 +47,8 @@ export interface LoggedRunOptions {
   refinery?: RefineryUse
   /** Whether the bot holds chains of steps (ticket 226); default `click` until the re-baseline. */
   chainPolicy?: ChainPolicy
+  /** Whether the bot fires the bore gun (ticket 347); default `never`, `forced` for `balance:bore`. */
+  borePolicy?: BorePolicy
 }
 
 /** One run of a scenario on one of its pacing world seeds (#84). */
@@ -103,6 +106,7 @@ export function playSliceIntoSink(
     chargePolicy: options.chargePolicy,
     refinery: options.refinery,
     chainPolicy: options.chainPolicy,
+    borePolicy: options.borePolicy,
     playerId: PLAYER_ID,
     startCommands: startCommandsOf(scenario),
     listener: {

@@ -16,7 +16,11 @@
  * Auto mode (ticket 317, #310) reads the steam sear's numbers from the same provider: the preview,
  * the wait after a manual shot, the energy reserve (#322's `autoShoot`) and whether the trip's
  * income cap is used up (the slice's `roomUnderCapOf`, which the kernel cannot read).
+ *
+ * The forced-gun bot run (ticket 347, the TD's seam 3 on #314) starts with the gun at its walls:
+ * the provider names the debug command that sets it there, as only the slice knows its tracks.
  */
+import type { CommandIntent } from '../authority/authorityCommand'
 import type { AuthorityState } from '../authority/authorityState'
 import { defineOneProviderRegistry, entriesOf } from './seal'
 
@@ -55,6 +59,11 @@ export interface BoreGunProvider {
   boreGunOf(state: AuthorityState, playerId: string): BoreGunStats | null
   /** The sear's numbers for this player, or null (or left out) when auto mode has none. */
   autoShootOf?(state: AuthorityState, playerId: string): BoreAutoShootStats | null
+  /**
+   * The debug command that mounts the gun with every track at its wall, free (the slice's
+   * `debug.ground-gun.setLevels`): the forced bot run's start. Left out, that run has no gun.
+   */
+  wallsMountIntent?(): CommandIntent
 }
 
 export const BORE_GUN_REGISTRY = defineOneProviderRegistry<BoreGunProvider>('boreGun')
@@ -91,6 +100,12 @@ export function boreAutoShootOf(
   const [provider] = entriesOf(BORE_GUN_REGISTRY)
   const stats = provider?.autoShootOf?.(state, playerId) ?? null
   return stats === null ? null : wholeAutoShootOf(stats)
+}
+
+/** The provider's debug command for a gun at its walls, or null with no provider or none named. */
+export function boreGunWallsMountIntent(): CommandIntent | null {
+  const [provider] = entriesOf(BORE_GUN_REGISTRY)
+  return provider?.wallsMountIntent?.() ?? null
 }
 
 function wholeAutoShootOf(stats: BoreAutoShootStats): BoreAutoShootStats {

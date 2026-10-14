@@ -78,6 +78,14 @@ export const BORE_AUTO_ACTOR: AutoActor = {
   act: (state, playerId, aim, tick) => fireWhenAccepted(state, { playerId, tick, bearing: aim }),
 }
 
+/**
+ * The bearing auto aim would pick now (highest sale value over the arc, holds not asked), or null
+ * with no gun or no ore worth a shot: the forced bot's aim (ticket 347).
+ */
+export function bestBoreBearingOf(state: AuthorityState, playerId: string): number | null {
+  return withAsk(state, playerId, bestBoreShotOf)?.bearing ?? null
+}
+
 function searOf(state: AuthorityState, playerId: string) {
   return boreAutoShootOf(state, playerId)
 }

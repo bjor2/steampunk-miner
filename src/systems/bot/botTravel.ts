@@ -6,6 +6,7 @@
 import { canTravel } from '../authority/travelRules'
 import { dockSiteOfPlanet } from '../authority/planetOfState'
 import { bayRestTileOf } from '../world/dockBays'
+import { DEFAULT_BORE_POLICY, type BorePolicy } from './botBore'
 import type { ChargePolicy } from './botCharges'
 import { noRouteDeaths } from './botDeathReplay'
 import type { BotPlanet } from './botPilot'
@@ -16,18 +17,19 @@ import { newMineLayout } from './mineLayout'
 
 /**
  * The bot on the planet its session is on, at the Sell bay with a mine not yet dug; the run's
- * gate route blocks (ticket 237) go on from the planet before.
+ * gate route blocks (ticket 237) and its bore policy (ticket 347) go on from the planet before.
  */
 export function botPlanetOf(
   session: BotSession,
   chargePolicy: ChargePolicy,
   gateRouteBlocks: GateRouteBlock[] = [],
+  borePolicy: BorePolicy = DEFAULT_BORE_POLICY,
 ): BotPlanet {
   const site = dockSiteOfPlanet(session.state().planet)
   if (site === null) throw new Error('the bot plays only on a generated planet')
   return {
     layout: newMineLayout(paramsOfSession(session.state()), site),
-    pilot: { position: bayRestTileOf(site, 'sell'), facing: 1 },
+    pilot: { position: bayRestTileOf(site, 'sell'), facing: 1, borePolicy },
     chargePolicy,
     hasMetBlastTile: false,
     shellChargeSize: 0,
@@ -42,5 +44,5 @@ export function travelWhenReady(session: BotSession, planet: BotPlanet): BotPlan
   const state = session.state()
   if (!state.core.isCompleted || !canTravel(state, session.playerId)) return planet
   session.submit({ type: 'travel', payload: { toPlanet: state.planet.index + 1 } })
-  return botPlanetOf(session, planet.chargePolicy, planet.gateRouteBlocks)
+  return botPlanetOf(session, planet.chargePolicy, planet.gateRouteBlocks, planet.pilot.borePolicy)
 }

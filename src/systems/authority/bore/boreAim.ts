@@ -17,6 +17,9 @@ export const BORE_BEARING_COUNT = BORE_BEARINGS.bearings.length
 
 const [LEFT_EDGE, RIGHT_EDGE] = BORE_BEARINGS.arcEdges
 
+/** The 60° edge on each side: the bearing a shot inside the cone is clamped to. */
+export const ARC_EDGE_BEARINGS = { left: LEFT_EDGE, right: RIGHT_EDGE } as const
+
 /** The bearing actually bored: itself inside the arc, else the 60° edge on its side. */
 export function clampedBearing(bearing: number): number {
   if (bearing <= LEFT_EDGE || bearing >= RIGHT_EDGE) return bearing

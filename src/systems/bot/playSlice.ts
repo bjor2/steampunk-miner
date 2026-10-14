@@ -26,6 +26,7 @@ import { canScratch } from '../vehicle/drillRule'
 import { statsOfVehicle } from '../vehicle/vehicleState'
 import { coreHardness } from '../economy/oreEconomy'
 import { deepestHeldBand, holdsCore } from './botCasing'
+import { DEFAULT_BORE_POLICY, mountBoreGunWhenForced, type BorePolicy } from './botBore'
 import { restockSizeOf, type ChargePolicy } from './botCharges'
 import { DEFAULT_CHAIN_POLICY, type ChainPolicy } from './botChains'
 import type { GunPolicy } from './botGuns'
@@ -81,6 +82,11 @@ export interface SliceRunOptions {
   chargePolicy?: ChargePolicy
   /** Buy every step as a click (the default until the re-baseline), or hold chains (ticket 226). */
   chainPolicy?: ChainPolicy
+  /**
+   * Never fire the bore gun (the default), or start with it at its walls and fire at every
+   * `nextShotTick` (ticket 347, `balance:bore`).
+   */
+  borePolicy?: BorePolicy
   listener?: BotListener
   /** `used` (the default) from the Refinery bay's planet; `ignored` plays as if it had none. */
   refinery?: RefineryUse
@@ -107,13 +113,24 @@ interface BotRun {
  */
 const CORE_TRIP_MAX_TICKS_PER_TILE = 20 * TICKS_PER_SECOND
 
-/** What playing on from a session under way needs: the run's options past its start. */
-export type PlayOnOptions = Omit<SliceRunOptions, 'playerId' | 'startCommands' | 'listener'>
+/**
+ * What playing on from a session under way needs: the run's options past its start. The bore
+ * policy rides on the planet's pilot (`botPlanetOf`), so it is not among them.
+ */
+export type PlayOnOptions = Omit<
+  SliceRunOptions,
+  'playerId' | 'startCommands' | 'listener' | 'borePolicy'
+>
 
 export function playSlice(start: AuthorityState, options: SliceRunOptions): SliceRun {
   const session = createBotSession(start, options.playerId ?? 'p1', options.listener)
   for (const intent of options.startCommands ?? []) session.submit(intent)
-  return playSliceFrom(session, botPlanetOf(session, chargePolicyOf(options)), options)
+  mountBoreGunWhenForced(session, borePolicyOf(options))
+  return playSliceFrom(session, firstBotPlanetOf(session, options), options)
+}
+
+function firstBotPlanetOf(session: BotSession, options: SliceRunOptions): BotPlanet {
+  return botPlanetOf(session, chargePolicyOf(options), [], borePolicyOf(options))
 }
 
 /** Plays on from a session under way, the bot on `planet` (a spec's fixture, or `playSlice`). */
@@ -146,6 +163,10 @@ function botRunOf(options: PlayOnOptions): BotRun {
 
 function chargePolicyOf(options: PlayOnOptions): ChargePolicy {
   return options.chargePolicy ?? 'blast'
+}
+
+function borePolicyOf(options: SliceRunOptions): BorePolicy {
+  return options.borePolicy ?? DEFAULT_BORE_POLICY
 }
 
 function sliceRunOf(session: BotSession, run: BotRun, planet: BotPlanet): SliceRun {
