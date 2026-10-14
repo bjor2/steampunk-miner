@@ -4,7 +4,7 @@ getcontext().prec=40
 C=dict(v0="10",rho="1.5",eta="1.2544",d0="1.5",gD="1.12",P0="1",gP="1.2544",H0="100",gH="1.12",
  E0=150,eStep=6,C0=10,cStep=4,sMin="6",sMax="14",aMin="1.0",aMax="1.8",tMin="2.0",tMax="3.5",Ke=25,
  coreMult="4",coreFrac="0.4",travelK="0.12",chargeK="0.002",repairK="0.5",feeFrac="0.05",feeFloorK="3",feeCapK="30",
- c0=24,base=dict(drill_power="55",drill_tip="83",cargo_hold="24",boiler="23",engine="36",hull="46"),r="1.225",rDrill="1.225",rTip="1.500625",w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
+ c0=24,base=dict(drill_power="10",drill_tip="83",cargo_hold="24",boiler="23",engine="36",hull="46"),r="1.225",rDrill="1.15",rTip="1.500625",drillPieces=[[1,"9.2","1.15"],[17,"1300","1.5"]],w=dict(drill_power=2,drill_tip=3,engine=1.5,boiler=1,cargo_hold=1,hull=2),
  Hk="7",Dkc="17.5",Dkb="16.5",gE="1.12",ET0=1,etPlanet=6,etBand=1,KxE=60,tkill="1.5",
  paceFrom=[[3,"1.4"],[8,"0.75"],[11,"1"]])
 d=lambda s:D(str(s))
@@ -23,9 +23,15 @@ def Lon(tr,p):
     return dict(drill_power=6*(p-1)+13,drill_tip=3*(p-1)+7,hull=6*(p-1)+2,cargo_hold=6*(p-1)+8,boiler=6*(p-1)+4,engine=6*(p-1)+6)[tr]
 # paceScale(p) (#131 fromPlanet): the last row at or below p, else 1; it multiplies every price.
 def pace(p): return d(([s for f_,s in C['paceFrom'] if f_<=p] or ["1"])[-1])
-def cost(tr,L,p=1):
+# drill power's later pieces (ticket 396, Systems' front-loaded rows, L0 worth 10 per the GD ruling):
+# from level f on, base*ratio^(L-f).
+def piece(tr,L):
     base=d(C['base'][tr]) if tr in C['base'] else d(C['c0'])*d(C['w'][tr]); r=d(C[dict(drill_tip='rTip',drill_power='rDrill').get(tr,'r')])
-    return (base*r**L*pace(p)).to_integral_value(rounding=ROUND_CEILING)
+    later=[(f_,d(b_),d(r_)) for f_,b_,r_ in (C['drillPieces'] if tr=='drill_power' else []) if f_<=L]
+    return later[-1] if later else (0,base,r)
+def cost(tr,L,p=1):
+    f_,base,r=piece(tr,L)
+    return (base*r**(L-f_)*pace(p)).to_integral_value(rounding=ROUND_CEILING)
 def cargo(L): return C['C0']+C['cStep']*L
 def energy(L): return C['E0']+C['eStep']*L
 def speed(L): return d(C['sMin'])+(d(C['sMax'])-d(C['sMin']))*L/(L+C['Ke'])

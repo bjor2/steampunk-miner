@@ -21,10 +21,11 @@ interface RowModules {
   workshopRowsOf: typeof workshopRowsOf
 }
 
-/** The track rows for a rig with `levels`, docked at the Upgrade bay with money to spare. */
+/** The track rows for a rig with `levels`, docked at the Upgrade bay with money to spare: a level-200
+ * drill step costs about 1e35 on ticket 396's rows. */
 function rowsOf(modules: RowModules, levels: Record<string, number>) {
   const session = modules.createScriptedSession()
-  session.submit(1, grantMoneyCommand('1e30'))
+  session.submit(1, grantMoneyCommand('1e60'))
   for (const [track, level] of Object.entries(levels)) {
     session.submit(1, setUpgradeCommand(track, level))
   }

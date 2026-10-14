@@ -50,7 +50,16 @@
     { "id": "cost.vehicle.boiler", "family": "geometric", "base": "23", "ratio": "1.225" },
     { "id": "cost.vehicle.engine", "family": "geometric", "base": "36", "ratio": "1.225" },
     { "id": "cost.vehicle.hull", "family": "geometric", "base": "46", "ratio": "1.225" },
-    { "id": "cost.vehicle.drill_power", "family": "geometric", "base": "55", "ratio": "1.225" },
+    {
+      "id": "cost.vehicle.drill_power",
+      "family": "geometric",
+      "base": "10",
+      "ratio": "1.15",
+      "pieces": [
+        { "fromLevel": 1, "base": "9.2", "ratio": "1.15" },
+        { "fromLevel": 17, "base": "1300", "ratio": "1.5" }
+      ]
+    },
     { "id": "cost.vehicle.drill_tip", "family": "geometric", "base": "83", "ratio": "1.500625" },
     { "id": "cost.casing.upgrade", "family": "geometric", "base": "48", "ratio": "1.225" },
     { "id": "cost.refinery.slot", "family": "bandOre", "band": 5, "oreUnitsByLevel": ["20", "40"] },

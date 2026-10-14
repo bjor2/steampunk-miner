@@ -29,7 +29,7 @@
   "feeCapK": "30",
   "c0": 24,
   "base": {
-    "drill_power": "55",
+    "drill_power": "10",
     "drill_tip": "83",
     "cargo_hold": "24",
     "boiler": "23",
@@ -37,7 +37,11 @@
     "hull": "46"
   },
   "r": "1.225",
-  "rDrill": "1.225",
+  "rDrill": "1.15",
+  "drillPieces": [
+    [1, "9.2", "1.15"],
+    [17, "1300", "1.5"]
+  ],
   "rTip": "1.500625",
   "w": {
     "drill_power": 2,

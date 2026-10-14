@@ -46,9 +46,14 @@ const setMoney = (session: ScriptedSession, amount: Money) =>
 const rejectionOf = (events: readonly DomainEvent[]) =>
   events.find((event) => event.type === 'CommandRejected')
 
-/** The drill power steps from `from` bought in one chain, the wallet holding exactly their sum. */
-function buyChainWithExactWallet(from: number, steps: number, chain: number) {
-  const session = upgradeBayOn(3, toCanonical(sumOfStepPrices(from, steps)))
+/**
+ * The drill power steps from `from` bought in one chain, the wallet holding their sum and its
+ * precision margin: past 1e37 a 40-digit sum rounds half-to-even and can land a 40th digit under
+ * the prices it adds up (ticket 396's drill rows at level 607, 1e107).
+ */
+function buyChainWithSumInWallet(from: number, steps: number, chain: number) {
+  const sum = sumOfStepPrices(from, steps)
+  const session = upgradeBayOn(3, toCanonical(add(sum, precisionMarginOf(sum))))
   session.submit(0, {
     type: 'debug.setUpgrade',
     payload: { upgradeId: 'drill_power', level: from },
@@ -73,8 +78,13 @@ function sumOfStepPrices(from: number, steps: number): Money {
  * stay small, within 1e-38 of the sum past 1e37 (the TD's restated acceptance 3 on #180).
  */
 function isWithinPrecisionOfZero(left: Money, sum: Money): boolean {
-  const tolerance = mul(sum, fromCanonical('1e-38'))
+  const tolerance = precisionMarginOf(sum)
   return cmp(left, tolerance) <= 0 && cmp(left, sub(ZERO_MONEY, tolerance)) >= 0
+}
+
+/** 1e-38 of the sum, the precision the TD restated for #180 acceptance 3. */
+function precisionMarginOf(sum: Money): Money {
+  return mul(sum, fromCanonical('1e-38'))
 }
 
 describe('purchase chains: cost (#180 section 2, ticket 226)', () => {
@@ -84,14 +94,15 @@ describe('purchase chains: cost (#180 section 2, ticket 226)', () => {
     ['level 607', stepOfMajor(607)],
     ['level 6007', stepOfMajor(6007)],
   ])('a 10-step chain from %s costs exactly its step prices, as 10 clicks do', (_name, from) => {
-    const held = buyChainWithExactWallet(from, 10, HOLD)
+    const held = buyChainWithSumInWallet(from, 10, HOLD)
     const prices = [...Array(10).keys()].map((k) =>
       toCanonical(stepPrice('drill_power', from + k, 3)),
     )
     expect(held.step).toBe(from + 10)
     expect(held.costs).toEqual(prices)
-    expect(isWithinPrecisionOfZero(held.wallet, sumOfStepPrices(from, 10))).toBe(true)
-    expect(buyChainWithExactWallet(from, 10, 0)).toEqual(held)
+    const sum = sumOfStepPrices(from, 10)
+    expect(isWithinPrecisionOfZero(sub(held.wallet, precisionMarginOf(sum)), sum)).toBe(true)
+    expect(buyChainWithSumInWallet(from, 10, 0)).toEqual(held)
   })
 })
 
