@@ -372,7 +372,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 4 | 4 |
 
-### `terrain-tools`: 33 files, 264 tests
+### `terrain-tools`: 34 files, 268 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -384,6 +384,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/sceneBudget.test.ts` | 3 | 3 |
 | `src/features/terrain-tools/shippedRows.test.ts` | 7 | 7 |
 | `src/features/terrain-tools/store/clampRelease.test.ts` | 2 | 2 |
+| `src/features/terrain-tools/systems/clampCountdown.test.ts` | 4 | 3 |
 | `src/features/terrain-tools/systems/clampLattice.test.ts` | 4 | 4 |
 | `src/features/terrain-tools/systems/dragHooks.test.ts` | 35 | 8 |
 | `src/features/terrain-tools/systems/gatesFixture.test.ts` | 22 | 5 |
@@ -504,7 +505,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/charges/chargeLiveBlast.test.ts` | 12 | 12 |
 | `src/systems/authority/charges/chargeShop.test.ts` | 10 | 10 |
 | `src/systems/authority/charges/chargeSizeRules.test.ts` | 14 | 14 |
-| `src/systems/authority/collapse/collapseBraces.test.ts` | 21 | 20 |
+| `src/systems/authority/collapse/collapseBraces.test.ts` | 23 | 22 |
 | `src/systems/authority/collapse/collapseRun.test.ts` | 19 | 19 |
 | `src/systems/authority/combat/burrower.test.ts` | 5 | 5 |
 | `src/systems/authority/combat/combatRun.test.ts` | 8 | 7 |
@@ -803,7 +804,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/chunkTileBatchGates.test.ts` | 12 | 5 |
 | `src/systems/render/chunkTileBatchOreLook.test.ts` | 1 | 1 |
 | `src/systems/render/chunkWorkerStreaming.test.ts` | 8 | 2 |
-| `src/systems/render/collapseTelegraph.test.ts` | 5 | 5 |
+| `src/systems/render/collapseTelegraph.test.ts` | 8 | 8 |
 | `src/systems/render/densityHalo.test.ts` | 5 | 5 |
 | `src/systems/render/drillHeadPose.test.ts` | 7 | 4 |
 | `src/systems/render/enemyArt.test.ts` | 3 | 3 |
