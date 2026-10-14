@@ -5,9 +5,11 @@ import {
   CORRIDOR_MIDDLE,
   poseAt,
   setHull,
+  setUpgrade,
   spawnEnemy,
 } from '../authority/combat/combatFixtures'
 import { coreNeededOf } from '../authority/coreBay'
+import { isTravelSetByDrill } from '../authority/travelSpeed'
 import { WORLD_SEED } from '../authority/scriptedSession'
 import { FACING } from '../vehicle/vehiclePose'
 import { moveStraight, type BotPlanet } from './botPilot'
@@ -24,6 +26,12 @@ const ON_CURVE_HULL = '125.44'
 const WRECK_HULL = '1'
 const BITE_WAIT_TICKS = 60
 const RICH = '1000000'
+/**
+ * The highest drill major that leaves planet 1's travel to the engine (5.6 of its 6 m/s): from
+ * ticket 396's 4-tick floor the corridor's on-curve drill (13) cuts band 1 at 6.6 cells/s and
+ * drives the rig at 9.7 m/s, past what a crawler two tiles behind can catch in six tiles.
+ */
+const ENGINE_BOUND_DRILL_LEVEL = 8
 
 /** The combat specs' planet 1 corridor (#25), the bot in its middle facing along it. */
 function botInCorridor(): { session: BotSession; planet: BotPlanet } {
@@ -33,6 +41,7 @@ function botInCorridor(): { session: BotSession; planet: BotPlanet } {
     session.wait(tick - session.tick())
     session.submit(intent)
   }
+  session.submit(setUpgrade('drill_power', ENGINE_BOUND_DRILL_LEVEL))
   const planet = botPlanetOf(session, 'never')
   planet.pilot.position = CORRIDOR_MIDDLE
   return { session, planet }
@@ -77,6 +86,7 @@ const hitArcsOf = (session: BotSession, fromEvent: number) =>
 describe('bot: combat reflex on the move (#29 Gameplay note 3, #130)', () => {
   it('drives on with its back to a crawler on a planet where it has not been destroyed', () => {
     const { session, planet } = botInCorridor()
+    expect(isTravelSetByDrill(session.state(), session.playerId)).toBe(false)
     const fromEvent = session.events().length
     driveWithCrawlerBehind(session, planet)
     expect(hitArcsOf(session, fromEvent)).toContain('rear')
@@ -90,7 +100,8 @@ describe('bot: combat reflex on the move (#29 Gameplay note 3, #130)', () => {
     returnToCorridor(session, planet)
     const fromEvent = session.events().length
     driveWithCrawlerBehind(session, planet)
-    expect(hitArcsOf(session, fromEvent)).toEqual(['front'])
+    // Every bite lands on the drill head; the engine-bound drill takes two to kill the crawler.
+    expect([...new Set(hitArcsOf(session, fromEvent))]).toEqual(['front'])
     expect(session.events().slice(fromEvent)).toContainEqual(
       expect.objectContaining({ type: 'EnemyKilled', kind: 'crawler', by: 'drill' }),
     )
