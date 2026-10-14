@@ -1,18 +1,24 @@
 import { describe, expect, it } from 'vitest'
 import { oreTier, oreValue } from '../../systems/economy/oreEconomy'
-import { cmp, fromCanonical, fromSafeInteger, mul, toCanonical } from '../../systems/money'
+import { add, cmp, fromCanonical, fromSafeInteger, mul, toCanonical } from '../../systems/money'
 import {
   incomeCapRowsOf,
+  milestoneIncomeCapRowsOf,
   type IncomeAnchors,
   type IncomeAt,
+  type IncomeCapRow,
 } from '../../systems/registries/incomeRates'
 import { tripCapAt } from '../extraction'
+import { lastMarkOf, reachedMilestonesOf } from '../tech-tree'
+import { terrainItemNamed } from './systems/itemMagnitude'
 import {
   beaconAtFullStack,
+  linkedBeaconAtFullStack,
   pocketAtFullStack,
   relocatedValuePerMinute,
   shifterAtFullStack,
 } from './systems/moverIncomeRates'
+import { markLadderOf } from './systems/terrainItems'
 
 // The movers' rows in the kernel's 15% income-cap check (#385, GD ruling on #212 Q2 (a)): the ore
 // value each relocates in a trip of minutes at full stack, after the trip cap, counted once its
@@ -30,8 +36,20 @@ const MOVER_ITEM_IDS = ['consumable.lodestone_beacon', 'power.ore_shifter', 'pow
 
 const EVERY_ITEM_OWNED: IncomeAnchors = { isRowLive: () => true, isItemOwned: () => true }
 
-function moverRowsOf(at: IncomeAt, anchors = EVERY_ITEM_OWNED) {
-  return incomeCapRowsOf(at, anchors).filter((row) => row.rateId.startsWith('terrain-tools.'))
+function moverRowsOf(at: IncomeAt, anchors = EVERY_ITEM_OWNED, rowsOf = incomeCapRowsOf) {
+  return rowsOf(at, anchors).filter((row) => row.rateId.startsWith('terrain-tools.'))
+}
+
+/** Each mover's unclamped trip, with and without its sibling-link. */
+function tripsOf(rows: readonly IncomeCapRow[]): Record<string, string> {
+  return Object.fromEntries(rows.map((row) => [row.itemId, toCanonical(row.unclampedValuePerTrip)]))
+}
+
+/** The sibling the item's last Mark links to; null when its ladder ends before its link. */
+function linkedSiblingOf(itemId: string): string | null {
+  const ladder = markLadderOf(terrainItemNamed(itemId))
+  const reached = reachedMilestonesOf(ladder, lastMarkOf(ladder))
+  return reached.find((milestone) => milestone.pattern === 'sibling-link')?.siblingId ?? null
 }
 
 describe('mover income rates', () => {
@@ -68,5 +86,30 @@ describe('mover income rates', () => {
   it('moves ore every minute at full stack with each mover', () => {
     const movers = [shifterAtFullStack(), pocketAtFullStack(), beaconAtFullStack()]
     expect(movers.every((mover) => mover.oreCellsPerUse * mover.usesPerMinute > 0)).toBe(true)
+  })
+})
+
+describe('mover income rates with Mark milestones (ticket 278)', () => {
+  it('links the shifter to the lodestone beacon and the pocket lance to the seam splitter, the beacon to nothing', () => {
+    expect(MOVER_ITEM_IDS.map(linkedSiblingOf)).toEqual([
+      null,
+      'consumable.lodestone_beacon',
+      'consumable.seam_splitter',
+    ])
+  })
+
+  it("adds the shifter's linked beacon, gathering half the beacon's ore, to the shifter's trip", () => {
+    expect(linkedBeaconAtFullStack().oreCellsPerUse * 2).toBe(beaconAtFullStack().oreCellsPerUse)
+    const linked = mul(relocatedValuePerMinute(linkedBeaconAtFullStack(), AT), AT.tripMinutes)
+    const plain = tripsOf(moverRowsOf(AT))['power.ore_shifter']
+    const withLink = tripsOf(moverRowsOf(AT, EVERY_ITEM_OWNED, milestoneIncomeCapRowsOf))
+    expect(withLink['power.ore_shifter']).toBe(toCanonical(add(fromCanonical(plain), linked)))
+  })
+
+  it("adds nothing for the pocket lance's linked fissure, which moves no ore, nor for the beacon", () => {
+    const plain = tripsOf(moverRowsOf(AT))
+    const withLink = tripsOf(moverRowsOf(AT, EVERY_ITEM_OWNED, milestoneIncomeCapRowsOf))
+    expect(withLink['power.pressure_pocket']).toBe(plain['power.pressure_pocket'])
+    expect(withLink['consumable.lodestone_beacon']).toBe(plain['consumable.lodestone_beacon'])
   })
 })

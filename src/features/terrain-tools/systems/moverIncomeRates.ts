@@ -13,11 +13,17 @@
  * move and an open each, and a beacon gathers at most its swap cap in moves, once a dock, one live
  * a planet: at most one gather a minute. Each mover is a tree item no `stats.json` row admits, so
  * it anchors on itself and counts once owned.
+ *
+ * A mover whose last Mark reaches its sibling-link (#256, ticket 278) also says what the link
+ * relocates a minute, for `balance:tree --milestones`: the ore-shifter's plants a lodestone beacon
+ * gathering half its swap cap, at most one gather a minute as the beacon's own; the pocket lance's
+ * opens a seam splitter fissure, which moves no ore.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { oreTier, oreValue } from '../../../systems/economy/oreEconomy'
 import { fromSafeInteger, mul, type Money } from '../../../systems/money'
 import type { IncomeAt, IncomeRate } from '../../../systems/registries/incomeRates'
+import { atLinkStrength } from '../../power-up-core'
 import { lastMarkOf, markStepOf, type MarkStep } from '../../tech-tree'
 import { ACTIVATION_UNIT_CAP, MOVE_UNITS, OPEN_UNITS } from './editDraft'
 import { tilesNearestFirst } from './editGeometry'
@@ -38,9 +44,11 @@ export interface MoverAtFullStack {
   usesPerMinute: number
 }
 
+const NO_ORE_MOVED: MoverAtFullStack = { oreCellsPerUse: 0, usesPerMinute: 0 }
+
 export const MOVER_INCOME_RATES: readonly IncomeRate[] = [
-  moverRateOf(ORE_SHIFTER_ID, shifterAtFullStack),
-  moverRateOf(PRESSURE_POCKET_ID, pocketAtFullStack),
+  linkedMoverRateOf(ORE_SHIFTER_ID, shifterAtFullStack, linkedBeaconAtFullStack),
+  linkedMoverRateOf(PRESSURE_POCKET_ID, pocketAtFullStack, () => NO_ORE_MOVED),
   moverRateOf(LODESTONE_BEACON_ID, beaconAtFullStack),
 ]
 
@@ -73,7 +81,19 @@ export function pocketAtFullStack(): MoverAtFullStack {
 }
 
 export function beaconAtFullStack(): MoverAtFullStack {
-  const swapCap = balanceOf(terrainItemNamed(LODESTONE_BEACON_ID)).swapCap ?? 0
+  return gatherOf(beaconSwapCap())
+}
+
+/** A beacon a shifter's link plants: half its swap cap, gathered at a dock like its own. */
+export function linkedBeaconAtFullStack(): MoverAtFullStack {
+  return gatherOf(atLinkStrength(beaconSwapCap()))
+}
+
+function beaconSwapCap(): number {
+  return balanceOf(terrainItemNamed(LODESTONE_BEACON_ID)).swapCap ?? 0
+}
+
+function gatherOf(swapCap: number): MoverAtFullStack {
   return { oreCellsPerUse: Math.floor(swapCap / MOVE_UNITS), usesPerMinute: 1 }
 }
 
@@ -84,6 +104,18 @@ function moverRateOf(itemId: string, atFullStack: () => MoverAtFullStack): Incom
     anchorRowId: itemId,
     isTripCappedInPlay: false,
     valuePerMinuteAtFullStack: (at) => relocatedValuePerMinute(atFullStack(), at),
+  }
+}
+
+/** A mover whose last Mark reaches its sibling-link, with what the link relocates. */
+function linkedMoverRateOf(
+  itemId: string,
+  atFullStack: () => MoverAtFullStack,
+  linkedAtFullStack: () => MoverAtFullStack,
+): IncomeRate {
+  return {
+    ...moverRateOf(itemId, atFullStack),
+    linkValuePerMinuteAtFullStack: (at) => relocatedValuePerMinute(linkedAtFullStack(), at),
   }
 }
 
