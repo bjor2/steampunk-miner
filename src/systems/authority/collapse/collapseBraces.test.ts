@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { COLLAPSE_WARN_TICKS } from '../../../constants/balance'
 import { withRegistrations } from '../../../registries/registrar'
 import type { SliceDefinition } from '../../../registries/sliceDefinition'
-import { bracesAt, COLLAPSE_BRACE_REGISTRY } from '../../registries/collapseBraces'
+import {
+  bracesAt,
+  COLLAPSE_BRACE_REGISTRY,
+  frozenTicksLeftAt,
+} from '../../registries/collapseBraces'
 import { entriesOf } from '../../registries/seal'
 import { blockContaining, blockIdOf } from '../../world/collapseBlock'
 import { advanceTicks } from '../advanceTicks'
@@ -260,6 +264,41 @@ describe('collapse braces: the fold (ticket 331)', () => {
         r.collapseBrace({
           id: `${id}.brace`,
           bracesAt: (state) => state.collapse.blocks.map(({ block }) => ({ block, untilTick })),
+        }),
+    }
+  }
+})
+
+describe('collapse braces: the frozen countdown (ticket 357)', () => {
+  it('draws no frozen countdown when no provider says one', () =>
+    withRegistrations([braceProbeSlice()], () => {
+      const { session, block } = braceableTunnel()
+      session.submit(BRACE_TICK, braceCommand([block]))
+      expect(frozenTicksLeftAt(session.state(), block)).toBeNull()
+    }))
+
+  it('freezes a block at the most ticks any provider froze it at, in any order', () => {
+    const slices = [frozenSlice('frozen-a', 44), frozenSlice('frozen-b', 30)]
+    for (const order of [slices, [...slices].reverse()]) {
+      withRegistrations(order, () => {
+        const { session, block } = braceableTunnel()
+        expect(frozenTicksLeftAt(session.state(), block)).toBe(44)
+        expect(frozenTicksLeftAt(session.state(), 'not-a-block')).toBeNull()
+      })
+    }
+  })
+
+  /** A slice bracing every warned block, each frozen at `ticksLeft`. */
+  function frozenSlice(id: string, ticksLeft: number): SliceDefinition {
+    return {
+      id,
+      register: (r) =>
+        r.collapseBrace({
+          id: `${id}.brace`,
+          bracesAt: (state) =>
+            state.collapse.blocks.map(({ block }) => ({ block, untilTick: null })),
+          frozenTicksLeftAt: (state, block) =>
+            state.collapse.blocks.some((entry) => entry.block === block) ? ticksLeft : null,
         }),
     }
   }

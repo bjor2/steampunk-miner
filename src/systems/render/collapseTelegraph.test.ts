@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { COLLAPSE_WARN_TICKS } from '../../constants/balance'
 import { CRACKS_PER_BLOCK } from '../../constants/scene'
 import type { CollapseState } from '../authority/collapse/collapseState'
 import {
@@ -61,5 +62,32 @@ describe('collapse telegraph', () => {
         expect(first[at]).toBeLessThanOrEqual(from + slot.size)
       }
     }
+  })
+})
+
+describe('collapse telegraph: a braced block (ticket 357)', () => {
+  const braced: CollapseState = {
+    blocks: [{ block: '0,8#17', startTick: 100, isForced: false, isBraced: true }],
+  }
+  const frozenAt44 = (block: string) => (block === '0,8#17' ? 44 : null)
+
+  it('stands at the countdown its brace froze, however long the brace holds', () => {
+    const slots = createTelegraphSlots(1)
+    for (const tick of [116, 160, 400]) {
+      writeTelegraphBlocks(slots, braced, tick, frozenAt44)
+      expect(slots[0].progress).toBe(telegraphProgress(COLLAPSE_WARN_TICKS - 44))
+    }
+  })
+
+  it('runs on from its warning when no provider freezes it', () => {
+    const slots = createTelegraphSlots(1)
+    writeTelegraphBlocks(slots, braced, 130, () => null)
+    expect(slots[0].progress).toBe(0.5)
+  })
+
+  it('never asks an unbraced block for a frozen countdown', () => {
+    const slots = createTelegraphSlots(2)
+    writeTelegraphBlocks(slots, collapse, 130, () => 44)
+    expect(slots.map(({ progress }) => progress)).toEqual([0.5, 0])
   })
 })

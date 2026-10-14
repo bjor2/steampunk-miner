@@ -4,6 +4,7 @@
  */
 import { collapseReportOf, type CollapseReport } from '../systems/authority/collapse/collapseReport'
 import type { CollapseState } from '../systems/authority/collapse/collapseState'
+import { frozenTicksLeftAt } from '../systems/registries/collapseBraces'
 import { readAuthorityState } from './authorityLink'
 
 export function readCollapseReport(): CollapseReport {
@@ -14,4 +15,9 @@ export function readCollapseReport(): CollapseReport {
 export function readCollapse(): { collapse: CollapseState; tick: number } {
   const state = readAuthorityState()
   return { collapse: state.collapse, tick: state.tick }
+}
+
+/** The warning ticks left a braced block is drawn frozen at (ticket 357); null runs it on. */
+export function readFrozenTicksLeft(block: string): number | null {
+  return frozenTicksLeftAt(readAuthorityState(), block)
 }

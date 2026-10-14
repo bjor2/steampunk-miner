@@ -4,11 +4,13 @@
  * bounds in metres and how far its telegraph has run, 0 at the warning's first tick to 1 when the
  * refill starts (and 1 while it refills). Cracks grow along a branching line seeded by the block's
  * place, one more segment as the warning runs on, so the same block always cracks the same way.
- * Presentation only: read from the authority's collapse list, written into scratch, never back.
+ * A braced block's countdown stands at what it had left when the brace caught it (ticket 357, as
+ * its provider says through `collapseBraces`); when the brace ends the kernel warns it afresh, so
+ * it shows the full 60 again. Presentation only: read from the authority's collapse list, written into scratch, never back.
  */
 import { COLLAPSE_BLOCK_SAMPLES, COLLAPSE_WARN_TICKS } from '../../constants/balance'
 import { CRACK_SEGMENT_M, CRACK_TURN_RADIANS, CRACKS_PER_BLOCK } from '../../constants/scene'
-import type { CollapseState } from '../authority/collapse/collapseState'
+import type { CollapseState, CollapsingBlock } from '../authority/collapse/collapseState'
 import { blockOfId, firstSampleOfBlock } from '../world/collapseBlock'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
 
@@ -24,6 +26,11 @@ export interface TelegraphBlock {
   seed: number
 }
 
+/** The warning ticks left a braced block is drawn frozen at; null runs its countdown on. */
+export type FrozenTicksLeftReader = (block: string) => number | null
+
+const NOTHING_FROZEN: FrozenTicksLeftReader = () => null
+
 export const BLOCK_SIZE_M = COLLAPSE_BLOCK_SAMPLES / SAMPLES_PER_TILE
 
 export function createTelegraphSlots(count: number): TelegraphBlock[] {
@@ -35,13 +42,25 @@ export function writeTelegraphBlocks(
   slots: TelegraphBlock[],
   collapse: CollapseState,
   tick: number,
+  frozenTicksLeftOf: FrozenTicksLeftReader = NOTHING_FROZEN,
 ): number {
   const count = Math.min(slots.length, collapse.blocks.length)
   for (let at = 0; at < count; at++) {
     const entry = collapse.blocks[at]
-    writeSlot(slots[at], entry.block, telegraphProgress(tick - entry.startTick))
+    writeSlot(slots[at], entry.block, progressOfEntry(entry, tick, frozenTicksLeftOf))
   }
   return count
+}
+
+/** Asks for a frozen countdown only of a braced block, so an unbraced frame reads no registry. */
+function progressOfEntry(
+  entry: CollapsingBlock,
+  tick: number,
+  frozenTicksLeftOf: FrozenTicksLeftReader,
+): number {
+  const frozenLeft = entry.isBraced === true ? frozenTicksLeftOf(entry.block) : null
+  const elapsed = frozenLeft === null ? tick - entry.startTick : COLLAPSE_WARN_TICKS - frozenLeft
+  return telegraphProgress(elapsed)
 }
 
 /** How far the telegraph has run `elapsedTicks` after the warning started. */

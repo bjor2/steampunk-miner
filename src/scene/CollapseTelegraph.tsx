@@ -1,7 +1,7 @@
 /**
  * The collapse telegraph (#43 Sequence 1, #41 feel): over every block warning or refilling, a crack
  * that grows segment by segment through the 1 s warning and dust falling toward the planet's centre,
- * thicker as the refill nears. Read every frame from the authority replica, never through React;
+ * thicker as the refill nears; a braced block's cracks stand still while the brace holds. Read every frame from the authority replica, never through React;
  * the dust and the cracks are fixed pools, so stepping and uploading never allocate. Presentation
  * only, on the render delta with its own fixed seed. The rumble and the crash are feedback cues.
  */
@@ -28,7 +28,7 @@ import {
   CRACK_COLOUR,
   CRACKS_PER_BLOCK,
 } from '../constants/scene'
-import { readCollapse } from '../store/collapseReads'
+import { readCollapse, readFrozenTicksLeft } from '../store/collapseReads'
 import {
   crackSegmentsAt,
   createTelegraphSlots,
@@ -73,7 +73,7 @@ export function CollapseTelegraph() {
 
   useFrame((_, delta) => {
     const { collapse, tick } = readCollapse()
-    const count = writeTelegraphBlocks(telegraph.slots, collapse, tick)
+    const count = writeTelegraphBlocks(telegraph.slots, collapse, tick, readFrozenTicksLeft)
     stepParticles(telegraph.dust, delta)
     shedDust(telegraph, count, delta)
     uploadCracks(telegraph, count, cracks.geometry)
