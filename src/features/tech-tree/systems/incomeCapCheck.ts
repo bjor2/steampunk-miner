@@ -1,40 +1,51 @@
 /**
- * The 15% income-cap check (#385, split from #212 by the GD ruling 6163442862; spec #161, the
- * Systems amendment of 6 Oct): each income item at full stack (last Mark, all charges, 100% uptime,
- * the income Marks' 0.7x cooldown floor and 1.4x duration cap already in its ladder) brings at most
- * `tech.incomeCap.maxShare` of the drill's own ore value a minute on the same band. Judged on each
- * of `tech.incomeCap.planets`, every band, at the track levels the pacing bot arrived with and left
- * with (GD ruling 6160885114 Q1 (i)), on the median of the seeds.
+ * The 15% income-cap check (#385, split from #212 by the GD ruling 6163442862; spec #161; measured
+ * per trip by the Systems ruling 6167240683 and its Scaler amendment 6167249318): each income item
+ * at full stack (last Mark, all charges, 100% uptime, the income Marks' 0.7x cooldown floor and
+ * 1.4x duration cap already in its ladder) brings in one trip at most `tech.incomeCap.maxShareBp`
+ * of a full hold of the band's ore, the unit the trip cap `tripCapAt` already holds play to
+ * (#162 4.5). Judged on each of `tech.incomeCap.planets`, every band, at the track levels the
+ * pacing bot arrived with and left with (GD ruling 6160885114 Q1 (i)), on the median of the seeds.
  *
- * - The items' rates come from the kernel `incomeRates` registry, clamped there to `tripCapAt`
- *   (movers count the relocated ore value reaching the hold, Q2 (a)); a rate counts on a seed only
- *   while its anchor is owned or unlocked on that seed's run.
- * - The drill's minute: the cells it cuts in a minute of the band (1 m tiles, #6) at those levels,
- *   each worth the band's ore. A band the tip only skids on is not judged at those levels.
- * - Items are judged one at a time (#161); one share for every planet, so the check is economic
- *   only and never caps play.
+ *   share = min(rate x tripMinutes, tripCapAt) / (cargo x V(t(p, b)))
+ *   tripMinutes = cargo / the drill's cells a minute on the band (1 m tiles, #6)
+ *
+ * - The items' trips come from the kernel `incomeRates` registry (movers count the relocated ore
+ *   value reaching the hold, Q2 (a)); an item counts on a seed only while its anchor is live there.
+ * - Beside each share the check keeps the unclamped one. An item over the cap before the clamp
+ *   passes only when play pays it through the trip ledger (`isTripCappedInPlay`), or it fails;
+ *   `tech.incomeCap.knownRed` lists the items known to fail until their ledger work lands.
+ * - Shares are whole basis points, rounded up (HS condition 1). A band the tip only skids on is
+ *   not judged at those levels. Items are judged one at a time (#161); one share for every planet,
+ *   so the check is economic only and never caps play, upgrade depth or drill speed.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
-import { formatPercent } from '../../../systems/displayAmount'
 import { oreTier, oreValue } from '../../../systems/economy/oreEconomy'
 import type { UpgradeLevels } from '../../../systems/economy/vehicleStats'
 import { vehicleStatsAt } from '../../../systems/economy/vehicleStats'
 import {
-  ceilMilli,
+  ceil,
   cmp,
   div,
+  floorMilli,
   fromSafeInteger,
   mul,
+  toSafeInteger,
   ZERO_MONEY,
   type Money,
 } from '../../../systems/money'
-import { incomeCapRowsOf, type IncomeAt } from '../../../systems/registries/incomeRates'
+import {
+  incomeCapRowsOf,
+  type IncomeAnchors,
+  type IncomeAt,
+  type IncomeCapRow,
+} from '../../../systems/registries/incomeRates'
 import { bandDigTicks } from '../../../systems/vehicle/bandDig'
 import { BAND_COUNT } from '../../../systems/world/planetGeometry'
 import { TREE_ECONOMY, type IncomeCap } from './treeEconomy'
-import { medianShareOf } from './treeSpendGuard'
 
 const MINUTE_TICKS = fromSafeInteger(60 * TICKS_PER_SECOND)
+const BASIS_POINTS = fromSafeInteger(10_000)
 const BANDS = Array.from({ length: BAND_COUNT }, (_, index) => index + 1)
 
 /** The two vehicles a planet is judged with. */
@@ -43,9 +54,18 @@ const VISITS: readonly PlanetVisit[] = ['arrival', 'departure']
 
 /** What the check reads of one seed's run. */
 export interface SeedIncome {
-  /** Planet to the track levels the bot entered it with and left it with. */
+  /** Planet to the track levels the bot entered it with and left with. */
   levelsOn: ReadonlyMap<number, Readonly<Record<PlanetVisit, UpgradeLevels>>>
-  isAnchorLive: (rowId: string) => boolean
+  anchors: IncomeAnchors
+}
+
+/** One drill trip on a band: what the cap is judged against. */
+export interface DrillTrip {
+  drillOrePerMinute: Money
+  /** The minutes the drill takes to fill the hold. */
+  tripMinutes: Money
+  /** A full hold of the band's ore. */
+  holdValue: Money
 }
 
 export interface IncomeCapVerdict {
@@ -53,20 +73,42 @@ export interface IncomeCapVerdict {
   visit: PlanetVisit
   band: number
   itemId: string
-  /** The item's share of the drill's minute on each seed that counts it, in seed order. */
-  seedShares: readonly Money[]
-  medianShare: Money
+  isTripCappedInPlay: boolean
+  /** The item's trip share after the clamp on each seed that counts it, in seed order. */
+  seedShareBps: readonly number[]
+  medianShareBp: number
+  /** The same before the clamp. */
+  seedUnclampedBps: readonly number[]
+  medianUnclampedBp: number
+  /** Over the cap after the trip cap. */
   isOverCap: boolean
+  /** Over the cap before the trip cap, and play does not hold it to the cap. */
+  isUnheldInPlay: boolean
+  /** Why it is known to fail until its ledger work lands, or null. */
+  knownRedBecause: string | null
 }
 
-/** One item's share on one seed at one planet, visit and band. */
+/** One band of a judged planet, with one of its two vehicles. */
+interface JudgedPatch {
+  planetIndex: number
+  visit: PlanetVisit
+  band: number
+}
+
+interface Standing {
+  levels: UpgradeLevels
+  trip: DrillTrip
+}
+
+/** One item's shares on one seed at one planet, visit and band. */
 interface SeedShare {
   key: string
   planetIndex: number
   visit: PlanetVisit
   band: number
-  itemId: string
-  share: Money
+  row: IncomeCapRow
+  shareBp: number
+  unclampedBp: number
 }
 
 /** One verdict per item, planet, visit and band any seed counts it on, in that order. */
@@ -78,36 +120,53 @@ export function incomeCapVerdictsOf(
   return groupByKey(shares).map((group) => verdictOf(group, cap))
 }
 
-/** The verdicts whose median share is over the cap. */
-export function overCapVerdictsOf(verdicts: readonly IncomeCapVerdict[]): IncomeCapVerdict[] {
-  return verdicts.filter((verdict) => verdict.isOverCap)
+/** The verdicts that fail the gate: over the cap, or unheld in play, and not known-red. */
+export function failingVerdictsOf(verdicts: readonly IncomeCapVerdict[]): IncomeCapVerdict[] {
+  return verdicts.filter((verdict) => isFailing(verdict) && verdict.knownRedBecause === null)
 }
 
-/** The drill's own ore value a minute on the band at these levels; null where the tip skids. */
-export function drillOrePerMinuteOf(
+/** The verdicts that would fail but are known-red, printed beside the gate. */
+export function knownRedVerdictsOf(verdicts: readonly IncomeCapVerdict[]): IncomeCapVerdict[] {
+  return verdicts.filter((verdict) => isFailing(verdict) && verdict.knownRedBecause !== null)
+}
+
+export function isFailing(verdict: IncomeCapVerdict): boolean {
+  return verdict.isOverCap || verdict.isUnheldInPlay
+}
+
+/** The drill's trip on the band at these levels; null where the tip skids. */
+export function drillTripOf(
   planetIndex: number,
   band: number,
   levels: UpgradeLevels,
-): Money | null {
+): DrillTrip | null {
   const ticksPerCell = bandDigTicks(planetIndex, levels, band)
   if (ticksPerCell === null) return null
   const cellsPerMinute = div(MINUTE_TICKS, fromSafeInteger(ticksPerCell))
-  return mul(cellsPerMinute, oreValue(oreTier(planetIndex, band)))
+  const hold = fromSafeInteger(vehicleStatsAt(levels).cargoCapacity)
+  const ore = oreValue(oreTier(planetIndex, band))
+  return {
+    drillOrePerMinute: mul(cellsPerMinute, ore),
+    tripMinutes: div(hold, cellsPerMinute),
+    holdValue: mul(hold, ore),
+  }
 }
 
 /**
- * The verdicts as a Markdown table: per planet and item, its worst median over the visits and
- * bands, and a planet no seed counts any item on.
+ * `value` in whole basis points of `whole`, rounded up so a hair over the cap reads over it. The
+ * trip's minutes are a quotient, so the share carries division noise in its last digits: cut to a
+ * thousandth of a basis point first, the noise never rounds a share at the cap up past it.
  */
-export function incomeCapTableOf(
-  verdicts: readonly IncomeCapVerdict[],
-  cap: IncomeCap = TREE_ECONOMY.incomeCap,
-): string {
-  return [
-    '| planet | income item | worst median | at | seed shares there | cap | |',
-    '|---|---|---|---|---|---|---|',
-    ...cap.planets.flatMap((planetIndex) => planetLinesOf(planetIndex, verdicts, cap)),
-  ].join('\n')
+export function basisPointsOf(value: Money, whole: Money): number {
+  return toSafeInteger(ceil(floorMilli(mul(div(value, whole), BASIS_POINTS))))
+}
+
+/** The middle share; with an even count, the mean of the middle two rounded up. */
+export function medianBasisPointsOf(shares: readonly number[]): number {
+  const sorted = [...shares].sort((a, b) => a - b)
+  const middle = Math.floor(sorted.length / 2)
+  if (sorted.length % 2 === 1) return sorted[middle]
+  return Math.ceil((sorted[middle - 1] + sorted[middle]) / 2)
 }
 
 function sharesOnPlanet(planetIndex: number, seeds: readonly SeedIncome[]): SeedShare[] {
@@ -118,31 +177,42 @@ function sharesOnPlanet(planetIndex: number, seeds: readonly SeedIncome[]): Seed
   )
 }
 
-function seedSharesAt(
-  seed: SeedIncome,
-  where: { planetIndex: number; visit: PlanetVisit; band: number },
-): SeedShare[] {
-  const at = incomeAtOf(seed, where)
-  if (at === null) return []
-  return incomeCapRowsOf(at, seed.isAnchorLive).map((row) => ({
-    ...where,
-    key: `${where.planetIndex} ${where.visit} ${where.band} ${row.itemId}`,
-    itemId: row.itemId,
-    share: div(row.valuePerMinute, at.drillOrePerMinute),
-  }))
+function seedSharesAt(seed: SeedIncome, where: JudgedPatch): SeedShare[] {
+  const standing = standingOf(seed, where)
+  if (standing === null) return []
+  const at = incomeAtOf(where, standing)
+  return incomeCapRowsOf(at, seed.anchors).map((row) => seedShareOf(where, row, standing.trip))
 }
 
-/** Where the rates are asked; null when the seed never stood there or the drill cannot cut. */
-function incomeAtOf(
-  seed: SeedIncome,
-  where: { planetIndex: number; visit: PlanetVisit; band: number },
-): IncomeAt | null {
+/** The seed's vehicle on the patch and its drill trip; null when it never stood there or skids. */
+function standingOf(seed: SeedIncome, where: JudgedPatch): Standing | null {
   const levels = seed.levelsOn.get(where.planetIndex)?.[where.visit]
   if (levels === undefined) return null
-  const drillOrePerMinute = drillOrePerMinuteOf(where.planetIndex, where.band, levels)
-  if (drillOrePerMinute === null || cmp(drillOrePerMinute, ZERO_MONEY) <= 0) return null
+  const trip = drillTripOf(where.planetIndex, where.band, levels)
+  if (trip === null || cmp(trip.holdValue, ZERO_MONEY) <= 0) return null
+  return { levels, trip }
+}
+
+function incomeAtOf(where: JudgedPatch, { levels, trip }: Standing): IncomeAt {
   const { cargoCapacity } = vehicleStatsAt(levels)
-  return { planetIndex: where.planetIndex, band: where.band, cargoCapacity, drillOrePerMinute }
+  const { drillOrePerMinute, tripMinutes } = trip
+  return {
+    planetIndex: where.planetIndex,
+    band: where.band,
+    cargoCapacity,
+    drillOrePerMinute,
+    tripMinutes,
+  }
+}
+
+function seedShareOf(where: JudgedPatch, row: IncomeCapRow, trip: DrillTrip): SeedShare {
+  return {
+    ...where,
+    key: `${where.planetIndex} ${where.visit} ${where.band} ${row.itemId}`,
+    row,
+    shareBp: basisPointsOf(row.valuePerTrip, trip.holdValue),
+    unclampedBp: basisPointsOf(row.unclampedValuePerTrip, trip.holdValue),
+  }
 }
 
 /** The shares grouped by planet, visit, band and item, in the order they were found. */
@@ -153,45 +223,23 @@ function groupByKey(shares: readonly SeedShare[]): SeedShare[][] {
 }
 
 function verdictOf(group: readonly SeedShare[], cap: IncomeCap): IncomeCapVerdict {
-  const [{ planetIndex, visit, band, itemId }] = group
-  const seedShares = group.map((each) => each.share)
-  const medianShare = medianShareOf(seedShares)
-  const isOverCap = cmp(medianShare, cap.maxShare) > 0
-  return { planetIndex, visit, band, itemId, seedShares, medianShare, isOverCap }
-}
-
-function planetLinesOf(
-  planetIndex: number,
-  verdicts: readonly IncomeCapVerdict[],
-  cap: IncomeCap,
-): string[] {
-  const onPlanet = verdicts.filter((verdict) => verdict.planetIndex === planetIndex)
-  if (onPlanet.length === 0) return [`| P${planetIndex} | no live income item | | | | | |`]
-  return itemIdsOf(onPlanet).map((itemId) =>
-    worstLineOf(worstOf(onPlanet.filter((verdict) => verdict.itemId === itemId)), cap),
-  )
-}
-
-function itemIdsOf(verdicts: readonly IncomeCapVerdict[]): string[] {
-  return [...new Set(verdicts.map((verdict) => verdict.itemId))].sort()
-}
-
-function worstOf(verdicts: readonly IncomeCapVerdict[]): IncomeCapVerdict {
-  return verdicts.reduce((worst, each) =>
-    cmp(each.medianShare, worst.medianShare) > 0 ? each : worst,
-  )
-}
-
-function worstLineOf(verdict: IncomeCapVerdict, cap: IncomeCap): string {
-  const seeds = verdict.seedShares.map(shownShareOf).join(' / ')
-  const mark = verdict.isOverCap ? 'over the cap' : ''
-  return (
-    `| P${verdict.planetIndex} | ${verdict.itemId} | ${shownShareOf(verdict.medianShare)} | ` +
-    `${verdict.visit}, band ${verdict.band} | ${seeds} | ${formatPercent(cap.maxShare)} | ${mark} |`
-  )
-}
-
-/** Rounded up to the money quantum: a share past 100% prints as an amount, which allows 3 decimals. */
-function shownShareOf(share: Money): string {
-  return formatPercent(ceilMilli(share))
+  const [{ planetIndex, visit, band, row }] = group
+  const seedShareBps = group.map((each) => each.shareBp)
+  const seedUnclampedBps = group.map((each) => each.unclampedBp)
+  const medianShareBp = medianBasisPointsOf(seedShareBps)
+  const medianUnclampedBp = medianBasisPointsOf(seedUnclampedBps)
+  return {
+    planetIndex,
+    visit,
+    band,
+    itemId: row.itemId,
+    isTripCappedInPlay: row.isTripCappedInPlay,
+    seedShareBps,
+    medianShareBp,
+    seedUnclampedBps,
+    medianUnclampedBp,
+    isOverCap: medianShareBp > cap.maxShareBp,
+    isUnheldInPlay: medianUnclampedBp > cap.maxShareBp && !row.isTripCappedInPlay,
+    knownRedBecause: cap.knownRed[row.itemId] ?? null,
+  }
 }

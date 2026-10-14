@@ -23,12 +23,13 @@ import {
 } from './systems/familySharePins'
 import { familyShareRowsOf, familyShareTableOf, type SeedSpends } from './systems/familySpendShares'
 import {
-  incomeCapTableOf,
+  failingVerdictsOf,
   incomeCapVerdictsOf,
-  overCapVerdictsOf,
   type IncomeCapVerdict,
   type PlanetVisit,
+  type SeedIncome,
 } from './systems/incomeCapCheck'
+import { incomeCapTableOf } from './systems/incomeCapTable'
 import {
   loadoutYieldsOf,
   loadoutYieldTableOf,
@@ -53,11 +54,12 @@ import {
 // (GD ruling on #371). Report-only, each spend family's share from the kernel registry (GD ruling
 // Q3, Q4 on #212), the one armoury row among them, printed on P2/P10/P20/P40 at zero too, and
 // each of the six lanes' share (ticket 266, the sixth lane's row; no per-lane band, GD Q4). On the
-// same runs, the #385 income cap: every income item at full stack brings at most 15% of the drill's
-// ore value a minute on P10, P20, P40 and P60, at the levels the bot arrived with and left with, on
-// the median of the seeds. Beside the runs, the loadout yield cap (GD lock on #245, ticket 266): a
-// full loadout at max Mark yields no more than the five lanes' maximum on P10/P20/P40/P60, the
-// Aetheric lane adding zero.
+// same runs, the #385 income cap (ruling 6167240683): every income item at full stack brings at
+// most 15% of a full hold of the band's ore in a trip on P10, P20, P40 and P60, at the levels the
+// bot arrived with and left with, on the median of the seeds, and an item over it before the trip
+// cap is held by the ledger in play (the movers are known-red until their ledger ticket lands).
+// Beside the runs, the loadout yield cap (GD lock on #245, ticket 266): a full loadout at max Mark
+// yields no more than the five lanes' maximum on P10/P20/P40/P60, the Aetheric lane adding zero.
 // Headless, with no run log kept: the lane reads the bot's spend records, a summary fold's track
 // levels per planet, and which anchors the run opened or owns. The runs take hours, so this is a
 // lane (vite.config.ts leaves it out unless it is named):
@@ -76,8 +78,10 @@ const SCENARIO_FILE = new URL('../../../scenarios/bot-slice.scenario.json', impo
 interface SeedRun {
   worldSeed: number
   shopSpend: readonly ShopSpend[]
-  /** The spend families' and income rates' anchors owned or unlocked when the run ended. */
+  /** The spend families' and income rates' anchor rows owned or unlocked when the run ended. */
   liveAnchorRowIds: ReadonlySet<string>
+  /** The self-anchored income items a player owned when the run ended. */
+  ownedIncomeItemIds: ReadonlySet<string>
   /** The judged planets' track levels on arrival and on leaving. */
   levelsOn: ReadonlyMap<number, Readonly<Record<PlanetVisit, UpgradeLevels>>>
   endedOnPlanet: number
@@ -110,8 +114,8 @@ describe('tech tree: spend guard of the pacing bot to planet 60', () => {
     expect(brokenPinsOf(pinVerdicts).map(pinMissOf)).toEqual([])
   })
 
-  it('keeps every income item within 15% of the drill ore minute on P10, P20, P40 and P60', () => {
-    expect(overCapVerdictsOf(incomeVerdicts).map(incomeMissOf)).toEqual([])
+  it('keeps every income item within 15% of a full hold a trip on P10, P20, P40 and P60', () => {
+    expect(failingVerdictsOf(incomeVerdicts).map(incomeMissOf)).toEqual([])
   })
 })
 
@@ -136,13 +140,14 @@ function playSeedToLastPlanet(worldSeed: number): SeedRun {
     worldSeed,
     shopSpend,
     liveAnchorRowIds: liveAnchorRowIdsOf(run.state),
+    ownedIncomeItemIds: ownedIncomeItemIdsOf(run.state),
     levelsOn: judgedLevelsOf(summary.summarize()),
     endedOnPlanet: run.state.planet.index,
     isFinished,
   }
 }
 
-/** Unlocked schedule rows, and the income items' own anchors any player owns. */
+/** The schedule rows the families and rates anchor on that are unlocked or owned. */
 function liveAnchorRowIdsOf(state: AuthorityState): ReadonlySet<string> {
   const anchorRowIds = [
     ...spendFamiliesOf().map((family) => family.anchorRowId),
@@ -152,8 +157,17 @@ function liveAnchorRowIdsOf(state: AuthorityState): ReadonlySet<string> {
 }
 
 function isAnchorLiveIn(state: AuthorityState, rowId: string): boolean {
-  if (isFeatureUnlocked(state, rowId)) return true
-  return Object.keys(state.players).some((playerId) => ownsItem(state, playerId, rowId))
+  return isFeatureUnlocked(state, rowId) || isOwnedByAnyPlayer(state, rowId)
+}
+
+/** Income items any player owns: a self-anchor is live from ownership only (TD 6167250352). */
+function ownedIncomeItemIdsOf(state: AuthorityState): ReadonlySet<string> {
+  const itemIds = entriesOf(INCOME_RATE_REGISTRY).map((rate) => rate.itemId)
+  return new Set(itemIds.filter((itemId) => isOwnedByAnyPlayer(state, itemId)))
+}
+
+function isOwnedByAnyPlayer(state: AuthorityState, itemId: string): boolean {
+  return Object.keys(state.players).some((playerId) => ownsItem(state, playerId, itemId))
 }
 
 /** Each judged planet the run entered: its arrival levels, and its leaving (or last) levels. */
@@ -179,8 +193,12 @@ function upgradeLevelsOf(logged: LoggedLevels): UpgradeLevels {
   return Object.fromEntries(entries) as UpgradeLevels
 }
 
-function seedIncomeOf({ levelsOn, liveAnchorRowIds }: SeedRun) {
-  return { levelsOn, isAnchorLive: (rowId: string) => liveAnchorRowIds.has(rowId) }
+function seedIncomeOf({ levelsOn, liveAnchorRowIds, ownedIncomeItemIds }: SeedRun): SeedIncome {
+  const anchors = {
+    isRowLive: (rowId: string) => liveAnchorRowIds.has(rowId),
+    isItemOwned: (itemId: string) => ownedIncomeItemIds.has(itemId),
+  }
+  return { levelsOn, anchors }
 }
 
 function incomeMissOf(verdict: IncomeCapVerdict): string {

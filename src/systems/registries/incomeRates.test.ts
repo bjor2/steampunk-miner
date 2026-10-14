@@ -5,6 +5,7 @@ import { fromCanonical, fromSafeInteger, mul, toCanonical } from '../money'
 import {
   incomeCapRowsOf,
   stackedIncomeOf,
+  type IncomeAnchors,
   type IncomeAt,
   type IncomeRate,
   type TripCapSource,
@@ -12,14 +13,16 @@ import {
 import { createRegistrySet, swapRegistrySet } from './seal'
 
 // The income-cap check's rates (ticket 384, TD lock "K-ir" on #212): slices register them, the
-// check counts a rate only while its anchor row is live, and the kernel clamps each to the trip
-// cap. Fake slices register through withRegistrations, so no real slice is imported.
+// check counts a rate only while its anchor row is live, and the kernel clamps each trip of it to
+// the trip cap (#385 ruling 6167240683). Fake slices register through withRegistrations, so no real
+// slice is imported.
 
 const AT: IncomeAt = {
   planetIndex: 10,
   band: 3,
   cargoCapacity: 24,
   drillOrePerMinute: fromCanonical('1000'),
+  tripMinutes: fromCanonical('2'),
 }
 
 function rateOf(id: string, anchorRowId: string, perMinute: string): IncomeRate {
@@ -27,6 +30,7 @@ function rateOf(id: string, anchorRowId: string, perMinute: string): IncomeRate 
     id,
     itemId: `power.${id.split('.')[1]}`,
     anchorRowId,
+    isTripCappedInPlay: true,
     valuePerMinuteAtFullStack: () => fromCanonical(perMinute),
   }
 }
@@ -57,16 +61,20 @@ function sliceOf(
 const DRAIN = rateOf('fake.drain', 'side_drills', '40')
 const SHIFTER = rateOf('fake.shifter', 'shields', '300')
 
-const everyAnchorLive = () => true
+const EVERY_ANCHOR_LIVE: IncomeAnchors = { isRowLive: () => true, isItemOwned: () => true }
 
-function rowsAsText(
-  slices: readonly SliceDefinition[],
-  isAnchorLive: (rowId: string) => boolean = everyAnchorLive,
-) {
+/** Anchors where only the rows in `liveRowIds` are owned or unlocked, and no item is owned. */
+function rowsLive(...liveRowIds: string[]): IncomeAnchors {
+  return { isRowLive: (rowId) => liveRowIds.includes(rowId), isItemOwned: () => false }
+}
+
+function rowsAsText(slices: readonly SliceDefinition[], anchors = EVERY_ANCHOR_LIVE) {
   return withRegistrations(slices, () =>
-    incomeCapRowsOf(AT, isAnchorLive).map((row) => ({
-      ...row,
-      valuePerMinute: toCanonical(row.valuePerMinute),
+    incomeCapRowsOf(AT, anchors).map((row) => ({
+      rateId: row.rateId,
+      itemId: row.itemId,
+      unclampedValuePerTrip: toCanonical(row.unclampedValuePerTrip),
+      valuePerTrip: toCanonical(row.valuePerTrip),
     })),
   )
 }
@@ -79,28 +87,47 @@ describe('income rates', () => {
     expect(rowsAsText([sliceOf('fake', [], tripCapOf('5'))])).toEqual([])
   })
 
-  it('reports one row per registered rate, by rate id', () => {
+  it('reports one row per registered rate, by rate id, worth a trip of the rate', () => {
+    // Two minutes a trip: the drain's 40 a minute is 80 a trip, the shifter's 300 is 600.
     const rows = rowsAsText([sliceOf('fake', [SHIFTER, DRAIN])])
     expect(rows).toEqual([
-      { rateId: 'fake.drain', itemId: 'power.drain', valuePerMinute: canonical('40') },
-      { rateId: 'fake.shifter', itemId: 'power.shifter', valuePerMinute: canonical('300') },
+      {
+        rateId: 'fake.drain',
+        itemId: 'power.drain',
+        unclampedValuePerTrip: canonical('80'),
+        valuePerTrip: canonical('80'),
+      },
+      {
+        rateId: 'fake.shifter',
+        itemId: 'power.shifter',
+        unclampedValuePerTrip: canonical('600'),
+        valuePerTrip: canonical('600'),
+      },
     ])
   })
 
   it('counts a rate only while its anchor row is owned or unlocked', () => {
-    const liveRows = new Set(['shields'])
-    const rows = rowsAsText([sliceOf('fake', [DRAIN, SHIFTER])], (rowId) => liveRows.has(rowId))
+    const rows = rowsAsText([sliceOf('fake', [DRAIN, SHIFTER])], rowsLive('shields'))
     expect(rows.map((row) => row.rateId)).toEqual(['fake.shifter'])
   })
 
   it('reports nothing for a rate whose anchor row is held or unbuilt', () => {
-    expect(rowsAsText([sliceOf('fake', [DRAIN, SHIFTER])], () => false)).toEqual([])
+    expect(rowsAsText([sliceOf('fake', [DRAIN, SHIFTER])], rowsLive())).toEqual([])
   })
 
-  it('clamps each rate to the trip cap of the hold it is asked at', () => {
-    // 24 units at 5 a unit: a cap of 120, under the shifter's 300 and over the drain's 40.
+  it('clamps each trip to the trip cap of the hold it is asked at, keeping the unclamped trip', () => {
+    // 24 units at 5 a unit: a cap of 120, under the shifter's 600 a trip and over the drain's 80.
     const rows = rowsAsText([sliceOf('fake', [DRAIN, SHIFTER], tripCapOf('5'))])
-    expect(rows.map((row) => row.valuePerMinute)).toEqual([canonical('40'), canonical('120')])
+    expect(rows.map((row) => [row.unclampedValuePerTrip, row.valuePerTrip])).toEqual([
+      [canonical('80'), canonical('80')],
+      [canonical('600'), canonical('120')],
+    ])
+  })
+
+  it('counts an item once, under its first rate by id', () => {
+    const second = { ...rateOf('fake.zdrain', 'side_drills', '999'), itemId: DRAIN.itemId }
+    const rows = rowsAsText([sliceOf('fake', [second, DRAIN, SHIFTER])])
+    expect(rows.map((row) => row.rateId)).toEqual(['fake.drain', 'fake.shifter'])
   })
 
   it('hands every rate the planet, band, hold and drill rate it is asked at', () => {
@@ -118,9 +145,9 @@ describe('income rates', () => {
 
   it('sums the rows after the clamp for the report-only stacked line', () => {
     const stacked = withRegistrations([sliceOf('fake', [DRAIN, SHIFTER], tripCapOf('5'))], () =>
-      stackedIncomeOf(incomeCapRowsOf(AT, everyAnchorLive)),
+      stackedIncomeOf(incomeCapRowsOf(AT, EVERY_ANCHOR_LIVE)),
     )
-    expect(toCanonical(stacked)).toBe(canonical('160'))
+    expect(toCanonical(stacked)).toBe(canonical('200'))
   })
 })
 
@@ -140,9 +167,21 @@ describe('income rate registration', () => {
 
   it("accepts the rate's own item as its anchor, live once the item is owned", () => {
     const drain = rateOf('fake.drain', 'power.drain', '40')
-    const owned = new Set(['power.drain'])
-    const rows = rowsAsText([sliceOf('fake', [drain])], (rowId) => owned.has(rowId))
+    const owned = {
+      isRowLive: () => false,
+      isItemOwned: (itemId: string) => itemId === 'power.drain',
+    }
+    const rows = rowsAsText([sliceOf('fake', [drain])], owned)
     expect(rows.map((row) => row.rateId)).toEqual(['fake.drain'])
+  })
+
+  it('never counts a self-anchored rate from a row or feature lookup, only from ownership', () => {
+    const drain = rateOf('fake.drain', 'power.drain', '40')
+    const rows = rowsAsText([sliceOf('fake', [drain])], {
+      isRowLive: () => true,
+      isItemOwned: () => false,
+    })
+    expect(rows).toEqual([])
   })
 
   it("refuses an anchor that is neither a stats.json row nor the rate's own item", () => {

@@ -70,12 +70,18 @@ export interface SpendGuardBand {
 }
 
 /**
- * The #385 income cap: no income item at full stack brings more than `maxShare` of the drill's ore
- * value a minute, judged on `planets`. One share for every planet (economic only, never per planet).
+ * The #385 income cap (ruling 6167240683): no income item at full stack brings more in a trip than
+ * `maxShareBp` basis points of a full hold of the band's ore, judged on `planets`. One share for
+ * every planet (economic only, never per planet), integer fixed point (HS condition 1).
  */
 export interface IncomeCap {
-  maxShare: Money
+  maxShareBp: number
   planets: readonly number[]
+  /**
+   * Item id to the work that will route it through the trip ledger: its rows print and are known
+   * to fail until then, and fail no gate.
+   */
+  knownRed: Readonly<Record<string, string>>
 }
 
 export interface TreeEconomy {
@@ -206,9 +212,20 @@ function readNodeShareWatch(reader: FieldReader, raw: unknown): NodeShareWatch {
 function readIncomeCap(reader: FieldReader, raw: unknown): IncomeCap {
   const cap = reader.object('tech.incomeCap', raw)
   return {
-    maxShare: reader.money('tech.incomeCap.maxShare', cap.maxShare),
+    maxShareBp: reader.safeInteger('tech.incomeCap.maxShareBp', cap.maxShareBp),
     planets: reader
       .list('tech.incomeCap.planets', cap.planets)
       .map((planet, index) => reader.safeInteger(`tech.incomeCap.planets[${index}]`, planet)),
+    knownRed: readKnownRed(reader, cap.knownRed),
   }
+}
+
+function readKnownRed(reader: FieldReader, raw: unknown): IncomeCap['knownRed'] {
+  const knownRed = reader.object('tech.incomeCap.knownRed', raw)
+  return Object.fromEntries(
+    Object.entries(knownRed).map(([itemId, why]) => [
+      itemId,
+      reader.text(`tech.incomeCap.knownRed.${itemId}`, why),
+    ]),
+  )
 }

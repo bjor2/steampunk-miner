@@ -5,7 +5,7 @@
  * cap and the hold's room. The same arithmetic judged #201 Q3 (`drainPerMinute.test.ts`).
  *
  * The drain is a tree item that no `stats.json` row admits, so it anchors on itself and counts once
- * owned.
+ * owned. Play pays it through the trip ledger (`incomeTrip.ts`), so the trip cap holds it there.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { oreTier } from '../../../systems/economy/oreEconomy'
@@ -33,6 +33,7 @@ export const DRAIN_INCOME_RATE: IncomeRate = {
   id: 'extraction.mineral_drain',
   itemId: MINERAL_DRAIN.itemId,
   anchorRowId: MINERAL_DRAIN.itemId,
+  isTripCappedInPlay: true,
   valuePerMinuteAtFullStack: drainAtLastMarkForAMinute,
 }
 

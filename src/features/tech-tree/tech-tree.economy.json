@@ -42,9 +42,14 @@
       "share": "0.150"
     },
     "incomeCap": {
-      "source": "#161 Systems amendment (Vertical Scaler review, 6 Oct) and the GD split of #212 (#385): each income item at its last Mark, all charges and 100% uptime, after the trip cap, brings at most 15% of the drill's ore value a minute on the same band, on P10, P20, P40 and P60, at the bot's arrival and departure levels, on the median of the pacing seeds. One share for every planet: the check is economic only. Levers if an item misses, in order: income cooldown floor 0.7 -> 0.8, then the income duration cap 1.4 -> 1.25 (tech.markAbsorb.income).",
-      "maxShare": "0.150",
-      "planets": [10, 20, 40, 60]
+      "source": "#161 Systems amendment (Vertical Scaler review, 6 Oct), the GD split of #212 (#385) and the Systems ruling on #385 (6167240683, Scaler amendment 6167249318): each income item at its last Mark, all charges and 100% uptime, brings at most 15% of a full hold of the band's ore in a trip (the drill's minutes to fill the hold), after the trip cap, on P10, P20, P40 and P60, at the bot's arrival and departure levels, on the median of the pacing seeds; an item over 15% before the clamp must be held by the trip ledger in play. Basis points, one share for every planet: the check is economic only. Levers if an item misses, in order: income cooldown floor 0.7 -> 0.8, then the income duration cap 1.4 -> 1.25 (tech.markAbsorb.income).",
+      "maxShareBp": 1500,
+      "planets": [10, 20, 40, 60],
+      "knownRed": {
+        "consumable.lodestone_beacon": "the terrain-tools ticket that routes mover hold-arrival value into the trip ledger (ruling 6167240683 on #385; Producer to file)",
+        "power.ore_shifter": "the terrain-tools ticket that routes mover hold-arrival value into the trip ledger (ruling 6167240683 on #385; Producer to file)",
+        "power.pressure_pocket": "the terrain-tools ticket that routes mover hold-arrival value into the trip ledger (ruling 6167240683 on #385; Producer to file)"
+      }
     }
   }
 }

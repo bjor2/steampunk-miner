@@ -3,8 +3,10 @@
  * "K-ir"): the ore-shifter, the pressure pocket lance and the lodestone beacon count the value of
  * the ore cells they relocate in a minute at their last Mark, every charge spent, each cell the
  * band's richest ore (+2 lead, #140) and no more cells than the hold takes: an upper bound on what
- * reaches the hold. The kernel clamps each to `tripCapAt`, though play never clamps a mover. The
- * seam splitter opens plain ground only and moves no ore, so it has no rate.
+ * reaches the hold. The kernel clamps each trip to `tripCapAt`, but play pays no mover through the
+ * trip ledger yet, so a mover over the cap before the clamp is known-red in the check until the
+ * ledger blocker of ruling 6167240683 lands (`tech.incomeCap.knownRed`). The seam splitter opens
+ * plain ground only and moves no ore, so it has no rate.
  *
  * A use moves no more ore than its item's size and the TD's unit cap allow (`editDraft.ts`): the
  * shifter drags `magnitude` nodules at a move each, the lance pushes the ore of its disc out at a
@@ -80,6 +82,7 @@ function moverRateOf(itemId: string, atFullStack: () => MoverAtFullStack): Incom
     id: `terrain-tools.${itemId.split('.')[1]}`,
     itemId,
     anchorRowId: itemId,
+    isTripCappedInPlay: false,
     valuePerMinuteAtFullStack: (at) => relocatedValuePerMinute(atFullStack(), at),
   }
 }
