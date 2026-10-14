@@ -31,6 +31,7 @@ const SPAWN_DX = -5
 /** The whistle sounds on the corridor's middle, where the vehicle stands when it is pressed. */
 const WHISTLE_CELL = CORRIDOR_MIDDLE
 const WHISTLE_CENTRE_X = WHISTLE_CELL.tx * MM_PER_METRE + MM_PER_METRE / 2
+const WHISTLE_CENTRE_Y = WHISTLE_CELL.ty * MM_PER_METRE + MM_PER_METRE / 2
 /** The vehicle drives this many tiles right after the blow, a tile every few ticks. */
 const DRIVE_TILES = 5
 const TICKS_PER_TILE = 6
@@ -91,7 +92,7 @@ describe('resonance whistle', () => {
     const fight = whistleFight({ ticks: RETARGET_TICKS })
     const state = fight.session.state()
     const goal = lureGoalOf(state, state.combat.enemies[0], fight.pressTick + RETARGET_TICKS)
-    expect(goal).toEqual({ x: WHISTLE_CENTRE_X, y: WHISTLE_CELL.ty * MM_PER_METRE + 500 })
+    expect(goal).toEqual({ x: WHISTLE_CENTRE_X, y: WHISTLE_CENTRE_Y })
   })
 
   it('holds the enemy at the whistle cell while the vehicle drives off, for the whole duration', () => {
