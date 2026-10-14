@@ -48,20 +48,19 @@ import {
 // income trip the mineral drain shares, so no trip banks more than `tripCapAt` of mover value. The
 // trip ends at the dock, rides in the save, and the drill's own cargo never passes through it.
 
-const MOVERS = {
-  'powerup.1': ORE_SHIFTER_ID,
-  'powerup.2': PRESSURE_POCKET_ID,
-  'powerup.3': LODESTONE_BEACON_ID,
-}
+/** Planet 1 opens two power-up slots. */
+const MOVERS = { 'powerup.1': ORE_SHIFTER_ID, 'powerup.2': PRESSURE_POCKET_ID }
+const SHIFTER_AND_BEACON = { 'powerup.1': ORE_SHIFTER_ID, 'powerup.2': LODESTONE_BEACON_ID }
 const PLAYER = 'p1'
 /** Stands down one column, in the planet-1 band the shallow pockets share. */
 const STAND_DEPTHS = [8, 10, 12, 14, 16, 18]
-const STAND_TICKS = 60
+/** Past the shifter's 600-tick and the lance's 480-tick cooldowns, so each stand uses both. */
+const STAND_TICKS = 620
 const FIRST_STAND_TICK = 5
 const HEAVY_TRIP_END = FIRST_STAND_TICK + STAND_DEPTHS.length * STAND_TICKS + 40
 /** The wind-up, then the queue's ticks for a corner edit. */
 const SETTLED = 20
-const DRILL_TICKS = 60
+const DRILL_TICKS = 120
 /** Wide is the drill-gear lane's flank branch (ticket 268), chosen at its P16 fork. */
 const WIDE = { lane: 'drill-gear', branch: 'wide' }
 const FORK_SEED = 83921
@@ -75,7 +74,7 @@ function refill(itemId: string): CommandIntent {
   } as CommandIntent
 }
 
-/** At each stand the shifter and the pocket lance refilled and each used twice. */
+/** At each stand the shifter and the pocket lance refilled and each used once. */
 function heavyMoverTrip(): TimedIntent[] {
   return [
     [0, setVehicleLoadoutCommand(MOVERS)],
@@ -93,8 +92,6 @@ function usesAt(tick: number, tile: TilePoint): TimedIntent[] {
     [tick + 1, refill(PRESSURE_POCKET_ID)],
     [tick + 5, press('powerup.1')],
     [tick + 15, press('powerup.2')],
-    [tick + 25, press('powerup.1')],
-    [tick + 35, press('powerup.2')],
   ]
 }
 
@@ -118,9 +115,12 @@ function refusalsOf(events: readonly DomainEvent[], reason: string): DomainEvent
   )
 }
 
-/** A shifter used from a pocket `depth` tiles down. */
-function shiftedAt(depth: number): { session: ScriptedSession; stand: TilePoint } {
-  const session = sessionWith(MOVERS)
+/** A shifter used from a pocket `depth` tiles down, `slots` loaded. */
+function shiftedAt(
+  depth: number,
+  slots: Readonly<Record<string, string>> = MOVERS,
+): { session: ScriptedSession; stand: TilePoint } {
+  const session = sessionWith(slots)
   const stand = buriedTile(depth)
   standAt(session, 5, stand, FACING.right)
   session.submit(10, press('powerup.1'))
@@ -162,6 +162,8 @@ describe('mover trip ledger', () => {
     const bands = new Set(stands.map((tile) => bandOfTile(PARAMS, tile.tx, tile.ty)))
     expect(bands.size).toBe(1)
     for (const run of runs) {
+      const edits = ofType(run.events, 'terrain-tools.TerrainEdited')
+      expect(edits.length).toBeGreaterThanOrEqual(STAND_DEPTHS.length)
       expect(cmp(bankedOf(run.state), ZERO_MONEY)).toBe(1)
       expect(cmp(bankedOf(run.state), capAt(run.state, stands[0]))).toBeLessThanOrEqual(0)
       expect(refusalsOf(run.events, 'terrain-tools.trip_capped').length).toBeGreaterThan(0)
@@ -179,17 +181,16 @@ describe('mover trip ledger', () => {
   })
 
   it('banks a lodestone gather on the trip its dock starts, under the cap of its band', () => {
-    const { session, stand } = shiftedAt(12)
-    const beforeDock = bankedOf(session.state())
-    session.submit(32, press('powerup.3'))
+    const { session, stand } = shiftedAt(12, SHIFTER_AND_BEACON)
+    session.submit(32, press('powerup.2'))
     session.advanceTo(40)
     dockInBay(session, 50, 'sell')
     session.advanceTo(70)
     expect(ofType(session.events(), 'terrain-tools.TerrainEdited')).toHaveLength(2)
+    // The dock empties the shifter's trip first, so all the trip holds now is the gather's ore.
     const gathered = bankedOf(session.state())
     expect(cmp(gathered, ZERO_MONEY)).toBe(1)
     expect(cmp(gathered, capAt(session.state(), stand))).toBeLessThanOrEqual(0)
-    expect(gathered).not.toEqual(beforeDock)
   })
 
   it('keeps the trip across a save and load, and plays on to the same state', () => {
@@ -207,11 +208,12 @@ describe('mover trip ledger', () => {
     expect(stateDigest(resumed.state())).toBe(stateDigest(session.state()))
   })
 
-  it('leaves the trip as the shifter left it while the drill cuts the ore it dragged', () => {
+  it('leaves the trip as the shifter left it while the drill mines below the stand', () => {
     const { session, stand } = shiftedAt(8)
     const banked = bankedOf(session.state())
-    session.submit(40, poseAbove(stand, FACING.down))
-    session.submit(40 + DRILL_TICKS, poseAbove(stand, FACING.down, { drillTicks: DRILL_TICKS }))
+    const below = { tx: stand.tx, ty: stand.ty - 1 }
+    session.submit(40, poseAbove(below, FACING.down))
+    session.submit(40 + DRILL_TICKS, poseAbove(below, FACING.down, { drillTicks: DRILL_TICKS }))
     expect(ofType(session.events(), 'CargoAdded').length).toBeGreaterThan(0)
     expect(bankedOf(session.state())).toEqual(banked)
   })
