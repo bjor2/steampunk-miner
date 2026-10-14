@@ -15,8 +15,11 @@
  * and the long barrel sets the reach and the hold. The five signature modules (ticket 380) shape the
  * shot through the provider: splay lines, seam turns, a cemented lining, grounding and the strut,
  * whose collapse hold reaches the kernel only through the #157 reinforcement registry; the
- * cementing round's and the strut's charges are restocked by the dock's recharge. Every weapon buy through a slice files under
- * the spend guard's one `armoury` family row, with its gun-track pin (ticket 371).
+ * cementing round's and the strut's charges are restocked by the dock's recharge. The cementing round
+ * is also the shoring shot (ticket 369, piece iii of the #157 seam): the cells it opens are held as
+ * permanent ground from the `ground-gun.shot-cells` section, each billed at its band. Every weapon
+ * buy through a slice files under the spend guard's one `armoury` family row, with its gun-track
+ * pin (ticket 371).
  * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -39,6 +42,8 @@ import { GUN_BAY_ENTRIES } from './systems/gunBayEntries'
 import { GROUND_GUN_SECTION } from './systems/gunLevels'
 import { MODULE_USE_SECTION } from './systems/moduleUse'
 import { MODULE_RESTOCK_SERVICE, MODULE_USE_REACTION } from './systems/moduleUseReaction'
+import { SHORING_SHOT_REACTION } from './systems/shoringShot'
+import { SHOT_CELL_REINFORCEMENT, SHOT_CELLS_SECTION } from './systems/shotCells'
 import { GUN_PURCHASE_RULES } from './systems/gunPurchase'
 import { boreGunModuleCards } from './systems/moduleCards'
 import { BORE_GUN_MODULE_SELLER } from './systems/moduleSales'
@@ -54,6 +59,7 @@ export const slice: SliceDefinition = {
   register(r) {
     r.saveSection(GROUND_GUN_SECTION)
     r.saveSection(MODULE_USE_SECTION)
+    r.saveSection(SHOT_CELLS_SECTION)
     r.content(BORE_GUN_KIND, boreGunParts())
     r.itemDescriptionEntries(boreGunCards())
     r.content('vehicle-item', SHIPPED_BORE_GUN_MODULES.map(vehicleItemOf))
@@ -66,9 +72,12 @@ export const slice: SliceDefinition = {
     r.boreGun(GROUND_GUN_PROVIDER)
     r.authorityReaction(BORE_PICKUP_REACTION)
     r.authorityReaction(MODULE_USE_REACTION)
+    r.authorityReaction(SHORING_SHOT_REACTION)
     r.dockService(MODULE_RESTOCK_SERVICE)
     // A strut stands in its mouth cell only through the #157 registry (ticket 379's rule).
     r.reinforcement({ id: 'ground-gun.strut', reinforces: strutReinforces })
+    // The cells a cementing round opened, held from its own section (ticket 369).
+    r.reinforcement(SHOT_CELL_REINFORCEMENT)
     r.inputReaction(FIRE_KEY_REACTION)
     r.eventProjections(GROUND_GUN_PROJECTIONS)
     r.runEvents(GROUND_GUN_RUN_EVENTS)

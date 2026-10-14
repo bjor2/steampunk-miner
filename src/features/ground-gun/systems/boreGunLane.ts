@@ -40,6 +40,9 @@ export const STRUT_BORE_ITEM_ID = 'weapon.strut_bore'
 /** The row the grounded lining opens on (P25): the earthing spike stays hidden until it. */
 const GROUNDED_LINING_ROW = 'grounded_lining'
 
+/** The P1 Feature row the cementing round needs (Content's node table on #310, point 4). */
+export const CASING_CEMENT_ROW = 'casing_cement'
+
 /** Where the module sits on the gun (the #315 mount's zones; the art wiring is #321's). */
 export type BoreMountZone = 'sight' | 'breech' | 'barrel' | 'muzzle' | 'magazine'
 
@@ -119,7 +122,7 @@ export const BORE_GUN_MODULES: readonly BoreGunModule[] = [
     isHeldBack: false,
     node: {
       ...nodeOf('cementing_round', 23, ['long_barrel']),
-      alsoRequiresFeature: ['casing_cement'],
+      alsoRequiresFeature: [CASING_CEMENT_ROW],
     },
   },
   {
