@@ -7,13 +7,16 @@
  * ore value reaching the hold, never cells moved (Q2 (a)).
  *
  * A rate counts only while its anchor row is owned or `FeatureUnlocked`; the caller answers that
- * once, here, at report time. A held or unbuilt anchor counts zero and prints no row. Economic
+ * once, here, at report time. A held or unbuilt anchor counts zero and prints no row. A tree item
+ * with no schedule row of its own (the drain, the movers) anchors on its own item, live once owned
+ * (#385: no `stats.json` row admits them). Economic
  * only, never per planet: pure arithmetic per report, never in the authority, so there is no
  * command, event, save section or protocol bump. A sibling of `spendFamilies` with the same rules;
  * they share no code paths (one reads what the bot spent, this what the items earn).
  */
 import { add, cmp, ZERO_MONEY, type Money } from '../money'
 import { defineOneProviderRegistry, defineRegistry, entriesOf } from './seal'
+import { anchorRowProblemOf } from './spendFamilies'
 
 /** Where the check asks for a rate: one band of one planet, with the run's hold. */
 export interface IncomeAt {
@@ -29,7 +32,10 @@ export interface IncomeRate {
   /** `<slice>.<item>`. */
   id: string
   itemId: string
-  /** The `docs/scaling/horizontal/stats.json` row whose ownership or unlock admits the item. */
+  /**
+   * The `docs/scaling/horizontal/stats.json` row whose ownership or unlock admits the item, or the
+   * item's own id when no row admits it: then the item counts once it is owned.
+   */
   anchorRowId: string
   /**
    * Ore value a minute reaching the hold at the last Mark, all charges, 100% uptime; the kernel
@@ -54,6 +60,12 @@ export interface IncomeCapRow {
 export const INCOME_RATE_REGISTRY = defineRegistry<IncomeRate>('incomeRates')
 
 export const TRIP_CAP_SOURCE_REGISTRY = defineOneProviderRegistry<TripCapSource>('tripCapSource')
+
+/** Why the registrar refuses the rate's anchor: neither a schedule row nor its own item. */
+export function incomeAnchorProblemOf(rate: Pick<IncomeRate, 'anchorRowId' | 'itemId'>) {
+  if (rate.anchorRowId === rate.itemId) return null
+  return anchorRowProblemOf(rate)
+}
 
 /**
  * One row per registered rate whose anchor row is live, by rate id. With no trip-cap source

@@ -63,6 +63,7 @@ import {
   type SpendFamily,
 } from '../systems/registries/spendFamilies'
 import {
+  incomeAnchorProblemOf,
   INCOME_RATE_REGISTRY,
   TRIP_CAP_SOURCE_REGISTRY,
   type IncomeRate,
@@ -291,9 +292,9 @@ function addSpendFamily(sliceId: string, family: SpendFamily) {
   addPrefixed(SPEND_FAMILY_REGISTRY, sliceId, family)
 }
 
-/** An income rate's anchor is a locked schedule row too (ticket 384). */
+/** An income rate's anchor is a locked schedule row too (ticket 384), or its own item (#385). */
 function addIncomeRate(sliceId: string, rate: IncomeRate) {
-  const problem = anchorRowProblemOf(rate)
+  const problem = incomeAnchorProblemOf(rate)
   if (problem !== null) refuseAnchoredEntry(sliceId, `income rate "${rate.id}"`, problem)
   addPrefixed(INCOME_RATE_REGISTRY, sliceId, rate)
 }
