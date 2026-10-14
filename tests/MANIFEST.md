@@ -27,7 +27,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
-### `aetheric`: 12 files, 97 tests
+### `aetheric`: 12 files, 101 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/aetheric/itemHeat.test.ts` | 4 | 4 |
 | `src/features/aetheric/lanternArcRows.test.ts` | 15 | 9 |
 | `src/features/aetheric/phaseLantern.pace.test.ts` | 2 | 1 |
-| `src/features/aetheric/phaseLantern.test.ts` | 14 | 11 |
+| `src/features/aetheric/phaseLantern.test.ts` | 18 | 15 |
 | `src/features/aetheric/resonanceWhistle.test.ts` | 8 | 8 |
 | `src/features/aetheric/systems/aethericNodes.test.ts` | 5 | 5 |
 | `src/features/aetheric/whistleRows.test.ts` | 7 | 7 |
@@ -993,6 +993,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/sprayPool.test.ts` | 10 | 10 |
 | `src/systems/render/stagedTurn.test.ts` | 2 | 2 |
 | `src/systems/render/vehicleLook.test.ts` | 10 | 8 |
+| `src/systems/render/vehicleLookFold.test.ts` | 9 | 9 |
 | `src/systems/render/vehiclePreviewLook.test.ts` | 5 | 5 |
 | `src/systems/render/viewZoom.test.ts` | 20 | 14 |
 | `src/systems/render/visibleChunks.test.ts` | 7 | 7 |

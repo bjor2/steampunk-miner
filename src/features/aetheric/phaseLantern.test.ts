@@ -23,6 +23,15 @@ import {
 } from '../../systems/authority/scriptedSession'
 import { slotHoldEndOf } from '../../systems/registries/slotHoldCues'
 import { vehicleMotionAt } from '../../systems/registries/vehicleMotionEffects'
+import {
+  createDrawnVehicleLook,
+  createLookFlashes,
+  drawVehicleLookAt,
+  startLookFlashes,
+  swapVeilForOutline,
+  type DrawnVehicleLook,
+  type LookFlashes,
+} from '../../systems/render/vehicleLookFold'
 import { replayRun } from '../../systems/replay/replayRun'
 import { ENERGY_QUANTA_PER_TICK } from '../../systems/vehicle/energyQuanta'
 import { FACING, tileOfMillimetres } from '../../systems/vehicle/vehiclePose'
@@ -44,6 +53,13 @@ import {
 import { itemHeatUnitsAt } from './systems/itemHeat'
 import { LANTERN_ID } from './systems/lanternItem'
 import { phaseCellsOf } from './systems/phaseCells'
+import {
+  AETHER_BLUE,
+  FLICKER_TICKS,
+  LANTERN_SLOTS,
+  PHASE_OPACITY,
+  REFUSAL_RED,
+} from './systems/phaseLook'
 import { phaseOf } from './systems/phaseSection'
 
 // The phase lantern in play on the loaded slices (#261, the GD locks on #245 and #255 "phase",
@@ -410,5 +426,57 @@ describe('phase lantern', () => {
     expect(slotHoldEndOf(eventsOfType(refused.session, 'power-up-core.PowerUpRefused')[0])).toBe(
       'cancelled',
     )
+  })
+})
+
+/** The look the kernel would paint on `PLAYER`'s vehicle at `tick` from the session's state. */
+function lookAt(
+  session: ScriptedSession,
+  tick: number,
+  flashes: LookFlashes = createLookFlashes(),
+): DrawnVehicleLook {
+  const drawn = createDrawnVehicleLook()
+  drawVehicleLookAt(drawn, flashes, { state: session.state(), playerId: PLAYER, tick })
+  return drawn
+}
+
+function lanternGlowsOf(look: DrawnVehicleLook) {
+  return look.glows.filter((glow) => glow.slots === LANTERN_SLOTS)
+}
+
+// The phase look (G&V on #261, ticket 389), through the kernel's `vehicleLooks` fold.
+describe('phase look', () => {
+  it('turns the vehicle translucent aether blue with the lantern lit while it phases, and clears it on landing', () => {
+    const fight = phaseFight({ ticks: LANTERN.windupTicks + 1 })
+    const moving = lookAt(fight.session, fight.actTick + 1)
+    expect(moving).toMatchObject({ tint: AETHER_BLUE, opacity: PHASE_OPACITY, outline: null })
+    expect(lanternGlowsOf(moving).map((glow) => glow.colour)).toEqual([AETHER_BLUE])
+    stepTicks(fight.session, fight.actTick + 1, fight.bitTicks)
+    expect(eventsOfType(fight.session, 'aetheric.PhaseLanded')).toHaveLength(1)
+    const landed = lookAt(fight.session, fight.session.state().tick)
+    expect(landed).toEqual({ tint: null, opacity: 1, outline: null, glows: [] })
+  })
+
+  it('pulses the lantern over the move', () => {
+    const fight = phaseFight({ ticks: LANTERN.windupTicks + 1 })
+    const glowAt = (tick: number) => lanternGlowsOf(lookAt(fight.session, tick))[0].glow
+    expect(glowAt(fight.actTick + 1)).not.toBe(glowAt(fight.actTick))
+  })
+
+  it('flickers the lantern red on a refused phase, then puts it out, with no tint', () => {
+    const refused = phaseFight({ hasLanding: false, ticks: LANTERN.windupTicks + 1 })
+    const flashes = createLookFlashes()
+    startLookFlashes(flashes, refused.session.events(), PLAYER, refused.actTick)
+    const flicker = lookAt(refused.session, refused.actTick, flashes)
+    expect(flicker).toMatchObject({ tint: null, opacity: 1 })
+    expect(lanternGlowsOf(flicker).map((glow) => glow.colour)).toEqual([REFUSAL_RED])
+    expect(lookAt(refused.session, refused.actTick + FLICKER_TICKS, flashes).glows).toEqual([])
+  })
+
+  it('draws one aether-blue outline and no translucency under reduced effects', () => {
+    const fight = phaseFight({ ticks: LANTERN.windupTicks + 1 })
+    const reduced = lookAt(fight.session, fight.actTick + 1)
+    swapVeilForOutline(reduced)
+    expect(reduced).toMatchObject({ tint: null, opacity: 1, outline: AETHER_BLUE })
   })
 })

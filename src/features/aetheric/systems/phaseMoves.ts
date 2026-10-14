@@ -66,7 +66,8 @@ function phaseHoldEndOf(event: DomainEvent): SlotHoldEnd | null {
   return isRefusedPhase(event) ? 'cancelled' : null
 }
 
-function isRefusedPhase(event: DomainEvent): boolean {
+/** A press of the lantern refused for one of the phase's own reasons. */
+export function isRefusedPhase(event: DomainEvent): boolean {
   if (event.type !== 'power-up-core.PowerUpRefused') return false
   return event.itemId === LANTERN_ID && PHASE_REFUSALS.includes(event.reason)
 }
