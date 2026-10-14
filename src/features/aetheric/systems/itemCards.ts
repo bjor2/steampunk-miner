@@ -1,14 +1,16 @@
 /**
- * The resonance whistle's card entry (#159, the K7 `itemDescriptionEntries` seam): the #245 flavour
+ * The aetheric items' card entries (#159, the K7 `itemDescriptionEntries` seam): the #245 flavour
  * line and one stat line per `statPreview` line, read at the Mark the card's level names. A card at
  * level 0 (the slot card, an item not yet marked up) reads Mark 1, the item as bought; a stat the
- * Marks step shows the next Mark's value until the whistle is Mastered. The reach, the energy a
- * blow costs and the price never change with the Mark.
+ * Marks step shows the next Mark's value until the item is Mastered. The rest never changes with
+ * the Mark.
  */
 import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber'
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
-import { isMasteredAt } from '../../tech-tree'
+import { isMasteredAt, type MarkLadder } from '../../tech-tree'
+import { CONDENSER_DESCRIPTION, CONDENSER_ID, condenserMarkLadder } from './condenserItem'
+import { GOVERNOR_DESCRIPTION, GOVERNOR_ID, governorMarkLadder } from './governorItem'
 import { statPreview, type StatPreviewLine } from './statPreview'
 import { WHISTLE_DESCRIPTION, WHISTLE_ID, whistleMarkLadder } from './whistleItem'
 
@@ -16,29 +18,63 @@ const FIRST_MARK = 1
 /** Any planet: the labels do not change with it. */
 const LABEL_PLANET = 1
 
-export const WHISTLE_ITEM_CARD: ItemDescriptionEntry = {
-  id: 'aetheric.resonance_whistle',
-  matches: { kind: 'vehicle-item', id: WHISTLE_ID },
-  flavour: WHISTLE_DESCRIPTION,
-  statLines: statPreview(WHISTLE_ID, FIRST_MARK, LABEL_PLANET).map(lineSpecOf),
-}
+export const WHISTLE_ITEM_CARD = itemCardOf(
+  'aetheric.resonance_whistle',
+  WHISTLE_ID,
+  WHISTLE_DESCRIPTION,
+  whistleMarkLadder(),
+)
+
+export const GOVERNOR_ITEM_CARD = itemCardOf(
+  'aetheric.chronometric_governor',
+  GOVERNOR_ID,
+  GOVERNOR_DESCRIPTION,
+  governorMarkLadder(),
+)
+
+export const CONDENSER_ITEM_CARD = itemCardOf(
+  'aetheric.aether_condenser',
+  CONDENSER_ID,
+  CONDENSER_DESCRIPTION,
+  condenserMarkLadder(),
+)
 
 /** The Mark a card's level names: Mark 1 before any Mark is researched. */
 export function markOfLevel(level: number): number {
   return Math.max(FIRST_MARK, level)
 }
 
-function lineSpecOf(line: StatPreviewLine, index: number): DescribedStatLineSpec {
+function itemCardOf(
+  id: string,
+  itemId: string,
+  flavour: string,
+  ladder: MarkLadder,
+): ItemDescriptionEntry {
+  return {
+    id,
+    matches: { kind: 'vehicle-item', id: itemId },
+    flavour,
+    statLines: statPreview(itemId, FIRST_MARK, LABEL_PLANET).map((line, index) =>
+      lineSpecOf(line, index, ladder),
+    ),
+  }
+}
+
+function lineSpecOf(
+  line: StatPreviewLine,
+  index: number,
+  ladder: MarkLadder,
+): DescribedStatLineSpec {
   return {
     label: line.label,
     kind: line.isMarked ? 'linearInt' : 'geometric',
     value: (ref: ItemRef, ctx: ItemCtx) =>
       statPreview(ref.id, markOfLevel(ctx.level), ctx.planetIndex)[index].value,
-    nextLevel: line.isMarked ? nextMarkOf : hasNoNextLevel,
+    nextLevel: line.isMarked ? (_ref, ctx) => nextMarkOf(ladder, ctx) : hasNoNextLevel,
   }
 }
 
-function nextMarkOf(_ref: ItemRef, ctx: ItemCtx): number | null {
+function nextMarkOf(ladder: MarkLadder, ctx: ItemCtx): number | null {
   const mark = markOfLevel(ctx.level)
-  return isMasteredAt(whistleMarkLadder(), mark) ? null : mark + 1
+  return isMasteredAt(ladder, mark) ? null : mark + 1
 }

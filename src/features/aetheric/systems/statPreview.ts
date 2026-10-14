@@ -1,14 +1,28 @@
 /**
- * `statPreview(entryId, mark, planetIndex)` (spec #162 "Slice and contract"): what the resonance
- * whistle does at a Mark, as raw values the item card formats (#159), and its one-off price (#162
- * 4.1), fixed at the unlock planet so a card shows one number. The cooldown, the lure's duration
- * and the charges step with the Marks; the reach and the energy a blow costs stay as bought.
- * Times read in seconds, energy in units of the tank.
+ * `statPreview(entryId, mark, planetIndex)` (spec #162 "Slice and contract"): what an aetheric item
+ * does at a Mark, as raw values the item card formats (#159), and its one-off price (#162 4.1),
+ * fixed at the unlock planet so a card shows one number. The cooldown, the duration and the
+ * charges step with the Marks; the rest stays as bought. Times read in seconds, energy in units of
+ * the tank, heat in percent of the item heat gauge.
+ *
+ * - The resonance whistle (#262): its lure's duration, its reach and the energy a blow costs.
+ * - The chronometric governor (#263): its pocket's duration and range, the energy it draws a
+ *   second and the heat a pocket adds.
+ * - The aether condenser (#263): the energy a full item heat gauge condenses into.
  */
 import { ENERGY_QUANTA_PER_UNIT } from '../../../constants/balance'
 import { TICKS_PER_SECOND } from '../../../constants/physics'
-import { div, fromSafeInteger, type Money } from '../../../systems/money'
-import { markStepOf } from '../../tech-tree'
+import { CONDENSE_RATIO } from '../../../systems/aetheric/condense'
+import { div, fromSafeInteger, mul, type Money } from '../../../systems/money'
+import { markStepOf, type MarkLadder } from '../../tech-tree'
+import {
+  condenserBalance,
+  condenserMarkLadder,
+  CONDENSER_ID,
+  condenserPrice,
+} from './condenserItem'
+import { governorBalance, governorMarkLadder, GOVERNOR_ID, governorPrice } from './governorItem'
+import { gaugeMaxUnits } from './itemHeat'
 import { WHISTLE_ID, whistleBalance, whistleMarkLadder, whistlePrice } from './whistleItem'
 
 export interface StatPreviewLine {
@@ -18,36 +32,63 @@ export interface StatPreviewLine {
   isMarked: boolean
 }
 
-/** The whistle's lines at `mark`, its price last; none for an id this lane does not own. */
+const PERCENT = 100
+
+const PREVIEWS: Readonly<Record<string, (mark: number) => readonly StatPreviewLine[]>> = {
+  [WHISTLE_ID]: whistleLinesOf,
+  [GOVERNOR_ID]: governorLinesOf,
+  [CONDENSER_ID]: condenserLinesOf,
+}
+
+/** The item's lines at `mark`, its price last; none for an id this lane does not own. */
 export function statPreview(
   entryId: string,
   mark: number,
   _planetIndex: number,
 ): readonly StatPreviewLine[] {
-  if (entryId !== WHISTLE_ID) return []
-  return [...markedLinesOf(mark), ...boughtLines(), priceLine()]
+  return PREVIEWS[entryId]?.(mark) ?? []
 }
 
-function markedLinesOf(mark: number): StatPreviewLine[] {
+function whistleLinesOf(mark: number): StatPreviewLine[] {
   const balance = whistleBalance()
-  const stats = markStepOf(whistleMarkLadder(), mark).stats
+  const stats = statsAt(whistleMarkLadder(), mark)
   return [
     marked('Cooldown (s)', secondsOf(stats.cooldown ?? balance.cooldownTicks)),
     marked('Lure lasts (s)', secondsOf(stats.magnitude ?? balance.durationTicks)),
     marked('Charges', fromSafeInteger(stats.charges ?? balance.charges)),
-  ]
-}
-
-function boughtLines(): StatPreviewLine[] {
-  const balance = whistleBalance()
-  return [
     bought('Reach (tiles)', fromSafeInteger(balance.reachTiles)),
     bought('Energy a blow', unitsOf(balance.energyQuanta)),
+    bought('Price', whistlePrice()),
   ]
 }
 
-function priceLine(): StatPreviewLine {
-  return bought('Price', whistlePrice())
+function governorLinesOf(mark: number): StatPreviewLine[] {
+  const balance = governorBalance()
+  const stats = statsAt(governorMarkLadder(), mark)
+  return [
+    marked('Cooldown (s)', secondsOf(stats.cooldown ?? balance.cooldownTicks)),
+    marked('Pocket lasts (s)', secondsOf(stats.magnitude ?? balance.durationTicks)),
+    marked('Charges', fromSafeInteger(stats.charges ?? balance.charges)),
+    bought('Range (tiles)', fromSafeInteger(balance.rangeTiles)),
+    bought('Energy a second', unitsOf(balance.energyQuantaPerTick * TICKS_PER_SECOND)),
+    bought('Heat a pocket (%)', gaugePercentOf(balance.heatUnits)),
+    bought('Price', governorPrice()),
+  ]
+}
+
+function condenserLinesOf(mark: number): StatPreviewLine[] {
+  const balance = condenserBalance()
+  const stats = statsAt(condenserMarkLadder(), mark)
+  return [
+    marked('Cooldown (s)', secondsOf(stats.cooldown ?? balance.cooldownTicks)),
+    marked('Charges', fromSafeInteger(stats.charges ?? balance.charges)),
+    bought('Energy a full gauge', unitsOf(Math.floor(gaugeMaxUnits() / CONDENSE_RATIO))),
+    bought('Price', condenserPrice()),
+  ]
+}
+
+function statsAt(ladder: MarkLadder, mark: number) {
+  return markStepOf(ladder, mark).stats
 }
 
 function marked(label: string, value: Money): StatPreviewLine {
@@ -64,4 +105,11 @@ function secondsOf(ticks: number): Money {
 
 function unitsOf(quanta: number): Money {
   return div(fromSafeInteger(quanta), fromSafeInteger(ENERGY_QUANTA_PER_UNIT))
+}
+
+function gaugePercentOf(units: number): Money {
+  return div(
+    mul(fromSafeInteger(units), fromSafeInteger(PERCENT)),
+    fromSafeInteger(gaugeMaxUnits()),
+  )
 }

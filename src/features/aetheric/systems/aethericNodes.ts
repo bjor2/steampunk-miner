@@ -3,10 +3,24 @@
  * researched at the `research_lab` and refused `no_lab` before it stands, and two shared lane
  * nodes on P24 and P29 that need only the entry node, so a P16 fork re-choice (#255) strands
  * neither. Every item adds a verb and spends energy or heat, never yield; the items, their Mark
- * ladders and their numbers come with their own builds: the whistle's with #262, the later two
- * with #263, the P16 fork pair with #261.
+ * ladders and their numbers come with their own builds: the whistle's with #262, the governor's
+ * and the condenser's with #263, the P16 fork pair with #261.
  */
 import type { TechNode } from '../../tech-tree'
+import {
+  CONDENSER_DESCRIPTION,
+  CONDENSER_ID,
+  CONDENSER_NAME,
+  CONDENSER_UNLOCK_PLANET,
+  condenserMarkLadder,
+} from './condenserItem'
+import {
+  GOVERNOR_DESCRIPTION,
+  GOVERNOR_ID,
+  GOVERNOR_NAME,
+  GOVERNOR_UNLOCK_PLANET,
+  governorMarkLadder,
+} from './governorItem'
 import {
   WHISTLE_DESCRIPTION,
   WHISTLE_ID,
@@ -36,24 +50,26 @@ export const AETHERIC_TECH_NODES: readonly TechNode[] = [
     id: 'tech.aetheric.chronometric_governor',
     iconId: 'node-aetheric-chronometric-governor',
     lane: 'aetheric',
-    name: 'Chronometric governor',
-    unlockTier: 24,
+    name: GOVERNOR_NAME,
+    unlockTier: GOVERNOR_UNLOCK_PLANET,
     prereqs: [ENTRY_NODE_ID],
-    unlocks: 'power.chronometric_governor',
-    description: 'An escapement cage slows the clockwork of every enemy caught near it.',
+    unlocks: GOVERNOR_ID,
+    description: GOVERNOR_DESCRIPTION,
     label: 'horizontal',
     costKind: 'capability',
+    marks: governorMarkLadder(),
   },
   {
     id: 'tech.aetheric.aether_condenser',
     iconId: 'node-aetheric-aether-condenser',
     lane: 'aetheric',
-    name: 'Aether condenser',
-    unlockTier: 29,
+    name: CONDENSER_NAME,
+    unlockTier: CONDENSER_UNLOCK_PLANET,
     prereqs: [ENTRY_NODE_ID],
-    unlocks: 'power.aether_condenser',
-    description: "A flank tank condenses the boiler's spare heat back into stored charge.",
+    unlocks: CONDENSER_ID,
+    description: CONDENSER_DESCRIPTION,
     label: 'horizontal',
     costKind: 'capability',
+    marks: condenserMarkLadder(),
   },
 ]

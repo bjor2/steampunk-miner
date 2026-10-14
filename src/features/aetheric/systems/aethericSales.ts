@@ -1,20 +1,36 @@
 /**
- * What the Upgrade bay sells of this lane (ticket 248, kernel `vehicleItemSellers`): the resonance
- * whistle at its one-off price, 15 band-5 units at its unlock planet (#162 4.1), the price its card
- * shows. It is answered before P15 too: the kernel refuses an unresearched item, and the entry node
- * opens only at P15 and the research lab.
+ * What the Upgrade bay sells of this lane (ticket 248, kernel `vehicleItemSellers`): each shipped
+ * item at its one-off price, 15 band-5 units at its unlock planet (#162 4.1), the price its card
+ * shows: the resonance whistle (#262), the chronometric governor and the aether condenser (#263).
+ * An item is answered before its planet too: the kernel refuses an unresearched item, and its node
+ * opens only at its planet (the entry node also at the research lab).
  */
+import type { Money } from '../../../systems/money'
 import type {
   VehicleItemOffer,
   VehicleItemSeller,
 } from '../../../systems/registries/vehicleItemSales'
+import { CONDENSER_ID, CONDENSER_NAME, condenserPrice } from './condenserItem'
+import { GOVERNOR_ID, GOVERNOR_NAME, governorPrice } from './governorItem'
 import { WHISTLE_ID, WHISTLE_NAME, whistlePrice } from './whistleItem'
+
+interface SoldItem {
+  name: string
+  price: () => Money
+}
+
+const SOLD_ITEMS: Readonly<Record<string, SoldItem>> = {
+  [WHISTLE_ID]: { name: WHISTLE_NAME, price: whistlePrice },
+  [GOVERNOR_ID]: { name: GOVERNOR_NAME, price: governorPrice },
+  [CONDENSER_ID]: { name: CONDENSER_NAME, price: condenserPrice },
+}
 
 export const AETHERIC_SELLER: VehicleItemSeller = {
   id: 'aetheric.seller',
-  offerOf: (itemId) => whistleOfferOf(itemId),
+  offerOf: (itemId) => offerOf(itemId),
 }
 
-function whistleOfferOf(itemId: string): VehicleItemOffer | null {
-  return itemId === WHISTLE_ID ? { name: WHISTLE_NAME, price: whistlePrice() } : null
+function offerOf(itemId: string): VehicleItemOffer | null {
+  const sold = SOLD_ITEMS[itemId]
+  return sold === undefined ? null : { name: sold.name, price: sold.price() }
 }

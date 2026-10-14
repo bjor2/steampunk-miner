@@ -72,7 +72,7 @@ describe('resonance whistle rows', () => {
         price,
       }),
     )
-    expect(AETHERIC_SELLER.offerOf('power.chronometric_governor', LATE_PLANET)).toBeNull()
+    expect(AETHERIC_SELLER.offerOf('power.phase_lantern', LATE_PLANET)).toBeNull()
   })
 
   it('prices a tech.mark node for every Mark from 2 to its last, and none past it', () => {

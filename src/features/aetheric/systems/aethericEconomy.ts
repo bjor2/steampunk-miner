@@ -1,7 +1,8 @@
 /**
  * The aetheric lane's numbers from `aetheric.economy.json`, under `tech.aetheric` (the GD lock on
  * #245: range, duration, chain count, condense ratio and cooldowns live there, never in code): the
- * one-off price every item pays (#162 4.1) and the resonance whistle's row (#262). The file is
+ * one-off price every item pays (#162 4.1), the resonance whistle's row (#262), the chronometric
+ * governor's and the aether condenser's rows and the off-act item heat gauge (#263). The file is
  * refused whole on any problem, like the kernel's economy file, so a stand-in never reaches a rule.
  */
 import {
@@ -26,10 +27,43 @@ export interface WhistleBalance {
   energyQuanta: number
 }
 
+/** The governor's Mark 1 numbers, in whole ticks, tiles, energy quanta and heat units. */
+export interface GovernorBalance {
+  /** Charges per dock. */
+  charges: number
+  cooldownTicks: number
+  windupTicks: number
+  /** How far from the pocket's cell, in whole tiles, an enemy is slowed. */
+  rangeTiles: number
+  /** How long the pocket holds: the stat the Mark magnitude step grows. */
+  durationTicks: number
+  /** What each tick the pocket holds takes from the tank. */
+  energyQuantaPerTick: number
+  /** What opening a pocket adds to the item heat gauge (`HEAT_UNITS_PER_POINT` a point). */
+  heatUnits: number
+}
+
+/** The condenser's Mark 1 numbers; its ratio is the kernel's (`src/data/aetheric.json`, #360). */
+export interface CondenserBalance {
+  /** Charges per dock. */
+  charges: number
+  cooldownTicks: number
+  windupTicks: number
+}
+
+/** The off-act gauge that holds the heat items add (GD ruling on #263 Q1 a), in heat units. */
+export interface ItemHeatBalance {
+  gaugeMaxUnits: number
+  coolingUnitsPerTick: number
+}
+
 export interface AethericEconomy {
   /** `k` band-5 ore units, paid at the item's unlock planet (#162 4.1). */
   price: BandOreCost
   resonanceWhistle: WhistleBalance
+  chronometricGovernor: GovernorBalance
+  aetherCondenser: CondenserBalance
+  itemHeat: ItemHeatBalance
 }
 
 export const AETHERIC_ECONOMY: AethericEconomy = loadAethericEconomy(AETHERIC_ECONOMY_FILE)
@@ -44,6 +78,13 @@ export function readAethericEconomy(
   const economy = {
     price: readBandOreCost(reader, 'tech.aetheric.price', lane.price),
     resonanceWhistle: readWhistle(reader, 'tech.aetheric.resonanceWhistle', lane.resonanceWhistle),
+    chronometricGovernor: readGovernor(
+      reader,
+      'tech.aetheric.chronometricGovernor',
+      lane.chronometricGovernor,
+    ),
+    aetherCondenser: readCondenser(reader, 'tech.aetheric.aetherCondenser', lane.aetherCondenser),
+    itemHeat: readItemHeat(reader, 'tech.aetheric.itemHeat', lane.itemHeat),
   }
   return reader.problems.length > 0 ? { problems: reader.problems } : { economy }
 }
@@ -65,5 +106,35 @@ function readWhistle(reader: FieldReader, path: string, raw: unknown): WhistleBa
     reachTiles: reader.safeInteger(`${path}.reachTiles`, row.reachTiles),
     durationTicks: reader.safeInteger(`${path}.durationTicks`, row.durationTicks),
     energyQuanta: reader.safeInteger(`${path}.energyQuanta`, row.energyQuanta),
+  }
+}
+
+function readGovernor(reader: FieldReader, path: string, raw: unknown): GovernorBalance {
+  const row = reader.object(path, raw)
+  return {
+    charges: reader.safeInteger(`${path}.charges`, row.charges),
+    cooldownTicks: reader.safeInteger(`${path}.cooldownTicks`, row.cooldownTicks),
+    windupTicks: reader.safeInteger(`${path}.windupTicks`, row.windupTicks),
+    rangeTiles: reader.safeInteger(`${path}.rangeTiles`, row.rangeTiles),
+    durationTicks: reader.safeInteger(`${path}.durationTicks`, row.durationTicks),
+    energyQuantaPerTick: reader.safeInteger(`${path}.energyQuantaPerTick`, row.energyQuantaPerTick),
+    heatUnits: reader.safeInteger(`${path}.heatUnits`, row.heatUnits),
+  }
+}
+
+function readCondenser(reader: FieldReader, path: string, raw: unknown): CondenserBalance {
+  const row = reader.object(path, raw)
+  return {
+    charges: reader.safeInteger(`${path}.charges`, row.charges),
+    cooldownTicks: reader.safeInteger(`${path}.cooldownTicks`, row.cooldownTicks),
+    windupTicks: reader.safeInteger(`${path}.windupTicks`, row.windupTicks),
+  }
+}
+
+function readItemHeat(reader: FieldReader, path: string, raw: unknown): ItemHeatBalance {
+  const row = reader.object(path, raw)
+  return {
+    gaugeMaxUnits: reader.safeInteger(`${path}.gaugeMaxUnits`, row.gaugeMaxUnits),
+    coolingUnitsPerTick: reader.safeInteger(`${path}.coolingUnitsPerTick`, row.coolingUnitsPerTick),
   }
 }

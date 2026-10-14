@@ -5,10 +5,12 @@ import { describeItem } from '../../systems/registries/itemDescriber'
 import { itemSnapshotViewOf } from '../../systems/registries/itemSnapshotView'
 import { LOCKED_SCHEDULE } from '../../systems/unlocks/unlockSchedule'
 import { oreFamilies } from '../ores'
-import { lastMarkOf } from '../tech-tree'
+import { lastMarkOf, type MarkLadder } from '../tech-tree'
 import { AETHERIC_PROJECTIONS, AETHERIC_RUN_EVENTS } from './logging'
-import { ENERGY_SHORT } from './systems/aethericEvents'
+import { AETHERIC_REFUSALS } from './systems/aethericEvents'
 import { AETHERIC_TECH_NODES } from './systems/aethericNodes'
+import { CONDENSER_ID, condenserMarkLadder } from './systems/condenserItem'
+import { GOVERNOR_ID, governorMarkLadder } from './systems/governorItem'
 import { WHISTLE_ID, whistleMarkLadder } from './systems/whistleItem'
 
 // The GD lock on #245: an aetheric item names no frozen, magnetic or hollow feature and no ore
@@ -18,7 +20,13 @@ import { WHISTLE_ID, whistleMarkLadder } from './systems/whistleItem'
 
 const VISION_FEATURE_WORDS = /\b(frozen|magnetic|hollow)\b/i
 
-const AETHERIC_ITEM_IDS = [WHISTLE_ID]
+const AETHERIC_LADDERS: Readonly<Record<string, MarkLadder>> = {
+  [WHISTLE_ID]: whistleMarkLadder(),
+  [GOVERNOR_ID]: governorMarkLadder(),
+  [CONDENSER_ID]: condenserMarkLadder(),
+}
+
+const AETHERIC_ITEM_IDS = Object.keys(AETHERIC_LADDERS)
 
 const view = itemSnapshotViewOf(
   createAuthorityState({ planetIndex: 1, planetSeed: 83921, playerIds: ['p1'] }),
@@ -43,7 +51,8 @@ function visionRowWords(): string[] {
 
 /** Every card of the item from Mark 1 to its last, as plain text, on the lane's first planet. */
 function cardTextsOf(itemId: string): string[] {
-  return Array.from({ length: lastMarkOf(whistleMarkLadder()) }, (_, at) => at + 1).map((level) =>
+  const lastMark = lastMarkOf(AETHERIC_LADDERS[itemId])
+  return Array.from({ length: lastMark }, (_, at) => at + 1).map((level) =>
     JSON.stringify(
       describeItem(
         { kind: 'vehicle-item', id: itemId },
@@ -63,7 +72,7 @@ function aethericTexts(): string[] {
       .map((powerUp) => JSON.stringify(powerUp)),
     ...Object.keys(AETHERIC_PROJECTIONS),
     JSON.stringify(AETHERIC_RUN_EVENTS),
-    ENERGY_SHORT,
+    ...AETHERIC_REFUSALS,
   ].map((text) => text.toLowerCase())
 }
 
