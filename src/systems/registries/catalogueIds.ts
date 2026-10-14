@@ -3,7 +3,8 @@
  * keeps one id across the store, the tree and the descriptions (`slot.powerup_4`,
  * `tech.terrain.cradle_4`), so a slice may register its content under `<category>.<name>` instead
  * of its own prefix. The category is one of the #162 store categories (`combo` for the milestone
- * combos, 206b) or `tech` (the #165 lane nodes). An id with no category, or any other one, is
+ * combos, 206b; `weapon` for the armoury modules of Content's #310 table, ticket 318) or `tech`
+ * (the #165 lane nodes). An id with no category, or any other one, is
  * refused, so a bare id never equals a flat snake_case stats.json row id (`remote_detonator`).
  * Each bare id has one owning slice: a second slice registering it is the content registry's
  * duplicate refusal.
@@ -18,6 +19,7 @@ export const BARE_CATALOGUE_CATEGORIES = [
   'rig',
   'slot',
   'combo',
+  'weapon',
   'tech',
 ] as const
 

@@ -8,9 +8,13 @@
  * the tick it was allowed. The authority's refusals come back through the domain events: a
  * `recovering` one is silent, any other clanks once.
  *
+ * With the gimbal sight on the gun (ticket 318), a shot with no manual aim takes the sight's pick
+ * rather than the facing (`sightAim.ts`).
+ *
  * Plain module state, not a store field: it changes on input and every frame, and only the
  * reticle reads the aim, on the frame (CLAUDE.md, frame loop rules).
  */
+import { bestBoreBearingOf } from '../../../systems/authority/bore/boreAuto'
 import { nextShotTickOf } from '../../../systems/authority/bore/boreFire'
 import { vehicleOf, type AuthorityState } from '../../../systems/authority/authorityState'
 import type { CommandIntent } from '../../../systems/authority/authorityCommand'
@@ -19,10 +23,12 @@ import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
 import { isActionDown } from '../../../store/inputRuntime'
 import { requestSoundCue } from '../../../store/soundCueRequests'
+import { sightMarkOf, sightRetargetTicksAt } from '../systems/boreGunModules'
 import { bearingOfAim, facingBearingOf, type RigAim } from '../systems/fireAim'
 import { isClankRefusal, refusedFire, fireStepAt } from '../systems/fireHold'
 import { keyFrameInput, keyPressedInput, keyReleasedByRefusal } from '../systems/fireKey'
 import { gunLevelsOf, isGunMounted } from '../systems/gunLevels'
+import { isSightPickDue, restingBearingOf, type SightPick } from '../systems/sightAim'
 import { FIRE_TILE_FEEL } from '../systems/render/fireTileFeel'
 import {
   cancelledTile,
@@ -40,6 +46,8 @@ export const FIRE_ACTION = 'fire_ground_gun'
 let input: FireInput = IDLE_INPUT
 /** Where the mouse aimed on the last frame (`advanceFire`'s argument); null with no mouse. */
 let cursorAim: RigAim | null = null
+/** The gimbal sight's last look; null with no sight or before its first. */
+let sightPick: SightPick | null = null
 
 export function pressFireTile(): void {
   input = pressedTile(input, readAuthorityState().tick)
@@ -52,7 +60,7 @@ export function aimFireTile(aim: RigAim): void {
 
 export function releaseFireTile(): void {
   const state = readAuthorityState()
-  input = releasedTile(input, state.tick, facingBearingOf(facingOf(state)))
+  input = releasedTile(input, state.tick, unaimedBearingOf(state))
   advanceFire(cursorAim)
 }
 
@@ -86,7 +94,7 @@ export function advanceFire(aim: RigAim | null): void {
     input,
     state.tick,
     nextShotTickOf(state, playerId),
-    facingBearingOf(facingOf(state)),
+    unaimedBearingOf(state),
     FIRE_TILE_FEEL.holdFireTicks,
   )
   input = frame.input
@@ -118,6 +126,7 @@ export function readAimBearing(): number | null {
 export function resetFireInput(): void {
   input = IDLE_INPUT
   cursorAim = null
+  sightPick = null
 }
 
 function sendShot(bearing: number): void {
@@ -134,10 +143,23 @@ function clankRefusedShot(): void {
   requestSoundCue(FIRE_TILE_FEEL.refusalClank.id)
 }
 
-/** The cursor's aim snapped into the arc, or the facing with no mouse over the canvas. */
+/** The cursor's aim snapped into the arc, or the unaimed bearing with no mouse over the canvas. */
 function keyBearingOf(state: AuthorityState): number {
-  const facing = facingOf(state)
-  return cursorAim === null ? facingBearingOf(facing) : bearingOfAim(cursorAim, facing)
+  return cursorAim === null ? unaimedBearingOf(state) : bearingOfAim(cursorAim, facingOf(state))
+}
+
+/** A shot with no manual aim: the gimbal sight's pick when the gun carries one, else the facing. */
+function unaimedBearingOf(state: AuthorityState): number {
+  sightPick = sightPickNow(state, localPlayerId())
+  return restingBearingOf(sightPick, facingBearingOf(facingOf(state)))
+}
+
+/** The sight's look, kept until its retarget wait runs out; null without a sight. */
+function sightPickNow(state: AuthorityState, playerId: string): SightPick | null {
+  const mark = sightMarkOf(state, playerId)
+  if (mark === 0) return null
+  if (!isSightPickDue(sightPick, state.tick, sightRetargetTicksAt(mark))) return sightPick
+  return { pickedTick: state.tick, bearing: bestBoreBearingOf(state, playerId) }
 }
 
 function fireRefusalsOf(events: readonly DomainEvent[], playerId: string): string[] {

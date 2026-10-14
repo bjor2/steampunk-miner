@@ -5,9 +5,11 @@
  * bot's shot floor, the turret's cap and Content's module placeholders. The file is refused whole
  * on any problem, like the kernel's economy file, so a stand-in never reaches a formula.
  */
+import type { BandOreCost } from '../../../systems/economy/economyDefinition'
 import type { Money } from '../../../systems/money'
 import {
   createFieldReader,
+  readBandOreCost,
   readIntegerList,
   readLiteral,
   type FieldReader,
@@ -121,6 +123,8 @@ export interface ArmouryModule {
 export interface GroundGunEconomy {
   bore: BoreNumbers
   mount: MountPrice
+  /** A module's one-off price in band ore, read at its unlock planet (#162 4.1, ticket 318). */
+  modulePrice: BandOreCost
   tracks: GunTracks
   longBarrel: LongBarrelNumbers
   autoShoot: AutoShootNumbers
@@ -148,6 +152,7 @@ export function readGroundGunEconomy(
   const economy: GroundGunEconomy = {
     bore: readBore(reader, file.bore),
     mount: readMountPrice(reader, file.mount),
+    modulePrice: readBandOreCost(reader, 'modulePrice', file.modulePrice),
     tracks: {
       rate: readTrack(reader, 'tracks.rate', tracks.rate, RATE_STATS),
       penetration: readTrack(reader, 'tracks.penetration', tracks.penetration, PENETRATION_STATS),

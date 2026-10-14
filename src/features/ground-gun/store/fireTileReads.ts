@@ -5,7 +5,7 @@
  */
 import { readAuthorityState } from '../../../store/authorityLink'
 import { useGameStore } from '../../../store/gameStore'
-import { boreGunStatsOf } from '../systems/boreGunProvider'
+import { playerBoreGunOf } from '../systems/boreGunProvider'
 import { fireTileOf, type FireTileModel } from '../systems/fireTile'
 import { gunLevelsOf, isGunMounted } from '../systems/gunLevels'
 import { boundLabel } from '../../../systems/input/actionMap'
@@ -23,8 +23,7 @@ export function readIsGunMounted(): boolean {
 
 /** How far the local player's gun reaches now, in cells; 0 with no gun. */
 export function readGunReachCells(): number {
-  const levels = gunLevelsOf(readAuthorityState(), useGameStore.getState().playerId)
-  return boreGunStatsOf(levels)?.rangeCells ?? 0
+  return playerBoreGunOf(readAuthorityState(), useGameStore.getState().playerId)?.rangeCells ?? 0
 }
 
 /** What the touch tile and the desktop gauge draw: the ring, the lamp and the fire key. */

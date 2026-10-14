@@ -7,7 +7,10 @@
  * tile with its recovery ring fires, holds and aims (the reticle on the overlay); hold-fire and
  * the tap buffer live only in that client input, and a refused shot clanks unless it was only
  * the recovery. The bought gun shows on the rig: `vehicle-bore-gun` (#362's art) hangs at
- * `hull.front` as a vehicle piece, its barrel turned to the aim (ticket 315).
+ * `hull.front` as a vehicle piece, its barrel turned to the aim (ticket 315). The
+ * `armoury.bore_gun` lane (ticket 318) adds the shipped modules as store items with their tech
+ * nodes, cards and seller: the gimbal sight aims an unaimed shot, the steam sear answers auto mode
+ * and the long barrel sets the reach and the hold.
  * No side effects at import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -17,6 +20,7 @@ import { BORE_GUN_PIECE_ID, BoreGunPiece } from './scene/BoreGunPiece'
 import { FIRE_KEY_REACTION } from './store/fireKeyReaction'
 import { boreGunCards } from './systems/boreGunCards'
 import { BORE_GUN_KIND, boreGunParts } from './systems/boreGunContent'
+import { SHIPPED_BORE_GUN_MODULES, techNodeOf, vehicleItemOf } from './systems/boreGunLane'
 import { BORE_PICKUP_REACTION } from './systems/borePickup'
 import { GROUND_GUN_PROVIDER } from './systems/boreGunProvider'
 import { BORE_GUN_ATTACH_USE, boreGunArtAssets } from './systems/render/boreGunLook'
@@ -24,6 +28,8 @@ import { FIRE_TILE_FEEL } from './systems/render/fireTileFeel'
 import { GUN_BAY_ENTRIES } from './systems/gunBayEntries'
 import { GROUND_GUN_SECTION } from './systems/gunLevels'
 import { GUN_PURCHASE_RULES } from './systems/gunPurchase'
+import { boreGunModuleCards } from './systems/moduleCards'
+import { BORE_GUN_MODULE_SELLER } from './systems/moduleSales'
 import { FireGauge } from './ui/FireGauge'
 import { FireReticle } from './ui/FireReticle'
 import { FireTile } from './ui/FireTile'
@@ -37,6 +43,10 @@ export const slice: SliceDefinition = {
     r.saveSection(GROUND_GUN_SECTION)
     r.content(BORE_GUN_KIND, boreGunParts())
     r.itemDescriptionEntries(boreGunCards())
+    r.content('vehicle-item', SHIPPED_BORE_GUN_MODULES.map(vehicleItemOf))
+    r.content('tech-node', SHIPPED_BORE_GUN_MODULES.map(techNodeOf))
+    r.itemDescriptionEntries(boreGunModuleCards())
+    r.vehicleItemSeller(BORE_GUN_MODULE_SELLER)
     r.commandRules(GUN_PURCHASE_RULES)
     r.bayEntry(GUN_BAY_ENTRIES)
     r.boreGun(GROUND_GUN_PROVIDER)
