@@ -276,6 +276,8 @@ function applyReaction(reaction: InputReaction): void {
   const game = useGameStore.getState()
   if (reaction.kind === 'submit') game.submitPlayerIntent(reaction.intent)
   else if (reaction.kind === 'openSettings') game.openSettings()
+  else if (reaction.kind === 'openPauseMenu') game.openPauseMenu()
+  else if (reaction.kind === 'stepBackInPauseMenu') game.stepBackInPauseMenu()
   else if (reaction.kind === 'closeSettings') game.closeSettings()
   else if (reaction.kind === 'closeArtefactChoice') game.closeArtefactChoice()
   else if (reaction.kind === 'dismissScreen') game.dismissScreen()

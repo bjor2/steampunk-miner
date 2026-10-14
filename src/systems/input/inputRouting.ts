@@ -4,11 +4,12 @@
  * the world is an ordinary authority command; the rest move UI state. Nothing here mutates state.
  *
  * Contexts are layers: the title menu over everything while it is open (ticket 403: nothing
- * reaches the game behind it), then `settings`, then the artefact cache's cards while open
- * (#46), then a slice's full screen while one is open (ticket 211), then `platform` while docked
- * (the screen is open exactly then), else `vehicle`. Escape closes the top layer: settings, the
+ * reaches the game behind it), then `settings`, then the pause menu (ticket 404), then the
+ * artefact cache's cards while open (#46), then a slice's full screen while one is open (ticket
+ * 211), then `platform` while docked (the screen is open exactly then), else `vehicle`. Escape
+ * closes the top layer: settings, the pause menu (its save page steps back to the first page), the
  * cards (no pick, the cache stays live), the slice screen, then the platform screen (that is
- * `Undock`), and in `vehicle` it opens settings. `interact` opens a live cache the
+ * `Undock`), and in `vehicle` it opens the pause menu. `interact` opens a live cache the
  * vehicle is over, else docks. An action outside its context, a dock or open the authority would
  * refuse, the quick action away from the shops (#37, #40, #170), a tow call while the vehicle can
  * still move, the guns' toggle with no guns mounted (#107), the bore gun's auto toggle before the
@@ -45,6 +46,9 @@ export type InputReaction =
   | { kind: 'submit'; intent: CommandIntent }
   | { kind: 'openSettings' }
   | { kind: 'closeSettings' }
+  | { kind: 'openPauseMenu' }
+  /** Escape on the pause menu: the save page steps back to the first page, which closes. */
+  | { kind: 'stepBackInPauseMenu' }
   | { kind: 'closeArtefactChoice' }
   | { kind: 'dismissScreen' }
   | { kind: 'moveFocus'; step: -1 | 1 }
@@ -82,6 +86,8 @@ export interface OpenOverlays {
   /** The title menu (ticket 403); null once play started. */
   titleMenu: TitleMenu | null
   isSettingsOpen: boolean
+  /** The pause menu (ticket 404); null while it is closed. */
+  pauseMenu: object | null
   isArtefactChoiceOpen: boolean
   /** The slice screen drawn (ticket 211); null while none is. */
   openScreenId: string | null
@@ -116,7 +122,7 @@ const REACTIONS_BY_LAYER: Readonly<
         : submit(plantChargeCommand(situation.plantableChargeSize)),
     next_charge_size: ({ nextChargeSize }) =>
       nextChargeSize === null ? NONE : { kind: 'chooseChargeSize', size: nextChargeSize },
-    open_settings: () => ({ kind: 'openSettings' }),
+    open_pause_menu: () => ({ kind: 'openPauseMenu' }),
     zoom_in: () => ({ kind: 'zoom', change: 'in' }),
     zoom_out: () => ({ kind: 'zoom', change: 'out' }),
     zoom_reset: () => ({ kind: 'zoom', change: 'reset' }),
@@ -134,6 +140,10 @@ const REACTIONS_BY_LAYER: Readonly<
     ...MENU_REACTIONS,
     ui_cancel: () => ({ kind: 'closeSettings' }),
   },
+  pause: {
+    ...MENU_REACTIONS,
+    ui_cancel: () => ({ kind: 'stepBackInPauseMenu' }),
+  },
   screen: {
     ui_cancel: () => ({ kind: 'dismissScreen' }),
   },
@@ -149,12 +159,13 @@ export function reactionToPress(action: ActionId, situation: InputSituation): In
 }
 
 /**
- * The layer input goes to: the title menu, settings, the cache's cards, a slice screen, else the
- * dock screen.
+ * The layer input goes to: the title menu, settings, the pause menu, the cache's cards, a slice
+ * screen, else the dock screen.
  */
 export function topLayerOf(vehicleMode: VehicleMode, overlays: OpenOverlays): InputContext {
   if (overlays.titleMenu !== null) return 'title'
   if (overlays.isSettingsOpen) return 'settings'
+  if (overlays.pauseMenu !== null) return 'pause'
   if (overlays.isArtefactChoiceOpen) return 'artefact'
   if (overlays.openScreenId !== null) return 'screen'
   return vehicleMode === 'docked' ? 'platform' : 'vehicle'

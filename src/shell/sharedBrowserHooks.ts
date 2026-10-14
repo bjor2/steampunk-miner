@@ -29,8 +29,13 @@ export function listenForKeyChanges(listener: (key: KeyChange) => void): () => v
   }
 }
 
+/** Typing a save's name (ticket 404) must not drive the menu; Escape still steps back. */
+const KEYS_PASSED_FROM_TEXT_FIELDS: readonly string[] = ['Escape']
+
 function listenForKeys(listener: (key: KeyChange) => void): () => void {
-  const onDown = (event: KeyboardEvent) => listener(keyChangeOf(event, true))
+  const onDown = (event: KeyboardEvent) => {
+    if (!isTypedIntoTextField(event)) listener(keyChangeOf(event, true))
+  }
   const onUp = (event: KeyboardEvent) => listener(keyChangeOf(event, false))
   window.addEventListener('keydown', onDown)
   window.addEventListener('keyup', onUp)
@@ -38,6 +43,12 @@ function listenForKeys(listener: (key: KeyChange) => void): () => void {
     window.removeEventListener('keydown', onDown)
     window.removeEventListener('keyup', onUp)
   }
+}
+
+/** Only key-downs are dropped, so no action stays held from a press made before the field. */
+function isTypedIntoTextField(event: KeyboardEvent): boolean {
+  const isTextField = event.target instanceof HTMLInputElement
+  return isTextField && !KEYS_PASSED_FROM_TEXT_FIELDS.includes(event.code)
 }
 
 function keyChangeOf(event: KeyboardEvent, isDown: boolean): KeyChange {

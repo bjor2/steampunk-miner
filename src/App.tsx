@@ -6,6 +6,7 @@ import { AboveBayLayer } from './ui/platform/AboveBayLayer'
 import { PlanetCard } from './ui/planet/PlanetCard'
 import { PlatformScreen } from './ui/platform/PlatformScreen'
 import { Plaques } from './ui/plaques/Plaques'
+import { PauseMenu } from './ui/pause/PauseMenu'
 import { SettingsPanel } from './ui/settings/SettingsPanel'
 import { GameStage } from './ui/stage/GameStage'
 import { PortraitCard } from './ui/stage/PortraitCard'
@@ -27,6 +28,7 @@ export default function App() {
       <EndOfSliceCard />
       <SliceScreen />
       <ArtefactChoice />
+      <PauseMenu />
       <SettingsPanel />
       <TitleMenu />
       <PortraitCard />

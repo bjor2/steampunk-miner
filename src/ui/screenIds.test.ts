@@ -58,6 +58,12 @@ import { SellBayView } from './platform/SellBayView'
 import { UpgradeBayView } from './platform/UpgradeBayView'
 import { PlaquesView } from './plaques/PlaquesView'
 import { SettingsView } from './settings/SettingsView'
+import { PauseMenuView } from './pause/PauseMenuView'
+import {
+  pauseMenuOpenAt,
+  selectPauseMenuModel,
+  type PauseMenuModel,
+} from '../systems/views/pauseMenuModel'
 import { NO_DRIVE } from '../systems/vehicle/driveSigns'
 
 // #33 acceptance 12: the screens rendered on the server (no browser, no DOM) carry an element for
@@ -277,6 +283,20 @@ function settingsTexts(model: SettingsModel): Partial<Record<UiId, string | null
   }
 }
 
+function pauseMenuTexts(model: PauseMenuModel): Partial<Record<UiId, string | null>> {
+  const notice = model.notice === '' ? {} : { [UI_IDS.pauseNotice]: model.notice }
+  if (model.page === 'main') {
+    return {
+      [UI_IDS.pauseMenu]: null,
+      [UI_IDS.pauseResume]: model.resume.label,
+      [UI_IDS.pauseSaveGame]: model.saveGame.label,
+      [UI_IDS.pauseSettings]: model.settings.label,
+      ...notice,
+    }
+  }
+  return { [UI_IDS.pauseSaveName]: null, [UI_IDS.pauseBack]: model.back.label, ...notice }
+}
+
 function artefactChoiceTexts(model: ArtefactChoiceModel): Partial<Record<UiId, string | null>> {
   return { [UI_IDS.artefactChoice]: null, [UI_IDS.artefactLeave]: model.leave.label }
 }
@@ -390,6 +410,28 @@ function renderSettings(): string[] {
     createElement(SettingsView, { model, focusedId: 'settings-close' }),
     settingsTexts(model),
   )
+}
+
+/** The pause menu's first page, then its save page with a notice (ticket 404). */
+function renderPauseMenu(): string[] {
+  const onSaveNameChange = () => undefined
+  const main = selectPauseMenuModel(pauseMenuOpenAt(1))
+  const save = selectPauseMenuModel({
+    ...pauseMenuOpenAt(1),
+    page: 'save',
+    slotEntries: [],
+    savedSlot: 'slot-1',
+  })
+  return [
+    ...checkScreen(
+      createElement(PauseMenuView, { model: main, focusedId: main.startFocus, onSaveNameChange }),
+      pauseMenuTexts(main),
+    ),
+    ...checkScreen(
+      createElement(PauseMenuView, { model: save, focusedId: save.startFocus, onSaveNameChange }),
+      pauseMenuTexts(save),
+    ),
+  ]
 }
 
 /** The store mines through the live physics loop only, so a full hold comes from a script. */
@@ -610,6 +652,7 @@ function expectEveryIdRendered(): void {
   keep(renderRefineryScreens())
   keep(renderLiningVisit())
   keep(renderSliceScreen())
+  keep(renderPauseMenu())
   expect(Object.values(UI_IDS).filter((id) => !found.has(id))).toEqual([])
 }
 

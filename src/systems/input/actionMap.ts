@@ -21,6 +21,7 @@ export const INPUT_CONTEXTS = [
   'platform',
   'artefact',
   'settings',
+  'pause',
   'screen',
   'title',
 ] as const
@@ -28,7 +29,8 @@ export const INPUT_CONTEXTS = [
 /**
  * `vehicle` while driving, `platform` on the dock screen, `settings` on the overlay (#33),
  * `artefact` while the cache's three cards are open (#46), `screen` while a slice's full screen is
- * (ticket 211), `title` while the title menu is (ticket 403).
+ * (ticket 211), `pause` while the pause menu is (ticket 404), `title` while the title menu is
+ * (ticket 403).
  */
 export type InputContext = (typeof INPUT_CONTEXTS)[number]
 
@@ -58,7 +60,8 @@ export const ACTION_IDS = [
   'zoom_in',
   'zoom_out',
   'zoom_reset',
-  'open_settings',
+  // Escape or Start while driving (ticket 404): the pause menu, which holds Settings.
+  'open_pause_menu',
   // The power-up slots (#162, #217): only the slices' input reactions answer them.
   'use_slot_1',
   'use_slot_2',

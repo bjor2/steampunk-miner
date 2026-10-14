@@ -100,6 +100,12 @@ import {
 import { forgetMusicStingers, recordMusicStingers } from './musicStingerRecord'
 import { platformReplicaOf, type PlatformReplica } from './platformReplica'
 import {
+  pauseMenuActionsOf,
+  STARTING_PAUSE_MENU,
+  type PauseMenuActions,
+  type PauseMenuValues,
+} from './pauseMenuSlice'
+import {
   presentationActionsOf,
   STARTING_PRESENTATION,
   type PresentationActions,
@@ -134,6 +140,8 @@ export interface GameState
     PlanetCardActions,
     LiveStepValues,
     LiveStepActions,
+    PauseMenuValues,
+    PauseMenuActions,
     TitleMenuValues,
     TitleMenuActions {
   playerId: string
@@ -223,6 +231,7 @@ type GameValues = Pick<
   | keyof HintValues
   | keyof PlanetCardValues
   | keyof LiveStepValues
+  | keyof PauseMenuValues
   | keyof TitleMenuValues
   | 'travelTransition'
 >
@@ -245,6 +254,7 @@ export const STARTING_VALUES: GameValues = {
   ...STARTING_HINTS,
   ...STARTING_PLANET_CARD,
   ...STARTING_LIVE_STEP,
+  ...STARTING_PAUSE_MENU,
   ...STARTING_TITLE_MENU,
   travelTransition: null,
 }
@@ -263,6 +273,7 @@ export const useGameStore = create<GameState>()((set, get) => ({
   ...hintActionsOf(set, get),
   ...planetCardActionsOf(set, get),
   ...liveStepActionsOf(set, get),
+  ...pauseMenuActionsOf(set, get),
   ...titleMenuActionsOf(set, get),
 
   setPlanet: (planetTier) => {

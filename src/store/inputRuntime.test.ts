@@ -244,14 +244,14 @@ describe('input: keys, layers and the vehicle intent', () => {
     ])
   })
 
-  it('opens settings with Escape, idles the vehicle there, and closes it with Escape', () => {
+  it('opens the pause menu with Escape, idles the vehicle there, and closes it with Escape', () => {
     routeKeyChange(key('KeyD', true))
     routeKeyChange(key('Escape', true))
-    expect(game().isSettingsOpen).toBe(true)
+    expect(game().pauseMenu).not.toBeNull()
     expect(readVehicleIntent().moveX).toBe(0)
     routeKeyChange(key('Escape', false))
     routeKeyChange(key('Escape', true))
-    expect(game().isSettingsOpen).toBe(false)
+    expect(game().pauseMenu).toBeNull()
   })
 
   it('releases a key held while docking, so nothing sticks on the way out', () => {

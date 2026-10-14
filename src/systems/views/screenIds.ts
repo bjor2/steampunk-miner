@@ -115,6 +115,14 @@ export const UI_IDS = {
   settingsBindingProblems: 'settings-binding-problems',
   settingsResetBindings: 'settings-reset-bindings',
   settingsClose: 'settings-close',
+  // The pause menu (ticket 404): its first page, the save page's name field, Back and notice.
+  pauseMenu: 'pause-menu',
+  pauseResume: 'pause-resume',
+  pauseSaveGame: 'pause-save-game',
+  pauseSettings: 'pause-settings',
+  pauseSaveName: 'pause-save-name',
+  pauseBack: 'pause-back',
+  pauseNotice: 'pause-notice',
 } as const
 
 export type UiId = (typeof UI_IDS)[keyof typeof UI_IDS]
@@ -158,4 +166,7 @@ export const UI_ID_TEMPLATES = {
   artefactChoose: (optionId: string) => `artefact-choose-${optionId}`,
   settingsToggle: (name: string) => `settings-toggle-${name}`,
   settingsRebind: (actionId: string) => `settings-rebind-${actionId}`,
+  // A manual save slot's row and its save button (ticket 404), by slot key: `pause-slot-3-save`.
+  pauseSlot: (slot: string) => `pause-${slot}`,
+  pauseSlotSave: (slot: string) => `pause-${slot}-save`,
 } as const

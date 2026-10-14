@@ -1,0 +1,71 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(27 22 19 / 0.7);
+  font-family: var(--font-mono);
+  pointer-events: auto;
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 14rem;
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.nameField {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-brass);
+  border-radius: var(--radius-panel);
+  background: var(--color-bg);
+  color: var(--color-parchment);
+  font: inherit;
+}
+
+.nameField:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.slots {
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+  max-height: 60vh;
+  overflow: auto;
+}
+
+.slot {
+  display: grid;
+  grid-template-columns: 12rem 10rem 12rem auto;
+  gap: var(--space-2);
+  align-items: center;
+  padding: 2px 0;
+}
+
+/* An empty slot reads dimmer and in italics, not by colour alone. */
+.slot[data-empty] .slotTitle {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.slotTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notice {
+  margin: var(--space-1) 0;
+}

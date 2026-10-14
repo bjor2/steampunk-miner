@@ -13,6 +13,7 @@ import type { SellBayModel } from '../systems/views/sellBayModel'
 import type { UpgradeBayModel } from '../systems/views/upgradeBayModel'
 import type { RefineryBayModel } from '../systems/views/refineryBayModel'
 import type { SettingsModel } from '../systems/views/settingsModel'
+import type { PauseMenuModel } from '../systems/views/pauseMenuModel'
 import type { TitleMenuModel } from '../systems/views/titleMenuModel'
 import { dockedBayOf } from '../systems/authority/dockRules'
 import { chargesOf } from '../systems/authority/charges/chargeRules'
@@ -29,6 +30,7 @@ import {
   artefactChoiceModelOf,
   bayScreenOf,
   hudModelOf,
+  pauseMenuModelOf,
   plaqueModelOf,
   refineryBayModelOf,
   sellBayModelOf,
@@ -77,6 +79,11 @@ export function readRefineryBayModel(): RefineryBayModel {
 
 export function readSettingsModel(): SettingsModel {
   return settingsModelOf(useGameStore.getState())
+}
+
+/** The pause menu (ticket 404) as it draws now; null while it is closed. */
+export function readPauseMenuModel(): PauseMenuModel | null {
+  return pauseMenuModelOf(useGameStore.getState())
 }
 
 /** The title menu (ticket 403) as it draws now; null once play started. */

@@ -38,9 +38,11 @@ const AT_UPGRADE_BAY: InputSituation = { ...DOCKED, dockedBay: 'upgrade' }
 const SETTINGS: InputSituation = { ...DRIVING, layer: 'settings' }
 const CARDS: InputSituation = { ...DRIVING, layer: 'artefact' }
 const SLICE_SCREEN: InputSituation = { ...DOCKED, layer: 'screen' }
+const PAUSED: InputSituation = { ...DRIVING, layer: 'pause' }
 const NO_OVERLAY = {
   titleMenu: null,
   isSettingsOpen: false,
+  pauseMenu: null,
   isArtefactChoiceOpen: false,
   openScreenId: null,
 }
@@ -151,9 +153,26 @@ describe('input routing', () => {
   })
 
   it('closes the top layer with Escape: settings first, then the platform screen', () => {
-    expect(reactionToPress('open_settings', DRIVING)).toEqual({ kind: 'openSettings' })
     expect(reactionToPress('ui_cancel', SETTINGS)).toEqual({ kind: 'closeSettings' })
     expect(reactionToPress('ui_cancel', DOCKED)).toEqual(submitted('undock'))
+  })
+
+  it('opens the pause menu with Escape while driving and steps back out of it with Escape', () => {
+    expect(reactionToPress('open_pause_menu', DRIVING)).toEqual({ kind: 'openPauseMenu' })
+    expect(reactionToPress('ui_cancel', PAUSED)).toEqual({ kind: 'stepBackInPauseMenu' })
+    expect(reactionToPress('open_pause_menu', DOCKED)).toEqual({ kind: 'none' })
+  })
+
+  it('moves focus on the pause menu and drives nothing under it', () => {
+    expect(reactionToPress('ui_down', PAUSED)).toEqual({ kind: 'moveFocus', step: 1 })
+    expect(reactionToPress('ui_confirm', PAUSED)).toEqual({ kind: 'activateFocused' })
+    expect(reactionToPress('interact', PAUSED)).toEqual({ kind: 'none' })
+  })
+
+  it('puts the pause menu over the vehicle and under settings', () => {
+    const paused = { ...NO_OVERLAY, pauseMenu: {} }
+    expect(topLayerOf('active', paused)).toBe('pause')
+    expect(topLayerOf('active', { ...paused, isSettingsOpen: true })).toBe('settings')
   })
 
   it('moves menu focus only on a menu layer', () => {

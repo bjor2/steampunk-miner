@@ -123,12 +123,12 @@ describe('gamepad adapter: the key path under pad codes (ticket 346)', () => {
     expect(edgesOf()).toEqual(['zoom_in+', 'use_slot_1+'])
   })
 
-  it('opens settings with Start and closes them with Start or B', () => {
+  it('opens the pause menu with Start and closes it with Start or B', () => {
     routePadFrame(padHolding(['PadStart']))
-    expect(game().isSettingsOpen).toBe(true)
+    expect(game().pauseMenu).not.toBeNull()
     routePadFrame(IDLE_PAD)
     routePadFrame(padHolding(['PadB']))
-    expect(game().isSettingsOpen).toBe(false)
+    expect(game().pauseMenu).toBeNull()
   })
 })
 

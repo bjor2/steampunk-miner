@@ -46,6 +46,7 @@ import { focusOnScreen, stepFocus } from '../systems/views/menuFocus'
 import type { ButtonAction, ScreenButton } from '../systems/views/viewParts'
 import { refuseProblems, submitCommand } from './authorityLink'
 import { writePreferences } from './preferencesFile'
+import type { PauseMenuActions, PauseMenuValues } from './pauseMenuSlice'
 import { menuScreenOf, type ScreenSources } from './screenModels'
 import { screenIdProblems, winningScreenId } from '../ui/registries/screens'
 import type { TitleMenuActions } from './titleMenuSlice'
@@ -151,6 +152,8 @@ export interface PresentationActions {
 
 type SliceHost = PresentationValues &
   PresentationActions &
+  PauseMenuValues &
+  PauseMenuActions &
   TitleMenuActions &
   ScreenSources & { vehicle: VehicleReplica }
 
@@ -306,7 +309,23 @@ function runButtonAction(state: SliceHost, action: ButtonAction): void {
   else if (action.kind === 'togglePreference') state.togglePreference(action.name)
   else if (action.kind === 'rebind') state.startRebinding(action.actionId)
   else if (action.kind === 'resetBindings') state.resetBindings()
-  else runTitleMenuAction(state, action)
+  else runMenuAction(state, action)
+}
+
+/** The pause and title menus' buttons; each answers only its own kinds. */
+function runMenuAction(state: SliceHost, action: ButtonAction): void {
+  runPauseMenuAction(state, action)
+  runTitleMenuAction(state, action)
+}
+
+/** The pause menu's buttons (ticket 404); a save settles later and notes its own refusal. */
+
+function runPauseMenuAction(state: SliceHost, action: ButtonAction): void {
+  if (action.kind === 'closePauseMenu') state.closePauseMenu()
+  else if (action.kind === 'openSaveSlots') void state.openSaveSlots()
+  else if (action.kind === 'closeSaveSlots') state.closeSaveSlots()
+  else if (action.kind === 'saveToSlot') void state.saveToSlot(action.slot)
+  else if (action.kind === 'armOverwrite') state.armOverwrite(action.slot)
 }
 
 /** The title menu's buttons (ticket 403); a load settles later and reports its own refusal. */

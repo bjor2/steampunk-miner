@@ -29,6 +29,12 @@ export type ButtonAction =
   | { kind: 'togglePreference'; name: PreferenceName }
   | { kind: 'rebind'; actionId: ActionId }
   | { kind: 'resetBindings' }
+  /** The pause menu (ticket 404): Resume, its save page, a slot's save or overwrite's first press. */
+  | { kind: 'closePauseMenu' }
+  | { kind: 'openSaveSlots' }
+  | { kind: 'closeSaveSlots' }
+  | { kind: 'saveToSlot'; slot: SaveSlotKey }
+  | { kind: 'armOverwrite'; slot: SaveSlotKey }
   // The title menu (ticket 403): New Game (asking first when a save exists), its confirm,
   // Continue, one slot's Load, and a page change.
   | { kind: 'pressNewGame' }

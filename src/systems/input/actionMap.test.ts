@@ -215,13 +215,13 @@ describe('pad bindings', () => {
     expect(actionsOfChord(ACTION_MAP, padBindings, 'vehicle', 'PadUp')).toEqual(['use_slot_1'])
   })
 
-  it('closes every menu layer with B or Start, and Start opens settings while driving', () => {
+  it('closes every menu layer with B or Start, and Start opens the pause menu while driving', () => {
     const padBindings = defaultPadBindings(ACTION_MAP)
     for (const context of INPUT_CONTEXTS.filter((layer) => layer !== 'vehicle')) {
       expect(actionsOfChord(ACTION_MAP, padBindings, context, 'PadStart')).toEqual(['ui_cancel'])
     }
     expect(actionsOfChord(ACTION_MAP, padBindings, 'vehicle', 'PadStart')).toEqual([
-      'open_settings',
+      'open_pause_menu',
     ])
   })
 

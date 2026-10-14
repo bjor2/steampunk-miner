@@ -42,6 +42,12 @@ import {
 } from '../systems/views/settingsModel'
 import type { ScreenButton } from '../systems/views/viewParts'
 import {
+  pauseMenuButtonsOf,
+  selectPauseMenuModel,
+  type PauseMenuModel,
+  type PauseMenuState,
+} from '../systems/views/pauseMenuModel'
+import {
   ARTEFACT_CHOICE_START_FOCUS,
   selectArtefactChoiceModel,
   type ArtefactChoiceModel,
@@ -70,6 +76,7 @@ export interface ScreenSources {
   hintBoard: HintBoard
   transmissionBoard: TransmissionBoard
   arePlaquesAllowed: boolean
+  pauseMenu: PauseMenuState | null
   titleMenu: TitleMenu | null
 }
 
@@ -144,6 +151,11 @@ export function settingsModelOf(sources: ScreenSources): SettingsModel {
   return selectSettingsModel(sources)
 }
 
+/** The pause menu as it draws now (ticket 404); null while it is closed. */
+export function pauseMenuModelOf(sources: ScreenSources): PauseMenuModel | null {
+  return sources.pauseMenu === null ? null : selectPauseMenuModel(sources.pauseMenu)
+}
+
 export function artefactChoiceModelOf(sources: ScreenSources): ArtefactChoiceModel {
   return selectArtefactChoiceModel(readAuthorityState(), sources.playerId)
 }
@@ -164,6 +176,7 @@ export function menuScreenOf(layer: InputContext, sources: ScreenSources): MenuS
   if (layer === 'title') return titleMenu(titleMenuModelOf(sources))
   if (layer === 'platform') return bayMenu(bayScreenOf(sources))
   if (layer === 'settings') return settingsMenu(settingsModelOf(sources))
+  if (layer === 'pause') return pauseMenu(pauseMenuModelOf(sources))
   if (layer === 'artefact') return artefactMenu(artefactChoiceModelOf(sources))
   return NO_MENU
 }
@@ -193,6 +206,12 @@ function settingsMenu(model: SettingsModel): MenuScreen {
       model.close,
     ],
   }
+}
+
+function pauseMenu(model: PauseMenuModel | null): MenuScreen {
+  if (model === null) return NO_MENU
+  const { focusStops, startFocus } = model
+  return { focusStops, startFocus, buttons: pauseMenuButtonsOf(model) }
 }
 
 function titleMenu(model: TitleMenuModel | null): MenuScreen {

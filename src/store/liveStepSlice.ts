@@ -60,13 +60,22 @@ export function liveStepActionsOf(set: SetSlice, get: () => SliceHost): LiveStep
 }
 
 /**
- * The fixed step stands still: held here, paused by the settings overlay (#33 section 1), or
- * behind the title menu until the player picks a game (ticket 403).
+ * The fixed step stands still: held here, paused by the settings overlay (#33 section 1) or the
+ * pause menu (ticket 404), or behind the title menu until the player picks a game (ticket 403).
  */
-export function isLiveStepHeld(
-  state: LiveStepValues & { isSettingsOpen: boolean; titleMenu: TitleMenu | null },
-): boolean {
-  return state.isSettingsOpen || state.titleMenu !== null || state.liveStepHold !== 'running'
+export function isLiveStepHeld(state: LiveStepValues & HoldingMenus): boolean {
+  return isMenuHoldingPlay(state) || state.liveStepHold !== 'running'
+}
+
+/** The overlays that stand the fixed step still while open. */
+interface HoldingMenus {
+  isSettingsOpen: boolean
+  pauseMenu: object | null
+  titleMenu: TitleMenu | null
+}
+
+function isMenuHoldingPlay(state: HoldingMenus): boolean {
+  return state.isSettingsOpen || state.pauseMenu !== null || state.titleMenu !== null
 }
 
 /** Stamped with the tick the steps start from, like `fastForward`. */
