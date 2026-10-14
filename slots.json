@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T17:01:26+02:00",
+  "updated_at": "2026-10-14T17:33:20+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -20,10 +20,10 @@
         {
           "slot": "C1",
           "state": "busy",
-          "ticket": 369,
+          "ticket": 271,
           "grok_slot": 1,
           "kind": "dev",
-          "since": "2026-10-14T16:53:00+02:00"
+          "since": "2026-10-14T17:28:00+02:00"
         },
         {
           "slot": "C2",
@@ -36,10 +36,10 @@
         {
           "slot": "C3",
           "state": "busy",
-          "ticket": 269,
+          "ticket": 369,
           "grok_slot": 3,
           "kind": "dev",
-          "since": "2026-10-14T16:57:00+02:00"
+          "since": "2026-10-14T17:33:00+02:00"
         },
         {
           "slot": "C4",
@@ -53,7 +53,7 @@
       "size": 4,
       "used": 4,
       "free": 0,
-      "claims_last_hour": 6,
+      "claims_last_hour": 8,
       "name": "Claude Max 1"
     },
     {
@@ -104,7 +104,7 @@
     }
   ],
   "gate": {
-    "busy": 1,
+    "busy": 2,
     "max": 3
   },
   "tester": {
@@ -401,8 +401,8 @@
     {
       "slot": 1,
       "state": "dev",
-      "ticket": 369,
-      "since": "2026-10-14T16:53:00+02:00",
+      "ticket": 271,
+      "since": "2026-10-14T17:28:00+02:00",
       "claude_slot": 1
     },
     {
@@ -415,8 +415,8 @@
     {
       "slot": 3,
       "state": "dev",
-      "ticket": 269,
-      "since": "2026-10-14T16:57:00+02:00",
+      "ticket": 369,
+      "since": "2026-10-14T17:33:00+02:00",
       "claude_slot": 3
     },
     {
@@ -479,9 +479,9 @@
     {
       "slot": 1,
       "state": "busy",
-      "ticket": 369,
+      "ticket": 271,
       "grok_slot": 1,
-      "since": "2026-10-14T16:53:00+02:00",
+      "since": "2026-10-14T17:28:00+02:00",
       "account": 1
     },
     {
@@ -495,9 +495,9 @@
     {
       "slot": 3,
       "state": "busy",
-      "ticket": 269,
+      "ticket": 369,
       "grok_slot": 3,
-      "since": "2026-10-14T16:57:00+02:00",
+      "since": "2026-10-14T17:33:00+02:00",
       "account": 1
     },
     {
@@ -546,10 +546,10 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-14 17:01 CEST",
+    "at": "2026-10-14 17:33 CEST",
     "mode": "recheck",
-    "triggers": "#261",
-    "started": "#381->C4/A1",
+    "triggers": "#369",
+    "started": "#369->C3/A1",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
