@@ -456,6 +456,14 @@ export const RUN_EVENT_REGISTRY = {
     level: 'detail',
     payload: { tx: 'integer', ty: 'integer', kind: { oneOf: ['ground', 'ore', 'core'] } },
   },
+  // Ticket 335 (TD scope b on #316): one line per drill step (a tick, a player) for the cells the
+  // swept cut broke, the units that reached the hold and their value, in place of that step's
+  // `tile_destroyed` and `resource_collected` lines, so the log grows with ticks, not cells.
+  drill_cut: {
+    group: 'mining',
+    level: 'detail',
+    payload: { cells: 'integer', units: 'integer', value: 'money' },
+  },
   // K2 (#185, #142 acceptance 13): a slice's gate check stopped the drill at an ore cell, once per
   // drilling command that met it; `required` and `have` are the gate's own words. `blocked` is
   // #142's scratch-only drill-gated signature (#236); a new value, so old lines still read.

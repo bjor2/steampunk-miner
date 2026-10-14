@@ -14,6 +14,12 @@ export interface RunLog {
   record<N extends RunEventName>(stamp: RunEventStamp, event: N, data: RunEventData<N>): void
   /** Appends a submitted command to `commands.ndjson`, exactly as the authority receives it. */
   recordCommand(command: AuthorityCommand): void
+  /**
+   * The type of the player's last recorded command, when its seq is `seq`, else null: a command's
+   * events are recorded right after it, so its line projections can ask what caused them
+   * (`drill_cut`, ticket 335).
+   */
+  commandTypeOf(playerId: string, seq: number): string | null
 }
 
 export interface RunLogOptions {
@@ -25,6 +31,7 @@ export interface RunLogOptions {
 
 export function createRunLog({ runId, sink, secondsSinceStart }: RunLogOptions): RunLog {
   let nextSeq = 0
+  const lastCommands = new Map<string, { seq: number; type: string }>()
   return {
     runId,
     record(stamp, event, data) {
@@ -39,7 +46,14 @@ export function createRunLog({ runId, sink, secondsSinceStart }: RunLogOptions):
       }
       sink.append(stamped)
     },
-    recordCommand: (command) => sink.appendCommand(runId, command),
+    recordCommand: (command) => {
+      lastCommands.set(command.playerId, { seq: command.seq, type: command.type })
+      sink.appendCommand(runId, command)
+    },
+    commandTypeOf: (playerId, seq) => {
+      const last = lastCommands.get(playerId)
+      return last?.seq === seq ? last.type : null
+    },
   }
 }
 
@@ -47,6 +61,7 @@ const discardingRunLog: RunLog = {
   runId: 'run_none',
   record: () => undefined,
   recordCommand: () => undefined,
+  commandTypeOf: () => null,
 }
 
 let installed: RunLog = discardingRunLog

@@ -41,8 +41,14 @@ function emptyDive(leftTick: number): Dive {
   return { leftTick, tilesDestroyed: 0, ringsPlaced: 0 }
 }
 
+/** A drill step's `drill_cut` line counts its cells (ticket 335). */
+function cellsOfDrillCut(event: RunEvent): number {
+  return (event as RunEvent<'drill_cut'>).data.cells
+}
+
 function countIntoDive(dive: Dive | undefined, event: RunEvent): void {
   if (dive === undefined) return
   if (event.event === 'tile_destroyed') dive.tilesDestroyed += 1
+  if (event.event === 'drill_cut') dive.tilesDestroyed += cellsOfDrillCut(event)
   if (event.event === 'casing_placed') dive.ringsPlaced += 1
 }

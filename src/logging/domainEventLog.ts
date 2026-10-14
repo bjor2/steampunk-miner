@@ -16,6 +16,13 @@ import {
   type KernelDomainEventType,
 } from '../systems/authority/domainEvent'
 import { chargeDetonatedDataOf } from './chargeDetonationLine'
+import {
+  drillCutDataOf,
+  drillStepEventsOf,
+  drillStepKeyOf,
+  isFoldedIntoDrillCut,
+  type IsDrillStepEvent,
+} from './drillCutLine'
 import { heldStepFieldsOf } from './purchaseStepLine'
 import { resourceCollectedDataOf } from './resourceCollectedLine'
 import type { RunEventData, RunEventName } from './eventNames'
@@ -393,6 +400,37 @@ function causeOf(event: DomainEvent): { cmd?: CommandRef } {
   return isCommandCaused(event) ? { cmd: [event.tick, event.seq] } : {}
 }
 
+/**
+ * A batch's lines in order, each drill step's drilled cells and their units folded into one
+ * `drill_cut` line at the place of the first (`drillCutLine.ts`, ticket 335).
+ */
+export function projectDomainEvents(
+  events: readonly DomainEvent[],
+  isDrillStep: IsDrillStepEvent,
+): ProjectedLine[] {
+  const steps = drillStepEventsOf(events, isDrillStep)
+  return events.flatMap((event) => projectedLinesOf(event, steps, isDrillStep))
+}
+
+function projectedLinesOf(
+  event: DomainEvent,
+  steps: ReadonlyMap<string, readonly DomainEvent[]>,
+  isDrillStep: IsDrillStepEvent,
+): ProjectedLine[] {
+  if (!isFoldedIntoDrillCut(event, isDrillStep)) return lineListOf(projectDomainEvent(event))
+  const stepEvents = steps.get(drillStepKeyOf(event)) ?? []
+  return stepEvents[0] === event ? [drillCutLineOf(event, stepEvents)] : []
+}
+
+function lineListOf(projected: ProjectedLine | null): ProjectedLine[] {
+  return projected === null ? [] : [projected]
+}
+
+function drillCutLineOf(first: DomainEvent, stepEvents: readonly DomainEvent[]): ProjectedLine {
+  const line: RunLogLine = { event: 'drill_cut', data: drillCutDataOf(stepEvents) }
+  return { tick: first.tick, ...causeOf(first), line }
+}
+
 export function recordDomainEvents(place: RunEventPlace, events: readonly DomainEvent[]): void {
   recordDomainEventsTo(getRunLog(), place, events)
 }
@@ -403,9 +441,16 @@ export function recordDomainEventsTo(
   place: RunEventPlace,
   events: readonly DomainEvent[],
 ): void {
-  for (const projected of events.map(projectDomainEvent)) {
-    if (projected !== null) recordProjectedLine(runLog, place, projected)
+  const isDrillStep = drillStepEventsIn(runLog)
+  for (const projected of projectDomainEvents(events, isDrillStep)) {
+    recordProjectedLine(runLog, place, projected)
   }
+}
+
+/** Events a drill step caused, as the run log recorded the step just before them. */
+function drillStepEventsIn(runLog: RunLog): IsDrillStepEvent {
+  return (event) =>
+    isCommandCaused(event) && runLog.commandTypeOf(event.playerId, event.seq) === 'drillStep'
 }
 
 function recordProjectedLine(
