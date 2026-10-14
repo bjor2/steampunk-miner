@@ -1,30 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-14T02:46:07.055Z",
+ "updatedAt": "2026-10-14T02:51:12.145Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 37584261180,
-   "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37584261180",
-   "event": "push",
-   "mode": "scoped",
-   "sha": "e5c5a013cc6581876996484e5f27d12fc68122e7",
-   "branch": "main",
-   "startedAt": "2026-10-07T06:55:52Z",
-   "jobConclusion": "success",
-   "timedOut": false,
-   "jobDurationSec": 118,
-   "source": "actions",
-   "phase": null,
-   "job": "verify",
-   "feature": null,
-   "tickets": [],
-   "reportFound": true,
-   "files": 7,
-   "tests": 54,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 37584317181,
    "url": "https://github.com/bjor2/steampunk-miner/actions/runs/37584317181",
@@ -1182,12 +1160,34 @@
    "tests": 5786,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 1791946269070,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/6df895b28d6353eb27a9696b44518a73ac97c309",
+   "event": "nightly",
+   "mode": "nightly",
+   "sha": "6df895b28d6353eb27a9696b44518a73ac97c309",
+   "branch": "main",
+   "startedAt": "2026-10-14T02:46:16Z",
+   "jobConclusion": "success",
+   "timedOut": false,
+   "jobDurationSec": 293,
+   "source": "box",
+   "phase": "nightly",
+   "job": "balance-report",
+   "feature": null,
+   "tickets": [],
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "scoped": 9,
-   "nightly": 23,
+   "scoped": 8,
+   "nightly": 24,
    "full": 10,
    "nightly-only": 8
   },
@@ -1198,85 +1198,6 @@
   "scopingSuspects": []
  },
  "features": {
-  "store": {
-   "files": 14,
-   "p50Ms": 5595,
-   "p95Ms": 30571,
-   "fileRuns": 303,
-   "failedFileRuns": 2,
-   "lastFailure": {
-    "runId": 1791900294586,
-    "sha": "10cc21daae437b1c72943c3490d643aeaca94f19",
-    "at": "2026-10-13T01:00:14Z",
-    "tests": [
-     null
-    ],
-    "file": "src/store/authorityReads.test.ts"
-   },
-   "passRate": 0.9933993399339934
-  },
-  "authority": {
-   "files": 77,
-   "p50Ms": 132876,
-   "p95Ms": 682433,
-   "fileRuns": 1474,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "economy": {
-   "files": 26,
-   "p50Ms": 1022,
-   "p95Ms": 9423,
-   "fileRuns": 487,
-   "failedFileRuns": 1,
-   "lastFailure": {
-    "runId": 1791900294586,
-    "sha": "10cc21daae437b1c72943c3490d643aeaca94f19",
-    "at": "2026-10-13T01:00:14Z",
-    "tests": [
-     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
-    ],
-    "file": "src/systems/economy/economySourceScan.test.ts"
-   },
-   "passRate": 0.997946611909651
-  },
-  "feedback": {
-   "files": 4,
-   "p50Ms": 24,
-   "p95Ms": 105,
-   "fileRuns": 84,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "input": {
-   "files": 5,
-   "p50Ms": 75,
-   "p95Ms": 502,
-   "fileRuns": 104,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "vehicle": {
-   "files": 18,
-   "p50Ms": 196,
-   "p95Ms": 1297,
-   "fileRuns": 285,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
-  "ui": {
-   "files": 9,
-   "p50Ms": 1456,
-   "p95Ms": 11071,
-   "fileRuns": 199,
-   "failedFileRuns": 0,
-   "lastFailure": null,
-   "passRate": 1
-  },
   "tooling-ci": {
    "files": 2,
    "p50Ms": 30,
@@ -1462,6 +1383,23 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "store": {
+   "files": 14,
+   "p50Ms": 5598,
+   "p95Ms": 30571,
+   "fileRuns": 302,
+   "failedFileRuns": 2,
+   "lastFailure": {
+    "runId": 1791900294586,
+    "sha": "10cc21daae437b1c72943c3490d643aeaca94f19",
+    "at": "2026-10-13T01:00:14Z",
+    "tests": [
+     null
+    ],
+    "file": "src/store/authorityReads.test.ts"
+   },
+   "passRate": 0.9933774834437086
+  },
   "art": {
    "files": 21,
    "p50Ms": 829,
@@ -1497,6 +1435,15 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "authority": {
+   "files": 77,
+   "p50Ms": 132876,
+   "p95Ms": 682433,
+   "fileRuns": 1473,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "bot": {
    "files": 25,
    "p50Ms": 459670,
@@ -1523,11 +1470,46 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "economy": {
+   "files": 26,
+   "p50Ms": 1028,
+   "p95Ms": 9423,
+   "fileRuns": 486,
+   "failedFileRuns": 1,
+   "lastFailure": {
+    "runId": 1791900294586,
+    "sha": "10cc21daae437b1c72943c3490d643aeaca94f19",
+    "at": "2026-10-13T01:00:14Z",
+    "tests": [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
+    ],
+    "file": "src/systems/economy/economySourceScan.test.ts"
+   },
+   "passRate": 0.9979423868312757
+  },
+  "feedback": {
+   "files": 4,
+   "p50Ms": 25,
+   "p95Ms": 105,
+   "fileRuns": 83,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "hints": {
    "files": 4,
    "p50Ms": 3989,
    "p95Ms": 8259,
    "fileRuns": 88,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "input": {
+   "files": 5,
+   "p50Ms": 75,
+   "p95Ms": 502,
+   "fileRuns": 103,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1577,6 +1559,15 @@
    "lastFailure": null,
    "passRate": 1
   },
+  "vehicle": {
+   "files": 18,
+   "p50Ms": 196,
+   "p95Ms": 1297,
+   "fileRuns": 284,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
   "views": {
    "files": 15,
    "p50Ms": 4031,
@@ -1591,6 +1582,15 @@
    "p50Ms": 33756,
    "p95Ms": 106838,
    "fileRuns": 474,
+   "failedFileRuns": 0,
+   "lastFailure": null,
+   "passRate": 1
+  },
+  "ui": {
+   "files": 9,
+   "p50Ms": 1456,
+   "p95Ms": 11071,
+   "fileRuns": 198,
    "failedFileRuns": 0,
    "lastFailure": null,
    "passRate": 1
@@ -1795,109 +1795,6 @@
   }
  },
  "files": {
-  "src/store/touchRuntime.test.ts": {
-   "feature": "store",
-   "runs": 24,
-   "lastMs": 45,
-   "p50Ms": 32,
-   "p95Ms": 211,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791945963180,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/authority/moneyRounding.test.ts": {
-   "feature": "authority",
-   "runs": 24,
-   "lastMs": 8,
-   "p50Ms": 5,
-   "p95Ms": 85,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791945963180,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/economy/economySourceScan.test.ts": {
-   "feature": "economy",
-   "runs": 24,
-   "lastMs": 192,
-   "p50Ms": 171,
-   "p95Ms": 1106,
-   "passRate": 0.9583333333333334,
-   "lastStatus": "passed",
-   "lastRunId": 1791945963180,
-   "lastFailure": {
-    "runId": 1791900294586,
-    "sha": "10cc21daae437b1c72943c3490d643aeaca94f19",
-    "at": "2026-10-13T01:00:14Z",
-    "tests": [
-     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
-    ]
-   },
-   "flaky": false,
-   "slowest": [
-    [
-     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json",
-     126
-    ]
-   ]
-  },
-  "src/systems/feedback/haptics.test.ts": {
-   "feature": "feedback",
-   "runs": 20,
-   "lastMs": 5,
-   "p50Ms": 2,
-   "p95Ms": 8,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791945963180,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/input/touchControls.test.ts": {
-   "feature": "input",
-   "runs": 23,
-   "lastMs": 12,
-   "p50Ms": 15,
-   "p95Ms": 36,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791945963180,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/systems/vehicle/vehicleStats.test.ts": {
-   "feature": "vehicle",
-   "runs": 24,
-   "lastMs": 19,
-   "p50Ms": 20,
-   "p95Ms": 60,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791945963180,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
-  "src/ui/touch/touchSlots.test.ts": {
-   "feature": "ui",
-   "runs": 24,
-   "lastMs": 32,
-   "p50Ms": 17,
-   "p95Ms": 106,
-   "passRate": 1,
-   "lastStatus": "passed",
-   "lastRunId": 1791945963180,
-   "lastFailure": null,
-   "flaky": false,
-   "slowest": []
-  },
   "scripts/ci/testMetrics.test.mjs": {
    "feature": "tooling-ci",
    "runs": 18,
@@ -3458,6 +3355,19 @@
     ]
    ]
   },
+  "src/store/touchRuntime.test.ts": {
+   "feature": "store",
+   "runs": 23,
+   "lastMs": 45,
+   "p50Ms": 35,
+   "p95Ms": 211,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791945963180,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/art/assetLint.test.ts": {
    "feature": "art",
    "runs": 22,
@@ -4567,6 +4477,19 @@
     ]
    ]
   },
+  "src/systems/authority/moneyRounding.test.ts": {
+   "feature": "authority",
+   "runs": 23,
+   "lastMs": 8,
+   "p50Ms": 5,
+   "p95Ms": 85,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791945963180,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/authority/platformCommands.test.ts": {
    "feature": "authority",
    "runs": 22,
@@ -5249,6 +5172,31 @@
     ]
    ]
   },
+  "src/systems/economy/economySourceScan.test.ts": {
+   "feature": "economy",
+   "runs": 23,
+   "lastMs": 192,
+   "p50Ms": 177,
+   "p95Ms": 1106,
+   "passRate": 0.9565217391304348,
+   "lastStatus": "passed",
+   "lastRunId": 1791945963180,
+   "lastFailure": {
+    "runId": 1791900294586,
+    "sha": "10cc21daae437b1c72943c3490d643aeaca94f19",
+    "at": "2026-10-13T01:00:14Z",
+    "tests": [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json"
+    ]
+   },
+   "flaky": false,
+   "slowest": [
+    [
+     "economy source scan finds no economy price, ratio or fee number in game code outside economy.json",
+     126
+    ]
+   ]
+  },
   "src/systems/economy/economyTables.test.ts": {
    "feature": "economy",
    "runs": 20,
@@ -5431,6 +5379,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/feedback/haptics.test.ts": {
+   "feature": "feedback",
+   "runs": 19,
+   "lastMs": 5,
+   "p50Ms": 3,
+   "p95Ms": 8,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791945963180,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/feedback/screenEffects.test.ts": {
    "feature": "feedback",
    "runs": 21,
@@ -5582,6 +5543,19 @@
    "lastMs": 16,
    "p50Ms": 15,
    "p95Ms": 32,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791945963180,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/systems/input/touchControls.test.ts": {
+   "feature": "input",
+   "runs": 22,
+   "lastMs": 12,
+   "p50Ms": 15,
+   "p95Ms": 36,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791945963180,
@@ -6580,6 +6554,19 @@
    "flaky": false,
    "slowest": []
   },
+  "src/systems/vehicle/vehicleStats.test.ts": {
+   "feature": "vehicle",
+   "runs": 23,
+   "lastMs": 19,
+   "p50Ms": 20,
+   "p95Ms": 60,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791945963180,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
   "src/systems/views/bayPresentation.test.ts": {
    "feature": "views",
    "runs": 22,
@@ -7232,6 +7219,19 @@
    "lastMs": 19,
    "p50Ms": 21,
    "p95Ms": 136,
+   "passRate": 1,
+   "lastStatus": "passed",
+   "lastRunId": 1791945963180,
+   "lastFailure": null,
+   "flaky": false,
+   "slowest": []
+  },
+  "src/ui/touch/touchSlots.test.ts": {
+   "feature": "ui",
+   "runs": 23,
+   "lastMs": 32,
+   "p50Ms": 17,
+   "p95Ms": 106,
    "passRate": 1,
    "lastStatus": "passed",
    "lastRunId": 1791945963180,
