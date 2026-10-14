@@ -10,8 +10,8 @@ Checked against each part: every gear row of techGear.json at its point, folded 
 extractor's unfold in between is listed apart, as `unfold`, since it lasts 8 ticks); every slot
 housing in each of the five cradles; the auto-guns turret at every look, the dynamite rack and the
 bore gun; the hull.stack showcase stack at every tier and the hull.liner point; and the other four
-aetheric parts. The vehicle's own hull, boilers and wheels are what the parts are mounted on, so
-they are not obstacles.
+aetheric parts (their own gear rows are skipped). The vehicle's own hull, boilers and wheels are
+what the parts are mounted on, so they are not obstacles.
 """
 
 import json
@@ -81,13 +81,20 @@ def obstacle_silhouettes(attach):
     table = rig.read_json(rig.GEAR_TABLE)
     obstacles = []
     for item in table['items']:
-        obstacles += gear_silhouettes(item, attach)
+        if not is_aetheric(item):
+            obstacles += gear_silhouettes(item, attach)
     obstacles += asset_part_silhouettes(TURRET, (0.0, 0.0), 'turret')
     obstacles += [(asset, 'fitted', asset_silhouette(asset, attach[point]['atM'])) for asset, point in (RACK, BORE_GUN)]
     obstacles += [(name, 'showcase', mask) for name, _, mask in asset_part_silhouettes('vehicle', (0.0, 0.0), 'vehicle')
                   if name.split('/')[1] in SHOWCASE_STACK_PARTS]
     obstacles.append((LINER_POINT, 'showcase', disk_at(attach[LINER_POINT]['atM'], LINER_RADIUS_M)))
     return obstacles
+
+
+def is_aetheric(item):
+    """A gear row of one of the five parts themselves: #262 ships the whistle as a slot row until
+    #265 moves it to its point."""
+    return any(entry['itemId'] == item['itemId'] for entry in aetheric.read_table()['parts'])
 
 
 def gear_silhouettes(item, attach):

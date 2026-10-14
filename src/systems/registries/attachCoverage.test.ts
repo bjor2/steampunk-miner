@@ -82,8 +82,14 @@ function catalogueWith(id: string, change: Partial<AttachedItem>): AttachedItem[
   return CATALOGUE.map((item) => (item.id === id ? { ...item, ...change } : item))
 }
 
+/** The catalogue with #265's rows: the whistle leaves its slot (#262) for its own point. */
+function catalogueWithAetheric(): AttachedItem[] {
+  const isAetheric = (item: AttachedItem) => AETHERIC.some((other) => other.id === item.id)
+  return [...CATALOGUE.filter((item) => !isAetheric(item)), ...AETHERIC]
+}
+
 function aethericWith(id: string, attach: AttachId): AttachedItem[] {
-  return [...CATALOGUE, ...AETHERIC.map((item) => (item.id === id ? { ...item, attach } : item))]
+  return catalogueWithAetheric().map((item) => (item.id === id ? { ...item, attach } : item))
 }
 
 function ownersOf(items: readonly AttachedItem[], point: AttachId): string[] {
@@ -166,11 +172,11 @@ describe('attach coverage', () => {
 
 describe('attach coverage: the five aetheric points (ticket 376)', () => {
   it('finds no problem with the five aetheric parts on their points beside the whole catalogue', () => {
-    expect(attachCoverageProblems([...CATALOGUE, ...AETHERIC], ATTACH_IDS)).toEqual([])
+    expect(attachCoverageProblems(catalogueWithAetheric(), ATTACH_IDS)).toEqual([])
   })
 
   it('gives each aetheric point exactly one owner', () => {
-    const items = [...CATALOGUE, ...AETHERIC]
+    const items = catalogueWithAetheric()
     expect(AETHERIC.map((item) => ownersOf(items, item.attach as AttachId))).toEqual(
       AETHERIC.map((item) => [item.id]),
     )
@@ -202,7 +208,7 @@ describe('attach coverage: the five aetheric points (ticket 376)', () => {
   })
 
   it('fails when a second item that can be on the vehicle with the owner takes its point', () => {
-    const items = [...CATALOGUE, ...AETHERIC, powerUp('power.second_lantern', 'hull.nose')]
+    const items = [...catalogueWithAetheric(), powerUp('power.second_lantern', 'hull.nose')]
     expect(attachCoverageProblems(items, ATTACH_IDS)).toEqual([
       'items "power.phase_lantern" and "power.second_lantern" can be on the vehicle together but share "hull.nose"',
     ])
@@ -218,7 +224,7 @@ describe('attach coverage: the five aetheric points (ticket 376)', () => {
 
   it('fails when the vehicle sidecar lacks an aetheric point', () => {
     const sidecarIds = ATTACH_IDS.filter((id) => id !== 'hull.flank')
-    expect(attachCoverageProblems([...CATALOGUE, ...AETHERIC], sidecarIds)).toEqual([
+    expect(attachCoverageProblems(catalogueWithAetheric(), sidecarIds)).toEqual([
       'item "power.aether_condenser" names "hull.flank", which the sidecar lacks',
     ])
   })
