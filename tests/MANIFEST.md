@@ -409,7 +409,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 46 files, 328 tests
+### `tech-tree`: 46 files, 329 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
