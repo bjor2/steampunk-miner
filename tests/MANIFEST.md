@@ -848,6 +848,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/shell/listenerCount.test.ts` | 8 | 8 |
+| `src/shell/mouseHooks.test.ts` | 4 | 4 |
 | `src/shell/storedZip.test.ts` | 4 | 4 |
 
 ### `slice-loader`
@@ -878,7 +879,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/domainEventBroadcast.test.ts` | 3 | 3 |
 | `src/store/gameStore.test.ts` | 26 | 26 |
 | `src/store/hintSlice.test.ts` | 9 | 9 |
-| `src/store/inputRuntime.test.ts` | 44 | 44 |
+| `src/store/inputRuntime.test.ts` | 51 | 51 |
 | `src/store/liveStepSlice.test.ts` | 13 | 13 |
 | `src/store/padRuntime.test.ts` | 16 | 14 |
 | `src/store/partInstall.test.ts` | 5 | 5 |

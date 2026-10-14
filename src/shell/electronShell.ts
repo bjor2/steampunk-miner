@@ -2,11 +2,12 @@
 import type { ShellBridge } from '../../electron/bridgeContract.cts'
 import { readElectronLaunchParameters } from './launchParameters'
 import { watchPageListeners } from './listenerCount'
+import { trackCanvasPointer } from './mouseHooks'
 import { readPageMemory } from './pageMemory'
 import { listenForGamepad } from './gamepadHooks'
 import {
   exposeOnWindow,
-  listenForKeys,
+  listenForKeyChanges,
   listenForScrollNotches,
   runOnPageHide,
 } from './sharedBrowserHooks'
@@ -39,7 +40,8 @@ export function createElectronShell(bridge: ShellBridge): Shell {
     readBufferedRunCommands: () => '',
     exposeGlobalHandle: exposeOnWindow,
     onPageHide: runOnPageHide,
-    onKeyChange: listenForKeys,
+    onKeyChange: listenForKeyChanges,
+    readPointer: trackCanvasPointer(),
     onScrollNotch: listenForScrollNotches,
     onPadFrame: listenForGamepad,
     watchPageListeners,

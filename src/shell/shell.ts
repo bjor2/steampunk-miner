@@ -34,6 +34,12 @@ export interface KeyChange {
   isShiftHeld: boolean
 }
 
+/** The mouse over the game canvas, in the canvas's CSS pixels from its top-left corner. */
+export interface CanvasPointer {
+  x: number
+  y: number
+}
+
 /** What `exportSnapshots()` handed the player (#123): the zip's download name, size and entries. */
 export interface SnapshotExport {
   file: string
@@ -67,8 +73,13 @@ export interface Shell {
   readPreferences(): Promise<string | null>
   /** Replaces the local preferences file; a debug run writes its own (`preferencesFileOf`). */
   writePreferences(json: string): Promise<void>
-  /** Reports key presses and releases; returns an unsubscribe. */
+  /**
+   * Reports key presses and releases, and the mouse buttons pressed on the game canvas as the
+   * codes `MouseLeft`/`MouseRight` (ticket 345); returns an unsubscribe.
+   */
   onKeyChange(listener: (key: KeyChange) => void): () => void
+  /** The mouse cursor over the game canvas; null off it, before any mouse move, or on touch. */
+  readPointer(): CanvasPointer | null
   /** Reports mouse-wheel notches; returns an unsubscribe. */
   onScrollNotch(listener: (notch: ScrollNotch) => void): () => void
   /**

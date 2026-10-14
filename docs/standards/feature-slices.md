@@ -1042,6 +1042,15 @@ Section 4 of the TD kernel lock on #314, ruled by the GD: sparks, dust and debri
 - **Speed:** the bore gun is bounded (range ≤ 10, a cell per 2 ticks). A future user at the drill's rate aggregates per tick before asking (#334).
 - **Debug:** `steampunkDebug.ui.getSprayStats()` answers `{ requested, dropped, evicted, peak: { drawCalls, instances }, budget }` since load.
 
+### 3.45 Held presses, mouse buttons and the cursor (ticket 345)
+
+Section 2 of the TD kernel lock on #314, as the GD ruled it: the ground gun's fire key rides the #217/#332 press path, with no second hold seam.
+
+- **Action** `fire_ground_gun` (`data/input/actions.json`, `ACTION_IDS`): a `vehicle` press, default `MouseLeft` and `X`, `RT` on a pad (#346), rebindable. The kernel has no rule for it, so it asks the slices' input reactions; with none registered it sends and logs nothing (its down edge still joins the action stream, as any press does). `inputMapVersion` stays 2.
+- **Held presses** (`store/inputRuntime.ts`): `isActionDown(action)` and `pressCountOf(action)`. `pressAction` sets both once the press is accepted in its layer; `releaseAction` clears the down on any layer, so a key let go after docking never leaves fire on. The count only grows (reset with the input), so a frame loop that keeps the count it saw catches a tap shorter than a frame. Nothing is registered and no edge, command or log line is added.
+- **Mouse buttons** (`shell/mouseHooks.ts`): the shell reports the game canvas's mouse buttons through `onKeyChange` as the codes `MouseLeft`/`MouseRight` (`systems/input/keyCodes.ts`, labelled `Left Mouse`/`Right Mouse`), so binding, rebinding, preferences and any-layer release take them as keys. A press whose target is not the canvas (HUD buttons, menus) never comes down; a release anywhere comes up. Touch and pen pointers are not mice. The canvas keeps no context menu, so the right button can be bound. HUD panels drawn with `pointer-events: none` let a click through to the canvas.
+- **Cursor**: `Shell.readPointer(): {x, y} | null`, the mouse over the game canvas in its CSS pixels from the top-left; null before a mouse move, off the canvas, or after a touch. No screen-to-world helper: the slice aims with its own `rigOnScreen()` and `rigAimOfDrag()`.
+
 ## 4. Cross-slice contracts
 
 ```mermaid

@@ -1,4 +1,5 @@
 /** Window plumbing both shells share; neither holds game rules. */
+import { listenForMouseButtons } from './mouseHooks'
 import type { KeyChange, ScrollNotch } from './shell'
 
 /** About one mouse-wheel notch in pixels, so a trackpad's small deltas add up to notches. */
@@ -18,7 +19,17 @@ export function runOnPageHide(callback: () => void): void {
   })
 }
 
-export function listenForKeys(listener: (key: KeyChange) => void): () => void {
+/** Keys and the game canvas's mouse buttons, as one stream of key changes (ticket 345). */
+export function listenForKeyChanges(listener: (key: KeyChange) => void): () => void {
+  const stopKeys = listenForKeys(listener)
+  const stopMouseButtons = listenForMouseButtons(listener)
+  return () => {
+    stopKeys()
+    stopMouseButtons()
+  }
+}
+
+function listenForKeys(listener: (key: KeyChange) => void): () => void {
   const onDown = (event: KeyboardEvent) => listener(keyChangeOf(event, true))
   const onUp = (event: KeyboardEvent) => listener(keyChangeOf(event, false))
   window.addEventListener('keydown', onDown)

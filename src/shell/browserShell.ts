@@ -8,11 +8,12 @@ import { keepNewestLines } from '../logging/ndjson'
 import { createBrowserSnapshots } from './browserSnapshots'
 import { readBrowserLaunchParameters } from './launchParameters'
 import { watchPageListeners } from './listenerCount'
+import { trackCanvasPointer } from './mouseHooks'
 import { readPageMemory } from './pageMemory'
 import { listenForGamepad } from './gamepadHooks'
 import {
   exposeOnWindow,
-  listenForKeys,
+  listenForKeyChanges,
   listenForScrollNotches,
   runOnPageHide,
 } from './sharedBrowserHooks'
@@ -66,7 +67,8 @@ export function createBrowserShell(): Shell {
     readBufferedRunCommands: (runId) => commandLinesByRun.get(runId) ?? '',
     exposeGlobalHandle: exposeOnWindow,
     onPageHide: runOnPageHide,
-    onKeyChange: listenForKeys,
+    onKeyChange: listenForKeyChanges,
+    readPointer: trackCanvasPointer(),
     onScrollNotch: listenForScrollNotches,
     onPadFrame: listenForGamepad,
     watchPageListeners,
