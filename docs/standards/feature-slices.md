@@ -1263,6 +1263,17 @@ Content's five aetheric pair templates as the GD ruled them on #373 (14 Oct). Th
 - **Held:** the lull line (aetheric × extraction). The tether's tow is a counter with no cell, so the lump has no tile to lure to (the #206 lock, as `aether_reel`).
 - With no combo owned every digest and mined order is unchanged; the goldens move only by the protocol number.
 
+### 3.65 The consumable restock (ticket 394)
+
+X2 of the #157 gap review, as the GD ruled it on #381 (option c, 6172254768) with the HS and VS conditions: a consumable's stack is bought back by the charge, per player, at the Upgrade bay. It is never a free dock refill (#200 Q3) and never a one-off sale (#248). Protocol 72. With no restock sent every digest and mined order is unchanged; the goldens move only by the protocol number.
+
+- **The kind** (`power-up-core/systems/consumableRestock.ts`). `power-up-core` declares the content kind `consumable-restock` `{id, itemId, iconId, name, unitPrice: BandOreCost}`. An item slice opts a consumable in by registering one entry with `r.content('consumable-restock', …)`, so a later consumable adds data and no kernel or core code. One charge costs `bandOrePriceAt(unitPrice, p, p)` on the planet `p` it is restocked on (#162 4.1), never capped; a fill costs that times the charges missing at the player's Mark (`restockBillOf`).
+- **The command** `power-up-core.restock_consumable {itemId}` (`restockRules.ts`). It fills the player's own stack to capacity (`spent` back to 0 in their `power-up-core` section) and debits their own wallet. Refused, changing nothing: `power-up-core.not_restocked` (no slice restocks the item), `not_docked`/`wrong_bay` away from the Upgrade bay, `power-up-core.not_owned`, `power-up-core.stack_full`, then `money_short` for the whole fill, never trimmed (#8). Answered by `power-up-core.ConsumableRestocked {itemId, count, unitPrice, price, chargesLeft}` → `consumable_restocked {itemId, count, unitPrice, price, to}`, so the spend-share read tells it from a free `charges_refilled`.
+- **The bay entries** (`restockBayEntries.ts`, 3.42). The source `power-up-core.restock-entries` waits on `core_harvest`, a planet-1 travel row (ownership is its only gate), and lists one entry per restocked consumable the player owns, `restock-<itemId>`: the stack left at the Mark, the fill's price (one charge's on a full stack) and a `commandButton` over the command. A player who does not own the item sees none: no preview before research.
+- **The card's view read.** `chargesLeftInViewOf(view, itemId)` reads the charges left off the item card's snapshot view (K7), at the Mark the view shows researched. `descriptions`' `textOf(level, ctx)` now passes the card's ctx at that level, so a line of words can quote it.
+- **Foam first** (`terrain-tools/systems/foamRestock.ts`). Foam's entry prices a charge at the lane's per-unit row, 2 band-5 units, the band foam's price sits in. Its card's Charges line reads `{charges} left; restock {unitPrice} a charge at the Upgrade bay`. Ownership is unchanged (research of its tier-3 node, 3.63). The other consumables register no entry yet.
+- **Pace.** The pacing bot buys no restock. `foamRestockPace.lane.test.ts` reruns the shared collapse-delay gate with the bore gun forced, the clamp, foam at its cure Mark, the refractory lining and the restock hand (`restockHand.ts`) against the never-foam run, P1-P10 and P40.
+
 ## 4. Cross-slice contracts
 
 ```mermaid

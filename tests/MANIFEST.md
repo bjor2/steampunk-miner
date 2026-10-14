@@ -372,7 +372,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/planet-mix/systems/signatureTag.test.ts` | 4 | 4 |
 | `src/features/planet-mix/systems/themeRows.test.ts` | 5 | 5 |
 
-### `power-up-core`: 20 files, 141 tests
+### `power-up-core`: 21 files, 149 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -381,6 +381,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/power-up-core/store/slotPress.test.ts` | 8 | 7 |
 | `src/features/power-up-core/systems/autoPress.test.ts` | 7 | 7 |
 | `src/features/power-up-core/systems/chargeState.test.ts` | 5 | 5 |
+| `src/features/power-up-core/systems/consumableRestock.test.ts` | 8 | 8 |
 | `src/features/power-up-core/systems/cradleNodes.test.ts` | 5 | 3 |
 | `src/features/power-up-core/systems/cradleSales.test.ts` | 3 | 3 |
 | `src/features/power-up-core/systems/cradles.test.ts` | 5 | 5 |
@@ -502,12 +503,13 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/ui/nodeCardHold.test.ts` | 4 | 4 |
 | `src/features/tech-tree/ui/techTreeScreen.test.ts` | 6 | 6 |
 
-### `terrain-tools`: 45 files, 366 tests
+### `terrain-tools`: 47 files, 383 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/terrain-tools/foamCurePace.lane.test.ts` | 11 | 1 |
 | `src/features/terrain-tools/foamPace.test.ts` | 3 | 1 |
+| `src/features/terrain-tools/foamRestockPace.lane.test.ts` | 11 | 1 |
 | `src/features/terrain-tools/logging.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetFieldsBench.test.ts` | 2 | 2 |
 | `src/features/terrain-tools/magnetGuard.test.ts` | 6 | 6 |
@@ -524,6 +526,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/terrain-tools/systems/foamCards.test.ts` | 5 | 5 |
 | `src/features/terrain-tools/systems/foamCure.test.ts` | 14 | 14 |
 | `src/features/terrain-tools/systems/foamResearch.test.ts` | 5 | 5 |
+| `src/features/terrain-tools/systems/foamRestock.test.ts` | 6 | 6 |
 | `src/features/terrain-tools/systems/gatesFixture.test.ts` | 22 | 5 |
 | `src/features/terrain-tools/systems/lodeClamp.test.ts` | 16 | 12 |
 | `src/features/terrain-tools/systems/lodestoneBeacon.test.ts` | 5 | 5 |
