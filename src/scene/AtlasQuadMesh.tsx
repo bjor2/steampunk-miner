@@ -90,7 +90,11 @@ function AtlasQuadMeshLit({
   })
   return (
     <group ref={group} position={[pivotX, pivotY, z]}>
-      <mesh position={[quad.centre[0] - pivotX, quad.centre[1] - pivotY, 0]} geometry={geometry}>
+      <mesh
+        name={quad.partId}
+        position={[quad.centre[0] - pivotX, quad.centre[1] - pivotY, 0]}
+        geometry={geometry}
+      >
         <meshStandardMaterial
           ref={material}
           map={albedo}

@@ -1,7 +1,8 @@
 /**
  * The local vehicle: the input intent in, the fixed-step loop, the placeholder art, the drill head
  * the guns' turret once mounted (#107), the slices' pieces at their attach points (#235; the
- * dynamite rack among them since #215), and the heat shimmer above the throttle line (#113).
+ * dynamite rack among them since #215), and the heat shimmer above the throttle line (#113), all
+ * painted with the looks the slices ask of the vehicle (ticket 389).
  */
 import { useMemo } from 'react'
 import { VehicleBody } from '../physics/VehicleBody'
@@ -11,6 +12,7 @@ import { readVehicleIntent } from '../store/inputRuntime'
 import { DrillHeadView } from './DrillHeadView'
 import { HeatShimmer } from './HeatShimmer'
 import { VehicleGuns } from './VehicleGuns'
+import { VehicleLook } from './VehicleLook'
 import { VehiclePieces } from './VehiclePieces'
 import { VehiclePlaceholder } from './VehiclePlaceholder'
 import { createVehicleLoop } from './vehicleLoop'
@@ -33,13 +35,13 @@ export function Vehicle() {
       stage={vehicleStagePresence}
     >
       {(controller) => (
-        <>
+        <VehicleLook>
           <VehiclePlaceholder />
           <DrillHeadView controller={controller} />
           <VehicleGuns />
           <VehiclePieces />
           <HeatShimmer />
-        </>
+        </VehicleLook>
       )}
     </VehicleBody>
   )

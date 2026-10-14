@@ -79,6 +79,7 @@ import { ORE_LOOK_REGISTRY } from '../systems/registries/oreLook'
 import { ORE_DRILL_CLASS_REGISTRY } from '../systems/registries/oreDrillClasses'
 import { ORE_SIGNATURE_REGISTRY, ORE_TYPE_REGISTRY } from '../systems/registries/oreTypes'
 import { PART_MOTION_REQUEST_REGISTRY } from '../systems/registries/partMotionRequests'
+import { VEHICLE_LOOK_REGISTRY } from '../systems/registries/vehicleLooks'
 import { SAVE_SECTION_REGISTRY, type SaveSection } from '../systems/registries/saveSections'
 import { SHOCK_SHIELD_REGISTRY } from '../systems/registries/shockShields'
 import { SLOT_HOLD_CUE_REGISTRY } from '../systems/registries/slotHoldCues'
@@ -167,6 +168,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
     vehiclePiece: (piece) => add(VEHICLE_PIECE_REGISTRY, piece),
     vehicleStaging: (provider) => add(VEHICLE_STAGING_REGISTRY, provider),
     partMotionRequests: (source) => add(PART_MOTION_REQUEST_REGISTRY, source),
+    vehicleLook: (source) => add(VEHICLE_LOOK_REGISTRY, source),
     artAssets: (assets) => assets.forEach((asset) => addArtAsset(sliceId, asset)),
     botPurchase: (purchase) => add(BOT_PURCHASE_REGISTRY, purchase),
     spendFamily: (family) => addSpendFamily(sliceId, family),

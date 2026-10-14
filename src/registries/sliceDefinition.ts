@@ -56,6 +56,7 @@ import type { ShockShield } from '../systems/registries/shockShields'
 import type { OreDrillClassProvider } from '../systems/registries/oreDrillClasses'
 import type { OreSignatureTag, OreTypeProvider } from '../systems/registries/oreTypes'
 import type { PartMotionRequestSource } from '../systems/registries/partMotionRequests'
+import type { VehicleLookSource } from '../systems/registries/vehicleLooks'
 import type { SaveSection } from '../systems/registries/saveSections'
 import type { OneShot } from '../systems/registries/oneShots'
 import type { SoundCue } from '../systems/registries/soundCues'
@@ -209,6 +210,11 @@ export interface SliceRegistrar {
   vehicleStaging(provider: VehicleStagingProvider): void
   /** Poses and part swaps on the drawn car, at vehicle-attach points, asked each tick (#180). */
   partMotionRequests(source: PartMotionRequestSource): void
+  /**
+   * A tint, see-through body, outline or part glow on the local vehicle while the slice's state
+   * lasts or after one of its events; reduced effects swap the first two for the outline (389).
+   */
+  vehicleLook(source: VehicleLookSource): void
   /**
    * Blender assets the slice ships, joining `blenderAssetIds()`. Bare art ids, not prefixed:
    * kebab-case, starting with `<category>-`, never a kernel id or another slice's (#214).

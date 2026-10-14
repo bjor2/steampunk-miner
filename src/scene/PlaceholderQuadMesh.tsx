@@ -42,7 +42,7 @@ export function PlaceholderQuadMesh({ quad, baseZ }: { quad: PlaceholderQuad; ba
   })
   return (
     <group ref={group} position={[pivotX, pivotY, z]}>
-      <mesh position={[quad.centre[0] - pivotX, quad.centre[1] - pivotY, 0]}>
+      <mesh name={quad.partId} position={[quad.centre[0] - pivotX, quad.centre[1] - pivotY, 0]}>
         <planeGeometry args={[quad.size[0], quad.size[1]]} />
         <meshStandardMaterial
           ref={material}

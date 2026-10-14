@@ -29,9 +29,11 @@ export const ZOOM_STEP_FACTOR = 5 / 4
 export const ZOOM_EASE_SECONDS = 0.2
 /**
  * `useFrame` order (#208): the scene's own frame work at priority 0 moves the camera and the
- * bodies, then the projector feed publishes the frame about to be drawn, then the pipeline draws
- * it. A positive priority takes R3F's render over, which the pipeline does anyway.
+ * bodies, then the slices' looks paint the vehicle over the glow its parts wrote (ticket 389),
+ * then the projector feed publishes the frame about to be drawn, then the pipeline draws it. A
+ * positive priority takes R3F's render over, which the pipeline does anyway.
  */
+export const VEHICLE_LOOK_FRAME_PRIORITY = 0.5
 export const PROJECTOR_FRAME_PRIORITY = 1
 export const RENDER_FRAME_PRIORITY = 2
 
@@ -490,3 +492,12 @@ export const SKY_BAND_STEP_M = 2
 export const SKY_BAND_Z = -0.04
 /** With no ribbon art the kernel's procedural curtains repeat every this many metres round. */
 export const SKY_BAND_CURTAIN_REPEAT_M = 24
+
+/**
+ * The single outline a slice's look draws round the local vehicle's body (ticket 389, the reduced
+ * effects phase look on #261): each body part's frame this far past its edges, the Upgrade bay's
+ * part outline margin (#44, `PreviewVehicle`), so the two outlines read alike; just behind the
+ * body's parts (at 0.1) and in front of the enemies (0.08).
+ */
+export const VEHICLE_OUTLINE_MARGIN_M = 0.06
+export const VEHICLE_OUTLINE_Z = 0.095
