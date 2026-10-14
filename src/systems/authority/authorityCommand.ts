@@ -157,8 +157,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `groundReinforcement` provider cases every open tile with an intact cement-grade lining
  *    sample (refractory, insulated, grounded) in it or on its one-sample border, so its blocks
  *    never warn or refill. Standard lining cases nothing, so no P1-P7 digest or mined order changes.
+ * 55: the chronometric governor and the aether condenser (ticket 263, #245 build 4): the
+ *    `aetheric.pocket` and `aetheric.heat` player sections v1, the governor's slow on every enemy
+ *    step in its pocket (`enemyStepModifiers`) and its `aetheric.pockets` clock step,
+ *    `aetheric.PocketOpened`, `aetheric.HeatCondensed` and `debug.aetheric.setItemHeat`. With no
+ *    pocket opened and no heat condensed no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 54
+export const AUTHORITY_PROTOCOL_VERSION = 55
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
