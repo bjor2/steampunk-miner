@@ -52,6 +52,17 @@ export function fixedLine(
   return { label, kind, value: (_ref, ctx) => value(ctx), nextLevel: hasNoNextLevel }
 }
 
+/** A line of words, the same at every level: no amount, no next value. */
+export function wordsLine(label: string, words: string): DescribedStatLineSpec {
+  return {
+    label,
+    kind: 'linearInt',
+    value: () => 0,
+    nextLevel: hasNoNextLevel,
+    textOf: () => words,
+  }
+}
+
 /** A figure read at the owned level, with the next one a level on, up to an optional top level. */
 export function levelledLine(
   label: string,

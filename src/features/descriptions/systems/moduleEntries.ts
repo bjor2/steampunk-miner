@@ -10,6 +10,7 @@
 import { MM_PER_METRE, TICKS_PER_SECOND } from '../../../constants/physics'
 import { rackCapacity, rackMaxSlotLevel } from '../../../systems/economy/blastingCharges'
 import { casingHardness } from '../../../systems/economy/casingGrades'
+import { cementGradeOf } from '../../../systems/economy/casingPrices'
 import { chargeRadiusMm, fuseTicksOf } from '../../../systems/economy/chargeSizes'
 import {
   gunMountStep,
@@ -22,12 +23,14 @@ import { refineSeconds, refinerySlotsMax } from '../../../systems/economy/refine
 import { majorOf, stepOfMajor } from '../../../systems/economy/upgradeSteps'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
 import { KERNEL_ITEMS, liningItemOf } from '../../../systems/registries/kernelItems'
+import type { DescribedStatLineSpec } from './describedLineSpec'
 import {
   fixedLine,
   kernelEntryOf,
   levelledLine,
   stepLevelLine,
   steppedLine,
+  wordsLine,
   type DescribedEntry,
   type StepLadder,
 } from './kernelEntry'
@@ -39,6 +42,14 @@ const SHIPPED_CHARGE_SIZE = 1
 const LINING_FLAVOURS: Readonly<Record<string, string>> = {
   refractory: 'Firebrick casing that keeps lava out and your tunnel cool.',
 }
+
+/**
+ * Content's line for the casing_cement grades (ruling B on #367): a cement-grade lining cases the
+ * ground round it against collapse. Standard lining has no grade and gets none, so the #43
+ * under-grade hazard reads by its absence.
+ */
+const CASED_LABEL = 'Cased'
+const CASED_WORDS = "the ground around this lining won't collapse"
 
 /** The guns' climb (#181): nothing to the mount step, then a step a buy up to the top step. */
 const GUN_STEPS: StepLadder = {
@@ -105,12 +116,20 @@ export function moduleEntries(): readonly DescribedEntry[] {
 
 function liningEntries(): readonly DescribedEntry[] {
   return Object.entries(LINING_FLAVOURS).map(([liningType, flavour]) =>
-    kernelEntryOf(liningItemOf(liningType), flavour, [
-      fixedLine('Lining charge multiplier', 'geometric', () =>
-        liningTypePriceMultiplier(liningType),
-      ),
-    ]),
+    kernelEntryOf(liningItemOf(liningType), flavour, liningLinesOf(liningType)),
   )
+}
+
+/** A lining type's card lines: its charge multiplier, and the Cased line on a cement grade. */
+export function liningLinesOf(liningType: string): readonly DescribedStatLineSpec[] {
+  return [
+    fixedLine('Lining charge multiplier', 'geometric', () => liningTypePriceMultiplier(liningType)),
+    ...casedLinesOf(liningType),
+  ]
+}
+
+function casedLinesOf(liningType: string): readonly DescribedStatLineSpec[] {
+  return cementGradeOf(liningType) === null ? [] : [wordsLine(CASED_LABEL, CASED_WORDS)]
 }
 
 /** No guns before the mount: the card's next line is the mount's rate. */
