@@ -176,8 +176,11 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    {lane, branch}` with `tech-tree.ForkChosen`, `ForkRechosen` and `ForkRefused`, and
  *    `unlock_node` refusing a branch or an inactive branch's Marks as `fork_branch`. With no fork
  *    chosen no digest or mined order changes.
+ * 59: the forced fork branch (ticket 267, #255 build 2): `debug.tech-tree.forceFork {lane,
+ *    branch}` makes the branch its lane's active one, free and outside its tier, for the
+ *    `balance:forks` bot. With no branch forced no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 58
+export const AUTHORITY_PROTOCOL_VERSION = 59
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {

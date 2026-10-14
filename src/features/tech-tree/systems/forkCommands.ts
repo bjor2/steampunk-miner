@@ -7,8 +7,14 @@
  *   platform for one Mark step, answered by `ForkRechosen {lane, from, to, cost}` and
  *   `MoneyChanged`.
  *
+ * - `debug.tech-tree.forceFork {lane, branch}`: the forced-branch start of `balance:forks` (#255
+ *   build 2, ticket 267): the branch made the lane's active one, free and whatever the planet, as
+ *   a scenario sets a level. It logs only the kernel's `debug_command_applied`, so it never
+ *   counts as play.
+ *
  * A refusal changes nothing and is answered as `ForkRefused {lane, branch, reason}`, the first of
- * the rules' order, as `unlock_node` answers `TechNodeRefused`.
+ * the rules' order, as `unlock_node` answers `TechNodeRefused`; the forced start refuses only an
+ * unknown branch.
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import { withWallet } from '../../../systems/authority/authorityState'
@@ -34,6 +40,7 @@ declare module '../../../systems/authority/authorityCommand' {
   interface CommandPayloads {
     'tech-tree.choose_fork': ForkPick
     'tech-tree.rechoose_fork': ForkPick
+    'debug.tech-tree.forceFork': ForkPick
   }
 }
 
@@ -69,6 +76,10 @@ export const FORK_RULES: SliceCommandRules = {
     apply: (state, { playerId, payload }) =>
       answerForkPick(state, playerId, payload, rechooseForkRefusalOf, rechooseFork),
   },
+  'debug.tech-tree.forceFork': {
+    fields: { lane: 'text', branch: 'text' },
+    apply: (state, { playerId, payload }) => forceFork(state, playerId, payload),
+  },
 }
 
 function answerForkPick(
@@ -92,6 +103,13 @@ function answerForkPick(
 
 function refuseFork(state: AuthorityState, pick: ForkPick, reason: ForkRefusal): RuleEffect {
   return { state, events: [{ type: 'tech-tree.ForkRefused', ...pick, reason }] }
+}
+
+/** No gate, price or platform: only a branch no pair registers is refused. */
+function forceFork(state: AuthorityState, playerId: string, pick: ForkPick): RuleEffect {
+  const fork = forkBranchNodeOf(registeredTechTree(), pick.lane, pick.branch)
+  if (fork === null) return refuseFork(state, pick, 'unknown_branch')
+  return { state: withBranchActive(state, playerId, fork, [fork.node.id]), events: [] }
 }
 
 function chooseFork(state: AuthorityState, playerId: string, fork: ForkBranchNode): RuleEffect {
