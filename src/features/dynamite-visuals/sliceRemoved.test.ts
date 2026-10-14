@@ -3,8 +3,14 @@ import { recordDomainEventsTo } from '../../logging/domainEventLog'
 import { createMemorySink } from '../../logging/eventSink'
 import { createRunLog } from '../../logging/runLog'
 import { withRegistrations } from '../../registries/registrar'
-import { sceneLayers } from '../../scene/registries/sceneLayers'
+import {
+  KERNEL_SCENE_LAYER_BUDGET,
+  sceneLayerLineUseOf,
+  sceneLayers,
+} from '../../scene/registries/sceneLayers'
+import { admitRequestedSprays } from '../../scene/sprayIntake'
 import { vehiclePieces } from '../../scene/registries/vehiclePieces'
+import { requestSpray } from '../../store/sprayRequests'
 import { blenderAssetIds, kernelBlenderAssetIds } from '../../systems/art/artIds'
 import {
   ofType,
@@ -19,6 +25,7 @@ import {
   SHIPPED_CHARGE_BLAST_KICK,
 } from '../../systems/registries/chargeBlastCue'
 import { attachOf } from '../../systems/registries/vehicleAttach'
+import { createSprayPool } from '../../systems/render/sprayPool'
 import { DETONATE_INTENT } from '../dynamite'
 import { slice } from './register'
 import { RACK_ITEM_ID } from './systems/render/rackLook'
@@ -68,6 +75,19 @@ describe('dynamite-visuals removed', () => {
       expect(vehiclePieces()).toEqual([])
       expect(attachOf(RACK_ITEM_ID)).toBeNull()
       expect(blenderAssetIds()).toEqual([...kernelBlenderAssetIds()].sort())
+    })
+  })
+
+  it("leaves the kernel spray layer drawing a P1 tracer's sparks and debris (ticket 348)", () => {
+    withRegistrations([], () => {
+      const pool = createSprayPool()
+      const stopAdmitting = admitRequestedSprays(pool, { x: 0, y: 0 })
+      for (const kind of ['spark', 'debris'] as const) {
+        requestSpray({ kind, x: 3, y: -2, dirX: 1, dirY: 0, count: 4, priority: 'low' })
+      }
+      stopAdmitting()
+      expect(pool.particles.count).toBe(8)
+      expect(sceneLayerLineUseOf(sceneLayers())).toEqual(KERNEL_SCENE_LAYER_BUDGET)
     })
   })
 

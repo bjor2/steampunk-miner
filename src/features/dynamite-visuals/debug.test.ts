@@ -9,7 +9,7 @@ describe('dynamite-visuals debug reads', () => {
   it('reports the front budget it declares beside what it drew', () => {
     expect(dynamiteVisualsDebugActions.getFront()).toMatchObject({
       ok: true,
-      budget: { drawCalls: 4, instances: 673 },
+      budget: { drawCalls: 3, instances: 577 },
       peak: { drawCalls: 0, instances: 0 },
     })
   })

@@ -1,8 +1,8 @@
 /**
  * The dynamite-visuals slice's registration (#215, the wiring of #145; it replaces the kernel's
  * charge rack and planted charge): the two Blender assets, the rack at its `hull.rear` attach use
- * as a vehicle piece, the planted sizes and the blast front (ring, debris, flash) as scene layers,
- * and the blast cue that sizes each detonation's shake, flash and thump. No side effects at
+ * as a vehicle piece, the planted sizes and the blast front (ring and flash; its debris goes
+ * through the kernel spray since ticket 348) as scene layers, and the blast cue that sizes each detonation's shake, flash and thump. No side effects at
  * import; the loader calls `register`.
  */
 import type { SliceDefinition } from '../../registries/sliceDefinition'
@@ -31,7 +31,7 @@ export const slice: SliceDefinition = {
       Layer: PlantedDynamiteLayer,
       budget: PLANTED_DYNAMITE_BUDGET,
     })
-    // The ring, debris and flash of every blast, following its BlastFront slices (K6).
+    // The ring and flash of every blast, following its BlastFront slices (K6); debris is sprayed.
     r.sceneLayer({ id: BLAST_FRONT_LAYER_ID, Layer: BlastFrontLayer, budget: BLAST_FRONT_BUDGET })
     r.chargeBlastCue(DYNAMITE_BLAST_CUE)
     // steampunkDebug.features['dynamite-visuals'].getRack()

@@ -1,7 +1,8 @@
 /**
  * The blast's front in the world (#153 looks 1-3, the #145 TD lock; wired in #215): each
  * `BlastFront` slice (K6 #189) throws fire and dust across the ring it uncovered and debris out
- * of it, so the ring rides the clearing's edge tick by tick; each detonation lights the size's
+ * of it, so the ring rides the clearing's edge tick by tick; the debris draws in the kernel's
+ * spray layer at blast priority (ticket 348), the ring here; each detonation lights the size's
  * flash sprite for two frames while the player's flash switch is on. Fixed pools placed in
  * `useFrame`, never through React; it never writes the authority, the camera or the sound. A
  * debug preview (`previewBlast`) feeds it a solid-rock blast with no world change.
@@ -38,7 +39,6 @@ export function BlastFrontLayer() {
     <>
       <points geometry={pools.fireGeometry} material={pools.fireMaterial} frustumCulled={false} />
       <points geometry={pools.dustGeometry} material={pools.dustMaterial} frustumCulled={false} />
-      <primitive object={pools.debrisMesh} />
       <primitive object={pools.flashMesh} />
     </>
   )

@@ -3,8 +3,8 @@ import { SCENE_LAYER_LINE } from '../../constants/scene'
 import { withRegistrations } from '../../registries/registrar'
 import {
   isWithinSceneLayerLine,
+  sceneLayerLineUseOf,
   sceneLayers,
-  sceneLayersBudget,
 } from '../../scene/registries/sceneLayers'
 import { registeredArtAssets } from '../../systems/registries/artAssets'
 import { planetSkyBandOf } from '../../systems/registries/planetSkyBand'
@@ -29,7 +29,7 @@ describe('planet-mix scene layer', () => {
     expect(SCENE_LAYER_LINE.instances).toBe(RAISED_LINE_INSTANCES)
     expect(isWithinSceneLayerLine(sceneLayers())).toBe(true)
     expect(sceneLayers().map((layer) => layer.id)).toContain('planet-mix.field-lines')
-    expect(sceneLayersBudget(sceneLayers()).instances).toBeGreaterThan(1024)
+    expect(sceneLayerLineUseOf(sceneLayers()).instances).toBeGreaterThan(1024)
   })
 
   it('ships the aurora ribbon and the field dash as one prop asset', () => {

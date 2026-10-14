@@ -11,6 +11,8 @@ import { cameraPresence } from '../scene/cameraPresence'
 import { lightPresence } from '../scene/lightPresence'
 import { previewPresence } from '../scene/previewPresence'
 import { renderPresence } from '../scene/renderPresence'
+import { KERNEL_SCENE_LAYER_BUDGET, type SceneLayerBudget } from '../scene/registries/sceneLayers'
+import { sprayPresence } from '../scene/sprayPresence'
 import { useGameStore } from '../store/gameStore'
 import { shownPlanetCardOf } from '../store/planetCardSlice'
 import {
@@ -70,6 +72,11 @@ export interface DebugUi {
   getCameraView(): DebugResult<{ view: CameraView }>
   /** What the last frame drew and cost (#38 acceptance 1-3): draw calls, blocks, lights, scale. */
   getRenderStats(): DebugResult<{ stats: RenderStats }>
+  /**
+   * The kernel spray layer since load (ticket 348): pieces asked for, dropped for want of room,
+   * tracer pieces a blast evicted, the most drawn in a frame and the budget it declares.
+   */
+  getSprayStats(): DebugResult<{ stats: SprayStats }>
   /** Live geometries, textures and compiled programs in three's `renderer.info` (#119). */
   getRendererMemory(): DebugResult<RendererMemory>
   /** Holds the render scale (0 to 1, clamped to the 1080p floor), or `null` to adapt again (#38). */
@@ -110,6 +117,8 @@ export type RenderStats = typeof renderPresence & {
   pointLightIds: string[]
 }
 
+export type SprayStats = typeof sprayPresence & { budget: SceneLayerBudget }
+
 export interface DebugInput {
   /** Holds an action down (a held aim drives; a press action reacts once). */
   press(actionId: string): DebugResult
@@ -143,6 +152,7 @@ export function createDebugUi(): DebugUi {
     setZoom: setZoomUnlessRefused,
     getCameraView: () => ({ ok: true, view: cameraViewOnScreen() }),
     getRenderStats: () => ({ ok: true, stats: renderStatsNow() }),
+    getSprayStats: () => ({ ok: true, stats: sprayStatsNow() }),
     getRendererMemory: readRendererMemory,
     setRenderScale: pinRenderScaleUnlessRefused,
     getHudModel: () => ({ ok: true, model: readHudModel() }),
@@ -256,4 +266,8 @@ function runWithAction(actionId: unknown, run: (action: ActionId) => void): Debu
 
 function resultOf(problems: string[]): DebugResult {
   return problems.length > 0 ? { ok: false, problems } : { ok: true }
+}
+
+function sprayStatsNow(): SprayStats {
+  return { ...sprayPresence, peak: { ...sprayPresence.peak }, budget: KERNEL_SCENE_LAYER_BUDGET }
 }

@@ -4,6 +4,7 @@
  * radius ladder in the slice).
  */
 import { TICKS_PER_SECOND } from '../../../../constants/physics'
+import { SPRAY_CAPACITY } from '../../../../constants/spray'
 
 // --- the detonation-tick cue (#153 Game Director look 1, "Outside the radius") ---------------
 
@@ -32,25 +33,20 @@ export const RING_WIDTH_MAX_M = 3
 export const FIRE_PER_RIM_TILE = 3
 /** Dust motes per tile of rim, from the kernel collapse-dust pool (#154). */
 export const DUST_PER_RIM_TILE = 4
-/** Debris pieces per tile of rim, from the slice's own instanced pool. */
+/** Debris pieces per tile of rim, from the kernel spray pool (ticket 348). */
 export const DEBRIS_PER_RIM_TILE = 1
 /**
- * The debris pool: one GPU-only `InstancedMesh`, one draw call, a fixed capacity Art picks
- * (#154 "Particles and debris"). Enough for a tile of rim at every size up to the R24 cap.
+ * The most debris one blast throws: the whole kernel spray pool, which took this slice's debris
+ * pool at the same count (ticket 348; Art's 96 from #154, a tile of rim at every size up to R24).
+ * The blast asks at high priority, so it always gets it.
  */
-export const BLAST_DEBRIS_CAPACITY = 96
+export const BLAST_DEBRIS_CAPACITY = SPRAY_CAPACITY
 
 // --- the layer that draws them (#215): pools, motion and the flash sprite, tuned by eye --------
 /** Fire rides the kernel's spark look and dust the collapse dust's (#154: reuse the pools' look). */
 export const RING_FIRE_SPREAD_RADIANS = 0.6
 export const RING_DUST_SPREAD_RADIANS = 0.9
-/** Debris flies out of the front faster than the ring and tumbles as it goes. */
-export const DEBRIS_SPEED_MPS = 6
-export const DEBRIS_SPREAD_RADIANS = 0.5
-export const DEBRIS_LIFE_SECONDS = 0.7
-export const DEBRIS_SIZE_M = 0.18
-export const DEBRIS_SPIN_RADIANS_PER_SECOND = 9
-export const DEBRIS_COLOUR = '#3a2e24'
+/** Debris's motion, tumble and colour moved with its pool to `SPRAY_LOOKS` (ticket 348). */
 /** The flash sprite at full size share: a warm disc over the clearing, under the screen veil. */
 export const FLASH_SPRITE_MAX_OPACITY = 0.6
 export const FLASH_SPRITE_COLOUR = '#fff1d6'

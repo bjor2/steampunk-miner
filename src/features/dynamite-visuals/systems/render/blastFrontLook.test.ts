@@ -129,11 +129,11 @@ describe('blast flash sprite', () => {
 
 describe('blast front layer draw', () => {
   it('draws a call per pool holding any piece, and the flash sprite while it shows', () => {
-    expect(frontLayerDrawOf({ fire: 0, dust: 0, debris: 0, isFlashShown: false })).toEqual({
+    expect(frontLayerDrawOf({ fire: 0, dust: 0, isFlashShown: false })).toEqual({
       drawCalls: 0,
       instances: 0,
     })
-    expect(frontLayerDrawOf({ fire: 40, dust: 0, debris: 12, isFlashShown: true })).toEqual({
+    expect(frontLayerDrawOf({ fire: 40, dust: 12, isFlashShown: true })).toEqual({
       drawCalls: 3,
       instances: 53,
     })

@@ -3,6 +3,7 @@ import { SCENE_LAYER_LINE } from '../../constants/scene'
 import { withRegistrations } from '../../registries/registrar'
 import {
   isWithinSceneLayerLine,
+  KERNEL_SCENE_LAYER_BUDGET,
   sceneLayers,
   sceneLayersBudget,
 } from '../../scene/registries/sceneLayers'
@@ -19,11 +20,12 @@ describe('dynamite-visuals scene layers', () => {
     expect(sceneLayersBudget(layers).drawCalls).toBeLessThanOrEqual(SCENE_LAYER_LINE.drawCalls)
   })
 
-  it('draws the front in four pooled calls, its debris one of them (#213 pin)', () => {
+  it('draws the front in three pooled calls, its debris in the kernel spray at the same count (#213 pin)', () => {
     const front = withRegistrations([slice], sceneLayers).find((layer) =>
       layer.id.endsWith('.front'),
     )
-    expect(front?.budget).toEqual({ drawCalls: 4, instances: 256 + 320 + 96 + 1 })
+    expect(front?.budget).toEqual({ drawCalls: 3, instances: 256 + 320 + 1 })
+    expect(KERNEL_SCENE_LAYER_BUDGET).toEqual({ drawCalls: 1, instances: 96 })
   })
 
   it('draws no layer of its own with the slice removed', () => {

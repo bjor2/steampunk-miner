@@ -1,7 +1,8 @@
 /**
  * The blast front's fixed pools (#215; looks from #153 and the #154 budget): fire and dust riding
- * the clearing's edge as two point pools, debris thrown out of the front as one instanced pool,
- * and the flash sprite over the clearing. Each pool is one draw call however full; emitting,
+ * the clearing's edge as two point pools, and the flash sprite over the clearing. The debris thrown
+ * out of the front goes to the kernel's spray layer at high priority (ticket 348), which took this
+ * slice's debris pool at the same count. Each pool is one draw call however full; emitting,
  * stepping and uploading never allocate. Presentation only, on the render delta with its own seed.
  */
 import {
@@ -9,11 +10,8 @@ import {
   BufferAttribute,
   BufferGeometry,
   CircleGeometry,
-  InstancedMesh,
   Mesh,
   MeshBasicMaterial,
-  Object3D,
-  PlaneGeometry,
   PointsMaterial,
 } from 'three'
 import { MM_PER_METRE } from '../../../constants/physics'
@@ -29,6 +27,7 @@ import {
   SPARK_SPEED,
   COLLAPSE_DUST_FALL_SPEED,
 } from '../../../constants/scene'
+import { requestSpray, type SprayRequest } from '../../../store/sprayRequests'
 import { writeChargePlacement, type ChargePlacement } from '../../../systems/render/chargePlacement'
 import {
   createParticlePool,
@@ -48,14 +47,7 @@ import {
   type FrontPoolCounts,
 } from '../systems/render/blastFrontLook'
 import {
-  BLAST_DEBRIS_CAPACITY,
   BLAST_FRONT_SEED,
-  DEBRIS_COLOUR,
-  DEBRIS_LIFE_SECONDS,
-  DEBRIS_SIZE_M,
-  DEBRIS_SPEED_MPS,
-  DEBRIS_SPIN_RADIANS_PER_SECOND,
-  DEBRIS_SPREAD_RADIANS,
   FLASH_SPRITE_COLOUR,
   RING_DUST_SPREAD_RADIANS,
   RING_FIRE_SPREAD_RADIANS,
@@ -64,14 +56,16 @@ import {
 /** Over the drill sparks (0.3): the front is the louder effect. */
 const FIRE_Z = 0.31
 const DUST_Z = 0.31
-const DEBRIS_Z = 0.32
 const FLASH_Z = 0.33
 const FULL_TURN = Math.PI * 2
 
-/** The four pools draw a call each; the capacities are what the layer declares (#213). */
+/**
+ * The three pools draw a call each; the capacities are what the layer declares (#213). The debris
+ * pool's call and 96 instances moved to the kernel's `SPRAY_LAYER_BUDGET` (ticket 348).
+ */
 export const BLAST_FRONT_BUDGET = {
-  drawCalls: 4,
-  instances: SPARK_CAPACITY + COLLAPSE_DUST_CAPACITY + BLAST_DEBRIS_CAPACITY + 1,
+  drawCalls: 3,
+  instances: SPARK_CAPACITY + COLLAPSE_DUST_CAPACITY + 1,
 }
 
 /** How one kind of piece leaves the front. */
@@ -85,18 +79,16 @@ interface RingThrow {
 export interface BlastFrontPools {
   fire: RingThrow
   dust: RingThrow
-  debris: RingThrow
   random: SeededRandom
-  /** Scratch: one piece's spray, the blast's centre, one debris piece's matrix. */
+  /** Scratch: one piece's spray, the blast's centre, one debris piece's request to the kernel. */
   spray: Spray
   centre: ChargePlacement
-  piece: Object3D
+  debris: SprayRequest
   counts: FrontPoolCounts
   fireGeometry: BufferGeometry
   dustGeometry: BufferGeometry
   fireMaterial: PointsMaterial
   dustMaterial: PointsMaterial
-  debrisMesh: InstancedMesh
   flashMesh: Mesh<CircleGeometry, MeshBasicMaterial>
   flashFramesLeft: number
 }
@@ -110,22 +102,15 @@ export function createBlastFrontPools(): BlastFrontPools {
       RING_DUST_SPREAD_RADIANS,
       COLLAPSE_DUST_LIFE_SECONDS,
     ),
-    debris: ringThrowOf(
-      BLAST_DEBRIS_CAPACITY,
-      DEBRIS_SPEED_MPS,
-      DEBRIS_SPREAD_RADIANS,
-      DEBRIS_LIFE_SECONDS,
-    ),
     random: createSeededRandom(BLAST_FRONT_SEED),
     spray: { x: 0, y: 0, dirX: 0, dirY: 1, speed: 0, spreadRadians: 0, lifeSeconds: 0 },
     centre: { x: 0, y: 0, turn: 0 },
-    piece: new Object3D(),
-    counts: { fire: 0, dust: 0, debris: 0, isFlashShown: false },
+    debris: { kind: 'debris', x: 0, y: 0, dirX: 0, dirY: 1, count: 1, priority: 'high' },
+    counts: { fire: 0, dust: 0, isFlashShown: false },
     fireGeometry: createPointGeometry(SPARK_CAPACITY),
     dustGeometry: createPointGeometry(COLLAPSE_DUST_CAPACITY),
     fireMaterial: createFireMaterial(),
     dustMaterial: createDustMaterial(),
-    debrisMesh: createDebrisMesh(),
     flashMesh: createFlashMesh(),
     flashFramesLeft: 0,
   }
@@ -138,8 +123,6 @@ export function gpuResourcesOf(pools: BlastFrontPools) {
     pools.dustGeometry,
     pools.fireMaterial,
     pools.dustMaterial,
-    pools.debrisMesh.geometry,
-    pools.debrisMesh.material as MeshBasicMaterial,
     pools.flashMesh.geometry,
     pools.flashMesh.material,
   ]
@@ -151,7 +134,7 @@ export function throwFront(pools: BlastFrontPools, front: QueuedFront): void {
   writeChargePlacement(front, pools.centre)
   throwAcrossRing(pools, pools.fire, front, counts.fire)
   throwAcrossRing(pools, pools.dust, front, counts.dust)
-  throwAcrossRing(pools, pools.debris, front, counts.debris)
+  throwDebrisAcrossRing(pools, front, counts.debris)
   blastFrontPresence.frontsThrown++
 }
 
@@ -170,14 +153,12 @@ export function lightFlash(pools: BlastFrontPools, flash: QueuedFlash): void {
 export function stepBlastFrontPools(pools: BlastFrontPools, dt: number): void {
   stepParticles(pools.fire.pool, dt)
   stepParticles(pools.dust.pool, dt)
-  stepParticles(pools.debris.pool, dt)
 }
 
 /** Uploads this frame's pieces, counts the flash down a frame and records what it drew. */
 export function drawBlastFrontPools(pools: BlastFrontPools): void {
   uploadPoints(pools.fire.pool, pools.fireGeometry, FIRE_Z)
   uploadPoints(pools.dust.pool, pools.dustGeometry, DUST_Z)
-  placeDebris(pools.debris.pool, pools.debrisMesh, pools.piece)
   pools.flashMesh.visible = pools.flashFramesLeft > 0
   pools.flashFramesLeft = Math.max(0, pools.flashFramesLeft - 1)
   recordFrameDraw(pools)
@@ -187,7 +168,6 @@ function recordFrameDraw(pools: BlastFrontPools): void {
   const { counts } = pools
   counts.fire = pools.fire.pool.count
   counts.dust = pools.dust.pool.count
-  counts.debris = pools.debris.pool.count
   counts.isFlashShown = pools.flashMesh.visible
   raisePeak(blastFrontPresence.peak, frontLayerDrawOf(counts))
 }
@@ -219,6 +199,27 @@ function aimSprayAt(spray: Spray, ring: RingThrow): void {
 
 /** One piece somewhere on the slice's ring, flying straight out from the blast's centre. */
 function throwOnePiece(pools: BlastFrontPools, pool: ParticlePool, front: QueuedFront): void {
+  pickRingPoint(pools, front)
+  sprayParticles(pool, pools.random, pools.spray, 1)
+}
+
+/** Debris goes to the kernel spray at high priority: a held gun's tracer never takes its room. */
+function throwDebrisAcrossRing(pools: BlastFrontPools, front: QueuedFront, count: number): void {
+  for (let thrown = 0; thrown < count; thrown++) throwOneDebrisPiece(pools, front)
+}
+
+function throwOneDebrisPiece(pools: BlastFrontPools, front: QueuedFront): void {
+  const { spray, debris } = pools
+  pickRingPoint(pools, front)
+  debris.x = spray.x
+  debris.y = spray.y
+  debris.dirX = spray.dirX
+  debris.dirY = spray.dirY
+  requestSpray(debris)
+}
+
+/** Aims the spray scratch at a random point on the slice's ring, pointing out from the centre. */
+function pickRingPoint(pools: BlastFrontPools, front: QueuedFront): void {
   const { random, spray, centre } = pools
   const angle = random.nextFloat() * FULL_TURN
   const reachMm = front.rInnerMm + random.nextFloat() * (front.rOuterMm - front.rInnerMm)
@@ -226,7 +227,6 @@ function throwOnePiece(pools: BlastFrontPools, pool: ParticlePool, front: Queued
   spray.dirY = Math.sin(angle)
   spray.x = centre.x + (spray.dirX * reachMm) / MM_PER_METRE
   spray.y = centre.y + (spray.dirY * reachMm) / MM_PER_METRE
-  sprayParticles(pool, random, spray, 1)
 }
 
 function uploadPoints(pool: ParticlePool, geometry: BufferGeometry, z: number): void {
@@ -234,20 +234,6 @@ function uploadPoints(pool: ParticlePool, geometry: BufferGeometry, z: number): 
   for (let at = 0; at < pool.count; at++) position.setXYZ(at, pool.x[at], pool.y[at], z)
   position.needsUpdate = true
   geometry.setDrawRange(0, pool.count)
-}
-
-/** Each piece tumbles and shrinks away over its life. */
-function placeDebris(pool: ParticlePool, mesh: InstancedMesh, piece: Object3D): void {
-  for (let at = 0; at < pool.count; at++) {
-    const left = 1 - pool.age[at] / pool.life[at]
-    piece.position.set(pool.x[at], pool.y[at], DEBRIS_Z)
-    piece.rotation.set(0, 0, at + pool.age[at] * DEBRIS_SPIN_RADIANS_PER_SECOND)
-    piece.scale.set(DEBRIS_SIZE_M * left, DEBRIS_SIZE_M * left, 1)
-    piece.updateMatrix()
-    mesh.setMatrixAt(at, piece.matrix)
-  }
-  mesh.count = pool.count
-  mesh.instanceMatrix.needsUpdate = true
 }
 
 function createPointGeometry(capacity: number): BufferGeometry {
@@ -278,14 +264,6 @@ function createDustMaterial(): PointsMaterial {
     transparent: true,
     depthWrite: false,
   })
-}
-
-function createDebrisMesh(): InstancedMesh {
-  const material = new MeshBasicMaterial({ color: DEBRIS_COLOUR })
-  const mesh = new InstancedMesh(new PlaneGeometry(1, 1), material, BLAST_DEBRIS_CAPACITY)
-  mesh.count = 0
-  mesh.frustumCulled = false
-  return mesh
 }
 
 function createFlashMesh(): Mesh<CircleGeometry, MeshBasicMaterial> {

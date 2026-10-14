@@ -2,9 +2,9 @@
  * The look of a blast's front (#153 Game Director looks 2 and 3): a ring of fire and dust riding
  * the edge of the clearing, and debris thrown outward from that front, never from the centre.
  * Everything keys on the rim, so a bigger blast is a longer ring, not a denser one, and every
- * count stays inside its pool (#154: the kernel spark and collapse-dust pools, plus the slice's
- * one instanced debris pool). The ring and debris follow K6's `BlastFront` tick by tick in the
- * wiring (#215); this is the look at a given radius.
+ * count stays inside its pool (#154: the kernel spark and collapse-dust pools, plus the kernel
+ * spray pool for the debris, ticket 348). The ring and debris follow K6's `BlastFront` tick by
+ * tick in the wiring (#215); this is the look at a given radius.
  */
 import { MM_PER_METRE } from '../../../../constants/physics'
 import { COLLAPSE_DUST_CAPACITY, SPARK_CAPACITY } from '../../../../constants/scene'
@@ -53,7 +53,7 @@ export interface BlastFrontLook {
   fireCount: number
   /** Dust motes on the ring, from the kernel collapse-dust pool. */
   dustCount: number
-  /** Debris pieces thrown from the ring, from the slice's instanced pool. */
+  /** Debris pieces thrown from the ring, from the kernel spray pool. */
   debrisCount: number
   flash: BlastFlash
 }
@@ -117,7 +117,10 @@ function countOnRim(radiusMm: number, perTile: number, capacity: number): number
   return Math.min(capacity, Math.round(rimTilesOf(radiusMm) * perTile))
 }
 
-/** What the front layer draws in a frame: a pool draws one call while it holds any piece. */
+/**
+ * What the front layer draws in a frame: a pool draws one call while it holds any piece. Its debris
+ * draws in the kernel spray layer (ticket 348), so it is not the front's to count.
+ */
 export interface LayerDraw {
   drawCalls: number
   instances: number
@@ -127,16 +130,15 @@ export interface LayerDraw {
 export interface FrontPoolCounts {
   fire: number
   dust: number
-  debris: number
   isFlashShown: boolean
 }
 
 export function frontLayerDrawOf(counts: FrontPoolCounts): LayerDraw {
   const flash = counts.isFlashShown ? 1 : 0
-  const pools = [counts.fire, counts.dust, counts.debris]
+  const pools = [counts.fire, counts.dust]
   return {
     drawCalls: pools.filter((count) => count > 0).length + flash,
-    instances: counts.fire + counts.dust + counts.debris + flash,
+    instances: counts.fire + counts.dust + flash,
   }
 }
 
