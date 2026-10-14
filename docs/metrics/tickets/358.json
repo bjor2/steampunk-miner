@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "ticket": 358,
+  "title": "Kernel: requiresFeature on TechNode (hidden until anchor FeatureUnlocked) (#318 split)",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-14T03:12:52Z",
+  "closed": "2026-10-14T05:08:45Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-14T03:12:52.000Z","end":"2026-10-14T04:27:51.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-14T04:27:51.000Z","end":"2026-10-14T04:28:37.897Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-14T04:28:37.897Z","end":"2026-10-14T04:29:26.559Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-14T04:29:26.559Z","end":"2026-10-14T04:30:04.853Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-14T04:30:04.853Z","end":"2026-10-14T04:30:08.801Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-14T04:30:08.801Z","end":"2026-10-14T04:30:15.282Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-14T04:30:15.282Z","end":"2026-10-14T04:32:04.280Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-14T04:32:04.280Z","end":"2026-10-14T04:32:04.381Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-14T04:32:04.381Z","end":"2026-10-14T05:04:57.681Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-14T05:04:57.681Z","end":"2026-10-14T05:05:12.848Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-14T05:05:12.848Z","end":"2026-10-14T05:05:14.391Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-14T05:05:14.391Z","end":"2026-10-14T05:05:21.874Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-14T05:05:21.874Z","end":"2026-10-14T05:08:32.114Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-14T05:08:32.114Z","end":"2026-10-14T05:08:45.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":0,"planner_wait":0,"idle":4499,"context":163,"planning":7,"developing":45,"testing":1973,"gates":190,"landing":28,"other":47},
+  "lead_time_s": 6953,
+  "cycle_time_s": 2454,
+  "claimed": "2026-10-14T04:27:51.000Z",
+  "claimed_to_done_s": 2454,
+  "backfilled": false
+}
