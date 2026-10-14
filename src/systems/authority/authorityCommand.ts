@@ -209,8 +209,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `gunBurst` with the shape's `burst` cycle, and the guns fire at the burst's cadence, then
  *    idle for its vent. With no burst switched on no field is written and no digest or mined order
  *    changes.
+ * 66: stabiliser foam (ticket 381, the GD default ruling on #381): no longer held back, a spray
+ *    sets foam on a forward cone into the `terrain-tools` section's optional `foam` and logs
+ *    `terrain-tools.FoamSet`; a timed `collapseBraces` provider holds each set cell's block for 600
+ *    ticks and the `terrain-tools.lapse-foam` clock step drops each cell as it lapses. With no foam
+ *    owned no digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 65
+export const AUTHORITY_PROTOCOL_VERSION = 66
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
