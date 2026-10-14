@@ -14,6 +14,10 @@
  * It keeps the bore struts' planks too (ticket 379, `strutColliders.ts`): the rig lands on one, and
  * its wheels count it as ground.
  *
+ * While a slice's glide runs (ticket 390, `motionGlide.ts`) the input is locked, so the wheels,
+ * lift, drill and swivel rest, and the halo leaves out the walls of the one cell the glide passes
+ * through, on every substep of the tick.
+ *
  * The motor also steps the world through its tick (ticket 334, `tickStepping.ts`): `step` runs the
  * motion rule once and plans the tick from the speed it set, `stepWorld` then steps the world in
  * as many substeps as that speed needs, the halo synced round the body before each, or past the
@@ -39,8 +43,13 @@ import { localUpOf, type Vector2 } from '../systems/vehicle/localFrame'
 import type { ActionFlags } from '../systems/vehicle/poseReport'
 import { quantisePose } from '../systems/vehicle/poseReport'
 import { gravityAt } from '../systems/vehicle/radialGravity'
-import type { VehicleIntent } from '../systems/vehicle/vehicleIntent'
-import { isPlainMotion, type VehicleMotion } from '../systems/vehicle/motionEffects'
+import { IDLE_INTENT, type VehicleIntent } from '../systems/vehicle/vehicleIntent'
+import {
+  isInputLocked,
+  isPlainMotion,
+  passThroughOf,
+  type VehicleMotion,
+} from '../systems/vehicle/motionEffects'
 import {
   groundProbeOf,
   offsetToTileCentre,
@@ -50,6 +59,7 @@ import {
 } from '../systems/vehicle/vehicleMotion'
 import { FACING, type Facing, type VehiclePose } from '../systems/vehicle/vehiclePose'
 import type { GroundReader } from '../systems/world/groundReader'
+import type { TilePoint } from '../systems/world/tileGrid'
 import { ISO_DENSITY } from '../systems/world/sampleGrid'
 import {
   createBodyFrame,
@@ -183,9 +193,11 @@ export function createVehicleController(
   let up: Vector2 = { x: 0, y: 1 }
   let plan: TickPlan = tickPlanOf(0)
   let lastPlanet: { view: PlanetView; ground: HaloGround } | null = null
+  let passThrough: TilePoint | null = null
   const syncHaloAt = (position: Vector2) => {
     if (lastPlanet === null) return
-    halo.syncAround(blockOfPoint(position), lastPlanet.view.worldVersion, lastPlanet.ground)
+    const { view, ground } = lastPlanet
+    halo.syncAround(blockOfPoint(position), view.worldVersion, ground, passThrough)
   }
   const tick = {
     world,
@@ -194,12 +206,14 @@ export function createVehicleController(
   }
 
   return {
-    step(input, planet) {
+    step(stepInput, planet) {
+      const input = withInputLockedWhenGliding(stepInput)
       const position = planetPositionOf(body, frame.origin)
       recentreWhenFar(body, colliders, frame, position)
       const velocity = vectorOf(body.linvel())
       up = localUpOf(position, up)
       lastPlanet = lastPlanet?.view === planet ? lastPlanet : haloPlanetOf(planet)
+      passThrough = passThroughOf(input.motion)
       syncHaloAt(position)
       struts.sync(input.struts ?? NO_STRUTS)
       head = stepDrillHead(head, input.intent.facing)
@@ -257,6 +271,12 @@ export function createVehicleController(
       struts.dispose()
     },
   }
+}
+
+/** A glide locks the input (ticket 390): the step runs as if nothing were held. */
+function withInputLockedWhenGliding(input: VehicleStepInput): VehicleStepInput {
+  if (input.motion === undefined || !isInputLocked(input.motion)) return input
+  return { ...input, intent: IDLE_INTENT }
 }
 
 /** The halo's and the struts' colliders, moved together when the origin moves. */

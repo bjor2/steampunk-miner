@@ -3,6 +3,8 @@
  * collision block near the vehicle, its walls the block's contour segments extruded along Z. Added,
  * rebuilt and removed as the halo moves or a chunk under a block changes. The ONLY writer of ground
  * colliders; which blocks belong in it, and their segments, are the pure rules in `colliderHalo`.
+ * While a glide passes through a cell (ticket 390) the block over it is rebuilt without that cell's
+ * walls, and rebuilt whole once the glide ends.
  */
 import type RAPIER from '@dimforge/rapier3d-compat'
 import { COLLISION_BLOCK_METRES, MM_PER_METRE, WALL_HALF_DEPTH } from '../constants/physics'
@@ -10,10 +12,12 @@ import type { RenderOrigin } from '../systems/render/renderOrigin'
 import {
   blocksAround,
   chunksUnderBlock,
+  passThroughInBlock,
   wallSegmentsOf,
   type BlockPoint,
 } from '../systems/vehicle/colliderHalo'
 import type { DensityAt } from '../systems/world/groundContour'
+import type { TilePoint } from '../systems/world/tileGrid'
 
 type Rapier = typeof RAPIER
 
@@ -24,8 +28,16 @@ export interface HaloGround {
 }
 
 export interface GroundHalo {
-  /** Keeps the blocks round `centre` current; cheap when nothing moved or changed. */
-  syncAround(centre: BlockPoint, worldVersion: unknown, ground: HaloGround): void
+  /**
+   * Keeps the blocks round `centre` current, with no walls inside `passThrough`'s square; cheap
+   * when nothing moved or changed.
+   */
+  syncAround(
+    centre: BlockPoint,
+    worldVersion: unknown,
+    ground: HaloGround,
+    passThrough?: TilePoint | null,
+  ): void
   /** Measures every collider from another render origin: they stay where they are on the planet. */
   moveOrigin(origin: RenderOrigin): void
   /** How many ground colliders exist now (the #4 budget counts them). */
@@ -36,7 +48,24 @@ export interface GroundHalo {
 interface BlockCollider {
   block: BlockPoint
   versions: unknown[]
+  /** The pass-through cell the walls were built without, when it lies in this block. */
+  passThrough: TilePoint | null
   collider: RAPIER.Collider | null
+}
+
+/** What the halo was last synced for. */
+interface HaloSync {
+  bx: number
+  by: number
+  worldVersion: unknown
+  passThrough: TilePoint | null
+}
+
+/** What `refreshWanted` builds each block from. */
+interface BlockSource {
+  ground: HaloGround
+  passThrough: TilePoint | null
+  frame: HaloFrame
 }
 
 /** The render origin the halo's colliders are measured from; one object, moved in place. */
@@ -52,17 +81,16 @@ export function createGroundHalo(
 ): GroundHalo {
   const blocks = new Map<string, BlockCollider>()
   const frame: HaloFrame = { origin }
-  let last: { bx: number; by: number; worldVersion: unknown } | null = null
+  let last: HaloSync | null = null
 
   return {
-    syncAround(centre, worldVersion, ground) {
-      const isSame =
-        last?.bx === centre.bx && last.by === centre.by && last.worldVersion === worldVersion
-      if (isSame) return
-      last = { ...centre, worldVersion }
+    syncAround(centre, worldVersion, ground, passThrough = null) {
+      const sync = { ...centre, worldVersion, passThrough }
+      if (last !== null && isSameSync(last, sync)) return
+      last = sync
       const wanted = new Map(blocksAround(centre, radiusBlocks).map((b) => [keyOf(b), b]))
       removeUnwanted(world, blocks, wanted)
-      refreshWanted(rapier, world, blocks, wanted, ground, frame)
+      refreshWanted(rapier, world, blocks, wanted, { ground, passThrough, frame })
     },
     moveOrigin(next) {
       frame.origin = next
@@ -74,6 +102,20 @@ export function createGroundHalo(
       last = null
     },
   }
+}
+
+function isSameSync(a: HaloSync, b: HaloSync): boolean {
+  return (
+    a.bx === b.bx &&
+    a.by === b.by &&
+    a.worldVersion === b.worldVersion &&
+    isSameCell(a.passThrough, b.passThrough)
+  )
+}
+
+function isSameCell(a: TilePoint | null, b: TilePoint | null): boolean {
+  if (a === null || b === null) return a === b
+  return a.tx === b.tx && a.ty === b.ty
 }
 
 function keyOf(block: BlockPoint): string {
@@ -98,23 +140,40 @@ function removeUnwanted(
   }
 }
 
-/** Builds new blocks and rebuilds those whose chunks changed since they were built. */
+/** Builds new blocks and rebuilds those whose chunks or pass-through changed since they were built. */
 function refreshWanted(
   rapier: Rapier,
   world: RAPIER.World,
   blocks: Map<string, BlockCollider>,
   wanted: ReadonlyMap<string, BlockPoint>,
-  ground: HaloGround,
-  frame: HaloFrame,
+  source: BlockSource,
 ): void {
   for (const [key, block] of wanted) {
-    const versions = chunksUnderBlock(block).map(({ cx, cy }) => ground.chunkVersion(cx, cy))
+    const built = builtFromOf(block, source)
     const current = blocks.get(key)
-    if (current !== undefined && isSameVersions(current.versions, versions)) continue
+    if (current !== undefined && isBuiltFrom(current, built)) continue
     if (current !== undefined) removeCollider(world, current)
-    const collider = createWalls(rapier, world, block, ground.densityAt, frame.origin)
-    blocks.set(key, { block, versions, collider })
+    const collider = createWalls(rapier, world, block, source, built.passThrough)
+    blocks.set(key, { block, ...built, collider })
   }
+}
+
+/** The chunk versions and the pass-through cell a block's walls are built from now. */
+function builtFromOf(block: BlockPoint, source: BlockSource) {
+  return {
+    versions: chunksUnderBlock(block).map(({ cx, cy }) => source.ground.chunkVersion(cx, cy)),
+    passThrough: passThroughInBlock(block, source.passThrough),
+  }
+}
+
+function isBuiltFrom(
+  current: BlockCollider,
+  built: { versions: unknown[]; passThrough: TilePoint | null },
+): boolean {
+  return (
+    isSameVersions(current.versions, built.versions) &&
+    isSameCell(current.passThrough, built.passThrough)
+  )
 }
 
 function isSameVersions(a: readonly unknown[], b: readonly unknown[]): boolean {
@@ -130,10 +189,11 @@ function createWalls(
   rapier: Rapier,
   world: RAPIER.World,
   block: BlockPoint,
-  densityAt: DensityAt,
-  origin: RenderOrigin,
+  { ground, frame }: BlockSource,
+  passThrough: TilePoint | null,
 ): RAPIER.Collider | null {
-  const segments = wallSegmentsOf(block, densityAt)
+  const origin = frame.origin
+  const segments = wallSegmentsOf(block, ground.densityAt, passThrough)
   if (segments.length === 0) return null
   const count = segments.length / 4
   const vertices = new Float32Array(count * 12)

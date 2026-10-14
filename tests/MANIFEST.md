@@ -911,6 +911,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/physics/cutFollow.test.ts` | 5 | 3 |
 | `src/physics/drillEngagement.test.ts` | 2 | 2 |
 | `src/physics/floatingOrigin.test.ts` | 3 | 3 |
+| `src/physics/glidePassThrough.test.ts` | 4 | 4 |
 | `src/physics/liveFixedStep.test.ts` | 4 | 4 |
 | `src/physics/physicsStats.test.ts` | 3 | 3 |
 | `src/physics/strutColliders.test.ts` | 4 | 4 |
@@ -1246,6 +1247,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/bandDig.test.ts` | 5 | 5 |
 | `src/systems/vehicle/casingTrail.test.ts` | 16 | 12 |
 | `src/systems/vehicle/chargeSelection.test.ts` | 4 | 4 |
+| `src/systems/vehicle/colliderHalo.test.ts` | 3 | 3 |
 | `src/systems/vehicle/cutFollowMotion.test.ts` | 6 | 6 |
 | `src/systems/vehicle/cutGate.test.ts` | 8 | 8 |
 | `src/systems/vehicle/drillContact.test.ts` | 5 | 5 |
@@ -1259,6 +1261,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/vehicle/kinematicSweep.test.ts` | 6 | 6 |
 | `src/systems/vehicle/leadingSlab.test.ts` | 5 | 5 |
 | `src/systems/vehicle/motionEffects.test.ts` | 13 | 13 |
+| `src/systems/vehicle/motionGlide.test.ts` | 8 | 7 |
 | `src/systems/vehicle/poseReport.test.ts` | 7 | 7 |
 | `src/systems/vehicle/returnReserve.test.ts` | 4 | 4 |
 | `src/systems/vehicle/stepBound.test.ts` | 10 | 10 |

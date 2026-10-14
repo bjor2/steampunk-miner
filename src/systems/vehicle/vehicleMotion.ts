@@ -7,8 +7,8 @@
  * resolves the contacts. The engine stats are the bounded numbers from `computeVehicleStats` (#5 rule 5).
  *
  * A slice's motion effects (ticket 233, `motionEffects.ts`) boost the engine, hold the body against
- * gravity, or set its velocity outright for a burst or a reel. With none, or a vehicle that cannot
- * act, the step is exactly the plain one. A magnetic field's tug (#258, ticket 290) moves the
+ * gravity, or set its velocity outright for a glide (ticket 390), a burst or a reel. With none, or
+ * a vehicle that cannot act and is not gliding, the step is exactly the plain one. A magnetic field's tug (#258, ticket 290) moves the
  * wheels' target along the ground by its share along it, so the rig drifts at the tug's speed and
  * drives at its own plus that; the axis along `localUp` stays gravity's and the lift's.
  *
@@ -31,6 +31,7 @@ import { dot, fromLocalFrame, tangentOf, type Vector2 } from './localFrame'
 import {
   boostedEngineOf,
   isHeldAgainstGravity,
+  isInputLocked,
   steeredVelocityOf,
   type VehicleMotion,
 } from './motionEffects'
@@ -96,11 +97,18 @@ interface DriveFrame {
 const NO_PULL: Vector2 = Object.freeze({ x: 0, y: 0 })
 
 export function stepVehicleMotion(input: MotionStepInput): MotionStep {
-  if (input.effect === undefined || !input.canAct) return drivenStep(input, plainFrameOf(input))
-  return effectStep(input, input.effect)
+  const effect = appliedEffectOf(input)
+  if (effect === undefined) return drivenStep(input, plainFrameOf(input))
+  return effectStep(input, effect)
 }
 
-/** A burst or reel sets the velocity; otherwise the boosted engine drives, perhaps held. */
+/** A vehicle that cannot act ignores every effect but a glide, a move already paid for. */
+function appliedEffectOf(input: MotionStepInput): MotionEffectInput | undefined {
+  if (input.effect === undefined) return undefined
+  return input.canAct || isInputLocked(input.effect.motion) ? input.effect : undefined
+}
+
+/** A glide, burst or reel sets the velocity; otherwise the boosted engine drives, perhaps held. */
 function effectStep(input: MotionStepInput, effect: MotionEffectInput): MotionStep {
   const engine = boostedEngineOf(input.engine, effect.motion)
   const steered = steeredVelocityOf(effect.motion, effect.position, engine, input.dt)
@@ -142,7 +150,7 @@ function isCutFollowAlong(cut: CutFollowMotion | undefined): cut is CutFollowMot
   return cut !== undefined && isCutFollowAlongGround(cut)
 }
 
-/** A burst or reel is the item's own motion: no wheels, no thrust billed. */
+/** A glide, burst or reel is the item's own motion: no wheels, no thrust billed. */
 function steeredStep(velocity: Vector2, maxSpeed: number | undefined): MotionStep {
   return { velocity: withinSpeedBound(velocity, maxSpeed), isDriving: false, isThrusting: false }
 }

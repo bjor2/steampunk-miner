@@ -17,6 +17,7 @@ import {
 import { defineRegistry, entriesOf } from './seal'
 
 export type { MotionBurst, VehicleMotion, VehicleMotionEffect } from '../vehicle/motionEffects'
+export type { MotionGlide } from '../vehicle/motionGlide'
 
 export interface VehicleMotionEffectSource {
   id: string

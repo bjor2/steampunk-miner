@@ -10,6 +10,11 @@
  *   as velocities; the first reel in id order wins.
  * - `hover` holds the body against gravity in open air, and `cling` holds it while a side touches
  *   ground, so it can stay on a wall or ceiling. Thrust still lifts.
+ * - A `glide` (ticket 390, `motionGlide.ts`) moves the body at one constant speed to a tile's
+ *   centre by a tick the authority names, through the walls of one cell, with input locked and
+ *   gravity paused; the first glide in id order wins, and it outranks a burst or a reel. It is a
+ *   move already paid for, so it runs on a vehicle that cannot act as well: stopping it halfway
+ *   would leave the body in the ground.
  *
  * The authority keeps each window in the slice's section, so an effect replays the same on every
  * machine. No effect is `PLAIN_MOTION`, and the step then runs exactly as before.
@@ -21,6 +26,7 @@ import { cappedBoostBp } from '../economy/itemEffectCaps'
 import type { EngineStats } from '../economy/vehicleStats'
 import type { TilePoint } from '../world/tileGrid'
 import { dot, type Vector2 } from './localFrame'
+import { glideStepOf, glideVelocityOf, type GlideStep, type MotionGlide } from './motionGlide'
 
 export interface MotionBurst {
   /** The direction in the world frame; any length but zero. */
@@ -38,6 +44,7 @@ export interface VehicleMotionEffect {
   reelTo?: TilePoint
   cling?: boolean
   hover?: boolean
+  glide?: MotionGlide
 }
 
 export interface VehicleMotion {
@@ -49,6 +56,8 @@ export interface VehicleMotion {
   reelTo: Vector2 | null
   isClinging: boolean
   isHovering: boolean
+  /** The running glide as this step drives it, or null when none runs. */
+  glide: GlideStep | null
 }
 
 export const PLAIN_MOTION: VehicleMotion = Object.freeze({
@@ -58,6 +67,7 @@ export const PLAIN_MOTION: VehicleMotion = Object.freeze({
   reelTo: null,
   isClinging: false,
   isHovering: false,
+  glide: null,
 })
 
 const HALF_TILE = 0.5
@@ -82,11 +92,22 @@ export function foldMotionEffects(
     reelTo: firstReelOf(effects),
     isClinging: effects.some((effect) => effect.cling === true),
     isHovering: effects.some((effect) => effect.hover === true),
+    glide: glideStepOf(glidesOf(effects), tick),
   }
 }
 
 export function isPlainMotion(motion: VehicleMotion): boolean {
   return motion === PLAIN_MOTION
+}
+
+/** A glide locks the input: no wheels, lift, drill or swivel until it ends. */
+export function isInputLocked(motion: VehicleMotion): boolean {
+  return motion.glide !== null
+}
+
+/** The one cell whose walls the body passes through this step, or null. */
+export function passThroughOf(motion: VehicleMotion | undefined): TilePoint | null {
+  return motion?.glide?.passThrough ?? null
 }
 
 /** The engine with the boosts added; the engine itself when there are none. */
@@ -101,9 +122,9 @@ export function boostedEngineOf(engine: EngineStats, motion: VehicleMotion): Eng
 }
 
 /**
- * The velocity a burst or a reel sets this step, or null when neither runs. `engine` is the
+ * The velocity a glide, a burst or a reel sets this step, or null when none runs. `engine` is the
  * boosted one: a reel pulls at its top speed, a burst never passes the base top speed plus the
- * cap.
+ * cap. A glide keeps the speed its ticks set.
  */
 export function steeredVelocityOf(
   motion: VehicleMotion,
@@ -111,6 +132,7 @@ export function steeredVelocityOf(
   engine: EngineStats,
   dt: number,
 ): Vector2 | null {
+  if (motion.glide !== null) return glideVelocityOf(motion.glide, position, dt)
   if (motion.burst !== null) return withinSpeed(motion.burst, burstSpeedLimitOf(engine, motion))
   if (motion.reelTo !== null) return reelVelocityOf(motion.reelTo, position, engine.speedMax, dt)
   return null
@@ -139,6 +161,12 @@ function burstVelocityOf(burst: MotionBurst): Vector2 {
   if (length === 0) return { x: 0, y: 0 }
   const speed = burst.speedMmPerS / MM_PER_METRE
   return { x: (burst.dirX / length) * speed, y: (burst.dirY / length) * speed }
+}
+
+function glidesOf(effects: readonly VehicleMotionEffect[]): MotionGlide[] {
+  return effects
+    .map((effect) => effect.glide)
+    .filter((glide): glide is MotionGlide => glide !== undefined)
 }
 
 function firstReelOf(effects: readonly VehicleMotionEffect[]): Vector2 | null {
