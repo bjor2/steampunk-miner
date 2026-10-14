@@ -254,7 +254,7 @@ function addSlotHeader(file: MigratingFile): MigratingFile | null {
  * deltas would not pack, so the file is left at 2 and refused on its version.
  */
 function packChunkTable(file: MigratingFile): SaveSlotFile | null {
-  if (isPackedFile(file) || portableWorldProblems({ chunks: file.world.chunks }).length > 0) {
+  if (isPackedFile(file) || portableWorldProblems(file.world).length > 0) {
     return null
   }
   return { ...(file as SlottedFile), formatVersion: 3, world: packedWorldOf(file.world) }

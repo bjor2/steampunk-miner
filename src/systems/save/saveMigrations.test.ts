@@ -183,6 +183,14 @@ describe('save migration chain', () => {
     expect(migrateSaveSlot(migrated).migrations).toEqual([])
   })
 
+  it('refuses a format 2 file with no world on its version instead of packing it', () => {
+    const reading = readMigratedSaveSlot({ formatVersion: 2 })
+    expect(reading.migrations).toEqual([])
+    expect(reading.problems).toContain(
+      `save.formatVersion is 2, this build reads ${SAVE_FORMAT_VERSION}`,
+    )
+  })
+
   it('leaves a generator 5 save whose digest does not hold unmigrated, and refused', () => {
     const tampered = { ...PLANET_1_SAVE, digest: '0000000000000000' }
     const reading = readMigratedSaveSlot(tampered)
