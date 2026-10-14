@@ -616,6 +616,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/groundDrill.test.ts` | 3 | 3 |
 | `src/systems/authority/gunRules.test.ts` | 11 | 11 |
 | `src/systems/authority/heatRun.test.ts` | 13 | 13 |
+| `src/systems/authority/hollowPocket.test.ts` | 7 | 7 |
 | `src/systems/authority/lava/lavaRun.test.ts` | 9 | 9 |
 | `src/systems/authority/liningBill.test.ts` | 10 | 10 |
 | `src/systems/authority/liningTypes.test.ts` | 9 | 9 |

@@ -53,6 +53,12 @@ export function isDockPadTile(site: DockSite, tx: number, ty: number): boolean {
   return ty === site.padRow && tx >= site.firstColumn && tx <= site.lastColumn
 }
 
+/** Whether a tile lies in the air cleared above the pad: placed open, never a cave. */
+export function isDockClearanceTile(site: DockSite, tx: number, ty: number): boolean {
+  const isAbovePad = ty > site.padRow && ty <= site.clearanceTopRow
+  return isAbovePad && tx >= site.firstColumn && tx <= site.lastColumn
+}
+
 function clearanceTilesOfColumn(params: PlanetParams, site: DockSite, tx: number): PlacedTile[] {
   const tiles: PlacedTile[] = []
   for (let ty = site.padRow + 1; ty <= site.clearanceTopRow; ty++) {

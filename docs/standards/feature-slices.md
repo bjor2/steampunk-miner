@@ -1183,6 +1183,10 @@ K-flush of the TD lock on #319 (6163443399; GD ruling 6163449711), the enemy-beh
 - **The move** (`combat/burrowerFlush.ts`, applied in the hunting phases of `enemyBehaviour.ts`). A flushed burrower in the rock looks for the nearest open cell (an exposed face: a bored or cave cell) whose centre is within `flushTicks` of its walking step after any slow (3.52), inside a window of `flushReachCapTiles` each way (at most 81 cell reads per burrower per tick). With one it walks its walking step straight at it, so it stands in the open within `flushTicks`; with none the flush leaves it alone. Once in the open it hunts through open cells only (`walkOpenToward`) while the flush lasts, so it does not dive back in. A wind-up, lunge or recoil under way goes on, and a frozen or pinned burrower is not moved.
 - **Not here.** The flush cuts no cell and deals no hit; ownership, the turret's shot and `flushTicks` itself are the provider's (#388).
 
+### 3.58 Hollow pocket cells (ticket 387)
+
+K-hollow of the TD lock on #319 (GD ruling on #319), for #319b's Ricochet shot (`hazard:hollow`). `isHollowPocketCell(world, params, tile)` (`authority/hollowPocket.ts`) is the one authority meaning of a hollow pocket: generation made the cell air (the seeded caves, or a slice's generation hook) and it is not the dock clearance (`isDockClearanceTile`), and the cell is still air now, as the gun's line of fire reads it (`cellAt`). A tunnel the player opened through generated rock is open but never hollow; a pocket cell swapped back to rock or flooded by lava is not hollow while it is. One cell read from the generated chunk and the delta, O(1), and pure. It is generation content, not #365's reinforcement. Its only caller is the bounce leg, on at most `bounceLegCells` cells; until #319b lands nothing calls it, so no digest or golden moves. No protocol bump.
+
 ## 4. Cross-slice contracts
 
 ```mermaid
