@@ -6,6 +6,11 @@
  * repair or recharge fills up to it. `vehicle_configuration_changed` follows when the sum of the
  * six major levels crosses `T2` or `T3`. A refused purchase changes nothing and logs no purchase.
  * A held step (`chain` not 0) is also refused under the service reserve (`purchaseChain.ts`).
+ *
+ * The engine track stays finite (GD lock on #316 scope 0, ticket 333): once k times the drill's
+ * cut speed in the rig's band reaches the engine's top speed, the drill sets travel and an engine
+ * step would buy no travel speed, so it is refused `max_level`. With today's 24-tick floor that
+ * never happens.
  */
 import { costCurveIdOf, stepPrice } from '../economy/upgradePrices'
 import { isMajorStep, majorOf } from '../economy/upgradeSteps'
@@ -26,6 +31,7 @@ import {
 import { atBayRejection } from './dockRules'
 import type { DomainEventBody, PurchaseChainStamp } from './domainEvent'
 import { chainStampOf, CLICK_CHAIN, serviceReserveRejection } from './purchaseChain'
+import { isTravelSetByDrill } from './travelSpeed'
 import { visualTierEvents } from './vehicleDebugRules'
 
 export const WORKSHOP_RULES: { readonly buyUpgrade: CommandRule<'buyUpgrade'> } = {
@@ -50,6 +56,7 @@ export function upgradeRefusal(
   return firstRejection([
     () => atBayRejection(state, playerId, 'upgrade'),
     () => unknownUpgradeRejection(upgradeId),
+    () => travelSetByDrillRejection(state, playerId, upgradeId),
     () => upgradeMoneyRejection(state, playerId, upgradeId as UpgradeId),
     () => upgradeReserveRejection(state, playerId, upgradeId as UpgradeId, chain),
   ])
@@ -73,6 +80,15 @@ export function nextUpgradePrice(
 function unknownUpgradeRejection(upgradeId: string): Rejection | null {
   if (isUpgradeId(upgradeId)) return null
   return rejectionOf('unknown_upgrade', `${upgradeId} is not a registered upgrade id`)
+}
+
+function travelSetByDrillRejection(
+  state: AuthorityState,
+  playerId: string,
+  upgradeId: string,
+): Rejection | null {
+  if (upgradeId !== 'engine' || !isTravelSetByDrill(state, playerId)) return null
+  return rejectionOf('max_level', 'the drill sets travel speed: the engine track is maxed')
 }
 
 function upgradeMoneyRejection(

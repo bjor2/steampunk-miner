@@ -3,9 +3,12 @@
  * stored step and its major and pip as text (#180), the next step's cost (`stepPrice`, the same
  * value `upgrade_purchased.cost` logs) and an effect preview "before -> after" from
  * `vehicleStatsAt` at this step and the next (the same function as `upgrade_purchased.statsAfter`). `drill_tip` also says to which band of this planet
- * it drills at full speed (`P >= H`, #7).
+ * it drills at full speed (`P >= H`, #7). The engine reads maxed, the drill setting travel, once
+ * k times the drill's cut speed reaches its top speed (GD lock on #316 scope 0, ticket 333): the
+ * authority then refuses its step, so the row offers no buy.
  */
 import type { AuthorityState } from '../authority/authorityState'
+import { isTravelSetByDrill } from '../authority/travelSpeed'
 import { nextUpgradePrice } from '../authority/workshopRules'
 import { trackIconIdOf } from '../art/artIds'
 import { blockHardness } from '../economy/oreEconomy'
@@ -58,7 +61,7 @@ export interface WorkshopRow {
   label: string
   /** The stored step, `10L + k`. */
   level: number
-  /** "13" at a major, "13 · 4/9" on its pips. */
+  /** "13" at a major, "13 · 4/9" on its pips; the engine says when the drill sets travel. */
   levelText: string
   cost: AmountReading
   effectBefore: StatPreview
@@ -81,6 +84,9 @@ const TRACK_LABELS: Readonly<Record<UpgradeId, string>> = {
   cargo_hold: 'Cargo hold',
   hull: 'Hull',
 }
+
+/** What the engine row says once the drill sets travel (GD lock on #316 scope 0). */
+export const ENGINE_MAXED_TEXT = 'maxed, drill sets travel'
 
 const STATS_OF_TRACK: Readonly<Record<UpgradeId, readonly string[]>> = {
   drill_power: ['drillPower'],
@@ -128,13 +134,13 @@ function workshopRowOf(
     iconId,
     label,
     level: levels[upgradeId],
-    levelText: stepLevelText(levels[upgradeId]),
+    levelText: levelTextOf(state, playerId, levels, upgradeId),
     cost,
     effectBefore: previewOf(levels, upgradeId),
     effectAfter: previewOf(next, upgradeId),
     buy,
     buyState: buyStateOf(buy),
-    badge: null,
+    badge: isEngineMaxed(state, playerId, upgradeId) ? 'maxed' : null,
     isBuyOpen: isBuyOpen(buy),
     fullSpeedBand: upgradeId === 'drill_tip' ? fullSpeedBandOf(state.planet.index, levels) : null,
     card: itemCardOf(state, playerId, {
@@ -147,6 +153,21 @@ function workshopRowOf(
       source: SHOP_SOURCE,
     }),
   }
+}
+
+/** The engine track is maxed while the drill sets travel speed (ticket 333). */
+function isEngineMaxed(state: AuthorityState, playerId: string, upgradeId: UpgradeId): boolean {
+  return upgradeId === 'engine' && isTravelSetByDrill(state, playerId)
+}
+
+function levelTextOf(
+  state: AuthorityState,
+  playerId: string,
+  levels: UpgradeLevels,
+  upgradeId: UpgradeId,
+): string {
+  const text = stepLevelText(levels[upgradeId])
+  return isEngineMaxed(state, playerId, upgradeId) ? `${text} · ${ENGINE_MAXED_TEXT}` : text
 }
 
 function previewOf(levels: UpgradeLevels, upgradeId: UpgradeId): StatPreview {
