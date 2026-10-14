@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "ticket": 351,
+  "title": "Copy: Lode clamp 'On release' label and repulsor coil line (no rubble)",
+  "tier": "easy",
+  "model": "claude-opus-5-5",
+  "created": "2026-10-13T15:13:56Z",
+  "closed": "2026-10-14T02:13:07Z",
+  "segments": [
+    {"category":"idle","start":"2026-10-13T15:13:56.000Z","end":"2026-10-14T02:04:29.000Z","attempt":0,"tier":null,"model":null,"source":"derived"},
+    {"category":"other","start":"2026-10-14T02:04:29.000Z","end":"2026-10-14T02:05:11.330Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"context","start":"2026-10-14T02:05:11.330Z","end":"2026-10-14T02:05:37.888Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"developing","start":"2026-10-14T02:05:37.888Z","end":"2026-10-14T02:05:44.847Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-14T02:05:44.847Z","end":"2026-10-14T02:09:14.900Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"context","start":"2026-10-14T02:09:14.900Z","end":"2026-10-14T02:09:32.647Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"testing","start":"2026-10-14T02:09:32.647Z","end":"2026-10-14T02:09:39.159Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"landing","start":"2026-10-14T02:09:39.159Z","end":"2026-10-14T02:09:53.108Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"planning","start":"2026-10-14T02:09:53.108Z","end":"2026-10-14T02:09:58.873Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"transcript"},
+    {"category":"gates","start":"2026-10-14T02:09:58.873Z","end":"2026-10-14T02:12:55.906Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"},
+    {"category":"landing","start":"2026-10-14T02:12:55.906Z","end":"2026-10-14T02:13:07.000Z","attempt":1,"tier":"easy","model":"claude-opus-5-5","source":"loop-log"}
+  ],
+  "totals": {"blocked":0,"planner_wait":0,"idle":39033,"context":44,"planning":6,"developing":7,"testing":217,"gates":177,"landing":25,"other":42},
+  "lead_time_s": 39551,
+  "cycle_time_s": 518,
+  "claimed": "2026-10-14T02:04:29.000Z",
+  "claimed_to_done_s": 518,
+  "backfilled": false
+}
