@@ -1,30 +1,8 @@
 {
  "schema": 1,
- "updatedAt": "2026-10-14T05:19:36.232Z",
+ "updatedAt": "2026-10-14T07:42:25.959Z",
  "lastRuns": 50,
  "runs": [
-  {
-   "id": 1791359937192,
-   "url": "https://github.com/bjor2/steampunk-miner/commit/efb48ebb63e3f26ff5949567148d00d1bf0a329c",
-   "event": "manual-first-run",
-   "mode": "full",
-   "sha": "efb48ebb63e3f26ff5949567148d00d1bf0a329c",
-   "branch": "main",
-   "startedAt": "2026-10-07T07:58:41Z",
-   "jobConclusion": "failure",
-   "timedOut": false,
-   "jobDurationSec": 16,
-   "source": "box",
-   "phase": "fast",
-   "job": "fast",
-   "feature": null,
-   "tickets": [],
-   "reportFound": true,
-   "files": 0,
-   "tests": 0,
-   "failed": 0,
-   "failedFiles": 0
-  },
   {
    "id": 1791360647956,
    "url": "https://github.com/bjor2/steampunk-miner/commit/ec394b9c212a8db5c4adda88cd82a0edd192790e",
@@ -1182,20 +1160,43 @@
    "tests": 0,
    "failed": 0,
    "failedFiles": 0
+  },
+  {
+   "id": 1791963741723,
+   "url": "https://github.com/bjor2/steampunk-miner/commit/6df895b28d6353eb27a9696b44518a73ac97c309",
+   "event": "nightly",
+   "mode": "nightly",
+   "sha": "6df895b28d6353eb27a9696b44518a73ac97c309",
+   "branch": "main",
+   "startedAt": "2026-10-14T05:19:42Z",
+   "jobConclusion": "failure",
+   "timedOut": false,
+   "jobDurationSec": 8559,
+   "source": "box",
+   "phase": "nightly",
+   "job": "balance-charges",
+   "feature": null,
+   "tickets": [],
+   "reportFound": false,
+   "files": 0,
+   "tests": 0,
+   "failed": 0,
+   "failedFiles": 0
   }
  ],
  "pipeline": {
   "modes": {
-   "full": 10,
    "scoped": 6,
+   "full": 9,
    "nightly-only": 8,
-   "nightly": 26
+   "nightly": 27
   },
   "timedOut": [],
   "withoutReport": [
    1791436229533,
    1791946352423,
-   1791954269859
+   1791954269859,
+   1791963741723
   ],
   "scopingSuspects": []
  },
