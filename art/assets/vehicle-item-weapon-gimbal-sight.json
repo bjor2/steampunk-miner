@@ -1,0 +1,12 @@
+{
+  "id": "vehicle-item-weapon-gimbal-sight",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "gilded-plate": "#e8c25a",
+    "sight-gimbal": "#c9a24b",
+    "sight-scope": "#c9a24b"
+  }
+}

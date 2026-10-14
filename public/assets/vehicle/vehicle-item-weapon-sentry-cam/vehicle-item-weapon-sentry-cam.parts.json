@@ -1,0 +1,90 @@
+{
+  "assetId": "vehicle-item-weapon-sentry-cam",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-sentry-cam/vehicle-item-weapon-sentry-cam.blend",
+    "sha256": "defd69b26f6cc7206b2ecdf970b24024cec1031924aad7d48e615dde23fe9826",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-weapon-sentry-cam.albedo.ktx2",
+    "normal": "vehicle-item-weapon-sentry-cam.normal.ktx2",
+    "emissive": "vehicle-item-weapon-sentry-cam.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "cam-follower",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        10,
+        44
+      ],
+      "sizeM": [
+        0.018,
+        0.085
+      ],
+      "pivotM": [
+        0.009,
+        0.077
+      ],
+      "atM": [
+        0.06,
+        0.08
+      ],
+      "z": 13
+    },
+    {
+      "id": "cam-wheel",
+      "tier": 1,
+      "rect": [
+        34,
+        8,
+        50,
+        41
+      ],
+      "sizeM": [
+        0.0958,
+        0.08
+      ],
+      "pivotM": [
+        0.04,
+        0.04
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 13
+    },
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [
+        8,
+        68,
+        29,
+        16
+      ],
+      "sizeM": [
+        0.056,
+        0.03
+      ],
+      "pivotM": [
+        0.028,
+        0.015
+      ],
+      "atM": [
+        0.0,
+        -0.06
+      ],
+      "z": 14
+    }
+  ]
+}

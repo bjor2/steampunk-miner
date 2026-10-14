@@ -1,0 +1,116 @@
+{
+  "$comment": "Where each Armoury module hangs on its gun (#310 build 5, ticket 321; art #364): Content's mount names, each a point in metres in the gun's barrel frame (origin the trunnion, the barrel at rest), so the modules turn with the barrel they ride. A bore point sits on #362's zones of the real gun (docs/art/bore-gun); the two modules that share a mount were authored to fit side by side at one point (docs/art/armoury). The long barrel's sleeve runs past the crown, so a muzzle module rides out to its end once the long barrel is bought. Turret points are #364's review positions on the auto guns at look 3; a 'muzzle' point counts from the barrel's tip, which moves with the barrel look, and a 'head' point stays on the cupola while the barrel turns. The TD named no ids on #310, so these are mine (as hull.front was ticket 315's), checked against the committed review renders.",
+  "mounts": {
+    "bore.sight": { "gun": "bore", "rides": "barrel", "from": "trunnion", "atM": [0.21, 0.04] },
+    "bore.breech": { "gun": "bore", "rides": "barrel", "from": "trunnion", "atM": [-0.07, 0.0] },
+    "bore.barrel": { "gun": "bore", "rides": "barrel", "from": "trunnion", "atM": [0.09, 0.0] },
+    "bore.muzzle": { "gun": "bore", "rides": "barrel", "from": "trunnion", "atM": [0.33, 0.0] },
+    "bore.magazine": { "gun": "bore", "rides": "barrel", "from": "trunnion", "atM": [0.0, -0.04] },
+    "turret.sight": { "gun": "turret", "rides": "head", "from": "trunnion", "atM": [0.0, 0.09] },
+    "turret.cam": { "gun": "turret", "rides": "head", "from": "trunnion", "atM": [0.12, -0.02] },
+    "turret.barrel": { "gun": "turret", "rides": "barrel", "from": "muzzle", "atM": [0.0, 0.0] },
+    "turret.breech": {
+      "gun": "turret",
+      "rides": "barrel",
+      "from": "trunnion",
+      "atM": [-0.14, 0.0]
+    },
+    "turret.magazine": {
+      "gun": "turret",
+      "rides": "barrel",
+      "from": "trunnion",
+      "atM": [-0.08, -0.14]
+    },
+    "turret.cradle": { "gun": "turret", "rides": "head", "from": "trunnion", "atM": [0.1, 0.08] },
+    "turret.boiler": { "gun": "turret", "rides": "head", "from": "trunnion", "atM": [0.19, -0.06] },
+    "turret.hopper": {
+      "gun": "turret",
+      "rides": "barrel",
+      "from": "trunnion",
+      "atM": [-0.22, 0.05]
+    }
+  },
+  "modules": [
+    {
+      "itemId": "weapon.gimbal_sight",
+      "mount": "bore.sight",
+      "parts": ["gilded-plate", "sight-gimbal", "sight-scope"]
+    },
+    {
+      "itemId": "weapon.steam_sear",
+      "mount": "bore.breech",
+      "parts": ["gilded-plate", "sear-block", "sear-lever"]
+    },
+    {
+      "itemId": "weapon.long_barrel",
+      "mount": "bore.barrel",
+      "parts": ["barrel-sleeve", "gilded-plate"],
+      "extends": { "mount": "bore.muzzle", "byM": [0.23, 0.0] }
+    },
+    {
+      "itemId": "weapon.rifled_bore",
+      "mount": "bore.barrel",
+      "parts": ["gilded-plate", "rifled-jacket"]
+    },
+    {
+      "itemId": "weapon.splay_choke",
+      "mount": "bore.muzzle",
+      "parts": ["gilded-plate", "splay-choke"]
+    },
+    {
+      "itemId": "weapon.earthing_spike",
+      "mount": "bore.muzzle",
+      "parts": ["earthing-spike", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.cementing_round",
+      "mount": "bore.magazine",
+      "parts": ["cement-magazine", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.strut_bore",
+      "mount": "bore.magazine",
+      "parts": ["gilded-plate", "strut-rack"]
+    },
+    {
+      "itemId": "weapon.fire_director",
+      "mount": "turret.sight",
+      "parts": ["director-box", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.sentry_cam",
+      "mount": "turret.cam",
+      "parts": ["cam-follower", "cam-wheel", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.extended_barrels",
+      "mount": "turret.barrel",
+      "parts": ["barrel-extension", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.grapeshot_breech",
+      "mount": "turret.breech",
+      "parts": ["gilded-plate", "grapeshot-breech"]
+    },
+    {
+      "itemId": "weapon.concussion_shells",
+      "mount": "turret.magazine",
+      "parts": ["concussion-box", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.flushing_shell",
+      "mount": "turret.cradle",
+      "parts": ["flushing-cradle", "gilded-plate"]
+    },
+    {
+      "itemId": "weapon.overpressure_burst",
+      "mount": "turret.boiler",
+      "parts": ["gilded-plate", "overpressure-tank"]
+    },
+    {
+      "itemId": "weapon.ricochet_shot",
+      "mount": "turret.hopper",
+      "parts": ["gilded-plate", "ricochet-hopper"]
+    }
+  ]
+}

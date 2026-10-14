@@ -29,6 +29,7 @@ import { BORE_GUN_KIND, boreGunParts } from './systems/boreGunContent'
 import { SHIPPED_BORE_GUN_MODULES, techNodeOf, vehicleItemOf } from './systems/boreGunLane'
 import { BORE_PICKUP_REACTION } from './systems/borePickup'
 import { GROUND_GUN_PROVIDER } from './systems/boreGunProvider'
+import { armouryArtAssets } from './systems/render/armouryMounts'
 import { BORE_GUN_ATTACH_USE, boreGunArtAssets } from './systems/render/boreGunLook'
 import { FIRE_TILE_FEEL } from './systems/render/fireTileFeel'
 import { GUN_BAY_ENTRIES } from './systems/gunBayEntries'
@@ -79,6 +80,8 @@ export const slice: SliceDefinition = {
     r.soundCue(FIRE_TILE_FEEL.refusalClank)
     // The mount and barrel under public/assets/vehicle/ (#214), drawn once the gun is bought.
     r.artAssets(boreGunArtAssets())
+    // Every Armoury module's mount art (#364), hung on its gun once bought (ticket 321).
+    r.artAssets(armouryArtAssets())
     r.attachUse(BORE_GUN_ATTACH_USE)
     r.vehiclePiece({ id: BORE_GUN_PIECE_ID, Piece: BoreGunPiece })
     // steampunkDebug.features['ground-gun'].setLevels(1, 1, 1), .getGun()

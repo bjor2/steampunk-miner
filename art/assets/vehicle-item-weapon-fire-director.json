@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-weapon-fire-director",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "director-box": "#c9a24b",
+    "gilded-plate": "#e8c25a"
+  }
+}

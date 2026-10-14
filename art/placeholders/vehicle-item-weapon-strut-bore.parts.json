@@ -1,0 +1,36 @@
+{
+  "assetId": "vehicle-item-weapon-strut-bore",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-strut-bore/vehicle-item-weapon-strut-bore.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [256, 64],
+  "maps": {
+    "albedo": "vehicle-item-weapon-strut-bore.albedo.ktx2",
+    "normal": "vehicle-item-weapon-strut-bore.normal.ktx2",
+    "emissive": "vehicle-item-weapon-strut-bore.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [158, 8, 29, 16],
+      "sizeM": [0.056, 0.03],
+      "pivotM": [0.028, 0.015],
+      "atM": [0.1, -0.062],
+      "z": 14
+    },
+    {
+      "id": "strut-rack",
+      "tier": 1,
+      "rect": [8, 8, 134, 34],
+      "sizeM": [0.26, 0.066],
+      "pivotM": [0.03, 0.059],
+      "atM": [0.0, 0.0],
+      "z": 13
+    }
+  ]
+}

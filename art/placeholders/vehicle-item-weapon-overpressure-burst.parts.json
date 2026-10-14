@@ -1,0 +1,36 @@
+{
+  "assetId": "vehicle-item-weapon-overpressure-burst",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-overpressure-burst/vehicle-item-weapon-overpressure-burst.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [128, 128],
+  "maps": {
+    "albedo": "vehicle-item-weapon-overpressure-burst.albedo.ktx2",
+    "normal": "vehicle-item-weapon-overpressure-burst.normal.ktx2",
+    "emissive": "vehicle-item-weapon-overpressure-burst.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [80, 8, 29, 16],
+      "sizeM": [0.056, 0.03],
+      "pivotM": [0.028, 0.015],
+      "atM": [0.0, -0.032],
+      "z": 14
+    },
+    {
+      "id": "overpressure-tank",
+      "tier": 1,
+      "rect": [8, 8, 56, 99],
+      "sizeM": [0.1077, 0.193],
+      "pivotM": [0.0747, 0.055],
+      "atM": [0.0, 0.0],
+      "z": 13
+    }
+  ]
+}

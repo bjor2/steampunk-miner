@@ -1,0 +1,36 @@
+{
+  "assetId": "vehicle-item-weapon-grapeshot-breech",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-grapeshot-breech/vehicle-item-weapon-grapeshot-breech.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [64, 128],
+  "maps": {
+    "albedo": "vehicle-item-weapon-grapeshot-breech.albedo.ktx2",
+    "normal": "vehicle-item-weapon-grapeshot-breech.normal.ktx2",
+    "emissive": "vehicle-item-weapon-grapeshot-breech.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [8, 76, 29, 16],
+      "sizeM": [0.056, 0.03],
+      "pivotM": [0.028, 0.015],
+      "atM": [0.0, -0.05],
+      "z": 14
+    },
+    {
+      "id": "grapeshot-breech",
+      "tier": 1,
+      "rect": [8, 8, 34, 52],
+      "sizeM": [0.066, 0.1],
+      "pivotM": [0.03, 0.035],
+      "atM": [0.0, 0.0],
+      "z": 13
+    }
+  ]
+}

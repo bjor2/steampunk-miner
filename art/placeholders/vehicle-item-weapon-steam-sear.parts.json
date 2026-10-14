@@ -1,0 +1,45 @@
+{
+  "assetId": "vehicle-item-weapon-steam-sear",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-steam-sear/vehicle-item-weapon-steam-sear.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [64, 256],
+  "maps": {
+    "albedo": "vehicle-item-weapon-steam-sear.albedo.ktx2",
+    "normal": "vehicle-item-weapon-steam-sear.normal.ktx2",
+    "emissive": "vehicle-item-weapon-steam-sear.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [8, 139, 29, 16],
+      "sizeM": [0.056, 0.03],
+      "pivotM": [0.028, 0.015],
+      "atM": [-0.002, -0.024],
+      "z": 14
+    },
+    {
+      "id": "sear-block",
+      "tier": 1,
+      "rect": [8, 8, 38, 59],
+      "sizeM": [0.074, 0.115],
+      "pivotM": [0.036, 0.04],
+      "atM": [0.0, 0.0],
+      "z": 13
+    },
+    {
+      "id": "sear-lever",
+      "tier": 1,
+      "rect": [8, 83, 10, 40],
+      "sizeM": [0.018, 0.077],
+      "pivotM": [0.009, 0.069],
+      "atM": [0.018, 0.0],
+      "z": 13
+    }
+  ]
+}

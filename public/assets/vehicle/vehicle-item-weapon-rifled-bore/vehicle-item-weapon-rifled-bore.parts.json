@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-weapon-rifled-bore",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-rifled-bore/vehicle-item-weapon-rifled-bore.blend",
+    "sha256": "91ae22fe63dae6e74e39fce7cc49349b62ce1b9a4597536e657282d275640e46",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-weapon-rifled-bore.albedo.ktx2",
+    "normal": "vehicle-item-weapon-rifled-bore.normal.ktx2",
+    "emissive": "vehicle-item-weapon-rifled-bore.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [
+        91,
+        8,
+        29,
+        16
+      ],
+      "sizeM": [
+        0.056,
+        0.03
+      ],
+      "pivotM": [
+        0.028,
+        0.015
+      ],
+      "atM": [
+        0.06,
+        -0.035
+      ],
+      "z": 14
+    },
+    {
+      "id": "rifled-jacket",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        67,
+        51
+      ],
+      "sizeM": [
+        0.1291,
+        0.0991
+      ],
+      "pivotM": [
+        0.0046,
+        0.0496
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 13
+    }
+  ]
+}

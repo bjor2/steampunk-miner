@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-weapon-fire-director",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-fire-director/vehicle-item-weapon-fire-director.blend",
+    "sha256": "30706d7ae7dabc98a71433db55ae684d7df5984601b47c8910366f63217cbf78",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-weapon-fire-director.albedo.ktx2",
+    "normal": "vehicle-item-weapon-fire-director.normal.ktx2",
+    "emissive": "vehicle-item-weapon-fire-director.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "director-box",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        72,
+        21
+      ],
+      "sizeM": [
+        0.14,
+        0.041
+      ],
+      "pivotM": [
+        0.07,
+        0.006
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 13
+    },
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [
+        8,
+        45,
+        29,
+        16
+      ],
+      "sizeM": [
+        0.056,
+        0.03
+      ],
+      "pivotM": [
+        0.028,
+        0.015
+      ],
+      "atM": [
+        0.0,
+        0.05
+      ],
+      "z": 14
+    }
+  ]
+}

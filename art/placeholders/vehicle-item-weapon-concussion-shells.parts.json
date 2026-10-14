@@ -1,0 +1,36 @@
+{
+  "assetId": "vehicle-item-weapon-concussion-shells",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-concussion-shells/vehicle-item-weapon-concussion-shells.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [128, 128],
+  "maps": {
+    "albedo": "vehicle-item-weapon-concussion-shells.albedo.ktx2",
+    "normal": "vehicle-item-weapon-concussion-shells.normal.ktx2",
+    "emissive": "vehicle-item-weapon-concussion-shells.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "concussion-box",
+      "tier": 1,
+      "rect": [8, 8, 49, 50],
+      "sizeM": [0.094, 0.096],
+      "pivotM": [0.047, 0.06],
+      "atM": [0.0, 0.0],
+      "z": 13
+    },
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [73, 8, 29, 16],
+      "sizeM": [0.056, 0.03],
+      "pivotM": [0.028, 0.015],
+      "atM": [0.0, -0.075],
+      "z": 14
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "assetId": "vehicle-item-weapon-extended-barrels",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-extended-barrels/vehicle-item-weapon-extended-barrels.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [128, 128],
+  "maps": {
+    "albedo": "vehicle-item-weapon-extended-barrels.albedo.ktx2",
+    "normal": "vehicle-item-weapon-extended-barrels.normal.ktx2",
+    "emissive": "vehicle-item-weapon-extended-barrels.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "barrel-extension",
+      "tier": 1,
+      "rect": [8, 8, 93, 68],
+      "sizeM": [0.181, 0.1313],
+      "pivotM": [0.175, 0.0657],
+      "atM": [0.0, 0.0],
+      "z": 13
+    },
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [8, 92, 29, 16],
+      "sizeM": [0.056, 0.03],
+      "pivotM": [0.028, 0.015],
+      "atM": [-0.09, 0.0],
+      "z": 14
+    }
+  ]
+}

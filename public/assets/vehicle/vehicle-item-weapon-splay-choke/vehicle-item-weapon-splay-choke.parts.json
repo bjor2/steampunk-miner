@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-weapon-splay-choke",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-splay-choke/vehicle-item-weapon-splay-choke.blend",
+    "sha256": "46926d1ebec9c2cfd93bbc462438448bf4b0c8e488d8d4fd0dc6e2adbf271499",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-weapon-splay-choke.albedo.ktx2",
+    "normal": "vehicle-item-weapon-splay-choke.normal.ktx2",
+    "emissive": "vehicle-item-weapon-splay-choke.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [
+        78,
+        8,
+        29,
+        16
+      ],
+      "sizeM": [
+        0.056,
+        0.03
+      ],
+      "pivotM": [
+        0.028,
+        0.015
+      ],
+      "atM": [
+        0.03,
+        -0.058
+      ],
+      "z": 14
+    },
+    {
+      "id": "splay-choke",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        54,
+        58
+      ],
+      "sizeM": [
+        0.1037,
+        0.1117
+      ],
+      "pivotM": [
+        0.0026,
+        0.0558
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 13
+    }
+  ]
+}

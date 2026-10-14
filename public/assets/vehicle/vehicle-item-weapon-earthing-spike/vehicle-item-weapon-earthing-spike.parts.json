@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-weapon-earthing-spike",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-earthing-spike/vehicle-item-weapon-earthing-spike.blend",
+    "sha256": "048b88ae4d4c41be051cfab4d4ce9970d2bf628244a9f29cc6a6b67820101a1e",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    64
+  ],
+  "maps": {
+    "albedo": "vehicle-item-weapon-earthing-spike.albedo.ktx2",
+    "normal": "vehicle-item-weapon-earthing-spike.normal.ktx2",
+    "emissive": "vehicle-item-weapon-earthing-spike.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "earthing-spike",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        154,
+        43
+      ],
+      "sizeM": [
+        0.3,
+        0.0823
+      ],
+      "pivotM": [
+        0.15,
+        0.0723
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 13
+    },
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [
+        178,
+        8,
+        29,
+        16
+      ],
+      "sizeM": [
+        0.056,
+        0.03
+      ],
+      "pivotM": [
+        0.028,
+        0.015
+      ],
+      "atM": [
+        -0.07,
+        -0.082
+      ],
+      "z": 14
+    }
+  ]
+}

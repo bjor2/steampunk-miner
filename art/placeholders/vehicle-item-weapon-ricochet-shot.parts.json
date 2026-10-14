@@ -1,0 +1,36 @@
+{
+  "assetId": "vehicle-item-weapon-ricochet-shot",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-ricochet-shot/vehicle-item-weapon-ricochet-shot.blend",
+    "sha256": null,
+    "blender": null
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [128, 64],
+  "maps": {
+    "albedo": "vehicle-item-weapon-ricochet-shot.albedo.ktx2",
+    "normal": "vehicle-item-weapon-ricochet-shot.normal.ktx2",
+    "emissive": "vehicle-item-weapon-ricochet-shot.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [78, 8, 29, 16],
+      "sizeM": [0.056, 0.03],
+      "pivotM": [0.028, 0.015],
+      "atM": [0.0, 0.034],
+      "z": 14
+    },
+    {
+      "id": "ricochet-hopper",
+      "tier": 1,
+      "rect": [8, 8, 54, 35],
+      "sizeM": [0.1038, 0.0665],
+      "pivotM": [0.0688, 0.032],
+      "atM": [0.0, 0.0],
+      "z": 13
+    }
+  ]
+}

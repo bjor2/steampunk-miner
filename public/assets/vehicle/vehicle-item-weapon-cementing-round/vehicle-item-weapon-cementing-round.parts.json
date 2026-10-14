@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-weapon-cementing-round",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-cementing-round/vehicle-item-weapon-cementing-round.blend",
+    "sha256": "6a81fad677fd7f097ac5e77a71036807ce2be0163fc2d0f5cb4822e277a256e0",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    128
+  ],
+  "maps": {
+    "albedo": "vehicle-item-weapon-cementing-round.albedo.ktx2",
+    "normal": "vehicle-item-weapon-cementing-round.normal.ktx2",
+    "emissive": "vehicle-item-weapon-cementing-round.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "cement-magazine",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        69,
+        65
+      ],
+      "sizeM": [
+        0.134,
+        0.1257
+      ],
+      "pivotM": [
+        0.0783,
+        0.1157
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 13
+    },
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [
+        8,
+        89,
+        29,
+        16
+      ],
+      "sizeM": [
+        0.056,
+        0.03
+      ],
+      "pivotM": [
+        0.028,
+        0.015
+      ],
+      "atM": [
+        0.0,
+        -0.1
+      ],
+      "z": 14
+    }
+  ]
+}

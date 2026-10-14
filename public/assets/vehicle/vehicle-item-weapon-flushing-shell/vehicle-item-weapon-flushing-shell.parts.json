@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-weapon-flushing-shell",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-flushing-shell/vehicle-item-weapon-flushing-shell.blend",
+    "sha256": "fbc62af933f187ded48cf5967e5e278351f3f788a4a98bf89d59189d553271f0",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    64
+  ],
+  "maps": {
+    "albedo": "vehicle-item-weapon-flushing-shell.albedo.ktx2",
+    "normal": "vehicle-item-weapon-flushing-shell.normal.ktx2",
+    "emissive": "vehicle-item-weapon-flushing-shell.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "flushing-cradle",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        65,
+        31
+      ],
+      "sizeM": [
+        0.125,
+        0.0587
+      ],
+      "pivotM": [
+        0.075,
+        0.02
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 13
+    },
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [
+        89,
+        8,
+        29,
+        16
+      ],
+      "sizeM": [
+        0.056,
+        0.03
+      ],
+      "pivotM": [
+        0.028,
+        0.015
+      ],
+      "atM": [
+        0.0,
+        -0.034
+      ],
+      "z": 14
+    }
+  ]
+}

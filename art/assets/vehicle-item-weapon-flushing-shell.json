@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-weapon-flushing-shell",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "flushing-cradle": "#3b3631",
+    "gilded-plate": "#e8c25a"
+  }
+}

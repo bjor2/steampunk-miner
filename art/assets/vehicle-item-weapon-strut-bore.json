@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-weapon-strut-bore",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "gilded-plate": "#e8c25a",
+    "strut-rack": "#3b3631"
+  }
+}

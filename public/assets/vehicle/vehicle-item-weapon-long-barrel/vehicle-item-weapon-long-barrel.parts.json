@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-weapon-long-barrel",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-weapon-long-barrel/vehicle-item-weapon-long-barrel.blend",
+    "sha256": "3fa28cffeec40835e90c4b1fe22d6770385bbc6f8b32bb7baf8e830f4445acf9",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    256,
+    64
+  ],
+  "maps": {
+    "albedo": "vehicle-item-weapon-long-barrel.albedo.ktx2",
+    "normal": "vehicle-item-weapon-long-barrel.normal.ktx2",
+    "emissive": "vehicle-item-weapon-long-barrel.emissive.ktx2"
+  },
+  "parts": [
+    {
+      "id": "barrel-sleeve",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        175,
+        48
+      ],
+      "sizeM": [
+        0.34,
+        0.0931
+      ],
+      "pivotM": [
+        0.0,
+        0.0466
+      ],
+      "atM": [
+        0.14,
+        0.0
+      ],
+      "z": 13
+    },
+    {
+      "id": "gilded-plate",
+      "tier": 1,
+      "rect": [
+        199,
+        8,
+        29,
+        16
+      ],
+      "sizeM": [
+        0.056,
+        0.03
+      ],
+      "pivotM": [
+        0.028,
+        0.015
+      ],
+      "atM": [
+        0.31,
+        -0.03
+      ],
+      "z": 14
+    }
+  ]
+}

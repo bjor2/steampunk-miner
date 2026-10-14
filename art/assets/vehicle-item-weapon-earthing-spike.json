@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-weapon-earthing-spike",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "earthing-spike": "#b87333",
+    "gilded-plate": "#e8c25a"
+  }
+}
