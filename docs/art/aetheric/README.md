@@ -75,3 +75,12 @@ blender -b --factory-startup --python-exit-code 1 -P docs/art/aetheric/render_ae
   (with the drill hood), 6 for the rest (with the slot items).
 - The rig parts are drawn for the tier-3 hull; on tier 1 and 2 the stack and boilers sit a little
   differently and the TD's attach points absorb that.
+
+## The whistle ships first (#262)
+
+The resonance whistle is exported ahead of the wiring: its item shipped in #262, and the TD on
+#162 wants every item drawn at a power-up slot to ship a model (`assetLint.test.ts`). It is a
+`slot` row of the tech-tree's `techGear.json`, so the rig draws it at its slot's `hull.powerup.n`
+until #265 gives the five parts their own points; the placeholder sidecar was laid out from the
+`.blend` as `author_tech_gear.py` lays out a slot housing, and `art:export` left the source
+unchanged. The other four stay unexported until their items ship.

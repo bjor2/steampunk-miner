@@ -1,0 +1,11 @@
+{
+  "id": "vehicle-item-power-resonance-whistle",
+  "source": "blender",
+  "form": "parts",
+  "status": "final",
+  "color": "#c9a24b",
+  "partColors": {
+    "whistle-body": "#c9a24b",
+    "whistle-lever": "#c9a24b"
+  }
+}

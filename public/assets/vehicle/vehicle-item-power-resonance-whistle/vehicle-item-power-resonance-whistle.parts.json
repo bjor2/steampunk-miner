@@ -1,0 +1,67 @@
+{
+  "assetId": "vehicle-item-power-resonance-whistle",
+  "schema": 1,
+  "source": {
+    "blend": "art/blender/vehicle-item-power-resonance-whistle/vehicle-item-power-resonance-whistle.blend",
+    "sha256": "216f0f4017090a88873f5f187fb97b9f4c8030e3fd1001b2f4ecb9e26580e551",
+    "blender": "4.2.9 LTS"
+  },
+  "pxPerMetre": 512,
+  "atlasPx": [
+    128,
+    256
+  ],
+  "maps": {
+    "albedo": "vehicle-item-power-resonance-whistle.albedo.ktx2",
+    "normal": "vehicle-item-power-resonance-whistle.normal.ktx2",
+    "emissive": false
+  },
+  "parts": [
+    {
+      "id": "whistle-body",
+      "tier": 1,
+      "rect": [
+        8,
+        8,
+        50,
+        116
+      ],
+      "sizeM": [
+        0.0959,
+        0.2249
+      ],
+      "pivotM": [
+        0.0026,
+        0.0208
+      ],
+      "atM": [
+        0.0,
+        0.0
+      ],
+      "z": 3
+    },
+    {
+      "id": "whistle-lever",
+      "tier": 1,
+      "rect": [
+        74,
+        8,
+        31,
+        45
+      ],
+      "sizeM": [
+        0.059,
+        0.0863
+      ],
+      "pivotM": [
+        0.0065,
+        0.0798
+      ],
+      "atM": [
+        0.0676,
+        0.0585
+      ],
+      "z": 3
+    }
+  ]
+}

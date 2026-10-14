@@ -291,6 +291,13 @@
       "parts": [{ "id": "coil-housing" }]
     },
     {
+      "itemId": "power.resonance_whistle",
+      "kind": "slot",
+      "attach": "slot",
+      "assetId": "vehicle-item-power-resonance-whistle",
+      "parts": [{ "id": "whistle-body" }, { "id": "whistle-lever" }]
+    },
+    {
       "itemId": "consumable.flare_mortar",
       "kind": "crate",
       "attach": "hull.rear",

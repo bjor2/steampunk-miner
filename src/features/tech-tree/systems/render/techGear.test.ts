@@ -63,6 +63,7 @@ const PHYSICAL_ITEM_IDS = [
   'power.grav_anchor',
   'power.buoyancy_tanks',
   'power.repulsor_coil',
+  'power.resonance_whistle',
   'consumable.flare_mortar',
   'consumable.stabiliser_foam',
   'consumable.seam_splitter',
