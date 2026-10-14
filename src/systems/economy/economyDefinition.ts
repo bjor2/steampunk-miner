@@ -106,6 +106,19 @@ export interface GeometricCostCurve {
   family: 'geometric'
   base: Money
   ratio: Money
+  /**
+   * Later pieces of the curve, by rising `fromLevel`: from its level on, a piece prices level `L`
+   * at `base * ratio^(L - fromLevel)` (Systems' front-loaded drill rows on ticket 396). Absent, the
+   * whole curve is `base * ratio^L`.
+   */
+  pieces?: readonly GeometricCurvePiece[]
+}
+
+/** One piece of a geometric cost curve: its own base and ratio from `fromLevel` on. */
+export interface GeometricCurvePiece {
+  fromLevel: number
+  base: Money
+  ratio: Money
 }
 
 /**

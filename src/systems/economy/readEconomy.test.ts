@@ -131,6 +131,20 @@ describe('economy data validation', () => {
     expect(problemsOf(broken)).toContain('costCurves[0].ratio must be a decimal string >= 0')
   })
 
+  it('refuses curve pieces that do not start past level 0 and past the piece before (ticket 396)', () => {
+    const broken = economyFileCopy()
+    const pieces = [
+      { fromLevel: 0, base: '1', ratio: '1.5' },
+      { fromLevel: 9, base: '1', ratio: '1.5' },
+      { fromLevel: 9, base: '1', ratio: '1.5' },
+    ]
+    Object.assign(broken.costCurves[0], { pieces })
+    expect(problemsOf(broken)).toEqual([
+      'costCurves[0].pieces[0].fromLevel must be above 0',
+      'costCurves[0].pieces[2].fromLevel must be above 9',
+    ])
+  })
+
   it('refuses pace scale steps that do not climb by planet (#131)', () => {
     const broken = economyFileCopy()
     Object.assign(broken.planets.paceScale, {

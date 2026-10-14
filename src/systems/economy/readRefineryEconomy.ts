@@ -1,10 +1,11 @@
 /**
  * Reads the cost curves and the Refinery bay block of `economy.json` (#6 section 3 curves, #105
- * numbers). A curve is `geometric` (vehicle tracks, casing) or `bandOre` (the refinery's slots);
- * the refinery's slot curve must be a `bandOre` curve pricing exactly the slots past the first.
+ * numbers). A curve is `geometric` (vehicle tracks, casing), maybe in pieces (ticket 396), or
+ * `bandOre` (the refinery's slots); the refinery's slot curve must be a `bandOre` curve pricing
+ * exactly the slots past the first.
  */
 import { readLiteral, type FieldReader } from './economyFieldReader'
-import type { CostCurve, Economy } from './economyDefinition'
+import type { CostCurve, Economy, GeometricCurvePiece } from './economyDefinition'
 
 const COST_CURVE_FAMILIES = ['geometric', 'bandOre'] as const
 
@@ -27,6 +28,38 @@ export function readCostCurve(reader: FieldReader, path: string, value: unknown)
     family,
     base: reader.money(`${path}.base`, curve.base),
     ratio: reader.money(`${path}.ratio`, curve.ratio),
+    ...(curve.pieces === undefined ? {} : { pieces: readPieces(reader, path, curve.pieces) }),
+  }
+}
+
+/** A geometric curve's later pieces, each starting past level 0 and past the one before. */
+function readPieces(reader: FieldReader, path: string, value: unknown): GeometricCurvePiece[] {
+  const pieces = reader
+    .list(`${path}.pieces`, value)
+    .map((piece, index) => readPiece(reader, `${path}.pieces[${index}]`, piece))
+  checkPiecesRise(reader, path, pieces)
+  return pieces
+}
+
+function checkPiecesRise(
+  reader: FieldReader,
+  path: string,
+  pieces: readonly GeometricCurvePiece[],
+): void {
+  pieces.forEach((piece, index) => {
+    const after = index === 0 ? 0 : pieces[index - 1].fromLevel
+    if (piece.fromLevel <= after) {
+      reader.record(`${path}.pieces[${index}].fromLevel must be above ${after}`)
+    }
+  })
+}
+
+function readPiece(reader: FieldReader, path: string, value: unknown): GeometricCurvePiece {
+  const piece = reader.object(path, value)
+  return {
+    fromLevel: reader.safeInteger(`${path}.fromLevel`, piece.fromLevel),
+    base: reader.money(`${path}.base`, piece.base),
+    ratio: reader.money(`${path}.ratio`, piece.ratio),
   }
 }
 
