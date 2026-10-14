@@ -10,7 +10,7 @@ import { ITEM_DESCRIPTION_ENTRY_REGISTRY } from '../../../systems/registries/ite
 import { itemSnapshotViewOf } from '../../../systems/registries/itemSnapshotView'
 import { entriesOf } from '../../../systems/registries/seal'
 import { flavourOf } from './describeItemCard'
-import { COVERAGE_MAX_PLANET, descriptionCoverageProblems } from './descriptionCoverage'
+import { COVERAGE_MAX_PLANET, descriptionCoverageProblems, refNameOf } from './descriptionCoverage'
 import { flavourProblemsOf } from './flavourRules'
 
 const view = itemSnapshotViewOf(
@@ -26,6 +26,10 @@ const DRILL: ItemRef = { kind: 'track', id: 'drill_power' }
 const TIP: ItemRef = { kind: 'track', id: 'drill_tip' }
 const CARD: ItemDescription = { flavour: 'A brass bit.', statLines: [] }
 
+function isPowerItem(ref: ItemRef): boolean {
+  return ref.kind === 'vehicle-item' && ref.id.startsWith('power.')
+}
+
 describe('description coverage', () => {
   it('gives every buyable up to planet 100 a flavour line and at least one stat line', () => {
     const refs = listBuyableRefs(COVERAGE_MAX_PLANET)
@@ -36,6 +40,19 @@ describe('description coverage', () => {
     expect(descriptionCoverageProblems([DRILL], () => null, [])).toEqual([
       'buyable "track:drill_power" has no description',
     ])
+  })
+
+  it('fails every buyable power item that has no card, the sensing fork items among them', () => {
+    const refs = listBuyableRefs(COVERAGE_MAX_PLANET)
+    const powerNames = refs.filter(isPowerItem).map(refNameOf)
+    const describeAllButPower = (ref: ItemRef) =>
+      isPowerItem(ref) ? null : describeOnPlanetOne(ref)
+    expect(powerNames).toEqual(
+      expect.arrayContaining(['vehicle-item:power.diviner_rod', 'vehicle-item:power.scout_pinger']),
+    )
+    expect(descriptionCoverageProblems(refs, describeAllButPower)).toEqual(
+      powerNames.map((name) => `buyable "${name}" has no description`),
+    )
   })
 
   it('fails a description with no stat line', () => {

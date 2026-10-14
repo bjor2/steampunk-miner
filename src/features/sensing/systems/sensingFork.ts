@@ -113,6 +113,11 @@ export function forkMagnitudeAt(itemId: SensingForkItemId, mark: number): number
   return markStepOf(BRANCH_LADDERS[itemId], Math.max(mark, 1)).stats.magnitude ?? 0
 }
 
+/** The item's Mark ladder: what each Mark of the branch's item steps. */
+export function forkLadderOf(itemId: SensingForkItemId): MarkLadder {
+  return BRANCH_LADDERS[itemId]
+}
+
 /** The Diviner's cone length now; null unless the Diviner is the player's active branch. */
 export function divinerLengthOf(state: AuthorityState, playerId: string): number | null {
   if (!isBranchActive(state, playerId, DIVINER_ROD)) return null

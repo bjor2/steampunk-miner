@@ -4,7 +4,8 @@
  * milestone's verb (#256), and the price last. A card at level 0 (an item not yet marked up) reads
  * Mark 1, the item as bought; a line a Mark steps shows the next Mark's value until the item is
  * Mastered, and a fixed line (the wind-up, the echo's radius, the mortar's range) and the price
- * show none. Times read in seconds.
+ * show none. Times read in seconds. The fork's two items file their own cards (ticket 410,
+ * `forkItemCards.ts`) beside these.
  */
 import { TICKS_PER_SECOND } from '../../../constants/physics'
 import { div, fromSafeInteger, type Money } from '../../../systems/money'
@@ -12,6 +13,7 @@ import type { ItemCtx, ItemRef } from '../../../systems/registries/itemDescriber
 import type { ItemDescriptionEntry } from '../../../systems/registries/itemDescriptionEntries'
 import { hasNoNextLevel, type DescribedStatLineSpec } from '../../descriptions'
 import { isMasteredAt, milestoneLineSpecsOf } from '../../tech-tree'
+import { SENSING_FORK_ITEM_CARDS } from './forkItemCards'
 import { sensingItemOf, type SensingItem } from './sensingCatalogue'
 import { SHIPPED_SENSING_ITEMS } from './sensingContent'
 import { itemPriceOf, markLadderOf } from './sensingItems'
@@ -29,7 +31,10 @@ const UNIT_SUFFIX: Readonly<Record<SensingStatUnit, string>> = {
   cells: ' (cells)',
 }
 
-export const SENSING_ITEM_CARDS: readonly ItemDescriptionEntry[] = SHIPPED_SENSING_ITEMS.map(cardOf)
+export const SENSING_ITEM_CARDS: readonly ItemDescriptionEntry[] = [
+  ...SHIPPED_SENSING_ITEMS.map(cardOf),
+  ...SENSING_FORK_ITEM_CARDS,
+]
 
 /** The Mark a card's level names: Mark 1 before any Mark is researched. */
 function markOfLevel(level: number): number {
