@@ -9,9 +9,11 @@
  */
 import type { AuthorityState } from '../../../systems/authority/authorityState'
 import type { DomainEvent } from '../../../systems/authority/domainEvent'
+import type { TilePoint } from '../../../systems/world/tileGrid'
 import { sensingReachAt } from '../../../systems/authority/magnetic/sensingReach'
 import { droppedPinOf, pinAfterPasses, pinsWithBuoy, type BuoyPin } from './buoyPins'
-import { echoMarksOf } from './echoPing'
+import { echoConeTilesOf, twistedDownOf } from './deepStriker'
+import { echoMarksOf, echoMarksOn } from './echoPing'
 import { BUOY_PIN_CAP, REVEAL_MARK_CAP } from './revealBudget'
 import { buoyRepingTicks } from './revealReach'
 import {
@@ -31,6 +33,7 @@ import {
   type RevealPing,
 } from './revealPing'
 import { ECHO_SOUNDER, SIGNAL_BUOY, sensingUsesOf, type SensingUse } from './sensingUses'
+import { tilesWithin } from './tileDisc'
 
 export interface RevealBoard {
   marks: readonly RevealMark[]
@@ -93,15 +96,25 @@ function pingOfUse(use: SensingUse, state: AuthorityState): RevealPing {
   return use.itemId === ECHO_SOUNDER ? echoPingOf(use, state) : flareMapOf(use, state)
 }
 
-/** The ping round its centre, for its reveal time (`revealVerbs.ts`: a milestone, a link). */
+/**
+ * The ping round its centre, for its reveal time (`revealVerbs.ts`: a milestone, a link); with
+ * the Deep Striker held, the cone below it instead (`deepStriker.ts`).
+ */
 function echoPingOf(use: SensingUse, state: AuthorityState): RevealPing {
   const centre = echoCentreOf(use, state)
   return {
     centre,
-    marks: echoMarksOf(state, centre, sensingReachAt(state, centre, echoRadiusOf(use))),
+    marks: echoMarksOn(state, echoTilesOf(use, state, centre)),
     bornTick: use.tick,
     untilTick: echoUntilOf(use),
   }
+}
+
+/** The ring's tiles, or the cone's when the twist is held. */
+function echoTilesOf(use: SensingUse, state: AuthorityState, centre: TilePoint): TilePoint[] {
+  const radius = sensingReachAt(state, centre, echoRadiusOf(use))
+  const down = twistedDownOf(use, state, radius)
+  return down === null ? tilesWithin(centre, radius) : echoConeTilesOf(centre, down, radius)
 }
 
 /** The ring round where the shell lands, mapped for the rest of the trip. */

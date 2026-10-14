@@ -29,7 +29,12 @@ export function echoMarksOf(
   origin: TilePoint,
   radiusTiles: number,
 ): EchoMark[] {
-  return tilesWithin(origin, radiusTiles).flatMap((tile) => markOfTile(state, tile))
+  return echoMarksOn(state, tilesWithin(origin, radiusTiles))
+}
+
+/** Every marked cell among `tiles`, in their order: a ring's, or the Deep Striker's cone. */
+export function echoMarksOn(state: AuthorityState, tiles: readonly TilePoint[]): EchoMark[] {
+  return tiles.flatMap((tile) => markOfTile(state, tile))
 }
 
 function markOfTile(state: AuthorityState, tile: TilePoint): EchoMark[] {
