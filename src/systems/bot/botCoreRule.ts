@@ -8,16 +8,19 @@
  * band 5 started near the 24-tick cap and the #81 sawtooth (band 5 at departure at most 0.7x
  * arrival) could not show. The tip rises 3 levels a planet on curve, so +2 at departure is -1 on
  * the next arrival, and band 5 is already at full efficiency there: the tip lead does not speed
- * band 5 on arrival. At the caps the core digs at 135 ticks a tile on every planet.
+ * band 5 on arrival. At the caps the core digs at 135 ticks a tile on every planet. On planet 1
+ * alone, ticket 396's GD ruling lets drill power lead 5 (json `onCurve.botLeadOnPlanet1`).
  */
 import { TICKS_PER_SECOND } from '../../constants/physics'
 import type { UpgradeId } from '../economy/economyDefinition'
 import { stepOfMajor } from '../economy/upgradeSteps'
-import { onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
+import { botLeadOnPlanet1, onCurveLevel, type UpgradeLevels } from '../economy/vehicleStats'
 import { isCoreDugWithin } from './tripEstimate'
 
 /** #29 Systems & Economy note 3: the core is dug at 0.4 tiles a second (2.5 seconds a tile). */
 const FORCED_DRILL_TICKS_PER_TILE = (5 * TICKS_PER_SECOND) / 2
+
+const FIRST_PLANET = 1
 
 /**
  * Levels past the planet's on-curve level the bot buys, forced or marginal (#86). The tip's cap
@@ -53,6 +56,16 @@ export function isUnderLeadCap(
  * count majors (#180 section 3), so the ceiling is the step of the capped major.
  */
 export function leadCeiling(track: UpgradeId, planetIndex: number): number | null {
-  const lead = LEAD_CAPS[track]
+  const lead = leadOnPlanet(track, planetIndex)
   return lead === undefined ? null : stepOfMajor(onCurveLevel(track, planetIndex) + lead)
+}
+
+/**
+ * Planet 1 may set its own lead in the track's json (ticket 396: drill power leads 5 there, so
+ * the bot buys its way to 10 band-1 cells a second on Systems' cheap early rows); the #86 cap
+ * holds everywhere else.
+ */
+function leadOnPlanet(track: UpgradeId, planetIndex: number): number | undefined {
+  const planetOneLead = planetIndex === FIRST_PLANET ? botLeadOnPlanet1(track) : undefined
+  return planetOneLead ?? LEAD_CAPS[track]
 }

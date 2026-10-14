@@ -124,7 +124,7 @@
       "costCurveId": "cost.vehicle.drill_power",
       "maxLevel": null,
       "effect": { "family": "geometric", "stat": "drillPower", "start": "1.5", "ratio": "1.12" },
-      "onCurve": { "levelAtPlanet1": 13, "levelsPerPlanet": 6 }
+      "onCurve": { "levelAtPlanet1": 13, "levelsPerPlanet": 6, "botLeadOnPlanet1": 5 }
     },
     {
       "id": "drill_tip",

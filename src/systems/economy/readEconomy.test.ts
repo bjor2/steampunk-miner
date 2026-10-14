@@ -131,6 +131,14 @@ describe('economy data validation', () => {
     expect(problemsOf(broken)).toContain('costCurves[0].ratio must be a decimal string >= 0')
   })
 
+  it('refuses a planet 1 bot lead that is not a whole number of majors (ticket 396)', () => {
+    const broken = economyFileCopy()
+    Object.assign(broken.upgrades[0].onCurve, { botLeadOnPlanet1: 2.5 })
+    expect(problemsOf(broken)).toEqual([
+      'upgrades[0].onCurve.botLeadOnPlanet1 must be a safe integer',
+    ])
+  })
+
   it('refuses curve pieces that do not start past level 0 and past the piece before (ticket 396)', () => {
     const broken = economyFileCopy()
     const pieces = [

@@ -141,6 +141,11 @@ export function onCurveLevel(upgradeId: UpgradeId, planetIndex: number): number 
   return levelAtPlanet1 + levelsPerPlanet * (planetIndex - FIRST_PLANET)
 }
 
+/** Majors past on-curve the pacing bot may buy on planet 1, if the track sets one (ticket 396). */
+export function botLeadOnPlanet1(upgradeId: UpgradeId): number | undefined {
+  return upgradeDefOf(ECONOMY.upgrades, upgradeId).onCurve.botLeadOnPlanet1
+}
+
 export function onCurveLevels(planetIndex: number): UpgradeLevels {
   return levelsOf((upgradeId) => onCurveLevel(upgradeId, planetIndex))
 }

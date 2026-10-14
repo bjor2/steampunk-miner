@@ -29,6 +29,7 @@ import {
   type Economy,
   type GeometricEffect,
   type LinearEffect,
+  type OnCurve,
   type SaturatingEffect,
   type UpgradeDef,
   type UpgradeEffect,
@@ -229,8 +230,18 @@ function readUpgrade(reader: FieldReader, path: string, value: unknown): Upgrade
         `${path}.onCurve.levelsPerPlanet`,
         onCurve.levelsPerPlanet,
       ),
+      ...readBotLeadOnPlanet1(reader, `${path}.onCurve`, onCurve.botLeadOnPlanet1),
     },
   }
+}
+
+function readBotLeadOnPlanet1(
+  reader: FieldReader,
+  path: string,
+  value: unknown,
+): Pick<OnCurve, 'botLeadOnPlanet1'> {
+  if (value === undefined) return {}
+  return { botLeadOnPlanet1: reader.safeInteger(`${path}.botLeadOnPlanet1`, value) }
 }
 
 function readUpgradeEffect(reader: FieldReader, path: string, value: unknown): UpgradeEffect {

@@ -85,7 +85,18 @@ export interface UpgradeDef {
   maxLevel: null
   effect: UpgradeEffect
   /** `onCurveLevel(track, p) = levelAtPlanet1 + levelsPerPlanet * (p - 1)` (#6 section 3). */
-  onCurve: { levelAtPlanet1: number; levelsPerPlanet: number }
+  onCurve: OnCurve
+}
+
+export interface OnCurve {
+  levelAtPlanet1: number
+  levelsPerPlanet: number
+  /**
+   * Majors past on-curve the pacing bot buys on planet 1 only, in place of its #86 lead cap
+   * (ticket 396 GD ruling: drill power leads 5 so the bot leaves planet 1 at 10 band-1 cells a
+   * second on Systems' front-loaded rows). Absent, the #86 cap holds on planet 1 as well.
+   */
+  botLeadOnPlanet1?: number
 }
 
 /** A share as a fraction in lowest terms, so the pip rules stay in integers (#180 Systems). */

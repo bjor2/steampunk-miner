@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest'
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
+import { PACING_TARGETS } from '../../constants/pacingTargets'
+import { TICKS_PER_SECOND } from '../../constants/physics'
+import { blockHardness } from '../economy/oreEconomy'
 import { stepOfMajor, stepsOfMajors } from '../economy/upgradeSteps'
-import { onCurveLevels, type UpgradeLevels } from '../economy/vehicleStats'
-import { forcedCoreTrack } from './botCoreRule'
+import {
+  onCurveLevel,
+  onCurveLevels,
+  startLevels,
+  vehicleStatsAt,
+  type UpgradeLevels,
+} from '../economy/vehicleStats'
+import { subStepsPerTile } from '../vehicle/drillRule'
+import { forcedCoreTrack, leadCeiling } from './botCoreRule'
 
 const PLANET = 5
 /** Stricter than the 2.5 seconds a tile the bot plays to: the core is still slow at both caps. */
@@ -37,6 +48,20 @@ describe('bot: the forced core rule (#86)', () => {
         PLANET,
       ),
     ).toBe('drill_power')
+  })
+
+  it('lets drill power lead five majors on planet 1 and one from planet 2 (ticket 396)', () => {
+    expect(leadCeiling('drill_power', 1)).toBe(stepOfMajor(onCurveLevel('drill_power', 1) + 5))
+    expect(leadCeiling('drill_power', 2)).toBe(stepOfMajor(onCurveLevel('drill_power', 2) + 1))
+  })
+
+  it('lets the bot leave planet 1 cutting band 1 at 10 cells a second (ticket 396)', () => {
+    const levels = { ...startLevels(), drill_power: leadCeiling('drill_power', 1)! }
+    const subSteps = subStepsPerTile(vehicleStatsAt(levels), blockHardness(1, 1))!
+    const cellsPerSecond = (DRILL_SUBSTEPS_PER_TICK * TICKS_PER_SECOND) / subSteps
+    expect(cellsPerSecond).toBeGreaterThanOrEqual(
+      PACING_TARGETS.planet1Drill.departureCellsPerSecondMin,
+    )
   })
 
   it('stops buying at both caps while the core is still slow', () => {

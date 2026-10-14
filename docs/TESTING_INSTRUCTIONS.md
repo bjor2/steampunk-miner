@@ -508,8 +508,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   median band-5 departure is over 0.7x arrival on a planet the bot left (`sawtoothMedian.ts`);
   each seed's cell shows its drill_power and drill_tip leads past the curve on arrival and at
   departure (`planetLeads.ts`). The bot holds drill_power to one level past the planet's on-curve
-  level and its forced core rule then buys drill_tip to two past (`bot/botCoreRule.ts`, #86), so a
-  lead above those bounds is a bot bug, not a balance finding. Band 1 already digs at the
+  level (five on planet 1, json `onCurve.botLeadOnPlanet1`, ticket 396) and its forced core rule
+  then buys drill_tip to two past (`bot/botCoreRule.ts`, #86), so a lead above those bounds is a
+  bot bug, not a balance finding. Band 1 already digs at the
   24-tick cap on arrival, so it is printed, never judged. Reported in `balance:planets`; gated on
   planets 1 to 7 by R1 below.
 - **Campaign scaling gate** (R1, #89): `src/logging/campaignPacingGate.test.ts` (nightly only) plays

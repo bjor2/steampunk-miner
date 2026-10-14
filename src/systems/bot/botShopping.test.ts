@@ -57,8 +57,8 @@ describe('bot: shopping at the Upgrade bay', () => {
     expect(session.events().filter((event) => event.type === 'CommandRejected')).toEqual([])
   })
 
-  it('holds drill power to one major past the planet on-curve level (#86, caps count majors)', () => {
-    expect(leadCeiling('drill_power', 1)).toBe(stepOfMajor(onCurveLevel('drill_power', 1) + 1))
+  it('holds drill power to one major past the planet on-curve level from planet 2 (#86, caps count majors)', () => {
+    expect(leadCeiling('drill_power', 2)).toBe(stepOfMajor(onCurveLevel('drill_power', 2) + 1))
     expect(leadCeiling('drill_power', 3)).toBe(stepOfMajor(onCurveLevel('drill_power', 3) + 1))
   })
 
