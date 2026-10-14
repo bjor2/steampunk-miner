@@ -443,7 +443,9 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   (`ui.getRenderStats()`'s `renderScaleFloor`), the #38 budgets at the widest zoom, every HUD and
   bay-screen text at least its 1280 x 800 size times the UI scale, TV mode's 2.22%/2.78% text,
   5.9% controls and 5% safe area, 44 px targets (56 on touch), a focus ring on each control Tab
-  reaches, no art upscaled at the 12 m default, the portrait card, and the touch controls: their
+  reaches, no art upscaled at the 12 m default, a lined casing cell reading at the widest zoom and
+  the render-scale floor (`ui.getDrawnLiningAt`, ticket 315: about 24 px a cell on a phone), the
+  portrait card, and the touch controls: their
   sizes and clearances, taps alone reaching every screen, the cluster following the dock, the
   left-handed mirror, and a stick run pressing the same action stream as its key run
   (`input.getActionStream()`, real touches through CDP). Each cell also writes the #173 look set;

@@ -3,7 +3,9 @@
  * reference screen, the zoom cap and pillarbox, the render-scale floor, the #38 budgets at the
  * widest zoom, text sizes against the reference screen, TV mode's minimums and safe area, target
  * sizes, focus rings, and no art upscaled at the default zoom. Geometry and counts only, read
- * through the DOM and `steampunkDebug`.
+ * through the DOM and `steampunkDebug`. The ground row (ticket 315, Gameplay's test 8 on #309):
+ * a lined cell carries the lined bit and its lining reads at the cell size the widest zoom shows
+ * at the render-scale floor, about 24 px on a phone, by the shader's rule in TS.
  */
 import { expect, test, type Page } from '@playwright/test'
 import {
@@ -35,6 +37,12 @@ const TV_SAFE_SHARE = 0.05
 const LOWEST_TEXELS_PER_METRE = 256
 /** The canvas's device-pixel-ratio cap (#173 "Canvas"). */
 const CANVAS_MAX_DPR = 2
+/** The ring is laid round a bore this far below the docked rig, in mm, under the pad. */
+const LINED_BORE_DROP_MM = 5000
+const LINED_BORE_RADIUS_MM = 900
+const LINED_BORE_GRADE = 2
+/** Tiles either side of the bore's centre searched for its lined wall. */
+const LINED_SEARCH_TILES = 2
 /** A rounding pixel in the browser's layout. */
 const SLACK_PX = 1
 /** Font sizes and boxes round to hundredths of a pixel. */
@@ -196,6 +204,71 @@ test.describe('screen matrix: UI (#173)', () => {
     expect(errors).toEqual([])
   })
 })
+
+test.describe('screen matrix: ground (#173)', () => {
+  test('draws a lined cell that reads at the widest zoom and the render-scale floor (ticket 315)', async ({
+    page,
+  }) => {
+    test.setTimeout(300_000)
+    const cell = currentCell()
+    const errors = await openGame(page, cell)
+    await page.evaluate((floor) => {
+      window.steampunkDebug!.ui.setZoom(20)
+      window.steampunkDebug!.ui.setRenderScale(floor)
+    }, cell.renderScaleFloor)
+    await expect
+      .poll(async () => (await cameraView(page)).viewShortAxisMetres, { timeout: 30_000 })
+      .toBeCloseTo(cell.maxViewShortAxisMetres, 1)
+    const centre = await lineBoreBelowRig(page)
+    const pixelsPerCell =
+      (await cameraView(page)).pixelsPerMetre *
+      Math.min(cell.deviceScaleFactor, CANVAS_MAX_DPR) *
+      cell.renderScaleFloor
+    await expect
+      .poll(() => linedTileNear(page, centre, pixelsPerCell), { timeout: 60_000 })
+      .toMatchObject({ isLined: true, isReadable: true })
+    expect(errors).toEqual([])
+  })
+})
+
+/** Carves a bore below the docked rig and lines it; returns its centre tile. */
+async function lineBoreBelowRig(page: Page): Promise<{ tx: number; ty: number }> {
+  return page.evaluate(
+    ({ drop, radius, grade }) => {
+      const debug = window.steampunkDebug!
+      const snapshot = debug.snapshot()
+      if (!snapshot.ok) throw new Error(snapshot.problems.join('; '))
+      const [player] = Object.values(snapshot.snapshot.state.players)
+      const pose = player.vehicle.pose
+      if (pose === null) throw new Error('the vehicle has no pose')
+      // Down the rig's own up vector (UP_VECTOR_SCALE 1024): the planet is round.
+      const [x, y] = [pose.x - (pose.upx * drop) / 1024, pose.y - (pose.upy * drop) / 1024]
+      for (const result of [debug.carveCircle(x, y, radius), debug.lineCasing(x, y, grade)]) {
+        if (!result.ok) throw new Error(result.problems.join('; '))
+      }
+      return { tx: Math.floor(x / 1000), ty: Math.floor(y / 1000) }
+    },
+    { drop: LINED_BORE_DROP_MM, radius: LINED_BORE_RADIUS_MM, grade: LINED_BORE_GRADE },
+  )
+}
+
+/** The first drawn lined tile round the bore, as the debug read sees it; null while none is. */
+function linedTileNear(page: Page, centre: { tx: number; ty: number }, pixelsPerCell: number) {
+  return page.evaluate(
+    ({ centre, reach, pixelsPerCell }) => {
+      const ui = window.steampunkDebug!.ui
+      for (let dy = -reach; dy <= reach; dy++) {
+        for (let dx = -reach; dx <= reach; dx++) {
+          const read = ui.getDrawnLiningAt(centre.tx + dx, centre.ty + dy, pixelsPerCell)
+          if (!read.ok) throw new Error(read.problems.join('; '))
+          if (read.lining?.isLined === true) return { ...read.lining, pixelsPerCell }
+        }
+      }
+      return null
+    },
+    { centre, reach: LINED_SEARCH_TILES, pixelsPerCell },
+  )
+}
 
 /** TV mode: every text at least 2.22% of the short axis (other text), the strictest common rule. */
 function expectTenFootText(sizes: Record<string, number>, shortAxis: number): void {
