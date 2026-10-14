@@ -32,7 +32,7 @@ Versions mirror `infernal-bistro` (same owner). The game is 2D: an orthographic 
 | `npm run balance:refinery`                | P1-P8 bot with vs without the Refinery bay (#105, logged) |
 | `npm run balance:heat`                    | 3 seeds to P10: heat vs C4 (#113), P8-P10 deaths (#198)   |
 | `npm run balance:money-p200`              | lane: bot to P200, canonical money, 1 MB summary (#340)   |
-| `npm run balance:tree`                    | lane: 3 seeds to P60, tree share of planet spend (#212)   |
+| `npm run balance:tree`                    | lane: 3 seeds to P60, tree spend share, 15% income cap    |
 | `npm run balance:forks`                   | lane: each fork branch forced, 3 seeds to P10 (#255)      |
 | `npm run ore:mix -- --planets 1..60`      | each planet's ore histogram per band vs its mix (#141)    |
 | `npm run bench:world`                     | `generateChunk` p50/p95 per planet (logged, not gated)    |
