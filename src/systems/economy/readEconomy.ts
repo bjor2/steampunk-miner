@@ -167,6 +167,7 @@ function readDrill(reader: FieldReader, drill: Record<string, unknown>): Economy
     denseScratchFloor: reader.money('drill.denseScratchFloor', drill.denseScratchFloor),
     gateScratchFloor: reader.money('drill.gateScratchFloor', drill.gateScratchFloor),
     minTicksPerTile: reader.safeInteger('drill.minTicksPerTile', drill.minTicksPerTile),
+    travelParityK: reader.money('drill.travelParityK', drill.travelParityK),
   }
 }
 

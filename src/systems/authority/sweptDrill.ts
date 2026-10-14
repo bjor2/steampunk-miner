@@ -16,13 +16,16 @@
  *   leaves out the cells its start's disc already reached, and one that made no headway reports
  *   none, so holding the drill against a gate does not repeat it every tick.
  * - The cursor moves to where the cut reached, keeping the step's own position, from which the
- *   next step's bound is measured. Casing rings follow the cut at fixed spacing
- *   (`layCasingAlongCut`).
+ *   next step's bound is measured, and the cut gate read before the cut (`cutFollowRead.ts`,
+ *   ticket 333). Casing rings follow the cut at fixed spacing (`layCasingAlongCut`).
+ * - The stamp's front sits one pose step further ahead than a report's (`sweptDrillStampOf`,
+ *   ticket 333), so this tick's cut always clears the step the body may take next tick.
  */
 import { DENSITY_CELL_UNITS, TERRAIN_EDIT_UNITS_PER_TICK } from '../../constants/terrainBudget'
 import type { DrillBit } from '../vehicle/aheadBearingLatch'
+import type { CutGate } from '../vehicle/cutGate'
 import type { DriveSigns } from '../vehicle/driveSigns'
-import { drillStampOf } from '../vehicle/drillStamp'
+import { sweptDrillStampOf } from '../vehicle/drillStamp'
 import {
   lastClearStep,
   pointAtStep,
@@ -42,6 +45,7 @@ import { isTileYielded, materialCellAt, type WorldState } from '../world/worldSt
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
 import { layCasingAlongCut } from './casingPlacement'
 import { chainEffects, type RuleEffect } from './commandRule'
+import { cutGateAt } from './cutFollowRead'
 import type { DomainEventBody } from './domainEvent'
 import {
   carveStampWithRead,
@@ -63,11 +67,12 @@ export interface SweptStep {
   isLifting: boolean
 }
 
-/** A step's path and the stamp at its end. */
+/** A step's path, the stamp at its end, and the cut gate read before it cuts (ticket 333). */
 interface Sweep {
   step: SweptStep
   stamp: DiscStamp
   path: SweepPath
+  gate: CutGate
 }
 
 /** A sweep's carve and the sub-step it reached, or -1 when a fresh path could cut nothing. */
@@ -91,15 +96,22 @@ export function drillAlongSweep(
   target: TilePoint,
   step: SweptStep,
 ): RuleEffect {
-  const sweep = sweepOf(vehicleOf(state, playerId).sweptCut, step, state.tick)
+  const sweep = sweepOf(state, playerId, step)
   const carve = (request: DrillCarveRequest) => carveSweep(state, params, playerId, sweep, request)
   const outcome = drillGroundBy(state, params, playerId, { tile: target, carve }, 1, SUB_STEP_CLOCK)
   return settleSweep(outcome, playerId, sweep)
 }
 
-function sweepOf(cursor: SweptCut | undefined, step: SweptStep, tick: number): Sweep {
-  const stamp = drillStampOf(step.pose, step.isLifting)
-  return { step, stamp, path: sweepPathOf(cursor, step.pose, stamp, tick) }
+function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Sweep {
+  const stamp = sweptDrillStampOf(step.pose, step.isLifting)
+  const cursor = vehicleOf(state, playerId).sweptCut
+  const { x, y } = step.pose
+  return {
+    step,
+    stamp,
+    path: sweepPathOf(cursor, step.pose, stamp, state.tick),
+    gate: cutGateAt(state, playerId, { x, y, isLifting: step.isLifting, isDrilling: true }),
+  }
 }
 
 function carveSweep(
@@ -208,7 +220,7 @@ function reachedPointOf(path: SweepPath, reachedStep: number): StampPoint {
 function withCursorAt(
   state: AuthorityState,
   playerId: string,
-  { step }: Sweep,
+  { step, gate }: Sweep,
   reached: StampPoint,
 ): AuthorityState {
   const vehicle = vehicleOf(state, playerId)
@@ -218,6 +230,7 @@ function withCursorAt(
     poseYMm: step.pose.y,
     facing: step.pose.facing,
     tick: state.tick,
+    ...gate,
   }
   return withVehicle(state, playerId, { ...vehicle, sweptCut: cursor })
 }

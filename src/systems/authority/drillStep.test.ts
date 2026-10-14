@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_STEP_MM_PER_TICK } from '../../constants/balance'
+import {
+  DRILL_STAMP_AHEAD_MM,
+  MAX_STEP_MM_PER_TICK,
+  SWEPT_STAMP_AHEAD_MM,
+} from '../../constants/balance'
 import { withRegistrations } from '../../registries/registrar'
 import type { SliceDefinition } from '../../registries/sliceDefinition'
 import type { GateOutcome } from '../registries/gateChecks'
@@ -213,14 +217,19 @@ describe('drill step gates (ticket 330, Horizontal Scaler)', () => {
 describe('drill step yield per metre (ticket 330, Vertical Scaler)', () => {
   const top = { x: START.x, y: (SURFACE_TY + 1) * 1000 + 600 }
   const METRES = 8
+  /** The swept stamp's front leads a report's by one pose step (ticket 333). */
+  const REACH_GAIN_MM = SWEPT_STAMP_AHEAD_MM - DRILL_STAMP_AHEAD_MM
 
-  /** The same scripted descent cut by 5 Hz reports alone, or by a step every tick beside them. */
+  /**
+   * The same scripted descent of the stamp cut by 5 Hz reports alone, or by a step every tick
+   * beside them, each step's body held back by the swept stamp's longer reach.
+   */
   function descend(isStepped: boolean, mmPerTick: number) {
     const session = sessionFacingDownAt(top)
     const { payload } = poseAbove({ tx: 0, ty: 0 }, FACING.down, { drillTicks: 12 })
     for (let tick = 1; tick <= (METRES * 1000) / mmPerTick; tick++) {
       const y = top.y - mmPerTick * tick
-      if (isStepped) session.submit(tick, stepTo(top.x, y))
+      if (isStepped) session.submit(tick, stepTo(top.x, y + REACH_GAIN_MM))
       if (tick % 12 !== 0) continue
       session.submit(tick, { type: 'reportPose', payload: { ...payload, x: top.x, y } })
       session.submit(tick, { type: 'debug.setEnergy', payload: { energy: '150' } })
@@ -313,9 +322,11 @@ describe('drill step terrain budget (ticket 330)', () => {
 
   it('stops a sweep over the budget and resumes it next tick until it reaches the stamp', () => {
     const { session, cursors } = catchUpAfterTheGate()
-    const headAtOpening = above.y - MAX_STEP_MM_PER_TICK * OPENS_AT_TICK - 500
+    const headAtOpening = above.y - MAX_STEP_MM_PER_TICK * OPENS_AT_TICK - SWEPT_STAMP_AHEAD_MM
     expect(cursors[1].yMm).toBeGreaterThan(headAtOpening)
-    expect(session.vehicle().sweptCut?.yMm).toBe(above.y - MAX_STEP_MM_PER_TICK * TICKS - 500)
+    expect(session.vehicle().sweptCut?.yMm).toBe(
+      above.y - MAX_STEP_MM_PER_TICK * TICKS - SWEPT_STAMP_AHEAD_MM,
+    )
     const world = session.state().world
     for (let ty = gated.ty - 1; ty > gated.ty - 12; ty--) {
       const tile = { tx: gated.tx, ty }

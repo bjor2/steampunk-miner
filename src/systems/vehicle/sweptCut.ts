@@ -5,8 +5,8 @@
  *
  * - A step continues the cursor's sweep only when the cursor was cut on the tick before, with the
  *   same facing. Otherwise it is fresh: its path runs from the body (the stamp pulled back along
- *   the facing by `DRILL_STAMP_AHEAD_MM`) to the stamp, and it cuts a bare disc where it stops, so
- *   a fresh step with nothing in the way cuts the disc a pose report cuts.
+ *   the facing by `SWEPT_STAMP_AHEAD_MM`) to the stamp, and it cuts a bare disc where it stops:
+ *   with nothing in the way, a report's disc one pose step further ahead (ticket 333).
  * - The stamp's centre is walked along the path, and the sweep stops at the last sub-step before
  *   the centre would enter a cell the drill cannot cut (a gate that refuses or blocks it, or one
  *   past its scratch floor). Cells are 1 m and the stamp's radius 0.95 m, so a centre that never
@@ -14,9 +14,10 @@
  *   the stamp still cuts every other cell up to its face. A fresh path whose body point is already
  *   in such a cell cuts nothing.
  */
-import { DRILL_STAMP_AHEAD_MM } from '../../constants/balance'
+import { SWEPT_STAMP_AHEAD_MM } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
+import type { CutGate } from './cutGate'
 import type { TilePoint } from '../world/tileGrid'
 import { facingVectorOf, tileOfMillimetres, type Facing, type VehiclePose } from './vehiclePose'
 
@@ -25,9 +26,10 @@ export const SWEEP_STEP_MM = 125
 
 /**
  * The vehicle's cursor: where the last drill step's cut reached (the next step's start), the
- * position that step reported (the next step's bound is measured from it), its facing and tick.
+ * position that step reported (the next step's bound is measured from it), its facing and tick,
+ * and the cut gate as that step left it (ticket 333).
  */
-export interface SweptCut extends StampPoint {
+export interface SweptCut extends StampPoint, CutGate {
   poseXMm: number
   poseYMm: number
   facing: Facing
@@ -65,8 +67,8 @@ function isContinuing(cursor: SweptCut | undefined, pose: VehiclePose, tick: num
 function bodyPointOf(stamp: DiscStamp, pose: VehiclePose): StampPoint {
   const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
   return {
-    xMm: stamp.xMm - scaled(ahead.x, DRILL_STAMP_AHEAD_MM),
-    yMm: stamp.yMm - scaled(ahead.y, DRILL_STAMP_AHEAD_MM),
+    xMm: stamp.xMm - scaled(ahead.x, SWEPT_STAMP_AHEAD_MM),
+    yMm: stamp.yMm - scaled(ahead.y, SWEPT_STAMP_AHEAD_MM),
   }
 }
 

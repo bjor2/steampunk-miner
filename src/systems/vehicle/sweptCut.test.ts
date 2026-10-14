@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { DRILL_STAMP_AHEAD_MM } from '../../constants/balance'
+import { SWEPT_STAMP_AHEAD_MM } from '../../constants/balance'
 import { discSamplesOf } from '../world/stampShape'
-import { drillStampOf } from './drillStamp'
+import { CLOSED_CUT_GATE } from './cutGate'
+import { sweptDrillStampOf } from './drillStamp'
 import {
   lastClearStep,
   pointAtStep,
@@ -14,14 +15,14 @@ import { FACING, type VehiclePose } from './vehiclePose'
 
 const POSE: VehiclePose = {
   x: 20_500,
-  y: 296_300,
+  y: 296_700,
   vx: 0,
   vy: 0,
   upx: 0,
   upy: 1024,
   facing: FACING.down,
 }
-const STAMP = drillStampOf(POSE, false)
+const STAMP = sweptDrillStampOf(POSE, false)
 
 /** The cursor a step at tick 9 left 300 mm above this stamp. */
 const CURSOR: SweptCut = {
@@ -31,6 +32,7 @@ const CURSOR: SweptCut = {
   poseYMm: POSE.y + 300,
   facing: FACING.down,
   tick: 9,
+  ...CLOSED_CUT_GATE,
 }
 
 describe('swept cut path (ticket 330)', () => {
@@ -46,7 +48,7 @@ describe('swept cut path (ticket 330)', () => {
     const turned = sweepPathOf({ ...CURSOR, facing: FACING.right }, POSE, STAMP, 10)
     for (const path of [late, turned, sweepPathOf(undefined, POSE, STAMP, 10)]) {
       expect(path.isFresh).toBe(true)
-      expect(path.from).toEqual({ xMm: STAMP.xMm, yMm: STAMP.yMm + DRILL_STAMP_AHEAD_MM })
+      expect(path.from).toEqual({ xMm: STAMP.xMm, yMm: STAMP.yMm + SWEPT_STAMP_AHEAD_MM })
     }
   })
 

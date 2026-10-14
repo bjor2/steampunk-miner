@@ -132,7 +132,9 @@ export function portableVehicleProblems(vehicle: unknown, path: string): string[
       : [`${path}.shockHullBp must be a whole number of basis points, or be left out`]),
     ...(vehicle.sweptCut === undefined || isPortableSweptCut(vehicle.sweptCut)
       ? []
-      : [`${path}.sweptCut must hold safe-integer mm points, a facing and a tick, or be left out`]),
+      : [
+          `${path}.sweptCut must hold safe-integer mm points, a facing, a tick and the cut gate, or be left out`,
+        ]),
   ]
 }
 
@@ -229,7 +231,9 @@ function isPortableSweptCut(cursor: unknown): boolean {
     Number.isSafeInteger(cursor.poseXMm) &&
     Number.isSafeInteger(cursor.poseYMm) &&
     isFacing(cursor.facing as number) &&
-    isWholeNumber(cursor.tick)
+    isWholeNumber(cursor.tick) &&
+    (cursor.cutGate === 0 || cursor.cutGate === 1) &&
+    isWholeNumber(cursor.cutGateLowTicks)
   )
 }
 

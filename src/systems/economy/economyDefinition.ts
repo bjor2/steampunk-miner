@@ -378,6 +378,12 @@ export interface Economy {
     gateScratchFloor: BigStat
     /** The tile speed cap: 2.5 tiles/s at 60 ticks/s is 24 ticks per tile. */
     minTicksPerTile: number
+    /**
+     * Travel parity's k (GD lock on #316 scope 0, ticket 333): away from fresh ground the rig moves
+     * at up to `max(speedMax, k * cutSpeed)` of its drill in the band's nominal rock. Systems may
+     * tune it from 1 to 2.
+     */
+    travelParityK: BigStat
   }
   costCurves: readonly CostCurve[]
   /**

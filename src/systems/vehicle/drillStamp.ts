@@ -11,11 +11,15 @@
  * rounded radius next time, and the tunnel runs level along the planet's curve. Bobbing by less
  * than half a sample changes nothing. With the lift on (`W` + `D`, #40) the whole disc follows the path, so climbing while
  * drilling still cuts a smooth diagonal.
+ *
+ * The swept cut's stamp (ticket 333) is the same disc one pose step further ahead
+ * (`SWEPT_STAMP_AHEAD_MM`), so its nose reach grows with the step.
  */
 import {
   DRILL_STAMP_AHEAD_MM,
   DRILL_STAMP_LIFT_MM,
   DRILL_STAMP_RADIUS_MM,
+  SWEPT_STAMP_AHEAD_MM,
 } from '../../constants/balance'
 import { UP_VECTOR_SCALE, VEHICLE_COLLIDER_SIZE } from '../../constants/physics'
 import { centreDistanceFloorMmOf } from '../world/exactSquares'
@@ -28,12 +32,21 @@ const HALF_BODY_MM = (VEHICLE_COLLIDER_SIZE * 1000) / 2
 const FLOOR_JITTER_MM = 20
 
 export function drillStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
+  return stampAheadBy(pose, isLifting, DRILL_STAMP_AHEAD_MM)
+}
+
+/** The swept cut's stamp: the report's disc with the front one pose step further ahead. */
+export function sweptDrillStampOf(pose: VehiclePose, isLifting: boolean): DiscStamp {
+  return stampAheadBy(pose, isLifting, SWEPT_STAMP_AHEAD_MM)
+}
+
+function stampAheadBy(pose: VehiclePose, isLifting: boolean, aheadMm: number): DiscStamp {
   const ahead = facingVectorOf(pose.upx, pose.upy, pose.facing)
   const isLevelCut = isSideways(pose) && !isLifting
   const lift = isLevelCut ? DRILL_STAMP_LIFT_MM : 0
   return {
-    xMm: pose.x + scaled(ahead.x, DRILL_STAMP_AHEAD_MM) + scaled(pose.upx, lift),
-    yMm: pose.y + scaled(ahead.y, DRILL_STAMP_AHEAD_MM) + scaled(pose.upy, lift),
+    xMm: pose.x + scaled(ahead.x, aheadMm) + scaled(pose.upx, lift),
+    yMm: pose.y + scaled(ahead.y, aheadMm) + scaled(pose.upy, lift),
     radiusMm: DRILL_STAMP_RADIUS_MM,
     floorRadiusMm: isLevelCut ? wheelFloorRadiusOf(pose) : null,
   }

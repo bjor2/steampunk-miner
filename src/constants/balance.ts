@@ -92,6 +92,30 @@ export const MAX_CASING_TRAIL_POINTS = 6
 export const DRILL_SUBSTEPS_PER_TICK = 60
 
 /**
+ * The swept stamp's reach (TD scope 0 on #316, ticket 333): with the swept cut the stamp's front
+ * sits one pose step further ahead than a report's, so this tick's cut always clears the step the
+ * body may take next tick (`MAX_STEP_MM_PER_TICK`, the step bound until #334 derives it).
+ */
+export const SWEPT_STAMP_AHEAD_MM = DRILL_STAMP_AHEAD_MM + MAX_STEP_MM_PER_TICK
+
+/**
+ * The cut-follow (TD scope 0 on #316, ticket 333): while the rig actively cuts, the drill sets its
+ * speed along the facing, and the body reaches that speed, or stops when the drive lets go, within
+ * this many ticks, whatever the engine's `accel`. Gameplay's locked stop time on #316.
+ */
+export const CUT_FOLLOW_TICKS = 6
+
+/**
+ * The "actively cutting" gate (TD scope 0 on #316, ticket 333), on the uncut share of the leading
+ * slab in basis points: on at `CUT_GATE_ON_BP` or more, off once it stays under `CUT_GATE_OFF_BP`
+ * for `CUT_GATE_HOLD_TICKS` consecutive ticks, and never flipped again sooner than that, so a
+ * cell-by-cell dig through mixed caves does not flicker.
+ */
+export const CUT_GATE_ON_BP = 5000
+export const CUT_GATE_OFF_BP = 2500
+export const CUT_GATE_HOLD_TICKS = 6
+
+/**
  * Pose reports go out at most 5 times a second (#11 amendment), every 12 ticks; the authority
  * allows one interval of slack when it checks the action tick counts (#11 amendment 2).
  */

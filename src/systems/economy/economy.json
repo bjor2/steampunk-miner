@@ -42,7 +42,8 @@
     "scratchFloor": "0.25",
     "denseScratchFloor": "1.5",
     "gateScratchFloor": "1",
-    "minTicksPerTile": 24
+    "minTicksPerTile": 24,
+    "travelParityK": "1.5"
   },
   "costCurves": [
     { "id": "cost.vehicle.cargo_hold", "family": "geometric", "base": "24", "ratio": "1.225" },

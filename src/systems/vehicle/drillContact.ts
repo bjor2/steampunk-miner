@@ -65,7 +65,8 @@ export function sweptDrillContactOf(ground: DrillableGround, aim: DrillAim): Dri
   return discSamplesOf(aim.stamp).some(isBiting) ? 'ahead' : 'none'
 }
 
-function isCuttable(ground: DrillableGround, sample: WeightedSample): boolean {
+/** Ground the stamp can still lower at this sample: solid, above its floor, never a wall or lava. */
+export function isCuttable(ground: DrillableGround, sample: WeightedSample): boolean {
   const density = ground.densityAt(sample.sx, sample.sy)
   if (density < ISO_DENSITY || density <= sample.floor || sample.weight === 0) return false
   const tile = {
@@ -86,13 +87,13 @@ function placeOf(aim: DrillAim, sample: WeightedSample): DrillContact {
 }
 
 /** mm from the body's centre to the sample along the facing. */
-function aheadOf(aim: DrillAim, sample: WeightedSample): number {
+export function aheadOf(aim: DrillAim, sample: WeightedSample): number {
   const { dx, dy, scale } = offsetOf(aim, sample)
   return (dx * aim.facing.x + dy * aim.facing.y) / scale
 }
 
 /** mm from the body's centre to the sample across the facing. */
-function acrossOf(aim: DrillAim, sample: WeightedSample): number {
+export function acrossOf(aim: DrillAim, sample: WeightedSample): number {
   const { dx, dy, scale } = offsetOf(aim, sample)
   return (dy * aim.facing.x - dx * aim.facing.y) / scale
 }
