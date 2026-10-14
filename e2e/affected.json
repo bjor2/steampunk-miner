@@ -188,6 +188,17 @@
       "specs": ["e2e/browser/smoke.spec.ts", "e2e/browser/screens/screenLayout.spec.ts"]
     },
     {
+      "why": "The high-speed camera reads the felt speed and the drill's facing (ticket 338).",
+      "paths": [
+        "src/scene/PlanetCamera.tsx",
+        "src/scene/cameraPresence.ts",
+        "src/scene/motionPresence.ts",
+        "src/scene/drillPresence.ts",
+        "src/systems/render/speedFraming.ts"
+      ],
+      "specs": ["e2e/browser/speedCamera.spec.ts"]
+    },
+    {
       "why": "The committed scenarios the specs open with ?scenario=.",
       "paths": ["scenarios/planet1-start.scenario.json", "scenarios/broken.scenario.json"],
       "specs": ["e2e/browser/smoke.spec.ts", "e2e/browser/miningPopup.spec.ts"]
