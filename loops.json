@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-14T09:15:04Z",
+  "updated_at": "2026-10-14T09:15:09Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
@@ -370,9 +370,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "queue run on 8d1eab4 (pass)",
+      "note": "testing spec #145 (Art/VFX: Dynamite sizes and explosion effects) on 8d1eab4",
       "stale_after_min": 420,
-      "updated_at": "2026-10-14T09:15:04Z",
+      "updated_at": "2026-10-14T09:15:09Z",
       "host": "grok-bot-vm-452660841"
     }
   },
