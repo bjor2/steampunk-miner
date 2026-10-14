@@ -204,8 +204,13 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    vehicle's optional `stillSinceTick`), grapeshot's split (a gun tally's optional `energy`),
  *    concussion's knock (the enemy's optional `knockedTick`) and a one-bounce ricochet. With no
  *    provider no field is written and no digest or mined order changes.
+ * 65: Overpressure's toggle (ticket 383, K-burst of the TD lock on #319): `turret.burst {on}`
+ *    (refused `no_guns` or `no_burst`) answers `TurretBurstSet`, keeps the vehicle's optional
+ *    `gunBurst` with the shape's `burst` cycle, and the guns fire at the burst's cadence, then
+ *    idle for its vent. With no burst switched on no field is written and no digest or mined order
+ *    changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 64
+export const AUTHORITY_PROTOCOL_VERSION = 65
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
