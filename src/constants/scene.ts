@@ -124,6 +124,27 @@ export const CAMERA_POSITION: readonly [number, number, number] = [0, 0, 20]
  */
 export const CAMERA_TURN_SECONDS = 0.3
 
+/**
+ * The high-speed camera law (#316 GD lock 6049839104 of Gameplay's 6049828174, ticket 338). The
+ * felt speed `vCam` is the rig's speed along the drive, an exponential average over 0.5 s. The rig
+ * leans toward the trailing edge by `f = clamp((vCam - 3) / 12, 0, 0.6)` of the half short axis,
+ * eased over 0.4 s, so the ground ahead is `h (1 + f)`. The view pulls back to the short axis
+ * `2 vCam T_warn / (1 + f)` with `T_warn` 1 s, never under the player's zoom nor over the screen
+ * shape's cap: easing out over 0.5 s and in over 1 s, and only once the need has stayed lower for
+ * 1 s, so stop-start digging does not make the camera breathe. Placeholders, tuned by eye.
+ */
+export const SPEED_FRAMING = {
+  feltSpeedSeconds: 0.5,
+  leadStartCellsPerSecond: 3,
+  leadSpanCellsPerSecond: 12,
+  leadMaxShare: 0.6,
+  leadEaseSeconds: 0.4,
+  warnSeconds: 1,
+  pullOutEaseSeconds: 0.5,
+  pullInEaseSeconds: 1,
+  pullInHoldSeconds: 1,
+} as const
+
 /** The reference machine's screen (#4): budgets are stated at this size. */
 export const REFERENCE_VIEWPORT = { width: 1280, height: 800 } as const
 
