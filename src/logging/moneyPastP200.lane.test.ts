@@ -10,7 +10,10 @@ import { playSliceIntoSink } from './sliceRunLog'
 // bot scenario to planet 200's core, where prices are near 1e104, headless and with no command
 // log, and writes a summary log of one line a planet (about 1 MB at most, apart from the
 // first-hour 4 MB gate). Its gate: every money field it logged is canonical text (#5), checked
-// against the schema as each event arrives. Its largest price and income are printed. The run
+// against the schema as each event arrives. Its largest price and income are printed. It also
+// holds the per-tick authority cost budget at P200 (ticket 334, replacing the P100 acceptance of
+// #316 scope b): the process's CPU time over game ticks, bot planning included, so an upper bound
+// on what the authority spends a tick, stays inside the TD's 2 ms slice. The run
 // takes hours, so it is a lane: vite.config.ts leaves it out unless it is named,
 //   npx vitest run src/logging/moneyPastP200.lane.test.ts   (or npm run balance:money-p200)
 const LANE = 'money-p200'
@@ -19,22 +22,26 @@ const LAST_PLANET = 200
 const BUDGET_TICKS = LAST_PLANET * 2 * 60 * 60 * TICKS_PER_SECOND
 /** The TD's budget for the lane's summary log: about 1 MB. */
 const SUMMARY_BUDGET_BYTES = 1_000_000
+/** The TD's per-tick authority slice (#316 scope b: "about 2 ms or 32 density cells"), in µs. */
+const AUTHORITY_TICK_BUDGET_MICROS = 2_000
 const RUN_TIMEOUT_MS = 8 * 60 * 60 * 1000
 const SCENARIO_FILE = new URL('../../scenarios/bot-slice.scenario.json', import.meta.url)
 const REPORT_FOLDER = new URL('../../balance-report/', import.meta.url)
 
 describe('money lane: the pacing bot to planet 200', () => {
   it(
-    'logs only canonical money to planet 200 in a summary log of about 1 MB',
+    'logs only canonical money to planet 200 in a summary log of about 1 MB, inside the tick budget',
     () => {
       const scenario = JSON.parse(readFileSync(SCENARIO_FILE, 'utf8')) as Scenario
       const [worldSeed] = PACING_WORLD_SEEDS['bot-slice']
       const fold = startMoneyLaneFold()
+      const cpuBefore = process.cpuUsage()
       const run = playSliceIntoSink(
         { ...scenario, worldSeed },
         { append: fold.add, appendCommand: () => undefined },
         { lastPlanet: LAST_PLANET, maxTicks: BUDGET_TICKS },
       )
+      const microsPerTick = cpuMicrosSince(cpuBefore) / Math.max(1, run.state.tick)
       const summary = fold.summarize()
       const text = moneyLaneNdjsonOf(
         {
@@ -50,12 +57,19 @@ describe('money lane: the pacing bot to planet 200', () => {
       mkdirSync(REPORT_FOLDER, { recursive: true })
       writeFileSync(new URL(`${LANE}.ndjson`, REPORT_FOLDER), text)
       console.log(
-        `${LANE}: seed ${worldSeed}, ended on planet ${run.state.planet.index} (finished: ${run.isFinished}); largest price ${summary.largestPrice}, largest income ${summary.largestIncome}, largest amount ${summary.largestMoney}; ${Buffer.byteLength(text)} bytes`,
+        `${LANE}: seed ${worldSeed}, ended on planet ${run.state.planet.index} (finished: ${run.isFinished}); largest price ${summary.largestPrice}, largest income ${summary.largestIncome}, largest amount ${summary.largestMoney}; ${Buffer.byteLength(text)} bytes; ${Math.round(microsPerTick)} µs CPU a tick`,
       )
       expect(summary.problems).toEqual([])
       expect(run.isFinished).toBe(true)
       expect(Buffer.byteLength(text)).toBeLessThanOrEqual(SUMMARY_BUDGET_BYTES)
+      expect(microsPerTick).toBeLessThanOrEqual(AUTHORITY_TICK_BUDGET_MICROS)
     },
     RUN_TIMEOUT_MS,
   )
 })
+
+/** CPU time, not wall time, so a loaded shared box does not count other processes' work. */
+function cpuMicrosSince(before: NodeJS.CpuUsage): number {
+  const { user, system } = process.cpuUsage(before)
+  return user + system
+}
