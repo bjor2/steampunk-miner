@@ -2,7 +2,8 @@
  * The keyboard keys a binding may name (#33 section 2): `KeyboardEvent.code` values, so a binding
  * is a physical key and works on any layout, plus a `Shift+` chord for `Shift+Tab`. Labels fall
  * back to the code when the browser gives no layout map; the shell can add that later without
- * changing a binding.
+ * changing a binding. The mouse buttons pressed on the game canvas are codes here too
+ * (`MouseLeft`/`MouseRight`, ticket 345), so binding, rebinding and release reuse the key path.
  */
 
 const SHIFT_PREFIX = 'Shift+'
@@ -53,6 +54,8 @@ const NAMED_LABELS: Readonly<Record<string, string>> = {
   NumpadDivide: 'Num /',
   NumpadDecimal: 'Num .',
   NumpadEnter: 'Num Enter',
+  MouseLeft: 'Left Mouse',
+  MouseRight: 'Right Mouse',
 }
 
 const KEY_CODES: ReadonlySet<string> = new Set([

@@ -31,6 +31,18 @@ describe('preferences file', () => {
     })
   })
 
+  it('reads back a rebinding to a mouse button (#345)', () => {
+    const prefs = {
+      ...DEFAULT_PREFERENCES,
+      bindings: { fire_ground_gun: { keyboard: ['MouseRight'] } },
+    }
+    expect(readPreferences(preferencesText(prefs))).toEqual({
+      prefs,
+      problems: [],
+      bindingsReset: [],
+    })
+  })
+
   it('reads a file from before the seen-set as one with nothing seen', () => {
     const { seenHints: _seen, ...older } = DEFAULT_PREFERENCES
     const text = JSON.stringify({ preferencesVersion: 1, ...older, shake: false })

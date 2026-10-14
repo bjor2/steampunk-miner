@@ -76,6 +76,14 @@
       "gamepad": ["PadRS"]
     },
     {
+      "id": "fire_ground_gun",
+      "displayName": "Fire bore gun",
+      "contexts": ["vehicle"],
+      "kind": "press",
+      "keyboard": ["MouseLeft", "KeyX"],
+      "gamepad": ["PadRT"]
+    },
+    {
       "id": "plant_charge",
       "displayName": "Plant charge",
       "contexts": ["vehicle"],

@@ -74,11 +74,37 @@ describe('action map', () => {
     expect([bindings.use_drill_flank, bindings.use_drill_collar]).toEqual([['KeyF'], ['KeyC']])
     expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'KeyF')).toEqual(['use_drill_flank'])
     expect(actionsOfChord(ACTION_MAP, bindings, 'platform', 'KeyC')).toEqual([])
-    const rebound = bindingsWithOverrides(ACTION_MAP, { use_drill_collar: { keyboard: ['KeyX'] } })
+    const rebound = bindingsWithOverrides(ACTION_MAP, { use_drill_collar: { keyboard: ['KeyJ'] } })
     expect(rebound.problems).toEqual([])
-    expect(actionsOfChord(ACTION_MAP, rebound.bindings, 'vehicle', 'KeyX')).toEqual([
+    expect(actionsOfChord(ACTION_MAP, rebound.bindings, 'vehicle', 'KeyJ')).toEqual([
       'use_drill_collar',
     ])
+  })
+
+  it('fires the bore gun with the left mouse button or X while driving, a press (#345)', () => {
+    const bindings = defaultBindings(ACTION_MAP)
+    expect(bindings.fire_ground_gun).toEqual(['MouseLeft', 'KeyX'])
+    expect(ACTION_MAP.actions.find((action) => action.id === 'fire_ground_gun')?.kind).toBe('press')
+    expect(actionsOfChord(ACTION_MAP, bindings, 'vehicle', 'MouseLeft')).toEqual([
+      'fire_ground_gun',
+    ])
+    expect(actionsOfChord(ACTION_MAP, bindings, 'platform', 'MouseLeft')).toEqual([])
+    expect(boundLabel(bindings, 'fire_ground_gun')).toBe('Left Mouse')
+  })
+
+  it('rebinds an action to a mouse button and refuses a mouse button it does not know', () => {
+    const rebound = bindingsWithOverrides(ACTION_MAP, {
+      plant_charge: { keyboard: ['MouseRight'] },
+    })
+    expect(rebound.problems).toEqual([])
+    expect(actionsOfChord(ACTION_MAP, rebound.bindings, 'vehicle', 'MouseRight')).toEqual([
+      'plant_charge',
+    ])
+    expect(boundLabel(rebound.bindings, 'plant_charge')).toBe('Right Mouse')
+    const refused = bindingsWithOverrides(ACTION_MAP, {
+      plant_charge: { keyboard: ['MouseMiddle'] },
+    })
+    expect(refused.problems).toEqual(['plant_charge: "MouseMiddle" is not a known key code'])
   })
 
   it('never lets Space lift: in the vehicle it docks, on a menu it confirms', () => {

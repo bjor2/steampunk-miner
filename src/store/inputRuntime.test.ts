@@ -16,7 +16,9 @@ import {
   useGameStore,
 } from './gameStore'
 import {
+  isActionDown,
   pressAction,
+  pressCountOf,
   readActionStream,
   readVehicleIntent,
   releaseAction,
@@ -573,5 +575,66 @@ describe('input runtime: slot release (ticket 332)', () => {
       }),
     )
     expect(types).toEqual(['requestRescue', 'quickService'])
+  })
+})
+
+// The bore gun's fire key is a press the slice's frame loop reads while held (ticket 345, the
+// #314 TD lock section 2); with no ground-gun slice registered nothing answers it.
+describe('input runtime: held presses for the slices (ticket 345)', () => {
+  it('keeps a pressed action down until its key comes up, and counts each press once', () => {
+    routeKeyChange(key('KeyX', true))
+    routeKeyChange(key('KeyX', true, { isRepeat: true }))
+    expect([isActionDown('fire_ground_gun'), pressCountOf('fire_ground_gun')]).toEqual([true, 1])
+    routeKeyChange(key('KeyX', false))
+    routeKeyChange(key('KeyX', true))
+    expect([isActionDown('fire_ground_gun'), pressCountOf('fire_ground_gun')]).toEqual([true, 2])
+  })
+
+  it('counts a tap that comes up before the next frame reads it', () => {
+    tap('fire_ground_gun')
+    expect([isActionDown('fire_ground_gun'), pressCountOf('fire_ground_gun')]).toEqual([false, 1])
+  })
+
+  it('presses with the left mouse button on the canvas as with a key', () => {
+    routeKeyChange(key('MouseLeft', true))
+    expect(isActionDown('fire_ground_gun')).toBe(true)
+    routeKeyChange(key('MouseLeft', false))
+    expect(isActionDown('fire_ground_gun')).toBe(false)
+  })
+
+  it('lets go of a press whose button comes up after docking, so fire never sticks', () => {
+    routeKeyChange(key('MouseLeft', true))
+    tap('interact')
+    expect(game().vehicle.mode).toBe('docked')
+    routeKeyChange(key('MouseLeft', false))
+    expect(isActionDown('fire_ground_gun')).toBe(false)
+  })
+
+  it('neither downs nor counts a press outside its layer', () => {
+    dockAtStart()
+    routeKeyChange(key('MouseLeft', true))
+    expect([isActionDown('fire_ground_gun'), pressCountOf('fire_ground_gun')]).toEqual([false, 0])
+  })
+
+  it('sends and logs nothing for a held fire with no gun to answer it', () => {
+    const types = withRegistrations([], () =>
+      submittedDuring(() => {
+        routeKeyChange(key('MouseLeft', true))
+        routeKeyChange(key('MouseLeft', false))
+      }),
+    )
+    expect(types).toEqual([])
+    expect(sink.events).toEqual([])
+    expect(edgesOf()).toEqual(['fire_ground_gun+'])
+  })
+
+  it('leaves the slot key-up stream as it was beside a held fire', () => {
+    withRegistrations([RELEASE_PROBE], () => {
+      routeKeyChange(key('MouseLeft', true))
+      routeKeyChange(key('Digit3', true))
+      routeKeyChange(key('Digit3', false))
+      routeKeyChange(key('MouseLeft', false))
+    })
+    expect(edgesOf()).toEqual(['fire_ground_gun+', 'use_slot_3+', 'use_slot_3-'])
   })
 })

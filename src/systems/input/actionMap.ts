@@ -37,6 +37,9 @@ export const ACTION_IDS = [
   'toggle_guns',
   // The bore gun's auto mode (ticket 317, #310): answered once the steam sear is researched.
   'toggle_auto_fire',
+  // The bore gun's fire (ticket 345, the #314 TD lock section 2): a press routed to the ground-gun
+  // slice's input reaction; the slice reads `isActionDown`/`pressCountOf` for repeat-fire.
+  'fire_ground_gun',
   'plant_charge',
   'next_charge_size',
   'ui_up',

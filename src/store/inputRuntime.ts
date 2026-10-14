@@ -14,6 +14,11 @@
  * A gamepad (ticket 346) takes the same path under its own codes: `padRuntime` turns each polled
  * frame into pad changes, and a pad change presses through the pad bindings exactly as a key does
  * through the keys, so rebinding, Start cancelling a capture and the any-layer release hold alike.
+ *
+ * Which actions are down, and how many presses each had, is kept for the slices' frame loops
+ * (ticket 345, the #314 TD lock section 2): the ground gun repeats its fire while its press is
+ * held, and a press count catches a tap shorter than a frame. Release clears it on any layer, as
+ * it sends a release, so a key let go after docking never leaves the gun firing.
  */
 import type { KeyChange, ScrollNotch } from '../shell/shell'
 import { ACTION_MAP, actionDefOf, actionsOfChord, type ActionId } from '../systems/input/actionMap'
@@ -43,6 +48,9 @@ const heldActions: ActionId[] = []
 const actionsOfKey = new Map<string, ActionId[]>()
 /** Every key and pad code down now, whatever layer it pressed in: a held drive counts on a dock screen. */
 const keysDown = new Set<string>()
+/** Every action pressed in its layer and not released since, on any layer (ticket 345). */
+const actionsDown = new Set<ActionId>()
+const pressCounts = new Map<ActionId, number>()
 /** The vehicle's held drive actions (#170: holding one leaves the Workshop showcase). */
 const DRIVE_ACTIONS: readonly ActionId[] = ['aim_left', 'aim_right', 'aim_down', 'lift']
 
@@ -101,12 +109,14 @@ export function pressAction(action: ActionId): void {
   if (!actionDefOf(ACTION_MAP, action).contexts.includes(inputLayerOf(game))) return
   game.releaseHoldUntilPlay()
   recordEdge(action, true)
+  markActionDown(action)
   if (actionDefOf(ACTION_MAP, action).kind === 'hold') return holdAction(action)
   applyReaction(reactionToPress(action, situationNow()))
 }
 
 /** An action comes up: a held one leaves the intent, a pressed one sends its release, if any. */
 export function releaseAction(action: ActionId): void {
+  actionsDown.delete(action)
   if (actionDefOf(ACTION_MAP, action).kind === 'hold') return letGoOfAction(action)
   sendReleaseOf(action)
 }
@@ -117,6 +127,16 @@ export function releaseAction(action: ActionId): void {
  */
 export function readActionStream(): readonly ActionEdge[] {
   return actionStream
+}
+
+/** Whether the action is down now: pressed in its layer and not yet released (ticket 345). */
+export function isActionDown(action: ActionId): boolean {
+  return actionsDown.has(action)
+}
+
+/** How many times the action went down since input was reset; a reader keeps the count it saw. */
+export function pressCountOf(action: ActionId): number {
+  return pressCounts.get(action) ?? 0
 }
 
 /** What the fixed step drives with: idle whenever a menu layer is on top. */
@@ -139,6 +159,8 @@ export function resetInput(): void {
   actionsOfKey.clear()
   actionStream.length = 0
   keysDown.clear()
+  actionsDown.clear()
+  pressCounts.clear()
 }
 
 function rememberCode(code: string, isDown: boolean): void {
@@ -151,6 +173,11 @@ function noticePlayFromDevice(): void {
   useGameStore.getState().releaseHoldUntilPlay()
   useGameStore.getState().dismissTransmission()
   useGameStore.getState().hideTouchControls()
+}
+
+function markActionDown(action: ActionId): void {
+  actionsDown.add(action)
+  pressCounts.set(action, pressCountOf(action) + 1)
 }
 
 function holdAction(action: ActionId): void {
