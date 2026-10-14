@@ -479,6 +479,25 @@ The `planet-mix` slice registers the one asset through `r.artAssets` (#214).
 - `scripts/art/author_magnetic_field.py` wrote the first version of the `.blend`. From then on it
   is the source. The review renders are in [docs/art/magnetic/](art/magnetic/README.md).
 
+## The bore gun mount
+
+The art of the bore gun on the rig ([#362](https://github.com/bjor2/steampunk-miner/issues/362),
+the art half of [#315](https://github.com/bjor2/steampunk-miner/issues/315), for the GD decision
+on [#309](https://github.com/bjor2/steampunk-miner/issues/309)). Sources and review renders only:
+nothing exports, lists or registers it yet. The wiring (#315) gives it the TD's attach id (#314,
+#250, #235), exports it and registers it through `r.artAssets` (#214) for the `ground-gun` slice.
+
+| Id                 | Source         | What the build will draw                                                                 |
+| ------------------ | -------------- | ---------------------------------------------------------------------------------------- |
+| `vehicle-bore-gun` | Blender, parts | `t1-bore-mount` at the attach point; `t1-bore-barrel` on its trunnion, turned to the aim |
+
+- Authored in its own frame with the mounting point at the origin (K5), the barrel's pivot at the
+  trunnion (0, -0.108) and its rest pose along +X, the facing bearing; the code turns it down
+  through the #309 arc. The barrel's sight, breech, tube, muzzle and drum are where the #310
+  modules' `bore.*` mounts go.
+- `scripts/art/author_bore_gun.py` wrote the first version of the `.blend`. From then on it is
+  the source. The review renders are in [docs/art/bore-gun/](art/bore-gun/README.md).
+
 ## The `parts.json` sidecar, schema 1
 
 ```json
