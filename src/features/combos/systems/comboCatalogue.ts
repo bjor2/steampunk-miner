@@ -24,6 +24,11 @@ export interface ComboItem {
   /** The two capability nodes it combines, one in each lane. */
   parents: readonly [string, string]
   /**
+   * The store items those nodes unlock, in the same order: what a grade needs owned (GD lock on
+   * #206, decision 7) and whose current values the card shows (decision 8).
+   */
+  parentItemIds: readonly [string, string]
+  /**
    * Counts in the trip's `incomeItemValue` under the hard 15% clamp (#162 4.5; GD on ticket 206,
    * 7 Oct: the lodestone drain and the lens corer too).
    */
@@ -48,6 +53,7 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     description: 'The lens guides the drain leads to the richest seams first.',
     lanes: ['sensing', 'extraction'],
     parents: ['tech.sensing.assay_lens', 'tech.extraction.mineral_drain'],
+    parentItemIds: ['passive.assay_lens', 'power.mineral_drain'],
     isIncomeCombo: true,
     node: { id: 'tech.combo.assay_drain', iconId: 'node-combo-assay-drain', unlockTier: 15 },
   },
@@ -58,6 +64,7 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     description: "The sounder's echo tells the shifter coil where the ore lies thickest.",
     lanes: ['sensing', 'terrain'],
     parents: ['tech.sensing.echo_sounder', 'tech.terrain.ore_shifter'],
+    parentItemIds: ['power.echo_sounder', 'power.ore_shifter'],
     isIncomeCombo: false,
     node: {
       id: 'tech.combo.magnetic_survey',
@@ -72,6 +79,7 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     description: 'Nozzles on the flank cutters lay setting foam behind each cut.',
     lanes: ['terrain', 'drill-gear'],
     parents: ['tech.terrain.stabiliser_foam', 'tech.drill_gear.side_cutters'],
+    parentItemIds: ['consumable.stabiliser_foam', 'gear.side_cutters'],
     isIncomeCombo: false,
     node: { id: 'tech.combo.foam_cutters', iconId: 'node-combo-foam-cutters', unlockTier: 21 },
   },
@@ -82,6 +90,7 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     description: 'The periscope trips a valve and the steam curtain rises unbidden.',
     lanes: ['sensing', 'mobility'],
     parents: ['tech.sensing.threat_periscope', 'tech.mobility.steam_shield'],
+    parentItemIds: ['passive.threat_periscope', 'power.steam_shield'],
     isIncomeCombo: false,
     node: { id: 'tech.combo.alarm_shield', iconId: 'node-combo-alarm-shield', unlockTier: 24 },
   },
@@ -92,6 +101,7 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     description: 'Drain leads threaded down a corer bore tap a distant seam.',
     lanes: ['drill-gear', 'extraction'],
     parents: ['tech.drill_gear.sampling_corer', 'tech.extraction.mineral_drain'],
+    parentItemIds: ['gear.sampling_corer', 'power.mineral_drain'],
     isIncomeCombo: true,
     node: { id: 'tech.combo.cored_drain', iconId: 'node-combo-cored-drain', unlockTier: 28 },
   },
@@ -102,6 +112,7 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     description: "The beacon's gathered vein feeds the drain leads from across the field.",
     lanes: ['extraction', 'terrain'],
     parents: ['tech.extraction.mineral_drain', 'tech.terrain.lodestone_beacon'],
+    parentItemIds: ['power.mineral_drain', 'consumable.lodestone_beacon'],
     isIncomeCombo: true,
     node: null,
   },
@@ -112,6 +123,7 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     description: 'The assay prism steers the corer toward the richest glint in reach.',
     lanes: ['sensing', 'drill-gear'],
     parents: ['tech.sensing.assay_lens', 'tech.drill_gear.sampling_corer'],
+    parentItemIds: ['passive.assay_lens', 'gear.sampling_corer'],
     isIncomeCombo: true,
     node: null,
   },
@@ -122,6 +134,7 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     description: 'A foam charge on the hook sets hard in open air and holds the line.',
     lanes: ['terrain', 'mobility'],
     parents: ['tech.terrain.stabiliser_foam', 'tech.mobility.grapple_winch'],
+    parentItemIds: ['consumable.stabiliser_foam', 'power.grapple_winch'],
     isIncomeCombo: false,
     node: null,
   },
@@ -132,6 +145,7 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
     description: 'The winch takes up the tether line and hauls the aether lump home.',
     lanes: ['extraction', 'mobility'],
     parents: ['tech.extraction.aether_tether', 'tech.mobility.grapple_winch'],
+    parentItemIds: ['rig.aether_tether', 'power.grapple_winch'],
     isIncomeCombo: false,
     node: null,
   },
@@ -143,13 +157,14 @@ export const COMBO_ITEMS: readonly ComboItem[] = [
  */
 export const CEILING_ANCHOR_TEMPLATE_ROW: Pick<
   ComboItem,
-  'itemId' | 'name' | 'description' | 'lanes' | 'parents'
+  'itemId' | 'name' | 'description' | 'lanes' | 'parents' | 'parentItemIds'
 > = {
   itemId: 'combo.ceiling_anchor',
   name: 'Ceiling anchor',
   description: 'Pinned to the roof, the twin bits bite upward at a slant without a wobble.',
   lanes: ['mobility', 'drill-gear'],
   parents: ['tech.mobility.grav_anchor', 'tech.drill_gear.twin_bit'],
+  parentItemIds: ['power.grav_anchor', 'gear.twin_bit'],
 }
 
 /** The catalogue row of `itemId`, or null for an item that is not a combo of this slice. */

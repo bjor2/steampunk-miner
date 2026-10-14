@@ -1,9 +1,12 @@
 {
-  "source": "Spec #162 section 4.1 (Systems & Economy, locked 6 Oct 2026): a combo is a one-off store item, k 15 band-5 ore priced at its unlock planet; #206 carries the same rule. The node's own research cost (kCombo 20) is the tech tree's (#161 section 3).",
+  "source": "Spec #162 section 4.1 (Systems & Economy, locked 6 Oct 2026): a combo is a one-off store item, k 15 band-5 ore priced at its unlock planet; #206 carries the same rule. The node's own research cost (kCombo 20) is the tech tree's (#161 section 3). Grades: the GD lock on #206 (decision 7) closes a fixed share of the remaining headroom per grade in integer bp; the share is 206b's pick (half of what is left), flagged on the ticket for the Vertical Scaler.",
   "items": {
     "price": {
       "band": 5,
       "oreUnits": "15"
     }
+  },
+  "grades": {
+    "headroomShareBp": 5000
   }
 }

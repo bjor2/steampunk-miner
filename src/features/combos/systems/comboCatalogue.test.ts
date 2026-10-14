@@ -83,6 +83,18 @@ describe('combo catalogue', () => {
     expect(missing).toEqual([HELD_PARENT])
   })
 
+  it('names as parent items the store items its parent nodes unlock', () => {
+    const unlocksOf = new Map(
+      contentOf('tech-node').map((node) => [node.id, (node as TechNode).unlocks]),
+    )
+    ;[...COMBO_ITEMS, CEILING_ANCHOR_TEMPLATE_ROW].forEach((item) =>
+      item.parents.forEach((parent, index) => {
+        const unlocks = unlocksOf.get(parent)
+        if (unlocks !== undefined) expect(item.parentItemIds[index], parent).toBe(unlocks)
+      }),
+    )
+  })
+
   it('finds a combo by its item id, and nothing for another lane', () => {
     expect(comboItemOf('combo.alarm_shield')?.name).toBe('Alarm shield')
     expect(comboItemOf('power.mineral_drain')).toBeNull()
