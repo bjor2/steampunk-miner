@@ -26,6 +26,7 @@
  */
 import { DENSITY_CELL_UNITS, TERRAIN_EDIT_UNITS_PER_TICK } from '../../constants/terrainBudget'
 import type { DrillBit } from '../vehicle/aheadBearingLatch'
+import type { CutAxis } from '../vehicle/casingTrail'
 import type { CutGate } from '../vehicle/cutGate'
 import type { DriveSigns } from '../vehicle/driveSigns'
 import { sweptDrillStampOf } from '../vehicle/drillStamp'
@@ -250,8 +251,13 @@ function settleSweep(
       state: withCursorAt(current, playerId, sweep, reached),
       events: withoutStandingMetBefore(effect.events, sweep, carved.reachedStep),
     }),
-    (current) => layCasingAlongCut(current, playerId, reached, isCutting),
+    (current) => layCasingAlongCut(current, playerId, cutAxisOf(sweep.path, reached), isCutting),
   ])
+}
+
+/** The line the stamp's centre cut along: from the cursor, or a fresh path's one disc. */
+function cutAxisOf(path: SweepPath, reached: StampPoint): CutAxis {
+  return { from: path.isFresh ? reached : path.from, to: reached }
 }
 
 /** A fresh path that could cut nothing stays at its start: the body. */

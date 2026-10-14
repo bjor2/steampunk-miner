@@ -78,9 +78,27 @@ describe('casing trail along the swept cut (ticket 330)', () => {
   function followCutAlongX(stepMm: number, toMm: number) {
     let trail: CasingTrail = EMPTY_CASING_TRAIL
     for (const x of stepsTo(toMm, stepMm)) {
-      trail = followCasingTrailAlongCut(trail, { xMm: x, yMm: 0 }, true).trail
+      trail = followCasingTrailAlongCut(trail, cutTo(x, stepMm), true).trail
     }
     return trail
+  }
+
+  /** A swept cut that ran `stepMm` along x to `x`, its start no further back than 0. */
+  const cutTo = (x: number, stepMm: number) => ({
+    from: { xMm: Math.max(0, x - stepMm), yMm: 0 },
+    to: { xMm: x, yMm: 0 },
+  })
+
+  /** The x of each ring due, cutting along x at `stepMm` a tick to `toMm`. */
+  function dueAlongX(stepMm: number, toMm: number): number[] {
+    let trail: CasingTrail = EMPTY_CASING_TRAIL
+    const due: number[] = []
+    for (const x of stepsTo(toMm, stepMm)) {
+      const step = followCasingTrailAlongCut(trail, cutTo(x, stepMm), true)
+      trail = step.trail
+      due.push(...step.due.map((point) => point.xMm))
+    }
+    return due
   }
 
   it.each([60, 300, 290])('records a point every half metre at %i mm a step', (stepMm) => {
@@ -91,21 +109,26 @@ describe('casing trail along the swept cut (ticket 330)', () => {
   })
 
   it('leaves no gap and charges no lag at 18 m/s, 300 mm a tick', () => {
-    let trail: CasingTrail = EMPTY_CASING_TRAIL
-    const due: number[] = []
-    for (const x of stepsTo(30000, 300)) {
-      const step = followCasingTrailAlongCut(trail, { xMm: x, yMm: 0 }, true)
-      trail = step.trail
-      due.push(...step.due.map((point) => point.xMm))
-    }
+    const due = dueAlongX(300, 30000)
     const gaps = due.slice(1).map((x, index) => x - due[index])
     expect(due.length).toBeGreaterThan(50)
     expect(new Set(gaps)).toEqual(new Set([500]))
   })
 
-  it('starts a new cut where the last point is past the ring lag', () => {
-    const start = followCasingTrailAlongCut(EMPTY_CASING_TRAIL, { xMm: 0, yMm: 0 }, true).trail
-    const far = followCasingTrailAlongCut(start, { xMm: 9000, yMm: 0 }, true).trail
+  // Ticket 335: 60, 240 and 960 m/s are 1, 4 and 16 m a tick.
+  it.each([1000, 4000, 16000])(
+    'lays the rings due half a metre apart, in order, at %i mm a tick',
+    (stepMm) => {
+      const due = dueAlongX(stepMm, 96000)
+      const gaps = due.slice(1).map((x, index) => x - due[index])
+      expect(due.length).toBeGreaterThan(150)
+      expect(new Set(gaps)).toEqual(new Set([500]))
+    },
+  )
+
+  it('starts a new cut where the sweep starts past the ring lag of the last point', () => {
+    const start = followCasingTrailAlongCut(EMPTY_CASING_TRAIL, cutTo(0, 0), true).trail
+    const far = followCasingTrailAlongCut(start, cutTo(9000, 0), true).trail
     expect(far.lastAxisPoint).toEqual({ xMm: 9000, yMm: 0 })
   })
 })

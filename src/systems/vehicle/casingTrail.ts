@@ -15,7 +15,10 @@
  *
  * The swept cut (ticket 330) records along its cut instead (`followCasingTrailAlongCut`): a point
  * every `CASING_RING_SPACING_MM` on the line from the last recorded point to the centre the cut
- * reached, each standing for one spacing, so the rings keep their spacing at any step length.
+ * reached, each standing for one spacing, so the rings keep their spacing at any step length. A
+ * cut continues the trail when its sweep starts within the ring lag of the last point (ticket 335):
+ * measured from the sweep's start, not its end, so a step of any length (16 m at 960 m/s) keeps
+ * its rings every 0.5 m instead of starting a new cut at its far end.
  */
 import {
   CASING_RING_LAG_MM,
@@ -59,23 +62,29 @@ export function followCasingTrail(
   return splitDuePoints(recorded, stampCentre)
 }
 
-/** The trail after the swept cut's stamp centre reached `stampCentre`, recording at fixed spacing. */
-export function followCasingTrailAlongCut(
-  trail: CasingTrail,
-  stampCentre: RingPoint,
-  isCutting: boolean,
-): TrailStep {
-  const recorded = isCutting ? recordAxisPointsAlong(trail, stampCentre) : trail
-  return splitDuePoints(recorded, stampCentre)
+/** Where one swept cut's stamp centre ran: from its sweep's start to where the cut reached. */
+export interface CutAxis {
+  from: RingPoint
+  to: RingPoint
 }
 
-/** One point per whole spacing from the last point toward the centre; a new cut starts as before. */
-function recordAxisPointsAlong(trail: CasingTrail, stampCentre: RingPoint): CasingTrail {
+/** The trail after the swept cut's stamp centre ran along `axis`, recording at fixed spacing. */
+export function followCasingTrailAlongCut(
+  trail: CasingTrail,
+  axis: CutAxis,
+  isCutting: boolean,
+): TrailStep {
+  const recorded = isCutting ? recordAxisPointsAlong(trail, axis) : trail
+  return splitDuePoints(recorded, axis.to)
+}
+
+/** One point per whole spacing from the last point toward the cut's end; a new cut starts as before. */
+function recordAxisPointsAlong(trail: CasingTrail, { from, to }: CutAxis): CasingTrail {
   const last = trail.lastAxisPoint
-  if (last === null || squaredDistance(last, stampCentre) > squared(CASING_RING_LAG_MM)) {
-    return recordAxisPoint(trail, stampCentre)
+  if (last === null || squaredDistance(last, from) > squared(CASING_RING_LAG_MM)) {
+    return recordAxisPoint(trail, to)
   }
-  const points = spacedPointsBetween(last, stampCentre)
+  const points = spacedPointsBetween(last, to)
   if (points.length === 0) return trail
   return {
     lastAxisPoint: pointOnly(points[points.length - 1]),

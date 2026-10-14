@@ -14,6 +14,7 @@ import {
   followCasingTrail,
   followCasingTrailAlongCut,
   type AxisPoint,
+  type CutAxis,
   type RingPoint,
   type TrailStep,
 } from '../vehicle/casingTrail'
@@ -61,19 +62,19 @@ export function layDueCasingAtPose(
 }
 
 /**
- * The swept cut's rings (ticket 330): axis points at fixed spacing along the line to where the
- * step's stamp centre cut, so no step length leaves a gap.
+ * The swept cut's rings (tickets 330, 335): axis points at fixed spacing along the line to where
+ * the step's stamp centre cut, so no step length leaves a gap; the rings due are laid in order.
  */
 export function layCasingAlongCut(
   state: AuthorityState,
   playerId: string,
-  reached: RingPoint,
+  axis: CutAxis,
   isCutting: boolean,
 ): RuleEffect {
   const params = planetParamsOf(state.planet)
   const vehicle = vehicleOf(state, playerId)
   if (params === null || !isVehicleActive(vehicle)) return unchanged(state)
-  const step = followCasingTrailAlongCut(vehicle.casingTrail, reached, isCutting)
+  const step = followCasingTrailAlongCut(vehicle.casingTrail, axis, isCutting)
   return layTrailStep(state, playerId, params, step)
 }
 
