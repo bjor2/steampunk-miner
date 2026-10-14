@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { withRegistrations } from '../../registries/registrar'
 import { add, fromCanonical, toCanonical, ZERO_MONEY } from '../money'
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { ENERGY_QUANTA_PER_TICK } from '../vehicle/energyQuanta'
 import { cellDensitySum } from '../world/cellYield'
 import type { TilePoint } from '../world/tileGrid'
 import { EMPTY_WORLD } from '../world/worldState'
 import { vehicleOf, type AuthorityState } from './authorityState'
 import { toCanonicalJson } from './canonicalJson'
+import { cellDigEnergyOf } from './cellDigEnergy'
 import type { RuleEffect } from './commandRule'
 import type { DomainEventBody } from './domainEvent'
 import { FLOOR, HEAT_PARAMS } from './lava/lavaFixtures'
@@ -149,13 +151,17 @@ describe('swept span per chunk against the per-cell carve (ticket 374)', () => {
     expect(events.some(({ type }) => type === 'CoreTileHarvested')).toBe(true)
   })
 
-  it.each(SPEEDS_M_PER_S)('charges at most 4 quanta a swept tick at %i m/s', (speed) => {
+  // Ticket 335 (TD lock on #374): energy exact per cell, so a tick charges each cell it broke.
+  it.each(SPEEDS_M_PER_S)('charges each cell a swept tick breaks at %i m/s', (speed) => {
     const fixture = chunkCornerSweep(speed)
-    const states = [fixture.start(), ...spanCutsOf(fixture).map(({ effect }) => effect.state)]
+    const cuts = spanCutsOf(fixture)
+    const states = [fixture.start(), ...cuts.map(({ effect }) => effect.state)]
     const tanks = states.map((state) => vehicleOf(state, 'p1').energy)
     const charges = tanks.slice(1).map((tank, index) => tanks[index] - tank)
-    expect(ENERGY_QUANTA_PER_TICK.drill).toBe(4)
-    expect(Math.max(...charges)).toBe(ENERGY_QUANTA_PER_TICK.drill)
+    // The strong drill breaks every cell at the 24-tick floor, so each costs the same.
+    const perCell = cellDigEnergyOf(24 * DRILL_SUBSTEPS_PER_TICK)
+    expect(charges).toEqual(cuts.map(({ tally }) => tally.cells * perCell))
+    expect(Math.max(...charges)).toBeGreaterThan(ENERGY_QUANTA_PER_TICK.drill)
   })
 })
 

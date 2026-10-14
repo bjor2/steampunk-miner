@@ -79,10 +79,17 @@ export interface DrillCarveRequest {
 export interface DrillCarve extends Carve {
   /** The energy the drill gear's cells cost beyond the disc's ticks, in quanta. */
   gearQuanta: number
+  /** The drill gear's cells this cut reached, each with its energy share (ticket 335). */
+  gearCells: readonly GearCellShare[]
   /** The ahead bearing this cut latched, or null when no gear is aimed by the drive. */
   aheadLatch: AheadLatch | null
   /** The faced side this cut latched, or null when no side ask is aimed by the drive. */
   sideLatch: SideLatch | null
+}
+
+/** A drill-gear cell and its energy share, in basis points of the drill's. */
+export interface GearCellShare extends TilePoint {
+  shareBp: number
 }
 
 /** The drill gear's cells for one drill command, after `canMine`. */
@@ -97,7 +104,7 @@ export interface DrillGearRead {
 
 /** A carve with no drill gear: nothing beyond the disc's ticks. */
 export function withoutGear(carve: Carve): DrillCarve {
-  return { ...carve, gearQuanta: 0, aheadLatch: null, sideLatch: null }
+  return { ...carve, gearQuanta: 0, gearCells: [], aheadLatch: null, sideLatch: null }
 }
 
 export function carveStampWithGear(
@@ -263,7 +270,8 @@ function carveDiscAndGear(
     walk,
   )
   const latches = { aheadLatch: read.aheadLatch, sideLatch: read.sideLatch }
-  return { ...carved, gearQuanta: gearQuantaOf(carved, shares), ...latches }
+  const gearCells = cells.map((tile, index) => ({ ...tile, shareBp: shares[index] }))
+  return { ...carved, gearQuanta: gearQuantaOf(carved, shares), gearCells, ...latches }
 }
 
 /** Each listed cell's energy share in basis points, in carve order: ahead cells, then side. */

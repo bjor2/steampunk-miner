@@ -223,7 +223,7 @@ function isPortableHeat(heat: unknown): boolean {
   )
 }
 
-/** The swept cut's cursor (tickets 330, 333 and 335): its reach, step, cut gate and passed share. */
+/** The swept cut's cursor (tickets 330, 333, 335): reach, step, cut gate, share and dig time. */
 function isPortableSweptCut(cursor: unknown): boolean {
   return (
     isJsonObject(cursor) &&
@@ -234,7 +234,8 @@ function isPortableSweptCut(cursor: unknown): boolean {
     isWholeNumber(cursor.tick) &&
     (cursor.cutGate === 0 || cursor.cutGate === 1) &&
     isWholeNumber(cursor.cutGateLowTicks) &&
-    isWholeNumber(cursor.cutSharePassed)
+    isWholeNumber(cursor.cutSharePassed) &&
+    isWholeNumber(cursor.digSubSteps)
   )
 }
 

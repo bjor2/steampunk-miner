@@ -16,7 +16,8 @@
  *
  * With the dev flag `drill.sweptCut` on, `drillStep` (`drillStepRules.ts`, ticket 330) cuts every
  * tick the drill is engaged; a report whose drill ticks those steps already cut charges and lays
- * only the rest: movement, heat, lava and the rings now due.
+ * only the rest: movement, heat (for the steps' summed dig time, ticket 335), lava and the rings
+ * now due.
  *
  * Action tick counts may not exceed the ticks since the last charged command plus one report
  * interval of slack; more is refused (never trimmed), so a tap is charged exactly once.
@@ -32,6 +33,7 @@ import {
   type VehiclePose,
 } from '../vehicle/vehiclePose'
 import { reportSpeedOfStepBound } from '../vehicle/stepBound'
+import { stepDigTicksOf } from '../vehicle/sweptCut'
 import { isVehicleActive, type VehicleState } from '../vehicle/vehicleState'
 import type { TilePoint } from '../world/tileGrid'
 import { isRemovableCell } from '../world/worldCell'
@@ -114,7 +116,7 @@ export const VEHICLE_COMMAND_RULES: {
             current,
             command.playerId,
             command.tick,
-            reportedHeatActivity(command.payload),
+            reportedHeatActivity(command.payload, vehicleOf(state, command.playerId)),
           ),
         (current) =>
           touchLavaAtPose(current, command.playerId, command.tick, command.payload.drillTicks > 0),
@@ -214,12 +216,21 @@ function actionTicksOf(payload: PosePayload): number[] {
   return [payload.thrustTicks, payload.driveTicks, payload.drillTicks]
 }
 
-/** A report with no action ticks at all is the vehicle stopped to cool down (#113 "idle"). */
-function reportedHeatActivity(payload: PosePayload): HeatActivity {
+/**
+ * A report with no action ticks at all is the vehicle stopped to cool down (#113 "idle"). The
+ * drilling it heats for is its own drill ticks, or, when the swept cut's steps cut them, the steps'
+ * summed dig time (ticket 335), as `vehicle` stood before the report.
+ */
+function reportedHeatActivity(payload: PosePayload, vehicle: VehicleState): HeatActivity {
   return {
-    drillTicks: payload.drillTicks,
+    drillTicks: reportedDrillTicksOf(payload, vehicle),
     isIdle: actionTicksOf(payload).every((ticks) => ticks === 0),
   }
+}
+
+function reportedDrillTicksOf(payload: PosePayload, vehicle: VehicleState): number {
+  const cursor = vehicle.sweptCut
+  return isCutBySteps(vehicle) && cursor !== undefined ? stepDigTicksOf(cursor) : payload.drillTicks
 }
 
 function poseOf(payload: PosePayload): VehiclePose {

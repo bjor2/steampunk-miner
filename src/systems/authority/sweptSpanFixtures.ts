@@ -161,6 +161,21 @@ export function chunkCornerSweep(speed: number): SweepFixture {
   }
 }
 
+/**
+ * Planet 1 straight down column 30, 30 m through softened ground about 40 tiles under the surface
+ * (ticket 335: the same path at any speed).
+ */
+export function columnSweep(speed: number): SweepFixture {
+  const from = { x: 30_500, y: 261_500 }
+  const to = { x: 30_500, y: 231_500 }
+  return {
+    start: () => armed(createScriptedSession(), from, FACING.down, { x: 30_500, y: 246_000 }),
+    params: PARAMS,
+    slices: [],
+    positions: positionsAlong(from, to, speed),
+  }
+}
+
 /** Drill gear cutting a cell past the bit and one each side of the bore (tickets 234, 279). */
 const WIDE_GEAR: SliceDefinition = {
   id: 'gear-probe',

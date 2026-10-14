@@ -17,7 +17,8 @@
  * (`magnetic/electrifiedShock.ts`, spec #258).
  *
  * The swept cut (`drillStep`, ticket 330, `sweptDrill.ts`) goes through the same path one tick at a
- * time, counting drill time in sub-steps (`SUB_STEP_CLOCK`); every other drill counts whole ticks.
+ * time, counting drill time in sub-steps (`SUB_STEP_CLOCK`) and charging each cell it breaks its own
+ * dig energy (ticket 335, `cellDigEnergy.ts`); every other drill counts and charges whole ticks.
  */
 import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { casingHardness } from '../economy/casingGrades'
@@ -49,6 +50,7 @@ import {
   type DrillCarveRequest,
 } from './drillGearCut'
 import { openDrillGates, type DrillGates } from './drillGates'
+import { sweptCutEnergyOf } from './cellDigEnergy'
 import { groundChangedEventsOf } from './groundChangedEvents'
 import { heatThrottledDrill } from './heatRules'
 import { minedOreOf, type MinedOre } from './minedOre'
@@ -65,7 +67,9 @@ type CarveIn<C extends DrillCarve = DrillCarve> = (request: DrillCarveRequest) =
 
 /**
  * How a drill command counts drill time: in whole ticks, or in the swept cut's sub-steps of a
- * tick (ticket 330), with the cell times read in the same unit.
+ * tick (ticket 330), with the cell times read in the same unit; and what its carve costs: the ticks
+ * the stamp still removed something in, or (the swept cut, ticket 335) each broken cell's own dig
+ * energy (`cellDigEnergy.ts`).
  */
 export interface DrillClock {
   subStepsPerTick: number
@@ -74,13 +78,25 @@ export interface DrillClock {
     drill: DrillStats,
     shockTicksAt: ShockTicksAt,
   ) => CellDrillTicks
+  /** The quanta a carve costs from a tank of `tank`, its cells timed by `cellTimes`. */
+  energyOf: (carved: DrillCarve, cellTimes: CellDrillTicks, tank: number) => number
 }
 
-export const WHOLE_TICK_CLOCK: DrillClock = { subStepsPerTick: 1, cellTimesOf: drillTicksOfCells }
+export const WHOLE_TICK_CLOCK: DrillClock = {
+  subStepsPerTick: 1,
+  cellTimesOf: drillTicksOfCells,
+  energyOf: tickEnergyOf,
+}
 
 export const SUB_STEP_CLOCK: DrillClock = {
   subStepsPerTick: DRILL_SUBSTEPS_PER_TICK,
   cellTimesOf: drillSubStepsOfCells,
+  energyOf: sweptCutEnergyOf,
+}
+
+/** The ticks the stamp still removed something in, at the drill's rate, and its gear's cells. */
+function tickEnergyOf(carved: DrillCarve): number {
+  return carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill + carved.gearQuanta
 }
 
 /** Scripted mining: one cell's samples; call with a planet that has params. */
@@ -197,7 +213,7 @@ export function drillGroundBy<C extends DrillCarve>(
   const cellTicks = clock.cellTimesOf(params, drill, shockTicksFor(state, playerId))
   const gates = openDrillGates(state, playerId, params, cellTicks)
   const carved = target.carve({ world: state.world, window, gates, energy: vehicle.energy })
-  const effect = chargeAndCollect(state, params, playerId, { target, drill, gates, carved })
+  const effect = chargeAndCollect(state, params, playerId, { target, drill, gates, carved, clock })
   return { effect, carved }
 }
 
@@ -211,6 +227,7 @@ interface CarvedDrill {
   target: DrillTarget<DrillCarve>
   drill: DrillStats
   gates: DrillGates
+  clock: DrillClock
   carved: DrillCarve
 }
 
@@ -218,13 +235,13 @@ function chargeAndCollect(
   state: AuthorityState,
   params: PlanetParams,
   playerId: string,
-  { target, drill, gates, carved }: CarvedDrill,
+  { target, drill, gates, carved, clock }: CarvedDrill,
 ): RuleEffect {
   const vehicle = vehicleOf(state, playerId)
   if (carved.ticksUsed === 0) return { state, events: gates.refusedEvents() }
   const charged = withVehicle({ ...state, world: carved.world }, playerId, {
     ...withLatches(vehicle, carved),
-    energy: vehicle.energy - carved.ticksUsed * ENERGY_QUANTA_PER_TICK.drill - carved.gearQuanta,
+    energy: vehicle.energy - clock.energyOf(carved, gates.drillTicksOf, vehicle.energy),
   })
   const collected = chainEffects(charged, [
     (current) => collectYieldedCells(current, playerId, params, carved.yielded, gates),

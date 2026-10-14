@@ -14,6 +14,7 @@
  *   the stamp still cuts every other cell up to its face. A fresh path whose body point is already
  *   in such a cell cuts nothing.
  */
+import { DRILL_SUBSTEPS_PER_TICK } from '../../constants/balance'
 import { UP_VECTOR_SCALE } from '../../constants/physics'
 import type { DiscStamp, StampPoint } from '../world/stampShape'
 import type { CutGate } from './cutGate'
@@ -26,8 +27,9 @@ export const SWEEP_STEP_MM = 125
 /**
  * The vehicle's cursor: where the last drill step's cut reached (the next step's start), the
  * position that step reported (the next step's bound is measured from it), its facing and tick,
- * the cut gate as that step left it (ticket 333), and what it left of its per-cell share for the
- * next player that tick (ticket 335, `cutShare.ts`).
+ * the cut gate as that step left it (ticket 333), what it left of its per-cell share for the
+ * next player that tick (ticket 335, `cutShare.ts`), and the dig time the steps since the last
+ * charged report cut, in sub-steps, which that report heats from (ticket 335).
  */
 export interface SweptCut extends StampPoint, CutGate {
   poseXMm: number
@@ -35,6 +37,27 @@ export interface SweptCut extends StampPoint, CutGate {
   facing: Facing
   tick: number
   cutSharePassed: number
+  digSubSteps: number
+}
+
+/**
+ * The cursor's dig time after a step that cut `added` sub-steps: added to the steps' since the last
+ * charged report (`accountedTick`), or to what that report left of a whole tick (TD lock on #374:
+ * heat comes from summed dig time, so overheat never becomes a hidden speed cap).
+ */
+export function digSubStepsAfter(
+  cursor: SweptCut | undefined,
+  accountedTick: number,
+  added: number,
+): number {
+  if (cursor === undefined) return added
+  const isSinceReport = cursor.tick > accountedTick
+  return (isSinceReport ? cursor.digSubSteps : cursor.digSubSteps % DRILL_SUBSTEPS_PER_TICK) + added
+}
+
+/** The whole ticks of drilling a report heats for: the steps' summed dig time since the last. */
+export function stepDigTicksOf(cursor: SweptCut): number {
+  return Math.floor(cursor.digSubSteps / DRILL_SUBSTEPS_PER_TICK)
 }
 
 /** One step's path for the stamp's centre. */

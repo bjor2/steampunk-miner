@@ -2,7 +2,8 @@
  * How a swept cut's tick settles (tickets 330 and 335, split from `sweptDrill.ts`): the cursor
  * moves to where the cut reached with what it left of its per-cell share (`cutShare.ts`), a
  * standing cell is reported once as the sweep meets it, and the casing rings the cut makes due are
- * laid in order along it, their cells taken off the share passed on.
+ * laid in order along it, their cells taken off the share passed on. The cursor also sums the dig
+ * time of the cells the steps broke since the last charged report, which that report heats from.
  *
  * A step that continues its cursor leaves out the gated cells its start's disc already reached, and
  * one that made no headway reports none, so holding the drill against a gate does not repeat it
@@ -10,7 +11,7 @@
  * measured, and the cut gate read before the cut (`cutFollowRead.ts`, ticket 333).
  */
 import type { CutAxis } from '../vehicle/casingTrail'
-import { pointAtStep, type SweepPath, type SweptCut } from '../vehicle/sweptCut'
+import { digSubStepsAfter, pointAtStep, type SweepPath, type SweptCut } from '../vehicle/sweptCut'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
 import { discSamplesOf, type DiscStamp, type StampPoint } from '../world/stampShape'
 import { vehicleOf, withVehicle, type AuthorityState } from './authorityState'
@@ -25,6 +26,12 @@ function tileKeyOfSample(sx: number, sy: number): string {
   return `${Math.floor(sx / SAMPLES_PER_TILE)},${Math.floor(sy / SAMPLES_PER_TILE)}`
 }
 
+/** A tick's sweep and the dig time of the cells it broke, in sub-steps (`drillCutTally.ts`). */
+export interface SweptTickCut {
+  sweep: Sweep
+  digSubSteps: number
+}
+
 /**
  * The cursor moves to the cut's reach with what it left of its share, standing cells are reported
  * once, rings follow the cut and take their cells off the share passed on.
@@ -32,7 +39,7 @@ function tileKeyOfSample(sx: number, sy: number): string {
 export function settleSweep(
   outcome: DrillOutcome<SweptCarve>,
   playerId: string,
-  sweep: Sweep,
+  { sweep, digSubSteps }: SweptTickCut,
 ): RuleEffect {
   const { effect, carved } = outcome
   if (carved === null) return effect
@@ -40,7 +47,7 @@ export function settleSweep(
   const passed = sharePassedOf(sweep.share, carved.cells)
   return chainEffects(effect.state, [
     (current) => ({
-      state: withCursorAt(current, playerId, sweep, { reached, passed }),
+      state: withCursorAt(current, playerId, sweep, { reached, passed, digSubSteps }),
       events: withoutStandingMetBefore(effect.events, sweep, carved.reachedStep),
     }),
     (current) => layRingsAlongCut(current, playerId, cutAxisOf(sweep.path, reached), carved),
@@ -79,19 +86,21 @@ function reachedPointOf(path: SweepPath, reachedStep: number): StampPoint {
   return pointAtStep(path, Math.max(0, reachedStep))
 }
 
-/** Where a step's cut reached, and what it left of its share for the next player. */
+/** Where a step's cut reached, what it left of its share for the next player, and its dig time. */
 interface CursorReach {
   reached: StampPoint
   passed: number
+  digSubSteps: number
 }
 
 function withCursorAt(
   state: AuthorityState,
   playerId: string,
   { step, gate }: Sweep,
-  { reached, passed }: CursorReach,
+  { reached, passed, digSubSteps }: CursorReach,
 ): AuthorityState {
   const vehicle = vehicleOf(state, playerId)
+  const dig = digSubStepsAfter(vehicle.sweptCut, vehicle.accountedTick, digSubSteps)
   const cursor: SweptCut = {
     ...reached,
     poseXMm: step.pose.x,
@@ -100,6 +109,7 @@ function withCursorAt(
     tick: state.tick,
     ...gate,
     cutSharePassed: passed,
+    digSubSteps: dig,
   }
   return withVehicle(state, playerId, { ...vehicle, sweptCut: cursor })
 }

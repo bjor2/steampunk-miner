@@ -8,7 +8,10 @@ import { NO_DRIVE, type DriveSigns } from '../vehicle/driveSigns'
 import { FACING } from '../vehicle/vehiclePose'
 import { cellDensitySum } from '../world/cellYield'
 import { surfaceRowOfColumn, type TilePoint } from '../world/tileGrid'
-import { EMPTY_WORLD } from '../world/worldState'
+import { EMPTY_WORLD, materialCellAt } from '../world/worldState'
+import { statsOfVehicle } from '../vehicle/vehicleState'
+import { cellDigEnergyOf } from './cellDigEnergy'
+import { drillSubStepsOfCells } from './groundDrill'
 import type { DomainEvent } from './domainEvent'
 import {
   createScriptedSession,
@@ -76,7 +79,7 @@ describe('drill step (ticket 330)', () => {
     expect(session.vehicle().sweptCut?.tick).toBe(30)
   })
 
-  it('charges the drill only for the ticks it cut', () => {
+  it('charges each cell it breaks its own dig energy, and nothing for ground it only wears', () => {
     const session = sessionFacingDownAt()
     const before = session.vehicle().energy
     stepDown(session, 0, 5)
@@ -86,7 +89,19 @@ describe('drill step (ticket 330)', () => {
     session.submit(7, { type: 'reportPose', payload: { ...payload, ...near } })
     const charged = session.vehicle().energy
     session.submit(8, stepTo(near.x, near.y))
-    expect(charged - session.vehicle().energy).toBe(ENERGY_QUANTA_PER_TICK.drill)
+    expect(tilesDestroyed(session.submit(9, stepTo(near.x, near.y)))).toEqual([])
+    expect(charged - session.vehicle().energy).toBe(0)
+    for (let tick = 10; tick <= 80; tick++) session.submit(tick, stepTo(near.x, near.y))
+    const broken = tilesDestroyed(session.events())
+    const subStepsOf = drillSubStepsOfCells(PARAMS, statsOfVehicle(session.vehicle()), () => 0)
+    const energyOf = (event: (typeof broken)[number]) => {
+      const tile = { tx: event.tx, ty: event.ty }
+      return cellDigEnergyOf(subStepsOf(tile, materialCellAt(EMPTY_WORLD, PARAMS, tile), 0) ?? 0)
+    }
+    expect(broken.length).toBeGreaterThan(0)
+    expect(charged - session.vehicle().energy).toBe(
+      broken.reduce((sum, event) => sum + energyOf(event), 0),
+    )
   })
 
   it('refuses a second step in one tick', () => {

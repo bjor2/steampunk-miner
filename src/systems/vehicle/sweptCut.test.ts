@@ -3,10 +3,12 @@ import { discSamplesOf } from '../world/stampShape'
 import { CLOSED_CUT_GATE } from './cutGate'
 import { sweptDrillStampOf } from './drillStamp'
 import {
+  digSubStepsAfter,
   lastClearStep,
   pointAtStep,
   sweepPathOf,
   sweptStampOf,
+  stepDigTicksOf,
   SWEEP_STEP_MM,
   type SweptCut,
 } from './sweptCut'
@@ -36,6 +38,7 @@ const CURSOR: SweptCut = {
   tick: 9,
   ...CLOSED_CUT_GATE,
   cutSharePassed: 0,
+  digSubSteps: 0,
 }
 
 describe('swept cut path (ticket 330)', () => {
@@ -86,5 +89,24 @@ describe('swept cut path (ticket 330)', () => {
   it('cuts nothing on a fresh path whose body point stands in a stopping cell', () => {
     const path = sweepPathOf(undefined, POSE, STEP_STAMP, 10)
     expect(lastClearStep(path, () => true)).toBe(-1)
+  })
+})
+
+describe('swept cut dig time for heat (ticket 335)', () => {
+  const at = (tick: number, digSubSteps: number): SweptCut => ({ ...CURSOR, tick, digSubSteps })
+
+  it('adds a step dig time to the steps since the last charged report', () => {
+    expect(digSubStepsAfter(undefined, 0, 90)).toBe(90)
+    expect(digSubStepsAfter(at(9, 150), 6, 90)).toBe(240)
+  })
+
+  it('keeps only what the report left of a whole tick once it has charged the steps', () => {
+    expect(digSubStepsAfter(at(9, 150), 9, 90)).toBe(30 + 90)
+    expect(digSubStepsAfter(at(9, 150), 12, 0)).toBe(30)
+  })
+
+  it('heats for the whole ticks of the summed dig time', () => {
+    expect(stepDigTicksOf(at(9, 59))).toBe(0)
+    expect(stepDigTicksOf(at(9, 150))).toBe(2)
   })
 })

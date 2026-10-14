@@ -37,6 +37,7 @@ import { vehicleOf, type AuthorityState } from './authorityState'
 import type { RuleEffect } from './commandRule'
 import { cutGateAt } from './cutFollowRead'
 import { cutCellsWithin, perCellShareAt } from './cutShare'
+import { digSubStepsOfCells } from './drillCutTally'
 import {
   carveStampWithRead,
   drillGearReadAt,
@@ -125,7 +126,8 @@ export function drillSweepBy(
   const carve = (request: DrillCarveRequest) =>
     carveSweep(state, params, playerId, { sweep, request }, walkOf)
   const outcome = drillGroundBy(state, params, playerId, { tile: target, carve }, 1, SUB_STEP_CLOCK)
-  return { effect: settleSweep(outcome, playerId, sweep), carved: outcome.carved }
+  const digSubSteps = digSubStepsOfCells(state, params, playerId, outcome.carved?.yielded ?? [])
+  return { effect: settleSweep(outcome, playerId, { sweep, digSubSteps }), carved: outcome.carved }
 }
 
 function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Sweep {
@@ -192,6 +194,7 @@ function emptyCarveOf(world: WorldState): SweptCarve {
     ticksUsed: 0,
     casingCleared: { samples: 0, grade: 0 },
     gearQuanta: 0,
+    gearCells: [],
     aheadLatch: null,
     sideLatch: null,
     reachedStep: -1,

@@ -44,7 +44,7 @@ export function drillCutTallyOf(
     cells: broken.length,
     value: cargoValueOf(effect.events),
     ores: oreCountsOf(params, broken),
-    digSubSteps: digSubStepsOf(before, params, playerId, broken),
+    digSubSteps: digSubStepsOfCells(before, params, playerId, broken),
   }
 }
 
@@ -68,7 +68,8 @@ function isOreCell(cell: number): boolean {
   return kindOfCell(cell) === CELL_KIND.ore
 }
 
-function digSubStepsOf(
+/** The broken cells' own drill times from `before`, summed in sub-steps of a tick. */
+export function digSubStepsOfCells(
   before: AuthorityState,
   params: PlanetParams,
   playerId: string,
