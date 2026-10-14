@@ -6,9 +6,9 @@
  *   hollow specs share, and the story planets whose own row wins over their act's class (P30, relic).
  * - `planet-mix.economy.json` `magnetic` (Systems): how far a ferrous vein's field reaches past the
  *   vein's own radius, and the share of ferrous cells that are electrified, in basis points. The
- *   share is the balance lever the lock names first, before the shock time: 2000 ran P25 and P28
- *   +12% slower and +40% income a minute over the class off on the first Tester run, so ticket 353
- *   lowered it to 500.
+ *   share is the balance lever the lock names first, before the shock time. It is #289's 2000:
+ *   ticket 353 cut it to 500 for a slow first Tester run whose real cause was the pace harness
+ *   arriving with the planet-1 hull (ticket 354), so ticket 356 restored it.
  */
 import economyFile from '../planet-mix.economy.json'
 import classesFile from '../planetClasses.json'
