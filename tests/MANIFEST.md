@@ -27,21 +27,28 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 
 ## Slices
 
-### `aetheric`: 12 files, 101 tests
+### `aetheric`: 19 files, 130 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
 | `src/features/aetheric/aetherCondenser.test.ts` | 7 | 7 |
 | `src/features/aetheric/aethericCards.vision.test.ts` | 4 | 4 |
+| `src/features/aetheric/aethericCombos.test.ts` | 3 | 3 |
 | `src/features/aetheric/arcCoil.test.ts` | 9 | 9 |
 | `src/features/aetheric/chronometricGovernor.test.ts` | 10 | 10 |
 | `src/features/aetheric/governorCondenserRows.test.ts` | 12 | 6 |
 | `src/features/aetheric/itemHeat.test.ts` | 4 | 4 |
 | `src/features/aetheric/lanternArcRows.test.ts` | 15 | 9 |
+| `src/features/aetheric/pendulumAnchor.test.ts` | 5 | 5 |
 | `src/features/aetheric/phaseLantern.pace.test.ts` | 2 | 1 |
 | `src/features/aetheric/phaseLantern.test.ts` | 18 | 15 |
+| `src/features/aetheric/quenchCutters.test.ts` | 5 | 5 |
+| `src/features/aetheric/quenchCuttersPace.lane.test.ts` | 2 | 1 |
 | `src/features/aetheric/resonanceWhistle.test.ts` | 8 | 8 |
+| `src/features/aetheric/stillFoam.test.ts` | 4 | 4 |
 | `src/features/aetheric/systems/aethericNodes.test.ts` | 5 | 5 |
+| `src/features/aetheric/systems/render/comboCues.test.ts` | 4 | 4 |
+| `src/features/aetheric/warningChime.test.ts` | 6 | 6 |
 | `src/features/aetheric/whistleRows.test.ts` | 7 | 7 |
 
 ### `artefact`: 4 files, 31 tests
@@ -72,10 +79,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/codex/systems/codexSection.test.ts` | 7 | 7 |
 | `src/features/codex/systems/codexSize.test.ts` | 1 | 1 |
 
-### `combos`: 15 files, 87 tests
+### `combos`: 16 files, 92 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
+| `src/features/combos/aethericPairs.test.ts` | 4 | 4 |
 | `src/features/combos/alarmShield.test.ts` | 2 | 2 |
 | `src/features/combos/ceilingAnchor.test.ts` | 7 | 7 |
 | `src/features/combos/ceilingAnchorBounds.test.ts` | 3 | 3 |
@@ -85,7 +93,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/combos/gatesFixture.test.ts` | 3 | 3 |
 | `src/features/combos/scene/ceilingAnchorParts.test.ts` | 3 | 3 |
 | `src/features/combos/shippedRows.test.ts` | 6 | 6 |
-| `src/features/combos/systems/comboCatalogue.test.ts` | 9 | 9 |
+| `src/features/combos/systems/comboCatalogue.test.ts` | 10 | 10 |
 | `src/features/combos/systems/comboGrades.test.ts` | 4 | 4 |
 | `src/features/combos/systems/comboHooks.test.ts` | 14 | 14 |
 | `src/features/combos/systems/comboRows.test.ts` | 8 | 8 |
@@ -423,7 +431,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/sensing/systems/threatPeriscope.test.ts` | 6 | 6 |
 | `src/features/sensing/systems/useResolution.test.ts` | 16 | 16 |
 
-### `tech-tree`: 54 files, 381 tests
+### `tech-tree`: 54 files, 382 tests
 
 | File | Tests | Sites |
 | --- | --- | --- |
@@ -450,7 +458,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/features/tech-tree/systems/forkNode.test.ts` | 7 | 7 |
 | `src/features/tech-tree/systems/forkPace.test.ts` | 6 | 6 |
 | `src/features/tech-tree/systems/forkRechoice.spend.test.ts` | 3 | 3 |
-| `src/features/tech-tree/systems/generatedCombos.test.ts` | 9 | 9 |
+| `src/features/tech-tree/systems/generatedCombos.test.ts` | 10 | 10 |
 | `src/features/tech-tree/systems/incomeCapCheck.test.ts` | 16 | 16 |
 | `src/features/tech-tree/systems/itemDescriber.test.ts` | 3 | 3 |
 | `src/features/tech-tree/systems/itemMarks.test.ts` | 4 | 4 |

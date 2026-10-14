@@ -413,6 +413,15 @@ programs }` from three's `renderer.info` of the game canvas), read only when cal
   and with stabiliser foam slotted at its cure Mark and pressed by the magnet hand, so each spray
   cures its cells for good. Gated on the seed median: time to core at least 0.98x the bare time.
   Run it by name; a miss is a balance finding for the cure.
+- **Quench cutters** (the GD ruling on #373, ticket 373): the lane
+  `features/aetheric/quenchCuttersPace.lane.test.ts` plays the bot from on-curve arrival to the
+  core of planets 41 and 60 on the three pacing seeds through the quench hand
+  (`aetheric/quenchHand.ts`: side cutters kept engaged, the condenser run once a second whenever a
+  dry run accepts it), with and without the combo owned. Gated per planet:
+  the combo strands the bot on an empty tank no more often than the run without it (gate 2), and
+  the median core-time ratio stays at or above 0.98 (gate 3). Gate 1, net drill energy per cell at
+  least 0.9x, is a unit assert in `quenchCutters.test.ts`: the refund per dig second stays under a
+  tenth of the drill's draw at the condenser's ratio, whatever the bot's speed. Run it by name.
 - **Money to planet 200** (#316 TD scope f, TD pin on #123, ticket 340): `npm run balance:money-p200`
   runs the lane `logging/moneyPastP200.lane.test.ts`. The bot plays the bot scenario on the first
   pacing seed to planet 200's core (prices near 1e104), headless, keeping no run log
