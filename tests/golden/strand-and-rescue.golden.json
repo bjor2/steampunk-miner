@@ -2,10 +2,11 @@
   "name": "strand-and-rescue",
   "description": "Energy set to 0.05, drive off the pad until it runs out, stranded, towed after the grace (#7).",
   "generatorVersion": 8,
-  "authorityProtocolVersion": 52,
+  "authorityProtocolVersion": 53,
   "logSchemaVersion": 5,
   "numberFormatVersion": 1,
   "sliceSections": {
+    "aetheric": 1,
     "codex": 1,
     "combos": 1,
     "drill-gear": 1,

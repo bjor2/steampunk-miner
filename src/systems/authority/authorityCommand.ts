@@ -149,8 +149,12 @@ import type { DriveSigns } from '../vehicle/driveSigns'
  *    `ground-gun.GunMounted` and `ground-gun.TrackLevelBought`, `debug.ground-gun.setLevels`, the
  *    `boreGun` provider built from the tracks, and the pickup of bored ore on the trip's income
  *    cap with `ground-gun.BoredOreCapped`. With no gun mounted no digest or mined order changes.
+ * 53: the resonance whistle (ticket 262, #245 build 2): the `aetheric` player section v1 with
+ *    each player's sounding whistle, its `aetheric.lures` clock step, `aetheric.WhistleSounded`,
+ *    and the hunters' step hearing its lure (`enemy.lureRetarget` on). With no whistle blown no
+ *    digest or mined order changes.
  */
-export const AUTHORITY_PROTOCOL_VERSION = 52
+export const AUTHORITY_PROTOCOL_VERSION = 53
 
 /** The kernel's own commands: the closed set its rule tables are written against. */
 export interface KernelCommandPayloads {
