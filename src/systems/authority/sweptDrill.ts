@@ -21,6 +21,8 @@
  * - The stamp's front sits further ahead than a report's by the step the rig may take while it
  *   cuts (`sweptStampAheadMmAt`, tickets 333 and 334), so this tick's cut always clears the step
  *   the body may take next tick.
+ * - The swept span (`sweptSpanDrill.ts`, ticket 374) cuts the same tick through `drillSweepBy`
+ *   with its stamp walked per chunk and no terrain budget; everything else here is shared.
  */
 import { DENSITY_CELL_UNITS, TERRAIN_EDIT_UNITS_PER_TICK } from '../../constants/terrainBudget'
 import type { DrillBit } from '../vehicle/aheadBearingLatch'
@@ -39,6 +41,7 @@ import type { VehiclePose } from '../vehicle/vehiclePose'
 import type { VehicleState } from '../vehicle/vehicleState'
 import type { PlanetParams } from '../world/planetParams'
 import { discSamplesOf, type DiscStamp, type StampPoint } from '../world/stampShape'
+import { walkStampInRows } from '../world/groundEdit'
 import { SAMPLES_PER_TILE } from '../world/sampleGrid'
 import type { TilePoint } from '../world/tileGrid'
 import { isRemovableCell } from '../world/worldCell'
@@ -70,7 +73,7 @@ export interface SweptStep {
 }
 
 /** A step's path, the stamp at its end, and the cut gate read before it cuts (ticket 333). */
-interface Sweep {
+export interface Sweep {
   step: SweptStep
   stamp: DiscStamp
   path: SweepPath
@@ -78,7 +81,7 @@ interface Sweep {
 }
 
 /** A sweep's carve and the sub-step it reached, or -1 when a fresh path could cut nothing. */
-interface SweptCarve extends DrillCarve {
+export interface SweptCarve extends DrillCarve {
   reachedStep: number
 }
 
@@ -98,10 +101,39 @@ export function drillAlongSweep(
   target: TilePoint,
   step: SweptStep,
 ): RuleEffect {
+  return drillSweepBy(state, params, playerId, { target, step }, carveWithinBudget).effect
+}
+
+/** A drill step's tick: the cell it is said to work on and the step it cuts with. */
+export interface SweptTick {
+  target: TilePoint
+  step: SweptStep
+}
+
+/** How a tick's sweep is carved once its gates' furthest clear sub-step is known. */
+export type ClearSweepCarve = (
+  state: AuthorityState,
+  params: PlanetParams,
+  playerId: string,
+  cut: ClearSweep,
+) => SweptCarve
+
+/**
+ * One tick of the swept cut, carved by `carveClear`: the gates stop the sweep, the one drill path
+ * charges and collects it, and the cursor and rings settle where it reached.
+ */
+export function drillSweepBy(
+  state: AuthorityState,
+  params: PlanetParams,
+  playerId: string,
+  { target, step }: SweptTick,
+  carveClear: ClearSweepCarve,
+): DrillOutcome<SweptCarve> {
   const sweep = sweepOf(state, playerId, step)
-  const carve = (request: DrillCarveRequest) => carveSweep(state, params, playerId, sweep, request)
+  const carve = (request: DrillCarveRequest) =>
+    carveSweep(state, params, playerId, { sweep, request }, carveClear)
   const outcome = drillGroundBy(state, params, playerId, { tile: target, carve }, 1, SUB_STEP_CLOCK)
-  return settleSweep(outcome, playerId, sweep)
+  return { effect: settleSweep(outcome, playerId, sweep), carved: outcome.carved }
 }
 
 function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Sweep {
@@ -117,17 +149,23 @@ function sweepOf(state: AuthorityState, playerId: string, step: SweptStep): Swee
   }
 }
 
+/** A sweep and the drill command's carve request. */
+interface SweepRequest {
+  sweep: Sweep
+  request: DrillCarveRequest
+}
+
 function carveSweep(
   state: AuthorityState,
   params: PlanetParams,
   playerId: string,
-  sweep: Sweep,
-  request: DrillCarveRequest,
+  { sweep, request }: SweepRequest,
+  carveClear: ClearSweepCarve,
 ): SweptCarve {
   const isStop = (tile: TilePoint) => isStopCell(request.world, params, request.gates, tile)
   const clear = lastClearStep(sweep.path, isStop)
   if (clear < 0) return emptyCarveOf(request.world)
-  return carveWithinBudget(state, params, playerId, { sweep, request, clear })
+  return carveClear(state, params, playerId, { sweep, request, clear })
 }
 
 /** A cell standing in the drill's way: solid, not yet opened, and one it cannot cut. */
@@ -156,30 +194,31 @@ function emptyCarveOf(world: WorldState): SweptCarve {
   }
 }
 
-interface BudgetedCut {
-  sweep: Sweep
-  request: DrillCarveRequest
+/** A sweep whose gates leave it clear up to `clear`. */
+export interface ClearSweep extends SweepRequest {
   /** The furthest sub-step the gates leave clear. */
   clear: number
 }
 
-/** The furthest clear sub-step whose stamp and gear fit the budget, carved. */
+/** The furthest clear sub-step whose stamp and gear fit the budget, carved in rows. */
 function carveWithinBudget(
   state: AuthorityState,
   params: PlanetParams,
   playerId: string,
-  { sweep, request, clear }: BudgetedCut,
+  { sweep, request, clear }: ClearSweep,
 ): SweptCarve {
   for (let reached = clear; ; reached--) {
     const bit = bitAt(sweep, reached)
     const read = drillGearReadAt(state, params, playerId, bit, request.gates)
     if (reached === 0 || cellsTouchedBy(bit.disc, read) <= DRILL_CELLS_PER_TICK) {
-      return { ...carveStampWithRead(params, bit, read, request), reachedStep: reached }
+      const carved = carveStampWithRead(params, bit, read, request, walkStampInRows)
+      return { ...carved, reachedStep: reached }
     }
   }
 }
 
-function bitAt({ step, path, stamp }: Sweep, reached: number): DrillBit {
+/** The drill bit reaching sub-step `reached` of the sweep. */
+export function bitAt({ step, path, stamp }: Sweep, reached: number): DrillBit {
   return { pose: step.pose, disc: sweptStampOf(path, stamp, reached), drive: step.drive }
 }
 

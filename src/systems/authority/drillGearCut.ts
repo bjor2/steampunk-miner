@@ -56,6 +56,8 @@ import {
   type Carve,
   type CarveBesideDisc,
   type CarveWindow,
+  type StampWalk,
+  walkStampInRows,
 } from '../world/groundEdit'
 import type { PlanetParams } from '../world/planetParams'
 import type { DiscStamp } from '../world/stampShape'
@@ -106,22 +108,25 @@ export function carveStampWithGear(
   request: DrillCarveRequest,
 ): DrillCarve {
   const read = drillGearReadAt(state, params, playerId, bit, request.gates)
-  return carveStampWithRead(params, bit, read, request)
+  return carveStampWithRead(params, bit, read, request, walkStampInRows)
 }
 
-/** The cut at the bit with its gear read already taken: the swept cut counts its cells first. */
+/**
+ * The cut at the bit with its gear read already taken, walking the stamp by `walk`: the swept cut
+ * counts its cells first, and the swept span walks it per chunk (ticket 374).
+ */
 export function carveStampWithRead(
   params: PlanetParams,
   bit: DrillBit,
   read: DrillGearRead | null,
   request: DrillCarveRequest,
+  walk: StampWalk,
 ): DrillCarve {
   if (read === null) {
-    return withoutGear(
-      carveDisc(request.world, params, bit.disc, request.window, request.gates.drillTicksOf),
-    )
+    const { world, window, gates } = request
+    return withoutGear(carveDisc(world, params, bit.disc, window, gates.drillTicksOf, walk))
   }
-  return carveDiscAndGear(params, bit.disc, read, request)
+  return carveDiscAndGear(params, { disc: bit.disc, walk }, read, request)
 }
 
 /** The player's drill gear at the bit, listing only the cells that pass `canMine`; else null. */
@@ -233,9 +238,15 @@ function isMineableCell(
   return isRemovableCell(cell) && gates.canMine({ tile, cell })
 }
 
+/** The bit's stamp and how the carve walks it. */
+interface WalkedDisc {
+  disc: DiscStamp
+  walk: StampWalk
+}
+
 function carveDiscAndGear(
   params: PlanetParams,
-  disc: DiscStamp,
+  { disc, walk }: WalkedDisc,
   read: DrillGearRead,
   request: DrillCarveRequest,
 ): DrillCarve {
@@ -249,6 +260,7 @@ function carveDiscAndGear(
     cells,
     windows,
     request.gates.drillTicksOf,
+    walk,
   )
   const latches = { aheadLatch: read.aheadLatch, sideLatch: read.sideLatch }
   return { ...carved, gearQuanta: gearQuantaOf(carved, shares), ...latches }
