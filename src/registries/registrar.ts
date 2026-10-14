@@ -87,6 +87,7 @@ import { VEHICLE_PIECE_REGISTRY } from '../scene/registries/vehiclePieces'
 import { WORLD_PIECE_REGISTRY } from '../scene/registries/worldPieces'
 import { LOADOUT_ACCEPTANCE_REGISTRY } from '../systems/registries/vehicleLoadout'
 import { BAY_PANEL_REGISTRY } from '../ui/registries/bayPanels'
+import { BAY_ENTRY_REGISTRY } from '../systems/registries/bayEntries'
 import { BAY_SCREEN_REGISTRY } from '../ui/registries/bayScreens'
 import { HUD_PANEL_REGISTRY } from '../ui/registries/hudPanels'
 import { MONEY_COUNTER_REGISTRY } from '../ui/registries/moneyCounter'
@@ -132,6 +133,7 @@ export function registrarFor(sliceId: string): SliceRegistrar {
       entries.forEach((entry) => add(ITEM_DESCRIPTION_ENTRY_REGISTRY, entry)),
     loadoutAcceptance: (rule) => add(LOADOUT_ACCEPTANCE_REGISTRY, rule),
     vehicleItemSeller: (seller) => add(VEHICLE_ITEM_SELLER_REGISTRY, seller),
+    bayEntry: (source) => add(BAY_ENTRY_REGISTRY, source),
     vehicleItemResearch: (provider) => add(VEHICLE_ITEM_RESEARCH_REGISTRY, provider),
     attachUse: (use) => add(ATTACH_USE_REGISTRY, use),
     buildingAttachUse: (use) => add(BUILDING_ATTACH_USE_REGISTRY, use),

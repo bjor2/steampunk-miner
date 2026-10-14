@@ -52,6 +52,7 @@ import type { SaveSection } from '../systems/registries/saveSections'
 import type { SoundCue } from '../systems/registries/soundCues'
 import type { AttachUse } from '../systems/registries/vehicleAttach'
 import type { VehicleItemResearch, VehicleItemSeller } from '../systems/registries/vehicleItemSales'
+import type { BayEntrySource } from '../systems/registries/bayEntries'
 import type { VehicleMotionEffectSource } from '../systems/registries/vehicleMotionEffects'
 import type { VehicleStagingProvider } from '../systems/registries/vehicleStaging'
 import type { SceneLayer } from '../scene/registries/sceneLayers'
@@ -151,6 +152,11 @@ export interface SliceRegistrar {
   loadoutAcceptance(rule: LoadoutAcceptance): void
   /** Names and prices the slice's own vehicle items for `buyVehicleItem` (ticket 248). */
   vehicleItemSeller(seller: VehicleItemSeller): void
+  /**
+   * What the slice sells at the Upgrade bay through its own commands, asked once the anchor row
+   * is open; the anchor must be a schedule row and no id may name an unlock id (ticket 344).
+   */
+  bayEntry(source: BayEntrySource): void
   /** One provider across all slices (`tech-tree`): whether an item's node is researched. */
   vehicleItemResearch(provider: VehicleItemResearch): void
   attachUse(use: AttachUse): void

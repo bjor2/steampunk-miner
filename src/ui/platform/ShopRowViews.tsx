@@ -1,6 +1,7 @@
 /**
  * The Upgrade bay's buy rows in the track grid (#33 section 6, #37): the six tracks, then Casing
- * (#41, #58), Lining (#113), Guns (#107) and the tech-unlocked vehicle items (ticket 248). Each draws as the kernel item card's compact shop row
+ * (#41, #58), Lining (#113), Guns (#107), the tech-unlocked vehicle items (ticket 248) and the
+ * slices' bay entries (ticket 344). Each draws as the kernel item card's compact shop row
  * once a describer answers, and as the row below until then (K7 #199). Markup only.
  */
 import type { StatPreview, WorkshopRow } from '../../systems/views/workshopRows'
@@ -8,6 +9,8 @@ import type { GunRow } from '../../systems/views/gunRow'
 import type { LiningRow } from '../../systems/views/liningRow'
 import type { CasingRow } from '../../systems/views/upgradeBayModel'
 import type { VehicleItemRow } from '../../systems/views/vehicleItemRows'
+import type { BayEntryRow } from '../../systems/views/bayEntryRows'
+import type { ScreenButton } from '../../systems/views/viewParts'
 import { ItemCard } from '../kit/ItemCard'
 import { UI_ID_TEMPLATES, UI_IDS } from '../ids'
 import { ScreenButtonView } from '../ScreenButtonView'
@@ -158,6 +161,56 @@ export function VehicleItemRowView({ row, focusedId }: { row: VehicleItemRow; fo
         <ScreenButtonView button={row.buy} focusedId={focusedId} state={row.buyState} />
       </div>
     </ItemCard>
+  )
+}
+
+/** A slice's bay entry: its card while it is for sale; Mastered, with no buy, at its wall. */
+export function BayEntryRowView({ row, focusedId }: { row: BayEntryRow; focusedId: string }) {
+  if (row.buy === null) return <BayEntryLine row={row} buy={null} focusedId={focusedId} />
+  return (
+    <ItemCard variant="compact" card={row.card} buy={row.buy} focusedId={focusedId}>
+      <BayEntryLine row={row} buy={row.buy} focusedId={focusedId} />
+    </ItemCard>
+  )
+}
+
+function BayEntryLine({
+  row,
+  buy,
+  focusedId,
+}: {
+  row: BayEntryRow
+  buy: ScreenButton | null
+  focusedId: string
+}) {
+  return (
+    <div
+      className={rowStyles.trackRow}
+      data-testid={UI_ID_TEMPLATES.upgradebayEntry(row.entryId)}
+      data-buy-state={row.buyState ?? undefined}
+    >
+      <VectorIcon iconId={row.iconId} badge={row.badge} hasGlint={row.isBuyOpen} />
+      <span>{row.label}</span>
+      <span data-testid={UI_ID_TEMPLATES.upgradebayEntryLevel(row.entryId)}>{row.levelText}</span>
+      <span
+        className={rowStyles.cost}
+        data-testid={UI_ID_TEMPLATES.upgradebayEntryCost(row.entryId)}
+        data-exact={row.cost.exact}
+      >
+        {row.cost.text}
+      </span>
+      <span
+        className={rowStyles.effect}
+        data-testid={UI_ID_TEMPLATES.upgradebayEntryEffect(row.entryId)}
+      >
+        {row.effectText}
+      </span>
+      {buy === null ? (
+        <span>Mastered</span>
+      ) : (
+        <ScreenButtonView button={buy} focusedId={focusedId} state={row.buyState ?? undefined} />
+      )}
+    </div>
   )
 }
 

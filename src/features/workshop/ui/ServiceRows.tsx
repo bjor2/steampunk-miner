@@ -1,14 +1,15 @@
 /**
  * The Upgrade bay's rows that are not a track (#41 casing, #113 lining, #107 guns, #109 charges,
- * the tech-unlocked vehicle items of ticket 248), hull and repair, the look tier and quick
- * service, under the showcase. They are the kernel's own row views, so their #33 ids and their
- * click buys stay exactly as before. Markup only.
+ * the tech-unlocked vehicle items of ticket 248, the slices' bay entries of ticket 344), hull and
+ * repair, the look tier and quick service, under the showcase. They are the kernel's own row
+ * views, so their #33 ids and their click buys stay exactly as before. Markup only.
  */
 import { UI_IDS } from '../../../ui/ids'
 import { ItemTooltip } from '../../../ui/kit/ItemTooltip'
 import { Field } from '../../../ui/platform/BayHeader'
 import { ChargeRowsView } from '../../../ui/platform/ChargeRowsView'
 import {
+  BayEntryRowView,
   CasingRowView,
   GunRowView,
   LiningRowView,
@@ -28,6 +29,9 @@ export function ServiceRows({ model, focusedId }: { model: UpgradeBayModel; focu
         {model.charges !== null && <ChargeRowsView rows={model.charges} focusedId={focusedId} />}
         {model.items.map((row) => (
           <VehicleItemRowView key={row.itemId} row={row} focusedId={focusedId} />
+        ))}
+        {model.entries.map((row) => (
+          <BayEntryRowView key={row.entryId} row={row} focusedId={focusedId} />
         ))}
       </div>
       <div className={styles.serviceActions}>

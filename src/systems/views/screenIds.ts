@@ -146,6 +146,12 @@ export const UI_ID_TEMPLATES = {
   upgradebayItem: (itemId: string) => `upgradebay-item-${itemId}`,
   upgradebayItemCost: (itemId: string) => `upgradebay-item-${itemId}-cost`,
   upgradebayItemBuy: (itemId: string) => `upgradebay-item-${itemId}-buy`,
+  // A slice's bay entry (ticket 344), by its entry id; a Mastered entry has no `-buy`.
+  upgradebayEntry: (entryId: string) => `upgradebay-entry-${entryId}`,
+  upgradebayEntryLevel: (entryId: string) => `upgradebay-entry-${entryId}-level`,
+  upgradebayEntryCost: (entryId: string) => `upgradebay-entry-${entryId}-cost`,
+  upgradebayEntryEffect: (entryId: string) => `upgradebay-entry-${entryId}-effect`,
+  upgradebayEntryBuy: (entryId: string) => `upgradebay-entry-${entryId}-buy`,
   artefactCard: (optionId: string) => `artefact-card-${optionId}`,
   artefactChoose: (optionId: string) => `artefact-choose-${optionId}`,
   settingsToggle: (name: string) => `settings-toggle-${name}`,
