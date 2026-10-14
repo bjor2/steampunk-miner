@@ -41,7 +41,7 @@ export const MIN_TIME_BP = 9800
 export const MAX_INCOME_BP = BASIS_POINTS + ECONOMY.magnets.incomeCapBp
 
 /** Two hours on one planet: room for a slow core on either run. */
-const BUDGET_TICKS = 2 * 60 * 60 * TICKS_PER_SECOND
+export const BUDGET_TICKS = 2 * 60 * 60 * TICKS_PER_SECOND
 const TICKS_PER_MINUTE = 60 * TICKS_PER_SECOND
 
 const BARE_LOADOUT = setVehicleLoadoutCommand({})
