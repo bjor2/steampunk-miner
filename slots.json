@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T21:42:26+02:00",
+  "updated_at": "2026-10-14T21:43:07+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -104,32 +104,23 @@
     }
   ],
   "gate": {
-    "busy": 0,
+    "busy": 1,
     "max": 3
   },
   "tester": {
     "state": "running",
-    "phase": "triage-fast",
-    "sha": "7cb7387b6227c7183160b35d01ea104316d20bf2",
-    "since": "2026-10-14T19:36:26Z",
-    "holds_gate": false,
+    "phase": "fast",
+    "sha": "753bf01c96f03868faf55013bebd60cb8e8eb101",
+    "since": "2026-10-14T19:43:03Z",
+    "holds_gate": true,
     "claude_slot": null,
-    "last_run": "2026-10-14T17:09:40Z",
+    "last_run": "2026-10-14T19:42:54Z",
     "last_nightly": "2026-10-08T05:23:05Z",
     "last_nightly_result": "full=FAIL balance-report=ok bench=ok balance-planets=ok balance-guns=ok balance-charges=ok balance-refinery=ok balance-heat=ok e2e=FAIL memory-soak=ok packaged-smoke=ok ",
     "main_red_sha": null,
-    "feature": 301,
-    "feature_title": "Finish smooth vehicle movement from PR #210: port to main and fix the scenario digest mismatch",
+    "feature": 311,
+    "feature_title": "Spec: Faster hold-to-buy from the start",
     "queue": [
-      {
-        "feature": 311,
-        "kind": "spec",
-        "title": "Spec: Faster hold-to-buy from the start",
-        "tickets": [
-          312
-        ],
-        "since": "2026-10-08T01:03:01+02:00"
-      },
       {
         "feature": 142,
         "kind": "spec",
