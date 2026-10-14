@@ -814,6 +814,11 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/render/groundBlocks.test.ts` | 7 | 7 |
 | `src/systems/render/groundStrata.test.ts` | 6 | 6 |
 | `src/systems/render/gunLook.test.ts` | 7 | 7 |
+| `src/systems/render/hazardStrip/hazardStripPlanet.test.ts` | 5 | 2 |
+| `src/systems/render/hazardStrip/hazardStripSampler.test.ts` | 18 | 11 |
+| `src/systems/render/hazardStrip/seededStripGround.test.ts` | 10 | 6 |
+| `src/systems/render/hazardStrip/stripPath.test.ts` | 8 | 6 |
+| `src/systems/render/hazardStrip/stripViewer.test.ts` | 2 | 2 |
 | `src/systems/render/headlamp.test.ts` | 3 | 3 |
 | `src/systems/render/heatShimmer.test.ts` | 2 | 2 |
 | `src/systems/render/heatTiles.test.ts` | 3 | 3 |
@@ -911,7 +916,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/store/liveStepSlice.test.ts` | 13 | 13 |
 | `src/store/padRuntime.test.ts` | 16 | 14 |
 | `src/store/partInstall.test.ts` | 5 | 5 |
-| `src/store/perfLog.test.ts` | 6 | 6 |
+| `src/store/perfLog.test.ts` | 8 | 8 |
 | `src/store/planetCardSlice.test.ts` | 5 | 5 |
 | `src/store/platformLoop.test.ts` | 4 | 4 |
 | `src/store/runSnapshots.test.ts` | 10 | 10 |
@@ -1069,6 +1074,7 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/views/chargeViews.test.ts` | 14 | 14 |
 | `src/systems/views/combatStatuses.test.ts` | 8 | 8 |
 | `src/systems/views/engineTrackMaxed.test.ts` | 4 | 4 |
+| `src/systems/views/hazardStripView.test.ts` | 3 | 3 |
 | `src/systems/views/heatViews.test.ts` | 5 | 5 |
 | `src/systems/views/hudModel.test.ts` | 27 | 27 |
 | `src/systems/views/itemCardText.test.ts` | 4 | 4 |

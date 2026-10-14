@@ -1753,6 +1753,12 @@
           "issues": [39, 59, 179]
         },
         {
+          "title": "Hazard strip",
+          "description": "A strip along the drive warns 2 s ahead at any speed: lava, caves, collapsing blocks, the core, the artefact cache and gates (by kind) from P1, top-tier ore from the scanner station (P14), placed by time to arrival with compact metre labels. Far ahead at high speed it reads coarser, never shorter.",
+          "status": "built",
+          "issues": [341]
+        },
+        {
           "title": "4K adaptive resolution",
           "description": "Rendering resolution adjusts to keep the frame rate while the UI stays sharp.",
           "status": "built",
