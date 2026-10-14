@@ -1073,9 +1073,9 @@
         },
         {
           "title": "Tech tree",
-          "description": "Research nodes with money to unlock store items: six lanes on a planet ruler, Marks every 3 planets that step an item's charges, cooldown and effect in play, endless combos from P41 (fifteen lane pairs, each first offered by P86), a tree screen from the HUD. The rules and screen are built, and the mobility, sensing and drill-gear lanes and four terrain tools are in; the other lanes show 'coming soon' until their slices register nodes.",
+          "description": "Research nodes with money to unlock store items: six lanes on a planet ruler, Marks every 3 planets that step an item's charges, cooldown and effect in play, endless combos priced from P41 (fifteen lane pairs, each first offered by P86), a tree screen from the HUD. Money is the only gate: a node, its store item, the guns' mount and refractory lining can be bought on any planet once their prerequisites are met, priced at the planet they used to open on, and a locked card shows its price or what it needs, never a planet. The rules and screen are built, and the mobility, sensing and drill-gear lanes and four terrain tools are in; the other lanes show 'coming soon' until their slices register nodes.",
           "status": "partial",
-          "issues": [165, 200, 201, 202, 203, 204, 205, 206, 212, 249],
+          "issues": [165, 200, 201, 202, 203, 204, 205, 206, 212, 249, 411],
           "doc": "docs/standards/feature-slices.md",
           "children": [
             {
