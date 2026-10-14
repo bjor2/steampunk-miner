@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T04:14:05+02:00",
+  "updated_at": "2026-10-14T04:17:47+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -73,11 +73,11 @@
         },
         {
           "slot": "C6",
-          "state": "free",
-          "ticket": null,
-          "grok_slot": null,
-          "kind": null,
-          "since": null
+          "state": "busy",
+          "ticket": 356,
+          "grok_slot": 4,
+          "kind": "dev",
+          "since": "2026-10-14T04:14:00+02:00"
         },
         {
           "slot": "C7",
@@ -97,9 +97,9 @@
         }
       ],
       "size": 4,
-      "used": 2,
-      "free": 2,
-      "claims_last_hour": 4,
+      "used": 3,
+      "free": 1,
+      "claims_last_hour": 5,
       "name": "Claude Max 2"
     }
   ],
@@ -325,9 +325,10 @@
     },
     {
       "slot": 4,
-      "state": "free",
-      "ticket": null,
-      "since": null
+      "state": "dev",
+      "ticket": 356,
+      "since": "2026-10-14T04:14:00+02:00",
+      "claude_slot": 6
     },
     {
       "slot": 5,
@@ -424,10 +425,10 @@
     },
     {
       "slot": 6,
-      "state": "free",
-      "ticket": null,
-      "grok_slot": null,
-      "since": null,
+      "state": "busy",
+      "ticket": 356,
+      "grok_slot": 4,
+      "since": "2026-10-14T04:14:00+02:00",
       "account": 2
     },
     {
@@ -448,17 +449,17 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-14 04:08 CEST",
-    "mode": "refill-dev",
-    "triggers": "#328",
-    "started": "#206->C2/A1",
+    "at": "2026-10-14 04:14 CEST",
+    "mode": "recheck",
+    "triggers": "#343",
+    "started": "#356->C6/A2",
     "note": "spawned 1 worker(s)"
   },
   "totals": {
     "grok": {
       "size": 12,
-      "used": 6,
-      "dev": 6,
+      "used": 7,
+      "dev": 7,
       "dev_cap": 8,
       "planner": 0,
       "planner_cap": 4
@@ -466,8 +467,8 @@
     "claude": {
       "size": 8,
       "enabled": 8,
-      "used": 6,
-      "free": 2,
+      "used": 7,
+      "free": 1,
       "external": 0
     }
   }
