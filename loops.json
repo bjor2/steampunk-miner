@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-14T05:15:42Z",
+  "updated_at": "2026-10-14T05:19:55Z",
   "entries": {
     "steampunk-loop/1": {
       "loop": "steampunk-loop",
       "slot": "1",
       "state": "working",
       "issue": 260,
-      "note": "tier hard, attempt 1/2",
-      "updated_at": "2026-10-14T05:14:18Z",
+      "note": "started 2026-10-14 07:13 CEST",
+      "updated_at": "2026-10-14T05:19:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/2": {
@@ -16,8 +16,8 @@
       "slot": "2",
       "state": "idle",
       "issue": null,
-      "note": "free; #314 landed on main and closed",
-      "updated_at": "2026-10-14T05:14:53Z",
+      "note": "free",
+      "updated_at": "2026-10-14T05:19:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/3": {
@@ -25,8 +25,8 @@
       "slot": "3",
       "state": "working",
       "issue": 362,
-      "note": "tier easy, attempt 1/2",
-      "updated_at": "2026-10-14T05:05:09Z",
+      "note": "started 2026-10-14 07:04 CEST",
+      "updated_at": "2026-10-14T05:19:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/4": {
@@ -34,8 +34,8 @@
       "slot": "4",
       "state": "working",
       "issue": 365,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-14T05:15:22Z",
+      "note": "started 2026-10-14 07:04 CEST",
+      "updated_at": "2026-10-14T05:19:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop": {
@@ -43,9 +43,9 @@
       "slot": null,
       "state": "working",
       "issue": null,
-      "note": "7/8 Claude slots busy, 0/4 planner slots; status check",
+      "note": "6/8 Claude slots busy, 0/4 planner slots; status check",
       "extra": {
-        "active": 7,
+        "active": 6,
         "max": 8,
         "max_attempts": 2,
         "attempts": {
@@ -230,7 +230,7 @@
           "284": 1,
           "285": 0,
           "294": 1,
-          "314": 1,
+          "314": 2,
           "317": 0,
           "330": 1,
           "331": 1,
@@ -261,12 +261,16 @@
           "334": 0,
           "341": 1,
           "212": 0,
-          "260": 0,
+          "260": 1,
           "288": 0,
           "329": 1,
           "357": 1,
           "358": 1,
-          "360": 1
+          "360": 1,
+          "362": 1,
+          "364": 1,
+          "365": 1,
+          "359": 1
         },
         "tester_grants": {
           "123": {
@@ -288,7 +292,7 @@
         "planner": [],
         "push_pending": null
       },
-      "updated_at": "2026-10-14T05:04:46Z",
+      "updated_at": "2026-10-14T05:19:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "perf-loop": {
@@ -305,8 +309,8 @@
       "slot": "5",
       "state": "working",
       "issue": 364,
-      "note": "tier easy, attempt 1/2 (session running)",
-      "updated_at": "2026-10-14T05:15:17Z",
+      "note": "started 2026-10-14 07:04 CEST",
+      "updated_at": "2026-10-14T05:19:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/6": {
@@ -314,8 +318,8 @@
       "slot": "6",
       "state": "working",
       "issue": 329,
-      "note": "tier hard, attempt 1/2 (session running)",
-      "updated_at": "2026-10-14T05:15:42Z",
+      "note": "started 2026-10-14 06:22 CEST",
+      "updated_at": "2026-10-14T05:19:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/7": {
@@ -323,8 +327,8 @@
       "slot": "7",
       "state": "working",
       "issue": 359,
-      "note": "tier easy, attempt 1/2",
-      "updated_at": "2026-10-14T05:10:15Z",
+      "note": "started 2026-10-14 07:09 CEST",
+      "updated_at": "2026-10-14T05:19:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "steampunk-loop/8": {
@@ -332,8 +336,8 @@
       "slot": "8",
       "state": "idle",
       "issue": null,
-      "note": "free; #358 landed on main and closed",
-      "updated_at": "2026-10-14T05:09:08Z",
+      "note": "free",
+      "updated_at": "2026-10-14T05:19:55Z",
       "host": "grok-bot-vm-452660841"
     },
     "tester": {
