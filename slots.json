@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T05:22:07+02:00",
+  "updated_at": "2026-10-14T05:23:35+02:00",
   "caps": {
     "grok": 12,
     "claude": 8,
@@ -459,11 +459,11 @@
     }
   ],
   "last_refill": {
-    "at": "2026-10-14 05:15 CEST",
-    "mode": "recheck",
-    "triggers": "#345",
-    "started": "#334->C1/A1 #338->C7/A2 #341->C4/A1",
-    "note": "spawned 3 worker(s)"
+    "at": "2026-10-14 05:23 CEST",
+    "mode": "refill-dev",
+    "triggers": "#286 #314 #334 #338 #341",
+    "started": "",
+    "note": "spawned 0 worker(s)"
   },
   "totals": {
     "grok": {
