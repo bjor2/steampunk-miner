@@ -634,6 +634,9 @@ Gate seeds: 83921, 31415, 27182 (`src/constants/pacingSeeds.ts`, #84).
 | `src/systems/authority/combat/gunFire.test.ts` | 12 | 12 |
 | `src/systems/authority/combat/hitArc.test.ts` | 15 | 4 |
 | `src/systems/authority/combat/spawnPoints.test.ts` | 5 | 5 |
+| `src/systems/authority/combat/turretAim.test.ts` | 9 | 9 |
+| `src/systems/authority/combat/turretFire.test.ts` | 14 | 14 |
+| `src/systems/authority/combat/turretShape.test.ts` | 13 | 13 |
 | `src/systems/authority/combat/vehicleTarget.test.ts` | 2 | 2 |
 | `src/systems/authority/combat/wreckerGuns.test.ts` | 10 | 4 |
 | `src/systems/authority/combat/wreckerRun.test.ts` | 16 | 16 |
